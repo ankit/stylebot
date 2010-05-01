@@ -1,0 +1,18 @@
+{
+	"name":"Stylebot",
+	"version":"0.1",
+	"description":"Adapt the web's appearance.",
+	"background_page":"background.html",	
+	"content_scripts":[
+	{
+		"matches":["http://*/*","https://*/*"],
+		"css":["css/main.css"],
+		"js":["js/jquery.js", "js/main.js", "js/chrome.js"],
+		"run_at":"document_start"
+	}],
+	"page_action": {
+		"default_icon": "images/icon19_off.png",
+		"default_title": "Click to turn CSS editing on"
+	},
+	"permissions": ["tabs"]
+}
