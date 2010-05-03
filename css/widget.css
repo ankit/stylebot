@@ -13,6 +13,7 @@
     font-family:Helvetica, Arial, serif !important;
     padding:10px;
     font-size:10px;
+    z-index:100000;
 }
 
 ul.stylebot-controls{
@@ -50,9 +51,11 @@ li.stylebot-control:hover{
 .stylebot-button{
     background-color:#fbfbfb;
     border-radius:2px;
+    padding:2px;
     border:none;
     -webkit-box-shadow:0px 0px 1px #333;
     color:#313131;
+    margin-right:5px;
 }
 
 .stylebot-button:hover{
@@ -63,10 +66,14 @@ li.stylebot-control:hover{
 
 .stylebot-main-button{
     float:left;
-    margin-right:5px;
 }
 
 .stylebot-textfield{
     border:1px solid #ccc;
     outline:none;
+    padding:2px;
+}
+
+.stylebot-tool{
+    margin-right:5px;
 }

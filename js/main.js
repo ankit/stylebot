@@ -69,6 +69,7 @@ var Stylebot = {
         $(document).click(function(e){
             if(Stylebot.selectedElement && Stylebot.status)
             {
+                e.preventDefault();
                 Stylebot.isEditingElement = true;
                 Stylebot.selectedElement.removeClass('stylebot-selected');
                 Stylebot.Widget.show();
