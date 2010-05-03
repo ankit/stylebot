@@ -1,10 +1,10 @@
 #stylebot{
     display:none;
+    opacity:0.9;
     top:10%;
     right:10%;
     position:fixed;
     border:1px solid #ccc;
-    opacity:1;
     width:200px;
     background-color:#f5f5f5;
     color:#313131;
@@ -14,6 +14,7 @@
     padding:10px;
     font-size:10px;
     z-index:100000;
+    text-align:left;
 }
 
 ul.stylebot-controls{

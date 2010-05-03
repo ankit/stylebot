@@ -11,7 +11,8 @@ $(document).ready(function(){
 var Stylebot = {
     status: false,
     selectedElement:null,
-    isEditingElement:false,
+    hoveredElement:null,
+    isEditing:false,
     shortcutKey:69, //69 is keycode for 'e'
 
     init: function(){
@@ -29,13 +30,14 @@ var Stylebot = {
     },
     disable: function(){
         this.status = false;
-        if(this.selectedElement)
+        if(this.hoveredElement)
         {
-            this.selectedElement.removeClass('stylebot-selected');
-            this.selectedElement = null;
-            this.isEditingElement = false;
+            this.hoveredElement.removeClass('stylebot-selected');
+            this.hoveredElement = null;
         }
+        this.selectedElement = null;
         Stylebot.Chrome.setIcon(false);
+        Stylebot.Widget.hide();
     },
     addListeners: function(){
         /* Handle key presses */
@@ -56,22 +58,31 @@ var Stylebot = {
         
         /* Handle mouse move event on DOM elements */
         $(document).mousemove(function(e){
-            if(!Stylebot.isEditingElement && Stylebot.selectedElement != $(e.target) && Stylebot.status)
+            if(Stylebot.hoveredElement == $(e.target) || !Stylebot.status)
+                return true;
+            var parent = $(e.target).closest('#stylebot');
+            if(e.target.id == "stylebot" || parent.length != 0)
             {
-                if(Stylebot.selectedElement)
-                    Stylebot.selectedElement.removeClass('stylebot-selected');
-                Stylebot.selectedElement = $(e.target);
-                Stylebot.selectedElement.addClass('stylebot-selected');
+                if(Stylebot.hoveredElement)
+                    Stylebot.hoveredElement.removeClass('stylebot-selected');
+                Stylebot.hoveredElement = null;
+                return true;
             }
+            if(Stylebot.hoveredElement)
+                Stylebot.hoveredElement.removeClass('stylebot-selected');
+            Stylebot.hoveredElement = $(e.target);
+            Stylebot.hoveredElement.addClass('stylebot-selected');
         });
         
         /* Handle click event on DOM elements */
         $(document).click(function(e){
-            if(Stylebot.selectedElement && Stylebot.status)
+            if(Stylebot.hoveredElement && Stylebot.status)
             {
                 e.preventDefault();
-                Stylebot.isEditingElement = true;
-                Stylebot.selectedElement.removeClass('stylebot-selected');
+                e.stopPropagation();
+                Stylebot.hoveredElement.removeClass('stylebot-selected');
+                Stylebot.selectedElement = Stylebot.hoveredElement;
+                Stylebot.hoveredElement = null;
                 Stylebot.Widget.show();
             }
         });
