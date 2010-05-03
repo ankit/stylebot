@@ -1,0 +1,72 @@
+#stylebot{
+    display:none;
+    top:10%;
+    right:10%;
+    position:fixed;
+    border:1px solid #ccc;
+    opacity:1;
+    width:200px;
+    background-color:#f5f5f5;
+    color:#313131;
+    -webkit-box-shadow:0px 0px 10px #ccc;
+    border-radius:8px;
+    font-family:Helvetica, Arial, serif !important;
+    padding:10px;
+    font-size:10px;
+}
+
+ul.stylebot-controls{
+    list-style-type:none;
+    margin:0;
+    margin-bottom:20px;
+    padding:0;
+}
+
+li.stylebot-control{
+    padding:3px 2px;
+    margin:5px 0;
+    border-radius:2px;
+}
+
+li.stylebot-control:hover{
+    cursor:pointer;
+    background-color:#ececec;
+}
+
+.stylebot-control-set{
+    margin-top:2px;
+    display:none;
+}
+
+.stylebot-label{
+    font-size:12px;
+    text-shadow:1px 1px 0px #fff;
+}
+
+.stylebot-label:hover{
+    cursor:pointer;
+}
+
+.stylebot-button{
+    background-color:#fbfbfb;
+    border-radius:2px;
+    border:none;
+    -webkit-box-shadow:0px 0px 1px #333;
+    color:#313131;
+}
+
+.stylebot-button:hover{
+    background-color:#686868;
+    color:#fff;
+    cursor:pointer;
+}
+
+.stylebot-main-button{
+    float:left;
+    margin-right:5px;
+}
+
+.stylebot-textfield{
+    border:1px solid #ccc;
+    outline:none;
+}

@@ -6,9 +6,10 @@
 	"content_scripts":[
 	{
 		"matches":["http://*/*","https://*/*"],
-		"css":["css/main.css"],
-		"js":["js/jquery.js", "js/main.js", "js/chrome.js"],
-		"run_at":"document_start"
+		"css":["css/main.css", "css/widget.css"],
+		"js":["js/jquery.js", "js/main.js", "js/chrome.js", "js/widget.js", "js/selector.js"],
+		"run_at":"document_start",
+		"all_frames":true
 	}],
 	"page_action": {
 		"default_icon": "images/icon19_off.png",

@@ -71,11 +71,8 @@ var Stylebot = {
             {
                 Stylebot.isEditingElement = true;
                 Stylebot.selectedElement.removeClass('stylebot-selected');
-                Stylebot.showWidget();
+                Stylebot.Widget.show();
             }
         });
-    },
-    showWidget: function(){
-        
     }
 }
