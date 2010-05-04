@@ -30,11 +30,7 @@ var Stylebot = {
     },
     disable: function(){
         this.status = false;
-        if(this.hoveredElement)
-        {
-            this.hoveredElement.removeClass('stylebot-selected');
-            this.hoveredElement = null;
-        }
+        this.unhighlight();
         this.selectedElement = null;
         Stylebot.Chrome.setIcon(false);
         Stylebot.Widget.hide();
@@ -46,9 +42,7 @@ var Stylebot = {
             {
                 /* Handle shortcut key 'e' to toggle editing mode */
                 if(e.keyCode == Stylebot.shortcutKey)
-                {
                     Stylebot.toggle();
-                }
 
                 /* Handle Esc key to escape editing mode */
                 else if(e.keyCode == 27 && Stylebot.status)
@@ -60,18 +54,14 @@ var Stylebot = {
         $(document).mousemove(function(e){
             if(Stylebot.hoveredElement == $(e.target) || !Stylebot.status)
                 return true;
+            
             var parent = $(e.target).closest('#stylebot');
             if(e.target.id == "stylebot" || parent.length != 0)
             {
-                if(Stylebot.hoveredElement)
-                    Stylebot.hoveredElement.removeClass('stylebot-selected');
-                Stylebot.hoveredElement = null;
+                Stylebot.unhighlight();
                 return true;
             }
-            if(Stylebot.hoveredElement)
-                Stylebot.hoveredElement.removeClass('stylebot-selected');
-            Stylebot.hoveredElement = $(e.target);
-            Stylebot.hoveredElement.addClass('stylebot-selected');
+            Stylebot.highlight(e.target);
         });
         
         /* Handle click event on DOM elements */
@@ -79,12 +69,26 @@ var Stylebot = {
             if(Stylebot.hoveredElement && Stylebot.status)
             {
                 e.preventDefault();
-                e.stopPropagation();
-                Stylebot.hoveredElement.removeClass('stylebot-selected');
-                Stylebot.selectedElement = Stylebot.hoveredElement;
-                Stylebot.hoveredElement = null;
-                Stylebot.Widget.show();
+                e.stopImmediatePropagation();
+                Stylebot.select();
             }
         });
+    },
+    highlight: function(el){
+        if(Stylebot.hoveredElement)
+            Stylebot.hoveredElement.removeClass('stylebot-selected');
+        Stylebot.hoveredElement = $(el);
+        Stylebot.hoveredElement.addClass('stylebot-selected');
+    },
+    unhighlight: function(){
+        if(Stylebot.hoveredElement)
+            Stylebot.hoveredElement.removeClass('stylebot-selected');
+        Stylebot.hoveredElement = null;
+    },
+    select: function(){
+        Stylebot.selectedElement = Stylebot.hoveredElement;
+        Stylebot.unhighlight();
+        Stylebot.Selector.generate();
+        Stylebot.Widget.show();
     }
 }

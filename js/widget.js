@@ -72,6 +72,15 @@ Stylebot.Widget = {
             if(Stylebot.isEditing)
                 Stylebot.Widget.box.css('opacity','0.9');
         });
+        
+        /* listeners to update styles of DOM elements when value of widget controls is changed */
+        $('.stylebot-textfield').keyup(function(e){
+            var property = $(e.target).closest('.stylebot-control').attr('id').substring(9);
+            console.log("Property: " + property);
+            console.log("Value: " + e.target.value);
+            Stylebot.Style.apply(Stylebot.Selector.value, property, e.target.value);
+        });
+        
     },
     show: function(){
         Stylebot.isEditing = true;
@@ -89,7 +98,7 @@ Stylebot.Widget = {
     },
     setPosition: function(){
         var offset = Stylebot.selectedElement.offset();
-        var left = offset.left + Stylebot.selectedElement.width() + 5;
+        var left = offset.left + Stylebot.selectedElement.width() + 10;
         var left_diff = $(document.body).width() - left;
         if(left_diff <= this.box.width())
             left = left - left_diff;

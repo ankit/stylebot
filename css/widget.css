@@ -8,7 +8,7 @@
     width:200px;
     background-color:#f5f5f5;
     color:#313131;
-    -webkit-box-shadow:0px 0px 10px #ccc;
+    -webkit-box-shadow:0px 0px 10px #bbb;
     border-radius:8px;
     font-family:Helvetica, Arial, serif !important;
     padding:10px;
@@ -22,17 +22,21 @@ ul.stylebot-controls{
     margin:0;
     margin-bottom:20px;
     padding:0;
+    border:none;
 }
 
 li.stylebot-control{
     padding:3px 2px;
     margin:5px 0;
+    line-height:normal;
     border-radius:2px;
+    border:none ;
 }
 
 li.stylebot-control:hover{
     cursor:pointer;
-    background-color:#ececec;
+    background-color:#e8e8e8;
+    outline:1px solid #ccc;
 }
 
 .stylebot-control-set{
@@ -42,7 +46,7 @@ li.stylebot-control:hover{
 
 .stylebot-label{
     font-size:12px;
-    text-shadow:1px 1px 0px #fff;
+    text-shadow:0px 1px 0px #fff;
 }
 
 .stylebot-label:hover{
@@ -52,6 +56,7 @@ li.stylebot-control:hover{
 .stylebot-button{
     background-color:#fbfbfb;
     border-radius:2px;
+    font-size:11px;
     padding:2px;
     border:none;
     -webkit-box-shadow:0px 0px 1px #333;
