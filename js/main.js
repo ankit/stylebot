@@ -13,8 +13,9 @@ var Stylebot = {
     selectedElement:null,
     hoveredElement:null,
     isEditing:false,
-    shortcutKey:69, //69 is keycode for 'e'
-
+    defaults: {
+        shortcutKey:69 //69 is keycode for 'e'
+    },
     init: function(){
         this.addListeners();
     },
@@ -27,6 +28,7 @@ var Stylebot = {
     enable: function(){
         this.status = true;
         Stylebot.Chrome.setIcon(true);
+        Stylebot.Widget.show();
     },
     disable: function(){
         this.status = false;
@@ -38,20 +40,22 @@ var Stylebot = {
     addListeners: function(){
         /* Handle key presses */
         $(document).keyup(function(e){
-            if(e.target.tagName != 'INPUT' && e.target.tagName != 'TEXTAREA')
-            {
-                /* Handle shortcut key 'e' to toggle editing mode */
-                if(e.keyCode == Stylebot.shortcutKey)
-                    Stylebot.toggle();
+            var eTagName = e.target.tagName;
+            if(eTagName == 'INPUT' || eTagName == 'TEXTAREA' || eTagName == 'DIV')
+               return true;
+            /* Handle shortcut key 'e' to toggle editing mode */
+            if(e.keyCode == Stylebot.defaults.shortcutKey)
+                Stylebot.toggle();
 
-                /* Handle Esc key to escape editing mode */
-                else if(e.keyCode == 27 && Stylebot.status)
-                    Stylebot.disable();
-            }
+            /* Handle Esc key to escape editing mode */
+            else if(e.keyCode == 27 && Stylebot.status)
+                Stylebot.disable();
         });
         
         /* Handle mouse move event on DOM elements */
         $(document).mousemove(function(e){
+            if(Stylebot.Widget.isBeingDragged)
+                return true;
             if(Stylebot.hoveredElement == $(e.target) || !Stylebot.status)
                 return true;
             
@@ -88,7 +92,7 @@ var Stylebot = {
     select: function(){
         Stylebot.selectedElement = Stylebot.hoveredElement;
         Stylebot.unhighlight();
-        Stylebot.Selector.generate();
+        Stylebot.Selector.generate(Stylebot.selectedElement);
         Stylebot.Widget.show();
     }
 }

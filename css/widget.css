@@ -11,24 +11,34 @@
     -webkit-box-shadow:0px 0px 10px #bbb;
     border-radius:8px;
     font-family:Helvetica, Arial, serif !important;
-    padding:10px;
-    font-size:10px;
+/*    padding:10px;*/
     z-index:100000;
     text-align:left;
+}
+
+.stylebot-header{
+    color:#333;
+    font-size:12px;
+    font-weight:bold;
+    padding: 5px 10px;
+    text-shadow:0px 2px 0px #fff;
+/*    border-bottom: 2px solid #e8e8e8;
+    -webkit-box-shadow:0px 1px 0px #fff;*/
 }
 
 ul.stylebot-controls{
     list-style-type:none;
     margin:0;
-    margin-bottom:20px;
-    padding:0;
     border:none;
+    padding: 5px 10px;
+    border-bottom:1px solid #ccc;
+    -webkit-box-shadow:0px 1px 0px #fff;
 }
 
 li.stylebot-control{
     padding:3px 2px;
     margin:5px 0;
-    line-height:normal;
+    line-height:12px;
     border-radius:2px;
     border:none ;
 }
@@ -39,7 +49,7 @@ li.stylebot-control:hover{
     outline:1px solid #ccc;
 }
 
-.stylebot-control-set{
+.stylebot-control-toolset{
     margin-top:2px;
     display:none;
 }
@@ -51,6 +61,11 @@ li.stylebot-control:hover{
 
 .stylebot-label:hover{
     cursor:pointer;
+}
+
+#stylebot-main-buttons{
+    padding:5px;
+    height:20px;
 }
 
 .stylebot-button{
@@ -70,16 +85,12 @@ li.stylebot-control:hover{
     cursor:pointer;
 }
 
-.stylebot-main-button{
-    float:left;
+.stylebot-tool{
+    margin-right:5px;
 }
 
 .stylebot-textfield{
     border:1px solid #ccc;
     outline:none;
     padding:2px;
-}
-
-.stylebot-tool{
-    margin-right:5px;
 }
