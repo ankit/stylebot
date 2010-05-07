@@ -8,7 +8,7 @@ Stylebot.Widget = {
             id:'stylebot'
         });
         /* Headers */
-        $('<div class="stylebot-header">Add styles</div>').appendTo(this.box);
+        $('<div class="stylebot-header">Custom Styles</div>').appendTo(this.box);
         
         var controls = $('<ul class="stylebot-controls" id="stylebot-styles"></ul>');
 
@@ -16,19 +16,17 @@ Stylebot.Widget = {
         this.createControl('Color', 'color').appendTo(controls);
         this.createControl('Background Color', 'background-color').appendTo(controls);
         this.createControl('Font Size', 'font-size').appendTo(controls);
-        this.createControl('Hide Element', 'hide').appendTo(controls);
+        this.createControl('Hide Element', 'display').appendTo(controls);
         
         controls.appendTo(this.box);
         
-        $('<div class="stylebot-header">Applied styles</div>').appendTo(this.box);
-        
-        var applied_styles = $('<ul class="stylebot-controls" id="stylebot-added-styles"></ul>');
-        
-        applied_styles.appendTo(this.box);
+        // $('<div class="stylebot-header">Applied styles</div>').appendTo(this.box);
+        // var applied_styles = $('<ul class="stylebot-controls" id="stylebot-added-styles"></ul>');
+        // applied_styles.appendTo(this.box);
         
         var buttons = $('<div id="stylebot-main-buttons"></div>');
-        $('<button class="stylebot-button" style="float:left"> Save </button>').appendTo(buttons).click(Stylebot.Widget.save);
-        $('<button class="stylebot-button" style="float:left"> Generate CSS</button>').appendTo(buttons).click(Stylebot.Widget.generateCSS);
+        $('<button class="stylebot-button" style=""> Save </button>').appendTo(buttons).click(Stylebot.Widget.save);
+        $('<button class="stylebot-button" style=""> Generate CSS</button>').appendTo(buttons).click(Stylebot.Widget.generateCSS);
         buttons.appendTo(this.box);
 
         $(document.body).append(this.box);
@@ -38,12 +36,12 @@ Stylebot.Widget = {
             start: function(e, ui){ Stylebot.Widget.isBeingDragged = true; },
             stop: function(e, ui){ Stylebot.Widget.isBeingDragged = false; }
         });
-        
+
         this.addListeners();
     },
     createControl: function(text, property){
         var el = $('<li id="stylebot-'+property+'" class="stylebot-control"></li>');
-        $('<label class="stylebot-label">'+text+'</label>').appendTo(el);
+        $('<label class="stylebot-label">'+text+':</label>').appendTo(el);
         this.createControlToolSet(property, el);
         return el;
     },
@@ -62,16 +60,19 @@ Stylebot.Widget = {
             case 'background-color':
                 tool = $('<input type="text" class="stylebot-textfield stylebot-tool" size="10" />');
                 break;
+            case 'display':
+                tool = $('<input type="checkbox" class="stylebot-tool stylebot-checkbox" value="none"/>');
+                break;
         }
         if(tool)
             tool.appendTo(set);
         
         /* Common UI elements for all control sets */
-        $('<button class="stylebot-button"> add</button>').click(Stylebot.Widget.addStyle).appendTo(set);
-        $('<button class="stylebot-button"> cancel</button>').click(Stylebot.Widget.cancelStyle).appendTo(set);
+        // $('<button class="stylebot-button"> add</button>').click(Stylebot.Widget.addStyle).appendTo(set);
+        // $('<button class="stylebot-button"> cancel</button>').click(Stylebot.Widget.cancelStyle).appendTo(set);
+
         set.appendTo(el);
-        
-        el.click(Stylebot.Widget.showControlToolSet);
+        // el.click(Stylebot.Widget.showControlToolSet);
     },
     showControlToolSet: function(e){
         if(e.target.className != 'stylebot-button')
@@ -97,6 +98,11 @@ Stylebot.Widget = {
         /* listeners to update styles of DOM elements when value of widget controls is changed */
         $('.stylebot-textfield').keyup(function(e){
             var value = e.target.value;
+            if(value == "")
+            {
+                Stylebot.Widget.cancelStyle(e);
+                return;
+            }
             var property = $(e.target).closest('.stylebot-control').attr('id').substring(9);
             console.log("Property: " + property);
             console.log("Value: " + value);
@@ -105,6 +111,17 @@ Stylebot.Widget = {
                     value += 'px';
                     break;
             }
+            Stylebot.Style.apply(Stylebot.Selector.value, property, value);
+        });
+        
+        $('.stylebot-checkbox').click(function(e){
+            var value = e.target.value;
+            if(e.target.checked == 0)
+            {
+                Stylebot.Widget.cancelStyle(e);
+                return;
+            }
+            var property = $(e.target).closest('.stylebot-control').attr('id').substring(9);
             Stylebot.Style.apply(Stylebot.Selector.value, property, value);
         });
         
@@ -117,16 +134,23 @@ Stylebot.Widget = {
 
         /* decide where the widget should be displayed with respect to selected element */
         this.setPosition();
+        this.reset();
         this.box.fadeIn(200);
+        
+        setTimeout(function(){
+            $('.stylebot-tool')[0].focus();
+        }, 0);
     },
     hide: function(){
         Stylebot.isEditing = false;
-        this.reset();
         this.box.fadeOut(200);
     },
     reset: function(){
-        
+        /* clear all fields */
+        $('.stylebot-textfield').attr("value","");
+        $('.stylebot-checbox').checked = false;
     },
+    
     setPosition: function(){
         if(Stylebot.selectedElement)
         {
@@ -155,7 +179,6 @@ Stylebot.Widget = {
         Stylebot.Style.addToList();
     },
     cancelStyle: function(e){
-        $(e.target).parent().hide();
         Stylebot.Style.resetTemporaryCache();
     }
 }

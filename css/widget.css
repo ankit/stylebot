@@ -5,25 +5,26 @@
     right:10%;
     position:fixed;
     border:1px solid #ccc;
-    width:200px;
+    width:230px;
     background-color:#f5f5f5;
     color:#313131;
     -webkit-box-shadow:0px 0px 10px #bbb;
     border-radius:8px;
     font-family:Helvetica, Arial, serif !important;
-/*    padding:10px;*/
     z-index:100000;
     text-align:left;
+    line-height:12px;
 }
 
 .stylebot-header{
     color:#333;
+    text-align:center;
     font-size:12px;
     font-weight:bold;
-    padding: 5px 10px;
-    text-shadow:0px 2px 0px #fff;
-/*    border-bottom: 2px solid #e8e8e8;
-    -webkit-box-shadow:0px 1px 0px #fff;*/
+    padding:5px;
+    text-shadow:1px 1px 0px #fff;
+    border-bottom:1px solid #ccc;
+    -webkit-box-shadow:0px 1px 0px #fff;
 }
 
 ul.stylebot-controls{
@@ -36,36 +37,40 @@ ul.stylebot-controls{
 }
 
 li.stylebot-control{
-    padding:3px 2px;
+    padding:2px;
     margin:5px 0;
-    line-height:12px;
     border-radius:2px;
     border:none ;
 }
 
 li.stylebot-control:hover{
-    cursor:pointer;
+/*    cursor:pointer;
     background-color:#e8e8e8;
-    outline:1px solid #ccc;
+    outline:1px solid #ccc;*/
 }
 
 .stylebot-control-toolset{
     margin-top:2px;
-    display:none;
+    display:inline;
 }
 
 .stylebot-label{
     font-size:12px;
-    text-shadow:0px 1px 0px #fff;
+    text-shadow:1px 1px 0px #fff;
+    width:80px;
+    padding-right:4px;
+    display:inline-block;
+    text-align:right;
 }
 
 .stylebot-label:hover{
-    cursor:pointer;
+/*    cursor:pointer;*/
 }
 
 #stylebot-main-buttons{
     padding:5px;
     height:20px;
+    text-align:center;
 }
 
 .stylebot-button{
@@ -81,7 +86,7 @@ li.stylebot-control:hover{
 
 .stylebot-button:hover{
     background-color:#686868;
-    color:#fff;
+    color:#fff;*/
     cursor:pointer;
 }
 
@@ -90,7 +95,15 @@ li.stylebot-control:hover{
 }
 
 .stylebot-textfield{
+    padding:2px;
     border:1px solid #ccc;
     outline:none;
-    padding:2px;
+    border-radius:2px;
+}
+
+.stylebot-checkbox{
+/*    -khtml-appearance:none;*/
+    border:1px solid #ccc;
+    outline:none;
+    border-radius:2px;
 }

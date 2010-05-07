@@ -8,7 +8,7 @@ Stylebot.Style = {
     apply: function(selector, property, value){
         var el = $(selector);
         if(!this.isStyleBeingEdited)
-            tempCache = {el:el, property: property, value: value, originalValue: el.css(property)};
+            this.tempCache = {el:el, property: property, value: value, originalValue: el.css(property)};
         this.isStyleBeingEdited = true;
         el.css(property, value);
     },
@@ -16,16 +16,19 @@ Stylebot.Style = {
         
     },
     resetTemporaryCache: function(){
-        if(tempCache)
+        if(this.tempCache)
         {
-            console.log(tempCache.originalValue);
-            tempCache.el.css(tempCache.property, tempCache.originalValue);
-            tempCache = null;
+            console.log(this.tempCache.originalValue);
+            this.tempCache.el.css(this.tempCache.property, this.tempCache.originalValue);
+            this.tempCache = null;
         }
         this.isStyleBeingEdited = false;
     },
     addToList: function(){
         //write code here to add style in temporary cache to the current page's style rules list
         this.isStyleBeingEdited = false;
+    },
+    getProperties: function(selector){
+        
     }
 }
