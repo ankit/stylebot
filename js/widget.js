@@ -3,6 +3,7 @@
 Stylebot.Widget = {
     box: null,
     isBeingDragged:false,
+    selector: null,
     create: function(){
         this.box = $('<div/>', {
             id:'stylebot'
@@ -21,7 +22,7 @@ Stylebot.Widget = {
         controls.appendTo(this.box);
         
         var buttons = $('<div id="stylebot-main-buttons"></div>');
-        $('<button class="stylebot-button" style=""> Save </button>').appendTo(buttons).click(Stylebot.Widget.save);
+        $('<button class="stylebot-button" style=""> Save changes</button>').appendTo(buttons).click(Stylebot.Widget.save);
         $('<button class="stylebot-button" style=""> Generate CSS</button>').appendTo(buttons).click(Stylebot.Widget.generateCSS);
         buttons.appendTo(this.box);
 
@@ -88,37 +89,38 @@ Stylebot.Widget = {
         
         /* listeners to update styles of DOM elements when value of widget controls is changed */
         $('.stylebot-textfield').keyup(function(e){
-            var value = e.target.value;
-            if(value == "")
+            /* if esc is pressed, take away focus from textfield. */
+            if(e.keyCode == 27)
             {
-                Stylebot.Widget.cancelStyle(e);
-                return;
+                e.target.blur();
+                return true;
             }
+            
+            var value = e.target.value;
+            
             var property = $(e.target).closest('.stylebot-control').attr('id').substring(9);
-            console.log("Property: " + property);
-            console.log("Value: " + value);
             switch(property){
                 case 'font-size':
                     value += 'px';
                     break;
             }
-            Stylebot.Style.apply(Stylebot.Selector.value, property, value);
+            Stylebot.Style.apply( Stylebot.Widget.selector, property, value);
         });
         
         $('.stylebot-checkbox').click(function(e){
-            var value = e.target.value;
-            if(e.target.checked == 0)
-            {
-                Stylebot.Widget.cancelStyle(e);
-                return;
-            }
+            var value;
+            if(e.target.checked == true)
+                value = e.target.value;
+            else
+                value = '';
             var property = $(e.target).closest('.stylebot-control').attr('id').substring(9);
-            Stylebot.Style.apply(Stylebot.Selector.value, property, value);
+            Stylebot.Style.apply( Stylebot.Widget.selector, property, value);
         });
         
     },
     show: function(){
         Stylebot.isEditing = true;
+        this.selector = Stylebot.Selector.value;
         /* if DOM element for widget does not exist, create it */
         if(!this.box)
             this.create();
@@ -126,6 +128,7 @@ Stylebot.Widget = {
         /* decide where the widget should be displayed with respect to selected element */
         this.setPosition();
         this.reset();
+        this.fill(); //fill with any existing custom styles
         this.box.fadeIn(200);
         
         setTimeout(function(){
@@ -136,10 +139,19 @@ Stylebot.Widget = {
         Stylebot.isEditing = false;
         this.box.fadeOut(200);
     },
+    fill: function(){
+        var styles = Stylebot.Style.getProperties(this.selector);
+        if(styles)
+        {
+            var len = styles.length;
+            for(var i=0; i<len; i++)
+                this.fillControl(styles[i].property, styles[i].value);
+        }
+    },
     reset: function(){
         /* clear all fields */
         $('.stylebot-textfield').attr("value","");
-        $('.stylebot-checbox').checked = false;
+        $('.stylebot-checkbox').attr('checked', false);
     },
     setPosition: function(){
         if(Stylebot.selectedElement)
@@ -176,10 +188,23 @@ Stylebot.Widget = {
     generateCSS: function(e){
         Stylebot.Style.crunchCSS();
     },
-    addStyle: function(e){
-        Stylebot.Style.addToList();
+    getControl: function(property){
+        return $('#stylebot-' + property);
     },
-    cancelStyle: function(e){
-        Stylebot.Style.resetTemporaryCache();
+    fillControl: function(property, value){
+        var control = this.getControl(property);
+        switch(property)
+        {
+            case "color"            :   
+            case "background-color" :   
+            case "font-size"        :   control.find('.stylebot-textfield')[0].value = value;
+                                        break;
+            case "display"          :   var checkbox = control.find('.stylebot-checkbox');
+                                        if(value == 'none')
+                                            checbox.checked = true;
+                                        else
+                                            checkbox.checked = false;
+                                        break;
+        }
     }
 }

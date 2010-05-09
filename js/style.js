@@ -2,33 +2,96 @@
 
 Stylebot.Style = {
     //Temporary cache to store style when it is being tested
-    tempCache:null,
-    list:[],
-    isStyleBeingEdited:false,
+    rules:[],
     apply: function(selector, property, value){
         var el = $(selector);
-        if(!this.isStyleBeingEdited)
-            this.tempCache = {el:el, property: property, value: value, originalValue: el.css(property)};
-        this.isStyleBeingEdited = true;
-        el.css(property, value);
-    },
-    remove: function(selector, property){
+
+        /* TODO: Any original inline CSS should remain unaltered */
+        var origCSS = el.attr('style');
+        origCSS = (typeof(origCSS) == "undefined") ? "" : origCSS;
         
+        this.applyInlineCSS(el, this.getInlineCSS(selector, property, value));
+        
+        this.updateRule(selector, property, value);
     },
-    resetTemporaryCache: function(){
-        if(this.tempCache)
+    updateRule: function(selector, property, value){
+        var index = this.search(this.rules, "selector", selector);
+        if(index != null)
         {
-            console.log(this.tempCache.originalValue);
-            this.tempCache.el.css(this.tempCache.property, this.tempCache.originalValue);
-            this.tempCache = null;
+            console.log("Rule already exists in list at index "+ index + "\n");
+            var rule = this.rules[index];
+            index = this.search(rule.styles, "property", property);
+            if(index != null)
+            {
+                console.log("Property already exists in rule at index "+ index + "\n");
+                rule.styles[index].value = value;
+            }
+            else
+                rule.styles[rule.styles.length] = {property: property, value: value};
         }
-        this.isStyleBeingEdited = false;
+        else
+        {
+            console.log("Nothing found. Creating a new rule \n");
+            this.rules[this.rules.length] = {selector: selector, styles:[{property: property, value: value}]};
+        }
+        
+        for(var i=0;i < this.rules.length; i++)
+        {
+            console.log("Rule "+i+" Selector: "+this.rules[i].selector+"\n");
+        }
     },
-    addToList: function(){
-        //write code here to add style in temporary cache to the current page's style rules list
-        this.isStyleBeingEdited = false;
+    search: function(arr, pName, pValue){
+        var len = arr.length;
+        for(var i=0; i<len; i++)
+        {
+            console.log("Comparing "+arr[i][pName]+" to "+pValue+"\n");
+            if(arr[i][pName] == pValue)
+                return i;
+        }
+        return null;
+    },
+    getInlineCSS: function(selector, property, value){
+        /* TODO: Try using $.each for iteration here */
+        var index = this.search(this.rules, "selector", selector);
+        if(index != null)
+        {
+            var css = "";
+            var rule = this.rules[index];
+            var len = rule.styles.length;
+            var isPropertyPresent = false;
+            for(var i=0; i<len; i++)
+            {
+                if(rule.styles[i].property == property && !isPropertyPresent)
+                {
+                    rule.styles[i].value = value;
+                    isPropertyPresent = true;
+                }
+                css += rule.styles[i].property + ": " + rule.styles[i].value + " !important;";
+            }
+            if(!isPropertyPresent)
+                css += property + ": " + value + " !important;";
+            return css;
+        }
+        else
+            return property + ": " + value + " !important;";
+    },
+    applyInlineCSS: function(el, css){
+        el.attr({
+            style: css,
+            'stylebot-css': css //save stylebot css in a separate attribute
+        });
+    },
+    clearInlineCSS: function(el){
+        $(selector).attr({
+            style:'',
+            'stylebot-css':''
+        });
     },
     getProperties: function(selector){
-        
+        var index = this.search(this.rules, "selector", selector);
+        if(index != null)
+            return this.rules[index].styles;
+        else
+            return null;
     }
 }

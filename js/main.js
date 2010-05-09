@@ -41,8 +41,9 @@ var Stylebot = {
         /* Handle key presses */
         $(document).keyup(function(e){
             var eTagName = e.target.tagName;
-            if(eTagName == 'INPUT' || eTagName == 'TEXTAREA' || eTagName == 'DIV')
+            if(eTagName == 'INPUT' || eTagName == 'TEXTAREA' || eTagName == 'DIV' || eTagName == 'OBJECT')
                return true;
+            
             /* Handle shortcut key 'e' to toggle editing mode */
             if(e.keyCode == Stylebot.defaults.shortcutKey)
                 Stylebot.toggle();
