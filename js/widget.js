@@ -20,10 +20,6 @@ Stylebot.Widget = {
         
         controls.appendTo(this.box);
         
-        // $('<div class="stylebot-header">Applied styles</div>').appendTo(this.box);
-        // var applied_styles = $('<ul class="stylebot-controls" id="stylebot-added-styles"></ul>');
-        // applied_styles.appendTo(this.box);
-        
         var buttons = $('<div id="stylebot-main-buttons"></div>');
         $('<button class="stylebot-button" style=""> Save </button>').appendTo(buttons).click(Stylebot.Widget.save);
         $('<button class="stylebot-button" style=""> Generate CSS</button>').appendTo(buttons).click(Stylebot.Widget.generateCSS);
@@ -66,13 +62,8 @@ Stylebot.Widget = {
         }
         if(tool)
             tool.appendTo(set);
-        
-        /* Common UI elements for all control sets */
-        // $('<button class="stylebot-button"> add</button>').click(Stylebot.Widget.addStyle).appendTo(set);
-        // $('<button class="stylebot-button"> cancel</button>').click(Stylebot.Widget.cancelStyle).appendTo(set);
 
         set.appendTo(el);
-        // el.click(Stylebot.Widget.showControlToolSet);
     },
     showControlToolSet: function(e){
         if(e.target.className != 'stylebot-button')
@@ -150,23 +141,33 @@ Stylebot.Widget = {
         $('.stylebot-textfield').attr("value","");
         $('.stylebot-checbox').checked = false;
     },
-    
     setPosition: function(){
         if(Stylebot.selectedElement)
         {
+            /* Left offset of widget */
             var offset = Stylebot.selectedElement.offset();
             var left = offset.left + Stylebot.selectedElement.width() + 10;
-            var left_diff = $(document.body).width() - left;
-            if(left_diff <= this.box.width())
-                left = left - left_diff;
-
+            var leftDiff = this.box.width() - (document.body.clientWidth - left);
+            if(leftDiff >= 0)
+                left = left - leftDiff;
+            
+            /* Top offset of widget */
             var top = offset.top - window.pageYOffset;
-            var top_diff = window.innerHeight - top - 300;
-            if(top_diff <= 0)
-                top = top + top_diff;
-
+            /* in case the element's top is beyond current view */
+            if(top < 0)
+                top = window.pageYOffset - 300;
+            else
+            {
+                var topDiff = window.innerHeight - (top + this.box.height() + 100);
+                if(topDiff <= 0)
+                    top = top + topDiff;
+            }
+            
             this.box.css('left', left);
             this.box.css('top', top);
+            
+            console.log("Box Width: "+this.box.width() + "\nLeft: " + left + "\nLeft Diff: " + leftDiff);
+            console.log("Box Height: " + this.box.height() + "\nTop: " + top + "\nTop Diff: " + topDiff);
         }
     },
     save: function(e){

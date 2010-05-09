@@ -55,7 +55,8 @@ li.stylebot-control:hover{
 }
 
 .stylebot-label{
-    font-size:12px;
+    font-family:Helvetica, Arial, serif !important;
+    font-size:12px !important;
     text-shadow:1px 1px 0px #fff;
     width:80px;
     padding-right:4px;
@@ -94,14 +95,15 @@ li.stylebot-control:hover{
     margin-right:5px;
 }
 
-.stylebot-textfield{
+input.stylebot-textfield{
     padding:2px;
-    border:1px solid #ccc;
-    outline:none;
+    border:1px solid #ccc !important;
     border-radius:2px;
+    outline:none;
+    -webkit-box-shadow:none !important;
 }
 
-.stylebot-checkbox{
+input.stylebot-checkbox{
 /*    -khtml-appearance:none;*/
     border:1px solid #ccc;
     outline:none;
