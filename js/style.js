@@ -18,7 +18,7 @@ Stylebot.Style = {
         var index = this.search(this.rules, "selector", selector);
         if(index != null)
         {
-            console.log("Rule already exists in list at index "+ index + "\n");
+            console.log("Rule already exists at index "+ index + "\n");
             var rule = this.rules[index];
             index = this.search(rule.styles, "property", property);
             if(index != null)
@@ -66,14 +66,14 @@ Stylebot.Style = {
                     rule.styles[i].value = value;
                     isPropertyPresent = true;
                 }
-                css += rule.styles[i].property + ": " + rule.styles[i].value + " !important;";
+                css += this.getCSSDeclaration(rule.styles[i].property, rule.styles[i].value, true);
             }
             if(!isPropertyPresent)
-                css += property + ": " + value + " !important;";
+                css += this.getCSSDeclaration(property, value, true);
             return css;
         }
         else
-            return property + ": " + value + " !important;";
+            return this.getCSSDeclaration(property, value, true);
     },
     applyInlineCSS: function(el, css){
         el.attr({
@@ -87,11 +87,33 @@ Stylebot.Style = {
             'stylebot-css':''
         });
     },
-    getProperties: function(selector){
+    getStyles: function(selector){
         var index = this.search(this.rules, "selector", selector);
         if(index != null)
             return this.rules[index].styles;
         else
             return null;
+    },
+    crunchCSS: function(){
+        var len = this.rules.length;
+        var css = '';
+        for(var i=0; i<len; i++)
+        {
+            var rule = this.rules[i];
+            css += rule.selector + "{ " + "\n";
+            var styles_len = rule.styles.length;
+            for(var j=0; j<styles_len; j++)
+            {
+                css += "\t" + this.getCSSDeclaration(rule.styles[j].property, rule.styles[j].value) + "\n";
+            }
+            css += "}" + "\n";
+        }
+        return css;
+    },
+    getCSSDeclaration: function(property, value, setImportant){
+        if(setImportant)
+            return property + ": " + value + " !important;";
+        else
+            return property + ": " + value + ";";
     }
 }

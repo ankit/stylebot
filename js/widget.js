@@ -4,6 +4,30 @@ Stylebot.Widget = {
     box: null,
     isBeingDragged:false,
     selector: null,
+    controls:[{
+        name:'Color', 
+        property:'color'
+    },
+    {
+        name:'Background Color', 
+        property:'background-color'
+    },
+    {
+        name:'Size', 
+        property:'font-size'
+    },
+    {
+        name:'Style', 
+        property:'style'
+    },
+    {
+        name:'Decoration', 
+        property:'text-decoration'
+    },
+    {
+        name:'Hide Element', 
+        property:'display'
+    }],
     create: function(){
         this.box = $('<div/>', {
             id:'stylebot'
@@ -11,15 +35,15 @@ Stylebot.Widget = {
         /* Headers */
         $('<div class="stylebot-header">Custom Styles</div>').appendTo(this.box);
         
-        var controls = $('<ul class="stylebot-controls" id="stylebot-styles"></ul>');
+        var controls_ui = $('<ul class="stylebot-controls" id="stylebot-styles"></ul>');
 
         /* creating the controls for different CSS properties */
-        this.createControl('Color', 'color').appendTo(controls);
-        this.createControl('Background Color', 'background-color').appendTo(controls);
-        this.createControl('Font Size', 'font-size').appendTo(controls);
-        this.createControl('Hide Element', 'display').appendTo(controls);
+        var len = this.controls.length;
         
-        controls.appendTo(this.box);
+        for(var i=0; i<len; i++)
+            this.createControl(this.controls[i].name, this.controls[i].property).appendTo(controls_ui);
+        
+        controls_ui.appendTo(this.box);
         
         var buttons = $('<div id="stylebot-main-buttons"></div>');
         $('<button class="stylebot-button" style=""> Save changes</button>').appendTo(buttons).click(Stylebot.Widget.save);
@@ -37,45 +61,63 @@ Stylebot.Widget = {
         this.addListeners();
     },
     createControl: function(text, property){
-        var el = $('<li id="stylebot-'+property+'" class="stylebot-control"></li>');
+        var el = $('<li class="stylebot-control"></li>');
         $('<label class="stylebot-label">'+text+':</label>').appendTo(el);
-        this.createControlToolSet(property, el);
-        return el;
-    },
-    createControlToolSet: function(property, el){
-        var set = $('<div class="stylebot-control-toolset"></div>');
-        var tool = null;
         
         /* Property specific tools to add to control set */
         switch(property){
-            case 'font-size':
-                tool = $('<input type="text" class="stylebot-textfield stylebot-tool" size="4" />');
+            case 'font-size': 
+                this.createTextfield(property, 4).appendTo(el);el.html(el.html() + " px");
                 break;
             case 'color':
-                tool = $('<input type="text" class="stylebot-textfield stylebot-tool" size="10" />');
+                this.createTextfield(property, 10).appendTo(el);
                 break;
             case 'background-color':
-                tool = $('<input type="text" class="stylebot-textfield stylebot-tool" size="10" />');
+                this.createTextfield(property, 10).appendTo(el);
                 break;
             case 'display':
-                tool = $('<input type="checkbox" class="stylebot-tool stylebot-checkbox" value="none"/>');
+                this.createCheckbox(null, property, 'none').appendTo(el);
+                break;
+            case 'style':
+                // this.createCheckbox("<b>Bold</b>", 'font-weight', 'bold').appendTo(el);
+                // this.createCheckbox("<i>Italic</i>", 'font-style', 'italic').appendTo(el);
+                this.createRadio("<b>B</b>", "style", ['font-weight','font-style'], ['bold', 'none']).appendTo(el);
+                this.createRadio("<i>i</i>", "style", ['font-weight','font-style'], ['none', 'italic']).appendTo(el);
+                this.createRadio("<b>B</b> + <i>i</i>", "style", ['font-weight','font-style'], ['bold','italic']).appendTo(el);
+                this.createRadio("None", "style", ['font-weight','font-style'], ['normal','none']).appendTo(el);
+                break;
+            case 'text-decoration':
+                this.createRadio("<u>underline</u>", property, property, 'underline').appendTo(el);
+                this.createRadio("None", property, property, 'none').appendTo(el);
                 break;
         }
-        if(tool)
-            tool.appendTo(set);
-
-        set.appendTo(el);
+        return el;
     },
-    showControlToolSet: function(e){
-        if(e.target.className != 'stylebot-button')
+    createTextfield: function(property, size){
+        return $('<input type="text" class="stylebot-textfield stylebot-tool" stylebot-property="'+ property +'" size="'+ size +'" />');
+    },
+    createCheckbox: function(text, property, value){
+        var checkbox = $('<input type="checkbox" class="stylebot-tool stylebot-checkbox" stylebot-property="'+ property +'" value="'+ value +'"/> ');
+        if(text)
         {
-            $('.stylebot-control-toolset').hide();
-            var set = $($(this).children('div')[0]);
-            set.show();
-            var tool = set.children('.stylebot-tool')[0];
-            if(tool)
-                tool.focus();
+            var span = $('<span class="stylebot-tool"></span>');
+            checkbox.appendTo(span);
+            $('<label class="stylebot-inline-label">'+text+'</label>').appendTo(span);
+            return span;
         }
+        else
+            return checkbox;
+    },
+    createRadio: function(text, name, property, value){
+        var span = $('<span class="stylebot-tool"></span>');
+        var radio;
+        if(typeof(property) == 'string')
+            radio = $('<input type="radio" name = "'+ name +'" class="stylebot-tool stylebot-radio" stylebot-property="'+ property +'" value="'+ value +'"/> ');
+        else
+            radio = $('<input type="radio" name = "'+ name +'" class="stylebot-tool stylebot-radio" stylebot-property="'+ property.join(",") +'" value="'+ value.join(",") +'"/> ');
+        radio.appendTo(span);
+        $('<label class="stylebot-inline-label">'+text+'</label>').appendTo(span);
+        return span;
     },
     addListeners: function(){
         this.box.mouseenter(function(e){
@@ -88,6 +130,7 @@ Stylebot.Widget = {
         });
         
         /* listeners to update styles of DOM elements when value of widget controls is changed */
+        /* For textfields */
         $('.stylebot-textfield').keyup(function(e){
             /* if esc is pressed, take away focus from textfield. */
             if(e.keyCode == 27)
@@ -98,23 +141,38 @@ Stylebot.Widget = {
             
             var value = e.target.value;
             
-            var property = $(e.target).closest('.stylebot-control').attr('id').substring(9);
+            var property = $(e.target).attr('stylebot-property');
             switch(property){
                 case 'font-size':
                     value += 'px';
                     break;
             }
-            Stylebot.Style.apply( Stylebot.Widget.selector, property, value);
+            Stylebot.Style.apply(Stylebot.Widget.selector, property, value);
         });
         
+        /* For checkboxes */
         $('.stylebot-checkbox').click(function(e){
             var value;
             if(e.target.checked == true)
                 value = e.target.value;
             else
                 value = '';
-            var property = $(e.target).closest('.stylebot-control').attr('id').substring(9);
+            var property = $(e.target).attr('stylebot-property');
             Stylebot.Style.apply( Stylebot.Widget.selector, property, value);
+        });
+        
+        /* For radios */
+        $('.stylebot-radio').click(function(e){
+            var value;
+            if(e.target.checked == true)
+                value = e.target.value;
+            else
+                value = '';
+            var properties = $(e.target).attr('stylebot-property').split(',');
+            var len = properties.length;
+            var values = $(e.target).attr('value').split(',');
+            for(var i=0; i<len; i++)
+                Stylebot.Style.apply( Stylebot.Widget.selector, properties[i], values[i]);
         });
         
     },
@@ -127,7 +185,7 @@ Stylebot.Widget = {
 
         /* decide where the widget should be displayed with respect to selected element */
         this.setPosition();
-        this.reset();
+        this.reset(); //clear all values for controls
         this.fill(); //fill with any existing custom styles
         this.box.fadeIn(200);
         
@@ -140,18 +198,21 @@ Stylebot.Widget = {
         this.box.fadeOut(200);
     },
     fill: function(){
-        var styles = Stylebot.Style.getProperties(this.selector);
+        var len = this.controls.length;
+        var styles = Stylebot.Style.getStyles(this.selector);
         if(styles)
         {
-            var len = styles.length;
             for(var i=0; i<len; i++)
-                this.fillControl(styles[i].property, styles[i].value);
+            {
+                this.fillControl(this.controls[i].property, styles);
+            }
         }
     },
     reset: function(){
         /* clear all fields */
-        $('.stylebot-textfield').attr("value","");
+        $('.stylebot-textfield').attr('value', '');
         $('.stylebot-checkbox').attr('checked', false);
+        $('.stylebot-radio').attr('checked', false);
     },
     setPosition: function(){
         if(Stylebot.selectedElement)
@@ -178,7 +239,7 @@ Stylebot.Widget = {
             this.box.css('left', left);
             this.box.css('top', top);
             
-            console.log("Box Width: "+this.box.width() + "\nLeft: " + left + "\nLeft Diff: " + leftDiff);
+            console.log("Box Width: "+ this.box.width() + "\nLeft: " + left + "\nLeft Diff: " + leftDiff);
             console.log("Box Height: " + this.box.height() + "\nTop: " + top + "\nTop Diff: " + topDiff);
         }
     },
@@ -186,25 +247,56 @@ Stylebot.Widget = {
         Stylebot.Style.save();
     },
     generateCSS: function(e){
-        Stylebot.Style.crunchCSS();
+        alert(Stylebot.Style.crunchCSS());
+        // Stylebot.Modal.show(Stylebot.Style.crunchCSS());
     },
     getControl: function(property){
-        return $('#stylebot-' + property);
+        return $('[stylebot-property=' + property + ']');
     },
-    fillControl: function(property, value){
-        var control = this.getControl(property);
-        switch(property)
-        {
-            case "color"            :   
-            case "background-color" :   
-            case "font-size"        :   control.find('.stylebot-textfield')[0].value = value;
+    fillControl: function(control, styles){
+        /* TODO: Clean this mess up! */
+        switch(control){
+            case 'color'            :   
+            case 'background-color' :   
+            case 'font-size'        :   var index = Stylebot.Style.search(styles, "property", control);
+                                        if(index != null)
+                                        {
+                                            var value = styles[index].value;
+                                            this.getControl(control).attr('value', value);
+                                        }
                                         break;
-            case "display"          :   var checkbox = control.find('.stylebot-checkbox');
-                                        if(value == 'none')
-                                            checbox.checked = true;
-                                        else
-                                            checkbox.checked = false;
+            case 'display'          :   var index = Stylebot.Style.search(styles, "property", control);
+                                        if(index != null)
+                                        {
+                                            if(styles[index].value == 'none')
+                                                this.getControl(control).attr('checked', true);
+                                            else
+                                                this.getControl(control).attr('checked', false);                                            
+                                        }
                                         break;
+            case 'text-decoration'  :   var index = Stylebot.Style.search(styles, "property", "text-decoration");
+                                        if(index != null){
+                                            if(styles[index].value == 'underline')
+                                                this.getControl(control)[0].checked = true;
+                                            else
+                                                this.getControl(control)[1].checked = true;
+                                        }
+            case 'style'            :   var index = Stylebot.Style.search(styles, "property", "font-weight");
+                                        var index2 = Stylebot.Style.search(styles, "property", "font-style");
+                                        if(index != null)
+                                        {
+                                            var val = styles[index].value;
+                                            var val2 = styles[index2].value;
+                                            if(val == 'bold' && val2 == 'italic')
+                                                this.getControl('font-weight,font-style')[2].checked = true;
+                                            else if(val == 'bold')
+                                                this.getControl('font-weight,font-style')[0].checked = true;
+                                            else if(val2 == 'italic')
+                                                this.getControl('font-weight,font-style')[1].checked = true;
+                                            else
+                                                this.getControl('font-weight,font-style')[3].checked = true;
+                                        }
+                                        
         }
     }
 }
