@@ -96,13 +96,16 @@ Stylebot.Style = {
         for(var i=0; i<len; i++)
         {
             var rule = this.rules[i];
-            css += rule.selector + "{ " + "\n";
             var styles_len = rule.styles.length;
-            for(var j=0; j<styles_len; j++)
+            if(styles_len != 0)
             {
-                css += "\t" + this.getCSSDeclaration(rule.styles[j].property, rule.styles[j].value) + "\n";
+                css += rule.selector + "{ " + "\n";
+                for(var j=0; j<styles_len; j++)
+                {
+                    css += "\t" + this.getCSSDeclaration(rule.styles[j].property, rule.styles[j].value) + "\n";
+                }
+                css += "}" + "\n";
             }
-            css += "}" + "\n";
         }
         return css;
     },
