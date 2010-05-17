@@ -1,6 +1,10 @@
-/* Code for the Stylebot Modal Window */
+/**
+  * stylebot.modal
+  * 
+  * Modal window used by Stylebot
+  **/
 
-Stylebot.Modal = {
+stylebot.modal = {
     box: null,
     create: function(){
         

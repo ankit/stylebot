@@ -1,6 +1,10 @@
-/* Stylebot Utility Methods */
+/**
+  * stylebot.utils
+  * 
+  * Stylebot Utility methods
+  **/
 
-Stylebot.Utils = {
+stylebot.utils = {
     search: function(arr, pName, pValue){
         var len = arr.length;
         for(var i=0; i<len; i++)

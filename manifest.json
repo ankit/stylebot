@@ -7,7 +7,7 @@
 	{
 		"matches":["http://*/*","https://*/*"],
 		"css":["css/main.css", "css/widget.css"],
-		"js":["js/jquery.js", "js/jquery-ui.js", "js/main.js", "js/chrome.js", "js/widget.js", "js/selector.js", "js/style.js", "js/modal.js", "js/utils.js"],
+		"js":["js/jquery.js", "js/jquery-ui.js", "js/main.js", "js/chrome.js", "js/widget.js","js/widget.ui.js", "js/selector.js", "js/style.js", "js/modal.js", "js/utils.js"],
 		"run_at":"document_start",
 		"all_frames":true
 	}],

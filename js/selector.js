@@ -1,6 +1,10 @@
-/* Code to create/manipulate CSS selector for selected element(s) */
+/**
+  * stylebot.selector
+  * 
+  * Selector generation for selected element
+  **/
 
-Stylebot.Selector = {
+stylebot.selector = {
     value: null,
     generate: function(el){
         this.value = this.inspect(el, 0);

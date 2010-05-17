@@ -1,6 +1,10 @@
-/* Code to add/remove custom styles */
+/**
+  * stylebot.style
+  * 
+  * Generation and application of CSS rules
+  **/
 
-Stylebot.Style = {
+stylebot.style = {
     //List of CSS rules applied to the current page
     rules:[],
     apply: function(selector, property, value){
@@ -17,13 +21,13 @@ Stylebot.Style = {
     //Save the rule to the list of css rules for the current page
     saveRule: function(selector, property, value){
         //check if the selector already exists in the list
-        var index = Stylebot.Utils.search(this.rules, "selector", selector);
+        var index = stylebot.utils.search(this.rules, "selector", selector);
         if(index != null)
         {
             console.log("Rule already exists at index "+ index + "\n");
             var rule = this.rules[index];
             //check if the property exists
-            index = Stylebot.Utils.search(rule.styles, "property", property);
+            index = stylebot.utils.search(rule.styles, "property", property);
             if(index != null)
             {
                 console.log("Property already exists in rule at index "+ index + "\n");
@@ -48,7 +52,7 @@ Stylebot.Style = {
     },
     getInlineCSS: function(selector, property, value){
         /* TODO: Try using $.each for iteration here */
-        var index = Stylebot.Utils.search(this.rules, "selector", selector);
+        var index = stylebot.utils.search(this.rules, "selector", selector);
         if(index != null)
         {
             var css = "";
@@ -84,7 +88,7 @@ Stylebot.Style = {
         });
     },
     getStyles: function(selector){
-        var index = Stylebot.Utils.search(this.rules, "selector", selector);
+        var index = stylebot.utils.search(this.rules, "selector", selector);
         if(index != null)
             return this.rules[index].styles;
         else

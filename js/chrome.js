@@ -1,6 +1,10 @@
-/* Stylebot content code making use of Chrome API */
+/**
+  * stylebot.chrome
+  * 
+  * Methods making use of Chrome API
+  **/
 
-Stylebot.Chrome = {
+stylebot.chrome = {
     setIcon: function(value){
         if(value)
             chrome.extension.sendRequest({name:"enablePageIcon"}, function(){});
@@ -13,7 +17,7 @@ chrome.extension.onRequest.addListener(
 	function(request, sender, sendResponse){
         if(request.name == "toggle")
 		{
-		    Stylebot.toggle();
-		    sendResponse({status:Stylebot.status});
+		    stylebot.toggle();
+		    sendResponse({status:stylebot.status});
 		}
 });
