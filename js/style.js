@@ -1,7 +1,7 @@
 /* Code to add/remove custom styles */
 
 Stylebot.Style = {
-    //Temporary cache to store style when it is being tested
+    //List of CSS rules applied to the current page
     rules:[],
     apply: function(selector, property, value){
         var el = $(selector);
@@ -12,47 +12,43 @@ Stylebot.Style = {
         
         this.applyInlineCSS(el, this.getInlineCSS(selector, property, value));
         
-        this.updateRule(selector, property, value);
+        this.saveRule(selector, property, value);
     },
-    updateRule: function(selector, property, value){
-        var index = this.search(this.rules, "selector", selector);
+    //Save the rule to the list of css rules for the current page
+    saveRule: function(selector, property, value){
+        //check if the selector already exists in the list
+        var index = Stylebot.Utils.search(this.rules, "selector", selector);
         if(index != null)
         {
             console.log("Rule already exists at index "+ index + "\n");
             var rule = this.rules[index];
-            index = this.search(rule.styles, "property", property);
+            //check if the property exists
+            index = Stylebot.Utils.search(rule.styles, "property", property);
             if(index != null)
             {
                 console.log("Property already exists in rule at index "+ index + "\n");
-                rule.styles[index].value = value;
+
+                if(value == "")                     //if value is empty, remove the property
+                    rule.styles.splice(index, 1);
+                else                                //else update value
+                    rule.styles[index].value = value;
             }
             else
                 rule.styles[rule.styles.length] = {property: property, value: value};
         }
-        else
+        else if(value != "")
         {
             console.log("Nothing found. Creating a new rule \n");
             this.rules[this.rules.length] = {selector: selector, styles:[{property: property, value: value}]};
         }
-        
+
+
         for(var i=0;i < this.rules.length; i++)
-        {
             console.log("Rule "+i+" Selector: "+this.rules[i].selector+"\n");
-        }
-    },
-    search: function(arr, pName, pValue){
-        var len = arr.length;
-        for(var i=0; i<len; i++)
-        {
-            console.log("Comparing "+arr[i][pName]+" to "+pValue+"\n");
-            if(arr[i][pName] == pValue)
-                return i;
-        }
-        return null;
     },
     getInlineCSS: function(selector, property, value){
         /* TODO: Try using $.each for iteration here */
-        var index = this.search(this.rules, "selector", selector);
+        var index = Stylebot.Utils.search(this.rules, "selector", selector);
         if(index != null)
         {
             var css = "";
@@ -84,11 +80,11 @@ Stylebot.Style = {
     clearInlineCSS: function(el){
         $(selector).attr({
             style:'',
-            'stylebot-css':''
+            'stylebot-css': ''
         });
     },
     getStyles: function(selector){
-        var index = this.search(this.rules, "selector", selector);
+        var index = Stylebot.Utils.search(this.rules, "selector", selector);
         if(index != null)
             return this.rules[index].styles;
         else

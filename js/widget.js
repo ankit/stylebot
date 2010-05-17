@@ -62,34 +62,34 @@ Stylebot.Widget = {
     },
     createControl: function(text, property){
         var el = $('<li class="stylebot-control"></li>');
+        //add label
         $('<label class="stylebot-label">'+text+':</label>').appendTo(el);
         
         /* Property specific tools to add to control set */
         switch(property){
-            case 'font-size': 
-                this.createTextfield(property, 4).appendTo(el);el.html(el.html() + " px");
-                break;
-            case 'color':
-                this.createTextfield(property, 10).appendTo(el);
-                break;
-            case 'background-color':
-                this.createTextfield(property, 10).appendTo(el);
-                break;
-            case 'display':
-                this.createCheckbox(null, property, 'none').appendTo(el);
-                break;
-            case 'style':
-                // this.createCheckbox("<b>Bold</b>", 'font-weight', 'bold').appendTo(el);
-                // this.createCheckbox("<i>Italic</i>", 'font-style', 'italic').appendTo(el);
-                this.createRadio("<b>B</b>", "style", ['font-weight','font-style'], ['bold', 'none']).appendTo(el);
-                this.createRadio("<i>i</i>", "style", ['font-weight','font-style'], ['none', 'italic']).appendTo(el);
-                this.createRadio("<b>B</b> + <i>i</i>", "style", ['font-weight','font-style'], ['bold','italic']).appendTo(el);
-                this.createRadio("None", "style", ['font-weight','font-style'], ['normal','none']).appendTo(el);
-                break;
-            case 'text-decoration':
-                this.createRadio("<u>underline</u>", property, property, 'underline').appendTo(el);
-                this.createRadio("None", property, property, 'none').appendTo(el);
-                break;
+            case 'font-size'        :   this.createTextfield(property, 4).appendTo(el);el.html(el.html() + " px");
+                                        break;
+                                        
+            case 'color'            :   this.createTextfield(property, 10).appendTo(el);
+                                        break;
+                                        
+            case 'background-color' :   this.createTextfield(property, 10).appendTo(el);
+                                        break;
+                                        
+            case 'display'          :   this.createCheckbox(null, property, 'none').appendTo(el);
+                                        break;
+                                        
+            case 'style'            :   // this.createCheckbox("<b>Bold</b>", 'font-weight', 'bold').appendTo(el);
+                                        // this.createCheckbox("<i>Italic</i>", 'font-style', 'italic').appendTo(el);
+                                        this.createRadio("<b>B</b>", "style", ['font-weight','font-style'], ['bold', 'none']).appendTo(el);
+                                        this.createRadio("<i>i</i>", "style", ['font-weight','font-style'], ['none', 'italic']).appendTo(el);
+                                        this.createRadio("<b>B</b> + <i>i</i>", "style", ['font-weight','font-style'], ['bold','italic']).appendTo(el);
+                                        this.createRadio("None", "style", ['font-weight','font-style'], ['normal','none']).appendTo(el);
+                                        break;
+                                        
+            case 'text-decoration'  :   this.createRadio("<u>underline</u>", property, property, 'underline').appendTo(el);
+                                        this.createRadio("None", property, property, 'none').appendTo(el);
+                                        break;
         }
         return el;
     },
@@ -122,14 +122,19 @@ Stylebot.Widget = {
     addListeners: function(){
         this.box.mouseenter(function(e){
             if(Stylebot.isEditing)
-                Stylebot.Widget.box.css('opacity','1.0');
+                Stylebot.Widget.box.animate({
+                    opacity:1
+                });
         });
         this.box.mouseleave(function(e){
             if(Stylebot.isEditing)
-                Stylebot.Widget.box.css('opacity','0.9');
+                Stylebot.Widget.box.animate({
+                    opacity:0.9
+                });
         });
         
         /* listeners to update styles of DOM elements when value of widget controls is changed */
+        
         /* For textfields */
         $('.stylebot-textfield').keyup(function(e){
             /* if esc is pressed, take away focus from textfield. */
@@ -179,14 +184,13 @@ Stylebot.Widget = {
     show: function(){
         Stylebot.isEditing = true;
         this.selector = Stylebot.Selector.value;
-        /* if DOM element for widget does not exist, create it */
-        if(!this.box)
+        
+        if(!this.box)           //if DOM element for widget does not exist, create it
             this.create();
 
-        /* decide where the widget should be displayed with respect to selected element */
-        this.setPosition();
-        this.reset(); //clear all values for controls
-        this.fill(); //fill with any existing custom styles
+        this.setPosition();     //decide where the widget should be displayed with respect to selected element
+        this.reset();           //clear all values for controls
+        this.fill();            //fill widget with any existing custom styles
         this.box.fadeIn(200);
         
         setTimeout(function(){
@@ -253,36 +257,36 @@ Stylebot.Widget = {
     getControl: function(property){
         return $('[stylebot-property=' + property + ']');
     },
-    fillControl: function(control, styles){
-        /* TODO: Clean this mess up! */
-        switch(control){
+    fillControl: function(property, styles){
+        /* TODO: Take a less expensive approach here */
+        switch(property){
             case 'color'            :   
             case 'background-color' :   
-            case 'font-size'        :   var index = Stylebot.Style.search(styles, "property", control);
+            case 'font-size'        :   var index = Stylebot.Utils.search(styles, "property", property);
                                         if(index != null)
                                         {
                                             var value = styles[index].value;
-                                            this.getControl(control).attr('value', value);
+                                            this.getControl(property).attr('value', value);
                                         }
                                         break;
-            case 'display'          :   var index = Stylebot.Style.search(styles, "property", control);
+            case 'display'          :   var index = Stylebot.Utils.search(styles, "property", property);
                                         if(index != null)
                                         {
                                             if(styles[index].value == 'none')
-                                                this.getControl(control).attr('checked', true);
+                                                this.getControl(property).attr('checked', true);
                                             else
-                                                this.getControl(control).attr('checked', false);                                            
+                                                this.getControl(property).attr('checked', false);                                            
                                         }
                                         break;
-            case 'text-decoration'  :   var index = Stylebot.Style.search(styles, "property", "text-decoration");
+            case 'text-decoration'  :   var index = Stylebot.Utils.search(styles, "property", "text-decoration");
                                         if(index != null){
                                             if(styles[index].value == 'underline')
-                                                this.getControl(control)[0].checked = true;
+                                                this.getControl(property)[0].checked = true;
                                             else
-                                                this.getControl(control)[1].checked = true;
+                                                this.getControl(property)[1].checked = true;
                                         }
-            case 'style'            :   var index = Stylebot.Style.search(styles, "property", "font-weight");
-                                        var index2 = Stylebot.Style.search(styles, "property", "font-style");
+            case 'style'            :   var index = Stylebot.Utils.search(styles, "property", "font-weight");
+                                        var index2 = Stylebot.Utils.search(styles, "property", "font-style");
                                         if(index != null)
                                         {
                                             var val = styles[index].value;
