@@ -58,12 +58,14 @@ li.stylebot-control{
     text-align:right;
     font-family:inherit;
     font-size:inherit;
+    font-weight:normal;
     color:inherit;
 }
 
 .stylebot-inline-label{
     font-family:inherit;
     font-size:inherit;
+    font-weight:normal;
     color:inherit;
     display:inline;
     padding-right:5px;

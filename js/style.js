@@ -7,6 +7,7 @@
 stylebot.style = {
     //List of CSS rules applied to the current page
     rules:[],
+    
     apply: function(selector, property, value){
         var el = $(selector);
 
@@ -15,9 +16,9 @@ stylebot.style = {
         origCSS = (typeof(origCSS) == "undefined") ? "" : origCSS;
         
         this.applyInlineCSS(el, this.getInlineCSS(selector, property, value));
-        
         this.saveRule(selector, property, value);
     },
+    
     //Save the rule to the list of css rules for the current page
     saveRule: function(selector, property, value){
         //check if the selector already exists in the list
@@ -31,7 +32,6 @@ stylebot.style = {
             if(index != null)
             {
                 console.log("Property already exists in rule at index "+ index + "\n");
-
                 if(value == "")                     //if value is empty, remove the property
                     rule.styles.splice(index, 1);
                 else                                //else update value
@@ -46,10 +46,10 @@ stylebot.style = {
             this.rules[this.rules.length] = {selector: selector, styles:[{property: property, value: value}]};
         }
 
-
         for(var i=0;i < this.rules.length; i++)
             console.log("Rule "+i+" Selector: "+this.rules[i].selector+"\n");
     },
+    
     getInlineCSS: function(selector, property, value){
         /* TODO: Try using $.each for iteration here */
         var index = stylebot.utils.search(this.rules, "selector", selector);
@@ -75,18 +75,21 @@ stylebot.style = {
         else
             return this.getCSSDeclaration(property, value, true);
     },
+    
     applyInlineCSS: function(el, css){
         el.attr({
             style: css,
             'stylebot-css': css //save stylebot css in a separate attribute
         });
     },
+    
     clearInlineCSS: function(el){
         $(selector).attr({
             style:'',
             'stylebot-css': ''
         });
     },
+    
     getStyles: function(selector){
         var index = stylebot.utils.search(this.rules, "selector", selector);
         if(index != null)
@@ -94,6 +97,7 @@ stylebot.style = {
         else
             return null;
     },
+    
     crunchCSS: function(){
         var len = this.rules.length;
         var css = '';
@@ -113,6 +117,7 @@ stylebot.style = {
         }
         return css;
     },
+    
     getCSSDeclaration: function(property, value, setImportant){
         if(setImportant)
             return property + ": " + value + " !important;";

@@ -9,28 +9,28 @@ stylebot.widget = {
     isBeingDragged:false,
     selector: null,
     controls:[{
-        name:'Color', 
-        property:'color'
+        name:'Color',
+        id: 'color'
     },
     {
-        name:'Background Color', 
-        property:'background-color'
+        name:'Background Color',
+        id: 'background-color'
     },
     {
-        name:'Size', 
-        property:'font-size'
+        name:'Size',
+        id: 'font-size'
     },
     {
-        name:'Style', 
-        property:'style'
+        name:'Style',
+        id: 'style'
     },
     {
-        name:'Decoration', 
-        property:'text-decoration'
+        name:'Decoration',
+        id: 'text-decoration'
     },
     {
-        name:'Hide Element', 
-        property:'display'
+        name:'Hide Element',
+        id: 'display'
     }],
     create: function(){
         this.box = $('<div/>', {
@@ -45,7 +45,7 @@ stylebot.widget = {
         var len = this.controls.length;
         
         for(var i=0; i<len; i++)
-            this.ui.createControl(this.controls[i].name, this.controls[i].property).appendTo(controls_ui);
+            this.ui.createControl(this.controls[i]).appendTo(controls_ui);
         
         controls_ui.appendTo(this.box);
         
@@ -77,54 +77,6 @@ stylebot.widget = {
                     opacity:0.9
                 });
         });
-        
-        /* listeners to update styles of DOM elements when value of widget controls is changed */
-        
-        /* For textfields */
-        $('.stylebot-textfield').keyup(function(e){
-            /* if esc is pressed, take away focus from textfield. */
-            if(e.keyCode == 27)
-            {
-                e.target.blur();
-                return true;
-            }
-            
-            var value = e.target.value;
-            
-            var property = $(e.target).attr('stylebot-property');
-            switch(property){
-                case 'font-size':
-                    value += 'px';
-                    break;
-            }
-            stylebot.style.apply(stylebot.widget.selector, property, value);
-        });
-        
-        /* For checkboxes */
-        $('.stylebot-checkbox').click(function(e){
-            var value;
-            if(e.target.checked == true)
-                value = e.target.value;
-            else
-                value = '';
-            var property = $(e.target).attr('stylebot-property');
-            stylebot.style.apply( stylebot.widget.selector, property, value);
-        });
-        
-        /* For radios */
-        $('.stylebot-radio').click(function(e){
-            var value;
-            if(e.target.checked == true)
-                value = e.target.value;
-            else
-                value = '';
-            var properties = $(e.target).attr('stylebot-property').split(',');
-            var len = properties.length;
-            var values = $(e.target).attr('value').split(',');
-            for(var i=0; i<len; i++)
-                stylebot.style.apply( stylebot.widget.selector, properties[i], values[i]);
-        });
-        
     },
     show: function(){
         stylebot.isEditing = true;
@@ -149,11 +101,12 @@ stylebot.widget = {
     fill: function(){
         var len = this.controls.length;
         var styles = stylebot.style.getStyles(this.selector);
+        
         if(styles)
         {
             for(var i=0; i<len; i++)
             {
-                this.fillControl(this.controls[i].property, styles);
+                this.ui.fillControl(this.controls[i], styles);
             }
         }
     },
@@ -198,54 +151,5 @@ stylebot.widget = {
     generateCSS: function(e){
         alert(stylebot.style.crunchCSS());
         // stylebot.modal.show(stylebot.style.crunchCSS());
-    },
-    getControl: function(property){
-        return $('[stylebot-property=' + property + ']');
-    },
-    fillControl: function(property, styles){
-        /* TODO: Take a less expensive approach here */
-        switch(property){
-            case 'color'            :   
-            case 'background-color' :   
-            case 'font-size'        :   var index = stylebot.utils.search(styles, "property", property);
-                                        if(index != null)
-                                        {
-                                            var value = styles[index].value;
-                                            this.getControl(property).attr('value', value);
-                                        }
-                                        break;
-            case 'display'          :   var index = stylebot.utils.search(styles, "property", property);
-                                        if(index != null)
-                                        {
-                                            if(styles[index].value == 'none')
-                                                this.getControl(property).attr('checked', true);
-                                            else
-                                                this.getControl(property).attr('checked', false);                                            
-                                        }
-                                        break;
-            case 'text-decoration'  :   var index = stylebot.utils.search(styles, "property", "text-decoration");
-                                        if(index != null){
-                                            if(styles[index].value == 'underline')
-                                                this.getControl(property)[0].checked = true;
-                                            else
-                                                this.getControl(property)[1].checked = true;
-                                        }
-            case 'style'            :   var index = stylebot.utils.search(styles, "property", "font-weight");
-                                        var index2 = stylebot.utils.search(styles, "property", "font-style");
-                                        if(index != null)
-                                        {
-                                            var val = styles[index].value;
-                                            var val2 = styles[index2].value;
-                                            if(val == 'bold' && val2 == 'italic')
-                                                this.getControl('font-weight,font-style')[2].checked = true;
-                                            else if(val == 'bold')
-                                                this.getControl('font-weight,font-style')[0].checked = true;
-                                            else if(val2 == 'italic')
-                                                this.getControl('font-weight,font-style')[1].checked = true;
-                                            else
-                                                this.getControl('font-weight,font-style')[3].checked = true;
-                                        }
-                                        
-        }
     }
 }
