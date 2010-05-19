@@ -115,6 +115,7 @@ stylebot.widget = {
         $('.stylebot-textfield').attr('value', '');
         $('.stylebot-checkbox').attr('checked', false);
         $('.stylebot-radio').attr('checked', false);
+        $('.stylebot-select').attr('selectedIndex', 0);
     },
     setPosition: function(){
         if(stylebot.selectedElement)

@@ -25,12 +25,13 @@ stylebot.widget.ui = {
             case 'style'            :   var select = this.createSelect('style');
                                         this.createSelectOption("Default", ['font-weight','font-style'], ['','']).appendTo(select);
                                         this.createSelectOption("Bold", ['font-weight','font-style'], ['bold', 'none']).appendTo(select);
+                                        this.createSelectOption("Italic", ['font-weight','font-style'], ['normal', 'italic']).appendTo(select);                                        
                                         this.createSelectOption("Bold + Italic", ['font-weight','font-style'], ['bold', 'italic']).appendTo(select);
-                                        this.createSelectOption("None", ['font-weight','font-style'], ['none', 'none']).appendTo(select);
+                                        this.createSelectOption("None", ['font-weight','font-style'], ['normal', 'none']).appendTo(select);
                                         select.appendTo(el);
                                         break;
                                         
-            case 'text-decoration'  :   var select = this.createSelect('style');
+            case 'text-decoration'  :   var select = this.createSelect('text-decoration');
                                         this.createSelectOption("Default", 'text-decoration', '').appendTo(select);
                                         this.createSelectOption("Underline", 'text-decoration', 'underline').appendTo(select);
                                         this.createSelectOption("None", 'text-decoration', 'none').appendTo(select);
@@ -117,6 +118,31 @@ stylebot.widget.ui = {
                                                 this.getControl(control.id).attr('checked', true);
                                             else
                                                 this.getControl(control.id).attr('checked', false);                                                
+                                        }
+                                        break;
+            case 'style'            :   var index = stylebot.utils.search(styles, "property", "font-weight");
+                                        var index2 = stylebot.utils.search(styles, "property", "font-style");
+                                        if(index != null)
+                                        {
+                                            var val = styles[index].value;
+                                            var val2 = styles[index2].value;
+                                            if(val == 'bold' && val2 == 'italic')
+                                                this.getControl(control.id).attr('selectedIndex', 3);
+                                            else if(val == 'bold')
+                                                this.getControl(control.id).attr('selectedIndex', 1);
+                                            else if(val2 == 'italic')
+                                                this.getControl(control.id).attr('selectedIndex', 2);
+                                            else
+                                                this.getControl(control.id).attr('selectedIndex', 4);
+                                        }
+                                        break;
+            case 'text-decoration'  :   var index = stylebot.utils.search(styles, "property", "text-decoration");
+                                        if(index != null)
+                                        {
+                                            if(styles[index].value == 'underline')
+                                                this.getControl(control.id).attr('selectedIndex', 1);
+                                            else
+                                                this.getControl(control.id).attr('selectedIndex', 2);
                                         }
                                         break;
         }
