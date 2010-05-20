@@ -61,9 +61,10 @@ var stylebot = {
                 return true;
             if(stylebot.hoveredElement == $(e.target) || !stylebot.status)
                 return true;
-            
-            var parent = $(e.target).closest('#stylebot');
-            if(e.target.id == "stylebot" || parent.length != 0)
+
+            var parent = $(e.target).closest('.ui-dialog');
+            var id = $(e.target).attr('id');
+            if(id.indexOf("stylebot") != -1 || parent.length != 0)
             {
                 stylebot.unhighlight();
                 return true;

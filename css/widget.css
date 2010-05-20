@@ -1,5 +1,5 @@
 #stylebot{
-    display:none;
+/*    display:none;
     opacity:0.9;
     top:10%;
     right:10%;
@@ -14,7 +14,7 @@
     font-size:12px;
     z-index:100000;
     text-align:left;
-    line-height:12px;
+    line-height:12px;*/
 }
 
 .stylebot-header{
@@ -73,11 +73,17 @@ li.stylebot-control{
 
 #stylebot-main-buttons{
     padding:5px;
-    height:20px;
+    height:23px;
     text-align:center;
 }
 
 .stylebot-button{
+    font-family:inherit !important;
+    font-size:10px;
+    margin:0px 3px;
+}
+
+/*.stylebot-button{
     background-color:#fbfbfb;
     border-radius:2px;
     padding:3px 4px;
@@ -93,7 +99,7 @@ li.stylebot-control{
 .stylebot-button:hover{
     background-color:#686868;
     color:#fff;
-}
+}*/
 
 .stylebot-tool{
     margin:0px 2px;
