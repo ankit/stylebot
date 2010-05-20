@@ -79,6 +79,12 @@ stylebot.widget = {
             },
             dragStop: function(e, ui){
                 stylebot.widget.isBeingDragged = false;
+            },
+            beforeOpen: function(e, ui){
+                stylebot.isEditing = true;
+            },
+            beforeClose: function(e, ui){
+                stylebot.isEditing = false;
             }
         });
     },
@@ -100,7 +106,6 @@ stylebot.widget = {
         }, 0);
     },
     hide: function(){
-        stylebot.isEditing = false;
         this.box.dialog('close');
     },
     fill: function(){
@@ -128,7 +133,6 @@ stylebot.widget = {
             /* Left offset of widget */
             var offset = stylebot.selectedElement.offset();
             var left = offset.left + stylebot.selectedElement.width() + 10;
-            // var leftDiff = this.box.width() - (document.body.clientWidth - left);
             var leftDiff = this.box.dialog('option','width') - (document.body.clientWidth - left);
             if(leftDiff >= 0)
                 left = left - leftDiff;
@@ -140,14 +144,11 @@ stylebot.widget = {
                 top = window.pageYOffset - 300;
             else
             {
-                // var topDiff = window.innerHeight - (top + this.box.height() + 100);
                 var topDiff = window.innerHeight - (top + this.box.dialog('option','height') + 100);
                 if(topDiff <= 0)
                     top = top + topDiff;
             }
             
-            // this.box.css('left', left);
-            // this.box.css('top', top);
             this.box.dialog('option', 'position', [left, top]);
             
             console.log("Box Width: "+ this.box.width() + "\nLeft: " + left + "\nLeft Diff: " + leftDiff);
