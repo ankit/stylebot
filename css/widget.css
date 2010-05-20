@@ -6,6 +6,14 @@
     line-height:12px;
 }
 
+#stylebot-modal{
+    color:#444;
+    font-family:Helvetica, Arial, serif !important;
+    font-size:12px;
+    padding:10px;
+    line-height:15px;
+}
+
 ul.stylebot-controls{
     list-style-type:none;
     margin:0;
@@ -73,7 +81,7 @@ li.stylebot-control{
     font-size:12px;
 }
 
-input.stylebot-textfield{
+input.stylebot-textfield, .stylebot-textarea{
     padding:2px;
     border:1px solid #ccc !important;
     border-radius:2px;
@@ -82,4 +90,10 @@ input.stylebot-textfield{
     font-family:inherit;
     font-size:inherit;
     color:inherit;
+}
+
+.stylebot-css-code{
+    font-size:12px !important;
+    color:#333 !important;
+    font-family:"Courier New" !important;
 }

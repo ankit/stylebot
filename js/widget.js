@@ -61,17 +61,25 @@ stylebot.widget = {
         this.addListeners();
     },
     addListeners: function(){
-        this.box.mouseenter(function(e){
+        this.box.dialog('widget').mouseenter(function(e){
             if(stylebot.isEditing)
-                stylebot.widget.box.animate({
+                $(this).animate({
                     opacity:1
                 });
         });
-        this.box.mouseleave(function(e){
+        this.box.dialog('widget').mouseleave(function(e){
             if(stylebot.isEditing)
-                stylebot.widget.box.animate({
+                $(this).animate({
                     opacity:0.9
                 });
+        });
+        this.box.dialog({
+            dragStart: function(e, ui){
+                stylebot.widget.isBeingDragged = true;
+            },
+            dragStop: function(e, ui){
+                stylebot.widget.isBeingDragged = false;
+            }
         });
     },
     show: function(){
@@ -84,7 +92,7 @@ stylebot.widget = {
         this.setPosition();     //decide where the widget should be displayed with respect to selected element
         this.reset();           //clear all values for controls
         this.fill();            //fill widget with any existing custom styles
-        // this.box.fadeIn(200);
+
         this.box.dialog('open');
         
         setTimeout(function(){
@@ -93,7 +101,6 @@ stylebot.widget = {
     },
     hide: function(){
         stylebot.isEditing = false;
-        // this.box.fadeOut(200);
         this.box.dialog('close');
     },
     fill: function(){
@@ -151,7 +158,6 @@ stylebot.widget = {
         stylebot.style.save();
     },
     generateCSS: function(e){
-        alert(stylebot.style.crunchCSS());
-        // stylebot.modal.show(stylebot.style.crunchCSS());
+        stylebot.modal.show(stylebot.style.crunchCSS());
     }
 }
