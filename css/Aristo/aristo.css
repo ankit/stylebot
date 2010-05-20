@@ -371,6 +371,9 @@ button.ui-button-icons-only { width: 3.2em; }
 .ui-state-hover .ui-button-text { background: url(chrome-extension://koplbicggfbehbbgoonjkcakfmdpegfj/css/Aristo/images/button_bg.png) 0px 0px repeat-x !important; color: #313131; border-color: #9d9d9d; -moz-box-shadow: 0 0 6px rgba(0, 0, 0, 0.3); -webkit-box-shadow: 0px 0px 8px rgba(212,212,212,1); box-shadow: 0px 0px 8px rgba(212,212,212,1); }
 .ui-state-active .ui-button-text { background: url(chrome-extension://koplbicggfbehbbgoonjkcakfmdpegfj/css/Aristo/images/button_bg.png) 0px bottom repeat-x !important; color: #4f4f4f; border-color: #b6b6b6; }
 
+.ui-button.ui-state-default {border:0px none !important;}
+.ui-button.ui-state-hover {border:0px none !important;}
+
 /*button text element */
 .ui-button .ui-button-text { display: block; line-height: 1.2; font-weight: bold; font-size: 10px; text-shadow: 0px 1px 0px rgba(255,255,255,0.8); }
 .ui-button-text-only .ui-button-text { padding: 4px 9px; }

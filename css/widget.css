@@ -1,31 +1,9 @@
 #stylebot{
-/*    display:none;
-    opacity:0.9;
-    top:10%;
-    right:10%;
-    position:fixed;
-    border:1px solid #ccc;
-    width:300px;
-    background-color:#f5f5f5;
     color:#313131;
-    -webkit-box-shadow:0px 0px 10px #bbb;
-    border-radius:8px;
     font-family:Helvetica, Arial, serif !important;
     font-size:12px;
-    z-index:100000;
     text-align:left;
-    line-height:12px;*/
-}
-
-.stylebot-header{
-    color:#333;
-    text-align:center;
-    font-size:12px;
-    font-weight:bold;
-    padding:5px;
-    text-shadow:1px 1px 0px #fff;
-    border-bottom:1px solid #ccc;
-    -webkit-box-shadow:0px 1px 0px #fff;
+    line-height:12px;
 }
 
 ul.stylebot-controls{
@@ -83,26 +61,16 @@ li.stylebot-control{
     margin:0px 3px;
 }
 
-/*.stylebot-button{
-    background-color:#fbfbfb;
-    border-radius:2px;
-    padding:3px 4px;
-    border:none;
-    -webkit-box-shadow:0px 0px 1px #333;
-    color:#313131;
-    margin:0px 5px;
-    cursor:pointer;
-    font-family:inherit;
-    font-size:11px;
-}
-
-.stylebot-button:hover{
-    background-color:#686868;
-    color:#fff;
-}*/
-
 .stylebot-tool{
     margin:0px 2px;
+}
+
+#stylebot input{
+    font-size:12px;
+}
+
+#stylebot select{
+    font-size:12px;
 }
 
 input.stylebot-textfield{
@@ -114,11 +82,4 @@ input.stylebot-textfield{
     font-family:inherit;
     font-size:inherit;
     color:inherit;
-}
-
-input.stylebot-checkbox{
-/*    -khtml-appearance:none;*/
-    border:1px solid #ccc;
-    outline:none;
-    border-radius:2px;
 }

@@ -57,12 +57,6 @@ stylebot.widget = {
         this.box.appendTo(document.body).dialog({
             title: 'Custom Styles'
         });
-        
-        /* Make widget draggable */
-        // this.box.draggable({
-        //     start: function(e, ui){ stylebot.widget.isBeingDragged = true; },
-        //     stop: function(e, ui){ stylebot.widget.isBeingDragged = false; }
-        // });
 
         this.addListeners();
     },
