@@ -25,11 +25,10 @@ stylebot.modal = {
         this.box.appendTo(document.body).dialog({
             title: 'Generated CSS',
             modal: true,
-            width:400
+            width:400,
+            draggable:false,
+            resizable:false
         });
-    },
-    addListeners: function(){
-        
     },
     fill: function(content){
         this.box.find('textarea').html(content);
