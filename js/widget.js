@@ -50,8 +50,8 @@ stylebot.widget = {
         controls_ui.appendTo(this.box);
         
         var buttons = $('<div id="stylebot-main-buttons"></div>');
-        $('<div class="stylebot-button" style=""> Save changes</div>').button().appendTo(buttons).click(stylebot.widget.save);
-        $('<div class="stylebot-button" style=""> Generate CSS</div>').button().appendTo(buttons).click(stylebot.widget.generateCSS);
+        $('<button class="stylebot-button" style=""> Save changes</button>').button().appendTo(buttons).click(stylebot.widget.save);
+        $('<button class="stylebot-button" style=""> Generate CSS</button>').button().appendTo(buttons).click(stylebot.widget.generateCSS);
         buttons.appendTo(this.box);
 
         this.box.appendTo(document.body).dialog({
