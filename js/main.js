@@ -79,6 +79,7 @@ var stylebot = {
                 e.preventDefault();
                 e.stopImmediatePropagation();
                 stylebot.select();
+                return false;
             }
         });
     },
