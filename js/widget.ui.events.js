@@ -35,11 +35,12 @@ stylebot.widget.ui.events = {
     },
     
     onTextFieldKeyUp: function(e){
-        /* if esc is pressed, take away focus from textfield. */
+        /* if esc is pressed, take away focus from textfield and stop editing*/
         if(e.keyCode == 27)
         {
             e.target.blur();
-            return true;
+            stylebot.disable();
+            return;
         }
         
         var value = e.target.value;

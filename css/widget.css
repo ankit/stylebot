@@ -6,14 +6,6 @@
     line-height:12px;
 }
 
-#stylebot-modal{
-    color:#444;
-    font-family:Helvetica, Arial, serif !important;
-    font-size:12px;
-    padding:10px;
-    line-height:15px;
-}
-
 ul.stylebot-controls{
     list-style-type:none;
     margin:0;
@@ -86,11 +78,16 @@ input.stylebot-textfield, .stylebot-textarea{
     border:1px solid #ccc !important;
     border-radius:2px;
     outline:none;
+    background-color:#fff;
     -webkit-box-shadow:none !important;
     font-family:inherit;
     font-size:inherit;
     color:inherit;
 }
+
+/*input.stylebot-textfield:focus, input.stylebot-textfield:hover, .stylebot-textarea:focus, .stylebot-textarea:hover{
+    background-color:#fff;
+}*/
 
 .stylebot-css-code{
     font-size:12px !important;

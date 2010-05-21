@@ -36,8 +36,6 @@ stylebot.widget = {
         this.box = $('<div/>', {
             id:'stylebot'
         });
-        /* Headers */
-        // $('<div class="stylebot-header">Custom Styles</div>').appendTo(this.box);
         
         var controls_ui = $('<ul class="stylebot-controls" id="stylebot-styles"></ul>');
 
@@ -55,9 +53,22 @@ stylebot.widget = {
         buttons.appendTo(this.box);
 
         this.box.appendTo(document.body).dialog({
-            title: 'Custom Styles'
+            title: 'Custom Styles',
+            autoOpen: false,
+            dragStart: function(e, ui){
+                stylebot.widget.isBeingDragged = true;
+            },
+            dragStop: function(e, ui){
+                stylebot.widget.isBeingDragged = false;
+            },
+            beforeOpen: function(e, ui){
+                stylebot.isEditing = true;
+            },
+            beforeClose: function(e, ui){
+                stylebot.isEditing = false;
+            }
         });
-
+        // this.box.dialog('widget').css('position', 'fixed');
         this.addListeners();
     },
     addListeners: function(){
@@ -73,20 +84,6 @@ stylebot.widget = {
                     opacity:0.9
                 });
         });
-        this.box.dialog({
-            dragStart: function(e, ui){
-                stylebot.widget.isBeingDragged = true;
-            },
-            dragStop: function(e, ui){
-                stylebot.widget.isBeingDragged = false;
-            },
-            beforeOpen: function(e, ui){
-                stylebot.isEditing = true;
-            },
-            beforeClose: function(e, ui){
-                stylebot.isEditing = false;
-            }
-        });
     },
     show: function(){
         stylebot.isEditing = true;
@@ -100,9 +97,9 @@ stylebot.widget = {
         this.fill();            //fill widget with any existing custom styles
 
         this.box.dialog('open');
-        
+
         setTimeout(function(){
-            $('.stylebot-tool')[0].focus();
+            $('input.stylebot-tool')[0].focus(); //set focus to first control tool in widget
         }, 0);
     },
     hide: function(){
@@ -115,9 +112,7 @@ stylebot.widget = {
         if(styles)
         {
             for(var i=0; i<len; i++)
-            {
                 this.ui.fillControl(this.controls[i], styles);
-            }
         }
     },
     reset: function(){
