@@ -5,6 +5,7 @@
   **/
   
 stylebot.widget.ui = {
+    colorpicker:null,
     createControl: function(control){
         var el = $('<li class="stylebot-control"></li>');
         this.createLabel(control.name).appendTo(el);
@@ -13,7 +14,8 @@ stylebot.widget.ui = {
             case 'font-size'        :   this.createTextfield('font-size', 4).appendTo(el);
                                         break;
                                         
-            case 'color'            :   this.createTextfield('color', 10).appendTo(el);
+            case 'color'            :   this.createColorPicker().appendTo(el);
+                                        this.createTextfield('color', 10).appendTo(el);
                                         break;
                                         
             case 'background-color' :   this.createTextfield('background-color', 10).appendTo(el);
@@ -103,6 +105,25 @@ stylebot.widget.ui = {
         return option;
     },
     
+    createColorPicker: function(){
+        return $('<div>', {
+            class:'stylebot-colorselector stylebot-tool'
+        })
+        .append($('<div>', {class:'stylebot-colorselector-color'}))
+        .click(stylebot.widget.ui.events.onColorSelectorClick);
+    },
+    
+    getColorPickerLeftPosition: function(){
+        var dialog = stylebot.widget.box.dialog('widget');
+        var left = dialog.offset().left + dialog.width();
+        console.log("ColorPicker left: " + left);
+        var leftDiff = 410 - (document.body.clientWidth - left);
+        console.log("ColorPicker leftDiff: " + leftDiff);
+        if(leftDiff >= 0)
+            left = left - leftDiff;
+        return left;
+    },
+    
     fillControl: function(control, styles){
         switch(control.id){
             case 'font-size'        : 
@@ -149,6 +170,6 @@ stylebot.widget.ui = {
     },
     
     getControl: function(controlId){
-        return $('#stylebot-'+controlId);
+        return $('#stylebot-' + controlId);
     }
 }

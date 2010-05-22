@@ -64,5 +64,25 @@ stylebot.widget.ui.events = {
         }
         else
             stylebot.style.apply(stylebot.widget.selector, property, value);
+    },
+    
+    onColorSelectorClick: function(e){
+        var left = stylebot.widget.ui.getColorPickerLeftPosition();
+        var top = stylebot.widget.box.dialog('widget').css('top');
+        
+        if(!stylebot.widget.ui.colorpicker)
+        {
+            stylebot.widget.ui.colorpicker = $('<div>', {id:'stylebot-colorpicker'});
+            stylebot.widget.ui.colorpicker.ColorPicker({flat:true}).dialog({
+                title:'Color Picker',
+                width:400,
+                height:250
+                // buttons:{"Close": function(e){$(this).dialog('close');}}
+            });
+        }
+        else
+            stylebot.widget.ui.colorpicker.dialog('open');
+
+        stylebot.widget.ui.colorpicker.dialog('option', 'position', [left, top]);
     }
 }
