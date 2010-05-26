@@ -3,7 +3,7 @@
   * Source: http://github.com/ankit/stylebot
   *
   * Copyright (c) 2010 Ankit Ahuja
-  * Licensed under GPL. See LICENSE
+  * Dual licensed under GPL and MIT licenses.
  **/
 
 $(document).ready(function(){
