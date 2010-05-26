@@ -1,3 +1,5 @@
+/* Main */
+
 #stylebot{
     color:#313131;
     font-family:Helvetica, Arial, serif !important;
@@ -6,7 +8,7 @@
     line-height:12px;
 }
 
-ul.stylebot-controls{
+ul#stylebot-controls{
     list-style-type:none;
     margin:0;
     border:none;
@@ -18,7 +20,7 @@ ul.stylebot-controls{
     color:inherit;
 }
 
-li.stylebot-control{
+li.stylebot-control-set{
     padding:2px;
     margin:5px 0;
     border-radius:2px;
@@ -27,6 +29,12 @@ li.stylebot-control{
     font-size:inherit;
     color:inherit;
 }
+
+.stylebot-control{
+    margin:0px 2px;
+}
+
+/* Labels */
 
 .stylebot-label{
     text-shadow:1px 1px 0px #fff;
@@ -49,6 +57,8 @@ li.stylebot-control{
     padding-right:5px;
 }
 
+/* Buttons */
+
 #stylebot-main-buttons{
     padding:5px;
     height:23px;
@@ -61,9 +71,7 @@ li.stylebot-control{
     margin:0px 3px;
 }
 
-.stylebot-tool{
-    margin:0px 2px;
-}
+/* Controls */
 
 #stylebot input{
     font-size:12px;
@@ -89,6 +97,7 @@ input.stylebot-textfield, .stylebot-textarea{
     background-color:#fff;
 }*/
 
+/* Code styling */
 .stylebot-css-code{
     font-size:12px !important;
     color:#333 !important;

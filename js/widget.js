@@ -5,9 +5,13 @@
   **/
 
 stylebot.widget = {
+    
     box: null,
+    
     isBeingDragged:false,
+    
     selector: null,
+    
     controls:[{
         name:'Color',
         id: 'color'
@@ -32,12 +36,13 @@ stylebot.widget = {
         name:'Hide Element',
         id: 'display'
     }],
+    
     create: function(){
         this.box = $('<div/>', {
             id:'stylebot'
         });
         
-        var controls_ui = $('<ul class="stylebot-controls" id="stylebot-styles"></ul>');
+        var controls_ui = $('<ul id="stylebot-controls"></ul>');
 
         /* creating the controls for different CSS properties */
         var len = this.controls.length;
@@ -71,6 +76,7 @@ stylebot.widget = {
         // this.box.dialog('widget').css('position', 'fixed');
         this.addListeners();
     },
+    
     addListeners: function(){
         this.box.dialog('widget').mouseenter(function(e){
             if(stylebot.isEditing)
@@ -85,26 +91,29 @@ stylebot.widget = {
                 });
         });
     },
+    
     show: function(){
         stylebot.isEditing = true;
         this.selector = stylebot.selector.value;
         
-        if(!this.box)           //if DOM element for widget does not exist, create it
+        if(!this.box)
             this.create();
 
-        this.setPosition();     //decide where the widget should be displayed with respect to selected element
-        this.reset();           //clear all values for controls
-        this.fill();            //fill widget with any existing custom styles
+        this.setPosition();     // decide where the widget should be displayed with respect to selected element
+        this.reset();           // reset all values for controls
+        this.fill();            // fill widget with any existing custom styles
 
         this.box.dialog('open');
 
         setTimeout(function(){
-            $('input.stylebot-tool')[0].focus(); //set focus to first control tool in widget
+            $('.stylebot-control')[0].focus(); //set focus to first control in widget
         }, 0);
     },
+    
     hide: function(){
         this.box.dialog('close');
     },
+    
     fill: function(){
         var len = this.controls.length;
         var styles = stylebot.style.getStyles(this.selector);
@@ -115,13 +124,16 @@ stylebot.widget = {
                 this.ui.fillControl(this.controls[i], styles);
         }
     },
+    
+    // reset values to default for all controls
     reset: function(){
-        /* clear all fields */
         $('.stylebot-textfield').attr('value', '');
         $('.stylebot-checkbox').attr('checked', false);
         $('.stylebot-radio').attr('checked', false);
         $('.stylebot-select').attr('selectedIndex', 0);
     },
+    
+    // calculate where the widget should be displayed w.r.t selected element
     setPosition: function(){
         if(stylebot.selectedElement)
         {
@@ -150,9 +162,11 @@ stylebot.widget = {
             console.log("Box Height: " + this.box.height() + "\nTop: " + top + "\nTop Diff: " + topDiff);
         }
     },
+    
     save: function(e){
         stylebot.style.save();
     },
+    
     generateCSS: function(e){
         stylebot.modal.show(stylebot.style.crunchCSS());
     }

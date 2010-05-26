@@ -5,6 +5,8 @@
   **/
 
 stylebot.utils = {
+    
+    // return array index at which property pName is equal to value 'pValue'
     search: function(arr, pName, pValue){
         var len = arr.length;
         for(var i=0; i<len; i++)

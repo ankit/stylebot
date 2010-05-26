@@ -1,7 +1,7 @@
 /**
   * stylebot.widget.ui.events
   * 
-  * Events for Stylebot Widget UI Controls
+  * Events for Stylebot Widget Controls
   **/
 
 stylebot.widget.ui.events = {
@@ -35,7 +35,7 @@ stylebot.widget.ui.events = {
     },
     
     onTextFieldKeyUp: function(e){
-        /* if esc is pressed, take away focus from textfield and stop editing*/
+        // if esc is pressed, take away focus from textfield and stop editing
         if(e.keyCode == 27)
         {
             e.target.blur();
