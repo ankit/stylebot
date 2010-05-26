@@ -1,7 +1,7 @@
 /**
   * stylebot.widget.ui.events
   * 
-  * Events for Stylebot Widget UI Controls
+  * Events for Stylebot Widget Controls
   **/
 
 stylebot.widget.ui.events = {

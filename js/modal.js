@@ -5,7 +5,10 @@
   **/
 
 stylebot.modal = {
+    
     box: null,
+
+    // create the DOM elements
     create: function(){
         this.box = $('<div/>', {
             id:'stylebot-modal'
@@ -30,15 +33,18 @@ stylebot.modal = {
             resizable:false
         });
     },
+    
     fill: function(content){
         this.box.find('textarea').html(content);
     },
+    
     show: function(content){
         if(!this.box)
             this.create();
         this.fill(content);
         this.box.dialog('open');
     },
+    
     hide: function(){
         this.box.fadeOut(300);
     }

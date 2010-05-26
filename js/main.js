@@ -18,20 +18,25 @@ var stylebot = {
     defaults: {
         shortcutKey:69 //69 is keycode for 'e'
     },
+    
     init: function(){
         this.addListeners();
     },
+    
+    // toggle stylebot editing status
     toggle: function(){
         if(this.status == true)
             this.disable();
         else
             this.enable();
     },
+    
     enable: function(){
         this.status = true;
         stylebot.chrome.setIcon(true);
         stylebot.widget.show();
     },
+    
     disable: function(){
         this.status = false;
         this.unhighlight();
@@ -39,6 +44,7 @@ var stylebot = {
         stylebot.chrome.setIcon(false);
         stylebot.widget.hide();
     },
+    
     addListeners: function(){
         /* Handle key presses */
         $(document).keyup(function(e){
@@ -85,17 +91,20 @@ var stylebot = {
             }
         });
     },
+    
     highlight: function(el){
         if(stylebot.hoveredElement)
             stylebot.hoveredElement.removeClass('stylebot-selected');
         stylebot.hoveredElement = $(el);
         stylebot.hoveredElement.addClass('stylebot-selected');
     },
+    
     unhighlight: function(){
         if(stylebot.hoveredElement)
             stylebot.hoveredElement.removeClass('stylebot-selected');
         stylebot.hoveredElement = null;
     },
+    
     select: function(){
         stylebot.selectedElement = stylebot.hoveredElement;
         stylebot.unhighlight();
