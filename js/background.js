@@ -25,7 +25,7 @@ function addListeners(){
  * Page Action handling
  **/
 
-/* Toggle CSS editing when page icon is clicked */
+// Toggle CSS editing when page icon is clicked
 function handlePageIconClick(tab){
     currTabId = tab.id;
     chrome.tabs.sendRequest(currTabId, {name:"toggle"}, function(response){
