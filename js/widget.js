@@ -121,6 +121,7 @@ stylebot.widget = {
         $('.stylebot-checkbox').attr('checked', false);
         $('.stylebot-radio').attr('checked', false);
         $('.stylebot-select').attr('selectedIndex', 0);
+        $('.stylebot-colorselector-color').css('backgroundColor', '#fff');
     },
     setPosition: function(){
         if(stylebot.selectedElement)

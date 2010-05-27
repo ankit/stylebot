@@ -14,11 +14,14 @@ stylebot.widget.ui = {
             case 'font-size'        :   this.createTextfield('font-size', 4).appendTo(el);
                                         break;
                                         
-            case 'color'            :   this.createColorPicker().appendTo(el);
-                                        this.createTextfield('color', 10).appendTo(el);
+            case 'color'            :   var input = this.createTextfield('color', 10);
+                                        this.createColorPicker(input).appendTo(el);
+                                        input.appendTo(el);
                                         break;
                                         
-            case 'background-color' :   this.createTextfield('background-color', 10).appendTo(el);
+            case 'background-color' :   var input = this.createTextfield('background-color', 10);
+                                        this.createColorPicker(input).appendTo(el);
+                                        input.appendTo(el);
                                         break;
                                         
             case 'display'          :   this.createCheckbox(null, 'display', 'none').appendTo(el);
@@ -105,11 +108,11 @@ stylebot.widget.ui = {
         return option;
     },
     
-    createColorPicker: function(){
+    createColorPicker: function(input){
         return $('<div>', {
             class:'stylebot-colorselector stylebot-tool'
         })
-        .append($('<div>', {class:'stylebot-colorselector-color'}))
+        .append($('<div>', {class:'stylebot-colorselector-color'}).data('input', input))
         .click(stylebot.widget.ui.events.onColorSelectorClick);
     },
     
@@ -126,12 +129,26 @@ stylebot.widget.ui = {
     
     fillControl: function(control, styles){
         switch(control.id){
-            case 'font-size'        : 
-            case 'color'            :
-            case 'background-color' :   var index = stylebot.utils.search(styles, "property", control.id);
+            case 'font-size'        : var index = stylebot.utils.search(styles, "property", control.id);
                                         if(index != null)
                                             this.getControl(control.id).attr('value', styles[index].value);
                                         break;
+            case 'color'            :   
+            case 'background-color' :   
+                                        var index = stylebot.utils.search(styles, "property", control.id);
+                                        if(index != null)
+                                        {
+                                            var control = this.getControl(control.id);
+                                            var color = styles[index].value;
+                                            control.attr('value', color);
+                                            if(color != "")
+                                            {
+                                                var colorSelector = control.prev('.stylebot-colorselector').find('.stylebot-colorselector-color');
+                                                colorSelector.css('backgroundColor', color);
+                                            }
+                                                
+                                        }
+                                        break;                               
             case 'display'          :   var index = stylebot.utils.search(styles, "property", control.id);
                                         if(index != null)
                                         {
