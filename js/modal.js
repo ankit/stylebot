@@ -10,7 +10,7 @@ stylebot.modal = {
 
     // create the DOM elements
     create: function(){
-        this.box = $('<div/>', {
+        this.box = $('<div>', {
             id:'stylebot-modal'
         });
         
@@ -24,7 +24,7 @@ stylebot.modal = {
             width:'98%',
             class:'stylebot-textarea stylebot-css-code'
         }).appendTo(this.box);
-        
+
         this.box.appendTo(document.body).dialog({
             title: 'Generated CSS',
             modal: true,
@@ -46,6 +46,6 @@ stylebot.modal = {
     },
     
     hide: function(){
-        this.box.fadeOut(300);
+        this.box.dialog('close');
     }
 }

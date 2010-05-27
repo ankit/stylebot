@@ -1,13 +1,15 @@
 /**
   * stylebot.widget.ui
   * 
-  * Controls for Stylebot Widget
+  * UI for Stylebot Widget
   **/
   
 stylebot.widget.ui = {
     colorpicker:null,
     createControl: function(control){
-        var el = $('<li class="stylebot-control-set"></li>');
+        var el = $('<li>', {
+            class: 'stylebot-control-set'
+        });
         this.createLabel(control.name).appendTo(el);
         
         // Property specific controls to add to control set
@@ -48,14 +50,26 @@ stylebot.widget.ui = {
     },
     
     createTextfield: function(property, size){
-        var input = $('<input type="text" id="stylebot-' + property + '" class="stylebot-textfield stylebot-control" size="' + size + '" />');
+        var input = $('<input>',{
+            type: 'text',
+            id: 'stylebot-' + property,
+            class: 'stylebot-control stylebot-textfield',
+            size: size
+        });
+        
         input.data("property", property);
         input.keyup(stylebot.widget.ui.events.onTextFieldKeyUp);
         return input;
     },
     
     createCheckbox: function(text, property, value){
-        var checkbox = $('<input type="checkbox" id="stylebot-' + property + '" class="stylebot-control stylebot-checkbox" value="' + value + '"/> ');
+        var checkbox = $('<input>',{
+            type: 'checkbox',
+            id: 'stylebot' + property,
+            class: 'stylebot-control stylebot-checkbox',
+            value: value
+        });
+        
         checkbox.data('property', property);
         checkbox.click(stylebot.widget.ui.events.onCheckboxClick);
         if(text)
@@ -70,13 +84,22 @@ stylebot.widget.ui = {
     },
     
     createRadio: function(text, name, property, value){
-        var span = $('<span id="stylebot-' + property + '" class="stylebot-control"></span>');
-        var radio;
+        var span = $('<span>',{
+            id: 'stylebot' + property,
+            class: 'stylebot-control'
+        });
+
+        var radio = $('<input>',{
+            type: 'radio',
+            name: name,
+            class: 'stylebot-control stylebot-radio'
+        });
         
         if(typeof(property) == 'string')
-            radio = $('<input type="radio" name = "' + name + '" class="stylebot-control stylebot-radio" value="' + value + '"/> ');
+            radio.attr('value', value);
         else
-            radio = $('<input type="radio" name = "' + name + '" class="stylebot-control stylebot-radio" value="' + value.join(",") + '"/> ');
+            radio.attr('value', value.join(','));
+        
         radio.data('property', property);
         radio.click(stylebot.widget.ui.events.onRadioClick);
         radio.appendTo(span);
@@ -84,27 +107,26 @@ stylebot.widget.ui = {
         return span;
     },
     
-    createLabel: function(text){
-        return $('<label class="stylebot-label">' + text + ':</label>');
-    },
-    
-    createInlineLabel: function(text){
-        return $('<label class="stylebot-inline-label">' + text + '</label>');
-    },
-    
     createSelect: function(property){
-        var select = $('<select id="stylebot-' + property + '" class="stylebot-select stylebot-control"></select>');
+        var select = $('<select>', {
+            id:'stylebot' + property,
+            class: 'stylebot-control stylebot-select'
+        });
         select.data('property', property);
         select.change(stylebot.widget.ui.events.onSelectChange);
         return select;
     },
     
     createSelectOption: function(text, property, value){
-        var option;
+        var option = $('<option>', {
+            class: 'stylebot-select-option',
+            html: text
+        });
+        
         if(typeof(property) == 'string')
-            option = $('<option class="stylebot-select-option" value="' + value + '">' + text + '</option>');
+            option.attr('value', value);
         else
-            option = $('<option class="stylebot-select-option" value="' + value.join(",") + '">' + text + '</option>');
+            option.attr('value', value.join(','));
         option.data('property', property);
         return option;
     },
@@ -146,6 +168,26 @@ stylebot.widget.ui = {
         // get the color selector connected to the input field
         var colorSelector = input.prev().find('div');
         colorSelector.css('backgroundColor', color);
+
+    createLabel: function(text){
+        return $('<label>', {
+            class: 'stylebot-label',
+            html: text
+        });
+    },
+    
+    createInlineLabel: function(text){
+        return $('<label>', {
+            class: 'stylebot-inline-label',
+            html: text
+        });
+    },
+    
+    createButton: function(text){
+        return $('<button>', {
+            class: 'stylebot-button',
+            html: text
+        }).button();
     },
     
     fillControl: function(control, styles){
