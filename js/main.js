@@ -33,12 +33,15 @@ var stylebot = {
     
     enable: function(){
         this.status = true;
+        // Add stylebot-ui class to body, so that jquery-ui styles are applied to widget
+        $(document.body).addClass('stylebot-ui');
         stylebot.chrome.setIcon(true);
         stylebot.widget.show();
     },
     
     disable: function(){
         this.status = false;
+        $(document.body).removeClass('stylebot-ui');
         this.unhighlight();
         this.selectedElement = null;
         stylebot.chrome.setIcon(false);
