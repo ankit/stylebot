@@ -38,11 +38,13 @@ stylebot.widget = {
     }],
     
     create: function(){
-        this.box = $('<div/>', {
+        this.box = $('<div>', {
             id:'stylebot'
         });
         
-        var controls_ui = $('<ul id="stylebot-controls"></ul>');
+        var controls_ui = $('<ul>', {
+            id: 'stylebot-controls'
+        });
 
         /* creating the controls for different CSS properties */
         var len = this.controls.length;
@@ -52,9 +54,12 @@ stylebot.widget = {
         
         controls_ui.appendTo(this.box);
         
-        var buttons = $('<div id="stylebot-main-buttons"></div>');
-        $('<button class="stylebot-button" style=""> Save changes</button>').button().appendTo(buttons).click(stylebot.widget.save);
-        $('<button class="stylebot-button" style=""> Generate CSS</button>').button().appendTo(buttons).click(stylebot.widget.generateCSS);
+        var buttons = $('<div>', {
+            id: 'stylebot-main-buttons'
+        });
+        
+        this.ui.createButton('Save changes').appendTo(buttons).click(stylebot.widget.save);
+        this.ui.createButton('Generate CSS').appendTo(buttons).click(stylebot.widget.generateCSS);
         buttons.appendTo(this.box);
 
         this.box.appendTo(document.body).dialog({

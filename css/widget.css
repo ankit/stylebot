@@ -46,6 +46,7 @@ li.stylebot-control-set{
     font-size:inherit;
     font-weight:normal;
     color:inherit;
+    margin:0;
 }
 
 .stylebot-inline-label{
@@ -69,6 +70,7 @@ li.stylebot-control-set{
     font-family:inherit !important;
     font-size:10px;
     margin:0px 3px;
+    float:none;
 }
 
 /* Controls */
