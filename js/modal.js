@@ -20,7 +20,7 @@ stylebot.modal = {
         }).appendTo(this.box);
         
         $('<textarea>', {
-            height:180,
+            height:300,
             width:'98%',
             class:'stylebot-textarea stylebot-css-code'
         }).appendTo(this.box);
@@ -28,7 +28,8 @@ stylebot.modal = {
         this.box.appendTo(document.body).dialog({
             title: 'Generated CSS',
             modal: true,
-            width:400,
+            width:'50%',
+            height:450,
             draggable:false,
             resizable:false,
             buttons: { "Copy to Clipboard": stylebot.modal.copyToClipboard }
@@ -43,6 +44,7 @@ stylebot.modal = {
         if(!this.box)
             this.create();
         this.fill(content);
+        this.box.find('textarea').focus();
         this.box.dialog('open');
     },
     

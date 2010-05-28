@@ -1,0 +1,33 @@
+/* Prettier scrollbars */
+.stylebot-textarea{
+    resize:none;
+}
+
+.stylebot-textarea::-webkit-scrollbar {
+	width: 8px;
+	height: 8px;
+}
+
+.stylebot-textarea::-webkit-scrollbar-button:start:decrement,
+.stylebot-textarea::-webkit-scrollbar-button:end:increment{
+	display:none;
+}
+
+.stylebot-textarea::-webkit-scrollbar-button:start:increment,
+.stylebot-textarea::-webkit-scrollbar-button:end:decrement {
+    display: none;
+}
+
+.stylebot-textarea::-webkit-scrollbar-track-piece {
+	border-radius:5px;
+	background-color: #ededed;
+}
+
+.stylebot-textarea::-webkit-scrollbar-thumb:vertical {
+    height: 100px;
+	border-radius:5px;
+	background-color: #aaa;
+}
+.stylebot-textarea::-webkit-scrollbar-corner:vertical, .stylebot-textarea::-webkit-scrollbar-resizer:vertical {
+    background-color: #ededed;
+}
