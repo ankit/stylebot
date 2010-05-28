@@ -8,9 +8,9 @@ stylebot.widget = {
     
     box: null,
     
-    isBeingDragged:false,
-    
     selector: null,
+    
+    isBeingDragged:false,
     
     controls:[{
         name:'Color',
@@ -113,9 +113,9 @@ stylebot.widget = {
         if(!this.box)
             this.create();
 
-        this.setPosition();     // decide where the widget should be displayed with respect to selected element
-        this.reset();           // reset all values for controls
-        this.fill();            // fill widget with any existing custom styles
+        this.setPosition();         // decide where the widget should be displayed with respect to selected element
+        this.ui.reset();            // reset all values for controls to default values
+        this.ui.fill();             // fill widget with any existing custom styles
 
         this.box.dialog('open');
 
@@ -126,26 +126,6 @@ stylebot.widget = {
     
     hide: function(){
         this.box.dialog('close');
-    },
-    
-    fill: function(){
-        var len = this.controls.length;
-        var styles = stylebot.style.getStyles(this.selector);
-        
-        if(styles)
-        {
-            for(var i=0; i<len; i++)
-                this.ui.fillControl(this.controls[i], styles);
-        }
-    },
-    
-    // reset values to default for all controls
-    reset: function(){
-        $('.stylebot-textfield').attr('value', '');
-        $('.stylebot-checkbox').attr('checked', false);
-        $('.stylebot-radio').attr('checked', false);
-        $('.stylebot-select').attr('selectedIndex', 0);
-        $('.stylebot-colorselector-color').css('backgroundColor', '#fff');
     },
     
     // calculate where the widget should be displayed w.r.t selected element

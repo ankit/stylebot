@@ -252,5 +252,26 @@ stylebot.widget.ui = {
     
     getControl: function(controlId){
         return $('#stylebot-' + controlId);
-    }
+    },
+    
+    // fill controls with any existing custom styles for current selector
+    fill: function(){
+        var len = stylebot.widget.controls.length;
+        var styles = stylebot.style.getStyles(stylebot.selector.value);
+        
+        if(styles)
+        {
+            for(var i=0; i<len; i++)
+                this.fillControl(stylebot.widget.controls[i], styles);
+        }
+    },
+    
+    // reset values to default for all controls
+    reset: function(){
+        $('.stylebot-textfield').attr('value', '');
+        $('.stylebot-checkbox').attr('checked', false);
+        $('.stylebot-radio').attr('checked', false);
+        $('.stylebot-select').attr('selectedIndex', 0);
+        $('.stylebot-colorselector-color').css('backgroundColor', '#fff');
+    },
 }

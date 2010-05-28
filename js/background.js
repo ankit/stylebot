@@ -17,6 +17,7 @@ function addListeners(){
         switch(request.name){
             case "enablePageIcon": enablePageIcon(sender.tab.id); break;
             case "disablePageIcon": disablePageIcon(sender.tab.id); break;
+            case "copyToClipboard": copyToClipboard(request.text); break;
         }
     });
 }
@@ -44,6 +45,16 @@ function enablePageIcon(tabId){
 function disablePageIcon(tabId){
     chrome.pageAction.setIcon({tabId:tabId, path:"images/icon19_off.png"});
     chrome.pageAction.setTitle({tabId:tabId, title:"Click to turn CSS editing on"});
+}
+
+// Copy to Clipboard
+function copyToClipboard(text){
+    var copyTextarea = document.createElement('textarea');
+    document.body.appendChild(copyTextarea);
+    copyTextarea.value = text;
+    copyTextarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(copyTextarea);
 }
 
 window.addEventListener('load', function(){

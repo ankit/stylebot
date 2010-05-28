@@ -10,7 +10,7 @@ stylebot.style = {
         e.g.: 
         rule = { 
             selector: 'a', 
-            rules:  [{
+            styles:  [{
                 property: 'color',
                 value: '#fff'
                 }]
@@ -18,7 +18,10 @@ stylebot.style = {
     */
     rules:[],
     
+    // apply a new style to selected elements
     apply: function(selector, property, value){
+        if(!selector)
+            return true;
         var el = $(selector);
 
         /* TODO: Any original inline CSS should remain unaltered */

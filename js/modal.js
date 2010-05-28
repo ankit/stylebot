@@ -30,7 +30,8 @@ stylebot.modal = {
             modal: true,
             width:400,
             draggable:false,
-            resizable:false
+            resizable:false,
+            buttons: { "Copy to Clipboard": stylebot.modal.copyToClipboard }
         });
     },
     
@@ -47,5 +48,10 @@ stylebot.modal = {
     
     hide: function(){
         this.box.dialog('close');
+    },
+    
+    copyToClipboard: function(){
+        var text = stylebot.modal.box.find('textarea').attr('value');
+        stylebot.chrome.copyToClipboard(text);
     }
 }

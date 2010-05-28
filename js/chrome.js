@@ -10,6 +10,10 @@ stylebot.chrome = {
             chrome.extension.sendRequest({name:"enablePageIcon"}, function(){});
         else
             chrome.extension.sendRequest({name:"disablePageIcon"}, function(){});
+    },
+    // send request to background.html to copy text
+    copyToClipboard: function(text){
+        chrome.extension.sendRequest({name:"copyToClipboard", text:text}, function(){});
     }
 }
 
