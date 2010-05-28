@@ -110,9 +110,10 @@ stylebot.widget.ui = {
     
     createColorPicker: function(input){
         return $('<div>', {
-            class:'stylebot-colorselector stylebot-tool'
+            class:'stylebot-colorselector stylebot-tool', 
+            tabIndex:0
         })
-        .append($('<div>', { class:'stylebot-colorselector-color' , tabIndex:0}))
+        .append($('<div>', { class:'stylebot-colorselector-color'}))
         .ColorPicker({
             flat:false,
             onChange: function(hsb, hex, rgb){

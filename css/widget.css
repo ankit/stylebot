@@ -95,7 +95,7 @@ input.stylebot-textfield, .stylebot-textarea{
     font-family:"Courier New" !important;
 }
 
-/* colorpicker */
+/* colorpicker selector*/
 .stylebot-colorselector{
     width:30px !important;
     height:12px !important;
@@ -107,6 +107,11 @@ input.stylebot-textfield, .stylebot-textarea{
 }
 .stylebot-colorselector-color{
     background-color:#fff;
+    margin:1px 1px;
     border:1px solid #aaa;
-    height:90% !important;
+    height:70% !important;
+}
+.stylebot-colorselector:focus{
+    outline:none;
+    background-color:#ddd;
 }
