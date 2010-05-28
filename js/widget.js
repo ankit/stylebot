@@ -95,7 +95,7 @@ stylebot.widget = {
                     opacity:0.9
                 });
         });
-        $('.stylebot-tool').keyup(function(e){
+        $('.stylebot-control').keyup(function(e){
             /* if esc is pressed, take away focus and stop editing*/
             if(e.keyCode == 27)
             {

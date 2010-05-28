@@ -133,7 +133,7 @@ stylebot.widget.ui = {
     
     createColorPicker: function(input){
         return $('<div>', {
-            class:'stylebot-colorselector stylebot-tool', 
+            class:'stylebot-colorselector stylebot-control', 
             tabIndex:0
         })
         .append($('<div>', { class:'stylebot-colorselector-color'}))
@@ -168,6 +168,7 @@ stylebot.widget.ui = {
         // get the color selector connected to the input field
         var colorSelector = input.prev().find('div');
         colorSelector.css('backgroundColor', color);
+    },
 
     createLabel: function(text){
         return $('<label>', {
@@ -188,6 +189,7 @@ stylebot.widget.ui = {
             class: 'stylebot-button',
             html: text
         }).button();
+
     },
     
     fillControl: function(control, styles){
