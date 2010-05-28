@@ -16,12 +16,12 @@ stylebot.widget.ui = {
                                         
             case 'color'            :   var input = this.createTextfield('color', 10);
                                         this.createColorPicker(input).appendTo(el);
-                                        input.appendTo(el);
+                                        input.appendTo(el).keyup(function(e){ stylebot.widget.ui.setColorSelectorColor( $(this) ) });
                                         break;
                                         
             case 'background-color' :   var input = this.createTextfield('background-color', 10);
                                         this.createColorPicker(input).appendTo(el);
-                                        input.appendTo(el);
+                                        input.appendTo(el).keyup(function(e){ stylebot.widget.ui.setColorSelectorColor( $(this) ) });;
                                         break;
                                         
             case 'display'          :   this.createCheckbox(null, 'display', 'none').appendTo(el);
@@ -112,43 +112,59 @@ stylebot.widget.ui = {
         return $('<div>', {
             class:'stylebot-colorselector stylebot-tool'
         })
-        .append($('<div>', {class:'stylebot-colorselector-color'}).data('input', input))
-        .click(stylebot.widget.ui.events.onColorSelectorClick);
+        .append($('<div>', { class:'stylebot-colorselector-color' , tabIndex:0}))
+        .ColorPicker({
+            flat:false,
+            onChange: function(hsb, hex, rgb){
+                var colorCode = '#' + hex;
+                // set input value to reflect the newly picked color's code
+                input.attr('value', colorCode);
+                input.keyup();
+                // update the color selector color
+                stylebot.widget.ui.setColorSelectorColor(input);
+            },
+            onBeforeShow: function(){
+                var color = input.attr('value');
+                if(color == "")
+                    color = "#ffffff"; // default is white
+                $(this).ColorPickerSetColor(color);
+            }
+        })
+        .keyup(function(e){
+            // TODO: Toggle visibility of color picker when enter is pressed
+            if(e.keyCode == 13) //enter
+                $(this).ColorPickerShow();
+        });
     },
     
-    getColorPickerLeftPosition: function(){
-        var dialog = stylebot.widget.box.dialog('widget');
-        var left = dialog.offset().left + dialog.width();
-        console.log("ColorPicker left: " + left);
-        var leftDiff = 410 - (document.body.clientWidth - left);
-        console.log("ColorPicker leftDiff: " + leftDiff);
-        if(leftDiff >= 0)
-            left = left - leftDiff;
-        return left;
+    // Set color selector value by fetching value from connected input textfield
+    setColorSelectorColor: function(input){
+        // get the color value
+        var color = input.attr('value');
+        // get the color selector connected to the input field
+        var colorSelector = input.prev().find('div');
+        colorSelector.css('backgroundColor', color);
     },
     
     fillControl: function(control, styles){
         switch(control.id){
-            case 'font-size'        : var index = stylebot.utils.search(styles, "property", control.id);
+            case 'font-size'        :   var index = stylebot.utils.search(styles, "property", control.id);
                                         if(index != null)
                                             this.getControl(control.id).attr('value', styles[index].value);
                                         break;
+                                        
             case 'color'            :   
-            case 'background-color' :   
-                                        var index = stylebot.utils.search(styles, "property", control.id);
+            case 'background-color' :   var index = stylebot.utils.search(styles, "property", control.id);
                                         if(index != null)
                                         {
                                             var control = this.getControl(control.id);
                                             var color = styles[index].value;
                                             control.attr('value', color);
                                             if(color != "")
-                                            {
-                                                var colorSelector = control.prev('.stylebot-colorselector').find('.stylebot-colorselector-color');
-                                                colorSelector.css('backgroundColor', color);
-                                            }
-                                                
+                                                stylebot.widget.ui.setColorSelectorColor(control);
                                         }
-                                        break;                               
+                                        break;
+                                        
             case 'display'          :   var index = stylebot.utils.search(styles, "property", control.id);
                                         if(index != null)
                                         {
@@ -158,6 +174,7 @@ stylebot.widget.ui = {
                                                 this.getControl(control.id).attr('checked', false);                                                
                                         }
                                         break;
+                                        
             case 'style'            :   var index = stylebot.utils.search(styles, "property", "font-weight");
                                         var index2 = stylebot.utils.search(styles, "property", "font-style");
                                         if(index != null)
@@ -174,6 +191,7 @@ stylebot.widget.ui = {
                                                 this.getControl(control.id).attr('selectedIndex', 4);
                                         }
                                         break;
+                                        
             case 'text-decoration'  :   var index = stylebot.utils.search(styles, "property", "text-decoration");
                                         if(index != null)
                                         {

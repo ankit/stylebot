@@ -99,7 +99,7 @@ stylebot.widget = {
         this.box.dialog('open');
 
         setTimeout(function(){
-            $('input.stylebot-tool')[0].focus(); //set focus to first control tool in widget
+            $('.stylebot-tool')[0].focus(); //set focus to first control tool in widget
         }, 0);
     },
     hide: function(){

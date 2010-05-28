@@ -64,7 +64,9 @@ var stylebot = {
 
             var parent = $(e.target).closest('.ui-dialog');
             var id = $(e.target).attr('id');
-            if(id.indexOf("stylebot") != -1 || parent.length != 0)
+            var colorPicker = $(e.target).closest('.colorpicker');
+            
+            if(id.indexOf("stylebot") != -1 || parent.length != 0 || colorPicker.length != 0)
             {
                 stylebot.unhighlight();
                 return true;
