@@ -22,13 +22,8 @@ stylebot.style = {
     apply: function(selector, property, value){
         if(!selector)
             return true;
-        var el = $(selector);
-
-        /* TODO: Any original inline CSS should remain unaltered */
-        var origCSS = el.attr('style');
-        origCSS = (typeof(origCSS) == "undefined") ? "" : origCSS;
-        
-        this.applyInlineCSS(el, this.getInlineCSS(selector, property, value));
+        var selectedElements = $(selector);
+        this.applyInlineCSS(selectedElements, this.getInlineCSS(selector, property, value));
         this.saveRule(selector, property, value);
     },
     
@@ -90,19 +85,54 @@ stylebot.style = {
             return this.getCSSDeclaration(property, value, true);
     },
     
-    // apply inline CSS to an element
-    applyInlineCSS: function(el, css){
-        el.attr({
-            style: css,
-            'stylebot-css': css //save stylebot css in a separate attribute
+    // apply inline CSS to selected element(s)
+    applyInlineCSS: function(el, newCustomCSS){
+        if(el.length == 0) return false;
+        el.each(function(){
+            var existingCSS = $(this).attr('style');
+            var existingCustomCSS = $(this).data('stylebot-css');
+            var newCSS;
+            
+            // if stylebot css is being applied to the element for the first time
+            if(!existingCustomCSS)
+            {
+                // if there is any existing inline CSS, append stylebot CSS to it
+                if(typeof(existingCSS) != 'undefined')  
+                    newCSS = existingCSS + newCustomCSS;
+                else
+                    newCSS = newCustomCSS;
+                $(this).attr({
+                    style: newCSS
+                });
+            }
+            else
+            {
+                // replace existing stylebot CSS with updated stylebot CSS
+                newCSS = existingCSS.replace(existingCustomCSS, newCustomCSS);
+                $(this).attr({
+                    style: newCSS
+                });
+            }
+            // update stylebot css data associated with element
+            $(this).data('stylebot-css', newCustomCSS);
         });
     },
     
-    // reset inline CSS for an element
+    // reset inline CSS for element(s)
     clearInlineCSS: function(el){
-        $(selector).attr({
-            style:'',
-            'stylebot-css': ''
+        el.each(function(){
+            var existingCSS = $(this).attr('style');
+            var existingCustomCSS = $(this).data('stylebot-css');
+            
+            if(existingCustomCSS && typeof(existingCSS) != 'undefined')
+            {
+                var newCSS = existingCSS.replace(existingCustomCSS, '');
+                $(this).attr({
+                    style: newCSS
+                });
+                // clear stylebot css data associated with element
+                $(this).data('stylebot-css', null);
+            }
         });
     },
     
