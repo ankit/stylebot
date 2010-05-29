@@ -95,8 +95,19 @@ stylebot.widget = {
                     opacity:0.9
                 });
         });
+        
+        this.box.dialog('widget').keyup(function(e){
+            // disable editing on esc
+            if(e.keyCode == 27)
+            {
+                e.preventDefault();
+                this.blur();
+                stylebot.disable();
+            }
+        });
+        
         $('.stylebot-control').keyup(function(e){
-            /* if esc is pressed, take away focus and stop editing*/
+            // if esc is pressed, take away focus and stop editing
             if(e.keyCode == 27)
             {
                 e.target.blur();

@@ -16,7 +16,7 @@ var stylebot = {
     hoveredElement:null,
     isEditing:false,
     defaults: {
-        shortcutKey:69 //69 is keycode for 'e'
+        shortcutKey:69 // 69 is keycode for 'e'
     },
     
     init: function(){
@@ -49,22 +49,22 @@ var stylebot = {
     },
     
     addListeners: function(){
-        /* Handle key presses */
+        // Handle key presses
         $(document).keyup(function(e){
             var eTagName = e.target.tagName;
             if(eTagName == 'INPUT' || eTagName == 'TEXTAREA' || eTagName == 'DIV' || eTagName == 'OBJECT')
                return true;
             
-            /* Handle shortcut key 'e' to toggle editing mode */
+            // Handle shortcut key 'e' to toggle editing mode
             if(e.keyCode == stylebot.defaults.shortcutKey)
                 stylebot.toggle();
 
-            /* Handle Esc key to escape editing mode */
+            // Handle Esc key to escape editing mode
             else if(e.keyCode == 27 && stylebot.status)
                 stylebot.disable();
         });
         
-        /* Handle mouse move event on DOM elements */
+        // Handle mouse move event on DOM elements
         $(document).mousemove(function(e){
             if(stylebot.widget.isBeingDragged)
                 return true;
@@ -83,16 +83,16 @@ var stylebot = {
             stylebot.highlight(e.target);
         });
         
-        /* Handle click event on DOM elements */
-        $(document).click(function(e){
-            if(stylebot.hoveredElement && stylebot.status)
-            {
-                e.preventDefault();
-                e.stopImmediatePropagation();
-                stylebot.select();
-                return false;
-            }
-        });
+        // Handle click event on document.body (during capturing phase)
+        document.body.addEventListener('click', function(e){
+                if(stylebot.hoveredElement && stylebot.status)
+                {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    stylebot.select();
+                    return false;
+                }
+        }, true);
     },
     
     highlight: function(el){

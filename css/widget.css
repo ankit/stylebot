@@ -32,6 +32,9 @@ li.stylebot-control-set{
 
 .stylebot-control{
     margin:0px 2px;
+    float:none;
+    display:inline;
+    width:auto;
 }
 
 /* Labels */
@@ -47,6 +50,7 @@ li.stylebot-control-set{
     font-weight:normal;
     color:inherit;
     margin:0;
+    float:none;
 }
 
 .stylebot-inline-label{
