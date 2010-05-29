@@ -196,7 +196,7 @@ stylebot.widget.ui = {
         switch(control.id){
             case 'font-size'        :   var index = stylebot.utils.search(styles, "property", control.id);
                                         if(index != null)
-                                            this.getControl(control.id).attr('value', styles[index].value);
+                                            this.getControl(control.id).attr('value', styles[index].value.replace('px',''));
                                         break;
                                         
             case 'color'            :   
