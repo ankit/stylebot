@@ -35,6 +35,10 @@ stylebot.widget.ui.events = {
     },
     
     onTextFieldKeyUp: function(e){
+        // filter out meta keys which do not display any text
+        if(!stylebot.utils.filterKeys(['ctrl', 'shift', 'tab', 'esc', 'enter', 'arrowkeys'], e))
+            return true;
+        
         var value = e.target.value;
         var property = $(e.target).data('property');
         switch(property){

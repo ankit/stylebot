@@ -65,7 +65,7 @@ stylebot.widget.ui = {
     createCheckbox: function(text, property, value){
         var checkbox = $('<input>',{
             type: 'checkbox',
-            id: 'stylebot' + property,
+            id: 'stylebot-' + property,
             class: 'stylebot-control stylebot-checkbox',
             value: value
         });
@@ -85,7 +85,7 @@ stylebot.widget.ui = {
     
     createRadio: function(text, name, property, value){
         var span = $('<span>',{
-            id: 'stylebot' + property,
+            id: 'stylebot-' + property,
             class: 'stylebot-control'
         });
 
@@ -109,7 +109,7 @@ stylebot.widget.ui = {
     
     createSelect: function(property){
         var select = $('<select>', {
-            id:'stylebot' + property,
+            id:'stylebot-' + property,
             class: 'stylebot-control stylebot-select'
         });
         select.data('property', property);
