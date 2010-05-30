@@ -13,7 +13,8 @@
 			"css/widget.css",
 			"css/Aristo/aristo.css",
 			"css/colorpicker.css",
-			"css/scrollbars.css"
+			"css/scrollbars.css",
+			"css/controls.css"
 		],
 		
 		"js":[

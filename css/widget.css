@@ -83,10 +83,6 @@ li.stylebot-control-set{
     font-size:12px;
 }
 
-#stylebot select{
-    font-size:12px;
-}
-
 input.stylebot-textfield, .stylebot-textarea{
     padding:2px;
     border:1px solid #ccc !important;
