@@ -14,18 +14,30 @@ var stylebot = {
 
     status: false,
 
-    selectedElement:null,
+    selectedElement: null,
 
-    hoveredElement:null,
+    hoveredElement: null,
 
-    isEditing:false,
+    isEditing: false,
+    
+    // kill switch for jQuery lint
+    lintDebug: false,
 
     defaults: {
         shortcutKey:69 // 69 is keycode for 'e'
     },
     
     init: function(){
+        // initialize debugging
+        this.initDebug();
         this.addListeners();
+    },
+    
+    initDebug: function(){
+        if(this.lintDebug)
+            jQuery.LINT.level = 3;
+        else
+            jQuery.LINT.level = 0;
     },
     
     // toggle stylebot editing status

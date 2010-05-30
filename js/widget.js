@@ -42,13 +42,13 @@ stylebot.widget = {
     
     addListeners: function(){
         this.ui.cache.dialog.mouseenter(function(e){
-            if(stylebot.isEditing)
+            if(stylebot.isEditing && !stylebot.widget.isBeingDragged)
                 $(this).animate({
                     opacity:1
                 });
         });
         this.ui.cache.dialog.mouseleave(function(e){
-            if(stylebot.isEditing)
+            if(stylebot.isEditing && !stylebot.widget.isBeingDragged)
                 $(this).animate({
                     opacity:0.9
                 });

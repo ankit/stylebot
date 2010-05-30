@@ -21,7 +21,8 @@ stylebot.utils = {
     // Accepts a keys array and 'keyup' event object as arguments.
     // TODO: Add support for keydown, keypress events and alphanumeric keys
     filterKeys: function(keys, e){
-        console.log("KeyCode: " + e.keyCode);
+        if(typeof(e.keyCode) == 'undefined')
+            return true;
         var len = keys.length;
         var keyCodes = {
             'ctrl':17,

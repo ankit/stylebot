@@ -52,7 +52,7 @@
 .stylebot-ui .ui-widget input, .stylebot-ui .ui-widget select, .stylebot-ui .ui-widget textarea, .stylebot-ui .ui-widget button { font-family: Helvetica, Arial, sans-serif; font-size: 10px; }
 .stylebot-ui .ui-widget-content { border: 1px solid #dddddd; color: #333333; }
 .stylebot-ui .ui-widget-content a { color: #333333; }
-.stylebot-ui .ui-widget-header { border: 1px solid #8ab0c6; background: #83b0ca url(images/progress_bar.gif) 50% 50% repeat-x; color: #ffffff; font-weight: bold; }
+.stylebot-ui .ui-widget-header { border: 1px solid #8ab0c6; background: #83b0ca 50% 50% repeat-x; color: #ffffff; font-weight: bold; }
 .stylebot-ui .ui-widget-header a { color: #ffffff; }
 
 /* Interaction states
