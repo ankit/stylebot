@@ -6,26 +6,30 @@
 
 stylebot.modal = {
     
-    box: null,
+    // cache of jQuery objects
+    cache: {
+        box: null,
+        textarea: null
+    },
 
     // create the DOM elements
     create: function(){
-        this.box = $('<div>', {
+        this.cache.box = $('<div>', {
             id:'stylebot-modal'
         });
         
         $('<div>', {
             html: "You can now copy the CSS below into the custom stylesheet for Chrome",
             style: "padding-bottom:10px"
-        }).appendTo(this.box);
+        }).appendTo(this.cache.box);
         
-        $('<textarea>', {
+        this.cache.textarea = $('<textarea>', {
             height:300,
             width:'98%',
             class:'stylebot-textarea stylebot-css-code'
-        }).appendTo(this.box);
+        }).appendTo(this.cache.box);
 
-        this.box.appendTo(document.body).dialog({
+        this.cache.box.appendTo(document.body).dialog({
             title: 'Generated CSS',
             modal: true,
             width:'50%',
@@ -37,23 +41,23 @@ stylebot.modal = {
     },
     
     fill: function(content){
-        this.box.find('textarea').html(content);
+        this.cache.box.find('textarea').html(content);
     },
     
     show: function(content){
-        if(!this.box)
+        if(!this.cache.box)
             this.create();
         this.fill(content);
-        this.box.find('textarea').focus();
-        this.box.dialog('open');
+        this.cache.textarea.focus();
+        this.cache.box.dialog('open');
     },
     
     hide: function(){
-        this.box.dialog('close');
+        this.cache.box.dialog('close');
     },
     
     copyToClipboard: function(){
-        var text = stylebot.modal.box.find('textarea').attr('value');
+        var text = stylebot.modal.cache.textarea.attr('value');
         stylebot.chrome.copyToClipboard(text);
     }
 }

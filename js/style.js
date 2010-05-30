@@ -18,13 +18,27 @@ stylebot.style = {
     */
     rules:[],
     
+    cache: {
+        // most recently selected elements' selector
+        selector: null,
+        // most recently selected elements
+        elements: null
+    },
+    
     // apply a new style to selected elements
     apply: function(selector, property, value){
         if(!selector)
             return true;
-        var selectedElements = $(selector);
-        this.applyInlineCSS(selectedElements, this.getInlineCSS(selector, property, value));
-        this.saveRule(selector, property, value);
+        
+        // check if a property for the last selected elements is being edited. If not, update cache
+        if(selector != this.cache.selector)
+        {
+            this.cache.selector = selector;
+            this.cache.elements = $(selector);
+        }
+        
+        this.applyInlineCSS(this.cache.elements, this.getInlineCSS(this.cache.selector, property, value));
+        this.saveRule(this.cache.selector, property, value);
     },
     
     // add/update rule to CSS rules cache
@@ -33,13 +47,11 @@ stylebot.style = {
         var index = stylebot.utils.search(this.rules, "selector", selector);
         if(index != null)
         {
-            console.log("Rule already exists at index "+ index + "\n");
             var rule = this.rules[index];
             // check if the property exists
             index = stylebot.utils.search(rule.styles, "property", property);
             if(index != null)
             {
-                console.log("Property already exists in rule at index "+ index + "\n");
                 if(value == "")                     // if value is empty, remove the property
                     rule.styles.splice(index, 1);
                 else                                // else update value
@@ -49,13 +61,7 @@ stylebot.style = {
                 rule.styles[rule.styles.length] = {property: property, value: value};
         }
         else if(value != "")
-        {
-            console.log("Nothing found. Creating a new rule \n");
             this.rules[this.rules.length] = {selector: selector, styles:[{property: property, value: value}]};
-        }
-
-        for(var i=0;i < this.rules.length; i++)
-            console.log("Rule " + i + " Selector: " + this.rules[i].selector+"\n");
     },
     
     // generate inline CSS

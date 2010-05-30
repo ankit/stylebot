@@ -11,10 +11,15 @@ $(document).ready(function(){
 });
 
 var stylebot = {
+
     status: false,
+
     selectedElement:null,
+
     hoveredElement:null,
+
     isEditing:false,
+
     defaults: {
         shortcutKey:69 // 69 is keycode for 'e'
     },

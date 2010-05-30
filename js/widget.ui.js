@@ -5,7 +5,86 @@
   **/
   
 stylebot.widget.ui = {
+    
     colorpicker:null,
+    
+    // cache of jQuery objects
+    cache:{
+        box: null,
+        dialog: null,
+        controls: null,
+        textfields: null,
+        checkboxes: null,
+        radios: null,
+        selectboxes: null,
+        colorSelectorColor:null
+    },
+    
+    createBox: function(){
+        
+        this.cache.box = $('<div>', {
+            id:'stylebot'
+        });
+        
+        var controls_ui = $('<ul>', {
+            id: 'stylebot-controls'
+        });
+        
+        // creating controls for different CSS properties
+        var len = stylebot.widget.controls.length;
+        
+        for(var i=0; i<len; i++)
+            this.createControl(stylebot.widget.controls[i]).appendTo(controls_ui);
+        
+        controls_ui.appendTo(this.cache.box);
+        
+        // creating main buttons for widget
+        var buttons = $('<div>', {
+            id: 'stylebot-main-buttons'
+        });
+        this.createButton('Save changes').appendTo(buttons).click(stylebot.widget.save);
+        this.createButton('Generate CSS').appendTo(buttons).click(stylebot.widget.generateCSS);
+        buttons.appendTo(this.cache.box);
+        
+        // create dialog
+        this.cache.box.appendTo(document.body).dialog({
+            title: 'Custom Styles',
+            autoOpen: false,
+            dragStart: function(e, ui){
+                stylebot.widget.isBeingDragged = true;
+            },
+            dragStop: function(e, ui){
+                stylebot.widget.isBeingDragged = false;
+            },
+            beforeOpen: function(e, ui){
+                stylebot.isEditing = true;
+            },
+            beforeClose: function(e, ui){
+                stylebot.isEditing = false;
+            }
+        });
+        
+        // fill cache with widget UI elements
+        this.fillCache();
+    },
+    
+    fillCache: function(){
+        // dialog widget
+        this.cache.dialog = this.cache.box.dialog('widget');
+        // controls
+        this.cache.controls = $('.stylebot-control');
+        // textfields
+        this.cache.textfields = $('.stylebot-textfield');
+        // checkboxes
+        this.cache.checkboxes = $('.stylebot-checkbox');
+        // radios
+        this.cache.radios = $('.stylebot-radio');
+        // select boxes
+        this.cache.selectboxes = $('.stylebot-select');
+        // color selector color divs
+        this.cache.colorSelectorColor = $('.stylebot-colorselector-color');
+    },
+    
     createControl: function(control){
         var el = $('<li>', {
             class: 'stylebot-control-set'
@@ -58,7 +137,7 @@ stylebot.widget.ui = {
         });
         
         input.data("property", property);
-        input.keyup(stylebot.widget.ui.events.onTextFieldKeyUp);
+        input.keyup(this.events.onTextFieldKeyUp);
         return input;
     },
     
@@ -101,7 +180,7 @@ stylebot.widget.ui = {
             radio.attr('value', value.join(','));
         
         radio.data('property', property);
-        radio.click(stylebot.widget.ui.events.onRadioClick);
+        radio.click(this.events.onRadioClick);
         radio.appendTo(span);
         this.createInlineLabel(text).appendTo(span);
         return span;
@@ -113,7 +192,7 @@ stylebot.widget.ui = {
             class: 'stylebot-control stylebot-select'
         });
         select.data('property', property);
-        select.change(stylebot.widget.ui.events.onSelectChange);
+        select.change(this.events.onSelectChange);
         return select;
     },
     
@@ -207,7 +286,7 @@ stylebot.widget.ui = {
                                             var color = styles[index].value;
                                             control.attr('value', color);
                                             if(color != "")
-                                                stylebot.widget.ui.setColorSelectorColor(control);
+                                            this.setColorSelectorColor(control);
                                         }
                                         break;
                                         
@@ -268,10 +347,10 @@ stylebot.widget.ui = {
     
     // reset values to default for all controls
     reset: function(){
-        $('.stylebot-textfield').attr('value', '');
-        $('.stylebot-checkbox').attr('checked', false);
-        $('.stylebot-radio').attr('checked', false);
-        $('.stylebot-select').attr('selectedIndex', 0);
-        $('.stylebot-colorselector-color').css('backgroundColor', '#fff');
+        this.cache.textfields.attr('value', '');
+        this.cache.checkboxes.attr('checked', false);
+        this.cache.radios.attr('checked', false);
+        this.cache.selectboxes.attr('selectedIndex', 0);
+        this.cache.colorSelectorColor.css('backgroundColor', '#fff');
     },
 }

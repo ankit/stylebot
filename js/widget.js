@@ -6,8 +6,6 @@
 
 stylebot.widget = {
     
-    box: null,
-    
     selector: null,
     
     isBeingDragged:false,
@@ -38,65 +36,25 @@ stylebot.widget = {
     }],
     
     create: function(){
-        this.box = $('<div>', {
-            id:'stylebot'
-        });
-        
-        var controls_ui = $('<ul>', {
-            id: 'stylebot-controls'
-        });
-
-        /* creating the controls for different CSS properties */
-        var len = this.controls.length;
-        
-        for(var i=0; i<len; i++)
-            this.ui.createControl(this.controls[i]).appendTo(controls_ui);
-        
-        controls_ui.appendTo(this.box);
-        
-        var buttons = $('<div>', {
-            id: 'stylebot-main-buttons'
-        });
-        
-        this.ui.createButton('Save changes').appendTo(buttons).click(stylebot.widget.save);
-        this.ui.createButton('Generate CSS').appendTo(buttons).click(stylebot.widget.generateCSS);
-        buttons.appendTo(this.box);
-
-        this.box.appendTo(document.body).dialog({
-            title: 'Custom Styles',
-            autoOpen: false,
-            dragStart: function(e, ui){
-                stylebot.widget.isBeingDragged = true;
-            },
-            dragStop: function(e, ui){
-                stylebot.widget.isBeingDragged = false;
-            },
-            beforeOpen: function(e, ui){
-                stylebot.isEditing = true;
-            },
-            beforeClose: function(e, ui){
-                stylebot.isEditing = false;
-            }
-        });
-        // this.box.dialog('widget').css('position', 'fixed');
+        this.ui.createBox();
         this.addListeners();
     },
     
     addListeners: function(){
-        this.box.dialog('widget').mouseenter(function(e){
+        this.ui.cache.dialog.mouseenter(function(e){
             if(stylebot.isEditing)
                 $(this).animate({
                     opacity:1
                 });
         });
-        this.box.dialog('widget').mouseleave(function(e){
+        this.ui.cache.dialog.mouseleave(function(e){
             if(stylebot.isEditing)
                 $(this).animate({
                     opacity:0.9
                 });
         });
         
-        this.box.dialog('widget').keyup(function(e){
+        this.ui.cache.dialog.keyup(function(e){
             // disable editing on esc
             if(e.keyCode == 27)
             {
@@ -106,7 +64,7 @@ stylebot.widget = {
             }
         });
         
-        $('.stylebot-control').keyup(function(e){
+        this.ui.cache.controls.keyup(function(e){
             // if esc is pressed, take away focus and stop editing
             if(e.keyCode == 27)
             {
@@ -121,22 +79,22 @@ stylebot.widget = {
         stylebot.isEditing = true;
         this.selector = stylebot.selector.value;
         
-        if(!this.box)
+        if(!this.ui.cache.box)
             this.create();
 
         this.setPosition();         // decide where the widget should be displayed with respect to selected element
         this.ui.reset();            // reset all values for controls to default values
         this.ui.fill();             // fill widget with any existing custom styles
 
-        this.box.dialog('open');
+        this.ui.cache.box.dialog('open');
 
         setTimeout(function(){
-            $('.stylebot-control')[0].focus(); //set focus to first control in widget
+            stylebot.widget.ui.cache.controls[0].focus(); //set focus to first control in widget
         }, 0);
     },
     
     hide: function(){
-        this.box.dialog('close');
+        this.ui.cache.box.dialog('close');
     },
     
     // calculate where the widget should be displayed w.r.t selected element
@@ -146,7 +104,7 @@ stylebot.widget = {
             /* Left offset of widget */
             var offset = stylebot.selectedElement.offset();
             var left = offset.left + stylebot.selectedElement.width() + 10;
-            var leftDiff = this.box.dialog('option','width') - (document.body.clientWidth - left);
+            var leftDiff = this.ui.cache.box.dialog('option','width') - (document.body.clientWidth - left);
             if(leftDiff >= 0)
                 left = left - leftDiff;
             
@@ -157,15 +115,15 @@ stylebot.widget = {
                 top = window.pageYOffset - 300;
             else
             {
-                var topDiff = window.innerHeight - (top + this.box.dialog('option','height') + 100);
+                var topDiff = window.innerHeight - (top + this.ui.cache.box.dialog('option','height') + 100);
                 if(topDiff <= 0)
                     top = top + topDiff;
             }
             
-            this.box.dialog('option', 'position', [left, top]);
+            this.ui.cache.box.dialog('option', 'position', [left, top]);
             
-            console.log("Box Width: "+ this.box.width() + "\nLeft: " + left + "\nLeft Diff: " + leftDiff);
-            console.log("Box Height: " + this.box.height() + "\nTop: " + top + "\nTop Diff: " + topDiff);
+            // console.log("Box Width: "+ this.ui.cache.box.width() + "\nLeft: " + left + "\nLeft Diff: " + leftDiff);
+            // console.log("Box Height: " + this.ui.cache.box.height() + "\nTop: " + top + "\nTop Diff: " + topDiff);
         }
     },
     
