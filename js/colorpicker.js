@@ -4,8 +4,9 @@
  * Author: Stefan Petre www.eyecon.ro
  * 
  * Dual licensed under the MIT and GPL licenses
- * 
+ *
  */
+ 
 (function ($) {
 	var ColorPicker = function () {
 		var
@@ -211,8 +212,8 @@
 				if (top + 176 > viewPort.t + viewPort.h) {
 					top -= this.offsetHeight + 176;
 				}
-				if (left + 356 > viewPort.l + viewPort.w) {
-					left -= 356;
+				if (left + 208 > viewPort.l + viewPort.w) {
+					left -= 208;
 				}
 				cal.css({left: left + 'px', top: top + 'px'});
 				if (cal.data('colorpicker').onShow.apply(this, [cal.get(0)]) != false) {

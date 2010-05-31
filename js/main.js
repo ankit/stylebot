@@ -88,11 +88,10 @@ var stylebot = {
             if(stylebot.hoveredElement == $(e.target) || !stylebot.status)
                 return true;
 
-            var parent = $(e.target).closest('.ui-dialog');
+            var parent = $(e.target).closest('.ui-dialog, .colorpicker');
             var id = $(e.target).attr('id');
-            var colorPicker = $(e.target).closest('.colorpicker');
             
-            if(id.indexOf("stylebot") != -1 || parent.length != 0 || colorPicker.length != 0)
+            if(id.indexOf("stylebot") != -1 || parent.length != 0)
             {
                 stylebot.unhighlight();
                 return true;
