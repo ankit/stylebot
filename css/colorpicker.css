@@ -60,15 +60,3 @@
 	margin: -4px 0 0 -4px;
 	left: 0px;
 }
-
-/* Not used */
-/* TODO: Get rid of dependency on these elements in Color Picker JS */
-.colorpicker input,
-.colorpicker_current_color,
-.colorpicker_new_color,
-.colorpicker_hex,
-.colorpicker_field,
-.colorpicker submit
-{
-    display:none;
-}
