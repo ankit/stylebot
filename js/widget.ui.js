@@ -343,6 +343,9 @@ stylebot.widget.ui = {
             for(var i=0; i<len; i++)
                 this.fillControl(stylebot.widget.controls[i], styles);
         }
+        
+        // set widget title
+        this.cache.box.dialog('option', 'title', stylebot.selector.value);
     },
     
     // reset values to default for all controls
