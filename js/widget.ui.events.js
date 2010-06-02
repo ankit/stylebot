@@ -43,8 +43,9 @@ stylebot.widget.ui.events = {
         var property = $(e.target).data('property');
         switch(property){
             case 'font-size':
-                value += 'px';
-                break;
+            case 'line-height':   
+            case 'letter-spacing':  value += 'px';
+                                    break;
         }
         stylebot.style.apply(stylebot.widget.selector, property, value);
     },

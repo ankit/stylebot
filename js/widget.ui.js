@@ -8,6 +8,40 @@ stylebot.widget.ui = {
     
     colorpicker:null,
     
+    controls:[{
+        name: 'Color',
+        id: 'color'
+    },
+    {
+        name: 'Background Color',
+        id: 'background-color'
+    },
+    {
+        name: 'Size',
+        id: 'font-size'
+    },
+    {
+        name: 'Style',
+        id: 'style'
+    },
+    {
+        name: 'Decoration',
+        id: 'text-decoration'
+    },
+    {
+        name: 'Line Height',
+        id: 'line-height'
+    },
+    {
+        name: 'Letter Spacing',
+        id: 'letter-spacing'
+    },
+    {
+        name: 'Hide Element',
+        id: 'display'
+    }
+    ],
+    
     // cache of jQuery objects
     cache:{
         box: null,
@@ -31,10 +65,10 @@ stylebot.widget.ui = {
         });
         
         // creating controls for different CSS properties
-        var len = stylebot.widget.controls.length;
+        var len = this.controls.length;
         
         for(var i=0; i<len; i++)
-            this.createControl(stylebot.widget.controls[i]).appendTo(controls_ui);
+            this.createControl(this.controls[i]).appendTo(controls_ui);
         
         controls_ui.appendTo(this.cache.box);
         
@@ -93,17 +127,20 @@ stylebot.widget.ui = {
         
         // Property specific controls to add to control set
         switch(control.id){
-            case 'font-size'        :   this.createTextfield('font-size', 4).appendTo(el);
+
+            case 'font-size'        :   
+            
+            case 'line-height'      :   
+            
+            case 'letter-spacing'   :   var input = this.createSizeField(control.id).appendTo(el);
                                         break;
                                         
-            case 'color'            :   var input = this.createTextfield('color', 10);
-                                        this.createColorPicker(input).appendTo(el);
-                                        input.appendTo(el).keyup(function(e){ stylebot.widget.ui.setColorSelectorColor( $(this) ) });
-                                        break;
+            case 'color'            :   
                                         
-            case 'background-color' :   var input = this.createTextfield('background-color', 10);
+            case 'background-color' :   var input = this.createTextField(control.id, 10);
                                         this.createColorPicker(input).appendTo(el);
-                                        input.appendTo(el).keyup(function(e){ stylebot.widget.ui.setColorSelectorColor( $(this) ) });;
+                                        input.appendTo(el)
+                                        .keyup(function(e){ stylebot.widget.ui.setColorSelectorColor( $(this) ) });
                                         break;
                                         
             case 'display'          :   this.createCheckbox(null, 'display', 'none').appendTo(el);
@@ -128,17 +165,29 @@ stylebot.widget.ui = {
         return el;
     },
     
-    createTextfield: function(property, size){
+    createTextField: function(property, size){
         var input = $('<input>',{
             type: 'text',
             id: 'stylebot-' + property,
             class: 'stylebot-control stylebot-textfield',
             size: size
         });
-        
+
         input.data("property", property);
         input.keyup(this.events.onTextFieldKeyUp);
         return input;
+    },
+    
+    createSizeField: function(property){
+        var span = $('<span>');
+        
+        this.createTextField(property, 4).appendTo(span);
+        $('<span>', {
+             html: ' px',
+             style: 'color:#aaa'
+        })
+        .appendTo(span);
+        return span;
     },
     
     createCheckbox: function(text, property, value){
@@ -252,7 +301,7 @@ stylebot.widget.ui = {
     createLabel: function(text){
         return $('<label>', {
             class: 'stylebot-label',
-            html: text
+            html: text+":"
         });
     },
     
@@ -273,12 +322,22 @@ stylebot.widget.ui = {
     
     fillControl: function(control, styles){
         switch(control.id){
-            case 'font-size'        :   var index = stylebot.utils.search(styles, "property", control.id);
+
+            case 'font-size'        :   
+            
+            case 'line-height'      :   
+            
+            case 'letter-spacing'   :   var index = stylebot.utils.search(styles, "property", control.id);
                                         if(index != null)
-                                            this.getControl(control.id).attr('value', styles[index].value.replace('px',''));
+                                        {
+                                            this.getControl(control.id)
+                                            .attr('value', styles[index].value.replace('px',''));
+                                        }
+                                            
                                         break;
                                         
-            case 'color'            :   
+            case 'color'            :
+            
             case 'background-color' :   var index = stylebot.utils.search(styles, "property", control.id);
                                         if(index != null)
                                         {
@@ -335,13 +394,13 @@ stylebot.widget.ui = {
     
     // fill controls with any existing custom styles for current selector
     fill: function(){
-        var len = stylebot.widget.controls.length;
+        var len = this.controls.length;
         var styles = stylebot.style.getStyles(stylebot.selector.value);
         
         if(styles)
         {
             for(var i=0; i<len; i++)
-                this.fillControl(stylebot.widget.controls[i], styles);
+                this.fillControl(this.controls[i], styles);
         }
         
         // set widget title

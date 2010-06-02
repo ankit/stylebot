@@ -10,31 +10,6 @@ stylebot.widget = {
     
     isBeingDragged:false,
     
-    controls:[{
-        name:'Color',
-        id: 'color'
-    },
-    {
-        name:'Background Color',
-        id: 'background-color'
-    },
-    {
-        name:'Size',
-        id: 'font-size'
-    },
-    {
-        name:'Style',
-        id: 'style'
-    },
-    {
-        name:'Decoration',
-        id: 'text-decoration'
-    },
-    {
-        name:'Hide Element',
-        id: 'display'
-    }],
-    
     create: function(){
         this.ui.createBox();
         this.addListeners();

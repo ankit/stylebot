@@ -8,8 +8,8 @@
     line-height:12px;
 }
 
-ul#stylebot-controls{
-    list-style-type:none;
+#stylebot-controls{
+    list-style-type:none !important;
     margin:0;
     border:none;
     padding: 5px 10px;
@@ -21,8 +21,9 @@ ul#stylebot-controls{
 }
 
 li.stylebot-control-set{
+    list-style-type:none;
     padding:2px;
-    margin:5px 0;
+    margin:6px 0;
     border-radius:2px;
     border:none;
     font-family:inherit;
@@ -31,7 +32,9 @@ li.stylebot-control-set{
 }
 
 .stylebot-control{
-    margin:0px 2px;
+    margin:0;
+    padding:0;
+    margin-left:6px;
     float:none;
     display:inline;
     width:auto;
@@ -95,18 +98,7 @@ input.stylebot-textfield, .stylebot-textarea{
     color:inherit;
 }
 
-/*input.stylebot-textfield:focus, input.stylebot-textfield:hover, .stylebot-textarea:focus, .stylebot-textarea:hover{
-    background-color:#fff;
-}*/
-
-/* Code styling */
-.stylebot-css-code{
-    font-size:12px !important;
-    color:#333 !important;
-    font-family:"Courier New" !important;
-}
-
-/* colorpicker selector*/
+/* Color Picker Selector */
 .stylebot-colorselector{
     width:30px !important;
     height:12px !important;
@@ -116,13 +108,23 @@ input.stylebot-textfield, .stylebot-textarea{
     border:1px solid #ccc;
     background-color:#f8f8f8;
 }
+
 .stylebot-colorselector-color{
     background-color:#fff;
     margin:1px 1px;
     border:1px solid #aaa;
     height:70% !important;
+    width:auto;
 }
+
 .stylebot-colorselector:focus{
     outline:none;
     background-color:#ddd;
+}
+
+/* Code styling */
+.stylebot-css-code{
+    font-size:12px !important;
+    color:#333 !important;
+    font-family:"Courier New" !important;
 }
