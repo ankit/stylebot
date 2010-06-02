@@ -1,8 +1,9 @@
 /**
  *
- * Color picker
- * Author: Stefan Petre www.eyecon.ro
- * 
+ * Slim Color picker
+ * Original Author: Stefan Petre www.eyecon.ro
+ * Modified By: Ankit Ahuja
+ *
  * Dual licensed under the MIT and GPL licenses
  *
  */
@@ -14,7 +15,7 @@
 			inAction,
 			charMin = 65,
 			visible,
-			tpl = '<div class="colorpicker"><div class="colorpicker_color"><div><div></div></div></div><div class="colorpicker_hue"><div></div></div></div>',
+			tpl = '<div class="stylebot_colorpicker"><div class="stylebot_colorpicker_color"><div><div></div></div></div><div class="stylebot_colorpicker_hue"><div></div></div></div>',
 			defaults = {
 				eventName: 'click',
 				onShow: function () {},
@@ -269,11 +270,11 @@
 						} else {
 							cal.appendTo(document.body);
 						}
-						options.selector = cal.find('div.colorpicker_color').bind('mousedown', downSelector);
+						options.selector = cal.find('div.stylebot_colorpicker_color').bind('mousedown', downSelector);
 						options.selectorIndic = options.selector.find('div div');
 						options.el = this;
-						options.hue = cal.find('div.colorpicker_hue div');
-						cal.find('div.colorpicker_hue').bind('mousedown', downHue);
+						options.hue = cal.find('div.stylebot_colorpicker_hue div');
+						cal.find('div.stylebot_colorpicker_hue').bind('mousedown', downHue);
 						cal.data('colorpicker', options);
 						setHue(options.color, cal.get(0));
 						setSelector(options.color, cal.get(0));

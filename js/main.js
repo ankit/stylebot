@@ -88,7 +88,7 @@ var stylebot = {
             if(stylebot.hoveredElement == $(e.target) || !stylebot.status)
                 return true;
 
-            var parent = $(e.target).closest('.ui-dialog, .colorpicker');
+            var parent = $(e.target).closest('.ui-dialog, .stylebot_colorpicker');
             var id = $(e.target).attr('id');
             
             if(id.indexOf("stylebot") != -1 || parent.length != 0)
