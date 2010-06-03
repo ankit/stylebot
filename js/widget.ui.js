@@ -8,35 +8,69 @@ stylebot.widget.ui = {
     isColorPickerVisible: false,
     controls:[{
         name: 'Color',
-        id: 'color'
+        id: 'color',
+        type: 'color'
     },
     {
         name: 'Background Color',
-        id: 'background-color'
+        id: 'background-color',
+        type: 'color'
     },
     {
         name: 'Size',
-        id: 'font-size'
+        id: 'font-size',
+        type: 'size'
+    },
+    {
+        name: 'Weight',
+        id: 'font-weight',
+        type: 'select',
+        options: ['none', 'bold']
     },
     {
         name: 'Style',
-        id: 'style'
+        id: 'font-style',
+        type: 'select',
+        options: ['none', 'italic']
     },
     {
         name: 'Decoration',
-        id: 'text-decoration'
+        id: 'text-decoration',
+        type: 'select',
+        options: ['none', 'underline']
+        
     },
     {
         name: 'Line Height',
-        id: 'line-height'
+        id: 'line-height',
+        type: 'size'
     },
     {
         name: 'Letter Spacing',
-        id: 'letter-spacing'
+        id: 'letter-spacing',
+        type: 'size'
+    },
+    {
+        name: 'Border Style',
+        id: 'border-style',
+        type: 'select',
+        options: [ 'none', 'solid', 'dotted', 'dashed', 'double', 'groove', 'ridge', 'inset', 'outset' ]
+    },
+    {
+        name: 'Border Width',
+        id: 'border-width',
+        type: 'size'
+    },
+    {
+        name: 'Border Color',
+        id: 'border-color',
+        type: 'color'
     },
     {
         name: 'Hide Element',
-        id: 'display'
+        id: 'display',
+        type: 'checkbox',
+        value: 'none'
     }
     ],
     
@@ -122,42 +156,32 @@ stylebot.widget.ui = {
         var el = $('<li>', {
             class: 'stylebot-control-set'
         });
+
         this.createLabel(control.name).appendTo(el);
         
-        // Property specific controls to add to control set
-        switch(control.id){
+        // Add controls of different types
+        switch(control.type){
 
-            case 'font-size'        :   
-            
-            case 'line-height'      :   
-            
-            case 'letter-spacing'   :   var input = this.createSizeField(control.id).appendTo(el);
+            case 'size'             :   var input = this.createSizeField(control.id).appendTo(el);
                                         break;
                                         
-            case 'color'            :   
-                                        
-            case 'background-color' :   var input = this.createTextField(control.id, 10);
+            case 'color'            :   var input = this.createTextField(control.id, 10);
                                         this.createColorPicker(input).appendTo(el);
                                         input.appendTo(el)
                                         .keyup(function(e){ stylebot.widget.ui.setColorSelectorColor( $(this) ) });
                                         break;
                                         
-            case 'display'          :   this.createCheckbox(null, 'display', 'none').appendTo(el);
+            case 'checkbox'          :  this.createCheckbox(null, control.id , control.value).appendTo(el);
                                         break;
                                         
-            case 'style'            :   var select = this.createSelect('style');
-                                        this.createSelectOption("Default", ['font-weight','font-style'], ['','']).appendTo(select);
-                                        this.createSelectOption("Bold", ['font-weight','font-style'], ['bold', 'none']).appendTo(select);
-                                        this.createSelectOption("Italic", ['font-weight','font-style'], ['normal', 'italic']).appendTo(select);                                        
-                                        this.createSelectOption("Bold + Italic", ['font-weight','font-style'], ['bold', 'italic']).appendTo(select);
-                                        this.createSelectOption("None", ['font-weight','font-style'], ['normal', 'none']).appendTo(select);
-                                        select.appendTo(el);
-                                        break;
-                                        
-            case 'text-decoration'  :   var select = this.createSelect('text-decoration');
-                                        this.createSelectOption("Default", 'text-decoration', '').appendTo(select);
-                                        this.createSelectOption("Underline", 'text-decoration', 'underline').appendTo(select);
-                                        this.createSelectOption("None", 'text-decoration', 'none').appendTo(select);
+            case 'select'            :  var select = this.createSelect(control.id);
+                                        this.createSelectOption("Default", control.id, '').appendTo(select);
+                                        var len = control.options.length;
+                                        for(var i=0; i<len; i++)
+                                        {
+                                            var option = control.options[i];
+                                            this.createSelectOption( stylebot.utils.capitalize(option), control.id, option).appendTo(select);
+                                        }
                                         select.appendTo(el);
                                         break;
         }
@@ -324,13 +348,8 @@ stylebot.widget.ui = {
     },
     
     fillControl: function(control, styles){
-        switch(control.id){
-
-            case 'font-size'        :   
-            
-            case 'line-height'      :   
-            
-            case 'letter-spacing'   :   var index = stylebot.utils.search(styles, "property", control.id);
+        switch(control.type){
+            case 'size'             :   var index = stylebot.utils.search(styles, "property", control.id);
                                         if(index != null)
                                         {
                                             this.getControl(control.id)
@@ -339,9 +358,7 @@ stylebot.widget.ui = {
                                             
                                         break;
                                         
-            case 'color'            :
-            
-            case 'background-color' :   var index = stylebot.utils.search(styles, "property", control.id);
+            case 'color'            :   var index = stylebot.utils.search(styles, "property", control.id);
                                         if(index != null)
                                         {
                                             var control = this.getControl(control.id);
@@ -352,40 +369,22 @@ stylebot.widget.ui = {
                                         }
                                         break;
                                         
-            case 'display'          :   var index = stylebot.utils.search(styles, "property", control.id);
+            case 'checkbox'         :   var index = stylebot.utils.search(styles, "property", control.id);
                                         if(index != null)
                                         {
-                                            if(styles[index].value == 'none')
+                                            if(styles[index].value == control.value)
                                                 this.getControl(control.id).attr('checked', true);
                                             else
                                                 this.getControl(control.id).attr('checked', false);                                                
                                         }
                                         break;
                                         
-            case 'style'            :   var index = stylebot.utils.search(styles, "property", "font-weight");
-                                        var index2 = stylebot.utils.search(styles, "property", "font-style");
+            case 'select'            :  var index = stylebot.utils.search(styles, "property", control.id);
                                         if(index != null)
                                         {
-                                            var val = styles[index].value;
-                                            var val2 = styles[index2].value;
-                                            if(val == 'bold' && val2 == 'italic')
-                                                this.getControl(control.id).attr('selectedIndex', 3);
-                                            else if(val == 'bold')
-                                                this.getControl(control.id).attr('selectedIndex', 1);
-                                            else if(val2 == 'italic')
-                                                this.getControl(control.id).attr('selectedIndex', 2);
-                                            else
-                                                this.getControl(control.id).attr('selectedIndex', 4);
-                                        }
-                                        break;
-                                        
-            case 'text-decoration'  :   var index = stylebot.utils.search(styles, "property", "text-decoration");
-                                        if(index != null)
-                                        {
-                                            if(styles[index].value == 'underline')
-                                                this.getControl(control.id).attr('selectedIndex', 1);
-                                            else
-                                                this.getControl(control.id).attr('selectedIndex', 2);
+                                            var index2 = $.inArray($.trim(String(styles[index].value)), control.options);
+                                            if(index2 != -1)
+                                                this.getControl(control.id).attr('selectedIndex', index2 + 1);
                                         }
                                         break;
         }

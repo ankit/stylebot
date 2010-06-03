@@ -42,10 +42,11 @@ stylebot.widget.ui.events = {
         var value = e.target.value;
         var property = $(e.target).data('property');
         switch(property){
-            case 'font-size':
-            case 'line-height':   
-            case 'letter-spacing':  value += 'px';
-                                    break;
+            case 'font-size'        :
+            case 'line-height'      :
+            case 'letter-spacing'   :
+            case 'border-width'     :   value += 'px';
+                                        break;
         }
         stylebot.style.apply(stylebot.widget.selector, property, value);
     },
