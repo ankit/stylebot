@@ -5,9 +5,7 @@
   **/
   
 stylebot.widget.ui = {
-    
-    colorpicker:null,
-    
+    isColorPickerVisible: false,
     controls:[{
         name: 'Color',
         id: 'color'
@@ -51,7 +49,7 @@ stylebot.widget.ui = {
         checkboxes: null,
         radios: null,
         selectboxes: null,
-        colorSelectorColor:null
+        colorSelectorColor: null
     },
     
     createBox: function(){
@@ -84,6 +82,7 @@ stylebot.widget.ui = {
         this.cache.box.appendTo(document.body).dialog({
             title: 'Custom Styles',
             autoOpen: false,
+            closeOnEscape: false,
             dragStart: function(e, ui){
                 stylebot.widget.isBeingDragged = true;
             },
@@ -280,6 +279,10 @@ stylebot.widget.ui = {
                 if(color == "")
                     color = "#ffffff"; // default is white
                 $(this).ColorPickerSetColor(color);
+                stylebot.widget.ui.isColorPickerVisible = true;
+            },
+            onHide: function(){
+                stylebot.widget.ui.isColorPickerVisible = false;
             }
         })
         .keyup(function(e){

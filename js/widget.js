@@ -31,25 +31,27 @@ stylebot.widget = {
                 });
         });
         
+        
+        // TODO: Instead of having these two handlers, implement them into the document 'keyup' handler
         this.ui.cache.dialog.keyup(function(e){
             // disable editing on esc
-            if(e.keyCode == 27)
+            if(e.keyCode == 27 && !stylebot.widget.ui.isColorPickerVisible)
             {
-                e.preventDefault();
-                this.blur();
+                console.log("Escape handler for Dialog triggered");
+                e.target.blur();
                 stylebot.disable();
             }
         });
         
         this.ui.cache.controls.keyup(function(e){
             // if esc is pressed, take away focus and stop editing
-            if(e.keyCode == 27)
+            if(e.keyCode == 27 && !stylebot.widget.ui.isColorPickerVisible)
             {
+                console.log("Escape handler for Control triggered");                
                 e.target.blur();
                 stylebot.disable();
-                return;
             }
-        })
+        });
     },
     
     show: function(){

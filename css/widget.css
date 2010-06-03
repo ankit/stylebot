@@ -1,130 +1,89 @@
 /* Main */
 
-#stylebot{
-    color:#313131;
-    font-family:Helvetica, Arial, serif !important;
-    font-size:12px;
-    text-align:left;
-    line-height:12px;
+#stylebot {
+    color: #313131;
+    font-family: Helvetica, Arial, serif !important;
+    line-height: 12px;
+    font-size: 12px;
+    text-align: left;
 }
 
-#stylebot-controls{
-    list-style-type:none !important;
-    margin:0;
-    border:none;
+#stylebot-controls {
+    -webkit-box-shadow: 0px 1px 0px #fff;
+    border: none;
+    border-bottom: 1px solid #ccc;
+    color: inherit;
+    font-family: inherit;
+    font-size: inherit;
+    list-style-type: none !important;
+    margin: 0;
     padding: 5px 10px;
-    border-bottom:1px solid #ccc;
-    -webkit-box-shadow:0px 1px 0px #fff;
-    font-family:inherit;
-    font-size:inherit;
-    color:inherit;
 }
 
-li.stylebot-control-set{
-    list-style-type:none;
-    padding:2px;
-    margin:6px 0;
-    border-radius:2px;
-    border:none;
-    font-family:inherit;
-    font-size:inherit;
-    color:inherit;
+li.stylebot-control-set {
+    -webkit-border-radius: 2px;
+    border: none;    
+    color: inherit;
+    font-family: inherit;
+    font-size: inherit;
+    list-style-type: none;
+    margin: 6px 0;
+    padding: 2px;
 }
 
-.stylebot-control{
-    margin:0;
-    padding:0;
-    margin-left:6px;
-    float:none;
-    display:inline;
-    width:auto;
+.stylebot-control {
+    display: inline;
+    float: none;
+    margin: 0;
+    margin-left: 6px;
+    padding: 0;
+    width: auto;
 }
 
 /* Labels */
 
-.stylebot-label{
-    text-shadow:1px 1px 0px #fff;
-    width:80px;
-    padding-right:4px;
-    display:inline-block;
-    text-align:right;
-    font-family:inherit;
-    font-size:inherit;
-    font-weight:normal;
-    color:inherit;
-    margin:0;
-    float:none;
+.stylebot-label {
+    color: inherit;
+    display: inline-block;
+    float: none;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: normal;
+    margin: 0;
+    padding-right: 4px;
+    text-align: right;
+    text-shadow: 1px 1px 0px #fff;
+    width: 80px;
 }
 
-.stylebot-inline-label{
-    font-family:inherit;
-    font-size:inherit;
+.stylebot-inline-label {
+    color: inherit;
+    display: inline;
+    padding-right: 5px;
+    font-family: inherit;
+    font-size: inherit;
     font-weight:normal;
-    color:inherit;
-    display:inline;
-    padding-right:5px;
 }
 
 /* Buttons */
 
-#stylebot-main-buttons{
-    padding:5px;
-    height:23px;
-    text-align:center;
+#stylebot-main-buttons {
+    padding: 5px;
+    height: 23px;
+    text-align: center;
 }
 
-.stylebot-button{
-    font-family:inherit !important;
-    font-size:10px;
-    margin:0px 3px;
-    float:none;
+.stylebot-button {
+    float: none;
+    font-family: inherit !important;
+    font-size: 10px;
+    margin: 0px 3px;
 }
 
-/* Controls */
+/* Code */
 
-#stylebot input{
-    font-size:12px;
-}
-
-input.stylebot-textfield, .stylebot-textarea{
-    padding:2px;
-    border:1px solid #ccc !important;
-    border-radius:2px;
-    outline:none;
-    background-color:#fff;
-    -webkit-box-shadow:none !important;
-    font-family:inherit;
-    font-size:inherit;
-    color:inherit;
-}
-
-/* Color Picker Selector */
-.stylebot-colorselector{
-    width:30px !important;
-    height:12px !important;
-    margin-bottom:-5px;
-    display:inline-block;
-    padding:2px;
-    border:1px solid #ccc;
-    background-color:#f8f8f8;
-}
-
-.stylebot-colorselector-color{
-    background-color:#fff;
-    margin:1px 1px;
-    border:1px solid #aaa;
-    height:70% !important;
-    width:auto;
-}
-
-.stylebot-colorselector:focus{
-    outline:none;
-    background-color:#ddd;
-}
-
-/* Code styling */
-.stylebot-css-code{
-    font-size:12px !important;
-    color:#333 !important;
-    font-family:"Courier New" !important;
+.stylebot-css-code {
+    color: #333 !important;
+    font-size: 12px !important;
+    font-family: "Courier New" !important;
 }

@@ -11,10 +11,10 @@
 		"css":[
 			"css/main.css",
 			"css/widget.css",
+			"css/controls.css",
 			"css/Aristo/aristo.css",
 			"css/colorpicker.css",
-			"css/scrollbars.css",
-			"css/controls.css"
+			"css/scrollbars.css"
 		],
 		
 		"js":[

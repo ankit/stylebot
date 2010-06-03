@@ -78,8 +78,12 @@ var stylebot = {
                 stylebot.toggle();
 
             // Handle Esc key to escape editing mode
-            else if(e.keyCode == 27 && stylebot.status)
+            else if(e.keyCode == 27 && stylebot.status && !stylebot.widget.ui.isColorPickerVisible)
+            {
+                console.log("Escape handler for document triggered");
                 stylebot.disable();
+            }
+                
         });
         
         // Handle mouse move event on DOM elements

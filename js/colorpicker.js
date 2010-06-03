@@ -105,15 +105,17 @@
 				if (cal.data('colorpicker').onShow.apply(this, [cal.get(0)]) != false) {
 					cal.show();
 				}
-				$(document).bind('mousedown', {cal: cal}, hide);
+				$(document).bind('mousedown keyup', {cal: cal}, hide);
 				return false;
 			},
 			hide = function (ev) {
+			    if(ev.type == 'keyup' && ev.keyCode != 27)
+			        return true;
 				if (!isChildOf(ev.data.cal.get(0), ev.target, ev.data.cal.get(0))) {
 					if (ev.data.cal.data('colorpicker').onHide.apply(this, [ev.data.cal.get(0)]) != false) {
 						ev.data.cal.hide();
 					}
-					$(document).unbind('mousedown', hide);
+					$(document).unbind('mousedown keyup', hide);
 				}
 			},
 			isChildOf = function(parentEl, el, container) {
