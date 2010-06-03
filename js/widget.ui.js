@@ -404,7 +404,7 @@ stylebot.widget.ui = {
         }
         
         // set widget title
-        this.cache.box.dialog('option', 'title', stylebot.selector.value);
+        this.cache.box.dialog('option', 'title', stylebot.selector.value ? stylebot.selector.value : "Select an element");
     },
     
     // reset values to default for all controls

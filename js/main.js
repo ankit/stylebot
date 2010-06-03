@@ -61,6 +61,7 @@ var stylebot = {
         $(document.body).removeClass('stylebot-ui');
         this.unhighlight();
         this.selectedElement = null;
+        this.selector.value = null;
         stylebot.chrome.setIcon(false);
         stylebot.widget.hide();
     },

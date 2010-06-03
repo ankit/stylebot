@@ -80,7 +80,7 @@ stylebot.widget = {
         {
             /* Left offset of widget */
             var offset = stylebot.selectedElement.offset();
-            var left = offset.left + stylebot.selectedElement.width() + 10;
+            var left = offset.left + stylebot.selectedElement.width() + 80;
             var leftDiff = this.ui.cache.box.dialog('option','width') - (document.body.clientWidth - left);
             if(leftDiff >= 0)
                 left = left - leftDiff;
@@ -99,6 +99,11 @@ stylebot.widget = {
             
             this.ui.cache.box.dialog('option', 'position', [left, top]);
         }
+        else
+            
+            this.ui.cache.box.dialog('option', 'position', 
+            [ document.body.clientWidth * 0.7 , 
+              document.body.clientHeight * 0.1 ]);
     },
     
     save: function(e){
