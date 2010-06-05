@@ -49,7 +49,7 @@ input.stylebot-textfield, .stylebot-textarea {
     background-color: #fff;
     border: 1px solid #ccc !important;
     border-radius: 2px;
-    color: inherit;
+    color: #333;
     font-family: inherit;
     font-size: 12px !important;
     outline: none;

@@ -101,11 +101,6 @@ stylebot.widget = {
             
             this.ui.cache.box.dialog('option', 'position', [left, top]);
         }
-        else
-            
-            this.ui.cache.box.dialog('option', 'position', 
-            [ document.body.clientWidth * 0.7 , 
-              document.body.clientHeight * 0.1 ]);
     },
     
     save: function(e){

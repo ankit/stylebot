@@ -264,7 +264,7 @@
 				return this.each(function () {
 					if (!$(this).data('colorpickerId')) {
 						var options = $.extend({}, opt);
-						var id = 'collorpicker_' + parseInt(Math.random() * 1000);
+						var id = 'colorpicker_' + parseInt(Math.random() * 1000);
 						$(this).data('colorpickerId', id);
 						var cal = $(tpl).attr('id', id);
 						if (options.flat) {

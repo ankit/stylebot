@@ -87,3 +87,9 @@ li.stylebot-control-set {
     font-size: 12px !important;
     font-family: "Courier New" !important;
 }
+
+/* Denote selector is editable */
+#ui-dialog-title-stylebot:hover{
+    cursor:text;
+    background-color:#fbfbfb;
+}

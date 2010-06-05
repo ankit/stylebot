@@ -5,7 +5,9 @@
   **/
   
 stylebot.widget.ui = {
+    
     isColorPickerVisible: false,
+    
     controls:[{
         name: 'Color',
         id: 'color',
@@ -112,7 +114,7 @@ stylebot.widget.ui = {
         this.createButton('Generate CSS').appendTo(buttons).click(stylebot.widget.generateCSS);
         buttons.appendTo(this.cache.box);
         
-        // create dialog
+        // creating dialog
         this.cache.box.appendTo(document.body).dialog({
             title: 'Custom Styles',
             autoOpen: false,
@@ -131,8 +133,21 @@ stylebot.widget.ui = {
             }
         });
         
-        // fill cache with widget UI elements
+        // make title editable
+        stylebot.utils.makeEditable($('#ui-dialog-title-stylebot'), function(value){
+            stylebot.selector.value = value;
+            // this is to prevent repositioning of the widget
+            stylebot.selectedElement = null;
+            stylebot.widget.show();
+        });
+        
+        // fill cache with jQuery objects widget UI elements
         this.fillCache();
+        
+        // set initial widget position 
+        this.cache.box.dialog('option', 'position', 
+        [ document.body.clientWidth * 0.7 , 
+          document.body.clientHeight * 0.1 ]);
     },
     
     fillCache: function(){
@@ -416,5 +431,5 @@ stylebot.widget.ui = {
         this.cache.radios.attr('checked', false);
         this.cache.selectboxes.attr('selectedIndex', 0);
         this.cache.colorSelectorColor.css('backgroundColor', '#fff');
-    },
+    }
 }
