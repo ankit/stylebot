@@ -358,8 +358,7 @@ stylebot.widget.ui = {
         return $('<button>', {
             class: 'stylebot-button',
             html: text
-        }).button();
-
+        });
     },
     
     fillControl: function(control, styles){

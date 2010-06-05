@@ -2,10 +2,6 @@
  * Modified version of http://github.com/maccman/aristo
  */
 
-.stylebot-textarea{
-    resize:none;
-}
-
 .stylebot-textarea::-webkit-scrollbar {
   width: 17px;
   height: 17px;
