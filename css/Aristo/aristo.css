@@ -322,7 +322,7 @@
 .stylebot-ui .ui-accordion .ui-accordion-header a { display: block; font-size: 11px; padding: .5em .5em .5em .7em; font-weight: bold; color:#4f4f4f; text-shadow: 0px 1px 0px rgba(255,255,255,0.7); }
 .stylebot-ui .ui-accordion-icons .ui-accordion-header a { padding-left: 24px; }
 .stylebot-ui .ui-accordion .ui-accordion-header .ui-icon { position: absolute; left: .5em; top: 50%; margin-top: -7px; }
-.stylebot-ui .ui-accordion .ui-accordion-content { background: #f8fcfe; padding: 1em 2.2em; border-top: 0; margin-top: -2px; position: relative; top: 1px; margin-bottom: 2px; overflow: auto; display: none; zoom: 1; font-size: 11px; /*border-color: #749aaf;*/ }
+.stylebot-ui .ui-accordion .ui-accordion-content { background: #f8fcfe; /*padding: 1em 2.2em;*/ padding:0 2.2em; border-top: 0; margin-top: -2px; position: relative; top: 1px; margin-bottom: 2px; overflow: auto; display: none; zoom: 1; font-size: 11px; /*border-color: #749aaf;*/ }
 .stylebot-ui .ui-accordion .ui-accordion-content-active { display: block; }
 .stylebot-ui .ui-accordion .ui-accordion-header,.stylebot-ui .ui-accordion .ui-accordion-content { -moz-border-radius: 0px; -webkit-border-radius: 0px; border-radius: 0px; }
 .stylebot-ui .ui-accordion .ui-state-active {  }

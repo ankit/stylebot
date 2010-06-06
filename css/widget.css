@@ -84,3 +84,8 @@
     cursor:text;
     background-color:#fbfbfb;
 }
+
+/* Accordion modifications */
+.stylebot-ui .ui-accordion .ui-accordion-header a:active{
+    color:#4f4f4f !important;
+}

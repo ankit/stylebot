@@ -9,30 +9,21 @@ stylebot.widget.ui = {
     isColorPickerVisible: false,
     
     controls:[{
-        name: 'Fonts & Color',
-        items:[{
-            name: 'Color',
-            id: 'color',
-            type: 'color'
-        },
+        name: 'Text',
+        items:[
         {
-            name: 'Background Color',
-            id: 'background-color',
-            type: 'color'
-        },
-        {
-            name: 'Size',
+            name: 'Font Size',
             id: 'font-size',
             type: 'size'
         },
         {
-            name: 'Weight',
+            name: 'Font Weight',
             id: 'font-weight',
             type: 'select',
             options: ['none', 'bold']
         },
         {
-            name: 'Style',
+            name: 'Font Style',
             id: 'font-style',
             type: 'select',
             options: ['none', 'italic']
@@ -53,6 +44,19 @@ stylebot.widget.ui = {
             name: 'Letter Spacing',
             id: 'letter-spacing',
             type: 'size'
+        }]
+    },
+    {
+        name: 'Color & Background',
+        items:[{
+            name: 'Color',
+            id: 'color',
+            type: 'color'
+        },
+        {
+            name: 'Background Color',
+            id: 'background-color',
+            type: 'color'
         }]
     },
     {
