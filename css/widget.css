@@ -15,25 +15,23 @@
     color: inherit;
     font-family: inherit;
     font-size: inherit;
-    list-style-type: none !important;
     margin: 0;
-    padding: 5px 10px;
+/*    padding: 5px 10px;*/
 }
 
-li.stylebot-control-set {
+.stylebot-control-set {
     -webkit-border-radius: 2px;
-    border: none;    
+    border: none;
     color: inherit;
     font-family: inherit;
     font-size: inherit;
-    list-style-type: none;
     margin: 6px 0;
     padding: 2px;
 }
 
 .stylebot-control {
     display: inline;
-    float: none;
+/*    float: none;*/
     margin: 0;
     margin-left: 6px;
     padding: 0;

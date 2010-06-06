@@ -9,70 +9,80 @@ stylebot.widget.ui = {
     isColorPickerVisible: false,
     
     controls:[{
-        name: 'Color',
-        id: 'color',
-        type: 'color'
+        name: 'Fonts & Color',
+        items:[{
+            name: 'Color',
+            id: 'color',
+            type: 'color'
+        },
+        {
+            name: 'Background Color',
+            id: 'background-color',
+            type: 'color'
+        },
+        {
+            name: 'Size',
+            id: 'font-size',
+            type: 'size'
+        },
+        {
+            name: 'Weight',
+            id: 'font-weight',
+            type: 'select',
+            options: ['none', 'bold']
+        },
+        {
+            name: 'Style',
+            id: 'font-style',
+            type: 'select',
+            options: ['none', 'italic']
+        },
+        {
+            name: 'Decoration',
+            id: 'text-decoration',
+            type: 'select',
+            options: ['none', 'underline']
+
+        },
+        {
+            name: 'Line Height',
+            id: 'line-height',
+            type: 'size'
+        },
+        {
+            name: 'Letter Spacing',
+            id: 'letter-spacing',
+            type: 'size'
+        }]
     },
     {
-        name: 'Background Color',
-        id: 'background-color',
-        type: 'color'
+        name: 'Borders',
+        items:[
+        {
+            name: 'Border Style',
+            id: 'border-style',
+            type: 'select',
+            options: [ 'none', 'solid', 'dotted', 'dashed', 'double', 'groove', 'ridge', 'inset', 'outset' ]
+        },
+        {
+            name: 'Color',
+            id: 'border-color',
+            type: 'color'
+        },
+        {
+            name: 'Thickness',
+            id: 'border-width',
+            type: 'size'
+        }]
     },
     {
-        name: 'Size',
-        id: 'font-size',
-        type: 'size'
-    },
-    {
-        name: 'Weight',
-        id: 'font-weight',
-        type: 'select',
-        options: ['none', 'bold']
-    },
-    {
-        name: 'Style',
-        id: 'font-style',
-        type: 'select',
-        options: ['none', 'italic']
-    },
-    {
-        name: 'Decoration',
-        id: 'text-decoration',
-        type: 'select',
-        options: ['none', 'underline']
-        
-    },
-    {
-        name: 'Line Height',
-        id: 'line-height',
-        type: 'size'
-    },
-    {
-        name: 'Letter Spacing',
-        id: 'letter-spacing',
-        type: 'size'
-    },
-    {
-        name: 'Border Style',
-        id: 'border-style',
-        type: 'select',
-        options: [ 'none', 'solid', 'dotted', 'dashed', 'double', 'groove', 'ridge', 'inset', 'outset' ]
-    },
-    {
-        name: 'Border Width',
-        id: 'border-width',
-        type: 'size'
-    },
-    {
-        name: 'Border Color',
-        id: 'border-color',
-        type: 'color'
-    },
-    {
-        name: 'Hide Element',
-        id: 'display',
-        type: 'checkbox',
-        value: 'none'
+        name: 'Others',
+        items:[{
+            name: 'Hide',
+            id: 'display',
+            type: 'checkbox',
+            value: 'none'
+        }]
     }
     ],
     
@@ -94,7 +104,7 @@ stylebot.widget.ui = {
             id:'stylebot'
         });
         
-        var controls_ui = $('<ul>', {
+        var controls_ui = $('<div>', {
             id: 'stylebot-controls'
         });
         
@@ -102,9 +112,23 @@ stylebot.widget.ui = {
         var len = this.controls.length;
         
         for(var i=0; i<len; i++)
-            this.createControl(this.controls[i]).appendTo(controls_ui);
+        {
+
+            var len2 = this.controls[i].items.length;
+            this.createControlGroupHeader(this.controls[i].name).appendTo(controls_ui);
+            var group = $('<div>').appendTo(controls_ui);
+            for(var j=0; j<len2; j++)
+            {
+                var control = this.controls[i].items[j];
+                this.createControl(control).appendTo(group);
+            }
+        }
         
-        controls_ui.appendTo(this.cache.box);
+        controls_ui.appendTo(this.cache.box).accordion({
+            header: 'h3',
+            autoHeight: false,
+            collapsible: true
+        });
         
         // creating main buttons for widget
         var buttons = $('<div>', {
@@ -167,8 +191,16 @@ stylebot.widget.ui = {
         this.cache.colorSelectorColor = $('.stylebot-colorselector-color');
     },
     
+    createControlGroupHeader: function(name){
+        return $('<h3>')
+        .append($('<a>', {
+            href: '#',
+            html: name
+        }));
+    },
+    
     createControl: function(control){
-        var el = $('<li>', {
+        var el = $('<div>', {
             class: 'stylebot-control-set'
         });
 
