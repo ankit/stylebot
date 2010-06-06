@@ -8,84 +8,96 @@ stylebot.widget.ui = {
     
     isColorPickerVisible: false,
     
-    controls:[{
+    groups:[{
         name: 'Text',
-        items:[
+        controls:[
         {
             name: 'Font Size',
             id: 'font-size',
-            type: 'size'
+            type: 'size',
+            el: null
         },
         {
             name: 'Font Weight',
             id: 'font-weight',
             type: 'select',
-            options: ['none', 'bold']
+            options: ['none', 'bold'],
+            el: null
         },
         {
             name: 'Font Style',
             id: 'font-style',
             type: 'select',
-            options: ['none', 'italic']
+            options: ['none', 'italic'],
+            el: null
         },
         {
             name: 'Decoration',
             id: 'text-decoration',
             type: 'select',
-            options: ['none', 'underline']
+            options: ['none', 'underline'],
+            el: null
 
         },
         {
             name: 'Line Height',
             id: 'line-height',
-            type: 'size'
+            type: 'size',
+            el: null
         },
         {
             name: 'Letter Spacing',
             id: 'letter-spacing',
-            type: 'size'
+            type: 'size',
+            el: null
         }]
     },
     {
         name: 'Color & Background',
-        items:[{
+        controls:[{
             name: 'Color',
             id: 'color',
-            type: 'color'
+            type: 'color',
+            el: null
         },
         {
             name: 'Background Color',
             id: 'background-color',
-            type: 'color'
+            type: 'color',
+            el: null
         }]
     },
     {
         name: 'Borders',
-        items:[
+        controls:[
         {
             name: 'Border Style',
             id: 'border-style',
             type: 'select',
-            options: [ 'none', 'solid', 'dotted', 'dashed', 'double', 'groove', 'ridge', 'inset', 'outset' ]
+            options: [ 'none', 'solid', 'dotted', 'dashed', 'double', 'groove', 'ridge', 'inset', 'outset' ],
+            el: null
         },
         {
             name: 'Color',
             id: 'border-color',
-            type: 'color'
+            type: 'color',
+            el: null
         },
         {
             name: 'Thickness',
             id: 'border-width',
-            type: 'size'
+            type: 'size',
+            el: null
         }]
     },
     {
         name: 'Others',
-        items:[{
+        controls:[{
             name: 'Hide',
             id: 'display',
             type: 'checkbox',
-            value: 'none'
+            value: 'none',
+            el: null
         }]
     }
     ],
@@ -113,19 +125,16 @@ stylebot.widget.ui = {
         });
         
         // creating controls for different CSS properties
-        var len = this.controls.length;
+        var len = this.groups.length;
         
         for(var i=0; i<len; i++)
         {
-            this.createControlGroupHeader(this.controls[i].name).appendTo(controls_ui);
+            this.createGroupHeader(this.groups[i].name).appendTo(controls_ui);
             var group = $('<div>').appendTo(controls_ui);
 
-            var len2 = this.controls[i].items.length;
+            var len2 = this.groups[i].controls.length;
             for(var j=0; j<len2; j++)
-            {
-                var control = this.controls[i].items[j];
-                this.createControl(control).appendTo(group);
-            }
+                this.createControl(this.groups[i].controls[j]).appendTo(group);
         }
         
         controls_ui.appendTo(this.cache.box).accordion({
@@ -195,7 +204,7 @@ stylebot.widget.ui = {
         this.cache.colorSelectorColor = $('.stylebot-colorselector-color');
     },
     
-    createControlGroupHeader: function(name){
+    createGroupHeader: function(name){
         return $('<h3>')
         .append($('<a>', {
             href: '#',
@@ -210,32 +219,37 @@ stylebot.widget.ui = {
 
         this.createLabel(control.name).appendTo(el);
         
+        var control_el; // this will contain the control element
+        
         // Add controls of different types
         switch(control.type){
 
-            case 'size'             :   var input = this.createSizeField(control.id).appendTo(el);
+            case 'size'             :   control_el = this.createTextField(control.id, 4).appendTo(el);
+                                        this.createSizeText().appendTo(el);
                                         break;
                                         
-            case 'color'            :   var input = this.createTextField(control.id, 10);
-                                        this.createColorPicker(input).appendTo(el);
-                                        input.appendTo(el)
+            case 'color'            :   control_el = this.createTextField(control.id, 10);
+                                        this.createColorPicker(control_el).appendTo(el);
+                                        control_el.appendTo(el)
                                         .keyup(function(e){ stylebot.widget.ui.setColorSelectorColor( $(this) ) });
                                         break;
                                         
-            case 'checkbox'          :  this.createCheckbox(null, control.id , control.value).appendTo(el);
+            case 'checkbox'          :  control_el = this.createCheckbox(null, control.id , control.value).appendTo(el);
                                         break;
                                         
-            case 'select'            :  var select = this.createSelect(control.id);
-                                        this.createSelectOption("Default", control.id, '').appendTo(select);
+            case 'select'            :  control_el = this.createSelect(control.id);
+                                        this.createSelectOption("Default", control.id, '').appendTo(control_el);
                                         var len = control.options.length;
                                         for(var i=0; i<len; i++)
                                         {
                                             var option = control.options[i];
-                                            this.createSelectOption( stylebot.utils.capitalize(option), control.id, option).appendTo(select);
+                                            this.createSelectOption( stylebot.utils.capitalize(option), control.id, option).appendTo(control_el);
                                         }
-                                        select.appendTo(el);
+                                        control_el.appendTo(el);
                                         break;
         }
+        // objects (except primitive type) are passed by reference in JS :)
+        control.el = control_el;
         return el;
     },
     
@@ -252,16 +266,11 @@ stylebot.widget.ui = {
         return input;
     },
     
-    createSizeField: function(property){
-        var span = $('<span>');
-        
-        this.createTextField(property, 4).appendTo(span);
-        $('<span>', {
+    createSizeText: function(){
+        return $('<span>', {
              html: ' px',
              style: 'color:#aaa'
-        })
-        .appendTo(span);
-        return span;
+        });
     },
     
     createCheckbox: function(text, property, value){
@@ -400,9 +409,10 @@ stylebot.widget.ui = {
     fillControl: function(control, styles){
         switch(control.type){
             case 'size'             :   var index = stylebot.utils.search(styles, "property", control.id);
+                                        console.log("Control Element ID: " + control.el.attr('id'));
                                         if(index != null)
                                         {
-                                            this.getControl(control.id)
+                                            control.el
                                             .attr('value', styles[index].value.replace('px',''));
                                         }
                                             
@@ -411,11 +421,10 @@ stylebot.widget.ui = {
             case 'color'            :   var index = stylebot.utils.search(styles, "property", control.id);
                                         if(index != null)
                                         {
-                                            var control = this.getControl(control.id);
                                             var color = styles[index].value;
-                                            control.attr('value', color);
+                                            control.el.attr('value', color);
                                             if(color != "")
-                                            this.setColorSelectorColor(control);
+                                                this.setColorSelectorColor(control.el);
                                         }
                                         break;
                                         
@@ -423,9 +432,9 @@ stylebot.widget.ui = {
                                         if(index != null)
                                         {
                                             if(styles[index].value == control.value)
-                                                this.getControl(control.id).attr('checked', true);
+                                                control.el.attr('checked', true);
                                             else
-                                                this.getControl(control.id).attr('checked', false);                                                
+                                                control.el.attr('checked', false);                                                
                                         }
                                         break;
                                         
@@ -434,30 +443,25 @@ stylebot.widget.ui = {
                                         {
                                             var index2 = $.inArray($.trim(String(styles[index].value)), control.options);
                                             if(index2 != -1)
-                                                this.getControl(control.id).attr('selectedIndex', index2 + 1);
+                                                control.el.attr('selectedIndex', index2 + 1);
                                         }
                                         break;
         }
     },
     
-    getControl: function(controlId){
-        return $('#stylebot-' + controlId);
-    },
-    
     // fill controls with any existing custom styles for current selector
     fill: function(){
-        var len = this.controls.length;
+        var len = this.groups.length;
         var styles = stylebot.style.getStyles(stylebot.selector.value);
         
         if(styles)
         {
             for(var i=0; i<len; i++)
             {
-                var len2 = this.controls[i].items.length;
+                var len2 = this.groups[i].controls.length;
                 for(var j=0; j<len2; j++)
-                    this.fillControl(this.controls[i].items[j], styles);
+                    this.fillControl(this.groups[i].controls[j], styles);
             }
-                
         }
         
         // set widget title
