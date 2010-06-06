@@ -117,10 +117,10 @@ stylebot.widget.ui = {
         
         for(var i=0; i<len; i++)
         {
-
-            var len2 = this.controls[i].items.length;
             this.createControlGroupHeader(this.controls[i].name).appendTo(controls_ui);
             var group = $('<div>').appendTo(controls_ui);
+
+            var len2 = this.controls[i].items.length;
             for(var j=0; j<len2; j++)
             {
                 var control = this.controls[i].items[j];
@@ -452,7 +452,12 @@ stylebot.widget.ui = {
         if(styles)
         {
             for(var i=0; i<len; i++)
-                this.fillControl(this.controls[i], styles);
+            {
+                var len2 = this.controls[i].items.length;
+                for(var j=0; j<len2; j++)
+                    this.fillControl(this.controls[i].items[j], styles);
+            }
+                
         }
         
         // set widget title

@@ -3,9 +3,11 @@
 #stylebot {
     color: #313131;
     font-family: Helvetica, Arial, serif !important;
+    height: auto !important;
     line-height: 12px;
     font-size: 12px;
     text-align: left;
+    width: auto !important;
 }
 
 #stylebot-controls {
