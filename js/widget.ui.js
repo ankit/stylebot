@@ -21,7 +21,7 @@ stylebot.widget.ui = {
             name: 'Font Weight',
             id: 'font-weight',
             type: 'select',
-            options: ['none', 'bold'],
+            options: ['normal', 'bold'],
             el: null
         },
         {

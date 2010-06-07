@@ -86,6 +86,7 @@ button.stylebot-button {
 button.stylebot-button:hover:not(:disabled) {
     color: #313131;
     border-color:#ccc;
+    cursor: pointer;
     -webkit-box-shadow: 0 0 5px #D4D4D4;
 }
 

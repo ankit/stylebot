@@ -2,10 +2,12 @@
 
 #stylebot {
     color: #313131;
-    font-family: Helvetica, Arial, serif !important;
+    font-family: Helvetica, Arial, serif;
+    font-size: 12px;
     height: auto !important;
     line-height: 12px;
-    font-size: 12px;
+    margin: 0;
+    padding: 0;
     text-align: left;
     width: auto !important;
 }
@@ -18,7 +20,6 @@
     font-family: inherit;
     font-size: inherit;
     margin: 0;
-/*    padding: 5px 10px;*/
 }
 
 .stylebot-control-set {
@@ -33,7 +34,6 @@
 
 .stylebot-control {
     display: inline;
-/*    float: none;*/
     margin: 0;
     margin-left: 6px;
     padding: 0;
@@ -68,8 +68,7 @@
 /* Main buttons */
 
 #stylebot-main-buttons {
-    padding: 5px;
-    height: 23px;
+    margin: 8px 0;
     text-align: center;
 }
 
@@ -78,16 +77,25 @@
 .stylebot-css-code {
     color: #333 !important;
     font-size: 12px !important;
-    font-family: "Courier New" !important;
+    font-family: 'Andale Mono', 'Lucida Console', monospace !important;
 }
 
 /* Denote selector is editable */
-#ui-dialog-title-stylebot:hover{
-    cursor:text;
-    background-color:#fbfbfb;
+#ui-dialog-title-stylebot:hover {
+    cursor: text;
+    background-color: #fbfbfb;
 }
 
 /* Accordion modifications */
-.stylebot-ui .ui-accordion .ui-accordion-header a:active{
+.stylebot-ui .ui-accordion .ui-accordion-header a:active {
     color:#4f4f4f !important;
+}
+.stylebot-ui .ui-accordion .ui-accordion-header {
+    font-family: Helvetica, Arial, serif !important;
+}
+
+/* Modal window */
+#stylebot-modal {
+    padding: 10px;
+    text-align: left;
 }
