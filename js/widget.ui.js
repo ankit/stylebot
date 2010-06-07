@@ -185,8 +185,11 @@ stylebot.widget.ui = {
         
         // set initial widget position 
         this.cache.box.dialog('option', 'position', 
-        [ document.body.clientWidth - ( this.cache.box.dialog('option', 'width') + 80 ) , 
+        [ document.body.clientWidth - ( this.cache.box.dialog('option', 'width') + 50 ) , 
         null] );
+        
+        // fix widget position
+        this.cache.dialog.css('position', 'fixed');
     },
     
     fillCache: function(){
