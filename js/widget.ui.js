@@ -156,6 +156,8 @@ stylebot.widget.ui = {
             title: 'Custom Styles',
             autoOpen: false,
             closeOnEscape: false,
+            draggable: true,
+            resizable: false,
             dragStart: function(e, ui){
                 stylebot.widget.isBeingDragged = true;
             },
@@ -183,8 +185,8 @@ stylebot.widget.ui = {
         
         // set initial widget position 
         this.cache.box.dialog('option', 'position', 
-        [ document.body.clientWidth * 0.7 , 
-          document.body.clientHeight * 0.1 ]);
+        [ document.body.clientWidth - ( this.cache.box.dialog('option', 'width') + 80 ) , 
+        null] );
     },
     
     fillCache: function(){

@@ -80,25 +80,30 @@ stylebot.widget = {
     setPosition: function(){
         if(stylebot.selectedElement)
         {
-            /* Left offset of widget */
             var offset = stylebot.selectedElement.offset();
-            var left = offset.left + stylebot.selectedElement.width() + 80;
-            var leftDiff = this.ui.cache.box.dialog('option','width') - (document.body.clientWidth - left);
-            if(leftDiff >= 0)
-                left = left - leftDiff;
             
-            /* Top offset of widget */
+            // left offset of widget
+            var left = offset.left + stylebot.selectedElement.width();
+            var dialogWidth = this.ui.cache.box.dialog('option','width');
+            var leftDiff = (document.body.clientWidth - left) - dialogWidth;
+
+            if(leftDiff >= 0)
+                left = document.body.clientWidth - dialogWidth - 80;
+            else
+                left = 80;
+            
+            /* top offset of widget */
+            var dialogHeight = this.ui.cache.dialog.height() + 100;
             var top = offset.top - window.pageYOffset;
-            /* in case the element's top is beyond current view */
+            // in case the element's top is beyond current view
             if(top < 0)
-                top = window.pageYOffset - 300;
+                top = null;
             else
             {
                 var topDiff = window.innerHeight - (top + this.ui.cache.box.dialog('option','height') + 100);
                 if(topDiff <= 0)
                     top = top + topDiff;
             }
-            
             this.ui.cache.box.dialog('option', 'position', [left, top]);
         }
     },
