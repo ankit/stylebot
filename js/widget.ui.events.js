@@ -6,7 +6,7 @@
 
 stylebot.widget.ui.events = {
     
-    onCheckboxClick: function(e){
+    onCheckboxChange: function(e){
         var value;
         if(e.target.checked == true)
             value = e.target.value;

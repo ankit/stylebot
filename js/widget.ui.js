@@ -93,9 +93,9 @@ stylebot.widget.ui = {
     {
         name: 'Others',
         controls:[{
-            name: 'Hide',
+            name: 'Visibility',
             id: 'display',
-            type: 'checkbox',
+            type: 'toggle',
             value: 'none',
             el: null
         }]
@@ -111,7 +111,8 @@ stylebot.widget.ui = {
         checkboxes: null,
         radios: null,
         selectboxes: null,
-        colorSelectorColor: null
+        colorSelectorColor: null,
+        toggleButtons: null
     },
     
     createBox: function(){
@@ -202,6 +203,8 @@ stylebot.widget.ui = {
         this.cache.selectboxes = $('.stylebot-select');
         // color selector color divs
         this.cache.colorSelectorColor = $('.stylebot-colorselector-color');
+        // toggle buttons
+        this.cache.toggleButtons = $('.stylebot-toggle');
     },
     
     createGroupHeader: function(name){
@@ -233,10 +236,13 @@ stylebot.widget.ui = {
                                         .keyup(function(e){ stylebot.widget.ui.setColorSelectorColor( $(this) ) });
                                         break;
                                         
-            case 'checkbox'          :  control_el = this.createCheckbox(null, control.id , control.value).appendTo(el);
+            case 'checkbox'         :   control_el = this.createCheckbox(null, control.id , control.value).appendTo(el);
                                         break;
-                                        
-            case 'select'            :  control_el = this.createSelect(control.id);
+
+            case 'toggle'           :   control_el = this.createToggleButton('Hide', control.id , control.value).appendTo(el);
+                                        break;
+
+            case 'select'           :   control_el = this.createSelect(control.id);
                                         this.createSelectOption("Default", control.id, '').appendTo(control_el);
                                         var len = control.options.length;
                                         for(var i=0; i<len; i++)
@@ -247,7 +253,7 @@ stylebot.widget.ui = {
                                         control_el.appendTo(el);
                                         break;
         }
-        // objects (except primitive type) are passed by reference in JS :)
+        // objects (except primitive type) are passed by reference in JS
         control.el = control_el;
         return el;
     },
@@ -308,10 +314,10 @@ stylebot.widget.ui = {
             id: 'stylebot-' + property,
             class: 'stylebot-control stylebot-checkbox',
             value: value
-        });
+        })
+        .data('property', property)
+        .click(stylebot.widget.ui.events.onCheckboxChange);
         
-        checkbox.data('property', property);
-        checkbox.click(stylebot.widget.ui.events.onCheckboxClick);
         if(text)
         {
             var span = $('<span class="stylebot-control"></span>');
@@ -321,6 +327,29 @@ stylebot.widget.ui = {
         }
         else
             return checkbox;
+    },
+    
+    createToggleButton: function(text, property, value){
+        var container = $('<span>', {
+            class: 'stylebot-control'
+        });
+        
+        var checkbox = $('<input>',{
+            type: 'checkbox',
+            id: 'stylebot-' + property,
+            class: 'stylebot-control stylebot-toggle',
+            value: value
+        })
+        .appendTo(container)
+        .data('property', property);
+        
+        $('<label for="stylebot-' + property + '" >' + text + '</label>')
+        .appendTo(container);
+        
+        checkbox.button()
+        .change(this.events.onCheckboxChange);
+        
+        return container;
     },
     
     createRadio: function(text, name, property, value){
@@ -467,6 +496,17 @@ stylebot.widget.ui = {
                                         }
                                         break;
                                         
+            case 'toggle'         :     var index = stylebot.utils.search(styles, "property", control.id);
+                                        if(index != null)
+                                        {
+                                            if(styles[index].value == control.value)
+                                                control.el.find('input').attr('checked', true);
+                                            else
+                                                control.el.find('input').attr('checked', false);
+                                            control.el.find('input').button('refresh');
+                                        }
+                                        break;
+                                        
             case 'select'            :  var index = stylebot.utils.search(styles, "property", control.id);
                                         if(index != null)
                                         {
@@ -504,5 +544,6 @@ stylebot.widget.ui = {
         this.cache.radios.attr('checked', false);
         this.cache.selectboxes.attr('selectedIndex', 0);
         this.cache.colorSelectorColor.css('backgroundColor', '#fff');
+        this.cache.toggleButtons.attr('checked', false).button('refresh');
     }
 }
