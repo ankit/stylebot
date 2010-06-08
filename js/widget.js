@@ -47,7 +47,7 @@ stylebot.widget = {
             // if esc is pressed, take away focus and stop editing
             if(e.keyCode == 27 && !stylebot.widget.ui.isColorPickerVisible)
             {
-                console.log("Escape handler for Control triggered");                
+                console.log("Escape handler for Control triggered");
                 e.target.blur();
                 stylebot.disable();
             }
@@ -81,9 +81,9 @@ stylebot.widget = {
         var left;
 
         if(where == 'Left')
-            left = 80;
+            left = 20;
         else if(where == 'Right')
-            left = document.body.clientWidth - dialogWidth - 80;
+            left = document.body.clientWidth - dialogWidth - 20;
 
         this.ui.cache.box.dialog('option', 'position', [left, null]);
     },

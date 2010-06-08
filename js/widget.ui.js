@@ -167,6 +167,7 @@ stylebot.widget.ui = {
             title: 'Custom Styles',
             autoOpen: false,
             closeOnEscape: false,
+            width:300,
             draggable: true,
             resizable: false,
             dragStart: function(e, ui){
