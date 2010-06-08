@@ -41,13 +41,19 @@ stylebot.widget.ui.events = {
         
         var value = e.target.value;
         var property = $(e.target).data('property');
-        switch(property){
-            case 'font-size'        :
-            case 'line-height'      :
-            case 'letter-spacing'   :
-            case 'border-width'     :   value += 'px';
-                                        break;
-        }
+
+        stylebot.style.apply(stylebot.widget.selector, property, value);
+    },
+    
+    onSizeFieldKeyUp: function(e){
+        if(!stylebot.utils.filterKeys(['ctrl', 'shift', 'tab', 'esc', 'enter', 'arrowkeys'], e))
+            return true;
+        
+        var value = e.target.value;
+        var property = $(e.target).data('property');
+        var unit = $(e.target).next().attr('value');
+        value += unit;
+        
         stylebot.style.apply(stylebot.widget.selector, property, value);
     },
     

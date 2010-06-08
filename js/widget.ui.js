@@ -224,8 +224,7 @@ stylebot.widget.ui = {
         // Add controls of different types
         switch(control.type){
 
-            case 'size'             :   control_el = this.createTextField(control.id, 4).appendTo(el);
-                                        this.createSizeText().appendTo(el);
+            case 'size'             :   control_el = this.createSizeControl(control.id).appendTo(el);
                                         break;
                                         
             case 'color'            :   control_el = this.createTextField(control.id, 10);
@@ -266,11 +265,41 @@ stylebot.widget.ui = {
         return input;
     },
     
-    createSizeText: function(){
-        return $('<span>', {
-             html: ' px',
-             style: 'color:#aaa'
+    createSizeControl: function(property){
+        var container = $('<span>');
+        
+        // Textfield for entering size
+        var input = $('<input>',{
+            type: 'text',
+            id: 'stylebot-' + property,
+            class: 'stylebot-control stylebot-textfield',
+            size: 4
         });
+        input.data("property", property)
+        .keyup(this.events.onSizeFieldKeyUp)
+        .appendTo(container);
+
+        // Select box for choosing unit
+        var select = $('<select>', {
+            class: 'stylebot-control stylebot-select'
+        })
+        .change(function(e){
+            $(this).prev().keyup();
+        })
+        .appendTo(container);
+        
+        var units = ['px', 'em', '%', 'pt'];
+        var len = units.length;
+        
+        for(var i=0; i<len; i++){
+            $('<option>', {
+                class: 'stylebot-select-option',
+                html: units[i]
+            })
+            .appendTo(select);
+        }
+        
+        return container;
     },
     
     createCheckbox: function(text, property, value){
