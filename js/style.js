@@ -124,7 +124,7 @@ stylebot.style = {
         });
     },
     
-    // reset inline CSS for element(s)
+    // clear any custom inline CSS for element(s)
     clearInlineCSS: function(el){
         el.each(function(){
             var existingCSS = $(this).attr('style');
@@ -177,5 +177,14 @@ stylebot.style = {
             return property + ": " + value + " !important;";
         else
             return property + ": " + value + ";";
+    },
+    
+    // clear any existing custom CSS for current selector in cache
+    clear: function(){
+        var index = stylebot.utils.search(this.rules, "selector", this.cache.selector);
+        if(index != -1)
+            this.rules.splice(index, 1);
+
+        this.clearInlineCSS($(this.cache.selector));
     }
 }

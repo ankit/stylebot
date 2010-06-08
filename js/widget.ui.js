@@ -148,8 +148,9 @@ stylebot.widget.ui = {
         var buttons = $('<div>', {
             id: 'stylebot-main-buttons'
         });
-        this.createButton('Save changes').appendTo(buttons).click(stylebot.widget.save);
-        this.createButton('Generate CSS').appendTo(buttons).click(stylebot.widget.generateCSS);
+        this.createButton('Save').appendTo(buttons).click(stylebot.widget.save);
+        this.createButton('View CSS').appendTo(buttons).click(stylebot.widget.viewCSS);
+        this.createButton('Reset').appendTo(buttons).click(stylebot.widget.resetCSS);
         buttons.appendTo(this.cache.box);
         
         // creating dialog
@@ -499,11 +500,12 @@ stylebot.widget.ui = {
             case 'toggle'         :     var index = stylebot.utils.search(styles, "property", control.id);
                                         if(index != null)
                                         {
+                                            var input = control.el.find('input');
                                             if(styles[index].value == control.value)
-                                                control.el.find('input').attr('checked', true);
+                                                input.attr('checked', true);
                                             else
-                                                control.el.find('input').attr('checked', false);
-                                            control.el.find('input').button('refresh');
+                                                input.attr('checked', false);
+                                            input.button('refresh');
                                         }
                                         break;
                                         

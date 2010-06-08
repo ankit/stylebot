@@ -107,7 +107,13 @@ stylebot.widget = {
         stylebot.style.save();
     },
     
-    generateCSS: function(e){
+    viewCSS: function(e){
         stylebot.modal.show(stylebot.style.crunchCSS());
+    },
+    
+    resetCSS: function(e){
+        stylebot.widget.ui.reset();
+        // clear any custom styles for currently selected element
+        stylebot.style.clear();
     }
 }
