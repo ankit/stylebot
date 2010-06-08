@@ -61,7 +61,6 @@ stylebot.widget = {
         if(!this.ui.cache.box)
             this.create();
 
-        this.setPosition();         // decide where the widget should be displayed with respect to selected element
         this.ui.reset();            // reset all values for controls to default values
         this.ui.fill();             // fill widget with any existing custom styles
 
@@ -77,23 +76,16 @@ stylebot.widget = {
     },
     
     // calculate where the widget should be displayed w.r.t selected element
-    setPosition: function(){
-        if(stylebot.selectedElement)
-        {
-            var offset = stylebot.selectedElement.offset();
-            
-            // left offset of widget
-            var left = offset.left + stylebot.selectedElement.width() + 80;
-            var dialogWidth = this.ui.cache.box.dialog('option', 'width');
-            var leftDiff = (document.body.clientWidth - left) - dialogWidth;
+    setPosition: function(where){
+        var dialogWidth = stylebot.widget.ui.cache.box.dialog('option', 'width');
+        var left;
 
-            if(leftDiff >= 0)
-                left = document.body.clientWidth - dialogWidth - 80;
-            else
-                left = 80;
-            
-            this.ui.cache.box.dialog('option', 'position', [left, null]);
-        }
+        if(where == 'Left')
+            left = 80;
+        else if(where == 'Right')
+            left = document.body.clientWidth - dialogWidth - 80;
+
+        this.ui.cache.box.dialog('option', 'position', [left, null]);
     },
     
     save: function(e){
