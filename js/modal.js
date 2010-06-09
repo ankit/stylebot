@@ -21,13 +21,15 @@ stylebot.modal = {
         $('<div>', {
             html: "You can now copy the CSS below into the custom stylesheet for Chrome",
             style: "padding-bottom:10px"
-        }).appendTo(this.cache.box);
+        })
+        .appendTo(this.cache.box);
         
         this.cache.textarea = $('<textarea>', {
             height:300,
             width:'98%',
             class:'stylebot-textarea stylebot-css-code'
-        }).appendTo(this.cache.box);
+        })
+        .appendTo(this.cache.box);
 
         this.cache.box.appendTo(document.body).dialog({
             title: 'Generated CSS',

@@ -23,7 +23,7 @@ var stylebot = {
     // kill switch for jQuery lint
     lintDebug: false,
 
-    defaults: {
+    options: {
         shortcutKey:69 // 69 is keycode for 'e'
     },
     
@@ -74,7 +74,7 @@ var stylebot = {
                return true;
             
             // Handle shortcut key 'e' to toggle editing mode
-            if(e.keyCode == stylebot.defaults.shortcutKey)
+            if(e.keyCode == stylebot.options.shortcutKey)
                 stylebot.toggle();
 
             // Handle Esc key to escape editing mode
@@ -83,11 +83,10 @@ var stylebot = {
                 console.log("Escape handler for document triggered");
                 stylebot.disable();
             }
-                
-        });
+        })
         
         // Handle mouse move event on DOM elements
-        $(document).mousemove(function(e){
+        .mousemove(function(e){
             if(stylebot.widget.isBeingDragged)
                 return true;
             if(stylebot.hoveredElement == $(e.target) || !stylebot.status)
@@ -106,13 +105,13 @@ var stylebot = {
         
         // Handle click event on document.body (during capturing phase)
         document.body.addEventListener('click', function(e){
-                if(stylebot.hoveredElement && stylebot.status)
-                {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    stylebot.select();
-                    return false;
-                }
+            if(stylebot.hoveredElement && stylebot.status)
+            {
+                e.preventDefault();
+                e.stopPropagation();
+                stylebot.select();
+                return false;
+            }
         }, true);
     },
     

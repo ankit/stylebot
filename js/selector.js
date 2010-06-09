@@ -18,24 +18,17 @@ stylebot.selector = {
         var elClass = el.attr("class");
         if(elClass.length != 0)
         {
-            var len = 0;
-            if(elClass.length != 0)
-            {
-                var classes = elClass.split(" ");
-                len = classes.length;
-            }
-            if(len != 0)
-    		{
-    			var response = el[0].tagName.toLowerCase();
-    			for(var i=0; i<len; i++)
-    			{
-    				response += "."+classes[i];
-    			}
-                return response;
-    		}
+            var classes = elClass.split(" ");
+            var len = classes.length;
+			var response = el[0].tagName.toLowerCase();
+
+			for(var i=0; i<len; i++)
+				response += "." + classes[i];
+
+            return response;
         }
         if(elId.length != 0){
-            return "#"+elId;
+            return "#" + elId;
         }
         // don't go beyond 2 levels up
     	if(level < 2)

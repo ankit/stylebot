@@ -58,10 +58,10 @@ stylebot.style = {
                     rule.styles[index].value = value;
             }
             else
-                rule.styles[rule.styles.length] = {property: property, value: value};
+                rule.styles[rule.styles.length] = { property: property, value: value };
         }
         else if(value != "")
-            this.rules[this.rules.length] = {selector: selector, styles:[{property: property, value: value}]};
+            this.rules[this.rules.length] = { selector: selector, styles: [{ property: property, value: value }]};
     },
     
     // generate inline CSS
@@ -185,6 +185,6 @@ stylebot.style = {
         if(index != -1)
             this.rules.splice(index, 1);
 
-        this.clearInlineCSS($(this.cache.selector));
+        this.clearInlineCSS(this.cache.elements);
     }
 }

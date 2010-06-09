@@ -29,7 +29,7 @@ function addListeners(){
 // Toggle CSS editing when page icon is clicked
 function handlePageIconClick(tab){
     currTabId = tab.id;
-    chrome.tabs.sendRequest(currTabId, {name:"toggle"}, function(response){
+    chrome.tabs.sendRequest(currTabId, { name: "toggle" }, function(response){
         if(response.status)
             enablePageIcon(currTabId);
         else
@@ -38,13 +38,13 @@ function handlePageIconClick(tab){
 }
 
 function enablePageIcon(tabId){
-    chrome.pageAction.setIcon({tabId:tabId, path:"images/icon19_on.png"});
-    chrome.pageAction.setTitle({tabId:tabId, title:"Click to turn CSS editing off"});
+    chrome.pageAction.setIcon({ tabId: tabId, path: "images/icon19_on.png" });
+    chrome.pageAction.setTitle({ tabId: tabId, title: "Click to turn CSS editing off" });
 }
 
 function disablePageIcon(tabId){
-    chrome.pageAction.setIcon({tabId:tabId, path:"images/icon19_off.png"});
-    chrome.pageAction.setTitle({tabId:tabId, title:"Click to turn CSS editing on"});
+    chrome.pageAction.setIcon({ tabId: tabId, path: "images/icon19_off.png" });
+    chrome.pageAction.setTitle({ tabId: tabId, title: "Click to turn CSS editing on" });
 }
 
 // Copy to Clipboard
