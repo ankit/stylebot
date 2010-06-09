@@ -465,73 +465,67 @@ stylebot.widget.ui = {
         });
     },
     
-    fillControl: function(control, styles){
-        switch(control.type){
-            case 'size'             :   var index = stylebot.utils.search(styles, "property", control.id);
-                                        console.log("Control Element ID: " + control.el.attr('id'));
-                                        if(index != null)
-                                        {
-                                            control.el
-                                            .attr('value', styles[index].value.replace('px',''));
-                                        }
+    fillControl: function(control, rule){
+        var pValue = rule[control.id];
+        if( typeof(pValue) != 'undefined' )
+        {
+            switch(control.type){
+                case 'size'             :   // get unit
+                                            var validUnits = ['px', 'em', '%', 'pt'];
+                                            var len = validUnits.length;
+                                            for(var i=0; i<len; i++)
+                                            {
+                                                if( pValue.indexOf(validUnits[i]) != -1)
+                                                    break;
+                                            }
+                                            var unit = validUnits[i];
+                                            // set textfield value
+                                            control.el.find('input')
+                                            .attr('value', pValue.replace(unit, '') );
                                             
-                                        break;
+                                            // set select option
+                                            var index = $.inArray( $.trim( String(unit) ), validUnits);
+                                            control.el.find('select').attr('selectedIndex', index);
+                                            break;
                                         
-            case 'color'            :   var index = stylebot.utils.search(styles, "property", control.id);
-                                        if(index != null)
-                                        {
-                                            var color = styles[index].value;
-                                            control.el.attr('value', color);
-                                            if(color != "")
-                                                this.setColorSelectorColor(control.el);
-                                        }
-                                        break;
+                case 'color'            :   control.el.attr('value', pValue);
+                                            this.setColorSelectorColor(control.el);
+                                            break;
                                         
-            case 'checkbox'         :   var index = stylebot.utils.search(styles, "property", control.id);
-                                        if(index != null)
-                                        {
-                                            if(styles[index].value == control.value)
+                case 'checkbox'         :   if(pValue == control.value)
                                                 control.el.attr('checked', true);
                                             else
                                                 control.el.attr('checked', false);                                                
-                                        }
-                                        break;
+                                            break;
                                         
-            case 'toggle'         :     var index = stylebot.utils.search(styles, "property", control.id);
-                                        if(index != null)
-                                        {
-                                            var input = control.el.find('input');
-                                            if(styles[index].value == control.value)
+                case 'toggle'         :     var input = control.el.find('input');
+                                            if(pValue == control.value)
                                                 input.attr('checked', true);
                                             else
                                                 input.attr('checked', false);
                                             input.button('refresh');
-                                        }
-                                        break;
+                                            break;
                                         
-            case 'select'            :  var index = stylebot.utils.search(styles, "property", control.id);
-                                        if(index != null)
-                                        {
-                                            var index2 = $.inArray($.trim(String(styles[index].value)), control.options);
-                                            if(index2 != -1)
-                                                control.el.attr('selectedIndex', index2 + 1);
-                                        }
-                                        break;
+                case 'select'            :  var index = $.inArray( $.trim( String(pValue) ), control.options);
+                                            if(index != -1)
+                                                control.el.attr('selectedIndex', index + 1);
+                                            break;
+            }
         }
     },
     
     // fill controls with any existing custom styles for current selector
     fill: function(){
         var len = this.groups.length;
-        var styles = stylebot.style.getStyles(stylebot.selector.value);
+        var rule = stylebot.style.getRule(stylebot.selector.value);
         
-        if(styles)
+        if(rule)
         {
             for(var i=0; i<len; i++)
             {
                 var len2 = this.groups[i].controls.length;
                 for(var j=0; j<len2; j++)
-                    this.fillControl(this.groups[i].controls[j], styles);
+                    this.fillControl(this.groups[i].controls[j], rule);
             }
         }
         

@@ -8,15 +8,14 @@ stylebot.style = {
 
     /*  cache of custom CSS rules applied to elements on the current page
         e.g.: 
-        rule = { 
-            selector: 'a', 
-            styles:  [{
-                property: 'color',
-                value: '#fff'
-                }]
+        rules = {
+            'a': { 
+                    'color': '#fff',
+                    'font-size': '12px'
+                }
             }
     */
-    rules:[],
+    rules: {},
     
     cache: {
         // most recently selected elements' selector
@@ -36,59 +35,44 @@ stylebot.style = {
             this.cache.selector = selector;
             this.cache.elements = $(selector);
         }
-        
-        this.applyInlineCSS(this.cache.elements, this.getInlineCSS(this.cache.selector, property, value));
+
         this.saveRule(this.cache.selector, property, value);
+        this.applyInlineCSS(this.cache.elements, this.getInlineCSS(this.cache.selector));
     },
     
     // add/update rule to CSS rules cache
     saveRule: function(selector, property, value){
         // check if the selector already exists in the list
-        var index = stylebot.utils.search(this.rules, "selector", selector);
-        if(index != null)
+        var rule = this.rules[selector];
+        if(typeof(rule) != 'undefined')
         {
-            var rule = this.rules[index];
-            // check if the property exists
-            index = stylebot.utils.search(rule.styles, "property", property);
-            if(index != null)
-            {
-                if(value == "")                     // if value is empty, remove the property
-                    rule.styles.splice(index, 1);
-                else                                // else update value
-                    rule.styles[index].value = value;
-            }
+            // check if a value for the property already exists
+            var pValue = rule[property];
+            
+            if(typeof(pValue) != 'undefined' && value == "")
+                delete rule[property];
             else
-                rule.styles[rule.styles.length] = { property: property, value: value };
+                rule[property] = value;
         }
         else if(value != "")
-            this.rules[this.rules.length] = { selector: selector, styles: [{ property: property, value: value }]};
+        {
+            this.rules[selector] = new Object();
+            this.rules[selector][property] = value;
+        }
     },
     
     // generate inline CSS
-    getInlineCSS: function(selector, property, value){
-        /* TODO: Try using $.each for iteration here */
-        var index = stylebot.utils.search(this.rules, "selector", selector);
-        if(index != null)
+    getInlineCSS: function(selector){
+
+        var rule = this.rules[selector];
+        if(typeof(rule) != 'undefined')
         {
-            var css = "";
-            var rule = this.rules[index];
-            var len = rule.styles.length;
-            var isPropertyPresent = false;
-            for(var i=0; i<len; i++)
-            {
-                if(rule.styles[i].property == property && !isPropertyPresent)
-                {
-                    rule.styles[i].value = value;
-                    isPropertyPresent = true;
-                }
-                css += this.getCSSDeclaration(rule.styles[i].property, rule.styles[i].value, true);
-            }
-            if(!isPropertyPresent)
-                css += this.getCSSDeclaration(property, value, true);
+            var css = '';
+            for(var property in rule)
+                css += this.getCSSDeclaration(property, rule[property], true);
+
             return css;
         }
-        else
-            return this.getCSSDeclaration(property, value, true);
     },
     
     // apply inline CSS to selected element(s)
@@ -142,32 +126,26 @@ stylebot.style = {
         });
     },
     
-    // get all the custom CSS rules set for a selector
-    getStyles: function(selector){
-        var index = stylebot.utils.search(this.rules, "selector", selector);
-        if(index != null)
-            return this.rules[index].styles;
+    // get all the custom CSS rule set for the selector in cache
+    getRule: function(selector){
+        var rule = this.rules[selector];
+        if(typeof(rule) != 'undefined')
+            return rule;
         else
             return null;
     },
     
     // generate CSS for all the rules in cache
     crunchCSS: function(){
-        var len = this.rules.length;
         var css = '';
-        for(var i=0; i<len; i++)
+
+        for(var selector in this.rules)
         {
-            var rule = this.rules[i];
-            var styles_len = rule.styles.length;
-            if(styles_len != 0)
-            {
-                css += rule.selector + "{ " + "\n";
-                for(var j=0; j<styles_len; j++)
-                {
-                    css += "\t" + this.getCSSDeclaration(rule.styles[j].property, rule.styles[j].value) + "\n";
-                }
-                css += "}" + "\n";
-            }
+            css += selector + "{" + "\n";
+            for(var property in this.rules[selector])
+                css += "\t" + this.getCSSDeclaration(property, this.rules[selector][property]) + "\n";
+                
+            css += "}" + "\n";
         }
         return css;
     },
@@ -181,9 +159,9 @@ stylebot.style = {
     
     // clear any existing custom CSS for current selector in cache
     clear: function(){
-        var index = stylebot.utils.search(this.rules, "selector", this.cache.selector);
-        if(index != -1)
-            this.rules.splice(index, 1);
+        var rule = this.rules[this.cache.selector];
+        if(typeof(rule) != 'undefined')
+            delete rule;
 
         this.clearInlineCSS(this.cache.elements);
     }
