@@ -4,12 +4,39 @@
     color: #313131;
     font-family: Helvetica, Arial, serif;
     font-size: 12px;
+    width: 300px;
     height: auto !important;
     line-height: 12px;
     margin: 0;
-    padding: 0;
     text-align: left;
-    width: auto !important;
+    position: fixed;
+    top: 20%;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    background-color: #fff;
+    z-index: 10000;
+}
+
+#stylebot-header {
+    padding: 10px;
+    background: #C2C2C2;
+    background: -webkit-gradient(linear, left top, left bottom, from(#EAEAEA), to(#C2C2C2));
+    background: -moz-linear-gradient(left top, left bottom, from(#EAEAEA), to(#C2C2C2));
+    text-shadow: 0px 1px 1px #fff;
+    color: #2c2c2c;
+    line-height: 15px;
+    font-weight: bold;
+    display: block;
+    min-height: 15px;
+}
+
+#stylebot-header-text {
+    float: left;
+}
+
+#stylebot-header-text:hover {
+    cursor: text;
+    background-color: #fbfbfb;
 }
 
 #stylebot-controls {
@@ -43,7 +70,8 @@
 /* Labels */
 
 .stylebot-label {
-    color: inherit;
+    color: #2c2c2c;
+    text-shadow: 0px 1px 1px #fff;
     display: inline-block;
     float: none;
     font-family: inherit;
@@ -52,7 +80,6 @@
     margin: 0;
     padding-right: 4px;
     text-align: right;
-    text-shadow: 1px 1px 0px #fff;
     width: 80px;
 }
 
@@ -89,15 +116,9 @@
     font-family: 'Andale Mono', 'Lucida Console', monospace !important;
 }
 
-/* Denote selector is editable */
-#ui-dialog-title-stylebot:hover {
-    cursor: text;
-    background-color: #fbfbfb;
-}
-
 /* Accordion modifications */
 .stylebot-ui .ui-accordion .ui-accordion-header a:active {
-    color:#4f4f4f !important;
+    color: #4f4f4f !important;
 }
 .stylebot-ui .ui-accordion .ui-accordion-header {
     font-family: Helvetica, Arial, serif !important;

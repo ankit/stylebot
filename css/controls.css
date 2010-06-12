@@ -48,7 +48,7 @@ input[type=text].stylebot-textfield, .stylebot-textarea {
     color: #333;
     font-family: inherit;
     font-size: 12px !important;
-    height: auto;
+    height: 11px;
     outline: none;
     padding: 2px;
     width: auto;

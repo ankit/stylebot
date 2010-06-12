@@ -17,23 +17,8 @@ stylebot.widget = {
     
     addListeners: function(){
         
-        this.ui.cache.dialog.mouseenter(function(e){
-            if(stylebot.isEditing && !stylebot.widget.isBeingDragged)
-                $(this).animate({
-                    opacity:1
-                });
-        });
-        
-        this.ui.cache.dialog.mouseleave(function(e){
-            if(stylebot.isEditing && !stylebot.widget.isBeingDragged)
-                $(this).animate({
-                    opacity:0.9
-                });
-        });
-        
-        
         // TODO: Instead of having these two handlers, implement them into the document 'keyup' handler
-        this.ui.cache.dialog.keyup(function(e){
+        this.ui.cache.box.keyup(function(e){
             // disable editing on esc
             if(e.keyCode == 27 && !stylebot.widget.ui.isColorPickerVisible)
             {
@@ -64,7 +49,7 @@ stylebot.widget = {
         this.ui.reset();            // reset all values for controls to default values
         this.ui.fill();             // fill widget with any existing custom styles
 
-        this.ui.cache.box.dialog('open');
+        this.ui.cache.box.css('display', 'block');
 
         setTimeout(function(){
             stylebot.widget.ui.cache.controls[0].focus(); //set focus to first control in widget
@@ -72,20 +57,20 @@ stylebot.widget = {
     },
     
     hide: function(){
-        this.ui.cache.box.dialog('close');
+        this.ui.cache.box.css('display', 'none');
     },
     
     // calculate where the widget should be displayed w.r.t selected element
     setPosition: function(where){
-        var dialogWidth = stylebot.widget.ui.cache.box.dialog('option', 'width');
+        var dialogWidth = stylebot.widget.ui.cache.box.width();
         var left;
 
         if(where == 'Left')
-            left = 20;
+            left = 50;
         else if(where == 'Right')
-            left = document.body.clientWidth - dialogWidth - 20;
+            left = document.body.clientWidth - dialogWidth - 50;
 
-        this.ui.cache.box.dialog('option', 'position', [left, null]);
+        this.ui.cache.box.css('left', left);
     },
     
     save: function(e){

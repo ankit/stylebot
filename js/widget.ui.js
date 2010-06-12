@@ -105,7 +105,7 @@ stylebot.widget.ui = {
     // cache of jQuery objects
     cache:{
         box: null,
-        dialog: null,
+        header: null,
         controls: null,
         textfields: null,
         checkboxes: null,
@@ -118,8 +118,19 @@ stylebot.widget.ui = {
     createBox: function(){
         
         this.cache.box = $('<div>', {
-            id:'stylebot'
+            id: 'stylebot'
         });
+        
+        
+        this.cache.header = $('<div>', {
+            id: 'stylebot-header-text',
+            html: 'custom styles'
+        });
+        $('<div>', {
+            id: 'stylebot-header'
+        })
+        .append(this.cache.header)
+        .appendTo(this.cache.box);
         
         var controls_ui = $('<div>', {
             id: 'stylebot-controls'
@@ -150,7 +161,6 @@ stylebot.widget.ui = {
             id: 'stylebot-widget-options'
         });
         
-        
         this.createLabel('Position').appendTo(options_div);
         this.createButtonSet(['Left', 'Right'], 1).appendTo(options_div);
         
@@ -166,32 +176,11 @@ stylebot.widget.ui = {
         this.createButton('Reset').appendTo(buttons).click(stylebot.widget.resetCSS);
         buttons.appendTo(this.cache.box);
         
-        // creating dialog
-        this.cache.box.appendTo(document.body).dialog({
-            title: 'Custom Styles',
-            autoOpen: false,
-            closeOnEscape: false,
-            width: 300,
-            draggable: true,
-            resizable: false,
-            dragStart: function(e, ui){
-                stylebot.widget.isBeingDragged = true;
-            },
-            dragStop: function(e, ui){
-                stylebot.widget.isBeingDragged = false;
-            },
-            beforeOpen: function(e, ui){
-                stylebot.isEditing = true;
-            },
-            beforeClose: function(e, ui){
-                stylebot.isEditing = false;
-            }
-        });
+        this.cache.box.appendTo(document.body);
         
         // make title editable
-        stylebot.utils.makeEditable($('#ui-dialog-title-stylebot'), function(value){
+        stylebot.utils.makeEditable(this.cache.header, function(value){
             stylebot.selector.value = value;
-            // this is to prevent repositioning of the widget
             stylebot.selectedElement = null;
             stylebot.widget.show();
         });
@@ -199,17 +188,12 @@ stylebot.widget.ui = {
         // fill cache with jQuery objects widget UI elements
         this.fillCache();
         
-        // fix widget position
-        this.cache.dialog.css('position', 'fixed');
-        
         // set initial widget position to Right
         stylebot.widget.setPosition('Right');
 
     },
     
     fillCache: function(){
-        // dialog widget
-        this.cache.dialog = this.cache.box.dialog('widget');
         // controls
         this.cache.controls = $('.stylebot-control');
         // textfields
@@ -572,7 +556,7 @@ stylebot.widget.ui = {
         }
         
         // set widget title
-        this.cache.box.dialog('option', 'title', stylebot.selector.value ? stylebot.selector.value : "Select an element");
+        this.cache.header.html(stylebot.selector.value ? stylebot.selector.value : "Select an element");
     },
     
     // reset values to default for all controls
