@@ -141,7 +141,8 @@ stylebot.widget.ui = {
         controls_ui.appendTo(this.cache.box).accordion({
             header: 'h3',
             autoHeight: false,
-            collapsible: true
+            collapsible: true,
+            animated: false
         });
         
         // creating options in widget
@@ -151,7 +152,7 @@ stylebot.widget.ui = {
         
         
         this.createLabel('Position').appendTo(options_div);
-        this.createButtonSet(['Left', 'Right'], 1).appendTo(options_div);// .change(stylebot.widget.togglePosition);
+        this.createButtonSet(['Left', 'Right'], 1).appendTo(options_div);
         
         options_div.appendTo(this.cache.box);
         
@@ -159,6 +160,7 @@ stylebot.widget.ui = {
         var buttons = $('<div>', {
             id: 'stylebot-main-buttons'
         });
+        
         this.createButton('Save').appendTo(buttons).click(stylebot.widget.save);
         this.createButton('View CSS').appendTo(buttons).click(stylebot.widget.viewCSS);
         this.createButton('Reset').appendTo(buttons).click(stylebot.widget.resetCSS);
@@ -169,7 +171,7 @@ stylebot.widget.ui = {
             title: 'Custom Styles',
             autoOpen: false,
             closeOnEscape: false,
-            width:300,
+            width: 300,
             draggable: true,
             resizable: false,
             dragStart: function(e, ui){
