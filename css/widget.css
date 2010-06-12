@@ -65,6 +65,15 @@
     font-weight:normal;
 }
 
+/* Options */
+
+#stylebot-widget-options {
+    font-size: 11px;
+    margin-top: 10px;
+    padding: 10px;
+    padding-left: 25px;
+}
+
 /* Main buttons */
 
 #stylebot-main-buttons {

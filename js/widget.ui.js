@@ -144,6 +144,17 @@ stylebot.widget.ui = {
             collapsible: true
         });
         
+        // creating options in widget
+        var options_div = $('<div>', {
+            id: 'stylebot-widget-options'
+        });
+        
+        
+        this.createLabel('Position').appendTo(options_div);
+        this.createButtonSet(['Left', 'Right'], 1).appendTo(options_div);// .change(stylebot.widget.togglePosition);
+        
+        options_div.appendTo(this.cache.box);
+        
         // creating main buttons for widget
         var buttons = $('<div>', {
             id: 'stylebot-main-buttons'
@@ -158,6 +169,9 @@ stylebot.widget.ui = {
             title: 'Custom Styles',
             autoOpen: false,
             closeOnEscape: false,
+            width:300,
+            draggable: true,
+            resizable: false,
             dragStart: function(e, ui){
                 stylebot.widget.isBeingDragged = true;
             },
@@ -183,10 +197,12 @@ stylebot.widget.ui = {
         // fill cache with jQuery objects widget UI elements
         this.fillCache();
         
-        // set initial widget position 
-        this.cache.box.dialog('option', 'position', 
-        [ document.body.clientWidth * 0.7 , 
-          document.body.clientHeight * 0.1 ]);
+        // fix widget position
+        this.cache.dialog.css('position', 'fixed');
+        
+        // set initial widget position to Right
+        stylebot.widget.setPosition('Right');
+
     },
     
     fillCache: function(){
@@ -462,7 +478,30 @@ stylebot.widget.ui = {
         return $('<button>', {
             class: 'stylebot-button',
             html: text
-        });
+        }).button();
+    },
+    
+    createButtonSet: function(buttons, enabledButtonIndex){
+        var container = $('<span>');
+        var len = buttons.length;
+        for( var i=0; i<buttons.length; i++)
+        {
+            var radio = $('<input>', {
+                type: 'radio',
+                id: 'stylebot-position-' + i,
+                name: 'stylebot-position',
+                value: buttons[i]
+            }).appendTo(container);
+            $('<label for="stylebot-position-'+ i + '">' + buttons[i] + '</label>').appendTo(container);
+
+            if(i == enabledButtonIndex)
+                radio.attr('checked', 'checked');
+            radio.change(function(e){
+                stylebot.widget.setPosition(e.target.value);
+            });
+        }
+        
+        return container.buttonset();
     },
     
     fillControl: function(control, rule){
@@ -514,8 +553,9 @@ stylebot.widget.ui = {
         }
     },
     
-    // fill controls with any existing custom styles for current selector
+    // fill widget
     fill: function(){
+        // fill controls
         var len = this.groups.length;
         var rule = stylebot.style.getRule(stylebot.selector.value);
         
