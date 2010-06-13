@@ -25,7 +25,7 @@ stylebot.style = {
     },
     
     // apply a new style to selected elements
-    apply: function(selector, property, value){
+    apply: function(selector, property, value) {
         if(!selector)
             return true;
         
@@ -41,7 +41,7 @@ stylebot.style = {
     },
     
     // add/update rule to CSS rules cache
-    saveRule: function(selector, property, value){
+    saveRule: function(selector, property, value) {
         // check if the selector already exists in the list
         var rule = this.rules[selector];
         if(typeof(rule) != 'undefined')
@@ -62,7 +62,7 @@ stylebot.style = {
     },
     
     // generate inline CSS
-    getInlineCSS: function(selector){
+    getInlineCSS: function(selector) {
 
         var rule = this.rules[selector];
         if(typeof(rule) != 'undefined')
@@ -76,7 +76,7 @@ stylebot.style = {
     },
     
     // apply inline CSS to selected element(s)
-    applyInlineCSS: function(el, newCustomCSS){
+    applyInlineCSS: function(el, newCustomCSS) {
         if(el.length == 0) return false;
         el.each(function(){
             var existingCSS = $(this).attr('style');
@@ -109,7 +109,7 @@ stylebot.style = {
     },
     
     // clear any custom inline CSS for element(s)
-    clearInlineCSS: function(el){
+    clearInlineCSS: function(el) {
         el.each(function(){
             var existingCSS = $(this).attr('style');
             var existingCustomCSS = $(this).data('stylebot-css');
@@ -136,21 +136,21 @@ stylebot.style = {
     },
     
     // generate CSS for all the rules in cache
-    crunchCSS: function(){
+    crunchCSS: function(setImportant) {
         var css = '';
 
         for(var selector in this.rules)
         {
             css += selector + "{" + "\n";
             for(var property in this.rules[selector])
-                css += "\t" + this.getCSSDeclaration(property, this.rules[selector][property]) + "\n";
+                css += "\t" + this.getCSSDeclaration(property, this.rules[selector][property], setImportant) + "\n";
                 
             css += "}" + "\n";
         }
         return css;
     },
     
-    getCSSDeclaration: function(property, value, setImportant){
+    getCSSDeclaration: function(property, value, setImportant) {
         if(setImportant)
             return property + ": " + value + " !important;";
         else
@@ -158,11 +158,38 @@ stylebot.style = {
     },
     
     // clear any existing custom CSS for current selector in cache
-    clear: function(){
+    clear: function() {
         var rule = this.rules[this.cache.selector];
         if(typeof(rule) != 'undefined')
             delete rule;
 
         this.clearInlineCSS(this.cache.elements);
+    },
+    
+    // save rules for page
+    save: function() {
+        stylebot.chrome.save(document.domain, stylebot.style.rules);
+    },
+    
+    // load rules for page 
+    load: function(callback) {
+        stylebot.chrome.load(document.domain, function(rules){
+            console.log("Rules: " + rules);
+            if(rules)
+                stylebot.style.rules = rules;
+                
+            callback();
+        });
+    },
+    
+    // inject <style> element into page
+    injectCSS: function() {
+        var d = document.documentElement;
+        var css = stylebot.style.crunchCSS(true);
+        console.log("Stylebot CSS For Page: " + css);
+        var style = document.createElement('style');
+        style.type = "text/css";
+        style.innerText = css;
+        d.insertBefore(style, null);
     }
 }

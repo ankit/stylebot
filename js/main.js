@@ -28,7 +28,7 @@ var stylebot = {
     },
     
     init: function(){
-        // initialize debugging
+        this.initCSS();
         this.initDebug();
         this.addListeners();
     },
@@ -38,6 +38,10 @@ var stylebot = {
             jQuery.LINT.level = 3;
         else
             jQuery.LINT.level = 0;
+    },
+    
+    initCSS: function() {
+        stylebot.style.load(stylebot.style.injectCSS);
     },
     
     // toggle stylebot editing status
