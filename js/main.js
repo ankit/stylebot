@@ -87,12 +87,12 @@ var stylebot = {
         
         // Handle mouse move event on DOM elements
         .mousemove(function(e){
-            if(stylebot.widget.isBeingDragged)
+            if(stylebot.widget.isBeingDragged || stylebot.modal.isVisible)
                 return true;
             if(stylebot.hoveredElement == $(e.target) || !stylebot.status)
                 return true;
 
-            var parent = $(e.target).closest(' #stylebot, .stylebot_colorpicker');
+            var parent = $(e.target).closest(' .ui-dialog, #stylebot, .stylebot_colorpicker');
             var id = $(e.target).attr('id');
             
             if(id.indexOf("stylebot") != -1 || parent.length != 0)

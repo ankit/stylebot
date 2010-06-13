@@ -62,13 +62,13 @@ stylebot.widget = {
     
     // calculate where the widget should be displayed w.r.t selected element
     setPosition: function(where){
-        var dialogWidth = stylebot.widget.ui.cache.box.width();
+        var dialogWidth = 300;
         var left;
 
         if(where == 'Left')
-            left = 50;
+            left = 30;
         else if(where == 'Right')
-            left = document.body.clientWidth - dialogWidth - 50;
+            left = document.body.clientWidth - dialogWidth - 30;
 
         this.ui.cache.box.css('left', left);
     },

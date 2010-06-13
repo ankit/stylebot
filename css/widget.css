@@ -10,7 +10,7 @@
     margin: 0;
     text-align: left;
     position: fixed;
-    top: 20%;
+    top: 10%;
     border: 1px solid #ccc;
     border-radius: 3px;
     background-color: #fff;
@@ -29,6 +29,10 @@
     display: block;
     min-height: 15px;
 }
+
+#stylebot-editing-field {
+    font-size: 12px !important;
+}    
 
 #stylebot-header-text {
     float: left;
