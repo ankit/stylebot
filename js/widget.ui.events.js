@@ -6,7 +6,7 @@
 
 stylebot.widget.ui.events = {
     
-    onCheckboxChange: function(e){
+    onCheckboxChange: function(e) {
         var value;
         if(e.target.checked == true)
             value = e.target.value;
@@ -16,7 +16,7 @@ stylebot.widget.ui.events = {
         stylebot.style.apply(stylebot.widget.selector, property, value);
     },
     
-    onRadioClick: function(e){
+    onRadioClick: function(e) {
         var value;
         if(e.target.checked == true)
             value = e.target.value;
@@ -34,7 +34,7 @@ stylebot.widget.ui.events = {
             stylebot.style.apply(stylebot.widget.selector, property, value);
     },
     
-    onTextFieldKeyUp: function(e){
+    onTextFieldKeyUp: function(e) {
         // filter out meta keys which do not display any text
         if(!stylebot.utils.filterKeys(['ctrl', 'shift', 'tab', 'esc', 'enter', 'arrowkeys'], e))
             return true;
@@ -45,7 +45,7 @@ stylebot.widget.ui.events = {
         stylebot.style.apply(stylebot.widget.selector, property, value);
     },
     
-    onSizeFieldKeyUp: function(e){
+    onSizeFieldKeyUp: function(e) {
         if(!stylebot.utils.filterKeys(['ctrl', 'shift', 'tab', 'esc', 'enter', 'arrowkeys'], e))
             return true;
         
@@ -57,7 +57,7 @@ stylebot.widget.ui.events = {
         stylebot.style.apply(stylebot.widget.selector, property, value);
     },
     
-    onSelectChange: function(e){
+    onSelectChange: function(e) {
         var value = e.target.value.split(',');
         var property = $(e.target).find('[value='+e.target.value+']').data('property');
         if(typeof(property) == "object")

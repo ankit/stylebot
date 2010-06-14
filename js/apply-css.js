@@ -1,5 +1,5 @@
 console.log("Document domain: " + document.domain);
-// send request to background.html to get custom css for page
+// send request to background.html to get stylebot rules for page
 chrome.extension.sendRequest({ name: "getRulesForPage", domain: document.domain }, function(response){
     console.log("Stylebot Rules for this page: " + response.rules);
     if(!response.rules)
@@ -7,7 +7,6 @@ chrome.extension.sendRequest({ name: "getRulesForPage", domain: document.domain 
     injectCSS(crunchCSS(response.rules));
 });
 
-// crunch CSS
 function crunchCSS(rules) {
     var css = "";
 
@@ -35,6 +34,7 @@ function injectCSS(css) {
     var d = document.documentElement;
     var style = document.createElement('style');
     style.type = "text/css";
+    style.title = "stylebot-css";
     style.innerText = css;
     d.insertBefore(style, null);
 }

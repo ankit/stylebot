@@ -6,7 +6,7 @@
   * Dual licensed under GPL and MIT licenses.
  **/
 
-$(document).ready(function(){
+$(document).ready(function() {
     stylebot.init();
 });
 
@@ -27,13 +27,13 @@ var stylebot = {
         shortcutKey:69 // 69 is keycode for 'e'
     },
     
-    init: function(){
+    init: function() {
         this.initCSS();
         this.initDebug();
         this.addListeners();
     },
     
-    initDebug: function(){
+    initDebug: function() {
         if(this.lintDebug)
             jQuery.LINT.level = 3;
         else
@@ -41,18 +41,18 @@ var stylebot = {
     },
     
     initCSS: function() {
-        stylebot.style.load();
+        stylebot.style.load(stylebot.style.initInlineCSS);
     },
     
     // toggle stylebot editing status
-    toggle: function(){
+    toggle: function() {
         if(this.status == true)
             this.disable();
         else
             this.enable();
     },
     
-    enable: function(){
+    enable: function() {
         this.status = true;
         // Add stylebot-ui class to body, so that jquery-ui theme is applied to widget
         $(document.body).addClass('stylebot-ui');
@@ -60,7 +60,7 @@ var stylebot = {
         stylebot.widget.show();
     },
     
-    disable: function(){
+    disable: function() {
         this.status = false;
         $(document.body).removeClass('stylebot-ui');
         this.unhighlight();
@@ -70,9 +70,9 @@ var stylebot = {
         stylebot.widget.hide();
     },
     
-    addListeners: function(){
+    addListeners: function() {
         // Handle key presses
-        $(document).keyup(function(e){
+        $(document).keyup(function(e) {
             var eTagName = e.target.tagName;
             if(eTagName == 'INPUT' || eTagName == 'TEXTAREA' || eTagName == 'DIV' || eTagName == 'OBJECT')
                return true;
@@ -90,7 +90,7 @@ var stylebot = {
         })
         
         // Handle mouse move event on DOM elements
-        .mousemove(function(e){
+        .mousemove(function(e) {
             if(stylebot.widget.isBeingDragged || stylebot.modal.isVisible)
                 return true;
             if(stylebot.hoveredElement == $(e.target) || !stylebot.status)
@@ -108,7 +108,7 @@ var stylebot = {
         });
         
         // Handle click event on document.body (during capturing phase)
-        document.body.addEventListener('click', function(e){
+        document.body.addEventListener('click', function(e) {
             if(stylebot.hoveredElement && stylebot.status)
             {
                 e.preventDefault();
@@ -119,20 +119,20 @@ var stylebot = {
         }, true);
     },
     
-    highlight: function(el){
+    highlight: function(el) {
         if(stylebot.hoveredElement)
             stylebot.hoveredElement.removeClass('stylebot-selected');
         stylebot.hoveredElement = $(el);
         stylebot.hoveredElement.addClass('stylebot-selected');
     },
     
-    unhighlight: function(){
+    unhighlight: function() {
         if(stylebot.hoveredElement)
             stylebot.hoveredElement.removeClass('stylebot-selected');
         stylebot.hoveredElement = null;
     },
     
-    select: function(){
+    select: function() {
         stylebot.selectedElement = stylebot.hoveredElement;
         stylebot.unhighlight();
         stylebot.selector.generate(stylebot.selectedElement);

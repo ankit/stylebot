@@ -127,7 +127,7 @@ stylebot.style = {
     },
     
     // get all the custom CSS rule set for the selector in cache
-    getRule: function(selector){
+    getRule: function(selector) {
         var rule = this.rules[selector];
         if(rule != undefined)
             return rule;
@@ -179,6 +179,22 @@ stylebot.style = {
             if(callback != undefined)
                 callback();
         });
+    },
+    
+    // This applies all rules for page as inline CSS to elements and clears the stylebot <style> element. This is done
+    // because when an element's styles are edited, they are applied as inline CSS.
+    
+    // An alternate approach can be to crunchCSS for page everytime a style is edited and update <style>'s html,
+    // which maybe more costly
+
+    // this method is called when page's DOM finishes loading.
+    // maybe call this when stylebot is enabled for the first time instead?
+    initInlineCSS: function() {
+        for(var selector in stylebot.style.rules)
+        {
+            stylebot.style.applyInlineCSS($(selector), stylebot.style.getInlineCSS(selector));
+        }
+        $('style[title=stylebot-css]').html('');
     },
     
     // inject <style> element into page

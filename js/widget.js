@@ -10,15 +10,15 @@ stylebot.widget = {
     
     isBeingDragged: false,
     
-    create: function(){
+    create: function() {
         this.ui.createBox();
         this.addListeners();
     },
     
-    addListeners: function(){
+    addListeners: function() {
         
         // TODO: Instead of having these two handlers, implement them into the document 'keyup' handler
-        this.ui.cache.box.keyup(function(e){
+        this.ui.cache.box.keyup(function(e) {
             // disable editing on esc
             if(e.keyCode == 27 && !stylebot.widget.ui.isColorPickerVisible)
             {
@@ -28,7 +28,7 @@ stylebot.widget = {
             }
         });
         
-        this.ui.cache.controls.keyup(function(e){
+        this.ui.cache.controls.keyup(function(e) {
             // if esc is pressed, take away focus and stop editing
             if(e.keyCode == 27 && !stylebot.widget.ui.isColorPickerVisible)
             {
@@ -39,7 +39,7 @@ stylebot.widget = {
         });
     },
     
-    show: function(){
+    show: function() {
         stylebot.isEditing = true;
         this.selector = stylebot.selector.value;
         
@@ -51,17 +51,17 @@ stylebot.widget = {
 
         this.ui.cache.box.css('display', 'block');
 
-        setTimeout(function(){
+        setTimeout(function() {
             stylebot.widget.ui.cache.controls[0].focus(); //set focus to first control in widget
         }, 0);
     },
     
-    hide: function(){
+    hide: function() {
         this.ui.cache.box.css('display', 'none');
     },
     
     // calculate where the widget should be displayed w.r.t selected element
-    setPosition: function(where){
+    setPosition: function(where) {
         var dialogWidth = 300;
         var left;
 
@@ -73,15 +73,15 @@ stylebot.widget = {
         this.ui.cache.box.css('left', left);
     },
     
-    save: function(e){
+    save: function(e) {
         stylebot.style.save();
     },
     
-    viewCSS: function(e){
+    viewCSS: function(e) {
         stylebot.modal.show(stylebot.style.crunchCSS());
     },
     
-    resetCSS: function(e){
+    resetCSS: function(e) {
         stylebot.widget.ui.reset();
         // clear any custom styles for currently selected element
         stylebot.style.clear();

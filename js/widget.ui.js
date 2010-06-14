@@ -8,9 +8,9 @@ stylebot.widget.ui = {
     
     isColorPickerVisible: false,
     
-    groups:[{
+    groups: [{
         name: 'Text',
-        controls:[
+        controls: [
         {
             name: 'Font Size',
             id: 'font-size',
@@ -69,7 +69,7 @@ stylebot.widget.ui = {
     },
     {
         name: 'Borders',
-        controls:[
+        controls: [
         {
             name: 'Border Style',
             id: 'border-style',
@@ -92,7 +92,7 @@ stylebot.widget.ui = {
     },
     {
         name: 'Others',
-        controls:[{
+        controls: [{
             name: 'Visibility',
             id: 'display',
             type: 'toggle',
@@ -103,7 +103,7 @@ stylebot.widget.ui = {
     ],
     
     // cache of jQuery objects
-    cache:{
+    cache: {
         box: null,
         header: null,
         controls: null,
@@ -115,7 +115,7 @@ stylebot.widget.ui = {
         toggleButtons: null
     },
     
-    createBox: function(){
+    createBox: function() {
         
         this.cache.box = $('<div>', {
             id: 'stylebot'
@@ -179,7 +179,7 @@ stylebot.widget.ui = {
         this.cache.box.appendTo(document.body);
         
         // make title editable
-        stylebot.utils.makeEditable(this.cache.header, function(value){
+        stylebot.utils.makeEditable(this.cache.header, function(value) {
             stylebot.selector.value = value;
             stylebot.selectedElement = null;
             stylebot.widget.show();
@@ -193,7 +193,7 @@ stylebot.widget.ui = {
 
     },
     
-    fillCache: function(){
+    fillCache: function() {
         // controls
         this.cache.controls = $('.stylebot-control');
         // textfields
@@ -210,7 +210,7 @@ stylebot.widget.ui = {
         this.cache.toggleButtons = $('.stylebot-toggle');
     },
     
-    createGroupHeader: function(name){
+    createGroupHeader: function(name) {
         return $('<h3>')
         .append($('<a>', {
             href: '#',
@@ -218,7 +218,7 @@ stylebot.widget.ui = {
         }));
     },
     
-    createControl: function(control){
+    createControl: function(control) {
         var el = $('<div>', {
             class: 'stylebot-control-set'
         });
@@ -261,7 +261,7 @@ stylebot.widget.ui = {
         return el;
     },
     
-    createTextField: function(property, size){
+    createTextField: function(property, size) {
         var input = $('<input>',{
             type: 'text',
             id: 'stylebot-' + property,
@@ -274,7 +274,7 @@ stylebot.widget.ui = {
         return input;
     },
     
-    createSizeControl: function(property){
+    createSizeControl: function(property) {
         var container = $('<span>');
         
         // Textfield for entering size
@@ -311,7 +311,7 @@ stylebot.widget.ui = {
         return container;
     },
     
-    createCheckbox: function(text, property, value){
+    createCheckbox: function(text, property, value) {
         var checkbox = $('<input>',{
             type: 'checkbox',
             id: 'stylebot-' + property,
@@ -332,7 +332,7 @@ stylebot.widget.ui = {
             return checkbox;
     },
     
-    createToggleButton: function(text, property, value){
+    createToggleButton: function(text, property, value) {
         var container = $('<span>', {
             class: 'stylebot-control'
         });
@@ -355,7 +355,7 @@ stylebot.widget.ui = {
         return container;
     },
     
-    createRadio: function(text, name, property, value){
+    createRadio: function(text, name, property, value) {
         var span = $('<span>',{
             id: 'stylebot-' + property,
             class: 'stylebot-control'
@@ -379,7 +379,7 @@ stylebot.widget.ui = {
         return span;
     },
     
-    createSelect: function(property){
+    createSelect: function(property) {
         var select = $('<select>', {
             id:'stylebot-' + property,
             class: 'stylebot-control stylebot-select'
@@ -389,7 +389,7 @@ stylebot.widget.ui = {
         return select;
     },
     
-    createSelectOption: function(text, property, value){
+    createSelectOption: function(text, property, value) {
         var option = $('<option>', {
             class: 'stylebot-select-option',
             html: text
@@ -403,7 +403,7 @@ stylebot.widget.ui = {
         return option;
     },
     
-    createColorPicker: function(input){
+    createColorPicker: function(input) {
         return $('<div>', {
             class:'stylebot-colorselector stylebot-control', 
             tabIndex:0
@@ -411,7 +411,7 @@ stylebot.widget.ui = {
         .append($('<div>', { class:'stylebot-colorselector-color'}))
         .ColorPicker({
             flat:false,
-            onChange: function(hsb, hex, rgb){
+            onChange: function(hsb, hex, rgb) {
                 var colorCode = '#' + hex;
                 // set input value to reflect the newly picked color's code
                 input.attr('value', colorCode);
@@ -419,18 +419,18 @@ stylebot.widget.ui = {
                 // update the color selector color
                 stylebot.widget.ui.setColorSelectorColor(input);
             },
-            onBeforeShow: function(){
+            onBeforeShow: function() {
                 var color = input.attr('value');
                 if(color == "")
                     color = "#ffffff"; // default is white
                 $(this).ColorPickerSetColor(color);
                 stylebot.widget.ui.isColorPickerVisible = true;
             },
-            onHide: function(){
+            onHide: function() {
                 stylebot.widget.ui.isColorPickerVisible = false;
             }
         })
-        .keyup(function(e){
+        .keyup(function(e) {
             // TODO: Toggle visibility of color picker when enter is pressed
             if(e.keyCode == 13) //enter
                 $(this).ColorPickerShow();
@@ -438,7 +438,7 @@ stylebot.widget.ui = {
     },
     
     // Set color selector value by fetching value from connected input textfield
-    setColorSelectorColor: function(input){
+    setColorSelectorColor: function(input) {
         // get the color value
         var color = input.attr('value');
         // get the color selector connected to the input field
@@ -446,28 +446,28 @@ stylebot.widget.ui = {
         colorSelector.css('backgroundColor', color);
     },
 
-    createLabel: function(text){
+    createLabel: function(text) {
         return $('<label>', {
             class: 'stylebot-label',
             html: text+":"
         });
     },
     
-    createInlineLabel: function(text){
+    createInlineLabel: function(text) {
         return $('<label>', {
             class: 'stylebot-inline-label',
             html: text
         });
     },
     
-    createButton: function(text){
+    createButton: function(text) {
         return $('<button>', {
             class: 'stylebot-button',
             html: text
         }).button();
     },
     
-    createButtonSet: function(buttons, enabledButtonIndex){
+    createButtonSet: function(buttons, enabledButtonIndex) {
         var container = $('<span>');
         var len = buttons.length;
         for( var i=0; i<buttons.length; i++)
@@ -490,7 +490,7 @@ stylebot.widget.ui = {
         return container.buttonset();
     },
     
-    fillControl: function(control, rule){
+    fillControl: function(control, rule) {
         var pValue = rule[control.id];
         if( typeof(pValue) != 'undefined' )
         {
@@ -540,7 +540,7 @@ stylebot.widget.ui = {
     },
     
     // fill widget
-    fill: function(){
+    fill: function() {
         // fill controls
         var len = this.groups.length;
         var rule = stylebot.style.getRule(stylebot.selector.value);
@@ -560,7 +560,7 @@ stylebot.widget.ui = {
     },
     
     // reset values to default for all controls
-    reset: function(){
+    reset: function() {
         this.cache.textfields.attr('value', '');
         this.cache.checkboxes.attr('checked', false);
         this.cache.radios.attr('checked', false);

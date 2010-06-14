@@ -7,7 +7,7 @@
 stylebot.utils = {
     
     // return array index at which property pName is equal to value 'pValue'
-    search: function(arr, pName, pValue){
+    search: function(arr, pName, pValue) {
         var len = arr.length;
         for(var i=0; i<len; i++)
         {
@@ -20,7 +20,7 @@ stylebot.utils = {
     // if any of the passed keys is pressed, returns false.
     // Accepts a keys array and 'keyup' event object as arguments.
     // TODO: Add support for keydown, keypress events and alphanumeric keys
-    filterKeys: function(keys, e){
+    filterKeys: function(keys, e) {
         if(typeof(e.keyCode) == 'undefined')
             return true;
         var len = keys.length;
@@ -55,12 +55,12 @@ stylebot.utils = {
         return true;
     },
     
-    capitalize: function(string){
+    capitalize: function(string) {
         return string.charAt(0).toUpperCase() + string.slice(1);
     },
     
-    makeEditable: function(el, callback){
-        el.bind('click', {callback: callback}, function(e){
+    makeEditable: function(el, callback) {
+        el.bind('click', { callback: callback }, function(e) {
             // hide element
             $(this).hide();
             
@@ -77,7 +77,7 @@ stylebot.utils = {
             $(this).parent().append(input);
             input.focus();
             
-            var onMouseDown = function(e){
+            var onMouseDown = function(e) {
                 if(input.length == 0)
                     return true;
                 
@@ -94,13 +94,13 @@ stylebot.utils = {
                 }
             };
             
-            var onMouseUp = function(e){
+            var onMouseUp = function(e) {
                 $(document).unbind('mouseup', onMouseUp);
                 $(document).unbind('mousedown', onMouseDown);
             }
             
             
-            var onKeyDown = function(e){
+            var onKeyDown = function(e) {
                 var value = e.data.input.attr('value');
                 if(e.keyCode == 13 || e.keyCode == 27) // on enter or esc
                 {
