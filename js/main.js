@@ -136,6 +136,7 @@ var stylebot = {
         stylebot.selectedElement = stylebot.hoveredElement;
         stylebot.unhighlight();
         stylebot.selector.generate(stylebot.selectedElement);
+        stylebot.style.fillCache(stylebot.selector.value);
         stylebot.widget.show();
     }
 }

@@ -13,7 +13,7 @@ stylebot.widget.ui.events = {
         else
             value = '';
         var property = $(e.target).data('property');
-        stylebot.style.apply(stylebot.widget.selector, property, value);
+        stylebot.style.apply(property, value);
     },
     
     onRadioClick: function(e) {
@@ -28,10 +28,10 @@ stylebot.widget.ui.events = {
         {
             var len = property.length;
             for(var i=0; i<len; i++)
-                stylebot.style.apply(stylebot.widget.selector, property[i], value[i]);
+                stylebot.style.apply(property[i], value[i]);
         }
         else
-            stylebot.style.apply(stylebot.widget.selector, property, value);
+            stylebot.style.apply(property, value);
     },
     
     onTextFieldKeyUp: function(e) {
@@ -42,7 +42,7 @@ stylebot.widget.ui.events = {
         var value = e.target.value;
         var property = $(e.target).data('property');
 
-        stylebot.style.apply(stylebot.widget.selector, property, value);
+        stylebot.style.apply(property, value);
     },
     
     onSizeFieldKeyUp: function(e) {
@@ -54,7 +54,7 @@ stylebot.widget.ui.events = {
         var unit = $(e.target).next().attr('value');
         value += unit;
         
-        stylebot.style.apply(stylebot.widget.selector, property, value);
+        stylebot.style.apply(property, value);
     },
     
     onSelectChange: function(e) {
@@ -64,9 +64,9 @@ stylebot.widget.ui.events = {
         {
             var len = property.length;
             for(var i=0; i<len; i++)
-                stylebot.style.apply(stylebot.widget.selector, property[i], value[i]);
+                stylebot.style.apply(property[i], value[i]);
         }
         else
-            stylebot.style.apply(stylebot.widget.selector, property, value);
+            stylebot.style.apply(property, value);
     }
 }

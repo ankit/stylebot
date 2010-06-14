@@ -24,18 +24,19 @@ stylebot.style = {
         elements: null
     },
     
-    // apply a new style to selected elements
-    apply: function(selector, property, value) {
-        if(!selector)
-            return true;
-        
-        // check if a property for the last selected elements is being edited. If not, update cache
+    fillCache: function(selector) {
         if(selector != this.cache.selector)
         {
             this.cache.selector = selector;
             this.cache.elements = $(selector);
         }
-
+    },
+    
+    // apply a new style to selected elements
+    apply: function(property, value) {
+        if(!this.cache.selector)
+            return true;
+        
         this.saveRule(this.cache.selector, property, value);
         this.applyInlineCSS(this.cache.elements, this.getInlineCSS(this.cache.selector));
     },
@@ -115,7 +116,7 @@ stylebot.style = {
             var existingCSS = $(this).attr('style');
             var existingCustomCSS = $(this).data('stylebot-css');
             
-            if(existingCustomCSS && typeof(existingCSS) != 'undefined')
+            if(existingCustomCSS && existingCSS != undefined)
             {
                 var newCSS = existingCSS.replace(existingCustomCSS, '');
                 $(this).attr({
@@ -158,12 +159,10 @@ stylebot.style = {
             return property + ": " + value + ";";
     },
     
-    // clear any existing custom CSS for current selector in cache
+    // clear any existing custom CSS for current selector
     clear: function() {
-        var rule = this.rules[this.cache.selector];
-        if(typeof(rule) != 'undefined')
-            delete rule;
-
+        if(this.rules[this.cache.selector] != undefined)
+            delete this.rules[this.cache.selector];
         this.clearInlineCSS(this.cache.elements);
     },
     
