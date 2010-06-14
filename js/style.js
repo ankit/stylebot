@@ -65,7 +65,7 @@ stylebot.style = {
     getInlineCSS: function(selector) {
 
         var rule = this.rules[selector];
-        if(typeof(rule) != 'undefined')
+        if(rule != undefined)
         {
             var css = '';
             for(var property in rule)
@@ -78,7 +78,7 @@ stylebot.style = {
     // apply inline CSS to selected element(s)
     applyInlineCSS: function(el, newCustomCSS) {
         if(el.length == 0) return false;
-        el.each(function(){
+        el.each( function() {
             var existingCSS = $(this).attr('style');
             var existingCustomCSS = $(this).data('stylebot-css');
             var newCSS;
@@ -87,8 +87,9 @@ stylebot.style = {
             if(!existingCustomCSS)
             {
                 // if there is any existing inline CSS, append stylebot CSS to it
-                if(typeof(existingCSS) != 'undefined')  
-                    newCSS = existingCSS + newCustomCSS;
+                if(existingCSS != undefined)
+                    // TODO: Only add ; if there is no trailing ; in existingCSS
+                    newCSS = existingCSS + ";" + newCustomCSS;
                 else
                     newCSS = newCustomCSS;
                 $(this).attr({
