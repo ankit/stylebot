@@ -83,6 +83,7 @@ function loadStylesIntoCache() {
 
 function getRulesForPage(domain) {
     var rules = cache.styles[domain];
+    console.log("Rules in background.js: " + rules);
     if(rules != undefined)
         return rules;
     else

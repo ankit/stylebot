@@ -1,14 +1,24 @@
 {
-	"name":"Stylebot",
-	"version":"0.1",
-	"description":"Adapt the web's appearance.",
-	"background_page":"background.html",
+	"name": "Stylebot",
+	"version": "0.1",
+	"description": "Adapt the web's appearance.",
+	"background_page": "background.html",
 	
-	"content_scripts":[
+	"content_scripts": [
 	{
 		"matches":["http://*/*", "https://*/*"],
 		
-		"css":[
+		"js": [
+			"js/apply-css.js"
+		],
+		
+		"run_at": "document_start",
+		"all_frames": true
+	},
+	{
+		"matches": ["http://*/*", "https://*/*"],
+		
+		"css": [
 			"css/main.css",
 			"css/widget.css",
 			"css/controls.css",
@@ -17,7 +27,7 @@
 			"css/scrollbars.css"
 		],
 		
-		"js":[
+		"js": [
 			"js/jquery.js",
 			"js/jquery-ui.js",
 			"js/main.js",
@@ -33,8 +43,8 @@
 			"js/jquery.lint.js"
 		],
 		
-		"run_at":"document_start",
-		"all_frames":true
+		"run_at": "document_end",
+		"all_frames": true
 	}],
 	
 	"page_action": {

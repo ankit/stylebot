@@ -129,7 +129,7 @@ stylebot.style = {
     // get all the custom CSS rule set for the selector in cache
     getRule: function(selector){
         var rule = this.rules[selector];
-        if(typeof(rule) != 'undefined')
+        if(rule != undefined)
             return rule;
         else
             return null;
@@ -137,7 +137,7 @@ stylebot.style = {
     
     // generate CSS for all the rules in cache
     crunchCSS: function(setImportant) {
-        var css = '';
+        var css = "";
 
         for(var selector in this.rules)
         {
@@ -174,11 +174,10 @@ stylebot.style = {
     // load rules for page 
     load: function(callback) {
         stylebot.chrome.load(document.domain, function(rules){
-            console.log("Rules: " + rules);
             if(rules)
                 stylebot.style.rules = rules;
-                
-            callback();
+            if(callback != undefined)
+                callback();
         });
     },
     
@@ -186,7 +185,6 @@ stylebot.style = {
     injectCSS: function() {
         var d = document.documentElement;
         var css = stylebot.style.crunchCSS(true);
-        console.log("Stylebot CSS For Page: " + css);
         var style = document.createElement('style');
         style.type = "text/css";
         style.innerText = css;

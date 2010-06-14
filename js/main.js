@@ -41,7 +41,7 @@ var stylebot = {
     },
     
     initCSS: function() {
-        stylebot.style.load(stylebot.style.injectCSS);
+        stylebot.style.load();
     },
     
     // toggle stylebot editing status
