@@ -211,7 +211,7 @@ stylebot.widget.ui = {
     },
     
     createAccordionHeader: function(name) {
-        return $('<h3>', {
+        return $('<a>', {
             class: 'stylebot-accordion-header',
             tabIndex: 0,
             html: name
@@ -223,6 +223,7 @@ stylebot.widget.ui = {
         .bind('mousedown keydown', function (e) {
             if(e.type == "keydown" && e.keyCode != 13)
                 return;
+            e.preventDefault();
             stylebot.widget.ui.toggleAccordion(e.target);
         });
     },
