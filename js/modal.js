@@ -11,58 +11,86 @@ stylebot.modal = {
     // cache of jQuery objects
     cache: {
         box: null,
-        textarea: null
+        textarea: null,
+        background: null
     },
 
     // create the DOM elements
     create: function() {
         this.cache.box = $('<div>', {
             id:'stylebot-modal'
-        });
+        })
+        .appendTo(document.body);
         
         $('<div>', {
-            html: "You can now copy the CSS below into the custom stylesheet for Chrome",
-            style: "padding-bottom:10px"
+            html: "You can now copy the CSS below into the custom stylesheet for Chrome: "
         })
         .appendTo(this.cache.box);
         
         this.cache.textarea = $('<textarea>', {
-            height: 300,
+            height: this.cache.box.height() * 0.8,
             width: '98%',
             class:'stylebot-textarea stylebot-css-code'
         })
         .appendTo(this.cache.box);
 
-        this.cache.box.appendTo(document.body).dialog({
-            title: 'Generated CSS',
-            modal: true,
-            width: '50%',
-            height: 450,
-            draggable: false,
-            resizable: false,
-            buttons: { "Copy to Clipboard": stylebot.modal.copyToClipboard },
-            zIndex: 10500,
-            beforeclose: function(e, ui) {
-                stylebot.modal.isVisible = false;
-            }
-        });
+        stylebot.widget.ui.createButton( "Copy to Clipboard" )
+        .click(stylebot.modal.copyToClipboard)
+        .appendTo(this.cache.box);
+        
+        // darken background
+        this.cache.background = $('<div>', {
+            id: 'stylebot-background'
+        })
+        .appendTo(document.body);
     },
     
     fill: function(content) {
         this.cache.box.find('textarea').html(content);
     },
     
+    darkenBg: function(callback) {
+        this.cache.background.css({
+            height: document.height
+        });
+        this.cache.background.fadeIn(170);
+    },
+    
     show: function(content) {
         if(!this.cache.box)
             this.create();
         this.fill(content);
-        this.cache.box.dialog('open');
+        this.cache.box.show();
+        this.darkenBg();
         this.cache.textarea.focus();
         this.isVisible = true;
+        var onKeyDown = function(e) {
+            if(e.keyCode == 27)
+            {
+                e.preventDefault();
+                stylebot.modal.hide();
+                $(document).unbind('keydown', onKeyDown);
+                $(document).unbind('mousedown', onMouseDown);
+            }
+        }
+        var onMouseDown = function(e) {
+            var id = e.target.id;
+            var parent = $(e.target).closest('#stylebot-modal');
+            if(id != 'stylebot-modal' && parent.length == 0)
+            {
+                e.preventDefault();
+                stylebot.modal.hide();
+                $(document).unbind('keydown', onKeyDown);
+                $(document).unbind('mousedown', onMouseDown);
+            }
+        }
+        $(document).bind('keydown', onKeyDown);
+        $(document).bind('mousedown', onMouseDown);
     },
     
     hide: function() {
-        this.cache.box.dialog('close');
+        this.cache.box.hide();
+        this.cache.background.fadeOut(170);
         this.isVisible = false;
     },
     

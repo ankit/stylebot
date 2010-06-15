@@ -127,9 +127,3 @@
 .stylebot-ui .ui-accordion .ui-accordion-header {
     font-family: Helvetica, Arial, serif !important;
 }
-
-/* Modal window */
-#stylebot-modal {
-    padding: 10px;
-    text-align: left;
-}

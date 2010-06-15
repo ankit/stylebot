@@ -1,0 +1,40 @@
+/* Modal window */
+#stylebot-modal {
+    padding: 15px;
+    text-align: left;
+    width: 50%;
+    height: 60%;
+    background-color: #fff;
+    border-radius: 5px;
+    z-index: 10500;
+    position: fixed;
+    top: 20%;
+    left: 25%;
+    border: 1px solid #ccc;
+    -webkit-box-shadow: 0px 0px 10px #000;
+    color: #333;
+    font-size: 12px;
+    font-family: Helvetica, Arial, sans-serif;
+    display: none;
+}
+
+#stylebot-modal textarea {
+    margin: 10px 0;
+    background-color: #fbfbfb;
+}
+
+#stylebot-modal button {
+    float: right;
+}
+
+#stylebot-background {
+    background-color: #000;
+    opacity: 0.8;
+    z-index: 10250;
+    height: 100%;
+    width: 100%;
+    display: none;
+    top: 0;
+    left: 0;
+    position: absolute;
+}
