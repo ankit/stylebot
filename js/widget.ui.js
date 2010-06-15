@@ -162,7 +162,7 @@ stylebot.widget.ui = {
         });
         
         this.createLabel('Position').appendTo(options_div);
-        this.createButtonSet(['Left', 'Right'], 1).appendTo(options_div);
+        this.createButtonSet(['Left', 'Right'], "stylebot-position", 1, stylebot.widget.ui.togglePosition).appendTo(options_div);
         
         options_div.appendTo(this.cache.box);
         
@@ -464,30 +464,24 @@ stylebot.widget.ui = {
         return $('<button>', {
             class: 'stylebot-button',
             html: text
-        }).button();
+        });
     },
     
-    createButtonSet: function(buttons, enabledButtonIndex) {
+    createButtonSet: function(buttons, className,  enabledButtonIndex, callback) {
         var container = $('<span>');
         var len = buttons.length;
-        for( var i=0; i<buttons.length; i++)
+        for(var i=0; i<len; i++)
         {
-            var radio = $('<input>', {
-                type: 'radio',
-                id: 'stylebot-position-' + i,
-                name: 'stylebot-position',
-                value: buttons[i]
-            }).appendTo(container);
-            $('<label for="stylebot-position-'+ i + '">' + buttons[i] + '</label>').appendTo(container);
+            var bt = this.createButton(buttons[i])
+            .addClass(className)
+            .data('class', className)
+            .appendTo(container)
+            .mouseup(callback);
 
             if(i == enabledButtonIndex)
-                radio.attr('checked', 'checked');
-            radio.change(function(e){
-                stylebot.widget.setPosition(e.target.value);
-            });
+                bt.addClass('stylebot-active-button');
         }
-        
-        return container.buttonset();
+        return container;
     },
     
     fillControl: function(control, rule) {
@@ -567,5 +561,12 @@ stylebot.widget.ui = {
         this.cache.selectboxes.attr('selectedIndex', 0);
         this.cache.colorSelectorColor.css('backgroundColor', '#fff');
         this.cache.toggleButtons.attr('checked', false).button('refresh');
+    },
+    
+    togglePosition: function(e) {
+        var el = $(e.target);
+        stylebot.widget.setPosition(el.html());
+        $("." + el.data('class')).removeClass('stylebot-active-button');
+        el.addClass('stylebot-active-button');
     }
 }
