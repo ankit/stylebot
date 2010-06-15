@@ -141,20 +141,17 @@ stylebot.widget.ui = {
         
         for(var i=0; i<len; i++)
         {
-            this.createGroupHeader(this.groups[i].name).appendTo(controls_ui);
-            var group = $('<div>').appendTo(controls_ui);
+            this.createAccordionHeader(this.groups[i].name).appendTo(controls_ui);
+            var group = $('<div>', {
+                class: 'stylebot-accordion'
+            }).appendTo(controls_ui);
 
             var len2 = this.groups[i].controls.length;
             for(var j=0; j<len2; j++)
                 this.createControl(this.groups[i].controls[j]).appendTo(group);
         }
         
-        controls_ui.appendTo(this.cache.box).accordion({
-            header: 'h3',
-            autoHeight: false,
-            collapsible: true,
-            animated: false
-        });
+        controls_ui.appendTo(this.cache.box);
         
         // creating options in widget
         var options_div = $('<div>', {
@@ -185,6 +182,9 @@ stylebot.widget.ui = {
             stylebot.widget.show();
         });
         
+        // open first accordion
+        this.toggleAccordion($('.stylebot-accordion-header')[0]);
+        
         // fill cache with jQuery objects widget UI elements
         this.fillCache();
         
@@ -210,12 +210,38 @@ stylebot.widget.ui = {
         this.cache.toggleButtons = $('.stylebot-toggle');
     },
     
-    createGroupHeader: function(name) {
-        return $('<h3>')
-        .append($('<a>', {
-            href: '#',
+    createAccordionHeader: function(name) {
+        return $('<h3>', {
+            class: 'stylebot-accordion-header',
+            tabIndex: 0,
             html: name
-        }));
+        })
+        .prepend($('<div>', {
+            class: 'stylebot-accordion-icon'
+        }))
+        .data('status', false)
+        .bind('mousedown keydown', function (e) {
+            if(e.type == "keydown" && e.keyCode != 13)
+                return;
+            stylebot.widget.ui.toggleAccordion(e.target);
+        });
+    },
+    
+    toggleAccordion: function(h) {
+        h = $(h);
+        var group = h.next();
+        if(h.data('status'))
+        {
+            group.hide();
+            h.removeClass('stylebot-accordion-active');
+            h.data('status', false);
+        }
+        else
+        {
+            group.show();
+            h.addClass('stylebot-accordion-active');
+            h.data('status', true);
+        }
     },
     
     createControl: function(control) {
