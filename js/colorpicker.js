@@ -26,6 +26,7 @@
 				color: 'ff0000',
 				flat: false
 			},
+			
 			setSelector = function (hsb, cal) {
 				$(cal).data('colorpicker').selector.css('backgroundColor', '#' + HSBToHex({h: hsb.h, s: 100, b: 100}));
 				$(cal).data('colorpicker').selectorIndic.css({
@@ -33,23 +34,28 @@
 					top: parseInt(150 * (100-hsb.b)/100, 10)
 				});
 			},
+			
 			setHue = function (hsb, cal) {
 				$(cal).data('colorpicker').hue.css('top', parseInt(150 - 150 * hsb.h/360, 10));
 			},
+			
             update = function (cal) {
 				var col = cal.data('colorpicker').color;
 				setSelector(col, cal.get(0));
 				setHue(col, cal.get(0));
                 cal.data('colorpicker').onChange.apply(cal, [col, HSBToHex(col), HSBToRGB(col)]);
 			},
+			
 			downHue = function (ev) {
                 var current = {
                  cal: $(this).parent(),
                  y: $(this).offset().top
                 };
 				$(document).bind('mouseup', current, upHue);
+				$(document).bind('mousedown', current, moveHue);
 				$(document).bind('mousemove', current, moveHue);
 			},
+			
 			moveHue = function (ev) {
                 var cal = ev.data.cal;
                 var hsb_h = parseInt(360*(150 - Math.max(0,Math.min(150,(ev.pageY - ev.data.y))))/150, 10);
@@ -57,24 +63,29 @@
                 update(cal);
                 return false;
 			},
+			
 			upHue = function (ev) {
 				$(document).unbind('mouseup', upHue);
+				$(document).unbind('mousedown', moveHue);
 				$(document).unbind('mousemove', moveHue);
 				return false;
 			},
+			
 			downSelector = function (ev) {
                 var current = {
                     cal: $(this).parent(),
                     pos: $(this).offset()
                 };
 				$(document).bind('mouseup', current, upSelector);
+				$(document).bind('mousedown', current, moveSelector);
 				$(document).bind('mousemove', current, moveSelector);
 			},
+			
 			moveSelector = function (ev) {
                 var cal = ev.data.cal;
                 var hsb_s = parseInt(100*(Math.max(0,Math.min(150,(ev.pageX - ev.data.pos.left))))/150, 10);
                 var hsb_b = parseInt(100*(150 - Math.max(0,Math.min(150,(ev.pageY - ev.data.pos.top))))/150, 10);
-                hsb_h = cal.data('colorpicker').color.h;                
+                hsb_h = cal.data('colorpicker').color.h;
                 cal.data('colorpicker').color = fixHSB({
                      h: hsb_h,
                      s: hsb_s,
@@ -83,11 +94,14 @@
                  update(cal);
                  return false;
 			},
+			
 			upSelector = function (ev) {
 				$(document).unbind('mouseup', upSelector);
+				$(document).unbind('mousedown', moveSelector);
 				$(document).unbind('mousemove', moveSelector);
 				return false;
 			},
+			
 			show = function (ev) {
 				var cal = $('#' + $(this).data('colorpickerId'));
 				cal.data('colorpicker').onBeforeShow.apply(this, [cal.get(0)]);
@@ -108,6 +122,7 @@
 				$(document).bind('mousedown keyup', {cal: cal}, hide);
 				return false;
 			},
+			
 			hide = function (ev) {
 			    if(ev.type == 'keyup' && ev.keyCode != 27)
 			        return true;
@@ -118,6 +133,7 @@
 					$(document).unbind('mousedown keyup', hide);
 				}
 			},
+			
 			isChildOf = function(parentEl, el, container) {
 				if (parentEl == el) {
 					return true;
@@ -136,6 +152,7 @@
 				}
 				return false;
 			},
+			
 			getViewport = function () {
 				var m = document.compatMode == 'CSS1Compat';
 				return {
@@ -145,13 +162,15 @@
 					h : window.innerHeight || (m ? document.documentElement.clientHeight : document.body.clientHeight)
 				};
 			},
+			
 			fixHSB = function (hsb) {
 				return {
 					h: Math.min(360, Math.max(0, hsb.h)),
 					s: Math.min(100, Math.max(0, hsb.s)),
 					b: Math.min(100, Math.max(0, hsb.b))
 				};
-			}, 
+			},
+			
 			fixRGB = function (rgb) {
 				return {
 					r: Math.min(255, Math.max(0, rgb.r)),
@@ -159,6 +178,7 @@
 					b: Math.min(255, Math.max(0, rgb.b))
 				};
 			},
+			
 			fixHex = function (hex) {
 				var len = 6 - hex.length;
 				if (len > 0) {
@@ -171,13 +191,16 @@
 				}
 				return hex;
 			},
+			
 			HexToRGB = function (hex) {
 				var hex = parseInt(((hex.indexOf('#') > -1) ? hex.substring(1) : hex), 16);
 				return {r: hex >> 16, g: (hex & 0x00FF00) >> 8, b: (hex & 0x0000FF)};
 			},
+			
 			HexToHSB = function (hex) {
 				return RGBToHSB(HexToRGB(hex));
 			},
+			
 			RGBToHSB = function (rgb) {
 				var hsb = {
 					h: 0,
@@ -211,6 +234,7 @@
 				hsb.b *= 100/255;
 				return hsb;
 			},
+			
 			HSBToRGB = function (hsb) {
 				var rgb = {};
 				var h = Math.round(hsb.h);
@@ -233,6 +257,7 @@
 				}
 				return {r:Math.round(rgb.r), g:Math.round(rgb.g), b:Math.round(rgb.b)};
 			},
+			
 			RGBToHex = function (rgb) {
 				var hex = [
 					rgb.r.toString(16),
@@ -246,6 +271,7 @@
 				});
 				return hex.join('');
 			},
+			
 			HSBToHex = function (hsb) {
 				return RGBToHex(HSBToRGB(hsb));
 			};
@@ -291,6 +317,7 @@
 					}
 				});
 			},
+			
 			showPicker: function() {
 				return this.each( function () {
 					if ($(this).data('colorpickerId')) {
@@ -298,6 +325,7 @@
 					}
 				});
 			},
+			
 			hidePicker: function() {
 				return this.each( function () {
 					if ($(this).data('colorpickerId')) {
@@ -305,6 +333,7 @@
 					}
 				});
 			},
+			
 			setColor: function(col) {
 				if (typeof col == 'string') {
 					col = HexToHSB(col);
