@@ -112,7 +112,8 @@ stylebot.widget.ui = {
         radios: null,
         selectboxes: null,
         colorSelectorColor: null,
-        toggleButtons: null
+        toggleButtons: null,
+        accordionHeaders: null
     },
     
     createBox: function() {
@@ -182,11 +183,12 @@ stylebot.widget.ui = {
             stylebot.widget.show();
         });
         
-        // open first accordion
-        this.toggleAccordion($('.stylebot-accordion-header')[0]);
-        
         // fill cache with jQuery objects widget UI elements
         this.fillCache();
+        
+        // open first accordion
+        // TODO: Load accordions last opened from cache in background.html
+        this.toggleAccordion(this.cache.accordionHeaders[0]);
         
         // set initial widget position to Right
         stylebot.widget.setPosition('Right');
@@ -208,6 +210,8 @@ stylebot.widget.ui = {
         this.cache.colorSelectorColor = $('.stylebot-colorselector-color');
         // toggle buttons
         this.cache.toggleButtons = $('.stylebot-toggle');
+        // accordion headers
+        this.cache.accordionHeaders = $('.stylebot-accordion-header');
     },
     
     createAccordionHeader: function(name) {
@@ -220,7 +224,7 @@ stylebot.widget.ui = {
             class: 'stylebot-accordion-icon'
         }))
         .data('status', false)
-        .bind('mousedown keydown', function (e) {
+        .bind('mouseup keydown', function (e) {
             if(e.type == "keydown" && e.keyCode != 13)
                 return;
             e.preventDefault();
@@ -230,18 +234,24 @@ stylebot.widget.ui = {
     
     toggleAccordion: function(h) {
         h = $(h);
-        var group = h.next();
-        if(h.data('status'))
+        var status = h.data('status');
+        if(status)
         {
-            group.hide();
-            h.removeClass('stylebot-accordion-active');
-            h.data('status', false);
+            h.removeClass('stylebot-accordion-active')
+            .data('status', false)
+            .next().hide();
         }
         else
         {
-            group.show();
-            h.addClass('stylebot-accordion-active');
-            h.data('status', true);
+            // close all accordion groups
+            stylebot.widget.ui.cache.accordionHeaders
+            .removeClass('stylebot-accordion-active')
+            .data('status', false)
+            .next().hide();
+            
+            h.addClass('stylebot-accordion-active')
+            .data('status', true)
+            .next().show();
         }
     },
     
