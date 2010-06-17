@@ -66,9 +66,9 @@ stylebot.widget = {
         var left;
 
         if(where == 'Left')
-            left = 30;
+            left = 50;
         else if(where == 'Right')
-            left = document.body.clientWidth - dialogWidth - 30;
+            left = document.body.clientWidth - dialogWidth - 50;
 
         this.ui.cache.box.css('left', left);
     },

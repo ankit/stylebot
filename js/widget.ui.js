@@ -8,9 +8,20 @@ stylebot.widget.ui = {
     
     isColorPickerVisible: false,
     
+    defaults: {
+        validSizeUnits: ['px', 'em', '%', 'pt']
+    },
+    
     groups: [{
         name: 'Text',
         controls: [
+        {
+            name: 'Font Family',
+            id: 'font-family',
+            type: 'font-family',
+            options: ['Arial', 'Lucida Grande', 'Times New Roman', 'Georgia', 'Verdana'],
+            el: null
+        },
         {
             name: 'Font Size',
             id: 'font-size',
@@ -113,7 +124,8 @@ stylebot.widget.ui = {
         selectboxes: null,
         colorSelectorColor: null,
         toggleButtons: null,
-        accordionHeaders: null
+        accordionHeaders: null,
+        fontFamilyInput: null
     },
     
     createBox: function() {
@@ -143,9 +155,11 @@ stylebot.widget.ui = {
         for(var i=0; i<len; i++)
         {
             this.createAccordionHeader(this.groups[i].name).appendTo(controls_ui);
+            
             var group = $('<div>', {
                 class: 'stylebot-accordion'
-            }).appendTo(controls_ui);
+            })
+            .appendTo(controls_ui);
 
             var len2 = this.groups[i].controls.length;
             for(var j=0; j<len2; j++)
@@ -212,6 +226,8 @@ stylebot.widget.ui = {
         this.cache.toggleButtons = $('.stylebot-toggle');
         // accordion headers
         this.cache.accordionHeaders = $('.stylebot-accordion-header');
+        // font family input
+        this.cache.fontFamilyInput = $('#stylebot-font-family');
     },
     
     createAccordionHeader: function(name) {
@@ -266,7 +282,7 @@ stylebot.widget.ui = {
             case 'size'             :   control_el = this.createSizeControl(control.id).appendTo(el);
                                         break;
                                         
-            case 'color'            :   control_el = this.createTextField(control.id, 10);
+            case 'color'            :   control_el = this.createTextField(control.id, 10, stylebot.widget.ui.events.onTextFieldKeyUp);
                                         this.createColorPicker(control_el).appendTo(el);
                                         control_el.appendTo(el)
                                         .keyup(function(e){ stylebot.widget.ui.setColorSelectorColor( $(this) ) });
@@ -288,58 +304,103 @@ stylebot.widget.ui = {
                                         }
                                         control_el.appendTo(el);
                                         break;
+                                        
+            case 'font-family'      :   control_el = this.createFontFamilyControl(control).appendTo(el);
+                                        break;
         }
+        
         // objects (except primitive type) are passed by reference in JS
         control.el = control_el;
         return el;
     },
     
-    createTextField: function(property, size) {
-        var input = $('<input>',{
+    createTextField: function(property, size, handler) {
+        return $('<input>',{
             type: 'text',
             id: 'stylebot-' + property,
             class: 'stylebot-control stylebot-textfield',
             size: size
-        });
-
-        input.data("property", property);
-        input.keyup(this.events.onTextFieldKeyUp);
-        return input;
+        })
+        .data('property', property)
+        .keyup(handler);
     },
     
     createSizeControl: function(property) {
         var container = $('<span>');
         
         // Textfield for entering size
-        var input = $('<input>',{
-            type: 'text',
-            id: 'stylebot-' + property,
-            class: 'stylebot-control stylebot-textfield',
-            size: 4
-        });
-        input.data("property", property)
-        .keyup(this.events.onSizeFieldKeyUp)
+        this.createTextField(property, 4, stylebot.widget.ui.events.onSizeFieldKeyUp)
         .appendTo(container);
 
         // Select box for choosing unit
         var select = $('<select>', {
             class: 'stylebot-control stylebot-select'
         })
-        .change(function(e){
+        .change(function(e) {
             $(this).prev().keyup();
         })
         .appendTo(container);
         
-        var units = ['px', 'em', '%', 'pt'];
-        var len = units.length;
+        var len = this.defaults.validSizeUnits.length;
         
         for(var i=0; i<len; i++){
-            $('<option>', {
-                class: 'stylebot-select-option',
-                html: units[i]
-            })
+            this.createSelectOption(this.defaults.validSizeUnits[i], null, this.defaults.validSizeUnits[i])
             .appendTo(select);
         }
+        
+        return container;
+    },
+    
+    createFontFamilyControl: function(control) {
+        var container = $('<span>');
+        
+        var select = $('<select>', {
+            class: 'stylebot-control stylebot-select'
+        })
+        .change(function(e) {
+            var el = $(this);
+            var input = el.next();
+            if(el.attr('value') == "Custom")
+            {
+                input
+                .attr('value', '')
+                .show();
+            }
+            else
+            {
+                input
+                .hide()
+                .attr('value', el.attr('value'));
+            }
+            input.keyup();
+        })
+        .appendTo(container);
+        
+        // default option
+        this.createSelectOption('Default', null, '')
+        .appendTo(select);
+        
+        var len = control.options.length;
+        for(var i=0; i<len; i++)
+        {
+            this.createSelectOption(control.options[i], null, control.options[i])
+            .appendTo(select);
+        }
+        
+        // custom option
+        this.createSelectOption('Custom', null, 'Custom')
+        .appendTo(select);
+
+        // end of select
+        
+        // create custom font field
+        this.createTextField(control.id, 20, stylebot.widget.ui.events.onTextFieldKeyUp)
+        .css({
+            marginLeft: '90px',
+            marginTop: '5px',
+            display: 'none'
+        })
+        .appendTo(container);
         
         return container;
     },
@@ -410,26 +471,25 @@ stylebot.widget.ui = {
     },
     
     createSelect: function(property) {
-        var select = $('<select>', {
+        return $('<select>', {
             id:'stylebot-' + property,
             class: 'stylebot-control stylebot-select'
-        });
-        select.data('property', property);
-        select.change(this.events.onSelectChange);
-        return select;
+        })
+        
+        .data('property', property)
+        .change(this.events.onSelectChange);
     },
     
     createSelectOption: function(text, property, value) {
         var option = $('<option>', {
             class: 'stylebot-select-option',
-            html: text
+            html: text,
+            value: value
         });
         
-        if(typeof(property) == 'string')
-            option.attr('value', value);
-        else
-            option.attr('value', value.join(','));
-        option.data('property', property);
+        if(property)
+            option.data('property', property);
+        
         return option;
     },
     
@@ -519,22 +579,39 @@ stylebot.widget.ui = {
         if( typeof(pValue) != 'undefined' )
         {
             switch(control.type){
-                case 'size'             :   // get unit
-                                            var validUnits = ['px', 'em', '%', 'pt'];
-                                            var len = validUnits.length;
+                
+                case 'size'         :       // get unit
+                                            var len = this.defaults.validSizeUnits.length;
                                             for(var i=0; i<len; i++)
                                             {
-                                                if( pValue.indexOf(validUnits[i]) != -1)
+                                                if( pValue.indexOf(this.defaults.validSizeUnits[i]) != -1)
                                                     break;
                                             }
-                                            var unit = validUnits[i];
-                                            // set textfield value
+                                            var unit = this.defaults.validSizeUnits[i];
+
                                             control.el.find('input')
                                             .attr('value', pValue.replace(unit, '') );
                                             
                                             // set select option
-                                            var index = $.inArray( $.trim( String(unit) ), validUnits);
+                                            var index = $.inArray( $.trim( String(unit) ), this.defaults.validSizeUnits);
                                             control.el.find('select').attr('selectedIndex', index);
+                                            break;
+
+                case 'font-family'  :       // set input value
+                                            var input = control.el.find('input')
+                                            .attr('value', pValue);
+                                            
+                                            var index = $.inArray(pValue, control.options);
+                                            if(index != -1)
+                                            {
+                                                control.el.find('select').attr('selectedIndex', index + 1);
+                                                input.hide();
+                                            }
+                                            else
+                                            {
+                                                control.el.find('select').attr('selectedIndex', control.options.length+1);
+                                                input.show();
+                                            }
                                             break;
                                         
                 case 'color'            :   control.el.attr('value', pValue);
@@ -589,6 +666,7 @@ stylebot.widget.ui = {
         this.cache.selectboxes.attr('selectedIndex', 0);
         this.cache.colorSelectorColor.css('backgroundColor', '#fff');
         this.cache.toggleButtons.removeClass('stylebot-active-button');
+        this.cache.fontFamilyInput.hide();
     },
     
     togglePosition: function(e) {
