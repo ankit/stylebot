@@ -124,14 +124,13 @@
 .stylebot-accordion {
     display: none;
     font-family: Helvetica, Arial, sans-serif;
-    background: #f8fcfe; 
+    background: #f8fcfe;
     padding: 0 2.2em;
     border-top: 0;
     margin-top: -2px;
     position: relative;
     top: 1px;
     margin-bottom: 2px;
-    overflow: auto;
     zoom: 1;
     font-size: 11px;
 }
@@ -157,6 +156,14 @@ a.stylebot-accordion-header {
 a.stylebot-accordion-active {
     background-position: 0px -33px;
     color: #1c4257 !important;
+}
+
+a.stylebot-accordion-header:focus {
+    outline: 1px solid #777;
+}
+
+a.stylebot-accordion-active:focus {
+    outline: 1px solid #6a8ea2;
 }
 
 .stylebot-accordion-icon {

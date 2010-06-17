@@ -23,14 +23,12 @@
 			"css/widget.css",
 			"css/controls.css",
 			"css/modal.css",
-			"css/Aristo/aristo.css",
 			"css/colorpicker.css",
 			"css/scrollbars.css"
 		],
 		
 		"js": [
 			"js/jquery.js",
-			"js/jquery-ui.js",
 			"js/main.js",
 			"js/chrome.js",
 			"js/widget.js",

@@ -16,6 +16,22 @@ stylebot.widget.ui.events = {
         stylebot.style.apply(property, value);
     },
     
+    onToggle: function(e) {
+        var el = $(this);
+        var className = 'stylebot-active-button';
+        var status = el.hasClass(className);
+        var value = '';
+        var property = el.data('property');
+        if(status)
+            el.removeClass(className);
+        else
+        {
+            el.addClass(className);
+            value = el.data('value');
+        }
+        stylebot.style.apply(property, value);
+    },
+    
     onRadioClick: function(e) {
         var value;
         if(e.target.checked == true)

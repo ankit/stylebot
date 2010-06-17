@@ -223,8 +223,7 @@ stylebot.widget.ui = {
         .prepend($('<div>', {
             class: 'stylebot-accordion-icon'
         }))
-        .data('status', false)
-        .bind('mouseup keydown', function (e) {
+        .bind('click keydown', function (e) {
             if(e.type == "keydown" && e.keyCode != 13)
                 return;
             e.preventDefault();
@@ -234,11 +233,10 @@ stylebot.widget.ui = {
     
     toggleAccordion: function(h) {
         h = $(h);
-        var status = h.data('status');
+        var status = h.hasClass('stylebot-accordion-active');
         if(status)
         {
             h.removeClass('stylebot-accordion-active')
-            .data('status', false)
             .next().hide();
         }
         else
@@ -246,11 +244,9 @@ stylebot.widget.ui = {
             // close all accordion groups
             stylebot.widget.ui.cache.accordionHeaders
             .removeClass('stylebot-accordion-active')
-            .data('status', false)
             .next().hide();
             
             h.addClass('stylebot-accordion-active')
-            .data('status', true)
             .next().show();
         }
     },
@@ -373,27 +369,24 @@ stylebot.widget.ui = {
         var container = $('<span>', {
             class: 'stylebot-control'
         });
-        
-        var checkbox = $('<input>',{
-            type: 'checkbox',
-            id: 'stylebot-' + property,
-            class: 'stylebot-control stylebot-toggle',
-            value: value
+        return this.createButton(text)
+        .addClass('stylebot-toggle')
+        .attr('id', 'stylebot-' + property)
+        .data({
+            'value': value,
+            'property': property
         })
         .appendTo(container)
-        .data('property', property);
+        .click(stylebot.widget.ui.events.onToggle);
         
         $('<label for="stylebot-' + property + '" >' + text + '</label>')
         .appendTo(container);
-        
-        checkbox.button()
-        .change(this.events.onCheckboxChange);
         
         return container;
     },
     
     createRadio: function(text, name, property, value) {
-        var span = $('<span>',{
+        var span = $('<span>', {
             id: 'stylebot-' + property,
             class: 'stylebot-control'
         });
@@ -513,7 +506,7 @@ stylebot.widget.ui = {
             .addClass(className)
             .data('class', className)
             .appendTo(container)
-            .mouseup(callback);
+            .click(callback);
 
             if(i == enabledButtonIndex)
                 bt.addClass('stylebot-active-button');
@@ -554,12 +547,10 @@ stylebot.widget.ui = {
                                                 control.el.attr('checked', false);                                                
                                             break;
                                         
-                case 'toggle'         :     var input = control.el.find('input');
-                                            if(pValue == control.value)
-                                                input.attr('checked', true);
+                case 'toggle'           :   if(pValue == control.el.data('value'))
+                                                control.el.addClass('stylebot-active-button');
                                             else
-                                                input.attr('checked', false);
-                                            input.button('refresh');
+                                                control.el.removeClass('stylebot-active-button');
                                             break;
                                         
                 case 'select'            :  var index = $.inArray( $.trim( String(pValue) ), control.options);
@@ -597,7 +588,7 @@ stylebot.widget.ui = {
         this.cache.radios.attr('checked', false);
         this.cache.selectboxes.attr('selectedIndex', 0);
         this.cache.colorSelectorColor.css('backgroundColor', '#fff');
-        this.cache.toggleButtons.attr('checked', false).button('refresh');
+        this.cache.toggleButtons.removeClass('stylebot-active-button');
     },
     
     togglePosition: function(e) {
