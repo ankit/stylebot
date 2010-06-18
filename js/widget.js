@@ -52,7 +52,7 @@ stylebot.widget = {
         this.ui.cache.box.css('display', 'block');
 
         setTimeout(function() {
-            stylebot.widget.ui.cache.controls[0].focus(); //set focus to first control in widget
+            stylebot.widget.ui.cache.accordionHeaders[0].focus();
         }, 0);
     },
     

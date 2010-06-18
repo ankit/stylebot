@@ -49,10 +49,13 @@ input[type=text].stylebot-textfield, .stylebot-textarea {
     color: #333;
     font-family: inherit;
     font-size: 11px !important;
-    height: 12px;
     outline: none;
     padding: 2px;
     width: auto;
+}
+
+.stylebot-textfield {
+    height: 12px !important;
 }
 
 .stylebot-textarea {

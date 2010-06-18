@@ -206,7 +206,28 @@ stylebot.widget.ui = {
         
         // set initial widget position to Right
         stylebot.widget.setPosition('Right');
+        
+        var lastBt = buttons.find('button').last();
+        
+        // TAB on last button sets focus to first accordion header
+        lastBt.keydown(function(e) {
+            if(e.keyCode == 9 && !e.shiftKey)
+            {
+                e.stopImmediatePropagation();
+                e.preventDefault();
+                stylebot.widget.ui.cache.accordionHeaders[0].focus();
+            }
+        });
 
+        // Shift + TAB on first accordion sets focus to last button
+        $(this.cache.accordionHeaders[0]).bind('keydown', { lastBt: lastBt }, function(e) {
+            if(e.keyCode == 9 && e.shiftKey)
+            {
+                e.stopImmediatePropagation();
+                e.preventDefault();
+                e.data.lastBt.focus();
+            }
+        });
     },
     
     fillCache: function() {
@@ -241,7 +262,7 @@ stylebot.widget.ui = {
         }))
         .bind('click keydown', function (e) {
             if(e.type == "keydown" && e.keyCode != 13)
-                return;
+                return true;
             e.preventDefault();
             stylebot.widget.ui.toggleAccordion(e.target);
         });
