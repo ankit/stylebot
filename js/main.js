@@ -54,15 +54,12 @@ var stylebot = {
     
     enable: function() {
         this.status = true;
-        // Add stylebot-ui class to body, so that jquery-ui theme is applied to widget
-        $(document.body).addClass('stylebot-ui');
         stylebot.chrome.setIcon(true);
         stylebot.widget.show();
     },
     
     disable: function() {
         this.status = false;
-        $(document.body).removeClass('stylebot-ui');
         this.unhighlight();
         this.selectedElement = null;
         this.selector.value = null;
@@ -73,22 +70,21 @@ var stylebot = {
     addListeners: function() {
         // Handle key presses
         $(document).keyup(function(e) {
-            var eTagName = e.target.tagName;
-            if(eTagName == 'INPUT' || eTagName == 'TEXTAREA' || eTagName == 'DIV' || eTagName == 'OBJECT')
+            var eTagName = e.target.tagName.toLowerCase();
+            var disabledEl = ['input', 'textarea', 'div', 'object', 'select'];
+            if( $.inArray(eTagName, disabledEl) != -1 )
                return true;
-            
+
             // Handle shortcut key 'e' to toggle editing mode
             if(e.keyCode == stylebot.options.shortcutKey)
                 stylebot.toggle();
-
+                
             // Handle Esc key to escape editing mode
             else if(e.keyCode == 27 && stylebot.status && !stylebot.widget.ui.isColorPickerVisible)
-            {
-                console.log("Escape handler for document triggered");
                 stylebot.disable();
-            }
+
         })
-        
+
         // Handle mouse move event on DOM elements
         .mousemove(function(e) {
             if(stylebot.widget.isBeingDragged || stylebot.modal.isVisible)

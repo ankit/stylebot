@@ -8,6 +8,8 @@ stylebot.modal = {
     
     isVisible: false,
     
+    onClose: null,
+    
     // cache of jQuery objects
     cache: {
         box: null,
@@ -56,7 +58,7 @@ stylebot.modal = {
         this.cache.background.fadeIn(170);
     },
     
-    show: function(content) {
+    show: function(content, options) {
         if(!this.cache.box)
             this.create();
         this.fill(content);
@@ -64,12 +66,12 @@ stylebot.modal = {
         this.darkenBg();
         this.cache.textarea.focus();
         this.isVisible = true;
-        var onKeyDown = function(e) {
+        var onKeyUp = function(e) {
             if(e.keyCode == 27)
             {
                 e.preventDefault();
                 stylebot.modal.hide();
-                $(document).unbind('keydown', onKeyDown);
+                $(document).unbind('keyup', onKeyUp);
                 $(document).unbind('mousedown', onMouseDown);
             }
         }
@@ -80,18 +82,23 @@ stylebot.modal = {
             {
                 e.preventDefault();
                 stylebot.modal.hide();
-                $(document).unbind('keydown', onKeyDown);
+                $(document).unbind('keyup', onKeyUp);
                 $(document).unbind('mousedown', onMouseDown);
             }
         }
-        $(document).bind('keydown', onKeyDown);
+        $(document).bind('keyup', onKeyUp);
         $(document).bind('mousedown', onMouseDown);
+        
+        if(options)
+            this.onClose = options.onClose;
     },
     
     hide: function() {
         this.cache.box.hide();
         this.cache.background.fadeOut(170);
         this.isVisible = false;
+        if(this.onClose && this.onClose != undefined)
+            this.onClose();
     },
     
     copyToClipboard: function() {

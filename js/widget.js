@@ -17,22 +17,20 @@ stylebot.widget = {
     
     addListeners: function() {
         
-        // TODO: Instead of having these two handlers, implement them into the document 'keyup' handler
-        this.ui.cache.box.keyup(function(e) {
+        // TODO: Instead of having these separate handlers, implement them into a single handler
+        this.ui.cache.box.keydown(function(e) {
             // disable editing on esc
             if(e.keyCode == 27 && !stylebot.widget.ui.isColorPickerVisible)
             {
-                console.log("Escape handler for Dialog triggered");
                 e.target.blur();
                 stylebot.disable();
             }
         });
         
-        this.ui.cache.controls.keyup(function(e) {
+        this.ui.cache.controls.keydown(function(e) {
             // if esc is pressed, take away focus and stop editing
             if(e.keyCode == 27 && !stylebot.widget.ui.isColorPickerVisible)
             {
-                console.log("Escape handler for Control triggered");
                 e.target.blur();
                 stylebot.disable();
             }
@@ -78,7 +76,9 @@ stylebot.widget = {
     },
     
     viewCSS: function(e) {
-        stylebot.modal.show(stylebot.style.crunchCSS());
+        stylebot.modal.show(stylebot.style.crunchCSS(), {
+            onClose: function() { e.target.focus(); }
+        });
     },
     
     resetCSS: function(e) {
