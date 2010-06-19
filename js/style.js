@@ -147,7 +147,7 @@ stylebot.style = {
             for(var property in this.rules[selector])
                 css += "\t" + this.getCSSDeclaration(property, this.rules[selector][property], setImportant) + "\n";
                 
-            css += "}" + "\n";
+            css += "}" + "\n\n";
         }
         return css;
     },

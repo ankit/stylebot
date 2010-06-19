@@ -38,7 +38,6 @@ stylebot.widget = {
     },
     
     show: function() {
-        stylebot.isEditing = true;
         this.selector = stylebot.selector.value;
         
         if(!this.ui.cache.box)
@@ -70,7 +69,7 @@ stylebot.widget = {
 
         this.ui.cache.box.css('left', left);
     },
-    
+        
     save: function(e) {
         stylebot.style.save();
     },

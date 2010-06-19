@@ -15,7 +15,7 @@ stylebot.selector = {
     // inspect an element and return a CSS selector for it
     inspect: function(el, level){
         var elId = el.attr("id");
-        var elClass = el.attr("class");
+        var elClass = $.trim(el.attr("class").replace('stylebot-selected', ''));
         if(elClass.length != 0)
         {
             var classes = elClass.split(" ");

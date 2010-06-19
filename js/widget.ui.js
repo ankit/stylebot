@@ -19,7 +19,7 @@ stylebot.widget.ui = {
             name: 'Font Family',
             id: 'font-family',
             type: 'font-family',
-            options: ['Arial', 'Lucida Grande', 'Times New Roman', 'Georgia', 'Verdana'],
+            options: ['Arial', 'Georgia', 'Lucida Grande', 'Times New Roman', 'Verdana'],
             el: null
         },
         {
@@ -117,6 +117,7 @@ stylebot.widget.ui = {
     cache: {
         box: null,
         header: null,
+        headerSelectIcon: null,
         controls: null,
         textfields: null,
         checkboxes: null,
@@ -139,10 +140,20 @@ stylebot.widget.ui = {
             id: 'stylebot-header-text',
             html: 'custom styles'
         });
+        
+        this.cache.headerSelectIcon = $('<div>', {
+            class: 'stylebot-select-icon stylebot-select-icon-active',
+            html: 'pick'
+        })
+        .click(function(e) {
+            stylebot.toggleSelectionMode();
+        });
+        
         $('<div>', {
             id: 'stylebot-header'
         })
         .append(this.cache.header)
+        .append(this.cache.headerSelectIcon)
         .appendTo(this.cache.box);
         
         var controls_ui = $('<div>', {
@@ -175,7 +186,7 @@ stylebot.widget.ui = {
         
         this.createLabel('Position').appendTo(options_div);
         this.createButtonSet(['Left', 'Right'], "stylebot-position", 1, stylebot.widget.ui.togglePosition).appendTo(options_div);
-        
+                
         options_div.appendTo(this.cache.box);
         
         // creating main buttons for widget
@@ -312,7 +323,7 @@ stylebot.widget.ui = {
             case 'checkbox'         :   control_el = this.createCheckbox(null, control.id , control.value).appendTo(el);
                                         break;
 
-            case 'toggle'           :   control_el = this.createToggleButton('Hide', control.id , control.value).appendTo(el);
+            case 'toggle'           :   control_el = this.createToggleButton('Hide', control.id , control.value, stylebot.widget.ui.events.onToggle).appendTo(el);
                                         break;
 
             case 'select'           :   control_el = this.createSelect(control.id);
@@ -447,24 +458,25 @@ stylebot.widget.ui = {
             return checkbox;
     },
     
-    createToggleButton: function(text, property, value) {
-        var container = $('<span>', {
-            class: 'stylebot-control'
-        });
-        return this.createButton(text)
+    createToggleButton: function(defaultText, property, value, onToggle) {
+
+        var bt = this.createButton(defaultText)
         .addClass('stylebot-toggle')
-        .attr('id', 'stylebot-' + property)
-        .data({
-            'value': value,
-            'property': property
-        })
-        .appendTo(container)
-        .click(stylebot.widget.ui.events.onToggle);
+        .click(function(e) {
+            if(onToggle)
+                onToggle(e);
+        });
         
-        $('<label for="stylebot-' + property + '" >' + text + '</label>')
-        .appendTo(container);
+        if(property)
+        {
+            bt.attr('id', 'stylebot-' + property)
+            .data({
+                'value': value,
+                'property': property
+            });
+        }
         
-        return container;
+        return bt;
     },
     
     createRadio: function(text, name, property, value) {

@@ -36,10 +36,27 @@
 
 #stylebot-header-text {
     float: left;
+    padding: 2px;
+    width: 80%;
 }
 
 #stylebot-header-text:hover {
     cursor: text;
+    background-color: #fbfbfb;
+}
+
+.stylebot-select-icon {
+    float: right;
+    padding: 2px;
+}
+
+.stylebot-select-icon:hover {
+    cursor: pointer;
+}
+
+.stylebot-select-icon:hover, .stylebot-select-icon-active {
+    text-shadow: none;
+    border-radius: 2px;
     background-color: #fbfbfb;
 }
 

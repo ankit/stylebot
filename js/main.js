@@ -18,7 +18,7 @@ var stylebot = {
 
     hoveredElement: null,
 
-    isEditing: false,
+    selectMode: true,
     
     // kill switch for jQuery lint
     lintDebug: false,
@@ -89,7 +89,7 @@ var stylebot = {
         .mousemove(function(e) {
             if(stylebot.widget.isBeingDragged || stylebot.modal.isVisible)
                 return true;
-            if(stylebot.hoveredElement == $(e.target) || !stylebot.status)
+            if(stylebot.hoveredElement == $(e.target) || !stylebot.status || !stylebot.selectMode)
                 return true;
 
             var parent = $(e.target).closest(' .ui-dialog, #stylebot, .stylebot_colorpicker');
@@ -105,7 +105,7 @@ var stylebot = {
         
         // Handle click event on document.body (during capturing phase)
         document.body.addEventListener('click', function(e) {
-            if(stylebot.hoveredElement && stylebot.status)
+            if(stylebot.hoveredElement && stylebot.status && stylebot.selectMode)
             {
                 e.preventDefault();
                 e.stopPropagation();
@@ -130,9 +130,25 @@ var stylebot = {
     
     select: function() {
         stylebot.selectedElement = stylebot.hoveredElement;
-        stylebot.unhighlight();
+        // stylebot.unhighlight();
+        stylebot.toggleSelectionMode();
         stylebot.selector.generate(stylebot.selectedElement);
         stylebot.style.fillCache(stylebot.selector.value);
         stylebot.widget.show();
+    },
+    
+    
+    toggleSelectionMode: function(e) {
+        if(stylebot.selectMode)
+        {
+            stylebot.selectMode = false;
+            stylebot.widget.ui.cache.headerSelectIcon.removeClass('stylebot-select-icon-active');
+        }
+        else
+        {
+            stylebot.selectMode = true;
+            stylebot.widget.ui.cache.headerSelectIcon.addClass('stylebot-select-icon-active');
+        }
+
     }
 }
