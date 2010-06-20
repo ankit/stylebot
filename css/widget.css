@@ -2,7 +2,7 @@
 
 #stylebot {
     color: #313131;
-    font-family: Helvetica, Arial, serif;
+    font-family: 'Lucida Grande', Tahoma, Arial, sans-serif;
     font-size: 12px;
     text-transform: none;
     width: 320px;
@@ -94,7 +94,7 @@
 /* Labels */
 
 .stylebot-label {
-    color: #000;
+    color: #333;
     display: inline-block;
     float: none;
     font-family: inherit;
@@ -136,14 +136,14 @@
 
 .stylebot-css-code {
     color: #333 !important;
-    font-size: 12px !important;
-    font-family: 'Andale Mono', 'Lucida Console', monospace !important;
+    font-size: 11px !important;
+    font-family: Monaco, 'Lucida Console', monospace !important;
 }
 
 /* Accordion */
 .stylebot-accordion {
     display: none;
-    font-family: Helvetica, Arial, sans-serif;
+    font-family: 'Lucida Grande', Tahoma, Arial, sans-serif;
     background: #f8fcfe;
     padding: 0 2.2em;
     border-top: 0;
@@ -161,6 +161,7 @@ a.stylebot-accordion-header {
     cursor: pointer;
     color: #4f4f4f !important;
     display: block;
+    font-family: 'Lucida Grande', Tahoma, Arial, sans-serif;
     font-size: 11px;
     font-weight: bold;
     line-height: 1.1em;

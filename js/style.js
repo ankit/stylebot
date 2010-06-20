@@ -176,7 +176,7 @@ stylebot.style = {
 
         for(var selector in this.rules)
         {
-            css += selector + "{" + "\n";
+            css += selector + " {" + "\n";
             for(var property in this.rules[selector])
                 css += "\t" + this.getCSSDeclaration(property, this.rules[selector][property], setImportant) + "\n";
                 
