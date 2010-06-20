@@ -56,6 +56,7 @@ var stylebot = {
         this.status = true;
         stylebot.chrome.setIcon(true);
         stylebot.widget.show();
+        stylebot.enableSelectionMode();
     },
     
     disable: function() {
@@ -64,6 +65,7 @@ var stylebot = {
         this.selectedElement = null;
         this.selector.value = null;
         stylebot.chrome.setIcon(false);
+        stylebot.disableSelectionMode();
         stylebot.widget.hide();
     },
     
@@ -138,17 +140,20 @@ var stylebot = {
     },
     
     
-    toggleSelectionMode: function(e) {
+    toggleSelectionMode: function() {
         if(stylebot.selectMode)
-        {
-            stylebot.selectMode = false;
-            stylebot.widget.ui.cache.headerSelectIcon.removeClass('stylebot-select-icon-active');
-        }
+            stylebot.disableSelectionMode();
         else
-        {
-            stylebot.selectMode = true;
-            stylebot.widget.ui.cache.headerSelectIcon.addClass('stylebot-select-icon-active');
-        }
-
+            stylebot.enableSelectionMode();
+    },
+    
+    enableSelectionMode: function() {
+        stylebot.selectMode = true;
+        stylebot.widget.ui.cache.headerSelectIcon.addClass('stylebot-select-icon-active');
+    },
+    
+    disableSelectionMode: function() {
+        stylebot.selectMode = false;
+        stylebot.widget.ui.cache.headerSelectIcon.removeClass('stylebot-select-icon-active');
     }
 }

@@ -142,7 +142,7 @@ stylebot.widget.ui = {
         });
         
         this.cache.headerSelectIcon = $('<div>', {
-            class: 'stylebot-select-icon stylebot-select-icon-active'
+            class: 'stylebot-select-icon'
         })
         .click(function(e) {
             stylebot.toggleSelectionMode();
