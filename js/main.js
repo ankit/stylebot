@@ -24,7 +24,7 @@ var stylebot = {
     lintDebug: false,
 
     options: {
-        shortcutKey:69 // 69 is keycode for 'e'
+        shortcutKey: 69 // 69 is keycode for 'e'
     },
     
     init: function() {
@@ -133,7 +133,7 @@ var stylebot = {
     select: function() {
         stylebot.selectedElement = stylebot.hoveredElement;
         // stylebot.unhighlight();
-        stylebot.toggleSelectionMode();
+        stylebot.disableSelectionMode();
         stylebot.selector.generate(stylebot.selectedElement);
         stylebot.style.fillCache(stylebot.selector.value);
         stylebot.widget.show();

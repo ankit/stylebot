@@ -45,45 +45,78 @@ stylebot.style = {
     saveRule: function(selector, property, value) {
         // check if the selector already exists in the list
         var rule = this.rules[selector];
-        if(typeof(rule) != 'undefined')
+        if(rule != undefined)
         {
-            // check if a value for the property already exists
-            var pValue = rule[property];
-            
-            if(typeof(pValue) != 'undefined' && value == "")
-                delete rule[property];
+            if( !this.filter(property, value) )
+            {
+                // does a value for property already exist
+                var pValue = rule[property];
+                
+                if(pValue != undefined)
+                {
+                    delete this.rules[selector][property];
+                 
+                    // if no properties left, remove rule as well
+                    // TODO: Use something more elegant than this hack.
+                    var i = null;
+                    for( i in this.rules[selector])
+                    { break; }
+                 
+                    if(!i)
+                        delete this.rules[selector];
+                }
+            }
             else
                 rule[property] = value;
         }
-        else if(value != "")
+        else if( this.filter(property, value) )
         {
             this.rules[selector] = new Object();
             this.rules[selector][property] = value;
         }
     },
     
+    // check if a property / value pair is valid for addition to rules cache
+    filter: function(property, value) {
+        if(value == "")
+            return false;
+        
+        switch(property) {
+            case 'font-size'        :
+            case 'line-height'      :
+            case 'letter-spacing'   :
+            case 'border-width'     :   if($.inArray(value, stylebot.widget.ui.defaults.validSizeUnits) != -1)
+                                            return false;
+                                        else
+                                            return true;
+                                        break;
+        }
+        return true;
+    },
+    
     // generate inline CSS
     getInlineCSS: function(selector) {
-
         var rule = this.rules[selector];
         if(rule != undefined)
         {
-            var css = '';
+            var css = "";
             for(var property in rule)
                 css += this.getCSSDeclaration(property, rule[property], true);
 
             return css;
         }
+        return "";
     },
     
     // apply inline CSS to selected element(s)
     applyInlineCSS: function(el, newCustomCSS) {
         if(el.length == 0) return false;
+        
         el.each( function() {
             var existingCSS = $(this).attr('style');
             var existingCustomCSS = $(this).data('stylebot-css');
             var newCSS;
-            
+
             // if stylebot css is being applied to the element for the first time
             if(!existingCustomCSS)
             {
