@@ -142,8 +142,7 @@ stylebot.widget.ui = {
         });
         
         this.cache.headerSelectIcon = $('<div>', {
-            class: 'stylebot-select-icon stylebot-select-icon-active',
-            html: 'pick'
+            class: 'stylebot-select-icon stylebot-select-icon-active'
         })
         .click(function(e) {
             stylebot.toggleSelectionMode();
@@ -204,7 +203,8 @@ stylebot.widget.ui = {
         // make title editable
         stylebot.utils.makeEditable(this.cache.header, function(value) {
             stylebot.selector.value = value;
-            stylebot.selectedElement = null;
+            stylebot.unhighlight();
+            stylebot.highlight($(value)[0]);
             stylebot.widget.show();
         });
         
@@ -461,11 +461,8 @@ stylebot.widget.ui = {
     createToggleButton: function(defaultText, property, value, onToggle) {
 
         var bt = this.createButton(defaultText)
-        .addClass('stylebot-toggle')
-        .click(function(e) {
-            if(onToggle)
-                onToggle(e);
-        });
+        .addClass('stylebot-toggle stylebot-control')
+        .click(onToggle);
         
         if(property)
         {
