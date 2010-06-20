@@ -24,7 +24,7 @@ div.stylebot-colorselector {
     background-color: #f8f8f8;
     display: inline-block;
     height: 12px !important;
-    margin-bottom: -5px;
+    margin-bottom: -6px;
     padding: 2px;
     width: 30px !important;
 }
@@ -50,13 +50,16 @@ input[type=text].stylebot-textfield, .stylebot-textarea {
     font-family: inherit;
     font-size: 11px !important;
     outline: none;
-    padding: 2px;
     width: auto;
-    -webkit-appearance: textfield;
+    border: 1px solid #ccc;
+    border-radius: 2px;
+/*    -webkit-appearance: textfield;*/
 }
 
 .stylebot-textfield {
-    line-height: 12px;
+    padding: 2px !important;
+    height: 12px;
+    -webkit-box-sizing: content-box;
 }
 
 .stylebot-textarea {
