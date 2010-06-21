@@ -31,10 +31,6 @@
     overflow: auto;
 }
 
-#stylebot-editing-field {
-    font-size: 12px !important;
-}
-
 #stylebot-header-text {
     float: left;
     padding: 1px;
@@ -123,6 +119,13 @@
     margin-top: 10px;
     padding: 10px;
     padding-left: 25px;
+}
+
+.stylebot-editable-text {
+    padding: 1px;
+}
+.stylebot-editable-text:hover {
+    background-color: #9dcbe7;
 }
 
 /* Main buttons */

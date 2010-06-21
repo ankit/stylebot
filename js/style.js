@@ -21,7 +21,8 @@ stylebot.style = {
         // most recently selected elements' selector
         selector: null,
         // most recently selected elements
-        elements: null
+        elements: null,
+        url: document.domain
     },
     
     fillCache: function(selector) {
@@ -209,14 +210,15 @@ stylebot.style = {
     
     // save rules for page
     save: function() {
-        stylebot.chrome.save(document.domain, stylebot.style.rules);
+        stylebot.chrome.save(stylebot.style.cache.url, stylebot.style.rules);
     },
     
     // load rules for page 
     load: function(callback) {
-        stylebot.chrome.load(document.domain, function(rules){
-            if(rules)
-                stylebot.style.rules = rules;
+        stylebot.chrome.load(window.location.href, function(response){
+            if(response.rules)
+                stylebot.style.rules = response.rules;
+            stylebot.style.cache.url = response.url;
             if(callback != undefined)
                 callback();
         });

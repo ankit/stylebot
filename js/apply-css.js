@@ -1,10 +1,9 @@
-console.log("Document domain: " + document.domain);
 // send request to background.html to get stylebot rules for page
-chrome.extension.sendRequest({ name: "getRulesForPage", domain: document.domain }, function(response){
+chrome.extension.sendRequest({ name: "getRulesForPage", url: window.location.href }, function(response){
     console.log("Stylebot Rules for this page: " + response.rules);
     if(!response.rules)
         return;
-    injectCSS(crunchCSS(response.rules));
+    injectCSS( crunchCSS(response.rules) );
 });
 
 function crunchCSS(rules) {

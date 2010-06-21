@@ -196,6 +196,20 @@ stylebot.widget.ui = {
             id: 'stylebot-widget-options'
         });
         
+        this.createLabel('Styles will be applied to pages with URL containing').appendTo(options_div);
+        var url_container = $('<span>', {
+            html: stylebot.style.cache.url,
+            class: 'stylebot-editable-text',
+            style: 'margin-left: 5px; font-weight: bold;'
+        })
+        .appendTo(options_div);
+        
+        stylebot.utils.makeEditable(url_container, function(value) {
+            stylebot.style.cache.url = value;
+        });
+        
+        $('<br><br>').appendTo(options_div);
+        
         this.createLabel('Widget position').appendTo(options_div);
         this.createButtonSet(['Left', 'Right'], "stylebot-position", 1, stylebot.widget.ui.togglePosition).appendTo(options_div);
         
@@ -259,7 +273,7 @@ stylebot.widget.ui = {
         // controls
         this.cache.controls = $('.stylebot-control');
         // textfields
-        this.cache.textfields = $('.stylebot-textfield');
+        this.cache.textfields = $('.stylebot-textfield .stylebot-control');
         // checkboxes
         this.cache.checkboxes = $('.stylebot-checkbox');
         // radios

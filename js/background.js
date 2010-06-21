@@ -28,8 +28,8 @@ function addListeners(){
             case "enablePageIcon"   : enablePageIcon(sender.tab.id); break;
             case "disablePageIcon"  : disablePageIcon(sender.tab.id); break;
             case "copyToClipboard"  : copyToClipboard(request.text); break;
-            case "save"             : save(request.domain, request.rules); break;
-            case "getRulesForPage"  : sendResponse( { rules: getRulesForPage(request.domain) }); break;
+            case "save"             : save(request.url, request.rules); break;
+            case "getRulesForPage"  : sendResponse(getRulesForPage(request.url)); break;
         }
     });
 }
@@ -81,20 +81,23 @@ function loadStylesIntoCache() {
     cache.styles = JSON.parse( localStorage['stylebot_styles'] );
 }
 
-function getRulesForPage(currentUrl) {
+function getRulesForPage(currUrl) {
     var rules = {};
+    var url_for_page = '';
     for(var url in cache.styles)
     {
-        if(currentUrl.indexOf(url) != -1)
+        if(currUrl.indexOf(url) != -1)
         {
             for(var property in cache.styles[url])
                 rules[property] = cache.styles[url][property];
+            if(url.length > url_for_page.length)
+                url_for_page = url;
         }
     }
     if(rules != undefined)
-        return rules;
+        return { rules: rules, url: url_for_page };
     else
-        return null;
+        return { rules: null, url: document.domain };
 }
 
 window.addEventListener('load', function(){

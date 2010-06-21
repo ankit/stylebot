@@ -60,6 +60,8 @@ stylebot.utils = {
     },
     
     makeEditable: function(el, callback) {
+        el.attr('title', 'click to edit');
+        var fontSize = el.css('font-size');
         el.bind('click', { callback: callback }, function(e) {
             // hide element
             $(this).hide();
@@ -72,9 +74,10 @@ stylebot.utils = {
                 length: 10,
                 value: value,
                 id: 'stylebot-editing-field'
-            });
+            })
+            .css('font-size', fontSize);
             
-            $(this).parent().append(input);
+            $(this).before(input);
             input.focus();
             
             var onMouseDown = function(e) {
