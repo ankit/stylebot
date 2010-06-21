@@ -70,20 +70,27 @@ function copyToClipboard(text) {
 }
 
 // save rules
-function save(domain, rules) {
-    cache.styles[domain] = rules;
+function save(url, rules) {
+    cache.styles[url] = rules;
 
     // for now, simply store them in localStorage. In future, they'll stored in a bookmark / db
     localStorage['stylebot_styles'] = JSON.stringify(cache.styles);
 }
 
 function loadStylesIntoCache() {
-    cache.styles = JSON.parse(localStorage['stylebot_styles']);
+    cache.styles = JSON.parse( localStorage['stylebot_styles'] );
 }
 
-function getRulesForPage(domain) {
-    var rules = cache.styles[domain];
-    console.log("Rules in background.js: " + rules);
+function getRulesForPage(currentUrl) {
+    var rules = {};
+    for(var url in cache.styles)
+    {
+        if(currentUrl.indexOf(url) != -1)
+        {
+            for(var property in cache.styles[url])
+                rules[property] = cache.styles[url][property];
+        }
+    }
     if(rules != undefined)
         return rules;
     else
