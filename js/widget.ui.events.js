@@ -84,5 +84,22 @@ stylebot.widget.ui.events = {
         }
         else
             stylebot.style.apply(property, value);
+    },
+    
+    onSegmentedControlClick: function(e) {
+        var el = $(e.target);
+        if(el[0].tagName != 'BUTTON')
+            el = el.parent('button');
+        
+        var control = el.parent();
+        var status = el.hasClass('stylebot-active-button');
+        control.find('button').removeClass('stylebot-active-button');
+        if(!status)
+        {
+            el.addClass('stylebot-active-button');
+            stylebot.style.apply(el.data('property'), el.data('value'));
+        }
+        else
+            stylebot.style.apply(el.data('property'), '');
     }
 }

@@ -31,22 +31,41 @@ stylebot.widget.ui = {
         {
             name: 'Font Weight',
             id: 'font-weight',
-            type: 'select',
-            options: ['normal', 'bold'],
+            type: 'segmented',
+            values: ['bold', 'normal'],
+            options: ['Bold', 'Normal'],
             el: null
         },
         {
             name: 'Font Style',
             id: 'font-style',
-            type: 'select',
-            options: ['none', 'italic'],
+            type: 'segmented',
+            values: ['italic', 'normal'],
+            options: ['<i>Italic</i>', 'Normal'],
+            el: null
+        },
+        {
+            name: 'Font Variant',
+            id: 'font-variant',
+            type: 'segmented',
+            options: ['<span style="font-variant: small-caps;">Small Caps</span>', 'Normal'],
+            values: ['small-caps', 'normal'],
+            el: null
+        },
+        {
+            name: 'Transform',
+            id: 'text-transform',
+            type: 'segmented',
+            values: ['capitalize', 'uppercase', 'lowercase', 'none'],
+            options: ['Abc', 'ABC', 'abc', 'None'],
             el: null
         },
         {
             name: 'Decoration',
             id: 'text-decoration',
-            type: 'select',
-            options: ['none', 'underline'],
+            type: 'segmented',
+            options: ['<u>ab</u>', '<span style="text-decoration: line-through;">ab</span>', '<span style="text-decoration: overline;">ab</span>', 'None'],
+            values: ['underline', 'line-through', 'overline', 'none'],
             el: null
 
         },
@@ -139,7 +158,8 @@ stylebot.widget.ui = {
         colorSelectorColor: null,
         toggleButtons: null,
         accordionHeaders: null,
-        fontFamilyInput: null
+        fontFamilyInput: null,
+        segmentedControls: null
     },
     
     createBox: function() {
@@ -196,7 +216,7 @@ stylebot.widget.ui = {
             id: 'stylebot-widget-options'
         });
         
-        this.createLabel('Styles will be applied to pages with URL containing').appendTo(options_div);
+        this.createLabel('For pages matching URL').appendTo(options_div);
         var url_container = $('<span>', {
             html: stylebot.style.cache.url,
             class: 'stylebot-editable-text',
@@ -288,6 +308,8 @@ stylebot.widget.ui = {
         this.cache.accordionHeaders = $('.stylebot-accordion-header');
         // font family input
         this.cache.fontFamilyInput = $('#stylebot-font-family');
+        // segmented controls
+        this.cache.segmentedControls = $('.stylebot-segmented-control');
     },
     
     createAccordionHeader: function(name) {
@@ -363,6 +385,9 @@ stylebot.widget.ui = {
                                             this.createSelectOption( stylebot.utils.capitalize(option), control.id, option).appendTo(control_el);
                                         }
                                         control_el.appendTo(el);
+                                        break;
+
+            case 'segmented'        :   control_el = this.createSegmentedControl(control).appendTo(el);
                                         break;
                                         
             case 'font-family'      :   control_el = this.createFontFamilyControl(control).appendTo(el);
@@ -624,6 +649,27 @@ stylebot.widget.ui = {
                 bt.addClass('stylebot-active-button');
         }
         return container;
+    }, 
+    
+    createSegmentedControl: function(control) {
+        var container = $('<span>', {
+            class: 'stylebot-control stylebot-segmented-control',
+            id: 'stylebot-' + control.id
+        });
+        
+        var len = control.options.length;
+        for(var i=0; i<len; i++)
+        {
+            var bt = this.createButton( control.options[i] )
+            .addClass('stylebot-segmented-button')
+            .data({
+                 value: control.values[i],
+                 property: control.id
+            })
+            .click(stylebot.widget.ui.events.onSegmentedControlClick)
+            .appendTo(container);
+        }
+        return container;
     },
     
     fillControl: function(control, rule) {
@@ -682,10 +728,14 @@ stylebot.widget.ui = {
                                                 control.el.removeClass('stylebot-active-button');
                                             break;
                                         
-                case 'select'            :  var index = $.inArray( $.trim( String(pValue) ), control.options);
+                case 'select'           :   var index = $.inArray( $.trim( String(pValue) ), control.options);
                                             if(index != -1)
                                                 control.el.attr('selectedIndex', index + 1);
                                             break;
+
+                case 'segmented'        :   var index = $.inArray( $.trim( String(pValue) ), control.values);
+                                            if(index != -1)
+                                                $(control.el.find('button')[index]).addClass('stylebot-active-button');
             }
         }
     },
@@ -719,6 +769,7 @@ stylebot.widget.ui = {
         this.cache.colorSelectorColor.css('backgroundColor', '#fff');
         this.cache.toggleButtons.removeClass('stylebot-active-button');
         this.cache.fontFamilyInput.hide();
+        this.cache.segmentedControls.find('button').removeClass('stylebot-active-button');
     },
     
     togglePosition: function(e) {
