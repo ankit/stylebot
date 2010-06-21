@@ -80,9 +80,16 @@ stylebot.widget = {
         });
     },
     
+    // reset css for current selector
     resetCSS: function(e) {
         stylebot.widget.ui.reset();
         // clear any custom styles for currently selected element
         stylebot.style.clear();
+    },
+    
+    // reset all CSS for page
+    resetAllCSS: function(e) {
+        stylebot.widget.ui.reset();
+        stylebot.style.clearAll();
     }
 }

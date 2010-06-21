@@ -86,7 +86,7 @@
 .stylebot-control {
     display: inline;
     margin: 0;
-    margin-left: 6px;
+    margin-left: 6px !important;
     padding: 0;
     width: auto;
 }
@@ -104,7 +104,7 @@
     margin: 0;
     padding-right: 4px;
     text-align: right;
-    width: 80px;
+    width: 100px;
 }
 
 .stylebot-inline-label {

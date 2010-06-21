@@ -199,6 +199,14 @@ stylebot.style = {
         this.clearInlineCSS(this.cache.elements);
     },
     
+    clearAll: function() {
+        for(var selector in this.rules)
+        {
+            delete this.rules[selector];
+            this.clearInlineCSS($(selector));
+        }
+    },
+    
     // save rules for page
     save: function() {
         stylebot.chrome.save(document.domain, stylebot.style.rules);
