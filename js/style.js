@@ -228,22 +228,33 @@ stylebot.style = {
     // An alternate approach can be to crunchCSS for page everytime a style is edited and update <style>'s html,
     // which maybe more costly
 
-    // this method is called when page's DOM finishes loading.
-    // maybe call this when stylebot is enabled for the first time instead?
+    // this method is called when stylebot is enabled
     initInlineCSS: function() {
         for(var selector in stylebot.style.rules)
-        {
-            stylebot.style.applyInlineCSS($(selector), stylebot.style.getInlineCSS(selector));
-        }
+            stylebot.style.applyInlineCSS( $(selector), stylebot.style.getInlineCSS(selector) );
+        
         $('style[title=stylebot-css]').html('');
     },
     
+    // replace inline CSS with <style> element. called when stylebot is disabled
+    resetInlineCSS: function() {
+        var style = $('style[title=stylebot-css]');
+        
+        if(style.length != 0)
+            style.html(stylebot.style.crunchCSS(true));
+        else
+            stylebot.style.injectCSS(stylebot.style.crunchCSS(true));
+
+        for(var selector in stylebot.style.rules)
+            stylebot.style.clearInlineCSS($(selector));
+    },
+    
     // inject <style> element into page
-    injectCSS: function() {
+    injectCSS: function(css) {
         var d = document.documentElement;
-        var css = stylebot.style.crunchCSS(true);
         var style = document.createElement('style');
         style.type = "text/css";
+        style.title = "stylebot-css";
         style.innerText = css;
         d.insertBefore(style, null);
     }

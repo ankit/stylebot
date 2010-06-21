@@ -39,22 +39,21 @@ stylebot.widget = {
     
     show: function() {
         this.selector = stylebot.selector.value;
-        
         if(!this.ui.cache.box)
             this.create();
 
         this.ui.reset();            // reset all values for controls to default values
         this.ui.fill();             // fill widget with any existing custom styles
-
-        this.ui.cache.box.css('display', 'block');
-
+        
         setTimeout(function() {
             stylebot.widget.ui.cache.accordionHeaders[0].focus();
         }, 0);
+        
+        this.ui.cache.box.show();
     },
     
     hide: function() {
-        this.ui.cache.box.css('display', 'none');
+        this.ui.cache.box.hide();
     },
     
     // calculate where the widget should be displayed w.r.t selected element

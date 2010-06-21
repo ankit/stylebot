@@ -41,7 +41,7 @@ var stylebot = {
     },
     
     initCSS: function() {
-        stylebot.style.load(stylebot.style.initInlineCSS);
+        stylebot.style.load();
     },
     
     // toggle stylebot editing status
@@ -54,9 +54,12 @@ var stylebot = {
     
     enable: function() {
         this.status = true;
-        stylebot.chrome.setIcon(true);
         stylebot.widget.show();
+        stylebot.chrome.setIcon(true);
         stylebot.enableSelectionMode();
+        setTimeout(function() {
+            stylebot.style.initInlineCSS();
+        }, 0);
     },
     
     disable: function() {
@@ -64,14 +67,17 @@ var stylebot = {
         this.unhighlight();
         this.selectedElement = null;
         this.selector.value = null;
+        stylebot.widget.hide();
         stylebot.chrome.setIcon(false);
         stylebot.disableSelectionMode();
-        stylebot.widget.hide();
+        setTimeout(function() {
+           stylebot.style.resetInlineCSS();
+        }, 0);
     },
     
     addListeners: function() {
         // Handle key presses
-        $(document).keyup(function(e) {
+        $(document).keydown(function(e) {
             var eTagName = e.target.tagName.toLowerCase();
             var disabledEl = ['input', 'textarea', 'div', 'object', 'select'];
             if( $.inArray(eTagName, disabledEl) != -1 )
@@ -84,7 +90,6 @@ var stylebot = {
             // Handle Esc key to escape editing mode
             else if(e.keyCode == 27 && stylebot.status && !stylebot.widget.ui.isColorPickerVisible)
                 stylebot.disable();
-
         })
 
         // Handle mouse move event on DOM elements
@@ -132,7 +137,6 @@ var stylebot = {
     
     select: function() {
         stylebot.selectedElement = stylebot.hoveredElement;
-        // stylebot.unhighlight();
         stylebot.disableSelectionMode();
         stylebot.selector.generate(stylebot.selectedElement);
         stylebot.style.fillCache(stylebot.selector.value);
