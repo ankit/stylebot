@@ -33,7 +33,9 @@ chrome.extension.onRequest.addListener(
 	function(request, sender, sendResponse) {
         if(request.name == "toggle")
 		{
-		    stylebot.toggle();
+		    if(window != window.top)
+		        return;
+            stylebot.toggle();
 		    sendResponse({ status:stylebot.status });
 		}
 });

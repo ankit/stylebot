@@ -143,7 +143,6 @@ var stylebot = {
         stylebot.widget.show();
     },
     
-    
     toggleSelectionMode: function() {
         if(stylebot.selectMode)
             stylebot.disableSelectionMode();
