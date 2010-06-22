@@ -631,7 +631,8 @@ stylebot.widget.ui = {
         return $('<button>', {
             class: 'stylebot-button',
             html: text
-        });
+        })
+        .mouseup( function(e) { e.target.focus(); } );
     },
     
     createButtonSet: function(buttons, className,  enabledButtonIndex, callback) {
@@ -654,7 +655,7 @@ stylebot.widget.ui = {
     createSegmentedControl: function(control) {
         var container = $('<span>', {
             class: 'stylebot-control stylebot-segmented-control',
-            id: 'stylebot-' + control.id
+            id: 'stylebot-' + control.id,
         });
         
         var len = control.options.length;

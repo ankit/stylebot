@@ -105,5 +105,6 @@ stylebot.widget.ui.events = {
         }
         else
             stylebot.style.apply(el.data('property'), '');
+        el.focus();
     }
 }

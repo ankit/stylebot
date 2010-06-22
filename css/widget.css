@@ -1,20 +1,20 @@
 /* Main */
 
 #stylebot {
+    border: 1px solid #aaa;
+    border-radius: 3px;
+    background-color: #fdfdfd;
     color: #313131;
     font-family: 'Lucida Grande', Tahoma, Arial, sans-serif;
     font-size: 12px;
     text-transform: none;
-    width: 320px;
     height: auto !important;
     line-height: 12px;
     margin: 0;
     text-align: left;
     position: fixed;
     top: 5%;
-    border: 1px solid #aaa;
-    border-radius: 3px;
-    background-color: #fdfdfd;
+    width: 320px;
     z-index: 10000;
 }
 
@@ -29,6 +29,7 @@
     font-weight: bold;
     display: block;
     overflow: auto;
+    width: auto;
 }
 
 #stylebot-header-text {
@@ -67,6 +68,7 @@
     font-family: inherit;
     font-size: inherit;
     margin: 0;
+    width: 100%;
 }
 
 .stylebot-control-set {
@@ -155,6 +157,7 @@
     top: 1px;
     margin-bottom: 2px;
     zoom: 1;
+    width: auto;
     font-size: 11px;
 }
 
