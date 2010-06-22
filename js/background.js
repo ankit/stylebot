@@ -97,7 +97,7 @@ function getRulesForPage(currUrl) {
     if(rules != undefined)
         return { rules: rules, url: url_for_page };
     else
-        return { rules: null, url: document.domain };
+        return { rules: null, url: null };
 }
 
 window.addEventListener('load', function(){

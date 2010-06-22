@@ -41,7 +41,7 @@ stylebot.widget = {
         this.selector = stylebot.selector.value;
         if(!this.ui.cache.box)
             this.create();
-
+        
         this.ui.reset();            // reset all values for controls to default values
         this.ui.fill();             // fill widget with any existing custom styles
         

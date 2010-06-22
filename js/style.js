@@ -218,7 +218,8 @@ stylebot.style = {
         stylebot.chrome.load(window.location.href, function(response){
             if(response.rules)
                 stylebot.style.rules = response.rules;
-            stylebot.style.cache.url = response.url;
+            if(response.url)
+                stylebot.style.cache.url = response.url;
             if(callback != undefined)
                 callback();
         });
