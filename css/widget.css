@@ -12,9 +12,9 @@
     text-align: left;
     position: fixed;
     top: 5%;
-    border: 1px solid #ccc;
+    border: 1px solid #aaa;
     border-radius: 3px;
-    background-color: #fff;
+    background-color: #fdfdfd;
     z-index: 10000;
 }
 

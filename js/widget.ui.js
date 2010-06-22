@@ -41,7 +41,7 @@ stylebot.widget.ui = {
             id: 'font-style',
             type: 'segmented',
             values: ['italic', 'normal'],
-            options: ['<i>Italic</i>', 'Normal'],
+            options: ['<span style="font-style: italic;">Italic</span>', 'Normal'],
             el: null
         },
         {
@@ -64,7 +64,7 @@ stylebot.widget.ui = {
             name: 'Decoration',
             id: 'text-decoration',
             type: 'segmented',
-            options: ['<u>ab</u>', '<span style="text-decoration: line-through;">ab</span>', '<span style="text-decoration: overline;">ab</span>', 'None'],
+            options: ['<span style="text-decoration: underline;">ab</span>', '<span style="text-decoration: line-through;">ab</span>', '<span style="text-decoration: overline;">ab</span>', 'None'],
             values: ['underline', 'line-through', 'overline', 'none'],
             el: null
 
@@ -735,7 +735,9 @@ stylebot.widget.ui = {
 
                 case 'segmented'        :   var index = $.inArray( $.trim( String(pValue) ), control.values);
                                             if(index != -1)
-                                                $(control.el.find('button')[index]).addClass('stylebot-active-button');
+                                                $(control.el.find('button')[index])
+                                                .addClass('stylebot-active-button')
+                                                .next().css('border-left-width', '0px');
             }
         }
     },
@@ -769,7 +771,9 @@ stylebot.widget.ui = {
         this.cache.colorSelectorColor.css('backgroundColor', '#fff');
         this.cache.toggleButtons.removeClass('stylebot-active-button');
         this.cache.fontFamilyInput.hide();
-        this.cache.segmentedControls.find('button').removeClass('stylebot-active-button');
+        this.cache.segmentedControls.find('.stylebot-active-button')
+        .removeClass('stylebot-active-button')
+        .next().css('border-left-width', '1px');
     },
     
     togglePosition: function(e) {

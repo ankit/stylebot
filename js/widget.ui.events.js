@@ -90,13 +90,17 @@ stylebot.widget.ui.events = {
         var el = $(e.target);
         if(el[0].tagName != 'BUTTON')
             el = el.parent('button');
-        
+
+        // TODO: Try to implement the next element's border width using CSS
         var control = el.parent();
         var status = el.hasClass('stylebot-active-button');
-        control.find('button').removeClass('stylebot-active-button');
+        control.find('.stylebot-active-button')
+        .removeClass('stylebot-active-button')
+        .next().css('border-left-width', '1px');
         if(!status)
         {
             el.addClass('stylebot-active-button');
+            el.next().css('border-left-width', '0px');
             stylebot.style.apply(el.data('property'), el.data('value'));
         }
         else
