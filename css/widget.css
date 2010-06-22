@@ -5,6 +5,7 @@
     border-radius: 3px;
     background-color: #fdfdfd;
     color: #313131;
+    display: none;
     font-family: 'Lucida Grande', Tahoma, Arial, sans-serif;
     font-size: 12px;
     text-transform: none;

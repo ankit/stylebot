@@ -49,7 +49,7 @@ stylebot.widget = {
             stylebot.widget.ui.cache.accordionHeaders[0].focus();
         }, 0);
         
-        this.ui.cache.box.show();
+        stylebot.widget.ui.cache.box.show();
     },
     
     hide: function() {

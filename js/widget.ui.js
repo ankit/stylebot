@@ -216,7 +216,7 @@ stylebot.widget.ui = {
             id: 'stylebot-widget-options'
         });
         
-        this.createLabel('For pages matching URL').appendTo(options_div);
+        this.createLabel('Apply to pages matching URL').appendTo(options_div);
         var url_container = $('<span>', {
             html: stylebot.style.cache.url,
             class: 'stylebot-editable-text',
@@ -293,7 +293,7 @@ stylebot.widget.ui = {
         // controls
         this.cache.controls = $('.stylebot-control');
         // textfields
-        this.cache.textfields = $('.stylebot-textfield .stylebot-control');
+        this.cache.textfields = $('.stylebot-textfield');
         // checkboxes
         this.cache.checkboxes = $('.stylebot-checkbox');
         // radios
