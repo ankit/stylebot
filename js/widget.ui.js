@@ -211,6 +211,9 @@ stylebot.widget.ui = {
         
         controls_ui.appendTo(this.cache.box);
         
+        // advanced ui
+        stylebot.widget.advanced.create();
+        
         // creating options in widget
         var options_div = $('<div>', {
             id: 'stylebot-widget-options'
@@ -227,6 +230,11 @@ stylebot.widget.ui = {
         stylebot.utils.makeEditable(url_container, function(value) {
             stylebot.style.cache.url = value;
         });
+        
+        $('<br><br>').appendTo(options_div);
+        
+        this.createLabel('Mode').appendTo(options_div);
+        this.createButtonSet(['Basic', 'Advanced'], "stylebot-mode", 0, stylebot.widget.ui.toggleMode).appendTo(options_div);
         
         $('<br><br>').appendTo(options_div);
         
@@ -777,9 +785,28 @@ stylebot.widget.ui = {
         .next().css('border-left-width', '1px');
     },
     
+    // show UI for basic mode
+    showBasic: function() {
+        this.reset();            // reset all values for controls to default values
+        this.fill();             // fill widget with any existing custom styles
+        $('#stylebot-controls').show();
+    },
+    
+    // hide UI for basic mode
+    hideBasic: function() {
+        $('#stylebot-controls').hide();
+    },
+    
     togglePosition: function(e) {
         var el = $(e.target);
         stylebot.widget.setPosition(el.html());
+        $("." + el.data('class')).removeClass('stylebot-active-button');
+        el.addClass('stylebot-active-button');
+    },
+    
+    toggleMode: function(e) {
+        var el = $(e.target);
+        stylebot.widget.setMode(el.html());
         $("." + el.data('class')).removeClass('stylebot-active-button');
         el.addClass('stylebot-active-button');
     }

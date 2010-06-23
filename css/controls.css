@@ -67,7 +67,7 @@ input[type=text].stylebot-textfield, .stylebot-textarea {
 
 .stylebot-textarea {
     resize: none;
-    padding: 4px;
+    padding: 4px !important;
     padding-right: 6px;
 }
 

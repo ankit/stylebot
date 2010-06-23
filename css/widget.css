@@ -212,3 +212,18 @@ a.stylebot-accordion-active:focus {
 a.stylebot-accordion-active .stylebot-accordion-icon {
     background-position: -4px 1px;
 }
+
+/* UI for Advanced Mode */
+#stylebot-advanced {
+    display: none;
+    margin-top: 20px;
+}
+
+#stylebot-advanced .stylebot-textarea {
+    height: 200px;
+    width: 300px;
+}
+
+#stylebot-advanced div {
+    margin: 6px;
+}

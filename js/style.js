@@ -42,6 +42,27 @@ stylebot.style = {
         this.applyInlineCSS(this.cache.elements, this.getInlineCSS(this.cache.selector));
     },
     
+    // parse CSS into rules and add them to cache
+    saveRulesFromCSS: function(css) {
+        if(!this.cache.selector)
+            return true;
+
+        // empty rules cache
+        delete this.rules[this.cache.selector];
+        
+        // parse css into property value pairs
+        // TODO: Implement better parsing. Currently parsing is very strict ( e.g. ; is essential)
+        var rules = css.split(';');
+        var len = rules.length;
+        for(var i=0; i<len; i++)
+        {
+            var pair = rules[i].split(':');
+            var property = $.trim(pair[0]);
+            var value = $.trim(pair[1]);
+            this.saveRule(this.cache.selector, property, value);
+        }
+    },
+    
     // add/update rule to CSS rules cache
     saveRule: function(selector, property, value) {
         // check if the selector already exists in the list
@@ -111,6 +132,8 @@ stylebot.style = {
     
     // apply inline CSS to selected element(s)
     applyInlineCSS: function(el, newCustomCSS) {
+        if(!el)
+            el = this.cache.elements;
         if(el.length == 0) return false;
         
         el.each( function() {
@@ -183,6 +206,15 @@ stylebot.style = {
                 
             css += "}" + "\n\n";
         }
+        return css;
+    },
+    
+    crunchCSSForSelector: function(selector, setImportant) {
+        var css = "";
+
+        for(var property in this.rules[selector])
+            css += this.getCSSDeclaration(property, this.rules[selector][property], setImportant) + "\n";
+        
         return css;
     },
     

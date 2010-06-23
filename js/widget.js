@@ -68,7 +68,20 @@ stylebot.widget = {
 
         this.ui.cache.box.css('left', left);
     },
-        
+    
+    setMode: function(mode) {
+        if(mode == 'Advanced')
+        {
+            stylebot.widget.ui.hideBasic();
+            stylebot.widget.advanced.show();
+        }
+        else
+        {
+            stylebot.widget.advanced.hide();
+            stylebot.widget.ui.showBasic();
+        }
+    },
+    
     save: function(e) {
         stylebot.style.save();
     },
