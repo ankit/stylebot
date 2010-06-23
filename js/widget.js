@@ -98,7 +98,7 @@ stylebot.widget = {
     // reset css for current selector
     resetCSS: function(e) {
         stylebot.widget.ui.reset();
-        stylebot.advanced.reset();
+        stylebot.widget.advanced.reset();
         // clear any custom styles for currently selected element
         stylebot.style.clear();
     },
@@ -106,7 +106,7 @@ stylebot.widget = {
     // reset all CSS for page
     resetAllCSS: function(e) {
         stylebot.widget.ui.reset();
-        stylebot.advanced.reset();
+        stylebot.widget.advanced.reset();
         stylebot.style.clearAll();
     },
     
