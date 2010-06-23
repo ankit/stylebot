@@ -46,7 +46,7 @@ stylebot.style = {
     saveRulesFromCSS: function(css) {
         if(!this.cache.selector)
             return true;
-
+        
         // empty rules cache
         delete this.rules[this.cache.selector];
         
@@ -242,6 +242,7 @@ stylebot.style = {
     
     // save rules for page
     save: function() {
+        stylebot.widget.updateRuleCache();
         stylebot.chrome.save(stylebot.style.cache.url, stylebot.style.rules);
     },
     
@@ -292,5 +293,11 @@ stylebot.style = {
         style.title = "stylebot-css";
         style.innerText = css;
         d.insertBefore(style, null);
+    },
+    
+    reset: function() {
+        this.resetInlineCSS();
+        this.cache.selector = null;
+        this.cache.elements = null;
     }
 }

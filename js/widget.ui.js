@@ -1,7 +1,7 @@
 /**
   * stylebot.widget.ui
   * 
-  * UI for Stylebot Widget
+  * UI for Stylebot Widget (Basic Mode)
   **/
   
 stylebot.widget.ui = {
@@ -756,7 +756,7 @@ stylebot.widget.ui = {
         // fill controls
         var len = this.groups.length;
         var rule = stylebot.style.getRule(stylebot.selector.value);
-        
+
         if(rule)
         {
             for(var i=0; i<len; i++)
@@ -766,9 +766,6 @@ stylebot.widget.ui = {
                     this.fillControl(this.groups[i].controls[j], rule);
             }
         }
-        
-        // set widget title
-        this.cache.header.html(stylebot.selector.value ? stylebot.selector.value : "Select an element");
     },
     
     // reset values to default for all controls
@@ -789,11 +786,15 @@ stylebot.widget.ui = {
     showBasic: function() {
         this.reset();            // reset all values for controls to default values
         this.fill();             // fill widget with any existing custom styles
+        setTimeout(function() {
+            stylebot.widget.ui.cache.accordionHeaders[0].focus();
+        }, 0);
         $('#stylebot-controls').show();
     },
     
     // hide UI for basic mode
     hideBasic: function() {
+        this.updateRuleCache();
         $('#stylebot-controls').hide();
     },
     
@@ -809,5 +810,9 @@ stylebot.widget.ui = {
         stylebot.widget.setMode(el.html());
         $("." + el.data('class')).removeClass('stylebot-active-button');
         el.addClass('stylebot-active-button');
+    },
+    
+    updateRuleCache: function() {
+        // stub for now
     }
 }

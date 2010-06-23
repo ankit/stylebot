@@ -1,3 +1,9 @@
+/**
+  * stylebot.widget.advanced
+  * 
+  * Stylebot Advanced Mode
+  **/
+
 stylebot.widget.advanced = {
     
     cache: {
@@ -9,7 +15,7 @@ stylebot.widget.advanced = {
             id: 'stylebot-advanced'
         });
         $('<div>', {
-            html: "Custom CSS"
+            html: "Custom CSS:"
         })
         .appendTo(ui);
         
@@ -24,7 +30,8 @@ stylebot.widget.advanced = {
     },
     
     fill: function() {
-        this.cache.cssField.html( stylebot.style.crunchCSSForSelector(stylebot.selector.value, false) );
+        var css = stylebot.style.crunchCSSForSelector(stylebot.selector.value, false);
+        this.cache.cssField.html( css ).attr('value', css);
     },
     
     show: function() {
@@ -38,6 +45,14 @@ stylebot.widget.advanced = {
     
     hide: function() {
         $('#stylebot-advanced').hide();
+        stylebot.widget.advanced.updateRuleCache();
+    },
+    
+    reset: function() {
+        this.cache.cssField.html('');
+    },
+    
+    updateRuleCache: function() {
         stylebot.style.saveRulesFromCSS( stylebot.widget.advanced.cache.cssField.attr('value') );
     }
 }

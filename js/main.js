@@ -54,25 +54,22 @@ var stylebot = {
     
     enable: function() {
         this.status = true;
-        stylebot.widget.show();
-        stylebot.chrome.setIcon(true);
-        stylebot.enableSelectionMode();
-        setTimeout(function() {
-            stylebot.style.initInlineCSS();
-        }, 0);
+        this.widget.show();
+        this.chrome.setIcon(true);
+        this.enableSelectionMode();
+        this.style.initInlineCSS();
     },
     
     disable: function() {
-        this.status = false;
+        this.widget.updateRuleCache();
+        this.widget.hide();
+        this.style.reset();
+        this.disableSelectionMode();
         this.unhighlight();
+        this.chrome.setIcon(false);
+        this.status = false;
         this.selectedElement = null;
         this.selector.value = null;
-        stylebot.widget.hide();
-        stylebot.chrome.setIcon(false);
-        stylebot.disableSelectionMode();
-        setTimeout(function() {
-           stylebot.style.resetInlineCSS();
-        }, 0);
     },
     
     addListeners: function() {
@@ -136,8 +133,9 @@ var stylebot = {
     },
     
     select: function() {
-        stylebot.selectedElement = stylebot.hoveredElement;
         stylebot.disableSelectionMode();
+        stylebot.widget.updateRuleCache();
+        stylebot.selectedElement = stylebot.hoveredElement;
         stylebot.selector.generate(stylebot.selectedElement);
         stylebot.style.fillCache(stylebot.selector.value);
         stylebot.widget.show();

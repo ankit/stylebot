@@ -10,6 +10,8 @@ stylebot.widget = {
     
     isBeingDragged: false,
     
+    mode: 'Basic',
+    
     create: function() {
         this.ui.createBox();
         this.addListeners();
@@ -42,13 +44,13 @@ stylebot.widget = {
         if(!this.ui.cache.box)
             this.create();
         
-        this.ui.reset();            // reset all values for controls to default values
-        this.ui.fill();             // fill widget with any existing custom styles
+        if(this.mode == "Basic")
+            this.ui.showBasic();
+        else
+            this.advanced.show();
         
-        setTimeout(function() {
-            stylebot.widget.ui.cache.accordionHeaders[0].focus();
-        }, 0);
-        
+        // set widget title
+        this.ui.cache.header.html(stylebot.selector.value ? stylebot.selector.value : "Select an element");
         stylebot.widget.ui.cache.box.show();
     },
     
@@ -70,6 +72,7 @@ stylebot.widget = {
     },
     
     setMode: function(mode) {
+        stylebot.widget.mode = mode;
         if(mode == 'Advanced')
         {
             stylebot.widget.ui.hideBasic();
@@ -95,6 +98,7 @@ stylebot.widget = {
     // reset css for current selector
     resetCSS: function(e) {
         stylebot.widget.ui.reset();
+        stylebot.advanced.reset();
         // clear any custom styles for currently selected element
         stylebot.style.clear();
     },
@@ -102,6 +106,14 @@ stylebot.widget = {
     // reset all CSS for page
     resetAllCSS: function(e) {
         stylebot.widget.ui.reset();
+        stylebot.advanced.reset();
         stylebot.style.clearAll();
+    },
+    
+    updateRuleCache: function(e) {
+        if(stylebot.widget.mode == "Basic")
+            stylebot.widget.ui.updateRuleCache();
+        else
+            stylebot.widget.advanced.updateRuleCache();
     }
 }
