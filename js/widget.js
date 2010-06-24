@@ -10,6 +10,8 @@ stylebot.widget = {
     
     isBeingDragged: false,
     
+    mode: 'Basic',
+    
     create: function() {
         this.ui.createBox();
         this.addListeners();
@@ -42,13 +44,13 @@ stylebot.widget = {
         if(!this.ui.cache.box)
             this.create();
         
-        this.ui.reset();            // reset all values for controls to default values
-        this.ui.fill();             // fill widget with any existing custom styles
+        if(this.mode == "Basic")
+            this.ui.show();
+        else
+            this.advanced.show();
         
-        setTimeout(function() {
-            stylebot.widget.ui.cache.accordionHeaders[0].focus();
-        }, 0);
-        
+        // set widget title
+        this.ui.cache.header.html(stylebot.selector.value ? stylebot.selector.value : "Select an element");
         stylebot.widget.ui.cache.box.show();
     },
     
@@ -68,20 +70,38 @@ stylebot.widget = {
 
         this.ui.cache.box.css('left', left);
     },
-        
+    
+    setMode: function(mode) {
+        stylebot.widget.mode = mode;
+        if(mode == 'Advanced')
+        {
+            stylebot.widget.ui.hide();
+            stylebot.widget.advanced.show();
+        }
+        else
+        {
+            stylebot.widget.advanced.updateRuleCache();
+            stylebot.widget.advanced.hide();
+            stylebot.widget.ui.show();
+        }
+    },
+    
     save: function(e) {
+        stylebot.widget.updateRuleCache();
         stylebot.style.save();
     },
     
+    // display CSS for page in a modal box
     viewCSS: function(e) {
         stylebot.modal.show(stylebot.style.crunchCSS(), {
             onClose: function() { e.target.focus(); }
         });
     },
     
-    // reset css for current selector
+    // reset CSS for current selector
     resetCSS: function(e) {
         stylebot.widget.ui.reset();
+        stylebot.widget.advanced.reset();
         // clear any custom styles for currently selected element
         stylebot.style.clear();
     },
@@ -89,6 +109,26 @@ stylebot.widget = {
     // reset all CSS for page
     resetAllCSS: function(e) {
         stylebot.widget.ui.reset();
+        stylebot.widget.advanced.reset();
         stylebot.style.clearAll();
+    },
+    
+    togglePosition: function(e) {
+        var el = $(e.target);
+        stylebot.widget.setPosition( el.html() );
+        $("." + el.data('class')).removeClass('stylebot-active-button');
+        el.addClass('stylebot-active-button');
+    },
+    
+    toggleMode: function(e) {
+        var el = $(e.target);
+        stylebot.widget.setMode( el.html() );
+        $("." + el.data('class')).removeClass('stylebot-active-button');
+        el.addClass('stylebot-active-button');
+    },
+    
+    updateRuleCache: function(e) {
+        if(stylebot.widget.mode == "Advanced")
+            stylebot.widget.advanced.updateRuleCache();
     }
 }

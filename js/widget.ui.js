@@ -1,7 +1,7 @@
 /**
   * stylebot.widget.ui
   * 
-  * UI for Stylebot Widget
+  * Basic Mode UI for Stylebot Widget
   **/
   
 stylebot.widget.ui = {
@@ -226,13 +226,21 @@ stylebot.widget.ui = {
         
         controls_ui.appendTo(this.cache.box);
         
+        // advanced ui
+        stylebot.widget.advanced.create();
+        
         // creating options in widget
         var options_div = $('<div>', {
             id: 'stylebot-widget-options'
         });
         
+        this.createLabel('Mode').appendTo(options_div);
+        this.createButtonSet(['Basic', 'Advanced'], "stylebot-mode", 0, stylebot.widget.toggleMode).appendTo(options_div);
+        
+        $('<br><br>').appendTo(options_div);
+        
         this.createLabel('Widget position').appendTo(options_div);
-        this.createButtonSet(['Left', 'Right'], "stylebot-position", 1, stylebot.widget.ui.togglePosition).appendTo(options_div);
+        this.createButtonSet(['Left', 'Right'], "stylebot-position", 1, stylebot.widget.togglePosition).appendTo(options_div);
         
         options_div.appendTo(this.cache.box);
         
@@ -709,7 +717,7 @@ stylebot.widget.ui = {
                                             }
                                             else
                                             {
-                                                control.el.find('select').attr('selectedIndex', control.options.length+1);
+                                                control.el.find('select').attr('selectedIndex', control.options.length + 1);
                                                 input.show();
                                             }
                                             break;
@@ -749,7 +757,7 @@ stylebot.widget.ui = {
         // fill controls
         var len = this.groups.length;
         var rule = stylebot.style.getRule(stylebot.selector.value);
-        
+
         if(rule)
         {
             for(var i=0; i<len; i++)
@@ -759,9 +767,6 @@ stylebot.widget.ui = {
                     this.fillControl(this.groups[i].controls[j], rule);
             }
         }
-        
-        // set widget title
-        this.cache.header.html(stylebot.selector.value ? stylebot.selector.value : "Select an element");
     },
     
     // reset values to default for all controls
@@ -778,10 +783,24 @@ stylebot.widget.ui = {
         .next().css('border-left-width', '1px');
     },
     
-    togglePosition: function(e) {
-        var el = $(e.target);
-        stylebot.widget.setPosition(el.html());
-        $("." + el.data('class')).removeClass('stylebot-active-button');
-        el.addClass('stylebot-active-button');
+    // show UI for basic mode
+    show: function() {
+        this.reset();            // reset all values for controls to default values
+        this.fill();             // fill widget with any existing custom styles
+        
+        setTimeout(function() {
+            stylebot.widget.ui.cache.accordionHeaders[0].focus();
+        }, 0);
+        
+        $('#stylebot-controls').show();
+    },
+    
+    // hide UI for basic mode
+    hide: function() {
+        $('#stylebot-controls').hide();
+    },
+
+    updateRuleCache: function() {
+        // stub for now
     }
 }

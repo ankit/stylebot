@@ -34,6 +34,7 @@
 			"js/widget.js",
 			"js/widget.ui.js",
 			"js/widget.ui.events.js",
+			"js/widget.advanced.js",
 			"js/selector.js",
 			"js/style.js",
 			"js/modal.js",
