@@ -45,7 +45,7 @@ stylebot.widget = {
             this.create();
         
         if(this.mode == "Basic")
-            this.ui.showBasic();
+            this.ui.show();
         else
             this.advanced.show();
         
@@ -75,14 +75,14 @@ stylebot.widget = {
         stylebot.widget.mode = mode;
         if(mode == 'Advanced')
         {
-            stylebot.widget.ui.hideBasic();
+            stylebot.widget.ui.hide();
             stylebot.widget.advanced.show();
         }
         else
         {
             stylebot.widget.advanced.updateRuleCache();
             stylebot.widget.advanced.hide();
-            stylebot.widget.ui.showBasic();
+            stylebot.widget.ui.show();
         }
     },
     
@@ -91,13 +91,14 @@ stylebot.widget = {
         stylebot.style.save();
     },
     
+    // display CSS for page in a modal box
     viewCSS: function(e) {
         stylebot.modal.show(stylebot.style.crunchCSS(), {
             onClose: function() { e.target.focus(); }
         });
     },
     
-    // reset css for current selector
+    // reset CSS for current selector
     resetCSS: function(e) {
         stylebot.widget.ui.reset();
         stylebot.widget.advanced.reset();

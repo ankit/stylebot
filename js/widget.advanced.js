@@ -29,6 +29,10 @@ stylebot.widget.advanced = {
         ui.appendTo(stylebot.widget.ui.cache.box);
     },
     
+    onKeyUp: function(e) {
+        stylebot.style.applyInlineCSS( null, stylebot.widget.advanced.cache.cssField.attr('value') );
+    },
+    
     fill: function() {
         this.reset();
         this.cache.cssField.html( stylebot.style.crunchCSSForSelector(stylebot.selector.value, false) );
@@ -37,10 +41,6 @@ stylebot.widget.advanced = {
     show: function() {
         $('#stylebot-advanced').show();
         this.fill();
-    },
-    
-    onKeyUp: function(e) {
-        stylebot.style.applyInlineCSS( null, stylebot.widget.advanced.cache.cssField.attr('value') );
     },
     
     hide: function() {

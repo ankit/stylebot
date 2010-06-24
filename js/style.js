@@ -33,7 +33,7 @@ stylebot.style = {
         }
     },
     
-    // apply a new style to selected elements
+    // apply a new rule to selected elements
     apply: function(property, value) {
         if(!this.cache.selector)
             return true;
@@ -116,7 +116,7 @@ stylebot.style = {
         return true;
     },
     
-    // generate inline CSS
+    // generate inline CSS for selector
     getInlineCSS: function(selector) {
         var rule = this.rules[selector];
         if(rule != undefined)
@@ -185,7 +185,34 @@ stylebot.style = {
         });
     },
     
-    // get all the custom CSS rule set for the selector in cache
+    // This applies all rules for page as inline CSS to elements and clears the stylebot <style> element. This is done
+    // because when an element's styles are edited, they are applied as inline CSS.
+    
+    // An alternate approach can be to crunchCSS for page everytime a style is edited and update <style>'s html,
+    // which maybe more costly
+    
+    // this method is called when stylebot is enabled
+    initInlineCSS: function() {
+        for(var selector in stylebot.style.rules)
+            stylebot.style.applyInlineCSS( $(selector), stylebot.style.getInlineCSS(selector) );
+        
+        $('style[title=stylebot-css]').html('');
+    },
+    
+    // replace inline CSS with <style> element. called when stylebot is disabled
+    resetInlineCSS: function() {
+        var style = $('style[title=stylebot-css]');
+        
+        if(style.length != 0)
+            style.html(stylebot.style.crunchCSS(true));
+        else
+            stylebot.style.injectCSS(stylebot.style.crunchCSS(true));
+
+        for(var selector in stylebot.style.rules)
+            stylebot.style.clearInlineCSS($(selector));
+    },
+    
+    // get all the custom CSS rules set for the selector in cache
     getRule: function(selector) {
         var rule = this.rules[selector];
         if(rule != undefined)
@@ -194,7 +221,7 @@ stylebot.style = {
             return null;
     },
     
-    // generate CSS for all the rules in cache
+    // generate formatted CSS for all the rules in cache
     crunchCSS: function(setImportant) {
         var css = "";
 
@@ -209,6 +236,7 @@ stylebot.style = {
         return css;
     },
     
+    // generate formatted CSS for selector
     crunchCSSForSelector: function(selector, setImportant) {
         var css = "";
 
@@ -257,31 +285,10 @@ stylebot.style = {
         });
     },
     
-    // This applies all rules for page as inline CSS to elements and clears the stylebot <style> element. This is done
-    // because when an element's styles are edited, they are applied as inline CSS.
-    
-    // An alternate approach can be to crunchCSS for page everytime a style is edited and update <style>'s html,
-    // which maybe more costly
-
-    // this method is called when stylebot is enabled
-    initInlineCSS: function() {
-        for(var selector in stylebot.style.rules)
-            stylebot.style.applyInlineCSS( $(selector), stylebot.style.getInlineCSS(selector) );
-        
-        $('style[title=stylebot-css]').html('');
-    },
-    
-    // replace inline CSS with <style> element. called when stylebot is disabled
-    resetInlineCSS: function() {
-        var style = $('style[title=stylebot-css]');
-        
-        if(style.length != 0)
-            style.html(stylebot.style.crunchCSS(true));
-        else
-            stylebot.style.injectCSS(stylebot.style.crunchCSS(true));
-
-        for(var selector in stylebot.style.rules)
-            stylebot.style.clearInlineCSS($(selector));
+    reset: function() {
+        this.resetInlineCSS();
+        this.cache.selector = null;
+        this.cache.elements = null;
     },
     
     // inject <style> element into page
@@ -292,11 +299,5 @@ stylebot.style = {
         style.title = "stylebot-css";
         style.innerText = css;
         d.insertBefore(style, null);
-    },
-    
-    reset: function() {
-        this.resetInlineCSS();
-        this.cache.selector = null;
-        this.cache.elements = null;
     }
 }

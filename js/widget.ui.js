@@ -1,7 +1,7 @@
 /**
   * stylebot.widget.ui
   * 
-  * UI for Stylebot Widget (Basic Mode)
+  * Basic Mode UI for Stylebot Widget
   **/
   
 stylebot.widget.ui = {
@@ -716,7 +716,7 @@ stylebot.widget.ui = {
                                             }
                                             else
                                             {
-                                                control.el.find('select').attr('selectedIndex', control.options.length+1);
+                                                control.el.find('select').attr('selectedIndex', control.options.length + 1);
                                                 input.show();
                                             }
                                             break;
@@ -783,17 +783,19 @@ stylebot.widget.ui = {
     },
     
     // show UI for basic mode
-    showBasic: function() {
+    show: function() {
         this.reset();            // reset all values for controls to default values
         this.fill();             // fill widget with any existing custom styles
+        
         setTimeout(function() {
             stylebot.widget.ui.cache.accordionHeaders[0].focus();
         }, 0);
+        
         $('#stylebot-controls').show();
     },
     
     // hide UI for basic mode
-    hideBasic: function() {
+    hide: function() {
         $('#stylebot-controls').hide();
     },
 

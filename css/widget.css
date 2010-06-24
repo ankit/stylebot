@@ -214,6 +214,7 @@ a.stylebot-accordion-active .stylebot-accordion-icon {
 }
 
 /* UI for Advanced Mode */
+
 #stylebot-advanced {
     display: none;
     margin-top: 20px;
@@ -221,7 +222,7 @@ a.stylebot-accordion-active .stylebot-accordion-icon {
 
 #stylebot-advanced .stylebot-textarea {
     height: 200px;
-    width: 300px;
+    width: 298px;
 }
 
 #stylebot-advanced div {
