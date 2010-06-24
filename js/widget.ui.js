@@ -170,7 +170,8 @@ stylebot.widget.ui = {
         
         
         this.cache.header = $('<div>', {
-            id: 'stylebot-header-text',
+            id: 'stylebot-header-selector',
+            class: 'stylebot-editable-text',
             html: 'custom styles'
         });
         
@@ -181,11 +182,25 @@ stylebot.widget.ui = {
             stylebot.toggleSelectionMode();
         });
         
+        var url_container = $('<span>', {
+            id: 'stylebot-header-url'
+        });
+        
+        var url = $('<span>', {
+            html: stylebot.style.cache.url,
+            class: 'stylebot-editable-text'
+        }).appendTo(url_container);
+        
+        stylebot.utils.makeEditable(url, function(value) {
+            stylebot.style.cache.url = value;
+        });
+        
         $('<div>', {
             id: 'stylebot-header'
         })
         .append(this.cache.header)
         .append(this.cache.headerSelectIcon)
+        .append(url_container)
         .appendTo(this.cache.box);
         
         var controls_ui = $('<div>', {
@@ -215,20 +230,6 @@ stylebot.widget.ui = {
         var options_div = $('<div>', {
             id: 'stylebot-widget-options'
         });
-        
-        this.createLabel('Apply to pages matching URL').appendTo(options_div);
-        var url_container = $('<span>', {
-            html: stylebot.style.cache.url,
-            class: 'stylebot-editable-text',
-            style: 'margin-left: 5px; font-weight: bold;'
-        })
-        .appendTo(options_div);
-        
-        stylebot.utils.makeEditable(url_container, function(value) {
-            stylebot.style.cache.url = value;
-        });
-        
-        $('<br><br>').appendTo(options_div);
         
         this.createLabel('Widget position').appendTo(options_div);
         this.createButtonSet(['Left', 'Right'], "stylebot-position", 1, stylebot.widget.ui.togglePosition).appendTo(options_div);
