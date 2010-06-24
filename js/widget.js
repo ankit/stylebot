@@ -80,12 +80,14 @@ stylebot.widget = {
         }
         else
         {
+            stylebot.widget.advanced.updateRuleCache();
             stylebot.widget.advanced.hide();
             stylebot.widget.ui.showBasic();
         }
     },
     
     save: function(e) {
+        stylebot.widget.updateRuleCache();
         stylebot.style.save();
     },
     
@@ -110,10 +112,22 @@ stylebot.widget = {
         stylebot.style.clearAll();
     },
     
+    togglePosition: function(e) {
+        var el = $(e.target);
+        stylebot.widget.setPosition( el.html() );
+        $("." + el.data('class')).removeClass('stylebot-active-button');
+        el.addClass('stylebot-active-button');
+    },
+    
+    toggleMode: function(e) {
+        var el = $(e.target);
+        stylebot.widget.setMode( el.html() );
+        $("." + el.data('class')).removeClass('stylebot-active-button');
+        el.addClass('stylebot-active-button');
+    },
+    
     updateRuleCache: function(e) {
-        if(stylebot.widget.mode == "Basic")
-            stylebot.widget.ui.updateRuleCache();
-        else
+        if(stylebot.widget.mode == "Advanced")
             stylebot.widget.advanced.updateRuleCache();
     }
 }

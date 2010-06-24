@@ -242,7 +242,6 @@ stylebot.style = {
     
     // save rules for page
     save: function() {
-        stylebot.widget.updateRuleCache();
         stylebot.chrome.save(stylebot.style.cache.url, stylebot.style.rules);
     },
     

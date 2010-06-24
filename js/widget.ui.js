@@ -234,12 +234,12 @@ stylebot.widget.ui = {
         $('<br><br>').appendTo(options_div);
         
         this.createLabel('Mode').appendTo(options_div);
-        this.createButtonSet(['Basic', 'Advanced'], "stylebot-mode", 0, stylebot.widget.ui.toggleMode).appendTo(options_div);
+        this.createButtonSet(['Basic', 'Advanced'], "stylebot-mode", 0, stylebot.widget.toggleMode).appendTo(options_div);
         
         $('<br><br>').appendTo(options_div);
         
         this.createLabel('Widget position').appendTo(options_div);
-        this.createButtonSet(['Left', 'Right'], "stylebot-position", 1, stylebot.widget.ui.togglePosition).appendTo(options_div);
+        this.createButtonSet(['Left', 'Right'], "stylebot-position", 1, stylebot.widget.togglePosition).appendTo(options_div);
         
         options_div.appendTo(this.cache.box);
         
@@ -794,24 +794,9 @@ stylebot.widget.ui = {
     
     // hide UI for basic mode
     hideBasic: function() {
-        this.updateRuleCache();
         $('#stylebot-controls').hide();
     },
-    
-    togglePosition: function(e) {
-        var el = $(e.target);
-        stylebot.widget.setPosition(el.html());
-        $("." + el.data('class')).removeClass('stylebot-active-button');
-        el.addClass('stylebot-active-button');
-    },
-    
-    toggleMode: function(e) {
-        var el = $(e.target);
-        stylebot.widget.setMode(el.html());
-        $("." + el.data('class')).removeClass('stylebot-active-button');
-        el.addClass('stylebot-active-button');
-    },
-    
+
     updateRuleCache: function() {
         // stub for now
     }

@@ -53,21 +53,21 @@ var stylebot = {
     },
     
     enable: function() {
-        this.status = true;
         this.widget.show();
+        this.status = true;
         this.chrome.setIcon(true);
         this.enableSelectionMode();
         this.style.initInlineCSS();
     },
     
     disable: function() {
-        this.widget.updateRuleCache();
         this.widget.hide();
+        this.status = false;
+        this.chrome.setIcon(false);
+        this.widget.updateRuleCache();
         this.style.reset();
         this.disableSelectionMode();
         this.unhighlight();
-        this.chrome.setIcon(false);
-        this.status = false;
         this.selectedElement = null;
         this.selector.value = null;
     },
