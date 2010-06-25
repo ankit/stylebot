@@ -7,26 +7,27 @@
 stylebot.widget.advanced = {
     
     cache: {
-        cssField: null
+        cssField: null,
+        container: null
     },
     
     create: function() {
-        var ui = $('<div>', {
+        this.cache.container = $('<div>', {
             id: 'stylebot-advanced'
         });
         $('<div>', {
             html: "Custom CSS:"
         })
-        .appendTo(ui);
+        .appendTo(this.cache.container);
         
         this.cache.cssField = $('<textarea>', {
             id: 'stylebot-advanced-css',
             class: 'stylebot-textarea stylebot-control stylebot-css-code'
         })
         .keyup(stylebot.widget.advanced.onKeyUp)
-        .appendTo(ui);
+        .appendTo(this.cache.container);
         
-        ui.appendTo(stylebot.widget.ui.cache.box);
+        this.cache.container.appendTo(stylebot.widget.ui.cache.box);
     },
     
     onKeyUp: function(e) {
@@ -41,12 +42,21 @@ stylebot.widget.advanced = {
     },
     
     show: function() {
-        $('#stylebot-advanced').show();
         this.fill();
+        this.setHeight();
+        this.cache.container.show();
     },
     
     hide: function() {
-        $('#stylebot-advanced').hide();
+        this.cache.container.hide();
+    },
+    
+    setHeight: function() {
+        stylebot.widget.setHeight();
+        var height = window.innerHeight - 275;
+        // if( height < 0 )
+        //     height = 10;
+        this.cache.cssField.css('height', height);
     },
 
     // called when mode is toggled, editing is disabled or when an element is selected

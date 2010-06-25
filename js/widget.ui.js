@@ -150,6 +150,7 @@ stylebot.widget.ui = {
         box: null,
         header: null,
         headerSelectIcon: null,
+        container: null,
         controls: null,
         textfields: null,
         checkboxes: null,
@@ -203,7 +204,7 @@ stylebot.widget.ui = {
         .append(url_container)
         .appendTo(this.cache.box);
         
-        var controls_ui = $('<div>', {
+        this.cache.container = $('<div>', {
             id: 'stylebot-controls'
         });
         
@@ -212,19 +213,19 @@ stylebot.widget.ui = {
         
         for(var i=0; i<len; i++)
         {
-            this.createAccordionHeader(this.groups[i].name).appendTo(controls_ui);
+            this.createAccordionHeader(this.groups[i].name).appendTo(this.cache.container);
             
             var group = $('<div>', {
                 class: 'stylebot-accordion'
             })
-            .appendTo(controls_ui);
+            .appendTo(this.cache.container);
 
             var len2 = this.groups[i].controls.length;
             for(var j=0; j<len2; j++)
                 this.createControl(this.groups[i].controls[j]).appendTo(group);
         }
         
-        controls_ui.appendTo(this.cache.box);
+        this.cache.container.appendTo(this.cache.box);
         
         // advanced ui
         stylebot.widget.advanced.create();
@@ -792,12 +793,18 @@ stylebot.widget.ui = {
             stylebot.widget.ui.cache.accordionHeaders[0].focus();
         }, 0);
         
+        this.setHeight();
         $('#stylebot-controls').show();
     },
     
     // hide UI for basic mode
     hide: function() {
         $('#stylebot-controls').hide();
+    },
+    
+    setHeight: function() {
+        stylebot.widget.setHeight();
+        this.cache.container.css('height', window.innerHeight - 230);
     },
 
     updateRuleCache: function() {

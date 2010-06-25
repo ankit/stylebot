@@ -38,16 +38,17 @@ stylebot.widget = {
     show: function() {
         if(!this.ui.cache.box)
             this.create();
+            
+        this.setPosition(stylebot.options.position);
+        
+        // set widget title
+        this.ui.cache.header.html(stylebot.selector.value ? stylebot.selector.value : "Select an element");
         
         if(stylebot.options.mode == "Basic")
             this.ui.show();
         else
             this.advanced.show();
         
-        // set widget title
-        this.ui.cache.header.html(stylebot.selector.value ? stylebot.selector.value : "Select an element");
-        
-        this.setPosition(stylebot.options.position);
         stylebot.widget.ui.cache.box.show();
     },
     
@@ -67,9 +68,11 @@ stylebot.widget = {
 
         this.ui.cache.box.css('left', left);
         
-        // height
-        this.ui.cache.box.css('height', window.innerHeight - 50);
         stylebot.options.position = where;
+    },
+    
+    setHeight: function() {
+        this.ui.cache.box.css('height', window.innerHeight - 50);
     },
     
     setMode: function(mode) {

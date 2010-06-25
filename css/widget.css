@@ -9,9 +9,9 @@
     font-family: 'Lucida Grande', Tahoma, Arial, sans-serif;
     font-size: 12px;
     text-transform: none;
-    height: auto;
-    overflow: auto;
-    line-height: 12px;
+/*    height: auto;
+    overflow: auto;*/
+    line-height: 10px;
     margin: 0;
     text-align: left;
     position: fixed;
@@ -84,6 +84,8 @@
     color: inherit;
     font-family: inherit;
     font-size: inherit;
+    height: auto;
+    overflow: auto;
     margin: 0;
     width: 100%;
 }
@@ -238,8 +240,8 @@ a.stylebot-accordion-active .stylebot-accordion-icon {
 }
 
 #stylebot-advanced .stylebot-textarea {
-    height: 200px;
-    width: 298px;
+    height: 100;
+    width: 93%;
 }
 
 #stylebot-advanced div {
