@@ -6,11 +6,7 @@
 
 stylebot.widget = {
     
-    selector: null,
-    
     isBeingDragged: false,
-    
-    mode: 'Basic',
     
     create: function() {
         this.ui.createBox();
@@ -40,17 +36,18 @@ stylebot.widget = {
     },
     
     show: function() {
-        this.selector = stylebot.selector.value;
         if(!this.ui.cache.box)
             this.create();
         
-        if(this.mode == "Basic")
+        if(stylebot.options.mode == "Basic")
             this.ui.show();
         else
             this.advanced.show();
         
         // set widget title
         this.ui.cache.header.html(stylebot.selector.value ? stylebot.selector.value : "Select an element");
+        
+        this.setPosition(stylebot.options.position);
         stylebot.widget.ui.cache.box.show();
     },
     
@@ -64,15 +61,19 @@ stylebot.widget = {
         var left;
 
         if(where == 'Left')
-            left = 50;
+            left = 20;
         else if(where == 'Right')
-            left = document.body.clientWidth - dialogWidth - 50;
+            left = window.innerWidth - dialogWidth - 70;
 
         this.ui.cache.box.css('left', left);
+        
+        // height
+        this.ui.cache.box.css('height', window.innerHeight - 50);
+        stylebot.options.position = where;
     },
     
     setMode: function(mode) {
-        stylebot.widget.mode = mode;
+        stylebot.options.mode = mode;
         if(mode == 'Advanced')
         {
             stylebot.widget.ui.hide();
@@ -128,7 +129,7 @@ stylebot.widget = {
     },
     
     updateRuleCache: function(e) {
-        if(stylebot.widget.mode == "Advanced")
+        if(stylebot.options.mode == "Advanced")
             stylebot.widget.advanced.updateRuleCache();
     }
 }

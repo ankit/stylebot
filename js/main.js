@@ -24,7 +24,9 @@ var stylebot = {
     lintDebug: false,
 
     options: {
-        shortcutKey: 69 // 69 is keycode for 'e'
+        shortcutKey: 69, // 69 is keycode for 'e'
+        mode: 'Basic',
+        position: 'Right'
     },
     
     init: function() {

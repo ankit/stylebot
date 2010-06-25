@@ -684,7 +684,7 @@ stylebot.widget.ui = {
     
     fillControl: function(control, rule) {
         var pValue = rule[control.id];
-        if( typeof(pValue) != 'undefined' )
+        if( pValue != undefined )
         {
             switch(control.type){
                 

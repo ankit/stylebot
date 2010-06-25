@@ -9,13 +9,14 @@
     font-family: 'Lucida Grande', Tahoma, Arial, sans-serif;
     font-size: 12px;
     text-transform: none;
-    height: auto !important;
+    height: auto;
+    overflow: auto;
     line-height: 12px;
     margin: 0;
     text-align: left;
     position: fixed;
     top: 5%;
-    width: 320px;
+    width: 340px;
     z-index: 10000;
 }
 

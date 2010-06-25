@@ -242,7 +242,7 @@ stylebot.style = {
 
         for(var property in this.rules[selector])
             css += this.getCSSDeclaration(property, this.rules[selector][property], setImportant) + "\n";
-        
+
         return css;
     },
     

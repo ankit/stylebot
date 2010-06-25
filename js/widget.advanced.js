@@ -34,8 +34,10 @@ stylebot.widget.advanced = {
     },
     
     fill: function() {
-        this.reset();
-        this.cache.cssField.html( stylebot.style.crunchCSSForSelector(stylebot.selector.value, false) );
+        var css = stylebot.style.crunchCSSForSelector(stylebot.selector.value, false);
+        this.cache.cssField
+        .html( css )
+        .attr('value', css );
     },
     
     show: function() {
@@ -45,10 +47,6 @@ stylebot.widget.advanced = {
     
     hide: function() {
         $('#stylebot-advanced').hide();
-    },
-    
-    reset: function() {
-        this.cache.cssField.html('');
     },
 
     // called when mode is toggled, editing is disabled or when an element is selected
