@@ -43,7 +43,6 @@ stylebot.widget.advanced = {
     
     show: function() {
         this.fill();
-        this.setHeight();
         this.cache.container.show();
     },
     
@@ -51,8 +50,7 @@ stylebot.widget.advanced = {
         this.cache.container.hide();
     },
     
-    setHeight: function() {
-        stylebot.widget.setHeight();
+    updateHeight: function() {
         var height = window.innerHeight - 275;
         // if( height < 0 )
         //     height = 10;

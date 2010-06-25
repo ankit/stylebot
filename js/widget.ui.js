@@ -793,7 +793,6 @@ stylebot.widget.ui = {
             stylebot.widget.ui.cache.accordionHeaders[0].focus();
         }, 0);
         
-        this.setHeight();
         $('#stylebot-controls').show();
     },
     
@@ -802,8 +801,7 @@ stylebot.widget.ui = {
         $('#stylebot-controls').hide();
     },
     
-    setHeight: function() {
-        stylebot.widget.setHeight();
+    updateHeight: function() {
         this.cache.container.css('height', window.innerHeight - 230);
     },
 

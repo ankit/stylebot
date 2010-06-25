@@ -33,6 +33,12 @@ stylebot.widget = {
                 stylebot.disable();
             }
         });
+        
+        // listen to window resize event to update position/dimension of widget
+        $(window).resize( function(e) {
+            stylebot.widget.setPosition(stylebot.options.position);
+            stylebot.widget.updateHeight();
+        });
     },
     
     show: function() {
@@ -40,6 +46,7 @@ stylebot.widget = {
             this.create();
             
         this.setPosition(stylebot.options.position);
+        this.updateHeight();
         
         // set widget title
         this.ui.cache.header.html(stylebot.selector.value ? stylebot.selector.value : "Select an element");
@@ -56,7 +63,6 @@ stylebot.widget = {
         this.ui.cache.box.hide();
     },
     
-    // calculate where the widget should be displayed w.r.t selected element
     setPosition: function(where) {
         var dialogWidth = 300;
         var left;
@@ -71,8 +77,12 @@ stylebot.widget = {
         stylebot.options.position = where;
     },
     
-    setHeight: function() {
+    updateHeight: function() {
         this.ui.cache.box.css('height', window.innerHeight - 50);
+        if(stylebot.options.mode == "Basic")
+            this.ui.updateHeight();
+        else
+            this.advanced.updateHeight();
     },
     
     setMode: function(mode) {
