@@ -788,7 +788,7 @@ stylebot.widget.ui = {
     show: function() {
         this.reset();            // reset all values for controls to default values
         this.fill();             // fill widget with any existing custom styles
-        
+        this.updateHeight();
         setTimeout(function() {
             stylebot.widget.ui.cache.accordionHeaders[0].focus();
         }, 0);

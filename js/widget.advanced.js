@@ -43,6 +43,7 @@ stylebot.widget.advanced = {
     
     show: function() {
         this.fill();
+        this.updateHeight();
         this.cache.container.show();
     },
     

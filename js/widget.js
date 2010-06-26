@@ -79,10 +79,6 @@ stylebot.widget = {
     
     updateHeight: function() {
         this.ui.cache.box.css('height', window.innerHeight - 50);
-        if(stylebot.options.mode == "Basic")
-            this.ui.updateHeight();
-        else
-            this.advanced.updateHeight();
     },
     
     setMode: function(mode) {
