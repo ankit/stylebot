@@ -24,12 +24,13 @@
     padding: 10px;
     background: #C2C2C2;
     background: -webkit-gradient(linear, left top, left bottom, from(#EAEAEA), to(#C2C2C2));
-    text-shadow: 0px 1px 1px #fff;
     color: #2c2c2c;
-    line-height: 12px;
-    font-weight: bold;
     display: block;
+    font-family: 'Lucida Grande', Arial, sans-serif;
+    font-weight: bold;
+    line-height: 12px;
     overflow: auto;
+    text-shadow: 0px 1px 1px #fff;
     width: auto;
     height: auto;
 }
