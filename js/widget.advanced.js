@@ -51,6 +51,10 @@ stylebot.widget.advanced = {
         this.cache.container.hide();
     },
     
+    reset: function() {
+      this.cache.cssField.html('').attr('value', '');
+    },
+    
     updateHeight: function() {
         var height = window.innerHeight - 275;
         // if( height < 0 )

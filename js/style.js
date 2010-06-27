@@ -172,7 +172,6 @@ stylebot.style = {
         el.each(function(){
             var existingCSS = $(this).attr('style');
             var existingCustomCSS = $(this).data('stylebot-css');
-            
             if(existingCustomCSS && existingCSS != undefined)
             {
                 var newCSS = existingCSS.replace(existingCustomCSS, '');

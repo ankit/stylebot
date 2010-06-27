@@ -25,6 +25,7 @@ var stylebot = {
 
     options: {
         shortcutKey: 69, // 69 is keycode for 'e'
+        useShortcutKey: true,
         mode: 'Basic',
         position: 'Right'
     },
@@ -82,8 +83,8 @@ var stylebot = {
             if( $.inArray(eTagName, disabledEl) != -1 )
                return true;
 
-            // Handle shortcut key 'e' to toggle editing mode
-            if(e.keyCode == stylebot.options.shortcutKey)
+            // Handle shortcut key combo 'ctrl + e' to toggle editing mode
+            if(stylebot.options.useShortcutKey && e.keyCode == stylebot.options.shortcutKey && e.ctrlKey)
                 stylebot.toggle();
                 
             // Handle Esc key to escape editing mode

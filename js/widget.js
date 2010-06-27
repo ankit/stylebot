@@ -38,6 +38,10 @@ stylebot.widget = {
         $(window).resize( function(e) {
             stylebot.widget.setPosition(stylebot.options.position);
             stylebot.widget.updateHeight();
+            if(stylebot.options.mode == 'Basic')
+                stylebot.widget.ui.updateHeight();
+            else
+                stylebot.widget.advanced.updateHeight();
         });
     },
     
