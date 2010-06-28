@@ -335,12 +335,14 @@ stylebot.widget.ui = {
             if(e.type == "keydown" && e.keyCode != 13)
                 return true;
             e.preventDefault();
-            stylebot.widget.ui.toggleAccordion(e.target);
+            var el = $(e.target);
+            if(!el.hasClass('stylebot-accordion-header'))
+                el = el.parent();
+            stylebot.widget.ui.toggleAccordion(el);
         });
     },
     
     toggleAccordion: function(h) {
-        h = $(h);
         var status = h.hasClass('stylebot-accordion-active');
         if(status)
         {
