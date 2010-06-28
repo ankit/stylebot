@@ -11,6 +11,10 @@ stylebot.widget.advanced = {
         container: null
     },
     
+    defaults: {
+        optionsHeight: 275
+    },
+    
     create: function() {
         this.cache.container = $('<div>', {
             id: 'stylebot-advanced'
@@ -56,7 +60,7 @@ stylebot.widget.advanced = {
     },
     
     updateHeight: function() {
-        var height = window.innerHeight - 275;
+        var height = window.innerHeight - this.defaults.optionsHeight;
         // if( height < 0 )
         //     height = 10;
         this.cache.cssField.css('height', height);

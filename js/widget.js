@@ -82,7 +82,7 @@ stylebot.widget = {
     },
     
     updateHeight: function() {
-        this.ui.cache.box.css('height', window.innerHeight - 50);
+        this.ui.cache.box.css('height', window.innerHeight - 20);
     },
     
     setMode: function(mode) {
@@ -137,6 +137,16 @@ stylebot.widget = {
     toggleMode: function(e) {
         var el = $(e.target);
         stylebot.widget.setMode( el.html() );
+        $("." + el.data('class')).removeClass('stylebot-active-button');
+        el.addClass('stylebot-active-button');
+    },
+    
+    toggleSpecificity: function(e) {
+        var el = $(e.target);
+        stylebot.selector.mode = el.html().toLowerCase();
+        stylebot.selector.generate(stylebot.selectedElement);
+        stylebot.style.fillCache(stylebot.selector.value);
+        stylebot.widget.show();
         $("." + el.data('class')).removeClass('stylebot-active-button');
         el.addClass('stylebot-active-button');
     },

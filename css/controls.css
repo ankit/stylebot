@@ -87,7 +87,6 @@ button.stylebot-button {
     font-family: 'Lucida Grande', Arial, sans-serif;
     font-size: 10px;
     font-weight: bold;
-    line-height: normal;
     margin: 0 3px;
     padding: 3px 8px;
     border-radius: 2px;
@@ -127,7 +126,14 @@ background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAABjCAMAAABzPq
     margin: 0px;
     border-radius: 0px;
     padding: 3px 8px;
+    line-height: 12px;
     border-right-width: 0px;
+}
+
+.stylebot-segmented-control button span {
+    line-height: 12px;
+    padding: 0;
+    margin: 0;
 }
 
 .stylebot-segmented-control button:hover, 
