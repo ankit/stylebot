@@ -20,12 +20,6 @@ stylebot.chrome = {
     // save rules for page
     save: function(url, rules) {
         chrome.extension.sendRequest({ name: "save", rules: rules, url: url }, function(){});
-    },
-    
-    load: function(url, callback) {
-        chrome.extension.sendRequest({ name: "getRulesForPage", url: url }, function(response){
-            callback(response);
-        });
     }
 }
 

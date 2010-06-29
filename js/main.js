@@ -31,7 +31,7 @@ var stylebot = {
     },
     
     init: function() {
-        this.initCSS();
+        this.style.init();
         this.initDebug();
         this.addListeners();
     },
@@ -41,10 +41,6 @@ var stylebot = {
             jQuery.LINT.level = 3;
         else
             jQuery.LINT.level = 0;
-    },
-    
-    initCSS: function() {
-        stylebot.style.load();
     },
     
     // toggle stylebot editing status

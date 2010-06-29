@@ -25,6 +25,14 @@ stylebot.style = {
         url: document.domain
     },
     
+    // init rules from temporary variable in apply-css.js
+    init: function() {
+        if(stylebotTempRules)
+            this.rules = stylebotTempRules;
+        if(stylebotTempUrl)
+            this.cache.url = stylebotTempUrl;
+    },
+    
     fillCache: function(selector) {
         if(selector != this.cache.selector)
         {
@@ -123,7 +131,7 @@ stylebot.style = {
         {
             var css = "";
             for(var property in rule)
-                css += this.getCSSDeclaration(property, rule[property], true);
+                css += getCSSDeclaration(property, rule[property], true);
 
             return css;
         }
@@ -200,15 +208,15 @@ stylebot.style = {
     
     // replace inline CSS with <style> element. called when stylebot is disabled
     resetInlineCSS: function() {
-        var style = $('style[title=stylebot-css]');
+        var style = $( 'style[title=stylebot-css]' );
         
         if(style.length != 0)
-            style.html(stylebot.style.crunchCSS(true));
+            style.html( crunchCSS(this.rules, true) );
         else
-            stylebot.style.injectCSS(stylebot.style.crunchCSS(true));
+            injectCSS( crunchCSS(this.rules, true) );
 
         for(var selector in stylebot.style.rules)
-            stylebot.style.clearInlineCSS($(selector));
+            stylebot.style.clearInlineCSS( $(selector) );
     },
     
     // get all the custom CSS rules set for the selector in cache
@@ -220,36 +228,14 @@ stylebot.style = {
             return null;
     },
     
-    // generate formatted CSS for all the rules in cache
-    crunchCSS: function(setImportant) {
-        var css = "";
-
-        for(var selector in this.rules)
-        {
-            css += selector + " {" + "\n";
-            for(var property in this.rules[selector])
-                css += "\t" + this.getCSSDeclaration(property, this.rules[selector][property], setImportant) + "\n";
-                
-            css += "}" + "\n\n";
-        }
-        return css;
-    },
-    
     // generate formatted CSS for selector
     crunchCSSForSelector: function(selector, setImportant) {
         var css = "";
 
         for(var property in this.rules[selector])
-            css += this.getCSSDeclaration(property, this.rules[selector][property], setImportant) + "\n";
+            css += getCSSDeclaration(property, this.rules[selector][property], setImportant) + "\n";
 
         return css;
-    },
-    
-    getCSSDeclaration: function(property, value, setImportant) {
-        if(setImportant)
-            return property + ": " + value + " !important;";
-        else
-            return property + ": " + value + ";";
     },
     
     // clear any existing custom CSS for current selector
@@ -272,31 +258,9 @@ stylebot.style = {
         stylebot.chrome.save(stylebot.style.cache.url, stylebot.style.rules);
     },
     
-    // load rules for page 
-    load: function(callback) {
-        stylebot.chrome.load(window.location.href, function(response){
-            if(response.rules)
-                stylebot.style.rules = response.rules;
-            if(response.url)
-                stylebot.style.cache.url = response.url;
-            if(callback != undefined)
-                callback();
-        });
-    },
-    
     reset: function() {
         this.resetInlineCSS();
         this.cache.selector = null;
         this.cache.elements = null;
-    },
-    
-    // inject <style> element into page
-    injectCSS: function(css) {
-        var d = document.documentElement;
-        var style = document.createElement('style');
-        style.type = "text/css";
-        style.title = "stylebot-css";
-        style.innerText = css;
-        d.insertBefore(style, null);
     }
 }

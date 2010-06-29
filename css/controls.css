@@ -47,28 +47,29 @@ div.stylebot-colorselector:focus {
 
 /* Textfields & Textareas */
 
-input[type=text].stylebot-textfield, .stylebot-textarea {
+input.stylebot-textfield, textarea.stylebot-textarea {
     background-color: #fff;
     border: 1px solid #C2C2C2;
     border-radius: 2px;
     color: #333;
     font-family: inherit;
     font-size: 11px !important;
-    line-height: 12px !important;
     outline: none;
     width: auto;
 }
 
-.stylebot-textfield {
-    padding: 2px !important;
+input.stylebot-textfield {
     height: 12px;
+    line-height: 12px;
+    padding: 2px !important;
     -webkit-box-sizing: content-box;
 }
 
-.stylebot-textarea {
-    resize: none;
+textarea.stylebot-textarea {
+    line-height: 16px;
     padding: 4px !important;
     padding-right: 6px;
+    resize: none;
 }
 
 /* Checkbox */
