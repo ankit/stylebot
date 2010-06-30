@@ -154,7 +154,6 @@ stylebot.style = {
             {
                 // if there is any existing inline CSS, append stylebot CSS to it
                 if(existingCSS != undefined)
-                    // TODO: Only add ; if there is no trailing ; in existingCSS
                     newCSS = newCustomCSS + existingCSS;
                 else
                     newCSS = newCustomCSS;
