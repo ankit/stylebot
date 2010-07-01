@@ -78,7 +78,8 @@ function save(url, rules) {
 }
 
 function loadStylesIntoCache() {
-    cache.styles = JSON.parse( localStorage['stylebot_styles'] );
+    if( localStorage['stylebot_styles'] )
+        cache.styles = JSON.parse( localStorage['stylebot_styles'] );
 }
 
 function getRulesForPage(currUrl) {
