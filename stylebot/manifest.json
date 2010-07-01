@@ -3,6 +3,7 @@
 	"version": "0.1",
 	"description": "Adapt the web's appearance.",
 	"background_page": "background.html",
+	"options_page": "options.html",
 	
 	"content_scripts": [
 	{

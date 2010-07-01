@@ -100,7 +100,3 @@ function getRulesForPage(currUrl) {
     else
         return { rules: null, url: null };
 }
-
-window.addEventListener('load', function(){
-    init();
-});
