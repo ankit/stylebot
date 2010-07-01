@@ -11,7 +11,9 @@ Using Stylebot, users will be able to:
 Installation
 --------------
 
-Download `stylebot.crx` and open it in Chrome / Chromium. Or, you can also load `/stylebot` as an unpacked extension (in Developer mode).
+Download `stylebot.crx` (use Download Source button on top right) and open it in Chrome / Chromium.
+
+Or, you can also load `/stylebot` as an unpacked extension (in Developer mode).
 
 Once installed, you can toggle stylebot on a page by either clicking on the 'css' icon in omnibar or pressing 'ctrl + e'.
 
