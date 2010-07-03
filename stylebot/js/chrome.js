@@ -20,16 +20,28 @@ stylebot.chrome = {
     // save rules for page
     save: function(url, rules) {
         chrome.extension.sendRequest({ name: "save", rules: rules, url: url }, function(){});
+    },
+    
+    // send request to fetch options from datastore
+    fetchOptions: function() {
+        chrome.extension.sendRequest({ name: "fetchOptions" }, function( response ){
+            stylebot.setOptions(response.options);
+        });
     }
 }
 
 chrome.extension.onRequest.addListener(
 	function(request, sender, sendResponse) {
-        if(request.name == "toggle")
+        if( request.name == "toggle" )
 		{
 		    if(window != window.top)
 		        return;
             stylebot.toggle();
-		    sendResponse({ status:stylebot.status });
+		    sendResponse( { status: stylebot.status } );
+		}
+		else if( request.name == "setOptions" )
+		{
+		    stylebot.setOptions( request.options );
+            sendResponse({});
 		}
 });

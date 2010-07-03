@@ -81,6 +81,7 @@
     border: none;
     border-bottom: 1px solid #ccc;
     color: inherit;
+    display: none;
     font-family: inherit;
     font-size: inherit;
     height: auto;

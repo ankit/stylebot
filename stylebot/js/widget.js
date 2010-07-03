@@ -56,9 +56,15 @@ stylebot.widget = {
         this.ui.cache.header.html(stylebot.selector.value ? stylebot.selector.value : "Select an element");
         
         if(stylebot.options.mode == "Basic")
+        {
+            this.advanced.hide();
             this.ui.show();
+        }
         else
+        {
+            this.ui.hide();
             this.advanced.show();
+        }
         
         stylebot.widget.ui.cache.box.show();
     },

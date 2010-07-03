@@ -8,12 +8,19 @@ var cache = {
             'google.com' : rules
         }
     */
-    styles: {}
+    styles: {},
+    options: {
+        useShortcutKey: true,
+        shortcutKey: 69, //keydown code for 'e'
+        shortcutMetaKey: 'ctrl',
+        mode: 'Basic'
+    }
 };
 
 function init(){
     addListeners();
     loadStylesIntoCache();
+    loadOptionsIntoCache();
 }
 
 function addListeners(){
@@ -30,6 +37,7 @@ function addListeners(){
             case "copyToClipboard"  : copyToClipboard(request.text); break;
             case "save"             : save(request.url, request.rules); break;
             case "getRulesForPage"  : sendResponse(getRulesForPage(request.url)); break;
+            case "fetchOptions"     : sendResponse({ options: cache.options }); break;
         }
     });
 }
@@ -82,6 +90,27 @@ function loadStylesIntoCache() {
         cache.styles = JSON.parse( localStorage['stylebot_styles'] );
 }
 
+
+function initDataStore() {
+    // set defaults in datastore
+    localStorage['stylebot_option_useShortcutKey'] = cache.options.useShortcutKey;
+    localStorage['stylebot_option_shortcutKey'] = cache.options.shortcutKey;
+    localStorage['stylebot_option_shortcutMetaKey'] = cache.options.shortcutMetaKey;
+    localStorage['stylebot_option_mode'] = cache.options.mode;
+}
+
+function loadOptionsIntoCache() {
+    if( !localStorage['stylebot_option_useShortcutKey'] )
+    {
+        initDataStore();
+        return true;
+    }
+    cache.options.useShortcutKey = ( localStorage['stylebot_option_useShortcutKey'] == 'true' );
+    cache.options.shortcutKey = localStorage['stylebot_option_shortcutKey'];
+    cache.options.shortcutMetaKey = localStorage['stylebot_option_shortcutMetaKey'];
+    cache.options.mode = localStorage['stylebot_option_mode'];
+}
+
 function getRulesForPage(currUrl) {
     var rules = {};
     var url_for_page = '';
@@ -100,3 +129,25 @@ function getRulesForPage(currUrl) {
     else
         return { rules: null, url: null };
 }
+
+function propagateChanges() {
+    sendRequestToAllTabs( { name: 'setOptions', options: cache.options }, function(){} );
+}
+
+function sendRequestToAllTabs(req){
+    chrome.windows.getAll( { populate: true }, function(windows) {
+	    var w_len = windows.length;
+		for( i = 0; i < w_len; i++)
+		{
+            var t_len = windows[i].tabs.length;
+			for(j = 0; j < t_len; j++)
+			{
+				chrome.tabs.sendRequest( windows[i].tabs[j].id, req, function(response){} );
+			}
+		}
+	});
+}
+
+window.addEventListener('load', function(){
+    init();
+});
