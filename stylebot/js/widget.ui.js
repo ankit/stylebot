@@ -115,8 +115,9 @@ stylebot.widget.ui = {
         },
         {
             name: 'Thickness',
-            id: 'border-width',
-            type: 'size',
+            options: ['All', 'Top', 'Right', 'Bottom', 'Left'],
+            id: ['border-width', 'border-top-width', 'border-right-width', 'border-bottom-width', 'border-left-width'],
+            type: 'multi-size',
             el: null
         }]
     },
@@ -124,15 +125,17 @@ stylebot.widget.ui = {
         name: 'Layout & Visibility',
         controls: [
         {
-            name: 'Margin',
-            id: 'margin',
-            type: 'size',
+            name: 'Margins',
+            options: ['All', 'Top', 'Right', 'Bottom', 'Left'],
+            id: ['margin', 'margin-top', 'margin-right', 'margin-bottom', 'margin-left'],
+            type: 'multi-size',
             el: null
         },
         {
-            name: 'Padding',
-            id: 'padding',
-            type: 'size',
+            name: 'Paddings',
+            options: ['All', 'Top', 'Right', 'Bottom', 'Left'],
+            id: ['padding', 'padding-top', 'padding-right', 'padding-bottom', 'padding-left'],
+            type: 'multi-size',
             el: null
         },
         {
@@ -375,6 +378,8 @@ stylebot.widget.ui = {
 
             case 'size'             :   control_el = this.createSizeControl(control.id).appendTo(el);
                                         break;
+            
+            case 'multi-size'       :   control_el = this.createMultiSizeControl(control).appendTo(el); break;
                                         
             case 'color'            :   control_el = this.createTextField(control.id, 10, stylebot.widget.ui.events.onTextFieldKeyUp);
                                         this.createColorPicker(control_el).appendTo(el);
@@ -426,7 +431,7 @@ stylebot.widget.ui = {
         var container = $('<span>');
         
         // Textfield for entering size
-        this.createTextField(property, 4, stylebot.widget.ui.events.onSizeFieldKeyUp)
+        this.createTextField(property, 2, stylebot.widget.ui.events.onSizeFieldKeyUp)
         .appendTo(container);
 
         // Select box for choosing unit
@@ -445,6 +450,23 @@ stylebot.widget.ui = {
             .appendTo(select);
         }
         
+        return container;
+    },
+    
+    createMultiSizeControl: function(control) {
+        var container = $('<span>', {
+            style: 'display: inline-block; margin-left: 50px; margin-top: -10px'
+        });
+        var len = control.id.length;
+        for(var i=0; i<len; i++)
+        {
+            this.createLabel(control.options[i])
+            .appendTo(container);
+            
+            this.createSizeControl(control.id[i])
+            .attr('style', 'margin-bottom: 3px; display: inline-block;')
+            .appendTo(container);
+        }
         return container;
     },
     
@@ -686,72 +708,99 @@ stylebot.widget.ui = {
     },
     
     fillControl: function(control, rule) {
-        var pValue = rule[control.id];
-        if( pValue != undefined )
-        {
-            switch(control.type){
-                
-                case 'size'         :       // get unit
-                                            var len = this.defaults.validSizeUnits.length;
-                                            for(var i=0; i<len; i++)
-                                            {
-                                                if( pValue.indexOf(this.defaults.validSizeUnits[i]) != -1)
-                                                    break;
-                                            }
-                                            var unit = this.defaults.validSizeUnits[i];
-
-                                            control.el.find('input')
-                                            .attr('value', pValue.replace(unit, '') );
-                                            
-                                            // set select option
-                                            var index = $.inArray( $.trim( String(unit) ), this.defaults.validSizeUnits);
-                                            control.el.find('select').attr('selectedIndex', index);
-                                            break;
-
-                case 'font-family'  :       // set input value
-                                            var input = control.el.find('input')
-                                            .attr('value', pValue);
-                                            
-                                            var index = $.inArray(pValue, control.options);
-                                            if(index != -1)
-                                            {
-                                                control.el.find('select').attr('selectedIndex', index + 1);
-                                                input.hide();
-                                            }
-                                            else
-                                            {
-                                                control.el.find('select').attr('selectedIndex', control.options.length + 1);
-                                                input.show();
-                                            }
-                                            break;
-                                        
-                case 'color'            :   control.el.attr('value', pValue);
-                                            this.setColorSelectorColor(control.el);
-                                            break;
-                                        
-                case 'checkbox'         :   if(pValue == control.value)
-                                                control.el.attr('checked', true);
-                                            else
-                                                control.el.attr('checked', false);                                                
-                                            break;
-                                        
-                case 'toggle'           :   if(pValue == control.el.data('value'))
-                                                control.el.addClass('stylebot-active-button');
-                                            else
-                                                control.el.removeClass('stylebot-active-button');
-                                            break;
-                                        
-                case 'select'           :   var index = $.inArray( $.trim( String(pValue) ), control.options);
-                                            if(index != -1)
-                                                control.el.attr('selectedIndex', index + 1);
-                                            break;
-
-                case 'segmented'        :   var index = $.inArray( $.trim( String(pValue) ), control.values);
-                                            if(index != -1)
-                                                $(control.el.find('button')[index])
-                                                .addClass('stylebot-active-button')
-                                                .next().css('border-left-width', '0px');
+        
+        function determineSizeUnit(val) {
+            var len = stylebot.widget.ui.defaults.validSizeUnits.length;
+            for(var i=0; i<len; i++)
+            {
+                if( val.indexOf(stylebot.widget.ui.defaults.validSizeUnits[i]) != -1)
+                    break;
             }
+            return stylebot.widget.ui.defaults.validSizeUnits[i];
+        }
+        
+        var pValue = rule[control.id];
+
+        switch(control.type) {
+            
+            case 'size'         :       if(pValue == undefined)
+                                            return false;
+                                        var unit = determineSizeUnit(pValue);
+                                        
+                                        control.el.find('input')
+                                        .attr('value', pValue.replace(unit, '') );
+                                        
+                                        // set select option
+                                        var index = $.inArray( $.trim( String(unit) ), this.defaults.validSizeUnits);
+                                        control.el.find('select').attr('selectedIndex', index);
+                                        break;
+                                        
+            case 'multi-size'   :       var len = control.id.length;
+                                        var inputFields = control.el.find('input');
+                                        var selectInputs = control.el.find('select');
+                                        
+                                        for(var i=0; i<len; i++)
+                                        {
+                                            pValue = rule[ control.id[i] ];
+                                            if(pValue != undefined)
+                                            {
+                                                var unit = determineSizeUnit(pValue);
+                                                $(inputFields[i]).attr( 'value', pValue.replace(unit, '') );
+
+                                                var index = $.inArray( $.trim( String(unit) ), this.defaults.validSizeUnits);
+                                                $(selectInputs[i]).attr('selectedIndex', index);
+                                            }
+                                        }
+                                        break;
+
+            case 'font-family'  :       if(pValue == undefined)
+                                            return false;
+                                        
+                                        // set input value
+                                        var input = control.el.find('input')
+                                        .attr('value', pValue);
+                                        
+                                        var index = $.inArray(pValue, control.options);
+                                        if(index != -1)
+                                        {
+                                            control.el.find('select').attr('selectedIndex', index + 1);
+                                            input.hide();
+                                        }
+                                        else
+                                        {
+                                            control.el.find('select').attr('selectedIndex', control.options.length + 1);
+                                            input.show();
+                                        }
+                                        break;
+                                    
+            case 'color'            :   if(pValue == undefined)
+                                            return false;
+                                        control.el.attr('value', pValue);
+                                        this.setColorSelectorColor(control.el);
+                                        break;
+                                    
+            case 'checkbox'         :   if(pValue == control.value)
+                                            control.el.attr('checked', true);
+                                        else
+                                            control.el.attr('checked', false);                                                
+                                        break;
+                                    
+            case 'toggle'           :   if(pValue == control.el.data('value'))
+                                            control.el.addClass('stylebot-active-button');
+                                        else
+                                            control.el.removeClass('stylebot-active-button');
+                                        break;
+                                    
+            case 'select'           :   var index = $.inArray( $.trim( String(pValue) ), control.options);
+                                        if(index != -1)
+                                            control.el.attr('selectedIndex', index + 1);
+                                        break;
+
+            case 'segmented'        :   var index = $.inArray( $.trim( String(pValue) ), control.values);
+                                        if(index != -1)
+                                            $(control.el.find('button')[index])
+                                            .addClass('stylebot-active-button')
+                                            .next().css('border-left-width', '0px');
         }
     },
     

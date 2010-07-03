@@ -157,7 +157,7 @@
 
 /* Code */
 
-.stylebot-css-code {
+textarea.stylebot-css-code {
     color: #333 !important;
     font-size: 11px !important;
     font-family: Monaco, 'Lucida Console', monospace !important;

@@ -111,16 +111,14 @@ stylebot.style = {
         if(value == "")
             return false;
         
-        switch(property) {
-            case 'font-size'        :
-            case 'line-height'      :
-            case 'letter-spacing'   :
-            case 'border-width'     :   if($.inArray(value, stylebot.widget.ui.defaults.validSizeUnits) != -1)
-                                            return false;
-                                        else
-                                            return true;
-                                        break;
+        var sizeProperties = ['font-size', 'line-height', 'letter-height', 'margin', 'margin-top', 'margin-right', 'margin-bottom', 'margin-left', 'padding', 'padding-top', 'padding-right', 'padding-bottom', 'padding-left', 'border-width'];
+        
+        if( $.inArray(property, sizeProperties) )
+        {
+            if($.inArray(value, stylebot.widget.ui.defaults.validSizeUnits) != -1)
+                return false;
         }
+
         return true;
     },
     
