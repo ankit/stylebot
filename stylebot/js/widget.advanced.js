@@ -64,6 +64,6 @@ stylebot.widget.advanced = {
 
     // called when mode is toggled, editing is disabled or when an element is selected
     updateRuleCache: function() {
-        stylebot.style.saveRulesFromCSS( stylebot.widget.advanced.cache.cssField.attr('value') );
+        stylebot.style.saveRulesToCacheFromCSS( stylebot.widget.advanced.cache.cssField.attr('value') );
     }
 }

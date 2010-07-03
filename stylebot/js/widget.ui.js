@@ -738,14 +738,41 @@ stylebot.widget.ui = {
             case 'multi-size'   :       var len = control.id.length;
                                         var inputFields = control.el.find('input');
                                         var selectInputs = control.el.find('select');
+                                        var values = [];
+                                        for(var i=0; i<len; i++)
+                                            values[i] = rule[ control.id[i] ];
+                                        
+                                        if(values[0] != undefined)
+                                        {
+                                            var parts = values[0].split(' ');
+                                            // parse value of the form margin: 2px 10px;
+                                            if(parts.length == 2)
+                                            {
+                                                values[0] = "";
+                                                values[1] = values[3] = $.trim( parts[0] ); // top & bottom
+                                                values[2] = values[4] = $.trim( parts[1] ); // left & right
+                                            }
+                                            // parse value of the form margin: 2px 10px 8px 6px;                                        
+                                            else if(parts.length == 4)
+                                            {
+                                                values[0] = "";
+                                                values[1] = $.trim( parts[0] );
+                                                values[2] = $.trim( parts[1] );
+                                                values[3] = $.trim( parts[2] );
+                                                values[4] = $.trim( parts[3] );
+                                            }
+                                        }
                                         
                                         for(var i=0; i<len; i++)
                                         {
-                                            pValue = rule[ control.id[i] ];
+                                            pValue = values[i];
+
                                             if(pValue != undefined)
                                             {
                                                 var unit = determineSizeUnit(pValue);
-                                                $(inputFields[i]).attr( 'value', pValue.replace(unit, '') );
+                                                var input = $(inputFields[i]);
+                                                input.attr( 'value', pValue.replace(unit, '') )
+                                                .keyup(); // keyup called to update rules cache as values maybe modified when mode is switched.
 
                                                 var index = $.inArray( $.trim( String(unit) ), this.defaults.validSizeUnits);
                                                 $(selectInputs[i]).attr('selectedIndex', index);

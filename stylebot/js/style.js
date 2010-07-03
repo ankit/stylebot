@@ -46,12 +46,12 @@ stylebot.style = {
         if(!this.cache.selector)
             return true;
         
-        this.saveRule(this.cache.selector, property, value);
+        this.saveRuleToCache(this.cache.selector, property, value);
         this.applyInlineCSS(this.cache.elements, this.getInlineCSS(this.cache.selector));
     },
     
     // parse CSS into rules and add them to cache
-    saveRulesFromCSS: function(css) {
+    saveRulesToCacheFromCSS: function(css) {
         if(!this.cache.selector)
             return true;
         
@@ -65,14 +65,14 @@ stylebot.style = {
         for(var i=0; i<len; i++)
         {
             var pair = rules[i].split(':');
-            var property = $.trim(pair[0]);
-            var value = $.trim(pair[1]);
-            this.saveRule(this.cache.selector, property, value);
+            var property = $.trim( pair[0] );
+            var value = $.trim( pair[1] );
+            this.saveRuleToCache(this.cache.selector, property, value);
         }
     },
     
     // add/update rule to CSS rules cache
-    saveRule: function(selector, property, value) {
+    saveRuleToCache: function(selector, property, value) {
         // check if the selector already exists in the list
         var rule = this.rules[selector];
         if(rule != undefined)
