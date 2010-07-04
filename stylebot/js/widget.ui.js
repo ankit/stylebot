@@ -9,7 +9,8 @@ stylebot.widget.ui = {
     isColorPickerVisible: false,
     
     defaults: {
-        validSizeUnits: ['px', 'em', '%', 'pt']
+        validSizeUnits: ['px', 'em', '%', 'pt'],
+        optionsHeight: 230
     },
     
     groups: [{
@@ -238,13 +239,16 @@ stylebot.widget.ui = {
             id: 'stylebot-widget-options'
         });
         
-        this.createLabel('Mode').appendTo(options_div);
-        this.createButtonSet(['Basic', 'Advanced'], "stylebot-mode", 0, stylebot.widget.toggleMode).appendTo(options_div);
+        this.createOption('Selection Specificity', 
+        this.createButtonSet(['Low', 'Medium', 'High'], "stylebot-specificity", 1, stylebot.widget.toggleSpecificity))
+        .appendTo(options_div);
         
-        $('<br><br>').appendTo(options_div);
+        this.createOption('Mode', this.createButtonSet(['Basic', 'Advanced'], "stylebot-mode", 0, stylebot.widget.toggleMode))
+        .appendTo(options_div);
         
-        this.createLabel('Widget position').appendTo(options_div);
-        this.createButtonSet(['Left', 'Right'], "stylebot-position", 1, stylebot.widget.togglePosition).appendTo(options_div);
+        
+        this.createOption('Widget position', this.createButtonSet(['Left', 'Right'], "stylebot-position", 1, stylebot.widget.togglePosition) )
+        .appendTo(options_div);
         
         options_div.appendTo(this.cache.box);
         
@@ -323,6 +327,17 @@ stylebot.widget.ui = {
         this.cache.fontFamilyInput = $('#stylebot-font-family');
         // segmented controls
         this.cache.segmentedControls = $('.stylebot-segmented-control');
+    },
+    
+    createOption: function(option, control) {
+        var container = $('<div>', {
+            class: 'stylebot-widget-option'
+        });
+        
+        this.createLabel(option)
+        .appendTo(container);
+        
+        return container.append(control);
     },
     
     createAccordionHeader: function(name) {
@@ -880,7 +895,7 @@ stylebot.widget.ui = {
     },
     
     updateHeight: function() {
-        this.cache.container.css('height', window.innerHeight - 230);
+        this.cache.container.css('height', window.innerHeight - this.defaults.optionsHeight);
     },
 
     updateRuleCache: function() {

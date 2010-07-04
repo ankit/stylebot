@@ -78,7 +78,7 @@ stylebot.widget = {
     },
     
     updateHeight: function() {
-        this.ui.cache.box.css('height', window.innerHeight - 50);
+        this.ui.cache.box.css('height', window.innerHeight - 20);
     },
     
     setMode: function() {
@@ -139,6 +139,16 @@ stylebot.widget = {
         if(stylebot.options.mode == "Basic")
             stylebot.widget.advanced.updateRuleCache();
         stylebot.widget.setMode();
+    },
+    
+    toggleSpecificity: function(e) {
+        var el = $(e.target);
+        stylebot.selector.mode = el.html().toLowerCase();
+        stylebot.selector.generate(stylebot.selectedElement);
+        stylebot.style.fillCache(stylebot.selector.value);
+        stylebot.widget.show();
+        $("." + el.data('class')).removeClass('stylebot-active-button');
+        el.addClass('stylebot-active-button');
     },
     
     updateRuleCache: function(e) {
