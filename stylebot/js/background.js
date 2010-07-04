@@ -11,7 +11,7 @@ var cache = {
     styles: {},
     options: {
         useShortcutKey: true,
-        shortcutKey: 69, //keydown code for 'e'
+        shortcutKey: 69, // keydown code for 'e'
         shortcutMetaKey: 'ctrl',
         mode: 'Basic'
     }
@@ -130,7 +130,7 @@ function getRulesForPage(currUrl) {
         return { rules: null, url: null };
 }
 
-function propagateChanges() {
+function propagateOptions() {
     sendRequestToAllTabs( { name: 'setOptions', options: cache.options }, function(){} );
 }
 

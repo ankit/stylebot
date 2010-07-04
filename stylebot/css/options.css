@@ -1,6 +1,6 @@
 body {
 	background-color: #fafbff;
-	font-size: 16px;
+	font-size: 15px;
 	line-height: 28px;
     font-family: 'Lucida Grande', Helvetica, Arial, sans-serif;
 	color: #414141;
@@ -65,8 +65,8 @@ button {
     background-color: #fff;
     border: 1px solid #ccc;
     border-radius: 2px;
-    color: #414141;
-    font-size: 18px;
+    color: #333;
+    font-size: 15px;
 }
 
 button:hover {

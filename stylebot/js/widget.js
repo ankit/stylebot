@@ -54,18 +54,8 @@ stylebot.widget = {
         
         // set widget title
         this.ui.cache.header.html(stylebot.selector.value ? stylebot.selector.value : "Select an element");
-        
-        if(stylebot.options.mode == "Basic")
-        {
-            this.advanced.hide();
-            this.ui.show();
-        }
-        else
-        {
-            this.ui.hide();
-            this.advanced.show();
-        }
-        
+        // set mode
+        this.setMode(stylebot.options.mode);
         stylebot.widget.ui.cache.box.show();
     },
     
@@ -95,11 +85,15 @@ stylebot.widget = {
         stylebot.options.mode = mode;
         if(mode == 'Advanced')
         {
+            $('.stylebot-mode').removeClass('stylebot-active-button');
+            $('.stylebot-mode:contains(Advanced)').addClass('stylebot-active-button');
             stylebot.widget.ui.hide();
             stylebot.widget.advanced.show();
         }
         else
         {
+            $('.stylebot-mode').removeClass('stylebot-active-button');
+            $('.stylebot-mode:contains(Basic)').addClass('stylebot-active-button');
             stylebot.widget.advanced.updateRuleCache();
             stylebot.widget.advanced.hide();
             stylebot.widget.ui.show();
@@ -143,8 +137,6 @@ stylebot.widget = {
     toggleMode: function(e) {
         var el = $(e.target);
         stylebot.widget.setMode( el.html() );
-        $("." + el.data('class')).removeClass('stylebot-active-button');
-        el.addClass('stylebot-active-button');
     },
     
     updateRuleCache: function(e) {

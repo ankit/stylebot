@@ -17,7 +17,7 @@ function save() {
     
     // save to datastore
     localStorage['stylebot_option_useShortcutKey'] = options.useShortcutKey;
-    localStorage['stylebot_option_shorcutMetaKey'] = options.shortcutMetaKey;
+    localStorage['stylebot_option_shortcutMetaKey'] = options.shortcutMetaKey;
     localStorage['stylebot_option_shortcutKey'] = options.shortcutKey;
     localStorage['stylebot_option_mode'] = options.mode;
     
@@ -25,7 +25,7 @@ function save() {
     var bg_window = chrome.extension.getBackgroundPage();
     bg_window.cache.options = options;
     // propagate changes to all open tabs
-    bg_window.propagateChanges();
+    bg_window.propagateOptions();
 }
 
 // initialize options
