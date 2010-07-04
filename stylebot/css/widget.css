@@ -114,12 +114,13 @@
     display: inline-block;
     float: none;
     font-family: inherit;
-    text-transform: inherit;
     font-size: 11px;
     font-weight: normal;
+    line-height: 10px;
     margin: 0;
     padding-right: 4px;
     text-align: right;
+    text-transform: inherit;
     width: 100px;
 }
 
@@ -138,11 +139,12 @@
     font-size: 11px;
     margin-top: 10px;
     padding-left: 25px;
+    padding-bottom: 3px;
 }
 
 .stylebot-widget-option {
     line-height: 10px;
-    margin: 6px 0px;
+    margin: 5px 0px;
     padding: 2px;
 }
 

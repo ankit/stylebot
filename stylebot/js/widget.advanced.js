@@ -12,7 +12,7 @@ stylebot.widget.advanced = {
     },
     
     defaults: {
-        optionsHeight: 275
+        optionsHeight: 265
     },
     
     create: function() {
