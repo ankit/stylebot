@@ -1,0 +1,49 @@
+<html>
+
+<head>
+	<title>Stylebot Options</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<link rel="stylesheet" href="css/options.css" type="text/css" media="screen" title="no title" charset="utf-8">
+	<script type="text/javascript" src="js/jquery.js"></script>
+	<script type="text/javascript" src="js/options.js"></script>
+	<script type="text/javascript" src="js/keycombo.js"></script>
+</head>
+
+<body onload="init();">
+<div id="wrap">
+	<h1>Stylebot Options</h1>
+	<ul id="options">
+		<li class="option">
+			<label>Shortcut Key to launch Stylebot: </label>
+			<div class="option-field">
+				<input type="radio" name="useShortcutKey" value="true" /> On
+				<input type="radio" name="useShortcutKey" value="false" /> Off
+			</div>
+		</li>
+		<li class="option">
+			<label>Shortcut Key Combo: </label>
+			<div class="option-field">
+				<input type="radio" name="shortcutMetaKey" value="ctrl" /> Ctrl
+				<input type="radio" name="shortcutMetaKey" value="shift" /> Shift
+				<input type="radio" name="shortcutMetaKey" value="none" /> None
+				+ <input type="text" name="shortcutKey" value="e" size="1" />
+				<!-- Hidden field to store keycode value -->
+				<input type="hidden" name="shortcutKeyHiddenField" />
+			</div>
+		</li>
+		<li class="option">
+			<label>Preferred mode: </label>
+			<div class="option-field">
+				<input type="radio" name="mode" value="Basic" /> Basic
+				<input type="radio" name="mode" value="Advanced" /> Advanced
+			</div>
+		</li>
+		<br><br>
+		<div id="main-buttons">
+			<button onclick="save();">Save</button>
+			<button>Restore Defaults</button>
+		</div>
+	</ul>
+</body>
+
+</html>

@@ -31,7 +31,7 @@ stylebot.widget.advanced = {
     },
     
     onKeyUp: function(e) {
-        stylebot.style.applyInlineCSS( null, stylebot.widget.advanced.cache.cssField.attr('value') );
+        stylebot.style.applyInlineCSS( stylebot.style.cache.elements, stylebot.widget.advanced.cache.cssField.attr('value') );
     },
     
     fill: function() {
@@ -45,6 +45,9 @@ stylebot.widget.advanced = {
         this.fill();
         this.updateHeight();
         this.cache.container.show();
+        setTimeout( function() {
+            stylebot.widget.advanced.cache.cssField.focus();
+        });
     },
     
     hide: function() {

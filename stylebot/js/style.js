@@ -138,9 +138,7 @@ stylebot.style = {
     
     // apply inline CSS to selected element(s)
     applyInlineCSS: function(el, newCustomCSS) {
-        if(!el)
-            el = this.cache.elements;
-        if(el.length == 0) return false;
+        if(!el || el.length == 0) return false;
         
         el.each( function() {
             var existingCSS = $(this).attr('style');

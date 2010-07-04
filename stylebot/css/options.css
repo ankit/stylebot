@@ -1,0 +1,80 @@
+body {
+	background-color: #fafbff;
+	font-size: 15px;
+	line-height: 28px;
+    font-family: 'Lucida Grande', Helvetica, Arial, sans-serif;
+	color: #414141;
+	margin: 0;
+	padding: 0;
+}
+
+#wrap {
+    margin: 10px auto auto;
+    padding: 5px;
+    width: 650px;
+}
+
+h1 {
+    color: #5cd458;
+    font-family: 'Lucida Grande', Helvetica, Arial, sans-serif;
+    font-size: 30px;
+	text-align: right;
+}
+
+#options {
+    background-color: #fff;
+    border: 1px solid #e8e9ed;
+    border-radius: 5px;
+    margin: 0;
+    padding: 20px;
+    -webkit-box-shadow: 0px 0px 10px #eff0f3;
+}
+
+li.option {
+    list-style-type: none;
+    padding: 10px 0px;
+    margin: 0;
+}
+
+li.option label {
+    width: 300px;
+    display: inline-block;
+    text-align: right;
+}
+
+.option-field {
+    display: inline;
+    float: right;
+}
+
+input[type=text] {
+    border: 1px solid #ccc;
+    border-radius: 2px;
+    color: #414141;
+    font-size: 15px;
+    padding: 2px;
+    text-align: right;
+}
+
+#main-buttons {
+    text-align: right;
+    display: block;
+}
+
+button {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 2px;
+    color: #333;
+    font-size: 15px;
+}
+
+button:hover {
+    background-color: #eceef5;
+    color: #222;
+    cursor: pointer;
+}
+
+button:active {
+    background: -webkit-gradient(linear, left top, left bottom, from(#e8e9ed), to(#cfd1d7));
+}

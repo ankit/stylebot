@@ -24,16 +24,26 @@ var stylebot = {
     lintDebug: false,
 
     options: {
-        shortcutKey: 69, // 69 is keycode for 'e'
         useShortcutKey: true,
+        shortcutKey: 69, // 69 is keycode for 'e'
+        shortcutMetaKey: 'ctrl',
         mode: 'Basic',
         position: 'Right'
     },
     
     init: function() {
         this.style.init();
+        this.chrome.fetchOptions();
         this.initDebug();
         this.addListeners();
+    },
+    
+    // callback for request sent to background.html in stylebot.chrome.fetchOptions()
+    setOptions: function(options) {
+        this.options.useShortcutKey = options.useShortcutKey;
+        this.options.shortcutKey = options.shortcutKey;
+        this.options.shortcutMetaKey = options.shortcutMetaKey;
+        this.options.mode = options.mode;
     },
     
     initDebug: function() {
@@ -73,29 +83,34 @@ var stylebot = {
     
     addListeners: function() {
         // Handle key presses
-        $(document).keydown(function(e) {
+        $(document).keydown( function(e) {
             var eTagName = e.target.tagName.toLowerCase();
             var disabledEl = ['input', 'textarea', 'div', 'object', 'select'];
             if( $.inArray(eTagName, disabledEl) != -1 )
                return true;
 
             // Handle shortcut key combo 'ctrl + e' to toggle editing mode
-            if(stylebot.options.useShortcutKey && e.keyCode == stylebot.options.shortcutKey && e.ctrlKey)
+            if( stylebot.options.useShortcutKey && e.keyCode == stylebot.options.shortcutKey )
+            {
+                if( stylebot.options.shortcutMetaKey == 'ctrl' && e.ctrlKey 
+                  || stylebot.options.shortcutMetaKey == 'shift' && e.shiftKey
+                  || stylebot.options.shortcutMetaKey == 'none' )
                 stylebot.toggle();
-                
+            }
+            
             // Handle Esc key to escape editing mode
             else if(e.keyCode == 27 && stylebot.status && !stylebot.widget.ui.isColorPickerVisible)
                 stylebot.disable();
         })
 
         // Handle mouse move event on DOM elements
-        .mousemove(function(e) {
-            if(stylebot.widget.isBeingDragged || stylebot.modal.isVisible)
+        .mousemove( function(e) {
+            if( stylebot.widget.isBeingDragged || stylebot.modal.isVisible )
                 return true;
-            if(stylebot.hoveredElement == $(e.target) || !stylebot.status || !stylebot.selectMode)
+            if( stylebot.hoveredElement == $(e.target) || !stylebot.status || !stylebot.selectMode )
                 return true;
 
-            var parent = $(e.target).closest(' .ui-dialog, #stylebot, .stylebot_colorpicker');
+            var parent = $(e.target).closest( '.ui-dialog, #stylebot, .stylebot_colorpicker' );
             var id = $(e.target).attr('id');
             
             if(id.indexOf("stylebot") != -1 || parent.length != 0)
