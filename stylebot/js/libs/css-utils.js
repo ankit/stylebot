@@ -1,3 +1,11 @@
+/**
+  * CSS Utility Methods
+  *
+  * Copyright (c) 2010 Ankit Ahuja
+  * Dual licensed under GPL and MIT licenses.
+ **/
+
+
 // generate formatted CSS for all the rules
 function crunchCSS(rules,  setImportant) {
     var css = "";
@@ -10,7 +18,7 @@ function crunchCSS(rules,  setImportant) {
             
         css += "}" + "\n\n";
     }
-    console.log("Stylebot CSS for this page: " + css);
+    console.log("Crunched CSS: " + css);
     return css;
 }
 

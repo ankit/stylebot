@@ -1,10 +1,11 @@
 /**
-  * stylebot.utils
-  * 
-  * Stylebot Utility methods
+  * General JavaScript utility methods used in stylebot
+  *
+  * Copyright (c) 2010 Ankit Ahuja
+  * Dual licensed under GPL and MIT licenses.
   **/
 
-stylebot.utils = {
+Utils = {
     
     // return array index at which property pName is equal to value 'pValue'
     search: function(arr, pName, pValue) {

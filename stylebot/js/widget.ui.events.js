@@ -51,8 +51,6 @@ stylebot.widget.ui.events = {
     },
     
     onTextFieldKeyUp: function(e) {
-        // if(!stylebot.utils.filterKeys(['ctrl', 'shift', 'tab', 'esc', 'enter', 'arrowkeys'], e))
-        //     return true;
         
         var value = e.target.value;
         var property = $(e.target).data('property');
@@ -61,8 +59,6 @@ stylebot.widget.ui.events = {
     },
     
     onSizeFieldKeyUp: function(e) {
-        // if(!stylebot.utils.filterKeys(['ctrl', 'shift', 'tab', 'esc', 'enter', 'arrowkeys'], e))
-        //     return true;
         
         var value = e.target.value;
         var property = $(e.target).data('property');

@@ -196,7 +196,7 @@ stylebot.widget.ui = {
             class: 'stylebot-editable-text'
         }).appendTo(url_container);
         
-        stylebot.utils.makeEditable(url, function(value) {
+        Utils.makeEditable(url, function(value) {
             stylebot.style.cache.url = value;
         });
         
@@ -265,7 +265,7 @@ stylebot.widget.ui = {
         this.cache.box.appendTo(document.body);
         
         // make title editable
-        stylebot.utils.makeEditable(this.cache.header, function(value) {
+        Utils.makeEditable(this.cache.header, function(value) {
             stylebot.selector.value = value;
             stylebot.unhighlight();
             stylebot.highlight($(value)[0]);
@@ -413,7 +413,7 @@ stylebot.widget.ui = {
                                         for(var i=0; i<len; i++)
                                         {
                                             var option = control.options[i];
-                                            this.createSelectOption( stylebot.utils.capitalize(option), control.id, option).appendTo(control_el);
+                                            this.createSelectOption( Utils.capitalize(option), control.id, option).appendTo(control_el);
                                         }
                                         control_el.appendTo(el);
                                         break;

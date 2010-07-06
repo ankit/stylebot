@@ -1,7 +1,5 @@
 // TODO: For now, options are stored in localStorage. Instead store them more persistently, either in DB or in a bookmark
 
-var stylebot = {};
-
 var modal = null;
 var uiCache = { 
     textarea: null,
@@ -125,7 +123,7 @@ function createCustomStyleOption(url, rules) {
     .data('value', url)
     .appendTo( container );
     
-    stylebot.utils.makeEditable( url_div , function(newValue) {
+    Utils.makeEditable( url_div , function(newValue) {
         editURL( url_div.data('value'), newValue );
         url_div.data('value', newValue);
         setTimeout(function(){

@@ -10,7 +10,7 @@
 		"matches":["http://*/*", "https://*/*"],
 		
 		"js": [
-			"js/css.js",
+			"js/libs/css-utils.js",
 			"js/apply-css.js"
 		],
 		
@@ -30,7 +30,7 @@
 		],
 		
 		"js": [
-			"js/jquery.js",
+			"js/libs/jquery.js",
 			"js/main.js",
 			"js/chrome.js",
 			"js/widget.js",
@@ -39,11 +39,11 @@
 			"js/widget.advanced.js",
 			"js/selector.js",
 			"js/style.js",
-			"js/modalbox.js",
 			"js/modal.js",
-			"js/utils.js",
-			"js/colorpicker.js",
-			"js/jquery.lint.js"
+			"js/libs/modalbox.js",
+			"js/libs/utils.js",
+			"js/libs/colorpicker.js",
+			"js/libs/jquery.lint.js"
 		],
 		
 		"run_at": "document_end",
