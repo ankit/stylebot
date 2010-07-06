@@ -62,7 +62,9 @@ stylebot.utils = {
     makeEditable: function(el, callback) {
         el.attr('title', 'click to edit');
 
-        el.bind('click', { callback: callback }, function(e) {
+        el.bind('click keyup', { callback: callback }, function(e) {
+            if( e.type == 'keyup' && e.keyCode != 13)
+                return true;
             // hide element
             $(this).hide();
             
@@ -101,7 +103,6 @@ stylebot.utils = {
                 $(document).unbind('mousedown', onMouseDown);
             }
             
-            
             var onKeyDown = function(e) {
                 var value = e.data.input.attr('value');
                 if(e.keyCode == 13 || e.keyCode == 27) // on enter or esc
@@ -116,8 +117,8 @@ stylebot.utils = {
                 }
             };
             
-            input.bind('keyup', {input: input, el: $(this), callback: callback}, onKeyDown);
-            $(document).bind('mousedown', {input: input, el: $(this), callback: callback}, onMouseDown);
+            input.bind( 'keyup', { input: input, el: $(this), callback: callback }, onKeyDown );
+            $(document).bind( 'mousedown', { input: input, el: $(this), callback: callback }, onMouseDown );
             
         });
     }

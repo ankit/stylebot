@@ -1,5 +1,7 @@
 // TODO: For now, options are stored in localStorage. Instead store them more persistently, either in DB or in a bookmark
 
+var stylebot = {};
+
 var options = {
     useShortcutKey: true,
     shortcutKey: 69, //keydown code for 'e'
@@ -109,38 +111,60 @@ function createCustomStyleOption(url, rules) {
         class: 'custom-style'
     });
     
-    $('<div>', {
+    var url_div = $('<div>', {
         html: url,
-        class: 'custom-style-url'
+        class: 'custom-style-url',
+        tabIndex: 0
     })
+    .data('value', url)
     .appendTo( container );
     
-    $('<button>', {
-        html: 'remove',
-        class: 'inline-button custom-style-button'
-    })
-    .click( removeStyle )
-    .appendTo( container );
+    stylebot.utils.makeEditable( url_div , function(newValue) {
+        editURL( url_div.data('value'), newValue );
+        url_div.data('value', newValue);
+        setTimeout(function(){
+            url_div.focus();
+        }, 0);
+    });
+    
+    var b_container = $('<div>', {
+        class: 'button-container'
+    });
     
     $('<button>', {
         html: 'edit',
-        class: 'inline-button custom-style-button'
+        class: 'inline-button'
     })
     .click( editStyle )
-    .appendTo( container );
+    .appendTo( b_container );
     
-    return container;
+    $('<button>', {
+        html: 'remove',
+        class: 'inline-button'
+    })
+    .click( removeStyle )
+    .appendTo( b_container );
+    
+    return container.append( b_container );
 }
 
 function removeStyle(e) {
-    var parent = $(e.target).parent();
+    var parent = $(e.target).parents('.custom-style');
     var url = parent.find('.custom-style-url');
     delete styles[ url.html() ];
     parent.remove();
 }
 
 function editStyle(e) {
-    var parent = $(e.target).parent();
+    var parent = $(e.target).parents('.custom-style');
     var url = parent.find('.custom-style-url');
     var rules = styles [ url.html() ];
+}
+
+function editURL(oldValue, newValue) {
+    if( oldValue == newValue )
+        return;
+    var rules = styles[ oldValue ];
+    delete styles[ oldValue ];
+    styles[ newValue ] = rules;
 }

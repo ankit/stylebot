@@ -87,8 +87,8 @@ button:active {
 
 button.inline-button {
     font-size: 12px;
-    display: inline;
-    margin: 0px 5px;
+    display: inline-block;
+    margin: 5px 5px;
 }
 
 /* custom styles ui */
@@ -97,10 +97,26 @@ button.inline-button {
     margin-bottom: 100px;
 }
 
-#custom-styles .custom-style-url {
-    display: inline;
+.custom-style-url {
+    display: inline-block;
+    width: 80%;
+    padding: 2px;
 }
 
-#custom-styles .custom-style-button {
+.custom-style-url:hover {
+    background-color: #fbfbfb;
+    outline: 1px solid #ccc;
+    cursor: text;
+}
+
+.custom-style-url:focus {
+    outline: 1px solid #ccc;
+}
+
+#custom-styles input {
+    text-align: left;
+}
+
+#custom-styles .button-container {
     float: right;
 }

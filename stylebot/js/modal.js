@@ -20,7 +20,7 @@ stylebot.modal = {
     // create the DOM elements
     create: function() {
         this.cache.box = $('<div>', {
-            id:'stylebot-modal'
+            id:'stylebot-modal',
         })
         .appendTo(document.body);
         
