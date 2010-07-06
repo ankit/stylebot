@@ -7,6 +7,8 @@ var options = {
     mode: 'Basic'
 }
 
+var styles = {};
+
 // save options
 
 function save() {
@@ -21,9 +23,14 @@ function save() {
     localStorage['stylebot_option_shortcutKey'] = options.shortcutKey;
     localStorage['stylebot_option_mode'] = options.mode;
     
+    // save styles
+    localStorage['stylebot_styles'] = JSON.stringify( styles );
+    
     // update cache in background.html
     var bg_window = chrome.extension.getBackgroundPage();
     bg_window.cache.options = options;
+    bg_window.cache.styles = styles;
+    
     // propagate changes to all open tabs
     bg_window.propagateOptions();
 }
@@ -61,6 +68,8 @@ function init() {
         radioBt[1].checked = true;
     else
         radioBt[0].checked = true;
+        
+    fillCustomStyles();
 }
 
 // fetches options from the datastore
@@ -69,4 +78,69 @@ function fetch() {
     options.shortcutMetaKey = localStorage['stylebot_option_shorcutMetaKey'];
     options.shortcutKey = localStorage['stylebot_option_shortcutKey'];
     options.mode = localStorage['stylebot_option_mode'];
+}
+
+function restoreDefaults() {
+    // use shortcut key = true
+    $('[name=useShortcutKey]')[0].checked = true;
+    
+    // shortcut meta key = ctrl
+    $('[name=shortcutMetaKey]')[0].checked = true;
+    
+    // shortcut key = 69 (e)
+    $('[name=shortcutKeyHiddenField]').attr('value', 69);
+    $('[name=shortcutKey]').attr('value', 'e');
+    
+    // mode = basic
+    $('[name=mode]')[0].checked = true;
+}
+
+function fillCustomStyles() {
+    var container = $("#custom-styles");
+    styles = JSON.parse( localStorage['stylebot_styles'] );
+    for( var url in styles )
+    {
+        container.append( createCustomStyleOption( url, styles[url] ) );
+    }
+}
+
+function createCustomStyleOption(url, rules) {
+    var container = $('<div>', {
+        class: 'custom-style'
+    });
+    
+    $('<div>', {
+        html: url,
+        class: 'custom-style-url'
+    })
+    .appendTo( container );
+    
+    $('<button>', {
+        html: 'remove',
+        class: 'inline-button custom-style-button'
+    })
+    .click( removeStyle )
+    .appendTo( container );
+    
+    $('<button>', {
+        html: 'edit',
+        class: 'inline-button custom-style-button'
+    })
+    .click( editStyle )
+    .appendTo( container );
+    
+    return container;
+}
+
+function removeStyle(e) {
+    var parent = $(e.target).parent();
+    var url = parent.find('.custom-style-url');
+    delete styles[ url.html() ];
+    parent.remove();
+}
+
+function editStyle(e) {
+    var parent = $(e.target).parent();
+    var url = parent.find('.custom-style-url');
+    var rules = styles [ url.html() ];
 }

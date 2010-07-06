@@ -1,7 +1,7 @@
 /**
   * stylebot.chrome
   * 
-  * Methods making use of Chrome API
+  * Methods sending / receving messages from background.html
   **/
 
 stylebot.chrome = {

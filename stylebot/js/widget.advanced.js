@@ -12,7 +12,7 @@ stylebot.widget.advanced = {
     },
     
     defaults: {
-        optionsHeight: 265
+        optionsHeight: 225
     },
     
     create: function() {
@@ -28,7 +28,7 @@ stylebot.widget.advanced = {
             id: 'stylebot-advanced-css',
             class: 'stylebot-textarea stylebot-control stylebot-css-code'
         })
-        .keyup(stylebot.widget.advanced.onKeyUp)
+        .keyup(this.onKeyUp)
         .appendTo(this.cache.container);
         
         this.cache.container.appendTo(stylebot.widget.ui.cache.box);

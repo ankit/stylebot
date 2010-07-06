@@ -10,7 +10,7 @@ stylebot.widget.ui = {
     
     defaults: {
         validSizeUnits: ['px', 'em', '%', 'pt'],
-        optionsHeight: 220
+        optionsHeight: 180
     },
     
     groups: [{
@@ -245,9 +245,9 @@ stylebot.widget.ui = {
         this.createOption('Widget position', this.createButtonSet(['Left', 'Right'], "stylebot-position", 1, stylebot.widget.togglePosition) )
         .appendTo(options_div);
         
-        this.createOption('Selection Specificness', 
-        this.createButtonSet(['Low', 'Medium', 'High'], "stylebot-specificity", 1, stylebot.widget.toggleSpecificity))
-        .appendTo(options_div);
+        // this.createOption('Selection Specificness', 
+        // this.createButtonSet(['Low', 'Medium', 'High'], "stylebot-specificity", 1, stylebot.widget.toggleSpecificity))
+        // .appendTo(options_div);
         
         options_div.appendTo(this.cache.box);
         

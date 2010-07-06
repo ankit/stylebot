@@ -10,6 +10,7 @@
 		"matches":["http://*/*", "https://*/*"],
 		
 		"js": [
+			"js/css.js",
 			"js/apply-css.js"
 		],
 		

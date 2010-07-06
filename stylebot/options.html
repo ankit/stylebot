@@ -7,12 +7,14 @@
 	<script type="text/javascript" src="js/jquery.js"></script>
 	<script type="text/javascript" src="js/options.js"></script>
 	<script type="text/javascript" src="js/keycombo.js"></script>
+	<script type="text/javascript" src="js/css.js"></script>
 </head>
 
 <body onload="init();">
 <div id="wrap">
 	<h1>Stylebot Options</h1>
 	<ul id="options">
+		<h2>Basic</h2>
 		<li class="option">
 			<label>Shortcut Key to launch Stylebot: </label>
 			<div class="option-field">
@@ -38,10 +40,12 @@
 				<input type="radio" name="mode" value="Advanced" /> Advanced
 			</div>
 		</li>
-		<br><br>
+		<h2>Custom Styles</h2>
+		<div id="custom-styles">
+		</div>
 		<div id="main-buttons">
 			<button onclick="save();">Save</button>
-			<button>Restore Defaults</button>
+			<button onclick="restoreDefaults();">Restore Defaults</button>
 		</div>
 	</ul>
 </body>

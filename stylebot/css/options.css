@@ -21,6 +21,12 @@ h1 {
 	text-align: right;
 }
 
+h2 {
+    font-size: 14px;
+    font-weight: bold;
+    color: #111;
+}
+
 #options {
     background-color: #fff;
     border: 1px solid #e8e9ed;
@@ -77,4 +83,24 @@ button:hover {
 
 button:active {
     background: -webkit-gradient(linear, left top, left bottom, from(#e8e9ed), to(#cfd1d7));
+}
+
+button.inline-button {
+    font-size: 12px;
+    display: inline;
+    margin: 0px 5px;
+}
+
+/* custom styles ui */
+
+#custom-styles {
+    margin-bottom: 100px;
+}
+
+#custom-styles .custom-style-url {
+    display: inline;
+}
+
+#custom-styles .custom-style-button {
+    float: right;
 }

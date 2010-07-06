@@ -1,6 +1,12 @@
-// Code for detecting and validating keypresses in a field
+
+// Detecting and validating keypresses in a textfield 
+// Uses a hidden field to store keydown code
+
 var KeyCombo = {
-	init: function(el, codeEl){
+    
+    // el: the textfield in which key is pressed
+    // codeEl: Hidden textfield which will store the keydown code
+	init: function(el, codeEl) {
 		el.value = KeyCombo.mapKeyDownCode(codeEl.value);
 		el.addEventListener(
 			"keydown",
@@ -18,7 +24,8 @@ var KeyCombo = {
 			},
 			false);
 	},
-	filterKeyCode: function(code){
+	
+	filterKeyCode: function(code) {
 		// filter tab/shift/enter/esc/arrow keys
 		if(code == 27 || code == 16 || code == 37 || code == 38 || code == 39 || code == 40 || code == 13 || code == 9)
 			return false;
@@ -27,9 +34,10 @@ var KeyCombo = {
 			return false;
 		return true;
 	},
-	mapKeyDownCode: function(code){
+	
+	mapKeyDownCode: function(code) {
 	    code = Math.floor(code);
-		if((code >= 65 && code <= 90) || (code >= 48 && code <= 57))
+		if( (code >= 65 && code <= 90) || (code >= 48 && code <= 57) )
 		{
 			return String.fromCharCode(code).toLowerCase();
 		}
