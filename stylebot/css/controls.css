@@ -65,13 +65,6 @@ input.stylebot-textfield {
     -webkit-box-sizing: content-box;
 }
 
-textarea.stylebot-textarea {
-    line-height: 16px;
-    padding: 4px !important;
-    padding-right: 6px;
-    resize: none;
-}
-
 /* Checkbox */
 
 input[type=checkbox] {

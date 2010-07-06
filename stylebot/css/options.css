@@ -120,3 +120,11 @@ button.inline-button {
 #custom-styles .button-container {
     float: right;
 }
+
+textarea.stylebot-css-code {
+    color: #333 !important;
+    font-size: 11px !important;
+    font-family: Monaco, 'Lucida Console', monospace !important;
+    line-height: 14px;
+    padding: 2px;
+}

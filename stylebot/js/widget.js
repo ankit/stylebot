@@ -104,7 +104,7 @@ stylebot.widget = {
     
     // display CSS for page in a modal box
     viewCSS: function(e) {
-        stylebot.modal.show( crunchCSS( stylebot.style.rules, false ), {
+        stylebot.modal.show( crunchCSS( stylebot.style.rules, false ) , {
             onClose: function() { e.target.focus(); }
         });
     },

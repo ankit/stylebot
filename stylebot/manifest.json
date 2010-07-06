@@ -39,6 +39,7 @@
 			"js/widget.advanced.js",
 			"js/selector.js",
 			"js/style.js",
+			"js/modalbox.js",
 			"js/modal.js",
 			"js/utils.js",
 			"js/colorpicker.js",

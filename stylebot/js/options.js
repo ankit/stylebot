@@ -2,6 +2,12 @@
 
 var stylebot = {};
 
+var modal = null;
+var uiCache = { 
+    textarea: null,
+    intro: null
+}
+
 var options = {
     useShortcutKey: true,
     shortcutKey: 69, //keydown code for 'e'
@@ -159,6 +165,24 @@ function editStyle(e) {
     var parent = $(e.target).parents('.custom-style');
     var url = parent.find('.custom-style-url');
     var rules = styles [ url.html() ];
+    if(!modal)
+    {
+        var html = "<div>Edit the CSS for :</div><textarea class='stylebot-css-code' style='width: 100%; height: 300px'></textarea><button onclick='modal.hide();'>Close</button>";
+        
+        modal = new ModalBox( html, {
+            onOpen: function() { 
+                modal.box.find('textarea').focus();
+            },
+            onClose: function() { editRules( uiCache.textarea.html() ); }
+        });
+        
+        uiCache.textarea = modal.box.find('textarea');
+        uiCache.intro = modal.box.find('div');
+    }
+    
+    uiCache.intro.html( "Edit CSS for <b>" + url.html() + "</b>: ");
+    uiCache.textarea.html( crunchCSS( rules, false ) );
+    modal.show();
 }
 
 function editURL(oldValue, newValue) {
@@ -167,4 +191,8 @@ function editURL(oldValue, newValue) {
     var rules = styles[ oldValue ];
     delete styles[ oldValue ];
     styles[ newValue ] = rules;
+}
+
+function editRules(url, newRules) {
+    
 }

@@ -99,7 +99,7 @@ var stylebot = {
             }
             
             // Handle Esc key to escape editing mode
-            else if(e.keyCode == 27 && stylebot.status && !stylebot.widget.ui.isColorPickerVisible)
+            else if(e.keyCode == 27 && stylebot.status && !stylebot.widget.ui.isColorPickerVisible && !stylebot.modal.isVisible)
                 stylebot.disable();
         })
 

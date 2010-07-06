@@ -16,11 +16,16 @@
     font-size: 11px;
     font-family: 'Lucida Grande', Tahoma, Arial, sans-serif;
     display: none;
+    line-height: 15px;
 }
 
 #stylebot-modal textarea {
     margin: 10px 0;
+    border: 1px solid #ccc;
+    padding: 5px;
     background-color: #fbfbfb;
+    resize: none;
+    outline: none;
 }
 
 #stylebot-modal button {
