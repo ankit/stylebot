@@ -26,7 +26,7 @@ stylebot.style = {
     },
     
     // init rules from temporary variable in apply-css.js
-    init: function() {
+    initialize: function() {
         if(stylebotTempRules)
             this.rules = stylebotTempRules;
         if(stylebotTempUrl)
@@ -43,11 +43,11 @@ stylebot.style = {
     
     // apply a new rule to selected elements
     apply: function(property, value) {
-        if(!this.cache.selector)
+        if( !this.cache.selector )
             return true;
         
-        this.saveRuleToCache(this.cache.selector, property, value);
-        this.applyInlineCSS(this.cache.elements, this.getInlineCSS(this.cache.selector));
+        this.saveRuleToCache( this.cache.selector, property, value );
+        this.applyInlineCSS( this.cache.elements, this.getInlineCSS( this.cache.selector ) );
     },
     
     // parse CSS into rules and add them to cache
@@ -108,7 +108,7 @@ stylebot.style = {
         
         if( $.inArray(property, sizeProperties) )
         {
-            if($.inArray(value, stylebot.widget.ui.defaults.validSizeUnits) != -1)
+            if($.inArray(value, WidgetUI.validSizeUnits) != -1)
                 return false;
         }
 
@@ -201,7 +201,7 @@ stylebot.style = {
         if(style.length != 0)
             style.html( CSSUtils.crunchCSS( this.rules, true ) );
         else
-            injectCSS( CSSUtils.crunchCSS( this.rules, true ) );
+            CSSUtils.injectCSS( CSSUtils.crunchCSS( this.rules, true ), "stylebot-css");
 
         for(var selector in stylebot.style.rules)
             stylebot.style.clearInlineCSS( $(selector) );

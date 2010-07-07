@@ -31,12 +31,14 @@
 		
 		"js": [
 			"js/libs/jquery.js",
-			"js/main.js",
+			"js/init.js",
+			"js/stylebot.js",
 			"js/chrome.js",
 			"js/widget.js",
-			"js/widget.ui.js",
-			"js/widget.ui.events.js",
+			"js/widget.basic.js",
+			"js/widget.basic.events.js",
 			"js/widget.advanced.js",
+			"js/widget-ui.js",
 			"js/style.js",
 			"js/modal.js",
 			"js/libs/selectorGenerator.js",

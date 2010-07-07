@@ -1,10 +1,10 @@
 /**
-  * stylebot.widget.ui.events
+  * stylebot.widget.basic.events
   * 
-  * Events for Stylebot Widget Controls
+  * Events for Stylebot Widget Controls in Basic Mode
   **/
 
-stylebot.widget.ui.events = {
+stylebot.widget.basic.events = {
     
     onCheckboxChange: function(e) {
         var value;
@@ -101,5 +101,24 @@ stylebot.widget.ui.events = {
         else
             stylebot.style.apply(el.data('property'), '');
         el.focus();
+    },
+    
+    toggleAccordion: function(h) {
+        var status = h.hasClass('stylebot-accordion-active');
+        if(status)
+        {
+            h.removeClass('stylebot-accordion-active')
+            .next().hide();
+        }
+        else
+        {
+            // close all accordion groups
+            stylebot.widget.basic.cache.accordionHeaders
+            .removeClass('stylebot-accordion-active')
+            .next().hide();
+            
+            h.addClass('stylebot-accordion-active')
+            .next().show();
+        }
     }
 }

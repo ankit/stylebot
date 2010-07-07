@@ -15,7 +15,7 @@ stylebot.widget.advanced = {
         optionsHeight: 225
     },
     
-    create: function() {
+    createUI: function() {
         this.cache.container = $('<div>', {
             id: 'stylebot-advanced'
         });
@@ -31,7 +31,7 @@ stylebot.widget.advanced = {
         .keyup(this.onKeyUp)
         .appendTo(this.cache.container);
         
-        this.cache.container.appendTo(stylebot.widget.ui.cache.box);
+        return this.cache.container;
     },
     
     onKeyUp: function(e) {

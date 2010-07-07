@@ -25,7 +25,7 @@ stylebot.chrome = {
     // send request to fetch options from datastore
     fetchOptions: function() {
         chrome.extension.sendRequest({ name: "fetchOptions" }, function( response ){
-            stylebot.setOptions(response.options);
+            initialize( response.options );
         });
     }
 }
