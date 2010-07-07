@@ -3,14 +3,14 @@ var stylebotTempRules;
 var stylebotTempUrl;
 
 // send request to background.html to get stylebot rules for page
-chrome.extension.sendRequest({ name: "getRulesForPage", url: window.location.href }, function(response){
+chrome.extension.sendRequest({ name: "getRulesForPage", url: window.location.href }, function(response) {
     console.log("Stylebot Rules for this page: " + response.rules);
     
     // update temp vars for stylebot.style
     stylebotTempRules = response.rules;
     styleTempUrl = response.url;
     
-    if(!response.rules)
+    if( !response.rules )
         return;
-    injectCSS( crunchCSS(response.rules, true) );
+    CSSUtils.injectCSS( CSSUtils.crunchCSS( response.rules, true , "stylebot-css" ) );
 });

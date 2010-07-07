@@ -58,17 +58,10 @@ stylebot.style = {
         // empty rules cache
         delete this.rules[this.cache.selector];
         
-        // parse css into property value pairs
-        // TODO: Implement better parsing. Currently parsing is very strict ( e.g. ; is essential)
-        var rules = css.split(';');
-        var len = rules.length;
-        for(var i=0; i<len; i++)
-        {
-            var pair = rules[i].split(':');
-            var property = $.trim( pair[0] );
-            var value = $.trim( pair[1] );
-            this.saveRuleToCache(this.cache.selector, property, value);
-        }
+        var generatedRule = CSSUtils.generateRuleFromCSS( css );
+        
+        for( var property in generatedRule )
+            this.saveRuleToCache( this.cache.selector, property, generatedRule[ property ] );
     },
     
     // add/update rule to CSS rules cache
@@ -129,7 +122,7 @@ stylebot.style = {
         {
             var css = "";
             for(var property in rule)
-                css += getCSSDeclaration(property, rule[property], true);
+                css += CSSUtils.getCSSDeclaration(property, rule[property], true);
 
             return css;
         }
@@ -206,17 +199,17 @@ stylebot.style = {
         var style = $( 'style[title=stylebot-css]' );
         
         if(style.length != 0)
-            style.html( crunchCSS(this.rules, true) );
+            style.html( CSSUtils.crunchCSS( this.rules, true ) );
         else
-            injectCSS( crunchCSS(this.rules, true) );
+            injectCSS( CSSUtils.crunchCSS( this.rules, true ) );
 
         for(var selector in stylebot.style.rules)
             stylebot.style.clearInlineCSS( $(selector) );
     },
     
-    // get all the custom CSS rules set for the selector in cache
-    getRule: function(selector) {
-        var rule = this.rules[selector];
+    // get the rule for a selector
+    getRule: function( selector ) {
+        var rule = this.rules[ selector ];
         if(rule != undefined)
             return rule;
         else
@@ -228,7 +221,7 @@ stylebot.style = {
         var css = "";
 
         for(var property in this.rules[selector])
-            css += getCSSDeclaration(property, this.rules[selector][property], setImportant) + "\n";
+            css += CSSUtils.getCSSDeclaration(property, this.rules[selector][property], setImportant) + "\n";
 
         return css;
     },

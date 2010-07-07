@@ -53,7 +53,7 @@ stylebot.widget = {
         this.updateHeight();
         
         // set widget title
-        this.ui.cache.header.html(stylebot.selector.value ? stylebot.selector.value : "Select an element");
+        this.ui.cache.header.html(stylebot.style.cache.selector ? stylebot.style.cache.selector : "Select an element");
         // set mode
         this.setMode();
         stylebot.widget.ui.cache.box.show();
@@ -104,7 +104,7 @@ stylebot.widget = {
     
     // display CSS for page in a modal box
     viewCSS: function(e) {
-        stylebot.modal.show( crunchCSS( stylebot.style.rules, false ) , {
+        stylebot.modal.show( CSSUtils.crunchCSS( stylebot.style.rules, false ) , {
             onClose: function() { e.target.focus(); }
         });
     },
@@ -143,9 +143,9 @@ stylebot.widget = {
     
     toggleSpecificity: function(e) {
         var el = $(e.target);
-        stylebot.selector.mode = el.html().toLowerCase();
-        stylebot.selector.generate(stylebot.selectedElement);
-        stylebot.style.fillCache(stylebot.selector.value);
+        // stylebot.selector.mode = el.html().toLowerCase();
+        // stylebot.selector.generate(stylebot.selectedElement);
+        // stylebot.style.fillCache(stylebot.selector.value);
         stylebot.widget.show();
         $("." + el.data('class')).removeClass('stylebot-active-button');
         el.addClass('stylebot-active-button');

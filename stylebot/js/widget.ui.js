@@ -266,7 +266,7 @@ stylebot.widget.ui = {
         
         // make title editable
         Utils.makeEditable(this.cache.header, function(value) {
-            stylebot.selector.value = value;
+            stylebot.style.cache.selector = value;
             stylebot.unhighlight();
             stylebot.highlight($(value)[0]);
             stylebot.widget.show();
@@ -620,12 +620,12 @@ stylebot.widget.ui = {
     
     createColorPicker: function(input) {
         return $('<div>', {
-            class:'stylebot-colorselector stylebot-control', 
-            tabIndex:0
+            class: 'stylebot-colorselector stylebot-control', 
+            tabIndex: 0
         })
         .append($('<div>', { class:'stylebot-colorselector-color'}))
         .ColorPicker({
-            flat:false,
+            flat: false,
             onChange: function(hsb, hex, rgb) {
                 var colorCode = '#' + hex;
                 // set input value to reflect the newly picked color's code
@@ -849,7 +849,7 @@ stylebot.widget.ui = {
     fill: function() {
         // fill controls
         var len = this.groups.length;
-        var rule = stylebot.style.getRule(stylebot.selector.value);
+        var rule = stylebot.style.getRule( stylebot.style.cache.selector );
 
         if(rule)
         {

@@ -78,7 +78,6 @@ var stylebot = {
         this.disableSelectionMode();
         this.unhighlight();
         this.selectedElement = null;
-        this.selector.value = null;
     },
     
     addListeners: function() {
@@ -150,8 +149,7 @@ var stylebot = {
         stylebot.disableSelectionMode();
         stylebot.widget.updateRuleCache();
         stylebot.selectedElement = stylebot.hoveredElement;
-        stylebot.selector.generate(stylebot.selectedElement);
-        stylebot.style.fillCache(stylebot.selector.value);
+        stylebot.style.fillCache( SelectorGenerator.generate(stylebot.selectedElement) );
         stylebot.widget.show();
     },
     

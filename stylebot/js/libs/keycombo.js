@@ -14,7 +14,7 @@ var KeyCombo = {
 		el.value = KeyCombo.mapKeyDownCode(codeEl.value);
 		el.addEventListener(
 			"keydown",
-			function(e){
+			function(e) {
 				KeyCombo.lastValue = el.value;
 				if(e.keyCode == 8)
 					e.preventDefault();

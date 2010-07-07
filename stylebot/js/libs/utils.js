@@ -5,7 +5,7 @@
   * Dual licensed under GPL and MIT licenses.
   **/
 
-Utils = {
+var Utils = {
     
     // return array index at which property pName is equal to value 'pValue'
     search: function(arr, pName, pValue) {

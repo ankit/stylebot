@@ -7,6 +7,13 @@
 
 // constructor
 var ModalBox = function( html, options ) {
+    
+    if( options )
+    {
+        for( var option in options )
+            this.options[ option ] = options[ option ];
+    }
+    
     this.box = $('<div>', {
         id:'stylebot-modal'
     })
@@ -15,29 +22,31 @@ var ModalBox = function( html, options ) {
     
     // darken background
     this.background = $('<div>', {
-        id: 'stylebot-background'
+        id: 'stylebot-background',
     })
+    .css('opacity', this.options.bgOpacity)
     .appendTo(document.body);
-    
-    if( options )
-    {
-        this.onClose = options.onClose;
-        this.onOpen = options.onOpen;
-    }
 };
-    
+
+ModalBox.prototype.options = {
+    bgOpacity: 0.7,
+    bgFadeSpeed: 120,
+    fadeSpeed: 0,
+    onClose: function() {},
+    onOpen: function() {}
+}
+
 ModalBox.prototype.darkenBg = function(callback) {
         this.background.css({
             height: document.height
         });
-        this.background.fadeIn(170);
+        this.background.fadeIn( this.options.bgFadeSpeed );
 }
     
 ModalBox.prototype.show = function(content, options) {
-    this.box.show();
+    this.box.fadeIn( this.options.fadeSpeed );
     this.darkenBg();
-    if(this.onOpen != undefined && this.onOpen)
-        this.onOpen();
+    this.options.onOpen();
     var onKeyUp = function(e) {
         if(e.keyCode == 27)
         {
@@ -63,8 +72,7 @@ ModalBox.prototype.show = function(content, options) {
 }
     
 ModalBox.prototype.hide = function() {
-        this.box.hide();
-        this.background.fadeOut(170);
-        if(this.onClose && this.onClose != undefined)
-            this.onClose();
+        this.box.fadeOut( this.options.fadeSpeed );
+        this.background.fadeOut( this.options.bgFadeSpeed );
+        this.options.onClose();
 }

@@ -160,24 +160,25 @@ function removeStyle(e) {
 }
 
 function editStyle(e) {
-    var parent = $(e.target).parents('.custom-style');
-    var url = parent.find('.custom-style-url');
-    var rules = styles [ url.html() ];
     if(!modal)
     {
-        var html = "<div>Edit the CSS for :</div><textarea class='stylebot-css-code' style='width: 100%; height: 300px'></textarea><button onclick='modal.hide();'>Close</button>";
+        var textareaHeight = window.innerHeight * 0.5 + 'px';
+        var html = "<div>Edit the CSS for :</div><textarea class='stylebot-css-code' style='width: 100%; height:" + textareaHeight + "'></textarea><button onclick='modal.hide();'>Close</button>";
         
         modal = new ModalBox( html, {
             onOpen: function() { 
                 modal.box.find('textarea').focus();
             },
-            onClose: function() { editRules( uiCache.textarea.html() ); }
+            onClose: function() { editRules( uiCache.textarea.html() ); },
+            bgFadeSpeed: 0
         });
         
         uiCache.textarea = modal.box.find('textarea');
         uiCache.intro = modal.box.find('div');
     }
-    
+    var parent = $(e.target).parents('.custom-style');
+    var url = parent.find('.custom-style-url');
+    var rules = styles [ url.html() ];
     uiCache.intro.html( "Edit CSS for <b>" + url.html() + "</b>: ");
     uiCache.textarea.html( crunchCSS( rules, false ) );
     modal.show();

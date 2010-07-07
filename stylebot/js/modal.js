@@ -16,7 +16,8 @@ stylebot.modal = {
 
     // create the DOM elements
     create: function( options ) {
-        var html = "<div>You can now copy the CSS below into the custom stylesheet for Chrome:</div><textarea class='stylebot-textarea stylebot-css-code' style='width: 98%; height: 300px' ></textarea><button class='stylebot-button'>Copy to Clipboard</button>";
+        var textareaHeight = window.innerHeight * 0.5 + 'px';
+        var html = "<div>You can now copy the CSS below into the custom stylesheet for Chrome:</div><textarea class='stylebot-textarea stylebot-css-code' style='width: 98%; height: " + textareaHeight + "' ></textarea><button class='stylebot-button'>Copy to Clipboard</button>";
 
         this.modal = new ModalBox( html, options );
         this.cache.textarea = this.modal.box.find('textarea');
