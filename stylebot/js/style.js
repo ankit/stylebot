@@ -58,7 +58,7 @@ stylebot.style = {
         // empty rules cache
         delete this.rules[this.cache.selector];
         
-        var generatedRule = CSSUtils.generateRuleFromCSS( css );
+        var generatedRule = CSSUtils.parseBlockCSS( css );
         
         for( var property in generatedRule )
             this.saveRuleToCache( this.cache.selector, property, generatedRule[ property ] );

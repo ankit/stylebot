@@ -1,16 +1,18 @@
 // TODO: For now, options are stored in localStorage. Instead store them more persistently, either in DB or in a bookmark
 
-var modal = null;
-var uiCache = { 
+var bg_window = null;
+
+var cache = { 
     textarea: null,
-    intro: null
+    intro: null,
+    modal: null
 }
 
 var options = {
-    useShortcutKey: true,
-    shortcutKey: 69, //keydown code for 'e'
-    shortcutMetaKey: 'ctrl',
-    mode: 'Basic'
+    useShortcutKey: null,
+    shortcutKey: null,
+    shortcutMetaKey: null,
+    mode: null
 }
 
 var styles = {};
@@ -18,9 +20,10 @@ var styles = {};
 // save options
 
 function save() {
+    
     options.useShortcutKey = ( $('[name=useShortcutKey]:checked').attr('value') == 'true' );
     options.shortcutKey = $('[name=shortcutKeyHiddenField]').attr('value');
-    options.shortcutMetaKey = $('[name=shortcutMetaKey]:checked').attr('value');
+    options.shortcutMetaKey = $('[name=shortcutMetaKey]')[0].value;
     options.mode = $('[name=mode]:checked').attr('value');
     
     // save to datastore
@@ -33,7 +36,7 @@ function save() {
     localStorage['stylebot_styles'] = JSON.stringify( styles );
     
     // update cache in background.html
-    var bg_window = chrome.extension.getBackgroundPage();
+    bg_window = chrome.extension.getBackgroundPage();
     bg_window.cache.options = options;
     bg_window.cache.styles = styles;
     
@@ -42,11 +45,9 @@ function save() {
 }
 
 // initialize options
-
 function init() {
     // fetch options from datastore
-    fetch();
-    
+    fetchOptions();
     // update UI
     var radioBt = $('[name=useShortcutKey]');
     if( options.useShortcutKey == false )
@@ -54,34 +55,31 @@ function init() {
     else
         radioBt[0].checked = true;
 
-    radioBt = $('[name=shortcutMetaKey]');
-    if ( options.shortcutMetaKey == "shift" )
-        radioBt[1].checked = true;
-    else if( options.shortcutMetaKey == "none")
-        radioBt[2].checked = true;
-    else
-        radioBt[0].checked = true;
-    
+    var select = $('[name=shortcutMetaKey]')[0];
+
+    if ( options.shortcutMetaKey != undefined)
+        select.value = options.shortcutMetaKey;
+
     if( options.shortcutKey != undefined )
         $('[name=shortcutKeyHiddenField]').attr('value', options.shortcutKey);
     else
         $('[name=shortcutKeyHiddenField]').attr('value', 69);
 
     KeyCombo.init( $('[name=shortcutKey]')[0], $('[name=shortcutKeyHiddenField]')[0] );
-    
+
     radioBt = $('[name=mode]');
     if( options.mode == "Advanced" )
         radioBt[1].checked = true;
     else
         radioBt[0].checked = true;
-        
+
     fillCustomStyles();
 }
 
 // fetches options from the datastore
-function fetch() {
+function fetchOptions() {
     options.useShortcutKey = ( localStorage['stylebot_option_useShortcutKey'] == 'true' );
-    options.shortcutMetaKey = localStorage['stylebot_option_shorcutMetaKey'];
+    options.shortcutMetaKey = localStorage['stylebot_option_shortcutMetaKey'];
     options.shortcutKey = localStorage['stylebot_option_shortcutKey'];
     options.mode = localStorage['stylebot_option_mode'];
 }
@@ -160,28 +158,31 @@ function removeStyle(e) {
 }
 
 function editStyle(e) {
-    if(!modal)
+    if( !cache.modal )
     {
         var textareaHeight = window.innerHeight * 0.5 + 'px';
         var html = "<div>Edit the CSS for :</div><textarea class='stylebot-css-code' style='width: 100%; height:" + textareaHeight + "'></textarea><button onclick='modal.hide();'>Close</button>";
         
-        modal = new ModalBox( html, {
+        cache.modal = new ModalBox( html, {
             onOpen: function() { 
-                modal.box.find('textarea').focus();
+                cache.textarea.focus();
             },
-            onClose: function() { editRules( uiCache.textarea.html() ); },
+            onClose: function() { updateRules(); },
             bgFadeSpeed: 0
         });
         
-        uiCache.textarea = modal.box.find('textarea');
-        uiCache.intro = modal.box.find('div');
+        cache.textarea = cache.modal.box.find('textarea');
+        cache.intro = cache.modal.box.find('div');
     }
     var parent = $(e.target).parents('.custom-style');
-    var url = parent.find('.custom-style-url');
-    var rules = styles [ url.html() ];
-    uiCache.intro.html( "Edit CSS for <b>" + url.html() + "</b>: ");
-    uiCache.textarea.html( crunchCSS( rules, false ) );
-    modal.show();
+    var url = parent.find('.custom-style-url').html();
+    var rules = styles [ url ];
+    var css = CSSUtils.crunchCSS( rules, false );
+    cache.intro.html( "Edit CSS for <b>" + url + "</b>: ");
+    cache.textarea.html( css )
+    .attr('value', css)
+    .data( 'url', url );
+    cache.modal.show();
 }
 
 function editURL(oldValue, newValue) {
@@ -192,6 +193,8 @@ function editURL(oldValue, newValue) {
     styles[ newValue ] = rules;
 }
 
-function editRules(url, newRules) {
-    
+function updateRules() {
+    var newCSS = cache.textarea.attr('value');
+    var url = cache.textarea.data('url');
+    styles[ url ] = CSSUtils.parseCSS( newCSS );
 }

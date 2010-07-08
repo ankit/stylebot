@@ -91,7 +91,11 @@ button.inline-button {
     margin: 5px 5px;
 }
 
-/* custom styles ui */
+select {
+    font-size: 15px;
+}
+
+/* custom styles section */
 
 #custom-styles {
     margin-bottom: 100px;

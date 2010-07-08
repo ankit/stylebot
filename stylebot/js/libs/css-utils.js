@@ -8,7 +8,7 @@
 
 var CSSUtils = {
     
-    /*  e.g. of rules object used as input in several methods:
+    /*  e.g. of rules object used as input / output:
     
     rules = {
         'a.someclass': { 
@@ -51,20 +51,41 @@ var CSSUtils = {
         d.insertBefore(style, null);
     },
     
-    generateRuleFromCSS: function(css) {
+    parseBlockCSS: function(css) {
         var rule = {};
-        var declaration = css.split(';');
-        var len = declaration.length;
-        
+        var declarations = css.split(';');
+        declarations.pop();
+        var len = declarations.length;
         for(var i=0; i<len; i++)
         {
-            var pair = declaration[i].split(':');
+            var pair = declarations[i].split(':');
             var property = $.trim( pair[0] );
             var value = $.trim( pair[1] );
-            rule[ property ] = value;
+            if( property != "" && value != "" )
+                rule[ property ] = value;
         }
-        
         return rule;
+    },
+    
+    parseCSS: function(css) {
+        var rules = {};
+        css = this.removeComments( css );
+        var blocks = css.split( '}' );
+        blocks.pop();
+        var len = blocks.length;
+        for(var i=0; i<len; i++)
+        {
+            var pair = blocks[i].split( '{' );
+            rules[ $.trim( pair[0] ) ] = this.parseBlockCSS( pair[1] );
+        }
+        console.log( rules );
+        return rules;
+    },
+    
+    // from http://www.senocular.com/pub/javascript/CSS_parse.js
+    removeComments: function(css){
+        console.log(css.replace(/\/\*(\r|\n|.)*\*\//g,""));
+	    return css.replace(/\/\*(\r|\n|.)*\*\//g,"");
     }
 }
 

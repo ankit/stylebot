@@ -28,9 +28,12 @@
 		<li class="option">
 			<label>Shortcut Key Combo: </label>
 			<div class="option-field">
-				<input type="radio" name="shortcutMetaKey" value="ctrl" /> Ctrl
-				<input type="radio" name="shortcutMetaKey" value="shift" /> Shift
-				<input type="radio" name="shortcutMetaKey" value="none" /> None
+				<select name="shortcutMetaKey">
+					<option value="ctrl">Ctrl</option>
+					<option value="shift">Shift</option>
+					<option value="alt">Alt</option>
+					<option value="none">None</option>
+				</select>
 				+ <input type="text" name="shortcutKey" value="e" size="1" />
 				<!-- Hidden field to store keycode value -->
 				<input type="hidden" name="shortcutKeyHiddenField" />
