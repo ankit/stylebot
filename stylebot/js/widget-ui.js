@@ -240,7 +240,7 @@ WidgetUI = {
                 input.attr('value', colorCode);
                 input.keyup();
                 // update the color selector color
-                stylebot.widget.basic.setColorSelectorColor(input);
+                WidgetUI.setColorSelectorColor(input);
             },
             onBeforeShow: function() {
                 var color = input.attr('value');
