@@ -101,7 +101,8 @@ function restoreDefaults() {
 
 function fillCustomStyles() {
     var container = $("#custom-styles");
-    styles = JSON.parse( localStorage['stylebot_styles'] );
+    if( localStorage['stylebot_styles'] )
+        styles = JSON.parse( localStorage['stylebot_styles'] );
     for( var url in styles )
     {
         container.append( createCustomStyleOption( url, styles[url] ) );

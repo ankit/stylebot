@@ -1,3 +1,8 @@
+/**
+  * This content script's purpose is to inject any custom style for the page (if it exists) 
+  * as soon as the document starts loading.
+ **/
+
 // temporaries used by stylebot.style.init()
 var stylebotTempRules;
 var stylebotTempUrl;

@@ -46,7 +46,8 @@ var CSSUtils = {
         var d = document.documentElement;
         var style = document.createElement('style');
         style.type = "text/css";
-        style.title = title;
+        if( title != undefined)
+            style.title = title;
         style.innerText = css;
         d.insertBefore(style, null);
     },
@@ -84,8 +85,6 @@ var CSSUtils = {
     
     // from http://www.senocular.com/pub/javascript/CSS_parse.js
     removeComments: function(css){
-        console.log(css.replace(/\/\*(\r|\n|.)*\*\//g,""));
 	    return css.replace(/\/\*(\r|\n|.)*\*\//g,"");
     }
 }
-

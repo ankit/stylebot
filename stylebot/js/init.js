@@ -1,9 +1,5 @@
 /**
-  * stylebot
-  * Source: http://github.com/ankit/stylebot
-  *
-  * Copyright (c) 2010 Ankit Ahuja
-  * Dual licensed under GPL and MIT licenses.
+  * This content script initializes the stylebot widget
  **/
 
 lintDebug = false;

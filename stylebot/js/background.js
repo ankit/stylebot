@@ -27,7 +27,8 @@ function addListeners(){
     chrome.pageAction.onClicked.addListener(handlePageIconClick);
     
     chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-        chrome.pageAction.show(tabId);
+        if(tab.url.match("^http") == "http" && tab.url.indexOf("https://chrome.google.com/extensions") == -1)
+            chrome.pageAction.show(tabId);
     });
     
     chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
