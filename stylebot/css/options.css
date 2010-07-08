@@ -18,7 +18,7 @@ h1 {
     color: #5cd458;
     font-family: 'Lucida Grande', Helvetica, Arial, sans-serif;
     font-size: 30px;
-	text-align: right;
+	text-align: center;
 }
 
 h2 {
@@ -33,6 +33,7 @@ h2 {
     border-radius: 5px;
     margin: 0;
     padding: 20px;
+
     -webkit-box-shadow: 0px 0px 10px #eff0f3;
 }
 
@@ -43,14 +44,13 @@ li.option {
 }
 
 li.option label {
-    width: 300px;
+    width: 400px;
     display: inline-block;
-    text-align: right;
+
 }
 
 .option-field {
     display: inline;
-    float: right;
 }
 
 input[type=text] {
@@ -63,7 +63,7 @@ input[type=text] {
 }
 
 #main-buttons {
-    text-align: right;
+    text-align: center;
     display: block;
 }
 
@@ -98,12 +98,13 @@ select {
 /* custom styles section */
 
 #custom-styles {
-    margin-bottom: 100px;
+    margin-top: 50px;
+    margin-bottom: 50px;
 }
 
 .custom-style-url {
     display: inline-block;
-    width: 80%;
+    width: 400px;
     padding: 2px;
 }
 
@@ -119,10 +120,15 @@ select {
 
 #custom-styles input {
     text-align: left;
+    width: 404px;
+    outline: none;
+    border: 2px solid #ccc;
+    background-color: #eee;
+    color: #333;
 }
 
 #custom-styles .button-container {
-    float: right;
+    display: inline;
 }
 
 textarea.stylebot-css-code {
