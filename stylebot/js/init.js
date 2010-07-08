@@ -34,8 +34,9 @@ function addDOMListeners() {
         // Handle shortcut key combo 'ctrl + e' to toggle editing mode
         if( stylebot.options.useShortcutKey && e.keyCode == stylebot.options.shortcutKey )
         {
-            if( stylebot.options.shortcutMetaKey == 'ctrl' && e.ctrlKey 
+            if( stylebot.options.shortcutMetaKey == 'ctrl' && e.ctrlKey
               || stylebot.options.shortcutMetaKey == 'shift' && e.shiftKey
+              || stylebot.options.shortcutMetaKey == 'alt' && e.altKey
               || stylebot.options.shortcutMetaKey == 'none' )
             stylebot.toggle();
         }
