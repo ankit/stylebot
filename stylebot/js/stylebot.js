@@ -48,7 +48,7 @@ var stylebot = {
         this.widget.show();
         this.status = true;
         this.chrome.setIcon(true);
-        this.enableSelectionMode();
+        this.enableSelection();
         this.style.initInlineCSS();
     },
     
@@ -58,7 +58,7 @@ var stylebot = {
         this.chrome.setIcon(false);
         this.widget.updateRuleCache();
         this.style.reset();
-        this.disableSelectionMode();
+        this.disableSelection();
         this.unhighlight();
         this.selectedElement = null;
     },
@@ -77,26 +77,26 @@ var stylebot = {
     },
     
     select: function() {
-        stylebot.disableSelectionMode();
+        stylebot.disableSelection();
         stylebot.widget.updateRuleCache();
         stylebot.selectedElement = stylebot.hoveredElement;
         stylebot.style.fillCache( SelectorGenerator.generate(stylebot.selectedElement) );
         stylebot.widget.show();
     },
     
-    toggleSelectionMode: function() {
+    toggleSelection: function() {
         if(stylebot.selectionStatus)
-            stylebot.disableSelectionMode();
+            stylebot.disableSelection();
         else
-            stylebot.enableSelectionMode();
+            stylebot.enableSelection();
     },
     
-    enableSelectionMode: function() {
+    enableSelection: function() {
         stylebot.selectionStatus = true;
         stylebot.widget.cache.headerSelectIcon.addClass('stylebot-select-icon-active');
     },
     
-    disableSelectionMode: function() {
+    disableSelection: function() {
         stylebot.selectionStatus = false;
         stylebot.widget.cache.headerSelectIcon.removeClass('stylebot-select-icon-active');
     }

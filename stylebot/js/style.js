@@ -106,7 +106,7 @@ stylebot.style = {
         
         var sizeProperties = ['font-size', 'line-height', 'letter-height', 'margin', 'margin-top', 'margin-right', 'margin-bottom', 'margin-left', 'padding', 'padding-top', 'padding-right', 'padding-bottom', 'padding-left', 'border-width'];
         
-        if( $.inArray(property, sizeProperties) )
+        if( $.inArray(property, sizeProperties) != -1)
         {
             if($.inArray(value, WidgetUI.validSizeUnits) != -1)
                 return false;
@@ -139,7 +139,7 @@ stylebot.style = {
             var newCSS;
 
             // if stylebot css is being applied to the element for the first time
-            if(!existingCustomCSS)
+            if( !existingCustomCSS )
             {
                 // if there is any existing inline CSS, append stylebot CSS to it
                 if(existingCSS != undefined)

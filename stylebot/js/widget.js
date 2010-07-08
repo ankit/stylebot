@@ -31,18 +31,28 @@ stylebot.widget = {
             class: 'stylebot-select-icon'
         })
         .click(function(e) {
-            stylebot.toggleSelectionMode();
+            stylebot.toggleSelection();
         });
         
-        var url_container = $('<span>', {
+        var urlContainer = $('<span>', {
             id: 'stylebot-header-url'
         });
         
         var url = $('<span>', {
             html: stylebot.style.cache.url,
             class: 'stylebot-editable-text'
-        }).appendTo(url_container);
+        }).appendTo(urlContainer);
+
+        // make selector editable
+        Utils.makeEditable( this.cache.header, function(value) {
+            stylebot.style.fillCache( value );
+            stylebot.disableSelection();
+            stylebot.unhighlight();
+            stylebot.highlight( $(value)[0] );
+            stylebot.widget.show();
+        });
         
+        // make url editable
         Utils.makeEditable(url, function(value) {
             stylebot.style.cache.url = value;
         });
@@ -50,10 +60,10 @@ stylebot.widget = {
         $('<div>', {
             id: 'stylebot-header'
         })
-        .append(this.cache.header)
-        .append(this.cache.headerSelectIcon)
-        .append(url_container)
-        .appendTo(this.cache.box);
+        .append( this.cache.header )
+        .append( this.cache.headerSelectIcon )
+        .append( urlContainer )
+        .appendTo( this.cache.box );
         
         // UI for basic mode
         stylebot.widget.basic.createUI().appendTo( this.cache.box );
@@ -87,14 +97,6 @@ stylebot.widget = {
         btContainer.appendTo( this.cache.box );
         
         this.cache.box.appendTo( document.body );
-        
-        // make title editable
-        Utils.makeEditable( this.cache.header, function(value) {
-            stylebot.style.cache.selector = value;
-            stylebot.unhighlight();
-            stylebot.highlight($(value)[0]);
-            stylebot.widget.show();
-        });
         
         this.basic.fillCache();
 
