@@ -27,7 +27,7 @@ function addDOMListeners() {
     
     $( document ).keydown( function(e) {
         var eTagName = e.target.tagName.toLowerCase();
-        var disabledEl = ['input', 'textarea', 'div', 'object', 'select'];
+        var disabledEl = [ 'input', 'textarea', 'div', 'object', 'select' ];
         if( $.inArray(eTagName, disabledEl) != -1 )
            return true;
 
@@ -42,7 +42,7 @@ function addDOMListeners() {
         }
         
         // Handle Esc key to escape editing mode
-        else if(e.keyCode == 27 && stylebot.status && !stylebot.widget.ui.isColorPickerVisible && !stylebot.modal.isVisible)
+        else if( e.keyCode == 27 && stylebot.status && !WidgetUI.isColorPickerVisible && !stylebot.modal.isVisible )
             stylebot.disable();
     })
 
@@ -53,26 +53,25 @@ function addDOMListeners() {
         if( stylebot.hoveredElement == $(e.target) || !stylebot.status || !stylebot.selectionStatus )
             return true;
 
-        var parent = $(e.target).closest( '.ui-dialog, #stylebot, .stylebot_colorpicker' );
+        var parent = $(e.target).closest( '#stylebot, .stylebot_colorpicker' );
         var id = $(e.target).attr('id');
         
-        if(id.indexOf("stylebot") != -1 || parent.length != 0)
+        if( id.indexOf("stylebot") != -1 || parent.length != 0 )
         {
             stylebot.unhighlight();
             return true;
         }
-        stylebot.highlight(e.target);
+        stylebot.highlight( e.target );
     });
     
     // Handle click event on document.body (during capturing phase)
     document.body.addEventListener('click', function(e) {
-        if(stylebot.hoveredElement && stylebot.status && stylebot.selectionStatus)
+        if( stylebot.hoveredElement && stylebot.status && stylebot.selectionStatus )
         {
             e.preventDefault();
             e.stopPropagation();
             stylebot.select();
             return false;
         }
-    }, true);
-    
+    }, true );
 }

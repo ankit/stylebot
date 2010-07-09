@@ -27,9 +27,9 @@ stylebot.style = {
     
     // init rules from temporary variable in apply-css.js
     initialize: function() {
-        if(stylebotTempRules)
+        if( stylebotTempRules )
             this.rules = stylebotTempRules;
-        if(stylebotTempUrl)
+        if( stylebotTempUrl )
             this.cache.url = stylebotTempUrl;
     },
     
@@ -104,7 +104,7 @@ stylebot.style = {
         if(value == "")
             return false;
         
-        var sizeProperties = ['font-size', 'line-height', 'letter-height', 'margin', 'margin-top', 'margin-right', 'margin-bottom', 'margin-left', 'padding', 'padding-top', 'padding-right', 'padding-bottom', 'padding-left', 'border-width'];
+        var sizeProperties = [ 'font-size', 'line-height', 'letter-spacing', 'letter-height', 'margin', 'margin-top', 'margin-right', 'margin-bottom', 'margin-left', 'padding', 'padding-top', 'padding-right', 'padding-bottom', 'padding-left', 'border-width', 'border-top-width', 'border-right-width', 'border-bottom-width', 'border-left-width' ];
         
         if( $.inArray(property, sizeProperties) != -1)
         {
@@ -118,11 +118,11 @@ stylebot.style = {
     // generate inline CSS for selector
     getInlineCSS: function(selector) {
         var rule = this.rules[selector];
-        if(rule != undefined)
+        if( rule != undefined )
         {
             var css = "";
-            for(var property in rule)
-                css += CSSUtils.getCSSDeclaration(property, rule[property], true);
+            for( var property in rule )
+                css += CSSUtils.getCSSDeclaration( property, rule[property], true );
 
             return css;
         }
@@ -131,11 +131,11 @@ stylebot.style = {
     
     // apply inline CSS to selected element(s)
     applyInlineCSS: function(el, newCustomCSS) {
-        if(!el || el.length == 0) return false;
+        if( !el || el.length == 0 ) return false;
         
         el.each( function() {
-            var existingCSS = $(this).attr('style');
-            var existingCustomCSS = $(this).data('stylebot-css');
+            var existingCSS = $(this).attr( 'style' );
+            var existingCustomCSS = $(this).data( "stylebot-css" );
             var newCSS;
 
             // if stylebot css is being applied to the element for the first time
@@ -159,23 +159,23 @@ stylebot.style = {
                 });
             }
             // update stylebot css data associated with element
-            $(this).data('stylebot-css', newCustomCSS);
+            $(this).data( "stylebot-css", newCustomCSS );
         });
     },
     
     // clear any custom inline CSS for element(s)
     clearInlineCSS: function(el) {
-        el.each(function(){
-            var existingCSS = $(this).attr('style');
-            var existingCustomCSS = $(this).data('stylebot-css');
-            if(existingCustomCSS && existingCSS != undefined)
+        el.each( function(){
+            var existingCSS = $(this).attr( 'style' );
+            var existingCustomCSS = $(this).data( "stylebot-css" );
+            if( existingCustomCSS && existingCSS != undefined )
             {
-                var newCSS = existingCSS.replace(existingCustomCSS, '');
+                var newCSS = existingCSS.replace( existingCustomCSS, '' );
                 $(this).attr({
                     style: newCSS
                 });
                 // clear stylebot css data associated with element
-                $(this).data('stylebot-css', null);
+                $(this).data( "stylebot-css", null );
             }
         });
     },
@@ -188,22 +188,22 @@ stylebot.style = {
     
     // this method is called when stylebot is enabled
     initInlineCSS: function() {
-        for(var selector in stylebot.style.rules)
+        for( var selector in stylebot.style.rules )
             stylebot.style.applyInlineCSS( $(selector), stylebot.style.getInlineCSS(selector) );
         
-        $('style[title=stylebot-css]').html('');
+        $( "style[title=stylebot-css]" ).html("");
     },
     
     // replace inline CSS with <style> element. called when stylebot is disabled
     resetInlineCSS: function() {
-        var style = $( 'style[title=stylebot-css]' );
+        var style = $( "style[title=stylebot-css]" );
         
         if(style.length != 0)
             style.html( CSSUtils.crunchCSS( this.rules, true ) );
         else
             CSSUtils.injectCSS( CSSUtils.crunchCSS( this.rules, true ), "stylebot-css");
 
-        for(var selector in stylebot.style.rules)
+        for( var selector in stylebot.style.rules )
             stylebot.style.clearInlineCSS( $(selector) );
     },
     
@@ -220,30 +220,30 @@ stylebot.style = {
     crunchCSSForSelector: function(selector, setImportant) {
         var css = "";
 
-        for(var property in this.rules[selector])
-            css += CSSUtils.getCSSDeclaration(property, this.rules[selector][property], setImportant) + "\n";
+        for( var property in this.rules[selector] )
+            css += CSSUtils.getCSSDeclaration( property, this.rules[selector][property], setImportant ) + "\n";
 
         return css;
     },
     
     // clear any existing custom CSS for current selector
     clear: function() {
-        if(this.rules[this.cache.selector] != undefined)
+        if( this.rules[this.cache.selector] != undefined )
             delete this.rules[this.cache.selector];
-        this.clearInlineCSS(this.cache.elements);
+        this.clearInlineCSS( this.cache.elements );
     },
     
     clearAll: function() {
-        for(var selector in this.rules)
+        for( var selector in this.rules )
         {
             delete this.rules[selector];
-            this.clearInlineCSS($(selector));
+            this.clearInlineCSS( $(selector) );
         }
     },
     
     // save rules for page
     save: function() {
-        stylebot.chrome.save(stylebot.style.cache.url, stylebot.style.rules);
+        stylebot.chrome.save( stylebot.style.cache.url, stylebot.style.rules );
     },
     
     reset: function() {

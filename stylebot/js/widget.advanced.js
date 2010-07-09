@@ -64,12 +64,10 @@ stylebot.widget.advanced = {
     
     updateHeight: function() {
         var height = window.innerHeight - this.defaults.optionsHeight;
-        // if( height < 0 )
-        //     height = 10;
         this.cache.cssField.css('height', height);
     },
 
-    // called when mode is toggled, editing is disabled or when an element is selected
+    // called when mode is toggled, editing is disabled, css is viewed or when an element is selected
     updateRuleCache: function() {
         stylebot.style.saveRulesToCacheFromCSS( stylebot.widget.advanced.cache.cssField.attr('value') );
     }

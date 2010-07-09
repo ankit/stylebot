@@ -131,7 +131,7 @@ function getRulesForPage(currUrl) {
         return { rules: null, url: null };
 }
 
-function propagateOptions() {    
+function propagateOptions() {
     sendRequestToAllTabs( { name: 'setOptions', options: cache.options }, function(){} );
 }
 

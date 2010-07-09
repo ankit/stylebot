@@ -162,7 +162,7 @@ function editStyle(e) {
     if( !cache.modal )
     {
         var textareaHeight = window.innerHeight * 0.5 + 'px';
-        var html = "<div>Edit the CSS for :</div><textarea class='stylebot-css-code' style='width: 100%; height:" + textareaHeight + "'></textarea><button onclick='modal.hide();'>Close</button>";
+        var html = "<div>Edit the CSS for :</div><textarea class='stylebot-css-code' style='width: 100%; height:" + textareaHeight + "'></textarea><button onclick='cache.modal.hide();'>Close</button>";
         
         cache.modal = new ModalBox( html, {
             onOpen: function() { 
