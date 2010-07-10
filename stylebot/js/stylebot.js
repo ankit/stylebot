@@ -49,7 +49,6 @@ var stylebot = {
         this.status = true;
         this.chrome.setIcon(true);
         this.enableSelection();
-        this.style.initInlineCSS();
     },
     
     disable: function() {
@@ -64,24 +63,39 @@ var stylebot = {
     },
     
     highlight: function(el) {
-        if(stylebot.hoveredElement)
+        if( stylebot.hoveredElement )
             stylebot.hoveredElement.removeClass('stylebot-selected');
         stylebot.hoveredElement = $(el);
         stylebot.hoveredElement.addClass('stylebot-selected');
     },
     
     unhighlight: function() {
-        if(stylebot.hoveredElement)
+        if( stylebot.hoveredElement )
             stylebot.hoveredElement.removeClass('stylebot-selected');
         stylebot.hoveredElement = null;
     },
     
-    select: function() {
+    select: function( selector ) {
         stylebot.disableSelection();
         stylebot.widget.updateRuleCache();
-        stylebot.selectedElement = stylebot.hoveredElement;
-        stylebot.style.fillCache( SelectorGenerator.generate(stylebot.selectedElement) );
+        if( selector )
+        {
+            var el = $( selector )[0];
+            stylebot.selectedElement = el;
+            stylebot.unhighlight();
+            stylebot.highlight( el )
+        }
+        else
+        {
+            stylebot.selectedElement = stylebot.hoveredElement;
+            selector = SelectorGenerator.generate( stylebot.selectedElement );
+        }
+        stylebot.style.fillCache( selector );
         stylebot.widget.show();
+        
+        setTimeout( function() {
+            stylebot.style.removeFromStyleElement( stylebot.style.cache.selector );
+        }, 100);
     },
     
     toggleSelection: function() {

@@ -35,6 +35,16 @@ var CSSUtils = {
         return css;
     },
     
+    // generate formatted CSS for selector
+    crunchCSSForSelector: function(rules, selector, setImportant) {
+        var css = "";
+
+        for( var property in rules[ selector ] )
+            css += CSSUtils.getCSSDeclaration( property, rules[selector][property], setImportant ) + "\n";
+
+        return css;
+    },
+    
     getCSSDeclaration: function(property, value, setImportant) {
         if(setImportant)
             return property + ": " + value + " !important;";

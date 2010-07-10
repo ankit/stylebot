@@ -22,7 +22,8 @@ stylebot.style = {
         selector: null,
         // most recently selected elements
         elements: null,
-        url: document.domain
+        url: document.domain,
+        styleEl: null
     },
     
     // init rules from temporary variable in apply-css.js
@@ -180,13 +181,6 @@ stylebot.style = {
         });
     },
     
-    // This applies all rules for page as inline CSS to elements and clears the stylebot <style> element. This is done
-    // because when an element's styles are edited, they are applied as inline CSS.
-    
-    // An alternate approach can be to crunchCSS for page everytime a style is edited and update <style>'s html,
-    // which maybe more costly
-    
-    // this method is called when stylebot is enabled
     initInlineCSS: function() {
         for( var selector in stylebot.style.rules )
             stylebot.style.applyInlineCSS( $(selector), stylebot.style.getInlineCSS(selector) );
@@ -196,15 +190,36 @@ stylebot.style = {
     
     // replace inline CSS with <style> element. called when stylebot is disabled
     resetInlineCSS: function() {
-        var style = $( "style[title=stylebot-css]" );
-        
-        if(style.length != 0)
-            style.html( CSSUtils.crunchCSS( this.rules, true ) );
-        else
-            CSSUtils.injectCSS( CSSUtils.crunchCSS( this.rules, true ), "stylebot-css");
+        this.updateStyleElement( this.rules );
 
         for( var selector in stylebot.style.rules )
             stylebot.style.clearInlineCSS( $(selector) );
+    },
+    
+    removeFromStyleElement: function( selector ) {
+        
+        stylebot.style.applyInlineCSS( $(selector), stylebot.style.getInlineCSS(selector) );
+        
+        var tempRules = {};
+        for(var sel in this.rules)
+        {
+            if(sel != selector)
+                tempRules[ sel ] = this.rules[ sel ];
+        }
+        this.updateStyleElement( tempRules );
+    },
+    
+    updateStyleElement: function( rules ) {
+        if( !this.cache.styleEl )
+            this.cache.styleEl = $( "style[title=stylebot-css]" );
+        
+        if( this.cache.styleEl.length != 0 )
+            this.cache.styleEl.html( CSSUtils.crunchCSS( rules, true ) );
+        else
+        {
+            CSSUtils.injectCSS( CSSUtils.crunchCSS( rules, true ), "stylebot-css");
+            this.cache.styleEl = $( "style[title=stylebot-css]" );
+        }
     },
     
     // get the rule for a selector
@@ -214,16 +229,6 @@ stylebot.style = {
             return rule;
         else
             return null;
-    },
-    
-    // generate formatted CSS for selector
-    crunchCSSForSelector: function(selector, setImportant) {
-        var css = "";
-
-        for( var property in this.rules[selector] )
-            css += CSSUtils.getCSSDeclaration( property, this.rules[selector][property], setImportant ) + "\n";
-
-        return css;
     },
     
     // clear any existing custom CSS for current selector
@@ -247,8 +252,10 @@ stylebot.style = {
     },
     
     reset: function() {
-        this.resetInlineCSS();
         this.cache.selector = null;
         this.cache.elements = null;
+        setTimeout(function() {
+            this.resetInlineCSS();
+        }, 100);
     }
 }

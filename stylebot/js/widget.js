@@ -45,11 +45,7 @@ stylebot.widget = {
 
         // make selector editable
         Utils.makeEditable( this.cache.header, function(value) {
-            stylebot.style.fillCache( value );
-            stylebot.disableSelection();
-            stylebot.unhighlight();
-            stylebot.highlight( $(value)[0] );
-            stylebot.widget.show();
+            stylebot.select( value );
         });
         
         // make url editable
@@ -168,7 +164,7 @@ stylebot.widget = {
         if( !this.cache.box )
             this.createUI();
             
-        this.setPosition(stylebot.options.position);
+        this.setPosition( stylebot.options.position );
         this.updateHeight();
         
         // set widget title
