@@ -255,7 +255,7 @@ stylebot.style = {
         this.cache.selector = null;
         this.cache.elements = null;
         setTimeout(function() {
-            this.resetInlineCSS();
+            stylebot.style.resetInlineCSS();
         }, 100);
     }
 }

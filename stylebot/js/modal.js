@@ -40,11 +40,6 @@ stylebot.modal = {
         this.modal.show();
     },
     
-    hide: function() {
-        this.modal.hide();
-        this.isVisible = false;
-    },
-    
     copyToClipboard: function() {
         var text = stylebot.modal.cache.textarea.attr('value');
         stylebot.chrome.copyToClipboard(text);

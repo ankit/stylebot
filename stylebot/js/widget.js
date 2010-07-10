@@ -223,7 +223,7 @@ stylebot.widget = {
     viewCSS: function(e) {
         stylebot.widget.updateRuleCache();
         stylebot.modal.show( CSSUtils.crunchCSS( stylebot.style.rules, false ) , {
-            onClose: function() { e.target.focus(); }
+            onClose: function() { stylebot.modal.isVisible = false; e.target.focus(); }
         });
     },
     

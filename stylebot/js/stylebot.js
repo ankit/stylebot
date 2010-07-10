@@ -82,8 +82,7 @@ var stylebot = {
         {
             var el = $( selector )[0];
             stylebot.selectedElement = el;
-            stylebot.unhighlight();
-            stylebot.highlight( el )
+            stylebot.highlight( el );
         }
         else
         {
