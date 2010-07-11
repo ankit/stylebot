@@ -10,8 +10,10 @@ $( document ).ready(function() {
 });
 
 // callback for request sent to background.html in stylebot.chrome.fetchOptions()
-function initialize( options ) {
-    stylebot.initialize( options );
+function initialize( response ) {
+    stylebot.initialize( response.options );
+    // init accordion state
+    stylebot.widget.basic.enabledAccordions = response.enabledAccordions;
     addDOMListeners();
 }
 

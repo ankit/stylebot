@@ -2,6 +2,8 @@ stylebot.widget.basic = {
     
     isColorPickerVisible: false,
     
+    enabledAccordions: [0],
+    
     cache: {
         container: null,
         controls: null,
@@ -444,5 +446,11 @@ stylebot.widget.basic = {
     
     updateHeight: function() {
         this.cache.container.css('height', window.innerHeight - this.defaults.optionsHeight);
+    },
+    
+    initAccordions: function() {
+        var len = this.enabledAccordions.length;
+        for( var i=0; i < len; i++ )
+            this.events.toggleAccordion( $( this.cache.accordionHeaders[ this.enabledAccordions[i] ] ) );
     }
 }

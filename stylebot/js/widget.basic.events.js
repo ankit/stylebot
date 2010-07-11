@@ -6,6 +6,8 @@
 
 stylebot.widget.basic.events = {
     
+    accordionTimer: null,
+    
     onCheckboxChange: function(e) {
         var value;
         if(e.target.checked == true)
@@ -121,5 +123,20 @@ stylebot.widget.basic.events = {
             .focus()
             .next().show();
         }
+        
+        // determine which accordions are open and
+        // send request to save the new state to background.html cache
+        if( this.accordionTimer )
+            clearTimeout( this.accordionTimer );
+        this.accordionTimer = setTimeout( function() {
+            var len = stylebot.widget.basic.cache.accordionHeaders.length;
+            var enabledAccordions = [];
+            for( var i=0; i < len; i++ )
+            {
+                if( $ ( stylebot.widget.basic.cache.accordionHeaders[i] ).hasClass( 'stylebot-accordion-active' ) )
+                    enabledAccordions[ enabledAccordions.length ] = i;
+            }
+            stylebot.chrome.saveAccordionState( enabledAccordions );
+        }, 2000);
     }
 }

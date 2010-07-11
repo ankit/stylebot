@@ -25,8 +25,12 @@ stylebot.chrome = {
     // send request to fetch options from datastore
     fetchOptions: function() {
         chrome.extension.sendRequest({ name: "fetchOptions" }, function( response ){
-            initialize( response.options );
+            initialize( response );
         });
+    },
+    
+    saveAccordionState: function( enabledAccordions ) {
+        chrome.extension.sendRequest( { name: "saveAccordionState", enabledAccordions: enabledAccordions }, function(){} );
     }
 }
 

@@ -9,18 +9,23 @@ var cache = {
         }
     */
     styles: {},
+    
     options: {
         useShortcutKey: true,
         shortcutKey: 69, // keydown code for 'e'
         shortcutMetaKey: 'ctrl',
         mode: 'Basic'
-    }
+    },
+    
+    // indices of enabled accordions
+    enabledAccordions: 0
 };
 
 function init(){
     addListeners();
     loadStylesIntoCache();
     loadOptionsIntoCache();
+    loadAccordionState();
 }
 
 function addListeners(){
@@ -43,7 +48,9 @@ function addListeners(){
             
             case "getRulesForPage"  : sendResponse( getRulesForPage( request.url ) ); sendResponse({}); break;
             
-            case "fetchOptions"     : sendResponse( { options: cache.options } ); break;
+            case "fetchOptions"     : sendResponse( { options: cache.options, enabledAccordions: cache.enabledAccordions } ); break;
+            
+            case "saveAccordionState": saveAccordionState( request.enabledAccordions ); sendResponse({}); break;
         }
     });
 }
@@ -152,6 +159,16 @@ function sendRequestToAllTabs(req){
 			}
 		}
 	});
+}
+
+function saveAccordionState( enabledAccordions ) {
+    cache.enabledAccordions = enabledAccordions;
+    localStorage[ 'stylebot_enabledAccordions' ] = enabledAccordions;
+}
+
+function loadAccordionState() {
+    if( localStorage[ 'stylebot_enabledAccordions' ] )
+        cache.enabledAccordions = localStorage[ 'stylebot_enabledAccordions' ].split(',');
 }
 
 window.addEventListener('load', function(){

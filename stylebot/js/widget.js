@@ -96,9 +96,8 @@ stylebot.widget = {
         
         this.basic.fillCache();
 
-        // open first accordion
-        // TODO: load last opened accordions from cache
-        this.basic.events.toggleAccordion( $( this.basic.cache.accordionHeaders[0] ) );
+        // open the accordions loaded from cache
+        this.basic.initAccordions();
         
         // set initial widget position to Right
         stylebot.widget.setPosition( 'Right' );
