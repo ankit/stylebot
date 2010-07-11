@@ -24,16 +24,17 @@ WidgetUI = {
             tabIndex: 0,
             html: name
         })
-        .prepend($('<div>', {
+        .prepend( $('<div>', {
             class: 'stylebot-accordion-icon'
         }))
-        .bind('click keydown', function (e) {
-            if(e.type == "keydown" && e.keyCode != 13)
+        .bind('mousedown keydown', function (e) {
+            if( e.type == "keydown" && e.keyCode != 13 )
                 return true;
             e.preventDefault();
-            var el = $(e.target);
-            if( !el.hasClass('stylebot-accordion-header') )
+            var el = $( e.target );
+            if( !el.hasClass( 'stylebot-accordion-header' ) )
                 el = el.parent();
+            
             stylebot.widget.basic.events.toggleAccordion( el );
         });
     },

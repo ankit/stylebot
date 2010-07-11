@@ -130,8 +130,15 @@ stylebot.widget.basic = {
         }]
     },
     {
-        name: 'Layout & Visibility',
+        name: 'Visibility & Layout',
         controls: [
+        {
+            name: 'Visibility',
+            id: 'display',
+            type: 'toggle',
+            value: 'none',
+            el: null
+        },
         {
             name: 'Margins',
             options: ['All', 'Top', 'Right', 'Bottom', 'Left'],
@@ -144,13 +151,6 @@ stylebot.widget.basic = {
             options: ['All', 'Top', 'Right', 'Bottom', 'Left'],
             id: ['padding', 'padding-top', 'padding-right', 'padding-bottom', 'padding-left'],
             type: 'multi-size',
-            el: null
-        },
-        {
-            name: 'Visibility',
-            id: 'display',
-            type: 'toggle',
-            value: 'none',
             el: null
         }]
     }
@@ -420,11 +420,22 @@ stylebot.widget.basic = {
         this.fill();
         
         this.updateHeight();
-        setTimeout(function() {
-            stylebot.widget.basic.cache.accordionHeaders[0].focus();
-        }, 0);
         
-        $('#stylebot-controls').show();
+        // set focus to first visible accordion header
+        var controlContainerOffset = this.cache.container.offset().top;
+
+        for( var i=0; i<4; i++ )
+        {
+            if( $(this.cache.accordionHeaders[i]).offset().top >= controlContainerOffset )
+             {
+                 setTimeout( function() {
+                      stylebot.widget.basic.cache.accordionHeaders[i].focus();
+                 }, 0);
+                 break;
+             }
+        }
+        
+        this.cache.container.show();
     },
     
     hide: function() {

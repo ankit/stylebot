@@ -31,14 +31,19 @@ function addListeners(){
             chrome.pageAction.show(tabId);
     });
     
-    chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
-        switch(request.name){
-            case "enablePageIcon"   : enablePageIcon(sender.tab.id); break;
-            case "disablePageIcon"  : disablePageIcon(sender.tab.id); break;
-            case "copyToClipboard"  : copyToClipboard(request.text); break;
-            case "save"             : save(request.url, request.rules); break;
-            case "getRulesForPage"  : sendResponse(getRulesForPage(request.url)); break;
-            case "fetchOptions"     : sendResponse({ options: cache.options }); break;
+    chrome.extension.onRequest.addListener( function(request, sender, sendResponse) {
+        switch( request.name ) {
+            case "enablePageIcon"   : enablePageIcon( sender.tab.id ); sendResponse({}); break;
+            
+            case "disablePageIcon"  : disablePageIcon( sender.tab.id ); sendResponse({}); break;
+            
+            case "copyToClipboard"  : copyToClipboard( request.text ); sendResponse({}); break;
+            
+            case "save"             : save( request.url, request.rules ); sendResponse({}); break;
+            
+            case "getRulesForPage"  : sendResponse( getRulesForPage( request.url ) ); sendResponse({}); break;
+            
+            case "fetchOptions"     : sendResponse( { options: cache.options } ); break;
         }
     });
 }

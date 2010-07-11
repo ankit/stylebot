@@ -97,11 +97,11 @@ stylebot.widget = {
         this.basic.fillCache();
 
         // open first accordion
-        // TODO: Load accordions last opened from cache in background.html
+        // TODO: load last opened accordions from cache
         this.basic.events.toggleAccordion( $( this.basic.cache.accordionHeaders[0] ) );
         
         // set initial widget position to Right
-        stylebot.widget.setPosition('Right');
+        stylebot.widget.setPosition( 'Right' );
         
         this.addListeners();
     },
@@ -109,9 +109,9 @@ stylebot.widget = {
     addListeners: function() {
         
         // TODO: Instead of having these separate handlers, implement them into a single handler
-        this.cache.box.keydown(function(e) {
+        this.cache.box.keydown( function(e) {
             // disable editing on esc
-            if(e.keyCode == 27 && !stylebot.widget.basic.isColorPickerVisible)
+            if( e.keyCode == 27 && !stylebot.widget.basic.isColorPickerVisible )
             {
                 e.target.blur();
                 stylebot.disable();
@@ -128,7 +128,7 @@ stylebot.widget = {
                 stylebot.widget.advanced.updateHeight();
         });
         
-        this.basic.cache.controls.keydown(function(e) {
+        this.basic.cache.controls.keydown( function(e) {
             // if esc is pressed, take away focus and stop editing
             if(e.keyCode == 27 && !stylebot.widget.basic.isColorPickerVisible)
             {
@@ -150,7 +150,7 @@ stylebot.widget = {
         });
         
         // TAB on last button sets focus to first accordion header
-        lastBt.keydown(function(e) {
+        lastBt.keydown( function(e) {
             if(e.keyCode == 9 && !e.shiftKey)
             {
                 e.stopImmediatePropagation();
@@ -185,17 +185,17 @@ stylebot.widget = {
         var left;
 
         if(where == 'Left')
-            left = 20;
+            left = 0;
         else if(where == 'Right')
-            left = window.innerWidth - dialogWidth - 70;
+            left = document.width - dialogWidth - 40;
 
         this.cache.box.css('left', left);
-        
+
         stylebot.options.position = where;
     },
     
     updateHeight: function() {
-        this.cache.box.css('height', window.innerHeight - 20);
+        this.cache.box.css('height', window.innerHeight);
     },
     
     setMode: function() {

@@ -6,7 +6,7 @@
     min-height: 50%;
     background-color: #fff;
     border-radius: 5px;
-    z-index: 10500;
+    z-index: 100500;
     position: fixed;
     top: 20%;
     left: 25%;
@@ -35,7 +35,7 @@
 #stylebot-background {
     background-color: #000;
     opacity: 0.7;
-    z-index: 10250;
+    z-index: 100250;
     height: 100%;
     width: 100%;
     display: none;

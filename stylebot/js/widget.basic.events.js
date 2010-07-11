@@ -88,36 +88,37 @@ stylebot.widget.basic.events = {
 
         // TODO: Try to implement the next element's border width using CSS
         var control = el.parent();
-        var status = el.hasClass('stylebot-active-button');
-        control.find('.stylebot-active-button')
-        .removeClass('stylebot-active-button')
-        .next().css('border-left-width', '1px');
-        if(!status)
+        var status = el.hasClass( 'stylebot-active-button' );
+        control.find( '.stylebot-active-button' )
+        .removeClass( 'stylebot-active-button' )
+        .next().css( 'border-left-width', '1px' );
+        if( !status )
         {
-            el.addClass('stylebot-active-button');
-            el.next().css('border-left-width', '0px');
-            stylebot.style.apply(el.data('property'), el.data('value'));
+            el.addClass( 'stylebot-active-button' );
+            el.next().css( 'border-left-width', '0px' );
+            stylebot.style.apply( el.data( 'property' ), el.data( 'value' ) );
         }
         else
-            stylebot.style.apply(el.data('property'), '');
+            stylebot.style.apply( el.data( 'property' ), '' );
         el.focus();
     },
     
     toggleAccordion: function(h) {
-        var status = h.hasClass('stylebot-accordion-active');
-        if(status)
+        if( h.hasClass( 'stylebot-accordion-active' ) )
         {
-            h.removeClass('stylebot-accordion-active')
+            h.removeClass( 'stylebot-accordion-active' )
+            .focus()
             .next().hide();
         }
         else
         {
             // close all accordion groups
-            stylebot.widget.basic.cache.accordionHeaders
-            .removeClass('stylebot-accordion-active')
-            .next().hide();
-            
-            h.addClass('stylebot-accordion-active')
+            // stylebot.widget.basic.cache.accordionHeaders
+            // .removeClass('stylebot-accordion-active')
+            // .next().hide();
+
+            h.addClass( 'stylebot-accordion-active' )
+            .focus()
             .next().show();
         }
     }

@@ -2,7 +2,7 @@
 
 #stylebot {
     border: 1px solid #C2C2C2;
-    border-radius: 3px;
+    border-radius: 0px;
     background-color: #fdfdfd;
     color: #313131;
     display: none;
@@ -13,9 +13,9 @@
     margin: 0;
     text-align: left;
     position: fixed;
-    top: 2%;
+    top: 0%;
     width: 340px;
-    z-index: 10000;
+    z-index: 100000;
 }
 
 #stylebot-header {
@@ -249,7 +249,7 @@ a.stylebot-accordion-active .stylebot-accordion-icon {
 
 #stylebot-advanced .stylebot-textarea {
     height: 100;
-    width: 93%;
+    width: 92%;
     padding: 5px;
     resize: none;
 }

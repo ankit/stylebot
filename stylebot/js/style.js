@@ -46,9 +46,13 @@ stylebot.style = {
     apply: function(property, value) {
         if( !this.cache.selector )
             return true;
-        
-        this.saveRuleToCache( this.cache.selector, property, value );
-        this.applyInlineCSS( this.cache.elements, this.getInlineCSS( this.cache.selector ) );
+
+        stylebot.style.saveRuleToCache( stylebot.style.cache.selector, property, value );
+
+        setTimeout( function() {
+            stylebot.style.applyInlineCSS( stylebot.style.cache.elements, stylebot.style.getInlineCSS( stylebot.style.cache.selector ) );
+        }, 0 );
+
     },
     
     // parse CSS into rules and add them to cache

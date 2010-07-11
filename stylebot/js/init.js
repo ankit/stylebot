@@ -68,7 +68,6 @@ function addDOMListeners() {
     document.body.addEventListener('click', function(e) {
         if( stylebot.hoveredElement && stylebot.status && stylebot.selectionStatus )
         {
-            
             e.preventDefault();
             e.stopPropagation();
             stylebot.select();
