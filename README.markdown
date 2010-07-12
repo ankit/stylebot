@@ -15,7 +15,7 @@ Download `stylebot.crx` (use Download Source button on top right) and open it in
 
 Or, you can also load `/stylebot` as an unpacked extension (in Developer mode).
 
-Once installed, you can toggle stylebot on a page by either clicking on the 'css' icon in omnibar or pressing 'ctrl + e'.
+Once installed, you can toggle stylebot on a page by either clicking on the '**css**' icon in omnibar or pressing '**ctrl + e**'.
 
 Credits
 ---------
