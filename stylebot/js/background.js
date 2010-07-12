@@ -18,7 +18,7 @@ var cache = {
     },
     
     // indices of enabled accordions
-    enabledAccordions: 0
+    enabledAccordions: [0]
 };
 
 function init(){
