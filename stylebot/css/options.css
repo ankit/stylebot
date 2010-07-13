@@ -99,7 +99,7 @@ select {
 
 #custom-styles {
     margin-top: 50px;
-    margin-bottom: 50px;
+    margin-bottom: 20px;
 }
 
 .custom-style-url {
@@ -137,4 +137,8 @@ textarea.stylebot-css-code {
     font-family: Monaco, 'Lucida Console', monospace !important;
     line-height: 14px;
     padding: 2px;
+}
+
+#stylebot-modal input {
+    text-align: left;
 }

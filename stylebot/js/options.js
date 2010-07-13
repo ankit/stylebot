@@ -2,9 +2,7 @@
 
 var bg_window = null;
 
-var cache = { 
-    textarea: null,
-    intro: null,
+var cache = {
     modal: null
 }
 
@@ -100,8 +98,8 @@ function restoreDefaults() {
 }
 
 function fillCustomStyles() {
-    var container = $("#custom-styles");
-    if( localStorage['stylebot_styles'] )
+    var container = $( "#custom-styles" );
+    if( localStorage[ 'stylebot_styles' ] )
         styles = JSON.parse( localStorage['stylebot_styles'] );
     for( var url in styles )
     {
@@ -159,31 +157,53 @@ function removeStyle(e) {
 }
 
 function editStyle(e) {
-    if( !cache.modal )
-    {
-        var textareaHeight = window.innerHeight * 0.5 + 'px';
-        var html = "<div>Edit the CSS for :</div><textarea class='stylebot-css-code' style='width: 100%; height:" + textareaHeight + "'></textarea><button onclick='cache.modal.hide();'>Close</button>";
-        
-        cache.modal = new ModalBox( html, {
-            onOpen: function() { 
-                cache.textarea.focus();
-            },
-            onClose: function() { updateRules(); },
-            bgFadeSpeed: 0
-        });
-        
-        cache.textarea = cache.modal.box.find('textarea');
-        cache.intro = cache.modal.box.find('div');
-    }
-    var parent = $(e.target).parents('.custom-style');
-    var url = parent.find('.custom-style-url').html();
+    
+    var textareaHeight = window.innerHeight * 0.5 + 'px';
+    
+    var parent = $( e.target ).parents( '.custom-style' );
+    var url = parent.find( '.custom-style-url' ).html();
     var rules = styles [ url ];
     var css = CSSUtils.crunchCSS( rules, false );
-    cache.intro.html( "Edit CSS for <b>" + url + "</b>: ");
-    cache.textarea.html( css )
-    .attr('value', css)
-    .data( 'url', url );
+    
+    var html = "<div>Edit the CSS for <b>" + url + "</b>:</div><textarea class='stylebot-css-code' style='width: 100%; height:" + textareaHeight + "'>" + css + "</textarea><button onclick='cache.modal.hide();'>Close</button>";
+    
+    initModal( html );
+    
+    cache.modal.options.onOpen = function() { cache.modal.box.find( 'textarea' ).focus(); };
+   
+    cache.modal.options.onClose = function() {
+        var url = cache.modal.box.find( 'div > b' ).html();
+        var css = cache.modal.box.find( 'textarea' ).attr( 'value' );
+        
+        saveStyle( url, css );
+    };
+    
     cache.modal.show();
+}
+
+function addStyle() {
+    var textareaHeight = window.innerHeight * 0.5 + 'px';
+    
+    var html = "<div>URL: <input type='text'></input></div><textarea class='stylebot-css-code' style='width: 100%; height:" + textareaHeight + "'></textarea><button onclick= 'cache.modal.hide();' >Cancel</button><button onclick= 'onAddClick(); cache.modal.hide();' >Add</button>";
+    
+    initModal( html );
+    
+    cache.modal.options.onOpen = function() { cache.modal.box.find('input').focus(); };
+    
+    cache.modal.show();
+}
+
+function onAddClick() {
+    var url = cache.modal.box.find('input').attr('value');
+    var css = cache.modal.box.find('textarea').attr('value');
+    saveStyle( url, css );
+    
+    // add to list
+    createCustomStyleOption( url, styles[ url ] ).appendTo( $( "#custom-styles" ) );
+}
+
+function saveStyle( url, css ) {
+    styles[ url ] = CSSUtils.parseCSS( css );
 }
 
 function editURL(oldValue, newValue) {
@@ -194,8 +214,13 @@ function editURL(oldValue, newValue) {
     styles[ newValue ] = rules;
 }
 
-function updateRules() {
-    var newCSS = cache.textarea.attr('value');
-    var url = cache.textarea.data('url');
-    styles[ url ] = CSSUtils.parseCSS( newCSS );
+function initModal( html ) {
+    if( !cache.modal )
+    {
+        cache.modal = new ModalBox( html, {
+            bgFadeSpeed: 0
+        });
+    }
+    else
+        cache.modal.box.html( html );
 }
