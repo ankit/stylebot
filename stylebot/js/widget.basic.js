@@ -19,7 +19,7 @@ stylebot.widget.basic = {
     },
     
     defaults: {
-        optionsHeight: 180
+        optionsHeight: 150
     },
     
     groups: [{

@@ -75,22 +75,37 @@ stylebot.widget = {
         WidgetUI.createOption( "Mode", WidgetUI.createButtonSet( ['Basic', 'Advanced'], "stylebot-mode", 0, stylebot.widget.toggleMode) )
         .appendTo( optionsContainer );
         
-        WidgetUI.createOption( "Widget position", WidgetUI.createButtonSet( ['Left', 'Right'], "stylebot-position", 1, stylebot.widget.togglePosition) )
-        .appendTo( optionsContainer );
-        
-        optionsContainer.appendTo( this.cache.box );
-        
         // creating main buttons for widget
         var btContainer = $('<div>', {
             id: 'stylebot-main-buttons'
         });
         
-        WidgetUI.createButton('Save').appendTo( btContainer ).click( stylebot.widget.save );
-        WidgetUI.createButton('View CSS').appendTo( btContainer ).click( stylebot.widget.viewCSS );
-        WidgetUI.createButton('Reset').appendTo( btContainer ).click( stylebot.widget.resetCSS );
-        WidgetUI.createButton('Reset All').appendTo( btContainer ).click( stylebot.widget.resetAllCSS );
+        // left arrow
+        $('<div>', {
+            id: 'stylebot-left-arrow',
+            title: "Move To Left"
+        })
+        .data( 'position', "Left" )
+        .appendTo( this.cache.box )
+        .click( stylebot.widget.togglePosition );
+                
+        WidgetUI.createButton( "Save" ).appendTo( btContainer ).click( stylebot.widget.save );
+        WidgetUI.createButton( "View CSS" ).appendTo( btContainer ).click( stylebot.widget.viewCSS );
+        WidgetUI.createButton( "Reset" ).appendTo( btContainer ).click( stylebot.widget.resetCSS );
+        WidgetUI.createButton( "Reset All" ).appendTo( btContainer ).click( stylebot.widget.resetAllCSS );
 
-        btContainer.appendTo( this.cache.box );
+        btContainer.appendTo( optionsContainer );
+        
+        optionsContainer.appendTo( this.cache.box );
+        
+        // right arrow
+        $('<div>', {
+            id: 'stylebot-right-arrow',
+            title: "Move To Right"
+        })
+        .data( 'position', "Right" )
+        .appendTo( this.cache.box )
+        .click( stylebot.widget.togglePosition );
         
         this.cache.box.appendTo( document.body );
         
@@ -100,7 +115,7 @@ stylebot.widget = {
         this.basic.initAccordions();
         
         // set initial widget position to Right
-        stylebot.widget.setPosition( 'Right' );
+        stylebot.widget.setPosition( "Right" );
         
         this.addListeners();
     },
@@ -119,9 +134,10 @@ stylebot.widget = {
 
         // listen to window resize event to update position/dimension of widget
         $( window ).resize( function(e) {
-            stylebot.widget.setPosition(stylebot.options.position);
+            stylebot.widget.setPosition( stylebot.options.position );
             stylebot.widget.updateHeight();
-            if(stylebot.options.mode == 'Basic')
+            
+            if( stylebot.options.mode == "Basic" )
                 stylebot.widget.basic.updateHeight();
             else
                 stylebot.widget.advanced.updateHeight();
@@ -183,9 +199,9 @@ stylebot.widget = {
         var dialogWidth = 300;
         var left;
 
-        if(where == 'Left')
+        if(where == "Left")
             left = 0;
-        else if(where == 'Right')
+        else if(where == "Right")
             left = document.width - dialogWidth - 40;
 
         this.cache.box.css('left', left);
@@ -194,20 +210,20 @@ stylebot.widget = {
     },
     
     updateHeight: function() {
-        this.cache.box.css('height', window.innerHeight);
+        this.cache.box.css( 'height', window.innerHeight );
     },
     
     setMode: function() {
-        $('.stylebot-mode').removeClass('stylebot-active-button');
-        if(stylebot.options.mode == "Advanced")
+        $('.stylebot-mode').removeClass( 'stylebot-active-button' );
+        if( stylebot.options.mode == "Advanced" )
         {
-            $('.stylebot-mode:contains(Advanced)').addClass('stylebot-active-button');
+            $( '.stylebot-mode:contains(Advanced)' ).addClass( 'stylebot-active-button' );
             stylebot.widget.basic.hide();
             stylebot.widget.advanced.show();
         }
         else
         {
-            $('.stylebot-mode:contains(Basic)').addClass('stylebot-active-button');
+            $( '.stylebot-mode:contains(Basic)' ).addClass( 'stylebot-active-button' );
             stylebot.widget.advanced.hide();
             stylebot.widget.basic.show();
         }
@@ -243,9 +259,13 @@ stylebot.widget = {
     
     togglePosition: function(e) {
         var el = $(e.target);
-        stylebot.widget.setPosition( el.html() );
-        $("." + el.data('class')).removeClass('stylebot-active-button');
-        el.addClass('stylebot-active-button');
+        var pos = el.data( 'position' );
+        stylebot.widget.setPosition( pos );
+        el.css( 'visibility', 'hidden' );
+        if( pos == "Left" )
+            $( '#stylebot-right-arrow' ).css( 'visibility', 'visible' );
+        else
+            $( '#stylebot-left-arrow' ).css( 'visibility', 'visible' );
     },
     
     toggleMode: function(e) {
