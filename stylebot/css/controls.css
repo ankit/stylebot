@@ -17,6 +17,10 @@ select.stylebot-select {
     padding: 0 35px 0 5px !important;
 }
 
+select.stylebot-select:disabled {
+    opacity: 0.5;
+}
+
 select.stylebot-select:focus {
     outline: 1px solid #777;
 }
@@ -30,6 +34,10 @@ div.stylebot-colorselector {
     margin-bottom: -5px;
     padding: 2px;
     width: 30px !important;
+}
+
+div.stylebot-colorselector.disabled {
+    opacity: 0.5;
 }
 
 div.stylebot-colorselector-color {
@@ -56,6 +64,10 @@ input.stylebot-textfield, textarea.stylebot-textarea {
     font-size: 11px !important;
     outline: none;
     width: auto;
+}
+
+input.stylebot-textfield:disabled, textarea.stylebot-textarea:disabled {
+    opacity: 0.5;
 }
 
 input.stylebot-textfield {
@@ -89,18 +101,23 @@ button.stylebot-button {
     background: -webkit-gradient(linear, left top, left bottom, from(#eee), to(#bdbdbd)) !important;
     text-shadow: 0px 1px 1px #fff;
 }
-button.stylebot-button:focus {
+
+button.stylebot-button:disabled {
+    opacity: 0.5;
+}
+
+button.stylebot-button:focus:not(:disabled) {
     outline:1px solid #777;
 }
 
-button.stylebot-button:hover {
+button.stylebot-button:hover:not(:disabled) {
     color: #313131; 
     border-color: #9d9d9d;
     -webkit-box-shadow: 0px 0px 8px rgba(212,212,212,1);
     cursor: pointer;
 }
 
-button.stylebot-button:active {
+button.stylebot-button:active:not(:disabled) {
     background: -webkit-gradient(linear, left top, left bottom, from(#bababa), to(#f5f5f5)) !important;
     color: #4f4f4f; 
     border-color: #b6b6b6;
@@ -108,15 +125,15 @@ button.stylebot-button:active {
 
 button.stylebot-active-button, 
 button.stylebot-blue-button, 
-button.stylebot-active-button:hover, 
-button.stylebot-blue-button:hover {
+button.stylebot-active-button:hover:not(:disabled),
+button.stylebot-blue-button:hover:not(:disabled) {
     background: -webkit-gradient(linear, left top, left bottom, from(#b9e0f5), to(#73a4c4)) !important;
     color: #1c4257;
     border-color: #7096ab;
 }
 
-button.stylebot-blue-button:active,
-button.stylebot-active-button:active {
+button.stylebot-blue-button:active:not(:disabled),
+button.stylebot-active-button:active:not(:disabled) {
     background: -webkit-gradient(linear, left top, left bottom, from(#81afc8), to(#b7def4)) !important;
 }
 
@@ -129,8 +146,8 @@ button.stylebot-active-button:active {
     border-right-width: 0px;
 }
 
-.stylebot-segmented-control button:hover, 
-.stylebot-segmented-control button:focus {
+.stylebot-segmented-control button:hover:not(:disabled), 
+.stylebot-segmented-control button:focus:not(:disabled) {
     -webkit-box-shadow: none;
     outline: none;
     color: #313131;
@@ -141,8 +158,8 @@ button.stylebot-active-button:active {
     border-right-width: 1px;
 }
 
-.stylebot-segmented-control button.stylebot-active-button:hover,
-.stylebot-segmented-control button.stylebot-active-button:focus {
+.stylebot-segmented-control button.stylebot-active-button:hover:not(:disabled),
+.stylebot-segmented-control button.stylebot-active-button:focus:not(:disabled) {
     color: #102632;
     border-color: #7096ab;
 }

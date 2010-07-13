@@ -152,7 +152,7 @@ stylebot.widget = {
             }
         });
         
-        var lastBt = $('#stylebot-main-buttons').find('button').last();
+        var lastBt = $( '#stylebot-main-buttons' ).find( 'button' ).last();
         
         // Shift + TAB on first accordion sets focus to last button
         $( this.basic.cache.accordionHeaders[0] ).bind('keydown', { lastBt: lastBt }, function(e) {
@@ -183,12 +183,37 @@ stylebot.widget = {
         this.updateHeight();
         
         // set widget title
-        this.cache.header.html(stylebot.style.cache.selector ? stylebot.style.cache.selector : "Select an element");
+        if( stylebot.style.cache.selector )
+        {
+            this.cache.header.html( stylebot.style.cache.selector );
+            this.enable();
+        }
+        else
+        {
+            this.cache.header.html( "Select an element" );
+            this.disable();
+        }
         
         // set mode
         this.setMode();
         
         this.cache.box.show();
+    },
+    
+    enable: function() {
+        this.basic.cache.textfields.attr( 'disabled', '' );
+        this.basic.cache.buttons.attr( 'disabled', '' );
+        this.basic.cache.selectboxes.attr( 'disabled', '' );
+        this.basic.cache.colorSelectors.removeClass( 'disabled' );
+        this.advanced.cache.cssField.attr( 'disabled', '' );
+    },
+    
+    disable: function() {
+        this.basic.cache.textfields.attr( 'disabled', 'disabled' );
+        this.basic.cache.buttons.attr( 'disabled', 'disabled' );
+        this.basic.cache.selectboxes.attr( 'disabled', 'disabled' );
+        this.basic.cache.colorSelectors.addClass( 'disabled' );
+        this.advanced.cache.cssField.attr( 'disabled', 'disabled' );
     },
     
     hide: function() {

@@ -209,7 +209,6 @@ WidgetUI = {
             id:'stylebot-' + property,
             class: 'stylebot-control stylebot-select'
         })
-        
         .data('property', property)
         .change(stylebot.widget.basic.events.onSelectChange);
     },
@@ -228,35 +227,35 @@ WidgetUI = {
     },
     
     createColorPicker: function(input) {
-        return $('<div>', {
+        return $( '<div>', {
             class: 'stylebot-colorselector stylebot-control', 
             tabIndex: 0
         })
-        .append($('<div>', { class:'stylebot-colorselector-color'}))
+        .append( $('<div>', { class: 'stylebot-colorselector-color' } ) )
         .ColorPicker({
             flat: false,
             onChange: function(hsb, hex, rgb) {
                 var colorCode = '#' + hex;
                 // set input value to reflect the newly picked color's code
-                input.attr('value', colorCode);
+                input.attr( 'value', colorCode );
                 input.keyup();
                 // update the color selector color
-                WidgetUI.setColorSelectorColor(input);
+                WidgetUI.setColorSelectorColor( input );
             },
             onBeforeShow: function() {
                 var color = input.attr('value');
                 if(color == "")
                     color = "#ffffff"; // default is white
-                $(this).ColorPickerSetColor(color);
+                $(this).ColorPickerSetColor( color );
                 stylebot.widget.basic.isColorPickerVisible = true;
             },
             onHide: function() {
                 stylebot.widget.basic.isColorPickerVisible = false;
             }
         })
-        .keyup(function(e) {
+        .keyup( function(e) {
             // TODO: Toggle visibility of color picker when enter is pressed
-            if(e.keyCode == 13) //enter
+            if( e.keyCode == 13 && !$(e.target).hasClass( 'disabled' ) ) //enter
                 $(this).ColorPickerShow();
         });
     },

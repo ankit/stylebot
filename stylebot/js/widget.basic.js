@@ -7,10 +7,10 @@ stylebot.widget.basic = {
     cache: {
         container: null,
         controls: null,
+        buttons: null,
         textfields: null,
-        checkboxes: null,
-        radios: null,
         selectboxes: null,
+        colorSelectors: null,
         colorSelectorColor: null,
         toggleButtons: null,
         accordionHeaders: null,
@@ -188,25 +188,25 @@ stylebot.widget.basic = {
     
     fillCache: function() {
         // controls
-        this.cache.controls = $('.stylebot-control');
+        this.cache.controls = $( '.stylebot-control' );
         // textfields
-        this.cache.textfields = $('.stylebot-textfield');
-        // checkboxes
-        this.cache.checkboxes = $('.stylebot-checkbox');
-        // radios
-        this.cache.radios = $('.stylebot-radio');
-        // select boxes
-        this.cache.selectboxes = $('.stylebot-select');
+        this.cache.textfields = $( '.stylebot-textfield' );
+        // buttons
+        this.cache.buttons = $( '#stylebot-controls .stylebot-button' );
+        // select dropdowns
+        this.cache.selectboxes = $( '.stylebot-select' );
+        // color selector
+        this.cache.colorSelectors = $( '.stylebot-colorselector' );
         // color selector color divs
-        this.cache.colorSelectorColor = $('.stylebot-colorselector-color');
+        this.cache.colorSelectorColor = $( '.stylebot-colorselector-color' );
         // toggle buttons
-        this.cache.toggleButtons = $('.stylebot-toggle');
+        this.cache.toggleButtons = $( '.stylebot-toggle' );
         // accordion headers
-        this.cache.accordionHeaders = $('.stylebot-accordion-header');
+        this.cache.accordionHeaders = $( '.stylebot-accordion-header' );
         // font family input
-        this.cache.fontFamilyInput = $('#stylebot-font-family');
+        this.cache.fontFamilyInput = $( '#stylebot-font-family' );
         // segmented controls
-        this.cache.segmentedControls = $('.stylebot-segmented-control');
+        this.cache.segmentedControls = $( '.stylebot-segmented-control' );
     },
     
     createUIForControl: function(control) {
@@ -402,16 +402,14 @@ stylebot.widget.basic = {
     
     // reset values to default for all controls
     reset: function() {
-        this.cache.textfields.attr('value', '');
-        this.cache.checkboxes.attr('checked', false);
-        this.cache.radios.attr('checked', false);
-        this.cache.selectboxes.attr('selectedIndex', 0);
-        this.cache.colorSelectorColor.css('backgroundColor', '#fff');
-        this.cache.toggleButtons.removeClass('stylebot-active-button');
+        this.cache.textfields.attr( 'value' , '' );
+        this.cache.selectboxes.attr( 'selectedIndex', 0 );
+        this.cache.colorSelectorColor.css( 'backgroundColor', '#fff' );
+        this.cache.toggleButtons.removeClass( 'stylebot-active-button' );
         this.cache.fontFamilyInput.hide();
-        this.cache.segmentedControls.find('.stylebot-active-button')
-        .removeClass('stylebot-active-button')
-        .next().css('border-left-width', '1px');
+        this.cache.segmentedControls.find( '.stylebot-active-button' )
+        .removeClass( 'stylebot-active-button' )
+        .next().css( 'border-left-width', '1px' );
     },
 
     show: function() {
