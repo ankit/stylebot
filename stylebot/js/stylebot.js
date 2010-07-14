@@ -52,14 +52,14 @@ var stylebot = {
     },
     
     disable: function() {
-        this.widget.hide();
-        this.status = false;
-        this.chrome.setIcon(false);
-        this.widget.updateRuleCache();
-        this.style.reset();
-        this.disableSelection();
-        this.unhighlight();
-        this.selectedElement = null;
+        stylebot.widget.hide();
+        stylebot.status = false;
+        stylebot.chrome.setIcon(false);
+        stylebot.widget.updateRuleCache();
+        stylebot.style.reset();
+        stylebot.disableSelection();
+        stylebot.unhighlight();
+        stylebot.selectedElement = null;
     },
     
     highlight: function(el) {

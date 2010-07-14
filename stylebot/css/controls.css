@@ -111,7 +111,7 @@ button.stylebot-button:focus:not(:disabled) {
 }
 
 button.stylebot-button:hover:not(:disabled) {
-    color: #313131; 
+    color: #313131;
     border-color: #9d9d9d;
     -webkit-box-shadow: 0px 0px 8px rgba(212,212,212,1);
     cursor: pointer;

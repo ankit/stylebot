@@ -28,7 +28,7 @@ stylebot.widget = {
         });
         
         this.cache.headerSelectIcon = $('<div>', {
-            class: 'stylebot-select-icon'
+            id: 'stylebot-select-icon'
         })
         .click(function(e) {
             stylebot.toggleSelection();
@@ -60,11 +60,18 @@ stylebot.widget = {
             stylebot.style.cache.url = value;
         });
         
+        // close button
+        var closeButton = $('<div>', {
+            id: 'stylebot-close-button'
+        })
+        .click( stylebot.disable );
+        
         $('<div>', {
             id: 'stylebot-header'
         })
         .append( this.cache.headerSelectIcon )
         .append( headerTextContainer )
+        .append( closeButton )
         .appendTo( this.cache.box );
         
         // UI for basic mode
