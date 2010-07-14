@@ -169,7 +169,12 @@ function editStyle(e) {
     
     initModal( html );
     
-    cache.modal.options.onOpen = function() { cache.modal.box.find( 'textarea' ).focus(); };
+    cache.modal.options.onOpen = function() { 
+        var textarea = cache.modal.box.find( 'textarea' )
+        textarea.focus();
+        var len = textarea.attr( 'value' ).length;
+        textarea[0].setSelectionRange( len, len );
+    };
    
     cache.modal.options.onClose = function() {
         var url = cache.modal.box.find( 'div > b' ).html();

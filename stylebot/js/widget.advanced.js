@@ -22,20 +22,20 @@ stylebot.widget.advanced = {
         $('<div>', {
             html: "Custom CSS:"
         })
-        .appendTo(this.cache.container);
+        .appendTo( this.cache.container );
         
         this.cache.cssField = $('<textarea>', {
             id: 'stylebot-advanced-css',
             class: 'stylebot-textarea stylebot-control stylebot-css-code'
         })
-        .keyup(this.onKeyUp)
-        .appendTo(this.cache.container);
+        .keyup( this.onKeyUp )
+        .appendTo( this.cache.container );
         
         return this.cache.container;
     },
     
     onKeyUp: function(e) {
-        stylebot.style.applyInlineCSS( stylebot.style.cache.elements, stylebot.widget.advanced.cache.cssField.attr('value') );
+        stylebot.style.applyInlineCSS( stylebot.style.cache.elements, stylebot.widget.advanced.cache.cssField.attr( 'value' ) );
     },
     
     fill: function() {
@@ -51,6 +51,9 @@ stylebot.widget.advanced = {
         this.cache.container.show();
         setTimeout( function() {
             stylebot.widget.advanced.cache.cssField.focus();
+            // place cursor at end of textarea
+            var len = stylebot.widget.advanced.cache.cssField.attr( 'value' ).length;
+            stylebot.widget.advanced.cache.cssField[0].setSelectionRange( len, len );
         });
     },
     
