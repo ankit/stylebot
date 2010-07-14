@@ -106,11 +106,15 @@ var stylebot = {
     
     enableSelection: function() {
         stylebot.selectionStatus = true;
-        stylebot.widget.cache.headerSelectIcon.addClass('stylebot-select-icon-active');
+        stylebot.widget.cache.headerSelectIcon
+        .addClass( 'stylebot-select-icon-active' )
+        .attr( 'title', 'Click to disable selection of element' );
     },
     
     disableSelection: function() {
         stylebot.selectionStatus = false;
-        stylebot.widget.cache.headerSelectIcon.removeClass('stylebot-select-icon-active');
+        stylebot.widget.cache.headerSelectIcon
+        .removeClass('stylebot-select-icon-active')
+        .attr( 'title', 'Click to enable selection of element' );
     }
 }

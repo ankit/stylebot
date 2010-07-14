@@ -33,15 +33,22 @@ stylebot.widget = {
         .click(function(e) {
             stylebot.toggleSelection();
         });
-        
-        var urlContainer = $('<span>', {
-            id: 'stylebot-header-url'
-        });
-        
-        var url = $('<span>', {
+
+        var url = $( '<span>', {
             html: stylebot.style.cache.url,
             class: 'stylebot-editable-text'
-        }).appendTo(urlContainer);
+        });
+        
+        var urlContainer = $( '<div>', {
+            id: 'stylebot-header-url'
+        })
+        .append( url );
+
+        var headerTextContainer = $('<div>', {
+            id: 'stylebot-header-container'
+        })
+        .append( this.cache.header )
+        .append( urlContainer );
 
         // make selector editable
         Utils.makeEditable( this.cache.header, function(value) {
@@ -56,9 +63,8 @@ stylebot.widget = {
         $('<div>', {
             id: 'stylebot-header'
         })
-        .append( this.cache.header )
         .append( this.cache.headerSelectIcon )
-        .append( urlContainer )
+        .append( headerTextContainer )
         .appendTo( this.cache.box );
         
         // UI for basic mode
