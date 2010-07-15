@@ -98,10 +98,16 @@ var stylebot = {
     },
     
     toggleSelection: function() {
-        if(stylebot.selectionStatus)
+        if( stylebot.selectionStatus ) {
+            stylebot.select( stylebot.style.cache.selector );
             stylebot.disableSelection();
+        }
         else
+        {
+            stylebot.widget.disable();
+            stylebot.unhighlight();
             stylebot.enableSelection();
+        }
     },
     
     enableSelection: function() {

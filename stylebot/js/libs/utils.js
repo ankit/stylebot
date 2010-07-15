@@ -61,15 +61,17 @@ var Utils = {
     },
     
     makeEditable: function(el, callback) {
-        el.attr('title', 'click to edit');
+        el.attr( 'title', 'click to edit' );
 
-        el.bind('click keyup', { callback: callback }, function(e) {
-            if( e.type == 'keyup' && e.keyCode != 13)
+        el.bind( 'click keyup', { callback: callback }, function(e) {
+            if( e.type == 'keyup' && e.keyCode != 13 )
                 return true;
-            // hide element
-            $(this).hide();
+
+            var el = $( this );
+            el.hide();
+            var elWidth = el.width();
+            var value = el.html();
             
-            var value = $(this).html();
             // create a textfield
             var input = $('<input>', {
                 type: 'text',
@@ -77,50 +79,49 @@ var Utils = {
                 length: 10,
                 value: value,
                 id: 'stylebot-editing-field'
-            });
+            })
+            .css( 'min-width', elWidth );
             
-            $(this).before(input);
+            el.before( input );
             input.focus();
             
             var onMouseDown = function(e) {
-                if(input.length == 0)
+                if( input.length == 0 )
                     return true;
                 
-                if(e.target.id != e.data.input.attr('id'))
+                if( e.target.id != e.data.input.attr('id') )
                 {
-                    var value = e.data.input.attr('value');
+                    var value = e.data.input.attr( 'value' );
                     e.data.input.remove();
-                    if(value != ""){
-                        e.data.el.html(value);
-                        e.data.callback(value);
+                    if( value != "" ){
+                        e.data.el.html( value );
+                        e.data.callback( value );
                     }
                     e.data.el.show();
-                    $(document).bind('mouseup', onMouseUp);
+                    $(document).bind( 'mouseup', onMouseUp );
                 }
             };
             
             var onMouseUp = function(e) {
-                $(document).unbind('mouseup', onMouseUp);
-                $(document).unbind('mousedown', onMouseDown);
+                $(document).unbind( 'mouseup', onMouseUp );
+                $(document).unbind( 'mousedown', onMouseDown );
             }
             
             var onKeyDown = function(e) {
-                var value = e.data.input.attr('value');
-                if(e.keyCode == 13 || e.keyCode == 27) // on enter or esc
+                var value = e.data.input.attr( 'value' );
+                if( e.keyCode == 13 || e.keyCode == 27 ) // on enter or esc
                 {
                     e.data.input.remove();
-                    if(value != ""){
-                        e.data.el.html(value);
-                        e.data.callback(value);
+                    if( value != "" ){
+                        e.data.el.html( value );
+                        e.data.callback( value );
                     }
                     e.data.el.show();
-                    $(document).unbind('mousedown', onMouseDown);
+                    $(document).unbind( 'mousedown', onMouseDown );
                 }
             };
-            
-            input.bind( 'keyup', { input: input, el: $(this), callback: callback }, onKeyDown );
-            $(document).bind( 'mousedown', { input: input, el: $(this), callback: callback }, onMouseDown );
-            
+            input.bind( 'keyup', { input: input, el: el, callback: callback }, onKeyDown );
+            $(document).bind( 'mousedown', { input: input, el: el, callback: callback }, onMouseDown );
         });
     }
 }

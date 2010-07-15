@@ -197,15 +197,9 @@ stylebot.widget = {
         
         // set widget title
         if( stylebot.style.cache.selector )
-        {
-            this.cache.header.html( stylebot.style.cache.selector );
             this.enable();
-        }
         else
-        {
-            this.cache.header.html( "Select an element" );
             this.disable();
-        }
         
         // set mode
         this.setMode();
@@ -214,6 +208,7 @@ stylebot.widget = {
     },
     
     enable: function() {
+        this.cache.header.html( stylebot.style.cache.selector );
         this.basic.cache.textfields.attr( 'disabled', '' );
         this.basic.cache.buttons.attr( 'disabled', '' );
         this.basic.cache.selectboxes.attr( 'disabled', '' );
@@ -222,6 +217,7 @@ stylebot.widget = {
     },
     
     disable: function() {
+        this.cache.header.html( "Select an element" );
         this.basic.cache.textfields.attr( 'disabled', 'disabled' );
         this.basic.cache.buttons.attr( 'disabled', 'disabled' );
         this.basic.cache.selectboxes.attr( 'disabled', 'disabled' );

@@ -28,9 +28,7 @@ function addDOMListeners() {
     // Handle key presses
     
     $( document ).keydown( function(e) {
-        var eTagName = e.target.tagName.toLowerCase();
-        var disabledEl = [ 'input', 'textarea', 'div', 'object', 'select' ];
-        if( $.inArray(eTagName, disabledEl) != -1 )
+        if( isInputField( e.target ) )
            return true;
 
         // Handle shortcut key combo 'ctrl + e' to toggle editing mode
@@ -52,13 +50,10 @@ function addDOMListeners() {
     .mousemove( function(e) {
         if( stylebot.widget.isBeingDragged || stylebot.modal.isVisible )
             return true;
-        if( stylebot.hoveredElement == $(e.target) || !stylebot.status || !stylebot.selectionStatus )
+        if( stylebot.hoveredElement == $( e.target ) || !stylebot.status || !stylebot.selectionStatus )
             return true;
-
-        var parent = $(e.target).closest( '#stylebot, .stylebot_colorpicker' );
-        var id = $(e.target).attr('id');
         
-        if( id.indexOf("stylebot") != -1 || parent.length != 0 )
+        if( belongsToStylebot( $(e.target) ) )
         {
             stylebot.unhighlight();
             return true;
@@ -68,13 +63,33 @@ function addDOMListeners() {
     
     // Handle click event on document.body (during capturing phase)
     document.body.addEventListener('click', function(e) {
-        if( stylebot.hoveredElement && stylebot.status && stylebot.selectionStatus )
+        if( stylebot.hoveredElement && stylebot.status && !belongsToStylebot( $(e.target) ) )
         {
             e.preventDefault();
             e.stopPropagation();
-            stylebot.select();
-            return false;
+            if( stylebot.selectionStatus )
+            {
+                stylebot.select();
+                return false;
+            }
         }
         return true;
     }, true );
+}
+
+function belongsToStylebot( el ) {
+    var parent = el.closest( '#stylebot, .stylebot_colorpicker' );
+    var id = el.attr( 'id' );
+    if( parent.length != 0 || id.indexOf( "stylebot" ) != -1 )
+        return true;
+    return false;
+}
+
+function isInputField( el ) {
+    var tagName = el.tagName.toLowerCase();
+    var inputTypes = [ 'input', 'textarea', 'div', 'object', 'select' ];
+    if( $.inArray( tagName, inputTypes ) != -1 )
+        return true;
+    else
+        return false;
 }
