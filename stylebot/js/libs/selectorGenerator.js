@@ -5,7 +5,6 @@
   * Dual licensed under GPL and MIT licenses.
  **/
 
-
 var SelectorGenerator =  {
     
     generate: function(el, granularityLevel) {

@@ -15,6 +15,8 @@ var stylebot = {
     hoveredElement: null,
 
     selectionStatus: true,
+    
+    selectionBox: null,
 
     options: {
         useShortcutKey: true,
@@ -63,16 +65,18 @@ var stylebot = {
     },
     
     highlight: function(el) {
-        if( stylebot.hoveredElement )
-            stylebot.hoveredElement.removeClass('stylebot-selected');
-        stylebot.hoveredElement = $(el);
-        stylebot.hoveredElement.addClass('stylebot-selected');
+        if( !stylebot.selectionBox )
+            stylebot.createSelectionBox();
+        this.selectionBox.show();
+        el = $(el);
+        stylebot.hoveredElement = el;
+
+        stylebot.selectionBox.highlight( el );
     },
     
     unhighlight: function() {
-        if( stylebot.hoveredElement )
-            stylebot.hoveredElement.removeClass('stylebot-selected');
         stylebot.hoveredElement = null;
+        stylebot.selectionBox.hide();
     },
     
     select: function( selector ) {
@@ -122,5 +126,9 @@ var stylebot = {
         stylebot.widget.cache.headerSelectIcon
         .removeClass('stylebot-select-icon-active')
         .attr( 'title', 'Click to enable selection of element' );
+    },
+    
+    createSelectionBox: function() {
+        stylebot.selectionBox = new SelectionBox( 2, "stylebot-selection" );
     }
 }

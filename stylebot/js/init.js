@@ -26,7 +26,6 @@ function initDebug() {
 
 function addDOMListeners() {
     // Handle key presses
-    
     $( document ).keydown( function(e) {
         if( isInputField( e.target ) )
            return true;
@@ -45,24 +44,27 @@ function addDOMListeners() {
         else if( e.keyCode == 27 && stylebot.status && !WidgetUI.isColorPickerVisible && !stylebot.modal.isVisible )
             stylebot.disable();
     })
-
+    
     // Handle mouse move event on DOM elements
-    .mousemove( function(e) {
+    .mouseover( function(e) {
+        var target = $( e.target );
+        if( $( target ).hasClass( "stylebot-selection" ) )
+            return true;
         if( stylebot.widget.isBeingDragged || stylebot.modal.isVisible )
             return true;
-        if( stylebot.hoveredElement == $( e.target ) || !stylebot.status || !stylebot.selectionStatus )
+        if( stylebot.hoveredElement == $( target ) || !stylebot.status || !stylebot.selectionStatus )
             return true;
         
-        if( belongsToStylebot( $(e.target) ) )
+        if( belongsToStylebot( $( target ) ) )
         {
             stylebot.unhighlight();
             return true;
         }
-        stylebot.highlight( e.target );
+        stylebot.highlight( target );
     });
     
     // Handle click event on document.body (during capturing phase)
-    document.body.addEventListener('click', function(e) {
+    document.body.addEventListener( 'click', function(e) {
         if( stylebot.hoveredElement && stylebot.status && !belongsToStylebot( $(e.target) ) )
         {
             e.preventDefault();

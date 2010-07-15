@@ -42,6 +42,7 @@
 			"js/style.js",
 			"js/modal.js",
 			"js/libs/selectorGenerator.js",
+			"js/libs/selectionBox.js",
 			"js/libs/modalbox.js",
 			"js/libs/utils.js",
 			"js/libs/colorpicker.js",

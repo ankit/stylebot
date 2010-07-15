@@ -166,6 +166,11 @@ stylebot.style = {
             // update stylebot css data associated with element
             $(this).data( "stylebot-css", newCustomCSS );
         });
+        
+        // update selection box
+        setTimeout( function() {
+            stylebot.selectionBox.highlight( stylebot.selectedElement );
+        }, 0 );
     },
     
     // clear any custom inline CSS for element(s)

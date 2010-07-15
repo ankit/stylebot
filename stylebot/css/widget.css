@@ -15,7 +15,7 @@
     text-transform: none;
     top: 0%;
     width: 340px;
-    z-index: 100000;
+    z-index: 1000000;
 }
 
 #stylebot-header {
