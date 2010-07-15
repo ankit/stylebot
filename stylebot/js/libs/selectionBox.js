@@ -51,15 +51,13 @@ SelectionBox.prototype.resizeEdge = function( edge, w, h ) {
 
 SelectionBox.prototype.hide = function() {
     for( var edge in this.edges )
-        this.edges[edge].hide();
-}
-
-SelectionBox.prototype.show = function() {
-    for( var edge in this.edges )
-        this.edges[edge].show();
+        this.edges[edge].width(0).height(0);
 }
 
 SelectionBox.prototype.highlight = function( el ) {
+    if ( !el ){
+        this.hide(); return;
+    }
     if( el.nodeType != 1 )
         el = el.parentNode;
     

@@ -67,7 +67,6 @@ var stylebot = {
     highlight: function(el) {
         if( !stylebot.selectionBox )
             stylebot.createSelectionBox();
-        this.selectionBox.show();
         stylebot.hoveredElement = el;
 
         stylebot.selectionBox.highlight( el );
@@ -75,7 +74,8 @@ var stylebot = {
     
     unhighlight: function() {
         stylebot.hoveredElement = null;
-        stylebot.selectionBox.hide();
+        if( stylebot.selectionBox )
+            stylebot.selectionBox.hide();
     },
     
     select: function( selector ) {
