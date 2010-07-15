@@ -68,7 +68,6 @@ var stylebot = {
         if( !stylebot.selectionBox )
             stylebot.createSelectionBox();
         this.selectionBox.show();
-        el = $(el);
         stylebot.hoveredElement = el;
 
         stylebot.selectionBox.highlight( el );

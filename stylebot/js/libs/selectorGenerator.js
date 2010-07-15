@@ -8,6 +8,7 @@
 var SelectorGenerator =  {
     
     generate: function(el, granularityLevel) {
+            el = $(el);
             if(!el)
                 return null;
             else if( granularityLevel == 'low')

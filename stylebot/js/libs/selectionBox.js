@@ -60,9 +60,86 @@ SelectionBox.prototype.show = function() {
 }
 
 SelectionBox.prototype.highlight = function( el ) {
-    var offset = el.offset();
-    var w = el.width();
-    var h = el.height();
+    if( el.nodeType != 1 )
+        el = el.parentNode;
     
-    this.updatePosition( offset.left, offset.top, w, h );
+    var offset = this.getViewOffset( el, true );
+    var w = el.offsetWidth;
+    var h = el.offsetHeight;
+    
+    this.updatePosition( offset.x, offset.y, w, h );
 }
+
+// from lib.js in Firebug
+SelectionBox.prototype.getViewOffset = function( elt )
+{
+    function addOffset(elt, coords, view)
+    {
+        var p = elt.offsetParent;
+        coords.x += elt.offsetLeft - (p ? p.scrollLeft : 0);
+        coords.y += elt.offsetTop - (p ? p.scrollTop : 0);
+
+        if (p)
+        {
+            if (p.nodeType == 1)
+            {
+                var parentStyle = view.getComputedStyle(p, "");
+                if (parentStyle.position != "static")
+                {
+                    coords.x += parseInt(parentStyle.borderLeftWidth);
+                    coords.y += parseInt(parentStyle.borderTopWidth);
+
+                    if (p.localName == "TABLE")
+                    {
+                        coords.x += parseInt(parentStyle.paddingLeft);
+                        coords.y += parseInt(parentStyle.paddingTop);
+                    }
+                    else if (p.localName == "BODY")
+                    {
+                        var style = view.getComputedStyle(elt, "");
+                        coords.x += parseInt(style.marginLeft);
+                        coords.y += parseInt(style.marginTop);
+                    }
+                }
+                else if (p.localName == "BODY")
+                {
+                    coords.x += parseInt(parentStyle.borderLeftWidth);
+                    coords.y += parseInt(parentStyle.borderTopWidth);
+                }
+
+                var parent = elt.parentNode;
+                while (p != parent)
+                {
+                    coords.x -= parent.scrollLeft;
+                    coords.y -= parent.scrollTop;
+                    parent = parent.parentNode;
+                }
+                addOffset(p, coords, view);
+            }
+        }
+        else
+        {
+            if (elt.localName == "BODY")
+            {
+                var style = view.getComputedStyle(elt, "");
+                coords.x += parseInt(style.borderLeftWidth);
+                coords.y += parseInt(style.borderTopWidth);
+
+                var htmlStyle = view.getComputedStyle(elt.parentNode, "");
+                coords.x -= parseInt(htmlStyle.paddingLeft);
+                coords.y -= parseInt(htmlStyle.paddingTop);
+            }
+
+            if (elt.scrollLeft)
+                coords.x += elt.scrollLeft;
+            if (elt.scrollTop)
+                coords.y += elt.scrollTop;
+        }
+    }
+
+    var coords = {x: 0, y: 0};
+    if (elt)
+        addOffset(elt, coords, elt.ownerDocument.defaultView);
+
+    return coords;
+};

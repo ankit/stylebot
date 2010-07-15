@@ -55,12 +55,12 @@ function addDOMListeners() {
         if( stylebot.hoveredElement == $( target ) || !stylebot.status || !stylebot.selectionStatus )
             return true;
         
-        if( belongsToStylebot( $( target ) ) )
+        if( belongsToStylebot( target ) )
         {
             stylebot.unhighlight();
             return true;
         }
-        stylebot.highlight( target );
+        stylebot.highlight( e.target );
     });
     
     // Handle click event on document.body (during capturing phase)
