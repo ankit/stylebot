@@ -165,7 +165,7 @@ function editStyle(e) {
     var rules = styles [ url ];
     var css = CSSUtils.crunchFormattedCSS( rules, false );
     
-    var html = "<div>Edit the CSS for <b>" + url + "</b>:</div><textarea class='stylebot-css-code' style='width: 100%; height:" + textareaHeight + "'>" + css + "</textarea><button onclick='cache.modal.hide();'>Close</button>";
+    var html = "<div>Edit the CSS for <b>" + url + "</b>:</div><textarea class='stylebot-css-code' style='width: 100%; height:" + textareaHeight + "'>" + css + "</textarea><button onclick='cache.modal.hide();'>Done</button>";
     
     initModal( html );
     
@@ -223,7 +223,9 @@ function initModal( html ) {
     if( !cache.modal )
     {
         cache.modal = new ModalBox( html, {
-            bgFadeSpeed: 0
+            bgFadeSpeed: 0,
+            closeOnEsc: false,
+            closeOnBgClick: false
         });
     }
     else

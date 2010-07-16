@@ -18,8 +18,6 @@ var CSSUtils = {
         }
     
     */
-
-
     crunchCSS: function(rules, setImportant) {
         var css = "";
 
@@ -101,7 +99,6 @@ var CSSUtils = {
             var pair = blocks[i].split( '{' );
             rules[ $.trim( pair[0] ) ] = this.parseCSSBlock( pair[1] );
         }
-        console.log( rules );
         return rules;
     },
     

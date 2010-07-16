@@ -32,6 +32,8 @@ ModalBox.prototype.options = {
     bgOpacity: 0.7,
     bgFadeSpeed: 120,
     fadeSpeed: 0,
+    closeOnBgClick: true,
+    closeOnEsc: true,
     onClose: function() {},
     onOpen: function() {}
 }
@@ -47,30 +49,33 @@ ModalBox.prototype.show = function(content, options) {
     this.box.fadeIn( this.options.fadeSpeed );
     this.darkenBg();
     this.options.onOpen();
-    var onKeyUp = function(e) {
-        if(e.keyCode == 27)
-        {
-            e.preventDefault();
-            e.data.modal.hide();
-            $(document).unbind('keyup', onKeyUp);
-            $(document).unbind('mousedown', onMouseDown);
-        }
-    }
-    var onMouseDown = function(e) {
-        var id = e.target.id;
-        var parent = $(e.target).closest('#stylebot-modal');
-        if(id != 'stylebot-modal' && parent.length == 0)
-        {
-            e.preventDefault();
-            e.data.modal.hide();
-            $(document).unbind('keyup', onKeyUp);
-            $(document).unbind('mousedown', onMouseDown);
-        }
-    }
-    $(document).bind( 'keyup', { modal: this }, onKeyUp );
-    $(document).bind( 'mousedown', { modal: this }, onMouseDown );
-}
     
+    var closeBox = function(e) {
+        if( e.type == "keyup" &&
+            ( e.keyCode != 27 || !e.data.modal.options.closeOnEsc )
+        )
+            return true;
+        
+        var id = e.target.id;
+        var parent = $( e.target ).closest( '#stylebot-modal' );
+        
+        if( ( e.type == "mousedown" &&
+            id != "stylebot-modal" &&
+            parent.length == 0 &&
+            e.data.modal.options.closeOnBgClick ) ||
+            e.type == "keyup"
+        )
+        {
+            e.preventDefault();
+            e.data.modal.hide();
+            $(document).unbind( 'keyup mousedown', closeBox );
+        }
+        return true;
+    }
+    
+    $(document).bind( 'keyup mousedown', { modal: this }, closeBox );
+}
+
 ModalBox.prototype.hide = function() {
         this.box.fadeOut( this.options.fadeSpeed );
         this.background.fadeOut( this.options.bgFadeSpeed );
