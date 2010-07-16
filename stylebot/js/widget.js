@@ -8,8 +8,12 @@ stylebot.widget = {
     
     cache: {
         box: null,
-        header: null,
+        headerSelector: null,
         headerSelectIcon: null
+    },
+    
+    defaults: {
+        width: 330
     },
     
     isBeingDragged: false,
@@ -20,20 +24,19 @@ stylebot.widget = {
             id: 'stylebot'
         });
         
-        // header
-        this.cache.header = $('<div>', {
+        // selector
+        this.cache.headerSelector = $('<div>', {
             id: 'stylebot-header-selector',
             class: 'stylebot-editable-text',
             html: 'custom styles'
         });
         
-        this.cache.headerSelectIcon = $('<div>', {
-            id: 'stylebot-select-icon'
-        })
-        .click(function(e) {
-            stylebot.toggleSelection();
+        // make selector editable
+        Utils.makeEditable( this.cache.headerSelector, function(value) {
+            stylebot.select( value );
         });
 
+        // url
         var url = $( '<span>', {
             html: stylebot.style.cache.url,
             class: 'stylebot-editable-text'
@@ -43,21 +46,25 @@ stylebot.widget = {
             id: 'stylebot-header-url'
         })
         .append( url );
-
-        var headerTextContainer = $('<div>', {
-            id: 'stylebot-header-container'
-        })
-        .append( this.cache.header )
-        .append( urlContainer );
-
-        // make selector editable
-        Utils.makeEditable( this.cache.header, function(value) {
-            stylebot.select( value );
-        });
         
         // make url editable
         Utils.makeEditable(url, function(value) {
             stylebot.style.cache.url = value;
+        });
+
+        // container for URL and selector
+        var headerTextContainer = $('<div>', {
+            id: 'stylebot-header-container'
+        })
+        .append( this.cache.headerSelector )
+        .append( urlContainer );
+        
+        // selection toggle button
+        this.cache.headerSelectIcon = $('<div>', {
+            id: 'stylebot-select-icon'
+        })
+        .click(function(e) {
+            stylebot.toggleSelection();
         });
         
         // close button
@@ -108,7 +115,6 @@ stylebot.widget = {
         WidgetUI.createButton( "Reset All" ).appendTo( btContainer ).click( stylebot.widget.resetAllCSS );
 
         btContainer.appendTo( optionsContainer );
-        
         optionsContainer.appendTo( this.cache.box );
         
         // right arrow
@@ -121,7 +127,6 @@ stylebot.widget = {
         .click( stylebot.widget.togglePosition );
         
         this.cache.box.appendTo( document.body );
-        
         this.basic.fillCache();
 
         // open the accordions loaded from cache
@@ -129,41 +134,9 @@ stylebot.widget = {
         
         // set initial widget position to Right
         stylebot.widget.setPosition( "Right" );
-        
-        this.addListeners();
     },
     
-    addListeners: function() {
-        
-        // TODO: Instead of having these separate handlers, implement them into a single handler
-        this.cache.box.keydown( function(e) {
-            // disable editing on esc
-            if( e.keyCode == 27 && !stylebot.widget.basic.isColorPickerVisible )
-            {
-                e.target.blur();
-                stylebot.disable();
-            }
-        });
-
-        // listen to window resize event to update position/dimension of widget
-        $( window ).resize( function(e) {
-            stylebot.widget.setPosition( stylebot.options.position );
-            stylebot.widget.updateHeight();
-            
-            if( stylebot.options.mode == "Basic" )
-                stylebot.widget.basic.updateHeight();
-            else
-                stylebot.widget.advanced.updateHeight();
-        });
-        
-        this.basic.cache.controls.keydown( function(e) {
-            // if esc is pressed, take away focus and stop editing
-            if(e.keyCode == 27 && !stylebot.widget.basic.isColorPickerVisible)
-            {
-                e.target.blur();
-                stylebot.disable();
-            }
-        });
+    attachListeners: function() {
         
         var lastBt = $( '#stylebot-main-buttons' ).find( 'button' ).last();
         
@@ -186,16 +159,35 @@ stylebot.widget = {
                 stylebot.widget.basic.cache.accordionHeaders[0].focus();
             }
         });
+        
+        // listen to window resize event to update position/dimension of widget
+        $( window ).bind( 'resize', this.onWindowResize );
+    },
+    
+    detachListeners: function() {
+        $( window ).unbind( 'resize', this.onWindowResize );
+    },
+    
+    onWindowResize: function(e) {
+        stylebot.widget.setPosition( stylebot.options.position );
+        stylebot.widget.updateHeight();
+        if( stylebot.selectionBox )
+            stylebot.selectionBox.highlight( stylebot.selectedElement );
+        
+        if( stylebot.options.mode == "Basic" )
+            stylebot.widget.basic.updateHeight();
+        else
+            stylebot.widget.advanced.updateHeight();
     },
     
     show: function() {
         if( !this.cache.box )
             this.createUI();
             
+        this.attachListeners();
         this.setPosition( stylebot.options.position );
         this.updateHeight();
-        
-        // set widget title
+
         if( stylebot.style.cache.selector )
             this.enable();
         else
@@ -203,12 +195,11 @@ stylebot.widget = {
         
         // set mode
         this.setMode();
-        
         this.cache.box.show();
     },
     
     enable: function() {
-        this.cache.header.html( stylebot.style.cache.selector );
+        this.cache.headerSelector.html( stylebot.style.cache.selector );
         this.basic.cache.textfields.attr( 'disabled', '' );
         this.basic.cache.buttons.attr( 'disabled', '' );
         this.basic.cache.selectboxes.attr( 'disabled', '' );
@@ -217,7 +208,7 @@ stylebot.widget = {
     },
     
     disable: function() {
-        this.cache.header.html( "Select an element" );
+        this.cache.headerSelector.html( "Select an element" );
         this.basic.cache.textfields.attr( 'disabled', 'disabled' );
         this.basic.cache.buttons.attr( 'disabled', 'disabled' );
         this.basic.cache.selectboxes.attr( 'disabled', 'disabled' );
@@ -226,19 +217,19 @@ stylebot.widget = {
     },
     
     hide: function() {
+        this.detachListeners();
         this.cache.box.hide();
     },
     
     setPosition: function(where) {
-        var dialogWidth = 300;
         var left;
 
         if(where == "Left")
             left = 0;
         else if(where == "Right")
-            left = document.width - dialogWidth - 40;
+            left = document.width - this.defaults.width;
 
-        this.cache.box.css('left', left);
+        this.cache.box.css( 'left', left );
 
         stylebot.options.position = where;
     },
@@ -248,7 +239,7 @@ stylebot.widget = {
     },
     
     setMode: function() {
-        $('.stylebot-mode').removeClass( 'stylebot-active-button' );
+        $( '.stylebot-mode' ).removeClass( 'stylebot-active-button' );
         if( stylebot.options.mode == "Advanced" )
         {
             $( '.stylebot-mode:contains(Advanced)' ).addClass( 'stylebot-active-button' );
@@ -271,7 +262,7 @@ stylebot.widget = {
     // display CSS for page in a modal box
     viewCSS: function(e) {
         stylebot.widget.updateRuleCache();
-        stylebot.modal.show( CSSUtils.crunchCSS( stylebot.style.rules, false ) , {
+        stylebot.modal.show( CSSUtils.crunchFormattedCSS( stylebot.style.rules, false ) , {
             onClose: function() { stylebot.modal.isVisible = false; e.target.focus(); }
         });
     },
@@ -292,10 +283,11 @@ stylebot.widget = {
     },
     
     togglePosition: function(e) {
-        var el = $(e.target);
+        var el = $( e.target );
         var pos = el.data( 'position' );
         stylebot.widget.setPosition( pos );
         el.css( 'visibility', 'hidden' );
+        
         if( pos == "Left" )
             $( '#stylebot-right-arrow' ).css( 'visibility', 'visible' );
         else
@@ -303,17 +295,15 @@ stylebot.widget = {
     },
     
     toggleMode: function(e) {
-        var el = $(e.target);
+        stylebot.widget.updateRuleCache();
+
+        var el = $( e.target );
         stylebot.options.mode = el.html();
-        
-        // when toggling from Advanced mode, update rule cache.
-        if(stylebot.options.mode == "Basic")
-            stylebot.widget.advanced.updateRuleCache();
         stylebot.widget.setMode();
     },
     
     updateRuleCache: function(e) {
-        if(stylebot.options.mode == "Advanced")
+        if( stylebot.options.mode == "Advanced" )
             stylebot.widget.advanced.updateRuleCache();
     }
 }

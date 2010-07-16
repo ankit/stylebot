@@ -163,7 +163,7 @@ function editStyle(e) {
     var parent = $( e.target ).parents( '.custom-style' );
     var url = parent.find( '.custom-style-url' ).html();
     var rules = styles [ url ];
-    var css = CSSUtils.crunchCSS( rules, false );
+    var css = CSSUtils.crunchFormattedCSS( rules, false );
     
     var html = "<div>Edit the CSS for <b>" + url + "</b>:</div><textarea class='stylebot-css-code' style='width: 100%; height:" + textareaHeight + "'>" + css + "</textarea><button onclick='cache.modal.hide();'>Close</button>";
     

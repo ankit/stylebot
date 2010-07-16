@@ -141,3 +141,8 @@ SelectionBox.prototype.getViewOffset = function( elt )
 
     return coords;
 };
+
+SelectionBox.prototype.destroy = function() {
+    for( var edge in this.edges )
+        this.edges[edge].remove();
+}

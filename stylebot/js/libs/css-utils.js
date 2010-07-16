@@ -19,19 +19,31 @@ var CSSUtils = {
     
     */
 
-    // generate formatted CSS for rules
+
     crunchCSS: function(rules, setImportant) {
         var css = "";
 
-        for(var selector in rules)
+        for( var selector in rules )
+        {
+            css += selector + "{";
+            for( var property in rules[selector] )
+                css += this.getCSSDeclaration(property, rules[selector][property], setImportant);
+            css += "}";
+        }
+        return css;
+    },
+    
+    crunchFormattedCSS: function(rules, setImportant) {
+        var css = "";
+
+        for( var selector in rules )
         {
             css += selector + "{" + "\n";
-            for(var property in rules[selector])
+            for( var property in rules[selector] )
                 css += "\t" + this.getCSSDeclaration(property, rules[selector][property], setImportant) + "\n";
 
             css += "}" + "\n\n";
         }
-        
         return css;
     },
     

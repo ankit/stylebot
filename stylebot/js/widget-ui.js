@@ -138,7 +138,7 @@ WidgetUI = {
         // create custom font field
         this.createTextField(control.id, 20, stylebot.widget.basic.events.onTextFieldKeyUp)
         .css({
-            marginLeft: '110px !important',
+            marginLeft: '95px !important',
             marginTop: '5px',
             display: 'none'
         })

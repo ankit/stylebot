@@ -14,7 +14,7 @@ var stylebot = {
 
     hoveredElement: null,
 
-    selectionStatus: true,
+    selectionStatus: false,
     
     selectionBox: null,
 
@@ -40,13 +40,14 @@ var stylebot = {
     
     // toggle stylebot editing status
     toggle: function() {
-        if(this.status == true)
+        if( this.status == true )
             this.disable();
         else
             this.enable();
     },
     
     enable: function() {
+        this.attachListeners();
         this.widget.show();
         this.status = true;
         this.chrome.setIcon(true);
@@ -54,6 +55,7 @@ var stylebot = {
     },
     
     disable: function() {
+        stylebot.detachListeners();
         stylebot.widget.hide();
         stylebot.status = false;
         stylebot.chrome.setIcon(false);
@@ -62,13 +64,14 @@ var stylebot = {
         stylebot.disableSelection();
         stylebot.unhighlight();
         stylebot.selectedElement = null;
+        stylebot.destroySelectionBox();
     },
     
     highlight: function(el) {
         if( !stylebot.selectionBox )
             stylebot.createSelectionBox();
-        stylebot.hoveredElement = el;
 
+        stylebot.hoveredElement = el;
         stylebot.selectionBox.highlight( el );
     },
     
@@ -129,5 +132,69 @@ var stylebot = {
     
     createSelectionBox: function() {
         stylebot.selectionBox = new SelectionBox( 2, "stylebot-selection" );
+    },
+    
+    destroySelectionBox: function() {
+        if( stylebot.selectionBox )
+        {
+            stylebot.selectionBox.destroy();
+            delete stylebot.selectionBox;
+        }
+    },
+    
+    attachListeners: function() {
+        document.body.addEventListener( 'mouseover', this.onMouseOverHandler, true );
+        document.body.addEventListener( 'click', this.onMouseClickHandler, true );
+    },
+    
+    detachListeners: function() {
+        document.body.removeEventListener( 'mouseover', this.onMouseOverHandler, true );
+        document.body.removeEventListener( 'click', this.onMouseClickHandler, true );
+    },
+    
+    onMouseOverHandler: function(e) {
+        if( e.target.className == "stylebot-selection" 
+            || stylebot.widget.isBeingDragged
+            || stylebot.modal.isVisible
+            || stylebot.hoveredElement == e.target
+            || !stylebot.selectionStatus
+            )
+        {
+            return true;
+        }
+
+        if( stylebot.belongsToStylebot( e.target ) )
+        {
+            stylebot.unhighlight();
+            return true;
+        }
+        stylebot.highlight( e.target );
+    },
+
+    onMouseClickHandler: function(e) {
+        if( stylebot.hoveredElement &&
+            stylebot.status &&
+            !stylebot.belongsToStylebot( e.target )
+            )
+        {
+            e.preventDefault();
+            e.stopPropagation();
+            if( stylebot.selectionStatus )
+            {
+                stylebot.select();
+                return false;
+            }
+        }
+        return true;
+    },
+    
+    belongsToStylebot: function(el) {
+        $el = $(el);
+        var parent = $el.closest( '#stylebot, .stylebot_colorpicker' );
+        var id = $el.attr( 'id' );
+        if( parent.length != 0 || id.indexOf( "stylebot" ) != -1 )
+            return true;
+        
+        return false;
     }
 }
