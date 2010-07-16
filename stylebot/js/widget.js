@@ -33,7 +33,7 @@ stylebot.widget = {
         
         // make selector editable
         Utils.makeEditable( this.cache.headerSelector, function(value) {
-            stylebot.select( value );
+            stylebot.select( null, value );
         });
 
         // url

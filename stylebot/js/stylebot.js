@@ -80,11 +80,18 @@ var stylebot = {
             stylebot.selectionBox.hide();
     },
     
-    select: function( selector ) {
+    select: function( el, selector ) {
+        // preference is given to element
         stylebot.disableSelection();
-        if( selector )
+        if( el )
         {
-            var el = $( selector )[0];
+            stylebot.selectedElement = el;
+            selector = SelectorGenerator.generate( el );
+            stylebot.highlight( el );
+        }
+        else if( selector )
+        {
+            el = $( selector )[0];
             stylebot.selectedElement = el;
             stylebot.highlight( el );
         }
@@ -93,9 +100,9 @@ var stylebot = {
             stylebot.selectedElement = stylebot.hoveredElement;
             selector = SelectorGenerator.generate( stylebot.selectedElement );
         }
+        
         stylebot.style.fillCache( selector );
         stylebot.widget.show();
-        
         setTimeout( function() {
             stylebot.style.removeFromStyleElement( stylebot.style.cache.selector );
         }, 100);
@@ -103,7 +110,7 @@ var stylebot = {
     
     toggleSelection: function() {
         if( stylebot.selectionStatus ) {
-            stylebot.select( stylebot.style.cache.selector );
+            stylebot.select( null, stylebot.style.cache.selector );
             stylebot.disableSelection();
         }
         else
