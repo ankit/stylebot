@@ -102,6 +102,18 @@
 				return false;
 			},
 			
+			toggle = function(ev) {
+				var cal = $('#' + $(this).data('colorpickerId'));
+                if( cal.css('display') == "none" )
+                {
+                    show.apply( this );
+                }
+                else
+                {
+                    cal.hide();
+                }
+			},
+			
 			show = function (ev) {
 				var cal = $('#' + $(this).data('colorpickerId'));
 				cal.data('colorpicker').onBeforeShow.apply(this, [cal.get(0)]);
@@ -119,14 +131,15 @@
 				if (cal.data('colorpicker').onShow.apply(this, [cal.get(0)]) != false) {
 					cal.show();
 				}
-				$(document).bind('mousedown keyup', {cal: cal}, hide);
+				$(document).bind('mousedown keyup', {cal: cal, el: this}, hide);
 				return false;
 			},
 			
 			hide = function (ev) {
 			    if(ev.type == 'keyup' && ev.keyCode != 27)
 			        return true;
-				if (!isChildOf(ev.data.cal.get(0), ev.target, ev.data.cal.get(0))) {
+				if ( !isChildOf( ev.data.cal.get(0), ev.target, ev.data.cal.get(0) ) && 
+				!isChildOf(ev.data.el, ev.target, ev.data.el) ) {
 					if (ev.data.cal.data('colorpicker').onHide.apply(this, [ev.data.cal.get(0)]) != false) {
 						ev.data.cal.hide();
 					}
@@ -312,23 +325,31 @@
 								display: 'block'
 							});
 						} else {
-							$(this).bind(options.eventName, show);
+							$(this).bind(options.eventName, toggle);
 						}
 					}
 				});
 			},
 			
+			togglePicker: function() {
+			    this.each( function() {
+			        if( $(this).data('colorpickerId') ) {
+                        toggle.apply( this );
+                    }
+			    })
+			},
+			
 			showPicker: function() {
 				return this.each( function () {
-					if ($(this).data('colorpickerId')) {
-						show.apply(this);
+					if ( $(this).data('colorpickerId') ) {
+						show.apply( this );
 					}
 				});
 			},
 			
 			hidePicker: function() {
 				return this.each( function () {
-					if ($(this).data('colorpickerId')) {
+					if ( $(this).data('colorpickerId') ) {
 						$('#' + $(this).data('colorpickerId')).hide();
 					}
 				});
@@ -359,6 +380,7 @@
 		ColorPicker: ColorPicker.init,
 		ColorPickerHide: ColorPicker.hidePicker,
 		ColorPickerShow: ColorPicker.showPicker,
+		ColorPickerToggle: ColorPicker.togglePicker,
 		ColorPickerSetColor: ColorPicker.setColor
 	});
 })(jQuery)

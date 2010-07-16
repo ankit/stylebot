@@ -137,7 +137,6 @@ stylebot.widget = {
     },
     
     attachListeners: function() {
-        
         var lastBt = $( '#stylebot-main-buttons' ).find( 'button' ).last();
         
         // Shift + TAB on first accordion sets focus to last button

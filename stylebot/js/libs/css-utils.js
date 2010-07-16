@@ -74,7 +74,7 @@ var CSSUtils = {
         d.insertBefore(style, null);
     },
     
-    parseBlockCSS: function(css) {
+    parseCSSBlock: function(css) {
         var rule = {};
         var declarations = css.split(';');
         declarations.pop();
@@ -99,7 +99,7 @@ var CSSUtils = {
         for(var i=0; i<len; i++)
         {
             var pair = blocks[i].split( '{' );
-            rules[ $.trim( pair[0] ) ] = this.parseBlockCSS( pair[1] );
+            rules[ $.trim( pair[0] ) ] = this.parseCSSBlock( pair[1] );
         }
         console.log( rules );
         return rules;

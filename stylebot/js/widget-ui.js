@@ -234,6 +234,7 @@ WidgetUI = {
         .append( $('<div>', { class: 'stylebot-colorselector-color' } ) )
         .ColorPicker({
             flat: false,
+            
             onChange: function(hsb, hex, rgb) {
                 var colorCode = '#' + hex;
                 // set input value to reflect the newly picked color's code
@@ -242,6 +243,7 @@ WidgetUI = {
                 // update the color selector color
                 WidgetUI.setColorSelectorColor( input );
             },
+            
             onBeforeShow: function() {
                 var color = input.attr('value');
                 if(color == "")
@@ -249,14 +251,14 @@ WidgetUI = {
                 $(this).ColorPickerSetColor( color );
                 stylebot.widget.basic.isColorPickerVisible = true;
             },
+            
             onHide: function() {
                 stylebot.widget.basic.isColorPickerVisible = false;
             }
         })
         .keyup( function(e) {
-            // TODO: Toggle visibility of color picker when enter is pressed
             if( e.keyCode == 13 && !$(e.target).hasClass( 'disabled' ) ) //enter
-                $(this).ColorPickerShow();
+                $( this ).ColorPickerToggle();
         });
     },
     
