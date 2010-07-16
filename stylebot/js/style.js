@@ -17,6 +17,8 @@ stylebot.style = {
     */
     rules: {},
     
+    timer: null,
+    
     cache: {
         // most recently selected elements' selector
         selector: null,
@@ -44,7 +46,7 @@ stylebot.style = {
     
     // apply a new rule to selected elements
     apply: function(property, value) {
-        if( !this.cache.selector )
+        if( !stylebot.style.cache.selector )
             return true;
 
         stylebot.style.saveRuleToCache( stylebot.style.cache.selector, property, value );
@@ -53,6 +55,21 @@ stylebot.style = {
             stylebot.style.applyInlineCSS( stylebot.style.cache.elements, stylebot.style.getInlineCSS( stylebot.style.cache.selector ) );
         }, 0 );
 
+    },
+    
+    applyCSS: function( css ) {
+        if( !stylebot.style.cache.selector )
+            return true;
+        stylebot.style.applyInlineCSS( stylebot.style.cache.elements, css );
+
+
+        if( stylebot.style.timer ){
+            clearTimeout( stylebot.style.timer );
+            stylebot.style.timer = null;
+        }
+        stylebot.style.timer = setTimeout( function() {
+            stylebot.style.saveRulesToCacheFromCSS( css );
+        }, 1000 );
     },
     
     // parse CSS into rules and add them to cache

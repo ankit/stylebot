@@ -234,12 +234,11 @@ WidgetUI = {
         .append( $('<div>', { class: 'stylebot-colorselector-color' } ) )
         .ColorPicker({
             flat: false,
-            
+
             onChange: function(hsb, hex, rgb) {
                 var colorCode = '#' + hex;
                 // set input value to reflect the newly picked color's code
                 input.attr( 'value', colorCode );
-                input.keyup();
                 // update the color selector color
                 WidgetUI.setColorSelectorColor( input );
             },
@@ -253,6 +252,7 @@ WidgetUI = {
             },
             
             onHide: function() {
+                input.keyup();
                 stylebot.widget.basic.isColorPickerVisible = false;
             }
         })

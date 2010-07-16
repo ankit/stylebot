@@ -59,7 +59,6 @@ var stylebot = {
         stylebot.widget.hide();
         stylebot.status = false;
         stylebot.chrome.setIcon(false);
-        stylebot.widget.updateRuleCache();
         stylebot.style.reset();
         stylebot.disableSelection();
         stylebot.unhighlight();
@@ -83,7 +82,6 @@ var stylebot = {
     
     select: function( selector ) {
         stylebot.disableSelection();
-        stylebot.widget.updateRuleCache();
         if( selector )
         {
             var el = $( selector )[0];

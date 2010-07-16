@@ -254,13 +254,11 @@ stylebot.widget = {
     },
     
     save: function(e) {
-        stylebot.widget.updateRuleCache();
         stylebot.style.save();
     },
     
     // display CSS for page in a modal box
     viewCSS: function(e) {
-        stylebot.widget.updateRuleCache();
         stylebot.modal.show( CSSUtils.crunchFormattedCSS( stylebot.style.rules, false ) , {
             onClose: function() { stylebot.modal.isVisible = false; e.target.focus(); }
         });
@@ -294,15 +292,8 @@ stylebot.widget = {
     },
     
     toggleMode: function(e) {
-        stylebot.widget.updateRuleCache();
-
         var el = $( e.target );
         stylebot.options.mode = el.html();
         stylebot.widget.setMode();
-    },
-    
-    updateRuleCache: function(e) {
-        if( stylebot.options.mode == "Advanced" )
-            stylebot.widget.advanced.updateRuleCache();
     }
 }

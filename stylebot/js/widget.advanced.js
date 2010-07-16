@@ -35,7 +35,7 @@ stylebot.widget.advanced = {
     },
     
     onKeyUp: function(e) {
-        stylebot.style.applyInlineCSS( stylebot.style.cache.elements, stylebot.widget.advanced.cache.cssField.attr( 'value' ) );
+        stylebot.style.applyCSS( stylebot.widget.advanced.cache.cssField.attr( 'value' ) );
     },
     
     fill: function() {
@@ -53,7 +53,7 @@ stylebot.widget.advanced = {
             stylebot.widget.advanced.cache.cssField.focus();
             // place cursor at end of textarea
             var len = stylebot.widget.advanced.cache.cssField.attr( 'value' ).length;
-            stylebot.widget.advanced.cache.cssField[0].setSelectionRange( len, len );
+            stylebot.widget.advanced.cache.cssField.get(0).setSelectionRange( len, len );
         });
     },
     
@@ -68,10 +68,5 @@ stylebot.widget.advanced = {
     updateHeight: function() {
         var height = window.innerHeight - this.defaults.optionsHeight;
         this.cache.cssField.css('height', height);
-    },
-
-    // called when mode is toggled, editing is disabled, css is viewed or when an element is selected
-    updateRuleCache: function() {
-        stylebot.style.saveRulesToCacheFromCSS( stylebot.widget.advanced.cache.cssField.attr('value') );
     }
 }
