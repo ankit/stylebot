@@ -80,8 +80,9 @@ var stylebot = {
             stylebot.selectionBox.hide();
     },
     
+    // called when user selects an element
     select: function( el, selector ) {
-        // preference is given to element
+        // preference is given to element over selector
         stylebot.disableSelection();
         if( el )
         {
@@ -100,7 +101,6 @@ var stylebot = {
             stylebot.selectedElement = stylebot.hoveredElement;
             selector = SelectorGenerator.generate( stylebot.selectedElement );
         }
-        
         stylebot.style.fillCache( selector );
         stylebot.widget.show();
         setTimeout( function() {

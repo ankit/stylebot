@@ -28,7 +28,7 @@ stylebot.style = {
         styleEl: null
     },
     
-    // init rules from temporary variable in apply-css.js
+    // initialize rules and url from temporary variables in apply-css.js
     initialize: function() {
         if( stylebotTempRules )
             this.rules = stylebotTempRules;
@@ -36,20 +36,22 @@ stylebot.style = {
             this.cache.url = stylebotTempUrl;
     },
     
+    // update current selector and selected elements
     fillCache: function(selector) {
-        if(selector != this.cache.selector)
+        if( selector != this.cache.selector )
         {
             this.cache.selector = selector;
-            this.cache.elements = $(selector);
+            this.cache.elements = $( selector + ":not(#stylebot *)" );
         }
     },
     
-    // apply a new rule to selected elements
+    // applies property-value pair to selected elements as inline css. Also, updates rules cache
+    // called by basic mode
     apply: function(property, value) {
         if( !stylebot.style.cache.selector )
             return true;
 
-        stylebot.style.saveRuleToCache( stylebot.style.cache.selector, property, value );
+        stylebot.style.savePropertyToCache( stylebot.style.cache.selector, property, value );
 
         setTimeout( function() {
             stylebot.style.applyInlineCSS( stylebot.style.cache.elements, stylebot.style.getInlineCSS( stylebot.style.cache.selector ) );
@@ -57,24 +59,25 @@ stylebot.style = {
 
     },
     
+    // applies css to selected elements as inline css and updates rules cache
+    // called by advanced mode
     applyCSS: function( css ) {
         if( !stylebot.style.cache.selector )
             return true;
         stylebot.style.applyInlineCSS( stylebot.style.cache.elements, css );
-
 
         if( stylebot.style.timer ){
             clearTimeout( stylebot.style.timer );
             stylebot.style.timer = null;
         }
         stylebot.style.timer = setTimeout( function() {
-            stylebot.style.saveRulesToCacheFromCSS( css );
-        }, 1000 );
+            stylebot.style.saveRuleToCacheFromCSS( css );
+        }, 1500 );
     },
     
-    // parse CSS into rules and add them to cache
-    saveRulesToCacheFromCSS: function(css) {
-        if(!this.cache.selector)
+    // parses CSS into a rule and updates the rules cache
+    saveRuleToCacheFromCSS: function(css) {
+        if( !this.cache.selector )
             return true;
         
         // empty rules cache
@@ -83,11 +86,11 @@ stylebot.style = {
         var generatedRule = CSSUtils.parseCSSBlock( css );
         
         for( var property in generatedRule )
-            this.saveRuleToCache( this.cache.selector, property, generatedRule[ property ] );
+            this.savePropertyToCache( this.cache.selector, property, generatedRule[ property ] );
     },
     
-    // add/update rule to CSS rules cache
-    saveRuleToCache: function(selector, property, value) {
+    // add/update property-value pair to CSS rules cache
+    savePropertyToCache: function(selector, property, value) {
         // check if the selector already exists in the list
         var rule = this.rules[selector];
         if(rule != undefined)
@@ -114,7 +117,7 @@ stylebot.style = {
             else
                 rule[property] = value;
         }
-        else if( this.filter(property, value) )
+        else if( this.filter( property, value ) )
         {
             this.rules[selector] = new Object();
             this.rules[selector][property] = value;
@@ -128,9 +131,9 @@ stylebot.style = {
         
         var sizeProperties = [ 'font-size', 'line-height', 'letter-spacing', 'letter-height', 'margin', 'margin-top', 'margin-right', 'margin-bottom', 'margin-left', 'padding', 'padding-top', 'padding-right', 'padding-bottom', 'padding-left', 'border-width', 'border-top-width', 'border-right-width', 'border-bottom-width', 'border-left-width' ];
         
-        if( $.inArray(property, sizeProperties) != -1)
+        if( $.inArray( property, sizeProperties ) != -1)
         {
-            if($.inArray(value, WidgetUI.validSizeUnits) != -1)
+            if( $.inArray( value, WidgetUI.validSizeUnits ) != -1 )
                 return false;
         }
 
@@ -151,7 +154,7 @@ stylebot.style = {
         return "";
     },
     
-    // apply inline CSS to selected element(s)
+    // apply inline CSS to element(s)
     applyInlineCSS: function(el, newCustomCSS) {
         if( !el || el.length == 0 ) return false;
         
@@ -164,7 +167,7 @@ stylebot.style = {
             if( !existingCustomCSS )
             {
                 // if there is any existing inline CSS, append stylebot CSS to it
-                if(existingCSS != undefined)
+                if( existingCSS != undefined )
                     newCSS = newCustomCSS + existingCSS;
                 else
                     newCSS = newCustomCSS;
@@ -189,9 +192,11 @@ stylebot.style = {
             stylebot.selectionBox.highlight( stylebot.selectedElement );
         }, 0 );
     },
-    
+
     // clear any custom inline CSS for element(s)
     clearInlineCSS: function(el) {
+        if( !el )
+            return false;
         el.each( function(){
             var existingCSS = $(this).attr( 'style' );
             var existingCustomCSS = $(this).data( "stylebot-css" );
@@ -207,24 +212,15 @@ stylebot.style = {
         });
     },
     
-    initInlineCSS: function() {
-        for( var selector in stylebot.style.rules )
-            stylebot.style.applyInlineCSS( $(selector), stylebot.style.getInlineCSS(selector) );
-        
-        $( "style[title=stylebot-css]" ).html("");
-    },
-    
-    // replace inline CSS with <style> element. called when stylebot is disabled
+    // clear all custom inline CSS
     resetInlineCSS: function() {
-        this.updateStyleElement( this.rules );
-
         for( var selector in stylebot.style.rules )
             stylebot.style.clearInlineCSS( $(selector) );
     },
-    
+
+    // remove rule for selector from stylebot's <style> element and apply it as inline css
     removeFromStyleElement: function( selector ) {
-        
-        stylebot.style.applyInlineCSS( $(selector), stylebot.style.getInlineCSS(selector) );
+        this.applyInlineCSS( $( selector + ":not(#stylebot *)" ), stylebot.style.getInlineCSS(selector) );
         
         var tempRules = {};
         for(var sel in this.rules)
@@ -235,6 +231,7 @@ stylebot.style = {
         this.updateStyleElement( tempRules );
     },
     
+    // update css in stylebot's <style> element
     updateStyleElement: function( rules ) {
         if( !this.cache.styleEl )
             this.cache.styleEl = $( "style[title=stylebot-css]" );
@@ -243,33 +240,41 @@ stylebot.style = {
             this.cache.styleEl.html( CSSUtils.crunchCSS( rules, true ) );
         else
         {
-            CSSUtils.injectCSS( CSSUtils.crunchCSS( rules, true ), "stylebot-css");
+            CSSUtils.injectCSS( CSSUtils.crunchCSS( rules, true ), "stylebot-css" );
             this.cache.styleEl = $( "style[title=stylebot-css]" );
         }
     },
     
-    // get the rule for a selector
+    // get the rule for a selector from rules cache
     getRule: function( selector ) {
         var rule = this.rules[ selector ];
-        if(rule != undefined)
+        if( rule != undefined )
             return rule;
         else
             return null;
     },
     
-    // clear any existing custom CSS for current selector
-    clear: function() {
+    // remove any existing custom CSS for current selector from rules cache and selected elements' inline css
+    remove: function() {
         if( this.rules[this.cache.selector] != undefined )
             delete this.rules[this.cache.selector];
         this.clearInlineCSS( this.cache.elements );
+        setTimeout( function() {
+            stylebot.selectionBox.highlight( stylebot.selectedElement );
+        }, 0 );
     },
     
-    clearAll: function() {
+    // remove all custom css for page from rules cache, stylebot's <style> element and inline css
+    removeAll: function() {
         for( var selector in this.rules )
         {
             delete this.rules[selector];
             this.clearInlineCSS( $(selector) );
         }
+        this.updateStyleElement( null );
+        setTimeout( function() {
+            stylebot.selectionBox.highlight( stylebot.selectedElement );
+        }, 0 );
     },
     
     // save rules for page
@@ -277,10 +282,12 @@ stylebot.style = {
         stylebot.chrome.save( stylebot.style.cache.url, stylebot.style.rules );
     },
     
+    // called when stylebot is disabled. resets cache and all inline css. Also, updates the <style> element
     reset: function() {
         this.cache.selector = null;
         this.cache.elements = null;
-        setTimeout(function() {
+        setTimeout( function() {
+            stylebot.updateStyleElement( this.rules );
             stylebot.style.resetInlineCSS();
         }, 100);
     }

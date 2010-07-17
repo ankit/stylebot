@@ -11,10 +11,6 @@ stylebot.widget.advanced = {
         container: null
     },
     
-    defaults: {
-        optionsHeight: 195
-    },
-    
     createUI: function() {
         this.cache.container = $('<div>', {
             id: 'stylebot-advanced'
@@ -47,7 +43,6 @@ stylebot.widget.advanced = {
     
     show: function() {
         this.fill();
-        this.updateHeight();
         this.cache.container.show();
         setTimeout( function() {
             stylebot.widget.advanced.cache.cssField.focus();
@@ -62,11 +57,6 @@ stylebot.widget.advanced = {
     },
     
     reset: function() {
-      this.cache.cssField.html('').attr('value', '');
-    },
-    
-    updateHeight: function() {
-        var height = window.innerHeight - this.defaults.optionsHeight;
-        this.cache.cssField.css('height', height);
+        this.cache.cssField.html('').attr('value', '').focus();
     }
 }

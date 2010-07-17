@@ -8,6 +8,7 @@ stylebot.widget = {
     
     cache: {
         box: null,
+        header: null,
         headerSelector: null,
         headerSelectIcon: null
     },
@@ -33,11 +34,12 @@ stylebot.widget = {
         
         // make selector editable
         Utils.makeEditable( this.cache.headerSelector, function(value) {
+            stylebot.widget.updateHeight();
             stylebot.select( null, value );
         });
 
         // url
-        var url = $( '<span>', {
+        var url = $( '<div>', {
             html: stylebot.style.cache.url,
             class: 'stylebot-editable-text'
         });
@@ -49,6 +51,7 @@ stylebot.widget = {
         
         // make url editable
         Utils.makeEditable(url, function(value) {
+            stylebot.widget.updateHeight();
             stylebot.style.cache.url = value;
         });
 
@@ -73,7 +76,7 @@ stylebot.widget = {
         })
         .click( stylebot.disable );
         
-        $('<div>', {
+        this.cache.header = $('<div>', {
             id: 'stylebot-header'
         })
         .append( this.cache.headerSelectIcon )
@@ -170,13 +173,9 @@ stylebot.widget = {
     onWindowResize: function(e) {
         stylebot.widget.setPosition( stylebot.options.position );
         stylebot.widget.updateHeight();
+        
         if( stylebot.selectionBox )
             stylebot.selectionBox.highlight( stylebot.selectedElement );
-        
-        if( stylebot.options.mode == "Basic" )
-            stylebot.widget.basic.updateHeight();
-        else
-            stylebot.widget.advanced.updateHeight();
     },
     
     show: function() {
@@ -185,14 +184,13 @@ stylebot.widget = {
             
         this.attachListeners();
         this.setPosition( stylebot.options.position );
-        this.updateHeight();
 
         if( stylebot.style.cache.selector )
             this.enable();
         else
             this.disable();
-        
-        // set mode
+
+        this.updateHeight();
         this.setMode();
         this.cache.box.show();
     },
@@ -229,12 +227,22 @@ stylebot.widget = {
             left = document.width - this.defaults.width;
 
         this.cache.box.css( 'left', left );
-
         stylebot.options.position = where;
     },
     
     updateHeight: function() {
-        this.cache.box.css( 'height', window.innerHeight );
+        stylebot.widget.cache.box.css( 'height', window.innerHeight );
+
+        var headerHeight = stylebot.widget.cache.header.height();
+        var optionsHeight = 145;
+        if( headerHeight != 0 )
+            headerHeight -= 36;
+        var newHeight = window.innerHeight - ( optionsHeight + headerHeight );
+        
+        if( stylebot.options.mode == "Basic" )
+            stylebot.widget.basic.cache.container.css( 'height',  newHeight );
+        else
+            stylebot.widget.advanced.cache.cssField.css( 'height',  newHeight - 47 );
     },
     
     setMode: function() {
@@ -257,6 +265,13 @@ stylebot.widget = {
         stylebot.style.save();
     },
     
+    reset: function() {
+        if( stylebot.options.mode == "Basic" )
+            stylebot.widget.basic.reset();
+        else
+            stylebot.widget.advanced.reset();
+    },
+    
     // display CSS for page in a modal box
     viewCSS: function(e) {
         stylebot.modal.show( CSSUtils.crunchFormattedCSS( stylebot.style.rules, false ) , {
@@ -266,17 +281,14 @@ stylebot.widget = {
     
     // reset CSS for current selector
     resetCSS: function(e) {
-        stylebot.widget.basic.reset();
-        stylebot.widget.advanced.reset();
-        // clear any custom styles for currently selected element
-        stylebot.style.clear();
+        stylebot.widget.reset();
+        stylebot.style.remove();
     },
     
     // reset all CSS for page
     resetAllCSS: function(e) {
-        stylebot.widget.basic.reset();
-        stylebot.widget.advanced.reset();
-        stylebot.style.clearAll();
+        stylebot.widget.reset();
+        stylebot.style.removeAll();
     },
     
     togglePosition: function(e) {
@@ -294,6 +306,7 @@ stylebot.widget = {
     toggleMode: function(e) {
         var el = $( e.target );
         stylebot.options.mode = el.html();
+        stylebot.widget.updateHeight();
         stylebot.widget.setMode();
     }
 }

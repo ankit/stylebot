@@ -70,6 +70,9 @@ var Utils = {
             var el = $( this );
             el.hide();
             var elWidth = el.width();
+            var parentWidth = el.parent().width();
+            if( elWidth > parentWidth )
+                elWidth = parentWidth - 10;
             var value = el.html();
             
             // create a textfield
@@ -85,43 +88,24 @@ var Utils = {
             el.before( input );
             input.focus();
             
-            var onMouseDown = function(e) {
-                if( input.length == 0 )
+            var onClose = function(e) {
+                if( e.type == "keyup" && e.keyCode != 13 && e.keyCode !=27 )
                     return true;
-                
-                if( e.target.id != e.data.input.attr('id') )
-                {
-                    var value = e.data.input.attr( 'value' );
-                    e.data.input.remove();
-                    if( value != "" ){
-                        e.data.el.html( value );
-                        e.data.callback( value );
-                    }
-                    e.data.el.show();
-                    $(document).bind( 'mouseup', onMouseUp );
-                }
-            };
-            
-            var onMouseUp = function(e) {
-                $(document).unbind( 'mouseup', onMouseUp );
-                $(document).unbind( 'mousedown', onMouseDown );
+                if( e.type == "mousedown" && e.target.id == e.data.input.attr('id') )
+                    return true;
+                var value = e.data.input.attr( 'value' );
+                e.data.input.remove();
+                if( value == "" )
+                    value = e.data.el.html();
+                e.data.el.html( value );
+                e.data.el.show();
+                e.data.callback( value );
+                $( document ).unbind( "mousedown", onClose );
+                $( document ).unbind( "keyup", onClose );
             }
             
-            var onKeyDown = function(e) {
-                var value = e.data.input.attr( 'value' );
-                if( e.keyCode == 13 || e.keyCode == 27 ) // on enter or esc
-                {
-                    e.data.input.remove();
-                    if( value != "" ){
-                        e.data.el.html( value );
-                        e.data.callback( value );
-                    }
-                    e.data.el.show();
-                    $(document).unbind( 'mousedown', onMouseDown );
-                }
-            };
-            input.bind( 'keyup', { input: input, el: el, callback: callback }, onKeyDown );
-            $(document).bind( 'mousedown', { input: input, el: el, callback: callback }, onMouseDown );
+            input.bind( 'keyup', { input: input, el: el, callback: callback }, onClose );
+            $( document ).bind( 'mousedown', { input: input, el: el, callback: callback }, onClose );
         });
     }
 }

@@ -18,10 +18,6 @@ stylebot.widget.basic = {
         segmentedControls: null
     },
     
-    defaults: {
-        optionsHeight: 150
-    },
-    
     groups: [{
         name: 'Text',
         controls: [
@@ -415,11 +411,7 @@ stylebot.widget.basic = {
     show: function() {
         // reset all values for controls to default values
         this.reset();
-        
-        // fill widget with any existing custom styles
         this.fill();
-        
-        this.updateHeight();
         
         // set focus to first visible accordion header
         var controlContainerOffset = this.cache.container.offset().top;
@@ -434,16 +426,11 @@ stylebot.widget.basic = {
                  break;
              }
         }
-        
         this.cache.container.show();
     },
     
     hide: function() {
         $('#stylebot-controls').hide();
-    },
-    
-    updateHeight: function() {
-        this.cache.container.css('height', window.innerHeight - this.defaults.optionsHeight);
     },
     
     initAccordions: function() {
