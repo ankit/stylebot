@@ -287,7 +287,7 @@ stylebot.style = {
         this.cache.selector = null;
         this.cache.elements = null;
         setTimeout(function() {
-            stylebot.updateStyleElement(this.rules);
+            stylebot.style.updateStyleElement(stylebot.style.rules);
             stylebot.style.resetInlineCSS();
         }, 100);
     }
