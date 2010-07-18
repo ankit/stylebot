@@ -1,4 +1,4 @@
-// TODO: For now, options are stored in localStorage. Instead store them more persistently, either in DB or in a bookmark
+/* Javascript for stylebot options page */
 
 var bg_window = null;
 

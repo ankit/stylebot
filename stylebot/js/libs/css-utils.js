@@ -21,10 +21,10 @@ var CSSUtils = {
     crunchCSS: function(rules, setImportant) {
         var css = "";
 
-        for( var selector in rules )
+        for (var selector in rules)
         {
             css += selector + "{";
-            for( var property in rules[selector] )
+            for (var property in rules[selector])
                 css += this.getCSSDeclaration(property, rules[selector][property], setImportant);
             css += "}";
         }
@@ -34,10 +34,10 @@ var CSSUtils = {
     crunchFormattedCSS: function(rules, setImportant) {
         var css = "";
 
-        for( var selector in rules )
+        for (var selector in rules)
         {
             css += selector + "{" + "\n";
-            for( var property in rules[selector] )
+            for (var property in rules[selector])
                 css += "\t" + this.getCSSDeclaration(property, rules[selector][property], setImportant) + "\n";
 
             css += "}" + "\n\n";
@@ -49,14 +49,14 @@ var CSSUtils = {
     crunchCSSForSelector: function(rules, selector, setImportant) {
         var css = "";
 
-        for( var property in rules[ selector ] )
+        for (var property in rules[selector])
             css += CSSUtils.getCSSDeclaration( property, rules[selector][property], setImportant ) + "\n";
 
         return css;
     },
     
     getCSSDeclaration: function(property, value, setImportant) {
-        if(setImportant)
+        if (setImportant)
             return property + ": " + value + " !important;";
         else
             return property + ": " + value + ";";
@@ -66,7 +66,7 @@ var CSSUtils = {
         var d = document.documentElement;
         var style = document.createElement('style');
         style.type = "text/css";
-        if( title != undefined)
+        if (title != undefined)
             style.title = title;
         style.innerText = css;
         d.insertBefore(style, null);
@@ -77,33 +77,33 @@ var CSSUtils = {
         var declarations = css.split(';');
         declarations.pop();
         var len = declarations.length;
-        for(var i=0; i<len; i++)
+        for (var i = 0; i < len; i++)
         {
             var pair = declarations[i].split(':');
-            var property = $.trim( pair[0] );
-            var value = $.trim( pair[1] );
-            if( property != "" && value != "" )
-                rule[ property ] = value;
+            var property = $.trim(pair[0]);
+            var value = $.trim(pair[1]);
+            if (property != "" && value != "")
+                rule[property] = value;
         }
         return rule;
     },
     
     parseCSS: function(css) {
         var rules = {};
-        css = this.removeComments( css );
-        var blocks = css.split( '}' );
+        css = this.removeComments(css);
+        var blocks = css.split('}');
         blocks.pop();
         var len = blocks.length;
-        for(var i=0; i<len; i++)
+        for (var i = 0; i < len; i++)
         {
-            var pair = blocks[i].split( '{' );
-            rules[ $.trim( pair[0] ) ] = this.parseCSSBlock( pair[1] );
+            var pair = blocks[i].split('{');
+            rules[$.trim(pair[0])] = this.parseCSSBlock(pair[1]);
         }
         return rules;
     },
     
     // from http://www.senocular.com/pub/javascript/CSS_parse.js
-    removeComments: function(css){
+    removeComments: function(css) {
 	    return css.replace(/\/\*(\r|\n|.)*\*\//g,"");
     }
 }

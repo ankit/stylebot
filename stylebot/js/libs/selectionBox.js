@@ -4,8 +4,7 @@
   * Based on Firebug's Implementation
  **/
 
-var SelectionBox = function( edgeSize, className ) {
-    
+var SelectionBox = function(edgeSize, className) {    
     this.edgeSize = edgeSize;
     this.className = className;
     
@@ -15,61 +14,61 @@ var SelectionBox = function( edgeSize, className ) {
     this.edges.bottom = this.createEdge();
     this.edges.left = this.createEdge();
     
-    for( var edge in this.edges )
-        this.edges[edge].appendTo( document.body );
+    for (var edge in this.edges)
+        this.edges[edge].appendTo(document.body);
 }
 
-SelectionBox.prototype.updatePosition = function( x, y, w, h ) {
+SelectionBox.prototype.updatePosition = function(x, y, w, h) {
     // move
-    this.moveEdge( "top", x, y-this.edgeSize );
-    this.moveEdge( "right", x+w, y-this.edgeSize );
-    this.moveEdge( "bottom", x, y+h );
-    this.moveEdge( "left", x-this.edgeSize, y-this.edgeSize );
+    this.moveEdge("top", x, y-this.edgeSize);
+    this.moveEdge("right", x+w, y-this.edgeSize);
+    this.moveEdge("bottom", x, y+h);
+    this.moveEdge("left", x-this.edgeSize, y-this.edgeSize);
     
     // resize
-    this.resizeEdge( "top", w, this.edgeSize );
-    this.resizeEdge( "right", this.edgeSize, h+this.edgeSize*2 );
-    this.resizeEdge( "bottom", w, this.edgeSize );
-    this.resizeEdge( "left", this.edgeSize, h+this.edgeSize*2 );
+    this.resizeEdge("top", w, this.edgeSize);
+    this.resizeEdge("right", this.edgeSize, h + this.edgeSize * 2);
+    this.resizeEdge("bottom", w, this.edgeSize);
+    this.resizeEdge("left", this.edgeSize, h + this.edgeSize * 2);
 }
 
 SelectionBox.prototype.createEdge = function() {
-    return $( '<div>', {
+    return $('<div>', {
         class: this.className
     });
 }
 
-SelectionBox.prototype.moveEdge = function( edge, x, y ) {
-    this.edges[edge].css( 'left', x + "px" );
-    this.edges[edge].css( 'top', y + "px" );
+SelectionBox.prototype.moveEdge = function(edge, x, y) {
+    this.edges[edge].css('left', x + "px");
+    this.edges[edge].css('top', y + "px");
 }
 
-SelectionBox.prototype.resizeEdge = function( edge, w, h ) {
+SelectionBox.prototype.resizeEdge = function(edge, w, h) {
     this.edges[edge].width(w);
     this.edges[edge].height(h);
 }
 
 SelectionBox.prototype.hide = function() {
-    for( var edge in this.edges )
+    for (var edge in this.edges)
         this.edges[edge].width(0).height(0);
 }
 
-SelectionBox.prototype.highlight = function( el ) {
-    if ( !el ){
+SelectionBox.prototype.highlight = function(el) {
+    if (!el){
         this.hide(); return;
     }
-    if( el.nodeType != 1 )
+    if (el.nodeType != 1)
         el = el.parentNode;
     
-    var offset = this.getViewOffset( el, true );
+    var offset = this.getViewOffset(el, true);
     var w = el.offsetWidth;
     var h = el.offsetHeight;
     
-    this.updatePosition( offset.x, offset.y, w, h );
+    this.updatePosition(offset.x, offset.y, w, h);
 }
 
 // from lib.js in Firebug
-SelectionBox.prototype.getViewOffset = function( elt )
+SelectionBox.prototype.getViewOffset = function(elt)
 {
     function addOffset(elt, coords, view)
     {
@@ -143,6 +142,6 @@ SelectionBox.prototype.getViewOffset = function( elt )
 };
 
 SelectionBox.prototype.destroy = function() {
-    for( var edge in this.edges )
+    for (var edge in this.edges)
         this.edges[edge].remove();
 }

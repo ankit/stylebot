@@ -1,13 +1,14 @@
 /**
   * Utility Methods to create various Widget controls.
   * Right now, tightly coupled with stylebot.widget.basic
+  *
   **/
   
 WidgetUI = {
     
     validSizeUnits: ['px', 'em', '%', 'pt'],
     
-    createOption: function( option, control ) {
+    createOption: function(option, control) {
         var container = $('<div>', {
             class: 'stylebot-widget-option'
         });
@@ -28,14 +29,15 @@ WidgetUI = {
             class: 'stylebot-accordion-icon'
         }))
         .bind('mousedown keydown', function (e) {
-            if( e.type == "keydown" && e.keyCode != 13 )
+            if (e.type == "keydown" && e.keyCode != 13)
                 return true;
             e.preventDefault();
-            var el = $( e.target );
-            if( !el.hasClass( 'stylebot-accordion-header' ) )
+            
+            var el = $(e.target);
+            if (!el.hasClass('stylebot-accordion-header'))
                 el = el.parent();
             
-            stylebot.widget.basic.events.toggleAccordion( el );
+            stylebot.widget.basic.events.toggleAccordion(el);
         });
     },
     
@@ -68,11 +70,10 @@ WidgetUI = {
         
         var len = this.validSizeUnits.length;
         
-        for(var i=0; i<len; i++){
+        for (var i = 0; i < len; i++){
             this.createSelectOption(this.validSizeUnits[i], null, this.validSizeUnits[i])
             .appendTo(select);
         }
-        
         return container;
     },
     
@@ -81,7 +82,7 @@ WidgetUI = {
             style: 'display: inline-block; margin-left: 50px; margin-top: -10px'
         });
         var len = control.id.length;
-        for(var i=0; i<len; i++)
+        for (var i = 0; i < len; i++)
         {
             this.createLabel(control.options[i])
             .appendTo(container);
@@ -100,9 +101,9 @@ WidgetUI = {
             class: 'stylebot-control stylebot-select'
         })
         .change(function(e) {
-            var el = $( this );
+            var el = $(this);
             var input = el.next();
-            if(el.attr('value') == "Custom")
+            if (el.attr('value') == "Custom")
             {
                 input
                 .attr('value', '')
@@ -123,7 +124,7 @@ WidgetUI = {
         .appendTo(select);
         
         var len = control.options.length;
-        for(var i=0; i<len; i++)
+        for (var i = 0; i < len; i++)
         {
             this.createSelectOption(control.options[i], null, control.options[i])
             .appendTo(select);
@@ -155,9 +156,9 @@ WidgetUI = {
             value: value
         })
         .data('property', property)
-        .click( stylebot.widget.basic.events.onCheckboxChange );
+        .click(stylebot.widget.basic.events.onCheckboxChange);
         
-        if(text)
+        if (text)
         {
             var span = $('<span class="stylebot-control"></span>');
             checkbox.appendTo(span);
@@ -192,7 +193,7 @@ WidgetUI = {
             class: 'stylebot-control stylebot-radio'
         });
         
-        if(typeof(property) == 'string')
+        if (typeof(property) == 'string')
             radio.attr('value', value);
         else
             radio.attr('value', value.join(','));
@@ -220,9 +221,8 @@ WidgetUI = {
             value: value
         });
         
-        if(property)
+        if (property)
             option.data('property', property);
-        
         return option;
     },
     

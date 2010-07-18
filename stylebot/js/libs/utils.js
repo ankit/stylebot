@@ -10,9 +10,9 @@ var Utils = {
     // return array index at which property pName is equal to value 'pValue'
     search: function(arr, pName, pValue) {
         var len = arr.length;
-        for(var i=0; i<len; i++)
+        for (var i = 0; i < len; i++)
         {
-            if(arr[i][pName] == pValue)
+            if (arr[i][pName] == pValue)
                 return i;
         }
         return null;
@@ -22,7 +22,7 @@ var Utils = {
     // Accepts a keys array and 'keyup' event object as arguments.
     // TODO: Add support for keydown, keypress events and alphanumeric keys
     filterKeys: function(keys, e) {
-        if(typeof(e.keyCode) == 'undefined')
+        if (typeof(e.keyCode) == 'undefined')
             return true;
         var len = keys.length;
         var keyCodes = {
@@ -40,16 +40,16 @@ var Utils = {
             'bottom': 40,
             'arrowkeys':[ 37, 38, 39, 40 ],
         }
-        for(var i=0; i<len; i++){
+        for (var i = 0; i < len; i++){
             var code = keyCodes[keys[i]];
-            if(code.length > 1) // it is an array
+            if (code.length > 1) // it is an array
             {
-                if($.inArray(e.keyCode, code) != -1)
+                if ($.inArray(e.keyCode, code) != -1)
                     return false;
             }
             else
             {
-                if(e.keyCode == code)
+                if (e.keyCode == code)
                     return false;
             }
         }
@@ -61,17 +61,17 @@ var Utils = {
     },
     
     makeEditable: function(el, callback) {
-        el.attr( 'title', 'click to edit' );
+        el.attr('title', 'click to edit');
 
-        el.bind( 'click keyup', { callback: callback }, function(e) {
-            if( e.type == 'keyup' && e.keyCode != 13 )
+        el.bind('click keyup', {callback: callback}, function(e) {
+            if (e.type == 'keyup' && e.keyCode != 13)
                 return true;
 
-            var el = $( this );
+            var el = $(this);
             el.hide();
             var elWidth = el.width();
             var parentWidth = el.parent().width();
-            if( elWidth > parentWidth )
+            if (elWidth > parentWidth)
                 elWidth = parentWidth - 10;
             var value = el.html();
             
@@ -83,29 +83,29 @@ var Utils = {
                 value: value,
                 id: 'stylebot-editing-field'
             })
-            .css( 'min-width', elWidth );
+            .css('min-width', elWidth);
             
-            el.before( input );
+            el.before(input);
             input.focus();
             
             var onClose = function(e) {
-                if( e.type == "keyup" && e.keyCode != 13 && e.keyCode !=27 )
+                if (e.type == "keyup" && e.keyCode != 13 && e.keyCode != 27)
                     return true;
-                if( e.type == "mousedown" && e.target.id == e.data.input.attr('id') )
+                if (e.type == "mousedown" && e.target.id == e.data.input.attr('id'))
                     return true;
-                var value = e.data.input.attr( 'value' );
+                var value = e.data.input.attr('value');
                 e.data.input.remove();
-                if( value == "" )
+                if (value == "")
                     value = e.data.el.html();
-                e.data.el.html( value );
+                e.data.el.html(value);
                 e.data.el.show();
-                e.data.callback( value );
-                $( document ).unbind( "mousedown", onClose );
-                $( document ).unbind( "keyup", onClose );
+                e.data.callback(value);
+                $(document).unbind("mousedown", onClose);
+                $(document).unbind("keyup", onClose);
             }
             
-            input.bind( 'keyup', { input: input, el: el, callback: callback }, onClose );
-            $( document ).bind( 'mousedown', { input: input, el: el, callback: callback }, onClose );
+            input.bind('keyup', {input: input, el: el, callback: callback}, onClose);
+            $(document).bind('mousedown',{input: input, el: el, callback: callback}, onClose);
         });
     }
 }

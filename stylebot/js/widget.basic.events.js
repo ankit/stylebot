@@ -10,7 +10,7 @@ stylebot.widget.basic.events = {
     
     onCheckboxChange: function(e) {
         var value;
-        if(e.target.checked == true)
+        if (e.target.checked == true)
             value = e.target.value;
         else
             value = '';
@@ -24,7 +24,7 @@ stylebot.widget.basic.events = {
         var status = el.hasClass(className);
         var value = '';
         var property = el.data('property');
-        if(status)
+        if (status)
             el.removeClass(className);
         else
         {
@@ -36,16 +36,16 @@ stylebot.widget.basic.events = {
     
     onRadioClick: function(e) {
         var value;
-        if(e.target.checked == true)
+        if (e.target.checked == true)
             value = e.target.value;
         else
             value = '';
         var property = $(e.target).data('property');
         value = value.split(',');
-        if(typeof(property) == "object")
+        if (typeof(property) == "object")
         {
             var len = property.length;
-            for(var i=0; i<len; i++)
+            for (var i = 0; i < len; i++)
                 stylebot.style.apply(property[i], value[i]);
         }
         else
@@ -53,7 +53,6 @@ stylebot.widget.basic.events = {
     },
     
     onTextFieldKeyUp: function(e) {
-        
         var value = e.target.value;
         var property = $(e.target).data('property');
 
@@ -61,7 +60,6 @@ stylebot.widget.basic.events = {
     },
     
     onSizeFieldKeyUp: function(e) {
-        
         var value = e.target.value;
         var property = $(e.target).data('property');
         var unit = $(e.target).next().attr('value');
@@ -73,10 +71,10 @@ stylebot.widget.basic.events = {
     onSelectChange: function(e) {
         var value = e.target.value.split(',');
         var property = $(e.target).find('[value='+e.target.value+']').data('property');
-        if(typeof(property) == "object")
+        if (typeof(property) == "object")
         {
             var len = property.length;
-            for(var i=0; i<len; i++)
+            for (var i = 0; i < len; i++)
                 stylebot.style.apply(property[i], value[i]);
         }
         else
@@ -85,7 +83,7 @@ stylebot.widget.basic.events = {
     
     onSegmentedControlClick: function(e) {
         var el = $(e.target);
-        if(el[0].tagName != 'BUTTON')
+        if (el[0].tagName != 'BUTTON')
             el = el.parent('button');
 
         // TODO: Try to implement the next element's border width using CSS
@@ -94,7 +92,7 @@ stylebot.widget.basic.events = {
         control.find( '.stylebot-active-button' )
         .removeClass( 'stylebot-active-button' )
         .next().css( 'border-left-width', '1px' );
-        if( !status )
+        if (!status)
         {
             el.addClass( 'stylebot-active-button' );
             el.next().css( 'border-left-width', '0px' );
@@ -106,9 +104,9 @@ stylebot.widget.basic.events = {
     },
     
     toggleAccordion: function(h) {
-        if( h.hasClass( 'stylebot-accordion-active' ) )
+        if (h.hasClass('stylebot-accordion-active'))
         {
-            h.removeClass( 'stylebot-accordion-active' )
+            h.removeClass('stylebot-accordion-active')
             .focus()
             .next().hide();
         }
@@ -126,17 +124,17 @@ stylebot.widget.basic.events = {
         
         // determine which accordions are open and
         // send request to save the new state to background.html cache
-        if( this.accordionTimer )
-            clearTimeout( this.accordionTimer );
-        this.accordionTimer = setTimeout( function() {
+        if (this.accordionTimer)
+            clearTimeout(this.accordionTimer);
+        this.accordionTimer = setTimeout(function() {
             var len = stylebot.widget.basic.cache.accordionHeaders.length;
             var enabledAccordions = [];
-            for( var i=0; i < len; i++ )
+            for (var i = 0; i < len; i++)
             {
-                if( $ ( stylebot.widget.basic.cache.accordionHeaders[i] ).hasClass( 'stylebot-accordion-active' ) )
-                    enabledAccordions[ enabledAccordions.length ] = i;
+                if ($(stylebot.widget.basic.cache.accordionHeaders[i]).hasClass( 'stylebot-accordion-active' ))
+                    enabledAccordions[enabledAccordions.length] = i;
             }
-            stylebot.chrome.saveAccordionState( enabledAccordions );
+            stylebot.chrome.saveAccordionState(enabledAccordions);
         }, 2000);
     }
 }

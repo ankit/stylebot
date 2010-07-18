@@ -6,7 +6,7 @@
 
 stylebot.chrome = {
     setIcon: function(value) {
-        if(value)
+        if (value)
             chrome.extension.sendRequest({ name: "enablePageIcon" }, function(){});
         else
             chrome.extension.sendRequest({ name: "disablePageIcon" }, function(){});
@@ -24,28 +24,28 @@ stylebot.chrome = {
     
     // send request to fetch options from datastore
     fetchOptions: function() {
-        chrome.extension.sendRequest({ name: "fetchOptions" }, function( response ){
-            initialize( response );
+        chrome.extension.sendRequest({ name: "fetchOptions" }, function(response){
+            initialize(response);
         });
     },
     
-    saveAccordionState: function( enabledAccordions ) {
+    saveAccordionState: function(enabledAccordions) {
         chrome.extension.sendRequest( { name: "saveAccordionState", enabledAccordions: enabledAccordions }, function(){} );
     }
 }
 
 chrome.extension.onRequest.addListener(
 	function(request, sender, sendResponse) {
-        if( request.name == "toggle" )
+        if (request.name == "toggle")
 		{
-		    if(window != window.top)
+		    if (window != window.top)
 		        return;
             stylebot.toggle();
-		    sendResponse( { status: stylebot.status } );
+		    sendResponse({ status: stylebot.status });
 		}
-		else if( request.name == "setOptions" )
+		else if (request.name == "setOptions")
 		{
-		    stylebot.setOptions( request.options );
+		    stylebot.setOptions(request.options);
             sendResponse({});
 		}
 });

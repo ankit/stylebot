@@ -6,12 +6,12 @@
  **/
 
 // constructor
-var ModalBox = function( html, options ) {
+var ModalBox = function(html, options) {
     
-    if( options )
+    if (options)
     {
-        for( var option in options )
-            this.options[ option ] = options[ option ];
+        for (var option in options)
+            this.options[option] = options[option];
     }
     
     this.box = $('<div>', {
@@ -42,24 +42,24 @@ ModalBox.prototype.darkenBg = function(callback) {
         this.background.css({
             height: document.height
         });
-        this.background.fadeIn( this.options.bgFadeSpeed );
+        this.background.fadeIn(this.options.bgFadeSpeed);
 }
-    
+
 ModalBox.prototype.show = function(content, options) {
-    this.box.fadeIn( this.options.fadeSpeed );
+    this.box.fadeIn(this.options.fadeSpeed);
     this.darkenBg();
     this.options.onOpen();
     
     var closeBox = function(e) {
-        if( e.type == "keyup" &&
-            ( e.keyCode != 27 || !e.data.modal.options.closeOnEsc )
+        if (e.type == "keyup" &&
+            (e.keyCode != 27 || !e.data.modal.options.closeOnEsc)
         )
             return true;
         
         var id = e.target.id;
-        var parent = $( e.target ).closest( '#stylebot-modal' );
+        var parent = $(e.target).closest('#stylebot-modal');
         
-        if( ( e.type == "mousedown" &&
+        if ((e.type == "mousedown" &&
             id != "stylebot-modal" &&
             parent.length == 0 &&
             e.data.modal.options.closeOnBgClick ) ||
@@ -68,16 +68,16 @@ ModalBox.prototype.show = function(content, options) {
         {
             e.preventDefault();
             e.data.modal.hide();
-            $(document).unbind( 'keyup mousedown', closeBox );
+            $(document).unbind('keyup mousedown', closeBox);
         }
         return true;
     }
     
-    $(document).bind( 'keyup mousedown', { modal: this }, closeBox );
+    $(document).bind('keyup mousedown', {modal: this}, closeBox);
 }
 
 ModalBox.prototype.hide = function() {
-        this.box.fadeOut( this.options.fadeSpeed );
-        this.background.fadeOut( this.options.bgFadeSpeed );
+        this.box.fadeOut(this.options.fadeSpeed);
+        this.background.fadeOut(this.options.bgFadeSpeed);
         this.options.onClose();
 }

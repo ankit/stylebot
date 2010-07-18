@@ -16,14 +16,14 @@ var KeyCombo = {
 			"keydown",
 			function(e) {
 				KeyCombo.lastValue = el.value;
-				if(e.keyCode == 8)
+				if (e.keyCode == 8)
 					e.preventDefault();
-				if(KeyCombo.filterKeyCode(e.keyCode))
+				if (KeyCombo.filterKeyCode(e.keyCode))
 				{
 					codeEl.value = e.keyCode;
 					el.value = "";
 				}
-				if(e.keyCode == 27)
+				if (e.keyCode == 27)
 					el.blur();
 			},
 			false);
@@ -31,21 +31,21 @@ var KeyCombo = {
 	
 	filterKeyCode: function(code) {
 		// filter tab/shift/enter/esc/arrow keys
-		if(code == 27 || code == 16 || code == 37 || code == 38 || code == 39 || code == 40 || code == 13 || code == 9)
+		if (code == 27 || code == 16 || code == 37 || code == 38 || code == 39 || code == 40 || code == 13 || code == 9)
 			return false;
 		// filter /meta/ctrl/alt/backspace
-		if(code == 18 || code == 17 || code == 0 || code == 91 || code == 93 || code == 8)
+		if (code == 18 || code == 17 || code == 0 || code == 91 || code == 93 || code == 8)
 			return false;
 		return true;
 	},
 	
 	mapKeyDownCode: function(code) {
 	    code = Math.floor(code);
-		if( (code >= 65 && code <= 90) || (code >= 48 && code <= 57) )
+		if ((code >= 65 && code <= 90) || (code >= 48 && code <= 57))
 		{
 			return String.fromCharCode(code).toLowerCase();
 		}
-		switch(code)
+		switch (code)
 		{
 			case 186: return ";";
 			case 187: return "=";

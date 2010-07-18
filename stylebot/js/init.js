@@ -4,21 +4,21 @@
 
 lintDebug = false;
 
-$( document ).ready(function() {
+$(document).ready(function() {
     initDebug();
     stylebot.chrome.fetchOptions();
 });
 
 // callback for request sent to background.html in stylebot.chrome.fetchOptions()
-function initialize( response ) {
+function initialize(response) {
     // init accordion state
     stylebot.widget.basic.enabledAccordions = response.enabledAccordions;
-    stylebot.initialize( response.options );
+    stylebot.initialize(response.options);
     attachListeners();
 }
 
 function initDebug() {
-    if( lintDebug )
+    if(lintDebug)
         jQuery.LINT.level = 3;
     else
         jQuery.LINT.level = 0;
@@ -26,23 +26,23 @@ function initDebug() {
 
 function attachListeners() {
 
-    document.addEventListener( 'keydown', function(e) {
+    document.addEventListener('keydown', function(e) {
         
-        if( isInputField( e.target ) )
+        if (isInputField(e.target))
            return true;
 
         // Handle shortcut key combo 'ctrl + e' to toggle editing mode
-        if( stylebot.options.useShortcutKey && e.keyCode == stylebot.options.shortcutKey )
+        if (stylebot.options.useShortcutKey && e.keyCode == stylebot.options.shortcutKey)
         {
-            if( stylebot.options.shortcutMetaKey == 'ctrl' && e.ctrlKey
+            if (stylebot.options.shortcutMetaKey == 'ctrl' && e.ctrlKey
               || stylebot.options.shortcutMetaKey == 'shift' && e.shiftKey
               || stylebot.options.shortcutMetaKey == 'alt' && e.altKey
-              || stylebot.options.shortcutMetaKey == 'none' )
+              || stylebot.options.shortcutMetaKey == 'none')
             stylebot.toggle();
         }
         
         // Handle Esc key to escape editing mode
-        else if( e.keyCode == 27 &&
+        else if (e.keyCode == 27 &&
             stylebot.status &&
             !stylebot.widget.basic.isColorPickerVisible &&
             !stylebot.modal.isVisible &&
@@ -52,16 +52,16 @@ function attachListeners() {
             e.target.blur();
             stylebot.disable();
         }
-        
         return true;
-    }, true );
+    
+    }, true);
 }
 
-function isInputField( el ) {
+function isInputField(el) {
     var tagName = el.tagName.toLowerCase();
-    var inputTypes = [ 'input', 'textarea', 'div', 'object' ];
+    var inputTypes = ['input', 'textarea', 'div', 'object'];
     
-    if( $.inArray( tagName, inputTypes ) != -1 ||
+    if ($.inArray( tagName, inputTypes) != -1 ||
     el.id == "stylebot"
     )
         return true;

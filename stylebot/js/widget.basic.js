@@ -163,46 +163,45 @@ stylebot.widget.basic = {
         // creating controls for different CSS properties
         var len = this.groups.length;
         
-        for(var i=0; i<len; i++)
+        for (var i=0; i<len; i++)
         {
-            WidgetUI.createAccordionHeader( this.groups[i].name )
-            .appendTo( this.cache.container );
+            WidgetUI.createAccordionHeader(this.groups[i].name)
+            .appendTo(this.cache.container);
             
             var group = $('<div>', {
                 class: 'stylebot-accordion'
             })
-            .appendTo( this.cache.container );
+            .appendTo(this.cache.container);
 
             var len2 = this.groups[i].controls.length;
-            for(var j=0; j<len2; j++)
-                this.createUIForControl( this.groups[i].controls[j] )
-                .appendTo( group );
+            for (var j=0; j<len2; j++)
+                this.createUIForControl(this.groups[i].controls[j])
+                .appendTo(group);
         }
-        
         return this.cache.container;
     },
     
     fillCache: function() {
         // controls
-        this.cache.controls = $( '.stylebot-control' );
+        this.cache.controls = $('.stylebot-control');
         // textfields
-        this.cache.textfields = $( '.stylebot-textfield' );
+        this.cache.textfields = $('.stylebot-textfield');
         // buttons
-        this.cache.buttons = $( '#stylebot-controls .stylebot-button' );
+        this.cache.buttons = $('#stylebot-controls .stylebot-button');
         // select dropdowns
-        this.cache.selectboxes = $( '.stylebot-select' );
+        this.cache.selectboxes = $('.stylebot-select');
         // color selector
-        this.cache.colorSelectors = $( '.stylebot-colorselector' );
+        this.cache.colorSelectors = $('.stylebot-colorselector');
         // color selector color divs
-        this.cache.colorSelectorColor = $( '.stylebot-colorselector-color' );
+        this.cache.colorSelectorColor = $('.stylebot-colorselector-color');
         // toggle buttons
-        this.cache.toggleButtons = $( '.stylebot-toggle' );
+        this.cache.toggleButtons = $('.stylebot-toggle');
         // accordion headers
-        this.cache.accordionHeaders = $( '.stylebot-accordion-header' );
+        this.cache.accordionHeaders = $('.stylebot-accordion-header');
         // font family input
-        this.cache.fontFamilyInput = $( '#stylebot-font-family' );
+        this.cache.fontFamilyInput = $('#stylebot-font-family');
         // segmented controls
-        this.cache.segmentedControls = $( '.stylebot-segmented-control' );
+        this.cache.segmentedControls = $('.stylebot-segmented-control');
     },
     
     createUIForControl: function(control) {
@@ -215,7 +214,7 @@ stylebot.widget.basic = {
         var control_el; // this will contain the control element
         
         // Add controls of different types
-        switch(control.type){
+        switch (control.type) {
 
             case 'size'             :   control_el = WidgetUI.createSizeControl(control.id).appendTo(el);
                                         break;
@@ -225,22 +224,22 @@ stylebot.widget.basic = {
             case 'color'            :   control_el = WidgetUI.createTextField(control.id, 10, stylebot.widget.basic.events.onTextFieldKeyUp);
                                         WidgetUI.createColorPicker(control_el).appendTo(el);
                                         control_el.appendTo(el)
-                                        .keyup(function(e){ WidgetUI.setColorSelectorColor( $(this) ) });
+                                        .keyup(function (e) { WidgetUI.setColorSelectorColor($(this)) });
                                         break;
                                         
             case 'checkbox'         :   control_el = WidgetUI.createCheckbox(null, control.id , control.value).appendTo(el);
                                         break;
 
-            case 'toggle'           :   control_el = WidgetUI.createToggleButton('Hide', control.id , control.value).appendTo(el);
+            case 'toggle'           :   control_el = WidgetUI.createToggleButton("Hide", control.id , control.value).appendTo(el);
                                         break;
 
             case 'select'           :   control_el = WidgetUI.createSelect(control.id);
                                         WidgetUI.createSelectOption("Default", control.id, '').appendTo(control_el);
                                         var len = control.options.length;
-                                        for(var i=0; i<len; i++)
+                                        for (var i=0; i<len; i++)
                                         {
                                             var option = control.options[i];
-                                            WidgetUI.createSelectOption( Utils.capitalize(option), control.id, option).appendTo(control_el);
+                                            WidgetUI.createSelectOption(Utils.capitalize(option), control.id, option).appendTo(control_el);
                                         }
                                         control_el.appendTo(el);
                                         break;
@@ -260,14 +259,14 @@ stylebot.widget.basic = {
     fill: function() {
         // fill controls
         var len = this.groups.length;
-        var rule = stylebot.style.getRule( stylebot.style.cache.selector );
+        var rule = stylebot.style.getRule(stylebot.style.cache.selector);
 
-        if(rule)
+        if (rule)
         {
-            for(var i=0; i<len; i++)
+            for (var i=0; i<len; i++)
             {
                 var len2 = this.groups[i].controls.length;
-                for(var j=0; j<len2; j++)
+                for (var j=0; j<len2; j++)
                     this.fillControl(this.groups[i].controls[j], rule);
             }
         }
@@ -275,11 +274,11 @@ stylebot.widget.basic = {
     
     fillControl: function(control, rule) {
         
-        function determineSizeUnit( val ) {
+        function determineSizeUnit(val) {
             var len = WidgetUI.validSizeUnits.length;
-            for(var i=0; i<len; i++)
+            for (var i=0; i<len; i++)
             {
-                if( val.indexOf( WidgetUI.validSizeUnits[i] ) != -1 )
+                if (val.indexOf(WidgetUI.validSizeUnits[i]) != -1)
                     break;
             }
             return WidgetUI.validSizeUnits[i];
@@ -287,7 +286,7 @@ stylebot.widget.basic = {
         
         var pValue = rule[control.id];
 
-        switch(control.type) {
+        switch (control.type) {
             
             case 'size'         :       if(pValue == undefined)
                                             return false;
@@ -297,7 +296,7 @@ stylebot.widget.basic = {
                                         .attr('value', pValue.replace(unit, '') );
                                         
                                         // set select option
-                                        var index = $.inArray( $.trim( String(unit) ), WidgetUI.validSizeUnits);
+                                        var index = $.inArray($.trim(String(unit)), WidgetUI.validSizeUnits);
                                         control.el.find('select').attr('selectedIndex', index);
                                         break;
                                         
@@ -305,21 +304,21 @@ stylebot.widget.basic = {
                                         var inputFields = control.el.find('input');
                                         var selectInputs = control.el.find('select');
                                         var values = [];
-                                        for(var i=0; i<len; i++)
-                                            values[i] = rule[ control.id[i] ];
+                                        for (var i=0; i<len; i++)
+                                            values[i] = rule[control.id[i]];
                                         
-                                        if(values[0] != undefined)
+                                        if (values[0] != undefined)
                                         {
                                             var parts = values[0].split(' ');
                                             // parse value of the form margin: 2px 10px;
-                                            if(parts.length == 2)
+                                            if (parts.length == 2)
                                             {
                                                 values[0] = "";
                                                 values[1] = values[3] = $.trim( parts[0] ); // top & bottom
                                                 values[2] = values[4] = $.trim( parts[1] ); // left & right
                                             }
                                             // parse value of the form margin: 2px 10px 8px 6px;                                        
-                                            else if(parts.length == 4)
+                                            else if (parts.length == 4)
                                             {
                                                 values[0] = "";
                                                 values[1] = $.trim( parts[0] );
@@ -329,23 +328,22 @@ stylebot.widget.basic = {
                                             }
                                         }
                                         
-                                        for(var i=0; i<len; i++)
+                                        for (var i=0; i<len; i++)
                                         {
                                             pValue = values[i];
-
-                                            if(pValue != undefined)
+                                            if (pValue != undefined)
                                             {
                                                 var unit = determineSizeUnit(pValue);
                                                 var input = $(inputFields[i]);
-                                                input.attr( 'value', pValue.replace(unit, '') )
+                                                input.attr('value', pValue.replace(unit, ''))
                                                 .keyup(); // keyup called to update rules cache as values maybe modified when mode is switched.
-                                                var index = $.inArray( $.trim( String(unit) ), WidgetUI.validSizeUnits);
+                                                var index = $.inArray($.trim( String(unit)), WidgetUI.validSizeUnits);
                                                 $(selectInputs[i]).attr('selectedIndex', index);
                                             }
                                         }
                                         break;
 
-            case 'font-family'  :       if(pValue == undefined)
+            case 'font-family'  :       if (pValue == undefined)
                                             return false;
                                         
                                         // set input value
@@ -353,7 +351,7 @@ stylebot.widget.basic = {
                                         .attr('value', pValue);
                                         
                                         var index = $.inArray(pValue, control.options);
-                                        if(index != -1)
+                                        if (index != -1)
                                         {
                                             control.el.find('select').attr('selectedIndex', index + 1);
                                             input.hide();
@@ -365,31 +363,31 @@ stylebot.widget.basic = {
                                         }
                                         break;
                                     
-            case 'color'            :   if(pValue == undefined)
+            case 'color'            :   if (pValue == undefined)
                                             return false;
                                         control.el.attr('value', pValue);
                                         WidgetUI.setColorSelectorColor(control.el);
                                         break;
                                     
-            case 'checkbox'         :   if(pValue == control.value)
+            case 'checkbox'         :   if (pValue == control.value)
                                             control.el.attr('checked', true);
                                         else
                                             control.el.attr('checked', false);                                                
                                         break;
                                     
-            case 'toggle'           :   if(pValue == control.el.data('value'))
+            case 'toggle'           :   if (pValue == control.el.data('value'))
                                             control.el.addClass('stylebot-active-button');
                                         else
                                             control.el.removeClass('stylebot-active-button');
                                         break;
                                     
-            case 'select'           :   var index = $.inArray( $.trim( String(pValue) ), control.options);
-                                        if(index != -1)
+            case 'select'           :   var index = $.inArray($.trim(String(pValue)), control.options);
+                                        if (index != -1)
                                             control.el.attr('selectedIndex', index + 1);
                                         break;
 
             case 'segmented'        :   var index = $.inArray( $.trim( String(pValue) ), control.values);
-                                        if(index != -1)
+                                        if (index != -1)
                                             $(control.el.find('button')[index])
                                             .addClass('stylebot-active-button')
                                             .next().css('border-left-width', '0px');
@@ -398,14 +396,14 @@ stylebot.widget.basic = {
     
     // reset values to default for all controls
     reset: function() {
-        this.cache.textfields.attr( 'value' , '' );
-        this.cache.selectboxes.attr( 'selectedIndex', 0 );
-        this.cache.colorSelectorColor.css( 'backgroundColor', '#fff' );
-        this.cache.toggleButtons.removeClass( 'stylebot-active-button' );
+        this.cache.textfields.attr('value' , '');
+        this.cache.selectboxes.attr('selectedIndex', 0);
+        this.cache.colorSelectorColor.css('backgroundColor', '#fff');
+        this.cache.toggleButtons.removeClass('stylebot-active-button');
         this.cache.fontFamilyInput.hide();
-        this.cache.segmentedControls.find( '.stylebot-active-button' )
-        .removeClass( 'stylebot-active-button' )
-        .next().css( 'border-left-width', '1px' );
+        this.cache.segmentedControls.find('.stylebot-active-button')
+        .removeClass('stylebot-active-button')
+        .next().css('border-left-width', '1px');
     },
 
     show: function() {
@@ -416,11 +414,11 @@ stylebot.widget.basic = {
         // set focus to first visible accordion header
         var controlContainerOffset = this.cache.container.offset().top;
 
-        for( var i=0; i<4; i++ )
+        for (var i=0; i<4; i++)
         {
-            if( $(this.cache.accordionHeaders[i]).offset().top >= controlContainerOffset )
+            if ($(this.cache.accordionHeaders[i]).offset().top >= controlContainerOffset)
              {
-                 setTimeout( function() {
+                 setTimeout(function() {
                       stylebot.widget.basic.cache.accordionHeaders[i].focus();
                  }, 0);
                  break;
@@ -435,7 +433,7 @@ stylebot.widget.basic = {
     
     initAccordions: function() {
         var len = this.enabledAccordions.length;
-        for( var i=0; i < len; i++ )
-            this.events.toggleAccordion( $( this.cache.accordionHeaders[ this.enabledAccordions[i] ] ) );
+        for (var i=0; i < len; i++)
+            this.events.toggleAccordion($(this.cache.accordionHeaders[this.enabledAccordions[i]]));
     }
 }

@@ -26,12 +26,12 @@ var stylebot = {
         position: 'Right'
     },
     
-    initialize: function( options ) {
+    initialize: function(options) {
         this.style.initialize();
-        this.setOptions( options );
+        this.setOptions(options);
     },
     
-    setOptions: function( options ) {
+    setOptions: function(options) {
         this.options.useShortcutKey = options.useShortcutKey;
         this.options.shortcutKey = options.shortcutKey;
         this.options.shortcutMetaKey = options.shortcutMetaKey;
@@ -40,7 +40,7 @@ var stylebot = {
     
     // toggle stylebot editing status
     toggle: function() {
-        if( this.status == true )
+        if (this.status == true)
             this.disable();
         else
             this.enable();
@@ -67,49 +67,51 @@ var stylebot = {
     },
     
     highlight: function(el) {
-        if( !stylebot.selectionBox )
+        if (!stylebot.selectionBox)
             stylebot.createSelectionBox();
 
         stylebot.hoveredElement = el;
-        stylebot.selectionBox.highlight( el );
+        stylebot.selectionBox.highlight(el);
     },
     
     unhighlight: function() {
         stylebot.hoveredElement = null;
-        if( stylebot.selectionBox )
+        if (stylebot.selectionBox)
             stylebot.selectionBox.hide();
     },
     
     // called when user selects an element
-    select: function( el, selector ) {
+    select: function(el, selector) {
         // preference is given to element over selector
         stylebot.disableSelection();
-        if( el )
+        if (el)
         {
             stylebot.selectedElement = el;
-            selector = SelectorGenerator.generate( el );
-            stylebot.highlight( el );
+            selector = SelectorGenerator.generate(el);
+            stylebot.highlight(el);
         }
-        else if( selector )
+        else if (selector)
         {
-            el = $( selector )[0];
+            el = $(selector)[0];
             stylebot.selectedElement = el;
-            stylebot.highlight( el );
+            stylebot.highlight(el);
         }
         else
         {
             stylebot.selectedElement = stylebot.hoveredElement;
-            selector = SelectorGenerator.generate( stylebot.selectedElement );
+            selector = SelectorGenerator.generate(stylebot.selectedElement);
         }
-        stylebot.style.fillCache( selector );
+        
+        stylebot.style.fillCache(selector);
         stylebot.widget.show();
-        setTimeout( function() {
-            stylebot.style.removeFromStyleElement( stylebot.style.cache.selector );
+        setTimeout(function() {
+            stylebot.style.removeFromStyleElement(stylebot.style.cache.selector);
         }, 100);
     },
     
     toggleSelection: function() {
-        if( stylebot.selectionStatus ) {
+        if (stylebot.selectionStatus)
+        {
             stylebot.select( null, stylebot.style.cache.selector );
             stylebot.disableSelection();
         }
@@ -124,23 +126,23 @@ var stylebot = {
     enableSelection: function() {
         stylebot.selectionStatus = true;
         stylebot.widget.cache.headerSelectIcon
-        .addClass( 'stylebot-select-icon-active' )
-        .attr( 'title', 'Click to disable selection of element' );
+        .addClass('stylebot-select-icon-active')
+        .attr('title', 'Click to disable selection of element');
     },
     
     disableSelection: function() {
         stylebot.selectionStatus = false;
         stylebot.widget.cache.headerSelectIcon
         .removeClass('stylebot-select-icon-active')
-        .attr( 'title', 'Click to enable selection of element' );
+        .attr('title', 'Click to enable selection of element');
     },
     
     createSelectionBox: function() {
-        stylebot.selectionBox = new SelectionBox( 2, "stylebot-selection" );
+        stylebot.selectionBox = new SelectionBox(2, "stylebot-selection");
     },
     
     destroySelectionBox: function() {
-        if( stylebot.selectionBox )
+        if (stylebot.selectionBox)
         {
             stylebot.selectionBox.destroy();
             delete stylebot.selectionBox;
@@ -148,17 +150,17 @@ var stylebot = {
     },
     
     attachListeners: function() {
-        document.body.addEventListener( 'mouseover', this.onMouseOver, true );
-        document.body.addEventListener( 'click', this.onMouseClick, true );
+        document.body.addEventListener('mouseover', this.onMouseOver, true);
+        document.body.addEventListener('click', this.onMouseClick, true);
     },
     
     detachListeners: function() {
-        document.body.removeEventListener( 'mouseover', this.onMouseOver, true );
-        document.body.removeEventListener( 'click', this.onMouseClick, true );
+        document.body.removeEventListener('mouseover', this.onMouseOver, true);
+        document.body.removeEventListener('click', this.onMouseClick, true);
     },
     
     onMouseOver: function(e) {
-        if( e.target.className == "stylebot-selection"
+        if (e.target.className == "stylebot-selection"
             || stylebot.widget.isBeingDragged
             || stylebot.modal.isVisible
             || stylebot.hoveredElement == e.target
@@ -168,24 +170,23 @@ var stylebot = {
             return true;
         }
 
-        if( stylebot.belongsToStylebot( e.target ) )
+        if (stylebot.belongsToStylebot(e.target))
         {
             stylebot.unhighlight();
             return true;
         }
-        stylebot.highlight( e.target );
+        stylebot.highlight(e.target);
     },
 
     onMouseClick: function(e) {
-        if( stylebot.hoveredElement &&
+        if (stylebot.hoveredElement &&
             stylebot.status &&
-            !stylebot.belongsToStylebot( e.target )
+            !stylebot.belongsToStylebot(e.target)
             )
         {
             e.preventDefault();
             e.stopPropagation();
-            if( stylebot.selectionStatus )
-            {
+            if (stylebot.selectionStatus) {
                 stylebot.select();
                 return false;
             }
@@ -195,9 +196,9 @@ var stylebot = {
     
     belongsToStylebot: function(el) {
         $el = $(el);
-        var parent = $el.closest( '#stylebot, .stylebot_colorpicker' );
-        var id = $el.attr( 'id' );
-        if( parent.length != 0 || id.indexOf( "stylebot" ) != -1 )
+        var parent = $el.closest('#stylebot, .stylebot_colorpicker');
+        var id = $el.attr('id');
+        if (parent.length != 0 || id.indexOf("stylebot") != -1)
             return true;
         
         return false;
