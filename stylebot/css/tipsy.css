@@ -1,0 +1,12 @@
+.stylebot-tipsy { padding: 5px; font-size: 10px; position: absolute; z-index: 100000000000; }
+  .stylebot-tipsy-inner { padding: 5px 8px 4px 8px; background-color: black; color: white; max-width: 200px; text-align: center; }
+  .stylebot-tipsy-inner { border-radius: 3px; -moz-border-radius:3px; -webkit-border-radius:3px; }
+  .stylebot-tipsy-arrow { position: absolute; background: url(data:image/gif;base64,R0lGODlhCQAJAIABAAAAAAAAACH5BAEAAAEALAAAAAAJAAkAAAIRjAOnwIrcDJxvwkplPtchVQAAOw==) no-repeat top left; width: 9px; height: 5px; }
+  .stylebot-tipsy-n .stylebot-tipsy-arrow { top: 0; left: 50%; margin-left: -4px; }
+    .stylebot-tipsy-nw .stylebot-tipsy-arrow { top: 0; left: 10px; }
+    .stylebot-tipsy-ne .stylebot-tipsy-arrow { top: 0; right: 10px; }
+  .stylebot-tipsy-s .stylebot-tipsy-arrow { bottom: 0; left: 50%; margin-left: -4px; background-position: bottom left; }
+    .stylebot-tipsy-sw .stylebot-tipsy-arrow { bottom: 0; left: 10px; background-position: bottom left; }
+    .stylebot-tipsy-se .stylebot-tipsy-arrow { bottom: 0; right: 10px; background-position: bottom left; }
+  .stylebot-tipsy-e .stylebot-tipsy-arrow { top: 50%; margin-top: -4px; right: 0; width: 5px; height: 9px; background-position: top right; }
+  .stylebot-tipsy-w .stylebot-tipsy-arrow { top: 50%; margin-top: -4px; left: 0; width: 5px; height: 9px; }

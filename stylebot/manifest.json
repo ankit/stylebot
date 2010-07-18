@@ -26,7 +26,8 @@
 			"css/controls.css",
 			"css/modal.css",
 			"css/colorpicker.css",
-			"css/scrollbars.css"
+			"css/scrollbars.css",
+			"css/tipsy.css"
 		],
 		
 		"js": [
@@ -46,6 +47,7 @@
 			"js/libs/modalbox.js",
 			"js/libs/utils.js",
 			"js/libs/colorpicker.js",
+			"js/libs/jquery.tipsy.js",
 			"js/libs/jquery.lint.js"
 		],
 		

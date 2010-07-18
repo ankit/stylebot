@@ -29,8 +29,10 @@ stylebot.widget = {
         this.cache.headerSelector = $('<div>', {
             id: 'stylebot-header-selector',
             class: 'stylebot-editable-text',
-            html: 'custom styles'
-        });
+            html: 'custom styles',
+            title: 'click to edit selector'
+        })
+        .tipsy({delayIn: 1500, gravity:'nw'});
         
         // make selector editable
         Utils.makeEditable(this.cache.headerSelector, function(value) {
@@ -41,8 +43,10 @@ stylebot.widget = {
         // url
         var url = $( '<div>', {
             html: stylebot.style.cache.url,
-            class: 'stylebot-editable-text'
-        });
+            class: 'stylebot-editable-text',
+            title: 'click to edit url for which styles will be saved'
+        })
+        .tipsy({delayIn: 1500, gravity:'nw'});
         
         var urlContainer = $( '<div>', {
             id: 'stylebot-header-url'
@@ -66,6 +70,7 @@ stylebot.widget = {
         this.cache.headerSelectIcon = $('<div>', {
             id: 'stylebot-select-icon'
         })
+        .tipsy({delayIn: 1500})
         .click(function(e) {
             stylebot.toggleSelection();
         });

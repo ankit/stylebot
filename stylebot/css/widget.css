@@ -39,7 +39,7 @@
 
 #stylebot-header input {
     clear: both !important;
-    display: inline !important;
+    float: left !important;
 }
 
 #stylebot-header-container {
@@ -50,11 +50,14 @@
 
 #stylebot-header-selector {
     line-height: 12px;
+    float: left;
     padding: 1px;
 }
 
 #stylebot-header-url {
     font-size: 11px;
+    clear: both;
+    float: left;
     line-height: 12px;
     margin-top: 10px;
 }
