@@ -10,11 +10,9 @@ WidgetUI = {
     
     createOption: function(option, control) {
         var container = $('<div>', {
-            class: 'stylebot-widget-option'
+            class: 'stylebot-widget-option',
+            html: option+": "
         });
-        
-        this.createLabel(option)
-        .appendTo(container);
         
         return container.append(control);
     },

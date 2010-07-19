@@ -81,12 +81,24 @@ stylebot.widget = {
         })
         .click(stylebot.disable);
         
+        // arrow button
+        var arrowButton = $('<div>', {
+            id: 'stylebot-arrow-button',
+            class: 'stylebot-arrow-left',
+            title: "Move Widget To Left"
+        })
+        .data('position', "Right")
+        .tipsy({delayIn: 1500, gravity: 'ne'})
+        .appendTo(this.cache.box)
+        .mouseup(stylebot.widget.togglePosition);
+        
         this.cache.header = $('<div>', {
             id: 'stylebot-header'
         })
         .append(this.cache.headerSelectIcon)
         .append(headerTextContainer)
         .append(closeButton)
+        .append(arrowButton)
         .appendTo(this.cache.box);
         
         // UI for basic mode
@@ -108,15 +120,6 @@ stylebot.widget = {
             id: 'stylebot-main-buttons'
         });
         
-        // left arrow
-        $('<div>', {
-            id: 'stylebot-left-arrow',
-            title: "Move To Left"
-        })
-        .data('position', "Left")
-        .appendTo(this.cache.box )
-        .click(stylebot.widget.togglePosition);
-        
         WidgetUI.createButton("Save").appendTo(btContainer).click(stylebot.widget.save);
         WidgetUI.createButton("View CSS").appendTo(btContainer).click(stylebot.widget.viewCSS);
         WidgetUI.createButton("Reset").appendTo(btContainer).click(stylebot.widget.resetCSS);
@@ -124,15 +127,6 @@ stylebot.widget = {
 
         btContainer.appendTo(optionsContainer);
         optionsContainer.appendTo(this.cache.box);
-        
-        // right arrow
-        $('<div>', {
-            id: 'stylebot-right-arrow',
-            title: "Move To Right"
-        })
-        .data( 'position', "Right" )
-        .appendTo(this.cache.box)
-        .click(stylebot.widget.togglePosition);
         
         this.cache.box.appendTo(document.body);
         this.basic.fillCache();
@@ -301,13 +295,24 @@ stylebot.widget = {
     togglePosition: function(e) {
         var el = $(e.target);
         var pos = el.data('position');
-        stylebot.widget.setPosition(pos);
-        el.css('visibility', 'hidden');
-        
         if (pos == "Left")
-            $('#stylebot-right-arrow').css('visibility', 'visible');
+        {
+            pos = "Right";
+            el.attr({
+                title: "Move Widget To Left",
+                class: "stylebot-arrow-left"
+            });
+        }
         else
-            $('#stylebot-left-arrow').css('visibility', 'visible');
+        {
+            pos = "Left";
+            el.attr({
+                title: "Move Widget To Right",
+                class: "stylebot-arrow-right"
+            });
+        }
+        el.data('position', pos);
+        stylebot.widget.setPosition(pos);
     },
     
     toggleMode: function(e) {
