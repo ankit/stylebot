@@ -14,7 +14,7 @@ stylebot.widget = {
     },
     
     defaults: {
-        width: 330
+        width: 345
     },
     
     isBeingDragged: false,
@@ -38,13 +38,13 @@ stylebot.widget = {
         Utils.makeEditable(this.cache.headerSelector, function(value) {
             stylebot.widget.updateHeight();
             stylebot.select(null, value);
-        });
+        }, true);
 
         // url
         var url = $( '<div>', {
             html: stylebot.style.cache.url,
             class: 'stylebot-editable-text',
-            title: 'click to edit url for which styles will be saved'
+            title: 'click to edit url'
         })
         .tipsy({delayIn: 1500, gravity:'nw'});
         
@@ -57,7 +57,7 @@ stylebot.widget = {
         Utils.makeEditable(url, function(value) {
             stylebot.widget.updateHeight();
             stylebot.style.cache.url = value;
-        });
+        }, true);
 
         // container for URL and selector
         var headerTextContainer = $('<div>', {
@@ -70,7 +70,7 @@ stylebot.widget = {
         this.cache.headerSelectIcon = $('<div>', {
             id: 'stylebot-select-icon'
         })
-        .tipsy({delayIn: 1500})
+        .tipsy({delayIn: 1500, gravity:'nw'})
         .click(function(e) {
             stylebot.toggleSelection();
         });
@@ -229,7 +229,7 @@ stylebot.widget = {
         if (where == "Left")
             left = 0;
         else if (where == "Right")
-            left = document.width - this.defaults.width;
+            left = window.innerWidth - this.defaults.width;
 
         this.cache.box.css('left', left);
         stylebot.options.position = where;
@@ -239,7 +239,7 @@ stylebot.widget = {
         stylebot.widget.cache.box.css('height', window.innerHeight);
 
         var headerHeight = stylebot.widget.cache.header.height();
-        var optionsHeight = 145;
+        var optionsHeight = 150;
         if (headerHeight != 0)
             headerHeight -= 36;
         var newHeight = window.innerHeight - (optionsHeight + headerHeight);

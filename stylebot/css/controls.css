@@ -34,6 +34,7 @@ div.stylebot-colorselector {
     margin-bottom: -5px;
     padding: 2px;
     width: 30px !important;
+    -webkit-box-sizing: content-box;
 }
 
 div.stylebot-colorselector.disabled {
@@ -46,6 +47,7 @@ div.stylebot-colorselector-color {
     height: 70% !important;
     margin: 1px 1px;
     width: auto;
+    -webkit-box-sizing: content-box;
 }
 
 div.stylebot-colorselector:focus {

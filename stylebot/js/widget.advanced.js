@@ -25,6 +25,7 @@ stylebot.widget.advanced = {
             class: 'stylebot-textarea stylebot-control stylebot-css-code'
         })
         .keyup(this.onKeyUp)
+        .keydown(function(e) { if (e.keyCode == 27) this.blur(); })
         .appendTo(this.cache.container);
         
         return this.cache.container;

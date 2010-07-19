@@ -41,7 +41,7 @@ stylebot.style = {
         if (selector != this.cache.selector)
         {
             this.cache.selector = selector;
-            this.cache.elements = $( selector + ":not(#stylebot *)" );
+            this.cache.elements = $( selector + ":not(#stylebot, #stylebot *)" );
         }
     },
     
@@ -64,8 +64,26 @@ stylebot.style = {
     applyCSS: function(css) {
         if (!stylebot.style.cache.selector)
             return true;
-        stylebot.style.applyInlineCSS(stylebot.style.cache.elements, css);
-
+        
+        var noOfElements = stylebot.style.cache.elements.length;
+        
+        var duration;
+        if (noOfElements >= 400)
+            duration = 400;
+        else if (noOfElements >= 200)
+            duration = 300;
+        else
+            duration = 0;
+        
+        if (stylebot.style.applyInlineCSSTimer)
+        {
+            clearTimeout(stylebot.style.applyInlineCSSTimer);
+            stylebot.style.applyInlineCSSTimer = null;
+        }
+        stylebot.style.applyInlineCSSTimer = setTimeout(function() {
+            stylebot.style.applyInlineCSS(stylebot.style.cache.elements, css);
+        }, duration);
+        
         if (stylebot.style.timer){
             clearTimeout(stylebot.style.timer);
             stylebot.style.timer = null;
@@ -168,7 +186,12 @@ stylebot.style = {
             {
                 // if there is any existing inline CSS, append stylebot CSS to it
                 if (existingCSS != undefined)
-                    newCSS = newCustomCSS + existingCSS;
+                {
+                    if (existingCSS.length != 0 && existingCSS[existingCSS.length-1] != ";")
+                        newCSS = existingCSS + ";" + newCustomCSS;
+                    else
+                        newCSS = existingCSS + newCustomCSS;
+                }
                 else
                     newCSS = newCustomCSS;
                 $(this).attr({
@@ -220,7 +243,7 @@ stylebot.style = {
 
     // remove rule for selector from stylebot's <style> element and apply it as inline css
     removeFromStyleElement: function(selector) {
-        this.applyInlineCSS($(selector + ":not(#stylebot *)"), stylebot.style.getInlineCSS(selector));
+        this.applyInlineCSS($(selector + ":not(#stylebot, #stylebot *)"), stylebot.style.getInlineCSS(selector));
         
         var tempRules = {};
         for (var sel in this.rules)

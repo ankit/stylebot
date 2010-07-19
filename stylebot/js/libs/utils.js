@@ -60,7 +60,7 @@ var Utils = {
         return string.charAt(0).toUpperCase() + string.slice(1);
     },
     
-    makeEditable: function(el, callback) {
+    makeEditable: function(el, callback, selectText) {
         el.bind('click keyup', {callback: callback}, function(e) {
             if (e.type == 'keyup' && e.keyCode != 13)
                 return true;
@@ -85,7 +85,11 @@ var Utils = {
             
             el.before(input);
             input.focus();
-            
+
+            // if selectText is set to true, select all text in input field
+            if (selectText)
+                input.get(0).setSelectionRange(0, value.length);
+
             var onClose = function(e) {
                 if (e.type == "keyup" && e.keyCode != 13 && e.keyCode != 27)
                     return true;
