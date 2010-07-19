@@ -55,6 +55,7 @@
 }
 
 #stylebot-header-url {
+    display: block;
     clear: both;
     font-size: 11px;
     float: left;

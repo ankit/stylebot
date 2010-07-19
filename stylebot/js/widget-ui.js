@@ -8,10 +8,9 @@ WidgetUI = {
     
     validSizeUnits: ['px', 'em', '%', 'pt'],
     
-    createOption: function(option, control) {
+    createOption: function(control) {
         var container = $('<div>', {
-            class: 'stylebot-widget-option',
-            html: option+": "
+            class: 'stylebot-widget-option'
         });
         
         return container.append(control);

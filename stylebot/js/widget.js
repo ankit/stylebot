@@ -14,13 +14,12 @@ stylebot.widget = {
     },
     
     defaults: {
-        width: 345
+        width: 332
     },
     
     isBeingDragged: false,
     
     createUI: function() {
-        
         this.cache.box = $('<div>', {
             id: 'stylebot'
         });
@@ -30,7 +29,7 @@ stylebot.widget = {
             id: 'stylebot-header-selector',
             class: 'stylebot-editable-text',
             html: 'custom styles',
-            title: 'click to edit selector'
+            title: 'Click to edit the CSS selector'
         })
         .tipsy({delayIn: 1500, gravity:'nw'});
         
@@ -41,14 +40,14 @@ stylebot.widget = {
         }, true);
 
         // url
-        var url = $( '<div>', {
+        var url = $('<div>', {
             html: stylebot.style.cache.url,
             class: 'stylebot-editable-text',
-            title: 'click to edit url'
+            title: 'Click to edit the URL for which custom CSS will be saved'
         })
-        .tipsy({delayIn: 1500, gravity:'nw'});
+        .tipsy({delayIn: 1500, gravity:'n'});
         
-        var urlContainer = $( '<div>', {
+        var urlContainer = $('<div>', {
             id: 'stylebot-header-url'
         })
         .append(url);
@@ -85,7 +84,7 @@ stylebot.widget = {
         var arrowButton = $('<div>', {
             id: 'stylebot-arrow-button',
             class: 'stylebot-arrow-left',
-            title: "Move Widget To Left"
+            title: "Move stylebot to the left"
         })
         .data('position', "Right")
         .tipsy({delayIn: 1500, gravity: 'ne'})
@@ -112,7 +111,7 @@ stylebot.widget = {
             id: 'stylebot-widget-options'
         });
         
-        WidgetUI.createOption("Mode", WidgetUI.createButtonSet(['Basic', 'Advanced'], "stylebot-mode", 0, stylebot.widget.toggleMode))
+        WidgetUI.createOption(WidgetUI.createButtonSet(['Basic', 'Advanced'], "stylebot-mode", 0, stylebot.widget.toggleMode))
         .appendTo(optionsContainer);
         
         // creating main buttons for widget
@@ -223,7 +222,7 @@ stylebot.widget = {
         if (where == "Left")
             left = 0;
         else if (where == "Right")
-            left = window.innerWidth - this.defaults.width;
+            left = $(window).width() - this.defaults.width;
 
         this.cache.box.css('left', left);
         stylebot.options.position = where;
@@ -299,7 +298,7 @@ stylebot.widget = {
         {
             pos = "Right";
             el.attr({
-                title: "Move Widget To Left",
+                title: "Move stylebot to the left",
                 class: "stylebot-arrow-left"
             });
         }
@@ -307,7 +306,7 @@ stylebot.widget = {
         {
             pos = "Left";
             el.attr({
-                title: "Move Widget To Right",
+                title: "Move stylebot to the right",
                 class: "stylebot-arrow-right"
             });
         }
