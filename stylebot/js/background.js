@@ -49,7 +49,7 @@ function addListeners(){
             case "getRulesForPage"  : sendResponse(getRulesForPage(request.url)); sendResponse({}); break;
             
             case "fetchOptions"     : sendResponse({ options: cache.options, enabledAccordions: cache.enabledAccordions }); break;
-            
+
             case "saveAccordionState": saveAccordionState(request.enabledAccordions); sendResponse({}); break;
         }
     });
@@ -93,8 +93,6 @@ function copyToClipboard(text) {
 // save rules
 function save(url, rules) {
     cache.styles[url] = rules;
-
-    // for now, simply store them in localStorage. In future, they'll stored in a bookmark / db
     localStorage['stylebot_styles'] = JSON.stringify(cache.styles);
 }
 

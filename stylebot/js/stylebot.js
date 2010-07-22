@@ -200,7 +200,6 @@ var stylebot = {
         var id = $el.attr('id');
         if (parent.length != 0 || id.indexOf("stylebot") != -1)
             return true;
-        
         return false;
     }
 }

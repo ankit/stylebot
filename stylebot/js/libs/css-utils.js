@@ -24,8 +24,12 @@ var CSSUtils = {
         for (var selector in rules)
         {
             css += selector + "{";
-            for (var property in rules[selector])
-                css += this.getCSSDeclaration(property, rules[selector][property], setImportant);
+            for (var property in rules[selector]) {
+                if (rules[selector][property].indexOf("!important") != -1)
+                    css += this.getCSSDeclaration(property, rules[selector][property], false);
+                else
+                    css += this.getCSSDeclaration(property, rules[selector][property], setImportant);
+            }
             css += "}";
         }
         return css;
@@ -79,9 +83,10 @@ var CSSUtils = {
         var len = declarations.length;
         for (var i = 0; i < len; i++)
         {
-            var pair = declarations[i].split(':');
-            var property = $.trim(pair[0]);
-            var value = $.trim(pair[1]);
+            var loc = declarations[i].indexOf(':');
+            var property = $.trim(declarations[i].substring(0, loc));
+            var value = $.trim(declarations[i].substring(loc+1));
+
             if (property != "" && value != "")
                 rule[property] = value;
         }
@@ -104,6 +109,6 @@ var CSSUtils = {
     
     // from http://www.senocular.com/pub/javascript/CSS_parse.js
     removeComments: function(css) {
-	    return css.replace(/\/\*(\r|\n|.)*\*\//g,"");
+        return css.replace(/\/\*(\r|\n|.)*\*\//g,"");
     }
 }

@@ -18,6 +18,17 @@
 		"all_frames": true
 	},
 	{
+		"matches":["http://userstyles.org/styles/*"],
+		
+		"js": [
+			"js/libs/css-utils.js",
+			"js/userstyles-org.js"
+		],
+		
+		"run_at": "document_start",
+		"all_frames": true
+	},
+	{
 		"matches": ["http://*/*", "https://*/*"],
 		
 		"css": [
@@ -60,5 +71,5 @@
 		"default_title": "Click to turn CSS editing on"
 	},
 	
-	"permissions": ["tabs"]
+	"permissions": ["tabs", "http://userstyles.org/"]
 }
