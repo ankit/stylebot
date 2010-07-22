@@ -1,7 +1,7 @@
 /**
   * stylebot.widget.basic.events
   * 
-  * Events for Stylebot Widget Controls in Basic Mode
+  * Events for stylebot widget controls in Basic mode
   **/
 
 stylebot.widget.basic.events = {

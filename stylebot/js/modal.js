@@ -1,7 +1,7 @@
 /**
   * stylebot.modal
   * 
-  * Modal window used by Stylebot
+  * Modal window used by widget
   **/
 
 stylebot.modal = {

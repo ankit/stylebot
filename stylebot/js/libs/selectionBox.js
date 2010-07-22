@@ -1,10 +1,17 @@
 /**
   * Selection of DOM elements
-  * 
-  * Based on Firebug's Implementation
+  * Based on Firebug's non-canvas implementation
+  *
+  * Licensed under GPL, MIT and BSD Licenses
  **/
 
-var SelectionBox = function(edgeSize, className) {    
+/* 
+Currently, a DIV is used for each edge. To highlight an element, the width, height, left offset and top offset values of edge DIVs are manipulated to surround the element.
+
+TODO: Canvas?
+*/
+
+var SelectionBox = function(edgeSize, className) {
     this.edgeSize = edgeSize;
     this.className = className;
     
@@ -63,7 +70,6 @@ SelectionBox.prototype.highlight = function(el) {
     var offset = this.getViewOffset(el, true);
     var w = el.offsetWidth;
     var h = el.offsetHeight;
-    
     this.updatePosition(offset.x, offset.y, w, h);
 }
 
@@ -75,7 +81,6 @@ SelectionBox.prototype.getViewOffset = function(elt)
         var p = elt.offsetParent;
         coords.x += elt.offsetLeft - (p ? p.scrollLeft : 0);
         coords.y += elt.offsetTop - (p ? p.scrollTop : 0);
-
         if (p)
         {
             if (p.nodeType == 1)
@@ -85,20 +90,19 @@ SelectionBox.prototype.getViewOffset = function(elt)
                 {
                     coords.x += parseInt(parentStyle.borderLeftWidth);
                     coords.y += parseInt(parentStyle.borderTopWidth);
-
-                    if (p.localName == "TABLE")
+                    if (p.localName == "table")
                     {
                         coords.x += parseInt(parentStyle.paddingLeft);
                         coords.y += parseInt(parentStyle.paddingTop);
                     }
-                    else if (p.localName == "BODY")
+                    else if (p.localName == "body")
                     {
                         var style = view.getComputedStyle(elt, "");
                         coords.x += parseInt(style.marginLeft);
                         coords.y += parseInt(style.marginTop);
                     }
                 }
-                else if (p.localName == "BODY")
+                else if (p.localName == "body")
                 {
                     coords.x += parseInt(parentStyle.borderLeftWidth);
                     coords.y += parseInt(parentStyle.borderTopWidth);
@@ -116,7 +120,7 @@ SelectionBox.prototype.getViewOffset = function(elt)
         }
         else
         {
-            if (elt.localName == "BODY")
+            if (elt.localName == "body")
             {
                 var style = view.getComputedStyle(elt, "");
                 coords.x += parseInt(style.borderLeftWidth);

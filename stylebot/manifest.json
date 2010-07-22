@@ -21,7 +21,7 @@
 		"matches": ["http://*/*", "https://*/*"],
 		
 		"css": [
-			"css/main.css",
+			"css/highlight.css",
 			"css/widget.css",
 			"css/controls.css",
 			"css/modal.css",

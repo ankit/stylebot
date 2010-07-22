@@ -1,11 +1,9 @@
 /**
- *
  * Slim Color picker
  * Original Author: Stefan Petre www.eyecon.ro
  * Modified By: Ankit Ahuja
  *
  * Dual licensed under the MIT and GPL licenses
- *
  */
  
 (function ($) {

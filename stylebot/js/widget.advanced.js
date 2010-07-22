@@ -1,7 +1,7 @@
 /**
   * stylebot.widget.advanced
   * 
-  * Stylebot Advanced Mode
+  * Advanced mode
   **/
 
 stylebot.widget.advanced = {

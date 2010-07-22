@@ -1,10 +1,11 @@
 /**
   * Utility Methods to create various Widget controls.
-  * Right now, tightly coupled with stylebot.widget.basic
   *
+  * Dual licensed under GPL and MIT licenses
   **/
-  
-WidgetUI = {
+
+/** TODO: Remove any dependence on other parts of stylebot (mostly stylebot.widget.basic.events) **/
+var WidgetUI = {
     
     validSizeUnits: ['px', 'em', '%', 'pt'],
     

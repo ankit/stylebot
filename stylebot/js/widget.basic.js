@@ -1,3 +1,9 @@
+/**
+  * stylebot.widget.basic
+  * 
+  * Basic mode
+  **/
+
 stylebot.widget.basic = {
     
     isColorPickerVisible: false,
