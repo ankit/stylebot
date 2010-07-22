@@ -18,5 +18,4 @@ chrome.extension.sendRequest({ name: "getRulesForPage", url: window.location.hre
     
     var css = CSSUtils.crunchCSS(response.rules, true);
     CSSUtils.injectCSS(css, "stylebot-css");
-    console.log("Stylebot CSS for this page: " + css);
 });

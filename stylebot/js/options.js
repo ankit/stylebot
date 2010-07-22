@@ -3,7 +3,8 @@
 var bg_window = null;
 
 var cache = {
-    modal: null
+    modal: null,
+    textareaHeight: window.innerHeight * 0.5 + 'px'
 }
 
 var options = {
@@ -18,7 +19,6 @@ var styles = {};
 // save options
 
 function save() {
-    
     options.useShortcutKey = ( $('[name=useShortcutKey]:checked').attr('value') == 'true' );
     options.shortcutKey = $('[name=shortcutKeyHiddenField]').attr('value');
     options.shortcutMetaKey = $('[name=shortcutMetaKey]')[0].value;
@@ -31,7 +31,7 @@ function save() {
     localStorage['stylebot_option_mode'] = options.mode;
     
     // save styles
-    localStorage['stylebot_styles'] = JSON.stringify( styles );
+    localStorage['stylebot_styles'] = JSON.stringify(styles);
     
     // update cache in background.html
     bg_window = chrome.extension.getBackgroundPage();
@@ -48,17 +48,17 @@ function init() {
     fetchOptions();
     // update UI
     var radioBt = $('[name=useShortcutKey]');
-    if( options.useShortcutKey == false )
+    if (options.useShortcutKey == false)
         radioBt[1].checked = true;
     else
         radioBt[0].checked = true;
 
     var select = $('[name=shortcutMetaKey]')[0];
 
-    if ( options.shortcutMetaKey != undefined)
+    if (options.shortcutMetaKey != undefined)
         select.value = options.shortcutMetaKey;
 
-    if( options.shortcutKey != undefined )
+    if (options.shortcutKey != undefined)
         $('[name=shortcutKeyHiddenField]').attr('value', options.shortcutKey);
     else
         $('[name=shortcutKeyHiddenField]').attr('value', 69);
@@ -66,17 +66,17 @@ function init() {
     KeyCombo.init( $('[name=shortcutKey]')[0], $('[name=shortcutKeyHiddenField]')[0] );
 
     radioBt = $('[name=mode]');
-    if( options.mode == "Advanced" )
+    if (options.mode == "Advanced")
         radioBt[1].checked = true;
     else
         radioBt[0].checked = true;
 
-    fillCustomStyles();
+    fillCustomStyles(localStorage['stylebot_styles']);
 }
 
 // fetches options from the datastore
 function fetchOptions() {
-    options.useShortcutKey = ( localStorage['stylebot_option_useShortcutKey'] == 'true' );
+    options.useShortcutKey = (localStorage['stylebot_option_useShortcutKey'] == 'true');
     options.shortcutMetaKey = localStorage['stylebot_option_shortcutMetaKey'];
     options.shortcutKey = localStorage['stylebot_option_shortcutKey'];
     options.mode = localStorage['stylebot_option_mode'];
@@ -97,14 +97,12 @@ function restoreDefaults() {
     $('[name=mode]')[0].checked = true;
 }
 
-function fillCustomStyles() {
-    var container = $( "#custom-styles" );
-    if( localStorage[ 'stylebot_styles' ] )
-        styles = JSON.parse( localStorage['stylebot_styles'] );
-    for( var url in styles )
-    {
-        container.append( createCustomStyleOption( url, styles[url] ) );
-    }
+function fillCustomStyles(json) {
+    var container = $("#custom-styles");
+    if (json)
+        styles = JSON.parse(json);
+    for (var url in styles)
+        container.append(createCustomStyleOption(url, styles[url]));
 }
 
 function createCustomStyleOption(url, rules) {
@@ -118,10 +116,10 @@ function createCustomStyleOption(url, rules) {
         tabIndex: 0
     })
     .data('value', url)
-    .appendTo( container );
+    .appendTo(container);
     
-    Utils.makeEditable( url_div , function(newValue) {
-        editURL( url_div.data('value'), newValue );
+    Utils.makeEditable(url_div , function(newValue) {
+        editURL( url_div.data('value'), newValue);
         url_div.data('value', newValue);
         setTimeout(function(){
             url_div.focus();
@@ -136,98 +134,141 @@ function createCustomStyleOption(url, rules) {
         html: 'edit',
         class: 'inline-button'
     })
-    .click( editStyle )
-    .appendTo( b_container );
+    .click(editStyle)
+    .appendTo(b_container);
     
     $('<button>', {
         html: 'remove',
         class: 'inline-button'
     })
-    .click( removeStyle )
-    .appendTo( b_container );
+    .click(removeStyle)
+    .appendTo(b_container);
     
-    return container.append( b_container );
+    return container.append(b_container);
 }
 
 function removeStyle(e) {
     var parent = $(e.target).parents('.custom-style');
     var url = parent.find('.custom-style-url');
-    delete styles[ url.html() ];
+    delete styles[url.html()];
     parent.remove();
 }
 
 function editStyle(e) {
+    var parent = $(e.target).parents('.custom-style');
+    var url = parent.find('.custom-style-url').html();
+    var rules = styles[url];
+    var css = CSSUtils.crunchFormattedCSS(rules, false);
     
-    var textareaHeight = window.innerHeight * 0.5 + 'px';
+    var html = "<div>Edit the CSS for <b>" + url + "</b>:</div><textarea class='stylebot-css-code' style='width: 100%; height:" + cache.textareaHeight + "'>" + css + "</textarea><button onclick='cache.modal.hide();'>Done</button>";
     
-    var parent = $( e.target ).parents( '.custom-style' );
-    var url = parent.find( '.custom-style-url' ).html();
-    var rules = styles [ url ];
-    var css = CSSUtils.crunchFormattedCSS( rules, false );
-    
-    var html = "<div>Edit the CSS for <b>" + url + "</b>:</div><textarea class='stylebot-css-code' style='width: 100%; height:" + textareaHeight + "'>" + css + "</textarea><button onclick='cache.modal.hide();'>Done</button>";
-    
-    initModal( html );
+    initModal(html);
     
     cache.modal.options.onOpen = function() { 
-        var textarea = cache.modal.box.find( 'textarea' )
+        var textarea = cache.modal.box.find('textarea')
         textarea.focus();
-        var len = textarea.attr( 'value' ).length;
-        textarea[0].setSelectionRange( len, len );
+        var len = textarea.attr('value').length;
+        textarea[0].setSelectionRange(len, len);
     };
    
     cache.modal.options.onClose = function() {
-        var url = cache.modal.box.find( 'div > b' ).html();
-        var css = cache.modal.box.find( 'textarea' ).attr( 'value' );
-        
-        saveStyle( url, css );
+        var url = cache.modal.box.find('div > b').html();
+        var css = cache.modal.box.find('textarea').attr('value');
+        saveStyle(url, css);
     };
     
     cache.modal.show();
 }
 
 function addStyle() {
-    var textareaHeight = window.innerHeight * 0.5 + 'px';
+    var html = "<div>URL: <input type='text'></input></div><textarea class='stylebot-css-code' style='width: 100%; height:" + cache.textareaHeight + "'></textarea><button onclick= 'cache.modal.hide();' >Cancel</button><button onclick= 'onAddClick(); cache.modal.hide();' >Add</button>";
     
-    var html = "<div>URL: <input type='text'></input></div><textarea class='stylebot-css-code' style='width: 100%; height:" + textareaHeight + "'></textarea><button onclick= 'cache.modal.hide();' >Cancel</button><button onclick= 'onAddClick(); cache.modal.hide();' >Add</button>";
-    
-    initModal( html );
-    
+    initModal(html);
     cache.modal.options.onOpen = function() { cache.modal.box.find('input').focus(); };
-    
     cache.modal.show();
 }
 
 function onAddClick() {
     var url = cache.modal.box.find('input').attr('value');
     var css = cache.modal.box.find('textarea').attr('value');
-    saveStyle( url, css );
+    saveStyle(url, css);
     
     // add to list
-    createCustomStyleOption( url, styles[ url ] ).appendTo( $( "#custom-styles" ) );
+    createCustomStyleOption(url, styles[url]).appendTo($("#custom-styles"));
 }
 
-function saveStyle( url, css ) {
-    styles[ url ] = CSSUtils.parseCSS( css );
+function saveStyle(url, css) {
+    styles[url] = CSSUtils.parseCSS(css);
 }
 
 function editURL(oldValue, newValue) {
-    if( oldValue == newValue )
+    if (oldValue == newValue)
         return;
-    var rules = styles[ oldValue ];
-    delete styles[ oldValue ];
-    styles[ newValue ] = rules;
+    var rules = styles[oldValue];
+    delete styles[oldValue];
+    styles[newValue] = rules;
 }
 
-function initModal( html ) {
-    if( !cache.modal )
+function export() {
+    var css = localStorage['stylebot_styles'];
+    var html = "<div>Copy and paste your custom styles into a text file:</div><textarea class='stylebot-css-code' style='width: 100%; height:" + cache.textareaHeight + "'>" + css + "</textarea><button onclick='copyToClipboard()'>Copy To Clipboard</button>";
+    initModal(html, {
+        closeOnEsc: true,
+        closeOnBgClick: true
+    });
+    cache.modal.options.onOpen = function() { 
+        var textarea = cache.modal.box.find('textarea')
+        textarea.focus();
+        var len = textarea.attr('value').length;
+        textarea[0].setSelectionRange(0, len);
+    };
+    cache.modal.show();
+}
+
+function import() {
+    var html = "<div>Paste previously exported custom styles here.<div class='description' style='margin-top:10px'>Note: It will get rid of all your current custom styles. Also, changes will only be saved when you click on Save.</div></div><textarea class='stylebot-css-code' style='width: 100%; height:" + cache.textareaHeight + "'></textarea><button onclick='importCSS();cache.modal.hide();'>Import</button>";
+    initModal(html, {
+        closeOnEsc: true,
+        closeOnBgClick: true
+    });
+    cache.modal.options.onOpen = function() { 
+        var textarea = cache.modal.box.find('textarea')
+        textarea.focus();
+        var len = textarea.attr('value').length;
+        textarea[0].setSelectionRange(0, len);
+    };
+    cache.modal.show();
+}
+
+function copyToClipboard() {
+    chrome.extension.sendRequest({name: "copyToClipboard", text: cache.modal.box.find('textarea').attr('value')}, function(response){});
+}
+
+function importCSS() {
+    var json = cache.modal.box.find('textarea').attr('value');
+    try {
+        $(".custom-style").html("");
+        fillCustomStyles(json);
+    }
+    catch(e) {}
+}
+
+function initModal(html, options) {
+    if (!cache.modal)
     {
-        cache.modal = new ModalBox( html, {
+        cache.modal = new ModalBox(html, {
             bgFadeSpeed: 0,
             closeOnEsc: false,
             closeOnBgClick: false
         });
     }
-    else
-        cache.modal.box.html( html );
+    if (options) {
+        cache.modal.options.closeOnEsc = options.closeOnEsc ? true : false;
+        cache.modal.options.closeOnBgClick = options.closeOnBgClick ? true : false;
+    }
+    else {
+        cache.modal.options.closeOnEsc = false;
+        cache.modal.options.closeOnBgClick = false;
+    }
+    cache.modal.box.html(html);
 }

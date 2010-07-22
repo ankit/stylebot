@@ -42,6 +42,7 @@ function install() {
 }
 
 function save(response) {
+    console.log(response);
     var json = JSON.parse(response);
     
     var saveCodeBlock = function(block) {

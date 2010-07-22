@@ -37,7 +37,7 @@ function addListeners(){
     });
     
     chrome.extension.onRequest.addListener( function(request, sender, sendResponse) {
-        switch( request.name ) {
+        switch (request.name) {
             case "enablePageIcon"   : enablePageIcon(sender.tab.id); sendResponse({}); break;
             
             case "disablePageIcon"  : disablePageIcon(sender.tab.id); sendResponse({}); break;
@@ -101,7 +101,6 @@ function loadStylesIntoCache() {
         cache.styles = JSON.parse(localStorage['stylebot_styles']);
 }
 
-
 function initDataStore() {
     // set defaults in datastore
     localStorage['stylebot_option_useShortcutKey'] = cache.options.useShortcutKey;
@@ -127,7 +126,7 @@ function getRulesForPage(currUrl) {
     var url_for_page = '';
     for (var url in cache.styles)
     {
-        if (currUrl.indexOf(url) != -1)
+        if (currUrl.match(url))
         {
             for (var property in cache.styles[url])
                 rules[property] = cache.styles[url][property];

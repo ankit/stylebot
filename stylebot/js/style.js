@@ -31,9 +31,15 @@ stylebot.style = {
     // initialize rules and url from temporary variables in apply-css.js
     initialize: function() {
         if (stylebotTempRules)
+        {
             this.rules = stylebotTempRules;
+            delete stylebotTempRules;
+        }
         if (stylebotTempUrl)
+        {
             this.cache.url = stylebotTempUrl;
+            delete stylebotTempUrl;
+        }
     },
     
     // update current selector and selected elements

@@ -22,9 +22,10 @@ h1 {
 }
 
 h2 {
-    font-size: 14px;
+    border-bottom: 1px solid #eee;
+    font-size: 18px;
     font-weight: bold;
-    color: #111;
+    color: #333;
 }
 
 #options {
@@ -33,7 +34,6 @@ h2 {
     border-radius: 5px;
     margin: 0;
     padding: 20px;
-
     -webkit-box-shadow: 0px 0px 10px #eff0f3;
 }
 
@@ -51,6 +51,7 @@ li.option label {
 
 .option-field {
     display: inline;
+    float: right;
 }
 
 input[type=text] {
@@ -68,7 +69,7 @@ input[type=text] {
 }
 
 button {
-    background-color: #fff;
+    background-color: #fbfbfb;
     border: 1px solid #ccc;
     border-radius: 2px;
     color: #333;
@@ -104,7 +105,6 @@ select {
 
 .custom-style-url {
     display: inline-block;
-    width: 400px;
     padding: 2px;
 }
 
@@ -120,25 +120,32 @@ select {
 
 #custom-styles input {
     text-align: left;
-    width: 404px;
+    width: 400px;
     outline: none;
     border: 2px solid #ccc;
     background-color: #eee;
     color: #333;
+    display: inline-block;
 }
 
 #custom-styles .button-container {
-    display: inline;
+    float: right;
 }
 
 textarea.stylebot-css-code {
     color: #333 !important;
     font-size: 11px !important;
     font-family: Monaco, 'Lucida Console', monospace !important;
-    line-height: 14px;
+    line-height: 16px;
     padding: 2px;
 }
 
 #stylebot-modal input {
     text-align: left;
+}
+
+.description {
+    font-size: 11px;
+    font-weight: bold;
+    color: #555;
 }
