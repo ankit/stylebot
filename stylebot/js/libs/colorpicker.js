@@ -123,7 +123,7 @@
 					top -= this.offsetHeight + 176;
 				}
 				if (left + 208 > viewPort.l + viewPort.w) {
-					left -= 208;
+					left -= (208 - $(this).width() - 10);
 				}
 				cal.css({left: left + 'px', top: top + 'px'});
 				if (cal.data('colorpicker').onShow.apply(this, [cal.get(0)]) != false) {
@@ -134,15 +134,19 @@
 			},
 			
 			hide = function (ev) {
-			    if(ev.type == 'keyup' && ev.keyCode != 27)
+			    if (ev.type == 'keyup' && ev.keyCode != 27)
 			        return true;
-				if ( !isChildOf( ev.data.cal.get(0), ev.target, ev.data.cal.get(0) ) && 
-				!isChildOf(ev.data.el, ev.target, ev.data.el) ) {
-					if (ev.data.cal.data('colorpicker').onHide.apply(this, [ev.data.cal.get(0)]) != false) {
-						ev.data.cal.hide();
-					}
-					$(document).unbind('mousedown keyup', hide);
+			        
+				if (ev.type == 'mousedown' && (isChildOf(ev.data.cal.get(0), ev.target, ev.data.cal.get(0)) ||
+				isChildOf(ev.data.el, ev.target, ev.data.el))) {
+				    return true;
+			    }
+				
+				if (ev.data.cal.data('colorpicker').onHide.apply(this, [ev.data.cal.get(0)]) != false) {
+					ev.data.cal.hide();
 				}
+				
+				$(document).unbind('mousedown keyup', hide);
 			},
 			
 			isChildOf = function(parentEl, el, container) {
@@ -169,7 +173,7 @@
 				return {
 					l : window.pageXOffset || (m ? document.documentElement.scrollLeft : document.body.scrollLeft),
 					t : window.pageYOffset || (m ? document.documentElement.scrollTop : document.body.scrollTop),
-					w : window.innerWidth || (m ? document.documentElement.clientWidth : document.body.clientWidth),
+					w : $(window).width() || (m ? document.documentElement.clientWidth : document.body.clientWidth),
 					h : window.innerHeight || (m ? document.documentElement.clientHeight : document.body.clientHeight)
 				};
 			},
