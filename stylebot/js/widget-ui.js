@@ -77,7 +77,7 @@ var WidgetUI = {
     
     createMultiSizeControl: function(control) {
         var container = $('<span>', {
-            style: 'display: inline-block; margin-left: 50px; margin-top: -10px'
+            style: 'display: inline-block !important; margin-left: 50px !important; margin-top: -10px !important;'
         });
         var len = control.id.length;
         for (var i = 0; i < len; i++)
@@ -86,7 +86,7 @@ var WidgetUI = {
             .appendTo(container);
             
             this.createSizeControl(control.id[i])
-            .attr('style', 'margin-bottom: 3px; display: inline-block;')
+            .attr('style', 'margin-bottom: 3px !important; display: inline-block !important;')
             .appendTo(container);
         }
         return container;
@@ -135,10 +135,17 @@ var WidgetUI = {
         // end of select
         
         // create custom font field
-        this.createTextField(control.id, 20, stylebot.widget.basic.events.onTextFieldKeyUp)
+        $('<input>', {
+            type: 'text',
+            id: 'stylebot-' + control.id,
+            class: 'stylebot-textfield',
+            size: 20
+        })
+        .data('property', control.id)
+        .keyup(stylebot.widget.basic.events.onTextFieldKeyUp)
         .css({
             marginLeft: '95px !important',
-            marginTop: '5px',
+            marginTop: '5px !important',
             display: 'none'
         })
         .appendTo(container);

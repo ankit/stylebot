@@ -1,5 +1,5 @@
 .stylebot-selection {
-    background-color: #65f166;
-    position: absolute;
-    z-index: 100000;
+    background-color: #65f166 !important;
+    position: absolute !important;
+    z-index: 100000 !important;
 }

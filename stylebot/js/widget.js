@@ -246,7 +246,7 @@ stylebot.widget = {
         if (stylebot.options.mode == "Basic")
             stylebot.widget.basic.cache.container.css('height',  newHeight);
         else
-            stylebot.widget.advanced.cache.cssField.css('height',  newHeight - 47);
+            stylebot.widget.advanced.cache.cssField.css('height',  newHeight - 45);
     },
     
     setMode: function() {
