@@ -88,18 +88,18 @@ stylebot.widget.basic.events = {
 
         // TODO: Try to implement the next element's border width using CSS
         var control = el.parent();
-        var status = el.hasClass( 'stylebot-active-button' );
-        control.find( '.stylebot-active-button' )
-        .removeClass( 'stylebot-active-button' )
-        .next().css( 'border-left-width', '1px' );
+        var status = el.hasClass('stylebot-active-button');
+        control.find('.stylebot-active-button')
+        .removeClass('stylebot-active-button')
+        .next().removeClass('stylebot-active-button-next');
         if (!status)
         {
-            el.addClass( 'stylebot-active-button' );
-            el.next().css( 'border-left-width', '0px' );
-            stylebot.style.apply( el.data( 'property' ), el.data( 'value' ) );
+            el.addClass('stylebot-active-button');
+            el.next().addClass('stylebot-active-button-next');
+            stylebot.style.apply(el.data('property'), el.data('value'));
         }
         else
-            stylebot.style.apply( el.data( 'property' ), '' );
+            stylebot.style.apply(el.data('property'), '');
         el.focus();
     },
     
