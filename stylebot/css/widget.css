@@ -40,6 +40,7 @@
 #stylebot-header input {
     clear: both !important;
     float: left !important;
+    display: inline-block;
 }
 
 #stylebot-header-container {

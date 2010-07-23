@@ -60,34 +60,35 @@ var Utils = {
         return string.charAt(0).toUpperCase() + string.slice(1);
     },
     
-    makeEditable: function(el, callback, selectText) {
+    makeEditable: function(el, callback, options) {
         el.bind('click keyup', {callback: callback}, function(e) {
             if (e.type == 'keyup' && e.keyCode != 13)
                 return true;
 
             var el = $(this);
             el.hide();
-            var elWidth = el.width();
-            var parentWidth = el.parent().width();
-            if (elWidth > parentWidth)
-                elWidth = parentWidth - 10;
-            var value = el.html();
             
+            var elWidth;
+            if (options && options.fixedWidth)
+                elWidth = options.fixedWidth;
+            else 
+                elWidth = el.width();
+            
+            var value = el.html();
             // create a textfield
             var input = $('<input>', {
                 type: 'text',
                 class: 'stylebot-textfield',
-                length: 10,
                 value: value,
                 id: 'stylebot-editing-field'
             })
-            .css('min-width', elWidth);
+            .width(elWidth);
             
             el.before(input);
             input.focus();
 
             // if selectText is set to true, select all text in input field
-            if (selectText)
+            if (options && options.selectText)
                 input.get(0).setSelectionRange(0, value.length);
 
             var onClose = function(e) {

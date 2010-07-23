@@ -17,6 +17,8 @@ stylebot.style = {
     */
     rules: {},
     
+    originalURL: null,
+    
     timer: null,
     
     cache: {
@@ -30,15 +32,16 @@ stylebot.style = {
     
     // initialize rules and url from temporary variables in apply-css.js
     initialize: function() {
+        if (stylebotTempUrl)
+        {
+            this.cache.url = stylebotTempUrl;
+            this.originalURL = stylebotTempUrl;
+            delete stylebotTempUrl;
+        }
         if (stylebotTempRules)
         {
             this.rules = stylebotTempRules;
             delete stylebotTempRules;
-        }
-        if (stylebotTempUrl)
-        {
-            this.cache.url = stylebotTempUrl;
-            delete stylebotTempUrl;
         }
     },
     
@@ -47,7 +50,7 @@ stylebot.style = {
         if (selector != this.cache.selector)
         {
             this.cache.selector = selector;
-            this.cache.elements = $( selector + ":not(#stylebot, #stylebot *)" );
+            this.cache.elements = $(selector + ":not(#stylebot, #stylebot *)");
         }
     },
     
@@ -309,6 +312,8 @@ stylebot.style = {
     // save rules for page
     save: function() {
         stylebot.chrome.save(stylebot.style.cache.url, stylebot.style.rules);
+        if (stylebot.style.originalURL != stylebot.style.cache.url)
+            stylebot.chrome.save(stylebot.style.originalURL, null);
     },
     
     // called when stylebot is disabled. resets cache and all inline css. Also, updates the <style> element

@@ -3,11 +3,15 @@
 var currTabId;
 
 var cache = {
-    /*
+    /**
         e.g. styles = {
-            'google.com' : rules
+            'google.com' : {
+                'a': {
+                    'color': 'red'
+                }
+            }
         }
-    */
+    **/
     styles: {},
     
     options: {
@@ -92,7 +96,10 @@ function copyToClipboard(text) {
 
 // save rules
 function save(url, rules) {
-    cache.styles[url] = rules;
+    if (rules)
+        cache.styles[url] = rules;
+    else
+        delete cache.styles[url];
     localStorage['stylebot_styles'] = JSON.stringify(cache.styles);
 }
 
@@ -122,16 +129,41 @@ function loadOptionsIntoCache() {
 }
 
 function getRulesForPage(currUrl) {
+    // this will contain the combined set of evaluated rules to be applied to the page.
+    // longer, more specific URLs get the priority for each selector and property
     var rules = {};
     var url_for_page = '';
     for (var url in cache.styles)
     {
-        if (currUrl.match(url))
+        var subUrls = url.split(',');
+        var len = subUrls.length;
+        var isFound = false;
+        for (var i = 0; i < len; i++)
         {
-            for (var property in cache.styles[url])
-                rules[property] = cache.styles[url][property];
+            if (currUrl.indexOf(subUrls[i].trim()) != -1) {
+                isFound = true;
+                break;
+            }
+        }
+        if ( isFound || url == "*")
+        {
             if (url.length > url_for_page.length)
                 url_for_page = url;
+            
+            // iterate over each selector in styles
+            for (var selector in cache.styles[url]) {
+                // if no rule exists for selector, simply copy the rule
+                if (rules[selector] == undefined)
+                    rules[selector] = cache.styles[url][selector];
+                // otherwise, iterate over each property
+                else {
+                    for (var property in cache.styles[url][selector])
+                    {
+                        if (rules[selector][property] == undefined || url == url_for_page)
+                            rules[selector][property] = cache.styles[url][selector][property];
+                    }
+                }
+            }
         }
     }
     if (rules != undefined)
@@ -171,3 +203,7 @@ function loadAccordionState() {
 window.addEventListener('load', function(){
     init();
 });
+
+String.prototype.trim = function() {
+    return this.replace(/^\s+|\s+$/g, "");
+};

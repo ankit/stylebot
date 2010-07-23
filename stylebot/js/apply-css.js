@@ -3,16 +3,15 @@
   * as soon as the document starts loading.
  **/
 
-// temporaries used by stylebot.style.init()
-var stylebotTempRules;
+// temporaries used by stylebot.style.initialize()
 var stylebotTempUrl;
+var stylebotTempRules;
 
 // send request to background.html to get stylebot rules for page
 chrome.extension.sendRequest({ name: "getRulesForPage", url: window.location.href }, function(response) {
-    // update temp vars for stylebot.style
-    stylebotTempRules = response.rules;
     stylebotTempUrl = response.url;
-
+    stylebotTempRules = response.rules;
+    
     if (!response.rules)
         return;
     

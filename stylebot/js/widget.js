@@ -37,15 +37,18 @@ stylebot.widget = {
         Utils.makeEditable(this.cache.headerSelector, function(value) {
             stylebot.widget.updateHeight();
             stylebot.select(null, value);
-        }, true);
+        }, {
+            selectText: true,
+            fixedWidth: 200
+        });
 
         // url
         var url = $('<div>', {
             html: stylebot.style.cache.url,
             class: 'stylebot-editable-text',
-            title: 'Click to edit the URL for which custom CSS will be saved'
+            title: 'Click to edit the partial URL for which custom CSS will be saved. <br><br>Tip: You can add multiple such URLs by separating them with a ,'
         })
-        .tipsy({delayIn: 1500, gravity:'n'});
+        .tipsy({delayIn: 1500, gravity:'n', html: true});
         
         var urlContainer = $('<div>', {
             id: 'stylebot-header-url'
@@ -56,7 +59,10 @@ stylebot.widget = {
         Utils.makeEditable(url, function(value) {
             stylebot.widget.updateHeight();
             stylebot.style.cache.url = value;
-        }, true);
+        }, {
+            selectText: true,
+            fixedWidth: 200
+        });
 
         // container for URL and selector
         var headerTextContainer = $('<div>', {
