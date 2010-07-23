@@ -396,7 +396,7 @@ stylebot.widget.basic = {
                                         if (index != -1)
                                             $(control.el.find('button')[index])
                                             .addClass('stylebot-active-button')
-                                            .next().css('border-left-width', '0px');
+                                            .next().addClass('stylebot-active-button-next');
         }
     },
     
@@ -409,7 +409,7 @@ stylebot.widget.basic = {
         this.cache.fontFamilyInput.hide();
         this.cache.segmentedControls.find('.stylebot-active-button')
         .removeClass('stylebot-active-button')
-        .next().css('border-left-width', '1px');
+        .next().removeClass('stylebot-active-button-next');
     },
 
     show: function() {
