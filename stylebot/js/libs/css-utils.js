@@ -6,8 +6,7 @@
  **/
 
 
-var CSSUtils = {
-    
+var CSSUtils = {    
     /*  e.g. of rules object used as input / output:
     
     rules = {
@@ -40,7 +39,7 @@ var CSSUtils = {
 
         for (var selector in rules)
         {
-            css += selector + "{" + "\n";
+            css += selector + " {" + "\n";
             for (var property in rules[selector])
                 css += "\t" + this.getCSSDeclaration(property, rules[selector][property], setImportant) + "\n";
 
@@ -76,6 +75,51 @@ var CSSUtils = {
         d.insertBefore(style, null);
     },
     
+    // parser object is that returned by JSCSSP
+    getRulesFromParserObject: function(sheet) {
+        var rules = {};
+        var len = sheet.cssRules.length;
+        for (var i = 0; i < len; i++) {
+            var selector = sheet.cssRules[i].mSelectorText;
+            rules[selector] = new Object();
+            var len2 = sheet.cssRules[i].declarations.length;
+            for(var j = 0; j < len2; j++) {
+                var property = sheet.cssRules[i].declarations[j].property;
+                var value = sheet.cssRules[i].declarations[j].valueText;
+                rules[selector][property] = value;
+            }
+        }
+        return rules;
+    },
+    
+    // parser object is that returned by JSCSSP
+    getRuleFromParserObject: function(sheet) {
+        var rule = {};
+        var len = sheet.cssRules[0].declarations.length;
+        for (var i = 0; i < len; i++) {
+                var property = sheet.cssRules[0].declarations[i].property;
+                var value = sheet.cssRules[0].declarations[i].valueText;
+                rule[property] = value;
+        }
+        return rule;
+    },
+        
+    // deprecated
+    parseCSS: function(css) {
+        var rules = {};
+        css = this.removeComments(css);
+        var blocks = css.split('}');
+        blocks.pop();
+        var len = blocks.length;
+        for (var i = 0; i < len; i++)
+        {
+            var pair = blocks[i].split('{');
+            rules[$.trim(pair[0])] = this.parseCSSBlock(pair[1]);
+        }
+        return rules;
+    },
+    
+    // deprecated. instead using http://www.glazman.org/JSCSSP/
     parseCSSBlock: function(css) {
         var rule = {};
         var declarations = css.split(';');
@@ -91,20 +135,6 @@ var CSSUtils = {
                 rule[property] = value;
         }
         return rule;
-    },
-    
-    parseCSS: function(css) {
-        var rules = {};
-        css = this.removeComments(css);
-        var blocks = css.split('}');
-        blocks.pop();
-        var len = blocks.length;
-        for (var i = 0; i < len; i++)
-        {
-            var pair = blocks[i].split('{');
-            rules[$.trim(pair[0])] = this.parseCSSBlock(pair[1]);
-        }
-        return rules;
     },
     
     // from http://www.senocular.com/pub/javascript/CSS_parse.js

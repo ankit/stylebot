@@ -93,27 +93,28 @@ stylebot.style = {
             stylebot.style.applyInlineCSS(stylebot.style.cache.elements, css);
         }, duration);
         
-        if (stylebot.style.timer){
+        if (stylebot.style.timer) {
             clearTimeout(stylebot.style.timer);
             stylebot.style.timer = null;
         }
         stylebot.style.timer = setTimeout(function() {
             stylebot.style.saveRuleToCacheFromCSS(css);
-        }, 1500);
+        }, 1000);
     },
     
     // parses CSS into a rule and updates the rules cache
     saveRuleToCacheFromCSS: function(css) {
         if (!this.cache.selector)
             return true;
-        
         // empty rules cache
         delete this.rules[this.cache.selector];
-        
-        var generatedRule = CSSUtils.parseCSSBlock(css);
-        
-        for (var property in generatedRule)
+
+        var parser = new CSSParser();
+        var sheet = parser.parse(this.cache.selector + "{" + css + "}");
+        var generatedRule = CSSUtils.getRuleFromParserObject(sheet);
+        for (var property in generatedRule) {
             this.savePropertyToCache(this.cache.selector, property, generatedRule[property]);
+        }
     },
     
     // add/update property-value pair to CSS rules cache

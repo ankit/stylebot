@@ -198,7 +198,10 @@ function onAddClick() {
 }
 
 function saveStyle(url, css) {
-    styles[url] = CSSUtils.parseCSS(css);
+    var parser = new CSSParser();
+    var sheet = parser.parse(css);
+    var rules = CSSUtils.getRulesFromParserObject(sheet);
+    styles[url] = rules;
 }
 
 function editURL(oldValue, newValue) {

@@ -59,6 +59,7 @@
 			"js/libs/utils.js",
 			"js/libs/colorpicker.js",
 			"js/libs/jquery.tipsy.js",
+			"js/libs/parser.js",
 			"js/libs/jquery.lint.js"
 		],
 		
