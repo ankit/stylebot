@@ -36,7 +36,6 @@ var CSSUtils = {
     
     crunchFormattedCSS: function(rules, setImportant) {
         var css = "";
-
         for (var selector in rules)
         {
             css += selector + " {" + "\n";

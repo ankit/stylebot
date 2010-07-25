@@ -34,6 +34,7 @@ h2 {
     border-radius: 5px;
     margin: 0;
     padding: 20px;
+    padding-bottom: 0px;
     -webkit-box-shadow: 0px 0px 10px #eff0f3;
 }
 
@@ -97,12 +98,6 @@ select {
 }
 
 /* custom styles section */
-
-#custom-styles {
-    margin-top: 50px;
-    margin-bottom: 20px;
-}
-
 .custom-style-url {
     display: inline-block;
     padding: 2px;

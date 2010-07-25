@@ -14,11 +14,14 @@ var cache = {
     **/
     styles: {},
     
+    bookmarkId: null,
+    
     options: {
         useShortcutKey: true,
         shortcutKey: 69, // keydown code for 'e'
         shortcutMetaKey: 'ctrl',
-        mode: 'Basic'
+        mode: 'Basic',
+        sync: false
     },
     
     // indices of enabled accordions
@@ -27,8 +30,8 @@ var cache = {
 
 function init(){
     addListeners();
-    loadStylesIntoCache();
     loadOptionsIntoCache();
+    loadStylesIntoCache();
     loadAccordionState();
 }
 
@@ -100,11 +103,37 @@ function save(url, rules) {
         cache.styles[url] = rules;
     else
         delete cache.styles[url];
-    localStorage['stylebot_styles'] = JSON.stringify(cache.styles);
+    var json = JSON.stringify(cache.styles);
+    
+    localStorage['stylebot_styles'] = json;
+    
+    // is sync enabled? if yes, store in bookmark as well
+    if (cache.options.sync) {
+        saveStylebotBookmark(json);
+    }
 }
 
 function loadStylesIntoCache() {
-    if (localStorage['stylebot_styles'])
+    // if sync is enabled, load data from bookmark and save it to cache and localStorage
+    if (cache.options.sync) {
+        loadStylebotBookmark(function(data) {
+            var styles = null;
+            try {
+                styles = JSON.parse(data);
+            }
+            catch(e) {
+            }
+            if (styles && styles != "") {
+                cache.styles = styles;
+                localStorage['stylebot_styles'] = styles;
+            }
+            // fallback if bookmark is empty
+            else if (localStorage['stylebot_styles']) {
+                cache.styles = JSON.parse(localStorage['stylebot_styles']);
+            }
+        });
+    }
+    else if (localStorage['stylebot_styles'])
         cache.styles = JSON.parse(localStorage['stylebot_styles']);
 }
 
@@ -114,6 +143,7 @@ function initDataStore() {
     localStorage['stylebot_option_shortcutKey'] = cache.options.shortcutKey;
     localStorage['stylebot_option_shortcutMetaKey'] = cache.options.shortcutMetaKey;
     localStorage['stylebot_option_mode'] = cache.options.mode;
+    localStorage['stylebot_option_sync'] = cache.options.sync;
 }
 
 function loadOptionsIntoCache() {
@@ -126,6 +156,7 @@ function loadOptionsIntoCache() {
     cache.options.shortcutKey = localStorage['stylebot_option_shortcutKey'];
     cache.options.shortcutMetaKey = localStorage['stylebot_option_shortcutMetaKey'];
     cache.options.mode = localStorage['stylebot_option_mode'];
+    cache.options.sync = (localStorage['stylebot_option_sync'] == 'true');
 }
 
 function getRulesForPage(currUrl) {
@@ -145,7 +176,7 @@ function getRulesForPage(currUrl) {
                 break;
             }
         }
-        if ( isFound || url == "*")
+        if (isFound || url == "*")
         {
             if (url.length > url_for_page.length)
                 url_for_page = url;
@@ -198,6 +229,49 @@ function saveAccordionState(enabledAccordions) {
 function loadAccordionState() {
     if (localStorage['stylebot_enabledAccordions'])
         cache.enabledAccordions = localStorage['stylebot_enabledAccordions'].split(',');
+}
+
+function loadStylebotBookmark(callback) {
+    var parse = function(url) {
+        callback(unescape(url.replace("http://stylebot/?data=", "")));
+    }
+    
+    // if (!cache.bookmarkId)
+    // {
+    loadBookmark(null, "stylebot_styles_data", function(bookmark) {
+        if (bookmark) {
+            cache.bookmarkId = bookmark.id;
+            parse(bookmark.url);
+        }
+        else {
+            saveStylebotBookmark(null);
+        }
+    });
+    // }
+    // 
+    // else {
+    //     loadBookmark(cache.bookmarkId, null, function(bookmark) {
+    //         parse(bookmark.url);
+    //     });
+    // }
+}
+
+function saveStylebotBookmark(data) {
+    data = "http://stylebot/?data=" + escape(data);
+    if (!cache.bookmarkId) {
+        
+        var create = function(id) {
+            createBookmark("stylebot_styles_data", data, id, function(bookmark) {
+                cache.bookmarkId = bookmark.id;
+            });
+        }
+        // create folder
+        createBookmark("StylebotSync", null, null, function(folder) {
+            create(folder.id);
+        });
+    }
+    else
+        saveBookmark(cache.bookmarkId, data, function(){});
 }
 
 window.addEventListener('load', function(){

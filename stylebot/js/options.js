@@ -11,24 +11,26 @@ var options = {
     useShortcutKey: null,
     shortcutKey: null,
     shortcutMetaKey: null,
-    mode: null
+    mode: null,
+    sync: null
 }
 
 var styles = {};
 
 // save options
-
 function save() {
     options.useShortcutKey = ( $('[name=useShortcutKey]:checked').attr('value') == 'true' );
     options.shortcutKey = $('[name=shortcutKeyHiddenField]').attr('value');
     options.shortcutMetaKey = $('[name=shortcutMetaKey]')[0].value;
     options.mode = $('[name=mode]:checked').attr('value');
+    options.sync = $('[name=sync]:checked').attr('value');
     
     // save to datastore
     localStorage['stylebot_option_useShortcutKey'] = options.useShortcutKey;
     localStorage['stylebot_option_shortcutMetaKey'] = options.shortcutMetaKey;
     localStorage['stylebot_option_shortcutKey'] = options.shortcutKey;
     localStorage['stylebot_option_mode'] = options.mode;
+    localStorage['stylebot_option_sync'] = options.sync;
     
     // save styles
     localStorage['stylebot_styles'] = JSON.stringify(styles);
@@ -70,6 +72,12 @@ function init() {
         radioBt[1].checked = true;
     else
         radioBt[0].checked = true;
+        
+    radioBt = $('[name=sync]');
+    if (options.sync == true)
+        radioBt[0].checked = true;
+    else
+        radioBt[1].checked = true;
 
     fillCustomStyles(localStorage['stylebot_styles']);
 }
@@ -80,6 +88,7 @@ function fetchOptions() {
     options.shortcutMetaKey = localStorage['stylebot_option_shortcutMetaKey'];
     options.shortcutKey = localStorage['stylebot_option_shortcutKey'];
     options.mode = localStorage['stylebot_option_mode'];
+    options.sync = (localStorage['stylebot_option_sync'] == 'true');
 }
 
 function restoreDefaults() {

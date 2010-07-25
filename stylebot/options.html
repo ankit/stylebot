@@ -17,7 +17,6 @@
 <div id="wrap">
 	<h1>Stylebot Options</h1>
 	<ul id="options">
-		<h2>Basic</h2>
 		<li class="option">
 			<label>Shortcut Key to launch Stylebot: </label>
 			<div class="option-field">
@@ -46,9 +45,18 @@
 				<input type="radio" name="mode" value="Advanced" /> Advanced
 			</div>
 		</li>
+		<li class="option">
+			<label>Sync Styles: <div class="description">(you'll need to have Bookmark Sync enabled)</div></label>
+			<div class="option-field">
+				<input type="radio" name="sync" value="true" /> Yes
+				<input type="radio" name="sync" value="false" /> No
+			</div>
+		</li>
+		<br>
 		<div id="custom-styles">
 			<h2>Custom Styles</h2>
 		</div>
+		<br>
 		<button onclick="addStyle();">Add Style</button>
 		<br><br>
 		<div id="backup">
@@ -56,11 +64,12 @@
 			<button onclick="export();">Export</button>
 			<button onclick="import();">Import</button>
 		</div>
-		<br><br><br>
+		<br>
 		<div id="main-buttons">
 			<button onclick="save();">Save</button>
 			<button onclick="restoreDefaults();">Restore Defaults</button>
 		</div>
+		<br>
 	</ul>
 </body>
 </html>

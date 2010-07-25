@@ -72,5 +72,5 @@
 		"default_title": "Click to turn CSS editing on"
 	},
 	
-	"permissions": ["tabs", "http://userstyles.org/"]
+	"permissions": ["tabs", "http://userstyles.org/", "bookmarks"]
 }
