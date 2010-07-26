@@ -4,8 +4,13 @@
 function sync() {
     loadStylebotBookmark(function(data) {
         if (data) {
-            var styles = JSON.parse(data);
-            if (styles != cache.styles)
+            var styles = null;
+            try {
+                styles = JSON.parse(data);
+            }
+            catch(e) {
+            }
+            if (styles && styles != cache.styles)
                 mergeStyles(styles);
         }
         else {
@@ -18,6 +23,13 @@ function sync() {
 function stopSync() {
 }
 
+// TODO: actually do some merging here :)
 function mergeStyles(styles) {
     saveStyles(styles);
 }
+
+// add listener to sync when bookmark is changed
+chrome.bookmarks.onChanged.addListener(function(id, properties) {
+    if (cache.options.sync && id == cache.bookmarkId && !saveBookmarkWasCalled)
+        sync();
+});

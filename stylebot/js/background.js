@@ -2,6 +2,10 @@
 
 var currTabId;
 
+// to prevent sync() from getting called when saveBookmark changes bookmark url
+// used in sync
+var saveBookmarkWasCalled = false;
+
 var cache = {
     /**
         e.g. styles = {
@@ -33,6 +37,8 @@ function init(){
     loadOptionsIntoCache();
     loadStylesIntoCache();
     loadAccordionState();
+    if (cache.options.sync)
+        sync();
 }
 
 function addListeners(){
@@ -126,36 +132,12 @@ function saveStyles(styles) {
 }
 
 function loadStylesIntoCache() {
-    // if sync is enabled, load data from bookmark and save it to cache and localStorage
-    if (cache.options.sync) {
-        loadStylebotBookmark(function(data) {
-            var styles = null;
-            try {
-                if (data && data != "")
-                    styles = JSON.parse(data);
-            }
-            catch(e) {
-            }
-            if (styles) {
-                cache.styles = styles;
-                // update localStorage as well
-                localStorage['stylebot_styles'] = styles;
-            }
-            // fallback if bookmark is empty
-            else if (localStorage['stylebot_styles']) {
-                try {
-                    cache.styles = JSON.parse(localStorage['stylebot_styles']);
-                }
-                catch(e) { cache.styles = null; }
-            }
-        });
-    }
-    else if (localStorage['stylebot_styles']) {
+    if (localStorage['stylebot_styles']) {
         try {
             cache.styles = JSON.parse(localStorage['stylebot_styles']);
         }
         catch(e) {
-            cache.styles = null;
+            cache.styles = {};
         }
     }
 }
@@ -268,11 +250,28 @@ function loadStylebotBookmark(callback) {
             callback(null);
     }
 
-    loadBookmark(null, "stylebot_styles_data", function(bookmark) {
-        if (bookmark) {
+    loadBookmark(null, "stylebot_styles_data", function(bookmarks) {
+        if (bookmarks.length != 0) {
+            var bookmark = bookmarks[0];
+            // handle duplicates
+            if (bookmarks.length > 0) {
+                // retain only the latest bookmark. get rid of all others
+                // TODO: call mergeStyles for earlier bookmarks
+                var len = bookmarks.length;
+                for (var i = 1; i < len; i++) {
+                    if (bookmarks[i].dateAdded < bookmark.dateAdded) {
+                        removeBookmarkTree(bookmark.parentId);
+                        bookmark = bookmarks[i];
+                    }
+                    else
+                        removeBookmarkTree(bookmarks[i].parentId);
+                }
+            }
             cache.bookmarkId = bookmark.id;
             parse(bookmark.url);
         }
+        else
+            parse(null);
     });
 }
 
@@ -289,8 +288,17 @@ function saveStylebotBookmark(data) {
             create(folder.id);
         });
     }
-    else
-        saveBookmark(cache.bookmarkId, data, function(){});
+    else {
+        saveBookmarkWasCalled = true;
+        saveBookmark(cache.bookmarkId, data, function(bookmark){
+            saveBookmarkWasCalled = false;
+            // some develish power deleted the bookmark. reset cache.bookmarkId and create it again
+            if (!bookmark) {
+                cache.bookmarkId = null;
+                saveStylebotBookmark(JSON.stringify(cache.styles));
+            }
+        });
+    }
 }
 
 window.addEventListener('load', function(){

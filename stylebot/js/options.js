@@ -276,14 +276,16 @@ function setSyncUI() {
     if (options.sync) {
         status.html("Syncing is currently enabled.");
         $('#sync_button').html("Stop Syncing");
+        $('#sync_now').show();
     }
     else {
         status.html("Syncing is currently disabled.");
         $('#sync_button').html("Start Syncing");
+        $('#sync_now').hide();
     }
 }
 
-function sync() {
+function toggleSyncing() {
     if (options.sync) {
         options.sync = false;
         bg_window.saveOption("sync", true);

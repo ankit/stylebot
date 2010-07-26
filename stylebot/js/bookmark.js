@@ -34,13 +34,21 @@ function loadBookmark(id, title, callback) {
     
     if (title) {
         chrome.bookmarks.search("stylebot", function(bookmarks) {
-            callback(bookmarks[0]);
+            callback(bookmarks);
         });
     }
 }
 
 function saveBookmark(id, url, callback) {
     chrome.bookmarks.update(id, {url: url}, callback);
+}
+
+function removeBookmark(id, callback) {
+    chrome.bookmarks.remove(id, callback);
+}
+
+function removeBookmarkTree(id, callback) {
+    chrome.bookmarks.removeTree(id, callback);
 }
 
 function getRootBookmark(callback) {
