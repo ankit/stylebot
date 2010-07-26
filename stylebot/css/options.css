@@ -2,8 +2,8 @@ body {
 	background-color: #fafbff;
 	font-size: 15px;
 	line-height: 28px;
-    font-family: 'Lucida Grande', Helvetica, Arial, sans-serif;
-	color: #414141;
+    font-family: "Lucida Grande", Helvetica, Arial, sans-serif;
+	color: #333;
 	margin: 0;
 	padding: 0;
 }
@@ -16,14 +16,13 @@ body {
 
 h1 {
     color: #5cd458;
-    font-family: 'Lucida Grande', Helvetica, Arial, sans-serif;
     font-size: 30px;
 	text-align: center;
 }
 
 h2 {
     border-bottom: 1px solid #eee;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: bold;
     color: #333;
 }
@@ -71,7 +70,7 @@ input[type=text] {
 
 button {
     background-color: #fbfbfb;
-    border: 1px solid #ccc;
+    border: 1px solid #aaa;
     border-radius: 2px;
     color: #333;
     font-size: 15px;
@@ -141,6 +140,29 @@ textarea.stylebot-css-code {
 
 .description {
     font-size: 11px;
-    font-weight: bold;
-    color: #555;
+    color: #777;
+    line-height: 15px;
+}
+
+.description a {
+    color: #4c68bd;
+    text-decoration: none;
+}
+
+#footer {
+    border-top: 1px solid #eee;
+    font-size: 11px;
+    color: #777;
+    text-align: center;
+    line-height: 18px;
+    padding-bottom: 20px;
+}
+
+#footer a {
+    color: #4c68bd;
+    text-decoration: none;
+}
+
+#footer a:hover {
+    text-decoration: underline;
 }

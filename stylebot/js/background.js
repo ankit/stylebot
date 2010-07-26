@@ -113,28 +113,51 @@ function save(url, rules) {
     }
 }
 
+function saveStyles(styles) {
+    if (styles)
+        cache.styles = styles;
+    var json = JSON.stringify(cache.styles);
+    localStorage['stylebot_styles'] = json;
+
+    // is sync enabled? if yes, store in bookmark as well
+    if (cache.options.sync) {
+        saveStylebotBookmark(json);
+    }
+}
+
 function loadStylesIntoCache() {
     // if sync is enabled, load data from bookmark and save it to cache and localStorage
     if (cache.options.sync) {
         loadStylebotBookmark(function(data) {
             var styles = null;
             try {
-                styles = JSON.parse(data);
+                if (data && data != "")
+                    styles = JSON.parse(data);
             }
             catch(e) {
             }
-            if (styles && styles != "") {
+            if (styles) {
                 cache.styles = styles;
+                // update localStorage as well
                 localStorage['stylebot_styles'] = styles;
             }
             // fallback if bookmark is empty
             else if (localStorage['stylebot_styles']) {
-                cache.styles = JSON.parse(localStorage['stylebot_styles']);
+                try {
+                    cache.styles = JSON.parse(localStorage['stylebot_styles']);
+                }
+                catch(e) { cache.styles = null; }
             }
         });
     }
-    else if (localStorage['stylebot_styles'])
-        cache.styles = JSON.parse(localStorage['stylebot_styles']);
+    else if (localStorage['stylebot_styles']) {
+        try {
+            cache.styles = JSON.parse(localStorage['stylebot_styles']);
+        }
+        catch(e) {
+            cache.styles = null;
+        }
+    }
 }
 
 function initDataStore() {
@@ -198,9 +221,15 @@ function getRulesForPage(currUrl) {
         }
     }
     if (rules != undefined)
-        return { rules: rules, url: url_for_page };
+        return {rules: rules, url: url_for_page};
     else
-        return { rules: null, url: null };
+        return {rules: null, url: null};
+}
+
+function saveOption(name, value) {
+    cache.options[name] = value;
+    localStorage['stylebot_option_' + name] = value;
+    propagateOptions();
 }
 
 function propagateOptions() {
@@ -233,33 +262,23 @@ function loadAccordionState() {
 
 function loadStylebotBookmark(callback) {
     var parse = function(url) {
-        callback(unescape(url.replace("http://stylebot/?data=", "")));
+        if (url && url != "")
+            callback(unescape(url.replace("http://stylebot/?data=", "")));
+        else
+            callback(null);
     }
-    
-    // if (!cache.bookmarkId)
-    // {
+
     loadBookmark(null, "stylebot_styles_data", function(bookmark) {
         if (bookmark) {
             cache.bookmarkId = bookmark.id;
             parse(bookmark.url);
         }
-        else {
-            saveStylebotBookmark(null);
-        }
     });
-    // }
-    // 
-    // else {
-    //     loadBookmark(cache.bookmarkId, null, function(bookmark) {
-    //         parse(bookmark.url);
-    //     });
-    // }
 }
 
 function saveStylebotBookmark(data) {
     data = "http://stylebot/?data=" + escape(data);
     if (!cache.bookmarkId) {
-        
         var create = function(id) {
             createBookmark("stylebot_styles_data", data, id, function(bookmark) {
                 cache.bookmarkId = bookmark.id;

@@ -17,33 +17,6 @@ var options = {
 
 var styles = {};
 
-// save options
-function save() {
-    options.useShortcutKey = ( $('[name=useShortcutKey]:checked').attr('value') == 'true' );
-    options.shortcutKey = $('[name=shortcutKeyHiddenField]').attr('value');
-    options.shortcutMetaKey = $('[name=shortcutMetaKey]')[0].value;
-    options.mode = $('[name=mode]:checked').attr('value');
-    options.sync = $('[name=sync]:checked').attr('value');
-    
-    // save to datastore
-    localStorage['stylebot_option_useShortcutKey'] = options.useShortcutKey;
-    localStorage['stylebot_option_shortcutMetaKey'] = options.shortcutMetaKey;
-    localStorage['stylebot_option_shortcutKey'] = options.shortcutKey;
-    localStorage['stylebot_option_mode'] = options.mode;
-    localStorage['stylebot_option_sync'] = options.sync;
-    
-    // save styles
-    localStorage['stylebot_styles'] = JSON.stringify(styles);
-    
-    // update cache in background.html
-    bg_window = chrome.extension.getBackgroundPage();
-    bg_window.cache.options = options;
-    bg_window.cache.styles = styles;
-    
-    // propagate changes to all open tabs
-    bg_window.propagateOptions();
-}
-
 // initialize options
 function init() {
     // fetch options from datastore
@@ -72,14 +45,13 @@ function init() {
         radioBt[1].checked = true;
     else
         radioBt[0].checked = true;
-        
-    radioBt = $('[name=sync]');
-    if (options.sync == true)
-        radioBt[0].checked = true;
-    else
-        radioBt[1].checked = true;
 
     fillCustomStyles(localStorage['stylebot_styles']);
+
+    bg_window = chrome.extension.getBackgroundPage();
+    
+    attachListeners();
+    setSyncUI();
 }
 
 // fetches options from the datastore
@@ -91,27 +63,45 @@ function fetchOptions() {
     options.sync = (localStorage['stylebot_option_sync'] == 'true');
 }
 
-function restoreDefaults() {
-    // use shortcut key = true
-    $('[name=useShortcutKey]')[0].checked = true;
+function attachListeners() {
+    // radio
+    $('.option-field input[type=radio]').change(function(e) {
+        var name = e.target.name;
+        var value = translateOptionValue(name, e.target.value);
+        bg_window.saveOption(name, value);
+    });
     
-    // shortcut meta key = ctrl
-    $('[name=shortcutMetaKey]')[0].checked = true;
+    // select
+    $('.option-field select').change(function(e) {
+        bg_window.saveOption(e.target.name, e.target.value);
+    });
     
-    // shortcut key = 69 (e)
-    $('[name=shortcutKeyHiddenField]').attr('value', 69);
-    $('[name=shortcutKey]').attr('value', 'e');
-    
-    // mode = basic
-    $('[name=mode]')[0].checked = true;
+    // textfields
+    $('.option-field input[type=text]').keyup(function(e) {
+        bg_window.saveOption(e.target.name, translateOptionValue(e.target.name, e.target.value));
+    });
 }
+
+function translateOptionValue(name, value) {
+    switch(name) {
+        case "useShortcutKey": 
+        case "sync": return (value == "true") ? true : false;
+        
+        case "shortcutKey": return $('[name=shortcutKeyHiddenField]').attr('value');
+    }
+    return value;
+}
+
+/** custom styles **/
 
 function fillCustomStyles(json) {
     var container = $("#custom-styles");
-    if (json)
+    try {
         styles = JSON.parse(json);
-    for (var url in styles)
-        container.append(createCustomStyleOption(url, styles[url]));
+        for (var url in styles)
+            container.append(createCustomStyleOption(url, styles[url]));
+    }
+    catch(e) {}
 }
 
 function createCustomStyleOption(url, rules) {
@@ -161,6 +151,7 @@ function removeStyle(e) {
     var url = parent.find('.custom-style-url');
     delete styles[url.html()];
     parent.remove();
+    bg_window.saveStyles(styles);
 }
 
 function editStyle(e) {
@@ -211,6 +202,7 @@ function saveStyle(url, css) {
     var sheet = parser.parse(css);
     var rules = CSSUtils.getRulesFromParserObject(sheet);
     styles[url] = rules;
+    bg_window.saveStyles(styles);
 }
 
 function editURL(oldValue, newValue) {
@@ -219,10 +211,18 @@ function editURL(oldValue, newValue) {
     var rules = styles[oldValue];
     delete styles[oldValue];
     styles[newValue] = rules;
+    bg_window.saveStyles(styles);
 }
 
+/** end of custom styles **/
+
+/** backup **/
+
 function export() {
-    var css = localStorage['stylebot_styles'];
+    if (styles)
+        css = JSON.stringify(styles);
+    else
+        css = "";
     var html = "<div>Copy and paste your custom styles into a text file:</div><textarea class='stylebot-css-code' style='width: 100%; height:" + cache.textareaHeight + "'>" + css + "</textarea><button onclick='copyToClipboard()'>Copy To Clipboard</button>";
     initModal(html, {
         closeOnEsc: true,
@@ -238,12 +238,12 @@ function export() {
 }
 
 function import() {
-    var html = "<div>Paste previously exported custom styles here.<div class='description' style='margin-top:10px'>Note: It will get rid of all your current custom styles. Also, changes will only be saved when you click on Save.</div></div><textarea class='stylebot-css-code' style='width: 100%; height:" + cache.textareaHeight + "'></textarea><button onclick='importCSS();cache.modal.hide();'>Import</button>";
+    var html = "<div>Paste previously exported custom styles here.<div class='description' style='margin-top:10px'>Warning: It will replace all your current custom styles.</div></div><textarea class='stylebot-css-code' style='width: 100%; height:" + cache.textareaHeight + "'></textarea><button onclick='importCSS();cache.modal.hide();'>Import</button>";
     initModal(html, {
         closeOnEsc: true,
         closeOnBgClick: true
     });
-    cache.modal.options.onOpen = function() { 
+    cache.modal.options.onOpen = function() {
         var textarea = cache.modal.box.find('textarea')
         textarea.focus();
         var len = textarea.attr('value').length;
@@ -258,12 +258,46 @@ function copyToClipboard() {
 
 function importCSS() {
     var json = cache.modal.box.find('textarea').attr('value');
-    try {
+    if (json && json != "")
+    {
         $(".custom-style").html("");
         fillCustomStyles(json);
+        styles = JSON.parse(json);
+        bg_window.saveStyles(styles);
     }
-    catch(e) {}
 }
+
+/** end of backup **/
+
+/** sync **/
+
+function setSyncUI() {
+    var status = $('#sync_status');
+    if (options.sync) {
+        status.html("Syncing is currently enabled.");
+        $('#sync_button').html("Stop Syncing");
+    }
+    else {
+        status.html("Syncing is currently disabled.");
+        $('#sync_button').html("Start Syncing");
+    }
+}
+
+function sync() {
+    if (options.sync) {
+        options.sync = false;
+        bg_window.saveOption("sync", true);
+        bg_window.stopSync();
+    }
+    else {
+        options.sync = true;
+        bg_window.saveOption("sync", true);
+        bg_window.sync();
+    }
+    setSyncUI();
+}
+
+/** end of sync **/
 
 function initModal(html, options) {
     if (!cache.modal)
