@@ -96,6 +96,7 @@ function copyToClipboard(text) {
 }
 
 /** Data save, load, etc. **/
+
 function save(url, rules) {
     if (rules)
         cache.styles[url] = rules;
@@ -157,7 +158,7 @@ function updateDataStore() {
     localStorage['stylebot_styles'] = jsonString;
 
     // is sync enabled? if yes, store in bookmark as well
-    if (cache.options.sync) {
+    if (cache.options.sync)
         saveSyncData(jsonString);
 }
 
