@@ -2,10 +2,6 @@
 
 var currTabId;
 
-// to prevent sync() from getting called when saveBookmark changes bookmark url
-// used in sync
-var saveBookmarkWasCalled = false;
-
 var cache = {
     /**
         e.g. styles = {
@@ -17,8 +13,6 @@ var cache = {
         }
     **/
     styles: {},
-    
-    bookmarkId: null,
     
     options: {
         useShortcutKey: true,
@@ -37,8 +31,6 @@ function init(){
     loadOptionsIntoCache();
     loadStylesIntoCache();
     loadAccordionState();
-    if (cache.options.sync)
-        sync();
 }
 
 function addListeners(){
@@ -103,32 +95,26 @@ function copyToClipboard(text) {
     document.body.removeChild(copyTextarea);
 }
 
-// save rules
+/** Data save, load, etc. **/
 function save(url, rules) {
     if (rules)
         cache.styles[url] = rules;
     else
         delete cache.styles[url];
-    var json = JSON.stringify(cache.styles);
-    
-    localStorage['stylebot_styles'] = json;
-    
-    // is sync enabled? if yes, store in bookmark as well
-    if (cache.options.sync) {
-        saveStylebotBookmark(json);
-    }
+    updateDataStore();
 }
 
 function saveStyles(styles) {
     if (styles)
         cache.styles = styles;
-    var json = JSON.stringify(cache.styles);
-    localStorage['stylebot_styles'] = json;
+    updateDataStore();
+}
 
-    // is sync enabled? if yes, store in bookmark as well
-    if (cache.options.sync) {
-        saveStylebotBookmark(json);
-    }
+function saveStylesLocally(styles) {
+    if (styles)
+        cache.styles = styles;
+    var jsonString = JSON.stringify(cache.styles);
+    localStorage['stylebot_styles'] = jsonString;
 }
 
 function loadStylesIntoCache() {
@@ -140,15 +126,8 @@ function loadStylesIntoCache() {
             cache.styles = {};
         }
     }
-}
-
-function initDataStore() {
-    // set defaults in datastore
-    localStorage['stylebot_option_useShortcutKey'] = cache.options.useShortcutKey;
-    localStorage['stylebot_option_shortcutKey'] = cache.options.shortcutKey;
-    localStorage['stylebot_option_shortcutMetaKey'] = cache.options.shortcutMetaKey;
-    localStorage['stylebot_option_mode'] = cache.options.mode;
-    localStorage['stylebot_option_sync'] = cache.options.sync;
+    if (cache.options.sync)
+        sync();
 }
 
 function loadOptionsIntoCache() {
@@ -163,6 +142,32 @@ function loadOptionsIntoCache() {
     cache.options.mode = localStorage['stylebot_option_mode'];
     cache.options.sync = (localStorage['stylebot_option_sync'] == 'true');
 }
+
+function initDataStore() {
+    // set defaults in localStorage
+    localStorage['stylebot_option_useShortcutKey'] = cache.options.useShortcutKey;
+    localStorage['stylebot_option_shortcutKey'] = cache.options.shortcutKey;
+    localStorage['stylebot_option_shortcutMetaKey'] = cache.options.shortcutMetaKey;
+    localStorage['stylebot_option_mode'] = cache.options.mode;
+    localStorage['stylebot_option_sync'] = cache.options.sync;
+}
+
+function updateDataStore() {
+    var jsonString = JSON.stringify(cache.styles);
+    localStorage['stylebot_styles'] = jsonString;
+
+    // is sync enabled? if yes, store in bookmark as well
+    if (cache.options.sync) {
+        saveSyncData(jsonString);
+}
+
+function saveOption(name, value) {
+    cache.options[name] = value;
+    localStorage['stylebot_option_' + name] = value;
+    propagateOptions();
+}
+
+/** end of data methods **/
 
 function getRulesForPage(currUrl) {
     // this will contain the combined set of evaluated rules to be applied to the page.
@@ -208,12 +213,6 @@ function getRulesForPage(currUrl) {
         return {rules: null, url: null};
 }
 
-function saveOption(name, value) {
-    cache.options[name] = value;
-    localStorage['stylebot_option_' + name] = value;
-    propagateOptions();
-}
-
 function propagateOptions() {
     sendRequestToAllTabs({ name: 'setOptions', options: cache.options }, function(){});
 }
@@ -240,65 +239,6 @@ function saveAccordionState(enabledAccordions) {
 function loadAccordionState() {
     if (localStorage['stylebot_enabledAccordions'])
         cache.enabledAccordions = localStorage['stylebot_enabledAccordions'].split(',');
-}
-
-function loadStylebotBookmark(callback) {
-    var parse = function(url) {
-        if (url && url != "")
-            callback(unescape(url.replace("http://stylebot/?data=", "")));
-        else
-            callback(null);
-    }
-
-    loadBookmark(null, "stylebot_styles_data", function(bookmarks) {
-        if (bookmarks.length != 0) {
-            var bookmark = bookmarks[0];
-            // handle duplicates
-            if (bookmarks.length > 0) {
-                // retain only the latest bookmark. get rid of all others
-                // TODO: call mergeStyles for earlier bookmarks
-                var len = bookmarks.length;
-                for (var i = 1; i < len; i++) {
-                    if (bookmarks[i].dateAdded < bookmark.dateAdded) {
-                        removeBookmarkTree(bookmark.parentId);
-                        bookmark = bookmarks[i];
-                    }
-                    else
-                        removeBookmarkTree(bookmarks[i].parentId);
-                }
-            }
-            cache.bookmarkId = bookmark.id;
-            parse(bookmark.url);
-        }
-        else
-            parse(null);
-    });
-}
-
-function saveStylebotBookmark(data) {
-    data = "http://stylebot/?data=" + escape(data);
-    if (!cache.bookmarkId) {
-        var create = function(id) {
-            createBookmark("stylebot_styles_data", data, id, function(bookmark) {
-                cache.bookmarkId = bookmark.id;
-            });
-        }
-        // create folder
-        createBookmark("StylebotSync", null, null, function(folder) {
-            create(folder.id);
-        });
-    }
-    else {
-        saveBookmarkWasCalled = true;
-        saveBookmark(cache.bookmarkId, data, function(bookmark){
-            saveBookmarkWasCalled = false;
-            // some develish power deleted the bookmark. reset cache.bookmarkId and create it again
-            if (!bookmark) {
-                cache.bookmarkId = null;
-                saveStylebotBookmark(JSON.stringify(cache.styles));
-            }
-        });
-    }
 }
 
 window.addEventListener('load', function(){
