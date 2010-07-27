@@ -27,13 +27,13 @@ var cache = {
 };
 
 function init(){
-    addListeners();
+    attachListeners();
     loadOptionsIntoCache();
     loadStylesIntoCache();
     loadAccordionState();
 }
 
-function addListeners(){
+function attachListeners(){
     chrome.pageAction.onClicked.addListener(handlePageIconClick);
     
     chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
@@ -60,9 +60,7 @@ function addListeners(){
     });
 }
 
-/**
- * Page Action handling
- **/
+/** Page Action handling **/
 
 // Toggle CSS editing when page icon is clicked
 function handlePageIconClick(tab) {
@@ -85,37 +83,41 @@ function disablePageIcon(tabId) {
     chrome.pageAction.setTitle({ tabId: tabId, title: "Click to turn CSS editing on" });
 }
 
-// Copy to Clipboard
-function copyToClipboard(text) {
-    var copyTextarea = document.createElement('textarea');
-    document.body.appendChild(copyTextarea);
-    copyTextarea.value = text;
-    copyTextarea.select();
-    document.execCommand('copy');
-    document.body.removeChild(copyTextarea);
-}
+/** End of Page Action Handling **/
 
 /** Data save, load, etc. **/
 
+// save rules for a page
 function save(url, rules) {
     if (rules)
         cache.styles[url] = rules;
     else
         delete cache.styles[url];
-    updateDataStore();
+    updateStylesInDataStore();
 }
 
+// save all styles
 function saveStyles(styles) {
     if (styles)
         cache.styles = styles;
-    updateDataStore();
+    updateStylesInDataStore();
 }
 
+// save all styles only in localStorage and cache
 function saveStylesLocally(styles) {
     if (styles)
         cache.styles = styles;
     var jsonString = JSON.stringify(cache.styles);
     localStorage['stylebot_styles'] = jsonString;
+}
+
+function updateStylesInDataStore() {
+    var jsonString = JSON.stringify(cache.styles);
+    localStorage['stylebot_styles'] = jsonString;
+
+    // is sync enabled? if yes, store in bookmark as well
+    if (cache.options.sync)
+        saveSyncData(jsonString);
 }
 
 function loadStylesIntoCache() {
@@ -134,7 +136,7 @@ function loadStylesIntoCache() {
 function loadOptionsIntoCache() {
     if (!localStorage['stylebot_option_useShortcutKey'])
     {
-        initDataStore();
+        setDefaultOptionsInDataStore();
         return true;
     }
     cache.options.useShortcutKey = (localStorage['stylebot_option_useShortcutKey'] == 'true');
@@ -144,22 +146,13 @@ function loadOptionsIntoCache() {
     cache.options.sync = (localStorage['stylebot_option_sync'] == 'true');
 }
 
-function initDataStore() {
+function setDefaultOptionsInDataStore() {
     // set defaults in localStorage
     localStorage['stylebot_option_useShortcutKey'] = cache.options.useShortcutKey;
     localStorage['stylebot_option_shortcutKey'] = cache.options.shortcutKey;
     localStorage['stylebot_option_shortcutMetaKey'] = cache.options.shortcutMetaKey;
     localStorage['stylebot_option_mode'] = cache.options.mode;
     localStorage['stylebot_option_sync'] = cache.options.sync;
-}
-
-function updateDataStore() {
-    var jsonString = JSON.stringify(cache.styles);
-    localStorage['stylebot_styles'] = jsonString;
-
-    // is sync enabled? if yes, store in bookmark as well
-    if (cache.options.sync)
-        saveSyncData(jsonString);
 }
 
 function saveOption(name, value) {
@@ -246,6 +239,17 @@ window.addEventListener('load', function(){
     init();
 });
 
+/** Utility methods **/
 String.prototype.trim = function() {
     return this.replace(/^\s+|\s+$/g, "");
 };
+
+// Copy to Clipboard
+function copyToClipboard(text) {
+    var copyTextarea = document.createElement('textarea');
+    document.body.appendChild(copyTextarea);
+    copyTextarea.value = text;
+    copyTextarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(copyTextarea);
+}

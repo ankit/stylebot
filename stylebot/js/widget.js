@@ -10,7 +10,8 @@ stylebot.widget = {
         box: null,
         header: null,
         headerSelector: null,
-        headerSelectIcon: null
+        headerSelectIcon: null,
+        dropDown: null
     },
     
     defaults: {
@@ -24,16 +25,41 @@ stylebot.widget = {
             id: 'stylebot'
         });
         
-        // selector
+        /** Header **/
+        
+        /** Selection toggle button **/
+        this.cache.headerSelectIcon = $('<div>', {
+            id: 'stylebot-select-icon'
+        })
+        .tipsy({delayIn: 1500, gravity:'nw'})
+        .click(function(e) {
+            stylebot.toggleSelection();
+        });
+
+        /** Selector **/
         this.cache.headerSelector = $('<div>', {
-            id: 'stylebot-header-selector',
             class: 'stylebot-editable-text',
             html: 'custom styles',
             title: 'Click to edit the CSS selector'
         })
         .tipsy({delayIn: 1500, gravity:'nw'});
         
-        // make selector editable
+        /** Dropdown for choosing selectors **/
+        this.dropDown = $('<div>', {
+            id: 'stylebot-dropdown-button',
+            class: 'stylebot-header-button',
+            title: "View previously edited CSS selectors"
+        })
+        .tipsy({delayIn: 1500, gravity: 'ne'})
+        .mouseup(stylebot.widget.showSelectorDropdown);
+        
+        var selectorContainer = $('<div>', {
+            id: 'stylebot-header-selector'
+        })
+        .append(this.cache.headerSelector)
+        .append(this.dropDown);
+        
+        // Make selector editable
         Utils.makeEditable(this.cache.headerSelector, function(value) {
             stylebot.widget.updateHeight();
             stylebot.select(null, value);
@@ -41,8 +67,8 @@ stylebot.widget = {
             selectText: true,
             fixedWidth: 200
         });
-
-        // url
+        
+        /** URL **/
         var url = $('<div>', {
             html: stylebot.style.cache.url,
             class: 'stylebot-editable-text',
@@ -55,7 +81,7 @@ stylebot.widget = {
         })
         .append(url);
         
-        // make url editable
+        // Make url editable
         Utils.makeEditable(url, function(value) {
             stylebot.widget.updateHeight();
             stylebot.style.cache.url = value;
@@ -64,32 +90,24 @@ stylebot.widget = {
             fixedWidth: 200
         });
 
-        // container for URL and selector
+        // Container for URL and selector
         var headerTextContainer = $('<div>', {
             id: 'stylebot-header-container'
         })
-        .append(this.cache.headerSelector)
+        .append(selectorContainer)
         .append(urlContainer);
-        
-        // selection toggle button
-        this.cache.headerSelectIcon = $('<div>', {
-            id: 'stylebot-select-icon'
-        })
-        .tipsy({delayIn: 1500, gravity:'nw'})
-        .click(function(e) {
-            stylebot.toggleSelection();
-        });
-        
-        // close button
+
+        /** Close Button **/
         var closeButton = $('<div>', {
-            id: 'stylebot-close-button'
+            id: 'stylebot-close-button',
+            class: 'stylebot-header-button'
         })
         .click(stylebot.disable);
         
-        // arrow button
+        /** Position Toggle Button **/
         var arrowButton = $('<div>', {
             id: 'stylebot-arrow-button',
-            class: 'stylebot-arrow-left',
+            class: 'stylebot-arrow-left stylebot-header-button',
             title: "Move stylebot to the left"
         })
         .data('position', "Right")
@@ -106,13 +124,15 @@ stylebot.widget = {
         .append(arrowButton)
         .appendTo(this.cache.box);
         
-        // UI for basic mode
+        /** End of Header **/
+        
+        /** Basic Mode **/
         stylebot.widget.basic.createUI().appendTo(this.cache.box);
         
-        // UI for advanced mode
+        /** Advanced Mode **/
         stylebot.widget.advanced.createUI().appendTo(this.cache.box);
         
-        // creating options in widget
+        /** Options **/
         var optionsContainer = $('<div>', {
             id: 'stylebot-widget-options'
         });
@@ -120,7 +140,6 @@ stylebot.widget = {
         WidgetUI.createOption(WidgetUI.createButtonSet(['Basic', 'Advanced'], "stylebot-mode", 0, stylebot.widget.toggleMode))
         .appendTo(optionsContainer);
         
-        // creating main buttons for widget
         var btContainer = $('<div>', {
             id: 'stylebot-main-buttons'
         });
@@ -303,18 +322,16 @@ stylebot.widget = {
         if (pos == "Left")
         {
             pos = "Right";
-            el.attr({
-                title: "Move stylebot to the left",
-                class: "stylebot-arrow-left"
-            });
+            el.removeClass("stylebot-arrow-right")
+            .addClass("stylebot-arrow-left")
+            .attr('title', "Move stylebot to the left");
         }
         else
         {
             pos = "Left";
-            el.attr({
-                title: "Move stylebot to the right",
-                class: "stylebot-arrow-right"
-            });
+            el.removeClass("stylebot-arrow-left")
+            .addClass("stylebot-arrow-right")
+            .attr('title', "Move stylebot to the right");
         }
         el.data('position', pos);
         stylebot.widget.setPosition(pos);
@@ -325,5 +342,46 @@ stylebot.widget = {
         stylebot.options.mode = el.html();
         stylebot.widget.updateHeight();
         stylebot.widget.setMode();
+    },
+    
+    showSelectorDropdown: function() {
+        var dropdown = $("#stylebot-dropdown");
+        if (dropdown.length != 0) {
+            dropdown.remove(); return true;
+        }
+        var parent = stylebot.widget.cache.headerSelector.parent();
+        dropdown = $("<div>", {
+            id: "stylebot-dropdown"
+        })
+        .css('left', parent.width() + 15);
+        
+        var any = false;
+        for (var selector in stylebot.style.rules) {
+            any = true;
+            $("<li>", {
+                class: 'stylebot-dropdown-li',
+                html: selector
+            })
+            .click(function(e) {
+                var value = e.target.innerHTML;
+                stylebot.widget.cache.headerSelector.html(value)
+                stylebot.widget.updateHeight();
+                stylebot.select(null, value);
+                $("#stylebot-dropdown").remove();
+            })
+            .appendTo(dropdown);
+        }
+        if (!any)
+            $("<li>", { html: "No CSS selectors edited" }).appendTo(dropdown);
+        var onClickElsewhere = function(e) {
+            if ($(e.target).parent().attr('id') != "stylebot-dropdown" && e.target.id != "stylebot-dropdown-button") {
+                $("#stylebot-dropdown").remove();
+                $(document).unbind('mousedown', onClickElsewhere);
+                return true;
+            }
+            return true;
+        };
+        dropdown.appendTo(parent);
+        $(document).bind('mousedown', onClickElsewhere);
     }
 }
