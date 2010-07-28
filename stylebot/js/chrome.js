@@ -17,9 +17,14 @@ stylebot.chrome = {
         chrome.extension.sendRequest({ name: "copyToClipboard", text: text }, function(){});
     },
     
-    // save rules for page
+    // save all rules for a page
     save: function(url, rules) {
         chrome.extension.sendRequest({ name: "save", rules: rules, url: url }, function(){});
+    },
+    
+    // save a rule for a page
+    saveRule: function(url, selector, rule) {
+        chrome.extension.sendRequest({ name: "saveRule", selector: selector, rule: rule, url: url }, function(){});
     },
     
     // send request to fetch options from datastore
@@ -30,7 +35,7 @@ stylebot.chrome = {
     },
     
     saveAccordionState: function(enabledAccordions) {
-        chrome.extension.sendRequest( { name: "saveAccordionState", enabledAccordions: enabledAccordions }, function(){} );
+        chrome.extension.sendRequest({ name: "saveAccordionState", enabledAccordions: enabledAccordions }, function(){} );
     }
 }
 
@@ -48,4 +53,5 @@ chrome.extension.onRequest.addListener(
 		    stylebot.setOptions(request.options);
             sendResponse({});
 		}
-});
+	}
+);

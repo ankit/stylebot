@@ -51,6 +51,8 @@ function attachListeners(){
             
             case "save"             : save(request.url, request.rules); sendResponse({}); break;
             
+            case "saveRule"         : saveRule(request.url, request.selector, request.rule); sendResponse({}); break;
+            
             case "getRulesForPage"  : sendResponse(getRulesForPage(request.url)); sendResponse({}); break;
             
             case "fetchOptions"     : sendResponse({ options: cache.options, enabledAccordions: cache.enabledAccordions }); break;
@@ -87,7 +89,24 @@ function disablePageIcon(tabId) {
 
 /** Data save, load, etc. **/
 
-// save rules for a page
+// save rule
+function saveRule(url, selector, rule) {
+    if (!selector || selector == "")
+        return false;
+    
+    if (rule) {
+        if (!cache.styles[url])
+            cache.styles[url] = new Object();
+        cache.styles[url][selector] = rule;
+    }
+    else {
+        if (cache.styles[url] && cache.styles[url][selector])
+            delete cache.styles[url][selector];
+    }
+    updateStylesInDataStore();
+}
+
+// save all rules for a page
 function save(url, rules) {
     if (rules)
         cache.styles[url] = rules;

@@ -21,6 +21,8 @@ stylebot.style = {
     
     timer: null,
     
+    parser: null,
+    
     cache: {
         // most recently selected elements' selector
         selector: null,
@@ -54,21 +56,54 @@ stylebot.style = {
         }
     },
     
-    // applies property-value pair to selected elements as inline css. Also, updates rules cache
+    // applies property-value pair to selected elements as inline css, updates cache and saves the rule
     // called by basic mode
     apply: function(property, value) {
-        if (!stylebot.style.cache.selector)
+        if (!this.cache.selector || this.cache.selector == "")
             return true;
 
-        stylebot.style.savePropertyToCache(stylebot.style.cache.selector, property, value);
+        this.savePropertyToCache(this.cache.selector, property, value);
+        this.saveRule(this.cache.selector, this.rules[this.cache.selector]);
 
         setTimeout(function() {
             stylebot.style.applyInlineCSS(stylebot.style.cache.elements, stylebot.style.getInlineCSS( stylebot.style.cache.selector));
         }, 0);
-
     },
     
-    // applies css to selected elements as inline css and updates rules cache
+    // add/update property-value pair in rules cache
+    savePropertyToCache: function(selector, property, value) {
+        // check if the selector already exists in the list
+        var rule = this.rules[selector];
+        if (rule != undefined)
+        {
+            if (!this.filter(property, value))
+            {
+                // does a value for property already exist
+                if (rule[property] != undefined)
+                {
+                    delete this.rules[selector][property];
+                 
+                    // if no properties left, remove rule as well
+                    // TODO: Use something more elegant than this hack.
+                    var i = null;
+                    for (i in this.rules[selector])
+                    { break; }
+                 
+                    if (!i)
+                        delete this.rules[selector];
+                }
+            }
+            else
+                rule[property] = value;
+        }
+        else if (this.filter(property, value))
+        {
+            this.rules[selector] = new Object();
+            this.rules[selector][property] = value;
+        }
+    },
+    
+    // applies css to selected elements as inline css and calls saveRuleFromCSS
     // called by advanced mode
     applyCSS: function(css) {
         if (!stylebot.style.cache.selector)
@@ -98,58 +133,27 @@ stylebot.style = {
             stylebot.style.timer = null;
         }
         stylebot.style.timer = setTimeout(function() {
-            stylebot.style.saveRuleToCacheFromCSS(css);
+            stylebot.style.saveRuleFromCSS(css);
         }, 1000);
     },
     
-    // parses CSS into a rule and updates the rules cache
-    saveRuleToCacheFromCSS: function(css) {
+    // parses CSS into a rule, updates the cache and saves the rule
+    saveRuleFromCSS: function(css) {
         if (!this.cache.selector)
             return true;
-        // empty rules cache
+        // empty rule for selector
         delete this.rules[this.cache.selector];
 
-        var parser = new CSSParser();
-        var sheet = parser.parse(this.cache.selector + "{" + css + "}");
+        if (!this.parser)
+            this.parser = new CSSParser();
+        var sheet = this.parser.parse(this.cache.selector + "{" + css + "}");
         var generatedRule = CSSUtils.getRuleFromParserObject(sheet);
-        for (var property in generatedRule) {
-            this.savePropertyToCache(this.cache.selector, property, generatedRule[property]);
-        }
-    },
-    
-    // add/update property-value pair to CSS rules cache
-    savePropertyToCache: function(selector, property, value) {
-        // check if the selector already exists in the list
-        var rule = this.rules[selector];
-        if (rule != undefined)
-        {
-            if (!this.filter(property, value))
-            {
-                // does a value for property already exist
-                var pValue = rule[property];
-                
-                if (pValue != undefined)
-                {
-                    delete this.rules[selector][property];
-                 
-                    // if no properties left, remove rule as well
-                    // TODO: Use something more elegant than this hack.
-                    var i = null;
-                    for (i in this.rules[selector])
-                    { break; }
-                 
-                    if (!i)
-                        delete this.rules[selector];
-                }
-            }
-            else
-                rule[property] = value;
-        }
-        else if (this.filter(property, value))
-        {
-            this.rules[selector] = new Object();
-            this.rules[selector][property] = value;
-        }
+        
+        // save rule to cache
+        this.rules[this.cache.selector] = generatedRule;
+        
+        // save rule
+        this.saveRule(this.cache.selector, this.rules[this.cache.selector]);
     },
     
     // check if a property / value pair is valid for addition to rules cache
@@ -310,11 +314,16 @@ stylebot.style = {
         }, 0);
     },
     
-    // save rules for page
+    // send request to background.html to save all rules in cache
     save: function() {
         stylebot.chrome.save(stylebot.style.cache.url, stylebot.style.rules);
-        if (stylebot.style.originalURL != stylebot.style.cache.url)
-            stylebot.chrome.save(stylebot.style.originalURL, null);
+        // if (stylebot.style.originalURL != stylebot.style.cache.url)
+        //     stylebot.chrome.save(stylebot.style.originalURL, null);
+    },
+
+    // send request to background.html to save rule for selector
+    saveRule: function(selector, rule) {
+        stylebot.chrome.saveRule(stylebot.style.cache.url, selector, rule);
     },
     
     // called when stylebot is disabled. resets cache and all inline css. Also, updates the <style> element

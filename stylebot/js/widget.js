@@ -144,7 +144,7 @@ stylebot.widget = {
             id: 'stylebot-main-buttons'
         });
         
-        WidgetUI.createButton("Save").appendTo(btContainer).click(stylebot.widget.save);
+        // WidgetUI.createButton("Save").appendTo(btContainer).click(stylebot.widget.save);
         WidgetUI.createButton("View CSS").appendTo(btContainer).click(stylebot.widget.viewCSS);
         WidgetUI.createButton("Reset").appendTo(btContainer).click(stylebot.widget.resetCSS);
         WidgetUI.createButton("Reset All").appendTo(btContainer).click(stylebot.widget.resetAllCSS);
@@ -356,7 +356,7 @@ stylebot.widget = {
             id: "stylebot-dropdown"
         })
         .css({
-            left: parent.width() + 15,
+            left: parent.width() + 40,
             top: parent.offset().top + parent.height()
         });
         
