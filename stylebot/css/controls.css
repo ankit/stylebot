@@ -66,6 +66,7 @@ input[type="text"].stylebot-textfield, textarea.stylebot-textarea {
     font-size: 11px !important;
     outline: none !important;
     width: auto;
+    -webkit-box-shadow: none !important;
 }
 
 input.stylebot-textfield:disabled, textarea.stylebot-textarea:disabled {

@@ -212,8 +212,9 @@ stylebot.widget = {
             this.enable();
         else
             this.disable();
-
-        this.updateHeight();
+        setTimeout(function() {
+            stylebot.widget.updateHeight();
+        }, 0);
         this.setMode();
         this.cache.box.show();
     },
@@ -257,6 +258,7 @@ stylebot.widget = {
         stylebot.widget.cache.box.css('height', window.innerHeight);
 
         var headerHeight = stylebot.widget.cache.header.height();
+        
         var optionsHeight = 150;
         if (headerHeight != 0)
             headerHeight -= 36;
@@ -353,7 +355,10 @@ stylebot.widget = {
         dropdown = $("<div>", {
             id: "stylebot-dropdown"
         })
-        .css('left', parent.width() + 15);
+        .css({
+            left: parent.width() + 15,
+            top: parent.offset().top + parent.height()
+        });
         
         var any = false;
         for (var selector in stylebot.style.rules) {

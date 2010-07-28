@@ -59,36 +59,35 @@
     clear: both !important;
     font-size: 11px !important;
     float: left !important;
-    line-height: 12px !important;
     margin-top: 10px !important;
 }
 
 #stylebot-header-selector {
-    float: left !important;
-    line-height: 12px !important;
     border: 1px solid #bbb !important;
     border-radius: 2px !important;
+    display: inline-block !important;
+    float: left !important;
+    width: auto !important;
 }
 
 #stylebot-header-selector .stylebot-editable-text{
     float: left !important;
     padding: 0 !important;
     padding-left: 3px !important;
+    width: auto !important;
 }
 
 #stylebot-dropdown {
-    background-color: #333 !important;
+    background-color: #fbfbfb !important;
+    border: 1px solid #ccc !important;
     border-radius: 2px !important;
-    color: #fff !important;
+    color: #333 !important;
     display: block;
     font-size: 11px !important;
     font-weight: normal !important;
-    min-width: 30px;
-    max-width: 100px;
+    min-width: 40px;
+    max-width: 150px;
     position: absolute;
-    left: 50%;
-    line-height: 10px !important;
-    top: 4%;
     text-shadow: none !important;
     z-index: 10000000 !important;
 }
@@ -100,9 +99,9 @@
 }
 
 #stylebot-dropdown li.stylebot-dropdown-li:hover {
-    background-color: #fff !important;
+    background-color: #555 !important;
     cursor: pointer;
-    color: #333 !important;
+    color: #fff !important;
 }
 
 /* @group Header Icons */
@@ -226,7 +225,7 @@
 
 .stylebot-label {
     color: #333;
-    display: inline-block;
+    display: inline-block !important;
     float: none !important;
     font-family: inherit !important;
     font-size: 11px !important;

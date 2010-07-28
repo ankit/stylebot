@@ -51,16 +51,16 @@
 		</div><br>
 		<button onclick="addStyle();">Add Style</button>
 		<br><br>
-		<div id="backup">
-			<h2>Backup</h2>
-			<button onclick="export();">Export</button>
-			<button onclick="import();">Import</button>
-		</div><br>
 		<div id="sync">
 			<h2>Sync</h2>
 			<div class="description">This will sync your custom styles across multiple computers. For this to work, you need to have <a href="http://www.google.com/support/chrome/bin/answer.py?hl=en&answer=165139">Bookmark Sync enabled</a>.<br><div id="sync_status">Syncing is currently disabled.</div><br></div>
 			<button onclick="toggleSyncing();" id="sync_button">Start Syncing</button>
 			<button onclick="bg_window.sync();" style="display: none" id="sync_now">Sync Now</button>
+		</div><br>
+		<div id="backup">
+			<h2>Backup</h2>
+			<button onclick="export();">Export</button>
+			<button onclick="import();">Import</button>
 		</div>
 		<br><br>
 		<div id="footer">
