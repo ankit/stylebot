@@ -248,7 +248,7 @@ stylebot.widget = {
         if (where == "Left")
             left = 0;
         else if (where == "Right")
-            left = $(window).width() - this.defaults.width - 2; // some padding
+            left = $(window).width() - this.defaults.width - 3; // some padding
 
         this.cache.box.css('left', left);
         stylebot.options.position = where;
