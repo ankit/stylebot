@@ -150,13 +150,13 @@ var stylebot = {
     },
     
     attachListeners: function() {
-        document.body.addEventListener('mouseover', this.onMouseOver, true);
-        document.body.addEventListener('click', this.onMouseClick, true);
+        document.addEventListener('mouseover', this.onMouseOver, true);
+        document.addEventListener('mousedown', this.onMouseClick, true);
     },
     
     detachListeners: function() {
-        document.body.removeEventListener('mouseover', this.onMouseOver, true);
-        document.body.removeEventListener('click', this.onMouseClick, true);
+        document.removeEventListener('mouseover', this.onMouseOver, true);
+        document.removeEventListener('mousedown', this.onMouseClick, true);
     },
     
     onMouseOver: function(e) {
@@ -191,7 +191,7 @@ var stylebot = {
                 return false;
             }
         }
-        return true;
+        return false;
     },
     
     belongsToStylebot: function(el) {

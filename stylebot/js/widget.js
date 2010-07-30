@@ -356,8 +356,8 @@ stylebot.widget = {
             id: "stylebot-dropdown"
         })
         .css({
-            left: parent.width() + 40,
-            top: parent.offset().top + parent.height()
+            left: parent.offset().left + parent.width() - 40,
+            top: parent.height() + 10
         });
         
         var any = false;

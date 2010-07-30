@@ -16,7 +16,7 @@
     top: 0% !important;
     width: 320px !important;
     -webkit-box-shadow: 0px 0px 5px #ccc !important;
-    z-index: 1000000 !important;
+    z-index: 100000000000 !important;
 }
 
 /* @end */
@@ -51,7 +51,7 @@
 #stylebot-header-container {
     display: inline-block;
     float: left !important;
-    width: 70% !important;
+    width: 73% !important;
 }
 
 #stylebot-header-url {
@@ -67,6 +67,8 @@
     border-radius: 2px !important;
     display: inline-block !important;
     float: left !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
     width: auto !important;
 }
 
@@ -81,21 +83,23 @@
     background-color: #fbfbfb !important;
     border: 1px solid #ccc !important;
     border-radius: 2px !important;
-    color: #333 !important;
     display: block;
-    font-size: 11px !important;
-    font-weight: normal !important;
+    width: auto !important;
     min-width: 40px;
     max-width: 150px;
-    position: absolute;
-    text-shadow: none !important;
+    position: fixed !important;
     z-index: 10000000 !important;
 }
 
 #stylebot-dropdown li {
+    color: #333 !important;
     display: block !important;
+    font-size: 11px !important;
+    font-weight: normal !important;
+    font-family: inherit !important;
     list-style-type: none;
     padding: 2px !important;
+    text-shadow: none !important;
 }
 
 #stylebot-dropdown li.stylebot-dropdown-li:hover {
