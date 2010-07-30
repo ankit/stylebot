@@ -288,13 +288,13 @@ function setSyncUI() {
 function toggleSyncing() {
     if (options.sync) {
         options.sync = false;
-        bg_window.saveOption("sync", true);
+        bg_window.saveOption("sync", false);
         bg_window.stopSync();
     }
     else {
         options.sync = true;
         bg_window.saveOption("sync", true);
-        bg_window.sync();
+        bg_window.startSync();
     }
     setSyncUI();
 }

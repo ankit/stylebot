@@ -130,6 +130,27 @@ function saveStylesLocally(styles) {
     localStorage['stylebot_styles'] = jsonString;
 }
 
+function mergeStyles(s1, s2) {
+    if (!s2)
+        s2 = new Object();
+    for (var url in s1) {
+        if (s2[url]) {
+            for (var selector in s1[url]) {
+                if (s2[url][selector]) {
+                    for (var property in s1[url][selector]) {
+                        s2[url][selector][property] = s1[url][selector][property];
+                    }
+                }
+                else
+                    s2[url][selector] = s1[url][selector];
+            }
+        }
+        else
+            s2[url] = s1[url];
+    }
+    return s2;
+}
+
 function updateStylesInDataStore() {
     var jsonString = JSON.stringify(cache.styles);
     localStorage['stylebot_styles'] = jsonString;
