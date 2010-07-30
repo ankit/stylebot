@@ -17,17 +17,17 @@ var saveSyncDataWasCalled = false;
 var syncName = "stylebot";
 var syncBookmarkName = syncName + "_data";
 var syncURL = "http://" + syncName + "/?data=";
-var syncSource = "cache.styles";
 var onSync = saveStylesLocally;
+// data source is cache.styles here
 
 // loads data from bookmark (if it exists). If no data is returned, saves local data in the bookmark
 function sync() {
     loadSyncData(function(data) {
-        if (data && data != window[syncSource]) {
+        if (data && data != cache.styles) {
             onSync(data);
         }
         else {
-            saveSyncData(window[syncSource]);
+            saveSyncData(cache.styles);
         }
     });
 }
@@ -109,7 +109,7 @@ function saveSyncData(data) {
             // some develish power deleted the bookmark. reset syncId and create a new bookmark
             if (!bookmark) {
                 syncId = null;
-                saveSyncData(window[syncSource]);
+                saveSyncData(cache.styles);
             }
         });
     }
