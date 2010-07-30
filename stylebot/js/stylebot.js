@@ -151,12 +151,14 @@ var stylebot = {
     
     attachListeners: function() {
         document.addEventListener('mouseover', this.onMouseOver, true);
-        document.addEventListener('mousedown', this.onMouseClick, true);
+        document.addEventListener('mousedown', this.onMouseDown, true);
+        document.addEventListener('click', this.onMouseClick, true);
     },
     
     detachListeners: function() {
         document.removeEventListener('mouseover', this.onMouseOver, true);
-        document.removeEventListener('mousedown', this.onMouseClick, true);
+        document.removeEventListener('mousedown', this.onMouseDown, true);
+        document.removeEventListener('click', this.onMouseClick, true);
     },
     
     onMouseOver: function(e) {
@@ -175,23 +177,34 @@ var stylebot = {
             stylebot.unhighlight();
             return true;
         }
+        e.preventDefault();
+        e.stopPropagation();
         stylebot.highlight(e.target);
     },
 
-    onMouseClick: function(e) {
+    onMouseDown: function(e) {
         if (stylebot.hoveredElement &&
-            stylebot.status &&
+            stylebot.selectionStatus &&
             !stylebot.belongsToStylebot(e.target)
             )
         {
             e.preventDefault();
             e.stopPropagation();
-            if (stylebot.selectionStatus) {
-                stylebot.select();
-                return false;
-            }
+            return false;
         }
-        return false;
+    },
+    
+    onMouseClick: function(e) {
+        if (stylebot.hoveredElement &&
+            stylebot.selectionStatus &&
+            !stylebot.belongsToStylebot(e.target)
+            )
+        {
+            e.preventDefault();
+            e.stopPropagation();
+            stylebot.select();
+            return false;
+        }
     },
     
     belongsToStylebot: function(el) {
