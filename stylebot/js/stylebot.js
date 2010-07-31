@@ -82,8 +82,8 @@ var stylebot = {
     
     // called when user selects an element
     select: function(el, selector) {
-        // preference is given to element over selector
         stylebot.disableSelection();
+        // preference is given to element over selector
         if (el)
         {
             stylebot.selectedElement = el;
@@ -124,6 +124,7 @@ var stylebot = {
     },
     
     enableSelection: function() {
+        stylebot.attachListeners();
         stylebot.selectionStatus = true;
         stylebot.widget.cache.headerSelectIcon
         .addClass('stylebot-select-icon-active')
@@ -131,6 +132,7 @@ var stylebot = {
     },
     
     disableSelection: function() {
+        stylebot.detachListeners();
         stylebot.selectionStatus = false;
         stylebot.widget.cache.headerSelectIcon
         .removeClass('stylebot-select-icon-active')
@@ -158,6 +160,12 @@ var stylebot = {
     detachListeners: function() {
         document.removeEventListener('mouseover', this.onMouseOver, true);
         document.removeEventListener('mousedown', this.onMouseDown, true);
+    },
+    
+    detachClickListener: function() {
+        // We have to remove the click listener in a second phase because if we remove it
+        // after the mousedown, we won't be able to cancel clicked links
+        // thanks to firebug
         document.removeEventListener('click', this.onMouseClick, true);
     },
     
@@ -166,7 +174,6 @@ var stylebot = {
             || stylebot.widget.isBeingDragged
             || stylebot.modal.isVisible
             || stylebot.hoveredElement == e.target
-            || !stylebot.selectionStatus
             )
         {
             return true;
@@ -183,22 +190,7 @@ var stylebot = {
     },
 
     onMouseDown: function(e) {
-        if (stylebot.hoveredElement &&
-            stylebot.selectionStatus &&
-            !stylebot.belongsToStylebot(e.target)
-            )
-        {
-            e.preventDefault();
-            e.stopPropagation();
-            return false;
-        }
-    },
-    
-    onMouseClick: function(e) {
-        if (stylebot.hoveredElement &&
-            stylebot.selectionStatus &&
-            !stylebot.belongsToStylebot(e.target)
-            )
+        if (!stylebot.belongsToStylebot(e.target))
         {
             e.preventDefault();
             e.stopPropagation();
@@ -207,8 +199,18 @@ var stylebot = {
         }
     },
     
+    onMouseClick: function(e) {
+        if (!stylebot.belongsToStylebot(e.target))
+        {
+            e.preventDefault();
+            e.stopPropagation();
+            stylebot.detachClickListener();
+            return false;
+        }
+    },
+    
     belongsToStylebot: function(el) {
-        $el = $(el);
+        var $el = $(el);
         var parent = $el.closest('#stylebot, .stylebot_colorpicker');
         var id = $el.attr('id');
         if (parent.length != 0 || id.indexOf("stylebot") != -1)

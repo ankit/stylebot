@@ -1,7 +1,7 @@
 /* base */
 .stylebot_colorpicker {
 	width: 208px;
-	z-index: 10000000;
+    z-index: 10000000000 !important;
 	height: 174px;
 	overflow: hidden;
 	position: absolute;
