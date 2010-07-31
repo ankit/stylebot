@@ -154,7 +154,6 @@ function mergeStyles(s1, s2) {
 function updateStylesInDataStore() {
     var jsonString = JSON.stringify(cache.styles);
     localStorage['stylebot_styles'] = jsonString;
-
     // is sync enabled? if yes, store in bookmark as well
     if (cache.options.sync)
         saveSyncData(jsonString);

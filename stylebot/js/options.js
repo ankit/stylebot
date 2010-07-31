@@ -123,7 +123,7 @@ function createCustomStyleOption(url, rules) {
         setTimeout(function(){
             url_div.focus();
         }, 0);
-    });
+    }, {fixedWidth: 400});
     
     var b_container = $('<div>', {
         class: 'button-container'
@@ -262,8 +262,13 @@ function importCSS() {
     {
         $(".custom-style").html("");
         fillCustomStyles(json);
-        styles = JSON.parse(json);
-        bg_window.saveStyles(styles);
+        try {
+            styles = JSON.parse(json);
+            bg_window.saveStyles(styles);
+        }
+        catch(e) {
+            
+        }
     }
 }
 

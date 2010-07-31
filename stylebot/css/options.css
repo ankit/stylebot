@@ -1,11 +1,12 @@
 body {
-	background-color: #fafbff;
-	font-size: 15px;
+    background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#eee), to(#ccc));
+	font-size: 16px;
 	line-height: 28px;
-    font-family: "Lucida Grande", Helvetica, Arial, sans-serif;
+	font-family: Georgia, Palatino, "Palatino Linotype", serif;
 	color: #333;
 	margin: 0;
 	padding: 0;
+    text-shadow: #fff 0px 1px 0px;
 }
 
 #wrap {
@@ -15,35 +16,33 @@ body {
 }
 
 h1 {
-    color: #5cd458;
-    font-size: 30px;
+    color: #73a4c4;
+    font-size: 32px;
 	text-align: center;
 }
 
 h2 {
-    border-bottom: 1px solid #eee;
-    font-size: 16px;
+	font-size: 16px;
     font-weight: bold;
-    color: #333;
+	color: #444;
+	margin: 0;
+	padding: 0;
+	padding-bottom: 10px;
 }
 
 a {
-    color: #4c68bd;
+    color: #245571;
     text-decoration: none;
 }
 
 a:hover {
-    text-decoration: underline;
+    color: #18384a;
 }
 
 #options {
-    background-color: #fff;
-    border: 1px solid #e8e9ed;
-    border-radius: 5px;
     margin: 0;
     padding: 20px;
     padding-bottom: 0px;
-    -webkit-box-shadow: 0px 0px 10px #eff0f3;
 }
 
 li.option {
@@ -55,7 +54,6 @@ li.option {
 li.option label {
     width: 400px;
     display: inline-block;
-
 }
 
 .option-field {
@@ -66,10 +64,13 @@ li.option label {
 input[type=text] {
     border: 1px solid #ccc;
     border-radius: 2px;
-    color: #414141;
-    font-size: 15px;
+    background-color: #fbfbfb;
+    color: #333;
+	font-family: Georgia, Palatino, "Palatino Linotype", serif;
+    font-size: 16px;
     padding: 2px;
     text-align: right;
+    -webkit-box-shadow: 0px 1px 0px #fff;
 }
 
 #main-buttons {
@@ -78,25 +79,25 @@ input[type=text] {
 }
 
 button {
-    background-color: #fbfbfb;
-    border: 1px solid #aaa;
+    background-color: #e6e6e6;
+    border: 1px solid #b6b6b6;
     border-radius: 2px;
     color: #333;
-    font-size: 15px;
+    cursor: pointer;
+    font-family: Georgia, Palatino, "Palatino Linotype", serif;
+    font-size: 14px;
 }
 
 button:hover {
-    background-color: #e8e9ed;
-    color: #333;
-    cursor: pointer;
+    background-color: #fbfbfb;
 }
 
 button:active {
-    background-color: #cfd1d7;
+    background-color: #555;
+    color: #fbfbfb;
 }
 
 button.inline-button {
-    font-size: 12px;
     display: inline-block;
     margin: 5px 5px;
 }
@@ -106,9 +107,13 @@ select {
 }
 
 /* custom styles section */
+.custom-style {
+    clear: both;
+}
+
 .custom-style-url {
-    display: inline-block;
     padding: 2px;
+    float: left;
 }
 
 .custom-style-url:hover {
@@ -125,9 +130,7 @@ select {
     text-align: left;
     width: 400px;
     outline: none;
-    border: 2px solid #ccc;
-    background-color: #eee;
-    color: #333;
+    border: 1px solid #ccc;
     display: inline-block;
 }
 
@@ -136,11 +139,20 @@ select {
 }
 
 textarea.stylebot-css-code {
-    color: #333 !important;
-    font-size: 11px !important;
-    font-family: Monaco, 'Lucida Console', monospace !important;
+    color: #333 ;
+    font-size: 11px ;
+    font-family: Monaco, 'Lucida Console', monospace ;
     line-height: 16px;
     padding: 2px;
+}
+
+#stylebot-modal div {
+	font-family: Georgia, Palatino, "Palatino Linotype", serif;
+	font-size: 16px;
+}
+
+#stylebot-modal .description {
+    color: #666;
 }
 
 #stylebot-modal input {
@@ -148,15 +160,13 @@ textarea.stylebot-css-code {
 }
 
 .description {
-    font-size: 11px;
-    color: #777;
-    line-height: 15px;
+    color: #444;
+    font-size: 12px !important;
+    line-height: 16px;
 }
 
 #footer {
-    border-top: 1px solid #eee;
-    font-size: 11px;
-    color: #777;
+    font-size: 12px;
     text-align: center;
     line-height: 18px;
     padding-bottom: 20px;
