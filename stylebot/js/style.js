@@ -63,7 +63,7 @@ stylebot.style = {
             return true;
 
         this.savePropertyToCache(this.cache.selector, property, value);
-        this.saveRule(this.cache.selector, this.rules[this.cache.selector]);
+        this.save();
 
         setTimeout(function() {
             stylebot.style.applyInlineCSS(stylebot.style.cache.elements, stylebot.style.getInlineCSS( stylebot.style.cache.selector));
@@ -152,8 +152,8 @@ stylebot.style = {
         // save rule to cache
         this.rules[this.cache.selector] = generatedRule;
         
-        // save rule
-        this.saveRule(this.cache.selector, this.rules[this.cache.selector]);
+        // save rules persistently
+        this.save();
     },
     
     // check if a property / value pair is valid for addition to rules cache
@@ -316,7 +316,14 @@ stylebot.style = {
     
     // send request to background.html to save all rules in cache
     save: function() {
-        stylebot.chrome.save(stylebot.style.cache.url, stylebot.style.rules);
+        // if no rules are present, send null as value, so that entry for url is removed from storage
+        var rules = null;
+        var i = false;
+        for (var i in stylebot.style.rules)
+            break;
+        if (i)
+            rules = stylebot.style.rules;
+        stylebot.chrome.save(stylebot.style.cache.url, rules);
         // if (stylebot.style.originalURL != stylebot.style.cache.url)
         //     stylebot.chrome.save(stylebot.style.originalURL, null);
     },

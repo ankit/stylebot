@@ -26,7 +26,7 @@ var onMerge = mergeStyles;
 // loads data from bookmark (if it exists). If no data is returned, saves local data in the bookmark
 function sync() {
     loadSyncData(function(data) {
-        if (data && data != cache.styles) {
+        if (data) {
             onSync(data);
         }
         else {
@@ -37,10 +37,10 @@ function sync() {
 
 // called when syncing is turned on in options page
 // the only difference between this and sync() is that it merges local data with data from bookmark
-function startSync() {
+function syncWithMerge() {
     loadSyncData(function(data) {
-        if (data && data != cache.styles) {
-            if (onMerge) {
+        if (data) {
+            if (onMerge && data != cache.styles) {
                 data = onMerge(data, cache.styles);
                 saveSyncData(data);
             }
@@ -52,8 +52,18 @@ function startSync() {
     });
 }
 
+// called when syncing is turned on in options page and if sync is enabled, when background.html loads
+function enableSync(merge) {
+    attachSyncListeners();
+    if (merge)
+        syncWithMerge();
+    else
+        sync();
+}
+
 // called when syncing is turned off in options page
-function stopSync() {
+function disableSync() {
+    detachSyncListeners();
 }
 
 // loads data from bookmark and handles duplicate bookmarks.
@@ -71,7 +81,6 @@ function loadSyncData(callback) {
             syncFolderId = bookmark.parentId;
             // handle duplicates
             if (bookmarks.length > 1) {
-                
                 // iterate through all the surplus bookmarks and merge data from them
                 var len = bookmarks.length;
                 for (var i = 1; i < len; i++) {
@@ -155,25 +164,33 @@ function getURLFromData(data) {
     return syncURL + escape(data);
 }
 
-// add listener to sync when bookmark is changed
-chrome.bookmarks.onChanged.addListener(function(id, properties) {
+function attachSyncListeners() {
+    // add listener to sync when bookmark is changed
+    chrome.bookmarks.onChanged.addListener(onBookmarkUpdate);
+
+    // add listener to sync when bookmark is removed
+    // this handles the situation when Bookmark Sync is enabled on another machine
+    chrome.bookmarks.onRemoved.addListener(onBookmarkUpdate);
+
+    // add listener to sync when a bookmark is created in the sync folder
+    // this handles duplicate bookmarks when Bookmark Sync is enabled
+    chrome.bookmarks.onCreated.addListener(onBookmarkCreate);
+}
+
+function detachSyncListeners() {
+    chrome.bookmarks.onChanged.removeListener(onBookmarkUpdate);
+    chrome.bookmarks.onRemoved.removeListener(onBookmarkUpdate);
+    chrome.bookmarks.onCreated.removeListener(onBookmarkCreate);
+}
+
+function onBookmarkUpdate(id, properties) {
     if (cache.options.sync && id == syncId && !saveSyncDataWasCalled) {
         sync();
     }
-});
+}
 
-// add listener to sync when bookmark is removed
-// this handles the situation when Bookmark Sync is enabled on another machine
-chrome.bookmarks.onRemoved.addListener(function(id, properties) {
-    if (cache.options.sync && id == syncId && !saveSyncDataWasCalled) {
-        sync();
-    }
-});
-
-// add listener to sync when a bookmark is created in the sync folder
-// this handles duplicate bookmarks when Bookmark Sync is enabled
-chrome.bookmarks.onCreated.addListener(function(id, bookmark) {
+function onBookmarkCreate(id, bookmark) {
     if (cache.options.sync && bookmark.parentId == syncFolderId && !saveSyncDataWasCalled) {
         sync();
     }
-});
+}

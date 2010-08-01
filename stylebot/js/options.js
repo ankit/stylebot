@@ -294,12 +294,12 @@ function toggleSyncing() {
     if (options.sync) {
         options.sync = false;
         bg_window.saveOption("sync", false);
-        bg_window.stopSync();
+        bg_window.disableSync();
     }
     else {
         options.sync = true;
         bg_window.saveOption("sync", true);
-        bg_window.startSync();
+        bg_window.enableSync(true);
     }
     setSyncUI();
 }

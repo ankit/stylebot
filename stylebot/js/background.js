@@ -130,9 +130,12 @@ function saveStylesLocally(styles) {
     localStorage['stylebot_styles'] = jsonString;
 }
 
+// styles from both objects are merged
+// for common properties, s2 is given priority over s1
 function mergeStyles(s1, s2) {
-    if (!s2)
-        s2 = new Object();
+    if (!s2) {
+        return s1;
+    }
     for (var url in s1) {
         if (s2[url]) {
             for (var selector in s1[url]) {
@@ -169,7 +172,7 @@ function loadStylesIntoCache() {
         }
     }
     if (cache.options.sync)
-        sync();
+        enableSync();
 }
 
 function loadOptionsIntoCache() {
