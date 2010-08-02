@@ -77,12 +77,12 @@ function handlePageIconClick(tab) {
 
 function enablePageIcon(tabId) {
     chrome.pageAction.setIcon({ tabId: tabId, path: "images/icon19_on.png" });
-    chrome.pageAction.setTitle({ tabId: tabId, title: "Click to turn CSS editing off" });
+    chrome.pageAction.setTitle({ tabId: tabId, title: "Click to stop editing using Stylebot" });
 }
 
 function disablePageIcon(tabId) {
     chrome.pageAction.setIcon({ tabId: tabId, path: "images/icon19_off.png" });
-    chrome.pageAction.setTitle({ tabId: tabId, title: "Click to turn CSS editing on" });
+    chrome.pageAction.setTitle({ tabId: tabId, title: "Click to start editing using Stylebot" });
 }
 
 /** End of Page Action Handling **/

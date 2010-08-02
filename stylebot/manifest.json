@@ -69,7 +69,7 @@
 	
 	"page_action": {
 		"default_icon": "images/icon19_off.png",
-		"default_title": "Click to turn CSS editing on"
+		"default_title": "Click to start editing using Stylebot"
 	},
 	
 	"icons": {
