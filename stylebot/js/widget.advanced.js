@@ -16,7 +16,7 @@ stylebot.widget.advanced = {
             id: 'stylebot-advanced'
         });
         $('<div>', {
-            html: "Custom CSS for element(s):"
+            html: "Custom CSS for selected element(s):"
         })
         .appendTo(this.cache.container);
         

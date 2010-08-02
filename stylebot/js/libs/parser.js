@@ -1119,7 +1119,7 @@ CSSParser.prototype = {
             valid = true;
             break;
           } else {
-            var d = this.parseDeclaration(token, declarations, true, true, aSheet);
+            var d = this.parseDeclaration(token, declarations, true, false, aSheet);
             s += ((d && declarations.length) ? " " : "") + d;
           }
           token = this.getToken(true, false);
@@ -2512,7 +2512,7 @@ CSSParser.prototype = {
             valid = true;
             break;
           } else {
-            var d = this.parseDeclaration(token, declarations, true, true, aOwner);
+            var d = this.parseDeclaration(token, declarations, true, false, aOwner);
             s += ((d && declarations.length) ? " " : "") + d;
           }
           token = this.getToken(true, false);
@@ -3324,7 +3324,7 @@ jscsspDeclaration.prototype = {
     var declarations = [];
     var parser = new CSSParser(val);
     var token = parser.getToken(true, true);
-    if (parser.parseDeclaration(token, declarations, true, true, null)
+    if (parser.parseDeclaration(token, declarations, true, false, null)
         && declarations.length
         && declarations[0].type == kJscsspSTYLE_DECLARATION) {
       var newDecl = declarations.cssRules[0];

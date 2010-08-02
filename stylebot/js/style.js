@@ -89,7 +89,6 @@ stylebot.style = {
                     var i = null;
                     for (i in this.rules[selector])
                     { break; }
-                 
                     if (!i)
                         delete this.rules[selector];
                 }
@@ -145,13 +144,14 @@ stylebot.style = {
         // empty rule for selector
         delete this.rules[this.cache.selector];
 
-        if (!this.parser)
-            this.parser = new CSSParser();
-        var sheet = this.parser.parse(this.cache.selector + "{" + css + "}");
-        var generatedRule = CSSUtils.getRuleFromParserObject(sheet);
-        
-        // save rule to cache
-        this.rules[this.cache.selector] = generatedRule;
+        if (css != "") {
+            if (!this.parser)
+                this.parser = new CSSParser();
+            var sheet = this.parser.parse(this.cache.selector + "{" + css + "}");
+            var generatedRule = CSSUtils.getRuleFromParserObject(sheet);
+            // save rule to cache
+            this.rules[this.cache.selector] = generatedRule;
+        }
         
         // save rules persistently
         this.save();
@@ -164,7 +164,7 @@ stylebot.style = {
         
         var sizeProperties = [ 'font-size', 'line-height', 'letter-spacing', 'letter-height', 'margin', 'margin-top', 'margin-right', 'margin-bottom', 'margin-left', 'padding', 'padding-top', 'padding-right', 'padding-bottom', 'padding-left', 'border-width', 'border-top-width', 'border-right-width', 'border-bottom-width', 'border-left-width' ];
         
-        if ($.inArray(property, sizeProperties) != -1)
+        if ($.inArray(property, sizeProperties) != -1 && parseInt(value))
         {
             if ($.inArray(value, WidgetUI.validSizeUnits) != -1)
                 return false;
@@ -294,7 +294,7 @@ stylebot.style = {
     
     // remove any existing custom CSS for current selector from rules cache and selected elements' inline css
     remove: function() {
-        if (this.rules[this.cache.selector] != undefined)
+        if (this.rules[this.cache.selector])
             delete this.rules[this.cache.selector];
         this.clearInlineCSS(this.cache.elements);
         setTimeout(function() {
