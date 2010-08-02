@@ -279,13 +279,13 @@ function importCSS() {
 function setSyncUI() {
     var status = $('#sync_status');
     if (options.sync) {
-        status.html("Syncing is currently enabled.");
-        $('#sync_button').html("Stop Syncing");
+        $('#sync_button').html("Disable Sync");
+        $('#sync_enabled_note').show();
         $('#sync_now').show();
     }
     else {
-        status.html("Syncing is currently disabled.");
-        $('#sync_button').html("Start Syncing");
+        $('#sync_button').html("Enable Sync");
+        $('#sync_enabled_note').hide();
         $('#sync_now').hide();
     }
 }

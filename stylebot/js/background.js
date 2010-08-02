@@ -31,6 +31,8 @@ function init(){
     loadOptionsIntoCache();
     loadStylesIntoCache();
     loadAccordionState();
+    if (cache.options.sync)
+        loadSyncId();
 }
 
 function attachListeners(){
@@ -168,9 +170,12 @@ function mergeStyles(s1, s2) {
 function updateStylesInDataStore() {
     var jsonString = JSON.stringify(cache.styles);
     localStorage['stylebot_styles'] = jsonString;
+    
+    /** Automatic Sync is disabled for now, until it is made more robust **/
+    
     // is sync enabled? if yes, store in bookmark as well
-    if (cache.options.sync)
-        saveSyncData(jsonString);
+    // if (cache.options.sync)
+    //     saveSyncData(jsonString);
 }
 
 function loadStylesIntoCache() {
@@ -182,8 +187,6 @@ function loadStylesIntoCache() {
             cache.styles = {};
         }
     }
-    if (cache.options.sync)
-        enableSync();
 }
 
 function loadOptionsIntoCache() {

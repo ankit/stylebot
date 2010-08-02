@@ -27,7 +27,8 @@ var onMerge = mergeStyles;
 function sync() {
     loadSyncData(function(data) {
         if (data) {
-            onSync(data);
+            if (data != cache.styles)
+                onSync(data);
         }
         else {
             saveSyncData(cache.styles);
@@ -135,6 +136,13 @@ function saveSyncData(data) {
             }
         });
     }
+}
+
+function loadSyncId() {
+     loadBookmark(null, syncBookmarkName, function(bookmarks) {
+         if (bookmarks.length != 0)
+            syncId = bookmarks[0].id;
+     });
 }
 
 // returns json object from url of the form http://syncName?data={...}
