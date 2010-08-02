@@ -17,8 +17,6 @@ stylebot.style = {
     */
     rules: {},
     
-    originalURL: null,
-    
     timer: null,
     
     parser: null,
@@ -37,8 +35,11 @@ stylebot.style = {
         if (stylebotTempUrl)
         {
             this.cache.url = stylebotTempUrl;
-            this.originalURL = stylebotTempUrl;
             delete stylebotTempUrl;
+        }
+        // if domain is empty, return url
+        else if (!this.cache.url || this.cache.url == "") {
+            this.cache.url = location.href;
         }
         if (stylebotTempRules)
         {
@@ -299,6 +300,8 @@ stylebot.style = {
         setTimeout(function() {
             stylebot.selectionBox.highlight(stylebot.selectedElement);
         }, 0);
+        // save
+        this.save();
     },
     
     // remove all custom css for page from rules cache, stylebot's <style> element and inline css
@@ -312,6 +315,8 @@ stylebot.style = {
         setTimeout(function() {
             stylebot.selectionBox.highlight(stylebot.selectedElement);
         }, 0);
+        // save
+        this.save();
     },
     
     // send request to background.html to save all rules in cache
@@ -324,13 +329,6 @@ stylebot.style = {
         if (i)
             rules = stylebot.style.rules;
         stylebot.chrome.save(stylebot.style.cache.url, rules);
-        // if (stylebot.style.originalURL != stylebot.style.cache.url)
-        //     stylebot.chrome.save(stylebot.style.originalURL, null);
-    },
-
-    // send request to background.html to save rule for selector
-    saveRule: function(selector, rule) {
-        stylebot.chrome.saveRule(stylebot.style.cache.url, selector, rule);
     },
     
     // called when stylebot is disabled. resets cache and all inline css. Also, updates the <style> element

@@ -84,6 +84,9 @@ stylebot.widget = {
         // Make url editable
         Utils.makeEditable(url, function(value) {
             stylebot.widget.updateHeight();
+            if (value != stylebot.style.cache.url) {
+                stylebot.chrome.transfer(stylebot.style.cache.url, value);
+            }
             stylebot.style.cache.url = value;
         }, {
             selectText: true,

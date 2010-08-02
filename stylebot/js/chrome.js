@@ -22,9 +22,9 @@ stylebot.chrome = {
         chrome.extension.sendRequest({ name: "save", rules: rules, url: url }, function(){});
     },
     
-    // save a rule for a page
-    saveRule: function(url, selector, rule) {
-        chrome.extension.sendRequest({ name: "saveRule", selector: selector, rule: rule, url: url }, function(){});
+    // transfer all rules for src url to dest url
+    transfer: function(src, dest) {
+        chrome.extension.sendRequest({name: "transfer", source: src, destination: dest}, function(){});
     },
     
     // send request to fetch options from datastore

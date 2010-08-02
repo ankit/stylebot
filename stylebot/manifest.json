@@ -7,7 +7,7 @@
 	
 	"content_scripts": [
 	{
-		"matches":["http://*/*", "https://*/*"],
+		"matches":["http://*/*", "https://*/*", "file:///*/*"],
 		
 		"js": [
 			"js/libs/css-utils.js",
@@ -29,7 +29,7 @@
 		"all_frames": true
 	},
 	{
-		"matches": ["http://*/*", "https://*/*"],
+		"matches": ["http://*/*", "https://*/*", "file:///*/*"],
 		
 		"css": [
 			"css/highlight.css",
@@ -70,6 +70,12 @@
 	"page_action": {
 		"default_icon": "images/icon19_off.png",
 		"default_title": "Click to turn CSS editing on"
+	},
+	
+	"icons": {
+		"16": "images/icon16.png",
+		"48": "images/icon48.png",
+		"128": "images/icon128.png"
 	},
 	
 	"permissions": ["tabs", "http://userstyles.org/", "bookmarks"]

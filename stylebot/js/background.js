@@ -50,8 +50,8 @@ function attachListeners(){
             case "copyToClipboard"  : copyToClipboard(request.text); sendResponse({}); break;
             
             case "save"             : save(request.url, request.rules); sendResponse({}); break;
-            
-            case "saveRule"         : saveRule(request.url, request.selector, request.rule); sendResponse({}); break;
+
+            case "transfer"         : transfer(request.source, request.destination); sendResponse({}); break;
             
             case "getRulesForPage"  : sendResponse(getRulesForPage(request.url)); sendResponse({}); break;
             
@@ -89,9 +89,9 @@ function disablePageIcon(tabId) {
 
 /** Data save, load, etc. **/
 
-// save rule
+// save rule. ** not being used
 function saveRule(url, selector, rule) {
-    if (!selector || selector == "")
+    if (!selector || selector == "" || !url || url == "")
         return false;
     
     if (rule) {
@@ -108,11 +108,22 @@ function saveRule(url, selector, rule) {
 
 // save all rules for a page
 function save(url, rules) {
+    if (!url || url == "")
+        return;
     if (rules)
         cache.styles[url] = rules;
     else
         delete cache.styles[url];
     updateStylesInDataStore();
+}
+
+// transfer rules for source URL to destination URL
+function transfer(source, destination) {
+    if (cache.styles[source]) {
+        cache.styles[destination] = cache.styles[source];
+        delete cache.styles[source];
+        updateStylesInDataStore();
+    }
 }
 
 // save all styles
