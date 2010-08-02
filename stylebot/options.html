@@ -47,6 +47,7 @@
 		</li><br>
 		<div id="custom-styles">
 			<h2>Custom Styles</h2>
+			<input type="text" id="style-search-field" value="Search..." class="before-focus" />
 		</div><br><br>
 		<button onclick="addStyle();">Add Style</button>
 		<br><br>
@@ -58,15 +59,15 @@
 		<div id="sync">
 			<h2>Sync <span style="font-weight: normal; font-style: italic;" class="description">(experimental)</span></h2>
 			<div class="description">This will sync your custom styles across multiple computers. For this to work, you need to have <a href="http://www.google.com/support/chrome/bin/answer.py?hl=en&answer=165139">Bookmark Sync enabled</a>.<br></div>
-			<button onclick="toggleSyncing();" id="sync_button">Enable Sync</button><br><br>
-			<button onclick="bg_window.saveSyncData(bg_window.cache.styles);" style="display: none" id="sync_now">Sync Now</button>
-<div class="description" id="sync_enabled_note"><strong>Important</strong>: Only <strong>Manual sync</strong> is supported at the moment. When you click on <strong>Sync Now</strong>, your local styles here will replace existing styles on all other machines. When sync is first enabled, your styles are merged.</div>
+			<button onclick="toggleSyncing();" id="sync-button">Enable Sync</button><br><br>
+			<button onclick="bg_window.saveSyncData(bg_window.cache.styles);" style="display: none" id="sync-now">Sync Now</button>
+<div class="description" id="sync-enabled-note"><strong>Important</strong>: Only <strong>manual sync</strong> is supported at the moment. When you click on <strong>Sync Now</strong>, your local styles here will replace existing styles on all other machines. When sync is first enabled, your styles are merged.</div>
 		</div><br><br>
-		<div id="footer">
-			Find a bug? Have a feature request? Post them <a href="http://github.com/ankit/stylebot/issues">here</a>.<br>
-			Stylebot is opensource, you're welcome to contribute by going <a href="http://github.com/ankit/stylebot">here</a>.<br>
-			Created by <a href="http://ankitahuja.com">Ankit Ahuja</a>.
-		</div>
+	</div>
+	<div id="footer">
+		Find a bug? Have a feature request? Post them <a href="http://github.com/ankit/stylebot/issues">here</a>.<br>
+		Stylebot is opensource, you're welcome to contribute by going <a href="http://github.com/ankit/stylebot">here</a>.<br>
+		Created by <a href="http://ankitahuja.com">Ankit Ahuja</a>.
 	</div>
 </body>
 </html>

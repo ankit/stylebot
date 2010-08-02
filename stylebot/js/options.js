@@ -52,6 +52,7 @@ function init() {
     
     attachListeners();
     setSyncUI();
+    initFiltering();
 }
 
 // fetches options from the datastore
@@ -160,7 +161,7 @@ function editStyle(e) {
     var rules = styles[url];
     var css = CSSUtils.crunchFormattedCSS(rules, false);
     
-    var html = "<div>Edit the CSS for <b>" + url + "</b>:</div><textarea class='stylebot-css-code' style='width: 100%; height:" + cache.textareaHeight + "'>" + css + "</textarea><button onclick='cache.modal.hide();'>Done</button>";
+    var html = "<div>Edit the CSS for <b>" + url + "</b>:</div><textarea class='stylebot-css-code' style='width: 100%; height:" + cache.textareaHeight + "'>" + css + "</textarea><button onclick='cache.modal.hide();'>Cancel</button><button onclick='onUpdate();cache.modal.hide();'>Save</button>";
     
     initModal(html);
     
@@ -170,25 +171,25 @@ function editStyle(e) {
         var len = textarea.attr('value').length;
         textarea[0].setSelectionRange(len, len);
     };
-   
-    cache.modal.options.onClose = function() {
-        var url = cache.modal.box.find('div > b').html();
-        var css = cache.modal.box.find('textarea').attr('value');
-        saveStyle(url, css);
-    };
     
     cache.modal.show();
 }
 
+function onUpdate() {
+    var url = cache.modal.box.find('div > b').html();
+    var css = cache.modal.box.find('textarea').attr('value');
+    saveStyle(url, css);
+}
+
 function addStyle() {
-    var html = "<div>URL: <input type='text'></input></div><textarea class='stylebot-css-code' style='width: 100%; height:" + cache.textareaHeight + "'></textarea><button onclick= 'cache.modal.hide();' >Cancel</button><button onclick= 'onAddClick(); cache.modal.hide();' >Add</button>";
+    var html = "<div>URL: <input type='text'></input></div><textarea class='stylebot-css-code' style='width: 100%; height:" + cache.textareaHeight + "'></textarea><button onclick= 'cache.modal.hide();' >Cancel</button><button onclick= 'onAdd(); cache.modal.hide();' >Add</button>";
     
     initModal(html);
     cache.modal.options.onOpen = function() { cache.modal.box.find('input').focus(); };
     cache.modal.show();
 }
 
-function onAddClick() {
+function onAdd() {
     var url = cache.modal.box.find('input').attr('value');
     var css = cache.modal.box.find('textarea').attr('value');
     saveStyle(url, css);
@@ -279,14 +280,14 @@ function importCSS() {
 function setSyncUI() {
     var status = $('#sync_status');
     if (options.sync) {
-        $('#sync_button').html("Disable Sync");
-        $('#sync_enabled_note').show();
-        $('#sync_now').show();
+        $('#sync-button').html("Disable Sync");
+        $('#sync-enabled-note').show();
+        $('#sync-now').show();
     }
     else {
-        $('#sync_button').html("Enable Sync");
-        $('#sync_enabled_note').hide();
-        $('#sync_now').hide();
+        $('#sync-button').html("Enable Sync");
+        $('#sync-enabled-note').hide();
+        $('#sync-now').hide();
     }
 }
 
@@ -324,4 +325,34 @@ function initModal(html, options) {
         cache.modal.options.closeOnBgClick = false;
     }
     cache.modal.box.html(html);
+}
+
+/** filtering of custom styles **/
+function initFiltering() {
+    $("#style-search-field").click(function(e) {
+        if (e.target.value == "Search...") {
+            e.target.className = "";
+            e.target.value = "";
+        }
+        else {
+            var len = e.target.value.length;
+            e.target.setSelectionRange(0, len);
+        }
+    })
+    .keyup(function(e) {
+        filterStyles(e.target.value);
+    });
+}
+
+function filterStyles(value) {
+    var styleDivs = $('.custom-style');
+    var urls = $('.custom-style-url');
+    var len = styleDivs.length;
+    for (var i = 0; i < len; i++) {
+        var $div = $(styleDivs[i]);
+        if (urls[i].innerHTML.indexOf(value) == -1)
+            $div.hide();
+        else
+            $div.show();
+    }
 }

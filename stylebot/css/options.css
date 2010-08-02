@@ -12,7 +12,7 @@ body {
 #wrap {
     margin: 10px auto auto;
     padding: 5px;
-    width: 650px;
+    width: 750px;
 }
 
 h1 {
@@ -47,17 +47,16 @@ a:hover {
 
 li.option {
     list-style-type: none;
-    padding: 10px 0px;
     margin: 0;
+    padding: 5px 0;
+    width: 100%;
 }
 
 li.option label {
     width: 400px;
-    display: inline-block;
 }
 
 .option-field {
-    display: inline;
     float: right;
 }
 
@@ -71,11 +70,6 @@ input[type=text] {
     padding: 2px;
     text-align: right;
     -webkit-box-shadow: 0px 1px 0px #fff;
-}
-
-#main-buttons {
-    text-align: center;
-    display: block;
 }
 
 button {
@@ -136,6 +130,11 @@ select {
 
 #custom-styles .button-container {
     float: right;
+}
+
+.before-focus {
+    font-style: italic;
+    color: #bbb !important;
 }
 
 textarea.stylebot-css-code {
