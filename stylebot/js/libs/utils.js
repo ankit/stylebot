@@ -125,5 +125,8 @@ var Utils = {
             return false;
         var len = el.value.length;
         el.setSelectionRange(len, len);
+        if (el.localName == "textarea") {
+            el.scrollTop = el.scrollHeight;
+        }
     }
 }

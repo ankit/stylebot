@@ -47,9 +47,7 @@ stylebot.widget.advanced = {
         this.cache.container.show();
         setTimeout(function() {
             stylebot.widget.advanced.cache.cssField.focus();
-            // place cursor at end of textarea
-            var len = stylebot.widget.advanced.cache.cssField.attr('value').length;
-            stylebot.widget.advanced.cache.cssField.get(0).setSelectionRange(len, len);
+            Utils.moveCursorToEnd(stylebot.widget.advanced.cache.cssField.get(0));
         });
     },
     

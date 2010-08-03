@@ -2,10 +2,7 @@
   * This content script initializes stylebot
  **/
 
-lintDebug = false;
-
 $(document).ready(function() {
-    initDebug();
     stylebot.chrome.fetchOptions();
 });
 
@@ -15,13 +12,6 @@ function initialize(response) {
     stylebot.widget.basic.enabledAccordions = response.enabledAccordions;
     stylebot.initialize(response.options);
     attachListeners();
-}
-
-function initDebug() {
-    if(lintDebug)
-        jQuery.LINT.level = 3;
-    else
-        jQuery.LINT.level = 0;
 }
 
 function attachListeners() {
