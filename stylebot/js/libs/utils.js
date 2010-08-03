@@ -110,5 +110,20 @@ var Utils = {
             input.bind('keyup', {input: input, el: el, callback: callback}, onClose);
             $(document).bind('mousedown',{input: input, el: el, callback: callback}, onClose);
         });
+    },
+    
+    selectAllText: function(el) {
+        if (!el || !el.value || el.value == "")
+            return false;
+        var len = el.value.length;
+        el.setSelectionRange(0, len);
+        return true;
+    },
+    
+    moveCursorToEnd: function(el) {
+        if (!el || !el.value || el.value == "")
+            return false;
+        var len = el.value.length;
+        el.setSelectionRange(len, len);
     }
 }

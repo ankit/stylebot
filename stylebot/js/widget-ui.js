@@ -48,8 +48,7 @@ var WidgetUI = {
         })
         .data('property', property)
         .click(function(e) {
-            var len = e.target.value.length;
-            e.target.setSelectionRange(0, len);
+            Utils.selectAllText(e.target);
         })
         .keyup(handler);
     },

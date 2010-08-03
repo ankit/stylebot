@@ -166,12 +166,10 @@ function editStyle(e) {
     initModal(html);
     
     cache.modal.options.onOpen = function() { 
-        var textarea = cache.modal.box.find('textarea')
-        textarea.focus();
-        var len = textarea.attr('value').length;
-        textarea[0].setSelectionRange(len, len);
+        var textarea = cache.modal.box.find('textarea');
+        textarea[0].focus();
+        Utils.moveCursorToEnd(textarea[0]);
     };
-    
     cache.modal.show();
 }
 
@@ -231,9 +229,8 @@ function export() {
     });
     cache.modal.options.onOpen = function() { 
         var textarea = cache.modal.box.find('textarea')
-        textarea.focus();
-        var len = textarea.attr('value').length;
-        textarea[0].setSelectionRange(0, len);
+        textarea[0].focus();
+        Utils.selectAllText(textarea[0]);
     };
     cache.modal.show();
 }
@@ -245,10 +242,7 @@ function import() {
         closeOnBgClick: true
     });
     cache.modal.options.onOpen = function() {
-        var textarea = cache.modal.box.find('textarea')
-        textarea.focus();
-        var len = textarea.attr('value').length;
-        textarea[0].setSelectionRange(0, len);
+        cache.modal.box.find('textarea')[0].focus();
     };
     cache.modal.show();
 }
@@ -267,9 +261,7 @@ function importCSS() {
             styles = JSON.parse(json);
             bg_window.saveStyles(styles);
         }
-        catch(e) {
-            
-        }
+        catch(e) {}
     }
 }
 
@@ -335,8 +327,7 @@ function initFiltering() {
             e.target.value = "";
         }
         else {
-            var len = e.target.value.length;
-            e.target.setSelectionRange(0, len);
+            Utils.selectAllText(e.target);
         }
     })
     .keyup(function(e) {
