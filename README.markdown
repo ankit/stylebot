@@ -28,11 +28,16 @@ Code from the following projects is used in Stylebot:
   [http://github.com/280north/aristo](http://github.com/280north/aristo)  
   [http://github.com/maccman/aristo](http://github.com/maccman/aristo)  
   [http://github.com/taitems/Aristo-jQuery-UI-Theme](http://github.com/taitems/Aristo-jQuery-UI-Theme)
-  
-* ColorPicker - [http://www.eyecon.ro/colorpicker/](http://www.eyecon.ro/colorpicker/)
 
-* jQuery - [http://jquery.com/](http://jquery.com/)
-  
+* [Firebug](http://www.getfirebug.com) - Selection of DOM elements (selectionBox.js)
+
+* [JSCSSP](http://www.glazman.org/JSCSSP/) - CSS Parser in JavaScript
+
+* [ColorPicker](http://www.eyecon.ro/colorpicker/)
+
+* [Tipsy](http://github.com/jaz303/tipsy) - Tooltips
+
+* [jQuery](http://jquery.com/)
 
 License
 -------
