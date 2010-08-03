@@ -124,6 +124,7 @@ stylebot.style = {
             clearTimeout(stylebot.style.applyInlineCSSTimer);
             stylebot.style.applyInlineCSSTimer = null;
         }
+
         stylebot.style.applyInlineCSSTimer = setTimeout(function() {
             stylebot.style.applyInlineCSS(stylebot.style.cache.elements, css);
         }, duration);
@@ -132,6 +133,7 @@ stylebot.style = {
             clearTimeout(stylebot.style.timer);
             stylebot.style.timer = null;
         }
+
         stylebot.style.timer = setTimeout(function() {
             stylebot.style.saveRuleFromCSS(css);
         }, 1000);

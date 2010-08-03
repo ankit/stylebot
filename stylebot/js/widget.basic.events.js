@@ -136,6 +136,6 @@ stylebot.widget.basic.events = {
                     enabledAccordions[enabledAccordions.length] = i;
             }
             stylebot.chrome.saveAccordionState(enabledAccordions);
-        }, 2000);
+        }, 1000);
     }
 }
