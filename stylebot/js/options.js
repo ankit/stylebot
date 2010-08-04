@@ -46,10 +46,10 @@ function init() {
     else
         radioBt[0].checked = true;
 
-    fillCustomStyles(localStorage['stylebot_styles']);
-
     bg_window = chrome.extension.getBackgroundPage();
+    styles = bg_window.cache.styles;
     
+    fillCustomStyles();
     attachListeners();
     setSyncUI();
     initFiltering();
@@ -95,14 +95,10 @@ function translateOptionValue(name, value) {
 
 /** custom styles **/
 
-function fillCustomStyles(json) {
+function fillCustomStyles() {
     var container = $("#custom-styles");
-    try {
-        styles = JSON.parse(json);
-        for (var url in styles)
-            container.append(createCustomStyleOption(url, styles[url]));
-    }
-    catch(e) {}
+    for (var url in styles)
+        container.append(createCustomStyleOption(url, styles[url]));
 }
 
 function createCustomStyleOption(url, rules) {
@@ -227,7 +223,7 @@ function export() {
         closeOnEsc: true,
         closeOnBgClick: true
     });
-    cache.modal.options.onOpen = function() { 
+    cache.modal.options.onOpen = function() {
         var textarea = cache.modal.box.find('textarea')
         textarea[0].focus();
         Utils.selectAllText(textarea[0]);
@@ -236,7 +232,7 @@ function export() {
 }
 
 function import() {
-    var html = "<div>Paste previously exported custom styles here.<div class='description' style='margin-top:10px'>Warning: It will replace all your current custom styles.</div></div><textarea class='stylebot-css-code' style='width: 100%; height:" + cache.textareaHeight + "'></textarea><button onclick='importCSS();cache.modal.hide();'>Import</button>";
+    var html = "<div>Paste previously exported custom styles here.<div class='description' style='margin-top:10px'>Note: Current custom styles for similar URLs will be replaced.</div></div><textarea class='stylebot-css-code' style='width: 100%; height:" + cache.textareaHeight + "'></textarea><button onclick='importCSS();cache.modal.hide();'>Import</button>";
     initModal(html, {
         closeOnEsc: true,
         closeOnBgClick: true
@@ -256,9 +252,9 @@ function importCSS() {
     if (json && json != "")
     {
         $(".custom-style").html("");
-        fillCustomStyles(json);
         try {
-            styles = JSON.parse(json);
+            styles = mergeStyles(JSON.parse(json), styles);
+            fillCustomStyles();
             bg_window.saveStyles(styles);
         }
         catch(e) {}
@@ -346,4 +342,15 @@ function filterStyles(value) {
         else
             $div.show();
     }
+}
+
+// merges styles from s1 into s2
+function mergeStyles(s1, s2) {
+    if (!s2) {
+        return s1;
+    }
+    for (var url in s1) {
+        s2[url] = s1[url];
+    }
+    return s2;
 }
