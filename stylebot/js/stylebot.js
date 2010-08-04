@@ -92,9 +92,14 @@ var stylebot = {
         }
         else if (selector)
         {
-            el = $(selector)[0];
-            stylebot.selectedElement = el;
-            stylebot.highlight(el);
+            try {
+                el = $(selector)[0];
+                stylebot.selectedElement = el;
+                stylebot.highlight(el);
+            }
+            catch(e) {
+                stylebot.selectedElement = null;
+            }
         }
         else
         {
@@ -105,7 +110,7 @@ var stylebot = {
         stylebot.style.fillCache(selector);
         stylebot.widget.show();
         setTimeout(function() {
-            stylebot.style.removeFromStyleElement(stylebot.style.cache.selector);
+            stylebot.style.removeFromStyleElement();
         }, 100);
     },
     

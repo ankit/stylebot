@@ -53,7 +53,12 @@ stylebot.style = {
         if (selector != this.cache.selector)
         {
             this.cache.selector = selector;
-            this.cache.elements = $(selector + ":not(#stylebot, #stylebot *)");
+            try {
+                this.cache.elements = $(selector + ":not(#stylebot, #stylebot *)");
+            }
+            catch(e) {
+                this.cache.elements = null;
+            }
         }
     },
     
@@ -67,9 +72,73 @@ stylebot.style = {
         this.save();
 
         setTimeout(function() {
-            stylebot.style.applyInlineCSS(stylebot.style.cache.elements, stylebot.style.getInlineCSS( stylebot.style.cache.selector));
+            if (stylebot.style.cache.elements)
+                stylebot.style.updateInlineCSS(stylebot.style.cache.elements, stylebot.style.getInlineCSS( stylebot.style.cache.selector));
+            // if no elements, update the stylesheet
+            else
+                stylebot.style.updateStyleElement(stylebot.style.rules);
         }, 0);
     },
+    
+    // applies css to selected elements as inline css and calls saveRuleFromCSS
+    // called by advanced mode
+    applyCSS: function(css) {
+        if (!stylebot.style.cache.selector)
+            return true;
+        
+        var noOfElements = stylebot.style.cache.elements.length;
+        
+        var duration;
+        if (noOfElements >= 400)
+            duration = 400;
+        else if (noOfElements >= 200)
+            duration = 300;
+        else
+            duration = 0;
+        
+        if (stylebot.style.updateCSSTimer)
+        {
+            clearTimeout(stylebot.style.updateCSSTimer);
+            stylebot.style.updateCSSTimer = null;
+        }
+
+        stylebot.style.updateCSSTimer = setTimeout(function() {
+            if (stylebot.style.cache.elements)
+                stylebot.style.updateInlineCSS(stylebot.style.cache.elements, css);
+            else
+                stylebot.style.updateStyleElement(stylebot.style.rules);
+        }, duration);
+        
+        if (stylebot.style.timer) {
+            clearTimeout(stylebot.style.timer);
+            stylebot.style.timer = null;
+        }
+
+        stylebot.style.timer = setTimeout(function() {
+            stylebot.style.saveRuleFromCSS(css);
+        }, 1000);
+    },
+    
+    // parses CSS into a rule, updates the cache and saves the rule
+    saveRuleFromCSS: function(css) {
+        if (!this.cache.selector)
+            return true;
+        // empty rule for selector
+        delete this.rules[this.cache.selector];
+
+        if (css != "") {
+            if (!this.parser)
+                this.parser = new CSSParser();
+            var sheet = this.parser.parse(this.cache.selector + "{" + css + "}");
+            var generatedRule = CSSUtils.getRuleFromParserObject(sheet);
+            // save rule to cache
+            this.rules[this.cache.selector] = generatedRule;
+        }
+        
+        // save rules persistently
+        this.save();
+    },
+    
     
     // add/update property-value pair in rules cache
     savePropertyToCache: function(selector, property, value) {
@@ -103,62 +172,6 @@ stylebot.style = {
         }
     },
     
-    // applies css to selected elements as inline css and calls saveRuleFromCSS
-    // called by advanced mode
-    applyCSS: function(css) {
-        if (!stylebot.style.cache.selector)
-            return true;
-        
-        var noOfElements = stylebot.style.cache.elements.length;
-        
-        var duration;
-        if (noOfElements >= 400)
-            duration = 400;
-        else if (noOfElements >= 200)
-            duration = 300;
-        else
-            duration = 0;
-        
-        if (stylebot.style.applyInlineCSSTimer)
-        {
-            clearTimeout(stylebot.style.applyInlineCSSTimer);
-            stylebot.style.applyInlineCSSTimer = null;
-        }
-
-        stylebot.style.applyInlineCSSTimer = setTimeout(function() {
-            stylebot.style.applyInlineCSS(stylebot.style.cache.elements, css);
-        }, duration);
-        
-        if (stylebot.style.timer) {
-            clearTimeout(stylebot.style.timer);
-            stylebot.style.timer = null;
-        }
-
-        stylebot.style.timer = setTimeout(function() {
-            stylebot.style.saveRuleFromCSS(css);
-        }, 1000);
-    },
-    
-    // parses CSS into a rule, updates the cache and saves the rule
-    saveRuleFromCSS: function(css) {
-        if (!this.cache.selector)
-            return true;
-        // empty rule for selector
-        delete this.rules[this.cache.selector];
-
-        if (css != "") {
-            if (!this.parser)
-                this.parser = new CSSParser();
-            var sheet = this.parser.parse(this.cache.selector + "{" + css + "}");
-            var generatedRule = CSSUtils.getRuleFromParserObject(sheet);
-            // save rule to cache
-            this.rules[this.cache.selector] = generatedRule;
-        }
-        
-        // save rules persistently
-        this.save();
-    },
-    
     // check if a property / value pair is valid for addition to rules cache
     filter: function(property, value) {
         if (value == "")
@@ -189,7 +202,7 @@ stylebot.style = {
     },
     
     // apply inline CSS to element(s)
-    applyInlineCSS: function(el, newCustomCSS) {
+    updateInlineCSS: function(el, newCustomCSS) {
         if (!el || el.length == 0)
             return false;
         
@@ -258,14 +271,17 @@ stylebot.style = {
             stylebot.style.clearInlineCSS($(selector));
     },
 
-    // remove rule for selector from stylebot's <style> element and apply it as inline css
-    removeFromStyleElement: function(selector) {
-        this.applyInlineCSS($(selector + ":not(#stylebot, #stylebot *)"), stylebot.style.getInlineCSS(selector));
+    // remove rule for current selector from stylebot's <style> element and apply it as inline css
+    removeFromStyleElement: function() {
+        // if no elements are selected, return
+        if (!this.cache.elements)
+            return;
+        this.updateInlineCSS(this.cache.elements, this.getInlineCSS(this.cache.selector));
         
         var tempRules = {};
         for (var sel in this.rules)
         {
-            if (sel != selector)
+            if (sel != this.cache.selector)
                 tempRules[sel] = this.rules[sel];
         }
         this.updateStyleElement(tempRules);
