@@ -53,6 +53,10 @@ stylebot.widget.basic.events = {
     },
     
     onTextFieldKeyUp: function(e) {
+        if (e.keyCode == 27) { // esc
+            e.target.blur();
+            return;
+        }
         var value = e.target.value;
         var property = $(e.target).data('property');
 
@@ -60,6 +64,10 @@ stylebot.widget.basic.events = {
     },
     
     onSizeFieldKeyUp: function(e) {
+        if (e.keyCode == 27) { // esc
+            e.target.blur();
+            return;
+        }
         var value = e.target.value;
         var property = $(e.target).data('property');
         var unit = $(e.target).next().attr('value');
