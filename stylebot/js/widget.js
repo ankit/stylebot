@@ -147,8 +147,7 @@ stylebot.widget = {
             id: 'stylebot-main-buttons'
         });
         
-        // WidgetUI.createButton("Save").appendTo(btContainer).click(stylebot.widget.save);
-        WidgetUI.createButton("View CSS").appendTo(btContainer).click(stylebot.widget.viewCSS);
+        WidgetUI.createButton("Edit CSS").appendTo(btContainer).click(stylebot.widget.editCSS);
         WidgetUI.createButton("Reset").appendTo(btContainer).click(stylebot.widget.resetCSS);
         WidgetUI.createButton("Reset All").appendTo(btContainer).click(stylebot.widget.resetAllCSS);
 
@@ -301,12 +300,8 @@ stylebot.widget = {
     },
     
     // display CSS for page in a modal box
-    viewCSS: function(e) {
-        stylebot.modal.show(CSSUtils.crunchFormattedCSS(stylebot.style.rules, false) , {
-            onClose: function() { 
-                stylebot.modal.isVisible = false; e.target.focus(); 
-            }
-        });
+    editCSS: function(e) {
+        stylebot.modal.show(CSSUtils.crunchFormattedCSS(stylebot.style.rules, false), e.target);
     },
     
     // reset CSS for current selector

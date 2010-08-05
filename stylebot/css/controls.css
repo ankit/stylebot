@@ -84,7 +84,6 @@ button.stylebot-button {
     -khtml-appearance: none !important;
     color: #4F4F4F !important;
     display: inline;
-    float: none !important;
     font-family: 'Lucida Grande', Arial, sans-serif !important;
     font-size: 10px !important;
     font-weight: bold !important;
@@ -95,6 +94,10 @@ button.stylebot-button {
     border: 1px solid #b6b6b6 !important;
     background: -webkit-gradient(linear, left top, left bottom, from(#eee), to(#bdbdbd)) !important;
     text-shadow: 0px 1px 1px #fff !important;
+}
+
+#stylebot-controls button.stylebot-button {
+    float: none !important;
 }
 
 button.stylebot-button:disabled {

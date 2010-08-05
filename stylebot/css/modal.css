@@ -30,7 +30,7 @@
 }
 
 #stylebot-modal button {
-    float: right !important;
+    float: right;
 }
 
 #stylebot-background {

@@ -119,6 +119,24 @@ stylebot.style = {
         }, 1000);
     },
     
+    applyPageCSS: function(css) {
+        if (css == "")
+            this.rules = {};
+        else {
+            if (!this.parser)
+                this.parser = new CSSParser();
+            try {
+                var sheet = this.parser.parse(css);
+                var rules = CSSUtils.getRulesFromParserObject(sheet);
+                this.rules = rules;
+            }
+            catch(e) {}
+        }
+        this.clearInlineCSS(this.cache.elements);
+        this.updateStyleElement(this.rules);
+        this.save();
+    },
+    
     // parses CSS into a rule, updates the cache and saves the rule
     saveRuleFromCSS: function(css) {
         if (!this.cache.selector)
