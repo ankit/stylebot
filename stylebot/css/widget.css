@@ -1,3 +1,5 @@
+/** Stylebot widget **/
+
 /* @group Box */
 
 #stylebot {
@@ -8,7 +10,7 @@
     display: none;
     font-family: 'Lucida Grande', Tahoma, Arial, sans-serif;
     font-size: 12px !important;
-    line-height: 10px !important;
+    line-height: 10px;
     margin: 0 !important;
     position: fixed !important;
     text-align: left !important;
@@ -30,7 +32,7 @@
     font-family: 'Lucida Grande', Arial, sans-serif !important;
     font-weight: bold !important;
     height: auto !important;
-    line-height: 12px !important;
+    line-height: 14px !important;
     overflow: auto !important;
     padding: 8px !important;
     text-shadow: 0px 1px 1px #fff !important;
@@ -70,11 +72,14 @@
     max-width: 100% !important;
     overflow: hidden !important;
     width: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
 }
 
 #stylebot-header-selector .stylebot-editable-text{
     float: left !important;
     padding: 0 !important;
+    margin: 0 !important;
     padding-left: 3px !important;
     width: auto !important;
 }

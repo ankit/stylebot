@@ -1,3 +1,4 @@
+/** Stylebot tooltips **/
 .stylebot-tipsy { font-family: 'Lucida Grande', Arial, sans-serif !important; padding: 5px !important; font-size: 10px !important; width: auto !important; position: absolute !important; z-index: 100000000000 !important; text-shadow: none !important; }
   .stylebot-tipsy-inner { padding: 5px 8px 4px 8px !important; background-color: black !important; color: white !important; width: auto !important; max-width: 180px !important; text-align: center !important; line-height: normal !important; }
   .stylebot-tipsy-inner { border-radius: 3px !important; -moz-border-radius:3px !important; -webkit-border-radius:3px !important; }

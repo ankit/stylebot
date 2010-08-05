@@ -1,6 +1,4 @@
-/* Styled scrollbars in Aristo Theme 
- * Modified version of http://github.com/maccman/aristo
- */
+/** Styled scrollbars for Stylebot widget **/
 
 #stylebot-controls::-webkit-scrollbar,
 .stylebot-textarea::-webkit-scrollbar {

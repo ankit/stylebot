@@ -27,7 +27,7 @@ function addInstallLink() {
 
 function install() {
     var name = document.getElementById('stylish-description').innerText;
-    if (confirm("Add '" + name + "' to Stylebot ? \n\nIt may replace any existing stylebot CSS for the affected URLs."))
+    if (confirm("Add '" + name + "' to Stylebot ? \n\nIt will replace any existing stylebot CSS for the affected URLs."))
     {
         var xhr = new XMLHttpRequest();
         var url = document.querySelector("link[rel='stylish-code-chrome']").getAttribute("href");
@@ -42,7 +42,7 @@ function install() {
 }
 
 function save(response) {
-    console.log(response);
+    // console.log(response);
     var json = JSON.parse(response);
     
     var saveCodeBlock = function(block) {
