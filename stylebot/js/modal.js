@@ -36,6 +36,7 @@ stylebot.modal = {
             this.create({
                 closeOnEsc: false,
                 closeOnBgClick: false,
+                bgFadeSpeed: 0,
                 onOpen: function() {
                     Utils.moveCursorToEnd(stylebot.modal.cache.textarea[0]);
                     stylebot.modal.cache.textarea.focus();
