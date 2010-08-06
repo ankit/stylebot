@@ -157,13 +157,13 @@ var stylebot = {
     },
     
     attachListeners: function() {
-        document.addEventListener('mouseover', this.onMouseOver, true);
+        document.addEventListener('mousemove', this.onMouseMove, true);
         document.addEventListener('mousedown', this.onMouseDown, true);
         document.addEventListener('click', this.onMouseClick, true);
     },
     
     detachListeners: function() {
-        document.removeEventListener('mouseover', this.onMouseOver, true);
+        document.removeEventListener('mousemove', this.onMouseMove, true);
         document.removeEventListener('mousedown', this.onMouseDown, true);
     },
     
@@ -174,7 +174,7 @@ var stylebot = {
         document.removeEventListener('click', this.onMouseClick, true);
     },
     
-    onMouseOver: function(e) {
+    onMouseMove: function(e) {
         if (e.target.className == "stylebot-selection"
             || stylebot.widget.isBeingDragged
             || stylebot.modal.isVisible
@@ -183,7 +183,6 @@ var stylebot = {
         {
             return true;
         }
-
         if (stylebot.belongsToStylebot(e.target))
         {
             stylebot.unhighlight();
