@@ -88,7 +88,6 @@ button.stylebot-button {
     font-size: 10px !important;
     font-weight: bold !important;
     line-height: normal !important;
-    margin: 0 3px !important;
     padding: 3px 8px !important;
     border-radius: 2px !important;
     border: 1px solid #b6b6b6 !important;
@@ -98,6 +97,10 @@ button.stylebot-button {
 
 #stylebot-controls button.stylebot-button {
     float: none !important;
+}
+
+#stylebot button.stylebot-button {
+    margin: 0 3px !important;
 }
 
 button.stylebot-button:disabled {
@@ -136,6 +139,10 @@ button.stylebot-active-button:active:not(:disabled) {
 }
 
 /* Segmented Control */
+
+#stylebot .stylebot-segmented-control button {
+    margin: 0px !important;
+}
 
 .stylebot-segmented-control button {
     margin: 0px !important;

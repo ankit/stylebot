@@ -16,15 +16,15 @@ stylebot.modal = {
 
     // create the DOM elements
     create: function(options) {
-        var textareaHeight = window.innerHeight * 0.5 + 'px';
-        var html = "<div>Edit the CSS for <b>" + stylebot.style.cache.url + "</b>:</div><textarea class='stylebot-textarea stylebot-css-code' style='width: 98%; height: " + textareaHeight + "' ></textarea><button class='stylebot-button' style='float:left !important;'>Copy To Clipboard</button><button class='stylebot-button' >Cancel</button><button class='stylebot-button'>Save</button>";
+        var textareaHeight = window.innerHeight * 0.45 + 'px';
+        var html = "<div>Edit the CSS for <b>" + stylebot.style.cache.url + "</b>:</div><textarea class='stylebot-textarea stylebot-css-code' style='height: " + textareaHeight + "' ></textarea><button class='stylebot-button' style='float:left !important; margin: 0px !important;'>Copy To Clipboard</button><button class='stylebot-button' style='margin: 0px !important;'>Cancel</button><button class='stylebot-button' style='margin: 0px !important; margin-right: 3px !important;'>Save</button>";
 
         this.modal = new ModalBox(html, options);
         this.cache.textarea = this.modal.box.find('textarea');
         var buttons = this.modal.box.find('button');
         $(buttons[0]).click(stylebot.modal.copyToClipboard);
         $(buttons[1]).click(stylebot.modal.cancel);
-        $(buttons[2]).click(stylebot.modal.save);
+        $(buttons[2]).click(stylebot.modal.save)
     },
     
     fill: function(content) {

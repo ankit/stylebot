@@ -20,19 +20,6 @@
     line-height: 20px !important;
 }
 
-#stylebot-modal textarea {
-    margin: 10px 0 !important;
-    border: 1px solid #ccc !important;
-    padding: 5px !important;
-    background-color: #fbfbfb !important;
-    resize: none;
-    outline: none;
-}
-
-#stylebot-modal button {
-    float: right;
-}
-
 #stylebot-background {
     background-color: #000 !important;
     opacity: 0.7 !important;
@@ -43,4 +30,18 @@
     top: 0;
     left: 0;
     position: absolute !important;
+}
+
+#stylebot-modal textarea {
+    margin: 10px 0 !important;
+    border: 1px solid #ccc !important;
+    padding: 5px !important;
+    background-color: #fbfbfb !important;
+    resize: none !important;
+    outline: none !important;
+    width: 98% !important;
+}
+
+#stylebot-modal button.stylebot-button {
+    float: right;
 }
