@@ -228,6 +228,15 @@
     width: auto !important;
 }
 
+#stylebot-controls button.stylebot-button {
+    float: none !important;
+    margin: 0 !important;
+}
+
+#stylebot-controls button.stylebot-toggle {
+    margin-left: 6px !important;
+}
+
 /* @end */
 
 /* @group Labels */
@@ -264,6 +273,10 @@
     font-size: 11px !important;
     margin-top: 20px !important;
     text-align: center !important;
+}
+
+#stylebot-widget-options button.stylebot-button {
+    margin: 0 3px !important;
 }
 
 .stylebot-widget-option {
