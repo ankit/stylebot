@@ -16,7 +16,7 @@ var cache = {
     
     options: {
         useShortcutKey: true,
-        shortcutKey: 69, // keydown code for 'e'
+        shortcutKey: 77, // keydown code for 'm'
         shortcutMetaKey: 'ctrl',
         mode: 'Basic',
         sync: false

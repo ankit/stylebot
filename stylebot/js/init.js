@@ -21,7 +21,6 @@ function attachListeners() {
         if (isInputField(e.target))
            return true;
 
-        // Handle shortcut key combo 'ctrl + e' to toggle editing mode
         if (stylebot.options.useShortcutKey && e.keyCode == stylebot.options.shortcutKey)
         {
             if (stylebot.options.shortcutMetaKey == 'ctrl' && e.ctrlKey

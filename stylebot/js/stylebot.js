@@ -20,7 +20,7 @@ var stylebot = {
 
     options: {
         useShortcutKey: true,
-        shortcutKey: 69, // 69 is keycode for 'e'
+        shortcutKey: 77, // 77 is keycode for 'm'
         shortcutMetaKey: 'ctrl',
         mode: 'Basic',
         position: 'Right'

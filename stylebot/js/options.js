@@ -36,7 +36,7 @@ function init() {
     if (options.shortcutKey != undefined)
         $('[name=shortcutKeyHiddenField]').attr('value', options.shortcutKey);
     else
-        $('[name=shortcutKeyHiddenField]').attr('value', 69);
+        $('[name=shortcutKeyHiddenField]').attr('value', 77); // 77 is the keyCode value for 'm'
 
     KeyCombo.init( $('[name=shortcutKey]')[0], $('[name=shortcutKeyHiddenField]')[0] );
 
