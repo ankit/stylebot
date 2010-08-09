@@ -203,11 +203,21 @@ function saveStyle(url, css) {
 }
 
 function editURL(oldValue, newValue) {
-    if (oldValue == newValue)
+    if (oldValue == newValue || newValue == "")
         return;
-    var rules = styles[oldValue];
-    delete styles[oldValue];
-    styles[newValue] = rules;
+    // going through a loop so that new entry is inserted at the same position
+    // otherwise, on changing the url, new entry is inserted at the bottom
+    var newStyles = {};
+    for (var url in styles) {
+        if (url == oldValue) {
+            var rules = styles[oldValue];
+            newStyles[newValue] = rules;
+            delete styles[oldValue];
+        }
+        else
+            newStyles[url] = styles[url];
+    }
+    styles = newStyles;
     bg_window.saveStyles(styles);
 }
 
@@ -256,10 +266,10 @@ function importCSS() {
         $(".custom-style").html("");
         try {
             styles = mergeStyles(JSON.parse(json), styles);
-            fillCustomStyles();
             bg_window.saveStyles(styles);
         }
         catch(e) {}
+        fillCustomStyles();
     }
 }
 
