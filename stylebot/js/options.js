@@ -329,7 +329,7 @@ function initModal(html, options) {
 
 /** filtering of custom styles **/
 function initFiltering() {
-    $("#style-search-field").click(function(e) {
+    $("#style-search-field").bind('click focus', function(e) {
         if (e.target.value == "Search...") {
             e.target.className = "";
             e.target.value = "";

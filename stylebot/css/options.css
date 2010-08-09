@@ -119,7 +119,7 @@ select {
 }
 
 .custom-style-url:focus {
-    outline: 1px solid #ccc;
+    outline: 1px solid #aaa;
 }
 
 #custom-styles input {
