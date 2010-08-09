@@ -17,7 +17,7 @@ var cache = {
     options: {
         useShortcutKey: true,
         shortcutKey: 77, // keydown code for 'm'
-        shortcutMetaKey: 'ctrl',
+        shortcutMetaKey: 'alt',
         mode: 'Basic',
         sync: false
     },

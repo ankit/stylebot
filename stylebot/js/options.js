@@ -32,6 +32,8 @@ function init() {
 
     if (options.shortcutMetaKey != undefined)
         select.value = options.shortcutMetaKey;
+    else
+        select.value = 'alt';
 
     if (options.shortcutKey != undefined)
         $('[name=shortcutKeyHiddenField]').attr('value', options.shortcutKey);

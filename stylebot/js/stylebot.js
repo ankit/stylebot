@@ -21,7 +21,7 @@ var stylebot = {
     options: {
         useShortcutKey: true,
         shortcutKey: 77, // 77 is keycode for 'm'
-        shortcutMetaKey: 'ctrl',
+        shortcutMetaKey: 'alt',
         mode: 'Basic',
         position: 'Right'
     },
