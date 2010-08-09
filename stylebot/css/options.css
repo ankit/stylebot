@@ -160,6 +160,16 @@ textarea.stylebot-css-code {
     text-align: left;
 }
 
+#stylebot-modal button {
+    float: right;
+    margin: 0px;
+    margin-left: 4px;
+}
+
+#stylebot-modal textarea {
+    width: 100% !important;
+}
+
 .description {
     color: #444;
     font-size: 12px !important;

@@ -123,7 +123,9 @@ function save(url, rules) {
 function transfer(source, destination) {
     if (cache.styles[source]) {
         cache.styles[destination] = cache.styles[source];
-        delete cache.styles[source];
+        // the user has to delete the styles for the previous url manually
+        // if (destination.indexOf(source) == -1)
+        //     delete cache.styles[source];
         updateStylesInDataStore();
     }
 }
@@ -245,7 +247,7 @@ function getRulesForPage(currUrl) {
             for (var selector in cache.styles[url]) {
                 // if no rule exists for selector, simply copy the rule
                 if (rules[selector] == undefined)
-                    rules[selector] = cache.styles[url][selector];
+                    rules[selector] = cloneObject(cache.styles[url][selector]);
                 // otherwise, iterate over each property
                 else {
                     for (var property in cache.styles[url][selector])
@@ -309,3 +311,13 @@ function copyToClipboard(text) {
     document.execCommand('copy');
     document.body.removeChild(copyTextarea);
 }
+
+// To copy an object. from: http://my.opera.com/GreyWyvern/blog/show.dml/1725165
+function cloneObject(obj) {
+  var newObj = (obj instanceof Array) ? [] : {};
+  for (i in obj) {
+    if (obj[i] && typeof obj[i] == "object") {
+      newObj[i] = cloneObject(obj[i]);
+    } else newObj[i] = obj[i]
+  } return newObj;
+};
