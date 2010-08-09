@@ -8,7 +8,7 @@ stylebot.widget.basic = {
     
     isColorPickerVisible: false,
     
-    enabledAccordions: [0],
+    enabledAccordions: [0, 1, 2, 3],
     
     cache: {
         container: null,

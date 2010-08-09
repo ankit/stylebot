@@ -4,7 +4,7 @@ var bg_window = null;
 
 var cache = {
     modal: null,
-    textareaHeight: window.innerHeight * 0.5 + 'px'
+    textareaHeight: null
 }
 
 var options = {
@@ -55,6 +55,8 @@ function init() {
     attachListeners();
     setSyncUI();
     initFiltering();
+    
+    cache.textareaHeight = window.innerHeight * 0.5 + 'px';
 }
 
 // fetches options from the datastore

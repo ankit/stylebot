@@ -22,8 +22,8 @@ var cache = {
         sync: false
     },
     
-    // indices of enabled accordions
-    enabledAccordions: [0]
+    // indices of enabled accordions. be default, all are enabled
+    enabledAccordions: [0, 1, 2, 3]
 };
 
 function init(){
