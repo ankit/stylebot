@@ -85,16 +85,21 @@ stylebot.style = {
     applyCSS: function(css) {
         if (!stylebot.style.cache.selector)
             return true;
-        
-        var noOfElements = stylebot.style.cache.elements.length;
-        
+
         var duration;
-        if (noOfElements >= 400)
-            duration = 400;
-        else if (noOfElements >= 200)
-            duration = 300;
-        else
+        if (stylebot.style.cache.elements) {
+            var noOfElements = stylebot.style.cache.elements.length;
+
+            if (noOfElements >= 400)
+                duration = 400;
+            else if (noOfElements >= 200)
+                duration = 300;
+            else
+                duration = 0;
+        }
+        else {
             duration = 0;
+        }
         
         if (stylebot.style.updateCSSTimer)
         {

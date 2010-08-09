@@ -74,7 +74,7 @@ var Utils = {
             else 
                 elWidth = el.width();
             
-            var value = el.html();
+            var value = el.text();
             // create a textfield
             var input = $('<input>', {
                 type: 'text',
