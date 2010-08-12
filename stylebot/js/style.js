@@ -118,10 +118,12 @@ stylebot.style = {
             clearTimeout(stylebot.style.timer);
             stylebot.style.timer = null;
         }
-
+        
+        // in case stylebot is quit
+        var selector = stylebot.style.cache.selector;
         stylebot.style.timer = setTimeout(function() {
-            stylebot.style.saveRuleFromCSS(css);
-        }, 1000);
+            stylebot.style.saveRuleFromCSS(css, selector);
+        }, 750);
     },
     
     applyPageCSS: function(css) {
@@ -143,19 +145,19 @@ stylebot.style = {
     },
     
     // parses CSS into a rule, updates the cache and saves the rule
-    saveRuleFromCSS: function(css) {
-        if (!this.cache.selector)
+    saveRuleFromCSS: function(css, selector) {
+        if (!selector)
             return true;
         // empty rule for selector
-        delete this.rules[this.cache.selector];
+        delete this.rules[selector];
 
         if (css != "") {
             if (!this.parser)
                 this.parser = new CSSParser();
-            var sheet = this.parser.parse(this.cache.selector + "{" + css + "}");
+            var sheet = this.parser.parse(selector + "{" + css + "}");
             var generatedRule = CSSUtils.getRuleFromParserObject(sheet);
             // save rule to cache
-            this.rules[this.cache.selector] = generatedRule;
+            this.rules[selector] = generatedRule;
         }
         
         // save rules persistently
@@ -374,11 +376,15 @@ stylebot.style = {
     
     // called when stylebot is disabled. resets cache and all inline css. Also, updates the <style> element
     reset: function() {
+        var duration = 100;
+        if (this.timer) {
+            duration = 1500;
+        }
         this.cache.selector = null;
         this.cache.elements = null;
         setTimeout(function() {
             stylebot.style.updateStyleElement(stylebot.style.rules);
             stylebot.style.resetInlineCSS();
-        }, 100);
+        }, duration);
     }
 }
