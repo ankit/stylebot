@@ -120,7 +120,6 @@ stylebot.style = {
             stylebot.style.timer = null;
         }
         
-        // in case stylebot is quit
         stylebot.style.timer = setTimeout(function() {
             stylebot.style.saveRuleFromCSS(css, stylebot.style.cache.selector);
         }, 1000);
