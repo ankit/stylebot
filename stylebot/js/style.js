@@ -231,7 +231,7 @@ stylebot.style = {
         if (!el || el.length == 0)
             return false;
         el.each(function() {
-            var existingCSS = $(this).attr('style');
+            var existingCSS = $.trim($(this).attr('style'));
             var existingCustomCSS = $(this).data("stylebot-css");
             var newCSS;
             // if stylebot css is being applied to the element for the first time
