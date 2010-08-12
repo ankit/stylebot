@@ -108,9 +108,12 @@ stylebot.style = {
         }
 
         stylebot.style.updateCSSTimer = setTimeout(function() {
-            if (stylebot.style.cache.elements)
-                // TODO: append !important to CSS here
-                stylebot.style.updateInlineCSS(stylebot.style.cache.elements, css);
+            stylebot.style.saveRuleFromCSS(css, stylebot.style.cache.selector);
+            
+            if (stylebot.style.cache.elements) {
+                var newCSS = CSSUtils.crunchCSSForSelector(stylebot.style.rules, stylebot.style.cache.selector, true);
+                stylebot.style.updateInlineCSS(stylebot.style.cache.elements, newCSS);
+            }
             else
                 stylebot.style.updateStyleElement(stylebot.style.rules);
         }, duration);
@@ -121,7 +124,7 @@ stylebot.style = {
         }
         
         stylebot.style.timer = setTimeout(function() {
-            stylebot.style.saveRuleFromCSS(css, stylebot.style.cache.selector);
+            stylebot.style.save();
         }, 1000);
     },
     
@@ -153,14 +156,12 @@ stylebot.style = {
         if (css != "") {
             if (!this.parser)
                 this.parser = new CSSParser();
+                
             var sheet = this.parser.parse(selector + "{" + css + "}");
             var generatedRule = CSSUtils.getRuleFromParserObject(sheet);
             // save rule to cache
             this.rules[selector] = generatedRule;
         }
-        
-        // save rules persistently
-        this.save();
     },
     
     
@@ -229,12 +230,10 @@ stylebot.style = {
     updateInlineCSS: function(el, newCustomCSS) {
         if (!el || el.length == 0)
             return false;
-        
         el.each(function() {
             var existingCSS = $(this).attr('style');
             var existingCustomCSS = $(this).data("stylebot-css");
             var newCSS;
-
             // if stylebot css is being applied to the element for the first time
             if (!existingCustomCSS)
             {
@@ -376,12 +375,9 @@ stylebot.style = {
     // called when stylebot is disabled. resets cache and all inline css. Also, updates the <style> element
     reset: function() {
         var duration = 100;
-        if (this.timer) {
-            duration = 1500;
-        }
+        stylebot.style.cache.selector = null;
+        stylebot.style.cache.elements = null;
         setTimeout(function() {
-            stylebot.style.cache.selector = null;
-            stylebot.style.cache.elements = null;
             stylebot.style.updateStyleElement(stylebot.style.rules);
             stylebot.style.resetInlineCSS();
         }, duration);

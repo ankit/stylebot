@@ -36,7 +36,7 @@ stylebot.widget.advanced = {
     },
     
     fill: function() {
-        var css = CSSUtils.crunchCSSForSelector(stylebot.style.rules, stylebot.style.cache.selector, false);
+        var css = CSSUtils.crunchCSSForSelector(stylebot.style.rules, stylebot.style.cache.selector, false, true);
         this.cache.cssField
         .html(css)
         .attr('value', css);

@@ -48,12 +48,13 @@ var CSSUtils = {
     },
     
     // generate formatted CSS for selector
-    crunchCSSForSelector: function(rules, selector, setImportant) {
+    crunchCSSForSelector: function(rules, selector, setImportant, formatted) {
         var css = "";
-
+        var append = "";
+        if (formatted)
+            append = "\n"
         for (var property in rules[selector])
-            css += CSSUtils.getCSSDeclaration( property, rules[selector][property], setImportant ) + "\n";
-
+            css += CSSUtils.getCSSDeclaration( property, rules[selector][property], setImportant ) + append;
         return css;
     },
     
