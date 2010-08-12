@@ -109,6 +109,7 @@ stylebot.style = {
 
         stylebot.style.updateCSSTimer = setTimeout(function() {
             if (stylebot.style.cache.elements)
+                // TODO: append !important to CSS here
                 stylebot.style.updateInlineCSS(stylebot.style.cache.elements, css);
             else
                 stylebot.style.updateStyleElement(stylebot.style.rules);
@@ -120,10 +121,9 @@ stylebot.style = {
         }
         
         // in case stylebot is quit
-        var selector = stylebot.style.cache.selector;
         stylebot.style.timer = setTimeout(function() {
-            stylebot.style.saveRuleFromCSS(css, selector);
-        }, 750);
+            stylebot.style.saveRuleFromCSS(css, stylebot.style.cache.selector);
+        }, 1000);
     },
     
     applyPageCSS: function(css) {
@@ -380,9 +380,9 @@ stylebot.style = {
         if (this.timer) {
             duration = 1500;
         }
-        this.cache.selector = null;
-        this.cache.elements = null;
         setTimeout(function() {
+            stylebot.style.cache.selector = null;
+            stylebot.style.cache.elements = null;
             stylebot.style.updateStyleElement(stylebot.style.rules);
             stylebot.style.resetInlineCSS();
         }, duration);
