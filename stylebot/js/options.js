@@ -190,18 +190,31 @@ function addStyle() {
 function onAdd() {
     var url = cache.modal.box.find('input').attr('value');
     var css = cache.modal.box.find('textarea').attr('value');
-    saveStyle(url, css);
-    
-    // add to list
-    createCustomStyleOption(url, styles[url]).appendTo($("#custom-styles"));
+    if (css == "")
+        return false;
+
+    if (saveStyle(url, css))
+        createCustomStyleOption(url, styles[url]).appendTo($("#custom-styles"));
 }
 
 function saveStyle(url, css) {
     var parser = new CSSParser();
     var sheet = parser.parse(css);
-    var rules = CSSUtils.getRulesFromParserObject(sheet);
-    styles[url] = rules;
+    var rules = null;
+    var retVal = false;
+    if (sheet) {
+        try {
+            styles[url] = CSSUtils.getRulesFromParserObject(sheet);
+            retVal = true;
+        }
+        catch(e) {}
+    }
+    else if (styles[url]) {
+        delete styles[url];
+        $('.custom-style-url:contains(' + url + ')').parent().remove();
+    }
     bg_window.saveStyles(styles);
+    return retVal;
 }
 
 function editURL(oldValue, newValue) {
