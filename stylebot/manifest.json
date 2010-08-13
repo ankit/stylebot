@@ -7,7 +7,7 @@
 	
 	"content_scripts": [
 	{
-		"matches":["http://*/*", "https://*/*", "file:///*/*"],
+		"matches":["http://*/*", "https://*/*"],
 		
 		"js": [
 			"js/libs/css-utils.js",
