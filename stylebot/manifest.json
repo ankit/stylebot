@@ -29,7 +29,7 @@
 		"all_frames": true
 	},
 	{
-		"matches": ["http://*/*", "https://*/*", "file:///*/*"],
+		"matches": ["http://*/*", "https://*/*"],
 		
 		"css": [
 			"css/highlight.css",
