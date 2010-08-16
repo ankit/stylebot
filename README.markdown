@@ -1,7 +1,7 @@
 Stylebot
 -----------
 
-A Chrome/Chromium extension to allow users to adapt the web's appearance to their preference by creating custom CSS. It aims to improve the accessibility and adaptability of the web, both for users who're not familiar with CSS and advanced CSS users.
+A Chrome extension to allow users to adapt the web's appearance to their preference by creating custom CSS. It aims to improve the accessibility and adaptability of the web, both for users who're not familiar with CSS and advanced CSS users.
 
 Using Stylebot, users will be able to:
 
@@ -11,11 +11,16 @@ Using Stylebot, users will be able to:
 Installation
 --------------
 
-Download `stylebot.crx` (use Download Source button on top right) and open it in Chrome / Chromium.
+**Production Version**
 
+[https://chrome.google.com/extensions/detail/oiaejidbmkiecgbjeifoejpgmdaleoha](https://chrome.google.com/extensions/detail/oiaejidbmkiecgbjeifoejpgmdaleoha)
+
+**Development Version**
+
+Download `stylebot.crx` (use Download Source button on top right) and open it in Chrome / Chromium.  
 Or, you can also load `/stylebot` as an unpacked extension (in Developer mode).
 
-Once installed, you can toggle stylebot on a page by either clicking on the '**css**' icon in omnibar or pressing '**ctrl + e**'.
+Once installed, you can toggle stylebot on a page by either clicking on the '**css**' icon in omnibar or pressing '**Alt + m**'.
 
 Credits
 ---------
@@ -43,8 +48,3 @@ License
 -------
 
 Dual licensed under the GPL and MIT Licenses.
-
-Feedback
-----------
-
-This project is still in a very alpha stage. Please share ideas, feedback or report issues! You can do that by posting an issue here or email me directly at ahuja DOT ankit AT gmail DOT com.
