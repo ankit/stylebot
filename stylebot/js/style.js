@@ -100,7 +100,6 @@ stylebot.style = {
         else {
             duration = 0;
         }
-        
         if (stylebot.style.updateCSSTimer)
         {
             clearTimeout(stylebot.style.updateCSSTimer);

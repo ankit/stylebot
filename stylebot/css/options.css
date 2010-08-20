@@ -145,6 +145,7 @@ textarea.stylebot-css-code {
     font-family: Monaco, 'Lucida Console', monospace ;
     line-height: 16px;
     padding: 2px;
+    display: block;
 }
 
 #stylebot-modal div {

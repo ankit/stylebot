@@ -1,6 +1,6 @@
 {
 	"name": "Stylebot",
-	"version": "0.1",
+	"version": "0.1.1",
 	"description": "Adapt the web's appearance.",
 	"background_page": "background.html",
 	"options_page": "options.html",
@@ -18,7 +18,7 @@
 		"all_frames": true
 	},
 	{
-		"matches":["http://userstyles.org/styles/*"],
+		"matches": ["http://userstyles.org/styles/*"],
 		
 		"js": [
 			"js/libs/css-utils.js",

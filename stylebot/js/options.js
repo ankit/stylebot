@@ -1,3 +1,7 @@
+$(document).ready(function() {
+   init(); 
+});
+
 /* Javascript for stylebot options page */
 
 var bg_window = null;
@@ -55,8 +59,10 @@ function init() {
     attachListeners();
     setSyncUI();
     initFiltering();
-    
-    cache.textareaHeight = window.innerHeight * 0.5 + 'px';
+    setTimeout(function() {
+        // console.log("Inside setTimeout, window.innerHeight: " + window.innerHeight);
+        cache.textareaHeight = window.innerHeight * 0.5 + 'px';
+    }, 0);
 }
 
 // fetches options from the datastore
