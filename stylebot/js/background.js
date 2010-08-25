@@ -33,6 +33,7 @@ function init(){
     loadAccordionState();
     if (cache.options.sync)
         loadSyncId();
+    initContextMenu();
 }
 
 function attachListeners(){
@@ -292,6 +293,24 @@ function loadAccordionState() {
     if (localStorage['stylebot_enabledAccordions'])
         cache.enabledAccordions = localStorage['stylebot_enabledAccordions'].split(',');
 }
+
+/*** Context Menu ***/
+
+function initContextMenu() {
+    chrome.contextMenus.create( {
+        title: "Style element",
+        contexts: ['all'],
+        onclick: openWidget
+    } );
+}
+
+function openWidget() {
+    chrome.tabs.getSelected(null, function(tab) {
+        chrome.tabs.sendRequest(tab.id, {name: "openWidget"}, function(){});
+    });
+}
+
+/*** End of Context Menu ***/
 
 window.addEventListener('load', function(){
     init();

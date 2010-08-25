@@ -29,6 +29,7 @@ var stylebot = {
     initialize: function(options) {
         this.style.initialize();
         this.setOptions(options);
+        this.contextmenu.initialize();
     },
     
     setOptions: function(options) {

@@ -53,5 +53,10 @@ chrome.extension.onRequest.addListener(
 		    stylebot.setOptions(request.options);
             sendResponse({});
 		}
+		else if (request.name == "openWidget")
+		{
+            stylebot.contextmenu.openWidget();
+		    sendResponse({});
+		}
 	}
 );

@@ -53,6 +53,7 @@
 			"js/widget-ui.js",
 			"js/style.js",
 			"js/modal.js",
+			"js/contextmenu.js",
 			"js/libs/selectorGenerator.js",
 			"js/libs/selectionBox.js",
 			"js/libs/modalbox.js",
@@ -77,5 +78,5 @@
 		"128": "images/icon128.png"
 	},
 	
-	"permissions": ["tabs", "http://userstyles.org/", "bookmarks"]
+	"permissions": ["tabs", "http://userstyles.org/", "bookmarks", "contextMenus"]
 }
