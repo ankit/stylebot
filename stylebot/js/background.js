@@ -31,8 +31,10 @@ function init(){
     loadOptionsIntoCache();
     loadStylesIntoCache();
     loadAccordionState();
-    if (cache.options.sync)
+    if (cache.options.sync) {
         loadSyncId();
+        attachSyncListeners();
+    }
 }
 
 function attachListeners(){
