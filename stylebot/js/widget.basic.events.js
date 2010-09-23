@@ -71,7 +71,7 @@ stylebot.widget.basic.events = {
         var value = e.target.value;
         var property = $(e.target).data('property');
         var unit = $(e.target).next().attr('value');
-        if (parseInt(value))
+        if (parseFloat(value))
             value += unit;
         
         stylebot.style.apply(property, value);
