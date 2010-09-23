@@ -149,7 +149,7 @@ stylebot.widget = {
         
         WidgetUI.createButton("Edit CSS").appendTo(btContainer).click(stylebot.widget.editCSS);
         WidgetUI.createButton("Reset").appendTo(btContainer).click(stylebot.widget.resetCSS);
-        WidgetUI.createButton("Reset All").appendTo(btContainer).click(stylebot.widget.resetAllCSS);
+        WidgetUI.createButton("Reset Page").appendTo(btContainer).click(stylebot.widget.resetAllCSS);
 
         btContainer.appendTo(optionsContainer);
         optionsContainer.appendTo(this.cache.box);
