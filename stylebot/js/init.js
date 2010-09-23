@@ -15,9 +15,7 @@ function initialize(response) {
 }
 
 function attachListeners() {
-
     document.addEventListener('keydown', function(e) {
-        
         if (isInputField(e.target))
            return true;
 

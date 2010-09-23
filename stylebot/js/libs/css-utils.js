@@ -5,8 +5,7 @@
   * Dual licensed under GPL and MIT licenses.
  **/
 
-
-var CSSUtils = {    
+var CSSUtils = {
     /*  e.g. of rules object used as input / output:
     
     rules = {
@@ -22,14 +21,14 @@ var CSSUtils = {
 
         for (var selector in rules)
         {
-            css += selector + "{";
+            css += selector + " { ";
             for (var property in rules[selector]) {
                 if (rules[selector][property].indexOf("!important") != -1)
                     css += this.getCSSDeclaration(property, rules[selector][property], false);
                 else
                     css += this.getCSSDeclaration(property, rules[selector][property], setImportant);
             }
-            css += "}";
+            css += " } ";
         }
         return css;
     },
@@ -65,14 +64,13 @@ var CSSUtils = {
             return property + ": " + value + ";";
     },
     
-    injectCSS: function(css, title) {
-        var d = document.documentElement;
+    injectCSS: function(css, id) {
         var style = document.createElement('style');
         style.type = "text/css";
-        if (title != undefined)
-            style.title = title;
-        style.innerText = css;
-        d.insertBefore(style, null);
+        if (id != undefined)
+            style.setAttribute("id", id);
+        style.appendChild(document.createTextNode(css));
+        document.documentElement.appendChild(style);
     },
     
     // parser object is that returned by JSCSSP

@@ -12,9 +12,8 @@ chrome.extension.sendRequest({ name: "getRulesForPage", url: window.location.hre
     stylebotTempUrl = response.url;
     stylebotTempRules = response.rules;
     
-    if (!response.rules)
-        return;
-    
     var css = CSSUtils.crunchCSS(response.rules, true);
-    CSSUtils.injectCSS(css, "stylebot-css");
+    if (css != "") {
+        CSSUtils.injectCSS(css, "stylebot-css");
+    }
 });

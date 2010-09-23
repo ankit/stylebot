@@ -312,14 +312,14 @@ stylebot.style = {
     // update css in stylebot's <style> element
     updateStyleElement: function(rules) {
         if (!this.cache.styleEl)
-            this.cache.styleEl = $("style[title=stylebot-css]");
+            this.cache.styleEl = $("#stylebot-css");
         
         if (this.cache.styleEl.length != 0)
             this.cache.styleEl.html(CSSUtils.crunchCSS(rules, true));
         else
         {
             CSSUtils.injectCSS(CSSUtils.crunchCSS( rules, true ), "stylebot-css");
-            this.cache.styleEl = $("style[title=stylebot-css]");
+            this.cache.styleEl = $("#stylebot-css");
         }
     },
     
