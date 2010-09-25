@@ -128,5 +128,13 @@ var Utils = {
         if (el.localName == "textarea") {
             el.scrollTop = el.scrollHeight;
         }
-    }
+    },
+    
+    HTMLDecode: function(text) {
+		if (text && typeof(text) != "undefined")
+		{
+			// replace &lt; with < and &gt; with >
+			return text.replace("&lt;", "<").replace("&gt;", ">");
+		}
+	}
 }

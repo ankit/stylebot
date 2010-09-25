@@ -1,3 +1,7 @@
+**0.1.4**
+
+Fixed issue where Stylebot didn't run properly on certain sites
+
 **0.1.3**
 
 * Allow float values for size fields

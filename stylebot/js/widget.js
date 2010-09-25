@@ -369,7 +369,7 @@ stylebot.widget = {
                 var value = e.target.innerHTML;
                 stylebot.widget.cache.headerSelector.html(value)
                 stylebot.widget.updateHeight();
-                stylebot.select(null, value);
+                stylebot.select(null, Utils.HTMLDecode(value));
                 $("#stylebot-dropdown").remove();
             })
             .appendTo(dropdown);
