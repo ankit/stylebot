@@ -338,8 +338,21 @@ stylebot.widget = {
     },
     
     toggleMode: function(e) {
-        var el = $(e.target);
-        stylebot.options.mode = el.html();
+        var el;
+        if (e) {
+            el = $(e.target);
+            stylebot.options.mode = el.html();
+        }
+        else {
+            if (stylebot.options.mode == "Basic") {
+                stylebot.options.mode = "Advanced";
+                el = $(".stylebot-mode:contains(Advanced)");
+            }
+            else {
+                stylebot.options.mode = "Basic";
+                el = $(".stylebot-mode:contains(Basic)");
+            }
+        }
         stylebot.widget.updateHeight();
         stylebot.widget.setMode();
     },

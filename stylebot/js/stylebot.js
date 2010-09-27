@@ -52,6 +52,7 @@ var stylebot = {
         this.status = true;
         this.chrome.setIcon(true);
         this.enableSelection();
+        attachKeyboardShortcuts();
     },
     
     disable: function() {
@@ -64,6 +65,7 @@ var stylebot = {
         stylebot.unhighlight();
         stylebot.selectedElement = null;
         stylebot.destroySelectionBox();
+        detachKeyboardShortcuts();
     },
     
     highlight: function(el) {
