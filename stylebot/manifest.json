@@ -1,6 +1,6 @@
 {
 	"name": "Stylebot",
-	"version": "0.1.4",
+	"version": "0.1.5",
 	"description": "Adapt the web's appearance.",
 	"background_page": "background.html",
 	"options_page": "options.html",

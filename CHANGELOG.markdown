@@ -1,3 +1,7 @@
+**0.1.5**
+
+Fixed issue #30
+
 **0.1.4**
 
 Fixed issue where Stylebot didn't run properly on certain sites
