@@ -1,6 +1,6 @@
 function handleKeyboardShortcut(e) {
     var tag = e.target.tagName.toLowerCase();
-    if ((tag == "input" && e.type == 'text') || tag == "textarea") {
+    if ((tag == "input" && e.target.type == 'text') || tag == "textarea") {
         return true;
     }
     console.log(e.keyCode);
