@@ -72,11 +72,13 @@ stylebot.style = {
         this.save();
 
         setTimeout(function() {
-            if (stylebot.style.cache.elements)
+            if (stylebot.style.cache.elements && stylebot.style.cache.elements.length != 0) {
                 stylebot.style.updateInlineCSS(stylebot.style.cache.elements, stylebot.style.getInlineCSS( stylebot.style.cache.selector));
+            }
             // if no elements, update the stylesheet
-            else
+            else {
                 stylebot.style.updateStyleElement(stylebot.style.rules);
+            }
         }, 0);
     },
     
@@ -296,7 +298,7 @@ stylebot.style = {
     // remove rule for current selector from stylebot's <style> element and apply it as inline css
     removeFromStyleElement: function() {
         // if no elements are selected, return
-        if (!this.cache.elements)
+        if (!this.cache.elements || this.cache.elements.length == 0)
             return;
         this.updateInlineCSS(this.cache.elements, this.getInlineCSS(this.cache.selector));
         
