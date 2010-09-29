@@ -144,6 +144,18 @@ stylebot.widget.basic = {
             el: null
         },
         {
+            name: 'Height',
+            id: 'height',
+            type: 'size',
+            el: null
+        },
+        {
+            name: 'Width',
+            id: 'width',
+            type: 'size',
+            el: null
+        },
+        {
             name: 'Margins',
             options: ['All', 'Top', 'Right', 'Bottom', 'Left'],
             id: ['margin', 'margin-top', 'margin-right', 'margin-bottom', 'margin-left'],
@@ -161,7 +173,6 @@ stylebot.widget.basic = {
     ],
     
     createUI: function() {
-        
         this.cache.container = $('<div>', {
             id: 'stylebot-controls'
         });

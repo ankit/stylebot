@@ -206,7 +206,7 @@ stylebot.widget = {
     show: function() {
         if (!this.cache.box)
             this.createUI();
-            
+        
         this.attachListeners();
         this.setPosition(stylebot.options.position);
 
@@ -246,7 +246,6 @@ stylebot.widget = {
     
     setPosition: function(where) {
         var left;
-
         if (where == "Left")
             left = 0;
         else if (where == "Right")
@@ -317,8 +316,12 @@ stylebot.widget = {
     },
     
     togglePosition: function(e) {
-        var el = $(e.target);
-        var pos = el.data('position');
+        var el = $("#stylebot-arrow-button");
+        var pos;
+        if (e)
+            pos = el.data('position');
+        else
+            pos = stylebot.options.position;
         if (pos == "Left")
         {
             pos = "Right";

@@ -26,13 +26,21 @@ function handleKeyboardShortcut(e) {
         $("#stylebot-main-buttons button:contains(Edit CSS)").click();
         return false;
     }
-    //b = 98; bold
+    
+    // 'v': toggle highlight of *all* the elements for current selector
+    // TODO: Add functionality to this
+    
+    // 'p': Toggle Stylebot's position
+    if (e.keyCode == 112) {
+        stylebot.widget.togglePosition();
+        return true;
+    }
 }
 
 function attachKeyboardShortcuts() {
-    $(document).bind('keypress', handleKeyboardShortcut);
+    document.addEventListener('keypress', handleKeyboardShortcut, true);
 }
 
 function detachKeyboardShortcuts() {
-    $(document).unbind('keypress', handleKeyboardShortcut);
+    document.removeEventListener('keypress', handleKeyboardShortcut, true);
 }

@@ -264,10 +264,11 @@
 .stylebot-inline-label {
     color: inherit !important;
     display: inline;
-    padding-right: 5px !important;
+    padding: 0 !important;
+    margin: 0 !important;
     font-family: inherit !important;
     font-size: inherit !important;
-    font-weight:normal !important;
+    font-weight: normal !important;
 }
 
 /* @end */
