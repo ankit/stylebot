@@ -27,13 +27,9 @@ function attachListeners() {
               || stylebot.options.shortcutMetaKey == 'none')
             stylebot.toggle();
         }
-        
         // Handle Esc key to escape editing mode
         else if (e.keyCode == 27 &&
-            stylebot.status &&
-            !stylebot.widget.basic.isColorPickerVisible &&
-            !stylebot.modal.isVisible &&
-            e.target.tagName.toLowerCase() != 'select'
+            stylebot.shouldIClose(e)
         )
         {
             e.target.blur();
@@ -48,7 +44,7 @@ function isInputField(el) {
     var tagName = el.tagName.toLowerCase();
     var inputTypes = ['input', 'textarea', 'div', 'object'];
     
-    if ($.inArray( tagName, inputTypes) != -1 ||
+    if ($.inArray(tagName, inputTypes) != -1 ||
     el.id == "stylebot"
     )
         return true;

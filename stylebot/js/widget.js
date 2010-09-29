@@ -363,20 +363,29 @@ stylebot.widget = {
             dropdown.remove(); return true;
         }
         var parent = stylebot.widget.cache.headerSelector.parent();
+        var parentHeight = parent.height() + 10
+        var height = $(window).height() - 50 - parentHeight;
         dropdown = $("<div>", {
             id: "stylebot-dropdown"
         })
         .css({
             left: parent.offset().left + (parent.width()/2),
-            top: parent.height() + 10
-        });
+            top: parentHeight,
+            'max-height': height
+        })
         
         var any = false;
         for (var selector in stylebot.style.rules) {
             any = true;
-            $("<li>", {
+            var li = $("<li>", {
                 class: 'stylebot-dropdown-li',
                 html: selector
+            })
+            .hover(function(e) {
+                if (stylebot.selectionStatus)
+                    return true;
+                stylebot.highlight($(e.target.innerText)[0]);
+                return true;
             })
             .click(function(e) {
                 var value = e.target.innerHTML;
@@ -388,16 +397,22 @@ stylebot.widget = {
             .appendTo(dropdown);
         }
         if (!any)
-            $("<li>", { html: "No CSS selectors edited" }).appendTo(dropdown);
+            $("<li>", {html: "No CSS selectors edited"}).appendTo(dropdown);
+
         var onClickElsewhere = function(e) {
-            if ($(e.target).parent().attr('id') != "stylebot-dropdown" && e.target.id != "stylebot-dropdown-button") {
+            var $target = $(e.target);
+            var id = "stylebot-dropdown";
+            if ((e.type == "mousedown" && $target.parent().attr('id') != id && e.target.id.indexOf(id) == -1) ||
+                (e.type == "keydown" && e.keyCode == 27))
+            {
                 $("#stylebot-dropdown").remove();
-                $(document).unbind('mousedown', onClickElsewhere);
+                stylebot.select(null, stylebot.style.cache.selector);
+                $(document).unbind('mousedown keydown', onClickElsewhere);
                 return true;
             }
             return true;
         };
         dropdown.appendTo(parent);
-        $(document).bind('mousedown', onClickElsewhere);
+        $(document).bind('mousedown keydown', onClickElsewhere);
     }
 }

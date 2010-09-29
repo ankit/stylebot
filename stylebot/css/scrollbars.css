@@ -72,3 +72,40 @@
 .stylebot-textarea::-webkit-scrollbar-button:end:decrement {
     display: none;
 }
+
+
+/** Dropdown scrollbar **/
+
+#stylebot-dropdown::-webkit-scrollbar {
+	width: 8px;
+	height: 8px;
+}
+
+#stylebot-dropdown::-webkit-scrollbar-button:start:decrement,
+#stylebot-dropdown::-webkit-scrollbar-button:end:increment {
+	display: none;
+}
+
+#stylebot-dropdown::-webkit-scrollbar-button:start:increment,
+#stylebot-dropdown::-webkit-scrollbar-button:end:decrement {
+    display: none;
+}
+
+#stylebot-dropdown::-webkit-scrollbar-track-piece {
+	border-radius: 7px;
+	background-color: #e1e1e1;
+}
+
+#stylebot-dropdown::-webkit-scrollbar-thumb {
+    height: 100px;
+	border-radius: 7px;
+    background-color: #878787;
+}
+
+#stylebot-dropdown::-webkit-scrollbar-corner, #stylebot-dropdown::-webkit-scrollbar-resizer {
+    background-color: #ededed;
+}
+
+#stylebot-dropdown::-webkit-scrollbar-corner, #stylebot-dropdown::-webkit-scrollbar-resizer {
+    background-color: #c5c9d1;
+}

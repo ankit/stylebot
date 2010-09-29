@@ -119,7 +119,7 @@ var stylebot = {
     toggleSelection: function() {
         if (stylebot.selectionStatus)
         {
-            stylebot.select( null, stylebot.style.cache.selector );
+            stylebot.select(null, stylebot.style.cache.selector);
             stylebot.disableSelection();
         }
         else
@@ -185,6 +185,14 @@ var stylebot = {
         {
             return true;
         }
+        // for dropdown
+        if (e.target.className == "stylebot-dropdown-li") {
+            var el = $(e.target.innerText)[0];
+            if (el != stylebot.hoveredElement) {
+                stylebot.highlight(el);
+            }
+            return true;
+        }
         if (stylebot.belongsToStylebot(e.target))
         {
             stylebot.unhighlight();
@@ -222,5 +230,17 @@ var stylebot = {
         if (parent.length != 0 || id.indexOf("stylebot") != -1)
             return true;
         return false;
+    },
+    
+    shouldIClose: function(e) {
+        if (!stylebot.status ||
+            stylebot.widget.basic.isColorPickerVisible ||
+            stylebot.modal.isVisible ||
+            $("#stylebot-dropdown").length != 0 ||
+            e.target.tagName == 'SELECT')
+        {
+            return false;
+        }
+        return true;
     }
 }
