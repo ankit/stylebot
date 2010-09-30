@@ -136,5 +136,15 @@ var Utils = {
 			// replace &lt; with < and &gt; with >
 			return text.replace("&lt;", "<").replace("&gt;", ">");
 		}
-	}
+	},
+	
+	// To copy an object. from: http://my.opera.com/GreyWyvern/blog/show.dml/1725165
+    cloneObject: function(obj) {
+      var newObj = (obj instanceof Array) ? [] : {};
+      for (i in obj) {
+        if (obj[i] && typeof obj[i] == "object") {
+          newObj[i] = this.cloneObject(obj[i]);
+        } else newObj[i] = obj[i]
+      } return newObj;
+    }
 }

@@ -15,6 +15,8 @@ stylebot.widget.basic.events = {
         else
             value = '';
         var property = $(e.target).data('property');
+        // save current state to undo stack
+        stylebot.style.saveState();
         stylebot.style.apply(property, value);
     },
     
@@ -31,6 +33,8 @@ stylebot.widget.basic.events = {
             el.addClass(className);
             value = el.data('value');
         }
+        // save current state to undo stack
+        stylebot.style.saveState();
         stylebot.style.apply(property, value);
     },
     
@@ -42,6 +46,8 @@ stylebot.widget.basic.events = {
             value = '';
         var property = $(e.target).data('property');
         value = value.split(',');
+        // save current state to undo stack
+        stylebot.style.saveState();
         if (typeof(property) == "object")
         {
             var len = property.length;
@@ -59,7 +65,6 @@ stylebot.widget.basic.events = {
         }
         var value = e.target.value;
         var property = $(e.target).data('property');
-
         stylebot.style.apply(property, value);
     },
     
@@ -73,13 +78,14 @@ stylebot.widget.basic.events = {
         var unit = $(e.target).next().attr('value');
         if (parseFloat(value))
             value += unit;
-        
         stylebot.style.apply(property, value);
     },
     
     onSelectChange: function(e) {
         var value = e.target.value.split(',');
-        var property = $(e.target).find('[value='+e.target.value+']').data('property');
+        var property = $(e.target).find('[value=' + e.target.value + ']').data('property');
+        // save current state to undo stack
+        stylebot.style.saveState();
         if (typeof(property) == "object")
         {
             var len = property.length;
@@ -101,6 +107,8 @@ stylebot.widget.basic.events = {
         control.find('.stylebot-active-button')
         .removeClass('stylebot-active-button')
         .next().removeClass('stylebot-active-button-next');
+        // save current state to undo stack
+        stylebot.style.saveState();
         if (!status)
         {
             el.addClass('stylebot-active-button');
@@ -121,11 +129,6 @@ stylebot.widget.basic.events = {
         }
         else
         {
-            // close all accordion groups
-            // stylebot.widget.basic.cache.accordionHeaders
-            // .removeClass('stylebot-accordion-active')
-            // .next().hide();
-
             h.addClass( 'stylebot-accordion-active' )
             .focus()
             .next().show();
@@ -144,6 +147,6 @@ stylebot.widget.basic.events = {
                     enabledAccordions[enabledAccordions.length] = i;
             }
             stylebot.chrome.saveAccordionState(enabledAccordions);
-        }, 1000);
+        }, 500);
     }
 }

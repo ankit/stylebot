@@ -50,10 +50,19 @@ var WidgetUI = {
         .click(function(e) {
             Utils.selectAllText(e.target);
         })
+        .focus(function(e) {
+            stylebot.style.saveState();
+            $(e.target).data('lastState', e.target.value);
+        })
+        .blur(function(e) {
+            if ($(e.target).data('lastState') == e.target.value) {
+                stylebot.style.clearLastState();
+            }
+        })
         .keyup(handler);
     },
     
-    createSizeControl: function( property ) {
+    createSizeControl: function(property) {
         var container = $('<span>');
         
         // Textfield for entering size
@@ -71,7 +80,7 @@ var WidgetUI = {
         
         var len = this.validSizeUnits.length;
         
-        for (var i = 0; i < len; i++){
+        for (var i = 0; i < len; i++) {
             this.createSelectOption(this.validSizeUnits[i], null, this.validSizeUnits[i])
             .appendTo(select);
         }

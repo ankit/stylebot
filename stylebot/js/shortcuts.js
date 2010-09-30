@@ -4,8 +4,8 @@ function handleKeyboardShortcut(e) {
         return true;
     }
     console.log(e.keyCode);
-    // 't': shortcut to toggle selection of element
-    if (e.keyCode == 116) {
+    // 's': shortcut to toggle selection of element
+    if (e.keyCode == 115) {
         stylebot.toggleSelection();
         return true;
     }
@@ -33,6 +33,38 @@ function handleKeyboardShortcut(e) {
     // 'p': Toggle Stylebot's position
     if (e.keyCode == 112) {
         stylebot.widget.togglePosition();
+        return true;
+    }
+    
+    // 'z': Undo last action
+    if (e.keyCode == 122) {
+        stylebot.style.undo();
+        return true;
+    }
+    
+    /** Jump around sections **/
+    
+    // 't': Jump to Text
+    if (e.keyCode == 116) {
+        $(".stylebot-accordion-header:contains('Text')").focus();
+        return true;
+    }
+    
+    // 'c': Jump to Color
+    if (e.keyCode == 99) {
+        $(".stylebot-accordion-header:contains('Color')").focus();
+        return true;
+    }
+    
+    // 'b': Jump to Borders
+    if (e.keyCode == 98) {
+        $(".stylebot-accordion-header:contains('Borders')").focus();
+        return true;
+    }
+    
+    // 'l': Jump to Layout
+    if (e.keyCode == 108) {
+        $(".stylebot-accordion-header:contains('Layout')").focus();
         return true;
     }
 }

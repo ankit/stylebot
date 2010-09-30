@@ -25,7 +25,7 @@ stylebot.widget.basic = {
     },
     
     groups: [{
-        name: 'Text',
+        name: '<u>T</u>ext',
         controls: [
         {
             name: 'Font Family',
@@ -95,7 +95,7 @@ stylebot.widget.basic = {
         }]
     },
     {
-        name: 'Color & Background',
+        name: '<u>C</u>olor & Background',
         controls:[{
             name: 'Color',
             id: 'color',
@@ -110,7 +110,7 @@ stylebot.widget.basic = {
         }]
     },
     {
-        name: 'Borders',
+        name: '<u>B</u>orders',
         controls: [
         {
             name: 'Border Style',
@@ -134,7 +134,7 @@ stylebot.widget.basic = {
         }]
     },
     {
-        name: 'Visibility & Layout',
+        name: '<u>L</u>ayout & Visibility',
         controls: [
         {
             name: 'Visibility',

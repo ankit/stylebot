@@ -5,7 +5,6 @@
   **/
 
 stylebot.style = {
-
     /*  cache of custom CSS rules applied to elements on the current page
         e.g.: 
         rules = {
@@ -20,6 +19,9 @@ stylebot.style = {
     timer: null,
     
     parser: null,
+    
+    // the undo stack. size is limited to last 5 actions
+    undoStack: [],
     
     cache: {
         // most recently selected elements' selector
@@ -62,15 +64,13 @@ stylebot.style = {
         }
     },
     
-    // applies property-value pair to selected elements as inline css, updates cache and saves the rule
+    // applies property-value pair to currently selected elements as inline css, updates cache and saves the rule
     // called by basic mode
     apply: function(property, value) {
         if (!this.cache.selector || this.cache.selector == "")
             return true;
-
         this.savePropertyToCache(this.cache.selector, property, value);
         this.save();
-
         setTimeout(function() {
             if (stylebot.style.cache.elements && stylebot.style.cache.elements.length != 0) {
                 stylebot.style.updateInlineCSS(stylebot.style.cache.elements, stylebot.style.getInlineCSS( stylebot.style.cache.selector));
@@ -88,6 +88,7 @@ stylebot.style = {
         if (!stylebot.style.cache.selector)
             return true;
 
+        // calculating timer duration based upon number of elements
         var duration;
         if (stylebot.style.cache.elements) {
             var noOfElements = stylebot.style.cache.elements.length;
@@ -107,11 +108,11 @@ stylebot.style = {
             clearTimeout(stylebot.style.updateCSSTimer);
             stylebot.style.updateCSSTimer = null;
         }
-
+        
         stylebot.style.updateCSSTimer = setTimeout(function() {
             stylebot.style.saveRuleFromCSS(css, stylebot.style.cache.selector);
             
-            if (stylebot.style.cache.elements) {
+            if (stylebot.style.cache.elements && stylebot.style.cache.elements.length != 0) {
                 var newCSS = CSSUtils.crunchCSSForSelector(stylebot.style.rules, stylebot.style.cache.selector, true);
                 stylebot.style.updateInlineCSS(stylebot.style.cache.elements, newCSS);
             }
@@ -129,7 +130,10 @@ stylebot.style = {
         }, 1000);
     },
     
+    // called when CSS of the entire page is edited in modal popup
     applyPageCSS: function(css) {
+        // push current state to undo stack
+        this.saveState();
         if (css == "")
             this.rules = {};
         else {
@@ -382,5 +386,32 @@ stylebot.style = {
             stylebot.style.updateStyleElement(stylebot.style.rules);
             stylebot.style.resetInlineCSS();
         }, duration);
+    },
+    
+    undo: function() {
+        console.log("Undo called..");
+        console.log(this.undoStack.length);
+        if (this.undoStack.length == 0)
+            return false;
+        this.rules = this.undoStack.pop();
+        this.clearInlineCSS(this.cache.elements);
+        this.updateStyleElement(this.rules);
+        this.save();
+        stylebot.widget.show();
+        setTimeout(function() {
+            stylebot.selectionBox.highlight(stylebot.selectedElement);
+        }, 0);
+    },
+    
+    // save current state to undo stack
+    saveState: function() {
+        if (this.undoStack.length >= 5) {
+            this.undoStack.shift();
+        }
+        this.undoStack.push(Utils.cloneObject(this.rules));
+    },
+    
+    clearLastState: function() {
+        this.undoStack.pop();
     }
 }
