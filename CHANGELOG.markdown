@@ -1,3 +1,11 @@
+**0.1.8**
+
+* Keyboard shortcuts
+* Undo functionality (upto last 5 actions)
+* More useful selector dropdown. On hover over a selector, first matched element in DOM is highlighted. Also, made it scrollable.
+* Added Height and Width to Basic Mode
+* Fixed minor issues
+
 **0.1.5**
 
 Fixed issue #30

@@ -26,7 +26,8 @@ var cache = {
     enabledAccordions: [0, 1, 2, 3]
 };
 
-function init(){
+function init() {
+    updateVersion();
     attachListeners();
     loadOptionsIntoCache();
     loadStylesIntoCache();
@@ -37,7 +38,14 @@ function init(){
     }
 }
 
-function attachListeners(){
+function updateVersion() {
+    if (localStorage.version != "0.1.8") {
+        chrome.tabs.create({url:"http://stylebot.me/update.html", selected: true}, null);
+        localStorage.version = "0.1.8";
+    }
+}
+
+function attachListeners() {
     chrome.pageAction.onClicked.addListener(handlePageIconClick);
     
     chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
