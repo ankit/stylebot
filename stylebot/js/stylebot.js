@@ -179,7 +179,7 @@ var stylebot = {
     onMouseMove: function(e) {
         if (e.target.className == "stylebot-selection"
             || stylebot.widget.isBeingDragged
-            || stylebot.modal.isVisible
+            || stylebot.page.isVisible
             || stylebot.hoveredElement == e.target
             )
         {
@@ -225,7 +225,7 @@ var stylebot = {
     
     belongsToStylebot: function(el) {
         var $el = $(el);
-        var parent = $el.closest('#stylebot, .stylebot_colorpicker');
+        var parent = $el.closest('#stylebot, .stylebot_colorpicker, #stylebot-modal');
         var id = $el.attr('id');
         if (parent.length != 0 || id.indexOf("stylebot") != -1)
             return true;
@@ -235,7 +235,7 @@ var stylebot = {
     shouldIClose: function(e) {
         if (!stylebot.status ||
             stylebot.widget.basic.isColorPickerVisible ||
-            stylebot.modal.isVisible ||
+            stylebot.page.isVisible ||
             $("#stylebot-dropdown").length != 0 ||
             e.target.tagName == 'SELECT')
         {

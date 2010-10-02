@@ -7,7 +7,6 @@
 
 // constructor
 var ModalBox = function(html, options) {
-    
     if (options)
     {
         for (var option in options)

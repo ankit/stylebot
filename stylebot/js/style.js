@@ -130,9 +130,8 @@ stylebot.style = {
         }, 1000);
     },
     
-    // called when CSS of the entire page is edited in modal popup
+    // called when CSS of the entire page is edited in a popup
     applyPageCSS: function(css) {
-        this.saveState();
         if (css == "")
             this.rules = {};
         else {
@@ -388,7 +387,6 @@ stylebot.style = {
     },
     
     undo: function() {
-        console.log("undo called: " + this.undoStack.length);
         if (this.undoStack.length == 0)
             return false;
         this.rules = this.undoStack.pop();
@@ -404,7 +402,6 @@ stylebot.style = {
     
     // save current state to undo stack
     saveState: function() {
-        console.log("saveState called: " + this.undoStack.length);
         if (this.undoStack.length >= 5) {
             this.undoStack.shift();
         }
@@ -412,7 +409,6 @@ stylebot.style = {
     },
     
     clearLastState: function() {
-        console.log("clearLastState called: " + this.undoStack.length);
         this.undoStack.pop();
     },
     
@@ -424,7 +420,6 @@ stylebot.style = {
     },
     
     refreshUndoState: function() {
-        console.log("refreshUndoState called: " + this.undoStack.length);
         if (!this.shouldEnableUndo())
             stylebot.widget.disableUndo();
         else

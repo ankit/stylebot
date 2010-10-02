@@ -312,9 +312,9 @@ stylebot.widget = {
             stylebot.widget.advanced.reset();
     },
     
-    // display CSS for page in a modal box
+    // display page CSS in a popup
     editCSS: function(e) {
-        stylebot.modal.show(CSSUtils.crunchFormattedCSS(stylebot.style.rules, false), e.target);
+        stylebot.page.show(CSSUtils.crunchFormattedCSS(stylebot.style.rules, false), e.target);
     },
     
     // reset CSS for current selector

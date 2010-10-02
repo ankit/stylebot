@@ -18,7 +18,7 @@ function handleKeyboardShortcut(e) {
     if (e.keyCode == 109) {
         stylebot.widget.toggleMode();
     }
-    // 'e': Open the edit css modal popup
+    // 'e': Open the edit css popup
     if (e.keyCode == 101) {
         e.stopPropagation();
         e.preventDefault();
