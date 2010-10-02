@@ -1,4 +1,4 @@
-**0.1.8**
+**0.2**
 
 * Keyboard shortcuts
 * Undo functionality (upto last 5 actions)

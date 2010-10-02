@@ -39,9 +39,9 @@ function init() {
 }
 
 function updateVersion() {
-    if (localStorage.version != "0.1.8") {
+    if (localStorage.version != "0.2") {
         chrome.tabs.create({url:"http://stylebot.me/update.html", selected: true}, null);
-        localStorage.version = "0.1.8";
+        localStorage.version = "0.2";
     }
 }
 
