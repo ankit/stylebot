@@ -11,6 +11,7 @@ stylebot.widget = {
         header: null,
         headerSelector: null,
         headerSelectIcon: null,
+        undoBt: null,
         dropDown: null
     },
     
@@ -148,8 +149,21 @@ stylebot.widget = {
         });
         
         WidgetUI.createButton("Edit CSS").appendTo(btContainer).click(stylebot.widget.editCSS);
-        WidgetUI.createButton("Reset").appendTo(btContainer).click(stylebot.widget.resetCSS);
-        WidgetUI.createButton("Reset Page").appendTo(btContainer).click(stylebot.widget.resetAllCSS);
+
+        this.cache.undoBt = WidgetUI.createButton("Undo").attr({
+            title: "Undo your last action",
+            'disabled': "disabled"
+        })
+        .tipsy({delayIn: 1500, gravity:'s', html: true})
+        .appendTo(btContainer).click(function(e) {stylebot.style.undo();});
+        
+        WidgetUI.createButton("Reset").attr('title', "Reset selected element(s) CSS")
+        .tipsy({delayIn: 1500, gravity:'s', html: true})
+        .appendTo(btContainer).click(stylebot.widget.resetCSS);
+        
+        WidgetUI.createButton("Reset Page").attr('title', "Reset all custom CSS for page")
+        .tipsy({delayIn: 1500, gravity:'se', html: true})
+        .appendTo(btContainer).click(stylebot.widget.resetAllCSS);
 
         btContainer.appendTo(optionsContainer);
         optionsContainer.appendTo(this.cache.box);
@@ -417,5 +431,13 @@ stylebot.widget = {
         };
         dropdown.appendTo(parent);
         $(document).bind('mousedown keydown', onClickElsewhere);
+    },
+    
+    enableUndo: function() {
+        this.cache.undoBt.attr('disabled', '');
+    },
+    
+    disableUndo: function() {
+        this.cache.undoBt.attr('disabled', 'disabled');
     }
 }

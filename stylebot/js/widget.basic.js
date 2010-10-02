@@ -238,13 +238,10 @@ stylebot.widget.basic = {
             
             case 'multi-size'       :   control_el = WidgetUI.createMultiSizeControl(control).appendTo(el); break;
                                         
-            case 'color'            :   control_el = WidgetUI.createTextField(control.id, 10, stylebot.widget.basic.events.onTextFieldKeyUp);
+            case 'color'            :   control_el = WidgetUI.createTextField(control.id, 10, Events.onTextFieldKeyUp);
                                         WidgetUI.createColorPicker(control_el).appendTo(el);
                                         control_el.appendTo(el)
                                         .keyup(function (e) { WidgetUI.setColorSelectorColor($(this)) });
-                                        break;
-                                        
-            case 'checkbox'         :   control_el = WidgetUI.createCheckbox(null, control.id , control.value).appendTo(el);
                                         break;
 
             case 'toggle'           :   control_el = WidgetUI.createToggleButton("Hide", control.id , control.value).appendTo(el);
@@ -290,7 +287,6 @@ stylebot.widget.basic = {
     },
     
     fillControl: function(control, rule) {
-        
         function determineSizeUnit(val) {
             var len = WidgetUI.validSizeUnits.length;
             for (var i=0; i<len; i++)
@@ -304,7 +300,6 @@ stylebot.widget.basic = {
         var pValue = rule[control.id];
 
         switch (control.type) {
-            
             case 'size'         :       if(pValue == undefined)
                                             return false;
                                         var unit = determineSizeUnit(pValue);
@@ -386,12 +381,6 @@ stylebot.widget.basic = {
                                         WidgetUI.setColorSelectorColor(control.el);
                                         break;
                                     
-            case 'checkbox'         :   if (pValue == control.value)
-                                            control.el.attr('checked', true);
-                                        else
-                                            control.el.attr('checked', false);                                                
-                                        break;
-                                    
             case 'toggle'           :   if (pValue == control.el.data('value'))
                                             control.el.addClass('stylebot-active-button');
                                         else
@@ -451,6 +440,6 @@ stylebot.widget.basic = {
     initAccordions: function() {
         var len = this.enabledAccordions.length;
         for (var i=0; i < len; i++)
-            this.events.toggleAccordion($(this.cache.accordionHeaders[this.enabledAccordions[i]]));
+            Events.toggleAccordion($(this.cache.accordionHeaders[this.enabledAccordions[i]]));
     }
 }

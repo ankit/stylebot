@@ -26,6 +26,17 @@ stylebot.widget.advanced = {
         })
         .keyup(this.onKeyUp)
         .keydown(function(e) { if (e.keyCode == 27) this.blur(); })
+        .focus(function(e) {
+            stylebot.style.saveState();
+            $(e.target).data('lastState', e.target.value);
+        })
+        .blur(function(e) {
+            if ($(e.target).data('lastState') == e.target.value) {
+                stylebot.style.clearLastState();
+            }
+            $(e.target).data('lastState', null);
+            stylebot.style.refreshUndoState();
+        })
         .appendTo(this.cache.container);
         
         return this.cache.container;
@@ -46,8 +57,10 @@ stylebot.widget.advanced = {
         this.fill();
         this.cache.container.show();
         setTimeout(function() {
-            stylebot.widget.advanced.cache.cssField.focus();
-            Utils.moveCursorToEnd(stylebot.widget.advanced.cache.cssField.get(0));
+            if (!stylebot.widget.advanced.cache.cssField.get(0).disabled) {
+                stylebot.widget.advanced.cache.cssField.focus();
+                Utils.moveCursorToEnd(stylebot.widget.advanced.cache.cssField.get(0));
+            }
         });
     },
     

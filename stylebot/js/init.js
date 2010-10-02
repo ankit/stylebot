@@ -24,8 +24,12 @@ function attachListeners() {
             if (stylebot.options.shortcutMetaKey == 'ctrl' && e.ctrlKey
               || stylebot.options.shortcutMetaKey == 'shift' && e.shiftKey
               || stylebot.options.shortcutMetaKey == 'alt' && e.altKey
-              || stylebot.options.shortcutMetaKey == 'none')
-            stylebot.toggle();
+              || stylebot.options.shortcutMetaKey == 'none') {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  stylebot.toggle();
+                  return false;
+              }
         }
         // Handle Esc key to escape editing mode
         else if (e.keyCode == 27 &&

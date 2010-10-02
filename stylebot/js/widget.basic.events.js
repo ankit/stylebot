@@ -1,24 +1,12 @@
 /**
-  * stylebot.widget.basic.events
+  * Events
   * 
-  * Events for stylebot widget controls in Basic mode
+  * Events for Stylebot Widget Controls in Basic Mode
   **/
 
-stylebot.widget.basic.events = {
+Events = {
     
     accordionTimer: null,
-    
-    onCheckboxChange: function(e) {
-        var value;
-        if (e.target.checked == true)
-            value = e.target.value;
-        else
-            value = '';
-        var property = $(e.target).data('property');
-        // save current state to undo stack
-        stylebot.style.saveState();
-        stylebot.style.apply(property, value);
-    },
     
     onToggle: function(e) {
         var el = $(this);
@@ -33,9 +21,7 @@ stylebot.widget.basic.events = {
             el.addClass(className);
             value = el.data('value');
         }
-        // save current state to undo stack
-        stylebot.style.saveState();
-        stylebot.style.apply(property, value);
+        Events.saveProperty(property, value);
     },
     
     onRadioClick: function(e) {
@@ -46,16 +32,14 @@ stylebot.widget.basic.events = {
             value = '';
         var property = $(e.target).data('property');
         value = value.split(',');
-        // save current state to undo stack
-        stylebot.style.saveState();
         if (typeof(property) == "object")
         {
             var len = property.length;
             for (var i = 0; i < len; i++)
-                stylebot.style.apply(property[i], value[i]);
+                Events.saveProperty(property[i], value[i]);
         }
         else
-            stylebot.style.apply(property, value);
+            Events.saveProperty(property, value);
     },
     
     onTextFieldKeyUp: function(e) {
@@ -66,6 +50,19 @@ stylebot.widget.basic.events = {
         var value = e.target.value;
         var property = $(e.target).data('property');
         stylebot.style.apply(property, value);
+    },
+    
+    onTextFieldFocus: function(e) {
+        stylebot.style.saveState();
+        $(e.target).data('lastState', e.target.value);
+    },
+    
+    onTextFieldBlur: function(e) {
+        if ($(e.target).data('lastState') == e.target.value) {
+            stylebot.style.clearLastState();
+        }
+        $(e.target).data('lastState', null);
+        stylebot.style.refreshUndoState();
     },
     
     onSizeFieldKeyUp: function(e) {
@@ -79,21 +76,20 @@ stylebot.widget.basic.events = {
         if (parseFloat(value))
             value += unit;
         stylebot.style.apply(property, value);
+        // state saving for undo is handled by onTextFieldFocus and onTextFieldBlur
     },
     
     onSelectChange: function(e) {
         var value = e.target.value.split(',');
         var property = $(e.target).find('[value=' + e.target.value + ']').data('property');
-        // save current state to undo stack
-        stylebot.style.saveState();
         if (typeof(property) == "object")
         {
             var len = property.length;
             for (var i = 0; i < len; i++)
-                stylebot.style.apply(property[i], value[i]);
+                Events.saveProperty(property[i], value[i]);
         }
         else
-            stylebot.style.apply(property, value);
+            Events.saveProperty(property, value);
     },
     
     onSegmentedControlClick: function(e) {
@@ -107,16 +103,14 @@ stylebot.widget.basic.events = {
         control.find('.stylebot-active-button')
         .removeClass('stylebot-active-button')
         .next().removeClass('stylebot-active-button-next');
-        // save current state to undo stack
-        stylebot.style.saveState();
         if (!status)
         {
             el.addClass('stylebot-active-button');
             el.next().addClass('stylebot-active-button-next');
-            stylebot.style.apply(el.data('property'), el.data('value'));
+            Events.saveProperty(el.data('property'), el.data('value'));
         }
         else
-            stylebot.style.apply(el.data('property'), '');
+            Events.saveProperty(el.data('property'), '');
         el.focus();
     },
     
@@ -148,5 +142,13 @@ stylebot.widget.basic.events = {
             }
             stylebot.chrome.saveAccordionState(enabledAccordions);
         }, 500);
+    },
+    
+    saveProperty: function(property, value) {
+        console.log("saveProperty called");
+        // save current state to undo stack
+        stylebot.style.saveState();
+        stylebot.style.apply(property, value);
+        stylebot.style.refreshUndoState();
     }
 }

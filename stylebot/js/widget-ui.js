@@ -1,10 +1,8 @@
 /**
-  * Utility Methods to create various Widget controls.
+  * Utility Methods to create various UI Controls for Basic Mode
   *
-  * Dual licensed under GPL and MIT licenses
   **/
 
-/** TODO: Remove any dependence on other parts of stylebot (mostly stylebot.widget.basic.events) **/
 var WidgetUI = {
     
     validSizeUnits: ['px', 'em', '%', 'pt'],
@@ -35,7 +33,7 @@ var WidgetUI = {
             if (!el.hasClass('stylebot-accordion-header'))
                 el = el.parent();
             
-            stylebot.widget.basic.events.toggleAccordion(el);
+            Events.toggleAccordion(el);
         });
     },
     
@@ -50,15 +48,8 @@ var WidgetUI = {
         .click(function(e) {
             Utils.selectAllText(e.target);
         })
-        .focus(function(e) {
-            stylebot.style.saveState();
-            $(e.target).data('lastState', e.target.value);
-        })
-        .blur(function(e) {
-            if ($(e.target).data('lastState') == e.target.value) {
-                stylebot.style.clearLastState();
-            }
-        })
+        .focus(Events.onTextFieldFocus)
+        .blur(Events.onTextFieldBlur)
         .keyup(handler);
     },
     
@@ -66,7 +57,7 @@ var WidgetUI = {
         var container = $('<span>');
         
         // Textfield for entering size
-        this.createTextField(property, 2, stylebot.widget.basic.events.onSizeFieldKeyUp)
+        this.createTextField(property, 2, Events.onSizeFieldKeyUp)
         .appendTo(container);
 
         // Select box for choosing unit
@@ -154,7 +145,7 @@ var WidgetUI = {
             size: 20
         })
         .data('property', control.id)
-        .keyup(stylebot.widget.basic.events.onTextFieldKeyUp)
+        .keyup(Events.onTextFieldKeyUp)
         .css({
             marginLeft: '95px !important',
             marginTop: '5px !important',
@@ -163,27 +154,6 @@ var WidgetUI = {
         .appendTo(container);
         
         return container;
-    },
-    
-    createCheckbox: function(text, property, value) {
-        var checkbox = $('<input>',{
-            type: 'checkbox',
-            id: 'stylebot-' + property,
-            class: 'stylebot-control stylebot-checkbox',
-            value: value
-        })
-        .data('property', property)
-        .click(stylebot.widget.basic.events.onCheckboxChange);
-        
-        if (text)
-        {
-            var span = $('<span class="stylebot-control"></span>');
-            checkbox.appendTo(span);
-            this.createInlineLabel(text).appendTo(span);
-            return span;
-        }
-        else
-            return checkbox;
     },
     
     createToggleButton: function(text, property, value) {
@@ -195,7 +165,7 @@ var WidgetUI = {
             'value': value,
             'property': property
         })
-        .click(stylebot.widget.basic.events.onToggle);
+        .click(Events.onToggle);
     },
     
     createRadio: function(text, name, property, value) {
@@ -216,7 +186,7 @@ var WidgetUI = {
             radio.attr('value', value.join(','));
         
         radio.data('property', property);
-        radio.click(stylebot.widget.basic.events.onRadioClick);
+        radio.click(Events.onRadioClick);
         radio.appendTo(span);
         this.createInlineLabel(text).appendTo(span);
         return span;
@@ -228,7 +198,7 @@ var WidgetUI = {
             class: 'stylebot-control stylebot-select'
         })
         .data('property', property)
-        .change(stylebot.widget.basic.events.onSelectChange);
+        .change(Events.onSelectChange);
     },
     
     createSelectOption: function(text, property, value) {
@@ -248,7 +218,7 @@ var WidgetUI = {
             class: 'stylebot-colorselector stylebot-control', 
             tabIndex: 0
         })
-        .append( $('<div>', { class: 'stylebot-colorselector-color' } ) )
+        .append($('<div>', {class: 'stylebot-colorselector-color'}))
         .ColorPicker({
             flat: false,
 
@@ -264,18 +234,19 @@ var WidgetUI = {
                 var color = input.attr('value');
                 if(color == "")
                     color = "#ffffff"; // default is white
-                $(this).ColorPickerSetColor( color );
+                $(this).ColorPickerSetColor(color);
                 stylebot.widget.basic.isColorPickerVisible = true;
+                input.focus();
             },
             
             onHide: function() {
-                input.keyup();
+                input.keyup().blur();
                 stylebot.widget.basic.isColorPickerVisible = false;
             }
         })
-        .keyup( function(e) {
-            if( e.keyCode == 13 && !$(e.target).hasClass( 'disabled' ) ) //enter
-                $( this ).ColorPickerToggle();
+        .keyup(function(e) {
+            if(e.keyCode == 13 && !$(e.target).hasClass('disabled')) // enter
+                $(this).ColorPickerToggle();
         });
     },
     
@@ -334,15 +305,15 @@ var WidgetUI = {
         });
         
         var len = control.options.length;
-        for(var i=0; i<len; i++)
+        for(var i = 0; i < len; i++)
         {
-            var bt = this.createButton( control.options[i] )
+            var bt = this.createButton(control.options[i])
             .addClass('stylebot-segmented-button')
             .data({
                  value: control.values[i],
                  property: control.id
             })
-            .click(stylebot.widget.basic.events.onSegmentedControlClick)
+            .click(Events.onSegmentedControlClick)
             .appendTo(container);
         }
         return container;

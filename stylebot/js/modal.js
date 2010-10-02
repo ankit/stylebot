@@ -17,18 +17,18 @@ stylebot.modal = {
     // create the DOM elements
     create: function(options) {
         var textareaHeight = window.innerHeight * 0.45 + 'px';
-        var html = "<div>Edit the CSS for <b>" + stylebot.style.cache.url + "</b>:</div><textarea class='stylebot-textarea stylebot-css-code' style='height: " + textareaHeight + "' ></textarea><button class='stylebot-button' style='float:left !important; margin: 0px !important;'>Copy To Clipboard</button><button class='stylebot-button' style='margin: 0px !important;'>Cancel</button><button class='stylebot-button' style='margin: 0px !important; margin-right: 3px !important;'>Save</button>";
+        var html = "<div>Edit the CSS for <b>" + stylebot.style.cache.url + "</b>:</div><textarea class='stylebot-textarea stylebot-css-code' style='height: " + textareaHeight + "' tabindex='0'></textarea><button class='stylebot-button' style='float:left !important; margin: 0px !important;' tabindex='0'>Copy To Clipboard</button><div style='float: right'><button class='stylebot-button' style='margin: 0px !important; margin-right: 3px !important; float: none;' tabindex='0'>Save</button><button class='stylebot-button' style='margin: 0px !important; float: none;' tabindex='0'>Cancel</button></div>";
 
         this.modal = new ModalBox(html, options);
         this.cache.textarea = this.modal.box.find('textarea');
         var buttons = this.modal.box.find('button');
         $(buttons[0]).click(stylebot.modal.copyToClipboard);
-        $(buttons[1]).click(stylebot.modal.cancel);
-        $(buttons[2]).click(stylebot.modal.save)
+        $(buttons[1]).click(stylebot.modal.save);
+        $(buttons[2]).click(stylebot.modal.cancel);
     },
     
     fill: function(content) {
-        this.cache.textarea.html(content);
+        this.cache.textarea.attr('value', content);
     },
     
     show: function(content, prevTarget) {
@@ -42,11 +42,11 @@ stylebot.modal = {
                     stylebot.modal.cache.textarea.focus();
                 }
             });
+        this.fill(content);
         this.modal.options.onClose = function() {
             stylebot.modal.isVisible = false;
             prevTarget.focus();
         }
-        this.fill(content);
         this.isVisible = true;
         this.modal.show();
     },
@@ -60,7 +60,7 @@ stylebot.modal = {
         stylebot.modal.modal.hide();
     },
     
-    save: function() {
+    save: function(e) {
         stylebot.style.applyPageCSS(stylebot.modal.cache.textarea.attr('value'));
         stylebot.widget.show();
         stylebot.modal.modal.hide();

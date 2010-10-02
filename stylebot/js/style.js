@@ -132,7 +132,6 @@ stylebot.style = {
     
     // called when CSS of the entire page is edited in modal popup
     applyPageCSS: function(css) {
-        // push current state to undo stack
         this.saveState();
         if (css == "")
             this.rules = {};
@@ -389,8 +388,7 @@ stylebot.style = {
     },
     
     undo: function() {
-        console.log("Undo called..");
-        console.log(this.undoStack.length);
+        console.log("undo called: " + this.undoStack.length);
         if (this.undoStack.length == 0)
             return false;
         this.rules = this.undoStack.pop();
@@ -399,12 +397,14 @@ stylebot.style = {
         this.save();
         stylebot.widget.show();
         setTimeout(function() {
-            stylebot.selectionBox.highlight(stylebot.selectedElement);
+            stylebot.highlight(stylebot.selectedElement);
         }, 0);
+        this.refreshUndoState();
     },
     
     // save current state to undo stack
     saveState: function() {
+        console.log("saveState called: " + this.undoStack.length);
         if (this.undoStack.length >= 5) {
             this.undoStack.shift();
         }
@@ -412,6 +412,22 @@ stylebot.style = {
     },
     
     clearLastState: function() {
+        console.log("clearLastState called: " + this.undoStack.length);
         this.undoStack.pop();
+    },
+    
+    shouldEnableUndo: function() {
+        if (this.undoStack.length == 0)
+            return false;
+        else
+            return true;
+    },
+    
+    refreshUndoState: function() {
+        console.log("refreshUndoState called: " + this.undoStack.length);
+        if (!this.shouldEnableUndo())
+            stylebot.widget.disableUndo();
+        else
+            stylebot.widget.enableUndo();
     }
 }
