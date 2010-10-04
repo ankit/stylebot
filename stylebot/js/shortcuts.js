@@ -76,33 +76,39 @@ function displayShortcutHelp() {
     var div = $("<div>", {
         id: "stylebot-shortcuts"
     });
-    
+
+    var content = $("<div>", {
+        id: "stylebot-shortcuts-content"
+    }).appendTo(div);
+
     $("<h1>", {
         html: "Stylebot Keyboard shorcuts"
-    }).appendTo(div);
+    }).appendTo(content);
     
     var sec1 = "<ul class='stylebot-shortcut-section'><h2>Manage Stylebot</h2>"+
-                "<li class='stylebot-shortcut'><span class='stylebot-key'>s:</span>Toggle ability to select an element</li>"+
-                "<li class='stylebot-shortcut'><span class='stylebot-key'>m:</span>Switch between Basic / Advanced Mode</li>"+
-                "<li class='stylebot-shortcut'><span class='stylebot-key'>p:</span>Move Panel Left / Right</li>"+
-                "<li class='stylebot-shortcut'><span class='stylebot-key'>e:</span>Open Popup to Edit Page's CSS</li>"+
-                "<li class='stylebot-shortcut'><span class='stylebot-key'>z:</span>Undo Last Action</li></ul>";
+                "<li class='stylebot-shortcut'><span class='stylebot-key'>Alt + m</span><span class='stylebot-key-desc'>Launch Stylebot</span></li>"+
+                "<li class='stylebot-shortcut'><span class='stylebot-key'>s</span><span class='stylebot-key-desc'>Toggle ability to select an element</span></li>"+
+                "<li class='stylebot-shortcut'><span class='stylebot-key'>m</span><span class='stylebot-key-desc'>Switch between Basic / Advanced Mode</span></li>"+
+                "<li class='stylebot-shortcut'><span class='stylebot-key'>p</span><span class='stylebot-key-desc'>Move Panel Left / Right</span></li>"+
+                "<li class='stylebot-shortcut'><span class='stylebot-key'>e</span><span class='stylebot-key-desc'>Open Popup to Edit Page's CSS</span></li>"+
+                "<li class='stylebot-shortcut'><span class='stylebot-key'>esc</span><span class='stylebot-key-desc'>Close Stylebot</span></li></ul>";
                 
     var sec2 = "<ul class='stylebot-shortcut-section'><h2>Navigate Sections</h2>"+
-                "<li class='stylebot-shortcut'><span class='stylebot-key'>t:</span>Move to <i>Text</i> section</li>"+
-                "<li class='stylebot-shortcut'><span class='stylebot-key'>c:</span>Move to <i>Color & Background Color</i> section</li>"+
-                "<li class='stylebot-shortcut'><span class='stylebot-key'>b:</span>Move to <i>Borders</i> section</li>"+
-                "<li class='stylebot-shortcut'><span class='stylebot-key'>l:</span>Move to <i>Layout & Visibility</i> section</li></ul>";
+                "<li class='stylebot-shortcut'><span class='stylebot-key'>t</span><span class='stylebot-key-desc'>Move to <i>Text</i> section</span></li>"+
+                "<li class='stylebot-shortcut'><span class='stylebot-key'>c</span><span class='stylebot-key-desc'>Move to <i>Color & Background Color</i> section</span></li>"+
+                "<li class='stylebot-shortcut'><span class='stylebot-key'>b</span><span class='stylebot-key-desc'>Move to <i>Borders</i> section</span></li>"+
+                "<li class='stylebot-shortcut'><span class='stylebot-key'>l</span><span class='stylebot-key-desc'>Move to <i>Layout & Visibility</i> section</span></li></ul>";
                 
-    var sec3 = "<ul style='clear:left' class='stylebot-shortcut-section'><h2>Apply specific property values</h2>"+
-                "<li class='stylebot-shortcut'><span class='stylebot-key'>h:</span>Hide/Show selected element(s)</li></ul>";
+    var sec3 = "<ul style='clear:left' class='stylebot-shortcut-section'><h2>Apply property values</h2>"+
+                "<li class='stylebot-shortcut'><span class='stylebot-key'>h</span><span class='stylebot-key-desc'>Hide/Show selected element(s)</span></li>"+
+                "<li class='stylebot-shortcut'><span class='stylebot-key'>z</span><span class='stylebot-key-desc'>Undo Last Action</span></li></ul>";
                 
     var footer = $("<a href='#' id='stylebot-shortcuts-close'>Close</a>").click(closeShortcutHelp);
-    div.append(sec1)
+    content.append(sec1)
     .append(sec2)
     .append(sec3)
-    .append(footer)
-    .appendTo(document.body);
+    .append(footer);
+    div.appendTo(document.body);
 
     // darken page background
     $('<div>', {
@@ -110,7 +116,7 @@ function displayShortcutHelp() {
     })
     .css({
         height: document.height,
-        opacity: "0.7",
+        opacity: "0.1",
         display: "block"
     })
     .appendTo(document.body);

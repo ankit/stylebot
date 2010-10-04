@@ -1,20 +1,33 @@
 /** Keyboard Shortcuts Help **/
 
 #stylebot-shortcuts {
-    background: -webkit-gradient(linear, left top, left bottom, from(#eee), to(#bdbdbd)) !important;
-    border-radius: 5px !important;
-    padding: 10px !important;
-    color: #333 !important;
-    font-family: Helvetica, Arial, sans-serif !important;
-    font-size: 16px !important;
+    background: transparent !important;
+    border: 3px solid transparent !important;
+    border-radius: 3px !important;
     position: fixed !important;
     top: 5% !important;
     left: 10% !important;
-    width: 80% !important;
-    height: 70% !important;
-    text-shadow: 0px 1px 1px #fff !important;
     z-index: 2147483647 !important;
-    -webkit-box-shadow: 0px 0px 10px #333 !important;
+    -webkit-box-shadow: rgba(0, 0, 0, 0.398438) 0px 0px 18px;
+    width: 80% !important;
+    max-height: 90%;
+    overflow: auto !important;
+}
+
+#stylebot-shortcuts-content {
+    display: block !important;
+    background: -webkit-gradient(linear, left top, left bottom, from(#eee), to(#bdbdbd)) !important;
+    border-radius: 3px !important;
+    color: #333 !important;
+    position: relative !important;
+    font-family: Helvetica, Arial, sans-serif !important;
+    font-size: 16px !important;
+    text-shadow: 0px 1px 1px #fff !important;
+    float: left !important;
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0px !important;
+    padding: 20px 0px !important;
 }
 
 #stylebot-shortcuts h1 {
@@ -22,7 +35,6 @@
     text-align: center !important;
     font-weight: bold !important;
     color: #457392 !important;
-    margin: 5px !important;
     margin-bottom: 20px !important;
     padding: 0px !important;
 }
@@ -31,31 +43,49 @@
     font-size: 16px !important;
     font-weight: bold !important;
     color: #333 !important;
-    margin-bottom: 10px !important;
+    margin-bottom: 15px !important;
     padding: 0px !important;
 }
 
 ul.stylebot-shortcut-section {
     list-style-type: none !important;
     float: left !important;
-    width: 50% !important;
+    min-width: 40% !important;
     text-align: center !important;
-    min-height: 150px !important;
     margin-top: 20px !important;
+    margin: 20px !important;
 }
 
 span.stylebot-key {
-    font-weight: bold !important;
-    width: 50px !important;
-    text-align: right !important;
-    white-space: nowrap !important;
-    padding-right: 20px !important;
+    float: left !important;
+    background-color: #fbfbfb !important;
+    color: #333 !important;
+    border-radius: 2px;
+    text-align: center !important;
+    margin-right: 20px !important;
+    padding: 2px 7px !important;
+    border: 1px solid #ccc !important;
+    min-width: 10px;
+    text-shadow: none !important;
+    font-family: Monaco, 'Lucida Console', monospace !important;
+    font-size: 14px !important;
+    font-weight: normal !important;
+    -webkit-box-shadow: #bbb 1px 1px 0px !important;
+}
+
+span.stylebot-key-desc {
+    margin: 4px 0px 0px 0px !important;
+    display: inline !important;
     float: left !important;
 }
 
 li.stylebot-shortcut {
     text-align: left !important;
-    line-height: 24px !important;
+    float: left !important;
+    clear: both !important;
+    line-height: 20px !important;
+    margin: 1px 0px !important;
+    padding: 2px !important;
 }
 
 a#stylebot-shortcuts-close {

@@ -22,7 +22,7 @@
 
 #stylebot-background {
     background-color: #000 !important;
-    opacity: 0.7 !important;
+    opacity: 0.7;
     z-index: 2147483646 !important;
     height: 100%;
     width: 100%;
