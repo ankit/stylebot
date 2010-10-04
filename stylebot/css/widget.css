@@ -110,11 +110,13 @@
     list-style-type: none;
     padding: 2px !important;
     text-shadow: none !important;
+    margin: 0px !important;
 }
 
-#stylebot-dropdown li.stylebot-dropdown-li:hover {
+#stylebot-dropdown li.stylebot-dropdown-li:hover, #stylebot-dropdown li.stylebot-dropdown-li-selected {
     background-color: #555 !important;
     cursor: pointer;
+    outline: none !important;
     color: #fff !important;
 }
 

@@ -396,15 +396,22 @@ stylebot.widget = {
             any = true;
             var li = $("<li>", {
                 class: 'stylebot-dropdown-li',
+                tabIndex: 0,
                 html: selector
             })
             .hover(function(e) {
                 if (stylebot.selectionStatus)
                     return true;
                 stylebot.highlight($(e.target.innerText)[0]);
+                $(e.target).addClass('stylebot-dropdown-li-selected');
                 return true;
             })
-            .click(function(e) {
+            .mouseout(function(e) {
+                $(e.target).removeClass('stylebot-dropdown-li-selected');
+            })
+            .bind('click keydown', function(e) {
+                if (e.type == 'keydown' && e.keyCode != 13)
+                    return true;
                 var value = e.target.innerHTML;
                 stylebot.widget.cache.headerSelector.html(value)
                 stylebot.widget.updateHeight();
@@ -431,6 +438,64 @@ stylebot.widget = {
         };
         dropdown.appendTo(parent);
         $(document).bind('mousedown keydown', onClickElsewhere);
+    },
+    
+    // TODO: Clean up and make more readable!
+    selectNextDropdownOption: function() {
+        var li = $(".stylebot-dropdown-li");
+        if (li.length == 0)
+            return;
+        var current = $(".stylebot-dropdown-li-selected");
+        if (current.length == 0) {
+            $li = $(li[0]);
+            stylebot.highlight($($li.text())[0]);
+            $li.addClass("stylebot-dropdown-li-selected").focus();
+            return;
+        }
+        else {
+            $current = $(current[0]);
+            $current.removeClass("stylebot-dropdown-li-selected");
+            var $next = $($current.next().get(0));
+            if ($next.length != 0) {
+                stylebot.highlight($($next.text())[0]);
+                $next.addClass("stylebot-dropdown-li-selected").focus();
+            }
+            else {
+                $li = $(li[0]);
+                stylebot.highlight($($li.text())[0]);
+                $li.addClass("stylebot-dropdown-li-selected").focus();
+            }
+            return;
+        }
+    },
+    
+    // TODO: Clean up and make more readable!
+    selectPreviousDropdownOption: function() {
+        var li = $(".stylebot-dropdown-li");
+        if (li.length == 0)
+            return;
+        var current = $(".stylebot-dropdown-li-selected");
+        if (current.length == 0) {
+            $li = $(li[li.length - 1]);
+            stylebot.highlight($($li.text())[0]);
+            $li.addClass("stylebot-dropdown-li-selected").focus();
+            return;
+        }
+        else {
+            $current = $(current[0]);
+            $current.removeClass("stylebot-dropdown-li-selected");
+            var $prev = $($current.prev().get(0));
+            if ($prev.length != 0) {
+                stylebot.highlight($($prev.text())[0]);
+                $prev.addClass("stylebot-dropdown-li-selected").focus();
+            }
+            else {
+                $li = $(li[li.length - 1]);
+                stylebot.highlight($($li.text())[0]);
+                $li.addClass("stylebot-dropdown-li-selected").focus();
+            }
+            return;
+        }
     },
     
     enableUndo: function() {
