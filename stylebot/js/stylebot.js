@@ -177,24 +177,17 @@ var stylebot = {
     },
     
     onMouseMove: function(e) {
-        if (e.target.className == "stylebot-selection"
-            || stylebot.widget.isBeingDragged
-            || stylebot.page.isVisible
-            || stylebot.hoveredElement == e.target
-            )
-        {
-            return true;
-        }
         // for dropdown
         if (e.target.className == "stylebot-dropdown-li") {
-            var el = $(e.target.innerText)[0];
-            if (el != stylebot.hoveredElement) {
-                stylebot.highlight(el);
+            var $el = $(e.target.innerText)[0];
+            if ($el != stylebot.hoveredElement) {
+                stylebot.highlight($el);
             }
             return true;
         }
-        if (stylebot.belongsToStylebot(e.target))
-        {
+        if (!stylebot.shouldSelect(e.target))
+            return true;
+        if(stylebot.belongsToStylebot(e.target)) {
             stylebot.unhighlight();
             return true;
         }
@@ -232,12 +225,26 @@ var stylebot = {
         return false;
     },
     
-    shouldIClose: function(e) {
+    shouldClose: function(el) {
         if (!stylebot.status ||
             stylebot.widget.basic.isColorPickerVisible ||
+            stylebot.isKeyboardHelpVisible ||
             stylebot.page.isVisible ||
             $("#stylebot-dropdown").length != 0 ||
-            e.target.tagName == 'SELECT')
+            el.tagName == 'SELECT')
+        {
+            return false;
+        }
+        return true;
+    },
+    
+    shouldSelect: function(el) {
+        if (el.className == "stylebot-selection"
+            || stylebot.widget.isBeingDragged
+            || stylebot.page.isVisible
+            || stylebot.isKeyboardHelpVisible
+            || stylebot.hoveredElement == el
+            )
         {
             return false;
         }

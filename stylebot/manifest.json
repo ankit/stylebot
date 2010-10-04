@@ -38,7 +38,8 @@
 			"css/modal.css",
 			"css/colorpicker.css",
 			"css/scrollbars.css",
-			"css/tipsy.css"
+			"css/tipsy.css",
+			"css/shortcuts_help.css"
 		],
 		
 		"js": [

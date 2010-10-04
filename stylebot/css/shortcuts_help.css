@@ -1,0 +1,70 @@
+/** Keyboard Shortcuts Help **/
+
+#stylebot-shortcuts {
+    background: -webkit-gradient(linear, left top, left bottom, from(#eee), to(#bdbdbd)) !important;
+    border-radius: 5px !important;
+    padding: 10px !important;
+    color: #333 !important;
+    font-family: Helvetica, Arial, sans-serif !important;
+    font-size: 16px !important;
+    position: fixed !important;
+    top: 5% !important;
+    left: 10% !important;
+    width: 80% !important;
+    height: 70% !important;
+    text-shadow: 0px 1px 1px #fff !important;
+    z-index: 2147483647 !important;
+    -webkit-box-shadow: 0px 0px 10px #333 !important;
+}
+
+#stylebot-shortcuts h1 {
+    font-size: 18px !important;
+    text-align: center !important;
+    font-weight: bold !important;
+    color: #457392 !important;
+    margin: 5px !important;
+    margin-bottom: 20px !important;
+    padding: 0px !important;
+}
+
+#stylebot-shortcuts h2 {
+    font-size: 16px !important;
+    font-weight: bold !important;
+    color: #333 !important;
+    margin-bottom: 10px !important;
+    padding: 0px !important;
+}
+
+ul.stylebot-shortcut-section {
+    list-style-type: none !important;
+    float: left !important;
+    width: 50% !important;
+    text-align: center !important;
+    min-height: 150px !important;
+    margin-top: 20px !important;
+}
+
+span.stylebot-key {
+    font-weight: bold !important;
+    width: 50px !important;
+    text-align: right !important;
+    white-space: nowrap !important;
+    padding-right: 20px !important;
+    float: left !important;
+}
+
+li.stylebot-shortcut {
+    text-align: left !important;
+    line-height: 24px !important;
+}
+
+a#stylebot-shortcuts-close {
+    font-size: 16px !important;
+    font-weight: bold !important;
+    color: #457392 !important;
+    text-decoration: none !important;
+    clear: both !important;
+    float: left !important;
+    text-align: center !important;
+    width: 100% !important;
+}

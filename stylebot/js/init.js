@@ -33,7 +33,7 @@ function attachListeners() {
         }
         // Handle Esc key to escape editing mode
         else if (e.keyCode == 27 &&
-            stylebot.shouldIClose(e)
+            stylebot.shouldClose(e.target)
         )
         {
             e.target.blur();

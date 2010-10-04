@@ -18,13 +18,6 @@ var ModalBox = function(html, options) {
     })
     .append(html)
     .appendTo(document.body);
-    
-    // darken background
-    this.background = $('<div>', {
-        id: 'stylebot-background',
-    })
-    .css('opacity', this.options.bgOpacity)
-    .appendTo(document.body);
 };
 
 ModalBox.prototype.options = {
@@ -38,10 +31,16 @@ ModalBox.prototype.options = {
 }
 
 ModalBox.prototype.darkenBg = function(callback) {
-        this.background.css({
-            height: document.height
-        });
-        this.background.fadeIn(this.options.bgFadeSpeed);
+    // darken background
+    this.background = $('<div>', {
+        id: 'stylebot-background'
+    })
+    .css({
+        opacity: this.options.bgOpacity,
+        height: document.height
+    })
+    .appendTo(document.body)
+    .fadeIn(this.options.bgFadeSpeed);
 }
 
 ModalBox.prototype.show = function(content, options) {
@@ -77,6 +76,6 @@ ModalBox.prototype.show = function(content, options) {
 
 ModalBox.prototype.hide = function() {
         this.box.fadeOut(this.options.fadeSpeed);
-        this.background.fadeOut(this.options.bgFadeSpeed);
+        this.background.fadeOut(this.options.bgFadeSpeed).remove();
         this.options.onClose();
 }
