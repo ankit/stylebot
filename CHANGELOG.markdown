@@ -1,3 +1,9 @@
+**0.2.1**
+
+* Added keyboard shortcuts help
+* Added ability to scroll dropdown using arrow keys
+* Added 'w', 'd' and arrow key shortcuts for dropdown
+
 **0.2**
 
 * Keyboard shortcuts

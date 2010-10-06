@@ -119,10 +119,10 @@ function displayShortcutHelp() {
                 "<li class='stylebot-shortcut'><span class='stylebot-key'>s</span><span class='stylebot-key-desc'>Toggle ability to select an element</span></li>"+
                 "<li class='stylebot-shortcut'><span class='stylebot-key'>m</span><span class='stylebot-key-desc'>Switch between Basic / Advanced Mode</span></li>"+
                 "<li class='stylebot-shortcut'><span class='stylebot-key'>p</span><span class='stylebot-key-desc'>Move Panel Left / Right</span></li>"+
-                "<li class='stylebot-shortcut'><span class='stylebot-key'>e</span><span class='stylebot-key-desc'>Open Popup to Edit Page's CSS</span></li>"+
-                "<li class='stylebot-shortcut'><span class='stylebot-key'>w</span><span class='stylebot-key-desc'>Write selector manually</span></li>"+
-                "<li class='stylebot-shortcut'><span class='stylebot-key'>d</span><span class='stylebot-key-desc'>Open selector dropdown</span></li>"+
-                "<li class='stylebot-shortcut'><span class='stylebot-key'>↑↓</span><span class='stylebot-key-desc'>Navigate selectors in dropdown</span></li>"+
+                "<li class='stylebot-shortcut'><span class='stylebot-key'>e</span><span class='stylebot-key-desc'>Open Popup to edit page's CSS</span></li>"+
+                "<li class='stylebot-shortcut'><span class='stylebot-key'>w</span><span class='stylebot-key-desc'>Write CSS selector manually</span></li>"+
+                "<li class='stylebot-shortcut'><span class='stylebot-key'>d</span><span class='stylebot-key-desc'>Open CSS selector dropdown</span></li>"+
+                "<li class='stylebot-shortcut'><span class='stylebot-key'>↑↓</span><span class='stylebot-key-desc'>Navigate CSS selectors in dropdown</span></li>"+
                 "<li class='stylebot-shortcut'><span class='stylebot-key'>?</span><span class='stylebot-key-desc'>Bring up this help</span></li>"+
                 "<li class='stylebot-shortcut'><span class='stylebot-key'>esc</span><span class='stylebot-key-desc'>Close Stylebot</span></li></ul>";
                 
