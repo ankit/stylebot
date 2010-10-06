@@ -391,6 +391,21 @@ stylebot.widget = {
             'max-height': height
         })
         
+        var onClickElsewhere = function(e) {
+            var $target = $(e.target);
+            var id = "stylebot-dropdown";
+            if ((e.target.id.indexOf(id) == -1 && $target.parent().attr('id') != id && e.type == "mousedown")
+            || e.keyCode == 27)
+            {
+                $("#stylebot-dropdown").remove();
+                stylebot.unhighlight();
+                stylebot.select(null, stylebot.style.cache.selector);
+                $(document).unbind('mousedown keydown', onClickElsewhere);
+                return true;
+            }
+            return true;
+        };
+        
         var any = false;
         for (var selector in stylebot.style.rules) {
             any = true;
@@ -416,6 +431,7 @@ stylebot.widget = {
                 stylebot.widget.cache.headerSelector.html(value);
                 stylebot.widget.updateHeight();
                 stylebot.select(null, Utils.HTMLDecode(value));
+                $(document).unbind('mousedown keydown', onClickElsewhere);
                 $("#stylebot-dropdown").remove();
             })
             .appendTo(dropdown);
@@ -423,20 +439,6 @@ stylebot.widget = {
         if (!any)
             $("<li>", {html: "No CSS selectors edited"}).appendTo(dropdown);
 
-        var onClickElsewhere = function(e) {
-            var $target = $(e.target);
-            var id = "stylebot-dropdown";
-            if ((e.target.id.indexOf(id) == -1 && $target.parent().attr('id') != id && e.type == "mousedown")
-            || e.keyCode == 27)
-            {
-                $("#stylebot-dropdown").remove();
-                stylebot.unhighlight();
-                stylebot.select(null, stylebot.style.cache.selector);
-                $(document).unbind('mousedown keydown', onClickElsewhere);
-                return true;
-            }
-            return true;
-        };
         dropdown.appendTo(parent);
         $(document).bind('mousedown keydown', onClickElsewhere);
     },

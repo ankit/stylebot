@@ -55,7 +55,6 @@ function handleKeyboardShortcut(e) {
         case 40:    if ($("#stylebot-dropdown").length != 0) {
                         e.stopPropagation();
                         e.preventDefault();
-                        console.log("down arrow pressed");
                         stylebot.widget.selectNextDropdownOption();
                         return false;
                     }
