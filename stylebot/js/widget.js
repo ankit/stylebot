@@ -5,7 +5,7 @@
   **/
 
 stylebot.widget = {
-
+    
     cache: {
         box: null,
         header: null,
@@ -413,7 +413,7 @@ stylebot.widget = {
                 if (e.type == 'keydown' && e.keyCode != 13)
                     return true;
                 var value = e.target.innerHTML;
-                stylebot.widget.cache.headerSelector.html(value)
+                stylebot.widget.cache.headerSelector.html(value);
                 stylebot.widget.updateHeight();
                 stylebot.select(null, Utils.HTMLDecode(value));
                 $("#stylebot-dropdown").remove();
@@ -426,10 +426,11 @@ stylebot.widget = {
         var onClickElsewhere = function(e) {
             var $target = $(e.target);
             var id = "stylebot-dropdown";
-            if ((e.type == "mousedown" && $target.parent().attr('id') != id && e.target.id.indexOf(id) == -1) ||
-                (e.type == "keydown" && e.keyCode == 27))
+            if ((e.target.id.indexOf(id) == -1 && $target.parent().attr('id') != id && e.type == "mousedown")
+            || e.keyCode == 27)
             {
                 $("#stylebot-dropdown").remove();
+                stylebot.unhighlight();
                 stylebot.select(null, stylebot.style.cache.selector);
                 $(document).unbind('mousedown keydown', onClickElsewhere);
                 return true;

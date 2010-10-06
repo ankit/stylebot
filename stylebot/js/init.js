@@ -40,7 +40,6 @@ function attachListeners() {
             stylebot.disable();
         }
         return true;
-    
     }, true);
 }
 

@@ -108,7 +108,6 @@ var stylebot = {
             stylebot.selectedElement = stylebot.hoveredElement;
             selector = SelectorGenerator.generate(stylebot.selectedElement);
         }
-        
         stylebot.style.fillCache(selector);
         stylebot.widget.show();
         setTimeout(function() {

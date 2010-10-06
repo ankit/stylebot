@@ -39,7 +39,10 @@ function handleKeyboardShortcut(e) {
                     return false;
         
         // 'd': Open selector dropdown
-        case 68:    stylebot.widget.showSelectorDropdown(); return false;
+        case 68:    stylebot.widget.showSelectorDropdown();
+                    // select first selector
+                    stylebot.widget.selectNextDropdownOption();
+                    return false;
         
         // ↑ when dropdown is open
         case 38:    if ($("#stylebot-dropdown").length != 0) {
@@ -109,7 +112,7 @@ function displayShortcutHelp() {
     }).appendTo(div);
 
     $("<h1>", {
-        html: "Stylebot Keyboard shorcuts"
+        html: "Stylebot Keyboard shortcuts"
     }).appendTo(content);
     
     var sec1 = "<ul class='stylebot-shortcut-section'><h2>Manage Stylebot</h2>"+
@@ -121,6 +124,7 @@ function displayShortcutHelp() {
                 "<li class='stylebot-shortcut'><span class='stylebot-key'>w</span><span class='stylebot-key-desc'>Write selector manually</span></li>"+
                 "<li class='stylebot-shortcut'><span class='stylebot-key'>d</span><span class='stylebot-key-desc'>Open selector dropdown</span></li>"+
                 "<li class='stylebot-shortcut'><span class='stylebot-key'>↑↓</span><span class='stylebot-key-desc'>Navigate selectors in dropdown</span></li>"+
+                "<li class='stylebot-shortcut'><span class='stylebot-key'>?</span><span class='stylebot-key-desc'>Bring up this help</span></li>"+
                 "<li class='stylebot-shortcut'><span class='stylebot-key'>esc</span><span class='stylebot-key-desc'>Close Stylebot</span></li></ul>";
                 
     var sec2 = "<ul class='stylebot-shortcut-section'><h2>Navigate Sections</h2>"+
