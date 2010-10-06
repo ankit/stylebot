@@ -38,11 +38,19 @@ function init() {
     }
 }
 
+function openReleaseNotes() {
+    chrome.tabs.create({url:"http://stylebot.me/releases.html", selected: true}, null);
+}
+
 function updateVersion() {
-    if (localStorage.version != "0.2") {
-        chrome.tabs.create({url:"http://stylebot.me/update.html", selected: true}, null);
-        localStorage.version = "0.2";
+    // display notification on update
+    if (localStorage.version && localStorage.version != "0.2") {
+        var notification = webkitNotifications.createHTMLNotification(
+          'notification.html'
+        );
+        notification.show();
     }
+    localStorage.version = "0.2";
 }
 
 function attachListeners() {
