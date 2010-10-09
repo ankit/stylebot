@@ -43,14 +43,17 @@ function openReleaseNotes() {
 }
 
 function updateVersion() {
-    // display notification on update
-    if (localStorage.version && localStorage.version != "0.2") {
+    if (!localStorage.version) {
+        localStorage.version = 0.2; return true;
+    }
+    else if (localStorage.version != "0.2") {
+        // display notification on update
         var notification = webkitNotifications.createHTMLNotification(
           'notification.html'
         );
         notification.show();
+        localStorage.version = 0.2;
     }
-    localStorage.version = "0.2";
 }
 
 function attachListeners() {
