@@ -315,6 +315,11 @@ var WidgetUI = {
             })
             .click(Events.onSegmentedControlClick)
             .appendTo(container);
+			// explicitly having to add the 'stylebot-last-child' class as :last-child causes weird issue in Chrome
+			if (i == (len - 1))
+			{
+				bt.addClass('stylebot-last-child');
+			}
         }
         return container;
     }

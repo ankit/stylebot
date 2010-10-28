@@ -44,7 +44,7 @@ function openReleaseNotes() {
 
 function updateVersion() {
     if (!localStorage.version) {
-        localStorage.version = 0.2; return true;
+        localStorage.version = "0.2"; return true;
     }
     else if (localStorage.version != "0.2") {
         // display notification on update
@@ -52,7 +52,7 @@ function updateVersion() {
           'notification.html'
         );
         notification.show();
-        localStorage.version = 0.2;
+        localStorage.version = "0.2";
     }
 }
 
