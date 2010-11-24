@@ -36,7 +36,11 @@ stylebot.chrome = {
     
     saveAccordionState: function(enabledAccordions) {
         chrome.extension.sendRequest({ name: "saveAccordionState", enabledAccordions: enabledAccordions }, function(){} );
-    }
+    },
+
+	pushStyles: function() {
+		chrome.extension.sendRequest({ name: "pushStyles" }, function(){} );
+	}
 }
 
 chrome.extension.onRequest.addListener(
@@ -52,6 +56,11 @@ chrome.extension.onRequest.addListener(
 		{
 		    stylebot.setOptions(request.options);
             sendResponse({});
+		}
+		else if (request.name == "openWidget")
+		{
+            stylebot.contextmenu.openWidget();
+		    sendResponse({});
 		}
 	}
 );

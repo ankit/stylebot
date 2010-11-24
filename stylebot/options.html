@@ -60,7 +60,7 @@
 			<h2>Sync <span style="font-weight: normal; font-style: italic;" class="description">(experimental)</span></h2>
 			<div class="description">This will sync your custom styles across multiple computers. For this to work, you need to have <a href="http://www.google.com/support/chrome/bin/answer.py?hl=en&answer=165139">Bookmark Sync enabled</a>.<br></div>
 			<button onclick="toggleSyncing();" id="sync-button">Enable Sync</button><br><br>
-			<button onclick="bg_window.saveSyncData(bg_window.cache.styles);" style="display: none" id="sync-now">Push Styles Now</button>
+			<button onclick="bg_window.pushStyles();" style="display: none" id="sync-now">Push Styles Now</button>
 <div class="description" id="sync-enabled-note"><strong>Important</strong>: When you click on <strong>Push Styles Now</strong>, your custom styles on this computer will be pushed to and replace existing styles on all other computers. This is until automatic sync is built into Stylebot.</div>
 		</div><br><br>
 	</div>

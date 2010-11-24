@@ -54,6 +54,7 @@ function updateVersion() {
         notification.show();
         localStorage.version = "0.2";
     }
+    initContextMenu();
 }
 
 function attachListeners() {
@@ -81,6 +82,8 @@ function attachListeners() {
             case "fetchOptions"     : sendResponse({ options: cache.options, enabledAccordions: cache.enabledAccordions }); break;
 
             case "saveAccordionState": saveAccordionState(request.enabledAccordions); sendResponse({}); break;
+
+            case "pushStyles": pushStyles(); sendResponse({}); break;
         }
     });
 }
@@ -212,6 +215,13 @@ function loadStylesIntoCache() {
     }
 }
 
+// If sync is enabled, push styles to cloud
+function pushStyles() {
+	if (cache.options.sync) {
+		saveSyncData(cache.styles);
+	}
+}
+
 function loadOptionsIntoCache() {
     if (!localStorage['stylebot_option_useShortcutKey'])
     {
@@ -313,6 +323,24 @@ function loadAccordionState() {
     if (localStorage['stylebot_enabledAccordions'])
         cache.enabledAccordions = localStorage['stylebot_enabledAccordions'].split(',');
 }
+
+/*** Context Menu ***/
+
+function initContextMenu() {
+    chrome.contextMenus.create({
+        title: "Style element",
+        contexts: ['all'],
+        onclick: openWidget
+    });
+}
+
+function openWidget() {
+    chrome.tabs.getSelected(null, function(tab) {
+        chrome.tabs.sendRequest(tab.id, {name: "openWidget"}, function(){});
+    });
+}
+
+/*** End of Context Menu ***/
 
 window.addEventListener('load', function(){
     init();

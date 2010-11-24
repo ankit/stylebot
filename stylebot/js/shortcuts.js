@@ -8,8 +8,15 @@ function handleKeyboardShortcut(e) {
         return true;
     }
     switch (e.keyCode) {
-        // 's': shortcut to toggle selection of element, keypress: 115
-        case 83:   stylebot.toggleSelection(); return false;
+        case 83: 	if (e.ctrlKey && e.shiftKey) {
+						// 'ctrl+shift+s': Push styles, if sync is enabled
+						stylebot.chrome.pushStyles();
+					}
+					else {
+						// 's': shortcut to toggle selection of element, keypress: 115
+						stylebot.toggleSelection();
+					}
+					return false;
         
         // 'h': hide/show currently selected element(s), keypress: 104
         case 72:    if (stylebot.selectedElement) { 
@@ -58,10 +65,6 @@ function handleKeyboardShortcut(e) {
                         stylebot.widget.selectNextDropdownOption();
                         return false;
                     }
-
-        // 'ctrl+shift+s': Sync now, if sync is enabled
-        
-        
         /** Jump around sections **/
         
         // 't': Jump to Text, keypress: 116
@@ -123,6 +126,7 @@ function displayShortcutHelp() {
                 "<li class='stylebot-shortcut'><span class='stylebot-key'>w</span><span class='stylebot-key-desc'>Write CSS selector manually</span></li>"+
                 "<li class='stylebot-shortcut'><span class='stylebot-key'>d</span><span class='stylebot-key-desc'>Open CSS selector dropdown</span></li>"+
                 "<li class='stylebot-shortcut'><span class='stylebot-key'>↑↓</span><span class='stylebot-key-desc'>Navigate CSS selectors in dropdown</span></li>"+
+                "<li class='stylebot-shortcut'><span class='stylebot-key'>Ctrl + Shift + s</span><span class='stylebot-key-desc'>Push styles <i>(if sync is enabled)</i></span></li>"+
                 "<li class='stylebot-shortcut'><span class='stylebot-key'>?</span><span class='stylebot-key-desc'>Bring up this help</span></li>"+
                 "<li class='stylebot-shortcut'><span class='stylebot-key'>esc</span><span class='stylebot-key-desc'>Close Stylebot</span></li></ul>";
                 
