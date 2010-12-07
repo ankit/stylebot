@@ -11,6 +11,15 @@ var cache = {
     textareaHeight: null
 }
 
+// default values for options
+var defaults = {
+	useShortcutKey: true,
+	contextMenu: true,
+	shortcutKey: 77, // keycode for 'm'
+	shortcutMetaKey: 'alt',
+	mode: "Basic"
+}
+
 var options = {
     useShortcutKey: null,
 	contextMenu: null,
@@ -26,58 +35,65 @@ var styles = {};
 function init() {
     // fetch options from datastore
     fetchOptions();
-	
-    var checkbox = $('[name=useShortcutKey]');
-	
-    if (options.useShortcutKey == true)
-		checkbox[0].checked = true;
-	
-	checkbox = $('[name=contextMenu]');
 
-    if (options.contextMenu == true)
-		checkbox[0].checked = true;
-
-    var select = $('[name=shortcutMetaKey]')[0];
-
-    if (options.shortcutMetaKey != undefined)
-        select.value = options.shortcutMetaKey;
-    else
-        select.value = 'alt';
-
-    if (options.shortcutKey != undefined)
-        $('[name=shortcutKeyHiddenField]').attr('value', options.shortcutKey);
-    else
-        $('[name=shortcutKeyHiddenField]').attr('value', 77); // 77 is the keyCode value for 'm'
-
-    KeyCombo.init( $('[name=shortcutKey]')[0], $('[name=shortcutKeyHiddenField]')[0] );
-
-    radioBt = $('[name=mode]');
-    if (options.mode == "Advanced")
-        radioBt[1].checked = true;
-    else
-        radioBt[0].checked = true;
+ 	$.each(options, function(option, value) {
+		var $el = $('[name=' + option + ']');
+		var el = $el.get(0);
+		if (el == undefined)
+			return;
+		var tag = el.tagName.toLowerCase();
+		
+		if (el.type == "checkbox") {
+			if (value == true)
+				el.checked = true;
+		}
+		
+		else if (tag == "select" || el.type == "hidden") {
+			if (value != undefined)
+				el.value = value;
+			else
+				el.value = defaults[option];
+		}
+		
+		else if (el.type == "radio") {
+			var len = $el.length;
+			if (value == undefined)
+				value = defaults[option];
+			for (var i = 0; i < len; i++) {
+				if ($el.get(i).value == value)
+				{
+					$el.get(i).checked = true;
+					return true;
+				}
+			}
+		}
+		
+	});
+    KeyCombo.init($('[name=shortcutKeyCharacter]').get(0), $('[name=shortcutKey]').get(0));
 
     bg_window = chrome.extension.getBackgroundPage();
     styles = bg_window.cache.styles;
     
     fillCustomStyles();
     attachListeners();
-    setSyncUI();
     initFiltering();
+    setSyncUI();
+
+	// hack to wait for window.innerHeight to be available
     setTimeout(function() {
-        // console.log("Inside setTimeout, window.innerHeight: " + window.innerHeight);
         cache.textareaHeight = window.innerHeight * 0.5 + 'px';
     }, 0);
 }
 
 // fetches options from the datastore
 function fetchOptions() {
-    options.useShortcutKey = (localStorage['stylebot_option_useShortcutKey'] == 'true');
-    options.contextMenu = (localStorage['stylebot_option_contextMenu'] == 'true');
-    options.shortcutMetaKey = localStorage['stylebot_option_shortcutMetaKey'];
-    options.shortcutKey = localStorage['stylebot_option_shortcutKey'];
-    options.mode = localStorage['stylebot_option_mode'];
-    options.sync = (localStorage['stylebot_option_sync'] == 'true');
+	$.each(options, function(option, value) {
+		var dataStoreValue = localStorage['stylebot_option_' + option];
+		if (dataStoreValue == "true" || dataStoreValue == "false")
+			options[option] = (dataStoreValue == "true");
+		else
+			options[option] = dataStoreValue;
+	});
 }
 
 function attachListeners() {
@@ -102,15 +118,18 @@ function attachListeners() {
     
     // textfields
     $('.option-field input[type=text]').keyup(function(e) {
-        bg_window.saveOption(e.target.name, translateOptionValue(e.target.name, e.target.value));
+		if (e.target.name == "shortcutKeyCharacter")
+			option = "shortcutKey";
+		else
+			option = e.target.name;
+        bg_window.saveOption(option, translateOptionValue(option, e.target.value));
     });
 }
 
 function translateOptionValue(name, value) {
     switch(name) {
         case "sync": return (value == "true") ? true : false;
-        
-        case "shortcutKey": return $('[name=shortcutKeyHiddenField]').attr('value');
+        case "shortcutKey": return $('[name=shortcutKey]').attr('value');
     }
     return value;
 }

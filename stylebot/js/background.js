@@ -225,27 +225,18 @@ function pushStyles() {
 }
 
 function loadOptionsIntoCache() {
-    if (!localStorage['stylebot_option_useShortcutKey'])
-    {
-        setDefaultOptionsInDataStore();
-        return true;
-    }
-    cache.options.useShortcutKey = (localStorage['stylebot_option_useShortcutKey'] == 'true');
-    cache.options.shortcutKey = localStorage['stylebot_option_shortcutKey'];
-    cache.options.shortcutMetaKey = localStorage['stylebot_option_shortcutMetaKey'];
-    cache.options.mode = localStorage['stylebot_option_mode'];
-    cache.options.sync = (localStorage['stylebot_option_sync'] == 'true');
-	cache.options.contextMenu = (localStorage['stylebot_option_contextMenu'] == 'true');
-}
-
-function setDefaultOptionsInDataStore() {
-    // set defaults in localStorage
-    localStorage['stylebot_option_useShortcutKey'] = cache.options.useShortcutKey;
-    localStorage['stylebot_option_shortcutKey'] = cache.options.shortcutKey;
-    localStorage['stylebot_option_shortcutMetaKey'] = cache.options.shortcutMetaKey;
-    localStorage['stylebot_option_mode'] = cache.options.mode;
-    localStorage['stylebot_option_sync'] = cache.options.sync;
-	localStorage['stylebot_option_contextMenu'] = cache.options.contextMenu;
+	for (var option in cache.options) 
+	{
+		var dataStoreValue = localStorage['stylebot_option_' + option];
+		if (dataStoreValue) {
+			if (dataStoreValue == "true" || dataStoreValue == "false")
+				cache.options[option] = (dataStoreValue == 'true');
+			else
+				cache.options[option] = dataStoreValue;
+		}
+		else
+			localStorage['stylebot_option_' + option] = cache.options[option];
+	}
 }
 
 function saveOption(name, value) {
