@@ -1,3 +1,6 @@
+**0.2.4**
+* Added context menu
+
 **0.2.3**
 * Added workaround for Chrome bug related to :last-child which caused weird issues while pasting text into certain textareas
 
