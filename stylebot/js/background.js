@@ -1,6 +1,7 @@
 /* Background JS for Stylebot */
 
 var currTabId;
+var contextMenuId = null;
 
 var cache = {
     /**
@@ -19,10 +20,11 @@ var cache = {
         shortcutKey: 77, // keydown code for 'm'
         shortcutMetaKey: 'alt',
         mode: 'Basic',
-        sync: false
+        sync: false,
+		contextMenu: true
     },
     
-    // indices of enabled accordions. be default, all are enabled
+    // indices of enabled accordions. by default, all are enabled
     enabledAccordions: [0, 1, 2, 3]
 };
 
@@ -36,6 +38,7 @@ function init() {
         loadSyncId();
         attachSyncListeners();
     }
+	createContextMenu();
 }
 
 function openReleaseNotes() {
@@ -54,7 +57,6 @@ function updateVersion() {
         notification.show();
         localStorage.version = "0.2";
     }
-    initContextMenu();
 }
 
 function attachListeners() {
@@ -233,6 +235,7 @@ function loadOptionsIntoCache() {
     cache.options.shortcutMetaKey = localStorage['stylebot_option_shortcutMetaKey'];
     cache.options.mode = localStorage['stylebot_option_mode'];
     cache.options.sync = (localStorage['stylebot_option_sync'] == 'true');
+	cache.options.contextMenu = (localStorage['stylebot_option_contextMenu'] == 'true');
 }
 
 function setDefaultOptionsInDataStore() {
@@ -242,12 +245,19 @@ function setDefaultOptionsInDataStore() {
     localStorage['stylebot_option_shortcutMetaKey'] = cache.options.shortcutMetaKey;
     localStorage['stylebot_option_mode'] = cache.options.mode;
     localStorage['stylebot_option_sync'] = cache.options.sync;
+	localStorage['stylebot_option_contextMenu'] = cache.options.contextMenu;
 }
 
 function saveOption(name, value) {
     cache.options[name] = value;
     localStorage['stylebot_option_' + name] = value;
     propagateOptions();
+
+	// option specific code
+	if (name == "contextMenu" && value == false)
+		removeContextMenu();
+	else if (!contextMenuId)
+		createContextMenu();
 }
 
 /** end of data methods **/
@@ -326,12 +336,21 @@ function loadAccordionState() {
 
 /*** Context Menu ***/
 
-function initContextMenu() {
-    chrome.contextMenus.create({
-        title: "Style element",
-        contexts: ['all'],
-        onclick: openWidget
-    });
+function createContextMenu() {
+	if (localStorage['stylebot_option_contextMenu'] == 'true') {
+		contextMenuId = chrome.contextMenus.create({
+	        title: "Style Element",
+	        contexts: ['all'],
+	        onclick: openWidget
+	    });
+	}
+}
+
+function removeContextMenu() {
+	if (contextMenuId) {
+		chrome.contextMenus.remove(contextMenuId);
+		contextMenuId = null;
+	}
 }
 
 function openWidget() {

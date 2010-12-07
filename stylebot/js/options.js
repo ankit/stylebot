@@ -13,6 +13,7 @@ var cache = {
 
 var options = {
     useShortcutKey: null,
+	contextMenu: null,
     shortcutKey: null,
     shortcutMetaKey: null,
     mode: null,
@@ -25,12 +26,16 @@ var styles = {};
 function init() {
     // fetch options from datastore
     fetchOptions();
-    // update UI
-    var radioBt = $('[name=useShortcutKey]');
-    if (options.useShortcutKey == false)
-        radioBt[1].checked = true;
-    else
-        radioBt[0].checked = true;
+	
+    var checkbox = $('[name=useShortcutKey]');
+	
+    if (options.useShortcutKey == true)
+		checkbox[0].checked = true;
+	
+	checkbox = $('[name=contextMenu]');
+
+    if (options.contextMenu == true)
+		checkbox[0].checked = true;
 
     var select = $('[name=shortcutMetaKey]')[0];
 
@@ -68,6 +73,7 @@ function init() {
 // fetches options from the datastore
 function fetchOptions() {
     options.useShortcutKey = (localStorage['stylebot_option_useShortcutKey'] == 'true');
+    options.contextMenu = (localStorage['stylebot_option_contextMenu'] == 'true');
     options.shortcutMetaKey = localStorage['stylebot_option_shortcutMetaKey'];
     options.shortcutKey = localStorage['stylebot_option_shortcutKey'];
     options.mode = localStorage['stylebot_option_mode'];
@@ -75,6 +81,13 @@ function fetchOptions() {
 }
 
 function attachListeners() {
+	// checkbox
+	$('.option-field input[type=checkbox]').change(function(e) {
+        var name = e.target.name;
+        var value = translateOptionValue(name, e.target.checked);
+        bg_window.saveOption(name, value);
+    });
+
     // radio
     $('.option-field input[type=radio]').change(function(e) {
         var name = e.target.name;
@@ -95,7 +108,6 @@ function attachListeners() {
 
 function translateOptionValue(name, value) {
     switch(name) {
-        case "useShortcutKey": 
         case "sync": return (value == "true") ? true : false;
         
         case "shortcutKey": return $('[name=shortcutKeyHiddenField]').attr('value');

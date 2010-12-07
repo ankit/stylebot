@@ -18,14 +18,19 @@
 	<h1>Stylebot Options</h1>
 	<div id="options">
 		<li class="option">
-			<label>Shortcut Key to launch Stylebot: </label>
+			<label>Shortcut Key to launch Stylebot</label>
 			<div class="option-field">
-				<input type="radio" name="useShortcutKey" value="true" /> On
-				<input type="radio" name="useShortcutKey" value="false" /> Off
+				<input type="checkbox" name="useShortcutKey" />
 			</div>
 		</li>
 		<li class="option">
-			<label>Shortcut Key Combo: </label>
+			<label>Right Click Menu</label>
+			<div class="option-field">
+				<input type="checkbox" name="contextMenu" />
+			</div>
+		</li>
+		<li class="option">
+			<label>Shortcut Key Combo</label>
 			<div class="option-field">
 				<select name="shortcutMetaKey">
 					<option value="ctrl">Ctrl</option>
@@ -39,7 +44,7 @@
 			</div>
 		</li>
 		<li class="option">
-			<label>Preferred mode: </label>
+			<label>Preferred mode</label>
 			<div class="option-field">
 				<input type="radio" name="mode" value="Basic" /> Basic
 				<input type="radio" name="mode" value="Advanced" /> Advanced
