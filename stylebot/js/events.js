@@ -94,7 +94,7 @@ Events = {
     
     onSegmentedControlClick: function(e) {
         var el = $(e.target);
-        if (el[0].tagName != 'BUTTON')
+        if (el.get(0).tagName != 'BUTTON')
             el = el.parent('button');
 
         // TODO: Try to implement the next element's border width using CSS

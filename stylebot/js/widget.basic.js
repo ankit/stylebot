@@ -316,7 +316,7 @@ stylebot.widget.basic = {
                                         var inputFields = control.el.find('input');
                                         var selectInputs = control.el.find('select');
                                         var values = [];
-                                        for (var i=0; i<len; i++)
+                                        for (var i = 0; i < len; i++)
                                             values[i] = rule[control.id[i]];
                                         
                                         if (values[0] != undefined)

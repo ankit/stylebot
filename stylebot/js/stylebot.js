@@ -96,7 +96,7 @@ var stylebot = {
         else if (selector)
         {
             try {
-                el = $(selector)[0];
+                el = $(selector).get(0);
                 stylebot.selectedElement = el;
                 stylebot.highlight(el);
             }
@@ -179,7 +179,7 @@ var stylebot = {
     onMouseMove: function(e) {
         // for dropdown
         if (e.target.className == "stylebot-dropdown-li") {
-            var $el = $(e.target.innerText)[0];
+            var $el = $(e.target.innerText).get(0);
             if ($el != stylebot.hoveredElement) {
                 stylebot.highlight($el);
             }

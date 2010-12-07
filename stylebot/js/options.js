@@ -203,9 +203,9 @@ function editStyle(e) {
     initModal(html);
     
     cache.modal.options.onOpen = function() { 
-        var textarea = cache.modal.box.find('textarea');
-        textarea[0].focus();
-        Utils.moveCursorToEnd(textarea[0]);
+        var textarea = cache.modal.box.find('textarea').get(0);
+        textarea.focus();
+        Utils.moveCursorToEnd(textarea);
     };
     cache.modal.show();
 }
@@ -288,9 +288,9 @@ function export() {
         closeOnBgClick: true
     });
     cache.modal.options.onOpen = function() {
-        var textarea = cache.modal.box.find('textarea')
-        textarea[0].focus();
-        Utils.selectAllText(textarea[0]);
+        var textarea = cache.modal.box.find('textarea').get(0);
+        textarea.focus();
+        Utils.selectAllText(textarea);
     };
     cache.modal.show();
 }
@@ -302,7 +302,7 @@ function import() {
         closeOnBgClick: true
     });
     cache.modal.options.onOpen = function() {
-        cache.modal.box.find('textarea')[0].focus();
+        cache.modal.box.find('textarea').get(0).focus();
     };
     cache.modal.show();
 }

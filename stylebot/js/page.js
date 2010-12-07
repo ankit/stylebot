@@ -24,9 +24,9 @@ stylebot.page = {
         });
         stylebot.page.cache.textarea = stylebot.page.modal.box.find('textarea');
         var buttons = stylebot.page.modal.box.find('button');
-        $(buttons[0]).click(stylebot.page.copyToClipboard);
-        $(buttons[1]).click(stylebot.page.save);
-        $(buttons[2]).click(stylebot.page.cancel);
+        $(buttons.get(0)).click(stylebot.page.copyToClipboard);
+        $(buttons.get(1)).click(stylebot.page.save);
+        $(buttons.get(2)).click(stylebot.page.cancel);
     },
     
     fill: function(content) {
@@ -40,7 +40,7 @@ stylebot.page = {
                 closeOnBgClick: false,
                 bgFadeSpeed: 0,
                 onOpen: function() {
-                    var textarea = stylebot.page.cache.textarea[0];
+                    var textarea = stylebot.page.cache.textarea.get(0);
                     Utils.moveCursorToEnd(textarea);
                     stylebot.page.cache.textarea.focus();
                     stylebot.style.saveState();
