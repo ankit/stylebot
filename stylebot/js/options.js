@@ -33,6 +33,9 @@ var styles = {};
 
 // initialize options
 function init() {
+	// initialize tabs
+	initializeTabs();
+	
     // fetch options from datastore
     fetchOptions();
 
@@ -43,19 +46,19 @@ function init() {
 			return;
 		var tag = el.tagName.toLowerCase();
 		
-		if (el.type == "checkbox") {
+		if (el.type === "checkbox") {
 			if (value == true)
 				el.checked = true;
 		}
 		
-		else if (tag == "select" || el.type == "hidden") {
+		else if (tag === "select" || el.type === "hidden") {
 			if (value != undefined)
 				el.value = value;
 			else
 				el.value = defaults[option];
 		}
 		
-		else if (el.type == "radio") {
+		else if (el.type === "radio") {
 			var len = $el.length;
 			if (value == undefined)
 				value = defaults[option];
@@ -69,6 +72,7 @@ function init() {
 		}
 		
 	});
+	
     KeyCombo.init($('[name=shortcutKeyCharacter]').get(0), $('[name=shortcutKey]').get(0));
 
     bg_window = chrome.extension.getBackgroundPage();
@@ -82,7 +86,27 @@ function init() {
 	// hack to wait for window.innerHeight to be available
     setTimeout(function() {
         cache.textareaHeight = window.innerHeight * 0.5 + 'px';
-    }, 0);
+    }, 100);
+}
+
+// Initialize tabs
+function initializeTabs() {
+	$("ul.menu li:first").addClass("tabActive").show(); 
+	$("#options > div").hide();
+	$("#basic-options").show();
+	
+	// click event for tab menu items
+	$("ul.menu li").click(function() {
+
+		$("ul.menu li").removeClass("tabActive"); 
+		$(this).addClass("tabActive");
+		$("#options > div").hide();
+		
+		// Get DIV ID for content from the href of the menu link
+		var activeTab = $(this).find("a").attr("href");
+		$(activeTab).fadeIn();
+		return false;
+	});
 }
 
 // fetches options from the datastore
@@ -166,6 +190,13 @@ function createCustomStyleOption(url, rules) {
     var b_container = $('<div>', {
         class: 'button-container'
     });
+
+    $('<button>', {
+        html: 'share',
+        class: 'inline-button'
+    })
+    .click(shareStyle)
+    .appendTo(b_container);
     
     $('<button>', {
         html: 'edit',
@@ -208,6 +239,42 @@ function editStyle(e) {
         Utils.moveCursorToEnd(textarea);
     };
     cache.modal.show();
+}
+
+function shareStyle(e) {
+	var parent = $(e.target).parents('.custom-style');
+    var url = parent.find('.custom-style-url').html();
+    var rules = styles[url];
+    var css = CSSUtils.crunchFormattedCSS(rules, false);
+
+	var production_url = "http://stylebot.me/playground/social/post";
+	var local_url = "http://localhost:8888/stylebot_social/post";
+	
+	// create a form and submit data
+	var temp_form = $('<form>', {
+		'method': 'post',
+		'action': production_url,
+		'target': '_blank'
+	});
+	// site
+	$('<input>', {
+		type: 'hidden',
+		name: 'site',
+		value: url
+	}).appendTo(temp_form);
+	
+	// css
+	$('<input>', {
+		type: 'hidden',
+		name: 'css',
+		value: css
+	}).appendTo(temp_form);
+	
+	$('<submit>').appendTo(temp_form);
+	
+	temp_form.submit();
+	
+	temp_form.remove();
 }
 
 function onUpdate() {
@@ -282,16 +349,20 @@ function export() {
         css = JSON.stringify(styles);
     else
         css = "";
+
     var html = "<div>Copy and paste your custom styles into a text file:</div><textarea class='stylebot-css-code' style='width: 100%; height:" + cache.textareaHeight + "'>" + css + "</textarea><button onclick='copyToClipboard()'>Copy To Clipboard</button>";
+
     initModal(html, {
         closeOnEsc: true,
         closeOnBgClick: true
     });
+
     cache.modal.options.onOpen = function() {
         var textarea = cache.modal.box.find('textarea').get(0);
         textarea.focus();
         Utils.selectAllText(textarea);
     };
+
     cache.modal.show();
 }
 

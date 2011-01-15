@@ -1,96 +1,73 @@
 /** Stylebot options page css **/
 
 body {
-    background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#eee), to(#ccc));
 	font-size: 16px;
 	line-height: 28px;
-	font-family: Georgia, Palatino, "Palatino Linotype", serif;
-	color: #333;
+	font-family: Calibri, "Myriad Pro", Helvetica, Arial, sans-serif;
+	color: #555;
 	margin: 0;
 	padding: 0;
-    text-shadow: #fff 0px 1px 0px;
+	background-color: #fff;	
+    text-shadow: 0px 0px 1px #fbfbfb;
 }
 
 #wrap {
-    margin: 10px auto auto;
-    padding: 5px;
-    width: 750px;
+	width: 100%;
+	margin: 0 auto;
 }
 
-h1 {
-    color: #73a4c4;
-    font-size: 32px;
-	text-align: center;
-}
-
-h2 {
-	font-size: 16px;
-    font-weight: bold;
-	color: #444;
+h3 {
+	font-weight: normal;
+	font-size: 24px;
 	margin: 0;
 	padding: 0;
-	padding-bottom: 10px;
+	color: #555;
+}
+
+h4 {
+	font-weight: normal;
+	color: #555;
+	font-size: 20px;
 }
 
 a {
-    color: #245571;
+    color: #467ecc;
     text-decoration: none;
+	-webkit-transition: color 0.2s linear;
 }
 
 a:hover {
-    color: #18384a;
-}
-
-#options {
-    margin: 0;
-    padding: 20px;
-    padding-bottom: 0px;
-}
-
-li.option {
-    list-style-type: none;
-    margin: 0;
-    padding: 5px 0;
-    width: 100%;
-}
-
-li.option label {
-    width: 400px;
-}
-
-.option-field {
-    float: right;
+	color: #294266;
 }
 
 input[type=text] {
     border: 1px solid #ccc;
     border-radius: 2px;
-    background-color: #fbfbfb;
     color: #333;
-	font-family: Georgia, Palatino, "Palatino Linotype", serif;
+	font-family: Calibri, "Myriad Pro", Helvetica, Arial, sans-serif;
     font-size: 16px;
     padding: 2px;
     text-align: right;
-    -webkit-box-shadow: 0px 1px 0px #fff;
+	background-color: #fbfbfb;
 }
 
 button {
-    background-color: #e6e6e6;
-    border: 1px solid #b6b6b6;
-    border-radius: 2px;
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#fbfbfb), to(#eee));
+    border: 1px solid #ccc;
+	padding: 3px 4px 2px 4px;
+    border-radius: 5px;
     color: #333;
     cursor: pointer;
-    font-family: Georgia, Palatino, "Palatino Linotype", serif;
+	font-family: Calibri, "Myriad Pro", Helvetica, Arial, sans-serif;
     font-size: 14px;
 }
 
 button:hover {
-    background-color: #fbfbfb;
+    background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#fbfbfb), to(#ccc));
 }
 
 button:active {
-    background-color: #555;
-    color: #fbfbfb;
+    background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#ccc), to(#fbfbfb));
 }
 
 button.inline-button {
@@ -102,7 +79,52 @@ select {
     font-size: 15px;
 }
 
-/* custom styles section */
+.description {
+    color: #444;
+    font-size: 14px !important;
+}
+
+#footer {
+    font-size: 14px;
+    text-align: right;
+    line-height: 25px;
+	padding-right: 10px;
+	color: #555;
+}
+
+/** options **/
+
+ul {
+	margin: 0;
+	padding: 0;
+}
+
+li.option {
+    list-style-type: none;
+    padding: 5px 0;
+}
+
+li.option:first-of-type {
+	padding: 0;
+}
+
+li.option label {
+    width: 400px;
+}
+
+.option-field {
+    float: right;
+}
+
+/** end of options **/
+
+
+/* custom styles */
+
+#custom-styles {
+	width: 80%;
+}
+
 .custom-style {
     clear: both;
 }
@@ -124,32 +146,32 @@ select {
 
 #custom-styles input {
     text-align: left;
-    width: 400px;
+	width: 75%;
     outline: none;
-    border: 1px solid #ccc;
-    display: inline-block;
+	line-height: 15px;
+	margin-bottom: 20px;
 }
 
 #custom-styles .button-container {
     float: right;
 }
 
-.before-focus {
-    font-style: italic;
-    color: #bbb !important;
-}
+/** end of options **/
+
+
+/** popup **/
 
 textarea.stylebot-css-code {
     color: #333 ;
     font-size: 11px ;
-    font-family: Monaco, 'Lucida Console', monospace ;
+    font-family: Menlo, Monaco, 'Lucida Console', monospace ;
     line-height: 16px;
     padding: 2px;
     display: block;
 }
 
 #stylebot-modal div {
-	font-family: Georgia, Palatino, "Palatino Linotype", serif;
+	font-family: Calibri, "Myriad Pro", Helvetica, Arial, sans-serif;
 	font-size: 16px;
 }
 
@@ -171,14 +193,54 @@ textarea.stylebot-css-code {
     width: 100% !important;
 }
 
-.description {
-    color: #444;
-    font-size: 13px !important;
+/** tabs **/
+
+ul.menu {
+	float: right;
+	font-family: Calibri, "Myriad Pro", Helvetica, Arial, sans-serif;
+	font-size: 16px;
+	margin: 0;
+	margin-bottom: 200px;
 }
 
-#footer {
-    font-size: 12px;
-    text-align: center;
-    line-height: 18px;
-    padding-bottom: 20px;
+.tabActive {
+	font-weight: bold;
+	background-color: #fff;
+}
+
+ul.menu li {
+	text-align: right;
+	width: 300px;
+	list-style-type: none;
+	padding: 3 10 3 3;
+	margin: 5 0 0 0;
+}
+
+ul.menu li a, ul.menu li a:visited {
+	text-decoration: none;
+}
+
+#options {
+	position: absolute;
+	margin: 0 0 20px 300px;
+	float: left;
+	min-width: 500px;
+	background-color: #fff;
+	padding: 20px;
+}
+
+#tabmenu {
+	position: fixed;
+	width: 299px;
+	margin: 0;
+	float: left;
+	height: 100%;
+    background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#fdfdfd), to(#ccc));
+	border-right: 1px solid;
+	border-color: #C3C3C3;
+	text-align: right;
+}
+
+#tabmenu h3 {
+	padding: 45 10 17 5;
 }

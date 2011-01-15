@@ -15,66 +15,84 @@
 
 <body>
 <div id="wrap">
-	<h1>Stylebot Options</h1>
+	<div id="tabMenu">
+		<h3>Stylebot Options</h3>
+		<ul class="menu">
+			<li><a href="#basic-options">Basic</a></li>
+			<li><a href="#custom-styles-container">Styles</a></li>		
+			<li><a href="#backup">Backup and Sync</a></li>
+		</ul>
+		<div id="footer">
+			If you like Stylebot, please <a href="">donate</a>.<br><br>
+			Share your styles on <a href="">Stylebot Social</a><br>
+			Report an <a href="http://github.com/ankit/stylebot/issues">issue</a><br>
+			Follow <a href="http://twitter.com/stylebot">@stylebot</a>
+		</div>
+	</div>
 	<div id="options">
-		<li class="option">
-			<label>Shortcut Key to launch Stylebot</label>
-			<div class="option-field">
-				<input type="checkbox" name="useShortcutKey" />
-			</div>
-		</li>
-		<li class="option">
-			<label>Right Click Menu</label>
-			<div class="option-field">
-				<input type="checkbox" name="contextMenu" />
-			</div>
-		</li>
-		<li class="option">
-			<label>Shortcut Key Combo</label>
-			<div class="option-field">
-				<select name="shortcutMetaKey">
-					<option value="ctrl">Ctrl</option>
-					<option value="shift">Shift</option>
-					<option value="alt">Alt</option>
-					<option value="none">None</option>
-				</select>
-				+ <input type="text" name="shortcutKeyCharacter" value="e" size="1" />
-				<!-- Hidden field to store keycode value -->
-				<input type="hidden" name="shortcutKey" />
-			</div>
-		</li>
-		<li class="option">
-			<label>Preferred mode</label>
-			<div class="option-field">
-				<input type="radio" name="mode" value="Basic" /> Basic
-				<input type="radio" name="mode" value="Advanced" /> Advanced
-			</div>
-		</li><br>
-		<div id="custom-styles">
-			<h2>Custom Styles</h2>
-			<input type="text" id="style-search-field" value="Search..." class="before-focus" />
-		</div><br><br>
-		<button onclick="addStyle();">Add Style</button>
-		<br><br>
+		<div id="basic-options">
+			<h4>Basic</h4>
+			<ul>
+				<li class="option">
+					<label>Shortcut Key to launch Stylebot</label>
+					<div class="option-field">
+						<input type="checkbox" name="useShortcutKey" />
+					</div>
+				</li>
+				<li class="option">
+					<label>Right Click Menu</label>
+					<div class="option-field">
+						<input type="checkbox" name="contextMenu" />
+					</div>
+				</li>
+				<li class="option">
+					<label>Shortcut Key Combo</label>
+					<div class="option-field">
+						<select name="shortcutMetaKey">
+							<option value="ctrl">Ctrl</option>
+							<option value="shift">Shift</option>
+							<option value="alt">Alt</option>
+							<option value="none">None</option>
+						</select>
+						+ <input type="text" name="shortcutKeyCharacter" value="e" size="1" />
+						<!-- Hidden field to store keycode value -->
+						<input type="hidden" name="shortcutKey" />
+					</div>
+				</li>
+				<li class="option">
+					<label>Preferred mode</label>
+					<div class="option-field">
+						<input type="radio" name="mode" value="Basic" /> Basic
+						<input type="radio" name="mode" value="Advanced" /> Advanced
+					</div>
+				</li>
+			</ul>
+		</div>
+		<div id="custom-styles-container">
+			<div id="custom-styles">
+					<h4>Custom Styles</h4>
+					<input type="text" id="style-search-field" placeholder="Search existing styles..."/>
+					or <button onclick="addStyle();">Add Style</button>
+			</div><br><br>
+			<button onclick="addStyle();">Add Style</button>
+		</div>
 		<div id="backup">
-			<h2>Backup</h2>
+			<h4>Backup</h4>
 			<button onclick="export();">Export</button>
 			<button onclick="import();">Import</button>
-		</div><br>
-		<div id="sync">
-			<h2>Sync <span style="font-weight: normal; font-style: italic;" class="description">(experimental)</span></h2>
-			<div class="description">This will sync your custom styles across multiple computers. For this to work, you need to have <a href="http://www.google.com/support/chrome/bin/answer.py?hl=en&answer=165139">Bookmark Sync enabled</a>.<br></div>
-			<button onclick="toggleSyncing();" id="sync-button">Enable Sync</button><br><br>
-			<button onclick="bg_window.pushStyles();" style="display: none" id="sync-now">Push Styles Now</button>
-<div class="description" id="sync-enabled-note"><strong>Important</strong>: When you click on <strong>Push Styles Now</strong>, your custom styles on this computer will be pushed to and replace existing styles on all other computers. This is until automatic sync is built into Stylebot.</div>
-		</div><br><br>
-	</div>
-	<div id="footer">
-		<a href="http://github.com/ankit/stylebot/issues">Report Issues</a>&nbsp;&nbsp;&nbsp;::&nbsp;&nbsp;
-		<a href="http://stylebot.me/walkthrough.html">Walkthrough</a>&nbsp;&nbsp;&nbsp;::&nbsp;&nbsp;
-		<a href="http://twitter.com/stylebot">Twitter</a>&nbsp;&nbsp;&nbsp;::&nbsp;&nbsp;
-		<a href="http://stylebot.me/shortcuts.html">Keyboard shortcuts help</a><br>
-		Created by <a href="http://ankitahuja.com">Ankit Ahuja</a>
+			<div id="sync">
+				<h4>Sync <span class='description'>experimental</span></h2>
+				<div class="description">
+					This will sync your custom styles across multiple computers. For this to work, you need to have 
+					<a href="http://www.google.com/support/chrome/bin/answer.py?hl=en&answer=165139">
+						Bookmark Sync enabled
+					</a>.
+				</div>
+				<button onclick="toggleSyncing();" id="sync-button">Enable Sync</button><br><br>
+				<button onclick="bg_window.pushStyles();" style="display: none" id="sync-now">Push Styles Now</button>
+	<div class="description" id="sync-enabled-note"><strong>Important</strong>: When you click on <strong>Push Styles Now</strong>, your custom styles on this computer will be pushed to and replace existing styles on all other computers. This is until automatic sync is built into Stylebot.
+			</div>
+		</div>
 	</div>
 </body>
 </html>

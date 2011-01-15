@@ -21,6 +21,10 @@ stylebot.chrome = {
     save: function(url, rules) {
         chrome.extension.sendRequest({ name: "save", rules: rules, url: url }, function(){});
     },
+
+	install: function(url, rules, id) {
+		chrome.extension.sendRequest({ name: "install", rules: rules, url: url, id: id}, function() {});
+	},
     
     // transfer all rules for src url to dest url
     transfer: function(src, dest) {
