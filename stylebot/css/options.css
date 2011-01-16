@@ -123,6 +123,7 @@ li.option label {
 
 #custom-styles {
 	width: 80%;
+	min-width: 420px;
 }
 
 .custom-style {
@@ -146,7 +147,8 @@ li.option label {
 
 #custom-styles input {
     text-align: left;
-	width: 75%;
+	float: left;
+	width: 35%;
     outline: none;
 	line-height: 15px;
 	margin-bottom: 20px;
@@ -222,7 +224,7 @@ ul.menu li a, ul.menu li a:visited {
 
 #options {
 	position: absolute;
-	margin: 0 0 20px 300px;
+	margin: 0 0 20px 260px;
 	float: left;
 	min-width: 500px;
 	background-color: #fff;
@@ -231,7 +233,7 @@ ul.menu li a, ul.menu li a:visited {
 
 #tabmenu {
 	position: fixed;
-	width: 299px;
+	width: 259px;
 	margin: 0;
 	float: left;
 	height: 100%;
