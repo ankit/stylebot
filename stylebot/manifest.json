@@ -1,7 +1,7 @@
 {
 	"name": "Stylebot",
-	"version": "0.2.4.1",
-	"description": "Adapt the web's appearance.",
+	"version": "0.5",
+	"description": "Adapt the web's appearance",
 	"background_page": "background.html",
 	"options_page": "options.html",
 	
@@ -16,6 +16,13 @@
 		
 		"run_at": "document_start",
 		"all_frames": true
+	},
+	{
+		"matches": ["http://stylebot.me/*"],
+		"js": [
+			"js/installation.js"
+		],
+		"run_at": "document_start"
 	},
 	{
 		"matches": ["http://userstyles.org/styles/*"],
@@ -62,8 +69,7 @@
 			"js/libs/colorpicker.js",
 			"js/libs/jquery.tipsy.js",
 			"js/libs/parser.js",
-			"js/shortcuts.js",
-			"js/installation.js"
+			"js/shortcuts.js"
 		],
 		
 		"run_at": "document_end",

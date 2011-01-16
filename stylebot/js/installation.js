@@ -1,4 +1,6 @@
 $(document).ready(function(e) {
+	sendAvailabilityMessage();
+	
 	// respond to requests from stylebot social
 	var $install_divs = $('.stylebot_install_div');
 
@@ -34,9 +36,15 @@ $(document).ready(function(e) {
 			}
 		}); 
 	}
-	// append a hidden div to tell social that I am alive
-	$('<div>', {
-		id: "stylebot_is_alive",
-		style: 'display:none'
-	}).appendTo(document.body);
 });
+
+function sendAvailabilityMessage() {
+	// get first available install div
+	install_div = $('.stylebot_install_div').get(0);
+	// create event
+	if (install_div) {
+		var customEvent = document.createEvent('Event');
+		customEvent.initEvent('stylebotIsAvailableEvent', true, true);
+		install_div.dispatchEvent(customEvent);
+	}
+}
