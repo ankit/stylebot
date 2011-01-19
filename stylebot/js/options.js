@@ -253,7 +253,7 @@ function shareStyle(e) {
 	// create a form and submit data
 	var temp_form = $('<form>', {
 		'method': 'post',
-		'action': production_url,
+		'action': local_url,
 		'target': '_blank'
 	});
 	// site

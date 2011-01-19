@@ -18,13 +18,6 @@
 		"all_frames": true
 	},
 	{
-		"matches": ["http://stylebot.me/*"],
-		"js": [
-			"js/installation.js"
-		],
-		"run_at": "document_start"
-	},
-	{
 		"matches": ["http://userstyles.org/styles/*"],
 		
 		"js": [
@@ -69,7 +62,8 @@
 			"js/libs/colorpicker.js",
 			"js/libs/jquery.tipsy.js",
 			"js/libs/parser.js",
-			"js/shortcuts.js"
+			"js/shortcuts.js",
+			"js/installation.js"
 		],
 		
 		"run_at": "document_end",

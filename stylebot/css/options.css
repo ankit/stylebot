@@ -118,7 +118,6 @@ li.option label {
 
 /** end of options **/
 
-
 /* custom styles */
 
 #custom-styles {
@@ -202,7 +201,16 @@ ul.menu {
 	font-family: Calibri, "Myriad Pro", Helvetica, Arial, sans-serif;
 	font-size: 16px;
 	margin: 0;
-	margin-bottom: 200px;
+	padding-bottom: 20px;
+}
+
+.separator {
+	width: 96%;
+	height: 1px;
+	float: right;
+	background-color: #ccc;
+	margin: 5px;
+	-webkit-box-shadow: 0px 1px 1px #fff;
 }
 
 .tabActive {
