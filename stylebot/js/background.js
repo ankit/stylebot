@@ -330,10 +330,23 @@ function loadAccordionState() {
 function createContextMenu() {
 	if (localStorage['stylebot_option_contextMenu'] == 'true') {
 		contextMenuId = chrome.contextMenus.create({
-	        title: "Style Element",
-	        contexts: ['all'],
-	        onclick: openWidget
+	        title: "Stylebot",
+	        contexts: ['all']
 	    });
+		
+		chrome.contextMenus.create({
+			title: "Style Element",
+			contexts: ['all'],
+			onclick: openWidget,
+			parentId: contextMenuId
+		});
+		
+		chrome.contextMenus.create({
+			title: "Search for styles for this page...",
+			contexts: ['all'],
+			onclick: searchSocial,
+			parentId: contextMenuId
+		});
 	}
 }
 
@@ -342,6 +355,12 @@ function removeContextMenu() {
 		chrome.contextMenus.remove(contextMenuId);
 		contextMenuId = null;
 	}
+}
+
+function searchSocial() {
+	chrome.tabs.getSelected(null, function(tab) {
+        chrome.tabs.sendRequest(tab.id, {name: "searchSocial"}, function(){});
+    });
 }
 
 function openWidget() {

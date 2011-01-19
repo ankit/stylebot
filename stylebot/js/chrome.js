@@ -49,22 +49,27 @@ stylebot.chrome = {
 
 chrome.extension.onRequest.addListener(
 	function(request, sender, sendResponse) {
-        if (request.name == "toggle")
+        if (request.name === "toggle")
 		{
 		    if (window != window.top)
 		        return;
             stylebot.toggle();
-		    sendResponse({ status: stylebot.status });
+		    sendResponse({status: stylebot.status});
 		}
-		else if (request.name == "setOptions")
+		else if (request.name === "setOptions")
 		{
 		    stylebot.setOptions(request.options);
             sendResponse({});
 		}
-		else if (request.name == "openWidget")
+		else if (request.name === "openWidget")
 		{
             stylebot.contextmenu.openWidget();
 		    sendResponse({});
+		}
+		else if (request.name === "searchSocial") {
+			if (!window.top)
+				return;
+			stylebot.contextmenu.searchSocial();
 		}
 	}
 );

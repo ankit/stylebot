@@ -20,5 +20,9 @@ stylebot.contextmenu = {
             stylebot.enable();
             stylebot.select(stylebot.contextmenu.cache.el);
         }
-    }
+    },
+
+	searchSocial: function() {
+		window.open("http://stylebot.me/playground/social/search/" + document.domain);
+	}
 }
