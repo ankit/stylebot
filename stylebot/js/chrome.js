@@ -71,5 +71,10 @@ chrome.extension.onRequest.addListener(
 				return;
 			stylebot.contextmenu.searchSocial();
 		}
+		else if (request.name === "shareStyleOnSocial") {
+			if (!window.top)
+				return;
+			stylebot.contextmenu.shareStyleOnSocial();
+		}
 	}
 );

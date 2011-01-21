@@ -328,7 +328,7 @@ function loadAccordionState() {
 /*** Context Menu ***/
 
 function createContextMenu() {
-	if (localStorage['stylebot_option_contextMenu'] == 'true') {
+	if (localStorage['stylebot_option_contextMenu'] === 'true') {
 		contextMenuId = chrome.contextMenus.create({
 	        title: "Stylebot",
 	        contexts: ['all']
@@ -347,6 +347,13 @@ function createContextMenu() {
 			onclick: searchSocial,
 			parentId: contextMenuId
 		});
+		
+		chrome.contextMenus.create({
+			title: "Share your style for this page...",
+			contexts: ['all'],
+			onclick: shareStyleOnSocial,
+			parentId: contextMenuId
+		});
 	}
 }
 
@@ -360,6 +367,12 @@ function removeContextMenu() {
 function searchSocial() {
 	chrome.tabs.getSelected(null, function(tab) {
         chrome.tabs.sendRequest(tab.id, {name: "searchSocial"}, function(){});
+    });
+}
+
+function  shareStyleOnSocial() {
+	chrome.tabs.getSelected(null, function(tab) {
+        chrome.tabs.sendRequest(tab.id, {name: "shareStyleOnSocial"}, function(){});
     });
 }
 
