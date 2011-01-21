@@ -63,7 +63,7 @@ button, input[type=button], input[type=submit], a.button {
 	-moz-border-radius: 9px;
 	border: 1px solid #bbb;
 	cursor: pointer;
-	padding: 1px 5px;
+	padding: 0.1em 5px 0.2em 5px;
 	color: #555;
 	background-color: #eee;
 	font-family: 'Lucida Grande', 'Lucida Sans', 'Lucida Sans Unicode', Helvetica, Arial, sans-serif;	
