@@ -3,7 +3,7 @@
 body {
 	font-size: 14px;
 	line-height: 28px;
-	font-family: 'Lucida Grande', Helvetica, Arial, sans-serif;
+	font-family: 'Lucida Grande', 'Lucida Sans', 'Lucida Sans Unicode', Helvetica, Arial, sans-serif;
 	color: #555;
 	margin: 0;
 	padding: 0;
@@ -26,7 +26,10 @@ h3 {
 h4 {
 	font-weight: normal;
 	color: #555;
-	line-height: 2em;
+	padding: 0;
+	margin: 0;
+	margin-top: 27px;
+	margin-bottom: 23px;
 	font-size: 18px;
 }
 
@@ -44,7 +47,7 @@ input[type=text] {
     border: 1px solid #ccc;
     border-radius: 2px;
     color: #333;
-	font-family: 'Lucida Grande', Helvetica, Arial, sans-serif;
+	font-family: 'Lucida Grande', 'Lucida Sans', 'Lucida Sans Unicode', Helvetica, Arial, sans-serif;
     font-size: 14px;
     padding: 2px;
     text-align: right;
@@ -58,11 +61,12 @@ button, input[type=button], input[type=submit], a.button {
 	margin-right: 5px;
 	border-radius: 9px;
 	-moz-border-radius: 9px;
-	border: 1px solid #dedede;
+	border: 1px solid #bbb;
 	cursor: pointer;
-	padding: 1px 7px;
-	color: #666;
-	background-color: #efefef;
+	padding: 1px 5px;
+	color: #555;
+	background-color: #eee;
+	font-family: 'Lucida Grande', 'Lucida Sans', 'Lucida Sans Unicode', Helvetica, Arial, sans-serif;	
 	text-decoration: none;
 	-webkit-transition-property:color, background-color;
 	-webkit-transition-duration: 0.2s, 0.2s;
@@ -70,9 +74,8 @@ button, input[type=button], input[type=submit], a.button {
 }
 
 button:hover, input[type=button]:hover, input[type=submit]:hover {
-	background: none;
 	background-color: #fff;
-	color: #555;
+	color: #333;
 }
 
 select {
@@ -181,7 +184,7 @@ textarea.stylebot-css-code {
 }
 
 #stylebot-modal div {
-	font-family: 'Lucida Grande', Helvetica, Arial, sans-serif;
+	font-family: 'Lucida Grande', 'Lucida Sans', 'Lucida Sans Unicode', Helvetica, Arial, sans-serif;
 	font-size: 14px;
 }
 
@@ -207,7 +210,7 @@ textarea.stylebot-css-code {
 
 ul.menu {
 	float: right;
-	font-family: 'Lucida Grande', Helvetica, Arial, sans-serif;
+	font-family: 'Lucida Grande', 'Lucida Sans', 'Lucida Sans Unicode', Helvetica, Arial, sans-serif;
 	font-size: 14px;
 	margin: 0;
 	padding-bottom: 20px;
