@@ -52,28 +52,28 @@ input[type=text] {
 	background-color: #fbfbfb;
 }
 
-button {
-	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#fbfbfb), to(#eee));
-    border: 1px solid #ccc;
-	padding: 3px 4px 2px 4px;
-    border-radius: 5px;
-    color: #333;
-    cursor: pointer;
-	font-family: 'Lucida Grande', Helvetica, Arial, sans-serif;
-    font-size: 12px;
+button, input[type=button], input[type=submit], a.button {
+	font-size: 12px;
+	font-style: normal;
+	margin: 0px;
+	margin-left: 5px;
+	border-radius: 9px;
+	-moz-border-radius: 9px;
+	border: 1px solid #dedede;
+	cursor: pointer;
+	padding: 1px 7px;
+	color: #666;
+	background-color: #efefef;
+	text-decoration: none;
+	-webkit-transition-property:color, background-color;
+	-webkit-transition-duration: 0.2s, 0.2s;
+	-webkit-transition-timing-function: linear, linear;
 }
 
-button:hover {
-    background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#fbfbfb), to(#ccc));
-}
-
-button:active {
-    background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#ccc), to(#fbfbfb));
-}
-
-button.inline-button {
-    display: inline-block;
-    margin: 5px 5px;
+button:hover, input[type=button]:hover, input[type=submit]:hover {
+	background: none;
+	background-color: #fff;
+	color: #555;
 }
 
 select {
@@ -122,8 +122,13 @@ li.option label {
 /* custom styles */
 
 #custom-styles {
-	width: 80%;
+/*	width: 60%;*/
 	min-width: 420px;
+}
+
+#custom-style-install-text {
+	float: left; 
+	margin-left: 20px;
 }
 
 .custom-style {
@@ -132,7 +137,9 @@ li.option label {
 
 .custom-style-url {
     padding: 2px;
-    float: left;
+	width: 200px;
+	word-wrap: break-word;
+	display: inline-block;	
 }
 
 .custom-style-url:hover {
@@ -155,7 +162,9 @@ li.option label {
 }
 
 #custom-styles .button-container {
-    float: right;
+/*    float: right;*/
+	display: inline-block;
+	padding-top: 7px;
 }
 
 /** end of options **/
