@@ -1,9 +1,9 @@
 /** Stylebot options page css **/
 
 body {
-	font-size: 16px;
+	font-size: 14px;
 	line-height: 28px;
-	font-family: Calibri, "Myriad Pro", Helvetica, Arial, sans-serif;
+	font-family: 'Lucida Grande', Helvetica, Arial, sans-serif;
 	color: #555;
 	margin: 0;
 	padding: 0;
@@ -18,7 +18,7 @@ body {
 
 h3 {
 	font-weight: normal;
-	font-size: 24px;
+	font-size: 22px;
 	margin: 0;
 	padding: 0;
 	color: #555;
@@ -27,7 +27,8 @@ h3 {
 h4 {
 	font-weight: normal;
 	color: #555;
-	font-size: 20px;
+	line-height: 2em;
+	font-size: 18px;
 }
 
 a {
@@ -44,8 +45,8 @@ input[type=text] {
     border: 1px solid #ccc;
     border-radius: 2px;
     color: #333;
-	font-family: Calibri, "Myriad Pro", Helvetica, Arial, sans-serif;
-    font-size: 16px;
+	font-family: 'Lucida Grande', Helvetica, Arial, sans-serif;
+    font-size: 14px;
     padding: 2px;
     text-align: right;
 	background-color: #fbfbfb;
@@ -58,8 +59,8 @@ button {
     border-radius: 5px;
     color: #333;
     cursor: pointer;
-	font-family: Calibri, "Myriad Pro", Helvetica, Arial, sans-serif;
-    font-size: 14px;
+	font-family: 'Lucida Grande', Helvetica, Arial, sans-serif;
+    font-size: 12px;
 }
 
 button:hover {
@@ -76,16 +77,16 @@ button.inline-button {
 }
 
 select {
-    font-size: 15px;
+    font-size: 14px;
 }
 
 .description {
     color: #444;
-    font-size: 14px !important;
+    font-size: 12px !important;
 }
 
 #footer {
-    font-size: 14px;
+    font-size: 12px;
     text-align: right;
     line-height: 25px;
 	padding-right: 10px;
@@ -164,7 +165,7 @@ li.option label {
 
 textarea.stylebot-css-code {
     color: #333 ;
-    font-size: 11px ;
+    font-size: 12px ;
     font-family: Menlo, Monaco, 'Lucida Console', monospace ;
     line-height: 16px;
     padding: 2px;
@@ -172,8 +173,8 @@ textarea.stylebot-css-code {
 }
 
 #stylebot-modal div {
-	font-family: Calibri, "Myriad Pro", Helvetica, Arial, sans-serif;
-	font-size: 16px;
+	font-family: 'Lucida Grande', Helvetica, Arial, sans-serif;
+	font-size: 14px;
 }
 
 #stylebot-modal .description {
@@ -198,8 +199,8 @@ textarea.stylebot-css-code {
 
 ul.menu {
 	float: right;
-	font-family: Calibri, "Myriad Pro", Helvetica, Arial, sans-serif;
-	font-size: 16px;
+	font-family: 'Lucida Grande', Helvetica, Arial, sans-serif;
+	font-size: 14px;
 	margin: 0;
 	padding-bottom: 20px;
 }
