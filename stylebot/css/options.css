@@ -59,8 +59,8 @@ button, input[type=button], input[type=submit], a.button {
 	font-style: normal;
 	margin: 0px;
 	margin-right: 5px;
-	border-radius: 9px;
-	-moz-border-radius: 9px;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
 	border: 1px solid #bbb;
 	cursor: pointer;
 	padding: 0.1em 5px 0.2em 5px;
@@ -124,7 +124,6 @@ li.option label {
 /* custom styles */
 
 #custom-styles {
-/*	width: 60%;*/
 	min-width: 420px;
 }
 
@@ -135,13 +134,15 @@ li.option label {
 
 .custom-style {
     clear: both;
+	margin: 5px;
 }
 
 .custom-style-url {
     padding: 2px;
 	width: 200px;
 	word-wrap: break-word;
-	display: inline-block;	
+	display: inline-block;
+	line-height: 20px;	
 }
 
 .custom-style-url:hover {
@@ -155,7 +156,11 @@ li.option label {
 }
 
 #custom-styles input {
-    text-align: left;
+	text-align: left;
+	margin-right: 4px;
+}
+
+#style-search-field {
 	float: left;
 	width: 35%;
     outline: none;
@@ -164,7 +169,7 @@ li.option label {
 }
 
 #custom-styles .button-container {
-/*    float: right;*/
+	margin-left: 10px;
 	display: inline-block;
 	padding-top: 7px;
 }

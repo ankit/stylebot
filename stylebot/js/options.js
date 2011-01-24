@@ -182,10 +182,7 @@ function createCustomStyleOption(url, rules) {
     Utils.makeEditable(url_div , function(newValue) {
         editURL( url_div.data('value'), newValue);
         url_div.data('value', newValue);
-        setTimeout(function(){
-            url_div.focus();
-        }, 0);
-    }, {fixedWidth: 400});
+    });
     
     var b_container = $('<div>', {
         class: 'button-container'

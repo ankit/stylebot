@@ -102,6 +102,7 @@ var Utils = {
                     value = e.data.el.html();
                 e.data.el.html(value);
                 e.data.el.show();
+				e.data.el.focus();
                 e.data.callback(value);
                 $(document).unbind("mousedown", onClose);
                 $(document).unbind("keyup", onClose);
