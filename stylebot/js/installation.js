@@ -63,9 +63,10 @@ function sendAvailabilityMessage() {
 
 // Send request to background.html to save style along with metadata (id, timestamp, etc.)
 function saveStyleFromSocial(channel) {
-	var $post = $(channel).closest('.post');
+	var $channel = $(channel);
+	var $post = $channel.closest('.post');
 	
-	var css = $.trim( $post.find('pre').text() );
+	var css = $channel.text();
 
 	var url = $.trim( $post.find('.post_site').text() );
 	
