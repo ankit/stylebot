@@ -7,9 +7,16 @@ var cache = {
     /**
         e.g. styles = {
             'google.com' : {
-                'a': {
-                    'color': 'red'
-                }
+				rules: {
+					'a': {
+                    	'color': 'red'
+                	}
+				},
+				
+				social: {
+					id: 4,
+					timestamp: 123456 (UNIX based)
+				}
             }
         }
     **/
@@ -29,10 +36,10 @@ var cache = {
 };
 
 function init() {
-    updateVersion();
     attachListeners();
     loadOptionsIntoCache();
     loadStylesIntoCache();
+    updateVersion();
     loadAccordionState();
     if (cache.options.sync) {
         loadSyncId();
@@ -42,21 +49,34 @@ function init() {
 }
 
 function openReleaseNotes() {
-    chrome.tabs.create({url:"http://stylebot.me/releases.html", selected: true}, null);
+    chrome.tabs.create({ url: "http://stylebot.me/releases.html", selected: true }, null);
 }
 
 function updateVersion() {
     if (!localStorage.version) {
-        localStorage.version = "0.2"; return true;
+        localStorage.version = "1"; return true;
     }
-    else if (localStorage.version != "0.2") {
-        // display notification on update
-        var notification = webkitNotifications.createHTMLNotification(
-          'notification.html'
-        );
-        notification.show();
-        localStorage.version = "0.2";
-    }
+    else if (localStorage.version != "1") {
+		upgradeTo1();
+	}
+}
+
+function upgradeTo1() {
+    localStorage.version = "1";
+
+	// upgrading to the new data model
+    for (var url in cache.styles) {
+		var rules = cache.styles[url];
+		cache.styles[url] = {};
+		cache.styles[url]['rules']= rules;
+		cache.styles[url]['social'] = {};
+	}
+	
+	// save to localStorage
+	updateStylesInDataStore();
+	
+	// save to sync data as well
+	saveSyncData(cache.styles);
 }
 
 function attachListeners() {
@@ -75,11 +95,13 @@ function attachListeners() {
             
             case "copyToClipboard"  : copyToClipboard(request.text); sendResponse({}); break;
             
-            case "save"             : save(request.url, request.rules); sendResponse({}); break;
+            case "save"             : save(request.url, request.rules, request.data); sendResponse({}); break;
+
+            case "doesStyleExist"   : sendResponse(doesStyleExist(request.url)); break;
 
             case "transfer"         : transfer(request.source, request.destination); sendResponse({}); break;
             
-            case "getRulesForPage"  : sendResponse(getRulesForPage(request.url)); sendResponse({}); break;
+            case "getRulesForPage"  : sendResponse(getRulesForPage(request.url)); break;
             
             case "fetchOptions"     : sendResponse({ options: cache.options, enabledAccordions: cache.enabledAccordions }); break;
 
@@ -117,31 +139,35 @@ function disablePageIcon(tabId) {
 
 /** Data save, load, etc. **/
 
-// save rule. ** not being used
-function saveRule(url, selector, rule) {
-    if (!selector || selector == "" || !url || url == "")
-        return false;
-    
-    if (rule) {
-        if (!cache.styles[url])
-            cache.styles[url] = new Object();
-        cache.styles[url][selector] = rule;
-    }
-    else {
-        if (cache.styles[url] && cache.styles[url][selector])
-            delete cache.styles[url][selector];
-    }
-    updateStylesInDataStore();
+// checks if a style already exists for the site
+// used to issue warning to user while installing styles from social
+function doesStyleExist(url) {
+	if (cache.styles[url]) {
+		return true;
+	}
+	else
+		return false;
 }
 
 // save all rules for a page
-function save(url, rules) {
+function save(url, rules, data) {
     if (!url || url == "")
         return;
-    if (rules)
-        cache.styles[url] = rules;
+
+    if (rules) {
+		cache.styles[url] = {};
+ 		cache.styles[url]['rules'] = rules;		
+	}
     else
         delete cache.styles[url];
+		
+	// if there is meta data, store it in the social object
+	if (data != undefined) {
+		cache.styles[url]['social'] = {};
+		cache.styles[url]['social'].id = data.id;
+		cache.styles[url]['social'].timestamp = data.timestamp;
+	}
+	
     updateStylesInDataStore();
 }
 
@@ -149,10 +175,11 @@ function save(url, rules) {
 function transfer(source, destination) {
     if (cache.styles[source]) {
         cache.styles[destination] = cache.styles[source];
-        // the user has to delete the styles for the previous url manually
+        updateStylesInDataStore();
+
+		// the user has to delete the styles for the previous url manually
         // if (destination.indexOf(source) == -1)
         //     delete cache.styles[source];
-        updateStylesInDataStore();
     }
 }
 
@@ -177,33 +204,30 @@ function mergeStyles(s1, s2) {
     if (!s2) {
         return s1;
     }
+
     for (var url in s1) {
         if (s2[url]) {
-            for (var selector in s1[url]) {
-                if (s2[url][selector]) {
-                    for (var property in s1[url][selector]) {
-                        s2[url][selector][property] = s1[url][selector][property];
+            for (var selector in s1[url]['rules']) {
+                if (s2[url]['rules'][selector]) {
+                    for (var property in s1[url]['rules'][selector]) {
+                        s2[url]['rules'][selector][property] = s1[url]['rules'][selector][property];
                     }
                 }
                 else
-                    s2[url][selector] = s1[url][selector];
+                    s2[url]['rules'][selector] = s1[url]['rules'][selector];
             }
+			s1[url]['social'] = s2[url]['social'];
         }
         else
             s2[url] = s1[url];
     }
+
     return s2;
 }
 
 function updateStylesInDataStore() {
     var jsonString = JSON.stringify(cache.styles);
     localStorage['stylebot_styles'] = jsonString;
-    
-    /** Automatic Sync is disabled for now, until it is made more robust **/
-    
-    // is sync enabled? if yes, store in bookmark as well
-    // if (cache.options.sync)
-    //     saveSyncData(jsonString);
 }
 
 function loadStylesIntoCache() {
@@ -276,16 +300,16 @@ function getRulesForPage(currUrl) {
                 url_for_page = url;
             
             // iterate over each selector in styles
-            for (var selector in cache.styles[url]) {
+            for (var selector in cache.styles[url]['rules']) {
                 // if no rule exists for selector, simply copy the rule
                 if (rules[selector] == undefined)
-                    rules[selector] = cloneObject(cache.styles[url][selector]);
+                    rules[selector] = cloneObject(cache.styles[url]['rules'][selector]);
                 // otherwise, iterate over each property
                 else {
-                    for (var property in cache.styles[url][selector])
+                    for (var property in cache.styles[url]['rules'][selector])
                     {
                         if (rules[selector][property] == undefined || url == url_for_page)
-                            rules[selector][property] = cache.styles[url][selector][property];
+                            rules[selector][property] = cache.styles[url]['rules'][selector][property];
                     }
                 }
             }
@@ -370,7 +394,7 @@ function searchSocial() {
     });
 }
 
-function  shareStyleOnSocial() {
+function shareStyleOnSocial() {
 	chrome.tabs.getSelected(null, function(tab) {
         chrome.tabs.sendRequest(tab.id, {name: "shareStyleOnSocial"}, function(){});
     });

@@ -163,10 +163,10 @@ function translateOptionValue(name, value) {
 function fillCustomStyles() {
     var container = $("#custom-styles");
     for (var url in styles)
-        container.append(createCustomStyleOption(url, styles[url]));
+        container.append(createCustomStyleOption(url));
 }
 
-function createCustomStyleOption(url, rules) {
+function createCustomStyleOption(url) {
     var container = $('<div>', {
         class: 'custom-style'
     });
@@ -223,10 +223,13 @@ function removeStyle(e) {
 function editStyle(e) {
     var parent = $(e.target).parents('.custom-style');
     var url = parent.find('.custom-style-url').html();
-    var rules = styles[url];
+    var rules = styles[url]['rules'];
     var css = CSSUtils.crunchFormattedCSS(rules, false);
     
-    var html = "<div>Edit the CSS for <b>" + url + "</b>:</div><textarea class='stylebot-css-code' style='width: 100%; height:" + cache.textareaHeight + "'>" + css + "</textarea><button onclick='cache.modal.hide();'>Cancel</button><button onclick='onUpdate();cache.modal.hide();'>Save</button>";
+    var html = "<div>Edit the CSS for <b>" + url + "</b>:</div>";
+	html += "<textarea class='stylebot-css-code' style='width: 100%; height:" + cache.textareaHeight + "'>" + css + "</textarea>";
+	html += "<button onclick='cache.modal.hide();'>Cancel</button>";
+	html += "<button onclick='onUpdate(); cache.modal.hide();'>Save</button>";
     
     initModal(html);
     
@@ -301,16 +304,19 @@ function onAdd() {
 function saveStyle(url, css) {
     var parser = new CSSParser();
     var sheet = parser.parse(css);
-    var rules = null;
     var retVal = false;
     if (sheet) {
         try {
-            styles[url] = CSSUtils.getRulesFromParserObject(sheet);
+			var rules = CSSUtils.getRulesFromParserObject(sheet);
+			styles[url] = {};
+            styles[url]['rules'] = rules;
+			styles[url]['social'] = {};
             retVal = true;
         }
         catch(e) {}
     }
-    else if (styles[url]) {
+	// if css is empty. remove the style
+    else if (css === "" && styles[url]) {
         delete styles[url];
         $('.custom-style-url:contains(' + url + ')').parent().remove();
     }
@@ -385,7 +391,8 @@ function importCSS() {
     {
         $(".custom-style").html("");
         try {
-            styles = mergeStyles(JSON.parse(json), styles);
+			var imported_styles = JSON.parse(json);
+            styles = mergeStyles(imported_styles, styles);
             bg_window.saveStyles(styles);
         }
         catch(e) {}

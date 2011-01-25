@@ -18,22 +18,26 @@ stylebot.chrome = {
     },
     
     // save all rules for a page
-    save: function(url, rules) {
-        chrome.extension.sendRequest({ name: "save", rules: rules, url: url }, function(){});
+    save: function(url, rules, data) {
+        chrome.extension.sendRequest({ name: "save", rules: rules, url: url , data: data }, function(){});
     },
 
+	doesStyleExist: function(url, callback) {
+       chrome.extension.sendRequest({ name: "doesStyleExist", url:url }, callback);
+	},
+
 	install: function(url, rules, id) {
-		chrome.extension.sendRequest({ name: "install", rules: rules, url: url, id: id}, function() {});
+		chrome.extension.sendRequest({ name: "install", rules: rules, url: url, id: id }, function() {});
 	},
     
     // transfer all rules for src url to dest url
     transfer: function(src, dest) {
-        chrome.extension.sendRequest({name: "transfer", source: src, destination: dest}, function(){});
+        chrome.extension.sendRequest({name: "transfer", source: src, destination: dest }, function(){});
     },
     
     // send request to fetch options from datastore
     fetchOptions: function() {
-        chrome.extension.sendRequest({ name: "fetchOptions" }, function(response){
+        chrome.extension.sendRequest({ name: "fetchOptions" }, function(response) {
             initialize(response);
         });
     },
