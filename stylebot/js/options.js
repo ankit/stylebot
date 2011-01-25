@@ -244,7 +244,7 @@ function editStyle(e) {
 function shareStyle(e) {
 	var parent = $(e.target).parents('.custom-style');
     var url = parent.find('.custom-style-url').html();
-    var rules = styles[url];
+    var rules = styles[url]['rules'];
     var css = CSSUtils.crunchFormattedCSS(rules, false);
 
 	var production_url = "http://stylebot.me/playground/social/post";
