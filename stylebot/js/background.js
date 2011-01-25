@@ -49,7 +49,7 @@ function init() {
 }
 
 function openReleaseNotes() {
-    chrome.tabs.create({ url: "http://stylebot.me/releases.html", selected: true }, null);
+    chrome.tabs.create({ url: "http://stylebot.me/releases", selected: true }, null);
 }
 
 function updateVersion() {
@@ -57,6 +57,7 @@ function updateVersion() {
         localStorage.version = "1"; return true;
     }
     else if (localStorage.version != "1") {
+		openReleaseNotes();
 		upgradeTo1();
 	}
 }
