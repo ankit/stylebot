@@ -51,6 +51,7 @@ var stylebot = {
     
 	open: function() {
         this.attachListeners();
+		this.style.enable();
         this.widget.open();
         this.status = true;
         this.chrome.setIcon(true);
@@ -237,7 +238,7 @@ var stylebot = {
             stylebot.isKeyboardHelpVisible ||
             stylebot.page.isVisible ||
             $("#stylebot-dropdown").length != 0 ||
-            el.tagName == 'SELECT')
+            el.tagName === 'SELECT')
         {
             return false;
         }
@@ -245,11 +246,11 @@ var stylebot = {
     },
     
     shouldSelect: function(el) {
-        if (el.className == "stylebot-selection"
+        if (el.className === "stylebot-selection"
             || stylebot.widget.isBeingDragged
             || stylebot.page.isVisible
             || stylebot.isKeyboardHelpVisible
-            || stylebot.hoveredElement == el
+            || stylebot.hoveredElement === el
             )
         {
             return false;

@@ -395,7 +395,7 @@ stylebot.style = {
         this.clearInlineCSS(this.cache.elements);
         this.updateStyleElement(this.rules);
         this.save();
-        stylebot.widget.show();
+        stylebot.widget.open();
         setTimeout(function() {
             stylebot.highlight(stylebot.selectedElement);
         }, 0);
@@ -430,16 +430,20 @@ stylebot.style = {
 
 	disable: function() {
 		this.status = false;
-		$("#stylebot-css").remove();
+		$("#stylebot-css").html('');
 	},
 	
 	enable: function() {
+		if (this.status)
+			return;
 		this.status = true;
-		$("#stylebot-css").remove();
-		CSSUtils.injectCSS(CSSUtils.crunchCSS(this.rules, true), 'stylebot-css');
+		$("#stylebot-css").html(CSSUtils.crunchCSS(this.rules, true));
 	},
 	
 	toggle: function() {
+		// if stylebot is open, don't allow user to disable styling on the page
+		if (stylebot.status)
+			return false;
 		if (this.status) {
 			this.disable();
 		}
