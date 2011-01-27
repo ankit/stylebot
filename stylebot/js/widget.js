@@ -106,7 +106,7 @@ stylebot.widget = {
             id: 'stylebot-close-button',
             class: 'stylebot-header-button'
         })
-        .click(stylebot.disable);
+        .click(stylebot.close);
         
         /** Position Toggle Button **/
         var arrowButton = $('<div>', {
@@ -217,22 +217,32 @@ stylebot.widget = {
             stylebot.selectionBox.highlight(stylebot.selectedElement);
     },
     
-    show: function() {
+	open: function() {
         if (!this.cache.box)
             this.createUI();
         
         this.attachListeners();
         this.setPosition(stylebot.options.position);
 
-        if (stylebot.style.cache.selector)
-            this.enable();
-        else
-            this.disable();
+        if (stylebot.style.cache.selector) {
+			this.enable();
+		}
+		else {
+			this.disable();
+		}
+            
+
         setTimeout(function() {
             stylebot.widget.updateHeight();
         }, 0);
+
         this.setMode();
         this.cache.box.show();
+    },
+
+	close: function() {
+        this.detachListeners();
+		this.cache.box.hide();
     },
     
     enable: function() {
@@ -251,11 +261,6 @@ stylebot.widget = {
         this.basic.cache.selectboxes.attr('disabled', 'disabled');
         this.basic.cache.colorSelectors.addClass('disabled');
         this.advanced.cache.cssField.attr('disabled', 'disabled');
-    },
-    
-    hide: function() {
-        this.detachListeners();
-        this.cache.box.hide();
     },
     
     setPosition: function(where) {

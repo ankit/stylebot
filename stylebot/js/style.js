@@ -19,6 +19,8 @@ stylebot.style = {
     timer: null,
     
     parser: null,
+
+	status: true,
     
     // the undo stack. size is limited to last 5 actions
     undoStack: [],
@@ -424,5 +426,24 @@ stylebot.style = {
             stylebot.widget.disableUndo();
         else
             stylebot.widget.enableUndo();
-    }
+    },
+
+	disable: function() {
+		this.status = false;
+		$("#stylebot-css").remove();
+	},
+	
+	enable: function() {
+		this.status = true;
+		$("#stylebot-css").remove();
+		CSSUtils.injectCSS(CSSUtils.crunchCSS(this.rules, true), 'stylebot-css');
+	},
+	
+	toggle: function() {
+		if (this.status) {
+			this.disable();
+		}
+		else
+			this.enable();
+	}
 }

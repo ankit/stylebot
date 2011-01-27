@@ -21,10 +21,10 @@ function attachListeners() {
 
         if (stylebot.options.useShortcutKey && e.keyCode == stylebot.options.shortcutKey)
         {
-            if (stylebot.options.shortcutMetaKey == 'ctrl' && e.ctrlKey
-              || stylebot.options.shortcutMetaKey == 'shift' && e.shiftKey
-              || stylebot.options.shortcutMetaKey == 'alt' && e.altKey
-              || stylebot.options.shortcutMetaKey == 'none') {
+            if (stylebot.options.shortcutMetaKey === 'ctrl' && e.ctrlKey
+              || stylebot.options.shortcutMetaKey === 'shift' && e.shiftKey
+              || stylebot.options.shortcutMetaKey === 'alt' && e.altKey
+              || stylebot.options.shortcutMetaKey === 'none') {
                   e.preventDefault();
                   e.stopPropagation();
                   stylebot.toggle();
@@ -37,7 +37,7 @@ function attachListeners() {
         )
         {
             e.target.blur();
-            stylebot.disable();
+            stylebot.close();
         }
         return true;
     }, true);
@@ -48,7 +48,7 @@ function isInputField(el) {
     var inputTypes = ['input', 'textarea', 'div', 'object'];
     
     if ($.inArray(tagName, inputTypes) != -1 ||
-    el.id == "stylebot"
+    	el.id === "stylebot"
     )
         return true;
     else

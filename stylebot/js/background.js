@@ -7,6 +7,9 @@ var cache = {
     /**
         e.g. styles = {
             'google.com' : {
+
+				status: true,
+				
 				rules: {
 					'a': {
                     	'color': 'red'
@@ -362,24 +365,37 @@ function createContextMenu() {
 		chrome.contextMenus.create({
 			title: "Style Element",
 			contexts: ['all'],
-			onclick: openWidget,
+			onclick: function() { sendRequestToCurrentTab("openWidget"); },
 			parentId: contextMenuId
 		});
 		
 		chrome.contextMenus.create({
 			title: "Search for styles for this page...",
 			contexts: ['all'],
-			onclick: searchSocial,
+			onclick: function() { sendRequestToCurrentTab("searchSocial"); },
 			parentId: contextMenuId
 		});
 		
 		chrome.contextMenus.create({
 			title: "Share your style for this page...",
 			contexts: ['all'],
-			onclick: shareStyleOnSocial,
+			onclick: function() { sendRequestToCurrentTab("shareStyleOnSocial"); },
+			parentId: contextMenuId
+		});
+		
+		contextMenuStatusId = chrome.contextMenus.create({
+			title: "Toggle styling",
+			contexts: ['all'],
+			onclick: function() { sendRequestToCurrentTab("toggleStyle"); },
 			parentId: contextMenuId
 		});
 	}
+}
+
+function sendRequestToCurrentTab(msg) {
+	chrome.tabs.getSelected(null, function(tab) {
+        chrome.tabs.sendRequest(tab.id, { name: msg }, function() {});
+    });	
 }
 
 function removeContextMenu() {
@@ -387,24 +403,6 @@ function removeContextMenu() {
 		chrome.contextMenus.remove(contextMenuId);
 		contextMenuId = null;
 	}
-}
-
-function searchSocial() {
-	chrome.tabs.getSelected(null, function(tab) {
-        chrome.tabs.sendRequest(tab.id, {name: "searchSocial"}, function(){});
-    });
-}
-
-function shareStyleOnSocial() {
-	chrome.tabs.getSelected(null, function(tab) {
-        chrome.tabs.sendRequest(tab.id, {name: "shareStyleOnSocial"}, function(){});
-    });
-}
-
-function openWidget() {
-    chrome.tabs.getSelected(null, function(tab) {
-        chrome.tabs.sendRequest(tab.id, {name: "openWidget"}, function(){});
-    });
 }
 
 /*** End of Context Menu ***/

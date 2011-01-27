@@ -23,7 +23,8 @@ var stylebot = {
         shortcutKey: 77, // 77 is keycode for 'm'
         shortcutMetaKey: 'alt',
         mode: 'Basic',
-        position: 'Right'
+        position: 'Right',
+		sync: false
     },
     
     initialize: function(options) {
@@ -37,28 +38,29 @@ var stylebot = {
         this.options.shortcutKey = options.shortcutKey;
         this.options.shortcutMetaKey = options.shortcutMetaKey;
         this.options.mode = options.mode;
+		this.options.sync = options.sync;
     },
     
     // toggle stylebot editing status
     toggle: function() {
-        if (this.status == true)
-            this.disable();
+        if (this.status === true)
+            this.close();
         else
-            this.enable();
+            this.open();
     },
     
-    enable: function() {
+	open: function() {
         this.attachListeners();
-        this.widget.show();
+        this.widget.open();
         this.status = true;
         this.chrome.setIcon(true);
         this.enableSelection();
         attachKeyboardShortcuts();
     },
     
-    disable: function() {
+	close: function() {
         stylebot.detachListeners();
-        stylebot.widget.hide();
+        stylebot.widget.close();
         stylebot.status = false;
         stylebot.chrome.setIcon(false);
         stylebot.style.reset();
@@ -67,6 +69,10 @@ var stylebot = {
         stylebot.selectedElement = null;
         stylebot.destroySelectionBox();
         detachKeyboardShortcuts();
+		// sync styles
+		if (stylebot.options.sync === true) {
+			stylebot.chrome.pushStyles();
+		}
     },
     
     highlight: function(el) {
@@ -110,7 +116,7 @@ var stylebot = {
             selector = SelectorGenerator.generate(stylebot.selectedElement);
         }
         stylebot.style.fillCache(selector);
-        stylebot.widget.show();
+        stylebot.widget.open();
         setTimeout(function() {
             stylebot.style.removeFromStyleElement();
         }, 100);

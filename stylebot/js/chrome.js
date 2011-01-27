@@ -60,25 +60,35 @@ chrome.extension.onRequest.addListener(
             stylebot.toggle();
 		    sendResponse({status: stylebot.status});
 		}
+
 		else if (request.name === "setOptions")
 		{
 		    stylebot.setOptions(request.options);
             sendResponse({});
 		}
+
 		else if (request.name === "openWidget")
 		{
             stylebot.contextmenu.openWidget();
 		    sendResponse({});
 		}
+
 		else if (request.name === "searchSocial") {
 			if (!window.top)
 				return;
 			stylebot.contextmenu.searchSocial();
 		}
+
 		else if (request.name === "shareStyleOnSocial") {
 			if (!window.top)
 				return;
 			stylebot.contextmenu.shareStyleOnSocial();
+		}
+
+		else if (request.name === "toggleStyle") {
+			if (!window.top)
+				return;
+			stylebot.style.toggle();
 		}
 	}
 );
