@@ -66,23 +66,21 @@ function updateVersion() {
 }
 
 function upgradeTo1() {
+	console.log("Upgrading to version 1...");
     localStorage.version = "1";
 
 	// upgrading to the new data model
     for (var url in cache.styles) {
 		var rules = cache.styles[url];
 		cache.styles[url] = {};
-		cache.styles[url]['rules']= rules;
-		cache.styles[url]['social'] = {};
+		cache.styles[url]['rules'] = rules;
 	}
 	
 	// save to localStorage
 	updateStylesInDataStore();
-	
-	// save to sync data as well
-	saveSyncData(cache.styles);
 }
 
+// Listen to requests tabs and page action
 function attachListeners() {
     chrome.pageAction.onClicked.addListener(handlePageIconClick);
     
@@ -93,35 +91,34 @@ function attachListeners() {
     
     chrome.extension.onRequest.addListener( function(request, sender, sendResponse) {
         switch (request.name) {
-            case "enablePageIcon"   : enablePageIcon(sender.tab.id); sendResponse({}); break;
+            case "enablePageIcon"   	: enablePageIcon(sender.tab.id); sendResponse({}); break;
             
-            case "disablePageIcon"  : disablePageIcon(sender.tab.id); sendResponse({}); break;
+            case "disablePageIcon" 	 	: disablePageIcon(sender.tab.id); sendResponse({}); break;
             
-            case "copyToClipboard"  : copyToClipboard(request.text); sendResponse({}); break;
+            case "copyToClipboard"  	: copyToClipboard(request.text); sendResponse({}); break;
             
-            case "save"             : save(request.url, request.rules, request.data); sendResponse({}); break;
+            case "save"             	: save(request.url, request.rules, request.data); sendResponse({}); break;
 
-            case "doesStyleExist"   : sendResponse(doesStyleExist(request.url)); break;
+            case "doesStyleExist"   	: sendResponse(doesStyleExist(request.url)); break;
 
-            case "transfer"         : transfer(request.source, request.destination); sendResponse({}); break;
+            case "transfer"         	: transfer(request.source, request.destination); sendResponse({}); break;
             
-            case "getRulesForPage"  : sendResponse(getRulesForPage(request.url)); break;
+            case "getRulesForPage"  	: sendResponse(getRulesForPage(request.url)); break;
             
-            case "fetchOptions"     : sendResponse({ options: cache.options, enabledAccordions: cache.enabledAccordions }); break;
+            case "fetchOptions"     	: sendResponse({ options: cache.options, enabledAccordions: cache.enabledAccordions }); break;
 
-            case "saveAccordionState": saveAccordionState(request.enabledAccordions); sendResponse({}); break;
+            case "saveAccordionState"	: saveAccordionState(request.enabledAccordions); sendResponse({}); break;
 
-            case "pushStyles": pushStyles(); sendResponse({}); break;
+            case "pushStyles"			: pushStyles(); sendResponse({}); break;
         }
     });
 }
 
-/** Page Action handling **/
 
 // Toggle CSS editing when page icon is clicked
 function handlePageIconClick(tab) {
     currTabId = tab.id;
-    chrome.tabs.sendRequest(currTabId, { name: "toggle" }, function(response){
+    chrome.tabs.sendRequest(currTabId, { name: "toggle" }, function(response) {
         if(response.status)
             enablePageIcon(currTabId);
         else
@@ -129,10 +126,12 @@ function handlePageIconClick(tab) {
     });
 }
 
+
 function enablePageIcon(tabId) {
     chrome.pageAction.setIcon({ tabId: tabId, path: "images/icon19_on.png" });
     chrome.pageAction.setTitle({ tabId: tabId, title: "Click to stop editing using Stylebot" });
 }
+
 
 function disablePageIcon(tabId) {
     chrome.pageAction.setIcon({ tabId: tabId, path: "images/icon19_off.png" });
@@ -143,7 +142,7 @@ function disablePageIcon(tabId) {
 
 /** Data save, load, etc. **/
 
-// checks if a style already exists for the site
+// Returns if a style already exists for the site
 // used to issue warning to user while installing styles from social
 function doesStyleExist(url) {
 	if (cache.styles[url]) {
@@ -153,7 +152,7 @@ function doesStyleExist(url) {
 		return false;
 }
 
-// save all rules for a page
+// Save all rules for a page
 function save(url, rules, data) {
     if (!url || url == "")
         return;
@@ -175,7 +174,7 @@ function save(url, rules, data) {
     updateStylesInDataStore();
 }
 
-// transfer rules for source URL to destination URL
+// Transfer rules for source URL to destination URL
 function transfer(source, destination) {
     if (cache.styles[source]) {
         cache.styles[destination] = cache.styles[source];
@@ -187,14 +186,14 @@ function transfer(source, destination) {
     }
 }
 
-// save all styles
+// Save all styles
 function saveStyles(styles) {
     if (styles)
         cache.styles = styles;
     updateStylesInDataStore();
 }
 
-// save all styles only in localStorage and cache
+// Save all styles in localStorage and cache
 function saveStylesLocally(styles) {
     if (styles)
         cache.styles = styles;
@@ -202,7 +201,7 @@ function saveStylesLocally(styles) {
     localStorage['stylebot_styles'] = jsonString;
 }
 
-// styles from both objects are merged
+// Styles from both objects are merged
 // for common properties, s2 is given priority over s1
 function mergeStyles(s1, s2) {
     if (!s2) {
@@ -229,11 +228,13 @@ function mergeStyles(s1, s2) {
     return s2;
 }
 
+// Update styles in localStorage
 function updateStylesInDataStore() {
     var jsonString = JSON.stringify(cache.styles);
     localStorage['stylebot_styles'] = jsonString;
 }
 
+// Load styles from localStorage into cache
 function loadStylesIntoCache() {
     if (localStorage['stylebot_styles']) {
         try {
@@ -252,6 +253,7 @@ function pushStyles() {
 	}
 }
 
+// Load options from localStorage into background cache
 function loadOptionsIntoCache() {
 	for (var option in cache.options) 
 	{
@@ -267,20 +269,20 @@ function loadOptionsIntoCache() {
 	}
 }
 
+// Save an option
 function saveOption(name, value) {
     cache.options[name] = value;
     localStorage['stylebot_option_' + name] = value;
     propagateOptions();
 
 	// option specific code
-	if (name == "contextMenu" && value == false)
+	if (name === "contextMenu" && value === false)
 		removeContextMenu();
 	else if (!contextMenuId)
 		createContextMenu();
 }
 
-/** end of data methods **/
-
+// Return CSS rules for a URL
 function getRulesForPage(currUrl) {
     // this will contain the combined set of evaluated rules to be applied to the page.
     // longer, more specific URLs get the priority for each selector and property
@@ -325,10 +327,12 @@ function getRulesForPage(currUrl) {
         return {rules: null, url: null};
 }
 
+// Propagate options to all open tabs
 function propagateOptions() {
     sendRequestToAllTabs({ name: 'setOptions', options: cache.options }, function(){});
 }
 
+// Send request to all opened tabs
 function sendRequestToAllTabs(req){
     chrome.windows.getAll({ populate: true }, function(windows) {
 	    var w_len = windows.length;
@@ -343,18 +347,19 @@ function sendRequestToAllTabs(req){
 	});
 }
 
+// Save current accordion state into cache
 function saveAccordionState(enabledAccordions) {
     cache.enabledAccordions = enabledAccordions;
     localStorage['stylebot_enabledAccordions'] = enabledAccordions;
 }
 
+// Load previous accordion state into cache
 function loadAccordionState() {
     if (localStorage['stylebot_enabledAccordions'])
         cache.enabledAccordions = localStorage['stylebot_enabledAccordions'].split(',');
 }
 
-/*** Context Menu ***/
-
+// Initialize the right click context menu
 function createContextMenu() {
 	if (localStorage['stylebot_option_contextMenu'] === 'true') {
 		contextMenuId = chrome.contextMenus.create({
@@ -392,12 +397,14 @@ function createContextMenu() {
 	}
 }
 
+// Send a request to the current selected tab
 function sendRequestToCurrentTab(msg) {
 	chrome.tabs.getSelected(null, function(tab) {
         chrome.tabs.sendRequest(tab.id, { name: msg }, function() {});
     });	
 }
 
+// Remove context menu
 function removeContextMenu() {
 	if (contextMenuId) {
 		chrome.contextMenus.remove(contextMenuId);
@@ -405,13 +412,11 @@ function removeContextMenu() {
 	}
 }
 
-/*** End of Context Menu ***/
-
 window.addEventListener('load', function(){
     init();
 });
 
-/** Utility methods **/
+// Trim a string
 String.prototype.trim = function() {
     return this.replace(/^\s+|\s+$/g, "");
 };
@@ -426,7 +431,7 @@ function copyToClipboard(text) {
     document.body.removeChild(copyTextarea);
 }
 
-// To copy an object. from: http://my.opera.com/GreyWyvern/blog/show.dml/1725165
+// Clone an object. from: http://my.opera.com/GreyWyvern/blog/show.dml/1725165
 function cloneObject(obj) {
   var newObj = (obj instanceof Array) ? [] : {};
   for (i in obj) {

@@ -82,6 +82,7 @@ function saveStyleFromSocial(channel) {
 		var rules = CSSUtils.getRulesFromParserObject(sheet);
 
 		stylebot.chrome.save(url, rules, { id: id, timestamp: timestamp });
+		stylebot.chrome.pushStyles();
 		
 		// send back success message
 		var customEvent = document.createEvent('Event');

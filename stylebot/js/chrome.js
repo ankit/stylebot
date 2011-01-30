@@ -51,6 +51,7 @@ stylebot.chrome = {
 	}
 }
 
+// Listen to requests from background.html
 chrome.extension.onRequest.addListener(
 	function(request, sender, sendResponse) {
         if (request.name === "toggle")
