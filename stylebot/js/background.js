@@ -78,6 +78,9 @@ function upgradeTo1() {
 	
 	// save to localStorage
 	updateStylesInDataStore();
+	
+	// update data in bookmark as well
+	pushStyles();
 }
 
 // Listen to requests tabs and page action
