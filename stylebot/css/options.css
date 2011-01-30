@@ -155,7 +155,7 @@ li.option label {
     outline: 1px solid #aaa;
 }
 
-#custom-styles input {
+#custom-styles-container input {
 	text-align: left;
 	margin-right: 4px;
 }
@@ -168,7 +168,7 @@ li.option label {
 	margin-bottom: 20px;
 }
 
-#custom-styles .button-container {
+#custom-styles-container .button-container {
 	margin-left: 10px;
 	display: inline-block;
 	padding-top: 7px;

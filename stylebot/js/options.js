@@ -162,6 +162,7 @@ function translateOptionValue(name, value) {
 
 function fillCustomStyles() {
     var container = $("#custom-styles");
+	container.html("");
     for (var url in styles)
         container.append(createCustomStyleOption(url));
 }
@@ -396,7 +397,7 @@ function importCSS() {
             bg_window.saveStyles(styles);
         }
         catch(e) {}
-        fillCustomStyles();
+		fillCustomStyles();
     }
 }
 
@@ -488,8 +489,17 @@ function mergeStyles(s1, s2) {
     if (!s2) {
         return s1;
     }
+
     for (var url in s1) {
-        s2[url] = s1[url];
+		// it's the new format
+		if (s1[url]['rules']) {
+			s2[url] = s1[url];
+		}
+		// old format
+		else {
+			s2[url] = {};
+			s2[url]['rules'] = s1[url];
+		}
     }
     return s2;
 }
