@@ -23,7 +23,7 @@ stylebot.contextmenu = {
     },
 
 	searchSocial: function() {
-		window.open("http://stylebot.me/playground/social/search?q=" + document.domain);
+		window.open("http://stylebot.me/search?q=" + document.domain);
 	},
 	
 	shareStyleOnSocial: function() {
@@ -31,7 +31,7 @@ stylebot.contextmenu = {
 		if (stylebot.style.rules) {
 			
 			var css = CSSUtils.crunchFormattedCSS(stylebot.style.rules, false);
-			var url = "http://stylebot.me/playground/social/post";
+			var url = "http://stylebot.me/post";
 
 			// create a form and submit data
 			var temp_form = $('<form>', {

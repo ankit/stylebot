@@ -250,8 +250,7 @@ function shareStyle(e) {
     var rules = styles[url]['_rules'];
     var css = CSSUtils.crunchFormattedCSS(rules, false);
 
-	var production_url = "http://stylebot.me/playground/social/post";
-	var local_url = "http://localhost:8888/stylebot_social/post";
+	var production_url = "http://stylebot.me/post";
 	
 	// create a form and submit data
 	var temp_form = $('<form>', {
@@ -259,6 +258,7 @@ function shareStyle(e) {
 		'action': production_url,
 		'target': '_blank'
 	});
+	
 	// site
 	$('<input>', {
 		type: 'hidden',
