@@ -125,16 +125,19 @@ li.option label {
 
 #custom-styles {
 	min-width: 420px;
+	margin-bottom: 20px;
 }
 
 #custom-style-install-text {
-	float: left; 
-	margin-left: 20px;
+	float: left;
+	clear: both;
+	margin-bottom: 30px;
 }
 
 .custom-style {
     clear: both;
 	margin: 5px;
+	margin-left: 0px;
 }
 
 .custom-style-url {

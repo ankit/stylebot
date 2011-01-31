@@ -23,7 +23,7 @@ stylebot.contextmenu = {
     },
 
 	searchSocial: function() {
-		window.open("http://stylebot.me/playground/social/search/" + document.domain);
+		window.open("http://stylebot.me/playground/social/search?q=" + document.domain);
 	},
 	
 	shareStyleOnSocial: function() {

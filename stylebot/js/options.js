@@ -163,8 +163,10 @@ function translateOptionValue(name, value) {
 function fillCustomStyles() {
     var container = $("#custom-styles");
 	container.html("");
-    for (var url in styles)
-        container.append(createCustomStyleOption(url));
+	
+	for (var url in styles) {
+        container.append(createCustomStyleOption(url));		
+	}
 }
 
 function createCustomStyleOption(url) {
@@ -224,7 +226,7 @@ function removeStyle(e) {
 function editStyle(e) {
     var parent = $(e.target).parents('.custom-style');
     var url = parent.find('.custom-style-url').html();
-    var rules = styles[url]['rules'];
+    var rules = styles[url]['_rules'];
     var css = CSSUtils.crunchFormattedCSS(rules, false);
     
     var html = "<div>Edit the CSS for <b>" + url + "</b>:</div>";
@@ -245,7 +247,7 @@ function editStyle(e) {
 function shareStyle(e) {
 	var parent = $(e.target).parents('.custom-style');
     var url = parent.find('.custom-style-url').html();
-    var rules = styles[url]['rules'];
+    var rules = styles[url]['_rules'];
     var css = CSSUtils.crunchFormattedCSS(rules, false);
 
 	var production_url = "http://stylebot.me/playground/social/post";
@@ -310,8 +312,8 @@ function saveStyle(url, css) {
         try {
 			var rules = CSSUtils.getRulesFromParserObject(sheet);
 			styles[url] = {};
-            styles[url]['rules'] = rules;
-			styles[url]['social'] = {};
+            styles[url]['_rules'] = rules;
+			styles[url]['_social'] = {};
             retVal = true;
         }
         catch(e) {}
@@ -391,12 +393,16 @@ function importCSS() {
     if (json && json != "")
     {
         $(".custom-style").html("");
+
         try {
 			var imported_styles = JSON.parse(json);
             styles = mergeStyles(imported_styles, styles);
             bg_window.saveStyles(styles);
         }
-        catch(e) {}
+        catch(e) {
+			console.log(e);
+		}
+		
 		fillCustomStyles();
     }
 }
@@ -492,13 +498,13 @@ function mergeStyles(s1, s2) {
 
     for (var url in s1) {
 		// it's the new format
-		if (s1[url]['rules']) {
+		if (s1[url]['_rules']) {
 			s2[url] = s1[url];
 		}
 		// old format
 		else {
 			s2[url] = {};
-			s2[url]['rules'] = s1[url];
+			s2[url]['_rules'] = s1[url];
 		}
     }
     return s2;

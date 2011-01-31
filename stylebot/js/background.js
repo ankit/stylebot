@@ -7,19 +7,18 @@ var cache = {
     /**
         e.g. styles = {
             'google.com' : {
-
-				status: true,
 				
-				rules: {
+				_rules: {
 					'a': {
                     	'color': 'red'
                 	}
 				},
 				
-				social: {
+				_social: {
 					id: 4,
 					timestamp: 123456 (UNIX based)
 				}
+				
             }
         }
     **/
@@ -69,11 +68,27 @@ function upgradeTo1() {
 	console.log("Upgrading to version 1...");
     localStorage.version = "1";
 
+	var first = false;
+	
 	// upgrading to the new data model
     for (var url in cache.styles) {
+
+		// if it is already in the new format, do nothing
+		// this may happen when sync is enabled 
+		// and upgrade is taking place after an upgrade has already taken place at another computer
+
+		if (!first) {
+			first = cache.styles[url];
+			// ideally, there should me a more foolproof check
+			if (first['_rules']) {
+				console.log("Data model already at v1");
+				return;
+			}
+		}
+		
 		var rules = cache.styles[url];
 		cache.styles[url] = {};
-		cache.styles[url]['rules'] = rules;
+		cache.styles[url]['_rules'] = rules;
 	}
 	
 	// save to localStorage
@@ -162,16 +177,16 @@ function save(url, rules, data) {
 
     if (rules) {
 		cache.styles[url] = {};
- 		cache.styles[url]['rules'] = rules;		
+ 		cache.styles[url]['_rules'] = rules;		
 	}
     else
         delete cache.styles[url];
 		
 	// if there is meta data, store it in the social object
 	if (data != undefined) {
-		cache.styles[url]['social'] = {};
-		cache.styles[url]['social'].id = data.id;
-		cache.styles[url]['social'].timestamp = data.timestamp;
+		cache.styles[url]['_social'] = {};
+		cache.styles[url]['_social'].id = data.id;
+		cache.styles[url]['_social'].timestamp = data.timestamp;
 	}
 	
     updateStylesInDataStore();
@@ -213,16 +228,16 @@ function mergeStyles(s1, s2) {
 
     for (var url in s1) {
         if (s2[url]) {
-            for (var selector in s1[url]['rules']) {
-                if (s2[url]['rules'][selector]) {
-                    for (var property in s1[url]['rules'][selector]) {
-                        s2[url]['rules'][selector][property] = s1[url]['rules'][selector][property];
+            for (var selector in s1[url]['_rules']) {
+                if (s2[url]['_rules'][selector]) {
+                    for (var property in s1[url]['_rules'][selector]) {
+                        s2[url]['_rules'][selector][property] = s1[url]['_rules'][selector][property];
                     }
                 }
                 else
-                    s2[url]['rules'][selector] = s1[url]['rules'][selector];
+                    s2[url]['_rules'][selector] = s1[url]['_rules'][selector];
             }
-			s1[url]['social'] = s2[url]['social'];
+			s1[url]['_social'] = s2[url]['_social'];
         }
         else
             s2[url] = s1[url];
@@ -244,6 +259,7 @@ function loadStylesIntoCache() {
             cache.styles = JSON.parse(localStorage['stylebot_styles']);
         }
         catch(e) {
+			console.log(e);
             cache.styles = {};
         }
     }
@@ -309,16 +325,16 @@ function getRulesForPage(currUrl) {
                 url_for_page = url;
             
             // iterate over each selector in styles
-            for (var selector in cache.styles[url]['rules']) {
+            for (var selector in cache.styles[url]['_rules']) {
                 // if no rule exists for selector, simply copy the rule
                 if (rules[selector] == undefined)
-                    rules[selector] = cloneObject(cache.styles[url]['rules'][selector]);
+                    rules[selector] = cloneObject(cache.styles[url]['_rules'][selector]);
                 // otherwise, iterate over each property
                 else {
-                    for (var property in cache.styles[url]['rules'][selector])
+                    for (var property in cache.styles[url]['_rules'][selector])
                     {
                         if (rules[selector][property] == undefined || url == url_for_page)
-                            rules[selector][property] = cache.styles[url]['rules'][selector][property];
+                            rules[selector][property] = cache.styles[url]['_rules'][selector][property];
                     }
                 }
             }
@@ -377,24 +393,17 @@ function createContextMenu() {
 			parentId: contextMenuId
 		});
 		
-		chrome.contextMenus.create({
-			title: "Search for styles for this page...",
-			contexts: ['all'],
-			onclick: function() { sendRequestToCurrentTab("searchSocial"); },
-			parentId: contextMenuId
-		});
-		
-		chrome.contextMenus.create({
-			title: "Share your style for this page...",
-			contexts: ['all'],
-			onclick: function() { sendRequestToCurrentTab("shareStyleOnSocial"); },
-			parentId: contextMenuId
-		});
-		
 		contextMenuStatusId = chrome.contextMenus.create({
 			title: "Toggle styling",
 			contexts: ['all'],
 			onclick: function() { sendRequestToCurrentTab("toggleStyle"); },
+			parentId: contextMenuId
+		});
+		
+		chrome.contextMenus.create({
+			title: "Search for styles...",
+			contexts: ['all'],
+			onclick: function() { sendRequestToCurrentTab("searchSocial"); },
 			parentId: contextMenuId
 		});
 	}
