@@ -58,6 +58,7 @@ function updateVersion() {
     if (!localStorage.version) {
         localStorage.version = "1"; return true;
     }
+
     else if (localStorage.version != "1") {
 		openReleaseNotes();
 		upgradeTo1();
