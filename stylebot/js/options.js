@@ -120,6 +120,7 @@ function fetchOptions() {
 	});
 }
 
+// Attaches listeners for different types of inputs that change option values
 function attachListeners() {
 	// checkbox
 	$('.option-field input[type=checkbox]').change(function(e) {
@@ -158,8 +159,9 @@ function translateOptionValue(name, value) {
     return value;
 }
 
-/** custom styles **/
+// Custom Styles
 
+// Refreshes the custom styles. Called during initialization and on import
 function fillCustomStyles() {
     var container = $("#custom-styles");
 	container.html("");
@@ -169,6 +171,7 @@ function fillCustomStyles() {
 	}
 }
 
+// Adds a new style to the UI
 function createCustomStyleOption(url) {
     var container = $('<div>', {
         class: 'custom-style'
@@ -215,14 +218,17 @@ function createCustomStyleOption(url) {
     return container.append(b_container);
 }
 
+// Called when the remove button is clicked for a style
 function removeStyle(e) {
     var parent = $(e.target).parents('.custom-style');
     var url = parent.find('.custom-style-url');
     delete styles[url.html()];
     parent.remove();
     bg_window.saveStyles(styles);
+	bg_window.pushStyles();
 }
 
+// Displays the modal popup for editing a style
 function editStyle(e) {
     var parent = $(e.target).parents('.custom-style');
     var url = parent.find('.custom-style-url').html();
@@ -241,9 +247,11 @@ function editStyle(e) {
         textarea.focus();
         Utils.moveCursorToEnd(textarea);
     };
+
     cache.modal.show();
 }
 
+// Called when Share button is clicked for a style
 function shareStyle(e) {
 	var parent = $(e.target).parents('.custom-style');
     var url = parent.find('.custom-style-url').html();
@@ -280,20 +288,27 @@ function shareStyle(e) {
 	temp_form.remove();
 }
 
+// Called when a style is updated (Update button is clicked)
 function onUpdate() {
     var url = cache.modal.box.find('div > b').html();
     var css = cache.modal.box.find('textarea').attr('value');
     saveStyle(url, css);
 }
 
+// Displays the modal popup to add a new style
 function addStyle() {
-    var html = "<div>URL: <input type='text'></input></div><textarea class='stylebot-css-code' style='width: 100%; height:" + cache.textareaHeight + "'></textarea><button onclick= 'cache.modal.hide();' >Cancel</button><button onclick= 'onAdd(); cache.modal.hide();' >Add</button>";
+    var html = "<div>URL: <input type='text'></input></div>";
+	html += "<textarea class='stylebot-css-code' style='width: 100%; height:" + cache.textareaHeight + "'>";
+	html += "</textarea>";
+	html += "<button onclick= 'cache.modal.hide();' >Cancel</button>";
+	html += "<button onclick= 'onAdd(); cache.modal.hide();' >Add</button>";
     
     initModal(html);
     cache.modal.options.onOpen = function() { cache.modal.box.find('input').focus(); };
     cache.modal.show();
 }
 
+// Called when a new style is added (Add button is clicked)
 function onAdd() {
     var url = cache.modal.box.find('input').attr('value');
     var css = cache.modal.box.find('textarea').attr('value');
@@ -304,6 +319,7 @@ function onAdd() {
         createCustomStyleOption(url, styles[url]).appendTo($("#custom-styles"));
 }
 
+// Saves a style. Called by onUpdate and onAdd
 function saveStyle(url, css) {
     var parser = new CSSParser();
     var sheet = parser.parse(css);
@@ -323,10 +339,14 @@ function saveStyle(url, css) {
         delete styles[url];
         $('.custom-style-url:contains(' + url + ')').parent().remove();
     }
-    bg_window.saveStyles(styles);
+    
+	bg_window.saveStyles(styles);
+	bg_window.pushStyles();
+	
     return retVal;
 }
 
+// Callback for edit in place for URLs
 function editURL(oldValue, newValue) {
     if (oldValue == newValue || newValue == "")
         return;
@@ -346,10 +366,9 @@ function editURL(oldValue, newValue) {
     bg_window.saveStyles(styles);
 }
 
-/** end of custom styles **/
+// Backup
 
-/** backup **/
-
+// Generates JSON string for backup and displays the modal popup containing it
 function export() {
     if (styles)
         css = JSON.stringify(styles);
@@ -372,22 +391,33 @@ function export() {
     cache.modal.show();
 }
 
-function import() {
-    var html = "<div>Paste previously exported custom styles here.<div class='description' style='margin-top:10px'>Note: Current custom styles for similar URLs will be replaced.</div></div><textarea class='stylebot-css-code' style='width: 100%; height:" + cache.textareaHeight + "'></textarea><button onclick='importCSS();cache.modal.hide();'>Import</button>";
-    initModal(html, {
-        closeOnEsc: true,
-        closeOnBgClick: true
-    });
-    cache.modal.options.onOpen = function() {
-        cache.modal.box.find('textarea').get(0).focus();
-    };
-    cache.modal.show();
-}
-
+// Copy text in the popup's textarea to clipboard.
 function copyToClipboard() {
     chrome.extension.sendRequest({name: "copyToClipboard", text: cache.modal.box.find('textarea').attr('value')}, function(response){});
 }
 
+// Displays the modal popup for importing styles from JSON string
+function import() {
+    var html = "<div>Paste previously exported custom styles here.";
+	html += "<div class='description' style='margin-top: 10px'>Note: Current custom styles for similar URLs will be replaced.</div>";
+	html += "</div>";
+	html += "<textarea class='stylebot-css-code' style='width: 100%; height:" + cache.textareaHeight + "'>";
+	html += "</textarea>";
+	html += "<button onclick='importCSS();cache.modal.hide();'>Import</button>";
+	
+    initModal(html, {
+        closeOnEsc: true,
+        closeOnBgClick: true
+    });
+
+    cache.modal.options.onOpen = function() {
+        cache.modal.box.find('textarea').get(0).focus();
+    };
+
+    cache.modal.show();
+}
+
+// Import styles from JSON string
 function importCSS() {
     var json = cache.modal.box.find('textarea').attr('value');
     if (json && json != "")
@@ -407,10 +437,9 @@ function importCSS() {
     }
 }
 
-/** end of backup **/
+// Sync
 
-/** sync **/
-
+// Initialize Sync UI based on value of the sync option
 function setSyncUI() {
     var status = $('#sync_status');
     if (options.sync) {
@@ -425,6 +454,7 @@ function setSyncUI() {
     }
 }
 
+// Turn syncing on/off
 function toggleSyncing() {
     if (options.sync) {
         options.sync = false;
@@ -439,8 +469,9 @@ function toggleSyncing() {
     setSyncUI();
 }
 
-/** end of sync **/
+// Modal popup
 
+// Initialize a new popup
 function initModal(html, options) {
     if (!cache.modal)
     {
@@ -450,18 +481,21 @@ function initModal(html, options) {
             closeOnBgClick: false
         });
     }
+
     if (options) {
         cache.modal.options.closeOnEsc = options.closeOnEsc ? true : false;
         cache.modal.options.closeOnBgClick = options.closeOnBgClick ? true : false;
     }
+
     else {
         cache.modal.options.closeOnEsc = false;
         cache.modal.options.closeOnBgClick = false;
     }
+
     cache.modal.box.html(html);
 }
 
-/** filtering of custom styles **/
+// Attach listener to search field for filtering styles
 function initFiltering() {
     $("#style-search-field").bind('click focus', function(e) {
         if (e.target.value == "Search...") {
@@ -472,11 +506,13 @@ function initFiltering() {
             Utils.selectAllText(e.target);
         }
     })
+
     .keyup(function(e) {
         filterStyles(e.target.value);
     });
 }
 
+// Filter styles based on user entered text in search field
 function filterStyles(value) {
     var styleDivs = $('.custom-style');
     var urls = $('.custom-style-url');
@@ -490,7 +526,7 @@ function filterStyles(value) {
     }
 }
 
-// merges styles from s1 into s2
+// Merges styles from s1 into s2
 function mergeStyles(s1, s2) {
     if (!s2) {
         return s1;
