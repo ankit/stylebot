@@ -60,12 +60,12 @@ var stylebot = {
     },
     
 	close: function() {
-        stylebot.detachListeners();
         stylebot.widget.close();
         stylebot.status = false;
         stylebot.chrome.setIcon(false);
         stylebot.style.reset();
         stylebot.disableSelection();
+		stylebot.detachClickListener();
         stylebot.unhighlight();
         stylebot.selectedElement = null;
         stylebot.destroySelectionBox();

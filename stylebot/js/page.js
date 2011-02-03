@@ -75,7 +75,7 @@ stylebot.page = {
         else
             stylebot.style.clearLastState();
         stylebot.page.cache.css = null;
-        stylebot.widget.show();
+        stylebot.widget.open();
         stylebot.page.modal.hide();
     }
 }
