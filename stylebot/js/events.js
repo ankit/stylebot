@@ -26,12 +26,15 @@ Events = {
     
     onRadioClick: function(e) {
         var value;
+
         if (e.target.checked == true)
             value = e.target.value;
         else
             value = '';
-        var property = $(e.target).data('property');
         value = value.split(',');
+
+        var property = $(e.target).data('property');
+
         if (typeof(property) == "object")
         {
             var len = property.length;
@@ -47,9 +50,11 @@ Events = {
             e.target.blur();
             return;
         }
-        var value = e.target.value;
+	
+		var value = e.target.value;
         var property = $(e.target).data('property');
-        stylebot.style.apply(property, value);
+		
+		stylebot.style.apply(property, value);
     },
     
     onTextFieldFocus: function(e) {
@@ -61,33 +66,77 @@ Events = {
         if ($(e.target).data('lastState') == e.target.value) {
             stylebot.style.clearLastState();
         }
+
         $(e.target).data('lastState', null);
         stylebot.style.refreshUndoState();
     },
+
+	onSizeFieldKeyDown: function(e) {
+		// increment / decrement value by 1 with arrow keys
+		//	        
+		if (e.keyCode === 38 || e.keyCode === 40) { // up / down arrow
+			e.preventDefault();
+	
+			var value = e.target.value;
+		       var property = $(e.target).data('property');
+		       var unit = $(e.target).next().attr('value');
+	
+			value = parseInt(value);
+	
+			if (isNaN(value)) {
+				value = 0;
+			}
+	
+			else {
+				if (e.keyCode === 38) // up
+					value += 1;
+				else
+					value -= 1;
+			}
+	
+			e.target.value = value;
+
+			if ( parseFloat(value) )
+		           value += unit;
+
+	      	stylebot.style.apply(property, value);
+		}
+	},
     
     onSizeFieldKeyUp: function(e) {
-        if (e.keyCode == 27) { // esc
+        if (e.keyCode === 27) // esc
+		{
             e.target.blur();
             return;
         }
-        var value = e.target.value;
+
+		if (e.keyCode === 38 || e.keyCode === 40) {
+			// we're already handling this case in onSizeFieldKeyDown
+			return;
+		}
+		
+		var value = e.target.value;
         var property = $(e.target).data('property');
         var unit = $(e.target).next().attr('value');
-        if (parseFloat(value))
+
+        if ( parseFloat(value) )
             value += unit;
+
         stylebot.style.apply(property, value);
-        // state saving for undo is handled by onTextFieldFocus and onTextFieldBlur
+        // state is saved for undo in onTextFieldFocus and onTextFieldBlur
     },
     
     onSelectChange: function(e) {
         var value = e.target.value.split(',');
         var property = $(e.target).find('[value=' + e.target.value + ']').data('property');
-        if (typeof(property) == "object")
+        
+		if (typeof(property) == "object")
         {
             var len = property.length;
             for (var i = 0; i < len; i++)
                 Events.saveProperty(property[i], value[i]);
         }
+
         else
             Events.saveProperty(property, value);
     },
@@ -132,20 +181,22 @@ Events = {
         // send request to save the new state to background.html cache
         if (this.accordionTimer)
             clearTimeout(this.accordionTimer);
-        this.accordionTimer = setTimeout(function() {
+        	this.accordionTimer = setTimeout(function() {
             var len = stylebot.widget.basic.cache.accordionHeaders.length;
             var enabledAccordions = [];
-            for (var i = 0; i < len; i++)
+            
+			for (var i = 0; i < len; i++)
             {
                 if ($(stylebot.widget.basic.cache.accordionHeaders[i]).hasClass( 'stylebot-accordion-active' ))
                     enabledAccordions[enabledAccordions.length] = i;
             }
+
             stylebot.chrome.saveAccordionState(enabledAccordions);
+
         }, 500);
     },
     
     saveProperty: function(property, value) {
-        console.log("saveProperty called");
         // save current state to undo stack
         stylebot.style.saveState();
         stylebot.style.apply(property, value);

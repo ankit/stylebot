@@ -37,27 +37,34 @@ var WidgetUI = {
         });
     },
     
-    createTextField: function(property, size, handler) {
+    createTextField: function(property, size, onKeyDownHandler, onKeyUpHandler) {
         return $('<input>',{
             type: 'text',
             id: 'stylebot-' + property,
             class: 'stylebot-control stylebot-textfield',
             size: size
         })
+
         .data('property', property)
+
         .click(function(e) {
             Utils.selectAllText(e.target);
         })
+
         .focus(Events.onTextFieldFocus)
+
         .blur(Events.onTextFieldBlur)
-        .keyup(handler);
+
+        .keydown(onKeyDownHandler)
+
+		.keyup(onKeyUpHandler);
     },
     
     createSizeControl: function(property) {
         var container = $('<span>');
         
         // Textfield for entering size
-        this.createTextField(property, 2, Events.onSizeFieldKeyUp)
+        this.createTextField(property, 2, Events.onSizeFieldKeyDown, Events.onSizeFieldKeyUp)
         .appendTo(container);
 
         // Select box for choosing unit
@@ -144,13 +151,17 @@ var WidgetUI = {
             class: 'stylebot-textfield',
             size: 20
         })
+
         .data('property', control.id)
+
         .keyup(Events.onTextFieldKeyUp)
+
         .css({
             marginLeft: '95px !important',
             marginTop: '5px !important',
             display: 'none'
         })
+
         .appendTo(container);
         
         return container;
