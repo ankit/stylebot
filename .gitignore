@@ -1,0 +1,11 @@
+# OSX (https://github.com/github/gitignore/blob/master/Global/OSX.gitignore)
+.DS_Store?
+Icon?
+.DS_Store
+
+# Thumbnails
+._*
+
+# Files that might appear on external disk
+.Spotlight-V100
+.Trashes

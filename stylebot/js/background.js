@@ -175,11 +175,11 @@ function disablePageIcon(tab) {
 	// if a style is applied to the current page
 	//
 	if (doesStyleExist(tab.url)) {
-		chrome.pageAction.setIcon({ tabId: tab.id, path: "images/icon19_off_highlighted.png" });
+		chrome.pageAction.setIcon({ tabId: tab.id, path: "images/css_highlighted.png" });
 	}
 	
 	else {
-		chrome.pageAction.setIcon({ tabId: tab.id, path: "images/icon19_off.png" });
+		chrome.pageAction.setIcon({ tabId: tab.id, path: "images/css.png" });
 	}
 	
     chrome.pageAction.setTitle({ tabId: tab.id, title: "Click to start editing using Stylebot" });
@@ -188,7 +188,7 @@ function disablePageIcon(tab) {
 // Update page icon to indicate that stylebot is visible
 //
 function enablePageIcon(tab) {
-	chrome.pageAction.setIcon({ tabId: tab.id, path: "images/icon19_on.png" });
+	chrome.pageAction.setIcon({ tabId: tab.id, path: "images/css_active.png" });
     chrome.pageAction.setTitle({ tabId: tab.id, title: "Click to stop editing using Stylebot" });
 }
 

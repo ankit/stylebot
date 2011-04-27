@@ -84,7 +84,7 @@
 	}],
 	
 	"page_action": {
-		"default_icon": "images/icon19_off.png",
+		"default_icon": "images/css.png",
 		"default_title": "Click to start editing using Stylebot"
 	},
 	
