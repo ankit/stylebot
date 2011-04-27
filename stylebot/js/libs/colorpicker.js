@@ -13,7 +13,14 @@
 			inAction,
 			charMin = 65,
 			visible,
-			tpl = '<div class="stylebot_colorpicker"><div class="stylebot_colorpicker_color"><div><div></div></div></div><div class="stylebot_colorpicker_hue"><div></div></div></div>',
+			tpl = '<div class="stylebot_colorpicker"> \
+			<div class="stylebot_colorpicker_color"> \
+			<div><div></div></div> \
+			</div> \
+			<div class="stylebot_colorpicker_hue"><div> \
+			</div> \
+			</div> \
+			</div>',
 			defaults = {
 				eventName: 'click',
 				onShow: function () {},

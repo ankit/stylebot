@@ -38,7 +38,7 @@ var WidgetUI = {
     },
     
     createTextField: function(property, size, onKeyDownHandler, onKeyUpHandler) {
-        return $('<input>',{
+		var $input = $('<input>',{
             type: 'text',
             id: 'stylebot-' + property,
             class: 'stylebot-control stylebot-textfield',
@@ -53,11 +53,15 @@ var WidgetUI = {
 
         .focus(Events.onTextFieldFocus)
 
-        .blur(Events.onTextFieldBlur)
+        .blur(Events.onTextFieldBlur);
 
-        .keydown(onKeyDownHandler)
+		if (onKeyDownHandler)
+			$input.keydown(onKeyDownHandler)
 
-		.keyup(onKeyUpHandler);
+		if (onKeyUpHandler)
+			$input.keyup(onKeyUpHandler);
+		
+		return $input;
     },
     
     createSizeControl: function(property) {

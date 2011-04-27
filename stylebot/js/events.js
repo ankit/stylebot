@@ -95,7 +95,7 @@ Events = {
 			}
 	
 			e.target.value = value;
-
+	
 			if ( parseFloat(value) )
 		           value += unit;
 
