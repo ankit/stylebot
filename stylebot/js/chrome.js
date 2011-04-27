@@ -54,12 +54,20 @@ stylebot.chrome = {
 // Listen to requests from background.html
 chrome.extension.onRequest.addListener(
 	function(request, sender, sendResponse) {
-        if (request.name === "toggle")
+		
+		if (request.name === "status") {
+			if (window != window.top)
+				return;
+			sendResponse({ status: stylebot.status });
+		}
+		
+        else if (request.name === "toggle")
 		{
 		    if (window != window.top)
 		        return;
+			
             stylebot.toggle();
-		    sendResponse({status: stylebot.status});
+		    sendResponse({ status: stylebot.status });
 		}
 
 		else if (request.name === "setOptions")

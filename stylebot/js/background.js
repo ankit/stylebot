@@ -33,10 +33,12 @@ var cache = {
 		contextMenu: true
     },
     
-    // indices of enabled accordions. by default, all are enabled
+    // indices of enabled accordions in panel. by default, all are enabled
     enabledAccordions: [0, 1, 2, 3]
 };
 
+// Initialize
+//
 function init() {
     attachListeners();
     loadOptionsIntoCache();
@@ -50,10 +52,14 @@ function init() {
 	createContextMenu();
 }
 
+// Open release notes. Only done for major releases
+//
 function openReleaseNotes() {
     chrome.tabs.create({ url: "http://stylebot.me/releases", selected: true }, null);
 }
 
+// Update version string in localStorage
+//
 function updateVersion() {
     if (!localStorage.version) {
         localStorage.version = "1"; return true;
@@ -65,6 +71,8 @@ function updateVersion() {
 	}
 }
 
+// Upgrade to version 1
+//
 function upgradeTo1() {
 	console.log("Upgrading to version 1...");
     localStorage.version = "1";
@@ -99,20 +107,28 @@ function upgradeTo1() {
 	pushStyles();
 }
 
-// Listen to requests tabs and page action
+// Listen to requests from tabs and page action
 function attachListeners() {
-    chrome.pageAction.onClicked.addListener(handlePageIconClick);
+    chrome.pageAction.onClicked.addListener(onPageIconClick);
     
-    chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-        if (tab.url.match("^http") == "http" && tab.url.indexOf("https://chrome.google.com/extensions") == -1)
-            chrome.pageAction.show(tabId);
+    chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {		
+        if (tab.url.match("^http") == "http" && tab.url.indexOf("https://chrome.google.com/extensions") == -1) {
+			chrome.pageAction.show(tabId);
+			disablePageIcon(tab);
+		}
     });
+
+	chrome.tabs.onSelectionChanged.addListener(function(tabId, selectInfo) {
+		chrome.tabs.get(tabId, function(tab) {
+			refreshPageIcon(tab);
+		});
+	});
     
     chrome.extension.onRequest.addListener( function(request, sender, sendResponse) {
         switch (request.name) {
-            case "enablePageIcon"   	: enablePageIcon(sender.tab.id); sendResponse({}); break;
+            case "enablePageIcon"   	: enablePageIcon(sender.tab); sendResponse({}); break;
             
-            case "disablePageIcon" 	 	: disablePageIcon(sender.tab.id); sendResponse({}); break;
+            case "disablePageIcon" 	 	: disablePageIcon(sender.tab); sendResponse({}); break;
             
             case "copyToClipboard"  	: copyToClipboard(request.text); sendResponse({}); break;
             
@@ -135,40 +151,45 @@ function attachListeners() {
 
 
 // Toggle CSS editing when page icon is clicked
-function handlePageIconClick(tab) {
-    currTabId = tab.id;
-    chrome.tabs.sendRequest(currTabId, { name: "toggle" }, function(response) {
+function onPageIconClick(tab) {
+	chrome.tabs.sendRequest(tab.id, { name: "toggle" }, function(response) {
         if(response.status)
-            enablePageIcon(currTabId);
+           	enablePageIcon(tab);
         else
-            disablePageIcon(currTabId);
+            disablePageIcon(tab);
     });
 }
 
-
-function enablePageIcon(tabId) {
-    chrome.pageAction.setIcon({ tabId: tabId, path: "images/icon19_on.png" });
-    chrome.pageAction.setTitle({ tabId: tabId, title: "Click to stop editing using Stylebot" });
+function refreshPageIcon(tab) {
+	chrome.tabs.sendRequest(tab.id, { name: "status" }, function(response) {
+        if(response.status)
+           	enablePageIcon(tab);
+        else
+            disablePageIcon(tab);
+    });
 }
 
-
-function disablePageIcon(tabId) {
-    chrome.pageAction.setIcon({ tabId: tabId, path: "images/icon19_off.png" });
-    chrome.pageAction.setTitle({ tabId: tabId, title: "Click to start editing using Stylebot" });
-}
-
-/** End of Page Action Handling **/
-
-/** Data save, load, etc. **/
-
-// Returns if a style already exists for the site
-// used to issue warning to user while installing styles from social
-function doesStyleExist(url) {
-	if (cache.styles[url]) {
-		return true;
+// Update page icon to indicate that stylebot is not visible
+//
+function disablePageIcon(tab) {
+	// if a style is applied to the current page
+	//
+	if (doesStyleExist(tab.url)) {
+		chrome.pageAction.setIcon({ tabId: tab.id, path: "images/icon19_off_highlighted.png" });
 	}
-	else
-		return false;
+	
+	else {
+		chrome.pageAction.setIcon({ tabId: tab.id, path: "images/icon19_off.png" });
+	}
+	
+    chrome.pageAction.setTitle({ tabId: tab.id, title: "Click to start editing using Stylebot" });
+}
+
+// Update page icon to indicate that stylebot is visible
+//
+function enablePageIcon(tab) {
+	chrome.pageAction.setIcon({ tabId: tab.id, path: "images/icon19_on.png" });
+    chrome.pageAction.setTitle({ tabId: tab.id, title: "Click to stop editing using Stylebot" });
 }
 
 // Save all rules for a page
@@ -195,13 +216,10 @@ function save(url, rules, data) {
 
 // Transfer rules for source URL to destination URL
 function transfer(source, destination) {
-    if (cache.styles[source]) {
+    if (cache.styles[source]) 
+	{
         cache.styles[destination] = cache.styles[source];
         updateStylesInDataStore();
-
-		// the user has to delete the styles for the previous url manually
-        // if (destination.indexOf(source) == -1)
-        //     delete cache.styles[source];
     }
 }
 
@@ -222,6 +240,7 @@ function saveStylesLocally(styles) {
 
 // Styles from both objects are merged
 // for common properties, s2 is given priority over s1
+//
 function mergeStyles(s1, s2) {
     if (!s2) {
         return s1;
@@ -302,17 +321,32 @@ function saveOption(name, value) {
 		createContextMenu();
 }
 
+// Returns if a style already exists for the given page
+//
+function doesStyleExist(aURL) {
+    for (var url in cache.styles)
+    {
+     	if (aURL.trim().indexOf(url) != -1) {
+			return true;
+		}
+    }
+
+	return false;
+}
+
 // Return CSS rules for a URL
 function getRulesForPage(currUrl) {
     // this will contain the combined set of evaluated rules to be applied to the page.
     // longer, more specific URLs get the priority for each selector and property
     var rules = {};
     var url_for_page = '';
+
     for (var url in cache.styles)
     {
         var subUrls = url.split(',');
         var len = subUrls.length;
         var isFound = false;
+
         for (var i = 0; i < len; i++)
         {
             if (currUrl.indexOf(subUrls[i].trim()) != -1) {
@@ -320,6 +354,7 @@ function getRulesForPage(currUrl) {
                 break;
             }
         }
+
         if (isFound || url == "*")
         {
             if (url.length > url_for_page.length)
@@ -327,9 +362,11 @@ function getRulesForPage(currUrl) {
             
             // iterate over each selector in styles
             for (var selector in cache.styles[url]['_rules']) {
+	
                 // if no rule exists for selector, simply copy the rule
                 if (rules[selector] == undefined)
                     rules[selector] = cloneObject(cache.styles[url]['_rules'][selector]);
+
                 // otherwise, iterate over each property
                 else {
                     for (var property in cache.styles[url]['_rules'][selector])
@@ -341,6 +378,7 @@ function getRulesForPage(currUrl) {
             }
         }
     }
+
     if (rules != undefined)
         return {rules: rules, url: url_for_page};
     else
@@ -417,7 +455,7 @@ function sendRequestToCurrentTab(msg) {
     });	
 }
 
-// Remove context menu
+// Remove the right click context menu
 function removeContextMenu() {
 	if (contextMenuId) {
 		chrome.contextMenus.remove(contextMenuId);
@@ -428,6 +466,8 @@ function removeContextMenu() {
 window.addEventListener('load', function(){
     init();
 });
+
+// Utility methods
 
 // Trim a string
 String.prototype.trim = function() {

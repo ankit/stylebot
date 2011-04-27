@@ -1,3 +1,6 @@
+// Stylebot keyboard shortcuts
+//
+
 function handleKeyboardShortcut(e) {
     var tag = e.target.tagName.toLowerCase();
     if ((tag == "input" && e.target.type == 'text') || tag == "textarea") {
@@ -102,7 +105,7 @@ function detachKeyboardShortcuts() {
     document.removeEventListener('keydown', handleKeyboardShortcut, true);
 }
 
-/** Keyboard shortcuts help **/
+// Keyboard shortcuts help
 
 function displayShortcutHelp() {
     var div = $("<div>", {

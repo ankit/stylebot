@@ -1,4 +1,5 @@
-
+// Handles actions triggered from the right click menu
+//
 stylebot.contextmenu = {
     cache: {
         el: null
