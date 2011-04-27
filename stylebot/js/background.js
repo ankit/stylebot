@@ -30,7 +30,8 @@ var cache = {
         shortcutMetaKey: 'alt',
         mode: 'Basic',
         sync: false,
-		contextMenu: true
+		contextMenu: true,
+		livePreviewColorPicker: false
     },
     
     // indices of enabled accordions in panel. by default, all are enabled

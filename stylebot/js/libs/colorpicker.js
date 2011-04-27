@@ -21,6 +21,7 @@
 			</div> \
 			</div> \
 			</div>',
+			
 			defaults = {
 				eventName: 'click',
 				onShow: function () {},

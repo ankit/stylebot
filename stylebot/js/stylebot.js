@@ -24,7 +24,8 @@ var stylebot = {
         shortcutMetaKey: 'alt',
         mode: 'Basic',
         position: 'Right',
-		sync: false
+		sync: false,
+		livePreviewColorPicker: false
     },
     
     initialize: function(options) {
@@ -34,11 +35,9 @@ var stylebot = {
     },
     
     setOptions: function(options) {
-        this.options.useShortcutKey = options.useShortcutKey;
-        this.options.shortcutKey = options.shortcutKey;
-        this.options.shortcutMetaKey = options.shortcutMetaKey;
-        this.options.mode = options.mode;
-		this.options.sync = options.sync;
+		for (option in options) {
+			this.options[option] = options[option];
+		}
     },
     
     // toggle stylebot editing status

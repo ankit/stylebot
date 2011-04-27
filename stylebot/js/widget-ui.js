@@ -233,7 +233,9 @@ var WidgetUI = {
             class: 'stylebot-colorselector stylebot-control', 
             tabIndex: 0
         })
+
         .append($('<div>', {class: 'stylebot-colorselector-color'}))
+
         .ColorPicker({
             flat: false,
 
@@ -243,6 +245,10 @@ var WidgetUI = {
                 input.attr( 'value', colorCode );
                 // update the color selector color
                 WidgetUI.setColorSelectorColor( input );
+				
+				// if live preview is enabled, update DOM
+				if (stylebot.options.livePreviewColorPicker)
+					input.keyup().blur();
             },
             
             onBeforeShow: function() {
@@ -259,6 +265,7 @@ var WidgetUI = {
                 stylebot.widget.basic.isColorPickerVisible = false;
             }
         })
+
         .keyup(function(e) {
             if(e.keyCode == 13 && !$(e.target).hasClass('disabled')) // enter
                 $(this).ColorPickerToggle();

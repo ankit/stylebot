@@ -17,7 +17,8 @@ var defaults = {
 	contextMenu: true,
 	shortcutKey: 77, // keycode for 'm'
 	shortcutMetaKey: 'alt',
-	mode: "Basic"
+	mode: "Basic",
+	livePreviewColorPicker: false
 }
 
 var options = {
@@ -26,7 +27,8 @@ var options = {
     shortcutKey: null,
     shortcutMetaKey: null,
     mode: null,
-    sync: null
+    sync: null,
+	livePreviewColorPicker: null
 }
 
 var styles = {};
