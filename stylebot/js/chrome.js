@@ -27,7 +27,7 @@ stylebot.chrome = {
 	},
 
 	install: function(url, rules, id) {
-		chrome.extension.sendRequest({ name: "install", rules: rules, url: url, id: id }, function() {});
+		chrome.extension.sendRequest({ name: "install", rules: rules, url: url, id: id }, function(){});
 	},
     
     // transfer all rules for src url to dest url
@@ -43,11 +43,22 @@ stylebot.chrome = {
     },
     
     saveAccordionState: function(enabledAccordions) {
-        chrome.extension.sendRequest({ name: "saveAccordionState", enabledAccordions: enabledAccordions }, function(){} );
+        chrome.extension.sendRequest({ name: "saveAccordionState", enabledAccordions: enabledAccordions }, function(){});
     },
 
+	savePreference: function(name, value) {
+		chrome.extension.sendRequest({ name: "savePreference", preference: { name: name, value: value } }, function(){});
+	},
+	
+	getPreference: function(name, callback) {
+		chrome.extension.sendRequest({ name: "getPreference", preferenceName: name }, function(response) {
+			console.log(response);
+			callback(response.value);
+		});
+	},
+
 	pushStyles: function() {
-		chrome.extension.sendRequest({ name: "pushStyles" }, function(){} );
+		chrome.extension.sendRequest({ name: "pushStyles" }, function(){});
 	}
 }
 

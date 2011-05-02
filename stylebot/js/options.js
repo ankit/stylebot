@@ -480,7 +480,8 @@ function initModal(html, options) {
         cache.modal = new ModalBox(html, {
             bgFadeSpeed: 0,
             closeOnEsc: false,
-            closeOnBgClick: false
+            closeOnBgClick: false,
+			height: window.innerHeight * 0.6
         });
     }
 

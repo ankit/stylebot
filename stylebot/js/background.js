@@ -144,6 +144,10 @@ function attachListeners() {
             case "fetchOptions"     	: sendResponse({ options: cache.options, enabledAccordions: cache.enabledAccordions }); break;
 
             case "saveAccordionState"	: saveAccordionState(request.enabledAccordions); sendResponse({}); break;
+			
+			case "savePreference"		: savePreference(request.preference); sendResponse({}); break;
+			
+			case "getPreference"		: sendResponse(getPreference(request.preferenceName)); break;
 
             case "pushStyles"			: pushStyles(); sendResponse({}); break;
         }
@@ -416,6 +420,14 @@ function saveAccordionState(enabledAccordions) {
 function loadAccordionState() {
     if (localStorage['stylebot_enabledAccordions'])
         cache.enabledAccordions = localStorage['stylebot_enabledAccordions'].split(',');
+}
+
+function savePreference(preference) {
+	localStorage[preference.name] = preference.value;
+}
+
+function getPreference(preferenceName) {
+	return { name: preferenceName, value: localStorage[preferenceName] };
 }
 
 // Initialize the right click context menu

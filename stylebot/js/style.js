@@ -102,9 +102,11 @@ stylebot.style = {
             else
                 duration = 0;
         }
+
         else {
             duration = 0;
         }
+
         if (stylebot.style.updateCSSTimer)
         {
             clearTimeout(stylebot.style.updateCSSTimer);
@@ -120,6 +122,7 @@ stylebot.style = {
             }
             else
                 stylebot.style.updateStyleElement(stylebot.style.rules);
+
         }, duration);
         
         if (stylebot.style.timer) {
@@ -136,16 +139,20 @@ stylebot.style = {
     applyPageCSS: function(css) {
         if (css == "")
             this.rules = {};
+
         else {
             if (!this.parser)
                 this.parser = new CSSParser();
+
             try {
                 var sheet = this.parser.parse(css);
                 var rules = CSSUtils.getRulesFromParserObject(sheet);
                 this.rules = rules;
             }
+
             catch(e) {}
         }
+
         this.clearInlineCSS(this.cache.elements);
         this.updateStyleElement(this.rules);
         this.save();

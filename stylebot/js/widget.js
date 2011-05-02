@@ -147,21 +147,28 @@ stylebot.widget = {
             id: 'stylebot-main-buttons'
         });
         
-        WidgetUI.createButton("Edit CSS").appendTo(btContainer).click(stylebot.widget.editCSS);
+        WidgetUI.createButton("Edit CSS")
+		.attr('title', 'Edit entire page\'s CSS')
+       	.tipsy({delayIn: 800, gravity:'sw', html: true})
+		.appendTo(btContainer)
+		.click(stylebot.widget.editCSS)
 
         this.cache.undoBt = WidgetUI.createButton("Undo").attr({
             title: "Undo your last action",
             'disabled': "disabled"
         })
-        .tipsy({delayIn: 1500, gravity:'s', html: true})
+
+        .tipsy({delayIn: 800, gravity:'s', html: true})
         .appendTo(btContainer).click(function(e) {stylebot.style.undo();});
         
-        WidgetUI.createButton("Reset").attr('title', "Reset selected element(s) CSS")
-        .tipsy({delayIn: 1500, gravity:'s', html: true})
+        WidgetUI.createButton("Reset")
+		.attr('title', "Reset custom CSS for the selected elements")
+        .tipsy({delayIn: 800, gravity:'s', html: true})
         .appendTo(btContainer).click(stylebot.widget.resetCSS);
         
-        WidgetUI.createButton("Reset Page").attr('title', "Reset all custom CSS for page")
-        .tipsy({delayIn: 1500, gravity:'se', html: true})
+        WidgetUI.createButton("Reset Page")
+		.attr('title', "Reset custom CSS for the entire page")
+        .tipsy({delayIn: 500, gravity:'se', html: true})
         .appendTo(btContainer).click(stylebot.widget.resetAllCSS);
 
         btContainer.appendTo(optionsContainer);
