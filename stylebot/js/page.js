@@ -1,7 +1,7 @@
 /**
   * stylebot.page
   * 
-  * Shows the modal popup for editing CSS
+  * Shows the editor for the entire page's CSS
   **/
 
 stylebot.page = {
@@ -19,7 +19,7 @@ stylebot.page = {
         css: null,
 		// Reset CSS from http://meyerweb.com/eric/tools/css/reset/
 		//
-		stripCSS: 'html, body, div, span, applet, object, iframe,\n\
+		resetCSS: 'html, body, div, span, applet, object, iframe,\n\
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,\n\
 a, abbr, acronym, address, big, cite, code,\n\
 del, dfn, em, img, ins, kbd, q, s, samp,\n\
@@ -76,8 +76,8 @@ table {\n\
 		<input type='checkbox' title='This may cause performance issues' class='stylebot-button' />\
 		Live Preview Changes\
 		</div>\
-		<button class='stylebot-button' style='float:left !important; margin: 0px !important;' tabindex='0'>\
-		Copy To Clipboard\
+		<button class='stylebot-button' title='Copy to Clipboard' style='float:left !important; margin: 0px !important;' tabindex='0'>\
+		Copy\
 		</button>\
 		<div style='float: right'>\
 		<button class='stylebot-button' style='margin: 0px !important; margin-right: 3px !important; float: none;' tabindex='0'>\
@@ -107,7 +107,9 @@ table {\n\
 			stylebot.page.cache.livePreview = livePreview;
 		});
 		
-        $(buttons.get(1)).click(this.copyToClipboard);
+        $(buttons.get(1)).click(this.copyToClipboard)
+        .tipsy({delayIn: 100, gravity:'sw'});
+
         $(buttons.get(2)).click(this.save);
         $(buttons.get(3)).click(this.cancel);
     },
@@ -140,6 +142,7 @@ table {\n\
                 onClose: function() {
                     stylebot.page.isVisible = false;
                     prevTarget.focus();
+        			$(window).unbind('resize', stylebot.page.onWindowResize);
                 }
             });
 		}
@@ -153,13 +156,15 @@ table {\n\
 			});
 		}
 
-		this.cache.textarea.css('height', $("#stylebot").height() - 130 + "px");
+		this.cache.textarea.css('height', $("#stylebot").height() - 125 + "px");
 		
         this.fill(content);
 		this.cache.originalCSS = content;
         this.isVisible = true;
 
         stylebot.page.modal.show();
+
+        $(window).bind('resize', this.onWindowResize);
     },
     
     copyToClipboard: function() {
@@ -167,8 +172,12 @@ table {\n\
         stylebot.chrome.copyToClipboard(text);
     },
 
-	stripExistingCSS: function() {
-		stylebot.page.cache.textarea.attr('value', stylebot.page.cache.stripCSS);
+	applyResetCSS: function() {
+		stylebot.page.cache.textarea.attr('value', stylebot.page.cache.resetCSS);
+
+		if (stylebot.page.cache.livePreview) {
+			stylebot.page.saveCSS(stylebot.page.cache.textarea.attr('value'));
+		}
 	},
 	
 	toggleLivePreview: function() {
@@ -223,5 +232,16 @@ table {\n\
             stylebot.style.clearLastState();
 
         stylebot.page.cache.css = null;
+	},
+	
+	onWindowResize: function() {
+		stylebot.page.modal.reset({
+			width: $("#stylebot").width() - 30 + "px",
+			top: '0%',
+			left: '0',
+			height: '100%',
+		});
+		
+		stylebot.page.cache.textarea.css('height', $("#stylebot").height() - 125 + "px");		
 	}
 }

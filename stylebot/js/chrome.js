@@ -52,7 +52,6 @@ stylebot.chrome = {
 	
 	getPreference: function(name, callback) {
 		chrome.extension.sendRequest({ name: "getPreference", preferenceName: name }, function(response) {
-			console.log(response);
 			callback(response.value);
 		});
 	},
