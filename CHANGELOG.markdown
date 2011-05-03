@@ -1,3 +1,15 @@
+**1.1**
+* Added option to preview changes live when picking color using Color Picker
+* Use up / down arrows keys to increment / decrement values
+* Green 'css' icon indicates style is running on a page
+* Preview changes live when editing entire page's CSS
+
+**1.0**
+* Ability to share, browse and install styles from Stylebot Social
+* Cleaner options page with vertical tabs
+* Added option to temporarily disable custom styling of page in right click context menu
+* Better Sync
+
 **0.2.4**
 * Added context menu
 

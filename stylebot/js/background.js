@@ -1,4 +1,5 @@
 /* Background JS for Stylebot */
+var CURRENT_VERSION = "1.1";
 
 var currTabId;
 var contextMenuId = null;
@@ -46,11 +47,12 @@ function init() {
     loadStylesIntoCache();
     updateVersion();
     loadAccordionState();
+	createContextMenu();
+	
     if (cache.options.sync) {
         loadSyncId();
         attachSyncListeners();
     }
-	createContextMenu();
 }
 
 // Open release notes. Only done for major releases
@@ -63,21 +65,31 @@ function openReleaseNotes() {
 //
 function updateVersion() {
     if (!localStorage.version) {
-        localStorage.version = "1"; return true;
+		updateVersionString();
+		return true;
     }
 
-    else if (localStorage.version != "1") {
-		openReleaseNotes();
+	if (parseInt(localStorage.version) < 1) {
 		upgradeTo1();
+	}
+
+	if (localStorage.version != CURRENT_VERSION) {
+		updateVersionString();
+		openReleaseNotes();
 	}
 }
 
+function updateVersionString() {
+	console.log("Updating to version " + CURRENT_VERSION);
+	localStorage.version = CURRENT_VERSION;
+}
+
 // Upgrade to version 1
+// Mostly legacy code now, since almost everyone should already be updated to 1.0
 //
 function upgradeTo1() {
-	console.log("Upgrading to version 1...");
-    localStorage.version = "1";
-
+	console.log("Upgrading data model to version 1.0");
+	
 	var first = false;
 	
 	// upgrading to the new data model
@@ -109,6 +121,7 @@ function upgradeTo1() {
 }
 
 // Listen to requests from tabs and page action
+//
 function attachListeners() {
     chrome.pageAction.onClicked.addListener(onPageIconClick);
     
