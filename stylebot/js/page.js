@@ -70,20 +70,20 @@ table {\n\
     },
 
     create: function(options) {
-		var html = "<div style='font-size: 12px; line-height: 14px;'>Edit the CSS for <b>" + stylebot.style.cache.url + "</b>:</div>\
+		var html = "<div style='font-size: 12px !important; line-height: 14px !important;'>Edit the CSS for <b>" + stylebot.style.cache.url + "</b>:</div>\
 		<textarea class='stylebot-textarea stylebot-css-code' tabindex='0'></textarea>\
-		<div style='font-size: 11px; margin-bottom: 10px;'>\
+		<div style='font-size: 11px !important; margin-bottom: 10px !important;'>\
 		<input type='checkbox' title='This may cause performance issues' class='stylebot-button' />\
 		Live Preview Changes\
 		</div>\
 		<button class='stylebot-button' title='Copy to Clipboard' style='float:left !important; margin: 0px !important;' tabindex='0'>\
 		Copy\
 		</button>\
-		<div style='float: right'>\
-		<button class='stylebot-button' style='margin: 0px !important; margin-right: 3px !important; float: none;' tabindex='0'>\
+		<div style='float: right !important; margin-right: -5px !important;'>\
+		<button class='stylebot-button' style='margin: 0px !important; margin-right: 3px !important; float: none !important;' tabindex='0'>\
 		Save\
 		</button>\
-		<button class='stylebot-button' style='margin: 0px !important; float: none;' tabindex='0'>\
+		<button class='stylebot-button' style='margin: 0px !important; float: none !important;' tabindex='0'>\
 		Cancel\
 		</button>\
 		</div>";
