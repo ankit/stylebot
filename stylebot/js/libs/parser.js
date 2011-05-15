@@ -413,7 +413,7 @@ CSSScanner.prototype = {
           case "|" :
             return new jscsspToken(jscsspToken.DASHMATCH_TYPE, "|=");
           case "^" :
-            return new jscsspToken(jscsspToken.BEGINSMATCH_TYPE, "=");
+            return new jscsspToken(jscsspToken.BEGINSMATCH_TYPE, "^=");
           case "$" :
             return new jscsspToken(jscsspToken.ENDSMATCH_TYPE, "$=");
           case "*" :
