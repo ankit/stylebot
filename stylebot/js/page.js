@@ -239,7 +239,7 @@ table {\n\
 			width: $("#stylebot").width() - 30 + "px",
 			top: '0%',
 			left: '0',
-			height: '100%',
+			height: $("#stylebot").height() - 30 + "px",
 		});
 		
 		stylebot.page.cache.textarea.css('height', $("#stylebot").height() - 125 + "px");		
