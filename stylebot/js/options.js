@@ -11,24 +11,17 @@ var cache = {
     textareaHeight: null
 }
 
-// default values for options
-var defaults = {
+// options with their default values
+//
+var options = {
 	useShortcutKey: true,
 	contextMenu: true,
 	shortcutKey: 77, // keycode for 'm'
 	shortcutMetaKey: 'alt',
 	mode: "Basic",
-	livePreviewColorPicker: false
-}
-
-var options = {
-    useShortcutKey: null,
-	contextMenu: null,
-    shortcutKey: null,
-    shortcutMetaKey: null,
-    mode: null,
-    sync: null,
-	livePreviewColorPicker: null
+	sync: false,
+	livePreviewColorPicker: false,
+	showPageAction: true
 }
 
 var styles = {};
@@ -44,8 +37,10 @@ function init() {
  	$.each(options, function(option, value) {
 		var $el = $('[name=' + option + ']');
 		var el = $el.get(0);
+		
 		if (el == undefined)
 			return;
+		
 		var tag = el.tagName.toLowerCase();
 		
 		if (el.type === "checkbox") {
@@ -56,15 +51,12 @@ function init() {
 		else if (tag === "select" || el.type === "hidden") {
 			if (value != undefined)
 				el.value = value;
-			else
-				el.value = defaults[option];
 		}
 		
 		else if (el.type === "radio") {
 			var len = $el.length;
-			if (value == undefined)
-				value = defaults[option];
-			for (var i = 0; i < len; i++) {
+			
+			for (var i = 0; i < len; i ++) {
 				if ($el.get(i).value == value)
 				{
 					$el.get(i).checked = true;
@@ -83,7 +75,7 @@ function init() {
     fillCustomStyles();
     attachListeners();
     initFiltering();
-    setSyncUI();
+    updateSyncUI();
 
 	// hack to wait for window.innerHeight to be available
     setTimeout(function() {
@@ -114,7 +106,9 @@ function initializeTabs() {
 // fetches options from the datastore
 function fetchOptions() {
 	$.each(options, function(option, value) {
+		
 		var dataStoreValue = localStorage['stylebot_option_' + option];
+		
 		if (dataStoreValue == "true" || dataStoreValue == "false")
 			options[option] = (dataStoreValue == "true");
 		else
@@ -158,6 +152,7 @@ function translateOptionValue(name, value) {
         case "sync": return (value == "true") ? true : false;
         case "shortcutKey": return $('[name=shortcutKey]').attr('value');
     }
+
     return value;
 }
 
@@ -400,12 +395,12 @@ function copyToClipboard() {
 
 // Displays the modal popup for importing styles from JSON string
 function import() {
-    var html = "<div>Paste previously exported custom styles here.";
-	html += "<div class='description' style='margin-top: 10px'>Note: Current custom styles for similar URLs will be replaced.</div>";
-	html += "</div>";
-	html += "<textarea class='stylebot-css-code' style='width: 100%; height:" + cache.textareaHeight + "'>";
-	html += "</textarea>";
-	html += "<button onclick='importCSS();cache.modal.hide();'>Import</button>";
+    var html = "<div>Paste previously exported custom styles here. \
+	<div class='description' style='margin-top: 10px'>Note: Current custom styles for similar URLs will be replaced.</div> \
+	</div> \
+	<textarea class='stylebot-css-code' style='width: 100%; height:" + cache.textareaHeight + "'> \
+	</textarea> \
+	<button onclick='importCSS();cache.modal.hide();'>Import</button>";
 	
     initModal(html, {
         closeOnEsc: true,
@@ -422,6 +417,7 @@ function import() {
 // Import styles from JSON string
 function importCSS() {
     var json = cache.modal.box.find('textarea').attr('value');
+
     if (json && json != "")
     {
         $(".custom-style").html("");
@@ -431,6 +427,7 @@ function importCSS() {
             styles = mergeStyles(imported_styles, styles);
             bg_window.saveStyles(styles);
         }
+
         catch(e) {
 			console.log(e);
 		}
@@ -442,13 +439,15 @@ function importCSS() {
 // Sync
 
 // Initialize Sync UI based on value of the sync option
-function setSyncUI() {
+function updateSyncUI() {
     var status = $('#sync_status');
+
     if (options.sync) {
         $('#sync-button').html("Disable Sync");
         $('#sync-enabled-note').show();
         $('#sync-now').show();
     }
+
     else {
         $('#sync-button').html("Enable Sync");
         $('#sync-enabled-note').hide();
@@ -457,18 +456,37 @@ function setSyncUI() {
 }
 
 // Turn syncing on/off
+//
 function toggleSyncing() {
     if (options.sync) {
         options.sync = false;
         bg_window.saveOption("sync", false);
         bg_window.disableSync();
     }
+
     else {
         options.sync = true;
         bg_window.saveOption("sync", true);
         bg_window.enableSync(true);
     }
-    setSyncUI();
+
+    updateSyncUI();
+}
+
+// Toggle display of css icon in omnibar
+
+function togglePageAction() {
+	if (options.showPageAction) {
+		options.showPageAction = false;
+		bg_window.saveOption("showPageAction", options.showPageAction);
+		bg_window.hidePageActions();
+	}
+	
+	else {
+		options.showPageAction = true;
+		bg_window.saveOption("showPageAction", options.showPageAction);
+		bg_window.showPageActions();
+	}
 }
 
 // Modal popup
@@ -520,8 +538,10 @@ function filterStyles(value) {
     var styleDivs = $('.custom-style');
     var urls = $('.custom-style-url');
     var len = styleDivs.length;
+
     for (var i = 0; i < len; i++) {
         var $div = $(styleDivs[i]);
+
         if (urls[i].innerHTML.indexOf(value) == -1)
             $div.hide();
         else
@@ -546,5 +566,6 @@ function mergeStyles(s1, s2) {
 			s2[url]['_rules'] = s1[url];
 		}
     }
+
     return s2;
 }

@@ -32,7 +32,8 @@ var cache = {
         mode: 'Basic',
         sync: false,
 		contextMenu: true,
-		livePreviewColorPicker: false
+		livePreviewColorPicker: false,
+		showPageAction: true
     },
     
     // indices of enabled accordions in panel. by default, all are enabled
@@ -42,12 +43,14 @@ var cache = {
 // Initialize
 //
 function init() {
-    attachListeners();
     loadOptionsIntoCache();
     loadStylesIntoCache();
-    updateVersion();
     loadAccordionState();
+
+    updateVersion();
+
 	createContextMenu();
+    attachListeners();
 	
     if (cache.options.sync) {
         loadSyncId();
@@ -55,7 +58,7 @@ function init() {
     }
 }
 
-// Open release notes. Only done for major releases
+// Open release notes. Only done in case of x.x releases
 //
 function openReleaseNotes() {
     chrome.tabs.create({ url: "http://stylebot.me/releases", selected: true }, null);
@@ -88,7 +91,6 @@ function updateVersionString() {
 // Mostly legacy code now, since almost everyone should already be updated to 1.0
 //
 function upgradeTo1() {
-	console.log("Upgrading data model to version 1.0");
 	
 	var first = false;
 	
@@ -123,26 +125,20 @@ function upgradeTo1() {
 // Listen to requests from tabs and page action
 //
 function attachListeners() {
-    chrome.pageAction.onClicked.addListener(onPageIconClick);
-    
-    chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {		
-        if (tab.url.match("^http") == "http" && tab.url.indexOf("https://chrome.google.com/extensions") == -1) {
-			chrome.pageAction.show(tabId);
-			disablePageIcon(tab);
-		}
-    });
-
-	chrome.tabs.onSelectionChanged.addListener(function(tabId, selectInfo) {
-		chrome.tabs.get(tabId, function(tab) {
-			refreshPageIcon(tab);
-		});
-	});
+	
+	if (cache.options.showPageAction == undefined || cache.options.showPageAction) {
+		showPageActions();
+	}
     
     chrome.extension.onRequest.addListener( function(request, sender, sendResponse) {
         switch (request.name) {
-            case "enablePageIcon"   	: enablePageIcon(sender.tab); sendResponse({}); break;
+            case "enablePageAction"   	: if (cache.options.showPageAction) { enablePageAction(sender.tab); } sendResponse({}); break;
+
+            case "disablePageAction" 	: if (cache.options.showPageAction) { disablePageAction(sender.tab); } sendResponse({}); break;
             
-            case "disablePageIcon" 	 	: disablePageIcon(sender.tab); sendResponse({}); break;
+            case "showPageActions" 	 	: showPageActions(); sendResponse({}); break;
+
+            case "hidePageActions" 	 	: hidePageActions(); sendResponse({}); break;
             
             case "copyToClipboard"  	: copyToClipboard(request.text); sendResponse({}); break;
             
@@ -169,27 +165,28 @@ function attachListeners() {
 
 
 // Toggle CSS editing when page icon is clicked
-function onPageIconClick(tab) {
+//
+function onPageActionClick(tab) {
 	chrome.tabs.sendRequest(tab.id, { name: "toggle" }, function(response) {
         if(response.status)
-           	enablePageIcon(tab);
+           	enablePageAction(tab);
         else
-            disablePageIcon(tab);
+            disablePageAction(tab);
     });
 }
 
-function refreshPageIcon(tab) {
+function refreshPageAction(tab) {
 	chrome.tabs.sendRequest(tab.id, { name: "status" }, function(response) {
         if(response.status)
-           	enablePageIcon(tab);
+           	enablePageAction(tab);
         else
-            disablePageIcon(tab);
+            disablePageAction(tab);
     });
 }
 
-// Update page icon to indicate that stylebot is not visible
+// Update page action to indicate that stylebot is not visible
 //
-function disablePageIcon(tab) {
+function disablePageAction(tab) {
 	// if a style is applied to the current page
 	//
 	if (doesStyleExist(tab.url)) {
@@ -203,11 +200,78 @@ function disablePageIcon(tab) {
     chrome.pageAction.setTitle({ tabId: tab.id, title: "Click to start editing using Stylebot" });
 }
 
-// Update page icon to indicate that stylebot is visible
+// Update page action to indicate that stylebot is visible
 //
-function enablePageIcon(tab) {
+function enablePageAction(tab) {
 	chrome.pageAction.setIcon({ tabId: tab.id, path: "images/css_active.png" });
     chrome.pageAction.setTitle({ tabId: tab.id, title: "Click to stop editing using Stylebot" });
+}
+
+// Show page action for all tabs where it is applicable
+//
+function showPageActions() {
+	chrome.windows.getAll({ populate: true }, function(windows) {
+		var w_len = windows.length;
+		
+		for (var i = 0; i < w_len; i++) {
+			var tabs = windows[i].tabs;
+			
+			if (tabs) {
+				var t_len = tabs.length;
+
+				for (var j = 0; j < t_len; j++) {
+					var tab = tabs[j];
+					
+					if (tab.url.match("^http") == "http" 
+					&& tab.url.indexOf("https://chrome.google.com/extensions") == -1) 
+					{					
+						chrome.pageAction.show(tab.id);
+					}
+				}
+			}
+		}
+	});
+	
+	chrome.pageAction.onClicked.addListener(onPageActionClick);
+	chrome.tabs.onUpdated.addListener(onTabUpdated);
+	chrome.tabs.onSelectionChanged.addListener(onTabSelectionChanged);
+}
+
+// Hide page action on all tabs
+//
+function hidePageActions() {
+	chrome.windows.getAll({ populate: true }, function(windows) {
+		var w_len = windows.length;
+		
+		for (var i = 0; i < w_len; i++) {
+			var tabs = windows[i].tabs;
+			
+			if (tabs) {
+				var t_len = tabs.length;
+
+				for (var j = 0; j < t_len; j++) {
+					chrome.pageAction.hide(tabs[j].id);
+				}
+			}
+		}
+	});
+	
+	chrome.pageAction.onClicked.removeListener(onPageActionClick);
+	chrome.tabs.onUpdated.removeListener(onTabUpdated);
+	chrome.tabs.onSelectionChanged.removeListener(onTabSelectionChanged);
+}
+
+function onTabUpdated(tabId, changeInfo, tab) {
+	if (tab.url.match("^http") == "http" && tab.url.indexOf("https://chrome.google.com/extensions") == -1) {
+		chrome.pageAction.show(tabId);
+		disablePageAction(tab);
+	}
+}
+
+function onTabSelectionChanged(tabId, selectInfo) {
+	chrome.tabs.get(tabId, function(tab) {
+		refreshPageAction(tab);
+	});
 }
 
 // Save all rules for a page

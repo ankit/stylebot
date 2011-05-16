@@ -1,3 +1,10 @@
+**1.2**
+* Added support for comments
+* Updated CSS Parser
+* Fixed issue where CSS selectors containing ^= weren't working properly
+* Added option to hide omnibar icon
+* Bugfixes
+
 **1.1**
 * Added option to preview changes live when picking color using Color Picker
 * Use up / down arrows keys to increment / decrement values

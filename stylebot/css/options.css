@@ -104,11 +104,11 @@ ul {
 
 li.option {
     list-style-type: none;
-    padding: 5px 0;
+	line-height: 50px;
 }
 
 li.option:first-of-type {
-	padding: 0;
+	margin-top: -10px;
 }
 
 li.option label {
@@ -117,6 +117,10 @@ li.option label {
 
 .option-field {
     float: right;
+}
+
+.option-field input[type=checkbox] {
+	margin: 19px 0;
 }
 
 /** end of options **/
@@ -254,7 +258,7 @@ ul.menu li a, ul.menu li a:visited {
 	position: absolute;
 	margin: 0 0 20px 260px;
 	float: left;
-	min-width: 500px;
+	min-width: 375px;
 	background-color: #fff;
 	padding: 20px;
 }

@@ -7,9 +7,9 @@
 stylebot.chrome = {
     setIcon: function(value) {
         if (value)
-            chrome.extension.sendRequest({ name: "enablePageIcon" }, function(){});
+            chrome.extension.sendRequest({ name: "enablePageAction" }, function(){});
         else
-            chrome.extension.sendRequest({ name: "disablePageIcon" }, function(){});
+            chrome.extension.sendRequest({ name: "disablePageAction" }, function(){});
     },
     
     // send request to background.html to copy text
