@@ -21,8 +21,10 @@ var CSSUtils = {
 
         for (var selector in rules)
         {
+            if (rules[selector]["comment"]) continue;
             css += selector + " { ";
             for (var property in rules[selector]) {
+		if (property.indexOf("comment") != -1) continue;
                 if (rules[selector][property].indexOf("!important") != -1)
                     css += this.getCSSDeclaration(property, rules[selector][property], false);
                 else
@@ -37,11 +39,21 @@ var CSSUtils = {
         var css = "";
         for (var selector in rules)
         {
-            css += selector + " {" + "\n";
-            for (var property in rules[selector])
-                css += "\t" + this.getCSSDeclaration(property, rules[selector][property], setImportant) + "\n";
-
-            css += "}" + "\n\n";
+            if(rules[selector]["comment"]){
+                css += rules[selector]["comment"] + "\n";
+            }
+            else {
+                css += selector + " {" + "\n";
+                for (var property in rules[selector]){
+                    if(property.indexOf("comment") != -1){
+                        css += "\t" + rules[selector][property] + "\n";
+                    }
+                    else { 
+                        css += "\t" + this.getCSSDeclaration(property, rules[selector][property], setImportant) + "\n";
+                    }
+                }
+                css += "}" + "\n\n";
+            }
         }
         return css;
     },
@@ -52,8 +64,10 @@ var CSSUtils = {
         var append = "";
         if (formatted)
             append = "\n"
-        for (var property in rules[selector])
-            css += CSSUtils.getCSSDeclaration( property, rules[selector][property], setImportant ) + append;
+        for (var property in rules[selector]){
+             if(property.indexOf("comment") != -1) continue;
+             css += "\t" + this.getCSSDeclaration(property, rules[selector][property], setImportant) + "\n";
+        }
         return css;
     },
     
@@ -76,15 +90,28 @@ var CSSUtils = {
     // parser object is that returned by JSCSSP
     getRulesFromParserObject: function(sheet) {
         var rules = {};
+        var comment_index = 0;
         var len = sheet.cssRules.length;
         for (var i = 0; i < len; i++) {
-            var selector = sheet.cssRules[i].mSelectorText;
-            rules[selector] = new Object();
-            var len2 = sheet.cssRules[i].declarations.length;
-            for(var j = 0; j < len2; j++) {
-                var property = sheet.cssRules[i].declarations[j].property;
-                var value = sheet.cssRules[i].declarations[j].valueText;
-                rules[selector][property] = value;
+            if(sheet.cssRules[i] instanceof jscsspComment){
+                var selector = "comment-#"+comment_index++;
+                rules[selector] = new Object();
+                rules[selector]["comment"] = sheet.cssRules[i].parsedCssText;
+            }
+            else {
+                var selector = sheet.cssRules[i].mSelectorText;
+                rules[selector] = new Object();
+                var len2 = sheet.cssRules[i].declarations.length;
+                for(var j = 0; j < len2; j++) {
+                    if(sheet.cssRules[i].declarations[j] instanceof jscsspComment){
+                        rules[selector]["comment-#"+comment_index++] = sheet.cssRules[i].declarations[j].parsedCssText;
+                    }
+                    else {
+                        var property = sheet.cssRules[i].declarations[j].property;
+                        var value = sheet.cssRules[i].declarations[j].valueText;
+                        rules[selector][property] = value;
+                    }
+                }
             }
         }
         return rules;
