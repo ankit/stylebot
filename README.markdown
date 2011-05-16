@@ -32,7 +32,7 @@ I am using code from the following projects:
 
 * [Firebug](http://www.getfirebug.com) - Selection of DOM elements (selectionBox.js)
 
-* [JSCSSP](http://www.glazman.org/JSCSSP/) - CSS Parser in JavaScript
+* [JSCSSP](http://www.glazman.org/JSCSSP/) - Amazing CSS Parser in JavaScript written by Daniel Glazman
 
 * [ColorPicker](http://www.eyecon.ro/colorpicker/)
 

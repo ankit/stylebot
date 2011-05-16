@@ -44,6 +44,1049 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+/* FROM http://peter.sh/data/vendor-prefixed-css.php?js=1 */
+
+const kENGINES = [
+  "webkit",
+  "presto",
+  "trident",
+  "generic"
+];
+
+const kCSS_VENDOR_VALUES = {
+  "-moz-box":             {"webkit": "-webkit-box",        "presto": "", "trident": "", "generic": "box" },
+  "-moz-inline-box":      {"webkit": "-webkit-inline-box", "presto": "", "trident": "", "generic": "inline-box" },
+  "-moz-initial":         {"webkit": "",                   "presto": "", "trident": "", "generic": "initial" },
+  "-moz-linear-gradient": {"webkit20110101": FilterLinearGradientForOutput,
+                           "webkit": FilterLinearGradientForOutput,
+                           "presto": "",
+                           "trident": "",
+                           "generic": FilterLinearGradientForOutput },
+  "-moz-radial-gradient": {"webkit20110101": FilterRadialGradientForOutput,
+                           "webkit": FilterRadialGradientForOutput,
+                           "presto": "",
+                           "trident": "",
+                           "generic": FilterRadialGradientForOutput },
+  "-moz-repeating-linear-gradient": {"webkit20110101": "",
+                           "webkit": FilterRepeatingGradientForOutput,
+                           "presto": "",
+                           "trident": "",
+                           "generic": FilterRepeatingGradientForOutput },
+  "-moz-repeating-radial-gradient": {"webkit20110101": "",
+                           "webkit": FilterRepeatingGradientForOutput,
+                           "presto": "",
+                           "trident": "",
+                           "generic": FilterRepeatingGradientForOutput }
+};
+
+const kCSS_VENDOR_PREFIXES = {"lastUpdate":1304175007,"properties":[{"gecko":"","webkit":"","presto":"","trident":"-ms-accelerator","status":"P"},
+{"gecko":"","webkit":"","presto":"-wap-accesskey","trident":"","status":""},
+{"gecko":"-moz-animation","webkit":"-webkit-animation","presto":"","trident":"","status":"WD"},
+{"gecko":"-moz-animation-delay","webkit":"-webkit-animation-delay","presto":"","trident":"","status":"WD"},
+{"gecko":"-moz-animation-direction","webkit":"-webkit-animation-direction","presto":"","trident":"","status":"WD"},
+{"gecko":"-moz-animation-duration","webkit":"-webkit-animation-duration","presto":"","trident":"","status":"WD"},
+{"gecko":"-moz-animation-fill-mode","webkit":"-webkit-animation-fill-mode","presto":"","trident":"","status":"ED"},
+{"gecko":"-moz-animation-iteration-count","webkit":"-webkit-animation-iteration-count","presto":"","trident":"","status":"WD"},
+{"gecko":"-moz-animation-name","webkit":"-webkit-animation-name","presto":"","trident":"","status":"WD"},
+{"gecko":"-moz-animation-play-state","webkit":"-webkit-animation-play-state","presto":"","trident":"","status":"WD"},
+{"gecko":"-moz-animation-timing-function","webkit":"-webkit-animation-timing-function","presto":"","trident":"","status":"WD"},
+{"gecko":"-moz-appearance","webkit":"-webkit-appearance","presto":"","trident":"","status":"CR"},
+{"gecko":"","webkit":"-webkit-backface-visibility","presto":"","trident":"","status":"WD"},
+{"gecko":"background-clip","webkit":"-webkit-background-clip","presto":"background-clip","trident":"background-clip","status":"WD"},
+{"gecko":"","webkit":"-webkit-background-composite","presto":"","trident":"","status":""},
+{"gecko":"-moz-background-inline-policy","webkit":"","presto":"","trident":"","status":"P"},
+{"gecko":"background-origin","webkit":"-webkit-background-origin","presto":"background-origin","trident":"background-origin","status":"WD"},
+{"gecko":"","webkit":"background-position-x","presto":"","trident":"-ms-background-position-x","status":""},
+{"gecko":"","webkit":"background-position-y","presto":"","trident":"-ms-background-position-y","status":""},
+{"gecko":"background-size","webkit":"-webkit-background-size","presto":"background-size","trident":"background-size","status":"WD"},
+{"gecko":"","webkit":"","presto":"","trident":"-ms-behavior","status":""},
+{"gecko":"-moz-binding","webkit":"","presto":"","trident":"","status":"P"},
+{"gecko":"","webkit":"","presto":"","trident":"-ms-block-progression","status":""},
+{"gecko":"","webkit":"-webkit-border-after","presto":"","trident":"","status":"ED"},
+{"gecko":"","webkit":"-webkit-border-after-color","presto":"","trident":"","status":"ED"},
+{"gecko":"","webkit":"-webkit-border-after-style","presto":"","trident":"","status":"ED"},
+{"gecko":"","webkit":"-webkit-border-after-width","presto":"","trident":"","status":"ED"},
+{"gecko":"","webkit":"-webkit-border-before","presto":"","trident":"","status":"ED"},
+{"gecko":"","webkit":"-webkit-border-before-color","presto":"","trident":"","status":"ED"},
+{"gecko":"","webkit":"-webkit-border-before-style","presto":"","trident":"","status":"ED"},
+{"gecko":"","webkit":"-webkit-border-before-width","presto":"","trident":"","status":"ED"},
+{"gecko":"-moz-border-bottom-colors","webkit":"","presto":"","trident":"","status":"P"},
+{"gecko":"border-bottom-left-radius","webkit":"-webkit-border-bottom-left-radius","presto":"border-bottom-left-radius","trident":"border-bottom-left-radius","status":"WD"},
+{"gecko":"","webkit":"-webkit-border-bottom-left-radius = border-bottom-left-radius","presto":"","trident":"","status":""},
+{"gecko":"border-bottom-right-radius","webkit":"-webkit-border-bottom-right-radius","presto":"border-bottom-right-radius","trident":"border-bottom-right-radius","status":"WD"},
+{"gecko":"","webkit":"-webkit-border-bottom-right-radius = border-bottom-right-radius","presto":"","trident":"","status":""},
+{"gecko":"-moz-border-end","webkit":"-webkit-border-end","presto":"","trident":"","status":"ED"},
+{"gecko":"-moz-border-end-color","webkit":"-webkit-border-end-color","presto":"","trident":"","status":"ED"},
+{"gecko":"-moz-border-end-style","webkit":"-webkit-border-end-style","presto":"","trident":"","status":"ED"},
+{"gecko":"-moz-border-end-width","webkit":"-webkit-border-end-width","presto":"","trident":"","status":"ED"},
+{"gecko":"","webkit":"-webkit-border-fit","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"-webkit-border-horizontal-spacing","presto":"","trident":"","status":""},
+{"gecko":"-moz-border-image","webkit":"-webkit-border-image","presto":"-o-border-image","trident":"","status":"WD"},
+{"gecko":"-moz-border-left-colors","webkit":"","presto":"","trident":"","status":"P"},
+{"gecko":"border-radius","webkit":"-webkit-border-radius","presto":"border-radius","trident":"border-radius","status":"WD"},
+{"gecko":"-moz-border-right-colors","webkit":"","presto":"","trident":"","status":"P"},
+{"gecko":"-moz-border-start","webkit":"-webkit-border-start","presto":"","trident":"","status":"ED"},
+{"gecko":"-moz-border-start-color","webkit":"-webkit-border-start-color","presto":"","trident":"","status":"ED"},
+{"gecko":"-moz-border-start-style","webkit":"-webkit-border-start-style","presto":"","trident":"","status":"ED"},
+{"gecko":"-moz-border-start-width","webkit":"-webkit-border-start-width","presto":"","trident":"","status":"ED"},
+{"gecko":"-moz-border-top-colors","webkit":"","presto":"","trident":"","status":"P"},
+{"gecko":"border-top-left-radius","webkit":"-webkit-border-top-left-radius","presto":"border-top-left-radius","trident":"border-top-left-radius","status":"WD"},
+{"gecko":"","webkit":"-webkit-border-top-left-radius = border-top-left-radius","presto":"","trident":"","status":""},
+{"gecko":"border-top-right-radius","webkit":"-webkit-border-top-right-radius","presto":"border-top-right-radius","trident":"border-top-right-radius","status":"WD"},
+{"gecko":"","webkit":"-webkit-border-top-right-radius = border-top-right-radius","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"-webkit-border-vertical-spacing","presto":"","trident":"","status":""},
+{"gecko":"-moz-box-align","webkit":"-webkit-box-align","presto":"","trident":"-ms-box-align","status":"WD"},
+{"gecko":"-moz-box-direction","webkit":"-webkit-box-direction","presto":"","trident":"-ms-box-direction","status":"WD"},
+{"gecko":"-moz-box-flex","webkit":"-webkit-box-flex","presto":"","trident":"-ms-box-flex","status":"WD"},
+{"gecko":"","webkit":"-webkit-box-flex-group","presto":"","trident":"","status":"WD"},
+{"gecko":"","webkit":"","presto":"","trident":"-ms-box-line-progression","status":""},
+{"gecko":"","webkit":"-webkit-box-lines","presto":"","trident":"-ms-box-lines","status":"WD"},
+{"gecko":"-moz-box-ordinal-group","webkit":"-webkit-box-ordinal-group","presto":"","trident":"-ms-box-ordinal-group","status":"WD"},
+{"gecko":"-moz-box-orient","webkit":"-webkit-box-orient","presto":"","trident":"-ms-box-orient","status":"WD"},
+{"gecko":"-moz-box-pack","webkit":"-webkit-box-pack","presto":"","trident":"-ms-box-pack","status":"WD"},
+{"gecko":"","webkit":"-webkit-box-reflect","presto":"","trident":"","status":""},
+{"gecko":"box-shadow","webkit":"-webkit-box-shadow","presto":"box-shadow","trident":"box-shadow","status":"WD"},
+{"gecko":"-moz-box-sizing","webkit":"box-sizing","presto":"box-sizing","trident":"","status":"CR"},
+{"gecko":"","webkit":"-webkit-box-sizing = box-sizing","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"-epub-caption-side = caption-side","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"-webkit-color-correction","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"-webkit-column-break-after","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"-webkit-column-break-before","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"-webkit-column-break-inside","presto":"","trident":"","status":""},
+{"gecko":"-moz-column-count","webkit":"-webkit-column-count","presto":"column-count","trident":"column-count","status":"CR"},
+{"gecko":"-moz-column-gap","webkit":"-webkit-column-gap","presto":"column-gap","trident":"column-gap","status":"CR"},
+{"gecko":"-moz-column-rule","webkit":"-webkit-column-rule","presto":"column-rule","trident":"column-rule","status":"CR"},
+{"gecko":"-moz-column-rule-color","webkit":"-webkit-column-rule-color","presto":"column-rule-color","trident":"column-rule-color","status":"CR"},
+{"gecko":"-moz-column-rule-style","webkit":"-webkit-column-rule-style","presto":"column-rule-style","trident":"column-rule-style","status":"CR"},
+{"gecko":"-moz-column-rule-width","webkit":"-webkit-column-rule-width","presto":"column-rule-width","trident":"column-rule-width","status":"CR"},
+{"gecko":"","webkit":"-webkit-column-span","presto":"column-span","trident":"column-span","status":"CR"},
+{"gecko":"-moz-column-width","webkit":"-webkit-column-width","presto":"column-width","trident":"column-width","status":"CR"},
+{"gecko":"","webkit":"-webkit-columns","presto":"columns","trident":"columns","status":"CR"},
+{"gecko":"","webkit":"-webkit-dashboard-region","presto":"-apple-dashboard-region","trident":"","status":""},
+{"gecko":"filter","webkit":"","presto":"filter","trident":"-ms-filter","status":""},
+{"gecko":"-moz-float-edge","webkit":"","presto":"","trident":"","status":"P"},
+{"gecko":"","webkit":"","presto":"-o-focus-opacity","trident":"","status":""},
+{"gecko":"-moz-font-feature-settings","webkit":"","presto":"","trident":"","status":""},
+{"gecko":"-moz-font-language-override","webkit":"","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"-webkit-font-size-delta","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"-webkit-font-smoothing","presto":"","trident":"","status":""},
+{"gecko":"-moz-force-broken-image-icon","webkit":"","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"","presto":"","trident":"-ms-grid-column","status":"WD"},
+{"gecko":"","webkit":"","presto":"","trident":"-ms-grid-column-align","status":"WD"},
+{"gecko":"","webkit":"","presto":"","trident":"-ms-grid-column-span","status":"WD"},
+{"gecko":"","webkit":"","presto":"","trident":"-ms-grid-columns","status":"WD"},
+{"gecko":"","webkit":"","presto":"","trident":"-ms-grid-layer","status":"WD"},
+{"gecko":"","webkit":"","presto":"","trident":"-ms-grid-row","status":"WD"},
+{"gecko":"","webkit":"","presto":"","trident":"-ms-grid-row-align","status":"WD"},
+{"gecko":"","webkit":"","presto":"","trident":"-ms-grid-row-span","status":"WD"},
+{"gecko":"","webkit":"","presto":"","trident":"-ms-grid-rows","status":"WD"},
+{"gecko":"","webkit":"-webkit-highlight","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"-webkit-hyphenate-character","presto":"","trident":"","status":"WD"},
+{"gecko":"","webkit":"-webkit-hyphenate-limit-after","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"-webkit-hyphenate-limit-before","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"-webkit-hyphens","presto":"","trident":"","status":"WD"},
+{"gecko":"","webkit":"-epub-hyphens = -webkit-hyphens","presto":"","trident":"","status":""},
+{"gecko":"-moz-image-region","webkit":"","presto":"","trident":"","status":"P"},
+{"gecko":"ime-mode","webkit":"","presto":"","trident":"-ms-ime-mode","status":""},
+{"gecko":"","webkit":"","presto":"-wap-input-format","trident":"","status":""},
+{"gecko":"","webkit":"","presto":"-wap-input-required","trident":"","status":""},
+{"gecko":"","webkit":"","presto":"","trident":"-ms-interpolation-mode","status":""},
+{"gecko":"","webkit":"","presto":"-xv-interpret-as","trident":"","status":""},
+{"gecko":"","webkit":"","presto":"","trident":"-ms-layout-flow","status":""},
+{"gecko":"","webkit":"","presto":"","trident":"-ms-layout-grid","status":""},
+{"gecko":"","webkit":"","presto":"","trident":"-ms-layout-grid-char","status":""},
+{"gecko":"","webkit":"","presto":"","trident":"-ms-layout-grid-line","status":""},
+{"gecko":"","webkit":"","presto":"","trident":"-ms-layout-grid-mode","status":""},
+{"gecko":"","webkit":"","presto":"","trident":"-ms-layout-grid-type","status":""},
+{"gecko":"","webkit":"-webkit-line-box-contain","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"-webkit-line-break","presto":"","trident":"-ms-line-break","status":""},
+{"gecko":"","webkit":"-webkit-line-clamp","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"","presto":"","trident":"-ms-line-grid-mode","status":""},
+{"gecko":"","webkit":"","presto":"-o-link","trident":"","status":""},
+{"gecko":"","webkit":"","presto":"-o-link-source","trident":"","status":""},
+{"gecko":"","webkit":"-webkit-locale","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"-webkit-logical-height","presto":"","trident":"","status":"ED"},
+{"gecko":"","webkit":"-webkit-logical-width","presto":"","trident":"","status":"ED"},
+{"gecko":"","webkit":"-webkit-margin-after","presto":"","trident":"","status":"ED"},
+{"gecko":"","webkit":"-webkit-margin-after-collapse","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"-webkit-margin-before","presto":"","trident":"","status":"ED"},
+{"gecko":"","webkit":"-webkit-margin-before-collapse","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"-webkit-margin-bottom-collapse","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"-webkit-margin-collapse","presto":"","trident":"","status":""},
+{"gecko":"-moz-margin-end","webkit":"-webkit-margin-end","presto":"","trident":"","status":"ED"},
+{"gecko":"-moz-margin-start","webkit":"-webkit-margin-start","presto":"","trident":"","status":"ED"},
+{"gecko":"","webkit":"-webkit-margin-top-collapse","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"-webkit-marquee","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"","presto":"-wap-marquee-dir","trident":"","status":""},
+{"gecko":"","webkit":"-webkit-marquee-direction","presto":"","trident":"","status":"WD"},
+{"gecko":"","webkit":"-webkit-marquee-increment","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"","presto":"-wap-marquee-loop","trident":"","status":"WD"},
+{"gecko":"","webkit":"-webkit-marquee-repetition","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"-webkit-marquee-speed","presto":"-wap-marquee-speed","trident":"","status":"WD"},
+{"gecko":"","webkit":"-webkit-marquee-style","presto":"-wap-marquee-style","trident":"","status":"WD"},
+{"gecko":"mask","webkit":"-webkit-mask","presto":"mask","trident":"","status":""},
+{"gecko":"","webkit":"-webkit-mask-attachment","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"-webkit-mask-box-image","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"-webkit-mask-clip","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"-webkit-mask-composite","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"-webkit-mask-image","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"-webkit-mask-origin","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"-webkit-mask-position","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"-webkit-mask-position-x","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"-webkit-mask-position-y","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"-webkit-mask-repeat","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"-webkit-mask-repeat-x","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"-webkit-mask-repeat-y","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"-webkit-mask-size","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"-webkit-match-nearest-mail-blockquote-color","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"-webkit-max-logical-height","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"-webkit-max-logical-width","presto":"","trident":"","status":"ED"},
+{"gecko":"","webkit":"-webkit-min-logical-height","presto":"","trident":"","status":"ED"},
+{"gecko":"","webkit":"-webkit-min-logical-width","presto":"","trident":"","status":"ED"},
+{"gecko":"","webkit":"","presto":"-o-mini-fold","trident":"","status":""},
+{"gecko":"","webkit":"-webkit-nbsp-mode","presto":"","trident":"","status":"P"},
+{"gecko":"","webkit":"","presto":"-o-object-fit","trident":"","status":"ED"},
+{"gecko":"","webkit":"","presto":"-o-object-position","trident":"","status":"ED"},
+{"gecko":"opacity","webkit":"-webkit-opacity","presto":"opacity","trident":"opacity","status":"WD"},
+{"gecko":"","webkit":"-webkit-opacity = opacity","presto":"","trident":"","status":""},
+{"gecko":"-moz-outline-radius","webkit":"","presto":"","trident":"","status":"P"},
+{"gecko":"-moz-outline-radius-bottomleft","webkit":"","presto":"","trident":"","status":"P"},
+{"gecko":"-moz-outline-radius-bottomright","webkit":"","presto":"","trident":"","status":"P"},
+{"gecko":"-moz-outline-radius-topleft","webkit":"","presto":"","trident":"","status":"P"},
+{"gecko":"-moz-outline-radius-topright","webkit":"","presto":"","trident":"","status":"P"},
+{"gecko":"overflow-x","webkit":"overflow-x","presto":"overflow-x","trident":"-ms-overflow-x","status":"WD"},
+{"gecko":"overflow-y","webkit":"overflow-y","presto":"overflow-y","trident":"-ms-overflow-y","status":"WD"},
+{"gecko":"","webkit":"-webkit-padding-after","presto":"","trident":"","status":"ED"},
+{"gecko":"","webkit":"-webkit-padding-before","presto":"","trident":"","status":"ED"},
+{"gecko":"-moz-padding-end","webkit":"-webkit-padding-end","presto":"","trident":"","status":"ED"},
+{"gecko":"-moz-padding-start","webkit":"-webkit-padding-start","presto":"","trident":"","status":"ED"},
+{"gecko":"","webkit":"-webkit-perspective","presto":"","trident":"","status":"WD"},
+{"gecko":"","webkit":"-webkit-perspective-origin","presto":"","trident":"","status":"WD"},
+{"gecko":"","webkit":"-webkit-perspective-origin-x","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"-webkit-perspective-origin-y","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"","presto":"-xv-phonemes","trident":"","status":""},
+{"gecko":"","webkit":"-webkit-rtl-ordering","presto":"","trident":"","status":"P"},
+{"gecko":"-moz-script-level","webkit":"","presto":"","trident":"","status":""},
+{"gecko":"-moz-script-min-size","webkit":"","presto":"","trident":"","status":""},
+{"gecko":"-moz-script-size-multiplier","webkit":"","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"","presto":"scrollbar-3dlight-color","trident":"-ms-scrollbar-3dlight-color","status":"P"},
+{"gecko":"","webkit":"","presto":"scrollbar-arrow-color","trident":"-ms-scrollbar-arrow-color","status":"P"},
+{"gecko":"","webkit":"","presto":"scrollbar-base-color","trident":"-ms-scrollbar-base-color","status":"P"},
+{"gecko":"","webkit":"","presto":"scrollbar-darkshadow-color","trident":"-ms-scrollbar-darkshadow-color","status":"P"},
+{"gecko":"","webkit":"","presto":"scrollbar-face-color","trident":"-ms-scrollbar-face-color","status":"P"},
+{"gecko":"","webkit":"","presto":"scrollbar-highlight-color","trident":"-ms-scrollbar-highlight-color","status":"P"},
+{"gecko":"","webkit":"","presto":"scrollbar-shadow-color","trident":"-ms-scrollbar-shadow-color","status":"P"},
+{"gecko":"","webkit":"","presto":"scrollbar-track-color","trident":"-ms-scrollbar-track-color","status":"P"},
+{"gecko":"-moz-stack-sizing","webkit":"","presto":"","trident":"","status":"P"},
+{"gecko":"","webkit":"-webkit-svg-shadow","presto":"","trident":"","status":""},
+{"gecko":"-moz-tab-size","webkit":"","presto":"-o-tab-size","trident":"","status":""},
+{"gecko":"","webkit":"","presto":"-o-table-baseline","trident":"","status":""},
+{"gecko":"","webkit":"-webkit-tap-highlight-color","presto":"","trident":"","status":"P"},
+{"gecko":"","webkit":"","presto":"","trident":"-ms-text-align-last","status":"WD"},
+{"gecko":"","webkit":"","presto":"","trident":"-ms-text-autospace","status":"WD"},
+{"gecko":"-moz-text-blink","webkit":"","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"-webkit-text-combine","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"-epub-text-combine = -webkit-text-combine","presto":"","trident":"","status":""},
+{"gecko":"-moz-text-decoration-color","webkit":"","presto":"","trident":"","status":""},
+{"gecko":"-moz-text-decoration-line","webkit":"","presto":"","trident":"","status":""},
+{"gecko":"-moz-text-decoration-style","webkit":"","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"-webkit-text-decorations-in-effect","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"-webkit-text-emphasis","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"-epub-text-emphasis = -webkit-text-emphasis","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"-webkit-text-emphasis-color","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"-epub-text-emphasis-color = -webkit-text-emphasis-color","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"-webkit-text-emphasis-position","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"-webkit-text-emphasis-style","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"-epub-text-emphasis-style = -webkit-text-emphasis-style","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"-webkit-text-fill-color","presto":"","trident":"","status":"P"},
+{"gecko":"","webkit":"","presto":"","trident":"-ms-text-justify","status":"WD"},
+{"gecko":"","webkit":"","presto":"","trident":"-ms-text-kashida-space","status":"P"},
+{"gecko":"","webkit":"-webkit-text-orientation","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"-epub-text-orientation = -webkit-text-orientation","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"text-overflow","presto":"text-overflow","trident":"-ms-text-overflow","status":"WD"},
+{"gecko":"","webkit":"-webkit-text-security","presto":"","trident":"","status":"P"},
+{"gecko":"","webkit":"-webkit-text-size-adjust","presto":"","trident":"-ms-text-size-adjust","status":""},
+{"gecko":"","webkit":"-webkit-text-stroke","presto":"","trident":"","status":"P"},
+{"gecko":"","webkit":"-webkit-text-stroke-color","presto":"","trident":"","status":"P"},
+{"gecko":"","webkit":"-webkit-text-stroke-width","presto":"","trident":"","status":"P"},
+{"gecko":"","webkit":"-epub-text-transform = text-transform","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"","presto":"","trident":"-ms-text-underline-position","status":"P"},
+{"gecko":"","webkit":"-webkit-touch-callout","presto":"","trident":"","status":"P"},
+{"gecko":"-moz-transform","webkit":"-webkit-transform","presto":"-o-transform","trident":"-ms-transform","status":"WD"},
+{"gecko":"-moz-transform-origin","webkit":"-webkit-transform-origin","presto":"-o-transform-origin","trident":"-ms-transform-origin","status":"WD"},
+{"gecko":"","webkit":"-webkit-transform-origin-x","presto":"","trident":"","status":"P"},
+{"gecko":"","webkit":"-webkit-transform-origin-y","presto":"","trident":"","status":"P"},
+{"gecko":"","webkit":"-webkit-transform-origin-z","presto":"","trident":"","status":"P"},
+{"gecko":"","webkit":"-webkit-transform-style","presto":"","trident":"","status":"WD"},
+{"gecko":"-moz-transition","webkit":"-webkit-transition","presto":"-o-transition","trident":"","status":"WD"},
+{"gecko":"-moz-transition-delay","webkit":"-webkit-transition-delay","presto":"-o-transition-delay","trident":"","status":"WD"},
+{"gecko":"-moz-transition-duration","webkit":"-webkit-transition-duration","presto":"-o-transition-duration","trident":"","status":"WD"},
+{"gecko":"-moz-transition-property","webkit":"-webkit-transition-property","presto":"-o-transition-property","trident":"","status":"WD"},
+{"gecko":"-moz-transition-timing-function","webkit":"-webkit-transition-timing-function","presto":"-o-transition-timing-function","trident":"","status":"WD"},
+{"gecko":"","webkit":"-webkit-user-drag","presto":"","trident":"","status":"P"},
+{"gecko":"-moz-user-focus","webkit":"","presto":"","trident":"","status":"P"},
+{"gecko":"-moz-user-input","webkit":"","presto":"","trident":"","status":"P"},
+{"gecko":"-moz-user-modify","webkit":"-webkit-user-modify","presto":"","trident":"","status":"P"},
+{"gecko":"-moz-user-select","webkit":"-webkit-user-select","presto":"","trident":"","status":"P"},
+{"gecko":"","webkit":"","presto":"-xv-voice-balance","trident":"","status":""},
+{"gecko":"","webkit":"","presto":"-xv-voice-duration","trident":"","status":""},
+{"gecko":"","webkit":"","presto":"-xv-voice-pitch","trident":"","status":""},
+{"gecko":"","webkit":"","presto":"-xv-voice-pitch-range","trident":"","status":""},
+{"gecko":"","webkit":"","presto":"-xv-voice-rate","trident":"","status":""},
+{"gecko":"","webkit":"","presto":"-xv-voice-stress","trident":"","status":""},
+{"gecko":"","webkit":"","presto":"-xv-voice-volume","trident":"","status":""},
+{"gecko":"-moz-window-shadow","webkit":"","presto":"","trident":"","status":"P"},
+{"gecko":"","webkit":"word-break","presto":"","trident":"-ms-word-break","status":"WD"},
+{"gecko":"","webkit":"-epub-word-break = word-break","presto":"","trident":"","status":""},
+{"gecko":"word-wrap","webkit":"word-wrap","presto":"word-wrap","trident":"-ms-word-wrap","status":"WD"},
+{"gecko":"","webkit":"-webkit-writing-mode","presto":"writing-mode","trident":"-ms-writing-mode","status":"ED"},
+{"gecko":"","webkit":"-epub-writing-mode = -webkit-writing-mode","presto":"","trident":"","status":""},
+{"gecko":"","webkit":"zoom","presto":"","trident":"-ms-zoom","status":""}]};
+
+const kCSS_PREFIXED_VALUE = [
+  {"gecko": "-moz-box", "webkit": "-moz-box", "presto": "", "trident": "", "generic": "box"}
+];
+
+var CssInspector = {
+
+  mVENDOR_PREFIXES: null,
+
+  kEXPORTS_FOR_GECKO:   true,
+  kEXPORTS_FOR_WEBKIT:  true,
+  kEXPORTS_FOR_PRESTO:  true,
+  kEXPORTS_FOR_TRIDENT: true,
+
+  cleanPrefixes: function()
+  {
+    this.mVENDOR_PREFIXES = null;
+  },
+
+  prefixesForProperty: function(aProperty)
+  {
+    if (!this.mVENDOR_PREFIXES) {
+
+      this.mVENDOR_PREFIXES = {};
+      for (var i = 0; i < kCSS_VENDOR_PREFIXES.properties.length; i++) {
+        var p = kCSS_VENDOR_PREFIXES.properties[i];
+        if (p.gecko && (p.webkit || p.presto || p.trident)) {
+          var o = {};
+          if (this.kEXPORTS_FOR_GECKO) o[p.gecko] = true;
+          if (this.kEXPORTS_FOR_WEBKIT && p.webkit)  o[p.webkit] = true;
+          if (this.kEXPORTS_FOR_PRESTO && p.presto)  o[p.presto] = true;
+          if (this.kEXPORTS_FOR_TRIDENT && p.trident) o[p.trident] = true;
+          this.mVENDOR_PREFIXES[p.gecko] = [];
+          for (var j in o)
+            this.mVENDOR_PREFIXES[p.gecko].push(j)
+        }
+      }
+    }
+    if (aProperty in this.mVENDOR_PREFIXES)
+      return this.mVENDOR_PREFIXES[aProperty].sort();
+    return null;
+  },
+
+  parseColorStop: function(parser, token)
+  {
+    var color = parser.parseColor(token);
+    var position = "";
+    if (!color)
+      return null;
+    token = parser.getToken(true, true);
+    if (token.isPercentage() ||
+        token.isDimensionOfUnit("cm") ||
+        token.isDimensionOfUnit("mm") ||
+        token.isDimensionOfUnit("in") ||
+        token.isDimensionOfUnit("pc") ||
+        token.isDimensionOfUnit("px") ||
+        token.isDimensionOfUnit("em") ||
+        token.isDimensionOfUnit("ex") ||
+        token.isDimensionOfUnit("pt")) {
+      position = token.value;
+      token = parser.getToken(true, true);
+    }
+    return { color: color, position: position }
+  },
+
+  parseGradient: function (parser, token)
+  {
+    var isRadial = false;
+    var gradient = { isRepeating: false };
+    if (token.isNotNull()) {
+      if (token.isFunction("-moz-linear-gradient(") ||
+          token.isFunction("-moz-radial-gradient(") ||
+          token.isFunction("-moz-repeating-linear-gradient(") ||
+          token.isFunction("-moz-repeating-radial-gradient(")) {
+        if (token.isFunction("-moz-radial-gradient(") ||
+            token.isFunction("-moz-repeating-radial-gradient(")) {
+          gradient.isRadial = true;
+        }
+        if (token.isFunction("-moz-repeating-linear-gradient(") ||
+            token.isFunction("-moz-repeating-radial-gradient(")) {
+          gradient.isRepeating = true;
+        }
+        
+
+        token = parser.getToken(true, true);
+        var haveGradientLine = false;
+        var foundHorizPosition = false;
+        var haveAngle = false;
+
+        if (token.isAngle()) {
+          gradient.angle = token.value;
+          haveGradientLine = true;
+          haveAngle = true;
+          token = parser.getToken(true, true);
+        }
+
+        if (token.isLength()
+            || token.isIdent("top")
+            || token.isIdent("center")
+            || token.isIdent("bottom")
+            || token.isIdent("left")
+            || token.isIdent("right")) {
+          haveGradientLine = true;
+          if (token.isLength()
+            || token.isIdent("left")
+            || token.isIdent("right")) {
+            foundHorizPosition = true;
+          }
+          gradient.position = token.value;
+          token = parser.getToken(true, true);
+        }
+
+        if (haveGradientLine) {
+          if (!haveAngle && token.isAngle()) { // we have an angle here
+            gradient.angle = token.value;
+            haveAngle = true;
+            token = parser.getToken(true, true);
+          }
+
+          else if (token.isLength()
+                  || (foundHorizPosition && (token.isIdent("top")
+                                             || token.isIdent("center")
+                                             || token.isIdent("bottom")))
+                  || (!foundHorizPosition && (token.isLength()
+                                              || token.isIdent("top")
+                                              || token.isIdent("center")
+                                              || token.isIdent("bottom")
+                                              || token.isIdent("left")
+                                              || token.isIdent("right")))) {
+            gradient.position = ("position" in gradient) ? gradient.position + " ": "";
+            gradient.position += token.value;
+            token = parser.getToken(true, true);
+          }
+
+          if (!haveAngle && token.isAngle()) { // we have an angle here
+            gradient.angle = token.value;
+            haveAngle = true;
+            token = parser.getToken(true, true);
+          }
+
+          // we must find a comma here
+          if (!token.isSymbol(","))
+            return null;
+          token = parser.getToken(true, true);
+        }
+
+        // ok... Let's deal with the rest now
+        if (gradient.isRadial) {
+          if (token.isIdent("circle") ||
+              token.isIdent("ellipse")) {
+            gradient.shape = token.value;
+            token = parser.getToken(true, true);
+          }
+          if (token.isIdent("closest-side") ||
+                   token.isIdent("closest-corner") ||
+                   token.isIdent("farthest-side") ||
+                   token.isIdent("farthest-corner") ||
+                   token.isIdent("contain") ||
+                   token.isIdent("cover")) {
+            gradient.size = token.value;
+            token = parser.getToken(true, true);
+          }
+          if (!("shape" in gradient) &&
+              (token.isIdent("circle") ||
+               token.isIdent("ellipse"))) {
+            // we can still have the second value...
+            gradient.shape = token.value;
+            token = parser.getToken(true, true);
+          }
+          if ((("shape" in gradient) || ("size" in gradient)) && !token.isSymbol(","))
+            return null;
+          else if (("shape" in gradient) || ("size" in gradient))
+            token = parser.getToken(true, true);
+        }
+
+        // now color stops...
+        var stop1 = this.parseColorStop(parser, token);
+        if (!stop1)
+          return null;
+        token = parser.currentToken();
+        if (!token.isSymbol(","))
+          return null;
+        token = parser.getToken(true, true);
+        var stop2 = this.parseColorStop(parser, token);
+        if (!stop2)
+          return null;
+        token = parser.currentToken();
+        if (token.isSymbol(",")) {
+          token = parser.getToken(true, true);
+        }
+        // ok we have at least two color stops
+        gradient.stops = [stop1, stop2];
+        while (!token.isSymbol(")")) {
+          var colorstop = this.parseColorStop(parser, token);
+          if (!colorstop)
+            return null;
+          token = parser.currentToken();
+          if (!token.isSymbol(")") && !token.isSymbol(","))
+            return null;
+          if (token.isSymbol(","))
+            token = parser.getToken(true, true);
+          gradient.stops.push(colorstop);
+        }
+        return gradient;
+      }
+    }
+    return null;
+  },
+
+  parseBoxShadows: function(aString)
+  {
+    var parser = new CSSParser();
+    parser._init();
+    parser.mPreserveWS       = false;
+    parser.mPreserveComments = false;
+    parser.mPreservedTokens = [];
+    parser.mScanner.init(aString);
+
+    var shadows = [];
+    var token = parser.getToken(true, true);
+    var color = "", blurRadius = "0px", offsetX = "0px", offsetY = "0px", spreadRadius = "0px";
+    var inset = false;
+    while (token.isNotNull()) {
+      if (token.isIdent("none")) {
+        shadows.push( { none: true } );
+        token = parser.getToken(true, true);
+      }
+      else {
+        if (token.isIdent('inset')) {
+          inset = true;
+          token = parser.getToken(true, true);
+        }
+
+        if (token.isPercentage() ||
+            token.isDimensionOfUnit("cm") ||
+            token.isDimensionOfUnit("mm") ||
+            token.isDimensionOfUnit("in") ||
+            token.isDimensionOfUnit("pc") ||
+            token.isDimensionOfUnit("px") ||
+            token.isDimensionOfUnit("em") ||
+            token.isDimensionOfUnit("ex") ||
+            token.isDimensionOfUnit("pt")) {
+          var offsetX = token.value;
+          token = parser.getToken(true, true);
+        }
+        else
+          return [];
+
+        if (!inset && token.isIdent('inset')) {
+          inset = true;
+          token = parser.getToken(true, true);
+        }
+
+        if (token.isPercentage() ||
+            token.isDimensionOfUnit("cm") ||
+            token.isDimensionOfUnit("mm") ||
+            token.isDimensionOfUnit("in") ||
+            token.isDimensionOfUnit("pc") ||
+            token.isDimensionOfUnit("px") ||
+            token.isDimensionOfUnit("em") ||
+            token.isDimensionOfUnit("ex") ||
+            token.isDimensionOfUnit("pt")) {
+          var offsetX = token.value;
+          token = parser.getToken(true, true);
+        }
+        else
+          return [];
+
+        if (!inset && token.isIdent('inset')) {
+          inset = true;
+          token = parser.getToken(true, true);
+        }
+
+        if (token.isPercentage() ||
+            token.isDimensionOfUnit("cm") ||
+            token.isDimensionOfUnit("mm") ||
+            token.isDimensionOfUnit("in") ||
+            token.isDimensionOfUnit("pc") ||
+            token.isDimensionOfUnit("px") ||
+            token.isDimensionOfUnit("em") ||
+            token.isDimensionOfUnit("ex") ||
+            token.isDimensionOfUnit("pt")) {
+          var blurRadius = token.value;
+          token = parser.getToken(true, true);
+        }
+
+        if (!inset && token.isIdent('inset')) {
+          inset = true;
+          token = parser.getToken(true, true);
+        }
+
+        if (token.isPercentage() ||
+            token.isDimensionOfUnit("cm") ||
+            token.isDimensionOfUnit("mm") ||
+            token.isDimensionOfUnit("in") ||
+            token.isDimensionOfUnit("pc") ||
+            token.isDimensionOfUnit("px") ||
+            token.isDimensionOfUnit("em") ||
+            token.isDimensionOfUnit("ex") ||
+            token.isDimensionOfUnit("pt")) {
+          var spreadRadius = token.value;
+          token = parser.getToken(true, true);
+        }
+
+        if (!inset && token.isIdent('inset')) {
+          inset = true;
+          token = parser.getToken(true, true);
+        }
+
+        if (token.isFunction("rgb(") ||
+            token.isFunction("rgba(") ||
+            token.isFunction("hsl(") ||
+            token.isFunction("hsla(") ||
+            token.isSymbol("#") ||
+            token.isIdent()) {
+          var color = parser.parseColor(token);
+          token = parser.getToken(true, true);
+        }
+
+        if (!inset && token.isIdent('inset')) {
+          inset = true;
+          token = parser.getToken(true, true);
+        }
+
+        shadows.push( { none: false,
+                        color: color,
+                        offsetX: offsetX, offsetY: offsetY,
+                        blurRadius: blurRadius,
+                        spreadRadius: spreadRadius } );
+
+        if (token.isSymbol(",")) {
+          inset = false;
+          color = "";
+          blurRadius = "0px";
+          spreadRadius = "0px"
+          offsetX = "0px";
+          offsetY = "0px"; 
+          token = parser.getToken(true, true);
+        }
+        else if (!token.isNotNull())
+          return shadows;
+        else
+          return [];
+      }
+    }
+    return shadows;
+  },
+
+  parseTextShadows: function(aString)
+  {
+    var parser = new CSSParser();
+    parser._init();
+    parser.mPreserveWS       = false;
+    parser.mPreserveComments = false;
+    parser.mPreservedTokens = [];
+    parser.mScanner.init(aString);
+
+    var shadows = [];
+    var token = parser.getToken(true, true);
+    var color = "", blurRadius = "0px", offsetX = "0px", offsetY = "0px"; 
+    while (token.isNotNull()) {
+      if (token.isIdent("none")) {
+        shadows.push( { none: true } );
+        token = parser.getToken(true, true);
+      }
+      else {
+        if (token.isFunction("rgb(") ||
+            token.isFunction("rgba(") ||
+            token.isFunction("hsl(") ||
+            token.isFunction("hsla(") ||
+            token.isSymbol("#") ||
+            token.isIdent()) {
+          var color = parser.parseColor(token);
+          token = parser.getToken(true, true);
+        }
+        if (token.isPercentage() ||
+            token.isDimensionOfUnit("cm") ||
+            token.isDimensionOfUnit("mm") ||
+            token.isDimensionOfUnit("in") ||
+            token.isDimensionOfUnit("pc") ||
+            token.isDimensionOfUnit("px") ||
+            token.isDimensionOfUnit("em") ||
+            token.isDimensionOfUnit("ex") ||
+            token.isDimensionOfUnit("pt")) {
+          var offsetX = token.value;
+          token = parser.getToken(true, true);
+        }
+        else
+          return [];
+        if (token.isPercentage() ||
+            token.isDimensionOfUnit("cm") ||
+            token.isDimensionOfUnit("mm") ||
+            token.isDimensionOfUnit("in") ||
+            token.isDimensionOfUnit("pc") ||
+            token.isDimensionOfUnit("px") ||
+            token.isDimensionOfUnit("em") ||
+            token.isDimensionOfUnit("ex") ||
+            token.isDimensionOfUnit("pt")) {
+          var offsetY = token.value;
+          token = parser.getToken(true, true);
+        }
+        else
+          return [];
+        if (token.isPercentage() ||
+            token.isDimensionOfUnit("cm") ||
+            token.isDimensionOfUnit("mm") ||
+            token.isDimensionOfUnit("in") ||
+            token.isDimensionOfUnit("pc") ||
+            token.isDimensionOfUnit("px") ||
+            token.isDimensionOfUnit("em") ||
+            token.isDimensionOfUnit("ex") ||
+            token.isDimensionOfUnit("pt")) {
+          var blurRadius = token.value;
+          token = parser.getToken(true, true);
+        }
+        if (!color &&
+            (token.isFunction("rgb(") ||
+             token.isFunction("rgba(") ||
+             token.isFunction("hsl(") ||
+             token.isFunction("hsla(") ||
+             token.isSymbol("#") ||
+             token.isIdent())) {
+          var color = parser.parseColor(token);
+          token = parser.getToken(true, true);
+        }
+
+        shadows.push( { none: false,
+                        color: color,
+                        offsetX: offsetX, offsetY: offsetY,
+                        blurRadius: blurRadius } );
+
+        if (token.isSymbol(",")) {
+          color = "";
+          blurRadius = "0px";
+          offsetX = "0px";
+          offsetY = "0px"; 
+          token = parser.getToken(true, true);
+        }
+        else if (!token.isNotNull())
+          return shadows;
+        else
+          return [];
+      }
+    }
+    return shadows;
+  },
+
+  parseBackgroundImages: function(aString)
+  {
+    var parser = new CSSParser();
+    parser._init();
+    parser.mPreserveWS       = false;
+    parser.mPreserveComments = false;
+    parser.mPreservedTokens = [];
+    parser.mScanner.init(aString);
+
+    var backgrounds = [];
+    var token = parser.getToken(true, true);
+    while (token.isNotNull()) {
+      /*if (token.isFunction("rgb(") ||
+          token.isFunction("rgba(") ||
+          token.isFunction("hsl(") ||
+          token.isFunction("hsla(") ||
+          token.isSymbol("#") ||
+          token.isIdent()) {
+        var color = parser.parseColor(token);
+        backgrounds.push( { type: "color", value: color });
+        token = parser.getToken(true, true);
+      }
+      else */
+      if (token.isFunction("url(")) {
+        token = parser.getToken(true, true);
+        var urlContent = parser.parseURL(token);
+        backgrounds.push( { type: "image", value: "url(" + urlContent });
+        token = parser.getToken(true, true);
+      }
+      else if (token.isFunction("-moz-linear-gradient(") ||
+               token.isFunction("-moz-radial-gradient(") ||
+               token.isFunction("-moz-repeating-linear-gradient(") ||
+               token.isFunction("-moz-repeating-radial-gradient(")) {
+        var gradient = this.parseGradient(parser, token);
+        backgrounds.push( { type: gradient.isRadial ? "radial-gradient" : "linear-gradient", value: gradient });
+        token = parser.getToken(true, true);
+      }
+      else
+        return null;
+      if (token.isSymbol(",")) {
+        token = parser.getToken(true, true);
+        if (!token.isNotNull())
+          return null;
+      }
+    }
+    return backgrounds;
+  },
+
+  serializeGradient: function(gradient)
+  {
+    var s = gradient.isRadial
+              ? (gradient.isRepeating ? "-moz-repeating-radial-gradient(" : "-moz-radial-gradient(" )
+              : (gradient.isRepeating ? "-moz-repeating-linear-gradient(" : "-moz-linear-gradient(" );
+    if (gradient.angle || gradient.position)
+      s += (gradient.angle ? gradient.angle + " ": "") +
+           (gradient.position ? gradient.position : "") +
+           ", ";
+    if (gradient.isRadial && (gradient.shape || gradient.size))
+      s += (gradient.shape ? gradient.shape : "") +
+           " " +
+           (gradient.size ? gradient.size : "") +
+           ", ";
+    for (var i = 0; i < gradient.stops.length; i++) {
+      var colorstop = gradient.stops[i];
+      s += colorstop.color + (colorstop.position ? " " + colorstop.position : "");
+      if (i != gradient.stops.length -1)
+        s += ", ";
+    }
+    s += ")";
+    return s;
+  },
+
+  parseBorderImage: function(aString)
+  {
+    var parser = new CSSParser();
+    parser._init();
+    parser.mPreserveWS       = false;
+    parser.mPreserveComments = false;
+    parser.mPreservedTokens = [];
+    parser.mScanner.init(aString);
+
+    var borderImage = {url: "", offsets: [], widths: [], sizes: []};
+    var token = parser.getToken(true, true);
+    if (token.isFunction("url(")) {
+      token = parser.getToken(true, true);
+      var urlContent = parser.parseURL(token);
+      if (urlContent) {
+        borderImage.url = urlContent.substr(0, urlContent.length - 1).trim();
+        if ((borderImage.url[0] == '"' && borderImage.url[borderImage.url.length - 1] == '"') ||
+             (borderImage.url[0] == "'" && borderImage.url[borderImage.url.length - 1] == "'"))
+        borderImage.url = borderImage.url.substr(1, borderImage.url.length - 2);
+      }
+      else
+        return null;
+    }
+    else
+      return null; 
+
+    token = parser.getToken(true, true);
+    if (token.isNumber() || token.isPercentage())
+      borderImage.offsets.push(token.value);
+    else
+      return null;
+    var i;
+    for (i= 0; i < 3; i++) {
+      token = parser.getToken(true, true);
+      if (token.isNumber() || token.isPercentage())
+        borderImage.offsets.push(token.value);
+      else
+        break;
+    }
+    if (i == 3)
+      token = parser.getToken(true, true);
+
+    if (token.isSymbol("/")) {
+      token = parser.getToken(true, true);
+      if (token.isDimension()
+          || token.isNumber("0")
+          || (token.isIdent() && token.value in parser.kBORDER_WIDTH_NAMES))
+        borderImage.widths.push(token.value);
+      else
+        return null;
+
+      for (var i = 0; i < 3; i++) {
+        token = parser.getToken(true, true);
+        if (token.isDimension()
+            || token.isNumber("0")
+            || (token.isIdent() && token.value in parser.kBORDER_WIDTH_NAMES))
+          borderImage.widths.push(token.value);
+        else
+          break;
+      }
+      if (i == 3)
+        token = parser.getToken(true, true);
+    }
+
+    for (var i = 0; i < 2; i++) {
+      if (token.isIdent("stretch")
+          || token.isIdent("repeat")
+          || token.isIdent("round"))
+        borderImage.sizes.push(token.value);
+      else if (!token.isNotNull())
+        return borderImage;
+      else
+        return null;
+      token = parser.getToken(true, true);
+    }
+    if (!token.isNotNull())
+      return borderImage;
+
+    return null;
+  },
+
+  parseMediaQuery: function(aString)
+  {
+    const kCONSTRAINTS = {
+      "width": true,
+      "min-width": true,
+      "max-width": true,
+      "height": true,
+      "min-height": true,
+      "max-height": true,
+      "device-width": true,
+      "min-device-width": true,
+      "max-device-width": true,
+      "device-height": true,
+      "min-device-height": true,
+      "max-device-height": true,
+      "orientation": true,
+      "aspect-ratio": true,
+      "min-aspect-ratio": true,
+      "max-aspect-ratio": true,
+      "device-aspect-ratio": true,
+      "min-device-aspect-ratio": true,
+      "max-device-aspect-ratio": true,
+      "color": true,
+      "min-color": true,
+      "max-color": true,
+      "color-index": true,
+      "min-color-index": true,
+      "max-color-index": true,
+      "monochrome": true,
+      "min-monochrome": true,
+      "max-monochrome": true,
+      "resolution": true,
+      "min-resolution": true,
+      "max-resolution": true,
+      "scan": true,
+      "grid": true
+    };
+    var parser = new CSSParser();
+    parser._init();
+    parser.mPreserveWS       = false;
+    parser.mPreserveComments = false;
+    parser.mPreservedTokens = [];
+    parser.mScanner.init(aString);
+
+    var m = {amplifier: "", medium: "", constraints: []};
+    var token = parser.getToken(true, true);
+
+    if (token.isIdent("all") ||
+        token.isIdent("aural") ||
+        token.isIdent("braille") ||
+        token.isIdent("handheld") ||
+        token.isIdent("print") ||
+        token.isIdent("projection") ||
+        token.isIdent("screen") ||
+        token.isIdent("tty") ||
+        token.isIdent("tv")) {
+       m.medium = token.value;
+       token = parser.getToken(true, true);
+    }
+    else if (token.isIdent("not") || token.isIdent("only")) {
+      m.amplifier = token.value;
+      token = parser.getToken(true, true);
+      if (token.isIdent("all") ||
+          token.isIdent("aural") ||
+          token.isIdent("braille") ||
+          token.isIdent("handheld") ||
+          token.isIdent("print") ||
+          token.isIdent("projection") ||
+          token.isIdent("screen") ||
+          token.isIdent("tty") ||
+          token.isIdent("tv")) {
+         m.medium = token.value;
+         token = parser.getToken(true, true);
+      }
+      else
+        return null;
+    }
+
+    if (m.medium) {
+      if (!token.isNotNull())
+        return m;
+      if (token.isIdent("and")) {
+        token = parser.getToken(true, true);
+      }
+      else
+        return null;
+    }
+
+    while (token.isSymbol("(")) {
+      token = parser.getToken(true, true);
+      if (token.isIdent() && (token.value in kCONSTRAINTS)) {
+        var constraint = token.value;
+        token = parser.getToken(true, true);
+        if (token.isSymbol(":")) {
+          token = parser.getToken(true, true);
+          var values = [];
+          while (!token.isSymbol(")")) {
+            values.push(token.value);
+            token = parser.getToken(true, true);
+          }
+          if (token.isSymbol(")")) {
+            m.constraints.push({constraint: constraint, value: values});
+            token = parser.getToken(true, true);
+            if (token.isNotNull()) {
+              if (token.isIdent("and")) {
+                token = parser.getToken(true, true);
+              }
+              else
+                return null;
+            }
+            else
+              return m;
+          }
+          else
+            return null;
+        }
+        else if (token.isSymbol(")")) {
+          m.constraints.push({constraint: constraint, value: null});
+          token = parser.getToken(true, true);
+          if (token.isNotNull()) {
+            if (token.isIdent("and")) {
+              token = parser.getToken(true, true);
+            }
+            else
+              return null;
+          }
+          else
+            return m;
+        }
+        else
+          return null;
+      }
+      else
+        return null;
+    }
+    return m;
+  }
+
+};
+
+
+/************************************************************/
+/************************** JSCSSP **************************/
+/************************************************************/
+
 var CSS_ESCAPE  = '\\';
 
 var IS_HEX_DIGIT  = 1;
@@ -108,7 +1151,6 @@ CSSScanner.prototype = {
   mString : "",
   mPos : 0,
   mPreservedPos : [],
-  mCurrentLine: 0,
 
   init: function(aString) {
     this.mString = aString;
@@ -118,6 +1160,11 @@ CSSScanner.prototype = {
 
   getCurrentPos: function() {
     return this.mPos;
+  },
+
+  getAlreadyScanned: function()
+  {
+    return this.mString.substr(0, this.mPos);
   },
 
   preserveState: function() {
@@ -228,8 +1275,8 @@ CSSScanner.prototype = {
     while (c != -1
            && (this.isIdent(c) || c == CSS_ESCAPE)) {
       if (c == CSS_ESCAPE)
-	      s += this.gatherEscape();
-	    else
+        s += this.gatherEscape();
+      else
         s += c;
       c = this.read();
     }
@@ -286,7 +1333,8 @@ CSSScanner.prototype = {
       else
         break;
     }
-    if (this.startsWithIdent(c, this.peek())) { // DIMENSION
+
+    if (c != -1 && this.startsWithIdent(c, this.peek())) { // DIMENSION
       var unit = this.gatherIdent(c);
       s += unit;
       return new jscsspToken(jscsspToken.DIMENSION_TYPE, s, unit);
@@ -399,7 +1447,6 @@ CSSScanner.prototype = {
 
     if (this.isWhiteSpace(c)) {
       var s = this.eatWhiteSpace(c);
-      this.mCurrentLine += countChar(s);
       
       return new jscsspToken(jscsspToken.WHITESPACE_TYPE, s);
     }
@@ -442,9 +1489,17 @@ function CSSParser(aString)
   this.mPreserveComments = true;
 
   this.mPreservedTokens = [];
+  
+  this.mError = null;
 }
 
 CSSParser.prototype = {
+
+  _init:function() {
+    this.mToken = null;
+    this.mLookAhead = null;
+  },
+
   kINHERIT: "inherit",
 
   kBORDER_WIDTH_NAMES: {
@@ -764,6 +1819,16 @@ CSSParser.prototype = {
     "parenthesised-lower-latin": true
   },
 
+  reportError: function(aMsg) {
+    this.mError = aMsg;
+  },
+
+  consumeError: function() {
+    var e = this.mError;
+    this.mError = null;
+    return e;
+  },
+
   currentToken: function() {
     return this.mToken;
   },
@@ -803,6 +1868,7 @@ CSSParser.prototype = {
   },
 
   addUnknownAtRule: function(aSheet, aString) {
+    var currentLine = CountLF(this.mScanner.getAlreadyScanned());
     var blocks = [];
     var token = this.getToken(false, false);
     while (token.isNotNull()) {
@@ -831,11 +1897,13 @@ CSSParser.prototype = {
       token = this.getToken(false, false);
     }
 
-    this.addUnknownRule(aSheet, aString);
+    this.addUnknownRule(aSheet, aString, currentLine);
   },
 
-  addUnknownRule: function(aSheet, aString) {
-    var rule = new jscsspErrorRule();
+  addUnknownRule: function(aSheet, aString, aCurrentLine) {
+    var errorMsg = this.consumeError();
+    var rule = new jscsspErrorRule(errorMsg);
+    rule.currentLine = aCurrentLine;
     rule.parsedCssText = aString;
     rule.parentStyleSheet = aSheet;
     aSheet.cssRules.push(rule);
@@ -858,15 +1926,15 @@ CSSParser.prototype = {
   parseCharsetRule: function(aToken, aSheet) {
     var s = aToken.value;
     var token = this.getToken(false, false);
+    s += token.value;
     if (token.isWhiteSpace(" ")) {
-      s += token.value;
       token = this.getToken(false, false);
+      s += token.value;
       if (token.isString()) {
-        s += token.value;
         var encoding = token.value;
         token = this.getToken(false, false);
+        s += token.value;
         if (token.isSymbol(";")) {
-          s += token.value;
           var rule = new jscsspCharsetRule();
           rule.encoding = encoding;
           rule.parsedCssText = s;
@@ -874,14 +1942,21 @@ CSSParser.prototype = {
           aSheet.cssRules.push(rule);
           return true;
         }
+        else
+          this.reportError(kCHARSET_RULE_MISSING_SEMICOLON);
       }
+      else
+        this.reportError(kCHARSET_RULE_CHARSET_IS_STRING);
     }
+    else
+      this.reportError(kCHARSET_RULE_MISSING_WS);
 
     this.addUnknownAtRule(aSheet, s);
     return false;
   },
 
   parseImportRule: function(aToken, aSheet) {
+    var currentLine = CountLF(this.mScanner.getAlreadyScanned());
     var s = aToken.value;
     this.preserveState();
     var token = this.getToken(true, true);
@@ -899,6 +1974,8 @@ CSSParser.prototype = {
         s += " " + href;
       }
     }
+    else
+      this.reportError(kIMPORT_RULE_MISSING_URL);
 
     if (href) {
       token = this.getToken(true, true);
@@ -916,11 +1993,16 @@ CSSParser.prototype = {
           break;
         token = this.getToken(true, true);
       }
+
+      if (!media.length) {
+        media.push("all");
+      }
   
-      if (token.isSymbol(";") && href && media.length) {
+      if (token.isSymbol(";")) {
         s += ";"
         this.forgetState();
         var rule = new jscsspImportRule();
+        rule.currentLine = currentLine;
         rule.parsedCssText = s;
         rule.href = href;
         rule.media = media;
@@ -929,12 +2011,14 @@ CSSParser.prototype = {
         return true;
       }
     }
+
     this.restoreState();
     this.addUnknownAtRule(aSheet, "@import");
     return false;
   },
 
   parseVariablesRule: function(token, aSheet) {
+    var currentLine = CountLF(this.mScanner.getAlreadyScanned());
     var s = token.value;
     var declarations = [];
     var valid = false;
@@ -991,6 +2075,7 @@ CSSParser.prototype = {
     if (valid) {
       this.forgetState();
       var rule = new jscsspVariablesRule();
+      rule.currentLine = currentLine;
       rule.parsedCssText = s;
       rule.declarations = declarations;
       rule.media = media;
@@ -1003,6 +2088,7 @@ CSSParser.prototype = {
   },
 
   parseNamespaceRule: function(aToken, aSheet) {
+    var currentLine = CountLF(this.mScanner.getAlreadyScanned());
     var s = aToken.value;
     var valid = false;
     this.preserveState();
@@ -1038,6 +2124,7 @@ CSSParser.prototype = {
           s += ";";
           this.forgetState();
           var rule = new jscsspNamespaceRule();
+          rule.currentLine = currentLine;
           rule.parsedCssText = s;
           rule.prefix = prefix;
           rule.url = url;
@@ -1054,6 +2141,7 @@ CSSParser.prototype = {
   },
 
   parseFontFaceRule: function(aToken, aSheet) {
+    var currentLine = CountLF(this.mScanner.getAlreadyScanned());
     var s = aToken.value;
     var valid = false;
     var descriptors = [];
@@ -1080,6 +2168,7 @@ CSSParser.prototype = {
     if (valid) {
       this.forgetState();
       var rule = new jscsspFontFaceRule();
+      rule.currentLine = currentLine;
       rule.parsedCssText = s;
       rule.descriptors = descriptors;
       rule.parentStyleSheet = aSheet;
@@ -1091,6 +2180,7 @@ CSSParser.prototype = {
   },
 
   parsePageRule: function(aToken, aSheet) {
+    var currentLine = CountLF(this.mScanner.getAlreadyScanned());
     var s = aToken.value;
     var valid = false;
     var declarations = [];
@@ -1119,7 +2209,7 @@ CSSParser.prototype = {
             valid = true;
             break;
           } else {
-            var d = this.parseDeclaration(token, declarations, true, false, aSheet);
+            var d = this.parseDeclaration(token, declarations, true, true, aSheet);
             s += ((d && declarations.length) ? " " : "") + d;
           }
           token = this.getToken(true, false);
@@ -1129,6 +2219,7 @@ CSSParser.prototype = {
     if (valid) {
       this.forgetState();
       var rule = new jscsspPageRule();
+      rule.currentLine = currentLine;
       rule.parsedCssText = s;
       rule.pageSelector = pageSelector;
       rule.declarations = declarations;
@@ -1206,17 +2297,17 @@ CSSParser.prototype = {
             return "";
         }
         else {
-	        var fn = token.value;
-	        token = this.getToken(false, true);
-	        var arg = this.parseFunctionArgument(token);
-	        if (arg) {
-	          valueText += fn + arg;
-	          var value = new jscsspVariable(kJscsspPRIMITIVE_VALUE, aSheet);
-	          value.value = fn + arg;
-	          values.push(value);
-	        }
-	        else
-	          return "";
+          var fn = token.value;
+          token = this.getToken(false, true);
+          var arg = this.parseFunctionArgument(token);
+          if (arg) {
+            valueText += fn + arg;
+            var value = new jscsspVariable(kJscsspPRIMITIVE_VALUE, aSheet);
+            value.value = fn + arg;
+            values.push(value);
+          }
+          else
+            return "";
         }
       }
       else if (token.isSymbol("#")) {
@@ -1755,11 +2846,11 @@ CSSParser.prototype = {
 
       else if (!bgColor && !bgRepeat && !bgAttachment && !bgImage && !bgPosition
                && token.isIdent(this.kINHERIT)) {
-		    bgColor = this.kINHERIT;
-		    bgRepeat = this.kINHERIT;
-		    bgAttachment = this.kINHERIT;
-		    bgImage = this.kINHERIT;
-		    bgPosition = this.kINHERIT;
+        bgColor = this.kINHERIT;
+        bgRepeat = this.kINHERIT;
+        bgAttachment = this.kINHERIT;
+        bgImage = this.kINHERIT;
+        bgPosition = this.kINHERIT;
       }
 
       else {
@@ -1811,6 +2902,18 @@ CSSParser.prototype = {
             else
               return "";
           }
+        }
+
+        else if (!bgImage &&
+                 (token.isFunction("-moz-linear-gradient(")
+                  || token.isFunction("-moz-radial-gradient(")
+                  || token.isFunction("-moz-repeating-linear-gradient(")
+                  || token.isFunction("-moz-repeating-radial-gradient("))) {
+          var gradient = CssInspector.parseGradient(this, token);
+          if (gradient)
+            bgImage = CssInspector.serializeGradient(gradient);
+          else
+            return "";
         }
 
         else {
@@ -1948,13 +3051,13 @@ CSSParser.prototype = {
                && !fSize && !fLineHeight && !fFamily
                && !fSystem
                && token.isIdent(this.kINHERIT)) {
-		    fStyle = this.kINHERIT;
-		    fVariant = this.kINHERIT;
-		    fWeight = this.kINHERIT;
-		    fSize = this.kINHERIT;
-		    fLineHeight = this.kINHERIT;
-		    fFamily = this.kINHERIT;
-		    fSystem = this.kINHERIT;
+        fStyle = this.kINHERIT;
+        fVariant = this.kINHERIT;
+        fWeight = this.kINHERIT;
+        fSize = this.kINHERIT;
+        fLineHeight = this.kINHERIT;
+        fFamily = this.kINHERIT;
+        fSystem = this.kINHERIT;
       }
 
       else {
@@ -2118,12 +3221,15 @@ CSSParser.prototype = {
     else
       while (true)
       {
-        if (!token.isNotNull())
+        if (!token.isNotNull()) {
+          this.reportError(kURL_EOF);
           return "";
+        }
         if (token.isWhiteSpace()) {
           nextToken = this.lookAhead(true, true);
           // if next token is not a closing parenthesis, that's an error
           if (!nextToken.isSymbol(")")) {
+            this.reportError(kURL_WS_INSIDE);
             token = this.currentToken();
             break;
           }
@@ -2136,16 +3242,6 @@ CSSParser.prototype = {
       }
 
     if (token.isSymbol(")")) {
-      var v = this.trim11(value);
-      if ((v[0] == "'" && v[v.length -1] == "'") ||
-          (v[0] == '"' && v[v.length -1] == '"'))
-        v = v.substring(1, v.length - 2)
-      var r = new RegExp("^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?", "");
-      var m = v.match(r)
-      if (m) {
-        if (m[5].match ( /[^a-z0-9\\-_\\.!~\\*'\\(\\)]/g ) )
-          return null;
-      }
       return value + ")";
     }
     return "";
@@ -2159,17 +3255,23 @@ CSSParser.prototype = {
       value += token.value;
       token = this.getToken(true, true);
     }
-    else
+    else {
+      var parenthesis = 1;
       while (true)
       {
         if (!token.isNotNull())
           return "";
+        if (token.isFunction() || token.isSymbol("("))
+          parenthesis++;
         if (token.isSymbol(")")) {
-          break;
+          parenthesis--;
+          if (!parenthesis)
+            break;
         }
         value += token.value;
         token = this.getToken(false, false);
       }
+    }
 
     if (token.isSymbol(")"))
       return value + ")";
@@ -2299,47 +3401,47 @@ CSSParser.prototype = {
         var value = "";
         var declarations = [];
         if (aExpandShorthands)
-	        switch (descriptor) {
-	          case "background":
-	            value = this.parseBackgroundShorthand(token, declarations, aAcceptPriority);
-	            break;
-	          case "margin":
-	          case "padding":
-	            value = this.parseMarginOrPaddingShorthand(token, declarations, aAcceptPriority, descriptor);
-	            break;
-	          case "border-color":
-	            value = this.parseBorderColorShorthand(token, declarations, aAcceptPriority);
-	            break;
-	          case "border-style":
-	            value = this.parseBorderStyleShorthand(token, declarations, aAcceptPriority);
-	            break;
-	          case "border-width":
-	            value = this.parseBorderWidthShorthand(token, declarations, aAcceptPriority);
-	            break;
-	          case "border-top":
-	          case "border-right":
-	          case "border-bottom":
-	          case "border-left":
-	          case "border":
-	          case "outline":
-	            value = this.parseBorderEdgeOrOutlineShorthand(token, declarations, aAcceptPriority, descriptor);
-	            break;
-	          case "cue":
-	            value = this.parseCueShorthand(token, declarations, aAcceptPriority);
-	            break;
-	          case "pause":
-	            value = this.parsePauseShorthand(token, declarations, aAcceptPriority);
-	            break;
-	          case "font":
-	            value = this.parseFontShorthand(token, declarations, aAcceptPriority);
-	            break;
-	          case "list-style":
-	            value = this.parseListStyleShorthand(token, declarations, aAcceptPriority);
-	            break;
-	          default:
-	            value = this.parseDefaultPropertyValue(token, declarations, aAcceptPriority, descriptor, aSheet);
-	            break;
-	        }
+          switch (descriptor) {
+            case "background":
+              value = this.parseBackgroundShorthand(token, declarations, aAcceptPriority);
+              break;
+            case "margin":
+            case "padding":
+              value = this.parseMarginOrPaddingShorthand(token, declarations, aAcceptPriority, descriptor);
+              break;
+            case "border-color":
+              value = this.parseBorderColorShorthand(token, declarations, aAcceptPriority);
+              break;
+            case "border-style":
+              value = this.parseBorderStyleShorthand(token, declarations, aAcceptPriority);
+              break;
+            case "border-width":
+              value = this.parseBorderWidthShorthand(token, declarations, aAcceptPriority);
+              break;
+            case "border-top":
+            case "border-right":
+            case "border-bottom":
+            case "border-left":
+            case "border":
+            case "outline":
+              value = this.parseBorderEdgeOrOutlineShorthand(token, declarations, aAcceptPriority, descriptor);
+              break;
+            case "cue":
+              value = this.parseCueShorthand(token, declarations, aAcceptPriority);
+              break;
+            case "pause":
+              value = this.parsePauseShorthand(token, declarations, aAcceptPriority);
+              break;
+            case "font":
+              value = this.parseFontShorthand(token, declarations, aAcceptPriority);
+              break;
+            case "list-style":
+              value = this.parseListStyleShorthand(token, declarations, aAcceptPriority);
+              break;
+            default:
+              value = this.parseDefaultPropertyValue(token, declarations, aAcceptPriority, descriptor, aSheet);
+              break;
+          }
         else
           value = this.parseDefaultPropertyValue(token, declarations, aAcceptPriority, descriptor, aSheet);
         token = this.currentToken();
@@ -2413,9 +3515,11 @@ CSSParser.prototype = {
   },
 
   parseMediaRule: function(aToken, aSheet) {
+    var currentLine = CountLF(this.mScanner.getAlreadyScanned());
     var s = aToken.value;
     var valid = false;
     var mediaRule = new jscsspMediaRule();
+    mediaRule.currentLine = currentLine;
     this.preserveState();
     var token = this.getToken(true, true);
     var foundMedia = false;
@@ -2489,14 +3593,14 @@ CSSParser.prototype = {
 
   parseStyleRule: function(aToken, aOwner, aIsInsideMediaRule)
   {
-    var currentLine = this.mScanner.mCurrentLine;
+    var currentLine = CountLF(this.mScanner.getAlreadyScanned());
     this.preserveState();
     // first let's see if we have a selector here...
     var selector = this.parseSelector(aToken, false);
     var valid = false;
     var declarations = [];
     if (selector) {
-      selector = this.trim11(selector);
+      selector = this.trim11(selector.selector);
       var s = selector;
       var token = this.getToken(true, true);
       if (token.isSymbol("{")) {
@@ -2512,7 +3616,7 @@ CSSParser.prototype = {
             valid = true;
             break;
           } else {
-            var d = this.parseDeclaration(token, declarations, true, false, aOwner);
+            var d = this.parseDeclaration(token, declarations, true, true, aOwner);
             s += ((d && declarations.length) ? " " : "") + d;
           }
           token = this.getToken(true, false);
@@ -2544,6 +3648,7 @@ CSSParser.prototype = {
 
   parseSelector: function(aToken, aParseSelectorOnly) {
     var s = "";
+    var specificity = {a: 0, b: 0, c: 0, d: 0}; // CSS 2.1 section 6.4.3
     var isFirstInChain = true;
     var token = aToken;
     var valid = false;
@@ -2551,7 +3656,7 @@ CSSParser.prototype = {
     while (true) {
       if (!token.isNotNull()) {
         if (aParseSelectorOnly)
-          return s;
+          return {selector: s, specificity: specificity };
         return "";
       }
 
@@ -2562,7 +3667,7 @@ CSSParser.prototype = {
         break;
       }
 
-      if (token.isSymbol(",")) {
+      if (token.isSymbol(",")) { // group of selectors
         s += token.value;
         isFirstInChain = true;
         combinatorFound = false;
@@ -2571,10 +3676,10 @@ CSSParser.prototype = {
       }
       // now combinators and grouping...
       else if (!combinatorFound
-          && (token.isWhiteSpace()
-              || token.isSymbol(">")
-              || token.isSymbol("+")
-              || token.isSymbol("~"))) {
+                && (token.isWhiteSpace()
+                    || token.isSymbol(">")
+                    || token.isSymbol("+")
+                    || token.isSymbol("~"))) {
         if (token.isWhiteSpace())
           s += " ";
         else
@@ -2590,23 +3695,43 @@ CSSParser.prototype = {
         var simpleSelector = this.parseSimpleSelector(token, isFirstInChain, true);
         if (!simpleSelector)
           break; // error
-        s += simpleSelector;
+        s += simpleSelector.selector;
+        specificity.b += simpleSelector.specificity.b;
+        specificity.c += simpleSelector.specificity.c;
+        specificity.d += simpleSelector.specificity.d;
       }
 
-      isFirstInChain == false;
+      isFirstInChain = false;
       combinatorFound = false;
       token = this.getToken(false, true);
     }
 
     if (valid) {
-      return s;
+      return {selector: s, specificity: specificity };
     }
     return "";
+  },
+
+  isPseudoElement: function(aIdent)
+  {
+    switch (aIdent) {
+      case "first-letter":
+      case "first-line":
+      case "before":
+      case "after":
+      case "marker":
+        return true;
+        break;
+      default: return false;
+        break;
+    }
   },
 
   parseSimpleSelector: function(token, isFirstInChain, canNegate)
   {
     var s = "";
+    var specificity = {a: 0, b: 0, c: 0, d: 0}; // CSS 2.1 section 6.4.3
+    
     if (isFirstInChain
         && (token.isSymbol("*") || token.isSymbol("|") || token.isIdent())) {
       // type or universal selector
@@ -2614,6 +3739,7 @@ CSSParser.prototype = {
         // we don't know yet if it's a prefix or a universal
         // selector
         s += token.value;
+        var isIdent = token.isIdent();
         token = this.getToken(false, true);
         if (token.isSymbol("|")) {
           // it's a prefix
@@ -2623,16 +3749,23 @@ CSSParser.prototype = {
             // ok we now have a type element or universal
             // selector
             s += token.value;
+            if (token.isIdent())
+              specificity.d++;
           } else
             // oops that's an error...
             return null;
-        } else
+        } else {
           this.ungetToken();
+          if (isIdent)
+            specificity.d++;
+        }
       } else if (token.isSymbol("|")) {
         s += token.value;
         token = this.getToken(false, true);
         if (token.isIdent() || token.isSymbol("*")) {
           s += token.value;
+          if (token.isIdent())
+            specificity.d++;
         } else
           // oops that's an error
           return null;
@@ -2640,10 +3773,16 @@ CSSParser.prototype = {
     }
   
     else if (token.isSymbol(".") || token.isSymbol("#")) {
+      var isClass = token.isSymbol(".");
       s += token.value;
       token = this.getToken(false, true);
-      if (token.isIdent())
-        s += token.value
+      if (token.isIdent()) {
+        s += token.value;
+        if (isClass)
+          specificity.c++;
+        else
+          specificity.b++;
+      }
       else
         return null;
     }
@@ -2655,8 +3794,13 @@ CSSParser.prototype = {
         s += token.value;
         token = this.getToken(false, true);
       }
-      if (token.isIdent())
-        s += token.value
+      if (token.isIdent()) {
+        s += token.value;
+        if (this.isPseudoElement(token.value))
+          specificity.d++;
+        else
+          specificity.c++;
+      }
       else if (token.isFunction()) {
         s += token.value;
         if (token.isFunction(":not(")) {
@@ -2667,15 +3811,16 @@ CSSParser.prototype = {
           if (!simpleSelector)
             return null;
           else {
-            s += simpleSelector;
+            s += simpleSelector.selector;
             token = this.getToken(true, true);
             if (token.isSymbol(")"))
               s += ")";
             else
               return null;
           }
+          specificity.c++;
         }
-        else
+        else {
           while (true) {
             token = this.getToken(false, true);
             if (token.isSymbol(")")) {
@@ -2684,6 +3829,8 @@ CSSParser.prototype = {
             } else
               s += token.value;
           }
+          specificity.c++;
+        }
       } else
         return null;
   
@@ -2722,23 +3869,28 @@ CSSParser.prototype = {
           || token.isContainsmatch()
           || token.isSymbol("=")) {
         s += token.value;
-	      token = this.getToken(true, true);
-	      if (token.isString() || token.isIdent()) {
-	        s += token.value;
-	        token = this.getToken(true, true);
-	      }
-	      else
-	        return null;
-	  
-	      if (token.isSymbol("]"))
-	        s += token.value;
-	      else
-	        return null;
+        token = this.getToken(true, true);
+        if (token.isString() || token.isIdent()) {
+          s += token.value;
+          token = this.getToken(true, true);
+        }
+        else
+          return null;
+    
+        if (token.isSymbol("]")) {
+          s += token.value;
+          specificity.c++;
+        }
+        else
+          return null;
       }
-      else if (token.isSymbol("]"))
+      else if (token.isSymbol("]")) {
         s += token.value;
+        specificity.c++;
+      }
       else
         return null;
+        
     }
     else if (token.isWhiteSpace()) {
       var t = this.lookAhead(true, true);
@@ -2746,7 +3898,7 @@ CSSParser.prototype = {
         return ""
     }
     if (s)
-      return s;
+      return {selector: s, specificity: specificity };
     return null;
   },
 
@@ -2810,25 +3962,30 @@ CSSParser.prototype = {
         if (token.isAtRule("@variables")) {
           if (!foundImportRules && !foundStyleRules)
             this.parseVariablesRule(token, sheet);
-          else
+          else {
+            this.reportError(kVARIABLES_RULE_POSITION);
             this.addUnknownAtRule(sheet, token.value);
+          }
         }
         else if (token.isAtRule("@import")) {
           // @import rules MUST occur before all style and namespace
           // rules
           if (!foundStyleRules && !foundNameSpaceRules)
             foundImportRules = this.parseImportRule(token, sheet);
-          else
+          else {
+            this.reportError(kIMPORT_RULE_POSITION);
             this.addUnknownAtRule(sheet, token.value);
+          }
         }
         else if (token.isAtRule("@namespace")) {
           // @namespace rules MUST occur before all style rule and
           // after all @import rules
           if (!foundStyleRules)
-            foundNameSpaceRules = this.parseNamespaceRule(token,
-                sheet);
-          else
+            foundNameSpaceRules = this.parseNamespaceRule(token, sheet);
+          else {
+            this.reportError(kNAMESPACE_RULE_POSITION);
             this.addUnknownAtRule(sheet, token.value);
+          }
         }
         else if (token.isAtRule("@font-face")) {
           if (this.parseFontFaceRule(token, sheet))
@@ -2848,8 +4005,14 @@ CSSParser.prototype = {
           else
             this.addUnknownAtRule(sheet, token.value);
         }
-        else
+        else if (token.isAtRule("@charset")) {
+          this.reportError(kCHARSET_RULE_CHARSET_SOF);
           this.addUnknownAtRule(sheet, token.value);
+        }
+        else {
+          this.reportError(kUNKNOWN_AT_RULE);
+          this.addUnknownAtRule(sheet, token.value);
+        }
       }
 
       else // plain style rules
@@ -2993,6 +4156,26 @@ jscsspToken.prototype = {
   isDimensionOfUnit: function(aUnit)
   {
     return (this.isDimension() && this.unit == aUnit);
+  },
+
+  isLength: function()
+  {
+    return (this.isPercentage() ||
+            this.isDimensionOfUnit("cm") ||
+            this.isDimensionOfUnit("mm") ||
+            this.isDimensionOfUnit("in") ||
+            this.isDimensionOfUnit("pc") ||
+            this.isDimensionOfUnit("px") ||
+            this.isDimensionOfUnit("em") ||
+            this.isDimensionOfUnit("ex") ||
+            this.isDimensionOfUnit("pt"));
+  },
+
+  isAngle: function()
+  {
+    return (this.isDimensionOfUnit("deg") ||
+            this.isDimensionOfUnit("rad") ||
+            this.isDimensionOfUnit("grad"));
   }
 }
 
@@ -3025,7 +4208,6 @@ jscsspStylesheet.prototype = {
      this.cssRules.splice(aIndex, 1, aRule);
     }
     catch(e) {
-      dump("DOMException: jscsspStylesheet.insertRule\n")
     }
   },
 
@@ -3034,7 +4216,6 @@ jscsspStylesheet.prototype = {
       this.cssRules.splice(aIndex);
     }
     catch(e) {
-      dump("DOMException: jscsspStylesheet.insertRule\n")
     }
   },
 
@@ -3043,13 +4224,6 @@ jscsspStylesheet.prototype = {
     for (var i = 0; i < this.cssRules.length; i++)
       rv += this.cssRules[i].cssText() + "\n";
     return rv;
-  },
-
-  htmlText: function() {
-    var rv = "";
-    for (var i = 0; i < this.cssRules.length; i++)
-      rv += this.cssRules[i].htmlText() + "<br>";
-    return rv;    
   },
 
   resolveVariables: function(aMedium) {
@@ -3097,11 +4271,6 @@ jscsspCharsetRule.prototype = {
     return "@charset " + this.encoding + ";";
   },
 
-  htmlText: function() {
-    return "<span class='atrule'>@charset</span>&nbsp;<span class='string'>"
-           + this.encoding + "</span>;"; 
-  },
-
   setCssText: function(val) {
     var sheet = {cssRules: []};
     var parser = new CSSParser(val);
@@ -3120,8 +4289,9 @@ jscsspCharsetRule.prototype = {
 
 /* kJscsspUNKNOWN_RULE */
 
-function jscsspErrorRule()
+function jscsspErrorRule(aErrorMsg)
 {
+  this.error = aErrorMsg ? aErrorMsg : "INVALID"; 
   this.type = kJscsspUNKNOWN_RULE;
   this.parsedCssText = null;
   this.parentStyleSheet = null;
@@ -3131,10 +4301,6 @@ function jscsspErrorRule()
 jscsspErrorRule.prototype = {
   cssText: function() {
     return this.parsedCssText;
-  },
-
-  htmlText: function() {
-    return "<span class='error'>" + this.parsedCssText + "</span>";
   }
 };
 
@@ -3151,10 +4317,6 @@ function jscsspComment()
 jscsspComment.prototype = {
   cssText: function() {
     return this.parsedCssText;
-  },
-
-  htmlText: function() {
-    return "<span class='comment'>" + this.parsedCssText + "</span>";
   },
 
   setCssText: function(val) {
@@ -3180,12 +4342,7 @@ function jscsspWhitespace()
 jscsspWhitespace.prototype = {
   cssText: function() {
     return this.parsedCssText;
-  },
-
-  htmlText: function() {
-    return this.cssText().replace( / /g , "&nbsp;")
-                         .replace( /\n/g , "<br>");
-  },
+  }
 };
 
 /* kJscsspIMPORT_RULE */
@@ -3203,19 +4360,9 @@ function jscsspImportRule()
 jscsspImportRule.prototype = {
   cssText: function() {
     var mediaString = this.media.join(", ");
-    return "@import " + (mediaString ? mediaString + " " : "")
-                      + this.href
+    return "@import " + this.href
+                      + ((mediaString && mediaString != "all") ? mediaString + " " : "")
                       + ";";
-  },
-
-  htmlText: function() {
-    var mediaString = "";
-    if (this.media.length)
-	    mediaString = "<span class='medium'>" + this.media.join("</span>, <span class='medium'>")
-	                  + "</span>";
-    return "<span class='atrule'>@import</span> " + (mediaString ? mediaString + " " : "")
-           + "<span class='url'>" + this.href + "</span>"
-           + ";";
   },
 
   setCssText: function(val) {
@@ -3254,12 +4401,6 @@ jscsspNamespaceRule.prototype = {
                         + ";";
   },
 
-  htmlText: function() {
-    return "<span class='atrule'>@namespace</span> " + (this.prefix ? this.prefix + " ": "")
-                        + "<span class='url'>" + this.url + "</span>"
-                        + ";";    
-  },
-
   setCssText: function(val) {
     var sheet = {cssRules: []};
     var parser = new CSSParser(val);
@@ -3295,36 +4436,116 @@ jscsspDeclaration.prototype = {
   kCOMMA_SEPARATED: {
     "cursor": true,
     "font-family": true,
-    "voice-family": true
+    "voice-family": true,
+    "background-image": true
   },
 
-  htmlText: function() {
-    var rv = "<span class='property'>" + this.property + "</span>: ";
-    var separator = (this.property in this.kCOMMA_SEPARATED) ? ", " : " ";
-    for (var i = 0; i < this.values.length; i++)
-      if (this.values[i].cssText() != null)
-        rv += (i ? separator : "") + "<span class='value'>" + this.values[i].cssText() + "</span>";
-      else
-        return null;
-    return rv + (this.priority ? " <span class='bang'>!important</span>" : "") + ";";
+  kUNMODIFIED_COMMA_SEPARATED_PROPERTIES: {
+    "text-shadow": true,
+    "box-shadow": true,
+    "-moz-transition": true,
+    "-moz-transition-property": true,
+    "-moz-transition-duration": true,
+    "-moz-transition-timing-function": true,
+    "-moz-transition-delay": true
   },
 
   cssText: function() {
+    var prefixes = CssInspector.prefixesForProperty(this.property);
+
+    if (this.property in this.kUNMODIFIED_COMMA_SEPARATED_PROPERTIES) {
+      if (prefixes) {
+        var rv = "";
+        for (var propertyIndex = 0; propertyIndex < prefixes.length; propertyIndex++) {
+          var property = prefixes[propertyIndex];
+          rv += (propertyIndex ? gTABS : "") + property + ": ";
+          rv += this.valueText + (this.priority ? " !important" : "") + ";";
+          rv += ((prefixes.length > 1 && propertyIndex != prefixes.length -1) ? "\n" : "");
+        }
+        return rv;
+      }
+      return this.property + ": " + this.valueText +
+             (this.priority ? " !important" : "") + ";"
+    }
+
+    if (prefixes) {
+      var rv = "";
+      for (var propertyIndex = 0; propertyIndex < prefixes.length; propertyIndex++) {
+        var property = prefixes[propertyIndex];
+        rv += (propertyIndex ? gTABS : "") + property + ": ";
+        var separator = (property in this.kCOMMA_SEPARATED) ? ", " : " ";
+        for (var i = 0; i < this.values.length; i++)
+          if (this.values[i].cssText() != null)
+            rv += (i ? separator : "") + this.values[i].cssText();
+          else
+            return null;
+        rv += (this.priority ? " !important" : "") + ";" +
+              ((prefixes.length > 1 && propertyIndex != prefixes.length -1) ? "\n" : "");
+      }
+      return rv;
+    }
+
     var rv = this.property + ": ";
     var separator = (this.property in this.kCOMMA_SEPARATED) ? ", " : " ";
-    for (var i = 0; i < this.values.length; i++)
-      if (this.values[i].cssText() != null)
-        rv += (i ? separator : "") + this.values[i].cssText();
+    var extras = {"webkit": false, "presto": false, "trident": false, "generic": false }
+    for (var i = 0; i < this.values.length; i++) {
+      var v = this.values[i].cssText();
+      if (v != null) {
+        var paren = v.indexOf("(");
+        var kwd = v;
+        if (paren != -1)
+          kwd = v.substr(0, paren);
+        if (kwd in kCSS_VENDOR_VALUES) {
+          for (var j in kCSS_VENDOR_VALUES[kwd]) {
+            extras[j] = extras[j] || (kCSS_VENDOR_VALUES[kwd][j] != "");
+          }
+        }
+        rv += (i ? separator : "") + v;
+      }
       else
         return null;
-    return rv + (this.priority ? " !important" : "") + ";";
+    }
+    rv += (this.priority ? " !important" : "") + ";";
+
+    for (var j in extras) {
+      if (extras[j]) {
+        var str = "\n" + gTABS +  this.property + ": ";
+        for (var i = 0; i < this.values.length; i++) {
+          var v = this.values[i].cssText();
+          if (v != null) {
+            var paren = v.indexOf("(");
+            var kwd = v;
+            if (paren != -1)
+              kwd = v.substr(0, paren);
+            if (kwd in kCSS_VENDOR_VALUES) {
+              functor = kCSS_VENDOR_VALUES[kwd][j];
+              if (functor) {
+                v = (typeof functor == "string") ? functor : functor(v, j);
+                if (!v) {
+                  str = null;
+                  break;
+                }
+              }
+            }
+            str += (i ? separator : "") + v;
+          }
+          else
+            return null;
+        }
+        if (str)
+          rv += str + ";"
+        else
+          rv += "\n" + gTABS + "/* Impossible to translate property " + this.property + " for " + j + " */";
+      }
+    }
+    return rv;
   },
 
   setCssText: function(val) {
     var declarations = [];
     var parser = new CSSParser(val);
     var token = parser.getToken(true, true);
-    if (parser.parseDeclaration(token, declarations, true, false, null)
+    if (parser.parseDeclaration(token, declarations, true, true, null)
         && declarations.length
         && declarations[0].type == kJscsspSTYLE_DECLARATION) {
       var newDecl = declarations.cssRules[0];
@@ -3356,16 +4577,6 @@ jscsspFontFaceRule.prototype = {
     gTABS += "  ";
     for (var i = 0; i < this.descriptors.length; i++)
       rv += gTABS + this.descriptors[i].cssText() + "\n";
-    gTABS = preservedGTABS;
-    return rv + gTABS + "}";
-  },
-
-  htmlText: function() {
-    var rv = gTABS + "<span class='atrule'>@font-face</span> {<br>";
-    var preservedGTABS = gTABS;
-    gTABS += "&nbsp;&nbsp;";
-    for (var i = 0; i < this.descriptors.length; i++)
-      rv += gTABS + this.descriptors[i].htmlText() + "<br>";
     gTABS = preservedGTABS;
     return rv + gTABS + "}";
   },
@@ -3405,20 +4616,6 @@ jscsspMediaRule.prototype = {
     gTABS += "  ";
     for (var i = 0; i < this.cssRules.length; i++)
       rv += gTABS + this.cssRules[i].cssText() + "\n";
-    gTABS = preservedGTABS;
-    return rv + gTABS + "}";
-  },
-
-  htmlText: function() {
-    var mediaString = "";
-    if (this.media.length)
-      mediaString = "<span class='medium'>" + this.media.join("</span>, <span class='medium'>")
-                    + "</span>";
-    var rv = gTABS + "<span class='atrule'>@media</span> " + mediaString + " {<br>";
-    var preservedGTABS = gTABS;
-    gTABS += "&nbsp;&nbsp;";
-    for (var i = 0; i < this.cssRules.length; i++)
-      rv += gTABS + this.cssRules[i].htmlText() + "<br>";
     gTABS = preservedGTABS;
     return rv + gTABS + "}";
   },
@@ -3466,19 +4663,6 @@ jscsspStyleRule.prototype = {
     return rv + gTABS + "}";
   },
 
-  htmlText: function() {
-    var rv = "<span class='selector'>" + this.mSelectorText + "</span> {<br>";
-    var preservedGTABS = gTABS;
-    gTABS += "&nbsp;&nbsp;";
-    for (var i = 0; i < this.declarations.length; i++) {
-      var declText = this.declarations[i].htmlText();
-      if (declText)
-        rv += gTABS + this.declarations[i].htmlText() + "<br>";
-    }
-    gTABS = preservedGTABS;
-    return rv + gTABS + "}";
-  },
-
   setCssText: function(val) {
     var sheet = {cssRules: []};
     var parser = new CSSParser(val);
@@ -3505,7 +4689,7 @@ jscsspStyleRule.prototype = {
     if (!token.isNotNull()) {
       var s = parser.parseSelector(token, true);
       if (s) {
-        this.mSelectorText = s;
+        this.mSelectorText = s.selector;
         return;
       }
     }
@@ -3534,18 +4718,6 @@ jscsspPageRule.prototype = {
     gTABS += "  ";
     for (var i = 0; i < this.declarations.length; i++)
       rv += gTABS + this.declarations[i].cssText() + "\n";
-    gTABS = preservedGTABS;
-    return rv + gTABS + "}";
-  },
-
-  htmlText: function() {
-    var rv = gTABS + "<span class='atrule'>@page</span> "
-                   + (this.pageSelector ? "<span class='selector'>" + this.pageSelector + "</span> " : "")
-                   + "{<br>";
-    var preservedGTABS = gTABS;
-    gTABS += "&nbsp;&nbsp;";
-    for (var i = 0; i < this.declarations.length; i++)
-      rv += gTABS + this.declarations[i].htmlText() + "<br>";
     gTABS = preservedGTABS;
     return rv + gTABS + "}";
   },
@@ -3588,22 +4760,6 @@ jscsspVariablesRule.prototype = {
     gTABS += "  ";
     for (var i = 0; i < this.declarations.length; i++)
       rv += gTABS + this.declarations[i].cssText() + "\n";
-    gTABS = preservedGTABS;
-    return rv + gTABS + "}";
-  },
-
- htmlText: function() {
-    var mediaString = "";
-    if (this.media.length)
-      mediaString = "<span class='medium'>" + this.media.join("</span>, <span class='medium'>")
-                    + "</span>";
-    var rv = gTABS + "<span class='atrule'>@variables</span> " +
-                     (mediaString ? mediaString + " " : "") +
-                     "{<br>";
-    var preservedGTABS = gTABS;
-    gTABS += "&nbsp;&nbsp;";
-    for (var i = 0; i < this.declarations.length; i++)
-      rv += gTABS + this.declarations[i].htmlText() + "<br>";
     gTABS = preservedGTABS;
     return rv + gTABS + "}";
   },
@@ -3790,11 +4946,212 @@ function ParseException(description) {
     this.description = description;
 }
 
-function countChar(s){
-	var nChar = s.match(/[^\r\n]/g);
-	var nCRLF = s.match(/\r\n/g);
-	if (nChar != null){nChar = nChar.length}else{nChar = 0}
-	if (nCRLF != null){nCRLF = nCRLF.length}else{nCRLF = 0}
-	var nChar = nChar+nCRLF;
-	return nChar;
+function CountLF(s)
+{
+  var nCR = s.match( /\n/g );
+  return nCR ? nCR.length + 1 : 1;
+}
+
+
+function FilterLinearGradientForOutput(aValue, aEngine)
+{
+  if (aEngine == "generic")
+    return aValue.substr(5);
+
+  if (aEngine == "webkit")
+    return aValue.replace( /\-moz\-/g , "-webkit-")
+
+  if (aEngine != "webkit20110101")
+    return "";
+
+  var g = CssInspector.parseBackgroundImages(aValue)[0];
+
+  var cancelled = false;
+  var str = "-webkit-gradient(linear, ";
+  var position = ("position" in g.value) ? g.value.position.toLowerCase() : "";
+  var angle    = ("angle" in g.value) ? g.value.angle.toLowerCase() : "";
+  // normalize angle
+  if (angle) {
+    var match = angle.match(/^([0-9\-\.\\+]+)([a-z]*)/);
+    var angle = parseFloat(match[1]);
+    var unit  = match[2];
+    switch (unit) {
+      case "grad": angle = angle * 90 / 100; break;
+      case "rad":  angle = angle * 180 / Math.PI; break;
+      default: break;
+    }
+    while (angle < 0)
+      angle += 360;
+    while (angle >= 360)
+      angle -= 360;
+  }
+  // get startpoint w/o keywords
+  var startpoint = [];
+  var endpoint = [];
+  if (position != "") {
+    if (position == "center")
+      position = "center center";
+    startpoint = position.split(" ");
+    if (angle == "" && angle != 0) {
+      // no angle, then we just turn the point 180 degrees around center
+      switch (startpoint[0]) {
+        case "left":   endpoint.push("right"); break;
+        case "center": endpoint.push("center"); break;
+        case "right":  endpoint.push("left"); break;
+        default: {
+            var match = startpoint[0].match(/^([0-9\-\.\\+]+)([a-z]*)/);
+            var v     = parseFloat(match[0]);
+            var unit  = match[1];
+            if (unit == "%") {
+              endpoint.push((100-v) + "%");
+            }
+            else
+              cancelled = true;
+          }
+          break;
+      }
+      if (!cancelled)
+        switch (startpoint[1]) {
+          case "top":    endpoint.push("bottom"); break;
+          case "center": endpoint.push("center"); break;
+          case "bottom": endpoint.push("top"); break;
+          default: {
+              var match = startpoint[1].match(/^([0-9\-\.\\+]+)([a-z]*)/);
+              var v     = parseFloat(match[0]);
+              var unit  = match[1];
+              if (unit == "%") {
+                endpoint.push((100-v) + "%");
+              }
+              else
+                cancelled = true;
+            }
+            break;
+        }
+    }
+    else {
+      switch (angle) {
+        case 0:    endpoint.push("right"); endpoint.push(startpoint[1]); break;
+        case 90:   endpoint.push(startpoint[0]); endpoint.push("top"); break;
+        case 180:  endpoint.push("left"); endpoint.push(startpoint[1]); break;
+        case 270:  endpoint.push(startpoint[0]); endpoint.push("bottom"); break;
+        default:     cancelled = true; break;
+      }
+    }
+  }
+  else {
+    // no position defined, we accept only vertical and horizontal
+    if (angle == "")
+      angle = 270;
+    switch (angle) {
+      case 0:    startpoint= ["left", "center"];   endpoint = ["right", "center"]; break;
+      case 90:   startpoint= ["center", "bottom"]; endpoint = ["center", "top"]; break;
+      case 180:  startpoint= ["right", "center"];  endpoint = ["left", "center"]; break;
+      case 270:  startpoint= ["center", "top"];    endpoint = ["center", "bottom"]; break;
+      default:     cancelled = true; break;
+    }
+  }
+
+  if (cancelled)
+    return "";
+
+  str += startpoint.join(" ") + ", " + endpoint.join(" ");
+  if (!g.value.stops[0].position)
+    g.value.stops[0].position = "0%";
+  if (!g.value.stops[g.value.stops.length-1].position)
+    g.value.stops[g.value.stops.length-1].position = "100%";
+  var current = 0;
+  for (var i = 0; i < g.value.stops.length && !cancelled; i++) {
+    var s = g.value.stops[i];
+    if (s.position) {
+      if (s.position.indexOf("%") == -1) {
+        cancelled = true;
+        break;
+      }
+    }
+    else {
+      var j = i + 1;
+      while (j < g.value.stops.length && !g.value.stops[j].position)
+        j++;
+      var inc = parseFloat(g.value.stops[j].position) - current;
+      for (var k = i; k < j; k++) {
+        g.value.stops[k].position = (current + inc * (k - i + 1) / (j - i + 1)) + "%";
+      }
+    }
+    current = parseFloat(s.position);
+    str += ", color-stop(" + (parseFloat(current) / 100) + ", " + s.color + ")";
+  }
+
+  if (cancelled)
+    return "";
+  return str + ")";
+}
+
+function FilterRadialGradientForOutput(aValue, aEngine)
+{
+  if (aEngine == "generic")
+    return aValue.substr(5);
+
+  else if (aEngine == "webkit")
+    return aValue.replace( /\-moz\-/g , "-webkit-")
+
+  else if (aEngine != "webkit20110101")
+    return "";
+
+  var g = CssInspector.parseBackgroundImages(aValue)[0];
+
+  var shape = ("shape" in g.value) ? g.value.shape : "";
+  var size  = ("size"  in g.value) ? g.value.size : "";
+  if (shape != "circle"
+      || (size != "farthest-corner" && size != "cover"))
+    return "";
+
+  if (g.value.stops.length < 2
+      || !("position" in g.value.stops[0])
+      || !g.value.stops[g.value.stops.length - 1].position
+      || !("position" in g.value.stops[0])
+      || !g.value.stops[g.value.stops.length - 1].position)
+    return "";
+
+  for (var i = 0; i < g.value.stops.length; i++) {
+    var s = g.value.stops[i];
+    if (("position" in s) && s.position && s.position.indexOf("px") == -1)
+      return "";
+  }
+
+  var str = "-webkit-gradient(radial, ";
+  var position  = ("position"  in g.value) ? g.value.position : "center center";
+  str += position + ", " +  parseFloat(g.value.stops[0].position) + ", ";
+  str += position + ", " +  parseFloat(g.value.stops[g.value.stops.length - 1].position);
+
+  // at this point we're sure to deal with pixels
+  var current = parseFloat(g.value.stops[0].position);
+  for (var i = 0; i < g.value.stops.length; i++) {
+    var s = g.value.stops[i];
+    if (!("position" in s) || !s.position) {
+      var j = i + 1;
+      while (j < g.value.stops.length && !g.value.stops[j].position)
+        j++;
+      var inc = parseFloat(g.value.stops[j].position) - current;
+      for (var k = i; k < j; k++) {
+        g.value.stops[k].position = (current + inc * (k - i + 1) / (j - i + 1)) + "px";
+      }
+    }
+    current = parseFloat(s.position);
+    var c = (current - parseFloat(g.value.stops[0].position)) /
+            (parseFloat(g.value.stops[g.value.stops.length - 1].position) - parseFloat(g.value.stops[0].position));
+    str += ", color-stop(" + c + ", " + s.color + ")";
+  }
+  str += ")"
+  return str;
+}
+
+function FilterRepeatingGradientForOutput(aValue, aEngine)
+{
+  if (aEngine == "generic")
+    return aValue.substr(5);
+
+  else if (aEngine == "webkit")
+    return aValue.replace( /\-moz\-/g , "-webkit-")
+
+  return "";
 }
