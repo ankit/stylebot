@@ -227,15 +227,18 @@ stylebot.style = {
     // generate inline CSS for selector
     getInlineCSS: function(selector) {
         var rule = this.rules[selector];
+
         if (rule != undefined)
         {
             var css = "";
-            for (var property in rule){
+            for (var property in rule) {
                 if(property.indexOf("comment") != -1) continue;
                 css += CSSUtils.getCSSDeclaration(property, rule[property], true);
             }
+
             return css;
         }
+
         return "";
     },
     
@@ -243,6 +246,7 @@ stylebot.style = {
     updateInlineCSS: function(el, newCustomCSS) {
         if (!el || el.length == 0)
             return false;
+
         el.each(function() {
             var existingCSS = $.trim($(this).attr('style'));
             var existingCustomCSS = $(this).data("stylebot-css");
@@ -264,6 +268,7 @@ stylebot.style = {
                     style: newCSS
                 });
             }
+
             else
             {
                 // replace existing stylebot CSS with updated stylebot CSS
@@ -286,6 +291,7 @@ stylebot.style = {
     clearInlineCSS: function(el) {
         if (!el)
             return false;
+
         el.each(function(){
             var existingCSS = $(this).attr('style');
             var existingCustomCSS = $(this).data("stylebot-css");

@@ -110,10 +110,10 @@ function fetchOptions() {
 		
 		if (dataStoreValue != typeof undefined)
 		{
-			if (dataStoreValue == "true" || dataStoreValue == "false")
+			if (dataStoreValue === "true" || dataStoreValue === "false")
 				options[option] = (dataStoreValue === "true");
 			else
-				options[option] = dataStoreValue;	
+				options[option] = dataStoreValue;
 		}
 	});
 }
@@ -321,8 +321,9 @@ function onAdd() {
 // Saves a style. Called by onUpdate and onAdd
 function saveStyle(url, css) {
     var parser = new CSSParser();
-    var sheet = parser.parse(css);
+    var sheet = parser.parse(css, false, true);
     var retVal = false;
+
     if (sheet) {
         try {
 			var rules = CSSUtils.getRulesFromParserObject(sheet);
@@ -333,6 +334,7 @@ function saveStyle(url, css) {
         }
         catch(e) {}
     }
+
 	// if css is empty. remove the style
     else if (css === "" && styles[url]) {
         delete styles[url];

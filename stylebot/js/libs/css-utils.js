@@ -23,15 +23,20 @@ var CSSUtils = {
         {
             if (rules[selector]["comment"]) continue;
             css += selector + " { ";
+
             for (var property in rules[selector]) {
-		if (property.indexOf("comment") != -1) continue;
+				
+				if (property.indexOf("comment") != -1) continue;
+				
                 if (rules[selector][property].indexOf("!important") != -1)
                     css += this.getCSSDeclaration(property, rules[selector][property], false);
                 else
                     css += this.getCSSDeclaration(property, rules[selector][property], setImportant);
             }
+
             css += " } ";
         }
+
         return css;
     },
     
@@ -39,22 +44,26 @@ var CSSUtils = {
         var css = "";
         for (var selector in rules)
         {
-            if(rules[selector]["comment"]){
+            if (rules[selector]["comment"]) {
                 css += rules[selector]["comment"] + "\n";
             }
+
             else {
                 css += selector + " {" + "\n";
-                for (var property in rules[selector]){
-                    if(property.indexOf("comment") != -1){
+
+                for (var property in rules[selector]) {
+                    if (property.indexOf("comment") != -1) {
                         css += "\t" + rules[selector][property] + "\n";
                     }
                     else { 
                         css += "\t" + this.getCSSDeclaration(property, rules[selector][property], setImportant) + "\n";
                     }
                 }
+
                 css += "}" + "\n\n";
             }
         }
+
         return css;
     },
     
@@ -64,10 +73,12 @@ var CSSUtils = {
         var append = "";
         if (formatted)
             append = "\n"
-        for (var property in rules[selector]){
-             if(property.indexOf("comment") != -1) continue;
+        for (var property in rules[selector]) {
+             if (property.indexOf("comment") != -1) continue;
+
              css += "\t" + this.getCSSDeclaration(property, rules[selector][property], setImportant) + "\n";
         }
+
         return css;
     },
     
@@ -93,19 +104,23 @@ var CSSUtils = {
         var comment_index = 0;
         var len = sheet.cssRules.length;
         for (var i = 0; i < len; i++) {
-            if(sheet.cssRules[i] instanceof jscsspComment){
+	
+            if (sheet.cssRules[i] instanceof jscsspComment) {
                 var selector = "comment-#"+comment_index++;
                 rules[selector] = new Object();
                 rules[selector]["comment"] = sheet.cssRules[i].parsedCssText;
             }
+
             else {
                 var selector = sheet.cssRules[i].mSelectorText;
                 rules[selector] = new Object();
                 var len2 = sheet.cssRules[i].declarations.length;
-                for(var j = 0; j < len2; j++) {
-                    if(sheet.cssRules[i].declarations[j] instanceof jscsspComment){
+                for (var j = 0; j < len2; j++) {
+                    if (sheet.cssRules[i].declarations[j] instanceof jscsspComment)
+					{
                         rules[selector]["comment-#"+comment_index++] = sheet.cssRules[i].declarations[j].parsedCssText;
                     }
+
                     else {
                         var property = sheet.cssRules[i].declarations[j].property;
                         var value = sheet.cssRules[i].declarations[j].valueText;
@@ -126,6 +141,7 @@ var CSSUtils = {
                 var value = sheet.cssRules[0].declarations[i].valueText;
                 rule[property] = value;
         }
+
         return rule;
     },
         
@@ -136,11 +152,13 @@ var CSSUtils = {
         var blocks = css.split('}');
         blocks.pop();
         var len = blocks.length;
+
         for (var i = 0; i < len; i++)
         {
             var pair = blocks[i].split('{');
             rules[$.trim(pair[0])] = this.parseCSSBlock(pair[1]);
         }
+
         return rules;
     },
     
@@ -159,6 +177,7 @@ var CSSUtils = {
             if (property != "" && value != "")
                 rule[property] = value;
         }
+
         return rule;
     },
     
