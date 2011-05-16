@@ -441,6 +441,7 @@ stylebot.widget = {
         
         var any = false;
         for (var selector in stylebot.style.rules) {
+            if(stylebot.style.rules[selector]["comment"]) continue;
             any = true;
 
             var li = $("<li>", {
