@@ -145,7 +145,7 @@ stylebot.style = {
                 this.parser = new CSSParser();
 
             try {
-                var sheet = this.parser.parse(css);
+                var sheet = this.parser.parse(css, false, true);
                 var rules = CSSUtils.getRulesFromParserObject(sheet);
                 this.rules = rules;
             }
@@ -169,7 +169,7 @@ stylebot.style = {
             if (!this.parser)
                 this.parser = new CSSParser();
                 
-            var sheet = this.parser.parse(selector + "{" + css + "}");
+            var sheet = this.parser.parse(selector + "{" + css + "}", false, false);
             var generatedRule = CSSUtils.getRuleFromParserObject(sheet);
             // save rule to cache
             this.rules[selector] = generatedRule;
@@ -230,9 +230,10 @@ stylebot.style = {
         if (rule != undefined)
         {
             var css = "";
-            for (var property in rule)
+            for (var property in rule){
+                if(property.indexOf("comment") != -1) continue;
                 css += CSSUtils.getCSSDeclaration(property, rule[property], true);
-
+            }
             return css;
         }
         return "";
