@@ -106,13 +106,15 @@ function initializeTabs() {
 // fetches options from the datastore
 function fetchOptions() {
 	$.each(options, function(option, value) {
-		
 		var dataStoreValue = localStorage['stylebot_option_' + option];
 		
-		if (dataStoreValue == "true" || dataStoreValue == "false")
-			options[option] = (dataStoreValue == "true");
-		else
-			options[option] = dataStoreValue;
+		if (dataStoreValue != typeof undefined)
+		{
+			if (dataStoreValue == "true" || dataStoreValue == "false")
+				options[option] = (dataStoreValue === "true");
+			else
+				options[option] = dataStoreValue;	
+		}
 	});
 }
 

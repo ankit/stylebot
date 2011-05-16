@@ -127,7 +127,7 @@ function upgradeTo1() {
 //
 function attachListeners() {
 	
-	if (cache.options.showPageAction == undefined || cache.options.showPageAction) {
+	if (cache.options.showPageAction == typeof undefined || cache.options.showPageAction) {
 		showPageActions();
 	}
     
