@@ -3265,7 +3265,7 @@ CSSParser.prototype = {
           parenthesis++;
         if (token.isSymbol(")")) {
           parenthesis--;
-          if (!parenthesis)
+        if (!parenthesis)
             break;
         }
         value += token.value;
@@ -3821,15 +3821,19 @@ CSSParser.prototype = {
           specificity.c++;
         }
         else {
-          while (true) {
-            token = this.getToken(false, true);
+          token = this.getToken(false, true);
+          while (token.value) {
             if (token.isSymbol(")")) {
               s += ")";
               break;
             } else
               s += token.value;
+          	token = this.getToken(false, true);
           }
-          specificity.c++;
+			if (s.indexOf(')') != -1)
+          		specificity.c++;
+			else
+				return null;
         }
       } else
         return null;
