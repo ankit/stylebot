@@ -123,27 +123,27 @@ function displayShortcutHelp() {
         html: "Stylebot Keyboard shortcuts"
     }).appendTo(content);
     
-    var sec1 = "<ul class='stylebot-shortcut-section'><h2>Manage Stylebot</h2> /
-                <li class='stylebot-shortcut'><span class='stylebot-key'>Alt + m</span><span class='stylebot-key-desc'>Launch Stylebot</span></li> /
-                <li class='stylebot-shortcut'><span class='stylebot-key'>s</span><span class='stylebot-key-desc'>Toggle ability to select an element</span></li> /
-                <li class='stylebot-shortcut'><span class='stylebot-key'>m</span><span class='stylebot-key-desc'>Switch between Basic / Advanced Mode</span></li> /
-                <li class='stylebot-shortcut'><span class='stylebot-key'>p</span><span class='stylebot-key-desc'>Move Panel Left / Right</span></li> /
-                <li class='stylebot-shortcut'><span class='stylebot-key'>e</span><span class='stylebot-key-desc'>Open Popup to edit page's CSS</span></li> /
-                <li class='stylebot-shortcut'><span class='stylebot-key'>w</span><span class='stylebot-key-desc'>Write CSS selector manually</span></li> /
-                <li class='stylebot-shortcut'><span class='stylebot-key'>d</span><span class='stylebot-key-desc'>Open CSS selector dropdown</span></li> /
-                <li class='stylebot-shortcut'><span class='stylebot-key'>↑↓</span><span class='stylebot-key-desc'>Navigate CSS selectors in dropdown</span></li> /
-                <li class='stylebot-shortcut'><span class='stylebot-key'>Ctrl + Shift + s</span><span class='stylebot-key-desc'>Push styles <i>(if sync is enabled)</i></span></li> /
-                <li class='stylebot-shortcut'><span class='stylebot-key'>?</span><span class='stylebot-key-desc'>Bring up this help</span></li> /
+    var sec1 = "<ul class='stylebot-shortcut-section'><h2>Manage Stylebot</h2> \
+                <li class='stylebot-shortcut'><span class='stylebot-key'>Alt + m</span><span class='stylebot-key-desc'>Launch Stylebot</span></li> \
+                <li class='stylebot-shortcut'><span class='stylebot-key'>s</span><span class='stylebot-key-desc'>Toggle ability to select an element</span></li> \
+                <li class='stylebot-shortcut'><span class='stylebot-key'>m</span><span class='stylebot-key-desc'>Switch between Basic / Advanced Mode</span></li> \
+                <li class='stylebot-shortcut'><span class='stylebot-key'>p</span><span class='stylebot-key-desc'>Move Panel Left / Right</span></li> \
+                <li class='stylebot-shortcut'><span class='stylebot-key'>e</span><span class='stylebot-key-desc'>Open Popup to edit page's CSS</span></li> \
+                <li class='stylebot-shortcut'><span class='stylebot-key'>w</span><span class='stylebot-key-desc'>Write CSS selector manually</span></li> \
+                <li class='stylebot-shortcut'><span class='stylebot-key'>d</span><span class='stylebot-key-desc'>Open CSS selector dropdown</span></li> \
+                <li class='stylebot-shortcut'><span class='stylebot-key'>↑↓</span><span class='stylebot-key-desc'>Navigate CSS selectors in dropdown</span></li> \
+                <li class='stylebot-shortcut'><span class='stylebot-key'>Ctrl + Shift + s</span><span class='stylebot-key-desc'>Push styles <i>(if sync is enabled)</i></span></li> \
+                <li class='stylebot-shortcut'><span class='stylebot-key'>?</span><span class='stylebot-key-desc'>Bring up this help</span></li> \
                 <li class='stylebot-shortcut'><span class='stylebot-key'>esc</span><span class='stylebot-key-desc'>Close Stylebot</span></li></ul>";
                 
-    var sec2 = "<ul class='stylebot-shortcut-section'><h2>Navigate Sections</h2> /
-                <li class='stylebot-shortcut'><span class='stylebot-key'>t</span><span class='stylebot-key-desc'>Move to <i>Text</i> section</span></li> /
-                <li class='stylebot-shortcut'><span class='stylebot-key'>c</span><span class='stylebot-key-desc'>Move to <i>Color & Background Color</i> section</span></li> /
-                <li class='stylebot-shortcut'><span class='stylebot-key'>b</span><span class='stylebot-key-desc'>Move to <i>Borders</i> section</span></li> /
+    var sec2 = "<ul class='stylebot-shortcut-section'><h2>Navigate Sections</h2> \
+                <li class='stylebot-shortcut'><span class='stylebot-key'>t</span><span class='stylebot-key-desc'>Move to <i>Text</i> section</span></li> \
+                <li class='stylebot-shortcut'><span class='stylebot-key'>c</span><span class='stylebot-key-desc'>Move to <i>Color & Background Color</i> section</span></li> \
+                <li class='stylebot-shortcut'><span class='stylebot-key'>b</span><span class='stylebot-key-desc'>Move to <i>Borders</i> section</span></li> \
                 <li class='stylebot-shortcut'><span class='stylebot-key'>l</span><span class='stylebot-key-desc'>Move to <i>Layout & Visibility</i> section</span></li></ul>";
                 
-    var sec3 = "<ul class='stylebot-shortcut-section'><h2>Apply property values</h2> /
-                <li class='stylebot-shortcut'><span class='stylebot-key'>h</span><span class='stylebot-key-desc'>Hide/Show selected element(s)</span></li> /
+    var sec3 = "<ul class='stylebot-shortcut-section'><h2>Apply property values</h2> \
+                <li class='stylebot-shortcut'><span class='stylebot-key'>h</span><span class='stylebot-key-desc'>Hide/Show selected element(s)</span></li> \
                 <li class='stylebot-shortcut'><span class='stylebot-key'>z</span><span class='stylebot-key-desc'>Undo Last Action</span></li></ul>";
     
     var footer = $("<a href='#' id='stylebot-shortcuts-close'>Close</a>").click(closeShortcutHelp);

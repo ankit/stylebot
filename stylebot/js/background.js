@@ -9,23 +9,22 @@ var cache = {
     /**
         e.g. styles = {
             'google.com' : {
-                
+
                 _rules: {
                     'a': {
                         'color': 'red'
                     }
                 },
-                
+
                 _social: {
                     id: 4,
                     timestamp: 123456 (UNIX based)
                 }
-                
             }
         }
     **/
     styles: {},
-    
+
     options: {
         useShortcutKey: true,
         shortcutKey: 77, // keydown code for 'm'
@@ -36,7 +35,7 @@ var cache = {
         livePreviewColorPicker: false,
         showPageAction: true
     },
-    
+
     // indices of enabled accordions in panel. by default, all are enabled
     enabledAccordions: [0, 1, 2, 3]
 };
@@ -52,7 +51,7 @@ function init() {
 
     createContextMenu();
     attachListeners();
-    
+
     if (cache.options.sync) {
         loadSyncId();
         attachSyncListeners();
@@ -92,7 +91,6 @@ function updateVersionString() {
 // Mostly legacy code now, since almost everyone should already be updated to 1.0
 //
 function upgradeTo1() {
-    
     var first = false;
     
     // upgrading to the new data model
@@ -110,12 +108,12 @@ function upgradeTo1() {
                 return;
             }
         }
-        
+
         var rules = cache.styles[url];
         cache.styles[url] = {};
         cache.styles[url]['_rules'] = rules;
     }
-    
+
     // save to localStorage
     updateStylesInDataStore();
     
@@ -134,11 +132,11 @@ function attachListeners() {
     chrome.extension.onRequest.addListener( function(request, sender, sendResponse) {
         switch (request.name) {
             case "enablePageAction"     : if (cache.options.showPageAction) { enablePageAction(sender.tab); } sendResponse({}); break;
-
+            
             case "disablePageAction"    : if (cache.options.showPageAction) { disablePageAction(sender.tab); } sendResponse({}); break;
             
             case "showPageActions"      : showPageActions(); sendResponse({}); break;
-
+            
             case "hidePageActions"      : hidePageActions(); sendResponse({}); break;
             
             case "copyToClipboard"      : copyToClipboard(request.text); sendResponse({}); break;
@@ -152,13 +150,13 @@ function attachListeners() {
             case "getRulesForPage"      : sendResponse(getRulesForPage(request.url)); break;
             
             case "fetchOptions"         : sendResponse({ options: cache.options, enabledAccordions: cache.enabledAccordions }); break;
-
+            
             case "saveAccordionState"   : saveAccordionState(request.enabledAccordions); sendResponse({}); break;
             
             case "savePreference"       : savePreference(request.preference); sendResponse({}); break;
             
             case "getPreference"        : sendResponse(getPreference(request.preferenceName)); break;
-
+            
             case "pushStyles"           : pushStyles(); sendResponse({}); break;
         }
     });
@@ -197,7 +195,7 @@ function disablePageAction(tab) {
     else {
         chrome.pageAction.setIcon({ tabId: tab.id, path: "images/css.png" });
     }
-    
+
     chrome.pageAction.setTitle({ tabId: tab.id, title: "Click to start editing using Stylebot" });
 }
 
@@ -213,26 +211,26 @@ function enablePageAction(tab) {
 function showPageActions() {
     chrome.windows.getAll({ populate: true }, function(windows) {
         var w_len = windows.length;
-        
+
         for (var i = 0; i < w_len; i++) {
             var tabs = windows[i].tabs;
-            
+
             if (tabs) {
                 var t_len = tabs.length;
 
                 for (var j = 0; j < t_len; j++) {
                     var tab = tabs[j];
-                    
-                    if (tab.url.match("^http") == "http" 
-                    && tab.url.indexOf("https://chrome.google.com/extensions") == -1) 
-                    {                   
+
+                    if (tab.url.match("^http") == "http"
+                    && tab.url.indexOf("https://chrome.google.com/extensions") == -1)
+                    {
                         chrome.pageAction.show(tab.id);
                     }
                 }
             }
         }
     });
-    
+
     chrome.pageAction.onClicked.addListener(onPageActionClick);
     chrome.tabs.onUpdated.addListener(onTabUpdated);
     chrome.tabs.onSelectionChanged.addListener(onTabSelectionChanged);
@@ -243,13 +241,13 @@ function showPageActions() {
 function hidePageActions() {
     chrome.windows.getAll({ populate: true }, function(windows) {
         var w_len = windows.length;
-        
+
         for (var i = 0; i < w_len; i++) {
             var tabs = windows[i].tabs;
-            
+
             if (tabs) {
                 var t_len = tabs.length;
-
+                
                 for (var j = 0; j < t_len; j++) {
                     chrome.pageAction.hide(tabs[j].id);
                 }
@@ -279,7 +277,7 @@ function onTabSelectionChanged(tabId, selectInfo) {
 function save(url, rules, data) {
     if (!url || url == "")
         return;
-
+    
     if (rules) {
         cache.styles[url] = {};
         cache.styles[url]['_rules'] = rules;
@@ -287,7 +285,7 @@ function save(url, rules, data) {
     
     else
         delete cache.styles[url];
-
+    
     // if there is meta data, store it in the social object
     if (data != undefined) {
         cache.styles[url]['_social'] = {};
@@ -329,7 +327,7 @@ function mergeStyles(s1, s2) {
     if (!s2) {
         return s1;
     }
-
+    
     for (var url in s1) {
         if (s2[url]) {
             for (var selector in s1[url]['_rules']) {
@@ -346,7 +344,7 @@ function mergeStyles(s1, s2) {
         else
             s2[url] = s1[url];
     }
-
+    
     return s2;
 }
 
@@ -378,7 +376,7 @@ function pushStyles() {
 
 // Load options from localStorage into background cache
 function loadOptionsIntoCache() {
-    for (var option in cache.options) 
+    for (var option in cache.options)
     {
         var dataStoreValue = localStorage['stylebot_option_' + option];
         if (dataStoreValue) {
@@ -443,7 +441,7 @@ function getRulesForPage(currUrl) {
         {
             if (url.length > url_for_page.length)
                 url_for_page = url;
-            
+
             // iterate over each selector in styles
             for (var selector in cache.styles[url]['_rules']) {
                 
@@ -462,7 +460,7 @@ function getRulesForPage(currUrl) {
             }
         }
     }
-
+    
     if (rules != undefined)
         return {rules: rules, url: url_for_page};
     else
@@ -521,28 +519,42 @@ function createContextMenu() {
         chrome.contextMenus.create({
             title: "Style Element",
             contexts: ['all'],
-            onclick: function() { sendRequestToCurrentTab("openWidget"); },
+            onclick: function(info, tab) { sendRequestToTab(tab, "openWidget"); },
             parentId: contextMenuId
         });
         
-        contextMenuStatusId = chrome.contextMenus.create({
-            title: "Toggle styling",
-            type: 'checkbox',
+        chrome.contextMenus.create({
+            title: "Enable Styling",
+            type: "checkbox",
+            checked: true,
             contexts: ['all'],
-            onclick: function() { sendRequestToCurrentTab("toggleStyle"); },
+            onclick: function(info, tab) { sendRequestToTab(tab, "toggleStyle"); },
             parentId: contextMenuId
         });
         
         chrome.contextMenus.create({
             title: "Search for styles...",
             contexts: ['all'],
-            onclick: function() { sendRequestToCurrentTab("searchSocial"); },
+            onclick: function(info, tab) { sendRequestToTab(tab, "searchSocial"); },
             parentId: contextMenuId
+        });
+        
+        // Add a selectionChanged listener so we can track changes in current tab
+        chrome.tabs.onSelectionChanged.addListener(function(tabId, selectInfo) {
+            // Get style status from the tab we changed to and update the checkbox in the context menu
+            chrome.tabs.sendRequest(tabId, { name: "styleStatus" }, function(response) {
+                chrome.contextMenus.update(contextMenuStatusId, {checked: response.status});
+            });
         });
     }
 }
 
-// Send a request to the current selected tab
+// Send a request to tab
+function sendRequestToTab(tab, msg) {
+    chrome.tabs.sendRequest(tab.id, { name: msg }, function() {});
+}
+
+// @Deprecated: Send a request to the current selected tab
 function sendRequestToCurrentTab(msg) {
     chrome.tabs.getSelected(null, function(tab) {
         chrome.tabs.sendRequest(tab.id, { name: msg }, function() {});
