@@ -1,41 +1,42 @@
+<!-- Not being used -->
 <html>
 <head>
-	<script type="text/javascript">
-		function openReleaseNotes() {
-			chrome.extension.getBackgroundPage().openReleaseNotes();
-		}
-	</script>
+    <script type="text/javascript">
+        function openReleaseNotes() {
+            chrome.extension.getBackgroundPage().openReleaseNotes();
+        }
+    </script>
 <style>
 
 body {
     background: -webkit-gradient(linear, left top, left bottom, from(#eee), to(#bdbdbd));
-		color: #333;
-		font-family: Helvetica, Arial, sans-serif;
-		font-size: 12px;
+        color: #333;
+        font-family: Helvetica, Arial, sans-serif;
+        font-size: 12px;
 }
 
 h2 {
-	margin: 2px;
-	font-size: 14px;
-	padding: 0px;
-	display: inline;
+    margin: 2px;
+    font-size: 14px;
+    padding: 0px;
+    display: inline;
   color: #457392;
 }
 
 #version {
-	color: #333;
-	font-style: italic;
-	display: inline;
-	font-size: 12px;
-	margin-left: 10px;
+    color: #333;
+    font-style: italic;
+    display: inline;
+    font-size: 12px;
+    margin-left: 10px;
 }
 
 #content {
-	margin-top: 20px;
+    margin-top: 20px;
 }
 
 #content a {
-	text-decoration: none;
+    text-decoration: none;
   color: #457392;
 }
 
@@ -44,7 +45,7 @@ h2 {
 <body>
 <h2>Stylebot</h2><span id="version">v0.2.2</span>
 <div id="content">
-	See <a href="javascript:openReleaseNotes();window.close();">Release Notes</a>.
-</div>	
+    See <a href="javascript:openReleaseNotes();window.close();">Release Notes</a>.
+</div>
 </body>
 </html>

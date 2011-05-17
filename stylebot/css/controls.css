@@ -172,7 +172,7 @@ button.stylebot-active-button:active:not(:disabled) {
 }
 
 /** Not using :last-child here due to Chrome's dodgy behavior with it. Maybe related to this issue: http://bit.ly/dqEfww
-	Instead, stylebot-last-child class is added to the last button in segmented control
+    Instead, stylebot-last-child class is added to the last button in segmented control
 **/
 .stylebot-segmented-control button.stylebot-last-child {
     border-bottom-right-radius: 3px !important;

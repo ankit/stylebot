@@ -3828,12 +3828,12 @@ CSSParser.prototype = {
               break;
             } else
               s += token.value;
-          	token = this.getToken(false, true);
+            token = this.getToken(false, true);
           }
-			if (s.indexOf(')') != -1)
-          		specificity.c++;
-			else
-				return null;
+            if (s.indexOf(')') != -1)
+                specificity.c++;
+            else
+                return null;
         }
       } else
         return null;

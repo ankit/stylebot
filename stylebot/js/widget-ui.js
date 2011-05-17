@@ -38,30 +38,30 @@ var WidgetUI = {
     },
     
     createTextField: function(property, size, onKeyDownHandler, onKeyUpHandler) {
-		var $input = $('<input>',{
+        var $input = $('<input>',{
             type: 'text',
             id: 'stylebot-' + property,
             class: 'stylebot-control stylebot-textfield',
             size: size
         })
-
+        
         .data('property', property)
-
+        
         .click(function(e) {
             Utils.selectAllText(e.target);
         })
-
+        
         .focus(Events.onTextFieldFocus)
-
+        
         .blur(Events.onTextFieldBlur);
-
-		if (onKeyDownHandler)
-			$input.keydown(onKeyDownHandler)
-
-		if (onKeyUpHandler)
-			$input.keyup(onKeyUpHandler);
-		
-		return $input;
+        
+        if (onKeyDownHandler)
+            $input.keydown(onKeyDownHandler)
+        
+        if (onKeyUpHandler)
+            $input.keyup(onKeyUpHandler);
+        
+        return $input;
     },
     
     createSizeControl: function(property) {
@@ -70,7 +70,7 @@ var WidgetUI = {
         // Textfield for entering size
         this.createTextField(property, 2, Events.onSizeFieldKeyDown, Events.onSizeFieldKeyUp)
         .appendTo(container);
-
+        
         // Select box for choosing unit
         var select = $('<select>', {
             class: 'stylebot-control stylebot-select'
@@ -93,7 +93,9 @@ var WidgetUI = {
         var container = $('<span>', {
             style: 'display: inline-block !important; margin-left: 50px !important; margin-top: -10px !important;'
         });
+        
         var len = control.id.length;
+        
         for (var i = 0; i < len; i++)
         {
             this.createLabel(control.options[i])
@@ -145,7 +147,7 @@ var WidgetUI = {
         // custom option
         this.createSelectOption('Custom', null, 'Custom')
         .appendTo(select);
-
+        
         // end of select
         
         // create custom font field
@@ -155,24 +157,24 @@ var WidgetUI = {
             class: 'stylebot-textfield',
             size: 20
         })
-
+        
         .data('property', control.id)
-
+        
         .keyup(Events.onTextFieldKeyUp)
-
+        
         .css({
             marginLeft: '95px !important',
             marginTop: '5px !important',
             display: 'none'
         })
-
+        
         .appendTo(container);
         
         return container;
     },
     
     createToggleButton: function(text, property, value) {
-
+        
         return this.createButton(text)
         .addClass('stylebot-toggle stylebot-control')
         .attr('id', 'stylebot-' + property)
@@ -188,7 +190,7 @@ var WidgetUI = {
             id: 'stylebot-' + property,
             class: 'stylebot-control'
         });
-
+        
         var radio = $('<input>',{
             type: 'radio',
             name: name,
@@ -233,22 +235,22 @@ var WidgetUI = {
             class: 'stylebot-colorselector stylebot-control', 
             tabIndex: 0
         })
-
+        
         .append($('<div>', {class: 'stylebot-colorselector-color'}))
-
+        
         .ColorPicker({
             flat: false,
-
+            
             onChange: function(hsb, hex, rgb) {
                 var colorCode = '#' + hex;
                 // set input value to reflect the newly picked color's code
                 input.attr( 'value', colorCode );
                 // update the color selector color
                 WidgetUI.setColorSelectorColor( input );
-				
-				// if live preview is enabled, update DOM
-				if (stylebot.options.livePreviewColorPicker)
-					input.keyup().blur();
+                
+                // if live preview is enabled, update DOM
+                if (stylebot.options.livePreviewColorPicker)
+                    input.keyup().blur();
             },
             
             onBeforeShow: function() {
@@ -265,7 +267,7 @@ var WidgetUI = {
                 stylebot.widget.basic.isColorPickerVisible = false;
             }
         })
-
+        
         .keyup(function(e) {
             if(e.keyCode == 13 && !$(e.target).hasClass('disabled')) // enter
                 $(this).ColorPickerToggle();
@@ -280,7 +282,7 @@ var WidgetUI = {
         var colorSelector = input.prev().find('div');
         colorSelector.css('backgroundColor', color);
     },
-
+    
     createLabel: function(text) {
         return $('<label>', {
             class: 'stylebot-label',
@@ -313,7 +315,7 @@ var WidgetUI = {
             .data('class', className)
             .appendTo(container)
             .click(callback);
-
+            
             if(i == enabledButtonIndex)
                 bt.addClass('stylebot-active-button');
         }
@@ -337,11 +339,11 @@ var WidgetUI = {
             })
             .click(Events.onSegmentedControlClick)
             .appendTo(container);
-			// explicitly having to add the 'stylebot-last-child' class as :last-child causes weird issue in Chrome
-			if (i == (len - 1))
-			{
-				bt.addClass('stylebot-last-child');
-			}
+            // explicitly having to add the 'stylebot-last-child' class as :last-child causes weird issue in Chrome
+            if (i == (len - 1))
+            {
+                bt.addClass('stylebot-last-child');
+            }
         }
         return container;
     }

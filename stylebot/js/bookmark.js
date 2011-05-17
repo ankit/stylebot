@@ -11,17 +11,20 @@ function createBookmark(name, url, parentId, callback) {
             parentId: id,
             title: name
         };
+        
         if (url)
             properties.url = url;
-        
+            
         chrome.bookmarks.create(properties, callback);
     }
+
     if (!parentId)
     {
         getRootBookmark(function(bookmark) {
             makeCreateBookmarkRequest(bookmark.id);
         });
     }
+
     else
         makeCreateBookmarkRequest(parentId);
 }

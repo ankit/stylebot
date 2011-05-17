@@ -1,81 +1,81 @@
 /** Stylebot options page css **/
 
 body {
-	font-size: 14px;
-	line-height: 28px;
-	font-family: 'Lucida Grande', 'Lucida Sans', 'Lucida Sans Unicode', Helvetica, Arial, sans-serif;
-	color: #555;
-	margin: 0;
-	padding: 0;
-	background-color: #fff;	
+    font-size: 14px;
+    line-height: 28px;
+    font-family: 'Lucida Grande', 'Lucida Sans', 'Lucida Sans Unicode', Helvetica, Arial, sans-serif;
+    color: #555;
+    margin: 0;
+    padding: 0;
+    background-color: #fff;`
 }
 
 #wrap {
-	width: 100%;
-	margin: 0 auto;
+    width: 100%;
+    margin: 0 auto;
 }
 
 h3 {
-	font-weight: normal;
-	font-size: 22px;
-	margin: 0;
-	padding: 0;
-	color: #555;
+    font-weight: normal;
+    font-size: 22px;
+    margin: 0;
+    padding: 0;
+    color: #555;
 }
 
 h4 {
-	font-weight: normal;
-	color: #555;
-	padding: 0;
-	margin: 0;
-	margin-top: 27px;
-	margin-bottom: 23px;
-	font-size: 18px;
+    font-weight: normal;
+    color: #555;
+    padding: 0;
+    margin: 0;
+    margin-top: 27px;
+    margin-bottom: 23px;
+    font-size: 18px;
 }
 
 a {
     color: #467ecc;
     text-decoration: none;
-	-webkit-transition: color 0.2s linear;
+    -webkit-transition: color 0.2s linear;
 }
 
 a:hover {
-	color: #294266;
+    color: #294266;
 }
 
 input[type=text] {
     border: 1px solid #ccc;
     border-radius: 2px;
     color: #333;
-	font-family: 'Lucida Grande', 'Lucida Sans', 'Lucida Sans Unicode', Helvetica, Arial, sans-serif;
+    font-family: 'Lucida Grande', 'Lucida Sans', 'Lucida Sans Unicode', Helvetica, Arial, sans-serif;
     font-size: 14px;
     padding: 2px;
     text-align: right;
-	background-color: #fbfbfb;
+    background-color: #fbfbfb;
 }
 
 button, input[type=button], input[type=submit], a.button {
-	font-size: 12px;
-	font-style: normal;
-	margin: 0px;
-	margin-right: 5px;
-	border-radius: 5px;
-	-moz-border-radius: 5px;
-	border: 1px solid #bbb;
-	cursor: pointer;
-	padding: 0.1em 5px 0.2em 5px;
-	color: #555;
-	background-color: #eee;
-	font-family: 'Lucida Grande', 'Lucida Sans', 'Lucida Sans Unicode', Helvetica, Arial, sans-serif;	
-	text-decoration: none;
-	-webkit-transition-property:color, background-color;
-	-webkit-transition-duration: 0.2s, 0.2s;
-	-webkit-transition-timing-function: linear, linear;
+    font-size: 12px;
+    font-style: normal;
+    margin: 0px;
+    margin-right: 5px;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    border: 1px solid #bbb;
+    cursor: pointer;
+    padding: 0.1em 5px 0.2em 5px;
+    color: #555;
+    background-color: #eee;
+    font-family: 'Lucida Grande', 'Lucida Sans', 'Lucida Sans Unicode', Helvetica, Arial, sans-serif;
+    text-decoration: none;
+    -webkit-transition-property:color, background-color;
+    -webkit-transition-duration: 0.2s, 0.2s;
+    -webkit-transition-timing-function: linear, linear;
 }
 
 button:hover, input[type=button]:hover, input[type=submit]:hover {
-	background-color: #fff;
-	color: #333;
+    background-color: #fff;
+    color: #333;
 }
 
 select {
@@ -91,24 +91,24 @@ select {
     font-size: 12px;
     text-align: right;
     line-height: 25px;
-	padding-right: 10px;
-	color: #555;
+    padding-right: 10px;
+    color: #555;
 }
 
 /** options **/
 
 ul {
-	margin: 0;
-	padding: 0;
+    margin: 0;
+    padding: 0;
 }
 
 li.option {
     list-style-type: none;
-	line-height: 50px;
+    line-height: 50px;
 }
 
 li.option:first-of-type {
-	margin-top: -10px;
+    margin-top: -10px;
 }
 
 li.option label {
@@ -120,7 +120,7 @@ li.option label {
 }
 
 .option-field input[type=checkbox] {
-	margin-top: 20px;
+    margin-top: 20px;
 }
 
 /** end of options **/
@@ -128,28 +128,28 @@ li.option label {
 /* custom styles */
 
 #custom-styles {
-	min-width: 420px;
-	margin-bottom: 20px;
+    min-width: 420px;
+    margin-bottom: 20px;
 }
 
 #custom-style-install-text {
-	float: left;
-	clear: both;
-	margin-bottom: 30px;
+    float: left;
+    clear: both;
+    margin-bottom: 30px;
 }
 
 .custom-style {
     clear: both;
-	margin: 5px;
-	margin-left: 0px;
+    margin: 5px;
+    margin-left: 0px;
 }
 
 .custom-style-url {
     padding: 2px;
-	width: 200px;
-	word-wrap: break-word;
-	display: inline-block;
-	line-height: 20px;	
+    width: 200px;
+    word-wrap: break-word;
+    display: inline-block;
+    line-height: 20px;
 }
 
 .custom-style-url:hover {
@@ -163,22 +163,22 @@ li.option label {
 }
 
 #custom-styles-container input {
-	text-align: left;
-	margin-right: 4px;
+    text-align: left;
+    margin-right: 4px;
 }
 
 #style-search-field {
-	float: left;
-	width: 35%;
+    float: left;
+    width: 35%;
     outline: none;
-	line-height: 15px;
-	margin-bottom: 20px;
+    line-height: 15px;
+    margin-bottom: 20px;
 }
 
 #custom-styles-container .button-container {
-	margin-left: 10px;
-	display: inline-block;
-	padding-top: 7px;
+    margin-left: 10px;
+    display: inline-block;
+    padding-top: 7px;
 }
 
 /** end of options **/
@@ -189,15 +189,15 @@ li.option label {
 textarea.stylebot-css-code {
     color: #333 ;
     font-size: 12px ;
-    font-family: Menlo, Monaco, 'Lucida Console', monospace ;
+    font-family: Menlo, Monaco, 'Lucida Console', monospace;
     line-height: 16px;
     padding: 2px;
     display: block;
 }
 
 #stylebot-modal div {
-	font-family: 'Lucida Grande', 'Lucida Sans', 'Lucida Sans Unicode', Helvetica, Arial, sans-serif;
-	font-size: 14px;
+    font-family: 'Lucida Grande', 'Lucida Sans', 'Lucida Sans Unicode', Helvetica, Arial, sans-serif;
+    font-size: 14px;
 }
 
 #stylebot-modal .description {
@@ -221,60 +221,60 @@ textarea.stylebot-css-code {
 /** tabs **/
 
 ul.menu {
-	float: right;
-	font-family: 'Lucida Grande', 'Lucida Sans', 'Lucida Sans Unicode', Helvetica, Arial, sans-serif;
-	font-size: 14px;
-	margin: 0;
-	padding-bottom: 20px;
+    float: right;
+    font-family: 'Lucida Grande', 'Lucida Sans', 'Lucida Sans Unicode', Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    margin: 0;
+    padding-bottom: 20px;
 }
 
 .separator {
-	width: 96%;
-	height: 1px;
-	float: right;
-	background-color: #ccc;
-	margin: 5px;
-	-webkit-box-shadow: 0px 1px 1px #fff;
+    width: 96%;
+    height: 1px;
+    float: right;
+    background-color: #ccc;
+    margin: 5px;
+    -webkit-box-shadow: 0px 1px 1px #fff;
 }
 
 .tabActive {
-	font-weight: bold;
-	background-color: #fff;
+    font-weight: bold;
+    background-color: #fff;
 }
 
 ul.menu li {
-	text-align: right;
-	width: 300px;
-	list-style-type: none;
-	padding: 3 10 3 3;
-	margin: 5 0 0 0;
+    text-align: right;
+    width: 300px;
+    list-style-type: none;
+    padding: 3 10 3 3;
+    margin: 5 0 0 0;
 }
 
 ul.menu li a, ul.menu li a:visited {
-	text-decoration: none;
+    text-decoration: none;
 }
 
 #options {
-	position: absolute;
-	margin: 0 0 20px 260px;
-	float: left;
-	min-width: 375px;
-	background-color: #fff;
-	padding: 20px;
+    position: absolute;
+    margin: 0 0 20px 260px;
+    float: left;
+    min-width: 375px;
+    background-color: #fff;
+    padding: 20px;
 }
 
 #tabmenu {
-	position: fixed;
-	width: 259px;
-	margin: 0;
-	float: left;
-	height: 100%;
+    position: fixed;
+    width: 259px;
+    margin: 0;
+    float: left;
+    height: 100%;
     background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#fdfdfd), to(#ccc));
-	border-right: 1px solid;
-	border-color: #C3C3C3;
-	text-align: right;
+    border-right: 1px solid;
+    border-color: #C3C3C3;
+    text-align: right;
 }
 
 #tabmenu h3 {
-	padding: 45 10 17 5;
+    padding: 45 10 17 5;
 }

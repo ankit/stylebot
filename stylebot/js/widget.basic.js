@@ -225,14 +225,14 @@ stylebot.widget.basic = {
         var el = $('<div>', {
             class: 'stylebot-control-set'
         });
-
+        
         WidgetUI.createLabel(control.name).appendTo(el);
         
         var control_el; // this will contain the control element
         
         // Add controls of different types
         switch (control.type) {
-
+            
             case 'size'             :   control_el = WidgetUI.createSizeControl(control.id).appendTo(el);
                                         break;
             
@@ -243,10 +243,10 @@ stylebot.widget.basic = {
                                         control_el.appendTo(el)
                                         .keyup(function (e) { WidgetUI.setColorSelectorColor($(this)) });
                                         break;
-
+                                        
             case 'toggle'           :   control_el = WidgetUI.createToggleButton("Hide", control.id , control.value).appendTo(el);
                                         break;
-
+                                        
             case 'select'           :   control_el = WidgetUI.createSelect(control.id);
                                         WidgetUI.createSelectOption("Default", control.id, '').appendTo(control_el);
                                         var len = control.options.length;
@@ -257,7 +257,7 @@ stylebot.widget.basic = {
                                         }
                                         control_el.appendTo(el);
                                         break;
-
+                                        
             case 'segmented'        :   control_el = WidgetUI.createSegmentedControl(control).appendTo(el);
                                         break;
                                         
@@ -274,7 +274,7 @@ stylebot.widget.basic = {
         // fill controls
         var len = this.groups.length;
         var rule = stylebot.style.getRule(stylebot.style.cache.selector);
-
+        
         if (rule)
         {
             for (var i=0; i<len; i++)
@@ -298,7 +298,7 @@ stylebot.widget.basic = {
         }
         
         var pValue = rule[control.id];
-
+        
         switch (control.type) {
             case 'size'         :       if(pValue == undefined)
                                             return false;
@@ -354,7 +354,7 @@ stylebot.widget.basic = {
                                             }
                                         }
                                         break;
-
+                                        
             case 'font-family'  :       if (pValue == undefined)
                                             return false;
                                         
@@ -374,24 +374,24 @@ stylebot.widget.basic = {
                                             input.show();
                                         }
                                         break;
-                                    
+                                        
             case 'color'            :   if (pValue == undefined)
                                             return false;
                                         control.el.attr('value', pValue);
                                         WidgetUI.setColorSelectorColor(control.el);
                                         break;
-                                    
+                                        
             case 'toggle'           :   if (pValue == control.el.data('value'))
                                             control.el.addClass('stylebot-active-button');
                                         else
                                             control.el.removeClass('stylebot-active-button');
                                         break;
-                                    
+                                        
             case 'select'           :   var index = $.inArray($.trim(String(pValue)), control.options);
                                         if (index != -1)
                                             control.el.attr('selectedIndex', index + 1);
                                         break;
-
+                                        
             case 'segmented'        :   var index = $.inArray( $.trim( String(pValue) ), control.values);
                                         if (index != -1)
                                             $(control.el.find('button')[index])
@@ -411,7 +411,7 @@ stylebot.widget.basic = {
         .removeClass('stylebot-active-button')
         .next().removeClass('stylebot-active-button-next');
     },
-
+    
     show: function() {
         // reset all values for controls to default values
         this.reset();
@@ -419,7 +419,7 @@ stylebot.widget.basic = {
         
         // set focus to first visible accordion header
         var controlContainerOffset = this.cache.container.offset().top;
-
+        
         for (var i=0; i<4; i++)
         {
             if ($(this.cache.accordionHeaders[i]).offset().top >= controlContainerOffset)

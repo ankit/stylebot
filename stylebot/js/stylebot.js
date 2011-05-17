@@ -7,25 +7,25 @@
  **/
 
 var stylebot = {
-
+    
     status: false,
-
+    
     selectedElement: null,
-
+    
     hoveredElement: null,
-
+    
     selectionStatus: false,
     
     selectionBox: null,
-
+    
     options: {
         useShortcutKey: true,
         shortcutKey: 77, // 77 is keycode for 'm'
         shortcutMetaKey: 'alt',
         mode: 'Basic',
         position: 'Right',
-		sync: false,
-		livePreviewColorPicker: false
+        sync: false,
+        livePreviewColorPicker: false
     },
     
     initialize: function(options) {
@@ -35,9 +35,9 @@ var stylebot = {
     },
     
     setOptions: function(options) {
-		for (option in options) {
-			this.options[option] = options[option];
-		}
+        for (option in options) {
+            this.options[option] = options[option];
+        }
     },
     
     // toggle stylebot editing status
@@ -48,9 +48,9 @@ var stylebot = {
             this.open();
     },
     
-	open: function() {
+    open: function() {
         this.attachListeners();
-		this.style.enable();
+        this.style.enable();
         this.widget.open();
         this.status = true;
         this.chrome.setIcon(true);
@@ -58,27 +58,28 @@ var stylebot = {
         attachKeyboardShortcuts();
     },
     
-	close: function() {
+    close: function() {
         stylebot.widget.close();
         stylebot.status = false;
         stylebot.chrome.setIcon(false);
         stylebot.style.reset();
         stylebot.disableSelection();
-		stylebot.detachClickListener();
+        stylebot.detachClickListener();
         stylebot.unhighlight();
         stylebot.selectedElement = null;
         stylebot.destroySelectionBox();
         detachKeyboardShortcuts();
-		// sync styles
-		if (stylebot.options.sync === true) {
-			stylebot.chrome.pushStyles();
-		}
+        
+        // sync styles
+        if (stylebot.options.sync === true) {
+            stylebot.chrome.pushStyles();
+        }
     },
     
     highlight: function(el) {
         if (!stylebot.selectionBox)
             stylebot.createSelectionBox();
-
+        
         stylebot.hoveredElement = el;
         stylebot.selectionBox.highlight(el);
     },
@@ -99,6 +100,7 @@ var stylebot = {
             selector = SelectorGenerator.generate(el);
             stylebot.highlight(el);
         }
+        
         else if (selector)
         {
             try {
@@ -106,15 +108,18 @@ var stylebot = {
                 stylebot.selectedElement = el;
                 stylebot.highlight(el);
             }
+            
             catch(e) {
                 stylebot.selectedElement = null;
             }
         }
+        
         else
         {
             stylebot.selectedElement = stylebot.hoveredElement;
             selector = SelectorGenerator.generate(stylebot.selectedElement);
         }
+        
         stylebot.style.fillCache(selector);
         stylebot.widget.open();
         setTimeout(function() {
@@ -191,17 +196,20 @@ var stylebot = {
             }
             return true;
         }
+        
         if (!stylebot.shouldSelect(e.target))
             return true;
+        
         if(stylebot.belongsToStylebot(e.target)) {
             stylebot.unhighlight();
             return true;
         }
+        
         e.preventDefault();
         e.stopPropagation();
         stylebot.highlight(e.target);
     },
-
+    
     onMouseDown: function(e) {
         if (!stylebot.belongsToStylebot(e.target))
         {

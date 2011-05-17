@@ -15,6 +15,7 @@ var Utils = {
             if (arr[i][pName] == pValue)
                 return i;
         }
+        
         return null;
     },
     
@@ -102,7 +103,7 @@ var Utils = {
                     value = e.data.el.html();
                 e.data.el.html(value);
                 e.data.el.show();
-				e.data.el.focus();
+                e.data.el.focus();
                 e.data.callback(value);
                 $(document).unbind("mousedown", onClose);
                 $(document).unbind("keyup", onClose);
@@ -132,20 +133,27 @@ var Utils = {
     },
     
     HTMLDecode: function(text) {
-		if (text && typeof(text) != "undefined")
-		{
-			// replace &lt; with < and &gt; with >
-			return text.replace("&lt;", "<").replace("&gt;", ">");
-		}
-	},
-	
-	// To copy an object. from: http://my.opera.com/GreyWyvern/blog/show.dml/1725165
+        if (text && typeof(text) != "undefined")
+        {
+            // replace &lt; with < and &gt; with >
+            return text.replace("&lt;", "<").replace("&gt;", ">");
+        }
+    },
+    
+    // To copy an object. from: http://my.opera.com/GreyWyvern/blog/show.dml/1725165
     cloneObject: function(obj) {
-      var newObj = (obj instanceof Array) ? [] : {};
-      for (i in obj) {
-        if (obj[i] && typeof obj[i] == "object") {
-          newObj[i] = this.cloneObject(obj[i]);
-        } else newObj[i] = obj[i]
-      } return newObj;
+        var newObj = (obj instanceof Array) ? [] : {};
+        
+        for (i in obj)
+        {
+            if (obj[i] && typeof obj[i] == "object")
+            {
+                newObj[i] = this.cloneObject(obj[i]);
+            }
+            else
+                newObj[i] = obj[i]
+        }
+        
+        return newObj;
     }
 }

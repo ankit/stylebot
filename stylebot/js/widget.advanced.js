@@ -15,7 +15,7 @@ stylebot.widget.advanced = {
         this.cache.container = $('<div>', {
             id: 'stylebot-advanced'
         });
-
+        
         $('<div>', {
             html: "Edit custom CSS for selected element(s):"
         })
@@ -25,25 +25,25 @@ stylebot.widget.advanced = {
             id: 'stylebot-advanced-css',
             class: 'stylebot-textarea stylebot-control stylebot-css-code'
         })
-
+        
         .keyup(this.onKeyUp)
-
+        
         .keydown(function(e) { if (e.keyCode === 27) this.blur(); })
-
+        
         .focus(function(e) {
             stylebot.style.saveState();
             $(e.target).data('lastState', e.target.value);
         })
-
+        
         .blur(function(e) {
             if ($(e.target).data('lastState') == e.target.value) {
                 stylebot.style.clearLastState();
             }
-
+            
             $(e.target).data('lastState', null);
             stylebot.style.refreshUndoState();
         })
-
+        
         .appendTo(this.cache.container);
         
         return this.cache.container;
@@ -55,7 +55,7 @@ stylebot.widget.advanced = {
     
     fill: function() {
         var css = CSSUtils.crunchCSSForSelector(stylebot.style.rules, stylebot.style.cache.selector, false, true);
-
+        
         this.cache.cssField
         .html(css)
         .attr('value', css);
@@ -64,10 +64,10 @@ stylebot.widget.advanced = {
     show: function() {
         this.fill();
         this.cache.container.show();
-
+        
         setTimeout(function() {
             if ( !stylebot.widget.advanced.cache.cssField.get(0).disabled ) 
-			{
+            {
                 stylebot.widget.advanced.cache.cssField.focus();
                 Utils.moveCursorToEnd(stylebot.widget.advanced.cache.cssField.get(0));
             }
@@ -80,7 +80,7 @@ stylebot.widget.advanced = {
     
     reset: function() {
         this.cache.cssField.html('')
-		.attr('value', '')
-		.focus();
+        .attr('value', '')
+        .focus();
     }
 }

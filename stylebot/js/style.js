@@ -19,8 +19,8 @@ stylebot.style = {
     timer: null,
     
     parser: null,
-
-	status: true,
+    
+    status: true,
     
     // the undo stack. size is limited to last 5 actions
     undoStack: [],
@@ -41,10 +41,12 @@ stylebot.style = {
             this.cache.url = stylebotTempUrl;
             delete stylebotTempUrl;
         }
+        
         // if domain is empty, return url
         else if (!this.cache.url || this.cache.url == "") {
             this.cache.url = location.href;
         }
+        
         if (stylebotTempRules)
         {
             this.rules = stylebotTempRules;
@@ -60,6 +62,7 @@ stylebot.style = {
             try {
                 this.cache.elements = $(selector + ":not(#stylebot, #stylebot *)");
             }
+            
             catch(e) {
                 this.cache.elements = null;
             }
@@ -89,12 +92,12 @@ stylebot.style = {
     applyCSS: function(css) {
         if (!stylebot.style.cache.selector)
             return true;
-
+        
         // calculating timer duration based upon number of elements
         var duration;
         if (stylebot.style.cache.elements) {
             var noOfElements = stylebot.style.cache.elements.length;
-
+            
             if (noOfElements >= 400)
                 duration = 400;
             else if (noOfElements >= 200)
@@ -102,11 +105,11 @@ stylebot.style = {
             else
                 duration = 0;
         }
-
+        
         else {
             duration = 0;
         }
-
+        
         if (stylebot.style.updateCSSTimer)
         {
             clearTimeout(stylebot.style.updateCSSTimer);
@@ -120,9 +123,10 @@ stylebot.style = {
                 var newCSS = CSSUtils.crunchCSSForSelector(stylebot.style.rules, stylebot.style.cache.selector, true);
                 stylebot.style.updateInlineCSS(stylebot.style.cache.elements, newCSS);
             }
+            
             else
                 stylebot.style.updateStyleElement(stylebot.style.rules);
-
+            
         }, duration);
         
         if (stylebot.style.timer) {
@@ -139,20 +143,20 @@ stylebot.style = {
     applyPageCSS: function(css) {
         if (css == "")
             this.rules = {};
-
+        
         else {
             if (!this.parser)
                 this.parser = new CSSParser();
-
+            
             try {
                 var sheet = this.parser.parse(css, false, true);
                 var rules = CSSUtils.getRulesFromParserObject(sheet);
                 this.rules = rules;
             }
-
+            
             catch(e) {}
         }
-
+        
         this.clearInlineCSS(this.cache.elements);
         this.updateStyleElement(this.rules);
         this.save();
@@ -162,15 +166,18 @@ stylebot.style = {
     saveRuleFromCSS: function(css, selector) {
         if (!selector)
             return true;
+        
         // empty rule for selector
         delete this.rules[selector];
-
+        
         if (css != "") {
+            
             if (!this.parser)
                 this.parser = new CSSParser();
-                
+            
             var sheet = this.parser.parse(selector + "{" + css + "}", false, false);
             var generatedRule = CSSUtils.getRuleFromParserObject(sheet);
+            
             // save rule to cache
             this.rules[selector] = generatedRule;
         }
@@ -189,19 +196,22 @@ stylebot.style = {
                 if (rule[property] != undefined)
                 {
                     delete this.rules[selector][property];
-                 
+                    
                     // if no properties left, remove rule as well
                     // TODO: Use something more elegant than this hack.
                     var i = null;
                     for (i in this.rules[selector])
                     { break; }
+                    
                     if (!i)
                         delete this.rules[selector];
                 }
             }
+            
             else
                 rule[property] = value;
         }
+        
         else if (this.filter(property, value))
         {
             this.rules[selector] = new Object();
@@ -221,13 +231,14 @@ stylebot.style = {
             if ($.inArray(value, WidgetUI.validSizeUnits) != -1)
                 return false;
         }
+        
         return true;
     },
     
     // generate inline CSS for selector
     getInlineCSS: function(selector) {
         var rule = this.rules[selector];
-
+        
         if (rule != undefined)
         {
             var css = "";
@@ -235,10 +246,10 @@ stylebot.style = {
                 if(property.indexOf("comment") != -1) continue;
                 css += CSSUtils.getCSSDeclaration(property, rule[property], true);
             }
-
+            
             return css;
         }
-
+        
         return "";
     },
     
@@ -246,7 +257,7 @@ stylebot.style = {
     updateInlineCSS: function(el, newCustomCSS) {
         if (!el || el.length == 0)
             return false;
-
+        
         el.each(function() {
             var existingCSS = $.trim($(this).attr('style'));
             var existingCustomCSS = $(this).data("stylebot-css");
@@ -268,7 +279,7 @@ stylebot.style = {
                     style: newCSS
                 });
             }
-
+            
             else
             {
                 // replace existing stylebot CSS with updated stylebot CSS
@@ -277,6 +288,7 @@ stylebot.style = {
                     style: newCSS
                 });
             }
+            
             // update stylebot css data associated with element
             $(this).data("stylebot-css", newCustomCSS);
         });
@@ -286,12 +298,12 @@ stylebot.style = {
             stylebot.selectionBox.highlight(stylebot.selectedElement);
         }, 0);
     },
-
+    
     // clear any custom inline CSS for element(s)
     clearInlineCSS: function(el) {
         if (!el)
             return false;
-
+        
         el.each(function(){
             var existingCSS = $(this).attr('style');
             var existingCustomCSS = $(this).data("stylebot-css");
@@ -312,7 +324,7 @@ stylebot.style = {
         for (var selector in stylebot.style.rules)
             stylebot.style.clearInlineCSS($(selector));
     },
-
+    
     // remove rule for current selector from stylebot's <style> element and apply it as inline css
     removeFromStyleElement: function() {
         // if no elements are selected, return
@@ -321,11 +333,13 @@ stylebot.style = {
         this.updateInlineCSS(this.cache.elements, this.getInlineCSS(this.cache.selector));
         
         var tempRules = {};
+        
         for (var sel in this.rules)
         {
             if (sel != this.cache.selector)
                 tempRules[sel] = this.rules[sel];
         }
+        
         this.updateStyleElement(tempRules);
     },
     
@@ -356,10 +370,13 @@ stylebot.style = {
     remove: function() {
         if (this.rules[this.cache.selector])
             delete this.rules[this.cache.selector];
+        
         this.clearInlineCSS(this.cache.elements);
+        
         setTimeout(function() {
             stylebot.selectionBox.highlight(stylebot.selectedElement);
         }, 0);
+        
         // save
         this.save();
     },
@@ -371,10 +388,13 @@ stylebot.style = {
             delete this.rules[selector];
             this.clearInlineCSS($(selector));
         }
+        
         this.updateStyleElement(null);
+        
         setTimeout(function() {
             stylebot.selectionBox.highlight(stylebot.selectedElement);
         }, 0);
+        
         // save
         this.save();
     },
@@ -441,27 +461,27 @@ stylebot.style = {
         else
             stylebot.widget.enableUndo();
     },
-
-	disable: function() {
-		this.status = false;
-		$("#stylebot-css").html('');
-	},
-	
-	enable: function() {
-		if (this.status)
-			return;
-		this.status = true;
-		$("#stylebot-css").html(CSSUtils.crunchCSS(this.rules, true));
-	},
-	
-	toggle: function() {
-		// if stylebot is open, don't allow user to disable styling on the page
-		if (stylebot.status)
-			return false;
-		if (this.status) {
-			this.disable();
-		}
-		else
-			this.enable();
-	}
+    
+    disable: function() {
+        this.status = false;
+        $("#stylebot-css").html('');
+    },
+    
+    enable: function() {
+        if (this.status)
+            return;
+        this.status = true;
+        $("#stylebot-css").html(CSSUtils.crunchCSS(this.rules, true));
+    },
+    
+    toggle: function() {
+        // if stylebot is open, don't allow user to disable styling on the page
+        if (stylebot.status)
+            return false;
+        if (this.status) {
+            this.disable();
+        }
+        else
+            this.enable();
+    }
 }

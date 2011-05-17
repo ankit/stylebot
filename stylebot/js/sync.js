@@ -25,7 +25,7 @@ var onMerge = mergeStyles;
 
 // loads data from bookmark (if it exists). If no data is returned, saves local data in the bookmark
 function sync() {
-	console.log("Syncing data from stylebot_data");
+    console.log("Syncing data from stylebot_data");
     loadSyncData(function(data) {
         if (data) {
             if (data != cache.styles)
@@ -110,7 +110,7 @@ function loadSyncData(callback) {
 // saves data to the bookmark used for sync
 // takes json object / string as input
 function saveSyncData(data) {
-	console.log("Saving data to stylebot_data for sync");
+    console.log("Saving data to stylebot_data for sync");
     if (!data)
         return false;
     var url = getURLFromData(data);

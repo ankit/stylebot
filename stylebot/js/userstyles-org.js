@@ -59,14 +59,16 @@ function save(response) {
             });
         }
     }
+    
     if (json.code)
         saveCodeBlock(json);
+    
     else {
         var len = json.sections.length;
         for (var i = 0; i < len; i++) {
             if (json.sections[i].code)
             {
-                    saveCodeBlock(json.sections[i]);
+                saveCodeBlock(json.sections[i]);
             }
         }
     }

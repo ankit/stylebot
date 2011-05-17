@@ -32,13 +32,12 @@ function attachListeners() {
               }
         }
         // Handle Esc key to escape editing mode
-        else if (e.keyCode == 27 &&
-            stylebot.shouldClose(e.target)
-        )
+        else if ( e.keyCode == 27 && stylebot.shouldClose(e.target) )
         {
             e.target.blur();
             stylebot.close();
         }
+        
         return true;
     }, true);
 }
@@ -48,7 +47,7 @@ function isInputField(el) {
     var inputTypes = ['input', 'textarea', 'div', 'object'];
     
     if ($.inArray(tagName, inputTypes) != -1 ||
-    	el.id === "stylebot"
+        el.id === "stylebot"
     )
         return true;
     else

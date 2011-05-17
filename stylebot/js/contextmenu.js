@@ -23,43 +23,43 @@ stylebot.contextmenu = {
         }
     },
 
-	searchSocial: function() {
-		window.open("http://stylebot.me/search?q=" + document.domain);
-	},
-	
-	shareStyleOnSocial: function() {
-		// check if the current page has any styles
-		if (stylebot.style.rules) {
-			
-			var css = CSSUtils.crunchFormattedCSS(stylebot.style.rules, false);
-			var url = "http://stylebot.me/post";
+    searchSocial: function() {
+        window.open("http://stylebot.me/search?q=" + document.domain);
+    },
+    
+    shareStyleOnSocial: function() {
+        // check if the current page has any styles
+        if (stylebot.style.rules) {
+            
+            var css = CSSUtils.crunchFormattedCSS(stylebot.style.rules, false);
+            var url = "http://stylebot.me/post";
 
-			// create a form and submit data
-			var temp_form = $('<form>', {
-				'method': 'post',
-				'action': url,
-				'target': '_self'
-			});
-			
-			// site
-			$('<input>', {
-				type: 'hidden',
-				name: 'site',
-				value: stylebot.style.cache.url
-			}).appendTo(temp_form);
+            // create a form and submit data
+            var temp_form = $('<form>', {
+                'method': 'post',
+                'action': url,
+                'target': '_self'
+            });
+            
+            // site
+            $('<input>', {
+                type: 'hidden',
+                name: 'site',
+                value: stylebot.style.cache.url
+            }).appendTo(temp_form);
 
-			// css
-			$('<input>', {
-				type: 'hidden',
-				name: 'css',
-				value: css
-			}).appendTo(temp_form);
+            // css
+            $('<input>', {
+                type: 'hidden',
+                name: 'css',
+                value: css
+            }).appendTo(temp_form);
 
-			$('<submit>').appendTo(temp_form);
+            $('<submit>').appendTo(temp_form);
 
-			temp_form.submit();
+            temp_form.submit();
 
-			temp_form.remove();
-		}
-	}
+            temp_form.remove();
+        }
+    }
 }
