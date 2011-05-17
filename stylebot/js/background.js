@@ -1,6 +1,6 @@
 /* Background JS for Stylebot */
 
-var CURRENT_VERSION = "1.2";
+var CURRENT_VERSION = "1.2.1";
 
 var currTabId;
 var contextMenuId = null;
