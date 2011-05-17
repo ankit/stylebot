@@ -120,6 +120,15 @@ stylebot.widget = {
         .appendTo(this.cache.box)
         .mouseup(stylebot.widget.togglePosition);
         
+        // Settings button to open options page
+        var settingsButton = $('<div>', {
+            id: 'stylebot-settings-button',
+            class: 'stylebot-header-button',
+            title: 'View Options'
+        })
+        .tipsy({delayIn: 1000, gravity: 'ne'})
+        .click(stylebot.chrome.openOptionsPage);
+        
         this.cache.header = $('<div>', {
             id: 'stylebot-header'
         })
@@ -127,6 +136,7 @@ stylebot.widget = {
         .append(headerTextContainer)
         .append(closeButton)
         .append(arrowButton)
+        .append(settingsButton)
         .appendTo(this.cache.box);
         
         //  Basic mode
