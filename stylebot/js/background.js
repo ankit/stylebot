@@ -1,6 +1,7 @@
 /* Background JS for Stylebot */
 
-var CURRENT_VERSION = "1.2";
+// Major Version. Used to checked if it has to show the release notes or not.
+var CURRENT_MAJOR_VERSION = "1.2";
 
 var currTabId;
 var contextMenuId = null;
@@ -76,15 +77,15 @@ function updateVersion() {
         upgradeTo1();
     }
 
-    if (localStorage.version != CURRENT_VERSION) {
+    if (localStorage.version != CURRENT_MAJOR_VERSION) {
         updateVersionString();
         openReleaseNotes();
     }
 }
 
 function updateVersionString() {
-    console.log("Updating to version " + CURRENT_VERSION);
-    localStorage.version = CURRENT_VERSION;
+    console.log("Updating to version " + CURRENT_MAJOR_VERSION);
+    localStorage.version = CURRENT_MAJOR_VERSION;
 }
 
 // Upgrade to version 1
@@ -92,14 +93,14 @@ function updateVersionString() {
 //
 function upgradeTo1() {
     var first = false;
-    
+
     // upgrading to the new data model
     for (var url in cache.styles) {
-        
+
         // if it is already in the new format, do nothing
-        // this may happen when sync is enabled 
+        // this may happen when sync is enabled
         // and upgrade is taking place after an upgrade has already taken place at another computer
-        
+
         if (!first) {
             first = cache.styles[url];
             // ideally, there should me a more foolproof check
@@ -116,7 +117,7 @@ function upgradeTo1() {
 
     // save to localStorage
     updateStylesInDataStore();
-    
+
     // update data in bookmark as well
     pushStyles();
 }
@@ -124,39 +125,39 @@ function upgradeTo1() {
 // Listen to requests from tabs and page action
 //
 function attachListeners() {
-    
+
     if (cache.options.showPageAction == typeof undefined || cache.options.showPageAction) {
         showPageActions();
     }
-    
+
     chrome.extension.onRequest.addListener( function(request, sender, sendResponse) {
         switch (request.name) {
             case "enablePageAction"     : if (cache.options.showPageAction) { enablePageAction(sender.tab); } sendResponse({}); break;
-            
+
             case "disablePageAction"    : if (cache.options.showPageAction) { disablePageAction(sender.tab); } sendResponse({}); break;
-            
+
             case "showPageActions"      : showPageActions(); sendResponse({}); break;
-            
+
             case "hidePageActions"      : hidePageActions(); sendResponse({}); break;
-            
+
             case "copyToClipboard"      : copyToClipboard(request.text); sendResponse({}); break;
-            
+
             case "save"                 : save(request.url, request.rules, request.data); sendResponse({}); break;
 
             case "doesStyleExist"       : sendResponse(doesStyleExist(request.url)); break;
 
             case "transfer"             : transfer(request.source, request.destination); sendResponse({}); break;
-            
+
             case "getRulesForPage"      : sendResponse(getRulesForPage(request.url)); break;
-            
+
             case "fetchOptions"         : sendResponse({ options: cache.options, enabledAccordions: cache.enabledAccordions }); break;
-            
+
             case "saveAccordionState"   : saveAccordionState(request.enabledAccordions); sendResponse({}); break;
-            
+
             case "savePreference"       : savePreference(request.preference); sendResponse({}); break;
-            
+
             case "getPreference"        : sendResponse(getPreference(request.preferenceName)); break;
-            
+
             case "pushStyles"           : pushStyles(); sendResponse({}); break;
         }
     });
@@ -191,7 +192,7 @@ function disablePageAction(tab) {
     if (doesStyleExist(tab.url)) {
         chrome.pageAction.setIcon({ tabId: tab.id, path: "images/css_highlighted.png" });
     }
-    
+
     else {
         chrome.pageAction.setIcon({ tabId: tab.id, path: "images/css.png" });
     }
@@ -247,14 +248,14 @@ function hidePageActions() {
 
             if (tabs) {
                 var t_len = tabs.length;
-                
+
                 for (var j = 0; j < t_len; j++) {
                     chrome.pageAction.hide(tabs[j].id);
                 }
             }
         }
     });
-    
+
     chrome.pageAction.onClicked.removeListener(onPageActionClick);
     chrome.tabs.onUpdated.removeListener(onTabUpdated);
     chrome.tabs.onSelectionChanged.removeListener(onTabSelectionChanged);
@@ -277,22 +278,22 @@ function onTabSelectionChanged(tabId, selectInfo) {
 function save(url, rules, data) {
     if (!url || url == "")
         return;
-    
+
     if (rules) {
         cache.styles[url] = {};
         cache.styles[url]['_rules'] = rules;
     }
-    
+
     else
         delete cache.styles[url];
-    
+
     // if there is meta data, store it in the social object
     if (data != undefined) {
         cache.styles[url]['_social'] = {};
         cache.styles[url]['_social'].id = data.id;
         cache.styles[url]['_social'].timestamp = data.timestamp;
     }
-    
+
     updateStylesInDataStore();
 }
 
@@ -327,7 +328,7 @@ function mergeStyles(s1, s2) {
     if (!s2) {
         return s1;
     }
-    
+
     for (var url in s1) {
         if (s2[url]) {
             for (var selector in s1[url]['_rules']) {
@@ -344,7 +345,7 @@ function mergeStyles(s1, s2) {
         else
             s2[url] = s1[url];
     }
-    
+
     return s2;
 }
 
@@ -444,11 +445,11 @@ function getRulesForPage(currUrl) {
 
             // iterate over each selector in styles
             for (var selector in cache.styles[url]['_rules']) {
-                
+
                 // if no rule exists for selector, simply copy the rule
                 if (rules[selector] == undefined)
                     rules[selector] = cloneObject(cache.styles[url]['_rules'][selector]);
-                
+
                 // otherwise, iterate over each property
                 else {
                     for (var property in cache.styles[url]['_rules'][selector])
@@ -460,7 +461,7 @@ function getRulesForPage(currUrl) {
             }
         }
     }
-    
+
     if (rules != undefined)
         return {rules: rules, url: url_for_page};
     else
@@ -476,7 +477,7 @@ function propagateOptions() {
 function sendRequestToAllTabs(req){
     chrome.windows.getAll({ populate: true }, function(windows) {
         var w_len = windows.length;
-        
+
         for (var i = 0; i < w_len; i++)
         {
             var t_len = windows[i].tabs.length;
@@ -515,15 +516,15 @@ function createContextMenu() {
             title: "Stylebot",
             contexts: ['all']
         });
-        
+
         chrome.contextMenus.create({
             title: "Style Element",
             contexts: ['all'],
             onclick: function(info, tab) { sendRequestToTab(tab, "openWidget"); },
             parentId: contextMenuId
         });
-        
-        chrome.contextMenus.create({
+
+        contextMenuStatusId = chrome.contextMenus.create({
             title: "Enable Styling",
             type: "checkbox",
             checked: true,
@@ -531,14 +532,19 @@ function createContextMenu() {
             onclick: function(info, tab) { sendRequestToTab(tab, "toggleStyle"); },
             parentId: contextMenuId
         });
-        
+
         chrome.contextMenus.create({
             title: "Search for styles...",
             contexts: ['all'],
             onclick: function(info, tab) { sendRequestToTab(tab, "searchSocial"); },
             parentId: contextMenuId
         });
-        
+
+        // Added onUpdated listener so we can track tab refresh
+        chrome.tabs.onUpdated.addListener(function(tabId, changeInfo) {
+            chrome.contextMenus.update(contextMenuStatusId, {checked: true});
+        });
+
         // Add a selectionChanged listener so we can track changes in current tab
         chrome.tabs.onSelectionChanged.addListener(function(tabId, selectInfo) {
             // Get style status from the tab we changed to and update the checkbox in the context menu
@@ -597,10 +603,10 @@ function cloneObject(obj) {
         if (obj[i] && typeof obj[i] == "object") {
             newObj[i] = cloneObject(obj[i]);
         }
-        
+
         else
             newObj[i] = obj[i]
     }
-    
+
     return newObj;
 };
