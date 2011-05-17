@@ -59,7 +59,7 @@ stylebot.chrome = {
     pushStyles: function() {
         chrome.extension.sendRequest({ name: "pushStyles" }, function(){});
     },
-    
+
     openOptionsPage: function() {
         window.open(chrome.extension.getURL("options.html"));
     }

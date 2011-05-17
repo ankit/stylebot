@@ -1,5 +1,5 @@
 $(document).ready(function() {
-   init(); 
+   init();
 });
 
 /* Javascript for stylebot options page */
@@ -30,32 +30,32 @@ var styles = {};
 function init() {
     // initialize tabs
     initializeTabs();
-    
+
     // fetch options from datastore
     fetchOptions();
 
     $.each(options, function(option, value) {
         var $el = $('[name=' + option + ']');
         var el = $el.get(0);
-        
+
         if (el == undefined)
             return;
-        
+
         var tag = el.tagName.toLowerCase();
-        
+
         if (el.type === "checkbox") {
             if (value == true)
                 el.checked = true;
         }
-        
+
         else if (tag === "select" || el.type === "hidden") {
             if (value != undefined)
                 el.value = value;
         }
-        
+
         else if (el.type === "radio") {
             var len = $el.length;
-            
+
             for (var i = 0; i < len; i ++) {
                 if ($el.get(i).value == value)
                 {
@@ -64,14 +64,14 @@ function init() {
                 }
             }
         }
-        
+
     });
-    
+
     KeyCombo.init($('[name=shortcutKeyCharacter]').get(0), $('[name=shortcutKey]').get(0));
 
     bg_window = chrome.extension.getBackgroundPage();
     styles = bg_window.cache.styles;
-    
+
     fillCustomStyles();
     attachListeners();
     initFiltering();
@@ -88,14 +88,14 @@ function initializeTabs() {
     $("ul.menu li:first").addClass("tabActive").show();
     $("#options > div").hide();
     $("#basic-options").show();
-    
+
     // click event for tab menu items
     $("ul.menu li").click(function() {
 
         $("ul.menu li").removeClass("tabActive");
         $(this).addClass("tabActive");
         $("#options > div").hide();
-        
+
         // Get DIV ID for content from the href of the menu link
         var activeTab = $(this).find("a").attr("href");
         $(activeTab).fadeIn();
@@ -107,7 +107,7 @@ function initializeTabs() {
 function fetchOptions() {
     $.each(options, function(option, value) {
         var dataStoreValue = localStorage['stylebot_option_' + option];
-        
+
         if (dataStoreValue != typeof undefined)
         {
             if (dataStoreValue === "true" || dataStoreValue === "false")
@@ -133,12 +133,12 @@ function attachListeners() {
         var value = translateOptionValue(name, e.target.value);
         bg_window.saveOption(name, value);
     });
-    
+
     // select
     $('.option-field select').change(function(e) {
         bg_window.saveOption(e.target.name, e.target.value);
     });
-    
+
     // textfields
     $('.option-field input[type=text]').keyup(function(e) {
         if (e.target.name == "shortcutKeyCharacter")
@@ -164,7 +164,7 @@ function translateOptionValue(name, value) {
 function fillCustomStyles() {
     var container = $("#custom-styles");
     container.html("");
-    
+
     for (var url in styles) {
         container.append(createCustomStyleOption(url));
     }
@@ -175,7 +175,7 @@ function createCustomStyleOption(url) {
     var container = $('<div>', {
         class: 'custom-style'
     });
-    
+
     var url_div = $('<div>', {
         html: url,
         class: 'custom-style-url',
@@ -183,37 +183,37 @@ function createCustomStyleOption(url) {
     })
     .data('value', url)
     .appendTo(container);
-    
+
     Utils.makeEditable(url_div , function(newValue) {
         editURL( url_div.data('value'), newValue);
         url_div.data('value', newValue);
     });
-    
+
     var b_container = $('<div>', {
         class: 'button-container'
     });
 
     $('<button>', {
-        html: 'share',
+        html: 'Share',
         class: 'inline-button'
     })
     .click(shareStyle)
     .appendTo(b_container);
-    
+
     $('<button>', {
-        html: 'edit',
+        html: 'Edit',
         class: 'inline-button'
     })
     .click(editStyle)
     .appendTo(b_container);
-    
+
     $('<button>', {
-        html: 'remove',
+        html: 'Remove',
         class: 'inline-button'
     })
     .click(removeStyle)
     .appendTo(b_container);
-    
+
     return container.append(b_container);
 }
 
@@ -233,15 +233,15 @@ function editStyle(e) {
     var url = parent.find('.custom-style-url').html();
     var rules = styles[url]['_rules'];
     var css = CSSUtils.crunchFormattedCSS(rules, false);
-    
+
     var html = "<div>Edit the CSS for <b>" + url + "</b>:</div>";
     html += "<textarea class='stylebot-css-code' style='width: 100%; height:" + cache.textareaHeight + "'>" + css + "</textarea>";
     html += "<button onclick='cache.modal.hide();'>Cancel</button>";
     html += "<button onclick='onUpdate(); cache.modal.hide();'>Save</button>";
-    
+
     initModal(html);
-    
-    cache.modal.options.onOpen = function() { 
+
+    cache.modal.options.onOpen = function() {
         var textarea = cache.modal.box.find('textarea').get(0);
         textarea.focus();
         Utils.moveCursorToEnd(textarea);
@@ -258,32 +258,32 @@ function shareStyle(e) {
     var css = CSSUtils.crunchFormattedCSS(rules, false);
 
     var production_url = "http://stylebot.me/post";
-    
+
     // create a form and submit data
     var temp_form = $('<form>', {
         'method': 'post',
         'action': production_url,
         'target': '_blank'
     });
-    
+
     // site
     $('<input>', {
         type: 'hidden',
         name: 'site',
         value: url
     }).appendTo(temp_form);
-    
+
     // css
     $('<input>', {
         type: 'hidden',
         name: 'css',
         value: css
     }).appendTo(temp_form);
-    
+
     $('<submit>').appendTo(temp_form);
-    
+
     temp_form.submit();
-    
+
     temp_form.remove();
 }
 
@@ -301,7 +301,7 @@ function addStyle() {
     html += "</textarea>";
     html += "<button onclick= 'cache.modal.hide();' >Cancel</button>";
     html += "<button onclick= 'onAdd(); cache.modal.hide();' >Add</button>";
-    
+
     initModal(html);
     cache.modal.options.onOpen = function() { cache.modal.box.find('input').focus(); };
     cache.modal.show();
@@ -340,10 +340,10 @@ function saveStyle(url, css) {
         delete styles[url];
         $('.custom-style-url:contains(' + url + ')').parent().remove();
     }
-    
+
     bg_window.saveStyles(styles);
     bg_window.pushStyles();
-    
+
     return retVal;
 }
 
@@ -405,7 +405,7 @@ function import() {
     <textarea class='stylebot-css-code' style='width: 100%; height:" + cache.textareaHeight + "'> \
     </textarea> \
     <button onclick='importCSS();cache.modal.hide();'>Import</button>";
-    
+
     initModal(html, {
         closeOnEsc: true,
         closeOnBgClick: true
@@ -435,7 +435,7 @@ function importCSS() {
         catch(e) {
             console.log(e);
         }
-        
+
         fillCustomStyles();
     }
 }
@@ -485,7 +485,7 @@ function togglePageAction() {
         bg_window.saveOption("showPageAction", options.showPageAction);
         bg_window.hidePageActions();
     }
-    
+
     else {
         options.showPageAction = true;
         bg_window.saveOption("showPageAction", options.showPageAction);
@@ -564,7 +564,7 @@ function mergeStyles(s1, s2) {
         if (s1[url]['_rules']) {
             s2[url] = s1[url];
         }
-        
+
         // old format
         else {
             s2[url] = {};

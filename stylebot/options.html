@@ -16,7 +16,7 @@
 <body>
 <div id="wrap">
     <div id="tabMenu">
-        <h3>Stylebot Options</h3>
+        <h1>Stylebot Options</h1>
         <ul class="menu">
             <li><a href="#basic-options">Basic</a></li>
             <li><a href="#custom-styles-container">Styles</a></li>
@@ -32,23 +32,19 @@
     </div>
     <div id="options">
         <div id="basic-options">
-            <h4>Basic</h4>
+            <h1>Basic</h1>
             <ul>
                 <li class="option">
-                    <label>Shortcut Key to launch Stylebot</label>
-                    <div class="option-field">
-                        <input type="checkbox" name="useShortcutKey" />
-                    </div>
+                    <input type="checkbox" name="useShortcutKey" />
+                    <label>Enable Shortcut Key to launch Stylebot</label>
                 </li>
                 <li class="option">
-                    <label>Right Click Menu</label>
-                    <div class="option-field">
-                        <input type="checkbox" name="contextMenu" />
-                    </div>
+                    <input type="checkbox" name="contextMenu" />
+                    <label>Enable Right Click Menu</label>
                 </li>
                 <li class="option">
-                    <label>Shortcut Key Combo</label>
-                    <div class="option-field">
+                    <label>Shortcut Key to launch Stylebot:</label>
+                    <div class='option-field'>
                         <select name="shortcutMetaKey">
                             <option value="ctrl">Ctrl</option>
                             <option value="shift">Shift</option>
@@ -68,30 +64,23 @@
                     </div>
                 </li>
                 <li class="option">
+                    <input type="checkbox" name="livePreviewColorPicker" />
                     <label>Live Preview in Color Picker</label>
-                    <div class="option-field">
-                        <input type="checkbox" name="livePreviewColorPicker" />
-                    </div>
                 </li>
                 <li class="option">
+                    <input type="checkbox" name="showPageAction" onclick="togglePageAction();" />
                     <label>Show <img src='images/css.png' style='margin-bottom: -5px;' /> Icon in Omnibar</label>
-                    <div class="option-field">
-                        <input type="checkbox" name="showPageAction" onclick="togglePageAction();" />
-                    </div>
                 </li>
             </ul>
         </div>
         <div id="custom-styles-container">
             <div>
-                <h4>Custom Styles</h4>
+                <h1>Styles</h1>
                 <div id="custom-styles-header">
-                    <div id="custom-style-install-text">
-                        <button onclick="addStyle();">
-                            Add Style
-                        </button>
-                        or search for styles on <a href="http://stylebot.me">Stylebot Social</a>
-                    </div>
-                    <input type="text" id="style-search-field" placeholder="Search your styles..."/>
+                    <button onclick="addStyle();">Add Style</button>
+                    or search for styles on <a href="http://stylebot.me">Stylebot Social</a>
+                    <br><br>
+                    <input type="search" id="style-search-field" placeholder="Search your styles..."/>
                 </div>
                 <div id="custom-styles">
                 </div>
@@ -101,17 +90,19 @@
             </div>
         </div>
         <div id="backup">
-            <h4>Backup</h4>
+            <h1>Backup</h1>
             <button onclick="export();">Export</button>
             <button onclick="import();">Import</button>
+            <br><br>
             <div id="sync">
-                <h4>Sync <span class='description'>experimental</span></h2>
+                <h1>Sync <span class='description'>experimental</span></h1>
                 <div class="description">
                     This will sync your custom styles across multiple computers. For this to work, you need to have
                     <a href="http://www.google.com/support/chrome/bin/answer.py?hl=en&answer=165139">
                         Bookmark Sync enabled
                     </a>.
                 </div>
+                <br>
                 <button onclick="toggleSyncing();" id="sync-button">Enable Sync</button><br><br>
                 <button onclick="bg_window.pushStyles();" style="display: none" id="sync-now">Push Styles Now</button>
     <div class="description" id="sync-enabled-note"><strong>Important</strong>: When you click on <strong>Push Styles Now</strong>, your custom styles on this computer will be pushed to and replace existing styles on all other computers.
