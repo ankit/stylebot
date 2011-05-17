@@ -1,6 +1,7 @@
 /* Background JS for Stylebot */
 
-var CURRENT_VERSION = "1.2.1";
+// Major Version. Used to checked if it has to show the release notes or not.
+var CURRENT_MAJOR_VERSION = "1.2";
 
 var currTabId;
 var contextMenuId = null;
@@ -76,15 +77,15 @@ function updateVersion() {
         upgradeTo1();
     }
 
-    if (localStorage.version != CURRENT_VERSION) {
+    if (localStorage.version != CURRENT_MAJOR_VERSION) {
         updateVersionString();
         openReleaseNotes();
     }
 }
 
 function updateVersionString() {
-    console.log("Updating to version " + CURRENT_VERSION);
-    localStorage.version = CURRENT_VERSION;
+    console.log("Updating to version " + CURRENT_MAJOR_VERSION);
+    localStorage.version = CURRENT_MAJOR_VERSION;
 }
 
 // Upgrade to version 1
