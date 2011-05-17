@@ -1,6 +1,8 @@
 /* Background JS for Stylebot */
 
-// Major Version. Used to checked if it has to show the release notes or not.
+// Major Version. Used to check if the release notes should be shown during update
+// Only updated for X.X releases
+//
 var CURRENT_MAJOR_VERSION = "1.2";
 
 var currTabId;
