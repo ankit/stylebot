@@ -370,7 +370,7 @@ function export() {
     else
         css = "";
 
-    var html = "<div>Copy and paste your styles into a text file:</div><textarea class='stylebot-css-code'>" + css + "</textarea><button onclick='copyToClipboard()'>Copy To Clipboard</button>";
+    var html = "<div>Copy and paste the following into a text file:</div><textarea class='stylebot-css-code'>" + css + "</textarea><button onclick='copyToClipboard()'>Copy To Clipboard</button>";
 
     initModal(html, {
         closeOnEsc: true,
@@ -395,7 +395,7 @@ function copyToClipboard() {
 function import() {
     var html = "<div>Paste previously exported styles: \
     <div class='description'> \
-    <span class='note'>Note</span>: Existing styles for similar URLs will be replaced.</div> \
+    <span class='note'>Note</span>: Existing styles for similar URLs will be overwritten.</div> \
     </div> \
     <textarea id='stylebot-import-css' class='stylebot-css-code'> \
     </textarea> \
