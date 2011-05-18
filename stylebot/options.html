@@ -16,9 +16,9 @@
 <body>
 <div id="wrap">
     <div id="tabMenu">
-        <h3>Stylebot Options</h3>
+        <h1>Stylebot Options</h1>
         <ul class="menu">
-            <li><a href="#basic-options">Basic</a></li>
+            <li><a href="#basic-options">Basics</a></li>
             <li><a href="#custom-styles-container">Styles</a></li>
             <li><a href="#backup">Backup and Sync</a></li>
         </ul>
@@ -32,89 +32,119 @@
     </div>
     <div id="options">
         <div id="basic-options">
-            <h4>Basic</h4>
-            <ul>
-                <li class="option">
-                    <label>Shortcut Key to launch Stylebot</label>
-                    <div class="option-field">
-                        <input type="checkbox" name="useShortcutKey" />
-                    </div>
-                </li>
-                <li class="option">
-                    <label>Right Click Menu</label>
-                    <div class="option-field">
-                        <input type="checkbox" name="contextMenu" />
-                    </div>
-                </li>
-                <li class="option">
-                    <label>Shortcut Key Combo</label>
-                    <div class="option-field">
-                        <select name="shortcutMetaKey">
-                            <option value="ctrl">Ctrl</option>
-                            <option value="shift">Shift</option>
-                            <option value="alt">Alt</option>
-                            <option value="none">None</option>
-                        </select>
-                        + <input type="text" name="shortcutKeyCharacter" value="e" size="1" />
-                        <!-- Hidden field to store keycode value -->
-                        <input type="hidden" name="shortcutKey" />
-                    </div>
-                </li>
-                <li class="option">
-                    <label>Preferred mode</label>
-                    <div class="option-field">
-                        <input type="radio" name="mode" value="Basic" /> Basic
-                        <input type="radio" name="mode" value="Advanced" /> Advanced
-                    </div>
-                </li>
-                <li class="option">
-                    <label>Live Preview in Color Picker</label>
-                    <div class="option-field">
-                        <input type="checkbox" name="livePreviewColorPicker" />
-                    </div>
-                </li>
-                <li class="option">
-                    <label>Show <img src='images/css.png' style='margin-bottom: -5px;' /> Icon in Omnibar</label>
-                    <div class="option-field">
-                        <input type="checkbox" name="showPageAction" onclick="togglePageAction();" />
-                    </div>
-                </li>
-            </ul>
+            <h2>Basics</h2>
+            <div class="option-section">
+                <h3>Browser UI</h3>
+                <ul class="option-subsection">
+                    <li class="option">
+                        <label>
+                            <span class="option-field">Right Click Menu</span>
+                            <input type="checkbox" name="contextMenu" />
+                        </label>
+                    </li>
+                    <li class="option">
+                        <label>
+                            <span class="option-field">Show <img src='images/css.png' style='margin-bottom: -5px;' /> Icon in Omnibar</span>
+                            <input type="checkbox" name="showPageAction" onclick="togglePageAction();" />
+                        </label>
+                    </li>
+                </ul>
+            </div>
+            <div class="option-section">
+                <h3>Accessibility</h3>
+                <ul class="option-subsection">
+                    <li class="option">
+                        <label>
+                            <span class="option-field">Shortcut Key to launch Stylebot</span>
+                            <input type="checkbox" name="useShortcutKey" />
+                        </label>
+                    </li>
+                    <li class="option">
+                        <label>
+                            <span class="option-field">Shortcut Key Combo</span>
+                            <select name="shortcutMetaKey">
+                                <option value="ctrl">Ctrl</option>
+                                <option value="shift">Shift</option>
+                                <option value="alt">Alt</option>
+                                <option value="none">None</option>
+                            </select>
+                            + <input type="text" name="shortcutKeyCharacter" value="e" size="1" />
+                            <!-- Hidden field to store keycode value -->
+                            <input type="hidden" name="shortcutKey" />
+                        </label>
+                    </li>
+                </ul>
+            </div>
+            <div class="option-section">
+                <h3>Edition</h3>
+                <ul class="option-subsection">
+                    <li class="option">
+                        <span class='option-field'>Preferred mode</span>
+                        <label><input type="radio" name="mode" value="Basic" /> Basic </label>
+                        &nbsp;
+                        <label><input type="radio" name="mode" value="Advanced" /> Advanced </label>
+                    </li>
+                    <li class="option">
+                        <label>
+                            <span class="option-field">Live Preview in Color Picker</span>
+                            <input type="checkbox" name="livePreviewColorPicker" />
+                        </label>
+                    </li>
+                </ul>
+            </div>
         </div>
         <div id="custom-styles-container">
-            <div>
-                <h4>Custom Styles</h4>
-                <div id="custom-styles-header">
-                    <div id="custom-style-install-text">
-                        <button onclick="addStyle();">
-                            Add Style
-                        </button>
-                        or search for styles on <a href="http://stylebot.me">Stylebot Social</a>
-                    </div>
-                    <input type="text" id="style-search-field" placeholder="Search your styles..."/>
-                </div>
-                <div id="custom-styles">
+            <h2>Styles</h2>
+            <div class="option-section">
+                <h3>Search</h3>
+                <div class="option-subsection">
+                        <div>
+                            Search for styles on
+                            <a rel="external" target="_blank" href="http://stylebot.me">Stylebot Social</a>
+                        </div>
+                        <div>
+                            Search your own styles:
+                            <input type="search" id="style-search-field" incremental placeholder="Search your styles..."/>
+                        </div>
                 </div>
             </div>
-            <div style="clear:both; padding-top: 10px">
-                <button onclick="addStyle();">Add Style</button>
+            <div class="option-section">
+                <h3>Custom Styles</h3>
+                <div class="option-subsection">
+                    <div class="description">
+                    </div>
+                    <button onclick="addStyle();">Add a new style...</button>
+                    <br style='clear:both;'/>
+                    <div id="custom-styles">
+                    </div>
+                </div>
             </div>
         </div>
         <div id="backup">
-            <h4>Backup</h4>
-            <button onclick="export();">Export</button>
-            <button onclick="import();">Import</button>
-            <div id="sync">
-                <h4>Sync <span class='description'>experimental</span></h2>
-                <div class="description">
-                    This will sync your custom styles across multiple computers. For this to work, you need to have
-                    <a href="http://www.google.com/support/chrome/bin/answer.py?hl=en&answer=165139">
-                        Bookmark Sync enabled
-                    </a>.
+            <h2>Backup and Sync</h2>
+            <div class="option-section">
+                <h3>Backup</h3>
+                <div class='option-subsection'>
+                    <div class="description">
+                        You can export and import your styles!
+                    </div>
+                    <button onclick="export();">Export Styles...</button>
+                    <button onclick="import();">Import Styles...</button>
+                 </div>
+            </div>
+            <div class="option-section" id="sync">
+                <h3>Sync <span class='alert'>experimental</span></h3>
+                <div class='option-subsection'>
+                    <div class="description">
+                        This will sync your custom styles across multiple computers. <br/>
+                        For this to work, you need to have
+                        <a href="http://www.google.com/support/chrome/bin/answer.py?hl=en&amp;answer=165139">Bookmark Sync enabled</a>.
+                    </div>
+                    <button onclick="toggleSyncing();" id="sync-button">Enable Sync</button>
+                    <button onclick="bg_window.pushStyles();" disabled=disabled id="sync-now">Push Styles Now</button>
+                    <div class="description" id="sync-enabled-note"><span class='important'>Important</span>: When you click on <strong>Push Styles Now</strong>, your custom styles on this computer will be pushed to and replace existing styles on all other computers.
+                    </div>
                 </div>
-                <button onclick="toggleSyncing();" id="sync-button">Enable Sync</button><br><br>
-                <button onclick="bg_window.pushStyles();" style="display: none" id="sync-now">Push Styles Now</button>
-    <div class="description" id="sync-enabled-note"><strong>Important</strong>: When you click on <strong>Push Styles Now</strong>, your custom styles on this computer will be pushed to and replace existing styles on all other computers.
             </div>
         </div>
     </div>
