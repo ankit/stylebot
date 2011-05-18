@@ -138,6 +138,7 @@ li.option:first-of-type {
     display: inline-block;
     line-height: 20px;
     border: 1px solid transparent;
+    outline: none;
 }
 
 .custom-style-url:hover {
@@ -147,9 +148,10 @@ li.option:first-of-type {
 }
 
 #stylebot-editing-field {
-    width: 211px !important;
+    width: 208px !important;
     padding-left: 3px !important;
     font-size: 13px !important;
+    margin-right: 3px !important;
 }
 
 #custom-styles-container .button-container {
