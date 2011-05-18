@@ -235,7 +235,7 @@ function editStyle(e) {
     var css = CSSUtils.crunchFormattedCSS(rules, false);
 
     var html = "<div>Edit the CSS for <b>" + url + "</b>:</div>";
-    html += "<textarea class='stylebot-css-code' style='width: 100%; height:" + cache.textareaHeight + "'>" + css + "</textarea>";
+    html += "<textarea class='stylebot-css-code' style='height:" + (parseInt(cache.textareaHeight,10)+28) + "px'>" + css + "</textarea>";
     html += "<button onclick='cache.modal.hide();'>Cancel</button>";
     html += "<button onclick='onUpdate(); cache.modal.hide();'>Save</button>";
 
@@ -402,7 +402,7 @@ function import() {
     var html = "<div>Paste previously exported custom styles here. \
     <div class='description' style='margin-top: 10px'>Note: Current custom styles for similar URLs will be replaced.</div> \
     </div> \
-    <textarea class='stylebot-css-code' style='height:" + (parseInt(cache.textareaHeight,10)-4) + ";'> \
+    <textarea class='stylebot-css-code' style='height:" + (parseInt(cache.textareaHeight,10)-8) + ";'> \
     </textarea> \
     <button onclick='importCSS();cache.modal.hide();'>Import</button>";
 
@@ -507,6 +507,11 @@ function initModal(html, options) {
 function initFiltering() {
     $("#style-search-field").bind('search', function(e){
        filterStyles($(this).val());
+    }).keyup(function(e){
+        if(e.keyCode == 27){
+            $(this).val('')
+            filterStyles("");
+        }
     });
 }
 
