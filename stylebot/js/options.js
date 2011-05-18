@@ -297,7 +297,7 @@ function onUpdate() {
 // Displays the modal popup to add a new style
 function addStyle() {
     var html = "<div>URL: <input type='text'></input></div>";
-    html += "<textarea class='stylebot-css-code' style='width: 100%; height:" + cache.textareaHeight + "'>";
+    html += "<textarea class='stylebot-css-code' style='width: 100%; height:" + (parseInt(cache.textareaHeight,10)+20) + "'>";
     html += "</textarea>";
     html += "<button onclick= 'cache.modal.hide();' >Cancel</button>";
     html += "<button onclick= 'onAdd(); cache.modal.hide();' >Add</button>";
@@ -402,7 +402,7 @@ function import() {
     var html = "<div>Paste previously exported custom styles here. \
     <div class='description' style='margin-top: 10px'>Note: Current custom styles for similar URLs will be replaced.</div> \
     </div> \
-    <textarea class='stylebot-css-code' style='height:" + (parseInt(cache.textareaHeight,10)-8) + ";'> \
+    <textarea class='stylebot-css-code' style='height:" + (parseInt(cache.textareaHeight,10)-8) + "px;'> \
     </textarea> \
     <button onclick='importCSS();cache.modal.hide();'>Import</button>";
 
