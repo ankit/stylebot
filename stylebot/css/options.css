@@ -79,12 +79,12 @@ li.option:first-of-type {
 }
 
 .option-field {
-    min-width: 250px;
+    min-width: 280px;
     display: inline-block;
 }
 
 .option-section {
-    width: 600px;
+    width: 630px;
     padding-right: 20px;
     display: -webkit-box;
     -webkit-box-orient: horizontal;
@@ -181,6 +181,7 @@ li.option:first-of-type {
     margin: 10px 0;
     line-height: 18px;
     font-size: 11px;
+    text-align: justify;
 }
 
 #sync-button {
@@ -287,7 +288,7 @@ ul.menu li.tabActive a {
     margin: 0 0 20px 235px;
     float: left;
     max-width: 888px;
-    min-width: 600px;
+    min-width: 630px;
     background-color: #fff;
     padding: 20px;
 }
