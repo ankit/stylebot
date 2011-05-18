@@ -109,9 +109,9 @@ li.option:first-of-type {
 
 .alert {
     position: relative;
-    left: -5px;
+    left: -2px;
     top: 5px;
-    color: #EC483C;
+    color: #D77582;
     font-size: 70%;
 }
 
@@ -132,13 +132,6 @@ li.option:first-of-type {
     overflow: auto;
 }
 
-#style-search-field {
-    width: 35%;
-    outline: none;
-    margin-bottom: 20px;
-    font-size: 20px;
-}
-
 .custom-style {
     clear: both;
     margin: 5px;
@@ -147,29 +140,25 @@ li.option:first-of-type {
 
 .custom-style-url {
     padding: 2px;
+    padding-left: 4px;
+    margin-right: 3px;
     width: 200px;
     word-wrap: break-word;
     display: inline-block;
     line-height: 20px;
+    border: 1px solid transparent;
 }
 
 .custom-style-url:hover {
     background-color: #fbfbfb;
-    outline: 1px solid #ccc;
-    padding-left: 4px;
-    width: 195px;
-    margin-right: 3px;
+    border: 1px solid #ccc;
     cursor: text;
 }
 
-.custom-style-url:focus {
-    outline: 1px solid #aaa;
-}
-
-#custom-styles-container input {
-    text-align: left;
-    margin-right: 4px;
-    margin-bottom: -1px;
+#stylebot-editing-field {
+    width: 211px !important;
+    padding-left: 3px !important;
+    font-size: 13px !important;
 }
 
 #custom-styles-container .button-container {
@@ -178,19 +167,20 @@ li.option:first-of-type {
     padding-top: 7px;
 }
 
-
 #style-search-field {
-    -webkit-appearance: textfield;
     width: 166px;
-    outline: none;
     vertical-align: baseline;
-    font-size: 13px;
-    line-height: 15px;
     margin-bottom: 20px;
+    font-size: 14px;
 }
 
 .important {
-    color: #EC483C;
+    color: #D77582;
+    font-weight: bold;
+}
+
+.note {
+    color: #555;
     font-weight: bold;
 }
 
@@ -304,8 +294,7 @@ ul.menu li.tabActive a {
 
 /** CONTROLS: CSS from Chromium Project **/
 
-input[type=text],
-#style-search-field
+input[type=text]
 {
     border: 1px solid #ccc;
     border-radius: 2px;
