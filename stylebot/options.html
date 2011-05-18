@@ -99,8 +99,10 @@
                 <h3>Search</h3>
                 <div class="option-subsection">
                     <div>
-                        Search for styles on
-                        <a rel="external" target="_blank" href="http://stylebot.me">Stylebot Social</a>
+                        <li class='option'>
+                            Search for styles on
+                            <a rel="external" target="_blank" href="http://stylebot.me">Stylebot Social</a>
+                        </li>
                     </div>
                     <div>
                         Search your own styles:
@@ -125,28 +127,29 @@
             <div class="option-section">
                 <h3>Backup</h3>
                 <div class='option-subsection'>
-                    <div class="description">
+                    <li class='option'>
                         You can export and import your styles!
-                    </div>
-                    <button onclick="export();">Export Styles...</button>
-                    <button onclick="import();">Import Styles...</button>
+                        <div style='margin-top: 18px'>
+                            <button onclick="export();">Export Styles...</button>
+                            <button onclick="import();">Import Styles...</button>
+                        </div>
+                    </li>
                  </div>
             </div>
             <div class="option-section" id="sync">
                 <h3>Sync <span class='alert'>experimental</span></h3>
                 <div class='option-subsection'>
-                    <div class="description">
-                        This will sync your styles across multiple computers. Requires <a href="http://www.google.com/support/chrome/bin/answer.py?answer=185277" target='_blank'>Bookmark Sync to be enabled</a>.
-                    </div>
-
-                    <br>
-
-                    <button onclick="toggleSyncing();" id="sync-button">Enable Sync</button>
-                    <div class="description" id="sync-enabled-note">
+                    <li class='option'>
+                        Sync your styles across multiple computers.
                         <br>
-                        <span class='note'>Note</span>: Stylebot pushes changes automatically in the background. In case you want your changes to show up on other computers immediately, you may <a href='#' onclick='onclick="bg_window.pushStyles();'>push styles now</a>.
-                        <br><br>
-                    </div>
+Requires <a href="http://www.google.com/support/chrome/bin/answer.py?answer=185277" target='_blank'>Bookmark Sync</a>.
+                        <div style='margin-top:18px'>
+                            <button onclick="toggleSyncing();" id="sync-button">Enable Sync</button>
+                        </div>
+                        <div class="description" id="sync-enabled-note">
+                            <span class='note'>Note</span>: Stylebot pushes changes automatically in the background. In case you want your changes to show up on other computers immediately, you may <a href='#' onclick='onclick="bg_window.pushStyles();'>push styles now</a>.
+                        </div>
+                    </li>
                 </div>
             </div>
         </div>

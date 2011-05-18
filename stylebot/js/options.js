@@ -7,8 +7,7 @@ $(document).ready(function() {
 var bg_window = null;
 
 var cache = {
-    modal: null,
-    textareaHeight: null
+    modal: null
 }
 
 // options with their default values
@@ -76,11 +75,6 @@ function init() {
     attachListeners();
     initFiltering();
     updateSyncUI();
-
-    // hack to wait for window.innerHeight to be available
-    setTimeout(function() {
-        cache.textareaHeight = window.innerHeight * 0.5 + 'px';
-    }, 100);
 }
 
 // Initialize tabs
@@ -235,7 +229,7 @@ function editStyle(e) {
     var css = CSSUtils.crunchFormattedCSS(rules, false);
 
     var html = "<div>Edit the CSS for <b>" + url + "</b>:</div>";
-    html += "<textarea class='stylebot-css-code' style='height:" + (parseInt(cache.textareaHeight,10)+28) + "px'>" + css + "</textarea>";
+    html += "<textarea class='stylebot-css-code'>" + css + "</textarea>";
     html += "<button onclick='cache.modal.hide();'>Cancel</button>";
     html += "<button onclick='onUpdate(); cache.modal.hide();'>Save</button>";
 
@@ -297,7 +291,7 @@ function onUpdate() {
 // Displays the modal popup to add a new style
 function addStyle() {
     var html = "<div>URL: <input type='text'></input></div>";
-    html += "<textarea class='stylebot-css-code' style='width: 100%; height:" + (parseInt(cache.textareaHeight,10)+20) + "'>";
+    html += "<textarea class='stylebot-css-code'>";
     html += "</textarea>";
     html += "<button onclick= 'cache.modal.hide();' >Cancel</button>";
     html += "<button onclick= 'onAdd(); cache.modal.hide();' >Add</button>";
@@ -376,7 +370,7 @@ function export() {
     else
         css = "";
 
-    var html = "<div>Copy and paste your custom styles into a text file:</div><textarea class='stylebot-css-code' style='height:" + (parseInt(cache.textareaHeight,10)+26) + "px'>" + css + "</textarea><button onclick='copyToClipboard()'>Copy To Clipboard</button>";
+    var html = "<div>Copy and paste your styles into a text file:</div><textarea class='stylebot-css-code'>" + css + "</textarea><button onclick='copyToClipboard()'>Copy To Clipboard</button>";
 
     initModal(html, {
         closeOnEsc: true,
@@ -399,10 +393,11 @@ function copyToClipboard() {
 
 // Displays the modal popup for importing styles from JSON string
 function import() {
-    var html = "<div>Paste previously exported custom styles here. \
-    <div class='description' style='margin-top: 10px'>Note: Current custom styles for similar URLs will be replaced.</div> \
+    var html = "<div>Paste previously exported styles: \
+    <div class='description'> \
+    <span class='note'>Note</span>: Existing styles for similar URLs will be replaced.</div> \
     </div> \
-    <textarea class='stylebot-css-code' style='height:" + (parseInt(cache.textareaHeight,10)-8) + "px;'> \
+    <textarea id='stylebot-import-css' class='stylebot-css-code'> \
     </textarea> \
     <button onclick='importCSS();cache.modal.hide();'>Import</button>";
 
@@ -506,9 +501,11 @@ function initModal(html, options) {
 
 // Attach listener to search field for filtering styles
 function initFiltering() {
-    $("#style-search-field").bind('search', function(e){
+    $("#style-search-field").bind('search', function(e) {
        filterStyles($(this).val());
-    }).keyup(function(e){
+    })
+
+    .keyup(function(e){
         if(e.keyCode == 27){
             $(this).val('')
             filterStyles("");

@@ -40,8 +40,8 @@ h2 {
 .option-section h3 {
     font-size: 14px;
     font-weight: bold;
-    margin: 5px 0 0 0;
     width: 180px;
+    vertical-align: middle;
 }
 
 a {
@@ -52,15 +52,6 @@ a {
 
 a:hover {
     color: #294266;
-}
-
-.description {
-    color: #444;
-    font-size: 12px !important;
-    line-height: 22px;
-    padding-top: 4px;
-    max-width: 400px;
-    text-align: justify;
 }
 
 #footer {
@@ -80,7 +71,7 @@ ul {
 
 li.option {
     list-style-type: none;
-    line-height: 40px;
+    margin: 5px 0px;
 }
 
 li.option:first-of-type {
@@ -184,6 +175,12 @@ li.option:first-of-type {
     font-weight: bold;
 }
 
+.description {
+    margin: 10px 0;
+    line-height: 18px;
+    font-size: 11px;
+}
+
 #sync-button {
     width: 120px;
 }
@@ -198,8 +195,19 @@ textarea.stylebot-css-code {
     line-height: 16px;
     padding: 2px;
     display: block;
-    width: 100%;
+    width: 100% !important;
+    height: 87% !important;
+    position: relative;
     -webkit-border-radius: 2px;
+}
+
+/** because of the notice text, the height of the textarea in the import modal popup needs to be little less **/
+#stylebot-import-css {
+    height: 83% !important;
+}
+
+#stylebot-modal {
+    -webkit-border-radius: 2px !important;
 }
 
 #stylebot-modal div {
@@ -209,6 +217,8 @@ textarea.stylebot-css-code {
 
 #stylebot-modal .description {
     color: #666;
+    font-size: 11px;
+    margin: 2px 0 !important;
 }
 
 #stylebot-modal input {
