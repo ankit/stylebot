@@ -45,6 +45,17 @@
     display: inline-block;
 }
 
+#stylebot-header-selector #stylebot-editing-field {
+    width: 179px !important;
+    border: none !important;
+    border-radius: 0 !important;
+}
+
+#stylebot-header-url #stylebot-editing-field {
+    width: 199px !important;
+    margin-bottom: -3px !important;
+}
+
 #stylebot-header-container {
     display: inline-block;
     float: left !important;
@@ -65,7 +76,7 @@
     float: left !important;
     max-width: 100% !important;
     overflow: hidden !important;
-    width: auto !important;
+    width: 100% !important;
     padding: 0 !important;
     margin: 0 !important;
 }
@@ -75,7 +86,7 @@
     font-family: 'Lucida Grande', Arial, sans-serif !important;
     margin: 0 !important;
     padding: 0 !important;
-    width: auto !important;
+    width: 180px !important;
 }
 
 #stylebot-header .stylebot-editable-text:hover {
@@ -89,17 +100,30 @@
     padding-left: 3px !important;
 }
 
+#stylebot-header-url .stylebot-editable-text {
+    padding-left: 3px !important;
+    border-radius: 2px! important;
+    width: 200px !important;
+}
+
+#stylebot-header-url .stylebot-editable-text:hover {
+    padding-bottom: 1px !important;
+    border: 1px solid #c2c2c2 !important;
+    margin-bottom: -3px !important;
+}
+
 #stylebot-dropdown {
     background-color: #fbfbfb !important;
     border: 1px solid #ccc !important;
+    border-top: none !important;
     border-radius: 2px !important;
     display: block;
     width: auto !important;
-    min-width: 40px;
-    max-width: 150px;
+    width: 196px;
     position: fixed !important;
     z-index: 10000000 !important;
     overflow: auto !important;
+    margin-top: 1px !important;
 }
 
 #stylebot-dropdown li {
@@ -112,6 +136,7 @@
     padding: 2px !important;
     text-shadow: none !important;
     margin: 0px !important;
+    width: 196px !important;
 }
 
 #stylebot-dropdown li.stylebot-dropdown-li:hover, #stylebot-dropdown li.stylebot-dropdown-li-selected {
@@ -193,7 +218,7 @@
 
 #stylebot-dropdown-button {
     background: 2px 1px url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAPCAYAAAA71pVKAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAKlJREFUeNpiZEACDx8+FABSBgy4wQV5efkPGKJAjQYgjEcjdjVQQQEGIgBIHcwAJpgmrM7BAmDqwPqAhAMDGQCkjwldMCMzQwCIFQiJgZ2NxdB+ID4PVGwA0wik9gPxfGI0FwLxA5AGoEYHqEYFqDh+zTOmzwAFiCPMAKhGR6D4BWJsRjZgAy6N8FCjJLQvEEpZ2FIaSB8TSqQTmcIwEhU5aZuRklwFEGAAoDZsIypmv/AAAAAASUVORK5CYII=) no-repeat !important;
-    margin-left: 10px !important;
+    margin: 0 !important;
 }
 
 #stylebot-dropdown-button:hover {
