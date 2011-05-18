@@ -15,7 +15,7 @@ body {
     margin: 0 auto;
 }
 
-h1 {
+h1, h2, h3 {
     font-weight: normal;
     font-size: 22px;
     margin: 0;
@@ -24,12 +24,24 @@ h1 {
     color: #555;
 }
 
+h2 {
+    margin-bottom: 10px;
+}
+
 #tabmenu h1 {
     margin: 20px 10 17 5;
 }
 
-#options h1 {
-    border-bottom: 1px solid #eee;
+#options h2 {
+    font-size: 20px;
+    border-bottom: 1px solid #DDD;
+}
+
+.option-section h3 {
+    font-size: 14px;
+    font-weight: bold;
+    margin: 5px 0 0 0;
+    width: 180px;
 }
 
 a {
@@ -43,8 +55,12 @@ a:hover {
 }
 
 .description {
-    color: #888;
-    font-size: 13px !important;
+    color: #444;
+    font-size: 12px !important;
+    line-height: 22px;
+    padding-top: 4px;
+    max-width: 400px;
+    text-align: justify;
 }
 
 #footer {
@@ -64,20 +80,39 @@ ul {
 
 li.option {
     list-style-type: none;
-    line-height: 50px;
+    line-height: 40px;
 }
 
 li.option:first-of-type {
-    margin-top: -10px;
-}
-
-li.option label {
-    width: 280px;
-    display: inline-block;
+    margin-top: 10px;
 }
 
 .option-field {
-    display: inline;
+    min-width: 250px;
+    display: inline-block;
+}
+
+.option-section {
+    width: 600px;
+    padding-right: 20px;
+    display: -webkit-box;
+    -webkit-box-orient: horizontal;
+    border-bottom: 1px solid #DDD;
+    padding: 10px 0 14px 0;
+    margin-bottom: 6px;
+}
+
+.option-section .option-subsection {
+    font-size:13px;
+    -webkit-box-flex: 1;
+}
+
+.alert {
+    position: relative;
+    left: -5px;
+    top: 5px;
+    color: #EC483C;
+    font-size: 70%;
 }
 
 /** end of options **/
@@ -85,7 +120,7 @@ li.option label {
 /* custom styles */
 
 #custom-styles {
-    min-width: 420px;
+    min-width: 422px;
     margin-bottom: 20px;
 }
 
@@ -98,7 +133,6 @@ li.option label {
 }
 
 #style-search-field {
-    float: left;
     width: 35%;
     outline: none;
     margin-bottom: 20px;
@@ -122,11 +156,20 @@ li.option label {
 .custom-style-url:hover {
     background-color: #fbfbfb;
     outline: 1px solid #ccc;
+    padding-left: 4px;
+    width: 195px;
+    margin-right: 3px;
     cursor: text;
 }
 
 .custom-style-url:focus {
     outline: 1px solid #aaa;
+}
+
+#custom-styles-container input {
+    text-align: left;
+    margin-right: 4px;
+    margin-bottom: -1px;
 }
 
 #custom-styles-container .button-container {
@@ -135,11 +178,29 @@ li.option label {
     padding-top: 7px;
 }
 
+
+#style-search-field {
+    -webkit-appearance: textfield;
+    width: 166px;
+    outline: none;
+    vertical-align: baseline;
+    font-size: 13px;
+    line-height: 15px;
+    margin-bottom: 20px;
+}
+
+.important {
+    color: #EC483C;
+    font-weight: bold;
+}
+
+#sync-button {
+    width: 120px;
+}
+
 /** end of options **/
 
-
 /** popup **/
-
 textarea.stylebot-css-code {
     color: #333 ;
     font-size: 12px ;
@@ -147,6 +208,8 @@ textarea.stylebot-css-code {
     line-height: 16px;
     padding: 2px;
     display: block;
+    width: 100%;
+    -webkit-border-radius: 2px;
 }
 
 #stylebot-modal div {
@@ -173,15 +236,6 @@ textarea.stylebot-css-code {
 }
 
 /** tabs **/
-
-ul.menu {
-    float: right;
-    font-family: 'Lucida Grande', 'Lucida Sans', 'Lucida Sans Unicode', Helvetica, Arial, sans-serif;
-    font-size: 14px;
-    margin: 0;
-    padding-bottom: 20px;
-}
-
 .separator {
     width: 96%;
     height: 1px;
@@ -191,15 +245,12 @@ ul.menu {
     -webkit-box-shadow: 0px 1px 1px #fff;
 }
 
-ul.menu li.tabActive {
-    background-color: #fff;
-    border-top: 1px solid #ddd;
-    border-bottom: 1px solid #ddd;
-    -webkit-box-shadow: 0px 1px 0px #F7F7F7;
-}
-
-.tabActive a {
-    color: #294266;
+ul.menu {
+    float: right;
+    font-family: 'Lucida Grande', 'Lucida Sans', 'Lucida Sans Unicode', Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    margin: 0;
+    padding-bottom: 20px;
 }
 
 ul.menu li {
@@ -216,6 +267,17 @@ ul.menu li a,
 ul.menu li a:visited
 {
     text-decoration: none;
+}
+
+ul.menu li.tabActive {
+    background-color: #fff;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    -webkit-box-shadow: 0px 1px 0px #F7F7F7;
+}
+
+ul.menu li.tabActive a {
+    color: #294266;
 }
 
 #options {
@@ -242,7 +304,9 @@ ul.menu li a:visited
 
 /** CONTROLS: CSS from Chromium Project **/
 
-input[type=text] {
+input[type=text],
+#style-search-field
+{
     border: 1px solid #ccc;
     border-radius: 2px;
     color: #333;
@@ -353,4 +417,9 @@ input[type=radio] {
   margin-right: 0;
   position: relative;
   top: 1px;
+}
+
+/* custom inputs */
+input[name=shortcutKeyCharacter] {
+    text-transform: uppercase; text-align: center; width: 2em;
 }

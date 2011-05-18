@@ -121,26 +121,26 @@ function fetchOptions() {
 // Attaches listeners for different types of inputs that change option values
 function attachListeners() {
     // checkbox
-    $('.option-field input[type=checkbox]').change(function(e) {
+    $('.option label input[type=checkbox]').change(function(e) {
         var name = e.target.name;
         var value = translateOptionValue(name, e.target.checked);
         bg_window.saveOption(name, value);
     });
 
     // radio
-    $('.option-field input[type=radio]').change(function(e) {
+    $('.option label input[type=radio]').change(function(e) {
         var name = e.target.name;
         var value = translateOptionValue(name, e.target.value);
         bg_window.saveOption(name, value);
     });
 
     // select
-    $('.option-field select').change(function(e) {
+    $('.option label select').change(function(e) {
         bg_window.saveOption(e.target.name, e.target.value);
     });
 
     // textfields
-    $('.option-field input[type=text]').keyup(function(e) {
+    $('.option label input[type=text]').keyup(function(e) {
         if (e.target.name == "shortcutKeyCharacter")
             option = "shortcutKey";
         else
@@ -235,7 +235,7 @@ function editStyle(e) {
     var css = CSSUtils.crunchFormattedCSS(rules, false);
 
     var html = "<div>Edit the CSS for <b>" + url + "</b>:</div>";
-    html += "<textarea class='stylebot-css-code' style='width: 100%; height:" + cache.textareaHeight + "'>" + css + "</textarea>";
+    html += "<textarea class='stylebot-css-code' style='height:" + (parseInt(cache.textareaHeight,10)+28) + "px'>" + css + "</textarea>";
     html += "<button onclick='cache.modal.hide();'>Cancel</button>";
     html += "<button onclick='onUpdate(); cache.modal.hide();'>Save</button>";
 
@@ -297,7 +297,7 @@ function onUpdate() {
 // Displays the modal popup to add a new style
 function addStyle() {
     var html = "<div>URL: <input type='text'></input></div>";
-    html += "<textarea class='stylebot-css-code' style='width: 100%; height:" + cache.textareaHeight + "'>";
+    html += "<textarea class='stylebot-css-code' style='width: 100%; height:" + (parseInt(cache.textareaHeight,10)+20) + "'>";
     html += "</textarea>";
     html += "<button onclick= 'cache.modal.hide();' >Cancel</button>";
     html += "<button onclick= 'onAdd(); cache.modal.hide();' >Add</button>";
@@ -376,7 +376,7 @@ function export() {
     else
         css = "";
 
-    var html = "<div>Copy and paste your custom styles into a text file:</div><textarea class='stylebot-css-code' style='width: 100%; height:" + cache.textareaHeight + "'>" + css + "</textarea><button onclick='copyToClipboard()'>Copy To Clipboard</button>";
+    var html = "<div>Copy and paste your custom styles into a text file:</div><textarea class='stylebot-css-code' style='height:" + (parseInt(cache.textareaHeight,10)+26) + "px'>" + css + "</textarea><button onclick='copyToClipboard()'>Copy To Clipboard</button>";
 
     initModal(html, {
         closeOnEsc: true,
@@ -402,7 +402,7 @@ function import() {
     var html = "<div>Paste previously exported custom styles here. \
     <div class='description' style='margin-top: 10px'>Note: Current custom styles for similar URLs will be replaced.</div> \
     </div> \
-    <textarea class='stylebot-css-code' style='width: 100%; height:" + cache.textareaHeight + "'> \
+    <textarea class='stylebot-css-code' style='height:" + (parseInt(cache.textareaHeight,10)-8) + "px;'> \
     </textarea> \
     <button onclick='importCSS();cache.modal.hide();'>Import</button>";
 
@@ -444,51 +444,35 @@ function importCSS() {
 
 // Initialize Sync UI based on value of the sync option
 function updateSyncUI() {
-    var status = $('#sync_status');
-
-    if (options.sync) {
-        $('#sync-button').html("Disable Sync");
-        $('#sync-enabled-note').show();
-        $('#sync-now').show();
-    }
-
-    else {
-        $('#sync-button').html("Enable Sync");
-        $('#sync-enabled-note').hide();
-        $('#sync-now').hide();
-    }
+    $('#sync-button').html(options.sync ? "Disable Sync" : "Enable Sync");
+    $('#sync-enabled-note').toggle(options.sync);
+    $('#sync-now').attr('disabled', !options.sync);
 }
 
 // Turn syncing on/off
 //
 function toggleSyncing() {
-    if (options.sync) {
-        options.sync = false;
-        bg_window.saveOption("sync", false);
+    options.sync = !options.sync;
+    bg_window.saveOption("sync", options.sync);
+    if (!options.sync) {
         bg_window.disableSync();
     }
-
     else {
-        options.sync = true;
-        bg_window.saveOption("sync", true);
         bg_window.enableSync(true);
     }
-
     updateSyncUI();
 }
 
 // Toggle display of css icon in omnibar
 
 function togglePageAction() {
-    if (options.showPageAction) {
-        options.showPageAction = false;
-        bg_window.saveOption("showPageAction", options.showPageAction);
+    options.showPageAction = !options.showPageAction;
+    bg_window.saveOption("showPageAction", options.showPageAction);
+    if (!options.showPageAction) {
         bg_window.hidePageActions();
     }
 
     else {
-        options.showPageAction = true;
-        bg_window.saveOption("showPageAction", options.showPageAction);
         bg_window.showPageActions();
     }
 }
@@ -522,18 +506,13 @@ function initModal(html, options) {
 
 // Attach listener to search field for filtering styles
 function initFiltering() {
-    $("#style-search-field").bind('click focus', function(e) {
-        if (e.target.value == "Search...") {
-            e.target.className = "";
-            e.target.value = "";
+    $("#style-search-field").bind('search', function(e){
+       filterStyles($(this).val());
+    }).keyup(function(e){
+        if(e.keyCode == 27){
+            $(this).val('')
+            filterStyles("");
         }
-        else {
-            Utils.selectAllText(e.target);
-        }
-    })
-
-    .keyup(function(e) {
-        filterStyles(e.target.value);
     });
 }
 
