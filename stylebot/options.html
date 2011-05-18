@@ -142,9 +142,13 @@
                     <li class='option'>
                         Sync your styles across multiple computers.
                         <br>
-Requires <a href="http://www.google.com/support/chrome/bin/answer.py?answer=185277" target='_blank'>Bookmark Sync</a>.
+                        Requires <a href="http://www.google.com/support/chrome/bin/answer.py?answer=185277" target='_blank'>Bookmark Sync</a>.
+                        <br>
                         <div style='margin-top:18px'>
                             <button onclick="toggleSyncing();" id="sync-button">Enable Sync</button>
+                        </div>
+                        <div class="description" id="sync-disabled-note">
+                            <span class='important'>Warning</span>: Syncing will overwrite all your styles and the changes you've made on your other computers
                         </div>
                         <div class="description" id="sync-enabled-note">
                             <span class='note'>Note</span>: Stylebot pushes changes automatically in the background. In case you want your changes to show up on other computers immediately, you may <a href='#' onclick='onclick="bg_window.pushStyles();'>push styles now</a>.
