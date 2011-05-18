@@ -184,7 +184,7 @@ li.option:first-of-type {
 }
 
 .error {
-    color: #D77582;
+    color: hsl(349, 165%, 35%);
     font-weight: bold;
 }
 
@@ -225,7 +225,7 @@ textarea.stylebot-css-code {
 
 #stylebot-modal div {
     font-family: 'Lucida Grande', 'Lucida Sans', 'Lucida Sans Unicode', Helvetica, Arial, sans-serif;
-    font-size: 14px;
+    font-size: 12px;
 }
 
 #stylebot-modal .description {
