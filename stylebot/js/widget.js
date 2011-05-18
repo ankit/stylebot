@@ -73,7 +73,7 @@ stylebot.widget = {
         var url = $('<div>', {
             html: stylebot.style.cache.url,
             class: 'stylebot-editable-text',
-            title: 'Click to edit the partial URL for which custom CSS will be saved. <br><br>Tip: You can add multiple such URLs by separating them with a ,'
+            title: 'Click to edit the URL for the style <br>Tip: Add multiple URLs separated with ,'
         })
         .tipsy({delayIn: 1500, gravity:'n', html: true});
 
