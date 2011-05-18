@@ -6,7 +6,7 @@
   **/
 
 var Utils = {
-    
+
     // return array index at which property pName is equal to value 'pValue'
     search: function(arr, pName, pValue) {
         var len = arr.length;
@@ -15,10 +15,10 @@ var Utils = {
             if (arr[i][pName] == pValue)
                 return i;
         }
-        
+
         return null;
     },
-    
+
     // if any of the passed keys is pressed, returns false.
     // Accepts a keys array and 'keyup' event object as arguments.
     // TODO: Add support for keydown, keypress events and alphanumeric keys
@@ -56,11 +56,11 @@ var Utils = {
         }
         return true;
     },
-    
+
     capitalize: function(string) {
         return string.charAt(0).toUpperCase() + string.slice(1);
     },
-    
+
     makeEditable: function(el, callback, options) {
         el.bind('click keyup', {callback: callback}, function(e) {
             if (e.type == 'keyup' && e.keyCode != 13)
@@ -68,13 +68,13 @@ var Utils = {
 
             var el = $(this);
             el.hide();
-            
+
             var elWidth;
             if (options && options.fixedWidth)
                 elWidth = options.fixedWidth;
-            else 
+            else
                 elWidth = el.width();
-            
+
             var value = el.text();
             // create a textfield
             var input = $('<input>', {
@@ -84,7 +84,7 @@ var Utils = {
                 id: 'stylebot-editing-field'
             })
             .width(elWidth);
-            
+
             el.before(input);
             input.focus();
 
@@ -108,22 +108,31 @@ var Utils = {
                 $(document).unbind("mousedown", onClose);
                 $(document).unbind("keyup", onClose);
             }
-            
+
             input.bind('keyup', {input: input, el: el, callback: callback}, onClose);
             $(document).bind('mousedown',{input: input, el: el, callback: callback}, onClose);
         });
     },
-    
+
+    selectText: function(el, start, end) {
+        if (!el || !el.value || el.value === "")
+            return false;
+        var len = el.value.length;
+        if (end > len) end = len;
+        el.setSelectionRange(start, end);
+        return true;
+    },
+
     selectAllText: function(el) {
-        if (!el || !el.value || el.value == "")
+        if (!el || !el.value || el.value === "")
             return false;
         var len = el.value.length;
         el.setSelectionRange(0, len);
         return true;
     },
-    
+
     moveCursorToEnd: function(el) {
-        if (!el || !el.value || el.value == "")
+        if (!el || !el.value || el.value === "")
             return false;
         var len = el.value.length;
         el.setSelectionRange(len, len);
@@ -131,7 +140,7 @@ var Utils = {
             el.scrollTop = el.scrollHeight;
         }
     },
-    
+
     HTMLDecode: function(text) {
         if (text && typeof(text) != "undefined")
         {
@@ -139,11 +148,11 @@ var Utils = {
             return text.replace("&lt;", "<").replace("&gt;", ">");
         }
     },
-    
+
     // To copy an object. from: http://my.opera.com/GreyWyvern/blog/show.dml/1725165
     cloneObject: function(obj) {
         var newObj = (obj instanceof Array) ? [] : {};
-        
+
         for (i in obj)
         {
             if (obj[i] && typeof obj[i] == "object")
@@ -153,7 +162,7 @@ var Utils = {
             else
                 newObj[i] = obj[i]
         }
-        
+
         return newObj;
     }
 }

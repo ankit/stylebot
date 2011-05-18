@@ -157,6 +157,10 @@ button.stylebot-active-button:active:not(:disabled)
     border-color: #b6b6b6 !important;
 }
 
+.stylebot-segmented-control button:focus:not(:disabled) {
+    outline: 1px solid #777 !important;
+}
+
 .stylebot-segmented-control button.stylebot-active-button {
     border-right-width: 1px !important;
 }

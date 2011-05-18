@@ -7,39 +7,39 @@
 
 var CSSUtils = {
     /*  e.g. of rules object used as input / output:
-    
+
     rules = {
-        'a.someclass': { 
+        'a.someclass': {
                 'color': '#fff',
                 'font-size': '12px'
             }
         }
-    
+
     */
     crunchCSS: function(rules, setImportant) {
         var css = "";
-        
+
         for (var selector in rules)
         {
             if (rules[selector]["comment"]) continue;
             css += selector + " { ";
-            
+
             for (var property in rules[selector]) {
-                
+
                 if (property.indexOf("comment") != -1) continue;
-                
+
                 if (rules[selector][property].indexOf("!important") != -1)
                     css += this.getCSSDeclaration(property, rules[selector][property], false);
                 else
                     css += this.getCSSDeclaration(property, rules[selector][property], setImportant);
             }
-            
+
             css += " } ";
         }
-        
+
         return css;
     },
-    
+
     crunchFormattedCSS: function(rules, setImportant) {
         var css = "";
         for (var selector in rules)
@@ -47,49 +47,49 @@ var CSSUtils = {
             if (rules[selector]["comment"]) {
                 css += rules[selector]["comment"] + "\n";
             }
-            
+
             else {
                 css += selector + " {" + "\n";
-                
+
                 for (var property in rules[selector]) {
                     if (property.indexOf("comment") != -1) {
                         css += "\t" + rules[selector][property] + "\n";
                     }
-                    else { 
+                    else {
                         css += "\t" + this.getCSSDeclaration(property, rules[selector][property], setImportant) + "\n";
                     }
                 }
-                
+
                 css += "}" + "\n\n";
             }
         }
-        
+
         return css;
     },
-    
+
     // generate formatted CSS for selector
     crunchCSSForSelector: function(rules, selector, setImportant, formatted) {
         var css = "";
         var append = "";
         if (formatted)
             append = "\n"
-        
+
         for (var property in rules[selector]) {
              if (property.indexOf("comment") != -1) continue;
-             
+
              css += "\t" + this.getCSSDeclaration(property, rules[selector][property], setImportant) + "\n";
         }
-        
+
         return css;
     },
-    
+
     getCSSDeclaration: function(property, value, setImportant) {
         if (setImportant)
             return property + ": " + value + " !important;";
         else
             return property + ": " + value + ";";
     },
-    
+
     injectCSS: function(css, id) {
         var style = document.createElement('style');
         style.type = "text/css";
@@ -97,31 +97,41 @@ var CSSUtils = {
             style.setAttribute("id", id);
         style.appendChild(document.createTextNode(css));
         document.documentElement.appendChild(style);
-    }, 
-    
+    },
+
     // parser object is that returned by JSCSSP
     getRulesFromParserObject: function(sheet) {
         var rules = {};
         var comment_index = 0;
         var len = sheet.cssRules.length;
-        for (var i = 0; i < len; i++) {
-            
-            if (sheet.cssRules[i] instanceof jscsspComment) {
+
+        for (var i = 0; i < len; i++)
+        {
+
+            if (sheet.cssRules[i] instanceof jscsspErrorRule) {
+                rules['error'] = sheet.cssRules[i];
+                break;
+            }
+
+            else if (sheet.cssRules[i] instanceof jscsspComment) {
                 var selector = "comment-#"+comment_index++;
                 rules[selector] = new Object();
                 rules[selector]["comment"] = sheet.cssRules[i].parsedCssText;
             }
-            
+
             else {
                 var selector = sheet.cssRules[i].mSelectorText;
                 rules[selector] = new Object();
+
                 var len2 = sheet.cssRules[i].declarations.length;
+
                 for (var j = 0; j < len2; j++) {
+
                     if (sheet.cssRules[i].declarations[j] instanceof jscsspComment)
                     {
                         rules[selector]["comment-#"+comment_index++] = sheet.cssRules[i].declarations[j].parsedCssText;
                     }
-                    
+
                     else {
                         var property = sheet.cssRules[i].declarations[j].property;
                         var value = sheet.cssRules[i].declarations[j].valueText;
@@ -130,9 +140,10 @@ var CSSUtils = {
                 }
             }
         }
+
         return rules;
     },
-    
+
     // parser object is that returned by JSCSSP
     getRuleFromParserObject: function(sheet) {
         var rule = {};
@@ -142,10 +153,10 @@ var CSSUtils = {
                 var value = sheet.cssRules[0].declarations[i].valueText;
                 rule[property] = value;
         }
-        
+
         return rule;
     },
-    
+
     // deprecated
     parseCSS: function(css) {
         var rules = {};
@@ -153,16 +164,16 @@ var CSSUtils = {
         var blocks = css.split('}');
         blocks.pop();
         var len = blocks.length;
-        
+
         for (var i = 0; i < len; i++)
         {
             var pair = blocks[i].split('{');
             rules[$.trim(pair[0])] = this.parseCSSBlock(pair[1]);
         }
-        
+
         return rules;
     },
-    
+
     // deprecated. instead using http://www.glazman.org/JSCSSP/
     parseCSSBlock: function(css) {
         var rule = {};
@@ -174,14 +185,14 @@ var CSSUtils = {
             var loc = declarations[i].indexOf(':');
             var property = $.trim(declarations[i].substring(0, loc));
             var value = $.trim(declarations[i].substring(loc+1));
-            
+
             if (property != "" && value != "")
                 rule[property] = value;
         }
-        
+
         return rule;
     },
-    
+
     // from http://www.senocular.com/pub/javascript/CSS_parse.js
     removeComments: function(css) {
         return css.replace(/\/\*(\r|\n|.)*\*\//g,"");

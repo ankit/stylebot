@@ -183,6 +183,17 @@ li.option:first-of-type {
     text-align: justify;
 }
 
+.error {
+    color: #D77582;
+    font-weight: bold;
+}
+
+#parserError {
+    float: left;
+    width: 200px;
+    font-size: 12px !important;
+}
+
 #sync-button {
     width: 120px;
 }

@@ -215,8 +215,10 @@ function createCustomStyleOption(url) {
 function removeStyle(e) {
     var parent = $(e.target).parents('.custom-style');
     var url = parent.find('.custom-style-url');
+
     delete styles[url.html()];
     parent.remove();
+
     bg_window.saveStyles(styles);
     bg_window.pushStyles();
 }
@@ -231,7 +233,7 @@ function editStyle(e) {
     var html = "<div>Edit the CSS for <b>" + url + "</b>:</div>";
     html += "<textarea class='stylebot-css-code'>" + css + "</textarea>";
     html += "<button onclick='cache.modal.hide();'>Cancel</button>";
-    html += "<button onclick='onUpdate(); cache.modal.hide();'>Save</button>";
+    html += "<button onclick='onSave();'>Save</button>";
 
     initModal(html);
 
@@ -282,10 +284,14 @@ function shareStyle(e) {
 }
 
 // Called when a style is updated (Update button is clicked)
-function onUpdate() {
+//
+function onSave() {
     var url = cache.modal.box.find('div > b').html();
     var css = cache.modal.box.find('textarea').attr('value');
-    saveStyle(url, css);
+
+    if (saveStyle(url, css)) {
+        cache.modal.hide();
+    }
 }
 
 // Displays the modal popup to add a new style
@@ -294,7 +300,7 @@ function addStyle() {
     html += "<textarea class='stylebot-css-code'>";
     html += "</textarea>";
     html += "<button onclick= 'cache.modal.hide();' >Cancel</button>";
-    html += "<button onclick= 'onAdd(); cache.modal.hide();' >Add</button>";
+    html += "<button onclick= 'onAdd();' >Add</button>";
 
     initModal(html);
     cache.modal.options.onOpen = function() { cache.modal.box.find('input').focus(); };
@@ -305,59 +311,116 @@ function addStyle() {
 function onAdd() {
     var url = cache.modal.box.find('input').attr('value');
     var css = cache.modal.box.find('textarea').attr('value');
-    if (css == "")
+    if (css === "")
         return false;
 
-    if (saveStyle(url, css))
-        createCustomStyleOption(url, styles[url]).appendTo($("#custom-styles"));
+    if (saveStyle(url, css)) {
+        cache.modal.hide();
+    }
 }
 
-// Saves a style. Called by onUpdate and onAdd
+// Saves a style and updates the UI. Called by onSave and onAdd
+//
 function saveStyle(url, css) {
+    // if css is empty. remove the style
+    if (css === "")
+    {
+        if (styles[url])
+        {
+            delete styles[url];
+            $('.custom-style-url:contains(' + url + ')').parent().remove();
+            bg_window.saveStyles(styles);
+            bg_window.pushStyles();
+        }
+
+        return true;
+    }
+
+    // else try to parse the style
     var parser = new CSSParser();
     var sheet = parser.parse(css, false, true);
-    var retVal = false;
 
     if (sheet) {
         try {
             var rules = CSSUtils.getRulesFromParserObject(sheet);
+
+            // syntax error!
+            //
+            if (rules['error'])
+            {
+                console.log(rules);
+                // todo: notify user of syntax error and highlight the error causing line
+                //
+                displaySyntaxError(css, rules['error']);
+                return false;
+            }
+
             styles[url] = {};
             styles[url]['_rules'] = rules;
             styles[url]['_social'] = {};
-            retVal = true;
+
+            bg_window.saveStyles(styles);
+            bg_window.pushStyles();
+
+            createCustomStyleOption(url, styles[url]).appendTo($("#custom-styles"));
+
+            return true;
         }
-        catch(e) {}
+
+        catch(e) {
+            // todo: show error here instead of just returning
+            //
+            return true;
+        }
     }
 
-    // if css is empty. remove the style
-    else if (css === "" && styles[url]) {
-        delete styles[url];
-        $('.custom-style-url:contains(' + url + ')').parent().remove();
+    return true;
+}
+
+function displaySyntaxError(css, error) {
+    var start = css.indexOf(error.parsedCssText);
+    var end = start + error.parsedCssText.length;
+    Utils.selectText(cache.modal.box.find('textarea').get(0), start, end);
+
+    var $error = cache.modal.box.find('#parserError');
+
+    if ($error.length === 0) {
+        $error = $('<div>', {
+            id: 'parserError',
+            class: 'error'
+        });
+
+        cache.modal.box.append($error);
     }
 
-    bg_window.saveStyles(styles);
-    bg_window.pushStyles();
-
-    return retVal;
+    $error.text('Syntax Error at Line ' + error.currentLine);
 }
 
 // Callback for edit in place for URLs
 function editURL(oldValue, newValue) {
     if (oldValue == newValue || newValue == "")
         return;
+
     // going through a loop so that new entry is inserted at the same position
     // otherwise, on changing the url, new entry is inserted at the bottom
+
     var newStyles = {};
-    for (var url in styles) {
-        if (url == oldValue) {
+
+    for (var url in styles)
+    {
+        if (url == oldValue)
+        {
             var rules = styles[oldValue];
             newStyles[newValue] = rules;
             delete styles[oldValue];
         }
+
         else
             newStyles[url] = styles[url];
     }
+
     styles = newStyles;
+
     bg_window.saveStyles(styles);
 }
 

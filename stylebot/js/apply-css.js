@@ -1,5 +1,5 @@
 /**
-  * This content script injects any custom style for the page (if it exists) 
+  * This content script injects any custom style for the page (if it exists)
   * as soon as the document starts loading.
  **/
 
@@ -12,7 +12,7 @@ chrome.extension.sendRequest({ name: "getRulesForPage", url: window.location.hre
     stylebotTempUrl = response.url;
     stylebotTempRules = response.rules;
     var css = CSSUtils.crunchCSS(response.rules, true);
-    if (css != "") 
+    if (css != "")
     {
         CSSUtils.injectCSS(css, "stylebot-css");
     }
