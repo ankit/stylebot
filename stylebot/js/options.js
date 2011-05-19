@@ -241,11 +241,12 @@ function editStyle(e) {
     cache.modal.options.onOpen = function() {
         var attachTo = cache.modal.box.find("div").get(0);
         cache.modal.editor = CodeMirror(attachTo, {
-          value: css,
-          mode: "css",
-          lineNumbers: true,
-          onGutterClick: function(cm, n) { cm.clearMarker(n); }
+            value: css,
+            mode: "css",
+            lineNumbers: true,
+            onFocus: function() { cache.modal.editor.clearMarker(cache.modal.editor.errorLine); }
         });
+        cache.modal.editor.errorLine = 0;
         cache.modal.editor.focus();
     };
 
@@ -310,10 +311,11 @@ function addStyle() {
     cache.modal.options.onOpen = function() {
         var attachTo = cache.modal.box.find("div").get(0);
         cache.modal.editor = CodeMirror(attachTo, {
-          mode: "css",
-          lineNumbers: true,
-          onGutterClick: function(cm, n) { cm.clearMarker(n); }
+            mode: "css",
+            lineNumbers: true,
+            onFocus: function() { cache.modal.editor.clearMarker(cache.modal.editor.errorLine); }
         });
+        cache.modal.editor.errorLine = 0;
         cache.modal.editor.focus();
     };
     cache.modal.show();
@@ -396,6 +398,7 @@ function displaySyntaxError(css, error) {
     var end = start + error.parsedCssText.length;
     //cache.modal.editor.setLineClass(error.currentLine-1, "CodeMirror-error");
     cache.modal.editor.setMarker(error.currentLine - 1, "<span style=\"color: #900\">●</span> %N%");
+    cache.modal.editor.errorLine = error.currentLine - 1;
 
     var $error = cache.modal.box.find('#parserError');
 
