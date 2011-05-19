@@ -158,7 +158,6 @@ function translateOptionValue(name, value) {
 function fillCustomStyles() {
     var container = $("#custom-styles");
     container.html("");
-
     for (var url in styles) {
         container.append(createCustomStyleOption(url));
     }
@@ -281,7 +280,6 @@ function addStyle() {
         //
         setTimeout(function() {
             cache.modal.box.find('input').focus();
-            console.log(cache.modal.box.find('input'));
         }, 20);
 
         cache.modal.editor.errorLine = 0;
@@ -380,7 +378,6 @@ function saveStyle(url, css, add) {
             //
             if (rules['error'])
             {
-                console.log(rules);
                 // todo: notify user of syntax error and highlight the error causing line
                 //
                 displaySyntaxError(css, rules['error']);
@@ -410,14 +407,7 @@ function saveStyle(url, css, add) {
     return true;
 }
 
-function displaySyntaxError(css, error) {
-    var start = css.indexOf(error.parsedCssText);
-    var end = start + error.parsedCssText.length;
-    //cache.modal.editor.setLineClass(error.currentLine-1, "CodeMirror-error");
-    cache.modal.editor.setMarker(error.currentLine - 1, "<span style=\"color: #900\">●</span> %N%");
-    cache.modal.editor.setCursor(error.currentLine - 1, 0);
-    cache.modal.editor.errorLine = error.currentLine - 1;
-
+function displayErrorMessage(msg) {
     var $error = cache.modal.box.find('#parserError');
 
     if ($error.length === 0) {
@@ -429,7 +419,18 @@ function displaySyntaxError(css, error) {
         cache.modal.box.append($error);
     }
 
-    $error.text('Syntax Error at Line ' + error.currentLine);
+    $error.text(msg);
+}
+
+function displaySyntaxError(css, error) {
+    var start = css.indexOf(error.parsedCssText);
+    var end = start + error.parsedCssText.length;
+    //cache.modal.editor.setLineClass(error.currentLine-1, "CodeMirror-error");
+    cache.modal.editor.setMarker(error.currentLine - 1, "<span style=\"color: #900\">●</span> %N%");
+    cache.modal.editor.setCursor(error.currentLine - 1, 0);
+    cache.modal.editor.errorLine = error.currentLine - 1;
+
+    displayErrorMessage('Syntax Error at Line ' + error.currentLine);
 }
 
 // Callback for edit in place for URLs
@@ -504,7 +505,8 @@ function import() {
     </textarea> \
     </div> \
     <div id='stylebot-modal-buttons'> \
-    <button onclick='importCSS();cache.modal.hide();'>Import</button> \
+    <button onclick='importCSS();'>Import</button> \
+    <button onclick='cache.modal.hide();'>Cancel</button> \
     </div>";
 
     initModal(html, {
@@ -525,19 +527,22 @@ function importCSS() {
 
     if (json && json != "")
     {
-        $(".custom-style").html("");
-
         try {
             var imported_styles = JSON.parse(json);
             styles = mergeStyles(imported_styles, styles);
+
             bg_window.saveStyles(styles);
         }
 
         catch(e) {
-            console.log(e);
+            // show error. todo: show a more humanised message
+            displayErrorMessage("" + e);
+            return false;
         }
 
         fillCustomStyles();
+        cache.modal.hide();
+        return true;
     }
 }
 
@@ -554,12 +559,23 @@ function updateSyncUI() {
 function toggleSyncing() {
     options.sync = !options.sync;
     bg_window.saveOption("sync", options.sync);
+
     if (!options.sync) {
         bg_window.disableSync();
     }
+
     else {
         bg_window.enableSync(true);
+        // Update the UI
+        styles = bg_window.cache.styles;
+
+        // todo: again, 200 is an arbitrary value to wait for bg_window to respond
+        //
+        setTimeout(function() {
+            fillCustomStyles();
+        }, 200);
     }
+
     updateSyncUI();
 }
 
