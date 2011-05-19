@@ -551,7 +551,7 @@ function importCSS() {
 // Initialize Sync UI based on value of the sync option
 function updateSyncUI() {
     $('#sync-button').html(options.sync ? "Disable Sync" : "Enable Sync");
-    $('#sync-now').attr('disabled', !options.sync);
+    $('#sync-now').prop('disabled', !options.sync);
 }
 
 // Turn syncing on/off

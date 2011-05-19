@@ -276,11 +276,11 @@ stylebot.widget = {
     //  Disable UI of widget
     disable: function() {
         this.cache.headerSelector.html("Select an element");
-        this.basic.cache.textfields.attr('disabled', true);
-        this.basic.cache.buttons.attr('disabled', true);
-        this.basic.cache.selectboxes.attr('disabled', true);
+        this.basic.cache.textfields.prop('disabled', true);
+        this.basic.cache.buttons.prop('disabled', true);
+        this.basic.cache.selectboxes.prop('disabled', true);
         this.basic.cache.colorSelectors.addClass('disabled');
-        this.advanced.cache.cssField.attr('disabled', true);
+        this.advanced.cache.cssField.prop('disabled', true);
     },
 
     //  Update widget position
