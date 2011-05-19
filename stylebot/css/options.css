@@ -190,6 +190,7 @@ li.option:first-of-type {
 
 #stylebot-modal {
     -webkit-border-radius: 2px !important;
+    position: fixed !important;
 }
 
 #stylebot-modal .popup-content {
