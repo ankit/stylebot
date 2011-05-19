@@ -191,6 +191,7 @@ li.option:first-of-type {
 #stylebot-modal {
     -webkit-border-radius: 2px !important;
     position: fixed !important;
+    overflow: auto;
 }
 
 #stylebot-modal .popup-content {
@@ -455,16 +456,6 @@ input[name=shortcutKeyCharacter] {
   resize: none !important;
   outline: none !important;
   width: 99% !important;
-  height: 87% !important;
-}
-
-/** slightly variable CodeMirror heights based on type of modal popup **/
-#add-css .CodeMirror {
-    height: 84% !important;
-}
-
-#edit-css .CodeMirror {
-    height: 86% !important;
 }
 
 .CodeMirror-error {

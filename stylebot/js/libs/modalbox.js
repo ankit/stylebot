@@ -12,17 +12,17 @@ var ModalBox = function(html, options) {
         for (var option in options)
             this.options[option] = options[option];
     }
-    
+
     this.box = $('<div>', {
         id:'stylebot-modal'
     })
-    
+
     .append(html);
 
     if (this.options.parent) {
         this.box.appendTo(this.options.parent);
     }
-    
+
     else {
         this.box.appendTo(document.body);
     }
@@ -42,7 +42,7 @@ ModalBox.prototype.reset = function(options) {
             this.options[option] = options[option];
 
         this.box
-        
+
         .css({
             height: this.options.height + "!important",
             width: this.options.width + " !important",
@@ -59,7 +59,7 @@ ModalBox.prototype.options = {
     closeOnBgClick: true,
     closeOnEsc: true,
     width: '50%',
-    height: '50%',
+    height: '60%',
     top: '15%',
     left: '25%',
     onClose: function() {},
@@ -68,10 +68,10 @@ ModalBox.prototype.options = {
 }
 
 ModalBox.prototype.darkenBg = function(callback) {
-    
+
     if (this.options.bgOpacity == 0)
         return;
-    
+
     // darken background
     this.background = $('<div>', {
         id: 'stylebot-background'
@@ -91,16 +91,16 @@ ModalBox.prototype.show = function(content, options) {
     this.box.fadeIn(this.options.fadeSpeed);
     this.darkenBg();
     this.options.onOpen();
-    
+
     var closeBox = function(e) {
         if (e.type == "keyup" &&
             (e.keyCode != 27 || !e.data.modal.options.closeOnEsc)
         )
             return true;
-        
+
         var id = e.target.id;
         var parent = $(e.target).closest('#stylebot-modal');
-        
+
         if ((e.type == "mousedown" &&
             id != "stylebot-modal" &&
             parent.length == 0 &&
@@ -112,10 +112,10 @@ ModalBox.prototype.show = function(content, options) {
             e.data.modal.hide();
             $(document).unbind('keyup mousedown', closeBox);
         }
-        
+
         return true;
     }
-    
+
     $(document).bind('keyup mousedown', {modal: this}, closeBox);
 }
 

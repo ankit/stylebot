@@ -141,6 +141,11 @@ function attachListeners() {
             option = e.target.name;
         bg_window.saveOption(option, translateOptionValue(option, e.target.value));
     });
+
+    // on window resize, resize textarea
+    $(window).resize(function(e) {
+        resizeEditor();
+    });
 }
 
 function translateOptionValue(name, value) {
@@ -231,7 +236,7 @@ function editStyle(e) {
     var rules = styles[url]['_rules'];
     var css = CSSUtils.crunchFormattedCSS(rules, false);
 
-    var html = "<div class='popup-content' id='edit-css'>Edit the CSS for <strong>" + url + "</strong>:</div> \
+    var html = "<div class='popup-content'>Edit the CSS for <strong>" + url + "</strong>:</div> \
     <div id='stylebot-modal-buttons'> \
     <button onclick='onSave(\"" + url + "\");'>Save</button> \
     <button onclick='cache.modal.hide();'>Cancel</button> \
@@ -252,6 +257,9 @@ function editStyle(e) {
         cache.modal.editor.setCursor(cache.modal.editor.lineCount(), 0);
     };
 
+    setTimeout(function() {
+        resizeEditor();
+    }, 0);
     cache.modal.show();
 }
 
@@ -265,7 +273,7 @@ function editGlobalStylesheet(e) {
         var css = "";
     }
 
-    var html = "<div class='popup-content' id='edit-css'>Edit the <strong>Global Stylesheet</strong>:</div> \
+    var html = "<div class='popup-content'>Edit the <strong>Global Stylesheet</strong>:</div> \
     <div id='stylebot-modal-buttons'> \
     <button onclick='onSave(\"*\");'>Save</button> \
     <button onclick='cache.modal.hide();'>Cancel</button> \
@@ -286,13 +294,16 @@ function editGlobalStylesheet(e) {
         cache.modal.editor.setCursor(cache.modal.editor.lineCount(), 0);
     };
 
+    setTimeout(function() {
+        resizeEditor();
+    }, 0);
     cache.modal.show();
 }
 
 
 // Displays the modal popup to add a new style
 function addStyle() {
-    var html = "<div class='popup-content' id='add-css'>URL: <input type='text'></input></div> \
+    var html = "<div class='popup-content'>URL: <input type='text'></input></div> \
     <div id='stylebot-modal-buttons'> \
     <button onclick= 'onAdd();' >Add</button> \
     <button onclick= 'cache.modal.hide();' >Cancel</button> \
@@ -323,6 +334,10 @@ function addStyle() {
 
         cache.modal.editor.errorLine = 0;
     };
+
+    setTimeout(function() {
+        resizeEditor();
+    }, 0);
 
     cache.modal.show();
 }
@@ -526,6 +541,10 @@ function export() {
         Utils.selectAllText(textarea);
     };
 
+    setTimeout(function() {
+        resizeEditor();
+    }, 0);
+
     cache.modal.show();
 }
 
@@ -555,6 +574,10 @@ function import() {
     cache.modal.options.onOpen = function() {
         cache.modal.box.find('textarea').get(0).focus();
     };
+
+    setTimeout(function() {
+        resizeEditor(80);
+    }, 0);
 
     cache.modal.show();
 }
@@ -640,8 +663,7 @@ function initModal(html, options) {
         cache.modal = new ModalBox(html, {
             bgFadeSpeed: 0,
             closeOnEsc: false,
-            closeOnBgClick: false,
-            height: window.innerHeight * 0.6
+            closeOnBgClick: false
         });
     }
 
@@ -708,4 +730,12 @@ function mergeStyles(s1, s2) {
     }
 
     return s2;
+}
+
+function resizeEditor(bottomSpace) {
+    if (!bottomSpace) {
+        bottomSpace = 70;
+    }
+
+    $('.CodeMirror, #stylebot-modal textarea').css('height', $("#stylebot-modal").height() - bottomSpace + "px !important");
 }
