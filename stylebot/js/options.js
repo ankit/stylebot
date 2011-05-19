@@ -244,7 +244,6 @@ function editStyle(e) {
             mode: "css",
             lineNumbers: true,
             indentUnit: 4,
-            enterMode: "keep",
             onFocus: function() { cache.modal.editor.clearMarker(cache.modal.editor.errorLine); }
         });
         cache.modal.editor.errorLine = 0;
@@ -271,7 +270,6 @@ function addStyle() {
             mode: "css",
             lineNumbers: true,
             indentUnit: 4,
-            enterMode: "keep",
             onFocus: function() { cache.modal.editor.clearMarker(cache.modal.editor.errorLine); }
         });
 
