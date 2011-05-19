@@ -40,6 +40,8 @@ I am using code from the following projects:
 
 * [jQuery](http://jquery.com/)
 
+* [CodeMirror](http://codemirror.net/)
+
 ###License
 
 Dual licensed under the GPL and MIT Licenses.
