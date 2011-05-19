@@ -2415,6 +2415,58 @@ CSSParser.prototype = {
    return top + " " + right + " " + bottom + " " + left;
   },
 
+  stylebot_parseMarginOrPaddingShorthand: function(token, aDecl, aAcceptPriority, aProperty)
+  {
+    var top = null;
+    var bottom = null;
+    var left = null;
+    var right = null;
+
+    var values = [];
+    while (true) {
+
+      if (!token.isNotNull())
+        break;
+
+      if (token.isSymbol(";")
+          || (aAcceptPriority && token.isSymbol("!"))
+          || token.isSymbol("}")) {
+        if (token.isSymbol("}"))
+          this.ungetToken();
+        break;
+      }
+
+      else if (!values.length && token.isIdent(this.kINHERIT)) {
+        values.push(token.value);
+        token = this.getToken(true, true);
+        break;
+      }
+
+      else if (token.isDimension()
+              || token.isNumber("0")
+              || token.isPercentage()
+              || token.isIdent("auto")) {
+        values.push(token.value);
+      }
+      else
+        return "";
+
+      token = this.getToken(true, true);
+    }
+
+    this.forgetState();
+
+    var count = values.length;
+    var decl = "";
+    if (count < 1 || count > 4) return "";
+    for(var i = 0;i < count;i++) {
+        decl += values[i];
+        if(i < count - 1) decl += " ";
+    }
+    aDecl.push(this._createJscsspDeclarationFromValue(aProperty, decl));
+    return decl;
+  },
+
   parseBorderColorShorthand: function(token, aDecl, aAcceptPriority)
   {
     var top = null;
@@ -2490,6 +2542,57 @@ CSSParser.prototype = {
     return top + " " + right + " " + bottom + " " + left;
   },
 
+  stylebot_parseBorderColorShorthand: function(token, aDecl, aAcceptPriority)
+  {
+    var top = null;
+    var bottom = null;
+    var left = null;
+    var right = null;
+
+    var values = [];
+    while (true) {
+
+      if (!token.isNotNull())
+        break;
+
+      if (token.isSymbol(";")
+          || (aAcceptPriority && token.isSymbol("!"))
+          || token.isSymbol("}")) {
+        if (token.isSymbol("}"))
+          this.ungetToken();
+        break;
+      }
+
+      else if (!values.length && token.isIdent(this.kINHERIT)) {
+        values.push(token.value);
+        token = this.getToken(true, true);
+        break;
+      }
+
+      else {
+        var color = this.parseColor(token);
+        if (color)
+          values.push(color);
+        else
+          return "";
+      }
+
+      token = this.getToken(true, true);
+    }
+
+    this.forgetState();
+
+    var count = values.length;
+    var decl = "";
+    if (count < 1 || count > 4) return "";
+    for(var i = 0;i < count;i++) {
+        decl += values[i];
+        if(i < count - 1) decl += " ";
+    }
+    aDecl.push(this._createJscsspDeclarationFromValue("border-color", decl));
+    return decl;
+  },
+
   parseCueShorthand: function(token, declarations, aAcceptPriority)
   {
     var before = "";
@@ -2550,6 +2653,60 @@ CSSParser.prototype = {
     return before + " " + after;
   },
 
+  stylebot_parseCueShorthand: function(token, declarations, aAcceptPriority)
+  {
+    var before = "";
+    var after = "";
+
+    var values = [];
+    var values = [];
+    while (true) {
+
+      if (!token.isNotNull())
+        break;
+
+      if (token.isSymbol(";")
+          || (aAcceptPriority && token.isSymbol("!"))
+          || token.isSymbol("}")) {
+        if (token.isSymbol("}"))
+          this.ungetToken();
+        break;
+      }
+
+      else if (!values.length && token.isIdent(this.kINHERIT)) {
+        values.push(token.value);
+      }
+
+      else if (token.isIdent("none"))
+        values.push(token.value);
+
+        else if (token.isFunction("url(")) {
+        var token = this.getToken(true, true);
+        var urlContent = this.parseURL(token);
+        if (urlContent)
+          values.push("url(" + urlContent);
+        else
+          return "";
+      }
+      else
+        return "";
+
+      token = this.getToken(true, true);
+    }
+
+    this.forgetState();
+
+    var count = values.length;
+    var decl = "";
+    if (count < 1 || count > 2) return "";
+    for(var i = 0;i < count;i++) {
+        decl += values[i];
+        if(i < count - 1) decl += " ";
+    }
+    aDecl.push(this._createJscsspDeclarationFromValue("cue", decl));
+    return decl;
+  },
+
   parsePauseShorthand: function(token, declarations, aAcceptPriority)
   {
     var before = "";
@@ -2602,6 +2759,54 @@ CSSParser.prototype = {
     aDecl.push(this._createJscsspDeclarationFromValue("pause-before", before));
     aDecl.push(this._createJscsspDeclarationFromValue("pause-after", after));
     return before + " " + after;
+  },
+
+  stylebot_parsePauseShorthand: function(token, declarations, aAcceptPriority)
+  {
+    var before = "";
+    var after = "";
+
+    var values = [];
+    var values = [];
+    while (true) {
+
+      if (!token.isNotNull())
+        break;
+
+      if (token.isSymbol(";")
+          || (aAcceptPriority && token.isSymbol("!"))
+          || token.isSymbol("}")) {
+        if (token.isSymbol("}"))
+          this.ungetToken();
+        break;
+      }
+
+      else if (!values.length && token.isIdent(this.kINHERIT)) {
+        values.push(token.value);
+      }
+
+      else if (token.isDimensionOfUnit("ms")
+               || token.isDimensionOfUnit("s")
+               || token.isPercentage()
+               || token.isNumber("0"))
+        values.push(token.value);
+      else
+        return "";
+
+      token = this.getToken(true, true);
+    }
+
+    this.forgetState();
+
+    var count = values.length;
+    var decl = "";
+    if (count < 1 || count > 2) return "";
+    for(var i = 0;i < count;i++) {
+        decl += values[i];
+        if(i < count - 1) decl += " ";
+    }
+    aDecl.push(this._createJscsspDeclarationFromValue("pause", decl));
+    return decl;
   },
 
   parseBorderWidthShorthand: function(token, aDecl, aAcceptPriority)
@@ -2677,6 +2882,55 @@ CSSParser.prototype = {
     return top + " " + right + " " + bottom + " " + left;
   },
 
+  stylebot_parseBorderWidthShorthand: function(token, aDecl, aAcceptPriority)
+  {
+    var top = null;
+    var bottom = null;
+    var left = null;
+    var right = null;
+
+    var values = [];
+    while (true) {
+
+      if (!token.isNotNull())
+        break;
+
+      if (token.isSymbol(";")
+          || (aAcceptPriority && token.isSymbol("!"))
+          || token.isSymbol("}")) {
+        if (token.isSymbol("}"))
+          this.ungetToken();
+        break;
+      }
+
+      else if (!values.length && token.isIdent(this.kINHERIT)) {
+        values.push(token.value);
+      }
+
+      else if (token.isDimension()
+               || token.isNumber("0")
+               || (token.isIdent() && token.value in this.kBORDER_WIDTH_NAMES)) {
+        values.push(token.value);
+      }
+      else
+        return "";
+
+      token = this.getToken(true, true);
+    }
+
+    this.forgetState();
+
+    var count = values.length;
+    var decl = "";
+    if (count < 1 || count > 4) return "";
+    for(var i = 0;i < count;i++) {
+        decl += values[i];
+        if(i < count - 1) decl += " ";
+    }
+    aDecl.push(this._createJscsspDeclarationFromValue("border-width", decl));
+    return decl;
+  },
+
   parseBorderStyleShorthand: function(token, aDecl, aAcceptPriority)
   {
     var top = null;
@@ -2748,6 +3002,53 @@ CSSParser.prototype = {
     return top + " " + right + " " + bottom + " " + left;
   },
 
+  stylebot_parseBorderStyleShorthand: function(token, aDecl, aAcceptPriority)
+  {
+    var top = null;
+    var bottom = null;
+    var left = null;
+    var right = null;
+
+    var values = [];
+    while (true) {
+
+      if (!token.isNotNull())
+        break;
+
+      if (token.isSymbol(";")
+          || (aAcceptPriority && token.isSymbol("!"))
+          || token.isSymbol("}")) {
+        if (token.isSymbol("}"))
+          this.ungetToken();
+        break;
+      }
+
+      else if (!values.length && token.isIdent(this.kINHERIT)) {
+        values.push(token.value);
+      }
+
+      else if (token.isIdent() && token.value in this.kBORDER_STYLE_NAMES) {
+        values.push(token.value);
+      }
+      else
+        return "";
+
+      token = this.getToken(true, true);
+    }
+
+    this.forgetState();
+
+    var count = values.length;
+    var decl = "";
+    if (count < 1 || count > 4) return "";
+    for(var i = 0;i < count;i++) {
+        decl += values[i];
+        if(i < count - 1) decl += " ";
+    }
+    aDecl.push(this._createJscsspDeclarationFromValue("border-style", decl));
+    return decl;
+  },
+
   parseBorderEdgeOrOutlineShorthand: function(token, aDecl, aAcceptPriority, aProperty)
   {
     var bWidth = null;
@@ -2817,6 +3118,64 @@ CSSParser.prototype = {
     else
       addPropertyToDecl(this, aDecl, aProperty, bWidth, bStyle, bColor);
     return bWidth + " " + bStyle + " " + bColor;
+  },
+
+  stylebot_parseBorderEdgeOrOutlineShorthand: function(token, aDecl, aAcceptPriority, aProperty)
+  {
+    var bWidth = null;
+    var bStyle = null;
+    var bColor = null;
+
+    while (true) {
+      if (!token.isNotNull())
+        break;
+
+      if (token.isSymbol(";")
+          || (aAcceptPriority && token.isSymbol("!"))
+          || token.isSymbol("}")) {
+        if (token.isSymbol("}"))
+          this.ungetToken();
+        break;
+      }
+
+      else if (!bWidth && !bStyle && !bColor
+               && token.isIdent(this.kINHERIT)) {
+        bWidth = this.kINHERIT;
+        bStyle = this.kINHERIT;
+        bColor = this.kINHERIT;
+      }
+
+      else if (!bWidth &&
+               (token.isDimension()
+                || (token.isIdent() && token.value in this.kBORDER_WIDTH_NAMES)
+                || token.isNumber("0"))) {
+        bWidth = token.value;
+      }
+
+      else if (!bStyle &&
+               (token.isIdent() && token.value in this.kBORDER_STYLE_NAMES)) {
+        bStyle = token.value;
+      }
+
+      else {
+        var color = (aProperty == "outline" && token.isIdent("invert"))
+                    ? "invert" : this.parseColor(token);
+        if (!bColor && color)
+          bColor = color;
+        else
+          return "";
+      }
+      token = this.getToken(true, true);
+    }
+
+    // create the declarations
+    this.forgetState();
+    var decl = "";
+    decl += bWidth ? bWidth : "";
+    decl += bStyle ? (bWidth ? " " : "" ) + bStyle : "";
+    decl += bColor ? (bWidth || bStyle ? " " : "" ) + bColor : "";
+    aDecl.push(this._createJscsspDeclarationFromValue(aProperty, decl));
+    return decl;
   },
 
   parseBackgroundShorthand: function(token, aDecl, aAcceptPriority)
@@ -2943,6 +3302,193 @@ CSSParser.prototype = {
     aDecl.push(this._createJscsspDeclarationFromValue("background-attachment", bgAttachment));
     aDecl.push(this._createJscsspDeclarationFromValue("background-position", bgPosition));
     return bgColor + " " + bgImage + " " + bgRepeat + " " + bgAttachment + " " + bgPosition;
+  },
+
+  stylebot_parseBackgroundShorthand: function(token, aDecl, aAcceptPriority)
+    {
+      var kHPos = {"left": true, "right": true };
+      var kVPos = {"top": true, "bottom": true };
+      var kPos = {"left": true, "right": true, "top": true, "bottom": true, "center": true};
+
+      var bgColor = null;
+      var bgRepeat = null;
+      var bgAttachment = null;
+      var bgImage = null;
+      var bgPosition = null;
+
+      while (true) {
+
+        if (!token.isNotNull())
+          break;
+
+        if (token.isSymbol(";")
+            || (aAcceptPriority && token.isSymbol("!"))
+            || token.isSymbol("}")) {
+          if (token.isSymbol("}"))
+            this.ungetToken();
+          break;
+        }
+
+        else if (!bgColor && !bgRepeat && !bgAttachment && !bgImage && !bgPosition
+                 && token.isIdent(this.kINHERIT)) {
+          bgColor = this.kINHERIT;
+          bgRepeat = this.kINHERIT;
+          bgAttachment = this.kINHERIT;
+          bgImage = this.kINHERIT;
+          bgPosition = this.kINHERIT;
+        }
+
+        else {
+          if (!bgAttachment &&
+              (token.isIdent("scroll")
+               || token.isIdent("fixed"))) {
+            bgAttachment = token.value;
+          }
+
+          else if (!bgPosition &&
+                   ((token.isIdent() && token.value in kPos)
+                    || token.isDimension()
+                    || token.isNumber("0")
+                    || token.isPercentage())) {
+            bgPosition = token.value;
+            token = this.getToken(true, true);
+            if (token.isDimension() || token.isNumber("0") || token.isPercentage()) {
+              bgPosition += " " + token.value;
+            }
+            else if (token.isIdent() && token.value in kPos) {
+              if ((bgPosition in kHPos && token.value in kHPos) ||
+                  (bgPosition in kVPos && token.value in kVPos))
+                return "";
+              bgPosition += " " + token.value;
+            }
+            else {
+              this.ungetToken();
+              bgPosition += " center";
+            }
+          }
+
+          else if (!bgRepeat &&
+                   (token.isIdent("repeat")
+                    || token.isIdent("repeat-x")
+                    || token.isIdent("repeat-y")
+                    || token.isIdent("no-repeat"))) {
+            bgRepeat = token.value;
+          }
+
+          else if (!bgImage &&
+                   (token.isFunction("url(")
+                    || token.isIdent("none"))) {
+            bgImage = token.value;
+            if (token.isFunction("url(")) {
+              token = this.getToken(true, true);
+              var url = this.parseURL(token); // TODO
+              if (url)
+                bgImage += url;
+              else
+                return "";
+            }
+          }
+
+          else if (!bgImage &&
+                   (token.isFunction("-moz-linear-gradient(")
+                    || token.isFunction("-moz-radial-gradient(")
+                    || token.isFunction("-moz-repeating-linear-gradient(")
+                    || token.isFunction("-moz-repeating-radial-gradient("))) {
+            var gradient = CssInspector.parseGradient(this, token);
+            if (gradient)
+              bgImage = CssInspector.serializeGradient(gradient);
+            else
+              return "";
+          }
+
+          else {
+            var color = this.parseColor(token);
+            if (!bgColor && color)
+              bgColor = color;
+            else
+              return "";
+          }
+
+        }
+
+        token = this.getToken(true, true);
+      }
+
+      // create the declarations
+      this.forgetState();
+      var decl = "";
+      decl += bgColor ? bgColor : "";
+      decl += bgImage ? ( bgColor ? " " : "" ) + bgImage : "";
+      decl += bgRepeat ? ( bgColor || bgImage ? " " : "" ) + bgRepeat : "";
+      decl += bgAttachment ? ( bgColor || bgImage || bgRepeat ? " " : "" ) + bgAttachment : "";
+      decl += bgPosition ? ( bgColor || bgImage || bgRepeat || bgAttachment ? " " : "" ) + bgPosition : "";
+      aDecl.push(this._createJscsspDeclarationFromValue("background", decl));
+      return decl;
+    },
+
+  parseListStyleShorthand: function(token, aDecl, aAcceptPriority)
+  {
+    var kPosition = { "inside": true, "outside": true };
+
+    var lType = null;
+    var lPosition = null;
+    var lImage = null;
+
+    while (true) {
+
+      if (!token.isNotNull())
+        break;
+
+      if (token.isSymbol(";")
+          || (aAcceptPriority && token.isSymbol("!"))
+          || token.isSymbol("}")) {
+        if (token.isSymbol("}"))
+          this.ungetToken();
+        break;
+      }
+
+      else if (!lType && !lPosition && ! lImage
+               && token.isIdent(this.kINHERIT)) {
+        lType = this.kINHERIT;
+        lPosition = this.kINHERIT;
+        lImage = this.kINHERIT;
+      }
+
+      else if (!lType &&
+               (token.isIdent() && token.value in this.kLIST_STYLE_TYPE_NAMES)) {
+        lType = token.value;
+      }
+
+      else if (!lPosition &&
+               (token.isIdent() && token.value in kPosition)) {
+        lPosition = token.value;
+      }
+
+      else if (!lImage && token.isFunction("url")) {
+        token = this.getToken(true, true);
+        var urlContent = this.parseURL(token);
+        if (urlContent) {
+          lImage = "url(" + urlContent;
+        }
+        else
+          return "";
+      }
+      else if (!token.isIdent("none"))
+        return "";
+
+      token = this.getToken(true, true);
+    }
+
+    // create the declarations
+    this.forgetState();
+    lType = lType ? lType : "none";
+    lImage = lImage ? lImage : "none";
+    lPosition = lPosition ? lPosition : "outside";
+
+    aDecl.push(this._createJscsspDeclarationFromValue("list-style-type", lType));
+    aDecl.push(this._createJscsspDeclarationFromValue("list-style-position", lPosition));
+    aDecl.push(this._createJscsspDeclarationFromValue("list-style-image", lImage));
+    return lType + " " + lPosition + " " + lImage;
   },
 
   parseListStyleShorthand: function(token, aDecl, aAcceptPriority)
@@ -3403,20 +3949,21 @@ CSSParser.prototype = {
         if (aExpandShorthands)
           switch (descriptor) {
             case "background":
-              value = this.parseBackgroundShorthand(token, declarations, aAcceptPriority);
+              // @rduenasf the next line was changed so we can avoid the declaration breakdown
+              value = this.stylebot_parseBackgroundShorthand(token, declarations, aAcceptPriority);
               break;
             case "margin":
             case "padding":
-              value = this.parseMarginOrPaddingShorthand(token, declarations, aAcceptPriority, descriptor);
+              value = this.stylebot_parseMarginOrPaddingShorthand(token, declarations, aAcceptPriority, descriptor);
               break;
             case "border-color":
-              value = this.parseBorderColorShorthand(token, declarations, aAcceptPriority);
+              value = this.stylebot_parseBorderColorShorthand(token, declarations, aAcceptPriority);
               break;
             case "border-style":
-              value = this.parseBorderStyleShorthand(token, declarations, aAcceptPriority);
+              value = this.stylebot_parseBorderStyleShorthand(token, declarations, aAcceptPriority);
               break;
             case "border-width":
-              value = this.parseBorderWidthShorthand(token, declarations, aAcceptPriority);
+              value = this.stylebot_parseBorderWidthShorthand(token, declarations, aAcceptPriority);
               break;
             case "border-top":
             case "border-right":
@@ -3424,13 +3971,14 @@ CSSParser.prototype = {
             case "border-left":
             case "border":
             case "outline":
-              value = this.parseBorderEdgeOrOutlineShorthand(token, declarations, aAcceptPriority, descriptor);
+              // @rduenasf the next line was changed so we can avoid the declaration breakdown
+              value = this.stylebot_parseBorderEdgeOrOutlineShorthand(token, declarations, aAcceptPriority, descriptor);
               break;
             case "cue":
-              value = this.parseCueShorthand(token, declarations, aAcceptPriority);
+              value = this.stylebot_parseCueShorthand(token, declarations, aAcceptPriority);
               break;
             case "pause":
-              value = this.parsePauseShorthand(token, declarations, aAcceptPriority);
+              value = this.stylebot_parsePauseShorthand(token, declarations, aAcceptPriority);
               break;
             case "font":
               value = this.parseFontShorthand(token, declarations, aAcceptPriority);
@@ -3683,7 +4231,7 @@ CSSParser.prototype = {
         if (token.isWhiteSpace())
           s += " ";
         else
-          s += token.value;
+          s += token.value + " ";
         if (token.isSymbol(">")
             || token.isSymbol("+")
             || token.isSymbol("~"))
