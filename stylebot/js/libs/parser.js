@@ -2415,6 +2415,58 @@ CSSParser.prototype = {
    return top + " " + right + " " + bottom + " " + left;
   },
 
+  stylebot_parseMarginOrPaddingShorthand: function(token, aDecl, aAcceptPriority, aProperty)
+  {
+    var top = null;
+    var bottom = null;
+    var left = null;
+    var right = null;
+
+    var values = [];
+    while (true) {
+
+      if (!token.isNotNull())
+        break;
+
+      if (token.isSymbol(";")
+          || (aAcceptPriority && token.isSymbol("!"))
+          || token.isSymbol("}")) {
+        if (token.isSymbol("}"))
+          this.ungetToken();
+        break;
+      }
+
+      else if (!values.length && token.isIdent(this.kINHERIT)) {
+        values.push(token.value);
+        token = this.getToken(true, true);
+        break;
+      }
+
+      else if (token.isDimension()
+              || token.isNumber("0")
+              || token.isPercentage()
+              || token.isIdent("auto")) {
+        values.push(token.value);
+      }
+      else
+        return "";
+
+      token = this.getToken(true, true);
+    }
+
+    this.forgetState();
+
+    var count = values.length;
+    var decl = "";
+    if (count < 1 || count > 4) return "";
+    for(var i = 0;i < count;i++) {
+        decl += values[i];
+        if(i < count - 1) decl += " ";
+    }
+    aDecl.push(this._createJscsspDeclarationFromValue(aProperty, decl));
+    return decl;
+  },
+
   parseBorderColorShorthand: function(token, aDecl, aAcceptPriority)
   {
     var top = null;
@@ -2488,6 +2540,57 @@ CSSParser.prototype = {
     aDecl.push(this._createJscsspDeclarationFromValue("border-bottom-color", bottom));
     aDecl.push(this._createJscsspDeclarationFromValue("border-left-color", left));
     return top + " " + right + " " + bottom + " " + left;
+  },
+
+  stylebot_parseBorderColorShorthand: function(token, aDecl, aAcceptPriority)
+  {
+    var top = null;
+    var bottom = null;
+    var left = null;
+    var right = null;
+
+    var values = [];
+    while (true) {
+
+      if (!token.isNotNull())
+        break;
+
+      if (token.isSymbol(";")
+          || (aAcceptPriority && token.isSymbol("!"))
+          || token.isSymbol("}")) {
+        if (token.isSymbol("}"))
+          this.ungetToken();
+        break;
+      }
+
+      else if (!values.length && token.isIdent(this.kINHERIT)) {
+        values.push(token.value);
+        token = this.getToken(true, true);
+        break;
+      }
+
+      else {
+        var color = this.parseColor(token);
+        if (color)
+          values.push(color);
+        else
+          return "";
+      }
+
+      token = this.getToken(true, true);
+    }
+
+    this.forgetState();
+
+    var count = values.length;
+    var decl = "";
+    if (count < 1 || count > 4) return "";
+    for(var i = 0;i < count;i++) {
+        decl += values[i];
+        if(i < count - 1) decl += " ";
+    }
+    aDecl.push(this._createJscsspDeclarationFromValue("border-color", decl));
+    return decl;
   },
 
   parseCueShorthand: function(token, declarations, aAcceptPriority)
@@ -3583,11 +3686,12 @@ CSSParser.prototype = {
         if (aExpandShorthands)
           switch (descriptor) {
             case "background":
+              // @rduenasf the next line was changed so we can avoid the declaration breakdown
               value = this.stylebot_parseBackgroundShorthand(token, declarations, aAcceptPriority);
               break;
             case "margin":
             case "padding":
-              value = this.parseMarginOrPaddingShorthand(token, declarations, aAcceptPriority, descriptor);
+              value = this.stylebot_parseMarginOrPaddingShorthand(token, declarations, aAcceptPriority, descriptor);
               break;
             case "border-color":
               value = this.parseBorderColorShorthand(token, declarations, aAcceptPriority);
@@ -3604,8 +3708,7 @@ CSSParser.prototype = {
             case "border-left":
             case "border":
             case "outline":
-              /// @rduenasf the next line is commented out so we can avoid the declaration breakdown
-              //value = this.parseBorderEdgeOrOutlineShorthand(token, declarations, aAcceptPriority, descriptor);
+              // @rduenasf the next line was changed so we can avoid the declaration breakdown
               value = this.stylebot_parseBorderEdgeOrOutlineShorthand(token, declarations, aAcceptPriority, descriptor);
               break;
             case "cue":
