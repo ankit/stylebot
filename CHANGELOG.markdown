@@ -1,4 +1,5 @@
 **1.2.2**
+
 * New Options page similar to Chrome settings
 * Modified the 'Toggle Styling' option in context menu
 * Some UI Layout fixes for Stylebot Panel
@@ -9,12 +10,14 @@
 * Updated to jQuery 1.6.1
 
 **1.2.1**
+
 * Added support for comments
 * Fixed issue where CSS selectors containing ^= weren't working properly
 * Updated JSCSSP parser to support some @-webkit- properties
 * Added option to hide css icon in Omnibar
 
 **1.2**
+
 * Added support for comments
 * Updated CSS Parser
 * Fixed issue where CSS selectors containing ^= weren't working properly
@@ -22,21 +25,25 @@
 * Bugfixes
 
 **1.1**
+
 * Added option to preview changes live when picking color using Color Picker
 * Use up / down arrows keys to increment / decrement values
 * Green 'css' icon indicates style is running on a page
 * Preview changes live when editing entire page's CSS
 
 **1.0**
+
 * Ability to share, browse and install styles from Stylebot Social
 * Cleaner options page with vertical tabs
 * Added option to temporarily disable custom styling of page in right click context menu
 * Better Sync
 
 **0.2.4**
+
 * Added context menu
 
 **0.2.3**
+
 * Added workaround for Chrome bug related to :last-child which caused weird issues while pasting text into certain textareas
 
 **0.2.1**
