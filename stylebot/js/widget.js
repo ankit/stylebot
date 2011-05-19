@@ -161,10 +161,9 @@ stylebot.widget = {
         .appendTo(btContainer)
         .click(stylebot.widget.editCSS)
 
-        this.cache.undoBt = WidgetUI.createButton("Undo").attr({
-            title: "Undo your last action",
-            'disabled': "disabled"
-        })
+        this.cache.undoBt = WidgetUI.createButton("Undo")
+        .attr('title', "Undo your last action")
+        .prop('disabled', true)
 
         .tipsy({delayIn: 800, gravity:'s', html: true})
         .appendTo(btContainer).click(function(e) {stylebot.style.undo();});
@@ -267,21 +266,21 @@ stylebot.widget = {
     //  Enable UI of widget
     enable: function() {
         this.cache.headerSelector.html(stylebot.style.cache.selector);
-        this.basic.cache.textfields.attr('disabled', '');
-        this.basic.cache.buttons.attr('disabled', '');
-        this.basic.cache.selectboxes.attr('disabled', '');
+        this.basic.cache.textfields.prop('disabled', false);
+        this.basic.cache.buttons.prop('disabled', false);
+        this.basic.cache.selectboxes.prop('disabled', false);
         this.basic.cache.colorSelectors.removeClass('disabled');
-        this.advanced.cache.cssField.attr('disabled', '');
+        this.advanced.cache.cssField.prop('disabled', false);
     },
 
     //  Disable UI of widget
     disable: function() {
         this.cache.headerSelector.html("Select an element");
-        this.basic.cache.textfields.attr('disabled', 'disabled');
-        this.basic.cache.buttons.attr('disabled', 'disabled');
-        this.basic.cache.selectboxes.attr('disabled', 'disabled');
+        this.basic.cache.textfields.attr('disabled', true);
+        this.basic.cache.buttons.attr('disabled', true);
+        this.basic.cache.selectboxes.attr('disabled', true);
         this.basic.cache.colorSelectors.addClass('disabled');
-        this.advanced.cache.cssField.attr('disabled', 'disabled');
+        this.advanced.cache.cssField.attr('disabled', true);
     },
 
     //  Update widget position
@@ -565,11 +564,11 @@ stylebot.widget = {
 
     //  Enable the Undo button
     enableUndo: function() {
-        this.cache.undoBt.attr('disabled', '');
+        this.cache.undoBt.prop('disabled', false);
     },
 
     //  Disable the Undo button
     disableUndo: function() {
-        this.cache.undoBt.attr('disabled', 'disabled');
+        this.cache.undoBt.prop('disabled', true);
     }
 }

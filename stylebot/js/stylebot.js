@@ -7,17 +7,17 @@
  **/
 
 var stylebot = {
-    
+
     status: false,
-    
+
     selectedElement: null,
-    
+
     hoveredElement: null,
-    
+
     selectionStatus: false,
-    
+
     selectionBox: null,
-    
+
     options: {
         useShortcutKey: true,
         shortcutKey: 77, // 77 is keycode for 'm'
@@ -27,19 +27,19 @@ var stylebot = {
         sync: false,
         livePreviewColorPicker: false
     },
-    
+
     initialize: function(options) {
         this.style.initialize();
         this.setOptions(options);
         this.contextmenu.initialize();
     },
-    
+
     setOptions: function(options) {
         for (option in options) {
             this.options[option] = options[option];
         }
     },
-    
+
     // toggle stylebot editing status
     toggle: function() {
         if (this.status === true)
@@ -47,7 +47,7 @@ var stylebot = {
         else
             this.open();
     },
-    
+
     open: function() {
         this.attachListeners();
         this.style.enable();
@@ -57,7 +57,7 @@ var stylebot = {
         this.enableSelection();
         attachKeyboardShortcuts();
     },
-    
+
     close: function() {
         stylebot.widget.close();
         stylebot.status = false;
@@ -69,27 +69,27 @@ var stylebot = {
         stylebot.selectedElement = null;
         stylebot.destroySelectionBox();
         detachKeyboardShortcuts();
-        
+
         // sync styles
         if (stylebot.options.sync === true) {
             stylebot.chrome.pushStyles();
         }
     },
-    
+
     highlight: function(el) {
         if (!stylebot.selectionBox)
             stylebot.createSelectionBox();
-        
+
         stylebot.hoveredElement = el;
         stylebot.selectionBox.highlight(el);
     },
-    
+
     unhighlight: function() {
         stylebot.hoveredElement = null;
         if (stylebot.selectionBox)
             stylebot.selectionBox.hide();
     },
-    
+
     // called when user selects an element
     select: function(el, selector) {
         stylebot.disableSelection();
@@ -100,7 +100,7 @@ var stylebot = {
             selector = SelectorGenerator.generate(el);
             stylebot.highlight(el);
         }
-        
+
         else if (selector)
         {
             try {
@@ -108,25 +108,25 @@ var stylebot = {
                 stylebot.selectedElement = el;
                 stylebot.highlight(el);
             }
-            
+
             catch(e) {
                 stylebot.selectedElement = null;
             }
         }
-        
+
         else
         {
             stylebot.selectedElement = stylebot.hoveredElement;
             selector = SelectorGenerator.generate(stylebot.selectedElement);
         }
-        
+
         stylebot.style.fillCache(selector);
         stylebot.widget.open();
         setTimeout(function() {
             stylebot.style.removeFromStyleElement();
         }, 100);
     },
-    
+
     toggleSelection: function() {
         if (stylebot.selectionStatus)
         {
@@ -140,7 +140,7 @@ var stylebot = {
             stylebot.enableSelection();
         }
     },
-    
+
     enableSelection: function() {
         stylebot.attachListeners();
         stylebot.selectionStatus = true;
@@ -148,7 +148,7 @@ var stylebot = {
         .addClass('stylebot-select-icon-active')
         .attr('title', 'Click to disable selection of element');
     },
-    
+
     disableSelection: function() {
         stylebot.detachListeners();
         stylebot.selectionStatus = false;
@@ -156,11 +156,11 @@ var stylebot = {
         .removeClass('stylebot-select-icon-active')
         .attr('title', 'Click to enable selection of element');
     },
-    
+
     createSelectionBox: function() {
         stylebot.selectionBox = new SelectionBox(2, "stylebot-selection");
     },
-    
+
     destroySelectionBox: function() {
         if (stylebot.selectionBox)
         {
@@ -168,25 +168,25 @@ var stylebot = {
             delete stylebot.selectionBox;
         }
     },
-    
+
     attachListeners: function() {
         document.addEventListener('mousemove', this.onMouseMove, true);
         document.addEventListener('mousedown', this.onMouseDown, true);
         document.addEventListener('click', this.onMouseClick, true);
     },
-    
+
     detachListeners: function() {
         document.removeEventListener('mousemove', this.onMouseMove, true);
         document.removeEventListener('mousedown', this.onMouseDown, true);
     },
-    
+
     detachClickListener: function() {
         // We have to remove the click listener in a second phase because if we remove it
         // after the mousedown, we won't be able to cancel clicked links
         // thanks to firebug
         document.removeEventListener('click', this.onMouseClick, true);
     },
-    
+
     onMouseMove: function(e) {
         // for dropdown
         if (e.target.className == "stylebot-dropdown-li") {
@@ -196,20 +196,20 @@ var stylebot = {
             }
             return true;
         }
-        
+
         if (!stylebot.shouldSelect(e.target))
             return true;
-        
+
         if(stylebot.belongsToStylebot(e.target)) {
             stylebot.unhighlight();
             return true;
         }
-        
+
         e.preventDefault();
         e.stopPropagation();
         stylebot.highlight(e.target);
     },
-    
+
     onMouseDown: function(e) {
         if (!stylebot.belongsToStylebot(e.target))
         {
@@ -219,7 +219,7 @@ var stylebot = {
             return false;
         }
     },
-    
+
     onMouseClick: function(e) {
         if (!stylebot.belongsToStylebot(e.target))
         {
@@ -229,16 +229,16 @@ var stylebot = {
             return false;
         }
     },
-    
+
     belongsToStylebot: function(el) {
         var $el = $(el);
         var parent = $el.closest('#stylebot, .stylebot_colorpicker, #stylebot-modal');
         var id = $el.attr('id');
-        if (parent.length != 0 || id.indexOf("stylebot") != -1)
+        if (parent.length != 0 || (id && id.indexOf("stylebot") != -1))
             return true;
         return false;
     },
-    
+
     shouldClose: function(el) {
         if (!stylebot.status ||
             stylebot.widget.basic.isColorPickerVisible ||
@@ -251,7 +251,7 @@ var stylebot = {
         }
         return true;
     },
-    
+
     shouldSelect: function(el) {
         if (el.className === "stylebot-selection"
             || stylebot.widget.isBeingDragged

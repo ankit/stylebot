@@ -1,13 +1,13 @@
 /**
   * Events
-  * 
+  *
   * Events for Stylebot Panel Controls in Basic Mode
   **/
 
 Events = {
-    
+
     accordionTimer: null,
-    
+
     onToggle: function(e) {
         var el = $(this);
         var className = 'stylebot-active-button';
@@ -23,7 +23,7 @@ Events = {
         }
         Events.saveProperty(property, value);
     },
-    
+
     onRadioClick: function(e) {
         var value;
 
@@ -44,24 +44,24 @@ Events = {
         else
             Events.saveProperty(property, value);
     },
-    
+
     onTextFieldKeyUp: function(e) {
         if (e.keyCode == 27) { // esc
             e.target.blur();
             return;
         }
-    
+
         var value = e.target.value;
         var property = $(e.target).data('property');
-        
+
         stylebot.style.apply(property, value);
     },
-    
+
     onTextFieldFocus: function(e) {
         stylebot.style.saveState();
         $(e.target).data('lastState', e.target.value);
     },
-    
+
     onTextFieldBlur: function(e) {
         if ($(e.target).data('lastState') == e.target.value) {
             stylebot.style.clearLastState();
@@ -73,36 +73,36 @@ Events = {
 
     onSizeFieldKeyDown: function(e) {
         // increment / decrement value by 1 with arrow keys
-        //          
+        //
         if (e.keyCode === 38 || e.keyCode === 40) { // up / down arrow
             e.preventDefault();
-    
+
             var value = e.target.value;
-               var property = $(e.target).data('property');
-               var unit = $(e.target).next().attr('value');
-    
+            var property = $(e.target).data('property');
+            var unit = $(e.target).next().attr('value');
+
             value = parseInt(value);
-    
+
             if (isNaN(value)) {
                 value = 0;
             }
-    
+
             else {
                 if (e.keyCode === 38) // up
                     value += 1;
                 else
                     value -= 1;
             }
-    
+
             e.target.value = value;
-    
+
             if ( parseFloat(value) )
                    value += unit;
 
             stylebot.style.apply(property, value);
         }
     },
-    
+
     onSizeFieldKeyUp: function(e) {
         if (e.keyCode === 27) // esc
         {
@@ -114,7 +114,7 @@ Events = {
             // we're already handling this case in onSizeFieldKeyDown
             return;
         }
-        
+
         var value = e.target.value;
         var property = $(e.target).data('property');
         var unit = $(e.target).next().attr('value');
@@ -125,11 +125,11 @@ Events = {
         stylebot.style.apply(property, value);
         // state is saved for undo in onTextFieldFocus and onTextFieldBlur
     },
-    
+
     onSelectChange: function(e) {
         var value = e.target.value.split(',');
         var property = $(e.target).find('[value=' + e.target.value + ']').data('property');
-        
+
         if (typeof(property) == "object")
         {
             var len = property.length;
@@ -140,7 +140,7 @@ Events = {
         else
             Events.saveProperty(property, value);
     },
-    
+
     onSegmentedControlClick: function(e) {
         var el = $(e.target);
         if (el.get(0).tagName != 'BUTTON')
@@ -162,7 +162,7 @@ Events = {
             Events.saveProperty(el.data('property'), '');
         el.focus();
     },
-    
+
     toggleAccordion: function(h) {
         if (h.hasClass('stylebot-accordion-active'))
         {
@@ -176,7 +176,7 @@ Events = {
             .focus()
             .next().show();
         }
-        
+
         // determine which accordions are open and
         // send request to save the new state to background.html cache
         if (this.accordionTimer)
@@ -184,7 +184,7 @@ Events = {
             this.accordionTimer = setTimeout(function() {
             var len = stylebot.widget.basic.cache.accordionHeaders.length;
             var enabledAccordions = [];
-            
+
             for (var i = 0; i < len; i++)
             {
                 if ($(stylebot.widget.basic.cache.accordionHeaders[i]).hasClass( 'stylebot-accordion-active' ))
@@ -195,7 +195,7 @@ Events = {
 
         }, 500);
     },
-    
+
     saveProperty: function(property, value) {
         // save current state to undo stack
         stylebot.style.saveState();
