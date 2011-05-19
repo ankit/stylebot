@@ -2819,7 +2819,7 @@ CSSParser.prototype = {
     return bWidth + " " + bStyle + " " + bColor;
   },
 
-  parseBorderShorthand: function(token, aDecl, aAcceptPriority, aProperty)
+  stylebot_parseBorderEdgeOrOutlineShorthand: function(token, aDecl, aAcceptPriority, aProperty)
   {
     var bWidth = null;
     var bStyle = null;
@@ -3002,6 +3002,128 @@ CSSParser.prototype = {
     aDecl.push(this._createJscsspDeclarationFromValue("background-position", bgPosition));
     return bgColor + " " + bgImage + " " + bgRepeat + " " + bgAttachment + " " + bgPosition;
   },
+
+  stylebot_parseBackgroundShorthand: function(token, aDecl, aAcceptPriority)
+    {
+      var kHPos = {"left": true, "right": true };
+      var kVPos = {"top": true, "bottom": true };
+      var kPos = {"left": true, "right": true, "top": true, "bottom": true, "center": true};
+
+      var bgColor = null;
+      var bgRepeat = null;
+      var bgAttachment = null;
+      var bgImage = null;
+      var bgPosition = null;
+
+      while (true) {
+
+        if (!token.isNotNull())
+          break;
+
+        if (token.isSymbol(";")
+            || (aAcceptPriority && token.isSymbol("!"))
+            || token.isSymbol("}")) {
+          if (token.isSymbol("}"))
+            this.ungetToken();
+          break;
+        }
+
+        else if (!bgColor && !bgRepeat && !bgAttachment && !bgImage && !bgPosition
+                 && token.isIdent(this.kINHERIT)) {
+          bgColor = this.kINHERIT;
+          bgRepeat = this.kINHERIT;
+          bgAttachment = this.kINHERIT;
+          bgImage = this.kINHERIT;
+          bgPosition = this.kINHERIT;
+        }
+
+        else {
+          if (!bgAttachment &&
+              (token.isIdent("scroll")
+               || token.isIdent("fixed"))) {
+            bgAttachment = token.value;
+          }
+
+          else if (!bgPosition &&
+                   ((token.isIdent() && token.value in kPos)
+                    || token.isDimension()
+                    || token.isNumber("0")
+                    || token.isPercentage())) {
+            bgPosition = token.value;
+            token = this.getToken(true, true);
+            if (token.isDimension() || token.isNumber("0") || token.isPercentage()) {
+              bgPosition += " " + token.value;
+            }
+            else if (token.isIdent() && token.value in kPos) {
+              if ((bgPosition in kHPos && token.value in kHPos) ||
+                  (bgPosition in kVPos && token.value in kVPos))
+                return "";
+              bgPosition += " " + token.value;
+            }
+            else {
+              this.ungetToken();
+              bgPosition += " center";
+            }
+          }
+
+          else if (!bgRepeat &&
+                   (token.isIdent("repeat")
+                    || token.isIdent("repeat-x")
+                    || token.isIdent("repeat-y")
+                    || token.isIdent("no-repeat"))) {
+            bgRepeat = token.value;
+          }
+
+          else if (!bgImage &&
+                   (token.isFunction("url(")
+                    || token.isIdent("none"))) {
+            bgImage = token.value;
+            if (token.isFunction("url(")) {
+              token = this.getToken(true, true);
+              var url = this.parseURL(token); // TODO
+              if (url)
+                bgImage += url;
+              else
+                return "";
+            }
+          }
+
+          else if (!bgImage &&
+                   (token.isFunction("-moz-linear-gradient(")
+                    || token.isFunction("-moz-radial-gradient(")
+                    || token.isFunction("-moz-repeating-linear-gradient(")
+                    || token.isFunction("-moz-repeating-radial-gradient("))) {
+            var gradient = CssInspector.parseGradient(this, token);
+            if (gradient)
+              bgImage = CssInspector.serializeGradient(gradient);
+            else
+              return "";
+          }
+
+          else {
+            var color = this.parseColor(token);
+            if (!bgColor && color)
+              bgColor = color;
+            else
+              return "";
+          }
+
+        }
+
+        token = this.getToken(true, true);
+      }
+
+      // create the declarations
+      this.forgetState();
+      var decl = "";
+      decl += bgColor ? bgColor : "";
+      decl += bgImage ? ( bgColor ? " " : "" ) + bgImage : "";
+      decl += bgRepeat ? ( bgColor || bgImage ? " " : "" ) + bgRepeat : "";
+      decl += bgAttachment ? ( bgColor || bgImage || bgRepeat ? " " : "" ) + bgAttachment : "";
+      decl += bgPosition ? ( bgColor || bgImage || bgRepeat || bgAttachment ? " " : "" ) + bgPosition : "";
+      aDecl.push(this._createJscsspDeclarationFromValue("background", decl));
+      return decl;
+    },
 
   parseListStyleShorthand: function(token, aDecl, aAcceptPriority)
   {
@@ -3461,7 +3583,7 @@ CSSParser.prototype = {
         if (aExpandShorthands)
           switch (descriptor) {
             case "background":
-              value = this.parseBackgroundShorthand(token, declarations, aAcceptPriority);
+              value = this.stylebot_parseBackgroundShorthand(token, declarations, aAcceptPriority);
               break;
             case "margin":
             case "padding":
@@ -3484,7 +3606,7 @@ CSSParser.prototype = {
             case "outline":
               /// @rduenasf the next line is commented out so we can avoid the declaration breakdown
               //value = this.parseBorderEdgeOrOutlineShorthand(token, declarations, aAcceptPriority, descriptor);
-              value = this.parseBorderShorthand(token, declarations, aAcceptPriority, descriptor);
+              value = this.stylebot_parseBorderEdgeOrOutlineShorthand(token, declarations, aAcceptPriority, descriptor);
               break;
             case "cue":
               value = this.parseCueShorthand(token, declarations, aAcceptPriority);
