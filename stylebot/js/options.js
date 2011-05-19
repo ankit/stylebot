@@ -116,7 +116,6 @@ function fetchOptions() {
 function attachListeners() {
     // checkbox
     $('.option input[type=checkbox]').change(function(e) {
-        alert("hola");
         var name = e.target.name;
         var value = translateOptionValue(name, e.target.checked);
         bg_window.saveOption(name, value);
