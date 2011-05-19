@@ -317,14 +317,14 @@ function onAdd() {
     if (css === "")
         return false;
 
-    if (saveStyle(url, css)) {
+    if (saveStyle(url, css, true)) {
         cache.modal.hide();
     }
 }
 
 // Saves a style and updates the UI. Called by onSave and onAdd
 //
-function saveStyle(url, css) {
+function saveStyle(url, css, add) {
     // if css is empty. remove the style
     if (css === "")
     {
@@ -365,7 +365,8 @@ function saveStyle(url, css) {
             bg_window.saveStyles(styles);
             bg_window.pushStyles();
 
-            createCustomStyleOption(url, styles[url]).appendTo($("#custom-styles"));
+            if (add)
+                createCustomStyleOption(url, styles[url]).appendTo($("#custom-styles"));
 
             return true;
         }
