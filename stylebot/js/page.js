@@ -73,8 +73,10 @@ table {\n\
         var html = "<div style='font-size: 12px !important; line-height: 14px !important;'>Edit the CSS for <b>" + stylebot.style.cache.url + "</b>:</div>\
         <textarea class='stylebot-textarea stylebot-css-code' tabindex='0'></textarea>\
         <div style='font-size: 11px !important; margin-bottom: 10px !important;'>\
+        <label>\
         <input type='checkbox' title='This may cause performance issues' class='stylebot-button' />\
         Live Preview Changes\
+        </label>\
         </div>\
         <button class='stylebot-button' title='Copy to Clipboard' style='float:left !important; margin: 0px !important;' tabindex='0'>\
         Copy\
