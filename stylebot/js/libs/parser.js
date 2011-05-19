@@ -2819,6 +2819,64 @@ CSSParser.prototype = {
     return bWidth + " " + bStyle + " " + bColor;
   },
 
+  parseBorderShorthand: function(token, aDecl, aAcceptPriority, aProperty)
+  {
+    var bWidth = null;
+    var bStyle = null;
+    var bColor = null;
+
+    while (true) {
+      if (!token.isNotNull())
+        break;
+
+      if (token.isSymbol(";")
+          || (aAcceptPriority && token.isSymbol("!"))
+          || token.isSymbol("}")) {
+        if (token.isSymbol("}"))
+          this.ungetToken();
+        break;
+      }
+
+      else if (!bWidth && !bStyle && !bColor
+               && token.isIdent(this.kINHERIT)) {
+        bWidth = this.kINHERIT;
+        bStyle = this.kINHERIT;
+        bColor = this.kINHERIT;
+      }
+
+      else if (!bWidth &&
+               (token.isDimension()
+                || (token.isIdent() && token.value in this.kBORDER_WIDTH_NAMES)
+                || token.isNumber("0"))) {
+        bWidth = token.value;
+      }
+
+      else if (!bStyle &&
+               (token.isIdent() && token.value in this.kBORDER_STYLE_NAMES)) {
+        bStyle = token.value;
+      }
+
+      else {
+        var color = (aProperty == "outline" && token.isIdent("invert"))
+                    ? "invert" : this.parseColor(token);
+        if (!bColor && color)
+          bColor = color;
+        else
+          return "";
+      }
+      token = this.getToken(true, true);
+    }
+
+    // create the declarations
+    this.forgetState();
+    var decl = "";
+    decl += bWidth ? bWidth : "";
+    decl += bStyle ? (bWidth ? " " : "" ) + bStyle : "";
+    decl += bColor ? (bWidth || bStyle ? " " : "" ) + bColor : "";
+    aDecl.push(this._createJscsspDeclarationFromValue(aProperty, decl));
+    return decl;
+  },
+
   parseBackgroundShorthand: function(token, aDecl, aAcceptPriority)
   {
     var kHPos = {"left": true, "right": true };
@@ -3424,7 +3482,9 @@ CSSParser.prototype = {
             case "border-left":
             case "border":
             case "outline":
-              value = this.parseBorderEdgeOrOutlineShorthand(token, declarations, aAcceptPriority, descriptor);
+              /// @rduenasf the next line is commented out so we can avoid the declaration breakdown
+              //value = this.parseBorderEdgeOrOutlineShorthand(token, declarations, aAcceptPriority, descriptor);
+              value = this.parseBorderShorthand(token, declarations, aAcceptPriority, descriptor);
               break;
             case "cue":
               value = this.parseCueShorthand(token, declarations, aAcceptPriority);
@@ -3683,7 +3743,7 @@ CSSParser.prototype = {
         if (token.isWhiteSpace())
           s += " ";
         else
-          s += token.value;
+          s += token.value + " ";
         if (token.isSymbol(">")
             || token.isSymbol("+")
             || token.isSymbol("~"))
