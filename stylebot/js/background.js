@@ -3,7 +3,7 @@
 // Major Version. Used to check if the release notes should be shown during update
 // Only updated for X.X releases
 //
-var CURRENT_MAJOR_VERSION = "1.2";
+var CURRENT_MAJOR_VERSION = "1.3";
 
 var currTabId;
 var contextMenuId = null;

@@ -1,4 +1,4 @@
-**1.2.2**
+**1.3**
 
 * New Options page similar to Chrome settings
 * Modified the 'Toggle Styling' option in context menu
@@ -7,6 +7,7 @@
 * Fixed issue where selectors of the type 'ul li' and 'ul > li' were not working
 * Prettier CSS editor in options page with syntax highlighting
 * Syntax errors are shown when editing / importing CSS in the Options page
+* Global Stylesheet
 * Updated to jQuery 1.6.1
 
 **1.2.1**
