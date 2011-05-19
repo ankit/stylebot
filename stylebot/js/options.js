@@ -230,10 +230,12 @@ function editStyle(e) {
     var rules = styles[url]['_rules'];
     var css = CSSUtils.crunchFormattedCSS(rules, false);
 
-    var html = "<div>Edit the CSS for <b>" + url + "</b>:</div>";
-    html += "<textarea class='stylebot-css-code'>" + css + "</textarea>";
-    html += "<button onclick='cache.modal.hide();'>Cancel</button>";
-    html += "<button onclick='onSave();'>Save</button>";
+    var html = "<div>Edit the CSS for <strong>" + url + "</strong>:</div> \
+    <textarea class='stylebot-css-code'>" + css + "</textarea> \
+    <div id='stylebot-modal-buttons'> \
+    <button onclick='onSave();'>Save</button> \
+    <button onclick='cache.modal.hide();'>Cancel</button> \
+    </div>";
 
     initModal(html);
 
@@ -296,11 +298,12 @@ function onSave() {
 
 // Displays the modal popup to add a new style
 function addStyle() {
-    var html = "<div>URL: <input type='text'></input></div>";
-    html += "<textarea class='stylebot-css-code'>";
-    html += "</textarea>";
-    html += "<button onclick= 'cache.modal.hide();' >Cancel</button>";
-    html += "<button onclick= 'onAdd();' >Add</button>";
+    var html = "<div>URL: <input type='text'></input></div> \
+    <textarea class='stylebot-css-code'> \
+    </textarea> \
+    <div id='stylebot-modal-buttons'> \
+    <button onclick= 'onAdd();' >Add</button> \
+    <button onclick= 'cache.modal.hide();' >Cancel</button>";
 
     initModal(html);
     cache.modal.options.onOpen = function() { cache.modal.box.find('input').focus(); };
@@ -433,7 +436,11 @@ function export() {
     else
         css = "";
 
-    var html = "<div>Copy and paste the following into a text file:</div><textarea class='stylebot-css-code'>" + css + "</textarea><button onclick='copyToClipboard()'>Copy To Clipboard</button>";
+    var html = "<div>Copy and paste the following into a text file:</div> \
+    <textarea class='stylebot-css-code'>" + css + "</textarea> \
+    <div id='stylebot-modal-buttons'> \
+    <button onclick='copyToClipboard()'> Copy To Clipboard </button> \
+    </div>";
 
     initModal(html, {
         closeOnEsc: true,
@@ -462,7 +469,9 @@ function import() {
     </div> \
     <textarea id='stylebot-import-css' class='stylebot-css-code'> \
     </textarea> \
-    <button onclick='importCSS();cache.modal.hide();'>Import</button>";
+    <div id='stylebot-modal-buttons'> \
+    <button onclick='importCSS();cache.modal.hide();'>Import</button> \
+    </div>";
 
     initModal(html, {
         closeOnEsc: true,

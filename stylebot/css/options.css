@@ -226,6 +226,9 @@ textarea.stylebot-css-code {
 #stylebot-modal div {
     font-family: 'Lucida Grande', 'Lucida Sans', 'Lucida Sans Unicode', Helvetica, Arial, sans-serif;
     font-size: 12px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 #stylebot-modal .description {
@@ -238,8 +241,12 @@ textarea.stylebot-css-code {
     text-align: left;
 }
 
-#stylebot-modal button {
+#stylebot-modal-buttons {
     float: right;
+}
+
+#stylebot-modal button {
+    float: left;
     margin: 0px;
     margin-left: 4px;
 }
