@@ -38,14 +38,14 @@
                 <h3>Browser UI</h3>
                 <ul class="option-subsection">
                     <li class="option">
+                        <input type="checkbox" name="contextMenu" />
                         <label>
-                            <input type="checkbox" name="contextMenu" />
                             <span class="option-field">Show Right Click Menu</span>
                         </label>
                     </li>
                     <li class="option">
+                        <input type="checkbox" name="showPageAction" onclick="togglePageAction();" />
                         <label>
-                            <input type="checkbox" name="showPageAction" onclick="togglePageAction();" />
                             <span class="option-field">Show <img src='images/css.png' style='margin-bottom: -6px;' /> Icon in Omnibar</span>
                         </label>
                     </li>
@@ -55,24 +55,24 @@
                 <h3>Accessibility</h3>
                 <ul class="option-subsection">
                     <li class="option">
+                        <input type="checkbox" name="useShortcutKey" />
                         <label>
-                            <input type="checkbox" name="useShortcutKey" />
                             <span class="option-field">Enable Shortcut Key to launch Stylebot</span>
                         </label>
                     </li>
                     <li class="option">
                         <label>
                             <span class="option-field">Shortcut Key Combo:</span>
-                            <select name="shortcutMetaKey">
-                                <option value="ctrl">Ctrl</option>
-                                <option value="shift">Shift</option>
-                                <option value="alt">Alt</option>
-                                <option value="none">None</option>
-                            </select>
-                            + <input type="text" name="shortcutKeyCharacter" value="e" size="1" />
-                            <!-- Hidden field to store keycode value -->
-                            <input type="hidden" name="shortcutKey" />
                         </label>
+                        <select name="shortcutMetaKey">
+                            <option value="ctrl">Ctrl</option>
+                            <option value="shift">Shift</option>
+                            <option value="alt">Alt</option>
+                            <option value="none">None</option>
+                        </select>
+                        + <input type="text" name="shortcutKeyCharacter" value="e" size="1" />
+                        <!-- Hidden field to store keycode value -->
+                        <input type="hidden" name="shortcutKey" />
                     </li>
                 </ul>
             </div>
@@ -100,10 +100,8 @@
                 <h3>Search</h3>
                 <div class="option-subsection">
                     <div>
-                        <li class='option'>
-                            Search for styles on
-                            <a rel="external" target="_blank" href="http://stylebot.me">Stylebot Social</a>
-                        </li>
+                        Search for styles on
+                        <a rel="external" target="_blank" href="http://stylebot.me">Stylebot Social</a>
                     </div>
                     <div>
                         Search your own styles:

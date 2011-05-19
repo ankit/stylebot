@@ -115,26 +115,26 @@ function fetchOptions() {
 // Attaches listeners for different types of inputs that change option values
 function attachListeners() {
     // checkbox
-    $('.option label input[type=checkbox]').change(function(e) {
+    $('.option input[type=checkbox]').change(function(e) {
         var name = e.target.name;
         var value = translateOptionValue(name, e.target.checked);
         bg_window.saveOption(name, value);
     });
 
     // radio
-    $('.option label input[type=radio]').change(function(e) {
+    $('.option input[type=radio]').change(function(e) {
         var name = e.target.name;
         var value = translateOptionValue(name, e.target.value);
         bg_window.saveOption(name, value);
     });
 
     // select
-    $('.option label select').change(function(e) {
+    $('.option select').change(function(e) {
         bg_window.saveOption(e.target.name, e.target.value);
     });
 
     // textfields
-    $('.option label input[type=text]').keyup(function(e) {
+    $('.option input[type=text]').keyup(function(e) {
         if (e.target.name == "shortcutKeyCharacter")
             option = "shortcutKey";
         else
