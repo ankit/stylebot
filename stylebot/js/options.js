@@ -159,6 +159,8 @@ function fillCustomStyles() {
     var container = $("#custom-styles");
     container.html("");
     for (var url in styles) {
+        // skip the global styles
+        if(url == "*") continue;
         container.append(createCustomStyleOption(url));
     }
 }
@@ -231,7 +233,7 @@ function editStyle(e) {
 
     var html = "<div class='popup-content' id='edit-css'>Edit the CSS for <strong>" + url + "</strong>:</div> \
     <div id='stylebot-modal-buttons'> \
-    <button onclick='onSave();'>Save</button> \
+    <button onclick='onSave(\"" + url + "\");'>Save</button> \
     <button onclick='cache.modal.hide();'>Cancel</button> \
     </div>";
 
@@ -252,6 +254,41 @@ function editStyle(e) {
 
     cache.modal.show();
 }
+
+// Displays the modal popup for editing the global stylesheet
+function editGlobalStylesheet(e) {
+    if (styles["*"]){
+        var rules = styles["*"]['_rules'];
+        var css = CSSUtils.crunchFormattedCSS(rules, false);
+    }
+    else {
+        var css = "";
+    }
+
+    var html = "<div class='popup-content' id='edit-css'>Edit the <strong>Global Stylesheet</strong>:</div> \
+    <div id='stylebot-modal-buttons'> \
+    <button onclick='onSave(\"*\");'>Save</button> \
+    <button onclick='cache.modal.hide();'>Cancel</button> \
+    </div>";
+
+    initModal(html);
+
+    cache.modal.options.onOpen = function() {
+        var attachTo = cache.modal.box.find("div").get(0);
+        cache.modal.editor = CodeMirror(attachTo, {
+            value: css,
+            mode: "css",
+            lineNumbers: true,
+            indentUnit: 4,
+            onFocus: function() { cache.modal.editor.clearMarker(cache.modal.editor.errorLine); }
+        });
+        cache.modal.editor.errorLine = 0;
+        cache.modal.editor.setCursor(cache.modal.editor.lineCount(), 0);
+    };
+
+    cache.modal.show();
+}
+
 
 // Displays the modal popup to add a new style
 function addStyle() {
@@ -277,7 +314,11 @@ function addStyle() {
         // currently, we are just using an arbitrary value to determine when CodeMirror is finished setting up
         //
         setTimeout(function() {
-            cache.modal.box.find('input').focus();
+            cache.modal.box.find('input').focus()
+
+            .change(function() {
+                if($(this).val() == "*") $(this).val("");
+            });
         }, 20);
 
         cache.modal.editor.errorLine = 0;
@@ -326,8 +367,7 @@ function shareStyle(e) {
 
 // Called when a style is updated (Update button is clicked)
 //
-function onSave() {
-    var url = cache.modal.box.find('div > strong').html();
+function onSave(url) {
     var css = cache.modal.editor.getValue();
     if (saveStyle(url, css)) {
         cache.modal.hide();
