@@ -313,17 +313,19 @@ stylebot.style = {
         if (!el)
             return false;
 
-        el.each(function(){
-            var existingCSS = $(this).attr('style');
-            var existingCustomCSS = $(this).data("stylebot-css");
-            if (existingCustomCSS && existingCSS != undefined)
+        el.each(function() {
+            var $this = $(this);
+
+            var existingCSS = $this.attr('style');
+            var existingCustomCSS = $this.data("stylebotCSS");
+
+            if (existingCustomCSS != undefined && existingCSS != undefined)
             {
                 var newCSS = existingCSS.replace(existingCustomCSS, '');
-                $(this).attr({
-                    style: newCSS
-                });
+                $this.attr('style', newCSS);
+
                 // clear stylebot css data associated with element
-                $(this).data("stylebot-css", null);
+                $this.data("stylebotCSS", null);
             }
         });
     },
@@ -353,12 +355,14 @@ stylebot.style = {
     },
 
     // update css in stylebot's <style> element
+    //
     updateStyleElement: function(rules) {
         if (!this.cache.styleEl)
             this.cache.styleEl = $("#stylebot-css");
 
-        if (this.cache.styleEl.length != 0)
+        if (this.cache.styleEl.length != 0) {
             this.cache.styleEl.html(CSSUtils.crunchCSS(rules, true));
+        }
         else
         {
             CSSUtils.injectCSS(CSSUtils.crunchCSS( rules, true ), "stylebot-css");

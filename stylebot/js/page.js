@@ -1,17 +1,17 @@
 /**
   * stylebot.page
-  * 
+  *
   * Shows the editor for the entire page's CSS
   **/
 
 stylebot.page = {
-    
+
     isVisible: false,
-    
+
     modal: null,
-    
+
     timer: null,
-    
+
     cache: {
         livePreview: false,
         originalCSS: null,
@@ -68,7 +68,7 @@ table {\n\
     border-spacing: 0 !important;\n\
 }\n'
     },
-    
+
     create: function(options) {
         var html = "<div style='font-size: 12px !important; line-height: 14px !important;'>Edit the CSS for <b>" + stylebot.style.cache.url + "</b>:</div>\
         <textarea class='stylebot-textarea stylebot-css-code' tabindex='0'></textarea>\
@@ -87,37 +87,37 @@ table {\n\
         Cancel\
         </button>\
         </div>";
-        
+
         this.modal = new ModalBox(html, options, function(){});
-        
+
         stylebot.page.cache.textarea = stylebot.page.modal.box.find('textarea').keyup(this.contentUpdated);
-        
+
         var buttons = stylebot.page.modal.box.find('.stylebot-button');
-        
+
         var $livePreviewCheckbox = $(buttons.get(0));
-        
+
         $livePreviewCheckbox.click(this.toggleLivePreview)
         .tipsy({delayIn: 100, gravity:'sw'});
-        
+
         stylebot.chrome.getPreference("stylebot_page_live_preview", function(livePreview) {
             if (livePreview) {
-                $livePreviewCheckbox.attr('checked', 'checked');
+                $livePreviewCheckbox.prop('checked', true);
             }
-            
+
             stylebot.page.cache.livePreview = livePreview;
         });
-        
+
         $(buttons.get(1)).click(this.copyToClipboard)
         .tipsy({delayIn: 100, gravity:'sw'});
-        
+
         $(buttons.get(2)).click(this.save);
         $(buttons.get(3)).click(this.cancel);
     },
-    
+
     fill: function(content) {
         this.cache.textarea.attr('value', content);
     },
-    
+
     show: function(content, prevTarget) {
         if (!this.modal) {
             this.create({
@@ -130,7 +130,7 @@ table {\n\
                 height: $("#stylebot").height() - 30 + "px",
                 bgOpacity: 0,
                 parent: $("#stylebot"),
-                
+
                 onOpen: function() {
                     var textarea = stylebot.page.cache.textarea.get(0);
                     Utils.moveCursorToEnd(textarea);
@@ -138,16 +138,16 @@ table {\n\
                     stylebot.style.saveState();
                     stylebot.page.cache.css = textarea.value;
                 },
-                
+
                 onClose: function() {
                     stylebot.page.isVisible = false;
                     prevTarget.focus();
                     $(window).unbind('resize', stylebot.page.onWindowResize);
                 }
-                
+
             });
         }
-        
+
         else {
             stylebot.page.modal.reset({
                 width: $("#stylebot").width() - 30 + "px",
@@ -156,85 +156,90 @@ table {\n\
                 height: $("#stylebot").height() - 30 + "px",
             });
         }
-        
+
         this.cache.textarea.css('height', $("#stylebot").height() - 125 + "px");
-        
+
         this.fill(content);
         this.cache.originalCSS = content;
         this.isVisible = true;
-        
+
         stylebot.page.modal.show();
-        
+
         $(window).bind('resize', this.onWindowResize);
     },
-    
+
     copyToClipboard: function() {
         var text = stylebot.page.cache.textarea.attr('value');
-        stylebot.chrome.copyToClipboard(text);
+        if (text != undefined)
+            stylebot.chrome.copyToClipboard(text);
     },
-    
+
     applyResetCSS: function() {
         stylebot.page.cache.textarea.attr('value', stylebot.page.cache.resetCSS);
-        
+
         if (stylebot.page.cache.livePreview) {
             stylebot.page.saveCSS(stylebot.page.cache.textarea.attr('value'));
         }
     },
-    
+
     toggleLivePreview: function() {
         if (stylebot.page.cache.livePreview)
             stylebot.page.cache.livePreview = false;
-        
+
         else {
             stylebot.page.cache.livePreview = true;
             stylebot.page.contentUpdated();
         }
-        
+
         stylebot.chrome.savePreference("stylebot_page_live_preview", true);
     },
-    
+
     contentUpdated: function() {
         if (!stylebot.page.cache.livePreview)
             return;
-        
+
         if (stylebot.page.timer) {
             clearTimeout(stylebot.page.timer);
             stylebot.page.timer = null;
         }
-        
+
         stylebot.page.timer = setTimeout(function() {
             stylebot.page.saveCSS(stylebot.page.cache.textarea.attr('value'));
         }, 100);
     },
-    
+
     cancel: function(e) {
         stylebot.page.cancelChanges();
         stylebot.style.clearLastState();
         stylebot.page.modal.hide();
     },
-    
+
     save: function(e) {
         stylebot.page.saveCSS(stylebot.page.cache.textarea.attr('value'));
         stylebot.widget.open();
         stylebot.page.modal.hide();
     },
-    
+
     cancelChanges: function() {
         stylebot.page.saveCSS(stylebot.page.cache.originalCSS);
     },
-    
+
     saveCSS: function(css) {
-        if (stylebot.page.cache.css != css) {
+        if (css == undefined)
+            return;
+
+        if (stylebot.page.cache.css != css)
+        {
             stylebot.style.applyPageCSS(css);
             stylebot.style.refreshUndoState();
         }
-        
+
         else
             stylebot.style.clearLastState();
-        
+
         stylebot.page.cache.css = null;
     },
-    
+
     onWindowResize: function() {
         stylebot.page.modal.reset({
             width: $("#stylebot").width() - 30 + "px",
@@ -242,7 +247,7 @@ table {\n\
             left: '0',
             height: $("#stylebot").height() - 30 + "px",
         });
-        
+
         stylebot.page.cache.textarea.css('height', $("#stylebot").height() - 125 + "px");
     }
 }
