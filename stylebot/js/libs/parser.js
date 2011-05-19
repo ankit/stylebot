@@ -3491,7 +3491,7 @@ CSSParser.prototype = {
     return lType + " " + lPosition + " " + lImage;
   },
 
-  parseListStyleShorthand: function(token, aDecl, aAcceptPriority)
+  stylebot_parseListStyleShorthand: function(token, aDecl, aAcceptPriority)
   {
     var kPosition = { "inside": true, "outside": true };
 
@@ -3546,14 +3546,13 @@ CSSParser.prototype = {
 
     // create the declarations
     this.forgetState();
-    lType = lType ? lType : "none";
-    lImage = lImage ? lImage : "none";
-    lPosition = lPosition ? lPosition : "outside";
 
-    aDecl.push(this._createJscsspDeclarationFromValue("list-style-type", lType));
-    aDecl.push(this._createJscsspDeclarationFromValue("list-style-position", lPosition));
-    aDecl.push(this._createJscsspDeclarationFromValue("list-style-image", lImage));
-    return lType + " " + lPosition + " " + lImage;
+    var decl = "";
+    decl += lType ? lType : "";
+    decl += lImage ? ( lType ? " " : "" ) + lImage : "";
+    decl += lPosition ? ( lType || lImage ? " " : "" ) + lPosition : "";
+    aDecl.push(this._createJscsspDeclarationFromValue("list-style", decl));
+    return decl;
   },
 
   parseFontShorthand: function(token, aDecl, aAcceptPriority)
@@ -3723,6 +3722,171 @@ CSSParser.prototype = {
     aDecl.push(this._createJscsspDeclarationFromValue("line-height", fLineHeight));
     aDecl.push(this._createJscsspDeclarationFromValuesArray("font-family", fFamilyValues, fFamily));
     return fStyle + " " + fVariant + " " + fWeight + " " + fSize + "/" + fLineHeight + " " + fFamily;
+  },
+
+  stylebot_parseFontShorthand: function(token, aDecl, aAcceptPriority)
+  {
+    var kStyle = {"italic": true, "oblique": true };
+    var kVariant = {"small-caps": true };
+    var kWeight = { "bold": true, "bolder": true, "lighter": true,
+                      "100": true, "200": true, "300": true, "400": true,
+                      "500": true, "600": true, "700": true, "800": true,
+                      "900": true };
+    var kSize = { "xx-small": true, "x-small": true, "small": true, "medium": true,
+                    "large": true, "x-large": true, "xx-large": true,
+                    "larger": true, "smaller": true };
+    var kValues = { "caption": true, "icon": true, "menu": true, "message-box": true, "small-caption": true, "status-bar": true };
+    var kFamily = { "serif": true, "sans-serif": true, "cursive": true, "fantasy": true, "monospace": true };
+
+    var fStyle = null;
+    var fVariant = null;
+    var fWeight = null;
+    var fSize = null;
+    var fLineHeight = null;
+    var fFamily = "";
+    var fSystem = null;
+    var fFamilyValues = [];
+
+    var normalCount = 0;
+    while (true) {
+
+      if (!token.isNotNull())
+        break;
+
+      if (token.isSymbol(";")
+          || (aAcceptPriority && token.isSymbol("!"))
+          || token.isSymbol("}")) {
+        if (token.isSymbol("}"))
+          this.ungetToken();
+        break;
+      }
+
+      else if (!fStyle && !fVariant && !fWeight
+               && !fSize && !fLineHeight && !fFamily
+               && !fSystem
+               && token.isIdent(this.kINHERIT)) {
+        fStyle = this.kINHERIT;
+        fVariant = this.kINHERIT;
+        fWeight = this.kINHERIT;
+        fSize = this.kINHERIT;
+        fLineHeight = this.kINHERIT;
+        fFamily = this.kINHERIT;
+        fSystem = this.kINHERIT;
+      }
+
+      else {
+        if (!fSystem && (token.isIdent() && token.value in kValues)) {
+          fSystem = token.value;
+          break;
+        }
+
+        else {
+          if (!fStyle
+                   && token.isIdent()
+                   && (token.value in kStyle)) {
+            fStyle = token.value;
+          }
+
+          else if (!fVariant
+                   && token.isIdent()
+                   && (token.value in kVariant)) {
+            fVariant = token.value;
+          }
+
+          else if (!fWeight
+                   && (token.isIdent() || token.isNumber())
+                   && (token.value in kWeight)) {
+            fWeight = token.value;
+          }
+
+          else if (!fSize
+                   && ((token.isIdent() && (token.value in kSize))
+                       || token.isDimension()
+                       || token.isPercentage())) {
+            fSize = token.value;
+            var token = this.getToken(false, false);
+            if (token.isSymbol("/")) {
+              token = this.getToken(false, false);
+              if (!fLineHeight &&
+                  (token.isDimension() || token.isNumber() || token.isPercentage())) {
+                fLineHeight = token.value;
+              }
+              else
+                return "";
+            }
+            else
+              this.ungetToken();
+          }
+
+          else if (token.isIdent("normal")) {
+            normalCount++;
+            if (normalCount > 3)
+              return "";
+          }
+
+          else if (!fFamily && // *MUST* be last to be tested here
+                   (token.isString()
+                    || token.isIdent())) {
+            var lastWasComma = false;
+            while (true) {
+              if (!token.isNotNull())
+                break;
+              else if (token.isSymbol(";")
+                  || (aAcceptPriority && token.isSymbol("!"))
+                  || token.isSymbol("}")) {
+                this.ungetToken();
+                break;
+              }
+              else if (token.isIdent() && token.value in kFamily) {
+                var value = new jscsspVariable(kJscsspPRIMITIVE_VALUE, null);
+                value.value = token.value;
+                fFamilyValues.push(value);
+                fFamily += token.value;
+                break;
+              }
+              else if (token.isString() || token.isIdent()) {
+                var value = new jscsspVariable(kJscsspPRIMITIVE_VALUE, null);
+                value.value = token.value;
+                fFamilyValues.push(value);
+                fFamily += token.value;
+                lastWasComma = false;
+              }
+              else if (!lastWasComma && token.isSymbol(",")) {
+                fFamily += ", ";
+                lastWasComma = true;
+              }
+              else
+                return "";
+              token = this.getToken(true, true);
+            }
+          }
+
+          else {
+            return "";
+          }
+        }
+
+      }
+
+      token = this.getToken(true, true);
+    }
+
+    // create the declarations
+    this.forgetState();
+    if (fSystem) {
+      aDecl.push(this._createJscsspDeclarationFromValue("font", fSystem));
+      return fSystem;
+    }
+
+    var decl = "";
+    decl += fStyle ? fStyle : "";
+    decl += fVariant ? ( fStyle ? " " : "" ) + fVariant : "";
+    decl += fWeight ? ( fStyle || fVariant ? " " : "" ) + fWeight : "";
+    decl += fSize ? ( fStyle || fVariant || fWeight ? " " : "" ) + fSize : "";
+    decl += (fSize && fLineHeight) ? "/" + fLineHeight : "";
+    decl += fFamily ? ( fStyle || fVariant || fWeight || fSize ? " " : "" ) + fFamily : "";
+    aDecl.push(this._createJscsspDeclarationFromValue("font", decl));
+    return decl;
   },
 
   _createJscsspDeclaration: function(property, value)
@@ -3981,10 +4145,10 @@ CSSParser.prototype = {
               value = this.stylebot_parsePauseShorthand(token, declarations, aAcceptPriority);
               break;
             case "font":
-              value = this.parseFontShorthand(token, declarations, aAcceptPriority);
+              value = this.stylebot_parseFontShorthand(token, declarations, aAcceptPriority);
               break;
             case "list-style":
-              value = this.parseListStyleShorthand(token, declarations, aAcceptPriority);
+              value = this.stylebot_parseListStyleShorthand(token, declarations, aAcceptPriority);
               break;
             default:
               value = this.parseDefaultPropertyValue(token, declarations, aAcceptPriority, descriptor, aSheet);

@@ -231,7 +231,6 @@ function editStyle(e) {
     var css = CSSUtils.crunchFormattedCSS(rules, false);
 
     var html = "<div>Edit the CSS for <strong>" + url + "</strong>:</div> \
-    <textarea class='stylebot-css-code'>" + css + "</textarea> \
     <div id='stylebot-modal-buttons'> \
     <button onclick='onSave();'>Save</button> \
     <button onclick='cache.modal.hide();'>Cancel</button> \
@@ -240,9 +239,15 @@ function editStyle(e) {
     initModal(html);
 
     cache.modal.options.onOpen = function() {
-        var textarea = cache.modal.box.find('textarea').get(0);
-        textarea.focus();
-        Utils.moveCursorToEnd(textarea);
+        var attachTo = cache.modal.box.find("div").get(0);
+        cache.modal.editor = CodeMirror(attachTo, {
+            value: css,
+            mode: "css",
+            lineNumbers: true,
+            onFocus: function() { cache.modal.editor.clearMarker(cache.modal.editor.errorLine); }
+        });
+        cache.modal.editor.errorLine = 0;
+        cache.modal.editor.focus();
     };
 
     cache.modal.show();
@@ -288,9 +293,8 @@ function shareStyle(e) {
 // Called when a style is updated (Update button is clicked)
 //
 function onSave() {
-    var url = cache.modal.box.find('div > b').html();
-    var css = cache.modal.box.find('textarea').attr('value');
-
+    var url = cache.modal.box.find('div > strong').html();
+    var css = cache.modal.editor.getValue();
     if (saveStyle(url, css)) {
         cache.modal.hide();
     }
@@ -299,21 +303,29 @@ function onSave() {
 // Displays the modal popup to add a new style
 function addStyle() {
     var html = "<div>URL: <input type='text'></input></div> \
-    <textarea class='stylebot-css-code'> \
-    </textarea> \
     <div id='stylebot-modal-buttons'> \
     <button onclick= 'onAdd();' >Add</button> \
     <button onclick= 'cache.modal.hide();' >Cancel</button>";
 
     initModal(html);
-    cache.modal.options.onOpen = function() { cache.modal.box.find('input').focus(); };
+    cache.modal.options.onOpen = function() {
+        var attachTo = cache.modal.box.find("div").get(0);
+        cache.modal.editor = CodeMirror(attachTo, {
+            mode: "css",
+            lineNumbers: true,
+            onFocus: function() { cache.modal.editor.clearMarker(cache.modal.editor.errorLine); }
+        });
+        cache.modal.editor.errorLine = 0;
+        cache.modal.editor.focus();
+    };
     cache.modal.show();
 }
 
 // Called when a new style is added (Add button is clicked)
 function onAdd() {
     var url = cache.modal.box.find('input').attr('value');
-    var css = cache.modal.box.find('textarea').attr('value');
+    var css = cache.modal.editor.getValue();
+
     if (css === "")
         return false;
 
@@ -384,7 +396,9 @@ function saveStyle(url, css, add) {
 function displaySyntaxError(css, error) {
     var start = css.indexOf(error.parsedCssText);
     var end = start + error.parsedCssText.length;
-    Utils.selectText(cache.modal.box.find('textarea').get(0), start, end);
+    //cache.modal.editor.setLineClass(error.currentLine-1, "CodeMirror-error");
+    cache.modal.editor.setMarker(error.currentLine - 1, "<span style=\"color: #900\">●</span> %N%");
+    cache.modal.editor.errorLine = error.currentLine - 1;
 
     var $error = cache.modal.box.find('#parserError');
 
