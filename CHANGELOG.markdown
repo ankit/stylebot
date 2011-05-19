@@ -1,3 +1,19 @@
+**1.2.2**
+* New Options page similar to Chrome settings
+* Modified the 'Toggle Styling' option in context menu
+* Some UI Layout fixes for Stylebot Panel
+* Added Option button to Panel
+* Fixed issue where selectors of the type 'ul li' and 'ul > li' were not working
+* Prettier CSS editor in options page with syntax highlighting
+* Syntax errors are shown when editing / importing CSS in the Options page
+* Updated to jQuery 1.6.1
+
+**1.2.1**
+* Added support for comments
+* Fixed issue where CSS selectors containing ^= weren't working properly
+* Updated JSCSSP parser to support some @-webkit- properties
+* Added option to hide css icon in Omnibar
+
 **1.2**
 * Added support for comments
 * Updated CSS Parser

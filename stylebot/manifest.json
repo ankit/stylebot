@@ -1,50 +1,50 @@
 {
     "name": "Stylebot",
-    "version": "1.2.1",
+    "version": "1.2.2",
     "description": "Adapt the web's appearance",
     "background_page": "background.html",
     "options_page": "options.html",
-    
+
     "content_scripts": [
     {
         "matches":["http://*/*", "https://*/*"],
-        
+
         "js": [
             "js/libs/css-utils.js",
             "js/apply-css.js"
         ],
-        
+
         "run_at": "document_start",
         "all_frames": true
     },
-    
+
     {
         "matches": ["http://userstyles.org/styles/*"],
-        
+
         "js": [
             "js/libs/css-utils.js",
             "js/userstyles-org.js"
         ],
-        
+
         "run_at": "document_start",
         "all_frames": true
     },
-    
+
     {
         "matches": ["http://stylebot.me/*"],
-        
+
         "js": [
             "js/libs/jquery.js",
             "js/installation.js"
         ],
-        
+
         "run_at": "document_end",
         "all_frames": true
     },
-    
+
     {
         "matches": ["http://*/*", "https://*/*"],
-        
+
         "css": [
             "css/highlight.css",
             "css/widget.css",
@@ -55,11 +55,11 @@
             "css/tipsy.css",
             "css/shortcuts_help.css"
         ],
-        
+
         "js": [
             "js/libs/jquery.js",
             "js/stylebot.js",
-            "js/chrome.js",         
+            "js/chrome.js",
             "js/init.js",
             "js/widget.js",
             "js/widget.basic.js",
@@ -78,21 +78,21 @@
             "js/libs/parser.js",
             "js/shortcuts.js"
         ],
-        
+
         "run_at": "document_end",
         "all_frames": true
     }],
-    
+
     "page_action": {
         "default_icon": "images/css.png",
         "default_title": "Click to start editing using Stylebot"
     },
-    
+
     "icons": {
         "16": "images/icon16.png",
         "48": "images/icon48.png",
         "128": "images/icon128.png"
     },
-    
+
     "permissions": ["tabs", "http://userstyles.org/", "bookmarks", "contextMenus", "notifications"]
 }
