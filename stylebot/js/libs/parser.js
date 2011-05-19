@@ -3491,7 +3491,7 @@ CSSParser.prototype = {
     return lType + " " + lPosition + " " + lImage;
   },
 
-  parseListStyleShorthand: function(token, aDecl, aAcceptPriority)
+  stylebot_parseListStyleShorthand: function(token, aDecl, aAcceptPriority)
   {
     var kPosition = { "inside": true, "outside": true };
 
@@ -3546,14 +3546,13 @@ CSSParser.prototype = {
 
     // create the declarations
     this.forgetState();
-    lType = lType ? lType : "none";
-    lImage = lImage ? lImage : "none";
-    lPosition = lPosition ? lPosition : "outside";
 
-    aDecl.push(this._createJscsspDeclarationFromValue("list-style-type", lType));
-    aDecl.push(this._createJscsspDeclarationFromValue("list-style-position", lPosition));
-    aDecl.push(this._createJscsspDeclarationFromValue("list-style-image", lImage));
-    return lType + " " + lPosition + " " + lImage;
+    var decl = "";
+    decl += lType ? lType : "";
+    decl += lImage ? ( lType ? " " : "" ) + lImage : "";
+    decl += lPosition ? ( lType || lImage ? " " : "" ) + lPosition : "";
+    aDecl.push(this._createJscsspDeclarationFromValue("list-style", decl));
+    return decl;
   },
 
   parseFontShorthand: function(token, aDecl, aAcceptPriority)
@@ -3984,7 +3983,7 @@ CSSParser.prototype = {
               value = this.parseFontShorthand(token, declarations, aAcceptPriority);
               break;
             case "list-style":
-              value = this.parseListStyleShorthand(token, declarations, aAcceptPriority);
+              value = this.stylebot_parseListStyleShorthand(token, declarations, aAcceptPriority);
               break;
             default:
               value = this.parseDefaultPropertyValue(token, declarations, aAcceptPriority, descriptor, aSheet);
