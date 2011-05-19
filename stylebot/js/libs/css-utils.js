@@ -77,7 +77,7 @@ var CSSUtils = {
         for (var property in rules[selector]) {
              if (property.indexOf("comment") != -1) continue;
 
-             css += "\t" + this.getCSSDeclaration(property, rules[selector][property], setImportant) + "\n";
+             css += this.getCSSDeclaration(property, rules[selector][property], setImportant) + "\n";
         }
 
         return css;
@@ -157,7 +157,7 @@ var CSSUtils = {
         return rule;
     },
 
-    // deprecated
+    // @deprecated
     parseCSS: function(css) {
         var rules = {};
         css = this.removeComments(css);
@@ -174,7 +174,7 @@ var CSSUtils = {
         return rules;
     },
 
-    // deprecated. instead using http://www.glazman.org/JSCSSP/
+    // @deprecated. instead using http://www.glazman.org/JSCSSP/
     parseCSSBlock: function(css) {
         var rule = {};
         var declarations = css.split(';');
