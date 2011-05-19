@@ -230,7 +230,7 @@ function editStyle(e) {
     var rules = styles[url]['_rules'];
     var css = CSSUtils.crunchFormattedCSS(rules, false);
 
-    var html = "<div>Edit the CSS for <strong>" + url + "</strong>:</div> \
+    var html = "<div class='popup-content' id='edit-css'>Edit the CSS for <strong>" + url + "</strong>:</div> \
     <div id='stylebot-modal-buttons'> \
     <button onclick='onSave();'>Save</button> \
     <button onclick='cache.modal.hide();'>Cancel</button> \
@@ -244,14 +244,52 @@ function editStyle(e) {
             value: css,
             mode: "css",
             lineNumbers: true,
+            indentUnit: 4,
+            enterMode: "keep",
             onFocus: function() { cache.modal.editor.clearMarker(cache.modal.editor.errorLine); }
         });
         cache.modal.editor.errorLine = 0;
-        cache.modal.editor.focus();
+        cache.modal.editor.setCursor(cache.modal.editor.lineCount(), 0);
     };
 
     cache.modal.show();
 }
+
+// Displays the modal popup to add a new style
+function addStyle() {
+    var html = "<div class='popup-content' id='add-css'>URL: <input type='text'></input></div> \
+    <div id='stylebot-modal-buttons'> \
+    <button onclick= 'onAdd();' >Add</button> \
+    <button onclick= 'cache.modal.hide();' >Cancel</button> \
+    </div>";
+
+    initModal(html);
+
+    cache.modal.options.onOpen = function() {
+        var attachTo = cache.modal.box.find("div").get(0);
+
+        cache.modal.editor = CodeMirror(attachTo, {
+            mode: "css",
+            lineNumbers: true,
+            indentUnit: 4,
+            enterMode: "keep",
+            onFocus: function() { cache.modal.editor.clearMarker(cache.modal.editor.errorLine); }
+        });
+
+        // todo: do this in a more foolproof way
+        // currently, we are just using an arbitrary value to determine when CodeMirror is finished setting up
+        //
+        setTimeout(function() {
+            cache.modal.box.find('input').focus();
+            console.log(cache.modal.box.find('input'));
+        }, 20);
+
+        cache.modal.editor.errorLine = 0;
+    };
+
+    cache.modal.show();
+}
+
 
 // Called when Share button is clicked for a style
 function shareStyle(e) {
@@ -298,27 +336,6 @@ function onSave() {
     if (saveStyle(url, css)) {
         cache.modal.hide();
     }
-}
-
-// Displays the modal popup to add a new style
-function addStyle() {
-    var html = "<div>URL: <input type='text'></input></div> \
-    <div id='stylebot-modal-buttons'> \
-    <button onclick= 'onAdd();' >Add</button> \
-    <button onclick= 'cache.modal.hide();' >Cancel</button>";
-
-    initModal(html);
-    cache.modal.options.onOpen = function() {
-        var attachTo = cache.modal.box.find("div").get(0);
-        cache.modal.editor = CodeMirror(attachTo, {
-            mode: "css",
-            lineNumbers: true,
-            onFocus: function() { cache.modal.editor.clearMarker(cache.modal.editor.errorLine); }
-        });
-        cache.modal.editor.errorLine = 0;
-        cache.modal.editor.focus();
-    };
-    cache.modal.show();
 }
 
 // Called when a new style is added (Add button is clicked)
@@ -398,6 +415,7 @@ function displaySyntaxError(css, error) {
     var end = start + error.parsedCssText.length;
     //cache.modal.editor.setLineClass(error.currentLine-1, "CodeMirror-error");
     cache.modal.editor.setMarker(error.currentLine - 1, "<span style=\"color: #900\">●</span> %N%");
+    cache.modal.editor.setCursor(error.currentLine - 1, 0);
     cache.modal.editor.errorLine = error.currentLine - 1;
 
     var $error = cache.modal.box.find('#parserError');
@@ -451,8 +469,9 @@ function export() {
     else
         css = "";
 
-    var html = "<div>Copy and paste the following into a text file:</div> \
+    var html = "<div class='popup-content'>Copy and paste the following into a text file: \
     <textarea class='stylebot-css-code'>" + css + "</textarea> \
+    </div> \
     <div id='stylebot-modal-buttons'> \
     <button onclick='copyToClipboard()'> Copy To Clipboard </button> \
     </div>";
@@ -478,12 +497,12 @@ function copyToClipboard() {
 
 // Displays the modal popup for importing styles from JSON string
 function import() {
-    var html = "<div>Paste previously exported styles: \
+    var html = "<div class='popup-content' id='import-css'>Paste previously exported styles: \
     <div class='description'> \
     <span class='note'>Note</span>: Existing styles for similar URLs will be overwritten.</div> \
-    </div> \
-    <textarea id='stylebot-import-css' class='stylebot-css-code'> \
+    <textarea> \
     </textarea> \
+    </div> \
     <div id='stylebot-modal-buttons'> \
     <button onclick='importCSS();cache.modal.hide();'>Import</button> \
     </div>";

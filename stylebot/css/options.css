@@ -1,4 +1,4 @@
-/** Stylebot options page css **/
+/** Stylebot Options Page **/
 
 body {
     font-size: 14px;
@@ -54,16 +54,6 @@ a:hover {
     color: #294266;
 }
 
-#footer {
-    font-size: 12px;
-    text-align: right;
-    line-height: 25px;
-    padding-right: 10px;
-    color: #555;
-}
-
-/** options **/
-
 ul {
     margin: 0;
     padding: 0;
@@ -106,9 +96,35 @@ li.option:first-of-type {
     font-size: 70%;
 }
 
-/** end of options **/
+.important {
+    color: #D77582;
+    font-weight: bold;
+}
 
-/* custom styles */
+.note {
+    color: #555;
+    font-weight: bold;
+}
+
+.description {
+    margin: 10px 0;
+    line-height: 18px;
+    font-size: 11px;
+    text-align: justify;
+}
+
+.error {
+    color: hsl(349, 165%, 35%);
+    font-weight: bold;
+}
+
+#footer {
+    font-size: 12px;
+    text-align: right;
+    line-height: 25px;
+    padding-right: 10px;
+    color: #555;
+}
 
 #custom-styles {
     min-width: 422px;
@@ -166,75 +182,23 @@ li.option:first-of-type {
     font-size: 14px;
 }
 
-.important {
-    color: #D77582;
-    font-weight: bold;
-}
-
-.note {
-    color: #555;
-    font-weight: bold;
-}
-
-.description {
-    margin: 10px 0;
-    line-height: 18px;
-    font-size: 11px;
-    text-align: justify;
-}
-
-.error {
-    color: hsl(349, 165%, 35%);
-    font-weight: bold;
-}
-
-#parserError {
-    float: left;
-    width: 200px;
-    font-size: 12px !important;
-}
-
 #sync-button {
     width: 120px;
 }
 
-/** end of options **/
-
-/** popup **/
-textarea.stylebot-css-code {
-    color: #333 ;
-    font-size: 12px ;
-    font-family: Menlo, Monaco, 'Lucida Console', monospace;
-    line-height: 16px;
-    padding: 2px;
-    display: block;
-    width: 100% !important;
-    height: 87% !important;
-    position: relative;
-    -webkit-border-radius: 2px;
-}
-
-/** because of the notice text, the height of the textarea in the import modal popup needs to be little less **/
-#stylebot-import-css {
-    height: 83% !important;
-}
+/** MODAL POPUP **/
 
 #stylebot-modal {
     -webkit-border-radius: 2px !important;
 }
 
-#stylebot-modal div {
+#stylebot-modal .popup-content {
     font-family: 'Lucida Grande', 'Lucida Sans', 'Lucida Sans Unicode', Helvetica, Arial, sans-serif;
     font-size: 12px;
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
-}
-
-#stylebot-modal .description {
-    color: #666;
-    font-size: 11px;
-    margin: 2px 0 !important;
+    margin-left: 4px;
 }
 
 #stylebot-modal input {
@@ -243,6 +207,7 @@ textarea.stylebot-css-code {
 
 #stylebot-modal-buttons {
     float: right;
+    margin-right: 4px;
 }
 
 #stylebot-modal button {
@@ -252,10 +217,40 @@ textarea.stylebot-css-code {
 }
 
 #stylebot-modal textarea {
-    width: 100% !important;
+    color: #333 !important;
+    font-size: 12px !important;
+    font-family: Menlo, Monaco, 'Lucida Console', monospace !important;
+    line-height: 16px !important;
+    padding: 0px !important;
+    display: block;
+    width: 99% !important;
+    margin: 5px 2px !important;
+    height: 88% !important;
+    position: relative;
+    -webkit-border-radius: 2px !important;
 }
 
-/** tabs **/
+#import-css textarea {
+    height: 84% !important;
+}
+
+#stylebot-modal .description {
+    font-size: 11px !important;
+    margin: 0px !important;
+    padding: 0px !important;
+    color: #555 !important;
+}
+
+#parserError {
+    float: left;
+    width: 200px;
+    font-size: 12px !important;
+}
+
+/** end of modal popup **/
+
+/** TABS **/
+
 .separator {
     width: 96%;
     height: 1px;
@@ -440,7 +435,9 @@ input[type=radio] {
 
 /* custom inputs */
 input[name=shortcutKeyCharacter] {
-    text-transform: uppercase; text-align: center; width: 2em;
+    text-transform: uppercase;
+    text-align: center;
+    width: 2em;
 }
 
 /* CodeMirror */
@@ -448,16 +445,25 @@ input[name=shortcutKeyCharacter] {
   overflow-y: auto !important;
   font-size: 12px !important;
   line-height: 16px !important;
-  font-family: Menlo, Monaco, 'Lucida Console', monospace; !important;
+  font-family: Menlo, Monaco, 'Lucida Console', monospace !important;
   position: relative !important;
-  margin: 5px 0 !important;
+  margin: 5px 0px !important;
   border: 1px solid #ccc !important;
-  padding: 5px !important;
+  padding: 0px !important;
   background-color: #fbfbfb !important;
   resize: none !important;
   outline: none !important;
-  width: 98% !important;
+  width: 99% !important;
   height: 87% !important;
+}
+
+/** slightly variable CodeMirror heights based on type of modal popup **/
+#add-css .CodeMirror {
+    height: 84% !important;
+}
+
+#edit-css .CodeMirror {
+    height: 86% !important;
 }
 
 .CodeMirror-error {
@@ -466,18 +472,22 @@ input[name=shortcutKeyCharacter] {
 }
 
 .CodeMirror-gutter {
-  position: absolute; left: 0; top: 0;
+  position: absolute;
+  left: 0;
+  top: 0;
   background-color: #f7f7f7;
   border-right: 1px solid #eee;
   min-width: 2em;
   height: 100% !important;
 }
+
 .CodeMirror-gutter-text {
   color: #aaa;
   text-align: right;
   padding: .4em .2em .4em .4em;
   height: 100% !important;
 }
+
 .CodeMirror-lines {
   padding: .4em;
 }
@@ -487,7 +497,10 @@ input[name=shortcutKeyCharacter] {
   -webkit-border-radius: 0;
   -o-border-radius: 0;
   border-radius: 0;
-  border-width: 0; margin: 0; padding: 0; background: transparent;
+  border-width: 0;
+  margin: 0;
+  padding: 0;
+  background: transparent;
   font-family: Menlo, Monaco, 'Lucida Console', monospace;
 }
 
@@ -497,6 +510,7 @@ input[name=shortcutKeyCharacter] {
   visibility: hidden;
   border-left: 1px solid black !important;
 }
+
 .CodeMirror-focused .CodeMirror-cursor {
   visibility: visible;
 }
