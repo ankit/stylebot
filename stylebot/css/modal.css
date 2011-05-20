@@ -31,16 +31,6 @@
     position: absolute !important;
 }
 
-#stylebot-modal textarea {
-    margin: 5px 0 !important;
-    border: 1px solid #ccc !important;
-    padding: 5px !important;
-    background-color: #fbfbfb !important;
-    resize: none !important;
-    outline: none !important;
-    width: 98% !important;
-}
-
 #stylebot-modal button.stylebot-button {
     float: right;
 }

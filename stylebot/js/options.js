@@ -236,7 +236,11 @@ function editStyle(e) {
     var rules = styles[url]['_rules'];
     var css = CSSUtils.crunchFormattedCSS(rules, false);
 
-    var html = "<div class='popup-content'>Edit the CSS for <strong>" + url + "</strong>:</div> \
+    var html = "<div class='popup-content'> \
+    <div class='header-text'> \
+    Edit the CSS for <strong>" + url + "</strong>: \
+    </div> \
+    </div> \
     <div id='stylebot-modal-buttons'> \
     <button onclick='onSave(\"" + url + "\");'>Save</button> \
     <button onclick='cache.modal.hide();'>Cancel</button> \
@@ -252,7 +256,7 @@ function editStyle(e) {
             lineNumbers: true,
             indentUnit: 4,
             tabMode: "shift",
-            onFocus: function() { cache.modal.editor.clearMarker(cache.modal.editor.errorLine); }
+            onFocus: function() { /** cache.modal.editor.clearMarker(cache.modal.editor.errorLine); **/}
         });
 
         cache.modal.editor.errorLine = 0;
@@ -266,7 +270,7 @@ function editStyle(e) {
 
 // Displays the modal popup for editing the global stylesheet
 function editGlobalStylesheet(e) {
-    if (styles["*"]){
+    if (styles["*"]) {
         var rules = styles["*"]['_rules'];
         var css = CSSUtils.crunchFormattedCSS(rules, false);
     }
@@ -274,7 +278,11 @@ function editGlobalStylesheet(e) {
         var css = "";
     }
 
-    var html = "<div class='popup-content'>Edit the <strong>Global Stylesheet</strong>:</div> \
+    var html = "<div class='popup-content'> \
+    <div class='header-text'> \
+    Edit the <strong>Global Stylesheet</strong>: \
+    </div> \
+    </div> \
     <div id='stylebot-modal-buttons'> \
     <button onclick='onSave(\"*\");'>Save</button> \
     <button onclick='cache.modal.hide();'>Cancel</button> \
@@ -290,7 +298,7 @@ function editGlobalStylesheet(e) {
             lineNumbers: true,
             indentUnit: 4,
             tabMode: "shift",
-            onFocus: function() { cache.modal.editor.clearMarker(cache.modal.editor.errorLine); }
+            onFocus: function() { /** cache.modal.editor.clearMarker(cache.modal.editor.errorLine); **/}
         });
         cache.modal.editor.errorLine = 0;
 
@@ -304,7 +312,11 @@ function editGlobalStylesheet(e) {
 
 // Displays the modal popup to add a new style
 function addStyle() {
-    var html = "<div class='popup-content'>URL: <input type='text'></input></div> \
+    var html = "<div class='popup-content'> \
+    <div class='header-text'> \
+    URL: <input type='text'></input> \
+    </div> \
+    </div> \
     <div id='stylebot-modal-buttons'> \
     <button onclick= 'onAdd();' >Add</button> \
     <button onclick= 'cache.modal.hide();' >Cancel</button> \
@@ -319,7 +331,7 @@ function addStyle() {
             mode: "css",
             lineNumbers: true,
             indentUnit: 4,
-            onFocus: function() { cache.modal.editor.clearMarker(cache.modal.editor.errorLine); }
+            onFocus: function() { /**cache.modal.editor.clearMarker(cache.modal.editor.errorLine); **/}
         });
 
         // todo: do this in a more foolproof way
@@ -332,7 +344,7 @@ function addStyle() {
                 if($(this).val() == "*") $(this).val("");
             });
 
-            resizeEditor();
+            resizeEditor(65);
 
         }, 20);
 
@@ -555,10 +567,10 @@ function copyToClipboard() {
 
 // Displays the modal popup for importing styles from JSON string
 function import() {
-    var html = "<div class='popup-content' id='import-css'>Paste previously exported styles: \
+    var html = "<div class='popup-content'>Paste previously exported styles: \
     <div class='description'> \
     <span class='note'>Note</span>: Existing styles for similar URLs will be overwritten.</div> \
-    <textarea> \
+    <textarea class='stylebot-css-code'> \
     </textarea> \
     </div> \
     <div id='stylebot-modal-buttons'> \
@@ -734,8 +746,8 @@ function mergeStyles(s1, s2) {
 
 function resizeEditor(bottomSpace) {
     if (!bottomSpace) {
-        bottomSpace = 70;
+        bottomSpace = 60;
     }
 
-    $('.CodeMirror, #stylebot-modal textarea').css('height', $("#stylebot-modal").height() - bottomSpace + "px !important");
+    $('.CodeMirror, textarea.stylebot-css-code').css('height', $("#stylebot-modal").height() - bottomSpace + "px !important");
 }

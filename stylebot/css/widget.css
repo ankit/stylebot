@@ -353,7 +353,13 @@ textarea.stylebot-css-code {
     font-family: Monaco, 'Lucida Console', monospace !important;
     line-height: 16px !important;
     padding: 2px !important;
-    background: #fff !important;
+    background: #fbfbfb !important;
+    background-color: #fbfbfb !important;
+    margin: 5px 0 !important;
+    border: 1px solid #ccc !important;
+    padding: 5px !important;
+    outline: none !important;
+    width: 98% !important;
 }
 
 /* @end */

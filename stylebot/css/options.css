@@ -197,10 +197,13 @@ li.option:first-of-type {
 #stylebot-modal .popup-content {
     font-family: 'Lucida Grande', 'Lucida Sans', 'Lucida Sans Unicode', Helvetica, Arial, sans-serif;
     font-size: 12px;
+    margin-left: 4px;
+}
+
+#stylebot-modal .header-text {
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
-    margin-left: 4px;
 }
 
 #stylebot-modal input {
@@ -218,7 +221,7 @@ li.option:first-of-type {
     margin-left: 4px;
 }
 
-#stylebot-modal textarea {
+#stylebot-modal textarea.stylebot-css-code {
     color: #333 !important;
     font-size: 12px !important;
     font-family: Menlo, Monaco, 'Lucida Console', monospace !important;
@@ -230,10 +233,8 @@ li.option:first-of-type {
     height: 88% !important;
     position: relative;
     -webkit-border-radius: 2px !important;
-}
-
-#import-css textarea {
-    height: 84% !important;
+    border: 1px solid #ccc !important;
+    background-color: #fbfbfb !important;
 }
 
 #stylebot-modal .description {
@@ -444,75 +445,60 @@ input[name=shortcutKeyCharacter] {
 
 /* CodeMirror */
 .CodeMirror {
-  overflow-y: auto !important;
-  font-size: 12px !important;
-  line-height: 16px !important;
-  font-family: Menlo, Monaco, 'Lucida Console', monospace !important;
-  position: relative !important;
-  margin: 5px 0px !important;
-  border: 1px solid #ccc !important;
-  padding: 0px !important;
-  background-color: #fbfbfb !important;
-  resize: none !important;
-  outline: none !important;
-  width: 99% !important;
-}
-
-.CodeMirror-error {
-  background-color: #D77582 !important;
-  color: white !important;
+    overflow: auto;
+    font-size: 12px;
+    line-height: 16px;
+    font-family: Menlo, Monaco, 'Lucida Console', monospace;
+    margin: 5px 0px;
+    border: 1px solid #ccc;
+    background-color: #fbfbfb;
+    width: 99%;
 }
 
 .CodeMirror-gutter {
-  position: absolute;
-  left: 0;
-  top: 0;
-  background-color: #f7f7f7;
-  border-right: 1px solid #eee;
-  min-width: 2em;
-  height: 100% !important;
+    position: absolute; left: 0; top: 0;
+    background-color: #f7f7f7;
+    border-right: 1px solid #eee;
+    min-width: 2em;
+    height: 100%;
 }
-
 .CodeMirror-gutter-text {
-  color: #aaa;
-  text-align: right;
-  padding: .4em .2em .4em .4em;
-  height: 100% !important;
+    color: #aaa;
+    text-align: right;
+    padding: .4em .2em .4em .4em;
 }
-
 .CodeMirror-lines {
-  padding: .4em;
+    padding: .4em;
 }
 
 .CodeMirror pre {
-  -moz-border-radius: 0;
-  -webkit-border-radius: 0;
-  -o-border-radius: 0;
-  border-radius: 0;
-  border-width: 0;
-  margin: 0;
-  padding: 0;
-  background: transparent;
-  font-family: Menlo, Monaco, 'Lucida Console', monospace;
+    -moz-border-radius: 0;
+    -webkit-border-radius: 0;
+    -o-border-radius: 0;
+    border-radius: 0;
+    border-width: 0; margin: 0; padding: 0; background: transparent;
+    font-family: inherit;
+}
+
+.CodeMirror textarea {
+    font-family: Menlo, Monaco, 'Lucida Console', monospace !important;
 }
 
 .CodeMirror-cursor {
-  z-index: 10;
-  position: absolute;
-  visibility: hidden;
-  border-left: 1px solid black !important;
+    z-index: 10;
+    position: absolute;
+    visibility: hidden;
+    border-left: 1px solid black !important;
 }
-
 .CodeMirror-focused .CodeMirror-cursor {
-  visibility: visible;
+    visibility: visible;
 }
 
 span.CodeMirror-selected {
-  background: #ccc !important;
-  color: HighlightText !important;
+    background: #d1dae6 !important;
 }
 .CodeMirror-focused span.CodeMirror-selected {
-  background: Highlight !important;
+    background: #d1dae6 !important;
 }
 
 .CodeMirror-matchingbracket {color: #0f0 !important;}
