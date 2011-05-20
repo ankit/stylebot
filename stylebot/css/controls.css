@@ -83,6 +83,20 @@ input[type="text"].stylebot-textfield
     -webkit-box-sizing: content-box !important;
 }
 
+textarea.stylebot-css-code {
+    color: #333 !important;
+    font-size: 11px !important;
+    font-family: Monaco, 'Lucida Console', monospace !important;
+    line-height: 16px !important;
+    padding: 2px !important;
+    background: #fbfbfb !important;
+    margin: 5px 0 !important;
+    border: 1px solid #ccc !important;
+    padding: 5px !important;
+    outline: none !important;
+    width: 98% !important;
+}
+
 /* Buttons */
 
 button.stylebot-button {

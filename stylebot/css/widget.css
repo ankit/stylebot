@@ -345,25 +345,6 @@ background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAFo9M/
 
 /* @end */
 
-/* @group Code */
-
-textarea.stylebot-css-code {
-    color: #333 !important;
-    font-size: 11px !important;
-    font-family: Monaco, 'Lucida Console', monospace !important;
-    line-height: 16px !important;
-    padding: 2px !important;
-    background: #fbfbfb !important;
-    background-color: #fbfbfb !important;
-    margin: 5px 0 !important;
-    border: 1px solid #ccc !important;
-    padding: 5px !important;
-    outline: none !important;
-    width: 98% !important;
-}
-
-/* @end */
-
 /* @group Accordions */
 
 .stylebot-accordion {
