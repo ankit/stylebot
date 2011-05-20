@@ -256,7 +256,7 @@ function editStyle(e) {
             lineNumbers: true,
             indentUnit: 4,
             tabMode: "shift",
-            onFocus: function() { /** cache.modal.editor.clearMarker(cache.modal.editor.errorLine); **/}
+            onFocus: function() { cache.modal.editor.clearMarker(cache.modal.editor.errorLine); }
         });
 
         cache.modal.editor.errorLine = 0;
@@ -298,7 +298,7 @@ function editGlobalStylesheet(e) {
             lineNumbers: true,
             indentUnit: 4,
             tabMode: "shift",
-            onFocus: function() { /** cache.modal.editor.clearMarker(cache.modal.editor.errorLine); **/}
+            onFocus: function() { cache.modal.editor.clearMarker(cache.modal.editor.errorLine); }
         });
         cache.modal.editor.errorLine = 0;
 
@@ -331,7 +331,7 @@ function addStyle() {
             mode: "css",
             lineNumbers: true,
             indentUnit: 4,
-            onFocus: function() { /**cache.modal.editor.clearMarker(cache.modal.editor.errorLine); **/}
+            onFocus: function() { cache.modal.editor.clearMarker(cache.modal.editor.errorLine); }
         });
 
         // todo: do this in a more foolproof way
