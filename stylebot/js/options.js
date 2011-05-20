@@ -254,13 +254,13 @@ function editStyle(e) {
             tabMode: "shift",
             onFocus: function() { cache.modal.editor.clearMarker(cache.modal.editor.errorLine); }
         });
+
         cache.modal.editor.errorLine = 0;
+
+        resizeEditor();
         cache.modal.editor.setCursor(cache.modal.editor.lineCount(), 0);
     };
 
-    setTimeout(function() {
-        resizeEditor();
-    }, 0);
     cache.modal.show();
 }
 
@@ -293,12 +293,11 @@ function editGlobalStylesheet(e) {
             onFocus: function() { cache.modal.editor.clearMarker(cache.modal.editor.errorLine); }
         });
         cache.modal.editor.errorLine = 0;
+
+        resizeEditor();
         cache.modal.editor.setCursor(cache.modal.editor.lineCount(), 0);
     };
 
-    setTimeout(function() {
-        resizeEditor();
-    }, 0);
     cache.modal.show();
 }
 
@@ -332,14 +331,13 @@ function addStyle() {
             .change(function() {
                 if($(this).val() == "*") $(this).val("");
             });
+
+            resizeEditor();
+
         }, 20);
 
         cache.modal.editor.errorLine = 0;
     };
-
-    setTimeout(function() {
-        resizeEditor();
-    }, 0);
 
     cache.modal.show();
 }
@@ -544,7 +542,7 @@ function export() {
     };
 
     setTimeout(function() {
-        resizeEditor();
+        resizeEditor(60);
     }, 0);
 
     cache.modal.show();
