@@ -53,7 +53,8 @@
             "css/colorpicker.css",
             "css/scrollbars.css",
             "css/tipsy.css",
-            "css/shortcuts_help.css"
+            "css/shortcuts_help.css",
+            "css/codemirror.css"
         ],
 
         "js": [
@@ -76,6 +77,8 @@
             "js/libs/colorpicker.js",
             "js/libs/jquery.tipsy.js",
             "js/libs/parser.js",
+            "js/libs/codemirror.js",
+            "js/libs/css.js",
             "js/shortcuts.js"
         ],
 

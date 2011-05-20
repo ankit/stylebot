@@ -15,7 +15,7 @@ stylebot.page = {
     cache: {
         livePreview: false,
         originalCSS: null,
-        textarea: null,
+        editor: null,
         css: null,
         // Reset CSS from http://meyerweb.com/eric/tools/css/reset/
         //
@@ -70,8 +70,9 @@ table {\n\
     },
 
     create: function(options) {
-        var html = "<div style='font-size: 12px !important; line-height: 14px !important;'>Edit the CSS for <b>" + stylebot.style.cache.url + "</b>:</div>\
-        <textarea class='stylebot-textarea stylebot-css-code' tabindex='0'></textarea>\
+        var html = "<div>\
+        <div style='font-size: 12px !important; line-height: 14px !important;'>Edit the CSS for <b>" + stylebot.style.cache.url + "</b>:</div>\
+        </div>\
         <div style='font-size: 11px !important; margin-bottom: 10px !important;'>\
         <label>\
         <input type='checkbox' title='This may cause performance issues' class='stylebot-button' />\
@@ -92,7 +93,22 @@ table {\n\
 
         this.modal = new ModalBox(html, options, function(){});
 
-        stylebot.page.cache.textarea = stylebot.page.modal.box.find('textarea').keyup(this.contentUpdated);
+        var attachTo = stylebot.page.modal.box.find('div').get(0);
+
+        stylebot.page.cache.editor = CodeMirror(attachTo, {
+            mode: "css",
+            lineNumbers: true,
+            indentUnit: 4,
+            tabMode: "shift",
+            onKeyEvent: this.contentUpdated
+            /*
+            i'm not sure to update the css on keydown events only or updating for everything,
+            as for now, the css is updated on any keyboard event
+            function(i,e){
+                if(jQuery.Event(e).type == 'keydown');
+            }
+            */
+        });
 
         var buttons = stylebot.page.modal.box.find('.stylebot-button');
 
@@ -116,10 +132,6 @@ table {\n\
         $(buttons.get(3)).click(this.cancel);
     },
 
-    fill: function(content) {
-        this.cache.textarea.attr('value', content);
-    },
-
     show: function(content, prevTarget) {
         if (!this.modal) {
             this.create({
@@ -134,11 +146,12 @@ table {\n\
                 parent: $("#stylebot"),
 
                 onOpen: function() {
-                    var textarea = stylebot.page.cache.textarea.get(0);
-                    Utils.moveCursorToEnd(textarea);
-                    stylebot.page.cache.textarea.focus();
+                    $('.CodeMirror').css('height', $("#stylebot").height() - 125 + "px !important");
+                    var editor = stylebot.page.cache.editor;
+                    editor.setCursor(editor.lineCount(), 0);
+                    editor.focus();
                     stylebot.style.saveState();
-                    stylebot.page.cache.css = textarea.value;
+                    stylebot.page.cache.css = editor.getValue();
                 },
 
                 onClose: function() {
@@ -159,9 +172,9 @@ table {\n\
             });
         }
 
-        this.cache.textarea.css('height', $("#stylebot").height() - 125 + "px");
+        $('.CodeMirror').css('height', $("#stylebot").height() - 125 + "px");
 
-        this.fill(content);
+        stylebot.page.cache.editor.setValue(content);
         this.cache.originalCSS = content;
         this.isVisible = true;
 
@@ -171,16 +184,16 @@ table {\n\
     },
 
     copyToClipboard: function() {
-        var text = stylebot.page.cache.textarea.attr('value');
+        var text = stylebot.page.cache.editor.getValue();
         if (text != undefined)
             stylebot.chrome.copyToClipboard(text);
     },
 
     applyResetCSS: function() {
-        stylebot.page.cache.textarea.attr('value', stylebot.page.cache.resetCSS);
+        stylebot.page.modal.cache.setValue(stylebot.page.cache.resetCSS);
 
         if (stylebot.page.cache.livePreview) {
-            stylebot.page.saveCSS(stylebot.page.cache.textarea.attr('value'));
+            stylebot.page.saveCSS(stylebot.page.cache.editor.getValue());
         }
     },
 
@@ -206,7 +219,7 @@ table {\n\
         }
 
         stylebot.page.timer = setTimeout(function() {
-            stylebot.page.saveCSS(stylebot.page.cache.textarea.attr('value'));
+            stylebot.page.saveCSS(stylebot.page.cache.editor.getValue());
         }, 100);
     },
 
@@ -217,7 +230,7 @@ table {\n\
     },
 
     save: function(e) {
-        stylebot.page.saveCSS(stylebot.page.cache.textarea.attr('value'));
+        stylebot.page.saveCSS(stylebot.page.cache.editor.getValue());
         stylebot.widget.open();
         stylebot.page.modal.hide();
     },
@@ -250,6 +263,6 @@ table {\n\
             height: $("#stylebot").height() - 30 + "px",
         });
 
-        stylebot.page.cache.textarea.css('height', $("#stylebot").height() - 125 + "px");
+        $('.CodeMirror').css('height', $("#stylebot").height() - 125 + "px");
     }
 }

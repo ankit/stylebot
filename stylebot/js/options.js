@@ -331,6 +331,7 @@ function addStyle() {
             mode: "css",
             lineNumbers: true,
             indentUnit: 4,
+            tabMode: "shift",
             onFocus: function() { cache.modal.editor.clearMarker(cache.modal.editor.errorLine); }
         });
 
