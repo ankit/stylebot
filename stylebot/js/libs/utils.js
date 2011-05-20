@@ -93,18 +93,45 @@ var Utils = {
                 input.get(0).setSelectionRange(0, value.length);
 
             var onClose = function(e) {
-                if (e.type == "keyup" && e.keyCode != 13 && e.keyCode != 27)
-                    return true;
+                if (e.type == "keyup") {
+                    switch (e.keyCode) {
+                        case 38: // up
+                            var nextUrl = e.data.el.parent().prev().children(".custom-style-url");
+                            // if the target element doesn't exist, ignore this event
+                            if (nextUrl.length == 0) return true;
+                            break;
+                        case 40: // down
+                            var nextUrl = e.data.el.parent().next().children(".custom-style-url");
+                            // if the target element doesn't exist, ignore this event
+                            if (nextUrl.length == 0) return true;
+                            break;
+                        case 13: // enter
+                        case 27: // escape
+                        break;
+                        // if it is not an allowed key, ignore this event
+                        default:
+                            return true;
+                    }
+                }
+                
+                // if it's a mousedown event and the target is the element itself, ignore it
                 if (e.type == "mousedown" && e.target.id == e.data.input.attr('id'))
                     return true;
+                
                 var value = e.data.input.attr('value');
+                value = value == "" ? e.data.el.html() : value;
+                
+                // remove the input
                 e.data.input.remove();
-                if (value == "")
-                    value = e.data.el.html();
+                
+                // display the url's div
                 e.data.el.html(value);
                 e.data.el.show();
-                e.data.el.focus();
                 e.data.callback(value);
+                
+                // if available, let's focus the next element
+                if (nextUrl) nextUrl.click();
+                
                 $(document).unbind("mousedown", onClose);
                 $(document).unbind("keyup", onClose);
             }
