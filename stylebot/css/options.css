@@ -118,6 +118,11 @@ li.option:first-of-type {
     font-weight: bold;
 }
 
+.error-marker {
+    color: hsl(349, 165%, 35%);
+    position: absolute;
+}
+
 #footer {
     font-size: 12px;
     text-align: right;

@@ -18,6 +18,7 @@ stylebot.page = {
         livePreview: false,
         originalCSS: null,
         editor: null,
+        error: null,
         css: null,
         // Reset CSS from http://meyerweb.com/eric/tools/css/reset/
         //
@@ -150,8 +151,10 @@ table {\n\
                 onOpen: function() {
                     $('.CodeMirror').css('height', $("#stylebot").height() - stylebot.page.BOTTOM_PADDING + "px !important");
                     var editor = stylebot.page.cache.editor;
-                    editor.setCursor(editor.lineCount(), 0);
+                    editor.setValue(stylebot.page.cache.originalCSS);
                     editor.focus();
+                    editor.setCursor(editor.lineCount(), 0);
+                    stylebot.page.clearSyntaxError();
                     stylebot.style.saveState();
                     stylebot.page.cache.css = editor.getValue();
                 },
@@ -176,12 +179,11 @@ table {\n\
 
         $('.CodeMirror').css('height', $("#stylebot").height() - stylebot.page.BOTTOM_PADDING + "px");
 
-        stylebot.page.cache.editor.setValue(content);
         this.cache.originalCSS = content;
+
+        this.modal.show();
         this.isVisible = true;
-
-        stylebot.page.modal.show();
-
+        
         $(window).bind('resize', this.onWindowResize);
     },
 
@@ -191,11 +193,12 @@ table {\n\
             stylebot.chrome.copyToClipboard(text);
     },
 
+    /* @not in use : Used to reset the existing CSS of page */
     applyResetCSS: function() {
         stylebot.page.modal.cache.setValue(stylebot.page.cache.resetCSS);
 
         if (stylebot.page.cache.livePreview) {
-            stylebot.page.saveCSS(stylebot.page.cache.editor.getValue());
+            stylebot.page.saveCSS(stylebot.page.cache.editor.getValue(), false);
         }
     },
 
@@ -221,40 +224,51 @@ table {\n\
         }
 
         stylebot.page.timer = setTimeout(function() {
-            stylebot.page.saveCSS(stylebot.page.cache.editor.getValue());
+            try {
+                stylebot.page.saveCSS(stylebot.page.cache.editor.getValue(), false);
+            }
+            
+            catch (e) {
+                //
+            }
         }, 100);
     },
 
     cancel: function(e) {
-        stylebot.page.cancelChanges();
+        stylebot.page.saveCSS(stylebot.page.cache.originalCSS, true);
         stylebot.style.clearLastState();
         stylebot.page.modal.hide();
     },
 
     save: function(e) {
-        stylebot.page.saveCSS(stylebot.page.cache.editor.getValue());
-        stylebot.widget.open();
-        stylebot.page.modal.hide();
+        if (stylebot.page.saveCSS(stylebot.page.cache.editor.getValue(), true)) {
+            stylebot.widget.open();
+            stylebot.page.modal.hide();
+        }
     },
 
-    cancelChanges: function() {
-        stylebot.page.saveCSS(stylebot.page.cache.originalCSS);
-    },
-
-    saveCSS: function(css) {
-        if (css == undefined)
-            return;
+    saveCSS: function(css, save) {
+        if (css === undefined)
+            return true;
 
         if (stylebot.page.cache.css != css)
         {
-            stylebot.style.applyPageCSS(css);
+            stylebot.page.cache.css = null;
+            var response = stylebot.style.applyPageCSS(css, save);
+
+            if (response != true) {
+                stylebot.page.displaySyntaxError(response, save);
+                return false;
+            }
+            
+            stylebot.page.clearSyntaxError();
             stylebot.style.refreshUndoState();
         }
-
+        
         else
             stylebot.style.clearLastState();
-
-        stylebot.page.cache.css = null;
+            
+        return true;
     },
 
     onWindowResize: function() {
@@ -266,5 +280,18 @@ table {\n\
         });
 
         $('.CodeMirror').css('height', $("#stylebot").height() - stylebot.page.BOTTOM_PADDING + "px");
+    },
+    
+    displaySyntaxError: function(error, setCursor) {
+        this.cache.editor.setMarker(error.currentLine - 1, "<span class='stylebot-error-marker'>!</span> %N%");
+        this.cache.editor.errorLine = error.currentLine - 1;
+        if (setCursor)
+            this.cache.editor.setCursor(error.currentLine - 1, 0);
+    },
+    
+    clearSyntaxError: function() {
+        if (this.cache.editor.errorLine != undefined)
+            this.cache.editor.clearMarker(this.cache.editor.errorLine);
+        this.cache.editor.errorLine = 0;
     }
 }

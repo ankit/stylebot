@@ -300,6 +300,7 @@ function editGlobalStylesheet(e) {
             tabMode: "shift",
             onFocus: function() { cache.modal.editor.clearMarker(cache.modal.editor.errorLine); }
         });
+        
         cache.modal.editor.errorLine = 0;
 
         resizeEditor();
@@ -334,6 +335,8 @@ function addStyle() {
             tabMode: "shift",
             onFocus: function() { cache.modal.editor.clearMarker(cache.modal.editor.errorLine); }
         });
+        
+        cache.modal.editor.errorLine = 0;
 
         // todo: do this in a more foolproof way
         // currently, we are just using an arbitrary value to determine when CodeMirror is finished setting up
@@ -348,8 +351,6 @@ function addStyle() {
             resizeEditor(65);
 
         }, 20);
-
-        cache.modal.editor.errorLine = 0;
     };
 
     cache.modal.show();
@@ -489,10 +490,7 @@ function displayErrorMessage(msg) {
 }
 
 function displaySyntaxError(css, error) {
-    var start = css.indexOf(error.parsedCssText);
-    var end = start + error.parsedCssText.length;
-    //cache.modal.editor.setLineClass(error.currentLine-1, "CodeMirror-error");
-    cache.modal.editor.setMarker(error.currentLine - 1, "<span style=\"color: #900\">●</span> %N%");
+    cache.modal.editor.setMarker(error.currentLine - 1, "<span class='error-marker'>!</span> %N%");
     cache.modal.editor.setCursor(error.currentLine - 1, 0);
     cache.modal.editor.errorLine = error.currentLine - 1;
 

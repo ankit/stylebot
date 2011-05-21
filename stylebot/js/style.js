@@ -145,27 +145,41 @@ stylebot.style = {
         }, 1000);
     },
 
-    // called when CSS of the entire page is edited in a popup
-    applyPageCSS: function(css) {
-        if (css == "")
-            this.rules = {};
-
-        else {
+    // called when CSS of the entire page is edited in the stylebot panel
+    applyPageCSS: function(css, save) {
+        if (save === undefined)
+            save = true;
+        
+        var parsedRules = {};
+        
+        if (css != "")
+        {
             if (!this.parser)
                 this.parser = new CSSParser();
 
             try {
                 var sheet = this.parser.parse(css, false, true);
-                var rules = CSSUtils.getRulesFromParserObject(sheet);
-                this.rules = rules;
+                parsedRules = CSSUtils.getRulesFromParserObject(sheet);
             }
 
-            catch(e) {}
+            catch(e) {
+                //
+            }
         }
-
+        
+        if (parsedRules['error']) {
+            return parsedRules['error'];
+        }
+        
         this.clearInlineCSS(this.cache.elements);
-        this.updateStyleElement(this.rules);
-        this.save();
+        this.updateStyleElement(parsedRules);
+        
+        if (save) {
+            this.rules = parsedRules;
+            this.save();
+        }
+        
+        return true;
     },
 
     // parses CSS into a rule, updates the cache and saves the rule

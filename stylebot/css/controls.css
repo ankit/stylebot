@@ -119,6 +119,7 @@ button.stylebot-button:disabled {
 }
 
 button.stylebot-button:focus:not(:disabled) {
+    outline: 1px solid #777 !important;
 }
 
 button.stylebot-button:hover:not(:disabled)
