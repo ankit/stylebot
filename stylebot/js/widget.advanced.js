@@ -99,7 +99,6 @@ stylebot.widget.advanced = {
     
     disable: function() {
         this.cache.editor.setOption('readOnly', true);
-        $(".CodeMirror-cursor").css("visibility", "hidden !important");
     },
     
     isDisabled: function() {

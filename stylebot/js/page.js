@@ -74,7 +74,7 @@ table {\n\
 
     create: function(options) {
         var html = "<div>\
-        <div style='font-size: 12px !important; line-height: 14px !important;'>Edit the CSS for <b>" + stylebot.style.cache.url + "</b>:</div>\
+        <div id='stylebot-edit-css-panel' style='font-size: 12px !important; line-height: 14px !important;'>Edit the CSS for <b>" + stylebot.style.cache.url + "</b>:</div>\
         </div>\
         <div style='font-size: 11px !important; margin-bottom: 10px !important;'>\
         <label>\
@@ -179,7 +179,7 @@ table {\n\
             });
         }
 
-        $('.CodeMirror').css('height', $("#stylebot").height() - stylebot.page.BOTTOM_PADDING + "px");
+        self.modal.box.find('.CodeMirror').css('height', $("#stylebot").height() - stylebot.page.BOTTOM_PADDING + "px");
 
         self.cache.originalCSS = content;
 
@@ -282,7 +282,7 @@ table {\n\
             height: $("#stylebot").height() - 30 + "px",
         });
 
-        $('.CodeMirror').css('height', $("#stylebot").height() - stylebot.page.BOTTOM_PADDING + "px");
+        stylebot.page.modal.box.find('.CodeMirror').css('height', $("#stylebot").height() - stylebot.page.BOTTOM_PADDING + "px");
     },
     
     displaySyntaxError: function(error, setCursor) {
