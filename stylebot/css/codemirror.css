@@ -50,10 +50,10 @@
 }
 
 span.CodeMirror-selected {
-    background: #d1dae6 !important;
+    background: rgba(209, 218, 230, 0.75) !important;
 }
 .CodeMirror-focused span.CodeMirror-selected {
-    background: #d1dae6 !important;
+    background: rgba(209, 218, 230, 0.75) !important;
 }
 
 .CodeMirror-matchingbracket {color: #0f0 !important;}

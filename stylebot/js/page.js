@@ -5,6 +5,8 @@
   **/
 
 stylebot.page = {
+    
+    BOTTOM_PADDING: 110,
 
     isVisible: false,
 
@@ -82,7 +84,7 @@ table {\n\
         <button class='stylebot-button' title='Copy to Clipboard' style='float:left !important; margin: 0px !important;' tabindex='0'>\
         Copy\
         </button>\
-        <div style='float: right !important; margin-right: -5px !important;'>\
+        <div style='float: right !important;'>\
         <button class='stylebot-button' style='margin: 0px !important; margin-right: 3px !important; float: none !important;' tabindex='0'>\
         Save\
         </button>\
@@ -146,7 +148,7 @@ table {\n\
                 parent: $("#stylebot"),
 
                 onOpen: function() {
-                    $('.CodeMirror').css('height', $("#stylebot").height() - 125 + "px !important");
+                    $('.CodeMirror').css('height', $("#stylebot").height() - stylebot.page.BOTTOM_PADDING + "px !important");
                     var editor = stylebot.page.cache.editor;
                     editor.setCursor(editor.lineCount(), 0);
                     editor.focus();
@@ -172,7 +174,7 @@ table {\n\
             });
         }
 
-        $('.CodeMirror').css('height', $("#stylebot").height() - 125 + "px");
+        $('.CodeMirror').css('height', $("#stylebot").height() - stylebot.page.BOTTOM_PADDING + "px");
 
         stylebot.page.cache.editor.setValue(content);
         this.cache.originalCSS = content;
@@ -263,6 +265,6 @@ table {\n\
             height: $("#stylebot").height() - 30 + "px",
         });
 
-        $('.CodeMirror').css('height', $("#stylebot").height() - 125 + "px");
+        $('.CodeMirror').css('height', $("#stylebot").height() - stylebot.page.BOTTOM_PADDING + "px");
     }
 }
