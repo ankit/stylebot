@@ -19,7 +19,7 @@ stylebot.widget.advanced = {
 
         $('<div>', {
             class: "stylebot-advanced-text",
-            html: "Edit custom CSS for selected element(s):"
+            html: "CSS for selected element(s):"
         })
         .appendTo(this.cache.container);
         
@@ -99,6 +99,7 @@ stylebot.widget.advanced = {
     
     disable: function() {
         this.cache.editor.setOption('readOnly', true);
+        $(".CodeMirror-cursor").css("visibility", "hidden !important");
     },
     
     isDisabled: function() {

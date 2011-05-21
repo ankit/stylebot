@@ -348,6 +348,7 @@ var CodeMirror = (function() {
     }
 
     function onFocus() {
+      if (options.readOnly) return;
       if (!focused && options.onFocus) options.onFocus(instance);
       focused = true;
       slowPoll();
@@ -356,6 +357,7 @@ var CodeMirror = (function() {
       restartBlink();
     }
     function onBlur() {
+      if (options.readOnly) return;
       if (focused && options.onBlur) options.onBlur(instance);
       clearInterval(blinker);
       shiftSelecting = null;
