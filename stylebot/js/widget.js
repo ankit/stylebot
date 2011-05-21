@@ -44,7 +44,7 @@ stylebot.widget = {
             html: 'custom styles',
             title: 'Click to edit the CSS selector'
         })
-        .tipsy({delayIn: 1500, gravity:'nw'});
+        .tipsy({delayIn: 500, gravity:'n', });
 
         //  Selectors dropdown
         this.dropDown = $('<div>', {
@@ -63,7 +63,9 @@ stylebot.widget = {
 
         //  Make selector editable
         Utils.makeEditable(this.cache.headerSelector, function(value) {
-            stylebot.widget.updateHeight();
+            var self = stylebot.widget;
+            self.setSelector(self.cache.headerSelector.html());
+            self.updateHeight();
             stylebot.select(null, value);
         }, {
             selectText: true
@@ -73,7 +75,7 @@ stylebot.widget = {
         var url = $('<div>', {
             html: stylebot.style.cache.url,
             class: 'stylebot-editable-text',
-            title: 'Click to edit the URL for the style <br>Tip: Add multiple URLs separated with ,'
+            title: 'Click to edit the URL for the style <br>Add multiple URLs separated by ,'
         })
         .tipsy({delayIn: 1500, gravity:'n', html: true});
 
@@ -265,14 +267,14 @@ stylebot.widget = {
 
     //  Enable UI of widget
     enable: function() {
-        this.cache.headerSelector.html(stylebot.style.cache.selector);
+        this.setSelector(stylebot.style.cache.selector);
         this.basic.enable();
         this.advanced.enable();
     },
 
     //  Disable UI of widget
     disable: function() {
-        this.cache.headerSelector.html("Select an element");
+        this.setSelector("Select an element");
         this.basic.disable();
         this.advanced.disable();
     },
@@ -471,7 +473,7 @@ stylebot.widget = {
                 if (e.type === 'keydown' && e.keyCode != 13)
                     return true;
                 var value = e.target.innerHTML;
-                stylebot.widget.cache.headerSelector.html(value);
+                stylebot.widget.setSelector(value);
                 stylebot.widget.updateHeight();
                 stylebot.select(null, Utils.HTMLDecode(value));
                 $(document).unbind('mousedown keydown', onClickElsewhere);
@@ -567,5 +569,12 @@ stylebot.widget = {
     //  Disable the Undo button
     disableUndo: function() {
         this.cache.undoBt.prop('disabled', true);
+    },
+    
+    setSelector: function(value) {
+        this.cache.headerSelector.html(value);
+        if (value == "Select an element")
+            value = "Click to edit the CSS Selector"
+        this.cache.headerSelector.attr('title', value);
     }
 }

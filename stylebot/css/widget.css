@@ -80,6 +80,9 @@
     padding: 1px 0 0 3px !important;
     height: 16px !important;
     width: 178px !important;
+    text-overflow: ellipsis !important;
+    overflow: hidden !important;
+    white-space: nowrap !important
 }
 
 #stylebot-header-selector #stylebot-editing-field {
@@ -104,6 +107,9 @@
     border-radius: 2px !important;
     width: 197px !important;
     border: 1px solid transparent !important;
+    text-overflow: ellipsis !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
 }
 
 #stylebot-header-url .stylebot-editable-text:hover {

@@ -9,7 +9,7 @@ $(document).ready(function(e) {
 
         // Bind listener for install event
         $install_divs.bind('stylebotInstallEvent', function(e) {
-            console.log("Stylebot: Install event received. Dispatching request.");
+            console.log("Stylebot: Install event received. Installing style...");
             
             var $post = $(e.target).closest('.post');
 
@@ -29,19 +29,19 @@ $(document).ready(function(e) {
                 
                 // else save the style
                 else
-                    saveStyleFromSocial(e.target);
+                    saveStyleFromSocial(e);
             });
         });
         
         
-        // Bind listener for overwrite installation (without checking if style already exists) 
+        // Bind listener for overwrite installation (without checking if style already exists)
         
         $install_divs.bind('stylebotOverwriteEvent', function(e) {
-            console.log("Stylebot: Overwrite event received. Dispatching request.");
+            console.log("Stylebot: Overwrite event received. Installing style...");
             
             var $post = $(e.target).closest('.post');
             
-            saveStyleFromSocial(e.target);
+            saveStyleFromSocial(e);
         });
     }
 });
@@ -62,26 +62,52 @@ function sendAvailabilityMessage() {
 
 
 // Send request to background.html to save style along with metadata (id, timestamp, etc.)
-function saveStyleFromSocial(channel) {
+function saveStyleFromSocial(installationEvent) {
+    // @deprecated
+    //
+    // var $channel = $(channel);
+    // var $post = $channel.closest('.post');
+    //
+    // var css = $channel.text();
+    //
+    // var url = $.trim( $post.find('.post_site').text() );
+    //
+    // var timestamp = $post.attr('data-timestamp');
+    //
+    // var id = $post.attr('id').substring(4);
+    
+    // @new stuff
+    var channel = installationEvent.target;
     var $channel = $(channel);
-    var $post = $channel.closest('.post');
+    var data = $channel.data();
     
-    var css = $channel.text();
-
-    var url = $.trim( $post.find('.post_site').text() );
-    
-    var timestamp = $post.attr('data-timestamp');
-    
-    var id = $post.attr('id').substring(4);
-    
-    // let's parse the css
     var parser = new CSSParser();
     
     try {
-        var sheet = parser.parse(css);
+        var sheet = parser.parse(data.css);
         var rules = CSSUtils.getRulesFromParserObject(sheet);
 
-        stylebot.chrome.save(url, rules, { id: id, timestamp: timestamp });
+        // add the meta header
+        var header = "\
+/**\n\
+    Author      : " + data.author + "\n\
+    Title       : " + data.title + "\n";
+        
+        if (data.description) {
+            header += "\
+    Description : " + data.description + "\n";
+        }
+        
+        header += "\
+    URL         : http://stylebot.me/styles/" + data.id + "\n\
+**/\n";
+        
+        var rulesWithMeta = { 'comment-#0' : { comment: header } };
+        
+        for (selector in rules)
+            rulesWithMeta[selector] = rules[selector];
+        
+        stylebot.chrome.save(data.url, rulesWithMeta, { id: data.id, timestamp: data.timestamp })
         stylebot.chrome.pushStyles();
         
         // send back success message
