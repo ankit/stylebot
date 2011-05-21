@@ -434,7 +434,7 @@ a.stylebot-accordion-active .stylebot-accordion-icon {
     resize: none !important;
 }
 
-#stylebot-advanced div {
+div.stylebot-advanced-text {
     margin: 6px 0 !important;
 }
 

@@ -1,6 +1,6 @@
 /**
   * stylebot.widget.basic
-  * 
+  *
   * Basic mode
   **/
 
@@ -329,7 +329,7 @@ stylebot.widget.basic = {
                                                 values[1] = values[3] = $.trim( parts[0] ); // top & bottom
                                                 values[2] = values[4] = $.trim( parts[1] ); // left & right
                                             }
-                                            // parse value of the form margin: 2px 10px 8px 6px;                                        
+                                            // parse value of the form margin: 2px 10px 8px 6px;
                                             else if (parts.length == 4)
                                             {
                                                 values[0] = "";
@@ -441,5 +441,23 @@ stylebot.widget.basic = {
         var len = this.enabledAccordions.length;
         for (var i=0; i < len; i++)
             Events.toggleAccordion($(this.cache.accordionHeaders[this.enabledAccordions[i]]));
+    },
+    
+    resize: function(height) {
+        this.cache.container.css('height', height);
+    },
+    
+    enable: function() {
+        this.cache.textfields.prop('disabled', false);
+        this.cache.buttons.prop('disabled', false);
+        this.cache.selectboxes.prop('disabled', false);
+        this.cache.colorSelectors.removeClass('disabled');
+    },
+    
+    disable: function() {
+        this.cache.textfields.prop('disabled', true);
+        this.cache.buttons.prop('disabled', true);
+        this.cache.selectboxes.prop('disabled', true);
+        this.cache.colorSelectors.addClass('disabled');
     }
 }

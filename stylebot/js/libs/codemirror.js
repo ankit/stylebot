@@ -323,6 +323,10 @@ var CodeMirror = (function() {
       fastPoll(curKeyId);
     }
     function onKeyUp(e) {
+      // @ankit
+      // Pass 'keyup' event to onKeyEvent handler
+      //
+      if (options.onKeyEvent && options.onKeyEvent(instance, addStop(e.e))) return;
       if (reducedSelection) {
         reducedSelection = null;
         updateInput = true;

@@ -7,8 +7,9 @@
 stylebot.widget.advanced = {
 
     cache: {
-        cssField: null,
-        container: null
+        editor: null,
+        container: null,
+        lastState: null
     },
 
     createUI: function() {
@@ -17,61 +18,68 @@ stylebot.widget.advanced = {
         });
 
         $('<div>', {
+            class: "stylebot-advanced-text",
             html: "Edit custom CSS for selected element(s):"
         })
         .appendTo(this.cache.container);
+        
+        var self = this;
+        
+        this.cache.editor = CodeMirror(this.cache.container.get(0), {
+            mode: "css",
+            lineNumbers: false,
+            indentUnit: 4,
+            tabMode: "shift",
+            
+            onKeyEvent: function(i, e) {
+                if (e.type === 'keyup') {
+                    self.onKeyUp();
+                }
+                
+                else if (e.type === 'keydown')
+                {
+                    if (e.keyCode === 27) e.target.blur();
+                }
+            },
+            
+            onFocus: function(e) {
+                stylebot.style.saveState();
+                self.cache.lastState = self.cache.editor.getValue();
+            },
+            
+            onBlur: function(e) {
+                var $el = $(e.target);
+                if (self.cache.lastState == self.cache.editor.getValue()) {
+                    stylebot.style.clearLastState();
+                }
 
-        this.cache.cssField = $('<textarea>', {
-            id: 'stylebot-advanced-css',
-            class: 'stylebot-textarea stylebot-control stylebot-css-code'
-        })
-
-        .keyup(this.onKeyUp)
-
-        .keydown(function(e) { if (e.keyCode === 27) this.blur(); })
-
-        .focus(function(e) {
-            stylebot.style.saveState();
-            $(e.target).data('lastState', e.target.value);
-        })
-
-        .blur(function(e) {
-            if ($(e.target).data('lastState') == e.target.value) {
-                stylebot.style.clearLastState();
+                self.cache.lastState = null;
+                stylebot.style.refreshUndoState();
             }
-
-            $(e.target).data('lastState', null);
-            stylebot.style.refreshUndoState();
-        })
-
-        .appendTo(this.cache.container);
+        });
 
         return this.cache.container;
     },
 
-    onKeyUp: function(e) {
-        stylebot.style.applyCSS(stylebot.widget.advanced.cache.cssField.attr('value'));
+    onKeyUp: function() {
+        stylebot.style.applyCSS(stylebot.widget.advanced.cache.editor.getValue());
     },
 
     fill: function() {
         var css = CSSUtils.crunchCSSForSelector(stylebot.style.rules, stylebot.style.cache.selector, false, true);
-
-        this.cache.cssField
-        .html(css)
-        .attr('value', css);
+        this.cache.editor.setValue(css);
     },
 
     show: function() {
         this.fill();
         this.cache.container.show();
-
-        setTimeout(function() {
-            if ( !stylebot.widget.advanced.cache.cssField.prop('disabled') )
-            {
-                stylebot.widget.advanced.cache.cssField.focus();
-                Utils.moveCursorToEnd(stylebot.widget.advanced.cache.cssField.get(0));
-            }
-        });
+        
+        var self = this;
+        
+        if (!self.isDisabled()) {
+            self.cache.editor.focus();
+            self.cache.editor.setCursor(self.cache.editor.lineCount(), 0);
+        }
     },
 
     hide: function() {
@@ -79,8 +87,25 @@ stylebot.widget.advanced = {
     },
 
     reset: function() {
-        this.cache.cssField.html('')
-        .attr('value', '')
-        .focus();
+        this.cache.editor.setValue('');
+        this.cache.editor.focus();
+    },
+    
+    enable: function() {
+        if (!this.cache.editor)
+            return false;
+        this.cache.editor.setOption('readOnly', false);
+    },
+    
+    disable: function() {
+        this.cache.editor.setOption('readOnly', true);
+    },
+    
+    isDisabled: function() {
+        return this.cache.editor.getOption('readOnly');
+    },
+    
+    resize: function(height) {
+        this.cache.container.find('.CodeMirror').css('height', height);
     }
 }

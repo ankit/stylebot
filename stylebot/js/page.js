@@ -136,8 +136,10 @@ table {\n\
     },
 
     show: function(content, prevTarget) {
-        if (!this.modal) {
-            this.create({
+        var self = this;
+        
+        if (!self.modal) {
+            self.create({
                 closeOnEsc: false,
                 closeOnBgClick: false,
                 bgFadeSpeed: 0,
@@ -149,20 +151,20 @@ table {\n\
                 parent: $("#stylebot"),
 
                 onOpen: function() {
-                    $('.CodeMirror').css('height', $("#stylebot").height() - stylebot.page.BOTTOM_PADDING + "px !important");
-                    var editor = stylebot.page.cache.editor;
-                    editor.setValue(stylebot.page.cache.originalCSS);
+                    self.modal.box.find('.CodeMirror').css('height', $("#stylebot").height() - stylebot.page.BOTTOM_PADDING + "px !important");
+                    var editor = self.cache.editor;
+                    editor.setValue(self.cache.originalCSS);
                     editor.focus();
                     editor.setCursor(editor.lineCount(), 0);
-                    stylebot.page.clearSyntaxError();
+                    self.clearSyntaxError();
                     stylebot.style.saveState();
-                    stylebot.page.cache.css = editor.getValue();
+                    self.cache.css = editor.getValue();
                 },
 
                 onClose: function() {
-                    stylebot.page.isVisible = false;
+                    self.isVisible = false;
                     prevTarget.focus();
-                    $(window).unbind('resize', stylebot.page.onWindowResize);
+                    $(window).unbind('resize', self.onWindowResize);
                 }
 
             });
@@ -179,10 +181,10 @@ table {\n\
 
         $('.CodeMirror').css('height', $("#stylebot").height() - stylebot.page.BOTTOM_PADDING + "px");
 
-        this.cache.originalCSS = content;
+        self.cache.originalCSS = content;
 
-        this.modal.show();
-        this.isVisible = true;
+        self.modal.show();
+        self.isVisible = true;
         
         $(window).bind('resize', this.onWindowResize);
     },
@@ -238,12 +240,13 @@ table {\n\
         stylebot.page.saveCSS(stylebot.page.cache.originalCSS, true);
         stylebot.style.clearLastState();
         stylebot.page.modal.hide();
+        stylebot.widget.open();
     },
 
     save: function(e) {
         if (stylebot.page.saveCSS(stylebot.page.cache.editor.getValue(), true)) {
-            stylebot.widget.open();
             stylebot.page.modal.hide();
+            stylebot.widget.open();
         }
     },
 

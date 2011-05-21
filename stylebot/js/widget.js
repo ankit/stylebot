@@ -266,21 +266,15 @@ stylebot.widget = {
     //  Enable UI of widget
     enable: function() {
         this.cache.headerSelector.html(stylebot.style.cache.selector);
-        this.basic.cache.textfields.prop('disabled', false);
-        this.basic.cache.buttons.prop('disabled', false);
-        this.basic.cache.selectboxes.prop('disabled', false);
-        this.basic.cache.colorSelectors.removeClass('disabled');
-        this.advanced.cache.cssField.prop('disabled', false);
+        this.basic.enable();
+        this.advanced.enable();
     },
 
     //  Disable UI of widget
     disable: function() {
         this.cache.headerSelector.html("Select an element");
-        this.basic.cache.textfields.prop('disabled', true);
-        this.basic.cache.buttons.prop('disabled', true);
-        this.basic.cache.selectboxes.prop('disabled', true);
-        this.basic.cache.colorSelectors.addClass('disabled');
-        this.advanced.cache.cssField.prop('disabled', true);
+        this.basic.disable();
+        this.advanced.disable();
     },
 
     //  Update widget position
@@ -297,19 +291,22 @@ stylebot.widget = {
 
     //  Refresh height of widget
     updateHeight: function() {
-        stylebot.widget.cache.box.css('height', window.innerHeight);
+        var self = stylebot.widget;
+        
+        self.cache.box.css('height', window.innerHeight);
 
-        var headerHeight = stylebot.widget.cache.header.height();
-
-        var optionsHeight = 150;
+        var headerHeight = self.cache.header.height();
         if (headerHeight != 0)
             headerHeight -= 36;
+        
+        var optionsHeight = 150;
+        
         var newHeight = window.innerHeight - (optionsHeight + headerHeight);
 
-        if (stylebot.options.mode == "Basic")
-            stylebot.widget.basic.cache.container.css('height',  newHeight);
+        if (stylebot.options.mode === "Basic")
+            self.basic.resize(newHeight);
         else
-            stylebot.widget.advanced.cache.cssField.css('height',  newHeight - 44);
+            self.advanced.resize(newHeight - 34);
     },
 
     //  Refresh widget UI based on the current mode of stylebot
