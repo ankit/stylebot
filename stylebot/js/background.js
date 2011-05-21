@@ -150,6 +150,8 @@ function attachListeners() {
 
             case "transfer"             : transfer(request.source, request.destination); sendResponse({}); break;
 
+            case "getGlobalRules"       : sendResponse(getGlobalRules()); break;
+
             case "getRulesForPage"      : sendResponse(getRulesForPage(request.url)); break;
 
             case "fetchOptions"         : sendResponse({ options: cache.options, enabledAccordions: cache.enabledAccordions }); break;
@@ -419,6 +421,30 @@ function doesStyleExist(aURL) {
     return false;
 }
 
+// Return CSS rules for websites
+function getGlobalRules() {
+    var rules = {};
+                   
+    // iterate over each selector in styles
+    for (var selector in cache.styles["*"]['_rules']) {
+        // if no rule exists for selector, simply copy the rule
+        if (rules[selector] == undefined)
+            rules[selector] = cloneObject(cache.styles["*"]['_rules'][selector]);
+
+        // otherwise, iterate over each property
+        else {
+            for (var property in cache.styles["*"]['_rules'][selector])
+            {
+                rules[selector][property] = cache.styles["*"]['_rules'][selector][property];
+            }
+        }
+    }
+    if (rules != undefined)
+        return {rules: rules};
+    else
+        return {rules: null};
+}
+
 // Return CSS rules for a URL
 function getRulesForPage(currUrl) {
     // this will contain the combined set of evaluated rules to be applied to the page.
@@ -440,7 +466,7 @@ function getRulesForPage(currUrl) {
             }
         }
 
-        if (isFound || url == "*")
+        if (isFound)
         {
             if (url.length > url_for_page.length)
                 url_for_page = url;
