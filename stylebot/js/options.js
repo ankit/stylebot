@@ -746,17 +746,19 @@ function mergeStyles(s1, s2) {
 }
 
 function resizeEditor(bottomSpace) {
-    if(!cache.modal || !cache.modal.editor) return;
+    if (!cache.modal) return;
     
     if (!bottomSpace) {
         bottomSpace = 60;
     }
     
-    $('#editor').height($("#stylebot-modal").height() - bottomSpace + "px");
-    $('#editor').width($("#stylebot-modal").width() + "px");
-    
     $('.stylebot-css-code').height($("#stylebot-modal").height() - bottomSpace + "px");
     $('.stylebot-css-code').width($("#stylebot-modal").width() - 7 + "px");
+    
+    if (!cache.modal.editor) return;
+    
+    $('#editor').height($("#stylebot-modal").height() - bottomSpace + "px");
+    $('#editor').width($("#stylebot-modal").width() + "px");
     
     setTimeout(function() {
         cache.modal.editor.resize();
