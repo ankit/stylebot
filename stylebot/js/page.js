@@ -261,7 +261,7 @@ table {\n\
         self.timer = setTimeout(function() {
             try {
                 self.saveCSS(self.cache.editor.getSession().getValue(), false);
-                // let's update it one more time in case we've pasted in something
+                // let's update it after the timeout in case we've pasted something
                 self.cache.editor.updateScrollbars();
             }
             
