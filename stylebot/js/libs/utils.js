@@ -191,5 +191,44 @@ var Utils = {
         }
 
         return newObj;
+    },
+    
+    // functions for ace
+    ace: {
+        monkeyPatch: function(selector, editor) {
+            editor.hasScrollbar = {vertical: true, horizontal: true};
+            editor.updateScrollbars = function() {
+                var prevState = {vertical: this.hasScrollbar.vertical, horizontal: this.hasScrollbar.horizontal};
+
+                var horizontalScrollbar = $(selector + " .ace_scroller");
+                this.hasScrollbar.horizontal = horizontalScrollbar.innerHeight() > horizontalScrollbar.get(0).clientHeight;
+
+                var verticalScrollbar = $(selector + " .ace_sb");
+                this.hasScrollbar.vertical = verticalScrollbar.innerWidth() > verticalScrollbar.get(0).clientWidth;
+
+                if (prevState.vertical != this.hasScrollbar.vertical) {
+                    verticalScrollbar.css('right', this.hasScrollbar.vertical ? '0px' : '10000px');
+                    $(selector + " .ace_scroller").css('width', this.hasScrollbar.vertical ? '-=15' : '+=15');
+                    // force the editor to resize, this is the only way to update the inner content width safely
+                    editor.resize();
+                }
+            };
+            editor.getSession().on('change', function() {
+                if (editor.timer) {
+                    clearTimeout(editor.timer);
+                    editor.timer = null;
+                }
+                editor.timer = setTimeout(function() {
+                    try {
+                        // let's update it after the timeout in case we've pasted something
+                        editor.updateScrollbars();
+                    }
+                    catch (e) {
+                        //
+                    }
+                }, 100);
+            });
+            return editor;
+        }
     }
 }

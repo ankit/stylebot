@@ -455,7 +455,8 @@ input[name=shortcutKeyCharacter] {
 }
 
 .ace_scroller {
-    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    overflow-x: hidden !important;
 }
 
 .ace_sb {

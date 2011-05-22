@@ -124,28 +124,8 @@ table {\n\
     initializeEditor: function() {
         var self = this;
         
-        self.cache.editor = ace.edit('stylebot-page-editor');
-        
         // ace monkey-patch to allow automatic resizing based on scrollbars
-        self.cache.editor.hasScrollbar = {vertical: true, horizontal: true};
-        self.cache.editor.updateScrollbars = function() {
-            var editor = this;
-            var prevState = {vertical: editor.hasScrollbar.vertical, horizontal: editor.hasScrollbar.horizontal};
-            
-            var horizontalScrollbar = $("#stylebot-page-editor .ace_scroller");
-            editor.hasScrollbar.horizontal = horizontalScrollbar.innerHeight() > horizontalScrollbar.get(0).clientHeight;
-            
-            var verticalScrollbar = $("#stylebot-page-editor .ace_sb");
-            editor.hasScrollbar.vertical = verticalScrollbar.innerWidth() > verticalScrollbar.get(0).clientWidth;
-            
-            if (prevState.vertical != editor.hasScrollbar.vertical) {
-                verticalScrollbar.css('right', editor.hasScrollbar.vertical ? '0px' : '1000px');
-                $("#stylebot-page-editor .ace_scroller").css('width', editor.hasScrollbar.vertical ? '-=15' : '+=15');
-                // force the editor to resize, this is the only way to update the inner content width safely
-                editor.resize();
-            }
-        };
-        
+        self.cache.editor = Utils.ace.monkeyPatch("#stylebot-page-editor", ace.edit('stylebot-page-editor'));
         
         var session = self.cache.editor.getSession();
         
@@ -249,7 +229,6 @@ table {\n\
         var self = stylebot.page;
         
         if (!self.cache.livePreview){
-            self.cache.editor.updateScrollbars();
             return;
         }
         
@@ -261,10 +240,7 @@ table {\n\
         self.timer = setTimeout(function() {
             try {
                 self.saveCSS(self.cache.editor.getSession().getValue(), false);
-                // let's update it after the timeout in case we've pasted something
-                self.cache.editor.updateScrollbars();
             }
-            
             catch (e) {
                 //
             }
