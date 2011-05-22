@@ -198,22 +198,29 @@ var Utils = {
         monkeyPatch: function(selector, editor) {
             editor.hasScrollbar = {vertical: true, horizontal: true};
             editor.updateScrollbars = function() {
-                var prevState = {vertical: this.hasScrollbar.vertical, horizontal: this.hasScrollbar.horizontal};
-
+                // save previous state to see if we need to update the ace ui
+                var prevState = this.hasScrollbar;
+                
+                // ace's horizontal scrollbar
                 var horizontalScrollbar = $(selector + " .ace_scroller");
                 this.hasScrollbar.horizontal = horizontalScrollbar.innerHeight() > horizontalScrollbar.get(0).clientHeight;
-
+                
+                // ace's vertical scrollbar
                 var verticalScrollbar = $(selector + " .ace_sb");
                 this.hasScrollbar.vertical = verticalScrollbar.innerWidth() > verticalScrollbar.get(0).clientWidth;
-
+                
+                // if the scrollbar state has changed, update the css
                 if (prevState.vertical != this.hasScrollbar.vertical) {
+                    // hide it without affecting its actual width
                     verticalScrollbar.css('right', this.hasScrollbar.vertical ? '0px' : '10000px');
+                    // resize the editor scroller panel
                     $(selector + " .ace_scroller").css('width', this.hasScrollbar.vertical ? '-=15' : '+=15');
                     // force the editor to resize, this is the only way to update the inner content width safely
                     editor.resize();
                 }
             };
             
+            // Update the scrollbars every time the content changes
             var session = editor.getSession();
             session.on('change', function() {
                 if (editor.timer) {
@@ -234,6 +241,12 @@ var Utils = {
             // put a non empty value inside the editor, so even if we set the value to empty, it changes
             session.setValue(Math.random().toString());
             
+            // monkey-patch readOnly, to hide the cursor if set to on, and show it otherwise
+            var _setReadOnly = editor.setReadOnly;
+            editor.setReadOnly = function(readOnly){
+                $(selector + " .ace_cursor-layer").css("display", readOnly ? "none" : "");
+                _setReadOnly(readOnly);
+            }
             return editor;
         }
     }
