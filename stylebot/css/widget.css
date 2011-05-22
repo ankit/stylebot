@@ -470,13 +470,14 @@ a.stylebot-accordion-active .stylebot-accordion-icon {
 
 /** Ace editor **/
 
-/*.ace_scroller {
-    overflow-x: auto !important;
+.ace_scroller {
+    overflow-y: hidden !important;
+    overflow-x: scroll !important;
 }
 
 .ace_sb {
     overflow-y: auto !important;
-}*/
+}
 
 .ace_marker-layer .stylebot_warning {
     position: absolute;

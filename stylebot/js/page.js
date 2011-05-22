@@ -126,12 +126,32 @@ table {\n\
         
         self.cache.editor = ace.edit('stylebot-page-editor');
         
+        // ace monkey-patch to allow automatic resizing based on scrollbars
+        self.cache.editor.hasScrollbar = {vertical: true, horizontal: true};
+        self.cache.editor.updateScrollbars = function() {
+            var editor = this;
+            var prevState = {vertical: editor.hasScrollbar.vertical, horizontal: editor.hasScrollbar.horizontal};
+            
+            var horizontalScrollbar = $("#stylebot-page-editor .ace_scroller");
+            editor.hasScrollbar.horizontal = horizontalScrollbar.innerHeight() > horizontalScrollbar.get(0).clientHeight;
+            
+            var verticalScrollbar = $("#stylebot-page-editor .ace_sb");
+            editor.hasScrollbar.vertical = verticalScrollbar.innerWidth() > verticalScrollbar.get(0).clientWidth;
+            
+            if (prevState.vertical != editor.hasScrollbar.vertical) {
+                verticalScrollbar.css('right', editor.hasScrollbar.vertical ? '0px' : '1000px');
+                $("#stylebot-page-editor .ace_scroller").css('width', editor.hasScrollbar.vertical ? '-=15' : '+=15');
+                // force the editor to resize, this is the only way to update the inner content width safely
+                editor.resize();
+            }
+        };
+        
+        
         var session = self.cache.editor.getSession();
         
         var cssMode = require("ace/mode/css").Mode;
         session.setMode(new cssMode());
         session.on('change', self.contentChanged);
-        session.setUseWrapMode(true);
         
         self.cache.editor.setTheme("ace/theme/dawn");
         
@@ -238,6 +258,7 @@ table {\n\
         self.timer = setTimeout(function() {
             try {
                 self.saveCSS(self.cache.editor.getSession().getValue(), false);
+                self.cache.editor.updateScrollbars();
             }
             
             catch (e) {
@@ -294,7 +315,7 @@ table {\n\
             left: '0',
             height: $("#stylebot").height() - 30 + "px",
         });
-
+        
         stylebot.page.resize();
     },
     
@@ -319,5 +340,6 @@ table {\n\
     resize: function() {
         $("#stylebot-page-editor").css('height', $("#stylebot").height() - this.BOTTOM_PADDING + "px");
         this.cache.editor.resize();
+        this.cache.editor.updateScrollbars();
     }
 }
