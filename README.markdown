@@ -40,7 +40,7 @@ I am using code from the following projects:
 
 * [jQuery](http://jquery.com/)
 
-* [CodeMirror](http://codemirror.net/)
+* [Ace](http://ace.ajax.org/)
 
 ###License
 
