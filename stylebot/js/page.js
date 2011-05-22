@@ -151,6 +151,7 @@ table {\n\
         
         var cssMode = require("ace/mode/css").Mode;
         session.setMode(new cssMode());
+        session.setUseWrapMode(true);
         session.on('change', self.contentChanged);
         
         self.cache.editor.setTheme("ace/theme/dawn");
@@ -247,10 +248,10 @@ table {\n\
     contentChanged: function() {
         var self = stylebot.page;
         
-        self.cache.editor.updateScrollbars();
-        
-        if (!self.cache.livePreview)
+        if (!self.cache.livePreview){
+            self.cache.editor.updateScrollbars();
             return;
+        }
         
         if (self.timer) {
             clearTimeout(self.timer);
@@ -260,6 +261,8 @@ table {\n\
         self.timer = setTimeout(function() {
             try {
                 self.saveCSS(self.cache.editor.getSession().getValue(), false);
+                // let's update it one more time in case we've pasted in something
+                self.cache.editor.updateScrollbars();
             }
             
             catch (e) {

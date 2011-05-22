@@ -472,7 +472,7 @@ a.stylebot-accordion-active .stylebot-accordion-icon {
 
 .ace_scroller {
     overflow-y: hidden !important;
-    overflow-x: scroll !important;
+    overflow-x: hidden !important;
 }
 
 .ace_sb {
