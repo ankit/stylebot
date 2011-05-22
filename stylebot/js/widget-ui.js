@@ -230,7 +230,7 @@ var WidgetUI = {
         return option;
     },
 
-    createColorPicker: function(input) {
+    createColorPicker: function(input, el) {
         return $( '<div>', {
             class: 'stylebot-colorselector stylebot-control',
             tabIndex: 0
@@ -240,7 +240,9 @@ var WidgetUI = {
 
         .ColorPicker({
             flat: false,
-
+            
+            appendToElement: el,
+            
             onChange: function(hsb, hex, rgb) {
                 var colorCode = '#' + hex;
                 // set input value to reflect the newly picked color's code

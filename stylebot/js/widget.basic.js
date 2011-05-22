@@ -239,7 +239,8 @@ stylebot.widget.basic = {
             case 'multi-size'       :   control_el = WidgetUI.createMultiSizeControl(control).appendTo(el); break;
                                         
             case 'color'            :   control_el = WidgetUI.createTextField(control.id, 10, null, Events.onTextFieldKeyUp);
-                                        WidgetUI.createColorPicker(control_el).appendTo(el);
+                                        WidgetUI.createColorPicker(control_el, el);
+                                        
                                         control_el.appendTo(el)
                                         .keyup(function (e) { WidgetUI.setColorSelectorColor($(this)) });
                                         break;

@@ -29,6 +29,7 @@
                 onHide: function () {},
                 onChange: function () {},
                 onSubmit: function () {},
+                appendToElement: document.body,
                 color: 'ff0000',
                 flat: false
             },
@@ -319,7 +320,7 @@
                         if (options.flat) {
                             cal.appendTo(this).show();
                         } else {
-                            cal.appendTo(document.body);
+                            cal.appendTo(options.appendToElement);
                         }
                         options.selector = cal.find('div.stylebot_colorpicker_color').bind('mousedown', downSelector);
                         options.selectorIndic = options.selector.find('div div');
