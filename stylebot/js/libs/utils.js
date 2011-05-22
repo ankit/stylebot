@@ -199,7 +199,7 @@ var Utils = {
             editor.hasScrollbar = {vertical: true, horizontal: true};
             editor.updateScrollbars = function() {
                 // save previous state to see if we need to update the ace ui
-                var prevState = this.hasScrollbar;
+                var prevState = {vertical: this.hasScrollbar.vertical, horizontal: this.hasScrollbar.horizontal};
                 
                 // ace's horizontal scrollbar
                 var horizontalScrollbar = $(selector + " .ace_scroller");
