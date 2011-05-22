@@ -143,7 +143,7 @@ stylebot.widget = {
         stylebot.widget.basic.createUI().appendTo(this.cache.box);
 
         //  Advanced mode
-        stylebot.widget.advanced.createUI().appendTo(this.cache.box);
+        stylebot.widget.advanced.createUI(this.cache.box);
 
         //  Options (footer)
         var optionsContainer = $('<div>', {
@@ -298,6 +298,7 @@ stylebot.widget = {
         self.cache.box.css('height', window.innerHeight);
 
         var headerHeight = self.cache.header.height();
+        
         if (headerHeight != 0)
             headerHeight -= 36;
         
@@ -308,7 +309,7 @@ stylebot.widget = {
         if (stylebot.options.mode === "Basic")
             self.basic.resize(newHeight);
         else
-            self.advanced.resize(newHeight - 34);
+            self.advanced.resize(newHeight - 30);
     },
 
     //  Refresh widget UI based on the current mode of stylebot

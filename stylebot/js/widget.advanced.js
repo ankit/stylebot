@@ -12,62 +12,75 @@ stylebot.widget.advanced = {
         lastState: null
     },
 
-    createUI: function() {
+    createUI: function(parent) {
         this.cache.container = $('<div>', {
             id: 'stylebot-advanced'
         });
 
         $('<div>', {
-            class: "stylebot-advanced-text",
+            id: "stylebot-advanced-header",
             html: "CSS for selected element(s):"
+        })
+        .appendTo(this.cache.container);
+        
+        $('<div>', {
+            id: "stylebot-advanced-editor"
         })
         .appendTo(this.cache.container);
         
         var self = this;
         
-        this.cache.editor = CodeMirror(this.cache.container.get(0), {
-            mode: "css",
-            lineNumbers: false,
-            indentUnit: 4,
-            tabMode: "shift",
-            
-            onKeyEvent: function(i, e) {
-                if (e.type === 'keyup') {
-                    self.onKeyUp();
-                }
-                
-                else if (e.type === 'keydown')
-                {
-                    if (e.keyCode === 27) e.target.blur();
-                }
-            },
-            
-            onFocus: function(e) {
-                stylebot.style.saveState();
-                self.cache.lastState = self.cache.editor.getValue();
-            },
-            
-            onBlur: function(e) {
-                var $el = $(e.target);
-                if (self.cache.lastState == self.cache.editor.getValue()) {
-                    stylebot.style.clearLastState();
-                }
+        parent.append(this.cache.container);
+        
+        setTimeout(function() {
+            self.initializeEditor();
+        }, 0);
+    },
+    
+    initializeEditor: function() {
+        var self = this;
+        
+        self.cache.editor = ace.edit('stylebot-advanced-editor');
+        var editor = self.cache.editor;
+        var session = editor.getSession();
+        
+        var cssMode = require("ace/mode/css").Mode;
+        session.setMode(new cssMode());
+        session.on('change', self.contentChanged);
+        session.on('focus', self.onFocus);
+        session.on('blur', self.onBlur);
+        session.setUseWrapMode(true);
 
-                self.cache.lastState = null;
-                stylebot.style.refreshUndoState();
-            }
-        });
-
-        return this.cache.container;
+        editor.renderer.setShowGutter(false);
+        editor.setTheme("ace/theme/dawn");
+        
+        setTimeout(function() {
+            self.resize(300);
+        }, 0);
     },
 
-    onKeyUp: function() {
-        stylebot.style.applyCSS(stylebot.widget.advanced.cache.editor.getValue());
+    contentChanged: function() {
+        stylebot.style.applyCSS(stylebot.widget.advanced.cache.editor.getSession().getValue());
+    },
+    
+    onFocus: function() {
+        stylebot.style.saveState();
+        self.cache.lastState = self.cache.editor.getSession().getValue();
+    },
+    
+    onBlur: function() {
+        var $el = $(e.target);
+        if (self.cache.lastState == self.cache.editor.getSession().getValue()) {
+            stylebot.style.clearLastState();
+        }
+
+        self.cache.lastState = null;
+        stylebot.style.refreshUndoState();
     },
 
     fill: function() {
         var css = CSSUtils.crunchCSSForSelector(stylebot.style.rules, stylebot.style.cache.selector, false, true);
-        this.cache.editor.setValue(css);
+        this.cache.editor.getSession().setValue(css);
     },
 
     show: function() {
@@ -77,8 +90,10 @@ stylebot.widget.advanced = {
         var self = this;
         
         if (!self.isDisabled()) {
-            self.cache.editor.focus();
-            self.cache.editor.setCursor(self.cache.editor.lineCount(), 0);
+            setTimeout(function() {
+                self.cache.editor.focus();
+                self.cache.editor.gotoLine(self.cache.editor.getSession().getLength(), 0);
+            }, 0);
         }
     },
 
@@ -87,26 +102,30 @@ stylebot.widget.advanced = {
     },
 
     reset: function() {
-        this.cache.editor.setValue('');
+        this.cache.editor.getSession().setValue('');
         this.cache.editor.focus();
     },
     
     enable: function() {
-        if (!this.cache.editor)
-            return false;
-        this.cache.editor.setOption('readOnly', false);
+        if (this.cache.editor === null)
+            return;
+        this.cache.editor.setReadOnly(false);
     },
     
     disable: function() {
-        this.cache.editor.setOption('readOnly', true);
-        $(".CodeMirror-cursor").css("visibility", "hidden !important");
+        if (this.cache.editor === null)
+            return;
+        this.cache.editor.setReadOnly(true);
     },
     
     isDisabled: function() {
-        return this.cache.editor.getOption('readOnly');
+        return this.cache.editor.getReadOnly();
     },
     
     resize: function(height) {
-        this.cache.container.find('.CodeMirror').css('height', height);
+        $("#stylebot-advanced-editor").css('height', height);
+        setTimeout(function() {
+            stylebot.widget.advanced.cache.editor.resize();
+        }, 0);
     }
 }

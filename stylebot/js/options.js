@@ -240,30 +240,14 @@ function editStyle(e) {
     <div class='header-text'> \
     Edit the CSS for <strong>" + url + "</strong>: \
     </div> \
+    <div id='editor'></div> \
     </div> \
     <div id='stylebot-modal-buttons'> \
     <button onclick='onSave(\"" + url + "\");'>Save</button> \
     <button onclick='cache.modal.hide();'>Cancel</button> \
     </div>";
 
-    initModal(html);
-
-    cache.modal.options.onOpen = function() {
-        var attachTo = cache.modal.box.find("div").get(0);
-        cache.modal.editor = CodeMirror(attachTo, {
-            value: css,
-            mode: "css",
-            lineNumbers: true,
-            indentUnit: 4,
-            tabMode: "shift",
-            onFocus: function() { cache.modal.editor.clearMarker(cache.modal.editor.errorLine); }
-        });
-
-        cache.modal.editor.errorLine = 0;
-
-        resizeEditor();
-        cache.modal.editor.setCursor(cache.modal.editor.lineCount(), 0);
-    };
+    initializeEditorModal(html, css);
 
     cache.modal.show();
 }
@@ -282,31 +266,15 @@ function editGlobalStylesheet(e) {
     <div class='header-text'> \
     Edit the <strong>Global Stylesheet</strong>: \
     </div> \
+    <div id='editor'></div> \
     </div> \
     <div id='stylebot-modal-buttons'> \
     <button onclick='onSave(\"*\");'>Save</button> \
     <button onclick='cache.modal.hide();'>Cancel</button> \
     </div>";
 
-    initModal(html);
-
-    cache.modal.options.onOpen = function() {
-        var attachTo = cache.modal.box.find("div").get(0);
-        cache.modal.editor = CodeMirror(attachTo, {
-            value: css,
-            mode: "css",
-            lineNumbers: true,
-            indentUnit: 4,
-            tabMode: "shift",
-            onFocus: function() { cache.modal.editor.clearMarker(cache.modal.editor.errorLine); }
-        });
-        
-        cache.modal.editor.errorLine = 0;
-
-        resizeEditor();
-        cache.modal.editor.setCursor(cache.modal.editor.lineCount(), 0);
-    };
-
+    initializeEditorModal(html, css);
+    
     cache.modal.show();
 }
 
@@ -317,45 +285,17 @@ function addStyle() {
     <div class='header-text'> \
     URL: <input type='text'></input> \
     </div> \
+    <div id='editor'></div> \
     </div> \
     <div id='stylebot-modal-buttons'> \
     <button onclick= 'onAdd();' >Add</button> \
     <button onclick= 'cache.modal.hide();' >Cancel</button> \
     </div>";
 
-    initModal(html);
-
-    cache.modal.options.onOpen = function() {
-        var attachTo = cache.modal.box.find("div").get(0);
-
-        cache.modal.editor = CodeMirror(attachTo, {
-            mode: "css",
-            lineNumbers: true,
-            indentUnit: 4,
-            tabMode: "shift",
-            onFocus: function() { cache.modal.editor.clearMarker(cache.modal.editor.errorLine); }
-        });
-        
-        cache.modal.editor.errorLine = 0;
-
-        // todo: do this in a more foolproof way
-        // currently, we are just using an arbitrary value to determine when CodeMirror is finished setting up
-        //
-        setTimeout(function() {
-            cache.modal.box.find('input').focus()
-
-            .change(function() {
-                if($(this).val() == "*") $(this).val("");
-            });
-
-            resizeEditor(65);
-
-        }, 20);
-    };
+    initializeAddStyleEditorModal(html);
 
     cache.modal.show();
 }
-
 
 // Called when Share button is clicked for a style
 function shareStyle(e) {
@@ -397,7 +337,8 @@ function shareStyle(e) {
 // Called when a style is updated (Update button is clicked)
 //
 function onSave(url) {
-    var css = cache.modal.editor.getValue();
+    var css = cache.modal.editor.getSession().getValue();
+    
     if (saveStyle(url, css)) {
         cache.modal.hide();
     }
@@ -406,7 +347,7 @@ function onSave(url) {
 // Called when a new style is added (Add button is clicked)
 function onAdd() {
     var url = cache.modal.box.find('input').attr('value');
-    var css = cache.modal.editor.getValue();
+    var css = cache.modal.editor.getSession().getValue();
 
     if (css === "")
         return false;
@@ -490,11 +431,11 @@ function displayErrorMessage(msg) {
 }
 
 function displaySyntaxError(css, error) {
-    cache.modal.editor.setMarker(error.currentLine - 1, "<span class='error-marker'>!</span> %N%");
-    cache.modal.editor.setCursor(error.currentLine - 1, 0);
-    cache.modal.editor.errorLine = error.currentLine - 1;
+    // cache.modal.editor.setMarker(error.currentLine - 1, "<span class='error-marker'>!</span> %N%");
+    // cache.modal.editor.setCursor(error.currentLine - 1, 0);
+    // cache.modal.editor.errorLine = error.currentLine - 1;
 
-    displayErrorMessage('Syntax Error at Line ' + error.currentLine);
+    // displayErrorMessage('Syntax Error at Line ' + error.currentLine);
 }
 
 // Callback for edit in place for URLs
@@ -530,66 +471,42 @@ function editURL(oldValue, newValue) {
 // Generates JSON string for backup and displays the modal popup containing it
 function export() {
     if (styles)
-        css = JSON.stringify(styles);
+        json = JSON.stringify(styles);
     else
-        css = "";
+        json = "";
 
     var html = "<div class='popup-content'>Copy and paste the following into a text file: \
-    <textarea class='stylebot-css-code'>" + css + "</textarea> \
+    <textarea class='stylebot-css-code'></textarea> \
     </div> \
     <div id='stylebot-modal-buttons'> \
     <button onclick='copyToClipboard()'> Copy To Clipboard </button> \
     </div>";
 
-    initModal(html, {
-        closeOnEsc: true,
-        closeOnBgClick: true
-    });
-
-    cache.modal.options.onOpen = function() {
-        var textarea = cache.modal.box.find('textarea').get(0);
-        textarea.focus();
-        Utils.selectAllText(textarea);
-    };
-
-    setTimeout(function() {
-        resizeEditor(60);
-    }, 0);
+    initializeBackupModal(html, json);
 
     cache.modal.show();
 }
 
 // Copy text in the popup's textarea to clipboard.
 function copyToClipboard() {
-    chrome.extension.sendRequest({name: "copyToClipboard", text: cache.modal.box.find('textarea').attr('value')}, function(response){});
+    chrome.extension.sendRequest( { name: "copyToClipboard", text: cache.modal.box.find('textarea').attr('value') }, function(response){});
 }
 
 // Displays the modal popup for importing styles from JSON string
 function import() {
     var html = "<div class='popup-content'>Paste previously exported styles: \
     <div class='description'> \
-    <span class='note'>Note</span>: Existing styles for similar URLs will be overwritten.</div> \
-    <textarea class='stylebot-css-code'> \
-    </textarea> \
+    <span class='note'>Note</span>: Existing styles for similar URLs will be overwritten. \
+    </div> \
+    <textarea class='stylebot-css-code'></textarea>\
     </div> \
     <div id='stylebot-modal-buttons'> \
     <button onclick='importCSS();'>Import</button> \
     <button onclick='cache.modal.hide();'>Cancel</button> \
     </div>";
 
-    initModal(html, {
-        closeOnEsc: true,
-        closeOnBgClick: true
-    });
-
-    cache.modal.options.onOpen = function() {
-        cache.modal.box.find('textarea').get(0).focus();
-    };
-
-    setTimeout(function() {
-        resizeEditor(80);
-    }, 0);
-
+    initializeBackupModal(html);
+    
     cache.modal.show();
 }
 
@@ -667,28 +584,112 @@ function togglePageAction() {
 
 // Modal popup
 
-// Initialize a new popup
-function initModal(html, options) {
+// Initialize editor inside a modal popup
+//
+function initializeEditorModal(html, code) {
     if (!cache.modal)
     {
         cache.modal = new ModalBox(html, {
-            bgFadeSpeed: 0,
-            closeOnEsc: false,
-            closeOnBgClick: false
+            bgFadeSpeed: 0
         });
     }
-
-    if (options) {
-        cache.modal.options.closeOnEsc = options.closeOnEsc ? true : false;
-        cache.modal.options.closeOnBgClick = options.closeOnBgClick ? true : false;
-    }
-
+    
     else {
-        cache.modal.options.closeOnEsc = false;
-        cache.modal.options.closeOnBgClick = false;
+        cache.modal.box.html(html);
     }
+    
+    initializeEditor(code);
+    
+    cache.modal.options.closeOnEsc = false;
+    cache.modal.options.closeOnBgClick = false;
+    
+    cache.modal.options.onOpen = function()
+    {
+        setTimeout(function() {
+            cache.modal.editor.focus();
+            cache.modal.editor.gotoLine(cache.modal.editor.getSession().getLength(), 0);
+        }, 0);
+    }
+}
 
-    cache.modal.box.html(html);
+function initializeAddStyleEditorModal(html) {
+    
+    if (!cache.modal)
+    {
+        cache.modal = new ModalBox(html, {
+            bgFadeSpeed: 0
+        });
+    }
+    
+    else {
+        cache.modal.box.html(html);
+    }
+    
+    initializeEditor();
+
+    cache.modal.options.closeOnEsc = false;
+    cache.modal.options.closeOnBgClick = false;
+    
+    cache.modal.options.onOpen = function()
+    {
+        setTimeout(function() {
+            cache.modal.box.find('input')
+            
+            .focus()
+
+            .change(function() {
+                // user cannot explicity set the URL to *, as it is used for global stylesheet
+                // todo: notify user instead of bluntly clearing up the input field
+                //
+                if ($(this).val() === "*") { $(this).val(""); }
+            });
+            
+        }, 0);
+    }
+}
+
+function initializeEditor(code) {
+    
+    cache.modal.editor = ace.edit('editor');
+    var editor = cache.modal.editor;
+    var session = editor.getSession();
+    
+    editor.setTheme("ace/theme/dawn");
+
+    var Mode = require('ace/mode/css').Mode;
+    session.setMode(new Mode());
+    
+    resizeEditor();
+    
+    session.setUseWrapMode(true);
+    
+    if (code)
+        session.setValue(code);
+}
+
+function initializeBackupModal(html, code) {
+    if (!cache.modal)
+    {
+        cache.modal = new ModalBox(html, {
+            bgFadeSpeed: 0
+        });
+    }
+    
+    else {
+        cache.modal.box.html(html);
+    }
+    
+    resizeEditor(75);
+
+    cache.modal.options.closeOnEsc = true;
+    cache.modal.options.closeOnBgClick = true;
+
+    cache.modal.options.onOpen = function(){
+        var $textarea = cache.modal.box.find('textarea');
+        $textarea.attr('value', code);
+        $textarea.focus();
+        Utils.selectAllText($textarea.get(0));
+    }
 }
 
 // Attach listener to search field for filtering styles
@@ -698,7 +699,8 @@ function initFiltering() {
     })
 
     .keyup(function(e){
-        if(e.keyCode == 27){
+        if(e.keyCode == 27)
+        {
             $(this).val('')
             filterStyles("");
         }
@@ -748,5 +750,13 @@ function resizeEditor(bottomSpace) {
         bottomSpace = 60;
     }
 
-    $('.CodeMirror, textarea.stylebot-css-code').css('height', $("#stylebot-modal").height() - bottomSpace + "px !important");
+    $('#editor').height($("#stylebot-modal").height() - bottomSpace + "px");
+    $('#editor').width($("#stylebot-modal").width() + 10 + "px");
+    
+    $('.stylebot-css-code').height($("#stylebot-modal").height() - bottomSpace + "px");
+    $('.stylebot-css-code').width($("#stylebot-modal").width() - 7 + "px");
+    
+    setTimeout(function() {
+        cache.modal.editor.resize();
+    }, 0);
 }

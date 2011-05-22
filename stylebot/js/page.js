@@ -18,10 +18,9 @@ stylebot.page = {
         livePreview: false,
         originalCSS: null,
         editor: null,
-        error: null,
+        marker: null,
         css: null,
         // Reset CSS from http://meyerweb.com/eric/tools/css/reset/
-        //
         resetCSS: 'html, body, div, span, applet, object, iframe,\n\
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,\n\
 a, abbr, acronym, address, big, cite, code,\n\
@@ -74,7 +73,9 @@ table {\n\
 
     create: function(options) {
         var html = "<div>\
-        <div style='font-size: 12px !important; line-height: 14px !important;'>Edit the CSS for <b>" + stylebot.style.cache.url + "</b>:</div>\
+        <div id='stylebot-page-editor-header'>Edit the CSS for <b>" + stylebot.style.cache.url + "</b>:</div>\
+        </div>\
+        <div id='stylebot-page-editor'>\
         </div>\
         <div style='font-size: 11px !important; margin-bottom: 10px !important;'>\
         <label>\
@@ -96,23 +97,8 @@ table {\n\
 
         this.modal = new ModalBox(html, options, function(){});
 
-        var attachTo = stylebot.page.modal.box.find('div').get(0);
-
-        stylebot.page.cache.editor = CodeMirror(attachTo, {
-            mode: "css",
-            lineNumbers: true,
-            indentUnit: 4,
-            tabMode: "shift",
-            onKeyEvent: this.contentUpdated
-            /*
-            i'm not sure to update the css on keydown events only or updating for everything,
-            as for now, the css is updated on any keyboard event
-            function(i,e){
-                if(jQuery.Event(e).type == 'keydown');
-            }
-            */
-        });
-
+        this.initializeEditor();
+        
         var buttons = stylebot.page.modal.box.find('.stylebot-button');
 
         var $livePreviewCheckbox = $(buttons.get(0));
@@ -134,6 +120,25 @@ table {\n\
         $(buttons.get(2)).click(this.save);
         $(buttons.get(3)).click(this.cancel);
     },
+    
+    initializeEditor: function() {
+        var self = this;
+        
+        self.cache.editor = ace.edit('stylebot-page-editor');
+        
+        var session = self.cache.editor.getSession();
+        
+        var cssMode = require("ace/mode/css").Mode;
+        session.setMode(new cssMode());
+        session.on('change', self.contentChanged);
+        session.setUseWrapMode(true);
+        
+        self.cache.editor.setTheme("ace/theme/dawn");
+        
+        setTimeout(function() {
+            self.cache.editor.resize();
+        }, 0);
+    },
 
     show: function(content, prevTarget) {
         var self = this;
@@ -151,14 +156,19 @@ table {\n\
                 parent: $("#stylebot"),
 
                 onOpen: function() {
-                    self.modal.box.find('.CodeMirror').css('height', $("#stylebot").height() - stylebot.page.BOTTOM_PADDING + "px !important");
+                    stylebot.page.resize();
+                    
                     var editor = self.cache.editor;
-                    editor.setValue(self.cache.originalCSS);
+                    var session = editor.getSession();
+                    
+                    session.setValue(self.cache.originalCSS);
+
                     editor.focus();
-                    editor.setCursor(editor.lineCount(), 0);
+                    editor.gotoLine(session.getLength(), 0);
+                    
                     self.clearSyntaxError();
                     stylebot.style.saveState();
-                    self.cache.css = editor.getValue();
+                    self.cache.css = session.getValue();
                 },
 
                 onClose: function() {
@@ -178,8 +188,6 @@ table {\n\
                 height: $("#stylebot").height() - 30 + "px",
             });
         }
-
-        $('.CodeMirror').css('height', $("#stylebot").height() - stylebot.page.BOTTOM_PADDING + "px");
 
         self.cache.originalCSS = content;
 
@@ -210,24 +218,26 @@ table {\n\
 
         else {
             stylebot.page.cache.livePreview = true;
-            stylebot.page.contentUpdated();
+            stylebot.page.contentChanged();
         }
 
         stylebot.chrome.savePreference("stylebot_page_live_preview", true);
     },
 
-    contentUpdated: function() {
-        if (!stylebot.page.cache.livePreview)
+    contentChanged: function() {
+        var self = stylebot.page;
+        
+        if (!self.cache.livePreview)
             return;
 
-        if (stylebot.page.timer) {
-            clearTimeout(stylebot.page.timer);
-            stylebot.page.timer = null;
+        if (self.timer) {
+            clearTimeout(self.timer);
+            self.timer = null;
         }
 
-        stylebot.page.timer = setTimeout(function() {
+        self.timer = setTimeout(function() {
             try {
-                stylebot.page.saveCSS(stylebot.page.cache.editor.getValue(), false);
+                self.saveCSS(self.cache.editor.getSession().getValue(), false);
             }
             
             catch (e) {
@@ -238,14 +248,17 @@ table {\n\
 
     cancel: function(e) {
         stylebot.page.saveCSS(stylebot.page.cache.originalCSS, true);
-        stylebot.style.clearLastState();
         stylebot.page.modal.hide();
         stylebot.widget.open();
+        stylebot.style.clearLastState();
     },
 
     save: function(e) {
-        if (stylebot.page.saveCSS(stylebot.page.cache.editor.getValue(), true)) {
-            stylebot.page.modal.hide();
+        var self = stylebot.page;
+        
+        if (self.saveCSS(self.cache.editor.getSession().getValue(), true))
+        {
+            self.modal.hide();
             stylebot.widget.open();
         }
     },
@@ -282,19 +295,29 @@ table {\n\
             height: $("#stylebot").height() - 30 + "px",
         });
 
-        $('.CodeMirror').css('height', $("#stylebot").height() - stylebot.page.BOTTOM_PADDING + "px");
+        stylebot.page.resize();
     },
     
     displaySyntaxError: function(error, setCursor) {
-        this.cache.editor.setMarker(error.currentLine - 1, "<span class='stylebot-error-marker'>!</span> %N%");
-        this.cache.editor.errorLine = error.currentLine - 1;
+        if (!this.cache.marker) {
+            var Range = require('ace/range').Range;
+            var range = new Range(error.currentLine - 1, 0, error.currentLine, 0);
+            this.cache.marker = this.cache.editor.getSession().addMarker(range, "stylebot_warning", "line");
+        }
+        
         if (setCursor)
-            this.cache.editor.setCursor(error.currentLine - 1, 0);
+            this.cache.editor.gotoLine(error.currentLine - 1, 0);
     },
     
     clearSyntaxError: function() {
-        if (this.cache.editor.errorLine != undefined)
-            this.cache.editor.clearMarker(this.cache.editor.errorLine);
-        this.cache.editor.errorLine = 0;
+        if (!this.cache.marker)
+            return;
+        this.cache.editor.getSession().removeMarker(this.cache.marker);
+        this.cache.marker = null;
+    },
+    
+    resize: function() {
+        $("#stylebot-page-editor").css('height', $("#stylebot").height() - this.BOTTOM_PADDING + "px");
+        this.cache.editor.resize();
     }
 }

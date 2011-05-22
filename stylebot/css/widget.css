@@ -432,21 +432,54 @@ a.stylebot-accordion-active .stylebot-accordion-icon {
     margin: 0px !important;
 }
 
-#stylebot-advanced .stylebot-textarea {
-    height: 100;
-    width: 96% !important;
-    margin: 0 !important;
-    padding: 5px !important;
-    resize: none !important;
+#stylebot-advanced-header {
+    margin: 5px 10px !important;
 }
 
-div.stylebot-advanced-text {
-    margin: 6px 0 !important;
+#stylebot-advanced-editor {
+    position: relative !important;
+    margin: 5px 10px !important;
+    line-height: 20px !important;
+    width: 290px !important;
 }
 
 /* @end */
 
+/** Page Editor **/
+
 .stylebot-error-marker {
     color: hsl(349, 165%, 35%);
     position: absolute;
+}
+
+#stylebot-page-editor {
+    position: relative;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    width: 290px !important;
+}
+
+#stylebot-page-editor-header {
+    font-size: 12px !important;
+    line-height: 14px !important;
+    width: 300px !important;
+    text-overflow: ellipsis !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+}
+
+/** Ace editor **/
+
+/*.ace_scroller {
+    overflow-x: auto !important;
+}
+
+.ace_sb {
+    overflow-y: auto !important;
+}*/
+
+.ace_marker-layer .stylebot_warning {
+    position: absolute;
+    z-index: 4;
+    background: hsla(17, 80%, 60%, 0.50);
 }

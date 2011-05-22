@@ -202,7 +202,7 @@ li.option:first-of-type {
 #stylebot-modal .popup-content {
     font-family: 'Lucida Grande', 'Lucida Sans', 'Lucida Sans Unicode', Helvetica, Arial, sans-serif;
     font-size: 12px;
-    margin-left: 4px;
+    margin: 0;
 }
 
 #stylebot-modal .header-text {
@@ -233,9 +233,7 @@ li.option:first-of-type {
     line-height: 16px !important;
     padding: 0px !important;
     display: block;
-    width: 99% !important;
     margin: 5px 2px !important;
-    height: 88% !important;
     position: relative;
     -webkit-border-radius: 2px !important;
     border: 1px solid #ccc !important;
@@ -446,4 +444,26 @@ input[name=shortcutKeyCharacter] {
     text-transform: uppercase;
     text-align: center;
     width: 2em;
+}
+
+/** Ace Editor **/
+
+#editor {
+    position: relative;
+    margin: 0;
+    margin-bottom: 10px;
+}
+
+.ace_scroller {
+    overflow-x: auto !important;
+}
+
+.ace_sb {
+    overflow-y: auto !important;
+}
+
+.ace_marker-layer .warning {
+    position: absolute;
+    z-index: 4;
+    background: hsla(17, 80%, 60%, 0.50);
 }
