@@ -247,18 +247,19 @@ table {\n\
     contentChanged: function() {
         var self = stylebot.page;
         
+        self.cache.editor.updateScrollbars();
+        
         if (!self.cache.livePreview)
             return;
-
+        
         if (self.timer) {
             clearTimeout(self.timer);
             self.timer = null;
         }
-
+        
         self.timer = setTimeout(function() {
             try {
                 self.saveCSS(self.cache.editor.getSession().getValue(), false);
-                self.cache.editor.updateScrollbars();
             }
             
             catch (e) {
