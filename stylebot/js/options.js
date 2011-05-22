@@ -659,12 +659,14 @@ function initializeEditor(code) {
     var Mode = require('ace/mode/css').Mode;
     session.setMode(new Mode());
     
-    resizeEditor();
-    
     session.setUseWrapMode(true);
     
-    if (code)
-        session.setValue(code);
+    code = code === undefined ? "" : code;
+    session.setValue(code);
+    
+    setTimeout(function() {
+        resizeEditor();
+    }, 0);
 }
 
 function initializeBackupModal(html, code) {
@@ -760,7 +762,5 @@ function resizeEditor(bottomSpace) {
     $('#editor').height($("#stylebot-modal").height() - bottomSpace + "px");
     $('#editor').width($("#stylebot-modal").width() + "px");
     
-    setTimeout(function() {
-        cache.modal.editor.resize();
-    }, 0);
+    cache.modal.editor.resize();
 }

@@ -40,7 +40,7 @@ stylebot.widget.advanced = {
     initializeEditor: function() {
         var self = this;
         
-        self.cache.editor = ace.edit('stylebot-advanced-editor');
+        self.cache.editor = Utils.ace.monkeyPatch("#stylebot-advanced-editor", ace.edit('stylebot-advanced-editor'));
         var editor = self.cache.editor;
         var session = editor.getSession();
         
@@ -50,7 +50,7 @@ stylebot.widget.advanced = {
         session.on('focus', self.onFocus);
         session.on('blur', self.onBlur);
         session.setUseWrapMode(true);
-
+        editor.setReadOnly(true);
         editor.renderer.setShowGutter(false);
         editor.setTheme("ace/theme/dawn");
         

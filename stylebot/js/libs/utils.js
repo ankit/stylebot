@@ -213,7 +213,9 @@ var Utils = {
                     editor.resize();
                 }
             };
-            editor.getSession().on('change', function() {
+            
+            var session = editor.getSession();
+            session.on('change', function() {
                 if (editor.timer) {
                     clearTimeout(editor.timer);
                     editor.timer = null;
@@ -228,6 +230,10 @@ var Utils = {
                     }
                 }, 100);
             });
+            
+            // put a non empty value inside the editor, so even if we set the value to empty, it changes
+            session.setValue(Math.random().toString());
+            
             return editor;
         }
     }
