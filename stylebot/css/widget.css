@@ -2,6 +2,14 @@
 
 /* @group Box */
 
+#stylebot-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+}
+
 #stylebot {
     background-color: #fdfdfd !important;
     border: 1px solid #bbbbbb !important;

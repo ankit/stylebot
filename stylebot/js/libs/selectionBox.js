@@ -24,7 +24,7 @@ var SelectionBox = function(edgeSize, className) {
     this.edges.left = this.createEdge();
     
     for (var edge in this.edges)
-        this.edges[edge].appendTo(document.body);
+        this.edges[edge].appendTo($("#stylebot-container").get(0));
 }
 
 SelectionBox.prototype.createEdge = function() {
@@ -67,7 +67,7 @@ SelectionBox.prototype.highlight = function(el) {
     var height = box.height;
     var width = box.width;
     
-    var freeHorizontalSpace = scrollPosition.left + windowSize.width - left - width - 
+    var freeHorizontalSpace = scrollPosition.left + windowSize.width - left - width -
             (scrollSize.height > windowSize.height ? // is *vertical* scrollbar visible
              scrollbarSize : 0);
     
@@ -127,7 +127,7 @@ SelectionBox.prototype.getElementBox = function(el)
         result.height = Math.round(rect.bottom - rect.top);
         result.width = Math.round(rect.right - rect.left);
     }
-    else 
+    else
     {
         var position = this.getElementPosition(el);
         
@@ -180,7 +180,7 @@ SelectionBox.prototype.getWindowScrollSize = function() {
     var width = 0, height = 0, el;
 
     // first try the document.documentElement scroll size
-    if ((el = document.documentElement) && 
+    if ((el = document.documentElement) &&
        (el.scrollHeight || el.scrollWidth))
     {
         width = el.scrollWidth;
