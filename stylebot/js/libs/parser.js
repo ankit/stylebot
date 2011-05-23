@@ -406,25 +406,51 @@ var CssInspector = {
     }
     return { color: color, position: position }
   },
+  
+  // @ankit
+  // parse -webkit-gradient
+  // todo: we are not really parsing or checking the syntax of -webkit-gradient here
+  // instead we are simply storing the value entered by the user as a string
+  // things may not work properly if the user doesn't enter the right syntax
+  //
+  parseWebkitGradient: function (parser, token) {
+    var value = token.value;
+    var token = "";
 
+    while (true) {
+      token = parser.lookAhead(false, true);
+      if (token.value === ";" || !token.value) {
+        break;
+      }
+      else {
+        parser.getToken(false, true);
+      }
+      value += token.value;
+    }
+    
+    return value;
+  },
+  
   parseGradient: function (parser, token)
   {
     var isRadial = false;
     var gradient = { isRepeating: false };
     if (token.isNotNull()) {
+      
       if (token.isFunction("-moz-linear-gradient(") ||
           token.isFunction("-moz-radial-gradient(") ||
           token.isFunction("-moz-repeating-linear-gradient(") ||
           token.isFunction("-moz-repeating-radial-gradient(")) {
+        
         if (token.isFunction("-moz-radial-gradient(") ||
-            token.isFunction("-moz-repeating-radial-gradient(")) {
+          token.isFunction("-moz-repeating-radial-gradient(")) {
           gradient.isRadial = true;
         }
+        
         if (token.isFunction("-moz-repeating-linear-gradient(") ||
             token.isFunction("-moz-repeating-radial-gradient(")) {
           gradient.isRepeating = true;
         }
-
 
         token = parser.getToken(true, true);
         var haveGradientLine = false;
@@ -3274,7 +3300,13 @@ CSSParser.prototype = {
           else
             return "";
         }
-
+        
+        // @ankit support for -webkit-gradient
+        //
+        else if (!bgImage && token.isFunction('-webkit-gradient(')) {
+          bgImage = CssInspector.parseWebkitGradient(this, token);
+        }
+        
         else {
           var color = this.parseColor(token);
           if (!bgColor && color)
@@ -3399,6 +3431,12 @@ CSSParser.prototype = {
               bgImage = CssInspector.serializeGradient(gradient);
             else
               return "";
+          }
+          
+          // @ankit support for -webkit-gradient
+          //
+          else if (!bgImage && token.isFunction('-webkit-gradient(')) {
+            bgImage = CssInspector.parseWebkitGradient(this, token);
           }
 
           else {
