@@ -320,6 +320,5 @@ table {\n\
     resize: function() {
         $("#stylebot-page-editor").css('height', $("#stylebot").height() - this.BOTTOM_PADDING + "px");
         this.cache.editor.resize();
-        this.cache.editor.updateScrollbars();
     }
 }

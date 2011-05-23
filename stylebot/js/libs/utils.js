@@ -196,29 +196,15 @@ var Utils = {
     // functions for ace
     ace: {
         monkeyPatch: function(selector, editor) {
+            // ace's scrollbars
+            var verticalScrollbar = $(selector + " .ace_sb");
+            var horizontalScrollbar = $(selector + " .ace_scroller");
+            
             editor.hasScrollbar = {vertical: true, horizontal: true};
             
             editor.updateScrollbars = function() {
-                // save previous state to see if we need to update the ace ui
-                var prevState = {vertical: this.hasScrollbar.vertical, horizontal: this.hasScrollbar.horizontal};
-                
-                // ace's horizontal scrollbar
-                var horizontalScrollbar = $(selector + " .ace_scroller");
                 this.hasScrollbar.horizontal = horizontalScrollbar.innerHeight() > horizontalScrollbar.get(0).clientHeight;
-                
-                // ace's vertical scrollbar
-                var verticalScrollbar = $(selector + " .ace_sb");
                 this.hasScrollbar.vertical = verticalScrollbar.innerWidth() > verticalScrollbar.get(0).clientWidth;
-                
-                // if the scrollbar state has changed, update the css
-                if (prevState.vertical != this.hasScrollbar.vertical) {
-                    // hide it without affecting its actual width
-                    verticalScrollbar.css('right', this.hasScrollbar.vertical ? '0px' : '10000px');
-                    // resize the editor scroller panel
-                    $(selector + " .ace_scroller").css('width', this.hasScrollbar.vertical ? '-=15' : '+=15');
-                    // force the editor to resize, this is the only way to update the inner content width safely
-                    editor.resize();
-                }
             };
             
             // Update the scrollbars every time the content changes
@@ -233,7 +219,7 @@ var Utils = {
                 editor.timer = setTimeout(function() {
                     try {
                         // let's update it after the timeout in case we've pasted something
-                        editor.updateScrollbars();
+                        editor.resize();
                     }
                     catch (e) {
                         //
@@ -250,9 +236,19 @@ var Utils = {
             editor.setReadOnly = function(readOnly) {
                 $(selector + " .ace_cursor-layer").css("display", readOnly ? "none" : "");
                 $(selector + " .ace_marker-layer").css("display", readOnly ? "none": "");
-                _setReadOnly(readOnly);
+                _setReadOnly.call(editor, readOnly);
             }
             
+            var _resize = editor.resize;
+            
+            editor.resize = function() {
+                _resize.call(this);
+                this.updateScrollbars();
+                verticalScrollbar.css('right', this.hasScrollbar.vertical ? '0px' : '10000px');
+                verticalScrollbar.css('z-index', '1');
+                $(selector + " .ace_scroller").css('width', this.hasScrollbar.vertical ? '-=15' : '+=30');
+                this.$updateHighlightActiveLine();
+            }
             return editor;
         }
     }
