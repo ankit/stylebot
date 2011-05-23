@@ -221,7 +221,6 @@ li.option:first-of-type {
 
 #stylebot-modal-buttons {
     float: right;
-    margin-right: 4px;
 }
 
 #stylebot-modal button {
@@ -237,7 +236,8 @@ li.option:first-of-type {
     line-height: 16px !important;
     padding: 0px !important;
     display: block;
-    margin: 5px 2px !important;
+    margin: 0px !important;
+    margin-bottom: 10px !important;
     position: relative;
     -webkit-border-radius: 2px !important;
     border: 1px solid #ccc !important;

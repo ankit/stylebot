@@ -6,7 +6,7 @@
 
 stylebot.page = {
     
-    BOTTOM_PADDING: 110,
+    BOTTOM_PADDING: 112,
 
     isVisible: false,
 
@@ -77,7 +77,7 @@ table {\n\
         </div>\
         <div id='stylebot-page-editor'>\
         </div>\
-        <div style='font-size: 11px !important; margin-bottom: 10px !important;'>\
+        <div id='stylebot-page-live-preview'>\
         <label>\
         <input type='checkbox' title='This may cause performance issues' class='stylebot-button' />\
         Live Preview Changes\

@@ -313,7 +313,7 @@ stylebot.widget = {
         if (stylebot.options.mode === "Basic")
             self.basic.resize(newHeight);
         else
-            self.advanced.resize(newHeight - 30);
+            self.advanced.resize(newHeight);
     },
 
     //  Refresh widget UI based on the current mode of stylebot

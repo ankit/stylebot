@@ -441,7 +441,8 @@ a.stylebot-accordion-active .stylebot-accordion-icon {
 }
 
 #stylebot-advanced-header {
-    margin: 5px 10px !important;
+    line-height: 20px !important;
+    margin-left: 10px !important;
 }
 
 #stylebot-advanced-editor {
@@ -469,11 +470,20 @@ a.stylebot-accordion-active .stylebot-accordion-icon {
 
 #stylebot-page-editor-header {
     font-size: 12px !important;
-    line-height: 14px !important;
+    line-height: 20px !important;
     width: 300px !important;
     text-overflow: ellipsis !important;
     overflow: hidden !important;
     white-space: nowrap !important;
+}
+
+#stylebot-page-live-preview {
+    font-size: 11px !important;
+    margin-bottom: 10px !important;
+}
+
+#stylebot-page-live-preview input {
+    margin: 3px !important;
 }
 
 /** Ace editor **/

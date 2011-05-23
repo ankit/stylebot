@@ -5,6 +5,8 @@
   **/
 
 stylebot.widget.advanced = {
+    
+    BOTTOM_PADDING: 35,
 
     cache: {
         editor: null,
@@ -123,9 +125,12 @@ stylebot.widget.advanced = {
     },
     
     resize: function(height) {
-        $("#stylebot-advanced-editor").css('height', height);
+        var self = stylebot.widget.advanced;
+        
+        $("#stylebot-advanced-editor").css('height', height - self.BOTTOM_PADDING);
+        
         setTimeout(function() {
-            stylebot.widget.advanced.cache.editor.resize();
+            self.cache.editor.resize();
         }, 0);
     }
 }

@@ -776,7 +776,7 @@ function resizeEditor(bottomSpace) {
     }
     
     $('.stylebot-css-code').height($("#stylebot-modal").height() - bottomSpace + "px");
-    $('.stylebot-css-code').width($("#stylebot-modal").width() - 7 + "px");
+    $('.stylebot-css-code').width($("#stylebot-modal").width() + "px");
     
     if (!cache.modal.editor) return;
     
