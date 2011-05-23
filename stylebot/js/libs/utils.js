@@ -197,6 +197,7 @@ var Utils = {
     ace: {
         monkeyPatch: function(selector, editor) {
             editor.hasScrollbar = {vertical: true, horizontal: true};
+            
             editor.updateScrollbars = function() {
                 // save previous state to see if we need to update the ace ui
                 var prevState = {vertical: this.hasScrollbar.vertical, horizontal: this.hasScrollbar.horizontal};
@@ -222,11 +223,13 @@ var Utils = {
             
             // Update the scrollbars every time the content changes
             var session = editor.getSession();
+            
             session.on('change', function() {
                 if (editor.timer) {
                     clearTimeout(editor.timer);
                     editor.timer = null;
                 }
+                
                 editor.timer = setTimeout(function() {
                     try {
                         // let's update it after the timeout in case we've pasted something
@@ -241,12 +244,15 @@ var Utils = {
             // put a non empty value inside the editor, so even if we set the value to empty, it changes
             session.setValue(Math.random().toString());
             
-            // monkey-patch readOnly, to hide the cursor if set to on, and show it otherwise
+            // monkey-patch readOnly, to hide the cursor and line marker if set to true, else show them
             var _setReadOnly = editor.setReadOnly;
-            editor.setReadOnly = function(readOnly){
+            
+            editor.setReadOnly = function(readOnly) {
                 $(selector + " .ace_cursor-layer").css("display", readOnly ? "none" : "");
+                $(selector + " .ace_marker-layer").css("display", readOnly ? "none": "");
                 _setReadOnly(readOnly);
             }
+            
             return editor;
         }
     }
