@@ -22,7 +22,9 @@ var cache = {
                 _social: {
                     id: 4,
                     timestamp: 123456 (UNIX based)
-                }
+                },
+                
+                _enabled: true
             }
         }
     **/
@@ -61,12 +63,6 @@ function init() {
     }
 }
 
-// Open release notes. Only done in case of x.x releases
-//
-function openReleaseNotes() {
-    chrome.tabs.create({ url: "http://stylebot.me/releases", selected: true }, null);
-}
-
 // Update version string in localStorage
 //
 function updateVersion() {
@@ -81,7 +77,7 @@ function updateVersion() {
 
     if (localStorage.version != CURRENT_MAJOR_VERSION) {
         updateVersionString();
-        openReleaseNotes();
+        showUpdateNotification();
     }
 }
 
@@ -132,6 +128,22 @@ function upgradeTo1() {
 
     // update data in bookmark as well
     pushStyles();
+}
+
+// Open release notes
+//
+function openReleaseNotes() {
+    chrome.tabs.create({ url: "http://stylebot.me/releases", selected: true }, null);
+}
+
+// Show a notification popup to notify user of update
+//
+function showUpdateNotification() {
+    var notification = webkitNotifications.createHTMLNotification(
+      'notification.html'
+    );
+    
+    notification.show();
 }
 
 // Listen to requests from tabs and page action
