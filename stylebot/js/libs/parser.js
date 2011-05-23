@@ -2262,6 +2262,7 @@ CSSParser.prototype = {
     var blocks = [];
     var foundPriority = false;
     var values = [];
+    
     while (token.isNotNull()) {
 
       if ((token.isSymbol(";")
@@ -2285,15 +2286,19 @@ CSSParser.prototype = {
           break;
         }
       }
+      
       else if (token.isSymbol("{")
                  || token.isSymbol("(")
                  || token.isSymbol("[")) {
         blocks.push(token.value);
       }
+      
       else if (token.isSymbol("}")
                  || token.isSymbol("]")) {
+        
         if (blocks.length) {
           var ontop = blocks[blocks.length - 1];
+          
           if ((token.isSymbol("}") && ontop == "{")
               || (token.isSymbol(")") && ontop == "(")
               || (token.isSymbol("]") && ontop == "[")) {
@@ -2301,67 +2306,92 @@ CSSParser.prototype = {
           }
         }
       }
+      
       // XXX must find a better way to store individual values
       // probably a |values: []| field holding dimensions, percentages
       // functions, idents, numbers and symbols, in that order.
-      if (token.isFunction()) {
-        if (token.isFunction("var(")) {
+      if (token.isFunction())
+      {
+        if (token.isFunction("var("))
+        {
           token = this.getToken(true, true);
-          if (token.isIdent()) {
+          
+          if (token.isIdent())
+          {
             var name = token.value;
             token = this.getToken(true, true);
-            if (token.isSymbol(")")) {
+            
+            if (token.isSymbol(")"))
+            {
               var value = new jscsspVariable(kJscsspVARIABLE_VALUE, aSheet);
               valueText += "var(" + name + ")";
               value.name = name;
               values.push(value);
             }
+            
             else
               return "";
           }
           else
             return "";
         }
-        else {
+        
+        else
+        {
           var fn = token.value;
           token = this.getToken(false, true);
           var arg = this.parseFunctionArgument(token);
-          if (arg) {
+          
+          if (arg)
+          {
             valueText += fn + arg;
             var value = new jscsspVariable(kJscsspPRIMITIVE_VALUE, aSheet);
             value.value = fn + arg;
             values.push(value);
           }
+          
           else
             return "";
         }
       }
-      else if (token.isSymbol("#")) {
+      
+      else if (token.isSymbol("#"))
+      {
         var color = this.parseColor(token);
-        if (color) {
+        
+        if (color)
+        {
           valueText += color;
           var value = new jscsspVariable(kJscsspPRIMITIVE_VALUE, aSheet);
           value.value = color;
           values.push(value);
         }
+        
         else
           return "";
       }
-      else if (!token.isWhiteSpace() && !token.isSymbol(",")) {
+      
+      else if (!token.isWhiteSpace() && !token.isSymbol(","))
+      {
         var value = new jscsspVariable(kJscsspPRIMITIVE_VALUE, aSheet);
         value.value = token.value;
         values.push(value);
         valueText += token.value;
       }
+      
       else
         valueText += token.value;
+      
       token = this.getToken(false, true);
     }
-    if (values.length && valueText) {
+    
+    if (values.length && valueText)
+    {
       this.forgetState();
       aDecl.push(this._createJscsspDeclarationFromValuesArray(descriptor, values, valueText));
       return valueText;
     }
+    
     return "";
   },
 
@@ -2474,6 +2504,7 @@ CSSParser.prototype = {
               || token.isIdent("auto")) {
         values.push(token.value);
       }
+      
       else
         return "";
 
@@ -2484,11 +2515,15 @@ CSSParser.prototype = {
 
     var count = values.length;
     var decl = "";
+    
     if (count < 1 || count > 4) return "";
-    for(var i = 0;i < count;i++) {
+    
+    for(var i = 0; i < count; i++)
+    {
         decl += values[i];
         if(i < count - 1) decl += " ";
     }
+    
     aDecl.push(this._createJscsspDeclarationFromValue(aProperty, decl));
     return decl;
   },
@@ -4140,16 +4175,21 @@ CSSParser.prototype = {
   parseDeclaration: function(aToken, aDecl, aAcceptPriority, aExpandShorthands, aSheet) {
     this.preserveState();
     var blocks = [];
-    if (aToken.isIdent()) {
+    
+    if (aToken.isIdent())
+    {
       var descriptor = aToken.value.toLowerCase();
       var token = this.getToken(true, true);
-      if (token.isSymbol(":")) {
+      if (token.isSymbol(":"))
+      {
         var token = this.getToken(true, true);
 
         var value = "";
         var declarations = [];
+        
         if (aExpandShorthands)
-          switch (descriptor) {
+          switch (descriptor)
+          {
             case "background":
               // @rduenasf the next line was changed so we can avoid the declaration breakdown
               value = this.stylebot_parseBackgroundShorthand(token, declarations, aAcceptPriority);
@@ -4194,73 +4234,106 @@ CSSParser.prototype = {
           }
         else
           value = this.parseDefaultPropertyValue(token, declarations, aAcceptPriority, descriptor, aSheet);
+
         token = this.currentToken();
+
         if (value) // no error above
         {
           var priority = false;
-          if (token.isSymbol("!")) {
+          if (token.isSymbol("!"))
+          {
             token = this.getToken(true, true);
-            if (token.isIdent("important")) {
+            
+            if (token.isIdent("important"))
+            {
               priority = true;
               token = this.getToken(true, true);
-              if (token.isSymbol(";") || token.isSymbol("}")) {
+              
+              if (token.isSymbol(";") || token.isSymbol("}"))
+              {
                 if (token.isSymbol("}"))
                   this.ungetToken();
               }
+              
               else return "";
             }
+            
             else return "";
           }
+          
           else if  (token.isNotNull() && !token.isSymbol(";") && !token.isSymbol("}"))
             return "";
-          for (var i = 0; i < declarations.length; i++) {
+          
+          for (var i = 0; i < declarations.length; i++)
+          {
             declarations[i].priority = priority;
             aDecl.push(declarations[i]);
           }
+          
           return descriptor + ": " + value + ";";
         }
       }
     }
-    else if (aToken.isComment()) {
-      if (this.mPreserveComments) {
+    
+    else if (aToken.isComment())
+    {
+      if (this.mPreserveComments)
+      {
         this.forgetState();
         var comment = new jscsspComment();
         comment.parsedCssText = aToken.value;
         aDecl.push(comment);
       }
+      
       return aToken.value;
     }
 
     // we have an error here, let's skip it
     this.restoreState();
+    
     var s = aToken.value;
     blocks = [];
     var token = this.getToken(false, false);
-    while (token.isNotNull()) {
+    
+    while (token.isNotNull())
+    {
       s += token.value;
-      if ((token.isSymbol(";") || token.isSymbol("}")) && !blocks.length) {
+      
+      if ((token.isSymbol(";") || token.isSymbol("}")) && !blocks.length)
+      {
         if (token.isSymbol("}"))
           this.ungetToken();
         break;
-      } else if (token.isSymbol("{")
+      }
+      
+      else if (token.isSymbol("{")
                  || token.isSymbol("(")
                  || token.isSymbol("[")
-                 || token.isFunction()) {
+                 || token.isFunction())
+                 {
         blocks.push(token.isFunction() ? "(" : token.value);
-      } else if (token.isSymbol("}")
+      }
+      
+      else if (token.isSymbol("}")
                  || token.isSymbol(")")
-                 || token.isSymbol("]")) {
-        if (blocks.length) {
+                 || token.isSymbol("]"))
+                 {
+        if (blocks.length)
+        {
           var ontop = blocks[blocks.length - 1];
+          
           if ((token.isSymbol("}") && ontop == "{")
               || (token.isSymbol(")") && ontop == "(")
-              || (token.isSymbol("]") && ontop == "[")) {
+              || (token.isSymbol("]") && ontop == "["))
+          {
             blocks.pop();
           }
         }
       }
+      
       token = this.getToken(false, false);
     }
+    
     return "";
   },
 
@@ -4344,55 +4417,79 @@ CSSParser.prototype = {
   parseStyleRule: function(aToken, aOwner, aIsInsideMediaRule)
   {
     var currentLine = CountLF(this.mScanner.getAlreadyScanned());
+    
     this.preserveState();
+    
     // first let's see if we have a selector here...
     var selector = this.parseSelector(aToken, false);
     var valid = false;
     var declarations = [];
-    if (selector) {
+    
+    if (selector)
+    {
       selector = this.trim11(selector.selector);
+      
       var s = selector;
       var token = this.getToken(true, true);
-      if (token.isSymbol("{")) {
+      
+      if (token.isSymbol("{"))
+      {
         s += " { ";
+        
         var token = this.getToken(true, false);
-        while (true) {
-          if (!token.isNotNull()) {
+        
+        while (true)
+        {
+          if (!token.isNotNull())
+          {
             valid = true;
             break;
           }
-          if (token.isSymbol("}")) {
+          
+          if (token.isSymbol("}"))
+          {
             s += "}";
             valid = true;
             break;
-          } else {
+          }
+          
+          else {
             var d = this.parseDeclaration(token, declarations, true, true, aOwner);
             s += ((d && declarations.length) ? " " : "") + d;
           }
+          
           token = this.getToken(true, false);
         }
       }
     }
+    
     else {
       // selector is invalid so the whole rule is invalid with it
     }
 
-    if (valid) {
+    if (valid)
+    {
       var rule = new jscsspStyleRule();
+      
       rule.currentLine = currentLine;
       rule.parsedCssText = s;
       rule.declarations = declarations;
       rule.mSelectorText = selector;
+      
       if (aIsInsideMediaRule)
         rule.parentRule = aOwner;
       else
         rule.parentStyleSheet = aOwner;
+        
       aOwner.cssRules.push(rule);
+      
       return s;
     }
+    
     this.restoreState();
     s = this.currentToken().value;
     this.addUnknownAtRule(aOwner, s);
+    
     return "";
   },
 
@@ -4686,13 +4783,16 @@ CSSParser.prototype = {
     this.mPreserveComments = aTryToPreserveComments;
     this.mPreservedTokens = [];
     this.mScanner.init(aString);
+    
     var sheet = new jscsspStylesheet();
 
     // @charset can only appear at first char of the stylesheet
     var token = this.getToken(false, false);
     if (!token.isNotNull())
       return;
-    if (token.isAtRule("@charset")) {
+    
+    if (token.isAtRule("@charset"))
+    {
       this.parseCharsetRule(token, sheet);
       token = this.getToken(false, false);
     }
@@ -4700,9 +4800,12 @@ CSSParser.prototype = {
     var foundStyleRules = false;
     var foundImportRules = false;
     var foundNameSpaceRules = false;
-    while (true) {
+    
+    while (true)
+    {
       if (!token.isNotNull())
         break;
+      
       if (token.isWhiteSpace())
       {
         if (aTryToPreserveWhitespaces)
@@ -4715,16 +4818,21 @@ CSSParser.prototype = {
           this.addComment(sheet, token.value);
       }
 
-      else if (token.isAtRule()) {
-        if (token.isAtRule("@variables")) {
+      else if (token.isAtRule())
+      {
+        if (token.isAtRule("@variables"))
+        {
           if (!foundImportRules && !foundStyleRules)
             this.parseVariablesRule(token, sheet);
-          else {
+          else
+          {
             this.reportError(kVARIABLES_RULE_POSITION);
             this.addUnknownAtRule(sheet, token.value);
           }
         }
-        else if (token.isAtRule("@import")) {
+        
+        else if (token.isAtRule("@import"))
+        {
           // @import rules MUST occur before all style and namespace
           // rules
           if (!foundStyleRules && !foundNameSpaceRules)
@@ -4734,7 +4842,9 @@ CSSParser.prototype = {
             this.addUnknownAtRule(sheet, token.value);
           }
         }
-        else if (token.isAtRule("@namespace")) {
+        
+        else if (token.isAtRule("@namespace"))
+        {
           // @namespace rules MUST occur before all style rule and
           // after all @import rules
           if (!foundStyleRules)
@@ -4744,29 +4854,39 @@ CSSParser.prototype = {
             this.addUnknownAtRule(sheet, token.value);
           }
         }
-        else if (token.isAtRule("@font-face")) {
+        
+        else if (token.isAtRule("@font-face"))
+        {
           if (this.parseFontFaceRule(token, sheet))
             foundStyleRules = true;
           else
             this.addUnknownAtRule(sheet, token.value);
         }
-        else if (token.isAtRule("@page")) {
+        
+        else if (token.isAtRule("@page"))
+        {
           if (this.parsePageRule(token, sheet))
             foundStyleRules = true;
           else
             this.addUnknownAtRule(sheet, token.value);
         }
-        else if (token.isAtRule("@media")) {
+        
+        else if (token.isAtRule("@media"))
+        {
           if (this.parseMediaRule(token, sheet))
             foundStyleRules = true;
           else
             this.addUnknownAtRule(sheet, token.value);
         }
-        else if (token.isAtRule("@charset")) {
+        
+        else if (token.isAtRule("@charset"))
+        {
           this.reportError(kCHARSET_RULE_CHARSET_SOF);
           this.addUnknownAtRule(sheet, token.value);
         }
-        else {
+        
+        else
+        {
           this.reportError(kUNKNOWN_AT_RULE);
           this.addUnknownAtRule(sheet, token.value);
         }
@@ -4775,15 +4895,16 @@ CSSParser.prototype = {
       else // plain style rules
       {
         var ruleText = this.parseStyleRule(token, sheet, false);
+        
         if (ruleText)
           foundStyleRules = true;
       }
+      
       token = this.getToken(false);
     }
 
     return sheet;
   }
-
 };
 
 
