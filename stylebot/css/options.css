@@ -136,6 +136,10 @@ li.option:first-of-type {
     margin-bottom: 20px;
 }
 
+#custom-styles input[type=checkbox] {
+    margin: 0 6px 4px 0;
+}
+
 #custom-styles input {
     text-align: left;
 }

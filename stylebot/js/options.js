@@ -176,6 +176,16 @@ function createCustomStyleOption(url) {
         class: 'custom-style'
     });
 
+    $('<input>', {
+        type: 'checkbox',
+        class: 'inline-button',
+        title: 'Enable or disable this style'
+    })
+    .prop('checked', styles[url]['_enabled'])
+    .tipsy({delayIn: 100, gravity:'sw'})
+    .click(toggleStyle)
+    .appendTo(container);
+
     var url_div = $('<div>', {
         html: url,
         class: 'custom-style-url',
@@ -297,6 +307,13 @@ function addStyle() {
     cache.modal.show();
 }
 
+function toggleStyle(e) {
+    var parent = $(e.target).parents('.custom-style');
+    var url = parent.find('.custom-style-url').html();
+    styles[url]['_enabled'] = !styles[url]['_enabled'];
+}
+
+
 // Called when Share button is clicked for a style
 function shareStyle(e) {
     var parent = $(e.target).parents('.custom-style');
@@ -395,6 +412,7 @@ function saveStyle(url, css, add) {
             styles[url] = {};
             styles[url]['_rules'] = rules;
             styles[url]['_social'] = {};
+            styles[url]['_enabled'] = true;
 
             bg_window.saveStyles(styles);
             bg_window.pushStyles();

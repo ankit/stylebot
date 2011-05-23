@@ -413,6 +413,7 @@ function saveOption(name, value) {
 function doesStyleExist(aURL) {
     for (var url in cache.styles)
     {
+        if (!cache.styles[url]['_enabled']) continue;
         if (aURL.trim().indexOf(url) != -1) {
             return true;
         }
@@ -454,6 +455,8 @@ function getRulesForPage(currUrl) {
 
     for (var url in cache.styles)
     {
+        if (!cache.styles[url]['_enabled']) continue;
+        
         var subUrls = url.split(',');
         var len = subUrls.length;
         var isFound = false;
