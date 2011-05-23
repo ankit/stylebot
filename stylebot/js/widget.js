@@ -26,6 +26,10 @@ stylebot.widget = {
         this.cache.box = $('<div>', {
             id: 'stylebot'
         });
+        
+        var boxContainer = $('<div>', {
+            id: 'stylebot-container'
+        }).appendTo(document.body);
 
         //  Header
 
@@ -183,7 +187,7 @@ stylebot.widget = {
         btContainer.appendTo(optionsContainer);
         optionsContainer.appendTo(this.cache.box);
 
-        this.cache.box.appendTo(document.body);
+        this.cache.box.appendTo(boxContainer);
         this.basic.fillCache();
 
         //  Reload previous accordion state

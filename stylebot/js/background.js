@@ -90,6 +90,15 @@ function updateVersionString() {
     localStorage.version = CURRENT_MAJOR_VERSION;
 }
 
+// Upgrade to version 1.4
+function upgradeTo1_4() {
+    for (var url in cache.styles) {
+        if (cache.styles[url]['_enabled'] === undefined) {
+            cache.styles[url]['_enabled'] = true;
+        }
+    }
+}
+
 // Upgrade to version 1
 // Mostly legacy code now, since almost everyone should already be updated to 1.0
 //
