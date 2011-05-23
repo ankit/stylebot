@@ -246,7 +246,7 @@ var Utils = {
                 this.updateScrollbars();
                 verticalScrollbar.css('right', this.hasScrollbar.vertical ? '0px' : '10000px');
                 verticalScrollbar.css('z-index', '1');
-                $(selector + " .ace_scroller").css('width', this.hasScrollbar.vertical ? '-=15' : '+=30');
+                $(selector + " .ace_scroller").css('width', (this.hasScrollbar.vertical ? '-=' : '+=') + 2*this.renderer.scrollBar.getWidth() + 'px');
                 this.$updateHighlightActiveLine();
             }
             return editor;
