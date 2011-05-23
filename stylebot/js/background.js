@@ -114,6 +114,7 @@ function upgradeTo1() {
 
         var rules = cache.styles[url];
         cache.styles[url] = {};
+        cache.styles[url]['_enabled'] = true;
         cache.styles[url]['_rules'] = rules;
     }
 
@@ -286,6 +287,7 @@ function save(url, rules, data) {
     if (rules) {
         cache.styles[url] = {};
         cache.styles[url]['_rules'] = rules;
+        cache.styles[url]['_enabled'] = true;
     }
 
     else

@@ -181,9 +181,9 @@ function createCustomStyleOption(url) {
         class: 'inline-button',
         title: 'Enable or disable this style'
     })
-    .prop('checked', styles[url]['_enabled'])
+    .prop('checked', styles[url]['_enabled'] ? true : false)
     .tipsy({delayIn: 100, gravity:'sw'})
-    .click(toggleStyle)
+    .click(changeStyleStatus)
     .appendTo(container);
 
     var url_div = $('<div>', {
@@ -307,12 +307,15 @@ function addStyle() {
     cache.modal.show();
 }
 
-function toggleStyle(e) {
+function changeStyleStatus(e) {
     var parent = $(e.target).parents('.custom-style');
     var url = parent.find('.custom-style-url').html();
-    styles[url]['_enabled'] = !styles[url]['_enabled'];
+    if (styles[url]['_enabled']) {
+        styles[url]['_enabled'] = false;
+    } else {
+        styles[url]['_enabled'] = true;
+    }
 }
-
 
 // Called when Share button is clicked for a style
 function shareStyle(e) {
