@@ -7,7 +7,8 @@ $(document).ready(function() {
 var bg_window = null;
 
 var cache = {
-    modal: null
+    modal: null,
+    errorMarker: null
 }
 
 // options with their default values
@@ -401,14 +402,13 @@ function saveStyle(url, css, add) {
     if (sheet) {
         try {
             var rules = CSSUtils.getRulesFromParserObject(sheet);
-
             // syntax error!
             //
             if (rules['error'])
             {
                 // todo: notify user of syntax error and highlight the error causing line
                 //
-                displaySyntaxError(css, rules['error']);
+                displaySyntaxError(rules['error']);
                 return false;
             }
 
@@ -451,12 +451,33 @@ function displayErrorMessage(msg) {
     $error.text(msg);
 }
 
-function displaySyntaxError(css, error) {
-    // cache.modal.editor.setMarker(error.currentLine - 1, "<span class='error-marker'>!</span> %N%");
-    // cache.modal.editor.setCursor(error.currentLine - 1, 0);
-    // cache.modal.editor.errorLine = error.currentLine - 1;
+function displaySyntaxError(error) {
+    var editor = cache.modal.editor;
+    var session = editor.getSession();
+    
+    var Range = require('ace/range').Range;
+    var range = new Range(error.currentLine - 1, 0, error.currentLine, 0);
+    cache.errorMarker = session.addMarker(range, "warning", "line");
+    
+    editor.gotoLine(error.currentLine, 0);
+    editor.focus();
+    
+    session.on('change', clearSyntaxError);
+    
+    displayErrorMessage('Syntax Error at Line ' + error.currentLine);
+}
 
-    // displayErrorMessage('Syntax Error at Line ' + error.currentLine);
+function clearSyntaxError() {
+    if (!cache.errorMarker)
+        return;
+    
+    var editor = cache.modal.editor;
+    var session = editor.getSession();
+    
+    session.removeMarker(cache.errorMarker);
+    cache.errorMarker = null;
+    
+    session.removeEventListener('change', clearSyntaxError);
 }
 
 // Callback for edit in place for URLs
