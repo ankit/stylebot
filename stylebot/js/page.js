@@ -306,8 +306,10 @@ table {\n\
             this.cache.marker = this.cache.editor.getSession().addMarker(range, "stylebot_warning", "line");
         }
         
-        if (setCursor)
-            this.cache.editor.gotoLine(error.currentLine - 1, 0);
+        if (setCursor) {
+            this.cache.editor.focus();
+            this.cache.editor.gotoLine(error.currentLine, 0);
+        }
     },
     
     clearSyntaxError: function() {
