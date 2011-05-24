@@ -495,6 +495,7 @@ a.stylebot-accordion-active .stylebot-accordion-icon {
 
 .ace_sb {
     overflow-y: auto !important;
+    z-index: 5;
 }
 
 .ace_marker-layer .stylebot_warning {

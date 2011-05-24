@@ -42,7 +42,7 @@ stylebot.widget.advanced = {
     initializeEditor: function() {
         var self = this;
         
-        self.cache.editor = Utils.ace.monkeyPatch("#stylebot-advanced-editor", ace.edit('stylebot-advanced-editor'));
+        self.cache.editor = Utils.ace.monkeyPatch(ace.edit('stylebot-advanced-editor'));
         var editor = self.cache.editor;
         var session = editor.getSession();
         
@@ -52,7 +52,7 @@ stylebot.widget.advanced = {
         session.on('focus', self.onFocus);
         session.on('blur', self.onBlur);
         session.setUseWrapMode(true);
-        editor.setReadOnly(true);
+        editor.setDisabled(true);
         editor.renderer.setShowGutter(false);
         editor.setTheme("ace/theme/dawn");
         
@@ -111,17 +111,17 @@ stylebot.widget.advanced = {
     enable: function() {
         if (this.cache.editor === null)
             return;
-        this.cache.editor.setReadOnly(false);
+        this.cache.editor.setDisabled(false);
     },
     
     disable: function() {
         if (this.cache.editor === null)
             return;
-        this.cache.editor.setReadOnly(true);
+        this.cache.editor.setDisabled(true);
     },
     
     isDisabled: function() {
-        return this.cache.editor.getReadOnly();
+        return this.cache.editor.getDisabled();
     },
     
     resize: function(height) {

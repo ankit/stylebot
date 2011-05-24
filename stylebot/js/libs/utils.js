@@ -195,81 +195,51 @@ var Utils = {
     
     // functions for ace
     ace: {
-        monkeyPatch: function(selector, editor) {
-            // ace's scrollbars
-            var verticalScrollbar = $(selector + " .ace_sb");
-            var horizontalScrollbar = $(selector + " .ace_scroller");
+        monkeyPatch: function(editor) {
+            // monkey-patch the editor to add the disable function, sets it to readOnly, hides the cursor and line marker
+            editor.disabledProp = false;
+            editor.setDisabled = function(readOnly) {
+                this.renderer.$cursorLayer.element.style.display = readOnly ? 'none' : '';
+                this.renderer.$markerBack.element.style.display = readOnly ? 'none' : '';
+                this.renderer.$markerFront.element.style.display = readOnly ? 'none' : '';
+                this.setReadOnly(readOnly);
+                this.disabledProp = readOnly;
+            }
             
-            editor.hasScrollbar = { vertical: true, horizontal: true };
-            
-            editor.updateScrollbarState = function() {
-                this.hasScrollbar.horizontal = horizontalScrollbar.innerHeight() > horizontalScrollbar.get(0).clientHeight;
-                
-                this.hasScrollbar.vertical = verticalScrollbar.innerWidth() > verticalScrollbar.get(0).clientWidth;
+            editor.getDisabled = function() {
+                return this.disabledProp;
+            }
+                              
+            // monkey-patch the editor the correctly display the vertical scrollbar
+            editor.previousScrollbarWidth = 0;
+            var scrollbarWidth = editor.renderer.scrollBar.getWidth();
+            editor.renderer.scrollBar.getWidth = function() {
+                return this.width > this.element.clientWidth ? scrollbarWidth : 0;
             };
             
-            // Update the scrollbars every time the content changes
-            var session = editor.getSession();
-            
-            session.on('change', function() {
-                if (editor.timer) {
-                    clearTimeout(editor.timer);
-                    editor.timer = null;
-                }
-                
-                editor.timer = setTimeout(function() {
-                    try {
-                        // let's update it after the timeout in case we've pasted something
-                        editor.resize();
-                    }
-                    
-                    catch (e) {
-                        //
+            /* as for now, due to ace's limitations this is the only safe way to
+               update the markers and the wrap limit. At least, let's make sure we
+               update the editor's width only, and only if it's necessary
+             */
+            editor.getSession().on('change', function() {
+                setTimeout( function() {
+                    editor.$updateHighlightActiveLine();
+                    if (editor.renderer.scrollBar.getWidth() != editor.previousScrollbarWidth) {
+                        editor.previousScrollbarWidth = editor.renderer.scrollBar.getWidth();
+                        if (editor.previousScrollbarWidth == scrollbarWidth) {
+                            editor.renderer.scroller.style.width = Math.max(0, editor.renderer.scroller.clientWidth - scrollbarWidth) + "px";
+                        } else {
+                            editor.renderer.scroller.style.width = Math.max(0, editor.renderer.scroller.clientWidth + scrollbarWidth) + "px";
+                        }
+                        if (editor.renderer.session.getUseWrapMode()) {
+                            var availableWidth = editor.renderer.scroller.clientWidth - editor.renderer.$padding * 2;
+                            editor.renderer.session.adjustWrapLimit(Math.floor(availableWidth / editor.renderer.characterWidth) - 1);
+                        }
+                        editor.renderer.$size.scrollerWidth = editor.renderer.scroller.clientWidth;
+                        editor.renderer.$loop.schedule(editor.renderer.CHANGE_FULL);
                     }
                 }, 100);
             });
-            
-            // put a non empty value inside the editor, so even if we set the value to empty, it changes
-            session.setValue(Math.random().toString());
-            
-            // monkey-patch readOnly, to hide the cursor and line marker if set to true, else show them
-            var _setReadOnly = editor.setReadOnly;
-            
-            editor.setReadOnly = function(readOnly) {
-                $(selector + " .ace_cursor-layer").css("display", readOnly ? "none" : "");
-                $(selector + " .ace_marker-layer").css("display", readOnly ? "none": "");
-                _setReadOnly.call(editor, readOnly);
-            }
-            
-            var _resize = editor.resize;
-            
-            editor.resize = function() {
-                
-                _resize.call(this);
-
-                var prevState = { vertical: this.hasScrollbar.vertical, horizontal: this.hasScrollbar.horizontal };
-                this.updateScrollbarState();
-
-                if (prevState.vertical != this.hasScrollbar.vertical)
-                {
-                    verticalScrollbar.css('right', this.hasScrollbar.vertical ? '0px' : '10000px');
-                    verticalScrollbar.css('z-index', '1');
-                    
-                    var width = (this.hasScrollbar.vertical ? '-=' : '+=') + this.renderer.scrollBar.getWidth() + 'px';
-                    $(selector + " .ace_scroller").css('width', width);
-                    
-                    // todo: avoid another call to resize editor if possible
-                    // we need this so that the active line marker width is set properly
-                    //
-                    _resize.call(this);
-                }
-                
-                // the reason to keep this out of the conditional is
-                // to make the line marker appear even when user backspaces to previous line
-                // until this issue is resolved in Ace: https://github.com/ajaxorg/ace/issues/263
-                //
-                this.$updateHighlightActiveLine();
-            }
             
             return editor;
         }

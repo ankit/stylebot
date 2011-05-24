@@ -691,7 +691,7 @@ function initializeAddStyleEditorModal(html) {
 }
 
 function initializeEditor(code) {
-    cache.modal.editor = Utils.ace.monkeyPatch("#editor", ace.edit('editor'));
+    cache.modal.editor = Utils.ace.monkeyPatch(ace.edit('editor'));
     
     var editor = cache.modal.editor;
     var session = editor.getSession();

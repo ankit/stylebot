@@ -125,7 +125,7 @@ table {\n\
         var self = this;
         
         // ace monkey-patch to allow automatic resizing based on scrollbars
-        self.cache.editor = Utils.ace.monkeyPatch("#stylebot-page-editor", ace.edit('stylebot-page-editor'));
+        self.cache.editor = Utils.ace.monkeyPatch(ace.edit('stylebot-page-editor'));
         
         var session = self.cache.editor.getSession();
         
