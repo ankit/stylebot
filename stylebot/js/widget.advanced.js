@@ -55,6 +55,19 @@ stylebot.widget.advanced = {
         editor.setDisabled(true);
         editor.renderer.setShowGutter(false);
         editor.setTheme("ace/theme/dawn");
+        var canon = require('pilot/canon');
+        
+        canon.addCommand({
+            name: 'escToQuit',
+            bindKey: {
+                win: 'Esc',
+                mac: 'Esc',
+                sender: 'editor'
+            },
+            exec: function(env, args, req) {
+                editor.blur();
+            }
+        });
         
         setTimeout(function() {
             self.resize(300);
