@@ -359,7 +359,7 @@ function shareStyle(e) {
 //
 function onSave(url) {
     var css = cache.modal.editor.getSession().getValue();
-    
+
     if (saveStyle(url, css)) {
         cache.modal.hide();
     }
