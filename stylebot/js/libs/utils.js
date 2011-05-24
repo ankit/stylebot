@@ -223,7 +223,6 @@ var Utils = {
              */
             editor.getSession().on('change', function() {
                 setTimeout( function() {
-                    editor.$updateHighlightActiveLine();
                     if (editor.renderer.scrollBar.getWidth() != editor.previousScrollbarWidth) {
                         editor.previousScrollbarWidth = editor.renderer.scrollBar.getWidth();
                         if (editor.previousScrollbarWidth == scrollbarWidth) {
