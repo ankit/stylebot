@@ -200,10 +200,11 @@ var Utils = {
             var verticalScrollbar = $(selector + " .ace_sb");
             var horizontalScrollbar = $(selector + " .ace_scroller");
             
-            editor.hasScrollbar = {vertical: true, horizontal: true};
+            editor.hasScrollbar = { vertical: true, horizontal: true };
             
-            editor.updateScrollbars = function() {
+            editor.updateScrollbarState = function() {
                 this.hasScrollbar.horizontal = horizontalScrollbar.innerHeight() > horizontalScrollbar.get(0).clientHeight;
+                
                 this.hasScrollbar.vertical = verticalScrollbar.innerWidth() > verticalScrollbar.get(0).clientWidth;
             };
             
@@ -221,6 +222,7 @@ var Utils = {
                         // let's update it after the timeout in case we've pasted something
                         editor.resize();
                     }
+                    
                     catch (e) {
                         //
                     }
@@ -242,13 +244,33 @@ var Utils = {
             var _resize = editor.resize;
             
             editor.resize = function() {
+                
                 _resize.call(this);
-                this.updateScrollbars();
-                verticalScrollbar.css('right', this.hasScrollbar.vertical ? '0px' : '10000px');
-                verticalScrollbar.css('z-index', '1');
-                $(selector + " .ace_scroller").css('width', (this.hasScrollbar.vertical ? '-=' : '+=') + 2*this.renderer.scrollBar.getWidth() + 'px');
+
+                var prevState = { vertical: this.hasScrollbar.vertical, horizontal: this.hasScrollbar.horizontal };
+                this.updateScrollbarState();
+
+                if (prevState.vertical != this.hasScrollbar.vertical)
+                {
+                    verticalScrollbar.css('right', this.hasScrollbar.vertical ? '0px' : '10000px');
+                    verticalScrollbar.css('z-index', '1');
+                    
+                    var width = (this.hasScrollbar.vertical ? '-=' : '+=') + this.renderer.scrollBar.getWidth() + 'px';
+                    $(selector + " .ace_scroller").css('width', width);
+                    
+                    // todo: avoid another call to resize editor if possible
+                    // we need this so that the active line marker width is set properly
+                    //
+                    _resize.call(this);
+                }
+                
+                // the reason to keep this out of the conditional is
+                // to make the line marker appear even when user backspaces to previous line
+                // until this issue is resolved in Ace: https://github.com/ajaxorg/ace/issues/263
+                //
                 this.$updateHighlightActiveLine();
             }
+            
             return editor;
         }
     }
