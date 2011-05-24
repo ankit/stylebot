@@ -1499,6 +1499,7 @@ function CSSParser(aString)
 
   this.mPreserveWS = true;
   this.mPreserveComments = true;
+  this.mPreventExpansion = true;
 
   this.mPreservedTokens = [];
 
@@ -2420,98 +2421,53 @@ CSSParser.prototype = {
       token = this.getToken(true, true);
     }
 
-    var count = values.length;
-    switch (count) {
-      case 1:
-        top = values[0];
-        bottom = top;
-        left = top;
-        right = top;
-        break;
-      case 2:
-        top = values[0];
-        bottom = top;
-        left = values[1];
-        right = left;
-        break;
-      case 3:
-        top = values[0];
-        left = values[1];
-        right = left;
-        bottom = values[2];
-        break;
-      case 4:
-        top = values[0];
-        right = values[1];
-        bottom = values[2];
-        left = values[3];
-        break;
-      default:
-        return "";
-    }
     this.forgetState();
-    aDecl.push(this._createJscsspDeclarationFromValue(aProperty + "-top", top));
-    aDecl.push(this._createJscsspDeclarationFromValue(aProperty + "-right", right));
-    aDecl.push(this._createJscsspDeclarationFromValue(aProperty + "-bottom", bottom));
-    aDecl.push(this._createJscsspDeclarationFromValue(aProperty + "-left", left));
-   return top + " " + right + " " + bottom + " " + left;
-  },
-
-  stylebot_parseMarginOrPaddingShorthand: function(token, aDecl, aAcceptPriority, aProperty)
-  {
-    var top = null;
-    var bottom = null;
-    var left = null;
-    var right = null;
-
-    var values = [];
-    while (true) {
-
-      if (!token.isNotNull())
-        break;
-
-      if (token.isSymbol(";")
-          || (aAcceptPriority && token.isSymbol("!"))
-          || token.isSymbol("}")) {
-        if (token.isSymbol("}"))
-          this.ungetToken();
-        break;
-      }
-
-      else if (!values.length && token.isIdent(this.kINHERIT)) {
-        values.push(token.value);
-        token = this.getToken(true, true);
-        break;
-      }
-
-      else if (token.isDimension()
-              || token.isNumber("0")
-              || token.isPercentage()
-              || token.isIdent("auto")) {
-        values.push(token.value);
-      }
-      
-      else
-        return "";
-
-      token = this.getToken(true, true);
-    }
-
-    this.forgetState();
-
     var count = values.length;
-    var decl = "";
-    
-    if (count < 1 || count > 4) return "";
-    
-    for(var i = 0; i < count; i++)
-    {
-        decl += values[i];
-        if(i < count - 1) decl += " ";
+    if (this.mPreventExpansion) {
+      var decl = "";
+      if (count < 1 || count > 4) return "";
+      for(var i = 0; i < count; i++) {
+          decl += values[i];
+          if(i < count - 1) decl += " ";
+      }
+      aDecl.push(this._createJscsspDeclarationFromValue(aProperty, decl));
+      return decl;
     }
-    
-    aDecl.push(this._createJscsspDeclarationFromValue(aProperty, decl));
-    return decl;
+    else {
+      switch (count) {
+        case 1:
+          top = values[0];
+          bottom = top;
+          left = top;
+          right = top;
+          break;
+        case 2:
+          top = values[0];
+          bottom = top;
+          left = values[1];
+          right = left;
+          break;
+        case 3:
+          top = values[0];
+          left = values[1];
+          right = left;
+          bottom = values[2];
+          break;
+        case 4:
+          top = values[0];
+          right = values[1];
+          bottom = values[2];
+          left = values[3];
+          break;
+        default:
+          return "";
+      }
+      aDecl.push(this._createJscsspDeclarationFromValue(aProperty + "-top", top));
+      aDecl.push(this._createJscsspDeclarationFromValue(aProperty + "-right", right));
+      aDecl.push(this._createJscsspDeclarationFromValue(aProperty + "-bottom", bottom));
+      aDecl.push(this._createJscsspDeclarationFromValue(aProperty + "-left", left));
+      return top + " " + right + " " + bottom + " " + left;
+    }
   },
 
   parseBorderColorShorthand: function(token, aDecl, aAcceptPriority)
@@ -2553,91 +2509,52 @@ CSSParser.prototype = {
     }
 
     var count = values.length;
-    switch (count) {
-      case 1:
-        top = values[0];
-        bottom = top;
-        left = top;
-        right = top;
-        break;
-      case 2:
-        top = values[0];
-        bottom = top;
-        left = values[1];
-        right = left;
-        break;
-      case 3:
-        top = values[0];
-        left = values[1];
-        right = left;
-        bottom = values[2];
-        break;
-      case 4:
-        top = values[0];
-        right = values[1];
-        bottom = values[2];
-        left = values[3];
-        break;
-      default:
-        return "";
-    }
     this.forgetState();
-    aDecl.push(this._createJscsspDeclarationFromValue("border-top-color", top));
-    aDecl.push(this._createJscsspDeclarationFromValue("border-right-color", right));
-    aDecl.push(this._createJscsspDeclarationFromValue("border-bottom-color", bottom));
-    aDecl.push(this._createJscsspDeclarationFromValue("border-left-color", left));
-    return top + " " + right + " " + bottom + " " + left;
-  },
 
-  stylebot_parseBorderColorShorthand: function(token, aDecl, aAcceptPriority)
-  {
-    var top = null;
-    var bottom = null;
-    var left = null;
-    var right = null;
-
-    var values = [];
-    while (true) {
-
-      if (!token.isNotNull())
-        break;
-
-      if (token.isSymbol(";")
-          || (aAcceptPriority && token.isSymbol("!"))
-          || token.isSymbol("}")) {
-        if (token.isSymbol("}"))
-          this.ungetToken();
-        break;
+    if (this.mPreventExpansion) {
+      var decl = "";
+      if (count < 1 || count > 4) return "";
+      for(var i = 0;i < count;i++) {
+          decl += values[i];
+          if(i < count - 1) decl += " ";
       }
-
-      else if (!values.length && token.isIdent(this.kINHERIT)) {
-        values.push(token.value);
-        token = this.getToken(true, true);
-        break;
-      }
-
-      else {
-        var color = this.parseColor(token);
-        if (color)
-          values.push(color);
-        else
+      aDecl.push(this._createJscsspDeclarationFromValue("border-color", decl));
+      return decl;
+    } else {
+      switch (count) {
+        case 1:
+          top = values[0];
+          bottom = top;
+          left = top;
+          right = top;
+          break;
+        case 2:
+          top = values[0];
+          bottom = top;
+          left = values[1];
+          right = left;
+          break;
+        case 3:
+          top = values[0];
+          left = values[1];
+          right = left;
+          bottom = values[2];
+          break;
+        case 4:
+          top = values[0];
+          right = values[1];
+          bottom = values[2];
+          left = values[3];
+          break;
+        default:
           return "";
       }
-
-      token = this.getToken(true, true);
+      aDecl.push(this._createJscsspDeclarationFromValue("border-top-color", top));
+      aDecl.push(this._createJscsspDeclarationFromValue("border-right-color", right));
+      aDecl.push(this._createJscsspDeclarationFromValue("border-bottom-color", bottom));
+      aDecl.push(this._createJscsspDeclarationFromValue("border-left-color", left));
+      return top + " " + right + " " + bottom + " " + left;
     }
-
-    this.forgetState();
-
-    var count = values.length;
-    var decl = "";
-    if (count < 1 || count > 4) return "";
-    for(var i = 0;i < count;i++) {
-        decl += values[i];
-        if(i < count - 1) decl += " ";
-    }
-    aDecl.push(this._createJscsspDeclarationFromValue("border-color", decl));
-    return decl;
   },
 
   parseCueShorthand: function(token, declarations, aAcceptPriority)
@@ -2682,76 +2599,34 @@ CSSParser.prototype = {
     }
 
     var count = values.length;
-    switch (count) {
-      case 1:
-        before = values[0];
-        after = before;
-        break;
-      case 2:
-        before = values[0];
-        after = values[1];
-        break;
-      default:
-        return "";
-    }
     this.forgetState();
-    aDecl.push(this._createJscsspDeclarationFromValue("cue-before", before));
-    aDecl.push(this._createJscsspDeclarationFromValue("cue-after", after));
-    return before + " " + after;
-  },
 
-  stylebot_parseCueShorthand: function(token, declarations, aAcceptPriority)
-  {
-    var before = "";
-    var after = "";
-
-    var values = [];
-    var values = [];
-    while (true) {
-
-      if (!token.isNotNull())
-        break;
-
-      if (token.isSymbol(";")
-          || (aAcceptPriority && token.isSymbol("!"))
-          || token.isSymbol("}")) {
-        if (token.isSymbol("}"))
-          this.ungetToken();
-        break;
+    if (this.mPreventExpansion) {
+      var decl = "";
+      if (count < 1 || count > 2) return "";
+      for(var i = 0;i < count;i++) {
+          decl += values[i];
+          if(i < count - 1) decl += " ";
       }
-
-      else if (!values.length && token.isIdent(this.kINHERIT)) {
-        values.push(token.value);
-      }
-
-      else if (token.isIdent("none"))
-        values.push(token.value);
-
-        else if (token.isFunction("url(")) {
-        var token = this.getToken(true, true);
-        var urlContent = this.parseURL(token);
-        if (urlContent)
-          values.push("url(" + urlContent);
-        else
+      aDecl.push(this._createJscsspDeclarationFromValue("cue", decl));
+      return decl;
+    } else {
+      switch (count) {
+        case 1:
+          before = values[0];
+          after = before;
+          break;
+        case 2:
+          before = values[0];
+          after = values[1];
+          break;
+        default:
           return "";
       }
-      else
-        return "";
-
-      token = this.getToken(true, true);
+      aDecl.push(this._createJscsspDeclarationFromValue("cue-before", before));
+      aDecl.push(this._createJscsspDeclarationFromValue("cue-after", after));
+      return before + " " + after;
     }
-
-    this.forgetState();
-
-    var count = values.length;
-    var decl = "";
-    if (count < 1 || count > 2) return "";
-    for(var i = 0;i < count;i++) {
-        decl += values[i];
-        if(i < count - 1) decl += " ";
-    }
-    aDecl.push(this._createJscsspDeclarationFromValue("cue", decl));
-    return decl;
   },
 
   parsePauseShorthand: function(token, declarations, aAcceptPriority)
@@ -2790,70 +2665,35 @@ CSSParser.prototype = {
     }
 
     var count = values.length;
-    switch (count) {
-      case 1:
-        before = values[0];
-        after = before;
-        break;
-      case 2:
-        before = values[0];
-        after = values[1];
-        break;
-      default:
-        return "";
-    }
     this.forgetState();
-    aDecl.push(this._createJscsspDeclarationFromValue("pause-before", before));
-    aDecl.push(this._createJscsspDeclarationFromValue("pause-after", after));
-    return before + " " + after;
-  },
-
-  stylebot_parsePauseShorthand: function(token, declarations, aAcceptPriority)
-  {
-    var before = "";
-    var after = "";
-
-    var values = [];
-    var values = [];
-    while (true) {
-
-      if (!token.isNotNull())
-        break;
-
-      if (token.isSymbol(";")
-          || (aAcceptPriority && token.isSymbol("!"))
-          || token.isSymbol("}")) {
-        if (token.isSymbol("}"))
-          this.ungetToken();
-        break;
+    
+    if (this.mPreventExpansion) {
+      var decl = "";
+      if (count < 1 || count > 2) return "";
+      for(var i = 0;i < count;i++) {
+          decl += values[i];
+          if(i < count - 1) decl += " ";
       }
-
-      else if (!values.length && token.isIdent(this.kINHERIT)) {
-        values.push(token.value);
+      aDecl.push(this._createJscsspDeclarationFromValue("pause", decl));
+      return decl;
+      
+    } else {
+      switch (count) {
+        case 1:
+          before = values[0];
+          after = before;
+          break;
+        case 2:
+          before = values[0];
+          after = values[1];
+          break;
+        default:
+          return "";
       }
-
-      else if (token.isDimensionOfUnit("ms")
-               || token.isDimensionOfUnit("s")
-               || token.isPercentage()
-               || token.isNumber("0"))
-        values.push(token.value);
-      else
-        return "";
-
-      token = this.getToken(true, true);
+      aDecl.push(this._createJscsspDeclarationFromValue("pause-before", before));
+      aDecl.push(this._createJscsspDeclarationFromValue("pause-after", after));
+      return before + " " + after;
     }
-
-    this.forgetState();
-
-    var count = values.length;
-    var decl = "";
-    if (count < 1 || count > 2) return "";
-    for(var i = 0;i < count;i++) {
-        decl += values[i];
-        if(i < count - 1) decl += " ";
-    }
-    aDecl.push(this._createJscsspDeclarationFromValue("pause", decl));
-    return decl;
   },
 
   parseBorderWidthShorthand: function(token, aDecl, aAcceptPriority)
@@ -2893,89 +2733,52 @@ CSSParser.prototype = {
     }
 
     var count = values.length;
-    switch (count) {
-      case 1:
-        top = values[0];
-        bottom = top;
-        left = top;
-        right = top;
-        break;
-      case 2:
-        top = values[0];
-        bottom = top;
-        left = values[1];
-        right = left;
-        break;
-      case 3:
-        top = values[0];
-        left = values[1];
-        right = left;
-        bottom = values[2];
-        break;
-      case 4:
-        top = values[0];
-        right = values[1];
-        bottom = values[2];
-        left = values[3];
-        break;
-      default:
-        return "";
-    }
-    this.forgetState();
-    aDecl.push(this._createJscsspDeclarationFromValue("border-top-width", top));
-    aDecl.push(this._createJscsspDeclarationFromValue("border-right-width", right));
-    aDecl.push(this._createJscsspDeclarationFromValue("border-bottom-width", bottom));
-    aDecl.push(this._createJscsspDeclarationFromValue("border-left-width", left));
-    return top + " " + right + " " + bottom + " " + left;
-  },
-
-  stylebot_parseBorderWidthShorthand: function(token, aDecl, aAcceptPriority)
-  {
-    var top = null;
-    var bottom = null;
-    var left = null;
-    var right = null;
-
-    var values = [];
-    while (true) {
-
-      if (!token.isNotNull())
-        break;
-
-      if (token.isSymbol(";")
-          || (aAcceptPriority && token.isSymbol("!"))
-          || token.isSymbol("}")) {
-        if (token.isSymbol("}"))
-          this.ungetToken();
-        break;
-      }
-
-      else if (!values.length && token.isIdent(this.kINHERIT)) {
-        values.push(token.value);
-      }
-
-      else if (token.isDimension()
-               || token.isNumber("0")
-               || (token.isIdent() && token.value in this.kBORDER_WIDTH_NAMES)) {
-        values.push(token.value);
-      }
-      else
-        return "";
-
-      token = this.getToken(true, true);
-    }
-
     this.forgetState();
 
-    var count = values.length;
-    var decl = "";
-    if (count < 1 || count > 4) return "";
-    for(var i = 0;i < count;i++) {
-        decl += values[i];
-        if(i < count - 1) decl += " ";
+    if (this.mPreventExpansion) {
+      var decl = "";
+      if (count < 1 || count > 4) return "";
+      for(var i = 0;i < count;i++) {
+          decl += values[i];
+          if(i < count - 1) decl += " ";
+      }
+      aDecl.push(this._createJscsspDeclarationFromValue("border-width", decl));
+      return decl;
+    } else {
+      switch (count) {
+        case 1:
+          top = values[0];
+          bottom = top;
+          left = top;
+          right = top;
+          break;
+        case 2:
+          top = values[0];
+          bottom = top;
+          left = values[1];
+          right = left;
+          break;
+        case 3:
+          top = values[0];
+          left = values[1];
+          right = left;
+          bottom = values[2];
+          break;
+        case 4:
+          top = values[0];
+          right = values[1];
+          bottom = values[2];
+          left = values[3];
+          break;
+        default:
+          return "";
+      }
+      aDecl.push(this._createJscsspDeclarationFromValue("border-top-width", top));
+      aDecl.push(this._createJscsspDeclarationFromValue("border-right-width", right));
+      aDecl.push(this._createJscsspDeclarationFromValue("border-bottom-width", bottom));
+      aDecl.push(this._createJscsspDeclarationFromValue("border-left-width", left));
+      return top + " " + right + " " + bottom + " " + left;
     }
-    aDecl.push(this._createJscsspDeclarationFromValue("border-width", decl));
-    return decl;
   },
 
   parseBorderStyleShorthand: function(token, aDecl, aAcceptPriority)
@@ -3013,87 +2816,52 @@ CSSParser.prototype = {
     }
 
     var count = values.length;
-    switch (count) {
-      case 1:
-        top = values[0];
-        bottom = top;
-        left = top;
-        right = top;
-        break;
-      case 2:
-        top = values[0];
-        bottom = top;
-        left = values[1];
-        right = left;
-        break;
-      case 3:
-        top = values[0];
-        left = values[1];
-        right = left;
-        bottom = values[2];
-        break;
-      case 4:
-        top = values[0];
-        right = values[1];
-        bottom = values[2];
-        left = values[3];
-        break;
-      default:
-        return "";
-    }
-    this.forgetState();
-    aDecl.push(this._createJscsspDeclarationFromValue("border-top-style", top));
-    aDecl.push(this._createJscsspDeclarationFromValue("border-right-style", right));
-    aDecl.push(this._createJscsspDeclarationFromValue("border-bottom-style", bottom));
-    aDecl.push(this._createJscsspDeclarationFromValue("border-left-style", left));
-    return top + " " + right + " " + bottom + " " + left;
-  },
-
-  stylebot_parseBorderStyleShorthand: function(token, aDecl, aAcceptPriority)
-  {
-    var top = null;
-    var bottom = null;
-    var left = null;
-    var right = null;
-
-    var values = [];
-    while (true) {
-
-      if (!token.isNotNull())
-        break;
-
-      if (token.isSymbol(";")
-          || (aAcceptPriority && token.isSymbol("!"))
-          || token.isSymbol("}")) {
-        if (token.isSymbol("}"))
-          this.ungetToken();
-        break;
-      }
-
-      else if (!values.length && token.isIdent(this.kINHERIT)) {
-        values.push(token.value);
-      }
-
-      else if (token.isIdent() && token.value in this.kBORDER_STYLE_NAMES) {
-        values.push(token.value);
-      }
-      else
-        return "";
-
-      token = this.getToken(true, true);
-    }
-
     this.forgetState();
 
-    var count = values.length;
-    var decl = "";
-    if (count < 1 || count > 4) return "";
-    for(var i = 0;i < count;i++) {
-        decl += values[i];
-        if(i < count - 1) decl += " ";
+    if (this.mPreventExpansion) {
+      var decl = "";
+      if (count < 1 || count > 4) return "";
+      for(var i = 0;i < count;i++) {
+          decl += values[i];
+          if(i < count - 1) decl += " ";
+      }
+      aDecl.push(this._createJscsspDeclarationFromValue("border-style", decl));
+      return decl;
+    } else {
+      switch (count) {
+        case 1:
+          top = values[0];
+          bottom = top;
+          left = top;
+          right = top;
+          break;
+        case 2:
+          top = values[0];
+          bottom = top;
+          left = values[1];
+          right = left;
+          break;
+        case 3:
+          top = values[0];
+          left = values[1];
+          right = left;
+          bottom = values[2];
+          break;
+        case 4:
+          top = values[0];
+          right = values[1];
+          bottom = values[2];
+          left = values[3];
+          break;
+        default:
+          return "";
+      }
+      aDecl.push(this._createJscsspDeclarationFromValue("border-top-style", top));
+      aDecl.push(this._createJscsspDeclarationFromValue("border-right-style", right));
+      aDecl.push(this._createJscsspDeclarationFromValue("border-bottom-style", bottom));
+      aDecl.push(this._createJscsspDeclarationFromValue("border-left-style", left));
+      return top + " " + right + " " + bottom + " " + left;
     }
-    aDecl.push(this._createJscsspDeclarationFromValue("border-style", decl));
-    return decl;
   },
 
   parseBorderEdgeOrOutlineShorthand: function(token, aDecl, aAcceptPriority, aProperty)
@@ -3146,83 +2914,35 @@ CSSParser.prototype = {
 
     // create the declarations
     this.forgetState();
-    bWidth = bWidth ? bWidth : "medium";
-    bStyle = bStyle ? bStyle : "none";
-    bColor = bColor ? bColor : "-moz-initial";
+    
+    if (this.mPreventExpansion) {
+      var decl = "";
+      decl += bWidth ? bWidth : "";
+      decl += bStyle ? (bWidth ? " " : "" ) + bStyle : "";
+      decl += bColor ? (bWidth || bStyle ? " " : "" ) + bColor : "";
+      aDecl.push(this._createJscsspDeclarationFromValue(aProperty, decl));
+      return decl;
+    } else {
+      bWidth = bWidth ? bWidth : "medium";
+      bStyle = bStyle ? bStyle : "none";
+      bColor = bColor ? bColor : "-moz-initial";
 
-    function addPropertyToDecl(aSelf, aDecl, property, w, s, c) {
-      aDecl.push(aSelf._createJscsspDeclarationFromValue(property + "-width", w));
-      aDecl.push(aSelf._createJscsspDeclarationFromValue(property + "-style", s));
-      aDecl.push(aSelf._createJscsspDeclarationFromValue(property + "-color", c));
+      function addPropertyToDecl(aSelf, aDecl, property, w, s, c) {
+        aDecl.push(aSelf._createJscsspDeclarationFromValue(property + "-width", w));
+        aDecl.push(aSelf._createJscsspDeclarationFromValue(property + "-style", s));
+        aDecl.push(aSelf._createJscsspDeclarationFromValue(property + "-color", c));
+      }
+
+      if (aProperty == "border") {
+        addPropertyToDecl(this, aDecl, "border-top", bWidth, bStyle, bColor);
+        addPropertyToDecl(this, aDecl, "border-right", bWidth, bStyle, bColor);
+        addPropertyToDecl(this, aDecl, "border-bottom", bWidth, bStyle, bColor);
+        addPropertyToDecl(this, aDecl, "border-left", bWidth, bStyle, bColor);
+      }
+      else
+        addPropertyToDecl(this, aDecl, aProperty, bWidth, bStyle, bColor);
+      return bWidth + " " + bStyle + " " + bColor;
     }
-
-    if (aProperty == "border") {
-      addPropertyToDecl(this, aDecl, "border-top", bWidth, bStyle, bColor);
-      addPropertyToDecl(this, aDecl, "border-right", bWidth, bStyle, bColor);
-      addPropertyToDecl(this, aDecl, "border-bottom", bWidth, bStyle, bColor);
-      addPropertyToDecl(this, aDecl, "border-left", bWidth, bStyle, bColor);
-    }
-    else
-      addPropertyToDecl(this, aDecl, aProperty, bWidth, bStyle, bColor);
-    return bWidth + " " + bStyle + " " + bColor;
-  },
-
-  stylebot_parseBorderEdgeOrOutlineShorthand: function(token, aDecl, aAcceptPriority, aProperty)
-  {
-    var bWidth = null;
-    var bStyle = null;
-    var bColor = null;
-
-    while (true) {
-      if (!token.isNotNull())
-        break;
-
-      if (token.isSymbol(";")
-          || (aAcceptPriority && token.isSymbol("!"))
-          || token.isSymbol("}")) {
-        if (token.isSymbol("}"))
-          this.ungetToken();
-        break;
-      }
-
-      else if (!bWidth && !bStyle && !bColor
-               && token.isIdent(this.kINHERIT)) {
-        bWidth = this.kINHERIT;
-        bStyle = this.kINHERIT;
-        bColor = this.kINHERIT;
-      }
-
-      else if (!bWidth &&
-               (token.isDimension()
-                || (token.isIdent() && token.value in this.kBORDER_WIDTH_NAMES)
-                || token.isNumber("0"))) {
-        bWidth = token.value;
-      }
-
-      else if (!bStyle &&
-               (token.isIdent() && token.value in this.kBORDER_STYLE_NAMES)) {
-        bStyle = token.value;
-      }
-
-      else {
-        var color = (aProperty == "outline" && token.isIdent("invert"))
-                    ? "invert" : this.parseColor(token);
-        if (!bColor && color)
-          bColor = color;
-        else
-          return "";
-      }
-      token = this.getToken(true, true);
-    }
-
-    // create the declarations
-    this.forgetState();
-    var decl = "";
-    decl += bWidth ? bWidth : "";
-    decl += bStyle ? (bWidth ? " " : "" ) + bStyle : "";
-    decl += bColor ? (bWidth || bStyle ? " " : "" ) + bColor : "";
-    aDecl.push(this._createJscsspDeclarationFromValue(aProperty, decl));
-    return decl;
   },
 
   parseBackgroundShorthand: function(token, aDecl, aAcceptPriority)
@@ -3341,149 +3061,33 @@ CSSParser.prototype = {
       token = this.getToken(true, true);
     }
 
-    // create the declarations
     this.forgetState();
-    bgColor = bgColor ? bgColor : "transparent";
-    bgImage = bgImage ? bgImage : "none";
-    bgRepeat = bgRepeat ? bgRepeat : "repeat";
-    bgAttachment = bgAttachment ? bgAttachment : "scroll";
-    bgPosition = bgPosition ? bgPosition : "top left";
+    if (this.mPreventExpansion) {
+        // create the declarations
+        var decl = "";
+        decl += bgColor ? bgColor : "";
+        decl += bgImage ? ( bgColor ? " " : "" ) + bgImage : "";
+        decl += bgRepeat ? ( bgColor || bgImage ? " " : "" ) + bgRepeat : "";
+        decl += bgAttachment ? ( bgColor || bgImage || bgRepeat ? " " : "" ) + bgAttachment : "";
+        decl += bgPosition ? ( bgColor || bgImage || bgRepeat || bgAttachment ? " " : "" ) + bgPosition : "";
+        aDecl.push(this._createJscsspDeclarationFromValue("background", decl));
+        return decl;
+    } else {
+        // create the expanded declarations
+        bgColor = bgColor ? bgColor : "transparent";
+        bgImage = bgImage ? bgImage : "none";
+        bgRepeat = bgRepeat ? bgRepeat : "repeat";
+        bgAttachment = bgAttachment ? bgAttachment : "scroll";
+        bgPosition = bgPosition ? bgPosition : "top left";
 
-    aDecl.push(this._createJscsspDeclarationFromValue("background-color", bgColor));
-    aDecl.push(this._createJscsspDeclarationFromValue("background-image", bgImage));
-    aDecl.push(this._createJscsspDeclarationFromValue("background-repeat", bgRepeat));
-    aDecl.push(this._createJscsspDeclarationFromValue("background-attachment", bgAttachment));
-    aDecl.push(this._createJscsspDeclarationFromValue("background-position", bgPosition));
-    return bgColor + " " + bgImage + " " + bgRepeat + " " + bgAttachment + " " + bgPosition;
+        aDecl.push(this._createJscsspDeclarationFromValue("background-color", bgColor));
+        aDecl.push(this._createJscsspDeclarationFromValue("background-image", bgImage));
+        aDecl.push(this._createJscsspDeclarationFromValue("background-repeat", bgRepeat));
+        aDecl.push(this._createJscsspDeclarationFromValue("background-attachment", bgAttachment));
+        aDecl.push(this._createJscsspDeclarationFromValue("background-position", bgPosition));
+        return bgColor + " " + bgImage + " " + bgRepeat + " " + bgAttachment + " " + bgPosition;
+    }
   },
-
-  stylebot_parseBackgroundShorthand: function(token, aDecl, aAcceptPriority)
-    {
-      var kHPos = {"left": true, "right": true };
-      var kVPos = {"top": true, "bottom": true };
-      var kPos = {"left": true, "right": true, "top": true, "bottom": true, "center": true};
-
-      var bgColor = null;
-      var bgRepeat = null;
-      var bgAttachment = null;
-      var bgImage = null;
-      var bgPosition = null;
-
-      while (true) {
-
-        if (!token.isNotNull())
-          break;
-
-        if (token.isSymbol(";")
-            || (aAcceptPriority && token.isSymbol("!"))
-            || token.isSymbol("}")) {
-          if (token.isSymbol("}"))
-            this.ungetToken();
-          break;
-        }
-
-        else if (!bgColor && !bgRepeat && !bgAttachment && !bgImage && !bgPosition
-                 && token.isIdent(this.kINHERIT)) {
-          bgColor = this.kINHERIT;
-          bgRepeat = this.kINHERIT;
-          bgAttachment = this.kINHERIT;
-          bgImage = this.kINHERIT;
-          bgPosition = this.kINHERIT;
-        }
-
-        else {
-          if (!bgAttachment &&
-              (token.isIdent("scroll")
-               || token.isIdent("fixed"))) {
-            bgAttachment = token.value;
-          }
-
-          else if (!bgPosition &&
-                   ((token.isIdent() && token.value in kPos)
-                    || token.isDimension()
-                    || token.isNumber("0")
-                    || token.isPercentage())) {
-            bgPosition = token.value;
-            token = this.getToken(true, true);
-            if (token.isDimension() || token.isNumber("0") || token.isPercentage()) {
-              bgPosition += " " + token.value;
-            }
-            else if (token.isIdent() && token.value in kPos) {
-              if ((bgPosition in kHPos && token.value in kHPos) ||
-                  (bgPosition in kVPos && token.value in kVPos))
-                return "";
-              bgPosition += " " + token.value;
-            }
-            else {
-              this.ungetToken();
-              bgPosition += " center";
-            }
-          }
-
-          else if (!bgRepeat &&
-                   (token.isIdent("repeat")
-                    || token.isIdent("repeat-x")
-                    || token.isIdent("repeat-y")
-                    || token.isIdent("no-repeat"))) {
-            bgRepeat = token.value;
-          }
-
-          else if (!bgImage &&
-                   (token.isFunction("url(")
-                    || token.isIdent("none"))) {
-            bgImage = token.value;
-            if (token.isFunction("url(")) {
-              token = this.getToken(true, true);
-              var url = this.parseURL(token); // TODO
-              if (url)
-                bgImage += url;
-              else
-                return "";
-            }
-          }
-
-          else if (!bgImage &&
-                   (token.isFunction("-moz-linear-gradient(")
-                    || token.isFunction("-moz-radial-gradient(")
-                    || token.isFunction("-moz-repeating-linear-gradient(")
-                    || token.isFunction("-moz-repeating-radial-gradient("))) {
-            var gradient = CssInspector.parseGradient(this, token);
-            if (gradient)
-              bgImage = CssInspector.serializeGradient(gradient);
-            else
-              return "";
-          }
-          
-          // @ankit support for -webkit-gradient
-          //
-          else if (!bgImage && token.isFunction('-webkit-gradient(')) {
-            bgImage = CssInspector.parseWebkitGradient(this, token);
-          }
-
-          else {
-            var color = this.parseColor(token);
-            if (!bgColor && color)
-              bgColor = color;
-            else
-              return "";
-          }
-
-        }
-
-        token = this.getToken(true, true);
-      }
-
-      // create the declarations
-      this.forgetState();
-      var decl = "";
-      decl += bgColor ? bgColor : "";
-      decl += bgImage ? ( bgColor ? " " : "" ) + bgImage : "";
-      decl += bgRepeat ? ( bgColor || bgImage ? " " : "" ) + bgRepeat : "";
-      decl += bgAttachment ? ( bgColor || bgImage || bgRepeat ? " " : "" ) + bgAttachment : "";
-      decl += bgPosition ? ( bgColor || bgImage || bgRepeat || bgAttachment ? " " : "" ) + bgPosition : "";
-      aDecl.push(this._createJscsspDeclarationFromValue("background", decl));
-      return decl;
-    },
 
   parseListStyleShorthand: function(token, aDecl, aAcceptPriority)
   {
@@ -3540,78 +3144,24 @@ CSSParser.prototype = {
 
     // create the declarations
     this.forgetState();
-    lType = lType ? lType : "none";
-    lImage = lImage ? lImage : "none";
-    lPosition = lPosition ? lPosition : "outside";
+    
+    if (this.mPreventExpansion) {
+      var decl = "";
+      decl += lType ? lType : "";
+      decl += lImage ? ( lType ? " " : "" ) + lImage : "";
+      decl += lPosition ? ( lType || lImage ? " " : "" ) + lPosition : "";
+      aDecl.push(this._createJscsspDeclarationFromValue("list-style", decl));
+      return decl;
+    } else {
+      lType = lType ? lType : "none";
+      lImage = lImage ? lImage : "none";
+      lPosition = lPosition ? lPosition : "outside";
 
-    aDecl.push(this._createJscsspDeclarationFromValue("list-style-type", lType));
-    aDecl.push(this._createJscsspDeclarationFromValue("list-style-position", lPosition));
-    aDecl.push(this._createJscsspDeclarationFromValue("list-style-image", lImage));
-    return lType + " " + lPosition + " " + lImage;
-  },
-
-  stylebot_parseListStyleShorthand: function(token, aDecl, aAcceptPriority)
-  {
-    var kPosition = { "inside": true, "outside": true };
-
-    var lType = null;
-    var lPosition = null;
-    var lImage = null;
-
-    while (true) {
-
-      if (!token.isNotNull())
-        break;
-
-      if (token.isSymbol(";")
-          || (aAcceptPriority && token.isSymbol("!"))
-          || token.isSymbol("}")) {
-        if (token.isSymbol("}"))
-          this.ungetToken();
-        break;
-      }
-
-      else if (!lType && !lPosition && ! lImage
-               && token.isIdent(this.kINHERIT)) {
-        lType = this.kINHERIT;
-        lPosition = this.kINHERIT;
-        lImage = this.kINHERIT;
-      }
-
-      else if (!lType &&
-               (token.isIdent() && token.value in this.kLIST_STYLE_TYPE_NAMES)) {
-        lType = token.value;
-      }
-
-      else if (!lPosition &&
-               (token.isIdent() && token.value in kPosition)) {
-        lPosition = token.value;
-      }
-
-      else if (!lImage && token.isFunction("url")) {
-        token = this.getToken(true, true);
-        var urlContent = this.parseURL(token);
-        if (urlContent) {
-          lImage = "url(" + urlContent;
-        }
-        else
-          return "";
-      }
-      else if (!token.isIdent("none"))
-        return "";
-
-      token = this.getToken(true, true);
+      aDecl.push(this._createJscsspDeclarationFromValue("list-style-type", lType));
+      aDecl.push(this._createJscsspDeclarationFromValue("list-style-position", lPosition));
+      aDecl.push(this._createJscsspDeclarationFromValue("list-style-image", lImage));
+      return lType + " " + lPosition + " " + lImage;
     }
-
-    // create the declarations
-    this.forgetState();
-
-    var decl = "";
-    decl += lType ? lType : "";
-    decl += lImage ? ( lType ? " " : "" ) + lImage : "";
-    decl += lPosition ? ( lType || lImage ? " " : "" ) + lPosition : "";
-    aDecl.push(this._createJscsspDeclarationFromValue("list-style", decl));
-    return decl;
   },
 
   parseFontShorthand: function(token, aDecl, aAcceptPriority)
@@ -3767,185 +3317,33 @@ CSSParser.prototype = {
       aDecl.push(this._createJscsspDeclarationFromValue("font", fSystem));
       return fSystem;
     }
-    fStyle = fStyle ? fStyle : "normal";
-    fVariant = fVariant ? fVariant : "normal";
-    fWeight = fWeight ? fWeight : "normal";
-    fSize = fSize ? fSize : "medium";
-    fLineHeight = fLineHeight ? fLineHeight : "normal";
-    fFamily = fFamily ? fFamily : "-moz-initial";
-
-    aDecl.push(this._createJscsspDeclarationFromValue("font-style", fStyle));
-    aDecl.push(this._createJscsspDeclarationFromValue("font-variant", fVariant));
-    aDecl.push(this._createJscsspDeclarationFromValue("font-weight", fWeight));
-    aDecl.push(this._createJscsspDeclarationFromValue("font-size", fSize));
-    aDecl.push(this._createJscsspDeclarationFromValue("line-height", fLineHeight));
-    aDecl.push(this._createJscsspDeclarationFromValuesArray("font-family", fFamilyValues, fFamily));
-    return fStyle + " " + fVariant + " " + fWeight + " " + fSize + "/" + fLineHeight + " " + fFamily;
-  },
-
-  stylebot_parseFontShorthand: function(token, aDecl, aAcceptPriority)
-  {
-    var kStyle = {"italic": true, "oblique": true };
-    var kVariant = {"small-caps": true };
-    var kWeight = { "bold": true, "bolder": true, "lighter": true,
-                      "100": true, "200": true, "300": true, "400": true,
-                      "500": true, "600": true, "700": true, "800": true,
-                      "900": true };
-    var kSize = { "xx-small": true, "x-small": true, "small": true, "medium": true,
-                    "large": true, "x-large": true, "xx-large": true,
-                    "larger": true, "smaller": true };
-    var kValues = { "caption": true, "icon": true, "menu": true, "message-box": true, "small-caption": true, "status-bar": true };
-    var kFamily = { "serif": true, "sans-serif": true, "cursive": true, "fantasy": true, "monospace": true };
-
-    var fStyle = null;
-    var fVariant = null;
-    var fWeight = null;
-    var fSize = null;
-    var fLineHeight = null;
-    var fFamily = "";
-    var fSystem = null;
-    var fFamilyValues = [];
-
-    var normalCount = 0;
-    while (true) {
-
-      if (!token.isNotNull())
-        break;
-
-      if (token.isSymbol(";")
-          || (aAcceptPriority && token.isSymbol("!"))
-          || token.isSymbol("}")) {
-        if (token.isSymbol("}"))
-          this.ungetToken();
-        break;
-      }
-
-      else if (!fStyle && !fVariant && !fWeight
-               && !fSize && !fLineHeight && !fFamily
-               && !fSystem
-               && token.isIdent(this.kINHERIT)) {
-        fStyle = this.kINHERIT;
-        fVariant = this.kINHERIT;
-        fWeight = this.kINHERIT;
-        fSize = this.kINHERIT;
-        fLineHeight = this.kINHERIT;
-        fFamily = this.kINHERIT;
-        fSystem = this.kINHERIT;
-      }
-
-      else {
-        if (!fSystem && (token.isIdent() && token.value in kValues)) {
-          fSystem = token.value;
-          break;
-        }
-
-        else {
-          if (!fStyle
-                   && token.isIdent()
-                   && (token.value in kStyle)) {
-            fStyle = token.value;
-          }
-
-          else if (!fVariant
-                   && token.isIdent()
-                   && (token.value in kVariant)) {
-            fVariant = token.value;
-          }
-
-          else if (!fWeight
-                   && (token.isIdent() || token.isNumber())
-                   && (token.value in kWeight)) {
-            fWeight = token.value;
-          }
-
-          else if (!fSize
-                   && ((token.isIdent() && (token.value in kSize))
-                       || token.isDimension()
-                       || token.isPercentage())) {
-            fSize = token.value;
-            var token = this.getToken(false, false);
-            if (token.isSymbol("/")) {
-              token = this.getToken(false, false);
-              if (!fLineHeight &&
-                  (token.isDimension() || token.isNumber() || token.isPercentage())) {
-                fLineHeight = token.value;
-              }
-              else
-                return "";
-            }
-            else
-              this.ungetToken();
-          }
-
-          else if (token.isIdent("normal")) {
-            normalCount++;
-            if (normalCount > 3)
-              return "";
-          }
-
-          else if (!fFamily && // *MUST* be last to be tested here
-                   (token.isString()
-                    || token.isIdent())) {
-            var lastWasComma = false;
-            while (true) {
-              if (!token.isNotNull())
-                break;
-              else if (token.isSymbol(";")
-                  || (aAcceptPriority && token.isSymbol("!"))
-                  || token.isSymbol("}")) {
-                this.ungetToken();
-                break;
-              }
-              else if (token.isIdent() && token.value in kFamily) {
-                var value = new jscsspVariable(kJscsspPRIMITIVE_VALUE, null);
-                value.value = token.value;
-                fFamilyValues.push(value);
-                fFamily += token.value;
-                break;
-              }
-              else if (token.isString() || token.isIdent()) {
-                var value = new jscsspVariable(kJscsspPRIMITIVE_VALUE, null);
-                value.value = token.value;
-                fFamilyValues.push(value);
-                fFamily += token.value;
-                lastWasComma = false;
-              }
-              else if (!lastWasComma && token.isSymbol(",")) {
-                fFamily += ", ";
-                lastWasComma = true;
-              }
-              else
-                return "";
-              token = this.getToken(true, true);
-            }
-          }
-
-          else {
-            return "";
-          }
-        }
-
-      }
-
-      token = this.getToken(true, true);
+    
+    if (this.mPreventExpansion) {
+      var decl = "";
+      decl += fStyle ? fStyle : "";
+      decl += fVariant ? ( fStyle ? " " : "" ) + fVariant : "";
+      decl += fWeight ? ( fStyle || fVariant ? " " : "" ) + fWeight : "";
+      decl += fSize ? ( fStyle || fVariant || fWeight ? " " : "" ) + fSize : "";
+      decl += (fSize && fLineHeight) ? "/" + fLineHeight : "";
+      decl += fFamily ? ( fStyle || fVariant || fWeight || fSize ? " " : "" ) + fFamily : "";
+      aDecl.push(this._createJscsspDeclarationFromValue("font", decl));
+      return decl;
+    } else {
+      fStyle = fStyle ? fStyle : "normal";
+      fVariant = fVariant ? fVariant : "normal";
+      fWeight = fWeight ? fWeight : "normal";
+      fSize = fSize ? fSize : "medium";
+      fLineHeight = fLineHeight ? fLineHeight : "normal";
+      fFamily = fFamily ? fFamily : "-moz-initial";
+      
+      aDecl.push(this._createJscsspDeclarationFromValue("font-style", fStyle));
+      aDecl.push(this._createJscsspDeclarationFromValue("font-variant", fVariant));
+      aDecl.push(this._createJscsspDeclarationFromValue("font-weight", fWeight));
+      aDecl.push(this._createJscsspDeclarationFromValue("font-size", fSize));
+      aDecl.push(this._createJscsspDeclarationFromValue("line-height", fLineHeight));
+      aDecl.push(this._createJscsspDeclarationFromValuesArray("font-family", fFamilyValues, fFamily));
+      return fStyle + " " + fVariant + " " + fWeight + " " + fSize + "/" + fLineHeight + " " + fFamily;
     }
-
-    // create the declarations
-    this.forgetState();
-    if (fSystem) {
-      aDecl.push(this._createJscsspDeclarationFromValue("font", fSystem));
-      return fSystem;
-    }
-
-    var decl = "";
-    decl += fStyle ? fStyle : "";
-    decl += fVariant ? ( fStyle ? " " : "" ) + fVariant : "";
-    decl += fWeight ? ( fStyle || fVariant ? " " : "" ) + fWeight : "";
-    decl += fSize ? ( fStyle || fVariant || fWeight ? " " : "" ) + fSize : "";
-    decl += (fSize && fLineHeight) ? "/" + fLineHeight : "";
-    decl += fFamily ? ( fStyle || fVariant || fWeight || fSize ? " " : "" ) + fFamily : "";
-    aDecl.push(this._createJscsspDeclarationFromValue("font", decl));
-    return decl;
   },
 
   _createJscsspDeclaration: function(property, value)
@@ -4177,21 +3575,20 @@ CSSParser.prototype = {
           switch (descriptor)
           {
             case "background":
-              // @rduenasf the next line was changed so we can avoid the declaration breakdown
-              value = this.stylebot_parseBackgroundShorthand(token, declarations, aAcceptPriority);
+              value = this.parseBackgroundShorthand(token, declarations, aAcceptPriority);
               break;
             case "margin":
             case "padding":
-              value = this.stylebot_parseMarginOrPaddingShorthand(token, declarations, aAcceptPriority, descriptor);
+              value = this.parseMarginOrPaddingShorthand(token, declarations, aAcceptPriority, descriptor);
               break;
             case "border-color":
-              value = this.stylebot_parseBorderColorShorthand(token, declarations, aAcceptPriority);
+              value = this.parseBorderColorShorthand(token, declarations, aAcceptPriority);
               break;
             case "border-style":
-              value = this.stylebot_parseBorderStyleShorthand(token, declarations, aAcceptPriority);
+              value = this.parseBorderStyleShorthand(token, declarations, aAcceptPriority);
               break;
             case "border-width":
-              value = this.stylebot_parseBorderWidthShorthand(token, declarations, aAcceptPriority);
+              value = this.parseBorderWidthShorthand(token, declarations, aAcceptPriority);
               break;
             case "border-top":
             case "border-right":
@@ -4199,20 +3596,19 @@ CSSParser.prototype = {
             case "border-left":
             case "border":
             case "outline":
-              // @rduenasf the next line was changed so we can avoid the declaration breakdown
-              value = this.stylebot_parseBorderEdgeOrOutlineShorthand(token, declarations, aAcceptPriority, descriptor);
+              value = this.parseBorderEdgeOrOutlineShorthand(token, declarations, aAcceptPriority, descriptor);
               break;
             case "cue":
-              value = this.stylebot_parseCueShorthand(token, declarations, aAcceptPriority);
+              value = this.parseCueShorthand(token, declarations, aAcceptPriority);
               break;
             case "pause":
-              value = this.stylebot_parsePauseShorthand(token, declarations, aAcceptPriority);
+              value = this.parsePauseShorthand(token, declarations, aAcceptPriority);
               break;
             case "font":
-              value = this.stylebot_parseFontShorthand(token, declarations, aAcceptPriority);
+              value = this.parseFontShorthand(token, declarations, aAcceptPriority);
               break;
             case "list-style":
-              value = this.stylebot_parseListStyleShorthand(token, declarations, aAcceptPriority);
+              value = this.parseListStyleShorthand(token, declarations, aAcceptPriority);
               break;
             default:
               value = this.parseDefaultPropertyValue(token, declarations, aAcceptPriority, descriptor, aSheet);
@@ -4761,12 +4157,17 @@ CSSParser.prototype = {
     }
   },
 
-  parse: function(aString, aTryToPreserveWhitespaces, aTryToPreserveComments) {
+  parse: function(aString, aTryToPreserveWhitespaces, aTryToPreserveComments, aTryToPreventExpansion) {
     if (!aString)
       return null; // early way out if we can
+                                 
+    if (aTryToPreserveWhitespaces)
+        this.mPreserveWS = aTryToPreserveWhitespaces;
+    if (aTryToPreserveComments)
+        this.mPreserveComments = aTryToPreserveComments;
+    if (aTryToPreventExpansion)
+        this.mPreventExpansion = aTryToPreventExpansion;
 
-    this.mPreserveWS       = aTryToPreserveWhitespaces;
-    this.mPreserveComments = aTryToPreserveComments;
     this.mPreservedTokens = [];
     this.mScanner.init(aString);
     
