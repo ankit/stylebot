@@ -161,13 +161,17 @@ function translateOptionValue(name, value) {
 // Custom Styles
 
 // Refreshes the custom styles. Called during initialization and on import
+//
 function fillCustomStyles() {
     var container = $("#custom-styles");
     container.html("");
+    // newest styles are shown at the top
+    //
     for (var url in styles) {
         // skip the global styles
-        if(url == "*") continue;
-        container.append(createCustomStyleOption(url));
+        if(url === "*") continue;
+        
+        container.prepend(createCustomStyleOption(url));
     }
 }
 
@@ -359,7 +363,7 @@ function shareStyle(e) {
 //
 function onSave(url) {
     var css = cache.modal.editor.getSession().getValue();
-    
+
     if (saveStyle(url, css)) {
         cache.modal.hide();
     }
@@ -421,7 +425,7 @@ function saveStyle(url, css, add) {
             bg_window.pushStyles();
 
             if (add)
-                createCustomStyleOption(url, styles[url]).appendTo($("#custom-styles"));
+                createCustomStyleOption(url, styles[url]).prependTo($("#custom-styles"));
 
             return true;
         }

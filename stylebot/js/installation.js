@@ -84,7 +84,7 @@ function saveStyleFromSocial(installationEvent) {
     var parser = new CSSParser();
     
     try {
-        var sheet = parser.parse(data.css);
+        var sheet = parser.parse($channel.html());
         var rules = CSSUtils.getRulesFromParserObject(sheet);
 
         // add the meta header

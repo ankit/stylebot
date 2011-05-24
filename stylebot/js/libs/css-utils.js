@@ -22,7 +22,7 @@ var CSSUtils = {
         for (var selector in rules)
         {
             if (rules[selector]["comment"]) continue;
-            css += selector + " { ";
+            css += selector + "{";
 
             for (var property in rules[selector]) {
 
@@ -34,7 +34,7 @@ var CSSUtils = {
                     css += this.getCSSDeclaration(property, rules[selector][property], setImportant);
             }
 
-            css += " } ";
+            css += "}";
         }
 
         return css;
