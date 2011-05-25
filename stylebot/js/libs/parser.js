@@ -1914,6 +1914,10 @@ CSSParser.prototype = {
   },
 
   addUnknownRule: function(aSheet, aString, aCurrentLine) {
+    if (aCurrentLine === undefined) {
+      aCurrentLine = CountLF(this.mScanner.getAlreadyScanned());
+    }
+    
     var errorMsg = this.consumeError();
     var rule = new jscsspErrorRule(errorMsg);
     rule.currentLine = aCurrentLine;
@@ -2299,6 +2303,7 @@ CSSParser.prototype = {
       // functions, idents, numbers and symbols, in that order.
       if (token.isFunction())
       {
+        
         if (token.isFunction("var("))
         {
           token = this.getToken(true, true);
@@ -2316,11 +2321,15 @@ CSSParser.prototype = {
               values.push(value);
             }
             
-            else
+            else {
+              this.addUnknownRule(aSheet, "");
               return "";
+            }
           }
-          else
+          else {
+            this.addUnknownRule(aSheet, "");
             return "";
+          }
         }
         
         else
@@ -2337,8 +2346,10 @@ CSSParser.prototype = {
             values.push(value);
           }
           
-          else
+          else {
+            this.addUnknownRule(aSheet, "");
             return "";
+          }
         }
       }
       
@@ -2354,8 +2365,10 @@ CSSParser.prototype = {
           values.push(value);
         }
         
-        else
+        else {
+          this.addUnknownRule(aSheet, "");
           return "";
+        }
       }
       
       else if (!token.isWhiteSpace() && !token.isSymbol(","))
@@ -2379,10 +2392,11 @@ CSSParser.prototype = {
       return valueText;
     }
     
+    this.addUnknownRule(aSheet, "");
     return "";
   },
 
-  parseMarginOrPaddingShorthand: function(token, aDecl, aAcceptPriority, aProperty)
+  parseMarginOrPaddingShorthand: function(token, aDecl, aAcceptPriority, aProperty, aSheet)
   {
     var top = null;
     var bottom = null;
@@ -2415,8 +2429,10 @@ CSSParser.prototype = {
               || token.isIdent("auto")) {
         values.push(token.value);
       }
-      else
+      else {
+        this.addUnknownRule(aSheet, "");
         return "";
+      }
 
       token = this.getToken(true, true);
     }
@@ -2425,7 +2441,10 @@ CSSParser.prototype = {
     var count = values.length;
     if (this.mPreventExpansion) {
       var decl = "";
-      if (count < 1 || count > 4) return "";
+      if (count < 1 || count > 4) {
+        this.addUnknownRule(aSheet, "");
+        return "";
+      }
       for(var i = 0; i < count; i++) {
           decl += values[i];
           if(i < count - 1) decl += " ";
@@ -2460,6 +2479,7 @@ CSSParser.prototype = {
           left = values[3];
           break;
         default:
+          this.addUnknownRule(aSheet, "");
           return "";
       }
       aDecl.push(this._createJscsspDeclarationFromValue(aProperty + "-top", top));
@@ -2470,7 +2490,7 @@ CSSParser.prototype = {
     }
   },
 
-  parseBorderColorShorthand: function(token, aDecl, aAcceptPriority)
+  parseBorderColorShorthand: function(token, aDecl, aAcceptPriority, aSheet)
   {
     var top = null;
     var bottom = null;
@@ -2501,8 +2521,10 @@ CSSParser.prototype = {
         var color = this.parseColor(token);
         if (color)
           values.push(color);
-        else
+        else {
+          this.addUnknownRule(aSheet, "");
           return "";
+        }
       }
 
       token = this.getToken(true, true);
@@ -2513,7 +2535,11 @@ CSSParser.prototype = {
 
     if (this.mPreventExpansion) {
       var decl = "";
-      if (count < 1 || count > 4) return "";
+      if (count < 1 || count > 4) {
+        this.addUnknownRule(aSheet, "");
+        return "";
+      }
+      
       for(var i = 0;i < count;i++) {
           decl += values[i];
           if(i < count - 1) decl += " ";
@@ -2547,6 +2573,7 @@ CSSParser.prototype = {
           left = values[3];
           break;
         default:
+          this.addUnknownRule(aSheet, "");
           return "";
       }
       aDecl.push(this._createJscsspDeclarationFromValue("border-top-color", top));
@@ -2557,7 +2584,7 @@ CSSParser.prototype = {
     }
   },
 
-  parseCueShorthand: function(token, declarations, aAcceptPriority)
+  parseCueShorthand: function(token, declarations, aAcceptPriority, aSheet)
   {
     var before = "";
     var after = "";
@@ -2589,11 +2616,15 @@ CSSParser.prototype = {
         var urlContent = this.parseURL(token);
         if (urlContent)
           values.push("url(" + urlContent);
-        else
+        else {
+          this.addUnknownRule(aSheet, "");
           return "";
+        }
       }
-      else
+      else {
+        this.addUnknownRule(aSheet, "");
         return "";
+      }
 
       token = this.getToken(true, true);
     }
@@ -2603,7 +2634,11 @@ CSSParser.prototype = {
 
     if (this.mPreventExpansion) {
       var decl = "";
-      if (count < 1 || count > 2) return "";
+      if (count < 1 || count > 2) {
+        this.addUnknownRule(aSheet, "");
+        return "";
+      }
+      
       for(var i = 0;i < count;i++) {
           decl += values[i];
           if(i < count - 1) decl += " ";
@@ -2621,6 +2656,7 @@ CSSParser.prototype = {
           after = values[1];
           break;
         default:
+          this.addUnknownRule(aSheet, "");
           return "";
       }
       aDecl.push(this._createJscsspDeclarationFromValue("cue-before", before));
@@ -2629,7 +2665,7 @@ CSSParser.prototype = {
     }
   },
 
-  parsePauseShorthand: function(token, declarations, aAcceptPriority)
+  parsePauseShorthand: function(token, declarations, aAcceptPriority, aSheet)
   {
     var before = "";
     var after = "";
@@ -2658,8 +2694,10 @@ CSSParser.prototype = {
                || token.isPercentage()
                || token.isNumber("0"))
         values.push(token.value);
-      else
+      else {
+        this.addUnknownRule(aSheet, "");
         return "";
+      }
 
       token = this.getToken(true, true);
     }
@@ -2669,7 +2707,11 @@ CSSParser.prototype = {
     
     if (this.mPreventExpansion) {
       var decl = "";
-      if (count < 1 || count > 2) return "";
+      if (count < 1 || count > 2) {
+        this.addUnknownRule(aSheet, "");
+        return "";
+      }
+      
       for(var i = 0;i < count;i++) {
           decl += values[i];
           if(i < count - 1) decl += " ";
@@ -2688,6 +2730,7 @@ CSSParser.prototype = {
           after = values[1];
           break;
         default:
+          this.addUnknownRule(aSheet, "");
           return "";
       }
       aDecl.push(this._createJscsspDeclarationFromValue("pause-before", before));
@@ -2696,7 +2739,7 @@ CSSParser.prototype = {
     }
   },
 
-  parseBorderWidthShorthand: function(token, aDecl, aAcceptPriority)
+  parseBorderWidthShorthand: function(token, aDecl, aAcceptPriority, aSheet)
   {
     var top = null;
     var bottom = null;
@@ -2726,8 +2769,10 @@ CSSParser.prototype = {
                || (token.isIdent() && token.value in this.kBORDER_WIDTH_NAMES)) {
         values.push(token.value);
       }
-      else
+      else {
+        this.addUnknownRule(aSheet, "");
         return "";
+      }
 
       token = this.getToken(true, true);
     }
@@ -2737,7 +2782,11 @@ CSSParser.prototype = {
 
     if (this.mPreventExpansion) {
       var decl = "";
-      if (count < 1 || count > 4) return "";
+      if (count < 1 || count > 4) {
+        this.addUnknownRule(aSheet, "");
+        return "";
+      }
+      
       for(var i = 0;i < count;i++) {
           decl += values[i];
           if(i < count - 1) decl += " ";
@@ -2771,6 +2820,7 @@ CSSParser.prototype = {
           left = values[3];
           break;
         default:
+          this.addUnknownRule(aSheet, "");
           return "";
       }
       aDecl.push(this._createJscsspDeclarationFromValue("border-top-width", top));
@@ -2781,7 +2831,7 @@ CSSParser.prototype = {
     }
   },
 
-  parseBorderStyleShorthand: function(token, aDecl, aAcceptPriority)
+  parseBorderStyleShorthand: function(token, aDecl, aAcceptPriority, aSheet)
   {
     var top = null;
     var bottom = null;
@@ -2809,8 +2859,10 @@ CSSParser.prototype = {
       else if (token.isIdent() && token.value in this.kBORDER_STYLE_NAMES) {
         values.push(token.value);
       }
-      else
+      else {
+        this.addUnknownRule(aSheet, "");
         return "";
+      }
 
       token = this.getToken(true, true);
     }
@@ -2820,7 +2872,11 @@ CSSParser.prototype = {
 
     if (this.mPreventExpansion) {
       var decl = "";
-      if (count < 1 || count > 4) return "";
+      if (count < 1 || count > 4) {
+        this.addUnknownRule(aSheet, "");
+        return "";
+      }
+      
       for(var i = 0;i < count;i++) {
           decl += values[i];
           if(i < count - 1) decl += " ";
@@ -2854,6 +2910,7 @@ CSSParser.prototype = {
           left = values[3];
           break;
         default:
+          this.addUnknownRule(aSheet, "");
           return "";
       }
       aDecl.push(this._createJscsspDeclarationFromValue("border-top-style", top));
@@ -2864,7 +2921,7 @@ CSSParser.prototype = {
     }
   },
 
-  parseBorderEdgeOrOutlineShorthand: function(token, aDecl, aAcceptPriority, aProperty)
+  parseBorderEdgeOrOutlineShorthand: function(token, aDecl, aAcceptPriority, aProperty, aSheet)
   {
     var bWidth = null;
     var bStyle = null;
@@ -2906,8 +2963,10 @@ CSSParser.prototype = {
                     ? "invert" : this.parseColor(token);
         if (!bColor && color)
           bColor = color;
-        else
+        else {
+          this.addUnknownRule(aSheet, "");
           return "";
+        }
       }
       token = this.getToken(true, true);
     }
@@ -2920,8 +2979,13 @@ CSSParser.prototype = {
       decl += bWidth ? bWidth : "";
       decl += bStyle ? (bWidth ? " " : "" ) + bStyle : "";
       decl += bColor ? (bWidth || bStyle ? " " : "" ) + bColor : "";
-      aDecl.push(this._createJscsspDeclarationFromValue(aProperty, decl));
-      return decl;
+      if (decl == "") {
+        this.addUnknownRule(aSheet, "");
+        return "";
+      } else {
+        aDecl.push(this._createJscsspDeclarationFromValue(aProperty, decl));
+        return decl;
+      }
     } else {
       bWidth = bWidth ? bWidth : "medium";
       bStyle = bStyle ? bStyle : "none";
@@ -2945,7 +3009,7 @@ CSSParser.prototype = {
     }
   },
 
-  parseBackgroundShorthand: function(token, aDecl, aAcceptPriority)
+  parseBackgroundShorthand: function(token, aDecl, aAcceptPriority, aSheet)
   {
     var kHPos = {"left": true, "right": true };
     var kVPos = {"top": true, "bottom": true };
@@ -3025,8 +3089,10 @@ CSSParser.prototype = {
             var url = this.parseURL(token); // TODO
             if (url)
               bgImage += url;
-            else
+            else {
+              this.addUnknownRule(aSheet, "");
               return "";
+            }
           }
         }
 
@@ -3038,8 +3104,10 @@ CSSParser.prototype = {
           var gradient = CssInspector.parseGradient(this, token);
           if (gradient)
             bgImage = CssInspector.serializeGradient(gradient);
-          else
+          else {
+            this.addUnknownRule(aSheet, "");
             return "";
+          }
         }
         
         // @ankit support for -webkit-gradient
@@ -3052,8 +3120,10 @@ CSSParser.prototype = {
           var color = this.parseColor(token);
           if (!bgColor && color)
             bgColor = color;
-          else
+          else {
+            this.addUnknownRule(aSheet, "");
             return "";
+          }
         }
 
       }
@@ -3070,8 +3140,13 @@ CSSParser.prototype = {
         decl += bgRepeat ? ( bgColor || bgImage ? " " : "" ) + bgRepeat : "";
         decl += bgAttachment ? ( bgColor || bgImage || bgRepeat ? " " : "" ) + bgAttachment : "";
         decl += bgPosition ? ( bgColor || bgImage || bgRepeat || bgAttachment ? " " : "" ) + bgPosition : "";
-        aDecl.push(this._createJscsspDeclarationFromValue("background", decl));
-        return decl;
+        if (decl == "") {
+          this.addUnknownRule(aSheet, "");
+          return "";
+        } else {
+          aDecl.push(this._createJscsspDeclarationFromValue("background", decl));
+          return decl;
+        }
     } else {
         // create the expanded declarations
         bgColor = bgColor ? bgColor : "transparent";
@@ -3089,7 +3164,7 @@ CSSParser.prototype = {
     }
   },
 
-  parseListStyleShorthand: function(token, aDecl, aAcceptPriority)
+  parseListStyleShorthand: function(token, aDecl, aAcceptPriority, aSheet)
   {
     var kPosition = { "inside": true, "outside": true };
 
@@ -3133,11 +3208,15 @@ CSSParser.prototype = {
         if (urlContent) {
           lImage = "url(" + urlContent;
         }
-        else
+        else {
+          this.addUnknownRule(aSheet, "");
           return "";
+        }
       }
-      else if (!token.isIdent("none"))
+      else if (!token.isIdent("none")) {
+        this.addUnknownRule(aSheet, "");
         return "";
+      }
 
       token = this.getToken(true, true);
     }
@@ -3150,8 +3229,13 @@ CSSParser.prototype = {
       decl += lType ? lType : "";
       decl += lImage ? ( lType ? " " : "" ) + lImage : "";
       decl += lPosition ? ( lType || lImage ? " " : "" ) + lPosition : "";
-      aDecl.push(this._createJscsspDeclarationFromValue("list-style", decl));
-      return decl;
+      if (decl == "") {
+        this.addUnknownRule(aSheet, "");
+        return "";
+      } else {
+        aDecl.push(this._createJscsspDeclarationFromValue("list-style", decl));
+        return decl;
+      }
     } else {
       lType = lType ? lType : "none";
       lImage = lImage ? lImage : "none";
@@ -3164,7 +3248,7 @@ CSSParser.prototype = {
     }
   },
 
-  parseFontShorthand: function(token, aDecl, aAcceptPriority)
+  parseFontShorthand: function(token, aDecl, aAcceptPriority, aSheet)
   {
     var kStyle = {"italic": true, "oblique": true };
     var kVariant = {"small-caps": true };
@@ -3251,8 +3335,10 @@ CSSParser.prototype = {
                   (token.isDimension() || token.isNumber() || token.isPercentage())) {
                 fLineHeight = token.value;
               }
-              else
+              else {
+                this.addUnknownRule(aSheet, "");
                 return "";
+              }
             }
             else
               this.ungetToken();
@@ -3260,8 +3346,11 @@ CSSParser.prototype = {
 
           else if (token.isIdent("normal")) {
             normalCount++;
-            if (normalCount > 3)
+            if (normalCount > 3) {
+              this.addUnknownRule(aSheet, "");
               return "";
+            }
+            
           }
 
           else if (!fFamily && // *MUST* be last to be tested here
@@ -3295,13 +3384,16 @@ CSSParser.prototype = {
                 fFamily += ", ";
                 lastWasComma = true;
               }
-              else
+              else {
+                this.addUnknownRule(aSheet, "");
                 return "";
+              }
+              
               token = this.getToken(true, true);
             }
           }
-
           else {
+            this.addUnknownRule(aSheet, "");
             return "";
           }
         }
@@ -3326,8 +3418,13 @@ CSSParser.prototype = {
       decl += fSize ? ( fStyle || fVariant || fWeight ? " " : "" ) + fSize : "";
       decl += (fSize && fLineHeight) ? "/" + fLineHeight : "";
       decl += fFamily ? ( fStyle || fVariant || fWeight || fSize ? " " : "" ) + fFamily : "";
-      aDecl.push(this._createJscsspDeclarationFromValue("font", decl));
-      return decl;
+      if (decl == "") {
+        this.addUnknownRule(aSheet, "");
+        return "";
+      } else {
+        aDecl.push(this._createJscsspDeclarationFromValue("font", decl));
+        return decl;
+      }
     } else {
       fStyle = fStyle ? fStyle : "normal";
       fVariant = fVariant ? fVariant : "normal";
@@ -3575,20 +3672,20 @@ CSSParser.prototype = {
           switch (descriptor)
           {
             case "background":
-              value = this.parseBackgroundShorthand(token, declarations, aAcceptPriority);
+              value = this.parseBackgroundShorthand(token, declarations, aAcceptPriority, aSheet);
               break;
             case "margin":
             case "padding":
-              value = this.parseMarginOrPaddingShorthand(token, declarations, aAcceptPriority, descriptor);
+              value = this.parseMarginOrPaddingShorthand(token, declarations, aAcceptPriority, descriptor, aSheet);
               break;
             case "border-color":
-              value = this.parseBorderColorShorthand(token, declarations, aAcceptPriority);
+              value = this.parseBorderColorShorthand(token, declarations, aAcceptPriority, aSheet);
               break;
             case "border-style":
-              value = this.parseBorderStyleShorthand(token, declarations, aAcceptPriority);
+              value = this.parseBorderStyleShorthand(token, declarations, aAcceptPriority, aSheet);
               break;
             case "border-width":
-              value = this.parseBorderWidthShorthand(token, declarations, aAcceptPriority);
+              value = this.parseBorderWidthShorthand(token, declarations, aAcceptPriority, aSheet);
               break;
             case "border-top":
             case "border-right":
@@ -3596,19 +3693,19 @@ CSSParser.prototype = {
             case "border-left":
             case "border":
             case "outline":
-              value = this.parseBorderEdgeOrOutlineShorthand(token, declarations, aAcceptPriority, descriptor);
+              value = this.parseBorderEdgeOrOutlineShorthand(token, declarations, aAcceptPriority, descriptor, aSheet);
               break;
             case "cue":
-              value = this.parseCueShorthand(token, declarations, aAcceptPriority);
+              value = this.parseCueShorthand(token, declarations, aAcceptPriority, aSheet);
               break;
             case "pause":
-              value = this.parsePauseShorthand(token, declarations, aAcceptPriority);
+              value = this.parsePauseShorthand(token, declarations, aAcceptPriority, aSheet);
               break;
             case "font":
-              value = this.parseFontShorthand(token, declarations, aAcceptPriority);
+              value = this.parseFontShorthand(token, declarations, aAcceptPriority, aSheet);
               break;
             case "list-style":
-              value = this.parseListStyleShorthand(token, declarations, aAcceptPriority);
+              value = this.parseListStyleShorthand(token, declarations, aAcceptPriority, aSheet);
               break;
             default:
               value = this.parseDefaultPropertyValue(token, declarations, aAcceptPriority, descriptor, aSheet);
