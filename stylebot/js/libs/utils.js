@@ -63,7 +63,7 @@ var Utils = {
 
     makeEditable: function(el, callback, options) {
         el.bind('click keyup', {callback: callback}, function(e) {
-            if (e.type == 'keyup' && e.keyCode != 13)
+            if (e.type === 'keyup' && e.keyCode != 13)
                 return true;
 
             var el = $(this);
@@ -76,6 +76,7 @@ var Utils = {
                 elWidth = el.width();
 
             var value = el.text();
+            
             // create a textfield
             var input = $('<input>', {
                 type: 'text',
@@ -92,9 +93,12 @@ var Utils = {
             if (options && options.selectText)
                 input.get(0).setSelectionRange(0, value.length);
 
-            var onClose = function(e) {
-                if (e.type == "keyup") {
-                    switch (e.keyCode) {
+            var onClose = function(e)
+            {
+                if (e.type === "keyup")
+                {
+                    switch (e.keyCode)
+                    {
                         case 38: // up
                             var nextUrl = e.data.el.parent().prev().children(".custom-style-url");
                             // if the target element doesn't exist, ignore this event
@@ -115,7 +119,7 @@ var Utils = {
                 }
                 
                 // if it's a mousedown event and the target is the element itself, ignore it
-                if (e.type == "mousedown" && e.target.id == e.data.input.attr('id'))
+                if (e.type === "mousedown" && e.target.id == e.data.input.attr('id'))
                     return true;
                 
                 var value = e.data.input.attr('value');
@@ -137,7 +141,7 @@ var Utils = {
             }
 
             input.bind('keyup', {input: input, el: el, callback: callback}, onClose);
-            $(document).bind('mousedown',{input: input, el: el, callback: callback}, onClose);
+            $(document).bind('mousedown', {input: input, el: el, callback: callback}, onClose);
         });
     },
 

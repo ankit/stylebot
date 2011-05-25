@@ -53,6 +53,9 @@
     padding: 0 !important;
     width: 178px !important;
     float: left !important;
+    text-overflow: ellipsis !important;
+    overflow: hidden !important;
+    white-space: nowrap !important
 }
 
 #stylebot-header .stylebot-editable-text:hover {
@@ -66,6 +69,10 @@
     display: inline-block;
 }
 
+#stylebot-header #stylebot-editing-field {
+    border: none !important;
+}
+
 #stylebot-header-container {
     display: inline-block;
     float: left !important;
@@ -75,7 +82,6 @@
 #stylebot-header-selector {
     border: 1px solid #bbb !important;
     border-radius: 2px !important;
-    display: inline-block !important;
     float: left !important;
     overflow: hidden !important;
     padding: 0 !important;
@@ -88,14 +94,10 @@
     padding: 1px 0 0 3px !important;
     height: 16px !important;
     width: 178px !important;
-    text-overflow: ellipsis !important;
-    overflow: hidden !important;
-    white-space: nowrap !important
 }
 
 #stylebot-header-selector #stylebot-editing-field {
     width: 179px !important;
-    border: none !important;
     border-radius: 0 !important;
     font-size: 12px !important;
     height: 16px !important;
@@ -115,9 +117,6 @@
     border-radius: 2px !important;
     width: 197px !important;
     border: 1px solid transparent !important;
-    text-overflow: ellipsis !important;
-    overflow: hidden !important;
-    white-space: nowrap !important;
 }
 
 #stylebot-header-url .stylebot-editable-text:hover {
@@ -126,7 +125,6 @@
 
 #stylebot-header-url #stylebot-editing-field {
     width: 199px !important;
-    border: none !important;
     padding: 2px 0 2px 3px !important;
 }
 

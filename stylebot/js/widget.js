@@ -23,7 +23,9 @@ stylebot.widget = {
 
     //  Initialize widget UI
     createUI: function() {
-        this.cache.box = $('<div>', {
+        var self = stylebot.widget;
+        
+        self.cache.box = $('<div>', {
             id: 'stylebot'
         });
         
@@ -31,49 +33,39 @@ stylebot.widget = {
             id: 'stylebot-container'
         }).appendTo(document.body);
 
-        //  Header
-
         //  Selection toggle button
-        this.cache.headerSelectIcon = $('<div>', {
+        self.cache.headerSelectIcon = $('<div>', {
             id: 'stylebot-select-icon'
         })
+        
         .tipsy({delayIn: 1500, gravity:'nw'})
+        
         .click(function(e) {
             stylebot.toggleSelection();
         });
 
         //  Selector
-        this.cache.headerSelector = $('<div>', {
+        self.cache.headerSelector = $('<div>', {
             class: 'stylebot-editable-text',
             html: 'custom styles',
             title: 'Click to edit the CSS selector'
         })
-        .tipsy({delayIn: 500, gravity:'n', });
+        .tipsy({ delayIn: 500, gravity:'n' });
 
-        //  Selectors dropdown
-        this.dropDown = $('<div>', {
+        //  Selector dropdown
+        self.dropDown = $('<div>', {
             id: 'stylebot-dropdown-button',
             class: 'stylebot-header-button',
             title: "View previously edited CSS selectors"
         })
-        .tipsy({delayIn: 1500, gravity: 'ne'})
-        .mouseup(stylebot.widget.showSelectorDropdown);
+        .tipsy({ delayIn: 1500, gravity: 'ne' })
+        .mouseup(self.showSelectorDropdown);
 
         var selectorContainer = $('<div>', {
             id: 'stylebot-header-selector'
         })
-        .append(this.cache.headerSelector)
-        .append(this.dropDown);
-
-        //  Make selector editable
-        Utils.makeEditable(this.cache.headerSelector, function(value) {
-            var self = stylebot.widget;
-            self.setSelector(self.cache.headerSelector.html());
-            self.updateHeight();
-            stylebot.select(null, value);
-        }, {
-            selectText: true
-        });
+        .append(self.cache.headerSelector)
+        .append(self.dropDown);
 
         //  URL
         var url = $('<div>', {
@@ -87,24 +79,30 @@ stylebot.widget = {
             id: 'stylebot-header-url'
         })
         .append(url);
-
-        //  Make URL editable
-        Utils.makeEditable(url, function(value) {
-            stylebot.widget.updateHeight();
-            if (value != stylebot.style.cache.url) {
-                stylebot.chrome.transfer(stylebot.style.cache.url, value);
-            }
-            stylebot.style.cache.url = value;
-        }, {
-            selectText: true
-        });
-
+        
         //  Container for URL and selector
         var headerTextContainer = $('<div>', {
             id: 'stylebot-header-container'
         })
         .append(selectorContainer)
         .append(urlContainer);
+        
+        //  Make selector editable
+        Utils.makeEditable(self.cache.headerSelector, function(value) {
+            self.updateHeight();
+            self.setSelector(self.cache.headerSelector.html());
+            stylebot.select(null, value);
+        }, { selectText: true });
+
+        //  Make URL editable
+        Utils.makeEditable(url, function(value) {
+            self.updateHeight();
+            if (value != stylebot.style.cache.url)
+            {
+                stylebot.chrome.transfer(stylebot.style.cache.url, value);
+                stylebot.style.cache.url = value;
+            }
+        }, { selectText: true });
 
         //  Close button
         var closeButton = $('<div>', {
@@ -120,9 +118,9 @@ stylebot.widget = {
             title: "Move stylebot to the left"
         })
         .data('position', "Right")
-        .tipsy({delayIn: 1500, gravity: 'ne'})
-        .appendTo(this.cache.box)
-        .mouseup(stylebot.widget.togglePosition);
+        .tipsy({ delayIn: 1500, gravity: 'ne' })
+        .appendTo(self.cache.box)
+        .mouseup(self.togglePosition);
 
         // Settings button to open options page
         var settingsButton = $('<div>', {
@@ -133,68 +131,75 @@ stylebot.widget = {
         .tipsy({delayIn: 1000, gravity: 'ne'})
         .click(stylebot.chrome.openOptionsPage);
 
-        this.cache.header = $('<div>', {
+        self.cache.header = $('<div>', {
             id: 'stylebot-header'
         })
-        .append(this.cache.headerSelectIcon)
+        .append(self.cache.headerSelectIcon)
         .append(headerTextContainer)
         .append(closeButton)
         .append(arrowButton)
         .append(settingsButton)
-        .appendTo(this.cache.box);
+        .appendTo(self.cache.box);
 
         //  Basic mode
-        stylebot.widget.basic.createUI().appendTo(this.cache.box);
+        self.basic.createUI().appendTo(self.cache.box);
 
         //  Advanced mode
-        stylebot.widget.advanced.createUI(this.cache.box);
+        self.advanced.createUI(self.cache.box);
 
         //  Options (footer)
         var optionsContainer = $('<div>', {
             id: 'stylebot-widget-options'
         });
 
-        WidgetUI.createOption(WidgetUI.createButtonSet(['Basic', 'Advanced'], "stylebot-mode", 0, stylebot.widget.toggleMode))
+        // Basic and Advanced mode buttons
+        WidgetUI.createOption(WidgetUI.createButtonSet(['Basic', 'Advanced'], "stylebot-mode", 0, self.toggleMode))
         .appendTo(optionsContainer);
 
         var btContainer = $('<div>', {
             id: 'stylebot-main-buttons'
         });
 
+        // Edit CSS button
         WidgetUI.createButton("Edit CSS")
         .attr('title', 'Edit entire page\'s CSS')
-        .tipsy({delayIn: 800, gravity:'sw', html: true})
+        .tipsy({ delayIn: 800, gravity:'sw', html: true })
         .appendTo(btContainer)
-        .click(stylebot.widget.editCSS)
+        .click(self.editCSS);
 
-        this.cache.undoBt = WidgetUI.createButton("Undo")
+        // Undo button
+        self.cache.undoBt = WidgetUI.createButton("Undo")
         .attr('title', "Undo your last action")
         .prop('disabled', true)
+        .tipsy({ delayIn: 800, gravity:'s', html: true })
+        .appendTo(btContainer)
+        .click(function(e) { stylebot.style.undo(); });
 
-        .tipsy({delayIn: 800, gravity:'s', html: true})
-        .appendTo(btContainer).click(function(e) {stylebot.style.undo();});
-
+        // Reset button
         WidgetUI.createButton("Reset")
         .attr('title', "Reset custom CSS for the selected elements")
-        .tipsy({delayIn: 800, gravity:'s', html: true})
-        .appendTo(btContainer).click(stylebot.widget.resetCSS);
+        .tipsy({ delayIn: 800, gravity:'s', html: true })
+        .appendTo(btContainer)
+        .click(self.resetCSS);
 
+        // Reset Page button
         WidgetUI.createButton("Reset Page")
         .attr('title', "Reset custom CSS for the entire page")
-        .tipsy({delayIn: 500, gravity:'se', html: true})
-        .appendTo(btContainer).click(stylebot.widget.resetAllCSS);
+        .tipsy({ delayIn: 500, gravity:'se', html: true })
+        .appendTo(btContainer)
+        .click(self.resetAllCSS);
 
         btContainer.appendTo(optionsContainer);
-        optionsContainer.appendTo(this.cache.box);
+        optionsContainer.appendTo(self.cache.box);
 
-        this.cache.box.appendTo(boxContainer);
-        this.basic.fillCache();
+        self.cache.box.appendTo(boxContainer);
+        self.basic.fillCache();
 
-        //  Reload previous accordion state
-        this.basic.initAccordions();
+        //  Initialize accordion state
+        self.basic.initAccordions();
 
-        //  Initially, place the widget on the right of the screen
-        stylebot.widget.setPosition("Right");
+        //  By default, place the widget on the right of the screen
+        self.setPosition("Right");
     },
 
     //  Attach listeners for TAB keypresses and window resize
