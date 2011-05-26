@@ -90,7 +90,6 @@ function saveStyleFromSocial(installationEvent) {
         // add the meta header
         var header = "\
 /**\n\
-    Author      : " + data.author + "\n\
     Title       : " + data.title + "\n";
         
         if (data.description) {
@@ -100,6 +99,8 @@ function saveStyleFromSocial(installationEvent) {
         
         header += "\
     URL         : http://stylebot.me/styles/" + data.id + "\n\
+    Author      : " + data.author + "\n\
+    Author URL  : " + "http://stylebot.me/users/" + data.author + "\n\
 **/\n";
         
         var rulesWithMeta = { 'comment-#0' : { comment: header } };
