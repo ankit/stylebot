@@ -119,6 +119,11 @@ CSSScanner.prototype = {
   getCurrentPos: function() {
     return this.mPos;
   },
+  
+  getAlreadyScanned: function()
+  {
+    return this.mString.substr(0, this.mPos);
+  },
 
   preserveState: function() {
     this.mPreservedPos.push(this.mPos);
@@ -834,8 +839,13 @@ CSSParser.prototype = {
     this.addUnknownRule(aSheet, aString);
   },
 
-  addUnknownRule: function(aSheet, aString) {
+  addUnknownRule: function(aSheet, aString, aCurrentLine) {
+    if (aCurrentLine === undefined) {
+      aCurrentLine = CountLF(this.mScanner.getAlreadyScanned());
+    }
+    
     var rule = new jscsspErrorRule();
+    rule.currentLine = aCurrentLine;
     rule.parsedCssText = aString;
     rule.parentStyleSheet = aSheet;
     aSheet.cssRules.push(rule);
@@ -3784,6 +3794,12 @@ function ParseURL(buffer) {
   }
 
   return result;
+}
+
+function CountLF(s)
+{
+  var nCR = s.match( /\n/g );
+  return nCR ? nCR.length + 1 : 1;
 }
 
 function ParseException(description) {
