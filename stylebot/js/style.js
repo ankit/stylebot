@@ -14,8 +14,6 @@ stylebot.style = {
                 }
             }
     */
-    globalRules: {},
-
     rules: {},
 
     timer: null,

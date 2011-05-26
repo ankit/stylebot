@@ -3,7 +3,7 @@
 // Major Version. Used to check if the release notes should be shown during update
 // Only updated for X.X releases
 //
-var CURRENT_MAJOR_VERSION = "1.3";
+var CURRENT_MAJOR_VERSION = "1.4";
 
 var currTabId;
 var contextMenuId = null;
@@ -71,11 +71,15 @@ function updateVersion() {
         return true;
     }
 
-    if (parseInt(localStorage.version) < 1) {
-        upgradeTo1();
-    }
-
     if (localStorage.version != CURRENT_MAJOR_VERSION) {
+        if (parseInt(localStorage.version) < 1) {
+            upgradeTo1();
+        }
+        
+        if (parseFloat(localStorage.version) < 1.4) {
+            upgradeTo1_4();
+        }
+
         updateVersionString();
         showUpdateNotification();
     }
@@ -88,6 +92,7 @@ function updateVersionString() {
 
 // Upgrade to version 1.4
 function upgradeTo1_4() {
+    console.log("Upgrading data modal for 1.4");
     for (var url in cache.styles) {
         if (cache.styles[url]['_enabled'] === undefined) {
             cache.styles[url]['_enabled'] = true;
@@ -99,6 +104,7 @@ function upgradeTo1_4() {
 // Mostly legacy code now, since almost everyone should already be updated to 1.0
 //
 function upgradeTo1() {
+    console.log("Upgrading data modal for 1");
     var first = false;
 
     // upgrading to the new data model
@@ -447,26 +453,10 @@ function doesStyleExist(aURL) {
 
 // Return CSS rules for websites
 function getGlobalRules() {
-    var rules = {};
-                   
-    // iterate over each selector in styles
-    for (var selector in cache.styles["*"]['_rules']) {
-        // if no rule exists for selector, simply copy the rule
-        if (rules[selector] == undefined)
-            rules[selector] = cloneObject(cache.styles["*"]['_rules'][selector]);
-
-        // otherwise, iterate over each property
-        else {
-            for (var property in cache.styles["*"]['_rules'][selector])
-            {
-                rules[selector][property] = cache.styles["*"]['_rules'][selector][property];
-            }
-        }
-    }
-    if (rules != undefined)
-        return {rules: rules};
-    else
-        return {rules: null};
+    if (cache.styles["*"] === undefined)
+        return null;
+        
+    return cache.styles["*"]["_rules"];
 }
 
 // Return CSS rules for a URL

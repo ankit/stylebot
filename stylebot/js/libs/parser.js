@@ -1291,8 +1291,10 @@ CSSParser.prototype = {
               || token.isIdent("auto")) {
         values.push(token.value);
       }
-      else
+      
+      else {
         return "";
+      }
 
       token = this.getToken(true, true);
     }
