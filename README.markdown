@@ -23,7 +23,7 @@ Donate on Pledgie: [http://pledgie.com/campaigns/14409](http://pledgie.com/campa
 
 This project was initially developed as part of **Google Summer of Code 2010**, where I was mentored by **Rachel Shearer**.
 
-I am using code from the following projects:
+Code from the following projects is used:
 
 * Aristo UI  
   * [http://github.com/280north/aristo](http://github.com/280north/aristo)  
@@ -32,11 +32,11 @@ I am using code from the following projects:
 
 * [Firebug](http://www.getfirebug.com) - Selection of DOM elements (selectionBox.js)
 
-* [JSCSSP](http://www.glazman.org/JSCSSP/) - Amazing CSS Parser in JavaScript written by Daniel Glazman
+* [JSCSSP](http://www.glazman.org/JSCSSP/)
 
 * [ColorPicker](http://www.eyecon.ro/colorpicker/)
 
-* [Tipsy](http://github.com/jaz303/tipsy) - Tooltips
+* [Tipsy](http://github.com/jaz303/tipsy)
 
 * [jQuery](http://jquery.com/)
 
