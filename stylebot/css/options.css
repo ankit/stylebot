@@ -69,7 +69,12 @@ li.option:first-of-type {
 }
 
 .option-field {
+    vertical-align: top;
     min-width: 280px;
+    display: inline-block;
+}
+
+.option-value {
     display: inline-block;
 }
 

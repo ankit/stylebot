@@ -21,7 +21,8 @@ var options = {
     mode: "Basic",
     sync: false,
     livePreviewColorPicker: false,
-    showPageAction: true
+    showPageAction: true,
+    openEditCSS: false
 }
 
 var styles = {};

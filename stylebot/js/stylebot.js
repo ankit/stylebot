@@ -25,7 +25,8 @@ var stylebot = {
         mode: 'Basic',
         position: 'Right',
         sync: false,
-        livePreviewColorPicker: false
+        livePreviewColorPicker: false,
+        openEditCSS: false
     },
 
     initialize: function(options) {

@@ -266,6 +266,10 @@ stylebot.widget = {
 
         this.setMode();
         this.cache.box.show();
+
+        if (stylebot.options.openEditCSS){
+            this.editCSS();
+        }
     },
 
     //  Close stylebot widget
@@ -354,7 +358,7 @@ stylebot.widget = {
 
     //  Display the page's CSS in a popup for editing
     editCSS: function(e) {
-        stylebot.page.show(CSSUtils.crunchFormattedCSS(stylebot.style.rules, false), e.target);
+        stylebot.page.show(CSSUtils.crunchFormattedCSS(stylebot.style.rules, false), e ? e.target : null);
     },
 
     //  Reset CSS for current selector

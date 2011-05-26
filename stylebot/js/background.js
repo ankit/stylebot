@@ -38,7 +38,8 @@ var cache = {
         sync: false,
         contextMenu: true,
         livePreviewColorPicker: false,
-        showPageAction: true
+        showPageAction: true,
+        openEditCSS: false
     },
 
     // indices of enabled accordions in panel. by default, all are enabled

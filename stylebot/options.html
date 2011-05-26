@@ -66,15 +66,17 @@
                     </li>
                     <li class="option">
                         <span class="option-field">Shortcut Key Combo:</span>
-                        <select name="shortcutMetaKey">
-                            <option value="ctrl">Ctrl</option>
-                            <option value="shift">Shift</option>
-                            <option value="alt">Alt</option>
-                            <option value="none">None</option>
-                        </select>
-                        + <input type="text" name="shortcutKeyCharacter" value="e" size="1" />
-                        <!-- Hidden field to store keycode value -->
-                        <input type="hidden" name="shortcutKey" />
+                        <div class='option-value'>
+                            <select name="shortcutMetaKey">
+                                <option value="ctrl">Ctrl</option>
+                                <option value="shift">Shift</option>
+                                <option value="alt">Alt</option>
+                                <option value="none">None</option>
+                            </select>
+                            + <input type="text" name="shortcutKeyCharacter" value="e" size="1" />
+                            <!-- Hidden field to store keycode value -->
+                            <input type="hidden" name="shortcutKey" />
+                        </div>
                     </li>
                 </ul>
             </div>
@@ -83,9 +85,17 @@
                 <ul class="option-subsection">
                     <li class="option">
                         <span class='option-field'>Preferred Editing Mode:</span>
-                        <label><input type="radio" name="mode" value="Basic" /> Basic </label>
-                        &nbsp;
-                        <label><input type="radio" name="mode" value="Advanced" /> Advanced </label>
+                        <div class='option-value'>
+                            <label><input type="radio" name="mode" value="Basic" /> Basic </label>
+                            &nbsp;
+                            <label><input type="radio" name="mode" value="Advanced" /> Advanced </label>
+                        </div>
+                    </li>
+                    <li class="option">
+                        <label>
+                            <input type="checkbox" name="openEditCSS" />
+                            <span class="option-field">Open Edit CSS Mode by Default</span>
+                        </label>
                     </li>
                     <li class="option">
                         <label>

@@ -167,6 +167,12 @@ table {\n\
                     editor.focus();
                     editor.gotoLine(session.getLength(), 0);
                     
+                    if (!prevTarget) {
+                        setTimeout(function() {
+                            self.onWindowResize();
+                        }, 0);
+                    }
+                    
                     self.clearSyntaxError();
                     stylebot.style.saveState();
                     self.cache.css = session.getValue();
@@ -174,7 +180,7 @@ table {\n\
 
                 onClose: function() {
                     self.isVisible = false;
-                    prevTarget.focus();
+                    if (prevTarget) prevTarget.focus();
                     $(window).unbind('resize', self.onWindowResize);
                 }
 
@@ -250,7 +256,6 @@ table {\n\
     cancel: function(e) {
         stylebot.page.saveCSS(stylebot.page.cache.originalCSS, true);
         stylebot.page.modal.hide();
-        stylebot.widget.open();
         stylebot.style.clearLastState();
     },
 
