@@ -267,7 +267,8 @@ stylebot.widget = {
         this.setMode();
         this.cache.box.show();
 
-        if (stylebot.options.mode == "Edit CSS"){
+        if (stylebot.options.mode === "Edit CSS") {
+            stylebot.options.mode = "Basic";
             this.editCSS();
         }
     },
