@@ -6,8 +6,10 @@
 
 stylebot.page = {
     
-    BOTTOM_PADDING: 112,
-
+    RIGHT_PADDING: 15,
+    
+    BOTTOM_EDITOR_PADDING: 108,
+    
     isVisible: false,
 
     modal: null,
@@ -126,18 +128,20 @@ table {\n\
         
         // ace monkey-patch to allow automatic resizing based on scrollbars
         self.cache.editor = Utils.ace.monkeyPatch(ace.edit('stylebot-page-editor'));
-        
-        var session = self.cache.editor.getSession();
+
+        var editor = self.cache.editor;
+        var session = editor.getSession();
         
         var cssMode = require("ace/mode/css").Mode;
         session.setMode(new cssMode());
         session.setUseWrapMode(true);
         session.on('change', self.contentChanged);
         
-        self.cache.editor.setTheme("ace/theme/dawn");
+        editor.setTheme("ace/theme/dawn");
+        editor.renderer.setShowGutter(false);
         
         setTimeout(function() {
-            self.cache.editor.resize();
+            editor.resize();
         }, 0);
     },
 
@@ -149,10 +153,10 @@ table {\n\
                 closeOnEsc: false,
                 closeOnBgClick: false,
                 bgFadeSpeed: 0,
-                width: $("#stylebot").width() - 30 + "px",
+                width: $("#stylebot").width() - self.RIGHT_PADDING + "px",
                 top: '0%',
                 left: '0',
-                height: $("#stylebot").height() - 30 + "px",
+                height: $("#stylebot").height() + "px",
                 bgOpacity: 0,
                 parent: $("#stylebot"),
 
@@ -188,11 +192,11 @@ table {\n\
         }
 
         else {
-            stylebot.page.modal.reset({
-                width: $("#stylebot").width() - 30 + "px",
+            self.modal.reset({
+                width: $("#stylebot").width() - self.RIGHT_PADDING + "px",
                 top: '0%',
                 left: '0',
-                height: $("#stylebot").height() - 30 + "px",
+                height: $("#stylebot").height() + "px"
             });
         }
 
@@ -201,7 +205,7 @@ table {\n\
         self.modal.show();
         self.isVisible = true;
         
-        $(window).bind('resize', this.onWindowResize);
+        $(window).bind('resize', self.onWindowResize);
     },
 
     copyToClipboard: function() {
@@ -294,14 +298,16 @@ table {\n\
     },
 
     onWindowResize: function() {
-        stylebot.page.modal.reset({
-            width: $("#stylebot").width() - 30 + "px",
+        var self = stylebot.page;
+        
+        self.modal.reset({
+            width: $("#stylebot").width() - self.RIGHT_PADDING + "px",
             top: '0%',
             left: '0',
-            height: $("#stylebot").height() - 30 + "px",
+            height: $("#stylebot").height() + "px"
         });
         
-        stylebot.page.resize();
+        self.resize();
     },
     
     displaySyntaxError: function(error, setCursor) {
@@ -325,7 +331,7 @@ table {\n\
     },
     
     resize: function() {
-        $("#stylebot-page-editor").css('height', $("#stylebot").height() - this.BOTTOM_PADDING + "px");
+        $("#stylebot-page-editor").css('height', $("#stylebot").height() - this.BOTTOM_EDITOR_PADDING + "px");
         this.cache.editor.resize();
     }
 }

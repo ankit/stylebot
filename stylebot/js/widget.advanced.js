@@ -6,7 +6,7 @@
 
 stylebot.widget.advanced = {
     
-    BOTTOM_PADDING: 35,
+    BOTTOM_PADDING: 37,
 
     cache: {
         editor: null,

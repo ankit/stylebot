@@ -440,14 +440,14 @@ a.stylebot-accordion-active .stylebot-accordion-icon {
 
 #stylebot-advanced-header {
     line-height: 20px !important;
-    margin-left: 10px !important;
+    margin-left: 3px !important;
 }
 
 #stylebot-advanced-editor {
     position: relative !important;
-    margin: 5px 10px !important;
+    margin: 5px 3px 10px 3px !important;
     line-height: 20px !important;
-    width: 290px !important;
+    width: 302px !important;
 }
 
 /* @end */
@@ -463,13 +463,13 @@ a.stylebot-accordion-active .stylebot-accordion-icon {
     position: relative;
     margin-top: 5px;
     margin-bottom: 5px;
-    width: 290px !important;
+    width: 302px !important;
 }
 
 #stylebot-page-editor-header {
     font-size: 12px !important;
     line-height: 20px !important;
-    width: 300px !important;
+    width: 302px !important;
     text-overflow: ellipsis !important;
     overflow: hidden !important;
     white-space: nowrap !important;
@@ -486,6 +486,10 @@ a.stylebot-accordion-active .stylebot-accordion-icon {
 
 /** Ace editor **/
 
+.ace_editor {
+    border: 1px solid #eee !important;
+}
+
 .ace_scroller {
     overflow-y: hidden !important;
     overflow-x: hidden !important;
@@ -500,4 +504,9 @@ a.stylebot-accordion-active .stylebot-accordion-icon {
     position: absolute;
     z-index: 4;
     background: hsla(17, 80%, 60%, 0.50);
+}
+
+#stylebot #stylebot-modal {
+    padding: 7px !important;
+    padding-bottom: 15px !important;
 }

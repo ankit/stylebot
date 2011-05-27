@@ -106,7 +106,7 @@ function upgradeTo1_4() {
 }
 
 // Upgrade to version 1
-// Mostly legacy code now, since almost everyone should already be updated to 1.0
+// @deprecated Far too ahead in the release cycle :)
 //
 function upgradeTo1() {
     console.log("Upgrading data modal for 1");
