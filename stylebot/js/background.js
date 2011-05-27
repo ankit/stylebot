@@ -1,9 +1,6 @@
 /* Background JS for Stylebot */
 
-// Major Version. Used to check if the release notes should be shown during update
-// Only updated for X.X releases
-//
-var CURRENT_MAJOR_VERSION = "1.4";
+var CURRENT_VERSION = "1.4.1.1";
 
 var currTabId;
 var contextMenuId = null;
@@ -71,33 +68,41 @@ function updateVersion() {
         return true;
     }
 
-    if (localStorage.version != CURRENT_MAJOR_VERSION) {
-        if (parseInt(localStorage.version) < 1) {
-            upgradeTo1();
-        }
-        
-        if (parseFloat(localStorage.version) < 1.4) {
+    if (localStorage.version != CURRENT_VERSION) {
+        if (CURRENT_VERSION === "1.4.1.1") {
             upgradeTo1_4();
         }
-
+        
+        // only show notification for X.X updates
+        if (parseFloat(localStorage.version) < parseFloat(CURRENT_VERSION))
+        {
+            showUpdateNotification();
+        }
+        
+        // update version string in localStorage
         updateVersionString();
-        showUpdateNotification();
     }
 }
 
 function updateVersionString() {
-    console.log("Updating to version " + CURRENT_MAJOR_VERSION);
-    localStorage.version = CURRENT_MAJOR_VERSION;
+    console.log("Updating to version " + CURRENT_VERSION);
+    localStorage.version = CURRENT_VERSION;
 }
 
 // Upgrade to version 1.4
+//
 function upgradeTo1_4() {
     console.log("Upgrading data modal for 1.4");
-    for (var url in cache.styles) {
+    
+    for (var url in cache.styles)
+    {
         if (cache.styles[url]['_enabled'] === undefined) {
             cache.styles[url]['_enabled'] = true;
         }
     }
+    
+    // save the updated styles in localStorage
+    updateStylesInDataStore();
 }
 
 // Upgrade to version 1
