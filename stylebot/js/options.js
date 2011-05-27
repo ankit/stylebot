@@ -21,8 +21,7 @@ var options = {
     mode: "Basic",
     sync: false,
     livePreviewColorPicker: false,
-    showPageAction: true,
-    openEditCSS: false
+    showPageAction: true
 }
 
 var styles = {};
@@ -56,7 +55,6 @@ function init() {
 
         else if (el.type === "radio") {
             var len = $el.length;
-
             for (var i = 0; i < len; i ++) {
                 if ($el.get(i).value == value)
                 {

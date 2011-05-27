@@ -267,7 +267,7 @@ stylebot.widget = {
         this.setMode();
         this.cache.box.show();
 
-        if (stylebot.options.openEditCSS){
+        if (stylebot.options.mode == "Edit CSS"){
             this.editCSS();
         }
     },
@@ -319,10 +319,10 @@ stylebot.widget = {
         
         var newHeight = window.innerHeight - (optionsHeight + headerHeight);
 
-        if (stylebot.options.mode === "Basic")
-            self.basic.resize(newHeight);
-        else
+        if (stylebot.options.mode === "Advanced")
             self.advanced.resize(newHeight);
+        else
+            self.basic.resize(newHeight);
     },
 
     //  Refresh widget UI based on the current mode of stylebot
@@ -350,10 +350,10 @@ stylebot.widget = {
 
     //  Reset the UI of the widget
     reset: function() {
-        if (stylebot.options.mode === "Basic")
-            stylebot.widget.basic.reset();
-        else
+        if (stylebot.options.mode === "Advanced")
             stylebot.widget.advanced.reset();
+        else
+            stylebot.widget.basic.reset();
     },
 
     //  Display the page's CSS in a popup for editing
@@ -413,11 +413,10 @@ stylebot.widget = {
         if (e)
             stylebot.options.mode = $(e.target).html();
 
-        else if (stylebot.options.mode === "Basic")
-            stylebot.options.mode = "Advanced";
-
-        else
+        else if (stylebot.options.mode === "Advanced")
             stylebot.options.mode = "Basic";
+        else
+            stylebot.options.mode = "Advanced";
 
         stylebot.widget.updateHeight();
         stylebot.widget.setMode();
