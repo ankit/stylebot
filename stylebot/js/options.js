@@ -311,14 +311,40 @@ function addStyle() {
     cache.modal.show();
 }
 
+function enableAllStyles() {
+    for (var url in styles) {
+        styles[url]['_enabled'] = true;
+    }
+    
+    $('.custom-style input[type=checkbox]').prop('checked', true);
+    bg_window.saveStyles(styles);
+}
+
+function disableAllStyles() {
+    for (var url in styles) {
+        styles[url]['_enabled'] = false;
+    }
+    
+    $('.custom-style input[type=checkbox]').prop('checked', false);
+    bg_window.saveStyles(styles);
+}
+
 function changeStyleStatus(e) {
     var parent = $(e.target).parents('.custom-style');
     var url = parent.find('.custom-style-url').html();
+    
+    if (styles[url] === undefined)
+        return;
+    
     if (styles[url]['_enabled']) {
         styles[url]['_enabled'] = false;
-    } else {
+    }
+    
+    else {
         styles[url]['_enabled'] = true;
     }
+    
+    bg_window.saveStyles(styles);
 }
 
 // Called when Share button is clicked for a style

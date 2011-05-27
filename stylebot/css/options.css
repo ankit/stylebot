@@ -139,6 +139,7 @@ li.option:first-of-type {
 #custom-styles {
     min-width: 422px;
     margin-bottom: 20px;
+    margin-top: 20px;
 }
 
 #custom-styles input[type=checkbox] {

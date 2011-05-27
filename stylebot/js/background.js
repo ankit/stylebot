@@ -343,6 +343,7 @@ function transfer(source, destination) {
 function saveStyles(styles) {
     if (styles)
         cache.styles = styles;
+    
     updateStylesInDataStore();
 }
 
@@ -382,13 +383,15 @@ function mergeStyles(s1, s2) {
     return s2;
 }
 
-// Update styles in localStorage
+// Update styles in localStorage with styles from cache
+//
 function updateStylesInDataStore() {
     var jsonString = JSON.stringify(cache.styles);
     localStorage['stylebot_styles'] = jsonString;
 }
 
 // Load styles from localStorage into cache
+//
 function loadStylesIntoCache() {
     if (localStorage['stylebot_styles']) {
         try {
