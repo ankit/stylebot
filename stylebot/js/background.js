@@ -639,6 +639,8 @@ String.prototype.trim = function() {
 String.prototype.matchesPattern = function(pattern) {
     var hasComma = ~pattern.indexOf(',');
     pattern = pattern.
+            /* Removes white spaces */
+            replace(/ /g, '').
             /* Escapes . ? | ( ) [ ] + $ ^ \ { } */
             replace(/(\.|\?|\||\(|\)|\[|\]|\+|\$|\^|\\|\{|\})/g, '\\$1').
             /* Allows commas to be used to separate urls */
