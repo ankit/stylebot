@@ -479,6 +479,7 @@ function getRulesForPage(currUrl) {
     for (var url in cache.styles)
     {
         if (!cache.styles[url]['_enabled']) continue;
+        if (url === '*') continue;
         
         if (currUrl.matchesPattern(url))
         {

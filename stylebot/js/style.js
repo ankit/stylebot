@@ -15,6 +15,8 @@ stylebot.style = {
             }
     */
     rules: {},
+    
+    global: {},
 
     timer: null,
 
@@ -51,6 +53,12 @@ stylebot.style = {
         {
             this.rules = stylebotTempRules;
             delete stylebotTempRules;
+        }
+        
+        if (stylebotGlobalRules)
+        {
+            this.global = stylebotGlobalRules;
+            delete stylebotGlobalRules;
         }
     },
 
@@ -495,6 +503,7 @@ stylebot.style = {
     disable: function() {
         this.status = false;
         $("#stylebot-css").html('');
+        $("#stylebot-global-css").html('');
     },
 
     enable: function() {
@@ -502,6 +511,8 @@ stylebot.style = {
             return;
         this.status = true;
         $("#stylebot-css").html(CSSUtils.crunchCSS(this.rules, true));
+        if (this.global)
+            $("#stylebot-global-css").html(CSSUtils.crunchCSS(this.global, true));
     },
 
     toggle: function() {

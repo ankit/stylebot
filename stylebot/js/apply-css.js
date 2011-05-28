@@ -6,10 +6,12 @@
 // temporaries used by stylebot.style.initialize()
 var stylebotTempUrl;
 var stylebotTempRules;
+var stylebotGlobalRules;
 
 // send request to background.html to get stylebot global rules
 chrome.extension.sendRequest({ name: "getGlobalRules" }, function(response) {
     if (response) {
+        stylebotGlobalRules = response;
         var css = CSSUtils.crunchCSS(response, true);
         if (css != "")
         {
