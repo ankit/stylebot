@@ -454,11 +454,13 @@ function saveStyle(url, css, add) {
                 return false;
             }
 
-            styles[url] = {};
+            if (styles[url] === undefined) {
+                styles[url] = {};
+                styles[url]['_social'] = {};
+                styles[url]['_enabled'] = true;
+            }
             styles[url]['_rules'] = rules;
-            styles[url]['_social'] = {};
-            styles[url]['_enabled'] = true;
-
+            
             bg_window.saveStyles(styles);
             bg_window.pushStyles();
 
