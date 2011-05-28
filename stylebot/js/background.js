@@ -463,9 +463,8 @@ function doesStyleExist(aURL) {
 
 // Return CSS rules for websites
 function getGlobalRules() {
-    if (cache.styles['*'] === undefined)
+    if (cache.styles['*'] === undefined || !cache.styles['*']['_enabled'])
         return null;
-        
     return cache.styles['*']['_rules'];
 }
 

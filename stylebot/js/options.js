@@ -75,6 +75,7 @@ function init() {
     attachListeners();
     initFiltering();
     updateSyncUI();
+    updateGlobalStylesheetUI();
 }
 
 // Initialize tabs
@@ -241,6 +242,18 @@ function removeStyle(e) {
 
     bg_window.saveStyles(styles);
     bg_window.pushStyles();
+}
+
+// Update Global Stylesheet UI
+function updateGlobalStylesheetUI() {
+    $('#global-stylesheet-button').html(bg_window.cache.styles['*']['_enabled'] ? "Disable Global Stylesheet" : "Enable Global Stylesheet");
+}
+
+// Turn global stylesheet on/off
+function toggleGlobalStylesheet() {
+    bg_window.cache.styles['*']['_enabled'] = !bg_window.cache.styles['*']['_enabled'];
+    bg_window.updateStylesInDataStore();
+    updateGlobalStylesheetUI();
 }
 
 // Displays the modal popup for editing a style
@@ -611,11 +624,9 @@ function importCSS() {
 // Initialize Sync UI based on value of the sync option
 function updateSyncUI() {
     $('#sync-button').html(options.sync ? "Disable Sync" : "Enable Sync");
-    $('#sync-now').prop('disabled', !options.sync);
 }
 
 // Turn syncing on/off
-//
 function toggleSyncing() {
     options.sync = !options.sync;
     bg_window.saveOption("sync", options.sync);
