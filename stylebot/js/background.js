@@ -1,6 +1,6 @@
 /* Background JS for Stylebot */
 
-var CURRENT_VERSION = "1.4.2";
+var CURRENT_VERSION = '1.4.2';
 
 var currTabId;
 var contextMenuId = null;
@@ -87,14 +87,14 @@ function updateVersion() {
 }
 
 function updateVersionString() {
-    console.log("Updating to version " + CURRENT_VERSION);
+    console.log('Updating to version ' + CURRENT_VERSION);
     localStorage.version = CURRENT_VERSION;
 }
 
 // Upgrade to version 1.4
 //
 function upgradeTo1_4() {
-    console.log("Upgrading data modal for 1.4");
+    console.log('Upgrading data modal for 1.4');
     
     for (var url in cache.styles)
     {
@@ -111,7 +111,7 @@ function upgradeTo1_4() {
 // @deprecated Far too ahead in the release cycle :)
 //
 function upgradeTo1() {
-    console.log("Upgrading data modal for 1");
+    console.log('Upgrading data modal for 1');
     var first = false;
 
     // upgrading to the new data model
@@ -125,7 +125,7 @@ function upgradeTo1() {
             first = cache.styles[url];
             // ideally, there should me a more foolproof check
             if (first['_rules']) {
-                console.log("Data model already at v1");
+                console.log('Data model already at v1');
                 return;
             }
         }
@@ -146,7 +146,7 @@ function upgradeTo1() {
 // Open release notes
 //
 function openReleaseNotes() {
-    chrome.tabs.create({ url: "http://stylebot.me/releases", selected: true }, null);
+    chrome.tabs.create({ url: 'http://stylebot.me/releases', selected: true }, null);
 }
 
 // Show a notification popup to notify user of update
@@ -167,37 +167,37 @@ function attachListeners() {
         showPageActions();
     }
 
-    chrome.extension.onRequest.addListener( function(request, sender, sendResponse) {
+    chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
         switch (request.name) {
-            case "enablePageAction"     : if (cache.options.showPageAction) { enablePageAction(sender.tab); } sendResponse({}); break;
+            case 'enablePageAction'     : if (cache.options.showPageAction) { enablePageAction(sender.tab); } sendResponse({}); break;
 
-            case "disablePageAction"    : if (cache.options.showPageAction) { disablePageAction(sender.tab); } sendResponse({}); break;
+            case 'disablePageAction'    : if (cache.options.showPageAction) { disablePageAction(sender.tab); } sendResponse({}); break;
 
-            case "showPageActions"      : showPageActions(); sendResponse({}); break;
+            case 'showPageActions'      : showPageActions(); sendResponse({}); break;
 
-            case "hidePageActions"      : hidePageActions(); sendResponse({}); break;
+            case 'hidePageActions'      : hidePageActions(); sendResponse({}); break;
 
-            case "copyToClipboard"      : copyToClipboard(request.text); sendResponse({}); break;
+            case 'copyToClipboard'      : copyToClipboard(request.text); sendResponse({}); break;
 
-            case "save"                 : save(request.url, request.rules, request.data); sendResponse({}); break;
+            case 'save'                 : save(request.url, request.rules, request.data); sendResponse({}); break;
 
-            case "doesStyleExist"       : sendResponse(doesStyleExist(request.url)); break;
+            case 'doesStyleExist'       : sendResponse(doesStyleExist(request.url)); break;
 
-            case "transfer"             : transfer(request.source, request.destination); sendResponse({}); break;
+            case 'transfer'             : transfer(request.source, request.destination); sendResponse({}); break;
 
-            case "getGlobalRules"       : sendResponse(getGlobalRules()); break;
+            case 'getGlobalRules'       : sendResponse(getGlobalRules()); break;
 
-            case "getRulesForPage"      : sendResponse(getRulesForPage(request.url)); break;
+            case 'getRulesForPage'      : sendResponse(getRulesForPage(request.url)); break;
 
-            case "fetchOptions"         : sendResponse({ options: cache.options, enabledAccordions: cache.enabledAccordions }); break;
+            case 'fetchOptions'         : sendResponse({ options: cache.options, enabledAccordions: cache.enabledAccordions }); break;
 
-            case "saveAccordionState"   : saveAccordionState(request.enabledAccordions); sendResponse({}); break;
+            case 'saveAccordionState'   : saveAccordionState(request.enabledAccordions); sendResponse({}); break;
 
-            case "savePreference"       : savePreference(request.preference); sendResponse({}); break;
+            case 'savePreference'       : savePreference(request.preference); sendResponse({}); break;
 
-            case "getPreference"        : sendResponse(getPreference(request.preferenceName)); break;
+            case 'getPreference'        : sendResponse(getPreference(request.preferenceName)); break;
 
-            case "pushStyles"           : pushStyles(); sendResponse({}); break;
+            case 'pushStyles'           : pushStyles(); sendResponse({}); break;
         }
     });
 }
@@ -206,8 +206,8 @@ function attachListeners() {
 // Toggle CSS editing when page icon is clicked
 //
 function onPageActionClick(tab) {
-    chrome.tabs.sendRequest(tab.id, { name: "toggle" }, function(response) {
-        if(response.status)
+    chrome.tabs.sendRequest(tab.id, { name: 'toggle' }, function(response) {
+        if (response.status)
             enablePageAction(tab);
         else
             disablePageAction(tab);
@@ -215,8 +215,8 @@ function onPageActionClick(tab) {
 }
 
 function refreshPageAction(tab) {
-    chrome.tabs.sendRequest(tab.id, { name: "status" }, function(response) {
-        if(response.status)
+    chrome.tabs.sendRequest(tab.id, { name: 'status' }, function(response) {
+        if (response.status)
             enablePageAction(tab);
         else
             disablePageAction(tab);
@@ -229,21 +229,21 @@ function disablePageAction(tab) {
     // if a style is applied to the current page
     //
     if (doesStyleExist(tab.url)) {
-        chrome.pageAction.setIcon({ tabId: tab.id, path: "images/css_highlighted.png" });
+        chrome.pageAction.setIcon({ tabId: tab.id, path: 'images/css_highlighted.png' });
     }
 
     else {
-        chrome.pageAction.setIcon({ tabId: tab.id, path: "images/css.png" });
+        chrome.pageAction.setIcon({ tabId: tab.id, path: 'images/css.png' });
     }
 
-    chrome.pageAction.setTitle({ tabId: tab.id, title: "Click to start editing using Stylebot" });
+    chrome.pageAction.setTitle({ tabId: tab.id, title: 'Click to start editing using Stylebot' });
 }
 
 // Update page action to indicate that stylebot is visible
 //
 function enablePageAction(tab) {
-    chrome.pageAction.setIcon({ tabId: tab.id, path: "images/css_active.png" });
-    chrome.pageAction.setTitle({ tabId: tab.id, title: "Click to stop editing using Stylebot" });
+    chrome.pageAction.setIcon({ tabId: tab.id, path: 'images/css_active.png' });
+    chrome.pageAction.setTitle({ tabId: tab.id, title: 'Click to stop editing using Stylebot' });
 }
 
 // Show page action for all tabs where it is applicable
@@ -261,8 +261,8 @@ function showPageActions() {
                 for (var j = 0; j < t_len; j++) {
                     var tab = tabs[j];
 
-                    if (tab.url.match("^http") == "http"
-                    && tab.url.indexOf("https://chrome.google.com/extensions") == -1)
+                    if (tab.url.match('^http') == 'http'
+                    && tab.url.indexOf('https://chrome.google.com/extensions') == -1)
                     {
                         chrome.pageAction.show(tab.id);
                     }
@@ -301,7 +301,7 @@ function hidePageActions() {
 }
 
 function onTabUpdated(tabId, changeInfo, tab) {
-    if (tab.url.match("^http") == "http" && tab.url.indexOf("https://chrome.google.com/extensions") == -1) {
+    if (tab.url.match('^http') == 'http' && tab.url.indexOf('https://chrome.google.com/extensions') == -1) {
         chrome.pageAction.show(tabId);
         disablePageAction(tab);
     }
@@ -315,7 +315,7 @@ function onTabSelectionChanged(tabId, selectInfo) {
 
 // Save all rules for a page
 function save(url, rules, data) {
-    if (!url || url == "")
+    if (!url || url == '')
         return;
 
     if (rules) {
@@ -404,7 +404,7 @@ function loadStylesIntoCache() {
         try {
             cache.styles = JSON.parse(localStorage['stylebot_styles']);
         }
-        catch(e) {
+        catch (e) {
             console.log(e);
             cache.styles = {};
         }
@@ -424,7 +424,7 @@ function loadOptionsIntoCache() {
     {
         var dataStoreValue = localStorage['stylebot_option_' + option];
         if (dataStoreValue) {
-            if (dataStoreValue == "true" || dataStoreValue == "false")
+            if (dataStoreValue == 'true' || dataStoreValue == 'false')
                 cache.options[option] = (dataStoreValue == 'true');
             else
                 cache.options[option] = dataStoreValue;
@@ -441,7 +441,7 @@ function saveOption(name, value) {
     propagateOptions();
 
     // option specific code
-    if (name === "contextMenu" && value === false)
+    if (name === 'contextMenu' && value === false)
         removeContextMenu();
     else if (!contextMenuId)
         createContextMenu();
@@ -453,7 +453,7 @@ function doesStyleExist(aURL) {
     for (var url in cache.styles)
     {
         if (!cache.styles[url]['_enabled']) continue;
-        if (aURL.trim().indexOf(url) != -1) {
+        if (aURL.matchesPattern(url)) {
             return true;
         }
     }
@@ -463,10 +463,10 @@ function doesStyleExist(aURL) {
 
 // Return CSS rules for websites
 function getGlobalRules() {
-    if (cache.styles["*"] === undefined)
+    if (cache.styles['*'] === undefined)
         return null;
         
-    return cache.styles["*"]["_rules"];
+    return cache.styles['*']['_rules'];
 }
 
 // Return CSS rules for a URL
@@ -480,19 +480,7 @@ function getRulesForPage(currUrl) {
     {
         if (!cache.styles[url]['_enabled']) continue;
         
-        var subUrls = url.split(',');
-        var len = subUrls.length;
-        var isFound = false;
-
-        for (var i = 0; i < len; i++)
-        {
-            if (currUrl.indexOf(subUrls[i].trim()) != -1) {
-                isFound = true;
-                break;
-            }
-        }
-
-        if (isFound)
+        if (currUrl.matchesPattern(url))
         {
             if (url.length > url_for_page.length)
                 url_for_page = url;
@@ -524,11 +512,11 @@ function getRulesForPage(currUrl) {
 
 // Propagate options to all open tabs
 function propagateOptions() {
-    sendRequestToAllTabs({ name: 'setOptions', options: cache.options }, function(){});
+    sendRequestToAllTabs({ name: 'setOptions', options: cache.options }, function() {});
 }
 
 // Send request to all opened tabs
-function sendRequestToAllTabs(req){
+function sendRequestToAllTabs(req) {
     chrome.windows.getAll({ populate: true }, function(windows) {
         var w_len = windows.length;
 
@@ -537,7 +525,7 @@ function sendRequestToAllTabs(req){
             var t_len = windows[i].tabs.length;
             for (var j = 0; j < t_len; j++)
             {
-                chrome.tabs.sendRequest(windows[i].tabs[j].id, req, function(response){});
+                chrome.tabs.sendRequest(windows[i].tabs[j].id, req, function(response) {});
             }
         }
     });
@@ -567,30 +555,30 @@ function getPreference(preferenceName) {
 function createContextMenu() {
     if (localStorage['stylebot_option_contextMenu'] === 'true') {
         contextMenuId = chrome.contextMenus.create({
-            title: "Stylebot",
+            title: 'Stylebot',
             contexts: ['all']
         });
 
         chrome.contextMenus.create({
-            title: "Style Element",
+            title: 'Style Element',
             contexts: ['all'],
-            onclick: function(info, tab) { sendRequestToTab(tab, "openWidget"); },
+            onclick: function(info, tab) { sendRequestToTab(tab, 'openWidget'); },
             parentId: contextMenuId
         });
 
         contextMenuStatusId = chrome.contextMenus.create({
-            title: "Enable Styling",
-            type: "checkbox",
+            title: 'Enable Styling',
+            type: 'checkbox',
             checked: true,
             contexts: ['all'],
-            onclick: function(info, tab) { sendRequestToTab(tab, "toggleStyle"); },
+            onclick: function(info, tab) { sendRequestToTab(tab, 'toggleStyle'); },
             parentId: contextMenuId
         });
 
         chrome.contextMenus.create({
-            title: "Search for styles...",
+            title: 'Search for styles...',
             contexts: ['all'],
-            onclick: function(info, tab) { sendRequestToTab(tab, "searchSocial"); },
+            onclick: function(info, tab) { sendRequestToTab(tab, 'searchSocial'); },
             parentId: contextMenuId
         });
 
@@ -602,7 +590,7 @@ function createContextMenu() {
         // Add a selectionChanged listener so we can track changes in current tab
         chrome.tabs.onSelectionChanged.addListener(function(tabId, selectInfo) {
             // Get style status from the tab we changed to and update the checkbox in the context menu
-            chrome.tabs.sendRequest(tabId, { name: "styleStatus" }, function(response) {
+            chrome.tabs.sendRequest(tabId, { name: 'styleStatus' }, function(response) {
                 chrome.contextMenus.update(contextMenuStatusId, {checked: response.status});
             });
         });
@@ -629,15 +617,38 @@ function removeContextMenu() {
     }
 }
 
-window.addEventListener('load', function(){
+window.addEventListener('load', function() {
     init();
 });
 
 // Utility methods
 
-// Trim a string
+/**
+ * Trims a string
+ * @return {String} The trimmed string.
+ */
 String.prototype.trim = function() {
-    return this.replace(/^\s+|\s+$/g, "");
+    return this.replace(/^\s+|\s+$/g, '');
+};
+
+/**
+ * Checks if the string matches an stylebot pattern
+ * @param {String} pattern The stylebot pattern.
+ * @return {Boolean} True if the string matches the patern, false otherwise.
+ */
+String.prototype.matchesPattern = function(pattern) {
+    var hasComma = ~pattern.indexOf(',');
+    pattern = pattern.
+            /* Escapes . ? | ( ) [ ] + $ ^ \ { } */
+            replace(/(\.|\?|\||\(|\)|\[|\]|\+|\$|\^|\\|\{|\})/g, '\\$1').
+            /* Allows commas to be used to separate urls */
+            replace(/,/g, '|').
+            /* Allows use of the * wildcard */
+            replace(/\*/g, '.*');
+    /* Matches the beginning of the url. Enclose the pattern in ( ) if it has several urls */
+    pattern = '^.+?://' + (hasComma ? '(' + pattern + ')' : pattern);
+    pattern = new RegExp(pattern, 'i');
+    return pattern.test(this);
 };
 
 // Copy to Clipboard
@@ -654,13 +665,13 @@ function copyToClipboard(text) {
 function cloneObject(obj) {
     var newObj = (obj instanceof Array) ? [] : {};
     for (i in obj) {
-        if (obj[i] && typeof obj[i] == "object") {
+        if (obj[i] && typeof obj[i] == 'object') {
             newObj[i] = cloneObject(obj[i]);
         }
 
         else
-            newObj[i] = obj[i]
+            newObj[i] = obj[i];
     }
 
     return newObj;
-};
+}
