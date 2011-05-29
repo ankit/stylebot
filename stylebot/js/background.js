@@ -202,7 +202,9 @@ function attachListeners() {
     });
 }
 
-
+/**
+ *  Page Action stuff
+ */
 // Toggle CSS editing when page icon is clicked
 //
 function onPageActionClick(tab) {
@@ -261,9 +263,7 @@ function showPageActions() {
                 for (var j = 0; j < t_len; j++) {
                     var tab = tabs[j];
 
-                    if (tab.url.match('^http') == 'http'
-                    && tab.url.indexOf('https://chrome.google.com/webstore') == -1)
-                    {
+                    if (tab.url.isValidUrl()) {
                         chrome.pageAction.show(tab.id);
                     }
                 }
@@ -301,7 +301,7 @@ function hidePageActions() {
 }
 
 function onTabUpdated(tabId, changeInfo, tab) {
-    if (tab.url.match('^http') == 'http' && tab.url.indexOf('https://chrome.google.com/webstore') == -1) {
+    if (tab.url.isValidUrl()) {
         chrome.pageAction.show(tabId);
         disablePageAction(tab);
     }
@@ -523,22 +523,6 @@ function propagateOptions() {
     sendRequestToAllTabs({ name: 'setOptions', options: cache.options }, function() {});
 }
 
-// Send request to all opened tabs
-function sendRequestToAllTabs(req) {
-    chrome.windows.getAll({ populate: true }, function(windows) {
-        var w_len = windows.length;
-
-        for (var i = 0; i < w_len; i++)
-        {
-            var t_len = windows[i].tabs.length;
-            for (var j = 0; j < t_len; j++)
-            {
-                chrome.tabs.sendRequest(windows[i].tabs[j].id, req, function(response) {});
-            }
-        }
-    });
-}
-
 // Save current accordion state into cache
 function saveAccordionState(enabledAccordions) {
     cache.enabledAccordions = enabledAccordions;
@@ -591,18 +575,66 @@ function createContextMenu() {
         });
 
         // Added onUpdated listener so we can track tab refresh
-        chrome.tabs.onUpdated.addListener(function(tabId, changeInfo) {
-            chrome.contextMenus.update(contextMenuStatusId, {checked: true});
-        });
+        chrome.tabs.onUpdated.addListener(updateContextMenuOnUpdated);
 
         // Add a selectionChanged listener so we can track changes in current tab
-        chrome.tabs.onSelectionChanged.addListener(function(tabId, selectInfo) {
-            // Get style status from the tab we changed to and update the checkbox in the context menu
-            chrome.tabs.sendRequest(tabId, { name: 'styleStatus' }, function(response) {
-                chrome.contextMenus.update(contextMenuStatusId, {checked: response.status});
-            });
-        });
+        chrome.tabs.onSelectionChanged.addListener(updateContextMenuOnSelectionChanged);
     }
+}
+
+function updateContextMenuOnUpdated(tabId, changeInfo, tab) {
+    if (tab.status != "complete") return;
+    updateContextMenu(tab);
+}
+
+function updateContextMenuOnSelectionChanged(tabId, selectInfo) {
+    chrome.tabs.get(tabId, function(tab) {
+        updateContextMenu(tab);
+    });
+}
+      
+// Updates context menu for a tab: show/hide, update checkboxes
+function updateContextMenu(tab) {
+    if (tab.url.isValidUrl()){
+        // If it is a valid url, show the contextMenu
+        chrome.contextMenus.update(contextMenuId, { documentUrlPatterns: ['<all_urls>'] });
+        // Get style status from the tab we changed to and update the checkbox in the context menu
+        chrome.tabs.sendRequest(tab.id, { name: 'styleStatus' }, function(response) {
+            chrome.contextMenus.update(contextMenuStatusId, { checked: response.status });
+        });
+    } else {
+        // If it isn't a valid url, hide the contextMenu. Set the document pattern to foo/*random*
+        chrome.contextMenus.update(contextMenuId, { documentUrlPatterns: ['http://foo/'+Math.random()] });
+    }
+}
+
+// Remove the right click context menu
+function removeContextMenu() {
+    if (contextMenuId) {
+        chrome.tabs.onSelectionChanged.removeListener(updateContextMenuOnSelectionChanged);
+        chrome.tabs.onUpdated.removeListener(updateContextMenuOnUpdated);
+        chrome.contextMenus.remove(contextMenuId);
+        contextMenuId = null;
+    }
+}
+
+/**
+ * Tab Communication stuff
+ */
+// Send request to all opened tabs
+function sendRequestToAllTabs(req) {
+    chrome.windows.getAll({ populate: true }, function(windows) {
+        var w_len = windows.length;
+
+        for (var i = 0; i < w_len; i++)
+        {
+            var t_len = windows[i].tabs.length;
+            for (var j = 0; j < t_len; j++)
+            {
+                chrome.tabs.sendRequest(windows[i].tabs[j].id, req, function(response) {});
+            }
+        }
+    });
 }
 
 // Send a request to tab
@@ -615,14 +647,6 @@ function sendRequestToCurrentTab(msg) {
     chrome.tabs.getSelected(null, function(tab) {
         chrome.tabs.sendRequest(tab.id, { name: msg }, function() {});
     });
-}
-
-// Remove the right click context menu
-function removeContextMenu() {
-    if (contextMenuId) {
-        chrome.contextMenus.remove(contextMenuId);
-        contextMenuId = null;
-    }
 }
 
 window.addEventListener('load', function() {
@@ -662,6 +686,15 @@ String.prototype.matchesPattern = function(pattern) {
     pattern = new RegExp(pattern, 'i');
     return pattern.test(this);
 };
+
+/**
+ * Check if an url is a valid one
+ * @return {Boolean} True if the string is a valid url, false otherwise.
+ */
+String.prototype.isValidUrl = function() {
+    return (this.match('^http') == 'http' &&
+        this.indexOf('https://chrome.google.com/webstore') == -1);
+}
 
 // Copy to Clipboard
 function copyToClipboard(text) {
