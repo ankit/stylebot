@@ -426,12 +426,18 @@ function saveStyle(url, css, add) {
     // if css is empty. remove the style
     if (css === "")
     {
-        if (styles[url])
-        {
-            delete styles[url];
-            $('.custom-style-url:contains(' + url + ')').parent().remove();
+        if (url === '*') {
+            styles[url]['_rules'] = {};
             bg_window.saveStyles(styles);
             bg_window.pushStyles();
+        } else {
+            if (styles[url])
+            {
+                delete styles[url];
+                $('.custom-style-url:contains(' + url + ')').parent().remove();
+                bg_window.saveStyles(styles);
+                bg_window.pushStyles();
+            }
         }
 
         return true;
@@ -458,8 +464,15 @@ function saveStyle(url, css, add) {
                 styles[url] = {};
                 styles[url]['_social'] = {};
                 styles[url]['_enabled'] = true;
+                styles[url]['_rules'] = rules;
+            } else {
+                var _social = styles[url]['_social'];
+                var _enabled = styles[url]['_enabled'];
+                styles[url] = {};
+                styles[url]['_social'] = _social;
+                styles[url]['_enabled'] = _enabled;
+                styles[url]['_rules'] = rules;
             }
-            styles[url]['_rules'] = rules;
             
             bg_window.saveStyles(styles);
             bg_window.pushStyles();

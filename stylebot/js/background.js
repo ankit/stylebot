@@ -450,14 +450,22 @@ function saveOption(name, value) {
 // Returns if a style already exists for the given page
 //
 function doesStyleExist(aURL) {
-    for (var url in cache.styles)
-    {
-        if (!cache.styles[url]['_enabled']) continue;
-        if (aURL.matchesPattern(url)) {
-            return true;
+    var shouldPattern = (aURL.match("^http") == "http");
+
+    if (shouldPattern) {
+        for (var url in cache.styles)
+        {
+            if (!cache.styles[url]['_enabled']) continue;
+            if (aURL.matchesPattern(url)) {
+                return true;
+            }
+        }
+    } else {
+        for (var url in cache.styles)
+        {
+            if (url === aURL) return true;
         }
     }
-
     return false;
 }
 
@@ -647,8 +655,10 @@ String.prototype.matchesPattern = function(pattern) {
             replace(/,/g, '|').
             /* Allows use of the * wildcard */
             replace(/\*/g, '.*');
-    /* Matches the beginning of the url. Enclose the pattern in ( ) if it has several urls */
-    pattern = '^.+?://' + (hasComma ? '(' + pattern + ')' : pattern);
+    /* Enclose the pattern in ( ) if it has several urls separated by , */
+    pattern = (hasComma ? '(' + pattern + ')' : pattern);
+    /* Matches the beginning of the url */
+    pattern = '^.+?://' + pattern;
     pattern = new RegExp(pattern, 'i');
     return pattern.test(this);
 };
