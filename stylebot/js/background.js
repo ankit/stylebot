@@ -455,6 +455,7 @@ function doesStyleExist(aURL) {
     if (shouldPattern) {
         for (var url in cache.styles)
         {
+            if (url === '*' && !cache.styles['*']['_rules']) continue;
             if (!cache.styles[url]['_enabled']) continue;
             if (aURL.matchesPattern(url)) {
                 return true;

@@ -427,7 +427,7 @@ function saveStyle(url, css, add) {
     if (css === "")
     {
         if (url === '*') {
-            styles[url]['_rules'] = {};
+            styles[url]['_rules'] = null;
             bg_window.saveStyles(styles);
             bg_window.pushStyles();
         } else {
