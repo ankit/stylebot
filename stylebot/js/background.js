@@ -262,7 +262,7 @@ function showPageActions() {
                     var tab = tabs[j];
 
                     if (tab.url.match('^http') == 'http'
-                    && tab.url.indexOf('https://chrome.google.com/extensions') == -1)
+                    && tab.url.indexOf('https://chrome.google.com/webstore') == -1)
                     {
                         chrome.pageAction.show(tab.id);
                     }
@@ -301,7 +301,7 @@ function hidePageActions() {
 }
 
 function onTabUpdated(tabId, changeInfo, tab) {
-    if (tab.url.match('^http') == 'http' && tab.url.indexOf('https://chrome.google.com/extensions') == -1) {
+    if (tab.url.match('^http') == 'http' && tab.url.indexOf('https://chrome.google.com/webstore') == -1) {
         chrome.pageAction.show(tabId);
         disablePageAction(tab);
     }
