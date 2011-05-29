@@ -460,19 +460,12 @@ function saveStyle(url, css, add) {
                 return false;
             }
 
-            if (styles[url] === undefined) {
-                styles[url] = {};
-                styles[url]['_social'] = {};
-                styles[url]['_enabled'] = true;
-                styles[url]['_rules'] = rules;
-            } else {
-                var _social = styles[url]['_social'];
-                var _enabled = styles[url]['_enabled'];
-                styles[url] = {};
-                styles[url]['_social'] = _social;
-                styles[url]['_enabled'] = _enabled;
-                styles[url]['_rules'] = rules;
-            }
+            // If we modify any style, we should overwrite its metadata and their rules, not the enabled value
+            var _enabled = styles[url] === undefined ? true : styles[url]['_enabled'];
+            styles[url] = {};
+            styles[url]['_social'] = {};
+            styles[url]['_enabled'] = _enabled;
+            styles[url]['_rules'] = rules;
             
             bg_window.saveStyles(styles);
             bg_window.pushStyles();

@@ -48,7 +48,7 @@ function init() {
     loadOptionsIntoCache();
     loadStylesIntoCache();
     loadAccordionState();
-
+    console.log(cache.styles);
     updateVersion();
 
     createContextMenu();
