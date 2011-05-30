@@ -103,6 +103,13 @@ function upgradeTo1_4() {
         }
     }
     
+    /* If the global stylesheet is empty after the upgrade, let's create it */
+    if (!cache.styles['*']) {
+        cache.styles['*'] = {};
+        cache.styles['*']['_enabled'] = true;
+        cache.styles['*']['_rules'] = {};
+    }
+    
     // save the updated styles in localStorage
     updateStylesInDataStore();
 }
