@@ -839,8 +839,15 @@ String.prototype.matchesPattern = function(pattern) {
                 replace(/(\.|\?|\||\(|\)|\[|\]|\+|\$|\^|\\|\{|\})/g, '\\$1').
                 /* Allows commas to be used to separate urls */
                 replace(/,/g, '|').
-                /* Allows use of the * wildcard */
-                replace(/\*/g, '.*');
+                /* Allows use of the ** wildcard, matches anything */
+                replace(/\*\*/g, '.*').
+                /* Allows use of the * wildcard, matches anything but /
+                   Because we replace ** by .*, we have to make sure we don't
+                   replace an .* Therefore, we should replace an * if, and
+                   only if it is precedeed by anything different from a .
+                   except for \.
+                */
+                replace(/(\\\.|[^\.])\*/g, '$1[^/]*');
         /* Enclose the pattern in ( ) if it has several urls separated by , */
         pattern = (hasComma ? '(' + pattern + ')' : pattern);
         /* Matches the beginning of the url, we only consider http(s) urls */

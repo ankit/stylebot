@@ -343,6 +343,8 @@ function selectStyle($styleEl) {
 
     var $urlEl = $styleEl.find('.style-url');
 
+    $styleEl.data('value', $urlEl.text());
+
     Utils.editElement($urlEl, { editFieldClass: 'stylebot-editing-field' });
 
     function onEditingComplete(e) {
@@ -385,7 +387,7 @@ function selectStyle($styleEl) {
 
         Utils.endEditing($urlEl);
 
-        var newURL = $el.text();
+        var newURL = $styleEl.text();
         editURL($styleEl.data('value'), newURL);
         $styleEl.data('value', newURL);
 
