@@ -11,25 +11,49 @@
 var syncId;
 var syncFolderId;
 
-// to prevent sync() from getting called when saveSyncData() changes bookmark url
+// prevent sync() from getting called when saveSyncData() changes bookmark url
 var saveSyncDataWasCalled = false;
 
 // extension name. used to create titles for bookmark / containing folder
-var syncName = "stylebot";
-var syncBookmarkName = syncName + "_data";
-var syncURL = "http://" + syncName + "/?data=";
-var onSync = saveStylesLocally;
+var syncName = 'stylebot';
+var syncBookmarkName = syncName + '_data';
+var syncURL = 'http://' + syncName + '/?data=';
+var onSync = saveStyles;
 var onMerge = mergeStyles;
 // data source is cache.styles here
 // cache.options.sync is used to check if sync is enabled / disabled
 
-// loads data from bookmark (if it exists). If no data is returned, saves local data in the bookmark
+// loads data from bookmark (if it exists).
+// If no data is returned, saves local data in the bookmark
 function sync() {
-    console.log("Syncing data...");
+    console.log('Syncing data...');
     loadSyncData(function(data) {
         if (data) {
-            if (data != cache.styles)
+            // Overwrite the old styles
+            if (data != cache.styles.get()) {
                 onSync(data);
+            }
+        }
+        else {
+            saveSyncData(cache.styles.get());
+        }
+    });
+}
+
+// called when syncing is turned on in options page. the only difference
+// between this and sync() is that it merges local data with data from bookmark
+function syncWithMerge() {
+    loadSyncData(function(data) {
+        if (data) {
+            // If we can merge and the new style differes from the current one
+            if (data != cache.styles.get()) {
+                if (onMerge) {
+                    onMerge(data);
+                }
+                else {
+                    onSync(data);
+                }
+            }
         }
         else {
             saveSyncData(cache.styles);
@@ -38,23 +62,7 @@ function sync() {
 }
 
 // called when syncing is turned on in options page
-// the only difference between this and sync() is that it merges local data with data from bookmark
-function syncWithMerge() {
-    loadSyncData(function(data) {
-        if (data) {
-            if (onMerge && data != cache.styles) {
-                data = onMerge(data, cache.styles);
-                saveSyncData(data);
-            }
-            onSync(data);
-        }
-        else {
-            saveSyncData(cache.styles);
-        }
-    });
-}
-
-// called when syncing is turned on in options page and if sync is enabled, when background.html loads
+// called when background.html loads, if sync is enabled
 function enableSync(merge) {
     attachSyncListeners();
     if (merge)
@@ -73,7 +81,7 @@ function loadSyncData(callback) {
     var parse = function(url) {
         var data = getDataFromURL(url);
         callback(data);
-    }
+    };
 
     loadBookmark(null, syncBookmarkName, function(bookmarks) {
         if (bookmarks.length != 0) {
@@ -86,17 +94,16 @@ function loadSyncData(callback) {
                 // iterate through all the surplus bookmarks and merge data from them
                 var len = bookmarks.length;
                 for (var i = 1; i < len; i++) {
-                    
-                    if (onMerge && url != bookmarks[i].url)
+                    if (onMerge && url != bookmarks[i].url) {
                         url = getURLFromData(onMerge(getDataFromURL(bookmarks[i].url), getDataFromURL(url)));
-                        
+                    }
                     if (bookmarks[i].parentId != bookmark.parentId)
                         removeBookmarkTree(bookmarks[i].parentId);
                     else
                         removeBookmark(bookmarks[i].id);
                 }
                 saveSyncDataWasCalled = true;
-                saveBookmark(syncId, url, function(){
+                saveBookmark(syncId, url, function() {
                     saveSyncDataWasCalled = false;
                 });
             }
@@ -110,7 +117,7 @@ function loadSyncData(callback) {
 // saves data to the bookmark used for sync
 // takes json object / string as input
 function saveSyncData(data) {
-    console.log("Saving data for sync...");
+    console.log('Saving data for sync...');
     if (!data)
         return false;
     var url = getURLFromData(data);
@@ -122,16 +129,17 @@ function saveSyncData(data) {
             });
         }
         // create folder to contain the bookmark
-        createBookmark(syncName + "Sync", null, null, function(folder) {
+        createBookmark(syncName + 'Sync', null, null, function(folder) {
             create(folder.id);
         });
     }
     else {
         saveSyncDataWasCalled = true;
-        saveBookmark(syncId, url, function(bookmark){
+        saveBookmark(syncId, url, function(bookmark) {
             saveSyncDataWasCalled = false;
-            // some develish power deleted the bookmark. reset syncId and create a new bookmark
+            // some develish power deleted the bookmark.
             if (!bookmark) {
+                // reset syncId and create a new bookmark
                 syncId = null;
                 syncFolderId = null;
                 saveSyncData(cache.styles);
@@ -149,13 +157,13 @@ function loadSyncId() {
 
 // returns json object from url of the form http://syncName?data={...}
 function getDataFromURL(url) {
-    if (!url || url == "")
+    if (!url || url == '')
         return null;
-    var jsonString = unescape(url.replace(syncURL, ""));
+    var jsonString = unescape(url.replace(syncURL, ''));
     try {
         return JSON.parse(jsonString);
     }
-    catch(e) {
+    catch (e) {
         return null;
     }
 }
@@ -163,11 +171,11 @@ function getDataFromURL(url) {
 // returns url of the form http://syncName?data={...}
 // takes json string or object as input
 function getURLFromData(data) {
-    if (typeof data != "string") {
+    if (typeof data != 'string') {
         try {
             data = JSON.stringify(data);
         }
-        catch(e) {
+        catch (e) {
             return null;
         }
     }
@@ -179,7 +187,7 @@ function attachSyncListeners() {
     chrome.bookmarks.onChanged.addListener(onBookmarkUpdate);
 
     // add listener to sync when bookmark is removed
-    // this handles the situation when Bookmark Sync is enabled on another machine
+    // handles the situation when Bookmark Sync is enabled on another machine
     chrome.bookmarks.onRemoved.addListener(onBookmarkUpdate);
 
     // add listener to sync when a bookmark is created in the sync folder
@@ -201,6 +209,6 @@ function onBookmarkUpdate(id, properties) {
 
 function onBookmarkCreate(id, bookmark) {
     if (cache.options.sync && bookmark.parentId == syncFolderId && !saveSyncDataWasCalled) {
-        sync();
+            sync();
     }
 }
