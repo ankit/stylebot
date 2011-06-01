@@ -96,7 +96,7 @@ var Utils = {
                 
                 Utils.endEditing($el);
                 
-                e.data.callback($el.attr('value'));
+                e.data.callback($el.text());
                 
                 $(document).unbind("mousedown", onClose);
                 $(document).unbind("keydown", onClose);
