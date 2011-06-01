@@ -170,6 +170,9 @@ li.option:first-of-type {
     line-height: 20px;
     border: 1px solid transparent;
     outline: none;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 .custom-style-url:hover {
