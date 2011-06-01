@@ -42,6 +42,8 @@ Code from the following projects is used:
 
 * [Ace](http://ace.ajax.org/)
 
+* [Glyphish](http://glyphish.com/) - Icons in Options page
+
 ###License
 
 Dual licensed under the GPL and MIT Licenses.
