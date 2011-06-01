@@ -60,89 +60,166 @@ var Utils = {
     capitalize: function(string) {
         return string.charAt(0).toUpperCase() + string.slice(1);
     },
-
-    makeEditable: function(el, callback, options) {
-        el.bind('click keyup', {callback: callback}, function(e) {
-            if (e.type === 'keyup' && e.keyCode != 13)
+    
+    /**
+     *  Make text editable in place. Replaces text with textarea for editing.
+     *  Requires Utils.editElement and Utils.endEditing
+     *  @param {Element} el Element which contains the text
+     *  @param {Function} callback Function to be called when user finishes editing
+     *  @param {Object} options Options for edit in place field
+     *  @return {true}
+     */
+    makeEditable: function($el, callback, options) {
+        var editFieldClass = 'editing-field';
+        
+        if (options && options.editFieldClass) {
+            editFieldClass = options.editFieldClass;
+        }
+        
+        $el.addClass('editable');
+        
+        $el.bind('click keydown', {callback: callback}, function(e)
+        {
+            if (e.type === 'keydown' && e.keyCode != 13)
                 return true;
-
-            var el = $(this);
-            el.hide();
-
-            var elWidth;
-            if (options && options.fixedWidth)
-                elWidth = options.fixedWidth;
-            else
-                elWidth = el.width();
-
-            var value = el.text();
             
-            // create a textfield
-            var input = $('<input>', {
-                type: 'text',
-                class: 'stylebot-textfield',
-                value: value,
-                id: 'stylebot-editing-field'
-            })
-            .width(elWidth);
+            Utils.editElement($el, options);
 
-            el.before(input);
-            input.focus();
-
-            // if selectText is set to true, select all text in input field
-            if (options && options.selectText)
-                input.get(0).setSelectionRange(0, value.length);
-
-            var onClose = function(e)
-            {
-                if (e.type === "keyup")
-                {
-                    switch (e.keyCode)
-                    {
-                        case 38: // up
-                            var nextUrl = e.data.el.parent().prev().children(".custom-style-url");
-                            // if the target element doesn't exist, ignore this event
-                            if (nextUrl.length == 0) return true;
-                            break;
-                        case 40: // down
-                            var nextUrl = e.data.el.parent().next().children(".custom-style-url");
-                            // if the target element doesn't exist, ignore this event
-                            if (nextUrl.length == 0) return true;
-                            break;
-                        case 13: // enter
-                        case 27: // escape
-                        break;
-                        // if it is not an allowed key, ignore this event
-                        default:
-                            return true;
-                    }
-                }
-                
-                // if it's a mousedown event and the target is the element itself, ignore it
-                if (e.type === "mousedown" && e.target.id == e.data.input.attr('id'))
+            var onClose = function(e) {
+                if (e.type === "keydown" && e.keyCode != 13 && e.keyCode != 27)
                     return true;
                 
-                var value = e.data.input.attr('value');
-                value = value == "" ? e.data.el.html() : value;
+                if (e.type === "mousedown" && e.target.className === editFieldClass)
+                    return true;
                 
-                // remove the input
-                e.data.input.remove();
+                e.preventDefault();
                 
-                // display the url's div
-                e.data.el.html(value);
-                e.data.el.show();
-                e.data.callback(value);
+                Utils.endEditing($el);
                 
-                // if available, let's focus the next element
-                if (nextUrl) nextUrl.click();
+                e.data.callback($el.attr('value'));
                 
                 $(document).unbind("mousedown", onClose);
-                $(document).unbind("keyup", onClose);
+                $(document).unbind("keydown", onClose);
             }
-
-            input.bind('keyup', {input: input, el: el, callback: callback}, onClose);
-            $(document).bind('mousedown', {input: input, el: el, callback: callback}, onClose);
+            
+            $(document).bind('keydown mousedown', { callback: callback }, onClose);
         });
+        
+        return true;
+    },
+    
+    editElement: function($el, someOptions) {
+        // default options
+        var options = {
+            editFieldClass  : 'editing-field',
+            selectText      : true,
+            fixedWidth      : false
+        };
+        
+        if (someOptions) {
+            for (var option in someOptions)
+                options[option] = someOptions[option];
+        }
+        
+        $el.hide();
+        
+        var elWidth;
+        
+        if (options && options.fixedWidth)
+            elWidth = options.fixedWidth;
+        else
+            elWidth = $el.width();
+
+        var fontSize = $el.css('font-size');
+        var fontFamily = $el.css('font-family');
+        var fontWeight = $el.css('font-weight');
+        var lineHeight = $el.css('line-height');
+
+        var padding = {
+            top: parseInt($el.css('padding-top').replace('px', '')),
+            right: parseInt($el.css('padding-right').replace('px', '')),
+            bottom: parseInt($el.css('padding-bottom').replace('px', '')),
+            left: parseInt($el.css('padding-left').replace('px', ''))
+        };
+
+        var value = $el.text();
+        
+        // get the required height of textarea by creating a temporary div
+        //
+        var tempDiv = $('<div>', {
+            html: value
+        })
+        .css({
+            'line-height'       : lineHeight,
+            'word-wrap'         : 'break-word'
+        })
+        .width(elWidth);
+        
+        $el.before(tempDiv);
+        
+        var height = tempDiv.height() + padding.top + padding.bottom;
+        
+        tempDiv.remove();
+        
+        var textarea = $('<textarea>', {
+            value: value,
+            class: options.editFieldClass
+        })
+        .width(elWidth)
+        .height(height)
+        .css({
+            'font-family'       : fontFamily,
+            'font-size'         : fontSize,
+            'font-weight'       : fontWeight,
+            'line-height'       : lineHeight,
+            'overflow-y'        : 'hidden',
+            'resize'            : 'none'
+        });
+        
+        if (options.selectText) {
+            textarea.bind('click keyup', function(e)
+            {
+                if (e.type === 'keyup' && e.keyCode != 9) return true;
+                
+                e.preventDefault();
+                e.target.focus();
+                e.target.select();
+            });
+        }
+        
+        $el.before(textarea);
+        textarea.focus();
+
+        // if selectText is set to true, select all text in input field
+        // else set cursor to the end of field
+        //
+        var len = value.length;
+        
+        if (value[len - 1] === "\n")
+            len = len - 1;
+        
+        if (options && options.selectText)
+            textarea.get(0).setSelectionRange(0, len);
+        
+        $el.data('value', value);
+    },
+    
+    endEditing: function($el) {
+        if ($el === undefined)
+            return;
+        
+        var value = $el.prev('textarea').attr('value');
+        
+        $el.prev('textarea').remove();
+        
+        if (value === "")
+            value = $el.text($el.data('value'));
+            
+        $el.data('value', null);
+        
+        $el.html(value);
+        $el.show();
+        $el.focus();
     },
 
     selectText: function(el, start, end) {

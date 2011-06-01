@@ -532,7 +532,7 @@ Styles.prototype.setMetadata = function(url, data) {
  * @param {String} url URL of the saved object.
  * @param {Object} value The enabled status for the given URL.
  */
-Styles.prototype.toggle = function(url, value) {
+Styles.prototype.toggle = function(url, value, shouldPersist) {
     if (this.isEmpty(url)) return;
 
     if (value === undefined) {
@@ -540,7 +540,9 @@ Styles.prototype.toggle = function(url, value) {
     } else {
         this.styles[url]['_enabled'] = value;
     }
-    this.persist();
+    
+    if (shouldPersist != false)
+        this.persist();
 };
 
 /**
@@ -550,8 +552,10 @@ Styles.prototype.toggle = function(url, value) {
  */
 Styles.prototype.toggleAll = function(value) {
     for (var url in this.styles) {
-        this.toggle(url, value);
+        this.toggle(url, value, false);
     }
+    
+    this.persist();
 };
 
 /**

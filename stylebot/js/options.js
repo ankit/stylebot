@@ -68,7 +68,7 @@ function init() {
 
     bg_window = chrome.extension.getBackgroundPage();
 
-    fillCustomStyles();
+    fillStyles();
     attachListeners();
     initFiltering();
     updateSyncUI();
@@ -144,94 +144,123 @@ function attachListeners() {
     $(window).resize(function(e) {
         resizeEditor();
     });
+    
+    // edit styles
+    $('.style').live('click keydown', function(e) {
+        var $el = $(e.target);
+        var $this = $(this);
+        
+        if ($el.closest('.selected').length != 0) return true;
+
+        if (e.type === 'keydown' && (e.keyCode != 13 || $el.hasClass('style-button'))) return true;
+
+        setTimeout(function() {
+            selectStyle($this);
+        }, 0);
+    });
 }
 
 function translateOptionValue(name, value) {
     switch (name) {
-        case 'sync': return (value == 'true') ? true : false;
+        case 'sync': return (value === 'true') ? true : false;
         case 'shortcutKey': return $('[name=shortcutKey]').attr('value');
     }
 
     return value;
 }
 
-// Custom Styles
+// Styles
 
-// Refreshes the custom styles. Called during initialization and on import
+// Refreshes the styles. Called during initialization and on import
 //
-function fillCustomStyles() {
-    var container = $('#custom-styles');
+function fillStyles() {
+    var container = $('#styles');
     container.html('');
     // newest styles are shown at the top
     //
     for (var url in bg_window.cache.styles.get()) {
         // skip the global styles
         if (url === '*') continue;
-        container.prepend(createCustomStyleOption(url));
+        container.prepend(createStyleUI(url));
     }
 }
 
 // Adds a new style to the UI
-function createCustomStyleOption(url) {
+function createStyleUI(url) {
     var container = $('<div>', {
-        class: 'custom-style'
+        class: 'style',
+        tabIndex: 0
     });
+
+    var urlContainer = $('<span>', {
+        class: 'style-url-container'
+    })
+    .appendTo(container);
 
     $('<input>', {
         type: 'checkbox',
-        class: 'inline-button',
-        title: 'Enable or disable this style'
+        title: 'Enable or disable this style',
+        tabIndex: -1
     })
     .prop('checked', bg_window.cache.styles.isEnabled(url))
     .tipsy({delayIn: 100, gravity: 'sw'})
     .click(changeStyleStatus)
-    .appendTo(container);
+    .appendTo(urlContainer);
 
-    var url_div = $('<div>', {
+    var urlEl = $('<div>', {
         html: url,
-        class: 'custom-style-url',
-        tabIndex: 0
+        class: 'style-url'
     })
     .data('value', url)
-    .appendTo(container);
-
-    Utils.makeEditable(url_div, function(newValue) {
-        editURL(url_div.data('value'), newValue);
-        url_div.data('value', newValue);
-    });
+    .appendTo(urlContainer);
 
     var b_container = $('<div>', {
-        class: 'button-container'
+        class: 'buttons'
     });
 
-    $('<button>', {
-        html: 'Share',
-        class: 'inline-button'
+    $('<a>', {
+        title: 'Share on Social',
+        class: 'share-button style-button',
+        tabIndex: 0
     })
-    .click(shareStyle)
-    .appendTo(b_container);
+    .bind('click keydown', function(e) {
+        if (e.type === 'keydown' && e.keyCode != 13) return true;
+        shareStyle(e);
+    })
+    .appendTo(b_container)
+    .tipsy({delayIn: 100, gravity: 'sw'});
 
-    $('<button>', {
-        html: 'Edit',
-        class: 'inline-button'
+    $('<a>', {
+        title: 'Edit',
+        class: 'edit-button style-button',
+        tabIndex: 0
     })
-    .click(editStyle)
-    .appendTo(b_container);
+    .bind('click keydown', function(e) {
+        if (e.type === 'keydown' && e.keyCode != 13) return true;
+        editStyle(e);
+    })
+    .appendTo(b_container)
+    .tipsy({delayIn: 100, gravity: 'sw'});
 
-    $('<button>', {
-        html: 'Remove',
-        class: 'inline-button'
+    $('<a>', {
+        title: 'Delete',
+        class: 'close-button style-button',
+        tabIndex: 0
     })
-    .click(removeStyle)
-    .appendTo(b_container);
+    .bind('click keydown', function(e) {
+        if (e.type === 'keydown' && e.keyCode != 13) return true;
+        removeStyle(e);
+    })
+    .appendTo(b_container)
+    .tipsy({delayIn: 100, gravity: 'sw'});
 
     return container.append(b_container);
 }
 
 // Called when the remove button is clicked for a style
 function removeStyle(e) {
-    var parent = $(e.target).parents('.custom-style');
-    var url = parent.find('.custom-style-url');
+    var parent = $(e.target).parents('.style');
+    var url = parent.find('.style-url');
 
     parent.remove();
     bg_window.cache.styles.delete(url.html());
@@ -249,29 +278,6 @@ function toggleGlobalStylesheet() {
     updateGlobalStylesheetUI();
 }
 
-// Displays the modal popup for editing a style
-function editStyle(e) {
-    var parent = $(e.target).parents('.custom-style');
-    var url = parent.find('.custom-style-url').html();
-    var rules = bg_window.cache.styles.getRules(url);
-    var css = CSSUtils.crunchFormattedCSS(rules, false);
-
-    var html = "<div class='popup-content'> \
-    <div class='header-text'> \
-    Edit the CSS for <strong>" + url + "</strong>: \
-    </div> \
-    <div id='editor'></div> \
-    </div> \
-    <div id='stylebot-modal-buttons'> \
-    <button onclick='onSave(\"" + url + "\");'>Save</button> \
-    <button onclick='cache.modal.hide();'>Cancel</button> \
-    </div>";
-
-    initializeEditorModal(html, css);
-
-    cache.modal.show();
-}
-
 // Displays the modal popup for editing the global stylesheet
 function editGlobalStylesheet(e) {
     var rules = bg_window.cache.styles.getRules('*');
@@ -285,6 +291,98 @@ function editGlobalStylesheet(e) {
     </div> \
     <div id='stylebot-modal-buttons'> \
     <button onclick='onSave(\"*\");'>Save</button> \
+    <button onclick='cache.modal.hide();'>Cancel</button> \
+    </div>";
+
+    initializeEditorModal(html, css);
+
+    cache.modal.show();
+}
+
+function selectStyle($styleEl) {
+    $styleEl.addClass('selected');
+
+    var $urlEl = $styleEl.find('.style-url');
+
+    Utils.editElement($urlEl, { editFieldClass: 'stylebot-editing-field' });
+
+    function onEditingComplete(e) {
+        var el = e.target;
+        var $el = $(el);
+
+        if (e.type === 'keydown' && !$el.hasClass('stylebot-editing-field'))
+            return true;
+
+        if (e.type === 'mousedown' && $el.closest($styleEl).length != 0)
+            return true;
+
+        if (e.type === 'keydown')
+        {
+            switch (e.keyCode)
+            {
+                case 38: // up
+                    var $nextStyle = $el.closest('.style').prev();
+                    // if the target element doesn't exist, ignore this event
+                    if ($nextStyle.length === 0) return true;
+
+                    break;
+
+                case 40: // down
+                    var $nextStyle = $el.closest('.style').next();
+                    // if the target element doesn't exist, ignore this event
+                    if ($nextStyle.length === 0) return true;
+
+                    break;
+
+                case 27:
+                case 13: break;
+
+                default:
+                    return true;
+            }
+        }
+        
+        e.preventDefault();
+
+        Utils.endEditing($urlEl);
+
+        var newURL = $el.text();
+        editURL($styleEl.data('value'), newURL);
+        $styleEl.data('value', newURL);
+
+        $(document).unbind('keydown mousedown', onEditingComplete);
+
+        $styleEl.removeClass('selected');
+
+        if ($nextStyle != undefined) {
+            setTimeout(function() {
+                $nextStyle.click();
+            }, 0);
+        }
+
+        else {
+            $styleEl.focus();
+        }
+    }
+
+    $(document).bind('keydown mousedown', onEditingComplete);
+}
+
+// Displays the modal popup for editing a style
+function editStyle(e) {
+    var parent = $(e.target).parents('.style');
+    var url = parent.find('.style-url').html();
+    var rules = bg_window.cache.styles.getRules(url);
+    var css = CSSUtils.crunchFormattedCSS(rules, false);
+
+    var html = "<div class='popup-content'> \
+    <div class='header-text'> \
+    Edit the CSS for <strong>" + url + "</strong>: \
+    </div> \
+    <div id='editor'></div> \
+    </div> \
+    <div id='stylebot-modal-buttons'> \
+    <button onclick='onSave(\"" + url + "\");'>Save</button> \
     <button onclick='cache.modal.hide();'>Cancel</button> \
     </div>";
 
@@ -312,26 +410,26 @@ function addStyle() {
 }
 
 function enableAllStyles() {
+    $('.style input[type=checkbox]').prop('checked', true);
     bg_window.cache.styles.toggleAll(true);
-    $('.custom-style input[type=checkbox]').prop('checked', true);
 }
 
 function disableAllStyles() {
+    $('.style input[type=checkbox]').prop('checked', false);
     bg_window.cache.styles.toggleAll(false);
-    $('.custom-style input[type=checkbox]').prop('checked', false);
 }
 
 function changeStyleStatus(e) {
-    var parent = $(e.target).parents('.custom-style');
-    var url = parent.find('.custom-style-url').html();
+    var parent = $(e.target).parents('.style');
+    var url = parent.find('.style-url').html();
     
     bg_window.cache.styles.toggle(url);
 }
 
 // Called when Share button is clicked for a style
 function shareStyle(e) {
-    var parent = $(e.target).parents('.custom-style');
-    var url = parent.find('.custom-style-url').html();
+    var parent = $(e.target).parents('.style');
+    var url = parent.find('.style-url').html();
     var rules = bg_window.cache.styles.getRules(url);
     var css = CSSUtils.crunchFormattedCSS(rules, false);
 
@@ -401,7 +499,7 @@ function saveStyle(url, css, add) {
             if (!bg_window.cache.styles.isEmpty(url))
             {
                 bg_window.cache.styles.delete(url);
-                $('.custom-style-url:contains(' + url + ')').parent().remove();
+                $('.style-url:contains(' + url + ')').parent().remove();
 
                 bg_window.cache.styles.persist();
                 bg_window.cache.styles.push();
@@ -435,7 +533,7 @@ function saveStyle(url, css, add) {
             bg_window.cache.styles.push();
 
             if (add)
-                createCustomStyleOption(url, bg_window.cache.styles.get(url)).prependTo($('#custom-styles'));
+                createStyleUI(url, bg_window.cache.styles.get(url)).prependTo($('#styles'));
 
             return true;
         }
@@ -498,6 +596,7 @@ function clearSyntaxError() {
 function editURL(oldValue, newValue) {
     if (oldValue == newValue || newValue == '')
         return;
+    
     bg_window.cache.styles.replace(oldValue, newValue);
 }
 
@@ -559,7 +658,7 @@ function importCSS() {
             displayErrorMessage('' + e);
             return false;
         }
-        fillCustomStyles();
+        fillStyles();
         cache.modal.hide();
         return true;
     }
@@ -587,7 +686,7 @@ function toggleSyncing() {
         // todo: again, 200 is an arbitrary value to wait for bg_window to respond
         //
         setTimeout(function() {
-            fillCustomStyles();
+            fillStyles();
         }, 200);
     }
 
@@ -737,8 +836,8 @@ function initFiltering() {
 
 // Filter styles based on user entered text in search field
 function filterStyles(value) {
-    var styleDivs = $('.custom-style');
-    var urls = $('.custom-style-url');
+    var styleDivs = $('.style');
+    var urls = $('.style-url');
     var len = styleDivs.length;
 
     for (var i = 0; i < len; i++) {

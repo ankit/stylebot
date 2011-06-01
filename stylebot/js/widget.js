@@ -88,21 +88,38 @@ stylebot.widget = {
         .append(urlContainer);
         
         //  Make selector editable
-        Utils.makeEditable(self.cache.headerSelector, function(value) {
-            self.updateHeight();
-            self.setSelector(self.cache.headerSelector.html());
-            stylebot.select(null, value);
-        }, { selectText: true });
+        Utils.makeEditable(
+            self.cache.headerSelector,
+            
+            function(value) {
+                self.updateHeight();
+                self.setSelector(self.cache.headerSelector.html());
+                stylebot.select(null, value);
+            },
+
+            {
+                selectText: true,
+                editFieldClass: 'stylebot-editing-field'
+            });
 
         //  Make URL editable
-        Utils.makeEditable(url, function(value) {
-            self.updateHeight();
-            if (value != stylebot.style.cache.url)
+        Utils.makeEditable(
+            url,
+
+            function(value) {
+                self.updateHeight();
+
+                if (value != stylebot.style.cache.url)
+                {
+                    stylebot.chrome.transfer(stylebot.style.cache.url, value);
+                    stylebot.style.cache.url = value;
+                }
+            },
+
             {
-                stylebot.chrome.transfer(stylebot.style.cache.url, value);
-                stylebot.style.cache.url = value;
-            }
-        }, { selectText: true });
+                selectText: true,
+                editFieldClass: 'stylebot-editing-field'
+            });
 
         //  Close button
         var closeButton = $('<div>', {
