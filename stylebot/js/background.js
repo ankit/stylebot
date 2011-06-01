@@ -488,6 +488,9 @@ Styles.prototype.create = function(url, rules) {
  * @return {Boolean} The enabled status for the given URL.
  */
 Styles.prototype.isEnabled = function(url) {
+    if (this.styles[url] === undefined)
+        return false;
+
     return this.styles[url]['_enabled'];
 };
 
@@ -533,16 +536,20 @@ Styles.prototype.setMetadata = function(url, data) {
  * @param {Object} value The enabled status for the given URL.
  */
 Styles.prototype.toggle = function(url, value, shouldPersist) {
-    if (this.isEmpty(url)) return;
+    if (this.isEmpty(url)) {
+        return false;
+    }
 
     if (value === undefined) {
         this.styles[url]['_enabled'] = !this.styles[url]['_enabled'];
     } else {
         this.styles[url]['_enabled'] = value;
     }
-    
+
     if (shouldPersist != false)
         this.persist();
+    
+    return true;
 };
 
 /**
@@ -680,6 +687,8 @@ Styles.prototype.upgrade = function(version) {
  * @return {Object} The enabled status for the given URL.
  */
 Styles.prototype.getRules = function(url) {
+    if (this.styles[url] === undefined)
+        return null;
     var rules = this.styles[url]['_rules'];
     return rules ? rules : null;
 };

@@ -225,6 +225,8 @@ function createStyleUI(url) {
     })
     .bind('click keydown', function(e) {
         if (e.type === 'keydown' && e.keyCode != 13) return true;
+        e.preventDefault();
+        e.stopPropagation();
         shareStyle(e);
     })
     .appendTo(b_container)
@@ -237,6 +239,8 @@ function createStyleUI(url) {
     })
     .bind('click keydown', function(e) {
         if (e.type === 'keydown' && e.keyCode != 13) return true;
+        e.preventDefault();
+        e.stopPropagation();
         editStyle(e);
     })
     .appendTo(b_container)
@@ -249,6 +253,8 @@ function createStyleUI(url) {
     })
     .bind('click keydown', function(e) {
         if (e.type === 'keydown' && e.keyCode != 13) return true;
+        e.preventDefault();
+        e.stopPropagation();
         removeStyle(e);
     })
     .appendTo(b_container)
@@ -274,13 +280,23 @@ function updateGlobalStylesheetUI() {
 
 // Turn global stylesheet on/off
 function toggleGlobalStylesheet() {
-    bg_window.cache.styles.toggle('*');
+    if (!bg_window.cache.styles.toggle('*')) {
+        // create an empty global stylesheet
+        bg_window.cache.styles.create('*');
+    }
+
     updateGlobalStylesheetUI();
 }
 
 // Displays the modal popup for editing the global stylesheet
 function editGlobalStylesheet(e) {
     var rules = bg_window.cache.styles.getRules('*');
+    
+    if (!rules) {
+        bg_window.cache.styles.create('*');
+        rules = {};
+    }
+    
     var css = rules ? CSSUtils.crunchFormattedCSS(rules, false) : '';
 
     var html = "<div class='popup-content'> \

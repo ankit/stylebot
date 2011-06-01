@@ -158,7 +158,7 @@ li.option:first-of-type {
 .style {
     clear: both;
     min-height: 30px;
-    padding: 5px;
+    padding: 2px;
     margin-left: -5px;
     border-radius: 2px;
     overflow: auto;
