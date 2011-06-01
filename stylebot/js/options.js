@@ -79,7 +79,7 @@ function init() {
 function initializeTabs() {
     $('ul.menu li:first').addClass('tabActive').show();
     $('#options > div').hide();
-    $('#basic-options').show();
+    $('#basics').show();
 
     // click event for tab menu items
     $('ul.menu li').click(function() {
@@ -113,27 +113,27 @@ function fetchOptions() {
 // Attaches listeners for different types of inputs that change option values
 function attachListeners() {
     // checkbox
-    $('.option input[type=checkbox]').change(function(e) {
+    $('#basics input[type=checkbox]').change(function(e) {
         var name = e.target.name;
         var value = translateOptionValue(name, e.target.checked);
         bg_window.saveOption(name, value);
     });
 
     // radio
-    $('.option input[type=radio]').change(function(e) {
+    $('#basics input[type=radio]').change(function(e) {
         var name = e.target.name;
         var value = translateOptionValue(name, e.target.value);
         bg_window.saveOption(name, value);
     });
 
     // select
-    $('.option select').change(function(e) {
+    $('#basics select').change(function(e) {
         bg_window.saveOption(e.target.name, e.target.value);
     });
 
     // textfields
-    $('.option input[type=text]').keyup(function(e) {
-        if (e.target.name == 'shortcutKeyCharacter')
+    $('#basics input[type=text]').keyup(function(e) {
+        if (e.target.name === 'shortcutKeyCharacter')
             option = 'shortcutKey';
         else
             option = e.target.name;
@@ -157,6 +157,22 @@ function attachListeners() {
         setTimeout(function() {
             selectStyle($this);
         }, 0);
+    });
+    
+    // Tap / to search styles
+    $(document).keyup(function(e) {
+        if (e.keyCode != 191)
+            return true;
+
+        if ($('#styles-container').css('display') === 'none')
+            return true;
+
+        var tag = e.target.tagName.toLowerCase();
+
+        if (tag === 'input' || tag === 'textarea')
+            return true;
+
+        $('#style-search-field').focus();
     });
 }
 
@@ -268,8 +284,15 @@ function removeStyle(e) {
     var parent = $(e.target).parents('.style');
     var url = parent.find('.style-url');
 
-    parent.remove();
-    bg_window.cache.styles.delete(url.html());
+    // remove tooltip for delete icon so that it does not lag around later
+    parent.find('.close-button').attr('original-title', '');
+
+    // wait for the tooltip to disappear, then remove the style element from DOM
+    setTimeout(function() {
+        parent.remove();
+    }, 0);
+
+    bg_window.cache.styles.delete(url.text());
     bg_window.cache.styles.push();
 }
 
@@ -436,6 +459,8 @@ function disableAllStyles() {
 }
 
 function changeStyleStatus(e) {
+    e.stopPropagation();
+    
     var parent = $(e.target).parents('.style');
     var url = parent.find('.style-url').html();
     

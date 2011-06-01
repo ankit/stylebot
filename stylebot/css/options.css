@@ -42,6 +42,7 @@ h2 {
     font-weight: bold;
     width: 180px;
     vertical-align: middle;
+    margin: 0;
 }
 
 a {
@@ -89,7 +90,7 @@ li.option:first-of-type {
 }
 
 .option-section .option-subsection {
-    font-size:13px;
+    font-size: 13px;
     -webkit-box-flex: 1;
 }
 

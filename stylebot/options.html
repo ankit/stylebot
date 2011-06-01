@@ -23,7 +23,7 @@
     <div id="tabMenu">
         <h1>Stylebot Options</h1>
         <ul class="menu">
-            <li><a href="#basic-options">Basics</a></li>
+            <li><a href="#basics">Basics</a></li>
             <li><a href="#styles-container">Styles</a></li>
             <li><a href="#backup">Backup and Sync</a></li>
         </ul>
@@ -36,35 +36,35 @@
         </div>
     </div>
     <div id="options">
-        <div id="basic-options">
+        <div id="basics">
             <h2>Basics</h2>
             <div class="option-section">
                 <h3>Browser UI</h3>
-                <ul class="option-subsection">
-                    <li class="option">
+                <div class="option-subsection">
+                    <div>
                         <label>
                             <input type="checkbox" name="contextMenu" />
                             <span class="option-field">Show Right Click Menu</span>
                         </label>
-                    </li>
-                    <li class="option">
+                    </div>
+                    <div>
                         <label>
                             <input type="checkbox" name="showPageAction" onclick="togglePageAction();" />
                             <span class="option-field">Show <img src='images/css.png' style='margin-bottom: -6px;' /> Icon in Omnibar</span>
                         </label>
-                    </li>
-                </ul>
+                    </div>
+                </div>
             </div>
             <div class="option-section">
                 <h3>Accessibility</h3>
-                <ul class="option-subsection">
-                    <li class="option">
+                <div class="option-subsection">
+                    <div>
                         <label>
                             <input type="checkbox" name="useShortcutKey" />
                             <span class="option-field">Enable Shortcut Key to launch Stylebot</span>
                         </label>
-                    </li>
-                    <li class="option">
+                    </div>
+                    <div>
                         <span class="option-field">Shortcut Key Combo:</span>
                         <div class='option-value'>
                             <select name="shortcutMetaKey">
@@ -77,29 +77,27 @@
                             <!-- Hidden field to store keycode value -->
                             <input type="hidden" name="shortcutKey" />
                         </div>
-                    </li>
-                </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="option-section">
+                <h3>Default Editing Mode</h3>
+                <div class="option-subsection">
+                    <label><input type="radio" name="mode" value="Basic" /> Basic </label>
+                    <br>
+                    <label><input type="radio" name="mode" value="Advanced" /> Advanced </label>
+                    <br>
+                    <label><input type="radio" name="mode" value="Edit CSS" /> Edit CSS </label>
+                </div>
             </div>
             <div class="option-section">
                 <h3>Stylebot Panel</h3>
-                <ul class="option-subsection">
-                    <li class="option">
-                        <span class='option-field'>Preferred Editing Mode:</span>
-                        <div class='option-value'>
-                            <label><input type="radio" name="mode" value="Basic" /> Basic </label>
-                            <br>
-                            <label><input type="radio" name="mode" value="Advanced" /> Advanced </label>
-                            <br>
-                            <label><input type="radio" name="mode" value="Edit CSS" /> Edit CSS </label>
-                        </div>
-                    </li>
-                    <li class="option">
-                        <label>
-                            <input type="checkbox" name="livePreviewColorPicker" />
-                            <span class="option-field">Enable Live Preview in Color Picker</span>
-                        </label>
-                    </li>
-                </ul>
+                <div class="option-subsection">
+                    <label>
+                        <input type="checkbox" name="livePreviewColorPicker" />
+                        <span class="option-field">Enable Live Preview in Color Picker</span>
+                    </label>
+                </div>
             </div>
         </div>
         <div id="styles-container">
@@ -114,10 +112,7 @@
             <div class="option-section">
                 <h3>Search</h3>
                 <div class="option-subsection">
-                    Search for styles on
-                    <a rel="external" target="_blank" href="http://stylebot.me">Stylebot Social</a>
-                    <br>
-                    <input type="search" id="style-search-field" incremental placeholder="Search your own styles..."/>
+                    <input type="search" id="style-search-field" incremental placeholder="Type URL to search..."/>
                 </div>
             </div>
             <div class="option-section">
