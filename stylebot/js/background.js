@@ -843,8 +843,8 @@ String.prototype.matchesPattern = function(pattern) {
                 replace(/\*/g, '.*');
         /* Enclose the pattern in ( ) if it has several urls separated by , */
         pattern = (hasComma ? '(' + pattern + ')' : pattern);
-        /* Matches the beginning of the url */
-        pattern = '^.+?://' + pattern;
+        /* Matches the beginning of the url, we only consider http(s) urls */
+        pattern = '^https?://' + pattern;
         pattern = new RegExp(pattern, 'i');
         return pattern.test(this);
     } else {
