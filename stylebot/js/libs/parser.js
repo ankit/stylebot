@@ -1166,8 +1166,8 @@ CSSParser.prototype = {
     var blocks = [];
     var foundPriority = false;
     var values = [];
-    /* @rduenasf list of properties to fix the unitless declaration */
-    var shouldFixDimensionUnit = ["padding", "margin"];
+    /* @rduenasf list of properties fix its unitless declaration */
+    var shouldFixDimensionUnit = ["padding", "margin", "border", "width", "height"];
     while (token.isNotNull()) {
 
       if ((token.isSymbol(";")
@@ -1253,17 +1253,8 @@ CSSParser.prototype = {
         else
           return "";
       }
-      /* @rduenasf: Fix unitless declaration, e.g. padding: 10;
-         Ideally, we should define a list of properties to fix, but currently
-         we apply this to all properties declarations using any unitless
-         dimension different from 0 (to allow margin: 0 and others).
-         
-         The array mentioned above should be filled with these properties,
-         also, we have to add the condition shown below to the else if clause
-         
-         shouldFixDimensionUnit.indexOf(descriptor) != -1
-      */
-      else if (token.isNumber() && !token.isNumber("0")) {
+      /* @rduenasf: Fix unitless declaration, e.g. padding: 10; */
+      else if (token.isNumber() && !token.isNumber("0") && shouldFixDimensionUnit.indexOf(descriptor) != -1) {
           var value = new jscsspVariable(kJscsspPRIMITIVE_VALUE, aSheet);
           value.value = token.value + "px";
           values.push(value);
