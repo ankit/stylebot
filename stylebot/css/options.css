@@ -122,6 +122,7 @@ li.option:first-of-type {
 .error {
     color: hsl(349, 165%, 35%);
     font-weight: bold;
+    font-size: 12px;
 }
 
 .error-marker {
@@ -241,7 +242,7 @@ li.option:first-of-type {
     margin: 0;
 }
 
-#stylebot-modal .header-text {
+#stylebot-modal .popup-header {
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
@@ -251,7 +252,7 @@ li.option:first-of-type {
     text-align: left;
 }
 
-#stylebot-modal-buttons {
+#stylebot-modal .popup-footer {
     float: right;
 }
 
@@ -281,11 +282,6 @@ li.option:first-of-type {
     margin: 0px !important;
     padding: 0px !important;
     color: #555 !important;
-}
-
-#parserError {
-    float: left;
-    font-size: 12px !important;
 }
 
 /** end of modal popup **/

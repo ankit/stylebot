@@ -8,6 +8,7 @@ var bg_window = null;
 
 var cache = {
     modal: null,
+    backupModal: null,
     errorMarker: null
 };
 
@@ -322,18 +323,12 @@ function editGlobalStylesheet(e) {
     
     var css = rules ? CSSUtils.crunchFormattedCSS(rules, false) : '';
 
-    var html = "<div class='popup-content'> \
-    <div class='header-text'> \
-    Edit the <strong>Global Stylesheet</strong>: \
-    </div> \
-    <div id='editor'></div> \
-    </div> \
-    <div id='stylebot-modal-buttons'> \
-    <button onclick='onSave(\"*\");'>Save</button> \
-    <button onclick='cache.modal.hide();'>Cancel</button> \
-    </div>";
+    var headerHTML  = "Edit the <strong>Global Stylesheet</strong>:";
+    
+    var footerHTML = "<button onclick='onSave(\"*\");'>Save</button> \
+    <button onclick='cache.modal.hide();'>Cancel</button>";
 
-    initializeEditorModal(html, css);
+    initializeEditorModal(headerHTML, footerHTML, css);
 
     cache.modal.show();
 }
@@ -421,39 +416,31 @@ function editStyle(e) {
     var url = parent.find('.style-url').html();
     var rules = bg_window.cache.styles.getRules(url);
     var css = CSSUtils.crunchFormattedCSS(rules, false);
+    
+    var headerHTML = "Edit the CSS for <strong>" + url + "</strong>:";
+    
+    var footerHTML = "<button onclick='onSave(\"" + url + "\");'>Save</button> \
+    <button onclick='cache.modal.hide();'>Cancel</button>";
 
-    var html = "<div class='popup-content'> \
-    <div class='header-text'> \
-    Edit the CSS for <strong>" + url + "</strong>: \
-    </div> \
-    <div id='editor'></div> \
-    </div> \
-    <div id='stylebot-modal-buttons'> \
-    <button onclick='onSave(\"" + url + "\");'>Save</button> \
-    <button onclick='cache.modal.hide();'>Cancel</button> \
-    </div>";
-
-    initializeEditorModal(html, css);
+    initializeEditorModal(headerHTML, footerHTML, css);
 
     cache.modal.show();
 }
 
 // Displays the modal popup to add a new style
 function addStyle() {
-    var html = "<div class='popup-content'> \
-    <div class='header-text'> \
-    URL: <input type='text'></input> \
-    </div> \
-    <div id='editor'></div> \
-    </div> \
-    <div id='stylebot-modal-buttons'> \
-    <button onclick= 'onAdd();' >Add</button> \
-    <button onclick= 'cache.modal.hide();' >Cancel</button> \
-    </div>";
+    var headerHTML = "URL: <input type='text'></input>";
 
-    initializeAddStyleEditorModal(html);
+    var footerHTML = "<button onclick= 'onAdd();' >Add</button> \
+    <button onclick= 'cache.modal.hide();' >Cancel</button>";
+
+    initializeEditorModal(headerHTML, footerHTML, '');
 
     cache.modal.show();
+    
+    setTimeout(function() {
+        cache.modal.box.find('input').focus();
+    }, 40)
 }
 
 function enableAllStyles() {
@@ -524,11 +511,23 @@ function onSave(url) {
 
 // Called when a new style is added (Add button is clicked)
 function onAdd() {
-    var url = cache.modal.box.find('input').attr('value');
+    var url = $.trim(cache.modal.box.find('input').attr('value'));
     var css = cache.modal.editor.getSession().getValue();
 
-    if (css === '')
+    if (url === '') {
+        displayErrorMessage('Please enter a URL');
         return false;
+    }
+
+    else if (url === '*') {
+        displayErrorMessage('* is used for the global stylesheet. Please enter another URL.')
+        return false;
+    }
+
+    if (css === '') {
+        displayErrorMessage('Please enter some CSS');
+        return false;
+    }
 
     if (saveStyle(url, css, true)) {
         cache.modal.hide();
@@ -597,13 +596,30 @@ function saveStyle(url, css, add) {
     return true;
 }
 
+function displayBackupErrorMessage(msg) {
+    var $error = cache.backupModal.box.find('#backupError');
+
+    if ($error.length === 0)
+    {
+        $error = $('<div>', {
+            id      : 'backupError',
+            class   : 'error'
+        });
+
+        cache.backupModal.box.append($error);
+    }
+
+    $error.text(msg);
+}
+
 function displayErrorMessage(msg) {
     var $error = cache.modal.box.find('#parserError');
 
-    if ($error.length === 0) {
+    if ($error.length === 0)
+    {
         $error = $('<div>', {
-            id: 'parserError',
-            class: 'error'
+            id      : 'parserError',
+            class   : 'error'
         });
 
         cache.modal.box.append($error);
@@ -658,43 +674,35 @@ function export() {
     else
         json = '';
 
-    var html = "<div class='popup-content'>Copy and paste the following into a text file: \
-    <textarea class='stylebot-css-code'></textarea> \
-    </div> \
-    <div id='stylebot-modal-buttons'> \
-    <button onclick='copyToClipboard()'> Copy To Clipboard </button> \
-    </div>";
+    var headerHTML = "Copy and paste the following into a text file: ";
 
-    initializeBackupModal(html, json);
+    var footerHTML = "<button onclick='copyToClipboard(cache.backupModal.box.find(\"textarea\").attr(\"value\"));'> Copy To Clipboard </button>";
 
-    cache.modal.show();
+    initializeBackupModal(headerHTML, footerHTML, json, 60);
+
+    cache.backupModal.show();
 }
 
 // Copy text in the popup's textarea to clipboard.
-function copyToClipboard() {
-    chrome.extension.sendRequest({ name: 'copyToClipboard', text: cache.modal.box.find('textarea').attr('value') }, function(response) {});
+function copyToClipboard(text) {
+    chrome.extension.sendRequest({ name: 'copyToClipboard', text: text }, function(response) {});
 }
 
 // Displays the modal popup for importing styles from JSON string
 function import() {
-    var html = "<div class='popup-content'>Paste previously exported styles: \
-    <div class='description'> \
-    <span class='note'>Note</span>: Existing styles for similar URLs will be overwritten. \
-    </div> \
-    <textarea class='stylebot-css-code'></textarea>\
-    </div> \
-    <div id='stylebot-modal-buttons'> \
-    <button onclick='importCSS();'>Import</button> \
-    <button onclick='cache.modal.hide();'>Cancel</button> \
-    </div>";
+    var headerHTML = "Paste previously exported styles: <br><span class='note'>Note</span>: Existing styles for similar URLs will be overwritten."
 
-    initializeBackupModal(html);
-    cache.modal.show();
+    var footerHTML = "<button onclick='importCSS();'>Import</button> \
+    <button onclick='cache.backupModal.hide();'>Cancel</button>";
+
+    initializeBackupModal(headerHTML, footerHTML, '');
+
+    cache.backupModal.show();
 }
 
 // Import styles from JSON string
 function importCSS() {
-    var json = cache.modal.box.find('textarea').attr('value');
+    var json = cache.backupModal.box.find('textarea').attr('value');
 
     if (json && json != '')
     {
@@ -702,13 +710,16 @@ function importCSS() {
             var imported_styles = JSON.parse(json);
             bg_window.cache.styles.import(imported_styles);
         }
+
         catch (e) {
             // show error. todo: show a more humanised message
-            displayErrorMessage('' + e);
+            displayBackupErrorMessage('' + e);
             return false;
         }
+
         fillStyles();
-        cache.modal.hide();
+        cache.backupModal.hide();
+
         return true;
     }
 }
@@ -760,19 +771,31 @@ function togglePageAction() {
 
 // Initialize editor inside a modal popup
 //
-function initializeEditorModal(html, code) {
+function initializeEditorModal(headerHTML, footerHTML, code) {
     if (!cache.modal)
     {
+        var html = "<div class='popup-content'> \
+        <div class='popup-header'> \
+        </div> \
+        <div id='editor'></div> \
+        </div> \
+        <div class='popup-footer'> \
+        </div>";
+        
         cache.modal = new ModalBox(html, {
             bgFadeSpeed: 0
         });
+        
+        // set up editor
+        cache.modal.editor = Utils.ace.monkeyPatch(ace.edit('editor'));
     }
     
-    else {
-        cache.modal.box.html(html);
-    }
+    cache.modal.box.find('.popup-header').html(headerHTML);
+    cache.modal.box.find('.popup-footer').html(footerHTML);
     
-    initializeEditor(code);
+    setTimeout(function() {
+        initializeEditor(code);
+    }, 0);
     
     cache.modal.options.closeOnEsc = false;
     cache.modal.options.closeOnBgClick = false;
@@ -786,45 +809,7 @@ function initializeEditorModal(html, code) {
     }
 }
 
-function initializeAddStyleEditorModal(html) {
-    
-    if (!cache.modal)
-    {
-        cache.modal = new ModalBox(html, {
-            bgFadeSpeed: 0
-        });
-    }
-    
-    else {
-        cache.modal.box.html(html);
-    }
-    
-    initializeEditor();
-
-    cache.modal.options.closeOnEsc = false;
-    cache.modal.options.closeOnBgClick = false;
-    
-    cache.modal.options.onOpen = function()
-    {
-        setTimeout(function() {
-            cache.modal.box.find('input')
-            
-            .focus()
-
-            .change(function() {
-                // user cannot explicity set the URL to *, as it is used for global stylesheet
-                // todo: notify user instead of bluntly clearing up the input field
-                //
-                if ($(this).val() === '*') { $(this).val(''); }
-            });
-            
-        }, 0);
-    }
-}
-
 function initializeEditor(code) {
-    cache.modal.editor = Utils.ace.monkeyPatch(ace.edit('editor'));
-    
     var editor = cache.modal.editor;
     var session = editor.getSession();
     
@@ -841,27 +826,42 @@ function initializeEditor(code) {
     setTimeout(function() {
         resizeEditor();
     }, 0);
+    
+    // clear any syntax error notifications
+    $('#parserError').html('');
 }
 
-function initializeBackupModal(html, code) {
-    if (!cache.modal)
+function initializeBackupModal(headerHTML, footerHTML, code, bottomSpace) {
+    if (!cache.backupModal)
     {
-        cache.modal = new ModalBox(html, {
+        var html = "<div class='popup-content'> \
+        <div class='popup-header'> \
+        </div> \
+        <textarea class='stylebot-css-code'></textarea>\
+        </div> \
+        <div class='popup-footer'> \
+        </div>";
+
+        cache.backupModal = new ModalBox(html, {
             bgFadeSpeed: 0
         });
     }
-    
-    else {
-        cache.modal.box.html(html);
-    }
-    
-    resizeEditor(75);
 
-    cache.modal.options.closeOnEsc = true;
-    cache.modal.options.closeOnBgClick = true;
+    cache.backupModal.box.find('.popup-header').html(headerHTML);
+    cache.backupModal.box.find('.popup-footer').html(footerHTML);
+    
+    if (!bottomSpace)
+        bottomSpace = 75;
 
-    cache.modal.options.onOpen = function() {
-        var $textarea = cache.modal.box.find('textarea');
+    setTimeout(function() {
+        resizeEditor(bottomSpace);
+    }, 0);
+
+    cache.backupModal.options.closeOnEsc = true;
+    cache.backupModal.options.closeOnBgClick = true;
+
+    cache.backupModal.options.onOpen = function() {
+        var $textarea = cache.backupModal.box.find('textarea');
         $textarea.attr('value', code);
         $textarea.focus();
         Utils.selectAllText($textarea.get(0));
@@ -900,19 +900,22 @@ function filterStyles(value) {
 }
 
 function resizeEditor(bottomSpace) {
-    if (!cache.modal) return;
-    
     if (!bottomSpace) {
         bottomSpace = 60;
     }
     
-    $('.stylebot-css-code').height($('#stylebot-modal').height() - bottomSpace + 'px');
-    $('.stylebot-css-code').width($('#stylebot-modal').width() + 'px');
+    var $modal = $('#stylebot-modal');
+    var modalHeight = $modal.height();
+    var modalWidth = $modal.width();
     
-    if (!cache.modal.editor) return;
+    $('.stylebot-css-code')
+    .height(modalHeight - bottomSpace + 'px')
+    .width(modalWidth + 'px');
     
-    $('#editor').height($('#stylebot-modal').height() - bottomSpace + 'px');
-    $('#editor').width($('#stylebot-modal').width() + 'px');
+    if (!cache.modal || !cache.modal.editor) return;
+    
+    $('#editor').height(modalHeight - bottomSpace + 'px')
+    .width(modalWidth + 'px');
     
     cache.modal.editor.resize();
 }

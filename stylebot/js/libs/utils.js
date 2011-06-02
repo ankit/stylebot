@@ -208,13 +208,13 @@ var Utils = {
         if ($el === undefined)
             return;
         
-        var value = $el.prev('textarea').attr('value');
+        var value = $.trim($el.prev('textarea').attr('value'));
         
         $el.prev('textarea').remove();
         
-        if (value === "")
-            value = $el.text($el.data('value'));
-            
+        if (value === '')
+            value = $el.data('value');
+        
         $el.data('value', null);
         
         $el.html(value);

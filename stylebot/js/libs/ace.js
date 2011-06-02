@@ -1929,7 +1929,7 @@ function parseKeys(keys, val, ret) {
         return {
             key: key,
             hashId: hashId
-        }   
+        }
     } else {
         (ret[hashId] || (ret[hashId] = {}))[key] = val;
     }
@@ -1943,7 +1943,7 @@ function buildKeyHash(command) {
         ckbf = commandKeyBindingFunc
 
     if (!binding.sender) {
-        throw new Error('All key bindings must have a sender');   
+        throw new Error('All key bindings must have a sender');
     }
     if (!binding.mac && binding.mac !== null) {
         throw new Error('All key bindings must have a mac key binding');
@@ -1953,7 +1953,7 @@ function buildKeyHash(command) {
     }
     if(!binding[platform]) {
         // No keymapping for this platform.
-        return;   
+        return;
     }
     if (typeof binding.sender == 'string') {
         var targets = splitSafe(binding.sender, "\\|", null, true);
@@ -1962,7 +1962,7 @@ function buildKeyHash(command) {
                 ckb[target] = { };
             }
             key.split("|").forEach(function(keyPart) {
-                parseKeys(keyPart, command, ckb[target]);        
+                parseKeys(keyPart, command, ckb[target]);
             });
         });
     } else if (typecheck.isFunction(binding.sender)) {
@@ -1976,12 +1976,12 @@ function buildKeyHash(command) {
             ckbf[keyData.hashId] = { };
         }
         if (!ckbf[keyData.hashId][keyData.key]) {
-            ckbf[keyData.hashId][keyData.key] = [ val ];   
+            ckbf[keyData.hashId][keyData.key] = [ val ];
         } else {
             ckbf[keyData.hashId][keyData.key].push(val);
         }
     } else {
-        throw new Error('Key binding must have a sender that is a string or function');   
+        throw new Error('Key binding must have a sender that is a string or function');
     }
 }
 
@@ -1991,7 +1991,7 @@ function findKeyCommand(env, sender, hashId, textOrKey) {
         textOrKey = keyUtil.keyCodeToString(textOrKey);
     }
     
-    // Check bindings with functions as sender first.    
+    // Check bindings with functions as sender first.
     var bindFuncs = (commandKeyBindingFunc[hashId]  || {})[textOrKey] || [];
     for (var i = 0; i < bindFuncs.length; i++) {
         if (bindFuncs[i].sender(env, sender, hashId, textOrKey)) {
@@ -2006,7 +2006,7 @@ function findKeyCommand(env, sender, hashId, textOrKey) {
 function execKeyCommand(env, sender, hashId, textOrKey) {
     var command = findKeyCommand(env, sender, hashId, textOrKey);
     if (command) {
-        return exec(command, env, sender, { });   
+        return exec(command, env, sender, { });
     } else {
         return false;
     }
@@ -2043,7 +2043,7 @@ function addCommand(command) {
     commands[command.name] = command;
 
     if (command.bindKey) {
-        buildKeyHash(command);   
+        buildKeyHash(command);
     }
 
     commandNames.push(command.name);
@@ -2087,7 +2087,7 @@ function defaultArgsProvider(request, callback) {
         // If the parameter is already valid, then don't ask for it anymore.
         if (request.getParamStatus(param) != Status.VALID ||
             // Ask for optional parameters as well.
-            param.defaultValue === null) 
+            param.defaultValue === null)
         {
             var paramPrompt = param.description;
             if (param.defaultValue === null) {
@@ -2100,7 +2100,7 @@ function defaultArgsProvider(request, callback) {
                 return;
             } else {
                 args[param.name] = value;
-            }           
+            }
         }
     }
     callback();
@@ -2110,14 +2110,14 @@ function defaultArgsProvider(request, callback) {
  * Entry point for keyboard accelerators or anything else that wants to execute
  * a command. A new request object is created and a check performed, if the
  * passed in arguments are VALID/INVALID or INCOMPLETE. If they are INCOMPLETE
- * the ArgumentProvider on the sender is called or otherwise the default 
+ * the ArgumentProvider on the sender is called or otherwise the default
  * ArgumentProvider to get the still required arguments.
  * If they are valid (or valid after the ArgumentProvider is done), the command
  * is executed.
- * 
+ *
  * @param command   Either a command, or the name of one
  * @param env       Current environment to execute the command in
- * @param sender    String that should be the same as the senderObject stored on 
+ * @param sender    String that should be the same as the senderObject stored on
  *                  the environment in env[sender]
  * @param args      Arguments for the command
  * @param typed     (Optional)
@@ -2139,7 +2139,7 @@ function exec(command, env, sender, args, typed) {
     });
     
     /**
-     * Executes the command and ensures request.done is called on the request in 
+     * Executes the command and ensures request.done is called on the request in
      * case it's not marked to be done already or async.
      */
     function execute() {
@@ -2153,10 +2153,10 @@ function exec(command, env, sender, args, typed) {
     
     
     if (request.getStatus() == Status.INVALID) {
-        console.error("Canon.exec: Invalid parameter(s) passed to " + 
+        console.error("Canon.exec: Invalid parameter(s) passed to " +
                             command.name);
-        return false;   
-    } 
+        return false;
+    }
     // If the request isn't complete yet, try to complete it.
     else if (request.getStatus() == Status.INCOMPLETE) {
         // Check if the sender has a ArgsProvider, otherwise use the default
@@ -2164,7 +2164,7 @@ function exec(command, env, sender, args, typed) {
         var argsProvider;
         var senderObj = env[sender];
         if (!senderObj || !senderObj.getArgsProvider ||
-            !(argsProvider = senderObj.getArgsProvider())) 
+            !(argsProvider = senderObj.getArgsProvider()))
         {
             argsProvider = defaultArgsProvider;
         }
@@ -2272,8 +2272,8 @@ Request.prototype.getParamStatus = function(param) {
             if (param.defaultValue === null) {
                 return Status.VALID;
             } else {
-                return Status.INCOMPLETE;   
-            } 
+                return Status.INCOMPLETE;
+            }
         }
         
         // Check if the parameter value is valid.
@@ -2281,17 +2281,17 @@ Request.prototype.getParamStatus = function(param) {
             // The passed in value when parsing a type is a string.
             argsValue = args[param.name].toString();
         
-        // Type.parse can throw errors. 
+        // Type.parse can throw errors.
         try {
             reply = param.type.parse(argsValue);
         } catch (e) {
-            return Status.INVALID;   
+            return Status.INVALID;
         }
         
         if (reply.status != Status.VALID) {
-            return reply.status;   
+            return reply.status;
         }
-    } 
+    }
     // Check if the param is marked as required.
     else if (param.defaultValue === undefined) {
         // The parameter is not set on the args object but it's required,
@@ -2310,12 +2310,12 @@ Request.prototype.getParamNameStatus = function(paramName) {
     
     for (var i = 0; i < params.length; i++) {
         if (params[i].name == paramName) {
-            return this.getParamStatus(params[i]);   
+            return this.getParamStatus(params[i]);
         }
     }
     
-    throw "Parameter '" + paramName + 
-                "' not defined on command '" + this.command.name + "'"; 
+    throw "Parameter '" + paramName +
+                "' not defined on command '" + this.command.name + "'";
 }
 
 /**
@@ -2333,7 +2333,7 @@ Request.prototype.getStatus = function() {
 
     var status = [];
     for (var i = 0; i < params.length; i++) {
-        status.push(this.getParamStatus(params[i]));        
+        status.push(this.getParamStatus(params[i]));
     }
 
     return Status.combine(status);
@@ -2414,7 +2414,7 @@ Request.prototype.done = function(content) {
     // Ensure to finish the request only once.
     if (!this.isDone) {
         this.isDone = true;
-        this._dispatchEvent('output', {});   
+        this._dispatchEvent('output', {});
     }
 };
 exports.Request = Request;
@@ -2700,7 +2700,7 @@ NameGuesser.prototype = {
     },
 
     createXMLHTTPObject: function() {
-	    // Try XHR methods in order and store XHR factory
+        // Try XHR methods in order and store XHR factory
         var xmlhttp, XMLHttpFactories = [
             function() {
                 return new XMLHttpRequest();
@@ -3411,7 +3411,7 @@ exports.copyArray = function(array){
     for (i=0, l=array.length; i<l; i++) {
         if (array[i] && typeof array[i] == "object")
             copy[i] = this.copyObject( array[i] );
-        else 
+        else
             copy[i] = array[i]
     }
     return copy;
@@ -4119,7 +4119,7 @@ var checks = require("pilot/typecheck");
 var canon = require('pilot/canon');
 
 /**
- * 
+ *
  */
 var helpMessages = {
     plainPrefix:
@@ -5208,7 +5208,7 @@ exports.preventDefault = function(e) {
 };
 
 exports.getDocumentX = function(e) {
-    if (e.clientX) {        
+    if (e.clientX) {
         return e.clientX + dom.getPageScrollLeft();
     } else {
         return e.pageX;
@@ -6730,7 +6730,7 @@ var TextInput = function(parentNode, host) {
     };
 
     if (useragent.isIE) {
-        event.addListener(text, "beforecopy", function(e) {        
+        event.addListener(text, "beforecopy", function(e) {
             var copyText = host.getCopyText();
             if(copyText)
                 clipboardData.setData("Text", copyText);
@@ -7032,7 +7032,7 @@ var MouseHandler = function(editor) {
             var cursor = editor.renderer.screenToTextCoordinates(mousePageX, mousePageY);
             cursor.row = Math.max(0, Math.min(cursor.row, editor.session.getLength()-1));
     
-            if (self.$clickSelection) {                
+            if (self.$clickSelection) {
                 if (self.$clickSelection.contains(cursor.row, cursor.column)) {
                     editor.selection.setSelectionRange(self.$clickSelection);
                 } else {
@@ -11132,7 +11132,7 @@ var oop = require("pilot/oop");
 var EventEmitter = require("pilot/event_emitter").EventEmitter;
 
 var BackgroundTokenizer = function(tokenizer, editor) {
-    this.running = false;    
+    this.running = false;
     this.lines = [];
     this.currentLine = 0;
     this.tokenizer = tokenizer;
@@ -13487,7 +13487,7 @@ var Marker = function(parentEl) {
 
         this.config = config;
 
-        var html = [];        
+        var html = [];
         for ( var key in this.markers) {
             var marker = this.markers[key];
 
@@ -13498,7 +13498,7 @@ var Marker = function(parentEl) {
 
             if (marker.renderer) {
                 var top = this.$getTop(range.start.row, config);
-                var left = Math.round(range.start.column * config.characterWidth);        
+                var left = Math.round(range.start.column * config.characterWidth);
                 marker.renderer(html, range, left, top, config);
             }
             else if (range.isMultiLine()) {
@@ -13716,7 +13716,14 @@ var Text = function(parentEl) {
             // Note: characterWidth can be a float!
             measureNode.innerHTML = lang.stringRepeat("Xy", n);
 
-            if (document.body) {
+            // @ankit: Stylebot specific code to prevent the measureNode from polluting the DOM
+            //
+            var stylebotContainer = document.getElementById('stylebot-container');
+            if (stylebotContainer) {
+                stylebotContainer.appendChild(measureNode);
+            }
+            // End of Stylebot specific code
+            else if (document.body) {
                 document.body.appendChild(measureNode);
             } else {
                 var container = this.element.parentNode;
@@ -14506,7 +14513,7 @@ define('ace/theme/textmate', ['require', 'exports', 'module' , 'pilot/dom'], fun
 .ace-tm .ace_gutter {\
   width: 50px;\
   background: #e8e8e8;\
-  border-right: 1px solid rgb(159, 159, 159);	 \
+  border-right: 1px solid rgb(159, 159, 159);    \
   color: #333;\
   overflow : hidden;\
 }\
