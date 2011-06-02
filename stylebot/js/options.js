@@ -362,6 +362,9 @@ function selectStyle($styleEl) {
             switch (e.keyCode)
             {
                 case 38: // up
+                    // return for multiline textarea
+                    if ($el.height() > 30) return true;
+
                     var $nextStyle = $el.closest('.style').prev();
                     // if the target element doesn't exist, ignore this event
                     if ($nextStyle.length === 0) return true;
@@ -369,6 +372,9 @@ function selectStyle($styleEl) {
                     break;
 
                 case 40: // down
+                    // return for multiline textarea
+                    if ($el.height() > 30) return true;
+
                     var $nextStyle = $el.closest('.style').next();
                     // if the target element doesn't exist, ignore this event
                     if ($nextStyle.length === 0) return true;
