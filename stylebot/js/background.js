@@ -47,7 +47,6 @@ var cache = {
 function init() {
     loadOptionsIntoCache();
     loadStylesIntoCache();
-    console.log(cache.styles);
     loadAccordionState();
     updateVersion();
 
@@ -715,6 +714,8 @@ Styles.prototype.exists = function(aURL) {
  * @return {Object} rules: The rules. url: The identifier representing the URL.
  */
 Styles.prototype.getRulesForPage = function(aURL) {
+    if (!aURL.isOfHTMLType())
+        return {rules: null, url: null};
     // this will contain the combined set of evaluated rules to be applied to
     // the page. longer, more specific URLs get the priority for each selector
     // and property
@@ -724,7 +725,7 @@ Styles.prototype.getRulesForPage = function(aURL) {
     for (var url in this.styles)
     {
         if (!this.isEnabled(url) || url === '*') continue;
-        console.log(url, aURL.matchesPattern(url));
+        
         if (aURL.matchesPattern(url))
         {
             if (url.length > url_for_page.length)
@@ -732,7 +733,7 @@ Styles.prototype.getRulesForPage = function(aURL) {
 
             // iterate over each selector in styles
             var urlRules = this.getRules(url);
-            console.log(urlRules);
+
             for (var selector in urlRules) {
 
                 // if no rule exists for selector, simply copy the rule
@@ -829,7 +830,8 @@ String.prototype.isPattern = function() {
  * @return {Boolean} True if the string matches the patern, false otherwise.
  */
 String.prototype.matchesPattern = function(pattern) {
-    console.log('Matches Pattern calls');
+    console.log('matchesPattern called');
+    
     if (pattern.isPattern()) {
         var hasComma = ~pattern.indexOf(',');
         pattern = pattern.
@@ -883,9 +885,31 @@ String.prototype.matchesBasic = function(pattern) {
  * @return {Boolean} True if the string is a valid url, false otherwise.
  */
 String.prototype.isValidUrl = function() {
-    return (this.match('^http') == 'http' &&
-        this.indexOf('https://chrome.google.com/webstore') == -1);
+    return (this.match('^http') === 'http'
+    && this.indexOf('https://chrome.google.com/webstore') === -1
+    && this.isOfHTMLType());
 };
+
+/**
+ * Checks the extension of the URL to determine if it is valid HTML. Currently only checks for xml/json/pdf
+ * @return {Boolean} True if the string does not have an extension xml/json/pdf
+ */
+String.prototype.isOfHTMLType = function() {
+    var nonHTMLExt = ['xml', 'json', 'pdf'];
+
+    if (nonHTMLExt.indexOf(this.getExtension()) != -1)
+        return false;
+
+    return true;
+}
+
+/**
+ * Returns the extension of the given filename / URL. Deliberately not using a regex here
+ * @return {String} The extension
+ */
+String.prototype.getExtension = function() {
+    return this.split('.').pop();
+}
 
 /**
  * Copies the string to the clipboard
