@@ -53,7 +53,7 @@ var CSSUtils = {
 
                 for (var property in rules[selector]) {
                     if (property.indexOf("comment") != -1) {
-                        css += "    " + rules[selector][property] + "\n";
+                        css += "    " + rules[selector][property] + "\n\n";
                     }
                     else {
                         css += "    " + this.getCSSDeclaration(property, rules[selector][property], setImportant) + "\n";

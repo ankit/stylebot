@@ -164,7 +164,6 @@ li.option:first-of-type {
     margin-left: -5px;
     border-radius: 2px;
     overflow: auto;
-    outline: none;
 }
 
 .style:hover,
