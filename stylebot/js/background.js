@@ -885,7 +885,7 @@ String.prototype.matchesBasic = function(pattern) {
  * @return {Boolean} True if the string is a valid url, false otherwise.
  */
 String.prototype.isValidUrl = function() {
-    return (this.match('^http') === 'http'
+    return (this.match('^http') == 'http'
     && this.indexOf('https://chrome.google.com/webstore') === -1
     && this.isOfHTMLType());
 };
