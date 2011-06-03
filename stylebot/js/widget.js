@@ -345,17 +345,19 @@ stylebot.widget = {
 
     //  Refresh widget UI based on the current mode of stylebot
     setMode: function() {
-        $('.stylebot-mode').removeClass('stylebot-active-button');
+        var ui = WidgetUI;
+
+        ui.deselectButton($('.stylebot-mode'));
 
         if (stylebot.options.mode === "Advanced")
         {
-            $('.stylebot-mode:contains(Advanced)').addClass('stylebot-active-button');
+            ui.selectButton($('.stylebot-mode:contains(Advanced)'));
             stylebot.widget.basic.hide();
             stylebot.widget.advanced.show();
         }
         else
         {
-            $('.stylebot-mode:contains(Basic)').addClass('stylebot-active-button');
+            ui.selectButton($('.stylebot-mode:contains(Basic)'));
             stylebot.widget.advanced.hide();
             stylebot.widget.basic.show();
         }
@@ -604,7 +606,7 @@ stylebot.widget = {
     
     setSelector: function(value) {
         this.cache.headerSelector.html(value);
-        if (value == "Select an element")
+        if (value === "Select an element")
             value = "Click to edit the CSS Selector"
         this.cache.headerSelector.attr('title', value);
     }

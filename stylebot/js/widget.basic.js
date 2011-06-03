@@ -288,13 +288,17 @@ stylebot.widget.basic = {
     },
     
     fillControl: function(control, rule) {
+        var ui = WidgetUI;
+        
         function determineSizeUnit(val) {
             var len = WidgetUI.validSizeUnits.length;
-            for (var i=0; i<len; i++)
+            
+            for (var i = 0; i < len; i++)
             {
                 if (val.indexOf(WidgetUI.validSizeUnits[i]) != -1)
                     break;
             }
+            
             return WidgetUI.validSizeUnits[i];
         }
         
@@ -317,6 +321,7 @@ stylebot.widget.basic = {
                                         var inputFields = control.el.find('input');
                                         var selectInputs = control.el.find('select');
                                         var values = [];
+                                        
                                         for (var i = 0; i < len; i++)
                                             values[i] = rule[control.id[i]];
                                         
@@ -341,9 +346,10 @@ stylebot.widget.basic = {
                                             }
                                         }
                                         
-                                        for (var i=0; i<len; i++)
+                                        for (var i = 0; i < len; i++)
                                         {
                                             pValue = values[i];
+                                            
                                             if (pValue != undefined)
                                             {
                                                 var unit = determineSizeUnit(pValue);
@@ -364,28 +370,37 @@ stylebot.widget.basic = {
                                         .attr('value', pValue);
                                         
                                         var index = $.inArray(pValue, control.options);
+
                                         if (index != -1)
                                         {
-                                            control.el.find('select').attr('selectedIndex', index + 1);
+                                            control.el.find('select')
+                                            .attr('selectedIndex', index + 1);
+                                            
                                             input.hide();
                                         }
+                                        
                                         else
                                         {
-                                            control.el.find('select').attr('selectedIndex', control.options.length + 1);
+                                            control.el.find('select')
+                                            .attr('selectedIndex', control.options.length + 1);
+                                            
                                             input.show();
                                         }
+                                        
                                         break;
                                         
             case 'color'            :   if (pValue == undefined)
                                             return false;
+                                        
                                         control.el.attr('value', pValue);
-                                        WidgetUI.setColorSelectorColor(control.el);
+                                        ui.setColorSelectorColor(control.el);
+                                        
                                         break;
                                         
             case 'toggle'           :   if (pValue == control.el.data('value'))
-                                            control.el.addClass('stylebot-active-button');
+                                            ui.selectButton(control.el);
                                         else
-                                            control.el.removeClass('stylebot-active-button');
+                                            ui.deselectButton(control.el);
                                         break;
                                         
             case 'select'           :   var index = $.inArray($.trim(String(pValue)), control.options);
@@ -395,22 +410,21 @@ stylebot.widget.basic = {
                                         
             case 'segmented'        :   var index = $.inArray( $.trim( String(pValue) ), control.values);
                                         if (index != -1)
-                                            $(control.el.find('button')[index])
-                                            .addClass('stylebot-active-button')
-                                            .next().addClass('stylebot-active-button-next');
+                                            ui.selectSegmentedButton($(control.el.find('button')[index]));
         }
     },
     
     // reset values to default for all controls
     reset: function() {
+        var ui = WidgetUI;
+        
         this.cache.textfields.attr('value' , '');
         this.cache.selectboxes.attr('selectedIndex', 0);
         this.cache.colorSelectorColor.css('backgroundColor', '#fff');
-        this.cache.toggleButtons.removeClass('stylebot-active-button');
         this.cache.fontFamilyInput.hide();
-        this.cache.segmentedControls.find('.stylebot-active-button')
-        .removeClass('stylebot-active-button')
-        .next().removeClass('stylebot-active-button-next');
+        
+        ui.deselectButton(this.cache.toggleButtons);
+        ui.deselectSegmentedButton(this.cache.segmentedControls.find('button'));
     },
     
     show: function() {

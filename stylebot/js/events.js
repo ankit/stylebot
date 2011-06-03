@@ -6,21 +6,26 @@
 
 Events = {
 
+    ACCORDION_SAVE_TIMEOUT: 500,
+
     accordionTimer: null,
 
     onToggle: function(e) {
-        var el = $(this);
-        var className = 'stylebot-active-button';
-        var status = el.hasClass(className);
+        var $bt = $(this);
+        var ui = WidgetUI;
+
         var value = '';
-        var property = el.data('property');
-        if (status)
-            el.removeClass(className);
+        var property = $bt.data('property');
+
+        if (ui.isButtonSelected($bt))
+            ui.deselectButton($bt);
+
         else
         {
-            el.addClass(className);
-            value = el.data('value');
+            ui.selectButton($bt);
+            value = $bt.data('value');
         }
+
         Events.saveProperty(property, value);
     },
 
@@ -141,59 +146,86 @@ Events = {
             Events.saveProperty(property, value);
     },
 
-    onSegmentedControlClick: function(e) {
-        var el = $(e.target);
-        if (el.get(0).tagName != 'BUTTON')
-            el = el.parent('button');
+    onSegmentedControlMouseDown: function(e) {
+        var $button = $(e.target);
 
-        // TODO: Try to implement the next element's border width using CSS
-        var control = el.parent();
-        var status = el.hasClass('stylebot-active-button');
-        control.find('.stylebot-active-button')
-        .removeClass('stylebot-active-button')
-        .next().removeClass('stylebot-active-button-next');
-        if (!status)
-        {
-            el.addClass('stylebot-active-button');
-            el.next().addClass('stylebot-active-button-next');
-            Events.saveProperty(el.data('property'), el.data('value'));
+        // if the user clicked the SPAN enclosed inside BUTTON, get to the button
+        if (e.target.tagName != 'BUTTON')
+            $button = $button.parent();
+
+        WidgetUI.setButtonAsActive($button);
+
+        // Bind the mouseup handler which will handle saving the new property value and CSS classes
+        $(document).bind('mouseup', Events.onSegmentedControlMouseUp);
+    },
+    
+    onSegmentedControlMouseUp: function(e) {
+        var ui = WidgetUI;
+
+        var $button = $('.' + ui.BUTTON_ACTIVE_CLASS);
+        ui.setButtonAsInactive($button);
+
+        var status = ui.isButtonSelected($button);
+        var control = $button.parent();
+
+        ui.deselectSegmentedButton(control.find('.' + ui.BUTTON_SELECTED_CLASS));
+
+        // Button is currently selected. Deselect it
+        if (status) {
+            Events.saveProperty($button.data('property'), '');
         }
-        else
-            Events.saveProperty(el.data('property'), '');
-        el.focus();
+        
+        // Select button
+        else {
+            Events.saveProperty($button.data('property'), $button.data('value'));
+            ui.selectSegmentedButton($button);
+        }
+
+        $(document).unbind('mouseup', Events.onSegmentedControlMouseUp);
     },
 
     toggleAccordion: function(h) {
-        if (h.hasClass('stylebot-accordion-active'))
+        var self = Events;
+        var ui = WidgetUI;
+        
+        if (h.hasClass(ui.ACCORDION_SELECTED_CLASS))
         {
-            h.removeClass('stylebot-accordion-active')
+            h.removeClass(ui.ACCORDION_SELECTED_CLASS)
             .focus()
             .next().hide();
         }
+
         else
         {
-            h.addClass( 'stylebot-accordion-active' )
+            h.addClass(ui.ACCORDION_SELECTED_CLASS)
             .focus()
             .next().show();
         }
 
         // determine which accordions are open and
         // send request to save the new state to background.html cache
-        if (this.accordionTimer)
-            clearTimeout(this.accordionTimer);
-            this.accordionTimer = setTimeout(function() {
+        //
+        if (self.accordionTimer) {
+            clearTimeout(self.accordionTimer);
+            self.accordionTimer = null;
+        }
+
+        self.accordionTimer = setTimeout(function()
+        {
             var len = stylebot.widget.basic.cache.accordionHeaders.length;
             var enabledAccordions = [];
 
             for (var i = 0; i < len; i++)
             {
-                if ($(stylebot.widget.basic.cache.accordionHeaders[i]).hasClass( 'stylebot-accordion-active' ))
+                var $accordion = $(stylebot.widget.basic.cache.accordionHeaders[i]);
+
+                if ($accordion.hasClass(ui.ACCORDION_SELECTED_CLASS))
                     enabledAccordions[enabledAccordions.length] = i;
             }
 
             stylebot.chrome.saveAccordionState(enabledAccordions);
 
-        }, 500);
+        }, self.ACCORDION_SAVE_TIMEOUT);
     },
 
     saveProperty: function(property, value) {

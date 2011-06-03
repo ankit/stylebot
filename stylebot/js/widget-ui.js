@@ -4,6 +4,11 @@
   **/
 
 var WidgetUI = {
+    
+    BUTTON_ACTIVE_CLASS: 'stylebot-button-active',
+    BUTTON_SELECTED_CLASS: 'stylebot-button-selected',
+    NEXT_TO_SELECTED_BUTTON_CLASS: 'stylebot-next-segmented-button',
+    ACCORDION_SELECTED_CLASS: 'stylebot-accordion-active',
 
     validSizeUnits: ['px', 'em', '%', 'pt'],
 
@@ -174,7 +179,6 @@ var WidgetUI = {
     },
 
     createToggleButton: function(text, property, value) {
-
         return this.createButton(text)
         .addClass('stylebot-toggle stylebot-control')
         .attr('id', 'stylebot-' + property)
@@ -312,7 +316,8 @@ var WidgetUI = {
     createButtonSet: function(buttons, className,  enabledButtonIndex, callback) {
         var container = $('<span>');
         var len = buttons.length;
-        for(var i=0; i<len; i++)
+
+        for(var i = 0; i < len; i++)
         {
             var bt = this.createButton(buttons[i])
             .addClass(className)
@@ -320,9 +325,10 @@ var WidgetUI = {
             .appendTo(container)
             .click(callback);
 
-            if(i == enabledButtonIndex)
-                bt.addClass('stylebot-active-button');
+            if(i === enabledButtonIndex)
+                bt.addClass('stylebot-button-selected');
         }
+
         return container;
     },
 
@@ -333,22 +339,53 @@ var WidgetUI = {
         });
 
         var len = control.options.length;
+
         for(var i = 0; i < len; i++)
         {
             var bt = this.createButton(control.options[i])
-            .addClass('stylebot-segmented-button')
             .data({
                  value: control.values[i],
                  property: control.id
             })
-            .click(Events.onSegmentedControlClick)
+            .mousedown(Events.onSegmentedControlMouseDown)
             .appendTo(container);
             // explicitly having to add the 'stylebot-last-child' class as :last-child causes weird issue in Chrome
             if (i == (len - 1))
             {
-                bt.addClass('stylebot-last-child');
+                bt.addClass('stylebot-last-segmented-button');
             }
         }
+
         return container;
+    },
+
+    selectButton: function($bt) {
+        $bt.addClass(this.BUTTON_SELECTED_CLASS);
+    },
+
+    deselectButton: function($bt) {
+        $bt.removeClass(this.BUTTON_SELECTED_CLASS);
+    },
+    
+    selectSegmentedButton: function($bt) {
+        $bt.addClass(this.BUTTON_SELECTED_CLASS)
+        .next().addClass(this.NEXT_TO_SELECTED_BUTTON_CLASS);
+    },
+    
+    deselectSegmentedButton: function($bt) {
+        $bt.removeClass(this.BUTTON_SELECTED_CLASS)
+        .next().removeClass(this.NEXT_TO_SELECTED_BUTTON_CLASS);
+    },
+    
+    isButtonSelected: function($bt) {
+        return $bt.hasClass(this.BUTTON_SELECTED_CLASS);
+    },
+
+    setButtonAsActive: function($bt) {
+        $bt.addClass(this.BUTTON_ACTIVE_CLASS);
+    },
+
+    setButtonAsInactive: function($bt) {
+        $bt.removeClass(WidgetUI.BUTTON_ACTIVE_CLASS);
     }
 }
