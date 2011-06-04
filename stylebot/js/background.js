@@ -268,7 +268,13 @@ function mergeStyles(newStyles, oldStyles) {
 function loadStylesIntoCache() {
     if (localStorage['stylebot_styles']) {
         try {
-            cache.styles = new Styles(JSON.parse(localStorage['stylebot_styles']));
+            var styles = JSON.parse(localStorage['stylebot_styles']);
+            if (typeof styles === 'Styles') {
+                cache.styles = styles;
+            }
+            else {
+                cache.styles = new Styles(styles);
+            }
         }
         catch (e) {
             console.log(e);
