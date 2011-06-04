@@ -11,12 +11,12 @@ body {
     background: -webkit-linear-gradient(rgba(230, 230, 230, 1.0), #FFF), -webkit-linear-gradient(left, #FFF, #FFF 97%, #CCC);
     color: #333;
     font-family: 'Lucida Grande', 'Lucida Sans', 'Lucida Sans Unicode', Helvetica, Arial, sans-serif;
-    font-size: 12px;
+    font-size: 11px;
 }
 
 h1 {
     margin: 2px;
-    font-size: 14px;
+    font-size: 12px;
     padding: 0px;
     display: inline;
 }
@@ -44,7 +44,6 @@ li {
 
 #content {
     margin-top: 5px;
-    font-size: 11px;
 }
 
 #version {
@@ -53,17 +52,24 @@ li {
     margin-left: 5px;
 }
 
+code {
+    padding: 2px;
+    color: #000;
+    border-radius: 1px;
+    font-family: Menlo, Monaco, 'Lucida Console', monospace !important;
+}
+
 </style>
 </head>
 <body>
 <h1>Stylebot</h1>
-<span id="version">v 1.4</span>
+<span id="version">v 1.5</span>
 <div id="content">
     <ul>
-        <li>- Replaced textarea with <a href='javascript:openURL("http://ace.ajax.org/");'>Ace Code Editor</a> in Stylebot Panel</li>
-        <li>- Added ability to enable or disable a style</li>
-        <li>- Fixed issues with -webkit properties</li>
-        <li>- Comment header for styles installed from Stylebot Social</li>
+        <li>- Added support for wildcards <code>*</code> and <code>,</code>. Examples: <code>google.com, google.co.in</code> and <code>docs*.google.com</code></li>
+        <li>- Styles are not applied to xml/json/pdf content</li>
+        <li>- Improved Styles list in Options</li>
+        <li>- Bugfixes</li>
     </ul>
     <br>
     <a href="javascript:openURL('http://stylebot.me/releases');window.close();">View release notes</a>

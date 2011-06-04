@@ -830,9 +830,8 @@ String.prototype.isPattern = function() {
  * @return {Boolean} True if the string matches the patern, false otherwise.
  */
 String.prototype.matchesPattern = function(pattern) {
-    console.log('matchesPattern called');
-    
-    if (pattern.isPattern()) {
+    if (pattern.isPattern())
+    {
         var hasComma = ~pattern.indexOf(',');
         pattern = pattern.
                 /* Removes white spaces */
@@ -849,7 +848,7 @@ String.prototype.matchesPattern = function(pattern) {
                    only if it is precedeed by anything different from a .
                    except for \.
                 */
-                replace(/(\\\.|[^\.])\*/g, '$1[^/]*');
+                replace(/(\\\.|[^\.])*\*/g, '$1[^/]*');
         /* Enclose the pattern in ( ) if it has several urls separated by , */
         pattern = (hasComma ? '(' + pattern + ')' : pattern);
         /* Matches the beginning of the url, we only consider http(s) urls */

@@ -326,7 +326,7 @@ var WidgetUI = {
             .click(callback);
 
             if(i === enabledButtonIndex)
-                bt.addClass('stylebot-button-selected');
+                bt.addClass(this.BUTTON_SELECTED_CLASS);
         }
 
         return container;

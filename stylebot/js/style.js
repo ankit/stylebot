@@ -522,6 +522,7 @@ stylebot.style = {
         if (this.status) {
             this.disable();
         }
+
         else
             this.enable();
     }
