@@ -175,10 +175,8 @@ function cssFormatter(setImportant, compactCSS, preserveComments) {
 cssFormatter.prototype = {
     format: function(rules, selector) {
         var css = "";
-        var found = false;
         if (selector !== undefined) {
             if (rules[selector]) {
-                 found = true;
                  if (rules[selector]["comment"]) {
                      css = this.formatComment(rules[selector], true);
                  }
@@ -193,7 +191,6 @@ cssFormatter.prototype = {
         else {
             for (var selector in rules)
             {
-                found = true;
                 if (rules[selector]["comment"]) {
                     css += this.formatComment(rules[selector]);
                 }
@@ -205,7 +202,7 @@ cssFormatter.prototype = {
                 }
             }
         }
-        return found ? css + this.__newLine : "";
+        return css;
     },
     formatDeclaration: function(property, value) {
         var setImportant = this.setImportant;
@@ -232,8 +229,12 @@ cssFormatter.prototype = {
             }
         }
         css += this.__indentation + "}" + this.__newLine;
-        if (insideRule)
+        if (insideRule) {
             this.forgetState();
+        }
+        else {
+            css += this.__newLine;
+        }
         return css;
     },
     formatComment: function(comment, insideRule) {

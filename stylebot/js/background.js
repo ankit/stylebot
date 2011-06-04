@@ -844,12 +844,17 @@ String.prototype.matchesPattern = function(pattern) {
                     /* Allows use of the ** wildcard, matches anything */
                     replace(/\*\*/g, '.*').
                     /* Allows use of the * wildcard, matches anything but /
-                       Because we replace ** by .*, we have to make sure we don't
-                       replace an .* Therefore, we should replace an * if, and
-                       only if it is precedeed by anything different from a .
-                       except for \.
+                       Because we replace ** with .*, we have to make sure we
+                       don't replace an .* Therefore, we should replace an *
+                       if, and only if it is precedeed by anything different
+                       from a . except for \. (may be the beginning of a line
+                       too, i.e. the ^ symbol)
+                       Note: If we add an * before \* we are adding lazyness
+                       to the regexp which only reduces its performance.
+                       That's why I replaced the * with an ^ to check
+                       for patterns of the form `*something`
                     */
-                    replace(/(\\\.|[^\.])*\*/g, '$1[^/]*');
+                    replace(/(^|\\\.|[^\.])\*/g, '$1[^/]*');
             /* Enclose the pattern in ( ) if it has several urls separated by , */
             pattern = (hasComma ? '(' + pattern + ')' : pattern);
             /* Matches the beginning of the url, we only consider http(s) urls */
