@@ -1167,7 +1167,8 @@ CSSParser.prototype = {
     var foundPriority = false;
     var values = [];
     /* @rduenasf list of properties fix its unitless declaration */
-    var shouldFixDimensionUnit = ["padding", "margin", "border", "width", "height"];
+    var shouldFixDimensionUnit = ["padding", "margin", "border", "width", "height",
+                                  "left", "top", "bottom", "right"];
     while (token.isNotNull()) {
 
       if ((token.isSymbol(";")
@@ -2508,6 +2509,76 @@ CSSParser.prototype = {
     return false;
   },
 
+/* @rduenasf support for webkit keyframes */
+parseKeyframesRule: function(aToken, aSheet) {
+    var s = aToken.value;
+    var valid = false;
+    var keyframesRule = new jscsspKeyframesRule();
+    this.preserveState();
+    var token = this.getToken(true, true);
+    
+    /* keyframes name*/
+    if (token.isIdent()) {
+        s += " " + token.value;
+        keyframesRule.mSelectorText += token.value;
+        token = this.getToken(true, true);
+        if (token.isSymbol("{")) {
+            s += " { ";
+            /* parsing animation states */
+            token = this.getToken(true, false);
+            while (token.isNotNull()) {
+                /* put every comment inside the block as a property */
+                if (token.isComment() && this.mPreserveComments) {
+                    s += " " + token.value;
+                    var comment = new jscsspComment();
+                    comment.parsedCssText = token.value;
+                    keyframesRule.cssRules.push(comment);
+                }
+                /* keyframes rule ends here */
+                else if (token.isSymbol("}")) {
+                    s += " " + token.value;
+                    valid = true;
+                    break;
+                }
+                else {
+                    var state = this.parseStyleRule(token, keyframesRule, true, true);
+                    if (state)
+                        s += state;
+                }
+                token = this.getToken(true, false);
+            }
+        }
+    }
+    
+    if (valid) {
+      this.forgetState();
+      keyframesRule.parsedCssText = s;
+      aSheet.cssRules.push(keyframesRule);
+      return true;
+    }
+    this.restoreState();
+    return false;
+},
+
+parseKeyframeSelector: function(aToken) {
+    var selector = null;
+    if (aToken.isPercentage()) {
+      selector = aToken.value;
+    }
+    else if (aToken.isIdent()) {
+      var ident = aToken.value.toLowerCase();
+        switch (ident) {
+          case 'from':
+          case 'to':
+            selector = ident;
+            break;
+          default:
+            break;
+        }
+    }
+    return selector;
+},
+
   trim11: function(str) {
     str = str.replace(/^\s+/, '');
     for (var i = str.length - 1; i >= 0; i--) {
@@ -2519,12 +2590,15 @@ CSSParser.prototype = {
     return str;
   },
 
-  parseStyleRule: function(aToken, aOwner, aIsInsideMediaRule)
+  parseStyleRule: function(aToken, aOwner, aIsInsideRule, aIsKeyframeRule)
   {
+    var selector = null;
     var currentLine = this.mScanner.mCurrentLine;
     this.preserveState();
     // first let's see if we have a selector here...
-    var selector = this.parseSelector(aToken, false);
+    selector = (aIsKeyframeRule === true) ?
+                    this.parseKeyframeSelector(aToken) :
+                    this.parseSelector(aToken, false);
     var valid = false;
     var declarations = [];
     if (selector) {
@@ -2532,7 +2606,7 @@ CSSParser.prototype = {
       var s = selector;
       var token = this.getToken(true, true);
       if (token.isSymbol("{")) {
-        s += " { ";
+        s += " {";
         var token = this.getToken(true, false);
         while (true) {
           if (!token.isNotNull()) {
@@ -2540,7 +2614,7 @@ CSSParser.prototype = {
             break;
           }
           if (token.isSymbol("}")) {
-            s += "}";
+            s += " }";
             valid = true;
             break;
           } else {
@@ -2561,7 +2635,7 @@ CSSParser.prototype = {
       rule.parsedCssText = s;
       rule.declarations = declarations;
       rule.mSelectorText = selector;
-      if (aIsInsideMediaRule)
+      if (aIsInsideRule)
         rule.parentRule = aOwner;
       else
         rule.parentStyleSheet = aOwner;
@@ -2570,6 +2644,7 @@ CSSParser.prototype = {
     }
     this.restoreState();
     s = this.currentToken().value;
+    console.log("error");
     this.addUnknownAtRule(aOwner, s);
     return "";
   },
@@ -2868,6 +2943,13 @@ CSSParser.prototype = {
           else
             this.addUnknownAtRule(sheet, token.value);
         }
+        // @rduenasf support for @-webkit-keyframes
+        else if (token.isAtRule("@-webkit-keyframes")) {
+            if (this.parseKeyframesRule(token, sheet))
+              foundStyleRules = true;
+            else
+              this.addUnknownAtRule(sheet, token.value);
+        }
         else if (token.isAtRule("@page")) {
           if (this.parsePageRule(token, sheet))
             foundStyleRules = true;
@@ -3036,6 +3118,8 @@ var kJscsspMEDIA_RULE     = 4;
 var kJscsspFONT_FACE_RULE = 5;
 var kJscsspPAGE_RULE      = 6;
 var kJscsspVARIABLES_RULE = 7;
+/* @rduenasf support for webkit keyframes */
+var kJscsspKEYFRAMES_RULE = 8;
 
 var kJscsspNAMESPACE_RULE = 100;
 var kJscsspCOMMENT        = 101;
@@ -3418,8 +3502,19 @@ jscsspFontFaceRule.prototype = {
   }
 };
 
-/* kJscsspMEDIA_RULE */
+/* @rduenasf support for webkit keyframes */
+/* kJscsspKEYFRAMES_RULE */
+function jscsspKeyframesRule()
+{
+  this.type = kJscsspKEYFRAMES_RULE;
+  this.parsedCssText = null;
+  this.cssRules = [];
+  this.parentStyleSheet = null;
+  this.parentRule = null;
+  this.mSelectorText = "@-webkit-keyframes ";
+}
 
+/* kJscsspMEDIA_RULE */
 function jscsspMediaRule()
 {
   this.type = kJscsspMEDIA_RULE;

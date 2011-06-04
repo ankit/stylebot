@@ -17,78 +17,19 @@ var CSSUtils = {
 
     */
     crunchCSS: function(rules, setImportant) {
-        var css = "";
-
-        for (var selector in rules)
-        {
-            if (rules[selector]["comment"]) continue;
-            css += selector + "{";
-
-            for (var property in rules[selector]) {
-
-                if (property.indexOf("comment") != -1) continue;
-
-                if (rules[selector][property].indexOf("!important") != -1)
-                    css += this.getCSSDeclaration(property, rules[selector][property], false);
-                else
-                    css += this.getCSSDeclaration(property, rules[selector][property], setImportant);
-            }
-
-            css += "}";
-        }
-
-        return css;
+        var formatter = new cssFormatter(setImportant, true, false);
+        return formatter.format(rules);
     },
 
     crunchFormattedCSS: function(rules, setImportant) {
-        var css = "";
-        for (var selector in rules)
-        {
-            if (rules[selector]["comment"]) {
-                css += rules[selector]["comment"] + "\n\n";
-            }
-
-            else {
-                css += selector + " {" + "\n";
-
-                for (var property in rules[selector]) {
-                    if (property.indexOf("comment") != -1) {
-                        css += "    " + rules[selector][property] + "\n";
-                    }
-                    
-                    else {
-                        css += "    " + this.getCSSDeclaration(property, rules[selector][property], setImportant) + "\n";
-                    }
-                }
-
-                css += "}" + "\n\n";
-            }
-        }
-
-        return css;
+        var formatter = new cssFormatter(setImportant, false, true);
+        return formatter.format(rules);
     },
 
     // generate formatted CSS for selector
     crunchCSSForSelector: function(rules, selector, setImportant, formatted) {
-        var css = "";
-        var append = "";
-        if (formatted)
-            append = "\n"
-
-        for (var property in rules[selector]) {
-             if (property.indexOf("comment") != -1) continue;
-
-             css += this.getCSSDeclaration(property, rules[selector][property], setImportant) + "\n";
-        }
-
-        return css;
-    },
-
-    getCSSDeclaration: function(property, value, setImportant) {
-        if (setImportant)
-            return property + ": " + value + " !important;";
-        else
-            return property + ": " + value + ";";
+        var formatter = new cssFormatter(setImportant, false, true);
+        return formatter.format(rules, selector);
     },
 
     injectCSS: function(css, id) {
@@ -102,47 +43,8 @@ var CSSUtils = {
 
     // parser object is that returned by JSCSSP
     getRulesFromParserObject: function(sheet) {
-        var rules = {};
-        var comment_index = 0;
-        var len = sheet.cssRules.length;
-
-        for (var i = 0; i < len; i++)
-        {
-
-            if (sheet.cssRules[i] instanceof jscsspErrorRule) {
-                rules['error'] = sheet.cssRules[i];
-                break;
-            }
-
-            else if (sheet.cssRules[i] instanceof jscsspComment) {
-                var selector = "comment-#"+comment_index++;
-                rules[selector] = new Object();
-                rules[selector]["comment"] = sheet.cssRules[i].parsedCssText;
-            }
-
-            else {
-                var selector = sheet.cssRules[i].mSelectorText;
-                rules[selector] = new Object();
-
-                var len2 = sheet.cssRules[i].declarations.length;
-
-                for (var j = 0; j < len2; j++) {
-
-                    if (sheet.cssRules[i].declarations[j] instanceof jscsspComment)
-                    {
-                        rules[selector]["comment-#"+comment_index++] = sheet.cssRules[i].declarations[j].parsedCssText;
-                    }
-
-                    else {
-                        var property = sheet.cssRules[i].declarations[j].property;
-                        var value = sheet.cssRules[i].declarations[j].valueText;
-                        rules[selector][property] = value;
-                    }
-                }
-            }
-        }
-
-        return rules;
+        var importer = new JSCSSPImporter();
+        return importer.importSheet(sheet);
     },
 
     // parser object is that returned by JSCSSP
@@ -157,45 +59,221 @@ var CSSUtils = {
 
         return rule;
     },
+    
+}
 
-    // @deprecated
-    parseCSS: function(css) {
-        var rules = {};
-        css = this.removeComments(css);
-        var blocks = css.split('}');
-        blocks.pop();
-        var len = blocks.length;
-
-        for (var i = 0; i < len; i++)
-        {
-            var pair = blocks[i].split('{');
-            rules[$.trim(pair[0])] = this.parseCSSBlock(pair[1]);
-        }
-
-        return rules;
+function JSCSSPImporter() {
+    this.rules = {};
+    this.commentIndex = 0;
+}
+JSCSSPImporter.prototype = {
+    /* Error reporting functions */
+    reportError: function(rule) {
+        this.rules['error'] = rule;
+    },
+    isError: function(rule) {
+        return (rule instanceof jscsspErrorRule);
     },
 
-    // @deprecated. instead using http://www.glazman.org/JSCSSP/
-    parseCSSBlock: function(css) {
-        var rule = {};
-        var declarations = css.split(';');
-        declarations.pop();
-        var len = declarations.length;
-        for (var i = 0; i < len; i++)
-        {
-            var loc = declarations[i].indexOf(':');
-            var property = $.trim(declarations[i].substring(0, loc));
-            var value = $.trim(declarations[i].substring(loc+1));
+    /* @-webkit-keyframes */
+    isKeyframesRule: function(rule) {
+        return (rule instanceof jscsspKeyframesRule);
+    },
+    importKeyframesRule: function(keyframes, parent) {
+        var selector = keyframes.mSelectorText;
+        parent[selector] = new Object();
+        parent[selector]["__isAnimation"] = true;
 
-            if (property != "" && value != "")
-                rule[property] = value;
+        var len = keyframes.cssRules.length;
+        for (var i = 0; i < len; i++) {
+            /* found an error */
+            if (this.isError(keyframes.cssRules[i])) {
+                this.reportError(keyframes.cssRules[i], this.rules);
+                break;
+            }
+            /* found a comment */
+            else if (this.isComment(keyframes.cssRules[i])) {
+                this.importComment(keyframes.cssRules[i], parent[selector]);
+            }
+            else {
+                this.importStyleRule(keyframes.cssRules[i], parent[selector]);
+            }
         }
-
-        return rule;
     },
 
-    // from http://www.senocular.com/pub/javascript/CSS_parse.js
-    removeComments: function(css) {
-        return css.replace(/\/\*(\r|\n|.)*\*\//g,"");
+    /* comments */
+    isComment: function(rule) {
+        return (rule instanceof jscsspComment);
+    },
+    importComment: function(rule, parent) {
+        var selector = "comment-#" + this.commentIndex++;
+        parent[selector] = new Object();
+        parent[selector]["comment"] = rule.cssText();
+    },
+
+    /* style blocks */
+    importStyleRule: function(rule, parent) {
+        var selector = rule.mSelectorText;
+        parent[selector] = new Object();
+        var len = rule.declarations.length;
+        for (var i = 0; i < len; i++) {
+            if (this.isComment(rule.declarations[i])) {
+                this.importComment(rule.declarations[i], parent[selector]);
+            }
+            else {
+                var property = rule.declarations[i].property;
+                var value = rule.declarations[i].valueText;
+                parent[selector][property] = value;
+            }
+        }
+    },
+
+    /* import a JSCSSP Sheet */
+    importSheet: function(sheet) {
+        var len = sheet.cssRules.length;
+        for (var i = 0; i < len; i++) {
+            /* found an error */
+            if (this.isError(sheet.cssRules[i])) {
+                this.reportError(sheet.cssRules[i], this.rules);
+                break;
+            }
+            /* found a comment */
+            else if (this.isComment(sheet.cssRules[i])) {
+                this.importComment(sheet.cssRules[i], this.rules);
+            }
+            /* found keyframes animation */
+            else if (this.isKeyframesRule(sheet.cssRules[i])) {
+                this.importKeyframesRule(sheet.cssRules[i], this.rules);
+            }
+            else {
+                this.importStyleRule(sheet.cssRules[i], this.rules);
+            }
+        }
+        return this.rules;
+    }
+};
+
+/**
+ * CSS Formatter for Stylebot Rules Object
+ */
+
+function cssFormatter(setImportant, compactCSS, preserveComments) {
+    this.setImportant = setImportant;
+    this.compactCSS = compactCSS;
+    this.preserveComments = preserveComments;
+    this.__indentation = "";
+    if (compactCSS) {
+        this.__newLine = "";
+        this.__tab = "";
+    }
+    else {
+        this.__newLine = "\n";
+        this.__tab = "    ";
     }
 }
+
+cssFormatter.prototype = {
+    format: function(rules, selector) {
+        var css = "";
+        var found = false;
+        if (selector !== undefined) {
+            if (rules[selector]) {
+                 found = true;
+                 if (rules[selector]["comment"]) {
+                     css = this.formatComment(rules[selector], true);
+                 }
+                 else if (rules[selector]["__isAnimation"]) {
+                     css = this.formatKeyframesRule(selector, rules[selector]);
+                 }
+                 else {
+                     css = this.formatStyleRule(selector, rules[selector]);
+                 }
+            }
+        }
+        else {
+            for (var selector in rules)
+            {
+                found = true;
+                if (rules[selector]["comment"]) {
+                    css += this.formatComment(rules[selector]);
+                }
+                else if (rules[selector]["__isAnimation"]) {
+                    css += this.formatKeyframesRule(selector, rules[selector]);
+                }
+                else {
+                    css += this.formatStyleRule(selector, rules[selector]);
+                }
+            }
+        }
+        return found ? css + this.__newLine : "";
+    },
+    formatDeclaration: function(property, value) {
+        var setImportant = this.setImportant;
+        if (this.compactCSS && value.indexOf("!important") != -1)
+            setImportant = false;
+
+        this.saveState();
+        var css = this.__indentation + property + ": " + value;
+            css += setImportant ? " !important;" : ";";
+            css += this.__newLine;
+        this.forgetState();
+        return css;
+    },
+    formatStyleRule: function(selector, properties, insideRule) {
+        if (insideRule)
+            this.saveState();
+        var css = this.__indentation + selector + " {" + this.__newLine;
+        for (var property in properties) {
+            if (property.indexOf("comment-#") === 0) {
+                css += this.formatComment(properties[property], true);
+            }
+            else {
+                css += this.formatDeclaration(property, properties[property]);
+            }
+        }
+        css += this.__indentation + "}" + this.__newLine;
+        if (insideRule)
+            this.forgetState();
+        return css;
+    },
+    formatComment: function(comment, insideRule) {
+        var css = "";
+        if (!this.compactCSS && this.preserveComments) {
+            if (insideRule)
+                this.saveState();
+            var css = this.__indentation + comment["comment"] + this.__newLine;
+            if (insideRule) {
+                this.forgetState();
+            }
+            else {
+                css += this.__newLine;
+            }
+        }
+        return css;
+    },
+    formatKeyframesRule: function(selector, keyframes) {
+        var css = this.__indentation + selector  + " {" + this.__newLine;
+        for (var keyframe in keyframes) {
+            if (keyframe === "__isAnimation") continue;
+            if (keyframes[keyframe]["comment"]) {
+                css += this.formatComment(keyframes[keyframe], true);
+            }
+            else {
+                css += this.formatStyleRule(keyframe, keyframes[keyframe], true);
+            }
+        }
+        css += this.__indentation + "}" + this.__newLine + this.__newLine;
+        return css;
+    },
+    forgetState: function() {
+        if (!this.compactCSS) {
+            this.__indentation = this.__indentation.replace(this.__tab, '');
+        }
+    },
+    saveState: function() {
+        if (!this.compactCSS) {
+            this.__indentation += this.__tab;
+        }
+    }
+};
+
