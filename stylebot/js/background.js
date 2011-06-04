@@ -279,7 +279,12 @@ function loadStylesIntoCache() {
         catch (e) {
             console.log(e);
             cache.styles = new Styles({});
+            cache.styles.persist();
         }
+    }
+    else {
+        cache.styles = new Styles({});
+        cache.styles.persist();
     }
 }
 
