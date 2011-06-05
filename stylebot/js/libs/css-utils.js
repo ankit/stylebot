@@ -34,9 +34,9 @@ var CSSUtils = {
 
     injectCSS: function(css, id) {
         var style = document.createElement('style');
-        style.type = "text/css";
+        style.type = 'text/css';
         if (id != undefined)
-            style.setAttribute("id", id);
+            style.setAttribute('id', id);
         style.appendChild(document.createTextNode(css));
         document.documentElement.appendChild(style);
     },
@@ -58,19 +58,24 @@ var CSSUtils = {
         }
 
         return rule;
-    },
-    
-}
+    }
+
+};
 
 function JSCSSPImporter() {
     this.rules = {};
     this.commentIndex = 0;
 }
+
+// JSCSSPImporter
+//
+
 JSCSSPImporter.prototype = {
     /* Error reporting functions */
     reportError: function(rule) {
         this.rules['error'] = rule;
     },
+
     isError: function(rule) {
         return (rule instanceof jscsspErrorRule);
     },
@@ -79,10 +84,11 @@ JSCSSPImporter.prototype = {
     isKeyframesRule: function(rule) {
         return (rule instanceof jscsspKeyframesRule);
     },
+
     importKeyframesRule: function(keyframes, parent) {
         var selector = keyframes.mSelectorText;
         parent[selector] = new Object();
-        parent[selector]["__isAnimation"] = true;
+        parent[selector]['__isAnimation'] = true;
 
         var len = keyframes.cssRules.length;
         for (var i = 0; i < len; i++) {
@@ -105,10 +111,11 @@ JSCSSPImporter.prototype = {
     isComment: function(rule) {
         return (rule instanceof jscsspComment);
     },
+
     importComment: function(rule, parent) {
-        var selector = "comment-#" + this.commentIndex++;
+        var selector = 'comment-#' + this.commentIndex++;
         parent[selector] = new Object();
-        parent[selector]["comment"] = rule.cssText();
+        parent[selector]['comment'] = rule.cssText();
     },
 
     /* style blocks */
@@ -161,26 +168,26 @@ function cssFormatter(setImportant, compactCSS, preserveComments) {
     this.setImportant = setImportant;
     this.compactCSS = compactCSS;
     this.preserveComments = preserveComments;
-    this.__indentation = "";
+    this.__indentation = '';
     if (compactCSS) {
-        this.__newLine = "";
-        this.__tab = "";
+        this.__newLine = '';
+        this.__tab = '';
     }
     else {
-        this.__newLine = "\n";
-        this.__tab = "    ";
+        this.__newLine = '\n';
+        this.__tab = '    ';
     }
 }
 
 cssFormatter.prototype = {
     format: function(rules, selector) {
-        var css = "";
+        var css = '';
         if (selector !== undefined) {
             if (rules[selector]) {
-                 if (rules[selector]["comment"]) {
+                 if (rules[selector]['comment']) {
                      css = this.formatComment(rules[selector], true);
                  }
-                 else if (rules[selector]["__isAnimation"]) {
+                 else if (rules[selector]['__isAnimation']) {
                      css = this.formatKeyframesRule(selector, rules[selector]);
                  }
                  else {
@@ -191,10 +198,10 @@ cssFormatter.prototype = {
         else {
             for (var selector in rules)
             {
-                if (rules[selector]["comment"]) {
+                if (rules[selector]['comment']) {
                     css += this.formatComment(rules[selector]);
                 }
-                else if (rules[selector]["__isAnimation"]) {
+                else if (rules[selector]['__isAnimation']) {
                     css += this.formatKeyframesRule(selector, rules[selector]);
                 }
                 else {
@@ -204,31 +211,33 @@ cssFormatter.prototype = {
         }
         return css;
     },
+
     formatDeclaration: function(property, value) {
         var setImportant = this.setImportant;
-        if (this.compactCSS && value.indexOf("!important") != -1)
+        if (this.compactCSS && value.indexOf('!important') != -1)
             setImportant = false;
 
         this.saveState();
-        var css = this.__indentation + property + ": " + value;
-            css += setImportant ? " !important;" : ";";
+        var css = this.__indentation + property + ': ' + value;
+            css += setImportant ? ' !important;' : ';';
             css += this.__newLine;
         this.forgetState();
         return css;
     },
+
     formatStyleRule: function(selector, properties, insideRule) {
         if (insideRule)
             this.saveState();
-        var css = this.__indentation + selector + " {" + this.__newLine;
+        var css = this.__indentation + selector + ' {' + this.__newLine;
         for (var property in properties) {
-            if (property.indexOf("comment-#") === 0) {
+            if (property.indexOf('comment-#') === 0) {
                 css += this.formatComment(properties[property], true);
             }
             else {
                 css += this.formatDeclaration(property, properties[property]);
             }
         }
-        css += this.__indentation + "}" + this.__newLine;
+        css += this.__indentation + '}' + this.__newLine;
         if (insideRule) {
             this.forgetState();
         }
@@ -237,12 +246,13 @@ cssFormatter.prototype = {
         }
         return css;
     },
+
     formatComment: function(comment, insideRule) {
-        var css = "";
+        var css = '';
         if (!this.compactCSS && this.preserveComments) {
             if (insideRule)
                 this.saveState();
-            var css = this.__indentation + comment["comment"] + this.__newLine;
+            var css = this.__indentation + comment['comment'] + this.__newLine;
             if (insideRule) {
                 this.forgetState();
             }
@@ -252,29 +262,31 @@ cssFormatter.prototype = {
         }
         return css;
     },
+
     formatKeyframesRule: function(selector, keyframes) {
-        var css = this.__indentation + selector  + " {" + this.__newLine;
+        var css = this.__indentation + selector + ' {' + this.__newLine;
         for (var keyframe in keyframes) {
-            if (keyframe === "__isAnimation") continue;
-            if (keyframes[keyframe]["comment"]) {
+            if (keyframe === '__isAnimation') continue;
+            if (keyframes[keyframe]['comment']) {
                 css += this.formatComment(keyframes[keyframe], true);
             }
             else {
                 css += this.formatStyleRule(keyframe, keyframes[keyframe], true);
             }
         }
-        css += this.__indentation + "}" + this.__newLine + this.__newLine;
+        css += this.__indentation + '}' + this.__newLine + this.__newLine;
         return css;
     },
+
     forgetState: function() {
         if (!this.compactCSS) {
             this.__indentation = this.__indentation.replace(this.__tab, '');
         }
     },
+
     saveState: function() {
         if (!this.compactCSS) {
             this.__indentation += this.__tab;
         }
     }
 };
-

@@ -6,24 +6,7 @@ var currTabId;
 var contextMenuId = null;
 
 var cache = {
-    /**
-        e.g. styles = {
-            'google.com' : {
-
-                _rules: {
-                    'a': {
-                        'color': 'red'
-                    }
-                },
-
-                _social: {
-                    id: 4,
-                    timestamp: 123456 (UNIX based)
-                },
-                _enabled: true
-            }
-        }
-    **/
+    // Styles object
     styles: {},
 
     options: {
@@ -100,42 +83,91 @@ function showUpdateNotification() {
 //
 function attachListeners() {
 
-    if (cache.options.showPageAction == typeof undefined || cache.options.showPageAction) {
+    if (cache.options.showPageAction == typeof undefined ||
+        cache.options.showPageAction) {
         showPageActions();
     }
 
-    chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
-        switch (request.name) {
-            case 'enablePageAction'     : if (cache.options.showPageAction) { enablePageAction(sender.tab); } sendResponse({}); break;
+    chrome.extension.onRequest.addListener(
+        function(request, sender, sendResponse) {
+            switch (request.name) {
+                case 'enablePageAction' :
+                    if (cache.options.showPageAction) {
+                        enablePageAction(sender.tab);
+                    }
+                    sendResponse({});
+                    break;
 
-            case 'disablePageAction'    : if (cache.options.showPageAction) { disablePageAction(sender.tab); } sendResponse({}); break;
+                case 'disablePageAction' :
+                    if (cache.options.showPageAction) {
+                        disablePageAction(sender.tab);
+                    }
+                    sendResponse({});
+                    break;
 
-            case 'showPageActions'      : showPageActions(); sendResponse({}); break;
+                case 'showPageActions' :
+                    showPageActions();
+                    sendResponse({});
+                    break;
 
-            case 'hidePageActions'      : hidePageActions(); sendResponse({}); break;
+                case 'hidePageActions' :
+                    hidePageActions();
+                    sendResponse({});
+                    break;
 
-            case 'copyToClipboard'      : request.text.copyToClipboard(); sendResponse({}); break;
+                case 'copyToClipboard' :
+                    request.text.copyToClipboard();
+                    sendResponse({});
+                    break;
 
-            case 'save'                 : cache.styles.save(request.url, request.rules, request.data); sendResponse({}); break;
+                case 'save' :
+                    cache.styles.save(request.url, request.rules, request.data);
+                    sendResponse({});
+                    break;
 
-            case 'doesStyleExist'       : sendResponse(cache.styles.exists(request.url)); break;
+                case 'doesStyleExist' :
+                    sendResponse(cache.styles.exists(request.url));
+                    break;
 
-            case 'transfer'             : cache.styles.transfer(request.source, request.destination); sendResponse({}); break;
+                case 'transfer' :
+                    cache.styles.transfer(request.source, request.destination);
+                    sendResponse({});
+                    break;
 
-            case 'getGlobalRules'       : sendResponse(cache.styles.getGlobalRules()); break;
+                case 'getGlobalRules' :
+                    sendResponse(cache.styles.getGlobalRules());
+                    break;
 
-            case 'getRulesForPage'      : sendResponse(cache.styles.getRulesForPage(request.url)); break;
+                case 'getRulesForPage' :
+                    sendResponse(cache.styles.getRulesForPage(request.url));
+                    break;
 
-            case 'fetchOptions'         : sendResponse({ options: cache.options, enabledAccordions: cache.enabledAccordions }); break;
+                case 'fetchOptions' :
+                sendResponse({
+                    options: cache.options,
+                    enabledAccordions: cache.enabledAccordions
+                });
+                break;
 
-            case 'saveAccordionState'   : saveAccordionState(request.enabledAccordions); sendResponse({}); break;
+                case 'saveAccordionState' :
+                saveAccordionState(request.enabledAccordions);
+                sendResponse({});
+                break;
 
-            case 'savePreference'       : savePreference(request.preference); sendResponse({}); break;
+                case 'savePreference' :
+                    savePreference(request.preference);
+                    sendResponse({});
+                    break;
 
-            case 'getPreference'        : sendResponse(getPreference(request.preferenceName)); break;
+                case 'getPreference' :
+                    sendResponse(getPreference(request.preferenceName));
+                    break;
 
-            case 'pushStyles'           : cache.styles.push(); sendResponse({}); break;
-        }
+                case 'pushStyles' :
+                    cache.styles.push();
+                    sendResponse({});
+                    break;
+            }
     });
 }
 
@@ -276,12 +308,14 @@ function loadStylesIntoCache() {
                 cache.styles = new Styles(styles);
             }
         }
+
         catch (e) {
             console.log(e);
             cache.styles = new Styles({});
             cache.styles.persist();
         }
     }
+
     else {
         cache.styles = new Styles({});
         cache.styles.persist();
@@ -403,12 +437,18 @@ function updateContextMenu(tab) {
         // If it is a valid url, show the contextMenu
         chrome.contextMenus.update(contextMenuId, { documentUrlPatterns: ['<all_urls>'] });
         // Get style status from the tab we changed to and update the checkbox in the context menu
-        chrome.tabs.sendRequest(tab.id, { name: 'styleStatus' }, function(response) {
-            chrome.contextMenus.update(contextMenuStatusId, { checked: response.status });
+        chrome.tabs.sendRequest(
+            tab.id,
+            { name: 'styleStatus' },
+            function(response) {
+                chrome.contextMenus.update(contextMenuStatusId, { checked: response.status });
         });
-    } else {
+    }
+
+    else {
         // If it isn't a valid url, hide the contextMenu. Set the document pattern to foo/*random*
-        chrome.contextMenus.update(contextMenuId, { documentUrlPatterns: ['http://foo/' + Math.random()] });
+        chrome.contextMenus.update(contextMenuId,
+            { documentUrlPatterns: ['http://foo/' + Math.random()] });
     }
 }
 
@@ -450,7 +490,24 @@ window.addEventListener('load', function() {
 /**
  * Styles object used by background.js
  * @constructor
- * @param {Object} param Styles objects.
+ * @param {Object} param JSON style object
+ * e.g. styles = {
+         'google.com' : {.
+
+             _rules: {
+                 'a': {
+                     'color': 'red'
+                 }
+             },
+
+             _social: {
+                 id: 4,
+                 timestamp: 123456 (UNIX based)
+             },
+
+             _enabled: true
+         }
+     }
  */
 function Styles(param) {
     this.styles = param;
@@ -558,7 +615,7 @@ Styles.prototype.toggle = function(url, value, shouldPersist) {
 
     if (shouldPersist != false)
         this.persist();
-    
+
     return true;
 };
 
@@ -571,7 +628,7 @@ Styles.prototype.toggleAll = function(value) {
     for (var url in this.styles) {
         this.toggle(url, value, false);
     }
-    
+
     this.persist();
 };
 
@@ -631,12 +688,15 @@ Styles.prototype.merge = function(newStyles, oldStyles) {
     if (oldStyles === undefined) {
         oldStyles = this.styles;
     }
+
     for (var url in newStyles) {
         if (oldStyles[url]) {
             for (var selector in newStyles[url]['_rules']) {
                 if (oldStyles[url]['_rules'][selector]) {
-                    for (var property in newStyles[url]['_rules'][selector]) {
-                        oldStyles[url]['_rules'][selector][property] = newStyles[url]['_rules'][selector][property];
+                    for (var property in newStyles[url]['_rules'][selector])
+                    {
+                        oldStyles[url]['_rules'][selector][property] =
+                        newStyles[url]['_rules'][selector][property];
                     }
                 }
                 else
@@ -647,9 +707,11 @@ Styles.prototype.merge = function(newStyles, oldStyles) {
         else
             oldStyles[url] = newStyles[url];
     }
+    
     if (oldStyles === undefined) {
         this.persist();
     }
+
     else {
         return oldStyles;
     }
@@ -736,7 +798,7 @@ Styles.prototype.getRulesForPage = function(aURL) {
     for (var url in this.styles)
     {
         if (!this.isEnabled(url) || url === '*') continue;
-        
+
         if (aURL.matchesPattern(url))
         {
             if (url.length > url_for_page.length)
@@ -762,7 +824,7 @@ Styles.prototype.getRulesForPage = function(aURL) {
             }
         }
     }
-    
+
     if (rules != undefined)
         return {rules: rules, url: url_for_page};
     else
@@ -873,13 +935,13 @@ String.prototype.matchesPattern = function(pattern) {
             pattern = new RegExp(pattern, 'i');
             return pattern.test(this);
         }
-        
+
         catch (e) {
-            console.log("Error occured while running pattern check", e);
+            console.log('Error occured while running pattern check', e);
             return false;
         }
     }
-    
+
     else {
         return this.matchesBasic(pattern);
     }
@@ -915,8 +977,8 @@ String.prototype.isValidUrl = function() {
 };
 
 /**
- * Checks the extension of the URL to determine if it is valid HTML. Currently only checks for xml/json/pdf
- * @return {Boolean} True if the string does not have an extension xml/json/pdf
+ * Checks the extension of the URL to determine if it is valid HTML
+ * @return {Boolean} True if the string does not have an extension xml/json/pdf.
  */
 String.prototype.isOfHTMLType = function() {
     var nonHTMLExt = ['xml', 'json', 'pdf'];
@@ -925,15 +987,15 @@ String.prototype.isOfHTMLType = function() {
         return false;
 
     return true;
-}
+};
 
 /**
  * Returns the extension of the given filename / URL. Deliberately not using a regex here
- * @return {String} The extension
+ * @return {String} The extension.
  */
 String.prototype.getExtension = function() {
     return this.split('.').pop();
-}
+};
 
 /**
  * Copies the string to the clipboard
