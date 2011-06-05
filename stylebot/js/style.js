@@ -251,18 +251,10 @@ stylebot.style = {
     },
 
     // check if a property / value pair is valid for addition to rules cache
+    // currently only checking to make sure value is not empty
     filter: function(property, value) {
-        if (value == "")
+        if (value === '')
             return false;
-
-        var sizeProperties = [ 'font-size', 'line-height', 'letter-spacing', 'letter-height', 'margin', 'margin-top', 'margin-right', 'margin-bottom', 'margin-left', 'padding', 'padding-top', 'padding-right', 'padding-bottom', 'padding-left', 'border-width', 'border-top-width', 'border-right-width', 'border-bottom-width', 'border-left-width' ];
-
-        if ($.inArray(property, sizeProperties) != -1 && parseFloat(value))
-        {
-            if ($.inArray(value, WidgetUI.validSizeUnits) != -1)
-                return false;
-        }
-
         return true;
     },
 

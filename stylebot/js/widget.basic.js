@@ -305,16 +305,17 @@ stylebot.widget.basic = {
         var pValue = rule[control.id];
         
         switch (control.type) {
-            case 'size'         :       if(pValue == undefined)
+            case 'size'         :       if(pValue === undefined)
                                             return false;
                                         var unit = determineSizeUnit(pValue);
-                                        
+
                                         control.el.find('input')
                                         .attr('value', pValue.replace(unit, '') );
-                                        
+
                                         // set select option
                                         var index = $.inArray($.trim(String(unit)), WidgetUI.validSizeUnits);
-                                        control.el.find('select').attr('selectedIndex', index);
+                                        control.el.find('select').prop('selectedIndex', index);
+
                                         break;
                                         
             case 'multi-size'   :       var len = control.id.length;
@@ -357,7 +358,7 @@ stylebot.widget.basic = {
                                                 input.attr('value', pValue.replace(unit, ''))
                                                 .keyup(); // keyup called to update rules cache as values maybe modified when mode is switched.
                                                 var index = $.inArray($.trim( String(unit)), WidgetUI.validSizeUnits);
-                                                $(selectInputs[i]).attr('selectedIndex', index);
+                                                $(selectInputs[i]).prop('selectedIndex', index);
                                             }
                                         }
                                         break;
@@ -374,7 +375,7 @@ stylebot.widget.basic = {
                                         if (index != -1)
                                         {
                                             control.el.find('select')
-                                            .attr('selectedIndex', index + 1);
+                                            .prop('selectedIndex', index + 1);
                                             
                                             input.hide();
                                         }
@@ -382,7 +383,7 @@ stylebot.widget.basic = {
                                         else
                                         {
                                             control.el.find('select')
-                                            .attr('selectedIndex', control.options.length + 1);
+                                            .prop('selectedIndex', control.options.length + 1);
                                             
                                             input.show();
                                         }
@@ -405,7 +406,7 @@ stylebot.widget.basic = {
                                         
             case 'select'           :   var index = $.inArray($.trim(String(pValue)), control.options);
                                         if (index != -1)
-                                            control.el.attr('selectedIndex', index + 1);
+                                            control.el.prop('selectedIndex', index + 1);
                                         break;
                                         
             case 'segmented'        :   var index = $.inArray( $.trim( String(pValue) ), control.values);
@@ -419,7 +420,7 @@ stylebot.widget.basic = {
         var ui = WidgetUI;
         
         this.cache.textfields.attr('value' , '');
-        this.cache.selectboxes.attr('selectedIndex', 0);
+        this.cache.selectboxes.prop('selectedIndex', 0);
         this.cache.colorSelectorColor.css('backgroundColor', '#fff');
         this.cache.fontFamilyInput.hide();
         
