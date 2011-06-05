@@ -143,15 +143,15 @@ function attachListeners() {
                     break;
 
                 case 'fetchOptions' :
-                sendResponse({
-                    options: cache.options,
-                    enabledAccordions: cache.enabledAccordions
-                });
+                    sendResponse({
+                        options: cache.options,
+                        enabledAccordions: cache.enabledAccordions
+                    });
                 break;
 
                 case 'saveAccordionState' :
-                saveAccordionState(request.enabledAccordions);
-                sendResponse({});
+                    saveAccordionState(request.enabledAccordions);
+                    sendResponse({});
                 break;
 
                 case 'savePreference' :

@@ -132,7 +132,12 @@ stylebot.style = {
 
             if (stylebot.style.cache.elements && stylebot.style.cache.elements.length != 0)
             {
-                var newCSS = CSSUtils.crunchCSSForSelector(stylebot.style.rules, stylebot.style.cache.selector, true);
+                var newCSS = CSSUtils.crunchCSSForSelector(
+                    stylebot.style.rules,
+                    stylebot.style.cache.selector,
+                    true,
+                    false);
+
                 stylebot.style.updateInlineCSS(stylebot.style.cache.elements, newCSS);
             }
 
@@ -270,7 +275,7 @@ stylebot.style = {
             var css = "";
             for (var property in rule) {
                 if(property.indexOf("comment") != -1) continue;
-                css += CSSUtils.getCSSDeclaration(property, rule[property], true);
+                css += CSSUtils.crunchCSSForDeclaration(property, rule[property], true);
             }
 
             return css;

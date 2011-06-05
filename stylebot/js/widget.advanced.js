@@ -94,7 +94,11 @@ stylebot.widget.advanced = {
     },
 
     fill: function() {
-        var css = CSSUtils.crunchCSSForSelector(stylebot.style.rules, stylebot.style.cache.selector, false, true);
+        var css = CSSUtils.crunchCSSForSelector(
+            stylebot.style.rules,
+            stylebot.style.cache.selector,
+            false,
+            true);
         this.cache.editor.getSession().setValue(css);
     },
 
