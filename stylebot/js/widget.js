@@ -71,7 +71,7 @@ stylebot.widget = {
         var url = $('<div>', {
             html: stylebot.style.cache.url,
             class: 'stylebot-editable-text',
-            title: 'Click to edit the URL for the style <br>Add multiple URLs separated by ,'
+            title: 'Click to edit the URL for the style'
         })
         .tipsy({delayIn: 1500, gravity:'n', html: true});
 
@@ -333,7 +333,7 @@ stylebot.widget = {
         if (headerHeight != 0)
             headerHeight -= 42;
 
-        var optionsHeight = 125;
+        var optionsHeight = $('#stylebot-widget-options').height();
 
         var newHeight = window.innerHeight - (optionsHeight + headerHeight);
 

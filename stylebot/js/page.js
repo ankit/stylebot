@@ -8,7 +8,7 @@ stylebot.page = {
 
     RIGHT_PADDING: 15,
 
-    BOTTOM_EDITOR_PADDING: 105,
+    BOTTOM_EDITOR_PADDING: 102,
 
     isVisible: false,
 
