@@ -48,8 +48,11 @@ div.stylebot-colorselector-color {
 }
 
 div.stylebot-colorselector:focus {
-    background-color: #ddd;
     outline: none !important;
+}
+
+div.stylebot-colorselector:focus:not(.disabled) {
+    background-color: #ddd !important;
 }
 
 /* Textfields & Textareas */

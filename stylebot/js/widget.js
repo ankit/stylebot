@@ -24,11 +24,11 @@ stylebot.widget = {
     //  Initialize widget UI
     createUI: function() {
         var self = stylebot.widget;
-        
+
         self.cache.box = $('<div>', {
             id: 'stylebot'
         });
-        
+
         var boxContainer = $('<div>', {
             id: 'stylebot-container'
         }).appendTo(document.body);
@@ -37,9 +37,9 @@ stylebot.widget = {
         self.cache.headerSelectIcon = $('<div>', {
             id: 'stylebot-select-icon'
         })
-        
+
         .tipsy({delayIn: 1500, gravity:'nw'})
-        
+
         .click(function(e) {
             stylebot.toggleSelection();
         });
@@ -79,18 +79,18 @@ stylebot.widget = {
             id: 'stylebot-header-url'
         })
         .append(url);
-        
+
         //  Container for URL and selector
         var headerTextContainer = $('<div>', {
             id: 'stylebot-header-container'
         })
         .append(selectorContainer)
         .append(urlContainer);
-        
+
         //  Make selector editable
         Utils.makeEditable(
             self.cache.headerSelector,
-            
+
             function(value) {
                 self.updateHeight();
                 self.setSelector(self.cache.headerSelector.html());
@@ -316,7 +316,7 @@ stylebot.widget = {
         if (where === "Left")
             left = 0;
         else if (where === "Right")
-            left = $(window).width() - this.defaults.width - 3; // some padding
+            left = $(window).width() - this.defaults.width - 2; // some padding
 
         this.cache.box.css('left', left);
         stylebot.options.position = where;
@@ -325,16 +325,16 @@ stylebot.widget = {
     //  Refresh height of widget
     updateHeight: function() {
         var self = stylebot.widget;
-        
+
         self.cache.box.css('height', window.innerHeight);
 
         var headerHeight = self.cache.header.height();
-        
+
         if (headerHeight != 0)
             headerHeight -= 36;
-        
+
         var optionsHeight = 150;
-        
+
         var newHeight = window.innerHeight - (optionsHeight + headerHeight);
 
         if (stylebot.options.mode === "Advanced")
@@ -482,7 +482,7 @@ stylebot.widget = {
         for (var selector in stylebot.style.rules) {
             if(stylebot.style.rules[selector]["comment"]) continue;
             if(stylebot.style.rules[selector]["__isAnimation"]) continue;
-            
+
             any = true;
 
             var li = $("<li>", {
@@ -605,7 +605,7 @@ stylebot.widget = {
     disableUndo: function() {
         this.cache.undoBt.prop('disabled', true);
     },
-    
+
     setSelector: function(value) {
         this.cache.headerSelector.html(value);
         if (value === "Select an element")

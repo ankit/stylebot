@@ -145,12 +145,12 @@ function attachListeners() {
     $(window).resize(function(e) {
         resizeEditor();
     });
-    
+
     // edit styles
     $('.style').live('click keydown', function(e) {
         var $el = $(e.target);
         var $this = $(this);
-        
+
         if ($el.closest('.selected').length != 0) return true;
 
         if (e.type === 'keydown' && (e.keyCode != 13 || $el.hasClass('style-button'))) return true;
@@ -159,7 +159,7 @@ function attachListeners() {
             selectStyle($this);
         }, 0);
     });
-    
+
     // Tap / to search styles
     $(document).keyup(function(e) {
         if (e.keyCode != 191)
@@ -315,16 +315,16 @@ function toggleGlobalStylesheet() {
 // Displays the modal popup for editing the global stylesheet
 function editGlobalStylesheet(e) {
     var rules = bg_window.cache.styles.getRules('*');
-    
+
     if (!rules) {
         bg_window.cache.styles.create('*');
         rules = {};
     }
-    
+
     var css = rules ? CSSUtils.crunchFormattedCSS(rules, false) : '';
 
     var headerHTML  = "Edit the <strong>Global Stylesheet</strong>:";
-    
+
     var footerHTML = "<button onclick='onSave(\"*\");'>Save</button> \
     <button onclick='cache.modal.hide();'>Cancel</button>";
 
@@ -383,7 +383,7 @@ function selectStyle($styleEl) {
                     return true;
             }
         }
-        
+
         e.preventDefault();
 
         Utils.endEditing($urlEl);
@@ -416,9 +416,9 @@ function editStyle(e) {
     var url = parent.find('.style-url').html();
     var rules = bg_window.cache.styles.getRules(url);
     var css = CSSUtils.crunchFormattedCSS(rules, false);
-    
+
     var headerHTML = "Edit the CSS for <strong>" + url + "</strong>:";
-    
+
     var footerHTML = "<button onclick='onSave(\"" + url + "\");'>Save</button> \
     <button onclick='cache.modal.hide();'>Cancel</button>";
 
@@ -437,7 +437,7 @@ function addStyle() {
     initializeEditorModal(headerHTML, footerHTML, '');
 
     cache.modal.show();
-    
+
     setTimeout(function() {
         cache.modal.box.find('input').focus();
     }, 40)
@@ -455,10 +455,10 @@ function disableAllStyles() {
 
 function changeStyleStatus(e) {
     e.stopPropagation();
-    
+
     var parent = $(e.target).parents('.style');
     var url = parent.find('.style-url').html();
-    
+
     bg_window.cache.styles.toggle(url);
 }
 
@@ -631,29 +631,29 @@ function displayErrorMessage(msg) {
 function displaySyntaxError(error) {
     var editor = cache.modal.editor;
     var session = editor.getSession();
-    
+
     var Range = require('ace/range').Range;
     var range = new Range(error.currentLine - 1, 0, error.currentLine, 0);
     cache.errorMarker = session.addMarker(range, 'warning', 'line');
-    
+
     editor.gotoLine(error.currentLine, 0);
     editor.focus();
-    
+
     session.on('change', clearSyntaxError);
-    
+
     displayErrorMessage('Syntax Error at Line ' + error.currentLine);
 }
 
 function clearSyntaxError() {
     if (!cache.errorMarker)
         return;
-    
+
     var editor = cache.modal.editor;
     var session = editor.getSession();
-    
+
     session.removeMarker(cache.errorMarker);
     cache.errorMarker = null;
-    
+
     session.removeEventListener('change', clearSyntaxError);
 }
 
@@ -661,7 +661,7 @@ function clearSyntaxError() {
 function editURL(oldValue, newValue) {
     if (oldValue == newValue || newValue == '')
         return;
-    
+
     bg_window.cache.styles.replace(oldValue, newValue);
 }
 
@@ -781,25 +781,25 @@ function initializeEditorModal(headerHTML, footerHTML, code) {
         </div> \
         <div class='popup-footer'> \
         </div>";
-        
+
         cache.modal = new ModalBox(html, {
             bgFadeSpeed: 0
         });
-        
+
         // set up editor
         cache.modal.editor = Utils.ace.monkeyPatch(ace.edit('editor'));
     }
-    
+
     cache.modal.box.find('.popup-header').html(headerHTML);
     cache.modal.box.find('.popup-footer').html(footerHTML);
-    
+
     setTimeout(function() {
         initializeEditor(code);
     }, 0);
-    
+
     cache.modal.options.closeOnEsc = false;
     cache.modal.options.closeOnBgClick = false;
-    
+
     cache.modal.options.onOpen = function()
     {
         setTimeout(function() {
@@ -812,21 +812,21 @@ function initializeEditorModal(headerHTML, footerHTML, code) {
 function initializeEditor(code) {
     var editor = cache.modal.editor;
     var session = editor.getSession();
-    
+
     editor.setTheme('ace/theme/dawn');
-    
+
     var Mode = require('ace/mode/css').Mode;
     session.setMode(new Mode());
-    
+
     session.setUseWrapMode(true);
-    
+
     code = code === undefined ? '' : code;
     session.setValue(code);
-    
+
     setTimeout(function() {
         resizeEditor();
     }, 0);
-    
+
     // clear any syntax error notifications
     $('#parserError').html('');
 }
@@ -849,7 +849,7 @@ function initializeBackupModal(headerHTML, footerHTML, code, bottomSpace) {
 
     cache.backupModal.box.find('.popup-header').html(headerHTML);
     cache.backupModal.box.find('.popup-footer').html(footerHTML);
-    
+
     if (!bottomSpace)
         bottomSpace = 75;
 
@@ -903,19 +903,19 @@ function resizeEditor(bottomSpace) {
     if (!bottomSpace) {
         bottomSpace = 60;
     }
-    
+
     var $modal = $('#stylebot-modal');
     var modalHeight = $modal.height();
     var modalWidth = $modal.width();
-    
+
     $('.stylebot-css-code')
     .height(modalHeight - bottomSpace + 'px')
     .width(modalWidth + 'px');
-    
+
     if (!cache.modal || !cache.modal.editor) return;
-    
+
     $('#editor').height(modalHeight - bottomSpace + 'px')
-    .width(modalWidth + 'px');
-    
+    .width(modalWidth - 2 + 'px');
+
     cache.modal.editor.resize();
 }

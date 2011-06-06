@@ -532,6 +532,10 @@ input[name=shortcutKeyCharacter] {
     margin-bottom: 10px;
 }
 
+.ace_editor {
+    border: 1px solid #eee !important;
+}
+
 .ace_scroller {
     overflow-y: hidden !important;
     overflow-x: hidden !important;
