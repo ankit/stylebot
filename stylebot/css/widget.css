@@ -41,8 +41,7 @@
     height: auto !important;
     line-height: 14px !important;
     overflow: auto !important;
-    padding: 8px !important;
-    padding-right: 0px !important;
+    padding: 8px 0 6px 8px !important;
     text-shadow: 0px 1px 1px #fff !important;
     width: auto !important;
 }
@@ -331,7 +330,7 @@ background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAFo9M/
     font-size: 11px !important;
     margin-top: 8px !important;
     text-align: center !important;
-    height: 130px !important;
+    height: 128px !important;
 }
 
 #stylebot-widget-options button.stylebot-button {
