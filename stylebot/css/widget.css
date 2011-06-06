@@ -333,7 +333,7 @@ background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAFo9M/
 
 #stylebot-widget-options {
     font-size: 11px !important;
-    margin-top: 20px !important;
+    margin-top: 10px !important;
     text-align: center !important;
 }
 
@@ -342,7 +342,7 @@ background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAFo9M/
 }
 
 .stylebot-widget-option {
-    margin-bottom: 10px !important;
+    margin-bottom: 5px !important;
     padding: 2px !important;
     display: block !important;
 }
@@ -353,7 +353,7 @@ background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAFo9M/
 }
 
 #stylebot-main-buttons {
-    margin: 15px 5px;
+    margin: 5px 5px;
     text-align: center;
 }
 

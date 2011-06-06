@@ -333,7 +333,7 @@ stylebot.widget = {
         if (headerHeight != 0)
             headerHeight -= 36;
 
-        var optionsHeight = 150;
+        var optionsHeight = 125;
 
         var newHeight = window.innerHeight - (optionsHeight + headerHeight);
 

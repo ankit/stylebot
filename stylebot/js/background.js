@@ -302,6 +302,9 @@ function loadStylesIntoCache() {
         try {
             var styles = JSON.parse(localStorage['stylebot_styles']);
             if (typeof styles === 'Styles') {
+                // Debug code in case the encapsulated styles bug reappears
+                console.trace();
+                console.log(styles);
                 cache.styles = styles;
             }
             else {
@@ -707,7 +710,7 @@ Styles.prototype.merge = function(newStyles, oldStyles) {
         else
             oldStyles[url] = newStyles[url];
     }
-    
+
     if (oldStyles === undefined) {
         this.persist();
     }
