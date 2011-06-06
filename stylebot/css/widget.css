@@ -63,12 +63,6 @@
     cursor: text !important;
 }
 
-#stylebot-header input {
-    clear: both !important;
-    float: left !important;
-    display: inline-block;
-}
-
 #stylebot-header .stylebot-editing-field {
     border: none !important;
     outline: none !important;
@@ -91,20 +85,13 @@
     margin: 0 !important;
 }
 
-#stylebot-header-selector .stylebot-editable-text {
+#stylebot-header-selector .stylebot-editable-text,
+#stylebot-header-selector .stylebot-editing-field {
     font-size: 12px !important;
     float: left !important;
     padding: 1px 0 0 3px !important;
-    height: 16px !important;
     width: 178px !important;
-}
-
-#stylebot-header-selector .stylebot-editing-field {
-    width: 179px !important;
-    border-radius: 0 !important;
-    font-size: 12px !important;
     height: 16px !important;
-    padding: 1px 0 0 2px !important;
 }
 
 #stylebot-header-url {
@@ -116,9 +103,6 @@
 }
 
 #stylebot-header-url .stylebot-editable-text {
-    padding-left: 3px !important;
-    border-radius: 2px !important;
-    width: 197px !important;
     border: 1px solid transparent !important;
 }
 
@@ -126,9 +110,16 @@
     border-color: #c2c2c2 !important;
 }
 
+#stylebot-header-url .stylebot-editable-text,
 #stylebot-header-url .stylebot-editing-field {
-    width: 199px !important;
-    padding: 2px 0 2px 3px !important;
+    padding: 0 !important;
+    padding-left: 3px !important;
+    border-radius: 2px !important;
+    width: 197px !important;
+}
+
+#stylebot-header-url .stylebot-editing-field {
+    border: 1px solid #c2c2c2 !important;
 }
 
 #stylebot-dropdown {
