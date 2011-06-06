@@ -40,15 +40,15 @@
  * @param module a name for the payload
  * @param payload a function to call with (require, exports, module) params
  */
- 
+
 (function() {
-    
+
 // if we find an existing require function use it.
 if (window.require) {
     require.packaged = true;
     return;
 }
-    
+
 window.define = function(module, deps, payload) {
     if (typeof module !== 'string') {
         console.error('dropping module because define wasn\'t a string.');
@@ -61,7 +61,7 @@ window.define = function(module, deps, payload) {
 
     if (!define.modules)
         define.modules = {};
-        
+
     define.modules[module] = payload;
 };
 
@@ -81,11 +81,11 @@ window.require = function(module, callback) {
     }
     else if (typeof module === 'string') {
         var payload = lookup(module);
-        
+
         if (callback) {
             callback();
         }
-    
+
         return payload;
     }
 };
@@ -1970,7 +1970,7 @@ function buildKeyHash(command) {
             command: command,
             sender:  binding.sender
         };
-        
+
         keyData = parseKeys(key);
         if (!ckbf[keyData.hashId]) {
             ckbf[keyData.hashId] = { };
@@ -1990,7 +1990,7 @@ function findKeyCommand(env, sender, hashId, textOrKey) {
     if (typecheck.isNumber(textOrKey)) {
         textOrKey = keyUtil.keyCodeToString(textOrKey);
     }
-    
+
     // Check bindings with functions as sender first.
     var bindFuncs = (commandKeyBindingFunc[hashId]  || {})[textOrKey] || [];
     for (var i = 0; i < bindFuncs.length; i++) {
@@ -1998,7 +1998,7 @@ function findKeyCommand(env, sender, hashId, textOrKey) {
             return bindFuncs[i].command;
         }
     }
-    
+
     var ckbr = commmandKeyBinding[sender]
     return ckbr && ckbr[hashId] && ckbr[hashId][textOrKey];
 }
@@ -2137,21 +2137,21 @@ function exec(command, env, sender, args, typed) {
         args: args || {},
         typed: typed
     });
-    
+
     /**
      * Executes the command and ensures request.done is called on the request in
      * case it's not marked to be done already or async.
      */
     function execute() {
         command.exec(env, request.args, request);
-        
+
         // If the request isn't asnync and isn't done, then make it done.
         if (!request.isAsync && !request.isDone) {
             request.done();
         }
     }
-    
-    
+
+
     if (request.getStatus() == Status.INVALID) {
         console.error("Canon.exec: Invalid parameter(s) passed to " +
                             command.name);
@@ -2263,7 +2263,7 @@ oop.implement(Request.prototype, EventEmitter);
  */
 Request.prototype.getParamStatus = function(param) {
     var args = this.args || {};
-    
+
     // Check if there is already a value for this parameter.
     if (param.name in args) {
         // If there is no value set and then the value is VALID if it's not
@@ -2275,19 +2275,19 @@ Request.prototype.getParamStatus = function(param) {
                 return Status.INCOMPLETE;
             }
         }
-        
+
         // Check if the parameter value is valid.
         var reply,
             // The passed in value when parsing a type is a string.
             argsValue = args[param.name].toString();
-        
+
         // Type.parse can throw errors.
         try {
             reply = param.type.parse(argsValue);
         } catch (e) {
             return Status.INVALID;
         }
-        
+
         if (reply.status != Status.VALID) {
             return reply.status;
         }
@@ -2298,7 +2298,7 @@ Request.prototype.getParamStatus = function(param) {
         // which means, things are invalid.
         return Status.INCOMPLETE;
     }
-    
+
     return Status.VALID;
 }
 
@@ -2307,13 +2307,13 @@ Request.prototype.getParamStatus = function(param) {
  */
 Request.prototype.getParamNameStatus = function(paramName) {
     var params = this.command.params || [];
-    
+
     for (var i = 0; i < params.length; i++) {
         if (params[i].name == paramName) {
             return this.getParamStatus(params[i]);
         }
     }
-    
+
     throw "Parameter '" + paramName +
                 "' not defined on command '" + this.command.name + "'";
 }
@@ -2410,7 +2410,7 @@ Request.prototype.done = function(content) {
     if (content) {
         this.output(content);
     }
-    
+
     // Ensure to finish the request only once.
     if (!this.isDone) {
         this.isDone = true;
@@ -2460,7 +2460,7 @@ exports.Request = Request;
  *
  * ***** END LICENSE BLOCK ***** */
 define('pilot/console', ['require', 'exports', 'module' ], function(require, exports, module) {
-    
+
 /**
  * This object represents a "safe console" object that forwards debugging
  * messages appropriately without creating a dependency on Firebug in Firefox.
@@ -2498,7 +2498,7 @@ if (typeof(window) === 'undefined') {
 
 });
 define('pilot/stacktrace', ['require', 'exports', 'module' , 'pilot/useragent', 'pilot/console'], function(require, exports, module) {
-    
+
 var ua = require("pilot/useragent");
 var console = require('pilot/console');
 
@@ -5231,7 +5231,7 @@ exports.getButton = function(e) {
         return 0;
     else if (e.type == "contextmenu")
         return 2;
-        
+
     // DOM Event
     if (e.preventDefault) {
         return e.button;
@@ -5337,7 +5337,7 @@ exports.addMultiMouseDownListener = function(el, button, count, timeout, callbac
             clicks = 0;
             callback(e);
         }
-        
+
         if (isButton)
             return exports.preventDefault(e);
     };
@@ -6870,7 +6870,7 @@ var MouseHandler = function(editor) {
     event.addListener(editor.container, "selectstart", function(e) {
         return event.preventDefault(e);
     });
-    
+
     var mouseTarget = editor.renderer.getMouseEventTarget();
     event.addListener(mouseTarget, "mousedown", this.onMouseDown.bind(this));
     event.addMultiMouseDownListener(mouseTarget, 0, 2, 500, this.onMouseDoubleClick.bind(this));
@@ -6885,7 +6885,7 @@ var MouseHandler = function(editor) {
     this.setScrollSpeed = function(speed) {
         this.$scrollSpeed = speed;
     };
-    
+
     this.getScrollSpeed = function() {
         return this.$scrollSpeed;
     };
@@ -6912,7 +6912,7 @@ var MouseHandler = function(editor) {
         var selectionEmpty = selectionRange.isEmpty();
         var state = STATE_UNKNOWN;
         var inSelection = false;
-    
+
         var button = event.getButton(e);
         if (button !== 0) {
             if (selectionEmpty) {
@@ -6939,19 +6939,19 @@ var MouseHandler = function(editor) {
         var overwrite = editor.getOverwrite();
         var mousedownTime = (new Date()).getTime();
         var dragCursor, dragRange;
-    
+
         var onMouseSelection = function(e) {
             mousePageX = event.getDocumentX(e);
             mousePageY = event.getDocumentY(e);
         };
-    
+
         var onMouseSelectionEnd = function() {
             clearInterval(timerId);
             if (state == STATE_UNKNOWN)
                 onStartSelect(pos);
             else if (state == STATE_DRAG)
                 onMouseDragSelectionEnd();
-                
+
             self.$clickSelection = null;
             state = STATE_UNKNOWN;
         };
@@ -6984,7 +6984,7 @@ var MouseHandler = function(editor) {
 
             editor.selection.setSelectionRange(newRange);
         };
-    
+
         var onSelectionInterval = function() {
             if (mousePageX === undefined || mousePageY === undefined)
                 return;
@@ -6993,7 +6993,7 @@ var MouseHandler = function(editor) {
                 var distance = self.$distance(pageX, pageY, mousePageX, mousePageY);
                 var time = (new Date()).getTime();
 
-                
+
                 if (distance > DRAG_OFFSET) {
                     state = STATE_SELECT;
                     var cursor = editor.renderer.screenToTextCoordinates(mousePageX, mousePageY);
@@ -7009,13 +7009,13 @@ var MouseHandler = function(editor) {
                 }
 
             }
-            
+
             if (state == STATE_DRAG)
                 onDragSelectionInterval();
             else if (state == STATE_SELECT)
                 onUpdateSelectionInterval();
         };
-    
+
         function onStartSelect(pos) {
             if (e.shiftKey)
                 editor.selection.selectToPosition(pos)
@@ -7027,11 +7027,11 @@ var MouseHandler = function(editor) {
             }
             state = STATE_SELECT;
         }
-        
+
         var onUpdateSelectionInterval = function() {
             var cursor = editor.renderer.screenToTextCoordinates(mousePageX, mousePageY);
             cursor.row = Math.max(0, Math.min(cursor.row, editor.session.getLength()-1));
-    
+
             if (self.$clickSelection) {
                 if (self.$clickSelection.contains(cursor.row, cursor.column)) {
                     editor.selection.setSelectionRange(self.$clickSelection);
@@ -7048,7 +7048,7 @@ var MouseHandler = function(editor) {
             else {
                 editor.selection.selectToPosition(cursor);
             }
-    
+
             editor.renderer.scrollCursorIntoView();
         };
 
@@ -7062,32 +7062,32 @@ var MouseHandler = function(editor) {
 
         event.capture(editor.container, onMouseSelection, onMouseSelectionEnd);
         var timerId = setInterval(onSelectionInterval, 20);
-    
+
         return event.preventDefault(e);
     };
-    
+
     this.onMouseDoubleClick = function(e) {
         var pos = this.$getEventPosition(e);
         this.editor.moveCursorToPosition(pos);
         this.editor.selection.selectWord();
         this.$clickSelection = this.editor.getSelectionRange();
     };
-    
+
     this.onMouseTripleClick = function(e) {
         var pos = this.$getEventPosition(e);
         this.editor.moveCursorToPosition(pos);
         this.editor.selection.selectLine();
         this.$clickSelection = this.editor.getSelectionRange();
     };
-    
+
     this.onMouseQuadClick = function(e) {
         this.editor.selectAll();
         this.$clickSelection = this.editor.getSelectionRange();
     };
-    
+
     this.onMouseWheel = function(e) {
         var speed = this.$scrollSpeed * 2;
-    
+
         this.editor.renderer.scrollBy(e.wheelX * speed, e.wheelY * speed);
         return event.preventDefault(e);
     };
@@ -10095,7 +10095,7 @@ var Mode = function() {
 
         return "";
     };
-    
+
     this.createWorker = function(session) {
         return null;
     };
@@ -10161,7 +10161,7 @@ var Mode = function() {
 
         editor.session.$selectionOccurrences = [];
     };
-    
+
     this.createModeDelegates = function (mapping) {
         if (!this.$embeds) {
             return;
@@ -10170,7 +10170,7 @@ var Mode = function() {
         for (var i = 0; i < this.$embeds.length; i++) {
             this.$modes[this.$embeds[i]] = new mapping[this.$embeds[i]]();
         }
-        
+
         var delegations = ['toggleCommentLines', 'getNextLineIndent', 'checkOutdent', 'autoOutdent'];
 
         for (var i = 0; i < delegations.length; i++) {
@@ -10183,20 +10183,20 @@ var Mode = function() {
             } (this));
         }
     }
-    
+
     this.$delegator = function(method, args, defaultHandler) {
         var state = args[0];
-        
+
         for (var i = 0; i < this.$embeds.length; i++) {
             var split = state.split(this.$embeds[i]);
-        
+
             if (!split[0] && split[1]) {
                 args[0] = split[1];
                 var mode = this.$modes[this.$embeds[i]];
                 return mode[method].apply(mode, args);
             }
         }
-        
+
         return defaultHandler ? defaultHandler.apply(this, args) : undefined;
     };
 
@@ -10254,28 +10254,28 @@ var Tokenizer = function(rules) {
         var ruleRegExps = [];
         var matchTotal = 0;
         var mapping = this.matchMappings[key] = {};
-        
+
         for ( var i = 0; i < state.length; i++) {
             // Count number of matching groups. 2 extra groups from the full match
             // And the catch-all on the end (used to force a match);
             var matchcount = new RegExp("(?:(" + state[i].regex + ")|(.))").exec("a").length - 2;
-        
+
             // Replace any backreferences and offset appropriately.
             var adjustedregex = state[i].regex.replace(/\\([0-9]+)/g, function (match, digit) {
                 return "\\" + (parseInt(digit, 10) + matchTotal + 1);
             });
-            
+
             mapping[matchTotal] = {
                 rule: i,
                 len: matchcount
             };
             matchTotal += matchcount;
-            
+
             ruleRegExps.push(adjustedregex);
         }
 
         this.regExps[key] = new RegExp("(?:(" + ruleRegExps.join(")|(") + ")|(.))", "g");
-        
+
     }
 };
 
@@ -10287,16 +10287,16 @@ var Tokenizer = function(rules) {
         var mapping = this.matchMappings[currentState];
         var re = this.regExps[currentState];
         re.lastIndex = 0;
-        
+
         var match, tokens = [];
-        
+
         var lastIndex = 0;
-        
+
         var token = {
             type: null,
             value: ""
         };
-        
+
         while (match = re.exec(line)) {
             var type = "text";
             var value = [match[0]];
@@ -10304,11 +10304,11 @@ var Tokenizer = function(rules) {
             for ( var i = 0; i < match.length-2; i++) {
                 if (match[i + 1] !== undefined) {
                     var rule = state[mapping[i].rule];
-                    
+
                     if (mapping[i].len > 1) {
                         value = match.slice(i+2, i+1+mapping[i].len);
                     }
-                    
+
                     if (typeof rule.token == "function")
                         type = rule.token.apply(this, value);
                     else
@@ -10326,20 +10326,20 @@ var Tokenizer = function(rules) {
                     break;
                 }
             };
-            
+
             if (typeof type == "string") {
                 if (typeof value != "string") {
                     value = [value.join("")];
                 }
                 type = [type];
             }
-            
+
             for ( var i = 0; i < value.length; i++) {
                 if (token.type !== type[i]) {
                     if (token.type) {
                         tokens.push(token);
                     }
-                    
+
                     token = {
                         type: type[i],
                         value: value[i]
@@ -10348,10 +10348,10 @@ var Tokenizer = function(rules) {
                     token.value += value[i];
                 }
             }
-            
+
             if (lastIndex == line.length)
                 break;
-            
+
             lastIndex = re.lastIndex;
         };
 
@@ -10443,7 +10443,7 @@ var TextHighlightRules = function() {
     this.getRules = function() {
         return this.$rules;
     };
-    
+
     this.embedRules = function (HighlightRules, prefix, escapeRules, states) {
         var embedRules = new HighlightRules().getRules();
         if (states) {
@@ -10457,17 +10457,17 @@ var TextHighlightRules = function() {
             }
         }
         this.addRules(embedRules, prefix);
-        
+
         for (var i = 0; i < states.length; i++) {
             Array.prototype.unshift.apply(this.$rules[states[i]], escapeRules);
         }
-        
+
         if (!this.$embeds) {
             this.$embeds = [];
         }
         this.$embeds.push(prefix);
     }
-    
+
     this.getEmbeds = function() {
         return this.$embeds;
     }
@@ -10946,7 +10946,7 @@ var EventEmitter = require("pilot/event_emitter").EventEmitter;
  */
 var Anchor = exports.Anchor = function(doc, row, column) {
     this.document = doc;
-    
+
     if (typeof column == "undefined")
         this.setPosition(row.row, row.column);
     else
@@ -10959,31 +10959,31 @@ var Anchor = exports.Anchor = function(doc, row, column) {
 (function() {
 
     oop.implement(this, EventEmitter);
-    
+
     this.getPosition = function() {
         return this.$clipPositionToDocument(this.row, this.column);
     };
-    
+
     this.getDocument = function() {
         return this.document;
     };
-    
+
     this.onChange = function(e) {
         var delta = e.data;
         var range = delta.range;
-            
+
         if (range.start.row == range.end.row && range.start.row != this.row)
             return;
-            
+
         if (range.start.row > this.row)
             return;
-            
+
         if (range.start.row == this.row && range.start.column > this.column)
             return;
-    
+
         var row = this.row;
         var column = this.column;
-        
+
         if (delta.action === "insertText") {
             if (range.start.row === row && range.start.column <= column) {
                 if (range.start.row === range.end.row) {
@@ -11008,7 +11008,7 @@ var Anchor = exports.Anchor = function(doc, row, column) {
                     column = range.start.column;
                 else
                     column = Math.max(0, column - (range.end.column - range.start.column));
-                
+
             } else if (range.start.row !== range.end.row && range.start.row < row) {
                 if (range.end.row == row) {
                     column = Math.max(0, column - range.end.column) + range.start.column;
@@ -11043,15 +11043,15 @@ var Anchor = exports.Anchor = function(doc, row, column) {
         else {
             pos = this.$clipPositionToDocument(row, column);
         }
-        
+
         if (this.row == pos.row && this.column == pos.column)
             return;
-            
+
         var old = {
             row: this.row,
             column: this.column
         };
-        
+
         this.row = pos.row;
         this.column = pos.column;
         this._dispatchEvent("change", {
@@ -11059,14 +11059,14 @@ var Anchor = exports.Anchor = function(doc, row, column) {
             value: pos
         });
     };
-    
+
     this.detach = function() {
         this.document.removeEventListener("change", this.$onChange);
     };
-    
+
     this.$clipPositionToDocument = function(row, column) {
         var pos = {};
-    
+
         if (row >= this.document.getLength()) {
             pos.row = Math.max(0, this.document.getLength() - 1);
             pos.column = this.document.getLine(pos.row).length;
@@ -11079,13 +11079,13 @@ var Anchor = exports.Anchor = function(doc, row, column) {
             pos.row = row;
             pos.column = Math.min(this.document.getLine(pos.row).length, Math.max(0, column));
         }
-        
+
         if (column < 0)
             pos.column = 0;
-            
+
         return pos;
     };
-    
+
 }).call(Anchor.prototype);
 
 });
@@ -11223,7 +11223,7 @@ var BackgroundTokenizer = function(tokenizer, editor) {
     this.$tokenizeRows = function(firstRow, lastRow) {
         if (!this.doc)
             return [];
-            
+
         var rows = [];
 
         // determine start state
@@ -12134,7 +12134,7 @@ Search.SELECTION = 2;
         oop.mixin(this.$options, options);
         return this;
     };
-    
+
     this.getOptions = function() {
         return lang.copyObject(this.$options);
     };
@@ -13475,7 +13475,7 @@ var Marker = function(parentEl) {
     this.setSession = function(session) {
         this.session = session;
     };
-    
+
     this.setMarkers = function(markers) {
         this.markers = markers;
     };
@@ -14256,13 +14256,13 @@ var Cursor = function(parentEl) {
         if (this.isVisible) {
             this.element.appendChild(this.cursor);
         }
-        
+
         if (this.session.getOverwrite()) {
             dom.addCssClass(this.cursor, "ace_overwrite");
         } else {
             dom.removeCssClass(this.cursor, "ace_overwrite");
         }
-        
+
         this.restartTimer();
     };
 

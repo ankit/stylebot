@@ -536,6 +536,10 @@ input[name=shortcutKeyCharacter] {
     border: 1px solid #eee !important;
 }
 
+.ace_text-layer {
+    font-family: "Menlo", "Monaco", "Courier New", monospace !important;
+}
+
 .ace_scroller {
     overflow-y: hidden !important;
     overflow-x: hidden !important;
