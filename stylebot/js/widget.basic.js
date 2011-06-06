@@ -5,11 +5,11 @@
   **/
 
 stylebot.widget.basic = {
-    
+
     isColorPickerVisible: false,
-    
+
     enabledAccordions: [0, 1, 2, 3],
-    
+
     cache: {
         container: null,
         controls: null,
@@ -23,7 +23,7 @@ stylebot.widget.basic = {
         fontFamilyInput: null,
         segmentedControls: null
     },
-    
+
     groups: [{
         name: '<u>T</u>ext',
         controls: [
@@ -96,7 +96,7 @@ stylebot.widget.basic = {
     },
     {
         name: '<u>C</u>olor & Background',
-        controls:[{
+        controls: [{
             name: 'Color',
             id: 'color',
             type: 'color',
@@ -116,7 +116,7 @@ stylebot.widget.basic = {
             name: 'Border Style',
             id: 'border-style',
             type: 'select',
-            options: [ 'none', 'solid', 'dotted', 'dashed', 'double', 'groove', 'ridge', 'inset', 'outset' ],
+            options: ['none', 'solid', 'dotted', 'dashed', 'double', 'groove', 'ridge', 'inset', 'outset'],
             el: null
         },
         {
@@ -171,33 +171,36 @@ stylebot.widget.basic = {
         }]
     }
     ],
-    
+
+    // Create the UI for Basic Mode
     createUI: function() {
         this.cache.container = $('<div>', {
             id: 'stylebot-controls'
         });
-        
+
         // creating controls for different CSS properties
         var len = this.groups.length;
-        
-        for (var i=0; i<len; i++)
-        {
+
+        for (var i = 0; i < len; i++) {
+
             WidgetUI.createAccordionHeader(this.groups[i].name)
             .appendTo(this.cache.container);
-            
+
             var group = $('<div>', {
                 class: 'stylebot-accordion'
             })
             .appendTo(this.cache.container);
 
             var len2 = this.groups[i].controls.length;
-            for (var j=0; j<len2; j++)
+            for (var j = 0; j < len2; j++)
                 this.createUIForControl(this.groups[i].controls[j])
                 .appendTo(group);
         }
+
         return this.cache.container;
     },
-    
+
+    // initialize cache for UI controls. This is called when UI is first created
     fillCache: function() {
         // controls
         this.cache.controls = $('.stylebot-control');
@@ -220,260 +223,205 @@ stylebot.widget.basic = {
         // segmented controls
         this.cache.segmentedControls = $('.stylebot-segmented-control');
     },
-    
+
+    // Create the UI for a control
     createUIForControl: function(control) {
-        var el = $('<div>', {
+        var ui = WidgetUI;
+
+        var $controlSet = $('<div>', {
             class: 'stylebot-control-set'
         });
-        
-        WidgetUI.createLabel(control.name).appendTo(el);
-        
+        ui.createLabel(control.name)
+        .appendTo($controlSet);
+
         var control_el; // this will contain the control element
-        
+
         // Add controls of different types
         switch (control.type) {
-            
-            case 'size'             :   control_el = WidgetUI.createSizeControl(control.id).appendTo(el);
-                                        break;
-            
-            case 'multi-size'       :   control_el = WidgetUI.createMultiSizeControl(control).appendTo(el); break;
-                                        
-            case 'color'            :   control_el = WidgetUI.createTextField(control.id, 10, null, Events.onTextFieldKeyUp);
-                                        WidgetUI.createColorPicker(control_el, $("#stylebot-container")).appendTo(el);
-                                        
-                                        control_el.appendTo(el)
-                                        .keyup(function (e) { WidgetUI.setColorSelectorColor($(this)) });
-                                        break;
-                                        
-            case 'toggle'           :   control_el = WidgetUI.createToggleButton("Hide", control.id , control.value).appendTo(el);
-                                        break;
-                                        
-            case 'select'           :   control_el = WidgetUI.createSelect(control.id);
-                                        WidgetUI.createSelectOption("Default", control.id, '').appendTo(control_el);
-                                        var len = control.options.length;
-                                        for (var i=0; i<len; i++)
-                                        {
-                                            var option = control.options[i];
-                                            WidgetUI.createSelectOption(Utils.capitalize(option), control.id, option).appendTo(control_el);
-                                        }
-                                        control_el.appendTo(el);
-                                        break;
-                                        
-            case 'segmented'        :   control_el = WidgetUI.createSegmentedControl(control).appendTo(el);
-                                        break;
-                                        
-            case 'font-family'      :   control_el = WidgetUI.createFontFamilyControl(control).appendTo(el);
-                                        break;
+
+            case 'size' :
+                control_el = ui.createSizeControl(control.id)
+                .appendTo($controlSet);
+                break;
+
+            case 'multi-size' :
+                control_el = ui.createMultiSizeControl(control)
+                .appendTo($controlSet);
+                break;
+
+            case 'color' :
+                control_el = ui.createTextField(control.id, 10, null, Events.onTextFieldKeyUp);
+
+                ui.createColorPicker(control_el, $('#stylebot-container'))
+                .appendTo($controlSet);
+
+                control_el
+                .keyup(function(e) {
+                    ui.setColorSelectorColor($(this));
+                })
+                .appendTo($controlSet);
+
+                break;
+
+            case 'toggle' :
+                control_el = ui.createToggleButton('Hide', control.id, control.value)
+                .appendTo($controlSet);
+                break;
+
+            case 'select' :
+                control_el = ui.createSelect(control.id);
+
+                ui.createSelectOption('Default', control.id, '')
+                .appendTo(control_el);
+
+                var len = control.options.length;
+                for (var i = 0; i < len; i++) {
+                    var option = control.options[i];
+                    ui.createSelectOption(Utils.capitalize(option), control.id, option).appendTo(control_el);
+                }
+
+                control_el.appendTo($controlSet);
+                break;
+
+            case 'segmented' :
+                control_el = ui.createSegmentedControl(control)
+                .appendTo($controlSet);
+                break;
+
+            case 'font-family' :
+                control_el = ui.createFontFamilyControl(control)
+                .appendTo($controlSet);
+                break;
         }
-        
+
         // objects (except primitive type) are passed by reference in JS
         control.el = control_el;
-        return el;
+        return $controlSet;
     },
-    
+
+    // Fill controls with all rules for current selector in cache
     fill: function() {
-        // fill controls
-        var len = this.groups.length;
         var rule = stylebot.style.getRule(stylebot.style.cache.selector);
-        
         if (rule)
         {
-            for (var i=0; i<len; i++)
+            var len = this.groups.length;
+            for (var i = 0; i < len; i++)
             {
                 var len2 = this.groups[i].controls.length;
-                for (var j=0; j<len2; j++)
+                for (var j = 0; j < len2; j++)
                     this.fillControl(this.groups[i].controls[j], rule);
             }
         }
     },
-    
+
+    // Fill a control with a style rule
     fillControl: function(control, rule) {
         var ui = WidgetUI;
-        
-        function determineSizeUnit(val) {
-            var len = WidgetUI.validSizeUnits.length;
-            
-            for (var i = 0; i < len; i++)
-            {
-                if (val.indexOf(WidgetUI.validSizeUnits[i]) != -1)
-                    break;
-            }
-            
-            return WidgetUI.validSizeUnits[i];
-        }
-        
-        var pValue = rule[control.id];
-        
+        var value = rule[control.id];
+
         switch (control.type) {
-            case 'size'         :       if(pValue === undefined)
-                                            return false;
-                                        var unit = determineSizeUnit(pValue);
+            case 'size' :
+                ui.setSize(control, value);
+                break;
 
-                                        control.el.find('input')
-                                        .attr('value', pValue.replace(unit, '') );
+            case 'multi-size' :
+                var values = [];
+                var len = control.id.length;
+                for (var i = 0; i < len; i++)
+                    values[i] = rule[control.id[i]];
 
-                                        // set select option
-                                        var index = $.inArray($.trim(String(unit)), WidgetUI.validSizeUnits);
-                                        control.el.find('select').prop('selectedIndex', index);
+                ui.setMultiSize(control, values);
+                break;
 
-                                        break;
-                                        
-            case 'multi-size'   :       var len = control.id.length;
-                                        var inputFields = control.el.find('input');
-                                        var selectInputs = control.el.find('select');
-                                        var values = [];
-                                        
-                                        for (var i = 0; i < len; i++)
-                                            values[i] = rule[control.id[i]];
-                                        
-                                        if (values[0] != undefined)
-                                        {
-                                            var parts = values[0].split(' ');
-                                            // parse value of the form margin: 2px 10px;
-                                            if (parts.length == 2)
-                                            {
-                                                values[0] = "";
-                                                values[1] = values[3] = $.trim( parts[0] ); // top & bottom
-                                                values[2] = values[4] = $.trim( parts[1] ); // left & right
-                                            }
-                                            // parse value of the form margin: 2px 10px 8px 6px;
-                                            else if (parts.length == 4)
-                                            {
-                                                values[0] = "";
-                                                values[1] = $.trim( parts[0] );
-                                                values[2] = $.trim( parts[1] );
-                                                values[3] = $.trim( parts[2] );
-                                                values[4] = $.trim( parts[3] );
-                                            }
-                                        }
-                                        
-                                        for (var i = 0; i < len; i++)
-                                        {
-                                            pValue = values[i];
-                                            
-                                            if (pValue != undefined)
-                                            {
-                                                var unit = determineSizeUnit(pValue);
-                                                var input = $(inputFields[i]);
-                                                input.attr('value', pValue.replace(unit, ''))
-                                                .keyup(); // keyup called to update rules cache as values maybe modified when mode is switched.
-                                                var index = $.inArray($.trim( String(unit)), WidgetUI.validSizeUnits);
-                                                $(selectInputs[i]).prop('selectedIndex', index);
-                                            }
-                                        }
-                                        break;
-                                        
-            case 'font-family'  :       if (pValue == undefined)
-                                            return false;
-                                        
-                                        // set input value
-                                        var input = control.el.find('input')
-                                        .attr('value', pValue);
-                                        
-                                        var index = $.inArray(pValue, control.options);
+            case 'font-family' :
+                ui.setFontFamily(control, value);
+                break;
 
-                                        if (index != -1)
-                                        {
-                                            control.el.find('select')
-                                            .prop('selectedIndex', index + 1);
-                                            
-                                            input.hide();
-                                        }
-                                        
-                                        else
-                                        {
-                                            control.el.find('select')
-                                            .prop('selectedIndex', control.options.length + 1);
-                                            
-                                            input.show();
-                                        }
-                                        
-                                        break;
-                                        
-            case 'color'            :   if (pValue == undefined)
-                                            return false;
-                                        
-                                        control.el.attr('value', pValue);
-                                        ui.setColorSelectorColor(control.el);
-                                        
-                                        break;
-                                        
-            case 'toggle'           :   if (pValue == control.el.data('value'))
-                                            ui.selectButton(control.el);
-                                        else
-                                            ui.deselectButton(control.el);
-                                        break;
-                                        
-            case 'select'           :   var index = $.inArray($.trim(String(pValue)), control.options);
-                                        if (index != -1)
-                                            control.el.prop('selectedIndex', index + 1);
-                                        break;
-                                        
-            case 'segmented'        :   var index = $.inArray( $.trim( String(pValue) ), control.values);
-                                        if (index != -1)
-                                            ui.selectSegmentedButton($(control.el.find('button')[index]));
+            case 'color' :
+                ui.setColor(control, value);
+                break;
+
+            case 'toggle' :
+                ui.setToggleButton(control, value);
+                break;
+
+            case 'select' :
+                ui.setSelectOption(control, value);
+                break;
+
+            case 'segmented' :
+                ui.setSegmentedControl(control, value);
+                break;
         }
     },
-    
-    // reset values to default for all controls
+
+    // Reset all controls to default values
     reset: function() {
         var ui = WidgetUI;
-        
+
         this.cache.textfields.attr('value' , '');
         this.cache.selectboxes.prop('selectedIndex', 0);
         this.cache.colorSelectorColor.css('backgroundColor', '#fff');
         this.cache.fontFamilyInput.hide();
-        
+
         ui.deselectButton(this.cache.toggleButtons);
         ui.deselectSegmentedButton(this.cache.segmentedControls.find('button'));
     },
-    
+
+    // Initialize and present the Basic Mode UI to user
     show: function() {
-        // reset all values for controls to default values
-        this.reset();
-        this.fill();
-        
+        var self = stylebot.widget.basic;
+        self.reset();
+        self.fill();
+
         // set focus to first visible accordion header
-        var controlContainerOffset = this.cache.container.offset().top;
-        
-        for (var i=0; i<4; i++)
+        var controlContainerOffset = self.cache.container.offset().top;
+        var len = self.cache.accordionHeaders.length;
+        for (var i = 0; i < len; i++)
         {
-            if ($(this.cache.accordionHeaders[i]).offset().top >= controlContainerOffset)
+            if ($(self.cache.accordionHeaders[i]).offset().top >= controlContainerOffset)
              {
                  setTimeout(function() {
-                      stylebot.widget.basic.cache.accordionHeaders[i].focus();
+                     self.cache.accordionHeaders[i].focus();
                  }, 0);
+
                  break;
              }
         }
-        this.cache.container.show();
+        self.cache.container.show();
     },
-    
+
+    // Hide the Basic Mode UI
     hide: function() {
-        $('#stylebot-controls').hide();
+        stylebot.widget.basic.cache.container.hide();
     },
-    
+
+    // Open enabled accordions
     initAccordions: function() {
+        // todo: the toggleAccordion method should be in WidgetUI
         var len = this.enabledAccordions.length;
-        for (var i=0; i < len; i++)
+        for (var i = 0; i < len; i++)
             Events.toggleAccordion($(this.cache.accordionHeaders[this.enabledAccordions[i]]));
     },
-    
+
+    // Resize the height of the container
     resize: function(height) {
         this.cache.container.css('height', height);
     },
-    
+
+    // Enable all UI Controls
     enable: function() {
         this.cache.textfields.prop('disabled', false);
         this.cache.buttons.prop('disabled', false);
         this.cache.selectboxes.prop('disabled', false);
         this.cache.colorSelectors.removeClass('disabled');
     },
-    
+
+    // Disable all UI Controls
     disable: function() {
         this.cache.textfields.prop('disabled', true);
         this.cache.buttons.prop('disabled', true);
         this.cache.selectboxes.prop('disabled', true);
         this.cache.colorSelectors.addClass('disabled');
     }
-}
+};
