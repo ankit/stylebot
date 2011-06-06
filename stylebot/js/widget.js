@@ -331,7 +331,7 @@ stylebot.widget = {
         var headerHeight = self.cache.header.height();
 
         if (headerHeight != 0)
-            headerHeight -= 36;
+            headerHeight -= 42;
 
         var optionsHeight = 125;
 
