@@ -60,7 +60,7 @@ var Utils = {
     capitalize: function(string) {
         return string.charAt(0).toUpperCase() + string.slice(1);
     },
-    
+
     /**
      *  Make text editable in place. Replaces text with textarea for editing.
      *  Requires Utils.editElement and Utils.endEditing
@@ -71,43 +71,43 @@ var Utils = {
      */
     makeEditable: function($el, callback, options) {
         var editFieldClass = 'editing-field';
-        
+
         if (options && options.editFieldClass) {
             editFieldClass = options.editFieldClass;
         }
-        
+
         $el.addClass('editable');
-        
+
         $el.bind('click keydown', {callback: callback}, function(e)
         {
             if (e.type === 'keydown' && e.keyCode != 13)
                 return true;
-            
+
             Utils.editElement($el, options);
 
             var onClose = function(e) {
                 if (e.type === "keydown" && e.keyCode != 13 && e.keyCode != 27)
                     return true;
-                
+
                 if (e.type === "mousedown" && e.target.className === editFieldClass)
                     return true;
-                
+
                 e.preventDefault();
-                
+
                 Utils.endEditing($el);
-                
+
                 e.data.callback($el.text());
-                
+
                 $(document).unbind("mousedown", onClose);
                 $(document).unbind("keydown", onClose);
             }
-            
+
             $(document).bind('keydown mousedown', { callback: callback }, onClose);
         });
-        
+
         return true;
     },
-    
+
     editElement: function($el, someOptions) {
         // default options
         var options = {
@@ -115,16 +115,16 @@ var Utils = {
             selectText      : true,
             fixedWidth      : false
         };
-        
+
         if (someOptions) {
             for (var option in someOptions)
                 options[option] = someOptions[option];
         }
-        
+
         $el.hide();
-        
+
         var elWidth;
-        
+
         if (options && options.fixedWidth)
             elWidth = options.fixedWidth;
         else
@@ -143,7 +143,7 @@ var Utils = {
         };
 
         var value = $el.text();
-        
+
         // get the required height of textarea by creating a temporary div
         //
         var tempDiv = $('<div>', {
@@ -154,13 +154,13 @@ var Utils = {
             'word-wrap'         : 'break-word'
         })
         .width(elWidth);
-        
+
         $el.before(tempDiv);
-        
+
         var height = tempDiv.height() + padding.top + padding.bottom;
-        
+
         tempDiv.remove();
-        
+
         var textarea = $('<textarea>', {
             value: value,
             class: options.editFieldClass
@@ -175,18 +175,18 @@ var Utils = {
             'overflow-y'        : 'hidden',
             'resize'            : 'none'
         });
-        
+
         if (options.selectText) {
             textarea.bind('click keyup', function(e)
             {
                 if (e.type === 'keyup' && e.keyCode != 9) return true;
-                
+
                 e.preventDefault();
                 e.target.focus();
                 e.target.select();
             });
         }
-        
+
         $el.before(textarea);
         textarea.focus();
 
@@ -194,29 +194,29 @@ var Utils = {
         // else set cursor to the end of field
         //
         var len = value.length;
-        
+
         if (value[len - 1] === "\n")
             len = len - 1;
-        
+
         if (options && options.selectText)
             textarea.get(0).setSelectionRange(0, len);
-        
+
         $el.data('value', value);
     },
-    
+
     endEditing: function($el) {
         if ($el === undefined)
             return;
-        
+
         var value = $.trim($el.prev('textarea').attr('value'));
-        
+
         $el.prev('textarea').remove();
-        
+
         if (value === '')
             value = $el.data('value');
-        
+
         $el.data('value', null);
-        
+
         $el.html(value);
         $el.show();
         $el.focus();
@@ -273,7 +273,7 @@ var Utils = {
 
         return newObj;
     },
-    
+
     // functions for ace
     ace: {
         monkeyPatch: function(editor) {
@@ -286,18 +286,18 @@ var Utils = {
                 this.setReadOnly(readOnly);
                 this.disabledProp = readOnly;
             }
-            
+
             editor.getDisabled = function() {
                 return this.disabledProp;
             }
-                              
+
             // monkey-patch the editor the correctly display the vertical scrollbar
-            editor.previousScrollbarWidth = 0;
             var scrollbarWidth = editor.renderer.scrollBar.getWidth();
+            editor.previousScrollbarWidth = scrollbarWidth;
             editor.renderer.scrollBar.getWidth = function() {
                 return this.width > this.element.clientWidth ? scrollbarWidth : 0;
             };
-            
+
             /* as for now, due to ace's limitations this is the only safe way to
                update the markers and the wrap limit. At least, let's make sure we
                update the editor's width only, and only if it's necessary
@@ -320,7 +320,7 @@ var Utils = {
                     }
                 }, 100);
             });
-            
+
             return editor;
         }
     }
