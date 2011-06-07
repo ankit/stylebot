@@ -184,7 +184,7 @@ var WidgetUI = {
         .keyup(Events.onTextFieldKeyUp)
 
         .css({
-            marginLeft: '95px !important',
+            marginLeft: '5px !important',
             marginTop: '5px !important',
             display: 'none'
         })
