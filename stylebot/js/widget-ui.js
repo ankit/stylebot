@@ -176,7 +176,7 @@ var WidgetUI = {
             type: 'text',
             id: 'stylebot-' + control.id,
             class: 'stylebot-textfield',
-            size: 20
+            size: 25
         })
 
         .data('property', control.id)
@@ -184,7 +184,7 @@ var WidgetUI = {
         .keyup(Events.onTextFieldKeyUp)
 
         .css({
-            marginLeft: '5px !important',
+            marginLeft: '6px !important',
             marginTop: '5px !important',
             display: 'none'
         })

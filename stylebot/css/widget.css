@@ -71,6 +71,7 @@
     outline: none !important;
     display: inline-block !important;
     float: left !important;
+    box-sizing: content-box !important;
 }
 
 #stylebot-header-container {
