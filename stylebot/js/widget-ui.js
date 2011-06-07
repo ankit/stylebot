@@ -363,7 +363,7 @@ var WidgetUI = {
                  value: control.values[i],
                  property: control.id
             })
-            .mousedown(Events.onSegmentedControlMouseDown)
+            .bind('mousedown keydown', Events.onSegmentedControlMouseDown)
             .appendTo(container);
             // explicitly having to add the 'stylebot-last-child' class as :last-child causes weird issue in Chrome
             if (i == (len - 1))

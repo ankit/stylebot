@@ -147,6 +147,8 @@ Events = {
     },
 
     onSegmentedControlMouseDown: function(e) {
+        if (e.type === 'keydown' && e.keyCode != 13 && e.keyCode != 32)
+            return true;
         var $button = $(e.target);
 
         // if the user clicked the SPAN enclosed inside BUTTON, get to the button
@@ -156,7 +158,7 @@ Events = {
         WidgetUI.setButtonAsActive($button);
 
         // Bind the mouseup handler which will handle saving the new property value and CSS classes
-        $(document).bind('mouseup', Events.onSegmentedControlMouseUp);
+        $(document).bind('mouseup keyup', Events.onSegmentedControlMouseUp);
     },
 
     onSegmentedControlMouseUp: function(e) {
@@ -181,7 +183,7 @@ Events = {
             ui.selectSegmentedButton($button);
         }
 
-        $(document).unbind('mouseup', Events.onSegmentedControlMouseUp);
+        $(document).unbind('mouseup keyup', Events.onSegmentedControlMouseUp);
     },
 
     toggleAccordion: function(h) {
