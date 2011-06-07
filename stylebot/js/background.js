@@ -792,9 +792,10 @@ Styles.prototype.exists = function(aURL) {
 Styles.prototype.getRulesForPage = function(aURL) {
     // if the URL is stylebot.me, return rules for stylebot.me if they exist
     // otherwise, return null
+
     if (aURL.indexOf('stylebot.me') != -1) {
-        if (rules['stylebot.me']) {
-            return {rules: rules['stylebot.me'], url: 'stylebot.me'};
+        if (!this.isEmpty('stylebot.me')) {
+            return {rules: this.getRules('stylebot.me'), url: 'stylebot.me'};
         } else {
             return {rules: null, url: null};
         }

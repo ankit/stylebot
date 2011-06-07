@@ -119,7 +119,7 @@ CSSScanner.prototype = {
   getCurrentPos: function() {
     return this.mPos;
   },
-  
+
   getAlreadyScanned: function()
   {
     return this.mString.substr(0, this.mPos);
@@ -405,7 +405,7 @@ CSSScanner.prototype = {
     if (this.isWhiteSpace(c)) {
       var s = this.eatWhiteSpace(c);
       this.mCurrentLine += countChar(s);
-      
+
       return new jscsspToken(jscsspToken.WHITESPACE_TYPE, s);
     }
 
@@ -473,7 +473,7 @@ CSSParser.prototype = {
 
   kCOLOR_NAMES: {
     "transparent": true,
-  
+
     "black": true,
     "silver": true,
     "gray": true,
@@ -490,7 +490,7 @@ CSSParser.prototype = {
     "blue": true,
     "teal": true,
     "aqua": true,
-    
+
     "aliceblue": true,
     "antiquewhite": true,
     "aqua": true,
@@ -638,7 +638,7 @@ CSSParser.prototype = {
     "whitesmoke": true,
     "yellow": true,
     "yellowgreen": true,
-  
+
     "activeborder": true,
     "activecaption": true,
     "appworkspace": true,
@@ -686,7 +686,7 @@ CSSParser.prototype = {
     "circle": true,
     "square": true,
     "none": true,
-    
+
     /* CSS 3 */
     "box": true,
     "check": true,
@@ -806,7 +806,7 @@ CSSParser.prototype = {
   ungetToken: function() {
     this.mLookAhead = this.mToken;
   },
-  
+
   addUnknownAtRule: function(aSheet, aString) {
     var currentLine = CountLF(this.mScanner.getAlreadyScanned());
     var blocks = [];
@@ -814,10 +814,10 @@ CSSParser.prototype = {
     while (token.isNotNull())
     {
       aString += token.value;
-      
+
       if (token.isSymbol(";") && !blocks.length)
         break;
-      
+
       else if (token.isSymbol("{")
                || token.isSymbol("(")
                || token.isSymbol("[")
@@ -825,20 +825,20 @@ CSSParser.prototype = {
       {
         blocks.push(token.isFunction() ? "(" : token.value);
       }
-      
+
       else if (token.isSymbol("}")
                  || token.isSymbol(")")
                  || token.isSymbol("]"))
       {
         if (blocks.length) {
           var ontop = blocks[blocks.length - 1];
-          
+
           if ((token.isSymbol("}") && ontop == "{")
               || (token.isSymbol(")") && ontop == "(")
               || (token.isSymbol("]") && ontop == "["))
           {
             blocks.pop();
-            
+
             if (!blocks.length && token.isSymbol("}"))
               break;
           }
@@ -854,7 +854,7 @@ CSSParser.prototype = {
     if (aCurrentLine === undefined) {
       aCurrentLine = CountLF(this.mScanner.getAlreadyScanned());
     }
-    
+
     var rule = new jscsspErrorRule();
     rule.currentLine = aCurrentLine;
     rule.parsedCssText = aString;
@@ -937,7 +937,7 @@ CSSParser.prototype = {
           break;
         token = this.getToken(true, true);
       }
-  
+
       if (token.isSymbol(";") && href && media.length) {
         s += ";"
         this.forgetState();
@@ -1179,7 +1179,7 @@ CSSParser.prototype = {
           this.ungetToken();
         break;
       }
-  
+
       if (token.isIdent(this.kINHERIT)) {
         if (values.length) {
           return "";
@@ -1312,7 +1312,7 @@ CSSParser.prototype = {
               || token.isIdent("auto")) {
         values.push(token.value);
       }
-      
+
       else {
         return "";
       }
@@ -1383,7 +1383,7 @@ CSSParser.prototype = {
         token = this.getToken(true, true);
         break;
       }
-      
+
       else {
         var color = this.parseColor(token);
         if (color)
@@ -1570,7 +1570,7 @@ CSSParser.prototype = {
       else if (!values.length && token.isIdent(this.kINHERIT)) {
         values.push(token.value);
       }
-      
+
       else if (token.isDimension()
                || token.isNumber("0")
                || (token.isIdent() && token.value in this.kBORDER_WIDTH_NAMES)) {
@@ -1643,7 +1643,7 @@ CSSParser.prototype = {
       else if (!values.length && token.isIdent(this.kINHERIT)) {
         values.push(token.value);
       }
-      
+
       else if (token.isIdent() && token.value in this.kBORDER_STYLE_NAMES) {
         values.push(token.value);
       }
@@ -2002,19 +2002,19 @@ CSSParser.prototype = {
                    && (token.value in kStyle)) {
             fStyle = token.value;
           }
-  
+
           else if (!fVariant
                    && token.isIdent()
                    && (token.value in kVariant)) {
             fVariant = token.value;
           }
-  
+
           else if (!fWeight
                    && (token.isIdent() || token.isNumber())
                    && (token.value in kWeight)) {
             fWeight = token.value;
           }
-  
+
           else if (!fSize
                    && ((token.isIdent() && (token.value in kSize))
                        || token.isDimension()
@@ -2224,7 +2224,7 @@ CSSParser.prototype = {
       if (!token.isSymbol(","))
         return "";
       color += ", ";
-  
+
       token = this.getToken(true, true);
       if (!token.isNumber() && !token.isPercentage())
         return "";
@@ -2233,30 +2233,30 @@ CSSParser.prototype = {
       if (!token.isSymbol(","))
         return "";
       color += ", ";
-  
+
       token = this.getToken(true, true);
       if (!token.isNumber() && !token.isPercentage())
         return "";
       color += token.value;
-  
+
       if (isRgba) {
         token = this.getToken(true, true);
         if (!token.isSymbol(","))
           return "";
         color += ", ";
-  
+
         token = this.getToken(true, true);
         if (!token.isNumber())
           return "";
         color += token.value;
       }
-  
+
       token = this.getToken(true, true);
       if (!token.isSymbol(")"))
         return "";
       color += token.value;
     }
-  
+
     else if (token.isFunction("hsl(")
              || token.isFunction("hsla(")) {
       color = token.value;
@@ -2269,7 +2269,7 @@ CSSParser.prototype = {
       if (!token.isSymbol(","))
         return "";
       color += ", ";
-  
+
       token = this.getToken(true, true);
       if (!token.isPercentage())
         return "";
@@ -2278,24 +2278,24 @@ CSSParser.prototype = {
       if (!token.isSymbol(","))
         return "";
       color += ", ";
-  
+
       token = this.getToken(true, true);
       if (!token.isPercentage())
         return "";
       color += token.value;
-  
+
       if (isHsla) {
         token = this.getToken(true, true);
         if (!token.isSymbol(","))
           return "";
         color += ", ";
-  
+
         token = this.getToken(true, true);
         if (!token.isNumber())
           return "";
         color += token.value;
       }
-  
+
       token = this.getToken(true, true);
       if (!token.isSymbol(")"))
         return "";
@@ -2516,7 +2516,7 @@ parseKeyframesRule: function(aToken, aSheet) {
     var keyframesRule = new jscsspKeyframesRule();
     this.preserveState();
     var token = this.getToken(true, true);
-    
+
     /* keyframes name*/
     if (token.isIdent()) {
         s += " " + token.value;
@@ -2549,7 +2549,7 @@ parseKeyframesRule: function(aToken, aSheet) {
             }
         }
     }
-    
+
     if (valid) {
       this.forgetState();
       keyframesRule.parsedCssText = s;
@@ -2644,7 +2644,6 @@ parseKeyframeSelector: function(aToken) {
     }
     this.restoreState();
     s = this.currentToken().value;
-    console.log("error");
     this.addUnknownAtRule(aOwner, s);
     return "";
   },
@@ -2745,7 +2744,7 @@ parseKeyframeSelector: function(aToken) {
           return null;
       }
     }
-  
+
     else if (token.isSymbol(".") || token.isSymbol("#")) {
       s += token.value;
       token = this.getToken(false, true);
@@ -2793,7 +2792,7 @@ parseKeyframeSelector: function(aToken) {
           }
       } else
         return null;
-  
+
     } else if (token.isSymbol("[")) {
       s += "[";
       token = this.getToken(true, true);
@@ -2819,7 +2818,7 @@ parseKeyframeSelector: function(aToken) {
       }
       else
         return null;
-  
+
       // nothing, =, *=, $=, ^=, |=
       token = this.getToken(true, true);
       if (token.isIncludes()
@@ -3176,7 +3175,7 @@ jscsspStylesheet.prototype = {
           return true;
       return false;
     }
-    
+
     for (var i = 0; i < this.cssRules.length; i++)
     {
       var rule = this.cssRules[i];
@@ -3184,7 +3183,7 @@ jscsspStylesheet.prototype = {
         break;
       else if (rule.type == kJscsspVARIABLES_RULE &&
                (!rule.media.length || ItemFoundInArray(rule.media, aMedium))) {
-        
+
         for (var j = 0; j < rule.declarations.length; j++) {
           var valueText = "";
           for (var k = 0; k < rule.declarations[j].values.length; k++)
