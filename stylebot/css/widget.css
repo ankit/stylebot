@@ -280,6 +280,7 @@ background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAFo9M/
     font-size: inherit !important;
     margin: 6px 0 !important;
     padding: 2px !important;
+    display: table !important;
 }
 
 .stylebot-control {
@@ -304,7 +305,6 @@ background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAFo9M/
 
 .stylebot-label {
     color: #333;
-    display: inline-block !important;
     float: none !important;
     font-family: inherit !important;
     font-size: 11px !important;
@@ -315,6 +315,8 @@ background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAFo9M/
     text-align: right !important;
     text-transform: inherit !important;
     width: 85px !important;
+    display: table-cell !important;
+    vertical-align: middle !important;
 }
 
 .stylebot-inline-label {
@@ -390,7 +392,7 @@ a.stylebot-accordion-header:hover {
     font-weight: bold !important;
     line-height: 12px !important;
     margin-top: 1px !important;
-    padding: 4px 5px 7px 17px !important;
+    padding: 3px 5px 6px 17px !important;
     position: relative;
     text-decoration: none !important;
     text-shadow: 0px 1px 0px rgba(255,255,255,0.7);

@@ -40,7 +40,7 @@ Events = {
 
         var property = $(e.target).data('property');
 
-        if (typeof(property) == "object")
+        if (typeof property === 'object')
         {
             var len = property.length;
             for (var i = 0; i < len; i++)
@@ -84,7 +84,7 @@ Events = {
 
             var value = e.target.value;
             var property = $(e.target).data('property');
-            var unit = $(e.target).next().attr('value');
+            var unit = $(e.target).nextAll('select').attr('value');
 
             value = parseInt(value);
 
@@ -101,7 +101,7 @@ Events = {
 
             e.target.value = value;
 
-            if ( parseFloat(value) )
+            if (parseFloat(value))
                    value += unit;
 
             stylebot.style.apply(property, value);
@@ -122,9 +122,9 @@ Events = {
 
         var value = e.target.value;
         var property = $(e.target).data('property');
-        var unit = $(e.target).next().attr('value');
+        var unit = $(e.target).nextAll('select').attr('value');
 
-        if ( parseFloat(value) )
+        if (parseFloat(value))
             value += unit;
 
         stylebot.style.apply(property, value);
@@ -134,8 +134,8 @@ Events = {
     onSelectChange: function(e) {
         var value = e.target.value.split(',');
         var property = $(e.target).find('[value=' + e.target.value + ']').data('property');
-
-        if (typeof(property) == "object")
+        console.log(typeof property);
+        if (typeof property === 'object')
         {
             var len = property.length;
             for (var i = 0; i < len; i++)
@@ -158,7 +158,7 @@ Events = {
         // Bind the mouseup handler which will handle saving the new property value and CSS classes
         $(document).bind('mouseup', Events.onSegmentedControlMouseUp);
     },
-    
+
     onSegmentedControlMouseUp: function(e) {
         var ui = WidgetUI;
 
@@ -174,7 +174,7 @@ Events = {
         if (status) {
             Events.saveProperty($button.data('property'), '');
         }
-        
+
         // Select button
         else {
             Events.saveProperty($button.data('property'), $button.data('value'));
@@ -187,7 +187,7 @@ Events = {
     toggleAccordion: function(h) {
         var self = Events;
         var ui = WidgetUI;
-        
+
         if (h.hasClass(ui.ACCORDION_SELECTED_CLASS))
         {
             h.removeClass(ui.ACCORDION_SELECTED_CLASS)
@@ -234,4 +234,4 @@ Events = {
         stylebot.style.apply(property, value);
         stylebot.style.refreshUndoState();
     }
-}
+};

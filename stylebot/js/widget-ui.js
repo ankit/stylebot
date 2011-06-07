@@ -96,19 +96,35 @@ var WidgetUI = {
 
     createMultiSizeControl: function(control) {
         var container = $('<span>', {
-            style: 'display: inline-block !important; margin-left: 50px !important; margin-top: -10px !important;'
+            class: 'stylebot-multisize'
         });
 
         var len = control.id.length;
+        var classNames = ['all', 'top', 'right', 'bottom', 'left'];
 
         for (var i = 0; i < len; i++)
         {
-            this.createLabel(control.options[i])
-            .appendTo(container);
+            var property = control.id[i];
 
-            this.createSizeControl(control.id[i])
-            .attr('style', 'margin-bottom: 3px !important; display: inline-block !important;')
+            this.createTextField(property, 1, Events.onSizeFieldKeyDown, Events.onSizeFieldKeyUp)
+            .addClass('stylebot-multisize-' + classNames[i])
             .appendTo(container);
+        }
+
+        // Select box for choosing unit
+        var select = $('<select>', {
+            class: 'stylebot-control stylebot-select'
+        })
+        .change(function(e) {
+            $(this).parent().find('input').keyup();
+        })
+        .appendTo(container);
+
+        var len = this.validSizeUnits.length;
+
+        for (var i = 0; i < len; i++) {
+            this.createSelectOption(this.validSizeUnits[i], null, this.validSizeUnits[i])
+            .appendTo(select);
         }
         return container;
     },
@@ -475,6 +491,8 @@ var WidgetUI = {
         }
 
         var len = values.length;
+        var unit;
+
         for (var i = 0; i < len; i++)
         {
             var value = values[i];
@@ -482,19 +500,17 @@ var WidgetUI = {
             if (value != undefined)
             {
                 var unit = $.trim(self.determineSizeUnit(value));
-
-                // keyup called to update rules cache as values maybe modified when mode is switched.
-                $($input.get(i)).attr('value', value.replace(unit, ''))
-                .keyup();
-
-                var index = 0;
-                if (unit) {
-                    index = $.inArray(unit, self.validSizeUnits);
-                }
-
-                $($select.get(i)).prop('selectedIndex', index);
+                $($input.get(i)).attr('value', value.replace(unit, ''));
             }
         }
+
+        var index = 0;
+        if (unit) {
+            index = $.inArray(unit, self.validSizeUnits);
+        }
+
+        $select.prop('selectedIndex', index);
+        $input.keyup();
     },
 
     selectButton: function($bt) {

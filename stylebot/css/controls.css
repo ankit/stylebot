@@ -1,4 +1,6 @@
-/** Stylebot Widget Controls CSS **/
+/* Stylebot Panel Controls */
+
+/* Select */
 
 select.stylebot-select {
     font-size: 11px !important;
@@ -11,7 +13,7 @@ select.stylebot-select {
     border: 1px solid #b6b6b6 !important;
     border-radius: 3px !important;
     border-bottom-color: #949494 !important;
-    padding: 0 35px 0 5px !important;
+    padding: 0 25px 0 5px !important;
 }
 
 select.stylebot-select:disabled {
@@ -21,6 +23,50 @@ select.stylebot-select:disabled {
 select.stylebot-select:focus {
     outline: 1px solid #777 !important;
 }
+
+/* Multisize */
+
+.stylebot-multisize {
+    display: inline-block !important;
+    height: 55px !important;
+    position: relative;
+}
+
+.stylebot-multisize input.stylebot-textfield {
+    position: absolute;
+}
+
+.stylebot-multisize-top {
+    left: 32px;
+    top: 0px;
+}
+
+.stylebot-multisize-left {
+    left: 0px;
+    top: 20px;
+}
+
+.stylebot-multisize-all {
+    left: 32px;
+    top: 20px;
+}
+
+.stylebot-multisize-right {
+    left: 64px;
+    top: 20px;
+}
+
+.stylebot-multisize-bottom {
+    left: 32px;
+    top: 40px;
+}
+
+.stylebot-multisize .stylebot-select {
+    left: 100px;
+    top: 20px;
+    position: absolute !important;
+}
+
 /* Color Picker & Selector */
 
 div.stylebot-colorselector {
