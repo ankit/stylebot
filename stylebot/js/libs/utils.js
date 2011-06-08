@@ -39,9 +39,9 @@ var Utils = {
             'top': 38,
             'right': 39,
             'bottom': 40,
-            'arrowkeys':[ 37, 38, 39, 40 ],
-        }
-        for (var i = 0; i < len; i++){
+            'arrowkeys': [37, 38, 39, 40]
+        };
+        for (var i = 0; i < len; i++) {
             var code = keyCodes[keys[i]];
             if (code.length > 1) // it is an array
             {
@@ -64,9 +64,9 @@ var Utils = {
     /**
      *  Make text editable in place. Replaces text with textarea for editing.
      *  Requires Utils.editElement and Utils.endEditing
-     *  @param {Element} el Element which contains the text
-     *  @param {Function} callback Function to be called when user finishes editing
-     *  @param {Object} options Options for edit in place field
+     *  @param {Element} el Element which contains the text.
+     *  @param {Function} callback Function to be called when user finishes editing.
+     *  @param {Object} options Options for edit in place field.
      *  @return {true}
      */
     makeEditable: function($el, callback, options) {
@@ -86,10 +86,10 @@ var Utils = {
             Utils.editElement($el, options);
 
             var onClose = function(e) {
-                if (e.type === "keydown" && e.keyCode != 13 && e.keyCode != 27)
+                if (e.type === 'keydown' && e.keyCode != 13 && e.keyCode != 27)
                     return true;
 
-                if (e.type === "mousedown" && e.target.className === editFieldClass)
+                if (e.type === 'mousedown' && e.target.className === editFieldClass)
                     return true;
 
                 e.preventDefault();
@@ -98,8 +98,8 @@ var Utils = {
 
                 e.data.callback($el.text());
 
-                $(document).unbind("mousedown", onClose);
-                $(document).unbind("keydown", onClose);
+                $(document).unbind('mousedown', onClose);
+                $(document).unbind('keydown', onClose);
             }
 
             $(document).bind('keydown mousedown', { callback: callback }, onClose);
@@ -111,9 +111,9 @@ var Utils = {
     editElement: function($el, someOptions) {
         // default options
         var options = {
-            editFieldClass  : 'editing-field',
-            selectText      : true,
-            fixedWidth      : false
+            editFieldClass: 'editing-field',
+            selectText: true,
+            fixedWidth: false
         };
 
         if (someOptions) {
@@ -150,8 +150,8 @@ var Utils = {
             html: value
         })
         .css({
-            'line-height'       : lineHeight,
-            'word-wrap'         : 'break-word'
+            'line-height' : lineHeight,
+            'word-wrap' : 'break-word'
         })
         .width(elWidth);
 
@@ -168,12 +168,12 @@ var Utils = {
         .width(elWidth)
         .height(height)
         .css({
-            'font-family'       : fontFamily,
-            'font-size'         : fontSize,
-            'font-weight'       : fontWeight,
-            'line-height'       : lineHeight,
-            'overflow-y'        : 'hidden',
-            'resize'            : 'none'
+            'font-family' : fontFamily,
+            'font-size' : fontSize,
+            'font-weight' : fontWeight,
+            'line-height' : lineHeight,
+            'overflow-y' : 'hidden',
+            'resize' : 'none'
         });
 
         if (options.selectText) {
@@ -195,7 +195,7 @@ var Utils = {
         //
         var len = value.length;
 
-        if (value[len - 1] === "\n")
+        if (value[len - 1] === '\n')
             len = len - 1;
 
         if (options && options.selectText)
@@ -223,7 +223,7 @@ var Utils = {
     },
 
     selectText: function(el, start, end) {
-        if (!el || !el.value || el.value === "")
+        if (!el || !el.value || el.value === '')
             return false;
         var len = el.value.length;
         if (end > len) end = len;
@@ -232,7 +232,7 @@ var Utils = {
     },
 
     selectAllText: function(el) {
-        if (!el || !el.value || el.value === "")
+        if (!el || !el.value || el.value === '')
             return false;
         var len = el.value.length;
         el.setSelectionRange(0, len);
@@ -240,20 +240,20 @@ var Utils = {
     },
 
     moveCursorToEnd: function(el) {
-        if (!el || !el.value || el.value === "")
+        if (!el || !el.value || el.value === '')
             return false;
         var len = el.value.length;
         el.setSelectionRange(len, len);
-        if (el.localName == "textarea") {
+        if (el.localName == 'textarea') {
             el.scrollTop = el.scrollHeight;
         }
     },
 
     HTMLDecode: function(text) {
-        if (text && typeof(text) != "undefined")
+        if (text && typeof(text) != 'undefined')
         {
             // replace &lt; with < and &gt; with >
-            return text.replace("&lt;", "<").replace("&gt;", ">");
+            return text.replace('&lt;', '<').replace('&gt;', '>');
         }
     },
 
@@ -263,12 +263,12 @@ var Utils = {
 
         for (i in obj)
         {
-            if (obj[i] && typeof obj[i] == "object")
+            if (obj[i] && typeof obj[i] == 'object')
             {
                 newObj[i] = this.cloneObject(obj[i]);
             }
             else
-                newObj[i] = obj[i]
+                newObj[i] = obj[i];
         }
 
         return newObj;
@@ -303,13 +303,13 @@ var Utils = {
                update the editor's width only, and only if it's necessary
              */
             editor.getSession().on('change', function() {
-                setTimeout( function() {
+                setTimeout(function() {
                     if (editor.renderer.scrollBar.getWidth() != editor.previousScrollbarWidth) {
                         editor.previousScrollbarWidth = editor.renderer.scrollBar.getWidth();
                         if (editor.previousScrollbarWidth == scrollbarWidth) {
-                            editor.renderer.scroller.style.width = Math.max(0, editor.renderer.scroller.clientWidth - scrollbarWidth) + "px";
+                            editor.renderer.scroller.style.width = Math.max(0, editor.renderer.scroller.clientWidth - scrollbarWidth) + 'px';
                         } else {
-                            editor.renderer.scroller.style.width = Math.max(0, editor.renderer.scroller.clientWidth + scrollbarWidth) + "px";
+                            editor.renderer.scroller.style.width = Math.max(0, editor.renderer.scroller.clientWidth + scrollbarWidth) + 'px';
                         }
                         if (editor.renderer.session.getUseWrapMode()) {
                             var availableWidth = editor.renderer.scroller.clientWidth - editor.renderer.$padding * 2;
@@ -324,4 +324,4 @@ var Utils = {
             return editor;
         }
     }
-}
+};

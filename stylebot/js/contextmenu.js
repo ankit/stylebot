@@ -4,17 +4,17 @@ stylebot.contextmenu = {
     cache: {
         el: null
     },
-    
+
     initialize: function() {
         this.attachListeners();
     },
-    
+
     attachListeners: function() {
         $(document.body).bind('contextmenu', function(e) {
             stylebot.contextmenu.cache.el = e.target;
         });
     },
-    
+
     openWidget: function() {
         if (stylebot.contextmenu.cache.el && stylebot.contextmenu.cache.el.nodeType == 1)
         {
@@ -24,15 +24,15 @@ stylebot.contextmenu = {
     },
 
     searchSocial: function() {
-        window.open("http://stylebot.me/search?q=" + document.domain);
+        window.open('http://stylebot.me/search?q=' + document.domain);
     },
-    
+
     shareStyleOnSocial: function() {
         // check if the current page has any styles
         if (stylebot.style.rules) {
-            
+
             var css = CSSUtils.crunchFormattedCSS(stylebot.style.rules, false);
-            var url = "http://stylebot.me/post";
+            var url = 'http://stylebot.me/post';
 
             // create a form and submit data
             var temp_form = $('<form>', {
@@ -40,7 +40,7 @@ stylebot.contextmenu = {
                 'action': url,
                 'target': '_self'
             });
-            
+
             // site
             $('<input>', {
                 type: 'hidden',
@@ -62,4 +62,4 @@ stylebot.contextmenu = {
             temp_form.remove();
         }
     }
-}
+};

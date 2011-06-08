@@ -14,7 +14,7 @@ var ModalBox = function(html, options) {
     }
 
     this.box = $('<div>', {
-        id:'stylebot-modal'
+        id: 'stylebot-modal'
     })
 
     .append(html);
@@ -28,10 +28,10 @@ var ModalBox = function(html, options) {
     }
 
     this.box.css({
-        height: this.options.height + "!important",
-        width: this.options.width + " !important",
-        top: this.options.top + " !important",
-        left: this.options.left + " !important"
+        height: this.options.height + '!important',
+        width: this.options.width + ' !important',
+        top: this.options.top + ' !important',
+        left: this.options.left + ' !important'
     });
 };
 
@@ -44,13 +44,13 @@ ModalBox.prototype.reset = function(options) {
         this.box
 
         .css({
-            height: this.options.height + "!important",
-            width: this.options.width + " !important",
-            top: this.options.top + " !important",
-            left: this.options.left + " !important"
+            height: this.options.height + '!important',
+            width: this.options.width + ' !important',
+            top: this.options.top + ' !important',
+            left: this.options.left + ' !important'
         });
     }
-}
+};
 
 ModalBox.prototype.options = {
     bgOpacity: 0.7,
@@ -65,7 +65,7 @@ ModalBox.prototype.options = {
     onClose: function() {},
     onOpen: function() {},
     parent: null
-}
+};
 
 ModalBox.prototype.darkenBg = function(callback) {
 
@@ -85,7 +85,7 @@ ModalBox.prototype.darkenBg = function(callback) {
     .appendTo(document.body)
 
     .fadeIn(this.options.bgFadeSpeed);
-}
+};
 
 ModalBox.prototype.show = function(content, options) {
     this.box.fadeIn(this.options.fadeSpeed);
@@ -93,7 +93,7 @@ ModalBox.prototype.show = function(content, options) {
     this.options.onOpen();
 
     var closeBox = function(e) {
-        if (e.type == "keyup" &&
+        if (e.type == 'keyup' &&
             (e.keyCode != 27 || !e.data.modal.options.closeOnEsc)
         )
             return true;
@@ -101,11 +101,11 @@ ModalBox.prototype.show = function(content, options) {
         var id = e.target.id;
         var parent = $(e.target).closest('#stylebot-modal');
 
-        if ((e.type == "mousedown" &&
-            id != "stylebot-modal" &&
+        if ((e.type == 'mousedown' &&
+            id != 'stylebot-modal' &&
             parent.length == 0 &&
-            e.data.modal.options.closeOnBgClick ) ||
-            e.type == "keyup"
+            e.data.modal.options.closeOnBgClick) ||
+            e.type == 'keyup'
         )
         {
             e.preventDefault();
@@ -117,11 +117,11 @@ ModalBox.prototype.show = function(content, options) {
     }
 
     $(document).bind('keyup mousedown', {modal: this}, closeBox);
-}
+};
 
 ModalBox.prototype.hide = function() {
     this.box.fadeOut(this.options.fadeSpeed);
     if (this.background)
         this.background.fadeOut(this.options.bgFadeSpeed).remove();
     this.options.onClose();
-}
+};

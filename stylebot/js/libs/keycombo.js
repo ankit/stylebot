@@ -7,13 +7,13 @@
  **/
 
 var KeyCombo = {
-    
+
     // el: the textfield in which key is pressed
     // codeEl: Hidden textfield which will store the keydown code
     init: function(el, codeEl) {
         el.value = KeyCombo.mapKeyDownCode(codeEl.value);
         el.addEventListener(
-            "keydown",
+            'keydown',
             function(e) {
                 KeyCombo.lastValue = el.value;
                 if (e.keyCode == 8)
@@ -21,14 +21,14 @@ var KeyCombo = {
                 if (KeyCombo.filterKeyCode(e.keyCode))
                 {
                     codeEl.value = e.keyCode;
-                    el.value = "";
+                    el.value = '';
                 }
                 if (e.keyCode == 27)
                     el.blur();
             },
             false);
     },
-    
+
     filterKeyCode: function(code) {
         // filter tab/shift/enter/esc/arrow keys
         if (code == 27 || code == 16 || code == 37 || code == 38 || code == 39 || code == 40 || code == 13 || code == 9)
@@ -38,7 +38,7 @@ var KeyCombo = {
             return false;
         return true;
     },
-    
+
     mapKeyDownCode: function(code) {
         code = Math.floor(code);
         if ((code >= 65 && code <= 90) || (code >= 48 && code <= 57))
@@ -47,18 +47,18 @@ var KeyCombo = {
         }
         switch (code)
         {
-            case 186: return ";";
-            case 187: return "=";
-            case 188: return ",";
-            case 189: return "-";
-            case 190: return ".";
-            case 191: return "/";
-            case 192: return "`";
-            case 219: return "[";
-            case 220: return "\\";
-            case 221: return "]";
+            case 186: return ';';
+            case 187: return '=';
+            case 188: return ',';
+            case 189: return '-';
+            case 190: return '.';
+            case 191: return '/';
+            case 192: return '`';
+            case 219: return '[';
+            case 220: return '\\';
+            case 221: return ']';
             case 222: return "'";
         }
         return String.fromCharCode(code).toLowerCase();
     }
-}
+};
