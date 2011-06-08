@@ -88,32 +88,16 @@ function saveStyleFromSocial(installationEvent) {
         var rules = CSSUtils.getRulesFromParserObject(sheet);
 
         // add the meta header
-        var header = '\
-/**\n\
-    Title       : 
-'
- + data.title + '\n';
+        var header = '/**\n    Title: ' + data.title
+        + '\n    URL: http://stylebot.me/styles/' + data.id
+        + '\n    Author: ' + data.author
+        + '\n    Author URL: http://stylebot.me/users/' + data.author;
 
         if (data.description) {
-            header += '\
-    Description : 
-'
- + data.description + '\n';
+            header += '\n    Description: ' + data.description;
         }
 
-        header += '\
-    URL         : http://stylebot.me/styles/
-'
- + data.id + '\n\
-    Author      : 
-'
- + data.author + '\n\
-    Author URL  : 
-'
- + 'http://stylebot.me/users/' + data.author + '\n\
-**/\n
-'
-;
+        header += '\n**/';
 
         var rulesWithMeta = { 'comment-#0' : { comment: header } };
 
