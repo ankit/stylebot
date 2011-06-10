@@ -9,24 +9,24 @@ var stylebotTempRules;
 var stylebotGlobalRules;
 
 // send request to background.html to get stylebot global rules
-chrome.extension.sendRequest({ name: "getGlobalRules" }, function(response) {
+chrome.extension.sendRequest({ name: 'getGlobalRules' }, function(response) {
     if (response) {
         stylebotGlobalRules = response;
         var css = CSSUtils.crunchCSS(response, true);
-        if (css != "")
+        if (css != '')
         {
-            CSSUtils.injectCSS(css, "stylebot-global-css");
+            CSSUtils.injectCSS(css, 'stylebot-global-css');
         }
     }
 });
 
 // send request to background.html to get stylebot rules for page
-chrome.extension.sendRequest({ name: "getRulesForPage", url: window.location.href }, function(response) {
+chrome.extension.sendRequest({ name: 'getRulesForPage', url: window.location.href }, function(response) {
     stylebotTempUrl = response.url;
     stylebotTempRules = response.rules;
     var css = CSSUtils.crunchCSS(response.rules, true);
-    if (css != "")
+    if (css != '')
     {
-        CSSUtils.injectCSS(css, "stylebot-css");
+        CSSUtils.injectCSS(css, 'stylebot-css');
     }
 });

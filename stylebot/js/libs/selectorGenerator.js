@@ -5,7 +5,7 @@
   * Dual licensed under GPL and MIT licenses.
  **/
 
-var SelectorGenerator =  {
+var SelectorGenerator = {
 
     generate: function(el, granularityLevel) {
         if (!el)
@@ -25,21 +25,21 @@ var SelectorGenerator =  {
 
     // inspect an element and return a CSS selector for it. this is the default mode
     inspect: function(el, level) {
-        var elClass = el.attr("class");
+        var elClass = el.attr('class');
 
         if (elClass != undefined) {
             elClass = $.trim(elClass.replace('stylebot-selected', ''));
 
             if (elClass.length != 0)
             {
-                var classes = elClass.split(" ");
+                var classes = elClass.split(' ');
                 var len = classes.length;
 
                 var selector = el.prop('tagName');
-                selector = selector ? selector.toLowerCase() : "";
+                selector = selector ? selector.toLowerCase() : '';
 
                 for (var i = 0; i < len; i++)
-                    selector += "." + classes[i];
+                    selector += '.' + classes[i];
 
                 return selector;
             }
@@ -48,16 +48,16 @@ var SelectorGenerator =  {
         var elId = el.attr('id');
         if (elId != undefined)
         {
-            return "#" + elId;
+            return '#' + elId;
         }
 
         var elTag = el.prop('tagName');
-        elTag = elTag ? elTag.toLowerCase() : "";
+        elTag = elTag ? elTag.toLowerCase() : '';
 
         // don't go beyond 2 levels up
         //
         if (level < 2)
-            return this.inspect(el.parent(), level + 1) + " " + elTag;
+            return this.inspect(el.parent(), level + 1) + ' ' + elTag;
         else
             return elTag;
     },
@@ -66,29 +66,29 @@ var SelectorGenerator =  {
         var elId = el.attr('id');
 
         if (elId != undefined)
-            return "#" + elId;
+            return '#' + elId;
 
-        var elClass = el.attr("class");
+        var elClass = el.attr('class');
 
         if (elClass != undefined) {
             elClass = $.trim(elClass.replace('stylebot-selected', ''));
         }
 
         else {
-            elClass = "";
+            elClass = '';
         }
 
         var elTag = el.prop('tagName');
-        elTag = elTag ? elTag.toLowerCase : "";
+        elTag = elTag ? elTag.toLowerCase : '';
 
         var selector;
 
         if (level < 1)
         {
-            selector = this.inspectHigh(el.parent(), level + 1) + " " + elTag;
+            selector = this.inspectHigh(el.parent(), level + 1) + ' ' + elTag;
 
             if (elClass.length != 0) {
-                selector += "." + elClass;
+                selector += '.' + elClass;
             }
         }
 
@@ -97,7 +97,7 @@ var SelectorGenerator =  {
             selector = elTag;
 
             if (elClass.length != 0) {
-                selector += "." + elClass;
+                selector += '.' + elClass;
             }
         }
 
@@ -106,6 +106,6 @@ var SelectorGenerator =  {
 
     inspectLow: function(el) {
         var elTag = el.prop('tagName');
-        return elTag ? elTag.toLowerCase() : "";
+        return elTag ? elTag.toLowerCase() : '';
     }
 };

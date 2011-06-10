@@ -224,7 +224,7 @@ cssFormatter.prototype = {
         }
         return css;
     },
-    
+
     // @public
     formatProperties: function(properties, shouldIndent) {
         var css = '';

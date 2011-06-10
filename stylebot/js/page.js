@@ -97,7 +97,7 @@ table {\n\
         </button>\
         </div>";
 
-        this.modal = new ModalBox(html, options, function(){});
+        this.modal = new ModalBox(html, options, function() {});
 
         this.initializeEditor();
 
@@ -106,9 +106,9 @@ table {\n\
         var $livePreviewCheckbox = $(buttons.get(0));
 
         $livePreviewCheckbox.click(this.toggleLivePreview)
-        .tipsy({delayIn: 100, gravity:'sw'});
+        .tipsy({delayIn: 100, gravity: 'sw'});
 
-        stylebot.chrome.getPreference("stylebot_page_live_preview", function(livePreview) {
+        stylebot.chrome.getPreference('stylebot_page_live_preview', function(livePreview) {
             if (livePreview) {
                 $livePreviewCheckbox.prop('checked', true);
             }
@@ -117,7 +117,7 @@ table {\n\
         });
 
         $(buttons.get(1)).click(this.copyToClipboard)
-        .tipsy({delayIn: 100, gravity:'sw'});
+        .tipsy({delayIn: 100, gravity: 'sw'});
 
         $(buttons.get(2)).click(this.save);
         $(buttons.get(3)).click(this.cancel);
@@ -132,12 +132,12 @@ table {\n\
         var editor = self.cache.editor;
         var session = editor.getSession();
 
-        var cssMode = require("ace/mode/css").Mode;
+        var cssMode = require('ace/mode/css').Mode;
         session.setMode(new cssMode());
         session.setUseWrapMode(true);
         session.on('change', self.contentChanged);
 
-        editor.setTheme("ace/theme/dawn");
+        editor.setTheme('ace/theme/dawn');
         editor.renderer.setShowGutter(false);
 
         setTimeout(function() {
@@ -153,12 +153,12 @@ table {\n\
                 closeOnEsc: false,
                 closeOnBgClick: false,
                 bgFadeSpeed: 0,
-                width: $("#stylebot").width() - self.RIGHT_PADDING + "px",
+                width: $('#stylebot').width() - self.RIGHT_PADDING + 'px',
                 top: '0%',
                 left: '0',
-                height: $("#stylebot").height() + "px",
+                height: $('#stylebot').height() + 'px',
                 bgOpacity: 0,
-                parent: $("#stylebot"),
+                parent: $('#stylebot'),
 
                 onOpen: function() {
                     stylebot.page.resize();
@@ -193,10 +193,10 @@ table {\n\
 
         else {
             self.modal.reset({
-                width: $("#stylebot").width() - self.RIGHT_PADDING + "px",
+                width: $('#stylebot').width() - self.RIGHT_PADDING + 'px',
                 top: '0%',
                 left: '0',
-                height: $("#stylebot").height() + "px"
+                height: $('#stylebot').height() + 'px'
             });
         }
 
@@ -232,13 +232,13 @@ table {\n\
             stylebot.page.contentChanged();
         }
 
-        stylebot.chrome.savePreference("stylebot_page_live_preview", true);
+        stylebot.chrome.savePreference('stylebot_page_live_preview', true);
     },
 
     contentChanged: function() {
         var self = stylebot.page;
 
-        if (!self.cache.livePreview){
+        if (!self.cache.livePreview) {
             return;
         }
 
@@ -301,10 +301,10 @@ table {\n\
         var self = stylebot.page;
 
         self.modal.reset({
-            width: $("#stylebot").width() - self.RIGHT_PADDING + "px",
+            width: $('#stylebot').width() - self.RIGHT_PADDING + 'px',
             top: '0%',
             left: '0',
-            height: $("#stylebot").height() + "px"
+            height: $('#stylebot').height() + 'px'
         });
 
         self.resize();
@@ -314,7 +314,7 @@ table {\n\
         if (!this.cache.marker) {
             var Range = require('ace/range').Range;
             var range = new Range(error.currentLine - 1, 0, error.currentLine, 0);
-            this.cache.marker = this.cache.editor.getSession().addMarker(range, "stylebot_warning", "line");
+            this.cache.marker = this.cache.editor.getSession().addMarker(range, 'stylebot_warning', 'line');
         }
 
         if (setCursor) {
@@ -331,7 +331,7 @@ table {\n\
     },
 
     resize: function() {
-        $("#stylebot-page-editor").css('height', $("#stylebot").height() - this.BOTTOM_EDITOR_PADDING + "px");
+        $('#stylebot-page-editor').css('height', $('#stylebot').height() - this.BOTTOM_EDITOR_PADDING + 'px');
         this.cache.editor.resize();
     }
-}
+};

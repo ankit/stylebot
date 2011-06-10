@@ -15,7 +15,7 @@ stylebot.style = {
             }
     */
     rules: {},
-    
+
     global: {},
 
     timer: null,
@@ -45,7 +45,7 @@ stylebot.style = {
         }
 
         // if domain is empty, return url
-        else if (!this.cache.url || this.cache.url == "") {
+        else if (!this.cache.url || this.cache.url == '') {
             this.cache.url = location.href;
         }
 
@@ -54,7 +54,7 @@ stylebot.style = {
             this.rules = stylebotTempRules;
             delete stylebotTempRules;
         }
-        
+
         if (stylebotGlobalRules)
         {
             this.global = stylebotGlobalRules;
@@ -68,10 +68,10 @@ stylebot.style = {
         {
             this.cache.selector = selector;
             try {
-                this.cache.elements = $(selector + ":not(#stylebot, #stylebot *)");
+                this.cache.elements = $(selector + ':not(#stylebot, #stylebot *)');
             }
 
-            catch(e) {
+            catch (e) {
                 this.cache.elements = null;
             }
         }
@@ -80,13 +80,13 @@ stylebot.style = {
     // applies property-value pair to currently selected elements as inline css, updates cache and saves the rule
     // called by basic mode
     apply: function(property, value) {
-        if (!this.cache.selector || this.cache.selector == "")
+        if (!this.cache.selector || this.cache.selector == '')
             return true;
         this.savePropertyToCache(this.cache.selector, property, value);
         this.save();
         setTimeout(function() {
             if (stylebot.style.cache.elements && stylebot.style.cache.elements.length != 0) {
-                stylebot.style.updateInlineCSS(stylebot.style.cache.elements, stylebot.style.getInlineCSS( stylebot.style.cache.selector));
+                stylebot.style.updateInlineCSS(stylebot.style.cache.elements, stylebot.style.getInlineCSS(stylebot.style.cache.selector));
             }
             // if no elements, update the stylesheet
             else {
@@ -160,10 +160,10 @@ stylebot.style = {
     applyPageCSS: function(css, save) {
         if (save === undefined)
             save = true;
-        
+
         var parsedRules = {};
-        
-        if (css != "")
+
+        if (css != '')
         {
             if (!this.parser)
                 this.parser = new CSSParser();
@@ -173,23 +173,23 @@ stylebot.style = {
                 parsedRules = CSSUtils.getRulesFromParserObject(sheet);
             }
 
-            catch(e) {
+            catch (e) {
                 //
             }
         }
-        
+
         if (parsedRules['error']) {
             return parsedRules['error'];
         }
-        
+
         this.clearInlineCSS(this.cache.elements);
         this.updateStyleElement(parsedRules);
-        
+
         if (save) {
             this.rules = parsedRules;
             this.save();
         }
-        
+
         return true;
     },
 
@@ -201,12 +201,12 @@ stylebot.style = {
         // empty rule for selector
         delete this.rules[selector];
 
-        if (css != "") {
+        if (css != '') {
 
             if (!this.parser)
                 this.parser = new CSSParser();
 
-            var sheet = this.parser.parse(selector + "{" + css + "}", false, true);
+            var sheet = this.parser.parse(selector + '{' + css + '}', false, true);
             var generatedRule = CSSUtils.getRuleFromParserObject(sheet);
 
             // save rule to cache
@@ -264,16 +264,16 @@ stylebot.style = {
 
         if (rule != undefined)
         {
-            var css = "";
+            var css = '';
             for (var property in rule) {
-                if(property.indexOf("comment") != -1) continue;
+                if (property.indexOf('comment') != -1) continue;
                 css += CSSUtils.crunchCSSForDeclaration(property, rule[property], true);
             }
 
             return css;
         }
 
-        return "";
+        return '';
     },
 
     // apply inline CSS to element(s)
@@ -285,10 +285,10 @@ stylebot.style = {
             var $this = $(this);
 
             var existingCSS = $this.attr('style');
-            existingCSS = existingCSS ? $.trim(existingCSS) : "";
+            existingCSS = existingCSS ? $.trim(existingCSS) : '';
 
-            var existingCustomCSS = $this.data("stylebotCSS");
-            existingCustomCSS = existingCustomCSS ? $.trim(existingCustomCSS) : "";
+            var existingCustomCSS = $this.data('stylebotCSS');
+            existingCustomCSS = existingCustomCSS ? $.trim(existingCustomCSS) : '';
 
             var newCSS;
 
@@ -298,8 +298,8 @@ stylebot.style = {
                 // if there is any existing inline CSS, append stylebot CSS to it
                 if (existingCSS != undefined)
                 {
-                    if (existingCSS.length != 0 && existingCSS[existingCSS.length - 1] != ";")
-                        newCSS = existingCSS + ";" + newCustomCSS;
+                    if (existingCSS.length != 0 && existingCSS[existingCSS.length - 1] != ';')
+                        newCSS = existingCSS + ';' + newCustomCSS;
                     else
                         newCSS = existingCSS + newCustomCSS;
                 }
@@ -318,7 +318,7 @@ stylebot.style = {
             $this.attr('style', newCSS);
 
             // update stylebot css data associated with element
-            $this.data("stylebotCSS", newCustomCSS);
+            $this.data('stylebotCSS', newCustomCSS);
         });
 
         // update selection box
@@ -336,7 +336,7 @@ stylebot.style = {
             var $this = $(this);
 
             var existingCSS = $this.attr('style');
-            var existingCustomCSS = $this.data("stylebotCSS");
+            var existingCustomCSS = $this.data('stylebotCSS');
 
             if (existingCustomCSS != undefined && existingCSS != undefined)
             {
@@ -344,7 +344,7 @@ stylebot.style = {
                 $this.attr('style', newCSS);
 
                 // clear stylebot css data associated with element
-                $this.data("stylebotCSS", null);
+                $this.data('stylebotCSS', null);
             }
         });
     },
@@ -377,15 +377,15 @@ stylebot.style = {
     //
     updateStyleElement: function(rules) {
         if (!this.cache.styleEl)
-            this.cache.styleEl = $("#stylebot-css");
+            this.cache.styleEl = $('#stylebot-css');
 
         if (this.cache.styleEl.length != 0) {
             this.cache.styleEl.html(CSSUtils.crunchCSS(rules, true));
         }
         else
         {
-            CSSUtils.injectCSS(CSSUtils.crunchCSS( rules, true ), "stylebot-css");
-            this.cache.styleEl = $("#stylebot-css");
+            CSSUtils.injectCSS(CSSUtils.crunchCSS(rules, true), 'stylebot-css');
+            this.cache.styleEl = $('#stylebot-css');
         }
     },
 
@@ -499,17 +499,17 @@ stylebot.style = {
 
     disable: function() {
         this.status = false;
-        $("#stylebot-css").html('');
-        $("#stylebot-global-css").html('');
+        $('#stylebot-css').html('');
+        $('#stylebot-global-css').html('');
     },
 
     enable: function() {
         if (this.status)
             return;
         this.status = true;
-        $("#stylebot-css").html(CSSUtils.crunchCSS(this.rules, true));
+        $('#stylebot-css').html(CSSUtils.crunchCSS(this.rules, true));
         if (this.global)
-            $("#stylebot-global-css").html(CSSUtils.crunchCSS(this.global, true));
+            $('#stylebot-global-css').html(CSSUtils.crunchCSS(this.global, true));
     },
 
     toggle: function() {
@@ -523,4 +523,4 @@ stylebot.style = {
         else
             this.enable();
     }
-}
+};

@@ -11,10 +11,10 @@ function createBookmark(name, url, parentId, callback) {
             parentId: id,
             title: name
         };
-        
+
         if (url)
             properties.url = url;
-            
+
         chrome.bookmarks.create(properties, callback);
     }
 
@@ -34,9 +34,9 @@ function loadBookmark(id, title, callback) {
         chrome.bookmarks.get(id, callback);
         return;
     }
-    
+
     if (title) {
-        chrome.bookmarks.search("stylebot", function(bookmarks) {
+        chrome.bookmarks.search('stylebot', function(bookmarks) {
             callback(bookmarks);
         });
     }

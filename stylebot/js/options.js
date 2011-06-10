@@ -323,7 +323,7 @@ function editGlobalStylesheet(e) {
 
     var css = rules ? CSSUtils.crunchFormattedCSS(rules, false) : '';
 
-    var headerHTML  = "Edit the <strong>Global Stylesheet</strong>:";
+    var headerHTML = 'Edit the <strong>Global Stylesheet</strong>:';
 
     var footerHTML = "<button onclick='onSave(\"*\");'>Save</button> \
     <button onclick='cache.modal.hide();'>Cancel</button>";
@@ -417,7 +417,7 @@ function editStyle(e) {
     var rules = bg_window.cache.styles.getRules(url);
     var css = CSSUtils.crunchFormattedCSS(rules, false);
 
-    var headerHTML = "Edit the CSS for <strong>" + url + "</strong>:";
+    var headerHTML = 'Edit the CSS for <strong>' + url + '</strong>:';
 
     var footerHTML = "<button onclick='onSave(\"" + url + "\");'>Save</button> \
     <button onclick='cache.modal.hide();'>Cancel</button>";
@@ -440,7 +440,7 @@ function addStyle() {
 
     setTimeout(function() {
         cache.modal.box.find('input').focus();
-    }, 40)
+    }, 40);
 }
 
 function enableAllStyles() {
@@ -520,7 +520,7 @@ function onAdd() {
     }
 
     else if (url === '*') {
-        displayErrorMessage('* is used for the global stylesheet. Please enter another URL.')
+        displayErrorMessage('* is used for the global stylesheet. Please enter another URL.');
         return false;
     }
 
@@ -602,8 +602,8 @@ function displayBackupErrorMessage(msg) {
     if ($error.length === 0)
     {
         $error = $('<div>', {
-            id      : 'backupError',
-            class   : 'error'
+            id: 'backupError',
+            class: 'error'
         });
 
         cache.backupModal.box.append($error);
@@ -618,8 +618,8 @@ function displayErrorMessage(msg) {
     if ($error.length === 0)
     {
         $error = $('<div>', {
-            id      : 'parserError',
-            class   : 'error'
+            id: 'parserError',
+            class: 'error'
         });
 
         cache.modal.box.append($error);
@@ -674,7 +674,7 @@ function export() {
     else
         json = '';
 
-    var headerHTML = "Copy and paste the following into a text file: ";
+    var headerHTML = 'Copy and paste the following into a text file: ';
 
     var footerHTML = "<button onclick='copyToClipboard(cache.backupModal.box.find(\"textarea\").attr(\"value\"));'> Copy To Clipboard </button>";
 
@@ -690,7 +690,7 @@ function copyToClipboard(text) {
 
 // Displays the modal popup for importing styles from JSON string
 function import() {
-    var headerHTML = "Paste previously exported styles: <br><span class='note'>Note</span>: Existing styles for similar URLs will be overwritten."
+    var headerHTML = "Paste previously exported styles: <br><span class='note'>Note</span>: Existing styles for similar URLs will be overwritten.";
 
     var footerHTML = "<button onclick='importCSS();'>Import</button> \
     <button onclick='cache.backupModal.hide();'>Cancel</button>";

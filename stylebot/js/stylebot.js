@@ -109,7 +109,7 @@ var stylebot = {
                 stylebot.highlight(el);
             }
 
-            catch(e) {
+            catch (e) {
                 stylebot.selectedElement = null;
             }
         }
@@ -158,7 +158,7 @@ var stylebot = {
     },
 
     createSelectionBox: function() {
-        stylebot.selectionBox = new SelectionBox(2, "stylebot-selection");
+        stylebot.selectionBox = new SelectionBox(2, 'stylebot-selection');
     },
 
     destroySelectionBox: function() {
@@ -189,7 +189,7 @@ var stylebot = {
 
     onMouseMove: function(e) {
         // for dropdown
-        if (e.target.className == "stylebot-dropdown-li") {
+        if (e.target.className == 'stylebot-dropdown-li') {
             var $el = $(e.target.innerText).get(0);
             if ($el != stylebot.hoveredElement) {
                 stylebot.highlight($el);
@@ -200,7 +200,7 @@ var stylebot = {
         if (!stylebot.shouldSelect(e.target))
             return true;
 
-        if(stylebot.belongsToStylebot(e.target)) {
+        if (stylebot.belongsToStylebot(e.target)) {
             stylebot.unhighlight();
             return true;
         }
@@ -234,7 +234,7 @@ var stylebot = {
         var $el = $(el);
         var parent = $el.closest('#stylebot, .stylebot_colorpicker, #stylebot-modal');
         var id = $el.attr('id');
-        if (parent.length != 0 || (id && id.indexOf("stylebot") != -1))
+        if (parent.length != 0 || (id && id.indexOf('stylebot') != -1))
             return true;
         return false;
     },
@@ -244,7 +244,7 @@ var stylebot = {
             stylebot.widget.basic.isColorPickerVisible ||
             stylebot.isKeyboardHelpVisible ||
             stylebot.page.isVisible ||
-            $("#stylebot-dropdown").length != 0 ||
+            $('#stylebot-dropdown').length != 0 ||
             el.tagName === 'SELECT')
         {
             return false;
@@ -253,7 +253,7 @@ var stylebot = {
     },
 
     shouldSelect: function(el) {
-        if (el.className === "stylebot-selection"
+        if (el.className === 'stylebot-selection'
             || stylebot.widget.isBeingDragged
             || stylebot.page.isVisible
             || stylebot.isKeyboardHelpVisible
@@ -264,4 +264,4 @@ var stylebot = {
         }
         return true;
     }
-}
+};
