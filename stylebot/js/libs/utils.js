@@ -292,31 +292,20 @@ var Utils = {
             }
 
             // monkey-patch the editor the correctly display the vertical scrollbar
+            var gutterWidth = editor.renderer.showGutter ? editor.renderer.$gutter.offsetWidth : 0;
             var scrollbarWidth = editor.renderer.scrollBar.getWidth();
             editor.previousScrollbarWidth = scrollbarWidth;
             editor.renderer.scrollBar.getWidth = function() {
-                return this.width > this.element.clientWidth ? scrollbarWidth : 0;
+                return this.width > this.element.clientWidth ? scrollbarWidth + editor.renderer.$padding : 0;
             };
 
             /* as for now, due to ace's limitations this is the only safe way to
-               update the markers and the wrap limit. At least, let's make sure we
-               update the editor's width only, and only if it's necessary
+               update the markers and the wrap limit.
              */
             editor.getSession().on('change', function() {
                 setTimeout(function() {
                     if (editor.renderer.scrollBar.getWidth() != editor.previousScrollbarWidth) {
-                        editor.previousScrollbarWidth = editor.renderer.scrollBar.getWidth();
-                        if (editor.previousScrollbarWidth == scrollbarWidth) {
-                            editor.renderer.scroller.style.width = Math.max(0, editor.renderer.scroller.clientWidth - scrollbarWidth) + 'px';
-                        } else {
-                            editor.renderer.scroller.style.width = Math.max(0, editor.renderer.scroller.clientWidth + scrollbarWidth) + 'px';
-                        }
-                        if (editor.renderer.session.getUseWrapMode()) {
-                            var availableWidth = editor.renderer.scroller.clientWidth - editor.renderer.$padding * 2;
-                            editor.renderer.session.adjustWrapLimit(Math.floor(availableWidth / editor.renderer.characterWidth) - 1);
-                        }
-                        editor.renderer.$size.scrollerWidth = editor.renderer.scroller.clientWidth;
-                        editor.renderer.$loop.schedule(editor.renderer.CHANGE_FULL);
+                        editor.renderer.onResize(true);
                     }
                 }, 100);
             });
