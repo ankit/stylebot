@@ -2518,7 +2518,7 @@ parseKeyframesRule: function(aToken, aSheet) {
     var token = this.getToken(true, true);
 
     /* keyframes name*/
-    if (token.isIdent()) {
+    if (token.isString() || token.isIdent()) {
         s += " " + token.value;
         keyframesRule.mSelectorText += token.value;
         token = this.getToken(true, true);
