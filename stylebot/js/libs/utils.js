@@ -292,16 +292,15 @@ var Utils = {
             }
 
             // monkey-patch the editor the correctly display the vertical scrollbar
-            var gutterWidth = editor.renderer.showGutter ? editor.renderer.$gutter.offsetWidth : 0;
             var scrollbarWidth = editor.renderer.scrollBar.getWidth();
             editor.previousScrollbarWidth = scrollbarWidth;
             editor.renderer.scrollBar.getWidth = function() {
-                return this.width > this.element.clientWidth ? scrollbarWidth + editor.renderer.$padding : 0;
+                // ideally, we should figure out a way to detect the "-3", I think it's related to the editor's border width
+                // or may be to its padding, but I'm not really sure.
+                return this.width > this.element.clientWidth ? scrollbarWidth + editor.renderer.$padding - 3 : 0;
             };
 
-            /* as for now, due to ace's limitations this is the only safe way to
-               update the markers and the wrap limit.
-             */
+            // due to ace's limitations this is the only safe way to update the markers and the wrap limit.
             editor.getSession().on('change', function() {
                 setTimeout(function() {
                     if (editor.renderer.scrollBar.getWidth() != editor.previousScrollbarWidth) {

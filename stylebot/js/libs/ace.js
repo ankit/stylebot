@@ -5024,6 +5024,7 @@ exports.scrollbarWidth = function() {
 
     var inner = exports.createElement("p");
     inner.style.width = "100%";
+    inner.style.minWidth = "0px"; // @rduenasf fix for webkit.org issue
     inner.style.height = "200px";
 
     var outer = exports.createElement("div");
@@ -5032,6 +5033,7 @@ exports.scrollbarWidth = function() {
     style.position = "absolute";
     style.left = "-10000px";
     style.overflow = "hidden";
+    style.minWidth = "0px"; // @rduenasf fix for webkit.org issue
     style.width = "200px";
     style.height = "150px";
 
