@@ -326,7 +326,7 @@ stylebot.widget = {
     updateHeight: function() {
         var self = stylebot.widget;
 
-        self.cache.box.css('height', window.innerHeight);
+        self.cache.box.css('height', $(window).height());
 
         var headerHeight = self.cache.header.height();
 
@@ -335,7 +335,7 @@ stylebot.widget = {
 
         var optionsHeight = $('#stylebot-widget-options').height();
 
-        var newHeight = window.innerHeight - (optionsHeight + headerHeight);
+        var newHeight = $(window).height() - (optionsHeight + headerHeight);
 
         if (stylebot.options.mode === "Advanced")
             self.advanced.resize(newHeight);
