@@ -18,6 +18,8 @@ var stylebot = {
 
     selectionBox: null,
 
+    selectorGenerator: null,
+
     options: {
         useShortcutKey: true,
         shortcutKey: 77, // 77 is keycode for 'm'
@@ -32,6 +34,7 @@ var stylebot = {
         this.style.initialize();
         this.setOptions(options);
         this.contextmenu.initialize();
+        this.selectorGenerator = new SelectorGenerator();
     },
 
     setOptions: function(options) {
@@ -94,15 +97,13 @@ var stylebot = {
     select: function(el, selector) {
         stylebot.disableSelection();
         // preference is given to element over selector
-        if (el)
-        {
+        if (el) {
             stylebot.selectedElement = el;
-            selector = SelectorGenerator.generate(el);
+            selector = stylebot.selectorGenerator.generate(el);
             stylebot.highlight(el);
         }
 
-        else if (selector)
-        {
+        else if (selector) {
             try {
                 el = $(selector).get(0);
                 stylebot.selectedElement = el;
@@ -114,10 +115,9 @@ var stylebot = {
             }
         }
 
-        else
-        {
+        else {
             stylebot.selectedElement = stylebot.hoveredElement;
-            selector = SelectorGenerator.generate(stylebot.selectedElement);
+            selector = stylebot.selectorGenerator.generate(stylebot.selectedElement);
         }
 
         stylebot.style.fillCache(selector);

@@ -19,7 +19,7 @@
  * @constructor
  * @param {Integer} [edgeSize] Thickness of each edge. By default, 2
  * @param {String} [edgeColor] Hexcode for color of each edge. By default, #65f166
- * @param {Element} [edgeContainer] Element inside which the edges are insterted. By default, body
+ * @param {Element} [edgeContainer] Element inside which the edges are inserted. By default, body
  */
 var SelectionBox = function(edgeSize, edgeColor, edgeContainer) {
     edgeSize = edgeSize ? edgeSize : 2;

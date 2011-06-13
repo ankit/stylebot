@@ -1,34 +1,58 @@
 /**
-  * Generate CSS Selector for an element
-  *
-  * Copyright (c) 2010 Ankit Ahuja
-  * Dual licensed under GPL and MIT licenses.
- **/
+ * Generate CSS Selector for an element
+ *
+ * Copyright (c) 2011 Ankit Ahuja
+ * Dual licensed under GPL and MIT licenses.
+ *
+ * @requires jQuery
+**/
 
-var SelectorGenerator = {
+/**
+ * Generator of CSS selectors for an element
+ * @constructor
+ * @param {String} [level] Specificity level at which to generate CSS selector.
+ * Valid values are low, high and medium. Default is medium
+ */
+var SelectorGenerator = function(level) {
+    this.specificityLevel = level ? level : 'medium';
 
-    generate: function(el, granularityLevel) {
+    var self = this;
+
+    /**
+     * Generate CSS selector for element
+     * @param {Element} el Element
+     * @return {String} CSS selector
+     * @public
+     */
+    this.generate = function(el) {
         if (!el)
             return null;
 
         $el = $(el);
 
-        if (granularityLevel === 'low')
-            return this.inspectLow($el);
+        if (self.specificityLevel === 'low')
+            return inspectAtLowSpecificity($el);
 
-        else if (granularityLevel === 'high')
-            return this.inspectHigh($el, 0);
+        else if (self.specificityLevel === 'high')
+            return inspectAtHighSpecificity($el, 0);
 
         else
-            return this.inspect($el, 0);
-    },
+            return inspect($el, 0);
+    };
 
-    // inspect an element and return a CSS selector for it. this is the default mode
-    inspect: function(el, level) {
+    /**
+     * If element has class(es), returns them as the CSS selector. Else, looks for ID.
+     * Else, traverses upto 2 levels up
+     * @param {Element} el Element to inspect
+     * @param {Integer} DOM Traversal Level. Root is at 0
+     * @return {String} CSS Selector
+     * @private
+     */
+    var inspect = function(el, level) {
         var elClass = el.attr('class');
 
         if (elClass != undefined) {
-            elClass = $.trim(elClass.replace('stylebot-selected', ''));
+            elClass = $.trim(elClass);
 
             if (elClass.length != 0)
             {
@@ -46,8 +70,7 @@ var SelectorGenerator = {
         }
 
         var elId = el.attr('id');
-        if (elId != undefined)
-        {
+        if (elId != undefined) {
             return '#' + elId;
         }
 
@@ -55,14 +78,20 @@ var SelectorGenerator = {
         elTag = elTag ? elTag.toLowerCase() : '';
 
         // don't go beyond 2 levels up
-        //
         if (level < 2)
-            return this.inspect(el.parent(), level + 1) + ' ' + elTag;
+            return inspect(el.parent(), level + 1) + ' ' + elTag;
         else
             return elTag;
-    },
+    };
 
-    inspectHigh: function(el, level) {
+    /**
+     * If element has an ID, returns #ID. Else, checks for classname and traverses upto 1 level up
+     * @param {Element} el Element to inspect
+     * @param {Integer} DOM Traversal Level. Root is at 0
+     * @return {String} CSS Selector
+     * @private
+     */
+    var inspectAtHighSpecificity = function(el, level) {
         var elId = el.attr('id');
 
         if (elId != undefined)
@@ -71,9 +100,8 @@ var SelectorGenerator = {
         var elClass = el.attr('class');
 
         if (elClass != undefined) {
-            elClass = $.trim(elClass.replace('stylebot-selected', ''));
+            elClass = $.trim(elClass);
         }
-
         else {
             elClass = '';
         }
@@ -82,18 +110,14 @@ var SelectorGenerator = {
         elTag = elTag ? elTag.toLowerCase : '';
 
         var selector;
-
-        if (level < 1)
-        {
-            selector = this.inspectHigh(el.parent(), level + 1) + ' ' + elTag;
+        if (level < 1) {
+            selector = inspectAtHighSpecificity(el.parent(), level + 1) + ' ' + elTag;
 
             if (elClass.length != 0) {
                 selector += '.' + elClass;
             }
         }
-
-        else
-        {
+        else {
             selector = elTag;
 
             if (elClass.length != 0) {
@@ -102,10 +126,16 @@ var SelectorGenerator = {
         }
 
         return selector;
-    },
+    };
 
-    inspectLow: function(el) {
+    /**
+     * Returns element's tagName as CSS selector (Low Specificity Level)
+     * @param {Element} el Element to inspect
+     * @return {String} CSS Selector
+     * @private
+     */
+    var inspectAtLowSpecificity = function(el) {
         var elTag = el.prop('tagName');
         return elTag ? elTag.toLowerCase() : '';
-    }
+    };
 };
