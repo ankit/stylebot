@@ -46,7 +46,6 @@
         "matches": ["http://*/*", "https://*/*"],
 
         "css": [
-            "css/highlight.css",
             "css/widget.css",
             "css/controls.css",
             "css/modal.css",

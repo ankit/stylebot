@@ -158,12 +158,11 @@ var stylebot = {
     },
 
     createSelectionBox: function() {
-        stylebot.selectionBox = new SelectionBox(2, 'stylebot-selection');
+        stylebot.selectionBox = new SelectionBox(null, null, $('#stylebot-container').get(0));
     },
 
     destroySelectionBox: function() {
-        if (stylebot.selectionBox)
-        {
+        if (stylebot.selectionBox) {
             stylebot.selectionBox.destroy();
             delete stylebot.selectionBox;
         }

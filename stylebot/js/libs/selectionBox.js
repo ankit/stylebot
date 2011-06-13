@@ -2,222 +2,289 @@
   * Selection of DOM elements
   * Based on Firebug's non-canvas implementation
   *
+  * A DIV is used for each edge.
+  * To highlight an element, the width, height, left offset and top offset values of edge DIVs
+  * are manipulated to surround the element.
+  *
+  * TODO: Canvas?
+  *
   * Copyright (c) 2007, Parakey Inc.
-  * Copyright (c) 2010, Ankit Ahuja
+  * Copyright (c) 2011, Ankit Ahuja
   * Licensed under GPL, MIT and BSD Licenses
  **/
 
-/*
-Currently, a DIV is used for each edge. To highlight an element, the width, height, left offset and top offset values of edge DIVs are manipulated to surround the element.
+/**
+ * @constructor
+ * @param {Integer} [edgeSize] Thickness of each edge. By default, 2
+ * @param {String} [edgeColor] Hexcode for color of each edge. By default, #65f166
+ * @param {Element} [edgeContainer] Element inside which the edges are insterted. By default, body
+ */
+var SelectionBox = function(edgeSize, edgeColor, edgeContainer) {
+    edgeSize = edgeSize ? edgeSize : 2;
+    edgeColor = edgeColor ? edgeColor : '#65f166';
+    edgeContainer = edgeContainer ? edgeContainer : $('body').get(0);
 
-TODO: Canvas?
-*/
+    /**
+     * Create an edge
+     * @return {Element} DIV for the edge
+     * @private
+     */
+    var createEdge = function() {
+        var css = {
+            'background-color': edgeColor + ' !important',
+            'position': 'absolute !important',
+            'z-index': '2147483644 !important'
+        };
 
-var SelectionBox = function(edgeSize, className) {
-    this.edgeSize = edgeSize;
-    this.className = className;
+        return $('<div>').css(css);
+    };
 
-    this.edges = {};
-    this.edges.top = this.createEdge();
-    this.edges.right = this.createEdge();
-    this.edges.bottom = this.createEdge();
-    this.edges.left = this.createEdge();
+    var edges = {};
+    edges.top = createEdge();
+    edges.right = createEdge();
+    edges.bottom = createEdge();
+    edges.left = createEdge();
 
-    for (var edge in this.edges)
-        this.edges[edge].appendTo($('#stylebot-container').get(0));
-};
+    for (var edge in edges)
+        edges[edge].appendTo(edgeContainer);
 
-SelectionBox.prototype.createEdge = function() {
-    return $('<div>', {
-        class: this.className
-    });
-};
+    var self = this;
 
-SelectionBox.prototype.moveEdge = function(edge, t, l) {
-    this.edges[edge].css('top', t + 'px');
-    this.edges[edge].css('left', l + 'px');
-};
+    /**
+     * Highlight an element. Removes highlight from previously highlighted element
+     * @param {Element} el DOM element to highlight
+     * @public
+     */
+    this.highlight = function(el) {
+        if (!el) {
+            self.hide(); return;
+        }
+        if (el.nodeType != 1)
+            el = el.parentNode;
 
-SelectionBox.prototype.resizeEdge = function(edge, h, w) {
-    this.edges[edge].height(h);
-    this.edges[edge].width(w);
-};
+        var scrollbarSize = 17;
+        var windowSize = getWindowSize();
+        var scrollSize = getWindowScrollSize();
+        var scrollPosition = getWindowScrollPosition();
 
-SelectionBox.prototype.hide = function() {
-    for (var edge in this.edges)
-        this.edges[edge].width(0).height(0);
-};
+        var box = getElementBox(el);
+        var top = box.top;
+        var left = box.left;
+        var height = box.height;
+        var width = box.width;
 
-// Modified version of drawOutline() from Firebug Lite
-SelectionBox.prototype.highlight = function(el) {
-    if (!el) {
-        this.hide(); return;
-    }
-    if (el.nodeType != 1)
-        el = el.parentNode;
+        var freeHorizontalSpace = scrollPosition.left + windowSize.width - left - width -
+                (scrollSize.height > windowSize.height ? // is *vertical* scrollbar visible
+                 scrollbarSize : 0);
 
-    var scrollbarSize = 17;
-    var windowSize = this.getWindowSize();
-    var scrollSize = this.getWindowScrollSize();
-    var scrollPosition = this.getWindowScrollPosition();
+        var freeVerticalSpace = scrollPosition.top + windowSize.height - top - height -
+                (scrollSize.width > windowSize.width ? // is *horizontal* scrollbar visible
+                scrollbarSize : 0);
 
-    var box = this.getElementBox(el);
-    var top = box.top;
-    var left = box.left;
-    var height = box.height;
-    var width = box.width;
+        var numVerticalBorders = freeVerticalSpace > 0 ? 2 : 1;
 
-    var freeHorizontalSpace = scrollPosition.left + windowSize.width - left - width -
-            (scrollSize.height > windowSize.height ? // is *vertical* scrollbar visible
-             scrollbarSize : 0);
+        // top edge
+        moveEdge('top', top - edgeSize, left);
+        resizeEdge('top', edgeSize, width);
 
-    var freeVerticalSpace = scrollPosition.top + windowSize.height - top - height -
-            (scrollSize.width > windowSize.width ? // is *horizontal* scrollbar visible
-            scrollbarSize : 0);
+        // left edge
+        moveEdge('left', top - edgeSize, left - edgeSize);
+        resizeEdge('left', height + numVerticalBorders * edgeSize, edgeSize);
 
-    var numVerticalBorders = freeVerticalSpace > 0 ? 2 : 1;
+        // bottom edge
+        if (freeVerticalSpace > 0) {
+            moveEdge('bottom', top + height, left);
+            resizeEdge('bottom', edgeSize, width);
+        }
+        else {
+            moveEdge('bottom', -2 * edgeSize, -2 * edgeSize);
+            resizeEdge('bottom', edgeSize, edgeSize);
+        }
 
-    // top edge
-    this.moveEdge('top', top - this.edgeSize, left);
-    this.resizeEdge('top', this.edgeSize, width);
+        // right edge
+        if (freeHorizontalSpace > 0) {
+            moveEdge('right', top - edgeSize, left + width);
+            resizeEdge('right', height + numVerticalBorders * edgeSize, (freeHorizontalSpace < edgeSize ? freeHorizontalSpace : edgeSize));
+        }
+        else {
+            moveEdge('right', -2 * edgeSize, -2 * edgeSize);
+            resizeEdge('right', edgeSize, edgeSize);
+        }
+    };
 
-    // left edge
-    this.moveEdge('left', top - this.edgeSize, left - this.edgeSize);
-    this.resizeEdge('left', height + numVerticalBorders * this.edgeSize, this.edgeSize);
+    /**
+     * Hide selection edges
+     * @public
+     */
+    this.hide = function() {
+        for (var edge in edges)
+            edges[edge].width(0).height(0);
+    };
 
-    // bottom edge
-    if (freeVerticalSpace > 0) {
-        this.moveEdge('bottom', top + height, left);
-        this.resizeEdge('bottom', this.edgeSize, width);
-    }
-    else {
-        this.moveEdge('bottom', -2 * this.edgeSize, -2 * this.edgeSize);
-        this.resizeEdge('bottom', this.edgeSize, this.edgeSize);
-    }
+    /**
+     * Remove the selection box from DOM
+     * @public
+     */
+     this.destroy = function() {
+        for (var edge in edges)
+            edges[edge].remove();
+    };
 
-    // right edge
-    if (freeHorizontalSpace > 0) {
-        this.moveEdge('right', top - this.edgeSize, left + width);
-        this.resizeEdge('right', height + numVerticalBorders * this.edgeSize, (freeHorizontalSpace < this.edgeSize ? freeHorizontalSpace : this.edgeSize));
-    }
-    else {
-        this.moveEdge('right', -2 * this.edgeSize, -2 * this.edgeSize);
-        this.resizeEdge('right', this.edgeSize, this.edgeSize);
-    }
-};
+    /**
+     * Move an edge
+     * @param {Element} edge DIV
+     * @param {Integer} t Top offset
+     * @param {Integer} l Left offset
+     * @private
+     */
+    var moveEdge = function(edge, t, l) {
+        edges[edge].css('top', t + 'px');
+        edges[edge].css('left', l + 'px');
+    };
 
-SelectionBox.prototype.destroy = function() {
-    for (var edge in this.edges)
-        this.edges[edge].remove();
-};
+    /**
+     * Resize an edge
+     * @param {Element} edge DIV
+     * @param {Integer} h Height of edge to set
+     * @param {Integer} w Width of edge to set
+     * @private
+     */
+    var resizeEdge = function(edge, h, w) {
+        edges[edge].height(h);
+        edges[edge].width(w);
+    };
 
-// Unmodified methods from Firebug Lite
-SelectionBox.prototype.getElementBox = function(el)
-{
-    var result = {};
-
-    if (el.getBoundingClientRect)
+    /**
+     * Get an element's offset and dimensions
+     * @param {Element} el Element
+     * @return {Object} Offset and dimensions of element. E.g. {top:1, left: 2, height: 3, width: 4}
+     * @private
+     */
+    var getElementBox = function(el)
     {
-        var rect = el.getBoundingClientRect();
+        var result = {};
 
-        var scroll = this.getWindowScrollPosition();
+        if (el.getBoundingClientRect) {
+            var rect = el.getBoundingClientRect();
 
-        result.top = Math.round(rect.top + scroll.top);
-        result.left = Math.round(rect.left + scroll.left);
-        result.height = Math.round(rect.bottom - rect.top);
-        result.width = Math.round(rect.right - rect.left);
-    }
-    else
-    {
-        var position = this.getElementPosition(el);
+            var scroll = getWindowScrollPosition();
 
-        result.top = position.top;
-        result.left = position.left;
-        result.height = el.offsetHeight;
-        result.width = el.offsetWidth;
-    }
+            result.top = Math.round(rect.top + scroll.top);
+            result.left = Math.round(rect.left + scroll.left);
+            result.height = Math.round(rect.bottom - rect.top);
+            result.width = Math.round(rect.right - rect.left);
+        }
+        else {
+            var position = getElementPosition(el);
 
-    return result;
-};
+            result.top = position.top;
+            result.left = position.left;
+            result.height = el.offsetHeight;
+            result.width = el.offsetWidth;
+        }
 
-SelectionBox.prototype.getElementPosition = function(el) {
-    var left = 0;
-    var top = 0;
+        return result;
+    };
 
-    do
-    {
-        left += el.offsetLeft;
-        top += el.offsetTop;
-    }
-    while (el = el.offsetParent);
+    /**
+     * Get a window's scroll width and height
+     * @return {Object} Scroll width and height. {width: 12, height: 12}
+     * @private
+     */
+    var getWindowScrollSize = function() {
+        var width = 0, height = 0, el;
 
-    return {left: left, top: top};
-};
+        // first try the document.documentElement scroll size
+        if ((el = document.documentElement) &&
+           (el.scrollHeight || el.scrollWidth))
+        {
+            width = el.scrollWidth;
+            height = el.scrollHeight;
+        }
 
-SelectionBox.prototype.getWindowSize = function() {
-    var width = 0, height = 0, el;
+        // then we need to check if document.body has a bigger scroll size value
+        // because sometimes depending on the browser and the page, the document.body
+        // scroll size returns a smaller (and wrong) measure
+        if ((el = document.body) && (el.scrollHeight || el.scrollWidth) &&
+            (el.scrollWidth > width || el.scrollHeight > height))
+        {
+            width = el.scrollWidth;
+            height = el.scrollHeight;
+        }
 
-    if (typeof window.innerWidth == 'number')
-    {
-        width = window.innerWidth;
-        height = window.innerHeight;
-    }
-    else if ((el = document.documentElement) && (el.clientHeight || el.clientWidth))
-    {
-        width = el.clientWidth;
-        height = el.clientHeight;
-    }
-    else if ((el = document.body) && (el.clientHeight || el.clientWidth))
-    {
-        width = el.clientWidth;
-        height = el.clientHeight;
-    }
+        return {width: width, height: height};
+    };
 
-    return {width: width, height: height};
-};
+    /**
+     * Get an element's left and top offset
+     * @param {Element} el Element
+     * @return {Object} Object containing left and top offset values for element.
+     * @private
+     */
+    var getElementPosition = function(el) {
+        var left = 0;
+        var top = 0;
 
-SelectionBox.prototype.getWindowScrollSize = function() {
-    var width = 0, height = 0, el;
+        do
+        {
+            left += el.offsetLeft;
+            top += el.offsetTop;
+        }
+        while (el = el.offsetParent);
 
-    // first try the document.documentElement scroll size
-    if ((el = document.documentElement) &&
-       (el.scrollHeight || el.scrollWidth))
-    {
-        width = el.scrollWidth;
-        height = el.scrollHeight;
-    }
+        return {left: left, top: top};
+    };
 
-    // then we need to check if document.body has a bigger scroll size value
-    // because sometimes depending on the browser and the page, the document.body
-    // scroll size returns a smaller (and wrong) measure
-    if ((el = document.body) && (el.scrollHeight || el.scrollWidth) &&
-        (el.scrollWidth > width || el.scrollHeight > height))
-    {
-        width = el.scrollWidth;
-        height = el.scrollHeight;
-    }
+    /**
+     * Get the DOM window's width and height
+     * @return {Object} Example: {width: 600, height: 600}
+     * @private
+     */
+    var getWindowSize = function() {
+        var width = 0, height = 0, el;
 
-    return {width: width, height: height};
-};
+        if (typeof window.innerWidth == 'number')
+        {
+            width = window.innerWidth;
+            height = window.innerHeight;
+        }
+        else if ((el = document.documentElement) && (el.clientHeight || el.clientWidth))
+        {
+            width = el.clientWidth;
+            height = el.clientHeight;
+        }
+        else if ((el = document.body) && (el.clientHeight || el.clientWidth))
+        {
+            width = el.clientWidth;
+            height = el.clientHeight;
+        }
 
-SelectionBox.prototype.getWindowScrollPosition = function() {
-    var top = 0, left = 0, el;
+        return {width: width, height: height};
+    };
 
-    if (typeof window.pageYOffset == 'number')
-    {
-        top = window.pageYOffset;
-        left = window.pageXOffset;
-    }
-    else if ((el = document.body) && (el.scrollTop || el.scrollLeft))
-    {
-        top = el.scrollTop;
-        left = el.scrollLeft;
-    }
-    else if ((el = document.documentElement) && (el.scrollTop || el.scrollLeft))
-    {
-        top = el.scrollTop;
-        left = el.scrollLeft;
-    }
+    /**
+     * Get DOM window's scroll position
+     * @return {Object} With top and left properties
+     * @private
+     */
+    var getWindowScrollPosition = function() {
+        var top = 0, left = 0, el;
 
-    return {top: top, left: left};
+        if (typeof window.pageYOffset === 'number') {
+            top = window.pageYOffset;
+            left = window.pageXOffset;
+        }
+
+        else if ((el = document.body) && (el.scrollTop || el.scrollLeft)) {
+            top = el.scrollTop;
+            left = el.scrollLeft;
+        }
+
+        else if ((el = document.documentElement) && (el.scrollTop || el.scrollLeft)) {
+            top = el.scrollTop;
+            left = el.scrollLeft;
+        }
+
+        return {top: top, left: left};
+    };
 };
