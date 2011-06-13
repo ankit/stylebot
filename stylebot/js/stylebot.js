@@ -231,7 +231,7 @@ var stylebot = {
 
     belongsToStylebot: function(el) {
         var $el = $(el);
-        var parent = $el.closest('#stylebot, .stylebot_colorpicker, #stylebot-modal');
+        var parent = $el.closest('#stylebot-container');
         var id = $el.attr('id');
         if (parent.length != 0 || (id && id.indexOf('stylebot') != -1))
             return true;
@@ -252,8 +252,7 @@ var stylebot = {
     },
 
     shouldSelect: function(el) {
-        if (el.className === 'stylebot-selection'
-            || stylebot.widget.isBeingDragged
+        if (stylebot.widget.isBeingDragged
             || stylebot.page.isVisible
             || stylebot.isKeyboardHelpVisible
             || stylebot.hoveredElement === el
