@@ -2,6 +2,8 @@
   * Selection of DOM elements
   * Based on Firebug's non-canvas implementation
   *
+  * @requires jQuery
+  *
   * A DIV is used for each edge.
   * To highlight an element, the width, height, left offset and top offset values of edge DIVs
   * are manipulated to surround the element.
