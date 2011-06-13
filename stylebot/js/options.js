@@ -193,13 +193,23 @@ function translateOptionValue(name, value) {
 function fillStyles() {
     var container = $('#styles');
     container.html('');
+    var count = 0;
     // newest styles are shown at the top
-    //
     for (var url in bg_window.cache.styles.get()) {
         // skip the global styles
         if (url === '*') continue;
         container.prepend(createStyleUI(url));
+        count ++;
     }
+    setStyleCount(count);
+}
+
+function getStyleCount() {
+    return parseInt($('#style-count').text());
+}
+
+function setStyleCount(val) {
+    $('#style-count').text(val);
 }
 
 // Adds a new style to the UI
@@ -295,6 +305,7 @@ function removeStyle(e) {
 
     bg_window.cache.styles.delete(url.text());
     bg_window.cache.styles.push();
+    setStyleCount(getStyleCount() - 1);
 }
 
 // Update Global Stylesheet UI
@@ -440,7 +451,7 @@ function addStyle() {
 
     setTimeout(function() {
         cache.modal.box.find('input').focus();
-    }, 40);
+    }, 50);
 }
 
 function enableAllStyles() {
@@ -565,11 +576,8 @@ function saveStyle(url, css, add) {
         try {
             var rules = CSSUtils.getRulesFromParserObject(sheet);
             // syntax error!
-            //
-            if (rules['error'])
-            {
+            if (rules['error']) {
                 // todo: notify user of syntax error and highlight the error causing line
-                //
                 displaySyntaxError(rules['error']);
                 return false;
             }
@@ -580,8 +588,10 @@ function saveStyle(url, css, add) {
             bg_window.cache.styles.toggle(url, enabled);
             bg_window.cache.styles.push();
 
-            if (add)
+            if (add) {
                 createStyleUI(url, bg_window.cache.styles.get(url)).prependTo($('#styles'));
+                setStyleCount(getStyleCount() + 1);
+            }
 
             return true;
         }
@@ -901,7 +911,7 @@ function filterStyles(value) {
 
 function resizeEditor(bottomSpace) {
     if (!bottomSpace) {
-        bottomSpace = 60;
+        bottomSpace = 65;
     }
 
     var $modal = $('#stylebot-modal');

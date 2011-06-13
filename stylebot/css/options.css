@@ -228,6 +228,10 @@ li.option:first-of-type {
     width: 120px;
 }
 
+#style-count-container {
+    color: #ccc;
+}
+
 /** MODAL POPUP **/
 
 #stylebot-modal {
@@ -246,6 +250,7 @@ li.option:first-of-type {
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
+    min-height: 24px;
 }
 
 #stylebot-modal input {
