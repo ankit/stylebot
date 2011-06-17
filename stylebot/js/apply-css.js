@@ -9,7 +9,12 @@ var stylebotTempRules;
 var stylebotTempGlobalRules;
 
 // send request to background.html to get stylebot rules for page
-chrome.extension.sendRequest({name: 'getCombinedRulesForPage', url: window.location.href}, function(response) {
+var request;
+if (window === window.top)
+    request = 'getCombinedRulesForPage';
+else
+    request = 'getCombinedRulesForIframe';
+chrome.extension.sendRequest({name: request, url: window.location.href}, function(response) {
     // global css rules
     if (response.global) {
         stylebotTempGlobalRules = response.global;

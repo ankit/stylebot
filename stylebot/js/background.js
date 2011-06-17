@@ -21,9 +21,12 @@ var cache = {
     },
 
     // indices of enabled accordions in panel. by default, all are enabled
-    enabledAccordions: [0, 1, 2, 3]
-};
+    enabledAccordions: [0, 1, 2, 3],
 
+    // temporary cached map of tabId to rules. This is used to prevent recalculating rules for iframes
+    // the cache is only live until the tab completes loading or is closed, whichever occurs first
+    loadingTabs: []
+};
 
 // Initialize
 function init() {
@@ -83,6 +86,9 @@ function attachListeners() {
         showPageActions();
     }
 
+    chrome.tabs.onUpdated.addListener(onTabUpdated);
+    chrome.tabs.onRemoved.addListener(onTabRemoved);
+
     chrome.extension.onRequest.addListener(
         function(request, sender, sendResponse) {
             switch (request.name) {
@@ -95,6 +101,12 @@ function attachListeners() {
                 case 'disablePageAction':
                     if (cache.options.showPageAction)
                         disablePageAction(sender.tab);
+                    sendResponse({});
+                    break;
+
+                case 'highlightPageAction':
+                    if (cache.options.showPageAction)
+                        highlightPageAction(sender.tab);
                     sendResponse({});
                     break;
 
@@ -132,7 +144,11 @@ function attachListeners() {
                     break;
 
                 case 'getCombinedRulesForPage':
-                    sendResponse(cache.styles.getCombinedRulesForPage(request.url));
+                    sendResponse(cache.styles.getCombinedRulesForPage(request.url, sender.tab));
+                    break;
+
+                case 'getCombinedRulesForIframe':
+                    sendResponse(cache.styles.getCombinedRulesForIframe(request.url, sender.tab));
                     break;
 
                 case 'fetchOptions':
@@ -164,34 +180,30 @@ function attachListeners() {
     });
 }
 
-
-// Toggle CSS editing when page icon is clicked
-function onPageActionClick(tab) {
-    chrome.tabs.sendRequest(tab.id, { name: 'toggle' }, function(response) {
-        if (response.status)
-            enablePageAction(tab);
-        else
-            disablePageAction(tab);
-    });
+function onTabUpdated(tabId, changeInfo, tab) {
+    if (tab.status === 'completed') {
+        clearTabResponseCache(tabId);
+    }
 }
 
-function refreshPageAction(tab) {
-    chrome.tabs.sendRequest(tab.id, { name: 'status' }, function(response) {
-        if (response.status)
-            enablePageAction(tab);
-        else
-            disablePageAction(tab);
-    });
+function onTabRemoved(tabId, removeInfo) {
+    clearTabResponseCache(tabId);
 }
 
-// Update page action to indicate that stylebot is not visible
+function clearTabResponseCache(tabId) {
+    if (cache.loadingTabs[tabId])
+        delete cache.loadingTabs[tabId];
+}
+
+// Update page action to indicate that stylebot panel is not visible and no CSS is applied to the current page
 function disablePageAction(tab) {
-    // if a style is applied to the current page
-    if (cache.styles.exists(tab.url))
-        chrome.pageAction.setIcon({ tabId: tab.id, path: 'images/css_highlighted.png' });
-    else
-        chrome.pageAction.setIcon({ tabId: tab.id, path: 'images/css.png' });
+    chrome.pageAction.setIcon({ tabId: tab.id, path: 'images/css.png' });
+    chrome.pageAction.setTitle({ tabId: tab.id, title: 'Click to start editing using Stylebot' });
+}
 
+// Update page action to indicate that stylebot panel is not visible but CSS is applied to the current page
+function highlightPageAction(tab) {
+    chrome.pageAction.setIcon({ tabId: tab.id, path: 'images/css_highlighted.png' });
     chrome.pageAction.setTitle({ tabId: tab.id, title: 'Click to start editing using Stylebot' });
 }
 
@@ -222,10 +234,8 @@ function showPageActions() {
             }
         }
     });
-
     chrome.pageAction.onClicked.addListener(onPageActionClick);
-    chrome.tabs.onUpdated.addListener(onTabUpdated);
-    chrome.tabs.onSelectionChanged.addListener(onTabSelectionChanged);
+    chrome.tabs.onSelectionChanged.addListener(updatePageActionOnTabSelectionChanged);
 }
 
 // Hide page action on all tabs
@@ -245,26 +255,30 @@ function hidePageActions() {
             }
         }
     });
-
     chrome.pageAction.onClicked.removeListener(onPageActionClick);
-    chrome.tabs.onUpdated.removeListener(onTabUpdated);
-    chrome.tabs.onSelectionChanged.removeListener(onTabSelectionChanged);
+    chrome.tabs.onSelectionChanged.removeListener(updatePageActionOnTabSelectionChanged);
 }
 
-
-// Update the page action as soon as the tab gets updated, but only once per
-// tab to avoid bad performance. The tab.status should be different from
-// complete.
-function onTabUpdated(tabId, changeInfo, tab) {
-    if (tab.status != 'complete' && tab.url.isValidUrl()) {
-        chrome.pageAction.show(tabId);
-        disablePageAction(tab);
-    }
+// Toggle CSS editing when page icon is clicked
+function onPageActionClick(tab) {
+    chrome.tabs.sendRequest(tab.id, { name: 'toggle' }, function(response) {
+        if (response.status)
+            enablePageAction(tab);
+        else
+            disablePageAction(tab);
+    });
 }
 
-function onTabSelectionChanged(tabId, selectInfo) {
+function updatePageActionOnTabSelectionChanged(tabId, selectInfo) {
     chrome.tabs.get(tabId, function(tab) {
-        refreshPageAction(tab);
+        chrome.tabs.sendRequest(tab.id, {name: 'status'}, function(response) {
+            if (response.status)
+                enablePageAction(tab);
+            else if (response.rules || response.global)
+                highlightPageAction(tab);
+            else
+                disablePageAction(tab);
+        });
     });
 }
 
@@ -311,8 +325,7 @@ function loadStylesIntoCache() {
 
 // Load options from localStorage into background cache
 function loadOptionsIntoCache() {
-    for (var option in cache.options)
-    {
+    for (var option in cache.options) {
         var dataStoreValue = localStorage['stylebot_option_' + option];
         if (dataStoreValue) {
             if (dataStoreValue == 'true' || dataStoreValue == 'false')
@@ -453,12 +466,9 @@ function removeContextMenu() {
 function sendRequestToAllTabs(req) {
     chrome.windows.getAll({ populate: true }, function(windows) {
         var w_len = windows.length;
-
-        for (var i = 0; i < w_len; i++)
-        {
+        for (var i = 0; i < w_len; i++) {
             var t_len = windows[i].tabs.length;
-            for (var j = 0; j < t_len; j++)
-            {
+            for (var j = 0; j < t_len; j++) {
                 chrome.tabs.sendRequest(windows[i].tabs[j].id, req, function(response) {});
             }
         }
@@ -771,7 +781,7 @@ Styles.prototype.exists = function(aURL) {
  * @param {String} aURL The URL to retrieve the rules for.
  * @return {Object} rules: The rules. url: The identifier representing the URL.
  */
-Styles.prototype.getCombinedRulesForPage = function(aURL) {
+Styles.prototype.getCombinedRulesForPage = function(aURL, tab) {
     // global css rules
     var global;
     if (this.isEmpty('*') || !this.isEnabled('*'))
@@ -779,56 +789,98 @@ Styles.prototype.getCombinedRulesForPage = function(aURL) {
     else
         global = this.getRules('*');
 
-    // if the URL is stylebot.me, return rules for stylebot.me if they exist
-    // otherwise, return null
-    if (aURL.indexOf('stylebot.me') != -1) {
-        if (!this.isEmpty('stylebot.me')) {
-            return {rules: this.getRules('stylebot.me'), url: 'stylebot.me', global: global};
-        } else {
-            return {rules: null, url: null, global: global};
-        }
-    }
-
     if (!aURL.isOfHTMLType())
         return {rules: null, url: null, global: null};
 
-    // this will contain the combined set of evaluated rules to be applied to
-    // the page. longer, more specific URLs get the priority for each selector
-    // and property
-    var rules = {};
-    var url_for_page = '';
+    var response;
 
-    for (var url in this.styles)
-    {
-        if (!this.isEnabled(url) || url === '*') continue;
+    // if the URL is stylebot.me, return rules for stylebot.me if they exist
+    // otherwise, return response as null
+    if (aURL.indexOf('stylebot.me') != -1) {
+        if (!this.isEmpty('stylebot.me')) {
+            response = {
+                rules: this.getRules('stylebot.me'),
+                url: 'stylebot.me',
+                global: global
+            };
+        }
+        else {
+            response = {
+                rules: null,
+                url: null,
+                global: global
+            };
+        }
+    }
 
-        if (aURL.matchesPattern(url)) {
-            if (url.length > url_for_page.length)
-                url_for_page = url;
+    else {
+        // this will contain the combined set of evaluated rules to be applied to
+        // the page. longer, more specific URLs get the priority for each selector
+        // and property
+        var rules = {};
+        var url_for_page = '';
+        var found = false;
 
-            // iterate over each selector in styles
-            var urlRules = this.getRules(url);
+        for (var url in this.styles) {
+            if (!this.isEnabled(url) || url === '*') continue;
 
-            for (var selector in urlRules) {
-                // if no rule exists for selector, simply copy the rule
-                if (rules[selector] == undefined)
-                    rules[selector] = cloneObject(urlRules[selector]);
-                // otherwise, iterate over each property
-                else {
-                    for (var property in urlRules[selector]) {
-                        if (rules[selector][property] == undefined || url == url_for_page)
-                            rules[selector][property] = urlRules[selector][property];
+            if (aURL.matchesPattern(url)) {
+                if (!found) found = true;
+
+                if (url.length > url_for_page.length)
+                    url_for_page = url;
+
+                // iterate over each selector in styles
+                var urlRules = this.getRules(url);
+
+                for (var selector in urlRules) {
+                    // if no rule exists for selector, simply copy the rule
+                    if (rules[selector] == undefined)
+                        rules[selector] = cloneObject(urlRules[selector]);
+                    // otherwise, iterate over each property
+                    else {
+                        for (var property in urlRules[selector]) {
+                            if (rules[selector][property] == undefined || url == url_for_page)
+                                rules[selector][property] = urlRules[selector][property];
+                        }
                     }
                 }
             }
         }
+        if (found)
+            response = {
+                rules: rules,
+                url: url_for_page,
+                global: global
+            };
+        else
+            response = {
+                rules: null,
+                url: null,
+                global: global
+            };
     }
 
-    if (rules != undefined)
-        return {rules: rules, url: url_for_page, global: global};
-    else
-        return {rules: null, url: null, global: global};
+    cache.loadingTabs[tab.id] = response;
+    // update page action
+    if (cache.options.showPageAction) {
+        chrome.pageAction.show(tab.id);
+        if (response.rules || response.global)
+            highlightPageAction(tab);
+        else
+            disablePageAction(tab);
+    }
+
+    return response;
 };
+
+Styles.prototype.getCombinedRulesForIframe = function(aURL, tab) {
+    if (cache.loadingTabs[tab.id]) {
+        return cache.loadingTabs[tab.id];
+    }
+    else
+        return this.getCombinedRulesForPage(aURL, tab);
+}
 
 /**
  * Retrieves Get all the global rules

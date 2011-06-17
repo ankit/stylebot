@@ -56,7 +56,7 @@ var stylebot = {
         this.style.enable();
         this.widget.open();
         this.status = true;
-        this.chrome.setIcon(true);
+        this.chrome.setPageAction(true);
         this.enableSelection();
         attachKeyboardShortcuts();
     },
@@ -64,7 +64,7 @@ var stylebot = {
     close: function() {
         stylebot.widget.close();
         stylebot.status = false;
-        stylebot.chrome.setIcon(false);
+        stylebot.chrome.setPageAction(false);
         stylebot.style.reset();
         stylebot.disableSelection();
         stylebot.detachClickListener();

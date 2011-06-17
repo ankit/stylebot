@@ -5,9 +5,11 @@
   **/
 
 stylebot.chrome = {
-    setIcon: function(value) {
-        if (value)
+    setPageAction: function(status) {
+        if (status)
             chrome.extension.sendRequest({ name: 'enablePageAction' }, function() {});
+        else if (!$.isEmptyObject(stylebot.style.rules) || !$.isEmptyObject(stylebot.style.global))
+            chrome.extension.sendRequest({ name: 'highlightPageAction' }, function() {});
         else
             chrome.extension.sendRequest({ name: 'disablePageAction' }, function() {});
     },
@@ -72,26 +74,26 @@ chrome.extension.onRequest.addListener(
         if (request.name === 'status') {
             if (window != window.top)
                 return;
-            sendResponse({ status: stylebot.status });
+            sendResponse({
+                status: stylebot.status,
+                rules: $.isEmptyObject(stylebot.style.rules) ? null : stylebot.style.rules,
+                global: $.isEmptyObject(stylebot.style.global) ? null : stylebot.style.global
+            });
         }
 
-        else if (request.name === 'toggle')
-        {
+        else if (request.name === 'toggle') {
             if (window != window.top)
                 return;
-
             stylebot.toggle();
             sendResponse({ status: stylebot.status });
         }
 
-        else if (request.name === 'setOptions')
-        {
+        else if (request.name === 'setOptions') {
             stylebot.setOptions(request.options);
             sendResponse({});
         }
 
-        else if (request.name === 'openWidget')
-        {
+        else if (request.name === 'openWidget') {
             stylebot.contextmenu.openWidget();
             sendResponse({});
         }
@@ -112,7 +114,6 @@ chrome.extension.onRequest.addListener(
             if (!window.top)
                 return;
             stylebot.style.toggle();
-
             sendResponse({ status: stylebot.style.status });
         }
 
