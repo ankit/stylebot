@@ -38,39 +38,32 @@ stylebot.style = {
 
     // initialize rules and url from temporary variables in apply-css.js
     initialize: function() {
-        if (stylebotTempUrl)
-        {
+        if (stylebotTempUrl) {
             this.cache.url = stylebotTempUrl;
             delete stylebotTempUrl;
         }
-
         // if domain is empty, return url
-        else if (!this.cache.url || this.cache.url == '') {
+        else if (!this.cache.url || this.cache.url === '') {
             this.cache.url = location.href;
         }
 
-        if (stylebotTempRules)
-        {
+        if (stylebotTempRules) {
             this.rules = stylebotTempRules;
             delete stylebotTempRules;
         }
-
-        if (stylebotGlobalRules)
-        {
-            this.global = stylebotGlobalRules;
-            delete stylebotGlobalRules;
+        if (stylebotTempGlobalRules) {
+            this.global = stylebotTempGlobalRules;
+            delete stylebotTempGlobalRules;
         }
     },
 
     // update current selector and selected elements
     fillCache: function(selector) {
-        if (selector != this.cache.selector)
-        {
+        if (selector != this.cache.selector) {
             this.cache.selector = selector;
             try {
                 this.cache.elements = $(selector + ':not(#stylebot, #stylebot *)');
             }
-
             catch (e) {
                 this.cache.elements = null;
             }
@@ -104,8 +97,7 @@ stylebot.style = {
         // calculating timer duration based upon number of elements
         var duration;
 
-        if (stylebot.style.cache.elements)
-        {
+        if (stylebot.style.cache.elements) {
             var noOfElements = stylebot.style.cache.elements.length;
 
             if (noOfElements >= 400)
@@ -120,8 +112,7 @@ stylebot.style = {
             duration = 0;
         }
 
-        if (stylebot.style.updateCSSTimer)
-        {
+        if (stylebot.style.updateCSSTimer) {
             clearTimeout(stylebot.style.updateCSSTimer);
             stylebot.style.updateCSSTimer = null;
         }
@@ -130,8 +121,7 @@ stylebot.style = {
 
             stylebot.style.saveRuleFromCSS(css, stylebot.style.cache.selector);
 
-            if (stylebot.style.cache.elements && stylebot.style.cache.elements.length != 0)
-            {
+            if (stylebot.style.cache.elements && stylebot.style.cache.elements.length != 0) {
                 var newCSS = CSSUtils.crunchCSSForSelector(
                     stylebot.style.rules,
                     stylebot.style.cache.selector,
@@ -140,7 +130,6 @@ stylebot.style = {
 
                 stylebot.style.updateInlineCSS(stylebot.style.cache.elements, newCSS);
             }
-
             else
                 stylebot.style.updateStyleElement(stylebot.style.rules);
 
@@ -163,8 +152,7 @@ stylebot.style = {
 
         var parsedRules = {};
 
-        if (css != '')
-        {
+        if (css != '') {
             if (!this.parser)
                 this.parser = new CSSParser();
 
@@ -202,7 +190,6 @@ stylebot.style = {
         delete this.rules[selector];
 
         if (css != '') {
-
             if (!this.parser)
                 this.parser = new CSSParser();
 
@@ -219,13 +206,10 @@ stylebot.style = {
     savePropertyToCache: function(selector, property, value) {
         // check if the selector already exists in the list
         var rule = this.rules[selector];
-        if (rule != undefined)
-        {
-            if (!this.filter(property, value))
-            {
+        if (rule != undefined) {
+            if (!this.filter(property, value)) {
                 // does a value for property already exist
-                if (rule[property] != undefined)
-                {
+                if (rule[property] != undefined) {
                     delete this.rules[selector][property];
 
                     // if no properties left, remove rule as well
@@ -238,13 +222,11 @@ stylebot.style = {
                         delete this.rules[selector];
                 }
             }
-
             else
                 rule[property] = value;
         }
 
-        else if (this.filter(property, value))
-        {
+        else if (this.filter(property, value)) {
             this.rules[selector] = new Object();
             this.rules[selector][property] = value;
         }
@@ -262,8 +244,7 @@ stylebot.style = {
     getInlineCSS: function(selector) {
         var rule = this.rules[selector];
 
-        if (rule != undefined)
-        {
+        if (rule != undefined) {
             var css = '';
             for (var property in rule) {
                 if (property.indexOf('comment') != -1) continue;
@@ -293,23 +274,19 @@ stylebot.style = {
             var newCSS;
 
             // if stylebot css is being applied to the element for the first time
-            if (!existingCustomCSS)
-            {
+            if (!existingCustomCSS) {
                 // if there is any existing inline CSS, append stylebot CSS to it
-                if (existingCSS != undefined)
-                {
+                if (existingCSS != undefined) {
                     if (existingCSS.length != 0 && existingCSS[existingCSS.length - 1] != ';')
                         newCSS = existingCSS + ';' + newCustomCSS;
                     else
                         newCSS = existingCSS + newCustomCSS;
                 }
-
                 else
                     newCSS = newCustomCSS;
             }
 
-            else
-            {
+            else {
                 // replace existing stylebot CSS with updated stylebot CSS
                 newCSS = existingCSS.replace(existingCustomCSS, newCustomCSS);
             }
@@ -338,8 +315,7 @@ stylebot.style = {
             var existingCSS = $this.attr('style');
             var existingCustomCSS = $this.data('stylebotCSS');
 
-            if (existingCustomCSS != undefined && existingCSS != undefined)
-            {
+            if (existingCustomCSS != undefined && existingCSS != undefined) {
                 var newCSS = existingCSS.replace(existingCustomCSS, '');
                 $this.attr('style', newCSS);
 
@@ -364,8 +340,7 @@ stylebot.style = {
 
         var tempRules = {};
 
-        for (var sel in this.rules)
-        {
+        for (var sel in this.rules) {
             if (sel != this.cache.selector)
                 tempRules[sel] = this.rules[sel];
         }
@@ -382,8 +357,7 @@ stylebot.style = {
         if (this.cache.styleEl.length != 0) {
             this.cache.styleEl.html(CSSUtils.crunchCSS(rules, true));
         }
-        else
-        {
+        else {
             CSSUtils.injectCSS(CSSUtils.crunchCSS(rules, true), 'stylebot-css');
             this.cache.styleEl = $('#stylebot-css');
         }
@@ -415,8 +389,7 @@ stylebot.style = {
 
     // remove all custom css for page from rules cache, stylebot's <style> element and inline css
     removeAll: function() {
-        for (var selector in this.rules)
-        {
+        for (var selector in this.rules) {
             delete this.rules[selector];
             this.clearInlineCSS($(selector));
         }
@@ -516,10 +489,9 @@ stylebot.style = {
         // if stylebot is open, don't allow user to disable styling on the page
         if (stylebot.status)
             return false;
-        if (this.status) {
-            this.disable();
-        }
 
+        if (this.status)
+            this.disable();
         else
             this.enable();
     }

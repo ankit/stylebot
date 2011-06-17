@@ -19,8 +19,7 @@ function attachListeners() {
         if (isInputField(e.target))
            return true;
 
-        if (stylebot.options.useShortcutKey && e.keyCode == stylebot.options.shortcutKey)
-        {
+        if (stylebot.options.useShortcutKey && e.keyCode == stylebot.options.shortcutKey) {
             if (stylebot.options.shortcutMetaKey === 'ctrl' && e.ctrlKey
               || stylebot.options.shortcutMetaKey === 'shift' && e.shiftKey
               || stylebot.options.shortcutMetaKey === 'alt' && e.altKey
@@ -32,12 +31,10 @@ function attachListeners() {
               }
         }
         // Handle Esc key to escape editing mode
-        else if (e.keyCode == 27 && stylebot.shouldClose(e.target))
-        {
+        else if (e.keyCode === 27 && stylebot.shouldClose(e.target)) {
             e.target.blur();
             stylebot.close();
         }
-
         return true;
     }, true);
 }

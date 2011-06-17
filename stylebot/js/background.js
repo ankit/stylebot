@@ -26,7 +26,6 @@ var cache = {
 
 
 // Initialize
-//
 function init() {
     loadOptionsIntoCache();
     loadStylesIntoCache();
@@ -43,7 +42,6 @@ function init() {
 }
 
 // Update version string in localStorage
-//
 function updateVersion() {
     if (!localStorage.version) {
         updateVersionString();
@@ -70,17 +68,14 @@ function updateVersionString() {
 }
 
 // Show a notification popup to notify user of update
-//
 function showUpdateNotification() {
     var notification = webkitNotifications.createHTMLNotification(
       'notification.html'
     );
-
     notification.show();
 }
 
 // Listen to requests from tabs and page action
-//
 function attachListeners() {
 
     if (cache.options.showPageAction == typeof undefined ||
@@ -91,79 +86,77 @@ function attachListeners() {
     chrome.extension.onRequest.addListener(
         function(request, sender, sendResponse) {
             switch (request.name) {
-                case 'enablePageAction' :
-                    if (cache.options.showPageAction) {
+                case 'enablePageAction':
+                    if (cache.options.showPageAction)
                         enablePageAction(sender.tab);
-                    }
                     sendResponse({});
                     break;
 
-                case 'disablePageAction' :
-                    if (cache.options.showPageAction) {
+                case 'disablePageAction':
+                    if (cache.options.showPageAction)
                         disablePageAction(sender.tab);
-                    }
                     sendResponse({});
                     break;
 
-                case 'showPageActions' :
+                case 'showPageActions':
                     showPageActions();
                     sendResponse({});
                     break;
 
-                case 'hidePageActions' :
+                case 'hidePageActions':
                     hidePageActions();
                     sendResponse({});
                     break;
 
-                case 'copyToClipboard' :
+                case 'copyToClipboard':
                     request.text.copyToClipboard();
                     sendResponse({});
                     break;
 
-                case 'save' :
+                case 'save':
                     cache.styles.save(request.url, request.rules, request.data);
                     sendResponse({});
                     break;
 
-                case 'doesStyleExist' :
+                case 'doesStyleExist':
                     sendResponse(cache.styles.exists(request.url));
                     break;
 
-                case 'transfer' :
+                case 'transfer':
                     cache.styles.transfer(request.source, request.destination);
                     sendResponse({});
                     break;
 
-                case 'getGlobalRules' :
+                case 'getGlobalRules':
                     sendResponse(cache.styles.getGlobalRules());
                     break;
 
-                case 'getRulesForPage' :
-                    sendResponse(cache.styles.getRulesForPage(request.url));
+                case 'getCombinedRulesForPage':
+                    sendResponse(cache.styles.getCombinedRulesForPage(request.url));
                     break;
 
-                case 'fetchOptions' :
+                case 'fetchOptions':
                     sendResponse({
                         options: cache.options,
                         enabledAccordions: cache.enabledAccordions
                     });
                     break;
 
-                case 'saveAccordionState' :
+                case 'saveAccordionState':
                     saveAccordionState(request.enabledAccordions);
                     sendResponse({});
                     break;
 
-                case 'savePreference' :
+                case 'savePreference':
                     savePreference(request.preference);
                     sendResponse({});
                     break;
 
-                case 'getPreference' :
+                case 'getPreference':
                     sendResponse(getPreference(request.preferenceName));
                     break;
 
-                case 'pushStyles' :
+                case 'pushStyles':
                     cache.styles.push();
                     sendResponse({});
                     break;
@@ -173,7 +166,6 @@ function attachListeners() {
 
 
 // Toggle CSS editing when page icon is clicked
-//
 function onPageActionClick(tab) {
     chrome.tabs.sendRequest(tab.id, { name: 'toggle' }, function(response) {
         if (response.status)
@@ -193,29 +185,23 @@ function refreshPageAction(tab) {
 }
 
 // Update page action to indicate that stylebot is not visible
-//
 function disablePageAction(tab) {
     // if a style is applied to the current page
-    //
-    if (cache.styles.exists(tab.url)) {
+    if (cache.styles.exists(tab.url))
         chrome.pageAction.setIcon({ tabId: tab.id, path: 'images/css_highlighted.png' });
-    }
-    else {
+    else
         chrome.pageAction.setIcon({ tabId: tab.id, path: 'images/css.png' });
-    }
 
     chrome.pageAction.setTitle({ tabId: tab.id, title: 'Click to start editing using Stylebot' });
 }
 
 // Update page action to indicate that stylebot is visible
-//
 function enablePageAction(tab) {
     chrome.pageAction.setIcon({ tabId: tab.id, path: 'images/css_active.png' });
     chrome.pageAction.setTitle({ tabId: tab.id, title: 'Click to stop editing using Stylebot' });
 }
 
 // Show page action for all tabs where it is applicable
-//
 function showPageActions() {
     chrome.windows.getAll({ populate: true }, function(windows) {
         var w_len = windows.length;
@@ -243,7 +229,6 @@ function showPageActions() {
 }
 
 // Hide page action on all tabs
-//
 function hidePageActions() {
     chrome.windows.getAll({ populate: true }, function(windows) {
         var w_len = windows.length;
@@ -296,7 +281,6 @@ function mergeStyles(newStyles, oldStyles) {
 }
 
 // Load styles from localStorage into cache
-//
 function loadStylesIntoCache() {
     if (localStorage['stylebot_styles']) {
         try {
@@ -774,10 +758,8 @@ Styles.prototype.getRules = function(url) {
  * @return {Boolean} True if it has rules associated.
  */
 Styles.prototype.exists = function(aURL) {
-    for (var url in this.styles)
-    {
-        if (!this.isEnabled(url)) continue;
-        if (url === '*') continue;
+    for (var url in this.styles) {
+        if (!this.isEnabled(url) || url === '*') continue;
         if (aURL.matchesPattern(url))
             return true;
     }
@@ -785,24 +767,30 @@ Styles.prototype.exists = function(aURL) {
 };
 
 /**
- * Retrieves all the CSS rules for the given URL
+ * Retrieves all the CSS rules applicable to the URL, including global CSS rules
  * @param {String} aURL The URL to retrieve the rules for.
  * @return {Object} rules: The rules. url: The identifier representing the URL.
  */
-Styles.prototype.getRulesForPage = function(aURL) {
+Styles.prototype.getCombinedRulesForPage = function(aURL) {
+    // global css rules
+    var global;
+    if (this.isEmpty('*') || !this.isEnabled('*'))
+        global = null;
+    else
+        global = this.getRules('*');
+
     // if the URL is stylebot.me, return rules for stylebot.me if they exist
     // otherwise, return null
-
     if (aURL.indexOf('stylebot.me') != -1) {
         if (!this.isEmpty('stylebot.me')) {
-            return {rules: this.getRules('stylebot.me'), url: 'stylebot.me'};
+            return {rules: this.getRules('stylebot.me'), url: 'stylebot.me', global: global};
         } else {
-            return {rules: null, url: null};
+            return {rules: null, url: null, global: global};
         }
     }
 
     if (!aURL.isOfHTMLType())
-        return {rules: null, url: null};
+        return {rules: null, url: null, global: null};
 
     // this will contain the combined set of evaluated rules to be applied to
     // the page. longer, more specific URLs get the priority for each selector
@@ -814,8 +802,7 @@ Styles.prototype.getRulesForPage = function(aURL) {
     {
         if (!this.isEnabled(url) || url === '*') continue;
 
-        if (aURL.matchesPattern(url))
-        {
+        if (aURL.matchesPattern(url)) {
             if (url.length > url_for_page.length)
                 url_for_page = url;
 
@@ -823,15 +810,12 @@ Styles.prototype.getRulesForPage = function(aURL) {
             var urlRules = this.getRules(url);
 
             for (var selector in urlRules) {
-
                 // if no rule exists for selector, simply copy the rule
                 if (rules[selector] == undefined)
                     rules[selector] = cloneObject(urlRules[selector]);
-
                 // otherwise, iterate over each property
                 else {
-                    for (var property in urlRules[selector])
-                    {
+                    for (var property in urlRules[selector]) {
                         if (rules[selector][property] == undefined || url == url_for_page)
                             rules[selector][property] = urlRules[selector][property];
                     }
@@ -841,13 +825,13 @@ Styles.prototype.getRulesForPage = function(aURL) {
     }
 
     if (rules != undefined)
-        return {rules: rules, url: url_for_page};
+        return {rules: rules, url: url_for_page, global: global};
     else
-        return {rules: null, url: null};
+        return {rules: null, url: null, global: global};
 };
 
 /**
- * Retrieves all the global rules
+ * Retrieves Get all the global rules
  * @return {Object} The rules of the global stylesheet.
  */
 Styles.prototype.getGlobalRules = function() {
@@ -918,8 +902,7 @@ String.prototype.isPattern = function() {
  * @return {Boolean} True if the string matches the patern, false otherwise.
  */
 String.prototype.matchesPattern = function(pattern) {
-    if (pattern.isPattern())
-    {
+    if (pattern.isPattern()) {
         try {
             var hasComma = ~pattern.indexOf(',');
             pattern = pattern.
@@ -971,8 +954,7 @@ String.prototype.matchesBasic = function(pattern) {
     var isFound = false;
     var subUrls = pattern.split(',');
     var len = subUrls.length;
-    for (var i = 0; i < len; i++)
-    {
+    for (var i = 0; i < len; i++) {
         if (this.indexOf(subUrls[i].trim()) != -1) {
             isFound = true;
             break;
