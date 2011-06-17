@@ -566,7 +566,7 @@ Styles.prototype.isEnabled = function(url) {
  * @param {Object} data New metadata for the given URL.
  */
 Styles.prototype.save = function(url, rules, data) {
-    if (!url || url == '')
+    if (!url || url === '')
         return;
 
     if (rules) {

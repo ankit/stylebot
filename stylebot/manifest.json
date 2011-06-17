@@ -96,5 +96,11 @@
         "128": "images/icon128.png"
     },
 
-    "permissions": ["tabs", "http://userstyles.org/", "bookmarks", "contextMenus", "notifications"]
+    "permissions": [
+        "tabs",
+        "bookmarks",
+        "contextMenus",
+        "notifications",
+        "http://userstyles.org/"
+    ]
 }

@@ -160,15 +160,10 @@ stylebot.style = {
                 var sheet = this.parser.parse(css, false, true);
                 parsedRules = CSSUtils.getRulesFromParserObject(sheet);
             }
-
-            catch (e) {
-                //
-            }
+            catch (e) {}
         }
-
-        if (parsedRules['error']) {
+        if (parsedRules['error'])
             return parsedRules['error'];
-        }
 
         this.clearInlineCSS(this.cache.elements);
         this.updateStyleElement(parsedRules);
