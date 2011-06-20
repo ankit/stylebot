@@ -90,12 +90,7 @@ function saveStyleFromSocial(installationEvent) {
         // add the meta header
         var header = '/**\n    Title: ' + data.title
         + '\n    URL: http://stylebot.me/styles/' + data.id
-        + '\n    Author: ' + data.author
-        + '\n    Author URL: http://stylebot.me/users/' + data.author;
-
-        if (data.description) {
-            header += '\n    Description: ' + data.description;
-        }
+        + '\n    Author: http://stylebot.me/users/' + data.author;
 
         header += '\n**/';
 
