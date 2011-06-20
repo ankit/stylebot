@@ -34,7 +34,6 @@
         "matches": ["http://stylebot.me/*"],
 
         "js": [
-            "js/libs/jquery.js",
             "js/installation.js"
         ],
 
@@ -81,7 +80,7 @@
             "js/shortcuts.js"
         ],
 
-        "run_at": "document_end",
+        "run_at": "document_start",
         "all_frames": true
     }],
 
