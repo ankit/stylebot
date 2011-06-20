@@ -51,7 +51,8 @@
             "css/colorpicker.css",
             "css/scrollbars.css",
             "css/tipsy.css",
-            "css/shortcuts_help.css"
+            "css/shortcuts_help.css",
+            "css/ace_editor.css"
         ],
 
         "js": [

@@ -12547,7 +12547,8 @@ var EventEmitter = require("pilot/event_emitter").EventEmitter;
 var editorCss = require("text/ace/css/editor.css");
 
 // import CSS once
-dom.importCssString(editorCss);
+// @ankit In stylebot, we are including the CSS as an external stylesheet, so comment this out
+// dom.importCssString(editorCss);
 
 var VirtualRenderer = function(container, theme) {
     this.container = container;
