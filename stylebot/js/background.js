@@ -1,6 +1,6 @@
 /* Background JS for Stylebot */
 
-var CURRENT_VERSION = '1.5';
+var CURRENT_VERSION = '1.5.2';
 
 var currTabId;
 var contextMenuId = null;
@@ -53,13 +53,11 @@ function updateVersion() {
     if (localStorage.version != CURRENT_VERSION) {
         // let's keep this for 1.4.x, for any users who jump from 1.3.x
         // versions to the current version
-        if (parseFloat(CURRENT_VERSION) === 1.4) {
+        if (parseFloat(CURRENT_VERSION) === 1.4)
             cache.styles.upgrade('1.4');
-        }
         // only show notification for X.X updates
-        if (parseFloat(localStorage.version) < parseFloat(CURRENT_VERSION)) {
+        if (parseFloat(localStorage.version) < parseFloat(CURRENT_VERSION))
             showUpdateNotification();
-        }
         // update version string in localStorage
         updateVersionString();
     }
