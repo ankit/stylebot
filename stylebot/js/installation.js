@@ -63,20 +63,6 @@ function sendAvailabilityMessage() {
 
 // Send request to background.html to save style along with metadata (id, timestamp, etc.)
 function saveStyleFromSocial(installationEvent) {
-    // @deprecated
-    //
-    // var $channel = $(channel);
-    // var $post = $channel.closest('.post');
-    //
-    // var css = $channel.text();
-    //
-    // var url = $.trim( $post.find('.post_site').text() );
-    //
-    // var timestamp = $post.attr('data-timestamp');
-    //
-    // var id = $post.attr('id').substring(4);
-
-    // @new stuff
     var channel = installationEvent.target;
     var $channel = $(channel);
     var data = $channel.data();

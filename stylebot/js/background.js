@@ -1,6 +1,6 @@
 /* Background JS for Stylebot */
 
-var CURRENT_VERSION = '1.5.2';
+var CURRENT_VERSION = '1.5.3';
 
 var currTabId;
 var contextMenuId = null;
@@ -1018,8 +1018,7 @@ String.prototype.matchesBasic = function(pattern) {
  * @return {Boolean} True if the string is a valid url, false otherwise.
  */
 String.prototype.isValidUrl = function() {
-    return (this.match('^http') == 'http'
-    && this.indexOf('https://chrome.google.com/webstore') === -1
+    return (this.indexOf('https://chrome.google.com/webstore') === -1
     && this.isOfHTMLType());
 };
 
@@ -1063,10 +1062,8 @@ function cloneObject(obj) {
         if (obj[i] && typeof obj[i] == 'object') {
             newObj[i] = cloneObject(obj[i]);
         }
-
         else
             newObj[i] = obj[i];
     }
-
     return newObj;
 }

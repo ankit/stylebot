@@ -1,13 +1,13 @@
 {
     "name": "Stylebot",
-    "version": "1.5.2",
+    "version": "1.5.3",
     "description": "Adapt the web's appearance",
     "background_page": "background.html",
     "options_page": "options.html",
 
     "content_scripts": [
     {
-        "matches":["http://*/*", "https://*/*"],
+        "matches":["<all_urls>"],
 
         "js": [
             "js/libs/css-utils.js",
@@ -42,7 +42,7 @@
     },
 
     {
-        "matches": ["http://*/*", "https://*/*"],
+        "matches": ["<all_urls>"],
 
         "css": [
             "css/widget.css",

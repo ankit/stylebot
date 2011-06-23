@@ -177,10 +177,8 @@ var Utils = {
         });
 
         if (options.selectText) {
-            textarea.bind('click keyup', function(e)
-            {
+            textarea.bind('click keyup', function(e) {
                 if (e.type === 'keyup' && e.keyCode != 9) return true;
-
                 e.preventDefault();
                 e.target.focus();
                 e.target.select();

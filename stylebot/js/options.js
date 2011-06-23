@@ -68,7 +68,6 @@ function init() {
     KeyCombo.init($('[name=shortcutKeyCharacter]').get(0), $('[name=shortcutKey]').get(0));
 
     bg_window = chrome.extension.getBackgroundPage();
-
     fillStyles();
     attachListeners();
     initFiltering();
@@ -351,7 +350,7 @@ function selectStyle($styleEl) {
 
     $styleEl.data('value', $urlEl.text());
 
-    Utils.editElement($urlEl, { editFieldClass: 'stylebot-editing-field' });
+    Utils.editElement($urlEl, {editFieldClass: 'stylebot-editing-field'});
 
     function onEditingComplete(e) {
         var el = e.target;
@@ -359,14 +358,11 @@ function selectStyle($styleEl) {
 
         if (e.type === 'keydown' && !$el.hasClass('stylebot-editing-field'))
             return true;
-
         if (e.type === 'mousedown' && $el.closest($styleEl).length != 0)
             return true;
 
-        if (e.type === 'keydown')
-        {
-            switch (e.keyCode)
-            {
+        if (e.type === 'keydown') {
+            switch (e.keyCode) {
                 case 38: // up
                     // return for multiline textarea
                     if ($el.height() > 30) return true;
@@ -412,10 +408,8 @@ function selectStyle($styleEl) {
                 $nextStyle.click();
             }, 0);
         }
-
-        else {
+        else
             $styleEl.focus();
-        }
     }
 
     $(document).bind('keydown mousedown', onEditingComplete);
