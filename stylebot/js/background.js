@@ -1024,10 +1024,10 @@ String.prototype.isValidUrl = function() {
 
 /**
  * Checks the extension of the URL to determine if it is valid HTML
- * @return {Boolean} True if the string does not have an extension xml/json/pdf.
+ * @return {Boolean} True if the string does not have an extension json/pdf.
  */
 String.prototype.isOfHTMLType = function() {
-    var nonHTMLExt = ['xml', 'json', 'pdf'];
+    var nonHTMLExt = ['json', 'pdf'];
 
     if (nonHTMLExt.indexOf(this.getExtension()) != -1)
         return false;
