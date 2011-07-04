@@ -108,16 +108,6 @@ function attachListeners() {
                     sendResponse({});
                     break;
 
-                case 'showPageActions':
-                    showPageActions();
-                    sendResponse({});
-                    break;
-
-                case 'hidePageActions':
-                    hidePageActions();
-                    sendResponse({});
-                    break;
-
                 case 'copyToClipboard':
                     request.text.copyToClipboard();
                     sendResponse({});
@@ -730,8 +720,7 @@ Styles.prototype.upgrade = function(version) {
         case '1.4':
             console.log('Upgrading data model for 1.4');
 
-            for (var url in this.styles)
-            {
+            for (var url in this.styles) {
                 if (this.isEnabled(url) === undefined) {
                     this.toggle(url, true);
                 }
@@ -761,17 +750,15 @@ Styles.prototype.getRules = function(url) {
 };
 
 /**
- * Returns if a style already exists for the given page
+ * Returns if a style exists for the URL
  * @param {String} aURL The URL to check.
- * @return {Boolean} True if it has rules associated.
+ * @return {Boolean} True if any rules are associated with the URL
  */
 Styles.prototype.exists = function(aURL) {
-    for (var url in this.styles) {
-        if (!this.isEnabled(url) || url === '*') continue;
-        if (aURL.matchesPattern(url))
-            return true;
-    }
-    return false;
+    if (this.isEnabled(aURL) && aURL !== '*')
+        return true;
+    else
+        return false;
 };
 
 /**
@@ -860,22 +847,36 @@ Styles.prototype.getCombinedRulesForPage = function(aURL, tab) {
     }
 
     cache.loadingTabs[tab.id] = response;
+
     // update page action
     if (cache.options.showPageAction) {
-        chrome.pageAction.show(tab.id);
         if (response.rules || response.global)
             highlightPageAction(tab);
         else
             disablePageAction(tab);
+        chrome.pageAction.show(tab.id);
     }
 
     return response;
 };
 
 Styles.prototype.getCombinedRulesForIframe = function(aURL, tab) {
-    if (cache.loadingTabs[tab.id]) {
-        return cache.loadingTabs[tab.id];
+    var response;
+    if (response = cache.loadingTabs[tab.id]) {
+        // just in case the page action wasn't updated when getCombinedRulesForPage was called
+        // this mostly occurs when there are lots of iframes in a page. e.g. plus.google.com
+        // todo: find a better way out for this
+        if (cache.options.showPageAction) {
+            if (response.rules || response.global)
+                highlightPageAction(tab);
+            else
+                disablePageAction(tab);
+
+            chrome.pageAction.show(tab.id);
+        }
+        return response;
     }
+
     else
         return this.getCombinedRulesForPage(aURL, tab);
 }
@@ -896,8 +897,7 @@ Styles.prototype.getGlobalRules = function() {
  * @param {String} destination Destination's identifier.
  */
 Styles.prototype.transfer = function(source, destination) {
-    if (this.styles[source])
-    {
+    if (this.styles[source]) {
         this.styles[destination] = this.styles[source];
         this.persist();
     }
@@ -1014,8 +1014,8 @@ String.prototype.matchesBasic = function(pattern) {
 };
 
 /**
- * Check if an url is a valid one
- * @return {Boolean} True if the string is a valid url, false otherwise.
+ * Check if Stylebot should run on a URL
+ * @return {Boolean} True if Stylebot can run on the URL
  */
 String.prototype.isValidUrl = function() {
     return (this.indexOf('https://chrome.google.com/webstore') === -1

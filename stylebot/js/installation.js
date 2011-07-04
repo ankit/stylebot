@@ -17,7 +17,6 @@ $(document).ready(function(e) {
 
             // first, let's check if a style already exists for the url
             stylebot.chrome.doesStyleExist(url, function(response) {
-
                 // if yes, warn the user
                 if (response) {
                     console.log("Style for '" + url + "' already exists.");
@@ -26,7 +25,6 @@ $(document).ready(function(e) {
                     customEvent.initEvent('stylebotStyleExistsEvent', true, true);
                     e.target.dispatchEvent(customEvent);
                 }
-
                 // else save the style
                 else
                     saveStyleFromSocial(e);
