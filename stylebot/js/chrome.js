@@ -70,7 +70,6 @@ stylebot.chrome = {
 // Listen to requests from background.html
 chrome.extension.onRequest.addListener(
     function(request, sender, sendResponse) {
-
         if (request.name === 'status') {
             if (window != window.top)
                 return;
@@ -82,7 +81,11 @@ chrome.extension.onRequest.addListener(
         }
 
         else if (request.name === 'toggle') {
-            if (window != window.top)
+            if (window.document.domain === 'mail.google.com') {
+                if (!window.frameElement || window.frameElement.id != 'canvas_frame')
+                    return;
+            }
+            else if (window != window.top)
                 return;
             stylebot.toggle();
             sendResponse({ status: stylebot.status });
