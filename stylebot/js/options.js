@@ -672,7 +672,7 @@ function editURL(oldValue, newValue) {
 // Backup
 
 // Generates JSON string for backup and displays the modal popup containing it
-function exportCSS() {
+function showExportPopup() {
     if (styles)
         json = JSON.stringify(bg_window.cache.styles.get());
     else
@@ -693,7 +693,7 @@ function copyToClipboard(text) {
 }
 
 // Displays the modal popup for importing styles from JSON string
-function importCSS() {
+function showImportPopup() {
     var headerHTML = "Paste previously exported styles: <br><span class='note'>Note</span>: Existing styles for similar URLs will be overwritten.";
 
     var footerHTML = "<button onclick='importCSS();'>Import</button> \
@@ -708,8 +708,7 @@ function importCSS() {
 function importCSS() {
     var json = cache.backupModal.box.find('textarea').attr('value');
 
-    if (json && json != '')
-    {
+    if (json && json != '') {
         try {
             var imported_styles = JSON.parse(json);
             bg_window.cache.styles.import(imported_styles);
@@ -836,8 +835,7 @@ function initializeEditor(code) {
 }
 
 function initializeBackupModal(headerHTML, footerHTML, code, bottomSpace) {
-    if (!cache.backupModal)
-    {
+    if (!cache.backupModal) {
         var html = "<div class='popup-content'> \
         <div class='popup-header'> \
         </div> \
