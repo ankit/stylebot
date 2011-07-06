@@ -672,7 +672,7 @@ function editURL(oldValue, newValue) {
 // Backup
 
 // Generates JSON string for backup and displays the modal popup containing it
-function export() {
+function exportCSS() {
     if (styles)
         json = JSON.stringify(bg_window.cache.styles.get());
     else
@@ -693,7 +693,7 @@ function copyToClipboard(text) {
 }
 
 // Displays the modal popup for importing styles from JSON string
-function import() {
+function importCSS() {
     var headerHTML = "Paste previously exported styles: <br><span class='note'>Note</span>: Existing styles for similar URLs will be overwritten.";
 
     var footerHTML = "<button onclick='importCSS();'>Import</button> \
