@@ -317,6 +317,7 @@ function toggleGlobalStylesheet() {
     if (!bg_window.cache.styles.toggle('*')) {
         // create an empty global stylesheet
         bg_window.cache.styles.create('*');
+        bg_window.cache.styles.push();
     }
 
     updateGlobalStylesheetUI();
@@ -328,6 +329,7 @@ function editGlobalStylesheet(e) {
 
     if (!rules) {
         bg_window.cache.styles.create('*');
+        bg_window.cache.styles.push();
         rules = {};
     }
 
@@ -451,11 +453,13 @@ function addStyle() {
 function enableAllStyles() {
     $('.style input[type=checkbox]').prop('checked', true);
     bg_window.cache.styles.toggleAll(true);
+    bg_window.cache.styles.push();
 }
 
 function disableAllStyles() {
     $('.style input[type=checkbox]').prop('checked', false);
     bg_window.cache.styles.toggleAll(false);
+    bg_window.cache.styles.push();
 }
 
 function changeStyleStatus(e) {
@@ -465,6 +469,7 @@ function changeStyleStatus(e) {
     var url = parent.find('.style-url').html();
 
     bg_window.cache.styles.toggle(url);
+    bg_window.cache.styles.push();
 }
 
 // Called when Share button is clicked for a style
@@ -504,8 +509,7 @@ function shareStyle(e) {
     temp_form.remove();
 }
 
-// Called when a style is updated (Update button is clicked)
-//
+// Called when user finishes editing a style and clicks on Save
 function onSave(url) {
     var css = cache.modal.editor.getSession().getValue();
 
@@ -540,22 +544,17 @@ function onAdd() {
 }
 
 // Saves a style and updates the UI. Called by onSave and onAdd
-//
 function saveStyle(url, css, add) {
     // if css is empty. remove the style
-    if (css === '')
-    {
+    if (css === '') {
         if (url === '*') {
             bg_window.cache.styles.emptyRules('*');
             bg_window.cache.styles.push();
         } else {
-            if (!bg_window.cache.styles.isEmpty(url))
-            {
+            if (!bg_window.cache.styles.isEmpty(url)) {
                 bg_window.cache.styles.delete(url);
-                $('.style-url:contains(' + url + ')').parent().remove();
-
-                bg_window.cache.styles.persist();
                 bg_window.cache.styles.push();
+                $('.style-url:contains(' + url + ')').parent().remove();
             }
         }
 
@@ -665,8 +664,8 @@ function clearSyntaxError() {
 function editURL(oldValue, newValue) {
     if (oldValue == newValue || newValue == '')
         return;
-
     bg_window.cache.styles.replace(oldValue, newValue);
+    bg_window.cache.styles.push();
 }
 
 // Backup
@@ -712,6 +711,7 @@ function importCSS() {
         try {
             var imported_styles = JSON.parse(json);
             bg_window.cache.styles.import(imported_styles);
+            bg_window.cache.styles.push();
         }
 
         catch (e) {
@@ -745,9 +745,7 @@ function toggleSyncing() {
 
     else {
         bg_window.enableSync(true);
-
         // todo: again, 200 is an arbitrary value to wait for bg_window to respond
-        //
         setTimeout(function() {
             fillStyles();
         }, 200);

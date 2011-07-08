@@ -1,6 +1,6 @@
 /* Background JS for Stylebot */
 
-var CURRENT_VERSION = '1.5.3.2';
+var CURRENT_VERSION = '1.5.3.3';
 
 var currTabId;
 var contextMenuId = null;
@@ -706,6 +706,7 @@ Styles.prototype.merge = function(newStyles, oldStyles) {
  * Syncs the styles object
  */
 Styles.prototype.push = function() {
+    console.log('Pushing styles to the cloud...');
     if (cache.options.sync) {
         saveSyncData(this.styles);
     }
@@ -731,8 +732,8 @@ Styles.prototype.upgrade = function(version) {
                 this.create('*');
             }
 
-            // save the updated styles in localStorage
             this.persist();
+            this.push();
         break;
     }
 };
@@ -913,12 +914,11 @@ Styles.prototype.replace = function(oldValue, newValue) {
     // otherwise, on changing the url, new entry is inserted at the bottom
     var newStyles = {};
     for (var url in this.styles) {
-        if (url == oldValue) {
+        if (url === oldValue)
             newStyles[newValue] = this.styles[oldValue];
-        }
-        else {
+
+        else
             newStyles[url] = this.styles[url];
-        }
     }
     this.styles = newStyles;
     this.persist();

@@ -20,13 +20,13 @@ var syncBookmarkName = syncName + '_data';
 var syncURL = 'http://' + syncName + '/?data=';
 var onSync = saveStyles;
 var onMerge = mergeStyles;
-// data source is cache.styles here
+// data source is cache.styles.get() here
 // cache.options.sync is used to check if sync is enabled / disabled
 
 // loads data from bookmark (if it exists).
 // If no data is returned, saves local data in the bookmark
 function sync() {
-    console.log('Syncing data...');
+    console.log('Syncing styles...');
     loadSyncData(function(data) {
         if (data) {
             // Overwrite the old styles
@@ -56,7 +56,7 @@ function syncWithMerge() {
             }
         }
         else {
-            saveSyncData(cache.styles);
+            saveSyncData(cache.styles.get());
         }
     });
 }
@@ -117,7 +117,6 @@ function loadSyncData(callback) {
 // saves data to the bookmark used for sync
 // takes json object / string as input
 function saveSyncData(data) {
-    console.log('Saving data for sync...');
     if (!data)
         return false;
     var url = getURLFromData(data);
@@ -142,7 +141,7 @@ function saveSyncData(data) {
                 // reset syncId and create a new bookmark
                 syncId = null;
                 syncFolderId = null;
-                saveSyncData(cache.styles);
+                saveSyncData(cache.styles.get());
             }
         });
     }
@@ -209,6 +208,6 @@ function onBookmarkUpdate(id, properties) {
 
 function onBookmarkCreate(id, bookmark) {
     if (cache.options.sync && bookmark.parentId == syncFolderId && !saveSyncDataWasCalled) {
-            sync();
+        sync();
     }
 }
