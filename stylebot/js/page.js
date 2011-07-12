@@ -277,8 +277,7 @@ table {\n\
         if (css === undefined)
             return true;
 
-        if (stylebot.page.cache.css != css)
-        {
+        if (stylebot.page.cache.css != css) {
             stylebot.page.cache.css = null;
             var response = stylebot.style.applyPageCSS(css, save);
 

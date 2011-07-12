@@ -2782,13 +2782,14 @@ parseKeyframeSelector: function(aToken) {
           }
         }
         else
-          while (true) {
-            token = this.getToken(false, true);
+          token = this.getToken(false, true);
+          while (token.isNotNull()) {
             if (token.isSymbol(")")) {
               s += ")";
               break;
             } else
               s += token.value;
+            token = this.getToken(false, true);
           }
       } else
         return null;
