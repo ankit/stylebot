@@ -1,7 +1,7 @@
 /**
 * stylebot.widget.advanced
 *
-* Advanced mode of CSS editing. For manually writing CSS for selected element(s)
+* Manages the UI for the Advanced mode in Stylebot editor
 **/
 
 stylebot.widget.advanced = {
@@ -39,7 +39,8 @@ stylebot.widget.advanced = {
 
   initializeEditor: function() {
     var self = this;
-    self.cache.editor = Utils.ace.monkeyPatch(ace.edit('stylebot-advanced-editor'));
+    self.cache.editor = Utils.ace.monkeyPatch(
+      ace.edit('stylebot-advanced-editor'));
 
     var editor = self.cache.editor;
     var session = editor.getSession();
@@ -72,21 +73,21 @@ stylebot.widget.advanced = {
   },
 
   contentChanged: function() {
-    stylebot.style.applyCSS(stylebot.widget.advanced.cache.editor.getSession().getValue());
+    stylebot.style.applyCSS(
+      stylebot.widget.advanced.cache.editor.getSession().getValue());
   },
 
   onFocus: function() {
-    stylebot.style.saveState();
+    stylebot.undo.push(Utils.cloneObject(stylebot.style.rules));
     self.cache.lastState = self.cache.editor.getSession().getValue();
   },
 
   onBlur: function() {
     var $el = $(e.target);
     if (self.cache.lastState == self.cache.editor.getSession().getValue())
-      stylebot.style.clearLastState();
-
+      stylebot.undo.pop();
+    stylebot.undo.refresh();
     self.cache.lastState = null;
-    stylebot.style.refreshUndoState();
   },
 
   fill: function() {
@@ -106,7 +107,8 @@ stylebot.widget.advanced = {
     if (!self.isDisabled()) {
       setTimeout(function() {
         self.cache.editor.focus();
-        self.cache.editor.gotoLine(self.cache.editor.getSession().getLength(), 0);
+        self.cache.editor.gotoLine(
+          self.cache.editor.getSession().getLength(), 0);
       }, 0);
     }
   },
@@ -139,7 +141,8 @@ stylebot.widget.advanced = {
   resize: function(height) {
     var self = stylebot.widget.advanced;
 
-    $('#stylebot-advanced-editor').css('height', height - self.EDITOR_BOTTOM_PADDING);
+    $('#stylebot-advanced-editor').css('height',
+      height - self.EDITOR_BOTTOM_PADDING);
 
     setTimeout(function() {
       self.cache.editor.resize();

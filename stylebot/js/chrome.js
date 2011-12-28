@@ -1,9 +1,8 @@
 /**
 * stylebot.chrome
 *
-* Methods sending / receving messages from background.html
+* Sends / receives messages from background.html
 **/
-
 stylebot.chrome = {
   /**
     * Send the appropriate request to the background page

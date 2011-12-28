@@ -1,5 +1,5 @@
 /**
- * Sync for chrome extensions
+ * Sync for Chrome extensions
  *
  * dependencies: bookmark.js
  *

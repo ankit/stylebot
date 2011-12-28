@@ -1,6 +1,7 @@
 /**
   * stylebot.contextmenu
-  * Handles actions triggered from the right click menu
+  *
+  * Handles actions triggered from the right click context menu
   */
 stylebot.contextmenu = {
   cache: {

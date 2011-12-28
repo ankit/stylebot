@@ -1,3 +1,7 @@
+/**
+  * Installation of styles from Stylebot Social
+  */
+
 $(document).ready(function(e) {
   // let social know stylebot is installed
   sendAvailabilityMessage();
@@ -12,7 +16,6 @@ $(document).ready(function(e) {
       console.log('Stylebot: Install event received. Installing style...');
 
       var $post = $(e.target).closest('.post');
-
       var url = $.trim($post.find('.post_site').text());
 
       // first, let's check if a style already exists for the url
@@ -27,13 +30,11 @@ $(document).ready(function(e) {
         }
         // else save the style
         else
-        saveStyleFromSocial(e);
+          saveStyleFromSocial(e);
       });
     });
 
-
     // Bind listener for overwrite installation (without checking if style already exists)
-
     $install_divs.bind('stylebotOverwriteEvent', function(e) {
       console.log('Stylebot: Overwrite event received. Installing style...');
 
@@ -45,7 +46,10 @@ $(document).ready(function(e) {
 });
 
 
-// Sends stylebot social an availability message
+/**
+  * Sends stylebot social an availability message
+  *   i.e. Stylebot is installed
+  */
 function sendAvailabilityMessage() {
   // get the first communication DIV in DOM
   var install_div = $('.stylebot_install_div').get(0);
@@ -58,8 +62,10 @@ function sendAvailabilityMessage() {
   }
 }
 
-
-// Send request to background.html to save style along with metadata (id, timestamp, etc.)
+/**
+  * Send request to background.html to save style
+  *   along with metadata (id, timestamp, etc.)
+  */
 function saveStyleFromSocial(installationEvent) {
   var channel = installationEvent.target;
   var $channel = $(channel);
@@ -81,9 +87,10 @@ function saveStyleFromSocial(installationEvent) {
     var rulesWithMeta = { 'comment-#0' : { comment: header } };
 
     for (selector in rules)
-    rulesWithMeta[selector] = rules[selector];
+      rulesWithMeta[selector] = rules[selector];
 
-    stylebot.chrome.save(data.url, rulesWithMeta, { id: data.id, timestamp: data.timestamp });
+    stylebot.chrome.save(data.url, rulesWithMeta,
+      { id: data.id, timestamp: data.timestamp });
     stylebot.chrome.pushStyles();
 
     // send back success message
@@ -94,7 +101,6 @@ function saveStyleFromSocial(installationEvent) {
 
   catch (e) {
     console.log('Error parsing css: ' + e);
-
     // send back error message
     var customEvent = document.createEvent('Event');
     customEvent.initEvent('stylebotInstallationErrorEvent', true, true);

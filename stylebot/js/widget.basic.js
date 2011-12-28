@@ -1,7 +1,7 @@
 /**
 * stylebot.widget.basic
 *
-* Basic mode
+* Manages the UI for the Basic mode in Stylebot editor
 **/
 
 stylebot.widget.basic = {

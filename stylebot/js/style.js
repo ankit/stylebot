@@ -1,7 +1,7 @@
 /**
 * stylebot.style
 *
-* Generation and application of CSS rules
+* Generating, applying and saving CSS styling rules
 **/
 
 stylebot.style = {
@@ -19,9 +19,6 @@ stylebot.style = {
   timer: null,
   parser: null,
   status: true,
-
-  // the undo stack. size is limited to last 5 actions
-  undoStack: [],
 
   cache: {
     // last selected elements' selector
@@ -464,54 +461,18 @@ stylebot.style = {
     * Undo last style applied
     */
   undo: function() {
-    if (this.undoStack.length == 0)
+    var self = this;
+    if (stylebot.undo.isEmpty())
       return false;
-    this.rules = this.undoStack.pop();
-    this.clearInlineCSS(this.cache.elements);
-    this.updateStyleElement(this.rules);
-    this.save();
+    self.rules = stylebot.undo.pop();
+    self.clearInlineCSS(self.cache.elements);
+    self.updateStyleElement(self.rules);
+    self.save();
     stylebot.widget.open();
+    stylebot.undo.refresh();
     setTimeout(function() {
       stylebot.highlight(stylebot.selectedElement);
     }, 0);
-    this.refreshUndoBtn();
-  },
-
-  /**
-    * Save current rules state to the undo stack
-    */
-  saveState: function() {
-    if (this.undoStack.length >= 5)
-      this.undoStack.shift();
-    this.undoStack.push(Utils.cloneObject(this.rules));
-  },
-
-  /**
-    * Remove last saved state from undo stack
-    */
-  clearLastState: function() {
-    this.undoStack.pop();
-  },
-
-  /**
-    * Checks if Undo is possible i.e. if undo stack is not empty
-    * @return {boolean}
-    */
-  canUndo: function() {
-    if (this.undoStack.length == 0)
-      return false;
-    else
-      return true;
-  },
-
-  /**
-    * Refresh state of Undo button
-    */
-  refreshUndoBtn: function() {
-    if (!this.canUndo())
-      stylebot.widget.disableUndo();
-    else
-      stylebot.widget.enableUndo();
   },
 
   /**

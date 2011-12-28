@@ -1,6 +1,10 @@
 /**
   * Events
-  * Events for Stylebot Panel Controls in Basic Mode
+  *
+  * Event handlers for Stylebot editor Basic mode controls
+  *
+  * todo: Move this under stylebot.widget.basic or
+  *   atleast a more descriptive name
   **/
 Events = {
   ACCORDION_SAVE_TIMEOUT: 500,
@@ -54,21 +58,21 @@ Events = {
   },
 
   onTextFieldFocus: function(e) {
-    stylebot.style.saveState();
+    stylebot.undo.push(Utils.cloneObject(stylebot.style.rules));
     $(e.target).data('lastState', e.target.value);
   },
 
   onTextFieldBlur: function(e) {
     if ($(e.target).data('lastState') == e.target.value)
-      stylebot.style.clearLastState();
+      stylebot.undo.pop();
     $(e.target).data('lastState', null);
-    stylebot.style.refreshUndoState();
+    stylebot.undo.refresh();
   },
 
   onSizeFieldKeyDown: function(e) {
     // increment / decrement value by 1 with arrow keys
-    //
-    if (e.keyCode === 38 || e.keyCode === 40) { // up / down arrow
+    // up / down arrow
+    if (e.keyCode === 38 || e.keyCode === 40) {
       e.preventDefault();
 
       var value = e.target.value;
@@ -113,7 +117,6 @@ Events = {
       value += unit;
 
     stylebot.style.apply(property, value);
-    // state is saved for undo in onTextFieldFocus and onTextFieldBlur
   },
 
   onSelectChange: function(e) {
@@ -184,7 +187,6 @@ Events = {
 
     // determine which accordions are open and
     // send request to save the new state to background.html cache
-    //
     if (self.accordionTimer) {
       clearTimeout(self.accordionTimer);
       self.accordionTimer = null;
@@ -205,9 +207,8 @@ Events = {
   },
 
   saveProperty: function(property, value) {
-    // save current state to undo stack
-    stylebot.style.saveState();
+    stylebot.undo.push(Utils.cloneObject(stylebot.style.rules));
     stylebot.style.apply(property, value);
-    stylebot.style.refreshUndoState();
+    stylebot.undo.refresh();
   }
 };

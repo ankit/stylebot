@@ -67,6 +67,7 @@
       "js/style.js",
       "js/page.js",
       "js/contextmenu.js",
+      "js/undo.js",
       "js/libs/selectorGenerator.js",
       "js/libs/selectionBox.js",
       "js/libs/modalbox.js",

@@ -1,36 +1,36 @@
 /** Stylebot Modal Window **/
 
 #stylebot-modal {
-    padding: 15px !important;
-    text-align: left !important;
-    width: 50% !important;
-    min-height: 60% !important;
-    background-color: #fff !important;
-    border-radius: 0px !important;
-    z-index: 2147483647 !important;
-    position: absolute !important;
-    top: 15% !important;
-    left: 25% !important;
-    border: 1px solid #ccc !important;
-    color: #333 !important;
-    font-size: 14px !important;
-    font-family: 'Lucida Grande', Tahoma, Arial, sans-serif !important;
-    display: none;
-    line-height: 20px !important;
+  padding: 15px !important;
+  text-align: left !important;
+  width: 50% !important;
+  min-height: 60% !important;
+  background-color: #fff !important;
+  border-radius: 0px !important;
+  z-index: 2147483647 !important;
+  position: absolute !important;
+  top: 15% !important;
+  left: 25% !important;
+  border: 1px solid #ccc !important;
+  color: #333 !important;
+  font-size: 14px !important;
+  font-family: 'Lucida Grande', Tahoma, Arial, sans-serif !important;
+  display: none;
+  line-height: 20px !important;
 }
 
 #stylebot-background {
-    background-color: #000 !important;
-    opacity: 0.7;
-    z-index: 2147483646 !important;
-    height: 100%;
-    width: 100%;
-    display: none;
-    top: 0;
-    left: 0;
-    position: absolute !important;
+  background-color: #000 !important;
+  opacity: 0.7;
+  z-index: 2147483646 !important;
+  height: 100%;
+  width: 100%;
+  display: none;
+  top: 0;
+  left: 0;
+  position: absolute !important;
 }
 
 #stylebot-modal button.stylebot-button {
-    float: right;
+  float: right;
 }

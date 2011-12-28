@@ -1,7 +1,7 @@
 /**
 * Bookmark handling code for chrome extensions
 *
-* Copyright (c) 2010 Ankit Ahuja
+* Copyright (c) 2011 Ankit Ahuja
 * Dual licensed under GPL and MIT licenses.
 **/
 

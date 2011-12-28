@@ -1,6 +1,6 @@
 /**
   * This content script injects any custom style for the page (if it exists)
-  * as soon as the document starts loading.
+  *   as soon as the document starts loading
  **/
 
 // Temporary variables used by stylebot.style.initialize()

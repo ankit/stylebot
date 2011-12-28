@@ -1,4 +1,6 @@
-/* Background JS for Stylebot */
+/**
+  * background.html
+  */
 
 var CURRENT_VERSION = '1.5.3.4';
 

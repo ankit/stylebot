@@ -1,7 +1,7 @@
 /**
 * stylebot.page
 *
-* Shows the editor for the entire page's CSS
+* Manages the UI for the Page mode (Edit CSS) in Stylebot editor
 **/
 
 stylebot.page = {
@@ -173,7 +173,7 @@ stylebot.page = {
             }
 
           self.clearSyntaxError();
-          stylebot.style.saveState();
+          stylebot.undo.push(Utils.cloneObject(stylebot.style.rules));
           self.cache.css = session.getValue();
         },
 
@@ -274,10 +274,10 @@ stylebot.page = {
       }
 
       stylebot.page.clearSyntaxError();
-      stylebot.style.refreshUndoState();
+      stylebot.undo.refresh();
     }
     else
-      stylebot.style.clearLastState();
+      stylebot.undo.pop();
     return true;
   },
 

@@ -1,8 +1,10 @@
+/**
+  * Stylebot options page
+  */
+
 $(document).ready(function() {
   init();
 });
-
-/* Javascript for stylebot options page */
 
 var bg_window = null;
 

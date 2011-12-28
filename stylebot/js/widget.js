@@ -1,7 +1,7 @@
 /**
 * stylebot.widget
 *
-* Widget UI and functionality
+* Stylebot editor UI and event handling
 **/
 
 stylebot.widget = {
@@ -10,8 +10,8 @@ stylebot.widget = {
     header: null,
     headerSelector: null,
     headerSelectIcon: null,
-    undoBt: null,
-    dropDown: null
+    undo: null,
+    dropdown: null
   },
 
   defaults: {
@@ -50,7 +50,7 @@ stylebot.widget = {
     .tipsy({ delayIn: 500, gravity: 'n' });
 
     //  Selector dropdown
-    self.dropDown = $('<div>', {
+    self.dropdown = $('<div>', {
       id: 'stylebot-dropdown-button',
       class: 'stylebot-header-button',
       title: 'View previously edited CSS selectors'
@@ -176,7 +176,7 @@ stylebot.widget = {
     .click(self.editCSS);
 
     // Undo button
-    self.cache.undoBt = WidgetUI.createButton('Undo')
+    self.cache.undo = WidgetUI.createButton('Undo')
     .attr('title', 'Undo your last action')
     .prop('disabled', true)
     .tipsy({ delayIn: 800, gravity: 's', html: true })
@@ -564,20 +564,18 @@ stylebot.widget = {
     }
   },
 
-  //  Enable the Undo button
-  enableUndo: function() {
-    this.cache.undoBt.prop('disabled', false);
-  },
-
-  //  Disable the Undo button
-  disableUndo: function() {
-    this.cache.undoBt.prop('disabled', true);
-  },
-
   setSelector: function(value) {
     this.cache.headerSelector.html(value);
     if (value === 'Select an element')
       value = 'Click to edit the CSS Selector';
     this.cache.headerSelector.attr('title', value);
+  },
+
+  enableUndoButton: function() {
+    this.cache.undo.prop('disabled', false);
+  },
+
+  disableUndoButton: function() {
+    this.cache.undo.prop('disabled', true);
   }
 };
