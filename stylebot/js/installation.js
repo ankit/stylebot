@@ -1,103 +1,103 @@
 $(document).ready(function(e) {
-    // let social know stylebot is installed
-    sendAvailabilityMessage();
+  // let social know stylebot is installed
+  sendAvailabilityMessage();
 
-    // communication channel between stylebot social and the extension
-    var $install_divs = $('.stylebot_install_div');
+  // communication channel between stylebot social and the extension
+  var $install_divs = $('.stylebot_install_div');
 
-    if ($install_divs.length != 0) {
+  if ($install_divs.length != 0) {
 
-        // Bind listener for install event
-        $install_divs.bind('stylebotInstallEvent', function(e) {
-            console.log('Stylebot: Install event received. Installing style...');
+    // Bind listener for install event
+    $install_divs.bind('stylebotInstallEvent', function(e) {
+      console.log('Stylebot: Install event received. Installing style...');
 
-            var $post = $(e.target).closest('.post');
+      var $post = $(e.target).closest('.post');
 
-            var url = $.trim($post.find('.post_site').text());
+      var url = $.trim($post.find('.post_site').text());
 
-            // first, let's check if a style already exists for the url
-            stylebot.chrome.doesStyleExist(url, function(response) {
-                // if yes, warn the user
-                if (response) {
-                    console.log("Style for '" + url + "' already exists.");
+      // first, let's check if a style already exists for the url
+      stylebot.chrome.doesStyleExist(url, function(response) {
+        // if yes, warn the user
+        if (response) {
+          console.log("Style for '" + url + "' already exists.");
 
-                    var customEvent = document.createEvent('Event');
-                    customEvent.initEvent('stylebotStyleExistsEvent', true, true);
-                    e.target.dispatchEvent(customEvent);
-                }
-                // else save the style
-                else
-                    saveStyleFromSocial(e);
-            });
-        });
+          var customEvent = document.createEvent('Event');
+          customEvent.initEvent('stylebotStyleExistsEvent', true, true);
+          e.target.dispatchEvent(customEvent);
+        }
+        // else save the style
+        else
+        saveStyleFromSocial(e);
+      });
+    });
 
 
-        // Bind listener for overwrite installation (without checking if style already exists)
+    // Bind listener for overwrite installation (without checking if style already exists)
 
-        $install_divs.bind('stylebotOverwriteEvent', function(e) {
-            console.log('Stylebot: Overwrite event received. Installing style...');
+    $install_divs.bind('stylebotOverwriteEvent', function(e) {
+      console.log('Stylebot: Overwrite event received. Installing style...');
 
-            var $post = $(e.target).closest('.post');
+      var $post = $(e.target).closest('.post');
 
-            saveStyleFromSocial(e);
-        });
-    }
+      saveStyleFromSocial(e);
+    });
+  }
 });
 
 
 // Sends stylebot social an availability message
 function sendAvailabilityMessage() {
-    // get the first communication DIV in DOM
-    var install_div = $('.stylebot_install_div').get(0);
+  // get the first communication DIV in DOM
+  var install_div = $('.stylebot_install_div').get(0);
 
-    // dispatch the message
-    if (install_div) {
-        var customEvent = document.createEvent('Event');
-        customEvent.initEvent('stylebotIsAvailableEvent', true, true);
-        install_div.dispatchEvent(customEvent);
-    }
+  // dispatch the message
+  if (install_div) {
+    var customEvent = document.createEvent('Event');
+    customEvent.initEvent('stylebotIsAvailableEvent', true, true);
+    install_div.dispatchEvent(customEvent);
+  }
 }
 
 
 // Send request to background.html to save style along with metadata (id, timestamp, etc.)
 function saveStyleFromSocial(installationEvent) {
-    var channel = installationEvent.target;
-    var $channel = $(channel);
-    var data = $channel.data();
+  var channel = installationEvent.target;
+  var $channel = $(channel);
+  var data = $channel.data();
 
-    var parser = new CSSParser();
+  var parser = new CSSParser();
 
-    try {
-        var sheet = parser.parse($channel.text(), false, true);
-        var rules = CSSUtils.getRulesFromParserObject(sheet);
+  try {
+    var sheet = parser.parse($channel.text(), false, true);
+    var rules = CSSUtils.getRulesFromParserObject(sheet);
 
-        // add the meta header
-        var header = '/**\n    Title: ' + data.title
-        + '\n    URL: http://stylebot.me/styles/' + data.id
-        + '\n    Author: http://stylebot.me/users/' + data.author;
+    // add the meta header
+    var header = '/**\n    Title: ' + data.title
+    + '\n    URL: http://stylebot.me/styles/' + data.id
+    + '\n    Author: http://stylebot.me/users/' + data.author;
 
-        header += '\n**/';
+    header += '\n**/';
 
-        var rulesWithMeta = { 'comment-#0' : { comment: header } };
+    var rulesWithMeta = { 'comment-#0' : { comment: header } };
 
-        for (selector in rules)
-            rulesWithMeta[selector] = rules[selector];
+    for (selector in rules)
+    rulesWithMeta[selector] = rules[selector];
 
-        stylebot.chrome.save(data.url, rulesWithMeta, { id: data.id, timestamp: data.timestamp });
-        stylebot.chrome.pushStyles();
+    stylebot.chrome.save(data.url, rulesWithMeta, { id: data.id, timestamp: data.timestamp });
+    stylebot.chrome.pushStyles();
 
-        // send back success message
-        var customEvent = document.createEvent('Event');
-        customEvent.initEvent('stylebotInstallationSuccessfulEvent', true, true);
-        channel.dispatchEvent(customEvent);
-    }
+    // send back success message
+    var customEvent = document.createEvent('Event');
+    customEvent.initEvent('stylebotInstallationSuccessfulEvent', true, true);
+    channel.dispatchEvent(customEvent);
+  }
 
-    catch (e) {
-        console.log('Error parsing css: ' + e);
+  catch (e) {
+    console.log('Error parsing css: ' + e);
 
-        // send back error message
-        var customEvent = document.createEvent('Event');
-        customEvent.initEvent('stylebotInstallationErrorEvent', true, true);
-        channel.dispatchEvent(customEvent);
-    }
+    // send back error message
+    var customEvent = document.createEvent('Event');
+    customEvent.initEvent('stylebotInstallationErrorEvent', true, true);
+    channel.dispatchEvent(customEvent);
+  }
 }

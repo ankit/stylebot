@@ -7,8 +7,7 @@
 
 // constructor
 var ModalBox = function(html, options) {
-    if (options)
-    {
+    if (options) {
         for (var option in options)
             this.options[option] = options[option];
     }
@@ -36,13 +35,11 @@ var ModalBox = function(html, options) {
 };
 
 ModalBox.prototype.reset = function(options) {
-    if (options)
-    {
+    if (options) {
         for (var option in options)
             this.options[option] = options[option];
 
         this.box
-
         .css({
             height: this.options.height + '!important',
             width: this.options.width + ' !important',
@@ -106,8 +103,7 @@ ModalBox.prototype.show = function(content, options) {
             parent.length == 0 &&
             e.data.modal.options.closeOnBgClick) ||
             e.type == 'keyup'
-        )
-        {
+        ) {
             e.preventDefault();
             e.data.modal.hide();
             $(document).unbind('keyup mousedown', closeBox);

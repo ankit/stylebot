@@ -11,26 +11,25 @@ var stylebotTempGlobalRules;
 // send request to background.html to get stylebot rules for page
 var request;
 if (window === window.top)
-    request = 'getCombinedRulesForPage';
+  request = 'getCombinedRulesForPage';
 else
-    request = 'getCombinedRulesForIframe';
+  request = 'getCombinedRulesForIframe';
+
 chrome.extension.sendRequest({name: request, url: window.location.href}, function(response) {
-    // global css rules
-    if (response.global) {
-        stylebotTempGlobalRules = response.global;
-        var css = CSSUtils.crunchCSS(response.global, true);
-        if (css != '') {
-            CSSUtils.injectCSS(css, 'stylebot-global-css');
-        }
-    }
+  // global css rules
+  if (response.global) {
+    stylebotTempGlobalRules = response.global;
+    var css = CSSUtils.crunchCSS(response.global, true);
+    if (css != '')
+      CSSUtils.injectCSS(css, 'stylebot-global-css');
+  }
 
-    stylebotTempUrl = response.url;
-    stylebotTempRules = response.rules;
+  stylebotTempUrl = response.url;
+  stylebotTempRules = response.rules;
 
-    if (stylebotTempUrl && stylebotTempRules) {
-        var css = CSSUtils.crunchCSS(response.rules, true);
-        if (css != '') {
-            CSSUtils.injectCSS(css, 'stylebot-css');
-        }
-    }
+  if (stylebotTempUrl && stylebotTempRules) {
+    var css = CSSUtils.crunchCSS(response.rules, true);
+    if (css != '')
+      CSSUtils.injectCSS(css, 'stylebot-css');
+  }
 });

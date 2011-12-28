@@ -1,106 +1,105 @@
 {
-    "name": "Stylebot",
-    "version": "1.5.3.4",
-    "description": "Adapt the web's appearance",
-    "background_page": "background.html",
-    "options_page": "options.html",
+  "name": "Stylebot",
+  "version": "1.5.3.4",
+  "description": "Adapt the web's appearance",
+  "background_page": "background.html",
+  "options_page": "options.html",
 
-    "content_scripts": [
-    {
-        "matches":["<all_urls>"],
+  "content_scripts": [{
+    "matches":["<all_urls>"],
 
-        "js": [
-            "js/libs/css-utils.js",
-            "js/apply-css.js"
-        ],
+    "js": [
+      "js/libs/css-utils.js",
+      "js/apply-css.js"
+    ],
 
-        "run_at": "document_start",
-        "all_frames": true
-    },
+    "run_at": "document_start",
+    "all_frames": true
+  },
 
-    {
-        "matches": ["http://userstyles.org/styles/*"],
+  {
+    "matches": ["http://userstyles.org/styles/*"],
 
-        "js": [
-            "js/libs/css-utils.js",
-            "js/userstyles-org.js"
-        ],
+    "js": [
+      "js/libs/css-utils.js",
+      "js/userstyles-org.js"
+    ],
 
-        "run_at": "document_start",
-        "all_frames": true
-    },
+    "run_at": "document_start",
+    "all_frames": true
+  },
 
-    {
-        "matches": ["http://stylebot.me/*"],
+  {
+    "matches": ["http://stylebot.me/*"],
 
-        "js": [
-            "js/installation.js"
-        ],
+    "js": [
+      "js/installation.js"
+    ],
 
-        "run_at": "document_end",
-        "all_frames": true
-    },
+    "run_at": "document_end",
+    "all_frames": true
+  },
 
-    {
-        "matches": ["<all_urls>"],
+  {
+    "matches": ["<all_urls>"],
 
-        "css": [
-            "css/widget.css",
-            "css/controls.css",
-            "css/modal.css",
-            "css/colorpicker.css",
-            "css/scrollbars.css",
-            "css/tipsy.css",
-            "css/shortcuts_help.css",
-            "css/ace_editor.css"
-        ],
+    "css": [
+      "css/widget.css",
+      "css/controls.css",
+      "css/modal.css",
+      "css/colorpicker.css",
+      "css/scrollbars.css",
+      "css/tipsy.css",
+      "css/shortcuts_help.css",
+      "css/ace_editor.css"
+    ],
 
-        "js": [
-            "js/libs/jquery.js",
-            "js/stylebot.js",
-            "js/chrome.js",
-            "js/init.js",
-            "js/widget.js",
-            "js/widget.basic.js",
-            "js/events.js",
-            "js/widget.advanced.js",
-            "js/widget-ui.js",
-            "js/style.js",
-            "js/page.js",
-            "js/contextmenu.js",
-            "js/libs/selectorGenerator.js",
-            "js/libs/selectionBox.js",
-            "js/libs/modalbox.js",
-            "js/libs/utils.js",
-            "js/libs/colorpicker.js",
-            "js/libs/jquery.tipsy.js",
-            "js/libs/parser.js",
-            "js/libs/ace.js",
-            "js/libs/mode-css.js",
-            "js/libs/theme-dawn.js",
-            "js/shortcuts.js"
-        ],
+    "js": [
+      "js/libs/jquery.js",
+      "js/stylebot.js",
+      "js/chrome.js",
+      "js/init.js",
+      "js/widget.js",
+      "js/widget.basic.js",
+      "js/events.js",
+      "js/widget.advanced.js",
+      "js/widget-ui.js",
+      "js/style.js",
+      "js/page.js",
+      "js/contextmenu.js",
+      "js/libs/selectorGenerator.js",
+      "js/libs/selectionBox.js",
+      "js/libs/modalbox.js",
+      "js/libs/utils.js",
+      "js/libs/colorpicker.js",
+      "js/libs/jquery.tipsy.js",
+      "js/libs/parser.js",
+      "js/libs/ace.js",
+      "js/libs/mode-css.js",
+      "js/libs/theme-dawn.js",
+      "js/shortcuts.js"
+    ],
 
-        "run_at": "document_start",
-        "all_frames": true
-    }],
+    "run_at": "document_start",
+    "all_frames": true
+  }],
 
-    "page_action": {
-        "default_icon": "images/css.png",
-        "default_title": "Click to start editing using Stylebot"
-    },
+  "page_action": {
+    "default_icon": "images/css.png",
+    "default_title": "Click to start editing using Stylebot"
+  },
 
-    "icons": {
-        "16": "images/icon16.png",
-        "48": "images/icon48.png",
-        "128": "images/icon128.png"
-    },
+  "icons": {
+    "16": "images/icon16.png",
+    "48": "images/icon48.png",
+    "128": "images/icon128.png"
+  },
 
-    "permissions": [
-        "tabs",
-        "bookmarks",
-        "contextMenus",
-        "notifications",
-        "http://userstyles.org/"
-    ]
+  "permissions": [
+    "tabs",
+    "bookmarks",
+    "contextMenus",
+    "notifications",
+    "http://userstyles.org/"
+  ]
 }
