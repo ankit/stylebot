@@ -12,8 +12,9 @@ function createBookmark(name, url, parentId, callback) {
       title: name
     };
 
-    if (url)
+    if (url) {
       properties.url = url;
+    }
 
     chrome.bookmarks.create(properties, callback);
   }
