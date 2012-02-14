@@ -1,12 +1,12 @@
 {
-  "name": "Stylebot",
-  "version": "1.5.3.4",
-  "description": "Adapt the web's appearance",
-  "background_page": "background.html",
-  "options_page": "options.html",
+  "name"            : "Stylebot",
+  "version"         : "1.5.3.5",
+  "description"     : "Adapt the web's appearance",
+  "background_page" : "background.html",
+  "options_page"    : "options.html",
 
   "content_scripts": [{
-    "matches":["<all_urls>"],
+    "matches": ["<all_urls>"],
 
     "js": [
       "js/libs/css-utils.js",
@@ -86,14 +86,14 @@
   }],
 
   "page_action": {
-    "default_icon": "images/css.png",
-    "default_title": "Click to start editing using Stylebot"
+    "default_icon"  : "images/css.png",
+    "default_title" : "Click to start editing using Stylebot"
   },
 
   "icons": {
-    "16": "images/icon16.png",
-    "48": "images/icon48.png",
-    "128": "images/icon128.png"
+    "16"  : "images/icon16.png",
+    "48"  : "images/icon48.png",
+    "128" : "images/icon128.png"
   },
 
   "permissions": [
