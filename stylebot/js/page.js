@@ -84,7 +84,7 @@ stylebot.page = {
     <button class='stylebot-button' title='Copy to Clipboard' style='float:left !important; margin: 0px !important;' tabindex='0'>\
     Copy\
     </button>\
-    <div style='float: right !important;'>\
+    <div style='float: right !important; padding-right:15px !important;'>\
     <button class='stylebot-button' style='margin: 0px !important; margin-right: 3px !important; float: none !important;' tabindex='0'>\
     Save\
     </button>\
