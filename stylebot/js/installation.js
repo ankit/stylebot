@@ -2,108 +2,121 @@
   * Installation of styles from Stylebot Social
   */
 
-$(document).ready(function(e) {
-  // let social know stylebot is installed
-  sendAvailabilityMessage();
+stylebot.installation = {
+  selectors: {
+    style   : '.style',
+    channel : '.stylebot-installation',
+    button  : '.style-install-btn'
+  },
 
-  // communication channel between stylebot social and the extension
-  var $install_divs = $('.stylebot_install_div');
+  events: {
+    available: 'stylebotIsAvailableEvent',
+    success  : 'stylebotInstallationSuccessfulEvent',
+    error    : 'stylebotInstallationErrorEvent',
+    duplicate: 'stylebotStyleExistsEvent',
+    overwrite: 'stylebotOverwriteEvent',
+    install  : 'stylebotInstallEvent'
+  },
 
-  if ($install_divs.length != 0) {
+  init: function() {
+    // communication channel between stylebot social and the extension
+    var $channels = $(this.selectors.channel);
 
-    // Bind listener for install event
-    $install_divs.bind('stylebotInstallEvent', function(e) {
-      console.log('Stylebot: Install event received. Installing style...');
+    this.sendAvailabilityMessage($channels.get(0));
 
-      var $post = $(e.target).closest('.post');
-      var url = $.trim($post.find('.post_site').text());
+    if ($channels.length != 0) {
 
-      // first, let's check if a style already exists for the url
-      stylebot.chrome.doesStyleExist(url, function(response) {
-        // if yes, warn the user
-        if (response) {
-          console.log("Style for '" + url + "' already exists.");
+      $channels.bind(this.events.install, function(e) {
+        console.log('Stylebot: Install event received. Installing style...');
 
-          var customEvent = document.createEvent('Event');
-          customEvent.initEvent('stylebotStyleExistsEvent', true, true);
-          e.target.dispatchEvent(customEvent);
-        }
-        // else save the style
-        else
-          saveStyleFromSocial(e);
+        var $style = $(e.target).closest(stylebot.installation.selectors.style);
+        var url    = $.trim($style.find(stylebot.installation.selectors.channel).data('url'));
+
+        // check if a duplicate style already exists
+        stylebot.chrome.doesStyleExist(url, function(response) {
+          if (response) {
+            console.log("Style for '" + url + "' already exists.");
+            stylebot.installation.sendDuplicateWarning(e.target);
+          }
+          else {
+            stylebot.installation.save(e);
+          }
+        });
       });
-    });
 
-    // Bind listener for overwrite installation (without checking if style already exists)
-    $install_divs.bind('stylebotOverwriteEvent', function(e) {
-      console.log('Stylebot: Overwrite event received. Installing style...');
+      // Bind listener for overwrite installation 
+      //  (without checking if style already exists)
+      $channels.bind(this.events.overwrite, function(e) {
+        console.log('Stylebot: Overwrite event received. Installing style...');
+        stylebot.installation.save(e);
+      });
+    }
+  },
 
-      var $post = $(e.target).closest('.post');
+  save: function(event) {
+    var channel  = event.target;
+    var $channel = $(channel);
+    var data     = $channel.data();
 
-      saveStyleFromSocial(e);
-    });
+    var parser = new CSSParser();
+
+    try {
+      var sheet = parser.parse($channel.text(), false, true);
+      var rules = CSSUtils.getRulesFromParserObject(sheet);
+
+      // add the meta header
+      var header = '/**\n    Title: ' + data.title
+      + '\n    URL: http://stylebot.me/styles/' + data.id
+      + '\n    Author: http://stylebot.me/users/' + data.author;
+
+      header += '\n**/';
+
+      var rulesWithMeta = { 'comment-#0' : { comment: header } };
+
+      for (selector in rules)
+        rulesWithMeta[selector] = rules[selector];
+
+      stylebot.chrome.save(data.url, rulesWithMeta, { 
+        id: data.id, 
+        timestamp: data.timestamp 
+      });
+      
+      stylebot.chrome.pushStyles();
+
+      this.sendSuccessMessage(channel);
+    }
+
+    catch (e) {
+      this.sendErrorMessage(channel, e);
+    }
+  },
+
+  sendAvailabilityMessage: function(channel) {
+    console.log("Stylebot: I'm available!");
+    this.sendMessage(channel, this.events.available);
+  },
+
+  sendSuccessMessage: function(channel) {
+    console.log("Stylebot: Style was successfully installed!");
+    this.sendMessage(channel, this.events.success);
+  },
+
+  sendErrorMessage: function(channel, e) {
+    console.log("Stylebot: Error parsing css: " + e);
+    this.sendMessage(channel, this.events.error);
+  },
+
+  sendDuplicateWarning: function(channel) {
+    this.sendMessage(channel, this.events.duplicate);
+  },
+
+  sendMessage: function(channel, message) {
+    var customEvent = document.createEvent('Event');
+    customEvent.initEvent(message, true, true);
+    channel.dispatchEvent(customEvent);
   }
+}
+
+$(document).ready(function(e) {
+  stylebot.installation.init();
 });
-
-
-/**
-  * Sends stylebot social an availability message
-  *   i.e. Stylebot is installed
-  */
-function sendAvailabilityMessage() {
-  // get the first communication DIV in DOM
-  var install_div = $('.stylebot_install_div').get(0);
-
-  // dispatch the message
-  if (install_div) {
-    var customEvent = document.createEvent('Event');
-    customEvent.initEvent('stylebotIsAvailableEvent', true, true);
-    install_div.dispatchEvent(customEvent);
-  }
-}
-
-/**
-  * Send request to background.html to save style
-  *   along with metadata (id, timestamp, etc.)
-  */
-function saveStyleFromSocial(installationEvent) {
-  var channel = installationEvent.target;
-  var $channel = $(channel);
-  var data = $channel.data();
-
-  var parser = new CSSParser();
-
-  try {
-    var sheet = parser.parse($channel.text(), false, true);
-    var rules = CSSUtils.getRulesFromParserObject(sheet);
-
-    // add the meta header
-    var header = '/**\n    Title: ' + data.title
-    + '\n    URL: http://stylebot.me/styles/' + data.id
-    + '\n    Author: http://stylebot.me/users/' + data.author;
-
-    header += '\n**/';
-
-    var rulesWithMeta = { 'comment-#0' : { comment: header } };
-
-    for (selector in rules)
-      rulesWithMeta[selector] = rules[selector];
-
-    stylebot.chrome.save(data.url, rulesWithMeta,
-      { id: data.id, timestamp: data.timestamp });
-    stylebot.chrome.pushStyles();
-
-    // send back success message
-    var customEvent = document.createEvent('Event');
-    customEvent.initEvent('stylebotInstallationSuccessfulEvent', true, true);
-    channel.dispatchEvent(customEvent);
-  }
-
-  catch (e) {
-    console.log('Error parsing css: ' + e);
-    // send back error message
-    var customEvent = document.createEvent('Event');
-    customEvent.initEvent('stylebotInstallationErrorEvent', true, true);
-    channel.dispatchEvent(customEvent);
-  }
-}

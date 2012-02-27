@@ -2,7 +2,7 @@
   * background.html
   */
 
-var CURRENT_VERSION = '1.5.3.6';
+var CURRENT_VERSION = '1.6';
 
 var currTabId;
 var contextMenuId = null;
