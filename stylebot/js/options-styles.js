@@ -2,15 +2,15 @@
   * Refreshes the styles. Called during initialization and on import.
   */
 function fillStyles() {
-  var container = $('#styles');
+  var container = $("#styles");
   container.html('');
 
   var count = 0;
 
-  // newest styles are shown at the top
+  // Newest styles are shown at the top
   for (var url in bg_window.cache.styles.get()) {
-    // skip the global styles
-    if (url === '*') continue;
+    // Skip the global styles
+    if (url === "*") continue;
 
     var html = Handlebars.templates.style({
       url: url,
@@ -20,81 +20,16 @@ function fillStyles() {
     container.prepend(html);
     count ++;
   }
+
   setStyleCount(count);
 }
 
 function getStyleCount() {
-  return parseInt($('#style-count').text());
+  return parseInt($("#style-count").text());
 }
 
 function setStyleCount(val) {
-  $('#style-count').text(val);
-}
-
-function selectStyle($styleEl) {
-  $styleEl.addClass('selected');
-  var $urlEl = $styleEl.find('.style-url');
-  $styleEl.data('value', $urlEl.text());
-  Utils.editElement($urlEl, {editFieldClass: 'stylebot-editing-field'});
-
-  function onEditingComplete(e) {
-    var el = e.target;
-    var $el = $(el);
-
-    if (e.type === 'keydown' && !$el.hasClass('stylebot-editing-field')) return true;
-    if (e.type === 'mousedown' && $el.closest($styleEl).length != 0) return true;
-
-    if (e.type === 'keydown') {
-      switch (e.keyCode) {
-        case 38: // up
-        // return for multiline textarea
-        if ($el.height() > 30) return true;
-
-        var $nextStyle = $el.closest('.style').prev();
-        // if the target element doesn't exist, ignore this event
-        if ($nextStyle.length === 0) return true;
-
-        break;
-
-        case 40: // down
-        // return for multiline textarea
-        if ($el.height() > 30) return true;
-
-        var $nextStyle = $el.closest('.style').next();
-        // if the target element doesn't exist, ignore this event
-        if ($nextStyle.length === 0) return true;
-
-        break;
-
-        case 27:
-        case 13: break;
-
-        default:
-        return true;
-      }
-    }
-
-    e.preventDefault();
-
-    Utils.endEditing($urlEl);
-
-    var newURL = $styleEl.text();
-    editURL($styleEl.data('value'), newURL);
-    $styleEl.data('value', newURL);
-
-    $(document).unbind('keydown mousedown', onEditingComplete);
-
-    $styleEl.removeClass('selected');
-
-    if ($nextStyle != undefined) {
-      setTimeout(function() {
-        $nextStyle.click();
-      }, 0);
-    }
-    else
-      $styleEl.focus();
-  }
-  $(document).bind('keydown mousedown', onEditingComplete);
+  $("#style-count").text(val);
 }
 
 /**
@@ -142,16 +77,18 @@ function showEditGlobalStylesheet(e) {
   * Displays the modal popup for editing a style
   */
 function showEditStyle(e) {
-  var $parent = $(e.target).parents('.style');
+  var $parent = $(e.target).parents(".style");
 
-  var url = $parent.find('.style-url').html();
+  var url = $.trim($parent.find(".style-url").html());
   var rules = bg_window.cache.styles.getRules(url);
 
   initializeModal({
     url: url,
     editor: true,
     edit: true,
-    code: CSSUtils.crunchFormattedCSS(rules, false)
+    code: CSSUtils.crunchFormattedCSS(rules, false),
+    closeOnBgClick: false,
+    closeOnEsc: false
   });
 }
 
@@ -162,7 +99,9 @@ function showAddStyle() {
   initializeModal({
     editor: true,
     add: true,
-    code: ""
+    code: "",
+    closeOnBgClick: false,
+    closeOnEsc: false
   });
 }
 
@@ -254,34 +193,66 @@ function deleteStyle(e) {
 }
 
 /**
+  * Add a new style.
+  */
+function addStyle(e) {
+  var url = $.trim(cache.modal.box.find('input').attr('value'));
+  var css = cache.modal.editor.getSession().getValue();
+  if (saveStyle(url, css, true)) {
+      closeModal();
+  }
+}
+
+/**
+  * Update the global stylesheet.
+  */
+function editGlobal(e) {
+  if (saveStyle("*", cache.modal.editor.getSession().getValue())) {
+      closeModal();
+  }
+}
+
+/**
+  * Update an existing style.
+  */
+function editStyle(e) {
+  var url = $.trim(cache.modal.box.find('input').attr('value'));
+  var css = cache.modal.editor.getSession().getValue();
+
+  if (url === "") {
+    displayErrorMessage("Please enter a URL");
+    return false;
+  }
+
+  else if (url === "*") {
+    displayErrorMessage("* is used for the global stylesheet. Please enter another URL.");
+    return false;
+  }
+
+  if (css === "") {
+    displayErrorMessage("Please enter some CSS");
+    return false;
+  }
+
+  if (saveStyle(url, css)) {
+      closeModal();
+  }
+}
+
+/**
   * Save or update an existing style.
   */
 function saveStyle(url, css, add) {
-  if (url === '') {
-    displayErrorMessage('Please enter a URL');
-    return false;
-  }
-
-  else if (url === '*') {
-    displayErrorMessage('* is used for the global stylesheet. Please enter another URL.');
-    return false;
-  }
-
-  if (css === '') {
-    displayErrorMessage('Please enter some CSS');
-    return false;
-  }
-
   // if css is empty. remove the style
-  if (css === '') {
-    if (url === '*') {
-      bg_window.cache.styles.emptyRules('*');
+  if (css === "") {
+    if (url === "*") {
+      bg_window.cache.styles.emptyRules("*");
       bg_window.cache.styles.push();
     } else {
       if (!bg_window.cache.styles.isEmpty(url)) {
         bg_window.cache.styles.delete(url);
         bg_window.cache.styles.push();
-        $('.style-url:contains(' + url + ')').parent().remove();
+        $(".style-url:contains(" + url + ")").parent().remove();
       }
     }
 
@@ -295,15 +266,21 @@ function saveStyle(url, css, add) {
   if (sheet) {
     try {
       var rules = CSSUtils.getRulesFromParserObject(sheet);
-      // syntax error!
+
+      // Syntax error!
       if (rules['error']) {
-        // todo: notify user of syntax error and highlight the error causing line
+        // TODO: notify user of syntax error and
+        // highlight the error causing line.
         displaySyntaxError(rules['error']);
         return false;
       }
 
-      // If we modify any style, we should overwrite its metadata and their rules, not the enabled value
-      var enabled = bg_window.cache.styles.isEmpty(url) ? true : bg_window.cache.styles.isEnabled(url);
+      // If we modify any style, we should overwrite
+      // its metadata and their rules, not the enabled value.
+      console.log(bg_window.cache.styles.isEmpty(url));
+
+      var enabled = bg_window.cache.styles.isEmpty(url) ? true :
+        bg_window.cache.styles.isEnabled(url);
       bg_window.cache.styles.create(url, rules);
       bg_window.cache.styles.toggle(url, enabled);
       bg_window.cache.styles.push();
@@ -314,7 +291,7 @@ function saveStyle(url, css, add) {
           enabled: bg_window.cache.styles.isEnabled(url)
         });
 
-        $(html).prependTo($('#styles'));
+        $(html).prependTo($("#styles"));
         setStyleCount(getStyleCount() + 1);
       }
 
@@ -322,7 +299,7 @@ function saveStyle(url, css, add) {
     }
 
     catch (e) {
-      // todo: show error here instead of just true.
+      // TODO: show error here instead of just true.
       return true;
     }
   }
@@ -330,31 +307,26 @@ function saveStyle(url, css, add) {
   return true;
 }
 
-// Callback for edit in place for URLs
-function editURL(oldValue, newValue) {
-  if (oldValue == newValue || newValue == '') return;
-  bg_window.cache.styles.replace(oldValue, newValue);
-  bg_window.cache.styles.push();
-}
+/** Filtering **/
 
 // Attach listener to search field for filtering styles
 function initFiltering() {
-  $('#style-search-field').bind('search', function(e) {
+  $("#style-search-field").bind("search", function(e) {
     filterStyles($(this).val());
   })
 
   .keyup(function(e) {
     if (e.keyCode == 27) {
-      $(this).val('');
-      filterStyles('');
+      $(this).val("");
+      filterStyles("");
     }
   });
 }
 
 // Filter styles based on user entered text in search field
 function filterStyles(value) {
-  var styleDivs = $('.style');
-  var urls = $('.style-url');
+  var styleDivs = $(".style");
+  var urls = $(".style-url");
   var len = styleDivs.length;
 
   for (var i = 0; i < len; i++) {

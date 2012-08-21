@@ -192,32 +192,16 @@ li.option:first-of-type {
   float: left;
 }
 
-.stylebot-editing-field {
-  font-size: 13px;
-  float: left;
-  margin: 0;
-  margin-left: 2px;
-}
-
-.style .buttons {
-  display: none;
-  margin: 0;
-  padding: 0;
-  margin-left: 100px;
-  margin-top: 7px;
-  float: right;
-}
-
-.style div {
-  margin: 0 5px;
+.style .controls {
   display: inline-block;
-  border: none;
+  margin: 0;
   padding: 0;
+  margin-top: 3px;
 }
 
-.style:hover .buttons,
-.style.selected .buttons {
-  display: block;
+.style .button {
+  display: inline-block;
+  margin-left: 5px;
 }
 
 #style-search-field {
@@ -234,7 +218,7 @@ li.option:first-of-type {
   color: #ccc;
 }
 
-/** MODAL POPUP **/
+/** Modal popup **/
 
 #stylebot-modal {
   -webkit-border-radius: 2px !important;
@@ -242,24 +226,27 @@ li.option:first-of-type {
   overflow: auto;
 }
 
-#stylebot-modal .popup-content {
+#stylebot-modal .modal-content {
   font-family: 'Lucida Grande', 'Lucida Sans', 'Lucida Sans Unicode', Helvetica, Arial, sans-serif;
   font-size: 12px;
   margin: 0;
 }
 
-#stylebot-modal .popup-header {
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
+#stylebot-modal .modal-header {
+  margin-bottom: 5px;
   min-height: 24px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-#stylebot-modal input {
+#stylebot-modal .modal-header input {
   text-align: left;
+  padding: 2px;
+  width: 95%;
 }
 
-#stylebot-modal .popup-footer {
+#stylebot-modal .modal-footer {
   float: right;
 }
 
@@ -502,16 +489,16 @@ input[name=shortcutKeyCharacter] {
   background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAgMAAABinRfyAAAADFBMVEUAAAD///8AAAAAAADI23cLAAAABHRSTlMAAD7MYITzfAAAADJJREFUCNdjCAUCBgQR9oB7KkP4D/2rDGH/9k9lCNn/T5QhRP8HjABxwRIQJSDFqAYAAIjXHQebFIiyAAAAAElFTkSuQmCC");
 }
 
-.edit-style {
+.show-edit-style {
   -webkit-transition: .15s opacity;
   background: url('../images/edit-button.png') no-repeat;
   height: 16px;
   width: 16px;
 }
-.edit-style:hover {
+.show-edit-style:hover {
   background-image: url('../images/edit-button-hover.png');
 }
-.edit-style:active {
+.show-edit-style:active {
   background-image: url('../images/edit-button-active.png');
 }
 
@@ -527,6 +514,7 @@ input[name=shortcutKeyCharacter] {
 .share-style:active {
   background-image: url('../images/share-button-active.png');
 }
+
 /** Ace Editor **/
 
 #editor {

@@ -95,10 +95,11 @@ function fetchOptions() {
   $.each(options, function(option, value) {
     var dataStoreValue = localStorage['stylebot_option_' + option];
     if (dataStoreValue != typeof undefined) {
-      if (dataStoreValue === 'true' || dataStoreValue === 'false')
+      if (dataStoreValue === 'true' || dataStoreValue === 'false') {
         options[option] = (dataStoreValue === 'true');
-      else
+      } else {
         options[option] = dataStoreValue;
+      }
     }
   });
 }
@@ -134,18 +135,20 @@ function attachListeners() {
       option = e.target.name;
     }
     bg_window.saveOption(option, translateOptionValue(option, e.target.value));
-  });
+  })
+
+  .on("click", ".toggle-page-action", togglePageAction);
 
   $("#styles-container")
-    .on("click", ".edit-global", showEditGlobalStylesheet)
+    .on("click", ".show-edit-global", showEditGlobalStylesheet)
     .on("click", ".toggle-global", toggleGlobalStylesheet)
-    .on("click", ".add-style", showAddStyle)
+    .on("click", ".show-add-style", showAddStyle)
     .on("click", ".enable-all", enableAllStyles)
     .on("click", ".disable-all", disableAllStyles);
 
   $(".style")
     .on("click", ".share-style", shareStyle)
-    .on("click", ".edit-style", showEditStyle)
+    .on("click", ".show-edit-style", showEditStyle)
     .on("click", ".delete-style", deleteStyle)
     .on("click", ".toggle-style", toggleStyle);
 
@@ -153,23 +156,11 @@ function attachListeners() {
     .on("click", ".show-export", showExport)
     .on("click", ".show-import", showImport);
 
-  $(document).on("click", ".cancel", closeModal);
-
-  // Editing styles.
-  $(".style").on("click keydown", function(e) {
-    var $el = $(e.target);
-    var $this = $(this);
-
-    if ($el.closest('.selected').length != 0) return true;
-    if (e.type === 'keydown' &&
-      (e.keyCode != 13 || $el.hasClass('style-button'))) {
-        return true;
-    }
-
-    setTimeout(function() {
-      selectStyle($this);
-    }, 0);
-  });
+  $(document)
+    .on("click", "#stylebot-modal .cancel", closeModal)
+    .on("click", "#stylebot-modal .add-style", addStyle)
+    .on("click", "#stylebot-modal .edit-style", editStyle)
+    .on("click", "#stylebot-modal .edit-global", editGlobal);
 
   // Tap / to search styles.
   $(document).keyup(function(e) {
@@ -198,12 +189,15 @@ function translateOptionValue(name, value) {
   return value;
 }
 
-// Toggle display of css icon in omnibar
+/**
+  * Toggle display of css icon in omnibar.
+  */
 function togglePageAction() {
   options.showPageAction = !options.showPageAction;
   bg_window.saveOption('showPageAction', options.showPageAction);
-  if (!options.showPageAction)
+  if (!options.showPageAction) {
     bg_window.hidePageActions();
-  else
+  } else {
     bg_window.showPageActions();
+  }
 }

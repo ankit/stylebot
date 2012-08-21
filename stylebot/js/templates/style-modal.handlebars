@@ -1,14 +1,10 @@
-<div class="popup-content">
-  <div class="popup-header">
+<div class="modal-content">
+  <div class="modal-header">
     {{#if editor}}
         {{#if global}}
             Edit the Global Stylesheet:
         {{else}}
-            {{#if edit}}
-                Edit the style for <strong>{{url}}</strong>:
-            {{else}}
-                URL: <input type='text'></input>
-            {{/if}}
+            URL: <input type='text' value="{{url}}"></input>
         {{/if}}
     {{else}}
         {{#if export}}
@@ -26,12 +22,12 @@
     <textarea class="stylebot-css-code">{{code}}</textarea>
   {{/if}}
 
-  <div class="popup-footer">
+  <div class="modal-footer">
     {{#if editor}}
         {{#if add}}
             <button class="add-style">Add</button>
         {{else}}
-            <button class="save-style">Save</button>
+            <button {{#if global}}class="edit-global"{{else}}class="edit-style"{{/if}}>Save</button>
         {{/if}}
     {{else}}
         {{#if export}}

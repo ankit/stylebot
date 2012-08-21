@@ -12,3 +12,6 @@ Icon?
 
 # Patch files
 patch.diff
+
+# Compiled Handlebars templates
+stylebot/js/templates.js

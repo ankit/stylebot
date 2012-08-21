@@ -5,7 +5,9 @@
 function initializeModal(options) {
   var html = Handlebars.templates["style-modal"](options);
   var modal = new ModalBox(html, {
-    bgFadeSpeed: 0
+    bgFadeSpeed: 0,
+    closeOnBgClick: options.closeOnBgClick,
+    closeOnEsc: options.closeOnEsc
   });
 
   if (options.editor) {
@@ -13,7 +15,7 @@ function initializeModal(options) {
     modal.options.onOpen = function() {
       resizeEditor();
       setTimeout(function() {
-        modal.editor.focus();
+        modal.box.find("input").focus();
         modal.editor.gotoLine(
           modal.editor.getSession().getLength(), 0);
       }, 0);
