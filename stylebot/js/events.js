@@ -194,15 +194,16 @@ Events = {
 
     self.accordionTimer = setTimeout(function() {
       var len = stylebot.widget.basic.cache.accordionHeaders.length;
-      var enabledAccordions = [];
+      var accordions = [];
       for (var i = 0; i < len; i++) {
         var $accordion = $(stylebot.widget.basic.cache.accordionHeaders[i]);
 
-        if ($accordion.hasClass(ui.ACCORDION_SELECTED_CLASS))
-        enabledAccordions[enabledAccordions.length] = i;
+        if ($accordion.hasClass(ui.ACCORDION_SELECTED_CLASS)) {
+          accordions[accordions.length] = i;
+        }
       }
 
-      stylebot.chrome.saveAccordionState(enabledAccordions);
+      stylebot.chrome.saveAccordionState(accordions);
     }, self.ACCORDION_SAVE_TIMEOUT);
   },
 

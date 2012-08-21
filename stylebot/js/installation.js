@@ -44,7 +44,7 @@ stylebot.installation = {
         });
       });
 
-      // Bind listener for overwrite installation 
+      // Bind listener for overwrite installation
       //  (without checking if style already exists)
       $channels.bind(this.events.overwrite, function(e) {
         console.log('Stylebot: Overwrite event received. Installing style...');
@@ -76,12 +76,10 @@ stylebot.installation = {
       for (selector in rules)
         rulesWithMeta[selector] = rules[selector];
 
-      stylebot.chrome.save(data.url, rulesWithMeta, { 
-        id: data.id, 
-        timestamp: data.timestamp 
+      stylebot.chrome.save(data.url, rulesWithMeta, {
+        id: data.id,
+        timestamp: data.timestamp
       });
-      
-      stylebot.chrome.pushStyles();
 
       this.sendSuccessMessage(channel);
     }

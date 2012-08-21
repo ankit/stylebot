@@ -160,7 +160,9 @@ function attachListeners() {
     .on("click", "#stylebot-modal .cancel", closeModal)
     .on("click", "#stylebot-modal .add-style", addStyle)
     .on("click", "#stylebot-modal .edit-style", editStyle)
-    .on("click", "#stylebot-modal .edit-global", editGlobal);
+    .on("click", "#stylebot-modal .edit-global", editGlobal)
+    .on("click", "#stylebot-modal .import", importCSS)
+    .on("click", "#stylebot-modal .copy-to-clipboard", copyToClipboard);
 
   // Tap / to search styles.
   $(document).keyup(function(e) {

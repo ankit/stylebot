@@ -7,7 +7,7 @@
 stylebot.widget.basic = {
 
   isColorPickerVisible: false,
-  enabledAccordions: [0, 1, 2, 3],
+  accordions: [0, 1, 2, 3],
 
   cache: {
     container: null,
@@ -384,11 +384,11 @@ stylebot.widget.basic = {
 
   // Open enabled accordions
   initAccordions: function() {
-    // todo: the toggleAccordion method should be in WidgetUI
-    var len = this.enabledAccordions.length;
+    // TODO: the toggleAccordion method should be in WidgetUI
+    var len = this.accordions.length;
     for (var i = 0; i < len; i++) {
       Events.toggleAccordion(
-        $(this.cache.accordionHeaders[this.enabledAccordions[i]]));
+        $(this.cache.accordionHeaders[this.accordions[i]]));
     }
   },
 

@@ -2,7 +2,7 @@
   * background.html
   */
 
-var CURRENT_VERSION = '1.6';
+var CURRENT_VERSION = '1.7';
 
 var currTabId;
 var contextMenuId = null;
@@ -19,11 +19,9 @@ var cache = {
     sync: false,
     contextMenu: true,
     livePreviewColorPicker: false,
-    showPageAction: true
+    showPageAction: true,
+    accordions: [0, 1, 2, 3]
   },
-
-  // indices of enabled accordions in panel. by default, all are enabled
-  enabledAccordions: [0, 1, 2, 3],
 
   // temporary cached map of tabId to rules. This is used to prevent recalculating rules for iframes
   // the cache is only live until the tab completes loading or is closed, whichever occurs first
@@ -32,49 +30,29 @@ var cache = {
 
 // Initialize
 function init() {
-  loadOptionsIntoCache();
-  loadStylesIntoCache();
-  loadAccordionState();
   updateVersion();
-
+  setCache();
   createContextMenu();
   attachListeners();
-
-  if (cache.options.sync) {
-    loadSyncId();
-    attachSyncListeners();
-  }
 }
 
 /**
-  * Update the version of extension
-  *   Does any other essential upgrades. Also, shows update desktop notification
+  * Update the version of extension.
+  * Does any other essential upgrades. Also, shows update desktop notification
   */
 function updateVersion() {
-  if (!localStorage.version) {
-    updateVersionString();
-    return true;
-  }
+  chrome.storage.local.get(['version'], function(storage) {
+    if (!storage['version']) {
+      console.log('Updating to version ' + CURRENT_VERSION);
+      chrome.storage.local.set({'version': CURRENT_VERSION});
 
-  if (localStorage.version != CURRENT_VERSION) {
-    // legacy support for any users who jump from 1.3.x to 1.4.x
-    // versions to the current version
-    if (parseFloat(CURRENT_VERSION) === 1.4)
-      cache.styles.upgrade('1.4');
-    // only show notification for X.X updates
-    if (parseFloat(localStorage.version) < parseFloat(CURRENT_VERSION))
+      cache.styles = new Styles({});
+      cache.styles.upgrade('1.7');
+
       showUpdateNotification();
-    // update version string in localStorage
-    updateVersionString();
-  }
-}
-
-/**
-  * Updates version string in localStorage
-  */
-function updateVersionString() {
-  console.log('Updating to version ' + CURRENT_VERSION);
-  localStorage.version = CURRENT_VERSION;
+      return true;
+    }
+  });
 }
 
 /**
@@ -92,8 +70,9 @@ function showUpdateNotification() {
   */
 function attachListeners() {
   if (cache.options.showPageAction == typeof undefined ||
-    cache.options.showPageAction)
-      showPageActions();
+    cache.options.showPageAction) {
+    showPageActions();
+  }
 
   chrome.tabs.onUpdated.addListener(onTabUpdated);
   chrome.tabs.onRemoved.addListener(onTabRemoved);
@@ -143,51 +122,50 @@ function attachListeners() {
         break;
 
       case 'getCombinedRulesForPage':
-        sendResponse(cache.styles.getCombinedRulesForPage(request.url, sender.tab));
+        sendResponse(
+          cache.styles.getCombinedRulesForPage(request.url, sender.tab));
         break;
 
       case 'getCombinedRulesForIframe':
-        sendResponse(cache.styles.getCombinedRulesForIframe(request.url, sender.tab));
+        sendResponse(
+          cache.styles.getCombinedRulesForIframe(request.url, sender.tab));
         break;
 
       case 'fetchOptions':
         sendResponse({
-          options: cache.options,
-          enabledAccordions: cache.enabledAccordions
+          options: cache.options
         });
         break;
 
       case 'saveAccordionState':
-        saveAccordionState(request.enabledAccordions);
+        saveAccordionState(request.accordions);
         sendResponse({});
         break;
 
-      case 'savePreference':
-        savePreference(request.preference);
+      case 'saveOption':
+        saveOption(request.option);
         sendResponse({});
         break;
 
-      case 'getPreference':
-        sendResponse(getPreference(request.preferenceName));
-        break;
-
-      case 'pushStyles':
-        cache.styles.push();
-        sendResponse({});
+      case 'getOption':
+        sendResponse(getOption(request.optionName));
         break;
     }
   });
 }
 
 /**
-  * Request handler for when an existing tab is updated i.e. refreshed / new page is opened
+  * Request handler for when an existing tab is updated i.e.
+  * refreshed / new page is opened.
+  *
   * @param {number} tabId The tab's id
   * @param {object} changeInfo
   * @param {object} The tab object
   */
 function onTabUpdated(tabId, changeInfo, tab) {
-  if (tab.status === 'completed')
+  if (tab.status === 'completed') {
     clearTabResponseCache(tabId);
+  }
 }
 
 /**
@@ -204,8 +182,9 @@ function onTabRemoved(tabId, removeInfo) {
   * @param {number} tabId The id for the tab to be removed
   */
 function clearTabResponseCache(tabId) {
-  if (cache.loadingTabs[tabId])
+  if (cache.loadingTabs[tabId]) {
     delete cache.loadingTabs[tabId];
+  }
 }
 
 /**
@@ -216,7 +195,9 @@ function clearTabResponseCache(tabId) {
   */
 function disablePageAction(tab) {
   chrome.pageAction.setIcon({ tabId: tab.id, path: 'images/css.png' });
-  chrome.pageAction.setTitle({ tabId: tab.id, title: 'Click to start editing using Stylebot' });
+  chrome.pageAction.setTitle({
+    tabId: tab.id,
+    title: 'Click to start editing using Stylebot' });
 }
 
 /**
@@ -226,8 +207,15 @@ function disablePageAction(tab) {
   * @param {object} tab The tab for which the page action should be updated
   */
 function highlightPageAction(tab) {
-  chrome.pageAction.setIcon({ tabId: tab.id, path: 'images/css_highlighted.png' });
-  chrome.pageAction.setTitle({ tabId: tab.id, title: 'Click to start editing using Stylebot' });
+  chrome.pageAction.setIcon({
+    tabId: tab.id,
+    path: 'images/css_highlighted.png'
+  });
+
+  chrome.pageAction.setTitle({
+    tabId: tab.id,
+    title: 'Click to start editing using Stylebot'
+  });
 }
 
 /**
@@ -236,8 +224,15 @@ function highlightPageAction(tab) {
   * @param {object} tab The tab for which the page action should be updated
   */
 function enablePageAction(tab) {
-  chrome.pageAction.setIcon({ tabId: tab.id, path: 'images/css_active.png' });
-  chrome.pageAction.setTitle({ tabId: tab.id, title: 'Click to stop editing using Stylebot' });
+  chrome.pageAction.setIcon({
+    tabId: tab.id,
+    path: 'images/css_active.png'
+  });
+
+  chrome.pageAction.setTitle({
+    tabId: tab.id,
+    title: 'Click to stop editing using Stylebot'
+  });
 }
 
 /**
@@ -258,6 +253,7 @@ function showPageActions() {
       }
     }
   });
+
   chrome.pageAction.onClicked.addListener(onPageActionClick);
   chrome.tabs.onSelectionChanged.addListener(updatePageActionOnTabSelectionChanged);
 }
@@ -289,10 +285,11 @@ function hidePageActions() {
   */
 function onPageActionClick(tab) {
   chrome.tabs.sendRequest(tab.id, { name: 'toggle' }, function(response) {
-    if (response.status)
+    if (response.status) {
       enablePageAction(tab);
-    else
+    } else {
       disablePageAction(tab);
+    }
   });
 }
 
@@ -304,24 +301,17 @@ function onPageActionClick(tab) {
   */
 function updatePageActionOnTabSelectionChanged(tabId, selectInfo) {
   chrome.tabs.get(tabId, function(tab) {
-    chrome.tabs.sendRequest(tab.id, {name: 'status'}, function(response) {
-      if (response.status)
-        enablePageAction(tab);
-      else if (response.rules || response.global)
-        highlightPageAction(tab);
-      else
-        disablePageAction(tab);
-    });
+    if (tab.url.isValidUrl()) {
+      chrome.tabs.sendRequest(tab.id, {name: 'status'}, function(response) {
+        if (response.status)
+          enablePageAction(tab);
+        else if (response.rules || response.global)
+          highlightPageAction(tab);
+        else
+          disablePageAction(tab);
+      });
+    };
   });
-}
-
-/**
-  * Replace the styles object with the specified object
-  * @param {array} styles
-  */
-function saveStyles(styles) {
-  cache.styles = new Styles(styles);
-  cache.styles.persist();
 }
 
 /**
@@ -334,69 +324,35 @@ function mergeStyles(newStyles, oldStyles) {
   cache.styles.merge(newStyles, oldStyles);
 }
 
-/**
-  * Load styles from localStorage into the background page cache
-  */
-function loadStylesIntoCache() {
-  if (localStorage['stylebot_styles']) {
-    try {
-      var styles = JSON.parse(localStorage['stylebot_styles']);
-      if (typeof styles === 'Styles') {
-        // Debug code in case the encapsulated styles bug reappears
-        console.trace();
-        console.log(styles);
-        cache.styles = styles;
-      }
-      else {
-        cache.styles = new Styles(styles);
-      }
-    }
 
-    catch (e) {
-      console.log(e);
-      cache.styles = new Styles({});
-      cache.styles.persist();
-    }
-  }
-
-  else {
-    cache.styles = new Styles({});
-    cache.styles.persist();
-  }
+function setCache() {
+  chrome.storage.local.get(null, function(storage) {
+    cache.options = storage['options']
+    cache.styles = new Styles(storage['styles']);
+  });
 }
 
 /**
-  * Load options from localStorage into the background page cache
-  */
-function loadOptionsIntoCache() {
-  for (var option in cache.options) {
-    var dataStoreValue = localStorage['stylebot_option_' + option];
-    if (dataStoreValue) {
-      if (dataStoreValue == 'true' || dataStoreValue == 'false')
-        cache.options[option] = (dataStoreValue == 'true');
-      else
-        cache.options[option] = dataStoreValue;
-    }
-    else
-      localStorage['stylebot_option_' + option] = cache.options[option];
-  }
-}
-
-/**
-  * Save an option in cache and localStorage and push it to all open tabs
+  * Save an option in cache and datastore.
+  * Also pushes the change to all currently open tabs.
   * @param {string} name Option name
   * @param {object} value Option value
   */
 function saveOption(name, value) {
   cache.options[name] = value;
-  localStorage['stylebot_option_' + name] = value;
+  chrome.storage.local.set({'options': cache.options});
   propagateOptions();
 
-  // option specific code
-  if (name === 'contextMenu' && value === false)
+  // If the option was contextMenu, update it.
+  if (name === 'contextMenu' && value === false) {
     removeContextMenu();
-  else if (!contextMenuId)
+  } else if (!contextMenuId) {
     createContextMenu();
+  }
+}
+
+function getOption(name) {
+  return cache.options[name];
 }
 
 /**
@@ -410,47 +366,28 @@ function getGlobalRules() {
   * Propagate options to all existing tabs
   */
 function propagateOptions() {
-  sendRequestToAllTabs({ name: 'setOptions', options: cache.options }, function() {});
+  sendRequestToAllTabs({
+    name: 'setOptions',
+    options: cache.options
+  }, function() {});
 }
 
 /**
   * Save current accordion state of stylebot editor into background page cache
-  * @param {array} enabledAccordions Indices of open accordions
+  * @param {array} accordions Indices of open accordions
   */
-function saveAccordionState(enabledAccordions) {
-  cache.enabledAccordions = enabledAccordions;
-  localStorage['stylebot_enabledAccordions'] = enabledAccordions;
-}
-
-/**
-  * Load previous accordion state of stylebot into background page cache
-  */
-function loadAccordionState() {
-  if (localStorage['stylebot_enabledAccordions'])
-    cache.enabledAccordions = localStorage['stylebot_enabledAccordions'].split(',');
-}
-
-/**
-  * Save an option to localStorage
-  * @param {object} preference Option name + value
-  */
-function savePreference(preference) {
-  localStorage[preference.name] = preference.value;
-}
-
-/**
-  * Get an option from localStorage
-  * @return {object} Option name + value
-  */
-function getPreference(preferenceName) {
-  return { name: preferenceName, value: localStorage[preferenceName] };
+function saveAccordionState(accordions) {
+  cache.options.accordions = accordions;
+  chrome.storage.local.set({'options': cache.options});
 }
 
 /**
   * Initialize the right click context menu
   */
 function createContextMenu() {
-  if (localStorage['stylebot_option_contextMenu'] === 'true') {
+  if (cache.options.contextMenu) {
+    chrome.contextMenus.removeAll();
+
     contextMenuId = chrome.contextMenus.create({
       title: 'Stylebot',
       contexts: ['all']
@@ -459,7 +396,9 @@ function createContextMenu() {
     chrome.contextMenus.create({
       title: 'Style Element',
       contexts: ['all'],
-      onclick: function(info, tab) { sendRequestToTab(tab, 'openWidget'); },
+      onclick: function(info, tab) {
+        sendRequestToTab(tab, 'openWidget');
+      },
       parentId: contextMenuId
     });
 
@@ -479,10 +418,13 @@ function createContextMenu() {
       parentId: contextMenuId
     });
 
-    // Added onUpdated listener so we can track tab refresh
-    chrome.tabs.onUpdated.addListener(updateContextMenuOnUpdated);
+    // Added onUpdated listener so we can track tab refresh.
+    chrome.tabs.onUpdated.addListener(
+      updateContextMenuOnUpdated);
+
     // Add a selectionChanged listener so we can track changes in current tab
-    chrome.tabs.onSelectionChanged.addListener(updateContextMenuOnSelectionChanged);
+    chrome.tabs.onSelectionChanged.addListener(
+      updateContextMenuOnSelectionChanged);
   }
 }
 
@@ -491,7 +433,7 @@ function createContextMenu() {
   */
 function updateContextMenuOnUpdated(tabId, changeInfo, tab) {
   if (tab.status != 'complete') return;
-    updateContextMenu(tab);
+  updateContextMenu(tab);
 }
 
 /**
@@ -511,19 +453,26 @@ function updateContextMenuOnSelectionChanged(tabId, selectInfo) {
 function updateContextMenu(tab) {
   if (tab.url.isValidUrl()) {
     // If it is a valid url, show the contextMenu
-    chrome.contextMenus.update(contextMenuId, { documentUrlPatterns: ['<all_urls>'] });
-    // Get style status from the tab we changed to and update the checkbox in the context menu
-    chrome.tabs.sendRequest(tab.id,
-      {name: 'styleStatus'},
-      function(response) {
-        chrome.contextMenus.update(contextMenuStatusId, { checked: response.status });
+    chrome.contextMenus.update(contextMenuId, {
+      documentUrlPatterns: ['<all_urls>']
     });
+
+    // Get style status from the tab we changed to and
+    // update the checkbox in the context menu.
+    chrome.tabs.sendRequest(tab.id, {name: 'styleStatus'},
+      function(response) {
+          chrome.contextMenus.update(contextMenuStatusId, {
+          checked: response.status
+        });
+      });
   }
 
   else {
-    // If it isn't a valid url, hide the contextMenu. Set the document pattern to foo/*random*
-    chrome.contextMenus.update(contextMenuId,
-      { documentUrlPatterns: ['http://foo/' + Math.random()] });
+    // If it isn't a valid url, hide the contextMenu.
+    // Set the document pattern to foo/*random*.
+    chrome.contextMenus.update(contextMenuId, {
+      documentUrlPatterns: ['http://foo/' + Math.random()]
+    });
   }
 }
 
@@ -532,7 +481,8 @@ function updateContextMenu(tab) {
   */
 function removeContextMenu() {
   if (contextMenuId) {
-    chrome.tabs.onSelectionChanged.removeListener(updateContextMenuOnSelectionChanged);
+    chrome.tabs.onSelectionChanged.removeListener(
+      updateContextMenuOnSelectionChanged);
     chrome.tabs.onUpdated.removeListener(updateContextMenuOnUpdated);
     chrome.contextMenus.remove(contextMenuId);
     contextMenuId = null;
@@ -611,22 +561,50 @@ Styles.prototype.delete = function(url) {
   * @return {Object} The request style(s) object(s).
   */
 Styles.prototype.get = function(url) {
-  if (url === undefined)
+  if (url === undefined) {
     return this.styles;
-  else
+  } else {
     return this.styles[url];
+  }
 };
+
+Styles.prototype.set = function(url, value) {
+  if (url === undefined) {
+    return false;
+  } else {
+    this.styles[url] = value;
+    return this.styles[url];
+  }
+};
+
+Styles.prototype.persist = function() {
+  chrome.storage.local.set({'styles': this.styles});
+}
 
 /**
   * Creates a new style for the given URL
   * @param {String} url URL of the new object.
   * @param {Object} rules Rules for the given URL.
   */
-Styles.prototype.create = function(url, rules) {
+Styles.prototype.create = function(url, rules, data) {
   this.styles[url] = {};
   this.styles[url]['_enabled'] = true;
   this.styles[url]['_rules'] = rules === undefined ? {} : rules;
+  if (data !== undefined) {
+    this.setMetadata(url, data);
+  }
   this.persist();
+};
+
+/**
+  * Saves the given metadata inside the style for the given URL.
+  * @param {String} url URL of the saved object.
+  * @param {Object} data New metadata for the given URL.
+  */
+Styles.prototype.setMetadata = function(url, data) {
+  this.styles[url]['_social'] = {};
+  this.styles[url]['_social'].id = data.id;
+  this.styles[url]['_social'].timestamp = data.timestamp;
 };
 
 /**
@@ -635,8 +613,9 @@ Styles.prototype.create = function(url, rules) {
   * @return {Boolean} The enabled status for the given URL.
   */
 Styles.prototype.isEnabled = function(url) {
-  if (this.styles[url] === undefined)
+  if (this.styles[url] === undefined) {
     return false;
+  }
 
   return this.styles[url]['_enabled'];
 };
@@ -649,30 +628,15 @@ Styles.prototype.isEnabled = function(url) {
   * @param {Object} data New metadata for the given URL.
   */
 Styles.prototype.save = function(url, rules, data) {
-  if (!url || url === '')
+  if (!url || url === '') {
     return;
-
-  if (rules) {
-    this.create(url, rules);
-    // if there is meta data, store it in the social object
-    if (data !== undefined)
-      this.setMetadata(url, data);
   }
 
-  else
+  if (rules) {
+    this.create(url, rules, data);
+  } else {
     this.delete(url);
-};
-
-/**
-  * Saves the given metadata inside the style for the given URL.
-  * @param {String} url URL of the saved object.
-  * @param {Object} data New metadata for the given URL.
-  */
-Styles.prototype.setMetadata = function(url, data) {
-  this.styles[url]['_social'] = {};
-  this.styles[url]['_social'].id = data.id;
-  this.styles[url]['_social'].timestamp = data.timestamp;
-  this.persist();
+  }
 };
 
 /**
@@ -681,18 +645,18 @@ Styles.prototype.setMetadata = function(url, data) {
   * @param {String} url URL of the saved object.
   * @param {Object} value The enabled status for the given URL.
   */
-Styles.prototype.toggle = function(url, value, shouldPersist) {
-  if (this.isEmpty(url))
+Styles.prototype.toggle = function(url, value, shouldSave) {
+  if (this.isEmpty(url)) {
     return false;
+  }
 
-  if (value === undefined)
+  if (value === undefined) {
     this.styles[url]['_enabled'] = !this.styles[url]['_enabled'];
-  else
+  } else {
     this.styles[url]['_enabled'] = value;
+  }
 
-  if (shouldPersist != false)
-    this.persist();
-
+  this.persist();
   return true;
 };
 
@@ -705,7 +669,6 @@ Styles.prototype.toggleAll = function(value) {
   for (var url in this.styles) {
     this.toggle(url, value, false);
   }
-  this.persist();
 };
 
 /**
@@ -727,74 +690,22 @@ Styles.prototype.emptyRules = function(url) {
 };
 
 /**
-  * Saves all the styles in localStorage
-  */
-Styles.prototype.persist = function() {
-  var jsonString = JSON.stringify(this.styles);
-  localStorage['stylebot_styles'] = jsonString;
-};
-
-/**
   * Imports a styles object i.e. replaces the existing styles
   *   object with the specified object
   * @param {Object} newStyles Styles object to import.
   */
 Styles.prototype.import = function(newStyles) {
   for (var url in newStyles) {
-    // it's the new format
-    if (newStyles[url]['_rules'])
+    if (newStyles[url]['_rules']) {
+      // it's the new format.
       this.styles[url] = newStyles[url];
-    // old format
-    else
+    } else {
+      // legacy support for the old format.
       this.create(url, newStyles[url]);
-  }
-  this.persist();
-};
-
-/**
-  * Merge the old object with the new one.
-  * If the oldStyles parameter is given, we can use this as a
-  *   static function capable of merging two styles objects together.
-  * @param {Object} newStyles Styles object to merge.
-  * @param {Object} oldStyles Styles object used as basis.
-  * @return {Object} Merge object if the oldStyles parameter was given.
-  */
-Styles.prototype.merge = function(newStyles, oldStyles) {
-  if (oldStyles === undefined)
-    oldStyles = this.styles;
-
-  for (var url in newStyles) {
-    if (oldStyles[url]) {
-      for (var selector in newStyles[url]['_rules']) {
-        if (oldStyles[url]['_rules'][selector]) {
-          for (var property in newStyles[url]['_rules'][selector])
-          {
-            oldStyles[url]['_rules'][selector][property] =
-            newStyles[url]['_rules'][selector][property];
-          }
-        }
-        else
-          oldStyles[url]['_rules'][selector] = newStyles[url]['_rules'][selector];
-      }
-      oldStyles[url]['_social'] = newStyles[url]['_social'];
     }
-    else
-      oldStyles[url] = newStyles[url];
   }
 
-  if (oldStyles === undefined)
-    this.persist();
-  else
-    return oldStyles;
-};
-
-/**
-  * Syncs the styles object i.e. pushes changes to the bookmark url
-  */
-Styles.prototype.push = function() {
-  console.log('Pushing styles to the cloud...');
-  if (cache.options.sync)
-    saveSyncData(this.styles);
+  this.persist();
 };
 
 /**
@@ -803,20 +714,28 @@ Styles.prototype.push = function() {
   */
 Styles.prototype.upgrade = function(version) {
   switch (version) {
-    case '1.4':
-      console.log('Upgrading data model for 1.4');
+    case '1.7':
+      console.log('Upgrading data model for 1.7');
 
-      for (var url in this.styles) {
-        if (this.isEnabled(url) === undefined)
-          this.toggle(url, true);
+      chrome.storage.local.set({'styles':
+        JSON.parse(localStorage['stylebot_styles'])});
+
+      for (var option in cache.options) {
+        var value = localStorage['stylebot_option_' + option];
+        if (value) {
+          if (value === 'true' || value === 'false') {
+            value = (value === 'true');
+          }
+          cache.options[option] = value;
+        } else {
+          value = cache.options[option];
+        }
       }
 
-      /* If the global stylesheet is empty after the upgrade, create it */
-      if (this.isEmpty('*'))
-        this.create('*');
-
-      this.persist();
-      this.push();
+      chrome.storage.local.set({'options': cache.options})
+      chrome.storage.local.get(null, function(storage) {
+        console.log(storage);
+      });
       break;
   }
 };
@@ -827,8 +746,9 @@ Styles.prototype.upgrade = function(version) {
   * @return {Object} The enabled status for the given URL.
   */
 Styles.prototype.getRules = function(url) {
-  if (this.styles[url] === undefined)
+  if (this.styles[url] === undefined) {
     return null;
+  }
   var rules = this.styles[url]['_rules'];
   return rules ? rules : null;
 };
@@ -839,10 +759,12 @@ Styles.prototype.getRules = function(url) {
   * @return {Boolean} True if any rules are associated with the URL
   */
 Styles.prototype.exists = function(aURL) {
-  if (this.isEnabled(aURL) && aURL !== '*')
+  if (this.isEnabled(aURL) && aURL !== '*') {
     return true;
-  else
+  }
+  else {
     return false;
+  }
 };
 
 /**
@@ -934,17 +856,17 @@ Styles.prototype.getCombinedRulesForPage = function(aURL, tab) {
     }
   }
 
-  cache.loadingTabs[tab.id] = response;
-
-  // update page action
+  // Update page action.
   if (cache.options.showPageAction) {
-    if (response.rules || response.global)
+    if (response.rules || response.global) {
       highlightPageAction(tab);
-    else
+    } else {
       disablePageAction(tab);
+    }
     chrome.pageAction.show(tab.id);
   }
 
+  cache.loadingTabs[tab.id] = response;
   return response;
 };
 
@@ -964,8 +886,9 @@ Styles.prototype.getCombinedRulesForIframe = function(aURL, tab) {
     }
     return response;
   }
-  else
+  else {
     return this.getCombinedRulesForPage(aURL, tab);
+  }
 }
 
 /**
@@ -979,7 +902,7 @@ Styles.prototype.getGlobalRules = function() {
 };
 
 /**
-  * Transfer rules for source URL to destination URL
+  * Transfer rules from source URL to destination URL.
   * @param {String} source Source's identifier.
   * @param {String} destination Destination's identifier.
   */
@@ -988,25 +911,6 @@ Styles.prototype.transfer = function(source, destination) {
     this.styles[destination] = this.styles[source];
     this.persist();
   }
-};
-
-/**
-  * Replace an style's identifier in place
-  * @param {String} oldValue The old identifier.
-  * @param {String} newValue The new identifier.
-  */
-Styles.prototype.replace = function(oldValue, newValue) {
-  // going through a loop so that new entry is inserted at the same position
-  // otherwise, on changing the url, new entry is inserted at the bottom
-  var newStyles = {};
-  for (var url in this.styles) {
-    if (url === oldValue)
-      newStyles[newValue] = this.styles[oldValue];
-    else
-      newStyles[url] = this.styles[url];
-  }
-  this.styles = newStyles;
-  this.persist();
 };
 
 // Utility methods
@@ -1024,10 +928,8 @@ String.prototype.trim = function() {
   * @return {Boolean} True if the string is a patern, false otherwise.
   */
 String.prototype.isPattern = function() {
-  /**
-    * Currently, the only indicator that a string is a pattern is if
-    * if thas the wildcard character *
-    */
+  // Currently, the only indicator that a string is a pattern is if
+  //if thas the wildcard character *
   return this.indexOf('*') >= 0;
 };
 
@@ -1097,11 +999,13 @@ String.prototype.matchesBasic = function(pattern) {
 };
 
 /**
-  * Check if Stylebot should run on a URL
+  * Check if Stylebot should run on a URL.
   * @return {Boolean} True if Stylebot can run on the URL
   */
 String.prototype.isValidUrl = function() {
   return (this.indexOf('https://chrome.google.com/webstore') === -1
+  && this.indexOf('chrome-extension://') == -1
+  && this.indexOf('chrome://') == -1
   && this.isOfHTMLType());
 };
 

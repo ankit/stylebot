@@ -81,10 +81,6 @@ var stylebot = {
     stylebot.selectedElement = null;
     stylebot.destroyHighlighter();
     detachKeyboardShortcuts();
-
-    // sync styles
-    if (stylebot.options.sync === true)
-      stylebot.chrome.pushStyles();
   },
 
   /**

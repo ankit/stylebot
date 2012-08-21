@@ -13,7 +13,7 @@ $(document).ready(function() {
   */
 function initialize(response) {
   // init accordion state
-  stylebot.widget.basic.enabledAccordions = response.enabledAccordions;
+  stylebot.widget.basic.accordions = response.options.accordions;
   stylebot.initialize(response.options);
   attachListeners();
 }

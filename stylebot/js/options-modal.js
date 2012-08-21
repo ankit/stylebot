@@ -96,13 +96,13 @@ function closeModal() {
 
 
 function displayBackupErrorMessage(msg) {
-  var $error = cache.backupModal.box.find('#backupError');
+  var $error = cache.modal.box.find('#parserError');
   if ($error.length === 0) {
     $error = $('<div>', {
-      id: 'backupError',
+      id: 'parserError',
       class: 'error'
     });
-    cache.backupModal.box.append($error);
+    cache.modal.box.append($error);
   }
   $error.text(msg);
 }

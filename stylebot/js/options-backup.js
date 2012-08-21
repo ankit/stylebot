@@ -21,13 +21,12 @@ function showImport() {
 
 // Import styles from JSON string
 function importCSS() {
-  var json = cache.backupModal.box.find('textarea').attr('value');
+  var json = cache.modal.box.find('textarea').attr('value');
 
   if (json && json != '') {
     try {
       var imported_styles = JSON.parse(json);
       bg_window.cache.styles.import(imported_styles);
-      bg_window.cache.styles.push();
     }
 
     catch (e) {

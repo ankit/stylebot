@@ -5,9 +5,7 @@
   "description"     : "Adapt the web's appearance",
   "background" : {
     "scripts": [
-      "js/background.js",
-      "js/bookmark.js",
-      "js/sync.js"
+      "js/background.js"
     ]
   },
 
@@ -109,6 +107,7 @@
     "bookmarks",
     "contextMenus",
     "notifications",
+    "storage",
     "http://userstyles.org/"
   ]
 }

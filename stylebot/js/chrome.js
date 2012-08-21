@@ -76,10 +76,13 @@ stylebot.chrome = {
 
   /**
     * Send request to save accordion state
-    * @param {array} enabledAccordions Indices of open accordions
+    * @param {array} accordions Indices of open accordions
     */
-  saveAccordionState: function(enabledAccordions) {
-    chrome.extension.sendRequest({ name: 'saveAccordionState', enabledAccordions: enabledAccordions }, function() {});
+  saveAccordionState: function(accordions) {
+    chrome.extension.sendRequest({
+      name: 'saveAccordionState',
+      accordions: accordions
+    }, function() {});
   },
 
   /**
@@ -87,8 +90,11 @@ stylebot.chrome = {
     * @param {string} name Option name
     * @param {object} value Option value
     */
-  savePreference: function(name, value) {
-    chrome.extension.sendRequest({ name: 'savePreference', preference: { name: name, value: value } }, function() {});
+  saveOption: function(name, value) {
+    chrome.extension.sendRequest({
+      name: 'saveOption',
+      option: { name: name, value: value }
+    }, function() {});
   },
 
   /**
@@ -96,18 +102,11 @@ stylebot.chrome = {
     * @param {string} name Option name
     * @param {function} callback Method to be called with the option value
     */
-  getPreference: function(name, callback) {
-    chrome.extension.sendRequest({ name: 'getPreference', preferenceName: name }, function(response) {
-      callback(response.value);
-    });
-  },
-
-  /**
-    * Send request to background page to push styles
-    *   i.e. save them to bookmark for sync
-    */
-  pushStyles: function() {
-    chrome.extension.sendRequest({ name: 'pushStyles' }, function() {});
+  getOption: function(name, callback) {
+    chrome.extension.sendRequest({ name: 'getOption', optionName: name },
+      function(response) {
+        callback(response.value);
+      });
   },
 
   /**
