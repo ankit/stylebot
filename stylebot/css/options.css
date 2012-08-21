@@ -208,9 +208,11 @@ li.option:first-of-type {
   float: right;
 }
 
-.buttons a {
+.style div {
   margin: 0 5px;
   display: inline-block;
+  border: none;
+  padding: 0;
 }
 
 .style:hover .buttons,
@@ -500,33 +502,29 @@ input[name=shortcutKeyCharacter] {
   background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAgMAAABinRfyAAAADFBMVEUAAAD///8AAAAAAADI23cLAAAABHRSTlMAAD7MYITzfAAAADJJREFUCNdjCAUCBgQR9oB7KkP4D/2rDGH/9k9lCNn/T5QhRP8HjABxwRIQJSDFqAYAAIjXHQebFIiyAAAAAElFTkSuQmCC");
 }
 
-.edit-button {
+.edit-style {
   -webkit-transition: .15s opacity;
   background: url('../images/edit-button.png') no-repeat;
   height: 16px;
   width: 16px;
 }
-
-.edit-button:hover {
+.edit-style:hover {
   background-image: url('../images/edit-button-hover.png');
 }
-
-.edit-button:active {
+.edit-style:active {
   background-image: url('../images/edit-button-active.png');
 }
 
-.share-button {
+.share-style {
   -webkit-transition: .15s opacity;
   background: url('../images/share-button.png') no-repeat;
   height: 16px;
   width: 24px;
 }
-
-.share-button:hover {
+.share-style:hover {
   background-image: url('../images/share-button-hover.png');
 }
-
-.share-button:active {
+.share-style:active {
   background-image: url('../images/share-button-active.png');
 }
 /** Ace Editor **/

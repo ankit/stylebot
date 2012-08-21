@@ -2,12 +2,14 @@
   <head>
     <title>Stylebot Options</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
     <link rel="stylesheet" href="css/modal.css" type="text/css" media="screen" title="no title" charset="utf-8">
     <link rel="stylesheet" href="css/options.css" type="text/css" media="screen" title="no title" charset="utf-8">
     <link rel="stylesheet" href="css/tipsy.css" type="text/css" media="screen" title="no title" charset="utf-8">
     <link rel="stylesheet" href="css/ace_editor.css" type="text/css" media="screen" title="no title" charset="utf-8">
+
+    <script type="text/javascript" src="js/libs/handlebars.js"></script>
     <script type="text/javascript" src="js/libs/jquery.js"></script>
-    <script type="text/javascript" src="js/options.js"></script>
     <script type="text/javascript" src="js/libs/keycombo.js"></script>
     <script type="text/javascript" src="js/libs/utils.js"></script>
     <script type="text/javascript" src="js/libs/css-utils.js"></script>
@@ -17,6 +19,13 @@
     <script type="text/javascript" src="js/libs/ace.js"></script>
     <script type="text/javascript" src="js/libs/mode-css.js"></script>
     <script type="text/javascript" src="js/libs/theme-dawn.js"></script>
+
+    <script type="text/javascript" src="js/templates.js"></script>
+
+    <script type="text/javascript" src="js/options.js"></script>
+    <script type="text/javascript" src="js/options-modal.js"></script>
+    <script type="text/javascript" src="js/options-backup.js"></script>
+    <script type="text/javascript" src="js/options-styles.js"></script>
   </head>
   <body>
     <div id="wrap">
@@ -25,7 +34,7 @@
         <ul class="menu">
           <li><a href="#basics">Basics</a></li>
           <li><a href="#styles-container">Styles</a></li>
-          <li><a href="#backup">Backup and Sync</a></li>
+          <li><a href="#backup">Backup</a></li>
         </ul>
         <div class='separator'></div>
         <div id="footer">
@@ -49,7 +58,7 @@
               </div>
               <div>
                 <label>
-                  <input type="checkbox" name="showPageAction" onclick="togglePageAction();" />
+                  <input type="checkbox" name="showPageAction" class="toggle-page-action" />
                   <span class="option-field">Show <img src='images/css.png' style='margin-bottom: -6px;' /> Icon in Omnibar</span>
                 </label>
               </div>
@@ -105,8 +114,8 @@
           <div class="option-section">
             <h3>Global Stylesheet</h3>
             <div class="option-subsection">
-              <button onclick="editGlobalStylesheet();">Edit Global Stylesheet</button>
-              <button onclick="toggleGlobalStylesheet();" id="global-stylesheet-button">Enable Global Stylesheet</button>
+              <button class="edit-global">Edit Global Stylesheet</button>
+              <button class="toggle-global" >Enable Global Stylesheet</button>
             </div>
           </div>
           <div class="option-section">
@@ -118,33 +127,21 @@
           <div class="option-section">
             <h3>Styles <span id='style-count-container'>(<span id='style-count'>0</span>)</span></h3>
             <div class="option-subsection">
-              <button onclick="addStyle();">Add a new style...</button>
-              <button onclick="enableAllStyles();">Enable all</button>
-              <button onclick="disableAllStyles();">Disable all</button>
+              <button class="add-style">Add a new style...</button>
+              <button class="enable-all">Enable all</button>
+              <button class="disable-all">Disable all</button>
               <div id="styles">
               </div>
             </div>
           </div>
         </div>
         <div id="backup">
-          <h2>Backup and Sync</h2>
+          <h2>Backup</h2>
           <div class="option-section">
             <h3>Backup</h3>
             <div class='option-subsection'>
-              <button onclick="showExportPopup();">Export Styles...</button>
-              <button onclick="showImportPopup();">Import Styles...</button>
-            </div>
-          </div>
-          <div class="option-section" id="sync">
-            <h3>Sync <span class='alert'>experimental</span></h3>
-            <div class='option-subsection'>
-              Sync your styles across multiple computers.
-              <br>
-              Requires <a href="http://www.google.com/support/chrome/bin/answer.py?answer=185277" target='_blank'>Bookmark Sync</a>.
-              <br>
-              <div style='margin-top:18px'>
-                <button onclick="toggleSyncing();" id="sync-button">Enable Sync</button>
-              </div>
+              <button class="show-export">Export Styles...</button>
+              <button class="show-import">Import Styles...</button>
             </div>
           </div>
         </div>

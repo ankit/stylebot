@@ -1,0 +1,45 @@
+<div class="popup-content">
+  <div class="popup-header">
+    {{#if editor}}
+        {{#if global}}
+            Edit the Global Stylesheet:
+        {{else}}
+            {{#if edit}}
+                Edit the style for <strong>{{url}}</strong>:
+            {{else}}
+                URL: <input type='text'></input>
+            {{/if}}
+        {{/if}}
+    {{else}}
+        {{#if export}}
+            Copy and paste the following into a text file:
+        {{else}}
+            Paste previously exported styles: <br>
+            <span class='note'>Note</span>: Existing styles for similar URLs will be overwritten.
+        {{/if}}
+    {{/if}}
+  </div>
+
+  {{#if editor}}
+    <div id="editor"></div>
+  {{else}}
+    <textarea class="stylebot-css-code">{{code}}</textarea>
+  {{/if}}
+
+  <div class="popup-footer">
+    {{#if editor}}
+        {{#if add}}
+            <button class="add-style">Add</button>
+        {{else}}
+            <button class="save-style">Save</button>
+        {{/if}}
+    {{else}}
+        {{#if export}}
+            <button class="copy-to-clipboard">Copy to Clipboard</button>
+        {{else}}
+            <button class="import-styles">Import</button>
+        {{/if}}
+    {{/if}}
+    <button class="cancel">Cancel</button>
+  </div>
+</div>

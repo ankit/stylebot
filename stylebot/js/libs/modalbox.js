@@ -8,15 +8,14 @@
 // constructor
 var ModalBox = function(html, options) {
     if (options) {
-        for (var option in options)
+        for (var option in options) {
             this.options[option] = options[option];
+        }
     }
 
     this.box = $('<div>', {
         id: 'stylebot-modal'
-    })
-
-    .append(html);
+    }).append(html);
 
     if (this.options.parent) {
         this.box.appendTo(this.options.parent);
@@ -116,8 +115,15 @@ ModalBox.prototype.show = function(content, options) {
 };
 
 ModalBox.prototype.hide = function() {
-    this.box.fadeOut(this.options.fadeSpeed);
-    if (this.background)
-        this.background.fadeOut(this.options.bgFadeSpeed).remove();
-    this.options.onClose();
+    var self = this;
+
+    self.box.fadeOut(this.options.fadeSpeed, function() {
+        self.box.remove();
+    });
+
+    if (self.background) {
+        self.background.fadeOut(this.options.bgFadeSpeed).remove();
+    }
+
+    self.options.onClose();
 };
