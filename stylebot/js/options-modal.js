@@ -6,8 +6,8 @@ function initializeModal(options) {
   var html = Handlebars.templates["style-modal"](options);
   var modal = new ModalBox(html, {
     bgFadeSpeed: 0,
-    closeOnBgClick: options.closeOnBgClick,
-    closeOnEsc: options.closeOnEsc
+    closeOnBgClick: false,
+    closeOnEsc: false
   });
 
   if (options.editor) {

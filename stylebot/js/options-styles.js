@@ -86,9 +86,7 @@ function showEditStyle(e) {
     url: url,
     editor: true,
     edit: true,
-    code: CSSUtils.crunchFormattedCSS(rules, false),
-    closeOnBgClick: false,
-    closeOnEsc: false
+    code: CSSUtils.crunchFormattedCSS(rules, false)
   });
 }
 
@@ -99,9 +97,7 @@ function showAddStyle() {
   initializeModal({
     editor: true,
     add: true,
-    code: "",
-    closeOnBgClick: false,
-    closeOnEsc: false
+    code: ""
   });
 }
 
