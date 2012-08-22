@@ -46,18 +46,21 @@ Options.modal = {
   },
 
   resize: function() {
+    if (!this.cached || !this.cached.editor) return;
+
     var $modal = $('#stylebot-modal');
     var modalHeight = $modal.height();
     var modalWidth = $modal.width();
+    var bottomSpace = 60;
 
+    var newHeight = (modalHeight - bottomSpace);
     $('.stylebot-css-code')
-    .height(modalHeight - 50 + 'px')
-    .width(modalWidth + 'px');
+      .height(newHeight)
+      .width(modalWidth);
 
-    if (!this.cached || !this.cached.editor) return;
-
-    $('#editor').height(modalHeight - 50 + 'px')
-    .width(modalWidth - 2 + 'px');
+    $('#editor')
+      .height(newHeight)
+      .width(modalWidth - 2);
 
     this.cached.editor.resize();
   },

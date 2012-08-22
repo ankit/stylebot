@@ -108,7 +108,12 @@ function attachListeners() {
 
   // On window resize, resize CSS editors.
   $(window).resize(function(e) {
-    resizeEditor();
+    Options.modal.resize();
+  });
+
+  $('.tipsy').tipsy({
+    gravity: 's',
+    live: true
   });
 }
 
