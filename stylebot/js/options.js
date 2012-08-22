@@ -106,7 +106,6 @@ function attachListeners() {
 
   .on("click", ".toggle-page-action", togglePageAction);
 
-  // On window resize, resize CSS editors.
   $(window).resize(function(e) {
     Options.modal.resize();
   });

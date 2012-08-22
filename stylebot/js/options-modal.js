@@ -48,18 +48,16 @@ Options.modal = {
   resize: function() {
     if (!this.cached || !this.cached.editor) return;
 
-    var $modal = $('#stylebot-modal');
-    var modalHeight = $modal.height();
+    var $modal = this.cached.box;
+    var modalHeight = $(window).height() / 2;
     var modalWidth = $modal.width();
-    var bottomSpace = 60;
 
-    var newHeight = (modalHeight - bottomSpace);
     $('.stylebot-css-code')
-      .height(newHeight)
+      .height(modalHeight)
       .width(modalWidth);
 
     $('#editor')
-      .height(newHeight)
+      .height(modalHeight)
       .width(modalWidth - 2);
 
     this.cached.editor.resize();
