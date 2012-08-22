@@ -81,20 +81,23 @@ function attachListeners() {
     function(request, sender, sendResponse) {
     switch (request.name) {
       case 'enablePageAction':
-        if (cache.options.showPageAction)
+        if (cache.options.showPageAction) {
           enablePageAction(sender.tab);
+        }
         sendResponse({});
         break;
 
       case 'disablePageAction':
-        if (cache.options.showPageAction)
+        if (cache.options.showPageAction) {
           disablePageAction(sender.tab);
+        }
         sendResponse({});
         break;
 
       case 'highlightPageAction':
-        if (cache.options.showPageAction)
+        if (cache.options.showPageAction) {
           highlightPageAction(sender.tab);
+        }
         sendResponse({});
         break;
 
@@ -143,7 +146,7 @@ function attachListeners() {
         break;
 
       case 'saveOption':
-        saveOption(request.option);
+        saveOption(request.option.name, request.option.value);
         sendResponse({});
         break;
 

@@ -27,7 +27,7 @@
         {{#if add}}
             <button class="add-style">Add</button>
         {{else}}
-            <button {{#if global}}class="edit-global"{{else}}class="edit-style"{{/if}}>Save</button>
+            <button {{#if global}}class="edit-global"{{else}}data-original-url="{{url}}" class="edit-style"{{/if}}>Save</button>
         {{/if}}
     {{else}}
         {{#if export}}

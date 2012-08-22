@@ -104,7 +104,7 @@ stylebot.page = {
     $livePreviewCheckbox.click(this.toggleLivePreview)
     .tipsy({delayIn: 100, gravity: 'sw'});
 
-    stylebot.chrome.getOption('live_preview', function(livePreview) {
+    stylebot.chrome.getOption('livePreviewColorPicker', function(livePreview) {
       if (livePreview) {
         $livePreviewCheckbox.prop('checked', true);
       }
