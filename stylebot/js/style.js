@@ -492,20 +492,24 @@ stylebot.style = {
       return;
     this.status = true;
     $('#stylebot-css').html(CSSUtils.crunchCSS(this.rules, true));
-    if (this.global)
+    if (this.global) {
       $('#stylebot-global-css').html(CSSUtils.crunchCSS(this.global, true));
+    }
   },
 
   /**
     * Toggle styling
     */
   toggle: function() {
-    // if stylebot is open, don't allow user to disable styling on the page
-    if (stylebot.status)
+    // If stylebot is open, don't allow user to disable styling on the page.
+    if (stylebot.status) {
       return false;
-    if (this.status)
+    }
+    if (this.status) {
       this.disable();
-    else
+    }
+    else {
       this.enable();
+    }
   }
 };

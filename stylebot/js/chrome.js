@@ -132,13 +132,14 @@ chrome.extension.onRequest.addListener(
 
     else if (request.name === 'toggle') {
       if (window.document.domain === 'mail.google.com') {
-        if (!window.frameElement || window.frameElement.id != 'canvas_frame')
+        if (!window.frameElement || window.frameElement.id != 'canvas_frame') {
           return;
-      }
-      else if (window != window.top)
+        }
+      } else if (window != window.top) {
         return;
+      }
       stylebot.toggle();
-      sendResponse({ status: stylebot.status });
+      sendResponse({status: stylebot.status});
     }
 
     else if (request.name === 'setOptions') {
@@ -164,10 +165,11 @@ chrome.extension.onRequest.addListener(
     }
 
     else if (request.name === 'toggleStyle') {
-      if (!window.top)
+      if (!window.top) {
         return;
+      }
       stylebot.style.toggle();
-      sendResponse({ status: stylebot.style.status });
+      sendResponse({status: stylebot.style.status});
     }
 
     else if (request.name === 'styleStatus') {
