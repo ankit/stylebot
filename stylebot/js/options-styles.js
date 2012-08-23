@@ -134,6 +134,11 @@ Options.styles = {
     var $style = $(e.target).parents('.style');
     var url = $style.data('url');
 
+    if (!confirm('Are you sure you want to delete the style for "'
+      + url + '"?')) {
+      return false;
+    }
+
     backgroundPage.cache.styles.delete(url);
 
     // Remove tooltip for delete icon so that it does not lag around later.
