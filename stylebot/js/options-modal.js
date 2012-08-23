@@ -46,7 +46,7 @@ Options.modal = {
   },
 
   resize: function() {
-    if (!this.cached || !this.cached.editor) return;
+    if (!this.cached) return;
 
     var $modal = this.cached.box;
     var modalHeight = $(window).height() / 2;
@@ -55,6 +55,8 @@ Options.modal = {
     $('.stylebot-css-code')
       .height(modalHeight)
       .width(modalWidth);
+
+    if (!this.cached.editor) return;
 
     $('#editor')
       .height(modalHeight)
@@ -130,6 +132,6 @@ Options.modal = {
   },
 
   getText: function() {
-    return this.cached.box.find('textarea').html();
+    return this.cached.box.find('textarea').val();
   }
 }

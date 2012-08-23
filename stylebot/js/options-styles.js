@@ -335,7 +335,7 @@ Options.styles = {
   },
 
   import: function() {
-    var json = cache.modal.box.find('textarea').attr('value');
+    var json = Options.modal.getText();
 
     if (json && json != '') {
       try {
