@@ -50,7 +50,7 @@ stylebot.widget = {
     .tipsy({ delayIn: 500, gravity: 'n' });
 
     //  Selector dropdown
-    self.dropdown = $('<div>', {
+    self.dropDown = $('<div>', {
       id: 'stylebot-dropdown-button',
       class: 'stylebot-header-button',
       title: 'View previously edited CSS selectors'
@@ -64,7 +64,7 @@ stylebot.widget = {
     .append(self.cache.headerSelector)
     .append(self.dropDown);
 
-    //  URL
+    // URL
     var url = $('<div>', {
       html: stylebot.style.cache.url,
       class: 'stylebot-editable-text',
