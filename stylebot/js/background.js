@@ -32,8 +32,8 @@ var cache = {
 // Initialize
 function init() {
   updateVersion();
-  setCache();
-  createContextMenu();
+  initCache();
+  initContextMenu();
   attachListeners();
 }
 
@@ -329,7 +329,7 @@ function mergeStyles(newStyles, oldStyles) {
 }
 
 
-function setCache() {
+function initCache() {
   chrome.storage.local.get(null, function(storage) {
     cache.options = storage['options']
     cache.styles = new Styles(storage['styles']);
@@ -351,7 +351,7 @@ function saveOption(name, value) {
   if (name === 'contextMenu' && value === false) {
     removeContextMenu();
   } else if (!contextMenuId) {
-    createContextMenu();
+    initContextMenu();
   }
 }
 
@@ -385,71 +385,58 @@ function saveAccordionState(accordions) {
   chrome.storage.local.set({'options': cache.options});
 }
 
+function createContextMenu(title, parentId, action, type) {
+  var options = {
+    title: title,
+    contexts: ['all']
+  };
+
+  if (parentId) {
+    options.parentId = parentId;
+  }
+
+  if (action) {
+    options.onclick = function(info, tab) {
+      sendRequestToTab(tab, action);
+    }
+  }
+
+  if (type) {
+    options.type = type;
+  }
+
+  return chrome.contextMenus.create(options);
+}
+
 /**
-  * Initialize the right click context menu
+  * Initialize the right click context menu.
   */
-function createContextMenu() {
+function initContextMenu() {
   if (cache.options.contextMenu) {
     chrome.contextMenus.removeAll();
 
-    contextMenuId = chrome.contextMenus.create({
-      title: 'Stylebot',
-      contexts: ['all']
-    });
+    menuId = createContextMenu('Stylebot');
+    createContextMenu('Style Element', menuId, 'openWidget');
+    createContextMenu('Enable Styling', menuId, 'toggleStyle', 'checkbox');
+    createContextMenu('View Options...', menuId, 'viewOptions');
+    createContextMenu('Search...', menuId, 'searchSocial');
+    createContextMenu('Share...', menuId, 'shareOnSocial');
 
-    chrome.contextMenus.create({
-      title: 'Style Element',
-      contexts: ['all'],
-      onclick: function(info, tab) {
-        sendRequestToTab(tab, 'openWidget');
-      },
-      parentId: contextMenuId
-    });
-
-    contextMenuStatusId = chrome.contextMenus.create({
-      title: 'Enable Styling',
-      type: 'checkbox',
-      checked: true,
-      contexts: ['all'],
-      onclick: function(info, tab) { sendRequestToTab(tab, 'toggleStyle'); },
-      parentId: contextMenuId
-    });
-
-    chrome.contextMenus.create({
-      title: 'View Options...',
-      contexts: ['all'],
-      onclick: function(info, tab) { sendRequestToTab(tab, 'viewOptions')},
-      parentId: contextMenuId
-    });
-
-    chrome.contextMenus.create({
-      title: 'Search Social...',
-      contexts: ['all'],
-      onclick: function(info, tab) { sendRequestToTab(tab, 'searchSocial'); },
-      parentId: contextMenuId
-    });
-
-    // Added onUpdated listener so we can track tab refresh.
+    // Add onUpdated listener so we can track tab refresh.
     chrome.tabs.onUpdated.addListener(
       updateContextMenuOnUpdated);
 
-    // Add a selectionChanged listener so we can track changes in current tab
+    // Add a selectionChanged listener so we can track changes in current tab.
     chrome.tabs.onSelectionChanged.addListener(
       updateContextMenuOnSelectionChanged);
   }
 }
 
-/**
-  *
-  */
 function updateContextMenuOnUpdated(tabId, changeInfo, tab) {
   if (tab.status != 'complete') return;
   updateContextMenu(tab);
 }
 
-/**
-  *
-  */
 function updateContextMenuOnSelectionChanged(tabId, selectInfo) {
   chrome.tabs.get(tabId, function(tab) {
     updateContextMenu(tab);

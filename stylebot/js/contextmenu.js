@@ -46,18 +46,18 @@ stylebot.contextmenu = {
   /**
     * Share the styles for the current page on Stylebot Social
     */
-  shareStyleOnSocial: function() {
-    // check if the current page has any styles
+  shareOnSocial: function() {
+    // Check if the current page has any styles.
     if (stylebot.style.rules) {
 
       var css = CSSUtils.crunchFormattedCSS(stylebot.style.rules, false);
       var url = 'http://stylebot.me/post';
 
       // create a form and submit data
-      var temp_form = $('<form>', {
+      var tempForm = $('<form>', {
         'method': 'post',
         'action': url,
-        'target': '_self'
+        'target': 'formresult'
       });
 
       // site
@@ -65,18 +65,22 @@ stylebot.contextmenu = {
         type: 'hidden',
         name: 'site',
         value: stylebot.style.cache.url
-        }).appendTo(temp_form);
+        }).appendTo(tempForm);
 
       // css
       $('<input>', {
         type: 'hidden',
         name: 'css',
         value: css
-      }).appendTo(temp_form);
+      }).appendTo(tempForm);
 
-      $('<submit>').appendTo(temp_form);
-      temp_form.submit();
-      temp_form.remove();
+      $('<submit>').appendTo(tempForm);
+
+      // creating the 'formresult' window.
+      window.open('test.html', 'formresult');
+
+      tempForm.submit();
+      tempForm.remove();
     }
   }
 };

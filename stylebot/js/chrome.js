@@ -157,10 +157,10 @@ chrome.extension.onRequest.addListener(
       stylebot.contextmenu.searchSocial();
     }
 
-    else if (request.name === 'shareStyleOnSocial') {
+    else if (request.name === 'shareOnSocial') {
       if (!window.top)
         return;
-      stylebot.contextmenu.shareStyleOnSocial();
+      stylebot.contextmenu.shareOnSocial();
     }
 
     else if (request.name === 'toggleStyle') {

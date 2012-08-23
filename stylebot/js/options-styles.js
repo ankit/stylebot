@@ -125,6 +125,7 @@ Options.styles = {
     }).appendTo(tempForm);
 
     $('<submit>').appendTo(tempForm);
+
     tempForm.submit();
     tempForm.remove();
   },
