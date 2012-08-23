@@ -18,7 +18,8 @@ var cache = {
     mode: 'Basic',
     sync: false,
     contextMenu: true,
-    livePreviewColorPicker: false,
+    livePreviewColorPicker: true,
+    livePreviewPage: true,
     showPageAction: true,
     accordions: [0, 1, 2, 3]
   },

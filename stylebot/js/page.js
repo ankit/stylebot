@@ -17,56 +17,7 @@ stylebot.page = {
     originalCSS: null,
     editor: null,
     marker: null,
-    css: null,
-    // Reset CSS from http://meyerweb.com/eric/tools/css/reset/
-    resetCSS: 'html, body, div, span, applet, object, iframe,\n\
-    h1, h2, h3, h4, h5, h6, p, blockquote, pre,\n\
-    a, abbr, acronym, address, big, cite, code,\n\
-    del, dfn, em, img, ins, kbd, q, s, samp,\n\
-    small, strike, strong, sub, sup, tt, var,\n\
-    b, u, i, center,\n\
-    dl, dt, dd, ol, ul, li,\n\
-    fieldset, form, label, legend,\n\
-    table, caption, tbody, tfoot, thead, tr, th, td,\n\
-    article, aside, canvas, details, embed,\n\
-    figure, figcaption, footer, header, hgroup,\n\
-    menu, nav, output, ruby, section, summary,\n\
-    time, mark, audio, video {\n\
-      margin: 0 !important;\n\
-      padding: 0 !important;\n\
-      border: 0 !important;\n\
-      font-size: 100% !important;\n\
-      font: inherit !important;\n\
-      vertical-align: baseline !important;\n\
-      }\n\
-      \n\
-      article, aside, details, figcaption, figure,\n\
-      footer, header, hgroup, menu, nav, section {\n\
-        display: block !important;\n\
-        }\n\
-        \n\
-        body {\n\
-          line-height: 1 !important;\n\
-          }\n\
-          \n\
-        ol, ul {\n\
-          list-style: none !important;\n\
-          }\n\
-          \n\
-        blockquote, q {\n\
-          quotes: none !important;\n\
-        }\n\
-        \n\
-        blockquote:before, blockquote:after,\n\
-        q:before, q:after {\n\
-          content: "" !important;\n\
-          content: none !important;\n\
-        }\n\
-        \n\
-        table {\n\
-          border-collapse: collapse !important;\n\
-          border-spacing: 0 !important;\n\
-          }\n'
+    css: null
   },
 
   create: function(options) {
@@ -94,17 +45,15 @@ stylebot.page = {
     </div>";
 
     this.modal = new ModalBox(html, options, function() {});
-
     this.initializeEditor();
 
     var buttons = stylebot.page.modal.box.find('.stylebot-button');
 
     var $livePreviewCheckbox = $(buttons.get(0));
-
     $livePreviewCheckbox.click(this.toggleLivePreview)
-    .tipsy({delayIn: 100, gravity: 'sw'});
+      .tipsy({delayIn: 100, gravity: 'sw'});
 
-    stylebot.chrome.getOption('livePreviewColorPicker', function(livePreview) {
+    stylebot.chrome.getOption('livePreviewPage', function(livePreview) {
       if (livePreview) {
         $livePreviewCheckbox.prop('checked', true);
       }
@@ -113,7 +62,7 @@ stylebot.page = {
     });
 
     $(buttons.get(1)).click(this.copyToClipboard)
-    .tipsy({delayIn: 100, gravity: 'sw'});
+      .tipsy({delayIn: 100, gravity: 'sw'});
 
     $(buttons.get(2)).click(this.save);
     $(buttons.get(3)).click(this.cancel);
@@ -144,55 +93,45 @@ stylebot.page = {
   show: function(content, prevTarget) {
     var self = this;
 
-    if (!self.modal) {
-      self.create({
-        closeOnEsc: false,
-        closeOnBgClick: false,
-        bgFadeSpeed: 0,
-        width: $('#stylebot').width() - self.RIGHT_PADDING + 'px',
-        top: '0%',
-        left: '0',
-        height: $('#stylebot').height() + 'px',
-        bgOpacity: 0,
-        parent: $('#stylebot'),
+    self.create({
+      closeOnEsc: false,
+      closeOnBgClick: false,
+      bgFadeSpeed: 0,
+      width: $('#stylebot').width() - self.RIGHT_PADDING + 'px',
+      top: '0%',
+      left: '0',
+      height: $('#stylebot').height() + 'px',
+      bgOpacity: 0,
+      parent: $('#stylebot'),
 
-        onOpen: function() {
-          stylebot.page.resize();
-          var editor = self.cache.editor;
-          var session = editor.getSession();
+      onOpen: function() {
+        stylebot.page.resize();
+        var editor = self.cache.editor;
+        var session = editor.getSession();
 
-          session.setValue(self.cache.originalCSS);
+        session.setValue(self.cache.originalCSS);
 
-          editor.focus();
-          editor.gotoLine(session.getLength(), 0);
+        editor.focus();
+        editor.gotoLine(session.getLength(), 0);
 
-          if (!prevTarget) {
-            setTimeout(function() {
-              self.onWindowResize();
-              }, 0);
-            }
+        if (!prevTarget) {
+          setTimeout(function() {
+            self.onWindowResize();
+            }, 0);
+          }
 
-          self.clearSyntaxError();
-          stylebot.undo.push(Utils.cloneObject(stylebot.style.rules));
-          self.cache.css = session.getValue();
-        },
+        self.clearSyntaxError();
+        stylebot.undo.push(Utils.cloneObject(stylebot.style.rules));
+        self.cache.css = session.getValue();
+      },
 
-        onClose: function() {
-          self.isVisible = false;
-          if (prevTarget)
-            prevTarget.focus();
-          $(window).unbind('resize', self.onWindowResize);
-        }
-      });
-    }
-    else {
-      self.modal.reset({
-        width: $('#stylebot').width() - self.RIGHT_PADDING + 'px',
-        top: '0%',
-        left: '0',
-        height: $('#stylebot').height() + 'px'
-      });
-    }
+      onClose: function() {
+        self.isVisible = false;
+        if (prevTarget)
+          prevTarget.focus();
+        $(window).unbind('resize', self.onWindowResize);
+      }
+    });
 
     self.cache.originalCSS = content;
 
@@ -204,35 +143,24 @@ stylebot.page = {
 
   copyToClipboard: function() {
     var text = stylebot.page.cache.editor.getValue();
-    if (text != undefined)
-    stylebot.chrome.copyToClipboard(text);
-  },
-
-  /* @not in use : Used to reset the existing CSS of page */
-  applyResetCSS: function() {
-    stylebot.page.modal.cache.setValue(stylebot.page.cache.resetCSS);
-
-    if (stylebot.page.cache.livePreview) {
-      stylebot.page.saveCSS(stylebot.page.cache.editor.getValue(), false);
+    if (text != undefined) {
+      stylebot.chrome.copyToClipboard(text);
     }
   },
 
   toggleLivePreview: function() {
-    if (stylebot.page.cache.livePreview)
-      stylebot.page.cache.livePreview = false;
-
-    else {
-      stylebot.page.cache.livePreview = true;
+    stylebot.page.cache.livePreview = !stylebot.page.cache.livePreview;
+    if (stylebot.page.cache.livePreview) {
       stylebot.page.contentChanged();
     }
-
-    stylebot.chrome.savePreference('stylebot_page_live_preview', true);
+    stylebot.chrome.saveOption('livePreviewPage', stylebot.page.cache.livePreview);
   },
 
   contentChanged: function() {
     var self = stylebot.page;
-    if (!self.cache.livePreview)
+    if (!self.cache.livePreview) {
       return;
+    }
 
     if (self.timer) {
       clearTimeout(self.timer);
@@ -250,7 +178,7 @@ stylebot.page = {
   cancel: function(e) {
     stylebot.page.saveCSS(stylebot.page.cache.originalCSS, true);
     stylebot.page.modal.hide();
-    stylebot.style.clearLastState();
+    stylebot.style.undo();
   },
 
   save: function(e) {
@@ -275,9 +203,9 @@ stylebot.page = {
 
       stylebot.page.clearSyntaxError();
       stylebot.undo.refresh();
-    }
-    else
+    } else {
       stylebot.undo.pop();
+    }
     return true;
   },
 
@@ -289,7 +217,6 @@ stylebot.page = {
       left: '0',
       height: $('#stylebot').height() + 'px'
     });
-
     self.resize();
   },
 
@@ -307,14 +234,16 @@ stylebot.page = {
   },
 
   clearSyntaxError: function() {
-    if (!this.cache.marker)
+    if (!this.cache.marker) {
       return;
+    }
     this.cache.editor.getSession().removeMarker(this.cache.marker);
     this.cache.marker = null;
   },
 
   resize: function() {
-    $('#stylebot-page-editor').css('height', $('#stylebot').height() - this.BOTTOM_EDITOR_PADDING + 'px');
+    $('#stylebot-page-editor').css('height',
+      $('#stylebot').height() - this.BOTTOM_EDITOR_PADDING + 'px');
     this.cache.editor.resize();
   }
 };

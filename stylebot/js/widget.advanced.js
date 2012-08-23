@@ -14,7 +14,7 @@ stylebot.widget.advanced = {
     lastState: null
   },
 
-  createUI: function(parent) {
+  create: function($parent) {
     this.cache.container = $('<div>', {
       id: 'stylebot-advanced'
     });
@@ -30,11 +30,11 @@ stylebot.widget.advanced = {
     })
     .appendTo(this.cache.container);
 
-    var self = this;
-    parent.append(this.cache.container);
-    setTimeout(function() {
-      self.initializeEditor();
-    }, 0);
+    $parent.append(this.cache.container);
+
+    setTimeout($.proxy(function() {
+      this.initializeEditor();
+    }, this), 0);
   },
 
   initializeEditor: function() {
@@ -84,8 +84,9 @@ stylebot.widget.advanced = {
 
   onBlur: function() {
     var $el = $(e.target);
-    if (self.cache.lastState == self.cache.editor.getSession().getValue())
+    if (self.cache.lastState == self.cache.editor.getSession().getValue()) {
       stylebot.undo.pop();
+    }
     stylebot.undo.refresh();
     self.cache.lastState = null;
   },

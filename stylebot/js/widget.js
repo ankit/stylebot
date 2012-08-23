@@ -21,7 +21,7 @@ stylebot.widget = {
   isBeingDragged: false,
 
   //  Initialize widget UI
-  createUI: function() {
+  create: function() {
     var self = stylebot.widget;
 
     self.cache.box = $('<div>', {
@@ -149,10 +149,10 @@ stylebot.widget = {
     .appendTo(self.cache.box);
 
     //  Basic mode
-    self.basic.createUI().appendTo(self.cache.box);
+    self.basic.create().appendTo(self.cache.box);
 
     //  Advanced mode
-    self.advanced.createUI(self.cache.box);
+    self.advanced.create(self.cache.box);
 
     //  Options (footer)
     var optionsContainer = $('<div>', {
@@ -254,26 +254,33 @@ stylebot.widget = {
 
   //  Open the stylebot widget
   open: function() {
-    if (!this.cache.box)
-      this.createUI();
+    if (!this.cache.box) {
+      this.create();
+    }
+
     this.attachListeners();
     this.setPosition(stylebot.options.position);
-    if (stylebot.style.cache.selector)
+
+    if (stylebot.style.cache.selector) {
       this.enable();
-    else
+    } else {
       this.disable();
-
-    setTimeout(function() {
-      stylebot.widget.updateHeight();
-    }, 0);
-
-    this.setMode();
-    this.cache.box.show();
-
-    if (stylebot.options.mode === 'Edit CSS') {
-      stylebot.options.mode = 'Basic';
-      this.editCSS();
     }
+
+    // TODO: Get rid of all this setTimeout mess.
+    setTimeout($.proxy(function() {
+      this.setMode();
+      this.cache.box.show();
+
+      if (stylebot.options.mode === 'Edit CSS') {
+        this.editCSS();
+        this.updateHeight();
+      }
+
+      setTimeout($.proxy(function() {
+        this.updateHeight();
+      }, this), 0);
+    }, this), 0);
   },
 
   //  Close stylebot widget
@@ -335,8 +342,7 @@ stylebot.widget = {
       ui.selectButton($('.stylebot-mode:contains(Advanced)'));
       stylebot.widget.basic.hide();
       stylebot.widget.advanced.show();
-    }
-    else {
+    } else {
       ui.selectButton($('.stylebot-mode:contains(Basic)'));
       stylebot.widget.advanced.hide();
       stylebot.widget.basic.show();

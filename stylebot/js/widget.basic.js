@@ -165,8 +165,9 @@ stylebot.widget.basic = {
         el: null
       }]
     }],
+
   // Create the UI for Basic Mode
-  createUI: function() {
+  create: function() {
     this.cache.container = $('<div>', {
       id: 'stylebot-controls'
     });

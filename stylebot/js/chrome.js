@@ -103,10 +103,8 @@ stylebot.chrome = {
     * @param {function} callback Method to be called with the option value
     */
   getOption: function(name, callback) {
-    chrome.extension.sendRequest({ name: 'getOption', optionName: name },
-      function(response) {
-        callback(response.value);
-      });
+    chrome.extension.sendRequest({name: 'getOption', optionName: name},
+      callback);
   },
 
   /**
