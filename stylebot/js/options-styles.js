@@ -17,6 +17,7 @@ Options.styles = {
         .on("click", ".show-add-style", $.proxy(this.showAdd, this))
         .on("click", ".enable-all", $.proxy(this.enableAll, this))
         .on("click", ".disable-all", $.proxy(this.disableAll, this))
+        .on("click", ".delete-all", $.proxy(this.deleteAll, this))
 
         .on("click", ".style .share-style", $.proxy(this.share, this))
         .on("click", ".style .show-edit-style", $.proxy(this.showEdit, this))
@@ -92,7 +93,7 @@ Options.styles = {
   toggle: function(e) {
     var $style = $(e.target).parents('.style');
     var url = $style.data('url');
-    backgroundPage.cache.styles.toggle(url);
+    backgroundPage.cache.styles.toggle(url, null, true);
   },
 
   share: function(e) {
@@ -250,6 +251,17 @@ Options.styles = {
     backgroundPage.cache.styles.toggleAll(false);
   },
 
+  deleteAll: function() {
+    if (confirm('Are you sure you want to delete ALL your styles?')) {
+      backgroundPage.cache.styles.deleteAll();
+      $('#styles').html('');
+      this.count = 0;
+      this.updateCount();
+    }
+
+    return false;
+  },
+
   updateCount: function() {
     this.$count.text(this.count);
   },
@@ -261,7 +273,7 @@ Options.styles = {
   },
 
   toggleGlobal: function() {
-    if (!backgroundPage.cache.styles.toggle('*')) {
+    if (!backgroundPage.cache.styles.toggle('*', null, true)) {
       backgroundPage.cache.styles.create('*');
     }
 

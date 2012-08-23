@@ -614,7 +614,6 @@ Styles.prototype.isEnabled = function(url) {
   if (this.styles[url] === undefined) {
     return false;
   }
-
   return this.styles[url]['_enabled'];
 };
 
@@ -648,13 +647,16 @@ Styles.prototype.toggle = function(url, value, shouldSave) {
     return false;
   }
 
-  if (value === undefined) {
+  if (value != undefined && value != null) {
     this.styles[url]['_enabled'] = !this.styles[url]['_enabled'];
   } else {
     this.styles[url]['_enabled'] = value;
   }
 
-  this.persist();
+  if (shouldSave) {
+    this.persist();
+  }
+
   return true;
 };
 
@@ -667,6 +669,12 @@ Styles.prototype.toggleAll = function(value) {
   for (var url in this.styles) {
     this.toggle(url, value, false);
   }
+  this.persist();
+};
+
+Styles.prototype.deleteAll = function() {
+  this.styles = {};
+  this.persist();
 };
 
 /**
@@ -894,8 +902,9 @@ Styles.prototype.getCombinedRulesForIframe = function(aURL, tab) {
   * @return {Object} The rules of the global stylesheet.
   */
 Styles.prototype.getGlobalRules = function() {
-  if (this.isEmpty('*') || !this.isEnabled('*'))
+  if (this.isEmpty('*') || !this.isEnabled('*')) {
     return null;
+  }
   return this.getRules('*');
 };
 

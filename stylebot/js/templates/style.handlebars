@@ -1,6 +1,6 @@
 <div data-url="{{url}}" class="style" tabindex=0>
     <span class="style-url-container">
-        <input class="toggle-style" type="checkbox" title="Enable or disable this style" tabindex=-1 checked={{enabled}} />
+        <input class="toggle-style" type="checkbox" title="Enable or disable this style" tabindex=-1 {{#if enabled}}checked{{/if}} />
         <div class="style-url">{{url}}</div>
     </span>
     <div class="controls">
