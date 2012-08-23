@@ -416,7 +416,14 @@ function createContextMenu() {
     });
 
     chrome.contextMenus.create({
-      title: 'Search for styles...',
+      title: 'View Options...',
+      contexts: ['all'],
+      onclick: function(info, tab) { sendRequestToTab(tab, 'viewOptions')},
+      parentId: contextMenuId
+    });
+
+    chrome.contextMenus.create({
+      title: 'Search Social...',
       contexts: ['all'],
       onclick: function(info, tab) { sendRequestToTab(tab, 'searchSocial'); },
       parentId: contextMenuId

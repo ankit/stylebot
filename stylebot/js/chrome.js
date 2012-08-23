@@ -175,5 +175,12 @@ chrome.extension.onRequest.addListener(
         return;
       sendResponse({ status: stylebot.style.status });
     }
+
+    else if (request.name === 'viewOptions') {
+      if (!window.top) {
+        return;
+      }
+      stylebot.chrome.openOptionsPage();
+    }
   }
 );
