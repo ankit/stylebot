@@ -43,7 +43,7 @@ function init() {
   */
 function updateVersion() {
   chrome.storage.local.get(['version'], function(storage) {
-    if (!storage['version']) {
+    if (storage['version'] != CURRENT_VERSION) {
       console.log('Updating to version ' + CURRENT_VERSION);
       chrome.storage.local.set({'version': CURRENT_VERSION});
 
