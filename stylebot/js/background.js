@@ -5,9 +5,11 @@
 var CURRENT_VERSION = '1.7';
 
 var currTabId;
-var contextMenuId = null;
 
 var cache = {
+  contextMenuId: null,
+  styleStatusContextMenuId: null,
+
   // Styles object
   styles: {},
 
@@ -32,8 +34,9 @@ var cache = {
 // Initialize
 function init() {
   updateVersion();
-  initCache();
-  initContextMenu();
+  initCache(function() {
+    initContextMenu();
+  });
   attachListeners();
 }
 
@@ -167,7 +170,7 @@ function attachListeners() {
   * @param {object} The tab object
   */
 function onTabUpdated(tabId, changeInfo, tab) {
-  if (tab.status === 'completed') {
+  if (tab.status === 'complete') {
     clearTabResponseCache(tabId);
   }
 }
@@ -329,10 +332,13 @@ function mergeStyles(newStyles, oldStyles) {
 }
 
 
-function initCache() {
+function initCache(callback) {
   chrome.storage.local.get(null, function(storage) {
     cache.options = storage['options']
     cache.styles = new Styles(storage['styles']);
+    if (callback) {
+      callback();
+    }
   });
 }
 
@@ -348,10 +354,12 @@ function saveOption(name, value) {
   propagateOptions();
 
   // If the option was contextMenu, update it.
-  if (name === 'contextMenu' && value === false) {
-    removeContextMenu();
-  } else if (!contextMenuId) {
-    initContextMenu();
+  if (name === 'contextMenu') {
+    if (value === false) {
+      removeContextMenu();
+    } else if (!cache.contextMenuId) {
+      initContextMenu();
+    }
   }
 }
 
@@ -412,15 +420,17 @@ function createContextMenu(title, parentId, action, type) {
   * Initialize the right click context menu.
   */
 function initContextMenu() {
-  if (cache.options.contextMenu) {
-    chrome.contextMenus.removeAll();
+  chrome.contextMenus.removeAll();
 
+  if (cache.options.contextMenu) {
     menuId = createContextMenu('Stylebot');
     createContextMenu('Style Element', menuId, 'openWidget');
-    createContextMenu('Enable Styling', menuId, 'toggleStyle', 'checkbox');
+    cache.styleStatusContextMenuId =
+      createContextMenu('Enable Styling', menuId, 'toggleStyle', 'checkbox');
     createContextMenu('View Options...', menuId, 'viewOptions');
     createContextMenu('Search...', menuId, 'searchSocial');
     createContextMenu('Share...', menuId, 'shareOnSocial');
+    cache.contextMenuId = menuId;
 
     // Add onUpdated listener so we can track tab refresh.
     chrome.tabs.onUpdated.addListener(
@@ -433,7 +443,9 @@ function initContextMenu() {
 }
 
 function updateContextMenuOnUpdated(tabId, changeInfo, tab) {
-  if (tab.status != 'complete') return;
+  if (tab.status != 'complete') {
+    return;
+  }
   updateContextMenu(tab);
 }
 
@@ -449,26 +461,32 @@ function updateContextMenuOnSelectionChanged(tabId, selectInfo) {
   * @param {object} tab Tab based on which the right-click menu is to be updated
   */
 function updateContextMenu(tab) {
+  if (!cache.contextMenuId) {
+    return;
+  }
+
   if (tab.url.isValidUrl()) {
-    // If it is a valid url, show the contextMenu
-    chrome.contextMenus.update(contextMenuId, {
+    // If it is a valid url, show the contextMenu.
+    chrome.contextMenus.update(cache.contextMenuId, {
       documentUrlPatterns: ['<all_urls>']
     });
 
     // Get style status from the tab we changed to and
     // update the checkbox in the context menu.
-    chrome.tabs.sendRequest(tab.id, {name: 'styleStatus'},
+    if (cache.styleStatusContextMenuId) {
+      chrome.tabs.sendRequest(tab.id, {name: 'styleStatus'},
       function(response) {
-          chrome.contextMenus.update(contextMenuStatusId, {
+          chrome.contextMenus.update(cache.styleStatusContextMenuId, {
           checked: response.status
         });
       });
+    }
   }
 
   else {
     // If it isn't a valid url, hide the contextMenu.
     // Set the document pattern to foo/*random*.
-    chrome.contextMenus.update(contextMenuId, {
+    chrome.contextMenus.update(cache.contextMenuId, {
       documentUrlPatterns: ['http://foo/' + Math.random()]
     });
   }
@@ -478,12 +496,12 @@ function updateContextMenu(tab) {
   * Remove / Hide the right click context menu
   */
 function removeContextMenu() {
-  if (contextMenuId) {
+  if (cache.contextMenuId) {
     chrome.tabs.onSelectionChanged.removeListener(
       updateContextMenuOnSelectionChanged);
     chrome.tabs.onUpdated.removeListener(updateContextMenuOnUpdated);
-    chrome.contextMenus.remove(contextMenuId);
-    contextMenuId = null;
+    chrome.contextMenus.remove(cache.contextMenuId);
+    cache.contextMenuId = null;
   }
 }
 
