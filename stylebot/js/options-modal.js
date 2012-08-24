@@ -17,7 +17,12 @@ Options.modal = {
       modal.options.onOpen = $.proxy(function() {
         this.resize();
         setTimeout(function() {
-          modal.box.find("input").focus();
+          var $input = modal.box.find("input");
+          if ($input.length > 0) {
+            $input.focus();
+          } else {
+            modal.editor.focus();
+          }
           modal.editor.gotoLine(
             modal.editor.getSession().getLength(), 0);
         }, 0);
