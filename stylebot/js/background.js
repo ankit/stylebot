@@ -4,8 +4,6 @@
 
 var CURRENT_VERSION = '1.7';
 
-var currTabId;
-
 var cache = {
   contextMenuId: null,
   styleStatusContextMenuId: null,
@@ -79,6 +77,7 @@ function attachListeners() {
   }
 
   chrome.tabs.onUpdated.addListener(onTabUpdated);
+  chrome.tabs.onActivated.addListener(onTabActivated);
   chrome.tabs.onRemoved.addListener(onTabRemoved);
 
   chrome.extension.onRequest.addListener(
@@ -172,6 +171,19 @@ function attachListeners() {
 function onTabUpdated(tabId, changeInfo, tab) {
   if (tab.status === 'complete') {
     clearTabResponseCache(tabId);
+    if (cache.options.contextMenu) {
+      updateContextMenu(tab);
+    }
+
+    updatePageAction(tabId);
+  }
+}
+
+function onTabActivated(activeInfo) {
+  if (cache.options.contextMenu) {
+    chrome.tabs.get(activeInfo.tabId, function(tab) {
+      updateContextMenu(tab);
+    });
   }
 }
 
@@ -262,7 +274,6 @@ function showPageActions() {
   });
 
   chrome.pageAction.onClicked.addListener(onPageActionClick);
-  chrome.tabs.onSelectionChanged.addListener(updatePageActionOnTabSelectionChanged);
 }
 
 /**
@@ -281,8 +292,8 @@ function hidePageActions() {
       }
     }
   });
+
   chrome.pageAction.onClicked.removeListener(onPageActionClick);
-  chrome.tabs.onSelectionChanged.removeListener(updatePageActionOnTabSelectionChanged);
 }
 
 /**
@@ -303,19 +314,22 @@ function onPageActionClick(tab) {
 /**
   * Request listener for when the user switches a tab
   *   Updates page action for the newly active tab
-  * @param {number} tabId The tab's id for which the page action is to be updated
-  * @param {object} selectInfo
+  * @param {number} tabId The tab's id for whicht th epage action should
+  *  be updated.
   */
-function updatePageActionOnTabSelectionChanged(tabId, selectInfo) {
+function updatePageAction(tabId) {
   chrome.tabs.get(tabId, function(tab) {
     if (tab.url.isValidUrl()) {
       chrome.tabs.sendRequest(tab.id, {name: 'status'}, function(response) {
-        if (response.status)
-          enablePageAction(tab);
-        else if (response.rules || response.global)
-          highlightPageAction(tab);
-        else
-          disablePageAction(tab);
+        if (response) {
+          if (response.status) {
+            enablePageAction(tab);
+          } else if (response.rules || response.global) {
+            highlightPageAction(tab);
+          } else {
+            disablePageAction(tab);
+          }
+        }
       });
     };
   });
@@ -431,28 +445,7 @@ function initContextMenu() {
     createContextMenu('Search...', menuId, 'searchSocial');
     createContextMenu('Share...', menuId, 'shareOnSocial');
     cache.contextMenuId = menuId;
-
-    // Add onUpdated listener so we can track tab refresh.
-    chrome.tabs.onUpdated.addListener(
-      updateContextMenuOnUpdated);
-
-    // Add a selectionChanged listener so we can track changes in current tab.
-    chrome.tabs.onSelectionChanged.addListener(
-      updateContextMenuOnSelectionChanged);
   }
-}
-
-function updateContextMenuOnUpdated(tabId, changeInfo, tab) {
-  if (tab.status != 'complete') {
-    return;
-  }
-  updateContextMenu(tab);
-}
-
-function updateContextMenuOnSelectionChanged(tabId, selectInfo) {
-  chrome.tabs.get(tabId, function(tab) {
-    updateContextMenu(tab);
-  });
 }
 
 /**
@@ -497,9 +490,6 @@ function updateContextMenu(tab) {
   */
 function removeContextMenu() {
   if (cache.contextMenuId) {
-    chrome.tabs.onSelectionChanged.removeListener(
-      updateContextMenuOnSelectionChanged);
-    chrome.tabs.onUpdated.removeListener(updateContextMenuOnUpdated);
     chrome.contextMenus.remove(cache.contextMenuId);
     cache.contextMenuId = null;
   }
