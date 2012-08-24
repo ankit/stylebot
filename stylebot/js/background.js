@@ -29,11 +29,12 @@ var cache = {
   loadingTabs: []
 };
 
-// Initialize
+// Initialize.
 function init() {
-  updateVersion();
-  initCache(function() {
-    initContextMenu();
+  updateVersion(function() {
+    initCache(function() {
+      initContextMenu();
+    });
   });
   attachListeners();
 }
@@ -42,17 +43,18 @@ function init() {
   * Update the version of extension.
   * Does any other essential upgrades. Also, shows update desktop notification
   */
-function updateVersion() {
+function updateVersion(callback) {
   chrome.storage.local.get(['version'], function(storage) {
     if (storage['version'] != CURRENT_VERSION) {
       console.log('Updating to version ' + CURRENT_VERSION);
       chrome.storage.local.set({'version': CURRENT_VERSION});
 
       cache.styles = new Styles({});
-      cache.styles.upgrade('1.7');
+      cache.styles.upgrade('1.7', callback);
 
       showUpdateNotification();
-      return true;
+    } else {
+      callback();
     }
   });
 }
@@ -319,6 +321,10 @@ function onPageActionClick(tab) {
   */
 function updatePageAction(tabId) {
   chrome.tabs.get(tabId, function(tab) {
+    if (!tab) {
+      return;
+    }
+
     if (tab.url.isValidUrl()) {
       chrome.tabs.sendRequest(tab.id, {name: 'status'}, function(response) {
         if (response) {
@@ -461,6 +467,10 @@ function initContextMenu() {
   * @param {object} tab Tab based on which the right-click menu is to be updated
   */
 function updateContextMenu(tab) {
+  if (!tab) {
+    return;
+  }
+
   if (!cache.contextMenuId) {
     return;
   }
@@ -733,28 +743,32 @@ Styles.prototype.import = function(newStyles) {
   * Upgrades the style object to match the specified version
   * @param {String} version The version to upgrade to
   */
-Styles.prototype.upgrade = function(version) {
+Styles.prototype.upgrade = function(version, callback) {
   switch (version) {
     case '1.7':
       console.log('Upgrading data model for 1.7');
 
       chrome.storage.local.set({'styles':
-        JSON.parse(localStorage['stylebot_styles'])});
+        JSON.parse(localStorage['stylebot_styles'])}, function() {
 
-      for (var option in cache.options) {
-        var value = localStorage['stylebot_option_' + option];
-        if (value) {
-          if (value === 'true' || value === 'false') {
-            value = (value === 'true');
+        for (var option in cache.options) {
+          var value = localStorage['stylebot_option_' + option];
+          if (value) {
+            if (value === 'true' || value === 'false') {
+              value = (value === 'true');
+            }
+            cache.options[option] = value;
+          } else {
+            value = cache.options[option];
           }
-          cache.options[option] = value;
-        } else {
-          value = cache.options[option];
         }
-      }
 
-      chrome.storage.local.set({'options': cache.options})
-      chrome.storage.local.get(null, function(storage) {});
+        chrome.storage.local.set({'options': cache.options}, function() {
+          callback();
+        });
+
+      });
+
       break;
   }
 };
