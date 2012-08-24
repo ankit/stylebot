@@ -6,7 +6,7 @@ var CURRENT_VERSION = '1.7';
 
 var cache = {
   contextMenuId: null,
-  styleStatusContextMenuId: null,
+  enableStylingContextMenuId: null,
 
   // Styles object
   styles: {},
@@ -348,8 +348,16 @@ function mergeStyles(newStyles, oldStyles) {
 
 function initCache(callback) {
   chrome.storage.local.get(null, function(storage) {
-    cache.options = storage['options']
-    cache.styles = new Styles(storage['styles']);
+    if (storage['options']) {
+      cache.options = storage['options'];
+    }
+
+    if (storage['styles']) {
+      cache.styles = new Styles(storage['styles']);
+    } else {
+      cache.styles = new Styles({});
+    }
+
     if (callback) {
       callback();
     }
@@ -435,11 +443,10 @@ function createContextMenu(title, parentId, action, type) {
   */
 function initContextMenu() {
   chrome.contextMenus.removeAll();
-
   if (cache.options.contextMenu) {
     menuId = createContextMenu('Stylebot');
     createContextMenu('Style Element', menuId, 'openWidget');
-    cache.styleStatusContextMenuId =
+    cache.enableStylingContextMenuId =
       createContextMenu('Enable Styling', menuId, 'toggleStyle', 'checkbox');
     createContextMenu('View Options...', menuId, 'viewOptions');
     createContextMenu('Search...', menuId, 'searchSocial');
@@ -450,7 +457,7 @@ function initContextMenu() {
 
 /**
   * Update the right-click context menu for a tab i.e.
-  *   show or hide and update checkboxes
+  *   show or hide and update checkboxes.
   * @param {object} tab Tab based on which the right-click menu is to be updated
   */
 function updateContextMenu(tab) {
@@ -466,10 +473,10 @@ function updateContextMenu(tab) {
 
     // Get style status from the tab we changed to and
     // update the checkbox in the context menu.
-    if (cache.styleStatusContextMenuId) {
+    if (cache.enableStylingContextMenuId) {
       chrome.tabs.sendRequest(tab.id, {name: 'styleStatus'},
       function(response) {
-          chrome.contextMenus.update(cache.styleStatusContextMenuId, {
+          chrome.contextMenus.update(cache.enableStylingContextMenuId, {
           checked: response.status
         });
       });
@@ -747,9 +754,7 @@ Styles.prototype.upgrade = function(version) {
       }
 
       chrome.storage.local.set({'options': cache.options})
-      chrome.storage.local.get(null, function(storage) {
-        console.log(storage);
-      });
+      chrome.storage.local.get(null, function(storage) {});
       break;
   }
 };
