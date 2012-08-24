@@ -18,6 +18,7 @@ Google Chrome: [https://chrome.google.com/extensions/detail/oiaejidbmkiecgbjeifo
 ###Support
 
 Donate on Pledgie: [http://pledgie.com/campaigns/14409](http://pledgie.com/campaigns/14409)
+Bugs, Questions and Feature Requests: [https://chrome.google.com/webstore/support/oiaejidbmkiecgbjeifoejpgmdaleoha]([https://chrome.google.com/webstore/support/oiaejidbmkiecgbjeifoejpgmdaleoha)
 
 ###Credits
 
