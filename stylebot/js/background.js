@@ -748,26 +748,33 @@ Styles.prototype.upgrade = function(version, callback) {
     case '1.7':
       console.log('Upgrading data model for 1.7');
 
-      chrome.storage.local.set({'styles':
-        JSON.parse(localStorage['stylebot_styles'])}, function() {
-
-        for (var option in cache.options) {
-          var value = localStorage['stylebot_option_' + option];
-          if (value) {
-            if (value === 'true' || value === 'false') {
-              value = (value === 'true');
-            }
-            cache.options[option] = value;
-          } else {
-            value = cache.options[option];
-          }
-        }
-
+      var initOptions = function() {
         chrome.storage.local.set({'options': cache.options}, function() {
           callback();
         });
+      };
 
-      });
+      if (localStorage['stylebot_styles']) {
+          chrome.storage.local.set({'styles':
+          JSON.parse(localStorage['stylebot_styles'])}, function() {
+
+          for (var option in cache.options) {
+            var value = localStorage['stylebot_option_' + option];
+            if (value) {
+              if (value === 'true' || value === 'false') {
+                value = (value === 'true');
+              }
+              cache.options[option] = value;
+            } else {
+              value = cache.options[option];
+            }
+          }
+
+          initOptions();
+        });
+      } else {
+        initOptions();
+      }
 
       break;
   }
