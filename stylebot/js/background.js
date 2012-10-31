@@ -965,52 +965,21 @@ String.prototype.trim = function() {
 };
 
 /**
-  * Checks if a given string is a pattern
-  * @return {Boolean} True if the string is a patern, false otherwise.
-  */
-String.prototype.isPattern = function() {
-  // Currently, the only indicator that a string is a pattern is if
-  //if thas the wildcard character *
-  return this.indexOf('*') >= 0;
-};
-
-/**
   * Checks if the string matches an stylebot pattern
   * @param {String} pattern The stylebot pattern.
   * @return {Boolean} True if the string matches the patern, false otherwise.
   */
 String.prototype.matchesPattern = function(pattern) {
-  if (pattern.isPattern()) {
-    try {
-      pattern = new RegExp(pattern, 'i');
-      return pattern.test(this);
-    }
-
-    catch (e) {
-      console.log('Error occured while running pattern check', e);
-      return false;
-    }
+  try {
+    pattern = new RegExp(pattern, 'i');
+    return pattern.test(this);
   }
-  else
-    return this.matchesBasic(pattern);
-};
 
-/**
-  * Checks if the given url matches with the basic algorithm
-  * @param {String} pattern The stylebot pattern.
-  * @return {Boolean} True if the string matches the patern, false otherwise.
-  */
-String.prototype.matchesBasic = function(pattern) {
-  var isFound = false;
-  var subUrls = pattern.split(',');
-  var len = subUrls.length;
-  for (var i = 0; i < len; i++) {
-    if (this.indexOf(subUrls[i].trim()) != -1) {
-      isFound = true;
-      break;
-    }
+  catch (e) {
+    console.log('Error occured while running pattern check', e);
+    return false;
   }
-  return isFound;
+  
 };
 
 /**
