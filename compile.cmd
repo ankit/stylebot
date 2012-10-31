@@ -1,3 +1,14 @@
-@echo off
+@ECHO OFF
+SETLOCAL
 REM Compile the handlebars templates.
-handlebars %~dp0stylebot\js\templates\style.handlebars %~dp0stylebot\js\templates\style-modal.handlebars -f %~dp0stylebot\js\templates.js
+SET handlebars=
+FOR /r %%i in (stylebot\js\templates\*.handlebars) DO CALL :concat %%i
+handlebars %handlebars% -f %~dp0stylebot\js\templates.js
+GOTO :eof
+
+:concat
+SET handlebars=%handlebars%%1 
+GOTO :eof
+
+:eof
+ENDLOCAL
