@@ -2,7 +2,7 @@
   * background.html
   */
 
-var CURRENT_VERSION = '1.7.1';
+var CURRENT_VERSION = '1.7.2';
 
 var cache = {
   contextMenuId: null,
@@ -46,13 +46,15 @@ function init() {
 function updateVersion(callback) {
   chrome.storage.local.get(['version'], function(storage) {
     if (storage['version'] != CURRENT_VERSION) {
+
+      if (storage['version'].indexOf('1.7') == -1) {
+        cache.styles = new Styles({});
+        cache.styles.upgrade('1.7', callback);
+        showUpdateNotification();
+      }
+
       console.log('Updating to version ' + CURRENT_VERSION);
       chrome.storage.local.set({'version': CURRENT_VERSION});
-
-      cache.styles = new Styles({});
-      cache.styles.upgrade('1.7', callback);
-
-      showUpdateNotification();
     } else {
       callback();
     }
