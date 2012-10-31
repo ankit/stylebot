@@ -13,12 +13,12 @@ You can browse styles created by other users and share your own on [Stylebot Soc
 
 ###Installation
 
-Google Chrome: [https://chrome.google.com/extensions/detail/oiaejidbmkiecgbjeifoejpgmdaleoha](https://chrome.google.com/extensions/detail/oiaejidbmkiecgbjeifoejpgmdaleoha)
+Google Chrome: <https://chrome.google.com/extensions/detail/oiaejidbmkiecgbjeifoejpgmdaleoha>
 
 ###Support
 
 * Donate on Pledgie: [http://pledgie.com/campaigns/14409](http://pledgie.com/campaigns/14409)
-* Bugs, Questions and Feature Requests: [https://chrome.google.com/webstore/support/oiaejidbmkiecgbjeifoejpgmdaleoha](https://chrome.google.com/webstore/support/oiaejidbmkiecgbjeifoejpgmdaleoha)
+* Bugs, Questions and Feature Requests: <https://github.com/ankit/stylebot/issues>
 
 ###Credits
 
@@ -27,9 +27,9 @@ This project was initially developed as part of **Google Summer of Code 2010**, 
 Code from the following projects is used:
 
 * Aristo UI  
-  * [http://github.com/280north/aristo](http://github.com/280north/aristo)  
-  * [http://github.com/maccman/aristo](http://github.com/maccman/aristo)  
-  * [http://github.com/taitems/Aristo-jQuery-UI-Theme](http://github.com/taitems/Aristo-jQuery-UI-Theme)
+  * <http://github.com/280north/aristo>
+  * <http://github.com/maccman/aristo>
+  * <http://github.com/taitems/Aristo-jQuery-UI-Theme>
 
 * [Firebug](http://www.getfirebug.com) - Selection of DOM elements (selectionBox.js)
 
