@@ -281,7 +281,8 @@
   font-size: inherit !important;
   margin: 6px 0 !important;
   padding: 2px !important;
-  display: table !important;
+  display: inline-block !important;
+  position: relative !important;
 }
 
 .stylebot-control {
@@ -310,14 +311,15 @@
   font-family: inherit !important;
   font-size: 11px !important;
   font-weight: normal !important;
+  display: inline-block !important;
   line-height: 10px !important;
   margin: 0 !important;
   padding-right: 4px !important;
   text-align: right !important;
   text-transform: inherit !important;
   width: 85px !important;
-  display: table-cell !important;
-  vertical-align: middle !important;
+  vertical-align: top !important;
+  position: relative !important;
 }
 
 .stylebot-inline-label {
