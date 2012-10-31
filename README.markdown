@@ -26,11 +26,8 @@ This project was initially developed as part of **Google Summer of Code 2010**, 
 
 Code from the following projects is used:
 
-* Aristo UI  
-  * <http://github.com/280north/aristo>
-  * <http://github.com/maccman/aristo>
-  * <http://github.com/taitems/Aristo-jQuery-UI-Theme>
-
+* Aristo UI (<http://github.com/280north/aristo>, <http://github.com/maccman/aristo>, <http://github.com/taitems/Aristo-jQuery-UI-Theme>)
+ 
 * [Firebug](http://www.getfirebug.com) - Selection of DOM elements (selectionBox.js)
 
 * [JSCSSP](http://www.glazman.org/JSCSSP/)
