@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
-  "name"            : "Stylebot",
-  "version"         : "1.7",
-  "description"     : "Adapt the web's appearance",
+  "name"            : "Stylebot Regex Remix",
+  "version"         : "1.8",
+  "description"     : "Adapt the web's appearance - regex style!",
   "background" : {
     "scripts": [
       "js/background.js"
