@@ -2,7 +2,7 @@
   * background.html
   */
 
-var CURRENT_VERSION = '1.7.3';
+var CURRENT_VERSION = '1.7.3.1';
 
 var cache = {
   contextMenuId: null,
