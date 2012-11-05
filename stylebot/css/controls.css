@@ -1,5 +1,11 @@
 /* Stylebot Panel Controls */
 
+/* Custom Font Family */
+#stylebot-font-family {
+  margin-left: 95px;
+  margin-top: 7px;
+}
+
 /* Select */
 
 select.stylebot-select {
@@ -29,7 +35,8 @@ select.stylebot-select:focus {
 .stylebot-multisize {
   display: inline-block !important;
   height: 55px !important;
-  position: relative;
+  width: 150px !important;
+  position: relative !important;
 }
 
 .stylebot-multisize input.stylebot-textfield {
@@ -247,6 +254,7 @@ Instead, stylebot-last-child class is added to the last button in segmented cont
   border-bottom-right-radius: 3px !important;
   border-top-right-radius: 3px !important;
   border-right-width: 1px !important;
+
 }
 
 .stylebot-segmented-control button span {

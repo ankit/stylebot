@@ -91,9 +91,10 @@ Options.styles = {
   },
 
   toggle: function(e) {
-    var $style = $(e.target).parents('.style');
+    var $target = $(e.target);
+    var $style = $target.parents('.style');
     var url = $style.data('url');
-    backgroundPage.cache.styles.toggle(url, null, true);
+    backgroundPage.cache.styles.toggle(url, $target.attr("checked"), true);
   },
 
   share: function(e) {
