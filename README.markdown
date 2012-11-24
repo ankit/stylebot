@@ -7,7 +7,6 @@ This fork requires your style URLs to be regular expressions.
 1. Check out from GitHub
     - Unix  
         ![](https://raw.github.com/oliversalzburg/stylebot/master/artwork/install/github-clone-nix.png)
-    
     - Windows  
         ![](https://raw.github.com/oliversalzburg/stylebot/master/artwork/install/github-clone-win.png)
 
