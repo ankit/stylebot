@@ -5,17 +5,19 @@ This fork requires your style URLs to be regular expressions.
 ### Installation
 
 1. Check out from GitHub
-
-    - ![](artwork/install/github-clone-nix.png)
-    - ![](artwork/install/github-clone-win.png)
+    - Unix  
+        ![](https://raw.github.com/oliversalzburg/stylebot/master/artwork/install/github-clone-nix.png)
+    
+    - Windows  
+        ![](https://raw.github.com/oliversalzburg/stylebot/master/artwork/install/github-clone-win.png)
 
 2. Load in Chrome
 
-    - ![](artwork/install/chrome-extension-select.png)
+    ![](https://raw.github.com/oliversalzburg/stylebot/master/artwork/install/chrome-extension-select.png)
 
 3. Open Stylebot
 
-    - ![](artwork/install/load-css.png)
+    ![](https://raw.github.com/oliversalzburg/stylebot/master/artwork/install/load-css.png)
 
 4. Add new style for:
 
