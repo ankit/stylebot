@@ -18,8 +18,10 @@ This fork requires your style URLs to be regular expressions.
 
     ![](https://raw.github.com/oliversalzburg/stylebot/master/artwork/install/load-css.png)
 
-4. Add new style for:
+4. Add new style for your site
 
-        ^http://superuser.com/.*$
+    ![](https://raw.github.com/oliversalzburg/stylebot/master/artwork/install/add-new-style.png)
 
 5. Paste CSS into box
+
+    ![](https://raw.github.com/oliversalzburg/stylebot/master/artwork/install/new-style.png)
