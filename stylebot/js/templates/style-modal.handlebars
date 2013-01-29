@@ -4,7 +4,7 @@
         {{#if global}}
             Edit the Global Stylesheet:
         {{else}}
-            URL: <input type='text' value="{{url}}"></input>
+            <label for="url">URL:</label><input name="url" type='text' value="{{url}}"></input><input name="regex" class="toggle-regex" type="checkbox" title="Treat as regular expression" {{#if regex}}checked{{/if}} />
         {{/if}}
     {{else}}
         {{#if export}}

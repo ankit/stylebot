@@ -19,6 +19,7 @@ stylebot.style = {
   timer: null,
   parser: null,
   status: true,
+  regex: false,
 
   cache: {
     // last selected elements' selector

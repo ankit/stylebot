@@ -235,15 +235,30 @@ li.option:first-of-type {
 #stylebot-modal .modal-header {
   margin-bottom: 5px;
   min-height: 24px;
-  overflow: hidden;
+  /*overflow: hidden;*/
   text-overflow: ellipsis;
   white-space: nowrap;
+  display: table;
+  width: 100%;
 }
 
 #stylebot-modal .modal-header input {
+  display: table-cell;
+}
+#stylebot-modal .modal-header label {
+  display: table-cell;
+  width: 55px;
+}
+
+#stylebot-modal .modal-header input[type="text"] {
   text-align: left;
   padding: 2px;
-  width: 95%;
+  width: 90%;
+}
+
+#stylebot-modal .modal-header input[type="checkbox"] {
+  margin-left: 4px;
+  width: 10%;
 }
 
 #stylebot-modal .modal-footer {
