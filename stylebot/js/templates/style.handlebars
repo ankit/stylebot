@@ -1,7 +1,8 @@
-<div data-url="{{url}}" class="style" tabindex=0>
+<div data-url="{{url}}" data-regex="{{#if regex}}true{{/if}}" class="style" tabindex=0>
     <span class="style-url-container">
         <input class="toggle-style" type="checkbox" title="Enable or disable this style" tabindex=-1 {{#if enabled}}checked{{/if}} />
         <div class="style-url">{{url}}</div>
+        <input class="toggle-regex" type="checkbox" title="Treat as regular expression" tabindex=-1 {{#if regex}}checked{{/if}} />
     </span>
     <div class="controls">
         <div title="Share Style" class="tipsy button share-style" tabindex=0></div>

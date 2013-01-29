@@ -19,7 +19,8 @@ Options.modal = {
         setTimeout(function() {
           var $input = modal.box.find("input");
           if ($input.length > 0) {
-            $input.focus();
+            // Select first matching element (otherwise it focuses regex checkbox)
+            $input[ 0 ].focus();
           } else {
             modal.editor.focus();
           }
@@ -129,7 +130,11 @@ Options.modal = {
   },
 
   getURL: function() {
-    return $.trim(this.cached.box.find('input').attr('value'));
+    return $.trim(this.cached.box.find('input[type="text"]').attr('value'));
+  },
+
+  getIsRegEx: function() {
+    return ('checked' == this.cached.box.find('input[type="checkbox"]').attr('checked'));
   },
 
   getCode: function() {

@@ -23,6 +23,7 @@ Options.styles = {
         .on("click", ".style .show-edit-style", $.proxy(this.showEdit, this))
         .on("click", ".style .delete-style", $.proxy(this.delete, this))
         .on("click", ".style .toggle-style", $.proxy(this.toggle, this))
+        .on("click", ".style .toggle-regex", $.proxy(this.toggleRegex, this))
 
     $("#backup")
       .on("click", ".show-export", $.proxy(this.showExport, this))
@@ -72,7 +73,8 @@ Options.styles = {
       if (url === '*') continue;
 
       this.$container.prepend(this.render(url,
-        backgroundPage.cache.styles.isEnabled(url)));
+        backgroundPage.cache.styles.isEnabled(url),
+        backgroundPage.cache.styles.isRegEx(url)));
       this.count ++;
     }
 
@@ -83,10 +85,11 @@ Options.styles = {
     return $('[data-url="' + url + '"]');
   },
 
-  render: function(url, isEnabled) {
+  render: function(url, isEnabled, isRegEx) {
     return Handlebars.templates.style({
       url: url,
-      enabled: isEnabled
+      enabled: isEnabled,
+      regex: isRegEx
     });
   },
 
@@ -95,6 +98,14 @@ Options.styles = {
     var $style = $target.parents('.style');
     var url = $style.data('url');
     backgroundPage.cache.styles.toggle(url, $target.attr("checked"), true);
+  },
+
+  toggleRegex: function(e) {
+    var $target = $(e.target);
+    var $style = $target.parents('.style');
+    var url = $style.data('url');
+    backgroundPage.cache.styles.toggleRegEx(url, $target.attr("checked"), true);
+    $style.data('regex', 'checked' == $target.attr("checked"));
   },
 
   share: function(e) {
@@ -177,10 +188,11 @@ Options.styles = {
 
   add: function(e) {
     var url = Options.modal.getURL();
+    var regex = Options.modal.getIsRegEx();
     var css = Options.modal.getCode();
 
-    if (this.save(url, css)) {
-      this.$container.prepend(this.render(url, true));
+    if (this.save(url, regex, css)) {
+      this.$container.prepend(this.render(url, true, regex));
 
       this.count ++;
       this.updateCount();
@@ -192,21 +204,22 @@ Options.styles = {
   edit: function(e) {
     var originalUrl = $(e.target).data("original-url");
     var url = Options.modal.getURL();
+    var regex = Options.modal.getIsRegEx();
     var css = Options.modal.getCode();
 
-    if (this.save(url, css, originalUrl)) {
-        this.get(originalUrl).replaceWith(this.render(url, true));
+    if (this.save(url, regex, css, originalUrl)) {
+        this.get(originalUrl).replaceWith(this.render(url, true, regex));
         Options.modal.close();
     }
   },
 
   editGlobal: function() {
-    if (this.save('*', Options.modal.getCode())) {
+    if (this.save('*', false, Options.modal.getCode())) {
       Options.modal.close();
     }
   },
 
-  save: function(url, css, originalUrl) {
+  save: function(url, regex, css, originalUrl) {
     if (url != '*') {
       if (!this.validate(url, css)) {
         return false;
@@ -229,7 +242,7 @@ Options.styles = {
           return false;
         }
 
-        backgroundPage.cache.styles.create(url, rules);
+        backgroundPage.cache.styles.create(url, regex, rules);
         return true;
       }
 
@@ -300,10 +313,12 @@ Options.styles = {
   showEdit: function(e) {
     var $style = $(e.target).parents(".style");
     var url = $style.data('url');
+    var regex = $style.data('regex');
     var rules = backgroundPage.cache.styles.getRules(url);
 
     Options.modal.init({
       url: url,
+      regex: regex,
       editor: true,
       edit: true,
       code: CSSUtils.crunchFormattedCSS(rules, false)
