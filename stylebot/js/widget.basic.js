@@ -33,7 +33,8 @@ stylebot.widget.basic = {
         'Helvetica, Arial, sans-serif',
         '"Lucida Grande", Verdana, sans-serif',
         'Palatino, "Palatino Linotype", serif',
-        'Georgia'
+        'Georgia',
+        '"Ubuntu Mono", Monaco, Inconsolata, monospace'
       ],
       el: null
     },
