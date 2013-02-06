@@ -31,9 +31,8 @@ stylebot.widget.basic = {
       type: 'font-family',
       options: [
         'Helvetica, Arial, sans-serif',
+        'Palatino, Georgia, serif',
         '"Lucida Grande", Verdana, sans-serif',
-        'Palatino, "Palatino Linotype", serif',
-        'Georgia',
         '"Ubuntu Mono", Monaco, Inconsolata, monospace'
       ],
       el: null
