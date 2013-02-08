@@ -2,7 +2,9 @@
   * background.html
   */
 
-var CURRENT_VERSION = '1.7.3.1';
+// This is the only place you need to update the version string
+// besides manifest.json.
+var CURRENT_VERSION = '1.7.3.3';
 
 var cache = {
   contextMenuId: null,
