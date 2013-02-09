@@ -963,7 +963,7 @@ String.prototype.trim = function() {
 
 /**
   * Checks if a given string is a pattern
-  * @return {Boolean} True if the string is a patern, false otherwise.
+  * @return {Boolean} True if the string is a pattern, false otherwise.
   */
 String.prototype.isPattern = function() {
   // Currently, the only indicator that a string is a pattern is if
@@ -972,12 +972,25 @@ String.prototype.isPattern = function() {
 };
 
 /**
+ * Checks if a given string is a regular expression
+ * @return {Boolean} True if the string is a regular expression, false otherwise.
+ */
+String.prototype.isRegex = function() {
+  // Currently, the only indicator that a string is a pattern is if
+  //if thas the wildcard character *
+  return this.indexOf('^') == 0;
+};
+
+/**
   * Checks if the string matches an stylebot pattern
   * @param {String} pattern The stylebot pattern.
   * @return {Boolean} True if the string matches the patern, false otherwise.
   */
 String.prototype.matchesPattern = function(pattern) {
-  if (pattern.isPattern()) {
+  if (pattern.isRegex()) {
+    return new RegExp(pattern).test(this);
+  }
+  else if (pattern.isPattern()) {
     try {
       var hasComma = ~pattern.indexOf(',');
       pattern = pattern.
