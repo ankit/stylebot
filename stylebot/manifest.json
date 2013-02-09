@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name"            : "Stylebot",
-  "version"         : "1.7.3.3",
+  "version"         : "1.7.3.4",
   "description"     : "Adapt the web's appearance",
   "background" : {
     "scripts": [
