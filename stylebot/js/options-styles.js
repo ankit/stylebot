@@ -228,10 +228,13 @@ Options.styles = {
           Options.modal.showSyntaxError(rules['error']);
           return false;
         }
-        debugger;
 
         backgroundPage.cache.styles.create(url, rules);
-        if (originalUrl && originalUrl!=url) backgroundPage.cache.styles.delete(originalUrl);
+
+        if (originalUrl && originalUrl != url) {
+          backgroundPage.cache.styles.delete(originalUrl);
+        }
+
         return true;
       }
 
