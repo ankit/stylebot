@@ -230,7 +230,11 @@ Options.styles = {
         }
 
         backgroundPage.cache.styles.create(url, rules);
-        if (originalUrl && originalUrl!=url) backgroundPage.cache.styles.delete(originalUrl);
+
+        if (originalUrl && originalUrl != url) {
+          backgroundPage.cache.styles.delete(originalUrl);
+        }
+
         return true;
       }
 
