@@ -5,7 +5,9 @@
   "description"     : "Adapt the web's appearance",
   "background" : {
     "scripts": [
-      "js/background.js"
+      "js/background/styles.js",
+      "js/background/string.js",
+      "js/background/background.js"
     ]
   },
 
@@ -108,6 +110,7 @@
     "contextMenus",
     "notifications",
     "storage",
-    "http://userstyles.org/"
+    "http://userstyles.org/",
+    "unlimitedStorage"
   ]
 }
