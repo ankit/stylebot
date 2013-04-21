@@ -967,7 +967,7 @@ String.prototype.trim = function() {
   */
 String.prototype.isPattern = function() {
   // Currently, the only indicator that a string is a pattern is if
-  //if thas the wildcard character *
+  // it has the wildcard character *
   return this.indexOf('*') >= 0;
 };
 
@@ -976,8 +976,9 @@ String.prototype.isPattern = function() {
  * @return {Boolean} True if the string is a regular expression, false otherwise.
  */
 String.prototype.isRegex = function() {
-  // Currently, the only indicator that a string is a pattern is if
-  //if thas the wildcard character *
+  // Currently, the only indicator that a string is a regular expression is if
+  // it starts with a ^. The caret is unlikely to appear within a regular URL
+  // and marks the beggining of a string in a regular expression.
   return this.indexOf('^') == 0;
 };
 
