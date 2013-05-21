@@ -130,13 +130,13 @@ textarea.stylebot-textarea:disabled
   opacity: 0.5 !important;
 }
 
-input[type="text"].stylebot-textfield
-{
+input[type="text"].stylebot-textfield {
+  -webkit-box-sizing: content-box !important;
   font-family: 'Lucida Grande', Tahoma, Arial, sans-serif !important;
   height: 12px !important;
   line-height: 12px !important;
+  min-height: 12px !important;
   padding: 2px !important;
-  -webkit-box-sizing: content-box !important;
 }
 
 textarea.stylebot-css-code {
