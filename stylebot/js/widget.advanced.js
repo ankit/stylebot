@@ -5,7 +5,6 @@
 **/
 
 stylebot.widget.advanced = {
-
   EDITOR_BOTTOM_PADDING: 36,
 
   cache: {
@@ -87,6 +86,7 @@ stylebot.widget.advanced = {
     if (self.cache.lastState == self.cache.editor.getSession().getValue()) {
       stylebot.undo.pop();
     }
+
     stylebot.undo.refresh();
     self.cache.lastState = null;
   },

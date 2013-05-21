@@ -5,9 +5,9 @@
 **/
 
 stylebot.page = {
-
   RIGHT_PADDING: 15,
   BOTTOM_EDITOR_PADDING: 102,
+
   isVisible: false,
   modal: null,
   timer: null,
@@ -92,6 +92,9 @@ stylebot.page = {
 
   show: function(content, prevTarget) {
     var self = this;
+    if (self.isVisible) {
+      return;
+    }
 
     self.create({
       closeOnEsc: false,
