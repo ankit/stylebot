@@ -1,15 +1,7 @@
 /**
-  * background.html
+  * Background Page
   */
-
-// This is the only place you need to update the version string
-// besides manifest.json.
-var CURRENT_VERSION = '1.7.3.4';
-
 var cache = {
-  contextMenuId: null,
-  enableStylingContextMenuId: null,
-
   // Styles object
   styles: {},
 
@@ -36,34 +28,11 @@ var cache = {
 function init() {
   updateVersion(function() {
     initCache(function() {
-      initContextMenu();
+      ContextMenu.init();
     });
   });
+
   attachListeners();
-}
-
-/**
-  * Updates the version of extension. Does any other essential upgrades.
-  */
-function updateVersion(callback) {
-  chrome.storage.local.get(['version'], function(storage) {
-    if (storage['version'] != CURRENT_VERSION) {
-      console.log('Updating to version ' + CURRENT_VERSION);
-      chrome.storage.local.set({'version': CURRENT_VERSION});
-    }
-
-    callback();
-  });
-}
-
-/**
-  * Shows a desktop notification for version update
-  */
-function showUpdateNotification() {
-  var notification = webkitNotifications.createHTMLNotification(
-    'notification.html'
-  );
-  notification.show();
 }
 
 /**
@@ -72,7 +41,7 @@ function showUpdateNotification() {
 function attachListeners() {
   if (cache.options.showPageAction == typeof undefined ||
     cache.options.showPageAction) {
-    showPageActions();
+    PageAction.showAll();
   }
 
   chrome.tabs.onUpdated.addListener(onTabUpdated);
@@ -84,21 +53,21 @@ function attachListeners() {
     switch (request.name) {
       case 'enablePageAction':
         if (cache.options.showPageAction) {
-          enablePageAction(sender.tab);
+          PageAction.enable(sender.tab);
         }
         sendResponse({});
         break;
 
       case 'disablePageAction':
         if (cache.options.showPageAction) {
-          disablePageAction(sender.tab);
+          PageAction.disable(sender.tab);
         }
         sendResponse({});
         break;
 
       case 'highlightPageAction':
         if (cache.options.showPageAction) {
-          highlightPageAction(sender.tab);
+          PageAction.highlight(sender.tab);
         }
         sendResponse({});
         break;
@@ -171,17 +140,16 @@ function onTabUpdated(tabId, changeInfo, tab) {
   if (tab.status === 'complete') {
     clearTabResponseCache(tabId);
     if (cache.options.contextMenu) {
-      updateContextMenu(tab);
+      ContextMenu.update(tab);
     }
-
-    updatePageAction(tabId);
+    PageAction.update(tabId);
   }
 }
 
 function onTabActivated(activeInfo) {
   if (cache.options.contextMenu) {
     chrome.tabs.get(activeInfo.tabId, function(tab) {
-      updateContextMenu(tab);
+      ContextMenu.update(tab);
     });
   }
 }
@@ -203,139 +171,6 @@ function clearTabResponseCache(tabId) {
   if (cache.loadingTabs[tabId]) {
     delete cache.loadingTabs[tabId];
   }
-}
-
-/**
-  * Update page action for the specified tab to indicate:
-  *   - stylebot is not visible
-  *   - No CSS is applied to the current page
-  * @param {object} tab The tab for which the page action should be updated
-  */
-function disablePageAction(tab) {
-  chrome.pageAction.setIcon({ tabId: tab.id, path: 'images/css.png' });
-  chrome.pageAction.setTitle({
-    tabId: tab.id,
-    title: 'Click to start editing using Stylebot' });
-}
-
-/**
-  * Update page action for the specified tab to indicate:
-  *   - stylebot is not visible
-  *   - CSS is applied to the current page
-  * @param {object} tab The tab for which the page action should be updated
-  */
-function highlightPageAction(tab) {
-  chrome.pageAction.setIcon({
-    tabId: tab.id,
-    path: 'images/css_highlighted.png'
-  });
-
-  chrome.pageAction.setTitle({
-    tabId: tab.id,
-    title: 'Click to start editing using Stylebot'
-  });
-}
-
-/**
-  * Update page action for the specified tab to indicate:
-  *   - stylebot is visible
-  * @param {object} tab The tab for which the page action should be updated
-  */
-function enablePageAction(tab) {
-  chrome.pageAction.setIcon({
-    tabId: tab.id,
-    path: 'images/css_active.png'
-  });
-
-  chrome.pageAction.setTitle({
-    tabId: tab.id,
-    title: 'Click to stop editing using Stylebot'
-  });
-}
-
-/**
-  * Show the page action for all existing tabs
-  */
-function showPageActions() {
-  chrome.windows.getAll( { populate: true }, function(windows) {
-    var w_len = windows.length;
-    for (var i = 0; i < w_len; i++) {
-      var tabs = windows[i].tabs;
-      if (tabs) {
-        var t_len = tabs.length;
-        for (var j = 0; j < t_len; j++) {
-          var tab = tabs[j];
-          if (tab.url.isValidUrl())
-            chrome.pageAction.show(tab.id);
-        }
-      }
-    }
-  });
-
-  chrome.pageAction.onClicked.addListener(onPageActionClick);
-}
-
-/**
-  * Hide the page action for all existing tabs
-  */
-function hidePageActions() {
-  chrome.windows.getAll({ populate: true }, function(windows) {
-    var w_len = windows.length;
-    for (var i = 0; i < w_len; i++) {
-      var tabs = windows[i].tabs;
-      if (tabs) {
-        var t_len = tabs.length;
-        for (var j = 0; j < t_len; j++) {
-          chrome.pageAction.hide(tabs[j].id);
-        }
-      }
-    }
-  });
-
-  chrome.pageAction.onClicked.removeListener(onPageActionClick);
-}
-
-/**
-  * Request listener for when a page action is clicked
-  *   Toggles CSS editing for the currently active tab
-  * @param {object} tab The tab for which editing is toggled
-  */
-function onPageActionClick(tab) {
-  chrome.tabs.sendRequest(tab.id, { name: 'toggle' }, function(response) {
-    if (response.status) {
-      enablePageAction(tab);
-    } else {
-      disablePageAction(tab);
-    }
-  });
-}
-
-/**
-  * Request listener for when the user switches a tab
-  *   Updates page action for the newly active tab
-  * @param {number} tabId The tab's id for whicht th epage action should
-  *  be updated.
-  */
-function updatePageAction(tabId) {
-  chrome.tabs.get(tabId, function(tab) {
-    if (!tab) {
-      return;
-    }
-
-    if (tab.url.isValidUrl()) {
-      chrome.tabs.sendRequest(tab.id, {name: 'status'}, function(response) {
-        if (response) {
-          if (response.status) {
-            enablePageAction(tab);
-          } else if (response.rules || response.global) {
-            highlightPageAction(tab);
-          } else {
-            disablePageAction(tab);
-          }
-        }
-      });
-    };
-  });
 }
 
 /**
@@ -378,12 +213,12 @@ function saveOption(name, value) {
   chrome.storage.local.set({'options': cache.options});
   propagateOptions();
 
-  // If the option was contextMenu, update it.
+  // If the option was contextMenu, update it
   if (name === 'contextMenu') {
     if (value === false) {
-      removeContextMenu();
-    } else if (!cache.contextMenuId) {
-      initContextMenu();
+      ContextMenu.remove();
+    } else {
+      ContextMenu.init();
     }
   }
 }
@@ -416,97 +251,6 @@ function propagateOptions() {
 function saveAccordionState(accordions) {
   cache.options.accordions = accordions;
   chrome.storage.local.set({'options': cache.options});
-}
-
-function createContextMenu(title, parentId, action, type) {
-  var options = {
-    title: title,
-    contexts: ['all']
-  };
-
-  if (parentId) {
-    options.parentId = parentId;
-  }
-
-  if (action) {
-    options.onclick = function(info, tab) {
-      sendRequestToTab(tab, action);
-    }
-  }
-
-  if (type) {
-    options.type = type;
-  }
-
-  return chrome.contextMenus.create(options);
-}
-
-/**
-  * Initialize the right click context menu.
-  */
-function initContextMenu() {
-  chrome.contextMenus.removeAll();
-  if (cache.options.contextMenu) {
-    menuId = createContextMenu('Stylebot');
-    createContextMenu('Style Element', menuId, 'openWidget');
-    cache.enableStylingContextMenuId =
-      createContextMenu('Enable Styling', menuId, 'toggleStyle', 'checkbox');
-    createContextMenu('View Options...', menuId, 'viewOptions');
-    createContextMenu('Search...', menuId, 'searchSocial');
-    createContextMenu('Share...', menuId, 'shareOnSocial');
-    cache.contextMenuId = menuId;
-  }
-}
-
-/**
-  * Update the right-click context menu for a tab i.e.
-  *   show or hide and update checkboxes.
-  * @param {object} tab Tab based on which the right-click menu is to be updated
-  */
-function updateContextMenu(tab) {
-  if (!tab) {
-    return;
-  }
-
-  if (!cache.contextMenuId) {
-    return;
-  }
-
-  if (tab.url.isValidUrl()) {
-    // If it is a valid url, show the contextMenu.
-    chrome.contextMenus.update(cache.contextMenuId, {
-      documentUrlPatterns: ['<all_urls>']
-    });
-
-    // Get style status from the tab we changed to and
-    // update the checkbox in the context menu.
-    if (cache.enableStylingContextMenuId) {
-      chrome.tabs.sendRequest(tab.id, {name: 'styleStatus'},
-      function(response) {
-          chrome.contextMenus.update(cache.enableStylingContextMenuId, {
-          checked: response.status
-        });
-      });
-    }
-  }
-
-  else {
-    // If it isn't a valid url, hide the contextMenu.
-    // Set the document pattern to foo/*random*.
-    chrome.contextMenus.update(cache.contextMenuId, {
-      documentUrlPatterns: ['http://foo/' + Math.random()]
-    });
-  }
-}
-
-/**
-  * Remove / Hide the right click context menu
-  */
-function removeContextMenu() {
-  if (cache.contextMenuId) {
-    chrome.contextMenus.remove(cache.contextMenuId);
-    cache.contextMenuId = null;
-  }
 }
 
 /**

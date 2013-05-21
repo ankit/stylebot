@@ -353,9 +353,9 @@ Styles.prototype.getCombinedRulesForPage = function(aURL, tab) {
   // Update page action.
   if (cache.options.showPageAction) {
     if (response.rules || response.global) {
-      highlightPageAction(tab);
+      PageAction.highlight(tab);
     } else {
-      disablePageAction(tab);
+      PageAction.disable(tab);
     }
     chrome.pageAction.show(tab.id);
   }
@@ -372,9 +372,9 @@ Styles.prototype.getCombinedRulesForIframe = function(aURL, tab) {
     // todo: find a better way out for this
     if (cache.options.showPageAction) {
       if (response.rules || response.global)
-        highlightPageAction(tab);
+        PageAction.highlight(tab);
       else
-        disablePageAction(tab);
+        PageAction.disable(tab);
 
       chrome.pageAction.show(tab.id);
     }

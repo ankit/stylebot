@@ -491,10 +491,10 @@ stylebot.style = {
     if (this.status)
       return;
     this.status = true;
+
     $('#stylebot-css').html(CSSUtils.crunchCSS(this.rules, true));
-    if (this.global) {
+    if (this.global)
       $('#stylebot-global-css').html(CSSUtils.crunchCSS(this.global, true));
-    }
   },
 
   /**
@@ -505,11 +505,10 @@ stylebot.style = {
     if (stylebot.status) {
       return false;
     }
-    if (this.status) {
+
+    if (this.status)
       this.disable();
-    }
-    else {
+    else
       this.enable();
-    }
   }
 };

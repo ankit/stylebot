@@ -106,8 +106,7 @@ String.prototype.isValidUrl = function() {
     "https://chrome.google.com/webstore"
   ];
 
-  return (this.indexOf('') === -1
-    && this.indexOf('chrome://') === -1
+  return (this.indexOf('chrome://') === -1
     && blacklist.indexOf(this) === -1
     && this.isOfHTMLType());
 };

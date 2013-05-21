@@ -3,8 +3,12 @@
   "name"            : "Stylebot",
   "version"         : "1.7.3.4",
   "description"     : "Adapt the web's appearance",
+
   "background" : {
     "scripts": [
+      "js/background/updates.js",
+      "js/background/pageaction.js",
+      "js/background/contextmenu.js",
       "js/background/styles.js",
       "js/background/string.js",
       "js/background/background.js"

@@ -131,8 +131,8 @@ function translateOptionValue(name, value) {
 function togglePageAction() {
   showPageAction = backgroundPage.getOption('showPageAction');
   if (!showPageAction) {
-    backgroundPage.hidePageActions();
+    backgroundPage.PageAction.hideAll();
   } else {
-    backgroundPage.showPageActions();
+    backgroundPage.PageAction.showAll();
   }
 }

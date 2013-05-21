@@ -123,6 +123,7 @@ chrome.extension.onRequest.addListener(
     if (request.name === 'status') {
       if (window != window.top)
         return;
+
       sendResponse({
         status: stylebot.status,
         rules: $.isEmptyObject(stylebot.style.rules) ? null : stylebot.style.rules,
@@ -138,6 +139,7 @@ chrome.extension.onRequest.addListener(
       } else if (window != window.top) {
         return;
       }
+
       stylebot.toggle();
       sendResponse({status: stylebot.status});
     }
@@ -153,35 +155,35 @@ chrome.extension.onRequest.addListener(
     }
 
     else if (request.name === 'searchSocial') {
-      if (!window.top)
+      if (window != window.top)
         return;
       stylebot.contextmenu.searchSocial();
     }
 
     else if (request.name === 'shareOnSocial') {
-      if (!window.top)
+      if (window != window.top)
         return;
       stylebot.contextmenu.shareOnSocial();
     }
 
     else if (request.name === 'toggleStyle') {
-      if (!window.top) {
+      if (window != window.top)
         return;
-      }
       stylebot.style.toggle();
       sendResponse({status: stylebot.style.status});
     }
 
     else if (request.name === 'styleStatus') {
-      if (!window.top)
+      if (window != window.top)
         return;
       sendResponse({ status: stylebot.style.status });
     }
 
     else if (request.name === 'viewOptions') {
-      if (!window.top) {
+      if (window != window.top) {
         return;
       }
+
       stylebot.chrome.openOptionsPage();
     }
   }
