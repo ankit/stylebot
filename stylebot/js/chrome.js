@@ -132,14 +132,6 @@ chrome.extension.onRequest.addListener(
     }
 
     else if (request.name === 'toggle') {
-      if (window.document.domain === 'mail.google.com') {
-        if (!window.frameElement || window.frameElement.id != 'canvas_frame') {
-          return;
-        }
-      } else if (window != window.top) {
-        return;
-      }
-
       stylebot.toggle();
       sendResponse({status: stylebot.status});
     }
