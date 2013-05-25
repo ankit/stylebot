@@ -178,5 +178,49 @@ chrome.extension.onRequest.addListener(
 
       stylebot.chrome.openOptionsPage();
     }
+
+    else if (request.name === 'getURL') {
+      if (window != window.top) {
+        return;
+      }
+
+      sendResponse({url: stylebot.style.cache.url});
+    }
+
+    else if (request.name === 'preview') {
+      if (window != window.top) {
+        return;
+      }
+
+      stylebot.style.preview(request.title,
+        request.description,
+        request.author,
+        request.timeAgo,
+        request.favCount,
+        request.css);
+    }
+
+    else if (request.name === 'resetPreview') {
+      if (window != window.top) {
+        return;
+      }
+
+      stylebot.style.resetPreview();
+    }
+
+    else if (request.name === 'install') {
+      if (window != window.top) {
+        return;
+      }
+
+      stylebot.style.install(request.title, request.css);
+    }
+
+    else if (request.name === 'reset') {
+      if (window != window.top) {
+        return;
+      }
+      stylebot.style.removeAll();
+    }
   }
 );

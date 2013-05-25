@@ -1,0 +1,22 @@
+#stylebot-preview {
+  background: rgba(0, 0, 0, 0.70) !important;
+  color: #fff !important;
+  position: fixed;
+  top: 0 !important;
+  left: 0 !important;
+  font-size: 20px !important;
+  z-index: 10000 !important;
+  font-family: 'Lucida Grande', Tahoma, Arial, sans-serif;
+  max-width: 800px !important;
+  padding: 10px !important;
+}
+
+#stylebot-preview-meta {
+  font-size: 15px !important;
+  padding-top: 5px !important;
+}
+
+#stylebot-preview-description {
+  font-size: 15px !important;
+  padding-top: 8px !important;
+}

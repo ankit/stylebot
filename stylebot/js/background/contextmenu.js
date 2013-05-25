@@ -31,7 +31,6 @@ var ContextMenu = {
 
     if (action) {
       options.onclick = function(info, tab) {
-        console.log(info);
         sendRequestToTab(tab, action);
       }
     }

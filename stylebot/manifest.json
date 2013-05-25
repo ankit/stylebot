@@ -63,7 +63,8 @@
       "css/scrollbars.css",
       "css/tipsy.css",
       "css/shortcuts_help.css",
-      "css/ace_editor.css"
+      "css/ace_editor.css",
+      "css/preview.css"
     ],
 
     "js": [
@@ -99,7 +100,8 @@
 
   "page_action": {
     "default_icon"  : "images/css.png",
-    "default_title" : "Click to start editing using Stylebot"
+    "default_title" : "Click to start editing using Stylebot",
+    "default_popup" : "pageaction/index.html"
   },
 
   "icons": {
@@ -115,6 +117,7 @@
     "notifications",
     "storage",
     "http://userstyles.org/",
-    "unlimitedStorage"
+    "unlimitedStorage",
+    "http://stylebot.me/"
   ]
 }

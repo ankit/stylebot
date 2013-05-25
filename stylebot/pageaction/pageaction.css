@@ -1,0 +1,37 @@
+body {
+  min-width: 200px;
+}
+
+.dropdown-menu {
+  position: relative;
+  overflow: hidden;
+  overflow-y: scroll;
+}
+
+.nav-pills > li {
+  min-width: 200px;
+  border: 1px solid #eee;
+}
+
+.nav-pills > li > a {
+  color: #333;
+}
+
+.dropdown-menu > li {
+  width: 350px;
+  padding: 5px;
+}
+
+.dropdown-menu > li:hover {
+  background: #eee;
+}
+
+.style-meta {
+  padding-left: 5px;
+  font-size: 10px;
+}
+
+.style-featured {
+  color: #73ba68;
+  padding-left: 10px;
+}

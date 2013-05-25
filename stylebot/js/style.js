@@ -510,5 +510,50 @@ stylebot.style = {
       this.disable();
     else
       this.enable();
+  },
+
+  /**
+    * Preview a style
+    */
+  preview: function(title, desc, author, timeAgo, favCount, css) {
+    var $preview = $("#stylebot-preview");
+    if ($preview.length === 0) {
+      $preview = $("<div>", {
+        id: "stylebot-preview"
+      });
+
+      $("body").append($preview);
+    }
+
+    if (desc) {
+      desc = desc.replace(/\n/g, '<br />');
+    }
+
+    $preview.html("Previewing " + title + "<br>" +
+      "<div id='stylebot-preview-meta'>by " + author + " (" + favCount +
+      " favorites) • Last updated " + timeAgo + "</div>" +
+      "<br><div id='stylebot-preview-description'>" + desc + "</div>");
+    $preview.show();
+    stylebot.style.applyPageCSS(css, false);
+  },
+
+  /**
+    * Reset the preview and go back to the existing style
+    */
+  resetPreview: function(css) {
+    $('#stylebot-css').html(CSSUtils.crunchCSS(this.rules, true));
+    $("#stylebot-preview").hide();
+  },
+
+  /**
+    * Install css as style
+    */
+  install: function(title, css) {
+    var $preview = $("#stylebot-preview");
+    $preview.html("Installed " + title).show();
+    setTimeout(function() {
+      $preview.fadeOut(1000);
+    }, 500);
+    stylebot.style.applyPageCSS(css, true);
   }
 };
