@@ -4,6 +4,7 @@ $(document).ready(function() {
 
 var PageAction = {
   styles: {},
+
   init: function() {
     chrome.windows.getCurrent({populate: true}, function(aWindow) {
       var tabs = aWindow.tabs;
@@ -25,10 +26,17 @@ var PageAction = {
           });
 
           chrome.tabs.sendRequest(tab.id, {name: "getURL"}, function(response) {
-            $.get("http://stylebot.me/search_api?q="+response.url, function(styles_str) {
+            $.get("http://stylebot.me/search_api?q=" + response.url, function(styles_str) {
               var styles = JSON.parse(styles_str);
               var len = styles.length;
               var $menu = $("#menu");
+
+              $menu.html('');
+              if (len === 0) {
+                var html = '<li class="disabled"><a>No Styles Found.</a></li>';
+                $menu.append(html);
+                return;
+              }
 
               for (var i = 0; i < len; i++) {
                 var name = styles[i].title;
@@ -61,6 +69,8 @@ var PageAction = {
                 if (featured) {
                   html += '<span class="style-featured">featured</span>';
                 }
+
+                html += '<span class="hide style-installed">installed</span>';
 
                 html += '<span class="pull-right">by <a class="style-author" href="' +
                 userLink + '">' + username +'</a></span></div></li>';
@@ -128,6 +138,7 @@ var PageAction = {
     if ($el.hasClass("style-link") || $el.hasClass("style-author")) {
       return;
     }
+    $('.style-installed', $el).show();
 
     if (!$el.hasClass('style-item')) {
       $el = $el.parent('.style-item');

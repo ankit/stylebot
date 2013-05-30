@@ -35,3 +35,8 @@ body {
   color: #73ba68;
   padding-left: 10px;
 }
+
+.style-installed {
+  color: rgb(199, 96, 96);
+  padding-left: 10px;
+}
