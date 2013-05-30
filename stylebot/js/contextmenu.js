@@ -46,8 +46,7 @@ stylebot.contextmenu = {
   /**
     * Share the styles for the current page on Stylebot Social
     */
-  shareOnSocial: function() {
-    // Check if the current page has any styles.
+  shareOnSocial: function(screenshot) {
     if (stylebot.style.rules) {
 
       var css = CSSUtils.crunchFormattedCSS(stylebot.style.rules, false);
@@ -65,7 +64,7 @@ stylebot.contextmenu = {
         type: 'hidden',
         name: 'site',
         value: stylebot.style.cache.url
-        }).appendTo(tempForm);
+      }).appendTo(tempForm);
 
       // css
       $('<input>', {
@@ -74,11 +73,15 @@ stylebot.contextmenu = {
         value: css
       }).appendTo(tempForm);
 
+      // screenshot
+      var $screenshot = $('<input>', {
+        type: 'hidden',
+        name: 'screenshot',
+        value: screenshot
+      }).appendTo(tempForm);
+
       $('<submit>').appendTo(tempForm);
-
-      // creating the 'formresult' window.
       window.open('test.html', 'formresult');
-
       tempForm.submit();
       tempForm.remove();
     }

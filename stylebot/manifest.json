@@ -118,6 +118,7 @@
     "storage",
     "http://userstyles.org/",
     "unlimitedStorage",
-    "http://stylebot.me/"
+    "http://stylebot.me/",
+    "<all_urls>"
   ]
 }

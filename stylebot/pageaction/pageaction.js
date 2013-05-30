@@ -137,12 +137,22 @@ var PageAction = {
     var css = PageAction.styles[id];
     var title = $el.data('title');
 
-    chrome.tabs.sendRequest(tab.id, {name: "install", title: title, css: css}, function(response){});
+    chrome.tabs.sendRequest(tab.id, {
+      name: "install",
+      title: title,
+      css: css
+    }, function(response){});
   },
 
   share: function(e, tab) {
-    chrome.tabs.sendRequest(tab.id, {name: "shareOnSocial"}, function(response){});
-    window.close();
+    chrome.windows.getCurrent(null, function(aWindow) {
+      chrome.tabs.captureVisibleTab(aWindow.id, {format: "png"}, function(dataUrl) {
+        chrome.tabs.sendRequest(tab.id, {
+          name: "shareOnSocial",
+          screenshot: dataUrl
+        }, function(response){});
+      });
+    });
   },
 
   open: function(e, tab) {
