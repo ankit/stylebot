@@ -102,12 +102,23 @@ String.prototype.matchesBasic = function(pattern) {
   * @return {Boolean} True if Stylebot can run on the URL
   */
 String.prototype.isValidUrl = function() {
-  var blacklist = [
-    "https://chrome.google.com/webstore"
-  ];
+  var inBlacklist = function(url) {
+    var blacklist = [
+      "https://chrome.google.com/webstore",
+      "chrome-extension://"
+    ];
+    var len = blacklist.length;
+    for (var i = 0; i < len; i ++) {
+      if (url.indexOf(blacklist[i]) != -1) {
+        return true;
+      }
+    }
+
+    return false;
+  };
 
   return (this.indexOf('chrome://') === -1
-    && blacklist.indexOf(this) === -1
+    && !inBlacklist(this)
     && this.isOfHTMLType());
 };
 
