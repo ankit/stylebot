@@ -1,11 +1,23 @@
 body {
   min-width: 200px;
+  font-family: 'Lucida Grande', Helvetica, Arial, sans-serif;
+  background: #fefefe;
+}
+
+.nav {
+  margin: 0;
 }
 
 .dropdown-menu {
   position: relative;
   overflow: hidden;
   overflow-y: scroll;
+}
+
+.nav .dropdown-toggle .caret {
+  border-top-color: #333;
+  border-bottom-color: #333;
+  margin-top: 6px;
 }
 
 .nav-pills > li {
