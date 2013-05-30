@@ -488,12 +488,16 @@ a.stylebot-accordion-active .stylebot-accordion-icon {
 }
 
 #stylebot-page-live-preview {
-  font-size: 11px !important;
   margin-bottom: 10px !important;
 }
 
 #stylebot-page-live-preview input {
+  display: inline !important;
   margin: 3px !important;
+}
+
+#stylebot-page-live-preview label {
+  font-size: 11px !important;
 }
 
 /* #stylebot is required so that this rule overrides the one defined in modal.css */
