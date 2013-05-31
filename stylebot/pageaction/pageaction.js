@@ -30,7 +30,6 @@ var PageAction = {
               var styles = JSON.parse(styles_str);
               var len = styles.length;
               var $menu = $("#menu");
-
               $menu.html('');
               if (len === 0) {
                 var html = '<li class="disabled"><a>No Styles Found.</a></li>';
@@ -107,7 +106,7 @@ var PageAction = {
   onStyleMouseenter: function(e, tab) {
     var $el = $(e.target);
     if (!$el.hasClass('style-item')) {
-      $el = $el.parent('.style-item');
+      $el = $el.parents('.style-item');
     }
 
     var id = $el.data('id');
@@ -138,10 +137,12 @@ var PageAction = {
     if ($el.hasClass("style-link") || $el.hasClass("style-author")) {
       return;
     }
+
+    $('.style-installed').hide();
     $('.style-installed', $el).show();
 
     if (!$el.hasClass('style-item')) {
-      $el = $el.parent('.style-item');
+      $el = $el.parents('.style-item');
     }
 
     var id = $el.data('id');

@@ -2,6 +2,8 @@ body {
   min-width: 200px;
   font-family: 'Lucida Grande', Helvetica, Arial, sans-serif;
   background: #fefefe;
+  font-size: 13px;
+  max-height: 300px
 }
 
 .nav {

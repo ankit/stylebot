@@ -533,6 +533,7 @@ stylebot.style = {
       "<div id='stylebot-preview-meta'>by " + author + " (" + favCount +
       " favorites) • Last updated " + timeAgo + "</div>" +
       "<br><div id='stylebot-preview-description'>" + desc + "</div>");
+    $preview.css('left', $(window).width()/2 - $preview.width()/2);
     $preview.show();
     stylebot.style.applyPageCSS(css, false);
   },
@@ -550,7 +551,9 @@ stylebot.style = {
     */
   install: function(title, css) {
     var $preview = $("#stylebot-preview");
-    $preview.html("Installed " + title).show();
+    $preview.html("<h1>Installed " + title + "</h1>")
+      .css('left', $(window).width()/2 - $preview.width()/2)
+      .show();
     setTimeout(function() {
       $preview.fadeOut(1000);
     }, 500);
