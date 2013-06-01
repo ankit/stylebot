@@ -64,7 +64,8 @@
       "css/tipsy.css",
       "css/shortcuts_help.css",
       "css/ace_editor.css",
-      "css/preview.css"
+      "css/preview.css",
+      "css/selectize.css"
     ],
 
     "js": [
@@ -91,6 +92,7 @@
       "js/libs/ace.js",
       "js/libs/mode-css.js",
       "js/libs/theme-dawn.js",
+      "js/libs/selectize.js",
       "js/shortcuts.js"
     ],
 

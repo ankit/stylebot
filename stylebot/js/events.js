@@ -113,23 +113,22 @@ Events = {
     var property = $(e.target).data('property');
     var unit = $(e.target).nextAll('select').attr('value');
 
-    if (parseFloat(value))
+    if (parseFloat(value)) {
       value += unit;
+    }
 
     stylebot.style.apply(property, value);
   },
 
-  onSelectChange: function(e) {
-    var value = e.target.value.split(',');
-    var property = $(e.target).find('[value=' + e.target.value + ']').data('property');
+  onSelectChange: function(property, value) {
     if (typeof property === 'object') {
       var len = property.length;
       for (var i = 0; i < len; i++) {
         Events.saveProperty(property[i], value[i]);
       }
-    }
-    else
+    } else {
       Events.saveProperty(property, value);
+    }
   },
 
   onSegmentedControlMouseDown: function(e) {

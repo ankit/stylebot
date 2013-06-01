@@ -285,7 +285,8 @@
   position: relative !important;
 }
 
-.stylebot-control {
+.stylebot-control,
+.stylebot-selectize-control {
   display: inline;
   margin: 0 !important;
   margin-left: 6px !important;

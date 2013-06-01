@@ -111,6 +111,9 @@ var stylebot = {
     */
   select: function(el, selector) {
     stylebot.disableSelection();
+    stylebot.style.fillCache(null);
+    stylebot.widget.reset();
+
     // if element is specified, it is selected
     if (el) {
       stylebot.selectedElement = el;

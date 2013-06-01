@@ -5,7 +5,6 @@
 **/
 
 stylebot.widget.basic = {
-
   isColorPickerVisible: false,
   accordions: [0, 1, 2, 3],
 
@@ -30,10 +29,13 @@ stylebot.widget.basic = {
       id: 'font-family',
       type: 'font-family',
       options: [
-        'Helvetica, Arial, sans-serif',
-        'Palatino, Georgia, serif',
-        '"Lucida Grande", Verdana, sans-serif',
-        'Consolas, Monaco, "Ubuntu Mono", monospace'
+        'Helvetica',
+        'Palatino',
+        'Georgia',
+        'Lucida Grande',
+        'Consolas',
+        'Monaco',
+        'monospace'
       ],
       el: null
     },
@@ -116,7 +118,7 @@ stylebot.widget.basic = {
       controls: [{
         name: 'Border Style',
         id: 'border-style',
-        type: 'select',
+        type: 'border-style',
         options: ['none', 'solid', 'dotted', 'dashed', 'double', 'groove', 'ridge', 'inset', 'outset'],
         el: null
       },
@@ -264,28 +266,18 @@ stylebot.widget.basic = {
         .appendTo($controlSet);
         break;
 
-      case 'select' :
-        control_el = ui.createSelect(control.id);
-
-        ui.createSelectOption('Default', control.id, '')
-        .appendTo(control_el);
-
-        var len = control.options.length;
-        for (var i = 0; i < len; i++) {
-          var option = control.options[i];
-          ui.createSelectOption(Utils.capitalize(option), control.id, option).appendTo(control_el);
-        }
-
-        control_el.appendTo($controlSet);
-        break;
-
       case 'segmented' :
         control_el = ui.createSegmentedControl(control)
         .appendTo($controlSet);
         break;
 
-      case 'font-family' :
+      case 'font-family':
         control_el = ui.createFontFamilyControl(control)
+        .appendTo($controlSet);
+        break;
+
+      case 'border-style':
+        control_el = ui.createBorderStyleControl(control)
         .appendTo($controlSet);
         break;
     }
@@ -314,11 +306,11 @@ stylebot.widget.basic = {
     var ui = WidgetUI;
     var value = rule[control.id];
     switch (control.type) {
-      case 'size' :
+      case 'size':
         ui.setSize(control, value);
         break;
 
-      case 'multi-size' :
+      case 'multi-size':
         var values = [];
         var len = control.id.length;
         for (var i = 0; i < len; i++) {
@@ -327,23 +319,27 @@ stylebot.widget.basic = {
         ui.setMultiSize(control, values);
         break;
 
-      case 'font-family' :
+      case 'font-family':
         ui.setFontFamily(control, value);
         break;
 
-      case 'color' :
+      case 'border-style':
+        ui.setBorderStyle(control, value);
+        break;
+
+      case 'color':
         ui.setColor(control, value);
         break;
 
-      case 'toggle' :
+      case 'toggle':
         ui.setToggleButton(control, value);
         break;
 
-      case 'select' :
+      case 'select':
         ui.setSelectOption(control, value);
         break;
 
-      case 'segmented' :
+      case 'segmented':
         ui.setSegmentedControl(control, value);
         break;
     }
@@ -354,7 +350,12 @@ stylebot.widget.basic = {
     var ui = WidgetUI;
 
     this.cache.textfields.attr('value' , '');
-    this.cache.selectboxes.prop('selectedIndex', 0);
+
+    $.each(this.cache.selectboxes, function(index, select) {
+      var defaultValue = $(select).data('default');
+      select.selectize.setValue(defaultValue);
+    });
+
     this.cache.colorSelectorColor.css('backgroundColor', '#fff');
     this.cache.fontFamilyInput.hide();
 
@@ -365,7 +366,6 @@ stylebot.widget.basic = {
   // Initialize and present the Basic Mode UI to user
   show: function() {
     var self = stylebot.widget.basic;
-    self.reset();
     self.fill();
 
     // set focus to first visible accordion header
@@ -407,7 +407,9 @@ stylebot.widget.basic = {
   enable: function() {
     this.cache.textfields.prop('disabled', false);
     this.cache.buttons.prop('disabled', false);
-    this.cache.selectboxes.prop('disabled', false);
+    $.each(this.cache.selectboxes, function(index, select) {
+      select.selectize.unlock();
+    });
     this.cache.colorSelectors.removeClass('disabled');
   },
 
@@ -415,7 +417,9 @@ stylebot.widget.basic = {
   disable: function() {
     this.cache.textfields.prop('disabled', true);
     this.cache.buttons.prop('disabled', true);
-    this.cache.selectboxes.prop('disabled', true);
+    $.each(this.cache.selectboxes, function(index, select) {
+      select.selectize.lock();
+    });
     this.cache.colorSelectors.addClass('disabled');
   }
 };

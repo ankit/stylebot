@@ -94,19 +94,23 @@ var WidgetUI = {
     .appendTo(container);
 
     // Select box for choosing unit
-    var select = $('<select>', {
+    var $select = $('<select>', {
       class: 'stylebot-control stylebot-select'
     })
     .change(function(e) {
       $(this).prev().keyup();
     })
+    .data('default', 'px')
     .appendTo(container);
 
     var len = this.VALID_SIZE_UNITS.length;
     for (var i = 0; i < len; i++) {
-      this.createSelectOption(this.VALID_SIZE_UNITS[i], null, this.VALID_SIZE_UNITS[i])
-      .appendTo(select);
+      this.createSelectOption($select,
+        this.VALID_SIZE_UNITS[i],
+        this.VALID_SIZE_UNITS[i]);
     }
+
+    $select.selectize();
     return container;
   },
 
@@ -126,25 +130,28 @@ var WidgetUI = {
     for (var i = 0; i < len; i++) {
       var property = control.id[i];
       this.createTextField(property, 1, Events.onSizeFieldKeyDown, Events.onSizeFieldKeyUp)
-      .addClass('stylebot-multisize-' + classNames[i])
-      .appendTo(container);
+        .addClass('stylebot-multisize-' + classNames[i])
+        .appendTo(container);
     }
 
     // Select box for choosing unit
-    var select = $('<select>', {
+    var $select = $("<select>", {
       class: 'stylebot-control stylebot-select'
     })
     .change(function(e) {
       $(this).parent().find('input').keyup();
     })
+    .data('default', 'px')
     .appendTo(container);
 
     var len = this.VALID_SIZE_UNITS.length;
-
     for (var i = 0; i < len; i++) {
-      this.createSelectOption(this.VALID_SIZE_UNITS[i], null, this.VALID_SIZE_UNITS[i])
-      .appendTo(select);
+      this.createSelectOption($select,
+        this.VALID_SIZE_UNITS[i],
+        this.VALID_SIZE_UNITS[i]);
     }
+
+    $select.selectize();
     return container;
   },
 
@@ -154,62 +161,79 @@ var WidgetUI = {
     * @return {jQuery element} SPAN element containing the control
     */
   createFontFamilyControl: function(control) {
-    var container = $('<span>');
+    var container = $('<span>', {
+      class: 'stylebot-font-family-control'
+    });
 
-    var select = $('<select>', {
+    var $select = $('<select>', {
       class: 'stylebot-control stylebot-select'
     })
-    .change(function(e) {
-      var el = $(this);
-      var input = el.next();
-      if (el.attr('value') === 'Custom') {
-        input
-        .attr('value', '')
-        .show();
-      }
-      else {
-        input
-        .hide()
-        .attr('value', el.attr('value'));
-      }
-      input.keyup();
-    })
+    .data('default', 'default')
     .appendTo(container);
 
     // default option
-    this.createSelectOption('Default', null, '')
-    .appendTo(select);
+    this.createSelectOption($select, 'Default', 'default');
 
     var len = control.options.length;
     for (var i = 0; i < len; i++) {
-      this.createSelectOption(control.options[i], null, control.options[i])
-      .appendTo(select);
+      this.createSelectOption($select,
+        control.options[i],
+        control.options[i])
     }
 
-    // custom option
-    this.createSelectOption('Custom', null, 'Custom')
-    .appendTo(select);
+    $select.selectize({
+      persist: true,
+      create: function(input) {
+        return {
+            value: input,
+            text: input
+        }
+      },
 
-    // end of select
+      onChange: function(value) {
+        // todo: instead of this hack, fix this in selectize.js
+        if (value === 'default') {
+          value = '';
+        }
 
-    // create custom font field
-    $('<input>', {
-      type: 'text',
-      id: 'stylebot-' + control.id,
-      class: 'stylebot-textfield',
-      size: 25
+        Events.onSelectChange('font-family', value);
+      }
+    });
+
+    return container;
+  },
+
+  createBorderStyleControl: function(control) {
+    var container = $('<span>', {
+      class: 'stylebot-border-style-control'
+    });
+
+    var $select = $('<select>', {
+      class: 'stylebot-control stylebot-select'
     })
-
-    .data('property', control.id)
-
-    .keyup(Events.onTextFieldKeyUp)
-
-    .css({
-      marginLeft: '6px !important',
-      marginTop: '5px !important',
-      display: 'none'
-    })
+    .data('default', 'default')
     .appendTo(container);
+
+    // default option
+    this.createSelectOption($select, 'Default', 'default');
+
+    var len = control.options.length;
+    for (var i = 0; i < len; i++) {
+      this.createSelectOption($select, control.options[i], control.options[i])
+    }
+
+    $select.selectize({
+      persist: true,
+      create: false,
+      onChange: function(value) {
+        // todo: instead of this hack, fix this in selectize.js
+        if (value === 'default') {
+          value = '';
+        }
+        Events.onSelectChange('border-style', value);
+      }
+    });
+
     return container;
   },
 
@@ -257,28 +281,18 @@ var WidgetUI = {
   /**
     *
     */
-  createSelect: function(property) {
-    return $('<select>', {
-      id: 'stylebot-' + property,
-      class: 'stylebot-control stylebot-select'
-    })
-    .data('property', property)
-    .change(Events.onSelectChange);
-  },
-
-  /**
-    *
-    */
-  createSelectOption: function(text, property, value) {
-    var option = $('<option>', {
-      class: 'stylebot-select-option',
+  createSelectOption: function($select, text, data, property) {
+    var $option = $('<option>', {
       html: text,
-      value: value
+      value: data
     });
 
-    if (property)
-      option.data('property', property);
-    return option;
+    if (property) {
+      $option.data('property', property);
+    }
+
+    $select.append($option);
+    return $option;
   },
 
   /**
@@ -405,23 +419,14 @@ var WidgetUI = {
     if (value === undefined)
       return false;
 
-    var $input = control.el.find('input')
-    .attr('value', value);
+    control.el.find('select').get(0).selectize.setValue(value);
+  },
 
-    var index = $.inArray(value, control.options);
+  setBorderStyle: function(control, value) {
+    if (value === undefined)
+      return false;
 
-    if (index != -1) {
-      control.el.find('select')
-      .prop('selectedIndex', index + 1);
-
-      $input.hide();
-    }
-    else {
-      control.el.find('select')
-      .prop('selectedIndex', control.options.length + 1);
-
-      $input.show();
-    }
+    control.el.find('select').get(0).selectize.setValue(value);
   },
 
   setColor: function(control, value) {
@@ -429,12 +434,6 @@ var WidgetUI = {
       return false;
     control.el.attr('value', value);
     this.setColorSelectorColor(control.el);
-  },
-
-  setSelectOption: function(control, value) {
-    var index = $.inArray($.trim(String(value)), control.options);
-    if (index != -1)
-      control.el.prop('selectedIndex', index + 1);
   },
 
   setToggleButton: function(control, value) {
@@ -454,20 +453,15 @@ var WidgetUI = {
     var self = WidgetUI;
     if (value === undefined)
       return false;
+
     var unit = $.trim(self.determineSizeUnit(value));
 
-    control.el.find('input')
-    .attr('value', value.replace(unit, ''));
-
-    var index = 0;
-    if (unit)
-      index = $.inArray(unit, self.VALID_SIZE_UNITS);
-    control.el.find('select').prop('selectedIndex', index);
+    control.el.find('.stylebot-textfield').attr('value', value.replace(unit, ''));
+    control.el.find('select').get(0).selectize.setValue(unit);
   },
 
   determineSizeUnit: function(value) {
     var self = WidgetUI;
-
     var len = self.VALID_SIZE_UNITS.length;
 
     for (var i = 0; i < len; i++) {
@@ -483,7 +477,7 @@ var WidgetUI = {
 
   setMultiSize: function(control, values) {
     var self = WidgetUI;
-    var $input = control.el.find('input');
+    var $input = control.el.find('.stylebot-textfield');
     var $select = control.el.find('select');
 
     if (values[0] != undefined) {
@@ -510,15 +504,17 @@ var WidgetUI = {
     for (var i = 0; i < len; i++) {
       var value = values[i];
       if (value != undefined) {
-        var unit = $.trim(self.determineSizeUnit(value));
+        if (unit == undefined) {
+          unit = $.trim(self.determineSizeUnit(value));
+        }
         $($input.get(i)).attr('value', value.replace(unit, ''));
       }
     }
 
-    var index = 0;
-    if (unit)
-      index = $.inArray(unit, self.VALID_SIZE_UNITS);
-    $select.prop('selectedIndex', index);
+    if (unit) {
+      $select.get(0).selectize.setValue(unit);
+    }
+
     $input.keyup();
   },
 
