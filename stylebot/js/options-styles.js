@@ -101,35 +101,35 @@ Options.styles = {
     var $style = $(e.target).parents('.style');
     var url = $style.data('url');
     var rules = backgroundPage.cache.styles.getRules(url);
-    var css = CSSUtils.crunchFormattedCSS(rules, false);
-
     var socialURL = 'http://stylebot.me/post';
 
-    // create a form and submit data
-    var tempForm = $('<form>', {
-      'method': 'post',
-      'action': socialURL,
-      'target': '_blank'
+    CSSUtils.crunchFormattedCSS(rules, false, false, function(css) {
+      // create a form and submit data
+      var tempForm = $('<form>', {
+        'method': 'post',
+        'action': socialURL,
+        'target': '_blank'
+      });
+
+      // site
+      $('<input>', {
+        type: 'hidden',
+        name: 'site',
+        value: url
+      }).appendTo(tempForm);
+
+      // css
+      $('<input>', {
+        type: 'hidden',
+        name: 'css',
+        value: css
+      }).appendTo(tempForm);
+
+      $('<submit>').appendTo(tempForm);
+
+      tempForm.submit();
+      tempForm.remove();
     });
-
-    // site
-    $('<input>', {
-      type: 'hidden',
-      name: 'site',
-      value: url
-    }).appendTo(tempForm);
-
-    // css
-    $('<input>', {
-      type: 'hidden',
-      name: 'css',
-      value: css
-    }).appendTo(tempForm);
-
-    $('<submit>').appendTo(tempForm);
-
-    tempForm.submit();
-    tempForm.remove();
   },
 
   delete: function(e) {
@@ -294,11 +294,13 @@ Options.styles = {
       rules = {};
     }
 
-    Options.modal.init({
-      editor: true,
-      edit: true,
-      global: true,
-      code: CSSUtils.crunchFormattedCSS(rules, false)
+    CSSUtils.crunchFormattedCSS(rules, false, false, function(css) {
+      Options.modal.init({
+        editor: true,
+        edit: true,
+        global: true,
+        code:
+      });
     });
   },
 
@@ -307,11 +309,13 @@ Options.styles = {
     var url = $style.data('url');
     var rules = backgroundPage.cache.styles.getRules(url);
 
-    Options.modal.init({
-      url: url,
-      editor: true,
-      edit: true,
-      code: CSSUtils.crunchFormattedCSS(rules, false)
+    CSSUtils.crunchFormattedCSS(rules, false, false, function(css) {
+      Options.modal.init({
+        url: url,
+        editor: true,
+        edit: true,
+        code: css
+      });
     });
   },
 

@@ -3,6 +3,7 @@ function JSCSSPImporter() {
   this.rules = {};
   this._atRulePrefix = "@";
   this._commentPrefix = "comment";
+  this._importAtRuleType = "@import";
 }
 
 JSCSSPImporter.prototype = {
@@ -46,6 +47,18 @@ JSCSSPImporter.prototype = {
     parent[selector] = new Object();
     parent[selector][this._atRulePrefix] = true;
     parent[selector]['text'] = rule.cssText();
+
+    var type = rule.cssText() ? rule.cssText().split(' ')[0] : "";;
+    parent[selector]['type'] = type;
+
+    if (type === this._importAtRuleType) {
+      var url = rule.href.substring(4, rule.href.length - 1);
+      console.log(url);
+      if (url[0] == '"') {
+        url = url.substring(1, url.length - 1);
+      }
+      parent[selector]['url'] = url;
+    }
   },
 
   importComment: function(rule, parent) {

@@ -364,9 +364,9 @@ stylebot.widget = {
 
   //  Display the page's CSS in a popup for editing
   editCSS: function(e) {
-    stylebot.page.show(
-      CSSUtils.crunchFormattedCSS(stylebot.style.rules, false),
-      e ? e.target : null);
+    CSSUtils.crunchFormattedCSS(stylebot.style.rules, false, false, function(css) {
+      stylebot.page.show(css, e ? e.target : null);
+    });
   },
 
   //  Reset CSS for current selector

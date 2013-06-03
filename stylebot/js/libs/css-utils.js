@@ -14,14 +14,14 @@ var CSSUtils = {
     }
   }
   */
-  crunchCSS: function(rules, setImportant) {
+  crunchCSS: function(rules, setImportant, expandImport, callback) {
     var formatter = new cssFormatter(setImportant, true);
-    return formatter.format(rules);
+    formatter.format(rules, expandImport, callback);
   },
 
-  crunchFormattedCSS: function(rules, setImportant) {
+  crunchFormattedCSS: function(rules, setImportant, expandImport, callback) {
     var formatter = new cssFormatter(setImportant, false);
-    return formatter.format(rules);
+    formatter.format(rules, expandImport, callback);
   },
 
   crunchCSSForSelector: function(rules, selector, setImportant, formatted) {

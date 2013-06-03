@@ -18,6 +18,8 @@ var cache = {
     accordions: [0, 1, 2, 3]
   },
 
+  importRules: {},
+
   // Temporary cached map of tabId to rules to prevent recalculating rules
   // for iframes. The cache is only live until the tab completes loading
   // or is closed, whichever occurs first.
@@ -124,6 +126,21 @@ function attachListeners() {
       case 'getOption':
         sendResponse(getOption(request.optionName));
         break;
+
+      case 'expandImportRule':
+        if (cache.importRules[request.url]) {
+          sendResponse({text: cache.importRules[request.url]});
+        } else {
+          var xhr = new XMLHttpRequest();
+          xhr.open("GET", request.url, true);
+          xhr.onreadystatechange = function() {
+            if (xhr.readyState == 4) {
+              cache.importRules[request.url] = xhr.responseText;
+              sendResponse({text: xhr.responseText});
+            }
+          }
+          xhr.send();
+        }
     }
   });
 }

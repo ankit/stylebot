@@ -17,20 +17,24 @@ if (window === window.top) {
 }
 
 chrome.extension.sendRequest({name: request, url: window.location.href}, function(response) {
-  // global css rules
+  // global css
   if (response.global) {
     stylebotTempGlobalRules = response.global;
-    var css = CSSUtils.crunchCSS(response.global, true);
-    if (css != '')
-      CSSUtils.injectCSS(css, 'stylebot-global-css');
+    CSSUtils.crunchCSS(response.global, true, true, function(css) {
+      if (css != '') {
+        CSSUtils.injectCSS(css, 'stylebot-global-css');
+      }
+    });
   }
 
   stylebotTempUrl = response.url;
   stylebotTempRules = response.rules;
 
   if (stylebotTempUrl && stylebotTempRules) {
-    var css = CSSUtils.crunchCSS(response.rules, true);
-    if (css != '')
-      CSSUtils.injectCSS(css, 'stylebot-css');
+    CSSUtils.crunchCSS(response.rules, true, true, function(css) {
+      if (css != '') {
+        CSSUtils.injectCSS(css, 'stylebot-css');
+      }
+    });
   }
 });

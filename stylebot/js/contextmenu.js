@@ -48,42 +48,42 @@ stylebot.contextmenu = {
     */
   shareOnSocial: function(screenshot) {
     if (stylebot.style.rules) {
-
-      var css = CSSUtils.crunchFormattedCSS(stylebot.style.rules, false);
       var url = 'http://stylebot.me/post';
 
-      // create a form and submit data
-      var tempForm = $('<form>', {
-        'method': 'post',
-        'action': url,
-        'target': 'formresult'
+      CSSUtils.crunchFormattedCSS(stylebot.style.rules, false, false, function(css) {
+        // create a form and submit data
+        var tempForm = $('<form>', {
+          'method': 'post',
+          'action': url,
+          'target': 'formresult'
+        });
+
+        // site
+        $('<input>', {
+          type: 'hidden',
+          name: 'site',
+          value: stylebot.style.cache.url
+        }).appendTo(tempForm);
+
+        // css
+        $('<input>', {
+          type: 'hidden',
+          name: 'css',
+          value: css
+        }).appendTo(tempForm);
+
+        // screenshot
+        var $screenshot = $('<input>', {
+          type: 'hidden',
+          name: 'screenshot',
+          value: screenshot
+        }).appendTo(tempForm);
+
+        $('<submit>').appendTo(tempForm);
+        window.open('test.html', 'formresult');
+        tempForm.submit();
+        tempForm.remove();
       });
-
-      // site
-      $('<input>', {
-        type: 'hidden',
-        name: 'site',
-        value: stylebot.style.cache.url
-      }).appendTo(tempForm);
-
-      // css
-      $('<input>', {
-        type: 'hidden',
-        name: 'css',
-        value: css
-      }).appendTo(tempForm);
-
-      // screenshot
-      var $screenshot = $('<input>', {
-        type: 'hidden',
-        name: 'screenshot',
-        value: screenshot
-      }).appendTo(tempForm);
-
-      $('<submit>').appendTo(tempForm);
-      window.open('test.html', 'formresult');
-      tempForm.submit();
-      tempForm.remove();
     }
   }
 };

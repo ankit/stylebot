@@ -131,9 +131,9 @@ stylebot.style = {
           false);
 
           stylebot.style.updateInlineCSS(stylebot.style.cache.elements, newCSS);
-      }
-      else
+      } else {
         stylebot.style.updateStyleElement(stylebot.style.rules);
+      }
     }, duration);
 
     if (stylebot.style.timer) {
@@ -340,8 +340,11 @@ stylebot.style = {
     * Remove inline CSS for all elements
     */
   resetInlineCSS: function() {
-    for (var selector in stylebot.style.rules)
-      stylebot.style.clearInlineCSS($(selector));
+    for (var selector in stylebot.style.rules) {
+      if (selector[0] != "@") {
+        stylebot.style.clearInlineCSS($(selector));
+      }
+    }
   },
 
   /**
@@ -371,12 +374,14 @@ stylebot.style = {
     if (!this.cache.styleEl)
       this.cache.styleEl = $('#stylebot-css');
 
-    if (this.cache.styleEl.length != 0)
-      this.cache.styleEl.html(CSSUtils.crunchCSS(rules, true));
-    else {
-      CSSUtils.injectCSS(CSSUtils.crunchCSS(rules, true), 'stylebot-css');
-      this.cache.styleEl = $('#stylebot-css');
-    }
+    CSSUtils.crunchCSS(rules, true, true, $.proxy(function(css) {
+      if (this.cache.styleEl.length != 0) {
+        this.cache.styleEl.html(css);
+      } else {
+        CSSUtils.injectCSS(css, 'stylebot-css');
+        this.cache.styleEl = $('#stylebot-css');
+      }
+    }, this));
   },
 
   /**
@@ -491,9 +496,15 @@ stylebot.style = {
       return;
     this.status = true;
 
-    $('#stylebot-css').html(CSSUtils.crunchCSS(this.rules, true));
-    if (this.global)
-      $('#stylebot-global-css').html(CSSUtils.crunchCSS(this.global, true));
+    CSSUtils.crunchCSS(this.rules, true, true, function(css) {
+      $('#stylebot-css').html(css);
+    });
+
+    if (this.global) {
+      CSSUtils.crunchCSS(this.global, true, true, function(css) {
+        $('#stylebot-global-css').html(css);
+      })
+    }
   },
 
   /**
@@ -541,7 +552,10 @@ stylebot.style = {
     * Reset the preview and go back to the existing style
     */
   resetPreview: function(css) {
-    $('#stylebot-css').html(CSSUtils.crunchCSS(this.rules, true));
+    CSSUtils.crunchCSS(this.rules, true, true, function(css) {
+      $('#stylebot-css').html(css);
+    });
+
     $("#stylebot-preview").hide();
   },
 
