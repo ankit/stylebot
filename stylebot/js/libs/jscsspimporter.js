@@ -53,7 +53,6 @@ JSCSSPImporter.prototype = {
 
     if (type === this._importAtRuleType) {
       var url = rule.href.substring(4, rule.href.length - 1);
-      console.log(url);
       if (url[0] == '"') {
         url = url.substring(1, url.length - 1);
       }

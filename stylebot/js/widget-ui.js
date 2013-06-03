@@ -189,7 +189,6 @@ var WidgetUI = {
             text: input
         }
       },
-
       onChange: function(value) {
         // todo: instead of this hack, fix this in selectize.js
         if (value === 'default') {
@@ -419,7 +418,15 @@ var WidgetUI = {
     if (value === undefined)
       return false;
 
-    control.el.find('select').get(0).selectize.setValue(value);
+    var selectize = control.el.find('select').get(0).selectize;
+    var option = selectize.getOption(value);
+
+    if (option.length == 0) {
+      selectize.addOption(value, {text: value, value: value});
+      selectize.refreshOptions(false);
+    }
+
+    selectize.setValue(value);
   },
 
   setBorderStyle: function(control, value) {
