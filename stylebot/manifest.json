@@ -21,8 +21,8 @@
     "matches": ["<all_urls>"],
 
     "js": [
-      "js/libs/cssformatter.js",
       "js/libs/jscsspimporter.js",
+      "js/libs/cssformatter.js",
       "js/libs/css-utils.js",
       "js/apply-css.js"
     ],
@@ -35,8 +35,8 @@
     "matches": ["http://userstyles.org/styles/*"],
 
     "js": [
-      "js/libs/cssformatter.js",
       "js/libs/jscsspimporter.js",
+      "js/libs/cssformatter.js",
       "js/libs/css-utils.js",
       "js/userstyles-org.js"
     ],

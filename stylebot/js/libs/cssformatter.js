@@ -1,15 +1,20 @@
-/* Generates formatted css text from stylebot rules. */
+/**
+  * Generates formatted css text from stylebot rules.
+  */
 function cssFormatter(setImportant, compactCSS) {
+  // keep in sync with JSCSSPImporter
+  // todo: move to a common object
+  this.AT_RULE_PREFIX = "at";
+  this.COMMENT_PREFIX = "comment";
+  this.AT_IMPORT_RULE_TYPE = "@import";
+
   this.setImportant = setImportant;
   this.compactCSS = compactCSS;
   this.preserveComments = !compactCSS;
 
   this._indentation = '';
-  this._atRulePrefix = "@";
-  this._commentPrefix = "comment";
-  this._importAtRuleType = "@import";
 
-  if (compactCSS) {
+  if (this.compactCSS) {
     this._newLine = '';
     this._tab = '';
   } else {
@@ -23,6 +28,7 @@ cssFormatter.prototype = {
   format: function(rules, expandImport, callback) {
     var css = '';
     var atRulePointers = {};
+    var atRuleCounter = 0;
 
     // The callback for @rule formatter or at the end of the for loop,
     // this value is checked. If it is true, the callback is called.
@@ -30,23 +36,28 @@ cssFormatter.prototype = {
     var end = true;
 
     for (var selector in rules) {
-      if (rules[selector][this._commentPrefix]) {
+      if (rules[selector][this.COMMENT_PREFIX]) {
         css += this.formatComment(rules[selector]);
-      } else if (rules[selector][this._atRulePrefix]) {
+      } else if (rules[selector][this.AT_RULE_PREFIX]) {
         end = false;
         // store pointer on where to inject the @rule css
         atRulePointers[rules[selector]] = css.length;
+        atRuleCounter ++;
+
         this.formatAtRule(rules[selector], expandImport, function(rule, result) {
           var pointer = atRulePointers[rule];
           var newCSS = css.substring(0, pointer);
           newCSS += result;
           newCSS += css.substring(pointer, css.length);
           css = newCSS;
+          atRuleCounter --;
 
-          if (end) {
-            callback(css);
-          } else {
-            end = true;
+          if (atRuleCounter == 0) {
+            if (end) {
+              callback(css);
+            } else {
+              end = true;
+            }
           }
         });
       } else {
@@ -81,7 +92,7 @@ cssFormatter.prototype = {
   formatProperties: function(properties, shouldIndent) {
     var css = '';
     for (var property in properties) {
-      if (property.indexOf(this._commentPrefix) === 0) {
+      if (property.indexOf(this.COMMENT_PREFIX) === 0) {
         css += this.formatComment(properties[property], true);
       } else {
         css += this.formatDeclaration(property,
@@ -111,7 +122,7 @@ cssFormatter.prototype = {
 
   formatAtRule: function(rule, expandImport, callback) {
     var css;
-    if (rule.type === this._importAtRuleType && expandImport) {
+    if (rule.type === this.AT_IMPORT_RULE_TYPE && expandImport) {
       chrome.extension.sendRequest({name: 'expandImportRule', url: rule.url},
         function(response) {
           callback(rule, response.text);
@@ -130,7 +141,7 @@ cssFormatter.prototype = {
         this.saveState();
       }
 
-      var css = this._indentation + comment[this._commentPrefix] +
+      var css = this._indentation + comment[this.COMMENT_PREFIX] +
         this._newLine;
 
       if (insideRule) {

@@ -181,7 +181,6 @@ stylebot.page = {
   cancel: function(e) {
     stylebot.page.saveCSS(stylebot.page.cache.originalCSS, true);
     stylebot.page.modal.hide();
-    stylebot.style.undo();
   },
 
   save: function(e) {
@@ -209,6 +208,7 @@ stylebot.page = {
     } else {
       stylebot.undo.pop();
     }
+
     return true;
   },
 
@@ -227,7 +227,9 @@ stylebot.page = {
     if (!this.cache.marker) {
       var Range = require('ace/range').Range;
       var range = new Range(error.currentLine - 1, 0, error.currentLine, 0);
-      this.cache.marker = this.cache.editor.getSession().addMarker(range, 'stylebot_warning', 'line');
+      this.cache.marker = this.cache.editor.getSession().addMarker(range,
+        'stylebot_warning',
+        'line');
     }
 
     if (setCursor) {

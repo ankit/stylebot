@@ -201,7 +201,6 @@ stylebot.widget = {
     optionsContainer.appendTo(self.cache.box);
 
     self.cache.box.appendTo(boxContainer);
-    self.basic.fillCache();
 
     //  Initialize accordion state
     self.basic.initAccordions();
@@ -215,7 +214,7 @@ stylebot.widget = {
     var lastBt = $('#stylebot-main-buttons').find('button').last();
 
     // Shift + TAB on first accordion sets focus to last button
-    $(this.basic.cache.accordionHeaders[0]).bind('keydown',
+    $(WidgetUI.SELECTORS.accordion).bind('keydown',
       { lastBt: lastBt }, function(e) {
       if (e.keyCode == 9 && e.shiftKey) {
         e.stopImmediatePropagation();

@@ -1,0 +1,4 @@
+guard 'handlebars', :input => 'js/templates', :output => 'js/templates/compiled', :shallow => true, :bare => true do
+  watch(/js\/templates\/(.*)\.handlebars$/)
+end
+

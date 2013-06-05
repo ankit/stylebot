@@ -299,7 +299,7 @@ Options.styles = {
         editor: true,
         edit: true,
         global: true,
-        code:
+        code: css
       });
     });
   },

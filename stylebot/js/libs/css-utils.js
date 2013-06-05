@@ -16,7 +16,9 @@ var CSSUtils = {
   */
   crunchCSS: function(rules, setImportant, expandImport, callback) {
     var formatter = new cssFormatter(setImportant, true);
-    formatter.format(rules, expandImport, callback);
+    formatter.format(rules, expandImport, function(css) {
+      callback(css);
+    });
   },
 
   crunchFormattedCSS: function(rules, setImportant, expandImport, callback) {

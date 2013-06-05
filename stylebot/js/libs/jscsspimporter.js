@@ -1,9 +1,12 @@
-/* Transforms JSCSSP parser's generated objects into stylebot rules */
+/**
+  * Transforms JSCSSP parser's generated objects into stylebot rules
+  */
 function JSCSSPImporter() {
   this.rules = {};
-  this._atRulePrefix = "@";
-  this._commentPrefix = "comment";
-  this._importAtRuleType = "@import";
+
+  this.AT_RULE_PREFIX = "at";
+  this.COMMENT_PREFIX = "comment";
+  this.AT_IMPORT_RULE_TYPE = "@import";
 }
 
 JSCSSPImporter.prototype = {
@@ -43,15 +46,15 @@ JSCSSPImporter.prototype = {
   },
 
   importAtRule: function(rule, parent) {
-    var selector = this._atRulePrefix + rule.currentLine;
+    var selector = this.AT_RULE_PREFIX + rule.currentLine;
     parent[selector] = new Object();
-    parent[selector][this._atRulePrefix] = true;
+    parent[selector][this.AT_RULE_PREFIX] = true;
     parent[selector]['text'] = rule.cssText();
 
     var type = rule.cssText() ? rule.cssText().split(' ')[0] : "";;
     parent[selector]['type'] = type;
 
-    if (type === this._importAtRuleType) {
+    if (type === this.AT_IMPORT_RULE_TYPE) {
       var url = rule.href.substring(4, rule.href.length - 1);
       if (url[0] == '"') {
         url = url.substring(1, url.length - 1);
@@ -61,15 +64,16 @@ JSCSSPImporter.prototype = {
   },
 
   importComment: function(rule, parent) {
-    var selector = this._commentPrefix + rule.currentLine;
+    var selector = this.COMMENT_PREFIX + rule.currentLine;
     parent[selector] = new Object();
-    parent[selector][this._commentPrefix] = rule.cssText();
+    parent[selector][this.COMMENT_PREFIX] = rule.cssText();
   },
 
   importStyleRule: function(rule, parent) {
     var selector = rule.mSelectorText;
     parent[selector] = new Object();
     var len = rule.declarations.length;
+
     for (var i = 0; i < len; i++) {
       if (this.isComment(rule.declarations[i])) {
         this.importComment(rule.declarations[i], parent[selector]);

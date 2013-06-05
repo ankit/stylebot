@@ -1,15 +1,61 @@
-/**
-* Utility Methods to create various UI Controls for Basic Mode
-*   in Stylebot Editor
-**/
+/* Creation of UI Controls for Basic Mode in Stylebot */
 
 var WidgetUI = {
-  // constants
-  BUTTON_ACTIVE_CLASS: 'stylebot-button-active',
-  BUTTON_SELECTED_CLASS: 'stylebot-button-selected',
-  NEXT_TO_SELECTED_BUTTON_CLASS: 'stylebot-next-segmented-button',
-  ACCORDION_SELECTED_CLASS: 'stylebot-accordion-active',
-  VALID_SIZE_UNITS: ['px', 'em', '%', 'pt'],
+  SELECTORS: {
+    accordion: '.stylebot-accordion-header',
+    textfield: '.stylebot-textfield',
+    button: '#stylebot-controls .stylebot-button',
+    colorSelector: '.stylebot-color-selector',
+    select: '.stylebot-select',
+    toggleButton: '.stylebot-toggle',
+    segmentedButton: '.stylebot-segmented-button',
+    activeButton: '.stylebot-button-active',
+    selectedButton: '.stylebot-button-selected'
+  },
+
+  CLASS_NAMES: {
+    option: 'stylebot-widget-option',
+    control: 'stylebot-control',
+
+    button: {
+      default: 'stylebot-button',
+      active: 'stylebot-button-active',
+      selected: 'stylebot-button-selected',
+      nextToSelected: 'stylebot-next-segmented-button'
+    },
+
+    accordion: {
+      header: 'stylebot-accordion-header',
+      active: 'stylebot-accordion-active',
+      icon: 'stylebot-accordion-icon'
+    },
+
+    textfield: 'stylebot-textfield',
+    select: 'stylebot-select',
+    multisize: 'stylebot-multisize',
+    fontFamily: 'stylebot-font-family-control',
+    borderStyle: 'stylebot-border-style-control',
+    radio: 'stylebot-radio',
+    colorSelector: 'stylebot-colorselector',
+    colorSelectorColor: 'stylebot-colorselector-color',
+    label: 'stylebot-label',
+    inlineLabel: 'stylebot-inline-label',
+    segmentedControl: 'stylebot-segmented-control',
+    lastSegmentedButton: 'stylebot-last-segmented-button',
+    toggleButton: 'stylebot-toggle'
+  },
+
+  SIZE_UNITS: ['px', 'em', '%', 'pt'],
+
+  DEFAULT_FONT_STACK: ['Helvetica',
+    'Roboto',
+    'Lato',
+    'Palatino',
+    'Georgia',
+    'Lucida Grande',
+    'Consolas',
+    'monospace'
+  ],
 
   /**
     * Create option for control
@@ -18,7 +64,7 @@ var WidgetUI = {
     */
   createOption: function(control) {
     var container = $('<div>', {
-      class: 'stylebot-widget-option'
+      class: this.CLASS_NAMES.option
     });
     return container.append(control);
   },
@@ -29,24 +75,29 @@ var WidgetUI = {
     * @return {element} Accordion <a> element
     */
   createAccordionHeader: function(name) {
-    return $('<a>', {
-      class: 'stylebot-accordion-header',
+    var $accordion = $('<a>', {
+      class: this.CLASS_NAMES.accordion.header,
       tabIndex: 0,
       html: name
     })
+
     .prepend($('<div>', {
-      class: 'stylebot-accordion-icon'
+      class: this.CLASS_NAMES.accordion.icon
     }))
-    .bind('mousedown keydown', function(e) {
+
+    .bind('mousedown keydown', $.proxy(function(e) {
       if (e.type == 'keydown' && e.keyCode != 13)
         return true;
       e.preventDefault();
 
       var el = $(e.target);
-      if (!el.hasClass('stylebot-accordion-header'))
+      if (!el.hasClass(this.CLASS_NAMES.accordion.header))
         el = el.parent();
+
       Events.toggleAccordion(el);
-    });
+    }, this));
+
+    return $accordion;
   },
 
   /**
@@ -61,7 +112,7 @@ var WidgetUI = {
     var $input = $('<input>', {
       type: 'text',
       id: 'stylebot-' + property,
-      class: 'stylebot-control stylebot-textfield',
+      class: this.CLASS_NAMES.control + " " + this.CLASS_NAMES.textfield,
       size: size
     })
 
@@ -90,12 +141,14 @@ var WidgetUI = {
     var container = $('<span>');
 
     // Textfield for entering size
-    this.createTextField(property, 2, Events.onSizeFieldKeyDown, Events.onSizeFieldKeyUp)
+    this.createTextField(property, 2,
+      Events.onSizeFieldKeyDown,
+      Events.onSizeFieldKeyUp)
     .appendTo(container);
 
     // Select box for choosing unit
     var $select = $('<select>', {
-      class: 'stylebot-control stylebot-select'
+      class: this.CLASS_NAMES.control + " " + this.CLASS_NAMES.select
     })
     .change(function(e) {
       $(this).prev().keyup();
@@ -103,11 +156,9 @@ var WidgetUI = {
     .data('default', 'px')
     .appendTo(container);
 
-    var len = this.VALID_SIZE_UNITS.length;
+    var len = this.SIZE_UNITS.length;
     for (var i = 0; i < len; i++) {
-      this.createSelectOption($select,
-        this.VALID_SIZE_UNITS[i],
-        this.VALID_SIZE_UNITS[i]);
+      this.createSelectOption($select, this.SIZE_UNITS[i], this.SIZE_UNITS[i]);
     }
 
     $select.selectize();
@@ -121,34 +172,36 @@ var WidgetUI = {
     */
   createMultiSizeControl: function(control) {
     var container = $('<span>', {
-      class: 'stylebot-multisize'
+      class: this.CLASS_NAMES.multisize
     });
 
     var len = control.id.length;
-    var classNames = ['all', 'top', 'right', 'bottom', 'left'];
+    var sizeTypes = ['all', 'top', 'right', 'bottom', 'left'];
 
     for (var i = 0; i < len; i++) {
       var property = control.id[i];
       this.createTextField(property, 1, Events.onSizeFieldKeyDown, Events.onSizeFieldKeyUp)
-        .addClass('stylebot-multisize-' + classNames[i])
+        .addClass(this.CLASS_NAMES.multisize + '-' + sizeTypes[i])
         .appendTo(container);
     }
 
     // Select box for choosing unit
     var $select = $("<select>", {
-      class: 'stylebot-control stylebot-select'
+      class: this.CLASS_NAMES.control + " " + this.CLASS_NAMES.select
     })
+
     .change(function(e) {
       $(this).parent().find('input').keyup();
     })
+
     .data('default', 'px')
     .appendTo(container);
 
-    var len = this.VALID_SIZE_UNITS.length;
+    var len = this.SIZE_UNITS.length;
     for (var i = 0; i < len; i++) {
       this.createSelectOption($select,
-        this.VALID_SIZE_UNITS[i],
-        this.VALID_SIZE_UNITS[i]);
+        this.SIZE_UNITS[i],
+        this.SIZE_UNITS[i]);
     }
 
     $select.selectize();
@@ -161,54 +214,91 @@ var WidgetUI = {
     * @return {jQuery element} SPAN element containing the control
     */
   createFontFamilyControl: function(control) {
-    var container = $('<span>', {
-      class: 'stylebot-font-family-control'
+    var $container = $('<span>', {
+      class: this.CLASS_NAMES.fontFamily
     });
 
     var $select = $('<select>', {
-      class: 'stylebot-control stylebot-select'
+      class: this.CLASS_NAMES.control + " " + this.CLASS_NAMES.select
     })
     .data('default', 'default')
-    .appendTo(container);
+    .appendTo($container);
 
     // default option
     this.createSelectOption($select, 'Default', 'default');
 
-    var len = control.options.length;
-    for (var i = 0; i < len; i++) {
-      this.createSelectOption($select,
-        control.options[i],
-        control.options[i])
-    }
+    chrome.storage.local.get("fontStack", $.proxy(function(items) {
+      var fontStack = items["fontStack"];
+      if (!fontStack) {
+        fontStack = this.DEFAULT_FONT_STACK;
+        chrome.storage.local.set({"fontStack": fontStack});
+      }
+
+      var len = fontStack.length;
+      var $select = $('.' + this.CLASS_NAMES.fontFamily + ' select');
+      var selectize = $select.get(0).selectize;
+
+      for (var i = 0; i < len; i++) {
+        var font = fontStack[i];
+        selectize.addOption(font, {text: font, value: font});
+      }
+
+      $select.data('set', true);
+    }, this));
 
     $select.selectize({
       persist: true,
       create: function(input) {
+        input = $.trim(input);
+
         return {
-            value: input,
-            text: input
+          value: input,
+          text: input
         }
       },
-      onChange: function(value) {
+
+      onDropdownOpen: function($dropdown) {
+        var value = $select.get(0).selectize.getValue();
+        $dropdown.data('value', value);
+      },
+
+      onDropdownClose: function($dropdown) {
+        var oldValue = $dropdown.data('value');
+        var value = $select.get(0).selectize.getValue();
+
+        if (oldValue === value) { return; }
+
         // todo: instead of this hack, fix this in selectize.js
         if (value === 'default') {
           value = '';
         }
 
         Events.onSelectChange('font-family', value);
-      }
+      },
+
+      onOptionAdd: $.proxy(function(value, data) {
+        var $select = $('.' + this.CLASS_NAMES.fontFamily + ' select');
+        if (!$select.data('set')) { return; }
+
+        chrome.storage.local.get("fontStack", function(items) {
+          var fontStack = items["fontStack"];
+          fontStack.unshift(value);
+          fontStack = fontStack.slice(0, 15);
+          chrome.storage.local.set({"fontStack": fontStack});
+        });
+      }, this)
     });
 
-    return container;
+    return $container;
   },
 
   createBorderStyleControl: function(control) {
     var container = $('<span>', {
-      class: 'stylebot-border-style-control'
+      class: this.CLASS_NAMES.borderStyle
     });
 
     var $select = $('<select>', {
-      class: 'stylebot-control stylebot-select'
+      class: this.CLASS_NAMES.control + " " + this.CLASS_NAMES.select
     })
     .data('default', 'default')
     .appendTo(container);
@@ -224,11 +314,23 @@ var WidgetUI = {
     $select.selectize({
       persist: true,
       create: false,
-      onChange: function(value) {
+
+      onDropdownOpen: function($dropdown) {
+        var value = $select.get(0).selectize.getValue();
+        $dropdown.data('value', value);
+      },
+
+      onDropdownClose: function($dropdown) {
+        var oldValue = $dropdown.data('value');
+        var value = $select.get(0).selectize.getValue();
+
+        if (oldValue === value) { return; }
+
         // todo: instead of this hack, fix this in selectize.js
         if (value === 'default') {
           value = '';
         }
+
         Events.onSelectChange('border-style', value);
       }
     });
@@ -241,7 +343,7 @@ var WidgetUI = {
     */
   createToggleButton: function(text, property, value) {
     return this.createButton(text)
-    .addClass('stylebot-toggle stylebot-control')
+    .addClass(this.CLASS_NAMES.control + " " + this.CLASS_NAMES.toggleButton)
     .attr('id', 'stylebot-' + property)
     .data({
       'value': value,
@@ -256,13 +358,13 @@ var WidgetUI = {
   createRadio: function(text, name, property, value) {
     var span = $('<span>', {
       id: 'stylebot-' + property,
-      class: 'stylebot-control'
+      class: this.CLASS_NAMES.control
     });
 
     var radio = $('<input>', {
       type: 'radio',
       name: name,
-      class: 'stylebot-control stylebot-radio'
+      class: this.CLASS_NAMES.control + " " + this.CLASS_NAMES.radio
     });
 
     if (typeof(property) == 'string')
@@ -296,19 +398,21 @@ var WidgetUI = {
 
   /**
     * Create the color picker
-    *
     */
   createColorPicker: function(input, el) {
     return $('<div>', {
-      class: 'stylebot-colorselector stylebot-control',
+      class: this.CLASS_NAMES.control + " " + this.CLASS_NAMES.colorSelector,
       tabIndex: 0
     })
 
-    .append($('<div>', {class: 'stylebot-colorselector-color'}))
+    .append($('<div>', {
+      class: this.CLASS_NAMES.colorSelectorColor
+    }))
 
     .ColorPicker({
       flat: false,
       appendToElement: el,
+
       onChange: function(hsb, hex, rgb) {
         var colorCode = '#' + hex;
         // set input value to reflect the newly picked color's code
@@ -320,6 +424,7 @@ var WidgetUI = {
         if (stylebot.options.livePreviewColorPicker)
           input.keyup().blur();
       },
+
       onBeforeShow: function() {
         var color = input.attr('value');
         if (color === '' || color === undefined)
@@ -328,6 +433,7 @@ var WidgetUI = {
         stylebot.widget.basic.isColorPickerVisible = true;
         input.focus();
       },
+
       onHide: function() {
         input.keyup().blur();
         stylebot.widget.basic.isColorPickerVisible = false;
@@ -354,21 +460,21 @@ var WidgetUI = {
 
   createLabel: function(text) {
     return $('<label>', {
-      class: 'stylebot-label',
+      class: this.CLASS_NAMES.label,
       html: text + ':'
     });
   },
 
   createInlineLabel: function(text) {
     return $('<label>', {
-      class: 'stylebot-inline-label',
+      class: this.CLASS_NAMES.inlineLabel,
       html: text
     });
   },
 
   createButton: function(text) {
     return $('<button>', {
-      class: 'stylebot-button',
+      class: this.CLASS_NAMES.button.default,
       html: text
     })
     .mouseup(function(e) { e.target.focus(); });
@@ -394,7 +500,7 @@ var WidgetUI = {
 
   createSegmentedControl: function(control) {
     var container = $('<span>', {
-      class: 'stylebot-control stylebot-segmented-control',
+      class: this.CLASS_NAMES.control + " " + this.CLASS_NAMES.segmentedControl,
       id: 'stylebot-' + control.id
     });
 
@@ -408,9 +514,11 @@ var WidgetUI = {
       .bind('mousedown keydown', Events.onSegmentedControlMouseDown)
       .appendTo(container);
       // explicitly having to add the 'stylebot-last-child' class as :last-child causes weird issue in Chrome
-      if (i == (len - 1))
-        bt.addClass('stylebot-last-segmented-button');
+      if (i == (len - 1)) {
+        bt.addClass(this.CLASS_NAMES.lastSegmentedButton);
+      }
     }
+
     return container;
   },
 
@@ -457,35 +565,33 @@ var WidgetUI = {
   },
 
   setSize: function(control, value) {
-    var self = WidgetUI;
     if (value === undefined)
       return false;
 
-    var unit = $.trim(self.determineSizeUnit(value));
+    var unit = $.trim(this.determineSizeUnit(value));
 
-    control.el.find('.stylebot-textfield').attr('value', value.replace(unit, ''));
-    control.el.find('select').get(0).selectize.setValue(unit);
+    control.el.find(this.SELECTORS.textfield).attr('value', value.replace(unit, ''));
+    control.el.find(this.SELECTORS.select).get(0).selectize.setValue(unit);
   },
 
   determineSizeUnit: function(value) {
-    var self = WidgetUI;
-    var len = self.VALID_SIZE_UNITS.length;
+    var len = this.SIZE_UNITS.length;
 
     for (var i = 0; i < len; i++) {
-      if (value.indexOf(self.VALID_SIZE_UNITS[i]) != -1)
-      break;
+      if (value.indexOf(this.SIZE_UNITS[i]) != -1) {
+        break;
+      }
     }
 
     if (i < len)
-      return self.VALID_SIZE_UNITS[i];
+      return this.SIZE_UNITS[i];
     else
       return '';
   },
 
   setMultiSize: function(control, values) {
-    var self = WidgetUI;
-    var $input = control.el.find('.stylebot-textfield');
-    var $select = control.el.find('select');
+    var $input = control.el.find(this.SELECTORS.textfield);
+    var $select = control.el.find(this.SELECTORS.select);
 
     if (values[0] != undefined) {
       var parts = values[0].split(' ');
@@ -512,7 +618,7 @@ var WidgetUI = {
       var value = values[i];
       if (value != undefined) {
         if (unit == undefined) {
-          unit = $.trim(self.determineSizeUnit(value));
+          unit = $.trim(this.determineSizeUnit(value));
         }
         $($input.get(i)).attr('value', value.replace(unit, ''));
       }
@@ -526,32 +632,32 @@ var WidgetUI = {
   },
 
   selectButton: function($bt) {
-    $bt.addClass(this.BUTTON_SELECTED_CLASS);
+    $bt.addClass(this.CLASS_NAMES.button.selected);
   },
 
   deselectButton: function($bt) {
-    $bt.removeClass(this.BUTTON_SELECTED_CLASS);
+    $bt.removeClass(this.CLASS_NAMES.button.selected);
   },
 
   selectSegmentedButton: function($bt) {
-    $bt.addClass(this.BUTTON_SELECTED_CLASS)
-    .next().addClass(this.NEXT_TO_SELECTED_BUTTON_CLASS);
+    $bt.addClass(this.CLASS_NAMES.button.selected)
+    .next().addClass(this.CLASS_NAMES.button.nextToSelected);
   },
 
   deselectSegmentedButton: function($bt) {
-    $bt.removeClass(this.BUTTON_SELECTED_CLASS)
-    .next().removeClass(this.NEXT_TO_SELECTED_BUTTON_CLASS);
+    $bt.removeClass(this.CLASS_NAMES.button.selected)
+    .next().removeClass(this.CLASS_NAMES.button.nextToSelected);
   },
 
   isButtonSelected: function($bt) {
-    return $bt.hasClass(this.BUTTON_SELECTED_CLASS);
+    return $bt.hasClass(this.CLASS_NAMES.button.selected);
   },
 
   setButtonAsActive: function($bt) {
-    $bt.addClass(this.BUTTON_ACTIVE_CLASS);
+    $bt.addClass(this.CLASS_NAMES.button.active);
   },
 
   setButtonAsInactive: function($bt) {
-    $bt.removeClass(WidgetUI.BUTTON_ACTIVE_CLASS);
+    $bt.removeClass(this.CLASS_NAMES.button.active);
   }
 };

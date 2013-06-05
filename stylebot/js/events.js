@@ -8,6 +8,8 @@
   **/
 Events = {
   ACCORDION_SAVE_TIMEOUT: 500,
+  GOOGLE_FONT_API: "http://fonts.googleapis.com/css?family=",
+
   accordionTimer: null,
 
   onToggle: function(e) {
@@ -23,6 +25,7 @@ Events = {
       ui.selectButton($bt);
       value = $bt.data('value');
     }
+
     Events.saveProperty(property, value);
   },
 
@@ -127,7 +130,25 @@ Events = {
         Events.saveProperty(property[i], value[i]);
       }
     } else {
-      Events.saveProperty(property, value);
+      if (property === 'font-family') {
+        var valueForURL = value.replace(" ", "+");
+        var fontURL = Events.GOOGLE_FONT_API +
+          valueForURL;
+
+        chrome.extension.sendRequest({name: "expandImportRule", url: fontURL},
+          function(response) {
+            // Hacky check to see if Google Web Font exists
+            // todo: Use Google Font API instead
+            if (response.text.indexOf("@font-face") == 0) {
+              // prepend @import
+              stylebot.style.prependWebFont(fontURL);
+            }
+
+            Events.saveProperty(property, value);
+        });
+      } else {
+        Events.saveProperty(property, value);
+      }
     }
   },
 
@@ -149,13 +170,13 @@ Events = {
   onSegmentedControlMouseUp: function(e) {
     var ui = WidgetUI;
 
-    var $button = $('.' + ui.BUTTON_ACTIVE_CLASS);
+    var $button = $('.' + ui.CLASS_NAMES.button.active);
     ui.setButtonAsInactive($button);
 
     var status = ui.isButtonSelected($button);
     var control = $button.parent();
 
-    ui.deselectSegmentedButton(control.find('.' + ui.BUTTON_SELECTED_CLASS));
+    ui.deselectSegmentedButton(control.find('.' + ui.CLASS_NAMES.button.selected));
 
     // Button is currently selected. Deselect it
     if (status)
@@ -173,15 +194,10 @@ Events = {
     var self = Events;
     var ui = WidgetUI;
 
-    if (h.hasClass(ui.ACCORDION_SELECTED_CLASS)) {
-      h.removeClass(ui.ACCORDION_SELECTED_CLASS)
-      .focus()
-      .next().hide();
-    }
-    else {
-      h.addClass(ui.ACCORDION_SELECTED_CLASS)
-      .focus()
-      .next().show();
+    if (h.hasClass(ui.CLASS_NAMES.accordion.active)) {
+      h.removeClass(ui.CLASS_NAMES.accordion.active).focus().next().hide();
+    } else {
+      h.addClass(ui.CLASS_NAMES.accordion.active).focus().next().show();
     }
 
     // determine which accordions are open and
@@ -192,17 +208,18 @@ Events = {
     }
 
     self.accordionTimer = setTimeout(function() {
-      var len = stylebot.widget.basic.cache.accordionHeaders.length;
-      var accordions = [];
-      for (var i = 0; i < len; i++) {
-        var $accordion = $(stylebot.widget.basic.cache.accordionHeaders[i]);
+      var $accordions = $(ui.SELECTORS.accordion);
+      var len = $accordions.length;
+      var accordion_states = [];
 
-        if ($accordion.hasClass(ui.ACCORDION_SELECTED_CLASS)) {
-          accordions[accordions.length] = i;
+      for (var i = 0; i < len; i++) {
+        var $accordion = $($accordions.get(i));
+        if ($accordion.hasClass(ui.CLASS_NAMES.accordion.active)) {
+          accordion_states[accordion_states.length] = i;
         }
       }
 
-      stylebot.chrome.saveAccordionState(accordions);
+      stylebot.chrome.saveAccordionState(accordion_states);
     }, self.ACCORDION_SAVE_TIMEOUT);
   },
 

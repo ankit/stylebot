@@ -5,6 +5,8 @@
 **/
 
 stylebot.style = {
+  AT_RULE_PREFIX: "at",
+
   /*  cache of custom CSS rules applied to elements on the current page
   e.g.:
   rules = {
@@ -341,9 +343,7 @@ stylebot.style = {
     */
   resetInlineCSS: function() {
     for (var selector in stylebot.style.rules) {
-      if (selector[0] != "@") {
-        stylebot.style.clearInlineCSS($(selector));
-      }
+      stylebot.style.clearInlineCSS($(selector));
     }
   },
 
@@ -571,5 +571,38 @@ stylebot.style = {
       $preview.fadeOut(1000);
     }, 500);
     stylebot.style.applyPageCSS(css, true);
+  },
+
+  prependWebFont: function(url) {
+    var self = this;
+
+    var rule = {
+      'text': '@import url(' + url + ');',
+      'type': '@import',
+      'url': url
+    };
+
+    rule[self.AT_RULE_PREFIX] = true;
+
+    var selectorCounter = 1;
+    while (self.rules.hasOwnProperty(self.AT_RULE_PREFIX + selectorCounter)) {
+      selectorCounter++;
+    }
+
+    var newRules = {};
+    newRules[self.AT_RULE_PREFIX + selectorCounter] = rule;
+
+    // todo: add ordering to styling rules, this is not reliable.
+    for (selector in self.rules) {
+      if (self.rules[selector]['text'] &&  self.rules[selector]['text'] === rule['text']) {
+      } else {
+        newRules[selector] = self.rules[selector];
+      }
+    }
+
+    self.rules = newRules;
+    stylebot.style.resetInlineCSS();
+    self.updateStyleElement(self.rules);
+    self.save();
   }
 };

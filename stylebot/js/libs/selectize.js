@@ -1372,7 +1372,7 @@
         var $option = $(options[i]);
         if ($option.attr('data-value') === value) {
           $option.remove();
-          if ($option[0] === this.$activeOption[0]) {
+          if (this.$activeOption && ($option[0] === this.$activeOption[0])) {
             this.setActiveOption(options.length ? $(options[0]).addClass('active') : null);
           }
           break;

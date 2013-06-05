@@ -9,17 +9,7 @@ stylebot.widget.basic = {
   accordions: [0, 1, 2, 3],
 
   cache: {
-    container: null,
-    controls: null,
-    buttons: null,
-    textfields: null,
-    selectboxes: null,
-    colorSelectors: null,
-    colorSelectorColor: null,
-    toggleButtons: null,
-    accordionHeaders: null,
-    fontFamilyInput: null,
-    segmentedControls: null
+    container: null
   },
 
   groups: [{
@@ -28,15 +18,7 @@ stylebot.widget.basic = {
       name: 'Font Family',
       id: 'font-family',
       type: 'font-family',
-      options: [
-        'Helvetica',
-        'Palatino',
-        'Georgia',
-        'Lucida Grande',
-        'Consolas',
-        'Monaco',
-        'monospace'
-      ],
+      options: [],
       el: null
     },
     {
@@ -65,7 +47,8 @@ stylebot.widget.basic = {
       name: 'Font Variant',
       id: 'font-variant',
       type: 'segmented',
-      options: ['<span style="font-variant: small-caps;">Small Caps</span>', 'Normal'],
+      options: ['<span style="font-variant: small-caps;">Small Caps</span>',
+        'Normal'],
       values: ['small-caps', 'normal'],
       el: null
     },
@@ -81,7 +64,10 @@ stylebot.widget.basic = {
       name: 'Decoration',
       id: 'text-decoration',
       type: 'segmented',
-      options: ['<span style="text-decoration: underline;">ab</span>', '<span style="text-decoration: line-through;">ab</span>', '<span style="text-decoration: overline;">ab</span>', 'None'],
+      options: ['<span style="text-decoration: underline;">ab</span>',
+        '<span style="text-decoration: line-through;">ab</span>',
+        '<span style="text-decoration: overline;">ab</span>',
+        'None'],
       values: ['underline', 'line-through', 'overline', 'none'],
       el: null
     },
@@ -119,7 +105,15 @@ stylebot.widget.basic = {
         name: 'Border Style',
         id: 'border-style',
         type: 'border-style',
-        options: ['none', 'solid', 'dotted', 'dashed', 'double', 'groove', 'ridge', 'inset', 'outset'],
+        options: ['none',
+          'solid',
+          'dotted',
+          'dashed',
+          'double',
+          'groove',
+          'ridge',
+          'inset',
+          'outset'],
         el: null
       },
       {
@@ -131,7 +125,11 @@ stylebot.widget.basic = {
       {
         name: 'Thickness',
         options: ['All', 'Top', 'Right', 'Bottom', 'Left'],
-        id: ['border-width', 'border-top-width', 'border-right-width', 'border-bottom-width', 'border-left-width'],
+        id: ['border-width',
+          'border-top-width',
+          'border-right-width',
+          'border-bottom-width',
+          'border-left-width'],
         type: 'multi-size',
         el: null
       }]
@@ -160,14 +158,22 @@ stylebot.widget.basic = {
       {
         name: 'Margins',
         options: ['All', 'Top', 'Right', 'Bottom', 'Left'],
-        id: ['margin', 'margin-top', 'margin-right', 'margin-bottom', 'margin-left'],
+        id: ['margin',
+          'margin-top',
+          'margin-right',
+          'margin-bottom',
+          'margin-left'],
         type: 'multi-size',
         el: null
       },
       {
         name: 'Paddings',
         options: ['All', 'Top', 'Right', 'Bottom', 'Left'],
-        id: ['padding', 'padding-top', 'padding-right', 'padding-bottom', 'padding-left'],
+        id: ['padding',
+          'padding-top',
+          'padding-right',
+          'padding-bottom',
+          'padding-left'],
         type: 'multi-size',
         el: null
       }]
@@ -194,34 +200,11 @@ stylebot.widget.basic = {
       var len2 = this.groups[i].controls.length;
       for (var j = 0; j < len2; j++) {
         this.createUIForControl(this.groups[i].controls[j])
-        .appendTo(group);
+          .appendTo(group);
       }
     }
-    return this.cache.container;
-  },
 
-  // initialize cache for UI controls. This is called when UI is first created
-  fillCache: function() {
-    // controls
-    this.cache.controls = $('.stylebot-control');
-    // textfields
-    this.cache.textfields = $('.stylebot-textfield');
-    // buttons
-    this.cache.buttons = $('#stylebot-controls .stylebot-button');
-    // select dropdowns
-    this.cache.selectboxes = $('.stylebot-select');
-    // color selector
-    this.cache.colorSelectors = $('.stylebot-colorselector');
-    // color selector color divs
-    this.cache.colorSelectorColor = $('.stylebot-colorselector-color');
-    // toggle buttons
-    this.cache.toggleButtons = $('.stylebot-toggle');
-    // accordion headers
-    this.cache.accordionHeaders = $('.stylebot-accordion-header');
-    // font family input
-    this.cache.fontFamilyInput = $('#stylebot-font-family');
-    // segmented controls
-    this.cache.segmentedControls = $('.stylebot-segmented-control');
+    return this.cache.container;
   },
 
   // Create the UI for a control
@@ -231,8 +214,8 @@ stylebot.widget.basic = {
     var $controlSet = $('<div>', {
       class: 'stylebot-control-set'
     });
-    ui.createLabel(control.name)
-    .appendTo($controlSet);
+
+    ui.createLabel(control.name).appendTo($controlSet);
 
     var control_el; // this will contain the control element
 
@@ -272,8 +255,7 @@ stylebot.widget.basic = {
         break;
 
       case 'font-family':
-        control_el = ui.createFontFamilyControl(control)
-        .appendTo($controlSet);
+        control_el = ui.createFontFamilyControl(control).appendTo($controlSet);
         break;
 
       case 'border-style':
@@ -305,6 +287,7 @@ stylebot.widget.basic = {
   fillControl: function(control, rule) {
     var ui = WidgetUI;
     var value = rule[control.id];
+
     switch (control.type) {
       case 'size':
         ui.setSize(control, value);
@@ -347,39 +330,43 @@ stylebot.widget.basic = {
 
   // Reset all controls to default values
   reset: function() {
-    var ui = WidgetUI;
+    $(WidgetUI.SELECTORS.textfield).attr('value' , '');
 
-    this.cache.textfields.attr('value' , '');
-
-    $.each(this.cache.selectboxes, function(index, select) {
+    var $select = $(WidgetUI.SELECTORS.select);
+    $.each($select, function(index, select) {
       var defaultValue = $(select).data('default');
       select.selectize.setValue(defaultValue);
     });
 
-    this.cache.colorSelectorColor.css('backgroundColor', '#fff');
-    this.cache.fontFamilyInput.hide();
+    $(WidgetUI.SELECTORS.colorSelectorColor).css('backgroundColor', '#fff');
 
-    ui.deselectButton(this.cache.toggleButtons);
-    ui.deselectSegmentedButton(this.cache.segmentedControls.find('button'));
+    WidgetUI.deselectButton($(WidgetUI.SELECTORS.toggleButton));
+    WidgetUI.deselectSegmentedButton($(WidgetUI.SELECTORS.segmentedButton));
   },
 
   // Initialize and present the Basic Mode UI to user
   show: function() {
     var self = stylebot.widget.basic;
+    self.reset();
     self.fill();
 
     // set focus to first visible accordion header
     var controlContainerOffset = self.cache.container.offset().top;
-    var len = self.cache.accordionHeaders.length;
+    var $accordions = $(WidgetUI.SELECTORS.accordion);
+    var len = $accordions.length;
+
     for (var i = 0; i < len; i++) {
-      if ($(self.cache.accordionHeaders[i]).offset().top >=
-      controlContainerOffset) {
+      var $accordion = $($accordions.get(i));
+
+      if ($accordion.offset().top >= controlContainerOffset) {
         setTimeout(function() {
-          self.cache.accordionHeaders[i].focus();
+          $accordion.focus();
         }, 0);
+
         break;
       }
     }
+
     self.cache.container.show();
   },
 
@@ -392,9 +379,10 @@ stylebot.widget.basic = {
   initAccordions: function() {
     // TODO: the toggleAccordion method should be in WidgetUI
     var len = this.accordions.length;
+    var $accordions = $(WidgetUI.SELECTORS.accordion);
+
     for (var i = 0; i < len; i++) {
-      Events.toggleAccordion(
-        $(this.cache.accordionHeaders[this.accordions[i]]));
+      Events.toggleAccordion($($accordions.get(this.accordions[i])));
     }
   },
 
@@ -405,21 +393,25 @@ stylebot.widget.basic = {
 
   // Enable all UI Controls
   enable: function() {
-    this.cache.textfields.prop('disabled', false);
-    this.cache.buttons.prop('disabled', false);
-    $.each(this.cache.selectboxes, function(index, select) {
+    $(WidgetUI.SELECTORS.textfield).prop('disabled', false);
+    $(WidgetUI.SELECTORS.button).prop('disabled', false);
+    $(WidgetUI.SELECTORS.colorSelector).removeClass('disabled');
+
+    var $select = $(WidgetUI.SELECTORS.select);
+    $.each($select, function(index, select) {
       select.selectize.unlock();
     });
-    this.cache.colorSelectors.removeClass('disabled');
   },
 
   // Disable all UI Controls
   disable: function() {
-    this.cache.textfields.prop('disabled', true);
-    this.cache.buttons.prop('disabled', true);
-    $.each(this.cache.selectboxes, function(index, select) {
+    $(WidgetUI.SELECTORS.textfield).prop('disabled', true);
+    $(WidgetUI.SELECTORS.button).prop('disabled', true);
+    $(WidgetUI.SELECTORS.colorSelector).addClass('disabled');
+
+    var $select = $(WidgetUI.SELECTORS.select);
+    $.each($select, function(index, select) {
       select.selectize.lock();
     });
-    this.cache.colorSelectors.addClass('disabled');
   }
 };

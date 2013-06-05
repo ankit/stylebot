@@ -111,8 +111,6 @@ var stylebot = {
     */
   select: function(el, selector) {
     stylebot.disableSelection();
-    stylebot.style.fillCache(null);
-    stylebot.widget.reset();
 
     // if element is specified, it is selected
     if (el) {
@@ -138,6 +136,7 @@ var stylebot = {
 
     stylebot.style.fillCache(selector);
     stylebot.widget.open();
+
     setTimeout(function() {
       stylebot.style.removeFromStyleElement();
     }, 100);
