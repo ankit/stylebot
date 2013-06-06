@@ -100,12 +100,12 @@ stylebot.page = {
       closeOnEsc: false,
       closeOnBgClick: false,
       bgFadeSpeed: 0,
-      width: $('#stylebot').width() - self.RIGHT_PADDING + 'px',
+      width: $(WidgetUI.SELECTORS.stylebot).width() - self.RIGHT_PADDING + 'px',
       top: '0%',
       left: '0',
-      height: $('#stylebot').height() + 'px',
+      height: $(WidgetUI.SELECTORS.stylebot).height() + 'px',
       bgOpacity: 0,
-      parent: $('#stylebot'),
+      parent: $(WidgetUI.SELECTORS.stylebot),
 
       onOpen: function() {
         stylebot.page.resize();
@@ -215,10 +215,10 @@ stylebot.page = {
   onWindowResize: function() {
     var self = stylebot.page;
     self.modal.reset({
-      width: $('#stylebot').width() - self.RIGHT_PADDING + 'px',
+      width: $(WidgetUI.SELECTORS.stylebot).width() - self.RIGHT_PADDING + 'px',
       top: '0%',
       left: '0',
-      height: $('#stylebot').height() + 'px'
+      height: $(WidgetUI.SELECTORS.stylebot).height() + 'px'
     });
     self.resize();
   },
@@ -248,7 +248,7 @@ stylebot.page = {
 
   resize: function() {
     $('#stylebot-page-editor').css('height',
-      $('#stylebot').height() - this.BOTTOM_EDITOR_PADDING + 'px');
+      $(WidgetUI.SELECTORS.stylebot).height() - this.BOTTOM_EDITOR_PADDING + 'px');
     this.cache.editor.resize();
   }
 };

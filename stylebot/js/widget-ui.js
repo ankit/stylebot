@@ -2,6 +2,7 @@
 
 var WidgetUI = {
   SELECTORS: {
+    stylebot: '#stylebot',
     accordion: '.stylebot-accordion-header',
     textfield: '.stylebot-textfield',
     button: '#stylebot-controls .stylebot-button',

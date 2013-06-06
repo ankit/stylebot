@@ -6,6 +6,9 @@
 
 stylebot.style = {
   AT_RULE_PREFIX: "at",
+  CSS_SELECTOR: "#stylebot-css",
+  GLOBAL_CSS_SELECTOR: "#stylebot-global-css",
+  PREVIEW_SELECTOR: "#stylebot-preview",
 
   /*  cache of custom CSS rules applied to elements on the current page
   e.g.:
@@ -373,15 +376,16 @@ stylebot.style = {
     * @param {array} rules The style rules
     */
   updateStyleElement: function(rules) {
-    if (!this.cache.styleEl)
-      this.cache.styleEl = $('#stylebot-css');
+    if (!this.cache.styleEl) {
+      this.cache.styleEl = $(this.CSS_SELECTOR);
+    }
 
     CSSUtils.crunchCSS(rules, true, true, $.proxy(function(css) {
       if (this.cache.styleEl.length != 0) {
         this.cache.styleEl.html(css);
       } else {
         CSSUtils.injectCSS(css, 'stylebot-css');
-        this.cache.styleEl = $('#stylebot-css');
+        this.cache.styleEl = $(this.CSS_SELECTOR);
       }
     }, this));
   },
@@ -486,8 +490,8 @@ stylebot.style = {
     */
   disable: function() {
     this.status = false;
-    $('#stylebot-css').html('');
-    $('#stylebot-global-css').html('');
+    $(this.CSS_SELECTOR).html('');
+    $(this.GLOBAL_CSS_SELECTOR).html('');
   },
 
   /**
@@ -498,14 +502,14 @@ stylebot.style = {
       return;
     this.status = true;
 
-    CSSUtils.crunchCSS(this.rules, true, true, function(css) {
-      $('#stylebot-css').html(css);
-    });
+    CSSUtils.crunchCSS(this.rules, true, true, $.proxy(function(css) {
+      $(this.CSS_SELECTOR).html(css);
+    }, this));
 
     if (this.global) {
-      CSSUtils.crunchCSS(this.global, true, true, function(css) {
-        $('#stylebot-global-css').html(css);
-      })
+      CSSUtils.crunchCSS(this.global, true, true, $.proxy(function(css) {
+        $(this.GLOBAL_CSS_SELECTOR).html(css);
+      }, this));
     }
   },
 
@@ -535,7 +539,8 @@ stylebot.style = {
     * @param {String} css The css for the style.
     */
   preview: function(title, desc, author, timeAgo, favCount, css) {
-    var $preview = $("#stylebot-preview");
+    var $preview = $(this.PREVIEW_SELECTOR);
+
     if ($preview.length === 0) {
       $preview = $("<div>", {
         id: "stylebot-preview"
@@ -563,11 +568,11 @@ stylebot.style = {
     * @param {String} css The CSS to apply to the page.
     */
   resetPreview: function(css) {
-    CSSUtils.crunchCSS(this.rules, true, true, function(css) {
-      $('#stylebot-css').html(css);
-    });
+    CSSUtils.crunchCSS(this.rules, true, true, $.proxy(function(css) {
+      $(this.CSS_SELECTOR).html(css);
+    }, this));
 
-    $("#stylebot-preview").hide();
+    $(this.PREVIEW_SELECTOR).hide();
   },
 
   /**
@@ -576,7 +581,7 @@ stylebot.style = {
     * @param {String} css The css for the style.
     */
   install: function(title, css) {
-    var $preview = $("#stylebot-preview");
+    var $preview = $(this.PREVIEW_SELECTOR);
     $preview.html("<h1>Installed " + title + "</h1>")
       .css('left', $(window).width()/2 - $preview.width()/2)
       .show();
