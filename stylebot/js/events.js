@@ -136,13 +136,13 @@ Events = {
         var valueForURL = value.replace(" ", "+");
         var fontURL = Events.GOOGLE_FONT_API + valueForURL;
 
-        chrome.extension.sendRequest({name: "expandImportRule", url: fontURL},
+        chrome.extension.sendRequest({name: "fetchImportCSS", url: fontURL},
           function(response) {
             // Hacky check to see if Google Web Font exists
             // todo: Use Google Font API instead
             if (response.text.indexOf("@font-face") == 0) {
               // prepend @import
-              stylebot.style.prependWebFont(fontURL);
+              stylebot.style.prependWebFont(fontURL, response.text);
             }
 
             Events.saveProperty(property, value);

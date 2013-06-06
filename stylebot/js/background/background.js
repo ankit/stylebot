@@ -127,20 +127,10 @@ function attachListeners() {
         sendResponse(getOption(request.optionName));
         break;
 
-      case 'expandImportRule':
-        if (cache.importRules[request.url]) {
-          sendResponse({text: cache.importRules[request.url]});
-        } else {
-          var xhr = new XMLHttpRequest();
-          xhr.open("GET", request.url, true);
-          xhr.onreadystatechange = function() {
-            if (xhr.readyState == 4) {
-              cache.importRules[request.url] = xhr.responseText;
-              sendResponse({text: xhr.responseText});
-            }
-          }
-          xhr.send();
-        }
+      case 'fetchImportCSS':
+        cache.styles.fetchImportCSS(request.url, function(css) {
+          sendResponse({text: css});
+        });
     }
   });
 }

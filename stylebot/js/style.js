@@ -525,7 +525,14 @@ stylebot.style = {
   },
 
   /**
-    * Preview a style
+    * Preview the specified style by applying its CSS to the page.
+    * @param {String} title The title of style.
+    * @param {String} desc Description for the style.
+    * @param {String} author The author of the style.
+    * @param {String} timeAgo Relative time string when the style was authored.
+    * @param {Integer} favCount Number of times the style has been favorited
+    *   on Stylebot Social.
+    * @param {String} css The css for the style.
     */
   preview: function(title, desc, author, timeAgo, favCount, css) {
     var $preview = $("#stylebot-preview");
@@ -547,11 +554,13 @@ stylebot.style = {
       "<br><div id='stylebot-preview-description'>" + desc + "</div>");
     $preview.css('left', $(window).width()/2 - $preview.width()/2);
     $preview.show();
+
     stylebot.style.applyPageCSS(css, false);
   },
 
   /**
-    * Reset the preview and go back to the existing style
+    * Reset the preview of any style and reset to the specifed CSS.
+    * @param {String} css The CSS to apply to the page.
     */
   resetPreview: function(css) {
     CSSUtils.crunchCSS(this.rules, true, true, function(css) {
@@ -562,7 +571,9 @@ stylebot.style = {
   },
 
   /**
-    * Install css as style
+    * Install the specified style for the current URL.
+    * @param {String} title The title describing the style
+    * @param {String} css The css for the style.
     */
   install: function(title, css) {
     var $preview = $("#stylebot-preview");
@@ -575,11 +586,18 @@ stylebot.style = {
     stylebot.style.applyPageCSS(css, true);
   },
 
-  prependWebFont: function(url) {
+  /**
+    * Prepend an @import rule for a web-based font to the current
+    * style and save the style.
+    * @param {String} url The URL of the font.
+    * @param {String} css the @font-face css for the font.
+    */
+  prependWebFont: function(url, css) {
     var self = this;
 
     var rule = {
       'text': '@import url(' + url + ');',
+      'expanded_text': css,
       'type': '@import',
       'url': url
     };

@@ -123,10 +123,7 @@ cssFormatter.prototype = {
   formatAtRule: function(rule, expandImport, callback) {
     var css;
     if (rule.type === this.AT_IMPORT_RULE_TYPE && expandImport) {
-      chrome.extension.sendRequest({name: 'expandImportRule', url: rule.url},
-        function(response) {
-          callback(rule, response.text);
-        });
+      callback(rule, rule['expanded_text']);
     } else {
       css = this._indentation + rule['text'] + this._newLine + this._newLine;
       callback(rule, css);
