@@ -20,6 +20,14 @@
   */
 function Styles(param) {
   this.styles = param;
+
+  this.SOCIAL_URL = "stylebot.me";
+  this.AT_RULE_PREFIX = "at";
+  this.GLOBAL_URL = "*";
+
+  this.RULES_PROPERTY = "_rules";
+  this.SOCIAL_PROPERTY = "_social";
+  this.ENABLED_PROPERTY = "_enabled";
 }
 
 /**
@@ -65,8 +73,8 @@ Styles.prototype.persist = function() {
   */
 Styles.prototype.create = function(url, rules, data) {
   this.styles[url] = {};
-  this.styles[url]['_enabled'] = true;
-  this.styles[url]['_rules'] = rules === undefined ? {} : rules;
+  this.styles[url][this.ENABLED_PROPERTY] = true;
+  this.styles[url][this.RULES_PROPERTY] = rules === undefined ? {} : rules;
   if (data !== undefined) {
     this.setMetadata(url, data);
   }
@@ -79,9 +87,9 @@ Styles.prototype.create = function(url, rules, data) {
   * @param {Object} data New metadata for the given URL.
   */
 Styles.prototype.setMetadata = function(url, data) {
-  this.styles[url]['_social'] = {};
-  this.styles[url]['_social'].id = data.id;
-  this.styles[url]['_social'].timestamp = data.timestamp;
+  this.styles[url][this.SOCIAL_PROPERTY] = {};
+  this.styles[url][this.SOCIAL_PROPERTY].id = data.id;
+  this.styles[url][this.SOCIAL_PROPERTY].timestamp = data.timestamp;
 };
 
 /**
@@ -93,7 +101,7 @@ Styles.prototype.isEnabled = function(url) {
   if (this.styles[url] === undefined) {
     return false;
   }
-  return this.styles[url]['_enabled'];
+  return this.styles[url][this.ENABLED_PROPERTY];
 };
 
 /**
@@ -127,9 +135,9 @@ Styles.prototype.toggle = function(url, value, shouldSave) {
   }
 
   if (value != undefined && value != null) {
-    this.styles[url]['_enabled'] = !this.styles[url]['_enabled'];
+    this.styles[url][this.ENABLED_PROPERTY] = !this.styles[url][this.ENABLED_PROPERTY];
   } else {
-    this.styles[url]['_enabled'] = value;
+    this.styles[url][this.ENABLED_PROPERTY] = value;
   }
 
   if (shouldSave) {
@@ -170,7 +178,7 @@ Styles.prototype.isEmpty = function(url) {
   * @param {String} url Identifier of the style to empty.
   */
 Styles.prototype.emptyRules = function(url) {
-  this.styles[url]['_rules'] = null;
+  this.styles[url][this.RULES_PROPERTY] = null;
   this.persist();
 };
 
@@ -181,7 +189,7 @@ Styles.prototype.emptyRules = function(url) {
   */
 Styles.prototype.import = function(newStyles) {
   for (var url in newStyles) {
-    if (newStyles[url]['_rules']) {
+    if (newStyles[url][this.RULES_PROPERTY]) {
       // it's the new format.
       this.styles[url] = newStyles[url];
     } else {
@@ -244,7 +252,7 @@ Styles.prototype.getRules = function(url) {
     return null;
   }
 
-  var rules = this.styles[url]['_rules'];
+  var rules = this.styles[url][this.RULES_PROPERTY];
   return rules ? rules : null;
 };
 
@@ -254,7 +262,7 @@ Styles.prototype.getRules = function(url) {
   * @return {Boolean} True if any rules are associated with the URL
   */
 Styles.prototype.exists = function(aURL) {
-  if (this.isEnabled(aURL) && aURL !== '*') {
+  if (this.isEnabled(aURL) && aURL !== this.GLOBAL_URL) {
     return true;
   }
   else {
@@ -277,20 +285,21 @@ Styles.prototype.getCombinedRulesForPage = function(aURL, tab) {
   }
 
   var global = null;
-  if (!this.isEmpty('*') && this.isEnabled('*')) {
-    global = this.getRules('*');
+  if (!this.isEmpty(this.GLOBAL_URL) && this.isEnabled(this.GLOBAL_URL)) {
+    global = this.getRules(this.GLOBAL_URL);
   }
 
   var response;
 
-  // if the URL is stylebot.me, return rules for stylebot.me if they exist
-  // otherwise, return response as null
-  // todo: why do this?
-  if (aURL.indexOf('stylebot.me') != -1) {
-    if (!this.isEmpty('stylebot.me')) {
+  // If the URL is for stylebot social, return rules for it if they exist
+  // otherwise, return response as null.
+  // this is so that URLs of the form stylebot.me/search?q=google.com
+  // work properly.
+  if (aURL.indexOf(this.SOCIAL_URL) != -1) {
+    if (!this.isEmpty(this.SOCIAL_URL)) {
       response = {
-        rules: this.getRules('stylebot.me'),
-        url: 'stylebot.me',
+        rules: this.getRules(this.SOCIAL_URL),
+        url: this.SOCIAL_URL,
         global: global
       };
     }
@@ -313,7 +322,7 @@ Styles.prototype.getCombinedRulesForPage = function(aURL, tab) {
     var found = false;
 
     for (var url in this.styles) {
-      if (!this.isEnabled(url) || url === '*')
+      if (!this.isEnabled(url) || url === this.GLOBAL_URL)
         continue;
 
       if (aURL.matchesPattern(url)) {
@@ -366,7 +375,6 @@ Styles.prototype.getCombinedRulesForIframe = function(aURL, tab) {
         PageAction.highlight(tab);
       else
         PageAction.disable(tab);
-
       chrome.pageAction.show(tab.id);
     }
     return response;
@@ -381,11 +389,11 @@ Styles.prototype.getCombinedRulesForIframe = function(aURL, tab) {
   * @return {Object} The rules of the global stylesheet.
   */
 Styles.prototype.getGlobalRules = function() {
-  if (this.isEmpty('*') || !this.isEnabled('*')) {
+  if (this.isEmpty(this.GLOBAL_URL) || !this.isEnabled(this.GLOBAL_URL)) {
     return null;
   }
 
-  return this.getRules('*');
+  return this.getRules(this.GLOBAL_URL);
 };
 
 /**
@@ -452,7 +460,7 @@ Styles.prototype.expandRule = function(selector, rule, callback) {
   * @return {Boolean} True if the selector corresponds to an @import rule
   */
 Styles.prototype.isImportRuleSelector = function(selector) {
-  return selector.indexOf('at') == 0;
+  return selector.indexOf(this.AT_RULE_PREFIX) == 0;
 }
 
 /**
