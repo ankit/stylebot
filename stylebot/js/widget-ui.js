@@ -150,9 +150,6 @@ var WidgetUI = {
     var $select = $('<select>', {
       class: this.CLASS_NAMES.control + " " + this.CLASS_NAMES.select
     })
-    .change(function(e) {
-      $(this).prev().keyup();
-    })
     .data('default', 'px')
     .appendTo(container);
 
@@ -161,7 +158,12 @@ var WidgetUI = {
       this.createSelectOption($select, this.SIZE_UNITS[i], this.SIZE_UNITS[i]);
     }
 
-    $select.selectize();
+    this.selectize($select, {
+      onValueChange: function(value) {
+        $select.prev().keyup();
+      }
+    });
+
     return container;
   },
 
@@ -189,22 +191,20 @@ var WidgetUI = {
     var $select = $("<select>", {
       class: this.CLASS_NAMES.control + " " + this.CLASS_NAMES.select
     })
-
-    .change(function(e) {
-      $(this).parent().find('input').keyup();
-    })
-
     .data('default', 'px')
     .appendTo(container);
 
     var len = this.SIZE_UNITS.length;
     for (var i = 0; i < len; i++) {
-      this.createSelectOption($select,
-        this.SIZE_UNITS[i],
-        this.SIZE_UNITS[i]);
+      this.createSelectOption($select, this.SIZE_UNITS[i], this.SIZE_UNITS[i]);
     }
 
-    $select.selectize();
+    this.selectize($select, {
+      onValueChange: function(value) {
+        $select.parent().find('input').keyup();
+      }
+    });
+
     return container;
   },
 
@@ -246,8 +246,9 @@ var WidgetUI = {
       $select.data('set', true);
     }, this));
 
-    $select.selectize({
+    this.selectize($select, {
       persist: true,
+
       create: function(input) {
         input = $.trim(input);
 
@@ -255,25 +256,6 @@ var WidgetUI = {
           value: input,
           text: input
         }
-      },
-
-      onDropdownOpen: function($dropdown) {
-        var value = $select.get(0).selectize.getValue();
-        $dropdown.data('value', value);
-      },
-
-      onDropdownClose: function($dropdown) {
-        var oldValue = $dropdown.data('value');
-        var value = $select.get(0).selectize.getValue();
-
-        if (oldValue === value) { return; }
-
-        // todo: instead of this hack, fix this in selectize.js
-        if (value === 'default') {
-          value = '';
-        }
-
-        Events.onSelectChange('font-family', value);
       },
 
       onOptionAdd: $.proxy(function(value, data) {
@@ -286,7 +268,11 @@ var WidgetUI = {
           fontStack = fontStack.slice(0, 15);
           chrome.storage.local.set({"fontStack": fontStack});
         });
-      }, this)
+      }, this),
+
+      onValueChange: function(value) {
+        Events.onSelectChange('font-family', value);
+      }
     });
 
     return $container;
@@ -311,10 +297,26 @@ var WidgetUI = {
       this.createSelectOption($select, control.options[i], control.options[i])
     }
 
-    $select.selectize({
+    this.selectize($select, {
       persist: true,
       create: false,
+      onValueChange: function(value) {
+        Events.onSelectChange('border-style', value);
+      }
+    });
 
+    return container;
+  },
+
+  /**
+    * Wrapper for selectize.js with default options.
+    */
+  selectize: function($select, moreOptions) {
+    if (!moreOptions) {
+      moreOptions = {};
+    }
+
+    var options = {
       onDropdownOpen: function($dropdown) {
         var value = $select.get(0).selectize.getValue();
         $dropdown.data('value', value);
@@ -322,20 +324,33 @@ var WidgetUI = {
 
       onDropdownClose: function($dropdown) {
         var oldValue = $dropdown.data('value');
-        var value = $select.get(0).selectize.getValue();
+        var selectize = $select.get(0).selectize;
+        var value = selectize.getValue();
 
         if (oldValue === value) { return; }
 
-        // todo: instead of this hack, fix this in selectize.js
+        if (value === '') {
+          selectize.setValue(oldValue);
+          return;
+        }
+
         if (value === 'default') {
           value = '';
         }
 
-        Events.onSelectChange('border-style', value);
+        if (moreOptions['onValueChange']) {
+          moreOptions['onValueChange'](value);
+        }
       }
-    });
+    };
 
-    return container;
+    if (moreOptions) {
+      $.each(moreOptions, function (key, value) {
+        options[key] = value;
+      });
+    }
+
+    $select.selectize(options);
   },
 
   /**

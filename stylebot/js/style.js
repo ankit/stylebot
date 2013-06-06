@@ -77,8 +77,10 @@ stylebot.style = {
     * @param {string} value Value for CSS property
     */
   apply: function(property, value) {
-    if (!this.cache.selector || this.cache.selector == '')
+    if (!this.cache.selector || this.cache.selector == '') {
       return true;
+    }
+
     this.savePropertyToCache(this.cache.selector, property, value);
     this.save();
 

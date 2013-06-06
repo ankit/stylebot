@@ -199,8 +199,7 @@ stylebot.widget.basic = {
 
       var len2 = this.groups[i].controls.length;
       for (var j = 0; j < len2; j++) {
-        this.createUIForControl(this.groups[i].controls[j])
-          .appendTo(group);
+        this.createUIForControl(this.groups[i].controls[j]).appendTo(group);
       }
     }
 

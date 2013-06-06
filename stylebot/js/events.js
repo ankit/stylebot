@@ -88,14 +88,16 @@ Events = {
         value = 0;
       else {
         if (e.keyCode === 38) // up
-        value += 1;
+          value += 1;
         else
-        value -= 1;
+          value -= 1;
       }
 
       e.target.value = value;
-      if (parseFloat(value))
+      if (parseFloat(value)) {
         value += unit;
+      }
+
       stylebot.style.apply(property, value);
     }
   },
@@ -132,8 +134,7 @@ Events = {
     } else {
       if (property === 'font-family') {
         var valueForURL = value.replace(" ", "+");
-        var fontURL = Events.GOOGLE_FONT_API +
-          valueForURL;
+        var fontURL = Events.GOOGLE_FONT_API + valueForURL;
 
         chrome.extension.sendRequest({name: "expandImportRule", url: fontURL},
           function(response) {
