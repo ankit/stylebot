@@ -135,9 +135,9 @@ Styles.prototype.toggle = function(url, value, shouldSave) {
   }
 
   if (value != undefined && value != null) {
-    this.styles[url][this.ENABLED_PROPERTY] = !this.styles[url][this.ENABLED_PROPERTY];
-  } else {
     this.styles[url][this.ENABLED_PROPERTY] = value;
+  } else {
+    this.styles[url][this.ENABLED_PROPERTY] = !this.styles[url][this.ENABLED_PROPERTY];
   }
 
   if (shouldSave) {
@@ -284,12 +284,13 @@ Styles.prototype.getCombinedRulesForPage = function(aURL, tab) {
     };
   }
 
-  var global = null;
-  if (!this.isEmpty(this.GLOBAL_URL) && this.isEnabled(this.GLOBAL_URL)) {
-    global = this.getRules(this.GLOBAL_URL);
-  }
+  var globalRules = null;
+  var rules = {};
+  var pageURL = '';
 
-  var response;
+  if (!this.isEmpty(this.GLOBAL_URL) && this.isEnabled(this.GLOBAL_URL)) {
+    globalRules = this.getRules(this.GLOBAL_URL);
+  }
 
   // If the URL is for stylebot social, return rules for it if they exist
   // otherwise, return response as null.
@@ -297,28 +298,16 @@ Styles.prototype.getCombinedRulesForPage = function(aURL, tab) {
   // work properly.
   if (aURL.indexOf(this.SOCIAL_URL) != -1) {
     if (!this.isEmpty(this.SOCIAL_URL)) {
-      response = {
-        rules: this.getRules(this.SOCIAL_URL),
-        url: this.SOCIAL_URL,
-        global: global
-      };
+      rules = this.getRules(this.SOCIAL_URL);
+      pageURL = this.SOCIAL_URL;
+    } else {
+      rules = null;
+      pageURL = null;
     }
-
-    else {
-      response = {
-        rules: null,
-        url: null,
-        global: global
-      };
-    }
-  }
-
-  else {
+  } else {
     // this will contain the combined set of evaluated rules to be applied to
     // the page. longer, more specific URLs get the priority for each selector
     // and property
-    var rules = {};
-    var url_for_page = '';
     var found = false;
 
     for (var url in this.styles) {
@@ -328,35 +317,33 @@ Styles.prototype.getCombinedRulesForPage = function(aURL, tab) {
       if (aURL.matchesPattern(url)) {
         if (!found) found = true;
 
-        if (url.length > url_for_page.length) {
-          url_for_page = url;
+        if (url.length > pageURL.length) {
+          pageURL = url;
         }
 
-        this.copyRules(this.getRules(url), rules, (url === url_for_page));
+        this.copyRules(tab, this.getRules(url), rules, (url === pageURL));
       }
     }
 
-    if (found) {
-      response = {
-        rules: rules,
-        url: url_for_page,
-        global: global
-      };
-    } else {
-      response = {
-        rules: null,
-        url: null,
-        global: global
-      };
+    if (!found) {
+      rules = null;
+      pageURL = null;
     }
   }
 
+  var response = {
+    url: pageURL,
+    rules: rules,
+    global: this.expandRules(globalRules)
+  };
+
   if (cache.options.showPageAction) {
-    if (response.rules || response.global) {
+    if (response.rules || response.globalRules) {
       PageAction.highlight(tab);
     } else {
       PageAction.disable(tab);
     }
+
     chrome.pageAction.show(tab.id);
   }
 
@@ -365,8 +352,8 @@ Styles.prototype.getCombinedRulesForPage = function(aURL, tab) {
 };
 
 Styles.prototype.getCombinedRulesForIframe = function(aURL, tab) {
-  var response;
-  if (response = cache.loadingTabs[tab.id]) {
+  var response = cache.loadingTabs[tab.id];
+  if (response) {
     // just in case the page action wasn't updated when getCombinedRulesForPage was called
     // this mostly occurs when there are lots of iframes in a page. e.g. plus.google.com
     // todo: find a better way out for this
@@ -377,6 +364,7 @@ Styles.prototype.getCombinedRulesForIframe = function(aURL, tab) {
         PageAction.disable(tab);
       chrome.pageAction.show(tab.id);
     }
+
     return response;
   } else {
     return this.getCombinedRulesForPage(aURL, tab);
@@ -415,13 +403,14 @@ Styles.prototype.transfer = function(source, destination) {
   * @param {Boolean} isPrimaryURL If the url for the source rules is the primary
   *   url for the page. Used to manage conflicts.
   */
-Styles.prototype.copyRules = function(src, dest, isPrimaryURL) {
+Styles.prototype.copyRules = function(tab, src, dest, isPrimaryURL) {
   for (var selector in src) {
+    var rule = src[selector];
+
     // if no rule exists in dest for selector, copy the rule.
     if (dest[selector] == undefined) {
-      this.expandRule(selector, src[selector], function(expandedRule) {
-        dest[selector] = cloneObject(expandedRule);
-      });
+      rule = this.expandRule(selector, rule);
+      dest[selector] = cloneObject(rule);
     }
 
     // else, merge properties for rule, with the rules in dest taking priority.
@@ -435,6 +424,15 @@ Styles.prototype.copyRules = function(src, dest, isPrimaryURL) {
   }
 }
 
+
+Styles.prototype.expandRules = function(rules) {
+  for (selector in rules) {
+    rules[selector] = this.expandRule(selector, rules[selector]);
+  }
+
+  return rules;
+}
+
 /**
   * Expand rule to include any additional properties. Currently
   * expands only @import rule.
@@ -443,14 +441,15 @@ Styles.prototype.copyRules = function(src, dest, isPrimaryURL) {
   * @param {Function} callback The callback method that is passed the expanded
   *   rule.
   */
-Styles.prototype.expandRule = function(selector, rule, callback) {
+Styles.prototype.expandRule = function(selector, rule) {
   if (this.isImportRuleSelector(selector)) {
-    this.expandImportRule(rule, function(expandedRule) {
-      callback(expandedRule);
-    });
-  } else {
-    callback(rule);
+    var expandedRule = this.expandImportRule(rule);
+    if (expandedRule) {
+      rule = expandedRule;
+    }
   }
+
+  return rule;
 }
 
 /**
@@ -464,15 +463,20 @@ Styles.prototype.isImportRuleSelector = function(selector) {
 }
 
 /**
-  * Expand @import rule to include the CSS fetched from the URL in the rule
+  * Expand @import rule to include the CSS fetched from the URL
+  *   and send a push request to specified tab to update the rule.
   * @param {Object} rule The @import rule to expand
-  * @param {Function} callback The callback method that is passed the
-  *   expanded rule.
   */
-Styles.prototype.expandImportRule = function(rule, callback) {
+Styles.prototype.expandImportRule = function(rule) {
+  var css = cache.importRules[rule['url']];
+
+  if (css) {
+    rule['expanded_text'] = css;
+    return rule;
+  }
+
   this.fetchImportCSS(rule['url'], function(css) {
     rule['expanded_text'] = css;
-    callback(rule);
   });
 }
 
