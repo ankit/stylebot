@@ -107,6 +107,7 @@ String.prototype.isValidUrl = function() {
       "https://chrome.google.com/webstore",
       "chrome-extension://"
     ];
+
     var len = blacklist.length;
     for (var i = 0; i < len; i ++) {
       if (url.indexOf(blacklist[i]) != -1) {
@@ -127,7 +128,7 @@ String.prototype.isValidUrl = function() {
   * @return {Boolean} True if the string does not have an extension json/pdf.
   */
 String.prototype.isOfHTMLType = function() {
-  var nonHTMLExt = ['json', 'pdf'];
+  var nonHTMLExt = ['json', 'pdf', 'xml'];
   if (nonHTMLExt.indexOf(this.getExtension()) != -1) {
     return false;
   }
