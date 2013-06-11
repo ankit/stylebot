@@ -133,15 +133,12 @@ Events = {
       }
     } else {
       if (property === 'font-family') {
-        var valueForURL = value.replace(" ", "+");
-        var fontURL = Events.GOOGLE_FONT_API + valueForURL;
+        var fontURL = Events.GOOGLE_FONT_API + value;
 
         chrome.extension.sendRequest({name: "fetchImportCSS", url: fontURL},
           function(response) {
-            // Hacky check to see if Google Web Font exists
-            // todo: Use Google Font API instead
+            // Hacky check to see if Google Web Font exists.
             if (response.text.indexOf("@font-face") == 0) {
-              // prepend @import
               stylebot.style.prependWebFont(fontURL, response.text);
             }
 

@@ -144,6 +144,7 @@
     onChange        : null, // function(value)
     onItemAdd       : null, // function(value, $item) { ... }
     onItemRemove    : null, // function(value) { ... }
+    onItemCreate    : null, // function(value) { ... }
     onClear         : null, // function() { ... }
     onOptionAdd     : null, // function(value, data) { ... }
     onOptionRemove  : null, // function(value) { ... }
@@ -1480,6 +1481,7 @@
       self.addItem(value);
       self.refreshOptions(false);
       self.setTextboxValue('');
+      self.trigger('onItemCreate', value);
     });
 
     var output = setup(input, create);

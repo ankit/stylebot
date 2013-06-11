@@ -360,7 +360,8 @@ stylebot.style = {
     // if no elements are selected, return
     if (!this.cache.elements || this.cache.elements.length == 0) return;
 
-    this.updateInlineCSS(this.cache.elements, this.getInlineCSS(this.cache.selector));
+    this.updateInlineCSS(this.cache.elements,
+      this.getInlineCSS(this.cache.selector));
     var tempRules = {};
 
     for (var sel in this.rules) {
@@ -619,8 +620,8 @@ stylebot.style = {
 
     // todo: add ordering to styling rules, this is not reliable.
     for (selector in self.rules) {
-      if (self.rules[selector]['text'] &&  self.rules[selector]['text'] === rule['text']) {
-      } else {
+      if (!self.rules[selector]['text'] ||
+        !self.rules[selector]['text'] === rule['text']) {
         newRules[selector] = self.rules[selector];
       }
     }

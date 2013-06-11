@@ -342,6 +342,12 @@ var WidgetUI = {
         if (moreOptions['onValueChange']) {
           moreOptions['onValueChange'](value);
         }
+      },
+
+      onItemCreate: function(value) {
+        if (moreOptions['onValueChange']) {
+          moreOptions['onValueChange'](value);
+        }
       }
     };
 
