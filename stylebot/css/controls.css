@@ -81,8 +81,7 @@ div.stylebot-colorselector:focus:not(.disabled) {
 /* Textfields & Textareas */
 
 input[type="text"].stylebot-textfield,
-textarea.stylebot-textarea
-{
+textarea.stylebot-textarea {
   background: #fff !important;
   border: 1px solid #C2C2C2 !important;
   border-radius: 2px !important;
@@ -95,8 +94,7 @@ textarea.stylebot-textarea
 }
 
 input.stylebot-textfield:disabled,
-textarea.stylebot-textarea:disabled
-{
+textarea.stylebot-textarea:disabled {
   opacity: 0.5 !important;
 }
 
@@ -107,6 +105,7 @@ input[type="text"].stylebot-textfield {
   line-height: 12px !important;
   min-height: 12px !important;
   padding: 2px !important;
+  display: inline-block !important;
 }
 
 textarea.stylebot-css-code {

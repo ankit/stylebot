@@ -287,10 +287,13 @@
 
 .stylebot-control,
 .stylebot-selectize-control {
-  display: inline;
   margin: 0 !important;
   margin-left: 6px !important;
   width: auto !important;
+}
+
+.stylebot-selectize-control {
+  display: inline-block !important;
 }
 
 #stylebot-controls button.stylebot-button {
