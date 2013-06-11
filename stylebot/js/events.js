@@ -137,12 +137,15 @@ Events = {
 
         chrome.extension.sendRequest({name: "fetchImportCSS", url: fontURL},
           function(response) {
+            stylebot.undo.push(Utils.cloneObject(stylebot.style.rules));
+
             // Hacky check to see if Google Web Font exists.
             if (response.text.indexOf("@font-face") == 0) {
               stylebot.style.prependWebFont(fontURL, response.text);
             }
 
-            Events.saveProperty(property, value);
+            stylebot.style.apply(property, value);
+            stylebot.undo.refresh();
         });
       } else {
         Events.saveProperty(property, value);
