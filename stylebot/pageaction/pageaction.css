@@ -46,8 +46,10 @@ body {
 }
 
 .style-featured {
-  color: #73ba68;
-  padding-left: 10px;
+  background-color: #73ba68;
+  color: #fff;
+  padding: 1px 3px;
+  margin-left: 10px;
 }
 
 .style-installed {
