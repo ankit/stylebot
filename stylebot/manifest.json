@@ -106,7 +106,7 @@
 
   "page_action": {
     "default_icon"  : "images/css.png",
-    "default_title" : "Click to start editing using Stylebot",
+    "default_title" : "Stylebot",
     "default_popup" : "pageaction/index.html"
   },
 

@@ -337,38 +337,15 @@ Styles.prototype.getCombinedRulesForPage = function(aURL, tab) {
     global: this.expandRules(globalRules)
   };
 
-  if (cache.options.showPageAction) {
-    if (response.rules || response.globalRules) {
-      PageAction.highlight(tab);
-    } else {
-      PageAction.disable(tab);
-    }
-
-    chrome.pageAction.show(tab.id);
-  }
-
   cache.loadingTabs[tab.id] = response;
+  PageAction.update(tab, (rules || globalRules) ? true : false);
+
   return response;
 };
 
 Styles.prototype.getCombinedRulesForIframe = function(aURL, tab) {
   var response = cache.loadingTabs[tab.id];
-  if (response) {
-    // just in case the page action wasn't updated when getCombinedRulesForPage was called
-    // this mostly occurs when there are lots of iframes in a page. e.g. plus.google.com
-    // todo: find a better way out for this
-    if (cache.options.showPageAction) {
-      if (response.rules || response.global)
-        PageAction.highlight(tab);
-      else
-        PageAction.disable(tab);
-      chrome.pageAction.show(tab.id);
-    }
-
-    return response;
-  } else {
-    return this.getCombinedRulesForPage(aURL, tab);
-  }
+  return (response ? response : this.getCombinedRulesForPage(aURL, tab));
 }
 
 /**

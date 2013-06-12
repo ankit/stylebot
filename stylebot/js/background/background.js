@@ -21,8 +21,7 @@ var cache = {
   importRules: {},
 
   // Temporary cached map of tabId to rules to prevent recalculating rules
-  // for iframes. The cache is only live until the tab completes loading
-  // or is closed, whichever occurs first.
+  // for iframes. Cleared when a tab finishes loading or a tab is closed.
   loadingTabs: []
 };
 
@@ -41,11 +40,6 @@ function init() {
   * Attaches listeners to act on requests sent from tabs and page action
   */
 function attachListeners() {
-  if (cache.options.showPageAction == typeof undefined ||
-    cache.options.showPageAction) {
-    PageAction.showAll();
-  }
-
   chrome.tabs.onUpdated.addListener(onTabUpdated);
   chrome.tabs.onActivated.addListener(onTabActivated);
   chrome.tabs.onRemoved.addListener(onTabRemoved);
@@ -53,24 +47,18 @@ function attachListeners() {
   chrome.extension.onRequest.addListener(
     function(request, sender, sendResponse) {
     switch (request.name) {
-      case 'enablePageAction':
-        if (cache.options.showPageAction) {
-          PageAction.enable(sender.tab);
-        }
+      case 'activatePageAction':
+        PageAction.activate(sender.tab);
         sendResponse({});
         break;
 
-      case 'disablePageAction':
-        if (cache.options.showPageAction) {
-          PageAction.disable(sender.tab);
-        }
+      case 'unhighlightPageAction':
+        PageAction.unhighlight(sender.tab);
         sendResponse({});
         break;
 
       case 'highlightPageAction':
-        if (cache.options.showPageAction) {
-          PageAction.highlight(sender.tab);
-        }
+        PageAction.highlight(sender.tab);
         sendResponse({});
         break;
 
@@ -149,7 +137,6 @@ function onTabUpdated(tabId, changeInfo, tab) {
     if (cache.options.contextMenu) {
       ContextMenu.update(tab);
     }
-    PageAction.update(tabId);
   }
 }
 

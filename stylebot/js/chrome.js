@@ -10,12 +10,13 @@ stylebot.chrome = {
     * @param {boolean} Stylebot editor status i.e. open or closed
     */
   setPageAction: function(status) {
-    if (status)
-      chrome.extension.sendRequest({ name: 'enablePageAction' }, function() {});
-    else if (!$.isEmptyObject(stylebot.style.rules) || !$.isEmptyObject(stylebot.style.global))
+    if (status) {
+      chrome.extension.sendRequest({ name: 'activatePageAction' }, function() {});
+    } else if (!$.isEmptyObject(stylebot.style.rules) || !$.isEmptyObject(stylebot.style.global)) {
       chrome.extension.sendRequest({ name: 'highlightPageAction' }, function() {});
-    else
-      chrome.extension.sendRequest({ name: 'disablePageAction' }, function() {});
+    } else {
+      chrome.extension.sendRequest({ name: 'unhighlightPageAction' }, function() {});
+    }
   },
 
   /**
