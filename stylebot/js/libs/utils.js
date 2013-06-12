@@ -6,7 +6,6 @@
 **/
 
 var Utils = {
-
   // return array index at which property pName is equal to value 'pValue'
   search: function(arr, pName, pValue) {
     var len = arr.length;
@@ -253,6 +252,18 @@ var Utils = {
     }
 
     return newObj;
+  },
+
+  removeFromArray: function(arr) {
+    var what, a = arguments, L = a.length, ax;
+    while (L > 1 && arr.length) {
+        what = a[--L];
+        while ((ax= arr.indexOf(what)) !== -1) {
+            arr.splice(ax, 1);
+        }
+    }
+
+    return arr;
   },
 
   // functions for ace

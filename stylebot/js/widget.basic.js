@@ -216,7 +216,8 @@ stylebot.widget.basic = {
 
     ui.createLabel(control.name).appendTo($controlSet);
 
-    var control_el; // this will contain the control element
+    // this will contain the control element
+    var control_el;
 
     // Add controls of different types
     switch (control.type) {

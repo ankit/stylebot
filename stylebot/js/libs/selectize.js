@@ -1298,6 +1298,15 @@
   };
 
   /**
+  * Removes all options.
+  */
+  Selectize.prototype.removeAllOptions = function() {
+    this.userOptions = {};
+    this.options = {};
+    this.lastQuery = null;
+  };
+
+  /**
   * Removes an option.
   *
   * @param {string} value

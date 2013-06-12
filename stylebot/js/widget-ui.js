@@ -47,6 +47,7 @@ var WidgetUI = {
   },
 
   SIZE_UNITS: ['px', 'em', '%', 'pt'],
+  DEFAULT_SIZE_UNIT: 'px',
 
   DEFAULT_FONT_STACK: ['Helvetica',
     'Roboto',
@@ -57,6 +58,12 @@ var WidgetUI = {
     'Consolas',
     'monospace'
   ],
+
+  // Number of fonts the font stack can hold at a time
+  FONT_STACK_LIMIT: 15,
+
+  // Text to use as a default option placeholder for <select> controls
+  DEFAULT_OPTION: 'Default',
 
   /**
     * Create option for control
@@ -151,7 +158,7 @@ var WidgetUI = {
     var $select = $('<select>', {
       class: this.CLASS_NAMES.control + " " + this.CLASS_NAMES.select
     })
-    .data('default', 'px')
+    .data('default', this.DEFAULT_SIZE_UNIT)
     .appendTo(container);
 
     var len = this.SIZE_UNITS.length;
@@ -192,7 +199,7 @@ var WidgetUI = {
     var $select = $("<select>", {
       class: this.CLASS_NAMES.control + " " + this.CLASS_NAMES.select
     })
-    .data('default', 'px')
+    .data('default', this.DEFAULT_SIZE_UNIT)
     .appendTo(container);
 
     var len = this.SIZE_UNITS.length;
@@ -222,29 +229,17 @@ var WidgetUI = {
     var $select = $('<select>', {
       class: this.CLASS_NAMES.control + " " + this.CLASS_NAMES.select
     })
-    .data('default', 'default')
+    .data('default', this.DEFAULT_OPTION)
     .appendTo($container);
-
-    // default option
-    this.createSelectOption($select, 'Default', 'default');
 
     chrome.storage.local.get("fontStack", $.proxy(function(items) {
       var fontStack = items["fontStack"];
       if (!fontStack) {
         fontStack = this.DEFAULT_FONT_STACK;
-        chrome.storage.local.set({"fontStack": fontStack});
       }
 
-      var len = fontStack.length;
-      var $select = $('.' + this.CLASS_NAMES.fontFamily + ' select');
-      var selectize = $select.get(0).selectize;
-
-      for (var i = 0; i < len; i++) {
-        var font = fontStack[i];
-        selectize.addOption(font, {text: font, value: font});
-      }
-
-      $select.data('set', true);
+      chrome.storage.local.set({"fontStack": fontStack});
+      this.updateFontStack(fontStack);
     }, this));
 
     this.selectize($select, {
@@ -259,24 +254,51 @@ var WidgetUI = {
         }
       },
 
-      onOptionAdd: $.proxy(function(value, data) {
-        var $select = $('.' + this.CLASS_NAMES.fontFamily + ' select');
-        if (!$select.data('set')) { return; }
-
-        chrome.storage.local.get("fontStack", function(items) {
+      onValueChange: $.proxy(function(value) {
+        chrome.storage.local.get("fontStack", $.proxy(function(items) {
           var fontStack = items["fontStack"];
-          fontStack.unshift(value);
-          fontStack = fontStack.slice(0, 15);
-          chrome.storage.local.set({"fontStack": fontStack});
-        });
-      }, this),
+          if (fontStack.indexOf(value) != -1) {
+            fontStack = Utils.removeFromArray(fontStack, value);
+          }
 
-      onValueChange: function(value) {
+          fontStack.unshift(value);
+          fontStack = fontStack.slice(0, this.FONT_STACK_LIMIT);
+
+          chrome.storage.local.set({"fontStack": fontStack});
+          this.updateFontStack(fontStack, value);
+        }, this));
+
         Events.onSelectChange('font-family', value);
-      }
+      }, this)
     });
 
     return $container;
+  },
+
+  updateFontStack: function(fontStack, selectedValue) {
+    var $select = $('.' + this.CLASS_NAMES.fontFamily + ' select');
+    var selectize = $select.get(0).selectize;
+    var len = fontStack.length;
+
+    // Clear all existing options
+    selectize.removeAllOptions();
+
+    // Add the default option
+    selectize.addOption(this.DEFAULT_OPTION, {
+      text: this.DEFAULT_OPTION,
+      value: this.DEFAULT_OPTION
+    });
+
+    for (var i = 0; i < len; i++) {
+      var font = fontStack[i];
+      selectize.addOption(font, {text: font, value: font});
+    }
+
+    if (!selectedValue) {
+      selectedValue = this.DEFAULT_OPTION;
+    }
+
+    selectize.setValue(selectedValue);
   },
 
   createBorderStyleControl: function(control) {
@@ -287,11 +309,11 @@ var WidgetUI = {
     var $select = $('<select>', {
       class: this.CLASS_NAMES.control + " " + this.CLASS_NAMES.select
     })
-    .data('default', 'default')
+    .data('default', this.DEFAULT_OPTION)
     .appendTo(container);
 
     // default option
-    this.createSelectOption($select, 'Default', 'default');
+    this.createSelectOption($select, this.DEFAULT_OPTION, this.DEFAULT_OPTION);
 
     var len = control.options.length;
     for (var i = 0; i < len; i++) {
@@ -323,7 +345,7 @@ var WidgetUI = {
         $dropdown.data('value', value);
       },
 
-      onDropdownClose: function($dropdown) {
+      onDropdownClose: $.proxy(function($dropdown) {
         var oldValue = $dropdown.data('value');
         var selectize = $select.get(0).selectize;
         var value = selectize.getValue();
@@ -335,14 +357,14 @@ var WidgetUI = {
           return;
         }
 
-        if (value === 'default') {
+        if (value === this.DEFAULT_OPTION) {
           value = '';
         }
 
         if (moreOptions['onValueChange']) {
           moreOptions['onValueChange'](value);
         }
-      },
+      }, this),
 
       onItemCreate: function(value) {
         if (moreOptions['onValueChange']) {
@@ -551,6 +573,7 @@ var WidgetUI = {
     var selectize = control.el.find('select').get(0).selectize;
     var option = selectize.getOption(value);
 
+    // if the option does not already exist, add it to the stack.
     if (option.length == 0) {
       selectize.addOption(value, {text: value, value: value});
       selectize.refreshOptions(false);
