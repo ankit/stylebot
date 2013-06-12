@@ -242,8 +242,9 @@ li.option:first-of-type {
 
 #stylebot-modal .modal-header input {
   text-align: left;
-  padding: 2px;
-  width: 95%;
+  padding: 3px 5px;
+  width: 100%;
+  float: left;
 }
 
 #stylebot-modal .modal-footer {

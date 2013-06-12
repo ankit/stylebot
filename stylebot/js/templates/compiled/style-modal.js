@@ -21,7 +21,7 @@ function program2(depth0,data) {
 function program4(depth0,data) {
   
   var buffer = "", stack1, foundHelper;
-  buffer += "\n            URL: <input type='text' value=\"";
+  buffer += "\n            <div>URL (see <a target=\"_blank\" href=\"http://stylebot.me/patterns\">patterns</a>):</div>\n            <input type='text' value=\"";
   foundHelper = helpers.url;
   if (foundHelper) { stack1 = foundHelper.call(depth0, {hash:{}}); }
   else { stack1 = depth0.url; stack1 = typeof stack1 === functionType ? stack1() : stack1; }
