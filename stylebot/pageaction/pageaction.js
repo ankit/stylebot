@@ -25,12 +25,23 @@ var PageAction = {
             PageAction.options(e, tab);
           });
 
-          chrome.tabs.sendRequest(tab.id, {name: "getURL"}, function(response) {
+          chrome.tabs.sendRequest(tab.id, {name: "getURLAndSocialData"}, function(response) {
+            var socialId = null;
+
+            if (response.social && response.social.id) {
+              socialId = response.social.id;
+            }
+
             $.get("http://stylebot.me/search_api?q=" + response.url, function(styles_str) {
               var styles = JSON.parse(styles_str);
+              styles = _.sortBy(styles, function(style) {
+                return (style.id == socialId) ? -1 : 1;
+              });
+
               var len = styles.length;
               var $menu = $("#menu");
               $menu.html('');
+
               if (len === 0) {
                 var html = '<li class="disabled"><a>No Styles Found.</a></li>';
                 $menu.append(html);
@@ -39,8 +50,8 @@ var PageAction = {
 
               for (var i = 0; i < len; i++) {
                 var name = styles[i].title;
-                if (name.length > 30) {
-                  name = name.substring(0, 30) + "...";
+                if (name.length > 25) {
+                  name = name.substring(0, 25) + "...";
                 }
 
                 var title = styles[i].description;
@@ -48,7 +59,8 @@ var PageAction = {
                 var id = styles[i].id;
                 var link = "http://stylebot.me/styles/" + id;
                 var featured = (styles[i].featured == 1);
-                var timeAgo = moment(styles[i].updated_at).fromNow();
+                var timestamp = styles[i].updated_at;
+                var timeAgo = moment(timestamp).fromNow();
                 var username = styles[i].username;
                 var userLink = "http://stylebot.me/users/" + styles[i].username;
                 var favCount = styles[i].favorites;
@@ -60,20 +72,26 @@ var PageAction = {
                 '" data-author="' + username +
                 '" data-favcount="' + favCount +
                 '" data-timeago="' + timeAgo +
+                '" data-timestamp="' + timestamp +
                 '" role="presentation">' +
                 '<div role="menuitem" tabindex="-1" href="#">' +
                 name + '<span class="style-meta"><a class="style-link" href="' +
                 link + '">link</a>';
+                html += ' by <a class="style-author" href="' + userLink + '">' + username +'</a>';
+
+                html += '<span class="pull-right">';
 
                 if (featured) {
                   html += '<span class="style-featured">featured</span>';
                 }
 
-                html += '<span class="hide style-installed">installed</span>';
+                if (socialId == styles[i].id) {
+                  html += '<span class="style-installed">installed</span>';
+                } else {
+                  html += '<span class="hide style-installed">installed</span>';
+                }
 
-                html += '<span class="pull-right">by <a class="style-author" href="' +
-                userLink + '">' + username +'</a></span></div></li>';
-
+                html += '</span></div></li>';
                 $menu.append(html);
               }
 
@@ -148,11 +166,14 @@ var PageAction = {
     var id = $el.data('id');
     var css = PageAction.styles[id];
     var title = $el.data('title');
+    var timestamp = $el.data('timestamp');
 
     chrome.tabs.sendRequest(tab.id, {
       name: "install",
+      id: id,
       title: title,
-      css: css
+      css: css,
+      timestamp: timestamp
     }, function(response){});
   },
 

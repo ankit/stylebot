@@ -10,10 +10,8 @@ var VERSION = '1.7.3.4';
 function updateVersion(callback) {
   chrome.storage.local.get(['version'], function(storage) {
     if (storage['version'] != VERSION) {
-      console.log('Updating to version ' + VERSION);
       chrome.storage.local.set({'version': VERSION});
     }
-
     callback();
   });
 }

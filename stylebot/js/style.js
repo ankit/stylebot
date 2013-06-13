@@ -21,6 +21,7 @@ stylebot.style = {
   */
   rules: {},
   global: {},
+  social: {},
   timer: null,
   parser: null,
   status: true,
@@ -43,6 +44,7 @@ stylebot.style = {
       this.cache.url = stylebotTempUrl;
       delete stylebotTempUrl;
     }
+
     // if domain is empty, return url
     else if (!this.cache.url || this.cache.url === '')
       this.cache.url = location.href;
@@ -51,9 +53,15 @@ stylebot.style = {
       this.rules = stylebotTempRules;
       delete stylebotTempRules;
     }
+
     if (stylebotTempGlobalRules) {
       this.global = stylebotTempGlobalRules;
       delete stylebotTempGlobalRules;
+    }
+
+    if (stylebotTempSocialData) {
+      this.social = stylebotTempSocialData;
+      delete stylebotTempSocialData;
     }
   },
 
@@ -157,9 +165,11 @@ stylebot.style = {
     * Update CSS for the entire page. Used by Page Editing Mode
     * @param {string} css CSS string
     * @param {boolean} save Should CSS be saved
+    * @param {Object} data Any additional data that should be sent
+    *   along with the save request.
     */
-  applyPageCSS: function(css, save) {
-    if (save === undefined) save = true;
+  applyPageCSS: function(css, shouldSave, data) {
+    if (shouldSave === undefined) { shouldSave = true; }
 
     var parsedRules = {};
 
@@ -174,14 +184,14 @@ stylebot.style = {
       }
     }
 
-    if (parsedRules['error']) return parsedRules['error'];
+    if (parsedRules['error']) { return parsedRules['error']; }
 
     this.clearInlineCSS(this.cache.elements);
     this.updateStyleElement(parsedRules);
 
-    if (save) {
+    if (shouldSave) {
       this.rules = parsedRules;
-      this.save();
+      this.save(data);
     }
 
     return true;
@@ -404,7 +414,8 @@ stylebot.style = {
   },
 
   /**
-    * Remove any existing custom CSS for current selector from rules cache and selected elements' inline css
+    * Remove any existing custom CSS for current selector from rules cache
+    * and selected elements' inline css
     */
   remove: function() {
     if (this.rules[this.cache.selector])
@@ -420,8 +431,7 @@ stylebot.style = {
   },
 
   /**
-    * Remove all the CSS for page from cache,
-    *   <style> element and inline CSS
+    * Remove all the CSS for page from cache, <style> element and inline CSS
     */
   removeAll: function() {
     for (var selector in this.rules) {
@@ -440,32 +450,36 @@ stylebot.style = {
 
   /**
     * Send request to background.html to save all the cached rules
+    * @param {Object} data Any additional metadata to save along with the rules
     */
-  save: function() {
+  save: function(data) {
     // if no rules are present, send null as value
     var rules = null;
     var i = false;
 
-    for (var i in stylebot.style.rules)
+    for (var i in stylebot.style.rules) {
       break;
+    }
 
-    if (i)
+    if (i) {
       rules = stylebot.style.rules;
+    }
 
-    stylebot.chrome.save(stylebot.style.cache.url, rules);
+    stylebot.chrome.save(stylebot.style.cache.url, rules, data);
   },
 
   /**
     * Reset cache and all inline CSS. Also, updates the <style> element
     */
   reset: function() {
-    var duration = 100;
     stylebot.style.cache.selector = null;
     stylebot.style.cache.elements = null;
+    style.style.social = null;
+
     setTimeout(function() {
       stylebot.style.updateStyleElement(stylebot.style.rules);
       stylebot.style.resetInlineCSS();
-    }, duration);
+    }, 100);
   },
 
   /**
@@ -577,19 +591,28 @@ stylebot.style = {
   },
 
   /**
-    * Install the specified style for the current URL.
+    * Install the specified style for the current URL
+    * @param {Number} id The id of the style
     * @param {String} title The title describing the style
-    * @param {String} css The css for the style.
+    * @param {String} css The css for the style
+    * @param {String} timestamp The timestamp when the style was last updated
     */
-  install: function(title, css) {
+  install: function(id, title, css, timestamp) {
     var $preview = $(this.PREVIEW_SELECTOR);
     $preview.html("<h1>Installed " + title + "</h1>")
       .css('left', $(window).width()/2 - $preview.width()/2)
       .show();
+
     setTimeout(function() {
       $preview.fadeOut(1000);
     }, 500);
-    stylebot.style.applyPageCSS(css, true);
+
+    this.social = {
+      id: id,
+      timestamp: timestamp
+    };
+
+    this.applyPageCSS(css, true, this.social);
   },
 
   /**

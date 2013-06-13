@@ -34,7 +34,11 @@ stylebot.chrome = {
     * @param {data} Any additional data to send as 'data' property
     */
   save: function(url, rules, data) {
-    chrome.extension.sendRequest({ name: 'save', rules: rules, url: url, data: data }, function() {});
+    chrome.extension.sendRequest({ name: 'save',
+      rules: rules,
+      url: url,
+      data: data
+    }, function() {});
   },
 
   /**
@@ -184,12 +188,15 @@ chrome.extension.onRequest.addListener(
       stylebot.chrome.openOptionsPage();
     }
 
-    else if (request.name === 'getURL') {
+    else if (request.name === 'getURLAndSocialData') {
       if (window != window.top) {
         return;
       }
 
-      sendResponse({url: stylebot.style.cache.url});
+      sendResponse({
+        url: stylebot.style.cache.url,
+        social: stylebot.style.social
+      });
     }
 
     else if (request.name === 'preview') {
@@ -218,7 +225,11 @@ chrome.extension.onRequest.addListener(
         return;
       }
 
-      stylebot.style.install(request.title, request.css);
+      stylebot.style.install(
+        request.id,
+        request.title,
+        request.css,
+        request.timestamp);
     }
 
     else if (request.name === 'reset') {

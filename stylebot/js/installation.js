@@ -45,7 +45,7 @@ stylebot.installation = {
       });
 
       // Bind listener for overwrite installation
-      //  (without checking if style already exists)
+      // (without checking if style already exists)
       $channels.bind(this.events.overwrite, function(e) {
         console.log('Stylebot: Overwrite event received. Installing style...');
         stylebot.installation.save(e);
@@ -64,19 +64,7 @@ stylebot.installation = {
       var sheet = parser.parse($channel.text(), false, true);
       var rules = CSSUtils.getRulesFromParserObject(sheet);
 
-      // add the meta header
-      var header = '/**\n    Title: ' + data.title
-      + '\n    URL: http://stylebot.me/styles/' + data.id
-      + '\n    Author: http://stylebot.me/users/' + data.author;
-
-      header += '\n**/';
-
-      var rulesWithMeta = { 'comment-#0' : { comment: header } };
-
-      for (selector in rules)
-        rulesWithMeta[selector] = rules[selector];
-
-      stylebot.chrome.save(data.url, rulesWithMeta, {
+      stylebot.chrome.save(data.url, rules, {
         id: data.id,
         timestamp: data.timestamp
       });

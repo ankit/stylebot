@@ -6,10 +6,10 @@
 
   "background" : {
     "scripts": [
+      "js/background/styles.js",
       "js/background/updates.js",
       "js/background/pageaction.js",
       "js/background/contextmenu.js",
-      "js/background/styles.js",
       "js/background/string.js",
       "js/background/background.js"
     ]

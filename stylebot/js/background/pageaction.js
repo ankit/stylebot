@@ -90,7 +90,7 @@ var PageAction = {
           for (var j = 0; j < t_len; j++) {
             var tab = tabs[j];
             if (tab.url.isValidUrl()) {
-              PageAction.show(tab);
+              PageAction.update(tab);
             }
           }
         }

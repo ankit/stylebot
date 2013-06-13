@@ -75,9 +75,11 @@ Styles.prototype.create = function(url, rules, data) {
   this.styles[url] = {};
   this.styles[url][this.ENABLED_PROPERTY] = true;
   this.styles[url][this.RULES_PROPERTY] = rules === undefined ? {} : rules;
+
   if (data !== undefined) {
     this.setMetadata(url, data);
   }
+
   this.persist();
 };
 
@@ -243,9 +245,23 @@ Styles.prototype.upgrade = function(version, callback) {
 };
 
 /**
-  * Retrieve rules for the given identifier.
-  * @param {String} url The given identifier.
-  * @return {Object} The enabled status for the given URL.
+  * Retrieve social data for the specified url.
+  * @param {String} url The url for which to return the social data.
+  * @return {Object} The social data for the given URL, if it exists. Else, null.
+  */
+Styles.prototype.getSocialData = function(url) {
+  if (this.styles[url] === undefined) {
+    return null;
+  }
+
+  var social = this.styles[url][this.SOCIAL_PROPERTY];
+  return social ? social : null;
+};
+
+/**
+  * Retrieve style rules for the specified url.
+  * @param {String} url The url for which to return the rules.
+  * @return {Object} The style rules for the URL, if it exists. Else, null.
   */
 Styles.prototype.getRules = function(url) {
   if (this.styles[url] === undefined) {
@@ -264,8 +280,7 @@ Styles.prototype.getRules = function(url) {
 Styles.prototype.exists = function(aURL) {
   if (this.isEnabled(aURL) && aURL !== this.GLOBAL_URL) {
     return true;
-  }
-  else {
+  } else {
     return false;
   }
 };
@@ -280,13 +295,15 @@ Styles.prototype.getCombinedRulesForPage = function(aURL, tab) {
     return {
       rules: null,
       url: null,
-      global: null
+      global: null,
+      social: null
     };
   }
 
   var globalRules = null;
   var rules = {};
   var pageURL = '';
+  var social = null;
 
   if (!this.isEmpty(this.GLOBAL_URL) && this.isEnabled(this.GLOBAL_URL)) {
     globalRules = this.getRules(this.GLOBAL_URL);
@@ -299,6 +316,7 @@ Styles.prototype.getCombinedRulesForPage = function(aURL, tab) {
   if (aURL.indexOf(this.SOCIAL_URL) != -1) {
     if (!this.isEmpty(this.SOCIAL_URL)) {
       rules = this.getRules(this.SOCIAL_URL);
+      social = this.getSocialData(this.SOCIAL_URL);
       pageURL = this.SOCIAL_URL;
     } else {
       rules = null;
@@ -319,6 +337,7 @@ Styles.prototype.getCombinedRulesForPage = function(aURL, tab) {
 
         if (url.length > pageURL.length) {
           pageURL = url;
+          social = this.getSocialData(url);
         }
 
         this.copyRules(tab, this.getRules(url), rules, (url === pageURL));
@@ -328,17 +347,19 @@ Styles.prototype.getCombinedRulesForPage = function(aURL, tab) {
     if (!found) {
       rules = null;
       pageURL = null;
+      social = null;
     }
   }
 
   var response = {
     url: pageURL,
     rules: rules,
-    global: this.expandRules(globalRules)
+    global: this.expandRules(globalRules),
+    social: social
   };
 
   cache.loadingTabs[tab.id] = response;
-  PageAction.update(tab, (rules || globalRules) ? true : false);
+  PageAction.update(tab, (rules || (globalRules && !isEmptyObject(globalRules))) ? true : false);
 
   return response;
 };

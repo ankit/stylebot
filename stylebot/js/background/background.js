@@ -33,6 +33,7 @@ function init() {
     });
   });
 
+  PageAction.showAll();
   attachListeners();
 }
 
@@ -179,13 +180,13 @@ function mergeStyles(newStyles, oldStyles) {
 
 
 function initCache(callback) {
-  chrome.storage.local.get(null, function(storage) {
-    if (storage['options']) {
-      cache.options = storage['options'];
+  chrome.storage.local.get(['options', 'styles'], function(items) {
+    if (items['options']) {
+      cache.options = items['options'];
     }
 
-    if (storage['styles']) {
-      cache.styles = new Styles(storage['styles']);
+    if (items['styles']) {
+      cache.styles = new Styles(items['styles']);
     } else {
       cache.styles = new Styles({});
     }
@@ -272,14 +273,8 @@ function sendRequestToTab(tab, msg) {
   chrome.tabs.sendRequest(tab.id, { name: msg }, function() {});
 }
 
-/**
-  * Initialize the background page
-  */
-window.addEventListener('load', function() {
-  init();
-});
-
-// Clone an object. from: http://my.opera.com/GreyWyvern/blog/show.dml/1725165
+// Clone an object
+// http://my.opera.com/GreyWyvern/blog/show.dml/1725165
 function cloneObject(obj) {
   var newObj = (obj instanceof Array) ? [] : {};
   for (i in obj) {
@@ -289,4 +284,15 @@ function cloneObject(obj) {
       newObj[i] = obj[i];
   }
   return newObj;
-}
+};
+
+function isEmptyObject(obj) {
+  var isEmpty = true;
+  for(keys in obj) {
+     isEmpty = false;
+     break;
+  }
+  return isEmpty;
+};
+
+init();
