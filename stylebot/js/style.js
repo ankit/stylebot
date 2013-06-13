@@ -474,7 +474,7 @@ stylebot.style = {
   reset: function() {
     stylebot.style.cache.selector = null;
     stylebot.style.cache.elements = null;
-    style.style.social = null;
+    stylebot.style.social = null;
 
     setTimeout(function() {
       stylebot.style.updateStyleElement(stylebot.style.rules);

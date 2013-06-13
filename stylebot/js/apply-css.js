@@ -3,6 +3,10 @@
   * as soon as the document starts loading.
  **/
 
+// globals
+var APPLY_CSS_TIMEOUT = 300;
+var MAX_APPLY_CSS_COUNT = 10;
+
 // Temporary variables used by stylebot.style.initialize()
 var stylebotTempUrl;
 var stylebotTempRules;
@@ -17,26 +21,37 @@ if (window === window.top) {
   request = 'getCombinedRulesForIframe';
 }
 
-chrome.extension.sendRequest({name: request, url: window.location.href}, function(response) {
-  // global css
-  if (response.global) {
-    stylebotTempGlobalRules = response.global;
-    CSSUtils.crunchCSS(response.global, true, true, function(css) {
-      if (css != '') {
-        CSSUtils.injectCSS(css, 'stylebot-global-css');
+var applyCSSCount = 0;
+function applyCSS() {
+  chrome.extension.sendRequest({name: request, url: window.location.href}, function(response) {
+    if (response && response.success) {
+      if (response.global) {
+        stylebotTempGlobalRules = response.global;
+        CSSUtils.crunchCSS(response.global, true, true, function(css) {
+          if (css != '') {
+            CSSUtils.injectCSS(css, 'stylebot-global-css');
+          }
+        });
       }
-    });
-  }
 
-  stylebotTempUrl = response.url;
-  stylebotTempRules = response.rules;
-  stylebotTempSocialData = response.social;
+      stylebotTempUrl = response.url;
+      stylebotTempRules = response.rules;
+      stylebotTempSocialData = response.social;
 
-  if (stylebotTempUrl && stylebotTempRules) {
-    CSSUtils.crunchCSS(response.rules, true, true, function(css) {
-      if (css != '') {
-        CSSUtils.injectCSS(css, 'stylebot-css');
+      if (stylebotTempUrl && stylebotTempRules) {
+        CSSUtils.crunchCSS(response.rules, true, true, function(css) {
+          if (css != '') {
+            CSSUtils.injectCSS(css, 'stylebot-css');
+          }
+        });
       }
-    });
-  }
-});
+    } else {
+      if (applyCSSCount < MAX_APPLY_CSS_COUNT) {
+        applyCSSCount ++;
+        setTimeout(applyCSS, APPLY_CSS_TIMEOUT);
+      }
+    }
+  });
+}
+
+applyCSS();

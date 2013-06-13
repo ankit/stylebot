@@ -25,7 +25,7 @@ var cache = {
   loadingTabs: []
 };
 
-// Initialize.
+// Initialize
 function init() {
   updateVersion(function() {
     initCache(function() {
@@ -87,13 +87,33 @@ function attachListeners() {
         break;
 
       case 'getCombinedRulesForPage':
-        sendResponse(
-          cache.styles.getCombinedRulesForPage(request.url, sender.tab));
+        var response;
+        if (cache.styles.getCombinedRulesForPage) {
+          response = cache.styles.getCombinedRulesForPage(
+            request.url, sender.tab);
+          response.success = true;
+        } else {
+          response = {
+            success: false
+          }
+        }
+
+        sendResponse(response);
         break;
 
       case 'getCombinedRulesForIframe':
-        sendResponse(
-          cache.styles.getCombinedRulesForIframe(request.url, sender.tab));
+        var response;
+        if (cache.styles.getCombinedRulesForIframe) {
+          response = cache.styles.getCombinedRulesForIframe(
+            request.url, sender.tab);
+          response.success = true;
+        } else {
+          response = {
+            success: false
+          }
+        }
+
+        sendResponse(response);
         break;
 
       case 'fetchOptions':
