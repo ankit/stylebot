@@ -2,11 +2,10 @@
   background: rgba(0, 0, 0, 0.70) !important;
   color: #fff !important;
   position: fixed;
-  top: 75% !important;
   font-size: 20px !important;
   z-index: 10000 !important;
   font-family: 'Lucida Grande', Helvetica, Arial, sans-serif !important;
-  max-width: 800px !important;
+  max-width: 400px !important;
   padding: 10px !important;
   border-radius: 5px !important;
 }

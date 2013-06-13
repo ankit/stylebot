@@ -568,11 +568,12 @@ stylebot.style = {
       desc = desc.replace(/\n/g, '<br />');
     }
 
-    $preview.html("Previewing " + title + "<br>" +
+    $preview.html(title + "<br>" +
       "<div id='stylebot-preview-meta'>by " + author + " (" + favCount +
       " favorites) • Last updated " + timeAgo + "</div>" +
       "<br><div id='stylebot-preview-description'>" + desc + "</div>");
-    $preview.css('left', $(window).width()/2 - $preview.width()/2);
+    $preview.css('left', $(window).width() / 2 - $preview.width()/2);
+    $preview.css('top', $(window).height() - $preview.height() - 100);
     $preview.show();
 
     stylebot.style.applyPageCSS(css, false);
