@@ -29,11 +29,11 @@ var cache = {
 function init() {
   updateVersion(function() {
     initCache(function() {
+      PageAction.showAll();
       ContextMenu.init();
     });
   });
 
-  PageAction.showAll();
   attachListeners();
 }
 

@@ -81,6 +81,8 @@ var PageAction = {
     * Show the page action for all tabs.
     */
   showAll: function() {
+    if (!cache.options.showPageAction) { return; }
+
     chrome.windows.getAll({populate: true}, function(windows) {
       var w_len = windows.length;
       for (var i = 0; i < w_len; i++) {
