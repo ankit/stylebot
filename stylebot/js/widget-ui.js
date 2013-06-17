@@ -9,7 +9,7 @@ var WidgetUI = {
     colorSelector: '.stylebot-color-selector',
     select: '.stylebot-select',
     toggleButton: '.stylebot-toggle',
-    segmentedButton: '.stylebot-segmented-button',
+    segmentedButton: '.stylebot-segmented-control button',
     activeButton: '.stylebot-button-active',
     selectedButton: '.stylebot-button-selected'
   },

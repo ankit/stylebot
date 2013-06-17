@@ -188,14 +188,14 @@ stylebot.widget = {
     .attr('title', 'Reset custom CSS for the selected elements')
     .tipsy({ delayIn: 800, gravity: 's', html: true })
     .appendTo(btContainer)
-    .click(self.resetCSS);
+    .click(self.resetSelectedElements);
 
     // Reset Page button
     WidgetUI.createButton('Reset Page')
     .attr('title', 'Reset custom CSS for the entire page')
     .tipsy({ delayIn: 500, gravity: 'se', html: true })
     .appendTo(btContainer)
-    .click(self.resetAllCSS);
+    .click(self.resetPage);
 
     btContainer.appendTo(optionsContainer);
     optionsContainer.appendTo(self.cache.box);
@@ -266,7 +266,6 @@ stylebot.widget = {
       this.disable();
     }
 
-    // TODO: Get rid of all this setTimeout mess.
     setTimeout($.proxy(function() {
       this.setMode();
       this.cache.box.show();
@@ -369,15 +368,15 @@ stylebot.widget = {
   },
 
   //  Reset CSS for current selector
-  resetCSS: function() {
+  resetSelectedElements: function() {
     stylebot.widget.reset();
-    stylebot.style.remove();
+    stylebot.style.resetSelectedElementCSS();
   },
 
   //  Reset the entire CSS for the page
-  resetAllCSS: function() {
+  resetPage: function() {
     stylebot.widget.reset();
-    stylebot.style.removeAll();
+    stylebot.style.resetAllCSS();
   },
 
   //  Toggle stylebot position between left / right

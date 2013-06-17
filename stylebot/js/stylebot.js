@@ -74,7 +74,7 @@ var stylebot = {
     stylebot.widget.close();
     stylebot.status = false;
     stylebot.chrome.setPageAction(false);
-    stylebot.style.reset();
+    stylebot.style.cleanUp();
     stylebot.disableSelection();
     stylebot.detachClickListener();
     stylebot.unhighlight();

@@ -20,7 +20,15 @@ var PageAction = {
           });
           $(".reset").click(function(e) {
             PageAction.reset(e, tab);
-          });
+          }).mouseenter(function(e) {
+            chrome.tabs.sendRequest(tab.id, {
+              name: "previewReset"
+            }, function(response){});
+          }).mouseleave(function(e) {
+            chrome.tabs.sendRequest(tab.id, {
+              name: "resetPreview"
+            }, function(response){});
+          })
           $(".options").click(function(e) {
             PageAction.options(e, tab);
           });

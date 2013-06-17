@@ -212,6 +212,14 @@ chrome.extension.onRequest.addListener(
         request.css);
     }
 
+    else if (request.name === 'previewReset') {
+      if (window != window.top) {
+        return;
+      }
+
+      stylebot.style.previewReset();
+    }
+
     else if (request.name === 'resetPreview') {
       if (window != window.top) {
         return;
@@ -236,7 +244,8 @@ chrome.extension.onRequest.addListener(
       if (window != window.top) {
         return;
       }
-      stylebot.style.removeAll();
+
+      stylebot.style.resetAllCSS(true);
     }
   }
 );

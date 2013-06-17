@@ -9,6 +9,7 @@ stylebot.style = {
   CSS_SELECTOR: "#stylebot-css",
   GLOBAL_CSS_SELECTOR: "#stylebot-global-css",
   PREVIEW_SELECTOR: "#stylebot-preview",
+  PREVIEW_FADE_OUT_DELAY: 500,
 
   /*  cache of custom CSS rules applied to elements on the current page
   e.g.:
@@ -414,10 +415,10 @@ stylebot.style = {
   },
 
   /**
-    * Remove any existing custom CSS for current selector from rules cache
-    * and selected elements' inline css
+    * Remove any existing custom CSS for current selector from the rules cache
+    * and the selected elements' inline css
     */
-  remove: function() {
+  resetSelectedElementCSS: function() {
     if (this.rules[this.cache.selector])
       delete this.rules[this.cache.selector];
 
@@ -431,9 +432,14 @@ stylebot.style = {
   },
 
   /**
-    * Remove all the CSS for page from cache, <style> element and inline CSS
+    * Remove all the CSS for page from cache, <style> element and inline CSS.
     */
-  removeAll: function() {
+  resetAllCSS: function(showPopover) {
+    if (showPopover) {
+      this.showPreviewPopover("Reset custom CSS for the page");
+      this.hidePreviewPopover(true);
+    }
+
     for (var selector in this.rules) {
       delete this.rules[selector];
       this.clearInlineCSS($(selector));
@@ -442,7 +448,9 @@ stylebot.style = {
     this.updateStyleElement(null);
 
     setTimeout(function() {
-      stylebot.selectionBox.highlight(stylebot.selectedElement);
+      if (stylebot.selectionBox) {
+        stylebot.selectionBox.highlight(stylebot.selectedElement);
+      }
     }, 0);
 
     this.save();
@@ -469,9 +477,10 @@ stylebot.style = {
   },
 
   /**
-    * Reset cache and all inline CSS. Also, updates the <style> element
+    * Clears all the inline CSS and updates the <style> element
+    * Called when stylebot is closed.
     */
-  reset: function() {
+  cleanUp: function() {
     stylebot.style.cache.selector = null;
     stylebot.style.cache.elements = null;
     stylebot.style.social = null;
@@ -489,12 +498,15 @@ stylebot.style = {
     var self = this;
     if (stylebot.undo.isEmpty())
       return false;
+
     self.rules = stylebot.undo.pop();
     self.clearInlineCSS(self.cache.elements);
     self.updateStyleElement(self.rules);
     self.save();
+
     stylebot.widget.open();
     stylebot.undo.refresh();
+
     setTimeout(function() {
       stylebot.highlight(stylebot.selectedElement);
     }, 0);
@@ -544,6 +556,14 @@ stylebot.style = {
   },
 
   /**
+    * Preview the page after removing any style rules
+    */
+  previewReset: function() {
+    this.showPreviewPopover("Reset Preview");
+    this.applyPageCSS("", false);
+  },
+
+  /**
     * Preview the specified style by applying its CSS to the page.
     * @param {String} title The title of style.
     * @param {String} desc Description for the style.
@@ -554,29 +574,16 @@ stylebot.style = {
     * @param {String} css The css for the style.
     */
   preview: function(title, desc, author, timeAgo, favCount, css) {
-    var $preview = $(this.PREVIEW_SELECTOR);
-
-    if ($preview.length === 0) {
-      $preview = $("<div>", {
-        id: "stylebot-preview"
-      });
-
-      $("body").append($preview);
-    }
-
     if (desc) {
       desc = desc.replace(/\n/g, '<br />');
     }
 
-    $preview.html(title + "<br>" +
+    this.showPreviewPopover(title + "<br>" +
       "<div id='stylebot-preview-meta'>by " + author + " (" + favCount +
       " favorites) • Last updated " + timeAgo + "</div>" +
       "<br><div id='stylebot-preview-description'>" + desc + "</div>");
-    $preview.css('left', $(window).width() / 2 - $preview.width()/2);
-    $preview.css('top', $(window).height() - $preview.height() - 100);
-    $preview.show();
 
-    stylebot.style.applyPageCSS(css, false);
+    this.applyPageCSS(css, false);
   },
 
   /**
@@ -588,7 +595,7 @@ stylebot.style = {
       $(this.CSS_SELECTOR).html(css);
     }, this));
 
-    $(this.PREVIEW_SELECTOR).hide();
+    this.hidePreviewPopover();
   },
 
   /**
@@ -599,14 +606,8 @@ stylebot.style = {
     * @param {String} timestamp The timestamp when the style was last updated
     */
   install: function(id, title, css, timestamp) {
-    var $preview = $(this.PREVIEW_SELECTOR);
-    $preview.html("<h1>Installed " + title + "</h1>")
-      .css('left', $(window).width()/2 - $preview.width()/2)
-      .show();
-
-    setTimeout(function() {
-      $preview.fadeOut(1000);
-    }, 500);
+    this.showPreviewPopover("Installed " + title);
+    this.hidePreviewPopover(true);
 
     this.social = {
       id: id,
@@ -614,6 +615,41 @@ stylebot.style = {
     };
 
     this.applyPageCSS(css, true, this.social);
+  },
+
+  /**
+    * Show the preview popover
+    * @param {String} html The content to display inside the popover
+    */
+  showPreviewPopover: function(html) {
+    var $preview = $(this.PREVIEW_SELECTOR);
+    if ($preview.length === 0) {
+      $preview = $("<div>", {
+        id: "stylebot-preview"
+      });
+
+      $("body").append($preview);
+    }
+
+    $preview.html(html)
+    .css('left', $(window).width() / 2 - $preview.width() / 2)
+    .css('top', $(window).height() - $preview.height() - 100)
+    .show();
+  },
+
+  /**
+    * Hide the preview popover
+    * @param {Boolean} shouldFadeOut If the popover should fade out
+    */
+  hidePreviewPopover: function(shouldFadeOut) {
+    var $preview = $(this.PREVIEW_SELECTOR);
+    if (shouldFadeOut) {
+      setTimeout($.proxy(function() {
+        $preview.fadeOut(1000);
+      }, this), this.PREVIEW_FADE_OUT_DELAY);
+    } else {
+      $preview.hide();
+    }
   },
 
   /**
@@ -651,7 +687,7 @@ stylebot.style = {
     }
 
     self.rules = newRules;
-    stylebot.style.resetInlineCSS();
+    self.resetInlineCSS();
     self.updateStyleElement(self.rules);
     self.save();
   }
