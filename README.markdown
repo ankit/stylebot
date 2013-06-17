@@ -12,13 +12,14 @@ Using Stylebot, users are able to:
 
 * Chrome Webstore: <https://chrome.google.com/extensions/detail/oiaejidbmkiecgbjeifoejpgmdaleoha>
 * About: <http://stylebot.me/about>
+* Changelog: <http://stylebot.me/changelog>
 * Donate on Pledgie: [http://pledgie.com/campaigns/14409](http://pledgie.com/campaigns/14409)
 * Issues and feature requests: <https://github.com/ankit/stylebot/issues>
 
 ###About
 
-This project began as a Google Summer of Code 2010 project, where I was mentored by Rachel Shearer. 
-I have since continued to maintain it and build new features. 
+This project began as a Google Summer of Code 2010 project, where I was mentored by Rachel Shearer.
+I have since continued to maintain it and build new features.
 Along the way, few people have contributed new features and bugfixes.
 
 ###License
