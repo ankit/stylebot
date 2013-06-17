@@ -1,17 +1,17 @@
 // Extending the String object with utility functions
 
 /**
-  * Trims a string
-  * @return {String} The trimmed string.
-  */
+ * Trims a string
+ * @return {String} The trimmed string.
+ */
 String.prototype.trim = function() {
   return this.replace(/^\s+|\s+$/g, '');
 };
 
 /**
-  * Checks if a given string is a pattern
-  * @return {Boolean} True if the string is a pattern, false otherwise.
-  */
+ * Checks if a given string is a pattern
+ * @return {Boolean} True if the string is a pattern, false otherwise.
+ */
 String.prototype.isPattern = function() {
   // Currently, the only indicator that a string is a pattern is if
   // it has the wildcard character *
@@ -30,10 +30,10 @@ String.prototype.isRegex = function() {
 };
 
 /**
-  * Checks if the string matches an stylebot pattern
-  * @param {String} pattern The stylebot pattern.
-  * @return {Boolean} True if the string matches the patern, false otherwise.
-  */
+ * Checks if the string matches an stylebot pattern
+ * @param {String} pattern The stylebot pattern.
+ * @return {Boolean} True if the string matches the patern, false otherwise.
+ */
 String.prototype.matchesPattern = function(pattern) {
   if (pattern.isRegex()) {
     return new RegExp(pattern).test(this);
@@ -79,10 +79,10 @@ String.prototype.matchesPattern = function(pattern) {
 };
 
 /**
-  * Checks if the given url matches with the basic pattern.
-  * @param {String} pattern The stylebot pattern.
-  * @return {Boolean} True if the string matches the patern, false otherwise.
-  */
+ * Checks if the given url matches with the basic pattern.
+ * @param {String} pattern The stylebot pattern.
+ * @return {Boolean} True if the string matches the patern, false otherwise.
+ */
 String.prototype.matchesBasic = function(pattern) {
   var isFound = false;
   var subUrls = pattern.split(',');
@@ -98,9 +98,9 @@ String.prototype.matchesBasic = function(pattern) {
 };
 
 /**
-  * Check if Stylebot should run on a URL.
-  * @return {Boolean} True if Stylebot can run on the URL
-  */
+ * Check if Stylebot should run on a URL.
+ * @return {Boolean} True if Stylebot can run on the URL
+ */
 String.prototype.isValidUrl = function() {
   var inBlacklist = function(url) {
     var blacklist = [
@@ -124,9 +124,9 @@ String.prototype.isValidUrl = function() {
 };
 
 /**
-  * Checks the extension of the URL to determine if it is valid HTML
-  * @return {Boolean} True if the string does not have an extension json/pdf.
-  */
+ * Checks the extension of the URL to determine if it is valid HTML
+ * @return {Boolean} True if the string does not have an extension json/pdf.
+ */
 String.prototype.isOfHTMLType = function() {
   var nonHTMLExt = ['json', 'pdf', 'xml'];
   if (nonHTMLExt.indexOf(this.getExtension()) != -1) {
@@ -137,16 +137,16 @@ String.prototype.isOfHTMLType = function() {
 };
 
 /**
-  * Returns the extension of the given filename / URL.
-  * @return {String} The extension.
-  */
+ * Returns the extension of the given filename / URL.
+ * @return {String} The extension.
+ */
 String.prototype.getExtension = function() {
   return this.split('.').pop();
 };
 
 /**
-  * Copies the string to the clipboard
-  */
+ * Copies the string to the clipboard
+ */
 String.prototype.copyToClipboard = function() {
   var copyTextarea = document.createElement('textarea');
   document.body.appendChild(copyTextarea);

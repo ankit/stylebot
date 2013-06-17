@@ -1,11 +1,9 @@
 /**
-  * Events
-  *
-  * Event handlers for Stylebot editor Basic mode controls
-  *
-  * todo: Move this under stylebot.widget.basic or
-  *   atleast a more descriptive name
-  **/
+ * Events
+ *
+ * Event handlers for Stylebot editor Basic mode controls
+ *
+ */
 Events = {
   ACCORDION_SAVE_TIMEOUT: 500,
   GOOGLE_FONT_API: "http://fonts.googleapis.com/css?family=",

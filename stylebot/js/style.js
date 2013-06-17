@@ -1,9 +1,8 @@
 /**
-* stylebot.style
-*
-* Generating, applying and saving CSS styling rules
-**/
-
+ * stylebot.style
+ *
+ * Generating, applying and saving CSS styling rules
+ */
 stylebot.style = {
   AT_RULE_PREFIX: "at",
   CSS_SELECTOR: "#stylebot-css",
@@ -38,8 +37,8 @@ stylebot.style = {
   },
 
   /**
-    * Initialize rules and url from temporary variables in apply-css.js
-    */
+   * Initialize rules and url from temporary variables in apply-css.js
+   */
   initialize: function() {
     if (stylebotTempUrl) {
       this.cache.url = stylebotTempUrl;
@@ -67,9 +66,9 @@ stylebot.style = {
   },
 
   /**
-    * Update cache with selector and selected elements
-    * @param {string} selector CSS selector to update cache
-    */
+   * Update cache with selector and selected elements
+   * @param {string} selector CSS selector to update cache
+   */
   fillCache: function(selector) {
     if (selector != this.cache.selector) {
       this.cache.selector = selector;
@@ -83,11 +82,11 @@ stylebot.style = {
   },
 
   /**
-    * Applies and saves CSS style to selected elements as inline css.
-    *   Used by Basic Mode.
-    * @param {string} property CSS property
-    * @param {string} value Value for CSS property
-    */
+   * Applies and saves CSS style to selected elements as inline css.
+   *   Used by Basic Mode.
+   * @param {string} property CSS property
+   * @param {string} value Value for CSS property
+   */
   apply: function(property, value) {
     if (!this.cache.selector || this.cache.selector == '') {
       return true;
@@ -106,10 +105,11 @@ stylebot.style = {
     }, 0);
   },
 
-  /** Applies and saves CSS to selected elements as inline css.
-    *   Used by Advanced Mode.
-    * @param {string} css CSS string to apply
-    */
+  /**
+   * Applies and saves CSS to selected elements as inline css.
+   *   Used by Advanced Mode.
+   * @param {string} css CSS string to apply
+   */
   applyCSS: function(css) {
     if (!stylebot.style.cache.selector) return true;
 
@@ -163,12 +163,12 @@ stylebot.style = {
   },
 
   /**
-    * Update CSS for the entire page. Used by Page Editing Mode
-    * @param {string} css CSS string
-    * @param {boolean} save Should CSS be saved
-    * @param {Object} data Any additional data that should be sent
-    *   along with the save request.
-    */
+   * Update CSS for the entire page. Used by Page Editing Mode
+   * @param {string} css CSS string
+   * @param {boolean} save Should CSS be saved
+   * @param {Object} data Any additional data that should be sent
+   *   along with the save request.
+   */
   applyPageCSS: function(css, shouldSave, data) {
     if (shouldSave === undefined) { shouldSave = true; }
 
@@ -199,11 +199,11 @@ stylebot.style = {
   },
 
   /**
-    * Parses CSS string into a rule and then saves the rule
-    *   for the specified selector
-    * @param {string} css CSS String
-    * @param {string} selector CSS selector
-    */
+   * Parses CSS string into a rule and then saves the rule
+   *   for the specified selector
+   * @param {string} css CSS String
+   * @param {string} selector CSS selector
+   */
   saveRuleFromCSS: function(css, selector) {
     if (!selector) return true;
     // empty rule for selector
@@ -221,11 +221,11 @@ stylebot.style = {
   },
 
   /**
-    * Add rule to cache
-    * @param {string} selector CSS selector
-    * @param {property} property CSS property
-    * @param {value} value Value for property
-    */
+   * Add rule to cache
+   * @param {string} selector CSS selector
+   * @param {property} property CSS property
+   * @param {value} value Value for property
+   */
   savePropertyToCache: function(selector, property, value) {
     // check if the selector already exists in the list
     var rule = this.rules[selector];
@@ -255,10 +255,10 @@ stylebot.style = {
   },
 
   /**
-    * Checks to see if a rule is valid i.e. value is not empty
-    * @param {string} property CSS property
-    * @param {string} value Value for property
-    */
+   * Checks to see if a rule is valid i.e. value is not empty
+   * @param {string} property CSS property
+   * @param {string} value Value for property
+   */
   filter: function(property, value) {
     if (value === '')
       return false;
@@ -266,9 +266,9 @@ stylebot.style = {
   },
 
   /**
-    * Generate inline CSS for selector from saved rules
-    * @param {string} selector CSS Selector
-    */
+   * Generate inline CSS for selector from saved rules
+   * @param {string} selector CSS Selector
+   */
   getInlineCSS: function(selector) {
     var rule = this.rules[selector];
 
@@ -284,10 +284,10 @@ stylebot.style = {
   },
 
   /**
-    * Apply inline CSS to specified eleement(s)
-    * @param {element} el Element to apply CSS to
-    * @param {string} newCustomCSS CSS to apply
-    */
+   * Apply inline CSS to specified eleement(s)
+   * @param {element} el Element to apply CSS to
+   * @param {string} newCustomCSS CSS to apply
+   */
   updateInlineCSS: function(el, newCustomCSS) {
     if (!el || el.length == 0) return false;
 
@@ -333,9 +333,9 @@ stylebot.style = {
   },
 
   /**
-    * Remove any inline CSS for specified element(s)
-    * @param {element} el jQuery object of elements
-    */
+   * Remove any inline CSS for specified element(s)
+   * @param {element} el jQuery object of elements
+   */
   clearInlineCSS: function(el) {
     if (!el) return false;
 
@@ -355,8 +355,8 @@ stylebot.style = {
   },
 
   /**
-    * Remove inline CSS for all elements
-    */
+   * Remove inline CSS for all elements
+   */
   resetInlineCSS: function() {
     for (var selector in stylebot.style.rules) {
       stylebot.style.clearInlineCSS($(selector));
@@ -364,9 +364,9 @@ stylebot.style = {
   },
 
   /**
-    * Remove rule for cached CSS selector from <style> element
-    *   and apply it as inline css
-    */
+   * Remove rule for cached CSS selector from <style> element
+   *   and apply it as inline css
+   */
   removeFromStyleElement: function() {
     // if no elements are selected, return
     if (!this.cache.elements || this.cache.elements.length == 0) return;
@@ -384,9 +384,9 @@ stylebot.style = {
   },
 
   /**
-    * Update CSS in <style> element from the specified rules
-    * @param {array} rules The style rules
-    */
+   * Update CSS in <style> element from the specified rules
+   * @param {array} rules The style rules
+   */
   updateStyleElement: function(rules) {
     if (!this.cache.styleEl) {
       this.cache.styleEl = $(this.CSS_SELECTOR);
@@ -403,9 +403,9 @@ stylebot.style = {
   },
 
   /**
-    * Get the rule for the specified CSS selector
-    * @param {string} selector CSS selector for which to get the rule
-    */
+   * Get the rule for the specified CSS selector
+   * @param {string} selector CSS selector for which to get the rule
+   */
   getRule: function(selector) {
     var rule = this.rules[selector];
     if (rule != undefined)
@@ -415,9 +415,9 @@ stylebot.style = {
   },
 
   /**
-    * Remove any existing custom CSS for current selector from the rules cache
-    * and the selected elements' inline css
-    */
+   * Remove any existing custom CSS for current selector from the rules cache
+   * and the selected elements' inline css
+   */
   resetSelectedElementCSS: function() {
     if (this.rules[this.cache.selector])
       delete this.rules[this.cache.selector];
@@ -432,8 +432,8 @@ stylebot.style = {
   },
 
   /**
-    * Remove all the CSS for page from cache, <style> element and inline CSS.
-    */
+   * Remove all the CSS for page from cache, <style> element and inline CSS.
+   */
   resetAllCSS: function(showPopover) {
     if (showPopover) {
       this.showPreviewPopover("Reset custom CSS for the page");
@@ -457,9 +457,9 @@ stylebot.style = {
   },
 
   /**
-    * Send request to background.html to save all the cached rules
-    * @param {Object} data Any additional metadata to save along with the rules
-    */
+   * Send request to background.html to save all the cached rules
+   * @param {Object} data Any additional metadata to save along with the rules
+   */
   save: function(data) {
     // if no rules are present, send null as value
     var rules = null;
@@ -477,9 +477,9 @@ stylebot.style = {
   },
 
   /**
-    * Clears all the inline CSS and updates the <style> element
-    * Called when stylebot is closed.
-    */
+   * Clears all the inline CSS and updates the <style> element
+   * Called when stylebot is closed.
+   */
   cleanUp: function() {
     stylebot.style.cache.selector = null;
     stylebot.style.cache.elements = null;
@@ -492,8 +492,8 @@ stylebot.style = {
   },
 
   /**
-    * Undo last style applied
-    */
+   * Undo last style applied
+   */
   undo: function() {
     var self = this;
     if (stylebot.undo.isEmpty())
@@ -513,8 +513,8 @@ stylebot.style = {
   },
 
   /**
-    * Disable styling
-    */
+   * Disable styling
+   */
   disable: function() {
     this.status = false;
     $(this.CSS_SELECTOR).html('');
@@ -522,8 +522,8 @@ stylebot.style = {
   },
 
   /**
-    * Enable styling
-    */
+   * Enable styling
+   */
   enable: function() {
     if (this.status)
       return;
@@ -541,8 +541,8 @@ stylebot.style = {
   },
 
   /**
-    * Toggle styling
-    */
+   * Toggle styling
+   */
   toggle: function() {
     // If stylebot is open, don't allow user to disable styling on the page.
     if (stylebot.status) {
@@ -556,23 +556,23 @@ stylebot.style = {
   },
 
   /**
-    * Preview the page after removing any style rules
-    */
+   * Preview the page after removing any style rules
+   */
   previewReset: function() {
     this.showPreviewPopover("Reset Preview");
     this.applyPageCSS("", false);
   },
 
   /**
-    * Preview the specified style by applying its CSS to the page.
-    * @param {String} title The title of style.
-    * @param {String} desc Description for the style.
-    * @param {String} author The author of the style.
-    * @param {String} timeAgo Relative time string when the style was authored.
-    * @param {Integer} favCount Number of times the style has been favorited
-    *   on Stylebot Social.
-    * @param {String} css The css for the style.
-    */
+   * Preview the specified style by applying its CSS to the page.
+   * @param {String} title The title of style.
+   * @param {String} desc Description for the style.
+   * @param {String} author The author of the style.
+   * @param {String} timeAgo Relative time string when the style was authored.
+   * @param {Integer} favCount Number of times the style has been favorited
+   *   on Stylebot Social.
+   * @param {String} css The css for the style.
+   */
   preview: function(title, desc, author, timeAgo, favCount, css) {
     if (desc) {
       desc = desc.replace(/\n/g, '<br />');
@@ -587,9 +587,9 @@ stylebot.style = {
   },
 
   /**
-    * Reset the preview of any style and reset to the specifed CSS.
-    * @param {String} css The CSS to apply to the page.
-    */
+   * Reset the preview of any style and reset to the specifed CSS.
+   * @param {String} css The CSS to apply to the page.
+   */
   resetPreview: function(css) {
     CSSUtils.crunchCSS(this.rules, true, true, $.proxy(function(css) {
       $(this.CSS_SELECTOR).html(css);
@@ -599,12 +599,12 @@ stylebot.style = {
   },
 
   /**
-    * Install the specified style for the current URL
-    * @param {Number} id The id of the style
-    * @param {String} title The title describing the style
-    * @param {String} css The css for the style
-    * @param {String} timestamp The timestamp when the style was last updated
-    */
+   * Install the specified style for the current URL
+   * @param {Number} id The id of the style
+   * @param {String} title The title describing the style
+   * @param {String} css The css for the style
+   * @param {String} timestamp The timestamp when the style was last updated
+   */
   install: function(id, title, css, timestamp) {
     this.showPreviewPopover("Installed " + title);
     this.hidePreviewPopover(true);
@@ -618,9 +618,9 @@ stylebot.style = {
   },
 
   /**
-    * Show the preview popover
-    * @param {String} html The content to display inside the popover
-    */
+   * Show the preview popover
+   * @param {String} html The content to display inside the popover
+   */
   showPreviewPopover: function(html) {
     var $preview = $(this.PREVIEW_SELECTOR);
     if ($preview.length === 0) {
@@ -638,9 +638,9 @@ stylebot.style = {
   },
 
   /**
-    * Hide the preview popover
-    * @param {Boolean} shouldFadeOut If the popover should fade out
-    */
+   * Hide the preview popover
+   * @param {Boolean} shouldFadeOut If the popover should fade out
+   */
   hidePreviewPopover: function(shouldFadeOut) {
     var $preview = $(this.PREVIEW_SELECTOR);
     if (shouldFadeOut) {
@@ -653,11 +653,11 @@ stylebot.style = {
   },
 
   /**
-    * Prepend an @import rule for a web-based font to the current
-    * style and save the style.
-    * @param {String} url The URL of the font.
-    * @param {String} css the @font-face css for the font.
-    */
+   * Prepend an @import rule for a web-based font to the current
+   * style and save the style.
+   * @param {String} url The URL of the font.
+   * @param {String} css the @font-face css for the font.
+   */
   prependWebFont: function(url, css) {
     var self = this;
 

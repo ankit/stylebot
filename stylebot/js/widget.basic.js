@@ -1,9 +1,8 @@
 /**
-* stylebot.widget.basic
-*
-* Manages the UI for the Basic mode in Stylebot editor
-**/
-
+ * stylebot.widget.basic
+ *
+ * Manages the UI for the Basic mode in Stylebot editor
+ */
 stylebot.widget.basic = {
   isColorPickerVisible: false,
   accordions: [0, 1, 2, 3],

@@ -8,22 +8,22 @@
   **/
 
 /**
-  * Generator of CSS selectors for an element
-  * @constructor
-  * @param {String} [level] Specificity level at which to generate CSS selector. 
+ * Generator of CSS selectors for an element
+ * @constructor
+ * @param {String} [level] Specificity level at which to generate CSS selector.
       Valid values are low, high and medium. Default is medium
-  */
+ */
 var SelectorGenerator = function(level) {
   this.specificityLevel = level ? level : 'medium';
 
   var self = this;
 
   /**
-    * Generate CSS selector for element
-    * @public
-    * @param {element} el Element
-    * @return {string} CSS selector
-    */
+   * Generate CSS selector for element
+   * @public
+   * @param {element} el Element
+   * @return {string} CSS selector
+   */
   this.generate = function(el) {
     if (!el)
       return null;
@@ -39,13 +39,13 @@ var SelectorGenerator = function(level) {
   };
 
   /**
-    * If element has class(es), returns them as the CSS selector. Else, looks for ID.
-    *   Else, traverses upto 2 levels up
-    * @private
-    * @param {element} el Element to inspect
-    * @param {number} DOM Traversal Level. Root is at 0
-    * @return {string} CSS Selector
-    */
+   * If element has class(es), returns them as the CSS selector.
+   *    Else, looks for ID. Else, traverses upto 2 levels up
+   * @private
+   * @param {element} el Element to inspect
+   * @param {number} DOM Traversal Level. Root is at 0
+   * @return {string} CSS Selector
+   */
   var inspect = function(el, level) {
     var elClass = el.attr('class');
 
@@ -81,13 +81,13 @@ var SelectorGenerator = function(level) {
   };
 
   /**
-    * If element has an ID, returns #ID.
-    *   Else, checks for classname and traverses upto 1 level up
-    * @private
-    * @param {element} el Element to inspect
-    * @param {number} DOM Traversal Level. Root is at 0
-    * @return {string} CSS Selector
-    */
+   * If element has an ID, returns #ID.
+   *    Else, checks for classname and traverses upto 1 level up
+   * @private
+   * @param {element} el Element to inspect
+   * @param {number} DOM Traversal Level. Root is at 0
+   * @return {string} CSS Selector
+   */
   var inspectAtHighSpecificity = function(el, level) {
     var elId = el.attr('id');
 
@@ -122,11 +122,11 @@ var SelectorGenerator = function(level) {
   };
 
   /**
-    * Returns element's tagName as CSS selector (Low Specificity Level)
-    * @private
-    * @param {element} el Element to inspect
-    * @return {string} CSS Selector
-    */
+   * Returns element's tagName as CSS selector (Low Specificity Level)
+   * @private
+   * @param {element} el Element to inspect
+   * @return {string} CSS Selector
+   */
   var inspectAtLowSpecificity = function(el) {
     var elTag = el.prop('tagName');
     return elTag ? elTag.toLowerCase() : '';

@@ -1,7 +1,6 @@
 /**
-  * Installation of styles from Stylebot Social
-  */
-
+ * Installation of styles from Stylebot Social
+ */
 stylebot.installation = {
   selectors: {
     style   : '.style',

@@ -1,6 +1,6 @@
 /**
-  * Generates formatted css text from stylebot rules.
-  */
+ * Generates formatted css text from stylebot rules.
+ */
 function cssFormatter(setImportant, compactCSS) {
   // keep in sync with JSCSSPImporter
   // todo: move to a common object

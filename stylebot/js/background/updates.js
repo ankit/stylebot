@@ -4,9 +4,9 @@
 var VERSION = '1.7.3.4';
 
 /**
-  * Updates the version of extension.
-  * Updates the data model if required.
-  */
+ * Updates the version of extension.
+ * Updates the data model if required.
+ */
 function updateVersion(callback) {
   chrome.storage.local.get(['version'], function(storage) {
     if (storage['version'] != VERSION) {
@@ -17,8 +17,8 @@ function updateVersion(callback) {
 }
 
 /**
-  * Show notification for version update
-  */
+ * Show notification for version update
+ */
 function showUpdateNotification() {
   var notification = webkitNotifications.createHTMLNotification(
     'notification.html'

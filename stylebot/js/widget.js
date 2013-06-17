@@ -1,9 +1,8 @@
 /**
-* stylebot.widget
-*
-* Stylebot editor UI and event handling
-**/
-
+ * stylebot.widget
+ *
+ * Stylebot editor UI and event handling
+ */
 stylebot.widget = {
   cache: {
     box: null,
@@ -20,7 +19,9 @@ stylebot.widget = {
 
   isBeingDragged: false,
 
-  //  Initialize widget UI
+  /**
+   * Initialize widget UI
+   */
   create: function() {
     var self = stylebot.widget;
 
@@ -209,7 +210,9 @@ stylebot.widget = {
     self.setPosition('Right');
   },
 
-  //  Attach listeners for TAB keypresses and window resize
+  /**
+   * Attach listeners for TAB keypresses and window resize
+   */
   attachListeners: function() {
     var lastBt = $('#stylebot-main-buttons').find('button').last();
 
@@ -241,8 +244,11 @@ stylebot.widget = {
     $(window).unbind('resize', this.onWindowResize);
   },
 
-  //  Called on when the window is resized. Updates height of widget and selection UI
-  //  @param e Event  Event object for when the window is resized
+  /**
+   * Called on when the window is resized. Updates height of widget and
+   *    selection UI
+   * @param e Event  Event object for when the window is resized
+   */
   onWindowResize: function(e) {
     stylebot.widget.setPosition(stylebot.options.position);
     stylebot.widget.updateHeight();
@@ -251,7 +257,9 @@ stylebot.widget = {
       stylebot.selectionBox.highlight(stylebot.selectedElement);
   },
 
-  //  Open the stylebot widget
+  /**
+   * Open the stylebot widget
+   */
   open: function() {
     if (!this.cache.box) {
       this.create();
@@ -281,27 +289,35 @@ stylebot.widget = {
     }, this), 0);
   },
 
-  //  Close stylebot widget
+  /**
+   * Close stylebot widget
+   */
   close: function() {
     this.detachListeners();
     this.cache.box.hide();
   },
 
-  //  Enable UI of widget
+  /**
+   * Enable UI of widget
+   */
   enable: function() {
     this.setSelector(stylebot.style.cache.selector);
     this.basic.enable();
     this.advanced.enable();
   },
 
-  //  Disable UI of widget
+  /**
+   * Disable UI of widget
+   */
   disable: function() {
     this.setSelector('Select an element');
     this.basic.disable();
     this.advanced.disable();
   },
 
-  //  Update widget position
+  /**
+   * Update widget position
+   */
   setPosition: function(where) {
     var left;
     if (where === 'Left')
@@ -313,7 +329,9 @@ stylebot.widget = {
     stylebot.options.position = where;
   },
 
-  //  Refresh height of widget
+  /**
+   * Refresh height of widget
+   */
   updateHeight: function() {
     var self = stylebot.widget;
     var windowHeight = $(window).height();
@@ -331,7 +349,9 @@ stylebot.widget = {
       self.basic.resize(newHeight);
   },
 
-  //  Refresh widget UI based on the current mode of stylebot
+  /**
+   * Refresh widget UI based on the current mode of stylebot
+   */
   setMode: function() {
     var ui = WidgetUI;
     ui.deselectButton($('.stylebot-mode'));
@@ -347,12 +367,16 @@ stylebot.widget = {
     }
   },
 
-  //  Save styles
-  save: function(e) {
+  /**
+   * Save styles
+   */
+  save: function() {
     stylebot.style.save();
   },
 
-  //  Reset the UI of the widget
+  /**
+   * Reset the UI of the widget
+   */
   reset: function() {
     if (stylebot.options.mode === 'Advanced')
       stylebot.widget.advanced.reset();
@@ -360,27 +384,36 @@ stylebot.widget = {
       stylebot.widget.basic.reset();
   },
 
-  //  Display the page's CSS in a popup for editing
+  /**
+   * Display the page's CSS in a popup for editing
+   */
   editCSS: function(e) {
-    CSSUtils.crunchFormattedCSS(stylebot.style.rules, false, false, function(css) {
-      stylebot.page.show(css, e ? e.target : null);
-    });
+    CSSUtils.crunchFormattedCSS(stylebot.style.rules, false, false,
+      function(css) {
+        stylebot.page.show(css, e ? e.target : null);
+      });
   },
 
-  //  Reset CSS for current selector
+  /**
+   * Reset CSS for current selector
+   */
   resetSelectedElements: function() {
     stylebot.widget.reset();
     stylebot.style.resetSelectedElementCSS();
   },
 
-  //  Reset the entire CSS for the page
+  /**
+   * Reset the entire CSS for the page
+   */
   resetPage: function() {
     stylebot.widget.reset();
     stylebot.style.resetAllCSS();
   },
 
-  //  Toggle stylebot position between left / right
-  //  @param Event e The event object for when the left/right arrow button is clicked
+  /**
+   * Toggle stylebot position between left / right
+   * @param Event e The event object for when the arrow button is clicked
+   */
   togglePosition: function(e) {
     var $el = $('#stylebot-arrow-button');
     var pos;
@@ -406,8 +439,11 @@ stylebot.widget = {
     stylebot.widget.setPosition(pos);
   },
 
-  //  Toggle between Basic / Advanced modes
-  //  @param e Event Event object for when the Basic/Advanced mode buttons are clicked. Optional
+  /**
+   * Toggle between Basic / Advanced modes
+   * @param e Event Event object for when the Basic/Advanced mode
+   *    buttons are clicked. Optional
+   */
   toggleMode: function(e) {
     if (e)
       stylebot.options.mode = $(e.target).html();
@@ -420,7 +456,9 @@ stylebot.widget = {
     stylebot.widget.setMode();
   },
 
-  //  Initialize and toggle the visibility of the selectors dropdown
+  /**
+   * Initialize and toggle the visibility of the selectors dropdown
+   */
   showSelectorDropdown: function() {
     var dropdown = $('#stylebot-dropdown');
     if (dropdown.length != 0) {
@@ -504,7 +542,10 @@ stylebot.widget = {
     $(document).bind('mousedown keydown', onClickElsewhere);
   },
 
-  //  Select the next selector in the selectors dropdown list. Called when down arrow key is pressed
+  /**
+   * Select the next selector in the selectors dropdown list.
+   *    Called when down arrow key is pressed
+   */
   selectNextDropdownOption: function() {
     var $li = $('.stylebot-dropdown-li');
 
@@ -535,7 +576,10 @@ stylebot.widget = {
     }
   },
 
-  //  Select the previous selector in the selectors dropdown list. Called when up arrow key is pressed
+  /**
+   * Select the previous selector in the selectors dropdown list.
+   *    Called when up arrow key is pressed
+   */
   selectPreviousDropdownOption: function() {
     var $li = $('.stylebot-dropdown-li');
     if ($li.length === 0)

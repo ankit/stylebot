@@ -1,16 +1,15 @@
 /**
-  * Load options and initialize Stylebot
-  *
-  **/
+ * Load options and initialize Stylebot
+ */
 $(document).ready(function() {
   stylebot.chrome.fetchOptions();
 });
 
 /**
-  * Callback for request sent to background.html in
-  *   stylebot.chrome.fetchOptions()
-  * @param {object} response Response containing options
-  */
+ * Callback for request sent to background.html in
+ *   stylebot.chrome.fetchOptions()
+ * @param {object} response Response containing options
+ */
 function initialize(response) {
   // init accordion state
   stylebot.widget.basic.accordions = response.options.accordions;
@@ -19,8 +18,8 @@ function initialize(response) {
 }
 
 /**
-  * Attach event handlers for launching / closing Stylebot editor
-  */
+ * Attach event handlers for launching / closing Stylebot editor
+ */
 function attachListeners() {
   document.addEventListener('keydown', function(e) {
     if (isInputField(e.target))
@@ -47,9 +46,9 @@ function attachListeners() {
 }
 
 /**
-  * Utility method to check if the currently focused element
-  *   can take user input
-  */
+ * Utility method to check if the currently focused element
+ *   can take user input
+ */
 function isInputField(el) {
   var tagName = el.tagName.toLowerCase();
   var inputTypes = ['input', 'textarea', 'div', 'object'];

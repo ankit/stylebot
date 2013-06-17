@@ -1,9 +1,8 @@
 /**
-* stylebot.page
-*
-* Manages the UI for the Page mode (Edit CSS) in Stylebot editor
-**/
-
+ * stylebot.page
+ *
+ * Manages the UI for the Page mode (Edit CSS) in Stylebot editor
+ */
 stylebot.page = {
   RIGHT_PADDING: 15,
   BOTTOM_EDITOR_PADDING: 102,

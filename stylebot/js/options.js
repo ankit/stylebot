@@ -1,6 +1,6 @@
 /**
-  * Stylebot options page
-  */
+ * Stylebot options page
+ */
 var Options = {};
 
 $(document).ready(function() {
@@ -126,8 +126,8 @@ function translateOptionValue(name, value) {
 }
 
 /**
-  * Toggle display of css icon in omnibar.
-  */
+ * Toggle display of css icon in omnibar.
+ */
 function togglePageAction() {
   showPageAction = backgroundPage.getOption('showPageAction');
   if (!showPageAction) {

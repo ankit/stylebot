@@ -1,24 +1,24 @@
 /**
-  * stylebot.contextmenu
-  *
-  * Handles actions triggered from the right click context menu
-  */
+ * stylebot.contextmenu
+ *
+ * Handles actions triggered from the right click context menu
+ */
 stylebot.contextmenu = {
   cache: {
     el: null
   },
 
   /**
-    * Initialize context menu for a page
-    */
+   * Initialize context menu for a page
+   */
   initialize: function() {
     this.attachListeners();
   },
 
   /**
-    * Attach the listener to save the right-clicked element in cache
-    *   when the context menu is opened
-    */
+   * Attach the listener to save the right-clicked element in cache
+   *   when the context menu is opened
+   */
   attachListeners: function() {
     $(document.body).bind('contextmenu', function(e) {
       stylebot.contextmenu.cache.el = e.target;
@@ -26,8 +26,8 @@ stylebot.contextmenu = {
   },
 
   /**
-    * Open the stylebot editor
-    */
+   * Open the stylebot editor
+   */
   openWidget: function() {
     if (stylebot.contextmenu.cache.el
       && stylebot.contextmenu.cache.el.nodeType == 1) {
@@ -37,15 +37,15 @@ stylebot.contextmenu = {
   },
 
   /**
-    * Search Stylebot Social for styles for the current page's domain
-    */
+   * Search Stylebot Social for styles for the current page's domain
+   */
   searchSocial: function() {
     window.open('http://stylebot.me/search?q=' + document.domain);
   },
 
   /**
-    * Share the styles for the current page on Stylebot Social
-    */
+   * Share the styles for the current page on Stylebot Social
+   */
   shareOnSocial: function(screenshot) {
     if (stylebot.style.rules) {
       var url = 'http://stylebot.me/post';

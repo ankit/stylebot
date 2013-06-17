@@ -1,10 +1,9 @@
 /**
-* General JavaScript utility methods used in stylebot
-*
-* Copyright (c) 2010 Ankit Ahuja
-* Dual licensed under GPL and MIT licenses.
-**/
-
+ * General JavaScript utility methods used in stylebot
+ *
+ * Copyright (c) 2010 Ankit Ahuja
+ * Dual licensed under GPL and MIT licenses.
+ */
 var Utils = {
   // return array index at which property pName is equal to value 'pValue'
   search: function(arr, pName, pValue) {
@@ -58,13 +57,13 @@ var Utils = {
   },
 
   /**
-  *  Make text editable in place. Replaces text with textarea for editing.
-  *     Requires Utils.editElement and Utils.endEditing
-  *  @param {element} el Element which contains the text.
-  *  @param {function} callback Function to be called when user finishes editing.
-  *  @param {object} options Options for edit in place field.
-  *  @return {boolean}
-  */
+   * Make text editable in place. Replaces text with textarea for editing.
+   *    Requires Utils.editElement and Utils.endEditing
+   * @param {element} el Element which contains the text.
+   * @param {function} callback Function to be called when user finishes editing.
+   * @param {object} options Options for edit in place field.
+   * @return {boolean}
+   */
   makeEditable: function($el, callback, options) {
     var editFieldClass = 'editing-field';
 
@@ -269,7 +268,8 @@ var Utils = {
   // functions for ace
   ace: {
     monkeyPatch: function(editor) {
-      // monkey-patch the editor to add the disable function, sets it to readOnly, hides the cursor and line marker
+      // monkey-patch the editor to add the disable function,
+      // sets it to readOnly, hides the cursor and line marker
       editor.disabledProp = false;
       editor.setDisabled = function(readOnly) {
         this.renderer.$cursorLayer.element.style.display = readOnly ? 'none' : '';
@@ -287,7 +287,8 @@ var Utils = {
       var scrollbarWidth = editor.renderer.scrollBar.getWidth();
       editor.previousScrollbarWidth = scrollbarWidth;
       editor.renderer.scrollBar.getWidth = function() {
-        // ideally, we should figure out a way to detect the "-3", I think it's related to the editor's border width
+        // ideally, we should figure out a way to detect the "-3",
+        // I think it's related to the editor's border width
         // or may be to its padding, but I'm not really sure.
         return this.width > this.element.clientWidth ? scrollbarWidth + editor.renderer.$padding - 3 : 0;
       };

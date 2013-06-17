@@ -1,8 +1,7 @@
 /**
-  * This content script injects any custom style for the page (if it exists)
-  * as soon as the document starts loading.
- **/
-
+ * This content script injects any custom style for the page (if it exists)
+ * as soon as the document starts loading.
+ */
 // globals
 var APPLY_CSS_TIMEOUT = 300;
 var MAX_APPLY_CSS_COUNT = 10;

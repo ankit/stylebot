@@ -1,4 +1,3 @@
-
 Options.modal = {
   cached: null,
   errorMarker: null,

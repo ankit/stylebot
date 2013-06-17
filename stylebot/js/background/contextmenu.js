@@ -3,8 +3,8 @@ var ContextMenu = {
   ID: "stylebot",
 
   /**
-    * Initialize the menu
-    */
+   * Initialize the menu
+   */
   init: function() {
     ContextMenu.remove();
     if (cache.options.contextMenu) {
@@ -44,10 +44,10 @@ var ContextMenu = {
   },
 
   /**
-    * Update the right-click context menu for a tab
-    *   show or hide and update checkboxes.
-    * @param {object} tab Tab based on which the right-click menu is to be updated
-    */
+   * Update the right-click context menu for a tab
+   *   show or hide and update checkboxes.
+   * @param {object} tab Tab based on which the right-click menu is to be updated
+   */
   update: function(tab) {
     if (!tab) {
       return;
@@ -70,8 +70,8 @@ var ContextMenu = {
   },
 
   /**
-    * Remove the right click context menu
-    */
+   * Remove the right click context menu
+   */
   remove: function() {
     chrome.contextMenus.removeAll();
   }

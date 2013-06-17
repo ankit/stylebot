@@ -1,23 +1,23 @@
 /**
-  * Styles object used by background.js
-  * @constructor
-  * @param {Object} param JSON style object
-  * Example:
-  * styles = {
-      'google.com' : {.
-        _rules: {
-          'a': {
-            'color': 'red'
-          }
-        },
-        _social: {
-          id: 4,
-          timestamp: 123456 (UNIX based)
-        },
-        _enabled: true
-      }
+ * Styles object used by background.js
+ * @constructor
+ * @param {Object} param JSON style object
+ * Example:
+ * styles = {
+    'google.com' : {.
+      _rules: {
+        'a': {
+          'color': 'red'
+        }
+      },
+      _social: {
+        id: 4,
+        timestamp: 123456 (UNIX based)
+      },
+      _enabled: true
     }
-  */
+  }
+ */
 function Styles(param) {
   this.styles = param;
 
@@ -31,20 +31,20 @@ function Styles(param) {
 }
 
 /**
-  * Delete a style.
-  * @param {String} url The url of the style to delete.
-  */
+ * Delete a style.
+ * @param {String} url The url of the style to delete.
+ */
 Styles.prototype.delete = function(url) {
   delete this.styles[url];
   this.persist();
 };
 
 /**
-  * Return the style object associated with the given url.
-  *   If no url is given, return all the style objects.
-  * @param {String} url The URL of the requested object.
-  * @return {Object} The request style(s) object(s).
-  */
+ * Return the style object associated with the given url.
+ *   If no url is given, return all the style objects.
+ * @param {String} url The URL of the requested object.
+ * @return {Object} The request style(s) object(s).
+ */
 Styles.prototype.get = function(url) {
   if (url === undefined) {
     return this.styles;
@@ -67,10 +67,10 @@ Styles.prototype.persist = function() {
 }
 
 /**
-  * Create a new style for the specified URL
-  * @param {String} url URL of the new object.
-  * @param {Object} rules Rules for the given URL.
-  */
+ * Create a new style for the specified URL
+ * @param {String} url URL of the new object.
+ * @param {Object} rules Rules for the given URL.
+ */
 Styles.prototype.create = function(url, rules, data) {
   this.styles[url] = {};
   this.styles[url][this.ENABLED_PROPERTY] = true;
@@ -84,10 +84,10 @@ Styles.prototype.create = function(url, rules, data) {
 };
 
 /**
-  * Save the metadata for the given URL' style.
-  * @param {String} url URL of the saved object.
-  * @param {Object} data New metadata for the given URL.
-  */
+ * Save the metadata for the given URL' style.
+ * @param {String} url URL of the saved object.
+ * @param {Object} data New metadata for the given URL.
+ */
 Styles.prototype.setMetadata = function(url, data) {
   this.styles[url][this.SOCIAL_PROPERTY] = {};
   this.styles[url][this.SOCIAL_PROPERTY].id = data.id;
@@ -95,10 +95,10 @@ Styles.prototype.setMetadata = function(url, data) {
 };
 
 /**
-  * Retrieve the enabled status for the given URL.
-  * @param {String} url URL of the requested object.
-  * @return {Boolean} The enabled status for the given URL.
-  */
+ * Retrieve the enabled status for the given URL.
+ * @param {String} url URL of the requested object.
+ * @return {Boolean} The enabled status for the given URL.
+ */
 Styles.prototype.isEnabled = function(url) {
   if (this.styles[url] === undefined) {
     return false;
@@ -107,12 +107,12 @@ Styles.prototype.isEnabled = function(url) {
 };
 
 /**
-  * Save the given rules and metadata inside the style for the given URL.
-  *   If no rules are given, delete the given URL's style.
-  * @param {String} url URL of the saved object.
-  * @param {Object} rules rules New rules for the given URL.
-  * @param {Object} data New metadata for the given URL.
-  */
+ * Save the given rules and metadata inside the style for the given URL.
+ *   If no rules are given, delete the given URL's style.
+ * @param {String} url URL of the saved object.
+ * @param {Object} rules rules New rules for the given URL.
+ * @param {Object} data New metadata for the given URL.
+ */
 Styles.prototype.save = function(url, rules, data) {
   if (!url || url === '') {
     return;
@@ -126,11 +126,11 @@ Styles.prototype.save = function(url, rules, data) {
 };
 
 /**
-  * If no value is given, toggle the enabled status for the given URL.
-  *   Otherwise, set the enabled status for the given URL.
-  * @param {String} url URL of the saved object.
-  * @param {Object} value The enabled status for the given URL.
-  */
+ * If no value is given, toggle the enabled status for the given URL.
+ *   Otherwise, set the enabled status for the given URL.
+ * @param {String} url URL of the saved object.
+ * @param {Object} value The enabled status for the given URL.
+ */
 Styles.prototype.toggle = function(url, value, shouldSave) {
   if (this.isEmpty(url)) {
     return false;
@@ -150,10 +150,10 @@ Styles.prototype.toggle = function(url, value, shouldSave) {
 };
 
 /**
-  * If no value is given, toggle the enabled status for all the styles.
-  *   Otherwise, set the enabled status for all the styles.
-  * @param {Object} value The enabled status.
-  */
+ * If no value is given, toggle the enabled status for all the styles.
+ *   Otherwise, set the enabled status for all the styles.
+ * @param {Object} value The enabled status.
+ */
 Styles.prototype.toggleAll = function(value) {
   for (var url in this.styles) {
     this.toggle(url, value, false);
@@ -167,28 +167,28 @@ Styles.prototype.deleteAll = function() {
 };
 
 /**
-  * Check if the style for the given identifier exists.
-  * @param {String} url The style's identifier.
-  * @return {Boolean} True if the requested style exists.
-  */
+ * Check if the style for the given identifier exists.
+ * @param {String} url The style's identifier.
+ * @return {Boolean} True if the requested style exists.
+ */
 Styles.prototype.isEmpty = function(url) {
   return this.styles[url] === undefined || this.styles[url] == null;
 };
 
 /**
-  * Emptiy the rules for a style
-  * @param {String} url Identifier of the style to empty.
-  */
+ * Empty the rules for a style
+ * @param {String} url Identifier of the style to empty.
+ */
 Styles.prototype.emptyRules = function(url) {
   this.styles[url][this.RULES_PROPERTY] = null;
   this.persist();
 };
 
 /**
-  * Import a styles object i.e. replace the existing styles
-  *   object with the specified object
-  * @param {Object} newStyles Styles object to import.
-  */
+ * Import a styles object i.e. replace the existing styles
+ *   object with the specified object
+ * @param {Object} newStyles Styles object to import.
+ */
 Styles.prototype.import = function(newStyles) {
   for (var url in newStyles) {
     if (newStyles[url][this.RULES_PROPERTY]) {
@@ -204,51 +204,10 @@ Styles.prototype.import = function(newStyles) {
 };
 
 /**
-  * Upgrade the style object to match the specified version
-  * @param {String} version The version to upgrade to
-  */
-Styles.prototype.upgrade = function(version, callback) {
-  switch (version) {
-    case '1.7':
-      console.log('Upgrading data model for 1.7');
-
-      var initOptions = function() {
-        chrome.storage.local.set({'options': cache.options}, function() {
-          callback();
-        });
-      };
-
-      if (localStorage['stylebot_styles']) {
-          chrome.storage.local.set({'styles':
-          JSON.parse(localStorage['stylebot_styles'])}, function() {
-
-          for (var option in cache.options) {
-            var value = localStorage['stylebot_option_' + option];
-            if (value) {
-              if (value === 'true' || value === 'false') {
-                value = (value === 'true');
-              }
-              cache.options[option] = value;
-            } else {
-              value = cache.options[option];
-            }
-          }
-
-          initOptions();
-        });
-      } else {
-        initOptions();
-      }
-
-      break;
-  }
-};
-
-/**
-  * Retrieve social data for the specified url.
-  * @param {String} url The url for which to return the social data.
-  * @return {Object} The social data for the given URL, if it exists. Else, null.
-  */
+ * Retrieve social data for the specified url.
+ * @param {String} url The url for which to return the social data.
+ * @return {Object} The social data for the given URL, if it exists. Else, null.
+ */
 Styles.prototype.getSocialData = function(url) {
   if (this.styles[url] === undefined) {
     return null;
@@ -259,10 +218,10 @@ Styles.prototype.getSocialData = function(url) {
 };
 
 /**
-  * Retrieve style rules for the specified url.
-  * @param {String} url The url for which to return the rules.
-  * @return {Object} The style rules for the URL, if it exists. Else, null.
-  */
+ * Retrieve style rules for the specified url.
+ * @param {String} url The url for which to return the rules.
+ * @return {Object} The style rules for the URL, if it exists. Else, null.
+ */
 Styles.prototype.getRules = function(url) {
   if (this.styles[url] === undefined) {
     return null;
@@ -273,10 +232,10 @@ Styles.prototype.getRules = function(url) {
 };
 
 /**
-  * Check if a style exists for the URL.
-  * @param {String} aURL The URL to check.
-  * @return {Boolean} True if any rules are associated with the URL
-  */
+ * Check if a style exists for the URL.
+ * @param {String} aURL The URL to check.
+ * @return {Boolean} True if any rules are associated with the URL
+ */
 Styles.prototype.exists = function(aURL) {
   if (this.isEnabled(aURL) && aURL !== this.GLOBAL_URL) {
     return true;
@@ -286,10 +245,10 @@ Styles.prototype.exists = function(aURL) {
 };
 
 /**
-  * Retrieve all the CSS rules applicable to the URL, including global CSS rules.
-  * @param {String} aURL The URL to retrieve the rules for.
-  * @return {Object} rules: The rules. url: The identifier representing the URL.
-  */
+ * Retrieve all the CSS rules applicable to the URL, including global CSS rules.
+ * @param {String} aURL The URL to retrieve the rules for.
+ * @return {Object} rules: The rules. url: The identifier representing the URL.
+ */
 Styles.prototype.getCombinedRulesForPage = function(aURL, tab) {
   if (!aURL.isOfHTMLType()) {
     return {
@@ -370,10 +329,10 @@ Styles.prototype.getCombinedRulesForIframe = function(aURL, tab) {
 }
 
 /**
-  * Retrieve all the global rules.
-  *   The global rules are stored for the url '*'
-  * @return {Object} The rules of the global stylesheet.
-  */
+ * Retrieve all the global rules.
+ *   The global rules are stored for the url '*'
+ * @return {Object} The rules of the global stylesheet.
+ */
 Styles.prototype.getGlobalRules = function() {
   if (this.isEmpty(this.GLOBAL_URL) || !this.isEnabled(this.GLOBAL_URL)) {
     return null;
@@ -383,10 +342,10 @@ Styles.prototype.getGlobalRules = function() {
 };
 
 /**
-  * Transfer rules from source URL to destination URL.
-  * @param {String} source Source's identifier.
-  * @param {String} destination Destination's identifier.
-  */
+ * Transfer rules from source URL to destination URL.
+ * @param {String} source Source's identifier.
+ * @param {String} destination Destination's identifier.
+ */
 Styles.prototype.transfer = function(source, destination) {
   if (this.styles[source]) {
     this.styles[destination] = this.styles[source];
@@ -395,12 +354,12 @@ Styles.prototype.transfer = function(source, destination) {
 };
 
 /**
-  * Copy rules into another rules object while managing conflicts.
-  * @param {Object} src Rules that should be copied
-  * @param {Object} dest Rules object where the new rules are to be copied
-  * @param {Boolean} isPrimaryURL If the url for the source rules is the primary
-  *   url for the page. Used to manage conflicts.
-  */
+ * Copy rules into another rules object while managing conflicts.
+ * @param {Object} src Rules that should be copied
+ * @param {Object} dest Rules object where the new rules are to be copied
+ * @param {Boolean} isPrimaryURL If the url for the source rules is the primary
+ *   url for the page. Used to manage conflicts.
+ */
 Styles.prototype.copyRules = function(tab, src, dest, isPrimaryURL) {
   for (var selector in src) {
     var rule = src[selector];
@@ -432,13 +391,13 @@ Styles.prototype.expandRules = function(rules) {
 }
 
 /**
-  * Expand rule to include any additional properties. Currently
-  * expands only @import rule.
-  * @param {String} selector The CSS selector for the rule.
-  * @param {Object} rule The Rule to expand
-  * @param {Function} callback The callback method that is passed the expanded
-  *   rule.
-  */
+ * Expand rule to include any additional properties. Currently
+ * expands only @import rule.
+ * @param {String} selector The CSS selector for the rule.
+ * @param {Object} rule The Rule to expand
+ * @param {Function} callback The callback method that is passed the expanded
+ *   rule.
+ */
 Styles.prototype.expandRule = function(selector, rule) {
   if (this.isImportRuleSelector(selector)) {
     var expandedRule = this.expandImportRule(rule);
@@ -451,20 +410,20 @@ Styles.prototype.expandRule = function(selector, rule) {
 }
 
 /**
-  * Check if the selector corresponds to an @import rule. The selector
-  * is of the form "at-N" for @import rules (where N is the line number)
-  * @param {String} selector The CSS selector for the rule
-  * @return {Boolean} True if the selector corresponds to an @import rule
-  */
+ * Check if the selector corresponds to an @import rule. The selector
+ * is of the form "at-N" for @import rules (where N is the line number)
+ * @param {String} selector The CSS selector for the rule
+ * @return {Boolean} True if the selector corresponds to an @import rule
+ */
 Styles.prototype.isImportRuleSelector = function(selector) {
   return selector.indexOf(this.AT_RULE_PREFIX) == 0;
 }
 
 /**
-  * Expand @import rule to include the CSS fetched from the URL
-  *   and send a push request to specified tab to update the rule.
-  * @param {Object} rule The @import rule to expand
-  */
+ * Expand @import rule to include the CSS fetched from the URL
+ *   and send a push request to specified tab to update the rule.
+ * @param {Object} rule The @import rule to expand
+ */
 Styles.prototype.expandImportRule = function(rule) {
   var css = cache.importRules[rule['url']];
 
@@ -479,10 +438,10 @@ Styles.prototype.expandImportRule = function(rule) {
 }
 
 /**
-  * Fetch css for an @import rule
-  * @param {String} url URL for the @import rule
-  * @param {Function} callback This method is passed the css for the @import rule
-  */
+ * Fetch css for an @import rule
+ * @param {String} url URL for the @import rule
+ * @param {Function} callback This method is passed the css for the @import rule
+ */
 Styles.prototype.fetchImportCSS = function(url, callback) {
   if (cache.importRules[url]) {
     callback(cache.importRules[url]);

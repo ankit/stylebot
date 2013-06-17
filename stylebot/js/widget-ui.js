@@ -66,10 +66,10 @@ var WidgetUI = {
   DEFAULT_OPTION: 'Default',
 
   /**
-    * Create option for control
-    * @param {element} Control
-    * @return {element} UI for option
-    */
+   * Create option for control
+   * @param {element} Control
+   * @return {element} UI for option
+   */
   createOption: function(control) {
     var container = $('<div>', {
       class: this.CLASS_NAMES.option
@@ -78,10 +78,10 @@ var WidgetUI = {
   },
 
   /**
-    * Create Accordion UI
-    * @param {string} Name of accordion
-    * @return {element} Accordion <a> element
-    */
+   * Create Accordion UI
+   * @param {string} Name of accordion
+   * @return {element} Accordion <a> element
+   */
   createAccordionHeader: function(name) {
     var $accordion = $('<a>', {
       class: this.CLASS_NAMES.accordion.header,
@@ -109,13 +109,13 @@ var WidgetUI = {
   },
 
   /**
-    * Create a textfield
-    * @param {string} property Property name for textfield
-    * @param {number} size Size of textfield
-    * @param {function} onKeyDownHandler Callback for 'keydown' event
-    * @param {function} onKeyUpHandler Callback for 'keyup' event
-    * @return {jQuery element} The textfield element
-    */
+   * Create a textfield
+   * @param {string} property Property name for textfield
+   * @param {number} size Size of textfield
+   * @param {function} onKeyDownHandler Callback for 'keydown' event
+   * @param {function} onKeyUpHandler Callback for 'keyup' event
+   * @return {jQuery element} The textfield element
+   */
   createTextField: function(property, size, onKeyDownHandler, onKeyUpHandler) {
     var $input = $('<input>', {
       type: 'text',
@@ -141,10 +141,10 @@ var WidgetUI = {
   },
 
   /**
-    * Create a size <select> control
-    * @param {string} property Property Name
-    * @return {jQuery element} SPAN for size selection
-    */
+   * Create a size <select> control
+   * @param {string} property Property Name
+   * @return {jQuery element} SPAN for size selection
+   */
   createSizeControl: function(property) {
     var container = $('<span>');
 
@@ -176,10 +176,10 @@ var WidgetUI = {
   },
 
   /**
-    * Create size controls for top, right, bottom and all
-    * @param {element} control Control to insert multisize control in
-    * @return {jQuery element} SPAN containing select element
-    */
+   * Create size controls for top, right, bottom and all
+   * @param {element} control Control to insert multisize control in
+   * @return {jQuery element} SPAN containing select element
+   */
   createMultiSizeControl: function(control) {
     var container = $('<span>', {
       class: this.CLASS_NAMES.multisize
@@ -217,10 +217,10 @@ var WidgetUI = {
   },
 
   /**
-    * Create a font family <select>
-    * @param {element} control Element that should contain this control
-    * @return {jQuery element} SPAN element containing the control
-    */
+   * Create a font family <select>
+   * @param {element} control Element that should contain this control
+   * @return {jQuery element} SPAN element containing the control
+   */
   createFontFamilyControl: function(control) {
     var $container = $('<span>', {
       class: this.CLASS_NAMES.fontFamily
@@ -332,8 +332,8 @@ var WidgetUI = {
   },
 
   /**
-    * Wrapper for selectize.js with default options.
-    */
+   * Wrapper for selectize.js with default options.
+   */
   selectize: function($select, moreOptions) {
     if (!moreOptions) {
       moreOptions = {};
@@ -382,9 +382,6 @@ var WidgetUI = {
     $select.selectize(options);
   },
 
-  /**
-    *
-    */
   createToggleButton: function(text, property, value) {
     return this.createButton(text)
     .addClass(this.CLASS_NAMES.control + " " + this.CLASS_NAMES.toggleButton)
@@ -396,9 +393,6 @@ var WidgetUI = {
     .click(Events.onToggle);
   },
 
-  /**
-    *
-    */
   createRadio: function(text, name, property, value) {
     var span = $('<span>', {
       id: 'stylebot-' + property,
@@ -423,9 +417,6 @@ var WidgetUI = {
     return span;
   },
 
-  /**
-    *
-    */
   createSelectOption: function($select, text, data, property) {
     var $option = $('<option>', {
       html: text,
@@ -441,8 +432,8 @@ var WidgetUI = {
   },
 
   /**
-    * Create the color picker
-    */
+   * Create the color picker
+   */
   createColorPicker: function(input, el) {
     return $('<div>', {
       class: this.CLASS_NAMES.control + " " + this.CLASS_NAMES.colorSelector,
@@ -557,7 +548,8 @@ var WidgetUI = {
       })
       .bind('mousedown keydown', Events.onSegmentedControlMouseDown)
       .appendTo(container);
-      // explicitly having to add the 'stylebot-last-child' class as :last-child causes weird issue in Chrome
+      // explicitly having to add the 'stylebot-last-child'
+      // class as :last-child causes weird issue in Chrome
       if (i == (len - 1)) {
         bt.addClass(this.CLASS_NAMES.lastSegmentedButton);
       }

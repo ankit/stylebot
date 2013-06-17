@@ -1,10 +1,9 @@
 /**
-* stylebot
-* Source: http://github.com/ankit/stylebot
-*
-* Copyright (c) 2011 Ankit Ahuja
-* Dual licensed under GPL and MIT licenses
-**/
+ * stylebot
+ *
+ * Copyright (c) 2013 Ankit Ahuja
+ * Dual licensed under GPL and MIT licenses
+ **/
 
 var stylebot = {
   status: false,
@@ -25,9 +24,9 @@ var stylebot = {
   },
 
   /**
-    * Initialize stylebot
-    * @param {object} options Options to initialize stylebot with
-    */
+   * Initialize stylebot
+   * @param {object} options Options to initialize stylebot with
+   */
   initialize: function(options) {
     this.style.initialize();
     this.setOptions(options);
@@ -36,17 +35,17 @@ var stylebot = {
   },
 
   /**
-    * Apply stylebot options
-    * @param {object} options Options to apply
-    */
+   * Apply stylebot options
+   * @param {object} options Options to apply
+   */
   setOptions: function(options) {
     for (option in options)
       this.options[option] = options[option];
   },
 
   /**
-    * Open / close editor
-    */
+   * Open / close editor
+   */
   toggle: function() {
     if (this.status === true)
       this.close();
@@ -55,8 +54,8 @@ var stylebot = {
   },
 
   /**
-    * Open stylebot editor
-    */
+   * Open stylebot editor
+   */
   open: function() {
     this.attachListeners();
     this.style.enable();
@@ -68,8 +67,8 @@ var stylebot = {
   },
 
   /**
-    * Close stylebot editor
-    */
+   * Close stylebot editor
+   */
   close: function() {
     stylebot.widget.close();
     stylebot.status = false;
@@ -84,9 +83,9 @@ var stylebot = {
   },
 
   /**
-    * Highlight specified element
-    * @param {element} el Element to highlight
-    */
+   * Highlight specified element
+   * @param {element} el Element to highlight
+   */
   highlight: function(el) {
     if (!stylebot.selectionBox)
       stylebot.createHighlighter();
@@ -96,8 +95,8 @@ var stylebot = {
   },
 
   /**
-    * Remove highlight from previously selected element
-    */
+   * Remove highlight from previously selected element
+   */
   unhighlight: function() {
     stylebot.hoveredElement = null;
     if (stylebot.selectionBox)
@@ -105,10 +104,10 @@ var stylebot = {
   },
 
   /**
-    * Select element(s)
-    * @param {element} el Element to select
-    * @param {string} selector CSS selector for elements to select
-    */
+   * Select element(s)
+   * @param {element} el Element to select
+   * @param {string} selector CSS selector for elements to select
+   */
   select: function(el, selector) {
     stylebot.disableSelection();
 
@@ -143,8 +142,8 @@ var stylebot = {
   },
 
   /**
-    * Enable / disable selection of elements
-    */
+   * Enable / disable selection of elements
+   */
   toggleSelection: function() {
     if (stylebot.selectionStatus) {
       stylebot.select(null, stylebot.style.cache.selector);
@@ -158,8 +157,8 @@ var stylebot = {
   },
 
   /**
-    * Enable selection of elements
-    */
+   * Enable selection of elements
+   */
   enableSelection: function() {
     stylebot.attachListeners();
     stylebot.selectionStatus = true;
@@ -169,8 +168,8 @@ var stylebot = {
   },
 
   /**
-    * Disable selection of elements
-    */
+   * Disable selection of elements
+   */
   disableSelection: function() {
     stylebot.detachListeners();
     stylebot.selectionStatus = false;
@@ -187,8 +186,8 @@ var stylebot = {
   },
 
   /**
-    * Remove the highlighter
-    */
+   * Remove the highlighter
+   */
   destroyHighlighter: function() {
     if (stylebot.selectionBox) {
       stylebot.selectionBox.destroy();
@@ -197,8 +196,8 @@ var stylebot = {
   },
 
   /**
-    * Add event listeners for mouse activity
-    */
+   * Add event listeners for mouse activity
+   */
   attachListeners: function() {
     document.addEventListener('mousemove', this.onMouseMove, true);
     document.addEventListener('mousedown', this.onMouseDown, true);
@@ -206,16 +205,16 @@ var stylebot = {
   },
 
   /**
-    * Remove event listeners for mouse activity
-    */
+   * Remove event listeners for mouse activity
+   */
   detachListeners: function() {
     document.removeEventListener('mousemove', this.onMouseMove, true);
     document.removeEventListener('mousedown', this.onMouseDown, true);
   },
 
   /**
-    * Remove event listener for mouse click
-    */
+   * Remove event listener for mouse click
+   */
   detachClickListener: function() {
     // We have to remove the click listener in a second phase because if we remove it
     // after the mousedown, we won't be able to cancel clicked links
@@ -224,8 +223,8 @@ var stylebot = {
   },
 
   /**
-    * When the user moves the mouse
-    */
+   * When the user moves the mouse
+   */
   onMouseMove: function(e) {
     // for dropdown
     if (e.target.className == 'stylebot-dropdown-li') {
@@ -250,8 +249,8 @@ var stylebot = {
   },
 
   /**
-    * When the user has pressed the mouse button down
-    */
+   * When the user has pressed the mouse button down
+   */
   onMouseDown: function(e) {
     if (!stylebot.belongsToStylebot(e.target)) {
       e.preventDefault();
@@ -262,8 +261,8 @@ var stylebot = {
   },
 
   /**
-    * When the user clicks the mouse
-    */
+   * When the user clicks the mouse
+   */
   onMouseClick: function(e) {
     if (!stylebot.belongsToStylebot(e.target)) {
       e.preventDefault();
@@ -274,10 +273,10 @@ var stylebot = {
   },
 
   /**
-    * Checks if the specified element belongs to the stylebot editor
-    * @param {element} el Element to check
-    * @return {boolean} True if element belongs to stylebot
-    */
+   * Checks if the specified element belongs to the stylebot editor
+   * @param {element} el Element to check
+   * @return {boolean} True if element belongs to stylebot
+   */
   belongsToStylebot: function(el) {
     var $el = $(el);
     var parent = $el.closest('#stylebot-container');
@@ -288,10 +287,10 @@ var stylebot = {
   },
 
   /**
-    * Checks if the stylebot editor should close
-    * @param {element} el Currently selected element
-    * @return {boolean} Returns true if stylebot editor can close
-    */
+   * Checks if the stylebot editor should close
+   * @param {element} el Currently selected element
+   * @return {boolean} Returns true if stylebot editor can close
+   */
   shouldClose: function(el) {
     if (!stylebot.status ||
       stylebot.widget.basic.isColorPickerVisible ||
@@ -304,10 +303,10 @@ var stylebot = {
   },
 
   /**
-    * Checks if the specified element can be selected
-    * @param {element} el The element to select
-    * @return {boolean} Returns true if element should be selected
-    */
+   * Checks if the specified element can be selected
+   * @param {element} el The element to select
+   * @return {boolean} Returns true if element should be selected
+   */
   shouldSelect: function(el) {
     if (stylebot.widget.isBeingDragged
       || stylebot.page.isVisible

@@ -1,9 +1,9 @@
 /**
-  * Utility methods for CSS generation and injection.
-  *
-  * Copyright (c) 2010 Ankit Ahuja
-  * Dual licensed under GPL and MIT licenses.
-  **/
+ * Utility methods for CSS generation and injection.
+ *
+ * Copyright (c) 2010 Ankit Ahuja
+ * Dual licensed under GPL and MIT licenses.
+ */
 var CSSUtils = {
   /*  e.g. of rules object used as input / output:
 

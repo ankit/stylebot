@@ -1,11 +1,9 @@
 /**
-  * An extremely minimalistic modal box
-  *
-  * Copyright (c) 2010 Ankit Ahuja
-  * Dual licensed under GPL and MIT licenses.
- **/
-
-// constructor
+ * An extremely minimalistic modal box
+ *
+ * Copyright (c) 2010 Ankit Ahuja
+ * Dual licensed under GPL and MIT licenses.
+ */
 var ModalBox = function(html, options) {
     if (options) {
         for (var option in options) {

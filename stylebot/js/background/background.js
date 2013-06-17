@@ -1,6 +1,6 @@
 /**
-  * Background Page
-  */
+ * Background Page
+ */
 var cache = {
   // Styles object
   styles: {},
@@ -38,8 +38,8 @@ function init() {
 }
 
 /**
-  * Attaches listeners to act on requests sent from tabs and page action
-  */
+ * Attaches listeners to act on requests sent from tabs and page action
+ */
 function attachListeners() {
   chrome.tabs.onUpdated.addListener(onTabUpdated);
   chrome.tabs.onActivated.addListener(onTabActivated);
@@ -145,13 +145,13 @@ function attachListeners() {
 }
 
 /**
-  * Request handler for when an existing tab is updated i.e.
-  * refreshed / new page is opened.
-  *
-  * @param {number} tabId The tab's id
-  * @param {object} changeInfo
-  * @param {object} The tab object
-  */
+ * Request handler for when an existing tab is updated i.e.
+ * refreshed / new page is opened.
+ *
+ * @param {number} tabId The tab's id
+ * @param {object} changeInfo
+ * @param {object} The tab object
+ */
 function onTabUpdated(tabId, changeInfo, tab) {
   if (tab.status === 'complete') {
     clearTabResponseCache(tabId);
@@ -170,18 +170,18 @@ function onTabActivated(activeInfo) {
 }
 
 /**
-  * Request handler for when a tab is closed
-  * @param {number} tabId The tab's id
-  * @param {object} removeInfo
-  */
+ * Request handler for when a tab is closed
+ * @param {number} tabId The tab's id
+ * @param {object} removeInfo
+ */
 function onTabRemoved(tabId, removeInfo) {
   clearTabResponseCache(tabId);
 }
 
 /**
-  * Remove the specified tab from the loading queue
-  * @param {number} tabId The id for the tab to be removed
-  */
+ * Remove the specified tab from the loading queue
+ * @param {number} tabId The id for the tab to be removed
+ */
 function clearTabResponseCache(tabId) {
   if (cache.loadingTabs[tabId]) {
     delete cache.loadingTabs[tabId];
@@ -189,11 +189,11 @@ function clearTabResponseCache(tabId) {
 }
 
 /**
-  * Merge styles
-  * @param {array} newStyles The styles that should be merged.
-  * @param {array} oldStyles The styles to merge into.
-  *   This is given higher priority over a new style for the same selector
-  */
+ * Merge styles
+ * @param {array} newStyles The styles that should be merged.
+ * @param {array} oldStyles The styles to merge into.
+ *   This is given higher priority over a new style for the same selector
+ */
 function mergeStyles(newStyles, oldStyles) {
   cache.styles.merge(newStyles, oldStyles);
 }
@@ -218,11 +218,11 @@ function initCache(callback) {
 }
 
 /**
-  * Save an option in cache and datastore.
-  * Also pushes the change to all currently open tabs.
-  * @param {string} name Option name
-  * @param {object} value Option value
-  */
+ * Save an option in cache and datastore.
+ * Also pushes the change to all currently open tabs.
+ * @param {string} name Option name
+ * @param {object} value Option value
+ */
 function saveOption(name, value) {
   cache.options[name] = value;
   chrome.storage.local.set({'options': cache.options});
@@ -243,15 +243,15 @@ function getOption(name) {
 }
 
 /**
-  * Return global CSS rules i.e. for URL '*'
-  */
+ * Return global CSS rules i.e. for URL '*'
+ */
 function getGlobalRules() {
   return cache.styles.getGlobalRules();
 }
 
 /**
-  * Propagate options to all existing tabs
-  */
+ * Propagate options to all existing tabs
+ */
 function propagateOptions() {
   sendRequestToAllTabs({
     name: 'setOptions',
@@ -260,18 +260,18 @@ function propagateOptions() {
 }
 
 /**
-  * Save current accordion state of stylebot editor into background page cache
-  * @param {array} accordions Indices of open accordions
-  */
+ * Save current accordion state of stylebot editor into background page cache
+ * @param {array} accordions Indices of open accordions
+ */
 function saveAccordionState(accordions) {
   cache.options.accordions = accordions;
   chrome.storage.local.set({'options': cache.options});
 }
 
 /**
-  * Send a request to all existing tabs
-  * @param {object} req Request to send
-  */
+ * Send a request to all existing tabs
+ * @param {object} req Request to send
+ */
 function sendRequestToAllTabs(req) {
   chrome.windows.getAll({ populate: true }, function(windows) {
     var w_len = windows.length;
@@ -285,10 +285,10 @@ function sendRequestToAllTabs(req) {
 }
 
 /**
-  * Send a message to a tab
-  * @param {object} tab Tab to which message is to be sent
-  * @param {string} msg Message to send
-  */
+ * Send a message to a tab
+ * @param {object} tab Tab to which message is to be sent
+ * @param {string} msg Message to send
+ */
 function sendRequestToTab(tab, msg) {
   chrome.tabs.sendRequest(tab.id, { name: msg }, function() {});
 }

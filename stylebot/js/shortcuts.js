@@ -1,7 +1,6 @@
 /**
-  * Stylebot editor keyboard shortcuts
-  */
-
+ * Stylebot editor keyboard shortcuts
+ */
 function handleKeyboardShortcut(e) {
   var tag = e.target.tagName.toLowerCase();
 

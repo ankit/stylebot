@@ -1,11 +1,10 @@
 /**
-  * A single character keycode generator
-  * Converts a pressed character into its corresponding keydown code and stores the code in a hidden field
-  *
-  * Copyright (c) 2010 Ankit Ahuja
-  * Dual licensed under GPL and MIT licenses.
- **/
-
+ * A single character keycode generator
+ * Converts a pressed character into its corresponding keydown code and stores the code in a hidden field
+ *
+ * Copyright (c) 2010 Ankit Ahuja
+ * Dual licensed under GPL and MIT licenses.
+ */
 var KeyCombo = {
 
     // el: the textfield in which key is pressed

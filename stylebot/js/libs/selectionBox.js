@@ -1,36 +1,37 @@
 /**
-  * Selection of DOM elements
-  * Based on Firebug's non-canvas implementation
-  *
-  * @requires jQuery
-  *
-  * A DIV is used for each edge.
-  * To highlight an element, the width, height, left offset and top offset values of edge DIVs
-  * are manipulated to surround the element.
-  *
-  * TODO: Canvas?
-  *
-  * Copyright (c) 2007, Parakey Inc.
-  * Copyright (c) 2012, Ankit Ahuja
-  * Licensed under GPL, MIT and BSD Licenses
-  **/
+ * Selection of DOM elements
+ * Based on Firebug's non-canvas implementation
+ *
+ * @requires jQuery
+ *
+ * A DIV is used for each edge.
+ * To highlight an element, the width, height, left offset and top offset values of edge DIVs
+ * are manipulated to surround the element.
+ *
+ * TODO: Canvas?
+ *
+ * Copyright (c) 2007, Parakey Inc.
+ * Copyright (c) 2012, Ankit Ahuja
+ * Licensed under GPL, MIT and BSD Licenses
+ */
 
 /**
-  * @constructor
-  * @param {number} edgeSize Thickness of each edge. By default, 2
-  * @param {string} edgeColor Hexcode for color of each edge. By default, #65f166
-  * @param {element} edgeContainer Element inside which the edges are inserted. By default, body
-  */
+ * @constructor
+ * @param {number} edgeSize Thickness of each edge. By default, 2
+ * @param {string} edgeColor Hexcode for color of each edge. By default, #65f166
+ * @param {element} edgeContainer Element inside which the edges are inserted.
+ *    By default, body
+ */
 var SelectionBox = function(edgeSize, edgeColor, edgeContainer) {
   edgeSize = edgeSize ? edgeSize : 2;
   edgeColor = edgeColor ? edgeColor : '#65f166';
   edgeContainer = edgeContainer ? edgeContainer : $('body').get(0);
 
   /**
-    * Create an edge
-    * @return {element} DIV for the edge
-    * @private
-    */
+   * Create an edge
+   * @return {element} DIV for the edge
+   * @private
+   */
   var createEdge = function() {
     var css = {
       'background-color': edgeColor,
@@ -45,7 +46,7 @@ var SelectionBox = function(edgeSize, edgeColor, edgeContainer) {
   edges.right   = createEdge();
   edges.bottom  = createEdge();
   edges.left    = createEdge();
-  
+
   for (var edge in edges) {
     edges[edge].appendTo(edgeContainer);
   }
@@ -53,10 +54,10 @@ var SelectionBox = function(edgeSize, edgeColor, edgeContainer) {
   var self = this;
 
   /**
-    * Highlight an element. Removes highlight from previously highlighted element
-    * @param {element} el DOM element to highlight
-    * @public
-    */
+   * Highlight an element. Removes highlight from previously highlighted element
+   * @param {element} el DOM element to highlight
+   * @public
+   */
   this.highlight = function(el) {
     if (!el) {
       self.hide();
@@ -116,53 +117,54 @@ var SelectionBox = function(edgeSize, edgeColor, edgeContainer) {
   };
 
   /**
-    * Hide selection edges
-    * @public
-    */
+   * Hide selection edges
+   * @public
+   */
   this.hide = function() {
     for (var edge in edges)
       edges[edge].width(0).height(0);
   };
 
   /**
-    * Remove the selection box from DOM
-    * @public
-    */
+   * Remove the selection box from DOM
+   * @public
+   */
   this.destroy = function() {
     for (var edge in edges)
       edges[edge].remove();
   };
 
   /**
-    * Move an edge
-    * @private
-    * @param {element} edge DIV
-    * @param {number} t Top offset
-    * @param {number} l Left offset
-    */
+   * Move an edge
+   * @private
+   * @param {element} edge DIV
+   * @param {number} t Top offset
+   * @param {number} l Left offset
+   */
   var moveEdge = function(edge, t, l) {
     edges[edge].css('top', t + 'px');
     edges[edge].css('left', l + 'px');
   };
 
   /**
-    * Resize an edge
-    * @private
-    * @param {element} edge DIV
-    * @param {number} h Height of edge to set
-    * @param {number} w Width of edge to set
-    */
+   * Resize an edge
+   * @private
+   * @param {element} edge DIV
+   * @param {number} h Height of edge to set
+   * @param {number} w Width of edge to set
+   */
   var resizeEdge = function(edge, h, w) {
     edges[edge].height(h);
     edges[edge].width(w);
   };
 
   /**
-    * Get an element's offset and dimensions
-    * @private
-    * @param {element} el Element
-    * @return {object} Offset and dimensions of element. E.g. {top:1, left: 2, height: 3, width: 4}
-    */
+   * Get an element's offset and dimensions
+   * @private
+   * @param {element} el Element
+   * @return {object} Offset and dimensions of element.
+   *    Example: {top:1, left: 2, height: 3, width: 4}
+   */
   var getElementBox = function(el) {
     var result = {};
 
@@ -185,10 +187,10 @@ var SelectionBox = function(edgeSize, edgeColor, edgeContainer) {
   };
 
   /**
-    * Get a window's scroll width and height
-    * @private
-    * @return {object} Scroll width and height. {width: 12, height: 12}
-    */
+   * Get a window's scroll width and height
+   * @private
+   * @return {object} Scroll width and height. {width: 12, height: 12}
+   */
   var getWindowScrollSize = function() {
     var width = 0, height = 0, el;
 
@@ -212,11 +214,11 @@ var SelectionBox = function(edgeSize, edgeColor, edgeContainer) {
   };
 
   /**
-    * Get an element's left and top offset
-    * @private
-    * @param {element} el Element
-    * @return {object} Object containing left and top offset values for element.
-    */
+   * Get an element's left and top offset
+   * @private
+   * @param {element} el Element
+   * @return {object} Object containing left and top offset values for element.
+   */
   var getElementPosition = function(el) {
     var left = 0;
     var top = 0;
@@ -231,10 +233,10 @@ var SelectionBox = function(edgeSize, edgeColor, edgeContainer) {
   };
 
   /**
-    * Get the DOM window's width and height
-    * @private
-    * @return {object} Example: {width: 600, height: 600}
-    */
+   * Get the DOM window's width and height
+   * @private
+   * @return {object} Example: {width: 600, height: 600}
+   */
   var getWindowSize = function() {
     var width = 0, height = 0, el;
 
@@ -256,10 +258,10 @@ var SelectionBox = function(edgeSize, edgeColor, edgeContainer) {
   };
 
   /**
-    * Get DOM window's scroll position
-    * @private
-    * @return {object} With top and left properties
-    */
+   * Get DOM window's scroll position
+   * @private
+   * @return {object} With top and left properties
+   */
   var getWindowScrollPosition = function() {
     var top = 0, left = 0, el;
 

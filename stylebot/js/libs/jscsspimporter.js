@@ -1,6 +1,6 @@
 /**
-  * Transforms JSCSSP parser's generated objects into stylebot rules
-  */
+ * Transforms JSCSSP parser's generated objects into stylebot rules
+ */
 function JSCSSPImporter() {
   this.rules = {};
 

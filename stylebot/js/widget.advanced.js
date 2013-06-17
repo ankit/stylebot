@@ -1,9 +1,8 @@
 /**
-* stylebot.widget.advanced
-*
-* Manages the UI for the Advanced mode in Stylebot editor
-**/
-
+ * stylebot.widget.advanced
+ *
+ * Manages the UI for the Advanced mode in Stylebot editor
+ */
 stylebot.widget.advanced = {
   EDITOR_BOTTOM_PADDING: 36,
 
