@@ -1,10 +1,7 @@
 <html>
 <head>
-  <script type="text/javascript">
-  function openURL(url) {
-    window.open(url);
-  }
-  </script>
+  <script type="text/javascript" src="../js/libs/jquery.js"></script>
+  <script type="text/javascript" src="notification.js"></script>
   <style>
 
   body {
@@ -16,9 +13,13 @@
 
   h1 {
     margin: 2px;
-    font-size: 12px;
+    font-size: 14px;
     padding: 0px;
     display: inline;
+  }
+
+  h1 img {
+    margin-bottom: -4px;
   }
 
   a {
@@ -49,7 +50,8 @@
   #version {
     color: #333;
     display: inline;
-    margin-left: 5px;
+    margin-left: 3px;
+    font-size: 12px;
   }
 
   code {
@@ -62,14 +64,15 @@
   </style>
 </head>
 <body>
-  <h1>Stylebot</h1>
-  <span id="version">v 1.7</span>
+  <h1><img src="../images/icon16.png" alt=""> Stylebot</h1>
+  <span id="version">version 2</span>
   <div id="content">
     <ul>
-      <li>Updated right click menu.</li>
-      <li>Updates to the Options page.</li>
-      <li>Fixed issue: Edited elements now visible in Stylebot panel.</li>
-      <li>Disabled sync until I can fix it.</li>
+      <li>Easy way to discover, preview and install styles from Stylebot Social.</li>
+      <li>Support for regular expressions for URLs (see <a href="http://stylebot.me/patterns">patterns</a>)</li>
+      <li>Support for @rules (including @import, @keyframes, etc.)</li>
+      <li>Support a custom font stack, Google Web Fonts</li>
+      <li>See all changes in the <a href="http://stylebot.me/changelog">CHANGELOG</a></li>
     </ul>
   </div>
   </body>

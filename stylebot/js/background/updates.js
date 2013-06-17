@@ -1,7 +1,7 @@
 // Version updates
 // This is the only place you need to update the version string
 // besides manifest.json.
-var VERSION = '1.7.3.4';
+var VERSION = '2';
 
 /**
  * Updates the version of extension.
@@ -11,7 +11,9 @@ function updateVersion(callback) {
   chrome.storage.local.get(['version'], function(storage) {
     if (storage['version'] != VERSION) {
       chrome.storage.local.set({'version': VERSION});
+      showUpdateNotification();
     }
+
     callback();
   });
 }
@@ -21,7 +23,8 @@ function updateVersion(callback) {
  */
 function showUpdateNotification() {
   var notification = webkitNotifications.createHTMLNotification(
-    'notification.html'
+    'notification/index.html'
   );
   notification.show();
 }
+
