@@ -681,7 +681,7 @@ stylebot.style = {
     // todo: add ordering to styling rules, this is not reliable.
     for (selector in self.rules) {
       if (!self.rules[selector]['text'] ||
-        !self.rules[selector]['text'] === rule['text']) {
+        self.rules[selector]['text'] !== rule['text']) {
         newRules[selector] = self.rules[selector];
       }
     }
