@@ -258,18 +258,20 @@ var WidgetUI = {
       },
 
       onValueChange: $.proxy(function(value) {
-        chrome.storage.local.get("fontStack", $.proxy(function(items) {
-          var fontStack = items["fontStack"];
-          if (fontStack.indexOf(value) != -1) {
-            fontStack = Utils.removeFromArray(fontStack, value);
-          }
+        if (value != '') {
+          chrome.storage.local.get("fontStack", $.proxy(function(items) {
+            var fontStack = items["fontStack"];
+            if (fontStack.indexOf(value) != -1) {
+              fontStack = Utils.removeFromArray(fontStack, value);
+            }
 
-          fontStack.unshift(value);
-          fontStack = fontStack.slice(0, this.FONT_STACK_LIMIT);
+            fontStack.unshift(value);
+            fontStack = fontStack.slice(0, this.FONT_STACK_LIMIT);
 
-          chrome.storage.local.set({"fontStack": fontStack});
-          this.updateFontStack(fontStack, value);
-        }, this));
+            chrome.storage.local.set({"fontStack": fontStack});
+            this.updateFontStack(fontStack, value);
+          }, this));
+        }
 
         Events.onSelectChange('font-family', value);
       }, this)
@@ -562,8 +564,9 @@ var WidgetUI = {
   },
 
   setFontFamily: function(control, value) {
-    if (value === undefined)
+    if (value === undefined) {
       return false;
+    }
 
     var selectize = control.el.find('select').get(0).selectize;
     var option = selectize.getOption(value);

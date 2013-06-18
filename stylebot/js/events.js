@@ -131,20 +131,23 @@ Events = {
       }
     } else {
       if (property === 'font-family') {
-        var fontURL = Events.GOOGLE_FONT_API + value;
+        if (value != '') {
+          var fontURL = Events.GOOGLE_FONT_API + value;
+          chrome.extension.sendRequest({name: "fetchImportCSS", url: fontURL},
+            function(response) {
+              stylebot.undo.push(Utils.cloneObject(stylebot.style.rules));
 
-        chrome.extension.sendRequest({name: "fetchImportCSS", url: fontURL},
-          function(response) {
-            stylebot.undo.push(Utils.cloneObject(stylebot.style.rules));
+              // Hacky check to see if Google Web Font exists.
+              if (response.text.indexOf("@font-face") == 0) {
+                stylebot.style.prependWebFont(fontURL, response.text);
+              }
 
-            // Hacky check to see if Google Web Font exists.
-            if (response.text.indexOf("@font-face") == 0) {
-              stylebot.style.prependWebFont(fontURL, response.text);
-            }
-
-            stylebot.style.apply(property, value);
-            stylebot.undo.refresh();
-        });
+              stylebot.style.apply(property, value);
+              stylebot.undo.refresh();
+          });
+        } else {
+          Events.saveProperty(property, value);
+        }
       } else {
         Events.saveProperty(property, value);
       }
@@ -162,7 +165,8 @@ Events = {
 
     WidgetUI.setButtonAsActive($button);
 
-    // Bind the mouseup handler which will handle saving the new property value and CSS classes
+    // Bind the mouseup handler which will handle
+    // saving the new property value and CSS classes
     $(document).bind('mouseup keyup', Events.onSegmentedControlMouseUp);
   },
 
