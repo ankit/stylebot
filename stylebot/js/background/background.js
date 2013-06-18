@@ -21,7 +21,7 @@ var cache = {
   importRules: {},
 
   // Temporary cached map of tabId to rules to prevent recalculating rules
-  // for iframes. Cleared when a tab finishes loading or a tab is closed.
+  // for iframes. Cleared when a tab is closed.
   loadingTabs: []
 };
 
@@ -154,10 +154,13 @@ function attachListeners() {
  */
 function onTabUpdated(tabId, changeInfo, tab) {
   if (tab.status === 'complete') {
-    clearTabResponseCache(tabId);
     if (cache.options.contextMenu) {
       ContextMenu.update(tab);
     }
+  }
+
+  if (changeInfo.url) {
+    PageAction.update(tab);
   }
 }
 

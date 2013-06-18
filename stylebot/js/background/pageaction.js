@@ -47,10 +47,17 @@ var PageAction = {
   /**
    * Update the page action for the specified tab.
    * @param {Object} tab The tab for which to update the page action.
-   * @param {Boolean} stylingApplied If the tab has any style rules applied to it.
    */
-  update: function(tab, stylingApplied) {
+  update: function(tab) {
     if (tab.url.isValidUrl()) {
+      var response = cache.loadingTabs[tab.id];
+      var stylingApplied = false;
+
+      if (response && (response.rules ||
+         (response.global && !isEmptyObject(response.global)))) {
+        stylingApplied = true;
+      }
+
       if (stylingApplied) {
         PageAction.highlight(tab);
       } else {

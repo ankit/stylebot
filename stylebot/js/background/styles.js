@@ -318,7 +318,7 @@ Styles.prototype.getCombinedRulesForPage = function(aURL, tab) {
   };
 
   cache.loadingTabs[tab.id] = response;
-  PageAction.update(tab, (rules || (globalRules && !isEmptyObject(globalRules))) ? true : false);
+  PageAction.update(tab);
 
   return response;
 };
