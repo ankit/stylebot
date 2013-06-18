@@ -33,6 +33,7 @@ var WidgetUI = {
 
     textfield: 'stylebot-textfield',
     select: 'stylebot-select',
+    size: 'stylebot-size',
     multisize: 'stylebot-multisize',
     fontFamily: 'stylebot-font-family-control',
     borderStyle: 'stylebot-border-style-control',
@@ -146,7 +147,9 @@ var WidgetUI = {
    * @return {jQuery element} SPAN for size selection
    */
   createSizeControl: function(property) {
-    var container = $('<span>');
+    var container = $('<span>', {
+      class: this.CLASS_NAMES.size
+    });
 
     // Textfield for entering size
     this.createTextField(property, 2,

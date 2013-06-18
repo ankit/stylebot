@@ -1,5 +1,26 @@
 /* Stylebot Panel Controls */
 
+/* Size */
+
+.stylebot-size {
+  position: relative !important;
+  width: 100px !important;
+  height: 15px !important;
+  display: inline-block !important;
+}
+
+.stylebot-size input.stylebot-textfield {
+  left: 0;
+  top: 0;
+  position: absolute !important;
+}
+
+.stylebot-size .stylebot-selectize-control {
+  left: 40px;
+  top: 0;
+  position: absolute !important;
+}
+
 /* Multisize */
 
 .stylebot-multisize {
