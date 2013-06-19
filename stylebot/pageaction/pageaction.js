@@ -58,11 +58,12 @@ var PageAction = {
 
               for (var i = 0; i < len; i++) {
                 var name = styles[i].title;
-                if (name.length > 25) {
-                  name = name.substring(0, 25) + "...";
+                var shortName = name;
+                if (shortName.length > 25) {
+                  shortName = shortName.substring(0, 25) + "...";
                 }
 
-                var title = styles[i].description;
+                var title = styles[i].description.replace(/"/g, '&quot;').replace(/\n/g, '<br>');
                 var url = styles[i].site;
                 var id = styles[i].id;
                 var link = "http://stylebot.me/styles/" + id;
@@ -75,16 +76,20 @@ var PageAction = {
 
                 PageAction.styles[id] = styles[i].css;
 
-                var html = '<li class="style-item" data-title="' + name +'" data-id="' +
-                id + '" data-desc="' + title +
+                var html = '<li class="style-item"' +
+                '" data-placement="' + (i == 0 ? 'bottom' : 'top') +
+                '" data-title="' + name +
+                '" data-id="' + id +
+                '" data-desc="' + title +
                 '" data-author="' + username +
                 '" data-favcount="' + favCount +
                 '" data-timeago="' + timeAgo +
                 '" data-timestamp="' + timestamp +
                 '" role="presentation">' +
                 '<div role="menuitem" tabindex="-1" href="#">' +
-                name + '<span class="style-meta"><a class="style-link" href="' +
+                shortName + '<span class="style-meta"><a class="style-link" href="' +
                 link + '">link</a>';
+
                 html += ' by <a class="style-author" href="' + userLink + '">' + username +'</a>';
 
                 html += '<span class="pull-right">';
@@ -122,7 +127,6 @@ var PageAction = {
               });
             });
           });
-
           return;
         }
       }

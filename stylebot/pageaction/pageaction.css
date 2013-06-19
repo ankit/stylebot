@@ -10,10 +10,15 @@ body {
   margin: 0;
 }
 
+.nav-pills > li > a {
+  border-radius: 0 !important;
+}
+
 .dropdown-menu {
   position: relative;
   overflow: hidden;
   overflow-y: scroll;
+  border-radius: 0 !important;
 }
 
 .nav .dropdown-toggle .caret {
@@ -40,6 +45,10 @@ body {
   background: #eee;
 }
 
+.style-item {
+  cursor: pointer;
+}
+
 .style-meta {
   font-size: 10px;
 }
@@ -49,18 +58,49 @@ body {
   padding-right: 5px;
 }
 
+.pull-right {
+  position: relative;
+}
+
 .style-featured {
   font-size: 9px;
   background-color: #73ba68;
   color: #fff;
-  padding: 1px 3px;
-  margin-left: 2px;
+  padding: 0px 5px;
+  position: absolute;
+  right: 2;
+  height: 14px;
+  line-height: 13px;
+  top: 4;
 }
 
 .style-installed {
   font-size: 9px;
   background-color: rgb(199, 96, 96);
   color: #fff;
-  padding: 1px 3px;
-  margin-left: 2px;
+  padding: 0px 5px;
+  position: absolute;
+  right: 52;
+  height: 14px;
+  line-height: 13px;
+  top: 4;
+}
+
+.tooltip {
+  line-height: 16px;
+  text-align: left;
+}
+
+.tooltip * {
+  font-size: 11px;
+  text-align: left;
+}
+
+.tooltip-inner {
+  background: #333;
+}
+
+.tooltip-arrow {
+  border-bottom-color: #333 !important;
+  border-top-color: #333 !important;
 }

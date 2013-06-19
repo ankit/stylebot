@@ -194,7 +194,7 @@ chrome.extension.onRequest.addListener(
       }
 
       sendResponse({
-        url: stylebot.style.cache.url,
+        url: document.domain ? document.domain : location.href,
         social: stylebot.style.social
       });
     }
