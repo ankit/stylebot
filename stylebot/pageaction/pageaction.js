@@ -1,3 +1,6 @@
+/**
+ * PageAction menu actions
+ */
 $(document).ready(function() {
   PageAction.init();
 });
@@ -190,17 +193,12 @@ var PageAction = {
   },
 
   share: function(e, tab) {
-    chrome.windows.getCurrent(null, function(aWindow) {
-      chrome.tabs.captureVisibleTab(aWindow.id, {format: "png"}, function(dataUrl) {
-        chrome.tabs.sendRequest(tab.id, {
-          name: "shareOnSocial",
-          screenshot: dataUrl
-        }, function(response){});
-      });
-    });
+    $(e.target).text("Sharing...").addClass('disabled');
+    PostToSocial.init(tab);
   },
 
   open: function(e, tab) {
+    $(e.target).text("Opening...").addClass('disabled');
     chrome.tabs.sendRequest(tab.id, {name: "toggle"}, function(response){});
     window.close();
   },

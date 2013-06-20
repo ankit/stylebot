@@ -36,6 +36,10 @@ body {
   color: #333;
 }
 
+.nav-pills > li > a.disabled {
+  color: #ccc;
+}
+
 .dropdown-menu > li {
   width: 350px;
   padding: 5px;

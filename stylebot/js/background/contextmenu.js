@@ -12,7 +12,7 @@ var ContextMenu = {
       ContextMenu.create('Style Element', ContextMenu.ID, 'openWidget');
       ContextMenu.create('View Options...', ContextMenu.ID, 'viewOptions');
       ContextMenu.create('Search...', ContextMenu.ID, 'searchSocial');
-      ContextMenu.create('Share...', ContextMenu.ID, 'shareOnSocial');
+      ContextMenu.create('Share...', ContextMenu.ID, 'postToSocial');
     }
   },
 
@@ -27,8 +27,14 @@ var ContextMenu = {
     }
 
     if (action) {
-      options.onclick = function(info, tab) {
-        sendRequestToTab(tab, action);
+      if (action == 'postToSocial') {
+        options.onclick = function(info, tab) {
+          PostToSocial.init(tab);
+        }
+      } else {
+        options.onclick = function(info, tab) {
+          sendRequestToTab(tab, action);
+        }
       }
     }
 

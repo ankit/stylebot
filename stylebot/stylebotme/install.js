@@ -1,5 +1,6 @@
 /**
- * Installation of styles from Stylebot Social
+ * Manage installation of styles on stylebot.me into stylebot
+ * Runs on http://stylebot.me/*
  */
 stylebot.installation = {
   selectors: {
@@ -20,11 +21,9 @@ stylebot.installation = {
   init: function() {
     // communication channel between stylebot social and the extension
     var $channels = $(this.selectors.channel);
-
     this.sendAvailabilityMessage($channels.get(0));
 
     if ($channels.length != 0) {
-
       $channels.bind(this.events.install, function(e) {
         console.log('Stylebot: Install event received. Installing style...');
 

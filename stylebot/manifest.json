@@ -6,6 +6,7 @@
 
   "background" : {
     "scripts": [
+      "stylebotme/post-to-social.js",
       "js/background/styles.js",
       "js/background/updates.js",
       "js/background/pageaction.js",
@@ -49,7 +50,18 @@
     "matches": ["http://stylebot.me/*"],
 
     "js": [
-      "js/installation.js"
+      "stylebotme/install.js"
+    ],
+
+    "run_at": "document_end",
+    "all_frames": true
+  },
+
+  {
+    "matches": ["http://stylebot.me/post"],
+
+    "js": [
+      "stylebotme/post.js"
     ],
 
     "run_at": "document_end",
@@ -74,6 +86,7 @@
 
     "js": [
       "js/libs/jquery.js",
+      "stylebotme/post-to-social.js",
       "js/stylebot.js",
       "js/chrome.js",
       "js/init.js",
