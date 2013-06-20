@@ -116,7 +116,7 @@ stylebot.chrome = {
     * Open the options page for stylebot
     */
   openOptionsPage: function() {
-    window.open(chrome.extension.getURL('options.html'));
+    window.open(chrome.extension.getURL('options/index.html'));
   }
 };
 

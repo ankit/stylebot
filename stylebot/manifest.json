@@ -7,25 +7,25 @@
   "background" : {
     "scripts": [
       "stylebotme/post-to-social.js",
-      "js/background/styles.js",
-      "js/background/updates.js",
-      "js/background/pageaction.js",
-      "js/background/contextmenu.js",
-      "js/background/string.js",
-      "js/background/background.js"
+      "background/styles.js",
+      "background/updates.js",
+      "background/pageaction.js",
+      "background/contextmenu.js",
+      "background/string.js",
+      "background/background.js"
     ]
   },
 
-  "options_page"    : "options.html",
+  "options_page"    : "options/index.html",
 
   "content_scripts": [{
     "matches": ["<all_urls>"],
 
     "js": [
-      "js/libs/jscsspimporter.js",
-      "js/libs/cssformatter.js",
-      "js/libs/css-utils.js",
-      "js/apply-css.js"
+      "libs/jscsspimporter.js",
+      "libs/cssformatter.js",
+      "libs/css-utils.js",
+      "editor/apply-css.js"
     ],
 
     "run_at": "document_start",
@@ -36,10 +36,10 @@
     "matches": ["http://userstyles.org/styles/*"],
 
     "js": [
-      "js/libs/jscsspimporter.js",
-      "js/libs/cssformatter.js",
-      "js/libs/css-utils.js",
-      "js/userstyles-org.js"
+      "libs/jscsspimporter.js",
+      "libs/cssformatter.js",
+      "libs/css-utils.js",
+      "editor/userstyles-org.js"
     ],
 
     "run_at": "document_start",
@@ -72,45 +72,45 @@
     "matches": ["<all_urls>"],
 
     "css": [
-      "css/widget.css",
-      "css/controls.css",
-      "css/modal.css",
-      "css/colorpicker.css",
-      "css/scrollbars.css",
-      "css/tipsy.css",
-      "css/shortcuts_help.css",
-      "css/ace_editor.css",
-      "css/preview.css",
-      "css/selectize.css"
+      "editor/css/widget.css",
+      "editor/css/controls.css",
+      "libs/modal/modal.css",
+      "libs/colorpicker/colorpicker.css",
+      "editor/css/scrollbars.css",
+      "libs/tipsy/tipsy.css",
+      "editor/css/shortcuts_help.css",
+      "libs/ace/ace.css",
+      "editor/css/preview.css",
+      "libs/selectize/selectize.css"
     ],
 
     "js": [
-      "js/libs/jquery.js",
+      "libs/jquery.js",
       "stylebotme/post-to-social.js",
-      "js/stylebot.js",
-      "js/chrome.js",
-      "js/init.js",
-      "js/widget.js",
-      "js/widget.basic.js",
-      "js/events.js",
-      "js/widget.advanced.js",
-      "js/widget-ui.js",
-      "js/style.js",
-      "js/page.js",
-      "js/contextmenu.js",
-      "js/undo.js",
-      "js/libs/selectorGenerator.js",
-      "js/libs/selectionBox.js",
-      "js/libs/modalbox.js",
-      "js/libs/utils.js",
-      "js/libs/colorpicker.js",
-      "js/libs/jquery.tipsy.js",
-      "js/libs/parser.js",
-      "js/libs/ace.js",
-      "js/libs/mode-css.js",
-      "js/libs/theme-dawn.js",
-      "js/libs/selectize.js",
-      "js/shortcuts.js"
+      "editor/stylebot.js",
+      "editor/chrome.js",
+      "editor/init.js",
+      "editor/widget.js",
+      "editor/widget.basic.js",
+      "editor/events.js",
+      "editor/widget.advanced.js",
+      "editor/widget-ui.js",
+      "editor/style.js",
+      "editor/page.js",
+      "editor/contextmenu.js",
+      "editor/undo.js",
+      "libs/selectorGenerator.js",
+      "libs/selectionBox.js",
+      "libs/modal/modalbox.js",
+      "libs/utils.js",
+      "libs/colorpicker/colorpicker.js",
+      "libs/tipsy/jquery.tipsy.js",
+      "libs/parser.js",
+      "libs/ace/ace.js",
+      "libs/ace/mode-css.js",
+      "libs/ace/theme-dawn.js",
+      "libs/selectize/selectize.js",
+      "editor/shortcuts.js"
     ],
 
     "run_at": "document_start",
