@@ -132,7 +132,7 @@ Events = {
     } else {
       if (property === 'font-family') {
         if (value != '') {
-          var fontURL = Events.GOOGLE_FONT_API + value;
+          var fontURL = Events.GOOGLE_FONT_API + value.replace(/ /g, '+');
           chrome.extension.sendRequest({name: "fetchImportCSS", url: fontURL},
             function(response) {
               stylebot.undo.push(Utils.cloneObject(stylebot.style.rules));
