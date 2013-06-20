@@ -66,27 +66,31 @@ Options.styles = {
   fill: function() {
     this.$container.html('');
     var styles = backgroundPage.cache.styles.get();
+    var counter = 0;
 
     for (var url in styles) {
       // Global style is shown separately.
       if (url === '*') continue;
 
       this.$container.prepend(this.render(url,
-        backgroundPage.cache.styles.isEnabled(url)));
+        backgroundPage.cache.styles.isEnabled(url),
+        counter++));
+
       this.count ++;
     }
 
     this.updateCount();
   },
 
-  get: function(url) {
-    return $('[data-url="' + url + '"]');
+  get: function(id) {
+    return $('#style' + id);
   },
 
-  render: function(url, isEnabled) {
+  render: function(url, isEnabled, id) {
     return Handlebars.templates.style({
       url: url,
-      enabled: isEnabled
+      enabled: isEnabled,
+      id: id
     });
   },
 
@@ -180,23 +184,23 @@ Options.styles = {
     var css = Options.modal.getCode();
 
     if (this.save(url, css)) {
-      this.$container.prepend(this.render(url, true));
-
+      this.$container.prepend(this.render(url, true, this.count));
       this.count ++;
       this.updateCount();
-
       Options.modal.close();
     }
   },
 
   edit: function(e) {
-    var originalUrl = $(e.target).data("original-url");
+    var $el = $(e.target);
+    var previousURL = $el.data("previous-url");
+    var id = $el.data("id");
     var url = Options.modal.getURL();
     var css = Options.modal.getCode();
 
-    if (this.save(url, css, originalUrl)) {
-        this.get(originalUrl).replaceWith(this.render(url, true));
-        Options.modal.close();
+    if (this.save(url, css, previousURL)) {
+      this.get(id).replaceWith(this.render(url, true, id));
+      Options.modal.close();
     }
   },
 
@@ -206,7 +210,7 @@ Options.styles = {
     }
   },
 
-  save: function(url, css, originalUrl) {
+  save: function(url, css, previousURL) {
     if (url != '*') {
       if (!this.validate(url, css)) {
         return false;
@@ -231,8 +235,8 @@ Options.styles = {
 
         backgroundPage.cache.styles.create(url, rules);
 
-        if (originalUrl && originalUrl != url) {
-          backgroundPage.cache.styles.delete(originalUrl);
+        if (previousURL && previousURL != url) {
+          backgroundPage.cache.styles.delete(previousURL);
         }
 
         return true;
@@ -307,6 +311,7 @@ Options.styles = {
   showEdit: function(e) {
     var $style = $(e.target).parents(".style");
     var url = $style.data('url');
+    var id = $style.data('id');
     var rules = backgroundPage.cache.styles.getRules(url);
 
     CSSUtils.crunchFormattedCSS(rules, false, false, function(css) {
@@ -314,7 +319,8 @@ Options.styles = {
         url: url,
         editor: true,
         edit: true,
-        code: css
+        code: css,
+        id: id
       });
     });
   },

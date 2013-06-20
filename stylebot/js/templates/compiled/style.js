@@ -13,7 +13,15 @@ function program1(depth0,data) {
   foundHelper = helpers.url;
   if (foundHelper) { stack1 = foundHelper.call(depth0, {hash:{}}); }
   else { stack1 = depth0.url; stack1 = typeof stack1 === functionType ? stack1() : stack1; }
-  buffer += escapeExpression(stack1) + "\" class=\"style\" tabindex=0>\n    <span class=\"style-url-container\">\n        <input class=\"toggle-style\" type=\"checkbox\" title=\"Enable or disable this style\" tabindex=-1 ";
+  buffer += escapeExpression(stack1) + "\" class=\"style\" data-id=\"";
+  foundHelper = helpers.id;
+  if (foundHelper) { stack1 = foundHelper.call(depth0, {hash:{}}); }
+  else { stack1 = depth0.id; stack1 = typeof stack1 === functionType ? stack1() : stack1; }
+  buffer += escapeExpression(stack1) + "\" id=\"style";
+  foundHelper = helpers.id;
+  if (foundHelper) { stack1 = foundHelper.call(depth0, {hash:{}}); }
+  else { stack1 = depth0.id; stack1 = typeof stack1 === functionType ? stack1() : stack1; }
+  buffer += escapeExpression(stack1) + "\" tabindex=0>\n    <span class=\"style-url-container\">\n        <input class=\"toggle-style\" type=\"checkbox\" title=\"Enable or disable this style\" tabindex=-1 ";
   stack1 = depth0.enabled;
   stack1 = helpers['if'].call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(1, program1, data)});
   if(stack1 || stack1 === 0) { buffer += stack1; }
