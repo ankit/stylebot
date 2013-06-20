@@ -72,21 +72,36 @@
     "matches": ["<all_urls>"],
 
     "css": [
-      "editor/css/widget.css",
-      "editor/css/controls.css",
       "libs/modal/modal.css",
       "libs/colorpicker/colorpicker.css",
-      "editor/css/scrollbars.css",
       "libs/tipsy/tipsy.css",
-      "editor/css/shortcuts_help.css",
       "libs/ace/ace.css",
+      "libs/selectize/selectize.css",
+
+      "editor/css/widget.css",
+      "editor/css/controls.css",
+      "editor/css/shortcuts_help.css",
       "editor/css/preview.css",
-      "libs/selectize/selectize.css"
+      "editor/css/scrollbars.css"
     ],
 
     "js": [
       "libs/jquery.js",
+      "libs/selectorGenerator.js",
+      "libs/selectionBox.js",
+      "libs/modal/modalbox.js",
+      "libs/utils.js",
+      "libs/colorpicker/colorpicker.js",
+      "libs/tipsy/jquery.tipsy.js",
+      "libs/parser.js",
+
+      "libs/ace/ace.js",
+      "libs/ace/mode-css.js",
+      "libs/ace/theme-dawn.js",
+
+      "libs/selectize/selectize.js",
       "stylebotme/post-to-social.js",
+
       "editor/stylebot.js",
       "editor/chrome.js",
       "editor/init.js",
@@ -99,17 +114,6 @@
       "editor/page.js",
       "editor/contextmenu.js",
       "editor/undo.js",
-      "libs/selectorGenerator.js",
-      "libs/selectionBox.js",
-      "libs/modal/modalbox.js",
-      "libs/utils.js",
-      "libs/colorpicker/colorpicker.js",
-      "libs/tipsy/jquery.tipsy.js",
-      "libs/parser.js",
-      "libs/ace/ace.js",
-      "libs/ace/mode-css.js",
-      "libs/ace/theme-dawn.js",
-      "libs/selectize/selectize.js",
       "editor/shortcuts.js"
     ],
 
