@@ -171,7 +171,7 @@ stylebot.widget = {
 
     // Edit CSS button
     WidgetUI.createButton('Edit CSS')
-    .attr('title', 'Edit entire page\'s CSS')
+    .attr('title', 'Edit custom CSS for the entire page')
     .tipsy({ delayIn: 800, gravity: 'sw', html: true })
     .appendTo(btContainer)
     .click(self.editCSS);
@@ -185,15 +185,17 @@ stylebot.widget = {
     .click(function(e) { stylebot.style.undo(); });
 
     // Reset button
-    WidgetUI.createButton('Reset')
-    .attr('title', 'Reset custom CSS for the selected elements')
+    self.cache.resetBtn = WidgetUI.createButton('Reset')
+    .attr('title', 'Reset custom CSS for the selected element(s)')
+    .prop('disabled', true)
     .tipsy({ delayIn: 800, gravity: 's', html: true })
     .appendTo(btContainer)
     .click(self.resetSelectedElements);
 
     // Reset Page button
-    WidgetUI.createButton('Reset Page')
+    self.cache.resetPageBtn = WidgetUI.createButton('Reset Page')
     .attr('title', 'Reset custom CSS for the entire page')
+    .prop('disabled', true)
     .tipsy({ delayIn: 500, gravity: 'se', html: true })
     .appendTo(btContainer)
     .click(self.resetPage);
@@ -365,6 +367,8 @@ stylebot.widget = {
       stylebot.widget.advanced.hide();
       stylebot.widget.basic.show();
     }
+
+    stylebot.widget.refreshResetButtons();
   },
 
   /**
@@ -398,16 +402,22 @@ stylebot.widget = {
    * Reset CSS for current selector
    */
   resetSelectedElements: function() {
+    stylebot.undo.push(Utils.cloneObject(stylebot.style.rules));
+    stylebot.undo.refresh();
     stylebot.widget.reset();
     stylebot.style.resetSelectedElementCSS();
+    stylebot.widget.disableResetButton();
   },
 
   /**
    * Reset the entire CSS for the page
    */
   resetPage: function() {
+    stylebot.undo.push(Utils.cloneObject(stylebot.style.rules));
+    stylebot.undo.refresh();
     stylebot.widget.reset();
     stylebot.style.resetAllCSS();
+    stylebot.widget.disableResetPageButton();
   },
 
   /**
@@ -617,6 +627,36 @@ stylebot.widget = {
     if (value === 'Select an element')
       value = 'Click to edit the CSS Selector';
     this.cache.headerSelector.attr('title', value);
+  },
+
+  refreshResetButtons: function() {
+    if (stylebot.style.rules && !$.isEmptyObject(stylebot.style.rules)) {
+      this.enableResetPageButton();
+    } else {
+      this.disableResetPageButton();
+    }
+
+    if (stylebot.style.rules[stylebot.style.cache.selector]) {
+      this.enableResetButton();
+    } else {
+      this.disableResetButton();
+    }
+  },
+
+  enableResetButton: function() {
+    this.cache.resetBtn.prop('disabled', false);
+  },
+
+  disableResetButton: function() {
+    this.cache.resetBtn.prop('disabled', true);
+  },
+
+  enableResetPageButton: function() {
+    this.cache.resetPageBtn.prop('disabled', false);
+  },
+
+  disableResetPageButton: function() {
+    this.cache.resetPageBtn.prop('disabled', true);
   },
 
   enableUndoButton: function() {

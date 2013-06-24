@@ -102,6 +102,8 @@ stylebot.style = {
           stylebot.style.getInlineCSS(stylebot.style.cache.selector));
       else
         stylebot.style.updateStyleElement(stylebot.style.rules);
+
+      stylebot.widget.refreshResetButtons();
     }, 0);
   },
 
@@ -150,6 +152,8 @@ stylebot.style = {
       } else {
         stylebot.style.updateStyleElement(stylebot.style.rules);
       }
+
+      stylebot.widget.refreshResetButtons();
     }, duration);
 
     if (stylebot.style.timer) {
@@ -423,6 +427,7 @@ stylebot.style = {
       delete this.rules[this.cache.selector];
 
     this.clearInlineCSS(this.cache.elements);
+    this.updateStyleElement(this.rules);
 
     setTimeout(function() {
       stylebot.selectionBox.highlight(stylebot.selectedElement);

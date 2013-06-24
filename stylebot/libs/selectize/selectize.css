@@ -186,6 +186,8 @@
   overflow: hidden !important;
   position: relative !important;
   z-index: 1 !important;
+  width: auto !important;
+  margin: 0 !important;
 }
 .stylebot-selectize-input:after {
   content: ' ' !important;

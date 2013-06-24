@@ -21,5 +21,5 @@ setTimeout(function() {
       chrome.storage.local.remove("screenshot_cache");
     }
   });
-}, 1000);
+}, 500);
 
