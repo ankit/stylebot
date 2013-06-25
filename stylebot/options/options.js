@@ -104,8 +104,6 @@ function attachListeners() {
     backgroundPage.saveOption(option, translateOptionValue(option, e.target.value));
   })
 
-  .on("click", ".toggle-page-action", togglePageAction);
-
   $(window).resize(function(e) {
     Options.modal.resize();
   });
@@ -123,16 +121,4 @@ function translateOptionValue(name, value) {
   }
 
   return value;
-}
-
-/**
- * Toggle display of css icon in omnibar.
- */
-function togglePageAction() {
-  showPageAction = backgroundPage.getOption('showPageAction');
-  if (!showPageAction) {
-    backgroundPage.PageAction.hideAll();
-  } else {
-    backgroundPage.PageAction.showAll();
-  }
 }

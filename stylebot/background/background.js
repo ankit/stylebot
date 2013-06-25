@@ -14,7 +14,6 @@ var cache = {
     contextMenu: true,
     livePreviewColorPicker: true,
     livePreviewPage: true,
-    showPageAction: true,
     accordions: [0, 1, 2, 3]
   },
 
@@ -29,7 +28,6 @@ var cache = {
 function init() {
   updateVersion(function() {
     initCache(function() {
-      PageAction.showAll();
       ContextMenu.init();
     });
   });
@@ -38,7 +36,7 @@ function init() {
 }
 
 /**
- * Attaches listeners to act on requests sent from tabs and page action
+ * Attaches listeners to act on requests sent from tabs and browser action
  */
 function attachListeners() {
   chrome.tabs.onUpdated.addListener(onTabUpdated);
@@ -47,99 +45,99 @@ function attachListeners() {
 
   chrome.extension.onRequest.addListener(
     function(request, sender, sendResponse) {
-    switch (request.name) {
-      case 'activatePageAction':
-        PageAction.activate(sender.tab);
-        sendResponse({});
-        break;
+      switch (request.name) {
+        case 'activateBrowserAction':
+          BrowserAction.activate(sender.tab);
+          sendResponse({});
+          break;
 
-      case 'unhighlightPageAction':
-        PageAction.unhighlight(sender.tab);
-        sendResponse({});
-        break;
+        case 'unhighlightBrowserAction':
+          BrowserAction.unhighlight(sender.tab);
+          sendResponse({});
+          break;
 
-      case 'highlightPageAction':
-        PageAction.highlight(sender.tab);
-        sendResponse({});
-        break;
+        case 'highlightBrowserAction':
+          BrowserAction.highlight(sender.tab);
+          sendResponse({});
+          break;
 
-      case 'copyToClipboard':
-        request.text.copyToClipboard();
-        sendResponse({});
-        break;
+        case 'copyToClipboard':
+          request.text.copyToClipboard();
+          sendResponse({});
+          break;
 
-      case 'save':
-        cache.styles.save(request.url, request.rules, request.data);
-        sendResponse({});
-        break;
+        case 'save':
+          cache.styles.save(request.url, request.rules, request.data);
+          sendResponse({});
+          break;
 
-      case 'doesStyleExist':
-        sendResponse(cache.styles.exists(request.url));
-        break;
+        case 'doesStyleExist':
+          sendResponse(cache.styles.exists(request.url));
+          break;
 
-      case 'transfer':
-        cache.styles.transfer(request.source, request.destination);
-        sendResponse({});
-        break;
+        case 'transfer':
+          cache.styles.transfer(request.source, request.destination);
+          sendResponse({});
+          break;
 
-      case 'getGlobalRules':
-        sendResponse(cache.styles.getGlobalRules());
-        break;
+        case 'getGlobalRules':
+          sendResponse(cache.styles.getGlobalRules());
+          break;
 
-      case 'getCombinedRulesForPage':
-        var response;
-        if (cache.styles.getCombinedRulesForPage) {
-          response = cache.styles.getCombinedRulesForPage(
-            request.url, sender.tab);
-          response.success = true;
-        } else {
-          response = {
-            success: false
+        case 'getCombinedRulesForPage':
+          var response;
+          if (cache.styles.getCombinedRulesForPage) {
+            response = cache.styles.getCombinedRulesForPage(
+              request.url, sender.tab);
+            response.success = true;
+          } else {
+            response = {
+              success: false
+            }
           }
-        }
 
-        sendResponse(response);
-        break;
+          sendResponse(response);
+          break;
 
-      case 'getCombinedRulesForIframe':
-        var response;
-        if (cache.styles.getCombinedRulesForIframe) {
-          response = cache.styles.getCombinedRulesForIframe(
-            request.url, sender.tab);
-          response.success = true;
-        } else {
-          response = {
-            success: false
+        case 'getCombinedRulesForIframe':
+          var response;
+          if (cache.styles.getCombinedRulesForIframe) {
+            response = cache.styles.getCombinedRulesForIframe(
+              request.url, sender.tab);
+            response.success = true;
+          } else {
+            response = {
+              success: false
+            }
           }
-        }
 
-        sendResponse(response);
-        break;
+          sendResponse(response);
+          break;
 
-      case 'fetchOptions':
-        sendResponse({
-          options: cache.options
-        });
-        break;
+        case 'fetchOptions':
+          sendResponse({
+            options: cache.options
+          });
+          break;
 
-      case 'saveAccordionState':
-        saveAccordionState(request.accordions);
-        sendResponse({});
-        break;
+        case 'saveAccordionState':
+          saveAccordionState(request.accordions);
+          sendResponse({});
+          break;
 
-      case 'saveOption':
-        saveOption(request.option.name, request.option.value);
-        sendResponse({});
-        break;
+        case 'saveOption':
+          saveOption(request.option.name, request.option.value);
+          sendResponse({});
+          break;
 
-      case 'getOption':
-        sendResponse(getOption(request.optionName));
-        break;
+        case 'getOption':
+          sendResponse(getOption(request.optionName));
+          break;
 
-      case 'fetchImportCSS':
-        cache.styles.fetchImportCSS(request.url, function(css) {
-          sendResponse({text: css});
-        });
+        case 'fetchImportCSS':
+          cache.styles.fetchImportCSS(request.url, function(css) {
+            sendResponse({text: css});
+          });
     }
   });
 }
@@ -160,7 +158,7 @@ function onTabUpdated(tabId, changeInfo, tab) {
   }
 
   if (changeInfo.url) {
-    PageAction.update(tab);
+    BrowserAction.update(tab);
   }
 }
 

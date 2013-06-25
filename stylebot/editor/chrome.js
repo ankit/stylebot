@@ -6,16 +6,16 @@
 stylebot.chrome = {
   /**
     * Send the appropriate request to the background page
-    *   to update the page actio
+    *   to update the browser action
     * @param {boolean} Stylebot editor status i.e. open or closed
     */
-  setPageAction: function(status) {
+  setBrowserAction: function(status) {
     if (status) {
-      chrome.extension.sendRequest({ name: 'activatePageAction' }, function() {});
+      chrome.extension.sendRequest({ name: 'activateBrowserAction' }, function() {});
     } else if (!$.isEmptyObject(stylebot.style.rules) || !$.isEmptyObject(stylebot.style.global)) {
-      chrome.extension.sendRequest({ name: 'highlightPageAction' }, function() {});
+      chrome.extension.sendRequest({ name: 'highlightBrowserAction' }, function() {});
     } else {
-      chrome.extension.sendRequest({ name: 'unhighlightPageAction' }, function() {});
+      chrome.extension.sendRequest({ name: 'unhighlightBrowserAction' }, function() {});
     }
   },
 

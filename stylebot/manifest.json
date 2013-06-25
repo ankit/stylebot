@@ -9,7 +9,7 @@
       "stylebotme/post-to-social.js",
       "background/styles.js",
       "background/updates.js",
-      "background/pageaction.js",
+      "background/browseraction.js",
       "background/contextmenu.js",
       "background/string.js",
       "background/background.js"
@@ -121,10 +121,10 @@
     "all_frames": true
   }],
 
-  "page_action": {
+  "browser_action": {
     "default_icon"  : "images/css.png",
     "default_title" : "Stylebot",
-    "default_popup" : "pageaction/index.html"
+    "default_popup" : "browseraction/index.html"
   },
 
   "icons": {

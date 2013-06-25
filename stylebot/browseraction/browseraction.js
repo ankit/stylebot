@@ -1,11 +1,11 @@
 /**
- * PageAction menu actions
+ * BrowserAction menu
  */
 $(document).ready(function() {
-  PageAction.init();
+  BrowserAction.init();
 });
 
-var PageAction = {
+var BrowserAction = {
   styles: {},
 
   init: function() {
@@ -16,13 +16,13 @@ var PageAction = {
         var tab = tabs[i];
         if (tab.active) {
           $(".share").click(function(e) {
-            PageAction.share(e, tab);
+            BrowserAction.share(e, tab);
           });
           $(".open").click(function(e) {
-            PageAction.open(e, tab);
+            BrowserAction.open(e, tab);
           });
           $(".reset").click(function(e) {
-            PageAction.reset(e, tab);
+            BrowserAction.reset(e, tab);
           }).mouseenter(function(e) {
             chrome.tabs.sendRequest(tab.id, {
               name: "previewReset"
@@ -33,7 +33,7 @@ var PageAction = {
             }, function(response){});
           })
           $(".options").click(function(e) {
-            PageAction.options(e, tab);
+            BrowserAction.options(e, tab);
           });
 
           chrome.tabs.sendRequest(tab.id, {name: "getURLAndSocialData"}, function(response) {
@@ -77,7 +77,7 @@ var PageAction = {
                 var userLink = "http://stylebot.me/users/" + styles[i].username;
                 var favCount = styles[i].favorites;
 
-                PageAction.styles[id] = styles[i].css;
+                BrowserAction.styles[id] = styles[i].css;
 
                 var html = '<li class="style-item"' +
                 '" data-placement="' + (i == 0 ? 'bottom' : 'top') +
@@ -111,22 +111,22 @@ var PageAction = {
                 $menu.append(html);
               }
 
-              $('.style-link, .style-author').click(PageAction.openLink);
+              $('.style-link, .style-author').click(BrowserAction.openLink);
 
               $('.style-item').mouseenter(function(e) {
                 setTimeout(function() {
-                  PageAction.onStyleMouseenter(e, tab);
+                  BrowserAction.onStyleMouseenter(e, tab);
                 }, 0);
               });
 
               $('#menu').mouseleave(function(e) {
                 setTimeout(function() {
-                  PageAction.onStyleMouseleave(e, tab)
+                  BrowserAction.onStyleMouseleave(e, tab)
                 }, 100);
               });
 
               $('.style-item').click(function(e) {
-                PageAction.install(e, tab);
+                BrowserAction.install(e, tab);
               });
             });
           });
@@ -143,7 +143,7 @@ var PageAction = {
     }
 
     var id = $el.data('id');
-    var css = PageAction.styles[id];
+    var css = BrowserAction.styles[id];
     var title = $el.data('title');
     var description = $el.data('desc');
     var favCount = $el.data('favcount');
@@ -179,7 +179,7 @@ var PageAction = {
     }
 
     var id = $el.data('id');
-    var css = PageAction.styles[id];
+    var css = BrowserAction.styles[id];
     var title = $el.data('title');
     var timestamp = $el.data('timestamp');
 
