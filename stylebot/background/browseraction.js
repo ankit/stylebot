@@ -7,7 +7,13 @@ var BrowserAction = {
    * @param {object} tab The tab for which the browser action should be updated
    */
   unhighlight: function(tab) {
-    chrome.browserAction.setIcon({ tabId: tab.id, path: 'images/css.png' });
+    chrome.browserAction.setIcon({
+      tabId: tab.id,
+      path: {
+        '19': 'images/css.png',
+        '38': 'images/css@2x.png'
+      }
+    });
   },
 
   /**
@@ -19,7 +25,10 @@ var BrowserAction = {
   highlight: function(tab) {
     chrome.browserAction.setIcon({
       tabId: tab.id,
-      path: 'images/css_highlighted.png'
+      path: {
+        '19': 'images/css_highlighted.png',
+        '38': 'images/css_highlighted@2x.png'
+      }
     });
   },
 
@@ -31,7 +40,10 @@ var BrowserAction = {
   activate: function(tab) {
     chrome.browserAction.setIcon({
       tabId: tab.id,
-      path: 'images/css_active.png'
+      path: {
+        '19': 'images/css_active.png',
+        '38': 'images/css_active@2x.png'
+      }
     });
   },
 
