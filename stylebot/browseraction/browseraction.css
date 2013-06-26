@@ -29,7 +29,11 @@ body {
 
 .nav-pills > li {
   min-width: 200px;
-  border: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+}
+
+.nav-pills > li:last-of-type {
+  border-bottom: 0;
 }
 
 .nav-pills > li > a {
