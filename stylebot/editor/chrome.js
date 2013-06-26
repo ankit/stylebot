@@ -239,6 +239,7 @@ chrome.extension.onRequest.addListener(
         request.title,
         request.css,
         request.timestamp);
+      stylebot.chrome.setBrowserAction(false);
     }
 
     else if (request.name === 'reset') {
@@ -247,6 +248,7 @@ chrome.extension.onRequest.addListener(
       }
 
       stylebot.style.resetAllCSS(true);
+      stylebot.chrome.setBrowserAction(false);
     }
   }
 );
