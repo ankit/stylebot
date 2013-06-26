@@ -2,7 +2,8 @@
   "manifest_version": 2,
   "name"            : "Stylebot",
   "version"         : "2",
-  "description"     : "Adapt the web's appearance",
+  "description"     : "Change the appearance of websites instantly.
+  Preview and install styles created by users for your favorite websites",
 
   "background" : {
     "scripts": [
@@ -16,7 +17,7 @@
     ]
   },
 
-  "options_page"    : "options/index.html",
+  "options_page": "options/index.html",
 
   "content_scripts": [{
     "matches": ["<all_urls>"],

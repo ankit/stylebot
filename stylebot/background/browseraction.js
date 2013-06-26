@@ -1,5 +1,28 @@
 // Update the extension browser action
 var BrowserAction = {
+  init: function() {
+    // Track when the browser action closes to do cleanup on the current page
+    chrome.runtime.onConnect.addListener(function(port) {
+      if (port.name === "browserAction") {
+        var activeTab;
+
+        port.onMessage.addListener(function(message) {
+          if (message.name === "activeTab") {
+            activeTab = message.tab;
+          }
+        });
+
+        port.onDisconnect.addListener(function() {
+          if (activeTab) {
+            chrome.tabs.sendRequest(activeTab.id, {
+              name: "resetPreview"
+            }, function(response){});
+          }
+        });
+      }
+    });
+  },
+
   /**
    * Update browser action for the specified tab to indicate:
    *   - stylebot is not visible

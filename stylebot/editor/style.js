@@ -595,7 +595,7 @@ stylebot.style = {
    * Reset the preview of any style and reset to the specifed CSS.
    * @param {String} css The CSS to apply to the page.
    */
-  resetPreview: function(css) {
+  resetPreview: function() {
     CSSUtils.crunchCSS(this.rules, true, true, $.proxy(function(css) {
       $(this.CSS_SELECTOR).html(css);
     }, this));

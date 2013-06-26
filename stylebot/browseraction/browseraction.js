@@ -9,18 +9,25 @@ var BrowserAction = {
   styles: {},
 
   init: function() {
+    var port = chrome.runtime.connect({name: "browserAction"});
+
     chrome.windows.getCurrent({populate: true}, function(aWindow) {
       var tabs = aWindow.tabs;
       var len = tabs.length;
+
       for (var i = 0; i < len; i++) {
         var tab = tabs[i];
         if (tab.active) {
+          port.postMessage({name: "activeTab", tab: tab});
+
           $(".share").click(function(e) {
             BrowserAction.share(e, tab);
           });
+
           $(".open").click(function(e) {
             BrowserAction.open(e, tab);
           });
+
           $(".reset").click(function(e) {
             BrowserAction.reset(e, tab);
           }).mouseenter(function(e) {
@@ -32,6 +39,7 @@ var BrowserAction = {
               name: "resetPreview"
             }, function(response){});
           })
+
           $(".options").click(function(e) {
             BrowserAction.options(e, tab);
           });
@@ -130,6 +138,7 @@ var BrowserAction = {
               });
             });
           });
+
           return;
         }
       }

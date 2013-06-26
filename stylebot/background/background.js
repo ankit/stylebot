@@ -32,6 +32,7 @@ function init() {
     });
   });
 
+  BrowserAction.init();
   attachListeners();
 }
 
