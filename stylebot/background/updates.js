@@ -22,9 +22,13 @@ function updateVersion(callback) {
  * Show notification for version update
  */
 function showUpdateNotification() {
-  var notification = webkitNotifications.createHTMLNotification(
-    'notification/index.html'
-  );
-  notification.show();
+  try {
+    var notification = webkitNotifications.createHTMLNotification(
+      'notification/index.html'
+    );
+    notification.show();
+  } catch(e) {
+    console.log(e);
+  }
 }
 
