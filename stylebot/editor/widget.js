@@ -413,7 +413,7 @@ stylebot.widget = {
    * Reset the entire CSS for the page
    */
   resetPage: function() {
-    if (confirm("Are you sure you want to remove the custom CSS for this page?")) {
+    if (confirm("Are you sure you want to remove custom CSS for this page?")) {
       stylebot.undo.push(Utils.cloneObject(stylebot.style.rules));
       stylebot.undo.refresh();
       stylebot.widget.reset();
