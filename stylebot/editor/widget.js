@@ -413,11 +413,13 @@ stylebot.widget = {
    * Reset the entire CSS for the page
    */
   resetPage: function() {
-    stylebot.undo.push(Utils.cloneObject(stylebot.style.rules));
-    stylebot.undo.refresh();
-    stylebot.widget.reset();
-    stylebot.style.resetAllCSS();
-    stylebot.widget.disableResetPageButton();
+    if (confirm("Are you sure you want to reset the custom CSS for this page?")) {
+      stylebot.undo.push(Utils.cloneObject(stylebot.style.rules));
+      stylebot.undo.refresh();
+      stylebot.widget.reset();
+      stylebot.style.resetAllCSS();
+      stylebot.widget.disableResetPageButton();
+    }
   },
 
   /**
