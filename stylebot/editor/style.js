@@ -441,7 +441,7 @@ stylebot.style = {
    */
   resetAllCSS: function(showPopover) {
     if (showPopover) {
-      this.showPreviewPopover("Reset custom CSS for the page");
+      this.showPreviewPopover("Removed custom CSS for the page");
       this.hidePreviewPopover(true);
     }
 
@@ -564,7 +564,7 @@ stylebot.style = {
    * Preview the page after removing any style rules
    */
   previewReset: function() {
-    this.showPreviewPopover("Reset Preview");
+    this.showPreviewPopover("Preview after removing custom CSS");
     this.applyPageCSS("", false);
   },
 

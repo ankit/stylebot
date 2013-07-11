@@ -171,7 +171,7 @@ stylebot.widget = {
 
     // Edit CSS button
     WidgetUI.createButton('Edit CSS')
-    .attr('title', 'Edit custom CSS for the entire page')
+    .attr('title', 'Edit custom CSS for the page')
     .tipsy({ delayIn: 800, gravity: 'sw', html: true })
     .appendTo(btContainer)
     .click(self.editCSS);
@@ -186,15 +186,15 @@ stylebot.widget = {
 
     // Reset button
     self.cache.resetBtn = WidgetUI.createButton('Reset')
-    .attr('title', 'Reset custom CSS for the selected element(s)')
+    .attr('title', 'Remove custom CSS for the selected element(s)')
     .prop('disabled', true)
-    .tipsy({ delayIn: 800, gravity: 's', html: true })
+    .tipsy({ delayIn: 500, gravity: 's', html: true })
     .appendTo(btContainer)
     .click(self.resetSelectedElements);
 
-    // Reset Page button
+    // Reset Custom CSS button
     self.cache.resetPageBtn = WidgetUI.createButton('Reset Page')
-    .attr('title', 'Reset custom CSS for the entire page')
+    .attr('title', 'Remove custom CSS for the page')
     .prop('disabled', true)
     .tipsy({ delayIn: 500, gravity: 'se', html: true })
     .appendTo(btContainer)
@@ -413,7 +413,7 @@ stylebot.widget = {
    * Reset the entire CSS for the page
    */
   resetPage: function() {
-    if (confirm("Are you sure you want to reset the custom CSS for this page?")) {
+    if (confirm("Are you sure you want to remove the custom CSS for this page?")) {
       stylebot.undo.push(Utils.cloneObject(stylebot.style.rules));
       stylebot.undo.refresh();
       stylebot.widget.reset();
