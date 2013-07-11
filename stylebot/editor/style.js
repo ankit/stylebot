@@ -175,21 +175,25 @@ stylebot.style = {
    */
   applyPageCSS: function(css, shouldSave, data) {
     if (shouldSave === undefined) { shouldSave = true; }
-
     var parsedRules = {};
 
     if (css != '') {
-      if (!this.parser)
+      if (!this.parser) {
         this.parser = new CSSParser();
+      }
+
       try {
         var sheet = this.parser.parse(css, false, true);
         parsedRules = CSSUtils.getRulesFromParserObject(sheet);
       } catch (e) {
         console.log(e);
+        return false;
       }
     }
 
-    if (parsedRules['error']) { return parsedRules['error']; }
+    if (parsedRules['error']) {
+      return parsedRules['error'];
+    }
 
     this.clearInlineCSS(this.cache.elements);
     this.updateStyleElement(parsedRules);

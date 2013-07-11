@@ -3994,6 +3994,9 @@ CSSParser.prototype = {
           if (!canNegate)
             return null;
           token = this.getToken(true, true);
+          if (!token.isNotNull()) {
+            return null;
+          }
           var simpleSelector = this.parseSimpleSelector(token, isFirstInChain, false);
           if (!simpleSelector)
             return null;
@@ -4010,6 +4013,9 @@ CSSParser.prototype = {
         else {
           while (true) {
             token = this.getToken(false, true);
+            if (!token.isNotNull()) {
+              break;
+            }
             if (token.isSymbol(")")) {
               s += ")";
               break;
