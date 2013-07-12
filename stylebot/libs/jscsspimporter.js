@@ -7,6 +7,7 @@ function JSCSSPImporter() {
   this.AT_RULE_PREFIX = "at";
   this.COMMENT_PREFIX = "comment";
   this.AT_IMPORT_RULE_TYPE = "@import";
+  this.commentIndex = 0;
 }
 
 JSCSSPImporter.prototype = {
@@ -64,9 +65,10 @@ JSCSSPImporter.prototype = {
   },
 
   importComment: function(rule, parent) {
-    var selector = this.COMMENT_PREFIX + rule.currentLine;
+    var selector = this.COMMENT_PREFIX + this.commentIndex;
     parent[selector] = new Object();
     parent[selector][this.COMMENT_PREFIX] = rule.cssText();
+    this.commentIndex++;
   },
 
   importStyleRule: function(rule, parent) {
