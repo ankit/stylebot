@@ -73,6 +73,13 @@ chrome.extension.onRequest.addListener(
         });
         break;
 
+      case 'showOptions':
+        chrome.tabs.create({
+          url: 'options/index.html',
+          active: true
+        });
+        break;
+
       case 'saveAccordionState':
         saveAccordionState(request.accordions);
         break;
