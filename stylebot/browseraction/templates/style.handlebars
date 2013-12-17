@@ -1,0 +1,33 @@
+<li class="style-item"
+    role="presentation"
+    data-placement="bottom"
+    data-title="{{title}}"
+    data-desc="{{description}}"
+    data-id="{{id}}"
+    data-author="{{username}}"
+    data-favcount="{{favorites}}"
+    data-timeago="{{timeAgo}}"
+    data-timestamp="{{timestamp}}">
+
+  <div role="menuitem" tabindex="-1" href="#">
+    {{shortTitle}}
+    <span class="style-meta">
+      <a class="style-link" href="{{styleLink}}">link</a>
+      by <a class="style-author" href="{{usernameLink}}">{{username}}</a>
+
+      <span class="pull-right">
+        {{#if featured}}
+          <span class="style-featured">featured</span>
+        {{/if}}
+
+        {{#if installed}}
+          <span class="style-installed">installed</span>
+        {{else}}
+          <span class="hide style-installed">installed</span>
+        {{/if}}
+      </span>
+
+    </span>
+  </div>
+
+</li>

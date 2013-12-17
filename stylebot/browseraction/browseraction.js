@@ -1,182 +1,214 @@
 /**
  * BrowserAction menu
  */
-$(document).ready(function() {
-  BrowserAction.init();
-});
-
 var BrowserAction = {
-  styles: {},
+  // Cache of css of styles
+  // Key/value pair of style id/css
+  css: {},
 
+  /**
+   * Initialize the browser action for the currently active tab
+   */
   init: function() {
-    var port = chrome.runtime.connect({name: "browserAction"});
+    _.bindAll(this,
+      'setup',
+      'fetch',
+      'renderStyles',
+      'onResetMouseenter',
+      'onResetMouseleave',
+      'share',
+      'open',
+      'reset',
+      'options',
+      'openLink',
+      'onStyleMouseenter',
+      'onStyleMouseleave',
+      'install');
 
-    chrome.windows.getCurrent({populate: true}, function(aWindow) {
+    chrome.windows.getCurrent({populate: true}, _.bind(function(aWindow) {
       var tabs = aWindow.tabs;
       var len = tabs.length;
 
       for (var i = 0; i < len; i++) {
-        var tab = tabs[i];
-        if (tab.active) {
-          port.postMessage({name: "activeTab", tab: tab});
-
-          $(".share").click(function(e) {
-            BrowserAction.share(e, tab);
-          });
-
-          $(".open").click(function(e) {
-            BrowserAction.open(e, tab);
-          });
-
-          $(".reset").click(function(e) {
-            BrowserAction.reset(e, tab);
-          }).mouseenter(function(e) {
-            chrome.tabs.sendRequest(tab.id, {
-              name: "previewReset"
-            }, function(response){});
-          }).mouseleave(function(e) {
-            chrome.tabs.sendRequest(tab.id, {
-              name: "resetPreview"
-            }, function(response){});
-          })
-
-          $(".options").click(function(e) {
-            BrowserAction.options(e, tab);
-          });
-
-          chrome.tabs.sendRequest(tab.id, {name: "getURLAndSocialData"}, function(response) {
-            var socialId = null;
-
-            if (response.social && response.social.id) {
-              socialId = response.social.id;
-            }
-
-            $.get("http://stylebot.me/search_api?q=" + response.url, function(styles_str) {
-              var styles = JSON.parse(styles_str);
-              styles = _.sortBy(styles, function(style) {
-                return (style.id == socialId) ? -1 : 1;
-              });
-
-              var len = styles.length;
-              var $menu = $("#menu");
-              $menu.html('');
-
-              if (len === 0) {
-                var html = '<li class="disabled"><a>No Styles Found.</a></li>';
-                $menu.append(html);
-                return;
-              }
-
-              for (var i = 0; i < len; i++) {
-                var name = styles[i].title;
-                var shortName = name;
-                if (shortName.length > 25) {
-                  shortName = shortName.substring(0, 25) + "...";
-                }
-
-                var title = styles[i].description.replace(/"/g, '&quot;').replace(/\n/g, '<br>');
-                var url = styles[i].site;
-                var id = styles[i].id;
-                var link = "http://stylebot.me/styles/" + id;
-                var featured = (styles[i].featured == 1);
-                var timestamp = styles[i].updated_at;
-                var timeAgo = moment(timestamp).fromNow();
-                var username = styles[i].username;
-                var userLink = "http://stylebot.me/users/" + styles[i].username;
-                var favCount = styles[i].favorites;
-
-                BrowserAction.styles[id] = styles[i].css;
-
-                var html = '<li class="style-item"' +
-                '" data-placement="' + (i == 0 ? 'bottom' : 'top') +
-                '" data-title="' + name +
-                '" data-id="' + id +
-                '" data-desc="' + title +
-                '" data-author="' + username +
-                '" data-favcount="' + favCount +
-                '" data-timeago="' + timeAgo +
-                '" data-timestamp="' + timestamp +
-                '" role="presentation">' +
-                '<div role="menuitem" tabindex="-1" href="#">' +
-                shortName + '<span class="style-meta"><a class="style-link" href="' +
-                link + '">link</a>';
-
-                html += ' by <a class="style-author" href="' + userLink + '">' + username +'</a>';
-
-                html += '<span class="pull-right">';
-
-                if (featured) {
-                  html += '<span class="style-featured">featured</span>';
-                }
-
-                if (socialId == styles[i].id) {
-                  html += '<span class="style-installed">installed</span>';
-                } else {
-                  html += '<span class="hide style-installed">installed</span>';
-                }
-
-                html += '</span></div></li>';
-                $menu.append(html);
-              }
-
-              $('.style-link, .style-author').click(BrowserAction.openLink);
-
-              $('.style-item').mouseenter(function(e) {
-                setTimeout(function() {
-                  BrowserAction.onStyleMouseenter(e, tab);
-                }, 0);
-              });
-
-              $('#menu').mouseleave(function(e) {
-                setTimeout(function() {
-                  BrowserAction.onStyleMouseleave(e, tab)
-                }, 100);
-              });
-
-              $('.style-item').click(function(e) {
-                BrowserAction.install(e, tab);
-              });
-            });
-          });
-
-          return;
+        if (tabs[i].active) {
+          this.setup(tabs[i]);
+          break;
         }
       }
-    });
+    }, this));
   },
 
-  onStyleMouseenter: function(e, tab) {
+  /**
+   * Setup the UI and event listeners for the browser action
+   */
+  setup: function(tab) {
+    this.tab = tab;
+
+    this.$menu = $('#menu');
+    this.$share = $('.share');
+    this.$open = $('.open');
+    this.$reset = $('.reset');
+    this.$options = $('.options');
+
+    var port = chrome.runtime.connect({
+      name: 'browserAction'
+    });
+
+    port.postMessage({
+      name: 'activeTab',
+      tab: tab
+    });
+
+    this.$share.click(this.share);
+    this.$open.click(this.open);
+    this.$options.click(this.options);
+    this.$reset.click(this.reset)
+      .mouseenter(this.onResetMouseenter)
+      .mouseleave(this.onResetMouseleave);
+
+    this.fetch(_.bind(function() {
+      this.$links = $('.style-link, .style-author');
+      this.$style = $('.style-item');
+
+      this.$links.click(this.openLink);
+      this.$style.mouseenter(this.onStyleMouseenter)
+        .click(this.install);
+
+      this.$menu.mouseleave(this.onStyleMouseleave);
+    }, this));
+  },
+
+  /**
+   * Search for the styles for the current page and render them.
+   */
+  fetch: function(callback) {
+    var searchAPI = 'http://stylebot.me/search_api?q=';
+
+    chrome.tabs.sendRequest(this.tab.id, {
+      name: 'getURLAndSocialData'
+    },
+
+    _.bind(function(response) {
+      $.get(searchAPI + response.url,
+
+        _.bind(function(json) {
+          var styles = JSON.parse(json);
+          var socialId = null;
+
+          // Sort the installed style to the top
+          if (response.social && response.social.id) {
+            styles = _.sortBy(styles, function(style) {
+              socialId = response.social.id;
+              return (style.id == socialId) ? -1 : 1;
+            });
+          }
+
+          this.renderStyles(styles, socialId);
+          callback();
+        }, this));
+
+    }, this));
+  },
+
+  /**
+   * Render the given styles
+   */
+  renderStyles: function(styles, socialId) {
+    if (styles.length === 0) {
+      var html = '<li class="disabled"><a>No Styles Found.</a></li>';
+      this.$menu.html(html);
+      return;
+    }
+
+    this.$menu.html('');
+    _.each(styles, _.bind(function(style) {
+      this.css[style.id] = style.css;
+
+      this.$menu.append(Handlebars.templates['style']({
+        title: style.title,
+        shortTitle: (style.title.length > 25 ? style.title.substring(0, 25) + '...' : style.title),
+        description: style.description.replace(/"/g, '&quot;').replace(/\n/g, '<br>'),
+        id: style.id,
+        url: style.site,
+        styleLink: 'http://stylebot.me/styles/' + style.id,
+        featured: (style.featured === '1'),
+        timestamp: style.updated_at,
+        timeAgo: moment(style.updated_at).fromNow(),
+        username: style.username,
+        usernameLink: 'http://stylebot.me/users/' + style.username,
+        favorites: style.favorites,
+        installed: (socialId == style.id)
+      }));
+
+    }, this));
+  },
+
+  /**
+   * Listener for mouseenter on reset option.
+   * Trigger a preview after resetting any styling on the page.
+   */
+  onResetMouseenter: function(e) {
+    chrome.tabs.sendRequest(this.tab.id, {
+      name: 'previewReset'
+    }, function(){});
+  },
+
+  /**
+   * Listener for mouseleave on reset option.
+   * Reset preview of style reset.
+   */
+  onResetMouseleave: function(e) {
+    chrome.tabs.sendRequest(this.tab.id, {
+      name: 'resetPreview'
+    }, function(){});
+  },
+
+  /**
+   * Listener for the mouseenter event on styles.
+   * Trigger a preview of the style on the current page.
+   */
+  onStyleMouseenter: function(e) {
     var $el = $(e.target);
     if (!$el.hasClass('style-item')) {
       $el = $el.parents('.style-item');
     }
 
     var id = $el.data('id');
-    var css = BrowserAction.styles[id];
+    var css = this.css[id];
     var title = $el.data('title');
     var description = $el.data('desc');
     var favCount = $el.data('favcount');
     var author = $el.data('author');
     var timeAgo = $el.data('timeago');
 
-    chrome.tabs.sendRequest(tab.id, {
-      name: "preview",
+    chrome.tabs.sendRequest(this.tab.id, {
+      name: 'preview',
       description: description,
       title: title,
       author: author,
       timeAgo: timeAgo,
       favCount: favCount,
       css: css
+    }, function(){});
+  },
+
+  /**
+   * Listener for the mouseleave event on styles.
+   * Reset the preview of the style.
+   */
+  onStyleMouseleave: function(e) {
+    chrome.tabs.sendRequest(this.tab.id, {
+      name: 'resetPreview'
     }, function(response){});
   },
 
-  onStyleMouseleave: function(e, tab) {
-    chrome.tabs.sendRequest(tab.id, {name: "resetPreview"}, function(response){});
-  },
-
-  install: function(e, tab) {
+  /**
+   * Install the clicked style on the current page.
+   * Listener for the click event on styles.
+   */
+  install: function(e) {
     var $el = $(e.target);
-    if ($el.hasClass("style-link") || $el.hasClass("style-author")) {
+    if ($el.hasClass('style-link') || $el.hasClass('style-author')) {
       return;
     }
 
@@ -188,44 +220,76 @@ var BrowserAction = {
     }
 
     var id = $el.data('id');
-    var css = BrowserAction.styles[id];
     var title = $el.data('title');
     var timestamp = $el.data('timestamp');
+    var css = this.css[id];
 
-    chrome.tabs.sendRequest(tab.id, {
-      name: "install",
+    chrome.tabs.sendRequest(this.tab.id, {
+      name: 'install',
       id: id,
       title: title,
       css: css,
       timestamp: timestamp
-    }, function(response){});
+    }, function() {});
   },
 
-  share: function(e, tab) {
-    $(e.target).text("Sharing...").addClass('disabled');
-    PostToSocial.init(tab);
+  /**
+   * Open stylebot.me/post with the current page's style
+   * information prefilled.
+   */
+  share: function(e) {
+    $(e.target).text('Sharing...').addClass('disabled');
+    PostToSocial.init(this.tab);
   },
 
-  open: function(e, tab) {
-    $(e.target).text("Opening...").addClass('disabled');
-    chrome.tabs.sendRequest(tab.id, {name: "toggle"}, function(response){});
+  /**
+   * Show stylebot on the current page.
+   */
+  open: function(e) {
+    $(e.target).text('Opening...').addClass('disabled');
+
+    chrome.tabs.sendRequest(this.tab.id, {
+      name: 'toggle'
+    }, function() {});
+
     window.close();
   },
 
-  options: function(e, tab) {
-    chrome.tabs.sendRequest(tab.id, {name: "viewOptions"}, function(response){});
+  /**
+   * Open the options page in a new tab.
+   */
+  options: function(e) {
+    chrome.tabs.create({
+      url: 'options/index.html',
+      active: true
+    });
+
     window.close();
   },
 
-  reset: function(e, tab) {
-    chrome.tabs.sendRequest(tab.id, {name: "reset"}, function(response){});
+  /**
+   * Reset the styling for the current page.
+   */
+  reset: function(e) {
+    chrome.tabs.sendRequest(this.tab.id, {
+      name: 'reset'
+    }, function(){});
   },
 
-  openLink: function(e, tab) {
+  /**
+   * Listener for the click event on links in the browser action.
+   * By default, links don't open in a browser action.
+   */
+  openLink: function(e) {
     e.preventDefault();
+
     chrome.tabs.create({
       url: $(e.target).attr('href'),
       active: false
-    })
+    });
   }
-}
+};
+
+$(document).ready(function() {
+  BrowserAction.init();
+});
