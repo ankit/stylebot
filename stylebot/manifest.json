@@ -81,7 +81,7 @@
     "css": [
       "libs/colorpicker/colorpicker.css",
       "libs/tipsy/tipsy.css",
-      "libs/ace/ace.css",
+      "libs/ace/stylebot-ace.css",
       "libs/selectize/selectize.css",
 
       "shared/modalbox/modalbox.css",

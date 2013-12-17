@@ -476,9 +476,9 @@ a.stylebot-accordion-active .stylebot-accordion-icon {
 }
 
 #stylebot-page-editor {
-  position: relative;
-  margin-top: 5px;
-  margin-bottom: 5px;
+  position: relative !important;
+  margin-top: 5px !important;
+  margin-bottom: 5px !important;
   width: 302px !important;
 }
 
