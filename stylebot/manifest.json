@@ -7,12 +7,15 @@
   "background" : {
     "scripts": [
       "stylebotme/post-to-social.js",
+
+      "background/utils.js",
       "background/styles.js",
-      "background/updates.js",
       "background/browseraction.js",
       "background/contextmenu.js",
-      "background/string.js",
-      "background/background.js"
+      "background/options.js",
+      "background/version.js",
+      "background/listeners.js",
+      "background/init.js"
     ]
   },
 

@@ -33,7 +33,9 @@ var ContextMenu = {
         }
       } else {
         options.onclick = function(info, tab) {
-          sendRequestToTab(tab, action);
+          chrome.tabs.sendRequest(tab.id, {
+            name: msg
+          }, function() {});
         }
       }
     }

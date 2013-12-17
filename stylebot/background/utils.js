@@ -1,7 +1,39 @@
-// Extending the String object with utility functions
+/**
+ * Helper utility functions used by the background page
+ */
 
 /**
- * Trims a string
+ * Clone an object
+ * http://my.opera.com/GreyWyvern/blog/show.dml/1725165
+ */
+function cloneObject(obj) {
+  var newObj = (obj instanceof Array) ? [] : {};
+  for (i in obj) {
+    if (obj[i] && typeof obj[i] == 'object')
+      newObj[i] = cloneObject(obj[i]);
+    else
+      newObj[i] = obj[i];
+  }
+  return newObj;
+};
+
+/**
+ * Iterate through an object to see if it contains any keys
+ */
+function isEmptyObject(obj) {
+  var isEmpty = true;
+  for(keys in obj) {
+     isEmpty = false;
+     break;
+  }
+
+  return isEmpty;
+};
+
+// String Helpers
+
+/**
+ * Trim a string
  * @return {String} The trimmed string.
  */
 String.prototype.trim = function() {
@@ -9,7 +41,7 @@ String.prototype.trim = function() {
 };
 
 /**
- * Checks if a given string is a pattern
+ * Check if a given string is a pattern
  * @return {Boolean} True if the string is a pattern, false otherwise.
  */
 String.prototype.isPattern = function() {
@@ -19,7 +51,7 @@ String.prototype.isPattern = function() {
 };
 
 /**
- * Checks if a given string is a regular expression
+ * Check if a given string is a regular expression
  * @return {Boolean} True if the string is a regular expression, false otherwise.
  */
 String.prototype.isRegex = function() {
@@ -30,7 +62,7 @@ String.prototype.isRegex = function() {
 };
 
 /**
- * Checks if the string matches an stylebot pattern
+ * Check if the string matches an stylebot pattern
  * @param {String} pattern The stylebot pattern.
  * @return {Boolean} True if the string matches the patern, false otherwise.
  */
@@ -79,7 +111,7 @@ String.prototype.matchesPattern = function(pattern) {
 };
 
 /**
- * Checks if the given url matches with the basic pattern.
+ * Check if the given url matches with the basic pattern.
  * @param {String} pattern The stylebot pattern.
  * @return {Boolean} True if the string matches the patern, false otherwise.
  */
@@ -124,7 +156,7 @@ String.prototype.isValidUrl = function() {
 };
 
 /**
- * Checks the extension of the URL to determine if it is valid HTML
+ * Check the extension of the URL to determine if it is valid HTML
  * @return {Boolean} True if the string does not have an extension json/pdf.
  */
 String.prototype.isOfHTMLType = function() {
@@ -137,7 +169,7 @@ String.prototype.isOfHTMLType = function() {
 };
 
 /**
- * Returns the extension of the given filename / URL.
+ * Return the extension of the filename / URL.
  * @return {String} The extension.
  */
 String.prototype.getExtension = function() {
@@ -145,7 +177,7 @@ String.prototype.getExtension = function() {
 };
 
 /**
- * Copies the string to the clipboard
+ * Copy the string to the clipboard
  */
 String.prototype.copyToClipboard = function() {
   var copyTextarea = document.createElement('textarea');

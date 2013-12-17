@@ -1,6 +1,8 @@
-// Version updates
-// This is the only place you need to update the version string
-// besides manifest.json.
+/**
+ * Version updates
+ * This is the only place you need to update the version string
+ * besides manifest.json.
+ */
 var VERSION = '2';
 
 /**
