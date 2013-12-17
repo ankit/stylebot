@@ -11,6 +11,7 @@
 }
 
 #stylebot {
+  direction: ltr !important;
   background-color: #fdfdfd !important;
   border: 1px solid #bbbbbb !important;
   border-radius: 0px !important;
