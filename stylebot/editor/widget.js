@@ -137,7 +137,7 @@ stylebot.widget = {
       title: 'View Options'
     })
     .tipsy({delayIn: 1000, gravity: 'ne'})
-    .click(stylebot.chrome.openOptionsPage);
+    .click(stylebot.chrome.showOptions);
 
     self.cache.header = $('<div>', {
       id: 'stylebot-header'

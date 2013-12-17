@@ -99,7 +99,10 @@ stylebot.chrome = {
   saveOption: function(name, value) {
     chrome.extension.sendRequest({
       name: 'saveOption',
-      option: { name: name, value: value }
+      option: {
+        name: name,
+        value: value
+      }
     }, function() {});
   },
 
@@ -109,14 +112,16 @@ stylebot.chrome = {
    * @param {function} callback Method to be called with the option value
    */
   getOption: function(name, callback) {
-    chrome.extension.sendRequest({name: 'getOption', optionName: name},
-      callback);
+    chrome.extension.sendRequest({
+      name: 'getOption',
+      optionName: name
+    }, callback);
   },
 
   /**
    * Open the options page for stylebot
    */
-  openOptionsPage: function() {
+  showOptions: function() {
     chrome.extension.sendRequest({
       name: 'showOptions'
     });
@@ -175,10 +180,6 @@ chrome.extension.onRequest.addListener(
       sendResponse({
         status: stylebot.style.status
       });
-    }
-
-    else if (request.name === 'viewOptions') {
-      stylebot.chrome.openOptionsPage();
     }
 
     else if (request.name === 'getURLAndSocialData') {

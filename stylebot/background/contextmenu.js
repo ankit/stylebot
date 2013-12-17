@@ -1,6 +1,8 @@
-// Right click menu
+/**
+ * Right click menu
+ */
 var ContextMenu = {
-  ID: "stylebot",
+  ID: 'stylebot',
 
   /**
    * Initialize the menu
@@ -10,7 +12,7 @@ var ContextMenu = {
     if (cache.options.contextMenu) {
       ContextMenu.create('Stylebot', null, null, null, ContextMenu.ID);
       ContextMenu.create('Style Element', ContextMenu.ID, 'openWidget');
-      ContextMenu.create('View Options...', ContextMenu.ID, 'viewOptions');
+      ContextMenu.create('View Options...', ContextMenu.ID, 'showOptions');
       ContextMenu.create('Search...', ContextMenu.ID, 'searchSocial');
       ContextMenu.create('Share...', ContextMenu.ID, 'postToSocial');
     }
@@ -20,24 +22,33 @@ var ContextMenu = {
     var options = {
       title: title,
       contexts: ['all']
-    };
+    }, handler;
 
     if (parentId) {
       options.parentId = parentId;
     }
 
     if (action) {
-      if (action == 'postToSocial') {
-        options.onclick = function(info, tab) {
+      if (action === 'showOptions') {
+        handler = function() {
+          chrome.tabs.create({
+            url: 'options/index.html',
+            active: true
+          });
+        };
+      } else if (action === 'postToSocial') {
+        handler = function(info, tab) {
           PostToSocial.init(tab);
-        }
+        };
       } else {
-        options.onclick = function(info, tab) {
+        handler = function(info, tab) {
           chrome.tabs.sendRequest(tab.id, {
-            name: msg
-          }, function() {});
-        }
+            name: action
+          }, function(){});
+        };
       }
+
+      options.onclick = handler;
     }
 
     if (type) {
@@ -83,4 +94,4 @@ var ContextMenu = {
   remove: function() {
     chrome.contextMenus.removeAll();
   }
-}
+};
