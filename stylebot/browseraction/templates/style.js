@@ -23,7 +23,11 @@ function program5(depth0,data) {
   return "\n          <span class=\"hide style-installed\">installed</span>\n        ";
   }
 
-  buffer += "<li class=\"style-item\"\n    role=\"presentation\"\n    data-placement=\"bottom\"\n    data-title=\"";
+  buffer += "<li class=\"style-item\"\n    role=\"presentation\"\n    data-url=\"";
+  if (stack1 = helpers.url) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.url); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "\"\n    data-placement=\"bottom\"\n    data-title=\"";
   if (stack1 = helpers.title) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.title); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
@@ -73,7 +77,7 @@ function program5(depth0,data) {
   buffer += "\n\n        ";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.installed), {hash:{},inverse:self.program(5, program5, data),fn:self.program(3, program3, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n      </span>\n\n    </span>\n  </div>\n\n</li>";
+  buffer += "\n      </span>\n\n    </span>\n  </div>\n\n</li>\n";
   return buffer;
   });
 })();

@@ -4,10 +4,10 @@
  * Generating, applying and saving CSS styling rules
  */
 stylebot.style = {
-  AT_RULE_PREFIX: "at",
-  CSS_SELECTOR: "#stylebot-css",
-  GLOBAL_CSS_SELECTOR: "#stylebot-global-css",
-  PREVIEW_SELECTOR: "#stylebot-preview",
+  AT_RULE_PREFIX: 'at',
+  CSS_SELECTOR: '#stylebot-css',
+  GLOBAL_CSS_SELECTOR: '#stylebot-global-css',
+  PREVIEW_SELECTOR: '#stylebot-preview',
   PREVIEW_FADE_OUT_DELAY: 500,
 
   /*  cache of custom CSS rules applied to elements on the current page
@@ -46,8 +46,9 @@ stylebot.style = {
     }
 
     // if domain is empty, return url
-    else if (!this.cache.url || this.cache.url === '')
+    else if (!this.cache.url || this.cache.url === '') {
       this.cache.url = location.href;
+    }
 
     if (stylebotTempRules) {
       this.rules = stylebotTempRules;
@@ -70,8 +71,9 @@ stylebot.style = {
    * @param {string} selector CSS selector to update cache
    */
   fillCache: function(selector) {
-    if (selector != this.cache.selector) {
+    if (selector !== this.cache.selector) {
       this.cache.selector = selector;
+
       try {
         this.cache.elements = $(selector + ':not(#stylebot, #stylebot *)');
       }
@@ -88,7 +90,7 @@ stylebot.style = {
    * @param {string} value Value for CSS property
    */
   apply: function(property, value) {
-    if (!this.cache.selector || this.cache.selector == '') {
+    if (!this.cache.selector || this.cache.selector === '') {
       return true;
     }
 
@@ -96,8 +98,7 @@ stylebot.style = {
     this.save();
 
     setTimeout(function() {
-      if (stylebot.style.cache.elements &&
-        stylebot.style.cache.elements.length != 0)
+      if (stylebot.style.cache.elements && stylebot.style.cache.elements.length !== 0)
         stylebot.style.updateInlineCSS(stylebot.style.cache.elements,
           stylebot.style.getInlineCSS(stylebot.style.cache.selector));
       else
@@ -174,8 +175,11 @@ stylebot.style = {
    *   along with the save request.
    */
   applyPageCSS: function(css, shouldSave, data) {
-    if (shouldSave === undefined) { shouldSave = true; }
     var parsedRules = {};
+
+    if (shouldSave === undefined) {
+      shouldSave = true;
+    }
 
     if (css != '') {
       if (!this.parser) {
@@ -471,8 +475,8 @@ stylebot.style = {
    */
   save: function(data) {
     // if no rules are present, send null as value
-    var rules = null;
-    var i = false;
+    var rules = null,
+        i = false;
 
     for (var i in stylebot.style.rules) {
       break;
@@ -611,10 +615,11 @@ stylebot.style = {
    * Install the specified style for the current URL
    * @param {Number} id The id of the style
    * @param {String} title The title describing the style
+   * @param {String} url The url for which the style should be installed.
    * @param {String} css The css for the style
    * @param {String} timestamp The timestamp when the style was last updated
    */
-  install: function(id, title, css, timestamp) {
+  install: function(id, title, url, css, timestamp) {
     this.showPreviewPopover("Installed " + title);
     this.hidePreviewPopover(true);
 
@@ -623,6 +628,7 @@ stylebot.style = {
       timestamp: timestamp
     };
 
+    this.cache.url = url;
     this.applyPageCSS(css, true, this.social);
   },
 

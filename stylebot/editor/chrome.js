@@ -59,7 +59,12 @@ stylebot.chrome = {
    * @param {number} id ID of the style on Stylebot Social
    */
   install: function(url, rules, id) {
-    chrome.extension.sendRequest({ name: 'install', rules: rules, url: url, id: id }, function() {});
+    chrome.extension.sendRequest({
+      name: 'install',
+      rules: rules,
+      url: url,
+      id: id
+    }, function() {});
   },
 
   /**
@@ -68,14 +73,20 @@ stylebot.chrome = {
    * @param {string} dest Destination URL
    */
   transfer: function(src, dest) {
-    chrome.extension.sendRequest({name: 'transfer', source: src, destination: dest }, function() {});
+    chrome.extension.sendRequest({
+      name: 'transfer',
+      source: src,
+      destination: dest
+    }, function() {});
   },
 
   /**
    * Send request to fetch options from background page datastore
    */
   fetchOptions: function() {
-    chrome.extension.sendRequest({ name: 'fetchOptions' }, function(response) {
+    chrome.extension.sendRequest({
+      name: 'fetchOptions'
+    }, function(response) {
       initialize(response);
     });
   },
@@ -210,6 +221,7 @@ chrome.extension.onRequest.addListener(
       stylebot.style.install(
         request.id,
         request.title,
+        request.url,
         request.css,
         request.timestamp);
 

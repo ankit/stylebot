@@ -92,8 +92,8 @@ var BrowserAction = {
       $.get(searchAPI + response.url,
 
         _.bind(function(json) {
-          var styles = JSON.parse(json);
-          var socialId = null;
+          var styles = JSON.parse(json),
+              socialId = null;
 
           // Sort the installed style to the top
           if (response.social && response.social.id) {
@@ -115,12 +115,12 @@ var BrowserAction = {
    */
   renderStyles: function(styles, socialId) {
     if (styles.length === 0) {
-      var html = '<li class="disabled"><a>No Styles Found.</a></li>';
-      this.$menu.html(html);
+      this.$menu.html('<li class="disabled"><a>No Styles Found.</a></li>');
       return;
     }
 
     this.$menu.html('');
+
     _.each(styles, _.bind(function(style) {
       this.css[style.id] = style.css;
 
@@ -168,27 +168,22 @@ var BrowserAction = {
    * Trigger a preview of the style on the current page.
    */
   onStyleMouseenter: function(e) {
-    var $el = $(e.target);
+    var $el = $(e.target), id;
+
     if (!$el.hasClass('style-item')) {
       $el = $el.parents('.style-item');
     }
 
-    var id = $el.data('id');
-    var css = this.css[id];
-    var title = $el.data('title');
-    var description = $el.data('desc');
-    var favCount = $el.data('favcount');
-    var author = $el.data('author');
-    var timeAgo = $el.data('timeago');
+    id = $el.data('id');
 
     chrome.tabs.sendRequest(this.tab.id, {
       name: 'preview',
-      description: description,
-      title: title,
-      author: author,
-      timeAgo: timeAgo,
-      favCount: favCount,
-      css: css
+      description: $el.data('desc'),
+      title: $el.data('title'),
+      author: $el.data('author'),
+      timeAgo: $el.data('timeago'),
+      favCount: $el.data('favcount'),
+      css: this.css[id]
     }, function(){});
   },
 
@@ -207,7 +202,8 @@ var BrowserAction = {
    * Listener for the click event on styles.
    */
   install: function(e) {
-    var $el = $(e.target);
+    var $el = $(e.target), id;
+
     if ($el.hasClass('style-link') || $el.hasClass('style-author')) {
       return;
     }
@@ -219,17 +215,15 @@ var BrowserAction = {
       $el = $el.parents('.style-item');
     }
 
-    var id = $el.data('id');
-    var title = $el.data('title');
-    var timestamp = $el.data('timestamp');
-    var css = this.css[id];
+    id = $el.data('id');
 
     chrome.tabs.sendRequest(this.tab.id, {
       name: 'install',
       id: id,
-      title: title,
-      css: css,
-      timestamp: timestamp
+      title: $el.data('title'),
+      timestamp: $el.data('timestamp'),
+      url: $el.data('url'),
+      css: this.css[id]
     }, function() {});
   },
 
