@@ -73,7 +73,7 @@ var stylebot = {
     stylebot.widget.close();
     stylebot.status = false;
     stylebot.chrome.setBrowserAction(false);
-    stylebot.style.cleanUp();
+    stylebot.style.clean();
     stylebot.disableSelection();
     stylebot.detachClickListener();
     stylebot.unhighlight();
@@ -137,7 +137,7 @@ var stylebot = {
     stylebot.widget.open();
 
     setTimeout(function() {
-      stylebot.style.removeFromStyleElement();
+      stylebot.style.replaceAsInlineCSS(stylebot.style.cache.selector);
     }, 100);
   },
 

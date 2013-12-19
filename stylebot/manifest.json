@@ -95,6 +95,7 @@
 
     "js": [
       "libs/jquery.js",
+      "libs/underscore.js",
       "libs/colorpicker/colorpicker.js",
       "libs/tipsy/jquery.tipsy.js",
       "libs/parser.js",
