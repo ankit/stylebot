@@ -506,7 +506,8 @@ a.stylebot-accordion-active .stylebot-accordion-icon {
 }
 
 /* #stylebot is required so that this rule overrides the one defined in modal.css */
-#stylebot #stylebot-modal {
+
+#stylebot-container #stylebot-modal {
   padding: 7px !important;
   padding-bottom: 15px !important;
   width: 100% !important;
@@ -516,26 +517,33 @@ a.stylebot-accordion-active .stylebot-accordion-icon {
 
 /* @group Ace Editor Specific Modifications */
 
-#stylebot .ace_editor {
-  border: 1px solid #eee !important;
-}
-
-#stylebot .ace_editor * {
+#stylebot-container .stylebot-ace-measure-node {
   font-family: Menlo, Monaco, "Courier New", monospace !important;
+  font-size: 12px !important;
   line-height: 17px !important;
 }
 
-#stylebot .ace_scroller {
+#stylebot-container .ace_editor {
+  border: 1px solid #eee !important;
+}
+
+#stylebot-container .ace_editor * {
+  font-family: Menlo, Monaco, "Courier New", monospace !important;
+  font-size: 12px !important;
+  line-height: 17px !important;
+}
+
+#stylebot-container .ace_scroller {
   overflow-y: hidden !important;
   overflow-x: hidden !important;
 }
 
-#stylebot .ace_sb {
+#stylebot-container .ace_sb {
   overflow-y: auto !important;
   z-index: 5;
 }
 
-#stylebot  .ace_marker-layer .stylebot_warning {
+#stylebot-container  .ace_marker-layer .stylebot_warning {
   position: absolute;
   z-index: 4;
   background: hsla(17, 80%, 60%, 0.50);

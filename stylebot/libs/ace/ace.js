@@ -13720,12 +13720,14 @@ var Text = function(parentEl) {
             measureNode.innerHTML = lang.stringRepeat("Xy", n);
 
             // @ankit: Stylebot specific code to prevent the measureNode from polluting the DOM
-            //
+            // and adding a class to override certain styles
             var stylebotContainer = document.getElementById('stylebot-container');
             if (stylebotContainer) {
+                measureNode.className = measureNode.className + ' stylebot-ace-measure-node';
                 stylebotContainer.appendChild(measureNode);
             }
-            // End of Stylebot specific code
+            // end of Stylebot specific code
+
             else if (document.body) {
                 document.body.appendChild(measureNode);
             } else {
