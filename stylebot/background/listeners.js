@@ -89,7 +89,7 @@ chrome.extension.onRequest.addListener(
         break;
 
       case 'getOption':
-        sendResponse(cache.options[name]);
+        sendResponse(cache.options[request.optionName]);
         break;
 
       case 'fetchImportCSS':

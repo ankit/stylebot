@@ -33,12 +33,9 @@ stylebot.page = {
     $livePreviewCheckbox.click(this.toggleLivePreview)
       .tipsy({delayIn: 100, gravity: 'sw'});
 
-    stylebot.chrome.getOption('livePreviewPage', function(livePreview) {
-      if (livePreview) {
-        $livePreviewCheckbox.prop('checked', true);
-      }
-
-      stylebot.page.cache.livePreview = livePreview;
+    stylebot.chrome.getOption('livePreviewPage', function(value) {
+      $livePreviewCheckbox.prop('checked', value);
+      stylebot.page.cache.livePreview = value;
     });
 
     $(buttons.get(1)).click(this.copyToClipboard)
