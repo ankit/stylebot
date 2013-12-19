@@ -463,10 +463,10 @@ stylebot.style = {
    * Remove all the CSS for page from cache, <style> element and inline CSS.
    */
   resetAllCSS: function(showPopover) {
-    _.each(this.rules, function(rule, selector) {
+    _.each(this.rules, _.bind(function(rule, selector) {
       this.removeInlineCSS(selector);
       delete this.rules[selector];
-    });
+    }, this));
 
     this.resetStyleElement();
     this.save();

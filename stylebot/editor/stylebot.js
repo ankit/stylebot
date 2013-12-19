@@ -39,18 +39,20 @@ var stylebot = {
    * @param {object} options Options to apply
    */
   setOptions: function(options) {
-    for (option in options)
+    for (var option in options) {
       this.options[option] = options[option];
+    }
   },
 
   /**
    * Open / close editor
    */
   toggle: function() {
-    if (this.status === true)
+    if (this.status) {
       this.close();
-    else
+    } else {
       this.open();
+    }
   },
 
   /**
@@ -87,8 +89,9 @@ var stylebot = {
    * @param {element} el Element to highlight
    */
   highlight: function(el) {
-    if (!stylebot.selectionBox)
+    if (!stylebot.selectionBox) {
       stylebot.createHighlighter();
+    }
 
     stylebot.hoveredElement = el;
     stylebot.selectionBox.highlight(el);
@@ -99,8 +102,9 @@ var stylebot = {
    */
   unhighlight: function() {
     stylebot.hoveredElement = null;
-    if (stylebot.selectionBox)
+    if (stylebot.selectionBox) {
       stylebot.selectionBox.hide();
+    }
   },
 
   /**
@@ -179,8 +183,8 @@ var stylebot = {
   },
 
   /**
-    * Create the highlighter
-    */
+   * Create the highlighter
+   */
   createHighlighter: function() {
     stylebot.selectionBox = new SelectionBox(null, null, $('#stylebot-container').get(0));
   },
@@ -227,16 +231,18 @@ var stylebot = {
    */
   onMouseMove: function(e) {
     // for dropdown
-    if (e.target.className == 'stylebot-dropdown-li') {
+    if (e.target.className === 'stylebot-dropdown-li') {
       var $el = $(e.target.innerText).get(0);
-      if ($el != stylebot.hoveredElement) {
+      if ($el !== stylebot.hoveredElement) {
         stylebot.highlight($el);
       }
+
       return true;
     }
 
-    if (!stylebot.shouldSelect(e.target))
+    if (!stylebot.shouldSelect(e.target)) {
       return true;
+    }
 
     if (stylebot.belongsToStylebot(e.target)) {
       stylebot.unhighlight();
@@ -281,9 +287,9 @@ var stylebot = {
     var $el = $(el);
     var parent = $el.closest('#stylebot-container');
     var id = $el.attr('id');
-    if (parent.length != 0 || (id && id.indexOf('stylebot') != -1))
-      return true;
-    return false;
+
+    return (parent.length !== 0 ||
+      (id && id.indexOf('stylebot') !== -1));
   },
 
   /**
@@ -292,14 +298,12 @@ var stylebot = {
    * @return {boolean} Returns true if stylebot editor can close
    */
   shouldClose: function(el) {
-    if (!stylebot.status ||
+    return !(!stylebot.status ||
       stylebot.widget.basic.isColorPickerVisible ||
       stylebot.isKeyboardHelpVisible ||
       stylebot.page.isVisible ||
-      $('#stylebot-dropdown').length != 0 ||
-      el.tagName === 'SELECT')
-        return false;
-    return true;
+      $('#stylebot-dropdown').length !== 0 ||
+      el.tagName === 'SELECT');
   },
 
   /**
@@ -308,12 +312,10 @@ var stylebot = {
    * @return {boolean} Returns true if element should be selected
    */
   shouldSelect: function(el) {
-    if (stylebot.widget.isBeingDragged
-      || stylebot.page.isVisible
-      || stylebot.isKeyboardHelpVisible
-      || stylebot.hoveredElement === el
-    )
-      return false;
-    return true;
+    return !(stylebot.widget.isBeingDragged ||
+      stylebot.page.isVisible ||
+      stylebot.isKeyboardHelpVisible ||
+      stylebot.hoveredElement === el
+    );
   }
 };
