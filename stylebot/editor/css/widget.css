@@ -30,6 +30,10 @@
   z-index: 2147483645 !important;
 }
 
+#stylebot * {
+  font-family: 'Lucida Grande', Helvetica, Arial, sans-serif !important;
+}
+
 /* @end */
 
 /* @group Header */
@@ -494,6 +498,7 @@ a.stylebot-accordion-active .stylebot-accordion-icon {
 
 #stylebot-page-live-preview {
   margin-bottom: 10px !important;
+  font-weight: bold !important;
 }
 
 #stylebot-page-live-preview input {
