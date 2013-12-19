@@ -20,28 +20,9 @@ stylebot.page = {
   },
 
   create: function(options) {
-    var html = "<div>\
-    <div id='stylebot-page-editor-header'>Edit the CSS for <b>" + stylebot.style.cache.url + "</b>:</div>\
-    </div>\
-    <div id='stylebot-page-editor'>\
-    </div>\
-    <div id='stylebot-page-live-preview'>\
-    <label>\
-    <input type='checkbox' title='This may cause performance issues' class='stylebot-button' />\
-    Live Preview Changes\
-    </label>\
-    </div>\
-    <button class='stylebot-button' title='Copy to Clipboard' style='float:left !important; margin: 0px !important;' tabindex='0'>\
-    Copy\
-    </button>\
-    <div style='float: right !important; padding-right:15px !important;'>\
-    <button class='stylebot-button' style='margin: 0px !important; margin-right: 3px !important; float: none !important;' tabindex='0'>\
-    Save\
-    </button>\
-    <button class='stylebot-button' style='margin: 0px !important; float: none !important;' tabindex='0'>\
-    Cancel\
-    </button>\
-    </div>";
+    var html = Handlebars.templates['page']({
+      url: stylebot.style.cache.url
+    });
 
     this.modal = new ModalBox(html, options, function() {});
     this.initializeEditor();
@@ -68,16 +49,19 @@ stylebot.page = {
   },
 
   initializeEditor: function() {
-    var self = this;
+    var self = this,
+        editor,
+        session,
+        CssMode;
 
     // ace monkey-patch to allow automatic resizing based on scrollbars
     self.cache.editor = Utils.ace.monkeyPatch(ace.edit('stylebot-page-editor'));
 
-    var editor = self.cache.editor;
-    var session = editor.getSession();
+    editor = self.cache.editor;
+    session = editor.getSession();
+    CssMode = new require('ace/mode/css').Mode;
 
-    var cssMode = require('ace/mode/css').Mode;
-    session.setMode(new cssMode());
+    session.setMode(new CssMode());
     session.setUseWrapMode(true);
     session.on('change', self.contentChanged);
 
@@ -119,8 +103,8 @@ stylebot.page = {
         if (!prevTarget) {
           setTimeout(function() {
             self.onWindowResize();
-            }, 0);
-          }
+          }, 0);
+        }
 
         self.clearSyntaxError();
         stylebot.undo.push(Utils.cloneObject(stylebot.style.rules));
@@ -129,8 +113,10 @@ stylebot.page = {
 
       onClose: function() {
         self.isVisible = false;
-        if (prevTarget)
+        if (prevTarget) {
           prevTarget.focus();
+        }
+
         $(window).unbind('resize', self.onWindowResize);
       }
     });
@@ -145,7 +131,7 @@ stylebot.page = {
 
   copyToClipboard: function() {
     var text = stylebot.page.cache.editor.getValue();
-    if (text != undefined) {
+    if (text !== undefined) {
       stylebot.chrome.copyToClipboard(text);
     }
   },
@@ -191,13 +177,15 @@ stylebot.page = {
   },
 
   saveCSS: function(css, save) {
-    if (css === undefined) return true;
+    if (css === undefined) {
+      return true;
+    }
 
-    if (stylebot.page.cache.css != css) {
+    if (stylebot.page.cache.css !== css) {
       stylebot.page.cache.css = null;
       var response = stylebot.style.applyPageCSS(css, save);
 
-      if (response != true) {
+      if (response !== true) {
         stylebot.page.displaySyntaxError(response, save);
         return false;
       }

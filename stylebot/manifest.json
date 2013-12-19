@@ -96,6 +96,7 @@
     "js": [
       "libs/jquery.js",
       "libs/underscore.js",
+      "libs/handlebars.js",
       "libs/colorpicker/colorpicker.js",
       "libs/tipsy/jquery.tipsy.js",
       "libs/parser.js",
@@ -111,6 +112,8 @@
       "shared/utils.js",
 
       "stylebotme/post-to-social.js",
+
+      "editor/templates/page.js",
 
       "editor/stylebot.js",
       "editor/chrome.js",

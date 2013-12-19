@@ -1,0 +1,30 @@
+{{! Template for the stylebot page editing mode }}
+
+<div>
+  <div id="stylebot-page-editor-header">
+    Edit the CSS for <b>{{url}}</b>:</div>
+  </div>
+
+  <div id="stylebot-page-editor">
+  </div>
+
+  <div id="stylebot-page-live-preview">
+    <label>
+      <input type="checkbox" title="This may cause performance issues" class="stylebot-button" />
+      Live Preview Changes
+    </label>
+  </div>
+
+  <button class="stylebot-button" title="Copy to Clipboard" style="float:left !important; margin: 0px !important;" tabindex="0">
+    Copy
+  </button>
+
+  <div style="float: right !important; padding-right:15px !important;">
+    <button class="stylebot-button" style="margin: 0px !important; margin-right: 3px !important; float: none !important;" tabindex="0">
+      Save
+    </button>
+    <button class="stylebot-button" style="margin: 0px !important; float: none !important;" tabindex="0">
+      Cancel
+    </button>
+  </div>
+</div>
