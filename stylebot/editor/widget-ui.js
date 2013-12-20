@@ -50,7 +50,8 @@ var WidgetUI = {
   SIZE_UNITS: ['px', 'em', '%', 'pt'],
   DEFAULT_SIZE_UNIT: 'px',
 
-  DEFAULT_FONT_STACK: ['Helvetica',
+  DEFAULT_FONT_STACK: [
+    'Helvetica',
     'Roboto',
     'Lato',
     'Palatino',

@@ -616,9 +616,11 @@ stylebot.style = {
    * @param {String} css The CSS to apply to the page.
    */
   resetPreview: function() {
-    CSSUtils.crunchCSS(this.rules, true, true, _.bind(function(css) {
-      this.cache.$style.html(css);
-    }, this));
+    if (this.rules && this.cache.$style) {
+      CSSUtils.crunchCSS(this.rules, true, true, _.bind(function(css) {
+        this.cache.$style.html(css);
+      }, this));
+    };
 
     this.hidePreviewPopover();
   },

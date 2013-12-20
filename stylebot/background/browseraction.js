@@ -15,7 +15,7 @@ var BrowserAction = {
         port.onDisconnect.addListener(function() {
           if (activeTab) {
             chrome.tabs.sendRequest(activeTab.id, {
-              name: "resetPreview"
+              name: 'resetPreview'
             }, function(response){});
           }
         });

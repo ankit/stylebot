@@ -454,7 +454,7 @@
 
     $wrapper       = $('<div>').addClass(this.settings.theme).addClass(this.settings.wrapperClass);
     $control       = $('<div>').addClass(this.settings.inputClass).addClass('items').toggleClass('has-options', !$.isEmptyObject(this.options)).appendTo($wrapper);
-    $control_input = $('<input type="text">').appendTo($control);
+    $control_input = $('<input type="text" />').appendTo($control);
     $dropdown      = $('<div>').addClass(this.settings.dropdownClass).hide().appendTo($wrapper);
 
     displayMode = this.$input.css('display');

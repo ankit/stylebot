@@ -84,7 +84,7 @@ stylebot.widget.basic = {
       }]
     },
     {
-      name: '<u>C</u>olor & Background',
+      name: '<u>C</u>olor &amp; Background',
       controls: [{
         name: 'Color',
         id: 'color',
@@ -134,7 +134,7 @@ stylebot.widget.basic = {
       }]
     },
     {
-      name: '<u>L</u>ayout & Visibility',
+      name: '<u>L</u>ayout &amp; Visibility',
       controls: [{
         name: 'Visibility',
         id: 'display',
