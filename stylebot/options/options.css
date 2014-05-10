@@ -53,7 +53,7 @@ a:hover {
   color: #294266;
 }
 
-label, button {
+label, button, .button {
   cursor: pointer;
 }
 
