@@ -53,6 +53,10 @@ a:hover {
   color: #294266;
 }
 
+label, button {
+  cursor: pointer;
+}
+
 ul {
   margin: 0;
   padding: 0;
