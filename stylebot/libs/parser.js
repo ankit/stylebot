@@ -4877,6 +4877,9 @@ jscsspDeclaration.prototype = {
   kUNMODIFIED_COMMA_SEPARATED_PROPERTIES: {
     "text-shadow": true,
     "box-shadow": true,
+    "background-position": true,
+    "background-position-x": true,
+    "background-position-y": true,
     "-moz-transition": true,
     "-moz-transition-property": true,
     "-moz-transition-duration": true,
