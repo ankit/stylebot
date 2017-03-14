@@ -163,14 +163,22 @@ stylebot.page = {
   cancel: function(e) {
     stylebot.page.saveCSS(stylebot.page.cache.originalCSS, true);
     stylebot.page.modal.hide();
+    stylebot.widget.close();
   },
 
   save: function(e) {
     var self = stylebot.page;
     if (self.saveCSS(self.cache.editor.getSession().getValue(), true)) {
       self.modal.hide();
-      stylebot.widget.open();
+      // Until saveClose button can be created
+      stylebot.widget.close();
     }
+  },
+
+  // Need to figure out how to add a new button and tie it to this
+  saveClose: function(e) {
+    this.save(e);
+    stylebot.widget.close();
   },
 
   saveCSS: function(css, save) {

@@ -33,7 +33,12 @@ function initCache(callback) {
     }
 
     if (items['styles']) {
-      cache.styles = new Styles(items['styles']);
+      if (typeof items['styles'] === 'string')
+        cache.styles = new Styles( JSON.parse( items['styles'] ) );
+      else if ( typeof items['styles'] === 'Styles' )
+        cache.styles = items['styles'];
+      else
+        cache.styles = new Styles(items['styles']);
     } else {
       cache.styles = new Styles({});
     }

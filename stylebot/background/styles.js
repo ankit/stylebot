@@ -63,7 +63,7 @@ Styles.prototype.set = function(url, value) {
 };
 
 Styles.prototype.persist = function() {
-  chrome.storage.local.set({'styles': this.styles});
+  chrome.storage.local.set({'styles': JSON.stringify(this.styles)});
 }
 
 /**
