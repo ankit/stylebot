@@ -46,6 +46,7 @@ stylebot.page = {
     $(buttons.get(3)).click(this.save);
     $(buttons.get(4)).click(this.cancel);
     // Icebird end
+    
   },
 
   initializeEditor: function() {
@@ -166,19 +167,29 @@ stylebot.page = {
   cancel: function(e) {
     stylebot.page.saveCSS(stylebot.page.cache.originalCSS, true);
     stylebot.page.modal.hide();
+
+    // Icebird begin
+    if (stylebot.options.mode === 'Edit CSS')
+      stylebot.close();  
+    // Icebird end
+
   },
 
   save: function(e) {
     var self = stylebot.page;
     if (self.saveCSS(self.cache.editor.getSession().getValue(), true)) {
       self.modal.hide();
+      stylebot.widget.open();
     }
   },
 
 // Icebird begin
   saveClose: function(e) {
-    stylebot.page.save(e);
-    stylebot.close();
+    var self = stylebot.page;
+    if (self.saveCSS(self.cache.editor.getSession().getValue(), true)) {
+      self.modal.hide();
+      stylebot.close();
+    }
   },
 // Icebird end
   
