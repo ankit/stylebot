@@ -41,8 +41,11 @@ stylebot.page = {
     $(buttons.get(1)).click(this.copyToClipboard)
       .tipsy({delayIn: 100, gravity: 'sw'});
 
-    $(buttons.get(2)).click(this.save);
-    $(buttons.get(3)).click(this.cancel);
+    // Icebird begin    
+    $(buttons.get(2)).click(this.saveClose);
+    $(buttons.get(3)).click(this.save);
+    $(buttons.get(4)).click(this.cancel);
+    // Icebird end
   },
 
   initializeEditor: function() {
@@ -163,24 +166,22 @@ stylebot.page = {
   cancel: function(e) {
     stylebot.page.saveCSS(stylebot.page.cache.originalCSS, true);
     stylebot.page.modal.hide();
-    stylebot.widget.close();
   },
 
   save: function(e) {
     var self = stylebot.page;
     if (self.saveCSS(self.cache.editor.getSession().getValue(), true)) {
       self.modal.hide();
-      // Until saveClose button can be created
-      stylebot.widget.close();
     }
   },
 
-  // Need to figure out how to add a new button and tie it to this
+// Icebird begin
   saveClose: function(e) {
-    this.save(e);
-    stylebot.widget.close();
+    stylebot.page.save(e);
+    stylebot.close();
   },
-
+// Icebird end
+  
   saveCSS: function(css, save) {
     if (css === undefined) {
       return true;

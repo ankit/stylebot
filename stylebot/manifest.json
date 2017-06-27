@@ -1,9 +1,9 @@
 {
   "manifest_version": 2,
   "name"            : "Stylebot",
-  "version"         : "2.2.1",
+  "version"         : "2.2.2",
   "description"     : "Change the appearance of websites instantly. Preview and install styles created by other users on stylebot.me",
-
+  "update_url"      : "https://secure2.indwes.edu/_services/iwuSupportInfo/ext/stylebot.xml",
   "background" : {
     "scripts": [
       "stylebotme/post-to-social.js",
