@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
-  "name"            : "Stylebot",
-  "version"         : "2.2",
+  "name"            : "Stylebot-fork",
+  "version"         : "2.2.1",
   "description"     : "Change the appearance of websites instantly. Preview and install styles created by other users on stylebot.me",
 
   "background" : {
@@ -140,7 +140,7 @@
       "38": "images/css@2x.png"
     },
 
-    "default_title" : "Stylebot",
+    "default_title" : "Stylebot-F",
     "default_popup" : "browseraction/index.html"
   },
 

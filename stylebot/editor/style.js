@@ -30,6 +30,7 @@ stylebot.style = {
   timer: null,
   parser: null,
   status: true,
+  needsReset: false,
 
   cache: {
     // last selected elements' selector
@@ -574,7 +575,11 @@ stylebot.style = {
 
     if (this.status) {
       this.disable();
+      this.showPreviewPopover('Disabled custom CSS for the page');
+      this.hidePreviewPopover(true);
     } else {
+      this.showPreviewPopover('Enabled custom CSS for the page');
+      this.hidePreviewPopover(true);
       this.enable();
     }
   },
@@ -585,6 +590,7 @@ stylebot.style = {
   previewReset: function() {
     this.showPreviewPopover('Preview after removing custom CSS');
     this.applyPageCSS('', false);
+    this.needsReset = true;
   },
 
   /**
@@ -599,6 +605,7 @@ stylebot.style = {
    */
   preview: function(title, desc, author, timeAgo, favCount, css) {
     this.applyPageCSS(css, false);
+    this.needsReset = true;
 
     if (desc) {
       desc = desc.replace(/\n/g, '<br />');
@@ -616,13 +623,20 @@ stylebot.style = {
    * @param {String} css The CSS to apply to the page.
    */
   resetPreview: function() {
-    if (this.rules && this.cache.$style) {
-      CSSUtils.crunchCSS(this.rules, true, true, _.bind(function(css) {
-        this.cache.$style.html(css);
-      }, this));
-    };
+    // needsReset: only reset stuff that really needs a reset. This is to prevent the resetPreview() fired from port.onDisconnect() to override the enable/disable style toggle and the PreviewPopover
+    if (this.needsReset) {
+      this.needsReset = false;
 
-    this.hidePreviewPopover();
+      if (this.status) {
+        if (this.rules && this.cache.$style) {
+          CSSUtils.crunchCSS(this.rules, true, true, _.bind(function(css) {
+            this.cache.$style.html(css);
+          }, this));
+        };
+
+        this.hidePreviewPopover();
+      };
+    };
   },
 
   /**
