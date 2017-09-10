@@ -19,6 +19,7 @@ var BrowserAction = {
       'share',
       'open',
       'reset',
+      'togglestyle',
       'options',
       'openLink',
       'onStyleMouseenter',
@@ -48,6 +49,7 @@ var BrowserAction = {
     this.$share = $('.share');
     this.$open = $('.open');
     this.$reset = $('.reset');
+    this.$togglestyle = $('.togglestyle');
     this.$options = $('.options');
 
     var port = chrome.runtime.connect({
@@ -66,6 +68,10 @@ var BrowserAction = {
       .mouseenter(this.onResetMouseenter)
       .mouseleave(this.onResetMouseleave);
 
+    this.$togglestyle.click(this.togglestyle);
+    chrome.tabs.sendRequest(this.tab.id, {
+      name: 'styleStatus'
+    }, _.bind(function(response){this.$togglestyle.text((response.status ? 'Disable' : 'Enable') + ' Styling temporarily');}, this));
     this.fetch(_.bind(function() {
       this.$links = $('.style-link, .style-author');
       this.$style = $('.style-item');
@@ -270,6 +276,15 @@ var BrowserAction = {
     }, function(){});
   },
 
+  /**
+  * Toggle the styling for the current page.
+  */
+  togglestyle: function(e) {    
+    chrome.tabs.sendRequest(this.tab.id, {
+      name: 'toggleStyle'
+    }, function(){});
+    window.close();
+  },  
   /**
    * Listener for the click event on links in the browser action.
    * By default, links don't open in a browser action.
