@@ -1,12 +1,10 @@
 {
   "manifest_version": 2,
   "name"            : "Stylebot",
-  "version"         : "2.2.4",
-  "description"     : "Change the appearance of websites instantly. Preview and install styles created by other users on stylebot.me",
+  "version"         : "2.2.5",
+  "description"     : "Change the appearance of websites instantly.",
   "background" : {
     "scripts": [
-      "stylebotme/post-to-social.js",
-
       "background/utils.js",
       "background/styles.js",
       "background/browseraction.js",
@@ -53,28 +51,6 @@
   },
 
   {
-    "matches": ["http://stylebot.me/*"],
-
-    "js": [
-      "stylebotme/install.js"
-    ],
-
-    "run_at": "document_end",
-    "all_frames": true
-  },
-
-  {
-    "matches": ["http://stylebot.me/post"],
-
-    "js": [
-      "stylebotme/post.js"
-    ],
-
-    "run_at": "document_end",
-    "all_frames": true
-  },
-
-  {
     "matches": ["<all_urls>"],
 
     "css": [
@@ -109,8 +85,6 @@
       "shared/selectionBox.js",
       "shared/modalbox/modalbox.js",
       "shared/utils.js",
-
-      "stylebotme/post-to-social.js",
 
       "editor/templates/page.js",
 
@@ -157,7 +131,6 @@
     "storage",
     "http://userstyles.org/",
     "unlimitedStorage",
-    "http://stylebot.me/",
     "<all_urls>"
   ]
 }

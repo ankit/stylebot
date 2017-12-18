@@ -52,22 +52,6 @@ stylebot.chrome = {
   },
 
   /**
-   * Send the installation request for a style from Stylebot Social
-   *   to background page
-   * @param {string} url URL for which to install new styles
-   * @param {object} rules The styles
-   * @param {number} id ID of the style on Stylebot Social
-   */
-  install: function(url, rules, id) {
-    chrome.extension.sendRequest({
-      name: 'install',
-      rules: rules,
-      url: url,
-      id: id
-    }, function() {});
-  },
-
-  /**
    * Transfer all rules from a source URL to a destination URL
    * @param {string} src Source URL
    * @param {string} dest Destination URL
@@ -171,14 +155,6 @@ chrome.extension.onRequest.addListener(
       stylebot.contextmenu.openWidget();
     }
 
-    else if (request.name === 'searchSocial') {
-      stylebot.contextmenu.searchSocial();
-    }
-
-    else if (request.name === 'postToSocial') {
-      PostToSocial.post();
-    }
-
     else if (request.name === 'toggleStyle') {
       stylebot.style.toggle();
 
@@ -193,13 +169,6 @@ chrome.extension.onRequest.addListener(
       });
     }
 
-    else if (request.name === 'getURLAndSocialData') {
-      sendResponse({
-        url: document.domain ? document.domain : location.href,
-        social: stylebot.style.social
-      });
-    }
-
     else if (request.name === 'preview') {
       stylebot.style.preview(request.title,
         request.description,
@@ -209,28 +178,8 @@ chrome.extension.onRequest.addListener(
         request.css);
     }
 
-    else if (request.name === 'previewReset') {
-      stylebot.style.previewReset();
-    }
-
-    else if (request.name === 'resetPreview') {
-      stylebot.style.resetPreview();
-    }
-
-    else if (request.name === 'install') {
-      stylebot.style.install(
-        request.id,
-        request.title,
-        request.url,
-        request.css,
-        request.timestamp);
-
-      stylebot.chrome.setBrowserAction(false);
-    }
-
-    else if (request.name === 'reset') {
-      stylebot.style.resetAllCSS(true);
-      stylebot.chrome.setBrowserAction(false);
+    else if (request.name === 'togglePreview') {
+      stylebot.style.togglePreview(request.tabId);
     }
   }
 );

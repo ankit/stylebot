@@ -2,8 +2,8 @@
 .DS_Store?
 Icon?
 .DS_Store
-stylebot.crx
-stylebot.pem
+*.crx
+*.pem
 
 # Thumbnails
 ._*

@@ -10,7 +10,6 @@ var MAX_APPLY_CSS_COUNT = 10;
 var stylebotTempUrl;
 var stylebotTempRules;
 var stylebotTempGlobalRules;
-var stylebotTempSocialData;
 
 // send request to background.html to get stylebot rules for page
 var request;
@@ -35,7 +34,6 @@ function applyCSS() {
 
       stylebotTempUrl = response.url;
       stylebotTempRules = response.rules;
-      stylebotTempSocialData = response.social;
 
       if (stylebotTempUrl && stylebotTempRules) {
         CSSUtils.crunchCSS(response.rules, true, true, function(css) {

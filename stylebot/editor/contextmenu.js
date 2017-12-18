@@ -34,12 +34,5 @@ stylebot.contextmenu = {
         stylebot.open();
         stylebot.select(stylebot.contextmenu.cache.el);
     }
-  },
-
-  /**
-   * Search Stylebot Social for styles for the current page's domain
-   */
-  searchSocial: function() {
-    window.open('http://stylebot.me/search?q=' + document.domain);
   }
 };

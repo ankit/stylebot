@@ -41,12 +41,9 @@ stylebot.page = {
     $(buttons.get(1)).click(this.copyToClipboard)
       .tipsy({delayIn: 100, gravity: 'sw'});
 
-    // Icebird begin    
     $(buttons.get(2)).click(this.saveClose);
     $(buttons.get(3)).click(this.save);
     $(buttons.get(4)).click(this.cancel);
-    // Icebird end
-    
   },
 
   initializeEditor: function() {
@@ -168,11 +165,9 @@ stylebot.page = {
     stylebot.page.saveCSS(stylebot.page.cache.originalCSS, true);
     stylebot.page.modal.hide();
 
-    // Icebird begin
-    if (stylebot.options.mode === 'Edit CSS')
+    if (stylebot.options.mode === 'Edit CSS') {
       stylebot.close();  
-    // Icebird end
-
+    }
   },
 
   save: function(e) {
@@ -183,7 +178,6 @@ stylebot.page = {
     }
   },
 
-// Icebird begin
   saveClose: function(e) {
     var self = stylebot.page;
     if (self.saveCSS(self.cache.editor.getSession().getValue(), true)) {
@@ -191,7 +185,6 @@ stylebot.page = {
       stylebot.close();
     }
   },
-// Icebird end
   
   saveCSS: function(css, save) {
     if (css === undefined) {

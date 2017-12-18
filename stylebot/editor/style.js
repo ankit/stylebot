@@ -26,10 +26,11 @@ stylebot.style = {
   */
   rules: {},
   global: {},
-  social: {},
   timer: null,
   parser: null,
   status: true,
+
+  tabsPreviewing: [],
 
   cache: {
     // last selected elements' selector
@@ -66,11 +67,6 @@ stylebot.style = {
     if (stylebotTempGlobalRules) {
       this.global = stylebotTempGlobalRules;
       stylebotTempGlobalRules = null;
-    }
-
-    if (stylebotTempSocialData) {
-      this.social = stylebotTempSocialData;
-      stylebotTempSocialData = null;
     }
   },
 
@@ -505,7 +501,6 @@ stylebot.style = {
   clean: function() {
     this.cache.selector = null;
     this.cache.elements = null;
-    this.social = null;
 
     setTimeout(_.bind(function() {
       this.removeAllInlineCSS();
@@ -580,35 +575,24 @@ stylebot.style = {
   },
 
   /**
-   * Preview the page after removing any style rules
+   * Toggle previewing page after removing style rules
    */
-  previewReset: function() {
-    this.showPreviewPopover('Preview after removing custom CSS');
-    this.applyPageCSS('', false);
+  togglePreview: function (tabId) {
+    if (this.tabsPreviewing[tabId]) {
+      this.resetPreview();
+      this.tabsPreviewing[tabId] = false;
+    } else {
+      this.previewReset();
+      this.tabsPreviewing[tabId] = true;
+    }
   },
 
   /**
-   * Preview the specified style by applying its CSS to the page.
-   * @param {String} title The title of style.
-   * @param {String} desc Description for the style.
-   * @param {String} author The author of the style.
-   * @param {String} timeAgo Relative time string when the style was authored.
-   * @param {Integer} favCount Number of times the style has been favorited
-   *   on Stylebot Social.
-   * @param {String} css The css for the style.
+   * Preview the page after removing any style rules
    */
-  preview: function(title, desc, author, timeAgo, favCount, css) {
-    this.applyPageCSS(css, false);
-
-    if (desc) {
-      desc = desc.replace(/\n/g, '<br />');
-    }
-
-    this.showPreviewPopover(
-      title + '<br>' +
-      '<div id="stylebot-preview-meta">by ' + author + ' (' +
-      favCount + ' favorites) • Last updated ' + timeAgo + '</div>' +
-      '<br><div id="stylebot-preview-description">' + desc + '</div>');
+  previewReset: function() {
+    this.showPreviewPopover('Stylebot CSS disabled');
+    this.applyPageCSS('', false);
   },
 
   /**
@@ -623,27 +607,6 @@ stylebot.style = {
     };
 
     this.hidePreviewPopover();
-  },
-
-  /**
-   * Install the specified style for the given URL
-   * @param {Number} id The id of the style
-   * @param {String} title The title describing the style
-   * @param {String} url The url for which the style should be installed
-   * @param {String} css The css for the style
-   * @param {String} timestamp The timestamp when the style was last updated
-   */
-  install: function(id, title, url, css, timestamp) {
-    this.social = {
-      id: id,
-      timestamp: timestamp
-    };
-
-    this.cache.url = url;
-    this.applyPageCSS(css, true, this.social);
-
-    this.showPreviewPopover('Installed ' + title);
-    this.hidePreviewPopover(true);
   },
 
   /**
@@ -662,7 +625,7 @@ stylebot.style = {
     }
 
     $preview.html(html)
-      .css('left', $(window).width() / 2 - $preview.width() / 2)
+      .css('left', $(window).width() - $preview.width() * 1.5)
       .css('top', $(window).height() - $preview.height() - 100)
       .show();
   },

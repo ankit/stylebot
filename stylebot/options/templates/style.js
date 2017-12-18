@@ -30,7 +30,7 @@ function program1(depth0,data) {
   if (stack1 = helpers.url) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.url); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "</div>\n    </span>\n    <div class=\"controls\">\n        <div title=\"Share Style\" class=\"tipsy button share-style\" tabindex=0></div>\n        <div title=\"Edit Style\" class=\"tipsy button show-edit-style\" tabindex=0></div>\n        <div title=\"Delete Style\" class=\"tipsy button delete-style close-button\" tabindex=0></div>\n    </div>\n</div>\n";
+    + "</div>\n    </span>\n    <div class=\"controls\">\n        <div title=\"Edit Style\" class=\"tipsy button show-edit-style\" tabindex=0></div>\n        <div title=\"Delete Style\" class=\"tipsy button delete-style close-button\" tabindex=0></div>\n    </div>\n</div>\n";
   return buffer;
   });
 })();

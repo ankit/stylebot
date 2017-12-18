@@ -11,14 +11,6 @@ var BrowserAction = {
             activeTab = message.tab;
           }
         });
-
-        port.onDisconnect.addListener(function() {
-          if (activeTab) {
-            chrome.tabs.sendRequest(activeTab.id, {
-              name: 'resetPreview'
-            }, function(response){});
-          }
-        });
       }
     });
   },
