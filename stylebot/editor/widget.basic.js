@@ -1,7 +1,7 @@
 /**
  * stylebot.widget.basic
  *
- * Manages the UI for the Basic mode in Stylebot editor
+ * Manages the UI for the Basic mode in Stylebot Lite editor
  */
 stylebot.widget.basic = {
   isColorPickerVisible: false,

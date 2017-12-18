@@ -1,5 +1,5 @@
 /**
- * Stylebot Options
+ * Stylebot Lite Options
  */
 var Options = {};
 

@@ -13719,14 +13719,14 @@ var Text = function(parentEl) {
             // Note: characterWidth can be a float!
             measureNode.innerHTML = lang.stringRepeat("Xy", n);
 
-            // @ankit: Stylebot specific code to prevent the measureNode from polluting the DOM
+            // @ankit: Stylebot Lite specific code to prevent the measureNode from polluting the DOM
             // and adding a class to override certain styles
             var stylebotContainer = document.getElementById('stylebot-container');
             if (stylebotContainer) {
                 measureNode.className = measureNode.className + ' stylebot-ace-measure-node';
                 stylebotContainer.appendChild(measureNode);
             }
-            // end of Stylebot specific code
+            // end of Stylebot Lite specific code
 
             else if (document.body) {
                 document.body.appendChild(measureNode);

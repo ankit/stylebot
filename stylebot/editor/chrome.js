@@ -5,7 +5,7 @@ stylebot.chrome = {
   /**
    * Send the appropriate request to the background page
    *   to update the browser action
-   * @param {boolean} Stylebot editor status i.e. open or closed
+   * @param {boolean} Stylebot Lite editor status i.e. open or closed
    */
   setBrowserAction: function(status) {
     if (status) {

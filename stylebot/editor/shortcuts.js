@@ -1,5 +1,5 @@
 /**
- * Stylebot editor keyboard shortcuts
+ * Stylebot Lite editor keyboard shortcuts
  */
 function handleKeyboardShortcut(e) {
   var tag = e.target.tagName.toLowerCase();
@@ -41,7 +41,7 @@ function handleKeyboardShortcut(e) {
       return false;
     }
 
-    // 'p': Toggle Stylebot's position
+    // 'p': Toggle Stylebot Lite's position
     case 80:
     stylebot.widget.togglePosition();
     return false;
@@ -148,11 +148,11 @@ function displayShortcutHelp() {
   }).appendTo(div);
 
   $('<h1>', {
-    html: 'Stylebot Keyboard shortcuts'
+    html: 'Stylebot Lite Keyboard shortcuts'
   }).appendTo(content);
 
-  var sec1 = "<ul class='stylebot-shortcut-section'><h2>Manage Stylebot</h2> \
-  <li class='stylebot-shortcut'><span class='stylebot-key'>Alt + m</span><span class='stylebot-key-desc'>Launch Stylebot</span></li> \
+  var sec1 = "<ul class='stylebot-shortcut-section'><h2>Manage Stylebot Lite</h2> \
+  <li class='stylebot-shortcut'><span class='stylebot-key'>Alt + m</span><span class='stylebot-key-desc'>Launch Stylebot Lite</span></li> \
   <li class='stylebot-shortcut'><span class='stylebot-key'>s</span><span class='stylebot-key-desc'>Toggle ability to select an element</span></li> \
   <li class='stylebot-shortcut'><span class='stylebot-key'>m</span><span class='stylebot-key-desc'>Switch between Basic / Advanced Mode</span></li> \
   <li class='stylebot-shortcut'><span class='stylebot-key'>p</span><span class='stylebot-key-desc'>Move Panel Left / Right</span></li> \
@@ -161,7 +161,7 @@ function displayShortcutHelp() {
   <li class='stylebot-shortcut'><span class='stylebot-key'>d</span><span class='stylebot-key-desc'>Open CSS selector dropdown</span></li> \
   <li class='stylebot-shortcut'><span class='stylebot-key'>↑↓</span><span class='stylebot-key-desc'>Navigate CSS selectors in dropdown</span></li> \
   <li class='stylebot-shortcut'><span class='stylebot-key'>?</span><span class='stylebot-key-desc'>Bring up this help</span></li> \
-  <li class='stylebot-shortcut'><span class='stylebot-key'>esc</span><span class='stylebot-key-desc'>Close Stylebot</span></li></ul>";
+  <li class='stylebot-shortcut'><span class='stylebot-key'>esc</span><span class='stylebot-key-desc'>Close Stylebot Lite</span></li></ul>";
 
   var sec2 = "<ul class='stylebot-shortcut-section'><h2>Navigate Sections</h2> \
   <li class='stylebot-shortcut'><span class='stylebot-key'>t</span><span class='stylebot-key-desc'>Move to <i>Text</i> section</span></li> \

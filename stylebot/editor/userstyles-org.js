@@ -14,7 +14,7 @@ function addInstallLink() {
 
     // link
     var a = document.createElement('a');
-    a.innerHTML = 'Click to install in Stylebot';
+    a.innerHTML = 'Click to install in Stylebot Lite';
     a.className = 'stylebot-link';
     a.href = '#';
     a.id = 'stylebot_installation_status';

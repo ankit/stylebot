@@ -1,6 +1,6 @@
 {
   "manifest_version": 2,
-  "name"            : "Stylebot",
+  "name"            : "Stylebot Lite",
   "version"         : "2.2.5",
   "description"     : "Change the appearance of websites instantly.",
   "background" : {
@@ -113,7 +113,7 @@
       "38": "images/css@2x.png"
     },
 
-    "default_title" : "Stylebot",
+    "default_title" : "Stylebot Lite",
     "default_popup" : "browseraction/index.html"
   },
 

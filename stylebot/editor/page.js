@@ -1,7 +1,7 @@
 /**
  * stylebot.page
  *
- * Manages the UI for the Page mode (Edit CSS) in Stylebot editor
+ * Manages the UI for the Page mode (Edit CSS) in Stylebot Lite editor
  */
 stylebot.page = {
   RIGHT_PADDING: 15,

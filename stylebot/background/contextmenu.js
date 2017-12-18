@@ -10,7 +10,7 @@ var ContextMenu = {
   init: function() {
     ContextMenu.remove();
     if (cache.options.contextMenu) {
-      ContextMenu.create('Stylebot', null, null, null, ContextMenu.ID);
+      ContextMenu.create('Stylebot Lite', null, null, null, ContextMenu.ID);
       ContextMenu.create('Style Element', ContextMenu.ID, 'openWidget');
       ContextMenu.create('View Options...', ContextMenu.ID, 'showOptions');
     }

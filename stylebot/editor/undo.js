@@ -1,7 +1,7 @@
 /**
  * stylebot.undo
  *
- * Manages the states for undo in Stylebot editor
+ * Manages the states for undo in Stylebot Lite editor
  */
 stylebot.undo = {
   states: [],

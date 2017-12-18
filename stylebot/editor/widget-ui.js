@@ -1,4 +1,4 @@
-/* Creation of UI Controls for Basic Mode in Stylebot */
+/* Creation of UI Controls for Basic Mode in Stylebot Lite */
 
 var WidgetUI = {
   SELECTORS: {

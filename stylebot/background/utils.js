@@ -130,8 +130,8 @@ String.prototype.matchesBasic = function(pattern) {
 };
 
 /**
- * Check if Stylebot should run on a URL.
- * @return {Boolean} True if Stylebot can run on the URL
+ * Check if Stylebot Lite should run on a URL.
+ * @return {Boolean} True if Stylebot Lite can run on the URL
  */
 String.prototype.isValidUrl = function() {
   var inBlacklist = function(url) {

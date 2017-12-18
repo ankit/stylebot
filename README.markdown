@@ -1,8 +1,8 @@
-###Stylebot
+###Stylebot Lite
 
 A Google Chrome extension that allows users to manipulate a web page’s appearance in a WYSIWYG manner.
 
-Using Stylebot, users are able to:
+Using Stylebot Lite, users are able to:
 
 1. Incrementally build custom stylesheets for Chrome.
 2. Save custom CSS rules for sites. The next time they visit a site, their custom CSS is already applied.

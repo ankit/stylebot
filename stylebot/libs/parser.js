@@ -1,7 +1,7 @@
 //http://www.glazman.org/JSCSSP/freshmeat.html
 //http://sources.disruptive-innovations.com/jscssp/trunk/cssParser.js
 
-// Stylebot specific diff:
+// Stylebot Lite specific diff:
 
 //Change argument 4 of all calls to parseDeclaration to false.
 //this.parseDeclaration(token, declarations, true, true, aSheet); changes to

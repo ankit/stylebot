@@ -1,5 +1,5 @@
 /**
- * Load options and initialize Stylebot
+ * Load options and initialize Stylebot Lite
  */
 $(document).ready(function() {
   stylebot.chrome.fetchOptions();
@@ -18,7 +18,7 @@ function initialize(response) {
 }
 
 /**
- * Attach event handlers for launching / closing Stylebot editor
+ * Attach event handlers for launching / closing Stylebot Lite editor
  */
 function attachListeners() {
   document.addEventListener('keydown', function(e) {

@@ -1,7 +1,7 @@
 /**
  * stylebot.widget
  *
- * Stylebot editor UI and event handling
+ * Stylebot Lite editor UI and event handling
  */
 stylebot.widget = {
   cache: {

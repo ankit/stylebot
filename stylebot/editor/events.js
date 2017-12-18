@@ -1,7 +1,7 @@
 /**
  * Events
  *
- * Event handlers for Stylebot editor Basic mode controls
+ * Event handlers for Stylebot Lite editor Basic mode controls
  *
  */
 Events = {

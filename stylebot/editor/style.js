@@ -591,7 +591,7 @@ stylebot.style = {
    * Preview the page after removing any style rules
    */
   previewReset: function() {
-    this.showPreviewPopover('Stylebot CSS disabled');
+    this.showPreviewPopover('Stylebot Lite CSS disabled');
     this.applyPageCSS('', false);
   },
 
