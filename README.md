@@ -16,6 +16,10 @@ A Google Chrome extension that allows users to manipulate a web page’s appeara
 
 This project began as a [Google Summer of Code project](https://opensource.googleblog.com/2010/09/changing-look-of-web-with-stylebot.html) back in 2010. It is currently under limited support since I am the only primary maintainer for the project. I do plan to refresh the project at some point of time in the future.
 
+## Browser support
+
+Stylebot is only supported on Google Chrome. Cross-browser support is unlikely in the future due to limited resources.
+
 ## License
 
 Dual licensed under the GPL and MIT Licenses.
