@@ -29,6 +29,11 @@ that are, unfortunately, no longer available on stylebot.me.
 The orginal author's donation link has gone dead, so I have replaced 
 it if you would like to say 'thanks' for the updated fork.
 
+### Recommended Extension
+
+If you are looking for a way to darken websites to reduce eye strain, 
+I *highly* recommend [Dark Reader](https://darkreader.org/)
+
 ### License
 
 Dual licensed under the GPL and MIT Licenses.
