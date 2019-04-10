@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<head>
+    <title>Pattern Matching in Stylebot Lite</title>
+    <style>
+        body {
+            font-family: Helvetica, sans-serif;
+        }
+        h3 {
+            margin-bottom: 0px;
+        }
+        code {
+            font-family: Courier New;
+            color: #ff0000;
+            background-color: #eee;
+        }
+    </style>
+</head>
+<body>
+    <h2>Pattern Matching in Stylebot Lite</h2>
+    <hr>
+    <div class="pattern">
+        <h3>Basic (default)</h3>
+        By default, Stylebot Lite uses simple text strings to match styles to websites. Examples:
+        <ul>
+            <li><code>docs.google.com</code>: Matches any URL with <code>docs.google.com</code> in it.</li>
+            <li><code>docs.google.com, spreadsheets.google.com</code>: Matches any URL with <code>docs.google.com</code> or <code>spreadsheets.google.com</code> in it.</li>
+        </ul>
+    </div>
+    <div class="pattern">
+        <h3>Advanced</h3>
+        Stylebot Lite supports wildcards <code>**</code>, <code>*</code> and <code>,</code>
+
+        <ul>
+            <li><code>**</code> matches any character sequence. Examples:
+                <ul>
+                    <li><code>docs**</code>: Any URL beginning with <code>docs</code>.</li>
+                </ul>
+            </li>
+            <li><code>*</code> matches any character sequence, until a <code>/</code> is found.
+                <ul>
+                    <li><code>docs*.google.com</code>: This will match <code>http://docs.google.com</code>, <code>http://docs1.google.com</code>, <code>http://docs2.google.com</code> and so on.</li>
+                    <li><code>*.ycombinator.com</code>: This will match <code>http://news.ycombinator.com</code> and <code>http://apps.ycombinator.com</code></li>
+                </ul>
+            </li>
+            <li><code>,</code> separates a list of advanced patterns. Matches a URL if any sub-pattern matches it.</li>
+        </ul>
+    </div>
+    <div class="pattern">
+        <h3>Regular Expressions</h3>
+        Stylebot Lite treats a string as a regex if it start it with <code>^</code>. Examples:
+        <ul>
+            <li><code>^http://www.reddit.com/$</code>: This matches only the Reddit homepage.</li>
+        </ul>
+    </div>
+</body>

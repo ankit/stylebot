@@ -17,17 +17,17 @@ function program1(depth0,data) {
 function program2(depth0,data) {
   
   
-  return "\n            Edit the Global Stylesheet:\n        ";
+  return "\n            <strong>Edit the Global Stylesheet</strong>\n        ";
   }
 
 function program4(depth0,data) {
   
   var buffer = "", stack1;
-  buffer += "\n            <div>URL (see <a target=\"_blank\" href=\"http://stylebot.me/patterns\">patterns</a>):</div>\n            <input type='text' value=\"";
+  buffer += "\n            <div>Enter URL. Examples (see <a target=\"_blank\" href=\"../../documentation/index.html\">patterns</a>):<br>\n <pre style=\"display:inline;\">www.youtube.com</pre><br>\n <pre style=\"display:inline;\">*.google.com,docs**</pre><br>\n <pre style=\"display:inline;\">^http://www.reddit.com/$</pre>  </div >\n <input type='text' value=\"";
   if (stack1 = helpers.url) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.url); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\"></input>\n        ";
+  + "\"></input>\n        ";
   return buffer;
   }
 
@@ -55,13 +55,13 @@ function program9(depth0,data) {
 function program11(depth0,data) {
   
   
-  return "\n    <div id=\"editor\"></div>\n  ";
+  return "\n   <div>Enter custom CSS.</div>\n <div id=\"editor\"></div>\n  ";
   }
 
 function program13(depth0,data) {
   
   var buffer = "", stack1;
-  buffer += "\n    <textarea class=\"stylebot-css-code\">";
+  buffer += "\n     <textarea class=\"stylebot-css-code\">";
   if (stack1 = helpers.code) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.code); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)

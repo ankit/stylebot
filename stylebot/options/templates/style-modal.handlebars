@@ -2,9 +2,13 @@
   <div class="modal-header">
     {{#if editor}}
         {{#if global}}
-            Edit the Global Stylesheet:
+            <strong>Edit the Global Stylesheet</strong>
         {{else}}
-            <div>URL (see <a target="_blank" href="http://stylebot.me/patterns">patterns</a>):</div>
+            <div>Enter URL. Examples (see <a target="_blank" href="../../documentation/index.html">patterns</a>):<br>
+                <pre style="display:inline;">www.youtube.com</pre><br>
+                <pre style="display:inline;">*.google.com,docs**</pre><br>
+                <pre style="display:inline;">^http://www.reddit.com/$</pre>
+            </div>
             <input type='text' value="{{url}}"></input>
         {{/if}}
     {{else}}
@@ -16,8 +20,8 @@
         {{/if}}
     {{/if}}
   </div>
-
   {{#if editor}}
+    <div>Enter Custom CSS.</div>
     <div id="editor"></div>
   {{else}}
     <textarea class="stylebot-css-code">{{code}}</textarea>

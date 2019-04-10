@@ -13,7 +13,7 @@ Using Stylebot Lite, users are able to:
 * About: <https://github.com/Icebird/stylebot>
 * Changelog: <https://github.com/Icebird/stylebot/commits/master>
 * Donate to original author, Ankit Ahuja, on Pledgie: [http://pledgie.com/campaigns/14409](http://pledgie.com/campaigns/14409)
-* Issues and feature requests: <https://github.com/ankit/stylebot/issues>
+* Issues and feature requests: <https://github.com/Icebird/stylebot/issues>
 
 ###About
 
