@@ -6,8 +6,6 @@
 
   "background": {
     "scripts": [
-      "stylebotme/post-to-social.js",
-
       "background/utils.js",
       "background/styles.js",
       "background/browseraction.js",
@@ -21,8 +19,7 @@
 
   "options_page": "options/index.html",
 
-  "content_scripts": [
-    {
+  "content_scripts": [{
       "matches": ["<all_urls>"],
 
       "js": [
@@ -51,24 +48,6 @@
       ],
 
       "run_at": "document_start",
-      "all_frames": true
-    },
-
-    {
-      "matches": ["http://stylebot.me/*"],
-
-      "js": ["stylebotme/install.js"],
-
-      "run_at": "document_end",
-      "all_frames": true
-    },
-
-    {
-      "matches": ["http://stylebot.me/post"],
-
-      "js": ["stylebotme/post.js"],
-
-      "run_at": "document_end",
       "all_frames": true
     },
 
@@ -107,8 +86,6 @@
         "shared/selectionBox.js",
         "shared/modalbox/modalbox.js",
         "shared/utils.js",
-
-        "stylebotme/post-to-social.js",
 
         "editor/templates/page.js",
 
@@ -156,7 +133,6 @@
     "storage",
     "http://userstyles.org/",
     "unlimitedStorage",
-    "http://stylebot.me/",
     "<all_urls>"
   ]
 }
