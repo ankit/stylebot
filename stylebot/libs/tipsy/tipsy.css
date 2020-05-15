@@ -1,13 +1,75 @@
 /** Stylebot tooltips **/
-.stylebot-tipsy { font-family: 'Lucida Grande', Arial, sans-serif !important; padding: 5px !important; font-size: 10px !important; width: auto !important; position: absolute !important; z-index: 100000000000 !important; text-shadow: none !important; }
-  .stylebot-tipsy-inner { padding: 5px 8px 4px 8px !important; background-color: black !important; color: white !important; width: auto !important; max-width: 180px !important; text-align: center !important; line-height: normal !important; }
-  .stylebot-tipsy-inner { border-radius: 3px !important; -moz-border-radius:3px !important; -webkit-border-radius:3px !important; }
-  .stylebot-tipsy-arrow { position: absolute !important; background: url(data:image/gif;base64,R0lGODlhCQAJAIABAAAAAAAAACH5BAEAAAEALAAAAAAJAAkAAAIRjAOnwIrcDJxvwkplPtchVQAAOw==) no-repeat top left !important; width: 9px !important; height: 5px !important; }
-  .stylebot-tipsy-n .stylebot-tipsy-arrow { top: 0 !important; left: 50% !important; margin-left: -4px !important; }
-    .stylebot-tipsy-nw .stylebot-tipsy-arrow { top: 0 !important; left: 10px !important; }
-    .stylebot-tipsy-ne .stylebot-tipsy-arrow { top: 0 !important; right: 10px !important; }
-  .stylebot-tipsy-s .stylebot-tipsy-arrow { bottom: 0 !important; left: 50% !important; margin-left: -4px !important; background-position: bottom left !important; }
-    .stylebot-tipsy-sw .stylebot-tipsy-arrow { bottom: 0 !important; left: 10px !important; background-position: bottom left !important; }
-    .stylebot-tipsy-se .stylebot-tipsy-arrow { bottom: 0 !important; right: 10px !important; background-position: bottom left !important; }
-  .stylebot-tipsy-e .stylebot-tipsy-arrow { top: 50% !important; margin-top: -4px !important; right: 0 !important; width: 5px !important; height: 9px !important; background-position: top right !important; }
-  .stylebot-tipsy-w .stylebot-tipsy-arrow { top: 50% !important; margin-top: -4px !important; left: 0 !important; width: 5px !important; height: 9px !important; }
+.stylebot-tipsy {
+  font-family: 'Lucida Grande', Arial, sans-serif !important;
+  padding: 5px !important;
+  font-size: 10px !important;
+  width: auto !important;
+  position: absolute !important;
+  z-index: 100000000000 !important;
+  text-shadow: none !important;
+}
+.stylebot-tipsy-inner {
+  padding: 5px 8px 4px 8px !important;
+  background-color: black !important;
+  color: white !important;
+  width: auto !important;
+  max-width: 180px !important;
+  text-align: center !important;
+  line-height: normal !important;
+}
+.stylebot-tipsy-inner {
+  border-radius: 3px !important;
+  -moz-border-radius: 3px !important;
+  -webkit-border-radius: 3px !important;
+}
+.stylebot-tipsy-arrow {
+  position: absolute !important;
+  background: url(data:image/gif;base64,R0lGODlhCQAJAIABAAAAAAAAACH5BAEAAAEALAAAAAAJAAkAAAIRjAOnwIrcDJxvwkplPtchVQAAOw==)
+    no-repeat top left !important;
+  width: 9px !important;
+  height: 5px !important;
+}
+.stylebot-tipsy-n .stylebot-tipsy-arrow {
+  top: 0 !important;
+  left: 50% !important;
+  margin-left: -4px !important;
+}
+.stylebot-tipsy-nw .stylebot-tipsy-arrow {
+  top: 0 !important;
+  left: 10px !important;
+}
+.stylebot-tipsy-ne .stylebot-tipsy-arrow {
+  top: 0 !important;
+  right: 10px !important;
+}
+.stylebot-tipsy-s .stylebot-tipsy-arrow {
+  bottom: 0 !important;
+  left: 50% !important;
+  margin-left: -4px !important;
+  background-position: bottom left !important;
+}
+.stylebot-tipsy-sw .stylebot-tipsy-arrow {
+  bottom: 0 !important;
+  left: 10px !important;
+  background-position: bottom left !important;
+}
+.stylebot-tipsy-se .stylebot-tipsy-arrow {
+  bottom: 0 !important;
+  right: 10px !important;
+  background-position: bottom left !important;
+}
+.stylebot-tipsy-e .stylebot-tipsy-arrow {
+  top: 50% !important;
+  margin-top: -4px !important;
+  right: 0 !important;
+  width: 5px !important;
+  height: 9px !important;
+  background-position: top right !important;
+}
+.stylebot-tipsy-w .stylebot-tipsy-arrow {
+  top: 50% !important;
+  margin-top: -4px !important;
+  left: 0 !important;
+  width: 5px !important;
+  height: 9px !important;
+}

@@ -11,7 +11,7 @@ var WidgetUI = {
     toggleButton: '.stylebot-toggle',
     segmentedButton: '.stylebot-segmented-control button',
     activeButton: '.stylebot-button-active',
-    selectedButton: '.stylebot-button-selected'
+    selectedButton: '.stylebot-button-selected',
   },
 
   CLASS_NAMES: {
@@ -22,13 +22,13 @@ var WidgetUI = {
       default: 'stylebot-button',
       active: 'stylebot-button-active',
       selected: 'stylebot-button-selected',
-      nextToSelected: 'stylebot-next-segmented-button'
+      nextToSelected: 'stylebot-next-segmented-button',
     },
 
     accordion: {
       header: 'stylebot-accordion-header',
       active: 'stylebot-accordion-active',
-      icon: 'stylebot-accordion-icon'
+      icon: 'stylebot-accordion-icon',
     },
 
     textfield: 'stylebot-textfield',
@@ -44,7 +44,7 @@ var WidgetUI = {
     inlineLabel: 'stylebot-inline-label',
     segmentedControl: 'stylebot-segmented-control',
     lastSegmentedButton: 'stylebot-last-segmented-button',
-    toggleButton: 'stylebot-toggle'
+    toggleButton: 'stylebot-toggle',
   },
 
   SIZE_UNITS: ['px', 'em', '%', 'pt'],
@@ -58,7 +58,7 @@ var WidgetUI = {
     'Georgia',
     'Lucida Grande',
     'Consolas',
-    'monospace'
+    'monospace',
   ],
 
   // Number of fonts the font stack can hold at a time
@@ -72,9 +72,9 @@ var WidgetUI = {
    * @param {element} Control
    * @return {element} UI for option
    */
-  createOption: function(control) {
+  createOption: function (control) {
     var container = $('<div>', {
-      class: this.CLASS_NAMES.option
+      class: this.CLASS_NAMES.option,
     });
     return container.append(control);
   },
@@ -84,28 +84,30 @@ var WidgetUI = {
    * @param {string} Name of accordion
    * @return {element} Accordion <a> element
    */
-  createAccordionHeader: function(name) {
+  createAccordionHeader: function (name) {
     var $accordion = $('<a>', {
       class: this.CLASS_NAMES.accordion.header,
       tabIndex: 0,
-      html: name
+      html: name,
     })
+      .prepend(
+        $('<div>', {
+          class: this.CLASS_NAMES.accordion.icon,
+        })
+      )
 
-    .prepend($('<div>', {
-      class: this.CLASS_NAMES.accordion.icon
-    }))
+      .bind(
+        'mousedown keydown',
+        $.proxy(function (e) {
+          if (e.type == 'keydown' && e.keyCode != 13) return true;
+          e.preventDefault();
 
-    .bind('mousedown keydown', $.proxy(function(e) {
-      if (e.type == 'keydown' && e.keyCode != 13)
-        return true;
-      e.preventDefault();
+          var el = $(e.target);
+          if (!el.hasClass(this.CLASS_NAMES.accordion.header)) el = el.parent();
 
-      var el = $(e.target);
-      if (!el.hasClass(this.CLASS_NAMES.accordion.header))
-        el = el.parent();
-
-      Events.toggleAccordion(el);
-    }, this));
+          Events.toggleAccordion(el);
+        }, this)
+      );
 
     return $accordion;
   },
@@ -118,26 +120,23 @@ var WidgetUI = {
    * @param {function} onKeyUpHandler Callback for 'keyup' event
    * @return {jQuery element} The textfield element
    */
-  createTextField: function(property, size, onKeyDownHandler, onKeyUpHandler) {
+  createTextField: function (property, size, onKeyDownHandler, onKeyUpHandler) {
     var $input = $('<input>', {
       type: 'text',
       id: 'stylebot-' + property,
-      class: this.CLASS_NAMES.control + " " + this.CLASS_NAMES.textfield,
-      size: size
+      class: this.CLASS_NAMES.control + ' ' + this.CLASS_NAMES.textfield,
+      size: size,
     })
+      .data('property', property)
 
-    .data('property', property)
+      .click(function (e) {
+        Utils.selectAllText(e.target);
+      })
+      .focus(Events.onTextFieldFocus)
+      .blur(Events.onTextFieldBlur);
 
-    .click(function(e) {
-      Utils.selectAllText(e.target);
-    })
-    .focus(Events.onTextFieldFocus)
-    .blur(Events.onTextFieldBlur);
-
-    if (onKeyDownHandler)
-      $input.keydown(onKeyDownHandler);
-    if (onKeyUpHandler)
-      $input.keyup(onKeyUpHandler);
+    if (onKeyDownHandler) $input.keydown(onKeyDownHandler);
+    if (onKeyUpHandler) $input.keyup(onKeyUpHandler);
 
     return $input;
   },
@@ -147,23 +146,25 @@ var WidgetUI = {
    * @param {string} property Property Name
    * @return {jQuery element} SPAN for size selection
    */
-  createSizeControl: function(property) {
+  createSizeControl: function (property) {
     var container = $('<span>', {
-      class: this.CLASS_NAMES.size
+      class: this.CLASS_NAMES.size,
     });
 
     // Textfield for entering size
-    this.createTextField(property, 2,
+    this.createTextField(
+      property,
+      2,
       Events.onSizeFieldKeyDown,
-      Events.onSizeFieldKeyUp)
-    .appendTo(container);
+      Events.onSizeFieldKeyUp
+    ).appendTo(container);
 
     // Select box for choosing unit
     var $select = $('<select>', {
-      class: this.CLASS_NAMES.control + " " + this.CLASS_NAMES.select
+      class: this.CLASS_NAMES.control + ' ' + this.CLASS_NAMES.select,
     })
-    .data('default', this.DEFAULT_SIZE_UNIT)
-    .appendTo(container);
+      .data('default', this.DEFAULT_SIZE_UNIT)
+      .appendTo(container);
 
     var len = this.SIZE_UNITS.length;
     for (var i = 0; i < len; i++) {
@@ -171,9 +172,9 @@ var WidgetUI = {
     }
 
     this.selectize($select, {
-      onValueChange: function(value) {
+      onValueChange: function (value) {
         $select.prev().keyup();
-      }
+      },
     });
 
     return container;
@@ -184,9 +185,9 @@ var WidgetUI = {
    * @param {element} control Control to insert multisize control in
    * @return {jQuery element} SPAN containing select element
    */
-  createMultiSizeControl: function(control) {
+  createMultiSizeControl: function (control) {
     var container = $('<span>', {
-      class: this.CLASS_NAMES.multisize
+      class: this.CLASS_NAMES.multisize,
     });
 
     var len = control.id.length;
@@ -194,17 +195,22 @@ var WidgetUI = {
 
     for (var i = 0; i < len; i++) {
       var property = control.id[i];
-      this.createTextField(property, 1, Events.onSizeFieldKeyDown, Events.onSizeFieldKeyUp)
+      this.createTextField(
+        property,
+        1,
+        Events.onSizeFieldKeyDown,
+        Events.onSizeFieldKeyUp
+      )
         .addClass(this.CLASS_NAMES.multisize + '-' + sizeTypes[i])
         .appendTo(container);
     }
 
     // Select box for choosing unit
-    var $select = $("<select>", {
-      class: this.CLASS_NAMES.control + " " + this.CLASS_NAMES.select
+    var $select = $('<select>', {
+      class: this.CLASS_NAMES.control + ' ' + this.CLASS_NAMES.select,
     })
-    .data('default', this.DEFAULT_SIZE_UNIT)
-    .appendTo(container);
+      .data('default', this.DEFAULT_SIZE_UNIT)
+      .appendTo(container);
 
     var len = this.SIZE_UNITS.length;
     for (var i = 0; i < len; i++) {
@@ -212,9 +218,9 @@ var WidgetUI = {
     }
 
     this.selectize($select, {
-      onValueChange: function(value) {
+      onValueChange: function (value) {
         $select.parent().find('input').keyup();
-      }
+      },
     });
 
     return container;
@@ -225,63 +231,69 @@ var WidgetUI = {
    * @param {element} control Element that should contain this control
    * @return {jQuery element} SPAN element containing the control
    */
-  createFontFamilyControl: function(control) {
+  createFontFamilyControl: function (control) {
     var $container = $('<span>', {
-      class: this.CLASS_NAMES.fontFamily
+      class: this.CLASS_NAMES.fontFamily,
     });
 
     var $select = $('<select>', {
-      class: this.CLASS_NAMES.control + " " + this.CLASS_NAMES.select
+      class: this.CLASS_NAMES.control + ' ' + this.CLASS_NAMES.select,
     })
-    .data('default', this.DEFAULT_OPTION)
-    .appendTo($container);
+      .data('default', this.DEFAULT_OPTION)
+      .appendTo($container);
 
-    chrome.storage.local.get("fontStack", $.proxy(function(items) {
-      var fontStack = items["fontStack"];
-      if (!fontStack) {
-        fontStack = this.DEFAULT_FONT_STACK;
-      }
+    chrome.storage.local.get(
+      'fontStack',
+      $.proxy(function (items) {
+        var fontStack = items['fontStack'];
+        if (!fontStack) {
+          fontStack = this.DEFAULT_FONT_STACK;
+        }
 
-      chrome.storage.local.set({"fontStack": fontStack});
-      this.updateFontStack(fontStack);
-    }, this));
+        chrome.storage.local.set({ fontStack: fontStack });
+        this.updateFontStack(fontStack);
+      }, this)
+    );
 
     this.selectize($select, {
       persist: true,
 
-      create: function(input) {
+      create: function (input) {
         input = $.trim(input);
 
         return {
           value: input,
-          text: input
-        }
+          text: input,
+        };
       },
 
-      onValueChange: $.proxy(function(value) {
+      onValueChange: $.proxy(function (value) {
         if (value != '') {
-          chrome.storage.local.get("fontStack", $.proxy(function(items) {
-            var fontStack = items["fontStack"];
-            if (fontStack.indexOf(value) != -1) {
-              fontStack = Utils.removeFromArray(fontStack, value);
-            }
+          chrome.storage.local.get(
+            'fontStack',
+            $.proxy(function (items) {
+              var fontStack = items['fontStack'];
+              if (fontStack.indexOf(value) != -1) {
+                fontStack = Utils.removeFromArray(fontStack, value);
+              }
 
-            fontStack.unshift(value);
-            fontStack = fontStack.slice(0, this.FONT_STACK_LIMIT);
+              fontStack.unshift(value);
+              fontStack = fontStack.slice(0, this.FONT_STACK_LIMIT);
 
-            chrome.storage.local.set({"fontStack": fontStack});
-            this.updateFontStack(fontStack, value);
-          }, this));
+              chrome.storage.local.set({ fontStack: fontStack });
+              this.updateFontStack(fontStack, value);
+            }, this)
+          );
         }
 
         Events.onSelectChange('font-family', value);
-      }, this)
+      }, this),
     });
 
     return $container;
   },
 
-  updateFontStack: function(fontStack, selectedValue) {
+  updateFontStack: function (fontStack, selectedValue) {
     var $select = $('.' + this.CLASS_NAMES.fontFamily + ' select');
     var selectize = $select.get(0).selectize;
     var len = fontStack.length;
@@ -292,12 +304,12 @@ var WidgetUI = {
     // Add the default option
     selectize.addOption(this.DEFAULT_OPTION, {
       text: this.DEFAULT_OPTION,
-      value: this.DEFAULT_OPTION
+      value: this.DEFAULT_OPTION,
     });
 
     for (var i = 0; i < len; i++) {
       var font = fontStack[i];
-      selectize.addOption(font, {text: font, value: font});
+      selectize.addOption(font, { text: font, value: font });
     }
 
     if (!selectedValue) {
@@ -307,31 +319,31 @@ var WidgetUI = {
     selectize.setValue(selectedValue);
   },
 
-  createBorderStyleControl: function(control) {
+  createBorderStyleControl: function (control) {
     var container = $('<span>', {
-      class: this.CLASS_NAMES.borderStyle
+      class: this.CLASS_NAMES.borderStyle,
     });
 
     var $select = $('<select>', {
-      class: this.CLASS_NAMES.control + " " + this.CLASS_NAMES.select
+      class: this.CLASS_NAMES.control + ' ' + this.CLASS_NAMES.select,
     })
-    .data('default', this.DEFAULT_OPTION)
-    .appendTo(container);
+      .data('default', this.DEFAULT_OPTION)
+      .appendTo(container);
 
     // default option
     this.createSelectOption($select, this.DEFAULT_OPTION, this.DEFAULT_OPTION);
 
     var len = control.options.length;
     for (var i = 0; i < len; i++) {
-      this.createSelectOption($select, control.options[i], control.options[i])
+      this.createSelectOption($select, control.options[i], control.options[i]);
     }
 
     this.selectize($select, {
       persist: true,
       create: false,
-      onValueChange: function(value) {
+      onValueChange: function (value) {
         Events.onSelectChange('border-style', value);
-      }
+      },
     });
 
     return container;
@@ -340,23 +352,25 @@ var WidgetUI = {
   /**
    * Wrapper for selectize.js with default options.
    */
-  selectize: function($select, moreOptions) {
+  selectize: function ($select, moreOptions) {
     if (!moreOptions) {
       moreOptions = {};
     }
 
     var options = {
-      onDropdownOpen: function($dropdown) {
+      onDropdownOpen: function ($dropdown) {
         var value = $select.get(0).selectize.getValue();
         $dropdown.data('value', value);
       },
 
-      onDropdownClose: $.proxy(function($dropdown) {
+      onDropdownClose: $.proxy(function ($dropdown) {
         var oldValue = $dropdown.data('value');
         var selectize = $select.get(0).selectize;
         var value = selectize.getValue();
 
-        if (oldValue === value) { return; }
+        if (oldValue === value) {
+          return;
+        }
 
         if (value === '') {
           selectize.setValue(oldValue);
@@ -372,11 +386,11 @@ var WidgetUI = {
         }
       }, this),
 
-      onItemCreate: function(value) {
+      onItemCreate: function (value) {
         if (moreOptions['onValueChange']) {
           moreOptions['onValueChange'](value);
         }
-      }
+      },
     };
 
     if (moreOptions) {
@@ -388,33 +402,31 @@ var WidgetUI = {
     $select.selectize(options);
   },
 
-  createToggleButton: function(text, property, value) {
+  createToggleButton: function (text, property, value) {
     return this.createButton(text)
-    .addClass(this.CLASS_NAMES.control + " " + this.CLASS_NAMES.toggleButton)
-    .attr('id', 'stylebot-' + property)
-    .data({
-      'value': value,
-      'property': property
-    })
-    .click(Events.onToggle);
+      .addClass(this.CLASS_NAMES.control + ' ' + this.CLASS_NAMES.toggleButton)
+      .attr('id', 'stylebot-' + property)
+      .data({
+        value: value,
+        property: property,
+      })
+      .click(Events.onToggle);
   },
 
-  createRadio: function(text, name, property, value) {
+  createRadio: function (text, name, property, value) {
     var span = $('<span>', {
       id: 'stylebot-' + property,
-      class: this.CLASS_NAMES.control
+      class: this.CLASS_NAMES.control,
     });
 
     var radio = $('<input>', {
       type: 'radio',
       name: name,
-      class: this.CLASS_NAMES.control + " " + this.CLASS_NAMES.radio
+      class: this.CLASS_NAMES.control + ' ' + this.CLASS_NAMES.radio,
     });
 
-    if (typeof(property) == 'string')
-      radio.attr('value', value);
-    else
-      radio.attr('value', value.join(','));
+    if (typeof property == 'string') radio.attr('value', value);
+    else radio.attr('value', value.join(','));
 
     radio.data('property', property);
     radio.click(Events.onRadioClick);
@@ -423,10 +435,10 @@ var WidgetUI = {
     return span;
   },
 
-  createSelectOption: function($select, text, data, property) {
+  createSelectOption: function ($select, text, data, property) {
     var $option = $('<option>', {
       html: text,
-      value: data
+      value: data,
     });
 
     if (property) {
@@ -440,56 +452,55 @@ var WidgetUI = {
   /**
    * Create the color picker
    */
-  createColorPicker: function(input, el) {
+  createColorPicker: function (input, el) {
     return $('<div>', {
-      class: this.CLASS_NAMES.control + " " + this.CLASS_NAMES.colorSelector,
-      tabIndex: 0
+      class: this.CLASS_NAMES.control + ' ' + this.CLASS_NAMES.colorSelector,
+      tabIndex: 0,
     })
+      .append(
+        $('<div>', {
+          class: this.CLASS_NAMES.colorSelectorColor,
+        })
+      )
 
-    .append($('<div>', {
-      class: this.CLASS_NAMES.colorSelectorColor
-    }))
+      .ColorPicker({
+        flat: false,
+        appendToElement: el,
 
-    .ColorPicker({
-      flat: false,
-      appendToElement: el,
+        onChange: function (hsb, hex, rgb) {
+          var colorCode = '#' + hex;
+          // set input value to reflect the newly picked color's code
+          input.attr('value', colorCode);
+          // update the color selector color
+          WidgetUI.setColorSelectorColor(input);
 
-      onChange: function(hsb, hex, rgb) {
-        var colorCode = '#' + hex;
-        // set input value to reflect the newly picked color's code
-        input.attr('value', colorCode);
-        // update the color selector color
-        WidgetUI.setColorSelectorColor(input);
+          // if live preview is enabled, update DOM
+          if (stylebot.options.livePreviewColorPicker) input.keyup().blur();
+        },
 
-        // if live preview is enabled, update DOM
-        if (stylebot.options.livePreviewColorPicker)
+        onBeforeShow: function () {
+          var color = input.attr('value');
+          if (color === '' || color === undefined) color = '#ffffff'; // default is white
+          $(this).ColorPickerSetColor(color);
+          stylebot.widget.basic.isColorPickerVisible = true;
+          input.focus();
+        },
+
+        onHide: function () {
           input.keyup().blur();
-      },
+          stylebot.widget.basic.isColorPickerVisible = false;
+        },
+      })
 
-      onBeforeShow: function() {
-        var color = input.attr('value');
-        if (color === '' || color === undefined)
-          color = '#ffffff'; // default is white
-        $(this).ColorPickerSetColor(color);
-        stylebot.widget.basic.isColorPickerVisible = true;
-        input.focus();
-      },
-
-      onHide: function() {
-        input.keyup().blur();
-        stylebot.widget.basic.isColorPickerVisible = false;
-      }
-    })
-
-    .keyup(function(e) {
-      // enter
-      if (e.keyCode == 13 && !$(e.target).hasClass('disabled'))
-        $(this).ColorPickerToggle();
-    });
+      .keyup(function (e) {
+        // enter
+        if (e.keyCode == 13 && !$(e.target).hasClass('disabled'))
+          $(this).ColorPickerToggle();
+      });
   },
 
   // Set color selector value by fetching value from connected input textfield
-  setColorSelectorColor: function(input) {
+  setColorSelectorColor: function (input) {
     // get the color value
     var color = input.attr('value');
     if (color != undefined) {
@@ -499,64 +510,64 @@ var WidgetUI = {
     }
   },
 
-  createLabel: function(text) {
+  createLabel: function (text) {
     return $('<label>', {
       class: this.CLASS_NAMES.label,
-      html: text + ':'
+      html: text + ':',
     });
   },
 
-  createInlineLabel: function(text) {
+  createInlineLabel: function (text) {
     return $('<label>', {
       class: this.CLASS_NAMES.inlineLabel,
-      html: text
+      html: text,
     });
   },
 
-  createButton: function(text) {
+  createButton: function (text) {
     return $('<button>', {
       class: this.CLASS_NAMES.button.default,
-      html: text
-    })
-    .mouseup(function(e) { e.target.focus(); });
+      html: text,
+    }).mouseup(function (e) {
+      e.target.focus();
+    });
   },
 
-  createButtonSet: function(buttons, className,  enabledButtonIndex, callback) {
+  createButtonSet: function (buttons, className, enabledButtonIndex, callback) {
     var container = $('<span>');
     var len = buttons.length;
 
     for (var i = 0; i < len; i++) {
       var bt = this.createButton(buttons[i])
-      .addClass(className)
-      .data('class', className)
-      .appendTo(container)
-      .click(callback);
+        .addClass(className)
+        .data('class', className)
+        .appendTo(container)
+        .click(callback);
 
-      if (i === enabledButtonIndex)
-        bt.addClass(this.BUTTON_SELECTED_CLASS);
+      if (i === enabledButtonIndex) bt.addClass(this.BUTTON_SELECTED_CLASS);
     }
 
     return container;
   },
 
-  createSegmentedControl: function(control) {
+  createSegmentedControl: function (control) {
     var container = $('<span>', {
-      class: this.CLASS_NAMES.control + " " + this.CLASS_NAMES.segmentedControl,
-      id: 'stylebot-' + control.id
+      class: this.CLASS_NAMES.control + ' ' + this.CLASS_NAMES.segmentedControl,
+      id: 'stylebot-' + control.id,
     });
 
     var len = control.options.length;
     for (var i = 0; i < len; i++) {
       var bt = this.createButton(control.options[i])
-      .data({
-        value: control.values[i],
-        property: control.id
-      })
-      .bind('mousedown keydown', Events.onSegmentedControlMouseDown)
-      .appendTo(container);
+        .data({
+          value: control.values[i],
+          property: control.id,
+        })
+        .bind('mousedown keydown', Events.onSegmentedControlMouseDown)
+        .appendTo(container);
       // explicitly having to add the 'stylebot-last-child'
       // class as :last-child causes weird issue in Chrome
-      if (i == (len - 1)) {
+      if (i == len - 1) {
         bt.addClass(this.CLASS_NAMES.lastSegmentedButton);
       }
     }
@@ -564,7 +575,7 @@ var WidgetUI = {
     return container;
   },
 
-  setFontFamily: function(control, value) {
+  setFontFamily: function (control, value) {
     if (value === undefined) {
       return false;
     }
@@ -574,51 +585,48 @@ var WidgetUI = {
 
     // if the option does not already exist, add it to the stack.
     if (option.length == 0) {
-      selectize.addOption(value, {text: value, value: value});
+      selectize.addOption(value, { text: value, value: value });
       selectize.refreshOptions(false);
     }
 
     selectize.setValue(value);
   },
 
-  setBorderStyle: function(control, value) {
-    if (value === undefined)
-      return false;
+  setBorderStyle: function (control, value) {
+    if (value === undefined) return false;
 
     control.el.find('select').get(0).selectize.setValue(value);
   },
 
-  setColor: function(control, value) {
-    if (value === undefined)
-      return false;
+  setColor: function (control, value) {
+    if (value === undefined) return false;
     control.el.attr('value', value);
     this.setColorSelectorColor(control.el);
   },
 
-  setToggleButton: function(control, value) {
-    if (value === control.el.data('value'))
-      this.selectButton(control.el);
-    else
-      this.deselectButton(control.el);
+  setToggleButton: function (control, value) {
+    if (value === control.el.data('value')) this.selectButton(control.el);
+    else this.deselectButton(control.el);
   },
 
-  setSegmentedControl: function(control, value) {
+  setSegmentedControl: function (control, value) {
     var index = $.inArray($.trim(String(value)), control.values);
     if (index != -1)
       this.selectSegmentedButton($(control.el.find('button').get(index)));
   },
 
-  setSize: function(control, value) {
-    if (value === undefined)
-      return false;
+  setSize: function (control, value) {
+    if (value === undefined) return false;
 
     var unit = $.trim(this.determineSizeUnit(value));
 
-    control.el.find(this.SELECTORS.textfield).attr('value', value.replace(unit, ''));
+    control.el
+      .find(this.SELECTORS.textfield)
+      .attr('value', value.replace(unit, ''));
     control.el.find(this.SELECTORS.select).get(0).selectize.setValue(unit);
   },
 
-  determineSizeUnit: function(value) {
+  determineSizeUnit: function (value) {
     var len = this.SIZE_UNITS.length;
 
     for (var i = 0; i < len; i++) {
@@ -627,13 +635,11 @@ var WidgetUI = {
       }
     }
 
-    if (i < len)
-      return this.SIZE_UNITS[i];
-    else
-      return '';
+    if (i < len) return this.SIZE_UNITS[i];
+    else return '';
   },
 
-  setMultiSize: function(control, values) {
+  setMultiSize: function (control, values) {
     var $input = control.el.find(this.SELECTORS.textfield);
     var $select = control.el.find(this.SELECTORS.select);
 
@@ -675,33 +681,37 @@ var WidgetUI = {
     $input.keyup();
   },
 
-  selectButton: function($bt) {
+  selectButton: function ($bt) {
     $bt.addClass(this.CLASS_NAMES.button.selected);
   },
 
-  deselectButton: function($bt) {
+  deselectButton: function ($bt) {
     $bt.removeClass(this.CLASS_NAMES.button.selected);
   },
 
-  selectSegmentedButton: function($bt) {
-    $bt.addClass(this.CLASS_NAMES.button.selected)
-    .next().addClass(this.CLASS_NAMES.button.nextToSelected);
+  selectSegmentedButton: function ($bt) {
+    $bt
+      .addClass(this.CLASS_NAMES.button.selected)
+      .next()
+      .addClass(this.CLASS_NAMES.button.nextToSelected);
   },
 
-  deselectSegmentedButton: function($bt) {
-    $bt.removeClass(this.CLASS_NAMES.button.selected)
-    .next().removeClass(this.CLASS_NAMES.button.nextToSelected);
+  deselectSegmentedButton: function ($bt) {
+    $bt
+      .removeClass(this.CLASS_NAMES.button.selected)
+      .next()
+      .removeClass(this.CLASS_NAMES.button.nextToSelected);
   },
 
-  isButtonSelected: function($bt) {
+  isButtonSelected: function ($bt) {
     return $bt.hasClass(this.CLASS_NAMES.button.selected);
   },
 
-  setButtonAsActive: function($bt) {
+  setButtonAsActive: function ($bt) {
     $bt.addClass(this.CLASS_NAMES.button.active);
   },
 
-  setButtonAsInactive: function($bt) {
+  setButtonAsInactive: function ($bt) {
     $bt.removeClass(this.CLASS_NAMES.button.active);
-  }
+  },
 };

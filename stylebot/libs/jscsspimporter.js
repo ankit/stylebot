@@ -4,22 +4,22 @@
 function JSCSSPImporter() {
   this.rules = {};
 
-  this.AT_RULE_PREFIX = "at";
-  this.COMMENT_PREFIX = "comment";
-  this.AT_IMPORT_RULE_TYPE = "@import";
+  this.AT_RULE_PREFIX = 'at';
+  this.COMMENT_PREFIX = 'comment';
+  this.AT_IMPORT_RULE_TYPE = '@import';
   this.commentIndex = 0;
 }
 
 JSCSSPImporter.prototype = {
-  isError: function(rule) {
-    return (rule instanceof jscsspErrorRule);
+  isError: function (rule) {
+    return rule instanceof jscsspErrorRule;
   },
 
-  isComment: function(rule) {
-    return (rule instanceof jscsspComment);
+  isComment: function (rule) {
+    return rule instanceof jscsspComment;
   },
 
-  isAtRule: function(rule) {
+  isAtRule: function (rule) {
     var types = [
       jscsspImportRule,
       jscsspKeyframesRule,
@@ -28,7 +28,7 @@ JSCSSPImporter.prototype = {
       jscsspPageRule,
       jscsspCharsetRule,
       jscsspNamespaceRule,
-      jscsspFontFaceRule
+      jscsspFontFaceRule,
     ];
 
     var len = types.length;
@@ -42,17 +42,17 @@ JSCSSPImporter.prototype = {
     return false;
   },
 
-  reportError: function(rule) {
+  reportError: function (rule) {
     this.rules['error'] = rule;
   },
 
-  importAtRule: function(rule, parent) {
+  importAtRule: function (rule, parent) {
     var selector = this.AT_RULE_PREFIX + rule.currentLine;
     parent[selector] = new Object();
     parent[selector][this.AT_RULE_PREFIX] = true;
     parent[selector]['text'] = rule.cssText();
 
-    var type = rule.cssText() ? rule.cssText().split(' ')[0] : "";;
+    var type = rule.cssText() ? rule.cssText().split(' ')[0] : '';
     parent[selector]['type'] = type;
 
     if (type === this.AT_IMPORT_RULE_TYPE) {
@@ -64,14 +64,14 @@ JSCSSPImporter.prototype = {
     }
   },
 
-  importComment: function(rule, parent) {
+  importComment: function (rule, parent) {
     var selector = this.COMMENT_PREFIX + this.commentIndex;
     parent[selector] = new Object();
     parent[selector][this.COMMENT_PREFIX] = rule.cssText();
     this.commentIndex++;
   },
 
-  importStyleRule: function(rule, parent) {
+  importStyleRule: function (rule, parent) {
     var selector = rule.mSelectorText;
     parent[selector] = new Object();
     var len = rule.declarations.length;
@@ -87,7 +87,7 @@ JSCSSPImporter.prototype = {
     }
   },
 
-  importSheet: function(sheet) {
+  importSheet: function (sheet) {
     var len = sheet.cssRules.length;
     for (var i = 0; i < len; i++) {
       if (this.isError(sheet.cssRules[i])) {
@@ -103,5 +103,5 @@ JSCSSPImporter.prototype = {
     }
 
     return this.rules;
-  }
+  },
 };

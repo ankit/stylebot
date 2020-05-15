@@ -17,7 +17,7 @@ function showUpdateNotification() {
       'notification/index.html'
     );
     notification.show();
-  } catch(e) {
+  } catch (e) {
     console.log(e);
   }
 }
@@ -27,9 +27,9 @@ function showUpdateNotification() {
  * and data model if required.
  */
 function updateVersion(callback) {
-  chrome.storage.local.get(['version'], function(storage) {
+  chrome.storage.local.get(['version'], function (storage) {
     if (storage['version'] !== VERSION) {
-      chrome.storage.local.set({'version': VERSION});
+      chrome.storage.local.set({ version: VERSION });
       showUpdateNotification();
     }
 

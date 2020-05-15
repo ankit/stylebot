@@ -13,21 +13,21 @@ var cache = {
     contextMenu: true,
     livePreviewColorPicker: true,
     livePreviewPage: true,
-    accordions: [0, 1, 2, 3]
+    accordions: [0, 1, 2, 3],
   },
 
   importRules: {},
 
   // Temporary cached map of tabId to rules to prevent recalculating rules
   // for iframes. Cleared when a tab is closed.
-  loadingTabs: []
+  loadingTabs: [],
 };
 
 /**
  * Initialize the background page cache
  */
 function initCache(callback) {
-  chrome.storage.local.get(['options', 'styles'], function(items) {
+  chrome.storage.local.get(['options', 'styles'], function (items) {
     if (items['options']) {
       cache.options = items['options'];
     }
@@ -46,8 +46,8 @@ function initCache(callback) {
 
 BrowserAction.init();
 
-updateVersion(function() {
-  initCache(function() {
+updateVersion(function () {
+  initCache(function () {
     ContextMenu.init();
   });
 });

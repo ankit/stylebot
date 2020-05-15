@@ -22,7 +22,7 @@
  * @param {element} edgeContainer Element inside which the edges are inserted.
  *    By default, body
  */
-var SelectionBox = function(edgeSize, edgeColor, edgeContainer) {
+var SelectionBox = function (edgeSize, edgeColor, edgeContainer) {
   edgeSize = edgeSize ? edgeSize : 2;
   edgeColor = edgeColor ? edgeColor : '#65f166';
   edgeContainer = edgeContainer ? edgeContainer : $('body').get(0);
@@ -32,20 +32,20 @@ var SelectionBox = function(edgeSize, edgeColor, edgeContainer) {
    * @return {element} DIV for the edge
    * @private
    */
-  var createEdge = function() {
+  var createEdge = function () {
     var css = {
       'background-color': edgeColor,
-      'position'        : 'absolute',
-      'z-index'         : '2147483644'
+      position: 'absolute',
+      'z-index': '2147483644',
     };
     return $('<div>').css(css);
   };
 
-  var edges     = {};
-  edges.top     = createEdge();
-  edges.right   = createEdge();
-  edges.bottom  = createEdge();
-  edges.left    = createEdge();
+  var edges = {};
+  edges.top = createEdge();
+  edges.right = createEdge();
+  edges.bottom = createEdge();
+  edges.left = createEdge();
 
   for (var edge in edges) {
     edges[edge].appendTo(edgeContainer);
@@ -58,14 +58,13 @@ var SelectionBox = function(edgeSize, edgeColor, edgeContainer) {
    * @param {element} el DOM element to highlight
    * @public
    */
-  this.highlight = function(el) {
+  this.highlight = function (el) {
     if (!el) {
       self.hide();
       return;
     }
 
-    if (el.nodeType != 1)
-      el = el.parentNode;
+    if (el.nodeType != 1) el = el.parentNode;
 
     var scrollbarSize = 17;
     var windowSize = getWindowSize();
@@ -77,13 +76,23 @@ var SelectionBox = function(edgeSize, edgeColor, edgeContainer) {
     var height = box.height;
     var width = box.width;
 
-    var freeHorizontalSpace = scrollPosition.left + windowSize.width - left - width -
-    (scrollSize.height > windowSize.height ? // is *vertical* scrollbar visible
-      scrollbarSize : 0);
+    var freeHorizontalSpace =
+      scrollPosition.left +
+      windowSize.width -
+      left -
+      width -
+      (scrollSize.height > windowSize.height // is *vertical* scrollbar visible
+        ? scrollbarSize
+        : 0);
 
-    var freeVerticalSpace = scrollPosition.top + windowSize.height - top - height -
-    (scrollSize.width > windowSize.width ? // is *horizontal* scrollbar visible
-      scrollbarSize : 0);
+    var freeVerticalSpace =
+      scrollPosition.top +
+      windowSize.height -
+      top -
+      height -
+      (scrollSize.width > windowSize.width // is *horizontal* scrollbar visible
+        ? scrollbarSize
+        : 0);
 
     var numVerticalBorders = freeVerticalSpace > 0 ? 2 : 1;
 
@@ -99,8 +108,7 @@ var SelectionBox = function(edgeSize, edgeColor, edgeContainer) {
     if (freeVerticalSpace > 0) {
       moveEdge('bottom', top + height, left);
       resizeEdge('bottom', edgeSize, width);
-    }
-    else {
+    } else {
       moveEdge('bottom', -2 * edgeSize, -2 * edgeSize);
       resizeEdge('bottom', edgeSize, edgeSize);
     }
@@ -108,9 +116,12 @@ var SelectionBox = function(edgeSize, edgeColor, edgeContainer) {
     // right edge
     if (freeHorizontalSpace > 0) {
       moveEdge('right', top - edgeSize, left + width);
-      resizeEdge('right', height + numVerticalBorders * edgeSize, (freeHorizontalSpace < edgeSize ? freeHorizontalSpace : edgeSize));
-    }
-    else {
+      resizeEdge(
+        'right',
+        height + numVerticalBorders * edgeSize,
+        freeHorizontalSpace < edgeSize ? freeHorizontalSpace : edgeSize
+      );
+    } else {
       moveEdge('right', -2 * edgeSize, -2 * edgeSize);
       resizeEdge('right', edgeSize, edgeSize);
     }
@@ -120,18 +131,16 @@ var SelectionBox = function(edgeSize, edgeColor, edgeContainer) {
    * Hide selection edges
    * @public
    */
-  this.hide = function() {
-    for (var edge in edges)
-      edges[edge].width(0).height(0);
+  this.hide = function () {
+    for (var edge in edges) edges[edge].width(0).height(0);
   };
 
   /**
    * Remove the selection box from DOM
    * @public
    */
-  this.destroy = function() {
-    for (var edge in edges)
-      edges[edge].remove();
+  this.destroy = function () {
+    for (var edge in edges) edges[edge].remove();
   };
 
   /**
@@ -141,7 +150,7 @@ var SelectionBox = function(edgeSize, edgeColor, edgeContainer) {
    * @param {number} t Top offset
    * @param {number} l Left offset
    */
-  var moveEdge = function(edge, t, l) {
+  var moveEdge = function (edge, t, l) {
     edges[edge].css('top', t + 'px');
     edges[edge].css('left', l + 'px');
   };
@@ -153,7 +162,7 @@ var SelectionBox = function(edgeSize, edgeColor, edgeContainer) {
    * @param {number} h Height of edge to set
    * @param {number} w Width of edge to set
    */
-  var resizeEdge = function(edge, h, w) {
+  var resizeEdge = function (edge, h, w) {
     edges[edge].height(h);
     edges[edge].width(w);
   };
@@ -165,7 +174,7 @@ var SelectionBox = function(edgeSize, edgeColor, edgeContainer) {
    * @return {object} Offset and dimensions of element.
    *    Example: {top:1, left: 2, height: 3, width: 4}
    */
-  var getElementBox = function(el) {
+  var getElementBox = function (el) {
     var result = {};
 
     if (el.getBoundingClientRect) {
@@ -175,8 +184,7 @@ var SelectionBox = function(edgeSize, edgeColor, edgeContainer) {
       result.left = Math.round(rect.left + scroll.left);
       result.height = Math.round(rect.bottom - rect.top);
       result.width = Math.round(rect.right - rect.left);
-    }
-    else {
+    } else {
       var position = getElementPosition(el);
       result.top = position.top;
       result.left = position.left;
@@ -191,12 +199,16 @@ var SelectionBox = function(edgeSize, edgeColor, edgeContainer) {
    * @private
    * @return {object} Scroll width and height. {width: 12, height: 12}
    */
-  var getWindowScrollSize = function() {
-    var width = 0, height = 0, el;
+  var getWindowScrollSize = function () {
+    var width = 0,
+      height = 0,
+      el;
 
     // first try the document.documentElement scroll size
-    if ((el = document.documentElement) &&
-    (el.scrollHeight || el.scrollWidth)) {
+    if (
+      (el = document.documentElement) &&
+      (el.scrollHeight || el.scrollWidth)
+    ) {
       width = el.scrollWidth;
       height = el.scrollHeight;
     }
@@ -204,13 +216,16 @@ var SelectionBox = function(edgeSize, edgeColor, edgeContainer) {
     // then we need to check if document.body has a bigger scroll size value
     // because sometimes depending on the browser and the page, the document.body
     // scroll size returns a smaller (and wrong) measure
-    if ((el = document.body) && (el.scrollHeight || el.scrollWidth) &&
-    (el.scrollWidth > width || el.scrollHeight > height)) {
+    if (
+      (el = document.body) &&
+      (el.scrollHeight || el.scrollWidth) &&
+      (el.scrollWidth > width || el.scrollHeight > height)
+    ) {
       width = el.scrollWidth;
       height = el.scrollHeight;
     }
 
-    return {width: width, height: height};
+    return { width: width, height: height };
   };
 
   /**
@@ -219,17 +234,16 @@ var SelectionBox = function(edgeSize, edgeColor, edgeContainer) {
    * @param {element} el Element
    * @return {object} Object containing left and top offset values for element.
    */
-  var getElementPosition = function(el) {
+  var getElementPosition = function (el) {
     var left = 0;
     var top = 0;
 
     do {
       left += el.offsetLeft;
       top += el.offsetTop;
-    }
-    while (el = el.offsetParent);
+    } while ((el = el.offsetParent));
 
-    return {left: left, top: top};
+    return { left: left, top: top };
   };
 
   /**
@@ -237,24 +251,26 @@ var SelectionBox = function(edgeSize, edgeColor, edgeContainer) {
    * @private
    * @return {object} Example: {width: 600, height: 600}
    */
-  var getWindowSize = function() {
-    var width = 0, height = 0, el;
+  var getWindowSize = function () {
+    var width = 0,
+      height = 0,
+      el;
 
     if (typeof window.innerWidth == 'number') {
       width = window.innerWidth;
       height = window.innerHeight;
-    }
-    else if ((el = document.documentElement) &&
-    (el.clientHeight || el.clientWidth)) {
+    } else if (
+      (el = document.documentElement) &&
+      (el.clientHeight || el.clientWidth)
+    ) {
       width = el.clientWidth;
       height = el.clientHeight;
-    }
-    else if ((el = document.body) && (el.clientHeight || el.clientWidth)) {
+    } else if ((el = document.body) && (el.clientHeight || el.clientWidth)) {
       width = el.clientWidth;
       height = el.clientHeight;
     }
 
-    return {width: width, height: height};
+    return { width: width, height: height };
   };
 
   /**
@@ -262,24 +278,25 @@ var SelectionBox = function(edgeSize, edgeColor, edgeContainer) {
    * @private
    * @return {object} With top and left properties
    */
-  var getWindowScrollPosition = function() {
-    var top = 0, left = 0, el;
+  var getWindowScrollPosition = function () {
+    var top = 0,
+      left = 0,
+      el;
 
     if (typeof window.pageYOffset === 'number') {
       top = window.pageYOffset;
       left = window.pageXOffset;
-    }
-
-    else if ((el = document.body) && (el.scrollTop || el.scrollLeft)) {
+    } else if ((el = document.body) && (el.scrollTop || el.scrollLeft)) {
+      top = el.scrollTop;
+      left = el.scrollLeft;
+    } else if (
+      (el = document.documentElement) &&
+      (el.scrollTop || el.scrollLeft)
+    ) {
       top = el.scrollTop;
       left = el.scrollLeft;
     }
 
-    else if ((el = document.documentElement) && (el.scrollTop || el.scrollLeft)) {
-      top = el.scrollTop;
-      left = el.scrollLeft;
-    }
-
-    return {top: top, left: left};
+    return { top: top, left: left };
   };
 };

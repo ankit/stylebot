@@ -9,36 +9,38 @@ stylebot.widget.advanced = {
   cache: {
     editor: null,
     container: null,
-    lastState: null
+    lastState: null,
   },
 
-  create: function($parent) {
+  create: function ($parent) {
     this.cache.container = $('<div>', {
-      id: 'stylebot-advanced'
+      id: 'stylebot-advanced',
     });
 
     $('<div>', {
       id: 'stylebot-advanced-header',
-      html: 'CSS for selected element(s):'
-    })
-    .appendTo(this.cache.container);
+      html: 'CSS for selected element(s):',
+    }).appendTo(this.cache.container);
 
     $('<div>', {
-      id: 'stylebot-advanced-editor'
-    })
-    .appendTo(this.cache.container);
+      id: 'stylebot-advanced-editor',
+    }).appendTo(this.cache.container);
 
     $parent.append(this.cache.container);
 
-    setTimeout($.proxy(function() {
-      this.initializeEditor();
-    }, this), 0);
+    setTimeout(
+      $.proxy(function () {
+        this.initializeEditor();
+      }, this),
+      0
+    );
   },
 
-  initializeEditor: function() {
+  initializeEditor: function () {
     var self = this;
     self.cache.editor = Utils.ace.monkeyPatch(
-      ace.edit('stylebot-advanced-editor'));
+      ace.edit('stylebot-advanced-editor')
+    );
 
     var editor = self.cache.editor;
     var session = editor.getSession();
@@ -58,29 +60,30 @@ stylebot.widget.advanced = {
       bindKey: {
         win: 'Esc',
         mac: 'Esc',
-        sender: 'editor'
+        sender: 'editor',
       },
-      exec: function(env, args, req) {
+      exec: function (env, args, req) {
         editor.blur();
-      }
+      },
     });
 
-    setTimeout(function() {
+    setTimeout(function () {
       self.resize(300);
     }, 0);
   },
 
-  contentChanged: function() {
+  contentChanged: function () {
     stylebot.style.applyCSS(
-      stylebot.widget.advanced.cache.editor.getSession().getValue());
+      stylebot.widget.advanced.cache.editor.getSession().getValue()
+    );
   },
 
-  onFocus: function() {
+  onFocus: function () {
     stylebot.undo.push(Utils.cloneObject(stylebot.style.rules));
     self.cache.lastState = self.cache.editor.getSession().getValue();
   },
 
-  onBlur: function() {
+  onBlur: function () {
     var $el = $(e.target);
     if (self.cache.lastState == self.cache.editor.getSession().getValue()) {
       stylebot.undo.pop();
@@ -90,62 +93,65 @@ stylebot.widget.advanced = {
     self.cache.lastState = null;
   },
 
-  fill: function() {
+  fill: function () {
     var css = CSSUtils.crunchCSSForSelector(
       stylebot.style.rules,
       stylebot.style.cache.selector,
       false,
-      true);
+      true
+    );
     this.cache.editor.getSession().setValue(css);
   },
 
-  show: function() {
+  show: function () {
     this.fill();
     this.cache.container.show();
 
     var self = this;
     if (!self.isDisabled()) {
-      setTimeout(function() {
+      setTimeout(function () {
         self.cache.editor.focus();
         self.cache.editor.gotoLine(
-          self.cache.editor.getSession().getLength(), 0);
+          self.cache.editor.getSession().getLength(),
+          0
+        );
       }, 0);
     }
   },
 
-  hide: function() {
+  hide: function () {
     this.cache.container.hide();
   },
 
-  reset: function() {
+  reset: function () {
     this.cache.editor.getSession().setValue('');
     this.cache.editor.focus();
   },
 
-  enable: function() {
-    if (this.cache.editor === null)
-      return;
+  enable: function () {
+    if (this.cache.editor === null) return;
     this.cache.editor.setDisabled(false);
   },
 
-  disable: function() {
-    if (this.cache.editor === null)
-      return;
+  disable: function () {
+    if (this.cache.editor === null) return;
     this.cache.editor.setDisabled(true);
   },
 
-  isDisabled: function() {
+  isDisabled: function () {
     return this.cache.editor.getDisabled();
   },
 
-  resize: function(height) {
+  resize: function (height) {
     var self = stylebot.widget.advanced;
 
-    $('#stylebot-advanced-editor').css('height',
-      height - self.EDITOR_BOTTOM_PADDING);
+    $('#stylebot-advanced-editor').css(
+      'height',
+      height - self.EDITOR_BOTTOM_PADDING
+    );
 
-    setTimeout(function() {
+    setTimeout(function () {
       self.cache.editor.resize();
     }, 0);
-  }
+  },
 };

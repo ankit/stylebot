@@ -6,7 +6,7 @@
  */
 function saveOption(name, value) {
   cache.options[name] = value;
-  chrome.storage.local.set({'options': cache.options});
+  chrome.storage.local.set({ options: cache.options });
   propagateOptions();
 
   // If the option was contextMenu, update it
@@ -25,20 +25,25 @@ function saveOption(name, value) {
 function propagateOptions() {
   var req = {
     name: 'setOptions',
-    options: cache.options
+    options: cache.options,
   };
 
-  chrome.windows.getAll({
-    populate: true
-  }, function(windows) {
-    var w_len = windows.length;
-    for (var i = 0; i < w_len; i++) {
-      var t_len = windows[i].tabs.length;
-      for (var j = 0; j < t_len; j++) {
-        chrome.tabs.sendRequest(windows[i].tabs[j].id, req, function(response) {});
+  chrome.windows.getAll(
+    {
+      populate: true,
+    },
+    function (windows) {
+      var w_len = windows.length;
+      for (var i = 0; i < w_len; i++) {
+        var t_len = windows[i].tabs.length;
+        for (var j = 0; j < t_len; j++) {
+          chrome.tabs.sendRequest(windows[i].tabs[j].id, req, function (
+            response
+          ) {});
+        }
       }
     }
-  });
+  );
 }
 
 /**
@@ -48,6 +53,6 @@ function propagateOptions() {
 function saveAccordionState(accordions) {
   cache.options.accordions = accordions;
   chrome.storage.local.set({
-    'options': cache.options
+    options: cache.options,
   });
 }

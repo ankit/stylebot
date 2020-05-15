@@ -3,11 +3,39 @@
     <title>Stylebot Options</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
-    <link rel="stylesheet" href="../libs/tipsy/tipsy.css" type="text/css" media="screen" title="no title" charset="utf-8">
-    <link rel="stylesheet" href="../libs/ace/ace.css" type="text/css" media="screen" title="no title" charset="utf-8">
-    <link rel="stylesheet" href="../shared/modalbox/modalbox.css" type="text/css" media="screen" title="no title" charset="utf-8">
+    <link
+      rel="stylesheet"
+      href="../libs/tipsy/tipsy.css"
+      type="text/css"
+      media="screen"
+      title="no title"
+      charset="utf-8"
+    />
+    <link
+      rel="stylesheet"
+      href="../libs/ace/ace.css"
+      type="text/css"
+      media="screen"
+      title="no title"
+      charset="utf-8"
+    />
+    <link
+      rel="stylesheet"
+      href="../shared/modalbox/modalbox.css"
+      type="text/css"
+      media="screen"
+      title="no title"
+      charset="utf-8"
+    />
 
-    <link rel="stylesheet" href="options.css" type="text/css" media="screen" title="no title" charset="utf-8">
+    <link
+      rel="stylesheet"
+      href="options.css"
+      type="text/css"
+      media="screen"
+      title="no title"
+      charset="utf-8"
+    />
 
     <script type="text/javascript" src="../libs/handlebars.js"></script>
     <script type="text/javascript" src="../libs/jquery.js"></script>
@@ -22,7 +50,10 @@
     <script type="text/javascript" src="../shared/utils.js"></script>
     <script type="text/javascript" src="../shared/cssformatter.js"></script>
     <script type="text/javascript" src="../shared/css-utils.js"></script>
-    <script type="text/javascript" src="../shared/modalbox/modalbox.js"></script>
+    <script
+      type="text/javascript"
+      src="../shared/modalbox/modalbox.js"
+    ></script>
 
     <script type="text/javascript" src="templates/style-modal.js"></script>
     <script type="text/javascript" src="templates/style.js"></script>
@@ -31,6 +62,7 @@
     <script type="text/javascript" src="styles.js"></script>
     <script type="text/javascript" src="modal.js"></script>
   </head>
+
   <body>
     <div id="wrap">
       <div id="tabMenu">
@@ -40,15 +72,24 @@
           <li><a href="#styles-container">Styles</a></li>
           <li><a href="#backup">Backup</a></li>
         </ul>
-        <div class='separator'></div>
+
+        <div class="separator"></div>
         <div id="footer">
-          If you like Stylebot, please <a target='_blank' href="http://pledgie.com/campaigns/14409">donate</a><br>
-          Share your styles on <a target='_blank' href="http://stylebot.me">Stylebot Social</a><br>
-          <a target='_blank' href="http://stylebot.me/about">About</a> ·
-          <a target='_blank' href="http://github.com/ankit/stylebot/issues">Issues</a> ·
-          <a target='_blank' href="http://stylebot.me/changelog">Changelog</a>
+          If you like Stylebot, please
+          <a target="_blank" href="http://pledgie.com/campaigns/14409">donate</a
+          ><br />
+          Share your styles on
+          <a target="_blank" href="http://stylebot.me">Stylebot Social</a><br />
+          <a target="_blank" href="http://stylebot.me/about">About</a>
+          ·
+          <a target="_blank" href="http://github.com/ankit/stylebot/issues"
+            >Issues</a
+          >
+          ·
+          <a target="_blank" href="http://stylebot.me/changelog">Changelog</a>
         </div>
       </div>
+
       <div id="options">
         <div id="basics">
           <h2>Basics</h2>
@@ -63,39 +104,58 @@
               </div>
             </div>
           </div>
+
           <div class="option-section">
             <h3>Accessibility</h3>
             <div class="option-subsection">
               <div>
                 <label>
                   <input type="checkbox" name="useShortcutKey" />
-                  <span class="option-field">Enable Shortcut Key to launch Stylebot</span>
+                  <span class="option-field"
+                    >Enable Shortcut Key to launch Stylebot</span
+                  >
                 </label>
               </div>
               <div>
                 <span class="option-field">Shortcut Key Combo:</span>
-                <div class='option-value'>
+                <div class="option-value">
                   <select name="shortcutMetaKey">
                     <option value="ctrl">Ctrl</option>
                     <option value="shift">Shift</option>
                     <option value="alt">Alt</option>
                     <option value="none">None</option>
                   </select>
-                  + <input type="text" name="shortcutKeyCharacter" value="e" size="1" />
+                  +
+                  <input
+                    type="text"
+                    name="shortcutKeyCharacter"
+                    value="e"
+                    size="1"
+                  />
                   <!-- Hidden field to store keycode value -->
                   <input type="hidden" name="shortcutKey" />
                 </div>
               </div>
             </div>
           </div>
+
           <div class="option-section">
             <h3>Default Editing Mode</h3>
             <div class="option-subsection">
-              <label><input type="radio" name="mode" value="Basic" /> Basic </label>
-              <br>
-              <label><input type="radio" name="mode" value="Advanced" /> Advanced </label>
-              <br>
-              <label><input type="radio" name="mode" value="Edit CSS" /> Edit CSS </label>
+              <label
+                ><input type="radio" name="mode" value="Basic" />
+                Basic
+              </label>
+              <br />
+              <label
+                ><input type="radio" name="mode" value="Advanced" />
+                Advanced
+              </label>
+              <br />
+              <label
+                ><input type="radio" name="mode" value="Edit CSS" />
+                Edit CSS
+              </label>
             </div>
           </div>
           <div class="option-section">
@@ -103,48 +163,74 @@
             <div class="option-subsection">
               <label>
                 <input type="checkbox" name="livePreviewColorPicker" />
-                <span class="option-field">Enable Live Preview in Color Picker</span>
+                <span class="option-field"
+                  >Enable Live Preview in Color Picker</span
+                >
               </label>
             </div>
           </div>
         </div>
+
         <div id="styles-container">
           <h2>Styles</h2>
           <div class="option-section">
             <h3>Global Stylesheet</h3>
             <div class="option-subsection">
-              <button class="show-edit-global">Edit Global Stylesheet</button>
-              <button class="toggle-global" >Enable Global Stylesheet</button>
+              <button class="show-edit-global">
+                Edit Global Stylesheet
+              </button>
+              <button class="toggle-global">
+                Enable Global Stylesheet
+              </button>
             </div>
           </div>
+
           <div class="option-section">
             <h3>Search</h3>
             <div class="option-subsection">
-              <input type="search" id="style-search-field" incremental placeholder="Type URL to search..."/>
+              <input
+                type="search"
+                id="style-search-field"
+                incremental
+                placeholder="Type URL to search..."
+              />
             </div>
           </div>
+
           <div class="option-section">
-            <h3>Styles <span id='style-count-container'>(<span id='style-count'>0</span>)</span></h3>
+            <h3>
+              Styles
+              <span id="style-count-container"
+                >(<span id="style-count">0</span>)</span
+              >
+            </h3>
             <div class="option-subsection">
-              <button class="show-add-style">Add a new style...</button>
+              <button class="show-add-style">
+                Add a new style...
+              </button>
               <button class="enable-all">Enable all</button>
               <button class="disable-all">Disable all</button>
-              <div id="styles">
-              </div>
+              <div id="styles"></div>
               <button class="error delete-all">Delete all</button>
             </div>
           </div>
         </div>
+
         <div id="backup">
           <h2>Backup</h2>
           <div class="option-section">
             <h3>Backup</h3>
-            <div class='option-subsection'>
-              <button class="show-export">Export Styles...</button>
-              <button class="show-import">Import Styles...</button>
+            <div class="option-subsection">
+              <button class="show-export">
+                Export Styles...
+              </button>
+              <button class="show-import">
+                Import Styles...
+              </button>
             </div>
           </div>
         </div>
       </div>
+    </div>
   </body>
 </html>

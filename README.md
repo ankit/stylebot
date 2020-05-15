@@ -2,15 +2,15 @@
 
 A Google Chrome extension that allows users to manipulate a web page’s appearance in a WYSIWYG manner.
 
-* Incrementally build custom stylesheets for Chrome.
-* Save custom CSS rules for sites. The next time they visit a site, their custom CSS is already applied.
-* Share, explore and apply CSS created by other users (_website is currently down_)
+- Incrementally build custom stylesheets for Chrome.
+- Save custom CSS rules for sites. The next time they visit a site, their custom CSS is already applied.
+- Share, explore and apply CSS created by other users (_website is currently down_)
 
 ## Resources
 
-* Chrome Webstore: <https://chrome.google.com/extensions/detail/oiaejidbmkiecgbjeifoejpgmdaleoha>
-* Donate on Pledgie: [http://pledgie.com/campaigns/14409](http://pledgie.com/campaigns/14409)
-* Issues and feature requests: <https://github.com/ankit/stylebot/issues>
+- Chrome Webstore: <https://chrome.google.com/extensions/detail/oiaejidbmkiecgbjeifoejpgmdaleoha>
+- Donate on Pledgie: [http://pledgie.com/campaigns/14409](http://pledgie.com/campaigns/14409)
+- Issues and feature requests: <https://github.com/ankit/stylebot/issues>
 
 ## About
 

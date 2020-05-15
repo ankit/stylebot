@@ -7,13 +7,25 @@ stylebot.chrome = {
    *   to update the browser action
    * @param {boolean} Stylebot editor status i.e. open or closed
    */
-  setBrowserAction: function(status) {
+  setBrowserAction: function (status) {
     if (status) {
-      chrome.extension.sendRequest({ name: 'activateBrowserAction' }, function() {});
-    } else if (!$.isEmptyObject(stylebot.style.rules) || !$.isEmptyObject(stylebot.style.global)) {
-      chrome.extension.sendRequest({ name: 'highlightBrowserAction' }, function() {});
+      chrome.extension.sendRequest(
+        { name: 'activateBrowserAction' },
+        function () {}
+      );
+    } else if (
+      !$.isEmptyObject(stylebot.style.rules) ||
+      !$.isEmptyObject(stylebot.style.global)
+    ) {
+      chrome.extension.sendRequest(
+        { name: 'highlightBrowserAction' },
+        function () {}
+      );
     } else {
-      chrome.extension.sendRequest({ name: 'unhighlightBrowserAction' }, function() {});
+      chrome.extension.sendRequest(
+        { name: 'unhighlightBrowserAction' },
+        function () {}
+      );
     }
   },
 
@@ -21,8 +33,11 @@ stylebot.chrome = {
    * Send a request to the background page to copy text to clipboard
    * @param {string} text Text to copy
    */
-  copyToClipboard: function(text) {
-    chrome.extension.sendRequest({ name: 'copyToClipboard', text: text }, function() {});
+  copyToClipboard: function (text) {
+    chrome.extension.sendRequest(
+      { name: 'copyToClipboard', text: text },
+      function () {}
+    );
   },
 
   /**
@@ -31,12 +46,11 @@ stylebot.chrome = {
    * @param {object} rules The style rules
    * @param {data} Any additional data to send as 'data' property
    */
-  save: function(url, rules, data) {
-    chrome.extension.sendRequest({ name: 'save',
-      rules: rules,
-      url: url,
-      data: data
-    }, function() {});
+  save: function (url, rules, data) {
+    chrome.extension.sendRequest(
+      { name: 'save', rules: rules, url: url, data: data },
+      function () {}
+    );
   },
 
   /**
@@ -44,11 +58,14 @@ stylebot.chrome = {
    * @param {string} url URL for which to check
    * @param {function} callback Method called with the response from background page
    */
-  doesStyleExist: function(url, callback) {
-    chrome.extension.sendRequest({
-      name: 'doesStyleExist',
-      url: url
-    }, callback);
+  doesStyleExist: function (url, callback) {
+    chrome.extension.sendRequest(
+      {
+        name: 'doesStyleExist',
+        url: url,
+      },
+      callback
+    );
   },
 
   /**
@@ -58,13 +75,16 @@ stylebot.chrome = {
    * @param {object} rules The styles
    * @param {number} id ID of the style on Stylebot Social
    */
-  install: function(url, rules, id) {
-    chrome.extension.sendRequest({
-      name: 'install',
-      rules: rules,
-      url: url,
-      id: id
-    }, function() {});
+  install: function (url, rules, id) {
+    chrome.extension.sendRequest(
+      {
+        name: 'install',
+        rules: rules,
+        url: url,
+        id: id,
+      },
+      function () {}
+    );
   },
 
   /**
@@ -72,34 +92,43 @@ stylebot.chrome = {
    * @param {string} src Source URL
    * @param {string} dest Destination URL
    */
-  transfer: function(src, dest) {
-    chrome.extension.sendRequest({
-      name: 'transfer',
-      source: src,
-      destination: dest
-    }, function() {});
+  transfer: function (src, dest) {
+    chrome.extension.sendRequest(
+      {
+        name: 'transfer',
+        source: src,
+        destination: dest,
+      },
+      function () {}
+    );
   },
 
   /**
    * Send request to fetch options from background page datastore
    */
-  fetchOptions: function() {
-    chrome.extension.sendRequest({
-      name: 'fetchOptions'
-    }, function(response) {
-      initialize(response);
-    });
+  fetchOptions: function () {
+    chrome.extension.sendRequest(
+      {
+        name: 'fetchOptions',
+      },
+      function (response) {
+        initialize(response);
+      }
+    );
   },
 
   /**
    * Send request to save accordion state
    * @param {array} accordions Indices of open accordions
    */
-  saveAccordionState: function(accordions) {
-    chrome.extension.sendRequest({
-      name: 'saveAccordionState',
-      accordions: accordions
-    }, function() {});
+  saveAccordionState: function (accordions) {
+    chrome.extension.sendRequest(
+      {
+        name: 'saveAccordionState',
+        accordions: accordions,
+      },
+      function () {}
+    );
   },
 
   /**
@@ -107,14 +136,17 @@ stylebot.chrome = {
    * @param {string} name Option name
    * @param {object} value Option value
    */
-  saveOption: function(name, value) {
-    chrome.extension.sendRequest({
-      name: 'saveOption',
-      option: {
-        name: name,
-        value: value
-      }
-    }, function() {});
+  saveOption: function (name, value) {
+    chrome.extension.sendRequest(
+      {
+        name: 'saveOption',
+        option: {
+          name: name,
+          value: value,
+        },
+      },
+      function () {}
+    );
   },
 
   /**
@@ -122,115 +154,101 @@ stylebot.chrome = {
    * @param {string} name Option name
    * @param {function} callback Method to be called with the option value
    */
-  getOption: function(name, callback) {
-    chrome.extension.sendRequest({
-      name: 'getOption',
-      optionName: name
-    }, callback);
+  getOption: function (name, callback) {
+    chrome.extension.sendRequest(
+      {
+        name: 'getOption',
+        optionName: name,
+      },
+      callback
+    );
   },
 
   /**
    * Open the options page for stylebot
    */
-  showOptions: function() {
+  showOptions: function () {
     chrome.extension.sendRequest({
-      name: 'showOptions'
+      name: 'showOptions',
     });
-  }
+  },
 };
 
 /**
  * Listeners for requests sent from elsewhere
  */
-chrome.extension.onRequest.addListener(
-  function(request, sender, sendResponse) {
-    if (window !== window.top) {
-      return;
-    }
-
-    if (request.name === 'status') {
-      sendResponse({
-        status: stylebot.status,
-        rules: $.isEmptyObject(stylebot.style.rules) ? null : stylebot.style.rules,
-        global: $.isEmptyObject(stylebot.style.global) ? null : stylebot.style.global
-      });
-    }
-
-    else if (request.name === 'toggle') {
-      stylebot.toggle();
-      sendResponse({
-        status: stylebot.status
-      });
-    }
-
-    else if (request.name === 'setOptions') {
-      stylebot.setOptions(request.options);
-    }
-
-    else if (request.name === 'openWidget') {
-      stylebot.contextmenu.openWidget();
-    }
-
-    else if (request.name === 'searchSocial') {
-      stylebot.contextmenu.searchSocial();
-    }
-
-    else if (request.name === 'postToSocial') {
-      PostToSocial.post();
-    }
-
-    else if (request.name === 'toggleStyle') {
-      stylebot.style.toggle();
-
-      sendResponse({
-        status: stylebot.style.status
-      });
-    }
-
-    else if (request.name === 'styleStatus') {
-      sendResponse({
-        status: stylebot.style.status
-      });
-    }
-
-    else if (request.name === 'getURLAndSocialData') {
-      sendResponse({
-        url: document.domain ? document.domain : location.href,
-        social: stylebot.style.social
-      });
-    }
-
-    else if (request.name === 'preview') {
-      stylebot.style.preview(request.title,
-        request.description,
-        request.author,
-        request.timeAgo,
-        request.favCount,
-        request.css);
-    }
-
-    else if (request.name === 'previewReset') {
-      stylebot.style.previewReset();
-    }
-
-    else if (request.name === 'resetPreview') {
-      stylebot.style.resetPreview();
-    }
-
-    else if (request.name === 'install') {
-      stylebot.style.install(
-        request.id,
-        request.title,
-        request.url,
-        request.css,
-        request.timestamp);
-
-      stylebot.chrome.setBrowserAction(false);
-    }
-
-    else if (request.name === 'reset') {
-      stylebot.style.resetAllCSS(true);
-      stylebot.chrome.setBrowserAction(false);
-    }
+chrome.extension.onRequest.addListener(function (
+  request,
+  sender,
+  sendResponse
+) {
+  if (window !== window.top) {
+    return;
   }
-);
+
+  if (request.name === 'status') {
+    sendResponse({
+      status: stylebot.status,
+      rules: $.isEmptyObject(stylebot.style.rules)
+        ? null
+        : stylebot.style.rules,
+      global: $.isEmptyObject(stylebot.style.global)
+        ? null
+        : stylebot.style.global,
+    });
+  } else if (request.name === 'toggle') {
+    stylebot.toggle();
+    sendResponse({
+      status: stylebot.status,
+    });
+  } else if (request.name === 'setOptions') {
+    stylebot.setOptions(request.options);
+  } else if (request.name === 'openWidget') {
+    stylebot.contextmenu.openWidget();
+  } else if (request.name === 'searchSocial') {
+    stylebot.contextmenu.searchSocial();
+  } else if (request.name === 'postToSocial') {
+    PostToSocial.post();
+  } else if (request.name === 'toggleStyle') {
+    stylebot.style.toggle();
+
+    sendResponse({
+      status: stylebot.style.status,
+    });
+  } else if (request.name === 'styleStatus') {
+    sendResponse({
+      status: stylebot.style.status,
+    });
+  } else if (request.name === 'getURLAndSocialData') {
+    sendResponse({
+      url: document.domain ? document.domain : location.href,
+      social: stylebot.style.social,
+    });
+  } else if (request.name === 'preview') {
+    stylebot.style.preview(
+      request.title,
+      request.description,
+      request.author,
+      request.timeAgo,
+      request.favCount,
+      request.css
+    );
+  } else if (request.name === 'previewReset') {
+    stylebot.style.previewReset();
+  } else if (request.name === 'resetPreview') {
+    stylebot.style.resetPreview();
+  } else if (request.name === 'install') {
+    stylebot.style.install(
+      request.id,
+      request.title,
+      request.url,
+      request.css,
+      request.timestamp
+    );
+
+    stylebot.chrome.setBrowserAction(false);
+  } else if (request.name === 'reset') {
+    stylebot.style.resetAllCSS(true);
+    stylebot.chrome.setBrowserAction(false);
+  }
+});

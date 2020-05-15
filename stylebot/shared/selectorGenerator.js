@@ -13,7 +13,7 @@
  * @param {String} [level] Specificity level at which to generate CSS selector.
       Valid values are low, high and medium. Default is medium
  */
-var SelectorGenerator = function(level) {
+var SelectorGenerator = function (level) {
   this.specificityLevel = level ? level : 'medium';
 
   var self = this;
@@ -24,7 +24,7 @@ var SelectorGenerator = function(level) {
    * @param {element} el Element
    * @return {string} CSS selector
    */
-  this.generate = function(el) {
+  this.generate = function (el) {
     var $el;
 
     if (!el) {
@@ -50,7 +50,7 @@ var SelectorGenerator = function(level) {
    * @param {number} DOM Traversal Level. Root is at 0
    * @return {string} CSS Selector
    */
-  var inspect = function(el, level) {
+  var inspect = function (el, level) {
     var elClass = el.attr('class');
 
     if (elClass !== undefined) {
@@ -95,7 +95,7 @@ var SelectorGenerator = function(level) {
    * @param {number} DOM Traversal Level. Root is at 0
    * @return {string} CSS Selector
    */
-  var inspectAtHighSpecificity = function(el, level) {
+  var inspectAtHighSpecificity = function (el, level) {
     var elId = el.attr('id');
 
     if (elId !== undefined) {
@@ -120,8 +120,7 @@ var SelectorGenerator = function(level) {
       if (elClass.length !== 0) {
         selector += '.' + elClass;
       }
-    }
-    else {
+    } else {
       selector = elTag;
 
       if (elClass.length !== 0) {
@@ -138,7 +137,7 @@ var SelectorGenerator = function(level) {
    * @param {element} el Element to inspect
    * @return {string} CSS Selector
    */
-  var inspectAtLowSpecificity = function(el) {
+  var inspectAtLowSpecificity = function (el) {
     var elTag = el.prop('tagName');
     return elTag ? elTag.toLowerCase() : '';
   };

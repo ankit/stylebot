@@ -1,7 +1,7 @@
 Options.styles = {
   count: 0,
 
-  init: function() {
+  init: function () {
     this.$container = $('#styles');
     this.$count = $('#style-count');
     this.$globalButton = $('.toggle-global');
@@ -10,45 +10,56 @@ Options.styles = {
     this.updateGlobalButton();
   },
 
-  attachListeners: function() {
-      $("#styles-container")
-        .on("click", ".show-edit-global", $.proxy(this.showEditGlobal, this))
-        .on("click", ".toggle-global", $.proxy(this.toggleGlobal, this))
-        .on("click", ".show-add-style", $.proxy(this.showAdd, this))
-        .on("click", ".enable-all", $.proxy(this.enableAll, this))
-        .on("click", ".disable-all", $.proxy(this.disableAll, this))
-        .on("click", ".delete-all", $.proxy(this.deleteAll, this))
+  attachListeners: function () {
+    $('#styles-container')
+      .on('click', '.show-edit-global', $.proxy(this.showEditGlobal, this))
+      .on('click', '.toggle-global', $.proxy(this.toggleGlobal, this))
+      .on('click', '.show-add-style', $.proxy(this.showAdd, this))
+      .on('click', '.enable-all', $.proxy(this.enableAll, this))
+      .on('click', '.disable-all', $.proxy(this.disableAll, this))
+      .on('click', '.delete-all', $.proxy(this.deleteAll, this))
 
-        .on("click", ".style .share-style", $.proxy(this.share, this))
-        .on("click", ".style .show-edit-style", $.proxy(this.showEdit, this))
-        .on("click", ".style .delete-style", $.proxy(this.delete, this))
-        .on("click", ".style .toggle-style", $.proxy(this.toggle, this))
+      .on('click', '.style .share-style', $.proxy(this.share, this))
+      .on('click', '.style .show-edit-style', $.proxy(this.showEdit, this))
+      .on('click', '.style .delete-style', $.proxy(this.delete, this))
+      .on('click', '.style .toggle-style', $.proxy(this.toggle, this));
 
-    $("#backup")
-      .on("click", ".show-export", $.proxy(this.showExport, this))
-      .on("click", ".show-import", $.proxy(this.showImport, this));
+    $('#backup')
+      .on('click', '.show-export', $.proxy(this.showExport, this))
+      .on('click', '.show-import', $.proxy(this.showImport, this));
 
     $(document)
-      .on("click", "#stylebot-modal .cancel", $.proxy(Options.modal.close, Options.modal))
-      .on("click", "#stylebot-modal .add-style", $.proxy(this.add, this))
-      .on("click", "#stylebot-modal .edit-style", $.proxy(this.edit, this))
-      .on("click", "#stylebot-modal .edit-global", $.proxy(this.editGlobal, this))
-      .on("click", "#stylebot-modal .import", $.proxy(this.import, this))
-      .on("click", "#stylebot-modal .copy-to-clipboard", this.copyToClipboard);
+      .on(
+        'click',
+        '#stylebot-modal .cancel',
+        $.proxy(Options.modal.close, Options.modal)
+      )
+      .on('click', '#stylebot-modal .add-style', $.proxy(this.add, this))
+      .on('click', '#stylebot-modal .edit-style', $.proxy(this.edit, this))
+      .on(
+        'click',
+        '#stylebot-modal .edit-global',
+        $.proxy(this.editGlobal, this)
+      )
+      .on('click', '#stylebot-modal .import', $.proxy(this.import, this))
+      .on('click', '#stylebot-modal .copy-to-clipboard', this.copyToClipboard);
 
     // Search.
-    $("#style-search-field").bind("keyup", $.proxy(function(e) {
-      var $target = $(e.target);
-      if (e.keyCode === 27) {
-        $target.val('');
-        this.filter('');
-      } else {
-        this.filter($target.val());
-      }
-    }, this));
+    $('#style-search-field').bind(
+      'keyup',
+      $.proxy(function (e) {
+        var $target = $(e.target);
+        if (e.keyCode === 27) {
+          $target.val('');
+          this.filter('');
+        } else {
+          this.filter($target.val());
+        }
+      }, this)
+    );
 
     // Tap / to search styles.
-    $(document).keyup(function(e) {
+    $(document).keyup(function (e) {
       if (e.keyCode != 191) return true;
 
       if ($('#styles-container').css('display') === 'none') return true;
@@ -61,9 +72,9 @@ Options.styles = {
   },
 
   /**
-    * Resets and renders all the users styles.
-    */
-  fill: function() {
+   * Resets and renders all the users styles.
+   */
+  fill: function () {
     this.$container.html('');
     var styles = backgroundPage.cache.styles.get();
     var counter = 0;
@@ -72,61 +83,61 @@ Options.styles = {
       // Global style is shown separately.
       if (url === '*') continue;
 
-      this.$container.prepend(this.render(url,
-        backgroundPage.cache.styles.isEnabled(url),
-        counter++));
+      this.$container.prepend(
+        this.render(url, backgroundPage.cache.styles.isEnabled(url), counter++)
+      );
 
-      this.count ++;
+      this.count++;
     }
 
     this.updateCount();
   },
 
-  get: function(id) {
+  get: function (id) {
     return $('#style' + id);
   },
 
-  render: function(url, isEnabled, id) {
+  render: function (url, isEnabled, id) {
     return Handlebars.templates.style({
       url: url,
       enabled: isEnabled,
-      id: id
+      id: id,
     });
   },
 
-  toggle: function(e) {
+  toggle: function (e) {
     var $target = $(e.target);
     var $style = $target.parents('.style');
     var url = $style.data('url');
-    backgroundPage.cache.styles.toggle(url, $target.attr("checked"), true);
+    backgroundPage.cache.styles.toggle(url, $target.attr('checked'), true);
   },
 
-  share: function(e) {
+  share: function (e) {
     var $style = $(e.target).parents('.style');
     var url = $style.data('url');
     var rules = backgroundPage.cache.styles.getRules(url);
     var socialURL = 'http://stylebot.me/post';
 
-    CSSUtils.crunchFormattedCSS(rules, false, false, function(css) {
+    CSSUtils.crunchFormattedCSS(rules, false, false, function (css) {
       // create a form and submit data
       var tempForm = $('<form>', {
-        'method': 'post',
-        'action': socialURL,
-        'target': '_blank'
+        method: 'post',
+        action: socialURL,
+        target: '_blank',
       });
 
       // site
       $('<input>', {
         type: 'hidden',
         name: 'site',
-        value: url
+        value: url,
       }).appendTo(tempForm);
 
       // css
       $('<input>', {
         type: 'hidden',
         name: 'css',
-        value: css
+        value: css,
       }).appendTo(tempForm);
 
       $('<submit>').appendTo(tempForm);
@@ -136,12 +147,13 @@ Options.styles = {
     });
   },
 
-  delete: function(e) {
+  delete: function (e) {
     var $style = $(e.target).parents('.style');
     var url = $style.data('url');
 
-    if (!confirm('Are you sure you want to delete the style for "'
-      + url + '"?')) {
+    if (
+      !confirm('Are you sure you want to delete the style for "' + url + '"?')
+    ) {
       return false;
     }
 
@@ -151,23 +163,22 @@ Options.styles = {
     $style.find('.close-button').attr('original-title', '');
     // Wait for the tooltip to disappear,
     // then remove the style element from DOM.
-    setTimeout(function() {
+    setTimeout(function () {
       $style.remove();
     }, 0);
 
-    this.count --;
+    this.count--;
     this.updateCount();
   },
 
-  validate: function(url, css) {
+  validate: function (url, css) {
     if (url === '') {
       Options.modal.showError('Please enter a URL.');
       return false;
-    }
-
-    else if (url === '*') {
+    } else if (url === '*') {
       Options.modal.showError(
-        '* is used for the global stylesheet. Please enter another URL.');
+        '* is used for the global stylesheet. Please enter another URL.'
+      );
       return false;
     }
 
@@ -179,22 +190,22 @@ Options.styles = {
     return true;
   },
 
-  add: function(e) {
+  add: function (e) {
     var url = Options.modal.getURL();
     var css = Options.modal.getCode();
 
     if (this.save(url, css)) {
       this.$container.prepend(this.render(url, true, this.count));
-      this.count ++;
+      this.count++;
       this.updateCount();
       Options.modal.close();
     }
   },
 
-  edit: function(e) {
+  edit: function (e) {
     var $el = $(e.target);
-    var previousURL = $el.data("previous-url");
-    var id = $el.data("id");
+    var previousURL = $el.data('previous-url');
+    var id = $el.data('id');
     var url = Options.modal.getURL();
     var css = Options.modal.getCode();
 
@@ -204,13 +215,13 @@ Options.styles = {
     }
   },
 
-  editGlobal: function() {
+  editGlobal: function () {
     if (this.save('*', Options.modal.getCode())) {
       Options.modal.close();
     }
   },
 
-  save: function(url, css, previousURL) {
+  save: function (url, css, previousURL) {
     if (url != '*') {
       if (!this.validate(url, css)) {
         return false;
@@ -240,9 +251,7 @@ Options.styles = {
         }
 
         return true;
-      }
-
-      catch (e) {
+      } catch (e) {
         // TODO: show error here instead of just true.
         return true;
       }
@@ -251,17 +260,17 @@ Options.styles = {
     return true;
   },
 
-  enableAll: function() {
+  enableAll: function () {
     $('.style input[type=checkbox]').prop('checked', true);
     backgroundPage.cache.styles.toggleAll(true);
   },
 
-  disableAll: function() {
+  disableAll: function () {
     $('.style input[type=checkbox]').prop('checked', false);
     backgroundPage.cache.styles.toggleAll(false);
   },
 
-  deleteAll: function() {
+  deleteAll: function () {
     if (confirm('Are you sure you want to delete ALL your styles?')) {
       backgroundPage.cache.styles.deleteAll();
       $('#styles').html('');
@@ -272,17 +281,19 @@ Options.styles = {
     return false;
   },
 
-  updateCount: function() {
+  updateCount: function () {
     this.$count.text(this.count);
   },
 
-  updateGlobalButton: function() {
+  updateGlobalButton: function () {
     this.$globalButton.html(
-      backgroundPage.cache.styles.isEnabled('*') ? 'Disable Global Stylesheet':
-      'Enable Global Stylesheet');
+      backgroundPage.cache.styles.isEnabled('*')
+        ? 'Disable Global Stylesheet'
+        : 'Enable Global Stylesheet'
+    );
   },
 
-  toggleGlobal: function() {
+  toggleGlobal: function () {
     if (!backgroundPage.cache.styles.toggle('*', null, true)) {
       backgroundPage.cache.styles.create('*');
     }
@@ -290,7 +301,7 @@ Options.styles = {
     this.updateGlobalButton();
   },
 
-  showEditGlobal: function(e) {
+  showEditGlobal: function (e) {
     var rules = backgroundPage.cache.styles.getRules('*');
 
     if (!rules) {
@@ -298,43 +309,43 @@ Options.styles = {
       rules = {};
     }
 
-    CSSUtils.crunchFormattedCSS(rules, false, false, function(css) {
+    CSSUtils.crunchFormattedCSS(rules, false, false, function (css) {
       Options.modal.init({
         editor: true,
         edit: true,
         global: true,
-        code: css
+        code: css,
       });
     });
   },
 
-  showEdit: function(e) {
-    var $style = $(e.target).parents(".style");
+  showEdit: function (e) {
+    var $style = $(e.target).parents('.style');
     var url = $style.data('url');
     var id = $style.data('id');
     var rules = backgroundPage.cache.styles.getRules(url);
 
-    CSSUtils.crunchFormattedCSS(rules, false, false, function(css) {
+    CSSUtils.crunchFormattedCSS(rules, false, false, function (css) {
       Options.modal.init({
         url: url,
         editor: true,
         edit: true,
         code: css,
-        id: id
+        id: id,
       });
     });
   },
 
-  showAdd: function(e) {
+  showAdd: function (e) {
     Options.modal.init({
       editor: true,
       add: true,
-      code: ""
+      code: '',
     });
   },
 
-  filter: function(query) {
-    var $styles = $(".style");
+  filter: function (query) {
+    var $styles = $('.style');
     var len = $styles.length;
 
     for (var i = 0; i < len; i++) {
@@ -349,35 +360,33 @@ Options.styles = {
     }
   },
 
-  showExport: function() {
-    var json = "";
+  showExport: function () {
+    var json = '';
     if (styles) {
       json = JSON.stringify(backgroundPage.cache.styles.get());
     }
 
     Options.modal.init({
       export: true,
-      code: json
+      code: json,
     });
   },
 
-  showImport: function() {
+  showImport: function () {
     Options.modal.init({
       import: true,
-      code: ""
+      code: '',
     });
   },
 
-  import: function() {
+  import: function () {
     var json = Options.modal.getText();
 
     if (json && json != '') {
       try {
         var imported_styles = JSON.parse(json);
         backgroundPage.cache.styles.import(imported_styles);
-      }
-
-      catch (e) {
+      } catch (e) {
         // TODO: show a more humanised message.
         Options.modal.showError('' + e);
         return false;
@@ -390,9 +399,11 @@ Options.styles = {
     }
   },
 
-  copyToClipboard: function() {
+  copyToClipboard: function () {
     var text = Options.modal.getText();
-    chrome.extension.sendRequest({name: 'copyToClipboard', text: text},
-    function(response) {});
-  }
-}
+    chrome.extension.sendRequest(
+      { name: 'copyToClipboard', text: text },
+      function (response) {}
+    );
+  },
+};

@@ -9,21 +9,21 @@ stylebot.undo = {
   /**
    * Enable the undo button in editor
    */
-  enable: function() {
+  enable: function () {
     stylebot.widget.enableUndoButton();
   },
 
   /**
    * Disable the undo button in editor
    */
-  disable: function() {
+  disable: function () {
     stylebot.widget.disableUndoButton();
   },
 
   /**
    * Enable / disable the undo button based on if any states are stored
    */
-  refresh: function() {
+  refresh: function () {
     if (this.isEmpty()) {
       this.disable();
     } else {
@@ -35,7 +35,7 @@ stylebot.undo = {
    * Check if the states are empty.
    * @return {boolean} Returns true if no states exist
    */
-  isEmpty: function() {
+  isEmpty: function () {
     if (this.states.length === 0) {
       return true;
     } else {
@@ -46,7 +46,7 @@ stylebot.undo = {
   /**
    * Remove last saved state
    */
-  pop: function() {
+  pop: function () {
     return this.states.pop();
   },
 
@@ -54,7 +54,7 @@ stylebot.undo = {
    * Add a new state
    * @param {object} state State to save
    */
-  push: function(state) {
+  push: function (state) {
     this.states.push(state);
-  }
+  },
 };

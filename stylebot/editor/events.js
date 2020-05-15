@@ -6,19 +6,18 @@
  */
 Events = {
   ACCORDION_SAVE_TIMEOUT: 500,
-  GOOGLE_FONT_API: "http://fonts.googleapis.com/css?family=",
+  GOOGLE_FONT_API: 'http://fonts.googleapis.com/css?family=',
 
   accordionTimer: null,
 
-  onToggle: function(e) {
+  onToggle: function (e) {
     var $bt = $(this);
     var ui = WidgetUI;
 
     var value = '';
     var property = $bt.data('property');
 
-    if (ui.isButtonSelected($bt))
-      ui.deselectButton($bt);
+    if (ui.isButtonSelected($bt)) ui.deselectButton($bt);
     else {
       ui.selectButton($bt);
       value = $bt.data('value');
@@ -27,13 +26,11 @@ Events = {
     Events.saveProperty(property, value);
   },
 
-  onRadioClick: function(e) {
+  onRadioClick: function (e) {
     var value;
 
-    if (e.target.checked == true)
-      value = e.target.value;
-    else
-      value = '';
+    if (e.target.checked == true) value = e.target.value;
+    else value = '';
     value = value.split(',');
 
     var property = $(e.target).data('property');
@@ -42,13 +39,12 @@ Events = {
       for (var i = 0; i < len; i++) {
         Events.saveProperty(property[i], value[i]);
       }
-    }
-    else
-      Events.saveProperty(property, value);
+    } else Events.saveProperty(property, value);
   },
 
-  onTextFieldKeyUp: function(e) {
-    if (e.keyCode == 27) { // esc
+  onTextFieldKeyUp: function (e) {
+    if (e.keyCode == 27) {
+      // esc
       e.target.blur();
       return;
     }
@@ -58,19 +54,18 @@ Events = {
     stylebot.style.apply(property, value);
   },
 
-  onTextFieldFocus: function(e) {
+  onTextFieldFocus: function (e) {
     stylebot.undo.push(Utils.cloneObject(stylebot.style.rules));
     $(e.target).data('lastState', e.target.value);
   },
 
-  onTextFieldBlur: function(e) {
-    if ($(e.target).data('lastState') == e.target.value)
-      stylebot.undo.pop();
+  onTextFieldBlur: function (e) {
+    if ($(e.target).data('lastState') == e.target.value) stylebot.undo.pop();
     $(e.target).data('lastState', null);
     stylebot.undo.refresh();
   },
 
-  onSizeFieldKeyDown: function(e) {
+  onSizeFieldKeyDown: function (e) {
     // increment / decrement value by 1 with arrow keys
     // up / down arrow
     if (e.keyCode === 38 || e.keyCode === 40) {
@@ -82,13 +77,12 @@ Events = {
 
       value = parseInt(value);
 
-      if (isNaN(value))
-        value = 0;
+      if (isNaN(value)) value = 0;
       else {
-        if (e.keyCode === 38) // up
+        if (e.keyCode === 38)
+          // up
           value += 1;
-        else
-          value -= 1;
+        else value -= 1;
       }
 
       e.target.value = value;
@@ -100,7 +94,7 @@ Events = {
     }
   },
 
-  onSizeFieldKeyUp: function(e) {
+  onSizeFieldKeyUp: function (e) {
     // esc
     if (e.keyCode === 27) {
       e.target.blur();
@@ -123,7 +117,7 @@ Events = {
     stylebot.style.apply(property, value);
   },
 
-  onSelectChange: function(property, value) {
+  onSelectChange: function (property, value) {
     if (typeof property === 'object') {
       var len = property.length;
       for (var i = 0; i < len; i++) {
@@ -133,18 +127,20 @@ Events = {
       if (property === 'font-family') {
         if (value != '') {
           var fontURL = Events.GOOGLE_FONT_API + value.replace(/ /g, '+');
-          chrome.extension.sendRequest({name: "fetchImportCSS", url: fontURL},
-            function(response) {
+          chrome.extension.sendRequest(
+            { name: 'fetchImportCSS', url: fontURL },
+            function (response) {
               stylebot.undo.push(Utils.cloneObject(stylebot.style.rules));
 
               // Hacky check to see if Google Web Font exists.
-              if (response.text.indexOf("@font-face") == 0) {
+              if (response.text.indexOf('@font-face') == 0) {
                 stylebot.style.prependWebFont(fontURL, response.text);
               }
 
               stylebot.style.apply(property, value);
               stylebot.undo.refresh();
-          });
+            }
+          );
         } else {
           Events.saveProperty(property, value);
         }
@@ -154,14 +150,12 @@ Events = {
     }
   },
 
-  onSegmentedControlMouseDown: function(e) {
-    if (e.type === 'keydown' && e.keyCode != 13 && e.keyCode != 32)
-      return true;
+  onSegmentedControlMouseDown: function (e) {
+    if (e.type === 'keydown' && e.keyCode != 13 && e.keyCode != 32) return true;
     var $button = $(e.target);
 
     // if the user clicked the SPAN enclosed inside BUTTON, get to the button
-    if (e.target.tagName != 'BUTTON')
-      $button = $button.parent();
+    if (e.target.tagName != 'BUTTON') $button = $button.parent();
 
     WidgetUI.setButtonAsActive($button);
 
@@ -170,7 +164,7 @@ Events = {
     $(document).bind('mouseup keyup', Events.onSegmentedControlMouseUp);
   },
 
-  onSegmentedControlMouseUp: function(e) {
+  onSegmentedControlMouseUp: function (e) {
     var ui = WidgetUI;
 
     var $button = $('.' + ui.CLASS_NAMES.button.active);
@@ -179,11 +173,12 @@ Events = {
     var status = ui.isButtonSelected($button);
     var control = $button.parent();
 
-    ui.deselectSegmentedButton(control.find('.' + ui.CLASS_NAMES.button.selected));
+    ui.deselectSegmentedButton(
+      control.find('.' + ui.CLASS_NAMES.button.selected)
+    );
 
     // Button is currently selected. Deselect it
-    if (status)
-      Events.saveProperty($button.data('property'), '');
+    if (status) Events.saveProperty($button.data('property'), '');
     // Select button
     else {
       Events.saveProperty($button.data('property'), $button.data('value'));
@@ -193,7 +188,7 @@ Events = {
     $(document).unbind('mouseup keyup', Events.onSegmentedControlMouseUp);
   },
 
-  toggleAccordion: function(h) {
+  toggleAccordion: function (h) {
     var self = Events;
     var ui = WidgetUI;
 
@@ -210,7 +205,7 @@ Events = {
       self.accordionTimer = null;
     }
 
-    self.accordionTimer = setTimeout(function() {
+    self.accordionTimer = setTimeout(function () {
       var $accordions = $(ui.SELECTORS.accordion);
       var len = $accordions.length;
       var accordion_states = [];
@@ -226,9 +221,9 @@ Events = {
     }, self.ACCORDION_SAVE_TIMEOUT);
   },
 
-  saveProperty: function(property, value) {
+  saveProperty: function (property, value) {
     stylebot.undo.push(Utils.cloneObject(stylebot.style.rules));
     stylebot.style.apply(property, value);
     stylebot.undo.refresh();
-  }
+  },
 };

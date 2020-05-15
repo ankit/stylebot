@@ -6,11 +6,10 @@
  */
 var Utils = {
   // return array index at which property pName is equal to value 'pValue'
-  search: function(arr, pName, pValue) {
+  search: function (arr, pName, pValue) {
     var len = arr.length;
     for (var i = 0; i < len; i++) {
-      if (arr[i][pName] == pValue)
-      return i;
+      if (arr[i][pName] == pValue) return i;
     }
     return null;
   },
@@ -18,41 +17,37 @@ var Utils = {
   // if any of the passed keys is pressed, returns false.
   // Accepts a keys array and 'keyup' event object as arguments.
   // TODO: Add support for keydown, keypress events and alphanumeric keys
-  filterKeys: function(keys, e) {
-    if (typeof(e.keyCode) == 'undefined')
-      return true;
+  filterKeys: function (keys, e) {
+    if (typeof e.keyCode == 'undefined') return true;
     var len = keys.length;
     var keyCodes = {
-      'ctrl': 17,
-      'shift': 16,
-      'tab': 9,
-      'esc': 27,
-      'enter': 13,
-      'caps': 20,
-      'option': 18,
-      'backspace': 8,
-      'left': 37,
-      'top': 38,
-      'right': 39,
-      'bottom': 40,
-      'arrowkeys': [37, 38, 39, 40]
+      ctrl: 17,
+      shift: 16,
+      tab: 9,
+      esc: 27,
+      enter: 13,
+      caps: 20,
+      option: 18,
+      backspace: 8,
+      left: 37,
+      top: 38,
+      right: 39,
+      bottom: 40,
+      arrowkeys: [37, 38, 39, 40],
     };
     for (var i = 0; i < len; i++) {
       var code = keyCodes[keys[i]];
       // it is an array
       if (code.length > 1) {
-        if ($.inArray(e.keyCode, code) != -1)
-        return false;
-      }
-      else {
-        if (e.keyCode == code)
-          return false;
+        if ($.inArray(e.keyCode, code) != -1) return false;
+      } else {
+        if (e.keyCode == code) return false;
       }
     }
     return true;
   },
 
-  capitalize: function(string) {
+  capitalize: function (string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
   },
 
@@ -64,7 +59,7 @@ var Utils = {
    * @param {object} options Options for edit in place field.
    * @return {boolean}
    */
-  makeEditable: function($el, callback, options) {
+  makeEditable: function ($el, callback, options) {
     var editFieldClass = 'editing-field';
 
     if (options && options.editFieldClass)
@@ -72,13 +67,12 @@ var Utils = {
 
     $el.addClass('editable');
 
-    $el.bind('click keydown', {callback: callback}, function(e) {
-      if (e.type === 'keydown' && e.keyCode != 13)
-      return true;
+    $el.bind('click keydown', { callback: callback }, function (e) {
+      if (e.type === 'keydown' && e.keyCode != 13) return true;
 
       Utils.editElement($el, options);
 
-      var onClose = function(e) {
+      var onClose = function (e) {
         if (e.type === 'keydown' && e.keyCode != 13 && e.keyCode != 27)
           return true;
 
@@ -91,7 +85,7 @@ var Utils = {
 
         $(document).unbind('mousedown', onClose);
         $(document).unbind('keydown', onClose);
-      }
+      };
 
       $(document).bind('keydown mousedown', { callback: callback }, onClose);
     });
@@ -99,25 +93,22 @@ var Utils = {
     return true;
   },
 
-  editElement: function($el, someOptions) {
+  editElement: function ($el, someOptions) {
     // default options
     var options = {
       editFieldClass: 'editing-field',
       selectText: true,
-      fixedWidth: false
+      fixedWidth: false,
     };
 
     if (someOptions) {
-      for (var option in someOptions)
-        options[option] = someOptions[option];
+      for (var option in someOptions) options[option] = someOptions[option];
     }
 
     $el.hide();
     var elWidth;
-    if (options && options.fixedWidth)
-      elWidth = options.fixedWidth;
-    else
-      elWidth = $el.width();
+    if (options && options.fixedWidth) elWidth = options.fixedWidth;
+    else elWidth = $el.width();
 
     var fontSize = $el.css('font-size');
     var fontFamily = $el.css('font-family');
@@ -128,20 +119,20 @@ var Utils = {
       top: parseInt($el.css('padding-top').replace('px', '')),
       right: parseInt($el.css('padding-right').replace('px', '')),
       bottom: parseInt($el.css('padding-bottom').replace('px', '')),
-      left: parseInt($el.css('padding-left').replace('px', ''))
+      left: parseInt($el.css('padding-left').replace('px', '')),
     };
 
     var value = $el.text();
 
     // get the required height of textarea by creating a temporary div
     var tempDiv = $('<div>', {
-      html: value
+      html: value,
     })
-    .css({
-      'line-height' : lineHeight,
-      'word-wrap' : 'break-word'
-    })
-    .width(elWidth);
+      .css({
+        'line-height': lineHeight,
+        'word-wrap': 'break-word',
+      })
+      .width(elWidth);
 
     $el.before(tempDiv);
 
@@ -151,21 +142,21 @@ var Utils = {
 
     var textarea = $('<textarea>', {
       value: value,
-      class: options.editFieldClass
+      class: options.editFieldClass,
     })
-    .width(elWidth)
-    .height(height)
-    .css({
-      'font-family' : fontFamily,
-      'font-size' : fontSize,
-      'font-weight' : fontWeight,
-      'line-height' : lineHeight,
-      'overflow-y' : 'hidden',
-      'resize' : 'none'
-    });
+      .width(elWidth)
+      .height(height)
+      .css({
+        'font-family': fontFamily,
+        'font-size': fontSize,
+        'font-weight': fontWeight,
+        'line-height': lineHeight,
+        'overflow-y': 'hidden',
+        resize: 'none',
+      });
 
     if (options.selectText) {
-      textarea.bind('click keyup', function(e) {
+      textarea.bind('click keyup', function (e) {
         if (e.type === 'keyup' && e.keyCode != 9) return true;
         e.preventDefault();
         e.target.focus();
@@ -180,25 +171,22 @@ var Utils = {
     // else set cursor to the end of field
     var len = value.length;
 
-    if (value[len - 1] === '\n')
-    len = len - 1;
+    if (value[len - 1] === '\n') len = len - 1;
 
     if (options && options.selectText)
-    textarea.get(0).setSelectionRange(0, len);
+      textarea.get(0).setSelectionRange(0, len);
 
     $el.data('value', value);
   },
 
-  endEditing: function($el) {
-    if ($el === undefined)
-      return;
+  endEditing: function ($el) {
+    if ($el === undefined) return;
 
     var value = $.trim($el.prev('textarea').attr('value'));
 
     $el.prev('textarea').remove();
 
-    if (value === '')
-      value = $el.data('value');
+    if (value === '') value = $el.data('value');
 
     $el.data('value', null);
 
@@ -207,59 +195,57 @@ var Utils = {
     $el.focus();
   },
 
-  selectText: function(el, start, end) {
-    if (!el || !el.value || el.value === '')
-      return false;
+  selectText: function (el, start, end) {
+    if (!el || !el.value || el.value === '') return false;
     var len = el.value.length;
     if (end > len) end = len;
-      el.setSelectionRange(start, end);
+    el.setSelectionRange(start, end);
     return true;
   },
 
-  selectAllText: function(el) {
-    if (!el || !el.value || el.value === '')
-      return false;
+  selectAllText: function (el) {
+    if (!el || !el.value || el.value === '') return false;
     var len = el.value.length;
     el.setSelectionRange(0, len);
     return true;
   },
 
-  moveCursorToEnd: function(el) {
-    if (!el || !el.value || el.value === '')
-      return false;
+  moveCursorToEnd: function (el) {
+    if (!el || !el.value || el.value === '') return false;
     var len = el.value.length;
     el.setSelectionRange(len, len);
-    if (el.localName == 'textarea')
-      el.scrollTop = el.scrollHeight;
+    if (el.localName == 'textarea') el.scrollTop = el.scrollHeight;
   },
 
-  HTMLDecode: function(text) {
+  HTMLDecode: function (text) {
     // replace &lt; with < and &gt; with >
-    if (text && typeof(text) != 'undefined')
+    if (text && typeof text != 'undefined')
       return text.replace('&lt;', '<').replace('&gt;', '>');
   },
 
   // To copy an object. from: http://my.opera.com/GreyWyvern/blog/show.dml/1725165
-  cloneObject: function(obj) {
-    var newObj = (obj instanceof Array) ? [] : {};
+  cloneObject: function (obj) {
+    var newObj = obj instanceof Array ? [] : {};
 
     for (i in obj) {
       if (obj[i] && typeof obj[i] == 'object')
         newObj[i] = this.cloneObject(obj[i]);
-      else
-        newObj[i] = obj[i];
+      else newObj[i] = obj[i];
     }
 
     return newObj;
   },
 
-  removeFromArray: function(arr) {
-    var what, a = arguments, L = a.length, ax;
+  removeFromArray: function (arr) {
+    var what,
+      a = arguments,
+      L = a.length,
+      ax;
     while (L > 1 && arr.length) {
-        what = a[--L];
-        while ((ax= arr.indexOf(what)) !== -1) {
-            arr.splice(ax, 1);
-        }
+      what = a[--L];
+      while ((ax = arr.indexOf(what)) !== -1) {
+        arr.splice(ax, 1);
+      }
     }
 
     return arr;
@@ -267,42 +253,53 @@ var Utils = {
 
   // functions for ace
   ace: {
-    monkeyPatch: function(editor) {
+    monkeyPatch: function (editor) {
       // monkey-patch the editor to add the disable function,
       // sets it to readOnly, hides the cursor and line marker
       editor.disabledProp = false;
-      editor.setDisabled = function(readOnly) {
-        this.renderer.$cursorLayer.element.style.display = readOnly ? 'none' : '';
-        this.renderer.$markerBack.element.style.display = readOnly ? 'none' : '';
-        this.renderer.$markerFront.element.style.display = readOnly ? 'none' : '';
+      editor.setDisabled = function (readOnly) {
+        this.renderer.$cursorLayer.element.style.display = readOnly
+          ? 'none'
+          : '';
+        this.renderer.$markerBack.element.style.display = readOnly
+          ? 'none'
+          : '';
+        this.renderer.$markerFront.element.style.display = readOnly
+          ? 'none'
+          : '';
         this.setReadOnly(readOnly);
         this.disabledProp = readOnly;
-      }
+      };
 
-      editor.getDisabled = function() {
+      editor.getDisabled = function () {
         return this.disabledProp;
-      }
+      };
 
       // monkey-patch the editor the correctly display the vertical scrollbar
       var scrollbarWidth = editor.renderer.scrollBar.getWidth();
       editor.previousScrollbarWidth = scrollbarWidth;
-      editor.renderer.scrollBar.getWidth = function() {
+      editor.renderer.scrollBar.getWidth = function () {
         // ideally, we should figure out a way to detect the "-3",
         // I think it's related to the editor's border width
         // or may be to its padding, but I'm not really sure.
-        return this.width > this.element.clientWidth ? scrollbarWidth + editor.renderer.$padding - 3 : 0;
+        return this.width > this.element.clientWidth
+          ? scrollbarWidth + editor.renderer.$padding - 3
+          : 0;
       };
 
       // due to ace's limitations this is the only safe way to update the markers and the wrap limit.
-      editor.getSession().on('change', function() {
-        setTimeout(function() {
-          if (editor.renderer.scrollBar.getWidth() != editor.previousScrollbarWidth) {
+      editor.getSession().on('change', function () {
+        setTimeout(function () {
+          if (
+            editor.renderer.scrollBar.getWidth() !=
+            editor.previousScrollbarWidth
+          ) {
             editor.renderer.onResize(true);
           }
         }, 100);
       });
 
       return editor;
-    }
-  }
+    },
+  },
 };

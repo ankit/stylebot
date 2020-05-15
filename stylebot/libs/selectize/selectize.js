@@ -8,24 +8,25 @@
   } else {
     factory(jQuery);
   }
-}(function ($) {
-  "use strict";
+})(function ($) {
+  'use strict';
 
   // --- src/contrib/highlight.js ---
 
   /**
-  * highlight v3 | MIT license | Johann Burkard <jb@eaio.com>
-  * Highlights arbitrary terms in a node.
-  *
-  * - Modified by Marshal <beatgates@gmail.com> 2011-6-24 (added regex)
-  * - Modified by Brian Reavis <brian@thirdroute.com> 2012-8-27 (cleanup)
-  */
+   * highlight v3 | MIT license | Johann Burkard <jb@eaio.com>
+   * Highlights arbitrary terms in a node.
+   *
+   * - Modified by Marshal <beatgates@gmail.com> 2011-6-24 (added regex)
+   * - Modified by Brian Reavis <brian@thirdroute.com> 2012-8-27 (cleanup)
+   */
 
-  var highlight = function($element, pattern) {
+  var highlight = function ($element, pattern) {
     if (typeof pattern === 'string' && !pattern.length) return;
-    var regex = (typeof pattern === 'string') ? new RegExp(pattern, 'i') : pattern;
+    var regex =
+      typeof pattern === 'string' ? new RegExp(pattern, 'i') : pattern;
 
-    var highlight = function(node) {
+    var highlight = function (node) {
       var skip = 0;
       if (node.nodeType === 3) {
         var pos = node.data.search(regex);
@@ -40,7 +41,11 @@
           middlebit.parentNode.replaceChild(spannode, middlebit);
           skip = 1;
         }
-      } else if (node.nodeType === 1 && node.childNodes && !/(script|style)/i.test(node.tagName)) {
+      } else if (
+        node.nodeType === 1 &&
+        node.childNodes &&
+        !/(script|style)/i.test(node.tagName)
+      ) {
         for (var i = 0; i < node.childNodes.length; ++i) {
           i += highlight(node.childNodes[i]);
         }
@@ -48,66 +53,69 @@
       return skip;
     };
 
-    return $element.each(function() {
+    return $element.each(function () {
       highlight(this);
     });
   };
 
-  var unhighlight = function($element) {
-    return $element.find('span.highlight').each(function() {
-      var parent = this.parentNode;
-      parent.replaceChild(parent.firstChild, parent);
-      parent.normalize();
-    }).end();
+  var unhighlight = function ($element) {
+    return $element
+      .find('span.highlight')
+      .each(function () {
+        var parent = this.parentNode;
+        parent.replaceChild(parent.firstChild, parent);
+        parent.normalize();
+      })
+      .end();
   };
 
   // --- src/constants.js ---
 
   /**
-  * selectize - A highly customizable select control with autocomplete.
-  * Copyright (c) 2013 Brian Reavis & contributors
-  *
-  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this
-  * file except in compliance with the License. You may obtain a copy of the License at:
-  * http://www.apache.org/licenses/LICENSE-2.0
-  *
-  * Unless required by applicable law or agreed to in writing, software distributed under
-  * the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
-  * ANY KIND, either express or implied. See the License for the specific language
-  * governing permissions and limitations under the License.
-  *
-  * @author Brian Reavis <brian@thirdroute.com>
-  */
+   * selectize - A highly customizable select control with autocomplete.
+   * Copyright (c) 2013 Brian Reavis & contributors
+   *
+   * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this
+   * file except in compliance with the License. You may obtain a copy of the License at:
+   * http://www.apache.org/licenses/LICENSE-2.0
+   *
+   * Unless required by applicable law or agreed to in writing, software distributed under
+   * the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
+   * ANY KIND, either express or implied. See the License for the specific language
+   * governing permissions and limitations under the License.
+   *
+   * @author Brian Reavis <brian@thirdroute.com>
+   */
 
-  var IS_MAC        = /Mac/.test(navigator.userAgent);
+  var IS_MAC = /Mac/.test(navigator.userAgent);
 
-  var KEY_COMMA     = 188;
-  var KEY_RETURN    = 13;
-  var KEY_ESC       = 27;
-  var KEY_LEFT      = 37;
-  var KEY_UP        = 38;
-  var KEY_RIGHT     = 39;
-  var KEY_DOWN      = 40;
+  var KEY_COMMA = 188;
+  var KEY_RETURN = 13;
+  var KEY_ESC = 27;
+  var KEY_LEFT = 37;
+  var KEY_UP = 38;
+  var KEY_RIGHT = 39;
+  var KEY_DOWN = 40;
   var KEY_BACKSPACE = 8;
-  var KEY_DELETE    = 46;
-  var KEY_SHIFT     = 16;
-  var KEY_CTRL      = IS_MAC ? 18 : 17;
-  var KEY_TAB       = 9;
+  var KEY_DELETE = 46;
+  var KEY_SHIFT = 16;
+  var KEY_CTRL = IS_MAC ? 18 : 17;
+  var KEY_TAB = 9;
 
-  var TAG_SELECT    = 1;
-  var TAG_INPUT     = 2;
+  var TAG_SELECT = 1;
+  var TAG_INPUT = 2;
 
   var DIACRITICS = {
-    'a': '[aÀÁÂÃÄÅàáâãäå]',
-    'c': '[cÇç]',
-    'e': '[eÈÉÊËèéêë]',
-    'i': '[iÌÍÎÏìíîï]',
-    'n': '[nÑñ]',
-    'o': '[oÒÓÔÕÕÖØòóôõöø]',
-    's': '[sŠš]',
-    'u': '[uÙÚÛÜùúûü]',
-    'y': '[yŸÿý]',
-    'z': '[zŽž]'
+    a: '[aÀÁÂÃÄÅàáâãäå]',
+    c: '[cÇç]',
+    e: '[eÈÉÊËèéêë]',
+    i: '[iÌÍÎÏìíîï]',
+    n: '[nÑñ]',
+    o: '[oÒÓÔÕÕÖØòóôõöø]',
+    s: '[sŠš]',
+    u: '[uÙÚÛÜùúûü]',
+    y: '[yŸÿý]',
+    z: '[zŽž]',
   };
 
   // --- src/selectize.jquery.js ---
@@ -139,39 +147,52 @@
     inputClass: 'stylebot-selectize-input',
     dropdownClass: 'stylebot-selectize-dropdown',
 
-    load            : null, // function(query, callback)
-    score           : null, // function(search)
-    onChange        : null, // function(value)
-    onItemAdd       : null, // function(value, $item) { ... }
-    onItemRemove    : null, // function(value) { ... }
-    onItemCreate    : null, // function(value) { ... }
-    onClear         : null, // function() { ... }
-    onOptionAdd     : null, // function(value, data) { ... }
-    onOptionRemove  : null, // function(value) { ... }
-    onDropdownOpen  : null, // function($dropdown) { ... }
-    onDropdownClose : null, // function($dropdown) { ... }
-    onType          : null, // function(str) { ... }
+    load: null, // function(query, callback)
+    score: null, // function(search)
+    onChange: null, // function(value)
+    onItemAdd: null, // function(value, $item) { ... }
+    onItemRemove: null, // function(value) { ... }
+    onItemCreate: null, // function(value) { ... }
+    onClear: null, // function() { ... }
+    onOptionAdd: null, // function(value, data) { ... }
+    onOptionRemove: null, // function(value) { ... }
+    onDropdownOpen: null, // function($dropdown) { ... }
+    onDropdownClose: null, // function($dropdown) { ... }
+    onType: null, // function(str) { ... }
 
     render: {
       item: null,
       option: null,
-      option_create: null
-    }
+      option_create: null,
+    },
   };
 
   $.fn.selectize = function (settings) {
     var defaults = $.fn.selectize.defaults;
     settings = settings || {};
 
-    return this.each(function() {
-      var instance, value, values, i, n, data, dataAttr, settings_element, tagName;
-      var $options, $option, $input = $(this);
+    return this.each(function () {
+      var instance,
+        value,
+        values,
+        i,
+        n,
+        data,
+        dataAttr,
+        settings_element,
+        tagName;
+      var $options,
+        $option,
+        $input = $(this);
 
       tagName = $input[0].tagName.toLowerCase();
 
       if (typeof settings === 'string') {
         instance = $input.data('selectize');
-        instance[settings].apply(instance, Array.prototype.splice.apply(arguments, 1));
+        instance[settings].apply(
+          instance,
+          Array.prototype.splice.apply(arguments, 1)
+        );
       } else {
         dataAttr = settings.dataAttr || defaults.dataAttr;
         settings_element = {};
@@ -187,8 +208,8 @@
             value = $option.attr('value') || '';
             if (!value.length) continue;
             data = (dataAttr && $option.attr(dataAttr)) || {
-              'text'  : $option.html(),
-              'value' : value
+              text: $option.html(),
+              value: value,
             };
 
             if (typeof data === 'string') data = JSON.parse(data);
@@ -203,15 +224,18 @@
             values = value.split(settings.delimiter || defaults.delimiter);
             for (i = 0, n = values.length; i < n; i++) {
               settings_element.options[values[i]] = {
-                'text'  : values[i],
-                'value' : values[i]
+                text: values[i],
+                value: values[i],
               };
             }
             settings_element.items = values;
           }
         }
 
-        instance = new Selectize($input, $.extend(true, {}, defaults, settings_element, settings));
+        instance = new Selectize(
+          $input,
+          $.extend(true, {}, defaults, settings_element, settings)
+        );
         $input.data('selectize', instance);
         $input.addClass('selectized');
       }
@@ -222,49 +246,53 @@
 
   // --- src/utils.js ---
 
-  var isset = function(object) {
+  var isset = function (object) {
     return typeof object !== 'undefined';
   };
 
-  var htmlEntities = function(str) {
-    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  var htmlEntities = function (str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
   };
 
-  var quoteRegExp = function(str) {
+  var quoteRegExp = function (str) {
     return (str + '').replace(/([.?*+^$[\]\\(){}|-])/g, '\\$1');
   };
 
-  var once = function(fn) {
+  var once = function (fn) {
     var called = false;
-    return function() {
+    return function () {
       if (called) return;
       called = true;
       fn.apply(this, arguments);
     };
   };
 
-  var debounce = function(fn, delay) {
+  var debounce = function (fn, delay) {
     var timeout;
-    return function() {
+    return function () {
       var self = this;
       var args = arguments;
       window.clearTimeout(timeout);
-      timeout = window.setTimeout(function() {
+      timeout = window.setTimeout(function () {
         fn.apply(self, args);
       }, delay);
     };
   };
 
   /**
-  * A workaround for http://bugs.jquery.com/ticket/6696
-  *
-  * @param {object} $parent - Parent element to listen on.
-  * @param {string} event - Event name.
-  * @param {string} selector - Descendant selector to filter by.
-  * @param {function} fn - Event handler.
-  */
-  var watchChildEvent = function($parent, event, selector, fn) {
-    $parent.on(event, selector, function(e) {
+   * A workaround for http://bugs.jquery.com/ticket/6696
+   *
+   * @param {object} $parent - Parent element to listen on.
+   * @param {string} event - Event name.
+   * @param {string} selector - Descendant selector to filter by.
+   * @param {function} fn - Event handler.
+   */
+  var watchChildEvent = function ($parent, event, selector, fn) {
+    $parent.on(event, selector, function (e) {
       var child = e.target;
       while (child && child.parentNode !== $parent[0]) {
         child = child.parentNode;
@@ -274,7 +302,7 @@
     });
   };
 
-  var getSelection = function(input) {
+  var getSelection = function (input) {
     var result = {};
     if ('selectionStart' in input) {
       result.start = input.selectionStart;
@@ -290,7 +318,7 @@
     return result;
   };
 
-  var transferStyles = function($from, $to, properties) {
+  var transferStyles = function ($from, $to, properties) {
     var styles = {};
     if (properties) {
       for (var i = 0; i < properties.length; i++) {
@@ -303,22 +331,25 @@
     return $to;
   };
 
-  var measureString = function(str, $parent) {
-    var $test = $('<test>').css({
-      position: 'absolute',
-      top: -99999,
-      left: -99999,
-      width: 'auto',
-      padding: 0,
-      whiteSpace: 'nowrap'
-    }).text(str).appendTo('body');
+  var measureString = function (str, $parent) {
+    var $test = $('<test>')
+      .css({
+        position: 'absolute',
+        top: -99999,
+        left: -99999,
+        width: 'auto',
+        padding: 0,
+        whiteSpace: 'nowrap',
+      })
+      .text(str)
+      .appendTo('body');
 
     transferStyles($parent, $test, [
       'letterSpacing',
       'fontSize',
       'fontFamily',
       'fontWeight',
-      'textTransform'
+      'textTransform',
     ]);
 
     var width = $test.width();
@@ -327,8 +358,8 @@
     return width;
   };
 
-  var autoGrow = function($input) {
-    var update = function(e) {
+  var autoGrow = function ($input) {
+    var update = function (e) {
       var value, keyCode, printable, placeholder, width;
       var shift, character;
 
@@ -336,12 +367,11 @@
       value = $input.val();
       if (e.type && e.type.toLowerCase() === 'keydown') {
         keyCode = e.keyCode;
-        printable = (
+        printable =
           (keyCode >= 97 && keyCode <= 122) || // a-z
-          (keyCode >= 65 && keyCode <= 90)  || // A-Z
-          (keyCode >= 48 && keyCode <= 57)  || // 0-9
-          keyCode == 32 // space
-        );
+          (keyCode >= 65 && keyCode <= 90) || // A-Z
+          (keyCode >= 48 && keyCode <= 57) || // 0-9
+          keyCode == 32; // space
 
         if (printable) {
           shift = e.shiftKey;
@@ -370,52 +400,56 @@
   // --- src/selectize.js ---
 
   /**
-  * selectize.js
-  * Copyright (c) 2013 Brian Reavis & contributors
-  *
-  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this
-  * file except in compliance with the License. You may obtain a copy of the License at:
-  * http://www.apache.org/licenses/LICENSE-2.0
-  *
-  * Unless required by applicable law or agreed to in writing, software distributed under
-  * the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
-  * ANY KIND, either express or implied. See the License for the specific language
-  * governing permissions and limitations under the License.
-  *
-  * @author Brian Reavis <brian@thirdroute.com>
-  */
+   * selectize.js
+   * Copyright (c) 2013 Brian Reavis & contributors
+   *
+   * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this
+   * file except in compliance with the License. You may obtain a copy of the License at:
+   * http://www.apache.org/licenses/LICENSE-2.0
+   *
+   * Unless required by applicable law or agreed to in writing, software distributed under
+   * the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
+   * ANY KIND, either express or implied. See the License for the specific language
+   * governing permissions and limitations under the License.
+   *
+   * @author Brian Reavis <brian@thirdroute.com>
+   */
 
-  var Selectize = function($input, settings) {
-    $input[0].selectize   = this;
+  var Selectize = function ($input, settings) {
+    $input[0].selectize = this;
 
-    this.$input           = $input;
-    this.tagType          = $input[0].tagName.toLowerCase() === 'select' ? TAG_SELECT : TAG_INPUT;
-    this.settings         = settings;
+    this.$input = $input;
+    this.tagType =
+      $input[0].tagName.toLowerCase() === 'select' ? TAG_SELECT : TAG_INPUT;
+    this.settings = settings;
 
     this.highlightedValue = null;
-    this.isOpen           = false;
-    this.isLocked         = false;
-    this.isFocused        = false;
-    this.isInputFocused   = false;
-    this.isSetup          = false;
-    this.isShiftDown      = false;
-    this.isCtrlDown       = false;
-    this.ignoreFocus      = false;
-    this.hasOptions       = false;
-    this.currentResults   = null;
-    this.lastValue        = '';
-    this.caretPos         = 0;
-    this.loading          = 0;
-    this.loadedSearches   = {};
+    this.isOpen = false;
+    this.isLocked = false;
+    this.isFocused = false;
+    this.isInputFocused = false;
+    this.isSetup = false;
+    this.isShiftDown = false;
+    this.isCtrlDown = false;
+    this.ignoreFocus = false;
+    this.hasOptions = false;
+    this.currentResults = null;
+    this.lastValue = '';
+    this.caretPos = 0;
+    this.loading = 0;
+    this.loadedSearches = {};
 
-    this.$activeOption    = null;
-    this.$activeItems     = [];
+    this.$activeOption = null;
+    this.$activeItems = [];
 
-    this.options          = {};
-    this.userOptions      = {};
-    this.items            = [];
-    this.renderCache      = {};
-    this.onSearchChange   = debounce(this.onSearchChange, this.settings.loadThrottle);
+    this.options = {};
+    this.userOptions = {};
+    this.items = [];
+    this.renderCache = {};
+    this.onSearchChange = debounce(
+      this.onSearchChange,
+      this.settings.loadThrottle
+    );
 
     if ($.isArray(settings.options)) {
       var key = settings.valueField;
@@ -430,7 +464,8 @@
     }
 
     // option-dependent defaults
-    this.settings.mode = this.settings.mode || (this.settings.maxItems === 1 ? 'single' : 'multi');
+    this.settings.mode =
+      this.settings.mode || (this.settings.maxItems === 1 ? 'single' : 'multi');
     if (typeof this.settings.hideSelected !== 'boolean') {
       this.settings.hideSelected = this.settings.mode === 'multi';
     }
@@ -439,9 +474,9 @@
   };
 
   /**
-  * Creates all elements and sets up event bindings.
-  */
-  Selectize.prototype.setup = function() {
+   * Creates all elements and sets up event bindings.
+   */
+  Selectize.prototype.setup = function () {
     var self = this;
     var $wrapper;
     var $control;
@@ -452,22 +487,34 @@
     var timeout_blur;
     var timeout_focus;
 
-    $wrapper       = $('<div>').addClass(this.settings.theme).addClass(this.settings.wrapperClass);
-    $control       = $('<div>').addClass(this.settings.inputClass).addClass('items').toggleClass('has-options', !$.isEmptyObject(this.options)).appendTo($wrapper);
+    $wrapper = $('<div>')
+      .addClass(this.settings.theme)
+      .addClass(this.settings.wrapperClass);
+    $control = $('<div>')
+      .addClass(this.settings.inputClass)
+      .addClass('items')
+      .toggleClass('has-options', !$.isEmptyObject(this.options))
+      .appendTo($wrapper);
     $control_input = $('<input type="text" />').appendTo($control);
-    $dropdown      = $('<div>').addClass(this.settings.dropdownClass).hide().appendTo($wrapper);
+    $dropdown = $('<div>')
+      .addClass(this.settings.dropdownClass)
+      .hide()
+      .appendTo($wrapper);
 
     displayMode = this.$input.css('display');
     $wrapper.css({
       width: this.$input[0].style.width,
-      display: displayMode
+      display: displayMode,
     });
 
     inputMode = this.settings.mode;
     $wrapper.toggleClass('single', inputMode === 'single');
     $wrapper.toggleClass('multi', inputMode === 'multi');
 
-    if ((this.settings.maxItems === null || this.settings.maxItems > 1) && this.tagType === TAG_SELECT) {
+    if (
+      (this.settings.maxItems === null || this.settings.maxItems > 1) &&
+      this.tagType === TAG_SELECT
+    ) {
       this.$input.attr('multiple', 'multiple');
     }
 
@@ -475,13 +522,15 @@
       $control_input.attr('placeholder', this.settings.placeholder);
     }
 
-    this.$wrapper       = $wrapper;
-    this.$control       = $control;
+    this.$wrapper = $wrapper;
+    this.$control = $control;
     this.$control_input = $control_input;
-    this.$dropdown      = $dropdown;
+    this.$dropdown = $dropdown;
 
-    $control.on('mousedown', function(e) {
-      if (self.isLocked) { return; }
+    $control.on('mousedown', function (e) {
+      if (self.isLocked) {
+        return;
+      }
       if (e.currentTarget === self.$control[0]) {
         $control_input.trigger('focus');
       } else {
@@ -490,64 +539,97 @@
       e.preventDefault();
     });
 
-    watchChildEvent($dropdown, 'mouseenter', '*', function() { return self.onOptionHover.apply(self, arguments); });
-    watchChildEvent($dropdown, 'mousedown', '*', function() { return self.onOptionSelect.apply(self, arguments); });
-    watchChildEvent($control, 'mousedown', '*:not(input)', function() { return self.onItemSelect.apply(self, arguments); });
+    watchChildEvent($dropdown, 'mouseenter', '*', function () {
+      return self.onOptionHover.apply(self, arguments);
+    });
+    watchChildEvent($dropdown, 'mousedown', '*', function () {
+      return self.onOptionSelect.apply(self, arguments);
+    });
+    watchChildEvent($control, 'mousedown', '*:not(input)', function () {
+      return self.onItemSelect.apply(self, arguments);
+    });
 
     autoGrow($control_input);
 
     $control_input.on({
-      mousedown : function(e) { e.stopPropagation(); },
-      keydown   : function() { return self.onKeyDown.apply(self, arguments); },
-      keyup     : function() { return self.onKeyUp.apply(self, arguments); },
-      keypress  : function() { return self.onKeyPress.apply(self, arguments); },
-      resize    : function() { self.positionDropdown.apply(self, []); },
-      blur      : function() { return self.onBlur.apply(self, arguments); },
-      focus     : function() { return self.onFocus.apply(self, arguments); }
+      mousedown: function (e) {
+        e.stopPropagation();
+      },
+      keydown: function () {
+        return self.onKeyDown.apply(self, arguments);
+      },
+      keyup: function () {
+        return self.onKeyUp.apply(self, arguments);
+      },
+      keypress: function () {
+        return self.onKeyPress.apply(self, arguments);
+      },
+      resize: function () {
+        self.positionDropdown.apply(self, []);
+      },
+      blur: function () {
+        return self.onBlur.apply(self, arguments);
+      },
+      focus: function () {
+        return self.onFocus.apply(self, arguments);
+      },
     });
 
     $(document).on({
-      keydown: function(e) {
+      keydown: function (e) {
         self.isCtrlDown = e[IS_MAC ? 'altKey' : 'ctrlKey'];
         self.isShiftDown = e.shiftKey;
         if (self.isFocused && !self.isLocked) {
           var tagName = (e.target.tagName || '').toLowerCase();
           if (tagName === 'input' || tagName === 'textarea') return;
-          if ([KEY_SHIFT, KEY_BACKSPACE, KEY_DELETE, KEY_ESC, KEY_LEFT, KEY_RIGHT, KEY_TAB].indexOf(e.keyCode) !== -1) {
+          if (
+            [
+              KEY_SHIFT,
+              KEY_BACKSPACE,
+              KEY_DELETE,
+              KEY_ESC,
+              KEY_LEFT,
+              KEY_RIGHT,
+              KEY_TAB,
+            ].indexOf(e.keyCode) !== -1
+          ) {
             return self.onKeyDown.apply(self, arguments);
           }
         }
       },
-      keyup: function(e) {
+      keyup: function (e) {
         if (e.keyCode === KEY_CTRL) self.isCtrlDown = false;
         else if (e.keyCode === KEY_SHIFT) self.isShiftDown = false;
       },
-      mousedown: function(e) {
+      mousedown: function (e) {
         if (self.isFocused && !self.isLocked) {
           // prevent events on the dropdown scrollbar from causing the control to blur
           if (e.target === self.$dropdown[0]) {
             var ignoreFocus = self.ignoreFocus;
             self.ignoreFocus = true;
-            window.setTimeout(function() {
+            window.setTimeout(function () {
               self.ignoreFocus = ignoreFocus;
               self.focus(false);
             }, 0);
             return;
           }
           // blur on click outside
-          if (!self.$control.has(e.target).length && e.target !== self.$control[0]) {
+          if (
+            !self.$control.has(e.target).length &&
+            e.target !== self.$control[0]
+          ) {
             self.blur();
           }
         }
-      }
+      },
     });
 
     $(window).on({
-      resize: function() {
+      resize: function () {
         if (self.isOpen) {
           self.positionDropdown.apply(self, arguments);
         }
-      }
+      },
     });
 
     this.$input.hide().after(this.$wrapper);
@@ -564,12 +646,12 @@
   };
 
   /**
-  * Triggers a callback defined in the user-provided settings.
-  * Events: onItemAdd, onOptionAdd, etc
-  *
-  * @param {string} event
-  */
-  Selectize.prototype.trigger = function(event) {
+   * Triggers a callback defined in the user-provided settings.
+   * Events: onItemAdd, onOptionAdd, etc
+   *
+   * @param {string} event
+   */
+  Selectize.prototype.trigger = function (event) {
     var args;
     if (typeof this.settings[event] === 'function') {
       args = Array.prototype.slice.apply(arguments, [1]);
@@ -578,12 +660,12 @@
   };
 
   /**
-  * Triggered on <input> keypress.
-  *
-  * @param {object} e
-  * @returns {boolean}
-  */
-  Selectize.prototype.onKeyPress = function(e) {
+   * Triggered on <input> keypress.
+   *
+   * @param {object} e
+   * @returns {boolean}
+   */
+  Selectize.prototype.onKeyPress = function (e) {
     if (this.isLocked) return;
     var character = String.fromCharCode(e.keyCode || e.which);
     if (this.settings.create && character === this.settings.delimiter) {
@@ -594,12 +676,12 @@
   };
 
   /**
-  * Triggered on <input> keydown.
-  *
-  * @param {object} e
-  * @returns {boolean}
-  */
-  Selectize.prototype.onKeyDown = function(e) {
+   * Triggered on <input> keydown.
+   *
+   * @param {object} e
+   * @returns {boolean}
+   */
+  Selectize.prototype.onKeyDown = function (e) {
     if (this.isLocked) return;
     var isInput = e.target === this.$control_input[0];
 
@@ -625,7 +707,7 @@
         break;
       case KEY_RETURN:
         if (this.$activeOption) {
-          this.onOptionSelect({currentTarget: this.$activeOption});
+          this.onOptionSelect({ currentTarget: this.$activeOption });
         }
         e.preventDefault();
         break;
@@ -657,12 +739,12 @@
   };
 
   /**
-  * Triggered on <input> keyup.
-  *
-  * @param {object} e
-  * @returns {boolean}
-  */
-  Selectize.prototype.onKeyUp = function(e) {
+   * Triggered on <input> keyup.
+   *
+   * @param {object} e
+   * @returns {boolean}
+   */
+  Selectize.prototype.onKeyUp = function (e) {
     if (this.isLocked) return;
     var value = this.$control_input.val() || '';
     if (this.lastValue !== value) {
@@ -674,14 +756,14 @@
   };
 
   /**
-  * Invokes the user-provide option provider / loader.
-  *
-  * Note: this function is debounced in the Selectize
-  * constructor (by `settings.loadDelay` milliseconds)
-  *
-  * @param {string} value
-  */
-  Selectize.prototype.onSearchChange = function(value) {
+   * Invokes the user-provide option provider / loader.
+   *
+   * Note: this function is debounced in the Selectize
+   * constructor (by `settings.loadDelay` milliseconds)
+   *
+   * @param {string} value
+   */
+  Selectize.prototype.onSearchChange = function (value) {
     if (!this.settings.load) return;
     if (this.loadedSearches.hasOwnProperty(value)) return;
     var self = this;
@@ -689,26 +771,29 @@
 
     this.loading++;
     this.loadedSearches[value] = true;
-    this.settings.load.apply(this, [value, function(results) {
-      self.loading = Math.max(self.loading - 1, 0);
-      if (results && results.length) {
-        self.addOption(results);
-        self.refreshOptions(false);
-        if (self.isInputFocused) self.open();
-      }
-      if (!self.loading) {
-        $wrapper.removeClass('loading');
-      }
-    }]);
+    this.settings.load.apply(this, [
+      value,
+      function (results) {
+        self.loading = Math.max(self.loading - 1, 0);
+        if (results && results.length) {
+          self.addOption(results);
+          self.refreshOptions(false);
+          if (self.isInputFocused) self.open();
+        }
+        if (!self.loading) {
+          $wrapper.removeClass('loading');
+        }
+      },
+    ]);
   };
 
   /**
-  * Triggered on <input> focus.
-  *
-  * @param {object} e
-  * @returns {boolean}
-  */
-  Selectize.prototype.onFocus = function(e) {
+   * Triggered on <input> focus.
+   *
+   * @param {object} e
+   * @returns {boolean}
+   */
+  Selectize.prototype.onFocus = function (e) {
     this.showInput();
     this.isInputFocused = true;
     this.isFocused = true;
@@ -720,12 +805,12 @@
   };
 
   /**
-  * Triggered on <input> blur.
-  *
-  * @param {object} e
-  * @returns {boolean}
-  */
-  Selectize.prototype.onBlur = function(e) {
+   * Triggered on <input> blur.
+   *
+   * @param {object} e
+   * @returns {boolean}
+   */
+  Selectize.prototype.onBlur = function (e) {
     this.isInputFocused = false;
     if (this.ignoreFocus) return;
 
@@ -740,24 +825,24 @@
   };
 
   /**
-  * Triggered when the user rolls over
-  * an option in the autocomplete dropdown menu.
-  *
-  * @param {object} e
-  * @returns {boolean}
-  */
-  Selectize.prototype.onOptionHover = function(e) {
+   * Triggered when the user rolls over
+   * an option in the autocomplete dropdown menu.
+   *
+   * @param {object} e
+   * @returns {boolean}
+   */
+  Selectize.prototype.onOptionHover = function (e) {
     this.setActiveOption(e.currentTarget, false);
   };
 
   /**
-  * Triggered when the user clicks on an option
-  * in the autocomplete dropdown menu.
-  *
-  * @param {object} e
-  * @returns {boolean}
-  */
-  Selectize.prototype.onOptionSelect = function(e) {
+   * Triggered when the user clicks on an option
+   * in the autocomplete dropdown menu.
+   *
+   * @param {object} e
+   * @returns {boolean}
+   */
+  Selectize.prototype.onOptionSelect = function (e) {
     var $target = $(e.currentTarget);
     if ($target.hasClass('create')) {
       this.createItem();
@@ -771,13 +856,13 @@
   };
 
   /**
-  * Triggered when the user clicks on an item
-  * that has been selected.
-  *
-  * @param {object} e
-  * @returns {boolean}
-  */
-  Selectize.prototype.onItemSelect = function(e) {
+   * Triggered when the user clicks on an item
+   * that has been selected.
+   *
+   * @param {object} e
+   * @returns {boolean}
+   */
+  Selectize.prototype.onItemSelect = function (e) {
     if (this.settings.mode === 'multi') {
       this.$control_input.trigger('blur');
       this.setActiveItem(e.currentTarget, e);
@@ -786,24 +871,24 @@
   };
 
   /**
-  * Sets the input field of the control to the specified value.
-  *
-  * @param {string} value
-  */
-  Selectize.prototype.setTextboxValue = function(value) {
+   * Sets the input field of the control to the specified value.
+   *
+   * @param {string} value
+   */
+  Selectize.prototype.setTextboxValue = function (value) {
     this.$control_input.val(value);
     this.lastValue = value;
   };
 
   /**
-  * Returns the value of the control. If multiple items
-  * can be selected (e.g. <select multiple>), this returns
-  * an array. If only one item can be selected, this
-  * returns a string.
-  *
-  * @returns {mixed}
-  */
-  Selectize.prototype.getValue = function() {
+   * Returns the value of the control. If multiple items
+   * can be selected (e.g. <select multiple>), this returns
+   * an array. If only one item can be selected, this
+   * returns a string.
+   *
+   * @returns {mixed}
+   */
+  Selectize.prototype.getValue = function () {
     if (this.tagType === TAG_SELECT && this.$input.attr('multiple')) {
       return this.items;
     } else {
@@ -812,11 +897,11 @@
   };
 
   /**
-  * Resets the selected items to the given value.
-  *
-  * @param {mixed} value
-  */
-  Selectize.prototype.setValue = function(value) {
+   * Resets the selected items to the given value.
+   *
+   * @param {mixed} value
+   */
+  Selectize.prototype.setValue = function (value) {
     this.clear();
     var items = $.isArray(value) ? value : [value];
     for (var i = 0, n = items.length; i < n; i++) {
@@ -825,12 +910,12 @@
   };
 
   /**
-  * Sets the selected item.
-  *
-  * @param {object} $item
-  * @param {object} e (optional)
-  */
-  Selectize.prototype.setActiveItem = function($item, e) {
+   * Sets the selected item.
+   *
+   * @param {object} $item
+   * @param {object} e (optional)
+   */
+  Selectize.prototype.setActiveItem = function ($item, e) {
     var eventName;
     var i, idx, begin, end, item, swap;
     var $last;
@@ -848,14 +933,22 @@
     // modify selection
     eventName = e && e.type.toLowerCase();
 
-    if (eventName === 'mousedown' && this.isShiftDown && this.$activeItems.length) {
+    if (
+      eventName === 'mousedown' &&
+      this.isShiftDown &&
+      this.$activeItems.length
+    ) {
       $last = this.$control.children('.active:last');
-      begin = Array.prototype.indexOf.apply(this.$control[0].childNodes, [$last[0]]);
-      end   = Array.prototype.indexOf.apply(this.$control[0].childNodes, [$item[0]]);
+      begin = Array.prototype.indexOf.apply(this.$control[0].childNodes, [
+        $last[0],
+      ]);
+      end = Array.prototype.indexOf.apply(this.$control[0].childNodes, [
+        $item[0],
+      ]);
       if (begin > end) {
-        swap  = begin;
+        swap = begin;
         begin = end;
-        end   = swap;
+        end = swap;
       }
       for (i = begin; i <= end; i++) {
         item = this.$control[0].childNodes[i];
@@ -865,7 +958,10 @@
         }
       }
       e.preventDefault();
-    } else if ((eventName === 'mousedown' && this.isCtrlDown) || (eventName === 'keydown' && this.isShiftDown)) {
+    } else if (
+      (eventName === 'mousedown' && this.isCtrlDown) ||
+      (eventName === 'keydown' && this.isShiftDown)
+    ) {
       if ($item.hasClass('active')) {
         idx = this.$activeItems.indexOf($item[0]);
         this.$activeItems.splice(idx, 1);
@@ -882,14 +978,14 @@
   };
 
   /**
-  * Sets the selected item in the dropdown menu
-  * of available options.
-  *
-  * @param {object} $object
-  * @param {boolean} scroll
-  * @param {boolean} animate
-  */
-  Selectize.prototype.setActiveOption = function($option, scroll, animate) {
+   * Sets the selected item in the dropdown menu
+   * of available options.
+   *
+   * @param {object} $object
+   * @param {boolean} scroll
+   * @param {boolean} animate
+   */
+  Selectize.prototype.setActiveOption = function ($option, scroll, animate) {
     var height_menu, height_item, y;
     var scroll_top, scroll_bottom;
 
@@ -902,47 +998,56 @@
     this.$activeOption = $option.addClass('active');
 
     if (scroll || !isset(scroll)) {
-
-      height_menu   = this.$dropdown.height();
-      height_item   = this.$activeOption.outerHeight(true);
-      scroll        = this.$dropdown.scrollTop() || 0;
-      y             = this.$activeOption.offset().top - this.$dropdown.offset().top + scroll;
-      scroll_top    = y;
+      height_menu = this.$dropdown.height();
+      height_item = this.$activeOption.outerHeight(true);
+      scroll = this.$dropdown.scrollTop() || 0;
+      y =
+        this.$activeOption.offset().top - this.$dropdown.offset().top + scroll;
+      scroll_top = y;
       scroll_bottom = y - height_menu + height_item;
 
       if (y + height_item > height_menu - scroll) {
-        this.$dropdown.stop().animate({scrollTop: scroll_bottom}, animate ? this.settings.scrollDuration : 0);
+        this.$dropdown
+          .stop()
+          .animate(
+            { scrollTop: scroll_bottom },
+            animate ? this.settings.scrollDuration : 0
+          );
       } else if (y < scroll) {
-        this.$dropdown.stop().animate({scrollTop: scroll_top}, animate ? this.settings.scrollDuration : 0);
+        this.$dropdown
+          .stop()
+          .animate(
+            { scrollTop: scroll_top },
+            animate ? this.settings.scrollDuration : 0
+          );
       }
-
     }
   };
 
   /**
-  * Hides the input element out of view, while
-  * retaining its focus.
-  */
-  Selectize.prototype.hideInput = function() {
-    this.$control_input.css({opacity: 0});
+   * Hides the input element out of view, while
+   * retaining its focus.
+   */
+  Selectize.prototype.hideInput = function () {
+    this.$control_input.css({ opacity: 0 });
     this.isInputFocused = false;
   };
 
   /**
-  * Restores input visibility.
-  */
-  Selectize.prototype.showInput = function() {
-    this.$control_input.css({opacity: 1});
+   * Restores input visibility.
+   */
+  Selectize.prototype.showInput = function () {
+    this.$control_input.css({ opacity: 1 });
   };
 
   /**
-  * Gives the control focus. If "trigger" is falsy,
-  * focus handlers won't be fired--causing the focus
-  * to happen silently in the background.
-  *
-  * @param {boolean} trigger
-  */
-  Selectize.prototype.focus = function(trigger) {
+   * Gives the control focus. If "trigger" is falsy,
+   * focus handlers won't be fired--causing the focus
+   * to happen silently in the background.
+   *
+   * @param {boolean} trigger
+   */
+  Selectize.prototype.focus = function (trigger) {
     var ignoreFocus = this.ignoreFocus;
     this.ignoreFocus = !trigger;
     this.$control_input[0].focus();
@@ -950,21 +1055,21 @@
   };
 
   /**
-  * Forces the control out of focus.
-  */
-  Selectize.prototype.blur = function() {
+   * Forces the control out of focus.
+   */
+  Selectize.prototype.blur = function () {
     this.$control_input.trigger('blur');
     this.setActiveItem(null);
   };
 
   /**
-  * Splits a search string into an array of
-  * individual regexps to be used to match results.
-  *
-  * @param {string} query
-  * @returns {array}
-  */
-  Selectize.prototype.parseSearchTokens = function(query) {
+   * Splits a search string into an array of
+   * individual regexps to be used to match results.
+   *
+   * @param {string} query
+   * @returns {array}
+   */
+  Selectize.prototype.parseSearchTokens = function (query) {
     query = $.trim(String(query || '').toLowerCase());
     if (!query || !query.length) return [];
 
@@ -982,8 +1087,8 @@
         }
       }
       tokens.push({
-        string : words[i],
-        regex  : new RegExp(regex, 'i')
+        string: words[i],
+        regex: new RegExp(regex, 'i'),
       });
     }
 
@@ -991,23 +1096,25 @@
   };
 
   /**
-  * Returns a function to be used to score individual results.
-  * Results will be sorted by the score (descending). Scores less
-  * than or equal to zero (no match) will not be included in the results.
-  *
-  * @param {object} data
-  * @param {object} search
-  * @returns {function}
-  */
-  Selectize.prototype.getScoreFunction = function(search) {
+   * Returns a function to be used to score individual results.
+   * Results will be sorted by the score (descending). Scores less
+   * than or equal to zero (no match) will not be included in the results.
+   *
+   * @param {object} data
+   * @param {object} search
+   * @returns {function}
+   */
+  Selectize.prototype.getScoreFunction = function (search) {
     var self = this;
     var tokens = search.tokens;
 
-    var calculateFieldScore = (function() {
+    var calculateFieldScore = (function () {
       if (!tokens.length) {
-        return function() { return 0; };
+        return function () {
+          return 0;
+        };
       } else if (tokens.length === 1) {
-        return function(value) {
+        return function (value) {
           var score, pos;
 
           value = String(value || '').toLowerCase();
@@ -1018,7 +1125,7 @@
           return score;
         };
       } else {
-        return function(value) {
+        return function (value) {
           var score, pos, i, j;
 
           value = String(value || '').toLowerCase();
@@ -1034,21 +1141,23 @@
       }
     })();
 
-    var calculateScore = (function() {
+    var calculateScore = (function () {
       var fields = self.settings.searchField;
       if (typeof fields === 'string') {
         fields = [fields];
       }
       if (!fields || !fields.length) {
-        return function() { return 0; };
+        return function () {
+          return 0;
+        };
       } else if (fields.length === 1) {
         var field = fields[0];
-        return function(data) {
+        return function (data) {
           if (!data.hasOwnProperty(field)) return 0;
           return calculateFieldScore(data[field]);
         };
       } else {
-        return function(data) {
+        return function (data) {
           var n = 0;
           var score = 0;
           for (var i = 0, j = fields.length; i < j; i++) {
@@ -1066,28 +1175,28 @@
   };
 
   /**
-  * Searches through available options and returns
-  * a sorted array of matches. Includes options that
-  * have already been selected.
-  *
-  * The `settings` parameter can contain:
-  *
-  *   - searchField
-  *   - sortField
-  *   - sortDirection
-  *
-  * Returns an object containing:
-  *
-  *   - query {string}
-  *   - tokens {array}
-  *   - total {int}
-  *   - items {array}
-  *
-  * @param {string} query
-  * @param {object} settings
-  * @returns {object}
-  */
-  Selectize.prototype.search = function(query, settings) {
+   * Searches through available options and returns
+   * a sorted array of matches. Includes options that
+   * have already been selected.
+   *
+   * The `settings` parameter can contain:
+   *
+   *   - searchField
+   *   - sortField
+   *   - sortDirection
+   *
+   * Returns an object containing:
+   *
+   *   - query {string}
+   *   - tokens {array}
+   *   - total {int}
+   *   - items {array}
+   *
+   * @param {string} query
+   * @param {object} settings
+   * @returns {object}
+   */
+  Selectize.prototype.search = function (query, settings) {
     var self = this;
     var value, score, search, calculateScore;
 
@@ -1098,17 +1207,19 @@
       this.lastQuery = query;
 
       search = {
-        query  : query,
-        tokens : this.parseSearchTokens(query),
-        total  : 0,
-        items  : []
+        query: query,
+        tokens: this.parseSearchTokens(query),
+        total: 0,
+        items: [],
       };
 
       // generate result scoring function
       if (this.settings.score) {
         calculateScore = this.settings.score.apply(this, [search]);
         if (typeof calculateScore !== 'function') {
-          throw new Error('Selectize "score" setting must be a function that returns a function');
+          throw new Error(
+            'Selectize "score" setting must be a function that returns a function'
+          );
         }
       } else {
         calculateScore = this.getScoreFunction(search);
@@ -1122,12 +1233,12 @@
             if (score > 0) {
               search.items.push({
                 score: score,
-                value: value
+                value: value,
               });
             }
           }
         }
-        search.items.sort(function(a, b) {
+        search.items.sort(function (a, b) {
           return b.score - a.score;
         });
       } else {
@@ -1135,22 +1246,26 @@
           if (this.options.hasOwnProperty(value)) {
             search.items.push({
               score: 1,
-              value: value
+              value: value,
             });
           }
         }
         if (this.settings.sortField) {
-          search.items.sort((function() {
-            var field = self.settings.sortField;
-            var multiplier = self.settings.sortDirection === 'desc' ? -1 : 1;
-            return function(a, b) {
-              a = a && String(self.options[a.value][field] || '').toLowerCase();
-              b = b && String(self.options[b.value][field] || '').toLowerCase();
-              if (a > b) return 1 * multiplier;
-              if (b > a) return -1 * multiplier;
-              return 0;
-            };
-          })());
+          search.items.sort(
+            (function () {
+              var field = self.settings.sortField;
+              var multiplier = self.settings.sortDirection === 'desc' ? -1 : 1;
+              return function (a, b) {
+                a =
+                  a && String(self.options[a.value][field] || '').toLowerCase();
+                b =
+                  b && String(self.options[b.value][field] || '').toLowerCase();
+                if (a > b) return 1 * multiplier;
+                if (b > a) return -1 * multiplier;
+                return 0;
+              };
+            })()
+          );
         }
       }
       this.currentResults = search;
@@ -1163,14 +1278,14 @@
   };
 
   /**
-  * Filters out any items that have already been selected
-  * and applies search limits.
-  *
-  * @param {object} results
-  * @param {object} settings
-  * @returns {object}
-  */
-  Selectize.prototype.prepareResults = function(search, settings) {
+   * Filters out any items that have already been selected
+   * and applies search limits.
+   *
+   * @param {object} results
+   * @param {object} settings
+   * @returns {object}
+   */
+  Selectize.prototype.prepareResults = function (search, settings) {
     if (this.settings.hideSelected) {
       for (var i = search.items.length - 1; i >= 0; i--) {
         if (this.items.indexOf(String(search.items[i].value)) !== -1) {
@@ -1188,12 +1303,12 @@
   };
 
   /**
-  * Refreshes the list of available options shown
-  * in the autocomplete dropdown menu.
-  *
-  * @param {boolean} triggerDropdown
-  */
-  Selectize.prototype.refreshOptions = function(triggerDropdown) {
+   * Refreshes the list of available options shown
+   * in the autocomplete dropdown menu.
+   *
+   * @param {boolean} triggerDropdown
+   */
+  Selectize.prototype.refreshOptions = function (triggerDropdown) {
     if (typeof triggerDropdown === 'undefined') {
       triggerDropdown = true;
     }
@@ -1216,7 +1331,11 @@
     this.$dropdown.html(html.join(''));
 
     // highlight matching terms inline
-    if (this.settings.highlight && results.query.length && results.tokens.length) {
+    if (
+      this.settings.highlight &&
+      results.query.length &&
+      results.tokens.length
+    ) {
       for (i = 0, n = results.tokens.length; i < n; i++) {
         highlight(this.$dropdown, results.tokens[i].regex);
       }
@@ -1232,30 +1351,38 @@
     // add create option
     hasCreateOption = this.settings.create && results.query.length;
     if (hasCreateOption) {
-      this.$dropdown.prepend(this.render('option_create', {input: query}));
+      this.$dropdown.prepend(this.render('option_create', { input: query }));
     }
 
     // activate
     this.hasOptions = results.items.length > 0 || hasCreateOption;
     if (this.hasOptions) {
-      this.setActiveOption(this.$dropdown[0].childNodes[hasCreateOption && results.items.length > 0 ? 1 : 0]);
-      if (triggerDropdown && !this.isOpen) { this.open(); }
+      this.setActiveOption(
+        this.$dropdown[0].childNodes[
+          hasCreateOption && results.items.length > 0 ? 1 : 0
+        ]
+      );
+      if (triggerDropdown && !this.isOpen) {
+        this.open();
+      }
     } else {
       this.setActiveOption(null);
-      if (triggerDropdown && this.isOpen) { this.close(); }
+      if (triggerDropdown && this.isOpen) {
+        this.close();
+      }
     }
   };
 
   /**
-  * Adds an available option. If it already exists,
-  * nothing will happen. Note: this does not refresh
-  * the options list dropdown (use `refreshOptions`
-  * for that).
-  *
-  * @param {string} value
-  * @param {object} data
-  */
-  Selectize.prototype.addOption = function(value, data) {
+   * Adds an available option. If it already exists,
+   * nothing will happen. Note: this does not refresh
+   * the options list dropdown (use `refreshOptions`
+   * for that).
+   *
+   * @param {string} value
+   * @param {object} data
+   */
+  Selectize.prototype.addOption = function (value, data) {
     if ($.isArray(value)) {
       for (var i = 0, n = value.length; i < n; i++) {
         this.addOption(value[i][this.settings.valueField], value[i]);
@@ -1272,18 +1399,19 @@
   };
 
   /**
-  * Updates an option available for selection. If
-  * it is visible in the selected items or options
-  * dropdown, it will be re-rendered automatically.
-  *
-  * @param {string} value
-  * @param {object} data
-  */
-  Selectize.prototype.updateOption = function(value, data) {
+   * Updates an option available for selection. If
+   * it is visible in the selected items or options
+   * dropdown, it will be re-rendered automatically.
+   *
+   * @param {string} value
+   * @param {object} data
+   */
+  Selectize.prototype.updateOption = function (value, data) {
     value = String(value);
     this.options[value] = data;
     if (isset(this.renderCache['item'])) delete this.renderCache['item'][value];
-    if (isset(this.renderCache['option'])) delete this.renderCache['option'][value];
+    if (isset(this.renderCache['option']))
+      delete this.renderCache['option'][value];
 
     if (this.items.indexOf(value) !== -1) {
       var $item = this.getItem(value);
@@ -1298,20 +1426,20 @@
   };
 
   /**
-  * Removes all options.
-  */
-  Selectize.prototype.removeAllOptions = function() {
+   * Removes all options.
+   */
+  Selectize.prototype.removeAllOptions = function () {
     this.userOptions = {};
     this.options = {};
     this.lastQuery = null;
   };
 
   /**
-  * Removes an option.
-  *
-  * @param {string} value
-  */
-  Selectize.prototype.removeOption = function(value) {
+   * Removes an option.
+   *
+   * @param {string} value
+   */
+  Selectize.prototype.removeOption = function (value) {
     value = String(value);
     delete this.userOptions[value];
     delete this.options[value];
@@ -1320,24 +1448,26 @@
   };
 
   /**
-  * Returns the jQuery element of the option
-  * matching the given value.
-  *
-  * @param {string} value
-  * @returns {object}
-  */
-  Selectize.prototype.getOption = function(value) {
-    return this.$dropdown.children('[data-value="' + value.replace(/(['"])/g, '\\$1') + '"]:first');
+   * Returns the jQuery element of the option
+   * matching the given value.
+   *
+   * @param {string} value
+   * @returns {object}
+   */
+  Selectize.prototype.getOption = function (value) {
+    return this.$dropdown.children(
+      '[data-value="' + value.replace(/(['"])/g, '\\$1') + '"]:first'
+    );
   };
 
   /**
-  * Returns the jQuery element of the item
-  * matching the given value.
-  *
-  * @param {string} value
-  * @returns {object}
-  */
-  Selectize.prototype.getItem = function(value) {
+   * Returns the jQuery element of the item
+   * matching the given value.
+   *
+   * @param {string} value
+   * @returns {object}
+   */
+  Selectize.prototype.getItem = function (value) {
     var i = this.items.indexOf(value);
     if (i !== -1) {
       if (i >= this.caretPos) i++;
@@ -1350,12 +1480,12 @@
   };
 
   /**
-  * "Selects" an item. Adds it to the list
-  * at the current caret position.
-  *
-  * @param {string} value
-  */
-  Selectize.prototype.addItem = function(value) {
+   * "Selects" an item. Adds it to the list
+   * at the current caret position.
+   *
+   * @param {string} value
+   */
+  Selectize.prototype.addItem = function (value) {
     var $item;
     var self = this;
     var inputMode = this.settings.mode;
@@ -1382,15 +1512,21 @@
         var $option = $(options[i]);
         if ($option.attr('data-value') === value) {
           $option.remove();
-          if (this.$activeOption && ($option[0] === this.$activeOption[0])) {
-            this.setActiveOption(options.length ? $(options[0]).addClass('active') : null);
+          if (this.$activeOption && $option[0] === this.$activeOption[0]) {
+            this.setActiveOption(
+              options.length ? $(options[0]).addClass('active') : null
+            );
           }
           break;
         }
       }
 
       // hide the menu if the maximum number of items have been selected or no options are left
-      if (!options.length || (this.settings.maxItems !== null && this.items.length >= this.settings.maxItems)) {
+      if (
+        !options.length ||
+        (this.settings.maxItems !== null &&
+          this.items.length >= this.settings.maxItems)
+      ) {
         this.close();
       } else {
         this.positionDropdown();
@@ -1398,7 +1534,7 @@
 
       // restore focus to input
       if (this.isFocused) {
-        window.setTimeout(function() {
+        window.setTimeout(function () {
           if (inputMode === 'single') {
             self.blur();
             self.focus(false);
@@ -1416,15 +1552,15 @@
   };
 
   /**
-  * Removes the selected item matching
-  * the provided value.
-  *
-  * @param {string} value
-  */
-  Selectize.prototype.removeItem = function(value) {
+   * Removes the selected item matching
+   * the provided value.
+   *
+   * @param {string} value
+   */
+  Selectize.prototype.removeItem = function (value) {
     var $item, i, idx;
 
-    $item = (typeof value === 'object') ? value : this.getItem(value);
+    $item = typeof value === 'object' ? value : this.getItem(value);
     value = String($item.attr('data-value'));
     i = this.items.indexOf(value);
 
@@ -1446,8 +1582,11 @@
       this.positionDropdown();
       this.refreshOptions(false);
 
-      if (!this.hasOptions) { this.close(); }
-      else if (this.isInputFocused) { this.open(); }
+      if (!this.hasOptions) {
+        this.close();
+      } else if (this.isInputFocused) {
+        this.open();
+      }
 
       this.updatePlaceholder();
       this.updateOriginalInput();
@@ -1456,14 +1595,14 @@
   };
 
   /**
-  * Invokes the `create` method provided in the
-  * selectize options that should provide the data
-  * for the new item, given the user input.
-  *
-  * Once this completes, it will be added
-  * to the item list.
-  */
-  Selectize.prototype.createItem = function() {
+   * Invokes the `create` method provided in the
+   * selectize options that should provide the data
+   * for the new item, given the user input.
+   *
+   * Once this completes, it will be added
+   * to the item list.
+   */
+  Selectize.prototype.createItem = function () {
     var self = this;
     var input = $.trim(this.$control_input.val() || '');
     var caret = this.caretPos;
@@ -1471,14 +1610,17 @@
     this.lock();
     this.$control_input[0].blur();
 
-    var setup = (typeof this.settings.create === 'function') ? this.settings.create : function(input) {
-      var data = {};
-      data[self.settings.labelField] = input;
-      data[self.settings.valueField] = input;
-      return data;
-    };
+    var setup =
+      typeof this.settings.create === 'function'
+        ? this.settings.create
+        : function (input) {
+            var data = {};
+            data[self.settings.labelField] = input;
+            data[self.settings.valueField] = input;
+            return data;
+          };
 
-    var create = once(function(data) {
+    var create = once(function (data) {
       self.unlock();
       self.focus(false);
 
@@ -1500,9 +1642,9 @@
   };
 
   /**
-  * Re-renders the selected item lists.
-  */
-  Selectize.prototype.refreshItems = function() {
+   * Re-renders the selected item lists.
+   */
+  Selectize.prototype.refreshItems = function () {
     var isFull = this.isFull();
     this.lastQuery = null;
     this.$control.toggleClass('full', isFull).toggleClass('not-full', !isFull);
@@ -1518,26 +1660,33 @@
   };
 
   /**
-  * Determines whether or not more items can be added
-  * to the control without exceeding the user-defined maximum.
-  *
-  * @returns {boolean}
-  */
-  Selectize.prototype.isFull = function() {
-    return this.settings.maxItems !== null && this.items.length >= this.settings.maxItems;
+   * Determines whether or not more items can be added
+   * to the control without exceeding the user-defined maximum.
+   *
+   * @returns {boolean}
+   */
+  Selectize.prototype.isFull = function () {
+    return (
+      this.settings.maxItems !== null &&
+      this.items.length >= this.settings.maxItems
+    );
   };
 
   /**
-  * Refreshes the original <select> or <input>
-  * element to reflect the current state.
-  */
-  Selectize.prototype.updateOriginalInput = function() {
+   * Refreshes the original <select> or <input>
+   * element to reflect the current state.
+   */
+  Selectize.prototype.updateOriginalInput = function () {
     var i, n, options;
 
     if (this.$input[0].tagName.toLowerCase() === 'select') {
       options = [];
       for (i = 0, n = this.items.length; i < n; i++) {
-        options.push('<option value="' + htmlEntities(this.items[i]) + '" selected="selected"></option>');
+        options.push(
+          '<option value="' +
+            htmlEntities(this.items[i]) +
+            '" selected="selected"></option>'
+        );
       }
       if (!options.length && !this.$input.attr('multiple')) {
         options.push('<option value="" selected="selected"></option>');
@@ -1554,10 +1703,10 @@
   };
 
   /**
-  * Shows/hide the input placeholder depending
-  * on if there items in the list already.
-  */
-  Selectize.prototype.updatePlaceholder = function() {
+   * Shows/hide the input placeholder depending
+   * on if there items in the list already.
+   */
+  Selectize.prototype.updatePlaceholder = function () {
     if (!this.settings.placeholder) return;
     var $input = this.$control_input;
 
@@ -1570,11 +1719,12 @@
   };
 
   /**
-  * Shows the autocomplete dropdown containing
-  * the available options.
-  */
-  Selectize.prototype.open = function() {
-    if (this.isOpen || (this.settings.mode === 'multi' && this.isFull())) return;
+   * Shows the autocomplete dropdown containing
+   * the available options.
+   */
+  Selectize.prototype.open = function () {
+    if (this.isOpen || (this.settings.mode === 'multi' && this.isFull()))
+      return;
     this.isOpen = true;
     this.positionDropdown();
     this.$control.addClass('dropdown-active');
@@ -1583,9 +1733,9 @@
   };
 
   /**
-  * Closes the autocomplete dropdown menu.
-  */
-  Selectize.prototype.close = function() {
+   * Closes the autocomplete dropdown menu.
+   */
+  Selectize.prototype.close = function () {
     if (!this.isOpen) return;
     this.$dropdown.hide();
     this.$control.removeClass('dropdown-active');
@@ -1594,26 +1744,26 @@
   };
 
   /**
-  * Calculates and applies the appropriate
-  * position of the dropdown.
-  */
-  Selectize.prototype.positionDropdown = function() {
+   * Calculates and applies the appropriate
+   * position of the dropdown.
+   */
+  Selectize.prototype.positionDropdown = function () {
     var $control = this.$control;
     var offset = $control.position();
     offset.top += $control.outerHeight(true);
 
     this.$dropdown.css({
-      width : $control.outerWidth(),
-      top   : offset.top,
-      left  : offset.left
+      width: $control.outerWidth(),
+      top: offset.top,
+      left: offset.left,
     });
   };
 
   /**
-  * Resets / clears all selected items
-  * from the control.
-  */
-  Selectize.prototype.clear = function() {
+   * Resets / clears all selected items
+   * from the control.
+   */
+  Selectize.prototype.clear = function () {
     if (!this.items.length) return;
     this.$control.removeClass('has-items');
     this.$control.children(':not(input)').remove();
@@ -1625,12 +1775,12 @@
   };
 
   /**
-  * A helper method for inserting an element
-  * at the current caret position.
-  *
-  * @param {object} $el
-  */
-  Selectize.prototype.insertAtCaret = function($el) {
+   * A helper method for inserting an element
+   * at the current caret position.
+   *
+   * @param {object} $el
+   */
+  Selectize.prototype.insertAtCaret = function ($el) {
     var caret = Math.min(this.caretPos, this.items.length);
     if (caret === 0) {
       this.$control.prepend($el);
@@ -1641,19 +1791,25 @@
   };
 
   /**
-  * Removes the current selected item(s).
-  *
-  * @param {object} e (optional)
-  */
-  Selectize.prototype.deleteSelection = function(e) {
+   * Removes the current selected item(s).
+   *
+   * @param {object} e (optional)
+   */
+  Selectize.prototype.deleteSelection = function (e) {
     var i, n, direction, selection, values, caret, $tail;
 
-    direction = (e.keyCode === KEY_BACKSPACE) ? -1 : 1;
+    direction = e.keyCode === KEY_BACKSPACE ? -1 : 1;
     selection = getSelection(this.$control_input[0]);
     if (this.$activeItems.length) {
-      $tail = this.$control.children('.active:' + (direction > 0 ? 'last' : 'first'));
-      caret = Array.prototype.indexOf.apply(this.$control[0].childNodes, [$tail[0]]);
-      if (this.$activeItems.length > 1 && direction > 0) { caret--; }
+      $tail = this.$control.children(
+        '.active:' + (direction > 0 ? 'last' : 'first')
+      );
+      caret = Array.prototype.indexOf.apply(this.$control[0].childNodes, [
+        $tail[0],
+      ]);
+      if (this.$activeItems.length > 1 && direction > 0) {
+        caret--;
+      }
 
       values = [];
       for (i = 0, n = this.$activeItems.length; i < n; i++) {
@@ -1666,35 +1822,42 @@
       this.setCaret(caret);
       e.preventDefault();
       e.stopPropagation();
-    } else if ((this.isInputFocused || this.settings.mode === 'single') && this.items.length) {
+    } else if (
+      (this.isInputFocused || this.settings.mode === 'single') &&
+      this.items.length
+    ) {
       if (direction < 0 && selection.start === 0 && selection.length === 0) {
         this.removeItem(this.items[this.caretPos - 1]);
-      } else if (direction > 0 && selection.start === this.$control_input.val().length) {
+      } else if (
+        direction > 0 &&
+        selection.start === this.$control_input.val().length
+      ) {
         this.removeItem(this.items[this.caretPos]);
       }
     }
   };
 
   /**
-  * Selects the previous / next item (depending
-  * on the `direction` argument).
-  *
-  * > 0 - right
-  * < 0 - left
-  *
-  * @param {int} direction
-  * @param {object} e (optional)
-  */
-  Selectize.prototype.advanceSelection = function(direction, e) {
+   * Selects the previous / next item (depending
+   * on the `direction` argument).
+   *
+   * > 0 - right
+   * < 0 - left
+   *
+   * @param {int} direction
+   * @param {object} e (optional)
+   */
+  Selectize.prototype.advanceSelection = function (direction, e) {
     if (direction === 0) return;
     var tail = direction > 0 ? 'last' : 'first';
     var selection = getSelection(this.$control_input[0]);
 
     if (this.isInputFocused) {
       var valueLength = this.$control_input.val().length;
-      var cursorAtEdge = direction < 0
-        ? selection.start === 0 && selection.length === 0
-        : selection.start === valueLength;
+      var cursorAtEdge =
+        direction < 0
+          ? selection.start === 0 && selection.length === 0
+          : selection.start === valueLength;
 
       if (cursorAtEdge && !valueLength) {
         this.advanceCaret(direction, e);
@@ -1702,19 +1865,21 @@
     } else {
       var $tail = this.$control.children('.active:' + tail);
       if ($tail.length) {
-        var idx = Array.prototype.indexOf.apply(this.$control[0].childNodes, [$tail[0]]);
+        var idx = Array.prototype.indexOf.apply(this.$control[0].childNodes, [
+          $tail[0],
+        ]);
         this.setCaret(direction > 0 ? idx + 1 : idx);
       }
     }
   };
 
   /**
-  * Moves the caret left / right.
-  *
-  * @param {int} direction
-  * @param {object} e (optional)
-  */
-  Selectize.prototype.advanceCaret = function(direction, e) {
+   * Moves the caret left / right.
+   *
+   * @param {int} direction
+   * @param {object} e (optional)
+   */
+  Selectize.prototype.advanceCaret = function (direction, e) {
     if (direction === 0) return;
     var fn = direction > 0 ? 'next' : 'prev';
     if (this.isShiftDown) {
@@ -1730,12 +1895,12 @@
   };
 
   /**
-  * Moves the caret to the specified index.
-  *
-  * @param {int} i
-  * @param {boolean} focus
-  */
-  Selectize.prototype.setCaret = function(i, focus) {
+   * Moves the caret to the specified index.
+   *
+   * @param {int} i
+   * @param {boolean} focus
+   */
+  Selectize.prototype.setCaret = function (i, focus) {
     if (this.settings.mode === 'single' || this.isFull()) {
       i = this.items.length;
     } else {
@@ -1747,7 +1912,9 @@
     if (i === this.items.length) {
       this.$control.append(this.$control_input);
     } else {
-      this.$control_input.insertBefore(this.$control.children(':not(input)')[i]);
+      this.$control_input.insertBefore(
+        this.$control.children(':not(input)')[i]
+      );
     }
     this.ignoreFocus = false;
     if (focus && this.isSetup) {
@@ -1758,31 +1925,31 @@
   };
 
   /**
-  * Disables user input on the control. Used while
-  * items are being asynchronously created.
-  */
-  Selectize.prototype.lock = function() {
+   * Disables user input on the control. Used while
+   * items are being asynchronously created.
+   */
+  Selectize.prototype.lock = function () {
     this.isLocked = true;
     this.$control.addClass('locked');
   };
 
   /**
-  * Re-enables user input on the control.
-  */
-  Selectize.prototype.unlock = function() {
+   * Re-enables user input on the control.
+   */
+  Selectize.prototype.unlock = function () {
     this.isLocked = false;
     this.$control.removeClass('locked');
   };
 
   /**
-  * A helper method for rendering "item" and
-  * "option" templates, given the data.
-  *
-  * @param {string} templateName
-  * @param {object} data
-  * @returns {string}
-  */
-  Selectize.prototype.render = function(templateName, data) {
+   * A helper method for rendering "item" and
+   * "option" templates, given the data.
+   *
+   * @param {string} templateName
+   * @param {object} data
+   * @returns {string}
+   */
+  Selectize.prototype.render = function (templateName, data) {
     cache = isset(cache) ? cache : true;
 
     var value, label;
@@ -1803,7 +1970,10 @@
       }
     }
 
-    if (this.settings.render && typeof this.settings.render[templateName] === 'function') {
+    if (
+      this.settings.render &&
+      typeof this.settings.render[templateName] === 'function'
+    ) {
       html = this.settings.render[templateName].apply(this, [data]);
     } else {
       label = data[this.settings.labelField];
@@ -1815,13 +1985,19 @@
           html = '<div class="item">' + label + '</div>';
           break;
         case 'option_create':
-          html = '<div class="create">Create <strong>' + htmlEntities(data.input) + '</strong>&hellip;</div>';
+          html =
+            '<div class="create">Create <strong>' +
+            htmlEntities(data.input) +
+            '</strong>&hellip;</div>';
           break;
       }
     }
 
     if (isset(value)) {
-      html = html.replace(/^[\   ]*<([a-z][a-z0-9\-_]*(?:\:[a-z][a-z0-9\-_]*)?)/i, '<$1 data-value="' + value + '"');
+      html = html.replace(
+        /^[\   ]*<([a-z][a-z0-9\-_]*(?:\:[a-z][a-z0-9\-_]*)?)/i,
+        '<$1 data-value="' + value + '"'
+      );
     }
     if (cache) {
       this.renderCache[templateName][value] = html;
@@ -1831,5 +2007,4 @@
   };
 
   return Selectize;
-
-}));
+});

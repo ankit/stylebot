@@ -101,10 +101,10 @@ div.stylebot-colorselector:focus:not(.disabled) {
 
 /* Textfields & Textareas */
 
-input[type="text"].stylebot-textfield,
+input[type='text'].stylebot-textfield,
 textarea.stylebot-textarea {
   background: #fff !important;
-  border: 1px solid #C2C2C2 !important;
+  border: 1px solid #c2c2c2 !important;
   border-radius: 2px !important;
   color: #333 !important;
   font-family: inherit !important;
@@ -119,7 +119,7 @@ textarea.stylebot-textarea:disabled {
   opacity: 0.5 !important;
 }
 
-input[type="text"].stylebot-textfield {
+input[type='text'].stylebot-textfield {
   -webkit-box-sizing: content-box !important;
   font-family: inherit !important;
   height: 12px !important;
@@ -147,7 +147,7 @@ textarea.stylebot-css-code {
 
 button.stylebot-button {
   -khtml-appearance: none !important;
-  color: #4F4F4F !important;
+  color: #4f4f4f !important;
   display: inline !important;
   font-family: inherit !important;
   font-size: 10px !important;
@@ -156,7 +156,13 @@ button.stylebot-button {
   padding: 3px 8px !important;
   border-radius: 2px !important;
   border: 1px solid #b6b6b6 !important;
-  background: -webkit-gradient(linear, left top, left bottom, from(#eee), to(#bdbdbd)) !important;
+  background: -webkit-gradient(
+    linear,
+    left top,
+    left bottom,
+    from(#eee),
+    to(#bdbdbd)
+  ) !important;
   text-shadow: 0px 1px 1px #fff !important;
   min-height: 12px !important;
   width: auto !important;
@@ -173,30 +179,45 @@ button.stylebot-button:focus:not(:disabled) {
 button.stylebot-button:hover:not(:disabled) {
   color: #313131 !important;
   border-color: #9d9d9d !important;
-  -webkit-box-shadow: 0px 0px 8px rgba(212,212,212,1) !important;
+  -webkit-box-shadow: 0px 0px 8px rgba(212, 212, 212, 1) !important;
   cursor: pointer !important;
 }
 
 button.stylebot-button:active:not(:disabled),
-button.stylebot-button-active:not(:disabled)
-{
-  background: -webkit-gradient(linear, left top, left bottom, from(#bababa), to(#f5f5f5)) !important;
+button.stylebot-button-active:not(:disabled) {
+  background: -webkit-gradient(
+    linear,
+    left top,
+    left bottom,
+    from(#bababa),
+    to(#f5f5f5)
+  ) !important;
   color: #4f4f4f !important;
   border-color: #b6b6b6 !important;
 }
 
 button.stylebot-button-selected,
-button.stylebot-button-selected:hover:not(:disabled)
-{
-  background: -webkit-gradient(linear, left top, left bottom, from(#b9e0f5), to(#73a4c4)) !important;
+button.stylebot-button-selected:hover:not(:disabled) {
+  background: -webkit-gradient(
+    linear,
+    left top,
+    left bottom,
+    from(#b9e0f5),
+    to(#73a4c4)
+  ) !important;
   color: #1c4257 !important;
   border-color: #7096ab !important;
 }
 
 button.stylebot-button-selected:active:not(:disabled),
-button.stylebot-button-selected.stylebot-button-active:not(:disabled)
-{
-  background: -webkit-gradient(linear, left top, left bottom, from(#81afc8), to(#b7def4)) !important;
+button.stylebot-button-selected.stylebot-button-active:not(:disabled) {
+  background: -webkit-gradient(
+    linear,
+    left top,
+    left bottom,
+    from(#81afc8),
+    to(#b7def4)
+  ) !important;
 }
 
 /* Segmented Control */
@@ -209,8 +230,7 @@ button.stylebot-button-selected.stylebot-button-active:not(:disabled)
 }
 
 .stylebot-segmented-control button:hover:not(:disabled),
-.stylebot-segmented-control button:focus:not(:disabled)
-{
+.stylebot-segmented-control button:focus:not(:disabled) {
   -webkit-box-shadow: none !important;
   outline: none !important;
   color: #313131 !important;
@@ -225,9 +245,10 @@ button.stylebot-button-selected.stylebot-button-active:not(:disabled)
   border-left-width: 0px !important;
 }
 
-.stylebot-segmented-control button.stylebot-button-selected:hover:not(:disabled),
-.stylebot-segmented-control button.stylebot-button-selected:focus:not(:disabled)
-{
+.stylebot-segmented-control
+  button.stylebot-button-selected:hover:not(:disabled),
+.stylebot-segmented-control
+  button.stylebot-button-selected:focus:not(:disabled) {
   color: #102632 !important;
   border-color: #7096ab !important;
 }
@@ -244,7 +265,6 @@ Instead, stylebot-last-child class is added to the last button in segmented cont
   border-bottom-right-radius: 3px !important;
   border-top-right-radius: 3px !important;
   border-right-width: 1px !important;
-
 }
 
 .stylebot-segmented-control button span {
@@ -257,13 +277,17 @@ Instead, stylebot-last-child class is added to the last button in segmented cont
 /* Font Family Control */
 
 .stylebot-font-family-control .stylebot-selectize-input,
-.stylebot-font-family-control .stylebot-selectize-control.single .stylebot-selectize-input.focus {
+.stylebot-font-family-control
+  .stylebot-selectize-control.single
+  .stylebot-selectize-input.focus {
   width: 200px !important;
 }
 
 /* Border Style Control */
 
 .stylebot-border-style-control .stylebot-selectize-input,
-.stylebot-border-style-control .stylebot-selectize-control.single .stylebot-selectize-input.focus {
+.stylebot-border-style-control
+  .stylebot-selectize-control.single
+  .stylebot-selectize-input.focus {
   width: 80px !important;
 }

@@ -16,7 +16,13 @@
 
 #stylebot-shortcuts-content {
   display: block !important;
-  background: -webkit-gradient(linear, left top, left bottom, from(#eee), to(#bdbdbd)) !important;
+  background: -webkit-gradient(
+    linear,
+    left top,
+    left bottom,
+    from(#eee),
+    to(#bdbdbd)
+  ) !important;
   border-radius: 3px !important;
   color: #333 !important;
   position: relative !important;

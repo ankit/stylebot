@@ -4,32 +4,78 @@
 
 .stylebot-selectize-control.default.multi .stylebot-selectize-input > div {
   color: #3d5d18 !important;
-  text-shadow: 0 1px 0 rgba(255,255,255,0.1) !important;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.1) !important;
   border: 1px solid #74b21e !important;
   -webkit-border-radius: 3px !important;
   -moz-border-radius: 3px !important;
   border-radius: 3px !important;
   background: #b8e76f !important;
   background: -moz-linear-gradient(top, #b8e76f 0%, #a9e25c 100%) !important;
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#b8e76f), color-stop(100%,#a9e25c)) !important;
-  background: -webkit-linear-gradient(top, #b8e76f 0%,#a9e25c 100%) !important;
-  background: -o-linear-gradient(top, #b8e76f 0%,#a9e25c 100%) !important;
-  background: -ms-linear-gradient(top, #b8e76f 0%,#a9e25c 100%) !important;
-  background: linear-gradient(to bottom, #b8e76f 0%,#a9e25c 100%) !important;
+  background: -webkit-gradient(
+    linear,
+    left top,
+    left bottom,
+    color-stop(0%, #b8e76f),
+    color-stop(100%, #a9e25c)
+  ) !important;
+  background: -webkit-linear-gradient(top, #b8e76f 0%, #a9e25c 100%) !important;
+  background: -o-linear-gradient(top, #b8e76f 0%, #a9e25c 100%) !important;
+  background: -ms-linear-gradient(top, #b8e76f 0%, #a9e25c 100%) !important;
+  background: linear-gradient(to bottom, #b8e76f 0%, #a9e25c 100%) !important;
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#b8e76f', endColorstr='#a9e25c',GradientType=0 ) !important;
-  -webkit-box-shadow: 0 1px 1px rgba(0,0,0,0.1) !important;
-  -moz-box-shadow: 0 1px 1px rgba(0,0,0,0.1) !important;
-  box-shadow: 0 1px 1px rgba(0,0,0,0.1) !important;
+  -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1) !important;
+  -moz-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1) !important;
 }
-.stylebot-selectize-control.default.multi .stylebot-selectize-input > div.active {
+.stylebot-selectize-control.default.multi
+  .stylebot-selectize-input
+  > div.active {
   border-color: #6f9839 !important;
   background: #92c836 !important;
-  background: -moz-linear-gradient(top,  #92c836 0%, #006e2e 0%, #92c836 0%, #7abc2c 100%) !important;
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#92c836), color-stop(0%,#006e2e), color-stop(0%,#92c836), color-stop(100%,#7abc2c)) !important;
-  background: -webkit-linear-gradient(top,  #92c836 0%,#006e2e 0%,#92c836 0%,#7abc2c 100%) !important;
-  background: -o-linear-gradient(top,  #92c836 0%,#006e2e 0%,#92c836 0%,#7abc2c 100%) !important;
-  background: -ms-linear-gradient(top,  #92c836 0%,#006e2e 0%,#92c836 0%,#7abc2c 100%) !important;
-  background: linear-gradient(to bottom,  #92c836 0%,#006e2e 0%,#92c836 0%,#7abc2c 100%) !important;
+  background: -moz-linear-gradient(
+    top,
+    #92c836 0%,
+    #006e2e 0%,
+    #92c836 0%,
+    #7abc2c 100%
+  ) !important;
+  background: -webkit-gradient(
+    linear,
+    left top,
+    left bottom,
+    color-stop(0%, #92c836),
+    color-stop(0%, #006e2e),
+    color-stop(0%, #92c836),
+    color-stop(100%, #7abc2c)
+  ) !important;
+  background: -webkit-linear-gradient(
+    top,
+    #92c836 0%,
+    #006e2e 0%,
+    #92c836 0%,
+    #7abc2c 100%
+  ) !important;
+  background: -o-linear-gradient(
+    top,
+    #92c836 0%,
+    #006e2e 0%,
+    #92c836 0%,
+    #7abc2c 100%
+  ) !important;
+  background: -ms-linear-gradient(
+    top,
+    #92c836 0%,
+    #006e2e 0%,
+    #92c836 0%,
+    #7abc2c 100%
+  ) !important;
+  background: linear-gradient(
+    to bottom,
+    #92c836 0%,
+    #006e2e 0%,
+    #92c836 0%,
+    #7abc2c 100%
+  ) !important;
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#92c836', endColorstr='#7abc2c',GradientType=0 ) !important;
 }
 
@@ -48,9 +94,9 @@
   border-radius: 3px !important;
 }
 .stylebot-selectize-input.focus {
-  -webkit-box-shadow: inset 0 1px 2px rgba(0,0,0,0.15) !important;
-  -moz-box-shadow: inset 0 1px 2px rgba(0,0,0,0.15) !important;
-  box-shadow: inset 0 1px 2px rgba(0,0,0,0.15) !important;
+  -webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.15) !important;
+  -moz-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.15) !important;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.15) !important;
 }
 .stylebot-selectize-input.dropdown-active {
   -webkit-border-radius: 3px 3px 0 0 !important;
@@ -97,9 +143,9 @@
   background: #fff !important;
   margin-top: 0px !important;
   border-top: 0 none !important;
-  -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
-  -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+  -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+  -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
   -webkit-border-radius: 0 0 3px 3px !important;
   -moz-border-radius: 0 0 3px 3px !important;
   border-radius: 0 0 3px 3px !important;
@@ -120,7 +166,7 @@
   font-family: inherit !important;
   font-size: 10px !important;
   font-weight: bold !important;
-  color: #4F4F4F !important;
+  color: #4f4f4f !important;
   line-height: 14px !important;
   -webkit-font-smoothing: antialiased !important;
 }
@@ -144,7 +190,13 @@
 .stylebot-selectize-control.single .stylebot-selectize-input {
   cursor: pointer !important;
   border: 1px solid #b6b6b6 !important;
-  background: -webkit-gradient(linear, left top, left bottom, from(#eee), to(#bdbdbd)) !important;
+  background: -webkit-gradient(
+    linear,
+    left top,
+    left bottom,
+    from(#eee),
+    to(#bdbdbd)
+  ) !important;
   text-shadow: 0px 1px 1px #fff !important;
   font-size: 10px !important;
   font-family: inherit !important;
@@ -154,7 +206,7 @@
   line-height: 15px !important;
   padding: 0 5px 0 5px !important;
   font-weight: bold !important;
-  color: #4F4F4F !important;
+  color: #4f4f4f !important;
 }
 
 .stylebot-selectize-control.single .stylebot-selectize-input::after {
@@ -227,7 +279,8 @@
   cursor: pointer !important;
   overflow: hidden !important;
 }
-.stylebot-selectize-input, .stylebot-selectize-dropdown {
+.stylebot-selectize-input,
+.stylebot-selectize-dropdown {
   -webkit-box-sizing: border-box !important;
   -moz-box-sizing: border-box !important;
   box-sizing: border-box !important;

@@ -1,79 +1,87 @@
 <html>
-<head>
-  <script type="text/javascript" src="../libs/jquery.js"></script>
-  <script type="text/javascript" src="notification.js"></script>
-  <style>
+  <head>
+    <script type="text/javascript" src="../libs/jquery.js"></script>
+    <script type="text/javascript" src="notification.js"></script>
+    <style>
+      body {
+        background: -webkit-linear-gradient(rgba(230, 230, 230, 1), #fff),
+          -webkit-linear-gradient(left, #fff, #fff 97%, #ccc);
+        color: #333;
+        font-family: 'Lucida Grande', 'Lucida Sans', 'Lucida Sans Unicode',
+          Helvetica, Arial, sans-serif;
+        font-size: 11px;
+      }
 
-  body {
-    background: -webkit-linear-gradient(rgba(230, 230, 230, 1.0), #FFF), -webkit-linear-gradient(left, #FFF, #FFF 97%, #CCC);
-    color: #333;
-    font-family: 'Lucida Grande', 'Lucida Sans', 'Lucida Sans Unicode', Helvetica, Arial, sans-serif;
-    font-size: 11px;
-  }
+      h1 {
+        margin: 2px;
+        font-size: 14px;
+        padding: 0px;
+        display: inline;
+      }
 
-  h1 {
-    margin: 2px;
-    font-size: 14px;
-    padding: 0px;
-    display: inline;
-  }
+      h1 img {
+        margin-bottom: -4px;
+      }
 
-  h1 img {
-    margin-bottom: -4px;
-  }
+      a {
+        color: #467ecc;
+        text-decoration: none;
+        -webkit-transition: color 0.2s linear;
+      }
 
-  a {
-    color: #467ecc;
-    text-decoration: none;
-    -webkit-transition: color 0.2s linear;
-  }
+      a:hover {
+        color: #294266;
+      }
 
-  a:hover {
-    color: #294266;
-  }
+      ul {
+        margin: 0;
+        padding: 0;
+        list-style-type: none;
+      }
 
-  ul {
-    margin: 0;
-    padding: 0;
-    list-style-type: none;
-  }
+      li {
+        margin: 0;
+        padding: 2px;
+      }
 
-  li {
-    margin: 0;
-    padding: 2px;
-  }
+      #content {
+        margin-top: 5px;
+      }
 
-  #content {
-    margin-top: 5px;
-  }
+      #version {
+        color: #333;
+        display: inline;
+        margin-left: 3px;
+        font-size: 12px;
+      }
 
-  #version {
-    color: #333;
-    display: inline;
-    margin-left: 3px;
-    font-size: 12px;
-  }
-
-  code {
-    padding: 2px;
-    color: #000;
-    border-radius: 1px;
-    font-family: Menlo, Monaco, 'Lucida Console', monospace !important;
-  }
-
-  </style>
-</head>
-<body>
-  <h1><img src="../images/icon16.png" alt=""> Stylebot</h1>
-  <span id="version">version 2</span>
-  <div id="content">
-    <ul>
-      <li>Watch the <a href="http://www.youtube.com/watch?v=zcOLjfPptw4">video</a>!</li>
-      <li>Easy way to discover, preview and install styles from Stylebot Social.</li>
-      <li>Support a custom font stack, Google Web Fonts</li>
-      <li>Support for regular expressions and @rules</li>
-      <li>See all changes in the <a href="http://stylebot.me/changelog">CHANGELOG</a></li>
-    </ul>
-  </div>
+      code {
+        padding: 2px;
+        color: #000;
+        border-radius: 1px;
+        font-family: Menlo, Monaco, 'Lucida Console', monospace !important;
+      }
+    </style>
+  </head>
+  <body>
+    <h1><img src="../images/icon16.png" alt="" /> Stylebot</h1>
+    <span id="version">version 2</span>
+    <div id="content">
+      <ul>
+        <li>
+          Watch the
+          <a href="http://www.youtube.com/watch?v=zcOLjfPptw4">video</a>!
+        </li>
+        <li>
+          Easy way to discover, preview and install styles from Stylebot Social.
+        </li>
+        <li>Support a custom font stack, Google Web Fonts</li>
+        <li>Support for regular expressions and @rules</li>
+        <li>
+          See all changes in the
+          <a href="http://stylebot.me/changelog">CHANGELOG</a>
+        </li>
+      </ul>
+    </div>
   </body>
-  </html>
+</html>
