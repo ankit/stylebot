@@ -10,10 +10,6 @@
           'color': 'red'
         }
       },
-      _social: {
-        id: 4,
-        timestamp: 123456 (UNIX based)
-      },
       _enabled: true
     }
   }
@@ -21,12 +17,10 @@
 function Styles(param) {
   this.styles = param;
 
-  this.SOCIAL_URL = 'stylebot.me';
   this.AT_RULE_PREFIX = 'at';
   this.GLOBAL_URL = '*';
 
   this.RULES_PROPERTY = '_rules';
-  this.SOCIAL_PROPERTY = '_social';
   this.ENABLED_PROPERTY = '_enabled';
 }
 
@@ -63,7 +57,9 @@ Styles.prototype.set = function (url, value) {
 };
 
 Styles.prototype.persist = function () {
-  chrome.storage.local.set({ styles: this.styles });
+  chrome.storage.local.set({
+    styles: this.styles
+  });
 };
 
 /**
@@ -76,22 +72,7 @@ Styles.prototype.create = function (url, rules, data) {
   this.styles[url][this.ENABLED_PROPERTY] = true;
   this.styles[url][this.RULES_PROPERTY] = rules === undefined ? {} : rules;
 
-  if (data !== undefined) {
-    this.setMetadata(url, data);
-  }
-
   this.persist();
-};
-
-/**
- * Save the metadata for the given URL' style.
- * @param {String} url URL of the saved object.
- * @param {Object} data New metadata for the given URL.
- */
-Styles.prototype.setMetadata = function (url, data) {
-  this.styles[url][this.SOCIAL_PROPERTY] = {};
-  this.styles[url][this.SOCIAL_PROPERTY].id = data.id;
-  this.styles[url][this.SOCIAL_PROPERTY].timestamp = data.timestamp;
 };
 
 /**
@@ -206,20 +187,6 @@ Styles.prototype.import = function (newStyles) {
 };
 
 /**
- * Retrieve social data for the specified url.
- * @param {String} url The url for which to return the social data.
- * @return {Object} The social data for the given URL, if it exists. Else, null.
- */
-Styles.prototype.getSocialData = function (url) {
-  if (this.styles[url] === undefined) {
-    return null;
-  }
-
-  var social = this.styles[url][this.SOCIAL_PROPERTY];
-  return social ? social : null;
-};
-
-/**
  * Retrieve style rules for the specified url.
  * @param {String} url The url for which to return the rules.
  * @return {Object} The style rules for the URL, if it exists. Else, null.
@@ -254,68 +221,48 @@ Styles.prototype.exists = function (aURL) {
 Styles.prototype.getCombinedRulesForPage = function (aURL, tab) {
   if (!aURL.isOfHTMLType()) {
     return {
-      rules: null,
       url: null,
+      rules: null,
       global: null,
-      social: null,
     };
   }
 
   var globalRules = null;
   var rules = {};
   var pageURL = '';
-  var social = null;
 
   if (!this.isEmpty(this.GLOBAL_URL) && this.isEnabled(this.GLOBAL_URL)) {
     globalRules = this.getRules(this.GLOBAL_URL);
   }
 
-  // If the URL is for stylebot social, return rules for it if they exist
-  // otherwise, return response as null.
-  // this is so that URLs of the form stylebot.me/search?q=google.com
-  // work properly.
-  if (aURL.indexOf(this.SOCIAL_URL) != -1) {
-    if (!this.isEmpty(this.SOCIAL_URL)) {
-      rules = this.getRules(this.SOCIAL_URL);
-      social = this.getSocialData(this.SOCIAL_URL);
-      pageURL = this.SOCIAL_URL;
-    } else {
-      rules = null;
-      pageURL = null;
-    }
-  } else {
-    // this will contain the combined set of evaluated rules to be applied to
-    // the page. longer, more specific URLs get the priority for each selector
-    // and property
-    var found = false;
+  // this will contain the combined set of evaluated rules to be applied to
+  // the page. longer, more specific URLs get the priority for each selector
+  // and property
+  var found = false;
 
-    for (var url in this.styles) {
-      if (!this.isEnabled(url) || url === this.GLOBAL_URL) continue;
+  for (var url in this.styles) {
+    if (!this.isEnabled(url) || url === this.GLOBAL_URL) continue;
 
-      if (aURL.matchesPattern(url)) {
-        if (!found) found = true;
+    if (aURL.matchesPattern(url)) {
+      if (!found) found = true;
 
-        if (url.length > pageURL.length) {
-          pageURL = url;
-          social = this.getSocialData(url);
-        }
-
-        this.copyRules(tab, this.getRules(url), rules, url === pageURL);
+      if (url.length > pageURL.length) {
+        pageURL = url;
       }
-    }
 
-    if (!found) {
-      rules = null;
-      pageURL = null;
-      social = null;
+      this.copyRules(tab, this.getRules(url), rules, url === pageURL);
     }
+  }
+
+  if (!found) {
+    rules = null;
+    pageURL = null;
   }
 
   var response = {
     url: pageURL,
     rules: rules,
     global: this.expandRules(globalRules),
-    social: social,
   };
 
   cache.loadingTabs[tab.id] = response;

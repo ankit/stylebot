@@ -9,7 +9,6 @@ A Google Chrome extension that allows users to manipulate a web page’s appeara
 ## Resources
 
 - Chrome Webstore: <https://chrome.google.com/extensions/detail/oiaejidbmkiecgbjeifoejpgmdaleoha>
-- Donate on Pledgie: [http://pledgie.com/campaigns/14409](http://pledgie.com/campaigns/14409)
 - Issues and feature requests: <https://github.com/ankit/stylebot/issues>
 
 ## About

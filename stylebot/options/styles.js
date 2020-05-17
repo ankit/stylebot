@@ -18,8 +18,6 @@ Options.styles = {
       .on('click', '.enable-all', $.proxy(this.enableAll, this))
       .on('click', '.disable-all', $.proxy(this.disableAll, this))
       .on('click', '.delete-all', $.proxy(this.deleteAll, this))
-
-      .on('click', '.style .share-style', $.proxy(this.share, this))
       .on('click', '.style .show-edit-style', $.proxy(this.showEdit, this))
       .on('click', '.style .delete-style', $.proxy(this.delete, this))
       .on('click', '.style .toggle-style', $.proxy(this.toggle, this));
@@ -110,41 +108,6 @@ Options.styles = {
     var $style = $target.parents('.style');
     var url = $style.data('url');
     backgroundPage.cache.styles.toggle(url, $target.attr('checked'), true);
-  },
-
-  share: function (e) {
-    var $style = $(e.target).parents('.style');
-    var url = $style.data('url');
-    var rules = backgroundPage.cache.styles.getRules(url);
-    var socialURL = 'http://stylebot.me/post';
-
-    CSSUtils.crunchFormattedCSS(rules, false, false, function (css) {
-      // create a form and submit data
-      var tempForm = $('<form>', {
-        method: 'post',
-        action: socialURL,
-        target: '_blank',
-      });
-
-      // site
-      $('<input>', {
-        type: 'hidden',
-        name: 'site',
-        value: url,
-      }).appendTo(tempForm);
-
-      // css
-      $('<input>', {
-        type: 'hidden',
-        name: 'css',
-        value: css,
-      }).appendTo(tempForm);
-
-      $('<submit>').appendTo(tempForm);
-
-      tempForm.submit();
-      tempForm.remove();
-    });
   },
 
   delete: function (e) {
@@ -287,9 +250,9 @@ Options.styles = {
 
   updateGlobalButton: function () {
     this.$globalButton.html(
-      backgroundPage.cache.styles.isEnabled('*')
-        ? 'Disable Global Stylesheet'
-        : 'Enable Global Stylesheet'
+      backgroundPage.cache.styles.isEnabled('*') ?
+      'Disable Global Stylesheet' :
+      'Enable Global Stylesheet'
     );
   },
 
@@ -401,8 +364,10 @@ Options.styles = {
 
   copyToClipboard: function () {
     var text = Options.modal.getText();
-    chrome.extension.sendRequest(
-      { name: 'copyToClipboard', text: text },
+    chrome.extension.sendRequest({
+        name: 'copyToClipboard',
+        text: text
+      },
       function (response) {}
     );
   },
