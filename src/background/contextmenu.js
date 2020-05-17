@@ -13,8 +13,6 @@ var ContextMenu = {
       ContextMenu.create('Stylebot', null, null, null, ContextMenu.ID);
       ContextMenu.create('Style Element', ContextMenu.ID, 'openWidget');
       ContextMenu.create('View Options...', ContextMenu.ID, 'showOptions');
-      ContextMenu.create('Search...', ContextMenu.ID, 'searchSocial');
-      ContextMenu.create('Share...', ContextMenu.ID, 'postToSocial');
     }
   },
 
@@ -37,15 +35,10 @@ var ContextMenu = {
             active: true,
           });
         };
-      } else if (action === 'postToSocial') {
-        handler = function (info, tab) {
-          PostToSocial.init(tab);
-        };
       } else {
         handler = function (info, tab) {
           chrome.tabs.sendRequest(
-            tab.id,
-            {
+            tab.id, {
               name: action,
             },
             function () {}
