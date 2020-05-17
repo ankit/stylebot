@@ -2,7 +2,9 @@
   "name": "stylebot",
   "version": "2.3.0",
   "description": "Change the appearance of websites instantly.",
-  "scripts": {},
+  "scripts": {
+    "build": "cp -rf src/ dist/; node ./build_scripts/compile_templates"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ankit/stylebot.git"
@@ -12,5 +14,8 @@
   "bugs": {
     "url": "https://github.com/ankit/stylebot/issues"
   },
-  "homepage": "https://github.com/ankit/stylebot#readme"
+  "homepage": "https://github.com/ankit/stylebot#readme",
+  "devDependencies": {
+    "handlebars": "^4.7.6"
+  }
 }
