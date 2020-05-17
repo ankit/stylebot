@@ -1,0 +1,16 @@
+{
+  "name": "stylebot",
+  "version": "2.3.0",
+  "description": "Change the appearance of websites instantly.",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ankit/stylebot.git"
+  },
+  "author": "Ankit Ahuja",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ankit/stylebot/issues"
+  },
+  "homepage": "https://github.com/ankit/stylebot#readme"
+}
