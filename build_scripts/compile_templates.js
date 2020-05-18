@@ -1,5 +1,6 @@
-const fs = require('fs');
-const Handlebars = require('handlebars');
+const {
+  execSync
+} = require('child_process');
 
 const templates = [{
     src: 'dist/browseraction/templates/style.handlebars',
@@ -23,8 +24,6 @@ templates.forEach(({
   src,
   dest
 }) => {
-  const templateContent = fs.readFileSync(src, 'utf8');
-  const compiled = Handlebars.precompile(templateContent);
-  console.log(`compiling template to ${dest}...`);
-  fs.writeFileSync(dest, compiled);
+  console.log(`compiling ${src}...`);
+  const execution = execSync(`./node_modules/handlebars/bin/handlebars ${src} -f ${dest}`);
 });

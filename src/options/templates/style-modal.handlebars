@@ -1,41 +1,43 @@
 <div class="modal-content">
   <div class="modal-header">
     {{#if editor}}
-        {{#if global}}
-            Edit the Global Stylesheet:
-        {{else}}
-            <div>URL (see <a target="_blank" href="http://stylebot.me/patterns">patterns</a>):</div>
-            <input type='text' value="{{url}}"></input>
-        {{/if}}
+    {{#if global}}
+    Edit the Global Stylesheet:
     {{else}}
-        {{#if export}}
-            Copy and paste the following into a text file:
-        {{else}}
-            Paste previously exported styles: <br>
-            <span class='note'>Note</span>: Existing styles for similar URLs will be overwritten.
-        {{/if}}
+    <div>URL (see <a target="_blank" href="https://github.com/ankit/stylebot#pattern-matching">supported
+        patterns</a>):</div>
+    <input type='text' value="{{url}}"></input>
+    {{/if}}
+    {{else}}
+    {{#if export}}
+    Copy and paste the following into a text file:
+    {{else}}
+    Paste previously exported styles: <br>
+    <span class='note'>Note</span>: Existing styles for similar URLs will be overwritten.
+    {{/if}}
     {{/if}}
   </div>
 
   {{#if editor}}
-    <div id="editor"></div>
+  <div id="editor"></div>
   {{else}}
-    <textarea class="stylebot-css-code">{{code}}</textarea>
+  <textarea class="stylebot-css-code">{{code}}</textarea>
   {{/if}}
 
   <div class="modal-footer">
     {{#if editor}}
-        {{#if add}}
-            <button class="add-style">Add</button>
-        {{else}}
-            <button {{#if global}}class="edit-global"{{else}}data-previous-url="{{url}}" data-id="{{id}}" class="edit-style"{{/if}}>Save</button>
-        {{/if}}
+    {{#if add}}
+    <button class="add-style">Add</button>
     {{else}}
-        {{#if export}}
-            <button class="copy-to-clipboard">Copy to Clipboard</button>
-        {{else}}
-            <button class="import">Import</button>
-        {{/if}}
+    <button {{#if global}}class="edit-global" {{else}}data-previous-url="{{url}}" data-id="{{id}}" class="edit-style"
+      {{/if}}>Save</button>
+    {{/if}}
+    {{else}}
+    {{#if export}}
+    <button class="copy-to-clipboard">Copy to Clipboard</button>
+    {{else}}
+    <button class="import">Import</button>
+    {{/if}}
     {{/if}}
     <button class="cancel">Cancel</button>
   </div>

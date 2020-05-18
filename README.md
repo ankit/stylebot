@@ -1,4 +1,4 @@
-_Currently, this extension is in maintenance mode since I do not have time to actively work on it. I likely won't be able to respond to bugs / feature requests in a timely manner. Thanks for your patience._
+_Currently, this extension is under limited support. I likely won't be able to respond to bugs / feature requests in an active manner. Thanks for your patience._
 
 ## Stylebot
 
