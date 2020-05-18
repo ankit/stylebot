@@ -127,7 +127,6 @@
 
   "permissions": [
     "tabs",
-    "bookmarks",
     "contextMenus",
     "notifications",
     "storage",
