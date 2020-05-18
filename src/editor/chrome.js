@@ -77,24 +77,6 @@ stylebot.chrome = {
   },
 
   /**
-   * Send the installation request for a style from Stylebot Social
-   *   to background page
-   * @param {string} url URL for which to install new styles
-   * @param {object} rules The styles
-   * @param {number} id ID of the style on Stylebot Social
-   */
-  install: function (url, rules, id) {
-    chrome.extension.sendRequest({
-        name: 'install',
-        rules: rules,
-        url: url,
-        id: id,
-      },
-      function () {}
-    );
-  },
-
-  /**
    * Transfer all rules from a source URL to a destination URL
    * @param {string} src Source URL
    * @param {string} dest Destination URL
@@ -228,16 +210,6 @@ chrome.extension.onRequest.addListener(function (
     stylebot.style.previewReset();
   } else if (request.name === 'resetPreview') {
     stylebot.style.resetPreview();
-  } else if (request.name === 'install') {
-    stylebot.style.install(
-      request.id,
-      request.title,
-      request.url,
-      request.css,
-      request.timestamp
-    );
-
-    stylebot.chrome.setBrowserAction(false);
   } else if (request.name === 'reset') {
     stylebot.style.resetAllCSS(true);
     stylebot.chrome.setBrowserAction(false);

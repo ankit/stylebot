@@ -320,9 +320,9 @@ stylebot.style = {
         currentCSS = currentCSS ? $.trim(currentCSS) : null;
 
         currentStylebotCSS = $el.data('stylebotCSS');
-        currentStylebotCSS = currentStylebotCSS
-          ? $.trim(currentStylebotCSS)
-          : null;
+        currentStylebotCSS = currentStylebotCSS ?
+          $.trim(currentStylebotCSS) :
+          null;
 
         // If there is no existing stylebot CSS applied to the element
         if (!currentStylebotCSS) {
@@ -631,7 +631,6 @@ stylebot.style = {
    * @param {String} author The author of the style.
    * @param {String} timeAgo Relative time string when the style was authored.
    * @param {Integer} favCount Number of times the style has been favorited
-   *   on Stylebot Social.
    * @param {String} css The css for the style.
    */
   preview: function (title, desc, author, timeAgo, favCount, css) {
@@ -643,17 +642,17 @@ stylebot.style = {
 
     this.showPreviewPopover(
       title +
-        '<br>' +
-        '<div id="stylebot-preview-meta">by ' +
-        author +
-        ' (' +
-        favCount +
-        ' favorites) • Last updated ' +
-        timeAgo +
-        '</div>' +
-        '<br><div id="stylebot-preview-description">' +
-        desc +
-        '</div>'
+      '<br>' +
+      '<div id="stylebot-preview-meta">by ' +
+      author +
+      ' (' +
+      favCount +
+      ' favorites) • Last updated ' +
+      timeAgo +
+      '</div>' +
+      '<br><div id="stylebot-preview-description">' +
+      desc +
+      '</div>'
     );
   },
 
