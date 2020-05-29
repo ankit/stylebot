@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /**
  * This content script injects any custom style for the page (if it exists)
  * as soon as the document starts loading.
@@ -13,17 +14,18 @@ var stylebotTempGlobalRules;
 var stylebotTempSocialData;
 
 // send request to background.html to get stylebot rules for page
-var request;
+let request;
 if (window === window.top) {
-  request = 'getComputedStylesForPage';
+  request = { name: 'getComputedStylesForTab' };
 } else {
-  request = 'getComputedStylesForIframe';
+  request = { name: 'getComputedStylesForIframe', url: window.location.href };
 }
 
 var applyCSSCount = 0;
 function applyCSS() {
   chrome.extension.sendRequest(
-    { name: request, url: window.location.href },
+    request,
+
     function(response) {
       if (response && response.success) {
         if (response.global) {

@@ -216,19 +216,19 @@ Styles.prototype.exists = function(aURL) {
   }
 };
 
-Styles.prototype.getComputedStyleUrlForTab = function(tabUrl) {
-  if (!isValidHTML(tabUrl)) {
+Styles.prototype.getComputedStyleUrlForTab = function(tab) {
+  if (!isValidHTML(tab.url)) {
     return null;
   }
 
   let computedStyleUrl = '';
 
-  for (var url in this.styles) {
-    if (url === this.GLOBAL_URL) continue;
+  for (const styleUrl in this.styles) {
+    if (styleUrl === this.GLOBAL_URL) continue;
 
-    if (matchesPattern(tabUrl, url)) {
-      if (url.length > computedStyleUrl.length) {
-        computedStyleUrl = url;
+    if (matchesPattern(tab.url, styleUrl)) {
+      if (styleUrl.length > computedStyleUrl.length) {
+        computedStyleUrl = styleUrl;
       }
     }
   }
@@ -241,8 +241,8 @@ Styles.prototype.getComputedStyleUrlForTab = function(tabUrl) {
  * @param {String} aURL The URL to retrieve the rules for.
  * @return {Object} rules: The rules. url: The identifier representing the URL.
  */
-Styles.prototype.getComputedStylesForPage = function(aURL, tab) {
-  if (!isValidHTML(aURL)) {
+Styles.prototype.getComputedStylesForTab = function(tab) {
+  if (!isValidHTML(tab.url)) {
     return {
       url: null,
       rules: null,
@@ -250,9 +250,9 @@ Styles.prototype.getComputedStylesForPage = function(aURL, tab) {
     };
   }
 
-  var globalRules = null;
   var rules = {};
-  var pageURL = '';
+  var globalRules = null;
+  var computedStyleUrl = '';
 
   if (!this.isEmpty(this.GLOBAL_URL) && this.isEnabled(this.GLOBAL_URL)) {
     globalRules = this.getRules(this.GLOBAL_URL);
@@ -263,28 +263,35 @@ Styles.prototype.getComputedStylesForPage = function(aURL, tab) {
   // and property
   var found = false;
 
-  for (var url in this.styles) {
-    if (!this.isEnabled(url) || url === this.GLOBAL_URL) continue;
+  for (var styleUrl in this.styles) {
+    if (!this.isEnabled(styleUrl) || styleUrl === this.GLOBAL_URL) continue;
 
-    if (matchesPattern(aURL, url)) {
-      if (!found) found = true;
-
-      if (url.length > pageURL.length) {
-        pageURL = url;
+    if (matchesPattern(tab.url, styleUrl)) {
+      if (!found) {
+        found = true;
       }
 
-      this.copyRules(tab, this.getRules(url), rules, url === pageURL);
+      if (styleUrl.length > computedStyleUrl.length) {
+        computedStyleUrl = styleUrl;
+      }
+
+      this.copyRules(
+        tab,
+        this.getRules(styleUrl),
+        rules,
+        styleUrl === computedStyleUrl
+      );
     }
   }
 
   if (!found) {
     rules = null;
-    pageURL = null;
+    computedStyleUrl = null;
   }
 
   var response = {
-    url: pageURL,
     rules: rules,
+    url: computedStyleUrl,
     global: this.expandRules(globalRules),
   };
 
@@ -428,6 +435,21 @@ Styles.prototype.fetchImportCSS = function(url, callback) {
 
     xhr.send();
   }
+};
+
+Styles.prototype.enableStylesForTab = function(styleUrl, tab) {
+  const rules = this.getRules(styleUrl);
+
+  chrome.tabs.sendRequest(tab.id, {
+    name: 'enableStyles',
+    rules: rules,
+  });
+};
+
+Styles.prototype.disableStylesForTab = function(url, tab) {
+  chrome.tabs.sendRequest(tab.id, {
+    name: 'disableStyles',
+  });
 };
 
 export default Styles;

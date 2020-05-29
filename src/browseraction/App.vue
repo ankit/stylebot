@@ -92,7 +92,7 @@ export default Vue.extend({
     getComputedStyleUrl(callback: (url?: string) => void): void {
       if (this.tab && this.tab.url) {
         chrome.extension.sendRequest(
-          { name: 'getComputedStyleUrlForTab', url: this.tab.url },
+          { name: 'getComputedStyleUrlForTab', tab: this.tab },
           response => {
             if (response && response.success) {
               callback(response.url);
@@ -108,14 +108,20 @@ export default Vue.extend({
     },
 
     enableStyle(): void {
-      const backgroundPage = chrome.extension.getBackgroundPage() as any;
-      backgroundPage.cache.styles.toggle(this.computedStyleUrl, true, true);
+      chrome.extension.sendRequest({
+        tab: this.tab,
+        name: 'enableStylesForTab',
+      });
+
       this.isEnabled = true;
     },
 
     disableStyle(): void {
-      const backgroundPage = chrome.extension.getBackgroundPage() as any;
-      backgroundPage.cache.styles.toggle(this.computedStyleUrl, false, true);
+      chrome.extension.sendRequest({
+        tab: this.tab,
+        name: 'disableStylesForTab',
+      });
+
       this.isEnabled = false;
     },
   },

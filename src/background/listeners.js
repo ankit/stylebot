@@ -50,7 +50,7 @@ const init = () => {
       case 'getComputedStyleUrlForTab':
         if (window.cache.styles.getComputedStyleUrlForTab) {
           const url = window.cache.styles.getComputedStyleUrlForTab(
-            request.url
+            request.tab
           );
 
           if (url) {
@@ -65,13 +65,9 @@ const init = () => {
         sendResponse(response);
         break;
 
-      case 'getComputedStylesForPage':
-        if (window.cache.styles.getComputedStylesForPage) {
-          response = window.cache.styles.getComputedStylesForPage(
-            request.url,
-            sender.tab
-          );
-
+      case 'getComputedStylesForTab':
+        if (window.cache.styles.getComputedStylesForTab) {
+          response = window.cache.styles.getComputedStylesForTab(sender.tab);
           response.success = true;
         } else {
           response = {
@@ -97,6 +93,37 @@ const init = () => {
         }
 
         sendResponse(response);
+        break;
+
+      case 'enableStylesForTab':
+        {
+          const computedStyleUrl = window.cache.styles.getComputedStyleUrlForTab(
+            request.tab
+          );
+
+          window.cache.styles.toggle(computedStyleUrl, true, true);
+          window.cache.styles.enableStylesForTab(computedStyleUrl, request.tab);
+
+          BrowserAction.highlight(request.tab);
+        }
+
+        break;
+
+      case 'disableStylesForTab':
+        {
+          const computedStyleUrl = window.cache.styles.getComputedStyleUrlForTab(
+            request.tab
+          );
+
+          window.cache.styles.toggle(computedStyleUrl, false, true);
+          window.cache.styles.disableStylesForTab(
+            computedStyleUrl,
+            request.tab
+          );
+
+          BrowserAction.unhighlight(request.tab);
+        }
+
         break;
 
       case 'fetchOptions':
