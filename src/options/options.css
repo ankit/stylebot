@@ -56,6 +56,11 @@ a:hover {
   color: #294266;
 }
 
+.button,
+.style-url-container {
+  cursor: pointer;
+}
+
 ul {
   margin: 0;
   padding: 0;
