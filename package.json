@@ -16,6 +16,6 @@
   },
   "homepage": "https://github.com/ankit/stylebot#readme",
   "devDependencies": {
-    "handlebars": "4.3.0"
+    "handlebars": "4.7.6"
   }
 }
