@@ -98,7 +98,19 @@ const init = () => {
           window.cache.styles.toggle(request.styleUrl, true, true);
           window.cache.styles.enableStylesForTab(request.styleUrl, request.tab);
 
-          // BrowserAction.highlight(request.tab);
+          const styleUrlMetadata = window.cache.styles.getStyleUrlMetadataForTab(
+            request.tab
+          );
+
+          if (styleUrlMetadata) {
+            const enabledStyleUrls = styleUrlMetadata.filter(
+              item => item.enabled
+            );
+
+            if (enabledStyleUrls.length > 0) {
+              BrowserAction.highlight(request.tab);
+            }
+          }
         }
 
         break;
@@ -111,7 +123,19 @@ const init = () => {
             request.tab
           );
 
-          // BrowserAction.unhighlight(request.tab);
+          const styleUrlMetadata = window.cache.styles.getStyleUrlMetadataForTab(
+            request.tab
+          );
+
+          if (styleUrlMetadata) {
+            const enabledStyleUrls = styleUrlMetadata.filter(
+              item => item.enabled
+            );
+
+            if (enabledStyleUrls.length === 0) {
+              BrowserAction.unhighlight(request.tab);
+            }
+          }
         }
 
         break;
