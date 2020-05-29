@@ -1,11 +1,12 @@
 <div data-url="{{url}}" class="style" data-id="{{id}}" id="style{{id}}" tabindex=0>
-    <span class="style-url-container">
-        <input class="toggle-style" type="checkbox" title="Enable or disable this style" tabindex=-1 {{#if enabled}}checked{{/if}} />
-        <div class="style-url">{{url}}</div>
-    </span>
-    <div class="controls">
-        <div title="Share Style" class="tipsy button share-style" tabindex=0></div>
-        <div title="Edit Style" class="tipsy button show-edit-style" tabindex=0></div>
-        <div title="Delete Style" class="tipsy button delete-style close-button" tabindex=0></div>
-    </div>
+  <span class="style-url-container">
+    <input class="toggle-style" type="checkbox" title="Enable or disable this style" tabindex=-1
+      {{#if enabled}}checked{{/if}} />
+    <div class="style-url">{{url}}</div>
+  </span>
+
+  <div class="controls">
+    <div title="Edit Style" class="tipsy button show-edit-style" tabindex=0></div>
+    <div title="Delete Style" class="tipsy button delete-style close-button" tabindex=0></div>
+  </div>
 </div>
