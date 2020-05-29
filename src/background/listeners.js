@@ -65,9 +65,9 @@ const init = () => {
         sendResponse(response);
         break;
 
-      case 'getCombinedRulesForPage':
-        if (window.cache.styles.getCombinedRulesForPage) {
-          response = window.cache.styles.getCombinedRulesForPage(
+      case 'getComputedStylesForPage':
+        if (window.cache.styles.getComputedStylesForPage) {
+          response = window.cache.styles.getComputedStylesForPage(
             request.url,
             sender.tab
           );
@@ -82,9 +82,9 @@ const init = () => {
         sendResponse(response);
         break;
 
-      case 'getCombinedRulesForIframe':
-        if (window.cache.styles.getCombinedRulesForIframe) {
-          response = window.cache.styles.getCombinedRulesForIframe(
+      case 'getComputedStylesForIframe':
+        if (window.cache.styles.getComputedStylesForIframe) {
+          response = window.cache.styles.getComputedStylesForIframe(
             request.url,
             sender.tab
           );

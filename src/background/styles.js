@@ -241,7 +241,7 @@ Styles.prototype.getComputedStyleUrlForTab = function(tabUrl) {
  * @param {String} aURL The URL to retrieve the rules for.
  * @return {Object} rules: The rules. url: The identifier representing the URL.
  */
-Styles.prototype.getCombinedRulesForPage = function(aURL, tab) {
+Styles.prototype.getComputedStylesForPage = function(aURL, tab) {
   if (!isValidHTML(aURL)) {
     return {
       url: null,
@@ -294,7 +294,7 @@ Styles.prototype.getCombinedRulesForPage = function(aURL, tab) {
   return response;
 };
 
-Styles.prototype.getCombinedRulesForIframe = function(aURL, tab) {
+Styles.prototype.getComputedStylesForIframe = function(aURL, tab) {
   var response = window.cache.loadingTabs[tab.id];
   return response ? response : this.getCombinedRulesForPage(aURL, tab);
 };

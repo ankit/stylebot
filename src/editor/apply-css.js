@@ -15,9 +15,9 @@ var stylebotTempSocialData;
 // send request to background.html to get stylebot rules for page
 var request;
 if (window === window.top) {
-  request = 'getCombinedRulesForPage';
+  request = 'getComputedStylesForPage';
 } else {
-  request = 'getCombinedRulesForIframe';
+  request = 'getComputedStylesForIframe';
 }
 
 var applyCSSCount = 0;
