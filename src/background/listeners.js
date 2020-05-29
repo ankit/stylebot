@@ -8,11 +8,12 @@ import { saveOption, saveAccordionState } from './options';
  * Initialize listeners for the background page
  */
 const init = () => {
-  chrome.extension.onRequest.addListener(function (
+  chrome.extension.onRequest.addListener(function(
     request,
     sender,
     sendResponse
   ) {
+    let response;
     switch (request.name) {
       case 'activateBrowserAction':
         BrowserAction.activate(sender.tab);
@@ -47,12 +48,10 @@ const init = () => {
         break;
 
       case 'getCombinedRulesForPage':
-        var response;
-
         if (window.cache.styles.getCombinedRulesForPage) {
           response = window.cache.styles.getCombinedRulesForPage(
             request.url,
-            sender.tab
+            sender.tab || request.tab
           );
           response.success = true;
         } else {
@@ -65,8 +64,6 @@ const init = () => {
         break;
 
       case 'getCombinedRulesForIframe':
-        var response;
-
         if (window.cache.styles.getCombinedRulesForIframe) {
           response = window.cache.styles.getCombinedRulesForIframe(
             request.url,
@@ -110,7 +107,7 @@ const init = () => {
         break;
 
       case 'fetchImportCSS':
-        window.cache.styles.fetchImportCSS(request.url, function (css) {
+        window.cache.styles.fetchImportCSS(request.url, function(css) {
           sendResponse({ text: css });
         });
     }
@@ -120,7 +117,7 @@ const init = () => {
    * Listen when an existing tab is updated to update the context
    * menu and browser action
    */
-  chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+  chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
     if (tab.status === 'complete') {
       if (window.cache.options.contextMenu) {
         ContextMenu.update(tab);
@@ -135,9 +132,9 @@ const init = () => {
   /**
    * Listen when a tab is activated to update the context menu
    */
-  chrome.tabs.onActivated.addListener(function (activeInfo) {
+  chrome.tabs.onActivated.addListener(function(activeInfo) {
     if (window.cache.options.contextMenu) {
-      chrome.tabs.get(activeInfo.tabId, function (tab) {
+      chrome.tabs.get(activeInfo.tabId, function(tab) {
         ContextMenu.update(tab);
       });
     }
@@ -146,7 +143,7 @@ const init = () => {
   /**
    * Listen when a tab is removed to clear its related cache
    */
-  chrome.tabs.onRemoved.addListener(function (tabId, removeInfo) {
+  chrome.tabs.onRemoved.addListener(function(tabId) {
     if (window.cache.loadingTabs[tabId]) {
       delete window.cache.loadingTabs[tabId];
     }

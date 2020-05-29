@@ -1,18 +1,18 @@
 <template>
   <ul v-if="tab && tab.id">
-    <li><button v-on:click="openStylebot">Open Stylebot...</button></li>
-
     <li>
-      <button v-on:click="disableStyling">
-        Disable Styling
-      </button>
-
-      <button v-on:click="enableStyling">
-        Enable Styling
-      </button>
+      <button v-on:click="openStylebot">Open Stylebot...</button>
     </li>
 
-    <li><button v-on:click="openOptions">Options...</button></li>
+    <li>
+      <button v-on:click="disableStyling">Disable Styling</button>
+
+      <button v-on:click="enableStyling">Enable Styling</button>
+    </li>
+
+    <li>
+      <button v-on:click="openOptions">Options...</button>
+    </li>
   </ul>
 </template>
 
@@ -41,10 +41,29 @@ export default Vue.extend({
         tab: tab,
         name: 'activeTab',
       });
+
+      this.getStylesForTab(style => {});
     });
   },
 
   methods: {
+    getStylesForTab(callback: (style?: any) => void): void {
+      console.log(this.tab);
+      if (this.tab) {
+        chrome.extension.sendRequest(
+          { name: 'getCombinedRulesForPage', url: this.tab.url, tab: this.tab },
+          response => {
+            console.log('response', response);
+            if (response && response.success) {
+              callback(response);
+            }
+          }
+        );
+      }
+
+      callback();
+    },
+
     getCurrentTab(callback: (tab: chrome.tabs.Tab) => void): void {
       chrome.windows.getCurrent({ populate: true }, ({ tabs }) => {
         if (tabs) {

@@ -19,4 +19,12 @@ module.exports = {
   globals: {
     chrome: 'readonly',
   },
+  overrides: [
+    {
+      files: ['*.js', '*.jsx'],
+      rules: {
+        '@typescript-eslint/explicit-module-boundary-types': 'off',
+      },
+    },
+  ],
 };

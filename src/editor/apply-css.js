@@ -24,11 +24,11 @@ var applyCSSCount = 0;
 function applyCSS() {
   chrome.extension.sendRequest(
     { name: request, url: window.location.href },
-    function (response) {
+    function(response) {
       if (response && response.success) {
         if (response.global) {
           stylebotTempGlobalRules = response.global;
-          CSSUtils.crunchCSS(response.global, true, true, function (css) {
+          CSSUtils.crunchCSS(response.global, true, true, function(css) {
             if (css != '') {
               CSSUtils.injectCSS(css, 'stylebot-global-css');
             }
@@ -40,7 +40,7 @@ function applyCSS() {
         stylebotTempSocialData = response.social;
 
         if (stylebotTempUrl && stylebotTempRules) {
-          CSSUtils.crunchCSS(response.rules, true, true, function (css) {
+          CSSUtils.crunchCSS(response.rules, true, true, function(css) {
             if (css != '') {
               CSSUtils.injectCSS(css, 'stylebot-css');
             }
