@@ -1,6 +1,10 @@
-const webpack = require('webpack');
 const ejs = require('ejs');
+const webpack = require('webpack');
+
 const CopyPlugin = require('copy-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+
+const { VueLoaderPlugin } = require('vue-loader');
 const ExtensionReloader = require('webpack-extension-reloader');
 
 const config = {
@@ -8,16 +12,25 @@ const config = {
   context: __dirname + '/src',
   entry: {
     background: './background/index.js',
+    'browseraction/index': './browseraction/index.js',
   },
   output: {
     path: __dirname + '/dist',
     filename: '[name].js',
   },
   resolve: {
-    extensions: ['.js'],
+    extensions: ['.js', '.vue'],
   },
   module: {
     rules: [
+      {
+        test: /\.vue$/,
+        loader: 'vue-loader',
+      },
+      {
+        test: /\.css$/,
+        use: [MiniCssExtractPlugin.loader, 'css-loader'],
+      },
       {
         test: /\.js$/,
         loader: 'babel-loader',
@@ -28,6 +41,10 @@ const config = {
   plugins: [
     new webpack.DefinePlugin({
       global: 'window',
+    }),
+    new VueLoaderPlugin(),
+    new MiniCssExtractPlugin({
+      filename: '[name].css',
     }),
     new CopyPlugin({
       patterns: [
@@ -48,13 +65,13 @@ const config = {
           to: 'notification',
         },
         {
+          from: 'shared',
+          to: 'shared',
+        },
+        {
           from: 'options/index.html',
           to: 'options/index.html',
           transform: transformHtml,
-        },
-        {
-          from: 'shared',
-          to: 'shared',
         },
         {
           from: 'browseraction/index.html',
