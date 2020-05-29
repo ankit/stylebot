@@ -1,7 +1,8 @@
+/* eslint-disable no-undef */
 Options.styles = {
   count: 0,
 
-  init: function () {
+  init: function() {
     this.$container = $('#styles');
     this.$count = $('#style-count');
     this.$globalButton = $('.toggle-global');
@@ -10,7 +11,7 @@ Options.styles = {
     this.updateGlobalButton();
   },
 
-  attachListeners: function () {
+  attachListeners: function() {
     $('#styles-container')
       .on('click', '.show-edit-global', $.proxy(this.showEditGlobal, this))
       .on('click', '.toggle-global', $.proxy(this.toggleGlobal, this))
@@ -45,7 +46,7 @@ Options.styles = {
     // Search.
     $('#style-search-field').bind(
       'keyup',
-      $.proxy(function (e) {
+      $.proxy(function(e) {
         var $target = $(e.target);
         if (e.keyCode === 27) {
           $target.val('');
@@ -57,7 +58,7 @@ Options.styles = {
     );
 
     // Tap / to search styles.
-    $(document).keyup(function (e) {
+    $(document).keyup(function(e) {
       if (e.keyCode != 191) return true;
 
       if ($('#styles-container').css('display') === 'none') return true;
@@ -72,7 +73,7 @@ Options.styles = {
   /**
    * Resets and renders all the users styles.
    */
-  fill: function () {
+  fill: function() {
     this.$container.html('');
     var styles = backgroundPage.cache.styles.get();
     var counter = 0;
@@ -91,11 +92,11 @@ Options.styles = {
     this.updateCount();
   },
 
-  get: function (id) {
+  get: function(id) {
     return $('#style' + id);
   },
 
-  render: function (url, isEnabled, id) {
+  render: function(url, isEnabled, id) {
     return Handlebars.templates.style({
       url: url,
       enabled: isEnabled,
@@ -103,14 +104,14 @@ Options.styles = {
     });
   },
 
-  toggle: function (e) {
+  toggle: function(e) {
     var $target = $(e.target);
     var $style = $target.parents('.style');
     var url = $style.data('url');
     backgroundPage.cache.styles.toggle(url, $target.attr('checked'), true);
   },
 
-  delete: function (e) {
+  delete: function(e) {
     var $style = $(e.target).parents('.style');
     var url = $style.data('url');
 
@@ -126,7 +127,7 @@ Options.styles = {
     $style.find('.close-button').attr('original-title', '');
     // Wait for the tooltip to disappear,
     // then remove the style element from DOM.
-    setTimeout(function () {
+    setTimeout(function() {
       $style.remove();
     }, 0);
 
@@ -134,7 +135,7 @@ Options.styles = {
     this.updateCount();
   },
 
-  validate: function (url, css) {
+  validate: function(url, css) {
     if (url === '') {
       Options.modal.showError('Please enter a URL.');
       return false;
@@ -153,7 +154,7 @@ Options.styles = {
     return true;
   },
 
-  add: function (e) {
+  add: function(e) {
     var url = Options.modal.getURL();
     var css = Options.modal.getCode();
 
@@ -165,7 +166,7 @@ Options.styles = {
     }
   },
 
-  edit: function (e) {
+  edit: function(e) {
     var $el = $(e.target);
     var previousURL = $el.data('previous-url');
     var id = $el.data('id');
@@ -178,13 +179,13 @@ Options.styles = {
     }
   },
 
-  editGlobal: function () {
+  editGlobal: function() {
     if (this.save('*', Options.modal.getCode())) {
       Options.modal.close();
     }
   },
 
-  save: function (url, css, previousURL) {
+  save: function(url, css, previousURL) {
     if (url != '*') {
       if (!this.validate(url, css)) {
         return false;
@@ -223,17 +224,17 @@ Options.styles = {
     return true;
   },
 
-  enableAll: function () {
+  enableAll: function() {
     $('.style input[type=checkbox]').prop('checked', true);
     backgroundPage.cache.styles.toggleAll(true);
   },
 
-  disableAll: function () {
+  disableAll: function() {
     $('.style input[type=checkbox]').prop('checked', false);
     backgroundPage.cache.styles.toggleAll(false);
   },
 
-  deleteAll: function () {
+  deleteAll: function() {
     if (confirm('Are you sure you want to delete ALL your styles?')) {
       backgroundPage.cache.styles.deleteAll();
       $('#styles').html('');
@@ -244,19 +245,19 @@ Options.styles = {
     return false;
   },
 
-  updateCount: function () {
+  updateCount: function() {
     this.$count.text(this.count);
   },
 
-  updateGlobalButton: function () {
+  updateGlobalButton: function() {
     this.$globalButton.html(
-      backgroundPage.cache.styles.isEnabled('*') ?
-      'Disable Global Stylesheet' :
-      'Enable Global Stylesheet'
+      backgroundPage.cache.styles.isEnabled('*')
+        ? 'Disable Global Stylesheet'
+        : 'Enable Global Stylesheet'
     );
   },
 
-  toggleGlobal: function () {
+  toggleGlobal: function() {
     if (!backgroundPage.cache.styles.toggle('*', null, true)) {
       backgroundPage.cache.styles.create('*');
     }
@@ -264,7 +265,7 @@ Options.styles = {
     this.updateGlobalButton();
   },
 
-  showEditGlobal: function (e) {
+  showEditGlobal: function(e) {
     var rules = backgroundPage.cache.styles.getRules('*');
 
     if (!rules) {
@@ -272,7 +273,7 @@ Options.styles = {
       rules = {};
     }
 
-    CSSUtils.crunchFormattedCSS(rules, false, false, function (css) {
+    CSSUtils.crunchFormattedCSS(rules, false, false, function(css) {
       Options.modal.init({
         editor: true,
         edit: true,
@@ -282,13 +283,13 @@ Options.styles = {
     });
   },
 
-  showEdit: function (e) {
+  showEdit: function(e) {
     var $style = $(e.target).parents('.style');
     var url = $style.data('url');
     var id = $style.data('id');
     var rules = backgroundPage.cache.styles.getRules(url);
 
-    CSSUtils.crunchFormattedCSS(rules, false, false, function (css) {
+    CSSUtils.crunchFormattedCSS(rules, false, false, function(css) {
       Options.modal.init({
         url: url,
         editor: true,
@@ -299,7 +300,7 @@ Options.styles = {
     });
   },
 
-  showAdd: function (e) {
+  showAdd: function(e) {
     Options.modal.init({
       editor: true,
       add: true,
@@ -307,7 +308,7 @@ Options.styles = {
     });
   },
 
-  filter: function (query) {
+  filter: function(query) {
     var $styles = $('.style');
     var len = $styles.length;
 
@@ -323,7 +324,7 @@ Options.styles = {
     }
   },
 
-  showExport: function () {
+  showExport: function() {
     var json = '';
     if (styles) {
       json = JSON.stringify(backgroundPage.cache.styles.get());
@@ -335,14 +336,14 @@ Options.styles = {
     });
   },
 
-  showImport: function () {
+  showImport: function() {
     Options.modal.init({
       import: true,
       code: '',
     });
   },
 
-  import: function () {
+  import: function() {
     var json = Options.modal.getText();
 
     if (json && json != '') {
@@ -362,13 +363,14 @@ Options.styles = {
     }
   },
 
-  copyToClipboard: function () {
+  copyToClipboard: function() {
     var text = Options.modal.getText();
-    chrome.extension.sendRequest({
+    chrome.extension.sendRequest(
+      {
         name: 'copyToClipboard',
-        text: text
+        text: text,
       },
-      function (response) {}
+      function(response) {}
     );
   },
 };

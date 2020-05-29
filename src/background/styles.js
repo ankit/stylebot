@@ -31,7 +31,7 @@ function Styles(stylesObj) {
  * Delete a style.
  * @param {String} url The url of the style to delete.
  */
-Styles.prototype.delete = function (url) {
+Styles.prototype.delete = function(url) {
   delete this.styles[url];
   this.persist();
 };
@@ -42,7 +42,7 @@ Styles.prototype.delete = function (url) {
  * @param {String} url The URL of the requested object.
  * @return {Object} The request style(s) object(s).
  */
-Styles.prototype.get = function (url) {
+Styles.prototype.get = function(url) {
   if (url === undefined) {
     return this.styles;
   } else {
@@ -50,7 +50,7 @@ Styles.prototype.get = function (url) {
   }
 };
 
-Styles.prototype.set = function (url, value) {
+Styles.prototype.set = function(url, value) {
   if (url === undefined) {
     return false;
   } else {
@@ -59,7 +59,7 @@ Styles.prototype.set = function (url, value) {
   }
 };
 
-Styles.prototype.persist = function () {
+Styles.prototype.persist = function() {
   chrome.storage.local.set({
     styles: this.styles,
   });
@@ -70,7 +70,7 @@ Styles.prototype.persist = function () {
  * @param {String} url URL of the new object.
  * @param {Object} rules Rules for the given URL.
  */
-Styles.prototype.create = function (url, rules, data) {
+Styles.prototype.create = function(url, rules, data) {
   this.styles[url] = {};
   this.styles[url][this.ENABLED_PROPERTY] = true;
   this.styles[url][this.RULES_PROPERTY] = rules === undefined ? {} : rules;
@@ -83,7 +83,7 @@ Styles.prototype.create = function (url, rules, data) {
  * @param {String} url URL of the requested object.
  * @return {Boolean} The enabled status for the given URL.
  */
-Styles.prototype.isEnabled = function (url) {
+Styles.prototype.isEnabled = function(url) {
   if (this.styles[url] === undefined) {
     return false;
   }
@@ -97,7 +97,7 @@ Styles.prototype.isEnabled = function (url) {
  * @param {Object} rules rules New rules for the given URL.
  * @param {Object} data New metadata for the given URL.
  */
-Styles.prototype.save = function (url, rules, data) {
+Styles.prototype.save = function(url, rules, data) {
   if (!url || url === '') {
     return;
   }
@@ -115,7 +115,7 @@ Styles.prototype.save = function (url, rules, data) {
  * @param {String} url URL of the saved object.
  * @param {Object} value The enabled status for the given URL.
  */
-Styles.prototype.toggle = function (url, value, shouldSave) {
+Styles.prototype.toggle = function(url, value, shouldSave) {
   if (this.isEmpty(url)) {
     return false;
   }
@@ -140,14 +140,14 @@ Styles.prototype.toggle = function (url, value, shouldSave) {
  *   Otherwise, set the enabled status for all the styles.
  * @param {Object} value The enabled status.
  */
-Styles.prototype.toggleAll = function (value) {
+Styles.prototype.toggleAll = function(value) {
   for (var url in this.styles) {
     this.toggle(url, value, false);
   }
   this.persist();
 };
 
-Styles.prototype.deleteAll = function () {
+Styles.prototype.deleteAll = function() {
   this.styles = {};
   this.persist();
 };
@@ -157,7 +157,7 @@ Styles.prototype.deleteAll = function () {
  * @param {String} url The style's identifier.
  * @return {Boolean} True if the requested style exists.
  */
-Styles.prototype.isEmpty = function (url) {
+Styles.prototype.isEmpty = function(url) {
   return this.styles[url] === undefined || this.styles[url] == null;
 };
 
@@ -165,7 +165,7 @@ Styles.prototype.isEmpty = function (url) {
  * Empty the rules for a style
  * @param {String} url Identifier of the style to empty.
  */
-Styles.prototype.emptyRules = function (url) {
+Styles.prototype.emptyRules = function(url) {
   this.styles[url][this.RULES_PROPERTY] = null;
   this.persist();
 };
@@ -175,7 +175,7 @@ Styles.prototype.emptyRules = function (url) {
  *   object with the specified object
  * @param {Object} newStyles Styles object to import.
  */
-Styles.prototype.import = function (newStyles) {
+Styles.prototype.import = function(newStyles) {
   for (var url in newStyles) {
     if (newStyles[url][this.RULES_PROPERTY]) {
       // it's the new format.
@@ -194,7 +194,7 @@ Styles.prototype.import = function (newStyles) {
  * @param {String} url The url for which to return the rules.
  * @return {Object} The style rules for the URL, if it exists. Else, null.
  */
-Styles.prototype.getRules = function (url) {
+Styles.prototype.getRules = function(url) {
   if (this.styles[url] === undefined) {
     return null;
   }
@@ -208,7 +208,7 @@ Styles.prototype.getRules = function (url) {
  * @param {String} aURL The URL to check.
  * @return {Boolean} True if any rules are associated with the URL
  */
-Styles.prototype.exists = function (aURL) {
+Styles.prototype.exists = function(aURL) {
   if (this.isEnabled(aURL) && aURL !== this.GLOBAL_URL) {
     return true;
   } else {
@@ -216,12 +216,32 @@ Styles.prototype.exists = function (aURL) {
   }
 };
 
+Styles.prototype.getComputedStyleUrlForTab = function(tabUrl) {
+  if (!isValidHTML(tabUrl)) {
+    return null;
+  }
+
+  let computedStyleUrl = '';
+
+  for (var url in this.styles) {
+    if (url === this.GLOBAL_URL) continue;
+
+    if (matchesPattern(tabUrl, url)) {
+      if (url.length > computedStyleUrl.length) {
+        computedStyleUrl = url;
+      }
+    }
+  }
+
+  return computedStyleUrl;
+};
+
 /**
  * Retrieve all the CSS rules applicable to the URL, including global CSS rules.
  * @param {String} aURL The URL to retrieve the rules for.
  * @return {Object} rules: The rules. url: The identifier representing the URL.
  */
-Styles.prototype.getCombinedRulesForPage = function (aURL, tab) {
+Styles.prototype.getCombinedRulesForPage = function(aURL, tab) {
   if (!isValidHTML(aURL)) {
     return {
       url: null,
@@ -274,7 +294,7 @@ Styles.prototype.getCombinedRulesForPage = function (aURL, tab) {
   return response;
 };
 
-Styles.prototype.getCombinedRulesForIframe = function (aURL, tab) {
+Styles.prototype.getCombinedRulesForIframe = function(aURL, tab) {
   var response = window.cache.loadingTabs[tab.id];
   return response ? response : this.getCombinedRulesForPage(aURL, tab);
 };
@@ -284,7 +304,7 @@ Styles.prototype.getCombinedRulesForIframe = function (aURL, tab) {
  *   The global rules are stored for the url '*'
  * @return {Object} The rules of the global stylesheet.
  */
-Styles.prototype.getGlobalRules = function () {
+Styles.prototype.getGlobalRules = function() {
   if (this.isEmpty(this.GLOBAL_URL) || !this.isEnabled(this.GLOBAL_URL)) {
     return null;
   }
@@ -297,7 +317,7 @@ Styles.prototype.getGlobalRules = function () {
  * @param {String} source Source's identifier.
  * @param {String} destination Destination's identifier.
  */
-Styles.prototype.transfer = function (source, destination) {
+Styles.prototype.transfer = function(source, destination) {
   if (this.styles[source]) {
     this.styles[destination] = this.styles[source];
     this.persist();
@@ -312,7 +332,7 @@ Styles.prototype.transfer = function (source, destination) {
  * @param {Boolean} isPrimaryURL If the url for the source rules is the primary
  *   url for the page. Used to manage conflicts.
  */
-Styles.prototype.copyRules = function (_tab, src, dest, isPrimaryURL) {
+Styles.prototype.copyRules = function(_tab, src, dest, isPrimaryURL) {
   for (var selector in src) {
     var rule = src[selector];
 
@@ -333,8 +353,8 @@ Styles.prototype.copyRules = function (_tab, src, dest, isPrimaryURL) {
   }
 };
 
-Styles.prototype.expandRules = function (rules) {
-  for (selector in rules) {
+Styles.prototype.expandRules = function(rules) {
+  for (const selector in rules) {
     rules[selector] = this.expandRule(selector, rules[selector]);
   }
 
@@ -349,7 +369,7 @@ Styles.prototype.expandRules = function (rules) {
  * @param {Function} callback The callback method that is passed the expanded
  *   rule.
  */
-Styles.prototype.expandRule = function (selector, rule) {
+Styles.prototype.expandRule = function(selector, rule) {
   if (this.isImportRuleSelector(selector)) {
     var expandedRule = this.expandImportRule(rule);
     if (expandedRule) {
@@ -366,7 +386,7 @@ Styles.prototype.expandRule = function (selector, rule) {
  * @param {String} selector The CSS selector for the rule
  * @return {Boolean} True if the selector corresponds to an @import rule
  */
-Styles.prototype.isImportRuleSelector = function (selector) {
+Styles.prototype.isImportRuleSelector = function(selector) {
   return selector.indexOf(this.AT_RULE_PREFIX) == 0;
 };
 
@@ -375,7 +395,7 @@ Styles.prototype.isImportRuleSelector = function (selector) {
  *   and send a push request to specified tab to update the rule.
  * @param {Object} rule The @import rule to expand
  */
-Styles.prototype.expandImportRule = function (rule) {
+Styles.prototype.expandImportRule = function(rule) {
   var css = window.cache.importRules[rule['url']];
 
   if (css) {
@@ -383,7 +403,7 @@ Styles.prototype.expandImportRule = function (rule) {
     return rule;
   }
 
-  this.fetchImportCSS(rule['url'], function (css) {
+  this.fetchImportCSS(rule['url'], function(css) {
     rule['expanded_text'] = css;
   });
 };
@@ -393,13 +413,13 @@ Styles.prototype.expandImportRule = function (rule) {
  * @param {String} url URL for the @import rule
  * @param {Function} callback This method is passed the css for the @import rule
  */
-Styles.prototype.fetchImportCSS = function (url, callback) {
+Styles.prototype.fetchImportCSS = function(url, callback) {
   if (window.cache.importRules[url]) {
     callback(window.cache.importRules[url]);
   } else {
     var xhr = new XMLHttpRequest();
     xhr.open('GET', url, true);
-    xhr.onreadystatechange = function () {
+    xhr.onreadystatechange = function() {
       if (xhr.readyState == 4) {
         window.cache.importRules[url] = xhr.responseText;
         callback(xhr.responseText);

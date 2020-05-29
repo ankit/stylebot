@@ -5,9 +5,8 @@
     </li>
 
     <li>
-      <button v-on:click="disableStyling">Disable Styling</button>
-
-      <button v-on:click="enableStyling">Enable Styling</button>
+      <button v-if="isEnabled" v-on:click="disableStyle">Disable Styling</button>
+      <button v-else v-on:click="enableStyle">Enable Styling</button>
     </li>
 
     <li>
@@ -22,10 +21,15 @@ import Vue from 'vue';
 export default Vue.extend({
   name: 'App',
 
-  data(): { tab?: chrome.tabs.Tab; stylingEnabled: boolean } {
+  data(): {
+    tab?: chrome.tabs.Tab;
+    isEnabled: boolean;
+    computedStyleUrl?: string;
+  } {
     return {
       tab: undefined,
-      stylingEnabled: false,
+      isEnabled: false,
+      computedStyleUrl: undefined,
     };
   },
 
@@ -42,28 +46,18 @@ export default Vue.extend({
         name: 'activeTab',
       });
 
-      this.getStylesForTab(style => {});
+      this.getComputedStyleUrl(url => {
+        this.computedStyleUrl = url;
+
+        const backgroundPage = chrome.extension.getBackgroundPage() as any;
+        this.isEnabled = backgroundPage.cache.styles.isEnabled(
+          this.computedStyleUrl
+        );
+      });
     });
   },
 
   methods: {
-    getStylesForTab(callback: (style?: any) => void): void {
-      console.log(this.tab);
-      if (this.tab) {
-        chrome.extension.sendRequest(
-          { name: 'getCombinedRulesForPage', url: this.tab.url, tab: this.tab },
-          response => {
-            console.log('response', response);
-            if (response && response.success) {
-              callback(response);
-            }
-          }
-        );
-      }
-
-      callback();
-    },
-
     getCurrentTab(callback: (tab: chrome.tabs.Tab) => void): void {
       chrome.windows.getCurrent({ populate: true }, ({ tabs }) => {
         if (tabs) {
@@ -95,16 +89,34 @@ export default Vue.extend({
       window.close();
     },
 
-    disableStyling(): void {
-      if (this.tab && this.tab.id) {
-        chrome.tabs.sendRequest(this.tab.id, { name: 'disableStyling' });
+    getComputedStyleUrl(callback: (url?: string) => void): void {
+      if (this.tab && this.tab.url) {
+        chrome.extension.sendRequest(
+          { name: 'getComputedStyleUrlForTab', url: this.tab.url },
+          response => {
+            if (response && response.success) {
+              callback(response.url);
+              return;
+            }
+
+            callback();
+          }
+        );
+      } else {
+        callback();
       }
     },
 
-    enableStyling(): void {
-      if (this.tab && this.tab.id) {
-        chrome.tabs.sendRequest(this.tab.id, { name: 'enableStyling' });
-      }
+    enableStyle(): void {
+      const backgroundPage = chrome.extension.getBackgroundPage() as any;
+      backgroundPage.cache.styles.toggle(this.computedStyleUrl, true, true);
+      this.isEnabled = true;
+    },
+
+    disableStyle(): void {
+      const backgroundPage = chrome.extension.getBackgroundPage() as any;
+      backgroundPage.cache.styles.toggle(this.computedStyleUrl, false, true);
+      this.isEnabled = false;
     },
   },
 });

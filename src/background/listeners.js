@@ -47,12 +47,31 @@ const init = () => {
         sendResponse(window.cache.styles.getGlobalRules());
         break;
 
+      case 'getComputedStyleUrlForTab':
+        if (window.cache.styles.getComputedStyleUrlForTab) {
+          const url = window.cache.styles.getComputedStyleUrlForTab(
+            request.url
+          );
+
+          if (url) {
+            response = { url, success: true };
+          } else {
+            response = { success: false };
+          }
+        } else {
+          response = { success: false };
+        }
+
+        sendResponse(response);
+        break;
+
       case 'getCombinedRulesForPage':
         if (window.cache.styles.getCombinedRulesForPage) {
           response = window.cache.styles.getCombinedRulesForPage(
             request.url,
-            sender.tab || request.tab
+            sender.tab
           );
+
           response.success = true;
         } else {
           response = {
