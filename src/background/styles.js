@@ -1,3 +1,6 @@
+import BrowserAction from './browseraction';
+import { cloneObject, matchesPattern, isValidHTML } from './utils';
+
 /**
  * Styles object used by background.js
  * @constructor
@@ -14,8 +17,8 @@
     }
   }
  */
-function Styles(param) {
-  this.styles = param;
+function Styles(stylesObj) {
+  this.styles = stylesObj;
 
   this.AT_RULE_PREFIX = 'at';
   this.GLOBAL_URL = '*';
@@ -58,7 +61,7 @@ Styles.prototype.set = function (url, value) {
 
 Styles.prototype.persist = function () {
   chrome.storage.local.set({
-    styles: this.styles
+    styles: this.styles,
   });
 };
 
@@ -219,7 +222,7 @@ Styles.prototype.exists = function (aURL) {
  * @return {Object} rules: The rules. url: The identifier representing the URL.
  */
 Styles.prototype.getCombinedRulesForPage = function (aURL, tab) {
-  if (!aURL.isOfHTMLType()) {
+  if (!isValidHTML(aURL)) {
     return {
       url: null,
       rules: null,
@@ -243,7 +246,7 @@ Styles.prototype.getCombinedRulesForPage = function (aURL, tab) {
   for (var url in this.styles) {
     if (!this.isEnabled(url) || url === this.GLOBAL_URL) continue;
 
-    if (aURL.matchesPattern(url)) {
+    if (matchesPattern(aURL, url)) {
       if (!found) found = true;
 
       if (url.length > pageURL.length) {
@@ -265,14 +268,14 @@ Styles.prototype.getCombinedRulesForPage = function (aURL, tab) {
     global: this.expandRules(globalRules),
   };
 
-  cache.loadingTabs[tab.id] = response;
+  window.cache.loadingTabs[tab.id] = response;
   BrowserAction.update(tab);
 
   return response;
 };
 
 Styles.prototype.getCombinedRulesForIframe = function (aURL, tab) {
-  var response = cache.loadingTabs[tab.id];
+  var response = window.cache.loadingTabs[tab.id];
   return response ? response : this.getCombinedRulesForPage(aURL, tab);
 };
 
@@ -303,12 +306,13 @@ Styles.prototype.transfer = function (source, destination) {
 
 /**
  * Copy rules into another rules object while managing conflicts.
+ * @param {Object} _tab
  * @param {Object} src Rules that should be copied
  * @param {Object} dest Rules object where the new rules are to be copied
  * @param {Boolean} isPrimaryURL If the url for the source rules is the primary
  *   url for the page. Used to manage conflicts.
  */
-Styles.prototype.copyRules = function (tab, src, dest, isPrimaryURL) {
+Styles.prototype.copyRules = function (_tab, src, dest, isPrimaryURL) {
   for (var selector in src) {
     var rule = src[selector];
 
@@ -372,7 +376,7 @@ Styles.prototype.isImportRuleSelector = function (selector) {
  * @param {Object} rule The @import rule to expand
  */
 Styles.prototype.expandImportRule = function (rule) {
-  var css = cache.importRules[rule['url']];
+  var css = window.cache.importRules[rule['url']];
 
   if (css) {
     rule['expanded_text'] = css;
@@ -390,14 +394,14 @@ Styles.prototype.expandImportRule = function (rule) {
  * @param {Function} callback This method is passed the css for the @import rule
  */
 Styles.prototype.fetchImportCSS = function (url, callback) {
-  if (cache.importRules[url]) {
-    callback(cache.importRules[url]);
+  if (window.cache.importRules[url]) {
+    callback(window.cache.importRules[url]);
   } else {
     var xhr = new XMLHttpRequest();
     xhr.open('GET', url, true);
     xhr.onreadystatechange = function () {
       if (xhr.readyState == 4) {
-        cache.importRules[url] = xhr.responseText;
+        window.cache.importRules[url] = xhr.responseText;
         callback(xhr.responseText);
       }
     };
@@ -405,3 +409,5 @@ Styles.prototype.fetchImportCSS = function (url, callback) {
     xhr.send();
   }
 };
+
+export default Styles;

@@ -15,6 +15,7 @@ function init() {
   initializeTabs();
 
   backgroundPage = chrome.extension.getBackgroundPage();
+  console.log('backgroundPage', backgroundPage);
   var options = backgroundPage.cache.options;
 
   $.each(options, function (option, value) {

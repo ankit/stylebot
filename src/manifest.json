@@ -5,21 +5,13 @@
   "description": "Change the appearance of websites instantly.",
 
   "background": {
-    "scripts": [
-      "background/utils.js",
-      "background/styles.js",
-      "background/browseraction.js",
-      "background/contextmenu.js",
-      "background/options.js",
-      "background/version.js",
-      "background/listeners.js",
-      "background/init.js"
-    ]
+    "scripts": ["background.js"]
   },
 
   "options_page": "options/index.html",
 
-  "content_scripts": [{
+  "content_scripts": [
+    {
       "matches": ["<all_urls>"],
 
       "js": [

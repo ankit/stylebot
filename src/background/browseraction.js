@@ -1,5 +1,7 @@
+import { isValidUrl, isEmptyObject } from './utils';
+
 // Update the extension browser action
-var BrowserAction = {
+const BrowserAction = {
   init: function () {
     // Track when the browser action closes to do cleanup on the current page
     chrome.runtime.onConnect.addListener(function (port) {
@@ -79,8 +81,8 @@ var BrowserAction = {
    * @param {Object} tab The tab for which to update the browser action.
    */
   update: function (tab) {
-    if (tab.url.isValidUrl()) {
-      var response = cache.loadingTabs[tab.id];
+    if (isValidUrl(tab.url)) {
+      var response = window.cache.loadingTabs[tab.id];
       var stylingApplied = false;
 
       if (
@@ -104,3 +106,5 @@ var BrowserAction = {
     chrome.browserAction.disable(tabId);
   },
 };
+
+export default BrowserAction;

@@ -11,7 +11,7 @@ var VERSION = '2';
 /**
  * Show notification for version update
  */
-function showUpdateNotification() {
+const showUpdateNotification = () => {
   try {
     var notification = webkitNotifications.createHTMLNotification(
       'notification/index.html'
@@ -20,13 +20,13 @@ function showUpdateNotification() {
   } catch (e) {
     console.log(e);
   }
-}
+};
 
 /**
  * Updates the version of extension stored in storage
  * and data model if required.
  */
-function updateVersion(callback) {
+const update = callback => {
   chrome.storage.local.get(['version'], function (storage) {
     if (storage['version'] !== VERSION) {
       chrome.storage.local.set({ version: VERSION });
@@ -35,4 +35,6 @@ function updateVersion(callback) {
 
     callback();
   });
-}
+};
+
+export default { update };

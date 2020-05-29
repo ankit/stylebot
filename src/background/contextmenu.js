@@ -1,7 +1,9 @@
+import { isValidUrl } from './utils';
+
 /**
  * Right click menu
  */
-var ContextMenu = {
+const ContextMenu = {
   ID: 'stylebot',
 
   /**
@@ -9,7 +11,8 @@ var ContextMenu = {
    */
   init: function () {
     ContextMenu.remove();
-    if (cache.options.contextMenu) {
+
+    if (window.cache.options.contextMenu) {
       ContextMenu.create('Stylebot', null, null, null, ContextMenu.ID);
       ContextMenu.create('Style Element', ContextMenu.ID, 'openWidget');
       ContextMenu.create('View Options...', ContextMenu.ID, 'showOptions');
@@ -38,7 +41,8 @@ var ContextMenu = {
       } else {
         handler = function (info, tab) {
           chrome.tabs.sendRequest(
-            tab.id, {
+            tab.id,
+            {
               name: action,
             },
             function () {}
@@ -70,7 +74,7 @@ var ContextMenu = {
       return;
     }
 
-    if (tab.url.isValidUrl()) {
+    if (isValidUrl(tab.url)) {
       // If it is a valid url, show the contextMenu
       chrome.contextMenus.update(ContextMenu.ID, {
         documentUrlPatterns: ['<all_urls>'],
@@ -91,3 +95,5 @@ var ContextMenu = {
     chrome.contextMenus.removeAll();
   },
 };
+
+export default ContextMenu;
