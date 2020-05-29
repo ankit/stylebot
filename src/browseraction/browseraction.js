@@ -9,7 +9,7 @@ var BrowserAction = {
   /**
    * Initialize the browser action for the currently active tab
    */
-  init: function () {
+  init: function() {
     _.bindAll(
       this,
       'setup',
@@ -24,10 +24,11 @@ var BrowserAction = {
       'install'
     );
 
-    chrome.windows.getCurrent({
-        populate: true
+    chrome.windows.getCurrent(
+      {
+        populate: true,
       },
-      _.bind(function (aWindow) {
+      _.bind(function(aWindow) {
         var tabs = aWindow.tabs;
         var len = tabs.length;
 
@@ -44,7 +45,7 @@ var BrowserAction = {
   /**
    * Setup the UI and event listeners for the browser action
    */
-  setup: function (tab) {
+  setup: function(tab) {
     this.tab = tab;
 
     this.$menu = $('#menu');
@@ -73,12 +74,13 @@ var BrowserAction = {
    * Listener for mouseenter on reset option.
    * Trigger a preview after resetting any styling on the page.
    */
-  onResetMouseenter: function (e) {
+  onResetMouseenter: function(e) {
     chrome.tabs.sendRequest(
-      this.tab.id, {
+      this.tab.id,
+      {
         name: 'previewReset',
       },
-      function () {}
+      function() {}
     );
   },
 
@@ -86,12 +88,13 @@ var BrowserAction = {
    * Listener for mouseleave on reset option.
    * Reset preview of style reset.
    */
-  onResetMouseleave: function (e) {
+  onResetMouseleave: function(e) {
     chrome.tabs.sendRequest(
-      this.tab.id, {
+      this.tab.id,
+      {
         name: 'resetPreview',
       },
-      function () {}
+      function() {}
     );
   },
 
@@ -99,7 +102,7 @@ var BrowserAction = {
    * Listener for the mouseenter event on styles.
    * Trigger a preview of the style on the current page.
    */
-  onStyleMouseenter: function (e) {
+  onStyleMouseenter: function(e) {
     var $el = $(e.target),
       id;
 
@@ -110,7 +113,8 @@ var BrowserAction = {
     id = $el.data('id');
 
     chrome.tabs.sendRequest(
-      this.tab.id, {
+      this.tab.id,
+      {
         name: 'preview',
         description: $el.data('desc'),
         title: $el.data('title'),
@@ -119,7 +123,7 @@ var BrowserAction = {
         favCount: $el.data('favcount'),
         css: this.css[id],
       },
-      function () {}
+      function() {}
     );
   },
 
@@ -127,12 +131,13 @@ var BrowserAction = {
    * Listener for the mouseleave event on styles.
    * Reset the preview of the style.
    */
-  onStyleMouseleave: function (e) {
+  onStyleMouseleave: function(e) {
     chrome.tabs.sendRequest(
-      this.tab.id, {
+      this.tab.id,
+      {
         name: 'resetPreview',
       },
-      function (response) {}
+      function(response) {}
     );
   },
 
@@ -140,7 +145,7 @@ var BrowserAction = {
    * Install the clicked style on the current page.
    * Listener for the click event on styles.
    */
-  install: function (e) {
+  install: function(e) {
     var $el = $(e.target),
       id;
 
@@ -158,7 +163,8 @@ var BrowserAction = {
     id = $el.data('id');
 
     chrome.tabs.sendRequest(
-      this.tab.id, {
+      this.tab.id,
+      {
         name: 'install',
         id: id,
         title: $el.data('title'),
@@ -166,21 +172,24 @@ var BrowserAction = {
         url: $el.data('url'),
         css: this.css[id],
       },
-      function () {}
+      function() {}
     );
   },
 
   /**
    * Show stylebot on the current page.
    */
-  open: function (e) {
-    $(e.target).text('Opening...').addClass('disabled');
+  open: function(e) {
+    $(e.target)
+      .text('Opening...')
+      .addClass('disabled');
 
     chrome.tabs.sendRequest(
-      this.tab.id, {
+      this.tab.id,
+      {
         name: 'toggle',
       },
-      function () {}
+      function() {}
     );
 
     window.close();
@@ -189,7 +198,7 @@ var BrowserAction = {
   /**
    * Open the options page in a new tab.
    */
-  options: function (e) {
+  options: function(e) {
     chrome.tabs.create({
       url: 'options/index.html',
       active: true,
@@ -201,12 +210,13 @@ var BrowserAction = {
   /**
    * Reset the styling for the current page.
    */
-  reset: function (e) {
+  reset: function(e) {
     chrome.tabs.sendRequest(
-      this.tab.id, {
+      this.tab.id,
+      {
         name: 'reset',
       },
-      function () {}
+      function() {}
     );
   },
 
@@ -214,7 +224,7 @@ var BrowserAction = {
    * Listener for the click event on links in the browser action.
    * By default, links don't open in a browser action.
    */
-  openLink: function (e) {
+  openLink: function(e) {
     e.preventDefault();
 
     chrome.tabs.create({
@@ -224,6 +234,6 @@ var BrowserAction = {
   },
 };
 
-$(document).ready(function () {
+$(document).ready(function() {
   BrowserAction.init();
 });
