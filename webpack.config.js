@@ -3,6 +3,7 @@ const webpack = require('webpack');
 
 const CopyPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 const { VueLoaderPlugin } = require('vue-loader');
 const ExtensionReloader = require('webpack-extension-reloader');
@@ -12,20 +13,28 @@ const config = {
   context: __dirname + '/src',
   entry: {
     background: './background/index.js',
-    'browseraction/index': './browseraction/index.js',
+    'browseraction/index': './browseraction/index.ts',
   },
   output: {
     path: __dirname + '/dist',
     filename: '[name].js',
   },
   resolve: {
-    extensions: ['.js', '.vue'],
+    extensions: ['.ts', '.js', '.vue'],
   },
   module: {
     rules: [
       {
         test: /\.vue$/,
         loader: 'vue-loader',
+      },
+      {
+        test: /\.ts$/,
+        loader: 'ts-loader',
+        exclude: /node_modules/,
+        options: {
+          appendTsSuffixTo: [/\.vue$/],
+        },
       },
       {
         test: /\.css$/,
@@ -43,6 +52,7 @@ const config = {
       global: 'window',
     }),
     new VueLoaderPlugin(),
+    new ForkTsCheckerWebpackPlugin(),
     new MiniCssExtractPlugin({
       filename: '[name].css',
     }),
