@@ -4,9 +4,16 @@
       <button v-on:click="openStylebot">Open Stylebot...</button>
     </li>
 
-    <li v-if="computedStyleUrl">
-      <button v-if="isEnabled" v-on:click="disableStyle">Disable Styling</button>
-      <button v-else v-on:click="enableStyle">Enable Styling</button>
+    <li v-for="item in styleUrlMetadata" :key="item.url">
+      <button v-if="item.enabled" v-on:click="disableStyleUrl(item)">
+        Disable Styling for
+        <strong>{{ item.url }}</strong>
+      </button>
+
+      <button v-else v-on:click="enableStyleUrl(item)">
+        Enable Styling for
+        <strong>{{ item.url }}</strong>
+      </button>
     </li>
 
     <li>
@@ -23,13 +30,11 @@ export default Vue.extend({
 
   data(): {
     tab?: chrome.tabs.Tab;
-    isEnabled: boolean;
-    computedStyleUrl?: string;
+    styleUrlMetadata: Array<{ url: string; enabled: boolean }>;
   } {
     return {
       tab: undefined,
-      isEnabled: false,
-      computedStyleUrl: undefined,
+      styleUrlMetadata: [],
     };
   },
 
@@ -46,13 +51,9 @@ export default Vue.extend({
         name: 'activeTab',
       });
 
-      this.getComputedStyleUrl(url => {
-        this.computedStyleUrl = url;
-
-        const backgroundPage = chrome.extension.getBackgroundPage() as any;
-        this.isEnabled = backgroundPage.cache.styles.isEnabled(
-          this.computedStyleUrl
-        );
+      this.getStyleUrlMetadataForTab(styleUrlMetadata => {
+        console.log(styleUrlMetadata);
+        this.styleUrlMetadata = styleUrlMetadata;
       });
     });
   },
@@ -89,40 +90,42 @@ export default Vue.extend({
       window.close();
     },
 
-    getComputedStyleUrl(callback: (url?: string) => void): void {
-      if (this.tab && this.tab.url) {
-        chrome.extension.sendRequest(
-          { name: 'getComputedStyleUrlForTab', tab: this.tab },
-          response => {
-            if (response && response.success) {
-              callback(response.url);
-              return;
-            }
-
-            callback();
+    getStyleUrlMetadataForTab(
+      callback: (
+        styleUrlMetadata: Array<{ url: string; enabled: boolean }>
+      ) => void
+    ): void {
+      chrome.extension.sendRequest(
+        { name: 'getStyleUrlMetadataForTab', tab: this.tab },
+        response => {
+          if (response && response.success) {
+            callback(response.styleUrlMetadata);
+            return;
           }
-        );
-      } else {
-        callback();
-      }
+
+          callback([]);
+        }
+      );
     },
 
-    enableStyle(): void {
+    enableStyleUrl(styleUrlMetadata: { url: string; enabled: boolean }): void {
       chrome.extension.sendRequest({
         tab: this.tab,
-        name: 'enableStylesForTab',
+        name: 'enableStyleUrl',
+        styleUrl: styleUrlMetadata.url,
       });
 
-      this.isEnabled = true;
+      styleUrlMetadata.enabled = true;
     },
 
-    disableStyle(): void {
+    disableStyleUrl(styleUrlMetadata: { url: string; enabled: boolean }): void {
       chrome.extension.sendRequest({
         tab: this.tab,
-        name: 'disableStylesForTab',
+        name: 'disableStyleUrl',
+        styleUrl: styleUrlMetadata.url,
       });
 
-      this.isEnabled = false;
+      styleUrlMetadata.enabled = false;
     },
   },
 });

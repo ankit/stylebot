@@ -216,24 +216,22 @@ Styles.prototype.exists = function(aURL) {
   }
 };
 
-Styles.prototype.getComputedStyleUrlForTab = function(tab) {
+Styles.prototype.getStyleUrlMetadataForTab = function(tab) {
   if (!isValidHTML(tab.url)) {
     return null;
   }
 
-  let computedStyleUrl = '';
-
+  const styleUrlMetadata = [];
   for (const styleUrl in this.styles) {
-    if (styleUrl === this.GLOBAL_URL) continue;
-
     if (matchesPattern(tab.url, styleUrl)) {
-      if (styleUrl.length > computedStyleUrl.length) {
-        computedStyleUrl = styleUrl;
-      }
+      styleUrlMetadata.push({
+        url: styleUrl,
+        enabled: this.isEnabled(styleUrl),
+      });
     }
   }
 
-  return computedStyleUrl;
+  return styleUrlMetadata;
 };
 
 /**

@@ -47,19 +47,17 @@ const init = () => {
         sendResponse(window.cache.styles.getGlobalRules());
         break;
 
-      case 'getComputedStyleUrlForTab':
-        if (window.cache.styles.getComputedStyleUrlForTab) {
-          const url = window.cache.styles.getComputedStyleUrlForTab(
+      case 'getStyleUrlMetadataForTab':
+        {
+          const styleUrlMetadata = window.cache.styles.getStyleUrlMetadataForTab(
             request.tab
           );
 
-          if (url) {
-            response = { url, success: true };
+          if (styleUrlMetadata) {
+            response = { styleUrlMetadata, success: true };
           } else {
             response = { success: false };
           }
-        } else {
-          response = { success: false };
         }
 
         sendResponse(response);
@@ -95,33 +93,25 @@ const init = () => {
         sendResponse(response);
         break;
 
-      case 'enableStylesForTab':
+      case 'enableStyleUrl':
         {
-          const computedStyleUrl = window.cache.styles.getComputedStyleUrlForTab(
-            request.tab
-          );
+          window.cache.styles.toggle(request.styleUrl, true, true);
+          window.cache.styles.enableStylesForTab(request.styleUrl, request.tab);
 
-          window.cache.styles.toggle(computedStyleUrl, true, true);
-          window.cache.styles.enableStylesForTab(computedStyleUrl, request.tab);
-
-          BrowserAction.highlight(request.tab);
+          // BrowserAction.highlight(request.tab);
         }
 
         break;
 
-      case 'disableStylesForTab':
+      case 'disableStyleUrl':
         {
-          const computedStyleUrl = window.cache.styles.getComputedStyleUrlForTab(
-            request.tab
-          );
-
-          window.cache.styles.toggle(computedStyleUrl, false, true);
+          window.cache.styles.toggle(request.styleUrl, false, true);
           window.cache.styles.disableStylesForTab(
-            computedStyleUrl,
+            request.styleUrl,
             request.tab
           );
 
-          BrowserAction.unhighlight(request.tab);
+          // BrowserAction.unhighlight(request.tab);
         }
 
         break;
