@@ -4,7 +4,7 @@
       <button v-on:click="openStylebot">Open Stylebot...</button>
     </li>
 
-    <li>
+    <li v-if="computedStyleUrl">
       <button v-if="isEnabled" v-on:click="disableStyle">Disable Styling</button>
       <button v-else v-on:click="enableStyle">Enable Styling</button>
     </li>
