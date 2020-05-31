@@ -63,7 +63,7 @@ export const cloneObject = obj => JSON.parse(JSON.stringify(obj));
  */
 export const isEmptyObject = obj => {
   var isEmpty = true;
-  for (keys in obj) {
+  for (let keys in obj) {
     isEmpty = false;
     break;
   }

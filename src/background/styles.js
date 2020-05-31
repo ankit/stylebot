@@ -158,7 +158,16 @@ Styles.prototype.deleteAll = function() {
  * @return {Boolean} True if the requested style exists.
  */
 Styles.prototype.isEmpty = function(url) {
-  return this.styles[url] === undefined || this.styles[url] == null;
+  if (!this.styles[url]) {
+    return true;
+  }
+
+  const rules = this.getRules(url);
+  if (!rules || Object.keys(rules).length === 0) {
+    return true;
+  }
+
+  return false;
 };
 
 /**
@@ -195,7 +204,7 @@ Styles.prototype.import = function(newStyles) {
  * @return {Object} The style rules for the URL, if it exists. Else, null.
  */
 Styles.prototype.getRules = function(url) {
-  if (this.styles[url] === undefined) {
+  if (!this.styles[url]) {
     return null;
   }
 
@@ -223,7 +232,7 @@ Styles.prototype.getStyleUrlMetadataForTab = function(tab) {
 
   const styleUrlMetadata = [];
   for (const styleUrl in this.styles) {
-    if (matchesPattern(tab.url, styleUrl)) {
+    if (matchesPattern(tab.url, styleUrl) && !this.isEmpty(styleUrl)) {
       styleUrlMetadata.push({
         url: styleUrl,
         enabled: this.isEnabled(styleUrl),
@@ -305,8 +314,7 @@ Styles.prototype.getComputedStylesForIframe = function(aURL, tab) {
 };
 
 /**
- * Retrieve all the global rules.
- *   The global rules are stored for the url '*'
+ * Retrieve all the global rules. The global rules are stored for the url '*'
  * @return {Object} The rules of the global stylesheet.
  */
 Styles.prototype.getGlobalRules = function() {
