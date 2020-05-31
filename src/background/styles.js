@@ -416,18 +416,13 @@ Styles.prototype.fetchImportCSS = function(url, callback) {
   }
 };
 
-Styles.prototype.enableStylesForTab = function(styleUrl, tab) {
-  const rules = this.getRules(styleUrl);
+Styles.prototype.updateStylesForTab = function(tab) {
+  const response = this.getComputedStylesForTab(tab);
 
   chrome.tabs.sendRequest(tab.id, {
-    name: 'enableStyles',
-    rules: rules,
-  });
-};
-
-Styles.prototype.disableStylesForTab = function(url, tab) {
-  chrome.tabs.sendRequest(tab.id, {
-    name: 'disableStyles',
+    name: 'updateStyles',
+    url: response.url,
+    rules: response.rules,
   });
 };
 

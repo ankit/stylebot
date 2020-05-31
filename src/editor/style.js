@@ -526,17 +526,10 @@ stylebot.style = {
     }, 0);
   },
 
-  /**
-   * Disable styling for the page-specific styling for this page.
-   */
-  disable: function() {
-    CSSUtils.removeCSS(this.PAGE_STYLE_ID);
-  },
+  update: function(url, rules) {
+    this.cache.url = url;
+    this.rules = rules;
 
-  /**
-   * Enable styling for the page-specific styling for this page.
-   */
-  enable: function() {
     CSSUtils.crunchCSS(this.rules, true, true, css => {
       CSSUtils.injectCSS(css, this.PAGE_STYLE_ID);
     });

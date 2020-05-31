@@ -96,21 +96,7 @@ const init = () => {
       case 'enableStyleUrl':
         {
           window.cache.styles.toggle(request.styleUrl, true, true);
-          window.cache.styles.enableStylesForTab(request.styleUrl, request.tab);
-
-          const styleUrlMetadata = window.cache.styles.getStyleUrlMetadataForTab(
-            request.tab
-          );
-
-          if (styleUrlMetadata) {
-            const enabledStyleUrls = styleUrlMetadata.filter(
-              item => item.enabled
-            );
-
-            if (enabledStyleUrls.length > 0) {
-              BrowserAction.highlight(request.tab);
-            }
-          }
+          window.cache.styles.updateStylesForTab(request.tab);
         }
 
         break;
@@ -118,24 +104,7 @@ const init = () => {
       case 'disableStyleUrl':
         {
           window.cache.styles.toggle(request.styleUrl, false, true);
-          window.cache.styles.disableStylesForTab(
-            request.styleUrl,
-            request.tab
-          );
-
-          const styleUrlMetadata = window.cache.styles.getStyleUrlMetadataForTab(
-            request.tab
-          );
-
-          if (styleUrlMetadata) {
-            const enabledStyleUrls = styleUrlMetadata.filter(
-              item => item.enabled
-            );
-
-            if (enabledStyleUrls.length === 0) {
-              BrowserAction.unhighlight(request.tab);
-            }
-          }
+          window.cache.styles.updateStylesForTab(request.tab);
         }
 
         break;

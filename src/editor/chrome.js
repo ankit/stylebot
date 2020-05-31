@@ -171,10 +171,7 @@ chrome.extension.onRequest.addListener(function(
     stylebot.setOptions(request.options);
   } else if (request.name === 'openWidget') {
     stylebot.contextmenu.openWidget();
-  } else if (request.name === 'enableStyles') {
-    stylebot.style.rules = request.rules;
-    stylebot.style.enable();
-  } else if (request.name === 'disableStyles') {
-    stylebot.style.disable();
+  } else if (request.name === 'updateStyles') {
+    stylebot.style.update(request.url, request.rules);
   }
 });
