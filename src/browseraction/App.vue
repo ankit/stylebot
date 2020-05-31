@@ -30,7 +30,9 @@
           </v-list-item-icon>
 
           <v-list-item-content>
-            <v-list-item-title>{{ item.url }}</v-list-item-title>
+            <v-list-item-title>{{
+              item.url !== '*' ? item.url : 'Global Stylesheet'
+            }}</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
 
