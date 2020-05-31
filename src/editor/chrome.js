@@ -141,6 +141,13 @@ stylebot.chrome = {
       name: 'showOptions',
     });
   },
+
+  enableStyleUrl: function(url) {
+    chrome.extension.sendRequest({
+      name: 'enableStyleUrl',
+      styleUrl: url,
+    });
+  },
 };
 
 /**

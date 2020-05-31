@@ -29,7 +29,7 @@ stylebot.style = {
     // last selected elements
     elements: null,
     // url for which styles will be saved
-    url: document.domain,
+    url: '',
   },
 
   /**
@@ -41,11 +41,12 @@ stylebot.style = {
     if (stylebotTempUrl) {
       this.cache.url = stylebotTempUrl;
       stylebotTempUrl = null;
-    }
-
-    // if domain is empty, return url
-    else if (!this.cache.url || this.cache.url === '') {
-      this.cache.url = location.href;
+    } else {
+      if (document.domain) {
+        this.cache.url = document.domain;
+      } else {
+        this.cache.url = location.href;
+      }
     }
 
     if (stylebotTempRules) {
@@ -527,8 +528,23 @@ stylebot.style = {
   },
 
   update: function(url, rules) {
-    this.cache.url = url;
-    this.rules = rules;
+    if (url) {
+      this.cache.url = url;
+    } else {
+      if (document.domain) {
+        this.cache.url = document.domain;
+      } else {
+        this.cache.url = location.href;
+      }
+    }
+
+    stylebot.widget.cache.url.html(this.cache.url);
+
+    if (rules) {
+      this.rules = rules;
+    } else {
+      this.rules = {};
+    }
 
     CSSUtils.crunchCSS(this.rules, true, true, css => {
       CSSUtils.injectCSS(css, this.PAGE_STYLE_ID);

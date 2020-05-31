@@ -151,8 +151,8 @@ Styles.prototype.deleteAll = function() {
 };
 
 /**
- * Check if the style for the given identifier exists.
- * @param {String} url The style's identifier.
+ * Check if the style for the given URL exists.
+ * @param {String} url The style's URL.
  * @return {Boolean} True if the requested style exists.
  */
 Styles.prototype.isEmpty = function(url) {

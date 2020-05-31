@@ -66,6 +66,12 @@ var stylebot = {
     this.chrome.setBrowserAction(true);
     this.enableSelection();
     attachKeyboardShortcuts();
+
+    // If no styling is applied, enable any existing style
+    // for the current URL if it exists
+    if (Object.keys(this.style.rules).length === 0) {
+      this.chrome.enableStyleUrl(this.style.cache.url);
+    }
   },
 
   /**

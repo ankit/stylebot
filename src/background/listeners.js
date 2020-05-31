@@ -50,7 +50,7 @@ const init = () => {
       case 'getStyleUrlMetadataForTab':
         {
           const styleUrlMetadata = window.cache.styles.getStyleUrlMetadataForTab(
-            request.tab
+            sender.tab || request.tab
           );
 
           if (styleUrlMetadata) {
@@ -95,16 +95,20 @@ const init = () => {
 
       case 'enableStyleUrl':
         {
-          window.cache.styles.toggle(request.styleUrl, true, true);
-          window.cache.styles.updateStylesForTab(request.tab);
+          if (!window.cache.styles.isEmpty(request.styleUrl)) {
+            window.cache.styles.toggle(request.styleUrl, true, true);
+            window.cache.styles.updateStylesForTab(sender.tab || request.tab);
+          }
         }
 
         break;
 
       case 'disableStyleUrl':
         {
-          window.cache.styles.toggle(request.styleUrl, false, true);
-          window.cache.styles.updateStylesForTab(request.tab);
+          if (!window.cache.styles.isEmpty(request.styleUrl)) {
+            window.cache.styles.toggle(request.styleUrl, false, true);
+            window.cache.styles.updateStylesForTab(sender.tab || request.tab);
+          }
         }
 
         break;
