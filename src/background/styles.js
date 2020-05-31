@@ -251,7 +251,6 @@ Styles.prototype.getComputedStylesForTab = function(tab) {
   }
 
   let rules = {};
-  let found = false;
   let computedStyleUrl = '';
 
   for (const styleUrl in this.styles) {
@@ -260,10 +259,6 @@ Styles.prototype.getComputedStylesForTab = function(tab) {
     }
 
     if (matchesPattern(tab.url, styleUrl)) {
-      if (!found) {
-        found = true;
-      }
-
       if (styleUrl.length > computedStyleUrl.length) {
         computedStyleUrl = styleUrl;
       }
@@ -277,12 +272,12 @@ Styles.prototype.getComputedStylesForTab = function(tab) {
     }
   }
 
-  if (!found) {
+  if (!computedStyleUrl) {
     rules = null;
     computedStyleUrl = null;
   }
 
-  var response = {
+  const response = {
     rules: rules,
     url: computedStyleUrl,
   };
