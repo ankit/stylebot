@@ -21,8 +21,6 @@ function Styles(stylesObj) {
   this.styles = stylesObj;
 
   this.AT_RULE_PREFIX = 'at';
-  this.GLOBAL_URL = '*';
-
   this.RULES_PROPERTY = '_rules';
   this.ENABLED_PROPERTY = '_enabled';
 }
@@ -218,11 +216,7 @@ Styles.prototype.getRules = function(url) {
  * @return {Boolean} True if any rules are associated with the URL
  */
 Styles.prototype.exists = function(aURL) {
-  if (this.isEnabled(aURL) && aURL !== this.GLOBAL_URL) {
-    return true;
-  } else {
-    return false;
-  }
+  return this.isEnabled(aURL);
 };
 
 Styles.prototype.getStyleUrlMetadataForTab = function(tab) {
@@ -244,7 +238,7 @@ Styles.prototype.getStyleUrlMetadataForTab = function(tab) {
 };
 
 /**
- * Retrieve all the CSS rules applicable to the URL, including global CSS rules.
+ * Retrieve all the CSS rules applicable to the URL
  * @param {String} aURL The URL to retrieve the rules for.
  * @return {Object} rules: The rules. url: The identifier representing the URL.
  */
@@ -253,25 +247,17 @@ Styles.prototype.getComputedStylesForTab = function(tab) {
     return {
       url: null,
       rules: null,
-      global: null,
     };
   }
 
-  var rules = {};
-  var globalRules = null;
-  var computedStyleUrl = '';
+  let rules = {};
+  let found = false;
+  let computedStyleUrl = '';
 
-  if (!this.isEmpty(this.GLOBAL_URL) && this.isEnabled(this.GLOBAL_URL)) {
-    globalRules = this.getRules(this.GLOBAL_URL);
-  }
-
-  // this will contain the combined set of evaluated rules to be applied to
-  // the page. longer, more specific URLs get the priority for each selector
-  // and property
-  var found = false;
-
-  for (var styleUrl in this.styles) {
-    if (!this.isEnabled(styleUrl) || styleUrl === this.GLOBAL_URL) continue;
+  for (const styleUrl in this.styles) {
+    if (!this.isEnabled(styleUrl)) {
+      continue;
+    }
 
     if (matchesPattern(tab.url, styleUrl)) {
       if (!found) {
@@ -299,7 +285,6 @@ Styles.prototype.getComputedStylesForTab = function(tab) {
   var response = {
     rules: rules,
     url: computedStyleUrl,
-    global: this.expandRules(globalRules),
   };
 
   window.cache.loadingTabs[tab.id] = response;
@@ -311,18 +296,6 @@ Styles.prototype.getComputedStylesForTab = function(tab) {
 Styles.prototype.getComputedStylesForIframe = function(aURL, tab) {
   var response = window.cache.loadingTabs[tab.id];
   return response ? response : this.getCombinedRulesForPage(aURL, tab);
-};
-
-/**
- * Retrieve all the global rules. The global rules are stored for the url '*'
- * @return {Object} The rules of the global stylesheet.
- */
-Styles.prototype.getGlobalRules = function() {
-  if (this.isEmpty(this.GLOBAL_URL) || !this.isEnabled(this.GLOBAL_URL)) {
-    return null;
-  }
-
-  return this.getRules(this.GLOBAL_URL);
 };
 
 /**

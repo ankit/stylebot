@@ -1,9 +1,10 @@
+/* eslint-disable no-undef */
 /**
  * Stylebot Options
  */
 var Options = {};
 
-$(document).ready(function () {
+$(document).ready(function() {
   init();
 });
 
@@ -18,7 +19,7 @@ function init() {
   console.log('backgroundPage', backgroundPage);
   var options = backgroundPage.cache.options;
 
-  $.each(options, function (option, value) {
+  $.each(options, function(option, value) {
     var $el = $('[name=' + option + ']');
     var el = $el.get(0);
 
@@ -56,17 +57,23 @@ function init() {
 
 // Initialize tabs
 function initializeTabs() {
-  $('ul.menu li:first').addClass('tabActive').show();
+  $('ul.menu li:first')
+    .addClass('tabActive')
+    .show();
   $('#options > div').hide();
   $('#basics').show();
 
-  $('ul.menu').on('click', 'li', function () {
+  $('ul.menu').on('click', 'li', function() {
     $('ul.menu li').removeClass('tabActive');
     $(this).addClass('tabActive');
     $('#options > div').hide();
 
     // Fade in the correct DIV.
-    var activeTab = $($(this).find('a').attr('href')).fadeIn();
+    var activeTab = $(
+      $(this)
+        .find('a')
+        .attr('href')
+    ).fadeIn();
     return false;
   });
 }
@@ -77,26 +84,26 @@ function initializeTabs() {
 function attachListeners() {
   // Checkboxes.
   $('#basics')
-    .on('change', 'input[type=checkbox]', function (e) {
+    .on('change', 'input[type=checkbox]', function(e) {
       var name = e.target.name;
       var value = translateOptionValue(name, e.target.checked);
       backgroundPage.saveOption(name, value);
     })
 
     // Radio buttons.
-    .on('change', 'input[type=radio]', function (e) {
+    .on('change', 'input[type=radio]', function(e) {
       var name = e.target.name;
       var value = translateOptionValue(name, e.target.value);
       backgroundPage.saveOption(name, value);
     })
 
     // Select boxes.
-    .on('change', 'select', function (e) {
+    .on('change', 'select', function(e) {
       backgroundPage.saveOption(e.target.name, e.target.value);
     })
 
     // Textfields.
-    .on('keyup', 'input[type=text]', function (e) {
+    .on('keyup', 'input[type=text]', function(e) {
       if (e.target.name === 'shortcutKeyCharacter') {
         option = 'shortcutKey';
       } else {
@@ -108,7 +115,7 @@ function attachListeners() {
       );
     });
 
-  $(window).resize(function (e) {
+  $(window).resize(function(e) {
     Options.modal.resize();
   });
 

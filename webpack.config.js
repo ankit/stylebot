@@ -106,6 +106,10 @@ const config = {
           to: "shared",
         },
         {
+          from: "options",
+          to: "options",
+        },
+        {
           from: "options/index.html",
           to: "options/index.html",
           transform: transformHtml,

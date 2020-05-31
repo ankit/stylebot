@@ -73,10 +73,7 @@ const BrowserAction = {
       var response = window.cache.loadingTabs[tab.id];
       var stylingApplied = false;
 
-      if (
-        response &&
-        (response.rules || (response.global && !isEmptyObject(response.global)))
-      ) {
+      if (response && response.rules) {
         stylingApplied = true;
       }
 

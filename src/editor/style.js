@@ -6,12 +6,7 @@
  */
 stylebot.style = {
   AT_RULE_PREFIX: 'at',
-
-  STYLE_SELECTOR: '#stylebot-css',
-  GLOBAL_STYLE_SELECTOR: '#stylebot-global-css',
-  PREVIEW_SELECTOR: '#stylebot-preview',
-
-  PREVIEW_FADE_OUT_DELAY: 500,
+  PAGE_STYLE_ID: 'stylebot-css',
 
   /*
     cache of custom CSS rules applied to elements on the current page
@@ -25,7 +20,6 @@ stylebot.style = {
     }
   */
   rules: {},
-  global: {},
   timer: null,
   parser: null,
 
@@ -36,8 +30,6 @@ stylebot.style = {
     elements: null,
     // url for which styles will be saved
     url: document.domain,
-    // Stylebot <style> element
-    $style: null,
   },
 
   /**
@@ -59,11 +51,6 @@ stylebot.style = {
     if (stylebotTempRules) {
       this.rules = stylebotTempRules;
       stylebotTempRules = null;
-    }
-
-    if (stylebotTempGlobalRules) {
-      this.global = stylebotTempGlobalRules;
-      stylebotTempGlobalRules = null;
     }
   },
 
@@ -422,23 +409,9 @@ stylebot.style = {
    * @param {array} rules The style rules to apply
    */
   applyToStyleElement: function(rules) {
-    if (!this.cache.$style) {
-      this.cache.$style = $(this.STYLE_SELECTOR);
-    }
-
-    CSSUtils.crunchCSS(
-      rules,
-      true,
-      true,
-      _.bind(function(css) {
-        if (this.cache.$style.length !== 0) {
-          this.cache.$style.html(css);
-        } else {
-          CSSUtils.injectCSS(css, 'stylebot-css');
-          this.cache.$style = $(this.STYLE_SELECTOR);
-        }
-      }, this)
-    );
+    CSSUtils.crunchCSS(rules, true, true, css => {
+      CSSUtils.injectCSS(css, this.PAGE_STYLE_ID);
+    });
   },
 
   /**
@@ -557,11 +530,7 @@ stylebot.style = {
    * Disable styling for the page-specific styling for this page.
    */
   disable: function() {
-    $(this.STYLE_SELECTOR).html('');
-
-    if (this.cache.$style) {
-      this.cache.$style.html('');
-    }
+    CSSUtils.removeCSS(this.PAGE_STYLE_ID);
   },
 
   /**
@@ -569,11 +538,7 @@ stylebot.style = {
    */
   enable: function() {
     CSSUtils.crunchCSS(this.rules, true, true, css => {
-      $(this.STYLE_SELECTOR).html(css);
-
-      if (this.cache.$style) {
-        this.cache.$style.html(css);
-      }
+      CSSUtils.injectCSS(css, this.PAGE_STYLE_ID);
     });
   },
 
@@ -622,15 +587,10 @@ stylebot.style = {
    * @param {String} css The CSS to apply to the page.
    */
   resetPreview: function() {
-    if (this.rules && this.cache.$style) {
-      CSSUtils.crunchCSS(
-        this.rules,
-        true,
-        true,
-        _.bind(function(css) {
-          this.cache.$style.html(css);
-        }, this)
-      );
+    if (this.rules) {
+      CSSUtils.crunchCSS(this.rules, true, true, css => {
+        CSSUtils.injectCSS(css, this.PAGE_STYLE_ID);
+      });
     }
 
     this.hidePreviewPopover();
@@ -641,7 +601,7 @@ stylebot.style = {
    * @param {String} html The content to display inside the popover
    */
   showPreviewPopover: function(html) {
-    var $preview = $(this.PREVIEW_SELECTOR);
+    var $preview = $('#stylebot-preview');
 
     if ($preview.length === 0) {
       $preview = $('<div>', {
@@ -663,14 +623,14 @@ stylebot.style = {
    * @param {Boolean} shouldFadeOut If the popover should fade out
    */
   hidePreviewPopover: function(shouldFadeOut) {
-    var $preview = $(this.PREVIEW_SELECTOR);
+    var $preview = $('#stylebot-preview');
 
     if (shouldFadeOut) {
       setTimeout(
         $.proxy(function() {
           $preview.fadeOut(1000);
         }, this),
-        this.PREVIEW_FADE_OUT_DELAY
+        500
       );
     } else {
       $preview.hide();

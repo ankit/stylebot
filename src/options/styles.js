@@ -5,16 +5,13 @@ Options.styles = {
   init: function() {
     this.$container = $('#styles');
     this.$count = $('#style-count');
-    this.$globalButton = $('.toggle-global');
+
     this.fill();
     this.attachListeners();
-    this.updateGlobalButton();
   },
 
   attachListeners: function() {
     $('#styles-container')
-      .on('click', '.show-edit-global', $.proxy(this.showEditGlobal, this))
-      .on('click', '.toggle-global', $.proxy(this.toggleGlobal, this))
       .on('click', '.show-add-style', $.proxy(this.showAdd, this))
       .on('click', '.enable-all', $.proxy(this.enableAll, this))
       .on('click', '.disable-all', $.proxy(this.disableAll, this))
@@ -76,12 +73,10 @@ Options.styles = {
   fill: function() {
     this.$container.html('');
     var styles = backgroundPage.cache.styles.get();
+
     var counter = 0;
 
     for (var url in styles) {
-      // Global style is shown separately.
-      if (url === '*') continue;
-
       this.$container.prepend(
         this.render(url, backgroundPage.cache.styles.isEnabled(url), counter++)
       );
@@ -139,11 +134,6 @@ Options.styles = {
     if (url === '') {
       Options.modal.showError('Please enter a URL.');
       return false;
-    } else if (url === '*') {
-      Options.modal.showError(
-        '* is used for the global stylesheet. Please enter another URL.'
-      );
-      return false;
     }
 
     if (css === '') {
@@ -179,20 +169,9 @@ Options.styles = {
     }
   },
 
-  editGlobal: function() {
-    if (this.save('*', Options.modal.getCode())) {
-      Options.modal.close();
-    }
-  },
-
   save: function(url, css, previousURL) {
-    if (url != '*') {
-      if (!this.validate(url, css)) {
-        return false;
-      }
-    } else if (css === '') {
-      backgroundPage.cache.styles.emptyRules('*');
-      return true;
+    if (!this.validate(url, css)) {
+      return false;
     }
 
     var parser = new CSSParser();
@@ -247,40 +226,6 @@ Options.styles = {
 
   updateCount: function() {
     this.$count.text(this.count);
-  },
-
-  updateGlobalButton: function() {
-    this.$globalButton.html(
-      backgroundPage.cache.styles.isEnabled('*')
-        ? 'Disable Global Stylesheet'
-        : 'Enable Global Stylesheet'
-    );
-  },
-
-  toggleGlobal: function() {
-    if (!backgroundPage.cache.styles.toggle('*', null, true)) {
-      backgroundPage.cache.styles.create('*');
-    }
-
-    this.updateGlobalButton();
-  },
-
-  showEditGlobal: function(e) {
-    var rules = backgroundPage.cache.styles.getRules('*');
-
-    if (!rules) {
-      backgroundPage.cache.styles.create('*');
-      rules = {};
-    }
-
-    CSSUtils.crunchFormattedCSS(rules, false, false, function(css) {
-      Options.modal.init({
-        editor: true,
-        edit: true,
-        global: true,
-        code: css,
-      });
-    });
   },
 
   showEdit: function(e) {

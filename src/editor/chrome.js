@@ -13,10 +13,7 @@ stylebot.chrome = {
       chrome.extension.sendRequest({
         name: 'activateBrowserAction',
       });
-    } else if (
-      !$.isEmptyObject(stylebot.style.rules) ||
-      !$.isEmptyObject(stylebot.style.global)
-    ) {
+    } else if (!$.isEmptyObject(stylebot.style.rules)) {
       chrome.extension.sendRequest({
         name: 'highlightBrowserAction',
       });
@@ -164,9 +161,6 @@ chrome.extension.onRequest.addListener(function(
       rules: $.isEmptyObject(stylebot.style.rules)
         ? null
         : stylebot.style.rules,
-      global: $.isEmptyObject(stylebot.style.global)
-        ? null
-        : stylebot.style.global,
     });
   } else if (request.name === 'toggle') {
     stylebot.toggle();
