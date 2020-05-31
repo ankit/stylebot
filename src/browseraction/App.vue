@@ -1,38 +1,77 @@
 <template>
-  <ul v-if="tab && tab.id">
-    <li>
-      <button v-on:click="openStylebot">Open Stylebot...</button>
-    </li>
+  <v-app>
+    <v-card class="mx-auto" min-height="120" width="320">
+      <v-list v-if="tab && tab.id" class="py-0">
+        <v-list-item link :ripple="false" @click="openStylebot">
+          <v-list-item-icon class="mr-6">
+            <v-icon>{{ icons.edit }}</v-icon>
+          </v-list-item-icon>
 
-    <li v-for="item in styleUrlMetadata" :key="item.url">
-      <button v-if="item.enabled" v-on:click="disableStyleUrl(item)">
-        Disable Styling for
-        <strong>{{ item.url }}</strong>
-      </button>
+          <v-list-item-content>
+            <v-list-item-title>Open Stylebot...</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
 
-      <button v-else v-on:click="enableStyleUrl(item)">
-        Enable Styling for
-        <strong>{{ item.url }}</strong>
-      </button>
-    </li>
+        <v-list-item
+          link
+          :key="item.url"
+          :ripple="false"
+          v-bind:class="{
+            'green lighten-4': item.enabled,
+          }"
+          v-for="item in styleUrlMetadata"
+          @click="toggleStyleUrl(item)"
+        >
+          <v-list-item-icon class="mr-6">
+            <v-icon v-if="item.enabled" class="green--text text--darken-4">{{
+              icons.styleEnabled
+            }}</v-icon>
+            <v-icon v-else>{{ icons.styleDisabled }}</v-icon>
+          </v-list-item-icon>
 
-    <li>
-      <button v-on:click="openOptions">Options...</button>
-    </li>
-  </ul>
+          <v-list-item-content>
+            <v-list-item-title>{{ item.url }}</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-list-item link :ripple="false" @click="openOptions">
+          <v-list-item-icon class="mr-6">
+            <v-icon>{{ icons.cog }}</v-icon>
+          </v-list-item-icon>
+
+          <v-list-item-content>
+            <v-list-item-title>Options...</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list>
+    </v-card>
+  </v-app>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
+import { mdiCog, mdiImageEdit, mdiEye, mdiEyeOffOutline } from '@mdi/js';
 
 export default Vue.extend({
   name: 'App',
 
   data(): {
+    icons: {
+      cog: string;
+      edit: string;
+      styleEnabled: string;
+      styleDisabled: string;
+    };
     tab?: chrome.tabs.Tab;
     styleUrlMetadata: Array<{ url: string; enabled: boolean }>;
   } {
     return {
+      icons: {
+        cog: mdiCog,
+        edit: mdiImageEdit,
+        styleEnabled: mdiEye,
+        styleDisabled: mdiEyeOffOutline,
+      },
       tab: undefined,
       styleUrlMetadata: [],
     };
@@ -52,7 +91,6 @@ export default Vue.extend({
       });
 
       this.getStyleUrlMetadataForTab(styleUrlMetadata => {
-        console.log(styleUrlMetadata);
         this.styleUrlMetadata = styleUrlMetadata;
       });
     });
@@ -108,31 +146,44 @@ export default Vue.extend({
       );
     },
 
-    enableStyleUrl(styleUrlMetadata: { url: string; enabled: boolean }): void {
+    toggleStyleUrl(styleUrlMetadataItem: {
+      url: string;
+      enabled: boolean;
+    }): void {
+      if (styleUrlMetadataItem.enabled) {
+        this.disableStyleUrl(styleUrlMetadataItem);
+      } else {
+        this.enableStyleUrl(styleUrlMetadataItem);
+      }
+    },
+
+    enableStyleUrl(styleUrlMetadataItem: {
+      url: string;
+      enabled: boolean;
+    }): void {
       chrome.extension.sendRequest({
         tab: this.tab,
         name: 'enableStyleUrl',
-        styleUrl: styleUrlMetadata.url,
+        styleUrl: styleUrlMetadataItem.url,
       });
 
-      styleUrlMetadata.enabled = true;
+      styleUrlMetadataItem.enabled = true;
     },
 
-    disableStyleUrl(styleUrlMetadata: { url: string; enabled: boolean }): void {
+    disableStyleUrl(styleUrlMetadataItem: {
+      url: string;
+      enabled: boolean;
+    }): void {
       chrome.extension.sendRequest({
         tab: this.tab,
         name: 'disableStyleUrl',
-        styleUrl: styleUrlMetadata.url,
+        styleUrl: styleUrlMetadataItem.url,
       });
 
-      styleUrlMetadata.enabled = false;
+      styleUrlMetadataItem.enabled = false;
     },
   },
 });
 </script>
 
-<style scoped>
-p {
-  font-size: 20px;
-}
-</style>
+<style scoped></style>

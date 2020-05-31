@@ -1,36 +1,38 @@
-const ejs = require('ejs');
-const webpack = require('webpack');
+const ejs = require("ejs");
+const webpack = require("webpack");
 
-const CopyPlugin = require('copy-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const CopyPlugin = require("copy-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 
-const { VueLoaderPlugin } = require('vue-loader');
-const ExtensionReloader = require('webpack-extension-reloader');
+const { VueLoaderPlugin } = require("vue-loader");
+const VuetifyLoaderPlugin = require("vuetify-loader/lib/plugin");
+
+const ExtensionReloader = require("webpack-extension-reloader");
 
 const config = {
   mode: process.env.NODE_ENV,
-  context: __dirname + '/src',
+  context: __dirname + "/src",
   entry: {
-    background: './background/index.js',
-    'browseraction/index': './browseraction/index.ts',
+    background: "./background/index.js",
+    "browseraction/index": "./browseraction/index.ts",
   },
   output: {
-    path: __dirname + '/dist',
-    filename: '[name].js',
+    path: __dirname + "/dist",
+    filename: "[name].js",
   },
   resolve: {
-    extensions: ['.ts', '.js', '.vue'],
+    extensions: [".ts", ".js", ".vue"],
   },
   module: {
     rules: [
       {
         test: /\.vue$/,
-        loader: 'vue-loader',
+        loader: "vue-loader",
       },
       {
         test: /\.ts$/,
-        loader: 'ts-loader',
+        loader: "ts-loader",
         exclude: /node_modules/,
         options: {
           appendTsSuffixTo: [/\.vue$/],
@@ -38,79 +40,104 @@ const config = {
       },
       {
         test: /\.css$/,
-        use: [MiniCssExtractPlugin.loader, 'css-loader'],
+        use: [MiniCssExtractPlugin.loader, "css-loader"],
+      },
+      {
+        test: /\.s(c|a)ss$/,
+        use: [
+          "vue-style-loader",
+          "css-loader",
+          {
+            loader: "sass-loader",
+            // Requires sass-loader@^7.0.0
+            options: {
+              implementation: require("sass"),
+              fiber: require("fibers"),
+              indentedSyntax: true, // optional
+            },
+            // Requires sass-loader@^8.0.0
+            options: {
+              implementation: require("sass"),
+              sassOptions: {
+                fiber: require("fibers"),
+                indentedSyntax: true, // optional
+              },
+            },
+          },
+        ],
       },
       {
         test: /\.js$/,
-        loader: 'babel-loader',
+        loader: "babel-loader",
         exclude: /node_modules/,
       },
     ],
   },
   plugins: [
     new webpack.DefinePlugin({
-      global: 'window',
+      global: "window",
     }),
     new VueLoaderPlugin(),
+    new VuetifyLoaderPlugin(),
     new ForkTsCheckerWebpackPlugin(),
     new MiniCssExtractPlugin({
-      filename: '[name].css',
+      filename: "[name].css",
     }),
     new CopyPlugin({
       patterns: [
         {
-          from: 'editor',
-          to: 'editor',
+          from: "editor",
+          to: "editor",
         },
         {
-          from: 'images',
-          to: 'images',
+          from: "images",
+          to: "images",
         },
         {
-          from: 'libs',
-          to: 'libs',
+          from: "libs",
+          to: "libs",
         },
         {
-          from: 'notification',
-          to: 'notification',
+          from: "notification",
+          to: "notification",
         },
         {
-          from: 'shared',
-          to: 'shared',
+          from: "shared",
+          to: "shared",
         },
         {
-          from: 'options/index.html',
-          to: 'options/index.html',
+          from: "options/index.html",
+          to: "options/index.html",
           transform: transformHtml,
         },
         {
-          from: 'browseraction/index.html',
-          to: 'browseraction/index.html',
+          from: "browseraction/index.html",
+          to: "browseraction/index.html",
           transform: transformHtml,
         },
         {
-          from: 'manifest.json',
-          to: 'manifest.json',
+          from: "manifest.json",
+          to: "manifest.json",
         },
       ],
     }),
   ],
 };
 
-if (config.mode === 'production') {
+if (config.mode === "production") {
   config.plugins = (config.plugins || []).concat([
     new webpack.DefinePlugin({
-      'process.env': {
+      "process.env": {
         NODE_ENV: '"production"',
       },
     }),
   ]);
 }
 
-if (process.env.HMR === 'true') {
+if (process.env.HMR === "true") {
   config.plugins = (config.plugins || []).concat([
     new ExtensionReloader({
-      manifest: __dirname + '/src/manifest.json',
+      manifest: __dirname + "/src/manifest.json",
     }),
   ]);
 }
