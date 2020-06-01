@@ -29,7 +29,7 @@ function applyCSS() {
         stylebotTempUrl = response.url;
         stylebotTempRules = response.rules;
 
-        if (stylebotTempUrl && stylebotTempRules) {
+        if (stylebotTempUrl) {
           CSSUtils.crunchCSS(response.rules, true, true, function(css) {
             if (css != '') {
               CSSUtils.injectCSS(css, 'stylebot-css');

@@ -142,11 +142,22 @@ stylebot.chrome = {
     });
   },
 
-  enableStyleUrl: function(url) {
-    chrome.extension.sendRequest({
-      name: 'enableStyleUrl',
-      styleUrl: url,
-    });
+  getComputedStylesForTab: function(callback) {
+    chrome.extension.sendRequest(
+      {
+        name: 'getComputedStylesForTab',
+      },
+      callback
+    );
+  },
+
+  getEditableStyleUrlForTab: function(callback) {
+    chrome.extension.sendRequest(
+      {
+        name: 'getEditableStyleUrlForTab',
+      },
+      callback
+    );
   },
 };
 

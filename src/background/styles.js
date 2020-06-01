@@ -238,59 +238,74 @@ Styles.prototype.getStyleUrlMetadataForTab = function(tab) {
 };
 
 /**
- * Retrieve all the CSS rules applicable to the URL
- * @param {String} aURL The URL to retrieve the rules for.
- * @return {Object} rules: The rules. url: The identifier representing the URL.
+ * Retrieve merged CSS rules to be applied to the current tab
  */
-Styles.prototype.getComputedStylesForTab = function(tab) {
-  if (!isValidHTML(tab.url)) {
-    return {
-      url: null,
-      rules: null,
-    };
+Styles.prototype.getComputedStylesForTab = function(tabUrl, tab) {
+  if (!isValidHTML(tabUrl)) {
+    return { url: '', rules: {} };
   }
 
+  let url = '';
   let rules = {};
-  let computedStyleUrl = '';
 
   for (const styleUrl in this.styles) {
     if (!this.isEnabled(styleUrl)) {
       continue;
     }
 
-    if (matchesPattern(tab.url, styleUrl)) {
-      if (styleUrl.length > computedStyleUrl.length) {
-        computedStyleUrl = styleUrl;
+    if (matchesPattern(tabUrl, styleUrl)) {
+      if (styleUrl.length > url.length) {
+        url = styleUrl;
       }
 
-      this.copyRules(
-        tab,
-        this.getRules(styleUrl),
-        rules,
-        styleUrl === computedStyleUrl
-      );
+      this.copyRules(tab, this.getRules(styleUrl), rules, styleUrl === url);
     }
   }
 
-  if (!computedStyleUrl) {
-    rules = null;
-    computedStyleUrl = null;
-  }
-
-  const response = {
-    rules: rules,
-    url: computedStyleUrl,
-  };
-
-  window.cache.loadingTabs[tab.id] = response;
+  window.cache.loadingTabs[tab.id] = { url, rules };
   BrowserAction.update(tab);
 
-  return response;
+  return { url, rules };
 };
 
-Styles.prototype.getComputedStylesForIframe = function(aURL, tab) {
-  var response = window.cache.loadingTabs[tab.id];
-  return response ? response : this.getCombinedRulesForPage(aURL, tab);
+Styles.prototype.getComputedStylesForIframe = function(url, tab) {
+  const response = window.cache.loadingTabs[tab.id];
+  return response ? response : this.getComputedStylesForTab(url, tab);
+};
+
+Styles.prototype.getEditableStyleUrlForTab = function(tab) {
+  if (!isValidHTML(tab.url)) {
+    return { url: '', rules: {} };
+  }
+
+  let url = '';
+  let rules = {};
+
+  for (const styleUrl in this.styles) {
+    if (matchesPattern(tab.url, styleUrl)) {
+      const isUrlEnabled = url && this.isEnabled(url);
+      const isStyleUrlEnabled = this.isEnabled(styleUrl);
+
+      if (
+        (isStyleUrlEnabled && !isUrlEnabled) ||
+        (styleUrl.length > url.length && isStyleUrlEnabled) ||
+        (styleUrl.length > url.length && !isUrlEnabled)
+      ) {
+        url = styleUrl;
+      }
+
+      rules = this.getRules(styleUrl);
+    }
+  }
+
+  if (url && !this.isEnabled(url)) {
+    this.toggle(url, true, true);
+  }
+
+  window.cache.loadingTabs[tab.id] = { url, rules };
+  BrowserAction.update(tab);
+
+  return { url, rules };
 };
 
 /**
@@ -412,7 +427,7 @@ Styles.prototype.fetchImportCSS = function(url, callback) {
 };
 
 Styles.prototype.updateStylesForTab = function(tab) {
-  const response = this.getComputedStylesForTab(tab);
+  const response = this.getComputedStylesForTab(tab.url, tab);
 
   chrome.tabs.sendRequest(tab.id, {
     name: 'updateStyles',

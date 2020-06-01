@@ -538,7 +538,9 @@ stylebot.style = {
       }
     }
 
-    stylebot.widget.cache.url.html(this.cache.url);
+    if (stylebot.widget.cache.url) {
+      stylebot.widget.cache.url.html(this.cache.url);
+    }
 
     if (rules) {
       this.rules = rules;

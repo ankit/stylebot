@@ -43,10 +43,6 @@ const init = () => {
         window.cache.styles.transfer(request.source, request.destination);
         break;
 
-      case 'getGlobalRules':
-        sendResponse(window.cache.styles.getGlobalRules());
-        break;
-
       case 'getStyleUrlMetadataForTab':
         {
           const styleUrlMetadata = window.cache.styles.getStyleUrlMetadataForTab(
@@ -65,7 +61,10 @@ const init = () => {
 
       case 'getComputedStylesForTab':
         if (window.cache.styles.getComputedStylesForTab) {
-          response = window.cache.styles.getComputedStylesForTab(sender.tab);
+          response = window.cache.styles.getComputedStylesForTab(
+            sender.tab.url,
+            sender.tab
+          );
           response.success = true;
         } else {
           response = {
@@ -93,22 +92,22 @@ const init = () => {
         sendResponse(response);
         break;
 
+      case 'getEditableStyleUrlForTab':
+        sendResponse(window.cache.styles.getEditableStyleUrlForTab(sender.tab));
+        break;
+
       case 'enableStyleUrl':
         {
-          if (!window.cache.styles.isEmpty(request.styleUrl)) {
-            window.cache.styles.toggle(request.styleUrl, true, true);
-            window.cache.styles.updateStylesForTab(sender.tab || request.tab);
-          }
+          window.cache.styles.toggle(request.styleUrl, true, true);
+          window.cache.styles.updateStylesForTab(request.tab);
         }
 
         break;
 
       case 'disableStyleUrl':
         {
-          if (!window.cache.styles.isEmpty(request.styleUrl)) {
-            window.cache.styles.toggle(request.styleUrl, false, true);
-            window.cache.styles.updateStylesForTab(sender.tab || request.tab);
-          }
+          window.cache.styles.toggle(request.styleUrl, false, true);
+          window.cache.styles.updateStylesForTab(request.tab);
         }
 
         break;

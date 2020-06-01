@@ -67,11 +67,11 @@ var stylebot = {
     this.enableSelection();
     attachKeyboardShortcuts();
 
-    // If no styling is applied, enable any existing style
-    // for the current URL if it exists
-    if (Object.keys(this.style.rules).length === 0) {
-      this.chrome.enableStyleUrl(this.style.cache.url);
-    }
+    this.chrome.getEditableStyleUrlForTab(response => {
+      if (response.url) {
+        this.style.update(response.url, response.rules);
+      }
+    });
   },
 
   /**
@@ -88,6 +88,12 @@ var stylebot = {
     stylebot.selectedElement = null;
     stylebot.destroyHighlighter();
     detachKeyboardShortcuts();
+
+    this.chrome.getComputedStylesForTab(response => {
+      if (response.success) {
+        this.style.update(response.url, response.rules);
+      }
+    });
   },
 
   /**
