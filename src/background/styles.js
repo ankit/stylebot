@@ -273,7 +273,7 @@ Styles.prototype.getComputedStylesForIframe = function(url, tab) {
   return response ? response : this.getComputedStylesForTab(url, tab);
 };
 
-Styles.prototype.getEditableStyleUrlForTab = function(tab) {
+Styles.prototype.getEditableStyleUrlForTab = function(defaultUrl, tab) {
   if (!isValidHTML(tab.url)) {
     return { url: '', rules: {} };
   }
@@ -283,13 +283,9 @@ Styles.prototype.getEditableStyleUrlForTab = function(tab) {
 
   for (const styleUrl in this.styles) {
     if (matchesPattern(tab.url, styleUrl)) {
-      const isUrlEnabled = url && this.isEnabled(url);
-      const isStyleUrlEnabled = this.isEnabled(styleUrl);
-
       if (
-        (isStyleUrlEnabled && !isUrlEnabled) ||
-        (styleUrl.length > url.length && isStyleUrlEnabled) ||
-        (styleUrl.length > url.length && !isUrlEnabled)
+        (this.isEnabled(styleUrl) && styleUrl.length > url.length) ||
+        defaultUrl === styleUrl
       ) {
         url = styleUrl;
       }

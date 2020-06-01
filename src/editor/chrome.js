@@ -151,10 +151,11 @@ stylebot.chrome = {
     );
   },
 
-  getEditableStyleUrlForTab: function(callback) {
+  getEditableStyleUrlForTab: function(defaultUrl, callback) {
     chrome.extension.sendRequest(
       {
         name: 'getEditableStyleUrlForTab',
+        defaultUrl,
       },
       callback
     );

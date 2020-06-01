@@ -93,7 +93,12 @@ const init = () => {
         break;
 
       case 'getEditableStyleUrlForTab':
-        sendResponse(window.cache.styles.getEditableStyleUrlForTab(sender.tab));
+        sendResponse(
+          window.cache.styles.getEditableStyleUrlForTab(
+            request.defaultUrl,
+            sender.tab
+          )
+        );
         break;
 
       case 'enableStyleUrl':

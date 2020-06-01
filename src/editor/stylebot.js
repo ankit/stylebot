@@ -67,7 +67,7 @@ var stylebot = {
     this.enableSelection();
     attachKeyboardShortcuts();
 
-    this.chrome.getEditableStyleUrlForTab(response => {
+    this.chrome.getEditableStyleUrlForTab(document.domain, response => {
       if (response.url) {
         this.style.update(response.url, response.rules);
       }
