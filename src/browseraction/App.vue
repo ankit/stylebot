@@ -8,7 +8,11 @@
           </v-list-item-icon>
 
           <v-list-item-content>
-            <v-list-item-title>Open Stylebot...</v-list-item-title>
+            <v-list-item-title v-if="isStylebotOpen">
+              Close Stylebot...
+            </v-list-item-title>
+
+            <v-list-item-title v-else>Open Stylebot...</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
 
@@ -16,6 +20,7 @@
           link
           :key="item.url"
           :ripple="false"
+          v-bind:disabled="isStylebotOpen"
           v-bind:class="{
             'green lighten-4': item.enabled,
           }"
@@ -63,6 +68,7 @@ export default Vue.extend({
       styleDisabled: string;
     };
     tab?: chrome.tabs.Tab;
+    isStylebotOpen: boolean;
     styleUrlMetadata: Array<{ url: string; enabled: boolean }>;
   } {
     return {
@@ -74,6 +80,7 @@ export default Vue.extend({
       },
       tab: undefined,
       styleUrlMetadata: [],
+      isStylebotOpen: false,
     };
   },
 
@@ -92,6 +99,10 @@ export default Vue.extend({
 
       this.getStyleUrlMetadataForTab(styleUrlMetadata => {
         this.styleUrlMetadata = styleUrlMetadata;
+      });
+
+      this.getIsStylebotOpen(isStylebotOpen => {
+        this.isStylebotOpen = isStylebotOpen;
       });
     });
   },
@@ -116,6 +127,18 @@ export default Vue.extend({
         });
 
         window.close();
+      }
+    },
+
+    getIsStylebotOpen(callback: (isStylebotOpen: boolean) => void): void {
+      if (this.tab && this.tab.id) {
+        chrome.tabs.sendRequest(
+          this.tab.id,
+          {
+            name: 'status',
+          },
+          response => callback(response.status)
+        );
       }
     },
 
@@ -185,5 +208,3 @@ export default Vue.extend({
   },
 });
 </script>
-
-<style scoped></style>
