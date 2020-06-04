@@ -3,7 +3,8 @@
   "version": "2.3.0",
   "description": "Change the appearance of websites instantly.",
   "scripts": {
-    "build": "cross-env NODE_ENV=production webpack --hide-modules; node ./build_scripts/compile_templates"
+    "build": "cross-env NODE_ENV=production webpack --hide-modules; node ./build_scripts/compile_templates",
+    "watch": "cross-env NODE_ENV=production webpack --hide-modules --watch"
   },
   "repository": {
     "type": "git",

@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-card class="mx-auto" min-height="120" width="320">
+    <v-card class="mx-auto" width="320">
       <v-list v-if="tab && tab.id" class="py-0">
         <v-list-item link :ripple="false" @click="openStylebot">
           <v-list-item-icon class="mr-6">

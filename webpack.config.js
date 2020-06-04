@@ -16,6 +16,7 @@ const config = {
   entry: {
     background: "./background/index.js",
     "browseraction/index": "./browseraction/index.ts",
+    "options/index": "./options/index.ts",
   },
   output: {
     path: __dirname + "/dist",
@@ -104,10 +105,6 @@ const config = {
         {
           from: "shared",
           to: "shared",
-        },
-        {
-          from: "options",
-          to: "options",
         },
         {
           from: "options/index.html",
