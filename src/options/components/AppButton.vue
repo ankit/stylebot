@@ -23,6 +23,8 @@ export default {
 
 <style scoped>
 .v-btn {
+  font-size: 16px;
+  letter-spacing: 0;
   text-transform: none;
 }
 </style>
