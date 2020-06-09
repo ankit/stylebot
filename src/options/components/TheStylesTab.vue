@@ -30,7 +30,7 @@
         >
           <v-col cols="10">
             <v-checkbox
-              :value="style.isEnabled"
+              :value="style.enabled"
               :label="style.url"
               :ripple="false"
               hide-details
@@ -40,15 +40,37 @@
 
           <v-col cols="2">
             <v-row align="center" justify="end">
-              <v-btn
-                color="primary"
-                :ripple="false"
-                elevation="0"
-                fab
-                x-small
-                class="style-action"
-                ><v-icon>mdi-pencil</v-icon></v-btn
+              <v-dialog
+                v-model="edit"
+                scrollable
+                max-width="600px"
+                transition="false"
               >
+                <template v-slot:activator="{ on }">
+                  <v-btn
+                    color="primary"
+                    :ripple="false"
+                    elevation="0"
+                    fab
+                    x-small
+                    v-on="on"
+                    class="style-action"
+                    ><v-icon>mdi-pencil</v-icon></v-btn
+                  >
+                </template>
+
+                <v-card>
+                  <v-card-title>Edit Style</v-card-title>
+                  <v-divider></v-divider>
+                  <v-card-text> </v-card-text>
+                  <v-divider></v-divider>
+                  <v-card-actions>
+                    <v-btn color="blue darken-1" text @click="edit = false"
+                      >Close</v-btn
+                    >
+                  </v-card-actions>
+                </v-card>
+              </v-dialog>
 
               <v-btn
                 color="error"
@@ -73,16 +95,19 @@ import AppButton from './AppButton.vue';
 
 type Style = {
   url: string;
-  isEnabled: boolean;
+  enabled: boolean;
+  rules: any;
 };
 
 type StylebotBackgroundPage = {
   cache: {
     styles: {
       get: () => {
-        [url: string]: string;
+        [url: string]: {
+          _enabled: boolean;
+          _rules: any;
+        };
       };
-      isEnabled: (url: string) => boolean;
     };
   };
 };
@@ -106,10 +131,15 @@ export default Vue.extend({
     const styles = backgroundPage.cache.styles.get();
     const urls = Object.keys(styles);
 
-    this.styles = urls.map(url => ({
-      url,
-      isEnabled: backgroundPage.cache.styles.isEnabled(url),
-    }));
+    this.styles = urls.map(url => {
+      const style = styles[url];
+
+      return {
+        url,
+        rules: style._rules,
+        enabled: style._enabled,
+      };
+    });
   },
 });
 </script>
