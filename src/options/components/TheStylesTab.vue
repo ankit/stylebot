@@ -1,7 +1,23 @@
 <template>
   <div>
     <h2 class="title">Styles</h2>
-    <v-row no-gutters>
+
+    <v-card class="style-editor" v-if="showEditor">
+      <MonacoEditor
+        v-model="code"
+        language="css"
+        class="style-editor"
+        @editorDidMount="editorDidMount"
+      />
+
+      <v-card-actions>
+        <v-btn color="blue darken-1" text @click="showEditor = false"
+          >Close</v-btn
+        >
+      </v-card-actions>
+    </v-card>
+
+    <v-row no-gutters v-if="!showEditor">
       <v-col cols="6">
         <v-row>
           <v-col cols="10">
@@ -40,37 +56,19 @@
 
           <v-col cols="2">
             <v-row align="center" justify="end">
-              <v-dialog
-                v-model="edit"
-                scrollable
-                max-width="600px"
-                transition="false"
+              <v-btn
+                color="primary"
+                :ripple="false"
+                elevation="0"
+                fab
+                x-small
+                @click="
+                  code = style.css;
+                  showEditor = true;
+                "
+                class="style-action"
+                ><v-icon>mdi-pencil</v-icon></v-btn
               >
-                <template v-slot:activator="{ on }">
-                  <v-btn
-                    color="primary"
-                    :ripple="false"
-                    elevation="0"
-                    fab
-                    x-small
-                    v-on="on"
-                    class="style-action"
-                    ><v-icon>mdi-pencil</v-icon></v-btn
-                  >
-                </template>
-
-                <v-card>
-                  <v-card-title>Edit Style</v-card-title>
-                  <v-divider></v-divider>
-                  <v-card-text> </v-card-text>
-                  <v-divider></v-divider>
-                  <v-card-actions>
-                    <v-btn color="blue darken-1" text @click="edit = false"
-                      >Close</v-btn
-                    >
-                  </v-card-actions>
-                </v-card>
-              </v-dialog>
 
               <v-btn
                 color="error"
@@ -91,12 +89,14 @@
 
 <script lang="ts">
 import Vue from 'vue';
+// @ts-ignore
+import MonacoEditor from 'vue-monaco';
 import AppButton from './AppButton.vue';
 
 type Style = {
   url: string;
+  css: string;
   enabled: boolean;
-  rules: any;
 };
 
 type StylebotBackgroundPage = {
@@ -116,12 +116,17 @@ export default Vue.extend({
   name: 'TheStylesTab',
   components: {
     AppButton,
+    MonacoEditor,
   },
 
   data(): {
+    code: string;
+    showEditor: boolean;
     styles: Array<Style>;
   } {
     return {
+      showEditor: false,
+      code: 'a { color: red; }',
       styles: [],
     };
   },
@@ -131,15 +136,37 @@ export default Vue.extend({
     const styles = backgroundPage.cache.styles.get();
     const urls = Object.keys(styles);
 
-    this.styles = urls.map(url => {
+    const results = urls.map(async url => {
       const style = styles[url];
 
-      return {
-        url,
-        rules: style._rules,
-        enabled: style._enabled,
-      };
+      // @ts-ignore
+      return new Promise(resolve => {
+        // @ts-ignore
+        CSSUtils.crunchFormattedCSS(
+          style._rules,
+          false,
+          false,
+          (css: string) => {
+            resolve({
+              url,
+              css,
+              enabled: style._enabled,
+            });
+          }
+        );
+      });
     });
+
+    // @ts-ignore
+    Promise.all(results).then(styles => {
+      this.styles = styles;
+    });
+  },
+  methods: {
+    editorDidMount(editor: any): void {
+      editor.getModel().updateOptions({ tabSize: 2 });
+      editor.focus();
+    },
   },
 });
 </script>
@@ -156,5 +183,11 @@ export default Vue.extend({
 
 .style-action {
   margin-right: 8px;
+}
+
+.style-editor {
+  width: 1024px;
+  height: 560px;
+  border: 1px solid grey;
 }
 </style>

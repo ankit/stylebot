@@ -3,6 +3,7 @@ const webpack = require("webpack");
 
 const CopyPlugin = require("copy-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const MonacoEditorPlugin = require("monaco-editor-webpack-plugin");
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 
 const { VueLoaderPlugin } = require("vue-loader");
@@ -21,9 +22,10 @@ const config = {
   output: {
     path: __dirname + "/dist",
     filename: "[name].js",
+    publicPath: "/",
   },
   resolve: {
-    extensions: [".ts", ".js", ".vue"],
+    extensions: [".ts", ".js", ".vue", ".ttf"],
   },
   module: {
     rules: [
@@ -38,6 +40,10 @@ const config = {
         options: {
           appendTsSuffixTo: [/\.vue$/],
         },
+      },
+      {
+        test: /\.ttf$/,
+        use: ["file-loader"],
       },
       {
         test: /\.css$/,
@@ -77,6 +83,11 @@ const config = {
   plugins: [
     new webpack.DefinePlugin({
       global: "window",
+    }),
+    // https://github.com/Microsoft/monaco-editor-webpack-plugin#options
+    new MonacoEditorPlugin({
+      publicPath: "/",
+      languages: ["css"],
     }),
     new VueLoaderPlugin(),
     new VuetifyLoaderPlugin(),
