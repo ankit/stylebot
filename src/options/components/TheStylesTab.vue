@@ -20,8 +20,10 @@
             <app-button text="Disable all" />
           </v-col>
 
-          <v-col cols="2">
-            <app-button text="Delete all" color="red lighten-2" />
+          <v-col cols="2" align-self="end">
+            <v-row justify="end">
+              <app-button text="Delete all" color="red lighten-2" />
+            </v-row>
           </v-col>
         </v-row>
 
