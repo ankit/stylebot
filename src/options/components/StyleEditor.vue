@@ -49,7 +49,18 @@ import AppButton from './AppButton.vue';
 
 export default Vue.extend({
   name: 'StyleEditor',
-  props: ['initialUrl', 'initialCss'],
+  props: {
+    initialUrl: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    initialCss: {
+      type: String,
+      required: false,
+      default: '',
+    },
+  },
 
   data(): {
     url: string;

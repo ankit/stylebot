@@ -2,11 +2,25 @@
   <div>
     <h2 class="title">Styles</h2>
 
+    <style-editor
+      v-if="addStyleDialog"
+      @save="
+        addStyleDialog = false;
+        saveStyle($event);
+      "
+      @cancel="addStyleDialog = false"
+    ></style-editor>
+
     <v-row no-gutters>
       <v-col cols="6">
         <v-row>
           <v-col cols="10">
-            <app-button color="primary" text="Add a new style..." />
+            <app-button
+              color="primary"
+              text="Add a new style..."
+              @click="addStyleDialog = true"
+            />
+
             <app-button text="Enable all" @click="enableAll" />
             <app-button text="Disable all" @click="disableAll" />
           </v-col>
@@ -50,6 +64,7 @@ import Vue from 'vue';
 
 import UserStyle from './Style.vue';
 import AppButton from './AppButton.vue';
+import StyleEditor from './StyleEditor.vue';
 
 import {
   saveStyle,
@@ -72,15 +87,18 @@ export default Vue.extend({
   components: {
     UserStyle,
     AppButton,
+    StyleEditor,
   },
 
   data(): {
     urlFilter: string;
     styles: Array<Style>;
+    addStyleDialog: boolean;
   } {
     return {
       styles: [],
       urlFilter: '',
+      addStyleDialog: false,
     };
   },
 
