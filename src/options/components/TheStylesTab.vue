@@ -16,8 +16,8 @@
         <v-row>
           <v-col cols="10">
             <app-button color="primary" text="Add a new style..." />
-            <app-button text="Enable all" />
-            <app-button text="Disable all" />
+            <app-button text="Enable all" @click="enableAll" />
+            <app-button text="Disable all" @click="disableAll" />
           </v-col>
 
           <v-col cols="2" align-self="end">
@@ -45,6 +45,8 @@
           :enabled="style.enabled"
           @edit="editStyle(style)"
           @delete="deleteStyle(style)"
+          @enable="enableStyle(style)"
+          @disable="disableStyle(style)"
         ></user-style>
       </v-col>
     </v-row>
@@ -58,7 +60,15 @@ import UserStyle from './Style.vue';
 import AppButton from './AppButton.vue';
 import StyleEditor from './StyleEditor.vue';
 
-import { saveStyle, deleteStyle, getFormattedStyles } from '../utilities';
+import {
+  saveStyle,
+  deleteStyle,
+  enableStyle,
+  disableStyle,
+  getFormattedStyles,
+  enableAllStyles,
+  disableAllStyles,
+} from '../utilities';
 
 type Style = {
   url: string;
@@ -101,8 +111,24 @@ export default Vue.extend({
       deleteStyle(style.url);
       this.getStyles();
     },
+    enableStyle(style: Style): void {
+      enableStyle(style.url);
+      this.getStyles();
+    },
+    disableStyle(style: Style): void {
+      disableStyle(style.url);
+      this.getStyles();
+    },
     setUrlFilter(str: string): void {
       this.urlFilter = str;
+      this.getStyles();
+    },
+    enableAll(): void {
+      enableAllStyles();
+      this.getStyles();
+    },
+    disableAll(): void {
+      disableAllStyles();
       this.getStyles();
     },
     async saveStyle(

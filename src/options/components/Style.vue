@@ -3,9 +3,10 @@
     <v-col cols="10">
       <v-checkbox
         :label="url"
-        :value="enabled"
-        :ripple="false"
         hide-details
+        :ripple="false"
+        :input-value="enabled"
+        @click="enabled ? $emit('disable') : $emit('enable')"
       ></v-checkbox>
     </v-col>
 
@@ -16,7 +17,10 @@
           @click="$emit('edit')"
         ></style-edit-button>
 
-        <style-delete-button @click="dialog = true"></style-delete-button>
+        <style-delete-button
+          class="style-delete"
+          @click="dialog = true"
+        ></style-delete-button>
 
         <v-dialog v-model="dialog" max-width="500" persistent transition="none">
           <v-card>
@@ -80,7 +84,8 @@ export default Vue.extend({
   padding: 0;
 }
 
-.style-edit {
+.style-edit,
+.style-delete {
   margin-right: 10px;
 }
 </style>

@@ -71,3 +71,23 @@ export const deleteStyle = (url: string) => {
   const backgroundPage = (chrome.extension.getBackgroundPage() as any) as StylebotBackgroundPage;
   backgroundPage.cache.styles.delete(url);
 };
+
+export const enableStyle = (url: string) => {
+  const backgroundPage = (chrome.extension.getBackgroundPage() as any) as StylebotBackgroundPage;
+  backgroundPage.cache.styles.toggle(url, true, true);
+};
+
+export const disableStyle = (url: string) => {
+  const backgroundPage = (chrome.extension.getBackgroundPage() as any) as StylebotBackgroundPage;
+  backgroundPage.cache.styles.toggle(url, false, true);
+};
+
+export const enableAllStyles = () => {
+  const backgroundPage = (chrome.extension.getBackgroundPage() as any) as StylebotBackgroundPage;
+  backgroundPage.cache.styles.toggleAll(true);
+};
+
+export const disableAllStyles = () => {
+  const backgroundPage = (chrome.extension.getBackgroundPage() as any) as StylebotBackgroundPage;
+  backgroundPage.cache.styles.toggleAll(false);
+};
