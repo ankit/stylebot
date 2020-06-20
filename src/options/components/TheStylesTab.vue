@@ -2,20 +2,27 @@
   <div>
     <h2 class="title">Styles</h2>
 
-    <v-card class="style-editor" v-if="showEditor">
-      <MonacoEditor
-        v-model="code"
-        language="css"
-        class="style-editor"
-        @editorDidMount="editorDidMount"
-      />
+    <div class="style-editor-overlay" v-if="showEditor">
+      <div class="style-editor">
+        <v-text-field
+          v-model="editingStyle.url"
+          class="style-url-editor"
+          placeholder="Enter URL..."
+          hide-details
+          filled
+          label="URL"
+        ></v-text-field>
 
-      <v-card-actions>
-        <v-btn color="blue darken-1" text @click="showEditor = false"
-          >Close</v-btn
-        >
-      </v-card-actions>
-    </v-card>
+        <MonacoEditor
+          language="css"
+          v-model="editingStyle.css"
+          class="style-monaco-editor"
+          @editorDidMount="editorDidMount"
+        />
+
+        <v-btn color="blue darken-1" text @click="showEditor = false">Close</v-btn>
+      </div>
+    </div>
 
     <v-row no-gutters v-if="!showEditor">
       <v-col cols="6">
@@ -37,21 +44,9 @@
           </v-col>
         </v-row>
 
-        <v-row
-          class="style"
-          align="center"
-          justify="end"
-          :key="style.url"
-          v-for="style in styles"
-        >
+        <v-row class="style" align="center" justify="end" :key="style.url" v-for="style in styles">
           <v-col cols="10">
-            <v-checkbox
-              :value="style.enabled"
-              :label="style.url"
-              :ripple="false"
-              hide-details
-            >
-            </v-checkbox>
+            <v-checkbox :value="style.enabled" :label="style.url" :ripple="false" hide-details></v-checkbox>
           </v-col>
 
           <v-col cols="2">
@@ -63,22 +58,17 @@
                 fab
                 x-small
                 @click="
-                  code = style.css;
+                  editingStyle = style;
                   showEditor = true;
                 "
                 class="style-action"
-                ><v-icon>mdi-pencil</v-icon></v-btn
               >
+                <v-icon>mdi-pencil</v-icon>
+              </v-btn>
 
-              <v-btn
-                color="error"
-                :ripple="false"
-                elevation="0"
-                fab
-                x-small
-                class="style-action"
-                ><v-icon>mdi-delete</v-icon></v-btn
-              >
+              <v-btn color="error" :ripple="false" elevation="0" fab x-small class="style-action">
+                <v-icon>mdi-delete</v-icon>
+              </v-btn>
             </v-row>
           </v-col>
         </v-row>
@@ -120,14 +110,13 @@ export default Vue.extend({
   },
 
   data(): {
-    code: string;
+    editingStyle?: Style;
     showEditor: boolean;
     styles: Array<Style>;
   } {
     return {
-      showEditor: false,
-      code: 'a { color: red; }',
       styles: [],
+      showEditor: false,
     };
   },
 
@@ -185,9 +174,24 @@ export default Vue.extend({
   margin-right: 8px;
 }
 
+.style-editor-overlay {
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  position: fixed;
+  z-index: 1000000;
+  background: rgba(0, 0, 0, 0.87);
+}
+
 .style-editor {
+  margin: 120px auto;
+  height: 640px;
   width: 1024px;
-  height: 560px;
-  border: 1px solid grey;
+}
+
+.style-monaco-editor {
+  height: calc(100% - 100px);
+  width: 100%;
 }
 </style>
