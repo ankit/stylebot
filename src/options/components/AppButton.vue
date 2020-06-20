@@ -1,10 +1,10 @@
 <template>
   <v-btn
-    ripple="false"
-    elevation="0"
     tile
     outlined
+    elevation="0"
     :color="color"
+    :ripple="false"
     :disabled="disabled"
     @click="$emit('click')"
     >{{ text }}</v-btn

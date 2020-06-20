@@ -58,7 +58,7 @@ import UserStyle from './Style.vue';
 import AppButton from './AppButton.vue';
 import StyleEditor from './StyleEditor.vue';
 
-import { saveStyle, getFormattedStyles } from '../utilities';
+import { saveStyle, deleteStyle, getFormattedStyles } from '../utilities';
 
 type Style = {
   url: string;
@@ -97,6 +97,10 @@ export default Vue.extend({
     cancelEditStyle(): void {
       this.currentlyEditedStyle = null;
     },
+    deleteStyle(style: Style): void {
+      deleteStyle(style.url);
+      this.getStyles();
+    },
     setUrlFilter(str: string): void {
       this.urlFilter = str;
       this.getStyles();
@@ -112,9 +116,6 @@ export default Vue.extend({
       }
 
       this.currentlyEditedStyle = null;
-    },
-    deleteStyle(): void {
-      //
     },
     async getStyles(): Promise<void> {
       const styles = await getFormattedStyles();

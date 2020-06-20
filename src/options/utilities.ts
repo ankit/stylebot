@@ -66,3 +66,8 @@ export const saveStyle = (initialUrl: string, url: string, css: string) => {
 
   return true;
 };
+
+export const deleteStyle = (url: string) => {
+  const backgroundPage = (chrome.extension.getBackgroundPage() as any) as StylebotBackgroundPage;
+  backgroundPage.cache.styles.delete(url);
+};
