@@ -5,7 +5,6 @@
     elevation="0"
     fab
     x-small
-    class="style-action"
     @click="$emit('click')"
   >
     <v-icon>mdi-delete</v-icon>

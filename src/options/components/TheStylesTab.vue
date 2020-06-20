@@ -38,31 +38,14 @@
           </v-col>
         </v-row>
 
-        <v-row
-          class="style"
-          align="center"
-          justify="end"
+        <user-style
           :key="style.url"
           v-for="style in styles"
-        >
-          <v-col cols="10">
-            <v-checkbox
-              :value="style.enabled"
-              :label="style.url"
-              :ripple="false"
-              hide-details
-            ></v-checkbox>
-          </v-col>
-
-          <v-col cols="2">
-            <v-row align="center" justify="end">
-              <style-edit-button @click="editStyle(style)"></style-edit-button>
-              <style-delete-button
-                @click="deleteStyle(style)"
-              ></style-delete-button>
-            </v-row>
-          </v-col>
-        </v-row>
+          :url="style.url"
+          :enabled="style.enabled"
+          @edit="editStyle(style)"
+          @delete="deleteStyle(style)"
+        ></user-style>
       </v-col>
     </v-row>
   </div>
@@ -71,10 +54,9 @@
 <script lang="ts">
 import Vue from 'vue';
 
+import UserStyle from './Style.vue';
 import AppButton from './AppButton.vue';
 import StyleEditor from './StyleEditor.vue';
-import StyleEditButton from './StyleEditButton.vue';
-import StyleDeleteButton from './StyleDeleteButton.vue';
 
 import { saveStyle, getFormattedStyles } from '../utilities';
 
@@ -87,9 +69,8 @@ type Style = {
 export default Vue.extend({
   name: 'TheStylesTab',
   components: {
+    UserStyle,
     AppButton,
-    StyleEditButton,
-    StyleDeleteButton,
     StyleEditor,
   },
 
@@ -149,18 +130,3 @@ export default Vue.extend({
   },
 });
 </script>
-
-<style scoped>
-.style:hover {
-  background-color: #eee;
-}
-
-.style .v-input {
-  margin: 0;
-  padding: 0;
-}
-
-.style-action {
-  margin-right: 8px;
-}
-</style>
