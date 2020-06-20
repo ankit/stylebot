@@ -12,33 +12,33 @@ var CSSUtils = {
     }
   }
   */
-  crunchCSS: function(rules, setImportant, expandImport, callback) {
-    var formatter = new cssFormatter(setImportant, true);
-    formatter.format(rules, expandImport, function(css) {
+  crunchCSS: (rules, setImportant, expandImport, callback) => {
+    const formatter = new cssFormatter(setImportant, true);
+    formatter.format(rules, expandImport, css => {
       callback(css);
     });
   },
 
-  crunchFormattedCSS: function(rules, setImportant, expandImport, callback) {
-    var formatter = new cssFormatter(setImportant, false);
+  crunchFormattedCSS: (rules, setImportant, expandImport, callback) => {
+    const formatter = new cssFormatter(setImportant, false);
     formatter.format(rules, expandImport, callback);
   },
 
-  crunchCSSForSelector: function(rules, selector, setImportant, formatted) {
+  crunchCSSForSelector: (rules, selector, setImportant, formatted) => {
     if (rules[selector]) {
-      var formatter = new cssFormatter(setImportant, !formatted);
+      const formatter = new cssFormatter(setImportant, !formatted);
       return formatter.formatProperties(rules[selector]);
     } else {
       return '';
     }
   },
 
-  crunchCSSForDeclaration: function(property, value, setImportant) {
-    var formatter = new cssFormatter(setImportant, false);
+  crunchCSSForDeclaration: (property, value, setImportant) => {
+    const formatter = new cssFormatter(setImportant, false);
     return formatter.formatDeclaration(property, value);
   },
 
-  injectCSS: function(css, id) {
+  injectCSS: (css, id) => {
     if (document.getElementById(id)) {
       document.getElementById(id).innerHTML = css;
       return;
@@ -53,26 +53,29 @@ var CSSUtils = {
     document.documentElement.appendChild(style);
   },
 
-  removeCSS: function(id) {
+  removeCSS: id => {
     const el = document.getElementById(id);
     el.innerHTML = '';
   },
 
   // parser object is that returned by JSCSSP
-  getRulesFromParserObject: function(sheet) {
-    var importer = new JSCSSPImporter();
+  getRulesFromParserObject: sheet => {
+    const importer = new JSCSSPImporter();
     return importer.importSheet(sheet);
   },
 
   // parser object is that returned by JSCSSP
-  getRuleFromParserObject: function(sheet) {
-    var rule = {};
-    var len = sheet.cssRules[0].declarations.length;
-    for (var i = 0; i < len; i++) {
-      var property = sheet.cssRules[0].declarations[i].property;
-      var value = sheet.cssRules[0].declarations[i].valueText;
+  getRuleFromParserObject: sheet => {
+    const rule = {};
+    const len = sheet.cssRules[0].declarations.length;
+
+    for (let i = 0; i < len; i++) {
+      const property = sheet.cssRules[0].declarations[i].property;
+      const value = sheet.cssRules[0].declarations[i].valueText;
+
       rule[property] = value;
     }
+
     return rule;
   },
 };
