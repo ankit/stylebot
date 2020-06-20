@@ -69,7 +69,7 @@ import StyleEditor from './StyleEditor.vue';
 import StyleEditButton from './StyleEditButton.vue';
 import StyleDeleteButton from './StyleDeleteButton.vue';
 
-import { StylebotBackgroundPage } from '../types';
+import { saveStyle, getFormattedStyles } from '../utilities';
 
 type Style = {
   url: string;
@@ -96,37 +96,10 @@ export default Vue.extend({
     };
   },
 
-  created(): void {
-    const backgroundPage = (chrome.extension.getBackgroundPage() as any) as StylebotBackgroundPage;
-    const styles = backgroundPage.cache.styles.get();
-    const urls = Object.keys(styles);
-
-    const results = urls.map(async url => {
-      const style = styles[url];
-
-      // @ts-ignore
-      return new Promise(resolve => {
-        // @ts-ignore
-        CSSUtils.crunchFormattedCSS(
-          style._rules,
-          false,
-          false,
-          (css: string) => {
-            resolve({
-              url,
-              css,
-              enabled: style._enabled,
-            });
-          }
-        );
-      });
-    });
-
-    // @ts-ignore
-    Promise.all(results).then(styles => {
-      this.styles = styles;
-    });
+  async created() {
+    this.styles = await getFormattedStyles();
   },
+
   methods: {
     editStyle(style: Style): void {
       this.currentlyEditedStyle = style;
@@ -134,8 +107,16 @@ export default Vue.extend({
     cancelEditStyle(): void {
       this.currentlyEditedStyle = null;
     },
-    saveStyle(url: string, css: string): void {
-      console.log(url, css);
+    async saveStyle(
+      initialUrl: string,
+      url: string,
+      css: string
+    ): Promise<void> {
+      // TODO: Handle error
+      if (saveStyle(initialUrl, url, css)) {
+        this.styles = await getFormattedStyles();
+      }
+
       this.currentlyEditedStyle = null;
     },
     deleteStyle(): void {

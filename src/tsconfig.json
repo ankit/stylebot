@@ -5,6 +5,7 @@
     "target": "es5",
     "strict": true,
     "module": "es2015",
+    "lib": ["es2015", "dom"],
     "moduleResolution": "node",
     "types": ["vuetify", "chrome"]
   }

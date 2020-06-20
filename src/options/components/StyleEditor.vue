@@ -26,7 +26,7 @@
                 text="Save"
                 color="primary"
                 :disabled="!url"
-                @click="$emit('save', url, css)"
+                @click="$emit('save', initialUrl, url, css)"
               ></app-button>
             </v-col>
 

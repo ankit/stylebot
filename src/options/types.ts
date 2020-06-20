@@ -7,6 +7,9 @@ export type StylebotBackgroundPage = {
           _rules: any;
         };
       };
+
+      create: (url: string, rules: any) => void;
+      delete: (url: string) => void;
     };
   };
 };
