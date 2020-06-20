@@ -29,7 +29,12 @@
 
         <v-row class="search">
           <v-col cols="12">
-            <v-text-field placeholder="Search..." hide-details></v-text-field>
+            <v-text-field
+              clearable
+              hide-details
+              placeholder="Search..."
+              @input="setUrlFilter"
+            ></v-text-field>
           </v-col>
         </v-row>
 
@@ -89,17 +94,19 @@ export default Vue.extend({
   },
 
   data(): {
+    urlFilter: string;
     styles: Array<Style>;
     currentlyEditedStyle: Style | null;
   } {
     return {
       styles: [],
+      urlFilter: '',
       currentlyEditedStyle: null,
     };
   },
 
   async created() {
-    this.styles = await getFormattedStyles();
+    this.getStyles();
   },
 
   methods: {
@@ -109,6 +116,10 @@ export default Vue.extend({
     cancelEditStyle(): void {
       this.currentlyEditedStyle = null;
     },
+    setUrlFilter(str: string): void {
+      this.urlFilter = str;
+      this.getStyles();
+    },
     async saveStyle(
       initialUrl: string,
       url: string,
@@ -116,13 +127,24 @@ export default Vue.extend({
     ): Promise<void> {
       // TODO: Handle error
       if (saveStyle(initialUrl, url, css)) {
-        this.styles = await getFormattedStyles();
+        this.getStyles();
       }
 
       this.currentlyEditedStyle = null;
     },
     deleteStyle(): void {
       //
+    },
+    async getStyles(): Promise<void> {
+      const styles = await getFormattedStyles();
+
+      if (this.urlFilter) {
+        this.styles = styles.filter(style =>
+          style.url.includes(this.urlFilter)
+        );
+      } else {
+        this.styles = styles;
+      }
     },
   },
 });

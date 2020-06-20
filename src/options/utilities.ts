@@ -1,31 +1,38 @@
-import { StylebotBackgroundPage } from './types';
+import { Style, StylebotBackgroundPage } from './types';
 
 declare global {
   const CSSParser: any;
   const CSSUtils: any;
 }
 
-export const getFormattedStyles = async () => {
+export const getFormattedStyles = async (): Promise<Array<Style>> => {
   const backgroundPage = (chrome.extension.getBackgroundPage() as any) as StylebotBackgroundPage;
   const styles = backgroundPage.cache.styles.get();
   const urls = Object.keys(styles);
 
-  const results = urls.map(async url => {
-    const style = styles[url];
+  const results = urls.map(
+    async (url): Promise<Style> => {
+      const style = styles[url];
 
-    return new Promise(resolve => {
-      CSSUtils.crunchFormattedCSS(style._rules, false, false, (css: string) => {
-        resolve({
-          url,
-          css,
-          enabled: style._enabled,
-        });
+      return new Promise(resolve => {
+        CSSUtils.crunchFormattedCSS(
+          style._rules,
+          false,
+          false,
+          (css: string) => {
+            resolve({
+              url,
+              css,
+              enabled: style._enabled,
+            });
+          }
+        );
       });
-    });
-  });
+    }
+  );
 
   return new Promise(resolve => {
-    Promise.all(results).then(styles => resolve(styles));
+    Promise.all(results).then(formattedStyles => resolve(formattedStyles));
   });
 };
 
