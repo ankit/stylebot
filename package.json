@@ -4,7 +4,7 @@
   "description": "Change the appearance of websites instantly.",
   "scripts": {
     "build": "cross-env NODE_ENV=production webpack --hide-modules; node ./build_scripts/compile_templates",
-    "watch": "cross-env NODE_ENV=production webpack --hide-modules --watch"
+    "watch": "cross-env NODE_ENV=development webpack --hide-modules --watch"
   },
   "repository": {
     "type": "git",
@@ -52,6 +52,7 @@
     "webpack-extension-reloader": "^1.1.4"
   },
   "dependencies": {
+    "monaco-editor": "0.20.0",
     "vue": "^2.6.11",
     "vue-monaco": "^1.2.1",
     "vuetify": "^2.2.30"

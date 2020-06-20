@@ -1,7 +1,14 @@
 <template>
-  <v-btn :ripple="false" elevation="0" tile outlined v-bind:color="color">{{
-    text
-  }}</v-btn>
+  <v-btn
+    ripple="false"
+    elevation="0"
+    tile
+    outlined
+    :color="color"
+    :disabled="disabled"
+    @click="$emit('click')"
+    >{{ text }}</v-btn
+  >
 </template>
 
 <script lang="ts">
@@ -16,6 +23,11 @@ export default {
       type: String,
       required: false,
       default: 'grey darken-3',
+    },
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
 };
