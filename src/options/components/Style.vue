@@ -34,10 +34,10 @@
         ></style-delete-button>
 
         <v-dialog
-          v-model="deleteConfirmationDialog"
-          max-width="500"
           persistent
-          transition="none"
+          max-width="500"
+          transition="fade-transition"
+          v-model="deleteConfirmationDialog"
         >
           <v-card>
             <v-card-title class="headline">Are you sure?</v-card-title>
