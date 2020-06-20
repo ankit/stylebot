@@ -29,42 +29,10 @@
         ></style-edit-button>
 
         <style-delete-button
+          :url="url"
           class="style-delete"
-          @click="deleteConfirmationDialog = true"
+          @click="$emit('delete')"
         ></style-delete-button>
-
-        <v-dialog
-          persistent
-          max-width="500"
-          transition="fade-transition"
-          v-model="deleteConfirmationDialog"
-        >
-          <v-card>
-            <v-card-title class="headline">Are you sure?</v-card-title>
-            <v-card-text
-              >This will permanently delete your css for
-              <strong>{{ url }}</strong
-              >.</v-card-text
-            >
-
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <app-button
-                @click="deleteConfirmationDialog = false"
-                text="No"
-              ></app-button>
-
-              <app-button
-                @click="
-                  deleteConfirmationDialog = false;
-                  $emit('delete');
-                "
-                color="primary"
-                text="Yes"
-              ></app-button>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
       </v-row>
     </v-col>
   </v-row>
@@ -73,7 +41,6 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import AppButton from './AppButton.vue';
 import StyleEditor from './StyleEditor.vue';
 import StyleEditButton from './StyleEditButton.vue';
 import StyleDeleteButton from './StyleDeleteButton.vue';
@@ -82,7 +49,6 @@ export default Vue.extend({
   name: 'Style',
   props: ['url', 'css', 'enabled'],
   components: {
-    AppButton,
     StyleEditor,
     StyleEditButton,
     StyleDeleteButton,

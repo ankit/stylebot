@@ -27,7 +27,9 @@
 
           <v-col cols="2" align-self="end">
             <v-row justify="end">
-              <app-button text="Delete all" color="red lighten-2" />
+              <the-delete-all-styles-button
+                @click="deleteAll"
+              ></the-delete-all-styles-button>
             </v-row>
           </v-col>
         </v-row>
@@ -65,6 +67,7 @@ import Vue from 'vue';
 import UserStyle from './Style.vue';
 import AppButton from './AppButton.vue';
 import StyleEditor from './StyleEditor.vue';
+import TheDeleteAllStylesButton from './TheDeleteAllStylesButton.vue';
 
 import {
   saveStyle,
@@ -74,6 +77,7 @@ import {
   getFormattedStyles,
   enableAllStyles,
   disableAllStyles,
+  deleteAllStyles,
 } from '../utilities';
 
 type Style = {
@@ -88,6 +92,7 @@ export default Vue.extend({
     UserStyle,
     AppButton,
     StyleEditor,
+    TheDeleteAllStylesButton,
   },
 
   data(): {
@@ -129,6 +134,10 @@ export default Vue.extend({
     },
     disableAll(): void {
       disableAllStyles();
+      this.getStyles();
+    },
+    deleteAll(): void {
+      deleteAllStyles();
       this.getStyles();
     },
 

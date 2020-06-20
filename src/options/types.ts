@@ -12,6 +12,7 @@ export type StylebotBackgroundPage = {
       delete: (url: string) => void;
       toggle: (url: string, enabled: boolean, _: any) => void;
       toggleAll: (enabled: boolean) => void;
+      deleteAll: () => void;
     };
   };
 };
