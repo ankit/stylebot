@@ -2,16 +2,7 @@
   <div>
     <h2 class="title">Styles</h2>
 
-    <div v-if="!!currentlyEditedStyle">
-      <style-editor
-        @save="saveStyle"
-        @cancel="cancelEditStyle"
-        :initialUrl="currentlyEditedStyle.url"
-        :initialCss="currentlyEditedStyle.css"
-      ></style-editor>
-    </div>
-
-    <v-row no-gutters v-if="!currentlyEditedStyle">
+    <v-row no-gutters>
       <v-col cols="6">
         <v-row>
           <v-col cols="10">
@@ -40,10 +31,11 @@
 
         <user-style
           :key="style.url"
-          v-for="style in styles"
+          :css="style.css"
           :url="style.url"
           :enabled="style.enabled"
-          @edit="editStyle(style)"
+          v-for="style in styles"
+          @save="saveStyle"
           @delete="deleteStyle(style)"
           @enable="enableStyle(style)"
           @disable="disableStyle(style)"
@@ -58,7 +50,6 @@ import Vue from 'vue';
 
 import UserStyle from './Style.vue';
 import AppButton from './AppButton.vue';
-import StyleEditor from './StyleEditor.vue';
 
 import {
   saveStyle,
@@ -81,18 +72,15 @@ export default Vue.extend({
   components: {
     UserStyle,
     AppButton,
-    StyleEditor,
   },
 
   data(): {
     urlFilter: string;
     styles: Array<Style>;
-    currentlyEditedStyle: Style | null;
   } {
     return {
       styles: [],
       urlFilter: '',
-      currentlyEditedStyle: null,
     };
   },
 
@@ -101,11 +89,9 @@ export default Vue.extend({
   },
 
   methods: {
-    editStyle(style: Style): void {
-      this.currentlyEditedStyle = style;
-    },
-    cancelEditStyle(): void {
-      this.currentlyEditedStyle = null;
+    setUrlFilter(str: string): void {
+      this.urlFilter = str;
+      this.getStyles();
     },
     deleteStyle(style: Style): void {
       deleteStyle(style.url);
@@ -119,10 +105,6 @@ export default Vue.extend({
       disableStyle(style.url);
       this.getStyles();
     },
-    setUrlFilter(str: string): void {
-      this.urlFilter = str;
-      this.getStyles();
-    },
     enableAll(): void {
       enableAllStyles();
       this.getStyles();
@@ -131,18 +113,21 @@ export default Vue.extend({
       disableAllStyles();
       this.getStyles();
     },
-    async saveStyle(
-      initialUrl: string,
-      url: string,
-      css: string
-    ): Promise<void> {
-      // TODO: Handle error
+
+    async saveStyle({
+      initialUrl,
+      url,
+      css,
+    }: {
+      initialUrl: string;
+      url: string;
+      css: string;
+    }): Promise<void> {
       if (saveStyle(initialUrl, url, css)) {
         this.getStyles();
       }
-
-      this.currentlyEditedStyle = null;
     },
+
     async getStyles(): Promise<void> {
       const styles = await getFormattedStyles();
 

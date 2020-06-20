@@ -1,5 +1,16 @@
 <template>
   <v-row class="style" align="center" justify="end">
+    <style-editor
+      v-if="editDialog"
+      :initialUrl="url"
+      :initialCss="css"
+      @save="
+        editDialog = false;
+        $emit('save', $event);
+      "
+      @cancel="editDialog = false"
+    ></style-editor>
+
     <v-col cols="10">
       <v-checkbox
         :label="url"
@@ -14,15 +25,20 @@
       <v-row align="center" justify="end">
         <style-edit-button
           class="style-edit"
-          @click="$emit('edit')"
+          @click="editDialog = true"
         ></style-edit-button>
 
         <style-delete-button
           class="style-delete"
-          @click="dialog = true"
+          @click="deleteConfirmationDialog = true"
         ></style-delete-button>
 
-        <v-dialog v-model="dialog" max-width="500" persistent transition="none">
+        <v-dialog
+          v-model="deleteConfirmationDialog"
+          max-width="500"
+          persistent
+          transition="none"
+        >
           <v-card>
             <v-card-title class="headline">Are you sure?</v-card-title>
             <v-card-text
@@ -30,12 +46,17 @@
               <strong>{{ url }}</strong
               >.</v-card-text
             >
+
             <v-card-actions>
               <v-spacer></v-spacer>
-              <app-button @click="dialog = false" text="No"></app-button>
+              <app-button
+                @click="deleteConfirmationDialog = false"
+                text="No"
+              ></app-button>
+
               <app-button
                 @click="
-                  dialog = false;
+                  deleteConfirmationDialog = false;
                   $emit('delete');
                 "
                 color="primary"
@@ -53,22 +74,27 @@
 import Vue from 'vue';
 
 import AppButton from './AppButton.vue';
+import StyleEditor from './StyleEditor.vue';
 import StyleEditButton from './StyleEditButton.vue';
 import StyleDeleteButton from './StyleDeleteButton.vue';
 
 export default Vue.extend({
   name: 'Style',
-  props: ['url', 'enabled'],
+  props: ['url', 'css', 'enabled'],
   components: {
     AppButton,
+    StyleEditor,
     StyleEditButton,
     StyleDeleteButton,
   },
+
   data(): {
-    dialog: boolean;
+    editDialog: boolean;
+    deleteConfirmationDialog: boolean;
   } {
     return {
-      dialog: false,
+      editDialog: false,
+      deleteConfirmationDialog: false,
     };
   },
 });
