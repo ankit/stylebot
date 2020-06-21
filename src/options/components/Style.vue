@@ -17,7 +17,7 @@
         :label="url"
         :ripple="false"
         v-model="enabled"
-        @click="enabled ? $emit('enable') : $emit('disable')"
+        @click="$emit('toggle')"
       />
     </v-col>
 
@@ -40,6 +40,12 @@ import StyleDeleteButton from './StyleDeleteButton.vue';
 export default Vue.extend({
   name: 'Style',
   props: ['url', 'css', 'initialEnabled'],
+
+  watch: {
+    initialEnabled(newVal: boolean): void {
+      this.enabled = newVal;
+    },
+  },
 
   components: {
     StyleEditor,

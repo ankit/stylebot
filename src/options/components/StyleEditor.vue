@@ -36,7 +36,7 @@
               <app-button text="Cancel" @click="$emit('cancel')" />
             </v-col>
 
-            <v-col cols="4">
+            <v-col cols="4" class="mr-1">
               <app-button
                 text="Save"
                 color="primary"

@@ -48,7 +48,7 @@
           </v-col>
         </v-row>
 
-        <Style
+        <style-component
           :key="style.url"
           :css="style.css"
           :url="style.url"
@@ -56,8 +56,7 @@
           v-for="style in styles"
           @save="saveStyle"
           @delete="deleteStyle(style)"
-          @enable="enableStyle(style)"
-          @disable="disableStyle(style)"
+          @toggle="toggleStyle(style)"
         />
       </v-col>
     </v-row>
@@ -67,8 +66,8 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import Style from './Style.vue';
 import AppButton from './AppButton.vue';
+import StyleComponent from './Style.vue';
 import StyleEditor from './StyleEditor.vue';
 import TheDeleteAllStylesButton from './TheDeleteAllStylesButton.vue';
 
@@ -83,18 +82,15 @@ import {
   deleteAllStyles,
 } from '../utilities';
 
-type Style = {
-  url: string;
-  css: string;
-  enabled: boolean;
-};
+import { Style } from '../types';
 
 export default Vue.extend({
   name: 'TheStylesTab',
+
   components: {
-    Style,
     AppButton,
     StyleEditor,
+    StyleComponent,
     TheDeleteAllStylesButton,
   },
 
@@ -119,26 +115,32 @@ export default Vue.extend({
       this.urlFilter = str;
       this.getStyles();
     },
+
     deleteStyle(style: Style): void {
       deleteStyle(style.url);
       this.getStyles();
     },
-    enableStyle(style: Style): void {
-      enableStyle(style.url);
+
+    toggleStyle(style: Style): void {
+      if (style.enabled) {
+        disableStyle(style.url);
+      } else {
+        enableStyle(style.url);
+      }
+
       this.getStyles();
     },
-    disableStyle(style: Style): void {
-      disableStyle(style.url);
-      this.getStyles();
-    },
+
     enableAll(): void {
       enableAllStyles();
       this.getStyles();
     },
+
     disableAll(): void {
       disableAllStyles();
       this.getStyles();
     },
+
     deleteAll(): void {
       deleteAllStyles();
       this.getStyles();

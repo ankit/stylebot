@@ -15,7 +15,7 @@
           </v-list-item-content>
         </v-list-item>
 
-        <Style
+        <style-component
           :tab="tab"
           :key="style.url"
           :url="style.url"
@@ -42,12 +42,12 @@
 import Vue from 'vue';
 import { mdiCogOutline, mdiImageEditOutline } from '@mdi/js';
 
-import Style from './components/Style.vue';
+import StyleComponent from './components/Style.vue';
 
 export default Vue.extend({
   name: 'App',
   components: {
-    Style,
+    StyleComponent,
   },
 
   data(): {
