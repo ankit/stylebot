@@ -8,12 +8,11 @@
       label="Enable shortcut key to launch Stylebot"
     />
 
-    <v-col cols="2">
-      <v-row justify="start">
+    <v-row>
+      <v-col cols="6">
         <v-select
           solo
-          class="mr-2"
-          style="width: 20px"
+          class="mr-2 shortcut-meta-key"
           :items="shortcutMetaKeys"
           v-model="options.shortcutMetaKey"
           @change="saveShortcutMetaKey"
@@ -22,13 +21,12 @@
         <v-text-field
           solo
           counter="1"
-          style="width: 20px"
           @input="saveShortcutKey"
           v-model="shortcutKeyCharacter"
           class="shortcut-key-character"
         />
-      </v-row>
-    </v-col>
+      </v-col>
+    </v-row>
 
     <h2 class="title">Default Editing Mode</h2>
 
@@ -114,3 +112,15 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.shortcut-meta-key {
+  width: 120px;
+  display: inline-block;
+}
+
+.shortcut-key-character {
+  width: 48px;
+  display: inline-block;
+}
+</style>

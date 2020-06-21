@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-card class="mx-auto" width="320">
+    <v-card class="mx-auto" width="250">
       <v-list v-if="tab && tab.id" class="py-0">
         <v-list-item link :ripple="false" @click="openStylebot">
           <v-list-item-icon class="mr-6">
@@ -9,7 +9,6 @@
 
           <v-list-item-content>
             <v-list-item-title v-if="isStylebotOpen">Close Stylebot...</v-list-item-title>
-
             <v-list-item-title v-else>Open Stylebot...</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
