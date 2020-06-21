@@ -14,10 +14,11 @@ export type StylebotBackgroundPage = {
       toggle: (url: string, enabled: boolean, _: any) => void;
       toggleAll: (enabled: boolean) => void;
       deleteAll: () => void;
+      import: (styles: any) => void;
     };
   };
 
-  saveOption: (name: string, value: string | boolean) => void;
+  saveOption: (name: string, value: string | boolean | number) => void;
 };
 
 export type Style = {

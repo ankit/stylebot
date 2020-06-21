@@ -1,15 +1,10 @@
 <template>
   <v-app>
-    <v-app-bar
-      app
-      clipped-left
-      :elevation="0"
-      color="#fff"
-      style="border-bottom: 1px solid #eee"
-    >
-      <span class="title ml-3 mr-5"
-        >Stylebot<span class="font-weight-light"> | options</span></span
-      >
+    <v-app-bar app clipped-left :elevation="0" color="#fff" style="border-bottom: 1px solid #eee">
+      <span class="title ml-3 mr-5">
+        Stylebot
+        <span class="font-weight-light">| options</span>
+      </span>
       <v-spacer></v-spacer>
     </v-app-bar>
 
@@ -32,6 +27,7 @@ import Vue from 'vue';
 
 import TheBasicsTab from './components/TheBasicsTab.vue';
 import TheStylesTab from './components/TheStylesTab.vue';
+import TheBackupTab from './components/TheBackupTab.vue';
 import TheNavigation from './components/TheNavigation.vue';
 
 export default Vue.extend({
@@ -43,18 +39,15 @@ export default Vue.extend({
   } {
     return {
       currentTab: 'Basics',
-      tabs: ['Basics', 'Styles', 'Export'],
+      tabs: ['Basics', 'Styles', 'Backup'],
     };
   },
 
   components: {
     TheBasicsTab,
     TheStylesTab,
+    TheBackupTab,
     TheNavigation,
-  },
-
-  created() {
-    //
   },
 
   computed: {

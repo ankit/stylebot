@@ -141,3 +141,33 @@ export const getCharacterFromKeydownCode = (code: number): string => {
 export const getKeydownCode = (char: string): number => {
   return char.toUpperCase().charCodeAt(0);
 };
+
+export const exportStylesAsJSONString = () => {
+  const backgroundPage = (chrome.extension.getBackgroundPage() as any) as StylebotBackgroundPage;
+
+  if (backgroundPage.cache.styles) {
+    return JSON.stringify(backgroundPage.cache.styles.get(), null, 2);
+  } else {
+    return '';
+  }
+};
+
+export const importStylesFromJSONString = (json: string): boolean => {
+  const backgroundPage = (chrome.extension.getBackgroundPage() as any) as StylebotBackgroundPage;
+
+  try {
+    const styles = JSON.parse(json);
+    backgroundPage.cache.styles.import(styles);
+  } catch (e) {
+    return false;
+  }
+
+  return true;
+};
+
+export const copyToClipboard = (text: string) => {
+  chrome.extension.sendRequest({
+    name: 'copyToClipboard',
+    text: text,
+  });
+};

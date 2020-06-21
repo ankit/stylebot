@@ -5,10 +5,10 @@
         <v-list-item
           link
           :ripple="false"
-          v-bind:key="tab"
+          :key="tab"
           v-for="tab in tabs"
-          v-on:click="$emit('select', tab)"
-          v-bind:class="['pl-5', 'navigation-item']"
+          @click="$emit('select', tab)"
+          class="['pl-5', 'navigation-item']"
         >
           <v-list-item-content>
             <v-list-item-title>{{ tab }}</v-list-item-title>
