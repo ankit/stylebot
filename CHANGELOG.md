@@ -1,3 +1,10 @@
+## Version 2.4
+
+- Re-write options page with vuejs for better experience and maintainability
+- Code editor in the options page is now [Monaco Editor](https://microsoft.github.io/monaco-editor/)
+- Replace "Remove styling" in popup with toggle to enable/disable styling. This fixes a long-standing issue where users accidentally permanently deleted the styles applied to the page.
+- Fix Changelog link in the options page
+
 ## Version 2.3
 
 - Maintenance update
