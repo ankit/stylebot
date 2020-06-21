@@ -1,6 +1,12 @@
 <template>
   <div>
-    <h2 class="title">Styles</h2>
+    <h2 class="title">
+      Styles
+      <span
+        v-if="styles.length !== 0"
+        class="grey--text text--lighter-1"
+      >({{ styles.length }})</span>
+    </h2>
 
     <style-editor
       v-if="addStyleDialog"
