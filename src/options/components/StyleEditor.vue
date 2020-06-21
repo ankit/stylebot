@@ -20,18 +20,19 @@
 
       <v-row justify="end">
         <v-col cols="3">
-          <v-row justify="end" no-gutters dense>
+          <v-row justify="end">
+            <v-col cols="4">
+              <app-button text="Cancel" @click="$emit('cancel')"></app-button>
+            </v-col>
+
             <v-col cols="4">
               <app-button
                 text="Save"
                 color="primary"
                 :disabled="!url"
+                :outlined="false"
                 @click="$emit('save', { initialUrl, url, css })"
               ></app-button>
-            </v-col>
-
-            <v-col cols="4">
-              <app-button text="Cancel" @click="$emit('cancel')"></app-button>
             </v-col>
           </v-row>
         </v-col>
@@ -111,6 +112,7 @@ export default Vue.extend({
 .style-monaco-editor {
   width: 100%;
   margin-top: 5px;
-  height: calc(100% - 110px);
+  height: calc(100% - 120px);
 }
 </style>
+

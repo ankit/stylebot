@@ -1,14 +1,13 @@
 <template>
   <v-btn
     tile
-    outlined
     elevation="0"
     :color="color"
     :ripple="false"
     :disabled="disabled"
+    :outlined="outlined"
     @click="$emit('click')"
-    >{{ text }}</v-btn
-  >
+  >{{ text }}</v-btn>
 </template>
 
 <script lang="ts">
@@ -28,6 +27,11 @@ export default {
       type: Boolean,
       required: false,
       default: false,
+    },
+    outlined: {
+      type: Boolean,
+      required: false,
+      default: true,
     },
   },
 };

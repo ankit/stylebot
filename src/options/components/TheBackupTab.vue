@@ -1,22 +1,43 @@
 <template>
   <div>
     <h2 class="title">Backup</h2>
+    <v-row>
+      <v-col>
+        <div
+          class="body-1"
+        >Until we support automated sync/backup, please manually backup your work.</div>
+      </v-col>
+    </v-row>
 
     <v-dialog persistent max-width="800" transition="fade-transition" v-model="exportDialog">
       <v-card>
         <v-card-title class="headline">Copy/paste the following into a JSON file</v-card-title>
-        <v-card-text>
+
+        <v-card-text class="card-text">
           Keep the JSON safe to import it later until we support automatic sync/backup
-          <v-textarea outlined v-model="exportedJSONString" auto-grow autofocus class="json"></v-textarea>
+          <v-textarea
+            outlined
+            v-model="exportedJSONString"
+            auto-grow
+            autofocus
+            hide-details
+            class="json"
+          ></v-textarea>
         </v-card-text>
 
-        <v-card-actions>
+        <v-card-actions class="card-actions">
           <v-spacer></v-spacer>
-          <app-button @click="copyToClipboard" color="primary" text="Copy to Clipboard"></app-button>
 
           <app-button @click="
               exportDialog = false;
             " text="Close"></app-button>
+
+          <app-button
+            @click="copyToClipboard"
+            color="primary"
+            text="Copy to Clipboard"
+            :outlined="false"
+          ></app-button>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -24,18 +45,17 @@
     <v-dialog persistent max-width="800" transition="fade-transition" v-model="importDialog">
       <v-card>
         <v-card-title class="headline">Paste previously exported JSON</v-card-title>
-        <v-card-text>
+
+        <v-card-text class="card-text">
           <v-alert
             text
-            dense
-            type="info"
+            type="warning"
             class="alert"
             v-if="!importError"
-          >Existing styles will be overwritten.</v-alert>
+          >This will overwrite your existing styles. You can't undo this.</v-alert>
 
           <v-alert
             text
-            dense
             type="error"
             class="alert"
             v-if="importError"
@@ -46,19 +66,14 @@
             auto-grow
             autofocus
             class="json"
+            hide-details
             @input="importError = false"
             v-model="jsonStringForImport"
           ></v-textarea>
         </v-card-text>
 
-        <v-card-actions>
+        <v-card-actions class="card-actions">
           <v-spacer></v-spacer>
-          <app-button
-            text="Import"
-            color="primary"
-            @click="importJSONString"
-            :disabled="!jsonStringForImport"
-          ></app-button>
 
           <app-button
             @click="
@@ -67,6 +82,14 @@
               jsonStringForImport = ''
             "
             text="Cancel"
+          ></app-button>
+
+          <app-button
+            text="Import"
+            color="primary"
+            :outlined="false"
+            @click="importJSONString"
+            :disabled="!jsonStringForImport"
           ></app-button>
         </v-card-actions>
       </v-card>
@@ -135,5 +158,13 @@ export default {
 .alert,
 .json {
   margin-top: 10px !important;
+}
+
+.card-actions {
+  padding: 15px 25px;
+}
+
+.card-text {
+  padding-bottom: 0;
 }
 </style>
