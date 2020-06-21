@@ -22,11 +22,14 @@
     <div class="ma-4 ml-7">
       <span class="caption">
         v2.4 •
-        <a target="_blank" href="http://github.com/ankit/stylebot">Readme</a> •
+        <a target="_blank" href="http://github.com/ankit/stylebot">Readme</a>
+        •
         <a
           target="_blank"
           href="https://github.com/ankit/stylebot/blob/master/CHANGELOG.md"
-        >Changelog</a>
+        >
+          Changelog
+        </a>
       </span>
     </div>
   </v-navigation-drawer>

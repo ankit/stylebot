@@ -9,7 +9,7 @@
         $emit('save', $event);
       "
       @cancel="editDialog = false"
-    ></style-editor>
+    />
 
     <v-col cols="10">
       <v-checkbox
@@ -18,13 +18,13 @@
         :ripple="false"
         v-model="enabled"
         @click="enabled ? $emit('enable') : $emit('disable')"
-      ></v-checkbox>
+      />
     </v-col>
 
     <v-col cols="2">
       <v-row align="center" justify="end">
-        <style-edit-button class="mr-2" @click="editDialog = true"></style-edit-button>
-        <style-delete-button :url="url" class="mr-2" @click="$emit('delete')"></style-delete-button>
+        <style-edit-button class="mr-2" @click="editDialog = true" />
+        <style-delete-button :url="url" class="mr-2" @click="$emit('delete')" />
       </v-row>
     </v-col>
   </v-row>

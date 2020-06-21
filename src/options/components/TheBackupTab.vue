@@ -3,18 +3,27 @@
     <h2 class="title">Backup</h2>
     <v-row>
       <v-col>
-        <div
-          class="body-1"
-        >Until we support automated sync/backup, please manually backup your work.</div>
+        <div class="body-1">
+          Until we support automated sync/backup, please manually backup your
+          work.
+        </div>
       </v-col>
     </v-row>
 
-    <v-dialog persistent max-width="800" transition="fade-transition" v-model="exportDialog">
+    <v-dialog
+      persistent
+      max-width="800"
+      transition="fade-transition"
+      v-model="exportDialog"
+    >
       <v-card>
-        <v-card-title class="headline-2">Copy/paste into a JSON file</v-card-title>
+        <v-card-title class="headline-2">
+          Copy/paste into a JSON file
+        </v-card-title>
 
         <v-card-text class="pb-0">
-          Keep the JSON safe to import it later until we support automatic sync/backup
+          Keep the JSON safe to import it later until we support automatic
+          sync/backup
           <v-textarea
             outlined
             rows="12"
@@ -28,7 +37,7 @@
         <v-card-actions class="pa-6">
           <v-spacer />
 
-          <app-button @click="exportDialog = false;" text="Close" />
+          <app-button @click="exportDialog = false" text="Close" />
 
           <app-button
             @click="copyToClipboard"
@@ -40,24 +49,26 @@
       </v-card>
     </v-dialog>
 
-    <v-dialog persistent max-width="800" transition="fade-transition" v-model="importDialog">
+    <v-dialog
+      persistent
+      max-width="800"
+      transition="fade-transition"
+      v-model="importDialog"
+    >
       <v-card>
-        <v-card-title class="headline-2">Paste previously exported JSON</v-card-title>
+        <v-card-title class="headline-2">
+          Paste previously exported JSON
+        </v-card-title>
 
         <v-card-text class="pb-0">
-          <v-alert
-            text
-            type="warning"
-            class="mt-4"
-            v-if="!importError"
-          >This will overwrite your existing styles. You can't undo this.</v-alert>
+          <v-alert text type="warning" class="mt-4" v-if="!importError">
+            This will overwrite your existing styles. You can't undo this.
+          </v-alert>
 
-          <v-alert
-            text
-            type="error"
-            class="mt-4"
-            v-if="importError"
-          >We encountered an error importing the JSON. Please ensure it is properly formatted and try again.</v-alert>
+          <v-alert text type="error" class="mt-4" v-if="importError">
+            We encountered an error importing the JSON. Please ensure it is
+            properly formatted and try again.
+          </v-alert>
 
           <v-textarea
             outlined
@@ -77,7 +88,7 @@
             @click="
               importDialog = false;
               importError = false;
-              jsonStringForImport = ''
+              jsonStringForImport = '';
             "
             text="Cancel"
           />
@@ -95,7 +106,12 @@
 
     <v-row>
       <v-col>
-        <app-button color="primary" text="Export..." class="mr-4" @click="exportDialog = true" />
+        <app-button
+          color="primary"
+          text="Export..."
+          class="mr-4"
+          @click="exportDialog = true"
+        />
         <app-button text="Import..." @click="importDialog = true" />
       </v-col>
     </v-row>

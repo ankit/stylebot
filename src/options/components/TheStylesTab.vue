@@ -2,10 +2,9 @@
   <div>
     <h2 class="title">
       Styles
-      <span
-        v-if="styles.length !== 0"
-        class="grey--text text--lighter-1"
-      >({{ styles.length }})</span>
+      <span v-if="styles.length !== 0" class="grey--text text--lighter-1">
+        ({{ styles.length }})
+      </span>
     </h2>
 
     <style-editor
@@ -21,7 +20,11 @@
       <v-col cols="6">
         <v-row>
           <v-col cols="10">
-            <app-button color="primary" text="Add a new style..." @click="addStyleDialog = true" />
+            <app-button
+              color="primary"
+              text="Add a new style..."
+              @click="addStyleDialog = true"
+            />
 
             <app-button text="Enable all" @click="enableAll" />
             <app-button text="Disable all" @click="disableAll" />
@@ -36,11 +39,16 @@
 
         <v-row class="search">
           <v-col cols="12">
-            <v-text-field clearable hide-details placeholder="Search..." @input="setUrlFilter" />
+            <v-text-field
+              clearable
+              hide-details
+              placeholder="Search..."
+              @input="setUrlFilter"
+            />
           </v-col>
         </v-row>
 
-        <user-style
+        <Style
           :key="style.url"
           :css="style.css"
           :url="style.url"
@@ -59,7 +67,7 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import UserStyle from './Style.vue';
+import Style from './Style.vue';
 import AppButton from './AppButton.vue';
 import StyleEditor from './StyleEditor.vue';
 import TheDeleteAllStylesButton from './TheDeleteAllStylesButton.vue';
@@ -84,7 +92,7 @@ type Style = {
 export default Vue.extend({
   name: 'TheStylesTab',
   components: {
-    UserStyle,
+    Style,
     AppButton,
     StyleEditor,
     TheDeleteAllStylesButton,

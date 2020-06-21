@@ -7,7 +7,10 @@
     @click="toggleStyle"
   >
     <v-list-item-icon class="mr-6">
-      <v-icon v-if="enabled" class="green--text text--darken-4">{{ icons.enabled }}</v-icon>
+      <v-icon v-if="enabled" class="green--text text--darken-4">
+        {{ icons.enabled }}
+      </v-icon>
+
       <v-icon v-else>{{ icons.disabled }}</v-icon>
     </v-list-item-icon>
 

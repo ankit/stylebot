@@ -8,7 +8,9 @@
     :outlined="outlined"
     :title="title"
     @click="$emit('click')"
-  >{{ text }}</v-btn>
+  >
+    {{ text }}
+  </v-btn>
 </template>
 
 <script lang="ts">

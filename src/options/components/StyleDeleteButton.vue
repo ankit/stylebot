@@ -12,12 +12,21 @@
       <v-icon>mdi-delete</v-icon>
     </v-btn>
 
-    <v-dialog persistent max-width="500" transition="fade-transition" v-model="dialog">
+    <v-dialog
+      persistent
+      max-width="500"
+      transition="fade-transition"
+      v-model="dialog"
+    >
       <v-card>
-        <v-card-title class="headline-2">Delete style for {{url}}</v-card-title>
+        <v-card-title class="headline-2">
+          Delete style for {{ url }}
+        </v-card-title>
 
         <v-card-text class="pb-0">
-          <v-alert text type="warning">This will permanently delete your style. You can't undo this.</v-alert>
+          <v-alert text type="warning">
+            This will permanently delete your style. You can't undo this.
+          </v-alert>
         </v-card-text>
 
         <v-card-actions class="pt-4 pb-6 px-6">

@@ -10,14 +10,16 @@
         label="URL"
         hide-details
         dense
-      ></v-text-field>
+      />
 
       <div class="caption px-3 mb-5 grey--text">
         See supported
         <a
           target="_blank"
           href="https://github.com/ankit/stylebot#pattern-matching"
-        >URL patterns</a>
+        >
+          URL patterns
+        </a>
       </div>
 
       <vue-monaco
@@ -125,4 +127,3 @@ export default Vue.extend({
   height: calc(100% - 150px);
 }
 </style>
-
