@@ -25,7 +25,7 @@ function attachListeners() {
     'keydown',
     function(e) {
       if (isInputField(e.target)) return true;
-      console.log(e.keyCode, stylebot.options);
+
       if (
         stylebot.options.useShortcutKey &&
         e.keyCode == stylebot.options.shortcutKey

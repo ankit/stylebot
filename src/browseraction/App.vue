@@ -8,40 +8,24 @@
           </v-list-item-icon>
 
           <v-list-item-content>
-            <v-list-item-title v-if="isStylebotOpen">
-              Close Stylebot...
-            </v-list-item-title>
+            <v-list-item-title v-if="isStylebotOpen">Close Stylebot...</v-list-item-title>
 
             <v-list-item-title v-else>Open Stylebot...</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
 
-        <v-list-item
-          link
-          :key="item.url"
-          :ripple="false"
-          v-bind:disabled="isStylebotOpen"
-          v-bind:class="{
-            'green lighten-4': item.enabled,
-          }"
-          v-for="item in styleUrlMetadata"
-          @click="toggleStyleUrl(item)"
-        >
-          <v-list-item-icon class="mr-6">
-            <v-icon v-if="item.enabled" class="green--text text--darken-4">{{
-              icons.styleEnabled
-            }}</v-icon>
-            <v-icon v-else>{{ icons.styleDisabled }}</v-icon>
-          </v-list-item-icon>
-
-          <v-list-item-content>
-            <v-list-item-title>{{ item.url }}</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
+        <user-style
+          :tab="tab"
+          :key="style.url"
+          :url="style.url"
+          :enabled="style.enabled"
+          :disabled="isStylebotOpen"
+          v-for="style in styleUrlMetadata"
+        />
 
         <v-list-item link :ripple="false" @click="openOptions">
           <v-list-item-icon class="mr-6">
-            <v-icon>{{ icons.cog }}</v-icon>
+            <v-icon>{{ icons.options }}</v-icon>
           </v-list-item-icon>
 
           <v-list-item-content>
@@ -55,17 +39,20 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { mdiCog, mdiImageEdit, mdiEye, mdiEyeOffOutline } from '@mdi/js';
+import { mdiCog, mdiImageEdit } from '@mdi/js';
+
+import UserStyle from './components/Style.vue';
 
 export default Vue.extend({
   name: 'App',
+  components: {
+    UserStyle,
+  },
 
   data(): {
     icons: {
-      cog: string;
+      options: string;
       edit: string;
-      styleEnabled: string;
-      styleDisabled: string;
     };
     tab?: chrome.tabs.Tab;
     isStylebotOpen: boolean;
@@ -73,10 +60,8 @@ export default Vue.extend({
   } {
     return {
       icons: {
-        cog: mdiCog,
+        options: mdiCog,
         edit: mdiImageEdit,
-        styleEnabled: mdiEye,
-        styleDisabled: mdiEyeOffOutline,
       },
       tab: undefined,
       styleUrlMetadata: [],
@@ -167,43 +152,6 @@ export default Vue.extend({
           callback([]);
         }
       );
-    },
-
-    toggleStyleUrl(styleUrlMetadataItem: {
-      url: string;
-      enabled: boolean;
-    }): void {
-      if (styleUrlMetadataItem.enabled) {
-        this.disableStyleUrl(styleUrlMetadataItem);
-      } else {
-        this.enableStyleUrl(styleUrlMetadataItem);
-      }
-    },
-
-    enableStyleUrl(styleUrlMetadataItem: {
-      url: string;
-      enabled: boolean;
-    }): void {
-      chrome.extension.sendRequest({
-        tab: this.tab,
-        name: 'enableStyleUrl',
-        styleUrl: styleUrlMetadataItem.url,
-      });
-
-      styleUrlMetadataItem.enabled = true;
-    },
-
-    disableStyleUrl(styleUrlMetadataItem: {
-      url: string;
-      enabled: boolean;
-    }): void {
-      chrome.extension.sendRequest({
-        tab: this.tab,
-        name: 'disableStyleUrl',
-        styleUrl: styleUrlMetadataItem.url,
-      });
-
-      styleUrlMetadataItem.enabled = false;
     },
   },
 });
