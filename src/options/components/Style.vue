@@ -23,16 +23,8 @@
 
     <v-col cols="2">
       <v-row align="center" justify="end">
-        <style-edit-button
-          class="style-edit"
-          @click="editDialog = true"
-        ></style-edit-button>
-
-        <style-delete-button
-          :url="url"
-          class="style-delete"
-          @click="$emit('delete')"
-        ></style-delete-button>
+        <style-edit-button class="mr-2" @click="editDialog = true"></style-edit-button>
+        <style-delete-button :url="url" class="mr-2" @click="$emit('delete')"></style-delete-button>
       </v-row>
     </v-col>
   </v-row>
@@ -74,10 +66,5 @@ export default Vue.extend({
 .style .v-input {
   margin: 0;
   padding: 0;
-}
-
-.style-edit,
-.style-delete {
-  margin-right: 10px;
 }
 </style>

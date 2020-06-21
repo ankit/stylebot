@@ -11,9 +11,9 @@
 
     <v-dialog persistent max-width="800" transition="fade-transition" v-model="exportDialog">
       <v-card>
-        <v-card-title class="headline">Copy/paste the following into a JSON file</v-card-title>
+        <v-card-title class="headline">Copy/paste into a JSON file</v-card-title>
 
-        <v-card-text class="card-text">
+        <v-card-text class="pb-0">
           Keep the JSON safe to import it later until we support automatic sync/backup
           <v-textarea
             outlined
@@ -21,11 +21,11 @@
             auto-grow
             autofocus
             hide-details
-            class="json"
+            class="mt-4"
           ></v-textarea>
         </v-card-text>
 
-        <v-card-actions class="card-actions">
+        <v-card-actions class="pa-6">
           <v-spacer></v-spacer>
 
           <app-button @click="
@@ -46,18 +46,18 @@
       <v-card>
         <v-card-title class="headline">Paste previously exported JSON</v-card-title>
 
-        <v-card-text class="card-text">
+        <v-card-text class="pb-0">
           <v-alert
             text
             type="warning"
-            class="alert"
+            class="mt-4"
             v-if="!importError"
           >This will overwrite your existing styles. You can't undo this.</v-alert>
 
           <v-alert
             text
             type="error"
-            class="alert"
+            class="mt-4"
             v-if="importError"
           >We encountered an error importing the JSON. Please ensure it is properly formatted and try again.</v-alert>
 
@@ -72,7 +72,7 @@
           ></v-textarea>
         </v-card-text>
 
-        <v-card-actions class="card-actions">
+        <v-card-actions class="pa-6">
           <v-spacer></v-spacer>
 
           <app-button
@@ -97,7 +97,7 @@
 
     <v-row>
       <v-col>
-        <app-button color="primary" text="Export..." class="export" @click="exportDialog = true"></app-button>
+        <app-button color="primary" text="Export..." class="mr-4" @click="exportDialog = true"></app-button>
         <app-button text="Import..." @click="importDialog = true"></app-button>
       </v-col>
     </v-row>
@@ -149,22 +149,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.export {
-  margin-right: 10px;
-}
-
-.alert,
-.json {
-  margin-top: 10px !important;
-}
-
-.card-actions {
-  padding: 15px 25px;
-}
-
-.card-text {
-  padding-bottom: 0;
-}
-</style>

@@ -16,6 +16,19 @@
         </v-list-item>
       </v-list-item-group>
     </v-list>
+
+    <v-divider />
+
+    <div class="ma-4">
+      <span class="caption">
+        v2.4 •
+        <a target="_blank" href="http://github.com/ankit/stylebot">Readme</a> •
+        <a
+          target="_blank"
+          href="https://github.com/ankit/stylebot/blob/master/CHANGELOG.md"
+        >Changelog</a>
+      </span>
+    </div>
   </v-navigation-drawer>
 </template>
 

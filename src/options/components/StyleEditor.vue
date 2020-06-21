@@ -92,21 +92,21 @@ export default Vue.extend({
 
 <style scoped>
 .style-editor-overlay {
-  width: 100%;
-  height: 100%;
   top: 0;
   left: 0;
+  width: 100%;
+  height: 100%;
   position: fixed;
   z-index: 1000000;
   background: rgba(0, 0, 0, 0.87);
 }
 
 .style-editor {
-  margin: 120px auto;
   height: 640px;
   width: 1024px;
-  background: #fff;
   padding: 20px;
+  margin: 120px auto;
+  background: #fff;
 }
 
 .style-monaco-editor {
