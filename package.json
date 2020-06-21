@@ -1,6 +1,6 @@
 {
   "name": "stylebot",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "description": "Change the appearance of websites instantly.",
   "scripts": {
     "build": "cross-env NODE_ENV=production webpack --hide-modules; node ./build_scripts/compile_templates",
