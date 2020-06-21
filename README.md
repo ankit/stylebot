@@ -1,4 +1,4 @@
-_Currently, this extension is under limited support. I likely won't be able to respond to bugs / feature requests in an active manner. Thanks for your patience._
+_Currently, I am refactoring the extension to improve maintainability and enable future features/bugfixes. In the meanwhile, I will likely be slow to respond to bugs / feature requests. Thanks for your patience._
 
 ## Stylebot
 
@@ -46,7 +46,7 @@ This project began as a [Google Summer of Code project](https://opensource.googl
 
 ## Browser support
 
-Stylebot is only supported on Google Chrome.
+Stylebot is currently only supported on Google Chrome.
 
 ## License
 
