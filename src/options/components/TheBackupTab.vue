@@ -17,11 +17,11 @@
           Keep the JSON safe to import it later until we support automatic sync/backup
           <v-textarea
             outlined
-            v-model="exportedJSONString"
-            auto-grow
+            rows="12"
             autofocus
             hide-details
-            class="mt-4"
+            class="mt-4 body-2"
+            v-model="exportedJSONString"
           ></v-textarea>
         </v-card-text>
 
@@ -63,10 +63,10 @@
 
           <v-textarea
             outlined
-            auto-grow
             autofocus
-            class="json"
+            rows="12"
             hide-details
+            class="body-2"
             @input="importError = false"
             v-model="jsonStringForImport"
           ></v-textarea>
