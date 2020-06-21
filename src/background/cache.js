@@ -1,7 +1,7 @@
-/**
- * Background Page
- */
-var cache = {
+import Styles from './styles.js';
+
+// TODO: Make this only accessible as arg / via getters/setters
+window.cache = {
   styles: {},
 
   options: {
@@ -23,31 +23,22 @@ var cache = {
   loadingTabs: [],
 };
 
-/**
- * Initialize the background page cache
- */
-function initCache(callback) {
-  chrome.storage.local.get(['options', 'styles'], function (items) {
+const init = callback => {
+  chrome.storage.local.get(['options', 'styles'], items => {
     if (items['options']) {
-      cache.options = items['options'];
+      window.cache.options = items['options'];
     }
 
     if (items['styles']) {
-      cache.styles = new Styles(items['styles']);
+      window.cache.styles = new Styles(items['styles']);
     } else {
-      cache.styles = new Styles({});
+      window.cache.styles = new Styles({});
     }
 
     if (callback) {
       callback();
     }
   });
-}
+};
 
-BrowserAction.init();
-
-updateVersion(function () {
-  initCache(function () {
-    ContextMenu.init();
-  });
-});
+export default { init };

@@ -8,11 +8,11 @@
 var KeyCombo = {
   // el: the textfield in which key is pressed
   // codeEl: Hidden textfield which will store the keydown code
-  init: function (el, codeEl) {
+  init: function(el, codeEl) {
     el.value = KeyCombo.mapKeyDownCode(codeEl.value);
     el.addEventListener(
       'keydown',
-      function (e) {
+      function(e) {
         KeyCombo.lastValue = el.value;
         if (e.keyCode == 8) e.preventDefault();
         if (KeyCombo.filterKeyCode(e.keyCode)) {
@@ -25,7 +25,7 @@ var KeyCombo = {
     );
   },
 
-  filterKeyCode: function (code) {
+  filterKeyCode: function(code) {
     // filter tab/shift/enter/esc/arrow keys
     if (
       code == 27 ||
@@ -51,11 +51,8 @@ var KeyCombo = {
     return true;
   },
 
-  mapKeyDownCode: function (code) {
+  mapKeyDownCode: function(code) {
     code = Math.floor(code);
-    if ((code >= 65 && code <= 90) || (code >= 48 && code <= 57)) {
-      return String.fromCharCode(code).toLowerCase();
-    }
     switch (code) {
       case 186:
         return ';';
@@ -80,6 +77,7 @@ var KeyCombo = {
       case 222:
         return "'";
     }
+
     return String.fromCharCode(code).toLowerCase();
   },
 };

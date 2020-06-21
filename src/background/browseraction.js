@@ -1,26 +1,16 @@
+import { isValidUrl, isEmptyObject } from './utils';
+
 // Update the extension browser action
-var BrowserAction = {
-  init: function () {
+const BrowserAction = {
+  init: function() {
     // Track when the browser action closes to do cleanup on the current page
-    chrome.runtime.onConnect.addListener(function (port) {
+    chrome.runtime.onConnect.addListener(function(port) {
       if (port.name === 'browserAction') {
         var activeTab;
 
-        port.onMessage.addListener(function (message) {
+        port.onMessage.addListener(function(message) {
           if (message.name === 'activeTab') {
             activeTab = message.tab;
-          }
-        });
-
-        port.onDisconnect.addListener(function () {
-          if (activeTab) {
-            chrome.tabs.sendRequest(
-              activeTab.id,
-              {
-                name: 'resetPreview',
-              },
-              function (response) {}
-            );
           }
         });
       }
@@ -33,7 +23,7 @@ var BrowserAction = {
    *   - No CSS is applied to the current page
    * @param {object} tab The tab for which the browser action should be updated
    */
-  unhighlight: function (tab) {
+  unhighlight: function(tab) {
     chrome.browserAction.setIcon({
       tabId: tab.id,
       path: {
@@ -49,7 +39,7 @@ var BrowserAction = {
    *   - CSS is applied to the current page
    * @param {object} tab The tab for which the browser action should be updated
    */
-  highlight: function (tab) {
+  highlight: function(tab) {
     chrome.browserAction.setIcon({
       tabId: tab.id,
       path: {
@@ -64,7 +54,7 @@ var BrowserAction = {
    *   - stylebot is visible
    * @param {object} tab The tab for which the browser action should be updated
    */
-  activate: function (tab) {
+  activate: function(tab) {
     chrome.browserAction.setIcon({
       tabId: tab.id,
       path: {
@@ -78,14 +68,15 @@ var BrowserAction = {
    * Update the browser action for the specified tab.
    * @param {Object} tab The tab for which to update the browser action.
    */
-  update: function (tab) {
-    if (tab.url.isValidUrl()) {
-      var response = cache.loadingTabs[tab.id];
+  update: function(tab) {
+    if (isValidUrl(tab.url)) {
+      var response = window.cache.loadingTabs[tab.id];
       var stylingApplied = false;
 
       if (
         response &&
-        (response.rules || (response.global && !isEmptyObject(response.global)))
+        response.rules &&
+        Object.keys(response.rules).length !== 0
       ) {
         stylingApplied = true;
       }
@@ -100,7 +91,9 @@ var BrowserAction = {
     }
   },
 
-  disable: function (tabId) {
+  disable: function(tabId) {
     chrome.browserAction.disable(tabId);
   },
 };
+
+export default BrowserAction;

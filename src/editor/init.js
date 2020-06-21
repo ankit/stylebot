@@ -1,7 +1,7 @@
 /**
  * Load options and initialize Stylebot
  */
-$(document).ready(function () {
+$(document).ready(function() {
   stylebot.chrome.fetchOptions();
 });
 
@@ -23,7 +23,7 @@ function initialize(response) {
 function attachListeners() {
   document.addEventListener(
     'keydown',
-    function (e) {
+    function(e) {
       if (isInputField(e.target)) return true;
 
       if (

@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /**
  * Send / receive messages to/from elsewhere
  */
@@ -7,28 +8,19 @@ stylebot.chrome = {
    *   to update the browser action
    * @param {boolean} Stylebot editor status i.e. open or closed
    */
-  setBrowserAction: function (status) {
+  setBrowserAction: function(status) {
     if (status) {
       chrome.extension.sendRequest({
-          name: 'activateBrowserAction'
-        },
-        function () {}
-      );
-    } else if (
-      !$.isEmptyObject(stylebot.style.rules) ||
-      !$.isEmptyObject(stylebot.style.global)
-    ) {
+        name: 'activateBrowserAction',
+      });
+    } else if (!$.isEmptyObject(stylebot.style.rules)) {
       chrome.extension.sendRequest({
-          name: 'highlightBrowserAction'
-        },
-        function () {}
-      );
+        name: 'highlightBrowserAction',
+      });
     } else {
       chrome.extension.sendRequest({
-          name: 'unhighlightBrowserAction'
-        },
-        function () {}
-      );
+        name: 'unhighlightBrowserAction',
+      });
     }
   },
 
@@ -36,13 +28,11 @@ stylebot.chrome = {
    * Send a request to the background page to copy text to clipboard
    * @param {string} text Text to copy
    */
-  copyToClipboard: function (text) {
+  copyToClipboard: function(text) {
     chrome.extension.sendRequest({
-        name: 'copyToClipboard',
-        text: text
-      },
-      function () {}
-    );
+      name: 'copyToClipboard',
+      text: text,
+    });
   },
 
   /**
@@ -51,15 +41,13 @@ stylebot.chrome = {
    * @param {object} rules The style rules
    * @param {data} Any additional data to send as 'data' property
    */
-  save: function (url, rules, data) {
+  save: function(url, rules, data) {
     chrome.extension.sendRequest({
-        name: 'save',
-        rules: rules,
-        url: url,
-        data: data
-      },
-      function () {}
-    );
+      name: 'save',
+      rules: rules,
+      url: url,
+      data: data,
+    });
   },
 
   /**
@@ -67,8 +55,9 @@ stylebot.chrome = {
    * @param {string} url URL for which to check
    * @param {function} callback Method called with the response from background page
    */
-  doesStyleExist: function (url, callback) {
-    chrome.extension.sendRequest({
+  doesStyleExist: function(url, callback) {
+    chrome.extension.sendRequest(
+      {
         name: 'doesStyleExist',
         url: url,
       },
@@ -81,24 +70,23 @@ stylebot.chrome = {
    * @param {string} src Source URL
    * @param {string} dest Destination URL
    */
-  transfer: function (src, dest) {
+  transfer: function(src, dest) {
     chrome.extension.sendRequest({
-        name: 'transfer',
-        source: src,
-        destination: dest,
-      },
-      function () {}
-    );
+      name: 'transfer',
+      source: src,
+      destination: dest,
+    });
   },
 
   /**
    * Send request to fetch options from background page datastore
    */
-  fetchOptions: function () {
-    chrome.extension.sendRequest({
+  fetchOptions: function() {
+    chrome.extension.sendRequest(
+      {
         name: 'fetchOptions',
       },
-      function (response) {
+      function(response) {
         initialize(response);
       }
     );
@@ -108,13 +96,11 @@ stylebot.chrome = {
    * Send request to save accordion state
    * @param {array} accordions Indices of open accordions
    */
-  saveAccordionState: function (accordions) {
+  saveAccordionState: function(accordions) {
     chrome.extension.sendRequest({
-        name: 'saveAccordionState',
-        accordions: accordions,
-      },
-      function () {}
-    );
+      name: 'saveAccordionState',
+      accordions: accordions,
+    });
   },
 
   /**
@@ -122,16 +108,14 @@ stylebot.chrome = {
    * @param {string} name Option name
    * @param {object} value Option value
    */
-  saveOption: function (name, value) {
+  saveOption: function(name, value) {
     chrome.extension.sendRequest({
-        name: 'saveOption',
-        option: {
-          name: name,
-          value: value,
-        },
+      name: 'saveOption',
+      option: {
+        name: name,
+        value: value,
       },
-      function () {}
-    );
+    });
   },
 
   /**
@@ -139,8 +123,9 @@ stylebot.chrome = {
    * @param {string} name Option name
    * @param {function} callback Method to be called with the option value
    */
-  getOption: function (name, callback) {
-    chrome.extension.sendRequest({
+  getOption: function(name, callback) {
+    chrome.extension.sendRequest(
+      {
         name: 'getOption',
         optionName: name,
       },
@@ -151,19 +136,38 @@ stylebot.chrome = {
   /**
    * Open the options page for stylebot
    */
-  showOptions: function () {
+  showOptions: function() {
     chrome.extension.sendRequest({
       name: 'showOptions',
     });
+  },
+
+  getComputedStylesForTab: function(callback) {
+    chrome.extension.sendRequest(
+      {
+        name: 'getComputedStylesForTab',
+      },
+      callback
+    );
+  },
+
+  getEditableStyleUrlForTab: function(defaultUrl, callback) {
+    chrome.extension.sendRequest(
+      {
+        name: 'getEditableStyleUrlForTab',
+        defaultUrl,
+      },
+      callback
+    );
   },
 };
 
 /**
  * Listeners for requests sent from elsewhere
  */
-chrome.extension.onRequest.addListener(function (
+chrome.extension.onRequest.addListener(function(
   request,
-  sender,
+  _sender,
   sendResponse
 ) {
   if (window !== window.top) {
@@ -173,10 +177,9 @@ chrome.extension.onRequest.addListener(function (
   if (request.name === 'status') {
     sendResponse({
       status: stylebot.status,
-      rules: $.isEmptyObject(stylebot.style.rules) ?
-        null : stylebot.style.rules,
-      global: $.isEmptyObject(stylebot.style.global) ?
-        null : stylebot.style.global,
+      rules: $.isEmptyObject(stylebot.style.rules)
+        ? null
+        : stylebot.style.rules,
     });
   } else if (request.name === 'toggle') {
     stylebot.toggle();
@@ -187,31 +190,7 @@ chrome.extension.onRequest.addListener(function (
     stylebot.setOptions(request.options);
   } else if (request.name === 'openWidget') {
     stylebot.contextmenu.openWidget();
-  } else if (request.name === 'toggleStyle') {
-    stylebot.style.toggle();
-
-    sendResponse({
-      status: stylebot.style.status,
-    });
-  } else if (request.name === 'styleStatus') {
-    sendResponse({
-      status: stylebot.style.status,
-    });
-  } else if (request.name === 'preview') {
-    stylebot.style.preview(
-      request.title,
-      request.description,
-      request.author,
-      request.timeAgo,
-      request.favCount,
-      request.css
-    );
-  } else if (request.name === 'previewReset') {
-    stylebot.style.previewReset();
-  } else if (request.name === 'resetPreview') {
-    stylebot.style.resetPreview();
-  } else if (request.name === 'reset') {
-    stylebot.style.resetAllCSS(true);
-    stylebot.chrome.setBrowserAction(false);
+  } else if (request.name === 'updateStyles') {
+    stylebot.style.update(request.url, request.rules);
   }
 });

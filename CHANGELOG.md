@@ -1,3 +1,11 @@
+## Version 2.4
+
+- Re-wrote options page for better experience and maintainability
+- Code editor in the options page is now [Monaco Editor](https://microsoft.github.io/monaco-editor/)
+- Replace "Remove styling" in popup with toggle to enable/disable styling. This fixes a long-standing issue where users accidentally permanently deleted the styles applied to the page.
+- Remove explicit Global Stylesheet setting in the options page
+- Fix Changelog link in the options page
+
 ## Version 2.3
 
 - Maintenance update

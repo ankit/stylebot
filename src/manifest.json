@@ -1,25 +1,17 @@
 {
   "manifest_version": 2,
   "name": "Stylebot",
-  "version": "2.3",
+  "version": "2.4",
   "description": "Change the appearance of websites instantly.",
 
   "background": {
-    "scripts": [
-      "background/utils.js",
-      "background/styles.js",
-      "background/browseraction.js",
-      "background/contextmenu.js",
-      "background/options.js",
-      "background/version.js",
-      "background/listeners.js",
-      "background/init.js"
-    ]
+    "scripts": ["background.js"]
   },
 
   "options_page": "options/index.html",
 
-  "content_scripts": [{
+  "content_scripts": [
+    {
       "matches": ["<all_urls>"],
 
       "js": [
@@ -29,22 +21,6 @@
         "shared/css-utils.js",
 
         "editor/apply-css.js"
-      ],
-
-      "run_at": "document_start",
-      "all_frames": true
-    },
-
-    {
-      "matches": ["http://userstyles.org/styles/*"],
-
-      "js": [
-        "libs/jscsspimporter.js",
-
-        "shared/cssformatter.js",
-        "shared/css-utils.js",
-
-        "editor/userstyles-org.js"
       ],
 
       "run_at": "document_start",
@@ -130,7 +106,6 @@
     "contextMenus",
     "notifications",
     "storage",
-    "http://userstyles.org/",
     "unlimitedStorage",
     "<all_urls>"
   ]
