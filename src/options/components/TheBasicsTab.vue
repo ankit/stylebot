@@ -8,19 +8,21 @@
       label="Enable shortcut key to launch Stylebot"
     />
 
-    <v-col cols="4">
-      <v-row justify="space-around" pad>
+    <v-col cols="2">
+      <v-row justify="start">
         <v-select
           solo
+          class="mr-2"
+          style="width: 20px"
           :items="shortcutMetaKeys"
           v-model="options.shortcutMetaKey"
           @change="saveShortcutMetaKey"
         />
 
-        <v-spacer />
-
         <v-text-field
+          solo
           counter="1"
+          style="width: 20px"
           @input="saveShortcutKey"
           v-model="shortcutKeyCharacter"
           class="shortcut-key-character"
