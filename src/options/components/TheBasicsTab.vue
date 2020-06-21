@@ -1,8 +1,8 @@
 <template>
   <div class="v-basics-tab">
-    <h2 class="title">Shortcut Key</h2>
+    <h2>Shortcut Key</h2>
 
-    <v-switch
+    <v-checkbox
       @input="saveUseShortcutKey"
       v-model="options.useShortcutKey"
       label="Enable shortcut key to launch Stylebot"
@@ -28,7 +28,7 @@
       </v-col>
     </v-row>
 
-    <h2 class="title">Default Editing Mode</h2>
+    <h2 class="mt-5">Default Editing Mode</h2>
 
     <v-radio-group v-model="options.mode" @change="saveEditingMode">
       <v-radio value="Basic" label="Basic" />
@@ -36,9 +36,9 @@
       <v-radio value="Edit CSS" label="Edit CSS" />
     </v-radio-group>
 
-    <h2 class="title">Context Menu</h2>
+    <h2 class="mt-5">Context Menu</h2>
 
-    <v-switch
+    <v-checkbox
       @change="saveRightClickMenu"
       v-model="options.contextMenu"
       label="Show Right Click Context Menu"

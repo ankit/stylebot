@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-card class="mx-auto" width="250">
+    <v-card class="mx-auto" width="280">
       <v-list v-if="tab && tab.id" class="py-0">
         <v-list-item link :ripple="false" @click="openStylebot">
           <v-list-item-icon class="mr-6">
@@ -13,7 +13,7 @@
           </v-list-item-content>
         </v-list-item>
 
-        <user-style
+        <Style
           :tab="tab"
           :key="style.url"
           :url="style.url"
@@ -38,14 +38,14 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { mdiCog, mdiImageEdit } from '@mdi/js';
+import { mdiCogOutline, mdiImageEditOutline } from '@mdi/js';
 
-import UserStyle from './components/Style.vue';
+import Style from './components/Style.vue';
 
 export default Vue.extend({
   name: 'App',
   components: {
-    UserStyle,
+    Style,
   },
 
   data(): {
@@ -59,8 +59,8 @@ export default Vue.extend({
   } {
     return {
       icons: {
-        options: mdiCog,
-        edit: mdiImageEdit,
+        options: mdiCogOutline,
+        edit: mdiImageEditOutline,
       },
       tab: undefined,
       styleUrlMetadata: [],

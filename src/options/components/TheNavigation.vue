@@ -19,7 +19,7 @@
 
     <v-divider />
 
-    <div class="ma-4">
+    <div class="ma-4 ml-7">
       <span class="caption">
         v2.4 •
         <a target="_blank" href="http://github.com/ankit/stylebot">Readme</a> •
