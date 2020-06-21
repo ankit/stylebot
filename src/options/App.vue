@@ -5,7 +5,8 @@
         Stylebot
         <span class="font-weight-light">| options</span>
       </span>
-      <v-spacer></v-spacer>
+
+      <v-spacer />
     </v-app-bar>
 
     <the-navigation

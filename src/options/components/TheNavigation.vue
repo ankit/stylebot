@@ -1,14 +1,14 @@
 <template>
   <v-navigation-drawer app permanent clipped color="#fff">
-    <v-list nav class="py-0 pt-2">
+    <v-list nav class="py-0 pt-2 mb-2">
       <v-list-item-group v-model="model">
         <v-list-item
           link
-          :ripple="false"
           :key="tab"
+          class="pl-5"
+          :ripple="false"
           v-for="tab in tabs"
           @click="$emit('select', tab)"
-          class="['pl-5', 'navigation-item']"
         >
           <v-list-item-content>
             <v-list-item-title>{{ tab }}</v-list-item-title>

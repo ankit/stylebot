@@ -13,7 +13,7 @@
         </v-card-text>
 
         <v-card-actions class="pt-4 pb-6 px-6">
-          <v-spacer></v-spacer>
+          <v-spacer />
           <app-button @click="dialog = false" text="Cancel"></app-button>
 
           <app-button
@@ -40,6 +40,7 @@ export default {
   components: {
     AppButton,
   },
+
   data(): {
     dialog: boolean;
   } {

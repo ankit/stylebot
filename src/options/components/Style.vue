@@ -40,6 +40,7 @@ import StyleDeleteButton from './StyleDeleteButton.vue';
 export default Vue.extend({
   name: 'Style',
   props: ['url', 'css', 'enabled'],
+
   components: {
     StyleEditor,
     StyleEditButton,

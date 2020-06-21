@@ -4,12 +4,21 @@
       <v-text-field
         v-model="url"
         placeholder="Enter URL..."
-        hide-details
         filled
         solo
         flat
         label="URL"
+        hide-details
+        dense
       ></v-text-field>
+
+      <div class="caption px-3 mb-5 grey--text">
+        See supported
+        <a
+          target="_blank"
+          href="https://github.com/ankit/stylebot#pattern-matching"
+        >URL patterns</a>
+      </div>
 
       <vue-monaco
         language="css"
@@ -112,7 +121,7 @@ export default Vue.extend({
 .style-monaco-editor {
   width: 100%;
   margin-top: 5px;
-  height: calc(100% - 120px);
+  height: calc(100% - 150px);
 }
 </style>
 

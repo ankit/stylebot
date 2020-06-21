@@ -26,7 +26,7 @@
         </v-card-text>
 
         <v-card-actions class="pa-6">
-          <v-spacer></v-spacer>
+          <v-spacer />
 
           <app-button @click="
               exportDialog = false;
@@ -73,7 +73,7 @@
         </v-card-text>
 
         <v-card-actions class="pa-6">
-          <v-spacer></v-spacer>
+          <v-spacer />
 
           <app-button
             @click="
@@ -117,6 +117,7 @@ export default {
   components: {
     AppButton,
   },
+
   data(): {
     importError: boolean;
     importDialog: boolean;
@@ -132,10 +133,12 @@ export default {
       jsonStringForImport: '',
     };
   },
+
   methods: {
     copyToClipboard(): void {
       copyToClipboard(this.exportedJSONString);
     },
+
     importJSONString(): void {
       if (importStylesFromJSONString(this.jsonStringForImport)) {
         this.importDialog = false;

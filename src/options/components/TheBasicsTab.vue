@@ -17,7 +17,8 @@
           @change="saveShortcutMetaKey"
         ></v-select>
 
-        <v-spacer></v-spacer>
+        <v-spacer />
+
         <v-text-field
           counter="1"
           @input="saveShortcutKey"
