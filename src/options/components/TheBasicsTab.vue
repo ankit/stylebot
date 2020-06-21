@@ -47,6 +47,7 @@
 </template>
 
 <script lang="ts">
+import Vue from 'vue';
 import { StylebotOptions, StylebotShortcutMetaKey } from '../types';
 
 import {
@@ -56,14 +57,23 @@ import {
   getCharacterFromKeydownCode,
 } from '../utilities';
 
-export default {
+export default Vue.extend({
   name: 'TheBasicsTab',
+
   data(): {
-    options?: StylebotOptions;
-    shortcutKeyCharacter?: string;
+    options: StylebotOptions;
+    shortcutKeyCharacter: string;
     shortcutMetaKeys: Array<{ text: string; value: StylebotShortcutMetaKey }>;
   } {
     return {
+      options: {
+        contextMenu: true,
+        useShortcutKey: true,
+        shortcutKey: 77,
+        shortcutMetaKey: 'alt',
+        mode: 'Basic',
+      },
+      shortcutKeyCharacter: 'M',
       shortcutMetaKeys: [
         {
           text: 'Ctrl',
@@ -110,7 +120,7 @@ export default {
       saveOption('shortcutMetaKey', this.options.shortcutMetaKey);
     },
   },
-};
+});
 </script>
 
 <style scoped>

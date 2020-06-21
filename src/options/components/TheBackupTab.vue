@@ -119,14 +119,16 @@
 </template>
 
 <script lang="ts">
+import Vue from 'vue';
 import AppButton from './AppButton.vue';
+
 import {
   exportStylesAsJSONString,
   importStylesFromJSONString,
   copyToClipboard,
 } from '../utilities';
 
-export default {
+export default Vue.extend({
   name: 'TheBackupTab',
   components: {
     AppButton,
@@ -164,5 +166,5 @@ export default {
       }
     },
   },
-};
+});
 </script>

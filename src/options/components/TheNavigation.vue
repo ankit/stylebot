@@ -36,7 +36,9 @@
 </template>
 
 <script lang="ts">
-export default {
+import Vue from 'vue';
+
+export default Vue.extend({
   name: 'TheNavigation',
   props: {
     tabs: {
@@ -52,5 +54,5 @@ export default {
   data(): { model: number } {
     return { model: 0 };
   },
-};
+});
 </script>

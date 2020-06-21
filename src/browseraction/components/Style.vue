@@ -2,7 +2,7 @@
   <v-list-item
     link
     :ripple="false"
-    :disabled="disabled"
+    :disabled="disableToggle"
     :class="{ 'green lighten-4': enabled }"
     @click="toggleStyle"
   >
@@ -26,15 +26,17 @@ import { mdiEye, mdiEyeOffOutline } from '@mdi/js';
 
 export default Vue.extend({
   name: 'Style',
-  props: ['tab', 'url', 'enabled', 'disabled'],
+  props: ['tab', 'url', 'initialEnabled', 'disableToggle'],
 
   data(): {
+    enabled: boolean;
     icons: {
       enabled: string;
       disabled: string;
     };
   } {
     return {
+      enabled: this.initialEnabled,
       icons: {
         enabled: mdiEye,
         disabled: mdiEyeOffOutline,

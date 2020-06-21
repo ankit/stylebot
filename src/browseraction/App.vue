@@ -19,8 +19,8 @@
           :tab="tab"
           :key="style.url"
           :url="style.url"
-          :enabled="style.enabled"
-          :disabled="isStylebotOpen"
+          :initialEnabled="style.enabled"
+          :disableToggle="isStylebotOpen"
           v-for="style in styleUrlMetadata"
         />
 

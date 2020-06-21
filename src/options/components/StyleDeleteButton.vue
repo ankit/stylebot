@@ -49,9 +49,10 @@
 </template>
 
 <script lang="ts">
+import Vue from 'vue';
 import AppButton from './AppButton.vue';
 
-export default {
+export default Vue.extend({
   name: 'StyleDeleteButton',
   props: ['url'],
   components: {
@@ -65,5 +66,5 @@ export default {
       dialog: false,
     };
   },
-};
+});
 </script>
