@@ -28,22 +28,6 @@
     },
 
     {
-      "matches": ["http://userstyles.org/styles/*"],
-
-      "js": [
-        "libs/jscsspimporter.js",
-
-        "shared/cssformatter.js",
-        "shared/css-utils.js",
-
-        "editor/userstyles-org.js"
-      ],
-
-      "run_at": "document_start",
-      "all_frames": true
-    },
-
-    {
       "matches": ["<all_urls>"],
 
       "css": [
@@ -122,7 +106,6 @@
     "contextMenus",
     "notifications",
     "storage",
-    "http://userstyles.org/",
     "unlimitedStorage",
     "<all_urls>"
   ]
