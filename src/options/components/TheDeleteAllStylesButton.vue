@@ -15,7 +15,7 @@
         <v-card-actions class="pt-4 pb-6 px-6">
           <v-spacer />
 
-          <app-button @click="dialog = false" text="Cancel"></app-button>
+          <app-button @click="dialog = false" text="Cancel" />
 
           <app-button
             @click="
@@ -25,7 +25,7 @@
             color="primary"
             :outlined="false"
             text="Delete All Styles"
-          ></app-button>
+          />
         </v-card-actions>
       </v-card>
     </v-dialog>

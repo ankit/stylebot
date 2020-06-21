@@ -31,7 +31,7 @@
         <v-col cols="3">
           <v-row justify="end">
             <v-col cols="4">
-              <app-button text="Cancel" @click="$emit('cancel')"></app-button>
+              <app-button text="Cancel" @click="$emit('cancel')" />
             </v-col>
 
             <v-col cols="4">
@@ -41,7 +41,7 @@
                 :outlined="false"
                 :disabled="!url || !css"
                 @click="$emit('save', { initialUrl, url, css })"
-              ></app-button>
+              />
             </v-col>
           </v-row>
         </v-col>
@@ -119,8 +119,9 @@ export default Vue.extend({
 }
 
 .style-monaco-editor {
-  width: 100%;
+  width: calc(100% + 18px);
   margin-top: 5px;
+  margin-left: -18px;
   height: calc(100% - 150px);
 }
 </style>

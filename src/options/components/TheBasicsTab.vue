@@ -6,7 +6,7 @@
       @input="saveUseShortcutKey"
       v-model="options.useShortcutKey"
       label="Enable shortcut key to launch Stylebot"
-    ></v-switch>
+    />
 
     <v-col cols="4">
       <v-row justify="space-around" pad>
@@ -15,7 +15,7 @@
           :items="shortcutMetaKeys"
           v-model="options.shortcutMetaKey"
           @change="saveShortcutMetaKey"
-        ></v-select>
+        />
 
         <v-spacer />
 
@@ -24,16 +24,16 @@
           @input="saveShortcutKey"
           v-model="shortcutKeyCharacter"
           class="shortcut-key-character"
-        ></v-text-field>
+        />
       </v-row>
     </v-col>
 
     <h2 class="title">Default Editing Mode</h2>
 
     <v-radio-group v-model="options.mode" @change="saveEditingMode">
-      <v-radio value="Basic" label="Basic"></v-radio>
-      <v-radio value="Advanced" label="Advanced"></v-radio>
-      <v-radio value="Edit CSS" label="Edit CSS"></v-radio>
+      <v-radio value="Basic" label="Basic" />
+      <v-radio value="Advanced" label="Advanced" />
+      <v-radio value="Edit CSS" label="Edit CSS" />
     </v-radio-group>
 
     <h2 class="title">Context Menu</h2>
@@ -42,12 +42,13 @@
       @change="saveRightClickMenu"
       v-model="options.contextMenu"
       label="Show Right Click Context Menu"
-    ></v-switch>
+    />
   </div>
 </template>
 
 <script lang="ts">
 import { StylebotOptions, StylebotShortcutMetaKey } from '../types';
+
 import {
   getOptions,
   saveOption,

@@ -1,6 +1,14 @@
 <template>
   <div>
-    <v-btn color="error" :ripple="false" elevation="0" fab x-small @click="dialog = true">
+    <v-btn
+      color="error"
+      :ripple="false"
+      elevation="0"
+      fab
+      x-small
+      @click="dialog = true"
+      title="Delete Style"
+    >
       <v-icon>mdi-delete</v-icon>
     </v-btn>
 
@@ -14,7 +22,7 @@
 
         <v-card-actions class="pt-4 pb-6 px-6">
           <v-spacer />
-          <app-button @click="dialog = false" text="Cancel"></app-button>
+          <app-button @click="dialog = false" text="Cancel" />
 
           <app-button
             @click="
@@ -24,7 +32,7 @@
             color="primary"
             text="Delete"
             :outlined="false"
-          ></app-button>
+          />
         </v-card-actions>
       </v-card>
     </v-dialog>

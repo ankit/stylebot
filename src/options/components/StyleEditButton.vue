@@ -5,6 +5,7 @@
     elevation="0"
     fab
     x-small
+    title="Edit Style"
     @click="$emit('click')"
   >
     <v-icon>mdi-pencil</v-icon>

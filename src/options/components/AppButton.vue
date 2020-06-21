@@ -6,6 +6,7 @@
     :ripple="false"
     :disabled="disabled"
     :outlined="outlined"
+    :title="title"
     @click="$emit('click')"
   >{{ text }}</v-btn>
 </template>
@@ -32,6 +33,11 @@ export default {
       type: Boolean,
       required: false,
       default: true,
+    },
+    title: {
+      type: String,
+      required: false,
+      default: '',
     },
   },
 };

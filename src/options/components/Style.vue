@@ -13,11 +13,11 @@
 
     <v-col cols="10">
       <v-checkbox
-        :label="url"
         hide-details
+        :label="url"
         :ripple="false"
-        :input-value="enabled"
-        @click="enabled ? $emit('disable') : $emit('enable')"
+        v-model="enabled"
+        @click="enabled ? $emit('enable') : $emit('disable')"
       ></v-checkbox>
     </v-col>
 
@@ -39,7 +39,7 @@ import StyleDeleteButton from './StyleDeleteButton.vue';
 
 export default Vue.extend({
   name: 'Style',
-  props: ['url', 'css', 'enabled'],
+  props: ['url', 'css', 'initialEnabled'],
 
   components: {
     StyleEditor,
@@ -48,12 +48,12 @@ export default Vue.extend({
   },
 
   data(): {
+    enabled: boolean;
     editDialog: boolean;
-    deleteConfirmationDialog: boolean;
   } {
     return {
       editDialog: false,
-      deleteConfirmationDialog: false,
+      enabled: this.initialEnabled,
     };
   },
 });

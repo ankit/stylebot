@@ -11,7 +11,7 @@
 
     <v-dialog persistent max-width="800" transition="fade-transition" v-model="exportDialog">
       <v-card>
-        <v-card-title class="headline">Copy/paste into a JSON file</v-card-title>
+        <v-card-title class="headline-2">Copy/paste into a JSON file</v-card-title>
 
         <v-card-text class="pb-0">
           Keep the JSON safe to import it later until we support automatic sync/backup
@@ -22,29 +22,27 @@
             hide-details
             class="mt-4 body-2"
             v-model="exportedJSONString"
-          ></v-textarea>
+          />
         </v-card-text>
 
         <v-card-actions class="pa-6">
           <v-spacer />
 
-          <app-button @click="
-              exportDialog = false;
-            " text="Close"></app-button>
+          <app-button @click="exportDialog = false;" text="Close" />
 
           <app-button
             @click="copyToClipboard"
             color="primary"
             text="Copy to Clipboard"
             :outlined="false"
-          ></app-button>
+          />
         </v-card-actions>
       </v-card>
     </v-dialog>
 
     <v-dialog persistent max-width="800" transition="fade-transition" v-model="importDialog">
       <v-card>
-        <v-card-title class="headline">Paste previously exported JSON</v-card-title>
+        <v-card-title class="headline-2">Paste previously exported JSON</v-card-title>
 
         <v-card-text class="pb-0">
           <v-alert
@@ -69,7 +67,7 @@
             class="body-2"
             @input="importError = false"
             v-model="jsonStringForImport"
-          ></v-textarea>
+          />
         </v-card-text>
 
         <v-card-actions class="pa-6">
@@ -82,7 +80,7 @@
               jsonStringForImport = ''
             "
             text="Cancel"
-          ></app-button>
+          />
 
           <app-button
             text="Import"
@@ -90,15 +88,15 @@
             :outlined="false"
             @click="importJSONString"
             :disabled="!jsonStringForImport"
-          ></app-button>
+          />
         </v-card-actions>
       </v-card>
     </v-dialog>
 
     <v-row>
       <v-col>
-        <app-button color="primary" text="Export..." class="mr-4" @click="exportDialog = true"></app-button>
-        <app-button text="Import..." @click="importDialog = true"></app-button>
+        <app-button color="primary" text="Export..." class="mr-4" @click="exportDialog = true" />
+        <app-button text="Import..." @click="importDialog = true" />
       </v-col>
     </v-row>
   </div>

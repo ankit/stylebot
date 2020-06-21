@@ -9,17 +9,13 @@
         saveStyle($event);
       "
       @cancel="addStyleDialog = false"
-    ></style-editor>
+    />
 
     <v-row no-gutters>
       <v-col cols="6">
         <v-row>
           <v-col cols="10">
-            <app-button
-              color="primary"
-              text="Add a new style..."
-              @click="addStyleDialog = true"
-            />
+            <app-button color="primary" text="Add a new style..." @click="addStyleDialog = true" />
 
             <app-button text="Enable all" @click="enableAll" />
             <app-button text="Disable all" @click="disableAll" />
@@ -27,21 +23,14 @@
 
           <v-col cols="2" align-self="end">
             <v-row justify="end">
-              <the-delete-all-styles-button
-                @click="deleteAll"
-              ></the-delete-all-styles-button>
+              <the-delete-all-styles-button @click="deleteAll" />
             </v-row>
           </v-col>
         </v-row>
 
         <v-row class="search">
           <v-col cols="12">
-            <v-text-field
-              clearable
-              hide-details
-              placeholder="Search..."
-              @input="setUrlFilter"
-            ></v-text-field>
+            <v-text-field clearable hide-details placeholder="Search..." @input="setUrlFilter" />
           </v-col>
         </v-row>
 
@@ -49,13 +38,13 @@
           :key="style.url"
           :css="style.css"
           :url="style.url"
-          :enabled="style.enabled"
+          :initialEnabled="style.enabled"
           v-for="style in styles"
           @save="saveStyle"
           @delete="deleteStyle(style)"
           @enable="enableStyle(style)"
           @disable="disableStyle(style)"
-        ></user-style>
+        />
       </v-col>
     </v-row>
   </div>
