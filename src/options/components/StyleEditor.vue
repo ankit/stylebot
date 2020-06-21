@@ -38,8 +38,8 @@
               <app-button
                 text="Save"
                 color="primary"
-                :disabled="!url"
                 :outlined="false"
+                :disabled="!url || !css"
                 @click="$emit('save', { initialUrl, url, css })"
               ></app-button>
             </v-col>
