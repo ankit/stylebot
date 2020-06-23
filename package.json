@@ -54,6 +54,7 @@
   "dependencies": {
     "monaco-editor": "0.20.0",
     "vue": "^2.6.11",
+    "vue-material-design-icons": "^4.7.1",
     "vue-monaco": "^1.2.1",
     "vuetify": "^2.2.30"
   }

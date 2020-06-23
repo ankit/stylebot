@@ -16,6 +16,7 @@ const config = {
   context: __dirname + "/src",
   entry: {
     background: "./background/index.js",
+    editor: "./editor-v2/index.ts",
     "browseraction/index": "./browseraction/index.ts",
     "options/index": "./options/index.ts",
   },

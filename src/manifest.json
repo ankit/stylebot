@@ -12,76 +12,11 @@
 
   "content_scripts": [
     {
+      "all_frames": true,
+      "js": ["editor.js"],
+      "css": ["editor.css"],
       "matches": ["<all_urls>"],
-
-      "js": [
-        "libs/jscsspimporter.js",
-
-        "shared/cssformatter.js",
-        "shared/css-utils.js",
-
-        "editor/apply-css.js"
-      ],
-
-      "run_at": "document_start",
-      "all_frames": true
-    },
-
-    {
-      "matches": ["<all_urls>"],
-
-      "css": [
-        "libs/colorpicker/colorpicker.css",
-        "libs/tipsy/tipsy.css",
-        "libs/ace/stylebot-ace.css",
-        "libs/selectize/selectize.css",
-
-        "shared/modalbox/modalbox.css",
-
-        "editor/css/widget.css",
-        "editor/css/controls.css",
-        "editor/css/shortcuts_help.css",
-        "editor/css/preview.css",
-        "editor/css/scrollbars.css"
-      ],
-
-      "js": [
-        "libs/jquery.js",
-        "libs/underscore.js",
-        "libs/handlebars.js",
-        "libs/colorpicker/colorpicker.js",
-        "libs/tipsy/jquery.tipsy.js",
-        "libs/parser.js",
-        "libs/selectize/selectize.js",
-
-        "libs/ace/ace.js",
-        "libs/ace/mode-css.js",
-        "libs/ace/theme-dawn.js",
-
-        "shared/selectorGenerator.js",
-        "shared/selectionBox.js",
-        "shared/modalbox/modalbox.js",
-        "shared/utils.js",
-
-        "editor/templates/page.js",
-
-        "editor/stylebot.js",
-        "editor/chrome.js",
-        "editor/init.js",
-        "editor/widget.js",
-        "editor/widget.basic.js",
-        "editor/events.js",
-        "editor/widget.advanced.js",
-        "editor/widget-ui.js",
-        "editor/style.js",
-        "editor/page.js",
-        "editor/contextmenu.js",
-        "editor/undo.js",
-        "editor/shortcuts.js"
-      ],
-
-      "run_at": "document_start",
-      "all_frames": true
+      "run_at": "document_idle"
     }
   ],
 
