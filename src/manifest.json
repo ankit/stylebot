@@ -101,11 +101,5 @@
     "128": "images/icon128.png"
   },
 
-  "permissions": [
-    "tabs",
-    "contextMenus",
-    "notifications",
-    "storage",
-    "unlimitedStorage"
-  ]
+  "permissions": ["tabs", "contextMenus", "storage", "unlimitedStorage"]
 }
