@@ -1,15 +1,17 @@
 <template>
-  <div class="stylebot"><stylebot-header /></div>
+  <div class="stylebot">
+    <the-header />
+  </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import StylebotHeader from './components/StylebotHeader.vue';
+import TheHeader from './components/TheHeader.vue';
 
 export default Vue.extend({
   name: 'App',
   components: {
-    StylebotHeader,
+    TheHeader,
   },
 });
 </script>
