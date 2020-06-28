@@ -1,17 +1,20 @@
 <template>
   <b-container class="stylebot">
     <the-header />
+    <the-basic-editor />
   </b-container>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import TheHeader from './components/TheHeader.vue';
+import TheBasicEditor from './components/TheBasicEditor.vue';
 
 export default Vue.extend({
   name: 'App',
   components: {
     TheHeader,
+    TheBasicEditor,
   },
 });
 </script>

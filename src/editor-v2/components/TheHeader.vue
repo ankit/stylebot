@@ -18,6 +18,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
+
 import TheInspector from './TheInspector.vue';
 import TheHeaderActions from './TheHeaderActions.vue';
 import TheCssSelectorDropdown from './TheCssSelectorDropdown.vue';

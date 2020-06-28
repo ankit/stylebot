@@ -26,3 +26,9 @@ export default Vue.extend({
   props: ['selector'],
 });
 </script>
+
+<style scoped>
+.stylebot-selector-dropdown {
+  width: 180px;
+}
+</style>

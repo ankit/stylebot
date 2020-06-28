@@ -4,6 +4,11 @@ import {
   TooltipPlugin,
   LayoutPlugin,
   DropdownPlugin,
+  FormRadioPlugin,
+  FormInputPlugin,
+  InputGroupPlugin,
+  ButtonPlugin,
+  ButtonGroupPlugin,
 } from 'bootstrap-vue';
 
 import App from './App.vue';
@@ -17,6 +22,11 @@ Vue.use(IconsPlugin);
 Vue.use(TooltipPlugin);
 Vue.use(LayoutPlugin);
 Vue.use(DropdownPlugin);
+Vue.use(FormRadioPlugin);
+Vue.use(FormInputPlugin);
+Vue.use(InputGroupPlugin);
+Vue.use(ButtonPlugin);
+Vue.use(ButtonGroupPlugin);
 
 new Vue({
   el: '#stylebot',
