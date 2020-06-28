@@ -2,11 +2,13 @@ import Overlay from './Overlay';
 import CSSSelectorGenerator from '../css-selector-generator/CSSSelectorGenerator';
 
 class Highlighter {
-  overlay: Overlay;
+  overlay: Overlay | null;
+  onSelect: (selector: string) => void;
   cssSelectorGenerator: CSSSelectorGenerator;
 
-  constructor() {
-    this.overlay = new Overlay();
+  constructor({ onSelect }: { onSelect: (selector: string) => void }) {
+    this.overlay = null;
+    this.onSelect = onSelect;
     this.cssSelectorGenerator = new CSSSelectorGenerator();
   }
 
@@ -40,41 +42,64 @@ class Highlighter {
   };
 
   onClick = (event: MouseEvent) => {
-    event.preventDefault();
-    event.stopPropagation();
+    if (!this.isStylebotElement(event.target)) {
+      event.preventDefault();
+      event.stopPropagation();
 
-    this.stopInspecting();
+      const selector = this.cssSelectorGenerator.inspect(
+        event.target as HTMLElement
+      );
+
+      this.onSelect(selector);
+    }
   };
 
   onMouseEvent = (event: MouseEvent) => {
-    event.preventDefault();
-    event.stopPropagation();
+    if (!this.isStylebotElement(event.target)) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
   };
 
   onPointerDown = (event: MouseEvent) => {
-    event.preventDefault();
-    event.stopPropagation();
+    if (!this.isStylebotElement(event.target)) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
   };
 
   onPointerOver = (event: MouseEvent) => {
-    event.preventDefault();
-    event.stopPropagation();
+    if (!this.isStylebotElement(event.target)) {
+      event.preventDefault();
+      event.stopPropagation();
 
-    const el = event.target as HTMLElement;
-    this.showOverlay(el);
+      const el = event.target as HTMLElement;
+      this.showOverlay(el);
+    }
   };
 
   onPointerUp = (event: MouseEvent) => {
-    event.preventDefault();
-    event.stopPropagation();
+    if (!this.isStylebotElement(event.target)) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
   };
 
   showOverlay = (el: HTMLElement) => {
+    if (!this.overlay) {
+      this.overlay = new Overlay();
+    }
+
     this.overlay.inspect([el], this.cssSelectorGenerator.inspect(el));
   };
 
   hideOverlay = () => {
-    this.overlay.remove();
+    this.overlay?.remove();
+    this.overlay = null;
+  };
+
+  isStylebotElement = (el: EventTarget | null) => {
+    return !!el && !!(el as HTMLElement).closest('.stylebot');
   };
 }
 

@@ -3,8 +3,8 @@
     @click="toggle"
     class="stylebot-inspector"
     :class="{ enabled: enabled }"
-    v-b-tooltip.hover.nofade="{ customClass: 'stylebot-tooltip' }"
     title="Select an element in the page to style it"
+    v-b-tooltip.hover.nofade="{ customClass: 'stylebot-tooltip' }"
   >
     <b-icon icon="cursor" font-scale="2" />
   </button>
@@ -16,14 +16,19 @@ import Highlighter from '../highlighter/Highlighter';
 
 export default Vue.extend({
   name: 'TheInspector',
+
   data(): {
     enabled: boolean;
-    highlighter: Highlighter;
+    highlighter?: Highlighter;
   } {
     return {
       enabled: false,
-      highlighter: new Highlighter(),
+      highlighter: null,
     };
+  },
+
+  created() {
+    this.highlighter = new Highlighter({ onSelect: this.select });
   },
 
   methods: {
@@ -36,6 +41,11 @@ export default Vue.extend({
         this.highlighter.startInspecting();
       }
     },
+
+    select(selector: string): void {
+      this.toggle();
+      this.$emit('select', selector);
+    },
   },
 });
 </script>
@@ -44,11 +54,17 @@ export default Vue.extend({
 .stylebot-inspector {
   width: 50px;
   padding: 4px;
-  border: 1px solid #ddd;
+  border: none;
+  outline: 1px solid #ddd;
 }
 
 .stylebot-inspector:hover {
-  border: 1px solid #333;
+  outline: 1px solid #333;
   cursor: pointer;
+}
+
+.stylebot-inspector.enabled {
+  background: #ddd;
+  outline: 1px solid #333;
 }
 </style>

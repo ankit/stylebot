@@ -1,5 +1,8 @@
 .stylebot {
   all: initial;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji',
+    'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
 .stylebot-tooltip {
@@ -16,4 +19,12 @@
 
 .stylebot-tooltip .arrow::before {
   display: none;
+}
+
+.stylebot-selector-dropdown {
+  width: 180px;
+}
+
+.stylebot-selector-dropdown .dropdown-toggle::after {
+  margin-left: 10px;
 }

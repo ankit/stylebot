@@ -1,5 +1,10 @@
 import Vue from 'vue';
-import { IconsPlugin, TooltipPlugin, LayoutPlugin } from 'bootstrap-vue';
+import {
+  IconsPlugin,
+  TooltipPlugin,
+  LayoutPlugin,
+  DropdownPlugin,
+} from 'bootstrap-vue';
 
 import App from './App.vue';
 
@@ -16,6 +21,7 @@ document.body.appendChild(stylebotApp);
 Vue.use(IconsPlugin);
 Vue.use(TooltipPlugin);
 Vue.use(LayoutPlugin);
+Vue.use(DropdownPlugin);
 
 new Vue({
   el: '#stylebot',
