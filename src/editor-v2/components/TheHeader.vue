@@ -1,38 +1,35 @@
 <template>
-  <div class="stylebot-header">
-    <the-inspector />
+  <b-row class="stylebot-header justify-content-md-between">
+    <b-col cols="3" style="padding: 0"><the-inspector /></b-col>
 
-    <div class="stylebot-window-controls">
-      <cog-outline :size="20" />
-      <close-circle-outline :size="20" />
-    </div>
-  </div>
+    <b-col cols="4">
+      <b-row class="justify-content-md-end">
+        <b-icon class="stylebot-window-action" icon="gear" />
+        <b-icon class="stylebot-window-action" icon="x-circle" />
+      </b-row>
+    </b-col>
+  </b-row>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import TheInspector from './TheInspector.vue';
-import CogOutline from 'vue-material-design-icons/CogOutline.vue';
-import CloseCircleOutline from 'vue-material-design-icons/CloseCircleOutline.vue';
 
 export default Vue.extend({
   name: 'TheHeader',
   components: {
     TheInspector,
-    CogOutline,
-    CloseCircleOutline,
   },
 });
 </script>
 
 <style scoped>
 .stylebot-header {
-  height: 50px;
-  padding: 5px;
+  padding: 10px;
   background: #eee;
 }
 
-.stylebot-window-controls {
-  float: right;
+.stylebot-window-action {
+  margin-left: 5px;
 }
 </style>

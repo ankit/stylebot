@@ -52,9 +52,10 @@
     "webpack-extension-reloader": "^1.1.4"
   },
   "dependencies": {
+    "bootstrap": "^4.5.0",
+    "bootstrap-vue": "^2.15.0",
     "monaco-editor": "0.20.0",
     "vue": "^2.6.11",
-    "vue-material-design-icons": "^4.7.1",
     "vue-monaco": "^1.2.1",
     "vuetify": "^2.2.30"
   }

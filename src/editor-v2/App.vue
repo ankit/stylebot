@@ -1,7 +1,7 @@
 <template>
-  <div class="stylebot">
+  <b-container class="stylebot">
     <the-header />
-  </div>
+  </b-container>
 </template>
 
 <script lang="ts">
@@ -18,12 +18,13 @@ export default Vue.extend({
 
 <style scoped>
 .stylebot {
-  position: fixed;
   top: 0;
   right: 0;
   height: 100%;
+  position: fixed;
   background: #fff;
   width: 320px;
+  padding: 0 15px;
   z-index: 10000000;
   border: 1px solid #ccc;
   box-shadow: 1px solid #eee;

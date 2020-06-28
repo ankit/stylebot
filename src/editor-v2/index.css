@@ -1,0 +1,19 @@
+.stylebot {
+  all: initial;
+}
+
+.stylebot-tooltip {
+  font-size: 12px;
+  z-index: 1000000000000000000;
+}
+
+.stylebot-tooltip .tooltip-inner {
+  max-width: 300px;
+  color: #333;
+  background: #fff;
+  border: 1px solid #ccc;
+}
+
+.stylebot-tooltip .arrow::before {
+  display: none;
+}

@@ -3,24 +3,19 @@
     @click="toggle"
     class="stylebot-inspector"
     :class="{ enabled: enabled }"
+    v-b-tooltip.hover.nofade="{ customClass: 'stylebot-tooltip' }"
+    title="Select an element in the page to style it"
   >
-    <select-search
-      :size="36"
-      v-tooltip="'Select an element in the page to style it'"
-    />
+    <b-icon icon="cursor" font-scale="2" />
   </button>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import Highlighter from '../highlighter/Highlighter';
-import SelectSearch from 'vue-material-design-icons/SelectSearch.vue';
 
 export default Vue.extend({
   name: 'TheInspector',
-  components: {
-    SelectSearch,
-  },
   data(): {
     enabled: boolean;
     highlighter: Highlighter;
@@ -49,7 +44,6 @@ export default Vue.extend({
 .stylebot-inspector {
   width: 50px;
   padding: 4px;
-  float: left;
   border: 1px solid #ddd;
 }
 
