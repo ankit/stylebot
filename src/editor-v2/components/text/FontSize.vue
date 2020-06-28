@@ -5,7 +5,7 @@
     </css-property>
 
     <css-property-value>
-      <b-input-group>
+      <b-input-group style="width: 100px">
         <b-form-input size="sm" />
 
         <template v-slot:append>

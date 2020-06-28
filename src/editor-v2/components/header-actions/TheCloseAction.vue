@@ -1,6 +1,6 @@
 <template>
   <button
-    title="Close Stylebot"
+    title="Close"
     id="stylebot-close-action"
     @mouseenter="isHovered = true"
     @mouseleave="isHovered = false"
