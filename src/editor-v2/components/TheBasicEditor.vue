@@ -37,12 +37,13 @@ export default Vue.extend({
 .stylebot-basic-editor {
   padding: 20px 10px;
 }
+
 .stylebot-basic-editor-section {
   margin-top: 30px;
   border-top: 1px solid #ddd;
   padding-top: 15px;
-  margin-left: -25px;
-  margin-right: -25px;
-  padding: 15px 25px 0 25px;
+  margin-left: -10px;
+  margin-right: -10px;
+  padding: 15px 10px 0 10px;
 }
 </style>

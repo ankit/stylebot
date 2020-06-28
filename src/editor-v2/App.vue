@@ -26,8 +26,7 @@ export default Vue.extend({
   height: 100%;
   position: fixed;
   background: #fff;
-  width: 320px;
-  padding: 0 15px;
+  width: 350px;
   z-index: 10000000;
   border: 1px solid #ccc;
   box-shadow: 1px solid #eee;

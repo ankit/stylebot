@@ -1,11 +1,14 @@
 <template>
-  <b-row class="stylebot-header justify-content-md-between">
+  <b-row class="stylebot-header justify-content-md-between" no-gutters>
     <b-col cols="2" style="padding: 0">
       <the-inspector @select="selector = $event" />
     </b-col>
 
     <b-col cols="7" align-self="center">
-      <the-css-selector-dropdown :selector="selector" />
+      <the-css-selector-dropdown
+        :selected="selector"
+        :selectors="selector ? [selector] : []"
+      />
     </b-col>
 
     <b-col cols="3">

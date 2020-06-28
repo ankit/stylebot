@@ -4,7 +4,7 @@
     class="stylebot-inspector"
     :class="{ enabled: enabled }"
     title="Select an element in the page to style it"
-    v-b-tooltip.hover.nofade="{ customClass: 'stylebot-tooltip' }"
+    v-b-tooltip.hover.nofade.ds1000="{ customClass: 'stylebot-tooltip' }"
   >
     <b-icon icon="cursor" font-scale="2" />
   </button>
@@ -52,7 +52,7 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .stylebot-inspector {
-  width: 50px;
+  width: 42px;
   padding: 4px;
   border: none;
   outline: 1px solid #ddd;
