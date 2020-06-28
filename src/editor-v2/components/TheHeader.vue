@@ -6,7 +6,7 @@
 
     <b-col cols="7" align-self="center">
       <the-css-selector-dropdown
-        :selected="selector"
+        :selectedSelector="selector"
         :selectors="selector ? [selector] : []"
       />
     </b-col>

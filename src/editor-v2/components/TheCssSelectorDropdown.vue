@@ -1,10 +1,10 @@
 <template>
-  <div>
+  <div @mouseenter="highlight" @mouseleave="unhighlight">
     <v-select
       taggable
-      :value="selected"
-      :options="selectors"
       :clearable="false"
+      :options="selectors"
+      :value="selectedSelector"
       placeholder="Enter CSS selector"
       class="stylebot-selector-dropdown"
     >
@@ -19,14 +19,40 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import Highlighter from '../highlighter/Highlighter';
 import vSelect from 'vue-select';
 
 export default Vue.extend({
   name: 'TheCssSelectorDropdown',
-  props: ['selected', 'selectors'],
+
+  props: ['selectedSelector', 'selectors'],
 
   components: {
     vSelect,
+  },
+
+  data(): any {
+    return {
+      highlighter: null,
+    };
+  },
+
+  created() {
+    this.highlighter = new Highlighter({
+      onSelect: () => {
+        return;
+      },
+    });
+  },
+
+  methods: {
+    highlight(): void {
+      this.highlighter.highlight(this.selectedSelector);
+    },
+
+    unhighlight(): void {
+      this.highlighter.unhighlight(this.selectedSelector);
+    },
   },
 });
 </script>

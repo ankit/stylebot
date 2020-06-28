@@ -21,6 +21,26 @@ class Highlighter {
     this.removeWindowListeners();
   };
 
+  highlight = (selector: string) => {
+    if (!selector) {
+      return;
+    }
+
+    if (!this.overlay) {
+      this.overlay = new Overlay();
+    }
+
+    const elements = Array.prototype.slice.call(
+      document.querySelectorAll(selector)
+    );
+
+    this.overlay.inspect(elements, selector);
+  };
+
+  unhighlight = () => {
+    this.hideOverlay();
+  };
+
   addWindowListeners = () => {
     window.addEventListener('click', this.onClick, true);
     window.addEventListener('mousedown', this.onMouseEvent, true);
