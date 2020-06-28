@@ -7,12 +7,7 @@ import {
 } from 'bootstrap-vue';
 
 import App from './App.vue';
-
-import 'bootstrap/dist/css/bootstrap.css';
-import 'bootstrap-vue/dist/bootstrap-vue.css';
-import 'bootstrap-vue/dist/bootstrap-vue-icons.min.css';
-
-import './index.css';
+import './index.scss';
 
 const stylebotApp = document.createElement('div');
 stylebotApp.id = 'stylebot';

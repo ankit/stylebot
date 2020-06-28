@@ -30,7 +30,7 @@ export default Vue.extend({
     TheCssSelectorDropdown,
   },
   data(): {
-    selector?: string;
+    selector: string | null;
   } {
     return {
       selector: null,

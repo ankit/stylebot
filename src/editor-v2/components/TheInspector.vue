@@ -19,7 +19,7 @@ export default Vue.extend({
 
   data(): {
     enabled: boolean;
-    highlighter?: Highlighter;
+    highlighter: Highlighter | null;
   } {
     return {
       enabled: false,
@@ -35,10 +35,10 @@ export default Vue.extend({
     toggle(): void {
       if (this.enabled) {
         this.enabled = false;
-        this.highlighter.stopInspecting();
+        this.highlighter?.stopInspecting();
       } else {
         this.enabled = true;
-        this.highlighter.startInspecting();
+        this.highlighter?.startInspecting();
       }
     },
 
