@@ -50,21 +50,23 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .stylebot-inspector {
   width: 50px;
   padding: 4px;
   border: none;
   outline: 1px solid #ddd;
-}
 
-.stylebot-inspector:hover {
-  outline: 1px solid #333;
-  cursor: pointer;
-}
+  &:hover,
+  &:focus {
+    cursor: pointer;
+    outline: 1px solid #333;
+  }
 
-.stylebot-inspector.enabled {
-  background: #ddd;
-  outline: 1px solid #333;
+  &.enabled {
+    color: #fff;
+    background: #333;
+    outline: 1px solid #333;
+  }
 }
 </style>

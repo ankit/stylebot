@@ -1,75 +1,15 @@
+@import 'scss/tooltip.scss';
+
 .stylebot {
-  $theme-colors: (
-    'secondary': rgb(116, 116, 116),
-  );
+  @import 'scss/theme.scss';
 
   @import '~bootstrap';
   @import '~bootstrap-vue';
 
   all: initial;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-    'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji',
-    'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 
-  .dropdown-toggle::after {
-    margin-left: 7px;
-  }
-
-  .btn-sm {
-    font-size: 12px;
-    height: 26px;
-  }
-
-  .form-control-sm {
-    height: 26px;
-    font-size: 12px;
-    padding: 10px;
-  }
-
-  .dropdown-menu {
-    padding: 5px 0;
-    border-radius: 0;
-    min-width: 80px;
-    background: #333;
-  }
-
-  .dropdown-item {
-    color: #fff;
-    padding: 5px 10px;
-    font-size: 12px;
-
-    &:hover {
-      color: #fff;
-      background: $primary;
-    }
-  }
-
-  .form-group {
-    margin-bottom: 0;
-  }
-
-  h1 {
-    font-size: 15px;
-  }
-}
-
-.stylebot-tooltip {
-  font-size: 12px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-    'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji',
-    'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-  z-index: 10000000;
-}
-
-.stylebot-tooltip .tooltip-inner {
-  color: #333;
-  padding: 5px;
-  max-width: 300px;
-  background: #fff;
-  border: 1px solid #ccc;
-  margin-top: 5px;
-}
-
-.stylebot-tooltip .arrow::before {
-  display: none;
+  @import 'scss/btn.scss';
+  @import 'scss/form.scss';
+  @import 'scss/dropdown.scss';
+  @import 'scss/typography.scss';
 }

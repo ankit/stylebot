@@ -3,16 +3,14 @@
     <b-dropdown
       class="stylebot-selector-dropdown"
       v-if="selector"
-      size="sm"
       :text="selector"
-      variant="outline-primary"
+      variant="outline-secondary"
     ></b-dropdown>
 
     <b-dropdown
       v-if="!selector"
-      size="sm"
       text="Select an element"
-      variant="outline-primary"
+      variant="outline-secondary"
       class="stylebot-selector-dropdown"
     ></b-dropdown>
   </div>
@@ -26,9 +24,3 @@ export default Vue.extend({
   props: ['selector'],
 });
 </script>
-
-<style scoped>
-.stylebot-selector-dropdown {
-  width: 180px;
-}
-</style>

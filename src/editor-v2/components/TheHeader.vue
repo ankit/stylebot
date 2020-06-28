@@ -25,11 +25,13 @@ import TheCssSelectorDropdown from './TheCssSelectorDropdown.vue';
 
 export default Vue.extend({
   name: 'TheHeader',
+
   components: {
     TheInspector,
     TheHeaderActions,
     TheCssSelectorDropdown,
   },
+
   data(): {
     selector: string | null;
   } {
