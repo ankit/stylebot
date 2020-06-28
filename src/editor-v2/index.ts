@@ -9,6 +9,7 @@ import {
   InputGroupPlugin,
   ButtonPlugin,
   ButtonGroupPlugin,
+  FormGroupPlugin,
 } from 'bootstrap-vue';
 
 import App from './App.vue';
@@ -27,6 +28,7 @@ Vue.use(FormInputPlugin);
 Vue.use(InputGroupPlugin);
 Vue.use(ButtonPlugin);
 Vue.use(ButtonGroupPlugin);
+Vue.use(FormGroupPlugin);
 
 new Vue({
   el: '#stylebot',

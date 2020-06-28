@@ -5,6 +5,7 @@
 
     <div class="stylebot-basic-editor-section">
       <h1>Colors and Background</h1>
+      <the-color-properties />
     </div>
 
     <div class="stylebot-basic-editor-section">
@@ -19,12 +20,15 @@
 
 <script lang="ts">
 import Vue from 'vue';
+
 import TheTextProperties from './TheTextProperties.vue';
+import TheColorProperties from './TheColorProperties.vue';
 
 export default Vue.extend({
   name: 'TheBasicEditor',
   components: {
     TheTextProperties,
+    TheColorProperties,
   },
 });
 </script>
