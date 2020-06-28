@@ -58,7 +58,6 @@
     "vue": "^2.6.11",
     "vue-color": "^2.7.1",
     "vue-monaco": "^1.2.1",
-    "vue-select": "^3.10.5",
     "vuetify": "^2.2.30"
   }
 }

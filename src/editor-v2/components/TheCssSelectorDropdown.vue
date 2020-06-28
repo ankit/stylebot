@@ -1,40 +1,52 @@
 <template>
-  <div @mouseenter="highlight" @mouseleave="unhighlight">
-    <v-select
-      taggable
-      :clearable="false"
-      :options="selectors"
-      :value="selectedSelector"
-      placeholder="Enter CSS selector"
-      class="stylebot-selector-dropdown"
-    >
-      <template #no-options>
-        No styled CSS selectors
-      </template>
-    </v-select>
+  <div>
+    <b-input-group class="stylebot-css-selector">
+      <b-form-input
+        @blur="unhighlight"
+        v-model="selector"
+        @input="highlight(selector)"
+        @focus="highlight(selector)"
+        placeholder="Enter CSS selector..."
+      />
 
-    <b-icon icon="chevron-down" class="stylebot-selector-dropdown-icon" />
+      <template v-slot:append>
+        <b-dropdown variant="outline-secondary">
+          <div
+            :key="selector"
+            v-for="selector in selectors"
+            @mouseenter="highlight(selector)"
+            @mouseleave="unhighlight"
+          >
+            <b-dropdown-item>
+              {{ selector }}
+            </b-dropdown-item>
+          </div>
+        </b-dropdown>
+      </template>
+    </b-input-group>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import Highlighter from '../highlighter/Highlighter';
-import vSelect from 'vue-select';
 
 export default Vue.extend({
   name: 'TheCssSelectorDropdown',
 
-  props: ['selectedSelector', 'selectors'],
-
-  components: {
-    vSelect,
-  },
+  props: ['initialSelector', 'selectors'],
 
   data(): any {
     return {
       highlighter: null,
+      selector: this.initialSelector,
     };
+  },
+
+  watch: {
+    initialSelector(newVal: string): void {
+      this.selector = newVal;
+    },
   },
 
   created() {
@@ -46,46 +58,43 @@ export default Vue.extend({
   },
 
   methods: {
-    highlight(): void {
-      this.highlighter.highlight(this.selectedSelector);
+    validate(selector: string): boolean {
+      try {
+        document.querySelector(selector);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    },
+
+    highlight(selector: string): void {
+      if (!selector) {
+        this.unhighlight();
+      } else if (this.validate(selector)) {
+        this.highlighter.highlight(selector);
+      }
     },
 
     unhighlight(): void {
-      this.highlighter.unhighlight(this.selectedSelector);
+      this.highlighter.unhighlight();
     },
   },
 });
 </script>
 
 <style lang="scss">
-.stylebot-selector-dropdown {
-  font-size: 14px;
+.stylebot-css-selector {
+  margin-left: 8px;
 
-  .vs__search {
-    color: #555;
+  .form-control {
+    height: 30px !important;
+    font-size: 13px !important;
   }
 
-  .vs__dropdown-menu {
-    color: #fff !important;
-    background: #333 !important;
-    max-width: 250px !important;
+  .dropdown-toggle {
+    height: 30px !important;
+    padding: 0 8px !important;
+    padding-top: 3px !important;
   }
-
-  .vs__dropdown-option {
-    color: #fff !important;
-  }
-
-  .vs__open-indicator {
-    display: none !important;
-  }
-}
-
-.stylebot-selector-dropdown-icon {
-  top: 10px;
-  right: 10px;
-  color: #555;
-  font-size: 12px;
-  position: absolute;
-  pointer-events: none;
 }
 </style>
