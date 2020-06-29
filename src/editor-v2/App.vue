@@ -2,19 +2,25 @@
   <b-container class="stylebot">
     <the-header />
     <the-basic-editor />
+    <the-footer />
   </b-container>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
+
 import TheHeader from './components/TheHeader.vue';
+import TheFooter from './components/TheFooter.vue';
 import TheBasicEditor from './components/TheBasicEditor.vue';
+// import TheAdvancedEditor from './components/TheAdvancedEditor.vue';
 
 export default Vue.extend({
   name: 'App',
   components: {
     TheHeader,
+    TheFooter,
     TheBasicEditor,
+    // TheAdvancedEditor,
   },
 });
 </script>
