@@ -27,7 +27,7 @@ export default Vue.extend({
   position: fixed;
   background: #fff;
   width: 350px;
-  z-index: 10000000;
+  z-index: 100000000;
   border: 1px solid #ccc;
   box-shadow: 1px solid #eee;
 }

@@ -1,29 +1,43 @@
 <template>
   <div>
-    <b-input-group class="stylebot-css-selector">
+    <b-input-group>
       <b-form-input
-        @blur="unhighlight"
+        trim
+        @input="input"
+        @focus="focus"
         v-model="selector"
-        @input="highlight(selector)"
-        @focus="highlight(selector)"
+        @blur="unhighlight"
+        class="stylebot-css-selector-input"
         placeholder="Enter CSS selector..."
       />
 
       <template v-slot:append>
-        <b-dropdown variant="outline-secondary">
+        <b-dropdown
+          variant="outline-secondary"
+          class="stylebot-css-selector-dropdown"
+        >
           <div
-            :key="selector"
-            v-for="selector in selectors"
-            @mouseenter="highlight(selector)"
+            :key="dropdownSelector"
+            v-for="dropdownSelector in selectors"
+            @mouseenter="highlight(dropdownSelector)"
             @mouseleave="unhighlight"
           >
             <b-dropdown-item>
-              {{ selector }}
+              {{ dropdownSelector }}
             </b-dropdown-item>
           </div>
         </b-dropdown>
       </template>
     </b-input-group>
+
+    <b-icon
+      variant="danger"
+      icon="exclamation-circle"
+      v-if="validation.state === false"
+      class="stylebot-css-selector-validation-icon"
+      :title="validation.message"
+      v-b-tooltip.hover.nofade.ds1000="{ customClass: 'stylebot-tooltip' }"
+    />
   </div>
 </template>
 
@@ -40,6 +54,7 @@ export default Vue.extend({
     return {
       highlighter: null,
       selector: this.initialSelector,
+      validation: { state: null, message: '' },
     };
   },
 
@@ -58,19 +73,44 @@ export default Vue.extend({
   },
 
   methods: {
-    validate(selector: string): boolean {
+    validate(selector: string): { state: boolean | null; message: string } {
+      if (!selector) {
+        return { state: null, message: '' };
+      }
+
       try {
         document.querySelector(selector);
-        return true;
+        return { state: null, message: '' };
       } catch (e) {
-        return false;
+        console.log('error', e);
+        return { state: false, message: 'Invalid selector' };
+      }
+    },
+
+    input(): void {
+      this.validation = this.validate(this.selector);
+
+      if (this.validation.state !== false) {
+        this.highlight(this.selector);
+      } else {
+        this.unhighlight();
+      }
+    },
+
+    focus(): void {
+      this.validation = this.validate(this.selector);
+
+      if (this.validation.state !== false) {
+        this.highlight(this.selector);
+      } else {
+        this.unhighlight();
       }
     },
 
     highlight(selector: string): void {
       if (!selector) {
         this.unhighlight();
-      } else if (this.validate(selector)) {
+      } else {
         this.highlighter.highlight(selector);
       }
     },
@@ -82,15 +122,23 @@ export default Vue.extend({
 });
 </script>
 
+<style lang="scss" scoped>
+.stylebot-css-selector-validation-icon {
+  top: 7px;
+  right: 33px;
+  z-index: 10000000;
+  position: absolute;
+}
+</style>
+
 <style lang="scss">
-.stylebot-css-selector {
-  margin-left: 8px;
+.stylebot-css-selector-input {
+  height: 30px !important;
+  font-size: 13px !important;
+  margin-left: 8px !important;
+}
 
-  .form-control {
-    height: 30px !important;
-    font-size: 13px !important;
-  }
-
+.stylebot-css-selector-dropdown {
   .dropdown-toggle {
     height: 30px !important;
     padding: 0 8px !important;
