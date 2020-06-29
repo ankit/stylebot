@@ -1,8 +1,12 @@
 <template>
   <b-container class="stylebot">
     <the-header />
-    <the-basic-editor />
-    <the-footer />
+
+    <the-basic-editor v-if="mode === 'basic'" />
+    <the-page-css-editor v-if="mode === 'page'" />
+    <the-selector-css-editor v-if="mode === 'selector'" />
+
+    <the-footer :mode="mode" @updateMode="mode = $event" />
   </b-container>
 </template>
 
@@ -11,16 +15,26 @@ import Vue from 'vue';
 
 import TheHeader from './components/TheHeader.vue';
 import TheFooter from './components/TheFooter.vue';
+
 import TheBasicEditor from './components/TheBasicEditor.vue';
-// import TheAdvancedEditor from './components/TheAdvancedEditor.vue';
+import ThePageCssEditor from './components/ThePageCssEditor.vue';
+import TheSelectorCssEditor from './components/TheSelectorCssEditor.vue';
 
 export default Vue.extend({
   name: 'App',
+
   components: {
     TheHeader,
     TheFooter,
     TheBasicEditor,
-    // TheAdvancedEditor,
+    ThePageCssEditor,
+    TheSelectorCssEditor,
+  },
+
+  data(): any {
+    return {
+      mode: 'basic',
+    };
   },
 });
 </script>

@@ -1,6 +1,10 @@
 <template>
   <div class="stylebot-footer justify-content-md-between" no-gutters>
-    <the-editor-mode-actions />
+    <the-editor-mode-actions
+      :mode="mode"
+      @update="$emit('updateMode', $event)"
+    />
+
     <the-user-actions style="margin-top: 10px" />
   </div>
 </template>
@@ -18,6 +22,8 @@ export default Vue.extend({
     TheEditorModeActions,
     TheUserActions,
   },
+
+  props: ['mode'],
 });
 </script>
 
