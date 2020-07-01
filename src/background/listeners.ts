@@ -1,34 +1,40 @@
 import ContextMenu from './contextmenu';
 import BrowserAction from './browseraction';
 
-import { copyToClipboard } from './utils';
-import { saveOption, saveAccordionState } from './options';
+import BackgroundPageUtils from './utils';
+import { saveOption } from './options';
 
 /**
  * Initialize listeners for the background page
  */
 const init = () => {
-  chrome.extension.onRequest.addListener(function(
-    request,
-    sender,
-    sendResponse
-  ) {
+  chrome.extension.onRequest.addListener((request, sender, sendResponse) => {
     let response;
+
     switch (request.name) {
       case 'activateBrowserAction':
-        BrowserAction.activate(sender.tab);
+        if (sender.tab) {
+          BrowserAction.activate(sender.tab);
+        }
+
         break;
 
       case 'unhighlightBrowserAction':
-        BrowserAction.unhighlight(sender.tab);
+        if (sender.tab) {
+          BrowserAction.unhighlight(sender.tab);
+        }
+
         break;
 
       case 'highlightBrowserAction':
-        BrowserAction.highlight(sender.tab);
+        if (sender.tab) {
+          BrowserAction.highlight(sender.tab);
+        }
+
         break;
 
       case 'copyToClipboard':
-        copyToClipboard(request.text);
+        BackgroundPageUtils.copyToClipboard(request.text);
         break;
 
       case 'save':
@@ -62,7 +68,7 @@ const init = () => {
       case 'getComputedStylesForTab':
         if (window.cache.styles.getComputedStylesForTab) {
           response = window.cache.styles.getComputedStylesForTab(
-            sender.tab.url,
+            sender.tab?.url,
             sender.tab
           );
 
@@ -91,15 +97,6 @@ const init = () => {
         }
 
         sendResponse(response);
-        break;
-
-      case 'getEditableStyleUrlForTab':
-        sendResponse(
-          window.cache.styles.getEditableStyleUrlForTab(
-            request.defaultUrl,
-            sender.tab
-          )
-        );
         break;
 
       case 'enableStyleUrl':
@@ -132,10 +129,6 @@ const init = () => {
 
         break;
 
-      case 'saveAccordionState':
-        saveAccordionState(request.accordions);
-        break;
-
       case 'saveOption':
         saveOption(request.option.name, request.option.value);
         break;
@@ -143,11 +136,6 @@ const init = () => {
       case 'getOption':
         sendResponse(window.cache.options[request.optionName]);
         break;
-
-      case 'fetchImportCSS':
-        window.cache.styles.fetchImportCSS(request.url, function(css) {
-          sendResponse({ text: css });
-        });
     }
   });
 
@@ -155,7 +143,7 @@ const init = () => {
    * Listen when an existing tab is updated to update the context
    * menu and browser action
    */
-  chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+  chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     if (tab.status === 'complete') {
       if (window.cache.options.contextMenu) {
         ContextMenu.update(tab);
@@ -170,9 +158,9 @@ const init = () => {
   /**
    * Listen when a tab is activated to update the context menu
    */
-  chrome.tabs.onActivated.addListener(function(activeInfo) {
+  chrome.tabs.onActivated.addListener(activeInfo => {
     if (window.cache.options.contextMenu) {
-      chrome.tabs.get(activeInfo.tabId, function(tab) {
+      chrome.tabs.get(activeInfo.tabId, tab => {
         ContextMenu.update(tab);
       });
     }
@@ -181,7 +169,7 @@ const init = () => {
   /**
    * Listen when a tab is removed to clear its related cache
    */
-  chrome.tabs.onRemoved.addListener(function(tabId) {
+  chrome.tabs.onRemoved.addListener(tabId => {
     if (window.cache.loadingTabs[tabId]) {
       delete window.cache.loadingTabs[tabId];
     }

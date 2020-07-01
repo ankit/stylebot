@@ -1,4 +1,4 @@
-import { isValidUrl } from './utils';
+import BackgroundPageUtils from './utils';
 
 /**
  * Right click menu
@@ -9,7 +9,7 @@ const ContextMenu = {
   /**
    * Initialize the menu
    */
-  init: function () {
+  init() {
     ContextMenu.remove();
 
     if (window.cache.options.contextMenu) {
@@ -19,34 +19,45 @@ const ContextMenu = {
     }
   },
 
-  create: function (title, parentId, action, type, id) {
-    var options = {
-        title: title,
-        contexts: ['all'],
-      },
-      handler;
+  create(
+    title: string,
+    parentId: string | null,
+    action: string | null,
+    type?: any,
+    id?: string
+  ) {
+    const options: {
+      title: string;
+      contexts: any; // todo
+      parentId?: string;
+      onclick?: any; // todo
+      type?: any; // todo
+      id?: string;
+    } = {
+      title: title,
+      contexts: ['all'],
+    };
 
     if (parentId) {
       options.parentId = parentId;
     }
 
+    let handler;
     if (action) {
       if (action === 'showOptions') {
-        handler = function () {
+        handler = () => {
           chrome.tabs.create({
             url: 'options/index.html',
             active: true,
           });
         };
       } else {
-        handler = function (info, tab) {
-          chrome.tabs.sendRequest(
-            tab.id,
-            {
+        handler = (info: any, tab: chrome.tabs.Tab) => {
+          if (tab.id) {
+            chrome.tabs.sendRequest(tab.id, {
               name: action,
-            },
-            function () {}
-          );
+            });
+          }
         };
       }
 
@@ -65,16 +76,14 @@ const ContextMenu = {
   },
 
   /**
-   * Update the right-click context menu for a tab
-   *   show or hide and update checkboxes.
-   * @param {object} tab Tab based on which the right-click menu is to be updated
+   * Update the right-click context menu for a tab show or hide and update checkboxes.
    */
-  update: function (tab) {
+  update(tab: chrome.tabs.Tab) {
     if (!tab) {
       return;
     }
 
-    if (isValidUrl(tab.url)) {
+    if (tab.url && BackgroundPageUtils.isValidUrl(tab.url)) {
       // If it is a valid url, show the contextMenu
       chrome.contextMenus.update(ContextMenu.ID, {
         documentUrlPatterns: ['<all_urls>'],
@@ -91,7 +100,7 @@ const ContextMenu = {
   /**
    * Remove the right click context menu
    */
-  remove: function () {
+  remove() {
     chrome.contextMenus.removeAll();
   },
 };

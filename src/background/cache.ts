@@ -1,4 +1,4 @@
-import Styles from './styles.js';
+import BackgroundPageStyles from './styles';
 
 // TODO: Make this only accessible as arg / via getters/setters
 window.cache = {
@@ -11,9 +11,6 @@ window.cache = {
     mode: 'Basic',
     sync: false,
     contextMenu: true,
-    livePreviewColorPicker: true,
-    livePreviewPage: true,
-    accordions: [0, 1, 2, 3],
   },
 
   importRules: {},
@@ -23,16 +20,16 @@ window.cache = {
   loadingTabs: [],
 };
 
-const init = callback => {
+const init = (callback: () => void) => {
   chrome.storage.local.get(['options', 'styles'], items => {
     if (items['options']) {
       window.cache.options = items['options'];
     }
 
     if (items['styles']) {
-      window.cache.styles = new Styles(items['styles']);
+      window.cache.styles = new BackgroundPageStyles(items['styles']);
     } else {
-      window.cache.styles = new Styles({});
+      window.cache.styles = new BackgroundPageStyles({});
     }
 
     if (callback) {

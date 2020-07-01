@@ -19,7 +19,7 @@ const config = {
     "popup/index": "./popup/index.ts",
     "editor/index": "./editor/index.ts",
     "options/index": "./options/index.ts",
-    "background/index": "./background/index.js",
+    "background/index": "./background/index.ts",
     "inject-css/index": "./inject-css/index.ts",
   },
 

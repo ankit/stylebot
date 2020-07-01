@@ -1,5 +1,12 @@
 import ContextMenu from './contextmenu';
 
+declare global {
+  interface Window {
+    // todo
+    cache: any;
+  }
+}
+
 /**
  * Propagate options to all existing tabs
  */
@@ -13,11 +20,14 @@ const propagateOptions = () => {
     {
       populate: true,
     },
-    function(windows) {
+    windows => {
       var w_len = windows.length;
       for (var i = 0; i < w_len; i++) {
+        /* @ts-ignore */
         var t_len = windows[i].tabs.length;
+
         for (var j = 0; j < t_len; j++) {
+          /* @ts-ignore */
           chrome.tabs.sendRequest(windows[i].tabs[j].id, req);
         }
       }
@@ -28,8 +38,9 @@ const propagateOptions = () => {
 /**
  * Save an option in cache and datastore.
  * Also pushes the change to all currently open tabs.
+ * todo: tighten the types
  */
-export const saveOption = (name, value) => {
+export const saveOption = (name: string, value: string | boolean) => {
   window.cache.options[name] = value;
   chrome.storage.local.set({ options: window.cache.options });
 
@@ -45,15 +56,4 @@ export const saveOption = (name, value) => {
   }
 };
 
-/**
- * Save current accordion state of stylebot editor into background page cache
- */
-export const saveAccordionState = accordions => {
-  window.cache.options.accordions = accordions;
-
-  chrome.storage.local.set({
-    options: window.cache.options,
-  });
-};
-
-export default { saveOption, saveAccordionState };
+export default { saveOption };
