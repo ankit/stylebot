@@ -3,7 +3,7 @@
   "version": "2.4.1",
   "description": "Change the appearance of websites instantly.",
   "scripts": {
-    "build": "cross-env NODE_ENV=production webpack --hide-modules; node ./build_scripts/compile_templates",
+    "build": "cross-env NODE_ENV=production webpack --hide-modules;",
     "watch": "cross-env NODE_ENV=development webpack --hide-modules --watch"
   },
   "repository": {

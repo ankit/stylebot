@@ -100,16 +100,8 @@ const config = {
     new CopyPlugin({
       patterns: [
         {
-          from: "editor",
-          to: "editor",
-        },
-        {
           from: "images",
           to: "images",
-        },
-        {
-          from: "shared",
-          to: "shared",
         },
         {
           from: "options/index.html",
