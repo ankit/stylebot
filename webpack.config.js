@@ -103,8 +103,8 @@ const config = {
     new CopyPlugin({
       patterns: [
         {
-          from: "images",
-          to: "images",
+          from: "img",
+          to: "img",
         },
         {
           from: "options/index.html",

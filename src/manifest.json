@@ -28,8 +28,8 @@
 
   "browser_action": {
     "default_icon": {
-      "19": "images/css.png",
-      "38": "images/css@2x.png"
+      "19": "img/css.png",
+      "38": "img/css@2x.png"
     },
 
     "default_title": "Stylebot",
@@ -37,9 +37,9 @@
   },
 
   "icons": {
-    "16": "images/icon16.png",
-    "48": "images/icon48.png",
-    "128": "images/icon128.png"
+    "16": "img/icon16.png",
+    "48": "img/icon48.png",
+    "128": "img/icon128.png"
   },
 
   "permissions": [

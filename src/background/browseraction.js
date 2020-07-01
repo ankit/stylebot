@@ -27,8 +27,8 @@ const BrowserAction = {
     chrome.browserAction.setIcon({
       tabId: tab.id,
       path: {
-        '19': 'images/css.png',
-        '38': 'images/css@2x.png',
+        '19': 'img/css.png',
+        '38': 'img/css@2x.png',
       },
     });
   },
@@ -43,8 +43,8 @@ const BrowserAction = {
     chrome.browserAction.setIcon({
       tabId: tab.id,
       path: {
-        '19': 'images/css_highlighted.png',
-        '38': 'images/css_highlighted@2x.png',
+        '19': 'img/css_highlighted.png',
+        '38': 'img/css_highlighted@2x.png',
       },
     });
   },
@@ -58,8 +58,8 @@ const BrowserAction = {
     chrome.browserAction.setIcon({
       tabId: tab.id,
       path: {
-        '19': 'images/css_active.png',
-        '38': 'images/css_active@2x.png',
+        '19': 'img/css_active.png',
+        '38': 'img/css_active@2x.png',
       },
     });
   },
