@@ -16,11 +16,11 @@ const config = {
   context: __dirname + "/src",
 
   entry: {
-    editor: "./editor-v2/index.ts",
-    background: "./background/index.js",
-    "inject-css": "./inject-css/index.ts",
-    "options/index": "./options/index.ts",
     "popup/index": "./popup/index.ts",
+    "editor/index": "./editor/index.ts",
+    "options/index": "./options/index.ts",
+    "background/index": "./background/index.js",
+    "inject-css/index": "./inject-css/index.ts",
   },
 
   output: {

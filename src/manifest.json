@@ -5,7 +5,7 @@
   "description": "Change the appearance of websites instantly.",
 
   "background": {
-    "scripts": ["background.js"]
+    "scripts": ["background/index.js"]
   },
 
   "options_page": "options/index.html",
@@ -13,14 +13,14 @@
   "content_scripts": [
     {
       "all_frames": true,
-      "js": ["editor.js"],
-      "css": ["editor.css"],
+      "js": ["editor/index.js"],
+      "css": ["editor/index.css"],
       "matches": ["<all_urls>"],
       "run_at": "document_idle"
     },
     {
       "all_frames": true,
-      "js": ["inject-css.js"],
+      "js": ["inject-css/index.js"],
       "matches": ["<all_urls>"],
       "run_at": "document_start"
     }
