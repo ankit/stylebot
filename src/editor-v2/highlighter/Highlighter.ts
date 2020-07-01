@@ -1,15 +1,15 @@
 import Overlay from './Overlay';
-import CSSSelectorGenerator from '../css-selector-generator/CSSSelectorGenerator';
+import CssSelectorGenerator from '../../css/CssSelectorGenerator';
 
 class Highlighter {
   overlay: Overlay | null;
   onSelect: (selector: string) => void;
-  cssSelectorGenerator: CSSSelectorGenerator;
+  cssSelectorGenerator: CssSelectorGenerator;
 
   constructor({ onSelect }: { onSelect: (selector: string) => void }) {
     this.overlay = null;
     this.onSelect = onSelect;
-    this.cssSelectorGenerator = new CSSSelectorGenerator();
+    this.cssSelectorGenerator = new CssSelectorGenerator();
   }
 
   startInspecting = () => {

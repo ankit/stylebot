@@ -1,7 +1,7 @@
 /**
  * Generate CSS selector for HTML element.
  */
-class CSSSelectorGenerator {
+class CssSelectorGenerator {
   inspect = (el: HTMLElement, domHeirarchyLevel: number = 0): string => {
     const className = el
       .getAttribute('class')
@@ -39,4 +39,4 @@ class CSSSelectorGenerator {
   };
 }
 
-export default CSSSelectorGenerator;
+export default CssSelectorGenerator;

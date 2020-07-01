@@ -1,3 +1,4 @@
+/* eslint-ignore */
 //http://www.glazman.org/JSCSSP/freshmeat.html
 //http://sources.disruptive-innovations.com/jscssp/trunk/cssParser.js
 
@@ -2477,11 +2478,11 @@ var PrefixHelper = {
   kEXPORTS_FOR_PRESTO: true,
   kEXPORTS_FOR_TRIDENT: true,
 
-  cleanPrefixes: function () {
+  cleanPrefixes: function() {
     this.mVENDOR_PREFIXES = null;
   },
 
-  prefixesForProperty: function (aProperty) {
+  prefixesForProperty: function(aProperty) {
     if (!this.mVENDOR_PREFIXES) {
       this.mVENDOR_PREFIXES = {};
       for (var i = 0; i < kCSS_VENDOR_PREFIXES.properties.length; i++) {
@@ -3219,58 +3220,58 @@ CSSScanner.prototype = {
   mPos: 0,
   mPreservedPos: [],
 
-  init: function (aString) {
+  init: function(aString) {
     this.mString = aString;
     this.mPos = 0;
     this.mPreservedPos = [];
   },
 
-  getCurrentPos: function () {
+  getCurrentPos: function() {
     return this.mPos;
   },
 
-  getAlreadyScanned: function () {
+  getAlreadyScanned: function() {
     return this.mString.substr(0, this.mPos);
   },
 
-  preserveState: function () {
+  preserveState: function() {
     this.mPreservedPos.push(this.mPos);
   },
 
-  restoreState: function () {
+  restoreState: function() {
     if (this.mPreservedPos.length) {
       this.mPos = this.mPreservedPos.pop();
     }
   },
 
-  forgetState: function () {
+  forgetState: function() {
     if (this.mPreservedPos.length) {
       this.mPreservedPos.pop();
     }
   },
 
-  read: function () {
+  read: function() {
     if (this.mPos < this.mString.length)
       return this.mString.charAt(this.mPos++);
     return -1;
   },
 
-  peek: function () {
+  peek: function() {
     if (this.mPos < this.mString.length) return this.mString.charAt(this.mPos);
     return -1;
   },
 
-  isHexDigit: function (c) {
+  isHexDigit: function(c) {
     var code = c.charCodeAt(0);
     return code < 256 && (this.kLexTable[code] & IS_HEX_DIGIT) != 0;
   },
 
-  isIdentStart: function (c) {
+  isIdentStart: function(c) {
     var code = c.charCodeAt(0);
     return code >= 256 || (this.kLexTable[code] & START_IDENT) != 0;
   },
 
-  startsWithIdent: function (aFirstChar, aSecondChar) {
+  startsWithIdent: function(aFirstChar, aSecondChar) {
     var code = aFirstChar.charCodeAt(0);
     return (
       this.isIdentStart(aFirstChar) ||
@@ -3278,16 +3279,16 @@ CSSScanner.prototype = {
     );
   },
 
-  isIdent: function (c) {
+  isIdent: function(c) {
     var code = c.charCodeAt(0);
     return code >= 256 || (this.kLexTable[code] & IS_IDENT) != 0;
   },
 
-  pushback: function () {
+  pushback: function() {
     this.mPos--;
   },
 
-  nextHexValue: function () {
+  nextHexValue: function() {
     var c = this.read();
     if (c == -1 || !this.isHexDigit(c))
       return new jscsspToken(jscsspToken.NULL_TYPE, null);
@@ -3301,7 +3302,7 @@ CSSScanner.prototype = {
     return new jscsspToken(jscsspToken.HEX_TYPE, s);
   },
 
-  gatherEscape: function () {
+  gatherEscape: function() {
     var c = this.peek();
     if (c == -1) return '';
     if (this.isHexDigit(c)) {
@@ -3326,7 +3327,7 @@ CSSScanner.prototype = {
     return '';
   },
 
-  gatherIdent: function (c) {
+  gatherIdent: function(c) {
     var s = '';
     if (c == CSS_ESCAPE) s += this.gatherEscape();
     else s += c;
@@ -3340,7 +3341,7 @@ CSSScanner.prototype = {
     return s;
   },
 
-  parseIdent: function (c) {
+  parseIdent: function(c) {
     var value = this.gatherIdent(c);
     var nextChar = this.peek();
     if (nextChar == '(') {
@@ -3350,11 +3351,11 @@ CSSScanner.prototype = {
     return new jscsspToken(jscsspToken.IDENT_TYPE, value);
   },
 
-  isDigit: function (c) {
+  isDigit: function(c) {
     return c >= '0' && c <= '9';
   },
 
-  parseComment: function (c) {
+  parseComment: function(c) {
     var s = c;
     while ((c = this.read()) != -1) {
       s += c;
@@ -3371,7 +3372,7 @@ CSSScanner.prototype = {
     return new jscsspToken(jscsspToken.COMMENT_TYPE, s);
   },
 
-  parseNumber: function (c) {
+  parseNumber: function(c) {
     var s = c;
     var foundDot = false;
     while ((c = this.read()) != -1) {
@@ -3397,7 +3398,7 @@ CSSScanner.prototype = {
     return new jscsspToken(jscsspToken.NUMBER_TYPE, s);
   },
 
-  parseString: function (aStop) {
+  parseString: function(aStop) {
     var s = aStop;
     var previousChar = aStop;
     var c;
@@ -3429,12 +3430,12 @@ CSSScanner.prototype = {
     return new jscsspToken(jscsspToken.STRING_TYPE, s);
   },
 
-  isWhiteSpace: function (c) {
+  isWhiteSpace: function(c) {
     var code = c.charCodeAt(0);
     return code < 256 && (this.kLexTable[code] & IS_WHITESPACE) != 0;
   },
 
-  eatWhiteSpace: function (c) {
+  eatWhiteSpace: function(c) {
     var s = c;
     while ((c = this.read()) != -1) {
       if (!this.isWhiteSpace(c)) break;
@@ -3444,11 +3445,11 @@ CSSScanner.prototype = {
     return s;
   },
 
-  parseAtKeyword: function (c) {
+  parseAtKeyword: function(c) {
     return new jscsspToken(jscsspToken.ATRULE_TYPE, this.gatherIdent(c));
   },
 
-  nextToken: function () {
+  nextToken: function() {
     var c = this.read();
     if (c == -1) return new jscsspToken(jscsspToken.NULL_TYPE, null);
 
@@ -3512,7 +3513,7 @@ CSSScanner.prototype = {
   },
 };
 
-CSSParser.prototype.parseBackgroundImages = function () {
+CSSParser.prototype.parseBackgroundImages = function() {
   var backgrounds = [];
   var token = this.getToken(true, true);
   while (token.isNotNull()) {
@@ -3553,7 +3554,7 @@ CSSParser.prototype.parseBackgroundImages = function () {
   return backgrounds;
 };
 
-CSSParser.prototype.parseBackgroundShorthand = function (
+CSSParser.prototype.parseBackgroundShorthand = function(
   token,
   aDecl,
   aAcceptPriority
@@ -3714,7 +3715,7 @@ CSSParser.prototype.parseBackgroundShorthand = function (
     bgPosition
   );
 };
-CSSParser.prototype.parseBorderColorShorthand = function (
+CSSParser.prototype.parseBorderColorShorthand = function(
   token,
   aDecl,
   aAcceptPriority
@@ -3789,7 +3790,7 @@ CSSParser.prototype.parseBorderColorShorthand = function (
   return top + ' ' + right + ' ' + bottom + ' ' + left;
 };
 
-CSSParser.prototype.parseBorderEdgeOrOutlineShorthand = function (
+CSSParser.prototype.parseBorderEdgeOrOutlineShorthand = function(
   token,
   aDecl,
   aAcceptPriority,
@@ -3858,7 +3859,7 @@ CSSParser.prototype.parseBorderEdgeOrOutlineShorthand = function (
   return bWidth + ' ' + bStyle + ' ' + bColor;
 };
 
-CSSParser.prototype.parseBorderImage = function () {
+CSSParser.prototype.parseBorderImage = function() {
   var borderImage = { url: '', offsets: [], widths: [], sizes: [] };
   var token = this.getToken(true, true);
   if (token.isFunction('url(')) {
@@ -3928,7 +3929,7 @@ CSSParser.prototype.parseBorderImage = function () {
   return null;
 };
 
-CSSParser.prototype.parseBorderStyleShorthand = function (
+CSSParser.prototype.parseBorderStyleShorthand = function(
   token,
   aDecl,
   aAcceptPriority
@@ -3999,7 +4000,7 @@ CSSParser.prototype.parseBorderStyleShorthand = function (
   return top + ' ' + right + ' ' + bottom + ' ' + left;
 };
 
-CSSParser.prototype.parseBorderWidthShorthand = function (
+CSSParser.prototype.parseBorderWidthShorthand = function(
   token,
   aDecl,
   aAcceptPriority
@@ -4074,7 +4075,7 @@ CSSParser.prototype.parseBorderWidthShorthand = function (
   return top + ' ' + right + ' ' + bottom + ' ' + left;
 };
 
-CSSParser.prototype.parseBoxShadows = function () {
+CSSParser.prototype.parseBoxShadows = function() {
   var shadows = [];
   var token = this.getToken(true, true);
   var color = '',
@@ -4215,7 +4216,7 @@ CSSParser.prototype.parseBoxShadows = function () {
   return shadows;
 };
 
-CSSParser.prototype.parseCharsetRule = function (aSheet) {
+CSSParser.prototype.parseCharsetRule = function(aSheet) {
   var token = this.getToken(false, false);
   if (token.isAtRule('@charset') && token.value == '@charset') {
     // lowercase check
@@ -4245,7 +4246,7 @@ CSSParser.prototype.parseCharsetRule = function (aSheet) {
   return false;
 };
 
-CSSParser.prototype.parseColor = function (token) {
+CSSParser.prototype.parseColor = function(token) {
   var color = '';
   if (token.isFunction('rgb(') || token.isFunction('rgba(')) {
     color = token.value;
@@ -4328,7 +4329,7 @@ CSSParser.prototype.parseColor = function (token) {
   return color;
 };
 
-CSSParser.prototype.parseCueShorthand = function (
+CSSParser.prototype.parseCueShorthand = function(
   token,
   declarations,
   aAcceptPriority
@@ -4380,7 +4381,7 @@ CSSParser.prototype.parseCueShorthand = function (
   return before + ' ' + after;
 };
 
-CSSParser.prototype.parseDeclaration = function (
+CSSParser.prototype.parseDeclaration = function(
   aToken,
   aDecl,
   aAcceptPriority,
@@ -4569,11 +4570,11 @@ CSSParser.prototype.parseDeclaration = function (
   return '';
 };
 
-CSSParser.prototype.reportError = function (aMsg) {
+CSSParser.prototype.reportError = function(aMsg) {
   this.mError = aMsg;
 };
 
-CSSParser.prototype.consumeError = function () {
+CSSParser.prototype.consumeError = function() {
   var e = this.mError;
   this.mError = null;
   return e;
@@ -4592,7 +4593,7 @@ function CSSParser(aString) {
   this.mError = null;
 }
 
-CSSParser.prototype._init = function () {
+CSSParser.prototype._init = function() {
   this.mToken = null;
   this.mLookAhead = null;
 };
@@ -4898,7 +4899,7 @@ CSSParser.prototype.kLIST_STYLE_TYPE_NAMES = {
   'parenthesised-lower-latin': true,
 };
 
-CSSParser.prototype.parseFontFaceRule = function (aToken, aSheet) {
+CSSParser.prototype.parseFontFaceRule = function(aToken, aSheet) {
   var currentLine = CountLF(this.mScanner.getAlreadyScanned());
   var s = aToken.value;
   var valid = false;
@@ -4943,7 +4944,7 @@ CSSParser.prototype.parseFontFaceRule = function (aToken, aSheet) {
   return false;
 };
 
-CSSParser.prototype.parseFontShorthand = function (
+CSSParser.prototype.parseFontShorthand = function(
   token,
   aDecl,
   aAcceptPriority
@@ -5146,7 +5147,7 @@ CSSParser.prototype.parseFontShorthand = function (
   );
 };
 
-CSSParser.prototype.parseFunctionArgument = function (token) {
+CSSParser.prototype.parseFunctionArgument = function(token) {
   var value = '';
   if (token.isString()) {
     value += token.value;
@@ -5169,7 +5170,7 @@ CSSParser.prototype.parseFunctionArgument = function (token) {
   return '';
 };
 
-CSSParser.prototype.parseColorStop = function (token) {
+CSSParser.prototype.parseColorStop = function(token) {
   var color = this.parseColor(token);
   var position = '';
   if (!color) return null;
@@ -5181,7 +5182,7 @@ CSSParser.prototype.parseColorStop = function (token) {
   return { color: color, position: position };
 };
 
-CSSParser.prototype.parseGradient = function () {
+CSSParser.prototype.parseGradient = function() {
   var kHPos = { left: true, right: true };
   var kVPos = { top: true, bottom: true };
   var kPos = {
@@ -5366,7 +5367,7 @@ CSSParser.prototype.parseGradient = function () {
   return null;
 };
 
-CSSParser.prototype.serializeGradient = function (gradient) {
+CSSParser.prototype.serializeGradient = function(gradient) {
   var s = gradient.isRadial
     ? gradient.isRepeating
       ? 'repeating-radial-gradient('
@@ -5402,7 +5403,7 @@ CSSParser.prototype.serializeGradient = function (gradient) {
   return s;
 };
 
-CSSParser.prototype.parseImportRule = function (aToken, aSheet) {
+CSSParser.prototype.parseImportRule = function(aToken, aSheet) {
   var currentLine = CountLF(this.mScanner.getAlreadyScanned());
   var s = aToken.value;
   this.preserveState();
@@ -5459,7 +5460,7 @@ CSSParser.prototype.parseImportRule = function (aToken, aSheet) {
   return false;
 };
 
-CSSParser.prototype.parseKeyframesRule = function (aToken, aSheet) {
+CSSParser.prototype.parseKeyframesRule = function(aToken, aSheet) {
   var currentLine = CountLF(this.mScanner.getAlreadyScanned());
   var s = aToken.value;
   var valid = false;
@@ -5526,7 +5527,7 @@ CSSParser.prototype.parseKeyframesRule = function (aToken, aSheet) {
   return false;
 };
 
-CSSParser.prototype.parseKeyframeRule = function (aToken, aOwner) {
+CSSParser.prototype.parseKeyframeRule = function(aToken, aOwner) {
   var currentLine = CountLF(this.mScanner.getAlreadyScanned());
   this.preserveState();
   var token = aToken;
@@ -5607,7 +5608,7 @@ CSSParser.prototype.parseKeyframeRule = function (aToken, aOwner) {
   return '';
 };
 
-CSSParser.prototype.parseListStyleShorthand = function (
+CSSParser.prototype.parseListStyleShorthand = function(
   token,
   aDecl,
   aAcceptPriority
@@ -5672,7 +5673,7 @@ CSSParser.prototype.parseListStyleShorthand = function (
   return lType + ' ' + lPosition + ' ' + lImage;
 };
 
-CSSParser.prototype.parse = function (
+CSSParser.prototype.parse = function(
   aString,
   aTryToPreserveWhitespaces,
   aTryToPreserveComments
@@ -5758,7 +5759,7 @@ CSSParser.prototype.parse = function (
 
   return sheet;
 };
-CSSParser.prototype.parseMarginOrPaddingShorthand = function (
+CSSParser.prototype.parseMarginOrPaddingShorthand = function(
   token,
   aDecl,
   aAcceptPriority,
@@ -5837,7 +5838,7 @@ CSSParser.prototype.parseMarginOrPaddingShorthand = function (
   return top + ' ' + right + ' ' + bottom + ' ' + left;
 };
 
-CSSParser.prototype.parseMediaQuery = function () {
+CSSParser.prototype.parseMediaQuery = function() {
   var kCONSTRAINTS = {
     width: true,
     'min-width': true,
@@ -5962,7 +5963,7 @@ CSSParser.prototype.parseMediaQuery = function () {
   return m;
 };
 
-CSSParser.prototype.parseMediaRule = function (aToken, aSheet) {
+CSSParser.prototype.parseMediaRule = function(aToken, aSheet) {
   var currentLine = CountLF(this.mScanner.getAlreadyScanned());
   var s = aToken.value;
   var valid = false;
@@ -6030,7 +6031,7 @@ CSSParser.prototype.parseMediaRule = function (aToken, aSheet) {
   return false;
 };
 
-CSSParser.prototype.parseNamespaceRule = function (aToken, aSheet) {
+CSSParser.prototype.parseNamespaceRule = function(aToken, aSheet) {
   var currentLine = CountLF(this.mScanner.getAlreadyScanned());
   var s = aToken.value;
   var valid = false;
@@ -6082,7 +6083,7 @@ CSSParser.prototype.parseNamespaceRule = function (aToken, aSheet) {
   return false;
 };
 
-CSSParser.prototype.parsePageRule = function (aToken, aSheet) {
+CSSParser.prototype.parsePageRule = function(aToken, aSheet) {
   var currentLine = CountLF(this.mScanner.getAlreadyScanned());
   var s = aToken.value;
   var valid = false;
@@ -6140,7 +6141,7 @@ CSSParser.prototype.parsePageRule = function (aToken, aSheet) {
   return false;
 };
 
-CSSParser.prototype.parsePauseShorthand = function (
+CSSParser.prototype.parsePauseShorthand = function(
   token,
   declarations,
   aAcceptPriority
@@ -6193,7 +6194,7 @@ CSSParser.prototype.parsePauseShorthand = function (
   return before + ' ' + after;
 };
 
-CSSParser.prototype.parseDefaultPropertyValue = function (
+CSSParser.prototype.parseDefaultPropertyValue = function(
   token,
   aDecl,
   aAcceptPriority,
@@ -6298,7 +6299,7 @@ CSSParser.prototype.parseDefaultPropertyValue = function (
   return '';
 };
 
-CSSParser.prototype.parseSelector = function (aToken, aParseSelectorOnly) {
+CSSParser.prototype.parseSelector = function(aToken, aParseSelectorOnly) {
   var s = '';
   var specificity = { a: 0, b: 0, c: 0, d: 0 }; // CSS 2.1 section 6.4.3
   var isFirstInChain = true;
@@ -6383,7 +6384,7 @@ CSSParser.prototype.parseSelector = function (aToken, aParseSelectorOnly) {
   return '';
 };
 
-CSSParser.prototype.isPseudoElement = function (aIdent) {
+CSSParser.prototype.isPseudoElement = function(aIdent) {
   switch (aIdent) {
     case 'first-letter':
     case 'first-line':
@@ -6398,7 +6399,7 @@ CSSParser.prototype.isPseudoElement = function (aIdent) {
   return false;
 };
 
-CSSParser.prototype.parseSimpleSelector = function (
+CSSParser.prototype.parseSimpleSelector = function(
   token,
   isFirstInChain,
   canNegate
@@ -6544,7 +6545,7 @@ CSSParser.prototype.parseSimpleSelector = function (
   return null;
 };
 
-CSSParser.prototype.trim11 = function (str) {
+CSSParser.prototype.trim11 = function(str) {
   str = str.replace(/^\s+/, '');
   for (var i = str.length - 1; i >= 0; i--) {
     if (/\S/.test(str.charAt(i))) {
@@ -6556,7 +6557,7 @@ CSSParser.prototype.trim11 = function (str) {
   return str;
 };
 
-CSSParser.prototype.parseStyleRule = function (
+CSSParser.prototype.parseStyleRule = function(
   aToken,
   aOwner,
   aIsInsideMediaRule
@@ -6617,7 +6618,7 @@ CSSParser.prototype.parseStyleRule = function (
   return '';
 };
 
-CSSParser.prototype.parseTextShadows = function () {
+CSSParser.prototype.parseTextShadows = function() {
   var shadows = [];
   var token = this.getToken(true, true);
   var color = '',
@@ -6716,16 +6717,16 @@ CSSParser.prototype.parseTextShadows = function () {
   return shadows;
 };
 
-CSSParser.prototype.currentToken = function () {
+CSSParser.prototype.currentToken = function() {
   return this.mToken;
 };
 
-CSSParser.prototype.getHexValue = function () {
+CSSParser.prototype.getHexValue = function() {
   this.mToken = this.mScanner.nextHexValue();
   return this.mToken;
 };
 
-CSSParser.prototype.getToken = function (aSkipWS, aSkipComment) {
+CSSParser.prototype.getToken = function(aSkipWS, aSkipComment) {
   if (this.mLookAhead) {
     this.mToken = this.mLookAhead;
     this.mLookAhead = null;
@@ -6742,7 +6743,7 @@ CSSParser.prototype.getToken = function (aSkipWS, aSkipComment) {
   return this.mToken;
 };
 
-CSSParser.prototype.lookAhead = function (aSkipWS, aSkipComment) {
+CSSParser.prototype.lookAhead = function(aSkipWS, aSkipComment) {
   var preservedToken = this.mToken;
   this.mScanner.preserveState();
   var token = this.getToken(aSkipWS, aSkipComment);
@@ -6752,25 +6753,25 @@ CSSParser.prototype.lookAhead = function (aSkipWS, aSkipComment) {
   return token;
 };
 
-CSSParser.prototype.ungetToken = function () {
+CSSParser.prototype.ungetToken = function() {
   this.mLookAhead = this.mToken;
 };
 
-CSSParser.prototype.addWhitespace = function (aSheet, aString) {
+CSSParser.prototype.addWhitespace = function(aSheet, aString) {
   var rule = new jscsspWhitespace();
   rule.parsedCssText = aString;
   rule.parentStyleSheet = aSheet;
   aSheet.cssRules.push(rule);
 };
 
-CSSParser.prototype.addComment = function (aSheet, aString) {
+CSSParser.prototype.addComment = function(aSheet, aString) {
   var rule = new jscsspComment();
   rule.parsedCssText = aString;
   rule.parentStyleSheet = aSheet;
   aSheet.cssRules.push(rule);
 };
 
-CSSParser.prototype._createJscsspDeclaration = function (property, value) {
+CSSParser.prototype._createJscsspDeclaration = function(property, value) {
   var decl = new jscsspDeclaration();
   decl.property = property;
   decl.value = this.trim11(value);
@@ -6778,7 +6779,7 @@ CSSParser.prototype._createJscsspDeclaration = function (property, value) {
   return decl;
 };
 
-CSSParser.prototype._createJscsspDeclarationFromValue = function (
+CSSParser.prototype._createJscsspDeclarationFromValue = function(
   property,
   valueText
 ) {
@@ -6792,7 +6793,7 @@ CSSParser.prototype._createJscsspDeclarationFromValue = function (
   return decl;
 };
 
-CSSParser.prototype._createJscsspDeclarationFromValuesArray = function (
+CSSParser.prototype._createJscsspDeclarationFromValuesArray = function(
   property,
   values,
   valueText
@@ -6805,26 +6806,26 @@ CSSParser.prototype._createJscsspDeclarationFromValuesArray = function (
   return decl;
 };
 
-CSSParser.prototype.preserveState = function () {
+CSSParser.prototype.preserveState = function() {
   this.mPreservedTokens.push(this.currentToken());
   this.mScanner.preserveState();
 };
 
-CSSParser.prototype.restoreState = function () {
+CSSParser.prototype.restoreState = function() {
   if (this.mPreservedTokens.length) {
     this.mScanner.restoreState();
     this.mToken = this.mPreservedTokens.pop();
   }
 };
 
-CSSParser.prototype.forgetState = function () {
+CSSParser.prototype.forgetState = function() {
   if (this.mPreservedTokens.length) {
     this.mScanner.forgetState();
     this.mPreservedTokens.pop();
   }
 };
 
-CSSParser.prototype.addUnknownAtRule = function (aSheet, aString) {
+CSSParser.prototype.addUnknownAtRule = function(aSheet, aString) {
   var currentLine = CountLF(this.mScanner.getAlreadyScanned());
   var blocks = [];
   var token = this.getToken(false, false);
@@ -6861,7 +6862,7 @@ CSSParser.prototype.addUnknownAtRule = function (aSheet, aString) {
   this.addUnknownRule(aSheet, aString, currentLine);
 };
 
-CSSParser.prototype.addUnknownRule = function (aSheet, aString, aCurrentLine) {
+CSSParser.prototype.addUnknownRule = function(aSheet, aString, aCurrentLine) {
   var errorMsg = this.consumeError();
   var rule = new jscsspErrorRule(errorMsg);
   rule.currentLine = aCurrentLine;
@@ -6870,7 +6871,7 @@ CSSParser.prototype.addUnknownRule = function (aSheet, aString, aCurrentLine) {
   aSheet.cssRules.push(rule);
 };
 
-CSSParser.prototype.parseURL = function (token) {
+CSSParser.prototype.parseURL = function(token) {
   var value = '';
   if (token.isString()) {
     value += token.value;
@@ -6903,7 +6904,7 @@ CSSParser.prototype.parseURL = function (token) {
   return '';
 };
 
-CSSParser.prototype.parseVariablesRule = function (token, aSheet) {
+CSSParser.prototype.parseVariablesRule = function(token, aSheet) {
   var currentLine = CountLF(this.mScanner.getAlreadyScanned());
   var s = token.value;
   var declarations = [];
@@ -6997,85 +6998,85 @@ jscsspToken.PERCENTAGE_TYPE = 15;
 jscsspToken.HEX_TYPE = 16;
 
 jscsspToken.prototype = {
-  isNotNull: function () {
+  isNotNull: function() {
     return this.type;
   },
 
-  _isOfType: function (aType, aValue) {
+  _isOfType: function(aType, aValue) {
     return (
       this.type == aType && (!aValue || this.value.toLowerCase() == aValue)
     );
   },
 
-  isWhiteSpace: function (w) {
+  isWhiteSpace: function(w) {
     return this._isOfType(jscsspToken.WHITESPACE_TYPE, w);
   },
 
-  isString: function () {
+  isString: function() {
     return this._isOfType(jscsspToken.STRING_TYPE);
   },
 
-  isComment: function () {
+  isComment: function() {
     return this._isOfType(jscsspToken.COMMENT_TYPE);
   },
 
-  isNumber: function (n) {
+  isNumber: function(n) {
     return this._isOfType(jscsspToken.NUMBER_TYPE, n);
   },
 
-  isIdent: function (i) {
+  isIdent: function(i) {
     return this._isOfType(jscsspToken.IDENT_TYPE, i);
   },
 
-  isFunction: function (f) {
+  isFunction: function(f) {
     return this._isOfType(jscsspToken.FUNCTION_TYPE, f);
   },
 
-  isAtRule: function (a) {
+  isAtRule: function(a) {
     return this._isOfType(jscsspToken.ATRULE_TYPE, a);
   },
 
-  isIncludes: function () {
+  isIncludes: function() {
     return this._isOfType(jscsspToken.INCLUDES_TYPE);
   },
 
-  isDashmatch: function () {
+  isDashmatch: function() {
     return this._isOfType(jscsspToken.DASHMATCH_TYPE);
   },
 
-  isBeginsmatch: function () {
+  isBeginsmatch: function() {
     return this._isOfType(jscsspToken.BEGINSMATCH_TYPE);
   },
 
-  isEndsmatch: function () {
+  isEndsmatch: function() {
     return this._isOfType(jscsspToken.ENDSMATCH_TYPE);
   },
 
-  isContainsmatch: function () {
+  isContainsmatch: function() {
     return this._isOfType(jscsspToken.CONTAINSMATCH_TYPE);
   },
 
-  isSymbol: function (c) {
+  isSymbol: function(c) {
     return this._isOfType(jscsspToken.SYMBOL_TYPE, c);
   },
 
-  isDimension: function () {
+  isDimension: function() {
     return this._isOfType(jscsspToken.DIMENSION_TYPE);
   },
 
-  isPercentage: function () {
+  isPercentage: function() {
     return this._isOfType(jscsspToken.PERCENTAGE_TYPE);
   },
 
-  isHex: function () {
+  isHex: function() {
     return this._isOfType(jscsspToken.HEX_TYPE);
   },
 
-  isDimensionOfUnit: function (aUnit) {
+  isDimensionOfUnit: function(aUnit) {
     return this.isDimension() && this.unit == aUnit;
   },
 
-  isLength: function () {
+  isLength: function() {
     return (
       this.isPercentage() ||
       this.isDimensionOfUnit('cm') ||
@@ -7089,7 +7090,7 @@ jscsspToken.prototype = {
     );
   },
 
-  isAngle: function () {
+  isAngle: function() {
     return (
       this.isDimensionOfUnit('deg') ||
       this.isDimensionOfUnit('rad') ||
@@ -7109,11 +7110,11 @@ function jscsspCharsetRule() {
 }
 
 jscsspCharsetRule.prototype = {
-  cssText: function () {
+  cssText: function() {
     return '@charset ' + this.encoding + ';';
   },
 
-  setCssText: function (val) {
+  setCssText: function(val) {
     var sheet = { cssRules: [] };
     var parser = new CSSParser(val);
     if (parser.parseCharsetRule(sheet)) {
@@ -7136,11 +7137,11 @@ function jscsspComment() {
 }
 
 jscsspComment.prototype = {
-  cssText: function () {
+  cssText: function() {
     return this.parsedCssText;
   },
 
-  setCssText: function (val) {
+  setCssText: function(val) {
     var parser = new CSSParser(val);
     var token = parser.getToken(true, false);
     if (token.isComment()) this.parsedCssText = token.value;
@@ -7181,7 +7182,7 @@ jscsspDeclaration.prototype = {
     '-moz-font-feature-settings': true,
   },
 
-  cssText: function () {
+  cssText: function() {
     var prefixes = PrefixHelper.prefixesForProperty(this.property);
 
     var rv = '';
@@ -7305,7 +7306,7 @@ jscsspDeclaration.prototype = {
     return rv;
   },
 
-  setCssText: function (val) {
+  setCssText: function(val) {
     var declarations = [];
     var parser = new CSSParser(val);
     var token = parser.getToken(true, true);
@@ -7336,7 +7337,7 @@ function jscsspErrorRule(aErrorMsg) {
 }
 
 jscsspErrorRule.prototype = {
-  cssText: function () {
+  cssText: function() {
     return this.parsedCssText;
   },
 };
@@ -7352,7 +7353,7 @@ function jscsspFontFaceRule() {
 }
 
 jscsspFontFaceRule.prototype = {
-  cssText: function () {
+  cssText: function() {
     var rv = gTABS + '@font-face {\n';
     var preservedGTABS = gTABS;
     gTABS += '  ';
@@ -7362,7 +7363,7 @@ jscsspFontFaceRule.prototype = {
     return rv + gTABS + '}';
   },
 
-  setCssText: function (val) {
+  setCssText: function(val) {
     var sheet = { cssRules: [] };
     var parser = new CSSParser(val);
     var token = parser.getToken(true, true);
@@ -7390,7 +7391,7 @@ function jscsspImportRule() {
 }
 
 jscsspImportRule.prototype = {
-  cssText: function () {
+  cssText: function() {
     var mediaString = this.media.join(', ');
     return (
       '@import ' +
@@ -7400,7 +7401,7 @@ jscsspImportRule.prototype = {
     );
   },
 
-  setCssText: function (val) {
+  setCssText: function(val) {
     var sheet = { cssRules: [] };
     var parser = new CSSParser(val);
     var token = parser.getToken(true, true);
@@ -7428,7 +7429,7 @@ function jscsspKeyframeRule() {
 }
 
 jscsspKeyframeRule.prototype = {
-  cssText: function () {
+  cssText: function() {
     var rv = this.keyText + ' {\n';
     var preservedGTABS = gTABS;
     gTABS += '  ';
@@ -7440,7 +7441,7 @@ jscsspKeyframeRule.prototype = {
     return rv + gTABS + '}';
   },
 
-  setCssText: function (val) {
+  setCssText: function(val) {
     var sheet = { cssRules: [] };
     var parser = new CSSParser(val);
     var token = parser.getToken(true, true);
@@ -7468,7 +7469,7 @@ function jscsspKeyframesRule() {
 }
 
 jscsspKeyframesRule.prototype = {
-  cssText: function () {
+  cssText: function() {
     var rv = '';
     var prefixes = ['moz', 'webkit', 'ms', 'o', ''];
     for (var p = 0; p < prefixes.length; p++) {
@@ -7489,7 +7490,7 @@ jscsspKeyframesRule.prototype = {
     return rv;
   },
 
-  setCssText: function (val) {
+  setCssText: function(val) {
     var sheet = { cssRules: [] };
     var parser = new CSSParser(val);
     var token = parser.getToken(true, true);
@@ -7518,7 +7519,7 @@ function jscsspMediaRule() {
 }
 
 jscsspMediaRule.prototype = {
-  cssText: function () {
+  cssText: function() {
     var rv = gTABS + '@media ' + this.media.join(', ') + ' {\n';
     var preservedGTABS = gTABS;
     gTABS += '  ';
@@ -7528,7 +7529,7 @@ jscsspMediaRule.prototype = {
     return rv + gTABS + '}';
   },
 
-  setCssText: function (val) {
+  setCssText: function(val) {
     var sheet = { cssRules: [] };
     var parser = new CSSParser(val);
     var token = parser.getToken(true, true);
@@ -7557,13 +7558,13 @@ function jscsspNamespaceRule() {
 }
 
 jscsspNamespaceRule.prototype = {
-  cssText: function () {
+  cssText: function() {
     return (
       '@namespace ' + (this.prefix ? this.prefix + ' ' : '') + this.url + ';'
     );
   },
 
-  setCssText: function (val) {
+  setCssText: function(val) {
     var sheet = { cssRules: [] };
     var parser = new CSSParser(val);
     var token = parser.getToken(true, true);
@@ -7592,7 +7593,7 @@ function jscsspPageRule() {
 }
 
 jscsspPageRule.prototype = {
-  cssText: function () {
+  cssText: function() {
     var rv =
       gTABS +
       '@page ' +
@@ -7606,7 +7607,7 @@ jscsspPageRule.prototype = {
     return rv + gTABS + '}';
   },
 
-  setCssText: function (val) {
+  setCssText: function(val) {
     var sheet = { cssRules: [] };
     var parser = new CSSParser(val);
     var token = parser.getToken(true, true);
@@ -7635,7 +7636,7 @@ function jscsspStyleRule() {
 }
 
 jscsspStyleRule.prototype = {
-  cssText: function () {
+  cssText: function() {
     var rv = gTABS + this.mSelectorText + ' {';
     var preservedGTABS = gTABS;
     gTABS += '  ';
@@ -7647,7 +7648,7 @@ jscsspStyleRule.prototype = {
     return rv + '\n' + gTABS + '}';
   },
 
-  setCssText: function (val) {
+  setCssText: function(val) {
     var sheet = { cssRules: [] };
     var parser = new CSSParser(val);
     var token = parser.getToken(true, true);
@@ -7663,11 +7664,11 @@ jscsspStyleRule.prototype = {
     throw DOMException.SYNTAX_ERR;
   },
 
-  selectorText: function () {
+  selectorText: function() {
     return this.mSelectorText;
   },
 
-  setSelectorText: function (val) {
+  setSelectorText: function(val) {
     var parser = new CSSParser(val);
     var token = parser.getToken(true, true);
     if (!token.isNotNull()) {
@@ -7687,19 +7688,19 @@ function jscsspStylesheet() {
 }
 
 jscsspStylesheet.prototype = {
-  insertRule: function (aRule, aIndex) {
+  insertRule: function(aRule, aIndex) {
     try {
       this.cssRules.splice(aIndex, 1, aRule);
     } catch (e) {}
   },
 
-  deleteRule: function (aIndex) {
+  deleteRule: function(aIndex) {
     try {
       this.cssRules.splice(aIndex);
     } catch (e) {}
   },
 
-  cssText: function () {
+  cssText: function() {
     var rv = '';
     for (var i = 0; i < this.cssRules.length; i++)
       rv += this.cssRules[i].cssText() + '\n\n';
@@ -7720,7 +7721,7 @@ function jscsspVariable(aType, aSheet) {
 }
 
 jscsspVariable.prototype = {
-  cssText: function () {
+  cssText: function() {
     if (this.type == kJscsspVARIABLE_VALUE)
       return this.resolveVariable(
         this.name,
@@ -7730,12 +7731,12 @@ jscsspVariable.prototype = {
     else return this.value;
   },
 
-  setCssText: function (val) {
+  setCssText: function(val) {
     if (this.type == kJscsspVARIABLE_VALUE) throw DOMException.SYNTAX_ERR;
     else this.value = val;
   },
 
-  resolveVariable: function (aName, aRule, aSheet) {
+  resolveVariable: function(aName, aRule, aSheet) {
     return 'var(' + aName + ')';
   },
 };
@@ -7752,7 +7753,7 @@ function jscsspVariablesRule() {
 }
 
 jscsspVariablesRule.prototype = {
-  cssText: function () {
+  cssText: function() {
     var rv =
       gTABS +
       '@variables ' +
@@ -7766,7 +7767,7 @@ jscsspVariablesRule.prototype = {
     return rv + gTABS + '}';
   },
 
-  setCssText: function (val) {
+  setCssText: function(val) {
     var sheet = { cssRules: [] };
     var parser = new CSSParser(val);
     var token = parser.getToken(true, true);
@@ -7792,7 +7793,7 @@ function jscsspWhitespace() {
 }
 
 jscsspWhitespace.prototype = {
-  cssText: function () {
+  cssText: function() {
     return this.parsedCssText;
   },
 };

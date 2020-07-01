@@ -14,12 +14,15 @@ const ExtensionReloader = require("webpack-extension-reloader");
 const config = {
   mode: process.env.NODE_ENV,
   context: __dirname + "/src",
+
   entry: {
-    background: "./background/index.js",
     editor: "./editor-v2/index.ts",
-    "browseraction/index": "./browseraction/index.ts",
+    background: "./background/index.js",
+    "inject-css": "./inject-css/index.ts",
     "options/index": "./options/index.ts",
+    "browseraction/index": "./browseraction/index.ts",
   },
+
   output: {
     path: __dirname + "/dist",
     filename: "[name].js",

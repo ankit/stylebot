@@ -1,3 +1,16 @@
+/* global 
+    jscsspErrorRule, 
+    jscsspComment, 
+    jscsspImportRule, 
+    jscsspKeyframesRule, 
+    jscsspMediaRule, 
+    jscsspVariablesRule,  
+    jscsspPageRule, 
+    jscsspCharsetRule,
+    jscsspNamespaceRule,
+    jscsspFontFaceRule
+*/
+
 /**
  * Transforms JSCSSP parser's generated objects into stylebot rules
  */
@@ -11,15 +24,15 @@ function JSCSSPImporter() {
 }
 
 JSCSSPImporter.prototype = {
-  isError: function (rule) {
+  isError: rule => {
     return rule instanceof jscsspErrorRule;
   },
 
-  isComment: function (rule) {
+  isComment: rule => {
     return rule instanceof jscsspComment;
   },
 
-  isAtRule: function (rule) {
+  isAtRule: function(rule) {
     var types = [
       jscsspImportRule,
       jscsspKeyframesRule,
@@ -42,11 +55,11 @@ JSCSSPImporter.prototype = {
     return false;
   },
 
-  reportError: function (rule) {
+  reportError: rule => {
     this.rules['error'] = rule;
   },
 
-  importAtRule: function (rule, parent) {
+  importAtRule: (rule, parent) => {
     var selector = this.AT_RULE_PREFIX + rule.currentLine;
     parent[selector] = new Object();
     parent[selector][this.AT_RULE_PREFIX] = true;
@@ -64,14 +77,14 @@ JSCSSPImporter.prototype = {
     }
   },
 
-  importComment: function (rule, parent) {
+  importComment: (rule, parent) => {
     var selector = this.COMMENT_PREFIX + this.commentIndex;
     parent[selector] = new Object();
     parent[selector][this.COMMENT_PREFIX] = rule.cssText();
     this.commentIndex++;
   },
 
-  importStyleRule: function (rule, parent) {
+  importStyleRule: (rule, parent) => {
     var selector = rule.mSelectorText;
     parent[selector] = new Object();
     var len = rule.declarations.length;
@@ -87,7 +100,7 @@ JSCSSPImporter.prototype = {
     }
   },
 
-  importSheet: function (sheet) {
+  importSheet: sheet => {
     var len = sheet.cssRules.length;
     for (var i = 0; i < len; i++) {
       if (this.isError(sheet.cssRules[i])) {
@@ -105,3 +118,5 @@ JSCSSPImporter.prototype = {
     return this.rules;
   },
 };
+
+export default JSCSSPImporter;

@@ -17,6 +17,12 @@
       "css": ["editor.css"],
       "matches": ["<all_urls>"],
       "run_at": "document_idle"
+    },
+    {
+      "all_frames": true,
+      "js": ["inject-css.js"],
+      "matches": ["<all_urls>"],
+      "run_at": "document_start"
     }
   ],
 
