@@ -20,7 +20,7 @@ const config = {
     background: "./background/index.js",
     "inject-css": "./inject-css/index.ts",
     "options/index": "./options/index.ts",
-    "browseraction/index": "./browseraction/index.ts",
+    "popup/index": "./popup/index.ts",
   },
 
   output: {
@@ -28,9 +28,11 @@ const config = {
     filename: "[name].js",
     publicPath: "/",
   },
+
   resolve: {
     extensions: [".ts", ".js", ".vue", ".ttf"],
   },
+
   module: {
     rules: [
       {
@@ -82,6 +84,7 @@ const config = {
       },
     ],
   },
+
   plugins: [
     new webpack.DefinePlugin({
       global: "window",
@@ -109,8 +112,8 @@ const config = {
           transform: transformHtml,
         },
         {
-          from: "browseraction/index.html",
-          to: "browseraction/index.html",
+          from: "popup/index.html",
+          to: "popup/index.html",
           transform: transformHtml,
         },
         {
