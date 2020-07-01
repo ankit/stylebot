@@ -5,11 +5,9 @@
       :initialUrl="url"
       :initialCss="css"
       @save="
-        const response = $emit('save', $event);
-        // todo: display error stacktrace
-        if (response.success) {
-          editDialog = false;
-        }
+        // todo: handle syntax errors
+        $emit('save', $event);
+        editDialog = false;
       "
       @cancel="editDialog = false"
     />
