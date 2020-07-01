@@ -65,6 +65,7 @@ const init = () => {
             sender.tab.url,
             sender.tab
           );
+
           response.success = true;
         } else {
           response = {

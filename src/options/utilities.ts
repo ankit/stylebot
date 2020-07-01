@@ -1,64 +1,37 @@
+import * as postcss from 'postcss';
 import { Style, StylebotBackgroundPage } from './types';
 
-import CssUtils from '../css/CssUtils';
-/* @ts-ignore Will replace with a modern parser */
-import CSSParser from '../css/parser';
+declare global {
+  const CSSParser: any;
+}
 
-export const getFormattedStyles = async (): Promise<Array<Style>> => {
+export const getFormattedStyles = (): Array<Style> => {
   const backgroundPage = (chrome.extension.getBackgroundPage() as any) as StylebotBackgroundPage;
   const styles = backgroundPage.cache.styles.get();
   const urls = Object.keys(styles);
 
-  const results = urls.map(
-    async (url): Promise<Style> => {
-      const style = styles[url];
-
-      return new Promise(resolve => {
-        CssUtils.getFormattedCSS(style._rules, false, false, (css: string) => {
-          resolve({
-            url,
-            css,
-            enabled: style._enabled,
-          });
-        });
-      });
-    }
-  );
-
-  return new Promise(resolve => {
-    Promise.all(results).then(formattedStyles => resolve(formattedStyles));
-  });
+  return urls.map(url => ({
+    url,
+    css: styles[url].css,
+    enabled: styles[url].enabled,
+  }));
 };
 
 export const saveStyle = (initialUrl: string, url: string, css: string) => {
   const backgroundPage = (chrome.extension.getBackgroundPage() as any) as StylebotBackgroundPage;
 
-  const parser = new CSSParser();
-  const sheet = parser.parse(css, false, true);
+  try {
+    const postCSSAST = postcss.parse(css);
 
-  if (sheet) {
-    try {
-      const rules = CssUtils.getRulesFromParserObject(sheet);
-
-      // Syntax error.
-      if (rules['error']) {
-        return false;
-      }
-
-      backgroundPage.cache.styles.create(url, rules);
-
-      if (initialUrl && initialUrl !== url) {
-        backgroundPage.cache.styles.delete(initialUrl);
-      }
-
-      return true;
-    } catch (e) {
-      // TODO: Handle error properly here
-      return true;
+    backgroundPage.cache.styles.create(url, postCSSAST.toString());
+    if (initialUrl && initialUrl !== url) {
+      backgroundPage.cache.styles.delete(initialUrl);
     }
-  }
 
-  return true;
+    return { success: true };
+  } catch (e) {
+    return { success: false, error: e };
+  }
 };
 
 export const deleteStyle = (url: string) => {

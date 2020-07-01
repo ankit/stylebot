@@ -55,6 +55,7 @@
     "bootstrap": "^4.5.0",
     "bootstrap-vue": "^2.15.0",
     "monaco-editor": "0.20.0",
+    "postcss": "^7.0.32",
     "vue": "^2.6.11",
     "vue-color": "^2.7.1",
     "vue-monaco": "^1.2.1",

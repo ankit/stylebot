@@ -4,8 +4,8 @@ export type StylebotBackgroundPage = {
     styles: {
       get: () => {
         [url: string]: {
-          _enabled: boolean;
-          _rules: any;
+          enabled: boolean;
+          css: string;
         };
       };
 

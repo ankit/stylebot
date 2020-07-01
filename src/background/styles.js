@@ -1,5 +1,7 @@
+import * as postcss from 'postcss';
+
 import BrowserAction from './browseraction';
-import { cloneObject, matchesPattern, isValidHTML } from './utils';
+import { matchesPattern, isValidHTML } from './utils';
 
 /**
  * Styles object used by background.js
@@ -21,7 +23,7 @@ function Styles(stylesObj) {
   this.styles = stylesObj;
 
   this.AT_RULE_PREFIX = 'at';
-  this.RULES_PROPERTY = '_rules';
+  this.RULES_PROPERTY = 'css';
   this.ENABLED_PROPERTY = '_enabled';
 }
 
@@ -68,10 +70,10 @@ Styles.prototype.persist = function() {
  * @param {String} url URL of the new object.
  * @param {Object} rules Rules for the given URL.
  */
-Styles.prototype.create = function(url, rules, data) {
+Styles.prototype.create = function(url, css) {
   this.styles[url] = {};
-  this.styles[url][this.ENABLED_PROPERTY] = true;
-  this.styles[url][this.RULES_PROPERTY] = rules === undefined ? {} : rules;
+  this.styles[url].css = css;
+  this.styles[url].enabled = true;
 
   this.persist();
 };
@@ -85,7 +87,7 @@ Styles.prototype.isEnabled = function(url) {
   if (this.styles[url] === undefined) {
     return false;
   }
-  return this.styles[url][this.ENABLED_PROPERTY];
+  return this.styles[url].enabled;
 };
 
 /**
@@ -201,13 +203,12 @@ Styles.prototype.import = function(newStyles) {
  * @param {String} url The url for which to return the rules.
  * @return {Object} The style rules for the URL, if it exists. Else, null.
  */
-Styles.prototype.getRules = function(url) {
+Styles.prototype.getCss = function(url) {
   if (!this.styles[url]) {
-    return null;
+    return '';
   }
 
-  var rules = this.styles[url][this.RULES_PROPERTY];
-  return rules ? rules : null;
+  return this.styles[url].css;
 };
 
 /**
@@ -242,11 +243,11 @@ Styles.prototype.getStyleUrlMetadataForTab = function(tab) {
  */
 Styles.prototype.getComputedStylesForTab = function(tabUrl, tab) {
   if (!isValidHTML(tabUrl)) {
-    return { url: '', rules: {} };
+    return { url: '', css: '' };
   }
 
   let url = '';
-  let rules = {};
+  let css = '';
 
   for (const styleUrl in this.styles) {
     if (!this.isEnabled(styleUrl)) {
@@ -258,14 +259,14 @@ Styles.prototype.getComputedStylesForTab = function(tabUrl, tab) {
         url = styleUrl;
       }
 
-      this.copyRules(tab, this.getRules(styleUrl), rules, styleUrl === url);
+      css = this.mergeCss(this.getCss(styleUrl), css, styleUrl === url);
     }
   }
 
-  window.cache.loadingTabs[tab.id] = { url, rules };
+  window.cache.loadingTabs[tab.id] = { url, css };
   BrowserAction.update(tab);
 
-  return { url, rules };
+  return { url, css };
 };
 
 Styles.prototype.getComputedStylesForIframe = function(url, tab) {
@@ -317,32 +318,22 @@ Styles.prototype.transfer = function(source, destination) {
 };
 
 /**
- * Copy rules into another rules object while managing conflicts.
- * @param {Object} _tab
- * @param {Object} src Rules that should be copied
- * @param {Object} dest Rules object where the new rules are to be copied
- * @param {Boolean} isPrimaryURL If the url for the source rules is the primary
+ * Merge css into existing css while managing conflicts
+ * @param {string} src css that should be copied
+ * @param {string} dest css to merge into
+ * @param {Boolean} isPrimaryURL If the url for src takes priority over dest
  *   url for the page. Used to manage conflicts.
  */
-Styles.prototype.copyRules = function(_tab, src, dest, isPrimaryURL) {
-  for (var selector in src) {
-    var rule = src[selector];
+Styles.prototype.mergeCss = function(src, dest, isPrimaryURL) {
+  const root1 = postcss.parse(src);
+  const root2 = postcss.parse(dest);
+  root1.append(root2);
 
-    // if no rule exists in dest for selector, copy the rule.
-    if (dest[selector] == undefined) {
-      rule = this.expandRule(selector, rule);
-      dest[selector] = cloneObject(rule);
-    }
+  root1.walkDecls(decl => {
+    decl.important = true;
+  });
 
-    // else, merge properties for rule, with the rules in dest taking priority.
-    else {
-      for (var property in src) {
-        if (dest[selector][property] == undefined || isPrimaryURL) {
-          dest[selector][property] = src[selector][property];
-        }
-      }
-    }
-  }
+  return root1.toString();
 };
 
 Styles.prototype.expandRules = function(rules) {

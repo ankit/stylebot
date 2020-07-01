@@ -17,12 +17,8 @@ const injectCss = (
 
     response => {
       if (response && response.success) {
-        if (response.url) {
-          CssUtils.getCSS(response.rules, true, true, (css: string) => {
-            if (css !== '') {
-              CssUtils.injectCSSIntoDocument(css, 'stylebot-css');
-            }
-          });
+        if (response.url && response.css) {
+          CssUtils.injectCSSIntoDocument(response.css, 'stylebot-css');
         }
       } else {
         if (injectCount < MAX_INJECT_COUNT) {
