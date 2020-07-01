@@ -108,14 +108,6 @@ const config = {
           to: "images",
         },
         {
-          from: "libs",
-          to: "libs",
-        },
-        {
-          from: "notification",
-          to: "notification",
-        },
-        {
           from: "shared",
           to: "shared",
         },

@@ -1,9 +1,8 @@
 import { Style, StylebotBackgroundPage } from './types';
 
-declare global {
-  const CSSParser: any;
-  const CSSUtils: any;
-}
+import CssUtils from '../css/CssUtils';
+/* @ts-ignore Will replace with a modern parser */
+import CSSParser from '../css/parser';
 
 export const getFormattedStyles = async (): Promise<Array<Style>> => {
   const backgroundPage = (chrome.extension.getBackgroundPage() as any) as StylebotBackgroundPage;
@@ -15,18 +14,13 @@ export const getFormattedStyles = async (): Promise<Array<Style>> => {
       const style = styles[url];
 
       return new Promise(resolve => {
-        CSSUtils.crunchFormattedCSS(
-          style._rules,
-          false,
-          false,
-          (css: string) => {
-            resolve({
-              url,
-              css,
-              enabled: style._enabled,
-            });
-          }
-        );
+        CssUtils.getFormattedCSS(style._rules, false, false, (css: string) => {
+          resolve({
+            url,
+            css,
+            enabled: style._enabled,
+          });
+        });
       });
     }
   );
@@ -44,7 +38,7 @@ export const saveStyle = (initialUrl: string, url: string, css: string) => {
 
   if (sheet) {
     try {
-      const rules = CSSUtils.getRulesFromParserObject(sheet);
+      const rules = CssUtils.getRulesFromParserObject(sheet);
 
       // Syntax error.
       if (rules['error']) {

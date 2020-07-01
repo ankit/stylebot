@@ -7818,3 +7818,5 @@ var kJscsspVARIABLES_RULE = 200;
 var kJscsspSTYLE_DECLARATION = 1000;
 
 var gTABS = '';
+
+export default CSSParser;
