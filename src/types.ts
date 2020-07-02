@@ -1,6 +1,24 @@
+export type StylebotEditingMode = 'Basic' | 'Advanced' | 'Edit CSS';
+export type StylebotShortcutMetaKey = 'ctrl' | 'shift' | 'alt' | 'none';
+
+export type StylebotOptions = {
+  contextMenu: boolean;
+  mode: StylebotEditingMode;
+  useShortcutKey: boolean;
+  shortcutKey: number;
+  shortcutMetaKey: StylebotShortcutMetaKey;
+};
+
+export type Style = {
+  url: string;
+  css: string;
+  enabled: boolean;
+};
+
 export type StylebotBackgroundPage = {
   cache: {
-    options: any;
+    options: StylebotOptions;
+
     styles: {
       get: () => {
         [url: string]: {
@@ -19,21 +37,4 @@ export type StylebotBackgroundPage = {
   };
 
   saveOption: (name: string, value: string | boolean | number) => void;
-};
-
-export type Style = {
-  url: string;
-  css: string;
-  enabled: boolean;
-};
-
-export type StylebotEditingMode = 'Basic' | 'Advanced' | 'Edit CSS';
-export type StylebotShortcutMetaKey = 'ctrl' | 'shift' | 'alt' | 'none';
-
-export type StylebotOptions = {
-  contextMenu: boolean;
-  mode: StylebotEditingMode;
-  useShortcutKey: boolean;
-  shortcutKey: number;
-  shortcutMetaKey: StylebotShortcutMetaKey;
 };

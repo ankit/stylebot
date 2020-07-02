@@ -1,5 +1,5 @@
 import * as postcss from 'postcss';
-import { Style, StylebotBackgroundPage } from './types';
+import { Style, StylebotBackgroundPage } from './../types';
 
 export const getFormattedStyles = (): Array<Style> => {
   const backgroundPage = (chrome.extension.getBackgroundPage() as any) as StylebotBackgroundPage;

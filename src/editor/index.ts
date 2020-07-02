@@ -1,4 +1,8 @@
 import Vue from 'vue';
+import store from './store/index';
+import TheStylebotApp from './components/TheStylebotApp.vue';
+
+import './index.scss';
 
 import {
   IconsPlugin,
@@ -13,13 +17,6 @@ import {
   FormGroupPlugin,
 } from 'bootstrap-vue';
 
-import App from './App.vue';
-import './index.scss';
-
-const stylebotApp = document.createElement('div');
-stylebotApp.id = 'stylebot';
-document.body.appendChild(stylebotApp);
-
 Vue.use(IconsPlugin);
 Vue.use(TooltipPlugin);
 Vue.use(LayoutPlugin);
@@ -31,7 +28,12 @@ Vue.use(ButtonPlugin);
 Vue.use(ButtonGroupPlugin);
 Vue.use(FormGroupPlugin);
 
+const stylebotApp = document.createElement('div');
+stylebotApp.id = 'stylebot';
+document.body.appendChild(stylebotApp);
+
 new Vue({
+  store,
   el: '#stylebot',
-  render: (h: any) => h(App),
+  render: (h: any) => h(TheStylebotApp),
 });

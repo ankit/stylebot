@@ -2,6 +2,7 @@
   <button
     title="Close"
     id="stylebot-close-action"
+    @click="onClick"
     @mouseenter="isHovered = true"
     @mouseleave="isHovered = false"
   >
@@ -20,6 +21,12 @@ export default Vue.extend({
     return {
       isHovered: false,
     };
+  },
+
+  methods: {
+    onClick(): void {
+      this.$store.commit('hideStylebot');
+    },
   },
 });
 </script>

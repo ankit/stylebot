@@ -115,7 +115,7 @@ const init = () => {
 
         break;
 
-      case 'fetchOptions':
+      case 'getOptions':
         sendResponse({
           options: window.cache.options,
         });

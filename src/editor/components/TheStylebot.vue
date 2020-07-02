@@ -2,7 +2,7 @@
   <b-container class="stylebot">
     <the-header />
 
-    <the-basic-editor v-if="mode === 'basic'" />
+    <the-basic-editor v-if="mode === 'Basic'" />
     <the-page-css-editor v-if="mode === 'page'" />
     <the-selector-css-editor v-if="mode === 'selector'" />
 
@@ -13,15 +13,15 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import TheHeader from './components/TheHeader.vue';
-import TheFooter from './components/TheFooter.vue';
+import TheHeader from './TheHeader.vue';
+import TheFooter from './TheFooter.vue';
 
-import TheBasicEditor from './components/TheBasicEditor.vue';
-import ThePageCssEditor from './components/ThePageCssEditor.vue';
-import TheSelectorCssEditor from './components/TheSelectorCssEditor.vue';
+import TheBasicEditor from './TheBasicEditor.vue';
+import ThePageCssEditor from './ThePageCssEditor.vue';
+import TheSelectorCssEditor from './TheSelectorCssEditor.vue';
 
 export default Vue.extend({
-  name: 'App',
+  name: 'TheStylebot',
 
   components: {
     TheHeader,
@@ -31,10 +31,10 @@ export default Vue.extend({
     TheSelectorCssEditor,
   },
 
-  data(): any {
-    return {
-      mode: 'basic',
-    };
+  computed: {
+    mode(): string {
+      return this.$store.state.options.mode;
+    },
   },
 });
 </script>

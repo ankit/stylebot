@@ -86,7 +86,7 @@ import {
   deleteAllStyles,
 } from '../utilities';
 
-import { Style } from '../types';
+import { Style } from '../../types';
 import { CssSyntaxError } from 'postcss';
 
 export default Vue.extend({
