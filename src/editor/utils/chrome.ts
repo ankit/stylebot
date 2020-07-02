@@ -14,3 +14,9 @@ export const getOptions = async () => {
 
   return promise;
 };
+
+export const viewOptionsPage = () => {
+  chrome.extension.sendRequest({
+    name: 'showOptions',
+  });
+};

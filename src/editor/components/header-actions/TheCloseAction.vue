@@ -17,7 +17,7 @@ import Vue from 'vue';
 export default Vue.extend({
   name: 'TheCloseAction',
 
-  data(): any {
+  data(): { isHovered: boolean } {
     return {
       isHovered: false,
     };

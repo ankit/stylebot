@@ -7,7 +7,6 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { mapState } from 'vuex';
 
 import TheStylebot from './TheStylebot.vue';
 import TheChromeListener from './TheChromeListener.vue';
@@ -22,7 +21,11 @@ export default Vue.extend({
     TheChromeListener,
   },
 
-  computed: mapState(['visible']),
+  computed: {
+    visible(): boolean {
+      return this.$store.state.visible;
+    },
+  },
 
   async created(): Promise<void> {
     const options = await getOptions();

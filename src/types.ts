@@ -9,6 +9,8 @@ export type StylebotOptions = {
   shortcutMetaKey: StylebotShortcutMetaKey;
 };
 
+export type StylebotPlacement = 'left' | 'right';
+
 export type Style = {
   url: string;
   css: string;

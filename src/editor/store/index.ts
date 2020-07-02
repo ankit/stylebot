@@ -1,17 +1,41 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 
+import { StylebotOptions, StylebotPlacement } from '../../types';
+
 Vue.use(Vuex);
 
-export default new Vuex.Store({
+type State = {
+  visible: boolean;
+  options?: StylebotOptions;
+  position: StylebotPlacement;
+};
+
+export default new Vuex.Store<State>({
   state: {
+    options: {
+      useShortcutKey: true,
+      shortcutKey: 77,
+      shortcutMetaKey: 'alt',
+      mode: 'Basic',
+      contextMenu: true,
+    },
+
     visible: false,
-    options: {},
+    position: 'right',
   },
 
   mutations: {
     toggleStylebot(state) {
       state.visible = !state.visible;
+    },
+
+    togglePlacement(state) {
+      if (state.position === 'left') {
+        state.position = 'right';
+      } else {
+        state.position = 'left';
+      }
     },
 
     hideStylebot(state) {
