@@ -4,11 +4,7 @@
       Font Weight
     </css-property>
 
-    <css-property-value-group
-      name="font-weight"
-      :options="options"
-      :selected="selected"
-    />
+    <css-property-value-group property="font-weight" :options="options" />
   </b-row>
 </template>
 
@@ -30,8 +26,8 @@ export default Vue.extend({
     return {
       selected: null,
       options: [
-        { html: '<strong>Bold</strong>', value: 'bold' },
-        { text: 'Normal', value: 'normal' },
+        { content: '<strong>Bold</strong>', value: 'bold' },
+        { content: 'Normal', value: 'normal' },
       ],
     };
   },

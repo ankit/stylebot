@@ -4,11 +4,7 @@
       Font Variant
     </css-property>
 
-    <css-property-value-group
-      name="font-variant"
-      :options="options"
-      :selected="selected"
-    />
+    <css-property-value-group property="font-variant" :options="options" />
   </b-row>
 </template>
 
@@ -31,10 +27,10 @@ export default Vue.extend({
       selected: null,
       options: [
         {
-          html: '<span style="font-variant: small-caps">Small Caps</span>',
-          value: 'italic',
+          content: '<span style="font-variant: small-caps">Small Caps</span>',
+          value: 'small-caps',
         },
-        { text: 'Normal', value: 'normal' },
+        { content: 'Normal', value: 'normal' },
       ],
     };
   },

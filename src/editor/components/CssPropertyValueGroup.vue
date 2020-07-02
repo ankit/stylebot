@@ -1,15 +1,16 @@
 <template>
   <b-col cols="7">
-    <b-form-group>
-      <b-form-radio-group
-        buttons
+    <b-button-group>
+      <b-button
         size="sm"
-        :name="name"
-        v-model="selected"
-        :options="options"
-        button-variant="outline-secondary"
-      />
-    </b-form-group>
+        :key="option.value"
+        v-for="option in options"
+        @click="select(option.value)"
+        :variant="value === option.value ? 'secondary' : 'outline-secondary'"
+      >
+        <span v-html="option.content" />
+      </b-button>
+    </b-button-group>
   </b-col>
 </template>
 
@@ -18,6 +19,49 @@ import Vue from 'vue';
 
 export default Vue.extend({
   name: 'CssPropertyValueGroup',
-  props: ['name', 'options', 'selected'],
+  props: {
+    property: {
+      type: String,
+      required: true,
+    },
+
+    options: {
+      type: Array,
+      required: true,
+    },
+  },
+
+  computed: {
+    value(): string {
+      const activeRule = this.$store.state.activeRule;
+
+      let value = '';
+      if (activeRule) {
+        activeRule.clone().walkDecls(this.property, decl => {
+          value = decl.value;
+        });
+      }
+
+      return value;
+    },
+  },
+
+  methods: {
+    select(value: string): void {
+      if (value === this.value) {
+        this.$store.dispatch('applyDeclaration', {
+          property: this.property,
+          value: '',
+        });
+
+        return;
+      }
+
+      this.$store.dispatch('applyDeclaration', {
+        property: this.property,
+        value,
+      });
+    },
+  },
 });
 </script>

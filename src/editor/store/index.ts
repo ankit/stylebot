@@ -118,34 +118,42 @@ export default new Vuex.Store<State>({
 
     applyDeclaration({ commit, state }, { property, value }) {
       const { activeRule } = state;
-      if (!activeRule) {
-        return;
-      }
-
-      if (
-        activeRule.some(decl => decl.type === 'decl' && decl.prop === property)
-      ) {
-        activeRule.walkDecls(property, decl => {
-          if (value) {
-            decl.value = value;
-          } else {
-            decl.remove();
-          }
-        });
-      } else if (value) {
-        const decl = postcss.decl({ prop: property, value });
-        activeRule.append(decl);
-      }
-
       const root = postcss.parse(state.css);
-      root.walkRules(activeRule.selector, rule => {
-        rule.replaceWith(activeRule);
-      });
+
+      if (!activeRule) {
+        const rule = postcss.rule({ selector: state.activeSelector });
+        rule.append(postcss.decl({ prop: property, value }));
+        root.append(rule);
+
+        commit('setActiveRule', rule);
+      } else if (activeRule) {
+        if (
+          activeRule.some(
+            decl => decl.type === 'decl' && decl.prop === property
+          )
+        ) {
+          activeRule.walkDecls(property, decl => {
+            if (value) {
+              decl.value = value;
+            } else {
+              decl.remove();
+            }
+          });
+        } else if (value) {
+          const decl = postcss.decl({ prop: property, value });
+          activeRule.append(decl);
+        }
+
+        root.walkRules(activeRule.selector, rule => {
+          rule.replaceWith(activeRule);
+        });
+
+        commit('setActiveRule', activeRule);
+      }
 
       const css = root.toString();
-      commit('setActiveRule', activeRule);
-      commit('setCss', css);
 
+      commit('setCss', css);
       saveCss(state.url, css);
 
       const rootWithImportant = root.clone();

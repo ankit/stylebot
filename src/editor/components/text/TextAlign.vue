@@ -6,14 +6,15 @@
 
     <css-property-value>
       <b-button-group>
-        <b-button title="Align left" variant="outline-secondary" size="sm">
-          <b-icon icon="text-left" aria-hidden="true"></b-icon>
-        </b-button>
-        <b-button title="Align center" variant="outline-secondary" size="sm">
-          <b-icon icon="text-center" aria-hidden="true"></b-icon>
-        </b-button>
-        <b-button title="Align right" variant="outline-secondary" size="sm">
-          <b-icon icon="text-right" aria-hidden="true"></b-icon>
+        <b-button
+          size="sm"
+          :key="option.value"
+          :title="option.title"
+          v-for="option in options"
+          @click="select(option.value)"
+          :variant="value === option.value ? 'secondary' : 'outline-secondary'"
+        >
+          <b-icon :icon="option.icon" aria-hidden="true" />
         </b-button>
       </b-button-group>
     </css-property-value>
@@ -32,6 +33,49 @@ export default Vue.extend({
   components: {
     CssProperty,
     CssPropertyValue,
+  },
+
+  data(): any {
+    return {
+      options: [
+        { title: 'Align Left', value: 'left', icon: 'text-left' },
+        { title: 'Align Center', value: 'center', icon: 'text-center' },
+        { title: 'Align Right', value: 'right', icon: 'text-right' },
+      ],
+    };
+  },
+
+  computed: {
+    value(): string {
+      const activeRule = this.$store.state.activeRule;
+
+      let value = '';
+      if (activeRule) {
+        activeRule.clone().walkDecls('text-align', decl => {
+          value = decl.value;
+        });
+      }
+
+      return value;
+    },
+  },
+
+  methods: {
+    select(value: string): void {
+      if (value === this.value) {
+        this.$store.dispatch('applyDeclaration', {
+          property: 'text-align',
+          value: '',
+        });
+
+        return;
+      }
+
+      this.$store.dispatch('applyDeclaration', {
+        property: 'text-align',
+        value,
+      });
+    },
   },
 });
 </script>

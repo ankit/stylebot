@@ -87,8 +87,7 @@ export default Vue.extend({
       }
     },
 
-    input(event: KeyboardEvent): void {
-      const selector = (event.target as HTMLInputElement).value;
+    input(selector: string): void {
       this.$store.dispatch('setActiveSelector', selector);
 
       this.validation = this.validate(selector);

@@ -4,11 +4,7 @@
       Font Style
     </css-property>
 
-    <css-property-value-group
-      name="font-style"
-      :options="options"
-      :selected="selected"
-    />
+    <css-property-value-group property="font-style" :options="options" />
   </b-row>
 </template>
 
@@ -28,10 +24,9 @@ export default Vue.extend({
 
   data(): any {
     return {
-      selected: null,
       options: [
-        { html: '<i>Italic</i>', value: 'italic' },
-        { text: 'Normal', value: 'normal' },
+        { content: '<i>Italic</i>', value: 'italic' },
+        { content: 'Normal', value: 'normal' },
       ],
     };
   },

@@ -4,11 +4,7 @@
       Decoration
     </css-property>
 
-    <css-property-value-group
-      :options="options"
-      :selected="selected"
-      name="text-decoration"
-    />
+    <css-property-value-group property="text-decoration" :options="options" />
   </b-row>
 </template>
 
@@ -31,19 +27,19 @@ export default Vue.extend({
       selected: null,
       options: [
         {
-          html: '<span style="text-decoration: underlined">ab</span>',
+          content: '<span style="text-decoration: underlined">ab</span>',
           value: 'underline',
         },
         {
-          html: '<span style="text-decoration: line-through">ab</span>',
+          content: '<span style="text-decoration: line-through">ab</span>',
           value: 'line-through',
         },
         {
-          html: '<span style="text-decoration: overline">ab</span>',
+          content: '<span style="text-decoration: overline">ab</span>',
           value: 'overline',
         },
 
-        { text: 'None', value: 'none' },
+        { content: 'None', value: 'none' },
       ],
     };
   },

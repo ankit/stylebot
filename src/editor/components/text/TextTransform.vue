@@ -4,11 +4,7 @@
       Transform
     </css-property>
 
-    <css-property-value-group
-      :options="options"
-      :selected="selected"
-      name="text-transform"
-    />
+    <css-property-value-group property="text-transform" :options="options" />
   </b-row>
 </template>
 
@@ -31,19 +27,19 @@ export default Vue.extend({
       selected: null,
       options: [
         {
-          text: 'Abc',
+          content: 'Abc',
           value: 'capitalize',
         },
         {
-          text: 'ABC',
+          content: 'ABC',
           value: 'uppercase',
         },
         {
-          text: 'abc',
+          content: 'abc',
           value: 'lowercase',
         },
 
-        { text: 'None', value: 'none' },
+        { content: 'None', value: 'none' },
       ],
     };
   },

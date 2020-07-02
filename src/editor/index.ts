@@ -15,6 +15,7 @@ import {
   ButtonPlugin,
   ButtonGroupPlugin,
   FormGroupPlugin,
+  FormCheckboxPlugin,
 } from 'bootstrap-vue';
 
 Vue.use(IconsPlugin);
@@ -27,6 +28,7 @@ Vue.use(InputGroupPlugin);
 Vue.use(ButtonPlugin);
 Vue.use(ButtonGroupPlugin);
 Vue.use(FormGroupPlugin);
+Vue.use(FormCheckboxPlugin);
 
 const stylebotApp = document.createElement('div');
 stylebotApp.id = 'stylebot';
