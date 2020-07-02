@@ -38,7 +38,7 @@ const init = () => {
         break;
 
       case 'save':
-        window.cache.styles.save(request.url, request.rules, request.data);
+        window.cache.styles.save(request.url, request.css);
         break;
 
       case 'doesStyleExist':

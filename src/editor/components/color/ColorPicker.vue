@@ -1,6 +1,6 @@
 <template>
   <div>
-    <button class="stylebot-color-picker-btn" @click="enabled = !enabled">
+    <button class="stylebot-color-picker-btn" @click="toggle">
       <div class="stylebot-color-picker-color" :style="{ background: color }" />
     </button>
 
@@ -8,6 +8,7 @@
       v-if="enabled"
       :value="color"
       class="stylebot-color-picker"
+      @input="$emit('colorSelection', $event)"
     />
   </div>
 </template>
@@ -31,6 +32,27 @@ export default Vue.extend({
     return {
       enabled: false,
     };
+  },
+
+  methods: {
+    toggle(): void {
+      if (!this.enabled) {
+        this.enabled = true;
+        document.addEventListener('click', this.handleDocumentClick);
+      } else {
+        this.enabled = false;
+        document.removeEventListener('click', this.handleDocumentClick);
+      }
+    },
+
+    handleDocumentClick(event: MouseEvent): void {
+      if (
+        !(event.target as HTMLElement).closest('.stylebot-color-picker-btn') &&
+        !(event.target as HTMLElement).closest('.stylebot-color-picker')
+      ) {
+        this.toggle();
+      }
+    },
   },
 });
 </script>

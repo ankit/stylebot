@@ -7,11 +7,18 @@
     <css-property-value>
       <b-row>
         <b-col cols="3">
-          <color-picker color="#ffd700" />
+          <color-picker
+            :color="backgroundColor"
+            @colorSelection="colorPickerInput($event)"
+          />
         </b-col>
 
         <b-col cols="9">
-          <b-form-input size="sm" value="#ffd700" />
+          <b-form-input
+            size="sm"
+            :value="backgroundColor"
+            @input="colorInput($event)"
+          />
         </b-col>
       </b-row>
     </css-property-value>
@@ -32,6 +39,37 @@ export default Vue.extend({
     ColorPicker,
     CssProperty,
     CssPropertyValue,
+  },
+
+  computed: {
+    backgroundColor(): string {
+      const activeRule = this.$store.state.activeRule;
+
+      let color = '';
+      if (activeRule) {
+        activeRule.clone().walkDecls('background-color', decl => {
+          color = decl.value;
+        });
+      }
+
+      return color;
+    },
+  },
+
+  methods: {
+    colorPickerInput(color: { hex: string }): void {
+      this.$store.dispatch('applyDeclaration', {
+        property: 'background-color',
+        value: color.hex,
+      });
+    },
+
+    colorInput(color: string): void {
+      this.$store.dispatch('applyDeclaration', {
+        property: 'background-color',
+        value: color,
+      });
+    },
   },
 });
 </script>

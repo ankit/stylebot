@@ -1,9 +1,11 @@
 /**
  * Utility methods for CSS injection/removal.
  */
+const STYLE_ELEMENT_ID = 'stylebot-css';
+
 const CSSUtils = {
-  injectCSSIntoDocument: (css: string, elementId: string) => {
-    const el = document.getElementById(elementId);
+  injectCSSIntoDocument: (css: string) => {
+    const el = document.getElementById(STYLE_ELEMENT_ID);
 
     if (el) {
       el.innerHTML = css;
@@ -13,14 +15,14 @@ const CSSUtils = {
     const style = document.createElement('style');
 
     style.type = 'text/css';
-    style.setAttribute('id', elementId);
+    style.setAttribute('id', STYLE_ELEMENT_ID);
     style.appendChild(document.createTextNode(css));
 
     document.documentElement.appendChild(style);
   },
 
-  removeCSSFromDocument: (elementId: string) => {
-    const el = document.getElementById(elementId);
+  removeCSSFromDocument: () => {
+    const el = document.getElementById(STYLE_ELEMENT_ID);
 
     if (el) {
       el.innerHTML = '';

@@ -2,11 +2,10 @@
   <div>
     <b-input-group>
       <b-form-input
-        trim
         @input="input"
         @focus="focus"
-        v-model="selector"
         @blur="unhighlight"
+        :value="activeSelector"
         class="stylebot-css-selector-input"
         placeholder="Enter CSS selector..."
       />
@@ -19,6 +18,7 @@
           <div
             :key="dropdownSelector"
             v-for="dropdownSelector in selectors"
+            @click="select(dropdownSelector)"
             @mouseenter="highlight(dropdownSelector)"
             @mouseleave="unhighlight"
           >
@@ -33,9 +33,9 @@
     <b-icon
       variant="danger"
       icon="exclamation-circle"
+      :title="validation.message"
       v-if="validation.state === false"
       class="stylebot-css-selector-validation-icon"
-      :title="validation.message"
       v-b-tooltip.hover.nofade.ds1000="{ customClass: 'stylebot-tooltip' }"
     />
   </div>
@@ -48,20 +48,21 @@ import Highlighter from '../highlighter/Highlighter';
 export default Vue.extend({
   name: 'TheCssSelectorDropdown',
 
-  props: ['initialSelector', 'selectors'],
+  computed: {
+    activeSelector(): string {
+      return this.$store.state.activeSelector;
+    },
+
+    selectors(): Array<string> {
+      return this.$store.state.selectors;
+    },
+  },
 
   data(): any {
     return {
       highlighter: null,
-      selector: this.initialSelector,
       validation: { state: null, message: '' },
     };
-  },
-
-  watch: {
-    initialSelector(newVal: string): void {
-      this.selector = newVal;
-    },
   },
 
   created() {
@@ -82,29 +83,36 @@ export default Vue.extend({
         document.querySelector(selector);
         return { state: null, message: '' };
       } catch (e) {
-        console.log('error', e);
         return { state: false, message: 'Invalid selector' };
       }
     },
 
-    input(): void {
-      this.validation = this.validate(this.selector);
+    input(event: KeyboardEvent): void {
+      const selector = (event.target as HTMLInputElement).value;
+      this.$store.dispatch('setActiveSelector', selector);
+
+      this.validation = this.validate(selector);
 
       if (this.validation.state !== false) {
-        this.highlight(this.selector);
+        this.highlight(selector);
       } else {
         this.unhighlight();
       }
     },
 
     focus(): void {
-      this.validation = this.validate(this.selector);
+      const selector = this.$store.state.activeSelector;
+      this.validation = this.validate(selector);
 
       if (this.validation.state !== false) {
-        this.highlight(this.selector);
+        this.highlight(selector);
       } else {
         this.unhighlight();
       }
+    },
+
+    select(selector: string): void {
+      this.$store.dispatch('setActiveSelector', selector);
     },
 
     highlight(selector: string): void {

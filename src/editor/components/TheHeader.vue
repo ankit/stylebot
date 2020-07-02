@@ -1,14 +1,11 @@
 <template>
   <b-row class="stylebot-header justify-content-md-between" no-gutters>
     <b-col cols="2" style="padding: 0">
-      <the-inspector @select="selector = $event" />
+      <the-inspector @select="inspect($event)" />
     </b-col>
 
     <b-col cols="7" align-self="center">
-      <the-css-selector-dropdown
-        :initialSelector="selector"
-        :selectors="selector ? [selector] : []"
-      />
+      <the-css-selector-dropdown />
     </b-col>
 
     <b-col cols="3">
@@ -41,6 +38,12 @@ export default Vue.extend({
     return {
       selector: null,
     };
+  },
+
+  methods: {
+    inspect(selector: string): void {
+      this.$store.dispatch('setActiveSelector', selector);
+    },
   },
 });
 </script>
