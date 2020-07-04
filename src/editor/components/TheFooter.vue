@@ -4,8 +4,6 @@
       :mode="mode"
       @update="$emit('updateMode', $event)"
     />
-
-    <the-user-actions style="margin-top: 10px" />
   </div>
 </template>
 
@@ -13,14 +11,12 @@
 import Vue from 'vue';
 
 import TheEditorModeActions from './footer/TheEditorModeActions.vue';
-import TheUserActions from './footer/TheUserActions.vue';
 
 export default Vue.extend({
   name: 'TheFooter',
 
   components: {
     TheEditorModeActions,
-    TheUserActions,
   },
 
   props: ['mode'],
