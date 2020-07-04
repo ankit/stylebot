@@ -52,10 +52,13 @@
     "webpack-extension-reloader": "^1.1.4"
   },
   "dependencies": {
+    "@types/tinycolor2": "^1.4.2",
     "bootstrap": "^4.5.0",
     "bootstrap-vue": "^2.15.0",
+    "darkreader": "^4.9.12",
     "monaco-editor": "0.20.0",
     "postcss": "^7.0.32",
+    "tinycolor2": "^1.4.1",
     "vue": "^2.6.11",
     "vue-color": "^2.7.1",
     "vue-monaco": "^1.2.1",

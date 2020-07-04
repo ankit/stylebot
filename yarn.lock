@@ -884,6 +884,11 @@
   resolved "https://registry.yarnpkg.com/@types/tapable/-/tapable-1.0.5.tgz#9adbc12950582aa65ead76bffdf39fe0c27a3c02"
   integrity sha512-/gG2M/Imw7cQFp8PGvz/SwocNrmKFjFsm5Pb8HdbHkZ1K8pmuPzOX4VeVoiEecFCVf4CsN1r3/BRvx+6sNqwtQ==
 
+"@types/tinycolor2@^1.4.2":
+  version "1.4.2"
+  resolved "https://registry.yarnpkg.com/@types/tinycolor2/-/tinycolor2-1.4.2.tgz#721ca5c5d1a2988b4a886e35c2ffc5735b6afbdf"
+  integrity sha512-PeHg/AtdW6aaIO2a+98Xj7rWY4KC1E6yOy7AFknJQ7VXUGNrMlyxDFxJo7HqLtjQms/ZhhQX52mLVW/EX3JGOw==
+
 "@types/uglify-js@*":
   version "3.9.2"
   resolved "https://registry.yarnpkg.com/@types/uglify-js/-/uglify-js-3.9.2.tgz#01992579debba674e1e359cd6bcb1a1d0ab2e02b"
@@ -1988,6 +1993,13 @@ cyclist@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/cyclist/-/cyclist-1.0.1.tgz#596e9698fd0c80e12038c2b82d6eb1b35b6224d9"
   integrity sha1-WW6WmP0MgOEgOMK4LW6xs1tiJNk=
+
+darkreader@^4.9.12:
+  version "4.9.12"
+  resolved "https://registry.yarnpkg.com/darkreader/-/darkreader-4.9.12.tgz#78ac98c08f97b37731c6d590f61de529bfd5d748"
+  integrity sha512-la1uVcqP/NcsXR+VxKz1YD4A9Od9kyEqHiIpcWA+NPoCCG2zFcsmkVczu5+oQRMIOkGEAje8xS4b/ef138NUUw==
+  dependencies:
+    malevic "0.18.3"
 
 de-indent@^1.0.2:
   version "1.0.2"
@@ -3416,6 +3428,11 @@ make-dir@^3.0.2:
   integrity sha512-g3FeP20LNwhALb/6Cz6Dd4F2ngze0jz7tbzrD2wAV+o9FeNHe4rL+yK2md0J/fiSf1sa1ADhXqi5+oVwOM/eGw==
   dependencies:
     semver "^6.0.0"
+
+malevic@0.18.3:
+  version "0.18.3"
+  resolved "https://registry.yarnpkg.com/malevic/-/malevic-0.18.3.tgz#0d9853b4cb1ff381242f467d142c487112d9fbc2"
+  integrity sha512-RswIMGEfyFOjLK9JW82AWMcK9PLoEi27oZ7vWxVliBPnIYe9DBVcGEGlDoFd5A36YhVp/3Ci/aNasS6s4XYSLw==
 
 map-age-cleaner@^0.1.1:
   version "0.1.3"
@@ -5008,7 +5025,7 @@ timers-browserify@^2.0.4:
   dependencies:
     setimmediate "^1.0.4"
 
-tinycolor2@^1.1.2:
+tinycolor2@^1.1.2, tinycolor2@^1.4.1:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/tinycolor2/-/tinycolor2-1.4.1.tgz#f4fad333447bc0b07d4dc8e9209d8f39a8ac77e8"
   integrity sha1-9PrTM0R7wLB9TcjpIJ2POaisd+g=

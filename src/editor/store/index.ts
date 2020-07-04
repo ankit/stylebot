@@ -3,6 +3,8 @@ import Vuex from 'vuex';
 import * as postcss from 'postcss';
 
 import CssUtils from '../../css/CssUtils';
+import { getCss as getDarkModeCss } from '../../css/DarkMode';
+
 import { saveCss } from '../utils/chrome';
 
 import { StylebotOptions, StylebotPlacement } from '../../types';
@@ -162,6 +164,20 @@ export default new Vuex.Store<State>({
       rootWithImportant.walkDecls(decl => (decl.important = true));
       const cssWithImportant = rootWithImportant.toString();
 
+      CssUtils.injectCSSIntoDocument(cssWithImportant);
+    },
+
+    applyDarkMode({ commit, state }) {
+      CssUtils.removeCSSFromDocument();
+      const css = getDarkModeCss();
+      const root = postcss.parse(css);
+
+      commit('setCss', css);
+      saveCss(state.url, css);
+
+      const rootWithImportant = root.clone();
+      rootWithImportant.walkDecls(decl => (decl.important = true));
+      const cssWithImportant = rootWithImportant.toString();
       CssUtils.injectCSSIntoDocument(cssWithImportant);
     },
   },

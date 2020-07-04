@@ -14,6 +14,7 @@ class CssSelectorGenerator {
 
       let selector = el.tagName.toLowerCase();
       for (var i = 0; i < len; i++) {
+        // todo: optimize class selection to be more specific here
         selector += '.' + classes[i];
       }
 
@@ -21,7 +22,7 @@ class CssSelectorGenerator {
     }
 
     const id = el.getAttribute('id');
-    if (id !== undefined) {
+    if (id) {
       return `#${id}`;
     }
 
