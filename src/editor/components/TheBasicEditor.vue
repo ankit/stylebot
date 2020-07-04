@@ -1,5 +1,5 @@
 <template>
-  <div class="stylebot-basic-editor">
+  <div class="px-3 py-3">
     <h1>Text</h1>
     <the-text-properties />
 
@@ -9,11 +9,12 @@
     </div>
 
     <div class="stylebot-basic-editor-section">
-      <h1>Border</h1>
+      <h1>Layout and Visibility</h1>
+      <the-layout-properties />
     </div>
 
     <div class="stylebot-basic-editor-section">
-      <h1>Layout and Visibility</h1>
+      <h1>Border</h1>
     </div>
   </div>
 </template>
@@ -23,27 +24,22 @@ import Vue from 'vue';
 
 import TheTextProperties from './TheTextProperties.vue';
 import TheColorProperties from './TheColorProperties.vue';
+import TheLayoutProperties from './TheLayoutProperties.vue';
 
 export default Vue.extend({
   name: 'TheBasicEditor',
   components: {
     TheTextProperties,
     TheColorProperties,
+    TheLayoutProperties,
   },
 });
 </script>
 
-<style scoped>
-.stylebot-basic-editor {
-  padding: 20px 10px;
-}
-
+<style lang="scss" scoped>
 .stylebot-basic-editor-section {
-  margin-top: 30px;
-  border-top: 1px solid #ddd;
-  padding-top: 15px;
-  margin-left: -10px;
-  margin-right: -10px;
   padding: 15px 10px 0 10px;
+  margin: 30px -16px 0 -16px;
+  border-top: 1px solid #ddd;
 }
 </style>

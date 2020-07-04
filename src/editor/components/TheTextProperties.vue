@@ -1,30 +1,12 @@
 <template>
   <div>
-    <font-size />
-
-    <div style="margin-top: 20px">
-      <font-weight />
-    </div>
-
-    <div style="margin-top: 20px">
-      <font-style />
-    </div>
-
-    <div style="margin-top: 20px">
-      <font-variant />
-    </div>
-
-    <div style="margin-top: 20px">
-      <text-decoration />
-    </div>
-
-    <div style="margin-top: 20px">
-      <text-transform />
-    </div>
-
-    <div style="margin-top: 20px">
-      <text-align />
-    </div>
+    <font-size class="mt-3" />
+    <font-weight class="mt-3" />
+    <font-style class="mt-3" />
+    <font-variant class="mt-3" />
+    <text-decoration class="mt-3" />
+    <text-transform class="mt-3" />
+    <text-align class="mt-3" />
   </div>
 </template>
 

@@ -12,6 +12,7 @@ Vue.use(Vuex);
 type State = {
   url: string;
   css: string;
+
   activeRule: postcss.Rule | null;
   activeSelector: string;
   selectors: Array<string>;
@@ -25,6 +26,7 @@ export default new Vuex.Store<State>({
   state: {
     url: document.domain,
     css: '',
+
     activeRule: null,
     activeSelector: '',
     selectors: [],
@@ -84,8 +86,8 @@ export default new Vuex.Store<State>({
   },
 
   actions: {
-    setComputedCss({ commit }, computedCss) {
-      const root = postcss.parse(computedCss);
+    setCss({ commit }, css) {
+      const root = postcss.parse(css);
       const selectors: Array<string> = [];
 
       root.walkDecls(decl => {

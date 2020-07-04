@@ -38,7 +38,7 @@ export default Vue.extend({
     }
 
     if (css) {
-      this.$store.dispatch('setComputedCss', css);
+      this.$store.dispatch('setCss', css);
     }
   },
 });

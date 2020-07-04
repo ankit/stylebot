@@ -1,10 +1,7 @@
 <template>
   <div>
-    <color />
-
-    <div style="margin-top: 20px">
-      <background-color />
-    </div>
+    <color class="mt-3" />
+    <background-color class="mt-3" />
   </div>
 </template>
 
