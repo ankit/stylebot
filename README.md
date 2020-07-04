@@ -1,4 +1,4 @@
-_Currently, I am refactoring the extension to improve maintainability, fix existing bugs and add new features. In the meanwhile, I will likely be slow to respond to bugs / feature requests. Thanks for your patience._
+_I am currently working a on a massive update with improved maintainability, lots of bugfixes and add exciting new UI and features. In the meanwhile, I will likely be slow to respond to bugs / feature requests. Thanks for your patience._
 
 ## Stylebot
 
