@@ -1,5 +1,3 @@
-import { StylebotOptions } from '../../types';
-
 export const getOptions = async () => {
   return new Promise(resolve => {
     chrome.extension.sendRequest(
@@ -10,6 +8,16 @@ export const getOptions = async () => {
         resolve(response.options);
       }
     );
+  });
+};
+
+export const saveOption = (name: string, value: any) => {
+  chrome.extension.sendRequest({
+    name: 'saveOption',
+    option: {
+      name,
+      value,
+    },
   });
 };
 

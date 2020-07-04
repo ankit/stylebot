@@ -5,7 +5,7 @@ import * as postcss from 'postcss';
 import CssUtils from '../../css/CssUtils';
 import { getCss as getDarkModeCss } from '../../css/DarkMode';
 
-import { saveCss } from '../utils/chrome';
+import { saveCss, saveOption } from '../utils/chrome';
 
 import { StylebotOptions, StylebotPlacement } from '../../types';
 
@@ -20,7 +20,7 @@ type State = {
   selectors: Array<string>;
 
   visible: boolean;
-  options?: StylebotOptions;
+  options: StylebotOptions;
   position: StylebotPlacement;
 };
 
@@ -34,10 +34,10 @@ export default new Vuex.Store<State>({
     selectors: [],
 
     options: {
+      mode: 'basic',
       useShortcutKey: true,
       shortcutKey: 77,
       shortcutMetaKey: 'alt',
-      mode: 'Basic',
       contextMenu: true,
     },
 
@@ -85,6 +85,10 @@ export default new Vuex.Store<State>({
     setActiveRule(state, rule) {
       state.activeRule = rule;
     },
+
+    setMode(state, mode) {
+      state.options.mode = mode;
+    },
   },
 
   actions: {
@@ -102,6 +106,11 @@ export default new Vuex.Store<State>({
 
       commit('setCss', root.toString());
       commit('setSelectors', selectors);
+    },
+
+    setMode({ commit }, mode) {
+      commit('setMode', mode);
+      saveOption('mode', mode);
     },
 
     setActiveSelector({ commit, state }, selector) {

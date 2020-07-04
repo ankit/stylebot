@@ -2,11 +2,11 @@
   <b-container class="stylebot" :class="position">
     <the-header />
 
-    <the-basic-editor v-if="mode === 'Basic'" />
-    <the-page-css-editor v-if="mode === 'Advanced'" />
-    <the-selector-css-editor v-if="mode === 'Edit CSS'" />
+    <the-basic-editor v-if="mode === 'basic'" />
+    <the-magic-editor v-else-if="mode === 'magic'" />
+    <the-code-editor v-else-if="mode === 'code'" />
 
-    <the-footer :mode="mode" @updateMode="mode = $event" />
+    <the-footer />
   </b-container>
 </template>
 
@@ -17,10 +17,10 @@ import TheHeader from './TheHeader.vue';
 import TheFooter from './TheFooter.vue';
 
 import TheBasicEditor from './TheBasicEditor.vue';
-import ThePageCssEditor from './ThePageCssEditor.vue';
-import TheSelectorCssEditor from './TheSelectorCssEditor.vue';
+import TheMagicEditor from './TheMagicEditor.vue';
+import TheCodeEditor from './TheCodeEditor.vue';
 
-import { StylebotPlacement } from '../../types';
+import { StylebotPlacement, StylebotEditingMode } from '../../types';
 
 export default Vue.extend({
   name: 'TheStylebot',
@@ -29,12 +29,13 @@ export default Vue.extend({
     TheHeader,
     TheFooter,
     TheBasicEditor,
-    ThePageCssEditor,
-    TheSelectorCssEditor,
+    TheMagicEditor,
+    TheCodeEditor,
   },
 
   computed: {
-    mode(): string {
+    mode(): StylebotEditingMode {
+      console.log('mode', this.$store.state.options.mode);
       return this.$store.state.options.mode;
     },
 

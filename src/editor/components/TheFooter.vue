@@ -1,15 +1,11 @@
 <template>
   <div class="stylebot-footer justify-content-md-between" no-gutters>
-    <the-editor-mode-actions
-      :mode="mode"
-      @update="$emit('updateMode', $event)"
-    />
+    <the-editor-mode-actions />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-
 import TheEditorModeActions from './footer/TheEditorModeActions.vue';
 
 export default Vue.extend({
@@ -18,8 +14,6 @@ export default Vue.extend({
   components: {
     TheEditorModeActions,
   },
-
-  props: ['mode'],
 });
 </script>
 

@@ -1,4 +1,4 @@
-export type StylebotEditingMode = 'Basic' | 'Advanced' | 'Edit CSS';
+export type StylebotEditingMode = 'basic' | 'magic' | 'code';
 export type StylebotShortcutMetaKey = 'ctrl' | 'shift' | 'alt' | 'none';
 
 export type StylebotOptions = {
