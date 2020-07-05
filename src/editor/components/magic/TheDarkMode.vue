@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Dark Theme</h1>
+    <h1>Dark Mode</h1>
 
     <p class="lead">
       Apply a dark theme to the page.
