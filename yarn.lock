@@ -5441,10 +5441,9 @@ vm-browserify@^1.0.1:
   resolved "https://registry.yarnpkg.com/vm-browserify/-/vm-browserify-1.1.2.tgz#78641c488b8e6ca91a75f511e7a3b32a86e5dda0"
   integrity sha512-2ham8XPWTONajOR0ohOKOHXkm3+gaBmGut3SRuu75xLd/RRaY6vqgh8NBYYk7+RW3u5AtzPQZG8F10LHkl0lAQ==
 
-vue-color@^2.7.1:
+vue-color@ankit/vue-color#2.7.1-release-with-css:
   version "2.7.1"
-  resolved "https://registry.yarnpkg.com/vue-color/-/vue-color-2.7.1.tgz#ca035109ea0010f0d60b889b97d63d37ac712f2d"
-  integrity sha512-u3yl46B2eEej9zfAOIRRSphX1QfeNQzMwO82EIA+aoi0AKX3o1KcfsmMzm4BFkkj2ukCxLVfQ41k7g1gSI7SlA==
+  resolved "https://codeload.github.com/ankit/vue-color/tar.gz/e50bd210db4affdce6a998aa59a00021e7fb7e9d"
   dependencies:
     clamp "^1.0.1"
     lodash.throttle "^4.0.0"
