@@ -1,8 +1,6 @@
 <template>
   <b-row align-content="center" no-gutters>
-    <css-property>
-      Margin
-    </css-property>
+    <css-property>Margin</css-property>
 
     <css-property-value>
       <box-dimensions property="margin" />

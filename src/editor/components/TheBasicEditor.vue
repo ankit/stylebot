@@ -1,17 +1,19 @@
 <template>
-  <div class="px-3 py-3">
-    <h1>Text</h1>
-    <the-text-properties />
+  <div>
+    <b-row class="section" no-gutters>
+      <b-col cols="12"><h1>Text</h1></b-col>
+      <b-col cols="12"><the-text-properties /></b-col>
+    </b-row>
 
-    <div class="stylebot-basic-editor-section">
-      <h1>Colors and Background</h1>
-      <the-color-properties />
-    </div>
+    <b-row class="section" no-gutters>
+      <b-col cols="12"><h1>Colors and Background</h1></b-col>
+      <b-col cols="12"><the-color-properties /></b-col>
+    </b-row>
 
-    <div class="stylebot-basic-editor-section">
-      <h1>Layout and Visibility</h1>
-      <the-layout-properties />
-    </div>
+    <b-row class="section" no-gutters>
+      <b-col cols="12"><h1>Layout and Visibility</h1></b-col>
+      <b-col cols="12"><the-layout-properties /></b-col>
+    </b-row>
   </div>
 </template>
 
@@ -33,10 +35,15 @@ export default Vue.extend({
 });
 </script>
 
-<style lang="scss" scoped>
-.stylebot-basic-editor-section {
+<style lang="scss">
+.section {
+  margin-top: 30px;
   padding: 15px 10px 0 10px;
-  margin: 30px -16px 0 -16px;
   border-top: 1px solid #ddd;
+
+  &:first-of-type {
+    border: none;
+    margin-top: 0;
+  }
 }
 </style>

@@ -6,10 +6,6 @@
   @import '~bootstrap';
   @import '~bootstrap-vue';
 
-  all: initial;
-
-  @import 'scss/btn.scss';
-  @import 'scss/form.scss';
-  @import 'scss/dropdown.scss';
+  @import 'scss/overrides.scss';
   @import 'scss/typography.scss';
 }

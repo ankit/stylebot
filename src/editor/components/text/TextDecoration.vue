@@ -1,9 +1,6 @@
 <template>
   <b-row align-content="center" no-gutters>
-    <css-property>
-      Decoration
-    </css-property>
-
+    <css-property>Decoration</css-property>
     <css-property-value-group property="text-decoration" :options="options" />
   </b-row>
 </template>

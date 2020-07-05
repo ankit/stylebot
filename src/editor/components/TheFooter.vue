@@ -1,5 +1,5 @@
 <template>
-  <div class="stylebot-footer justify-content-md-between" no-gutters>
+  <div class="footer justify-content-md-between" no-gutters>
     <the-editor-mode-actions />
   </div>
 </template>
@@ -17,8 +17,8 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
-.stylebot-footer {
+<style lang="scss" scoped>
+.footer {
   position: absolute;
   bottom: 0;
   width: 100%;

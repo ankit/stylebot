@@ -1,24 +1,22 @@
 <template>
   <b-row no-gutters>
-    <b-col class="stylebot-box-dimension" cols="2">
+    <b-col class="box-dimension" cols="2">
       <b-form-input size="sm" v-model="top" placeholder="T" />
     </b-col>
 
-    <b-col class="stylebot-box-dimension" cols="2">
+    <b-col class="box-dimension" cols="2">
       <b-form-input size="sm" v-model="right" placeholder="R" />
     </b-col>
 
-    <b-col class="stylebot-box-dimension" cols="2">
+    <b-col class="box-dimension" cols="2">
       <b-form-input size="sm" v-model="bottom" placeholder="B" />
     </b-col>
 
-    <b-col class="stylebot-box-dimension" cols="2">
+    <b-col class="box-dimension" cols="2">
       <b-form-input size="sm" v-model="left" placeholder="L" />
     </b-col>
 
-    <b-col cols="1" class="text-muted stylebot-box-dimension-unit">
-      px
-    </b-col>
+    <b-col cols="1" class="text-muted box-dimension-unit">px</b-col>
   </b-row>
 </template>
 
@@ -118,12 +116,12 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-.stylebot-box-dimension {
+.box-dimension {
   min-width: 40px;
-  margin-right: 4px;
+  margin-right: 3px;
 }
 
-.stylebot-box-dimension-unit {
+.box-dimension-unit {
   font-size: 13px;
   line-height: 26px;
 }

@@ -6,14 +6,15 @@
         @focus="focus"
         @blur="unhighlight"
         :value="activeSelector"
-        class="stylebot-css-selector-input"
+        class="css-selector-input"
         placeholder="Enter CSS selector..."
       />
 
       <template v-slot:append>
         <b-dropdown
+          right
           variant="outline-secondary"
-          class="stylebot-css-selector-dropdown"
+          class="css-selector-dropdown"
         >
           <div
             :key="dropdownSelector"
@@ -22,9 +23,7 @@
             @mouseenter="highlight(dropdownSelector)"
             @mouseleave="unhighlight"
           >
-            <b-dropdown-item>
-              {{ dropdownSelector }}
-            </b-dropdown-item>
+            <b-dropdown-item>{{ dropdownSelector }}</b-dropdown-item>
           </div>
         </b-dropdown>
       </template>
@@ -35,7 +34,7 @@
       icon="exclamation-circle"
       :title="validation.message"
       v-if="validation.state === false"
-      class="stylebot-css-selector-validation-icon"
+      class="css-selector-validation-icon"
       v-b-tooltip.hover.nofade.ds1000="{ customClass: 'stylebot-tooltip' }"
     />
   </div>
@@ -129,23 +128,23 @@ export default Vue.extend({
 });
 </script>
 
-<style lang="scss" scoped>
-.stylebot-css-selector-validation-icon {
+<style lang="scss">
+.css-selector-validation-icon {
   top: 7px;
   right: 33px;
   z-index: 10000000;
   position: absolute;
 }
-</style>
 
-<style lang="scss">
-.stylebot-css-selector-input {
-  height: 30px !important;
-  font-size: 13px !important;
-  margin-left: 8px !important;
+.css-selector-input {
+  &.form-control {
+    height: 30px !important;
+    font-size: 13px !important;
+    margin-left: 8px !important;
+  }
 }
 
-.stylebot-css-selector-dropdown {
+.css-selector-dropdown {
   .dropdown-toggle {
     height: 30px !important;
     padding: 0 8px !important;

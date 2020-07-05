@@ -1,17 +1,13 @@
 <template>
   <b-row align-content="center" no-gutters>
-    <css-property>
-      Visibility
-    </css-property>
+    <css-property>Visibility</css-property>
 
     <css-property-value>
       <b-button
         size="sm"
         @click="toggle"
         :variant="isHidden ? 'secondary' : 'outline-secondary'"
-      >
-        Hide
-      </b-button>
+      >Hide</b-button>
     </css-property-value>
   </b-row>
 </template>

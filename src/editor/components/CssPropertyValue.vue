@@ -1,5 +1,5 @@
 <template>
-  <b-col cols="7">
+  <b-col cols="7" class="css-property-value">
     <slot />
   </b-col>
 </template>
@@ -11,3 +11,11 @@ export default Vue.extend({
   name: 'CssPropertyValue',
 });
 </script>
+
+<style lang="scss" scoped>
+.css-property-value {
+  padding: 0;
+  font-size: 12px;
+  text-align: left;
+}
+</style>

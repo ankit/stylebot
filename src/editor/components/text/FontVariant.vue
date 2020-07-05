@@ -1,9 +1,6 @@
 <template>
   <b-row align-content="center" no-gutters>
-    <css-property>
-      Font Variant
-    </css-property>
-
+    <css-property>Font Variant</css-property>
     <css-property-value-group property="font-variant" :options="options" />
   </b-row>
 </template>

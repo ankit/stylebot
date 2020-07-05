@@ -1,5 +1,5 @@
 <template>
-  <b-input-group style="width: 100px">
+  <b-input-group class="length-input-group">
     <b-form-input size="sm" v-model="length" />
 
     <template v-slot:append>
@@ -101,3 +101,9 @@ export default Vue.extend({
   },
 });
 </script>
+
+<style lang="scss" scoped>
+.length-input-group {
+  width: 100px !important;
+}
+</style>

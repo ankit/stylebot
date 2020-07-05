@@ -1,6 +1,6 @@
 <template>
-  <b-row class="stylebot-header justify-content-md-between" no-gutters>
-    <b-col cols="2" style="padding: 0">
+  <b-row class="header justify-content-md-between" no-gutters>
+    <b-col cols="2" class="p-0">
       <the-inspector @select="inspect($event)" />
     </b-col>
 
@@ -48,8 +48,8 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
-.stylebot-header {
+<style lang="scss" scoped>
+.header {
   padding: 10px;
   background: #eee;
 }

@@ -32,12 +32,27 @@ Vue.use(FormGroupPlugin);
 Vue.use(FormCheckboxPlugin);
 Vue.use(ListGroupPlugin);
 
+const stylebotAppHost = document.createElement('div');
+stylebotAppHost.id = 'stylebot';
+document.body.appendChild(stylebotAppHost);
+
+const shadowRoot = stylebotAppHost.attachShadow({ mode: 'open' });
 const stylebotApp = document.createElement('div');
-stylebotApp.id = 'stylebot';
-document.body.appendChild(stylebotApp);
+
+stylebotApp.id = 'stylebot-app';
+shadowRoot.appendChild(stylebotApp);
+
+const cssUrl = chrome.extension.getURL('editor/index.css');
+fetch(cssUrl, { method: 'GET' })
+  .then(response => response.text())
+  .then(css => {
+    const styleEl = document.createElement('style');
+    styleEl.innerHTML = css;
+    shadowRoot.appendChild(styleEl);
+  });
 
 new Vue({
   store,
-  el: '#stylebot',
+  el: stylebotApp,
   render: (h: any) => h(TheStylebotApp),
 });

@@ -1,8 +1,8 @@
 <template>
-  <div class="stylebot-header-actions">
-    <the-options-action class="stylebot-header-action-btn" />
-    <the-move-action class="stylebot-header-action-btn" />
-    <the-close-action class="stylebot-header-action-btn" />
+  <div class="mr-3">
+    <the-options-action class="header-action" />
+    <the-move-action class="header-action" />
+    <the-close-action class="header-action" />
   </div>
 </template>
 
@@ -24,12 +24,8 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
-.stylebot-header-actions {
-  margin-right: 15px;
-}
-
-.stylebot-header-action-btn {
+<style lang="scss" scoped>
+.header-action {
   background: none;
   border: none;
   padding: 0;

@@ -35,7 +35,6 @@ export default Vue.extend({
 
   computed: {
     mode(): StylebotEditingMode {
-      console.log('mode', this.$store.state.options.mode);
       return this.$store.state.options.mode;
     },
 

@@ -40,6 +40,8 @@
     "handlebars": "4.7.6",
     "mini-css-extract-plugin": "^0.9.0",
     "monaco-editor-webpack-plugin": "^1.9.0",
+    "postcss-loader": "^3.0.0",
+    "postcss-safe-important": "^1.2.0",
     "sass": "^1.26.9",
     "sass-loader": "^8.0.2",
     "ts-loader": "^7.0.5",

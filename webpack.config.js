@@ -52,22 +52,12 @@ const config = {
         use: ["file-loader"],
       },
       {
-        test: /\.css$/,
-        use: [MiniCssExtractPlugin.loader, "css-loader"],
-      },
-      {
         test: /\.s(c|a)ss$/,
         use: [
-          "vue-style-loader",
+          MiniCssExtractPlugin.loader,
           "css-loader",
           {
             loader: "sass-loader",
-            // Requires sass-loader@^7.0.0
-            options: {
-              implementation: require("sass"),
-              fiber: require("fibers"),
-            },
-            // Requires sass-loader@^8.0.0
             options: {
               implementation: require("sass"),
               sassOptions: {
@@ -76,6 +66,10 @@ const config = {
             },
           },
         ],
+      },
+      {
+        test: /\.css$/,
+        use: [MiniCssExtractPlugin.loader, "css-loader"],
       },
       {
         test: /\.js$/,

@@ -1,13 +1,13 @@
 <template>
   <div>
-    <button class="stylebot-color-picker-btn" @click="toggle">
-      <div class="stylebot-color-picker-color" :style="{ background: color }" />
+    <button class="color-picker-btn" @click="toggle">
+      <div class="color-picker-color" :style="{ background: `${color}` }" />
     </button>
 
     <chrome-picker
       v-if="enabled"
       :value="color"
-      class="stylebot-color-picker"
+      class="color-picker"
       @input="$emit('colorSelection', $event)"
     />
   </div>
@@ -46,10 +46,14 @@ export default Vue.extend({
     },
 
     handleDocumentClick(event: MouseEvent): void {
-      if (
-        !(event.target as HTMLElement).closest('.stylebot-color-picker-btn') &&
-        !(event.target as HTMLElement).closest('.stylebot-color-picker')
-      ) {
+      const matchedElement = event.composedPath().find(el => {
+        return (
+          (el as HTMLElement).className?.includes('color-picker') ||
+          (el as HTMLElement).className?.includes('color-picker=btn')
+        );
+      });
+
+      if (!matchedElement) {
         this.toggle();
       }
     },
@@ -57,8 +61,8 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
-.stylebot-color-picker-btn {
+<style lang="scss" scoped>
+.color-picker-btn {
   width: 45px;
   height: 25px;
   padding: 3px;
@@ -66,12 +70,12 @@ export default Vue.extend({
   border: 1px solid #ccc;
 }
 
-.stylebot-color-picker-color {
+.color-picker-color {
   height: 15px;
   border: 1px solid #888;
 }
 
-.stylebot-color-picker {
+.color-picker {
   top: 28px;
   z-index: 1;
   right: -8px;

@@ -14,7 +14,6 @@
     {
       "all_frames": true,
       "js": ["editor/index.js"],
-      "css": ["editor/index.css"],
       "matches": ["<all_urls>"],
       "run_at": "document_idle"
     },
@@ -49,5 +48,6 @@
     "storage",
     "unlimitedStorage",
     "<all_urls>"
-  ]
+  ],
+  "web_accessible_resources": ["editor/index.css"]
 }

@@ -1,24 +1,15 @@
 <template>
   <b-row align-content="center" no-gutters>
-    <css-property>
-      Background Color
-    </css-property>
+    <css-property>Background Color</css-property>
 
     <css-property-value>
       <b-row>
         <b-col cols="3">
-          <color-picker
-            :color="backgroundColor"
-            @colorSelection="colorPickerInput($event)"
-          />
+          <color-picker :color="backgroundColor" @colorSelection="colorPickerInput($event)" />
         </b-col>
 
         <b-col cols="9">
-          <b-form-input
-            size="sm"
-            :value="backgroundColor"
-            @input="colorInput($event)"
-          />
+          <b-form-input size="sm" :value="backgroundColor" @input="colorInput($event)" />
         </b-col>
       </b-row>
     </css-property-value>
