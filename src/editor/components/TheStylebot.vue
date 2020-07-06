@@ -50,11 +50,11 @@ export default Vue.extend({
   top: 0;
   height: 100%;
   position: fixed;
+  padding: 0;
   background: #fff;
   width: 350px;
   z-index: 100000000;
   border: 1px solid #ccc;
-  box-shadow: 1px solid #eee;
 
   &.left {
     left: 0;

@@ -1,6 +1,11 @@
 /* Override common bootstrap-vue component styles here */
 
 /* Dropdown */
+.dropdown-divider {
+  margin: 2px 0;
+  border-top: 1px solid #555;
+}
+
 .dropdown-toggle {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
@@ -11,7 +16,7 @@
 }
 
 .dropdown-menu {
-  padding: 5px 0;
+  padding: 3px 0;
   max-height: 350px;
   overflow-y: auto;
   border-radius: 0;

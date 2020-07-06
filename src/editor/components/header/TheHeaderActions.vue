@@ -9,9 +9,9 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import TheCloseAction from './header-actions/TheCloseAction.vue';
-import TheMoveAction from './header-actions/TheMoveAction.vue';
-import TheOptionsAction from './header-actions/TheOptionsAction.vue';
+import TheCloseAction from './TheCloseAction.vue';
+import TheMoveAction from './TheMoveAction.vue';
+import TheOptionsAction from './TheOptionsAction.vue';
 
 export default Vue.extend({
   name: 'TheHeaderActions',

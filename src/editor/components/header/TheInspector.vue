@@ -1,18 +1,17 @@
 <template>
-  <button
+  <b-btn
     @click="toggle"
-    class="stylebot-inspector"
-    :class="{ enabled: enabled }"
+    class="inspector"
     title="Select an element in the page to style it"
-    v-b-tooltip.hover.nofade.ds1000="{ customClass: 'stylebot-tooltip' }"
+    :variant="enabled ? 'primary' : 'outline-secondary'"
   >
-    <b-icon icon="cursor" font-scale="2" />
-  </button>
+    <b-icon icon="pencil-square" />
+  </b-btn>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import Highlighter from '../highlighter/Highlighter';
+import Highlighter from '../../highlighter/Highlighter';
 
 export default Vue.extend({
   name: 'TheInspector',
@@ -51,22 +50,20 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-.stylebot-inspector {
-  width: 42px;
-  padding: 4px;
-  border: none;
-  outline: 1px solid #ddd;
+.inspector {
+  outline: none !important;
+  font-size: 21px !important;
+  border-color: #ccc !important;
+  padding: 13px 13px 10px 13px !important;
 
   &:hover,
   &:focus {
+    outline: none;
     cursor: pointer;
-    outline: 1px solid #333;
   }
 
   &.enabled {
-    color: #fff;
-    background: #333;
-    outline: 1px solid #333;
+    outline: none;
   }
 }
 </style>

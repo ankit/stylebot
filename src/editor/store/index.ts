@@ -13,7 +13,7 @@ Vue.use(Vuex);
 
 type CssSelectorMetadata = {
   value: string;
-  elementCount: number;
+  count: number;
 };
 
 type State = {
@@ -205,15 +205,24 @@ export default new Vuex.Store<State>({
         try {
           selectors.push({
             value: rule.selector,
-            elementCount: document.querySelectorAll(rule.selector).length,
+            count: document.querySelectorAll(rule.selector).length,
           });
         } catch (e) {}
       });
 
       // sort in descending order of number of affected elements
-      selectors.sort((a, b) => b.elementCount - a.elementCount);
+      selectors.sort((a, b) => b.count - a.count);
 
       commit('setSelectors', selectors);
+    },
+
+    deleteCss({ commit, state }) {
+      CssUtils.removeCSSFromDocument();
+      commit('setCss', '');
+      saveCss(state.url, '');
+      commit('setActiveSelector', '');
+      commit('setActiveRule', null);
+      commit('setSelectors', []);
     },
   },
 });

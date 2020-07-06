@@ -1,5 +1,5 @@
 /**
- * Utility methods for CSS injection/removal.
+ * Utility methods for CSS injection/removal, selector validation.
  */
 const STYLE_ELEMENT_ID = 'stylebot-css';
 
@@ -26,6 +26,19 @@ const CSSUtils = {
 
     if (el) {
       el.innerHTML = '';
+    }
+  },
+
+  validateSelector: (selector: string): boolean => {
+    if (!selector) {
+      return false;
+    }
+
+    try {
+      document.querySelector(selector);
+      return true;
+    } catch (e) {
+      return false;
     }
   },
 };
