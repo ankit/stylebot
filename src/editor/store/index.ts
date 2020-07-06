@@ -169,6 +169,12 @@ export default new Vuex.Store<State>({
       commit('setCss', css);
       saveCss(state.url, css);
 
+      const selectors: Array<string> = [];
+      root.walkRules(rule => {
+        selectors.push(rule.selector);
+      });
+      commit('setSelectors', selectors);
+
       const rootWithImportant = root.clone();
       rootWithImportant.walkDecls(decl => (decl.important = true));
       const cssWithImportant = rootWithImportant.toString();

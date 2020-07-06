@@ -1,6 +1,11 @@
 /* Override common bootstrap-vue component styles here */
 
 /* Dropdown */
+.dropdown-toggle {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
 .dropdown-toggle::after {
   margin-left: 7px;
 }
@@ -22,8 +27,10 @@
   padding: 5px 10px;
   font-size: 12px;
 
-  &:hover {
+  &:hover,
+  &:focus {
     color: #fff;
+    outline: none;
     background: $primary;
   }
 }

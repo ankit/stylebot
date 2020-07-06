@@ -3,22 +3,25 @@
     <b-form-input size="sm" v-model="length" />
 
     <template v-slot:append>
-      <b-dropdown
-        size="sm"
-        :text="unit"
-        v-model="unit"
-        variant="outline-secondary"
-      >
-        <b-dropdown-item :key="unit" v-for="unit in supportedUnits">
-          {{ unit }}
-        </b-dropdown-item>
-      </b-dropdown>
+      <dropdown-hack-to-support-shadow-dom>
+        <b-dropdown
+          size="sm"
+          :text="unit"
+          v-model="unit"
+          variant="outline-secondary"
+        >
+          <b-dropdown-item :key="unit" v-for="unit in supportedUnits">
+            {{ unit }}
+          </b-dropdown-item>
+        </b-dropdown>
+      </dropdown-hack-to-support-shadow-dom>
     </template>
   </b-input-group>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
+import DropdownHackToSupportShadowDom from './DropdownHackToSupportShadowDom.vue';
 
 type Unit = 'px' | 'em' | '%' | string;
 
@@ -30,6 +33,10 @@ export default Vue.extend({
       type: String,
       required: true,
     },
+  },
+
+  components: {
+    DropdownHackToSupportShadowDom,
   },
 
   data(): {

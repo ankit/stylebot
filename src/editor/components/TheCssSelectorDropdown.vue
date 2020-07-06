@@ -11,21 +11,23 @@
       />
 
       <template v-slot:append>
-        <b-dropdown
-          right
-          variant="outline-secondary"
-          class="css-selector-dropdown"
-        >
-          <div
-            :key="dropdownSelector"
-            v-for="dropdownSelector in selectors"
-            @click="select(dropdownSelector)"
-            @mouseenter="highlight(dropdownSelector)"
-            @mouseleave="unhighlight"
+        <dropdown-hack-to-support-shadow-dom>
+          <b-dropdown
+            right
+            variant="outline-secondary"
+            class="css-selector-dropdown"
           >
-            <b-dropdown-item>{{ dropdownSelector }}</b-dropdown-item>
-          </div>
-        </b-dropdown>
+            <div
+              :key="dropdownSelector"
+              v-for="dropdownSelector in selectors"
+              @click="select(dropdownSelector)"
+              @mouseenter="highlight(dropdownSelector)"
+              @mouseleave="unhighlight"
+            >
+              <b-dropdown-item>{{ dropdownSelector }}</b-dropdown-item>
+            </div>
+          </b-dropdown>
+        </dropdown-hack-to-support-shadow-dom>
       </template>
     </b-input-group>
 
@@ -42,10 +44,15 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import DropdownHackToSupportShadowDom from './DropdownHackToSupportShadowDom.vue';
 import Highlighter from '../highlighter/Highlighter';
 
 export default Vue.extend({
   name: 'TheCssSelectorDropdown',
+
+  components: {
+    DropdownHackToSupportShadowDom,
+  },
 
   computed: {
     activeSelector(): string {
