@@ -34,6 +34,11 @@ class Highlighter {
       document.querySelectorAll(selector)
     );
 
+    // todo: until we can performantly support highlighting a large number of elements
+    if (elements.length > 200) {
+      return;
+    }
+
     this.overlay.inspect(elements, selector);
   };
 

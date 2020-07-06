@@ -18,13 +18,21 @@
             class="css-selector-dropdown"
           >
             <div
-              :key="dropdownSelector"
+              :key="dropdownSelector.value"
               v-for="dropdownSelector in selectors"
-              @click="select(dropdownSelector)"
-              @mouseenter="highlight(dropdownSelector)"
+              @click="select(dropdownSelector.value)"
+              @mouseenter="highlight(dropdownSelector.value)"
               @mouseleave="unhighlight"
             >
-              <b-dropdown-item>{{ dropdownSelector }}</b-dropdown-item>
+              <b-dropdown-item
+                :title="
+                  `${dropdownSelector.value} (${dropdownSelector.elementCount})`
+                "
+              >
+                {{
+                  `${dropdownSelector.value} (${dropdownSelector.elementCount})`
+                }}
+              </b-dropdown-item>
             </div>
           </b-dropdown>
         </dropdown-hack-to-support-shadow-dom>
@@ -59,7 +67,7 @@ export default Vue.extend({
       return this.$store.state.activeSelector;
     },
 
-    selectors(): Array<string> {
+    selectors(): Array<{ value: string; elementCount: number }> {
       return this.$store.state.selectors;
     },
   },
@@ -156,6 +164,15 @@ export default Vue.extend({
     height: 30px !important;
     padding: 0 8px !important;
     padding-top: 3px !important;
+  }
+
+  .dropdown-item {
+    font-family: Monaco, monospace;
+  }
+
+  .dropdown-menu {
+    border: none !important;
+    margin-left: 1px !important;
   }
 }
 </style>

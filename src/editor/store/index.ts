@@ -11,13 +11,18 @@ import { StylebotOptions, StylebotPlacement } from '../../types';
 
 Vue.use(Vuex);
 
+type CssSelectorMetadata = {
+  value: string;
+  elementCount: number;
+};
+
 type State = {
   url: string;
   css: string;
 
   activeRule: postcss.Rule | null;
   activeSelector: string;
-  selectors: Array<string>;
+  selectors: Array<CssSelectorMetadata>;
 
   visible: boolean;
   options: StylebotOptions;
@@ -105,7 +110,7 @@ export default new Vuex.Store<State>({
       });
 
       commit('setCss', root.toString());
-      commit('setSelectors', selectors);
+      this.dispatch('setSelectors');
     },
 
     setMode({ commit }, mode) {
@@ -169,17 +174,13 @@ export default new Vuex.Store<State>({
       commit('setCss', css);
       saveCss(state.url, css);
 
-      const selectors: Array<string> = [];
-      root.walkRules(rule => {
-        selectors.push(rule.selector);
-      });
-      commit('setSelectors', selectors);
-
       const rootWithImportant = root.clone();
       rootWithImportant.walkDecls(decl => (decl.important = true));
       const cssWithImportant = rootWithImportant.toString();
 
       CssUtils.injectCSSIntoDocument(cssWithImportant);
+
+      this.dispatch('setSelectors');
     },
 
     applyDarkMode({ commit, state }) {
@@ -194,6 +195,25 @@ export default new Vuex.Store<State>({
       rootWithImportant.walkDecls(decl => (decl.important = true));
       const cssWithImportant = rootWithImportant.toString();
       CssUtils.injectCSSIntoDocument(cssWithImportant);
+    },
+
+    setSelectors({ commit, state }) {
+      const root = postcss.parse(state.css);
+      const selectors: Array<CssSelectorMetadata> = [];
+
+      root.walkRules(rule => {
+        try {
+          selectors.push({
+            value: rule.selector,
+            elementCount: document.querySelectorAll(rule.selector).length,
+          });
+        } catch (e) {}
+      });
+
+      // sort in descending order of number of affected elements
+      selectors.sort((a, b) => b.elementCount - a.elementCount);
+
+      commit('setSelectors', selectors);
     },
   },
 });

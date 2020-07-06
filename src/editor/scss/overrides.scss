@@ -12,6 +12,8 @@
 
 .dropdown-menu {
   padding: 5px 0;
+  max-height: 350px;
+  overflow-y: auto;
   border-radius: 0;
   min-width: 80px;
   background: #333;
@@ -26,6 +28,10 @@
   color: #fff;
   padding: 5px 10px;
   font-size: 12px;
+  max-width: 250px;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 
   &:hover,
   &:focus {
