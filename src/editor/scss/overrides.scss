@@ -1,0 +1,69 @@
+/* Override common bootstrap-vue component styles here */
+
+/* Dropdown */
+.dropdown-divider {
+  margin: 2px 0;
+  border-top: 1px solid #555;
+}
+
+.dropdown-toggle {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.dropdown-toggle::after {
+  margin-left: 7px;
+}
+
+.dropdown-menu {
+  padding: 3px 0;
+  max-height: 350px;
+  overflow-y: auto;
+  border-radius: 0;
+  min-width: 80px;
+  background: #333;
+
+  &.show {
+    top: 0;
+    left: 0;
+  }
+}
+
+.dropdown-item {
+  color: #fff;
+  padding: 5px 10px;
+  font-size: 12px;
+  max-width: 250px;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  &:hover,
+  &:focus {
+    color: #fff;
+    outline: none;
+    background: $primary;
+  }
+}
+
+/* Form control and group */
+.form-control-sm {
+  height: 26px;
+  font-size: 12px;
+  padding: 10px;
+}
+
+.form-group {
+  margin-bottom: 0;
+}
+
+/* Buttons */
+.btn-sm {
+  height: 26px;
+  font-size: 12px;
+}
+
+.btn-md {
+  height: 36px;
+  font-size: 15px;
+}

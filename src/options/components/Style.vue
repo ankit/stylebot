@@ -5,8 +5,9 @@
       :initialUrl="url"
       :initialCss="css"
       @save="
-        editDialog = false;
+        // todo: handle syntax errors
         $emit('save', $event);
+        editDialog = false;
       "
       @cancel="editDialog = false"
     />

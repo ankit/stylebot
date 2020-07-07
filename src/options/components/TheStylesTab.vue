@@ -10,8 +10,11 @@
     <style-editor
       v-if="addStyleDialog"
       @save="
-        addStyleDialog = false;
-        saveStyle($event);
+        const response = saveStyle($event);
+        // todo: display error stacktrace
+        if (response.success) {
+          addStyleDialog = false;
+        }
       "
       @cancel="addStyleDialog = false"
     />
@@ -65,6 +68,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import * as postcss from 'postcss';
 
 import AppButton from './AppButton.vue';
 import StyleComponent from './Style.vue';
@@ -82,7 +86,8 @@ import {
   deleteAllStyles,
 } from '../utilities';
 
-import { Style } from '../types';
+import { Style } from '../../types';
+import { CssSyntaxError } from 'postcss';
 
 export default Vue.extend({
   name: 'TheStylesTab',
@@ -98,11 +103,13 @@ export default Vue.extend({
     urlFilter: string;
     styles: Array<Style>;
     addStyleDialog: boolean;
+    addStyleDialogError: any;
   } {
     return {
       styles: [],
       urlFilter: '',
       addStyleDialog: false,
+      addStyleDialogError: null,
     };
   },
 
@@ -146,7 +153,7 @@ export default Vue.extend({
       this.getStyles();
     },
 
-    async saveStyle({
+    saveStyle({
       initialUrl,
       url,
       css,
@@ -154,14 +161,18 @@ export default Vue.extend({
       initialUrl: string;
       url: string;
       css: string;
-    }): Promise<void> {
-      if (saveStyle(initialUrl, url, css)) {
+    }): { success: boolean; error?: postcss.CssSyntaxError } {
+      const response = saveStyle(initialUrl, url, css);
+
+      if (response.success) {
         this.getStyles();
       }
+
+      return response;
     },
 
-    async getStyles(): Promise<void> {
-      const styles = await getFormattedStyles();
+    getStyles(): void {
+      const styles = getFormattedStyles();
 
       if (this.urlFilter) {
         this.styles = styles.filter(style =>

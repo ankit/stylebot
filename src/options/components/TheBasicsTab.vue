@@ -48,7 +48,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { StylebotOptions, StylebotShortcutMetaKey } from '../types';
+import { StylebotOptions, StylebotShortcutMetaKey } from '../../types';
 
 import {
   getOptions,

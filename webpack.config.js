@@ -14,19 +14,25 @@ const ExtensionReloader = require("webpack-extension-reloader");
 const config = {
   mode: process.env.NODE_ENV,
   context: __dirname + "/src",
+
   entry: {
-    background: "./background/index.js",
-    "browseraction/index": "./browseraction/index.ts",
+    "popup/index": "./popup/index.ts",
+    "editor/index": "./editor/index.ts",
     "options/index": "./options/index.ts",
+    "background/index": "./background/index.ts",
+    "inject-css/index": "./inject-css/index.ts",
   },
+
   output: {
     path: __dirname + "/dist",
     filename: "[name].js",
     publicPath: "/",
   },
+
   resolve: {
     extensions: [".ts", ".js", ".vue", ".ttf"],
   },
+
   module: {
     rules: [
       {
@@ -46,32 +52,24 @@ const config = {
         use: ["file-loader"],
       },
       {
-        test: /\.css$/,
-        use: [MiniCssExtractPlugin.loader, "css-loader"],
-      },
-      {
         test: /\.s(c|a)ss$/,
         use: [
-          "vue-style-loader",
+          MiniCssExtractPlugin.loader,
           "css-loader",
           {
             loader: "sass-loader",
-            // Requires sass-loader@^7.0.0
-            options: {
-              implementation: require("sass"),
-              fiber: require("fibers"),
-              indentedSyntax: true, // optional
-            },
-            // Requires sass-loader@^8.0.0
             options: {
               implementation: require("sass"),
               sassOptions: {
                 fiber: require("fibers"),
-                indentedSyntax: true, // optional
               },
             },
           },
         ],
+      },
+      {
+        test: /\.css$/,
+        use: [MiniCssExtractPlugin.loader, "css-loader"],
       },
       {
         test: /\.js$/,
@@ -80,6 +78,7 @@ const config = {
       },
     ],
   },
+
   plugins: [
     new webpack.DefinePlugin({
       global: "window",
@@ -98,24 +97,8 @@ const config = {
     new CopyPlugin({
       patterns: [
         {
-          from: "editor",
-          to: "editor",
-        },
-        {
-          from: "images",
-          to: "images",
-        },
-        {
-          from: "libs",
-          to: "libs",
-        },
-        {
-          from: "notification",
-          to: "notification",
-        },
-        {
-          from: "shared",
-          to: "shared",
+          from: "img",
+          to: "img",
         },
         {
           from: "options/index.html",
@@ -123,8 +106,8 @@ const config = {
           transform: transformHtml,
         },
         {
-          from: "browseraction/index.html",
-          to: "browseraction/index.html",
+          from: "popup/index.html",
+          to: "popup/index.html",
           transform: transformHtml,
         },
         {

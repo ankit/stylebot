@@ -1,0 +1,13 @@
+@import '../../node_modules/vue-color/dist/vue-color.min.css';
+
+@import 'scss/tooltip.scss';
+
+.stylebot {
+  @import 'scss/theme.scss';
+
+  @import '~bootstrap';
+  @import '~bootstrap-vue';
+
+  @import 'scss/overrides.scss';
+  @import 'scss/typography.scss';
+}
