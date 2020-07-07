@@ -3,9 +3,6 @@
     <p class="lead text-muted">
       Experimental features. You may need to manually edit elements on the page
       that don't get correctly styled.
-      <br />
-      <br />
-      <strong>This will overwrite your existing styles on the page.</strong>
     </p>
 
     <div class="mt-5">
