@@ -124,7 +124,7 @@ class Highlighter {
   };
 
   isStylebotElement = (el: EventTarget | null) => {
-    return !!el && !!(el as HTMLElement).closest('.stylebot');
+    return (el as HTMLElement)?.id === 'stylebot';
   };
 }
 

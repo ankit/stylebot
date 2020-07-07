@@ -9,6 +9,7 @@
         <b-button
           size="sm"
           :key="option.value"
+          :disabled="disabled"
           :title="option.title"
           v-for="option in options"
           @click="select(option.value)"
@@ -57,6 +58,10 @@ export default Vue.extend({
       }
 
       return value;
+    },
+
+    disabled(): boolean {
+      return !this.$store.state.activeSelector;
     },
   },
 

@@ -6,8 +6,11 @@
       <b-button
         size="sm"
         @click="toggle"
+        :disabled="disabled"
         :variant="isHidden ? 'secondary' : 'outline-secondary'"
-      >Hide</b-button>
+      >
+        Hide
+      </b-button>
     </css-property-value>
   </b-row>
 </template>
@@ -20,6 +23,7 @@ import CssPropertyValue from '../CssPropertyValue.vue';
 
 export default Vue.extend({
   name: 'Visibility',
+
   components: {
     CssProperty,
     CssPropertyValue,
@@ -37,6 +41,10 @@ export default Vue.extend({
       }
 
       return value === 'none';
+    },
+
+    disabled(): boolean {
+      return !this.$store.state.activeSelector;
     },
   },
 

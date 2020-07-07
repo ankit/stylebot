@@ -4,7 +4,6 @@
     @click="viewOptions"
     @mouseenter="isHovered = true"
     @mouseleave="isHovered = false"
-    v-b-tooltip.hover.nofade.ds1000="{ customClass: 'stylebot-tooltip' }"
   >
     <b-icon icon="gear" v-if="!isHovered" />
     <b-icon icon="gear-fill" v-if="isHovered" />

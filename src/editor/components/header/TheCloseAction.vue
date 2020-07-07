@@ -1,7 +1,6 @@
 <template>
   <button
     title="Close"
-    id="stylebot-close-action"
     @click="onClick"
     @mouseenter="isHovered = true"
     @mouseleave="isHovered = false"

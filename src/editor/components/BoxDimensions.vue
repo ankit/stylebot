@@ -1,19 +1,43 @@
 <template>
   <b-row no-gutters>
     <b-col class="box-dimension" cols="2">
-      <b-form-input size="sm" v-model="top" placeholder="T" />
+      <b-form-input
+        size="sm"
+        v-model="top"
+        placeholder="T"
+        :disabled="disabled"
+        class="box-dimension-input"
+      />
     </b-col>
 
     <b-col class="box-dimension" cols="2">
-      <b-form-input size="sm" v-model="right" placeholder="R" />
+      <b-form-input
+        size="sm"
+        v-model="right"
+        placeholder="R"
+        :disabled="disabled"
+        class="box-dimension-input"
+      />
     </b-col>
 
     <b-col class="box-dimension" cols="2">
-      <b-form-input size="sm" v-model="bottom" placeholder="B" />
+      <b-form-input
+        size="sm"
+        v-model="bottom"
+        placeholder="B"
+        :disabled="disabled"
+        class="box-dimension-input"
+      />
     </b-col>
 
     <b-col class="box-dimension" cols="2">
-      <b-form-input size="sm" v-model="left" placeholder="L" />
+      <b-form-input
+        size="sm"
+        v-model="left"
+        placeholder="L"
+        :disabled="disabled"
+        class="box-dimension-input"
+      />
     </b-col>
 
     <b-col cols="1" class="text-muted box-dimension-unit">px</b-col>
@@ -73,6 +97,10 @@ export default Vue.extend({
         return this.put('left', left);
       },
     },
+
+    disabled(): boolean {
+      return !this.$store.state.activeSelector;
+    },
   },
 
   methods: {
@@ -87,7 +115,7 @@ export default Vue.extend({
         });
       }
 
-      const [length, unit] = value.split(/(\d+)/).filter(Boolean);
+      const [length, unit] = value.split(/(-?\d+)/).filter(Boolean);
 
       // todo: support other units.
       // currently, we render empty input and overwrite on edit
@@ -99,7 +127,6 @@ export default Vue.extend({
     },
 
     put(type: 'top' | 'right' | 'bottom' | 'left', length: string): void {
-      console.log('put', type, length);
       let value = '';
 
       if (length) {
@@ -124,5 +151,9 @@ export default Vue.extend({
 .box-dimension-unit {
   font-size: 13px;
   line-height: 26px;
+}
+
+.box-dimension-input {
+  padding: 1px 4px !important;
 }
 </style>

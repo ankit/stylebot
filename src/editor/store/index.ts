@@ -27,6 +27,7 @@ type State = {
   visible: boolean;
   options: StylebotOptions;
   position: StylebotPlacement;
+  inspecting: boolean;
 };
 
 export default new Vuex.Store<State>({
@@ -48,6 +49,7 @@ export default new Vuex.Store<State>({
 
     visible: false,
     position: 'right',
+    inspecting: false,
   },
 
   mutations: {
@@ -93,6 +95,10 @@ export default new Vuex.Store<State>({
 
     setMode(state, mode) {
       state.options.mode = mode;
+    },
+
+    setInspecting(state, inspecting) {
+      state.inspecting = inspecting;
     },
   },
 

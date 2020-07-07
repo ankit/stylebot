@@ -1,6 +1,6 @@
 <template>
   <b-input-group class="length-input-group">
-    <b-form-input size="sm" v-model="length" />
+    <b-form-input size="sm" v-model="length" :disabled="disabled" />
 
     <template v-slot:append>
       <dropdown-hack-to-support-shadow-dom>
@@ -8,6 +8,7 @@
           size="sm"
           :text="unit"
           v-model="unit"
+          :disabled="disabled"
           variant="outline-secondary"
         >
           <b-dropdown-item :key="unit" v-for="unit in supportedUnits">
@@ -68,6 +69,10 @@ export default Vue.extend({
       set(unit: Unit): void {
         this.put(this.length, unit);
       },
+    },
+
+    disabled(): boolean {
+      return !this.$store.state.activeSelector;
     },
   },
 

@@ -17,27 +17,45 @@ export default Vue.extend({
   name: 'TheInspector',
 
   data(): {
-    enabled: boolean;
     highlighter: Highlighter | null;
   } {
     return {
-      enabled: false,
       highlighter: null,
     };
   },
 
+  computed: {
+    enabled(): boolean {
+      return this.$store.state.inspecting;
+    },
+  },
+
+  watch: {
+    enabled(newValue: boolean): void {
+      if (!newValue) {
+        this.highlighter?.stopInspecting();
+      }
+    },
+  },
+
   created() {
     this.highlighter = new Highlighter({ onSelect: this.select });
+
+    if (this.$store.state.options.mode === 'basic') {
+      this.$store.commit('setInspecting', true);
+      this.highlighter.startInspecting();
+    }
   },
 
   methods: {
     toggle(): void {
       if (this.enabled) {
-        this.enabled = false;
         this.highlighter?.stopInspecting();
+        this.$store.commit('setInspecting', false);
       } else {
-        this.enabled = true;
         this.highlighter?.startInspecting();
+        this.$store.commit('setInspecting', true);
+        this.$store.dispatch('setActiveSelector', '');
       }
     },
 

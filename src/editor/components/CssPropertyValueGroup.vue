@@ -4,6 +4,7 @@
       <b-button
         size="sm"
         :key="option.value"
+        :disabled="disabled"
         v-for="option in options"
         @click="select(option.value)"
         :variant="value === option.value ? 'secondary' : 'outline-secondary'"
@@ -43,6 +44,10 @@ export default Vue.extend({
       }
 
       return value;
+    },
+
+    disabled(): boolean {
+      return !this.$store.state.activeSelector;
     },
   },
 
