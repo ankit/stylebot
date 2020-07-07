@@ -60,7 +60,6 @@ export default Vue.extend({
     },
 
     blur(): void {
-      const selector = this.$store.state.activeSelector;
       this.highlighter.unhighlight();
     },
   },
@@ -69,6 +68,8 @@ export default Vue.extend({
 
 <style lang="scss">
 .css-selector-input {
+  padding: 4px !important;
+
   &:focus {
     box-shadow: none !important;
   }

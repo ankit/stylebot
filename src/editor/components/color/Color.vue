@@ -5,7 +5,7 @@
     </css-property>
 
     <css-property-value>
-      <b-row>
+      <b-row no-gutters>
         <b-col cols="3">
           <color-picker
             :color="color"
@@ -13,7 +13,7 @@
           />
         </b-col>
 
-        <b-col cols="9">
+        <b-col cols="9" class="pl-2">
           <b-form-input size="sm" :value="color" @input="colorInput($event)" />
         </b-col>
       </b-row>
