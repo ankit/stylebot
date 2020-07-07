@@ -4,7 +4,8 @@
       <h1 class="title">Delete css for {{ url }}</h1>
 
       <div class="description text-muted mt-2 mb-4">
-        This will permanently remove your css. You can't undo this.
+        This will permanently delete your css for {{ url }}. You cannot undo
+        this.
       </div>
 
       <v-row class="justify-content-end mr-2">
@@ -65,7 +66,7 @@ export default Vue.extend({
   pointer-events: auto;
   background-color: #fff;
   outline: 0;
-  width: 500px;
+  width: 540px;
   margin: 200px auto;
   padding: 30px;
 }
