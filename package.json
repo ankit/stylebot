@@ -56,7 +56,6 @@
     "@types/vue-color": "^2.4.2",
     "bootstrap": "^4.5.0",
     "bootstrap-vue": "^2.15.0",
-    "darkreader": "^4.9.12",
     "monaco-editor": "^0.20.0",
     "postcss": "^7.0.32",
     "requirejs": "^2.3.6",

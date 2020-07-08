@@ -2051,13 +2051,6 @@ cyclist@^1.0.1:
   resolved "https://registry.yarnpkg.com/cyclist/-/cyclist-1.0.1.tgz#596e9698fd0c80e12038c2b82d6eb1b35b6224d9"
   integrity sha1-WW6WmP0MgOEgOMK4LW6xs1tiJNk=
 
-darkreader@^4.9.12:
-  version "4.9.12"
-  resolved "https://registry.yarnpkg.com/darkreader/-/darkreader-4.9.12.tgz#78ac98c08f97b37731c6d590f61de529bfd5d748"
-  integrity sha512-la1uVcqP/NcsXR+VxKz1YD4A9Od9kyEqHiIpcWA+NPoCCG2zFcsmkVczu5+oQRMIOkGEAje8xS4b/ef138NUUw==
-  dependencies:
-    malevic "0.18.3"
-
 de-indent@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/de-indent/-/de-indent-1.0.2.tgz#b2038e846dc33baa5796128d0804b455b8c1e21d"
@@ -3533,11 +3526,6 @@ make-dir@^3.0.2:
   integrity sha512-g3FeP20LNwhALb/6Cz6Dd4F2ngze0jz7tbzrD2wAV+o9FeNHe4rL+yK2md0J/fiSf1sa1ADhXqi5+oVwOM/eGw==
   dependencies:
     semver "^6.0.0"
-
-malevic@0.18.3:
-  version "0.18.3"
-  resolved "https://registry.yarnpkg.com/malevic/-/malevic-0.18.3.tgz#0d9853b4cb1ff381242f467d142c487112d9fbc2"
-  integrity sha512-RswIMGEfyFOjLK9JW82AWMcK9PLoEi27oZ7vWxVliBPnIYe9DBVcGEGlDoFd5A36YhVp/3Ci/aNasS6s4XYSLw==
 
 map-age-cleaner@^0.1.1:
   version "0.1.3"
