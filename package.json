@@ -53,6 +53,7 @@
   },
   "dependencies": {
     "@types/tinycolor2": "^1.4.2",
+    "@types/vue-color": "^2.4.2",
     "bootstrap": "^4.5.0",
     "bootstrap-vue": "^2.15.0",
     "darkreader": "^4.9.12",
