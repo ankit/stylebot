@@ -67,7 +67,7 @@ export default Vue.extend({
   background-color: #fff;
   outline: 0;
   width: 540px;
-  margin: 200px auto;
+  margin: 300px auto;
   padding: 30px;
 }
 

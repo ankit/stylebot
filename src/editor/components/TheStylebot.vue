@@ -52,7 +52,7 @@ export default Vue.extend({
   position: fixed;
   padding: 0;
   background: #fff;
-  width: 350px;
+  width: 375px;
   z-index: 100000000;
   border: 1px solid #ccc;
 

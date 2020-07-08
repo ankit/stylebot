@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <style>
+      #container {
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        position: fixed;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="container"></div>
+
+    <!-- Injected dynamically by build process -->
+    <script src="./node_modules/monaco-editor/min/vs/loader.js"></script>
+    <!-- Injected dynamically by build process -->
+    <script src="./node_modules/requirejs/require.js"></script>
+
+    <script src="index.js"></script>
+  </body>
+</html>

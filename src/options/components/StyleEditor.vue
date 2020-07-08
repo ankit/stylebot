@@ -22,13 +22,6 @@
         </a>
       </div>
 
-      <vue-monaco
-        language="css"
-        v-model="css"
-        class="style-monaco-editor"
-        @editorDidMount="editorDidMount"
-      />
-
       <v-row justify="end">
         <v-col cols="3">
           <v-row justify="end">
@@ -54,8 +47,6 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import VueMonaco from 'vue-monaco';
-import * as MonacoEditor from 'monaco-editor';
 
 import AppButton from './AppButton.vue';
 
@@ -86,17 +77,6 @@ export default Vue.extend({
 
   components: {
     AppButton,
-    VueMonaco,
-  },
-
-  methods: {
-    editorDidMount(editor: MonacoEditor.editor.IEditor): void {
-      (editor.getModel() as MonacoEditor.editor.ITextModel).updateOptions({
-        tabSize: 2,
-      });
-
-      editor.focus();
-    },
   },
 });
 </script>

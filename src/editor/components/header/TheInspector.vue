@@ -2,8 +2,9 @@
   <b-btn
     @click="toggle"
     class="inspector"
+    :disabled="disabled"
     title="Select an element in the page to style it"
-    :variant="enabled ? 'primary' : 'outline-secondary'"
+    :variant="active ? 'primary' : 'outline-secondary'"
   >
     <b-icon icon="pencil-square" />
   </b-btn>
@@ -25,13 +26,17 @@ export default Vue.extend({
   },
 
   computed: {
-    enabled(): boolean {
+    active(): boolean {
       return this.$store.state.inspecting;
+    },
+
+    disabled(): boolean {
+      return this.$store.state.options.mode !== 'basic';
     },
   },
 
   watch: {
-    enabled(newValue: boolean): void {
+    active(newValue: boolean): void {
       if (!newValue) {
         this.highlighter?.stopInspecting();
       }
@@ -49,7 +54,7 @@ export default Vue.extend({
 
   methods: {
     toggle(): void {
-      if (this.enabled) {
+      if (this.active) {
         this.highlighter?.stopInspecting();
         this.$store.commit('setInspecting', false);
       } else {
@@ -76,11 +81,6 @@ export default Vue.extend({
 
   &:hover,
   &:focus {
-    outline: none;
-    cursor: pointer;
-  }
-
-  &.enabled {
     outline: none;
   }
 }

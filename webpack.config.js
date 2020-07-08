@@ -3,7 +3,7 @@ const webpack = require("webpack");
 
 const CopyPlugin = require("copy-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const MonacoEditorPlugin = require("monaco-editor-webpack-plugin");
+
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 
 const { VueLoaderPlugin } = require("vue-loader");
@@ -21,6 +21,7 @@ const config = {
     "options/index": "./options/index.ts",
     "background/index": "./background/index.ts",
     "inject-css/index": "./inject-css/index.ts",
+    "monaco-editor/iframe/index": "./monaco-editor/iframe/index.ts",
   },
 
   output: {
@@ -83,11 +84,6 @@ const config = {
     new webpack.DefinePlugin({
       global: "window",
     }),
-    // https://github.com/Microsoft/monaco-editor-webpack-plugin#options
-    new MonacoEditorPlugin({
-      publicPath: "/",
-      languages: ["css"],
-    }),
     new VueLoaderPlugin(),
     new VuetifyLoaderPlugin(),
     new ForkTsCheckerWebpackPlugin(),
@@ -111,8 +107,22 @@ const config = {
           transform: transformHtml,
         },
         {
+          from: "monaco-editor/iframe/index.html",
+          to: "monaco-editor/iframe/index.html",
+          transform: transformHtml,
+        },
+        {
+          from: "../node_modules/monaco-editor/min/**/*",
+          to: "monaco-editor/iframe/monaco-editor/",
+        },
+        {
+          from: "../node_modules/requirejs/**/*",
+          to: "monaco-editor/iframe/requirejs",
+        },
+        {
           from: "manifest.json",
           to: "manifest.json",
+
           transform: (content) => {
             const jsonContent = JSON.parse(content);
 

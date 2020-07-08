@@ -13,7 +13,11 @@
   "content_scripts": [
     {
       "all_frames": true,
-      "js": ["editor/index.js"],
+      "js": [
+        "editor/index.js",
+        "monaco-editor/iframe/node_modules/requirejs/require.js",
+        "monaco-editor/iframe/node_modules/monaco-editor/min/vs/loader.js"
+      ],
       "matches": ["<all_urls>"],
       "run_at": "document_idle"
     },
@@ -42,5 +46,5 @@
   },
 
   "permissions": ["tabs", "contextMenus", "storage", "unlimitedStorage"],
-  "web_accessible_resources": ["editor/index.css"]
+  "web_accessible_resources": ["editor/index.css", "monaco-editor/*"]
 }

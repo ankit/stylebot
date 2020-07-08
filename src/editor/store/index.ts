@@ -189,6 +189,23 @@ export default new Vuex.Store<State>({
       this.dispatch('setSelectors');
     },
 
+    applyCss({ commit, state }, { css }) {
+      try {
+        const root = postcss.parse(css);
+        commit('setCss', css);
+        saveCss(state.url, css);
+
+        const rootWithImportant = root.clone();
+        rootWithImportant.walkDecls(decl => (decl.important = true));
+
+        const cssWithImportant = rootWithImportant.toString();
+
+        CssUtils.injectCSSIntoDocument(cssWithImportant);
+      } catch (e) {
+        //
+      }
+    },
+
     applyDarkMode({ commit, state }) {
       CssUtils.removeCSSFromDocument();
       const css = getDarkModeCss();

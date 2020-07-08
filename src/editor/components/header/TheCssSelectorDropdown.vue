@@ -1,12 +1,13 @@
 <template>
   <div @click="stopInspecting">
     <b-input-group>
-      <the-css-selector-input />
+      <the-css-selector-input :disabled="disabled" />
 
       <template v-slot:append>
         <dropdown-hack-to-support-shadow-dom>
           <b-dropdown
             right
+            :disabled="disabled"
             @show="stopInspecting"
             variant="outline-secondary"
             class="css-selector-dropdown"
@@ -67,6 +68,10 @@ export default Vue.extend({
   computed: {
     selectors(): Array<{ value: string; count: number }> {
       return this.$store.state.selectors;
+    },
+
+    disabled(): boolean {
+      return this.$store.state.options.mode !== 'basic';
     },
   },
 

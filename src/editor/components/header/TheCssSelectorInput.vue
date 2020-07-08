@@ -3,6 +3,7 @@
     @blur="blur"
     @focus="focus"
     @input="input"
+    :disabled="disabled"
     :value="activeSelector"
     class="css-selector-input"
     placeholder="Enter CSS selector..."
@@ -17,6 +18,12 @@ import Highlighter from '../../highlighter/Highlighter';
 
 export default Vue.extend({
   name: 'TheCssSelectorInput',
+  props: {
+    disabled: {
+      type: Boolean,
+      required: true,
+    },
+  },
 
   data(): any {
     return {
