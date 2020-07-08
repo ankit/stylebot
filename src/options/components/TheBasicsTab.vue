@@ -1,136 +1,45 @@
 <template>
-  <div class="v-basics-tab">
-    <h2>Shortcut Key</h2>
+  <div class="pt-2">
+    <b-row no-gutters class="mt-5">
+      <the-use-shortcut-key />
+    </b-row>
 
-    <v-checkbox
-      @input="saveUseShortcutKey"
-      v-model="options.useShortcutKey"
-      label="Enable shortcut key to launch Stylebot"
-    />
+    <b-row no-gutters class="mt-3">
+      <the-shortcut-key />
+    </b-row>
 
-    <v-row>
-      <v-col cols="6">
-        <v-select
-          solo
-          class="mr-2 shortcut-meta-key"
-          :items="shortcutMetaKeys"
-          v-model="options.shortcutMetaKey"
-          @change="saveShortcutMetaKey"
-        />
-
-        <v-text-field
-          solo
-          counter="1"
-          @input="saveShortcutKey"
-          v-model="shortcutKeyCharacter"
-          class="shortcut-key-character"
-        />
-      </v-col>
-    </v-row>
-
-    <h2 class="mt-5">Default Editing Mode</h2>
-
-    <v-radio-group v-model="options.mode" @change="saveEditingMode">
-      <v-radio value="Basic" label="Basic" />
-      <v-radio value="Advanced" label="Advanced" />
-      <v-radio value="Edit CSS" label="Edit CSS" />
-    </v-radio-group>
-
-    <h2 class="mt-5">Context Menu</h2>
-
-    <v-checkbox
-      @change="saveRightClickMenu"
-      v-model="options.contextMenu"
-      label="Show Right Click Context Menu"
-    />
+    <b-row no-gutters class="mt-5">
+      <the-context-menu />
+    </b-row>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import { StylebotOptions, StylebotShortcutMetaKey } from '../../types';
 
-import {
-  getOptions,
-  saveOption,
-  getKeydownCode,
-  getCharacterFromKeydownCode,
-} from '../utilities';
+import TheShortcutKey from './basics/TheShortcutKey.vue';
+import TheContextMenu from './basics/TheContextMenu.vue';
+import TheUseShortcutKey from './basics/TheUseShortcutKey.vue';
 
 export default Vue.extend({
   name: 'TheBasicsTab',
 
-  data(): {
-    options: StylebotOptions;
-    shortcutKeyCharacter: string;
-    shortcutMetaKeys: Array<{ text: string; value: StylebotShortcutMetaKey }>;
-  } {
-    return {
-      options: {
-        contextMenu: true,
-        useShortcutKey: true,
-        shortcutKey: 77,
-        shortcutMetaKey: 'alt',
-        mode: 'Basic',
-      },
-      shortcutKeyCharacter: 'M',
-      shortcutMetaKeys: [
-        {
-          text: 'Ctrl',
-          value: 'ctrl',
-        },
-        {
-          text: 'Shift',
-          value: 'shift',
-        },
-        {
-          text: 'Alt',
-          value: 'alt',
-        },
-        {
-          text: 'None',
-          value: 'none',
-        },
-      ],
-    };
-  },
-
-  async created(): Promise<void> {
-    this.options = getOptions();
-    this.shortcutKeyCharacter = getCharacterFromKeydownCode(
-      this.options.shortcutKey
-    );
-  },
-
-  methods: {
-    saveRightClickMenu(): void {
-      saveOption('contextMenu', this.options.contextMenu);
-    },
-    saveEditingMode(): void {
-      saveOption('mode', this.options.mode);
-    },
-    saveUseShortcutKey(): void {
-      saveOption('useShortcutKey', this.options.useShortcutKey);
-    },
-    saveShortcutKey(): void {
-      const code = getKeydownCode(this.shortcutKeyCharacter);
-      saveOption('shortcutKey', code);
-    },
-    saveShortcutMetaKey(): void {
-      saveOption('shortcutMetaKey', this.options.shortcutMetaKey);
-    },
+  components: {
+    TheShortcutKey,
+    TheContextMenu,
+    TheUseShortcutKey,
   },
 });
 </script>
 
-<style scoped>
-.shortcut-meta-key {
-  width: 120px;
-  display: inline-block;
+<style lang="scss">
+.shortcut-key-character {
+  width: 48px !important;
 }
 
-.shortcut-key-character {
-  width: 48px;
-  display: inline-block;
+.shortcut-meta-key {
+  .dropdown-toggle {
+    text-transform: capitalize;
+  }
 }
 </style>

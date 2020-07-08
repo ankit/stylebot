@@ -1,34 +1,30 @@
 <template>
-  <v-row class="style" align="center" justify="end">
+  <b-row class="style px-2 py-3" align-v="center">
     <style-editor
-      v-if="editDialog"
+      v-if="edit"
       :initialUrl="url"
       :initialCss="css"
       @save="
         // todo: handle syntax errors
         $emit('save', $event);
-        editDialog = false;
+        edit = false;
       "
-      @cancel="editDialog = false"
+      @cancel="edit = false"
     />
 
-    <v-col cols="10">
-      <v-checkbox
-        hide-details
-        :label="url"
-        :ripple="false"
-        v-model="enabled"
-        @click="$emit('toggle')"
-      />
-    </v-col>
+    <b-col cols="10">
+      <b-form-checkbox v-model="enabled" @change="$emit('toggle')">
+        {{ url }}
+      </b-form-checkbox>
+    </b-col>
 
-    <v-col cols="2">
-      <v-row align="center" justify="end">
-        <style-edit-button class="mr-2" @click="editDialog = true" />
-        <style-delete-button :url="url" class="mr-2" @click="$emit('delete')" />
-      </v-row>
-    </v-col>
-  </v-row>
+    <b-col cols="2">
+      <b-row align-h="end">
+        <style-edit-button class="mr-2" @click="edit = true" />
+        <style-delete-button class="mr-2" :url="url" @click="$emit('delete')" />
+      </b-row>
+    </b-col>
+  </b-row>
 </template>
 
 <script lang="ts">
@@ -56,10 +52,10 @@ export default Vue.extend({
 
   data(): {
     enabled: boolean;
-    editDialog: boolean;
+    edit: boolean;
   } {
     return {
-      editDialog: false,
+      edit: false,
       enabled: this.initialEnabled,
     };
   },
@@ -68,11 +64,6 @@ export default Vue.extend({
 
 <style scoped>
 .style:hover {
-  background-color: #eee;
-}
-
-.style .v-input {
-  margin: 0;
-  padding: 0;
+  border-bottom: 1px solid #ddd;
 }
 </style>

@@ -1,26 +1,21 @@
 <template>
-  <v-app>
-    <v-app-bar app clipped-left :elevation="0" color="#fff" style="border-bottom: 1px solid #eee">
-      <span class="title ml-3 mr-5">
-        Stylebot
-        <span class="font-weight-light">| options</span>
-      </span>
+  <b-container fluid="lg">
+    <b-row class="main">
+      <b-col cols="4">
+        <the-navigation
+          :tabs="tabs"
+          :currentTab="currentTab"
+          @select="currentTab = $event"
+        />
+      </b-col>
 
-      <v-spacer />
-    </v-app-bar>
+      <b-col cols="8" class="mt-2">
+        <component :is="currentTabComponent" />
+      </b-col>
+    </b-row>
 
-    <the-navigation
-      v-bind:tabs="tabs"
-      v-bind:currentTab="currentTab"
-      v-on:select="currentTab = $event"
-    />
-
-    <v-content>
-      <v-container fluid>
-        <component v-bind:is="currentTabComponent"></component>
-      </v-container>
-    </v-content>
-  </v-app>
+    <InjectMonacoEditorIframe />
+  </b-container>
 </template>
 
 <script lang="ts">
@@ -30,6 +25,7 @@ import TheBasicsTab from './components/TheBasicsTab.vue';
 import TheStylesTab from './components/TheStylesTab.vue';
 import TheBackupTab from './components/TheBackupTab.vue';
 import TheNavigation from './components/TheNavigation.vue';
+import InjectMonacoEditorIframe from './components/styles/InjectMonacoEditorIframe.vue';
 
 export default Vue.extend({
   name: 'App',
@@ -49,6 +45,7 @@ export default Vue.extend({
     TheStylesTab,
     TheBackupTab,
     TheNavigation,
+    InjectMonacoEditorIframe,
   },
 
   computed: {
@@ -59,8 +56,14 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
-.container {
-  padding: 16px 36px;
+<style lang="scss">
+@import '~bootstrap';
+@import '~bootstrap-vue';
+.main {
+  height: calc(100% - 50px);
+}
+
+h2 {
+  font-weight: 300;
 }
 </style>

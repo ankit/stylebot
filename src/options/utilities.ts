@@ -1,5 +1,5 @@
 import * as postcss from 'postcss';
-import { Style, StylebotBackgroundPage } from './../types';
+import { Style, StylebotBackgroundPage, StylebotOptions } from './../types';
 
 export const getFormattedStyles = (): Array<Style> => {
   const backgroundPage = (chrome.extension.getBackgroundPage() as any) as StylebotBackgroundPage;
@@ -60,12 +60,15 @@ export const deleteAllStyles = () => {
   backgroundPage.cache.styles.deleteAll();
 };
 
-export const getOptions = () => {
+export const getOption = (optionName: keyof StylebotOptions) => {
   const backgroundPage = (chrome.extension.getBackgroundPage() as any) as StylebotBackgroundPage;
-  return backgroundPage.cache.options;
+  return backgroundPage.cache.options[optionName];
 };
 
-export const saveOption = (name: string, value: boolean | string | number) => {
+export const saveOption = (
+  name: keyof StylebotOptions,
+  value: boolean | string | number
+) => {
   const backgroundPage = (chrome.extension.getBackgroundPage() as any) as StylebotBackgroundPage;
   backgroundPage.saveOption(name, value);
 };

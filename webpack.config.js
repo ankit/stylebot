@@ -5,9 +5,7 @@ const CopyPlugin = require("copy-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
-
 const { VueLoaderPlugin } = require("vue-loader");
-const VuetifyLoaderPlugin = require("vuetify-loader/lib/plugin");
 
 const ExtensionReloader = require("webpack-extension-reloader");
 
@@ -85,7 +83,6 @@ const config = {
       global: "window",
     }),
     new VueLoaderPlugin(),
-    new VuetifyLoaderPlugin(),
     new ForkTsCheckerWebpackPlugin(),
     new MiniCssExtractPlugin({
       filename: "[name].css",

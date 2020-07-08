@@ -8,17 +8,17 @@
         this.
       </div>
 
-      <v-row class="justify-content-end mr-2">
-        <v-col cols="2" class="mr-2">
+      <b-row class="justify-content-end mr-2">
+        <b-col cols="2" class="mr-2">
           <b-btn @click="$emit('close')" variant="outline-secondary">
             Cancel
           </b-btn>
-        </v-col>
+        </b-col>
 
-        <v-col cols="2">
+        <b-col cols="2">
           <b-btn @click="deleteCss" variant="outline-danger">Delete</b-btn>
-        </v-col>
-      </v-row>
+        </b-col>
+      </b-row>
     </div>
   </div>
 </template>

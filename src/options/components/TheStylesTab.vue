@@ -1,12 +1,5 @@
 <template>
-  <div>
-    <h2 class="title">
-      Styles
-      <span v-if="styles.length !== 0" class="grey--text text--lighter-1">
-        ({{ styles.length }})
-      </span>
-    </h2>
-
+  <div class="pt-3">
     <style-editor
       v-if="addStyleDialog"
       @save="
@@ -19,37 +12,36 @@
       @cancel="addStyleDialog = false"
     />
 
-    <v-row no-gutters>
-      <v-col cols="6">
-        <v-row>
-          <v-col cols="10">
+    <b-row no-gutters class="mt-5">
+      <b-col cols="12">
+        <b-row>
+          <b-col cols="10">
             <app-button
-              color="primary"
+              variant="primary"
               text="Add a new style..."
               @click="addStyleDialog = true"
             />
 
             <app-button text="Enable all" @click="enableAll" />
             <app-button text="Disable all" @click="disableAll" />
-          </v-col>
+          </b-col>
 
-          <v-col cols="2" align-self="end">
-            <v-row justify="end">
+          <b-col cols="2" align-self="end">
+            <b-row justify="end">
               <the-delete-all-styles-button @click="deleteAll" />
-            </v-row>
-          </v-col>
-        </v-row>
+            </b-row>
+          </b-col>
+        </b-row>
 
-        <v-row class="search">
-          <v-col cols="12">
-            <v-text-field
-              clearable
-              hide-details
+        <b-row>
+          <b-col cols="12" class="py-3">
+            <b-form-input
+              class="search"
               placeholder="Search..."
               @input="setUrlFilter"
             />
-          </v-col>
-        </v-row>
+          </b-col>
+        </b-row>
 
         <style-component
           :key="style.url"
@@ -61,8 +53,8 @@
           @delete="deleteStyle(style)"
           @toggle="toggleStyle(style)"
         />
-      </v-col>
-    </v-row>
+      </b-col>
+    </b-row>
   </div>
 </template>
 
@@ -71,9 +63,10 @@ import Vue from 'vue';
 import * as postcss from 'postcss';
 
 import AppButton from './AppButton.vue';
-import StyleComponent from './Style.vue';
-import StyleEditor from './StyleEditor.vue';
-import TheDeleteAllStylesButton from './TheDeleteAllStylesButton.vue';
+
+import StyleComponent from './styles/Style.vue';
+import StyleEditor from './styles/StyleEditor.vue';
+import TheDeleteAllStylesButton from './styles/TheDeleteAllStylesButton.vue';
 
 import {
   saveStyle,
@@ -185,3 +178,16 @@ export default Vue.extend({
   },
 });
 </script>
+
+<style lang="scss" scoped>
+.search {
+  border: none;
+  border-bottom: 1px solid #aaa;
+  border-radius: 0;
+  outline: none;
+
+  &:focus {
+    box-shadow: none;
+  }
+}
+</style>
