@@ -5,9 +5,13 @@ import * as postcss from 'postcss';
 import CssUtils from '../../css/CssUtils';
 import { getCss as getDarkModeCss } from '../../css/DarkMode';
 
-import { saveCss, saveOption } from '../utils/chrome';
+import { setStyle, setOption } from '../utils/chrome';
 
-import { StylebotOptions, StylebotPlacement } from '../../types';
+import {
+  StylebotOptions,
+  StylebotPlacement,
+  StylebotEditingMode,
+} from '../../types';
 
 Vue.use(Vuex);
 
@@ -53,20 +57,12 @@ export default new Vuex.Store<State>({
   },
 
   mutations: {
-    toggleStylebot(state) {
-      state.visible = !state.visible;
+    setVisible(state, visible) {
+      state.visible = visible;
     },
 
-    togglePlacement(state) {
-      if (state.position === 'left') {
-        state.position = 'right';
-      } else {
-        state.position = 'left';
-      }
-    },
-
-    hideStylebot(state) {
-      state.visible = false;
+    setPosition(state, position) {
+      state.position = position;
     },
 
     setOptions(state, options) {
@@ -103,28 +99,38 @@ export default new Vuex.Store<State>({
   },
 
   actions: {
-    setCss({ commit }, css) {
-      const root = postcss.parse(css);
-      const selectors: Array<string> = [];
+    showStylebot({ commit }) {
+      commit('setVisible', true);
+    },
 
-      root.walkDecls(decl => {
-        decl.important = false;
-      });
+    hideStylebot({ commit }) {
+      commit('setVisible', false);
+    },
+
+    setMode({ commit }, mode: StylebotEditingMode) {
+      commit('setMode', mode);
+      setOption('mode', mode);
+    },
+
+    setSelectors({ commit }, root: postcss.Root) {
+      const selectors: Array<CssSelectorMetadata> = [];
 
       root.walkRules(rule => {
-        selectors.push(rule.selector);
+        try {
+          selectors.push({
+            value: rule.selector,
+            count: document.querySelectorAll(rule.selector).length,
+          });
+        } catch (e) {}
       });
 
-      commit('setCss', root.toString());
-      this.dispatch('setSelectors');
+      // sort in descending order of number of affected elements
+      selectors.sort((a, b) => b.count - a.count);
+
+      commit('setSelectors', selectors);
     },
 
-    setMode({ commit }, mode) {
-      commit('setMode', mode);
-      saveOption('mode', mode);
-    },
-
-    setActiveSelector({ commit, state }, selector) {
+    setActiveSelector({ commit, state }, selector: string) {
       const root = postcss.parse(state.css);
       const matchingRules: Array<postcss.Rule> = [];
 
@@ -138,6 +144,26 @@ export default new Vuex.Store<State>({
       );
 
       commit('setActiveSelector', selector);
+    },
+
+    applyCss(
+      { commit, state },
+      { css, shouldSave = true }: { css: string; shouldSave: boolean }
+    ) {
+      try {
+        const root = postcss.parse(css);
+
+        this.dispatch('setSelectors', root);
+        CssUtils.injectRootIntoDocument(root);
+
+        commit('setCss', css);
+
+        if (shouldSave) {
+          setStyle(state.url, css);
+        }
+      } catch (e) {
+        //
+      }
     },
 
     applyDeclaration({ commit, state }, { property, value }) {
@@ -175,77 +201,12 @@ export default new Vuex.Store<State>({
         commit('setActiveRule', activeRule);
       }
 
-      const css = root.toString();
-
-      commit('setCss', css);
-      saveCss(state.url, css);
-
-      const rootWithImportant = root.clone();
-      rootWithImportant.walkDecls(decl => (decl.important = true));
-      const cssWithImportant = rootWithImportant.toString();
-
-      CssUtils.injectCSSIntoDocument(cssWithImportant);
-
-      this.dispatch('setSelectors');
+      this.dispatch('applyCss', { css: root.toString() });
     },
 
-    applyCss({ commit, state }, { css }) {
-      try {
-        const root = postcss.parse(css);
-        commit('setCss', css);
-        saveCss(state.url, css);
-
-        const rootWithImportant = root.clone();
-        rootWithImportant.walkDecls(decl => (decl.important = true));
-
-        const cssWithImportant = rootWithImportant.toString();
-
-        CssUtils.injectCSSIntoDocument(cssWithImportant);
-      } catch (e) {
-        //
-      }
-    },
-
-    applyDarkMode({ commit, state }) {
+    applyDarkMode() {
       CssUtils.removeCSSFromDocument();
-      const css = getDarkModeCss();
-      const root = postcss.parse(css);
-
-      commit('setCss', css);
-      saveCss(state.url, css);
-
-      const rootWithImportant = root.clone();
-      rootWithImportant.walkDecls(decl => (decl.important = true));
-      const cssWithImportant = rootWithImportant.toString();
-      CssUtils.injectCSSIntoDocument(cssWithImportant);
-    },
-
-    setSelectors({ commit, state }) {
-      const root = postcss.parse(state.css);
-      const selectors: Array<CssSelectorMetadata> = [];
-
-      root.walkRules(rule => {
-        try {
-          selectors.push({
-            value: rule.selector,
-            count: document.querySelectorAll(rule.selector).length,
-          });
-        } catch (e) {}
-      });
-
-      // sort in descending order of number of affected elements
-      selectors.sort((a, b) => b.count - a.count);
-
-      commit('setSelectors', selectors);
-    },
-
-    deleteCss({ commit, state }) {
-      CssUtils.removeCSSFromDocument();
-      commit('setCss', '');
-      saveCss(state.url, '');
-      commit('setActiveSelector', '');
-      commit('setActiveRule', null);
-      commit('setSelectors', []);
+      this.dispatch('applyCss', { css: getDarkModeCss() });
     },
   },
 });

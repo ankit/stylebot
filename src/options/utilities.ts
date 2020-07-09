@@ -1,9 +1,9 @@
 import * as postcss from 'postcss';
-import { Style, StylebotBackgroundPage, StylebotOptions } from './../types';
+import { Style, StylebotBackgroundPage, StylebotOptions } from '../types';
 
 export const getFormattedStyles = (): Array<Style> => {
   const backgroundPage = (chrome.extension.getBackgroundPage() as any) as StylebotBackgroundPage;
-  const styles = backgroundPage.cache.styles.get();
+  const styles = backgroundPage.cache.styles.getAll();
   const urls = Object.keys(styles);
 
   return urls.map(url => ({
@@ -18,8 +18,8 @@ export const saveStyle = (initialUrl: string, url: string, css: string) => {
 
   try {
     const postCSSAST = postcss.parse(css);
+    backgroundPage.cache.styles.set(url, postCSSAST.toString());
 
-    backgroundPage.cache.styles.create(url, postCSSAST.toString());
     if (initialUrl && initialUrl !== url) {
       backgroundPage.cache.styles.delete(initialUrl);
     }

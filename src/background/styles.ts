@@ -1,6 +1,4 @@
 import * as postcss from 'postcss';
-
-import BrowserAction from './browseraction';
 import BackgroundPageUtils from './utils';
 
 type Style = {
@@ -20,86 +18,31 @@ class BackgroundPageStyles {
   }
 
   /**
-   * Get style for URL. If URL is not provided, return all styles
+   * Get style for given url
    */
-  get(url?: string) {
-    if (url === undefined) {
-      return this.styles;
-    } else {
-      return this.styles[url];
-    }
-  }
-
-  /**
-   * Set style for URL
-   */
-  set(url: string, style: Style) {
-    this.styles[url] = style;
+  get(url: string) {
     return this.styles[url];
   }
 
   /**
-   * Save styles to chrome local storage
+   * Get all styles
    */
-  persist() {
-    chrome.storage.local.set({
-      styles: this.styles,
-    });
+  getAll() {
+    return this.styles;
   }
 
   /**
-   * Create new style for URL
+   * Set new style for URL
    */
-  create(url: string, css: string) {
+  set(url: string, css: string) {
     this.styles[url] = {
       css,
       enabled: true,
     };
 
-    this.persist();
-  }
-
-  /**
-   * Get if style is enabled for URL
-   */
-  isEnabled(url: string) {
-    if (this.styles[url] === undefined) {
-      return false;
-    }
-
-    return this.styles[url].enabled;
-  }
-
-  /**
-   * Save the css for given URL. If css is empty, delete style for URL
-   */
-  save(url: string, css: string) {
-    if (css) {
-      this.create(url, css);
-    } else {
-      this.delete(url);
-    }
-  }
-
-  /**
-   * Toggle the enabled status for the given URL's style
-   */
-  toggle(url: string, shouldPersist: boolean) {
-    if (this.isEmpty(url)) {
-      return false;
-    }
-
-    this.styles[url].enabled = !this.styles[url].enabled;
-    this.persist();
-  }
-
-  /**
-   * Toggle the enabled status for all styles
-   */
-  toggleAll() {
-    for (const url in this.styles) {
-      this.toggle(url, false);
-    }
+    chrome.storage.local.set({
+      styles: this.styles,
+    });
   }
 
   /**
@@ -107,7 +50,10 @@ class BackgroundPageStyles {
    */
   delete(url: string) {
     delete this.styles[url];
-    this.persist();
+
+    chrome.storage.local.set({
+      styles: this.styles,
+    });
   }
 
   /**
@@ -115,125 +61,117 @@ class BackgroundPageStyles {
    */
   deleteAll() {
     this.styles = {};
-    this.persist();
+
+    chrome.storage.local.set({
+      styles: this.styles,
+    });
   }
 
   /**
-   * Return true if the URL does not have any associated style
+   * Toggle the enabled status for the given URL's style
    */
-  isEmpty(url: string) {
+  toggle(url: string) {
     if (!this.styles[url]) {
-      return true;
-    }
-
-    if (!this.styles[url].css) {
-      return true;
-    }
-
-    return false;
-  }
-
-  /**
-   * Import and merge styles, overwriting any existing styles for URLs
-   */
-  import(stylesToImport: Styles) {
-    for (const url in stylesToImport) {
-      this.styles[url] = stylesToImport[url];
-    }
-
-    this.persist();
-  }
-
-  /**
-   * Get css for given URL
-   */
-  getCss(url: string) {
-    if (!this.styles[url]) {
-      return '';
-    }
-
-    return this.styles[url].css;
-  }
-
-  getStyleUrlMetadataForTab(tab: chrome.tabs.Tab) {
-    if (!tab.url) {
       return;
     }
 
-    if (!BackgroundPageUtils.isValidHTML(tab.url)) {
+    this.styles[url].enabled = !this.styles[url].enabled;
+
+    chrome.storage.local.set({
+      styles: this.styles,
+    });
+  }
+
+  /**
+   * Toggle the enabled status for all styles
+   */
+  toggleAll() {
+    for (const url in this.styles) {
+      this.toggle(url);
+    }
+  }
+
+  /**
+   * Add styles, overwriting any conflicting existing styles
+   */
+  import(styles: Styles) {
+    for (const url in styles) {
+      this.styles[url] = styles[url];
+    }
+
+    chrome.storage.local.set({
+      styles: this.styles,
+    });
+  }
+
+  getStylesForPage(pageUrl: string) {
+    if (!pageUrl) {
       return null;
     }
 
-    const styleUrlMetadata = [];
-    for (const styleUrl in this.styles) {
-      if (
-        BackgroundPageUtils.matchesPattern(tab.url, styleUrl) &&
-        !this.isEmpty(styleUrl)
-      ) {
-        styleUrlMetadata.push({
-          url: styleUrl,
-          enabled: this.isEnabled(styleUrl),
+    if (!BackgroundPageUtils.isValidHTML(pageUrl)) {
+      return null;
+    }
+
+    const styles = [];
+    for (const url in this.styles) {
+      const matches = BackgroundPageUtils.matchesPattern(pageUrl, url);
+
+      if (matches && this.styles[url]) {
+        styles.push({
+          url,
+          css: this.styles[url].css,
+          enabled: this.styles[url].enabled,
         });
       }
     }
 
-    return styleUrlMetadata;
+    return styles;
   }
 
   /**
-   * Get priority URL and merged css applicable for the given tab url
+   * Get merged css and url from given set of styles
+   *
+   * Currently, in case multiple styles exist are enabled for the page,
+   * we merge the css and return the longest url.
+   *
+   * This has the implicit side effect that the css for the longest url
+   * gets implicitly updated to include the css from other urls.
+   *
+   * todo: improve this behavior to remove the side effect
    */
-  getComputedStylesForTab(tabUrl: string, tab: chrome.tabs.Tab) {
-    if (!BackgroundPageUtils.isValidHTML(tabUrl)) {
-      return { url: '', css: '' };
+  getMergedCssAndUrlForPage(pageUrl: string): { url: string; css: string } {
+    const styles = this.getStylesForPage(pageUrl);
+
+    if (!styles) {
+      return { css: '', url: '' };
     }
 
-    let url = '';
     let css = '';
+    let url = '';
 
-    for (const styleUrl in this.styles) {
-      if (!this.isEnabled(styleUrl)) {
-        continue;
-      }
-
-      if (BackgroundPageUtils.matchesPattern(tabUrl, styleUrl)) {
-        if (styleUrl.length > url.length) {
-          url = styleUrl;
+    styles.forEach(styleDef => {
+      if (styleDef.enabled) {
+        if (styleDef.url > url) {
+          url = styleDef.url;
         }
 
-        css = this.mergeCss(this.getCss(styleUrl), css, styleUrl === url);
+        css = this.getMergedCss(styleDef.css, css);
       }
-    }
-
-    /* @ts-ignore */
-    window.cache.loadingTabs[tab.id] = { url, css };
-    BrowserAction.update(tab);
+    });
 
     return { url, css };
   }
 
-  getComputedStylesForIframe(iframeUrl: string, tab: chrome.tabs.Tab) {
-    /* @ts-ignore */
-    const response = window.cache.loadingTabs[tab.id];
-    return response ? response : this.getComputedStylesForTab(iframeUrl, tab);
+  getMergedCssAndUrlForIframe(iframeUrl: string) {
+    return this.getMergedCssAndUrlForPage(iframeUrl);
   }
 
-  /**
-   * Copy styles from source to destination url
-   */
-  transfer(sourceUrl: string, destinationUrl: string) {
-    if (this.styles[sourceUrl]) {
-      this.styles[destinationUrl] = this.styles[sourceUrl];
-      this.persist();
-    }
-  }
+  getMergedCss(src: string, dest: string) {
+    const root1 = postcss.parse(src);
+    const root2 = postcss.parse(dest);
 
-  mergeCss(sourceCss: string, destinationCss: string, isPriorityURL: boolean) {
-    // todo: respect priority of url
-    const root1 = postcss.parse(sourceCss);
-    const root2 = postcss.parse(destinationCss);
     root1.append(root2);
-
     root1.walkDecls(decl => {
       decl.important = true;
     });
@@ -241,18 +179,18 @@ class BackgroundPageStyles {
     return root1.toString();
   }
 
-  updateStylesForTab(tab: chrome.tabs.Tab) {
-    if (!tab.url || !tab.id) {
-      return;
+  /**
+   * Move styles from source to destination url
+   */
+  move(src: string, dest: string) {
+    if (this.styles[src]) {
+      this.styles[dest] = JSON.parse(JSON.stringify(this.styles[src]));
+      delete this.styles[src];
+
+      chrome.storage.local.set({
+        styles: this.styles,
+      });
     }
-
-    const response = this.getComputedStylesForTab(tab.url, tab);
-
-    chrome.tabs.sendRequest(tab.id, {
-      name: 'updateStyles',
-      url: response.url,
-      css: response.css,
-    });
   }
 }
 

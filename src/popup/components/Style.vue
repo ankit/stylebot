@@ -1,28 +1,19 @@
 <template>
-  <v-list-item
-    link
-    :ripple="false"
+  <b-list-group-item
+    button
+    @click="toggle"
     :disabled="disableToggle"
-    :class="{ 'green lighten-4': enabled }"
-    @click="toggleStyle"
+    :variant="enabled ? 'success' : 'default'"
   >
-    <v-list-item-icon class="mr-6">
-      <v-icon v-if="enabled" class="green--text text--darken-4">
-        {{ icons.enabled }}
-      </v-icon>
+    <b-icon v-if="enabled" icon="eye-fill" />
+    <b-icon v-else icon="eye-slash" />
 
-      <v-icon v-else>{{ icons.disabled }}</v-icon>
-    </v-list-item-icon>
-
-    <v-list-item-content>
-      <v-list-item-title>{{ url }}</v-list-item-title>
-    </v-list-item-content>
-  </v-list-item>
+    <span class="pl-2">{{ url }}</span>
+  </b-list-group-item>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import { mdiEye, mdiEyeOffOutline } from '@mdi/js';
 
 export default Vue.extend({
   name: 'Style',
@@ -30,30 +21,22 @@ export default Vue.extend({
 
   data(): {
     enabled: boolean;
-    icons: {
-      enabled: string;
-      disabled: string;
-    };
   } {
     return {
       enabled: this.initialEnabled,
-      icons: {
-        enabled: mdiEye,
-        disabled: mdiEyeOffOutline,
-      },
     };
   },
 
   methods: {
-    toggleStyle(): void {
+    toggle(): void {
       if (this.enabled) {
-        this.disableStyle();
+        this.disable();
       } else {
-        this.enableStyle();
+        this.enable();
       }
     },
 
-    enableStyle(): void {
+    enable(): void {
       chrome.extension.sendRequest({
         tab: this.tab,
         styleUrl: this.url,
@@ -63,7 +46,7 @@ export default Vue.extend({
       this.enabled = true;
     },
 
-    disableStyle(): void {
+    disable(): void {
       chrome.extension.sendRequest({
         tab: this.tab,
         styleUrl: this.url,

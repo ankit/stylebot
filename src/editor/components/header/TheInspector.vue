@@ -48,8 +48,12 @@ export default Vue.extend({
 
     if (this.$store.state.options.mode === 'basic') {
       this.$store.commit('setInspecting', true);
-      this.highlighter.startInspecting();
+      this.highlighter?.startInspecting();
     }
+  },
+
+  beforeDestroy() {
+    this.highlighter?.stopInspecting();
   },
 
   methods: {

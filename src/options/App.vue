@@ -59,6 +59,7 @@ export default Vue.extend({
 <style lang="scss">
 @import '~bootstrap';
 @import '~bootstrap-vue';
+
 .main {
   height: calc(100% - 50px);
 }

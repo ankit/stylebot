@@ -2,30 +2,41 @@
  * This content script injects any custom style for the page (if it exists)
  * as soon as the document starts loading.
  */
-
 import CssUtils from '../css/CssUtils';
+
+import {
+  GetMergedCssAndUrlForPageRequest,
+  GetMergedCssAndUrlForIframeRequest,
+} from '../types/BackgroundPageRequest';
+
+import {
+  GetMergedCssAndUrlForPageResponse,
+  GetMergedCssAndUrlForIframeResponse,
+} from '../types/BackgroundPageResponse';
 
 const MAX_INJECT_COUNT = 10;
 const INJECT_CSS_TIMEOUT = 300;
 
 const injectCss = (
-  request: { name: string; url?: string },
-  injectCount: number
+  request:
+    | GetMergedCssAndUrlForPageRequest
+    | GetMergedCssAndUrlForIframeRequest,
+  injectCount: number = 0
 ) => {
   chrome.extension.sendRequest(
     request,
 
-    response => {
-      if (response && response.success) {
-        if (response.url && response.css) {
-          CssUtils.injectCSSIntoDocument(response.css);
-        }
-      } else {
-        if (injectCount < MAX_INJECT_COUNT) {
-          setTimeout(() => {
-            injectCss(request, injectCount + 1);
-          }, INJECT_CSS_TIMEOUT);
-        }
+    (
+      response:
+        | GetMergedCssAndUrlForPageResponse
+        | GetMergedCssAndUrlForIframeResponse
+    ) => {
+      if (response) {
+        CssUtils.injectCSSIntoDocument(response.css);
+      } else if (injectCount < MAX_INJECT_COUNT) {
+        setTimeout(() => {
+          injectCss(request, injectCount + 1);
+        }, INJECT_CSS_TIMEOUT);
       }
     }
   );
@@ -33,15 +44,14 @@ const injectCss = (
 
 const run = () => {
   if (window === window.top) {
-    injectCss({ name: 'getComputedStylesForTab' }, 0);
+    injectCss({
+      name: 'getMergedCssAndUrlForPage',
+    });
   } else {
-    injectCss(
-      {
-        name: 'getComputedStylesForIframe',
-        url: window.location.href,
-      },
-      0
-    );
+    injectCss({
+      name: 'getMergedCssAndUrlForIframe',
+      url: window.location.href,
+    });
   }
 };
 

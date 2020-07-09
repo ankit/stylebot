@@ -34,7 +34,12 @@ export default Vue.extend({
   methods: {
     onClick(): void {
       this.isHovered = false;
-      this.$store.commit('togglePlacement');
+
+      if (this.right) {
+        this.$store.commit('setPosition', 'left');
+      } else {
+        this.$store.commit('setPosition', 'right');
+      }
     },
   },
 });

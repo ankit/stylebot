@@ -12,10 +12,10 @@ declare global {
   }
 }
 
-Cache.init(() => {
-  Listeners.init();
+Cache.init((styles, options) => {
   ContextMenu.init();
   BrowserAction.init();
+  Listeners.init(styles, options);
 });
 
 // todo: Find alternative approach to make methods accessible to Options page

@@ -1,3 +1,5 @@
+import * as postcss from 'postcss';
+
 /**
  * Utility methods for CSS injection/removal, selector validation.
  */
@@ -19,6 +21,14 @@ const CSSUtils = {
     style.appendChild(document.createTextNode(css));
 
     document.documentElement.appendChild(style);
+  },
+
+  injectRootIntoDocument: (root: postcss.Root) => {
+    const rootWithImportant = root.clone();
+    rootWithImportant.walkDecls(decl => (decl.important = true));
+
+    const css = rootWithImportant.toString();
+    CSSUtils.injectCSSIntoDocument(css);
   },
 
   removeCSSFromDocument: () => {
