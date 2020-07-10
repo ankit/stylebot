@@ -2,12 +2,12 @@
   <b-col cols="7">
     <b-button-group>
       <b-button
-        size="sm"
-        :key="option.value"
-        :disabled="disabled"
         v-for="option in options"
-        @click="select(option.value)"
+        :key="option.value"
+        size="sm"
+        :disabled="disabled"
         :variant="value === option.value ? 'secondary' : 'outline-secondary'"
+        @click="select(option.value)"
       >
         <span v-html="option.content" />
       </b-button>

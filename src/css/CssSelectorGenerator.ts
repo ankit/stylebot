@@ -2,7 +2,7 @@
  * Generate CSS selector for HTML element.
  */
 class CssSelectorGenerator {
-  inspect = (el: HTMLElement, domHeirarchyLevel: number = 0): string => {
+  inspect = (el: HTMLElement, domHeirarchyLevel = 0): string => {
     const className = el
       .getAttribute('class')
       ?.trim()
@@ -13,7 +13,7 @@ class CssSelectorGenerator {
       const len = classes.length;
 
       let selector = el.tagName.toLowerCase();
-      for (var i = 0; i < len; i++) {
+      for (let i = 0; i < len; i++) {
         // todo: optimize class selection to be more specific here
         selector += '.' + classes[i];
       }

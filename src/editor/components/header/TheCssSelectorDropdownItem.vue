@@ -1,9 +1,9 @@
 <template>
   <div @mouseenter="mouseenter" @mouseleave="mouseleave">
     <b-dropdown-item
-      @click="click"
       :title="`${selector} (${count})`"
       class="css-selector-dropdown-item"
+      @click="click"
     >
       {{ `${selector} (${count})` }}
     </b-dropdown-item>

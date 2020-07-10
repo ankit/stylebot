@@ -3,27 +3,27 @@
     <b-input-group>
       <the-css-selector-input :disabled="disabled" />
 
-      <template v-slot:append>
+      <template #append>
         <dropdown-hack-to-support-shadow-dom>
           <b-dropdown
             right
             :disabled="disabled"
-            @show="stopInspecting"
             variant="outline-secondary"
             class="css-selector-dropdown"
+            @show="stopInspecting"
           >
             <the-delete-css-dropdown-item
-              @click="deleteCssDialog = true"
               :disabled="selectors.length === 0"
+              @click="deleteCssDialog = true"
             />
 
             <b-dropdown-divider v-if="selectors.length > 0" />
 
             <the-css-selector-dropdown-item
+              v-for="selectorMetadata in selectors"
               :key="selectorMetadata.value"
               :count="selectorMetadata.count"
               :selector="selectorMetadata.value"
-              v-for="selectorMetadata in selectors"
             />
           </b-dropdown>
         </dropdown-hack-to-support-shadow-dom>

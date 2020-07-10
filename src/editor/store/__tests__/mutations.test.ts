@@ -1,15 +1,11 @@
-import { JSDOM } from 'jsdom';
 import * as postcss from 'postcss';
 import mutations from '../mutations';
 import mockState from '../__mocks__/state';
 
-const dom = new JSDOM();
-global.document = dom.window.document;
-
 describe('mutations', () => {
   describe('setSelectors', () => {
     it('selectors sorted by number of matching DOM elements', () => {
-      global.document.body
+      document.body
         .appendChild(document.createElement('a'))
         .appendChild(document.createElement('a'))
         .appendChild(document.createElement('b'))
@@ -31,7 +27,7 @@ describe('mutations', () => {
     });
 
     it('selectors sorted alphabetically when DOM elements count is the same', () => {
-      global.document.body.innerHTML = '';
+      document.body.innerHTML = '';
 
       const root = postcss.parse('b { color: red; } a { color: green; } c { }');
       const state = { ...mockState };

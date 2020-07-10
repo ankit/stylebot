@@ -2,7 +2,7 @@
   <div>
     <h5>Context Menu</h5>
 
-    <b-form-checkbox switch v-model="contextMenu">
+    <b-form-checkbox v-model="contextMenu" switch>
       Enable Right Click Context Menu
     </b-form-checkbox>
   </div>

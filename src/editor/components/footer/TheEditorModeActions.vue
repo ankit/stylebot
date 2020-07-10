@@ -3,8 +3,8 @@
     <b-button
       size="md"
       title="Basic CSS editor"
-      @click="setMode('basic')"
       :variant="mode === 'basic' ? 'secondary' : 'outline-secondary'"
+      @click="setMode('basic')"
     >
       <b-icon icon="image" aria-hidden="true" />
       <span class="pl-1">Basic</span>
@@ -13,8 +13,8 @@
     <b-button
       size="md"
       title="Code CSS for selector"
-      @click="setMode('magic')"
       :variant="mode === 'magic' ? 'secondary' : 'outline-secondary'"
+      @click="setMode('magic')"
     >
       <b-icon icon="star" aria-hidden="true" />
       <span class="pl-1">Magic</span>
@@ -23,8 +23,8 @@
     <b-button
       size="md"
       title="Code"
-      @click="setMode('code')"
       :variant="mode === 'code' ? 'secondary' : 'outline-secondary'"
+      @click="setMode('code')"
     >
       <b-icon icon="code" aria-hidden="true" />
       <span class="pl-1">Code</span>

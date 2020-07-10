@@ -1,12 +1,12 @@
 <template>
   <b-form-input
-    @blur="blur"
-    @focus="focus"
-    @input="input"
     :disabled="disabled"
     :value="activeSelector"
     class="css-selector-input"
     placeholder="Enter CSS selector..."
+    @blur="blur"
+    @focus="focus"
+    @input="input"
   />
 </template>
 
@@ -31,18 +31,18 @@ export default Vue.extend({
     };
   },
 
+  computed: {
+    activeSelector(): string {
+      return this.$store.state.activeSelector;
+    },
+  },
+
   created() {
     this.highlighter = new Highlighter({
       onSelect: () => {
         return;
       },
     });
-  },
-
-  computed: {
-    activeSelector(): string {
-      return this.$store.state.activeSelector;
-    },
   },
 
   methods: {

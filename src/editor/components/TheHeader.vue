@@ -1,6 +1,6 @@
 <template>
   <b-row class="header justify-content-md-between" no-gutters>
-    <b-col cols="2" class="p-0" style="margin: auto">
+    <b-col cols="2" class="p-0" style="margin: auto;">
       <the-inspector @select="inspect($event)" />
     </b-col>
 

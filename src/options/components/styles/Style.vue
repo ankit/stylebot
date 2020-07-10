@@ -2,8 +2,8 @@
   <b-row class="style px-2 py-3" align-v="center">
     <style-editor
       v-if="edit"
-      :initialUrl="url"
-      :initialCss="css"
+      :initial-url="url"
+      :initial-css="css"
       @save="
         // todo: handle syntax errors
         $emit('save', $event);
@@ -36,19 +36,13 @@ import StyleDeleteButton from './StyleDeleteButton.vue';
 
 export default Vue.extend({
   name: 'Style',
-  props: ['url', 'css', 'initialEnabled'],
-
-  watch: {
-    initialEnabled(newVal: boolean): void {
-      this.enabled = newVal;
-    },
-  },
 
   components: {
     StyleEditor,
     StyleEditButton,
     StyleDeleteButton,
   },
+  props: ['url', 'css', 'initialEnabled'],
 
   data(): {
     enabled: boolean;
@@ -58,6 +52,12 @@ export default Vue.extend({
       edit: false,
       enabled: this.initialEnabled,
     };
+  },
+
+  watch: {
+    initialEnabled(newVal: boolean): void {
+      this.enabled = newVal;
+    },
   },
 });
 </script>

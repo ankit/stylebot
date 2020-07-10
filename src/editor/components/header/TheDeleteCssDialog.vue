@@ -10,13 +10,13 @@
 
       <b-row class="justify-content-end mr-2">
         <b-col cols="2" class="mr-2">
-          <b-btn @click="$emit('close')" variant="outline-secondary">
+          <b-btn variant="outline-secondary" @click="$emit('close')">
             Cancel
           </b-btn>
         </b-col>
 
         <b-col cols="2">
-          <b-btn @click="deleteCss" variant="outline-danger">Delete</b-btn>
+          <b-btn variant="outline-danger" @click="deleteCss">Delete</b-btn>
         </b-col>
       </b-row>
     </div>

@@ -6,7 +6,7 @@ export const getCurrentTab = (
 ): void => {
   chrome.windows.getCurrent({ populate: true }, ({ tabs }) => {
     if (tabs) {
-      for (var i = 0; i < tabs.length; i++) {
+      for (let i = 0; i < tabs.length; i++) {
         if (tabs[i].active) {
           callback(tabs[i]);
         }
@@ -18,7 +18,7 @@ export const getCurrentTab = (
 export const getStyles = (
   tab: chrome.tabs.Tab,
   callback: (styles: GetStylesForPageResponse) => void
-) => {
+): void => {
   const request: GetStylesForPageRequest = {
     name: 'getStylesForPage',
     tab,
@@ -44,7 +44,7 @@ export const getIsStylebotOpen = (
   }
 };
 
-export const toggleStylebot = (tab: chrome.tabs.Tab) => {
+export const toggleStylebot = (tab: chrome.tabs.Tab): void => {
   if (tab.id) {
     chrome.tabs.sendRequest(tab.id, {
       name: 'toggle',

@@ -2,7 +2,7 @@
   <div>
     <h5>Shortcut Key</h5>
 
-    <b-form-checkbox switch v-model="useShortcutKey">
+    <b-form-checkbox v-model="useShortcutKey" switch>
       Enable shortcut key to launch Stylebot
     </b-form-checkbox>
   </div>

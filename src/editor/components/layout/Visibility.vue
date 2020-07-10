@@ -5,9 +5,9 @@
     <css-property-value>
       <b-button
         size="sm"
-        @click="toggle"
         :disabled="disabled"
         :variant="isHidden ? 'secondary' : 'outline-secondary'"
+        @click="toggle"
       >
         Hide
       </b-button>

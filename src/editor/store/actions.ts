@@ -22,7 +22,7 @@ export default {
   }: {
     commit: Commit;
     dispatch: Dispatch;
-  }) {
+  }): Promise<void> {
     const options = await getAllOptions();
     const { url, css } = await getMergedCssAndUrlForPage(false);
 
@@ -40,7 +40,7 @@ export default {
   setMode(
     { state, commit }: { state: State; commit: Commit },
     mode: StylebotEditingMode
-  ) {
+  ): void {
     setOption('mode', mode);
     commit('setOptions', { ...state.options, mode });
   },
@@ -48,7 +48,7 @@ export default {
   applyCss(
     { commit, state }: { commit: Commit; state: State },
     { css, shouldSave = true }: { css: string; shouldSave: boolean }
-  ) {
+  ): void {
     try {
       const root = postcss.parse(css);
       CssUtils.injectRootIntoDocument(root);
@@ -67,7 +67,7 @@ export default {
   applyDeclaration(
     { state, dispatch }: { state: State; dispatch: Dispatch },
     { property, value }: { property: string; value: string }
-  ) {
+  ): void {
     if (!state.activeSelector) {
       return;
     }
@@ -121,7 +121,7 @@ export default {
     }
   },
 
-  applyDarkMode({ dispatch }: { dispatch: Dispatch }) {
+  applyDarkMode({ dispatch }: { dispatch: Dispatch }): void {
     CssUtils.removeCSSFromDocument();
     dispatch('applyCss', { css: getDarkModeCss() });
   },

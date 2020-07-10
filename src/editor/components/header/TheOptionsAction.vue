@@ -5,8 +5,8 @@
     @mouseenter="isHovered = true"
     @mouseleave="isHovered = false"
   >
-    <b-icon icon="gear" v-if="!isHovered" />
-    <b-icon icon="gear-fill" v-if="isHovered" />
+    <b-icon v-if="!isHovered" icon="gear" />
+    <b-icon v-if="isHovered" icon="gear-fill" />
   </button>
 </template>
 

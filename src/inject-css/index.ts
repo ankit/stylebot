@@ -21,7 +21,7 @@ const injectCss = (
   request:
     | GetMergedCssAndUrlForPageRequest
     | GetMergedCssAndUrlForIframeRequest,
-  injectCount: number = 0
+  injectCount = 0
 ) => {
   chrome.extension.sendRequest(
     request,

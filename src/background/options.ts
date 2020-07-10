@@ -11,7 +11,7 @@ declare global {
  * Propagate options to all existing tabs
  */
 const propagateOptions = () => {
-  var req = {
+  const req = {
     name: 'setOptions',
     options: window.cache.options,
   };
@@ -21,12 +21,12 @@ const propagateOptions = () => {
       populate: true,
     },
     windows => {
-      var w_len = windows.length;
-      for (var i = 0; i < w_len; i++) {
+      const w_len = windows.length;
+      for (let i = 0; i < w_len; i++) {
         /* @ts-ignore */
-        var t_len = windows[i].tabs.length;
+        const t_len = windows[i].tabs.length;
 
-        for (var j = 0; j < t_len; j++) {
+        for (let j = 0; j < t_len; j++) {
           /* @ts-ignore */
           chrome.tabs.sendRequest(windows[i].tabs[j].id, req);
         }

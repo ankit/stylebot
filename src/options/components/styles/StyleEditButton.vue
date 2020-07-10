@@ -3,8 +3,8 @@
     size="sm"
     class="icon-btn"
     title="Edit Style"
-    @click="$emit('click')"
     variant="outline-primary"
+    @click="$emit('click')"
   >
     <b-icon icon="pencil" />
   </b-btn>

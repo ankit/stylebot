@@ -7,9 +7,9 @@
 
     <b-list-group class="navigation-list">
       <b-list-group-item
+        v-for="tab in tabs"
         :key="tab"
         button
-        v-for="tab in tabs"
         class="navigation-item"
         :active="currentTab === tab"
         @click="$emit('select', tab)"

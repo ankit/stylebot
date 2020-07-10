@@ -2,8 +2,8 @@
   <b-row no-gutters>
     <b-col class="box-dimension" cols="2">
       <b-form-input
-        size="sm"
         v-model="top"
+        size="sm"
         placeholder="T"
         :disabled="disabled"
         class="box-dimension-input"
@@ -12,8 +12,8 @@
 
     <b-col class="box-dimension" cols="2">
       <b-form-input
-        size="sm"
         v-model="right"
+        size="sm"
         placeholder="R"
         :disabled="disabled"
         class="box-dimension-input"
@@ -22,8 +22,8 @@
 
     <b-col class="box-dimension" cols="2">
       <b-form-input
-        size="sm"
         v-model="bottom"
+        size="sm"
         placeholder="B"
         :disabled="disabled"
         class="box-dimension-input"
@@ -32,8 +32,8 @@
 
     <b-col class="box-dimension" cols="2">
       <b-form-input
-        size="sm"
         v-model="left"
+        size="sm"
         placeholder="L"
         :disabled="disabled"
         class="box-dimension-input"

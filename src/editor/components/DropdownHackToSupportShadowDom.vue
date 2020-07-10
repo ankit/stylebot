@@ -1,6 +1,6 @@
 <template>
   <div @mousedown="mousedown">
-    <input type="text" ref="hiddenInput" class="hidden-input" />
+    <input ref="hiddenInput" type="text" class="hidden-input" />
     <slot />
   </div>
 </template>

@@ -3,31 +3,31 @@
     <b-btn
       variant="outline-danger"
       size="sm"
-      @click="modal = true"
       class="icon-btn"
       title="Delete Style"
+      @click="modal = true"
     >
       <b-icon icon="trash" />
     </b-btn>
 
     <b-modal
+      v-model="modal"
       size="md"
       centered
       no-fade
-      v-model="modal"
+      title="Delete style for url"
+      no-close-on-backdrop
+      no-close-on-esc
+      hide-header-close
       @ok="
         modal = false;
         $emit('click');
       "
       @cancel="modal = false"
-      title="Delete style for url"
-      no-close-on-backdrop
-      no-close-on-esc
-      hide-header-close
     >
       This will permanently delete your style. You can't undo this.
 
-      <template v-slot:modal-footer="{ ok, cancel }">
+      <template #modal-footer="{ ok, cancel }">
         <app-button text="Cancel" @click="cancel()" />
         <app-button text="Delete" variant="danger" @click="ok()" />
       </template>
@@ -42,15 +42,15 @@ import AppButton from '../AppButton.vue';
 export default Vue.extend({
   name: 'StyleDeleteButton',
 
+  components: {
+    AppButton,
+  },
+
   props: {
     url: {
       type: String,
       required: true,
     },
-  },
-
-  components: {
-    AppButton,
   },
 
   data(): {

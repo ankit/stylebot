@@ -8,8 +8,8 @@
         class="shortcut-meta-key ml-3"
       >
         <b-dropdown-item
-          :key="metaKey.value"
           v-for="metaKey in allShortcutMetaKeys"
+          :key="metaKey.value"
           @click="setShortcutMetaKey(metaKey.value)"
         >
           {{ metaKey.text }}
@@ -19,8 +19,8 @@
 
     <div class="ml-2" style="display: inline-block">
       <b-form-input
-        :disabled="disabled"
         v-model="shortcutKeyCharacter"
+        :disabled="disabled"
         class="shortcut-key-character"
       />
     </div>

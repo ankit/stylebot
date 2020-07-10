@@ -1,17 +1,17 @@
 <template>
   <b-modal
+    v-model="show"
     size="xl"
     centered
     no-fade
-    v-model="show"
-    @ok="importJson"
-    @cancel="cancel"
     title="Paste previously exported JSON"
     no-close-on-backdrop
     no-close-on-esc
     hide-header-close
+    @ok="importJson"
+    @cancel="cancel"
   >
-    <div class="mb-3" v-if="!error">
+    <div v-if="!error" class="mb-3">
       This will overwrite your existing styles. You can't undo this.
     </div>
 
@@ -21,20 +21,20 @@
     </div>
 
     <b-form-textarea
+      v-model="json"
       rows="15"
       autofocus
-      v-model="json"
       @input="error = false"
     />
 
-    <template v-slot:modal-footer="{ ok, cancel }">
+    <template #modal-footer="{ ok, cancel }">
       <app-button text="Cancel" @click="cancel()" />
 
       <app-button
         text="Import"
-        @click="ok()"
         variant="primary"
         :disabled="!json"
+        @click="ok()"
       />
     </template>
   </b-modal>
@@ -58,6 +58,16 @@ export default Vue.extend({
     },
   },
 
+  data(): {
+    json: string;
+    error: boolean;
+  } {
+    return {
+      json: '',
+      error: false,
+    };
+  },
+
   computed: {
     show: {
       get(): boolean {
@@ -68,16 +78,6 @@ export default Vue.extend({
         this.$emit('input', newValue);
       },
     },
-  },
-
-  data(): {
-    json: string;
-    error: boolean;
-  } {
-    return {
-      json: '',
-      error: false,
-    };
   },
 
   methods: {
