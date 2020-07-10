@@ -1,12 +1,7 @@
 import * as postcss from 'postcss';
 
 import { State, CssSelectorMetadata } from './';
-
-import {
-  StylebotPlacement,
-  StylebotOptions,
-  StylebotEditingMode,
-} from '../../types';
+import { StylebotPlacement, StylebotOptions } from '../../types';
 
 export default {
   showStylebot(state: State) {
@@ -54,7 +49,15 @@ export default {
     });
 
     // sort in descending order of number of affected elements
-    selectors.sort((a, b) => b.count - a.count);
+    selectors.sort((a, b) => {
+      if (b.count !== a.count) {
+        return b.count - a.count;
+      } else if (b.value > a.value) {
+        return -1;
+      } else {
+        return 1;
+      }
+    });
 
     state.selectors = selectors;
   },

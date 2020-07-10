@@ -1,12 +1,13 @@
 {
   "include": ["./**/*.ts", "./**/*.vue"],
   "exclude": ["node_modules"],
+
   "compilerOptions": {
     "target": "es5",
     "strict": true,
     "module": "es2015",
     "lib": ["es2015", "dom"],
     "moduleResolution": "node",
-    "types": ["chrome"]
+    "types": ["chrome", "jest", "node"]
   }
 }
