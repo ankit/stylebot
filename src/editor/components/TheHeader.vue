@@ -45,7 +45,7 @@ export default Vue.extend({
 
   methods: {
     inspect(selector: string): void {
-      this.$store.dispatch('setActiveSelector', selector);
+      this.$store.commit('setActiveSelector', selector);
     },
   },
 });

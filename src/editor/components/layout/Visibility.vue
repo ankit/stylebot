@@ -32,7 +32,7 @@ export default Vue.extend({
 
   computed: {
     isHidden(): boolean {
-      const activeRule = this.$store.state.activeRule;
+      const activeRule = this.$store.getters.activeRule;
       let value = '';
 
       if (activeRule) {

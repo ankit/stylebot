@@ -64,7 +64,7 @@ export default Vue.extend({
       } else {
         this.highlighter?.startInspecting();
         this.$store.commit('setInspecting', true);
-        this.$store.dispatch('setActiveSelector', '');
+        this.$store.commit('setActiveSelector', '');
       }
     },
 

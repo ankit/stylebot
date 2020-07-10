@@ -42,7 +42,7 @@ export default Vue.extend({
 
   computed: {
     backgroundColor(): string {
-      const activeRule = this.$store.state.activeRule;
+      const activeRule = this.$store.getters.activeRule;
 
       let color = '';
       if (activeRule) {

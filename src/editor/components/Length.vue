@@ -80,7 +80,7 @@ export default Vue.extend({
 
   methods: {
     get(): { length: string; unit: Unit } {
-      const activeRule = this.$store.state.activeRule;
+      const activeRule = this.$store.getters.activeRule;
       let value = '';
 
       if (activeRule) {

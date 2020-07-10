@@ -47,7 +47,7 @@ export default Vue.extend({
 
   methods: {
     input(selector: string): void {
-      this.$store.dispatch('setActiveSelector', selector);
+      this.$store.commit('setActiveSelector', selector);
 
       if (CssUtils.validateSelector(selector)) {
         this.highlighter.highlight(selector);

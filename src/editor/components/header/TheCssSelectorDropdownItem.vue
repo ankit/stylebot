@@ -36,7 +36,7 @@ export default Vue.extend({
 
   methods: {
     click(): void {
-      this.$store.dispatch('setActiveSelector', this.selector);
+      this.$store.commit('setActiveSelector', this.selector);
     },
 
     mouseenter(): void {

@@ -106,7 +106,7 @@ export default Vue.extend({
 
   methods: {
     get(type: 'top' | 'right' | 'bottom' | 'left'): string {
-      const activeRule = this.$store.state.activeRule;
+      const activeRule = this.$store.getters.activeRule;
       let value = '';
 
       if (activeRule) {

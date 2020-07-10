@@ -16,15 +16,12 @@ export default Vue.extend({
 
       if (request.name === 'toggle') {
         if (this.$store.state.visible) {
-          this.$store.dispatch('hideStylebot');
+          this.$store.commit('hideStylebot');
         } else {
-          this.$store.dispatch('showStylebot');
+          this.$store.commit('showStylebot');
         }
       } else if (request.name === 'getIsStylebotOpen') {
         sendResponse(this.$store.state.visible);
-      } else if (request.name === 'updateCss') {
-        this.$store.commit('setUrl', request.url);
-        this.$store.dispatch('injectCss', request.css);
       }
     });
   },
