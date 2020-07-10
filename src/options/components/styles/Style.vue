@@ -64,6 +64,6 @@ export default Vue.extend({
 
 <style scoped>
 .style:hover {
-  border-bottom: 1px solid #ddd;
+  outline: 1px solid #ddd;
 }
 </style>

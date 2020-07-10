@@ -25,6 +25,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import { Declaration } from 'postcss';
 
 import ColorPicker from './ColorPicker.vue';
 import CssProperty from '../CssProperty.vue';
@@ -45,9 +46,11 @@ export default Vue.extend({
 
       let color = '';
       if (activeRule) {
-        activeRule.clone().walkDecls('background-color', decl => {
-          color = decl.value;
-        });
+        activeRule
+          .clone()
+          .walkDecls('background-color', (decl: Declaration) => {
+            color = decl.value;
+          });
       }
 
       return color;

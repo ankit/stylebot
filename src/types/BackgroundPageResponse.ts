@@ -1,13 +1,15 @@
-import { StylebotOptions } from './';
+import { StylebotOptions, Style } from './';
 
-export type GetAllOptionsResponse = { options: StylebotOptions };
+export type GetAllOptionsResponse = StylebotOptions;
 export type GetOptionResponse = StylebotOptions[keyof StylebotOptions];
 
-export type GetStylesForPageResponse = Array<{
-  url: string;
-  css: string;
-  enabled: boolean;
-}>;
+export type GetAllStylesResponse = {
+  [url: string]: {
+    css: string;
+    enabled: boolean;
+  };
+};
+export type GetStylesForPageResponse = Array<Style>;
 
 export type GetMergedCssAndUrlForPageResponse = {
   url: string;
@@ -19,6 +21,7 @@ export type GetMergedCssAndUrlForIframeResponse = GetMergedCssAndUrlForPageRespo
 type BackgroundPageResponse =
   | GetAllOptionsResponse
   | GetOptionResponse
+  | GetAllStylesResponse
   | GetStylesForPageResponse
   | GetMergedCssAndUrlForPageResponse
   | GetMergedCssAndUrlForIframeResponse;

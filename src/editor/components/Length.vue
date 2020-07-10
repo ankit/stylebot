@@ -22,6 +22,8 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import { Declaration } from 'postcss';
+
 import DropdownHackToSupportShadowDom from './DropdownHackToSupportShadowDom.vue';
 
 type Unit = 'px' | 'em' | '%' | string;
@@ -82,7 +84,7 @@ export default Vue.extend({
       let value = '';
 
       if (activeRule) {
-        activeRule.clone().walkDecls(this.property, decl => {
+        activeRule.clone().walkDecls(this.property, (decl: Declaration) => {
           value = decl.value;
         });
       }

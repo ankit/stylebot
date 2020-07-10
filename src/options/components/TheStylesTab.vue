@@ -3,11 +3,8 @@
     <style-editor
       v-if="addStyleDialog"
       @save="
-        const response = saveStyle($event);
-        // todo: display error stacktrace
-        if (response.success) {
-          addStyleDialog = false;
-        }
+        saveStyle($event);
+        addStyleDialog = false;
       "
       @cancel="addStyleDialog = false"
     />
@@ -60,7 +57,6 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import * as postcss from 'postcss';
 
 import AppButton from './AppButton.vue';
 
@@ -68,19 +64,7 @@ import StyleComponent from './styles/Style.vue';
 import StyleEditor from './styles/StyleEditor.vue';
 import TheDeleteAllStylesButton from './styles/TheDeleteAllStylesButton.vue';
 
-import {
-  saveStyle,
-  deleteStyle,
-  enableStyle,
-  disableStyle,
-  getFormattedStyles,
-  enableAllStyles,
-  disableAllStyles,
-  deleteAllStyles,
-} from '../utilities';
-
 import { Style } from '../../types';
-import { CssSyntaxError } from 'postcss';
 
 export default Vue.extend({
   name: 'TheStylesTab',
@@ -94,56 +78,62 @@ export default Vue.extend({
 
   data(): {
     urlFilter: string;
-    styles: Array<Style>;
     addStyleDialog: boolean;
     addStyleDialogError: any;
   } {
     return {
-      styles: [],
       urlFilter: '',
       addStyleDialog: false,
       addStyleDialogError: null,
     };
   },
 
-  async created() {
-    this.getStyles();
+  computed: {
+    styles(): Array<Style> {
+      const stylesObj = this.$store.state.styles;
+      const styles: Array<Style> = [];
+
+      for (const url in stylesObj) {
+        if (url.indexOf(this.urlFilter) !== -1) {
+          styles.push({
+            url,
+            css: stylesObj[url].css,
+            enabled: stylesObj[url].enabled,
+          });
+        }
+      }
+
+      return styles;
+    },
   },
 
   methods: {
     setUrlFilter(str: string): void {
       this.urlFilter = str;
-      this.getStyles();
     },
 
     deleteStyle(style: Style): void {
-      deleteStyle(style.url);
-      this.getStyles();
+      this.$store.dispatch('deleteStyle', style.url);
     },
 
     toggleStyle(style: Style): void {
       if (style.enabled) {
-        disableStyle(style.url);
+        this.$store.dispatch('disableStyle', style.url);
       } else {
-        enableStyle(style.url);
+        this.$store.dispatch('enableStyle', style.url);
       }
-
-      this.getStyles();
     },
 
     enableAll(): void {
-      enableAllStyles();
-      this.getStyles();
+      this.$store.dispatch('enableAllStyles');
     },
 
     disableAll(): void {
-      disableAllStyles();
-      this.getStyles();
+      this.$store.dispatch('disableAllStyles');
     },
 
     deleteAll(): void {
-      deleteAllStyles();
-      this.getStyles();
+      this.$store.dispatch('deleteAllStyles');
     },
 
     saveStyle({
@@ -154,26 +144,8 @@ export default Vue.extend({
       initialUrl: string;
       url: string;
       css: string;
-    }): { success: boolean; error?: postcss.CssSyntaxError } {
-      const response = saveStyle(initialUrl, url, css);
-
-      if (response.success) {
-        this.getStyles();
-      }
-
-      return response;
-    },
-
-    getStyles(): void {
-      const styles = getFormattedStyles();
-
-      if (this.urlFilter) {
-        this.styles = styles.filter(style =>
-          style.url.includes(this.urlFilter)
-        );
-      } else {
-        this.styles = styles;
-      }
+    }): void {
+      this.$store.dispatch('saveStyle', { initialUrl, url, css });
     },
   },
 });

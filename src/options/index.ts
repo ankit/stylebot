@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import store from './store/index';
 
 import {
   IconsPlugin,
@@ -25,6 +26,7 @@ Vue.use(FormTextareaPlugin);
 import App from './App.vue';
 
 new Vue({
+  store,
   el: '#app',
   render: (h: any) => h(App),
 });

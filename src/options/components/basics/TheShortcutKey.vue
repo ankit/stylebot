@@ -9,7 +9,7 @@
       >
         <b-dropdown-item
           :key="metaKey.value"
-          v-for="metaKey in shortcutMetaKeys"
+          v-for="metaKey in allShortcutMetaKeys"
           @click="setShortcutMetaKey(metaKey.value)"
         >
           {{ metaKey.text }}
@@ -20,7 +20,6 @@
     <div class="ml-2" style="display: inline-block">
       <b-form-input
         :disabled="disabled"
-        @input="setShortcutKey"
         v-model="shortcutKeyCharacter"
         class="shortcut-key-character"
       />
@@ -32,15 +31,11 @@
 import Vue from 'vue';
 
 import { StylebotShortcutMetaKey } from '../../../types';
-import {
-  getOption,
-  saveOption,
-  getKeydownCode,
-  getCharacterFromKeydownCode,
-} from '../../utilities';
+import { getKeydownCode, getCharacterFromKeydownCode } from '../../utils';
 
 export default Vue.extend({
   name: 'TheShortcutKey',
+
   props: {
     disabled: {
       type: Boolean,
@@ -51,7 +46,7 @@ export default Vue.extend({
 
   data(): any {
     return {
-      shortcutMetaKeys: [
+      allShortcutMetaKeys: [
         {
           text: 'Ctrl',
           value: 'ctrl',
@@ -69,28 +64,34 @@ export default Vue.extend({
           value: 'none',
         },
       ],
-
-      shortcutKey: 77,
-      shortcutMetaKey: 'alt',
-      shortcutKeyCharacter: 'M',
     };
   },
 
-  created(): void {
-    this.shortcutKey = getOption('shortcutKey');
-    this.shortcutMetaKey = getOption('shortcutMetaKey');
-    this.shortcutKeyCharacter = getCharacterFromKeydownCode(this.shortcutKey);
+  computed: {
+    shortcutKeyCharacter: {
+      get(): string {
+        const shortcutKey = this.$store.state.options['shortcutKey'];
+        return getCharacterFromKeydownCode(shortcutKey);
+      },
+
+      set(shortcutKeyCharacter: string): void {
+        const shortcutKey = getKeydownCode(shortcutKeyCharacter);
+
+        this.$store.dispatch('setOption', {
+          name: 'shortcutKey',
+          value: shortcutKey,
+        });
+      },
+    },
+
+    shortcutMetaKey(): StylebotShortcutMetaKey {
+      return this.$store.state.options['shortcutMetaKey'];
+    },
   },
 
   methods: {
-    setShortcutKey(): void {
-      const keyCode = getKeydownCode(this.shortcutKeyCharacter);
-      saveOption('shortcutKey', keyCode);
-    },
-
-    setShortcutMetaKey(selectedMetaKey: StylebotShortcutMetaKey): void {
-      this.shortcutMetaKey = selectedMetaKey;
-      saveOption('shortcutMetaKey', this.shortcutMetaKey);
+    setShortcutMetaKey(value: StylebotShortcutMetaKey): void {
+      this.$store.dispatch('setOption', { name: 'shortcutMetaKey', value });
     },
   },
 });

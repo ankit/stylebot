@@ -30,6 +30,14 @@ import InjectMonacoEditorIframe from './components/styles/InjectMonacoEditorIfra
 export default Vue.extend({
   name: 'App',
 
+  components: {
+    TheBasicsTab,
+    TheStylesTab,
+    TheBackupTab,
+    TheNavigation,
+    InjectMonacoEditorIframe,
+  },
+
   data(): {
     currentTab: string;
     tabs: Array<string>;
@@ -40,12 +48,9 @@ export default Vue.extend({
     };
   },
 
-  components: {
-    TheBasicsTab,
-    TheStylesTab,
-    TheBackupTab,
-    TheNavigation,
-    InjectMonacoEditorIframe,
+  created() {
+    this.$store.dispatch('getAllStyles');
+    this.$store.dispatch('getAllOptions');
   },
 
   computed: {

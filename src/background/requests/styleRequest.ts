@@ -6,12 +6,15 @@ import {
   GetMergedCssAndUrlForIframeRequest,
   EnableStyleRequest,
   DisableStyleRequest,
+  GetAllStylesRequest,
+  SetAllStylesRequest,
 } from '../../types/BackgroundPageRequest';
 
 import {
   GetStylesForPageResponse,
   GetMergedCssAndUrlForPageResponse,
   GetMergedCssAndUrlForIframeResponse,
+  GetAllStylesResponse,
 } from '../../types/BackgroundPageResponse';
 
 import BackgroundPageStyles from '../styles';
@@ -19,6 +22,8 @@ import BackgroundPageStyles from '../styles';
 type Request =
   | SetStyleRequest
   | MoveStylesRequest
+  | GetAllStylesRequest
+  | SetAllStylesRequest
   | GetStylesForPageRequest
   | GetMergedCssAndUrlForPageRequest
   | GetMergedCssAndUrlForIframeRequest
@@ -26,6 +31,7 @@ type Request =
   | DisableStyleRequest;
 
 type Response =
+  | GetAllStylesResponse
   | GetStylesForPageResponse
   | GetMergedCssAndUrlForPageResponse
   | GetMergedCssAndUrlForIframeResponse;
@@ -37,11 +43,15 @@ export default (
   sendResponse: (response: Response) => void
 ) => {
   if (request.name === 'setStyle') {
-    if (request.css) {
-      styles.set(request.url, request.css);
-    } else {
-      styles.delete(request.url);
-    }
+    styles.set(request.url, request.css);
+  } else if (request.name === 'enableStyle') {
+    styles.enable(request.url);
+  } else if (request.name === 'disableStyle') {
+    styles.disable(request.url);
+  } else if (request.name === 'getAllStyles') {
+    sendResponse(styles.getAll());
+  } else if (request.name === 'setAllStyles') {
+    styles.setAll(request.styles);
   } else if (request.name === 'moveStyles') {
     styles.move(request.sourceUrl, request.destinationUrl);
   } else if (request.name === 'getStylesForPage') {
@@ -63,9 +73,5 @@ export default (
     sendResponse(styles.getMergedCssAndUrlForPage(sender.tab.url));
   } else if (request.name === 'getMergedCssAndUrlForIframe') {
     sendResponse(styles.getMergedCssAndUrlForIframe(request.url));
-  } else if (request.name === 'enableStyle') {
-    styles.toggle(request.url);
-  } else if (request.name === 'disableStyle') {
-    styles.toggle(request.url);
   }
 };

@@ -2,7 +2,7 @@
   <div>
     <h5>Shortcut Key</h5>
 
-    <b-form-checkbox switch @change="set" v-model="useShortcutKey">
+    <b-form-checkbox switch v-model="useShortcutKey">
       Enable shortcut key to launch Stylebot
     </b-form-checkbox>
   </div>
@@ -10,26 +10,19 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { getOption, saveOption } from '../../utilities';
 
 export default Vue.extend({
   name: 'TheUseShortcutKey',
 
-  data(): {
-    useShortcutKey: boolean;
-  } {
-    return {
-      useShortcutKey: true,
-    };
-  },
+  computed: {
+    useShortcutKey: {
+      get(): boolean {
+        return this.$store.state.options['useShortcutKey'];
+      },
 
-  created(): void {
-    this.useShortcutKey = getOption('useShortcutKey');
-  },
-
-  methods: {
-    set(value: boolean): void {
-      saveOption('useShortcutKey', value);
+      set(value: boolean): void {
+        this.$store.dispatch('setOption', { name: 'useShortcutKey', value });
+      },
     },
   },
 });

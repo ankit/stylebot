@@ -16,6 +16,30 @@ export type SetStyleRequest = {
   css: string;
 };
 
+export type EnableStyleRequest = {
+  name: 'enableStyle';
+  url: string;
+};
+
+export type DisableStyleRequest = {
+  name: 'disableStyle';
+  url: string;
+};
+
+export type GetAllStylesRequest = {
+  name: 'getAllStyles';
+};
+
+export type SetAllStylesRequest = {
+  name: 'setAllStyles';
+  styles: {
+    [url: string]: {
+      css: string;
+      enabled: boolean;
+    };
+  };
+};
+
 export type MoveStylesRequest = {
   name: 'moveStyles';
   sourceUrl: string;
@@ -33,16 +57,6 @@ export type GetMergedCssAndUrlForPageRequest = {
 
 export type GetMergedCssAndUrlForIframeRequest = {
   name: 'getMergedCssAndUrlForIframe';
-  url: string;
-};
-
-export type EnableStyleRequest = {
-  name: 'enableStyle';
-  url: string;
-};
-
-export type DisableStyleRequest = {
-  name: 'disableStyle';
   url: string;
 };
 
@@ -77,12 +91,14 @@ type BackgroundPageRequest =
   | UnhighlightBrowserActionRequest
   | HighlightBrowserActionRequest
   | SetStyleRequest
+  | EnableStyleRequest
+  | DisableStyleRequest
+  | GetAllStylesRequest
+  | SetAllStylesRequest
   | MoveStylesRequest
   | GetStylesForPageRequest
   | GetMergedCssAndUrlForPageRequest
   | GetMergedCssAndUrlForIframeRequest
-  | EnableStyleRequest
-  | DisableStyleRequest
   | GetAllOptionsRequest
   | GetOptionRequest
   | SetOptionRequest

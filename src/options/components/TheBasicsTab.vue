@@ -1,5 +1,5 @@
 <template>
-  <div class="pt-2">
+  <div class="pt-2" v-if="optionsLoaded">
     <b-row no-gutters class="mt-5">
       <the-use-shortcut-key />
     </b-row>
@@ -28,6 +28,12 @@ export default Vue.extend({
     TheShortcutKey,
     TheContextMenu,
     TheUseShortcutKey,
+  },
+
+  computed: {
+    optionsLoaded(): boolean {
+      return !!this.$store.state.options;
+    },
   },
 });
 </script>

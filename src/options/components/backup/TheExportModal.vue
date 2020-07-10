@@ -13,7 +13,7 @@
   >
     <div class="mb-3">Keep the JSON safe to import it later</div>
 
-    <b-form-textarea rows="15" autofocus :value="getJson()" />
+    <b-form-textarea readonly rows="15" autofocus :value="json" />
 
     <template v-slot:modal-footer="{ ok, cancel }">
       <app-button text="Cancel" @click="cancel()" />
@@ -26,7 +26,7 @@
 import Vue from 'vue';
 import AppButton from '../AppButton.vue';
 
-import { exportStylesAsJSONString, copyToClipboard } from '../../utilities';
+import { copyToClipboard } from '../../utils';
 
 export default Vue.extend({
   name: 'TheExportModal',
@@ -52,6 +52,10 @@ export default Vue.extend({
         this.$emit('input', newValue);
       },
     },
+
+    json(): string {
+      return JSON.stringify(this.$store.state.styles);
+    },
   },
 
   methods: {
@@ -60,11 +64,7 @@ export default Vue.extend({
     },
 
     copyJson(): void {
-      copyToClipboard(this.getJson());
-    },
-
-    getJson(): string {
-      return exportStylesAsJSONString();
+      copyToClipboard(this.json);
     },
   },
 });

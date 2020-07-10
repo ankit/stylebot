@@ -27,7 +27,7 @@ export default (
   sendResponse: (response: Response) => void
 ) => {
   if (request.name === 'getAllOptions') {
-    sendResponse({ options });
+    sendResponse(options);
   } else if (request.name === 'getOption') {
     sendResponse(options[request.optionName as keyof StylebotOptions]);
   } else if (request.name === 'setOption') {

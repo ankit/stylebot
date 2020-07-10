@@ -22,7 +22,7 @@ export const getAllOptions = async (): Promise<StylebotOptions> => {
 
   return new Promise(resolve => {
     chrome.extension.sendRequest(request, (response: GetAllOptionsResponse) => {
-      resolve(response.options);
+      resolve(response);
     });
   });
 };

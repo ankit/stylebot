@@ -17,6 +17,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import { Declaration } from 'postcss';
 
 export default Vue.extend({
   name: 'CssPropertyValueGroup',
@@ -38,7 +39,7 @@ export default Vue.extend({
 
       let value = '';
       if (activeRule) {
-        activeRule.clone().walkDecls(this.property, decl => {
+        activeRule.clone().walkDecls(this.property, (decl: Declaration) => {
           value = decl.value;
         });
       }

@@ -46,6 +46,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import { Declaration } from 'postcss';
 
 export default Vue.extend({
   name: 'BoxDimensions',
@@ -110,9 +111,11 @@ export default Vue.extend({
 
       if (activeRule) {
         // todo: support declarations of the form: margin: [all]px, margin: [x]px [y]px
-        activeRule.clone().walkDecls(`${this.property}-${type}`, decl => {
-          value = decl.value;
-        });
+        activeRule
+          .clone()
+          .walkDecls(`${this.property}-${type}`, (decl: Declaration) => {
+            value = decl.value;
+          });
       }
 
       const [length, unit] = value.split(/(-?\d+)/).filter(Boolean);

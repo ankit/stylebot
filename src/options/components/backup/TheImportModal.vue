@@ -44,8 +44,6 @@
 import Vue from 'vue';
 import AppButton from '../AppButton.vue';
 
-import { importStylesFromJSONString } from '../../utilities';
-
 export default Vue.extend({
   name: 'TheImportModal',
 
@@ -90,11 +88,14 @@ export default Vue.extend({
     },
 
     importJson(): void {
-      if (importStylesFromJSONString(this.json)) {
+      try {
+        const styles = JSON.parse(this.json);
+        this.$store.dispatch('setAllStyles', styles);
+
         this.json = '';
         this.error = false;
         this.$emit('close');
-      } else {
+      } catch (e) {
         this.error = true;
       }
     },

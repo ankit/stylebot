@@ -11,7 +11,7 @@ import {
 } from './../../../monaco-editor/types';
 
 export default Vue.extend({
-  name: 'TheMonacoEditor',
+  name: 'MonacoEditor',
 
   props: {
     css: {
@@ -75,7 +75,7 @@ export default Vue.extend({
       };
 
       // todo: why is typescript not picking up the type of iframe here?
-      (this.getIframe() as HTMLIFrameElement).contentWindow.postMessage(
+      (this.getIframe() as HTMLIFrameElement)?.contentWindow?.postMessage(
         message,
         chrome.runtime.getURL('*')
       );

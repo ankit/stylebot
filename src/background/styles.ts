@@ -17,84 +17,60 @@ class BackgroundPageStyles {
     this.styles = styles;
   }
 
-  /**
-   * Get style for given url
-   */
   get(url: string) {
     return this.styles[url];
   }
 
-  /**
-   * Get all styles
-   */
   getAll() {
     return this.styles;
   }
 
-  /**
-   * Set new style for URL
-   */
+  setAll(styles: Styles) {
+    this.styles = styles;
+
+    chrome.storage.local.set({
+      styles: this.styles,
+    });
+  }
+
   set(url: string, css: string) {
-    this.styles[url] = {
-      css,
-      enabled: true,
-    };
+    if (!css) {
+      delete this.styles[url];
+    } else {
+      this.styles[url] = {
+        css,
+        enabled: true,
+      };
+    }
 
     chrome.storage.local.set({
       styles: this.styles,
     });
   }
 
-  /**
-   * Delete style for URL
-   */
-  delete(url: string) {
-    delete this.styles[url];
-
-    chrome.storage.local.set({
-      styles: this.styles,
-    });
-  }
-
-  /**
-   * Delete all styles
-   */
-  deleteAll() {
-    this.styles = {};
-
-    chrome.storage.local.set({
-      styles: this.styles,
-    });
-  }
-
-  /**
-   * Toggle the enabled status for the given URL's style
-   */
-  toggle(url: string) {
+  enable(url: string) {
     if (!this.styles[url]) {
       return;
     }
 
-    this.styles[url].enabled = !this.styles[url].enabled;
-
+    this.styles[url].enabled = true;
     chrome.storage.local.set({
       styles: this.styles,
     });
   }
 
-  /**
-   * Toggle the enabled status for all styles
-   */
-  toggleAll() {
-    for (const url in this.styles) {
-      this.toggle(url);
+  disable(url: string) {
+    if (!this.styles[url]) {
+      return;
     }
+
+    this.styles[url].enabled = false;
+    chrome.storage.local.set({
+      styles: this.styles,
+    });
   }
 
-  /**
-   * Add styles, overwriting any conflicting existing styles
-   */
-  import(styles: Styles) {
+  import(styles: Styles): void {
     for (const url in styles) {
       this.styles[url] = styles[url];
     }
@@ -104,13 +80,26 @@ class BackgroundPageStyles {
     });
   }
 
-  getStylesForPage(pageUrl: string) {
+  move(src: string, dest: string): void {
+    if (this.styles[src]) {
+      this.styles[dest] = JSON.parse(JSON.stringify(this.styles[src]));
+      delete this.styles[src];
+
+      chrome.storage.local.set({
+        styles: this.styles,
+      });
+    }
+  }
+
+  getStylesForPage(
+    pageUrl: string
+  ): Array<{ url: string; css: string; enabled: boolean }> {
     if (!pageUrl) {
-      return null;
+      return [];
     }
 
     if (!BackgroundPageUtils.isValidHTML(pageUrl)) {
-      return null;
+      return [];
     }
 
     const styles = [];
@@ -163,11 +152,11 @@ class BackgroundPageStyles {
     return { url, css };
   }
 
-  getMergedCssAndUrlForIframe(iframeUrl: string) {
+  getMergedCssAndUrlForIframe(iframeUrl: string): { url: string; css: string } {
     return this.getMergedCssAndUrlForPage(iframeUrl);
   }
 
-  getMergedCss(src: string, dest: string) {
+  getMergedCss(src: string, dest: string): string {
     const root1 = postcss.parse(src);
     const root2 = postcss.parse(dest);
 
@@ -177,20 +166,6 @@ class BackgroundPageStyles {
     });
 
     return root1.toString();
-  }
-
-  /**
-   * Move styles from source to destination url
-   */
-  move(src: string, dest: string) {
-    if (this.styles[src]) {
-      this.styles[dest] = JSON.parse(JSON.stringify(this.styles[src]));
-      delete this.styles[src];
-
-      chrome.storage.local.set({
-        styles: this.styles,
-      });
-    }
   }
 }
 

@@ -51,6 +51,8 @@ const init = (styles: BackgroundPageStyles, options: StylebotOptions) => {
       if (
         request.name === 'setStyle' ||
         request.name === 'moveStyles' ||
+        request.name === 'getAllStyles' ||
+        request.name === 'setAllStyles' ||
         request.name === 'getStylesForPage' ||
         request.name === 'getMergedCssAndUrlForPage' ||
         request.name === 'getMergedCssAndUrlForIframe' ||

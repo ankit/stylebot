@@ -46,12 +46,12 @@ export default Vue.extend({
   },
 
   methods: {
-    getShadowRoot(): ShadowRoot {
-      return document.getElementById('stylebot').shadowRoot;
+    getShadowRoot(): ShadowRoot | null | undefined {
+      return document.getElementById('stylebot')?.shadowRoot;
     },
 
-    getIframe(): HTMLIFrameElement | null {
-      return this.getShadowRoot().getElementById(
+    getIframe(): HTMLIFrameElement | null | undefined {
+      return this.getShadowRoot()?.getElementById(
         'stylebot-monaco-editor'
       ) as HTMLIFrameElement;
     },
@@ -68,7 +68,7 @@ export default Vue.extend({
         );
 
         this.setInlineStyleForIframe(iframe);
-        this.getShadowRoot().appendChild(iframe);
+        this.getShadowRoot()?.appendChild(iframe);
       } else {
         iframe.classList.remove('hidden');
         this.updateCssInMonacoEditor();
@@ -105,7 +105,7 @@ export default Vue.extend({
       };
 
       // todo: why is typescript not picking up the type of iframe here?
-      (this.getIframe() as HTMLIFrameElement).contentWindow.postMessage(
+      (this.getIframe() as HTMLIFrameElement)?.contentWindow?.postMessage(
         message,
         chrome.runtime.getURL('*')
       );
