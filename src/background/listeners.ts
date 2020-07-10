@@ -5,7 +5,6 @@ import BackgroundPageStyles from './styles';
 
 import styleRequest from './requests/styleRequest';
 import optionRequest from './requests/optionRequest';
-import browserActionRequest from './requests/browserActionRequest';
 import copyToClipboardRequest from './requests/copyToClipboardRequest';
 
 import {
@@ -26,15 +25,6 @@ const init = (styles: BackgroundPageStyles, options: StylebotOptions) => {
     ) => {
       if (request.name === 'copyToClipboard') {
         copyToClipboardRequest(request);
-        return;
-      }
-
-      if (
-        request.name === 'activateBrowserAction' ||
-        request.name === 'highlightBrowserAction' ||
-        request.name === 'unhighlightBrowserAction'
-      ) {
-        browserActionRequest(request, sender);
         return;
       }
 
@@ -69,15 +59,11 @@ const init = (styles: BackgroundPageStyles, options: StylebotOptions) => {
    * Listen when an existing tab is updated
    * and update the context-menu and browser-action
    */
-  chrome.tabs.onUpdated.addListener((_tabId, changeInfo, tab) => {
+  chrome.tabs.onUpdated.addListener((_tabId, _changeInfo, tab) => {
     if (tab.status === 'complete') {
       if (options.contextMenu) {
         ContextMenu.update(tab);
       }
-    }
-
-    if (changeInfo.url) {
-      BrowserAction.update(tab);
     }
   });
 
@@ -89,15 +75,6 @@ const init = (styles: BackgroundPageStyles, options: StylebotOptions) => {
       chrome.tabs.get(activeInfo.tabId, tab => {
         ContextMenu.update(tab);
       });
-    }
-  });
-
-  /**
-   * Listen when a tab is removed to clear its related cache
-   */
-  chrome.tabs.onRemoved.addListener(tabId => {
-    if (window.cache.loadingTabs[tabId]) {
-      delete window.cache.loadingTabs[tabId];
     }
   });
 };

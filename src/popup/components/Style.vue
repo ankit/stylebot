@@ -15,6 +15,11 @@
 <script lang="ts">
 import Vue from 'vue';
 
+import {
+  EnableStyleRequest,
+  DisableStyleRequest,
+} from '../../types/BackgroundPageRequest';
+
 export default Vue.extend({
   name: 'Style',
   props: ['tab', 'url', 'initialEnabled', 'disableToggle'],
@@ -37,22 +42,22 @@ export default Vue.extend({
     },
 
     enable(): void {
-      chrome.extension.sendRequest({
-        tab: this.tab,
-        styleUrl: this.url,
-        name: 'enableStyleUrl',
-      });
+      const request: EnableStyleRequest = {
+        name: 'enableStyle',
+        url: this.url,
+      };
 
+      chrome.extension.sendRequest(request);
       this.enabled = true;
     },
 
     disable(): void {
-      chrome.extension.sendRequest({
-        tab: this.tab,
-        styleUrl: this.url,
-        name: 'disableStyleUrl',
-      });
+      const request: DisableStyleRequest = {
+        name: 'disableStyle',
+        url: this.url,
+      };
 
+      chrome.extension.sendRequest(request);
       this.enabled = false;
     },
   },

@@ -1,15 +1,3 @@
-export type ActivateBrowserActionRequest = {
-  name: 'activateBrowserAction';
-};
-
-export type UnhighlightBrowserActionRequest = {
-  name: 'unhighlightBrowserAction';
-};
-
-export type HighlightBrowserActionRequest = {
-  name: 'highlightBrowserAction';
-};
-
 export type SetStyleRequest = {
   name: 'setStyle';
   url: string;
@@ -53,11 +41,13 @@ export type GetStylesForPageRequest = {
 
 export type GetMergedCssAndUrlForPageRequest = {
   name: 'getMergedCssAndUrlForPage';
+  important: boolean;
 };
 
 export type GetMergedCssAndUrlForIframeRequest = {
   name: 'getMergedCssAndUrlForIframe';
   url: string;
+  important: boolean;
 };
 
 export type GetAllOptionsRequest = {
@@ -87,9 +77,6 @@ export type CopyToClipboardRequest = {
 };
 
 type BackgroundPageRequest =
-  | ActivateBrowserActionRequest
-  | UnhighlightBrowserActionRequest
-  | HighlightBrowserActionRequest
   | SetStyleRequest
   | EnableStyleRequest
   | DisableStyleRequest

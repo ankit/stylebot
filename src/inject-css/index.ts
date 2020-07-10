@@ -46,11 +46,13 @@ const run = () => {
   if (window === window.top) {
     injectCss({
       name: 'getMergedCssAndUrlForPage',
+      important: true,
     });
   } else {
     injectCss({
       name: 'getMergedCssAndUrlForIframe',
       url: window.location.href,
+      important: true,
     });
   }
 };

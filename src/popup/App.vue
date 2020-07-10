@@ -9,7 +9,7 @@
         :url="style.url"
         :disableToggle="isOpen"
         :initialEnabled="style.enabled"
-        v-for="style in styleUrlMetadata"
+        v-for="style in styles"
       />
 
       <view-options />
@@ -24,12 +24,7 @@ import StyleComponent from './components/Style.vue';
 import ViewOptions from './components/ViewOptions.vue';
 import ToggleStylebot from './components/ToggleStylebot.vue';
 
-import {
-  getCurrentTab,
-  setAsActiveTab,
-  getIsStylebotOpen,
-  getStyleUrlMetadataForTab,
-} from './utils';
+import { getStyles, getCurrentTab, getIsStylebotOpen } from './utils';
 
 export default Vue.extend({
   name: 'App',
@@ -41,14 +36,14 @@ export default Vue.extend({
   },
 
   data(): {
-    tab?: chrome.tabs.Tab;
     isOpen: boolean;
-    styleUrlMetadata: Array<{ url: string; enabled: boolean }>;
+    tab?: chrome.tabs.Tab;
+    styles: Array<{ url: string; css: string; enabled: boolean }>;
   } {
     return {
+      styles: [],
       isOpen: false,
       tab: undefined,
-      styleUrlMetadata: [],
     };
   },
 
@@ -60,11 +55,9 @@ export default Vue.extend({
         this.isOpen = isOpen;
       });
 
-      getStyleUrlMetadataForTab(this.tab, styleUrlMetadata => {
-        this.styleUrlMetadata = styleUrlMetadata;
+      getStyles(this.tab, styles => {
+        this.styles = styles;
       });
-
-      setAsActiveTab(tab);
     });
   },
 });

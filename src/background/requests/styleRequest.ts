@@ -18,6 +18,7 @@ import {
 } from '../../types/BackgroundPageResponse';
 
 import BackgroundPageStyles from '../styles';
+import BrowserAction from '../browseraction';
 
 type Request =
   | SetStyleRequest
@@ -70,8 +71,16 @@ export default (
       return;
     }
 
-    sendResponse(styles.getMergedCssAndUrlForPage(sender.tab.url));
+    const response = styles.getMergedCssAndUrlForPage(
+      sender.tab.url,
+      request.important
+    );
+    sendResponse(response);
+
+    BrowserAction.update(sender.tab, response.css);
   } else if (request.name === 'getMergedCssAndUrlForIframe') {
-    sendResponse(styles.getMergedCssAndUrlForIframe(request.url));
+    sendResponse(
+      styles.getMergedCssAndUrlForIframe(request.url, request.important)
+    );
   }
 };

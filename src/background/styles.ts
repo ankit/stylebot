@@ -1,5 +1,7 @@
 import * as postcss from 'postcss';
+
 import BackgroundPageUtils from './utils';
+import BrowserAction from './browseraction';
 
 type Style = {
   css: string;
@@ -57,6 +59,19 @@ class BackgroundPageStyles {
     chrome.storage.local.set({
       styles: this.styles,
     });
+
+    chrome.tabs.getSelected(tab => {
+      if (tab && tab.url && tab.id) {
+        const { css, url } = this.getMergedCssAndUrlForPage(tab.url, false);
+        BrowserAction.update(tab, css);
+
+        chrome.tabs.sendRequest(tab.id, {
+          name: 'updateCssAndUrl',
+          css,
+          url,
+        });
+      }
+    });
   }
 
   disable(url: string) {
@@ -67,6 +82,19 @@ class BackgroundPageStyles {
     this.styles[url].enabled = false;
     chrome.storage.local.set({
       styles: this.styles,
+    });
+
+    chrome.tabs.getSelected(tab => {
+      if (tab && tab.url && tab.id) {
+        const { css, url } = this.getMergedCssAndUrlForPage(tab.url, false);
+        BrowserAction.update(tab, css);
+
+        chrome.tabs.sendRequest(tab.id, {
+          name: 'updateCssAndUrl',
+          css,
+          url,
+        });
+      }
     });
   }
 
@@ -129,7 +157,10 @@ class BackgroundPageStyles {
    *
    * todo: improve this behavior to remove the side effect
    */
-  getMergedCssAndUrlForPage(pageUrl: string): { url: string; css: string } {
+  getMergedCssAndUrlForPage(
+    pageUrl: string,
+    important: boolean
+  ): { url: string; css: string } {
     const styles = this.getStylesForPage(pageUrl);
 
     if (!styles) {
@@ -145,25 +176,31 @@ class BackgroundPageStyles {
           url = styleDef.url;
         }
 
-        css = this.getMergedCss(styleDef.css, css);
+        css = this.getMergedCss(styleDef.css, css, important);
       }
     });
 
     return { url, css };
   }
 
-  getMergedCssAndUrlForIframe(iframeUrl: string): { url: string; css: string } {
-    return this.getMergedCssAndUrlForPage(iframeUrl);
+  getMergedCssAndUrlForIframe(
+    iframeUrl: string,
+    important: boolean
+  ): { url: string; css: string } {
+    return this.getMergedCssAndUrlForPage(iframeUrl, important);
   }
 
-  getMergedCss(src: string, dest: string): string {
+  getMergedCss(src: string, dest: string, important: boolean): string {
     const root1 = postcss.parse(src);
     const root2 = postcss.parse(dest);
 
     root1.append(root2);
-    root1.walkDecls(decl => {
-      decl.important = true;
-    });
+
+    if (important) {
+      root1.walkDecls(decl => {
+        decl.important = true;
+      });
+    }
 
     return root1.toString();
   }

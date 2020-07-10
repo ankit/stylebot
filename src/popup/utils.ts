@@ -1,3 +1,6 @@
+import { GetStylesForPageRequest } from '../types/BackgroundPageRequest';
+import { GetStylesForPageResponse } from '../types/BackgroundPageResponse';
+
 export const getCurrentTab = (
   callback: (tab: chrome.tabs.Tab) => void
 ): void => {
@@ -12,21 +15,18 @@ export const getCurrentTab = (
   });
 };
 
-export const getStyleUrlMetadataForTab = (
+export const getStyles = (
   tab: chrome.tabs.Tab,
-  callback: (styleUrlMetadata: Array<{ url: string; enabled: boolean }>) => void
+  callback: (styles: GetStylesForPageResponse) => void
 ) => {
-  chrome.extension.sendRequest(
-    { name: 'getStyleUrlMetadataForTab', tab },
-    response => {
-      if (response && response.success) {
-        callback(response.styleUrlMetadata);
-        return;
-      }
+  const request: GetStylesForPageRequest = {
+    name: 'getStylesForPage',
+    tab,
+  };
 
-      callback([]);
-    }
-  );
+  chrome.extension.sendRequest(request, response => {
+    callback(response);
+  });
 };
 
 export const getIsStylebotOpen = (
@@ -42,17 +42,6 @@ export const getIsStylebotOpen = (
       response => callback(response)
     );
   }
-};
-
-export const setAsActiveTab = (tab: chrome.tabs.Tab) => {
-  const port = chrome.runtime.connect({
-    name: 'browserAction',
-  });
-
-  port.postMessage({
-    tab: tab,
-    name: 'activeTab',
-  });
 };
 
 export const toggleStylebot = (tab: chrome.tabs.Tab) => {

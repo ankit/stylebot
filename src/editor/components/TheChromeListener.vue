@@ -22,6 +22,12 @@ export default Vue.extend({
         }
       } else if (request.name === 'getIsStylebotOpen') {
         sendResponse(this.$store.state.visible);
+      } else if (request.name === 'updateCssAndUrl') {
+        this.$store.commit('setUrl', request.url);
+        this.$store.dispatch('applyCss', {
+          css: request.css,
+          shoudSave: false,
+        });
       }
     });
   },

@@ -1,9 +1,7 @@
 import Cache from './cache';
 import Options from './options';
 import Listeners from './listeners';
-
 import ContextMenu from './contextmenu';
-import BrowserAction from './browseraction';
 
 declare global {
   interface Window {
@@ -14,7 +12,6 @@ declare global {
 
 Cache.init((styles, options) => {
   ContextMenu.init();
-  BrowserAction.init();
   Listeners.init(styles, options);
 });
 

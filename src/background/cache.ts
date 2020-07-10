@@ -6,9 +6,6 @@ window.cache = {
   styles: {},
   options: {},
   importRules: {},
-  // Temporary cached map of tabId to rules to prevent recalculating rules
-  // for iframes. Cleared when a tab is closed.
-  loadingTabs: [],
 };
 
 const init = (

@@ -43,31 +43,18 @@ export const setOption = (
 };
 
 export const getMergedCssAndUrlForPage = async (
-  important: boolean = true
+  important: boolean
 ): Promise<GetMergedCssAndUrlForPageResponse> => {
   const request: GetMergedCssAndUrlForPageRequest = {
     name: 'getMergedCssAndUrlForPage',
+    important,
   };
 
   return new Promise(resolve => {
     chrome.extension.sendRequest(
       request,
       (response: GetMergedCssAndUrlForPageResponse) => {
-        if (important) {
-          resolve(response);
-          return;
-        }
-
-        // todo: update interface for getMergedCssAndUrlForPage to avoid
-        // this duplicate work.
-        const { url, css } = response;
-        const root = postcss.parse(css);
-
-        root.walkDecls(decl => {
-          decl.important = false;
-        });
-
-        resolve({ url, css: root.toString() });
+        resolve(response);
       }
     );
   });
