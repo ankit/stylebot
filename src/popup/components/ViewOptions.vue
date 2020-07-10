@@ -7,14 +7,13 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { viewOptions } from '../utils';
 
 export default Vue.extend({
   name: 'ViewOptions',
 
   methods: {
     open(): void {
-      viewOptions();
+      chrome.runtime.openOptionsPage();
     },
   },
 });

@@ -67,8 +67,8 @@ export type SetOptionRequest = {
   };
 };
 
-export type ViewOptionsPageRequest = {
-  name: 'viewOptionsPage';
+export type OpenOptionsPageRequest = {
+  name: 'openOptionsPage';
 };
 
 export type CopyToClipboardRequest = {
@@ -89,7 +89,7 @@ type BackgroundPageRequest =
   | GetAllOptionsRequest
   | GetOptionRequest
   | SetOptionRequest
-  | ViewOptionsPageRequest
+  | OpenOptionsPageRequest
   | CopyToClipboardRequest;
 
 export default BackgroundPageRequest;

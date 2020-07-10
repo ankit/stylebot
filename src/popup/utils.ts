@@ -53,12 +53,3 @@ export const toggleStylebot = (tab: chrome.tabs.Tab) => {
     window.close();
   }
 };
-
-export const viewOptions = () => {
-  chrome.tabs.create({
-    active: true,
-    url: 'options/index.html',
-  });
-
-  window.close();
-};

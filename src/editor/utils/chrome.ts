@@ -3,7 +3,7 @@ import * as postcss from 'postcss';
 import {
   SetOptionRequest,
   GetAllOptionsRequest,
-  ViewOptionsPageRequest,
+  OpenOptionsPageRequest,
   SetStyleRequest,
   GetMergedCssAndUrlForPageRequest,
 } from '../../types/BackgroundPageRequest';
@@ -60,9 +60,9 @@ export const getMergedCssAndUrlForPage = async (
   });
 };
 
-export const viewOptionsPage = () => {
-  const request: ViewOptionsPageRequest = {
-    name: 'viewOptionsPage',
+export const openOptionsPage = () => {
+  const request: OpenOptionsPageRequest = {
+    name: 'openOptionsPage',
   };
 
   chrome.extension.sendRequest(request);

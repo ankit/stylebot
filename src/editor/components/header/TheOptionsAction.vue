@@ -12,7 +12,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { viewOptionsPage } from '../../utils/chrome';
+import { openOptionsPage } from '../../utils/chrome';
 
 export default Vue.extend({
   name: 'TheOptionsAction',
@@ -25,7 +25,7 @@ export default Vue.extend({
 
   methods: {
     viewOptions(): void {
-      viewOptionsPage();
+      openOptionsPage();
     },
   },
 });

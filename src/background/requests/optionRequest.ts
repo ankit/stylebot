@@ -2,7 +2,7 @@ import {
   GetAllOptionsRequest,
   GetOptionRequest,
   SetOptionRequest,
-  ViewOptionsPageRequest,
+  OpenOptionsPageRequest,
 } from '../../types/BackgroundPageRequest';
 
 import {
@@ -17,7 +17,7 @@ type Request =
   | GetAllOptionsRequest
   | GetOptionRequest
   | SetOptionRequest
-  | ViewOptionsPageRequest;
+  | OpenOptionsPageRequest;
 
 type Response = GetAllOptionsResponse | GetOptionResponse;
 
@@ -32,10 +32,7 @@ export default (
     sendResponse(options[request.optionName as keyof StylebotOptions]);
   } else if (request.name === 'setOption') {
     saveOption(request.option.name, request.option.value);
-  } else if (request.name === 'viewOptionsPage') {
-    chrome.tabs.create({
-      active: true,
-      url: 'options/index.html',
-    });
+  } else if (request.name === 'openOptionsPage') {
+    chrome.runtime.openOptionsPage();
   }
 };

@@ -32,7 +32,7 @@ const init = (styles: BackgroundPageStyles, options: StylebotOptions) => {
         request.name === 'getOption' ||
         request.name === 'setOption' ||
         request.name === 'getAllOptions' ||
-        request.name === 'viewOptionsPage'
+        request.name === 'openOptionsPage'
       ) {
         optionRequest(request, options, sendResponse);
         return;
