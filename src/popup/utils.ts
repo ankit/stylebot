@@ -6,7 +6,7 @@ export const getCurrentTab = (
 ): void => {
   chrome.windows.getCurrent({ populate: true }, ({ tabs }) => {
     if (tabs) {
-      for (var i = 0; i < tabs.length; i++) {
+      for (const i = 0; i < tabs.length; i++) {
         if (tabs[i].active) {
           callback(tabs[i]);
         }

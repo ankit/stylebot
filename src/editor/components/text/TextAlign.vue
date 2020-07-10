@@ -1,19 +1,17 @@
 <template>
   <b-row align-content="center" no-gutters>
-    <css-property>
-      Align
-    </css-property>
+    <css-property>Align</css-property>
 
     <css-property-value>
       <b-button-group>
         <b-button
-          size="sm"
+          v-for="option in options"
           :key="option.value"
+          size="sm"
           :disabled="disabled"
           :title="option.title"
-          v-for="option in options"
-          @click="select(option.value)"
           :variant="value === option.value ? 'secondary' : 'outline-secondary'"
+          @click="select(option.value)"
         >
           <b-icon :icon="option.icon" aria-hidden="true" />
         </b-button>
