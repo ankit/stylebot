@@ -80,7 +80,14 @@ export default {
 
     if (!activeRule) {
       if (value) {
-        root.append(`${state.activeSelector} {\n  ${property}: ${value};\n}`);
+        const ruleCss = `${state.activeSelector} {\n  ${property}: ${value};\n}`;
+
+        if (root.some(rule => !!rule)) {
+          root.append(`\n\n${ruleCss}`);
+        } else {
+          root.append(ruleCss);
+        }
+
         dispatch('applyCss', { css: root.toString() });
       }
 
