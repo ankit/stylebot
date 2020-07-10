@@ -1,5 +1,5 @@
 <template>
-  <div class="pt-2" v-if="optionsLoaded">
+  <div v-if="optionsLoaded" class="pt-2">
     <b-row no-gutters class="mt-5">
       <the-use-shortcut-key />
     </b-row>

@@ -4,7 +4,7 @@
       <b-col cols="4">
         <the-navigation
           :tabs="tabs"
-          :currentTab="currentTab"
+          :current-tab="currentTab"
           @select="currentTab = $event"
         />
       </b-col>
@@ -48,15 +48,15 @@ export default Vue.extend({
     };
   },
 
-  created() {
-    this.$store.dispatch('getAllStyles');
-    this.$store.dispatch('getAllOptions');
-  },
-
   computed: {
     currentTabComponent(): string {
       return `the-${this.currentTab.toLowerCase()}-tab`;
     },
+  },
+
+  created() {
+    this.$store.dispatch('getAllStyles');
+    this.$store.dispatch('getAllOptions');
   },
 });
 </script>

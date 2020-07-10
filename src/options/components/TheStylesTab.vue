@@ -41,11 +41,11 @@
         </b-row>
 
         <style-component
+          v-for="style in styles"
           :key="style.url"
           :css="style.css"
           :url="style.url"
-          :initialEnabled="style.enabled"
-          v-for="style in styles"
+          :initial-enabled="style.enabled"
           @save="saveStyle"
           @delete="deleteStyle(style)"
           @toggle="toggleStyle(style)"

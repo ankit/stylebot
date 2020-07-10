@@ -6,7 +6,7 @@
       Apply a dark theme to the page.
     </p>
 
-    <b-button size="sm" @click="apply" variant="outline-secondary">
+    <b-button size="sm" variant="outline-secondary" @click="apply">
       Apply
     </b-button>
   </div>

@@ -1,15 +1,15 @@
 <template>
   <div class="popup">
     <b-list-group v-if="tab && tab.id" class="list-group">
-      <toggle-stylebot :isOpen="isOpen" :tab="tab" />
+      <toggle-stylebot :is-open="isOpen" :tab="tab" />
 
       <style-component
-        :tab="tab"
-        :key="style.url"
-        :url="style.url"
-        :disableToggle="isOpen"
-        :initialEnabled="style.enabled"
         v-for="style in styles"
+        :key="style.url"
+        :tab="tab"
+        :url="style.url"
+        :disable-toggle="isOpen"
+        :initial-enabled="style.enabled"
       />
 
       <view-options />

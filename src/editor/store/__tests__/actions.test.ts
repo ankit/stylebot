@@ -106,7 +106,6 @@ describe('actions', () => {
         const property = 'color';
         const value = 'red';
 
-        mockRoot.walkRules.mockImplementation((_selector, _callback) => {});
         mockRoot.toString.mockImplementation(() => 'mockToString');
 
         actions.applyDeclaration(
@@ -126,7 +125,6 @@ describe('actions', () => {
         const value = 'red';
 
         mockRoot.some.mockImplementation(() => true);
-        mockRoot.walkRules.mockImplementation((_selector, _callback) => {});
         mockRoot.toString.mockImplementation(() => 'mockToString');
 
         actions.applyDeclaration(
@@ -146,7 +144,6 @@ describe('actions', () => {
         const value = 'red';
 
         mockRoot.some.mockImplementation(() => false);
-        mockRoot.walkRules.mockImplementation((_selector, _callback) => {});
         mockRoot.toString.mockImplementation(() => 'mockToString');
 
         actions.applyDeclaration(
@@ -165,7 +162,6 @@ describe('actions', () => {
         const property = 'color';
         const value = '';
 
-        mockRoot.walkRules.mockImplementation((_selector, _callback) => {});
         mockRoot.toString.mockImplementation(() => 'mockToString');
 
         actions.applyDeclaration(

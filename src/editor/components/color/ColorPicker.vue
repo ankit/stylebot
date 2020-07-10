@@ -20,11 +20,11 @@ import { Chrome } from 'vue-color';
 export default Vue.extend({
   name: 'ColorPicker',
 
-  props: ['color'],
-
   components: {
     'chrome-picker': Chrome,
   },
+
+  props: ['color'],
 
   data(): {
     enabled: boolean;

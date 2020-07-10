@@ -1,9 +1,9 @@
 <template>
   <b-list-group-item
     button
-    @click="toggle"
     :disabled="disableToggle"
     :variant="enabled ? 'success' : 'default'"
+    @click="toggle"
   >
     <b-icon v-if="enabled" icon="eye-fill" />
     <b-icon v-else icon="eye-slash" />

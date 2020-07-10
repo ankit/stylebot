@@ -1,15 +1,15 @@
 <template>
   <button
+    :title="right ? 'Move Left' : 'Move Right'"
     @click="onClick"
     @mouseenter="isHovered = true"
     @mouseleave="isHovered = false"
-    :title="right ? 'Move Left' : 'Move Right'"
   >
-    <b-icon icon="arrow-left-circle" v-if="right && !isHovered" />
-    <b-icon icon="arrow-left-circle-fill" v-if="right && isHovered" />
+    <b-icon v-if="right && !isHovered" icon="arrow-left-circle" />
+    <b-icon v-if="right && isHovered" icon="arrow-left-circle-fill" />
 
-    <b-icon icon="arrow-right-circle" v-if="!right && !isHovered" />
-    <b-icon icon="arrow-right-circle-fill" v-if="!right && isHovered" />
+    <b-icon v-if="!right && !isHovered" icon="arrow-right-circle" />
+    <b-icon v-if="!right && isHovered" icon="arrow-right-circle-fill" />
   </button>
 </template>
 

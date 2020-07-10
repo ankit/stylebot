@@ -26,11 +26,11 @@ class BackgroundPageUtils {
    * Check if the given url matches with the  pattern.
    */
   private static matchesBasicPattern = (url: string, pattern: string) => {
-    var isFound = false;
-    var subUrls = pattern.split(',');
-    var len = subUrls.length;
+    let isFound = false;
+    const subUrls = pattern.split(',');
+    const len = subUrls.length;
 
-    for (var i = 0; i < len; i++) {
+    for (let i = 0; i < len; i++) {
       if (url.indexOf(subUrls[i].trim()) != -1) {
         isFound = true;
         break;
@@ -128,7 +128,7 @@ class BackgroundPageUtils {
   }
 
   static copyToClipboard(str: string) {
-    var copyTextarea = document.createElement('textarea');
+    const copyTextarea = document.createElement('textarea');
     document.body.appendChild(copyTextarea);
     copyTextarea.value = str;
     copyTextarea.select();

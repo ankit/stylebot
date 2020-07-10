@@ -1,17 +1,17 @@
 <template>
   <b-input-group class="length-input-group">
-    <b-form-input size="sm" v-model="length" :disabled="disabled" />
+    <b-form-input v-model="length" size="sm" :disabled="disabled" />
 
-    <template v-slot:append>
+    <template #append>
       <dropdown-hack-to-support-shadow-dom>
         <b-dropdown
+          v-model="unit"
           size="sm"
           :text="unit"
-          v-model="unit"
           :disabled="disabled"
           variant="outline-secondary"
         >
-          <b-dropdown-item :key="unit" v-for="unit in supportedUnits">
+          <b-dropdown-item v-for="unit in supportedUnits" :key="unit">
             {{ unit }}
           </b-dropdown-item>
         </b-dropdown>
@@ -31,15 +31,15 @@ type Unit = 'px' | 'em' | '%' | string;
 export default Vue.extend({
   name: 'Length',
 
+  components: {
+    DropdownHackToSupportShadowDom,
+  },
+
   props: {
     property: {
       type: String,
       required: true,
     },
-  },
-
-  components: {
-    DropdownHackToSupportShadowDom,
   },
 
   data(): {

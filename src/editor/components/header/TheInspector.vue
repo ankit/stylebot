@@ -1,10 +1,10 @@
 <template>
   <b-btn
-    @click="toggle"
     class="inspector"
     :disabled="disabled"
     title="Select an element in the page to style it"
     :variant="active ? 'primary' : 'outline-secondary'"
+    @click="toggle"
   >
     <b-icon icon="pencil-square" />
   </b-btn>

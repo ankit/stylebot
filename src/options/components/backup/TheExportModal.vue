@@ -1,21 +1,21 @@
 <template>
   <b-modal
+    v-model="show"
     size="xl"
     centered
     no-fade
-    v-model="show"
-    @ok="copyJson"
-    @cancel="cancel"
     title="Copy / paste into a JSON file"
     no-close-on-backdrop
     no-close-on-esc
     hide-header-close
+    @ok="copyJson"
+    @cancel="cancel"
   >
     <div class="mb-3">Keep the JSON safe to import it later</div>
 
     <b-form-textarea readonly rows="15" autofocus :value="json" />
 
-    <template v-slot:modal-footer="{ ok, cancel }">
+    <template #modal-footer="{ ok, cancel }">
       <app-button text="Cancel" @click="cancel()" />
       <app-button variant="primary" text="Copy to Clipboard" @click="ok()" />
     </template>
