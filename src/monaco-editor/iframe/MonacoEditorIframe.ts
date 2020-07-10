@@ -47,6 +47,7 @@ class MonacEditorIframe {
       cursorBlinking: 'smooth',
       dragAndDrop: true,
       mouseWheelZoom: true,
+      wordWrap: 'on',
       minimap: {
         enabled: false,
       },
