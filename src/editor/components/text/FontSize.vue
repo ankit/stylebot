@@ -1,8 +1,6 @@
 <template>
   <b-row align-content="center" no-gutters>
-    <css-property>
-      Font Size
-    </css-property>
+    <css-property>Font Size</css-property>
 
     <css-property-value>
       <Length property="font-size" />

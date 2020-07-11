@@ -121,6 +121,28 @@ export default {
     }
   },
 
+  async applyFontFamily(
+    { state, dispatch }: { state: State; dispatch: Dispatch },
+    value: string
+  ): Promise<void> {
+    let css = state.css;
+
+    if (value) {
+      css = await CssUtils.addGoogleWebFont(value, css);
+    }
+
+    if (css !== state.css) {
+      dispatch('applyCss', { css });
+    }
+
+    dispatch('applyDeclaration', { property: 'font-family', value });
+
+    css = CssUtils.cleanGoogleWebFonts(state.css);
+    if (css !== state.css) {
+      dispatch('applyCss', { css });
+    }
+  },
+
   applyDarkMode({ dispatch }: { dispatch: Dispatch }): void {
     CssUtils.removeCSSFromDocument();
     dispatch('applyCss', { css: getDarkModeCss() });
