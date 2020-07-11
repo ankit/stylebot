@@ -9,6 +9,7 @@
         :variant="value === option.value ? 'secondary' : 'outline-secondary'"
         @click="select(option.value)"
       >
+        <!-- eslint-disable-next-line vue/no-v-html -->
         <span v-html="option.content" />
       </b-button>
     </b-button-group>

@@ -19,9 +19,13 @@ export default Vue.extend({
     CssPropertyValueGroup,
   },
 
-  data(): any {
+  data(): {
+    options: Array<{
+      content: string;
+      value: string;
+    }>;
+  } {
     return {
-      selected: null,
       options: [
         {
           content: '<span style="font-variant: small-caps">Small Caps</span>',

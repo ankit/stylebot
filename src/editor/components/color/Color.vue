@@ -7,14 +7,11 @@
     <css-property-value>
       <b-row no-gutters>
         <b-col cols="3">
-          <color-picker
-            :color="color"
-            @colorSelection="colorPickerInput($event)"
-          />
+          <color-picker :value="value" @input="colorSelection" />
         </b-col>
 
         <b-col cols="9" class="pl-2">
-          <b-form-input size="sm" :value="color" @input="colorInput($event)" />
+          <b-form-input v-model="value" size="sm" :debounce="150" />
         </b-col>
       </b-row>
     </css-property-value>
@@ -39,32 +36,34 @@ export default Vue.extend({
   },
 
   computed: {
-    color(): string {
-      const activeRule = this.$store.getters.activeRule;
+    value: {
+      get(): string {
+        const activeRule = this.$store.getters.activeRule;
 
-      let color = '';
-      if (activeRule) {
-        activeRule.clone().walkDecls('color', (decl: Declaration) => {
-          color = decl.value;
+        let value = '';
+        if (activeRule) {
+          activeRule.clone().walkDecls('color', (decl: Declaration) => {
+            value = decl.value;
+          });
+        }
+
+        return value;
+      },
+
+      set(value: string): void {
+        this.$store.dispatch('applyDeclaration', {
+          property: 'color',
+          value,
         });
-      }
-
-      return color;
+      },
     },
   },
 
   methods: {
-    colorPickerInput(color: { hex: string }): void {
+    colorSelection(color: { hex: string }): void {
       this.$store.dispatch('applyDeclaration', {
         property: 'color',
         value: color.hex,
-      });
-    },
-
-    colorInput(color: string): void {
-      this.$store.dispatch('applyDeclaration', {
-        property: 'color',
-        value: color,
       });
     },
   },

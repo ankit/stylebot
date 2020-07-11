@@ -10,7 +10,6 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { Declaration } from 'postcss';
 
 import Length from '../Length.vue';
 import CssProperty from '../CssProperty.vue';
@@ -23,30 +22,6 @@ export default Vue.extend({
     Length,
     CssProperty,
     CssPropertyValue,
-  },
-
-  computed: {
-    value(): string {
-      const activeRule = this.$store.getters.activeRule;
-      let value = '';
-
-      if (activeRule) {
-        activeRule.clone().walkDecls('font-size', (decl: Declaration) => {
-          value = decl.value;
-        });
-      }
-
-      return value;
-    },
-  },
-
-  methods: {
-    input(value: string): void {
-      this.$store.dispatch('applyDeclaration', {
-        property: 'font-size',
-        value,
-      });
-    },
   },
 });
 </script>

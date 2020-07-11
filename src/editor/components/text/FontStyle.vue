@@ -22,7 +22,12 @@ export default Vue.extend({
     CssPropertyValueGroup,
   },
 
-  data(): any {
+  data(): {
+    options: Array<{
+      content: string;
+      value: string;
+    }>;
+  } {
     return {
       options: [
         { content: '<i>Italic</i>', value: 'italic' },

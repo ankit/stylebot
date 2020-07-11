@@ -35,7 +35,13 @@ export default Vue.extend({
     CssPropertyValue,
   },
 
-  data(): any {
+  data(): {
+    options: Array<{
+      title: string;
+      value: string;
+      icon: string;
+    }>;
+  } {
     return {
       options: [
         { title: 'Align Left', value: 'left', icon: 'text-left' },

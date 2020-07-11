@@ -1,20 +1,21 @@
 <template>
   <div>
     <button class="color-picker-btn" @click="toggle">
-      <div class="color-picker-color" :style="{ background: `${color}` }" />
+      <div class="color-picker-color" :style="{ background: `${value}` }" />
     </button>
 
     <chrome-picker
       v-if="enabled"
-      :value="color"
+      :value="value"
       class="color-picker"
-      @input="$emit('colorSelection', $event)"
+      @input="debouncedInput"
     />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
+import { debounce } from 'lodash';
 import { Chrome } from 'vue-color';
 
 export default Vue.extend({
@@ -24,17 +25,31 @@ export default Vue.extend({
     'chrome-picker': Chrome,
   },
 
-  props: ['color'],
+  props: {
+    value: {
+      type: String,
+      required: true,
+    },
+  },
 
   data(): {
     enabled: boolean;
+    debouncedInput?: (color: { hex: string }) => void;
   } {
     return {
       enabled: false,
     };
   },
 
+  created() {
+    this.debouncedInput = debounce(this.input, 100);
+  },
+
   methods: {
+    input(color: { hex: string }): void {
+      this.$emit('input', color);
+    },
+
     toggle(): void {
       if (!this.enabled) {
         this.enabled = true;

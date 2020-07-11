@@ -11,17 +11,10 @@ import Vue from 'vue';
 export default Vue.extend({
   name: 'DropdownHackToSupportShadowDom',
 
-  data(): any {
-    return {
-      highlighter: null,
-      validation: { state: null, message: '' },
-    };
-  },
-
   methods: {
     mousedown(): void {
       // HACK: To make the dropdown work in shadow dom, pending in-depth debugging.
-      this.$refs.hiddenInput.focus();
+      (this.$refs.hiddenInput as HTMLInputElement).focus();
     },
   },
 });

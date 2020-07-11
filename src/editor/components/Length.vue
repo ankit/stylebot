@@ -11,8 +11,11 @@
           :disabled="disabled"
           variant="outline-secondary"
         >
-          <b-dropdown-item v-for="unit in supportedUnits" :key="unit">
-            {{ unit }}
+          <b-dropdown-item
+            v-for="supportedUnit in supportedUnits"
+            :key="supportedUnit"
+          >
+            {{ supportedUnit }}
           </b-dropdown-item>
         </b-dropdown>
       </dropdown-hack-to-support-shadow-dom>
