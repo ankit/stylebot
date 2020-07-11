@@ -3,6 +3,7 @@
     <dropdown-hack-to-support-shadow-dom>
       <b-dropdown
         right
+        :disabled="disabled"
         variant="outline-secondary"
         class="font-family-dropdown"
       >
@@ -27,6 +28,13 @@ export default Vue.extend({
 
   components: {
     DropdownHackToSupportShadowDom,
+  },
+
+  props: {
+    disabled: {
+      type: Boolean,
+      required: true,
+    },
   },
 
   data(): { fonts: Array<string> } {

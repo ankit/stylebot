@@ -6,8 +6,14 @@
       <b-row no-gutters>
         <b-col cols="10">
           <b-input-group>
-            <b-form-input v-model="value" size="sm" :debounce="400" />
-            <font-family-dropdown @select="select" />
+            <b-form-input
+              v-model="value"
+              size="sm"
+              :debounce="400"
+              :disabled="disabled"
+            />
+
+            <font-family-dropdown :disabled="disabled" @select="select" />
           </b-input-group>
         </b-col>
       </b-row>
@@ -50,6 +56,10 @@ export default Vue.extend({
       set(value: string) {
         this.$store.dispatch('applyFontFamily', value);
       },
+    },
+
+    disabled(): boolean {
+      return !this.$store.state.activeSelector;
     },
   },
 
