@@ -37,8 +37,13 @@ const CSSUtils = {
           });
 
           if (!importExists) {
-            const atRule = postcss.parse(`@import ${params};`);
-            root.prepend(atRule);
+            const rule = postcss.parse(`@import ${params};`);
+            root.prepend(rule);
+
+            const next = root.first?.next();
+            if (next) {
+              next.raws.before = '\n\n';
+            }
           }
 
           resolve(root.toString());

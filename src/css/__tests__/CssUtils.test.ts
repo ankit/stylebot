@@ -11,7 +11,7 @@ describe('CssUtils', () => {
       const output = await CssUtils.addGoogleWebFont('Muli', css);
 
       expect(output).toBe(
-        '@import url(//fonts.googleapis.com/css?family=Muli);\na { font-family: Muli; }'
+        '@import url(//fonts.googleapis.com/css?family=Muli);\n\na { font-family: Muli; }'
       );
     });
 
@@ -19,7 +19,7 @@ describe('CssUtils', () => {
       fetchMock.mockResponse(() => Promise.resolve({ status: 200 }));
 
       const css =
-        '@import url(//fonts.googleapis.com/css?family=Muli);\na { font-family: Muli }';
+        '@import url(//fonts.googleapis.com/css?family=Muli);\n\na { font-family: Muli }';
       const output = await CssUtils.addGoogleWebFont('Muli', css);
 
       expect(output).toBe(css);
@@ -47,7 +47,7 @@ describe('CssUtils', () => {
   describe('cleanGoogleWebFonts', () => {
     it('removes @import rule for unused font', () => {
       const css =
-        '@import url(//fonts.googleapis.com/css?family=Muli);\na { color: red; }';
+        '@import url(//fonts.googleapis.com/css?family=Muli);\n\na { color: red; }';
 
       const output = CssUtils.cleanGoogleWebFonts(css);
       expect(output).toBe('a { color: red; }');
@@ -55,7 +55,7 @@ describe('CssUtils', () => {
 
     it('does not remove @import rule for used font', () => {
       const css =
-        '@import url(//fonts.googleapis.com/css?family=Muli);\na { font-family: Muli, Helvetica; }';
+        '@import url(//fonts.googleapis.com/css?family=Muli);\n\na { font-family: Muli, Helvetica; }';
       const output = CssUtils.cleanGoogleWebFonts(css);
       expect(output).toBe(css);
     });
