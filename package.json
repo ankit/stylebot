@@ -29,7 +29,10 @@
       ".*\\.(vue)$": "vue-jest",
       "^.+\\.tsx?$": "ts-jest"
     },
-    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$"
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "setupFiles": [
+      "./setupJest.js"
+    ]
   },
   "devDependencies": {
     "@babel/core": "^7.10.1",
@@ -58,6 +61,7 @@
     "jest": "^26.1.0",
     "jest-cli": "^26.1.0",
     "jest-environment-jsdom": "^26.1.0",
+    "jest-fetch-mock": "^3.0.3",
     "mini-css-extract-plugin": "^0.9.0",
     "postcss-loader": "^3.0.0",
     "postcss-safe-important": "^1.2.0",
