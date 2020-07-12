@@ -72,53 +72,14 @@ export default {
       return;
     }
 
-    const root = postcss.parse(state.css);
-    const matchingRules: Array<postcss.Rule> = [];
-
-    root.walkRules(state.activeSelector, rule => matchingRules.push(rule));
-    const activeRule = matchingRules.length > 0 ? matchingRules[0] : null;
-
-    if (!activeRule) {
-      if (value) {
-        const ruleCss = `${state.activeSelector} {\n  ${property}: ${value};\n}`;
-
-        if (root.some(rule => !!rule)) {
-          root.append(`\n\n${ruleCss}`);
-        } else {
-          root.append(ruleCss);
-        }
-
-        dispatch('applyCss', { css: root.toString() });
-      }
-
-      return;
-    }
-
-    const declarationExists = activeRule.some(
-      decl => decl.type === 'decl' && decl.prop === property
+    const css = CssUtils.addDeclaration(
+      property,
+      value,
+      state.activeSelector,
+      state.css
     );
 
-    if (declarationExists) {
-      activeRule.walkDecls(property, (decl: postcss.Declaration) => {
-        if (value) {
-          decl.value = value;
-        } else {
-          decl.remove();
-        }
-      });
-
-      if (!activeRule.some(decl => !!decl)) {
-        activeRule.remove();
-      }
-
-      dispatch('applyCss', { css: root.toString() });
-      return;
-    }
-
-    if (value) {
-      activeRule.append(`\n  ${property}: ${value};`);
-      dispatch('applyCss', { css: root.toString() });
-    }
+    dispatch('applyCss', { css });
   },
 
   async applyFontFamily(

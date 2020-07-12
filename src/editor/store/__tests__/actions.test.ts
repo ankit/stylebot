@@ -16,19 +16,6 @@ const mockRoot = {
   toString: jest.fn(),
 };
 
-const mockRule = {
-  some: jest.fn(),
-  append: jest.fn(),
-  remove: jest.fn(),
-  walkDecls: jest.fn(),
-};
-
-const mockDeclaration = {
-  prop: 'color',
-  value: 'red',
-  remove: jest.fn(),
-};
-
 const mockCommit = jest.fn();
 const mockDispatch = jest.fn();
 
@@ -100,214 +87,41 @@ describe('actions', () => {
   });
 
   describe('applyDeclaration', () => {
-    describe('append rule', () => {
-      it('with proper indentation', () => {
-        const state = { ...mockState, activeSelector: 'a' };
-        const property = 'color';
-        const value = 'red';
-
-        mockRoot.toString.mockImplementation(() => 'mockToString');
-
-        actions.applyDeclaration(
-          { state, dispatch: mockDispatch },
-          { property, value }
-        );
-
-        expect(mockRoot.append).toBeCalledWith('a {\n  color: red;\n}');
-        expect(mockDispatch).toBeCalledWith('applyCss', {
-          css: 'mockToString',
-        });
-      });
-
-      it('with newlines prefixed when there are existing rules', () => {
-        const state = { ...mockState, activeSelector: 'a' };
-        const property = 'color';
-        const value = 'red';
-
-        mockRoot.some.mockImplementation(() => true);
-        mockRoot.toString.mockImplementation(() => 'mockToString');
-
-        actions.applyDeclaration(
-          { state, dispatch: mockDispatch },
-          { property, value }
-        );
-
-        expect(mockRoot.append).toBeCalledWith('\n\na {\n  color: red;\n}');
-        expect(mockDispatch).toBeCalledWith('applyCss', {
-          css: 'mockToString',
-        });
-      });
-
-      it('without newlines prefixed when there are no existing rules', () => {
-        const state = { ...mockState, activeSelector: 'a' };
-        const property = 'color';
-        const value = 'red';
-
-        mockRoot.some.mockImplementation(() => false);
-        mockRoot.toString.mockImplementation(() => 'mockToString');
-
-        actions.applyDeclaration(
-          { state, dispatch: mockDispatch },
-          { property, value }
-        );
-
-        expect(mockRoot.append).toBeCalledWith('a {\n  color: red;\n}');
-        expect(mockDispatch).toBeCalledWith('applyCss', {
-          css: 'mockToString',
-        });
-      });
-
-      it('does not append new rule when value is empty', () => {
-        const state = { ...mockState, activeSelector: 'a' };
-        const property = 'color';
-        const value = '';
-
-        mockRoot.toString.mockImplementation(() => 'mockToString');
-
-        actions.applyDeclaration(
-          { state, dispatch: mockDispatch },
-          { property, value }
-        );
-
-        expect(mockRoot.append).toHaveBeenCalledTimes(0);
-        expect(mockDispatch).toHaveBeenCalledTimes(0);
-      });
-    });
-
-    describe('append declaration', () => {
-      it('with proper indentation', () => {
-        const state = { ...mockState, activeSelector: 'a' };
-        const property = 'color';
-        const value = 'red';
-
-        mockRoot.walkRules.mockImplementation((_selector, callback) => {
-          callback(mockRule);
-        });
-
-        mockRule.some.mockImplementation(() => false);
-        mockRoot.toString.mockImplementation(() => 'mockToString');
-
-        actions.applyDeclaration(
-          { state, dispatch: mockDispatch },
-          { property, value }
-        );
-
-        expect(mockRoot.append).toHaveBeenCalledTimes(0);
-        expect(mockRule.append).toBeCalledWith('\n  color: red;');
-        expect(mockDispatch).toBeCalledWith('applyCss', {
-          css: 'mockToString',
-        });
-      });
-
-      it('does not append declaration when value is empty', () => {
-        const state = { ...mockState, activeSelector: 'a' };
-        const property = 'color';
-        const value = '';
-
-        mockRoot.walkRules.mockImplementation((_selector, callback) => {
-          callback(mockRule);
-        });
-
-        mockRule.some.mockImplementation(() => false);
-        mockRoot.toString.mockImplementation(() => 'mockToString');
-
-        actions.applyDeclaration(
-          { state, dispatch: mockDispatch },
-          { property, value }
-        );
-
-        expect(mockRoot.append).toHaveBeenCalledTimes(0);
-        expect(mockRule.append).toHaveBeenCalledTimes(0);
-        expect(mockDispatch).toHaveBeenCalledTimes(0);
-      });
-    });
-
-    it('modifies existing declaration with new value', () => {
-      const state = { ...mockState, activeSelector: 'a' };
-      const property = 'color';
-      const value = 'green';
-
-      mockRoot.walkRules.mockImplementation((_selector, callback) => {
-        callback(mockRule);
-      });
-
-      mockRule.some.mockImplementation(() => true);
-      mockRule.walkDecls.mockImplementation((_property, callback) => {
-        callback(mockDeclaration);
-      });
-
-      mockRoot.toString.mockImplementation(() => 'mockToString');
-
+    it('no-op if no selector is active', () => {
       actions.applyDeclaration(
-        { state, dispatch: mockDispatch },
-        { property, value }
+        { state: mockState, dispatch: mockDispatch },
+        {
+          property: 'color',
+          value: 'red',
+        }
       );
 
-      expect(mockRoot.append).toHaveBeenCalledTimes(0);
-      expect(mockRule.append).toHaveBeenCalledTimes(0);
-      expect(mockDeclaration.value).toEqual('green');
-      expect(mockDispatch).toBeCalledWith('applyCss', { css: 'mockToString' });
+      expect(CssUtils.addDeclaration).toBeCalledTimes(0);
+      expect(mockDispatch).toBeCalledTimes(0);
     });
 
-    it('removes existing declaration if value is empty', () => {
+    it('invokes addDeclaration correctly', () => {
       const state = { ...mockState, activeSelector: 'a' };
 
-      const property = 'color';
-      const value = '';
-
-      mockRoot.walkRules.mockImplementation((_selector, callback) => {
-        callback(mockRule);
+      Object.defineProperty(CssUtils, 'addDeclaration', {
+        value: jest.fn(() => 'outputOfAddDeclaration'),
       });
-
-      mockRule.some.mockImplementation(() => true);
-      mockRule.walkDecls.mockImplementation((_property, callback) => {
-        callback(mockDeclaration);
-      });
-
-      mockRoot.toString.mockImplementation(() => 'mockToString');
 
       actions.applyDeclaration(
-        { state, dispatch: mockDispatch },
-        { property, value }
+        {
+          state,
+          dispatch: mockDispatch,
+        },
+        {
+          property: 'color',
+          value: 'red',
+        }
       );
 
-      expect(mockRoot.append).toHaveBeenCalledTimes(0);
-      expect(mockRule.append).toHaveBeenCalledTimes(0);
-      expect(mockRule.remove).toHaveBeenCalledTimes(0);
-      expect(mockDeclaration.remove).toHaveBeenCalledTimes(1);
-
-      expect(mockDispatch).toBeCalledWith('applyCss', { css: 'mockToString' });
-    });
-
-    it('removes existing rule if empty after declaration removal', () => {
-      const state = { ...mockState, activeSelector: 'a' };
-
-      const property = 'color';
-      const value = '';
-
-      mockRoot.walkRules.mockImplementation((_selector, callback) => {
-        callback(mockRule);
+      expect(CssUtils.addDeclaration).toBeCalledWith('color', 'red', 'a', '');
+      expect(mockDispatch).toBeCalledWith('applyCss', {
+        css: 'outputOfAddDeclaration',
       });
-
-      mockRule.some.mockImplementationOnce(() => true);
-      mockRule.walkDecls.mockImplementation((_property, callback) => {
-        callback(mockDeclaration);
-        mockRule.some.mockImplementationOnce(() => false);
-      });
-
-      mockRoot.toString.mockImplementation(() => 'mockToString');
-
-      actions.applyDeclaration(
-        { state, dispatch: mockDispatch },
-        { property, value }
-      );
-
-      expect(mockRoot.append).toHaveBeenCalledTimes(0);
-      expect(mockRule.append).toHaveBeenCalledTimes(0);
-      expect(mockRule.remove).toHaveBeenCalledTimes(1);
-      expect(mockDeclaration.remove).toHaveBeenCalledTimes(1);
-
-      expect(mockDispatch).toBeCalledWith('applyCss', { css: 'mockToString' });
     });
   });
 });
