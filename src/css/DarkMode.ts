@@ -1,3 +1,4 @@
+import * as dedent from 'dedent';
 import * as postcss from 'postcss';
 import * as tinycolor from 'tinycolor2';
 
@@ -5,10 +6,10 @@ import CssSelectorGenerator from './CssSelectorGenerator';
 
 const Theme = {
   color: tinycolor('#e8e6e3'),
-  backgroundColor: tinycolor('#333'),
+  backgroundColor: tinycolor('#222'),
   borderColor: tinycolor('#736b5e'),
   placeholder: tinycolor('#b2aba1'),
-  linkColor: tinycolor('#3391ff'),
+  linkColor: tinycolor('#A9BAC5'),
   selectionColor: tinycolor('#fff'),
   selectionBackgroundColor: tinycolor('#68C2D0'),
 };
@@ -24,12 +25,16 @@ const getDarkModeBackgroundColor = (
     return color;
   }
 
-  return color.darken(88);
+  return color.darken(90);
 };
 
 const getDarkModeColor = (
   color: tinycolor.Instance
 ): tinycolor.Instance | null => {
+  if (color.getAlpha() === 0) {
+    return Theme.color;
+  }
+
   if (color.isLight()) {
     return color;
   }
@@ -37,149 +42,106 @@ const getDarkModeColor = (
   return color.lighten(50);
 };
 
-/**
- * Generate default boilerplate dark styling for the page
- */
-const getDefaultRootNode = (): postcss.Root => {
-  return postcss
-    .root()
-    .append(
-      postcss
-        .rule({
-          selectors: ['html', 'body', 'input', 'textarea', 'select', 'button'],
-        })
-        .append(
-          postcss.decl({ prop: 'color', value: Theme.color.toHexString() })
-        )
-        .append(
-          postcss.decl({
-            prop: 'border-color',
-            value: Theme.borderColor.toHexString(),
-          })
-        )
-        .append(
-          postcss.decl({
-            prop: 'background-color',
-            value: Theme.backgroundColor.toHexString(),
-          })
-        )
-    )
-    .append(
-      postcss
-        .rule({
-          selector: '::placeholder',
-        })
-        .append({
-          prop: 'color',
-          value: Theme.placeholder.toHexString(),
-        }),
+const getDarkModeBorderColor = (
+  color: tinycolor.Instance
+): tinycolor.Instance | null => {
+  if (color.isLight()) {
+    return color.darken(70);
+  }
 
-      postcss.rule({ selector: 'a' }).append(
-        postcss.decl({
-          prop: 'color',
-          value: Theme.linkColor.toHexString(),
-        })
-      )
-    )
-    .append(
-      postcss
-        .rule({ selector: '::selection' })
-        .append(
-          postcss.decl({
-            prop: 'color',
-            value: Theme.selectionColor.toHexString(),
-          })
-        )
-        .append(
-          postcss.decl({
-            prop: 'background',
-            value: Theme.selectionBackgroundColor.toHexString(),
-          })
-        )
-    );
+  return color.lighten(30);
 };
 
-/**
- * Analyze element and generate dark themed css for it
- */
-const getElementRootNode = (
-  el: HTMLElement,
-  selector: string
-): postcss.Root | null => {
-  const rule = postcss.rule({ selector });
-  const hoverRule = postcss.rule({ selector: `${selector}:hover` });
-
-  const color = getDarkModeColor(tinycolor(getComputedStyle(el).color));
-  if (color) {
-    rule.append(postcss.decl({ prop: 'color', value: color.toHexString() }));
-
-    if (el.matches('a, button')) {
-      hoverRule.append(
-        postcss.decl({ prop: 'color', value: color.lighten(30).toHexString() })
-      );
+const getDefaultCss = (): string => {
+  return dedent`
+    html, body, input, textarea, select, button {
+      color: ${Theme.color.toHexString()};
+      border-color: ${Theme.borderColor.toHexString()};
+      background-color: ${Theme.backgroundColor.toHexString()};
     }
-  }
 
-  const borderColor = getDarkModeColor(
-    tinycolor(getComputedStyle(el).borderColor)
-  );
-  if (borderColor) {
-    rule.append(
-      postcss.decl({ prop: 'border-color', value: borderColor.toHexString() })
-    );
-  }
+    ::placeholder {
+      color: ${Theme.placeholder.toHexString()};
+    }
 
+    a {
+      color: ${Theme.linkColor.toHexString()};
+    }
+
+    ::selection {
+      color: ${Theme.selectionColor.toHexString()};
+      background: ${Theme.selectionBackgroundColor.toHexString()};
+    }
+  `;
+};
+
+const getElementCss = (el: HTMLElement, selector: string): string => {
+  const computedStyle = getComputedStyle(el);
+  const isLinkOrButton = el.matches('a, button');
+
+  const color = getDarkModeColor(tinycolor(computedStyle.color));
   const backgroundColor = getDarkModeBackgroundColor(
-    tinycolor(getComputedStyle(el).backgroundColor)
+    tinycolor(computedStyle.backgroundColor)
   );
+  const borderColor = getDarkModeBorderColor(
+    tinycolor(computedStyle.borderColor)
+  );
+
+  if (!color && !backgroundColor) {
+    return '';
+  }
+
+  let css = `\n\n${selector} {`;
+
+  if (color) {
+    css += `\n  color: ${color.toHexString()};`;
+  }
+
   if (backgroundColor) {
-    rule.append(
-      postcss.decl({
-        prop: 'background-color',
-        value: backgroundColor.toHexString(),
-      })
-    );
-
-    if (el.matches('a, button')) {
-      hoverRule.append(
-        postcss.decl({
-          prop: 'background-color',
-          value: backgroundColor.darken(30).toHexString(),
-        })
-      );
-    }
+    css += `\n  background-color: ${backgroundColor.toHexString()};`;
   }
 
-  if (rule.nodes?.length !== 0) {
-    const root = postcss.root();
-    root.append(rule);
-
-    if (hoverRule.nodes?.length !== 0) {
-      root.append(hoverRule);
-    }
-
-    return root;
+  if (borderColor) {
+    css += `\n  border-color: ${borderColor.toHexString()};`;
   }
 
-  return null;
+  css += `\n}`;
+
+  if (isLinkOrButton && (color || backgroundColor)) {
+    css += `\n${selector}:hover {`;
+
+    if (color) {
+      css += `\n  color: ${color.lighten(20).toHexString()};`;
+    }
+
+    if (backgroundColor) {
+      css += `\n  background-color: ${backgroundColor
+        .darken(30)
+        .toHexString()};`;
+    }
+
+    css += `\n}`;
+  }
+
+  return css;
 };
 
 export const getCss = (): string => {
-  const root = getDefaultRootNode();
+  const root = postcss.parse(getDefaultCss());
 
-  const all = document.querySelectorAll('*');
+  const all = document.querySelectorAll('body, body *:not(#stylebot)');
   const selectorGenerator = new CssSelectorGenerator();
   const evaluatedSelectors: Array<string> = [];
 
   all.forEach(el => {
     if (!el.closest('.stylebot')) {
       const selector = selectorGenerator.inspect(el as HTMLElement);
+
       try {
         if (evaluatedSelectors.indexOf(selector) === -1) {
-          const elementRoot = getElementRootNode(el as HTMLElement, selector);
-
-          if (elementRoot) {
-            root.append(elementRoot);
+          const css = getElementCss(el as HTMLElement, selector);
+          if (css) {
+            root.append(css);
           }
 
           evaluatedSelectors.push(selector);

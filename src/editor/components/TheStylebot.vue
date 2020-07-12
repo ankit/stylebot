@@ -50,6 +50,7 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .stylebot {
   top: 0;
+  color: #000;
   height: 100%;
   position: fixed;
   padding: 0;
