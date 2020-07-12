@@ -2,9 +2,11 @@
   <b-container class="stylebot" :class="position">
     <the-header />
 
-    <the-basic-editor v-if="mode === 'basic'" />
-    <the-magic-editor v-else-if="mode === 'magic'" />
-    <the-code-editor v-else-if="mode === 'code'" />
+    <div class="stylebot-body">
+      <the-basic-editor v-if="mode === 'basic'" />
+      <the-magic-editor v-else-if="mode === 'magic'" />
+      <the-code-editor v-else-if="mode === 'code'" />
+    </div>
 
     <the-footer />
   </b-container>
@@ -63,5 +65,11 @@ export default Vue.extend({
   &.right {
     right: 0;
   }
+}
+
+.stylebot-body {
+  overflow: auto;
+  padding-bottom: 50px;
+  height: calc(100% - 154px);
 }
 </style>

@@ -8,7 +8,7 @@
           <color-picker :value="value" @input="colorSelection" />
         </b-col>
 
-        <b-col cols="9" class="pl-2">
+        <b-col cols="7" class="pl-2">
           <b-form-input v-model="value" size="sm" :debounce="150" />
         </b-col>
       </b-row>

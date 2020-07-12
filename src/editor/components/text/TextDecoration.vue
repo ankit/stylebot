@@ -28,7 +28,7 @@ export default Vue.extend({
     return {
       options: [
         {
-          content: '<span style="text-decoration: underlined">ab</span>',
+          content: '<span style="text-decoration: underline">ab</span>',
           value: 'underline',
         },
         {

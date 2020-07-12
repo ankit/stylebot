@@ -46,9 +46,13 @@
   }
 }
 
+.btn-group > .btn:not(:last-child):not(.dropdown-toggle) {
+  border-right: none;
+}
+
 /* Form control and group */
 .form-control-sm {
-  height: 26px;
+  height: 28px;
   font-size: 12px;
   padding: 10px;
 }
@@ -59,7 +63,7 @@
 
 /* Buttons */
 .btn-sm {
-  height: 26px;
+  height: 28px;
   font-size: 12px;
 }
 

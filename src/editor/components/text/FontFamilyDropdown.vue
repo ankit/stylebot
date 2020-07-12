@@ -56,7 +56,7 @@ export default Vue.extend({
 <style lang="scss">
 .font-family-dropdown {
   .dropdown-toggle {
-    height: 26px !important;
+    height: 28px !important;
     padding: 0 8px !important;
     padding-top: 2px !important;
   }

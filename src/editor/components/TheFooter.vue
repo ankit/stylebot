@@ -19,8 +19,6 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .footer {
-  position: absolute;
-  bottom: 0;
   width: 100%;
   padding: 20px;
   text-align: center;

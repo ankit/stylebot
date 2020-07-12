@@ -131,7 +131,7 @@ export default Vue.extend({
   top: 77px;
   width: 375px;
   z-index: 100000000000;
-  height: calc(100% - 152px);
+  height: calc(100% - 154px);
 
   &.hidden {
     display: none;
