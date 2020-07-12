@@ -11,7 +11,7 @@
 
     <b-col cols="2">
       <b-row class="justify-content-md-end">
-        <the-header-actions />
+        <the-window-actions />
       </b-row>
     </b-col>
   </b-row>
@@ -22,7 +22,7 @@ import Vue from 'vue';
 
 import TheUrlInput from './header/TheUrlInput.vue';
 import TheInspector from './header/TheInspector.vue';
-import TheHeaderActions from './header/TheHeaderActions.vue';
+import TheWindowActions from './header/TheWindowActions.vue';
 import TheCssSelectorDropdown from './header/TheCssSelectorDropdown.vue';
 
 export default Vue.extend({
@@ -31,7 +31,7 @@ export default Vue.extend({
   components: {
     TheUrlInput,
     TheInspector,
-    TheHeaderActions,
+    TheWindowActions,
     TheCssSelectorDropdown,
   },
 

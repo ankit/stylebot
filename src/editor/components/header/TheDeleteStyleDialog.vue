@@ -1,7 +1,7 @@
 <template>
   <div class="delete-css-dialog">
     <div class="delete-css-dialog-content pb-3">
-      <h1 class="title">Delete css for {{ url }}</h1>
+      <h1 class="title">Delete style for {{ url }}</h1>
 
       <div class="description text-muted mt-2 mb-4">
         This will permanently delete your css for {{ url }}. You cannot undo
@@ -10,13 +10,11 @@
 
       <b-row class="justify-content-end mr-2">
         <b-col cols="2" class="mr-2">
-          <b-btn variant="outline-secondary" @click="$emit('close')">
-            Cancel
-          </b-btn>
+          <b-btn variant="outline-secondary" @click="$emit('close')">Cancel</b-btn>
         </b-col>
 
         <b-col cols="2">
-          <b-btn variant="outline-danger" @click="deleteCss">Delete</b-btn>
+          <b-btn variant="outline-danger" @click="deleteStyle">Delete</b-btn>
         </b-col>
       </b-row>
     </div>
@@ -27,7 +25,7 @@
 import Vue from 'vue';
 
 export default Vue.extend({
-  name: 'TheDeleteCssDialog',
+  name: 'TheDeleteStyleDialog',
 
   computed: {
     url(): string {
@@ -36,8 +34,8 @@ export default Vue.extend({
   },
 
   methods: {
-    deleteCss(): void {
-      this.$store.dispatch('deleteCss');
+    deleteStyle(): void {
+      this.$store.dispatch('applyCss', { css: '' });
       this.$emit('close');
     },
   },

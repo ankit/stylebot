@@ -12,13 +12,6 @@
             class="css-selector-dropdown"
             @show="stopInspecting"
           >
-            <the-delete-css-dropdown-item
-              :disabled="selectors.length === 0"
-              @click="deleteCssDialog = true"
-            />
-
-            <b-dropdown-divider v-if="selectors.length > 0" />
-
             <the-css-selector-dropdown-item
               v-for="selectorMetadata in selectors"
               :key="selectorMetadata.value"
@@ -29,20 +22,13 @@
         </dropdown-hack-to-support-shadow-dom>
       </template>
     </b-input-group>
-
-    <the-delete-css-dialog
-      v-if="deleteCssDialog"
-      @close="deleteCssDialog = false"
-    />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 
-import TheDeleteCssDialog from './TheDeleteCssDialog.vue';
 import TheCssSelectorInput from './TheCssSelectorInput.vue';
-import TheDeleteCssDropdownItem from './TheDeleteCssDropdownItem.vue';
 import TheCssSelectorDropdownItem from './TheCssSelectorDropdownItem.vue';
 import DropdownHackToSupportShadowDom from './../DropdownHackToSupportShadowDom.vue';
 
@@ -50,19 +36,9 @@ export default Vue.extend({
   name: 'TheCssSelectorDropdown',
 
   components: {
-    TheDeleteCssDialog,
     TheCssSelectorInput,
-    TheDeleteCssDropdownItem,
     TheCssSelectorDropdownItem,
     DropdownHackToSupportShadowDom,
-  },
-
-  data(): {
-    deleteCssDialog: boolean;
-  } {
-    return {
-      deleteCssDialog: false,
-    };
   },
 
   computed: {

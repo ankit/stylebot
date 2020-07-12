@@ -1,25 +1,47 @@
 <template>
-  <button
-    title="View Options"
-    @click="viewOptions"
+  <div
+    class="stylebot-options-action"
     @mouseenter="isHovered = true"
     @mouseleave="isHovered = false"
   >
-    <b-icon v-if="!isHovered" icon="gear" />
-    <b-icon v-if="isHovered" icon="gear-fill" />
-  </button>
+    <dropdown-hack-to-support-shadow-dom>
+      <b-dropdown right class="stylebot-options-dropdown">
+        <the-delete-style-dropdown-item @click="deleteStyleDialog = true; isHovered = false;" />
+        <b-dropdown-item-button @click="viewOptions">View options...</b-dropdown-item-button>
+
+        <template #button-content>
+          <b-icon v-if="!isHovered" icon="gear" />
+          <b-icon v-if="isHovered" icon="gear-fill" />
+        </template>
+      </b-dropdown>
+    </dropdown-hack-to-support-shadow-dom>
+
+    <the-delete-style-dialog v-if="deleteStyleDialog" @close="deleteStyleDialog = false" />
+  </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
+
+import TheDeleteStyleDialog from './TheDeleteStyleDialog.vue';
+import TheDeleteStyleDropdownItem from './TheDeleteStyleDropdownItem.vue';
+import DropdownHackToSupportShadowDom from './../DropdownHackToSupportShadowDom.vue';
+
 import { openOptionsPage } from '../../utils/chrome';
 
 export default Vue.extend({
   name: 'TheOptionsAction',
 
-  data(): { isHovered: boolean } {
+  components: {
+    TheDeleteStyleDialog,
+    TheDeleteStyleDropdownItem,
+    DropdownHackToSupportShadowDom,
+  },
+
+  data(): { isHovered: boolean; deleteStyleDialog: boolean } {
     return {
       isHovered: false,
+      deleteStyleDialog: false,
     };
   },
 
@@ -30,3 +52,35 @@ export default Vue.extend({
   },
 });
 </script>
+
+<style lang="scss">
+.stylebot-options-action {
+  display: inline-block;
+}
+
+.stylebot-options-dropdown {
+  vertical-align: top !important;
+
+  .dropdown-toggle {
+    background: none !important;
+    color: #000 !important;
+    border: none !important;
+    font-size: 19px !important;
+    line-height: 20px !important;
+    padding: 0 !important;
+
+    &::after {
+      display: none !important;
+    }
+
+    svg {
+      font-size: 100% !important;
+    }
+
+    &:focus {
+      box-shadow: none !important;
+      outline: -webkit-focus-ring-color auto 5px !important;
+    }
+  }
+}
+</style>

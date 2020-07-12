@@ -1,8 +1,8 @@
 <template>
   <div class="mr-3">
-    <the-options-action class="header-action" />
-    <the-move-action class="header-action" />
-    <the-close-action class="header-action" />
+    <the-options-action class="window-action" />
+    <the-move-action class="window-action" />
+    <the-close-action class="window-action" />
   </div>
 </template>
 
@@ -14,7 +14,7 @@ import TheMoveAction from './TheMoveAction.vue';
 import TheOptionsAction from './TheOptionsAction.vue';
 
 export default Vue.extend({
-  name: 'TheHeaderActions',
+  name: 'TheWindowActions',
 
   components: {
     TheCloseAction,
@@ -25,11 +25,12 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-.header-action {
-  background: none;
-  border: none;
-  padding: 0;
+.window-action {
   margin: 0;
-  margin-left: 2px;
+  padding: 0;
+  border: none;
+  font-size: 18px;
+  line-height: 21px;
+  background: none;
 }
 </style>

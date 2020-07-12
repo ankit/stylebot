@@ -1,6 +1,6 @@
 <template>
   <div @mousedown="mousedown">
-    <input ref="hiddenInput" type="text" class="hidden-input" />
+    <input ref="hiddenInput" type="text" class="hidden-input" aria-hidden :tabindex="-1" />
     <slot />
   </div>
 </template>
