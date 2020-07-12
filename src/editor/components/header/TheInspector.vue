@@ -13,6 +13,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import Highlighter from '../../highlighter/Highlighter';
+import { StylebotEditingMode } from '../../../types';
 
 export default Vue.extend({
   name: 'TheInspector',
@@ -30,8 +31,12 @@ export default Vue.extend({
       return this.$store.state.inspecting;
     },
 
+    mode(): StylebotEditingMode {
+      return this.$store.state.options.mode;
+    },
+
     disabled(): boolean {
-      return this.$store.state.options.mode !== 'basic';
+      return this.mode !== 'basic';
     },
   },
 
@@ -39,6 +44,14 @@ export default Vue.extend({
     active(newValue: boolean): void {
       if (!newValue) {
         this.highlighter?.stopInspecting();
+      } else {
+        this.highlighter?.startInspecting();
+      }
+    },
+
+    mode(newValue: StylebotEditingMode): void {
+      if (newValue !== 'basic' && this.active) {
+        this.$store.commit('setInspecting', false);
       }
     },
   },
@@ -48,21 +61,19 @@ export default Vue.extend({
 
     if (this.$store.state.options.mode === 'basic') {
       this.$store.commit('setInspecting', true);
-      this.highlighter?.startInspecting();
     }
   },
 
   beforeDestroy() {
+    this.$store.commit('setInspecting', false);
     this.highlighter?.stopInspecting();
   },
 
   methods: {
     toggle(): void {
       if (this.active) {
-        this.highlighter?.stopInspecting();
         this.$store.commit('setInspecting', false);
       } else {
-        this.highlighter?.startInspecting();
         this.$store.commit('setInspecting', true);
         this.$store.commit('setActiveSelector', '');
       }
