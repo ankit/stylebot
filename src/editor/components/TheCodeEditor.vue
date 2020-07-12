@@ -27,7 +27,10 @@ export default Vue.extend({
   watch: {
     css(): void {
       const iframe = this.$el.querySelector('iframe');
-      this.updateCssInMonacoEditor(iframe?.contentWindow);
+
+      if (iframe?.contentWindow) {
+        this.updateCssInMonacoEditor(iframe?.contentWindow);
+      }
     },
   },
 

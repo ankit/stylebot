@@ -12,16 +12,16 @@ class Highlighter {
     this.cssSelectorGenerator = new CssSelectorGenerator();
   }
 
-  startInspecting = () => {
+  startInspecting = (): void => {
     this.addWindowListeners();
   };
 
-  stopInspecting = () => {
+  stopInspecting = (): void => {
     this.hideOverlay();
     this.removeWindowListeners();
   };
 
-  highlight = (selector: string) => {
+  highlight = (selector: string): void => {
     if (!selector) {
       return;
     }
@@ -35,18 +35,18 @@ class Highlighter {
     );
 
     // todo: until we can performantly support highlighting a large number of elements
-    if (elements.length > 200) {
+    if (elements.length > 100) {
       return;
     }
 
     this.overlay.inspect(elements, selector);
   };
 
-  unhighlight = () => {
+  unhighlight = (): void => {
     this.hideOverlay();
   };
 
-  addWindowListeners = () => {
+  addWindowListeners = (): void => {
     window.addEventListener('click', this.onClick, true);
     window.addEventListener('mousedown', this.onMouseEvent, true);
     window.addEventListener('mouseover', this.onMouseEvent, true);
@@ -56,7 +56,7 @@ class Highlighter {
     window.addEventListener('pointerup', this.onPointerUp, true);
   };
 
-  removeWindowListeners = () => {
+  removeWindowListeners = (): void => {
     window.removeEventListener('click', this.onClick, true);
     window.removeEventListener('mousedown', this.onMouseEvent, true);
     window.removeEventListener('mouseover', this.onMouseEvent, true);
@@ -66,7 +66,7 @@ class Highlighter {
     window.removeEventListener('pointerup', this.onPointerUp, true);
   };
 
-  onClick = (event: MouseEvent) => {
+  onClick = (event: MouseEvent): void => {
     if (!this.isStylebotElement(event.target)) {
       event.preventDefault();
       event.stopPropagation();
@@ -79,38 +79,40 @@ class Highlighter {
     }
   };
 
-  onMouseEvent = (event: MouseEvent) => {
+  onMouseEvent = (event: MouseEvent): void => {
     if (!this.isStylebotElement(event.target)) {
       event.preventDefault();
       event.stopPropagation();
     }
   };
 
-  onPointerDown = (event: MouseEvent) => {
+  onPointerDown = (event: MouseEvent): void => {
     if (!this.isStylebotElement(event.target)) {
       event.preventDefault();
       event.stopPropagation();
     }
   };
 
-  onPointerOver = (event: MouseEvent) => {
+  onPointerOver = (event: MouseEvent): void => {
     if (!this.isStylebotElement(event.target)) {
       event.preventDefault();
       event.stopPropagation();
 
       const el = event.target as HTMLElement;
       this.showOverlay(el);
+    } else {
+      this.hideOverlay();
     }
   };
 
-  onPointerUp = (event: MouseEvent) => {
+  onPointerUp = (event: MouseEvent): void => {
     if (!this.isStylebotElement(event.target)) {
       event.preventDefault();
       event.stopPropagation();
     }
   };
 
-  showOverlay = (el: HTMLElement) => {
+  showOverlay = (el: HTMLElement): void => {
     if (!this.overlay) {
       this.overlay = new Overlay();
     }
@@ -118,12 +120,12 @@ class Highlighter {
     this.overlay.inspect([el], this.cssSelectorGenerator.inspect(el));
   };
 
-  hideOverlay = () => {
+  hideOverlay = (): void => {
     this.overlay?.remove();
     this.overlay = null;
   };
 
-  isStylebotElement = (el: EventTarget | null) => {
+  isStylebotElement = (el: EventTarget | null): boolean => {
     return (el as HTMLElement)?.id === 'stylebot';
   };
 }
