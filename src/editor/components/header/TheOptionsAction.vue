@@ -6,8 +6,16 @@
   >
     <dropdown-hack-to-support-shadow-dom>
       <b-dropdown right class="stylebot-options-dropdown">
-        <the-delete-style-dropdown-item @click="deleteStyleDialog = true; isHovered = false;" />
-        <b-dropdown-item-button @click="viewOptions">View options...</b-dropdown-item-button>
+        <the-delete-style-dropdown-item
+          @click="
+            deleteStyleDialog = true;
+            isHovered = false;
+          "
+        />
+
+        <b-dropdown-item-button @click="viewOptions">
+          View options...
+        </b-dropdown-item-button>
 
         <template #button-content>
           <b-icon v-if="!isHovered" icon="gear" />
@@ -16,7 +24,10 @@
       </b-dropdown>
     </dropdown-hack-to-support-shadow-dom>
 
-    <the-delete-style-dialog v-if="deleteStyleDialog" @close="deleteStyleDialog = false" />
+    <the-delete-style-dialog
+      v-if="deleteStyleDialog"
+      @close="deleteStyleDialog = false"
+    />
   </div>
 </template>
 
@@ -65,8 +76,8 @@ export default Vue.extend({
     background: none !important;
     color: #000 !important;
     border: none !important;
-    font-size: 19px !important;
-    line-height: 20px !important;
+    font-size: 18px !important;
+    line-height: 19px !important;
     padding: 0 !important;
 
     &::after {

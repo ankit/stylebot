@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="pb-5">
     <b-row class="section" no-gutters>
       <b-col cols="12">
         <h1>Text</h1>
