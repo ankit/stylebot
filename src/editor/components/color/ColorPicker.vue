@@ -1,6 +1,6 @@
 <template>
   <div>
-    <button class="color-picker-btn" @click="toggle">
+    <button class="color-picker-btn" :disabled="disabled" @click="toggle">
       <div class="color-picker-color" :style="{ background: `${value}` }" />
     </button>
 
@@ -28,6 +28,11 @@ export default Vue.extend({
   props: {
     value: {
       type: String,
+      required: true,
+    },
+
+    disabled: {
+      type: Boolean,
       required: true,
     },
   },
