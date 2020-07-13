@@ -1,6 +1,4 @@
 import ContextMenu from './contextmenu';
-import BrowserAction from './browseraction';
-
 import BackgroundPageStyles from './styles';
 
 import styleRequest from './requests/styleRequest';
@@ -16,7 +14,7 @@ import {
 /**
  * Initialize listeners for the background page
  */
-const init = (styles: BackgroundPageStyles, options: StylebotOptions) => {
+const init = (styles: BackgroundPageStyles, options: StylebotOptions): void => {
   chrome.extension.onRequest.addListener(
     (
       request: BackgroundPageRequest,
@@ -44,8 +42,7 @@ const init = (styles: BackgroundPageStyles, options: StylebotOptions) => {
         request.name === 'getAllStyles' ||
         request.name === 'setAllStyles' ||
         request.name === 'getStylesForPage' ||
-        request.name === 'getMergedCssAndUrlForPage' ||
-        request.name === 'getMergedCssAndUrlForIframe' ||
+        request.name === 'getStylesForIframe' ||
         request.name === 'enableStyle' ||
         request.name === 'disableStyle'
       ) {

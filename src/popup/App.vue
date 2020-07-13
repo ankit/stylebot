@@ -55,7 +55,7 @@ export default Vue.extend({
         this.isOpen = isOpen;
       });
 
-      getStyles(this.tab, styles => {
+      getStyles(this.tab, ({ styles }) => {
         this.styles = styles;
       });
     });

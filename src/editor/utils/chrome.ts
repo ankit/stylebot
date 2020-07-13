@@ -1,16 +1,16 @@
-import * as postcss from 'postcss';
-
 import {
   SetOptionRequest,
   GetAllOptionsRequest,
   OpenOptionsPageRequest,
   SetStyleRequest,
-  GetMergedCssAndUrlForPageRequest,
+  EnableStyleRequest,
+  DisableStyleRequest,
+  GetStylesForPageRequest,
 } from '../../types/BackgroundPageRequest';
 
 import {
   GetAllOptionsResponse,
-  GetMergedCssAndUrlForPageResponse,
+  GetStylesForPageResponse,
 } from '../../types/BackgroundPageResponse';
 
 import { StylebotOptions } from '../../types';
@@ -30,7 +30,7 @@ export const getAllOptions = async (): Promise<StylebotOptions> => {
 export const setOption = (
   name: string,
   value: StylebotOptions[keyof StylebotOptions]
-) => {
+): void => {
   const request: SetOptionRequest = {
     name: 'setOption',
     option: {
@@ -42,25 +42,25 @@ export const setOption = (
   chrome.extension.sendRequest(request);
 };
 
-export const getMergedCssAndUrlForPage = async (
+export const getStylesForPage = async (
   important: boolean
-): Promise<GetMergedCssAndUrlForPageResponse> => {
-  const request: GetMergedCssAndUrlForPageRequest = {
-    name: 'getMergedCssAndUrlForPage',
+): Promise<GetStylesForPageResponse> => {
+  const request: GetStylesForPageRequest = {
+    name: 'getStylesForPage',
     important,
   };
 
   return new Promise(resolve => {
     chrome.extension.sendRequest(
       request,
-      (response: GetMergedCssAndUrlForPageResponse) => {
+      (response: GetStylesForPageResponse) => {
         resolve(response);
       }
     );
   });
 };
 
-export const openOptionsPage = () => {
+export const openOptionsPage = (): void => {
   const request: OpenOptionsPageRequest = {
     name: 'openOptionsPage',
   };
@@ -68,11 +68,29 @@ export const openOptionsPage = () => {
   chrome.extension.sendRequest(request);
 };
 
-export const setStyle = (url: string, css: string) => {
+export const setStyle = (url: string, css: string): void => {
   const request: SetStyleRequest = {
     name: 'setStyle',
     url,
     css,
+  };
+
+  chrome.extension.sendRequest(request);
+};
+
+export const enableStyle = (url: string): void => {
+  const request: EnableStyleRequest = {
+    name: 'enableStyle',
+    url,
+  };
+
+  chrome.extension.sendRequest(request);
+};
+
+export const disableStyle = (url: string): void => {
+  const request: DisableStyleRequest = {
+    name: 'disableStyle',
+    url,
   };
 
   chrome.extension.sendRequest(request);

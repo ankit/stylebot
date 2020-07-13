@@ -1,10 +1,5 @@
 import * as postcss from 'postcss';
 
-/**
- * Utility methods for CSS injection/removal, selector validation.
- */
-const STYLE_ELEMENT_ID = 'stylebot-css';
-
 const getGoogleFontUrlAndParams = (
   value: string
 ): { url: string; params: string } => {
@@ -13,6 +8,10 @@ const getGoogleFontUrlAndParams = (
   const params = `url(${url})`;
 
   return { url, params };
+};
+
+const getStyleElementId = (url: string) => {
+  return `stylebot-css-${url}`;
 };
 
 const CSSUtils = {
@@ -161,8 +160,9 @@ const CSSUtils = {
     }
   },
 
-  injectCSSIntoDocument: (css: string): void => {
-    const el = document.getElementById(STYLE_ELEMENT_ID);
+  injectCSSIntoDocument: (css: string, url: string): void => {
+    const id = getStyleElementId(url);
+    const el = document.getElementById(id);
 
     if (el) {
       el.innerHTML = css;
@@ -172,22 +172,23 @@ const CSSUtils = {
     const style = document.createElement('style');
 
     style.type = 'text/css';
-    style.setAttribute('id', STYLE_ELEMENT_ID);
+    style.setAttribute('id', id);
     style.appendChild(document.createTextNode(css));
 
     document.documentElement.appendChild(style);
   },
 
-  injectRootIntoDocument: (root: postcss.Root): void => {
+  injectRootIntoDocument: (root: postcss.Root, url: string): void => {
     const rootWithImportant = root.clone();
     rootWithImportant.walkDecls(decl => (decl.important = true));
 
     const css = rootWithImportant.toString();
-    CSSUtils.injectCSSIntoDocument(css);
+    CSSUtils.injectCSSIntoDocument(css, url);
   },
 
-  removeCSSFromDocument: (): void => {
-    const el = document.getElementById(STYLE_ELEMENT_ID);
+  removeCSSFromDocument: (url: string): void => {
+    const id = getStyleElementId(url);
+    const el = document.getElementById(id);
 
     if (el) {
       el.innerHTML = '';

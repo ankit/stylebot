@@ -9,21 +9,16 @@ export type GetAllStylesResponse = {
     enabled: boolean;
   };
 };
-export type GetStylesForPageResponse = Array<Style>;
 
-export type GetMergedCssAndUrlForPageResponse = {
-  url: string;
-  css: string;
+export type GetStylesForPageResponse = {
+  styles: Array<Style>;
+  defaultStyle?: Style;
 };
-
-export type GetMergedCssAndUrlForIframeResponse = GetMergedCssAndUrlForPageResponse;
 
 type BackgroundPageResponse =
   | GetAllOptionsResponse
   | GetOptionResponse
   | GetAllStylesResponse
-  | GetStylesForPageResponse
-  | GetMergedCssAndUrlForPageResponse
-  | GetMergedCssAndUrlForIframeResponse;
+  | GetStylesForPageResponse;
 
 export default BackgroundPageResponse;

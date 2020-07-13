@@ -37,17 +37,13 @@ export type MoveStylesRequest = {
 export type GetStylesForPageRequest = {
   name: 'getStylesForPage';
   tab?: chrome.tabs.Tab;
+  important?: boolean;
 };
 
-export type GetMergedCssAndUrlForPageRequest = {
-  name: 'getMergedCssAndUrlForPage';
-  important: boolean;
-};
-
-export type GetMergedCssAndUrlForIframeRequest = {
-  name: 'getMergedCssAndUrlForIframe';
+export type GetStylesForIframeRequest = {
+  name: 'getStylesForIframe';
   url: string;
-  important: boolean;
+  important?: boolean;
 };
 
 export type GetAllOptionsRequest = {
@@ -84,8 +80,7 @@ type BackgroundPageRequest =
   | SetAllStylesRequest
   | MoveStylesRequest
   | GetStylesForPageRequest
-  | GetMergedCssAndUrlForPageRequest
-  | GetMergedCssAndUrlForIframeRequest
+  | GetStylesForIframeRequest
   | GetAllOptionsRequest
   | GetOptionRequest
   | SetOptionRequest

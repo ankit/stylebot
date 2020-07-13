@@ -5,34 +5,31 @@
 import CssUtils from '../css/CssUtils';
 
 import {
-  GetMergedCssAndUrlForPageRequest,
-  GetMergedCssAndUrlForIframeRequest,
+  GetStylesForPageRequest,
+  GetStylesForIframeRequest,
 } from '../types/BackgroundPageRequest';
 
-import {
-  GetMergedCssAndUrlForPageResponse,
-  GetMergedCssAndUrlForIframeResponse,
-} from '../types/BackgroundPageResponse';
+import { GetStylesForPageResponse } from '../types/BackgroundPageResponse';
 
 const MAX_INJECT_COUNT = 10;
 const INJECT_CSS_TIMEOUT = 300;
 
 const injectCss = (
-  request:
-    | GetMergedCssAndUrlForPageRequest
-    | GetMergedCssAndUrlForIframeRequest,
+  request: GetStylesForPageRequest | GetStylesForIframeRequest,
   injectCount = 0
 ) => {
   chrome.extension.sendRequest(
     request,
 
-    (
-      response:
-        | GetMergedCssAndUrlForPageResponse
-        | GetMergedCssAndUrlForIframeResponse
-    ) => {
+    (response: GetStylesForPageResponse) => {
       if (response) {
-        CssUtils.injectCSSIntoDocument(response.css);
+        const { styles } = response;
+
+        styles.forEach(style => {
+          if (style.enabled) {
+            CssUtils.injectCSSIntoDocument(style.css, style.url);
+          }
+        });
       } else if (injectCount < MAX_INJECT_COUNT) {
         setTimeout(() => {
           injectCss(request, injectCount + 1);
@@ -45,12 +42,12 @@ const injectCss = (
 const run = () => {
   if (window === window.top) {
     injectCss({
-      name: 'getMergedCssAndUrlForPage',
+      name: 'getStylesForPage',
       important: true,
     });
   } else {
     injectCss({
-      name: 'getMergedCssAndUrlForIframe',
+      name: 'getStylesForIframe',
       url: window.location.href,
       important: true,
     });

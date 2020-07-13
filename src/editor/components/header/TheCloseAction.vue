@@ -24,7 +24,7 @@ export default Vue.extend({
 
   methods: {
     onClick(): void {
-      this.$store.commit('hideStylebot');
+      this.$store.dispatch('closeStylebot');
     },
   },
 });

@@ -1,8 +1,9 @@
 import { State } from '..';
 
 const mockState: State = {
-  url: document.domain,
   css: '',
+  enabled: true,
+  url: document.domain,
 
   activeSelector: '',
   selectors: [],

@@ -4,12 +4,8 @@ import { State, CssSelectorMetadata } from './';
 import { StylebotPlacement, StylebotOptions } from '../../types';
 
 export default {
-  showStylebot(state: State): void {
-    state.visible = true;
-  },
-
-  hideStylebot(state: State): void {
-    state.visible = false;
+  setVisible(state: State, visible: boolean): void {
+    state.visible = visible;
   },
 
   setPosition(state: State, position: StylebotPlacement): void {
@@ -22,6 +18,10 @@ export default {
 
   setUrl(state: State, url: string): void {
     state.url = url;
+  },
+
+  setEnabled(state: State, enabled: boolean): void {
+    state.enabled = enabled;
   },
 
   setCss(state: State, css: string): void {

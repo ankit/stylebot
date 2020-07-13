@@ -12,6 +12,7 @@ import {
 } from '../../../types';
 
 import { Declaration, Rule } from 'postcss';
+import { enableStyle, disableStyle } from '../../utils/chrome';
 
 export default Vue.extend({
   name: 'TheKeyboardShortcuts',
@@ -19,6 +20,9 @@ export default Vue.extend({
   computed: {
     url(): string {
       return this.$store.state.url;
+    },
+    enabled(): boolean {
+      return this.$store.state.enabled;
     },
     visible(): boolean {
       return this.$store.state.visible;
@@ -81,9 +85,9 @@ export default Vue.extend({
           this.shortcutMetaKey === 'none'
         ) {
           if (this.visible) {
-            this.$store.commit('hideStylebot');
+            this.$store.dispatch('closeStylebot');
           } else {
-            this.$store.commit('showStylebot');
+            this.$store.dispatch('openStylebot');
           }
         }
       }
@@ -91,7 +95,11 @@ export default Vue.extend({
       // toggle styling on page - Alt+t
       if (event.keyCode === 84 && event.altKey) {
         if (!this.visible) {
-          //
+          if (this.enabled) {
+            disableStyle(this.url);
+          } else {
+            enableStyle(this.url);
+          }
         }
       }
     },
@@ -191,7 +199,7 @@ export default Vue.extend({
           return;
         }
 
-        this.$store.commit('hideStylebot');
+        this.$store.commit('closeStylebot');
       }
     },
   },

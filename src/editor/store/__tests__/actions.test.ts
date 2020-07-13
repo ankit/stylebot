@@ -46,7 +46,7 @@ describe('actions', () => {
       try {
         actions.applyCss(
           { commit: mockCommit, state: mockState },
-          { css: 'invalid', shouldSave: true }
+          { css: 'invalid' }
         );
       } catch (e) {
         expect(mockCommit).toBeCalledTimes(0);
@@ -55,34 +55,19 @@ describe('actions', () => {
       }
     });
 
-    it('invokes setSave when shouldSave is true', () => {
+    it('invokes setSave correctly', () => {
       const css = 'a { color: red; }';
 
-      actions.applyCss(
-        { commit: mockCommit, state: mockState },
-        { css, shouldSave: true }
-      );
+      actions.applyCss({ commit: mockCommit, state: mockState }, { css });
 
       expect(mockCommit).toHaveBeenNthCalledWith(1, 'setCss', css);
       expect(mockCommit).toHaveBeenNthCalledWith(2, 'setSelectors', mockRoot);
 
       expect(chromeUtils.setStyle).toBeCalledWith(mockState.url, css);
-      expect(CssUtils.injectRootIntoDocument).toBeCalledWith(mockRoot);
-    });
-
-    it('does not invoke setSave when shouldSave is false', () => {
-      const css = 'a { color: red; }';
-
-      actions.applyCss(
-        { commit: mockCommit, state: mockState },
-        { css, shouldSave: false }
+      expect(CssUtils.injectRootIntoDocument).toBeCalledWith(
+        mockRoot,
+        mockState.url
       );
-
-      expect(mockCommit).toHaveBeenNthCalledWith(1, 'setCss', css);
-      expect(mockCommit).toHaveBeenNthCalledWith(2, 'setSelectors', mockRoot);
-
-      expect(chromeUtils.setStyle).toHaveBeenCalledTimes(0);
-      expect(CssUtils.injectRootIntoDocument).toBeCalledWith(mockRoot);
     });
   });
 

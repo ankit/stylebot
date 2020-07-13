@@ -4,6 +4,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import CssUtils from '../../css/CssUtils';
 
 export default Vue.extend({
   name: 'TheChromeListener',
@@ -16,18 +17,24 @@ export default Vue.extend({
 
       if (request.name === 'toggle') {
         if (this.$store.state.visible) {
-          this.$store.commit('hideStylebot');
+          this.$store.dispatch('closeStylebot');
         } else {
-          this.$store.commit('showStylebot');
+          this.$store.dispatch('openStylebot');
         }
       } else if (request.name === 'getIsStylebotOpen') {
         sendResponse(this.$store.state.visible);
-      } else if (request.name === 'updateCssAndUrl') {
-        this.$store.commit('setUrl', request.url);
-        this.$store.dispatch('applyCss', {
-          css: request.css,
-          shoudSave: false,
-        });
+      } else if (request.name === 'enableStyle') {
+        CssUtils.injectCSSIntoDocument(request.css, request.url);
+
+        if (request.url === this.$store.state.url) {
+          this.$store.commit('setEnabled', true);
+        }
+      } else if (request.name === 'disableStyle') {
+        CssUtils.injectCSSIntoDocument('', request.url);
+
+        if (request.url === this.$store.state.url) {
+          this.$store.commit('setEnabled', false);
+        }
       }
     });
   },

@@ -5,9 +5,10 @@ import CssUtils from '../../css/CssUtils';
 
 import {
   getAllOptions,
-  getMergedCssAndUrlForPage,
   setOption,
   setStyle,
+  getStylesForPage,
+  enableStyle,
 } from '../utils/chrome';
 
 import { getCss as getDarkModeCss } from '../../css/DarkMode';
@@ -16,25 +17,34 @@ import { State } from './';
 import { StylebotEditingMode } from '../../types';
 
 export default {
-  async initialize({
-    commit,
-    dispatch,
-  }: {
-    commit: Commit;
-    dispatch: Dispatch;
-  }): Promise<void> {
+  async initialize({ commit }: { commit: Commit }): Promise<void> {
     const options = await getAllOptions();
-    const { url, css } = await getMergedCssAndUrlForPage(false);
+    const { defaultStyle } = await getStylesForPage(false);
 
-    if (url) {
+    if (defaultStyle) {
+      const { url, enabled, css } = defaultStyle;
+
       commit('setUrl', url);
-    }
+      commit('setCss', css);
+      commit('setEnabled', enabled);
 
-    if (css) {
-      dispatch('applyCss', { css, shouldSave: false });
+      const root = postcss.parse(defaultStyle.css);
+      commit('setSelectors', root);
     }
 
     commit('setOptions', options);
+  },
+
+  openStylebot({ state, commit }: { state: State; commit: Commit }): void {
+    commit('setVisible', true);
+
+    if (!state.enabled) {
+      enableStyle(state.url);
+    }
+  },
+
+  closeStylebot({ commit }: { commit: Commit }): void {
+    commit('setVisible', false);
   },
 
   setMode(
@@ -47,18 +57,16 @@ export default {
 
   applyCss(
     { commit, state }: { commit: Commit; state: State },
-    { css, shouldSave = true }: { css: string; shouldSave: boolean }
+    { css }: { css: string }
   ): void {
     try {
       const root = postcss.parse(css);
-      CssUtils.injectRootIntoDocument(root);
+      CssUtils.injectRootIntoDocument(root, state.url);
 
       commit('setCss', css);
       commit('setSelectors', root);
 
-      if (shouldSave) {
-        setStyle(state.url, css);
-      }
+      setStyle(state.url, css);
     } catch (e) {
       //
     }
@@ -104,8 +112,14 @@ export default {
     }
   },
 
-  applyDarkMode({ dispatch }: { dispatch: Dispatch }): void {
-    CssUtils.removeCSSFromDocument();
+  applyDarkMode({
+    state,
+    dispatch,
+  }: {
+    state: State;
+    dispatch: Dispatch;
+  }): void {
+    CssUtils.removeCSSFromDocument(state.url);
     dispatch('applyCss', { css: getDarkModeCss() });
   },
 };

@@ -2,23 +2,19 @@ import {
   SetStyleRequest,
   MoveStylesRequest,
   GetStylesForPageRequest,
-  GetMergedCssAndUrlForPageRequest,
-  GetMergedCssAndUrlForIframeRequest,
   EnableStyleRequest,
   DisableStyleRequest,
   GetAllStylesRequest,
   SetAllStylesRequest,
+  GetStylesForIframeRequest,
 } from '../../types/BackgroundPageRequest';
 
 import {
   GetStylesForPageResponse,
-  GetMergedCssAndUrlForPageResponse,
-  GetMergedCssAndUrlForIframeResponse,
   GetAllStylesResponse,
 } from '../../types/BackgroundPageResponse';
 
 import BackgroundPageStyles from '../styles';
-import BrowserAction from '../browseraction';
 
 type Request =
   | SetStyleRequest
@@ -26,23 +22,18 @@ type Request =
   | GetAllStylesRequest
   | SetAllStylesRequest
   | GetStylesForPageRequest
-  | GetMergedCssAndUrlForPageRequest
-  | GetMergedCssAndUrlForIframeRequest
+  | GetStylesForIframeRequest
   | EnableStyleRequest
   | DisableStyleRequest;
 
-type Response =
-  | GetAllStylesResponse
-  | GetStylesForPageResponse
-  | GetMergedCssAndUrlForPageResponse
-  | GetMergedCssAndUrlForIframeResponse;
+type Response = GetAllStylesResponse | GetStylesForPageResponse;
 
 export default (
   request: Request,
   styles: BackgroundPageStyles,
   sender: chrome.runtime.MessageSender,
   sendResponse: (response: Response) => void
-) => {
+): void => {
   if (request.name === 'setStyle') {
     styles.set(request.url, request.css);
   } else if (request.name === 'enableStyle') {
@@ -62,25 +53,10 @@ export default (
       return;
     }
 
-    const pageStyles = styles.getStylesForPage(tab.url);
-    if (pageStyles) {
-      sendResponse(pageStyles);
-    }
-  } else if (request.name === 'getMergedCssAndUrlForPage') {
-    if (!sender.tab || !sender.tab.url) {
-      return;
-    }
-
-    const response = styles.getMergedCssAndUrlForPage(
-      sender.tab.url,
-      request.important
-    );
+    const response = styles.getStylesForPage(tab.url, request.important);
+    styles.updateBrowserAction(tab, response.styles);
     sendResponse(response);
-
-    BrowserAction.update(sender.tab, response.css);
-  } else if (request.name === 'getMergedCssAndUrlForIframe') {
-    sendResponse(
-      styles.getMergedCssAndUrlForIframe(request.url, request.important)
-    );
+  } else if (request.name === 'getStylesForIframe') {
+    sendResponse(styles.getStylesForPage(request.url, request.important));
   }
 };

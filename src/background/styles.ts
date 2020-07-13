@@ -1,5 +1,4 @@
 import * as postcss from 'postcss';
-
 import BackgroundPageUtils from './utils';
 import BrowserAction from './browseraction';
 
@@ -19,15 +18,15 @@ class BackgroundPageStyles {
     this.styles = styles;
   }
 
-  get(url: string) {
+  get(url: string): Style {
     return this.styles[url];
   }
 
-  getAll() {
+  getAll(): Styles {
     return this.styles;
   }
 
-  setAll(styles: Styles) {
+  setAll(styles: Styles): void {
     this.styles = styles;
 
     chrome.storage.local.set({
@@ -35,7 +34,7 @@ class BackgroundPageStyles {
     });
   }
 
-  set(url: string, css: string) {
+  set(url: string, css: string): void {
     if (!css) {
       delete this.styles[url];
     } else {
@@ -50,7 +49,7 @@ class BackgroundPageStyles {
     });
   }
 
-  enable(url: string) {
+  enable(url: string): void {
     if (!this.styles[url]) {
       return;
     }
@@ -62,19 +61,21 @@ class BackgroundPageStyles {
 
     chrome.tabs.getSelected(tab => {
       if (tab && tab.url && tab.id) {
-        const { css, url } = this.getMergedCssAndUrlForPage(tab.url, false);
-        BrowserAction.update(tab, css);
+        const { styles } = this.getStylesForPage(tab.url);
+        this.updateBrowserAction(tab, styles);
+
+        const css = this.addImportantToCss(this.styles[url].css);
 
         chrome.tabs.sendRequest(tab.id, {
-          name: 'updateCssAndUrl',
-          css,
+          name: 'enableStyle',
           url,
+          css,
         });
       }
     });
   }
 
-  disable(url: string) {
+  disable(url: string): void {
     if (!this.styles[url]) {
       return;
     }
@@ -86,12 +87,11 @@ class BackgroundPageStyles {
 
     chrome.tabs.getSelected(tab => {
       if (tab && tab.url && tab.id) {
-        const { css, url } = this.getMergedCssAndUrlForPage(tab.url, false);
-        BrowserAction.update(tab, css);
+        const { styles } = this.getStylesForPage(tab.url);
+        this.updateBrowserAction(tab, styles);
 
         chrome.tabs.sendRequest(tab.id, {
-          name: 'updateCssAndUrl',
-          css,
+          name: 'disableStyle',
           url,
         });
       }
@@ -120,89 +120,75 @@ class BackgroundPageStyles {
   }
 
   getStylesForPage(
-    pageUrl: string
-  ): Array<{ url: string; css: string; enabled: boolean }> {
+    pageUrl: string,
+    important = false
+  ): {
+    styles: Array<{ url: string; css: string; enabled: boolean }>;
+    defaultStyle?: {
+      url: string;
+      css: string;
+      enabled: boolean;
+    };
+  } {
     if (!pageUrl) {
-      return [];
+      return { styles: [] };
     }
 
     if (!BackgroundPageUtils.isValidHTML(pageUrl)) {
-      return [];
+      return { styles: [] };
     }
 
     const styles = [];
+
+    let defaultStyle:
+      | {
+          url: string;
+          css: string;
+          enabled: boolean;
+        }
+      | undefined;
+
     for (const url in this.styles) {
       const matches = BackgroundPageUtils.matchesPattern(pageUrl, url);
 
       if (matches && this.styles[url]) {
-        styles.push({
-          url,
-          css: this.styles[url].css,
-          enabled: this.styles[url].enabled,
-        });
-      }
-    }
+        const css = important
+          ? this.addImportantToCss(this.styles[url].css)
+          : this.styles[url].css;
 
-    return styles;
-  }
+        const enabled = this.styles[url].enabled;
+        const style = { url, css, enabled };
 
-  /**
-   * Get merged css and url from given set of styles
-   *
-   * Currently, in case multiple styles exist are enabled for the page,
-   * we merge the css and return the longest url.
-   *
-   * This has the implicit side effect that the css for the longest url
-   * gets implicitly updated to include the css from other urls.
-   *
-   * todo: improve this behavior to remove the side effect
-   */
-  getMergedCssAndUrlForPage(
-    pageUrl: string,
-    important: boolean
-  ): { url: string; css: string } {
-    const styles = this.getStylesForPage(pageUrl);
-
-    if (!styles) {
-      return { css: '', url: '' };
-    }
-
-    let css = '';
-    let url = '';
-
-    styles.forEach(styleDef => {
-      if (styleDef.enabled) {
-        if (styleDef.url > url) {
-          url = styleDef.url;
+        if (!defaultStyle || url.length > defaultStyle.url.length) {
+          defaultStyle = style;
         }
 
-        css = this.getMergedCss(styleDef.css, css, important);
+        styles.push(style);
       }
-    });
-
-    return { url, css };
-  }
-
-  getMergedCssAndUrlForIframe(
-    iframeUrl: string,
-    important: boolean
-  ): { url: string; css: string } {
-    return this.getMergedCssAndUrlForPage(iframeUrl, important);
-  }
-
-  getMergedCss(src: string, dest: string, important: boolean): string {
-    const root1 = postcss.parse(src);
-    const root2 = postcss.parse(dest);
-
-    root1.append(root2);
-
-    if (important) {
-      root1.walkDecls(decl => {
-        decl.important = true;
-      });
     }
 
-    return root1.toString();
+    return { styles, defaultStyle };
+  }
+
+  addImportantToCss(css: string): string {
+    const root = postcss.parse(css);
+
+    root.walkDecls(decl => {
+      decl.important = true;
+    });
+
+    return root.toString();
+  }
+
+  updateBrowserAction(
+    tab: chrome.tabs.Tab,
+    styles: Array<{ url: string; enabled: boolean; css: string }>
+  ): void {
+    if (!!styles.find(style => style.enabled)) {
+      BrowserAction.highlight(tab);
+    } else {
+      BrowserAction.unhighlight(tab);
+    }
   }
 }
 
