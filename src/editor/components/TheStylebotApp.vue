@@ -1,8 +1,9 @@
 <template>
   <div>
     <the-stylebot v-if="visible" />
+
     <the-chrome-listener />
-    <install-keyboard-shortcuts />
+    <the-keyboard-shortcuts />
   </div>
 </template>
 
@@ -11,7 +12,7 @@ import Vue from 'vue';
 
 import TheStylebot from './TheStylebot.vue';
 import TheChromeListener from './TheChromeListener.vue';
-import InstallKeyboardShortcuts from './shortcuts/InstallKeyboardShortcuts.vue';
+import TheKeyboardShortcuts from './shortcuts/TheKeyboardShortcuts.vue';
 
 export default Vue.extend({
   name: 'App',
@@ -19,7 +20,7 @@ export default Vue.extend({
   components: {
     TheStylebot,
     TheChromeListener,
-    InstallKeyboardShortcuts,
+    TheKeyboardShortcuts,
   },
 
   computed: {

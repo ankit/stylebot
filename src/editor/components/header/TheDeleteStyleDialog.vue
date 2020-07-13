@@ -1,22 +1,20 @@
 <template>
-  <div class="delete-css-dialog">
-    <div class="delete-css-dialog-content pb-3">
+  <div class="stylebot-delete-style-dialog">
+    <div class="delete-style-dialog-content p-4">
       <h1 class="title">Delete style for {{ url }}</h1>
 
-      <div class="description text-muted mt-2 mb-4">
+      <div class="description text-muted pt-2 pb-4">
         This will permanently delete your css for {{ url }}. You cannot undo
         this.
       </div>
 
-      <b-row class="justify-content-end mr-2">
-        <b-col cols="2" class="mr-2">
-          <b-btn variant="outline-secondary" @click="$emit('close')">Cancel</b-btn>
-        </b-col>
+      <div class="delete-style-dialog-footer">
+        <b-btn variant="outline-secondary" class="mr-2" @click="$emit('close')">
+          Cancel
+        </b-btn>
 
-        <b-col cols="2">
-          <b-btn variant="outline-danger" @click="deleteStyle">Delete</b-btn>
-        </b-col>
-      </b-row>
+        <b-btn variant="outline-danger" @click="deleteStyle">Delete</b-btn>
+      </div>
     </div>
   </div>
 </template>
@@ -43,11 +41,11 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-.delete-css-dialog {
+.stylebot-delete-style-dialog {
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 1050;
+  z-index: 1000000000;
   display: block;
   width: 100%;
   height: 100%;
@@ -56,17 +54,24 @@ export default Vue.extend({
   background: #000000b3;
 }
 
-.delete-css-dialog-content {
+.delete-style-dialog-content {
   position: relative;
   display: flex;
   flex-direction: column;
-  width: 100%;
   pointer-events: auto;
   background-color: #fff;
   outline: 0;
-  width: 540px;
-  margin: 300px auto;
-  padding: 30px;
+  width: 50%;
+  max-width: 600px;
+  margin: 200px auto;
+}
+
+.delete-style-dialog-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0.75rem;
 }
 
 .title {

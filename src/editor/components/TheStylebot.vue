@@ -9,6 +9,8 @@
     </div>
 
     <the-footer />
+
+    <the-help-dialog v-if="help" />
   </b-container>
 </template>
 
@@ -22,6 +24,8 @@ import TheBasicEditor from './TheBasicEditor.vue';
 import TheMagicEditor from './TheMagicEditor.vue';
 import TheCodeEditor from './TheCodeEditor.vue';
 
+import TheHelpDialog from './shortcuts/TheHelpDialog.vue';
+
 import { StylebotPlacement, StylebotEditingMode } from '../../types';
 
 export default Vue.extend({
@@ -33,6 +37,7 @@ export default Vue.extend({
     TheBasicEditor,
     TheMagicEditor,
     TheCodeEditor,
+    TheHelpDialog,
   },
 
   computed: {
@@ -42,6 +47,10 @@ export default Vue.extend({
 
     position(): StylebotPlacement {
       return this.$store.state.position;
+    },
+
+    help(): boolean {
+      return this.$store.state.help;
     },
   },
 });

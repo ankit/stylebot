@@ -18,6 +18,7 @@ const mockState: State = {
   visible: false,
   position: 'right',
   inspecting: false,
+  help: false,
 };
 
 export default mockState;

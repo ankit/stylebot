@@ -17,6 +17,10 @@
           View options...
         </b-dropdown-item-button>
 
+        <b-dropdown-item-button @click="showHelp">
+          View keyboard shortcuts...
+        </b-dropdown-item-button>
+
         <template #button-content>
           <b-icon v-if="!isHovered" icon="gear" />
           <b-icon v-if="isHovered" icon="gear-fill" />
@@ -59,6 +63,10 @@ export default Vue.extend({
   methods: {
     viewOptions(): void {
       openOptionsPage();
+    },
+
+    showHelp(): void {
+      this.$store.commit('setHelp', true);
     },
   },
 });

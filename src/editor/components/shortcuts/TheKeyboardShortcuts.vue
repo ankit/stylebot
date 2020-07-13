@@ -1,7 +1,5 @@
 <template>
-  <div v-if="help">
-    HELLPPPP!!!
-  </div>
+  <div />
 </template>
 
 <script lang="ts">
@@ -16,15 +14,12 @@ import {
 import { Declaration, Rule } from 'postcss';
 
 export default Vue.extend({
-  name: 'InstallKeyboardShortcuts',
-
-  data(): { help: boolean } {
-    return {
-      help: false,
-    };
-  },
+  name: 'TheKeyboardShortcuts',
 
   computed: {
+    url(): string {
+      return this.$store.state.url;
+    },
     visible(): boolean {
       return this.$store.state.visible;
     },
@@ -45,6 +40,9 @@ export default Vue.extend({
     },
     activeRule(): Rule {
       return this.$store.getters.activeRule;
+    },
+    help(): boolean {
+      return this.$store.state.help;
     },
   },
 
@@ -74,7 +72,7 @@ export default Vue.extend({
       window.removeEventListener('keydown', this.handleGlobalShortcut);
     },
     handleGlobalShortcut(event: KeyboardEvent): void {
-      // open / close stylebot
+      // open / close stylebot - default is Alt+m. customizable by user.
       if (event.keyCode === this.shortcutKey) {
         if (
           (this.shortcutMetaKey === 'ctrl' && event.ctrlKey) ||
@@ -112,6 +110,9 @@ export default Vue.extend({
 
       // i - Toggle inspect
       if (event.keyCode === 73) {
+        event.preventDefault();
+        event.stopPropagation();
+
         if (this.mode === 'basic') {
           this.$store.commit('setInspecting', !this.inspecting);
         }
@@ -119,6 +120,9 @@ export default Vue.extend({
 
       // p - Toggle editor position
       if (event.keyCode === 80) {
+        event.preventDefault();
+        event.stopPropagation();
+
         this.$store.commit(
           'setPosition',
           this.position === 'left' ? 'right' : 'left'
@@ -128,6 +132,9 @@ export default Vue.extend({
       // h - Toggle visibility css of selected element(s)
       if (event.keyCode === 72) {
         if (this.activeRule) {
+          event.preventDefault();
+          event.stopPropagation();
+
           let value = '';
 
           this.activeRule.clone().walkDecls('display', (decl: Declaration) => {
@@ -143,26 +150,44 @@ export default Vue.extend({
 
       // b - switch to basic editor
       if (event.keyCode === 66) {
+        event.preventDefault();
+        event.stopPropagation();
+
         this.$store.dispatch('setMode', 'basic');
       }
+
       // c - switch to code editor
       if (event.keyCode === 67) {
+        event.preventDefault();
+        event.stopPropagation();
+
         this.$store.dispatch('setMode', 'code');
       }
+
       // m - switch to magic editor
       if (event.keyCode === 77) {
+        event.preventDefault();
+        event.stopPropagation();
+
         this.$store.dispatch('setMode', 'magic');
       }
 
       // ? - show shortcut help
       if (event.keyCode === 191 && event.shiftKey) {
-        this.help = true;
+        event.preventDefault();
+        event.stopPropagation();
+
+        this.$store.commit('setInspecting', false);
+        this.$store.commit('setHelp', true);
       }
 
       // esc - if help is visible, close help. else, close stylebot
       if (event.keyCode === 27) {
+        event.preventDefault();
+        event.stopPropagation();
+
         if (this.help) {
-          this.help = false;
+          this.$store.commit('setHelp', false);
           return;
         }
 

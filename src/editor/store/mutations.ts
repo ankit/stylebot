@@ -4,39 +4,39 @@ import { State, CssSelectorMetadata } from './';
 import { StylebotPlacement, StylebotOptions } from '../../types';
 
 export default {
-  showStylebot(state: State) {
+  showStylebot(state: State): void {
     state.visible = true;
   },
 
-  hideStylebot(state: State) {
+  hideStylebot(state: State): void {
     state.visible = false;
   },
 
-  setPosition(state: State, position: StylebotPlacement) {
+  setPosition(state: State, position: StylebotPlacement): void {
     state.position = position;
   },
 
-  setOptions(state: State, options: StylebotOptions) {
+  setOptions(state: State, options: StylebotOptions): void {
     state.options = options;
   },
 
-  setUrl(state: State, url: string) {
+  setUrl(state: State, url: string): void {
     state.url = url;
   },
 
-  setCss(state: State, css: string) {
+  setCss(state: State, css: string): void {
     state.css = css;
   },
 
-  setActiveSelector(state: State, selector: string) {
+  setActiveSelector(state: State, selector: string): void {
     state.activeSelector = selector;
   },
 
-  setInspecting(state: State, inspecting: boolean) {
+  setInspecting(state: State, inspecting: boolean): void {
     state.inspecting = inspecting;
   },
 
-  setSelectors(state: State, root: postcss.Root) {
+  setSelectors(state: State, root: postcss.Root): void {
     const selectors: Array<CssSelectorMetadata> = [];
 
     root.walkRules(rule => {
@@ -60,5 +60,9 @@ export default {
     });
 
     state.selectors = selectors;
+  },
+
+  setHelp(state: State, help: boolean): void {
+    state.help = help;
   },
 };

@@ -25,6 +25,7 @@ export type State = {
   options: StylebotOptions;
   position: StylebotPlacement;
   inspecting: boolean;
+  help: boolean;
 };
 
 export default new Vuex.Store<State>({
@@ -46,6 +47,7 @@ export default new Vuex.Store<State>({
     visible: false,
     position: 'right',
     inspecting: false,
+    help: false,
   },
 
   getters: {
