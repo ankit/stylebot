@@ -25,10 +25,12 @@ export default Vue.extend({
   },
 
   watch: {
-    css(): void {
+    css(value: string): void {
       const iframe = this.$el.querySelector('iframe');
 
-      if (iframe?.contentWindow) {
+      // only handle the case where the css is deleted by the user
+      // from outside of the code editor. else, this will get invoked on every edit.
+      if (value === '' && iframe?.contentWindow) {
         this.updateCssInMonacoEditor(iframe?.contentWindow);
       }
     },
