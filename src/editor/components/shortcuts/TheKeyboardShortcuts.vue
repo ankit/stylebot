@@ -199,7 +199,7 @@ export default Vue.extend({
           return;
         }
 
-        this.$store.commit('closeStylebot');
+        this.$store.dispatch('closeStylebot');
       }
     },
   },
