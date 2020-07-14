@@ -36,6 +36,10 @@ Vue.use(TableSimplePlugin);
 
 const stylebotAppHost = document.createElement('div');
 stylebotAppHost.id = 'stylebot';
+stylebotAppHost.setAttribute(
+  'style',
+  'top: 0; height: 100%; position: fixed; z-index: 100000000;'
+);
 document.body.appendChild(stylebotAppHost);
 
 const shadowRoot = stylebotAppHost.attachShadow({ mode: 'open' });

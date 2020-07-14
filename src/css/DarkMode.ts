@@ -126,16 +126,16 @@ const getElementCss = (el: HTMLElement, selector: string): string => {
   return css;
 };
 
-export const getCss = (): string => {
+export const getCssAfterApplyingDarkModeToPage = (): string => {
   const root = postcss.parse(getDefaultCss());
 
   const all = document.querySelectorAll('body, body *:not(#stylebot)');
-  const selectorGenerator = new CssSelectorGenerator();
+
   const evaluatedSelectors: Array<string> = [];
 
   all.forEach(el => {
     if (!el.closest('.stylebot')) {
-      const selector = selectorGenerator.inspect(el as HTMLElement);
+      const selector = CssSelectorGenerator.get(el as HTMLElement);
 
       try {
         if (evaluatedSelectors.indexOf(selector) === -1) {

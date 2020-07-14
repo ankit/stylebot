@@ -56,7 +56,7 @@ export default Vue.extend({
 });
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .stylebot {
   top: 0;
   color: #000;

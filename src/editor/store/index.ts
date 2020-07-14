@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import * as postcss from 'postcss';
 
+import getters from './getters';
 import actions from './actions';
 import mutations from './mutations';
 
@@ -52,20 +52,7 @@ export default new Vuex.Store<State>({
     help: false,
   },
 
-  getters: {
-    activeRule: state => {
-      if (!state.activeSelector) {
-        return null;
-      }
-
-      const root = postcss.parse(state.css);
-      const matchingRules: Array<postcss.Rule> = [];
-
-      root.walkRules(state.activeSelector, rule => matchingRules.push(rule));
-      return matchingRules.length > 0 ? matchingRules[0] : null;
-    },
-  },
-
+  getters,
   actions,
   mutations,
 });

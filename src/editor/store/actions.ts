@@ -11,7 +11,11 @@ import {
   enableStyle,
 } from '../utils/chrome';
 
-import { getCss as getDarkModeCss } from '../../css/DarkMode';
+import { getCssAfterApplyingDarkModeToPage } from '../../css/DarkMode';
+import {
+  EffectName,
+  getCssAfterApplyingFilterEffectToPage,
+} from '../../css/Filters';
 
 import { State } from './';
 import { StylebotEditingMode } from '../../types';
@@ -120,6 +124,31 @@ export default {
     dispatch: Dispatch;
   }): void {
     CssUtils.removeCSSFromDocument(state.url);
-    dispatch('applyCss', { css: getDarkModeCss() });
+    dispatch('applyCss', { css: getCssAfterApplyingDarkModeToPage() });
+  },
+
+  applyFilter(
+    {
+      state,
+      dispatch,
+    }: {
+      state: State;
+      dispatch: Dispatch;
+    },
+    {
+      effectName,
+      percent,
+    }: {
+      effectName: EffectName;
+      percent: number;
+    }
+  ): void {
+    dispatch('applyCss', {
+      css: getCssAfterApplyingFilterEffectToPage(
+        effectName,
+        state.css,
+        percent
+      ),
+    });
   },
 };

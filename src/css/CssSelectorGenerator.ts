@@ -2,7 +2,7 @@
  * Generate CSS selector for HTML element.
  */
 class CssSelectorGenerator {
-  inspect = (el: HTMLElement, domHeirarchyLevel = 0): string => {
+  static getClassBasedSelector(el: HTMLElement): string | null {
     const className = el
       .getAttribute('class')
       ?.trim()
@@ -21,22 +21,50 @@ class CssSelectorGenerator {
       return selector;
     }
 
+    return null;
+  }
+
+  static getIdBasedSelector(el: HTMLElement): string | null {
     const id = el.getAttribute('id');
     if (id) {
       return `#${id}`;
     }
 
+    return null;
+  }
+
+  static getTagNameBasedSelector(
+    el: HTMLElement,
+    domHeirarchyLevel = 0
+  ): string {
     const tagName = el.tagName.toLowerCase();
 
     // don't go beyond 2 levels up the DOM
     if (domHeirarchyLevel < 2 && el.parentElement) {
       const parent = el.parentElement;
-      const parentSelector = this.inspect(parent, domHeirarchyLevel + 1);
+      const parentSelector = CssSelectorGenerator.getTagNameBasedSelector(
+        parent,
+        domHeirarchyLevel + 1
+      );
 
       return `${parentSelector} ${tagName}`;
-    } else {
-      return tagName;
     }
+
+    return tagName;
+  }
+
+  static get = (el: HTMLElement): string => {
+    let selector = CssSelectorGenerator.getClassBasedSelector(el);
+
+    if (!selector) {
+      selector = CssSelectorGenerator.getIdBasedSelector(el);
+    }
+
+    if (!selector) {
+      return CssSelectorGenerator.getTagNameBasedSelector(el);
+    }
+
+    return selector;
   };
 }
 

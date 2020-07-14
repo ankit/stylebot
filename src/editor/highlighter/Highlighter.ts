@@ -4,12 +4,10 @@ import CssSelectorGenerator from '../../css/CssSelectorGenerator';
 class Highlighter {
   overlay: Overlay | null;
   onSelect: (selector: string) => void;
-  cssSelectorGenerator: CssSelectorGenerator;
 
   constructor({ onSelect }: { onSelect: (selector: string) => void }) {
     this.overlay = null;
     this.onSelect = onSelect;
-    this.cssSelectorGenerator = new CssSelectorGenerator();
   }
 
   startInspecting = (): void => {
@@ -71,10 +69,7 @@ class Highlighter {
       event.preventDefault();
       event.stopPropagation();
 
-      const selector = this.cssSelectorGenerator.inspect(
-        event.target as HTMLElement
-      );
-
+      const selector = CssSelectorGenerator.get(event.target as HTMLElement);
       this.onSelect(selector);
     }
   };
@@ -117,7 +112,7 @@ class Highlighter {
       this.overlay = new Overlay();
     }
 
-    this.overlay.inspect([el], this.cssSelectorGenerator.inspect(el));
+    this.overlay.inspect([el], CssSelectorGenerator.get(el));
   };
 
   hideOverlay = (): void => {

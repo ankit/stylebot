@@ -1,8 +1,8 @@
 <template>
   <div class="px-3 py-3">
     <p class="lead text-muted">
-      Experimental features. You may need to manually edit elements on the page
-      that don't get correctly styled.
+      Experimental features. You may need to run on multiple pages on a site and
+      manually edit elements that don't get correctly styled.
     </p>
 
     <div class="mt-5">
