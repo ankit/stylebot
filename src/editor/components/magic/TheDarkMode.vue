@@ -1,14 +1,7 @@
 <template>
   <div>
-    <h1>Dark Mode</h1>
-
-    <p class="lead">
-      Apply a dark theme to the page.
-    </p>
-
-    <b-button size="sm" variant="outline-secondary" @click="apply">
-      Apply
-    </b-button>
+    <b-form-checkbox v-model="value" switch>Enable Dark Mode</b-form-checkbox>
+    <p class="lead pt-2">Apply a dark theme.</p>
   </div>
 </template>
 
@@ -18,9 +11,19 @@ import Vue from 'vue';
 export default Vue.extend({
   name: 'DarkMode',
 
-  methods: {
-    apply(): void {
-      this.$store.dispatch('applyDarkMode');
+  computed: {
+    url(): string {
+      return this.$store.state.url;
+    },
+
+    value: {
+      get(): boolean {
+        return this.$store.state.darkMode;
+      },
+
+      set(value: boolean): void {
+        this.$store.dispatch('applyDarkMode', value);
+      },
     },
   },
 });

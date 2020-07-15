@@ -75,25 +75,6 @@ const CSSUtils = {
   },
 
   /**
-   * Parse filter CSS property value to return individual values
-   * https://developer.mozilla.org/en-US/docs/Web/CSS/filter
-   */
-  parseCssFilterDeclarationValue(value: string): { [name: string]: string } {
-    const effects = value.split(' ');
-    const regex = new RegExp(/([^()]+)\((.*)\)$/);
-
-    const output: { [name: string]: string } = {};
-    effects.forEach(effect => {
-      const matches = effect.match(regex);
-      if (matches) {
-        output[matches[1]] = matches[2];
-      }
-    });
-
-    return output;
-  },
-
-  /**
    * If font exists in https://developers.google.com/fonts, add relevant @import to the css.
    * Guards against duplicate @import and invalid fonts.
    */

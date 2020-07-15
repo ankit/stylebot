@@ -15,6 +15,8 @@ export type Style = {
   url: string;
   css: string;
   enabled: boolean;
+  readability: boolean;
+  darkMode: boolean;
 };
 
 export type { default as BackgroundPageRequest } from './BackgroundPageRequest';

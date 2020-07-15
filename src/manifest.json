@@ -46,5 +46,9 @@
   },
 
   "permissions": ["tabs", "contextMenus", "storage", "unlimitedStorage"],
-  "web_accessible_resources": ["editor/index.css", "monaco-editor/*"]
+  "web_accessible_resources": [
+    "editor/index.css",
+    "readability/index.css",
+    "monaco-editor/*"
+  ]
 }

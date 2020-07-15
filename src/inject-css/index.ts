@@ -10,6 +10,7 @@ import {
 } from '../types/BackgroundPageRequest';
 
 import { GetStylesForPageResponse } from '../types/BackgroundPageResponse';
+import { apply as applyReadability } from '../readability/index';
 
 const MAX_INJECT_COUNT = 10;
 const INJECT_CSS_TIMEOUT = 300;
@@ -28,6 +29,12 @@ const injectCss = (
         styles.forEach(style => {
           if (style.enabled) {
             CssUtils.injectCSSIntoDocument(style.css, style.url);
+          }
+
+          if (style.readability) {
+            document.addEventListener('DOMContentLoaded', () => {
+              applyReadability();
+            });
           }
         });
       } else if (injectCount < MAX_INJECT_COUNT) {

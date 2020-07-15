@@ -6,6 +6,8 @@ import {
   EnableStyleRequest,
   DisableStyleRequest,
   GetStylesForPageRequest,
+  SetReadabilityRequest,
+  SetDarkModeRequest,
 } from '../../types/BackgroundPageRequest';
 
 import {
@@ -90,6 +92,26 @@ export const enableStyle = (url: string): void => {
 export const disableStyle = (url: string): void => {
   const request: DisableStyleRequest = {
     name: 'disableStyle',
+    url,
+  };
+
+  chrome.extension.sendRequest(request);
+};
+
+export const setDarkMode = (url: string, value: boolean): void => {
+  const request: SetDarkModeRequest = {
+    name: 'setDarkMode',
+    value,
+    url,
+  };
+
+  chrome.extension.sendRequest(request);
+};
+
+export const setReadability = (url: string, value: boolean): void => {
+  const request: SetReadabilityRequest = {
+    name: 'setReadability',
+    value,
     url,
   };
 

@@ -1,24 +1,20 @@
 <template>
   <div class="px-3 py-3">
     <p class="lead text-muted">
-      Experimental features. You may need to run on multiple pages on a site and
-      manually edit elements that don't get correctly styled.
+      Experimental features. May not work as expected on some pages.
     </p>
-
-    <div class="mt-5">
-      <the-dark-mode />
-    </div>
-
-    <div class="mt-5">
-      <the-grayscale />
-    </div>
 
     <div class="mt-5">
       <the-readability />
     </div>
 
     <div class="mt-5">
-      <the-typography />
+      <the-dark-mode />
+    </div>
+
+    <div class="mt-5">
+      <h1 class="magic-title">Grayscale</h1>
+      <the-grayscale />
     </div>
   </div>
 </template>
@@ -28,7 +24,6 @@ import Vue from 'vue';
 
 import TheDarkMode from './magic/TheDarkMode.vue';
 import TheGrayscale from './magic/TheGrayscale.vue';
-import TheTypography from './magic/TheTypography.vue';
 import TheReadability from './magic/TheReadability.vue';
 
 export default Vue.extend({
@@ -37,8 +32,14 @@ export default Vue.extend({
   components: {
     TheDarkMode,
     TheGrayscale,
-    TheTypography,
     TheReadability,
   },
 });
 </script>
+
+<style lang="scss" scoped>
+.magic-title {
+  font-size: 18px;
+  font-weight: 400;
+}
+</style>

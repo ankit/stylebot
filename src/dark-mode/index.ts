@@ -2,7 +2,7 @@ import * as dedent from 'dedent';
 import * as postcss from 'postcss';
 import * as tinycolor from 'tinycolor2';
 
-import CssSelectorGenerator from './CssSelectorGenerator';
+import CssSelectorGenerator from '../css/CssSelectorGenerator';
 
 const Theme = {
   color: tinycolor('#e8e6e3'),
@@ -126,7 +126,7 @@ const getElementCss = (el: HTMLElement, selector: string): string => {
   return css;
 };
 
-export const getCssAfterApplyingDarkModeToPage = (): string => {
+export const apply = (): string => {
   const root = postcss.parse(getDefaultCss());
 
   const all = document.querySelectorAll('body, body *:not(#stylebot)');
@@ -154,3 +154,5 @@ export const getCssAfterApplyingDarkModeToPage = (): string => {
 
   return root.toString();
 };
+
+export const remove = () => {};

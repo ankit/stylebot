@@ -38,10 +38,12 @@ export default {
 
   setSelectors(state: State, root: postcss.Root): void {
     const selectors: Array<CssSelectorMetadata> = [];
+    let index = 1;
 
     root.walkRules(rule => {
       try {
         selectors.push({
+          id: index++,
           value: rule.selector,
           count: document.querySelectorAll(rule.selector).length,
         });
@@ -62,7 +64,15 @@ export default {
     state.selectors = selectors;
   },
 
-  setHelp(state: State, help: boolean): void {
-    state.help = help;
+  setHelp(state: State, value: boolean): void {
+    state.help = value;
+  },
+
+  setDarkMode(state: State, value: boolean): void {
+    state.darkMode = value;
+  },
+
+  setReadability(state: State, value: boolean): void {
+    state.readability = value;
   },
 };

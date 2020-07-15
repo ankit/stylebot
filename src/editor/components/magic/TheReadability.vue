@@ -1,24 +1,10 @@
 <template>
   <div>
-    <h1>Improve Readability</h1>
+    <b-form-checkbox v-model="value" switch>Enable Readability</b-form-checkbox>
 
-    <p class="lead">
-      Hide distracting elements and make the page more readable.
+    <p class="lead pt-2">
+      Make articles readable by hiding everything but the article content.
     </p>
-
-    <b-row align-content="center" no-gutters>
-      <b-button size="sm" variant="outline-secondary" class="mr-2">
-        Minimalism
-      </b-button>
-
-      <b-button size="sm" variant="outline-secondary" class="mr-2">
-        Night Owl
-      </b-button>
-
-      <b-button size="sm" variant="outline-secondary" class="mr-2">
-        Golden Glow
-      </b-button>
-    </b-row>
   </div>
 </template>
 
@@ -27,5 +13,17 @@ import Vue from 'vue';
 
 export default Vue.extend({
   name: 'Readability',
+
+  computed: {
+    value: {
+      get(): boolean {
+        return this.$store.state.readability;
+      },
+
+      set(value: boolean): void {
+        this.$store.dispatch('applyReadability', value);
+      },
+    },
+  },
 });
 </script>

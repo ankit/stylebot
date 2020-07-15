@@ -44,7 +44,9 @@ const init = (styles: BackgroundPageStyles, options: StylebotOptions): void => {
         request.name === 'getStylesForPage' ||
         request.name === 'getStylesForIframe' ||
         request.name === 'enableStyle' ||
-        request.name === 'disableStyle'
+        request.name === 'disableStyle' ||
+        request.name === 'setDarkMode' ||
+        request.name === 'setReadability'
       ) {
         styleRequest(request, styles, sender, sendResponse);
         return;

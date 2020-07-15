@@ -5,6 +5,8 @@ import BrowserAction from './browseraction';
 type Style = {
   css: string;
   enabled: boolean;
+  readability: boolean;
+  darkMode: boolean;
 };
 
 type Styles = {
@@ -41,6 +43,8 @@ class BackgroundPageStyles {
       this.styles[url] = {
         css,
         enabled: true,
+        readability: false,
+        darkMode: false,
       };
     }
 
@@ -98,6 +102,33 @@ class BackgroundPageStyles {
     });
   }
 
+  setReadability(url: string, value: boolean): void {
+    if (this.styles[url]) {
+      this.styles[url].readability = value;
+    } else {
+      this.styles[url] = {
+        readability: value,
+        darkMode: false,
+        enabled: true,
+        css: '',
+      };
+    }
+
+    chrome.storage.local.set({
+      styles: this.styles,
+    });
+  }
+
+  setDarkMode(url: string, value: boolean): void {
+    if (this.styles[url]) {
+      this.styles[url].darkMode = value;
+    }
+
+    chrome.storage.local.set({
+      styles: this.styles,
+    });
+  }
+
   import(styles: Styles): void {
     for (const url in styles) {
       this.styles[url] = styles[url];
@@ -123,12 +154,8 @@ class BackgroundPageStyles {
     pageUrl: string,
     important = false
   ): {
-    styles: Array<{ url: string; css: string; enabled: boolean }>;
-    defaultStyle?: {
-      url: string;
-      css: string;
-      enabled: boolean;
-    };
+    styles: Array<Style & { url: string }>;
+    defaultStyle?: Style & { url: string };
   } {
     if (!pageUrl) {
       return { styles: [] };
@@ -140,13 +167,7 @@ class BackgroundPageStyles {
 
     const styles = [];
 
-    let defaultStyle:
-      | {
-          url: string;
-          css: string;
-          enabled: boolean;
-        }
-      | undefined;
+    let defaultStyle: (Style & { url: string }) | undefined;
 
     for (const url in this.styles) {
       const matches = BackgroundPageUtils.matchesPattern(pageUrl, url);
@@ -156,8 +177,8 @@ class BackgroundPageStyles {
           ? this.addImportantToCss(this.styles[url].css)
           : this.styles[url].css;
 
-        const enabled = this.styles[url].enabled;
-        const style = { url, css, enabled };
+        const { enabled, readability, darkMode } = this.styles[url];
+        const style = { url, css, enabled, readability, darkMode };
 
         if (!defaultStyle || url.length > defaultStyle.url.length) {
           defaultStyle = style;

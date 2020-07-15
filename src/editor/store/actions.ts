@@ -9,9 +9,20 @@ import {
   setStyle,
   getStylesForPage,
   enableStyle,
+  setDarkMode,
+  setReadability,
 } from '../utils/chrome';
 
-import { getCssAfterApplyingDarkModeToPage } from '../../css/DarkMode';
+import {
+  apply as applyDarkMode,
+  remove as removeDarkMode,
+} from '../../dark-mode/index';
+
+import {
+  apply as applyReadability,
+  remove as removeReadability,
+} from '../../readability/index';
+
 import {
   EffectName,
   getCssAfterApplyingFilterEffectToPage,
@@ -26,11 +37,13 @@ export default {
     const { defaultStyle } = await getStylesForPage(false);
 
     if (defaultStyle) {
-      const { url, enabled, css } = defaultStyle;
+      const { url, enabled, css, readability, darkMode } = defaultStyle;
 
       commit('setUrl', url);
       commit('setCss', css);
       commit('setEnabled', enabled);
+      commit('setReadability', readability);
+      commit('setDarkMode', darkMode);
 
       const root = postcss.parse(defaultStyle.css);
       commit('setSelectors', root);
@@ -116,15 +129,32 @@ export default {
     }
   },
 
-  applyDarkMode({
-    state,
-    dispatch,
-  }: {
-    state: State;
-    dispatch: Dispatch;
-  }): void {
-    CssUtils.removeCSSFromDocument(state.url);
-    dispatch('applyCss', { css: getCssAfterApplyingDarkModeToPage() });
+  applyDarkMode(
+    { state, commit }: { state: State; commit: Commit },
+    value: boolean
+  ): void {
+    if (value) {
+      applyDarkMode();
+    } else {
+      removeDarkMode();
+    }
+
+    commit('setDarkMode', value);
+    setDarkMode(state.url, value);
+  },
+
+  applyReadability(
+    { state, commit }: { state: State; commit: Commit },
+    value: boolean
+  ): void {
+    if (value) {
+      applyReadability();
+    } else {
+      removeReadability();
+    }
+
+    commit('setReadability', value);
+    setReadability(state.url, value);
   },
 
   applyFilter(

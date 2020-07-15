@@ -117,6 +117,10 @@ const config = {
           to: "monaco-editor/iframe/requirejs",
         },
         {
+          from: "readability/index.css",
+          to: "readability/index.css",
+        },
+        {
           from: "manifest.json",
           to: "manifest.json",
 

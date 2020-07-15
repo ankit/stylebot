@@ -13,10 +13,10 @@
             @show="stopInspecting"
           >
             <the-css-selector-dropdown-item
-              v-for="selectorMetadata in selectors"
-              :key="selectorMetadata.value"
-              :count="selectorMetadata.count"
-              :selector="selectorMetadata.value"
+              v-for="s in selectors"
+              :key="s.id"
+              :count="s.count"
+              :selector="s.value"
             />
           </b-dropdown>
         </dropdown-hack-to-support-shadow-dom>

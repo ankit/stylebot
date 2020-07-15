@@ -7,6 +7,8 @@ export type GetAllStylesResponse = {
   [url: string]: {
     css: string;
     enabled: boolean;
+    readability: boolean;
+    darkMode: boolean;
   };
 };
 

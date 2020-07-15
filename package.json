@@ -95,6 +95,7 @@
     "tinycolor2": "^1.4.1",
     "vue": "^2.6.11",
     "vue-color": "ankit/vue-color#2.7.1-release-with-css",
-    "vuex": "^3.5.1"
+    "vuex": "^3.5.1",
+    "readability": "mozilla/readability#master"
   }
 }

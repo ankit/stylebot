@@ -7,6 +7,8 @@ import {
   GetAllStylesRequest,
   SetAllStylesRequest,
   GetStylesForIframeRequest,
+  SetReadabilityRequest,
+  SetDarkModeRequest,
 } from '../../types/BackgroundPageRequest';
 
 import {
@@ -24,7 +26,9 @@ type Request =
   | GetStylesForPageRequest
   | GetStylesForIframeRequest
   | EnableStyleRequest
-  | DisableStyleRequest;
+  | DisableStyleRequest
+  | SetReadabilityRequest
+  | SetDarkModeRequest;
 
 type Response = GetAllStylesResponse | GetStylesForPageResponse;
 
@@ -46,6 +50,10 @@ export default (
     styles.setAll(request.styles);
   } else if (request.name === 'moveStyles') {
     styles.move(request.sourceUrl, request.destinationUrl);
+  } else if (request.name === 'setReadability') {
+    styles.setReadability(request.url, request.value);
+  } else if (request.name === 'setDarkMode') {
+    styles.setDarkMode(request.url, request.value);
   } else if (request.name === 'getStylesForPage') {
     const tab = sender.tab || request.tab;
 
