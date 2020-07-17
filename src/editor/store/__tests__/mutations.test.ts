@@ -20,9 +20,9 @@ describe('mutations', () => {
       mutations.setSelectors(state, root);
 
       expect(state.selectors).toEqual([
-        { value: 'c', count: 3 },
-        { value: 'a', count: 2 },
-        { value: 'b', count: 1 },
+        { id: 3, value: 'c', count: 3 },
+        { id: 2, value: 'a', count: 2 },
+        { id: 1, value: 'b', count: 1 },
       ]);
     });
 
@@ -35,9 +35,9 @@ describe('mutations', () => {
       mutations.setSelectors(state, root);
 
       expect(state.selectors).toEqual([
-        { value: 'a', count: 0 },
-        { value: 'b', count: 0 },
-        { value: 'c', count: 0 },
+        { id: 2, value: 'a', count: 0 },
+        { id: 1, value: 'b', count: 0 },
+        { id: 3, value: 'c', count: 0 },
       ]);
     });
   });
