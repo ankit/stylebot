@@ -58,12 +58,16 @@ const init = (styles: BackgroundPageStyles, options: StylebotOptions): void => {
    * Listen when an existing tab is updated
    * and update the context-menu and browser-action
    */
-  chrome.tabs.onUpdated.addListener((_tabId, _changeInfo, tab) => {
+  chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     if (tab.status === 'complete') {
       if (options.contextMenu) {
         ContextMenu.update(tab);
       }
     }
+
+    chrome.tabs.sendRequest(tabId, {
+      name: 'tabUpdated',
+    });
   });
 
   /**

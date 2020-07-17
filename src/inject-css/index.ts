@@ -32,9 +32,7 @@ const injectCss = (
           }
 
           if (style.readability) {
-            document.addEventListener('DOMContentLoaded', () => {
-              applyReadability();
-            });
+            applyReadability();
           }
         });
       } else if (injectCount < MAX_INJECT_COUNT) {

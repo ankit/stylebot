@@ -148,7 +148,7 @@ export default {
     value: boolean
   ): void {
     if (value) {
-      applyReadability();
+      applyReadability(true);
     } else {
       removeReadability();
     }

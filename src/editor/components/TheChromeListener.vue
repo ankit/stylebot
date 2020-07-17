@@ -5,6 +5,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import CssUtils from '../../css/CssUtils';
+import { apply as applyReadability } from '../../readability/index';
 
 export default Vue.extend({
   name: 'TheChromeListener',
@@ -34,6 +35,10 @@ export default Vue.extend({
 
         if (request.url === this.$store.state.url) {
           this.$store.commit('setEnabled', false);
+        }
+      } else if (request.name === 'tabUpdated') {
+        if (this.$store.state.readability) {
+          applyReadability();
         }
       }
     });

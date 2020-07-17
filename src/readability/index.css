@@ -1,90 +1,255 @@
+/* Modified version of https://hg.mozilla.org/mozilla-central/file/tip/toolkit/themes/shared/aboutReader.css */
+
 :host {
   --body-padding: 64px;
-  --popup-border: rgba(0, 0, 0, 0.12);
-  --opaque-popup-border: #e0e0e0;
-  --popup-shadow: rgba(49, 49, 49, 0.3);
-  --grey-90-a10: rgba(12, 12, 13, 0.1);
-  --grey-90-a20: rgba(12, 12, 13, 0.2);
-  --grey-90-a30: rgba(12, 12, 13, 0.3);
-  --grey-90-a80: rgba(12, 12, 13, 0.8);
-  --grey-30: #d7d7db;
-  --blue-40: #45a1ff;
-  --blue-40-a30: rgba(69, 161, 255, 0.3);
-  --blue-60: #0060df;
-  --active-color: #0b83ff;
   --font-size: 12;
-  --content-width: 650px;
+  --content-width: 35em;
   --line-height: 1.6em;
 }
 
 .stylebot-reader {
-  background: #fff;
-  z-index: 100;
+  --main-background: #fff;
+  --main-foreground: #333;
+}
+
+.stylebot-reader {
   top: 0;
   left: 0;
+  z-index: 100;
+
+  color: var(--main-foreground);
+  background-color: var(--main-background);
+
   width: 100%;
   height: 100%;
   overflow: auto;
 }
 
-.stylebot-reader * {
-  margin: 0;
-  max-width: 100%;
-  height: auto;
-}
-
-.stylebot-reader .content {
+.stylebot-reader-body {
   margin: 0 auto;
+  padding: var(--body-padding);
+
   font-size: var(--font-size);
   max-width: var(--content-width);
   line-height: var(--line-height);
+
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
     'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji',
     'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
-.stylebot-reader .header > h1 {
+/* Header */
+
+.stylebot-reader-header > h1 {
   font-size: 1.6em;
   line-height: 1.25em;
   width: 100%;
-  margin: 30px 0;
+  margin-top: 30px;
+  margin-bottom: 10px;
   padding: 0;
 }
 
-.stylebot-reader a {
-  color: var(--blue-40);
+.stylebot-reader-domain {
+  font-size: 0.9em;
+  line-height: 1.48em;
+  padding-bottom: 4px;
+  text-decoration: none;
+  border-bottom: 1px solid #333;
+  color: #45a1ff;
 }
 
-.stylebot-reader p,
-.stylebot-reader p,
-.stylebot-reader code,
-.stylebot-reader pre,
-.stylebot-reader blockquote,
-.stylebot-reader ul,
-.stylebot-reader ol,
-.stylebot-reader li,
-.stylebot-reader figure {
+.stylebot-reader-byline {
+  font-size: 1rem;
+  font-weight: 300;
+  margin-bottom: 30px;
+}
+
+/* Article Content */
+
+/*======= Article content =======*/
+
+@media print {
+  .stylebot-reader-content p,
+  .stylebot-reader-content code,
+  .stylebot-reader-content pre,
+  .stylebot-reader-content blockquote,
+  .stylebot-reader-content ul,
+  .stylebot-reader-content ol,
+  .stylebot-reader-content li,
+  .stylebot-reader-content figure,
+  .stylebot-reader-content .wp-caption {
+    margin: 0 0 10px !important;
+    padding: 0 !important;
+  }
+}
+
+.stylebot-reader-content h1,
+.stylebot-reader-content h2,
+.stylebot-reader-content h3 {
+  font-weight: bold;
+}
+
+.stylebot-reader-content h1 {
+  font-size: 1.6em;
+  line-height: 1.25em;
+}
+
+.stylebot-reader-content h2 {
+  font-size: 1.2em;
+  line-height: 1.51em;
+}
+
+.stylebot-reader-content h3 {
+  font-size: 1em;
+  line-height: 1.66em;
+}
+
+.stylebot-reader-content a:link {
+  text-decoration: underline;
+  font-weight: normal;
+}
+
+.stylebot-reader-content a:link,
+.stylebot-reader-content a:link:hover,
+.stylebot-reader-content a:link:active {
+  color: #0095dd;
+}
+
+.stylebot-reader-content a:visited {
+  color: #c2e;
+}
+
+.stylebot-reader-content * {
+  max-width: 100%;
+  height: auto;
+}
+
+.stylebot-reader-content p,
+.stylebot-reader-content p,
+.stylebot-reader-content code,
+.stylebot-reader-content pre,
+.stylebot-reader-content blockquote,
+.stylebot-reader-content ul,
+.stylebot-reader-content ol,
+.stylebot-reader-content li,
+.stylebot-reader-content figure,
+.stylebot-reader-content .wp-caption {
   margin: -10px -10px 20px;
   padding: 10px;
   border-radius: 5px;
 }
 
-.stylebot-reader .domain {
-  font-size: 0.9em;
-  line-height: 1.48em;
-  padding-bottom: 4px;
-  text-decoration: none;
-  border-bottom: 1px solid;
-  border-bottom-color: currentcolor;
-  color: #0095dd;
+.stylebot-reader-content li {
+  margin-bottom: 0;
 }
 
-.stylebot-reader .byline {
-  font-size: 1rem;
-  font-weight: 300;
+.stylebot-reader-content li > ul,
+.stylebot-reader-content li > ol {
+  margin-bottom: -10px;
+}
+
+.stylebot-reader-content p > img:only-child,
+.stylebot-reader-content p > a:only-child > img:only-child,
+.stylebot-reader-content .wp-caption img,
+.stylebot-reader-content figure img {
+  display: block;
+}
+
+.stylebot-reader-content img[moz-reader-center] {
+  margin-inline: auto;
+}
+
+.stylebot-reader-content .caption,
+.stylebot-reader-content .wp-caption-text .stylebot-reader-content figcaption {
+  font-size: 0.9em;
+  line-height: 1.48em;
+  font-style: italic;
+}
+
+.stylebot-reader-content code,
+.stylebot-reader-content pre {
+  white-space: pre-wrap;
+}
+
+.stylebot-reader-content blockquote {
+  padding: 0;
+  padding-inline-start: 16px;
+}
+
+.stylebot-reader-content ul,
+.stylebot-reader-content ol {
+  padding: 0;
+}
+
+.stylebot-reader-content ul {
+  padding-inline-start: 30px;
+  list-style: disc;
+}
+
+.stylebot-reader-content ol {
+  padding-inline-start: 30px;
+  list-style: decimal;
+}
+
+table,
+th,
+td {
+  border: 1px solid currentColor;
+  border-collapse: collapse;
+  padding: 6px;
+  vertical-align: top;
+}
+
+table {
+  margin: 5px;
+}
+
+/* Visually hide (but don't display: none) screen reader elements */
+.stylebot-reader-content .visually-hidden,
+.stylebot-reader-content .visuallyhidden,
+.stylebot-reader-content .sr-only {
+  display: inline-block;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  border-width: 0;
+}
+
+/* Hide elements with common "hidden" class names */
+.stylebot-reader-content .hidden,
+.stylebot-reader-content .invisible {
+  display: none;
+}
+
+/* Enforce wordpress and similar emoji/smileys aren't sized to be full-width,
+ * see bug 1399616 for context. */
+.stylebot-reader-content img.wp-smiley,
+.stylebot-reader-content img.emoji {
+  display: inline-block;
+  border-width: 0;
+  /* height: auto is implied from `.stylebot-reader-content *` rule. */
+  width: 1em;
+  margin: 0 0.07em;
+  padding: 0;
+}
+
+.stylebot-reader-content p,
+.stylebot-reader-content p,
+.stylebot-reader-content code,
+.stylebot-reader-content pre,
+.stylebot-reader-content blockquote,
+.stylebot-reader-content ul,
+.stylebot-reader-content ol,
+.stylebot-reader-content li,
+.stylebot-reader-content figure {
+  margin: -10px -10px 20px;
+  padding: 10px;
+  border-radius: 5px;
 }
 
 /* HACK: Hide "skip to main content" link */
-.stylebot-reader a[href='#content'] {
+.stylebot-reader-content a[href='#content'] {
   display: none;
 }
