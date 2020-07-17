@@ -4,6 +4,12 @@ import * as tinycolor from 'tinycolor2';
 
 import CssSelectorGenerator from '../css/CssSelectorGenerator';
 
+declare global {
+  interface Window {
+    stylebotDarkModeUrl: string;
+  }
+}
+
 const Theme = {
   color: tinycolor('#e8e6e3'),
   backgroundColor: tinycolor('#222'),
@@ -126,11 +132,9 @@ const getElementCss = (el: HTMLElement, selector: string): string => {
   return css;
 };
 
-export const apply = (): string => {
+const getCss = (): string => {
   const root = postcss.parse(getDefaultCss());
-
   const all = document.querySelectorAll('body, body *:not(#stylebot)');
-
   const evaluatedSelectors: Array<string> = [];
 
   all.forEach(el => {
@@ -152,7 +156,53 @@ export const apply = (): string => {
     }
   });
 
+  root.walkDecls(decl => (decl.important = true));
   return root.toString();
 };
 
-export const remove = () => {};
+const cacheCurrentUrl = (): void => {
+  window.stylebotDarkModeUrl = window.location.href;
+};
+
+const didUrlChange = (): boolean => {
+  return window.stylebotDarkModeUrl !== window.location.href;
+};
+
+const initDarkMode = () => {
+  const css = getCss();
+  const id = 'stylebot-dark-mode';
+  const el = document.getElementById(id);
+
+  if (el) {
+    el.innerHTML = css;
+    return;
+  }
+
+  const style = document.createElement('style');
+
+  style.type = 'text/css';
+  style.setAttribute('id', id);
+  style.appendChild(document.createTextNode(css));
+
+  document.documentElement.appendChild(style);
+};
+
+export const apply = (forceApply = false): void => {
+  // Prevent duplicate calls for the same url if not force applying
+  if (!forceApply && !didUrlChange()) {
+    return;
+  }
+  cacheCurrentUrl();
+
+  if (document.readyState === 'complete') {
+    initDarkMode();
+  } else {
+    document.addEventListener('DOMContentLoaded', async () => {
+      initDarkMode();
+    });
+  }
+};
+
+export const remove = () => {
+  document.getElementById('stylebot-dark-mode')?.remove();
+};

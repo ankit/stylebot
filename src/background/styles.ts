@@ -122,6 +122,13 @@ class BackgroundPageStyles {
   setDarkMode(url: string, value: boolean): void {
     if (this.styles[url]) {
       this.styles[url].darkMode = value;
+    } else {
+      this.styles[url] = {
+        readability: false,
+        darkMode: true,
+        enabled: true,
+        css: '',
+      };
     }
 
     chrome.storage.local.set({

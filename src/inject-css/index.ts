@@ -10,7 +10,9 @@ import {
 } from '../types/BackgroundPageRequest';
 
 import { GetStylesForPageResponse } from '../types/BackgroundPageResponse';
+
 import { apply as applyReadability } from '../readability/index';
+import { apply as applyDarkMode } from '../dark-mode/index';
 
 const MAX_INJECT_COUNT = 10;
 const INJECT_CSS_TIMEOUT = 300;
@@ -33,6 +35,8 @@ const injectCss = (
 
           if (style.readability) {
             applyReadability();
+          } else if (style.darkMode) {
+            applyDarkMode();
           }
         });
       } else if (injectCount < MAX_INJECT_COUNT) {

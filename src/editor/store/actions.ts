@@ -134,7 +134,7 @@ export default {
     value: boolean
   ): void {
     if (value) {
-      applyDarkMode();
+      applyDarkMode(true);
     } else {
       removeDarkMode();
     }

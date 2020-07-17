@@ -10,7 +10,7 @@ const getGoogleFontUrlAndParams = (
   return { url, params };
 };
 
-const getStyleElementId = (url: string) => {
+const getStylesheetId = (url: string) => {
   return `stylebot-css-${url}`;
 };
 
@@ -161,7 +161,7 @@ const CSSUtils = {
   },
 
   injectCSSIntoDocument: (css: string, url: string): void => {
-    const id = getStyleElementId(url);
+    const id = getStylesheetId(url);
     const el = document.getElementById(id);
 
     if (el) {
@@ -187,7 +187,7 @@ const CSSUtils = {
   },
 
   removeCSSFromDocument: (url: string): void => {
-    const id = getStyleElementId(url);
+    const id = getStylesheetId(url);
     const el = document.getElementById(id);
 
     if (el) {
