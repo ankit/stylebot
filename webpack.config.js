@@ -1,17 +1,17 @@
 const ejs = require("ejs");
 const webpack = require("webpack");
 
-const CopyPlugin = require("copy-webpack-plugin");
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-
-const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 const { VueLoaderPlugin } = require("vue-loader");
-
+const CopyPlugin = require("copy-webpack-plugin");
+const StyleLintPlugin = require("stylelint-webpack-plugin");
 const ExtensionReloader = require("webpack-extension-reloader");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 
 const config = {
   mode: process.env.NODE_ENV,
   context: __dirname + "/src",
+  devtool: "eval",
 
   entry: {
     "popup/index": "./popup/index.ts",
@@ -51,24 +51,28 @@ const config = {
         use: ["file-loader"],
       },
       {
-        test: /\.s(c|a)ss$/,
+        test: /\.((c|sa|sc)ss)$/i,
         use: [
           MiniCssExtractPlugin.loader,
-          "css-loader",
           {
-            loader: "sass-loader",
+            loader: "css-loader",
+            options: { importLoaders: 2 },
+          },
+          {
+            loader: "postcss-loader",
             options: {
-              implementation: require("sass"),
-              sassOptions: {
-                fiber: require("fibers"),
-              },
+              plugins: () => [
+                require("cssnano")({
+                  preset: "default",
+                }),
+                require("postcss-rem-to-pixel")({
+                  propList: ["*"],
+                }),
+              ],
             },
           },
+          "sass-loader",
         ],
-      },
-      {
-        test: /\.css$/,
-        use: [MiniCssExtractPlugin.loader, "css-loader"],
       },
       {
         test: /\.js$/,
@@ -79,6 +83,9 @@ const config = {
   },
 
   plugins: [
+    new StyleLintPlugin({
+      files: ["**/*.{vue,htm,html,css,sss,less,scss,sass}"],
+    }),
     new webpack.DefinePlugin({
       global: "window",
     }),

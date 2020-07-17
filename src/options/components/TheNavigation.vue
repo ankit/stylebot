@@ -69,12 +69,12 @@ export default Vue.extend({
 .navigation-item {
   border: none;
 
-  &:hover:not(.active) {
-    background: #ddd;
-  }
-
   &:focus {
     outline: none;
+  }
+
+  &:hover:not(.active) {
+    background: #ddd;
   }
 }
 </style>
