@@ -13,7 +13,12 @@ import {
 import { StylebotOptions } from '../types';
 
 type Styles = {
-  [url: string]: { css: string; enabled: boolean };
+  [url: string]: {
+    css: string;
+    enabled: boolean;
+    darkMode: boolean;
+    readability: boolean;
+  };
 };
 
 export const getAllStyles = async (): Promise<Styles> => {

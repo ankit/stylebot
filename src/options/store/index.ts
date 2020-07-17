@@ -13,6 +13,8 @@ type State = {
     [url: string]: {
       css: string;
       enabled: boolean;
+      darkMode: boolean;
+      readability: boolean;
     };
   };
   options: StylebotOptions | null;
@@ -37,7 +39,14 @@ export default new Vuex.Store<State>({
 
     setAllStyles(
       { state },
-      styles: { [url: string]: { css: string; enabled: boolean } }
+      styles: {
+        [url: string]: {
+          css: string;
+          enabled: boolean;
+          darkMode: boolean;
+          readability: boolean;
+        };
+      }
     ) {
       state.styles = styles;
       setAllStyles(styles);
@@ -59,6 +68,8 @@ export default new Vuex.Store<State>({
         styles[url] = {
           css,
           enabled: styles[url] ? styles[url].enabled : true,
+          darkMode: false,
+          readability: false,
         };
 
         if (initialUrl && initialUrl !== url) {
