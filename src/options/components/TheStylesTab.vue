@@ -99,6 +99,8 @@ export default Vue.extend({
             url,
             css: stylesObj[url].css,
             enabled: stylesObj[url].enabled,
+            darkMode: stylesObj[url].darkMode,
+            readability: stylesObj[url].readability,
           });
         }
       }

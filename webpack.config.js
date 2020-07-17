@@ -11,6 +11,7 @@ const config = {
   mode: process.env.NODE_ENV,
   context: __dirname + "/src",
   devtool: "eval",
+  stats: "errors-only",
 
   entry: {
     "popup/index": "./popup/index.ts",
@@ -87,7 +88,13 @@ const config = {
       global: "window",
     }),
     new VueLoaderPlugin(),
-    new ForkTsCheckerWebpackPlugin(),
+    new ForkTsCheckerWebpackPlugin({
+      typescript: {
+        extensions: {
+          vue: true,
+        },
+      },
+    }),
     new MiniCssExtractPlugin({
       filename: "[name].css",
     }),

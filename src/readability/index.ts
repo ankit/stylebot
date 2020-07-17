@@ -32,17 +32,17 @@ const getDomainUrlAndLabel = (): { url: string; urlLabel: string } => {
  */
 const getReadabilityArticle = async (): Promise<Article> => {
   return new Promise((resolve, reject) => {
-    let xhr = new XMLHttpRequest();
+    const xhr = new XMLHttpRequest();
     xhr.open('GET', window.location.href, true);
     xhr.responseType = 'document';
 
-    xhr.onload = evt => {
+    xhr.onload = () => {
       if (xhr.status !== 200) {
         reject();
         return;
       }
 
-      let doc = xhr.responseXML;
+      const doc = xhr.responseXML;
       if (!doc) {
         reject();
         return;
@@ -72,7 +72,7 @@ const getReadabilityArticle = async (): Promise<Article> => {
 const initCss = async (root: ShadowRoot): Promise<void> => {
   const cssUrl = chrome.extension.getURL('readability/index.css');
 
-  return new Promise((resolve, reject) => {
+  return new Promise(resolve => {
     fetch(cssUrl, { method: 'GET' })
       .then(response => response.text())
       .then(css => {
@@ -219,7 +219,7 @@ const shouldCheckUri = (): boolean => {
   return true;
 };
 
-export const apply = async (forceApply = false) => {
+export const apply = async (forceApply = false): Promise<void> => {
   if (window !== window.top) {
     return;
   }
@@ -247,7 +247,7 @@ export const apply = async (forceApply = false) => {
   }
 };
 
-export const remove = () => {
+export const remove = (): void => {
   revertToCachedDocumentBody();
   document.getElementById('stylebot-reader')?.remove();
 };

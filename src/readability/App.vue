@@ -39,7 +39,7 @@ export default Vue.extend({
   },
 
   mounted(): void {
-    this.$el.querySelector('a').focus();
+    this.$el.querySelector('a')?.focus();
     document.getElementById('stylebot-reader-loading')?.remove();
   },
 });
