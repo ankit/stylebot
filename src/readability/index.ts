@@ -19,9 +19,9 @@ type Article = {
   siteName: string;
 };
 
-const getDomainUrl = (): string => {
+const getDomainUrlAndLabel = (): { url: string; urlLabel: string } => {
   const parts = window.location.href.split('/');
-  return `${parts[0]}//${parts[2]}`;
+  return { url: `${parts[0]}//${parts[2]}`, urlLabel: parts[2] };
 };
 
 /**
@@ -97,7 +97,7 @@ const initShadowDOM = async () => {
   host.setAttribute('style', hostStyle);
   document.body.appendChild(host);
 
-  const shadowRoot = host.attachShadow({ mode: 'open', delegatesFocus: true });
+  const shadowRoot = host.attachShadow({ mode: 'open' });
   const app = document.createElement('div');
 
   app.id = 'stylebot-reader-app';
@@ -107,7 +107,11 @@ const initShadowDOM = async () => {
   return app;
 };
 
-const initReaderApp = async (url: string, article: Article) => {
+const initReaderApp = async (
+  url: string,
+  urlLabel: string,
+  article: Article
+) => {
   const el = await initShadowDOM();
 
   new Vue({
@@ -115,7 +119,7 @@ const initReaderApp = async (url: string, article: Article) => {
 
     render: createElement => {
       const context = {
-        props: { url, article },
+        props: { url, urlLabel, article },
       };
 
       return createElement(App, context);
@@ -145,11 +149,11 @@ const initReadability = async () => {
   return new Promise(async resolve => {
     if (isProbablyReaderable(document)) {
       try {
-        const url = getDomainUrl();
+        const { url, urlLabel } = getDomainUrlAndLabel();
         const article = await getReadabilityArticle();
 
         cacheDocumentBody();
-        initReaderApp(url, article);
+        initReaderApp(url, urlLabel, article);
         resolve();
       } catch (e) {
         resolve();

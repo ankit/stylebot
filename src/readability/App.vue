@@ -2,7 +2,7 @@
   <div class="stylebot-reader" v-if="article">
     <div class="stylebot-reader-body">
       <a :href="url" class="stylebot-reader-domain">
-        {{ article.siteName }}
+        {{ urlLabel }}
       </a>
 
       <div class="stylebot-reader-header">
@@ -23,6 +23,11 @@ export default Vue.extend({
 
   props: {
     url: {
+      type: String,
+      required: true,
+    },
+
+    urlLabel: {
       type: String,
       required: true,
     },

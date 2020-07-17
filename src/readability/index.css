@@ -2,7 +2,7 @@
 
 :host {
   --body-padding: 64px;
-  --font-size: 12;
+  --font-size: 16px;
   --content-width: 35em;
   --line-height: 1.6em;
 }
@@ -59,7 +59,7 @@
 }
 
 .stylebot-reader-byline {
-  font-size: 1rem;
+  font-size: 1em;
   font-weight: 300;
   margin-bottom: 30px;
 }
@@ -233,20 +233,6 @@ table {
   width: 1em;
   margin: 0 0.07em;
   padding: 0;
-}
-
-.stylebot-reader-content p,
-.stylebot-reader-content p,
-.stylebot-reader-content code,
-.stylebot-reader-content pre,
-.stylebot-reader-content blockquote,
-.stylebot-reader-content ul,
-.stylebot-reader-content ol,
-.stylebot-reader-content li,
-.stylebot-reader-content figure {
-  margin: -10px -10px 20px;
-  padding: 10px;
-  border-radius: 5px;
 }
 
 /* HACK: Hide "skip to main content" link */
