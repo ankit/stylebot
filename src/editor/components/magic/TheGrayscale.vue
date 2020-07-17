@@ -1,6 +1,6 @@
 <template>
   <div>
-    <p class="lead">Apply grayscale to make things less distracting.</p>
+    <p class="lead">Apply grayscale to the page.</p>
 
     <b-form-input
       v-model="value"

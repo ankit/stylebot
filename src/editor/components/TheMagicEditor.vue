@@ -1,8 +1,6 @@
 <template>
   <div class="px-3 py-3">
-    <p class="lead text-muted">
-      Experimental features. May not work as expected on some pages.
-    </p>
+    <p class="lead text-muted">Experimental features. May not work as expected on all pages.</p>
 
     <div class="mt-5">
       <the-readability />
@@ -39,7 +37,7 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .magic-title {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 400;
 }
 </style>
