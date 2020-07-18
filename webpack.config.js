@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 const ejs = require("ejs");
 const webpack = require("webpack");
 
@@ -29,7 +30,7 @@ const config = {
   },
 
   resolve: {
-    extensions: [".ts", ".js", ".vue", ".ttf"],
+    extensions: [".ts", ".js", ".vue"],
   },
 
   module: {
@@ -46,10 +47,6 @@ const config = {
           transpileOnly: true,
           appendTsSuffixTo: [/\.vue$/],
         },
-      },
-      {
-        test: /\.ttf$/,
-        use: ["file-loader"],
       },
       {
         test: /\.((c|sa|sc)ss)$/i,
@@ -101,7 +98,7 @@ const config = {
     new CopyPlugin({
       patterns: [
         {
-          from: "img",
+          from: "extension/img",
           to: "img",
         },
         {
@@ -132,7 +129,7 @@ const config = {
           to: "readability/index.css",
         },
         {
-          from: "manifest.json",
+          from: "extension/manifest.json",
           to: "manifest.json",
 
           transform: (content) => {
@@ -164,7 +161,7 @@ if (config.mode === "production") {
 if (process.env.HMR === "true") {
   config.plugins = (config.plugins || []).concat([
     new ExtensionReloader({
-      manifest: __dirname + "/src/manifest.json",
+      manifest: __dirname + "/src/extension/manifest.json",
     }),
   ]);
 }
