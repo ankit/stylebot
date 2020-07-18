@@ -44,7 +44,12 @@ export default Vue.extend({
     },
   },
 
-  data(): any {
+  data(): {
+    allShortcutMetaKeys: Array<{
+      text: 'Ctrl' | 'Shift' | 'Alt' | 'None';
+      value: 'ctrl' | 'shift' | 'alt' | 'none';
+    }>;
+  } {
     return {
       allShortcutMetaKeys: [
         {
