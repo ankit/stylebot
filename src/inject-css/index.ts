@@ -4,14 +4,14 @@
  */
 import { injectCSSIntoDocument } from '@stylebot/css';
 
+import { apply as applyDarkMode } from '@stylebot/dark-mode';
+import { apply as applyReadability } from '@stylebot/readability';
+
 import {
   GetStylesForPageRequest,
   GetStylesForIframeRequest,
   GetStylesForPageResponse,
 } from '@stylebot/types';
-
-import { apply as applyReadability } from '../readability/index';
-import { apply as applyDarkMode } from '../dark-mode/index';
 
 const MAX_INJECT_COUNT = 10;
 const INJECT_CSS_TIMEOUT = 300;

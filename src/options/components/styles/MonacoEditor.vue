@@ -4,11 +4,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-
-import {
-  IframeMessageType,
-  ParentUpdateCssMessage,
-} from './../../../monaco-editor/types';
+import { IframeMessage, ParentUpdateCssMessage } from '@stylebot/monaco-editor';
 
 export default Vue.extend({
   name: 'MonacoEditor',
@@ -60,7 +56,7 @@ export default Vue.extend({
       window.removeEventListener('message', this.handleMessage);
     },
 
-    handleMessage(message: { data: IframeMessageType }): void {
+    handleMessage(message: { data: IframeMessage }): void {
       if (message.data.type === 'stylebotMonacoIframeLoaded') {
         this.updateCssInMonacoEditor();
       } else if (message.data.type === 'stylebotMonacoIframeCssUpdated') {

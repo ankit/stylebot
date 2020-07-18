@@ -40,6 +40,14 @@ const config = {
         __dirname,
         "./src/readability/index"
       ),
+      "@stylebot/highlighter": path.resolve(
+        __dirname,
+        "./src/highlighter/index"
+      ),
+      "@stylebot/monaco-editor": path.resolve(
+        __dirname,
+        "./src/monaco-editor/index"
+      ),
     },
   },
 

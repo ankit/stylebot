@@ -5,10 +5,10 @@ import {
   OpenOptionsPageRequest,
   GetAllOptionsResponse,
   GetOptionResponse,
+  StylebotOptions,
 } from '@stylebot/types';
 
 import { saveOption } from '../options';
-import { StylebotOptions } from '../../types';
 
 type Request =
   | GetAllOptionsRequest

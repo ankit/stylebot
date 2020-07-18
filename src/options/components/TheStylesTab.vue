@@ -57,14 +57,13 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import { Style } from '@stylebot/types';
 
 import AppButton from './AppButton.vue';
 
 import StyleComponent from './styles/Style.vue';
 import StyleEditor from './styles/StyleEditor.vue';
 import TheDeleteAllStylesButton from './styles/TheDeleteAllStylesButton.vue';
-
-import { Style } from '../../types';
 
 export default Vue.extend({
   name: 'TheStylesTab',

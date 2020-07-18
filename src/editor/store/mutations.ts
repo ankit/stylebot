@@ -1,7 +1,7 @@
 import * as postcss from 'postcss';
+import { StylebotPlacement, StylebotOptions } from '@stylebot/types';
 
 import { State, CssSelectorMetadata } from './';
-import { StylebotPlacement, StylebotOptions } from '../../types';
 
 export default {
   setVisible(state: State, visible: boolean): void {

@@ -13,8 +13,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { validateSelector } from '@stylebot/css';
-
-import Highlighter from '../../highlighter/Highlighter';
+import { Highlighter } from '@stylebot/highlighter';
 
 export default Vue.extend({
   name: 'TheCssSelectorInput',

@@ -1,5 +1,5 @@
 import CustomLight from './themes/CustomLight';
-import { IframeMessageType, ParentUpdateCssMessage } from './../types';
+import { IframeMessage, ParentUpdateCssMessage } from '@stylebot/monaco-editor';
 
 declare global {
   interface Window {
@@ -61,7 +61,7 @@ class MonacEditorIframe {
     });
   }
 
-  postMessage(message: IframeMessageType): void {
+  postMessage(message: IframeMessage): void {
     window.parent.postMessage(message, '*');
   }
 

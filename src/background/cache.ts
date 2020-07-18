@@ -1,5 +1,5 @@
 import BackgroundPageStyles from './styles';
-import { StylebotOptions } from '../types';
+import { StylebotOptions } from '@stylebot/types';
 
 // TODO: Make this only accessible as arg / via getters/setters
 window.cache = {
@@ -10,7 +10,7 @@ window.cache = {
 
 const init = (
   callback: (styles: BackgroundPageStyles, options: StylebotOptions) => void
-) => {
+): void => {
   chrome.storage.local.get(['options', 'styles'], items => {
     const options = items['options'] || {
       useShortcutKey: true,

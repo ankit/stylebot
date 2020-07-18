@@ -3,7 +3,7 @@ import Vuex from 'vuex';
 
 import * as postcss from 'postcss';
 
-import { StylebotOptions } from '../../types';
+import { StylebotOptions } from '@stylebot/types';
 import { getAllStyles, setAllStyles, setOption, getAllOptions } from '../utils';
 
 Vue.use(Vuex);

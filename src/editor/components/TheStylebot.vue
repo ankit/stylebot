@@ -26,7 +26,7 @@ import TheCodeEditor from './TheCodeEditor.vue';
 
 import TheHelpDialog from './shortcuts/TheHelpDialog.vue';
 
-import { StylebotPlacement, StylebotEditingMode } from '../../types';
+import { StylebotPlacement, StylebotEditingMode } from '@stylebot/types';
 
 export default Vue.extend({
   name: 'TheStylebot',

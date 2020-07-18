@@ -12,7 +12,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import Highlighter from '../../highlighter/Highlighter';
+import { Highlighter } from '@stylebot/highlighter';
 import { StylebotEditingMode } from '@stylebot/types';
 
 export default Vue.extend({
