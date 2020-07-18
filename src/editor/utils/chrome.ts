@@ -8,14 +8,10 @@ import {
   GetStylesForPageRequest,
   SetReadabilityRequest,
   SetDarkModeRequest,
-} from '../../types/BackgroundPageRequest';
-
-import {
   GetAllOptionsResponse,
   GetStylesForPageResponse,
-} from '../../types/BackgroundPageResponse';
-
-import { StylebotOptions } from '../../types';
+  StylebotOptions,
+} from '@stylebot/types';
 
 export const getAllOptions = async (): Promise<StylebotOptions> => {
   const request: GetAllOptionsRequest = {

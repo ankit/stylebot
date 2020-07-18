@@ -9,7 +9,7 @@ import {
   StylebotOptions,
   BackgroundPageRequest,
   BackgroundPageResponse,
-} from '../types';
+} from '@stylebot/types';
 
 /**
  * Initialize listeners for the background page

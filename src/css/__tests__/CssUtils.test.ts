@@ -1,7 +1,11 @@
 import 'jest-fetch-mock';
 
 import * as dedent from 'dedent';
-import CssUtils from '../CssUtils';
+import {
+  addDeclaration,
+  addGoogleWebFont,
+  cleanGoogleWebFonts,
+} from '../CssUtils';
 
 describe('CssUtils', () => {
   describe('addDeclaration', () => {
@@ -11,7 +15,7 @@ describe('CssUtils', () => {
         const value = 'red';
         const selector = 'a';
         const css = '';
-        const output = CssUtils.addDeclaration(property, value, selector, css);
+        const output = addDeclaration(property, value, selector, css);
 
         expect(output).toBe(dedent`
           a {
@@ -28,7 +32,7 @@ describe('CssUtils', () => {
           background: red;
         }
         `;
-        const output = CssUtils.addDeclaration(property, value, selector, css);
+        const output = addDeclaration(property, value, selector, css);
 
         expect(output).toBe(dedent`
           div {
@@ -49,7 +53,7 @@ describe('CssUtils', () => {
           background: red;
         }
         `;
-        const output = CssUtils.addDeclaration(property, value, selector, css);
+        const output = addDeclaration(property, value, selector, css);
         expect(output).toBe(css);
       });
     });
@@ -65,7 +69,7 @@ describe('CssUtils', () => {
           }
         `;
 
-        const output = CssUtils.addDeclaration(property, value, selector, css);
+        const output = addDeclaration(property, value, selector, css);
         expect(output).toBe(dedent`  
           div {
             background: red;
@@ -84,7 +88,7 @@ describe('CssUtils', () => {
           }
         `;
 
-        const output = CssUtils.addDeclaration(property, value, selector, css);
+        const output = addDeclaration(property, value, selector, css);
         expect(output).toBe(css);
       });
     });
@@ -99,7 +103,7 @@ describe('CssUtils', () => {
         }
       `;
 
-      const output = CssUtils.addDeclaration(property, value, selector, css);
+      const output = addDeclaration(property, value, selector, css);
       expect(output).toBe(dedent`
         div {
           background: green;
@@ -118,7 +122,7 @@ describe('CssUtils', () => {
         }
       `;
 
-      const output = CssUtils.addDeclaration(property, value, selector, css);
+      const output = addDeclaration(property, value, selector, css);
       expect(output).toBe(dedent`
         div {
           color: blue;
@@ -136,7 +140,7 @@ describe('CssUtils', () => {
         }
       `;
 
-      const output = CssUtils.addDeclaration(property, value, selector, css);
+      const output = addDeclaration(property, value, selector, css);
       expect(output).toBe('');
     });
   });
@@ -146,7 +150,7 @@ describe('CssUtils', () => {
       fetchMock.mockResponse(() => Promise.resolve({ status: 200 }));
 
       const css = 'a { font-family: Muli; }';
-      const output = await CssUtils.addGoogleWebFont('Muli', css);
+      const output = await addGoogleWebFont('Muli', css);
 
       expect(output).toBe(
         '@import url(//fonts.googleapis.com/css?family=Muli);\n\na { font-family: Muli; }'
@@ -158,7 +162,7 @@ describe('CssUtils', () => {
 
       const css =
         '@import url(//fonts.googleapis.com/css?family=Muli);\n\na { font-family: Muli }';
-      const output = await CssUtils.addGoogleWebFont('Muli', css);
+      const output = await addGoogleWebFont('Muli', css);
 
       expect(output).toBe(css);
     });
@@ -167,7 +171,7 @@ describe('CssUtils', () => {
       fetchMock.mockResponse(() => Promise.resolve({ status: 400 }));
 
       const css = 'a { font-family: Roboto; }';
-      const output = await CssUtils.addGoogleWebFont('Invalid', css);
+      const output = await addGoogleWebFont('Invalid', css);
 
       expect(output).toBe(css);
     });
@@ -176,7 +180,7 @@ describe('CssUtils', () => {
       fetchMock.mockResponse(() => Promise.reject());
 
       const css = 'a { font-family: Roboto; }';
-      const output = await CssUtils.addGoogleWebFont('Invalid', css);
+      const output = await addGoogleWebFont('Invalid', css);
 
       expect(output).toBe(css);
     });
@@ -187,14 +191,14 @@ describe('CssUtils', () => {
       const css =
         '@import url(//fonts.googleapis.com/css?family=Muli);\n\na { color: red; }';
 
-      const output = CssUtils.cleanGoogleWebFonts(css);
+      const output = cleanGoogleWebFonts(css);
       expect(output).toBe('a { color: red; }');
     });
 
     it('does not remove @import rule for used font', () => {
       const css =
         '@import url(//fonts.googleapis.com/css?family=Muli);\n\na { font-family: Muli, Helvetica; }';
-      const output = CssUtils.cleanGoogleWebFonts(css);
+      const output = cleanGoogleWebFonts(css);
       expect(output).toBe(css);
     });
   });

@@ -13,7 +13,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import Highlighter from '../../highlighter/Highlighter';
-import { StylebotEditingMode } from '../../../types';
+import { StylebotEditingMode } from '@stylebot/types';
 
 export default Vue.extend({
   name: 'TheInspector',

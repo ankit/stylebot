@@ -12,8 +12,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-
-import CssUtils from '../../../css/CssUtils';
+import { validateSelector } from '@stylebot/css';
 import Highlighter from '../../highlighter/Highlighter';
 
 export default Vue.extend({
@@ -40,7 +39,7 @@ export default Vue.extend({
     },
 
     mouseenter(): void {
-      if (CssUtils.validateSelector(this.selector)) {
+      if (validateSelector(this.selector)) {
         this.highlighter.highlight(this.selector);
       } else {
         this.highlighter.unhighlight();

@@ -4,14 +4,14 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import { Declaration, Rule } from 'postcss';
 
 import {
   StylebotShortcutMetaKey,
   StylebotEditingMode,
   StylebotPlacement,
-} from '../../../types';
+} from '@stylebot/types';
 
-import { Declaration, Rule } from 'postcss';
 import { enableStyle, disableStyle } from '../../utils/chrome';
 
 export default Vue.extend({

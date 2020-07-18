@@ -12,8 +12,8 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import { validateSelector } from '@stylebot/css';
 
-import CssUtils from '../../../css/CssUtils';
 import Highlighter from '../../highlighter/Highlighter';
 
 export default Vue.extend({
@@ -49,7 +49,7 @@ export default Vue.extend({
     input(selector: string): void {
       this.$store.commit('setActiveSelector', selector);
 
-      if (CssUtils.validateSelector(selector)) {
+      if (validateSelector(selector)) {
         this.highlighter.highlight(selector);
       } else {
         this.highlighter.unhighlight();
@@ -59,7 +59,7 @@ export default Vue.extend({
     focus(): void {
       const selector = this.$store.state.activeSelector;
 
-      if (CssUtils.validateSelector(selector)) {
+      if (validateSelector(selector)) {
         this.highlighter.highlight(selector);
       } else {
         this.highlighter.unhighlight();

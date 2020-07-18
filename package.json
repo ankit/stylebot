@@ -32,6 +32,9 @@
     "transform": {
       ".*\\.(vue)$": "vue-jest",
       "^.+\\.tsx?$": "ts-jest"
+    },
+    "moduleNameMapper": {
+      "^@stylebot/(.*)$": "<rootDir>/src/$1/index"
     }
   },
   "devDependencies": {
@@ -72,6 +75,7 @@
     "jest-fetch-mock": "^3.0.3",
     "lodash": "^4.17.19",
     "mini-css-extract-plugin": "^0.9.0",
+    "module-alias": "^2.2.2",
     "monaco-editor": "^0.20.0",
     "postcss": "^7.0.32",
     "postcss-loader": "^3.0.0",

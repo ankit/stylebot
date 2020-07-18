@@ -2,14 +2,13 @@
  * This content script injects any custom style for the page (if it exists)
  * as soon as the document starts loading.
  */
-import CssUtils from '../css/CssUtils';
+import { injectCSSIntoDocument } from '@stylebot/css';
 
 import {
   GetStylesForPageRequest,
   GetStylesForIframeRequest,
-} from '../types/BackgroundPageRequest';
-
-import { GetStylesForPageResponse } from '../types/BackgroundPageResponse';
+  GetStylesForPageResponse,
+} from '@stylebot/types';
 
 import { apply as applyReadability } from '../readability/index';
 import { apply as applyDarkMode } from '../dark-mode/index';
@@ -30,7 +29,7 @@ const injectCss = (
 
         styles.forEach(style => {
           if (style.enabled) {
-            CssUtils.injectCSSIntoDocument(style.css, style.url);
+            injectCSSIntoDocument(style.css, style.url);
           }
 
           if (style.readability) {

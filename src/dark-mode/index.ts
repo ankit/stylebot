@@ -2,7 +2,7 @@ import * as dedent from 'dedent';
 import * as postcss from 'postcss';
 import * as tinycolor from 'tinycolor2';
 
-import CssSelectorGenerator from '../css/CssSelectorGenerator';
+import { getSelector } from '@stylebot/css';
 
 declare global {
   interface Window {
@@ -139,7 +139,7 @@ const getCss = (): string => {
 
   all.forEach(el => {
     if (!el.closest('.stylebot')) {
-      const selector = CssSelectorGenerator.get(el as HTMLElement);
+      const selector = getSelector(el as HTMLElement);
 
       try {
         if (evaluatedSelectors.indexOf(selector) === -1) {
@@ -203,6 +203,6 @@ export const apply = (forceApply = false): void => {
   }
 };
 
-export const remove = () => {
+export const remove = (): void => {
   document.getElementById('stylebot-dark-mode')?.remove();
 };

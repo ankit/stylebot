@@ -1,5 +1,7 @@
-import { GetStylesForPageRequest } from '../types/BackgroundPageRequest';
-import { GetStylesForPageResponse } from '../types/BackgroundPageResponse';
+import {
+  GetStylesForPageRequest,
+  GetStylesForPageResponse,
+} from '@stylebot/types';
 
 export const getCurrentTab = (
   callback: (tab: chrome.tabs.Tab) => void

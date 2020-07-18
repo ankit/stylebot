@@ -2,12 +2,12 @@ import * as postcss from 'postcss';
 import actions from '../actions';
 
 import mockState from '../__mocks__/state';
-import CssUtils from '../../../css/CssUtils';
+import * as stylebotCss from '@stylebot/css';
 import * as chromeUtils from '../../utils/chrome';
 
 jest.mock('postcss');
+jest.mock('@stylebot/css');
 jest.mock('../../utils/chrome');
-jest.mock('../../../css/CssUtils');
 
 const mockRoot = {
   some: jest.fn(),
@@ -21,7 +21,10 @@ const mockDispatch = jest.fn();
 
 describe('actions', () => {
   beforeAll(() => {
-    CssUtils.injectRootIntoDocument = jest.fn();
+    Object.defineProperty(stylebotCss, 'injectRootIntoDocument', {
+      value: jest.fn(),
+    });
+
     Object.defineProperty(chromeUtils, 'setStyle', { value: jest.fn() });
   });
 
@@ -51,7 +54,7 @@ describe('actions', () => {
       } catch (e) {
         expect(mockCommit).toBeCalledTimes(0);
         expect(chromeUtils.setStyle).toBeCalledTimes(0);
-        expect(CssUtils.injectRootIntoDocument).toBeCalledTimes(0);
+        expect(stylebotCss.injectRootIntoDocument).toBeCalledTimes(0);
       }
     });
 
@@ -64,7 +67,7 @@ describe('actions', () => {
       expect(mockCommit).toHaveBeenNthCalledWith(2, 'setSelectors', mockRoot);
 
       expect(chromeUtils.setStyle).toBeCalledWith(mockState.url, css);
-      expect(CssUtils.injectRootIntoDocument).toBeCalledWith(
+      expect(stylebotCss.injectRootIntoDocument).toBeCalledWith(
         mockRoot,
         mockState.url
       );
@@ -81,14 +84,14 @@ describe('actions', () => {
         }
       );
 
-      expect(CssUtils.addDeclaration).toBeCalledTimes(0);
+      expect(stylebotCss.addDeclaration).toBeCalledTimes(0);
       expect(mockDispatch).toBeCalledTimes(0);
     });
 
     it('invokes addDeclaration correctly', () => {
       const state = { ...mockState, activeSelector: 'a' };
 
-      Object.defineProperty(CssUtils, 'addDeclaration', {
+      Object.defineProperty(stylebotCss, 'addDeclaration', {
         value: jest.fn(() => 'outputOfAddDeclaration'),
       });
 
@@ -103,7 +106,12 @@ describe('actions', () => {
         }
       );
 
-      expect(CssUtils.addDeclaration).toBeCalledWith('color', 'red', 'a', '');
+      expect(stylebotCss.addDeclaration).toBeCalledWith(
+        'color',
+        'red',
+        'a',
+        ''
+      );
       expect(mockDispatch).toBeCalledWith('applyCss', {
         css: 'outputOfAddDeclaration',
       });

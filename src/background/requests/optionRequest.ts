@@ -3,12 +3,9 @@ import {
   GetOptionRequest,
   SetOptionRequest,
   OpenOptionsPageRequest,
-} from '../../types/BackgroundPageRequest';
-
-import {
   GetAllOptionsResponse,
   GetOptionResponse,
-} from '../../types/BackgroundPageResponse';
+} from '@stylebot/types';
 
 import { saveOption } from '../options';
 import { StylebotOptions } from '../../types';
@@ -25,7 +22,7 @@ export default (
   request: Request,
   options: StylebotOptions,
   sendResponse: (response: Response) => void
-) => {
+): void => {
   if (request.name === 'getAllOptions') {
     sendResponse(options);
   } else if (request.name === 'getOption') {

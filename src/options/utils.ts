@@ -3,14 +3,10 @@ import {
   SetAllStylesRequest,
   SetOptionRequest,
   GetAllOptionsRequest,
-} from '../types/BackgroundPageRequest';
-
-import {
   GetAllStylesResponse,
   GetAllOptionsResponse,
-} from '../types/BackgroundPageResponse';
-
-import { StylebotOptions } from '../types';
+  StylebotOptions,
+} from '@stylebot/types';
 
 type Styles = {
   [url: string]: {
@@ -45,7 +41,7 @@ export const getAllOptions = async (): Promise<StylebotOptions> => {
   });
 };
 
-export const setAllStyles = (styles: Styles) => {
+export const setAllStyles = (styles: Styles): void => {
   const request: SetAllStylesRequest = {
     name: 'setAllStyles',
     styles,
@@ -57,7 +53,7 @@ export const setAllStyles = (styles: Styles) => {
 export const setOption = (
   name: keyof StylebotOptions,
   value: StylebotOptions[keyof StylebotOptions]
-) => {
+): void => {
   const request: SetOptionRequest = {
     name: 'setOption',
     option: {
@@ -69,7 +65,7 @@ export const setOption = (
   chrome.extension.sendRequest(request);
 };
 
-export const copyToClipboard = (text: string) => {
+export const copyToClipboard = (text: string): void => {
   chrome.extension.sendRequest({
     name: 'copyToClipboard',
     text,

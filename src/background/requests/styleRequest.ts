@@ -9,12 +9,9 @@ import {
   GetStylesForIframeRequest,
   SetReadabilityRequest,
   SetDarkModeRequest,
-} from '../../types/BackgroundPageRequest';
-
-import {
   GetStylesForPageResponse,
   GetAllStylesResponse,
-} from '../../types/BackgroundPageResponse';
+} from '@stylebot/types';
 
 import BackgroundPageStyles from '../styles';
 

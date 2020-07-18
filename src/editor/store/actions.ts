@@ -1,7 +1,25 @@
 import * as postcss from 'postcss';
 import { Commit, Dispatch } from 'vuex';
 
-import CssUtils from '../../css/CssUtils';
+import {
+  addDeclaration,
+  addGoogleWebFont,
+  cleanGoogleWebFonts,
+  injectRootIntoDocument,
+  getCssAfterApplyingFilterEffectToPage,
+} from '@stylebot/css';
+
+import {
+  apply as applyDarkMode,
+  remove as removeDarkMode,
+} from '@stylebot/dark-mode';
+
+import {
+  apply as applyReadability,
+  remove as removeReadability,
+} from '@stylebot/readability';
+
+import { StylebotEditingMode, FilterEffect } from '@stylebot/types';
 
 import {
   getAllOptions,
@@ -13,23 +31,7 @@ import {
   setReadability,
 } from '../utils/chrome';
 
-import {
-  apply as applyDarkMode,
-  remove as removeDarkMode,
-} from '../../dark-mode/index';
-
-import {
-  apply as applyReadability,
-  remove as removeReadability,
-} from '../../readability/index';
-
-import {
-  EffectName,
-  getCssAfterApplyingFilterEffectToPage,
-} from '../../css/Filters';
-
 import { State } from './';
-import { StylebotEditingMode } from '../../types';
 
 export default {
   async initialize({ commit }: { commit: Commit }): Promise<void> {
@@ -78,7 +80,7 @@ export default {
   ): void {
     try {
       const root = postcss.parse(css);
-      CssUtils.injectRootIntoDocument(root, state.url);
+      injectRootIntoDocument(root, state.url);
 
       commit('setCss', css);
       commit('setSelectors', root);
@@ -97,7 +99,7 @@ export default {
       return;
     }
 
-    const css = CssUtils.addDeclaration(
+    const css = addDeclaration(
       property,
       value,
       state.activeSelector,
@@ -114,7 +116,7 @@ export default {
     let css = state.css;
 
     if (value) {
-      css = await CssUtils.addGoogleWebFont(value, css);
+      css = await addGoogleWebFont(value, css);
     }
 
     if (css !== state.css) {
@@ -123,7 +125,7 @@ export default {
 
     dispatch('applyDeclaration', { property: 'font-family', value });
 
-    css = CssUtils.cleanGoogleWebFonts(state.css);
+    css = cleanGoogleWebFonts(state.css);
     if (css !== state.css) {
       dispatch('applyCss', { css });
     }
@@ -169,7 +171,7 @@ export default {
       effectName,
       percent,
     }: {
-      effectName: EffectName;
+      effectName: FilterEffect;
       percent: number;
     }
   ): void {

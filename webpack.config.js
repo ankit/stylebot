@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const ejs = require("ejs");
+const path = require("path");
 const webpack = require("webpack");
 
 const { VueLoaderPlugin } = require("vue-loader");
@@ -31,6 +32,15 @@ const config = {
 
   resolve: {
     extensions: [".ts", ".js", ".vue"],
+    alias: {
+      "@stylebot/css": path.resolve(__dirname, "./src/css/index"),
+      "@stylebot/types": path.resolve(__dirname, "./src/types/index"),
+      "@stylebot/dark-mode": path.resolve(__dirname, "./src/dark-mode/index"),
+      "@stylebot/readability": path.resolve(
+        __dirname,
+        "./src/readability/index"
+      ),
+    },
   },
 
   module: {
@@ -87,6 +97,7 @@ const config = {
     new VueLoaderPlugin(),
     new ForkTsCheckerWebpackPlugin({
       typescript: {
+        configFile: "../tsconfig.json",
         extensions: {
           vue: true,
         },

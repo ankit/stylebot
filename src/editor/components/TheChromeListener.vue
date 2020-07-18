@@ -4,10 +4,10 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import CssUtils from '../../css/CssUtils';
 
-import { apply as applyReadability } from '../../readability/index';
-import { apply as applyDarkMode } from '../../dark-mode/index';
+import { injectCSSIntoDocument } from '@stylebot/css';
+import { apply as applyDarkMode } from '@stylebot/dark-mode';
+import { apply as applyReadability } from '@stylebot/readability';
 
 export default Vue.extend({
   name: 'TheChromeListener',
@@ -27,13 +27,13 @@ export default Vue.extend({
       } else if (request.name === 'getIsStylebotOpen') {
         sendResponse(this.$store.state.visible);
       } else if (request.name === 'enableStyle') {
-        CssUtils.injectCSSIntoDocument(request.css, request.url);
+        injectCSSIntoDocument(request.css, request.url);
 
         if (request.url === this.$store.state.url) {
           this.$store.commit('setEnabled', true);
         }
       } else if (request.name === 'disableStyle') {
-        CssUtils.injectCSSIntoDocument('', request.url);
+        injectCSSIntoDocument('', request.url);
 
         if (request.url === this.$store.state.url) {
           this.$store.commit('setEnabled', false);

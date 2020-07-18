@@ -14,11 +14,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-
-import {
-  EnableStyleRequest,
-  DisableStyleRequest,
-} from '../../types/BackgroundPageRequest';
+import { EnableStyleRequest, DisableStyleRequest } from '@stylebot/types';
 
 export default Vue.extend({
   name: 'Style',

@@ -1,5 +1,5 @@
 import Overlay from './Overlay';
-import CssSelectorGenerator from '../../css/CssSelectorGenerator';
+import { getSelector } from '@stylebot/css';
 
 class Highlighter {
   overlay: Overlay | null;
@@ -69,7 +69,7 @@ class Highlighter {
       event.preventDefault();
       event.stopPropagation();
 
-      const selector = CssSelectorGenerator.get(event.target as HTMLElement);
+      const selector = getSelector(event.target as HTMLElement);
       this.onSelect(selector);
     }
   };
@@ -112,7 +112,7 @@ class Highlighter {
       this.overlay = new Overlay();
     }
 
-    this.overlay.inspect([el], CssSelectorGenerator.get(el));
+    this.overlay.inspect([el], getSelector(el));
   };
 
   hideOverlay = (): void => {

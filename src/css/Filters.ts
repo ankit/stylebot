@@ -1,23 +1,15 @@
 import * as postcss from 'postcss';
 
-import CssUtils from './CssUtils';
-import CssSelectorGenerator from './CssSelectorGenerator';
+import {
+  addDeclaration,
+  getClassBasedSelector,
+  getIdBasedSelector,
+} from '@stylebot/css';
 
-// https://developer.mozilla.org/en-US/docs/Web/CSS/filter
-export type EffectName =
-  | 'blur'
-  | 'brightness'
-  | 'contrast'
-  | 'drop-shadow'
-  | 'grayscale'
-  | 'hue-rotate'
-  | 'invert'
-  | 'opacity'
-  | 'saturate'
-  | 'sepia';
+import { FilterEffect } from '@stylebot/types';
 
-const getEffectRegex = (name: EffectName) => new RegExp(`${name}\\((.*)\\)$`);
-const getEffectDeclarationValue = (name: EffectName, percent: number) =>
+const getEffectRegex = (name: FilterEffect) => new RegExp(`${name}\\((.*)\\)$`);
+const getEffectDeclarationValue = (name: FilterEffect, percent: number) =>
   `${name}(${percent}%)`;
 
 const getSelectorsToAttachFilterForPage = (): Array<string> => {
@@ -44,16 +36,14 @@ const getSelectorsToAttachFilterForPage = (): Array<string> => {
   });
 
   const selectors = filteredNodes.map(
-    node =>
-      CssSelectorGenerator.getClassBasedSelector(node) ||
-      CssSelectorGenerator.getIdBasedSelector(node)
+    node => getClassBasedSelector(node) || getIdBasedSelector(node)
   );
 
   return selectors.filter((s): s is string => s !== null);
 };
 
 export const getFilterEffectValueForPage = (
-  effectName: EffectName,
+  effectName: FilterEffect,
   css: string
 ): number => {
   const root = postcss.parse(css);
@@ -79,7 +69,7 @@ export const getFilterEffectValueForPage = (
 };
 
 export const getCssAfterApplyingFilterEffectToPage = (
-  effectName: EffectName,
+  effectName: FilterEffect,
   css: string,
   percent: number
 ): string => {
@@ -100,24 +90,14 @@ export const getCssAfterApplyingFilterEffectToPage = (
         } else {
           // todo: update method interfaces to avoid doing this redundant work
           root = postcss.parse(
-            CssUtils.addDeclaration(
-              'filter',
-              effectValue,
-              selector,
-              root.toString()
-            )
+            addDeclaration('filter', effectValue, selector, root.toString())
           );
         }
       });
     } else {
       // todo: update method interfaces to avoid doing this redundant work
       root = postcss.parse(
-        CssUtils.addDeclaration(
-          'filter',
-          effectValue,
-          selector,
-          root.toString()
-        )
+        addDeclaration('filter', effectValue, selector, root.toString())
       );
     }
   });

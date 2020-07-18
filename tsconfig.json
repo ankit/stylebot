@@ -1,5 +1,5 @@
 {
-  "include": ["./**/*.ts", "./**/*.vue"],
+  "include": ["./src/**/*"],
   "exclude": ["node_modules"],
 
   "compilerOptions": {
@@ -8,6 +8,10 @@
     "module": "es2015",
     "lib": ["es2015", "dom"],
     "moduleResolution": "node",
-    "types": ["chrome", "jest", "node"]
+    "types": ["chrome", "jest", "node"],
+    "baseUrl": "src",
+    "paths": {
+      "@stylebot/*": ["*/index"]
+    }
   }
 }

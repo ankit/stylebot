@@ -19,5 +19,21 @@ export type Style = {
   darkMode: boolean;
 };
 
-export type { default as BackgroundPageRequest } from './BackgroundPageRequest';
-export type { default as BackgroundPageResponse } from './BackgroundPageResponse';
+// https://developer.mozilla.org/en-US/docs/Web/CSS/filter
+export type FilterEffect =
+  | 'blur'
+  | 'brightness'
+  | 'contrast'
+  | 'drop-shadow'
+  | 'grayscale'
+  | 'hue-rotate'
+  | 'invert'
+  | 'opacity'
+  | 'saturate'
+  | 'sepia';
+
+export * from './BackgroundPageRequest';
+export * from './BackgroundPageResponse';
+
+export { default as BackgroundPageRequest } from './BackgroundPageRequest';
+export { default as BackgroundPageResponse } from './BackgroundPageResponse';

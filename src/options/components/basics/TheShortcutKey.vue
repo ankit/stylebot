@@ -17,7 +17,7 @@
       </b-dropdown>
     </div>
 
-    <div class="ml-2" style="display: inline-block">
+    <div class="ml-2" style="display: inline-block;">
       <b-form-input
         v-model="shortcutKeyCharacter"
         :disabled="disabled"
@@ -30,7 +30,7 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { StylebotShortcutMetaKey } from '../../../types';
+import { StylebotShortcutMetaKey } from '@stylebot/types';
 import { getKeydownCode, getCharacterFromKeydownCode } from '../../utils';
 
 export default Vue.extend({
