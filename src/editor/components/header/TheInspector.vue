@@ -3,7 +3,7 @@
     class="stylebot-inspector"
     :class="{ active }"
     :disabled="disabled"
-    title="Select an element in the page to style it"
+    title="Select an element in the page to style it (I)"
     :variant="active ? 'primary' : 'outline-secondary'"
     @click="toggle"
   >

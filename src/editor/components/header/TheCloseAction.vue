@@ -1,6 +1,6 @@
 <template>
   <button
-    title="Close"
+    title="Close (Esc)"
     @click="onClick"
     @mouseenter="isHovered = true"
     @mouseleave="isHovered = false"

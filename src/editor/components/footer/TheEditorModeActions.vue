@@ -2,7 +2,7 @@
   <b-button-group>
     <b-button
       size="md"
-      title="Basic CSS editor"
+      title="Visual CSS editor (B)"
       :variant="mode === 'basic' ? 'secondary' : 'outline-secondary'"
       @click="setMode('basic')"
     >
@@ -12,7 +12,7 @@
 
     <b-button
       size="md"
-      title="Code CSS for selector"
+      title="Experimental features (M)"
       :variant="mode === 'magic' ? 'secondary' : 'outline-secondary'"
       @click="setMode('magic')"
     >
@@ -22,7 +22,7 @@
 
     <b-button
       size="md"
-      title="Code"
+      title="Code (C)"
       :variant="mode === 'code' ? 'secondary' : 'outline-secondary'"
       @click="setMode('code')"
     >
