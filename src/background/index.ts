@@ -1,3 +1,4 @@
+import 'crx-hotreload';
 import Cache from './cache';
 import Options from './options';
 import Listeners from './listeners';
