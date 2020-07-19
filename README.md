@@ -1,3 +1,5 @@
+![CI](https://github.com/ankit/stylebot/workflows/CI/badge.svg)
+
 _I am currently working on a major release with improved maintainability, lots of bugfixes and exciting new UI and features. In the meanwhile, I will likely be slow to respond to bugs / feature requests. Thanks for your patience._
 
 ## Stylebot
