@@ -22,11 +22,11 @@ export type GetAllCommandsResponse = Array<{
   name: StylebotCommand;
 }>;
 
-type BackgroundPageResponse =
+type BackgroundPageMessageResponse =
   | GetAllOptionsResponse
   | GetOptionResponse
   | GetAllStylesResponse
   | GetStylesForPageResponse
   | GetAllCommandsResponse;
 
-export default BackgroundPageResponse;
+export default BackgroundPageMessageResponse;

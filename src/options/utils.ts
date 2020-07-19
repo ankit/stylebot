@@ -1,11 +1,12 @@
 import {
-  GetAllStylesRequest,
-  SetAllStylesRequest,
-  SetOptionRequest,
-  GetAllOptionsRequest,
+  GetAllStyles,
+  SetAllStyles,
+  SetOption,
+  GetAllOptions,
   GetAllStylesResponse,
   GetAllOptionsResponse,
   StylebotOptions,
+  CopyToClipboard,
 } from '@stylebot/types';
 
 type Styles = {
@@ -17,58 +18,60 @@ type Styles = {
 };
 
 export const getAllStyles = async (): Promise<Styles> => {
-  const request: GetAllStylesRequest = {
-    name: 'getAllStyles',
+  const message: GetAllStyles = {
+    name: 'GetAllStyles',
   };
 
   return new Promise(resolve => {
-    chrome.extension.sendRequest(request, (response: GetAllStylesResponse) => {
+    chrome.runtime.sendMessage(message, (response: GetAllStylesResponse) => {
       resolve(response);
     });
   });
 };
 
 export const getAllOptions = async (): Promise<StylebotOptions> => {
-  const request: GetAllOptionsRequest = {
-    name: 'getAllOptions',
+  const message: GetAllOptions = {
+    name: 'GetAllOptions',
   };
 
   return new Promise(resolve => {
-    chrome.extension.sendRequest(request, (response: GetAllOptionsResponse) => {
+    chrome.runtime.sendMessage(message, (response: GetAllOptionsResponse) => {
       resolve(response);
     });
   });
 };
 
 export const setAllStyles = (styles: Styles): void => {
-  const request: SetAllStylesRequest = {
-    name: 'setAllStyles',
+  const message: SetAllStyles = {
+    name: 'SetAllStyles',
     styles,
   };
 
-  chrome.extension.sendRequest(request);
+  chrome.runtime.sendMessage(message);
 };
 
 export const setOption = (
   name: keyof StylebotOptions,
   value: StylebotOptions[keyof StylebotOptions]
 ): void => {
-  const request: SetOptionRequest = {
-    name: 'setOption',
+  const message: SetOption = {
+    name: 'SetOption',
     option: {
       name,
       value,
     },
   };
 
-  chrome.extension.sendRequest(request);
+  chrome.runtime.sendMessage(message);
 };
 
 export const copyToClipboard = (text: string): void => {
-  chrome.extension.sendRequest({
-    name: 'copyToClipboard',
+  const message: CopyToClipboard = {
+    name: 'CopyToClipboard',
     text,
-  });
+  };
+
+  chrome.runtime.sendMessage(message);
 };
 
 export const getCharacterFromKeydownCode = (code: number): string => {

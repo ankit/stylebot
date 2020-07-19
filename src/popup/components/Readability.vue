@@ -8,6 +8,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import { ToggleReadabilityForTab } from '../../types';
 
 export default Vue.extend({
   name: 'Readability',
@@ -33,9 +34,11 @@ export default Vue.extend({
     toggle(): void {
       chrome.tabs.getSelected(tab => {
         if (tab.id) {
-          chrome.tabs.sendRequest(tab.id, {
-            name: 'toggleReadability',
-          });
+          const message: ToggleReadabilityForTab = {
+            name: 'ToggleReadabilityForTab',
+          };
+
+          chrome.tabs.sendMessage(tab.id, message);
         }
       });
     },

@@ -1,5 +1,7 @@
 import {
-  GetStylesForPageRequest,
+  ToggleStylebot,
+  GetStylesForPage,
+  GetIsStylebotOpen,
   GetStylesForPageResponse,
 } from '@stylebot/types';
 
@@ -21,12 +23,12 @@ export const getStyles = (
   tab: chrome.tabs.Tab,
   callback: (styles: GetStylesForPageResponse) => void
 ): void => {
-  const request: GetStylesForPageRequest = {
-    name: 'getStylesForPage',
+  const message: GetStylesForPage = {
+    name: 'GetStylesForPage',
     tab,
   };
 
-  chrome.extension.sendRequest(request, response => {
+  chrome.runtime.sendMessage(message, response => {
     callback(response);
   });
 };
@@ -36,22 +38,23 @@ export const getIsStylebotOpen = (
   callback: (isOpen: boolean) => void
 ): void => {
   if (tab.id) {
-    chrome.tabs.sendRequest(
-      tab.id,
-      {
-        name: 'getIsStylebotOpen',
-      },
-      response => callback(response)
+    const message: GetIsStylebotOpen = {
+      name: 'GetIsStylebotOpen',
+    };
+
+    chrome.tabs.sendMessage(tab.id, message, (response: boolean) =>
+      callback(response)
     );
   }
 };
 
 export const toggleStylebot = (tab: chrome.tabs.Tab): void => {
   if (tab.id) {
-    chrome.tabs.sendRequest(tab.id, {
-      name: 'toggleStylebot',
-    });
+    const message: ToggleStylebot = {
+      name: 'ToggleStylebot',
+    };
 
+    chrome.tabs.sendMessage(tab.id, message);
     window.close();
   }
 };

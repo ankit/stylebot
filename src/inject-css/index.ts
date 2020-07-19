@@ -6,8 +6,8 @@ import { injectCSSIntoDocument } from '@stylebot/css';
 import { apply as applyReadability } from '@stylebot/readability';
 
 import {
-  GetStylesForPageRequest,
-  GetStylesForIframeRequest,
+  GetStylesForPage,
+  GetStylesForIframe,
   GetStylesForPageResponse,
 } from '@stylebot/types';
 
@@ -15,11 +15,11 @@ const MAX_INJECT_COUNT = 10;
 const INJECT_CSS_TIMEOUT = 300;
 
 const injectCss = (
-  request: GetStylesForPageRequest | GetStylesForIframeRequest,
+  message: GetStylesForPage | GetStylesForIframe,
   injectCount = 0
 ) => {
-  chrome.extension.sendRequest(
-    request,
+  chrome.runtime.sendMessage(
+    message,
 
     (response: GetStylesForPageResponse) => {
       if (response) {
@@ -36,7 +36,7 @@ const injectCss = (
         }
       } else if (injectCount < MAX_INJECT_COUNT) {
         setTimeout(() => {
-          injectCss(request, injectCount + 1);
+          injectCss(message, injectCount + 1);
         }, INJECT_CSS_TIMEOUT);
       }
     }
@@ -46,12 +46,12 @@ const injectCss = (
 const run = () => {
   if (window === window.top) {
     injectCss({
-      name: 'getStylesForPage',
+      name: 'GetStylesForPage',
       important: true,
     });
   } else {
     injectCss({
-      name: 'getStylesForIframe',
+      name: 'GetStylesForIframe',
       url: window.location.href,
       important: true,
     });

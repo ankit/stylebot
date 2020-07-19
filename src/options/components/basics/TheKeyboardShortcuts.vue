@@ -7,7 +7,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { OpenCommandsPageRequest } from '../../../types';
+import { OpenCommandsPage } from '@stylebot/types';
 
 export default Vue.extend({
   name: 'TheKeyboardShortcuts',
@@ -15,11 +15,11 @@ export default Vue.extend({
     click(event: MouseEvent) {
       event.preventDefault();
 
-      const request: OpenCommandsPageRequest = {
-        name: 'openCommandsPage',
+      const message: OpenCommandsPage = {
+        name: 'OpenCommandsPage',
       };
 
-      chrome.extension.sendRequest(request);
+      chrome.runtime.sendMessage(message);
     },
   },
 });

@@ -27,12 +27,6 @@ export type FilterEffect =
   | 'saturate'
   | 'sepia';
 
-export * from './BackgroundPageRequest';
-export * from './BackgroundPageResponse';
-
-export { default as BackgroundPageRequest } from './BackgroundPageRequest';
-export { default as BackgroundPageResponse } from './BackgroundPageResponse';
-
 export type ReadabilityArticle = {
   title: string;
   byline: string;
@@ -45,3 +39,11 @@ export type StylebotCommand =
   | 'toggle-style'
   | 'toggle-readability'
   | 'toggle-grayscale';
+
+export * from './TabMessage';
+export * from './BackgroundPageMessage';
+export * from './BackgroundPageMessageResponse';
+
+export { default as TabMessage } from './TabMessage';
+export { default as BackgroundPageMessage } from './BackgroundPageMessage';
+export { default as BackgroundPageMessageResponse } from './BackgroundPageMessageResponse';

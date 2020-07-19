@@ -1,6 +1,7 @@
 import * as postcss from 'postcss';
 import BackgroundPageUtils from './utils';
 import BrowserAction from './browseraction';
+import { EnableStyleForTab, DisableStyleForTab } from 'types';
 
 type Style = {
   css: string;
@@ -67,12 +68,13 @@ class BackgroundPageStyles {
         this.updateBrowserAction(tab, styles);
 
         const css = this.addImportantToCss(this.styles[url].css);
-
-        chrome.tabs.sendRequest(tab.id, {
-          name: 'enableStyle',
+        const message: EnableStyleForTab = {
+          name: 'EnableStyleForTab',
           url,
           css,
-        });
+        };
+
+        chrome.tabs.sendMessage(tab.id, message);
       }
     });
   }
@@ -92,10 +94,12 @@ class BackgroundPageStyles {
         const { styles } = this.getStylesForPage(tab.url);
         this.updateBrowserAction(tab, styles);
 
-        chrome.tabs.sendRequest(tab.id, {
-          name: 'disableStyle',
+        const message: DisableStyleForTab = {
+          name: 'DisableStyleForTab',
           url,
-        });
+        };
+
+        chrome.tabs.sendMessage(tab.id, message);
       }
     });
   }

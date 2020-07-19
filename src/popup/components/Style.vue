@@ -13,7 +13,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { EnableStyleRequest, DisableStyleRequest } from '@stylebot/types';
+import { EnableStyle, DisableStyle } from '@stylebot/types';
 
 export default Vue.extend({
   name: 'Style',
@@ -48,22 +48,22 @@ export default Vue.extend({
     },
 
     enable(): void {
-      const request: EnableStyleRequest = {
-        name: 'enableStyle',
+      const message: EnableStyle = {
+        name: 'EnableStyle',
         url: this.url,
       };
 
-      chrome.extension.sendRequest(request);
+      chrome.runtime.sendMessage(message);
       this.enabled = true;
     },
 
     disable(): void {
-      const request: DisableStyleRequest = {
-        name: 'disableStyle',
+      const message: DisableStyle = {
+        name: 'DisableStyle',
         url: this.url,
       };
 
-      chrome.extension.sendRequest(request);
+      chrome.runtime.sendMessage(message);
       this.enabled = false;
     },
   },

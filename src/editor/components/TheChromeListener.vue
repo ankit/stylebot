@@ -5,8 +5,8 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { StylebotCommand } from '@stylebot/types';
 import { injectCSSIntoDocument } from '@stylebot/css';
+import { StylebotCommand, TabMessage } from '@stylebot/types';
 import { apply as applyReadability } from '@stylebot/readability';
 
 import { disableStyle, enableStyle } from '../utils/chrome';
@@ -33,33 +33,35 @@ export default Vue.extend({
   },
 
   created(): void {
-    chrome.extension.onRequest.addListener((request, _, sendResponse) => {
-      if (window !== window.top) {
-        return;
-      }
+    chrome.runtime.onMessage.addListener(
+      (message: TabMessage, _, sendResponse: (response: boolean) => void) => {
+        if (window !== window.top) {
+          return;
+        }
 
-      if (request.name === 'toggleStylebot') {
-        this.toggleStylebot();
-      } else if (request.name === 'openStylebot') {
-        if (!this.visible) {
+        if (message.name === 'ToggleStylebot') {
           this.toggleStylebot();
+        } else if (message.name === 'OpenStylebot') {
+          if (!this.visible) {
+            this.toggleStylebot();
+          }
+        } else if (message.name === 'EnableStyleForTab') {
+          this.enableStyle(message.css, message.url);
+        } else if (message.name === 'DisableStyleForTab') {
+          this.disableStyle(message.url);
+        } else if (message.name === 'TabUpdated') {
+          if (this.readability) {
+            applyReadability();
+          }
+        } else if (message.name === 'GetIsStylebotOpen') {
+          sendResponse(this.visible);
+        } else if (message.name === 'ExecuteCommand') {
+          this.handleCommand(message.command);
+        } else if (message.name === 'ToggleReadabilityForTab') {
+          this.toggleReadability();
         }
-      } else if (request.name === 'enableStyle') {
-        this.enableStyle(request.css, request.url);
-      } else if (request.name === 'disableStyle') {
-        this.disableStyle(request.url);
-      } else if (request.name === 'tabUpdated') {
-        if (this.readability) {
-          applyReadability();
-        }
-      } else if (request.name === 'getIsStylebotOpen') {
-        sendResponse(this.visible);
-      } else if (request.name === 'command') {
-        this.handleCommand(request.command);
-      } else if (request.name === 'toggleReadability') {
-        this.toggleReadability();
       }
-    });
+    );
   },
 
   methods: {

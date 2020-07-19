@@ -1,27 +1,27 @@
 import {
-  SetOptionRequest,
-  GetAllOptionsRequest,
-  OpenOptionsPageRequest,
-  SetStyleRequest,
-  EnableStyleRequest,
-  DisableStyleRequest,
-  GetStylesForPageRequest,
-  SetReadabilityRequest,
+  SetOption,
+  GetAllOptions,
+  OpenOptionsPage,
+  SetStyle,
+  EnableStyle,
+  DisableStyle,
+  GetStylesForPage,
+  SetReadability,
+  GetAllCommands,
+  OpenCommandsPage,
   GetAllOptionsResponse,
   GetStylesForPageResponse,
-  StylebotOptions,
-  GetAllCommandsRequest,
   GetAllCommandsResponse,
-  OpenCommandsPageRequest,
+  StylebotOptions,
 } from '@stylebot/types';
 
 export const getAllOptions = async (): Promise<StylebotOptions> => {
-  const request: GetAllOptionsRequest = {
-    name: 'getAllOptions',
+  const message: GetAllOptions = {
+    name: 'GetAllOptions',
   };
 
   return new Promise(resolve => {
-    chrome.extension.sendRequest(request, (response: GetAllOptionsResponse) => {
+    chrome.runtime.sendMessage(message, (response: GetAllOptionsResponse) => {
       resolve(response);
     });
   });
@@ -31,28 +31,28 @@ export const setOption = (
   name: string,
   value: StylebotOptions[keyof StylebotOptions]
 ): void => {
-  const request: SetOptionRequest = {
-    name: 'setOption',
+  const message: SetOption = {
+    name: 'SetOption',
     option: {
       name,
       value,
     },
   };
 
-  chrome.extension.sendRequest(request);
+  chrome.runtime.sendMessage(message);
 };
 
 export const getStylesForPage = async (
   important: boolean
 ): Promise<GetStylesForPageResponse> => {
-  const request: GetStylesForPageRequest = {
-    name: 'getStylesForPage',
+  const message: GetStylesForPage = {
+    name: 'GetStylesForPage',
     important,
   };
 
   return new Promise(resolve => {
-    chrome.extension.sendRequest(
-      request,
+    chrome.runtime.sendMessage(
+      message,
       (response: GetStylesForPageResponse) => {
         resolve(response);
       }
@@ -61,67 +61,67 @@ export const getStylesForPage = async (
 };
 
 export const openOptionsPage = (): void => {
-  const request: OpenOptionsPageRequest = {
-    name: 'openOptionsPage',
+  const message: OpenOptionsPage = {
+    name: 'OpenOptionsPage',
   };
 
-  chrome.extension.sendRequest(request);
+  chrome.runtime.sendMessage(message);
 };
 
 export const setStyle = (url: string, css: string): void => {
-  const request: SetStyleRequest = {
-    name: 'setStyle',
+  const message: SetStyle = {
+    name: 'SetStyle',
     url,
     css,
   };
 
-  chrome.extension.sendRequest(request);
+  chrome.runtime.sendMessage(message);
 };
 
 export const enableStyle = (url: string): void => {
-  const request: EnableStyleRequest = {
-    name: 'enableStyle',
+  const message: EnableStyle = {
+    name: 'EnableStyle',
     url,
   };
 
-  chrome.extension.sendRequest(request);
+  chrome.runtime.sendMessage(message);
 };
 
 export const disableStyle = (url: string): void => {
-  const request: DisableStyleRequest = {
-    name: 'disableStyle',
+  const message: DisableStyle = {
+    name: 'DisableStyle',
     url,
   };
 
-  chrome.extension.sendRequest(request);
+  chrome.runtime.sendMessage(message);
 };
 
 export const setReadability = (url: string, value: boolean): void => {
-  const request: SetReadabilityRequest = {
-    name: 'setReadability',
+  const message: SetReadability = {
+    name: 'SetReadability',
     value,
     url,
   };
 
-  chrome.extension.sendRequest(request);
+  chrome.runtime.sendMessage(message);
 };
 
 export const getAllCommands = async (): Promise<GetAllCommandsResponse> => {
-  const request: GetAllCommandsRequest = {
-    name: 'getAllCommands',
+  const message: GetAllCommands = {
+    name: 'GetAllCommands',
   };
 
   return new Promise(resolve => {
-    chrome.extension.sendRequest(request, response => {
+    chrome.runtime.sendMessage(message, (response: GetAllCommandsResponse) => {
       resolve(response);
     });
   });
 };
 
 export const openCommandsPage = (): void => {
-  const request: OpenCommandsPageRequest = {
-    name: 'openCommandsPage',
+  const message: OpenCommandsPage = {
+    name: 'OpenCommandsPage',
   };
 
-  chrome.extension.sendRequest(request);
+  chrome.runtime.sendMessage(message);
 };

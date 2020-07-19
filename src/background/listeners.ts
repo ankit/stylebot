@@ -1,66 +1,97 @@
 import ContextMenu from './contextmenu';
 import BackgroundPageStyles from './styles';
 
-import styleRequest from './requests/styleRequest';
-import optionRequest from './requests/optionRequest';
-import getAllCommandsRequest from './requests/getAllCommandsRequest';
-import copyToClipboardRequest from './requests/copyToClipboardRequest';
-import openCommandsPageRequest from './requests/openCommandsPageRequest';
+import {
+  CopyToClipboard,
+  GetAllCommands,
+  OpenCommandsPage,
+  GetOption,
+  SetOption,
+  GetAllOptions,
+  OpenOptionsPage,
+  SetStyle,
+  MoveStyle,
+  GetAllStyles,
+  SetAllStyles,
+  GetStylesForPage,
+  GetStylesForIframe,
+  EnableStyle,
+  DisableStyle,
+  SetReadability,
+} from './messages';
 
 import {
   StylebotOptions,
-  BackgroundPageRequest,
-  BackgroundPageResponse,
+  BackgroundPageMessage,
+  BackgroundPageMessageResponse,
+  ExecuteCommand,
+  StylebotCommand,
+  TabUpdated,
 } from '@stylebot/types';
 
 /**
  * Initialize listeners for the background page
  */
 const init = (styles: BackgroundPageStyles, options: StylebotOptions): void => {
-  chrome.extension.onRequest.addListener(
+  chrome.runtime.onMessage.addListener(
     (
-      request: BackgroundPageRequest,
+      message: BackgroundPageMessage,
       sender: chrome.runtime.MessageSender,
-      sendResponse: (response: BackgroundPageResponse) => void
+      sendResponse: (response: BackgroundPageMessageResponse) => void
     ) => {
-      if (request.name === 'copyToClipboard') {
-        copyToClipboardRequest(request.text);
-        return;
-      }
+      switch (message.name) {
+        case 'CopyToClipboard':
+          CopyToClipboard(message.text);
+          break;
 
-      if (request.name === 'getAllCommands') {
-        getAllCommandsRequest(sendResponse);
-        return;
-      }
+        case 'GetAllCommands':
+          GetAllCommands(sendResponse);
+          break;
+        case 'OpenCommandsPage':
+          OpenCommandsPage();
+          break;
 
-      if (request.name === 'openCommandsPage') {
-        openCommandsPageRequest();
-        return;
-      }
+        case 'GetOption':
+          GetOption(message, options, sendResponse);
+          break;
+        case 'SetOption':
+          SetOption(message);
+          break;
+        case 'GetAllOptions':
+          GetAllOptions(options, sendResponse);
+          break;
+        case 'OpenOptionsPage':
+          OpenOptionsPage();
+          break;
 
-      if (
-        request.name === 'getOption' ||
-        request.name === 'setOption' ||
-        request.name === 'getAllOptions' ||
-        request.name === 'openOptionsPage'
-      ) {
-        optionRequest(request, options, sendResponse);
-        return;
-      }
+        case 'SetStyle':
+          SetStyle(message, styles);
+          break;
+        case 'MoveStyle':
+          MoveStyle(message, styles);
+          break;
+        case 'GetAllStyles':
+          GetAllStyles(styles, sendResponse);
+          break;
+        case 'SetAllStyles':
+          SetAllStyles(message, styles);
+          break;
+        case 'GetStylesForPage':
+          GetStylesForPage(message, styles, sender, sendResponse);
+          break;
+        case 'GetStylesForIframe':
+          GetStylesForIframe(message, styles, sendResponse);
+          break;
+        case 'EnableStyle':
+          EnableStyle(message, styles);
+          break;
+        case 'DisableStyle':
+          DisableStyle(message, styles);
+          break;
 
-      if (
-        request.name === 'setStyle' ||
-        request.name === 'moveStyles' ||
-        request.name === 'getAllStyles' ||
-        request.name === 'setAllStyles' ||
-        request.name === 'getStylesForPage' ||
-        request.name === 'getStylesForIframe' ||
-        request.name === 'enableStyle' ||
-        request.name === 'disableStyle' ||
-        request.name === 'setReadability'
-      ) {
-        styleRequest(request, styles, sender, sendResponse);
-        return;
+        case 'SetReadability':
+          SetReadability(message, styles);
+          break;
       }
     }
   );
@@ -69,16 +100,18 @@ const init = (styles: BackgroundPageStyles, options: StylebotOptions): void => {
    * Listen when an existing tab is updated
    * and update the context-menu and browser-action
    */
-  chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  chrome.tabs.onUpdated.addListener((tabId, _, tab) => {
     if (tab.status === 'complete') {
       if (options.contextMenu) {
         ContextMenu.update(tab);
       }
     }
 
-    chrome.tabs.sendRequest(tabId, {
-      name: 'tabUpdated',
-    });
+    const message: TabUpdated = {
+      name: 'TabUpdated',
+    };
+
+    chrome.tabs.sendMessage(tabId, message);
   });
 
   /**
@@ -98,10 +131,12 @@ const init = (styles: BackgroundPageStyles, options: StylebotOptions): void => {
   chrome.commands.onCommand.addListener(command => {
     chrome.tabs.getSelected(tab => {
       if (tab.id) {
-        chrome.tabs.sendRequest(tab.id, {
-          name: 'command',
-          command,
-        });
+        const message: ExecuteCommand = {
+          name: 'ExecuteCommand',
+          command: command as StylebotCommand,
+        };
+
+        chrome.tabs.sendMessage(tab.id, message);
       }
     });
   });
