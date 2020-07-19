@@ -51,7 +51,18 @@ export default Vue.extend({
     StyleDeleteButton,
   },
 
-  props: ['url', 'css', 'initialEnabled', 'initialReadability'],
+  props: {
+    url: {
+      type: String,
+      required: true,
+    },
+    css: {
+      type: String,
+      required: true,
+    },
+    initialEnabled: Boolean,
+    initialReadability: Boolean,
+  },
 
   data(): {
     enabled: boolean;

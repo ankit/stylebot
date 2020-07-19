@@ -28,5 +28,5 @@ import App from './App.vue';
 new Vue({
   store,
   el: '#app',
-  render: (h: any) => h(App),
+  render: h => h(App),
 });

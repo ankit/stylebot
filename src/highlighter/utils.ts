@@ -18,6 +18,21 @@ export type Rect = {
   width: number;
 };
 
+export type Dimensions = {
+  borderLeft: number;
+  borderRight: number;
+  borderTop: number;
+  borderBottom: number;
+  marginLeft: number;
+  marginRight: number;
+  marginTop: number;
+  marginBottom: number;
+  paddingLeft: number;
+  paddingRight: number;
+  paddingTop: number;
+  paddingBottom: number;
+};
+
 // Get the window object for the document that a node belongs to,
 // or return null if it cannot be found (node not attached to DOM,
 // etc).
@@ -42,7 +57,7 @@ export function getOwnerIframe(node: HTMLElement): HTMLElement | null {
 
 // Get a bounding client rect for a node, with an
 // offset added to compensate for its border.
-export function getBoundingClientRectWithBorderOffset(node: HTMLElement) {
+export function getBoundingClientRectWithBorderOffset(node: HTMLElement): Rect {
   const dimensions = getElementDimensions(node);
   return mergeRectOffsets([
     node.getBoundingClientRect(),
@@ -119,7 +134,7 @@ export function getNestedBoundingClientRect(
   }
 }
 
-export function getElementDimensions(domElement: HTMLElement) {
+export function getElementDimensions(domElement: HTMLElement): Dimensions {
   const calculatedStyle = window.getComputedStyle(domElement);
 
   return {

@@ -17,9 +17,18 @@ import { Highlighter } from '@stylebot/highlighter';
 
 export default Vue.extend({
   name: 'TheCssSelectorDropdownItem',
-  props: ['selector', 'count'],
+  props: {
+    selector: {
+      type: String,
+      required: true,
+    },
+    count: {
+      type: Number,
+      required: true,
+    },
+  },
 
-  data(): any {
+  data(): { highlighter: Highlighter | null } {
     return {
       highlighter: null,
     };
@@ -40,14 +49,14 @@ export default Vue.extend({
 
     mouseenter(): void {
       if (validateSelector(this.selector)) {
-        this.highlighter.highlight(this.selector);
+        this.highlighter?.highlight(this.selector);
       } else {
-        this.highlighter.unhighlight();
+        this.highlighter?.unhighlight();
       }
     },
 
     mouseleave(): void {
-      this.highlighter.unhighlight();
+      this.highlighter?.unhighlight();
     },
   },
 });

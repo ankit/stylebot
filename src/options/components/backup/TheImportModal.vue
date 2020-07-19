@@ -9,7 +9,7 @@
     no-close-on-esc
     hide-header-close
     @ok="importJson"
-    @cancel="cancel"
+    @cancel="close"
   >
     <div v-if="!error" class="mb-3">
       This will overwrite your existing styles. You can't undo this.
@@ -77,7 +77,7 @@ export default Vue.extend({
   },
 
   methods: {
-    cancel(): void {
+    close(): void {
       this.json = '';
       this.error = false;
       this.$emit('close');

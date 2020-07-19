@@ -14,6 +14,7 @@ import {
   getElementDimensions,
   getNestedBoundingClientRect,
   Rect,
+  Dimensions,
 } from './utils';
 
 type Box = {
@@ -22,6 +23,11 @@ type Box = {
   width: number;
   height: number;
 };
+
+// https://dev.to/kingdaro/indexing-objects-in-typescript-1cgi
+function hasKey<O>(obj: O, key: string | number | symbol): key is keyof O {
+  return key in obj;
+}
 
 // Note that the Overlay components are not affected by the active Theme,
 // because they highlight elements in the main Chrome window (outside of devtools).
@@ -64,7 +70,7 @@ class OverlayRect {
     }
   }
 
-  update(box: Rect, dims: any) {
+  update(box: Rect, dims: Dimensions) {
     boxWrap(dims, 'margin', this.node);
     boxWrap(dims, 'border', this.border);
     boxWrap(dims, 'padding', this.padding);
@@ -177,7 +183,7 @@ export default class Overlay {
     doc.body.appendChild(this.container);
   }
 
-  remove() {
+  remove(): void {
     this.tip.remove();
     this.rects.forEach(rect => {
       rect.remove();
@@ -189,7 +195,7 @@ export default class Overlay {
     }
   }
 
-  inspect(nodes: Array<HTMLElement>, cssSelector: string) {
+  inspect(nodes: Array<HTMLElement>, cssSelector: string): void {
     // We can't get the size of text nodes or comment nodes. React as of v15
     // heavily uses comment nodes to delimit text.
     const elements = nodes.filter(node => node.nodeType === Node.ELEMENT_NODE);
@@ -300,14 +306,26 @@ function findTipPos(
   };
 }
 
-function boxWrap(dims: any, what: string, node: HTMLElement) {
-  Object.assign(node.style, {
-    borderTopWidth: dims[what + 'Top'] + 'px',
-    borderLeftWidth: dims[what + 'Left'] + 'px',
-    borderRightWidth: dims[what + 'Right'] + 'px',
-    borderBottomWidth: dims[what + 'Bottom'] + 'px',
-    borderStyle: 'solid',
-  });
+function boxWrap(dims: Dimensions, what: string, node: HTMLElement) {
+  const topIndex = `${what}Top`;
+  const leftIndex = `${what}Left`;
+  const rightIndex = `${what}Right`;
+  const bottomIndex = `${what}Bottom`;
+
+  if (
+    hasKey<Dimensions>(dims, topIndex) &&
+    hasKey<Dimensions>(dims, leftIndex) &&
+    hasKey<Dimensions>(dims, rightIndex) &&
+    hasKey<Dimensions>(dims, bottomIndex)
+  ) {
+    Object.assign(node.style, {
+      borderTopWidth: dims[topIndex] + 'px',
+      borderLeftWidth: dims[leftIndex] + 'px',
+      borderRightWidth: dims[rightIndex] + 'px',
+      borderBottomWidth: dims[bottomIndex] + 'px',
+      borderStyle: 'solid',
+    });
+  }
 }
 
 const overlayStyles = {

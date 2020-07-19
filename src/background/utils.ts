@@ -44,7 +44,7 @@ class BackgroundPageUtils {
    * Guess if the given URL is valid HTML by comparing URL extension
    * against an extension blacklist
    */
-  static isValidHTML(url: string) {
+  static isValidHTML(url: string): boolean {
     const extension = url.split('.').pop();
     if (!extension) {
       return true;
@@ -56,7 +56,7 @@ class BackgroundPageUtils {
   /**
    * Check if the URL matches the given stylebot pattern
    */
-  static matchesPattern(url: string, pattern: string) {
+  static matchesPattern(url: string, pattern: string): boolean {
     if (this.isRegex(pattern)) {
       return new RegExp(pattern).test(url);
     } else if (this.isPattern(pattern)) {
@@ -104,7 +104,7 @@ class BackgroundPageUtils {
   /**
    * Check if Stylebot should run on a URL.
    */
-  static isValidUrl(url: string) {
+  static isValidUrl(url: string): boolean {
     if (url.indexOf('chrome://') !== -1) {
       return false;
     }
@@ -127,7 +127,7 @@ class BackgroundPageUtils {
     return true;
   }
 
-  static copyToClipboard(str: string) {
+  static copyToClipboard(str: string): void {
     const copyTextarea = document.createElement('textarea');
     document.body.appendChild(copyTextarea);
     copyTextarea.value = str;

@@ -10,6 +10,7 @@
       </div>
 
       <div class="stylebot-reader-byline">{{ article.byline }}</div>
+      <!-- eslint-disable vue/no-v-html - html is generated with the readability project -->
       <div class="stylebot-reader-content" v-html="article.content" />
     </div>
   </div>

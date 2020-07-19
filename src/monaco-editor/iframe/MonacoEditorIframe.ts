@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import CustomLight from './themes/CustomLight';
 import { IframeMessage, ParentUpdateCssMessage } from '@stylebot/monaco-editor';
 

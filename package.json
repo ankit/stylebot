@@ -13,7 +13,7 @@
   "license": "MIT",
   "author": "Ankit Ahuja",
   "scripts": {
-    "build": "cross-env NODE_ENV=production webpack --hide-modules;",
+    "build": "cross-env NODE_ENV=production webpack --hide-modules",
     "lint": "eslint --ext .js,.ts,.vue src",
     "test": "jest",
     "watch": "cross-env NODE_ENV=development webpack --hide-modules --watch"
@@ -88,6 +88,7 @@
     "postcss-rem-to-pixel": "^4.1.2",
     "prettier": "^2.0.5",
     "prettier-eslint": "^11.0.0",
+    "progress-bar-webpack-plugin": "^2.1.0",
     "readability": "mozilla/readability#master",
     "requirejs": "^2.3.6",
     "sass": "^1.26.9",

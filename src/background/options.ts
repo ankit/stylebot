@@ -40,7 +40,7 @@ const propagateOptions = () => {
  * Also pushes the change to all currently open tabs.
  * todo: tighten the types
  */
-export const saveOption = (name: string, value: string | boolean) => {
+export const saveOption = (name: string, value: string | boolean): void => {
   window.cache.options[name] = value;
   chrome.storage.local.set({ options: window.cache.options });
 

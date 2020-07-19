@@ -13,5 +13,5 @@ Vue.use(FormCheckboxPlugin);
 
 new Vue({
   el: '#app',
-  render: (h: any) => h(App),
+  render: h => h(App),
 });

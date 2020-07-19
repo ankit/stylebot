@@ -1,3 +1,5 @@
+import { StylebotOptions } from 'types';
+
 export type SetStyleRequest = {
   name: 'setStyle';
   url: string;
@@ -60,7 +62,7 @@ export type SetOptionRequest = {
   name: 'setOption';
   option: {
     name: string;
-    value: any; // todo
+    value: StylebotOptions[keyof StylebotOptions]; // todo
   };
 };
 

@@ -9,7 +9,7 @@
     no-close-on-esc
     hide-header-close
     @ok="copyJson"
-    @cancel="cancel"
+    @cancel="close"
   >
     <div class="mb-3">Keep the JSON safe to import it later</div>
 
@@ -59,7 +59,7 @@ export default Vue.extend({
   },
 
   methods: {
-    cancel(): void {
+    close(): void {
       this.$emit('close');
     },
 

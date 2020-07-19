@@ -24,7 +24,7 @@ export default Vue.extend({
     },
   },
 
-  data(): any {
+  data(): { highlighter: Highlighter | null } {
     return {
       highlighter: null,
     };
@@ -49,9 +49,9 @@ export default Vue.extend({
       this.$store.commit('setActiveSelector', selector);
 
       if (validateSelector(selector)) {
-        this.highlighter.highlight(selector);
+        this.highlighter?.highlight(selector);
       } else {
-        this.highlighter.unhighlight();
+        this.highlighter?.unhighlight();
       }
     },
 
@@ -59,14 +59,14 @@ export default Vue.extend({
       const selector = this.$store.state.activeSelector;
 
       if (validateSelector(selector)) {
-        this.highlighter.highlight(selector);
+        this.highlighter?.highlight(selector);
       } else {
-        this.highlighter.unhighlight();
+        this.highlighter?.unhighlight();
       }
     },
 
     blur(): void {
-      this.highlighter.unhighlight();
+      this.highlighter?.unhighlight();
     },
   },
 });

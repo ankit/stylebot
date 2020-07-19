@@ -60,5 +60,5 @@ fetch(cssUrl, { method: 'GET' })
 new Vue({
   store,
   el: stylebotApp,
-  render: (h: any) => h(TheStylebotApp),
+  render: h => h(TheStylebotApp),
 });
