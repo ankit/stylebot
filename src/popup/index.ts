@@ -1,10 +1,15 @@
 import Vue from 'vue';
 import App from './App.vue';
 
-import { IconsPlugin, ListGroupPlugin } from 'bootstrap-vue';
+import {
+  IconsPlugin,
+  ListGroupPlugin,
+  FormCheckboxPlugin,
+} from 'bootstrap-vue';
 
 Vue.use(IconsPlugin);
 Vue.use(ListGroupPlugin);
+Vue.use(FormCheckboxPlugin);
 
 new Vue({
   el: '#app',

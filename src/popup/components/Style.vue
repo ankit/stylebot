@@ -1,14 +1,13 @@
 <template>
-  <b-list-group-item
-    button
-    :disabled="disableToggle"
-    :variant="enabled ? 'success' : 'default'"
-    @click="toggle"
-  >
-    <b-icon v-if="enabled" icon="eye-fill" />
-    <b-icon v-else icon="eye-slash" />
-
-    <span class="pl-2">{{ url }}</span>
+  <b-list-group-item>
+    <b-form-checkbox
+      v-model="enabled"
+      switch
+      :disabled="disableToggle"
+      @change="toggle"
+    >
+      {{ url }}
+    </b-form-checkbox>
   </b-list-group-item>
 </template>
 
@@ -18,7 +17,18 @@ import { EnableStyleRequest, DisableStyleRequest } from '@stylebot/types';
 
 export default Vue.extend({
   name: 'Style',
-  props: ['tab', 'url', 'initialEnabled', 'disableToggle'],
+  props: {
+    url: {
+      type: String,
+      required: true,
+    },
+    disableToggle: {
+      type: Boolean,
+    },
+    initialEnabled: {
+      type: Boolean,
+    },
+  },
 
   data(): {
     enabled: boolean;

@@ -1,17 +1,17 @@
 <template>
   <div class="popup">
     <b-list-group v-if="tab && tab.id" class="list-group">
-      <toggle-stylebot :is-open="isOpen" :tab="tab" />
-
       <style-component
         v-for="style in styles"
         :key="style.url"
-        :tab="tab"
         :url="style.url"
         :disable-toggle="isOpen"
         :initial-enabled="style.enabled"
       />
 
+      <readability :initial-readability="readability" />
+
+      <toggle-stylebot :is-open="isOpen" :tab="tab" />
       <view-options />
     </b-list-group>
   </div>
@@ -22,6 +22,7 @@ import Vue from 'vue';
 
 import StyleComponent from './components/Style.vue';
 import ViewOptions from './components/ViewOptions.vue';
+import Readability from './components/Readability.vue';
 import ToggleStylebot from './components/ToggleStylebot.vue';
 
 import { getStyles, getCurrentTab, getIsStylebotOpen } from './utils';
@@ -33,10 +34,12 @@ export default Vue.extend({
     ViewOptions,
     StyleComponent,
     ToggleStylebot,
+    Readability,
   },
 
   data(): {
     isOpen: boolean;
+    readability: boolean;
     tab?: chrome.tabs.Tab;
     styles: Array<{ url: string; css: string; enabled: boolean }>;
   } {
@@ -44,6 +47,7 @@ export default Vue.extend({
       styles: [],
       isOpen: false,
       tab: undefined,
+      readability: false,
     };
   },
 
@@ -55,8 +59,9 @@ export default Vue.extend({
         this.isOpen = isOpen;
       });
 
-      getStyles(this.tab, ({ styles }) => {
-        this.styles = styles;
+      getStyles(this.tab, ({ styles, defaultStyle }) => {
+        this.styles = styles.filter(style => style.css);
+        this.readability = !!defaultStyle && defaultStyle.readability;
       });
     });
   },

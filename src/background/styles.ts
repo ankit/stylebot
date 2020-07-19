@@ -167,11 +167,15 @@ class BackgroundPageStyles {
         const { enabled, readability } = this.styles[url];
         const style = { url, css, enabled, readability };
 
-        if (!defaultStyle || url.length > defaultStyle.url.length) {
-          defaultStyle = style;
+        if (url !== '*') {
+          if (!defaultStyle || url.length > defaultStyle.url.length) {
+            defaultStyle = style;
+          }
         }
 
-        styles.push(style);
+        if (style.css) {
+          styles.push(style);
+        }
       }
     }
 

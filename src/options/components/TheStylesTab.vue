@@ -80,12 +80,10 @@ export default Vue.extend({
   data(): {
     urlFilter: string;
     addStyleDialog: boolean;
-    addStyleDialogError: any;
   } {
     return {
       urlFilter: '',
       addStyleDialog: false,
-      addStyleDialogError: null,
     };
   },
 

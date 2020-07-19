@@ -13,7 +13,13 @@ import { toggleStylebot } from '../utils';
 
 export default Vue.extend({
   name: 'ToggleStylebot',
-  props: ['tab', 'isOpen'],
+  props: {
+    tab: {
+      type: Object,
+      required: true,
+    },
+    isOpen: Boolean,
+  },
 
   methods: {
     toggle(): void {

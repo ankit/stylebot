@@ -23,17 +23,17 @@ const injectCss = (
 
     (response: GetStylesForPageResponse) => {
       if (response) {
-        const { styles } = response;
+        const { styles, defaultStyle } = response;
 
         styles.forEach(style => {
           if (style.enabled) {
             injectCSSIntoDocument(style.css, style.url);
           }
-
-          if (style.readability) {
-            applyReadability();
-          }
         });
+
+        if (defaultStyle && defaultStyle.readability) {
+          applyReadability();
+        }
       } else if (injectCount < MAX_INJECT_COUNT) {
         setTimeout(() => {
           injectCss(request, injectCount + 1);

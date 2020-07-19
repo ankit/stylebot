@@ -8,10 +8,29 @@ import Vue from 'vue';
 import { StylebotCommand } from '@stylebot/types';
 import { injectCSSIntoDocument } from '@stylebot/css';
 import { apply as applyReadability } from '@stylebot/readability';
+
 import { disableStyle, enableStyle } from '../utils/chrome';
 
 export default Vue.extend({
   name: 'TheChromeListener',
+
+  computed: {
+    enabled(): boolean {
+      return this.$store.state.enabled;
+    },
+
+    readability(): boolean {
+      return this.$store.state.readability;
+    },
+
+    visible(): boolean {
+      return this.$store.state.visible;
+    },
+
+    url(): string {
+      return this.$store.state.url;
+    },
+  },
 
   created(): void {
     chrome.extension.onRequest.addListener((request, _, sendResponse) => {
@@ -26,20 +45,22 @@ export default Vue.extend({
       } else if (request.name === 'disableStyle') {
         this.disableStyle(request.url);
       } else if (request.name === 'tabUpdated') {
-        if (this.$store.state.readability) {
+        if (this.readability) {
           applyReadability();
         }
       } else if (request.name === 'getIsStylebotOpen') {
-        sendResponse(this.$store.state.visible);
+        sendResponse(this.visible);
       } else if (request.name === 'command') {
         this.handleCommand(request.command);
+      } else if (request.name === 'toggleReadability') {
+        this.toggleReadability();
       }
     });
   },
 
   methods: {
     toggleStylebot() {
-      if (this.$store.state.visible) {
+      if (this.visible) {
         this.$store.dispatch('closeStylebot');
       } else {
         this.$store.dispatch('openStylebot');
@@ -49,7 +70,7 @@ export default Vue.extend({
     enableStyle(css: string, url: string) {
       injectCSSIntoDocument(css, url);
 
-      if (url === this.$store.state.url) {
+      if (url === this.url) {
         this.$store.commit('setEnabled', true);
       }
     },
@@ -57,25 +78,21 @@ export default Vue.extend({
     disableStyle(url: string) {
       injectCSSIntoDocument('', url);
 
-      if (url === this.$store.state.url) {
+      if (url === this.url) {
         this.$store.commit('setEnabled', false);
       }
     },
 
     toggleStyle() {
-      if (!this.$store.state.url) {
-        return;
-      }
-
-      if (this.$store.state.enabled) {
-        disableStyle(this.$store.state.url);
+      if (this.enabled) {
+        disableStyle(this.url);
       } else {
-        enableStyle(this.$store.state.url);
+        enableStyle(this.url);
       }
     },
 
     toggleReadability() {
-      if (this.$store.state.readability) {
+      if (this.readability) {
         this.$store.dispatch('applyReadability', false);
       } else {
         this.$store.dispatch('applyReadability', true);
