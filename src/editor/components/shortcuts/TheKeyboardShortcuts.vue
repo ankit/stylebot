@@ -42,6 +42,9 @@ export default Vue.extend({
     position(): StylebotPlacement {
       return this.$store.state.position;
     },
+    activeSelector(): string {
+      return this.$store.state.activeSelector;
+    },
     activeRule(): Rule {
       return this.$store.getters.activeRule;
     },
@@ -152,15 +155,19 @@ export default Vue.extend({
 
       // h - Toggle visibility css of selected element(s)
       if (event.keyCode === 72) {
-        if (this.activeRule) {
+        if (this.activeSelector) {
           event.preventDefault();
           event.stopPropagation();
 
           let value = '';
 
-          this.activeRule.clone().walkDecls('display', (decl: Declaration) => {
-            value = decl.value;
-          });
+          if (this.activeRule) {
+            this.activeRule
+              .clone()
+              .walkDecls('display', (decl: Declaration) => {
+                value = decl.value;
+              });
+          }
 
           this.$store.dispatch('applyDeclaration', {
             property: 'display',
