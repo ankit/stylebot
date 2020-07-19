@@ -10,11 +10,6 @@ import {
 } from '@stylebot/css';
 
 import {
-  apply as applyDarkMode,
-  remove as removeDarkMode,
-} from '@stylebot/dark-mode';
-
-import {
   apply as applyReadability,
   remove as removeReadability,
 } from '@stylebot/readability';
@@ -27,7 +22,6 @@ import {
   setStyle,
   getStylesForPage,
   enableStyle,
-  setDarkMode,
   setReadability,
 } from '../utils/chrome';
 
@@ -39,13 +33,12 @@ export default {
     const { defaultStyle } = await getStylesForPage(false);
 
     if (defaultStyle) {
-      const { url, enabled, css, readability, darkMode } = defaultStyle;
+      const { url, enabled, css, readability } = defaultStyle;
 
       commit('setUrl', url);
       commit('setCss', css);
       commit('setEnabled', enabled);
       commit('setReadability', readability);
-      commit('setDarkMode', darkMode);
 
       const root = postcss.parse(defaultStyle.css);
       commit('setSelectors', root);
@@ -129,20 +122,6 @@ export default {
     if (css !== state.css) {
       dispatch('applyCss', { css });
     }
-  },
-
-  applyDarkMode(
-    { state, commit }: { state: State; commit: Commit },
-    value: boolean
-  ): void {
-    if (value) {
-      applyDarkMode(true);
-    } else {
-      removeDarkMode();
-    }
-
-    commit('setDarkMode', value);
-    setDarkMode(state.url, value);
   },
 
   applyReadability(

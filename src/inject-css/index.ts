@@ -3,8 +3,6 @@
  * as soon as the document starts loading.
  */
 import { injectCSSIntoDocument } from '@stylebot/css';
-
-import { apply as applyDarkMode } from '@stylebot/dark-mode';
 import { apply as applyReadability } from '@stylebot/readability';
 
 import {
@@ -34,8 +32,6 @@ const injectCss = (
 
           if (style.readability) {
             applyReadability();
-          } else if (style.darkMode) {
-            applyDarkMode();
           }
         });
       } else if (injectCount < MAX_INJECT_COUNT) {

@@ -7,7 +7,6 @@ import {
   DisableStyleRequest,
   GetStylesForPageRequest,
   SetReadabilityRequest,
-  SetDarkModeRequest,
   GetAllOptionsResponse,
   GetStylesForPageResponse,
   StylebotOptions,
@@ -88,16 +87,6 @@ export const enableStyle = (url: string): void => {
 export const disableStyle = (url: string): void => {
   const request: DisableStyleRequest = {
     name: 'disableStyle',
-    url,
-  };
-
-  chrome.extension.sendRequest(request);
-};
-
-export const setDarkMode = (url: string, value: boolean): void => {
-  const request: SetDarkModeRequest = {
-    name: 'setDarkMode',
-    value,
     url,
   };
 

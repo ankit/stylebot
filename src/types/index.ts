@@ -16,7 +16,6 @@ export type Style = {
   css: string;
   enabled: boolean;
   readability: boolean;
-  darkMode: boolean;
 };
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/filter

@@ -12,7 +12,6 @@ type Styles = {
   [url: string]: {
     css: string;
     enabled: boolean;
-    darkMode: boolean;
     readability: boolean;
   };
 };

@@ -34,11 +34,6 @@
               </b-tr>
 
               <b-tr>
-                <b-td>Toggle dark mode</b-td>
-                <b-td>⌥/Alt + d</b-td>
-              </b-tr>
-
-              <b-tr>
                 <b-td>Toggle readability</b-td>
                 <b-td>⌥/Alt + r</b-td>
               </b-tr>

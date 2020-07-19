@@ -68,10 +68,6 @@ export default {
     state.help = value;
   },
 
-  setDarkMode(state: State, value: boolean): void {
-    state.darkMode = value;
-  },
-
   setReadability(state: State, value: boolean): void {
     state.readability = value;
   },

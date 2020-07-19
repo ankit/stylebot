@@ -6,7 +6,6 @@ type Style = {
   css: string;
   enabled: boolean;
   readability: boolean;
-  darkMode: boolean;
 };
 
 type Styles = {
@@ -44,7 +43,6 @@ class BackgroundPageStyles {
         css,
         enabled: true,
         readability: false,
-        darkMode: false,
       };
     }
 
@@ -108,24 +106,6 @@ class BackgroundPageStyles {
     } else {
       this.styles[url] = {
         readability: value,
-        darkMode: false,
-        enabled: true,
-        css: '',
-      };
-    }
-
-    chrome.storage.local.set({
-      styles: this.styles,
-    });
-  }
-
-  setDarkMode(url: string, value: boolean): void {
-    if (this.styles[url]) {
-      this.styles[url].darkMode = value;
-    } else {
-      this.styles[url] = {
-        readability: false,
-        darkMode: true,
         enabled: true,
         css: '',
       };
@@ -184,8 +164,8 @@ class BackgroundPageStyles {
           ? this.addImportantToCss(this.styles[url].css)
           : this.styles[url].css;
 
-        const { enabled, readability, darkMode } = this.styles[url];
-        const style = { url, css, enabled, readability, darkMode };
+        const { enabled, readability } = this.styles[url];
+        const style = { url, css, enabled, readability };
 
         if (!defaultStyle || url.length > defaultStyle.url.length) {
           defaultStyle = style;

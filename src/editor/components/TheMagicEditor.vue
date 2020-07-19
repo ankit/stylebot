@@ -1,13 +1,11 @@
 <template>
   <div class="px-3 py-3">
-    <p class="lead text-muted">Experimental features. May not work as expected on all pages.</p>
+    <p class="lead text-muted">
+      Experimental features. May not work as expected on all pages.
+    </p>
 
     <div class="mt-5">
       <the-readability />
-    </div>
-
-    <div class="mt-5">
-      <the-dark-mode />
     </div>
 
     <div class="mt-5">
@@ -20,7 +18,6 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import TheDarkMode from './magic/TheDarkMode.vue';
 import TheGrayscale from './magic/TheGrayscale.vue';
 import TheReadability from './magic/TheReadability.vue';
 
@@ -28,7 +25,6 @@ export default Vue.extend({
   name: 'TheMagicEditor',
 
   components: {
-    TheDarkMode,
     TheGrayscale,
     TheReadability,
   },

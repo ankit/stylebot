@@ -13,7 +13,6 @@ type State = {
     [url: string]: {
       css: string;
       enabled: boolean;
-      darkMode: boolean;
       readability: boolean;
     };
   };
@@ -43,7 +42,6 @@ export default new Vuex.Store<State>({
         [url: string]: {
           css: string;
           enabled: boolean;
-          darkMode: boolean;
           readability: boolean;
         };
       }
@@ -67,9 +65,8 @@ export default new Vuex.Store<State>({
 
         styles[url] = {
           css,
-          enabled: styles[url] ? styles[url].enabled : true,
-          darkMode: false,
           readability: false,
+          enabled: styles[url] ? styles[url].enabled : true,
         };
 
         if (initialUrl && initialUrl !== url) {

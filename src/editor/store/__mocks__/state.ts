@@ -20,7 +20,6 @@ const mockState: State = {
   position: 'right',
   inspecting: false,
   help: false,
-  darkMode: false,
   readability: false,
 };
 

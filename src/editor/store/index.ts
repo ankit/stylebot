@@ -19,7 +19,6 @@ export type State = {
   url: string;
   css: string;
   enabled: boolean;
-  darkMode: boolean;
   readability: boolean;
   options: StylebotOptions;
 
@@ -36,7 +35,6 @@ export default new Vuex.Store<State>({
   state: {
     css: '',
     enabled: true,
-    darkMode: false,
     readability: false,
     url: document.domain,
 

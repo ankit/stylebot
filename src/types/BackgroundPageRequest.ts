@@ -25,7 +25,6 @@ export type SetAllStylesRequest = {
       css: string;
       enabled: boolean;
       readability: boolean;
-      darkMode: boolean;
     };
   };
 };
@@ -80,12 +79,6 @@ export type SetReadabilityRequest = {
   value: boolean;
 };
 
-export type SetDarkModeRequest = {
-  name: 'setDarkMode';
-  url: string;
-  value: boolean;
-};
-
 type BackgroundPageRequest =
   | SetStyleRequest
   | EnableStyleRequest
@@ -100,7 +93,6 @@ type BackgroundPageRequest =
   | SetOptionRequest
   | OpenOptionsPageRequest
   | CopyToClipboardRequest
-  | SetReadabilityRequest
-  | SetDarkModeRequest;
+  | SetReadabilityRequest;
 
 export default BackgroundPageRequest;

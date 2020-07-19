@@ -8,7 +8,6 @@ export type GetAllStylesResponse = {
     css: string;
     enabled: boolean;
     readability: boolean;
-    darkMode: boolean;
   };
 };
 

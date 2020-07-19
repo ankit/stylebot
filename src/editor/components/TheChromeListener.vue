@@ -6,7 +6,6 @@
 import Vue from 'vue';
 
 import { injectCSSIntoDocument } from '@stylebot/css';
-import { apply as applyDarkMode } from '@stylebot/dark-mode';
 import { apply as applyReadability } from '@stylebot/readability';
 
 export default Vue.extend({
@@ -41,8 +40,6 @@ export default Vue.extend({
       } else if (request.name === 'tabUpdated') {
         if (this.$store.state.readability) {
           applyReadability();
-        } else if (this.$store.state.darkMode) {
-          applyDarkMode();
         }
       }
     });

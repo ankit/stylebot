@@ -106,11 +106,6 @@ export default Vue.extend({
         }
       }
 
-      // toggle dark mode - Alt + d
-      if (event.keyCode === 68 && event.altKey) {
-        this.$store.dispatch('applyDarkMode', !this.$store.state.darkMode);
-      }
-
       // toggle readability - Alt + r
       if (event.keyCode === 82 && event.altKey) {
         this.$store.dispatch(

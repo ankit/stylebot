@@ -8,7 +8,6 @@ import {
   SetAllStylesRequest,
   GetStylesForIframeRequest,
   SetReadabilityRequest,
-  SetDarkModeRequest,
   GetStylesForPageResponse,
   GetAllStylesResponse,
 } from '@stylebot/types';
@@ -24,8 +23,7 @@ type Request =
   | GetStylesForIframeRequest
   | EnableStyleRequest
   | DisableStyleRequest
-  | SetReadabilityRequest
-  | SetDarkModeRequest;
+  | SetReadabilityRequest;
 
 type Response = GetAllStylesResponse | GetStylesForPageResponse;
 
@@ -49,8 +47,6 @@ export default (
     styles.move(request.sourceUrl, request.destinationUrl);
   } else if (request.name === 'setReadability') {
     styles.setReadability(request.url, request.value);
-  } else if (request.name === 'setDarkMode') {
-    styles.setDarkMode(request.url, request.value);
   } else if (request.name === 'getStylesForPage') {
     const tab = sender.tab || request.tab;
 
