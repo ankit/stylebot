@@ -1,5 +1,5 @@
 <template>
-  <b-container fluid="lg">
+  <b-container fluid="lg" class="container">
     <b-row class="main">
       <b-col cols="4">
         <the-navigation
@@ -67,6 +67,10 @@ export default Vue.extend({
 
 .main {
   height: calc(100% - 50px);
+}
+
+.container {
+  min-width: 880px;
 }
 
 h2 {

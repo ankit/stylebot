@@ -12,7 +12,7 @@
     <b-row no-gutters class="mt-5">
       <b-col cols="12">
         <b-row>
-          <b-col cols="10">
+          <b-col cols="8">
             <app-button
               variant="primary"
               text="Add a new style..."
@@ -25,8 +25,8 @@
             <app-button @click="disableAll">Disable all</app-button>
           </b-col>
 
-          <b-col cols="2" align-self="end">
-            <b-row justify="end">
+          <b-col cols="4">
+            <b-row align-h="end" no-gutters>
               <the-delete-all-styles-button @click="deleteAll" />
             </b-row>
           </b-col>

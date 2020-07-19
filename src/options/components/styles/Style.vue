@@ -12,13 +12,13 @@
       @cancel="edit = false"
     />
 
-    <b-col cols="9">
+    <b-col cols="7">
       <b-form-checkbox v-model="enabled" @change="$emit('toggle')">
         {{ url }}
       </b-form-checkbox>
     </b-col>
 
-    <b-col cols="3">
+    <b-col cols="5">
       <b-row align-h="end">
         <app-button
           class="mr-2"
@@ -29,7 +29,7 @@
           Edit...
         </app-button>
 
-        <style-delete-button class="mr-2" :url="url" @click="$emit('delete')" />
+        <style-delete-button :url="url" @click="$emit('delete')" />
       </b-row>
     </b-col>
   </b-row>
