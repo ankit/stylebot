@@ -37,6 +37,11 @@
       "^@stylebot/(.*)$": "<rootDir>/src/$1/index"
     }
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn test && yarn lint"
+    }
+  },
   "devDependencies": {
     "@babel/core": "^7.10.1",
     "@babel/plugin-proposal-optional-chaining": "^7.10.1",
@@ -70,6 +75,7 @@
     "eslint-plugin-vue": "^6.2.2",
     "fibers": "^5.0.0",
     "fork-ts-checker-webpack-plugin": "^5.0.7",
+    "husky": "^4.2.5",
     "jest": "^26.1.0",
     "jest-cli": "^26.1.0",
     "jest-environment-jsdom": "^26.1.0",
