@@ -84,20 +84,20 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .color-picker-btn {
   width: 45px;
-  height: 25px;
-  padding: 3px;
+  height: 28px;
+  padding: 4px;
   background: #eee;
   border: 1px solid #ccc;
 }
 
 .color-picker-color {
-  height: 15px;
+  height: 18px;
   border: 1px solid #888;
 }
 
 .color-picker {
   top: 28px;
-  z-index: 1;
+  z-index: 10;
   right: -8px;
   position: absolute;
 }
