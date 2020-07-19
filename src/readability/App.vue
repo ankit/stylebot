@@ -1,5 +1,5 @@
 <template>
-  <div class="stylebot-reader" v-if="article">
+  <div v-if="article" class="stylebot-reader">
     <div class="stylebot-reader-body">
       <a :href="url" class="stylebot-reader-domain">
         {{ urlLabel }}

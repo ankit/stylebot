@@ -1,9 +1,10 @@
 import Vue from 'vue';
-import App from './App.vue';
 import Readability from 'readability';
 
 /* @ts-ignore */
 import { isProbablyReaderable } from '../../node_modules/readability/Readability-readerable';
+
+import App from './App.vue';
 
 declare global {
   interface Window {
