@@ -49,7 +49,7 @@ export const getIsStylebotOpen = (
 export const toggleStylebot = (tab: chrome.tabs.Tab): void => {
   if (tab.id) {
     chrome.tabs.sendRequest(tab.id, {
-      name: 'toggle',
+      name: 'toggleStylebot',
     });
 
     window.close();

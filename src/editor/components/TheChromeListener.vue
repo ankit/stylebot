@@ -38,8 +38,12 @@ export default Vue.extend({
         return;
       }
 
-      if (request.name === 'toggle') {
+      if (request.name === 'toggleStylebot') {
         this.toggleStylebot();
+      } else if (request.name === 'openStylebot') {
+        if (!this.visible) {
+          this.toggleStylebot();
+        }
       } else if (request.name === 'enableStyle') {
         this.enableStyle(request.css, request.url);
       } else if (request.name === 'disableStyle') {
