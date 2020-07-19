@@ -68,7 +68,6 @@
     "eslint-plugin-vue": "^6.2.2",
     "fibers": "^5.0.0",
     "fork-ts-checker-webpack-plugin": "^5.0.7",
-    "handlebars": "4.7.6",
     "jest": "^26.1.0",
     "jest-cli": "^26.1.0",
     "jest-environment-jsdom": "^26.1.0",
