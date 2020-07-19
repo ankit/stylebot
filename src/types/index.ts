@@ -37,3 +37,10 @@ export * from './BackgroundPageResponse';
 
 export { default as BackgroundPageRequest } from './BackgroundPageRequest';
 export { default as BackgroundPageResponse } from './BackgroundPageResponse';
+
+export type ReadabilityArticle = {
+  title: string;
+  byline: string;
+  content: string;
+  siteName: string;
+};

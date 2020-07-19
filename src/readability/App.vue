@@ -17,6 +17,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import { hideLoader } from './loader';
 
 export default Vue.extend({
   name: 'App',
@@ -40,7 +41,7 @@ export default Vue.extend({
 
   mounted(): void {
     this.$el.querySelector('a')?.focus();
-    document.getElementById('stylebot-reader-loading')?.remove();
+    hideLoader();
   },
 });
 </script>
