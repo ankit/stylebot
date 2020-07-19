@@ -10,6 +10,9 @@ import {
   GetAllOptionsResponse,
   GetStylesForPageResponse,
   StylebotOptions,
+  GetAllCommandsRequest,
+  GetAllCommandsResponse,
+  OpenCommandsPageRequest,
 } from '@stylebot/types';
 
 export const getAllOptions = async (): Promise<StylebotOptions> => {
@@ -98,6 +101,26 @@ export const setReadability = (url: string, value: boolean): void => {
     name: 'setReadability',
     value,
     url,
+  };
+
+  chrome.extension.sendRequest(request);
+};
+
+export const getAllCommands = async (): Promise<GetAllCommandsResponse> => {
+  const request: GetAllCommandsRequest = {
+    name: 'getAllCommands',
+  };
+
+  return new Promise(resolve => {
+    chrome.extension.sendRequest(request, response => {
+      resolve(response);
+    });
+  });
+};
+
+export const openCommandsPage = (): void => {
+  const request: OpenCommandsPageRequest = {
+    name: 'openCommandsPage',
   };
 
   chrome.extension.sendRequest(request);

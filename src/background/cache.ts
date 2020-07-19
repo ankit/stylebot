@@ -13,11 +13,7 @@ const init = (
 ): void => {
   chrome.storage.local.get(['options', 'styles'], items => {
     const options = items['options'] || {
-      useShortcutKey: true,
-      shortcutKey: 77, // keydown code for 'm'
-      shortcutMetaKey: 'alt',
-      mode: 'Basic',
-      sync: false,
+      mode: 'basic',
       contextMenu: true,
     };
 

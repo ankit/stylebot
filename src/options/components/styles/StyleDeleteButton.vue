@@ -1,21 +1,20 @@
 <template>
   <div>
-    <b-btn
-      variant="outline-danger"
+    <app-button
+      class="mr-2"
       size="sm"
-      class="icon-btn"
-      title="Delete Style"
+      variant="outline-danger"
       @click="modal = true"
     >
-      <b-icon icon="trash" />
-    </b-btn>
+      Delete...
+    </app-button>
 
     <b-modal
       v-model="modal"
       size="md"
       centered
       no-fade
-      title="Delete style for url"
+      :title="'Delete style for ' + url"
       no-close-on-backdrop
       no-close-on-esc
       hide-header-close
@@ -28,8 +27,8 @@
       This will permanently delete your style. You can't undo this.
 
       <template #modal-footer="{ ok, cancel }">
-        <app-button text="Cancel" @click="cancel()" />
-        <app-button text="Delete" variant="danger" @click="ok()" />
+        <app-button @click="cancel()">Cancel</app-button>
+        <app-button variant="danger" @click="ok()">Delete</app-button>
       </template>
     </b-modal>
   </div>

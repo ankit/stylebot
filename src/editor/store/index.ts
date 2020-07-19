@@ -40,9 +40,6 @@ export default new Vuex.Store<State>({
 
     options: {
       mode: 'basic',
-      useShortcutKey: true,
-      shortcutKey: 77,
-      shortcutMetaKey: 'alt',
       contextMenu: true,
     },
 

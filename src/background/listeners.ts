@@ -3,7 +3,9 @@ import BackgroundPageStyles from './styles';
 
 import styleRequest from './requests/styleRequest';
 import optionRequest from './requests/optionRequest';
+import getAllCommandsRequest from './requests/getAllCommandsRequest';
 import copyToClipboardRequest from './requests/copyToClipboardRequest';
+import openCommandsPageRequest from './requests/openCommandsPageRequest';
 
 import {
   StylebotOptions,
@@ -22,7 +24,17 @@ const init = (styles: BackgroundPageStyles, options: StylebotOptions): void => {
       sendResponse: (response: BackgroundPageResponse) => void
     ) => {
       if (request.name === 'copyToClipboard') {
-        copyToClipboardRequest(request);
+        copyToClipboardRequest(request.text);
+        return;
+      }
+
+      if (request.name === 'getAllCommands') {
+        getAllCommandsRequest(sendResponse);
+        return;
+      }
+
+      if (request.name === 'openCommandsPage') {
+        openCommandsPageRequest();
         return;
       }
 
@@ -78,6 +90,20 @@ const init = (styles: BackgroundPageStyles, options: StylebotOptions): void => {
         ContextMenu.update(tab);
       });
     }
+  });
+
+  /**
+   * Listen to global keyboard shorcuts
+   */
+  chrome.commands.onCommand.addListener(command => {
+    chrome.tabs.getSelected(tab => {
+      if (tab.id) {
+        chrome.tabs.sendRequest(tab.id, {
+          name: 'command',
+          command,
+        });
+      }
+    });
   });
 };
 

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <app-button text="Delete all" variant="danger" @click="modal = true" />
+    <app-button variant="danger" @click="modal = true">Delete all</app-button>
 
     <b-modal
       v-model="modal"
@@ -20,8 +20,10 @@
       This will permanently delete all your styles. You can't undo this.
 
       <template #modal-footer="{ ok, cancel }">
-        <app-button text="Cancel" @click="cancel()" />
-        <app-button text="Delete All Styles" variant="danger" @click="ok()" />
+        <app-button @click="cancel()">Cancel</app-button>
+        <app-button variant="danger" @click="ok()">
+          Delete All Styles
+        </app-button>
       </template>
     </b-modal>
   </div>

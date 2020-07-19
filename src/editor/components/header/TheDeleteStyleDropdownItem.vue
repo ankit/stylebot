@@ -1,5 +1,7 @@
 <template>
-  <b-dropdown-item :disabled="disabled" @click="$emit('click')">Delete Style...</b-dropdown-item>
+  <b-dropdown-item :disabled="disabled" @click="$emit('click')">
+    Delete style...
+  </b-dropdown-item>
 </template>
 
 <script lang="ts">

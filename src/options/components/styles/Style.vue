@@ -12,15 +12,23 @@
       @cancel="edit = false"
     />
 
-    <b-col cols="10">
+    <b-col cols="9">
       <b-form-checkbox v-model="enabled" @change="$emit('toggle')">
         {{ url }}
       </b-form-checkbox>
     </b-col>
 
-    <b-col cols="2">
+    <b-col cols="3">
       <b-row align-h="end">
-        <style-edit-button class="mr-2" @click="edit = true" />
+        <app-button
+          class="mr-2"
+          size="sm"
+          variant="outline-primary"
+          @click="edit = true"
+        >
+          Edit...
+        </app-button>
+
         <style-delete-button class="mr-2" :url="url" @click="$emit('delete')" />
       </b-row>
     </b-col>
@@ -30,27 +38,30 @@
 <script lang="ts">
 import Vue from 'vue';
 
+import AppButton from '../AppButton.vue';
 import StyleEditor from './StyleEditor.vue';
-import StyleEditButton from './StyleEditButton.vue';
 import StyleDeleteButton from './StyleDeleteButton.vue';
 
 export default Vue.extend({
   name: 'Style',
 
   components: {
+    AppButton,
     StyleEditor,
-    StyleEditButton,
     StyleDeleteButton,
   },
-  props: ['url', 'css', 'initialEnabled'],
+
+  props: ['url', 'css', 'initialEnabled', 'initialReadability'],
 
   data(): {
     enabled: boolean;
     edit: boolean;
+    readability: boolean;
   } {
     return {
       edit: false,
       enabled: this.initialEnabled,
+      readability: this.initialReadability,
     };
   },
 
@@ -58,12 +69,16 @@ export default Vue.extend({
     initialEnabled(newVal: boolean): void {
       this.enabled = newVal;
     },
+
+    initialReadability(newVal: boolean): void {
+      this.readability = newVal;
+    },
   },
 });
 </script>
 
-<style scoped>
-.style:hover {
-  outline: 1px solid #ddd;
+<style lang="scss" scoped>
+.style {
+  border-bottom: 1px solid #ddd;
 }
 </style>

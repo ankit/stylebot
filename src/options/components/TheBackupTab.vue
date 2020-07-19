@@ -11,14 +11,11 @@
 
     <b-row class="mt-4">
       <b-col>
-        <app-button
-          class="mr-4"
-          text="Export..."
-          variant="primary"
-          @click="exportModal = true"
-        />
+        <app-button class="mr-4" variant="primary" @click="exportModal = true">
+          Export...
+        </app-button>
 
-        <app-button text="Import..." @click="importModal = true" />
+        <app-button @click="importModal = true">Import...</app-button>
       </b-col>
     </b-row>
   </div>

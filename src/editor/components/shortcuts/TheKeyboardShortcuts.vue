@@ -4,34 +4,16 @@
 
 <script lang="ts">
 import Vue from 'vue';
+
 import { Declaration, Rule } from 'postcss';
-
-import {
-  StylebotShortcutMetaKey,
-  StylebotEditingMode,
-  StylebotPlacement,
-} from '@stylebot/types';
-
-import { enableStyle, disableStyle } from '../../utils/chrome';
+import { StylebotEditingMode, StylebotPlacement } from '@stylebot/types';
 
 export default Vue.extend({
   name: 'TheKeyboardShortcuts',
 
   computed: {
-    url(): string {
-      return this.$store.state.url;
-    },
-    enabled(): boolean {
-      return this.$store.state.enabled;
-    },
     visible(): boolean {
       return this.$store.state.visible;
-    },
-    shortcutKey(): number {
-      return this.$store.state.options.shortcutKey;
-    },
-    shortcutMetaKey(): StylebotShortcutMetaKey {
-      return this.$store.state.options.shortcutMetaKey;
     },
     inspecting(): boolean {
       return this.$store.state.inspecting;
@@ -63,64 +45,59 @@ export default Vue.extend({
     },
   },
 
-  mounted(): void {
-    this.attachGlobalShortcuts();
-  },
-
-  beforeDestroy(): void {
-    this.detachGlobalShortcuts();
-  },
-
   methods: {
-    attachGlobalShortcuts(): void {
-      document.addEventListener('keydown', this.handleGlobalShortcut);
-    },
-    detachGlobalShortcuts(): void {
-      document.removeEventListener('keydown', this.handleGlobalShortcut);
-    },
-    handleGlobalShortcut(event: KeyboardEvent): void {
-      // open / close stylebot - default is Alt+m. customizable by user.
-      if (event.keyCode === this.shortcutKey) {
-        if (
-          (this.shortcutMetaKey === 'ctrl' && event.ctrlKey) ||
-          (this.shortcutMetaKey === 'alt' && event.altKey) ||
-          (this.shortcutMetaKey === 'shift' && event.shiftKey) ||
-          this.shortcutMetaKey === 'none'
-        ) {
-          if (this.visible) {
-            this.$store.dispatch('closeStylebot');
-          } else {
-            this.$store.dispatch('openStylebot');
-          }
-        }
-      }
-
-      // toggle styling on page - Alt+t
-      if (event.keyCode === 84 && event.altKey) {
-        if (!this.visible) {
-          if (this.enabled) {
-            disableStyle(this.url);
-          } else {
-            enableStyle(this.url);
-          }
-        }
-      }
-
-      // toggle readability - Alt + r
-      if (event.keyCode === 82 && event.altKey) {
-        this.$store.dispatch(
-          'applyReadability',
-          !this.$store.state.readability
-        );
-      }
-    },
-
     attachStylebotShortcuts(): void {
       document.addEventListener('keydown', this.handleStylebotShortcut);
     },
+
     detachStylebotShortcuts(): void {
       document.removeEventListener('keydown', this.handleStylebotShortcut);
     },
+
+    toggleInspect(): void {
+      if (this.mode === 'basic') {
+        this.$store.commit('setInspecting', !this.inspecting);
+      }
+    },
+
+    togglePosition(): void {
+      this.$store.commit(
+        'setPosition',
+        this.position === 'left' ? 'right' : 'left'
+      );
+    },
+
+    toggleVisibilityOfActiveSelector(): void {
+      if (this.activeSelector) {
+        let value = '';
+
+        if (this.activeRule) {
+          this.activeRule.clone().walkDecls('display', (decl: Declaration) => {
+            value = decl.value;
+          });
+        }
+
+        this.$store.dispatch('applyDeclaration', {
+          property: 'display',
+          value: value === 'none' ? '' : 'none',
+        });
+      }
+    },
+
+    toggleHelp(): void {
+      this.$store.commit('setInspecting', false);
+      this.$store.commit('setHelp', !this.help);
+    },
+
+    handleEscape(): void {
+      if (this.help) {
+        this.$store.commit('setHelp', false);
+        return;
+      }
+
+      this.$store.dispatch('closeStylebot');
+    },
+
     handleStylebotShortcut(event: KeyboardEvent): void {
       const target = event.composedPath()[0] as HTMLElement;
       if (target.tagName.toLowerCase() === 'input') {
@@ -132,9 +109,7 @@ export default Vue.extend({
         event.preventDefault();
         event.stopPropagation();
 
-        if (this.mode === 'basic') {
-          this.$store.commit('setInspecting', !this.inspecting);
-        }
+        this.toggleInspect();
       }
 
       // p - Toggle editor position
@@ -142,33 +117,15 @@ export default Vue.extend({
         event.preventDefault();
         event.stopPropagation();
 
-        this.$store.commit(
-          'setPosition',
-          this.position === 'left' ? 'right' : 'left'
-        );
+        this.togglePosition();
       }
 
       // h - Toggle visibility css of selected element(s)
       if (event.keyCode === 72) {
-        if (this.activeSelector) {
-          event.preventDefault();
-          event.stopPropagation();
+        event.preventDefault();
+        event.stopPropagation();
 
-          let value = '';
-
-          if (this.activeRule) {
-            this.activeRule
-              .clone()
-              .walkDecls('display', (decl: Declaration) => {
-                value = decl.value;
-              });
-          }
-
-          this.$store.dispatch('applyDeclaration', {
-            property: 'display',
-            value: value === 'none' ? '' : 'none',
-          });
-        }
+        this.toggleVisibilityOfActiveSelector();
       }
 
       // b - switch to basic editor
@@ -200,8 +157,7 @@ export default Vue.extend({
         event.preventDefault();
         event.stopPropagation();
 
-        this.$store.commit('setInspecting', false);
-        this.$store.commit('setHelp', true);
+        this.toggleHelp();
       }
 
       // esc - if help is visible, close help. else, close stylebot
@@ -209,12 +165,7 @@ export default Vue.extend({
         event.preventDefault();
         event.stopPropagation();
 
-        if (this.help) {
-          this.$store.commit('setHelp', false);
-          return;
-        }
-
-        this.$store.dispatch('closeStylebot');
+        this.handleEscape();
       }
     },
   },

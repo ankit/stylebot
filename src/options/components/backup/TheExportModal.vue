@@ -16,8 +16,8 @@
     <b-form-textarea readonly rows="15" autofocus :value="json" />
 
     <template #modal-footer="{ ok, cancel }">
-      <app-button text="Cancel" @click="cancel()" />
-      <app-button variant="primary" text="Copy to Clipboard" @click="ok()" />
+      <app-button @click="cancel()">Cancel</app-button>
+      <app-button variant="primary" @click="ok()">Copy to Clipboard</app-button>
     </template>
   </b-modal>
 </template>

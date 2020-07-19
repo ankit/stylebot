@@ -17,10 +17,12 @@
               variant="primary"
               text="Add a new style..."
               @click="addStyleDialog = true"
-            />
+            >
+              Add a new style...
+            </app-button>
 
-            <app-button text="Enable all" @click="enableAll" />
-            <app-button text="Disable all" @click="disableAll" />
+            <app-button @click="enableAll">Enable all</app-button>
+            <app-button @click="disableAll">Disable all</app-button>
           </b-col>
 
           <b-col cols="2" align-self="end">

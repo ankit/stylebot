@@ -1,4 +1,4 @@
-import { StylebotOptions, Style } from './';
+import { StylebotOptions, Style, StylebotCommand } from './';
 
 export type GetAllOptionsResponse = StylebotOptions;
 export type GetOptionResponse = StylebotOptions[keyof StylebotOptions];
@@ -16,10 +16,17 @@ export type GetStylesForPageResponse = {
   defaultStyle?: Style;
 };
 
+export type GetAllCommandsResponse = Array<{
+  shortcut: string;
+  description: string;
+  name: StylebotCommand;
+}>;
+
 type BackgroundPageResponse =
   | GetAllOptionsResponse
   | GetOptionResponse
   | GetAllStylesResponse
-  | GetStylesForPageResponse;
+  | GetStylesForPageResponse
+  | GetAllCommandsResponse;
 
 export default BackgroundPageResponse;

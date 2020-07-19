@@ -1,12 +1,8 @@
 export type StylebotEditingMode = 'basic' | 'magic' | 'code';
-export type StylebotShortcutMetaKey = 'ctrl' | 'shift' | 'alt' | 'none';
 
 export type StylebotOptions = {
   contextMenu: boolean;
   mode: StylebotEditingMode;
-  useShortcutKey: boolean;
-  shortcutKey: number;
-  shortcutMetaKey: StylebotShortcutMetaKey;
 };
 
 export type StylebotPlacement = 'left' | 'right';
@@ -43,3 +39,9 @@ export type ReadabilityArticle = {
   content: string;
   siteName: string;
 };
+
+export type StylebotCommand =
+  | 'toggle-stylebot'
+  | 'toggle-style'
+  | 'toggle-readability'
+  | 'toggle-grayscale';

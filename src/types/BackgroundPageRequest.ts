@@ -68,6 +68,10 @@ export type OpenOptionsPageRequest = {
   name: 'openOptionsPage';
 };
 
+export type OpenCommandsPageRequest = {
+  name: 'openCommandsPage';
+};
+
 export type CopyToClipboardRequest = {
   name: 'copyToClipboard';
   text: string;
@@ -77,6 +81,10 @@ export type SetReadabilityRequest = {
   name: 'setReadability';
   url: string;
   value: boolean;
+};
+
+export type GetAllCommandsRequest = {
+  name: 'getAllCommands';
 };
 
 type BackgroundPageRequest =
@@ -92,7 +100,9 @@ type BackgroundPageRequest =
   | GetOptionRequest
   | SetOptionRequest
   | OpenOptionsPageRequest
+  | OpenCommandsPageRequest
   | CopyToClipboardRequest
-  | SetReadabilityRequest;
+  | SetReadabilityRequest
+  | GetAllCommandsRequest;
 
 export default BackgroundPageRequest;

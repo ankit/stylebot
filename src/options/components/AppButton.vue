@@ -1,12 +1,13 @@
 <template>
   <b-btn
     class="app-btn"
+    :size="size"
     :title="title"
     :variant="variant"
     :disabled="disabled"
     @click="$emit('click')"
   >
-    {{ text }}
+    <slot />
   </b-btn>
 </template>
 
@@ -16,10 +17,6 @@ import Vue from 'vue';
 export default Vue.extend({
   name: 'AppButton',
   props: {
-    text: {
-      type: String,
-      required: true,
-    },
     disabled: {
       type: Boolean,
       required: false,
@@ -34,6 +31,11 @@ export default Vue.extend({
       type: String,
       required: false,
       default: 'secondary',
+    },
+    size: {
+      type: String,
+      required: false,
+      default: 'large',
     },
   },
 });

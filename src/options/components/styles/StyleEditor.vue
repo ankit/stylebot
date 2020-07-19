@@ -6,7 +6,7 @@
         placeholder="Enter URL..."
         label="URL"
         autofocus
-        style="max-width: 600px"
+        style="max-width: 600px;"
       />
 
       <div class="caption mt-1">
@@ -24,14 +24,15 @@
 
     <div class="style-editor-footer p-5">
       <app-button
-        text="Save"
         class="ml-3 mr-3"
         variant="primary"
         :disabled="!url || !css"
         @click="$emit('save', { initialUrl, url, css })"
-      />
+      >
+        Save
+      </app-button>
 
-      <app-button text="Cancel" @click="$emit('cancel')" />
+      <app-button @click="$emit('cancel')">Cancel</app-button>
     </div>
   </div>
 </template>

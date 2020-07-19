@@ -1,15 +1,11 @@
 <template>
   <div v-if="optionsLoaded" class="pt-2">
     <b-row no-gutters class="mt-5">
-      <the-use-shortcut-key />
-    </b-row>
-
-    <b-row no-gutters class="mt-3">
-      <the-shortcut-key />
+      <the-context-menu />
     </b-row>
 
     <b-row no-gutters class="mt-5">
-      <the-context-menu />
+      <the-keyboard-shortcuts />
     </b-row>
   </div>
 </template>
@@ -17,17 +13,15 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import TheShortcutKey from './basics/TheShortcutKey.vue';
 import TheContextMenu from './basics/TheContextMenu.vue';
-import TheUseShortcutKey from './basics/TheUseShortcutKey.vue';
+import TheKeyboardShortcuts from './basics/TheKeyboardShortcuts.vue';
 
 export default Vue.extend({
   name: 'TheBasicsTab',
 
   components: {
-    TheShortcutKey,
     TheContextMenu,
-    TheUseShortcutKey,
+    TheKeyboardShortcuts,
   },
 
   computed: {
@@ -37,15 +31,3 @@ export default Vue.extend({
   },
 });
 </script>
-
-<style lang="scss">
-.shortcut-key-character {
-  width: 48px !important;
-}
-
-.shortcut-meta-key {
-  .dropdown-toggle {
-    text-transform: capitalize;
-  }
-}
-</style>

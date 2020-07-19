@@ -6,7 +6,7 @@
           <h1 class="title mb-4">Stylebot Keyboard shortcuts</h1>
         </b-col>
 
-        <b-col cols="1">
+        <b-col cols="1" style="text-align: right;">
           <button class="close-btn" @click="close">
             <b-icon icon="x-circle" />
           </button>
@@ -18,24 +18,46 @@
           <b-table-simple>
             <b-thead>
               <b-tr>
-                <b-th colspan="2">Global</b-th>
+                <b-th colspan="2">
+                  Global
+                  <a
+                    href="#"
+                    class="customize"
+                    @click="customizeGlobalCommands"
+                  >
+                    Customize
+                  </a>
+                </b-th>
               </b-tr>
             </b-thead>
 
             <b-tbody>
               <b-tr>
                 <b-td>Toggle stylebot editor</b-td>
-                <b-td>⌥/Alt + m</b-td>
+                <b-td>
+                  {{ shortcuts.get('toggle-stylebot') }}
+                </b-td>
               </b-tr>
 
               <b-tr>
                 <b-td>Toggle styling</b-td>
-                <b-td>⌥/Alt + t</b-td>
+                <b-td>
+                  {{ shortcuts.get('toggle-style') }}
+                </b-td>
               </b-tr>
 
               <b-tr>
                 <b-td>Toggle readability</b-td>
-                <b-td>⌥/Alt + r</b-td>
+                <b-td>
+                  {{ shortcuts.get('toggle-readability') }}
+                </b-td>
+              </b-tr>
+
+              <b-tr>
+                <b-td>Toggle grayscale</b-td>
+                <b-td>
+                  {{ shortcuts.get('toggle-grayscale') }}
+                </b-td>
               </b-tr>
             </b-tbody>
           </b-table-simple>
@@ -52,27 +74,27 @@
             <b-tbody>
               <b-tr>
                 <b-td>Toggle element inspection</b-td>
-                <b-td>i</b-td>
+                <b-td>I</b-td>
               </b-tr>
 
               <b-tr>
                 <b-td>Move stylebot to left / right</b-td>
-                <b-td>p</b-td>
+                <b-td>P</b-td>
               </b-tr>
 
               <b-tr>
                 <b-td>Switch to basic editor</b-td>
-                <b-td>b</b-td>
+                <b-td>B</b-td>
               </b-tr>
 
               <b-tr>
                 <b-td>Switch to magic editor</b-td>
-                <b-td>m</b-td>
+                <b-td>M</b-td>
               </b-tr>
 
               <b-tr>
                 <b-td>Switch to code editor</b-td>
-                <b-td>c</b-td>
+                <b-td>C</b-td>
               </b-tr>
 
               <b-tr>
@@ -96,7 +118,7 @@
             <b-tbody>
               <b-tr>
                 <b-td>Apply CSS to show/hide selected element(s)</b-td>
-                <b-td>h</b-td>
+                <b-td>H</b-td>
               </b-tr>
             </b-tbody>
           </b-table-simple>
@@ -109,12 +131,32 @@
 <script lang="ts">
 import Vue from 'vue';
 
+import { getAllCommands, openCommandsPage } from '../../utils/chrome';
+import { StylebotCommand } from '@stylebot/types';
+
 export default Vue.extend({
   name: 'TheHelpDialog',
+
+  data(): {
+    shortcuts: Map<StylebotCommand, string>;
+  } {
+    return { shortcuts: new Map() };
+  },
 
   mounted() {
     this.$store.commit('setInspecting', false);
     document.addEventListener('mousedown', this.mousedown);
+  },
+
+  async created() {
+    const commands = await getAllCommands();
+    const shortcuts = new Map();
+
+    commands.forEach(cmd => {
+      shortcuts.set(cmd.name, cmd.shortcut);
+    });
+
+    this.shortcuts = shortcuts;
   },
 
   beforeDestroy() {
@@ -124,9 +166,15 @@ export default Vue.extend({
   methods: {
     mousedown(event: MouseEvent): void {
       const el = event.composedPath()[0] as HTMLElement;
+
       if (!el.closest('.help-dialog-content')) {
         this.close();
       }
+    },
+
+    customizeGlobalCommands(event: MouseEvent): void {
+      event.preventDefault();
+      openCommandsPage();
     },
 
     close(): void {
@@ -176,5 +224,10 @@ export default Vue.extend({
   font-size: 24px;
   background: none;
   color: #666;
+}
+
+.customize {
+  float: right;
+  font-weight: normal;
 }
 </style>

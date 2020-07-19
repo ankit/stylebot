@@ -28,14 +28,10 @@
     />
 
     <template #modal-footer="{ ok, cancel }">
-      <app-button text="Cancel" @click="cancel()" />
-
-      <app-button
-        text="Import"
-        variant="primary"
-        :disabled="!json"
-        @click="ok()"
-      />
+      <app-button @click="cancel()">Cancel</app-button>
+      <app-button variant="primary" :disabled="!json" @click="ok()">
+        Import
+      </app-button>
     </template>
   </b-modal>
 </template>
