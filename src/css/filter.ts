@@ -9,7 +9,7 @@ import {
 import { FilterEffect } from '@stylebot/types';
 
 const getEffectRegex = (name: FilterEffect) => new RegExp(`${name}\\((.*)\\)$`);
-const getEffectDeclarationValue = (name: FilterEffect, percent: number) =>
+const getEffectDeclarationValue = (name: FilterEffect, percent: string) =>
   `${name}(${percent}%)`;
 
 const getSelectorsToAttachFilterForPage = (): Array<string> => {
@@ -71,7 +71,7 @@ export const getFilterEffectValueForPage = (
 export const getCssAfterApplyingFilterEffectToPage = (
   effectName: FilterEffect,
   css: string,
-  percent: number
+  percent: string
 ): string => {
   let root = postcss.parse(css);
 
@@ -85,16 +85,28 @@ export const getCssAfterApplyingFilterEffectToPage = (
         if (rule.some(node => node.type === 'decl' && node.prop === 'filter')) {
           rule.walkDecls('filter', (decl: postcss.Declaration) => {
             const value = decl.value.replace(regex, '').trim();
-            decl.value = value ? `${value} ${effectValue}` : `${effectValue}`;
+
+            if (percent !== '0') {
+              decl.value = value ? `${value} ${effectValue}` : `${effectValue}`;
+            } else {
+              if (value) {
+                decl.value = value;
+              } else {
+                decl.remove();
+                if (!rule.some(node => node.type !== 'decl')) {
+                  rule.remove();
+                }
+              }
+            }
           });
-        } else {
+        } else if (percent !== '0') {
           // todo: update method interfaces to avoid doing this redundant work
           root = postcss.parse(
             addDeclaration('filter', effectValue, selector, root.toString())
           );
         }
       });
-    } else {
+    } else if (percent !== '0') {
       // todo: update method interfaces to avoid doing this redundant work
       root = postcss.parse(
         addDeclaration('filter', effectValue, selector, root.toString())

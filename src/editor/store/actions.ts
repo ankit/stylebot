@@ -172,7 +172,7 @@ export default {
       percent,
     }: {
       effectName: FilterEffect;
-      percent: number;
+      percent: string;
     }
   ): void {
     dispatch('applyCss', {
