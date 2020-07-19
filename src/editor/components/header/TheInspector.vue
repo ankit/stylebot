@@ -1,22 +1,30 @@
 <template>
   <b-btn
-    class="inspector"
+    class="stylebot-inspector"
+    :class="{ active }"
     :disabled="disabled"
     title="Select an element in the page to style it"
     :variant="active ? 'primary' : 'outline-secondary'"
     @click="toggle"
   >
-    <b-icon icon="pencil-square" />
+    <inspector-icon />
   </b-btn>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
+
 import { Highlighter } from '@stylebot/highlighter';
 import { StylebotEditingMode } from '@stylebot/types';
 
+import InspectorIcon from './InspectorIcon.vue';
+
 export default Vue.extend({
   name: 'TheInspector',
+
+  components: {
+    InspectorIcon,
+  },
 
   data(): {
     highlighter: Highlighter | null;
@@ -87,8 +95,8 @@ export default Vue.extend({
 });
 </script>
 
-<style lang="scss" scoped>
-.inspector {
+<style lang="scss">
+.stylebot-inspector {
   outline: none !important;
   font-size: 21px !important;
   border-color: #ccc !important;
@@ -97,6 +105,23 @@ export default Vue.extend({
   &:hover,
   &:focus {
     outline: none;
+  }
+
+  svg {
+    // todo: avoid doing this pixel pushing, fix svg
+    margin-top: -5px;
+    margin-left: 1px;
+  }
+
+  path {
+    fill: #555;
+  }
+
+  &:hover,
+  &.active {
+    path {
+      fill: #fff;
+    }
   }
 }
 </style>
