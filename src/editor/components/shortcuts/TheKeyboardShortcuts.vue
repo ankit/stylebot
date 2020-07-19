@@ -70,10 +70,10 @@ export default Vue.extend({
 
   methods: {
     attachGlobalShortcuts(): void {
-      window.addEventListener('keydown', this.handleGlobalShortcut);
+      document.addEventListener('keydown', this.handleGlobalShortcut);
     },
     detachGlobalShortcuts(): void {
-      window.removeEventListener('keydown', this.handleGlobalShortcut);
+      document.removeEventListener('keydown', this.handleGlobalShortcut);
     },
     handleGlobalShortcut(event: KeyboardEvent): void {
       // open / close stylebot - default is Alt+m. customizable by user.
@@ -102,13 +102,26 @@ export default Vue.extend({
           }
         }
       }
+
+      // toggle dark mode - Alt + d
+      if (event.keyCode === 68 && event.altKey) {
+        this.$store.dispatch('applyDarkMode', !this.$store.state.darkMode);
+      }
+
+      // toggle readability - Alt + r
+      if (event.keyCode === 82 && event.altKey) {
+        this.$store.dispatch(
+          'applyReadability',
+          !this.$store.state.readability
+        );
+      }
     },
 
     attachStylebotShortcuts(): void {
-      window.addEventListener('keydown', this.handleStylebotShortcut);
+      document.addEventListener('keydown', this.handleStylebotShortcut);
     },
     detachStylebotShortcuts(): void {
-      window.removeEventListener('keydown', this.handleStylebotShortcut);
+      document.removeEventListener('keydown', this.handleStylebotShortcut);
     },
     handleStylebotShortcut(event: KeyboardEvent): void {
       const target = event.composedPath()[0] as HTMLElement;

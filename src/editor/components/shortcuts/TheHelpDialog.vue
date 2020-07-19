@@ -24,13 +24,23 @@
 
             <b-tbody>
               <b-tr>
-                <b-td>Show/hide stylebot</b-td>
+                <b-td>Toggle stylebot editor</b-td>
                 <b-td>⌥/Alt + m</b-td>
               </b-tr>
 
               <b-tr>
-                <b-td>Toggle styling for current page</b-td>
+                <b-td>Toggle styling</b-td>
                 <b-td>⌥/Alt + t</b-td>
+              </b-tr>
+
+              <b-tr>
+                <b-td>Toggle dark mode</b-td>
+                <b-td>⌥/Alt + d</b-td>
+              </b-tr>
+
+              <b-tr>
+                <b-td>Toggle readability</b-td>
+                <b-td>⌥/Alt + r</b-td>
               </b-tr>
             </b-tbody>
           </b-table-simple>
@@ -142,6 +152,7 @@ export default Vue.extend({
   height: 100%;
   overflow: hidden;
   outline: 0;
+  font-size: 15px;
   background: #000000b3;
 }
 
