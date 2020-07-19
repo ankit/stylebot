@@ -62,3 +62,16 @@ export const getSelector = (el: HTMLElement): string => {
 
   return selector;
 };
+
+export const validateSelector = (selector: string): boolean => {
+  if (!selector) {
+    return false;
+  }
+
+  try {
+    document.querySelector(selector);
+    return true;
+  } catch (e) {
+    return false;
+  }
+};

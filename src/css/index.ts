@@ -1,21 +1,22 @@
 export {
   getFilterEffectValueForPage,
   getCssAfterApplyingFilterEffectToPage,
-} from './Filters';
+} from './filter';
 
 export {
-  addDeclaration,
-  addGoogleWebFont,
-  cleanGoogleWebFonts,
-  validateSelector,
   injectCSSIntoDocument,
   injectRootIntoDocument,
   removeCSSFromDocument,
-} from './CssUtils';
+} from './inject-style';
 
 export {
   getSelector,
   getIdBasedSelector,
   getClassBasedSelector,
   getTagNameBasedSelector,
-} from './CssSelectorGenerator';
+  validateSelector,
+} from './selector';
+
+export { addGoogleWebFont, cleanGoogleWebFonts } from './webfont';
+
+export { addDeclaration } from './declaration';
