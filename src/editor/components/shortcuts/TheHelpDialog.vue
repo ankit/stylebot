@@ -107,16 +107,17 @@ import Vue from 'vue';
 export default Vue.extend({
   name: 'TheHelpDialog',
 
-  created() {
-    document.addEventListener('click', this.handleClick);
+  mounted() {
+    this.$store.commit('setInspecting', false);
+    document.addEventListener('mousedown', this.mousedown);
   },
 
   beforeDestroy() {
-    document.removeEventListener('click', this.handleClick);
+    document.removeEventListener('mousedown', this.mousedown);
   },
 
   methods: {
-    handleClick(event: MouseEvent): void {
+    mousedown(event: MouseEvent): void {
       const el = event.composedPath()[0] as HTMLElement;
       if (!el.closest('.help-dialog-content')) {
         this.close();
