@@ -1,6 +1,8 @@
 <template>
   <div>
-    <app-button variant="danger" @click="modal = true">Delete all</app-button>
+    <app-button variant="danger" @click="modal = true">
+      Delete all...
+    </app-button>
 
     <b-modal
       v-model="modal"
