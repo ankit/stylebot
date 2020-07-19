@@ -1,6 +1,12 @@
 <template>
   <b-input-group class="length-input-group">
-    <b-form-input v-model="length" size="sm" :disabled="disabled" />
+    <b-form-input
+      v-model="length"
+      size="sm"
+      :disabled="disabled"
+      @focus="focus"
+      @keydown="keydown"
+    />
 
     <template #append>
       <dropdown-hack-to-support-shadow-dom>
@@ -96,7 +102,7 @@ export default Vue.extend({
         return { length: '', unit: 'px' };
       }
 
-      const [length, unit] = value.split(/(\d+)/).filter(Boolean);
+      const [length, unit] = value.split(/(-?\d+)/).filter(Boolean);
 
       // todo: support other units.
       // currently, we render empty input and overwrite on edit
@@ -114,6 +120,36 @@ export default Vue.extend({
         property: this.property,
         value,
       });
+    },
+
+    focus(event: FocusEvent): void {
+      (event.target as HTMLInputElement).select();
+    },
+
+    keydown(event: KeyboardEvent): void {
+      // up arrow
+      if (event.keyCode === 38) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (!this.length) {
+          this.length = '1';
+        } else {
+          this.length = `${parseInt(this.length, 10) + 1}`;
+        }
+      }
+
+      // down arrow
+      else if (event.keyCode === 40) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (!this.length) {
+          this.length = '-1';
+        } else {
+          this.length = `${parseInt(this.length, 10) - 1}`;
+        }
+      }
     },
   },
 });

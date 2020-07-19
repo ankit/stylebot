@@ -7,6 +7,7 @@
         placeholder="T"
         :disabled="disabled"
         class="box-dimension-input"
+        @focus="focus"
       />
     </b-col>
 
@@ -17,6 +18,7 @@
         placeholder="R"
         :disabled="disabled"
         class="box-dimension-input"
+        @focus="focus"
       />
     </b-col>
 
@@ -27,6 +29,7 @@
         placeholder="B"
         :disabled="disabled"
         class="box-dimension-input"
+        @focus="focus"
       />
     </b-col>
 
@@ -37,6 +40,7 @@
         placeholder="L"
         :disabled="disabled"
         class="box-dimension-input"
+        @focus="focus"
       />
     </b-col>
 
@@ -140,6 +144,10 @@ export default Vue.extend({
         property: `${this.property}-${type}`,
         value,
       });
+    },
+
+    focus(event: FocusEvent): void {
+      (event.target as HTMLInputElement).select();
     },
   },
 });

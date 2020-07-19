@@ -20,6 +20,7 @@
             size="sm"
             :debounce="150"
             :disabled="disabled"
+            @focus="focus"
           />
         </b-col>
       </b-row>
@@ -78,6 +79,10 @@ export default Vue.extend({
         property: 'color',
         value: color.hex,
       });
+    },
+
+    focus(event: FocusEvent): void {
+      (event.target as HTMLInputElement).select();
     },
   },
 });

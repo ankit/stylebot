@@ -11,6 +11,7 @@
               size="sm"
               :debounce="400"
               :disabled="disabled"
+              @focus="focus"
             />
 
             <font-family-dropdown :disabled="disabled" @select="select" />
@@ -66,6 +67,10 @@ export default Vue.extend({
   methods: {
     select(value: string): void {
       this.$store.dispatch('applyFontFamily', value);
+    },
+
+    focus(event: FocusEvent): void {
+      (event.target as HTMLInputElement).select();
     },
   },
 });
