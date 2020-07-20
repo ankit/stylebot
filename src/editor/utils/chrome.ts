@@ -28,7 +28,7 @@ export const getAllOptions = async (): Promise<StylebotOptions> => {
 };
 
 export const setOption = (
-  name: string,
+  name: keyof StylebotOptions,
   value: StylebotOptions[keyof StylebotOptions]
 ): void => {
   const message: SetOption = {

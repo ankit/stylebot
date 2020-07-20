@@ -5,7 +5,7 @@ import Listeners from './listeners';
 import ContextMenu from './contextmenu';
 
 Cache.init((styles, options) => {
-  if (options.contextMenu) {
+  if (options.get('contextMenu')) {
     ContextMenu.init();
   }
 

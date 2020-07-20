@@ -55,13 +55,13 @@ export type GetAllOptions = {
 
 export type GetOption = {
   name: 'GetOption';
-  optionName: string;
+  optionName: keyof StylebotOptions;
 };
 
 export type SetOption = {
   name: 'SetOption';
   option: {
-    name: string;
+    name: keyof StylebotOptions;
     value: StylebotOptions[keyof StylebotOptions]; // todo
   };
 };

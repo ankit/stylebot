@@ -21,18 +21,21 @@ import {
 } from './messages';
 
 import {
-  StylebotOptions,
   BackgroundPageMessage,
   BackgroundPageMessageResponse,
   ExecuteCommand,
   StylebotCommand,
   TabUpdated,
 } from '@stylebot/types';
+import BackgroundPageOptions from './options';
 
 /**
  * Initialize listeners for the background page
  */
-const init = (styles: BackgroundPageStyles, options: StylebotOptions): void => {
+const init = (
+  styles: BackgroundPageStyles,
+  options: BackgroundPageOptions
+): void => {
   chrome.runtime.onMessage.addListener(
     (
       message: BackgroundPageMessage,
@@ -55,7 +58,7 @@ const init = (styles: BackgroundPageStyles, options: StylebotOptions): void => {
           GetOption(message, options, sendResponse);
           break;
         case 'SetOption':
-          SetOption(message);
+          SetOption(message, options);
           break;
         case 'GetAllOptions':
           GetAllOptions(options, sendResponse);
@@ -102,7 +105,7 @@ const init = (styles: BackgroundPageStyles, options: StylebotOptions): void => {
    */
   chrome.tabs.onUpdated.addListener((tabId, _, tab) => {
     if (tab.status === 'complete') {
-      if (options.contextMenu) {
+      if (options.get('contextMenu')) {
         ContextMenu.update(tab);
       }
     }
@@ -118,7 +121,7 @@ const init = (styles: BackgroundPageStyles, options: StylebotOptions): void => {
    * Listen when a tab is activated to update the context-menu
    */
   chrome.tabs.onActivated.addListener(activeInfo => {
-    if (options.contextMenu) {
+    if (options.get('contextMenu')) {
       chrome.tabs.get(activeInfo.tabId, tab => {
         ContextMenu.update(tab);
       });

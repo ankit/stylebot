@@ -1,31 +1,31 @@
 import BackgroundPageStyles from './styles';
-import { StylebotOptions } from '@stylebot/types';
-
-// TODO: Make this only accessible as arg / via getters/setters
-window.cache = {
-  styles: {},
-  options: {},
-  importRules: {},
-};
+import BackgroundPageOptions from './options';
 
 const init = (
-  callback: (styles: BackgroundPageStyles, options: StylebotOptions) => void
+  callback: (
+    styles: BackgroundPageStyles,
+    options: BackgroundPageOptions
+  ) => void
 ): void => {
   chrome.storage.local.get(['options', 'styles'], items => {
-    const options = items['options'] || {
-      mode: 'basic',
-      contextMenu: true,
-    };
-
     let styles: BackgroundPageStyles;
+
     if (items['styles']) {
       styles = new BackgroundPageStyles(items['styles']);
     } else {
       styles = new BackgroundPageStyles({});
     }
 
-    window.cache.options = options;
-    window.cache.styles = styles;
+    let options: BackgroundPageOptions;
+
+    if (items['options']) {
+      options = new BackgroundPageOptions(items['options']);
+    } else {
+      options = new BackgroundPageOptions({
+        mode: 'basic',
+        contextMenu: true,
+      });
+    }
 
     if (callback) {
       callback(styles, options);

@@ -3,7 +3,6 @@ import BackgroundPageStyles from './styles';
 import BackgroundPageOptions from './options';
 
 import {
-  StylebotOptions,
   GetOption as GetOptionType,
   SetOption as SetOptionType,
   DisableStyle as DisableStyleType,
@@ -90,25 +89,28 @@ export const MoveStyle = (
 
 export const GetOption = (
   message: GetOptionType,
-  options: StylebotOptions,
+  options: BackgroundPageOptions,
   sendResponse: (response: GetOptionResponse) => void
 ): void => {
-  sendResponse(options[message.optionName as keyof StylebotOptions]);
+  sendResponse(options.get(message.optionName));
 };
 
 export const GetAllOptions = (
-  options: StylebotOptions,
+  options: BackgroundPageOptions,
   sendResponse: (response: GetAllOptionsResponse) => void
 ): void => {
-  sendResponse(options);
+  sendResponse(options.getAll());
 };
 
 export const OpenOptionsPage = (): void => {
   chrome.runtime.openOptionsPage();
 };
 
-export const SetOption = (message: SetOptionType): void => {
-  BackgroundPageOptions.saveOption(message.option.name, message.option.value);
+export const SetOption = (
+  message: SetOptionType,
+  options: BackgroundPageOptions
+): void => {
+  options.set(message.option.name, message.option.value);
 };
 
 export const GetAllCommands = (
