@@ -45,7 +45,13 @@
     "128": "img/icon128.png"
   },
 
-  "permissions": ["tabs", "contextMenus", "storage", "unlimitedStorage"],
+  "permissions": [
+    "tabs",
+    "contextMenus",
+    "storage",
+    "unlimitedStorage",
+    "notifications"
+  ],
   "web_accessible_resources": [
     "editor/index.css",
     "readability/index.css",
