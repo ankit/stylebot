@@ -3,6 +3,8 @@ import { shouldRunOnUrl } from './utils';
 import { showLoader, hideLoader } from './loader';
 import { cacheUrl, didUrlChange, revertToCachedDocument } from './cache';
 
+import './index.scss';
+
 const run = async () => {
   try {
     await initReader();

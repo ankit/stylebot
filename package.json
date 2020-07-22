@@ -35,7 +35,8 @@
       "^.+\\.js$": "babel-jest"
     },
     "moduleNameMapper": {
-      "^@stylebot/(.*)$": "<rootDir>/src/$1/index"
+      "^@stylebot/(.*)$": "<rootDir>/src/$1/index",
+      "\\.(css|scss)$": "<rootDir>/__mocks__/styleMock.js"
     }
   },
   "husky": {

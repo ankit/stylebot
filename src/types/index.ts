@@ -40,6 +40,11 @@ export type ReadabilityArticle = {
   siteName: string;
 };
 
+export type ReadabilitySettings = {
+  fontFamily: string;
+  fontSize: string;
+};
+
 export type StylebotCommand =
   | 'toggle-stylebot'
   | 'toggle-style'

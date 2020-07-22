@@ -23,6 +23,7 @@ const config = {
     'background/index': './background/index.ts',
     'inject-css/index': './inject-css/index.ts',
     'monaco-editor/iframe/index': './monaco-editor/iframe/index.ts',
+    'readability/index': './readability/index.ts',
   },
 
   output: {
@@ -139,10 +140,6 @@ const config = {
         {
           from: '../node_modules/requirejs/**/*',
           to: 'monaco-editor/iframe/requirejs',
-        },
-        {
-          from: 'readability/index.css',
-          to: 'readability/index.css',
         },
         {
           from: 'extension/manifest.json',

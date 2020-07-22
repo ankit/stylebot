@@ -1,9 +1,9 @@
 import Readability from 'readability';
 import { ReadabilityArticle } from '@stylebot/types';
 
-export const getDomainUrlAndLabel = (): { url: string; urlLabel: string } => {
+export const getDomainUrlAndSource = (): { url: string; source: string } => {
   const parts = window.location.href.split('/');
-  return { url: `${parts[0]}//${parts[2]}`, urlLabel: parts[2] };
+  return { url: `${parts[0]}//${parts[2]}`, source: parts[2] };
 };
 
 /**

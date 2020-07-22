@@ -18,6 +18,10 @@ const mockState: State = {
   inspecting: false,
   help: false,
   readability: false,
+  readabilitySettings: {
+    fontSize: '16px',
+    fontFamily: 'Helvetica',
+  },
 };
 
 export default mockState;

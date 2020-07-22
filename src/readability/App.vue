@@ -1,27 +1,19 @@
 <template>
-  <div v-if="article" class="stylebot-reader">
-    <div class="stylebot-reader-body">
-      <a :href="url" class="stylebot-reader-domain">
-        {{ urlLabel }}
-      </a>
-
-      <div class="stylebot-reader-header">
-        <h1>{{ article.title }}</h1>
-      </div>
-
-      <div class="stylebot-reader-byline">{{ article.byline }}</div>
-      <!-- eslint-disable vue/no-v-html - html is generated with the readability project -->
-      <div class="stylebot-reader-content" v-html="article.content" />
-    </div>
-  </div>
+  <the-reader v-if="article" :article="article" :url="url" :source="source" />
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
+import TheReader from './components/TheReader.vue';
+
 import { hideLoader } from './loader';
 
 export default Vue.extend({
   name: 'App',
+
+  components: {
+    TheReader,
+  },
 
   props: {
     url: {
@@ -29,7 +21,7 @@ export default Vue.extend({
       required: true,
     },
 
-    urlLabel: {
+    source: {
       type: String,
       required: true,
     },
@@ -41,7 +33,6 @@ export default Vue.extend({
   },
 
   mounted(): void {
-    this.$el.querySelector('a')?.focus();
     hideLoader();
   },
 });

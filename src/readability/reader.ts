@@ -1,9 +1,11 @@
 import Vue from 'vue';
+import store from '../editor/store/index';
+
 /* @ts-ignore */
 import { isProbablyReaderable } from '../../node_modules/readability/Readability-readerable';
 
 import App from './App.vue';
-import { getDomainUrlAndLabel, getReadabilityArticle } from './utils';
+import { getDomainUrlAndSource, getReadabilityArticle } from './utils';
 
 import { ReadabilityArticle } from '@stylebot/types';
 import { cacheDocument } from './cache';
@@ -45,17 +47,17 @@ const initShadowDOM = async (): Promise<HTMLElement> => {
 
 const initVueApp = async (
   url: string,
-  urlLabel: string,
+  source: string,
   article: ReadabilityArticle
 ) => {
   const el = await initShadowDOM();
 
   new Vue({
     el,
-
+    store,
     render: createElement => {
       const context = {
-        props: { url, urlLabel, article },
+        props: { url, source, article },
       };
 
       return createElement(App, context);
@@ -70,11 +72,11 @@ export const initReader = async (): Promise<void> => {
     }
 
     try {
-      const { url, urlLabel } = getDomainUrlAndLabel();
+      const { url, source } = getDomainUrlAndSource();
       const article = await getReadabilityArticle();
 
       cacheDocument();
-      initVueApp(url, urlLabel, article);
+      initVueApp(url, source, article);
       resolve();
     } catch (e) {
       reject();

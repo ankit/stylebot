@@ -1,0 +1,175 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+/* Modified version of https://hg.mozilla.org/mozilla-central/file/tip/toolkit/themes/shared/aboutReader.css */
+
+@media print {
+  .stylebot-reader-content {
+    p,
+    code,
+    pre,
+    blockquote,
+    ul,
+    ol,
+    li,
+    figure,
+    .wp-caption {
+      margin: 0 0 10px !important;
+      padding: 0 !important;
+    }
+  }
+}
+
+.stylebot-reader-content {
+  h1,
+  h2,
+  h3 {
+    font-weight: bold;
+  }
+
+  h1 {
+    font-size: 1.6em;
+    line-height: 1.25em;
+  }
+
+  h2 {
+    font-size: 1.2em;
+    line-height: 1.51em;
+  }
+
+  h3 {
+    font-size: 1em;
+    line-height: 1.66em;
+  }
+
+  a:link {
+    text-decoration: underline;
+    font-weight: normal;
+  }
+
+  a:link,
+  a:link:hover,
+  a:link:active {
+    color: #0095dd;
+  }
+
+  a:visited {
+    color: #c2e;
+  }
+
+  * {
+    max-width: 100%;
+    height: auto;
+  }
+
+  p,
+  code,
+  pre,
+  blockquote,
+  ul,
+  ol,
+  li,
+  figure,
+  .wp-caption {
+    margin: -10px -10px 20px;
+    padding: 10px;
+    border-radius: 5px;
+  }
+
+  li {
+    margin-bottom: 0;
+  }
+
+  li > ul,
+  li > ol {
+    margin-bottom: -10px;
+  }
+
+  p > img:only-child,
+  p > a:only-child > img:only-child,
+  .wp-caption img,
+  figure img {
+    display: block;
+  }
+
+  img[moz-reader-center] {
+    margin-inline: auto;
+  }
+
+  .caption,
+  .wp-caption-text figcaption {
+    font-size: 0.9em;
+    line-height: 1.48em;
+    font-style: italic;
+  }
+
+  code,
+  pre {
+    white-space: pre-wrap;
+  }
+
+  blockquote {
+    padding: 0;
+    padding-inline-start: 16px;
+  }
+
+  ul,
+  ol {
+    padding: 0;
+  }
+
+  ul {
+    padding-inline-start: 30px;
+    list-style: disc;
+  }
+
+  ol {
+    padding-inline-start: 30px;
+    list-style: decimal;
+  }
+
+  table,
+  th,
+  td {
+    border: 1px solid currentColor;
+    border-collapse: collapse;
+    padding: 6px;
+    vertical-align: top;
+  }
+
+  table {
+    margin: 5px;
+  }
+
+  /* Visually hide (but don't display: none) screen reader elements */
+  .visually-hidden,
+  .visuallyhidden,
+  .sr-only {
+    display: inline-block;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    border-width: 0;
+  }
+
+  /* Hide elements with common "hidden" class names */
+  .hidden,
+  .invisible {
+    display: none;
+  }
+
+  /* Enforce wordpress and similar emoji/smileys aren't sized to be full-width,
+ * see bug 1399616 for context. */
+  img.wp-smiley,
+  img.emoji {
+    display: inline-block;
+    border-width: 0;
+    /* height: auto is implied from `.stylebot-reader-content *` rule. */
+    width: 1em;
+    margin: 0 0.07em;
+    padding: 0;
+  }
+}

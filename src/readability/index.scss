@@ -1,0 +1,31 @@
+.stylebot-reader {
+  --body-padding: 64px;
+  --content-width: 35em;
+  --line-height: 1.6em;
+
+  @import './scss/content.scss';
+
+  --main-background: #fff;
+  --main-foreground: #333;
+}
+
+.stylebot-reader {
+  top: 0;
+  left: 0;
+  z-index: 100;
+
+  color: var(--main-foreground);
+  background-color: var(--main-background);
+
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+}
+
+.stylebot-reader-body {
+  margin: 0 auto;
+  padding: var(--body-padding);
+
+  max-width: var(--content-width);
+  line-height: var(--line-height);
+}

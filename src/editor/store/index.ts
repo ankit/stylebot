@@ -1,7 +1,11 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 
-import { StylebotOptions, StylebotPlacement } from '@stylebot/types';
+import {
+  StylebotOptions,
+  StylebotPlacement,
+  ReadabilitySettings,
+} from '@stylebot/types';
 
 import getters from './getters';
 import actions from './actions';
@@ -29,6 +33,7 @@ export type State = {
   visible: boolean;
   inspecting: boolean;
   position: StylebotPlacement;
+  readabilitySettings: ReadabilitySettings;
 };
 
 export default new Vuex.Store<State>({
@@ -50,6 +55,10 @@ export default new Vuex.Store<State>({
     visible: false,
     position: 'right',
     inspecting: false,
+    readabilitySettings: {
+      fontSize: '16px',
+      fontFamily: 'Helvetica',
+    },
   },
 
   getters,
