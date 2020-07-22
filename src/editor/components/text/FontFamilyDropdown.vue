@@ -40,13 +40,19 @@ export default Vue.extend({
   data(): { fonts: Array<string> } {
     return {
       fonts: [
-        'Helvetica',
-        'Roboto',
-        'Lora',
-        'Muli',
+        'Calibri',
         'Crimson Text',
-        'Inconsolata',
+        'Droid Sans',
+        'Droid Serif',
         'Fira Code',
+        'Helvetica',
+        'Inconsolata',
+        'Lato',
+        'Lora',
+        'Merriweather',
+        'Monaco',
+        'Muli',
+        'Roboto',
       ],
     };
   },

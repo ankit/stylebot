@@ -4,6 +4,7 @@
       <b-col cols="12">
         <h1>Text</h1>
       </b-col>
+
       <b-col cols="12">
         <the-text-properties />
       </b-col>
