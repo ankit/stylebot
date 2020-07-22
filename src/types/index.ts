@@ -14,6 +14,12 @@ export type Style = {
   readability: boolean;
 };
 
+export type StyleWithoutUrl = Omit<Style, 'url'>;
+
+export type StyleMap = {
+  [url: string]: Omit<Style, 'url'>;
+};
+
 // https://developer.mozilla.org/en-US/docs/Web/CSS/filter
 export type FilterEffect =
   | 'blur'

@@ -9,41 +9,31 @@ jest.mock('postcss');
 jest.mock('@stylebot/css');
 jest.mock('../../utils/chrome');
 
-const mockRoot = {
+const mockRoot = ({
   some: jest.fn(),
   walkRules: jest.fn(),
   append: jest.fn(),
   toString: jest.fn(),
-};
+} as never) as postcss.Root;
 
 const mockCommit = jest.fn();
 const mockDispatch = jest.fn();
 
 describe('actions', () => {
   beforeAll(() => {
-    Object.defineProperty(stylebotCss, 'injectRootIntoDocument', {
-      value: jest.fn(),
-    });
-
-    Object.defineProperty(chromeUtils, 'setStyle', { value: jest.fn() });
+    jest.spyOn(stylebotCss, 'injectRootIntoDocument');
+    jest.spyOn(chromeUtils, 'setStyle');
   });
 
   beforeEach(() => {
     jest.resetAllMocks();
-
-    Object.defineProperty(postcss, 'parse', {
-      value: jest.fn().mockImplementation(() => {
-        return mockRoot;
-      }),
-    });
+    jest.spyOn(postcss, 'parse').mockReturnValue(mockRoot);
   });
 
   describe('applyCss', () => {
     it('does not commit invalid css', () => {
-      Object.defineProperty(postcss, 'parse', {
-        value: jest.fn().mockImplementation(() => {
-          throw new Error();
-        }),
+      jest.spyOn(postcss, 'parse').mockImplementation(() => {
+        throw new Error();
       });
 
       try {
@@ -91,9 +81,9 @@ describe('actions', () => {
     it('invokes addDeclaration correctly', () => {
       const state = { ...mockState, activeSelector: 'a' };
 
-      Object.defineProperty(stylebotCss, 'addDeclaration', {
-        value: jest.fn(() => 'outputOfAddDeclaration'),
-      });
+      jest
+        .spyOn(stylebotCss, 'addDeclaration')
+        .mockReturnValue('outputOfAddDeclaration');
 
       actions.applyDeclaration(
         {
@@ -112,6 +102,7 @@ describe('actions', () => {
         'a',
         ''
       );
+
       expect(mockDispatch).toBeCalledWith('applyCss', {
         css: 'outputOfAddDeclaration',
       });

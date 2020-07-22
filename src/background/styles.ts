@@ -1,34 +1,32 @@
 import * as postcss from 'postcss';
+
 import BackgroundPageUtils from './utils';
 import BrowserAction from './browseraction';
-import { EnableStyleForTab, DisableStyleForTab } from 'types';
 
-type Style = {
-  css: string;
-  enabled: boolean;
-  readability: boolean;
-};
-
-type Styles = {
-  [url: string]: Style;
-};
+import {
+  Style,
+  StyleMap,
+  StyleWithoutUrl,
+  EnableStyleForTab,
+  DisableStyleForTab,
+} from '@stylebot/types';
 
 class BackgroundPageStyles {
-  styles: Styles;
+  styles: StyleMap;
 
-  constructor(styles: Styles) {
+  constructor(styles: StyleMap) {
     this.styles = styles;
   }
 
-  get(url: string): Style {
+  get(url: string): StyleWithoutUrl {
     return this.styles[url];
   }
 
-  getAll(): Styles {
+  getAll(): StyleMap {
     return this.styles;
   }
 
-  setAll(styles: Styles): void {
+  setAll(styles: StyleMap): void {
     this.styles = styles;
 
     chrome.storage.local.set({
@@ -120,7 +118,7 @@ class BackgroundPageStyles {
     });
   }
 
-  import(styles: Styles): void {
+  import(styles: StyleMap): void {
     for (const url in styles) {
       this.styles[url] = styles[url];
     }
@@ -145,8 +143,8 @@ class BackgroundPageStyles {
     pageUrl: string,
     important = false
   ): {
-    styles: Array<Style & { url: string }>;
-    defaultStyle?: Style & { url: string };
+    styles: Array<Style>;
+    defaultStyle?: Style;
   } {
     if (!pageUrl) {
       return { styles: [] };
@@ -158,7 +156,7 @@ class BackgroundPageStyles {
 
     const styles = [];
 
-    let defaultStyle: (Style & { url: string }) | undefined;
+    let defaultStyle: Style | undefined;
 
     for (const url in this.styles) {
       const matches = BackgroundPageUtils.matchesPattern(pageUrl, url);

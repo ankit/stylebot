@@ -31,7 +31,8 @@
     "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
     "transform": {
       ".*\\.(vue)$": "vue-jest",
-      "^.+\\.tsx?$": "ts-jest"
+      "^.+\\.ts$": "ts-jest",
+      "^.+\\.js$": "babel-jest"
     },
     "moduleNameMapper": {
       "^@stylebot/(.*)$": "<rootDir>/src/$1/index"
@@ -57,8 +58,8 @@
     "@vue/eslint-config-prettier": "^6.0.0",
     "@vue/eslint-config-typescript": "^5.0.2",
     "@vue/test-utils": "^1.0.3",
-    "babel-core": "^6.26.3",
-    "babel-loader": "^8.1.0",
+    "babel-core": "^7.0.0-bridge.0",
+    "babel-jest": "^26.1.0",
     "bootstrap": "^4.5.0",
     "bootstrap-vue": "^2.15.0",
     "copy-webpack-plugin": "^6.0.1",

@@ -1,35 +1,33 @@
 import BackgroundPageStyles from './styles';
 import BackgroundPageOptions from './options';
 
-const init = (
-  callback: (
-    styles: BackgroundPageStyles,
-    options: BackgroundPageOptions
-  ) => void
-): void => {
-  chrome.storage.local.get(['options', 'styles'], items => {
-    let styles: BackgroundPageStyles;
+const init = async (): Promise<{
+  styles: BackgroundPageStyles;
+  options: BackgroundPageOptions;
+}> => {
+  return new Promise(resolve => {
+    chrome.storage.local.get(['options', 'styles'], items => {
+      let styles: BackgroundPageStyles;
 
-    if (items['styles']) {
-      styles = new BackgroundPageStyles(items['styles']);
-    } else {
-      styles = new BackgroundPageStyles({});
-    }
+      if (items['styles']) {
+        styles = new BackgroundPageStyles(items['styles']);
+      } else {
+        styles = new BackgroundPageStyles({});
+      }
 
-    let options: BackgroundPageOptions;
+      let options: BackgroundPageOptions;
 
-    if (items['options']) {
-      options = new BackgroundPageOptions(items['options']);
-    } else {
-      options = new BackgroundPageOptions({
-        mode: 'basic',
-        contextMenu: true,
-      });
-    }
+      if (items['options']) {
+        options = new BackgroundPageOptions(items['options']);
+      } else {
+        options = new BackgroundPageOptions({
+          mode: 'basic',
+          contextMenu: true,
+        });
+      }
 
-    if (callback) {
-      callback(styles, options);
-    }
+      resolve({ styles, options });
+    });
   });
 };
 

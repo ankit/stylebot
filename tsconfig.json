@@ -3,11 +3,11 @@
   "exclude": ["node_modules"],
 
   "compilerOptions": {
-    "target": "es5",
     "strict": true,
-    "module": "es2015",
-    "lib": ["es2015", "dom"],
+    "module": "esnext",
+    "lib": ["dom", "esnext"],
     "moduleResolution": "node",
+    "esModuleInterop": true,
     "types": ["chrome", "jest", "node"],
     "baseUrl": "src",
     "paths": {
