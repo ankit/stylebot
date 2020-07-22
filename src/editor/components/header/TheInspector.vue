@@ -117,7 +117,7 @@ export default Vue.extend({
     fill: #555;
   }
 
-  &:hover,
+  &:hover:not(:disabled),
   &.active {
     path {
       fill: #fff;

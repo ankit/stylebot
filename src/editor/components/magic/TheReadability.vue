@@ -2,9 +2,10 @@
   <div>
     <b-form-checkbox v-model="value" switch>Enable Readability</b-form-checkbox>
 
-    <p
-      class="lead pt-2"
-    >Make articles on this site readable by hiding non-essential page elements like sidebars, footers and ads.</p>
+    <p class="lead pt-2">
+      Make articles on this site readable by hiding non-essential page elements
+      like sidebars, footers and ads.
+    </p>
   </div>
 </template>
 
