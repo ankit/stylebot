@@ -8,20 +8,15 @@
       @keydown="keydown"
     />
 
-    <template #append>
+    <template v-if="sizes.length !== 0" #append>
       <dropdown-hack-to-support-shadow-dom>
-        <b-dropdown
-          v-model="unit"
-          size="sm"
-          :text="unit"
-          :disabled="disabled"
-          variant="outline-secondary"
-        >
+        <b-dropdown size="sm" :disabled="disabled" variant="outline-secondary">
           <b-dropdown-item
-            v-for="supportedUnit in supportedUnits"
-            :key="supportedUnit"
+            v-for="size in sizes"
+            :key="size"
+            @click="length = size"
           >
-            {{ supportedUnit }}
+            {{ size }}
           </b-dropdown-item>
         </b-dropdown>
       </dropdown-hack-to-support-shadow-dom>
@@ -35,8 +30,6 @@ import { Declaration } from 'postcss';
 
 import DropdownHackToSupportShadowDom from './DropdownHackToSupportShadowDom.vue';
 
-type Unit = 'px' | 'em' | '%' | string;
-
 export default Vue.extend({
   name: 'Length',
 
@@ -45,40 +38,52 @@ export default Vue.extend({
   },
 
   props: {
+    sizes: {
+      type: Array,
+      required: false,
+      default: () => [],
+    },
+
     property: {
       type: String,
       required: true,
     },
   },
 
-  data(): {
-    supportedUnits: Array<string>;
-  } {
-    return {
-      supportedUnits: ['px', 'em', '%'],
-    };
-  },
-
   computed: {
     length: {
       get(): string {
-        const { length } = this.get();
+        const activeRule = this.$store.getters.activeRule;
+        let value = '';
+
+        if (activeRule) {
+          activeRule.clone().walkDecls(this.property, (decl: Declaration) => {
+            value = decl.value;
+          });
+        }
+
+        if (!value) {
+          return '';
+        }
+
+        const [length, unit] = value.split(/(-?\d+)/).filter(Boolean);
+
+        // todo: support other units.
+        // currently, we render empty input and overwrite on edit
+        if (unit !== 'px') {
+          return '';
+        }
+
         return length;
       },
 
       set(length: string): void {
-        this.put(length, this.unit);
-      },
-    },
+        const value = length ? `${length}px` : '';
 
-    unit: {
-      get(): Unit {
-        const { unit } = this.get();
-        return unit;
-      },
-
-      set(unit: Unit): void {
-        this.put(this.length, unit);
+        this.$store.dispatch('applyDeclaration', {
+          property: this.property,
+          value,
+        });
       },
     },
 
@@ -88,40 +93,6 @@ export default Vue.extend({
   },
 
   methods: {
-    get(): { length: string; unit: Unit } {
-      const activeRule = this.$store.getters.activeRule;
-      let value = '';
-
-      if (activeRule) {
-        activeRule.clone().walkDecls(this.property, (decl: Declaration) => {
-          value = decl.value;
-        });
-      }
-
-      if (!value) {
-        return { length: '', unit: 'px' };
-      }
-
-      const [length, unit] = value.split(/(-?\d+)/).filter(Boolean);
-
-      // todo: support other units.
-      // currently, we render empty input and overwrite on edit
-      if (this.supportedUnits.indexOf(unit) === -1) {
-        return { length: '', unit: 'px' };
-      }
-
-      return { length, unit };
-    },
-
-    put(length: string, unit: Unit): void {
-      const value = length ? `${length}${unit}` : '';
-
-      this.$store.dispatch('applyDeclaration', {
-        property: this.property,
-        value,
-      });
-    },
-
     focus(event: FocusEvent): void {
       (event.target as HTMLInputElement).select();
     },
@@ -155,8 +126,12 @@ export default Vue.extend({
 });
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .length-input-group {
-  width: 100px !important;
+  width: 65px !important;
+
+  .dropdown-toggle {
+    line-height: 21px !important;
+  }
 }
 </style>

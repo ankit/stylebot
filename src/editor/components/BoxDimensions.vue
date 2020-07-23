@@ -8,6 +8,7 @@
         :disabled="disabled"
         class="box-dimension-input"
         @focus="focus"
+        @keydown="keydown($event, 'top')"
       />
     </b-col>
 
@@ -19,6 +20,7 @@
         :disabled="disabled"
         class="box-dimension-input"
         @focus="focus"
+        @keydown="keydown($event, 'right')"
       />
     </b-col>
 
@@ -30,6 +32,7 @@
         :disabled="disabled"
         class="box-dimension-input"
         @focus="focus"
+        @keydown="keydown($event, 'bottom')"
       />
     </b-col>
 
@@ -41,10 +44,9 @@
         :disabled="disabled"
         class="box-dimension-input"
         @focus="focus"
+        @keydown="keydown($event, 'left')"
       />
     </b-col>
-
-    <b-col cols="1" class="text-muted box-dimension-unit">px</b-col>
   </b-row>
 </template>
 
@@ -149,22 +151,42 @@ export default Vue.extend({
     focus(event: FocusEvent): void {
       (event.target as HTMLInputElement).select();
     },
+
+    keydown(
+      event: KeyboardEvent,
+      direction: 'top' | 'right' | 'bottom' | 'left'
+    ): void {
+      // up arrow
+      if (event.keyCode === 38) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (!this[direction]) {
+          this[direction] = '1';
+        } else {
+          this[direction] = `${parseInt(this[direction], 10) + 1}`;
+        }
+      }
+
+      // down arrow
+      else if (event.keyCode === 40) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (!this[direction]) {
+          this[direction] = '-1';
+        } else {
+          this[direction] = `${parseInt(this[direction], 10) - 1}`;
+        }
+      }
+    },
   },
 });
 </script>
 
 <style lang="scss" scoped>
 .box-dimension {
-  min-width: 40px;
+  min-width: 45px;
   margin-right: 3px;
-}
-
-.box-dimension-unit {
-  font-size: 13px;
-  line-height: 26px;
-}
-
-.box-dimension-input {
-  padding: 1px 4px !important;
 }
 </style>

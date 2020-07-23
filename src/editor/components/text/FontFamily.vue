@@ -1,6 +1,6 @@
 <template>
   <b-row align-content="center" no-gutters>
-    <css-property>Font Family</css-property>
+    <css-property>Font</css-property>
 
     <css-property-value>
       <b-row no-gutters>

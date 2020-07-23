@@ -1,6 +1,6 @@
 <template>
   <b-row align-content="center" no-gutters>
-    <css-property>Background Color</css-property>
+    <css-property>Background</css-property>
 
     <css-property-value>
       <b-row no-gutters>

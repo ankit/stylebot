@@ -1,6 +1,6 @@
 <template>
   <b-row align-content="center" no-gutters>
-    <css-property>Decoration</css-property>
+    <css-property>Decorate</css-property>
     <css-property-value-group property="text-decoration" :options="options" />
   </b-row>
 </template>
@@ -21,26 +21,33 @@ export default Vue.extend({
 
   data(): {
     options: Array<{
-      content: string;
+      title: string;
+      icon?: string;
+      html?: string;
       value: string;
     }>;
   } {
     return {
       options: [
         {
-          content: '<span style="text-decoration: underline">ab</span>',
+          title: 'Underline',
+          icon: 'type-underline',
           value: 'underline',
         },
+
         {
-          content: '<span style="text-decoration: line-through">ab</span>',
+          title: 'Strikethrough',
+          icon: 'type-strikethrough',
           value: 'line-through',
         },
+
         {
-          content: '<span style="text-decoration: overline">ab</span>',
+          title: 'Overline',
+          html: '<span style="text-decoration: overline">A</span>',
           value: 'overline',
         },
 
-        { content: 'None', value: 'none' },
+        { title: 'None', html: 'None', value: 'none' },
       ],
     };
   },

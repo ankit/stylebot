@@ -1,7 +1,7 @@
 <template>
   <b-row align-content="center" no-gutters>
     <css-property>
-      Font Style
+      Style
     </css-property>
 
     <css-property-value-group property="font-style" :options="options" />
@@ -24,14 +24,16 @@ export default Vue.extend({
 
   data(): {
     options: Array<{
-      content: string;
+      title: string;
+      icon?: string;
+      html?: string;
       value: string;
     }>;
   } {
     return {
       options: [
-        { content: '<i>Italic</i>', value: 'italic' },
-        { content: 'Normal', value: 'normal' },
+        { title: 'Italic', icon: 'type-italic', value: 'italic' },
+        { title: 'Normal', html: 'None', value: 'normal' },
       ],
     };
   },

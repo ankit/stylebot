@@ -2,27 +2,20 @@
   <div class="pb-5">
     <b-row class="section" no-gutters>
       <b-col cols="12">
-        <h1>Text</h1>
+        <h1>Text and Colors</h1>
       </b-col>
 
       <b-col cols="12">
         <the-text-properties />
-      </b-col>
-    </b-row>
-
-    <b-row class="section" no-gutters>
-      <b-col cols="12">
-        <h1>Colors and Background</h1>
-      </b-col>
-      <b-col cols="12">
         <the-color-properties />
       </b-col>
     </b-row>
 
     <b-row class="section" no-gutters>
       <b-col cols="12">
-        <h1>Layout and Visibility</h1>
+        <h1>Visibility and Layout</h1>
       </b-col>
+
       <b-col cols="12">
         <the-layout-properties />
       </b-col>

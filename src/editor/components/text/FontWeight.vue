@@ -1,7 +1,7 @@
 <template>
   <b-row align-content="center" no-gutters>
     <css-property>
-      Font Weight
+      Weight
     </css-property>
 
     <css-property-value-group property="font-weight" :options="options" />
@@ -24,14 +24,16 @@ export default Vue.extend({
 
   data(): {
     options: Array<{
-      content: string;
+      title: string;
+      icon?: string;
+      html?: string;
       value: string;
     }>;
   } {
     return {
       options: [
-        { content: '<strong>Bold</strong>', value: 'bold' },
-        { content: 'Normal', value: 'normal' },
+        { title: 'Bold', icon: 'type-bold', value: 'bold' },
+        { title: 'Normal', html: 'None', value: 'normal' },
       ],
     };
   },

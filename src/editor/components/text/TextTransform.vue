@@ -24,26 +24,31 @@ export default Vue.extend({
 
   data(): {
     options: Array<{
-      content: string;
+      title: string;
+      icon?: string;
+      html?: string;
       value: string;
     }>;
   } {
     return {
       options: [
         {
-          content: 'Abc',
+          title: 'Capitalize',
+          html: 'Ab',
           value: 'capitalize',
         },
         {
-          content: 'ABC',
+          title: 'Uppercase',
+          html: 'AB',
           value: 'uppercase',
         },
         {
-          content: 'abc',
+          title: 'Lowercase',
+          html: 'ab',
           value: 'lowercase',
         },
 
-        { content: 'None', value: 'none' },
+        { title: 'None', html: 'None', value: 'none' },
       ],
     };
   },

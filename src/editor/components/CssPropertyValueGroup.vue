@@ -6,11 +6,13 @@
         :key="option.value"
         size="sm"
         :disabled="disabled"
+        :title="option.title"
         :variant="value === option.value ? 'secondary' : 'outline-secondary'"
         @click="select(option.value)"
       >
+        <b-icon v-if="option.icon" :icon="option.icon" aria-hidden="true" />
         <!-- eslint-disable-next-line vue/no-v-html -->
-        <span v-html="option.content" />
+        <span v-if="option.html" v-html="option.html" />
       </b-button>
     </b-button-group>
   </b-col>
@@ -22,6 +24,7 @@ import { Declaration } from 'postcss';
 
 export default Vue.extend({
   name: 'CssPropertyValueGroup',
+
   props: {
     property: {
       type: String,

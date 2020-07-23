@@ -1,9 +1,9 @@
 <template>
   <b-row align-content="center" no-gutters>
-    <css-property>Font Size</css-property>
+    <css-property>Size</css-property>
 
     <css-property-value>
-      <Length property="font-size" />
+      <Length property="font-size" :sizes="sizes" />
     </css-property-value>
   </b-row>
 </template>
@@ -22,6 +22,14 @@ export default Vue.extend({
     Length,
     CssProperty,
     CssPropertyValue,
+  },
+
+  data(): {
+    sizes: Array<string>;
+  } {
+    return {
+      sizes: ['8', '9', '10', '11', '12', '14', '18', '24', '30', '36', '48'],
+    };
   },
 });
 </script>

@@ -64,7 +64,7 @@ export default Vue.extend({
   .dropdown-toggle {
     height: 28px !important;
     padding: 0 8px !important;
-    padding-top: 2px !important;
+    line-height: 30px !important;
   }
 
   .dropdown-menu {

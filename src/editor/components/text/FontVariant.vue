@@ -1,6 +1,6 @@
 <template>
   <b-row align-content="center" no-gutters>
-    <css-property>Font Variant</css-property>
+    <css-property>Variant</css-property>
     <css-property-value-group property="font-variant" :options="options" />
   </b-row>
 </template>
@@ -21,17 +21,18 @@ export default Vue.extend({
 
   data(): {
     options: Array<{
-      content: string;
+      icon?: string;
+      html?: string;
       value: string;
     }>;
   } {
     return {
       options: [
         {
-          content: '<span style="font-variant: small-caps">Small Caps</span>',
+          html: '<span style="font-variant: small-caps">Ab</span>',
           value: 'small-caps',
         },
-        { content: 'Normal', value: 'normal' },
+        { html: 'Normal', value: 'normal' },
       ],
     };
   },
