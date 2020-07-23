@@ -3,6 +3,7 @@
     <b-button
       size="sm"
       :variant="theme === 'light' ? 'secondary' : 'outline-secondary'"
+      :disabled="disabled"
       @click="set('light')"
     >
       Light
@@ -11,6 +12,7 @@
     <b-button
       size="sm"
       :variant="theme === 'dark' ? 'secondary' : 'outline-secondary'"
+      :disabled="disabled"
       @click="set('dark')"
     >
       Dark
@@ -19,6 +21,7 @@
     <b-button
       size="sm"
       :variant="theme === 'sepia' ? 'secondary' : 'outline-secondary'"
+      :disabled="disabled"
       @click="set('sepia')"
     >
       Sepia
@@ -32,6 +35,9 @@ import { ReadabilityTheme } from '@stylebot/types';
 
 export default Vue.extend({
   name: 'TheReadabilityTheme',
+  props: {
+    disabled: Boolean,
+  },
 
   computed: {
     theme(): number {

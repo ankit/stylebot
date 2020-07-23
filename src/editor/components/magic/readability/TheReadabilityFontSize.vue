@@ -4,6 +4,7 @@
       size="sm"
       title="Decrease Font Size"
       variant="outline-secondary"
+      :disabled="disabled"
       @click="decrease"
     >
       <b-icon icon="dash" aria-hidden="true" />
@@ -13,6 +14,7 @@
       size="sm"
       title="Increase Font Size"
       variant="outline-secondary"
+      :disabled="disabled"
       @click="increase"
     >
       <b-icon icon="plus" aria-hidden="true" />
@@ -25,6 +27,9 @@ import Vue from 'vue';
 
 export default Vue.extend({
   name: 'TheReadabilityFontSize',
+  props: {
+    disabled: Boolean,
+  },
 
   computed: {
     size(): number {

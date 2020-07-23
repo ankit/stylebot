@@ -6,7 +6,8 @@
 
     <b-col cols="8" align-self="center" class="pl-2 pr-3">
       <the-css-selector-dropdown />
-      <the-url-input />
+
+      <div class="url">{{ url }}</div>
     </b-col>
 
     <b-col cols="2">
@@ -20,7 +21,6 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import TheUrlInput from './header/TheUrlInput.vue';
 import TheInspector from './header/TheInspector.vue';
 import TheWindowActions from './header/TheWindowActions.vue';
 import TheCssSelectorDropdown from './header/TheCssSelectorDropdown.vue';
@@ -29,7 +29,6 @@ export default Vue.extend({
   name: 'TheHeader',
 
   components: {
-    TheUrlInput,
     TheInspector,
     TheWindowActions,
     TheCssSelectorDropdown,
@@ -41,6 +40,12 @@ export default Vue.extend({
     return {
       selector: null,
     };
+  },
+
+  computed: {
+    url(): string {
+      return this.$store.state.url;
+    },
   },
 
   methods: {
@@ -55,5 +60,13 @@ export default Vue.extend({
 .header {
   padding: 10px;
   background: #eee;
+}
+
+.url {
+  color: #333;
+  height: 26px;
+  font-size: 13px;
+  padding: 0 12px;
+  margin-top: 3px;
 }
 </style>

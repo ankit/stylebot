@@ -5,6 +5,7 @@
       title="Decrease Width"
       variant="outline-secondary"
       style="width: 65px;"
+      :disabled="disabled"
       @click="decrease"
     >
       <b-icon icon="arrow-right-short" aria-hidden="true" />
@@ -16,6 +17,7 @@
       title="Increase Width"
       variant="outline-secondary"
       style="width: 65px;"
+      :disabled="disabled"
       @click="increase"
     >
       <b-icon icon="arrow-left-short" aria-hidden="true" />
@@ -29,6 +31,9 @@ import Vue from 'vue';
 
 export default Vue.extend({
   name: 'TheReadabilityWidth',
+  props: {
+    disabled: Boolean,
+  },
 
   computed: {
     width(): number {

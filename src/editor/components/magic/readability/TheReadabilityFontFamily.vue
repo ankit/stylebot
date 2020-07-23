@@ -1,8 +1,13 @@
 <template>
   <b-input-group>
-    <b-form-input v-model="value" size="sm" :debounce="400" @focus="focus" />
-
-    <font-family-dropdown :disabled="false" @select="select" />
+    <b-form-input
+      v-model="value"
+      size="sm"
+      :debounce="400"
+      :disabled="disabled"
+      @focus="focus"
+    />
+    <font-family-dropdown :disabled="disabled" @select="select" />
   </b-input-group>
 </template>
 
@@ -15,6 +20,10 @@ export default Vue.extend({
 
   components: {
     FontFamilyDropdown,
+  },
+
+  props: {
+    disabled: Boolean,
   },
 
   computed: {

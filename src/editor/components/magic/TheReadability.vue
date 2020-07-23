@@ -9,21 +9,21 @@
 
     <b-row align-content="center" no-gutters>
       <b-col cols="7" class="mr-3">
-        <the-readability-font-family />
+        <the-readability-font-family :disabled="!value" />
       </b-col>
 
       <b-col cols="4" class="mr-1">
-        <the-readability-font-size />
+        <the-readability-font-size :disabled="!value" />
       </b-col>
     </b-row>
 
     <b-row align-content="center" no-gutters class="mt-3">
       <b-col cols="5" class="mr-2">
-        <the-readability-theme />
+        <the-readability-theme :disabled="!value" />
       </b-col>
 
       <b-col cols="3">
-        <the-readability-width />
+        <the-readability-width :disabled="!value" />
       </b-col>
     </b-row>
   </div>
