@@ -1,4 +1,4 @@
-import { StylebotCommand } from 'types';
+import { StylebotCommand, ReadabilitySettings } from 'types';
 
 export type ToggleStylebot = {
   name: 'ToggleStylebot';
@@ -36,6 +36,11 @@ export type ExecuteCommand = {
   command: StylebotCommand;
 };
 
+export type UpdateReader = {
+  name: 'UpdateReader';
+  value: ReadabilitySettings;
+};
+
 type TabMessage =
   | ToggleStylebot
   | OpenStylebot
@@ -44,6 +49,7 @@ type TabMessage =
   | ToggleReadabilityForTab
   | TabUpdated
   | GetIsStylebotOpen
-  | ExecuteCommand;
+  | ExecuteCommand
+  | UpdateReader;
 
 export default TabMessage;

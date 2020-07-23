@@ -59,8 +59,10 @@ export default new Vuex.Store<State>({
     inspecting: false,
     shortcuts: new Map(),
     readabilitySettings: {
-      fontSize: '16px',
-      fontFamily: 'Helvetica',
+      size: 16,
+      width: 40,
+      theme: 'light',
+      font: 'Helvetica',
     },
   },
 

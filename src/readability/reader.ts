@@ -1,5 +1,4 @@
 import Vue from 'vue';
-import store from '../editor/store/index';
 
 /* @ts-ignore */
 import { isProbablyReaderable } from '../../node_modules/readability/Readability-readerable';
@@ -54,7 +53,6 @@ const initVueApp = async (
 
   new Vue({
     el,
-    store,
     render: createElement => {
       const context = {
         props: { url, source, article },

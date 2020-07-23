@@ -3,6 +3,7 @@ import {
   StylebotPlacement,
   StylebotOptions,
   StylebotShortcuts,
+  ReadabilitySettings,
 } from '@stylebot/types';
 
 import { State, CssSelectorMetadata } from './';
@@ -78,5 +79,9 @@ export default {
 
   setShortcuts(state: State, value: StylebotShortcuts): void {
     state.shortcuts = value;
+  },
+
+  setReadabilitySettings(state: State, value: ReadabilitySettings): void {
+    state.readabilitySettings = value;
   },
 };

@@ -1,6 +1,6 @@
 /* @ts-ignore */
 import LegacyCssFormatter from './legacy-css-formatter';
-import { Style, StyleMap } from '@stylebot/types';
+import { Style, StyleMap, StylebotOptions } from '@stylebot/types';
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 const isNewFormat = (styles: any) => {
@@ -69,9 +69,23 @@ export const getMigratedStyles = (): Promise<StyleMap> => {
   });
 };
 
+export const getMigratedOptions = (): Promise<StylebotOptions> => {
+  return new Promise(resolve => {
+    chrome.storage.local.get('options', async items => {
+      const options = items['options'];
+
+      if (!options || !['basic', 'magic', 'code'].includes(options.mode)) {
+        resolve({ mode: 'basic', contextMenu: true });
+      } else {
+        resolve(options);
+      }
+    });
+  });
+};
+
 const MigrateOldFormat = async (): Promise<void> => {
   const styles = await getMigratedStyles();
-  const options = { mode: 'basic', contextMenu: true };
+  const options = await getMigratedOptions();
 
   return new Promise(resolve => {
     chrome.storage.local.set({ options, styles }, () => {

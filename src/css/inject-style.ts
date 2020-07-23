@@ -1,11 +1,11 @@
 import * as postcss from 'postcss';
 
-const getStylesheetId = (url: string) => {
-  return `stylebot-css-${url}`;
+const getStylesheetId = (id: string) => {
+  return `stylebot-css-${id}`;
 };
 
-export const injectCSSIntoDocument = (css: string, url: string): void => {
-  const id = getStylesheetId(url);
+export const injectCSSIntoDocument = (css: string, id: string): void => {
+  const stylesheetId = getStylesheetId(id);
   const el = document.getElementById(id);
 
   if (el) {
@@ -16,7 +16,7 @@ export const injectCSSIntoDocument = (css: string, url: string): void => {
   const style = document.createElement('style');
 
   style.type = 'text/css';
-  style.setAttribute('id', id);
+  style.setAttribute('id', stylesheetId);
   style.appendChild(document.createTextNode(css));
 
   document.documentElement.appendChild(style);
@@ -24,18 +24,18 @@ export const injectCSSIntoDocument = (css: string, url: string): void => {
 
 export const injectRootIntoDocument = (
   root: postcss.Root,
-  url: string
+  id: string
 ): void => {
   const rootWithImportant = root.clone();
   rootWithImportant.walkDecls(decl => (decl.important = true));
 
   const css = rootWithImportant.toString();
-  injectCSSIntoDocument(css, url);
+  injectCSSIntoDocument(css, id);
 };
 
-export const removeCSSFromDocument = (url: string): void => {
-  const id = getStylesheetId(url);
-  const el = document.getElementById(id);
+export const removeCSSFromDocument = (id: string): void => {
+  const stylesheetId = getStylesheetId(id);
+  const el = document.getElementById(stylesheetId);
 
   if (el) {
     el.innerHTML = '';

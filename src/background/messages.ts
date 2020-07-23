@@ -13,12 +13,19 @@ import {
   MoveStyle as MoveStyleType,
   SetAllStyles as SetAllStylesType,
   SetReadability as SetReadabilityType,
+  SetReadabilitySettings as SetReadabilitySettingsType,
   GetAllCommandsResponse,
   GetAllOptionsResponse,
   GetAllStylesResponse,
   GetOptionResponse,
   GetStylesForPageResponse,
+  GetReadabilitySettingsResponse,
 } from '@stylebot/types';
+
+import {
+  get as getReadabilitySettings,
+  set as setReadabilitySettings,
+} from './readability-settings';
 
 export const DisableStyle = (
   message: DisableStyleType,
@@ -133,6 +140,19 @@ export const SetReadability = (
   styles: BackgroundPageStyles
 ): void => {
   styles.setReadability(message.url, message.value);
+};
+
+export const GetReadabilitySettings = async (
+  sendResponse: (response: GetReadabilitySettingsResponse) => void
+): Promise<void> => {
+  const settings = await getReadabilitySettings();
+  sendResponse(settings);
+};
+
+export const SetReadabilitySettings = (
+  message: SetReadabilitySettingsType
+): void => {
+  setReadabilitySettings(message.value);
 };
 
 export const CopyToClipboard = (text: string): void => {

@@ -14,7 +14,11 @@ import {
   remove as removeReadability,
 } from '@stylebot/readability';
 
-import { StylebotEditingMode, FilterEffect } from '@stylebot/types';
+import {
+  StylebotEditingMode,
+  FilterEffect,
+  ReadabilitySettings,
+} from '@stylebot/types';
 
 import {
   getAllOptions,
@@ -24,6 +28,8 @@ import {
   enableStyle,
   setReadability,
   getAllCommands,
+  getReadabilitySettings,
+  setReadabilitySettings,
 } from '../utils/chrome';
 
 import { State } from './';
@@ -55,6 +61,9 @@ export default {
     });
 
     commit('setShortcuts', shortcuts);
+
+    const readabilitySettings = await getReadabilitySettings();
+    commit('setReadabilitySettings', readabilitySettings);
   },
 
   openStylebot({ state, commit }: { state: State; commit: Commit }): void {
@@ -146,6 +155,14 @@ export default {
 
     commit('setReadability', value);
     setReadability(state.url, value);
+  },
+
+  setReadabilitySettings(
+    { commit }: { commit: Commit },
+    value: ReadabilitySettings
+  ): void {
+    setReadabilitySettings(value);
+    commit('setReadabilitySettings', value);
   },
 
   applyFilter(

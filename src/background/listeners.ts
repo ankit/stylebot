@@ -18,6 +18,8 @@ import {
   EnableStyle,
   DisableStyle,
   SetReadability,
+  GetReadabilitySettings,
+  SetReadabilitySettings,
 } from './messages';
 
 import {
@@ -94,6 +96,12 @@ const init = (
 
         case 'SetReadability':
           SetReadability(message, styles);
+          break;
+        case 'GetReadabilitySettings':
+          GetReadabilitySettings(sendResponse);
+          break;
+        case 'SetReadabilitySettings':
+          SetReadabilitySettings(message);
           break;
       }
 

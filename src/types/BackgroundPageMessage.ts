@@ -1,4 +1,4 @@
-import { StylebotOptions } from 'types';
+import { StylebotOptions, ReadabilitySettings } from 'types';
 
 export type SetStyle = {
   name: 'SetStyle';
@@ -89,6 +89,15 @@ export type OpenCommandsPage = {
   name: 'OpenCommandsPage';
 };
 
+export type GetReadabilitySettings = {
+  name: 'GetReadabilitySettings';
+};
+
+export type SetReadabilitySettings = {
+  name: 'SetReadabilitySettings';
+  value: ReadabilitySettings;
+};
+
 type BackgroundPageMessage =
   | SetStyle
   | EnableStyle
@@ -105,6 +114,8 @@ type BackgroundPageMessage =
   | OpenCommandsPage
   | CopyToClipboard
   | SetReadability
-  | GetAllCommands;
+  | GetAllCommands
+  | GetReadabilitySettings
+  | SetReadabilitySettings;
 
 export default BackgroundPageMessage;

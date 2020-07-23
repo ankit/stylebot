@@ -40,9 +40,12 @@ export type ReadabilityArticle = {
   siteName: string;
 };
 
+export type ReadabilityTheme = 'light' | 'dark' | 'sepia';
 export type ReadabilitySettings = {
-  fontFamily: string;
-  fontSize: string;
+  font: string;
+  size: number;
+  width: number;
+  theme: ReadabilityTheme;
 };
 
 export type StylebotCommand =

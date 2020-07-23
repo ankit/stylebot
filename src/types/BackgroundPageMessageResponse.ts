@@ -1,4 +1,9 @@
-import { StylebotOptions, Style, StylebotCommand } from './';
+import {
+  StylebotOptions,
+  Style,
+  StylebotCommand,
+  ReadabilitySettings,
+} from './';
 
 export type GetAllOptionsResponse = StylebotOptions;
 export type GetOptionResponse = StylebotOptions[keyof StylebotOptions];
@@ -22,11 +27,14 @@ export type GetAllCommandsResponse = Array<{
   name: StylebotCommand;
 }>;
 
+export type GetReadabilitySettingsResponse = ReadabilitySettings;
+
 type BackgroundPageMessageResponse =
   | GetAllOptionsResponse
   | GetOptionResponse
   | GetAllStylesResponse
   | GetStylesForPageResponse
-  | GetAllCommandsResponse;
+  | GetAllCommandsResponse
+  | GetReadabilitySettingsResponse;
 
 export default BackgroundPageMessageResponse;

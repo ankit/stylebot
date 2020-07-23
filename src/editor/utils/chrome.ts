@@ -13,6 +13,10 @@ import {
   GetStylesForPageResponse,
   GetAllCommandsResponse,
   StylebotOptions,
+  GetReadabilitySettingsResponse,
+  GetReadabilitySettings,
+  SetReadabilitySettings,
+  ReadabilitySettings,
 } from '@stylebot/types';
 
 export const getAllOptions = async (): Promise<StylebotOptions> => {
@@ -121,6 +125,32 @@ export const getAllCommands = async (): Promise<GetAllCommandsResponse> => {
 export const openCommandsPage = (): void => {
   const message: OpenCommandsPage = {
     name: 'OpenCommandsPage',
+  };
+
+  chrome.runtime.sendMessage(message);
+};
+
+export const getReadabilitySettings = async (): Promise<
+  GetReadabilitySettingsResponse
+> => {
+  const message: GetReadabilitySettings = {
+    name: 'GetReadabilitySettings',
+  };
+
+  return new Promise(resolve => {
+    chrome.runtime.sendMessage(
+      message,
+      (response: GetReadabilitySettingsResponse) => {
+        resolve(response);
+      }
+    );
+  });
+};
+
+export const setReadabilitySettings = (value: ReadabilitySettings): void => {
+  const message: SetReadabilitySettings = {
+    name: 'SetReadabilitySettings',
+    value,
   };
 
   chrome.runtime.sendMessage(message);
