@@ -97,7 +97,7 @@ export default {
       commit('setCss', css);
       commit('setSelectors', root);
 
-      setStyle(state.url, css);
+      setStyle(state.url, css, state.readability);
     } catch (e) {
       //
     }

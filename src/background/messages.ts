@@ -45,7 +45,7 @@ export const SetStyle = (
   message: SetStyleType,
   styles: BackgroundPageStyles
 ): void => {
-  styles.set(message.url, message.css);
+  styles.set(message.url, message.css, message.readability);
 };
 
 export const GetAllStyles = (

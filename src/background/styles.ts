@@ -34,14 +34,14 @@ class BackgroundPageStyles {
     });
   }
 
-  set(url: string, css: string): void {
+  set(url: string, css: string, readability: boolean): void {
     if (!css) {
       delete this.styles[url];
     } else {
       this.styles[url] = {
         css,
+        readability,
         enabled: true,
-        readability: false,
       };
     }
 

@@ -4,6 +4,7 @@ export type SetStyle = {
   name: 'SetStyle';
   url: string;
   css: string;
+  readability: boolean;
 };
 
 export type EnableStyle = {

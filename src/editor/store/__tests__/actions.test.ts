@@ -56,7 +56,11 @@ describe('actions', () => {
       expect(mockCommit).toHaveBeenNthCalledWith(1, 'setCss', css);
       expect(mockCommit).toHaveBeenNthCalledWith(2, 'setSelectors', mockRoot);
 
-      expect(chromeUtils.setStyle).toBeCalledWith(mockState.url, css);
+      expect(chromeUtils.setStyle).toBeCalledWith(
+        mockState.url,
+        css,
+        mockState.readability
+      );
       expect(stylebotCss.injectRootIntoDocument).toBeCalledWith(
         mockRoot,
         mockState.url

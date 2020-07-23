@@ -65,7 +65,7 @@ export default new Vuex.Store<State>({
 
         styles[url] = {
           css,
-          readability: false,
+          readability: styles[url] ? styles[url].readability : false,
           enabled: styles[url] ? styles[url].enabled : true,
         };
 

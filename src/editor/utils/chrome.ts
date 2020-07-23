@@ -72,11 +72,16 @@ export const openOptionsPage = (): void => {
   chrome.runtime.sendMessage(message);
 };
 
-export const setStyle = (url: string, css: string): void => {
+export const setStyle = (
+  url: string,
+  css: string,
+  readability: boolean
+): void => {
   const message: SetStyle = {
     name: 'SetStyle',
     url,
     css,
+    readability,
   };
 
   chrome.runtime.sendMessage(message);
