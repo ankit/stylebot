@@ -5,6 +5,7 @@ import {
   StylebotOptions,
   StylebotPlacement,
   ReadabilitySettings,
+  StylebotShortcuts,
 } from '@stylebot/types';
 
 import getters from './getters';
@@ -33,6 +34,7 @@ export type State = {
   visible: boolean;
   inspecting: boolean;
   position: StylebotPlacement;
+  shortcuts: StylebotShortcuts;
   readabilitySettings: ReadabilitySettings;
 };
 
@@ -55,6 +57,7 @@ export default new Vuex.Store<State>({
     visible: false,
     position: 'right',
     inspecting: false,
+    shortcuts: new Map(),
     readabilitySettings: {
       fontSize: '16px',
       fontFamily: 'Helvetica',

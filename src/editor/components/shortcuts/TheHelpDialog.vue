@@ -131,32 +131,21 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { getAllCommands, openCommandsPage } from '../../utils/chrome';
-import { StylebotCommand } from '@stylebot/types';
+import { openCommandsPage } from '../../utils/chrome';
+import { StylebotShortcuts } from '@stylebot/types';
 
 export default Vue.extend({
   name: 'TheHelpDialog',
 
-  data(): {
-    shortcuts: Map<StylebotCommand, string>;
-  } {
-    return { shortcuts: new Map() };
+  computed: {
+    shortcuts(): StylebotShortcuts {
+      return this.$store.state.shortcuts;
+    },
   },
 
   mounted() {
     this.$store.commit('setInspecting', false);
     document.addEventListener('mousedown', this.mousedown);
-  },
-
-  async created() {
-    const commands = await getAllCommands();
-    const shortcuts = new Map();
-
-    commands.forEach(cmd => {
-      shortcuts.set(cmd.name, cmd.shortcut);
-    });
-
-    this.shortcuts = shortcuts;
   },
 
   beforeDestroy() {

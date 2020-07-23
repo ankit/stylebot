@@ -51,6 +51,8 @@ export type StylebotCommand =
   | 'toggle-readability'
   | 'toggle-grayscale';
 
+export type StylebotShortcuts = Map<StylebotCommand, string>;
+
 export * from './TabMessage';
 export * from './BackgroundPageMessage';
 export * from './BackgroundPageMessageResponse';

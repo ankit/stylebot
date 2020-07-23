@@ -1,5 +1,9 @@
 import * as postcss from 'postcss';
-import { StylebotPlacement, StylebotOptions } from '@stylebot/types';
+import {
+  StylebotPlacement,
+  StylebotOptions,
+  StylebotShortcuts,
+} from '@stylebot/types';
 
 import { State, CssSelectorMetadata } from './';
 
@@ -70,5 +74,9 @@ export default {
 
   setReadability(state: State, value: boolean): void {
     state.readability = value;
+  },
+
+  setShortcuts(state: State, value: StylebotShortcuts): void {
+    state.shortcuts = value;
   },
 };

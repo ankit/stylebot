@@ -23,6 +23,7 @@ import {
   getStylesForPage,
   enableStyle,
   setReadability,
+  getAllCommands,
 } from '../utils/chrome';
 
 import { State } from './';
@@ -45,6 +46,15 @@ export default {
     }
 
     commit('setOptions', options);
+
+    const commands = await getAllCommands();
+    const shortcuts = new Map();
+
+    commands.forEach(cmd => {
+      shortcuts.set(cmd.name, cmd.shortcut);
+    });
+
+    commit('setShortcuts', shortcuts);
   },
 
   openStylebot({ state, commit }: { state: State; commit: Commit }): void {

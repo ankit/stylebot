@@ -96,6 +96,8 @@ const init = (
           SetReadability(message, styles);
           break;
       }
+
+      return true;
     }
   );
 

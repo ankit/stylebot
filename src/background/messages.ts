@@ -116,9 +116,9 @@ export const SetOption = (
 export const GetAllCommands = (
   sendResponse: (response: GetAllCommandsResponse) => void
 ): void => {
-  chrome.commands.getAll(commands =>
-    sendResponse(commands as GetAllCommandsResponse)
-  );
+  chrome.commands.getAll(commands => {
+    sendResponse(commands as GetAllCommandsResponse);
+  });
 };
 
 export const OpenCommandsPage = (): void => {
