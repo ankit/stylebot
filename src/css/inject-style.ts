@@ -6,7 +6,7 @@ const getStylesheetId = (id: string) => {
 
 export const injectCSSIntoDocument = (css: string, id: string): void => {
   const stylesheetId = getStylesheetId(id);
-  const el = document.getElementById(id);
+  const el = document.getElementById(stylesheetId);
 
   if (el) {
     el.innerHTML = css;
