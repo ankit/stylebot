@@ -19,9 +19,12 @@ const mockState: State = {
   help: false,
   readability: false,
   readabilitySettings: {
-    fontSize: '16px',
-    fontFamily: 'Helvetica',
+    size: 16,
+    width: 40,
+    theme: 'light',
+    font: 'Helvetica',
   },
+  shortcuts: new Map(),
 };
 
 export default mockState;
