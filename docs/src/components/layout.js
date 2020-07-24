@@ -37,7 +37,7 @@ const Layout = ({ children }) => {
         <main>{children}</main>
         <footer className="footer">
           © {new Date().getFullYear()}{" "}
-          <a href="http://ankitahuja.com" target="_blank">
+          <a href="http://ankitahuja.com" target="_blank" rel="noreferrer">
             Ankit Ahuja
           </a>
         </footer>

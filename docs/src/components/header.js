@@ -34,27 +34,25 @@ const Header = ({ siteTitle }) => (
         <a
           href="https://github.com/ankit/stylebot"
           target="_blank"
+          rel="noreferrer"
           title="Fork on Github"
           class="header-link"
         >
-          <img src={githubImg} />
+          <img src={githubImg} alt="Github" />
         </a>
 
         <a
           title="@stylebot"
           href="https://twitter.com/stylebot"
           target="_blank"
+          rel="noreferrer"
           class="header-link"
         >
-          <img src={twitterImg} />
+          <img src={twitterImg} alt="Twitter" />
         </a>
 
         <a href="/changelog" class="header-link">
           Changelog
-        </a>
-
-        <a href="#" class="header-link">
-          Donate
         </a>
       </div>
     </div>

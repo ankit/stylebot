@@ -19,6 +19,7 @@
     "react-helmet": "^6.1.0"
   },
   "devDependencies": {
+    "gh-pages": "^3.1.0",
     "prettier": "2.0.5",
     "pure-react-carousel": "^1.27.1"
   },
@@ -34,5 +35,5 @@
     "clean": "gatsby clean",
     "test": "echo \"Write tests! -> https://gatsby.dev/unit-testing\" && exit 1",
     "deploy": "gatsby build && gh-pages -d public -b master"
-  }  
+  }
 }

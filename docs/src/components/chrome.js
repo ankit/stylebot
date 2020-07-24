@@ -17,10 +17,12 @@ const Chrome = () => {
     <a
       href="https://chrome.google.com/webstore/detail/stylebot/oiaejidbmkiecgbjeifoejpgmdaleoha"
       target="_blank"
+      rel="noreferrer"
       class="chrome-install-link"
     >
       <img
         src={chromeImg}
+        alt="Stylebot for Chrome"
         style={{ height: "45px", marginRight: "10px", marginBottom: 0 }}
       />
 
