@@ -2,7 +2,7 @@
   <b-button-group>
     <b-button
       size="sm"
-      title="Decrease Width"
+      title="Decrease Line Height"
       variant="outline-secondary"
       :disabled="disabled"
       @click="decrease"
@@ -12,7 +12,7 @@
 
     <b-button
       size="sm"
-      title="Increase Width"
+      title="Increase Line Height"
       variant="outline-secondary"
       :disabled="disabled"
       @click="increase"
@@ -26,15 +26,15 @@
 import Vue from 'vue';
 
 export default Vue.extend({
-  name: 'TheReadabilityWidth',
+  name: 'TheReadabilityLineHeight',
 
   props: {
     disabled: Boolean,
   },
 
   computed: {
-    width(): number {
-      return this.$store.state.readabilitySettings.width;
+    lineHeight(): number {
+      return this.$store.state.readabilitySettings.lineHeight;
     },
   },
 
@@ -42,14 +42,14 @@ export default Vue.extend({
     increase() {
       this.$store.dispatch('setReadabilitySettings', {
         ...this.$store.state.readabilitySettings,
-        width: this.width + 1,
+        lineHeight: this.lineHeight + 0.1,
       });
     },
 
     decrease() {
       this.$store.dispatch('setReadabilitySettings', {
         ...this.$store.state.readabilitySettings,
-        width: this.width - 1,
+        lineHeight: this.lineHeight - 0.1,
       });
     },
   },

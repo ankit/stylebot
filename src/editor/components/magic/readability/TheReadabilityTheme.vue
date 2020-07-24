@@ -35,6 +35,7 @@ import { ReadabilityTheme } from '@stylebot/types';
 
 export default Vue.extend({
   name: 'TheReadabilityTheme',
+
   props: {
     disabled: Boolean,
   },

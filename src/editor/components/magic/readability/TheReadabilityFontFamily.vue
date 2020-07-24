@@ -7,7 +7,12 @@
       :disabled="disabled"
       @focus="focus"
     />
-    <font-family-dropdown :disabled="disabled" @select="select" />
+
+    <font-family-dropdown
+      :fonts="fonts"
+      :disabled="disabled"
+      @select="select"
+    />
   </b-input-group>
 </template>
 
@@ -24,6 +29,12 @@ export default Vue.extend({
 
   props: {
     disabled: Boolean,
+  },
+
+  data(): { fonts: Array<string> } {
+    return {
+      fonts: ['Georgia', 'Helvetica', 'Lato', 'Lora', 'Open Sans', 'Quicksand'],
+    };
   },
 
   computed: {

@@ -35,26 +35,10 @@ export default Vue.extend({
       type: Boolean,
       required: true,
     },
-  },
-
-  data(): { fonts: Array<string> } {
-    return {
-      fonts: [
-        'Calibri',
-        'Crimson Text',
-        'Droid Sans',
-        'Droid Serif',
-        'Fira Code',
-        'Helvetica',
-        'Inconsolata',
-        'Lato',
-        'Lora',
-        'Merriweather',
-        'Monaco',
-        'Muli',
-        'Roboto',
-      ],
-    };
+    fonts: {
+      type: Array,
+      required: true,
+    },
   },
 });
 </script>

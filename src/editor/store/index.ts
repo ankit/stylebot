@@ -61,6 +61,7 @@ export default new Vuex.Store<State>({
     readabilitySettings: {
       size: 16,
       width: 40,
+      lineHeight: 1.6,
       theme: 'light',
       font: 'Helvetica',
     },

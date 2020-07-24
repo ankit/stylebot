@@ -14,7 +14,11 @@
               @focus="focus"
             />
 
-            <font-family-dropdown :disabled="disabled" @select="select" />
+            <font-family-dropdown
+              :fonts="fonts"
+              :disabled="disabled"
+              @select="select"
+            />
           </b-input-group>
         </b-col>
       </b-row>
@@ -37,6 +41,26 @@ export default Vue.extend({
     CssProperty,
     CssPropertyValue,
     FontFamilyDropdown,
+  },
+
+  data(): { fonts: Array<string> } {
+    return {
+      fonts: [
+        'Calibri',
+        'Crimson Text',
+        'Droid Sans',
+        'Droid Serif',
+        'Fira Code',
+        'Helvetica',
+        'Inconsolata',
+        'Lato',
+        'Lora',
+        'Merriweather',
+        'Monaco',
+        'Muli',
+        'Roboto',
+      ],
+    };
   },
 
   computed: {

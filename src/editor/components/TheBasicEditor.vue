@@ -1,7 +1,7 @@
 <template>
   <div class="pb-5">
-    <b-row class="section" no-gutters>
-      <b-col cols="12">
+    <b-row class="section px-3 pt-3" no-gutters>
+      <b-col cols="12" class="pb-1">
         <h1>Text and Colors</h1>
       </b-col>
 
@@ -11,8 +11,8 @@
       </b-col>
     </b-row>
 
-    <b-row class="section" no-gutters>
-      <b-col cols="12">
+    <b-row class="section mt-4 px-3 pt-3" no-gutters>
+      <b-col cols="12" class="pb-1">
         <h1>Visibility and Layout</h1>
       </b-col>
 
@@ -43,8 +43,6 @@ export default Vue.extend({
 
 <style lang="scss">
 .section {
-  margin-top: 30px;
-  padding: 15px 10px 0 10px;
   border-top: 1px solid #ddd;
 
   &:first-of-type {

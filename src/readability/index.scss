@@ -6,7 +6,6 @@
 
 .stylebot-reader {
   --body-padding: 64px;
-  --line-height: 1.6em;
 
   @import './scss/content.scss';
 
@@ -19,10 +18,8 @@
   }
 
   &.dark {
-    --main-background: #333;
-    --main-foreground: #eee;
-    --font-value-border: #656468;
-    --font-color: #fff;
+    --main-background: #222;
+    --main-foreground: #bababa;
   }
 }
 
@@ -41,7 +38,5 @@
 
 .stylebot-reader-body {
   margin: 0 auto;
-
   padding: var(--body-padding);
-  line-height: var(--line-height);
 }

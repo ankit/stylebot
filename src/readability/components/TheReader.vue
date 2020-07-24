@@ -2,7 +2,7 @@
   <div
     v-if="font"
     :class="`stylebot-reader ${theme}`"
-    :style="`font-family: ${font}; font-size: ${size}px;`"
+    :style="`font-family: ${font}; font-size: ${size}px; line-height: ${lineHeight}em`"
   >
     <div class="stylebot-reader-body" :style="`max-width: ${width}em`">
       <the-reader-header
@@ -58,6 +58,7 @@ export default Vue.extend({
     size: number;
     font: string;
     width: number;
+    lineHeight: number;
     theme: ReadabilityTheme;
   } {
     return {
@@ -65,6 +66,7 @@ export default Vue.extend({
       font: '',
       width: 40,
       theme: 'light',
+      lineHeight: 1.6,
     };
   },
 
@@ -76,6 +78,7 @@ export default Vue.extend({
     this.size = settings.size;
     this.theme = settings.theme;
     this.width = settings.width;
+    this.lineHeight = settings.lineHeight;
 
     chrome.runtime.onMessage.addListener((message: UpdateReader) => {
       if (message.name === 'UpdateReader') {
@@ -83,6 +86,7 @@ export default Vue.extend({
         this.font = message.value.font;
         this.theme = message.value.theme;
         this.width = message.value.width;
+        this.lineHeight = message.value.lineHeight;
 
         this.injectFont(this.font);
       }

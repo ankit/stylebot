@@ -1,5 +1,5 @@
 <template>
-  <b-row class="header justify-content-md-between" no-gutters>
+  <b-row class="header px-3 py-2 justify-content-md-between" no-gutters>
     <b-col cols="2" class="p-0">
       <the-inspector @select="inspect($event)" />
     </b-col>
@@ -56,7 +56,6 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .header {
-  padding: 10px;
   background: #eee;
 }
 
