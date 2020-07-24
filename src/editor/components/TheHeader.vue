@@ -1,6 +1,6 @@
 <template>
   <b-row class="header justify-content-md-between" no-gutters>
-    <b-col cols="2" class="p-0" style="margin: auto;">
+    <b-col cols="2" class="p-0">
       <the-inspector @select="inspect($event)" />
     </b-col>
 
@@ -11,9 +11,7 @@
     </b-col>
 
     <b-col cols="2">
-      <b-row class="justify-content-md-end">
-        <the-window-actions />
-      </b-row>
+      <the-window-actions />
     </b-col>
   </b-row>
 </template>
@@ -64,9 +62,8 @@ export default Vue.extend({
 
 .url {
   color: #333;
-  height: 26px;
   font-size: 13px;
-  padding: 0 12px;
-  margin-top: 3px;
+  padding: 0 8px;
+  margin-top: 7px;
 }
 </style>

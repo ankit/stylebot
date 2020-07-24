@@ -97,10 +97,11 @@ export default Vue.extend({
 
 <style lang="scss">
 .stylebot-inspector {
+  height: 56px !important;
   outline: none !important;
   font-size: 21px !important;
   border-color: #ccc !important;
-  padding: 13px 13px 10px 13px !important;
+  line-height: 29px !important;
 
   &:hover,
   &:focus {
@@ -108,9 +109,8 @@ export default Vue.extend({
   }
 
   svg {
-    // todo: avoid doing this pixel pushing, fix svg
-    margin-top: -5px;
-    margin-left: 1px;
+    // todo: avoid this pixel pushing
+    margin-left: 1px !important;
   }
 
   path {
