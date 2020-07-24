@@ -23,6 +23,7 @@ const mockState: State = {
     width: 40,
     theme: 'light',
     font: 'Helvetica',
+    lineHeight: 1.6,
   },
   shortcuts: new Map(),
 };
