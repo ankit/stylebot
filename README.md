@@ -14,7 +14,7 @@ Visit [Chrome Web Store](https://chrome.google.com/webstore/detail/stylebot/oiae
 
 ### Donate
 
-[Buy me a coffee](https://ko-fi.com/stylebot) via Ko-fi!
+[Buy me a coffee](https://ko-fi.com/stylebot) via Ko-fi
 
 ### Add new features or fix bugs
 
