@@ -7,8 +7,8 @@ Visit [Chrome Web Store](https://chrome.google.com/webstore/detail/stylebot/oiae
 
 - Pick and style elements on any site using UI actions.
 - Save custom CSS for sites which is automatically applied on page load.
-- Code your own custom css to style pages
-- Make articles on any site readable by hiding non-essentixal page elements like sidebars, footers and ads.
+- Code your own custom css to style pages.
+- Make articles on any site readable by hiding non-essential page elements like sidebars, footers and ads.
 
 ## Supported URL Patterns
 
