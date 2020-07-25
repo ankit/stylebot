@@ -49,6 +49,16 @@ const Header = ({ siteTitle }) => (
         >
           <img src={twitterImg} alt="Twitter" />
         </a>
+
+        <a
+          title="Buy me a coffee"
+          href="https://ko-fi.com/stylebot"
+          target="_blank"
+          rel="noreferrer"
+          class="header-link"
+        >
+          Donate
+        </a>
       </div>
     </div>
   </header>

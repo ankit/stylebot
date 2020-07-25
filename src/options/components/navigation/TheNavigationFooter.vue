@@ -1,14 +1,11 @@
 <template>
   <div class="caption">
     v3 •
-    <a target="_blank" href="http://github.com/ankit/stylebot">Readme</a>
+    <a target="_blank" href="https://stylebot.dev">Stylebot</a>
     •
-    <a
-      target="_blank"
-      href="https://github.com/ankit/stylebot/blob/master/CHANGELOG.md"
-    >
-      Changelog
-    </a>
+    <a target="_blank" href="http://github.com/ankit/stylebot">Github</a>
+    •
+    <a target="_blank" href="https://ko-fi.com/stylebot">Donate</a>
   </div>
 </template>
 
