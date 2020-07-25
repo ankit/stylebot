@@ -1,55 +1,44 @@
+# Stylebot
+
 ![CI](https://github.com/ankit/stylebot/workflows/CI/badge.svg)
 
-_I am currently working on a major release with improved maintainability, lots of bugfixes and exciting new UI and features. In the meanwhile, I will likely be slow to respond to bugs / feature requests. Thanks for your patience._
+This extension lets you change the appearance of the web instantly. Currently only available on Google Chrome.
+Visit [Chrome Web Store](https://chrome.google.com/webstore/detail/stylebot/oiaejidbmkiecgbjeifoejpgmdaleoha) to install.
 
-## Stylebot
+- Pick and style elements on any site using UI actions.
+- Save custom CSS for sites which is automatically applied on page load.
+- Code your own custom css to style pages
+- Make articles on any site readable by hiding non-essentixal page elements like sidebars, footers and ads.
 
-A Google Chrome extension that lets you personalize a web page’s appearance using WYSIWYG editor
-
-- Incrementally build custom stylesheets for Chrome.
-- Save custom CSS rules for sites. The next time they visit a site, their custom CSS is already applied.
-- Share, explore and apply CSS created by other users (_currently down_)
-
-## Pattern matching
-
-### Basic (default)
+## Supported URL Patterns
 
 By default, Stylebot uses simple text strings to match styles to websites. Examples:
 
-- `docs.google.com`: Matches any URL with `docs.google.com` in it.
-- `docs.google.com, spreadsheets.google.com`: Matches any URL with `docs.google.com` or `spreadsheets.google.com` in it.
+- `docs.google.com` - Matches any URL with `docs.google.com` in it.
+- `docs.google.com, spreadsheets.google.com` - Matches any URL with `docs.google.com` or `spreadsheets.google.com` in it.
 
-### Advanced
+### Wildcard support
 
 Stylebot supports wildcards `**`, `*` and `,`
 
-- `**` matches any character sequence. Example: `docs**`: Any URL beginning with `docs`
+- `**` matches any character sequence. Example:
+
+  - `docs**` - Any URL beginning with `docs`
+
 - `*` matches any character sequence, until a `/` is found
 
-  - `docs_.google.com`: This will match `http://docs.google.com`, `http://docs1.google.com`, `http://docs2.google.com` and so on
-  - `\*.ycombinator.com`: This will match `http://news.ycombinator.com` and `http://apps.ycombinator.com`
+  - `docs_.google.com` - This will match `http://docs.google.com`, `http://docs1.google.com`, `http://docs2.google.com` and so on
+
+  - `\*.ycombinator.com` - This will match `http://news.ycombinator.com` and `http://apps.ycombinator.com`
 
 - `,` separates a list of advanced patterns. Matches a URL if any sub-pattern matches it.
 
-### Regular Expressions
+### RegEx support
 
-Stylebot treats a string as a regex if it start it with `^`. Examples:
+Stylebot treats a string as a regex if it start it with `^`.
 
-- `^http://www.reddit.com/$`: This matches only the Reddit homepage.
-
-## Resources
-
-- Chrome Webstore: <https://chrome.google.com/extensions/detail/oiaejidbmkiecgbjeifoejpgmdaleoha>
-- Issues and feature requests: <https://github.com/ankit/stylebot/issues>
-
-## History
-
-This project began as a [Google Summer of Code project](https://opensource.googleblog.com/2010/09/changing-look-of-web-with-stylebot.html) back in 2010.
-
-## Browser support
-
-Stylebot is currently only supported on Google Chrome.
+- `^http://www.reddit.com/$` - This matches only the Reddit homepage.
 
 ## License
 
-Dual licensed under the GPL and MIT Licenses.
+Stylebot is MIT licensed.
