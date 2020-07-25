@@ -1,3 +1,14 @@
+## Version 3
+
+- Re-wrote extension from scratch using modern tools ([PostCSS](ttps://postcss.org/), [Vue.js](https://vuejs.org/))
+- Modern, cleaner Stylebot Editor UI
+- Readability Mode - Make articles on any site readable by hiding
+  non-essential page elements like sidebars, footers and ads. Based on [Mozilla Readability](https://github.com/mozilla/readability)
+- Improved code editor based on [Monaco Editor](https://microsoft.github.io/monaco-editor/)
+- Support for all modern CSS syntax and rules
+- CSS comments and ordering is retained across edits
+- Numerous other bugfixes with the modern implementation
+
 ## Version 2.4
 
 - Re-wrote options page for better experience and maintainability

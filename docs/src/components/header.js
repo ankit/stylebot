@@ -26,7 +26,6 @@ const Header = ({ siteTitle }) => (
           }}
         >
           {siteTitle}
-          <span class="version"> v3</span>
         </Link>
       </h1>
 
@@ -49,10 +48,6 @@ const Header = ({ siteTitle }) => (
           class="header-link"
         >
           <img src={twitterImg} alt="Twitter" />
-        </a>
-
-        <a href="/changelog" class="header-link">
-          Changelog
         </a>
       </div>
     </div>
