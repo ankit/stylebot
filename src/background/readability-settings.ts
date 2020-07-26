@@ -12,7 +12,7 @@ export const get = (): Promise<ReadabilitySettings> => {
 
       resolve({
         size: 16,
-        width: 40,
+        width: 36,
         lineHeight: 1.6,
         theme: 'light',
         font: 'Helvetica',

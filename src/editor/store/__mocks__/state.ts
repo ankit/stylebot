@@ -20,7 +20,7 @@ const mockState: State = {
   readability: false,
   readabilitySettings: {
     size: 16,
-    width: 40,
+    width: 36,
     theme: 'light',
     font: 'Helvetica',
     lineHeight: 1.6,

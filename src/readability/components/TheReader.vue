@@ -64,7 +64,7 @@ export default Vue.extend({
     return {
       size: 16,
       font: '',
-      width: 40,
+      width: 36,
       theme: 'light',
       lineHeight: 1.6,
     };

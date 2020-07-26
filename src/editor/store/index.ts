@@ -60,7 +60,7 @@ export default new Vuex.Store<State>({
     shortcuts: new Map(),
     readabilitySettings: {
       size: 16,
-      width: 40,
+      width: 36,
       lineHeight: 1.6,
       theme: 'light',
       font: 'Helvetica',
