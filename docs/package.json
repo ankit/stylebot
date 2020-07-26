@@ -19,6 +19,7 @@
     "react-helmet": "^6.1.0"
   },
   "devDependencies": {
+    "gatsby-plugin-google-analytics": "^2.3.13",
     "gh-pages": "^3.1.0",
     "prettier": "2.0.5",
     "pure-react-carousel": "^1.27.1"
