@@ -83,7 +83,8 @@ export const GetStylesForPage = (
   }
 
   const response = styles.getStylesForPage(tab.url, message.important);
-  styles.updateBrowserAction(tab, response.styles);
+  styles.updateIcon(tab, response.styles, response.defaultStyle);
+
   sendResponse(response);
 };
 

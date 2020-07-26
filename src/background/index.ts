@@ -16,4 +16,8 @@ import NotificationManager from './notification-manager';
 
   Listeners.init(styles, options);
   NotificationManager.init();
+
+  chrome.browserAction.setBadgeBackgroundColor({
+    color: '#555',
+  });
 })();

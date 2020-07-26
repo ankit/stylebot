@@ -2,8 +2,6 @@
 
 This package includes code for the extension background page.
 
-- **`browseraction`**: Setup popup icon to indicate if custom css is applied in the current tab
-
 - **`cache`**: Setup styles and options on initial load
 
 - **`contextmenu`**: Setup and update right-click context menu

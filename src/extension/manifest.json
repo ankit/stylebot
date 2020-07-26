@@ -31,8 +31,9 @@
 
   "browser_action": {
     "default_icon": {
-      "19": "img/css.png",
-      "38": "img/css@2x.png"
+      "16": "img/icon16.png",
+      "24": "img/icon24.png",
+      "32": "img/icon32.png"
     },
 
     "default_title": "Stylebot",

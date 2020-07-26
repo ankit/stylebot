@@ -3,7 +3,7 @@ const NotificationManager = {
     chrome.storage.local.get('version', items => {
       const version = items['version'];
 
-      if (!version || version !== '3') {
+      if (version && version !== '3') {
         NotificationManager.showNotification();
         chrome.storage.local.set({ version: '3' });
       }

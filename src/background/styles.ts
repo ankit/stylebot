@@ -1,7 +1,5 @@
 import * as postcss from 'postcss';
-
 import BackgroundPageUtils from './utils';
-import BrowserAction from './browseraction';
 
 import {
   Style,
@@ -62,8 +60,8 @@ class BackgroundPageStyles {
 
     chrome.tabs.getSelected(tab => {
       if (tab && tab.url && tab.id) {
-        const { styles } = this.getStylesForPage(tab.url);
-        this.updateBrowserAction(tab, styles);
+        const { styles, defaultStyle } = this.getStylesForPage(tab.url);
+        this.updateIcon(tab, styles, defaultStyle);
 
         const css = this.addImportantToCss(this.styles[url].css);
         const message: EnableStyleForTab = {
@@ -89,8 +87,8 @@ class BackgroundPageStyles {
 
     chrome.tabs.getSelected(tab => {
       if (tab && tab.url && tab.id) {
-        const { styles } = this.getStylesForPage(tab.url);
-        this.updateBrowserAction(tab, styles);
+        const { styles, defaultStyle } = this.getStylesForPage(tab.url);
+        this.updateIcon(tab, styles, defaultStyle);
 
         const message: DisableStyleForTab = {
           name: 'DisableStyleForTab',
@@ -194,14 +192,25 @@ class BackgroundPageStyles {
     return root.toString();
   }
 
-  updateBrowserAction(
+  updateIcon(
     tab: chrome.tabs.Tab,
-    styles: Array<{ url: string; enabled: boolean; css: string }>
+    styles: Array<Style>,
+    defaultStyle?: Style
   ): void {
-    if (!!styles.find(style => style.enabled)) {
-      BrowserAction.highlight(tab);
+    const enabledStyles = styles.filter(style => style.enabled);
+
+    if (defaultStyle && defaultStyle.readability) {
+      chrome.browserAction.setBadgeText({
+        text: `R`,
+        tabId: tab.id,
+      });
+    } else if (enabledStyles.length > 0) {
+      chrome.browserAction.setBadgeText({
+        text: `${enabledStyles.length}`,
+        tabId: tab.id,
+      });
     } else {
-      BrowserAction.unhighlight(tab);
+      chrome.browserAction.setBadgeText({ text: '', tabId: tab.id });
     }
   }
 }
