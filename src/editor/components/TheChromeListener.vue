@@ -106,7 +106,15 @@ export default Vue.extend({
     },
 
     toggleGrayscale() {
-      // todo
+      let percent = 0;
+      if (!this.$store.getters.grayscale) {
+        percent = 100;
+      }
+
+      this.$store.dispatch('applyFilter', {
+        effectName: 'grayscale',
+        percent,
+      });
     },
 
     handleCommand(command: StylebotCommand) {
