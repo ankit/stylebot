@@ -10,7 +10,10 @@
     "scripts": ["background/index.js"]
   },
 
-  "options_page": "options/index.html",
+  "options_ui": {
+    "page": "options/index.html",
+    "open_in_tab": true
+  },
 
   "content_scripts": [
     {
