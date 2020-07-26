@@ -104,6 +104,10 @@ export default Vue.extend({
         return;
       }
 
+      if (event.metaKey || event.altKey || event.shiftKey) {
+        return;
+      }
+
       // i - Toggle inspect
       if (event.keyCode === 73) {
         event.preventDefault();
