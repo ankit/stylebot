@@ -8,16 +8,6 @@
         autofocus
         style="max-width: 600px;"
       />
-
-      <div class="caption mt-1">
-        See supported
-        <a
-          target="_blank"
-          href="https://github.com/ankit/stylebot#pattern-matching"
-        >
-          URL patterns
-        </a>
-      </div>
     </div>
 
     <monaco-editor :css="css" @update="css = $event" />

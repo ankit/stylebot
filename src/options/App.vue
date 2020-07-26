@@ -24,6 +24,7 @@ import Vue from 'vue';
 import TheBasicsTab from './components/TheBasicsTab.vue';
 import TheStylesTab from './components/TheStylesTab.vue';
 import TheBackupTab from './components/TheBackupTab.vue';
+import TheHelpTab from './components/TheHelpTab.vue';
 import TheNavigation from './components/TheNavigation.vue';
 import InjectMonacoEditorIframe from './components/styles/InjectMonacoEditorIframe.vue';
 
@@ -34,6 +35,7 @@ export default Vue.extend({
     TheBasicsTab,
     TheStylesTab,
     TheBackupTab,
+    TheHelpTab,
     TheNavigation,
     InjectMonacoEditorIframe,
   },
@@ -44,7 +46,7 @@ export default Vue.extend({
   } {
     return {
       currentTab: 'Basics',
-      tabs: ['Basics', 'Styles', 'Backup'],
+      tabs: ['Basics', 'Styles', 'Backup', 'Help'],
     };
   },
 
