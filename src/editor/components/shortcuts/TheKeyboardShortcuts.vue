@@ -104,7 +104,7 @@ export default Vue.extend({
         return;
       }
 
-      if (event.metaKey || event.altKey || event.shiftKey) {
+      if (event.metaKey || event.altKey) {
         return;
       }
 
