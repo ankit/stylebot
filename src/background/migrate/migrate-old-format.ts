@@ -44,14 +44,24 @@ export const getMigratedStyles = (): Promise<StyleMap> => {
           const style = oldStyles[url];
 
           return new Promise(resolveStyle => {
-            formatter.format(style._rules, false, (css: string) => {
+            try {
+              formatter.format(style._rules, false, (css: string) => {
+                resolveStyle({
+                  url,
+                  css,
+                  enabled: style._enabled,
+                  readability: false,
+                });
+              });
+            } catch (e) {
+              // guard against badly formatted style
               resolveStyle({
                 url,
-                css,
+                css: '',
                 enabled: style._enabled,
                 readability: false,
               });
-            });
+            }
           });
         }
       );
