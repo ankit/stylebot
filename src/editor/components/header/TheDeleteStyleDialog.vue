@@ -51,6 +51,7 @@ export default Vue.extend({
   height: 100%;
   overflow: hidden;
   outline: 0;
+  line-height: 24px;
   background: #000000b3;
 }
 

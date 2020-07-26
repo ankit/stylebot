@@ -5,7 +5,7 @@ import { Style, StyleMap, StylebotOptions } from '@stylebot/types';
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 const isNewFormat = (styles: any) => {
   const urls: Array<string> = Object.keys(styles);
-  return !!urls.find(url => !!styles[url].css);
+  return !!urls.find(url => styles[url].css !== undefined);
 };
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
@@ -20,28 +20,28 @@ const backupV2Styles = (styles: any) => {
 export const getMigratedStyles = (): Promise<StyleMap> => {
   return new Promise(resolve => {
     chrome.storage.local.get('styles', async items => {
-      const oldStyles = items['styles'];
+      const styles = items['styles'];
 
-      if (!oldStyles) {
+      if (!styles) {
         resolve({});
         return;
       }
 
-      // test to ensure styles are not already in the new format
-      if (isNewFormat(oldStyles)) {
-        resolve(oldStyles);
+      // check if styles are in the new format
+      if (isNewFormat(styles)) {
+        resolve(styles);
         return;
       }
 
       // backup old styles, in case we run into a bug
-      await backupV2Styles(oldStyles);
+      await backupV2Styles(styles);
 
       const formatter = new LegacyCssFormatter();
-      const urls: Array<string> = Object.keys(oldStyles);
+      const urls: Array<string> = Object.keys(styles);
 
       const results: Array<Promise<Style>> = urls.map(
         async (url): Promise<Style> => {
-          const style = oldStyles[url];
+          const style = styles[url];
 
           return new Promise(resolveStyle => {
             try {
@@ -67,13 +67,13 @@ export const getMigratedStyles = (): Promise<StyleMap> => {
       );
 
       Promise.all(results).then(formattedStyles => {
-        const styles: StyleMap = {};
+        const newStyles: StyleMap = {};
 
         formattedStyles.forEach(({ url, css, enabled, readability }) => {
-          styles[url] = { css, enabled, readability };
+          newStyles[url] = { css, enabled, readability };
         });
 
-        resolve(styles);
+        resolve(newStyles);
       });
     });
   });

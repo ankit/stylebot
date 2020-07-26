@@ -31,7 +31,7 @@ describe('MigrateOldFormat', () => {
       expect(mockSet).toHaveBeenCalledTimes(0);
     });
 
-    it('returns styles as is when they are already in the new format', async () => {
+    it('returns styles as is when they are in the new format', async () => {
       const mockSet = jest.fn((_, callback) => callback());
       const mockGet = (_, callback) => {
         callback({ styles: newFormat });
@@ -40,6 +40,26 @@ describe('MigrateOldFormat', () => {
 
       const styles = await getMigratedStyles();
       expect(styles).toEqual(newFormat);
+      expect(mockSet).toHaveBeenCalledTimes(0);
+    });
+
+    it('returns styles as is when they are in the new format (with empty css)', async () => {
+      const newFormatWithEmptyCss = {
+        'www.google.com': {
+          css: '',
+          enabled: false,
+          readability: false,
+        },
+      };
+
+      const mockSet = jest.fn((_, callback) => callback());
+      const mockGet = (_, callback) => {
+        callback({ styles: newFormatWithEmptyCss });
+      };
+      mockChromeAPI(mockGet, mockSet);
+
+      const styles = await getMigratedStyles();
+      expect(styles).toEqual(newFormatWithEmptyCss);
       expect(mockSet).toHaveBeenCalledTimes(0);
     });
 
