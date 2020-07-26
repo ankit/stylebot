@@ -9,12 +9,27 @@ const ExtensionReloader = require('webpack-extension-reloader');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const ProgressBarPlugin = require('progress-bar-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 
 const config = {
   mode: process.env.NODE_ENV,
   context: __dirname + '/src',
-  devtool: 'eval',
   stats: 'errors-only',
+
+  optimization: {
+    minimize: process.env.NODE_ENV === 'production',
+    minimizer: [
+      new TerserPlugin({
+        parallel: true,
+        terserOptions: {
+          ecma: 6,
+          output: {
+            ascii_only: true,
+          },
+        },
+      }),
+    ],
+  },
 
   entry: {
     'popup/index': './popup/index.ts',
