@@ -1,6 +1,7 @@
 import React from "react"
 
 import Layout from "../components/layout"
+import Demo from "../components/demo"
 import BasicMode from "../components/basic-mode"
 import Readability from "../components/readability"
 import Code from "../components/code"
@@ -30,7 +31,7 @@ const IndexPage = () => (
 
     <CarouselProvider
       isPlaying
-      totalSlides={4}
+      totalSlides={5}
       naturalSlideWidth={1200}
       naturalSlideHeight={890}
     >
@@ -49,6 +50,10 @@ const IndexPage = () => (
 
         <Slide index={3}>
           <Shortcuts />
+        </Slide>
+
+        <Slide index={4}>
+          <Demo />
         </Slide>
       </Slider>
 
