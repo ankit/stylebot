@@ -27,20 +27,20 @@ const NotificationManager = {
     };
 
     chrome.notifications.onClicked.addListener(() => {
-      this.openChangelog();
+      this.open();
     });
 
     chrome.notifications.onButtonClicked.addListener(() => {
-      this.openChangelog();
+      this.open();
     });
 
     chrome.notifications.create(options);
   },
 
-  openChangelog(): void {
+  open(): void {
     chrome.tabs.create({
       active: true,
-      url: 'http://ankitahuja.com',
+      url: 'https://stylebot.dev',
     });
   },
 };
