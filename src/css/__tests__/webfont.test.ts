@@ -10,7 +10,7 @@ describe('webfont', () => {
       const output = await addGoogleWebFont('Muli', css);
 
       expect(output).toBe(
-        '@import url(//fonts.googleapis.com/css?family=Muli);\n\na { font-family: Muli; }'
+        '@import url(https://fonts.googleapis.com/css?family=Muli);\n\na { font-family: Muli; }'
       );
     });
 
@@ -18,7 +18,7 @@ describe('webfont', () => {
       fetchMock.mockResponse(() => Promise.resolve({ status: 200 }));
 
       const css =
-        '@import url(//fonts.googleapis.com/css?family=Muli);\n\na { font-family: Muli }';
+        '@import url(https://fonts.googleapis.com/css?family=Muli);\n\na { font-family: Muli }';
       const output = await addGoogleWebFont('Muli', css);
 
       expect(output).toBe(css);
@@ -46,7 +46,7 @@ describe('webfont', () => {
   describe('cleanGoogleWebFonts', () => {
     it('removes @import rule for unused font', () => {
       const css =
-        '@import url(//fonts.googleapis.com/css?family=Muli);\n\na { color: red; }';
+        '@import url(https://fonts.googleapis.com/css?family=Muli);\n\na { color: red; }';
 
       const output = cleanGoogleWebFonts(css);
       expect(output).toBe('a { color: red; }');
@@ -54,7 +54,7 @@ describe('webfont', () => {
 
     it('does not remove @import rule for used font', () => {
       const css =
-        '@import url(//fonts.googleapis.com/css?family=Muli);\n\na { font-family: Muli, Helvetica; }';
+        '@import url(https://fonts.googleapis.com/css?family=Muli);\n\na { font-family: Muli, Helvetica; }';
       const output = cleanGoogleWebFonts(css);
       expect(output).toBe(css);
     });

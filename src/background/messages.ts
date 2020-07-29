@@ -14,12 +14,14 @@ import {
   SetAllStyles as SetAllStylesType,
   SetReadability as SetReadabilityType,
   SetReadabilitySettings as SetReadabilitySettingsType,
+  GetImportCss as GetImportCssType,
   GetAllCommandsResponse,
   GetAllOptionsResponse,
   GetAllStylesResponse,
   GetOptionResponse,
   GetStylesForPageResponse,
   GetReadabilitySettingsResponse,
+  GetImportCssResponse,
 } from '@stylebot/types';
 
 import {
@@ -154,6 +156,15 @@ export const SetReadabilitySettings = (
   message: SetReadabilitySettingsType
 ): void => {
   setReadabilitySettings(message.value);
+};
+
+export const GetImportCss = async (
+  message: GetImportCssType,
+  styles: BackgroundPageStyles,
+  sendResponse: (response: GetImportCssResponse) => void
+): Promise<void> => {
+  const css = await styles.getImportCss(message.url);
+  sendResponse(css);
 };
 
 export const CopyToClipboard = (text: string): void => {

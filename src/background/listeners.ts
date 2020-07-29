@@ -20,6 +20,7 @@ import {
   SetReadability,
   GetReadabilitySettings,
   SetReadabilitySettings,
+  GetImportCss,
 } from './messages';
 
 import {
@@ -102,6 +103,10 @@ const init = (
           break;
         case 'SetReadabilitySettings':
           SetReadabilitySettings(message);
+          break;
+
+        case 'GetImportCss':
+          GetImportCss(message, styles, sendResponse);
           break;
       }
 

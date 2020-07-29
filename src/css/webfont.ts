@@ -4,7 +4,7 @@ const getGoogleFontUrlAndParams = (
   value: string
 ): { url: string; params: string } => {
   const arg = value.replace(' ', '+');
-  const url = `//fonts.googleapis.com/css?family=${arg}`;
+  const url = `https://fonts.googleapis.com/css?family=${arg}`;
   const params = `url(${url})`;
 
   return { url, params };

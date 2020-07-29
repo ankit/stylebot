@@ -29,12 +29,15 @@ export type GetAllCommandsResponse = Array<{
 
 export type GetReadabilitySettingsResponse = ReadabilitySettings;
 
+export type GetImportCssResponse = string;
+
 type BackgroundPageMessageResponse =
   | GetAllOptionsResponse
   | GetOptionResponse
   | GetAllStylesResponse
   | GetStylesForPageResponse
   | GetAllCommandsResponse
-  | GetReadabilitySettingsResponse;
+  | GetReadabilitySettingsResponse
+  | GetImportCssResponse;
 
 export default BackgroundPageMessageResponse;

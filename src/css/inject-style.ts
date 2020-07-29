@@ -1,15 +1,21 @@
 import * as postcss from 'postcss';
+import { getCssWithExpandedImports } from './import';
 
 const getStylesheetId = (id: string) => {
   return `stylebot-css-${id}`;
 };
 
-export const injectCSSIntoDocument = (css: string, id: string): void => {
+export const injectCSSIntoDocument = async (
+  css: string,
+  id: string
+): Promise<void> => {
+  const cssWithExpandedImports = await getCssWithExpandedImports(css);
+
   const stylesheetId = getStylesheetId(id);
   const el = document.getElementById(stylesheetId);
 
   if (el) {
-    el.innerHTML = css;
+    el.innerHTML = cssWithExpandedImports;
     return;
   }
 
@@ -17,7 +23,7 @@ export const injectCSSIntoDocument = (css: string, id: string): void => {
 
   style.type = 'text/css';
   style.setAttribute('id', stylesheetId);
-  style.appendChild(document.createTextNode(css));
+  style.appendChild(document.createTextNode(cssWithExpandedImports));
 
   document.documentElement.appendChild(style);
 };

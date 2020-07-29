@@ -53,6 +53,7 @@
     "unlimitedStorage",
     "notifications"
   ],
+
   "web_accessible_resources": [
     "editor/index.css",
     "readability/index.css",

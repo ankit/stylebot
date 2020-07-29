@@ -192,6 +192,29 @@ class BackgroundPageStyles {
     return root.toString();
   }
 
+  getImportCss(url: string): Promise<string> {
+    return new Promise(resolve => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', url, true);
+
+      xhr.onreadystatechange = () => {
+        if (xhr.readyState == 4) {
+          try {
+            const css = xhr.responseText;
+            // validate css by parsing
+            postcss.parse(css);
+            resolve(css);
+          } catch (e) {
+            // if css is invalid, return back empty css
+            resolve('');
+          }
+        }
+      };
+
+      xhr.send();
+    });
+  }
+
   updateIcon(
     tab: chrome.tabs.Tab,
     styles: Array<Style>,

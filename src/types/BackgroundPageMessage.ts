@@ -99,6 +99,11 @@ export type SetReadabilitySettings = {
   value: ReadabilitySettings;
 };
 
+export type GetImportCss = {
+  name: 'GetImportCss';
+  url: string;
+};
+
 type BackgroundPageMessage =
   | SetStyle
   | EnableStyle
@@ -117,6 +122,7 @@ type BackgroundPageMessage =
   | SetReadability
   | GetAllCommands
   | GetReadabilitySettings
-  | SetReadabilitySettings;
+  | SetReadabilitySettings
+  | GetImportCss;
 
 export default BackgroundPageMessage;
