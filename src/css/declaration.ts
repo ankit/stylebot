@@ -58,3 +58,25 @@ export const addDeclaration = (
 
   return css;
 };
+
+export const appendImportantToDeclarations = (css: string): string => {
+  const root = postcss.parse(css);
+
+  const isAncestorAnAtRule = (node: postcss.Node): boolean => {
+    if (node.type === 'atrule') {
+      return true;
+    } else if (node.type === 'decl' || node.type === 'rule') {
+      return isAncestorAnAtRule(node.parent);
+    } else {
+      return false;
+    }
+  };
+
+  root.walkDecls(decl => {
+    if (!isAncestorAnAtRule(decl)) {
+      decl.important = true;
+    }
+  });
+
+  return root.toString();
+};

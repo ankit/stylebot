@@ -19,4 +19,4 @@ export {
 
 export { addGoogleWebFont, cleanGoogleWebFonts } from './webfont';
 
-export { addDeclaration } from './declaration';
+export { addDeclaration, appendImportantToDeclarations } from './declaration';

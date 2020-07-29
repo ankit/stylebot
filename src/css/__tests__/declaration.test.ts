@@ -2,7 +2,7 @@
 const dedent = require('dedent');
 
 import 'jest-fetch-mock';
-import { addDeclaration } from '../declaration';
+import { addDeclaration, appendImportantToDeclarations } from '../declaration';
 
 describe('declaration', () => {
   describe('addDeclaration', () => {
@@ -139,6 +139,92 @@ describe('declaration', () => {
 
       const output = addDeclaration(property, value, selector, css);
       expect(output).toBe('');
+    });
+  });
+
+  describe('appendImportantToDeclarations', () => {
+    it('correctly appends !important to declarations', () => {
+      const css = dedent`
+        * {
+          font-family: Helvetica;
+        }
+
+        a {
+          color: red;
+        }
+        `;
+
+      const output = appendImportantToDeclarations(css);
+      expect(output).toEqual(dedent`
+        * {
+          font-family: Helvetica !important;
+        }
+
+        a {
+          color: red !important;
+        }  
+      `);
+    });
+
+    it('does not append !important to declarations whose ancestor is an atrule', () => {
+      const css = dedent`
+        @font-face {
+          font-family: 'MS PGothic';
+          src: local('Meiryo');
+        }
+
+        @page {
+          margin: 1cm;
+        }
+
+        @keyframes slidein {
+          from {
+            transform: translateX(0%);
+          }
+        
+          to {
+            transform: translateX(100%);
+          }
+        }
+
+        * {
+          font-family: Helvetica;
+        }
+
+        a {
+          color: red;
+        }
+        `;
+
+      const output = appendImportantToDeclarations(css);
+      expect(output).toEqual(dedent`
+        @font-face {
+          font-family: 'MS PGothic';
+          src: local('Meiryo');
+        }
+
+        @page {
+          margin: 1cm;
+        }
+
+        @keyframes slidein {
+          from {
+            transform: translateX(0%);
+          }
+        
+          to {
+            transform: translateX(100%);
+          }
+        }
+
+        * {
+          font-family: Helvetica !important;
+        }
+
+        a {
+          color: red !important;
+        }  
+      `);
     });
   });
 });

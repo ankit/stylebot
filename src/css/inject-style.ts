@@ -1,4 +1,5 @@
 import * as postcss from 'postcss';
+import { appendImportantToDeclarations } from './declaration';
 import { getCssWithExpandedImports } from './import';
 
 const getStylesheetId = (id: string) => {
@@ -32,10 +33,7 @@ export const injectRootIntoDocument = (
   root: postcss.Root,
   id: string
 ): void => {
-  const rootWithImportant = root.clone();
-  rootWithImportant.walkDecls(decl => (decl.important = true));
-
-  const css = rootWithImportant.toString();
+  const css = appendImportantToDeclarations(root.toString());
   injectCSSIntoDocument(css, id);
 };
 

@@ -1,4 +1,6 @@
 import * as postcss from 'postcss';
+import { appendImportantToDeclarations } from '@stylebot/css';
+
 import BackgroundPageUtils from './utils';
 
 import {
@@ -63,7 +65,7 @@ class BackgroundPageStyles {
         const { styles, defaultStyle } = this.getStylesForPage(tab.url);
         this.updateIcon(tab, styles, defaultStyle);
 
-        const css = this.addImportantToCss(this.styles[url].css);
+        const css = appendImportantToDeclarations(this.styles[url].css);
         const message: EnableStyleForTab = {
           name: 'EnableStyleForTab',
           url,
@@ -161,7 +163,7 @@ class BackgroundPageStyles {
 
       if (matches && this.styles[url]) {
         const css = important
-          ? this.addImportantToCss(this.styles[url].css)
+          ? appendImportantToDeclarations(this.styles[url].css)
           : this.styles[url].css;
 
         const { enabled, readability } = this.styles[url];
@@ -180,16 +182,6 @@ class BackgroundPageStyles {
     }
 
     return { styles, defaultStyle };
-  }
-
-  addImportantToCss(css: string): string {
-    const root = postcss.parse(css);
-
-    root.walkDecls(decl => {
-      decl.important = true;
-    });
-
-    return root.toString();
   }
 
   getImportCss(url: string): Promise<string> {
