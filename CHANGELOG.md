@@ -1,3 +1,11 @@
+## Version 3.0.1
+
+- Only inject stylebot editor in the topmost frame. fixes #562 #561
+- Don't inject !important for @rules. fixes #559
+- Add support for @import of external/third-party CSS. fixes #556
+- Don't run on \*.xml pages
+- Fix ? keyboard shortcut to show help when stylebot editor is open
+
 ## Version 3
 
 - Re-wrote extension from scratch using modern tools ([PostCSS](ttps://postcss.org/), [Vue.js](https://vuejs.org/))
