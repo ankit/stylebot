@@ -12,7 +12,6 @@
 
   "content_scripts": [
     {
-      "all_frames": true,
       "js": [
         "editor/index.js",
         "monaco-editor/iframe/node_modules/requirejs/require.js",
