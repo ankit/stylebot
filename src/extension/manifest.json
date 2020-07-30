@@ -18,12 +18,14 @@
         "monaco-editor/iframe/node_modules/monaco-editor/min/vs/loader.js"
       ],
       "matches": ["<all_urls>"],
+      "exclude_matches": ["*://*/*.xml"],
       "run_at": "document_idle"
     },
     {
       "all_frames": true,
       "js": ["inject-css/index.js"],
       "matches": ["<all_urls>"],
+      "exclude_matches": ["*://*/*.xml"],
       "run_at": "document_start"
     }
   ],
