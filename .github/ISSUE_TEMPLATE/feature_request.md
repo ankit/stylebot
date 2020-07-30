@@ -1,8 +1,8 @@
 ---
 name: Feature request
 about: Suggest an idea for Stylebot
-title: ''
-labels: ''
+title: "[Feature Request]"
+labels: Feature
 assignees: ''
 
 ---
