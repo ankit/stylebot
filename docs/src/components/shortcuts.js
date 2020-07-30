@@ -34,7 +34,7 @@ const BasicMode = () => {
           marginBottom: "10px",
         }}
       />
-      <h3>Use shorcuts to easily toggle styling</h3>
+      <h3>Use shortcuts to easily toggle styling</h3>
     </div>
   )
 }
