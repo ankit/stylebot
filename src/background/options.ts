@@ -1,5 +1,5 @@
 import ContextMenu from './contextmenu';
-import { StylebotOptions } from 'types';
+import { StylebotOptions } from '@stylebot/types';
 
 class BackgroundPageOptions {
   options: StylebotOptions;

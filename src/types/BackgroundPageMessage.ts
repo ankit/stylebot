@@ -1,4 +1,8 @@
-import { StylebotOptions, ReadabilitySettings, StylebotCommands } from 'types';
+import {
+  StylebotOptions,
+  StylebotCommands,
+  ReadabilitySettings,
+} from '@stylebot/types';
 
 export type SetStyle = {
   name: 'SetStyle';
