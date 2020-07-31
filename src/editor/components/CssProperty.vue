@@ -1,5 +1,5 @@
 <template>
-  <b-col cols="5" align-self="center" class="css-property">
+  <b-col cols="4" align-self="center" class="css-property">
     <slot />
   </b-col>
 </template>
@@ -14,7 +14,7 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .css-property {
-  font-size: 13px;
+  font-size: 12px;
   text-align: right;
   padding-left: 0 !important;
   padding-right: 15px !important;

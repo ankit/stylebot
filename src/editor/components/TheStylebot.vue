@@ -64,7 +64,7 @@ export default Vue.extend({
   position: fixed;
   padding: 0;
   background: #fff;
-  width: 375px;
+  width: 320px;
   z-index: 100000000;
   border: 1px solid #ccc;
 
@@ -79,6 +79,6 @@ export default Vue.extend({
 
 .stylebot-body {
   overflow: auto;
-  height: calc(100% - 154px);
+  height: calc(100% - 146px);
 }
 </style>

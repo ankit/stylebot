@@ -5,7 +5,7 @@
     <css-property-value>
       <b-row no-gutters>
         <b-col cols="10">
-          <b-input-group>
+          <b-input-group class="font-input-group">
             <b-form-input
               v-model="value"
               size="sm"
@@ -99,3 +99,9 @@ export default Vue.extend({
   },
 });
 </script>
+
+<style lang="scss" scoped>
+.form-control {
+  border-right: none !important;
+}
+</style>

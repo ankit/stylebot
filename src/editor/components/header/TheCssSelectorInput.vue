@@ -2,6 +2,7 @@
   <b-form-input
     :disabled="disabled"
     :value="activeSelector"
+    size="sm"
     class="css-selector-input"
     placeholder="Enter CSS selector..."
     @blur="blur"
@@ -81,8 +82,6 @@ export default Vue.extend({
   }
 
   &.form-control {
-    height: 30px !important;
-    font-size: 13px !important;
     margin-left: 8px !important;
   }
 }

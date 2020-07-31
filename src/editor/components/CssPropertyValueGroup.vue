@@ -1,5 +1,5 @@
 <template>
-  <b-col cols="7">
+  <b-col cols="8">
     <b-button-group>
       <b-button
         v-for="option in options"

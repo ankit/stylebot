@@ -1,12 +1,13 @@
 <template>
   <div @click="stopInspecting">
-    <b-input-group>
+    <b-input-group class="css-selector-input-group">
       <the-css-selector-input :disabled="disabled" />
 
       <template #append>
         <dropdown-hack-to-support-shadow-dom>
           <b-dropdown
             right
+            size="sm"
             :disabled="disabled"
             variant="outline-secondary"
             class="css-selector-dropdown"
@@ -60,17 +61,9 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
-.css-selector-dropdown {
+.css-selector-input-group {
   .dropdown-toggle {
-    height: 30px !important;
-    padding: 0 8px !important;
-    padding-top: 3px !important;
-  }
-
-  .dropdown-menu {
-    border: none !important;
-    min-width: 120px !important;
-    margin-left: 1px !important;
+    line-height: 21px !important;
   }
 }
 </style>

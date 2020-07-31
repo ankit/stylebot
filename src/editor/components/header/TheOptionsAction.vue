@@ -84,8 +84,8 @@ export default Vue.extend({
     background: none !important;
     color: #000 !important;
     border: none !important;
-    font-size: 19px !important;
-    line-height: 15px !important;
+    font-size: 16px !important;
+    line-height: 18px !important;
     padding: 0 !important;
 
     &::after {

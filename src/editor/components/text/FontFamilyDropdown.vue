@@ -3,6 +3,7 @@
     <dropdown-hack-to-support-shadow-dom>
       <b-dropdown
         right
+        size="sm"
         :disabled="disabled"
         variant="outline-secondary"
         class="font-family-dropdown"

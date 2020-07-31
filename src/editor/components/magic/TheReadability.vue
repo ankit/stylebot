@@ -1,6 +1,8 @@
 <template>
   <div class="the-readability">
-    <b-form-checkbox v-model="value" switch>Enable Readability</b-form-checkbox>
+    <b-form-checkbox v-model="value" switch class="enable-readability">
+      Enable Readability
+    </b-form-checkbox>
 
     <p class="lead pt-2">
       Make articles on this site readable by hiding non-essential page elements
@@ -95,5 +97,11 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .the-readability {
   line-height: 21px;
+}
+
+.enable-readability {
+  &.custom-switch {
+    font-size: 14px;
+  }
 }
 </style>

@@ -4,9 +4,8 @@
       <the-inspector @select="inspect($event)" />
     </b-col>
 
-    <b-col cols="8" align-self="center" class="pl-2 pr-3">
+    <b-col cols="8" align-self="center" class="px-2">
       <the-css-selector-dropdown />
-
       <div class="url">{{ url }}</div>
     </b-col>
 
@@ -61,8 +60,8 @@ export default Vue.extend({
 
 .url {
   color: #333;
-  font-size: 13px;
+  font-size: 12px;
   padding: 0 8px;
-  margin-top: 7px;
+  margin-top: 3px;
 }
 </style>

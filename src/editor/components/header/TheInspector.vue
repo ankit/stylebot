@@ -97,7 +97,7 @@ export default Vue.extend({
 
 <style lang="scss">
 .stylebot-inspector {
-  height: 56px !important;
+  height: 53px !important;
   outline: none !important;
   font-size: 21px !important;
   border-color: #ccc !important;

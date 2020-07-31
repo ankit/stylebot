@@ -33,7 +33,7 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .magic-title {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 400;
 }
 

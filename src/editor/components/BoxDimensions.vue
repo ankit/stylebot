@@ -186,7 +186,7 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .box-dimension {
-  min-width: 45px;
+  min-width: 40px;
   margin-right: 3px;
 }
 </style>

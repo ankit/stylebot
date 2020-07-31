@@ -1,5 +1,5 @@
 <template>
-  <div class="mr-3">
+  <div>
     <the-options-action class="window-action" />
     <the-move-action class="window-action move-window-action" />
     <the-close-action class="window-action close-window-action" />
@@ -9,16 +9,16 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import TheCloseAction from './TheCloseAction.vue';
 import TheMoveAction from './TheMoveAction.vue';
+import TheCloseAction from './TheCloseAction.vue';
 import TheOptionsAction from './TheOptionsAction.vue';
 
 export default Vue.extend({
   name: 'TheWindowActions',
 
   components: {
-    TheCloseAction,
     TheMoveAction,
+    TheCloseAction,
     TheOptionsAction,
   },
 });
@@ -29,19 +29,19 @@ export default Vue.extend({
   margin: 0;
   padding: 0;
   border: none;
-  font-size: 18px;
-  line-height: 17px;
+  font-size: 15px;
+  line-height: 18px;
   background: none;
   position: absolute;
   top: 0;
-  left: 0;
+  left: 5px;
 
   &.move-window-action {
-    left: 23px;
+    left: 24px;
   }
 
   &.close-window-action {
-    left: 45px;
+    left: 42px;
   }
 }
 </style>
