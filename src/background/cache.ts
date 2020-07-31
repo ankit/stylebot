@@ -1,3 +1,5 @@
+import { defaultOptions } from '@stylebot/settings';
+
 import BackgroundPageStyles from './styles';
 import BackgroundPageOptions from './options';
 
@@ -20,10 +22,7 @@ const init = async (): Promise<{
       if (items['options']) {
         options = new BackgroundPageOptions(items['options']);
       } else {
-        options = new BackgroundPageOptions({
-          mode: 'basic',
-          contextMenu: true,
-        });
+        options = new BackgroundPageOptions(defaultOptions);
       }
 
       resolve({ styles, options });

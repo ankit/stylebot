@@ -3,10 +3,17 @@ import Vuex from 'vuex';
 
 import {
   StylebotOptions,
+  StylebotCommands,
   StylebotPlacement,
   ReadabilitySettings,
-  StylebotShortcuts,
+  StylebotEditorCommands,
 } from '@stylebot/types';
+
+import {
+  defaultOptions,
+  defaultEditorCommands,
+  defaultReadabilitySettings,
+} from '@stylebot/settings';
 
 import getters from './getters';
 import actions from './actions';
@@ -25,7 +32,6 @@ export type State = {
   css: string;
   enabled: boolean;
   readability: boolean;
-  options: StylebotOptions;
 
   activeSelector: string;
   selectors: Array<CssSelectorMetadata>;
@@ -34,7 +40,10 @@ export type State = {
   visible: boolean;
   inspecting: boolean;
   position: StylebotPlacement;
-  shortcuts: StylebotShortcuts;
+
+  options: StylebotOptions;
+  commands: StylebotCommands | null;
+  editorCommands: StylebotEditorCommands;
   readabilitySettings: ReadabilitySettings;
 };
 
@@ -45,26 +54,18 @@ export default new Vuex.Store<State>({
     readability: false,
     url: document.domain,
 
-    options: {
-      mode: 'basic',
-      contextMenu: true,
-    },
-
-    activeSelector: '',
     selectors: [],
+    activeSelector: '',
 
     help: false,
     visible: false,
-    position: 'right',
     inspecting: false,
-    shortcuts: new Map(),
-    readabilitySettings: {
-      size: 16,
-      width: 36,
-      lineHeight: 1.6,
-      theme: 'light',
-      font: 'Helvetica',
-    },
+    position: 'right',
+
+    commands: null,
+    options: defaultOptions,
+    editorCommands: defaultEditorCommands,
+    readabilitySettings: defaultReadabilitySettings,
   },
 
   getters,

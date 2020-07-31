@@ -8,6 +8,7 @@ import Vue from 'vue';
 import { Declaration, Rule } from 'postcss';
 import { StylebotEditingMode, StylebotPlacement } from '@stylebot/types';
 
+// todo: use hotkeys-js and editorCommands
 export default Vue.extend({
   name: 'TheKeyboardShortcuts',
 
@@ -100,7 +101,9 @@ export default Vue.extend({
 
     handleStylebotShortcut(event: KeyboardEvent): void {
       const target = event.composedPath()[0] as HTMLElement;
-      if (target.tagName.toLowerCase() === 'input') {
+      const tagName = target.tagName.toLowerCase();
+
+      if (tagName === 'input' || tagName === 'textarea') {
         return;
       }
 

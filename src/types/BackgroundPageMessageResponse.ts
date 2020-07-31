@@ -1,9 +1,9 @@
 import {
-  StylebotOptions,
   Style,
-  StylebotCommand,
+  StylebotOptions,
+  StylebotCommands,
   ReadabilitySettings,
-} from './';
+} from '@stylebot/types';
 
 export type GetAllOptionsResponse = StylebotOptions;
 export type GetOptionResponse = StylebotOptions[keyof StylebotOptions];
@@ -21,12 +21,7 @@ export type GetStylesForPageResponse = {
   defaultStyle?: Style;
 };
 
-export type GetAllCommandsResponse = Array<{
-  shortcut: string;
-  description: string;
-  name: StylebotCommand;
-}>;
-
+export type GetCommandsResponse = StylebotCommands;
 export type GetReadabilitySettingsResponse = ReadabilitySettings;
 
 export type GetImportCssResponse = string;
@@ -36,7 +31,7 @@ type BackgroundPageMessageResponse =
   | GetOptionResponse
   | GetAllStylesResponse
   | GetStylesForPageResponse
-  | GetAllCommandsResponse
+  | GetCommandsResponse
   | GetReadabilitySettingsResponse
   | GetImportCssResponse;
 

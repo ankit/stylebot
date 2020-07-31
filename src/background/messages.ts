@@ -12,10 +12,11 @@ import {
   GetStylesForIframe as GetStylesForIframeType,
   MoveStyle as MoveStyleType,
   SetAllStyles as SetAllStylesType,
+  SetCommands as SetCommandsType,
   SetReadability as SetReadabilityType,
   SetReadabilitySettings as SetReadabilitySettingsType,
   GetImportCss as GetImportCssType,
-  GetAllCommandsResponse,
+  GetCommandsResponse,
   GetAllOptionsResponse,
   GetAllStylesResponse,
   GetOptionResponse,
@@ -28,6 +29,8 @@ import {
   get as getReadabilitySettings,
   set as setReadabilitySettings,
 } from './readability-settings';
+
+import { get as getCommands, set as setCommands } from './commands';
 
 export const DisableStyle = (
   message: DisableStyleType,
@@ -123,19 +126,15 @@ export const SetOption = (
   options.set(message.option.name, message.option.value);
 };
 
-export const GetAllCommands = (
-  sendResponse: (response: GetAllCommandsResponse) => void
-): void => {
-  chrome.commands.getAll(commands => {
-    sendResponse(commands as GetAllCommandsResponse);
-  });
+export const GetCommands = async (
+  sendResponse: (response: GetCommandsResponse) => void
+): Promise<void> => {
+  const commands = await getCommands();
+  sendResponse(commands);
 };
 
-export const OpenCommandsPage = (): void => {
-  chrome.tabs.create({
-    active: true,
-    url: 'chrome://extensions/configureCommands',
-  });
+export const SetCommands = (message: SetCommandsType): void => {
+  setCommands(message.value);
 };
 
 export const SetReadability = (

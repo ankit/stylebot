@@ -5,11 +5,9 @@
 <script lang="ts">
 import Vue from 'vue';
 
+import { TabMessage } from '@stylebot/types';
 import { injectCSSIntoDocument } from '@stylebot/css';
-import { StylebotCommand, TabMessage } from '@stylebot/types';
 import { apply as applyReadability } from '@stylebot/readability';
-
-import { disableStyle, enableStyle } from '../utils/chrome';
 
 export default Vue.extend({
   name: 'TheChromeListener',
@@ -55,8 +53,6 @@ export default Vue.extend({
           }
         } else if (message.name === 'GetIsStylebotOpen') {
           sendResponse(this.visible);
-        } else if (message.name === 'ExecuteCommand') {
-          this.handleCommand(message.command);
         } else if (message.name === 'ToggleReadabilityForTab') {
           this.toggleReadability();
         }
@@ -89,43 +85,11 @@ export default Vue.extend({
       }
     },
 
-    toggleStyle() {
-      if (this.enabled) {
-        disableStyle(this.url);
-      } else {
-        enableStyle(this.url);
-      }
-    },
-
     toggleReadability() {
       if (this.readability) {
         this.$store.dispatch('applyReadability', false);
       } else {
         this.$store.dispatch('applyReadability', true);
-      }
-    },
-
-    toggleGrayscale() {
-      let percent = 0;
-      if (!this.$store.getters.grayscale) {
-        percent = 100;
-      }
-
-      this.$store.dispatch('applyFilter', {
-        effectName: 'grayscale',
-        percent,
-      });
-    },
-
-    handleCommand(command: StylebotCommand) {
-      if (command === 'toggle-stylebot') {
-        this.toggleStylebot();
-      } else if (command === 'toggle-style') {
-        this.toggleStyle();
-      } else if (command === 'toggle-readability') {
-        this.toggleReadability();
-      } else if (command === 'toggle-grayscale') {
-        this.toggleGrayscale();
       }
     },
   },

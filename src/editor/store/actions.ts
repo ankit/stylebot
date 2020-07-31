@@ -27,7 +27,7 @@ import {
   getStylesForPage,
   enableStyle,
   setReadability,
-  getAllCommands,
+  getCommands,
   getReadabilitySettings,
   setReadabilitySettings,
 } from '../utils/chrome';
@@ -36,7 +36,6 @@ import { State } from './';
 
 export default {
   async initialize({ commit }: { commit: Commit }): Promise<void> {
-    const options = await getAllOptions();
     const { defaultStyle } = await getStylesForPage(false);
 
     if (defaultStyle) {
@@ -51,16 +50,11 @@ export default {
       commit('setSelectors', root);
     }
 
+    const options = await getAllOptions();
     commit('setOptions', options);
 
-    const commands = await getAllCommands();
-    const shortcuts = new Map();
-
-    commands.forEach(cmd => {
-      shortcuts.set(cmd.name, cmd.shortcut);
-    });
-
-    commit('setShortcuts', shortcuts);
+    const commands = await getCommands();
+    commit('setCommands', commands);
 
     const readabilitySettings = await getReadabilitySettings();
     commit('setReadabilitySettings', readabilitySettings);

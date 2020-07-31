@@ -3,8 +3,8 @@ import BackgroundPageStyles from './styles';
 
 import {
   CopyToClipboard,
-  GetAllCommands,
-  OpenCommandsPage,
+  GetCommands,
+  SetCommands,
   GetOption,
   SetOption,
   GetAllOptions,
@@ -24,12 +24,11 @@ import {
 } from './messages';
 
 import {
+  TabUpdated,
   BackgroundPageMessage,
   BackgroundPageMessageResponse,
-  ExecuteCommand,
-  StylebotCommand,
-  TabUpdated,
 } from '@stylebot/types';
+
 import BackgroundPageOptions from './options';
 
 /**
@@ -50,11 +49,11 @@ const init = (
           CopyToClipboard(message.text);
           break;
 
-        case 'GetAllCommands':
-          GetAllCommands(sendResponse);
+        case 'GetCommands':
+          GetCommands(sendResponse);
           break;
-        case 'OpenCommandsPage':
-          OpenCommandsPage();
+        case 'SetCommands':
+          SetCommands(message);
           break;
 
         case 'GetOption':
@@ -141,22 +140,6 @@ const init = (
         ContextMenu.update(tab);
       });
     }
-  });
-
-  /**
-   * Listen to global keyboard shorcuts
-   */
-  chrome.commands.onCommand.addListener(command => {
-    chrome.tabs.getSelected(tab => {
-      if (tab.id) {
-        const message: ExecuteCommand = {
-          name: 'ExecuteCommand',
-          command: command as StylebotCommand,
-        };
-
-        chrome.tabs.sendMessage(tab.id, message);
-      }
-    });
   });
 };
 

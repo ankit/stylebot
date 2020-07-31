@@ -59,6 +59,7 @@ export default Vue.extend({
   created() {
     this.$store.dispatch('getAllStyles');
     this.$store.dispatch('getAllOptions');
+    this.$store.dispatch('getCommands');
   },
 });
 </script>
@@ -76,6 +77,12 @@ export default Vue.extend({
 }
 
 h2 {
-  font-weight: 300;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+h3 {
+  font-size: 16px;
+  font-weight: 500;
 }
 </style>

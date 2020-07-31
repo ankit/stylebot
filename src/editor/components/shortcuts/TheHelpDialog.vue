@@ -34,29 +34,29 @@
             <b-tbody>
               <b-tr>
                 <b-td>Toggle stylebot editor</b-td>
-                <b-td>
-                  {{ shortcuts.get('toggle-stylebot') }}
+                <b-td class="stylebot-key">
+                  {{ commands['stylebot'] }}
                 </b-td>
               </b-tr>
 
               <b-tr>
                 <b-td>Toggle styling</b-td>
-                <b-td>
-                  {{ shortcuts.get('toggle-style') }}
+                <b-td class="stylebot-key">
+                  {{ commands['style'] }}
                 </b-td>
               </b-tr>
 
               <b-tr>
                 <b-td>Toggle readability</b-td>
-                <b-td>
-                  {{ shortcuts.get('toggle-readability') }}
+                <b-td class="stylebot-key">
+                  {{ commands['readability'] }}
                 </b-td>
               </b-tr>
 
               <b-tr>
                 <b-td>Toggle grayscale</b-td>
-                <b-td>
-                  {{ shortcuts.get('toggle-grayscale') }}
+                <b-td class="stylebot-key">
+                  {{ commands['grayscale'] }}
                 </b-td>
               </b-tr>
             </b-tbody>
@@ -74,32 +74,36 @@
             <b-tbody>
               <b-tr>
                 <b-td>Toggle element inspection</b-td>
-                <b-td>I</b-td>
+                <b-td class="stylebot-key">
+                  {{ editorCommands['inspect'] }}
+                </b-td>
               </b-tr>
 
               <b-tr>
                 <b-td>Move stylebot to left / right</b-td>
-                <b-td>P</b-td>
+                <b-td class="stylebot-key">
+                  {{ editorCommands['position'] }}
+                </b-td>
               </b-tr>
 
               <b-tr>
                 <b-td>Switch to basic editor</b-td>
-                <b-td>B</b-td>
+                <b-td class="stylebot-key">{{ editorCommands['basic'] }}</b-td>
               </b-tr>
 
               <b-tr>
                 <b-td>Switch to magic editor</b-td>
-                <b-td>M</b-td>
+                <b-td class="stylebot-key">{{ editorCommands['magic'] }}</b-td>
               </b-tr>
 
               <b-tr>
                 <b-td>Switch to code editor</b-td>
-                <b-td>C</b-td>
+                <b-td class="stylebot-key">{{ editorCommands['code'] }}</b-td>
               </b-tr>
 
               <b-tr>
                 <b-td>Show help</b-td>
-                <b-td>?</b-td>
+                <b-td class="stylebot-key">{{ editorCommands['help'] }}</b-td>
               </b-tr>
             </b-tbody>
           </b-table-simple>
@@ -118,7 +122,9 @@
             <b-tbody>
               <b-tr>
                 <b-td>Apply CSS to show/hide selected element(s)</b-td>
-                <b-td>H</b-td>
+                <b-td class="stylebot-key">
+                  {{ editorCommands['hide'] }}
+                </b-td>
               </b-tr>
             </b-tbody>
           </b-table-simple>
@@ -130,16 +136,20 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import { StylebotCommands, StylebotEditorCommands } from '@stylebot/types';
 
-import { openCommandsPage } from '../../utils/chrome';
-import { StylebotShortcuts } from '@stylebot/types';
+import { openOptionsPage } from '../../utils/chrome';
 
 export default Vue.extend({
   name: 'TheHelpDialog',
 
   computed: {
-    shortcuts(): StylebotShortcuts {
-      return this.$store.state.shortcuts;
+    commands(): StylebotCommands {
+      return this.$store.state.commands;
+    },
+
+    editorCommands(): StylebotEditorCommands {
+      return this.$store.state.editorCommands;
     },
   },
 
@@ -163,7 +173,7 @@ export default Vue.extend({
 
     customizeGlobalCommands(event: MouseEvent): void {
       event.preventDefault();
-      openCommandsPage();
+      openOptionsPage();
     },
 
     close(): void {
@@ -218,5 +228,9 @@ export default Vue.extend({
 .customize {
   float: right;
   font-weight: normal;
+}
+
+.stylebot-key {
+  text-align: right;
 }
 </style>

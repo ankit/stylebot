@@ -23,7 +23,8 @@ export default Vue.extend({
 
     byline: {
       type: String,
-      required: true,
+      required: false,
+      default: '',
     },
 
     url: {

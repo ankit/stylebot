@@ -1,8 +1,9 @@
 import * as postcss from 'postcss';
+
 import {
-  StylebotPlacement,
   StylebotOptions,
-  StylebotShortcuts,
+  StylebotCommands,
+  StylebotPlacement,
   ReadabilitySettings,
 } from '@stylebot/types';
 
@@ -77,11 +78,11 @@ export default {
     state.readability = value;
   },
 
-  setShortcuts(state: State, value: StylebotShortcuts): void {
-    state.shortcuts = value;
-  },
-
   setReadabilitySettings(state: State, value: ReadabilitySettings): void {
     state.readabilitySettings = value;
+  },
+
+  setCommands(state: State, value: StylebotCommands): void {
+    state.commands = value;
   },
 };

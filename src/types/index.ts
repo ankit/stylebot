@@ -49,13 +49,28 @@ export type ReadabilitySettings = {
   theme: ReadabilityTheme;
 };
 
-export type StylebotCommand =
-  | 'toggle-stylebot'
-  | 'toggle-style'
-  | 'toggle-readability'
-  | 'toggle-grayscale';
+export type StylebotCommandName =
+  | 'stylebot'
+  | 'style'
+  | 'readability'
+  | 'grayscale';
 
-export type StylebotShortcuts = Map<StylebotCommand, string>;
+export type StylebotCommands = {
+  [key in StylebotCommandName]: string;
+};
+
+export type StylebotEditorCommandName =
+  | 'inspect'
+  | 'position'
+  | 'basic'
+  | 'magic'
+  | 'code'
+  | 'help'
+  | 'hide';
+
+export type StylebotEditorCommands = {
+  [key in StylebotEditorCommandName]: string;
+};
 
 export * from './TabMessage';
 export * from './BackgroundPageMessage';

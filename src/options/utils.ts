@@ -7,6 +7,10 @@ import {
   GetAllOptionsResponse,
   StylebotOptions,
   CopyToClipboard,
+  GetCommands,
+  SetCommands,
+  GetCommandsResponse,
+  StylebotCommands,
 } from '@stylebot/types';
 
 type Styles = {
@@ -74,37 +78,23 @@ export const copyToClipboard = (text: string): void => {
   chrome.runtime.sendMessage(message);
 };
 
-export const getCharacterFromKeydownCode = (code: number): string => {
-  const flooredCode = Math.floor(code);
+export const getCommands = async (): Promise<GetCommandsResponse> => {
+  const message: GetCommands = {
+    name: 'GetCommands',
+  };
 
-  switch (flooredCode) {
-    case 186:
-      return ';';
-    case 187:
-      return '=';
-    case 188:
-      return ',';
-    case 189:
-      return '-';
-    case 190:
-      return '.';
-    case 191:
-      return '/';
-    case 192:
-      return '`';
-    case 219:
-      return '[';
-    case 220:
-      return '\\';
-    case 221:
-      return ']';
-    case 222:
-      return "'";
-  }
-
-  return String.fromCharCode(flooredCode).toLowerCase();
+  return new Promise(resolve => {
+    chrome.runtime.sendMessage(message, (response: GetCommandsResponse) => {
+      resolve(response);
+    });
+  });
 };
 
-export const getKeydownCode = (char: string): number => {
-  return char.toUpperCase().charCodeAt(0);
+export const setCommands = (commands: StylebotCommands): void => {
+  const message: SetCommands = {
+    name: 'SetCommands',
+    value: commands,
+  };
+
+  chrome.runtime.sendMessage(message);
 };

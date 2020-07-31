@@ -1,5 +1,12 @@
 import { State } from '..';
 
+import {
+  defaultOptions,
+  defaultReadabilitySettings,
+  defaultCommands,
+  defaultEditorCommands,
+} from '@stylebot/settings';
+
 const mockState: State = {
   css: '',
   enabled: true,
@@ -8,24 +15,16 @@ const mockState: State = {
   activeSelector: '',
   selectors: [],
 
-  options: {
-    mode: 'basic',
-    contextMenu: true,
-  },
-
   visible: false,
   position: 'right',
   inspecting: false,
   help: false,
   readability: false,
-  readabilitySettings: {
-    size: 16,
-    width: 36,
-    theme: 'light',
-    font: 'Helvetica',
-    lineHeight: 1.6,
-  },
-  shortcuts: new Map(),
+
+  options: defaultOptions,
+  commands: defaultCommands,
+  editorCommands: defaultEditorCommands,
+  readabilitySettings: defaultReadabilitySettings,
 };
 
 export default mockState;

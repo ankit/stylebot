@@ -1,6 +1,6 @@
 <template>
   <div class="mt-5 pb-3 pt-2">
-    <h5>Style URL Matching</h5>
+    <h2>Style URL Matching</h2>
 
     <p>
       By default, Stylebot editor uses the site's domain name to match styles to
@@ -17,7 +17,7 @@
       </li>
     </ul>
 
-    <h6 class="pt-3">Wildcards</h6>
+    <h3 class="pt-3">Wildcards</h3>
 
     <ul>
       <li class="pb-3">
@@ -75,7 +75,7 @@
       </li>
     </ul>
 
-    <h6 class="pt-3">RegEx</h6>
+    <h3 class="pt-3">RegEx</h3>
 
     <p>
       Stylebot treats a string as a regex if it start it with

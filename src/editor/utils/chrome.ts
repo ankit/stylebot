@@ -7,11 +7,10 @@ import {
   DisableStyle,
   GetStylesForPage,
   SetReadability,
-  GetAllCommands,
-  OpenCommandsPage,
+  GetCommands,
   GetAllOptionsResponse,
   GetStylesForPageResponse,
-  GetAllCommandsResponse,
+  GetCommandsResponse,
   StylebotOptions,
   GetReadabilitySettingsResponse,
   GetReadabilitySettings,
@@ -115,24 +114,16 @@ export const setReadability = (url: string, value: boolean): void => {
   chrome.runtime.sendMessage(message);
 };
 
-export const getAllCommands = async (): Promise<GetAllCommandsResponse> => {
-  const message: GetAllCommands = {
-    name: 'GetAllCommands',
+export const getCommands = async (): Promise<GetCommandsResponse> => {
+  const message: GetCommands = {
+    name: 'GetCommands',
   };
 
   return new Promise(resolve => {
-    chrome.runtime.sendMessage(message, (response: GetAllCommandsResponse) => {
+    chrome.runtime.sendMessage(message, (response: GetCommandsResponse) => {
       resolve(response);
     });
   });
-};
-
-export const openCommandsPage = (): void => {
-  const message: OpenCommandsPage = {
-    name: 'OpenCommandsPage',
-  };
-
-  chrome.runtime.sendMessage(message);
 };
 
 export const getReadabilitySettings = async (): Promise<

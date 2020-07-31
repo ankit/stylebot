@@ -59,32 +59,5 @@
     "editor/index.css",
     "readability/index.css",
     "monaco-editor/*"
-  ],
-
-  "commands": {
-    "toggle-stylebot": {
-      "suggested_key": {
-        "default": "Alt+M"
-      },
-      "description": "Toggle Stylebot Editor"
-    },
-    "toggle-style": {
-      "suggested_key": {
-        "default": "Alt+S"
-      },
-      "description": "Toggle Styling"
-    },
-    "toggle-readability": {
-      "suggested_key": {
-        "default": "Alt+R"
-      },
-      "description": "Toggle Readability"
-    },
-    "toggle-grayscale": {
-      "suggested_key": {
-        "default": "Alt+G"
-      },
-      "description": "Toggle Grayscale"
-    }
-  }
+  ]
 }

@@ -3,8 +3,17 @@ import Vuex from 'vuex';
 
 import * as postcss from 'postcss';
 
-import { StylebotOptions } from '@stylebot/types';
-import { getAllStyles, setAllStyles, setOption, getAllOptions } from '../utils';
+import { defaultCommands } from '@stylebot/settings';
+import { StylebotOptions, StylebotCommands } from '@stylebot/types';
+
+import {
+  getAllStyles,
+  setAllStyles,
+  setOption,
+  getAllOptions,
+  getCommands,
+  setCommands,
+} from '../utils';
 
 Vue.use(Vuex);
 
@@ -16,13 +25,16 @@ type State = {
       readability: boolean;
     };
   };
+
   options: StylebotOptions | null;
+  commands: StylebotCommands;
 };
 
 export default new Vuex.Store<State>({
   state: {
     styles: {},
     options: null,
+    commands: defaultCommands,
   },
 
   actions: {
@@ -34,6 +46,11 @@ export default new Vuex.Store<State>({
     async getAllOptions({ state }) {
       const options = await getAllOptions();
       state.options = options;
+    },
+
+    async getCommands({ state }) {
+      const commands = await getCommands();
+      state.commands = commands;
     },
 
     setAllStyles(
@@ -138,6 +155,11 @@ export default new Vuex.Store<State>({
       /* @ts-ignore */
       state.options[name] = value;
       setOption(name, value);
+    },
+
+    setCommands({ state }, commands: StylebotCommands) {
+      state.commands = commands;
+      setCommands(commands);
     },
   },
 });

@@ -20,15 +20,18 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import TheReaderHeader from './TheReaderHeader.vue';
 
+import { defaultReadabilitySettings } from '@stylebot/settings';
 import { addGoogleWebFont, injectCSSIntoDocument } from '@stylebot/css';
+
 import {
   GetReadabilitySettings,
   GetReadabilitySettingsResponse,
   UpdateReader,
   ReadabilityTheme,
 } from '@stylebot/types';
+
+import TheReaderHeader from './TheReaderHeader.vue';
 
 export default Vue.extend({
   name: 'TheReader',
@@ -61,13 +64,7 @@ export default Vue.extend({
     lineHeight: number;
     theme: ReadabilityTheme;
   } {
-    return {
-      size: 16,
-      font: '',
-      width: 36,
-      theme: 'light',
-      lineHeight: 1.6,
-    };
+    return defaultReadabilitySettings;
   },
 
   async mounted(): Promise<void> {

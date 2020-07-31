@@ -1,6 +1,8 @@
+import { defaultOptions } from '@stylebot/settings';
+import { Style, StyleMap, StylebotOptions } from '@stylebot/types';
+
 /* @ts-ignore */
 import LegacyCssFormatter from './legacy-css-formatter';
-import { Style, StyleMap, StylebotOptions } from '@stylebot/types';
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 const isNewFormat = (styles: any) => {
@@ -85,7 +87,7 @@ export const getMigratedOptions = (): Promise<StylebotOptions> => {
       const options = items['options'];
 
       if (!options || !['basic', 'magic', 'code'].includes(options.mode)) {
-        resolve({ mode: 'basic', contextMenu: true });
+        resolve(defaultOptions);
       } else {
         resolve(options);
       }

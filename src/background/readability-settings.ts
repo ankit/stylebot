@@ -1,3 +1,4 @@
+import { defaultReadabilitySettings } from '@stylebot/settings';
 import { ReadabilitySettings, UpdateReader } from '@stylebot/types';
 
 export const get = (): Promise<ReadabilitySettings> => {
@@ -10,13 +11,7 @@ export const get = (): Promise<ReadabilitySettings> => {
         return;
       }
 
-      resolve({
-        size: 16,
-        width: 36,
-        lineHeight: 1.6,
-        theme: 'light',
-        font: 'Helvetica',
-      });
+      resolve(defaultReadabilitySettings);
     });
   });
 };

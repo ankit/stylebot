@@ -11,6 +11,7 @@ import {
   FormCheckboxPlugin,
   ModalPlugin,
   FormTextareaPlugin,
+  FormGroupPlugin,
 } from 'bootstrap-vue';
 
 Vue.use(IconsPlugin);
@@ -22,6 +23,7 @@ Vue.use(FormCheckboxPlugin);
 Vue.use(ListGroupPlugin);
 Vue.use(ModalPlugin);
 Vue.use(FormTextareaPlugin);
+Vue.use(FormGroupPlugin);
 
 import App from './App.vue';
 

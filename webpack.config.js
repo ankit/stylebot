@@ -53,14 +53,18 @@ const config = {
       '@stylebot/css': path.resolve(__dirname, './src/css/index'),
       '@stylebot/types': path.resolve(__dirname, './src/types/index'),
       '@stylebot/dark-mode': path.resolve(__dirname, './src/dark-mode/index'),
+      '@stylebot/settings': path.resolve(__dirname, './src/settings/index'),
+
       '@stylebot/readability': path.resolve(
         __dirname,
         './src/readability/index'
       ),
+
       '@stylebot/highlighter': path.resolve(
         __dirname,
         './src/highlighter/index'
       ),
+
       '@stylebot/monaco-editor': path.resolve(
         __dirname,
         './src/monaco-editor/index'
