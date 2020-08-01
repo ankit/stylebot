@@ -64,6 +64,7 @@ export default Vue.extend({
   position: fixed;
   padding: 0;
   background: #fff;
+  line-height: 20px;
   width: 320px;
   z-index: 100000000;
   border: 1px solid #ccc;
