@@ -96,9 +96,9 @@ export default Vue.extend({
 }
 
 .color-picker {
-  top: 28px;
+  top: 30px;
+  left: -45px;
   z-index: 10;
-  right: -8px;
   position: absolute;
 }
 </style>
