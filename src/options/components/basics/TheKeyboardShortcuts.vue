@@ -4,13 +4,12 @@
 
     <b-row align-v="center" class="mb-4">
       <b-col cols="12" class="help">
-        combine
         <kbd>shift</kbd>
         <kbd>option</kbd>
         <kbd>alt</kbd>
         <kbd>ctrl</kbd>
         <kbd>command</kbd>
-        with
+        +
         <kbd>a-z</kbd>
       </b-col>
     </b-row>
