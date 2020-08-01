@@ -53,6 +53,11 @@ fetch(cssUrl, { method: 'GET' })
     shadowRoot.appendChild(styleEl);
   });
 
+const fontFaceStyle = document.createElement('style');
+fontFaceStyle.setAttribute('id', 'stylebot-font');
+fontFaceStyle.innerHTML = `@import url(https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap);`;
+document.documentElement.appendChild(fontFaceStyle);
+
 new Vue({
   store,
   el: stylebotApp,
