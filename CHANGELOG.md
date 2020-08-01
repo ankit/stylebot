@@ -1,3 +1,9 @@
+## Version 3.0.2
+
+- Reduce stylebot editor width; improve font display
+- Fix global keyboard shortcuts to prevent conflict when entering text in input fields
+- Prevent conflict with underlying page due to injected div
+
 ## Version 3.0.1
 
 - Only inject stylebot editor in the topmost frame. fixes #562 #561
