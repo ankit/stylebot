@@ -55,7 +55,7 @@ fetch(cssUrl, { method: 'GET' })
 
 const fontFaceStyle = document.createElement('style');
 fontFaceStyle.setAttribute('id', 'stylebot-font');
-fontFaceStyle.innerHTML = `@import url(https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap);`;
+fontFaceStyle.innerHTML = `@import url(https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap);`;
 document.documentElement.appendChild(fontFaceStyle);
 
 new Vue({
