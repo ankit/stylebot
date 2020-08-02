@@ -11,10 +11,10 @@ export const defaultOptions: StylebotOptions = {
 };
 
 export const defaultCommands: StylebotCommands = {
-  style: 'alt+shift+s',
+  style: 'alt+shift+t',
   stylebot: 'alt+shift+m',
-  grayscale: 'alt+shift+g',
-  readability: 'alt+shift+r',
+  grayscale: '',
+  readability: '',
 };
 
 export const defaultEditorCommands: StylebotEditorCommands = {
