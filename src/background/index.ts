@@ -4,11 +4,11 @@ import Cache from './cache';
 import Listeners from './listeners';
 import ContextMenu from './contextmenu';
 import MigrateOldFormat from './migrate';
-import VersionBasedUpdate from './version-based-update';
+import DefaultShortcutUpdate from './default-shortcut-update';
 
 (async () => {
   await MigrateOldFormat();
-  await VersionBasedUpdate();
+  await DefaultShortcutUpdate();
 
   const { styles, options } = await Cache.init();
 
