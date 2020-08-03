@@ -187,9 +187,11 @@ class BackgroundPageStyles {
   getImportCss(url: string): Promise<string> {
     return new Promise(resolve => {
       const xhr = new XMLHttpRequest();
+      const urlObj = new URL(url);
+
       // append current time to circumvent cache
-      const dateTime = new Date().getTime();
-      xhr.open('GET', `${url}?_=${dateTime}`, true);
+      urlObj.searchParams.append('_', new Date().getTime().toString());
+      xhr.open('GET', urlObj.toString(), true);
 
       xhr.onreadystatechange = () => {
         if (xhr.readyState == 4) {
