@@ -12,11 +12,7 @@
 
   "content_scripts": [
     {
-      "js": [
-        "editor/index.js",
-        "monaco-editor/iframe/node_modules/requirejs/require.js",
-        "monaco-editor/iframe/node_modules/monaco-editor/min/vs/loader.js"
-      ],
+      "js": ["editor/index.js"],
       "matches": ["<all_urls>"],
       "exclude_matches": ["*://*/*.xml"],
       "run_at": "document_idle"
