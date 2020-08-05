@@ -1,6 +1,7 @@
 /* Include typography overrides here */
 * {
-  font-family: Inter, 'Helvetica Neue', sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    Ubuntu, 'Helvetica Neue', sans-serif;
   font-weight: 400;
 }
 
@@ -10,5 +11,5 @@ h1 {
 
 .lead {
   font-size: 12px;
-  line-height: 21px;
+  line-height: 18px;
 }

@@ -43,6 +43,10 @@ export default Vue.extend({
       return this.$store.state.options.mode;
     },
 
+    activeSelector(): string {
+      return this.$store.state.activeSelector;
+    },
+
     disabled(): boolean {
       return this.mode !== 'basic';
     },
@@ -67,7 +71,7 @@ export default Vue.extend({
   created() {
     this.highlighter = new Highlighter({ onSelect: this.select });
 
-    if (this.$store.state.options.mode === 'basic') {
+    if (this.mode === 'basic' && !this.activeSelector) {
       this.$store.commit('setInspecting', true);
     }
   },

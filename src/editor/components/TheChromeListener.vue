@@ -44,11 +44,11 @@ export default Vue.extend({
             this.toggleStylebot();
           }
         } else if (message.name === 'OpenStylebotFromContextMenu') {
+          this.updateSelectorWithContextMenuSelector();
+
           if (!this.visible) {
             this.toggleStylebot();
           }
-
-          this.updateSelectorWithContextMenuSelector();
         } else if (message.name === 'EnableStyleForTab') {
           this.enableStyle(message.css, message.url);
         } else if (message.name === 'DisableStyleForTab') {

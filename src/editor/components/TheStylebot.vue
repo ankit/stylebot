@@ -20,13 +20,15 @@ import Vue from 'vue';
 import TheHeader from './TheHeader.vue';
 import TheFooter from './TheFooter.vue';
 
+import TheCodeEditor from './TheCodeEditor.vue';
 import TheBasicEditor from './TheBasicEditor.vue';
 import TheMagicEditor from './TheMagicEditor.vue';
-import TheCodeEditor from './TheCodeEditor.vue';
 
 import TheHelpDialog from './shortcuts/TheHelpDialog.vue';
 
 import { StylebotPlacement, StylebotEditingMode } from '@stylebot/types';
+
+import injectEditorCss from '../utils/inject-editor-css';
 
 export default Vue.extend({
   name: 'TheStylebot',
@@ -38,6 +40,12 @@ export default Vue.extend({
     TheMagicEditor,
     TheCodeEditor,
     TheHelpDialog,
+  },
+
+  data(): { loaded: boolean } {
+    return {
+      loaded: false,
+    };
   },
 
   computed: {
@@ -52,6 +60,10 @@ export default Vue.extend({
     help(): boolean {
       return this.$store.state.help;
     },
+  },
+
+  beforeMount(): void {
+    injectEditorCss();
   },
 });
 </script>

@@ -44,20 +44,6 @@ const stylebotApp = document.createElement('div');
 stylebotApp.id = 'stylebot-app';
 shadowRoot.appendChild(stylebotApp);
 
-const cssUrl = chrome.extension.getURL('editor/index.css');
-fetch(cssUrl, { method: 'GET' })
-  .then(response => response.text())
-  .then(css => {
-    const styleEl = document.createElement('style');
-    styleEl.innerHTML = css;
-    shadowRoot.appendChild(styleEl);
-  });
-
-const fontFaceStyle = document.createElement('style');
-fontFaceStyle.setAttribute('id', 'stylebot-font');
-fontFaceStyle.innerHTML = `@import url(https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap);`;
-document.documentElement.appendChild(fontFaceStyle);
-
 new Vue({
   store,
   el: stylebotApp,
