@@ -1,5 +1,5 @@
 import BackgroundPageUtils from './utils';
-import { OpenStylebot } from '@stylebot/types';
+import { OpenStylebotFromContextMenu } from '@stylebot/types';
 
 const CONTEXT_MENU_ID = 'stylebot-contextmenu';
 
@@ -11,8 +11,8 @@ const StyleElementContextMenu = () => {
 
     onclick: (_info: chrome.contextMenus.OnClickData, tab: chrome.tabs.Tab) => {
       if (tab.id) {
-        const message: OpenStylebot = {
-          name: 'OpenStylebot',
+        const message: OpenStylebotFromContextMenu = {
+          name: 'OpenStylebotFromContextMenu',
         };
 
         chrome.tabs.sendMessage(tab.id, message);

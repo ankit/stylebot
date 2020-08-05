@@ -43,6 +43,12 @@ export default Vue.extend({
           if (!this.visible) {
             this.toggleStylebot();
           }
+        } else if (message.name === 'OpenStylebotFromContextMenu') {
+          if (!this.visible) {
+            this.toggleStylebot();
+          }
+
+          this.updateSelectorWithContextMenuSelector();
         } else if (message.name === 'EnableStyleForTab') {
           this.enableStyle(message.css, message.url);
         } else if (message.name === 'DisableStyleForTab') {
@@ -67,6 +73,13 @@ export default Vue.extend({
       } else {
         this.$store.dispatch('openStylebot');
       }
+    },
+
+    updateSelectorWithContextMenuSelector() {
+      this.$store.commit(
+        'setActiveSelector',
+        this.$store.state.contextMenuSelector
+      );
     },
 
     enableStyle(css: string, url: string) {

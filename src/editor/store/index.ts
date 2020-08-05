@@ -34,6 +34,7 @@ export type State = {
   readability: boolean;
 
   activeSelector: string;
+  contextMenuSelector: string;
   selectors: Array<CssSelectorMetadata>;
 
   help: boolean;
@@ -56,6 +57,7 @@ export default new Vuex.Store<State>({
 
     selectors: [],
     activeSelector: '',
+    contextMenuSelector: '',
 
     help: false,
     visible: false,

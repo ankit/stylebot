@@ -8,6 +8,10 @@ export type OpenStylebot = {
   name: 'OpenStylebot';
 };
 
+export type OpenStylebotFromContextMenu = {
+  name: 'OpenStylebotFromContextMenu';
+};
+
 export type EnableStyleForTab = {
   name: 'EnableStyleForTab';
   css: string;
@@ -39,6 +43,7 @@ export type UpdateReader = {
 type TabMessage =
   | ToggleStylebot
   | OpenStylebot
+  | OpenStylebotFromContextMenu
   | EnableStyleForTab
   | DisableStyleForTab
   | ToggleReadabilityForTab

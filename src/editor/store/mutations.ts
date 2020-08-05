@@ -85,4 +85,8 @@ export default {
   setCommands(state: State, value: StylebotCommands): void {
     state.commands = value;
   },
+
+  setContextMenuSelector(state: State, value: string): void {
+    state.contextMenuSelector = value;
+  },
 };

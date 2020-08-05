@@ -12,8 +12,9 @@ const mockState: State = {
   enabled: true,
   url: document.domain,
 
-  activeSelector: '',
   selectors: [],
+  activeSelector: '',
+  contextMenuSelector: '',
 
   visible: false,
   position: 'right',
