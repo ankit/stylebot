@@ -42,12 +42,6 @@ export default Vue.extend({
     TheHelpDialog,
   },
 
-  data(): { loaded: boolean } {
-    return {
-      loaded: false,
-    };
-  },
-
   computed: {
     mode(): StylebotEditingMode {
       return this.$store.state.options.mode;
