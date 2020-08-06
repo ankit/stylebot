@@ -1,7 +1,7 @@
 /**
  * Hide document content until reader is ready
  * todo: optimize performance and UX when loading stylebot reader
- * currently, sometimes the page flashes for the reader content is loaded.
+ * currently, sometimes the page flashes before the reader content is loaded.
  * or a white screen appears for a prolonged period, especially for slower websites.
  */
 export const showLoader = (): void => {

@@ -6,8 +6,6 @@
 import Vue from 'vue';
 import TheReader from './components/TheReader.vue';
 
-import { hideLoader } from './loader';
-
 export default Vue.extend({
   name: 'App',
 
@@ -30,10 +28,6 @@ export default Vue.extend({
       type: Object,
       required: true,
     },
-  },
-
-  mounted(): void {
-    hideLoader();
   },
 });
 </script>

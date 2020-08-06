@@ -24,6 +24,8 @@ import Vue from 'vue';
 import { defaultReadabilitySettings } from '@stylebot/settings';
 import { addGoogleWebFont, injectCSSIntoDocument } from '@stylebot/css';
 
+import { hideLoader } from '../loader';
+
 import {
   GetReadabilitySettings,
   GetReadabilitySettingsResponse,
@@ -76,6 +78,8 @@ export default Vue.extend({
     this.theme = settings.theme;
     this.width = settings.width;
     this.lineHeight = settings.lineHeight;
+
+    hideLoader();
 
     chrome.runtime.onMessage.addListener((message: UpdateReader) => {
       if (message.name === 'UpdateReader') {
