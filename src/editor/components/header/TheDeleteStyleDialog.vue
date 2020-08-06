@@ -10,10 +10,12 @@
 
       <div class="delete-style-dialog-footer">
         <b-btn variant="outline-secondary" class="mr-2" @click="$emit('close')">
-          Cancel
+          {{ t('cancel') }}
         </b-btn>
 
-        <b-btn variant="outline-danger" @click="deleteStyle">Delete</b-btn>
+        <b-btn variant="outline-danger" @click="deleteStyle">
+          {{ t('delete') }}
+        </b-btn>
       </div>
     </div>
   </div>

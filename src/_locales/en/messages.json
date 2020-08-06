@@ -68,13 +68,13 @@
   "none": {
     "message": "None"
   },
-  "magic_description": {
+  "magic_mode_description": {
     "message": "Experimental features. May not work as expected on all pages."
   },
   "enable_readability": {
     "message": "Enable Readability"
   },
-  "enable_readability_description": {
+  "readability_description": {
     "message": "Make articles on this site readable by hiding non-essential page elements like sidebars, footers and ads."
   },
   "theme": {
@@ -88,6 +88,12 @@
   },
   "sepia_theme": {
     "message": "Sepia"
+  },
+  "decrease_width": {
+    "message": "Decrease Width"
+  },
+  "increase_width": {
+    "message": "Increase Width"
   },
   "grayscale": {
     "message": "Grayscale"
@@ -104,8 +110,11 @@
   "delete_style": {
     "message": "Delete style..."
   },
-  "delete_style_confirmation_description": {
-    "message": "This will permanently delete your css"
+  "delete": {
+    "message": "Delete"
+  },
+  "cancel": {
+    "message": "Cancel"
   },
   "view_options": {
     "message": "View options..."
@@ -121,5 +130,53 @@
   },
   "close": {
     "message": "Close"
+  },
+  "keyboard_shortcuts": {
+    "message": "Keyboard shortcuts"
+  },
+  "customize": {
+    "message": "Customize"
+  },
+  "editor": {
+    "message": "Editor"
+  },
+  "global": {
+    "message": "Global"
+  },
+  "toggle_editor": {
+    "message": "Toggle editor"
+  },
+  "toggle_styling": {
+    "message": "Toggle styling"
+  },
+  "toggle_readability": {
+    "message": "Toggle readability"
+  },
+  "toggle_grayscale": {
+    "message": "Toggle grayscale"
+  },
+  "toggle_inspector": {
+    "message": "Toggle element inspection"
+  },
+  "move_editor": {
+    "message": "Move editor"
+  },
+  "set_basic_mode": {
+    "message": "Switch to basic editor"
+  },
+  "set_magic_mode": {
+    "message": "Switch to magic editor"
+  },
+  "set_code_mode": {
+    "message": "Switch to code editor"
+  },
+  "show_help": {
+    "message": "Show help"
+  },
+  "hide_element": {
+    "message": "Apply CSS to show/hide selected elements"
+  },
+  "styling": {
+    "message": "Styling"
   }
 }

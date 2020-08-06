@@ -1,7 +1,7 @@
 <template>
   <div>
     <p class="lead text-muted px-3 pt-3">
-      Experimental features. May not work as expected on all pages.
+      {{ t('magic_mode_description') }}
     </p>
 
     <div class="mt-4 px-3 magic-section">
@@ -9,7 +9,7 @@
     </div>
 
     <div class="mt-5 px-3 pt-4 magic-section">
-      <h1 class="magic-title">Grayscale</h1>
+      <h1 class="magic-title">{{ t('grayscale') }}</h1>
       <the-grayscale />
     </div>
   </div>

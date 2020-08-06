@@ -1,6 +1,6 @@
 <template>
   <b-dropdown-item :disabled="disabled" @click="$emit('click')">
-    Delete style...
+    {{ t('delete_style') }}
   </b-dropdown-item>
 </template>
 

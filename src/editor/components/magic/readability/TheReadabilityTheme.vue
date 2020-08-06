@@ -6,7 +6,7 @@
       :disabled="disabled"
       @click="set('light')"
     >
-      Light
+      {{ t('light_theme') }}
     </b-button>
 
     <b-button
@@ -15,7 +15,7 @@
       :disabled="disabled"
       @click="set('dark')"
     >
-      Dark
+      {{ t('dark_theme') }}
     </b-button>
 
     <b-button
@@ -24,7 +24,7 @@
       :disabled="disabled"
       @click="set('sepia')"
     >
-      Sepia
+      {{ t('sepia_theme') }}
     </b-button>
   </b-button-group>
 </template>
