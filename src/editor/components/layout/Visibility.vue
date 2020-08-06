@@ -1,6 +1,6 @@
 <template>
   <b-row align-content="center" no-gutters>
-    <css-property>Visibility</css-property>
+    <css-property>{{ t('visibility') }}</css-property>
 
     <css-property-value>
       <b-button

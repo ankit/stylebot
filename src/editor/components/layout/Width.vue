@@ -1,7 +1,7 @@
 <template>
   <b-row align-content="center" no-gutters>
     <css-property>
-      Width
+      {{ t('width') }}
     </css-property>
 
     <css-property-value>

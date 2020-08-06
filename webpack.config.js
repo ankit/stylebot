@@ -51,6 +51,7 @@ const config = {
     extensions: ['.ts', '.js', '.vue'],
     alias: {
       '@stylebot/css': path.resolve(__dirname, './src/css/index'),
+      '@stylebot/i18n': path.resolve(__dirname, './src/i18n/index'),
       '@stylebot/types': path.resolve(__dirname, './src/types/index'),
       '@stylebot/dark-mode': path.resolve(__dirname, './src/dark-mode/index'),
       '@stylebot/settings': path.resolve(__dirname, './src/settings/index'),
@@ -136,6 +137,10 @@ const config = {
         {
           from: 'extension/img',
           to: 'img',
+        },
+        {
+          from: '_locales',
+          to: '_locales',
         },
         {
           from: 'options/index.html',

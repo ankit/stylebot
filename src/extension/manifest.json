@@ -2,7 +2,9 @@
   "manifest_version": 2,
   "name": "Stylebot",
   "version": "3.0.3",
-  "description": "Change the appearance of the web instantly",
+  "author": "Ankit Ahuja",
+  "description": "__MSG_extension_description__",
+  "default_locale": "en",
 
   "background": {
     "scripts": ["background/index.js"]

@@ -1,7 +1,7 @@
 <template>
   <b-row align-content="center" no-gutters>
     <css-property>
-      Height
+      {{ t('height') }}
     </css-property>
 
     <css-property-value>

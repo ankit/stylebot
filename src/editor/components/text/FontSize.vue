@@ -1,6 +1,6 @@
 <template>
   <b-row align-content="center" no-gutters>
-    <css-property>Size</css-property>
+    <css-property>{{ t('font_size') }}</css-property>
 
     <css-property-value>
       <Length property="font-size" :sizes="sizes" />

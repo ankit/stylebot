@@ -1,4 +1,6 @@
 import Vue from 'vue';
+import { t } from '@stylebot/i18n';
+
 import store from './store/index';
 import TheStylebotApp from './components/TheStylebotApp.vue';
 
@@ -33,6 +35,12 @@ Vue.use(FormGroupPlugin);
 Vue.use(FormCheckboxPlugin);
 Vue.use(ListGroupPlugin);
 Vue.use(TableSimplePlugin);
+
+Vue.mixin({
+  methods: {
+    t,
+  },
+});
 
 const stylebotAppHost = document.createElement('div');
 stylebotAppHost.id = 'stylebot';
