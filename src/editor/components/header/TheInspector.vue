@@ -71,8 +71,8 @@ export default Vue.extend({
   created() {
     this.highlighter = new Highlighter({ onSelect: this.select });
 
-    if (this.mode === 'basic' && !this.activeSelector) {
-      this.$store.commit('setInspecting', true);
+    if (this.active) {
+      this.highlighter?.startInspecting();
     }
   },
 

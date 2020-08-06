@@ -1,5 +1,7 @@
 import * as postcss from 'postcss';
-import { Commit, Dispatch } from 'vuex';
+import { Commit, Dispatch, Store } from 'vuex';
+
+import { State } from './';
 
 import {
   addDeclaration,
@@ -32,10 +34,14 @@ import {
   setReadabilitySettings,
 } from '../utils/chrome';
 
-import { State } from './';
+import { initListeners } from '../listeners';
+import { initEditor } from '../utils/init-editor';
 
 export default {
-  async initialize({ commit }: { commit: Commit }): Promise<void> {
+  async initialize(
+    { commit }: { commit: Commit },
+    store: Store<State>
+  ): Promise<void> {
     const { defaultStyle } = await getStylesForPage(false);
 
     if (defaultStyle) {
@@ -58,13 +64,24 @@ export default {
 
     const readabilitySettings = await getReadabilitySettings();
     commit('setReadabilitySettings', readabilitySettings);
+
+    initListeners(store);
   },
 
-  openStylebot({ state, commit }: { state: State; commit: Commit }): void {
-    commit('setVisible', true);
+  openStylebot(
+    { state, commit }: { state: State; commit: Commit },
+    { inspect = false, store }: { inspect: boolean; store: Store<State> }
+  ): void {
+    initEditor(store);
 
     if (!state.enabled) {
       enableStyle(state.url);
+    }
+
+    commit('setVisible', true);
+
+    if (state.options.mode === 'basic' && inspect) {
+      commit('setInspecting', true);
     }
   },
 

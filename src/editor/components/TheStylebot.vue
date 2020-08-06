@@ -28,8 +28,6 @@ import TheHelpDialog from './shortcuts/TheHelpDialog.vue';
 
 import { StylebotPlacement, StylebotEditingMode } from '@stylebot/types';
 
-import injectEditorCss from '../utils/inject-editor-css';
-
 export default Vue.extend({
   name: 'TheStylebot',
 
@@ -54,10 +52,6 @@ export default Vue.extend({
     help(): boolean {
       return this.$store.state.help;
     },
-  },
-
-  beforeMount(): void {
-    injectEditorCss();
   },
 });
 </script>
