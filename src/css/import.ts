@@ -10,7 +10,9 @@ export const getCssWithExpandedImports = (css: string): Promise<string> => {
 
     root.walkAtRules('import', (atRule: postcss.AtRule) => {
       const regex = /^(url\()?([^\)]*)(\))?$/;
-      const paramsWithoutQuotes = atRule.params.replace(/"/g, '');
+      const paramsWithoutQuotes = atRule.params
+        .replace(/"/g, '')
+        .replace(/\'/g, '');
       const matches = paramsWithoutQuotes.match(regex);
 
       if (matches) {

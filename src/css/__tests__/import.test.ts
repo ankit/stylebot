@@ -67,6 +67,50 @@ describe('import', () => {
       `);
     });
 
+    it('correctly parses @import url("<url>")', async () => {
+      const css = dedent`
+        @import url("https://fonts.googleapis.com/css?family=Lato");
+
+        a {
+          color: red;
+          font-family: Lato;
+        }
+      `;
+
+      const output = await getCssWithExpandedImports(css);
+
+      expect(output).toBe(dedent`
+        ${mockFontCss}
+
+        a {
+          color: red;
+          font-family: Lato;
+        }
+      `);
+    });
+
+    it("correctly parses @import url('<url>')", async () => {
+      const css = dedent`
+        @import url('https://fonts.googleapis.com/css?family=Lato');
+
+        a {
+          color: red;
+          font-family: Lato;
+        }
+      `;
+
+      const output = await getCssWithExpandedImports(css);
+
+      expect(output).toBe(dedent`
+        ${mockFontCss}
+
+        a {
+          color: red;
+          font-family: Lato;
+        }
+      `);
+    });
+
     it('correctly parses @import "<url>"', async () => {
       const css = dedent`
       @import "https://fonts.googleapis.com/css?family=Lato)";
