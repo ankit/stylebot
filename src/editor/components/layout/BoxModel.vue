@@ -123,10 +123,12 @@ export default Vue.extend({
     input() {
       this.highlighter.unhighlight();
 
-      this.highlighter.highlight(
-        this.activeSelector,
-        this.highlightedTargets[this.highlightedTargets.length - 1]
-      );
+      if (this.highlightedTargets.length > 0) {
+        this.highlighter.highlight(
+          this.activeSelector,
+          this.highlightedTargets[this.highlightedTargets.length - 1]
+        );
+      }
     },
 
     highlight(target: HighlightTarget) {

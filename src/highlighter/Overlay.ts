@@ -73,17 +73,9 @@ class OverlayRect {
   }
 
   update(box: Rect, dims: Dimensions, property?: LayoutProperty) {
-    if (!property || property === 'margin') {
-      boxWrap(dims, 'margin', this.node);
-    }
-
-    if (!property || property === 'border') {
-      boxWrap(dims, 'border', this.border);
-    }
-
-    if (!property || property === 'padding') {
-      boxWrap(dims, 'padding', this.padding);
-    }
+    boxWrap(dims, 'margin', this.node);
+    boxWrap(dims, 'border', this.border);
+    boxWrap(dims, 'padding', this.padding);
 
     Object.assign(this.content.style, {
       height:
@@ -102,8 +94,22 @@ class OverlayRect {
         'px',
     });
 
-    if (property && property !== 'height' && property !== 'width') {
-      this.content.style.backgroundColor = 'transparent';
+    if (property) {
+      if (property !== 'height' && property !== 'width') {
+        this.content.style.backgroundColor = 'transparent';
+      }
+
+      if (property !== 'margin') {
+        this.node.style.borderColor = 'transparent';
+      }
+
+      if (property !== 'padding') {
+        this.padding.style.borderColor = 'transparent';
+      }
+
+      if (property !== 'border') {
+        this.border.style.borderColor = 'transparent';
+      }
     }
 
     Object.assign(this.node.style, {
