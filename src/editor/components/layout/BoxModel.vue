@@ -235,9 +235,13 @@ export default Vue.extend({
   margin-top: 3px;
 }
 
+.box-element-height {
+  margin-left: 1px;
+}
+
 .box-element-x {
   color: #333;
   font-size: 12px;
-  padding: 2px 1px;
+  padding: 2px 3px;
 }
 </style>
