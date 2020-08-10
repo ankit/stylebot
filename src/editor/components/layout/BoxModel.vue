@@ -2,8 +2,8 @@
   <b-row align-content="center" no-gutters>
     <box
       property="margin"
-      label="Margin"
       class="box-margin"
+      :label="t('margin')"
       :class="{
         highlighted: shouldHighlight('margin', [
           'border',
@@ -19,8 +19,8 @@
     >
       <box
         property="border"
-        label="Border"
         class="box-border"
+        :label="t('border')"
         :class="{
           highlighted: shouldHighlight('border', ['padding', 'element']),
           disabled,
@@ -32,8 +32,8 @@
       >
         <box
           property="padding"
-          label="Padding"
           class="box-padding"
+          :label="t('padding')"
           :class="{
             highlighted: shouldHighlight('padding', ['element']),
             disabled,
