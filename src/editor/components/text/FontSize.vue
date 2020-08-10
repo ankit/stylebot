@@ -3,7 +3,7 @@
     <css-property>{{ t('font_size') }}</css-property>
 
     <css-property-value>
-      <Length property="font-size" :sizes="sizes" />
+      <length property="font-size" :sizes="sizes" />
     </css-property-value>
   </b-row>
 </template>
