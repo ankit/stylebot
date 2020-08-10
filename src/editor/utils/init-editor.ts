@@ -21,6 +21,7 @@ import {
   FormCheckboxPlugin,
   ListGroupPlugin,
   TableSimplePlugin,
+  CollapsePlugin,
 } from 'bootstrap-vue';
 
 Vue.use(IconsPlugin);
@@ -36,6 +37,7 @@ Vue.use(FormGroupPlugin);
 Vue.use(FormCheckboxPlugin);
 Vue.use(ListGroupPlugin);
 Vue.use(TableSimplePlugin);
+Vue.use(CollapsePlugin);
 
 Vue.mixin({
   methods: {

@@ -28,10 +28,12 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import { StylebotEditingMode } from '@stylebot/types';
 
 import TheCssSelectorInput from './TheCssSelectorInput.vue';
 import TheCssSelectorDropdownItem from './TheCssSelectorDropdownItem.vue';
 import DropdownHackToSupportShadowDom from './../DropdownHackToSupportShadowDom.vue';
+
 
 export default Vue.extend({
   name: 'TheCssSelectorDropdown',
@@ -43,12 +45,16 @@ export default Vue.extend({
   },
 
   computed: {
+    mode(): StylebotEditingMode {
+      return this.$store.state.options.mode;
+    },
+
     selectors(): Array<{ value: string; count: number }> {
       return this.$store.state.selectors;
     },
 
     disabled(): boolean {
-      return this.$store.state.options.mode !== 'basic';
+      return this.mode !== 'basic' && this.mode !== 'code';
     },
   },
 

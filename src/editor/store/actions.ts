@@ -110,7 +110,7 @@ export default {
 
       setStyle(state.url, css, state.readability);
     } catch (e) {
-      console.log(`stylebot exception while parsing css: ${e}`);
+      //
     }
   },
 
