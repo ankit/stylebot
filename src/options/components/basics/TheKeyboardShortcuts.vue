@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2>Keyboard Shortcuts</h2>
+    <h2>{{ t('keyboard_shortcuts') }}</h2>
 
     <b-row align-v="center" class="mb-4">
       <b-col cols="12" class="help">
@@ -16,25 +16,25 @@
 
     <shortcut
       id="stylebot"
-      label="Toggle Stylebot Editor"
+      :label="t('toggle_editor')"
       @input="input('stylebot', $event)"
     />
 
     <shortcut
       id="style"
-      label="Toggle Styling"
+      :label="t('toggle_styling')"
       @input="input('style', $event)"
     />
 
     <shortcut
       id="readability"
-      label="Toggle Readability"
+      :label="t('toggle_readability')"
       @input="input('readability', $event)"
     />
 
     <shortcut
       id="grayscale"
-      label="Toggle Grayscale"
+      :label="t('toggle_grayscale')"
       @input="input('grayscale', $event)"
     />
   </div>

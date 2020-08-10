@@ -26,7 +26,7 @@
           variant="outline-primary"
           @click="edit = true"
         >
-          Edit...
+          {{ t('open_edit_style_dialog') }}
         </app-button>
 
         <style-delete-button :url="url" @click="$emit('delete')" />

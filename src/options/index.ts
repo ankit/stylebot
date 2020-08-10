@@ -1,4 +1,7 @@
 import Vue from 'vue';
+import { t } from '@stylebot/i18n';
+
+import App from './App.vue';
 import store from './store/index';
 
 import {
@@ -25,7 +28,11 @@ Vue.use(ModalPlugin);
 Vue.use(FormTextareaPlugin);
 Vue.use(FormGroupPlugin);
 
-import App from './App.vue';
+Vue.mixin({
+  methods: {
+    t,
+  },
+});
 
 new Vue({
   store,

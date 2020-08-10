@@ -1,9 +1,9 @@
 <template>
   <div>
-    <h2>Context Menu</h2>
+    <h2>{{ t('context_menu') }}</h2>
 
     <b-form-checkbox v-model="contextMenu" switch>
-      Enable Right Click Context Menu
+      {{ t('enable_right_click_menu') }}
     </b-form-checkbox>
   </div>
 </template>

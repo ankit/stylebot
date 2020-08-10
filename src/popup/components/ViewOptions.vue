@@ -1,7 +1,7 @@
 <template>
   <b-list-group-item button @click="open">
     <b-icon icon="gear" />
-    <span class="pl-2">Options...</span>
+    <span class="pl-2">{{ t('view_options') }}</span>
   </b-list-group-item>
 </template>
 

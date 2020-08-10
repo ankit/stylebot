@@ -2,8 +2,8 @@
   <b-list-group-item button class="open-stylebot" @click="toggle">
     <inspector-icon />
 
-    <span v-if="isOpen" class="pl-2">Close Stylebot</span>
-    <span v-else class="pl-2">Open Stylebot</span>
+    <span v-if="isOpen" class="pl-2">{{ t('close_stylebot') }}</span>
+    <span v-else class="pl-2">{{ t('open_stylebot') }}</span>
   </b-list-group-item>
 </template>
 
