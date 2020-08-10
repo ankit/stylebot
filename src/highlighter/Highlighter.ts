@@ -1,6 +1,8 @@
 import Overlay from './Overlay';
 import { getSelector } from '@stylebot/css';
 
+type LayoutProperty = 'margin' | 'border' | 'padding' | 'height' | 'width';
+
 class Highlighter {
   overlay: Overlay | null;
   onSelect: (selector: string) => void;
@@ -19,7 +21,7 @@ class Highlighter {
     this.removeWindowListeners();
   };
 
-  highlight = (selector: string): void => {
+  highlight = (selector: string, property?: LayoutProperty): void => {
     if (!selector) {
       return;
     }
@@ -32,12 +34,7 @@ class Highlighter {
       document.querySelectorAll(selector)
     );
 
-    // todo: until we can performantly support highlighting a large number of elements
-    if (elements.length > 100) {
-      return;
-    }
-
-    this.overlay.inspect(elements, selector);
+    this.overlay.inspect(elements, selector, property);
   };
 
   unhighlight = (): void => {

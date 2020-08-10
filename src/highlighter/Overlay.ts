@@ -24,6 +24,8 @@ type Box = {
   height: number;
 };
 
+type LayoutProperty = 'margin' | 'border' | 'padding' | 'height' | 'width';
+
 // https://dev.to/kingdaro/indexing-objects-in-typescript-1cgi
 function hasKey<O>(obj: O, key: string | number | symbol): key is keyof O {
   return key in obj;
@@ -70,10 +72,18 @@ class OverlayRect {
     }
   }
 
-  update(box: Rect, dims: Dimensions) {
-    boxWrap(dims, 'margin', this.node);
-    boxWrap(dims, 'border', this.border);
-    boxWrap(dims, 'padding', this.padding);
+  update(box: Rect, dims: Dimensions, property?: LayoutProperty) {
+    if (!property || property === 'margin') {
+      boxWrap(dims, 'margin', this.node);
+    }
+
+    if (!property || property === 'border') {
+      boxWrap(dims, 'border', this.border);
+    }
+
+    if (!property || property === 'padding') {
+      boxWrap(dims, 'padding', this.padding);
+    }
 
     Object.assign(this.content.style, {
       height:
@@ -91,6 +101,10 @@ class OverlayRect {
         dims.paddingRight +
         'px',
     });
+
+    if (property && property !== 'height' && property !== 'width') {
+      this.content.style.backgroundColor = 'transparent';
+    }
 
     Object.assign(this.node.style, {
       top: box.top - dims.marginTop + 'px',
@@ -195,10 +209,19 @@ export default class Overlay {
     }
   }
 
-  inspect(nodes: Array<HTMLElement>, cssSelector: string): void {
-    // We can't get the size of text nodes or comment nodes. React as of v15
-    // heavily uses comment nodes to delimit text.
-    const elements = nodes.filter(node => node.nodeType === Node.ELEMENT_NODE);
+  inspect(
+    nodes: Array<HTMLElement>,
+    cssSelector: string,
+    property?: LayoutProperty
+  ): void {
+    // We can't get the size of text nodes or comment nodes.
+    // todo: until we can performantly support displaying an overlay
+    // for a large number of elements, set an upper bound
+    const maxElements = 100;
+
+    const elements = nodes
+      .filter(node => node.nodeType === Node.ELEMENT_NODE)
+      .slice(0, maxElements);
 
     while (this.rects.length > elements.length) {
       const rect = this.rects.pop();
@@ -236,34 +259,36 @@ export default class Overlay {
       outerBox.left = Math.min(outerBox.left, box.left - dims.marginLeft);
 
       const rect = this.rects[index];
-      rect.update(box, dims);
+      rect.update(box, dims, property);
     });
 
-    this.tip.updateText(
-      cssSelector,
-      outerBox.right - outerBox.left,
-      outerBox.bottom - outerBox.top
-    );
+    if (!property) {
+      this.tip.updateText(
+        cssSelector,
+        outerBox.right - outerBox.left,
+        outerBox.bottom - outerBox.top
+      );
 
-    const tipBounds = getNestedBoundingClientRect(
-      window.document.documentElement,
-      window
-    );
+      const tipBounds = getNestedBoundingClientRect(
+        window.document.documentElement,
+        window
+      );
 
-    this.tip.updatePosition(
-      {
-        top: outerBox.top,
-        left: outerBox.left,
-        height: outerBox.bottom - outerBox.top,
-        width: outerBox.right - outerBox.left,
-      },
-      {
-        top: tipBounds.top + window.scrollY,
-        left: tipBounds.left + window.scrollX,
-        height: window.innerHeight,
-        width: window.innerWidth,
-      }
-    );
+      this.tip.updatePosition(
+        {
+          top: outerBox.top,
+          left: outerBox.left,
+          height: outerBox.bottom - outerBox.top,
+          width: outerBox.right - outerBox.left,
+        },
+        {
+          top: tipBounds.top + window.scrollY,
+          left: tipBounds.left + window.scrollX,
+          height: window.innerHeight,
+          width: window.innerWidth,
+        }
+      );
+    }
   }
 }
 
