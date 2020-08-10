@@ -51,6 +51,7 @@ const config = {
     extensions: ['.ts', '.js', '.vue'],
     alias: {
       '@stylebot/css': path.resolve(__dirname, './src/css/index'),
+      '@stylebot/i18n': path.resolve(__dirname, './src/i18n/index'),
       '@stylebot/types': path.resolve(__dirname, './src/types/index'),
       '@stylebot/dark-mode': path.resolve(__dirname, './src/dark-mode/index'),
       '@stylebot/settings': path.resolve(__dirname, './src/settings/index'),
@@ -159,6 +160,35 @@ const config = {
         {
           from: '../node_modules/requirejs/**/*',
           to: 'monaco-editor/iframe/requirejs',
+        },
+        {
+          from: '_locales/*.config',
+          to: '_locales/[name]/messages.json',
+
+          transform: raw => {
+            const content = raw.toString().replace(/^#.*?$/gm, '');
+            const messages = {};
+            const regex = /@([a-z0-9_]+)/gi;
+
+            let match;
+
+            while ((match = regex.exec(content))) {
+              const messageName = match[1];
+              const messageStart = match.index + match[0].length;
+
+              let messageEnd = content.indexOf('@', messageStart);
+
+              if (messageEnd < 0) {
+                messageEnd = content.length;
+              }
+
+              messages[messageName] = {
+                message: content.substring(messageStart, messageEnd).trim(),
+              };
+            }
+
+            return JSON.stringify(messages, null, 2);
+          },
         },
         {
           from: 'extension/manifest.json',

@@ -1,7 +1,7 @@
 <template>
   <b-row align-content="center" no-gutters>
     <css-property>
-      Text color
+      {{ t('text_color') }}
     </css-property>
 
     <css-property-value>

@@ -19,10 +19,10 @@
         :disabled="!url || !css"
         @click="$emit('save', { initialUrl, url, css })"
       >
-        Save
+        {{ t('save') }}
       </app-button>
 
-      <app-button @click="$emit('cancel')">Cancel</app-button>
+      <app-button @click="$emit('cancel')">{{ t('cancel') }}</app-button>
     </div>
   </div>
 </template>

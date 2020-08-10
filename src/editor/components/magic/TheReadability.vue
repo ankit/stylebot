@@ -1,16 +1,15 @@
 <template>
   <div class="the-readability">
     <b-form-checkbox v-model="value" switch class="enable-readability">
-      Enable Readability
+      {{ t('enable_readability') }}
     </b-form-checkbox>
 
     <p class="lead pt-2">
-      Make articles on this site readable by hiding non-essential page elements
-      like sidebars, footers and ads.
+      {{ t('readability_description') }}
     </p>
 
     <b-row align-content="center" no-gutters class="mb-3">
-      <css-property>Font</css-property>
+      <css-property>{{ t('font_family') }}</css-property>
 
       <css-property-value>
         <b-row no-gutters>
@@ -22,7 +21,7 @@
     </b-row>
 
     <b-row align-content="center" no-gutters class="mb-3">
-      <css-property>Theme</css-property>
+      <css-property>{{ t('theme') }}</css-property>
 
       <css-property-value>
         <the-readability-theme :disabled="!value" />
@@ -30,7 +29,7 @@
     </b-row>
 
     <b-row align-content="center" no-gutters class="mb-3">
-      <css-property>Width</css-property>
+      <css-property>{{ t('width') }}</css-property>
 
       <css-property-value>
         <the-readability-width :disabled="!value" />
@@ -38,7 +37,7 @@
     </b-row>
 
     <b-row align-content="center" no-gutters class="mb-3">
-      <css-property>Size</css-property>
+      <css-property>{{ t('font_size') }}</css-property>
 
       <css-property-value>
         <the-readability-font-size :disabled="!value" />
@@ -46,7 +45,7 @@
     </b-row>
 
     <b-row align-content="center" no-gutters class="mb-3">
-      <css-property>Line Height</css-property>
+      <css-property>{{ t('line_height') }}</css-property>
 
       <css-property-value>
         <the-readability-line-height :disabled="!value" />

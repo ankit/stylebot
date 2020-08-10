@@ -2,7 +2,7 @@
   <div class="pb-5">
     <b-row class="section px-3 pt-3" no-gutters>
       <b-col cols="12" class="pb-1">
-        <h1>Text and Colors</h1>
+        <h1>{{ t('text_and_color') }}</h1>
       </b-col>
 
       <b-col cols="12">
@@ -13,7 +13,7 @@
 
     <b-row class="section mt-4 px-3 pt-3" no-gutters>
       <b-col cols="12" class="pb-1">
-        <h1>Visibility and Layout</h1>
+        <h1>{{ t('visibility_and_layout') }}</h1>
       </b-col>
 
       <b-col cols="12">

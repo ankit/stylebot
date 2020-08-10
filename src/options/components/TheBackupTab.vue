@@ -2,7 +2,7 @@
   <div class="pt-3">
     <b-row class="mt-5">
       <b-col>
-        Until we support automated sync/backup, please manually backup your css.
+        {{ t('backup_description') }}
       </b-col>
     </b-row>
 
@@ -12,10 +12,12 @@
     <b-row class="mt-4">
       <b-col>
         <app-button class="mr-4" variant="primary" @click="exportModal = true">
-          Export...
+          {{ t('open_export_dialog') }}
         </app-button>
 
-        <app-button @click="importModal = true">Import...</app-button>
+        <app-button @click="importModal = true">
+          {{ t('open_import_dialog') }}
+        </app-button>
       </b-col>
     </b-row>
   </div>

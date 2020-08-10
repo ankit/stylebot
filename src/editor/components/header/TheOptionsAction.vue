@@ -14,11 +14,11 @@
         />
 
         <b-dropdown-item-button @click="viewOptions">
-          View options...
+          {{ t('view_options') }}
         </b-dropdown-item-button>
 
         <b-dropdown-item-button @click="showHelp">
-          View keyboard shortcuts...
+          {{ t('view_keyboard_shortcuts') }}
         </b-dropdown-item-button>
 
         <template #button-content>

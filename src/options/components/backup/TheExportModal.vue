@@ -4,20 +4,23 @@
     size="xl"
     centered
     no-fade
-    title="Copy / paste into a JSON file"
+    :title="t('export_dialog_title')"
     no-close-on-backdrop
     no-close-on-esc
     hide-header-close
     @ok="copyJson"
     @cancel="close"
   >
-    <div class="mb-3">Keep the JSON safe to import it later</div>
+    <div class="mb-3">{{ t('export_instructions') }}</div>
 
     <b-form-textarea readonly rows="15" autofocus :value="json" />
 
     <template #modal-footer="{ ok, cancel }">
-      <app-button @click="cancel()">Cancel</app-button>
-      <app-button variant="primary" @click="ok()">Copy to Clipboard</app-button>
+      <app-button @click="cancel()">{{ t('cancel') }}</app-button>
+
+      <app-button variant="primary" @click="ok()">
+        {{ t('copy_to_clipboard') }}
+      </app-button>
     </template>
   </b-modal>
 </template>

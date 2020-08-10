@@ -5,7 +5,7 @@
     •
     <a target="_blank" href="http://github.com/ankit/stylebot">Github</a>
     •
-    <a target="_blank" href="https://ko-fi.com/stylebot">Donate</a>
+    <a target="_blank" href="https://ko-fi.com/stylebot">{{ t('donate') }}</a>
   </div>
 </template>
 

@@ -1,6 +1,6 @@
 <template>
   <b-row align-content="center" no-gutters>
-    <css-property>Align</css-property>
+    <css-property>{{ t('text_align') }}</css-property>
     <css-property-value-group property="text-align" :options="options" />
   </b-row>
 </template>

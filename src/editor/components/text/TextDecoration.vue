@@ -1,6 +1,6 @@
 <template>
   <b-row align-content="center" no-gutters>
-    <css-property>Decorate</css-property>
+    <css-property>{{ t('text_decoration') }}</css-property>
     <css-property-value-group property="text-decoration" :options="options" />
   </b-row>
 </template>

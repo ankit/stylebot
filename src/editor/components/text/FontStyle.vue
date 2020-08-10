@@ -1,7 +1,7 @@
 <template>
   <b-row align-content="center" no-gutters>
     <css-property>
-      Style
+      {{ t('font_style') }}
     </css-property>
 
     <css-property-value-group property="font-style" :options="options" />

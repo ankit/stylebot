@@ -1,7 +1,7 @@
 <template>
   <b-list-group-item>
     <b-form-checkbox v-model="readability" switch @change="toggle">
-      Readability
+      {{ t('readability') }}
     </b-form-checkbox>
   </b-list-group-item>
 </template>

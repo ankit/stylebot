@@ -1,6 +1,6 @@
 <template>
   <div>
-    <p class="lead">Apply grayscale to the page.</p>
+    <p class="lead">{{ t('grayscale_description') }}</p>
 
     <b-form-input
       v-model="value"

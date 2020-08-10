@@ -20,6 +20,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import { t } from '@stylebot/i18n';
 
 import TheBasicsTab from './components/TheBasicsTab.vue';
 import TheStylesTab from './components/TheStylesTab.vue';
@@ -46,7 +47,12 @@ export default Vue.extend({
   } {
     return {
       currentTab: 'Basics',
-      tabs: ['Basics', 'Styles', 'Backup', 'Help'],
+      tabs: [
+        t('basic_options'),
+        t('style_options'),
+        t('backup_options'),
+        t('help_options'),
+      ],
     };
   },
 

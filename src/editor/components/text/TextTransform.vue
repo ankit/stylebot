@@ -1,7 +1,7 @@
 <template>
   <b-row align-content="center" no-gutters>
     <css-property>
-      Transform
+      {{ t('text_transform') }}
     </css-property>
 
     <css-property-value-group property="text-transform" :options="options" />

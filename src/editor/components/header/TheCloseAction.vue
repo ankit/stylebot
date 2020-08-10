@@ -1,6 +1,6 @@
 <template>
   <button
-    title="Close (Esc)"
+    :title="`${t('close')} (esc)`"
     @click="onClick"
     @mouseenter="isHovered = true"
     @mouseleave="isHovered = false"

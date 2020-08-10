@@ -2,32 +2,32 @@
   <b-button-group>
     <b-button
       size="md"
-      title="Visual CSS editor (B)"
+      title="Visual CSS editor (b)"
       :variant="mode === 'basic' ? 'secondary' : 'outline-secondary'"
       @click="setMode('basic')"
     >
       <b-icon icon="image" aria-hidden="true" />
-      <span class="pl-1">Basic</span>
+      <span class="pl-1">{{ t('basic_mode') }}</span>
     </b-button>
 
     <b-button
       size="md"
-      title="Experimental features (M)"
+      title="Experimental features (m)"
       :variant="mode === 'magic' ? 'secondary' : 'outline-secondary'"
       @click="setMode('magic')"
     >
       <b-icon icon="star" aria-hidden="true" />
-      <span class="pl-1">Magic</span>
+      <span class="pl-1">{{ t('magic_mode') }}</span>
     </b-button>
 
     <b-button
       size="md"
-      title="Code (C)"
+      title="Code (c)"
       :variant="mode === 'code' ? 'secondary' : 'outline-secondary'"
       @click="setMode('code')"
     >
       <b-icon icon="code" aria-hidden="true" />
-      <span class="pl-1">Code</span>
+      <span class="pl-1">{{ t('code_mode') }}</span>
     </b-button>
   </b-button-group>
 </template>

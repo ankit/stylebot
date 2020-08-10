@@ -1,7 +1,7 @@
 <template>
   <b-row align-content="center" no-gutters>
     <css-property>
-      Padding
+      {{ t('padding') }}
     </css-property>
 
     <css-property-value>

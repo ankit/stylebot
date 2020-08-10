@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import { Store } from 'vuex';
+import { t } from '@stylebot/i18n';
 
 import { State } from '../store';
 import TheStylebotApp from '../components/TheStylebotApp.vue';
@@ -35,6 +36,12 @@ Vue.use(FormGroupPlugin);
 Vue.use(FormCheckboxPlugin);
 Vue.use(ListGroupPlugin);
 Vue.use(TableSimplePlugin);
+
+Vue.mixin({
+  methods: {
+    t,
+  },
+});
 
 const injectCss = (shadowRoot: ShadowRoot): void => {
   const url = chrome.extension.getURL('editor/index.css');

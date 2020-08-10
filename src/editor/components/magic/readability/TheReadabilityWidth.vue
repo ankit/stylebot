@@ -2,7 +2,7 @@
   <b-button-group>
     <b-button
       size="sm"
-      title="Decrease Width"
+      :title="t('decrease_width')"
       variant="outline-secondary"
       :disabled="disabled"
       @click="decrease"
@@ -12,7 +12,7 @@
 
     <b-button
       size="sm"
-      title="Increase Width"
+      :title="t('increase_width')"
       variant="outline-secondary"
       :disabled="disabled"
       @click="increase"

@@ -4,7 +4,7 @@
     size="xl"
     centered
     no-fade
-    title="Paste previously exported JSON"
+    :title="t('import_dialog_title')"
     no-close-on-backdrop
     no-close-on-esc
     hide-header-close
@@ -12,12 +12,11 @@
     @cancel="close"
   >
     <div v-if="!error" class="mb-3">
-      This will overwrite your existing styles. You can't undo this.
+      {{ t('import_instructions') }}
     </div>
 
     <div v-if="error">
-      We encountered an error importing the JSON. Please ensure it is properly
-      formatted and try again.
+      {{ t('import_error') }}
     </div>
 
     <b-form-textarea
@@ -28,9 +27,10 @@
     />
 
     <template #modal-footer="{ ok, cancel }">
-      <app-button @click="cancel()">Cancel</app-button>
+      <app-button @click="cancel()">{{ t('cancel') }}</app-button>
+
       <app-button variant="primary" :disabled="!json" @click="ok()">
-        Import
+        {{ t('import') }}
       </app-button>
     </template>
   </b-modal>

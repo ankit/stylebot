@@ -1,6 +1,6 @@
 <template>
   <button
-    :title="right ? 'Move Left (P)' : 'Move Right (P)'"
+    :title="right ? `${t('move_left')} (p)` : `${t('move_right')} (p)`"
     @click="onClick"
     @mouseenter="isHovered = true"
     @mouseleave="isHovered = false"

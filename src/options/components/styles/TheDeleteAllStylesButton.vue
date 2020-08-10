@@ -1,7 +1,7 @@
 <template>
   <div>
     <app-button variant="danger" @click="modal = true">
-      Delete all...
+      {{ t('open_delete_all_styles_dialog') }}
     </app-button>
 
     <b-modal
@@ -9,7 +9,7 @@
       size="md"
       centered
       no-fade
-      title="Delete All Styles"
+      :title="t('delete_all_styles')"
       no-close-on-backdrop
       no-close-on-esc
       hide-header-close
@@ -19,12 +19,13 @@
       "
       @cancel="modal = false"
     >
-      This will permanently delete all your styles. You can't undo this.
+      {{ t('delete_all_warning') }}
 
       <template #modal-footer="{ ok, cancel }">
-        <app-button @click="cancel()">Cancel</app-button>
+        <app-button @click="cancel()">{{ t('cancel') }}</app-button>
+
         <app-button variant="danger" @click="ok()">
-          Delete All Styles
+          {{ t('delete_all_styles') }}
         </app-button>
       </template>
     </b-modal>

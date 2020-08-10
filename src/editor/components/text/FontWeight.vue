@@ -1,7 +1,7 @@
 <template>
   <b-row align-content="center" no-gutters>
     <css-property>
-      Weight
+      {{ t('font_weight') }}
     </css-property>
 
     <css-property-value-group property="font-weight" :options="options" />

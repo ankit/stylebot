@@ -18,11 +18,16 @@
               text="Add a new style..."
               @click="addStyleDialog = true"
             >
-              Add a new style...
+              {{ t('add_new_style') }}
             </app-button>
 
-            <app-button @click="enableAll">Enable all</app-button>
-            <app-button @click="disableAll">Disable all</app-button>
+            <app-button @click="enableAll">
+              {{ t('enable_all_styles') }}
+            </app-button>
+
+            <app-button @click="disableAll">
+              {{ t('disable_all_styles') }}
+            </app-button>
           </b-col>
 
           <b-col cols="4">

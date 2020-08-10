@@ -1,6 +1,6 @@
 <template>
   <b-row align-content="center" no-gutters>
-    <css-property>Background</css-property>
+    <css-property>{{ t('background_color') }}</css-property>
 
     <css-property-value>
       <b-row no-gutters>

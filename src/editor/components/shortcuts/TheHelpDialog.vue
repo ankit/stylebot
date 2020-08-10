@@ -3,7 +3,7 @@
     <div class="help-dialog-content p-4">
       <b-row>
         <b-col cols="11">
-          <h1 class="title mb-4">Stylebot Keyboard shortcuts</h1>
+          <h1 class="title mb-4">Stylebot {{ t('keyboard_shortcuts') }}</h1>
         </b-col>
 
         <b-col cols="1" style="text-align: right;">
@@ -19,13 +19,13 @@
             <b-thead>
               <b-tr>
                 <b-th colspan="2">
-                  Global
+                  {{ t('global') }}
                   <a
                     href="#"
                     class="customize"
                     @click="customizeGlobalCommands"
                   >
-                    Customize
+                    {{ t('customize') }}
                   </a>
                 </b-th>
               </b-tr>
@@ -33,28 +33,28 @@
 
             <b-tbody>
               <b-tr>
-                <b-td>Toggle stylebot editor</b-td>
+                <b-td>{{ t('toggle_editor') }}</b-td>
                 <b-td class="stylebot-key">
                   {{ commands['stylebot'] }}
                 </b-td>
               </b-tr>
 
               <b-tr>
-                <b-td>Toggle styling</b-td>
+                <b-td>{{ t('toggle_styling') }}</b-td>
                 <b-td class="stylebot-key">
                   {{ commands['style'] }}
                 </b-td>
               </b-tr>
 
               <b-tr>
-                <b-td>Toggle readability</b-td>
+                <b-td>{{ t('toggle_readability') }}</b-td>
                 <b-td class="stylebot-key">
                   {{ commands['readability'] }}
                 </b-td>
               </b-tr>
 
               <b-tr>
-                <b-td>Toggle grayscale</b-td>
+                <b-td>{{ t('toggle_grayscale') }}</b-td>
                 <b-td class="stylebot-key">
                   {{ commands['grayscale'] }}
                 </b-td>
@@ -67,42 +67,42 @@
           <b-table-simple>
             <b-thead>
               <b-tr>
-                <b-th colspan="2">Editor</b-th>
+                <b-th colspan="2">{{ t('editor') }}</b-th>
               </b-tr>
             </b-thead>
 
             <b-tbody>
               <b-tr>
-                <b-td>Toggle element inspection</b-td>
+                <b-td>{{ t('toggle_inspector') }}</b-td>
                 <b-td class="stylebot-key">
                   {{ editorCommands['inspect'] }}
                 </b-td>
               </b-tr>
 
               <b-tr>
-                <b-td>Move stylebot to left / right</b-td>
+                <b-td>{{ t('move_editor') }}</b-td>
                 <b-td class="stylebot-key">
                   {{ editorCommands['position'] }}
                 </b-td>
               </b-tr>
 
               <b-tr>
-                <b-td>Switch to basic editor</b-td>
+                <b-td>{{ t('set_basic_mode') }}</b-td>
                 <b-td class="stylebot-key">{{ editorCommands['basic'] }}</b-td>
               </b-tr>
 
               <b-tr>
-                <b-td>Switch to magic editor</b-td>
+                <b-td>{{ t('set_magic_mode') }}</b-td>
                 <b-td class="stylebot-key">{{ editorCommands['magic'] }}</b-td>
               </b-tr>
 
               <b-tr>
-                <b-td>Switch to code editor</b-td>
+                <b-td>{{ t('set_code_mode') }}</b-td>
                 <b-td class="stylebot-key">{{ editorCommands['code'] }}</b-td>
               </b-tr>
 
               <b-tr>
-                <b-td>Show help</b-td>
+                <b-td>{{ t('show_help') }}</b-td>
                 <b-td class="stylebot-key">{{ editorCommands['help'] }}</b-td>
               </b-tr>
             </b-tbody>
@@ -115,13 +115,13 @@
           <b-table-simple>
             <b-thead>
               <b-tr>
-                <b-th colspan="2">Styling</b-th>
+                <b-th colspan="2">{{ t('styling') }}</b-th>
               </b-tr>
             </b-thead>
 
             <b-tbody>
               <b-tr>
-                <b-td>Apply CSS to show/hide selected element(s)</b-td>
+                <b-td>{{ t('hide_element') }}</b-td>
                 <b-td class="stylebot-key">
                   {{ editorCommands['hide'] }}
                 </b-td>

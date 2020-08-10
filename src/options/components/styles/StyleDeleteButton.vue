@@ -6,7 +6,7 @@
       variant="outline-danger"
       @click="modal = true"
     >
-      Delete...
+      {{ t('open_delete_style_dialog') }}
     </app-button>
 
     <b-modal
@@ -24,11 +24,14 @@
       "
       @cancel="modal = false"
     >
-      This will permanently delete your style. You can't undo this.
+      {{ t('delete_style_warning') }}
 
       <template #modal-footer="{ ok, cancel }">
-        <app-button @click="cancel()">Cancel</app-button>
-        <app-button variant="danger" @click="ok()">Delete</app-button>
+        <app-button @click="cancel()">{{ t('cancel') }}</app-button>
+
+        <app-button variant="danger" @click="ok()">
+          {{ t('delete') }}
+        </app-button>
       </template>
     </b-modal>
   </div>
