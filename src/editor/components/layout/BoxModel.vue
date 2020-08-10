@@ -5,11 +5,7 @@
       class="box-margin"
       :label="t('margin')"
       :class="{
-        highlighted: shouldHighlight('margin', [
-          'border',
-          'padding',
-          'element',
-        ]),
+        highlighted: shouldHighlight('margin'),
         disabled,
       }"
       :disabled="disabled"
@@ -22,7 +18,7 @@
         class="box-border"
         :label="t('border')"
         :class="{
-          highlighted: shouldHighlight('border', ['padding', 'element']),
+          highlighted: shouldHighlight('border'),
           disabled,
         }"
         :disabled="disabled"
@@ -35,7 +31,7 @@
           class="box-padding"
           :label="t('padding')"
           :class="{
-            highlighted: shouldHighlight('padding', ['element']),
+            highlighted: shouldHighlight('padding'),
             disabled,
           }"
           :disabled="disabled"
@@ -46,7 +42,7 @@
           <div
             class="box-element"
             :class="{
-              highlighted: shouldHighlight('height', []),
+              highlighted: shouldHighlight('height'),
               disabled,
             }"
             @mouseenter="highlight('height')"
@@ -169,11 +165,10 @@ export default Vue.extend({
       }
     },
 
-    shouldHighlight(target: HighlightTarget, exclude: Array<HighlightTarget>) {
+    shouldHighlight(target: HighlightTarget) {
       return (
         this.highlightedTargets.length === 0 ||
-        (this.highlightedTargets.indexOf(target) > -1 &&
-          !exclude.find(t => this.highlightedTargets.indexOf(t) > -1))
+        this.highlightedTargets.indexOf(target) > -1
       );
     },
   },
