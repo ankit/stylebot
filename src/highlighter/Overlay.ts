@@ -214,9 +214,14 @@ export default class Overlay {
     cssSelector: string,
     property?: LayoutProperty
   ): void {
-    // We can't get the size of text nodes or comment nodes. React as of v15
-    // heavily uses comment nodes to delimit text.
-    const elements = nodes.filter(node => node.nodeType === Node.ELEMENT_NODE);
+    // We can't get the size of text nodes or comment nodes.
+    // todo: until we can performantly support displaying an overlay
+    // for a large number of elements, set an upper bound
+    const maxElements = 100;
+
+    const elements = nodes
+      .filter(node => node.nodeType === Node.ELEMENT_NODE)
+      .slice(0, maxElements);
 
     while (this.rects.length > elements.length) {
       const rect = this.rects.pop();
