@@ -1,6 +1,6 @@
 <template>
   <div>
-    <color class="mt-3" />
+    <color />
     <background-color class="mt-3" />
   </div>
 </template>

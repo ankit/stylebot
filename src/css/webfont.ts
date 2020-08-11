@@ -4,8 +4,9 @@ const getGoogleFontUrlAndParams = (
   value: string
 ): { url: string; params: string } => {
   const arg = value.replace(' ', '+');
-  const url = `https://fonts.googleapis.com/css?family=${arg}`;
-  const params = `url(${url})`;
+  const url = `https://fonts.googleapis.com/css2?family=${arg}:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap`;
+
+  https: const params = `url(${url})`;
 
   return { url, params };
 };
