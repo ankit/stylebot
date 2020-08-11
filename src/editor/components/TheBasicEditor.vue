@@ -60,6 +60,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import { StylebotBasicModeSections } from '@stylebot/types';
 
 import TheTextProperties from './TheTextProperties.vue';
 import TheColorProperties from './TheColorProperties.vue';
@@ -76,18 +77,50 @@ export default Vue.extend({
     TheBorderProperties,
   },
 
-  data(): {
-    text: boolean;
-    colors: boolean;
-    layout: boolean;
-    border: boolean;
-  } {
-    return {
-      text: true,
-      colors: true,
-      layout: true,
-      border: false,
-    };
+  computed: {
+    text: {
+      get(): boolean {
+        return this.$store.state.options.basicModeSections.text;
+      },
+      set(value: boolean) {
+        this.set('text', value);
+      },
+    },
+    colors: {
+      get(): boolean {
+        return this.$store.state.options.basicModeSections.colors;
+      },
+      set(value: boolean) {
+        this.set('colors', value);
+      },
+    },
+    layout: {
+      get(): boolean {
+        return this.$store.state.options.basicModeSections.layout;
+      },
+      set(value: boolean) {
+        this.set('layout', value);
+      },
+    },
+    border: {
+      get(): boolean {
+        return this.$store.state.options.basicModeSections.border;
+      },
+      set(value: boolean) {
+        this.set('border', value);
+      },
+    },
+  },
+
+  methods: {
+    set(name: keyof StylebotBasicModeSections, value: boolean) {
+      const sections = this.$store.state.options.basicModeSections;
+
+      this.$store.dispatch('setBasicModeSections', {
+        ...sections,
+        [name]: value,
+      });
+    },
   },
 });
 </script>

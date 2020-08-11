@@ -8,6 +8,12 @@ import {
 export const defaultOptions: StylebotOptions = {
   mode: 'basic',
   contextMenu: true,
+  basicModeSections: {
+    text: true,
+    colors: true,
+    layout: true,
+    border: false,
+  },
 };
 
 export const defaultCommands: StylebotCommands = {

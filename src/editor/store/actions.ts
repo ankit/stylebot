@@ -20,7 +20,10 @@ import {
   StylebotEditingMode,
   FilterEffect,
   ReadabilitySettings,
+  StylebotBasicModeSections,
 } from '@stylebot/types';
+
+import { defaultOptions } from '@stylebot/settings';
 
 import {
   getAllOptions,
@@ -57,6 +60,10 @@ export default {
     }
 
     const options = await getAllOptions();
+    if (!options.basicModeSections) {
+      options.basicModeSections = defaultOptions.basicModeSections;
+    }
+
     commit('setOptions', options);
 
     const commands = await getCommands();
@@ -95,6 +102,14 @@ export default {
   ): void {
     setOption('mode', mode);
     commit('setOptions', { ...state.options, mode });
+  },
+
+  setBasicModeSections(
+    { state, commit }: { state: State; commit: Commit },
+    basicModeSections: StylebotBasicModeSections
+  ): void {
+    setOption('basicModeSections', basicModeSections);
+    commit('setOptions', { ...state.options, basicModeSections });
   },
 
   applyCss(

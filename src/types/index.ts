@@ -1,8 +1,16 @@
 export type StylebotEditingMode = 'basic' | 'magic' | 'code';
 
+export type StylebotBasicModeSections = {
+  text: boolean;
+  colors: boolean;
+  layout: boolean;
+  border: boolean;
+};
+
 export type StylebotOptions = {
   contextMenu: boolean;
   mode: StylebotEditingMode;
+  basicModeSections: StylebotBasicModeSections;
 };
 
 export type StylebotPlacement = 'left' | 'right';

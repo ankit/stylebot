@@ -97,7 +97,16 @@ describe('MigrateOldFormat', () => {
     };
     mockChromeAPI(mockGet, mockSet);
 
-    const options = { mode: 'basic', contextMenu: true };
+    const options = {
+      mode: 'basic',
+      contextMenu: true,
+      basicModeSections: {
+        border: false,
+        colors: true,
+        layout: true,
+        text: true,
+      },
+    };
     await MigrateOldFormat();
 
     expect(mockSet).toHaveBeenCalledTimes(2);
