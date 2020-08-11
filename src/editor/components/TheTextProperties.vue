@@ -2,6 +2,7 @@
   <div>
     <font-family class="mt=3" />
     <font-size class="mt-3" />
+    <line-height class="mt-3" />
     <font-weight class="mt-3" />
     <font-style class="mt-3" />
     <text-decoration class="mt-3" />
@@ -14,6 +15,7 @@
 import Vue from 'vue';
 
 import FontSize from './text/FontSize.vue';
+import LineHeight from './text/LineHeight.vue';
 import FontWeight from './text/FontWeight.vue';
 import FontStyle from './text/FontStyle.vue';
 import FontFamily from './text/FontFamily.vue';
@@ -26,6 +28,7 @@ export default Vue.extend({
   components: {
     FontFamily,
     FontSize,
+    LineHeight,
     FontWeight,
     FontStyle,
     TextDecoration,
