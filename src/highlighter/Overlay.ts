@@ -220,12 +220,12 @@ export default class Overlay {
     cssSelector: string,
     property?: LayoutProperty
   ): void {
-    // We can't get the size of text nodes or comment nodes.
     // todo: until we can performantly support displaying an overlay
     // for a large number of elements, set an upper bound
     const maxElements = 100;
 
     const elements = nodes
+      // We can't get the size of text nodes or comment nodes.
       .filter(node => node.nodeType === Node.ELEMENT_NODE)
       .slice(0, maxElements);
 

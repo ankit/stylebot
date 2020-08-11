@@ -4,6 +4,7 @@
     size="sm"
     :disabled="disabled"
     class="box-model-length"
+    placeholder="-"
     @focus="focus"
     @keydown="keydown"
     @input="$emit('input')"
@@ -40,7 +41,7 @@ export default Vue.extend({
         }
 
         if (!value) {
-          return '-';
+          return '';
         }
 
         const [length, unit] = value.split(/(-?\d+)/).filter(Boolean);
@@ -48,7 +49,7 @@ export default Vue.extend({
         // todo: support other units.
         // currently, we render empty input and overwrite on edit
         if (unit !== 'px') {
-          return '-';
+          return '';
         }
 
         return length;
@@ -76,7 +77,7 @@ export default Vue.extend({
         event.preventDefault();
         event.stopPropagation();
 
-        if (!this.length || this.length === '-') {
+        if (!this.length) {
           this.length = '1';
         } else {
           this.length = `${parseInt(this.length, 10) + 1}`;
@@ -90,7 +91,7 @@ export default Vue.extend({
         event.preventDefault();
         event.stopPropagation();
 
-        if (!this.length || this.length === '-') {
+        if (!this.length) {
           this.length = '-1';
         } else {
           this.length = `${parseInt(this.length, 10) - 1}`;
@@ -105,13 +106,15 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .box-model-length {
-  width: 30px !important;
+  padding: 1px !important;
+  width: 32px !important;
   height: 18px !important;
   font-size: 12px !important;
   border: none !important;
   border-radius: 0 !important;
   text-align: center !important;
   color: #333 !important;
+  line-height: 20px !important;
   background: transparent !important;
 
   &:hover:not(:disabled) {

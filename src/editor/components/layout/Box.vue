@@ -70,7 +70,7 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .box {
   width: 100%;
-  padding: 25px 34px;
+  padding: 24px 32px;
   position: relative;
 }
 
@@ -88,12 +88,12 @@ export default Vue.extend({
   left: calc(100% / 2 - 18px);
 }
 .box-right {
-  right: 2px;
+  right: 0;
   position: absolute;
   top: calc(50% - 9px);
 }
 .box-left {
-  left: 2px;
+  left: 0;
   position: absolute;
   top: calc(50% - 9px);
 }

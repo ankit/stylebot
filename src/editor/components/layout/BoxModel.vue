@@ -10,8 +10,8 @@
       }"
       :disabled="disabled"
       @input="debouncedInput"
-      @mouseenter="highlight('margin')"
-      @mouseleave="unhighlight('margin')"
+      @mouseenter="mouseenter('margin')"
+      @mouseleave="mouseleave('margin')"
     >
       <box
         property="border"
@@ -23,8 +23,8 @@
         }"
         :disabled="disabled"
         @input="debouncedInput"
-        @mouseenter="highlight('border')"
-        @mouseleave="unhighlight('border')"
+        @mouseenter="mouseenter('border')"
+        @mouseleave="mouseleave('border')"
       >
         <box
           property="padding"
@@ -36,8 +36,8 @@
           }"
           :disabled="disabled"
           @input="debouncedInput"
-          @mouseenter="highlight('padding')"
-          @mouseleave="unhighlight('padding')"
+          @mouseenter="mouseenter('padding')"
+          @mouseleave="mouseleave('padding')"
         >
           <div
             class="box-element"
@@ -45,13 +45,13 @@
               highlighted: shouldHighlight('height'),
               disabled,
             }"
-            @mouseenter="highlight('height')"
-            @mouseleave="unhighlight('height')"
+            @mouseenter="mouseenter('height')"
+            @mouseleave="mouseleave('height')"
           >
             <b-row align-content="center" no-gutters>
               <box-model-length
-                property="height"
-                class="box-element-height"
+                property="width"
+                class="box-element-width"
                 :disabled="disabled"
                 @input="debouncedInput"
               />
@@ -59,8 +59,8 @@
               <span class="box-element-x">x</span>
 
               <box-model-length
-                property="width"
-                class="box-element-width"
+                property="height"
+                class="box-element-height"
                 :disabled="disabled"
                 @input="debouncedInput"
               />
@@ -92,7 +92,8 @@ export default Vue.extend({
 
   data(): {
     highlighter: Highlighter;
-    highlightedTargets: Array<HighlightTarget>;
+    targets: Array<HighlightTarget>;
+    highlightedTarget: HighlightTarget | null;
     debouncedInput?: () => void;
   } {
     return {
@@ -101,7 +102,8 @@ export default Vue.extend({
           return;
         },
       }),
-      highlightedTargets: [],
+      targets: [],
+      highlightedTarget: null,
     };
   },
 
@@ -120,58 +122,48 @@ export default Vue.extend({
   },
 
   methods: {
+    highlight() {
+      this.highlighter.unhighlight();
+
+      if (this.targets.length > 0) {
+        this.highlightedTarget = this.targets[this.targets.length - 1];
+        this.highlighter.highlight(this.activeSelector, this.highlightedTarget);
+      } else {
+        this.highlightedTarget = null;
+      }
+    },
+
     input() {
-      this.highlighter.unhighlight();
-
-      if (this.highlightedTargets.length > 0) {
-        this.highlighter.highlight(
-          this.activeSelector,
-          this.highlightedTargets[this.highlightedTargets.length - 1]
-        );
-      }
+      this.highlight();
     },
 
-    highlight(target: HighlightTarget) {
+    mouseenter(target: HighlightTarget) {
       if (this.disabled) {
-        this.highlightedTargets = [];
+        this.targets = [];
         return;
       }
 
-      this.highlightedTargets.push(target);
-
-      this.highlighter.unhighlight();
-      this.highlighter.highlight(this.activeSelector, target);
+      this.targets.push(target);
+      this.highlight();
     },
 
-    unhighlight(target: HighlightTarget) {
+    mouseleave(target: HighlightTarget) {
       if (this.disabled) {
-        this.highlightedTargets = [];
+        this.targets = [];
         return;
       }
 
-      const index = this.highlightedTargets.indexOf(target);
+      const index = this.targets.indexOf(target);
 
       if (index > -1) {
-        this.highlightedTargets.splice(index, 1);
+        this.targets.splice(index, 1);
       }
 
-      if (this.highlightedTargets.length > 0) {
-        this.highlighter.unhighlight();
-
-        this.highlighter.highlight(
-          this.activeSelector,
-          this.highlightedTargets[this.highlightedTargets.length - 1]
-        );
-      } else {
-        this.highlighter.unhighlight();
-      }
+      this.highlight();
     },
 
     shouldHighlight(target: HighlightTarget) {
-      return (
-        this.highlightedTargets.length === 0 ||
-        this.highlightedTargets.indexOf(target) > -1
-      );
+      return !this.highlightedTarget || this.highlightedTarget === target;
     },
   },
 });
@@ -219,7 +211,9 @@ export default Vue.extend({
 }
 
 .box-element {
-  height: 25px;
+  height: 24px;
+  margin: 0 auto;
+  position: relative;
   background: #fff;
   border: 1px solid #888;
 
@@ -232,18 +226,24 @@ export default Vue.extend({
   }
 }
 
-.box-element-height,
 .box-element-width {
-  margin-top: 3px;
+  left: 2px;
+  top: 2px;
+  position: absolute;
 }
 
 .box-element-height {
-  margin-left: 1px;
+  right: 2px;
+  top: 2px;
+  position: absolute;
 }
 
 .box-element-x {
   color: #333;
+  position: absolute;
+  top: 2px;
+  left: calc(50% - 4px);
   font-size: 12px;
-  padding: 2px 3px;
+  line-height: 18px;
 }
 </style>
