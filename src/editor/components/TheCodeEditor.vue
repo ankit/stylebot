@@ -1,73 +1,108 @@
 <template>
-  <the-code-editor-iframe />
+  <code-editor-iframe id="stylebot-selector-css" />
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import TheCodeEditorIframe from './code/TheCodeEditorIframe.vue';
 
+import { getRule, addEmptyRule } from '@stylebot/css';
 import { IframeMessage, ParentUpdateCssMessage } from '@stylebot/monaco-editor';
+
+import CodeEditorIframe from './code/CodeEditorIframe.vue';
 
 export default Vue.extend({
   name: 'TheCodeEditor',
 
   components: {
-    TheCodeEditorIframe,
+    CodeEditorIframe,
   },
 
   computed: {
     css(): string {
       return this.$store.state.css;
     },
+
+    activeSelector(): string {
+      return this.$store.state.activeSelector;
+    },
   },
 
   watch: {
+    activeSelector(selector: string): void {
+      this.handleActiveSelectorChange(selector);
+    },
+
     css(value: string): void {
-      const iframe = this.$el.querySelector('iframe');
+      const contentWindow = this.getIframeContentWindow();
 
       // only handle the case where the css is deleted by the user
       // from outside of the code editor. else, this will get invoked on every edit.
-      if (value === '' && iframe?.contentWindow) {
-        this.updateCssInMonacoEditor(iframe?.contentWindow);
+      if (value === '' && contentWindow) {
+        this.updateIframeCss(contentWindow);
       }
     },
   },
 
   created() {
-    this.attachListeners();
+    window.addEventListener('message', this.handleMessage);
   },
 
   beforeDestroy() {
-    this.detachListeners();
+    window.removeEventListener('message', this.handleMessage);
   },
 
   methods: {
-    attachListeners(): void {
-      window.addEventListener('message', this.handleMessage);
+    getIframeContentWindow(): Window | null | undefined {
+      return this.$el.querySelector('iframe')?.contentWindow;
     },
 
-    detachListeners(): void {
-      window.removeEventListener('message', this.handleMessage);
+    updateIframeCss(contentWindow: Window): void {
+      const message: ParentUpdateCssMessage = {
+        css: this.css,
+        type: 'stylebotCssUpdate',
+        selector: this.activeSelector,
+      };
+
+      contentWindow.postMessage(message, chrome.runtime.getURL('*'));
     },
 
     handleMessage(message: {
       source: Window | MessagePort | ServiceWorker | null;
       data: IframeMessage;
     }): void {
-      if (message.data.type === 'stylebotMonacoIframeLoaded') {
-        this.updateCssInMonacoEditor(message.source as Window);
-      } else if (message.data.type === 'stylebotMonacoIframeCssUpdated') {
-        this.$store.dispatch('applyCss', { css: message.data.css });
+      switch (message.data.type) {
+        case 'stylebotMonacoIframeLoaded':
+          this.handleIframeLoaded(message.source as Window);
+          break;
+
+        case 'stylebotMonacoIframeCssUpdated':
+          this.handleIframeCssUpdate(message.data.css);
+          break;
       }
     },
 
-    updateCssInMonacoEditor(iframeContentWindow: Window): void {
-      const message: ParentUpdateCssMessage = {
-        css: this.css,
-        type: 'stylebotCssUpdate',
-      };
+    handleIframeLoaded(contentWindow: Window): void {
+      this.updateIframeCss(contentWindow);
+      this.handleActiveSelectorChange(this.activeSelector);
+    },
 
-      iframeContentWindow.postMessage(message, chrome.runtime.getURL('*'));
+    handleIframeCssUpdate(css: string): void {
+      this.$store.dispatch('applyCss', { css });
+    },
+
+    handleActiveSelectorChange(selector: string): void {
+      const contentWindow = this.getIframeContentWindow();
+
+      if (!contentWindow || !selector) {
+        return;
+      }
+
+      if (!getRule(this.css, selector)) {
+        const css = addEmptyRule(this.css, selector);
+        this.$store.dispatch('applyCss', { css });
+      }
+
+      this.updateIframeCss(contentWindow);
     },
   },
 });

@@ -14,4 +14,5 @@ export type IframeMessage = IframeCssUpdatedMessage | IframeLoadedMessage;
 export type ParentUpdateCssMessage = {
   type: 'stylebotCssUpdate';
   css: string;
+  selector?: string;
 };

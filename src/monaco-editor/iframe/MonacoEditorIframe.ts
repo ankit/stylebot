@@ -77,6 +77,28 @@ class MonacEditorIframe {
         if (message.data.type === 'stylebotCssUpdate') {
           this.editor.setValue(message.data.css);
           this.editor.focus();
+
+          if (message.data.selector) {
+            const regex = `^${message.data.selector}\\s\\{\\n\\s*(?!\\}).*$`;
+
+            const match = this.editor.getModel().findNextMatch(
+              regex,
+              {
+                column: 1,
+                lineNumber: 1,
+              },
+              true
+            );
+
+            if (match) {
+              this.editor.setSelection({
+                startColumn: match.range.endColumn,
+                startLineNumber: match.range.endLineNumber,
+                endColumn: match.range.endColumn,
+                endLineNumber: match.range.endLineNumber,
+              });
+            }
+          }
         }
       }
     );

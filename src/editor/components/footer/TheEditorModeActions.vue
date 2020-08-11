@@ -12,22 +12,22 @@
 
     <b-button
       size="md"
-      title="Experimental features (m)"
-      :variant="mode === 'magic' ? 'secondary' : 'outline-secondary'"
-      @click="setMode('magic')"
-    >
-      <b-icon icon="star" aria-hidden="true" />
-      <span class="pl-1">{{ t('magic_mode') }}</span>
-    </b-button>
-
-    <b-button
-      size="md"
       title="Code (c)"
       :variant="mode === 'code' ? 'secondary' : 'outline-secondary'"
       @click="setMode('code')"
     >
       <b-icon icon="code" aria-hidden="true" />
       <span class="pl-1">{{ t('code_mode') }}</span>
+    </b-button>
+
+    <b-button
+      size="md"
+      title="Experimental features (m)"
+      :variant="mode === 'magic' ? 'secondary' : 'outline-secondary'"
+      @click="setMode('magic')"
+    >
+      <b-icon icon="star" aria-hidden="true" />
+      <span class="pl-1">{{ t('magic_mode') }}</span>
     </b-button>
   </b-button-group>
 </template>

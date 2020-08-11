@@ -18,5 +18,5 @@ export {
 } from './selector';
 
 export { addGoogleWebFont, cleanGoogleWebFonts } from './webfont';
-
 export { addDeclaration, appendImportantToDeclarations } from './declaration';
+export { getRule, addEmptyRule } from './rule';
