@@ -34,7 +34,6 @@ import TheCssSelectorInput from './TheCssSelectorInput.vue';
 import TheCssSelectorDropdownItem from './TheCssSelectorDropdownItem.vue';
 import DropdownHackToSupportShadowDom from './../DropdownHackToSupportShadowDom.vue';
 
-
 export default Vue.extend({
   name: 'TheCssSelectorDropdown',
 
@@ -54,7 +53,7 @@ export default Vue.extend({
     },
 
     disabled(): boolean {
-      return this.mode !== 'basic' && this.mode !== 'code';
+      return this.mode !== 'basic';
     },
   },
 

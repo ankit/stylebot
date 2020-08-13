@@ -5,7 +5,7 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { getRule, addEmptyRule } from '@stylebot/css';
+import { getRule, addEmptyRule, removeEmptyRules } from '@stylebot/css';
 import { IframeMessage, ParentUpdateCssMessage } from '@stylebot/monaco-editor';
 
 import CodeEditorIframe from './code/CodeEditorIframe.vue';
@@ -29,6 +29,12 @@ export default Vue.extend({
 
   watch: {
     activeSelector(selector: string): void {
+      // remove any previous injected empty rules if a new selector was selected
+      if (selector) {
+        const css = removeEmptyRules(this.css);
+        this.$store.dispatch('applyCss', { css });
+      }
+
       this.handleActiveSelectorChange(selector);
     },
 
@@ -45,6 +51,9 @@ export default Vue.extend({
 
   created() {
     window.addEventListener('message', this.handleMessage);
+    // remove any previous injected empty rules
+    const css = removeEmptyRules(this.css);
+    this.$store.dispatch('applyCss', { css });
   },
 
   beforeDestroy() {
@@ -72,7 +81,7 @@ export default Vue.extend({
     }): void {
       switch (message.data.type) {
         case 'stylebotMonacoIframeLoaded':
-          this.handleIframeLoaded(message.source as Window);
+          this.handleIframeLoaded();
           break;
 
         case 'stylebotMonacoIframeCssUpdated':
@@ -81,8 +90,7 @@ export default Vue.extend({
       }
     },
 
-    handleIframeLoaded(contentWindow: Window): void {
-      this.updateIframeCss(contentWindow);
+    handleIframeLoaded(): void {
       this.handleActiveSelectorChange(this.activeSelector);
     },
 
@@ -93,11 +101,11 @@ export default Vue.extend({
     handleActiveSelectorChange(selector: string): void {
       const contentWindow = this.getIframeContentWindow();
 
-      if (!contentWindow || !selector) {
+      if (!contentWindow) {
         return;
       }
 
-      if (!getRule(this.css, selector)) {
+      if (selector && !getRule(this.css, selector)) {
         const css = addEmptyRule(this.css, selector);
         this.$store.dispatch('applyCss', { css });
       }
