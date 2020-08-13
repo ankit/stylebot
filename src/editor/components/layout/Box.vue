@@ -9,28 +9,28 @@
     <box-model-length
       class="box-top"
       :disabled="disabled"
-      :property="`${property}-top`"
+      :property="properties.top"
       @input="$emit('input')"
     />
 
     <box-model-length
       class="box-right"
       :disabled="disabled"
-      :property="`${property}-right`"
+      :property="properties.right"
       @input="$emit('input')"
     />
 
     <box-model-length
       class="box-bottom"
       :disabled="disabled"
-      :property="`${property}-bottom`"
+      :property="properties.bottom"
       @input="$emit('input')"
     />
 
     <box-model-length
       class="box-left"
       :disabled="disabled"
-      :property="`${property}-left`"
+      :property="properties.left"
       @input="$emit('input')"
     />
 
@@ -50,8 +50,8 @@ export default Vue.extend({
   },
 
   props: {
-    property: {
-      type: String,
+    properties: {
+      type: Object,
       required: true,
     },
 

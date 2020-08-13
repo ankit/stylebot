@@ -1,8 +1,13 @@
 <template>
   <b-row align-content="center" no-gutters>
     <box
-      property="margin"
       class="box-margin"
+      :properties="{
+        top: 'margin-top',
+        right: 'margin-right',
+        bottom: 'margin-bottom',
+        left: 'margin-left',
+      }"
       :label="t('margin')"
       :class="{
         highlighted: shouldHighlight('margin'),
@@ -14,8 +19,13 @@
       @mouseleave="mouseleave('margin')"
     >
       <box
-        property="border"
         class="box-border"
+        :properties="{
+          top: 'border-top-width',
+          right: 'border-right-width',
+          bottom: 'border-bottom-width',
+          left: 'border-left-width',
+        }"
         :label="t('border')"
         :class="{
           highlighted: shouldHighlight('border'),
@@ -27,8 +37,13 @@
         @mouseleave="mouseleave('border')"
       >
         <box
-          property="padding"
           class="box-padding"
+          :properties="{
+            top: 'padding-top',
+            right: 'padding-right',
+            bottom: 'padding-bottom',
+            left: 'padding-left',
+          }"
           :label="t('padding')"
           :class="{
             highlighted: shouldHighlight('padding'),
