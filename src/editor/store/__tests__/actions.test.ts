@@ -48,22 +48,25 @@ describe('actions', () => {
       }
     });
 
-    it('invokes setSave correctly', () => {
+    it('invokes setStyle correctly', () => {
       const css = 'a { color: red; }';
+      jest.spyOn(stylebotCss, 'removeEmptyRules').mockReturnValue(css);
 
       actions.applyCss({ commit: mockCommit, state: mockState }, { css });
 
       expect(mockCommit).toHaveBeenNthCalledWith(1, 'setCss', css);
       expect(mockCommit).toHaveBeenNthCalledWith(2, 'setSelectors', mockRoot);
 
+      expect(stylebotCss.injectRootIntoDocument).toBeCalledWith(
+        mockRoot,
+        mockState.url
+      );
+
+      expect(stylebotCss.removeEmptyRules).toBeCalledWith(css);
       expect(chromeUtils.setStyle).toBeCalledWith(
         mockState.url,
         css,
         mockState.readability
-      );
-      expect(stylebotCss.injectRootIntoDocument).toBeCalledWith(
-        mockRoot,
-        mockState.url
       );
     });
   });

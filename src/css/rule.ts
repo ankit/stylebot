@@ -13,3 +13,13 @@ export const addEmptyRule = (css: string, selector: string): string => {
   const cssWithNewLines = css.replace(/((.*)\})\n*$/, '$1\n\n');
   return `${cssWithNewLines}${ruleCss}`;
 };
+
+export const removeEmptyRules = (css: string): string => {
+  const root = postcss.parse(css);
+  root.walkRules(rule => {
+    if (!rule.first) {
+      rule.remove();
+    }
+  });
+  return root.toString();
+};

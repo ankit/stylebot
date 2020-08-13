@@ -9,6 +9,7 @@ import {
   cleanGoogleWebFonts,
   injectRootIntoDocument,
   getCssAfterApplyingFilterEffectToPage,
+  removeEmptyRules,
 } from '@stylebot/css';
 
 import {
@@ -123,7 +124,9 @@ export default {
       commit('setCss', css);
       commit('setSelectors', root);
 
-      setStyle(state.url, css, state.readability);
+      // when saving, cleanup any empty rules
+      const cleanCss = removeEmptyRules(css);
+      setStyle(state.url, cleanCss, state.readability);
     } catch (e) {
       //
     }

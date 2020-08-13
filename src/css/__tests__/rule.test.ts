@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const dedent = require('dedent');
-import { getRule, addEmptyRule } from '../';
+import { getRule, addEmptyRule, removeEmptyRules } from '../';
 
 describe('rule', () => {
   describe('getRule', () => {
@@ -131,6 +131,27 @@ describe('rule', () => {
       `;
 
       expect(addEmptyRule(css, selector)).toEqual(output);
+    });
+  });
+
+  describe('removeEmptyRules', () => {
+    it('removes empty rules from css', () => {
+      const css = dedent`
+        .mock-selector-1 {
+          color: red;
+        }
+
+        .mock-selector-2 {
+          
+        }`;
+
+      const output = dedent`
+        .mock-selector-1 {
+          color: red;
+        }
+      `;
+
+      expect(removeEmptyRules(css)).toEqual(output);
     });
   });
 });
