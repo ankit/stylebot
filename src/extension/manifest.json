@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Stylebot",
-  "version": "3.0.3",
+  "version": "3.0.4",
   "author": "Ankit Ahuja",
   "description": "__MSG_extension_description__",
   "default_locale": "en",
