@@ -2,19 +2,19 @@
 
 ![CI](https://github.com/ankit/stylebot/workflows/CI/badge.svg)
 [![Kofi](https://badgen.net/badge/icon/kofi?icon=kofi&label)](https://ko-fi.com/stylebot)
-![Chrome Webstore Version](https://img.shields.io/chrome-web-store/v/oiaejidbmkiecgbjeifoejpgmdaleoha)
-![Chrome Users](https://badgen.net/chrome-web-store/users/oiaejidbmkiecgbjeifoejpgmdaleoha)
-![Webstore Rating](https://img.shields.io/chrome-web-store/stars/oiaejidbmkiecgbjeifoejpgmdaleoha)
+[![Chrome Webstore Version](https://img.shields.io/chrome-web-store/v/oiaejidbmkiecgbjeifoejpgmdaleoha)](https://chrome.google.com/webstore/detail/stylebot/oiaejidbmkiecgbjeifoejpgmdaleoha)
+[![Chrome Users](https://badgen.net/chrome-web-store/users/oiaejidbmkiecgbjeifoejpgmdaleoha)](https://chrome.google.com/webstore/detail/stylebot/oiaejidbmkiecgbjeifoejpgmdaleoha)
+[![Webstore Rating](https://img.shields.io/chrome-web-store/stars/oiaejidbmkiecgbjeifoejpgmdaleoha)](https://chrome.google.com/webstore/detail/stylebot/oiaejidbmkiecgbjeifoejpgmdaleoha)
+[![Follow Stylebot](https://badgen.net/twitter/follow/stylebot)](https://twitter.com/stylebot)
 ![License](https://img.shields.io/github/license/ankit/stylebot)
-![Follow Stylebot](https://badgen.net/twitter/follow/stylebot)
 
 Stylebot is a browser extension that lets you change the appearance of the web instantly. Currently only available on [Chrome Web Store](https://chrome.google.com/webstore/detail/stylebot/oiaejidbmkiecgbjeifoejpgmdaleoha).
 
-* Easy to use: Pick and style elements using UI actions
-* Simple & Quick: Changes are saved instantly
-* Code editor - Write your own CSS 
-* Readability Mode - Make articles on any site readable by hiding non-essential page elements like sidebars, footers and ads. 
-* Grayscale Mode - Turn on grayscale to reduce strain from websites
+- Easy to use: Pick and style elements using UI actions
+- Simple & Quick: Changes are saved instantly
+- Code editor - Write your own CSS 
+- Readability Mode - Make articles on any site readable by hiding non-essential page elements like sidebars, footers and ads. 
+- Grayscale Mode - Turn on grayscale to reduce strain from websites
 
 ## How to contribute
 
@@ -26,9 +26,9 @@ Stylebot is a browser extension that lets you change the appearance of the web i
 
 Please help add support for your language via the following steps
 
-1. Fork the repository and copy [`src/_locales/en.config`](src/_locales/en.config) to `src/_locales/[locale].config` where locale is one of the [supported locales](https://developer.chrome.com/webstore/i18n#localeTable).
-2. Update strings in `src/_locales/[locale].config` to your language
-3. Create a pull request
+- Fork the repository and copy [`src/_locales/en.config`](src/_locales/en.config) to `src/_locales/[locale].config` where locale is one of the [supported locales](https://developer.chrome.com/webstore/i18n#localeTable).
+- Update strings in `src/_locales/[locale].config` to your language
+- Create a pull request
 
 
 ### Add new features or fix bugs
