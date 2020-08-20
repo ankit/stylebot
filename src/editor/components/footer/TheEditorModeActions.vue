@@ -1,8 +1,8 @@
 <template>
   <b-button-group>
     <b-button
-      size="md"
-      title="Visual CSS editor (b)"
+      size="sm"
+      :title="`${t('basic_mode_description')} (b)`"
       :variant="mode === 'basic' ? 'secondary' : 'outline-secondary'"
       @click="setMode('basic')"
     >
@@ -11,8 +11,8 @@
     </b-button>
 
     <b-button
-      size="md"
-      title="Code (c)"
+      size="sm"
+      :title="`${t('code_mode_description')} (c)`"
       :variant="mode === 'code' ? 'secondary' : 'outline-secondary'"
       @click="setMode('code')"
     >
@@ -21,8 +21,8 @@
     </b-button>
 
     <b-button
-      size="md"
-      title="Experimental features (m)"
+      size="sm"
+      :title="`${t('magic_mode_description')} (m)`"
       :variant="mode === 'magic' ? 'secondary' : 'outline-secondary'"
       @click="setMode('magic')"
     >

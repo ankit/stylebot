@@ -79,7 +79,7 @@ export default Vue.extend({
         }
       }
 
-      return 'Default';
+      return t('default');
     },
 
     disabled(): boolean {

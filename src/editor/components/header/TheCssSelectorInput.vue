@@ -4,7 +4,7 @@
     :value="activeSelector"
     size="sm"
     class="css-selector-input"
-    placeholder="Enter CSS selector..."
+    :placeholder="t('enter_css_selector')"
     @blur="blur"
     @focus="focus"
     @input="input"

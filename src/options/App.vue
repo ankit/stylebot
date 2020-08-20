@@ -46,19 +46,14 @@ export default Vue.extend({
     tabs: Array<string>;
   } {
     return {
-      currentTab: 'Basics',
-      tabs: [
-        t('basic_options'),
-        t('style_options'),
-        t('backup_options'),
-        t('help_options'),
-      ],
+      currentTab: 'basics',
+      tabs: ['basics', 'styles', 'backup', 'help'],
     };
   },
 
   computed: {
     currentTabComponent(): string {
-      return `the-${this.currentTab.toLowerCase()}-tab`;
+      return `the-${this.currentTab}-tab`;
     },
   },
 

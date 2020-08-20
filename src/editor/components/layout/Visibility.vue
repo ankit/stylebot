@@ -9,7 +9,7 @@
         :variant="isHidden ? 'secondary' : 'outline-secondary'"
         @click="toggle"
       >
-        Hide
+        {{ t('hide') }}
       </b-button>
     </css-property-value>
   </b-row>
