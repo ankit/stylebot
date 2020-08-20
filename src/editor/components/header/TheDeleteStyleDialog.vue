@@ -1,11 +1,10 @@
 <template>
   <div class="stylebot-delete-style-dialog">
     <div class="delete-style-dialog-content p-4">
-      <h1 class="title">Delete style for {{ url }}</h1>
+      <h1 class="title">{{ t('delete_style_for_url_title', [url]) }}</h1>
 
       <div class="description text-muted pt-2 pb-4">
-        This will permanently delete your css for {{ url }}. You cannot undo
-        this.
+        {{ t('delete_style_for_url_description', [url]) }}
       </div>
 
       <div class="delete-style-dialog-footer">

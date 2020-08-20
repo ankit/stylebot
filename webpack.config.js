@@ -182,9 +182,25 @@ const config = {
                 messageEnd = content.length;
               }
 
+              const message = content
+                .substring(messageStart, messageEnd)
+                .trim();
+
               messages[messageName] = {
-                message: content.substring(messageStart, messageEnd).trim(),
+                message,
               };
+
+              const placeholderMatches = [...message.matchAll(/\$([^$]+)\$/g)];
+
+              if (placeholderMatches.length > 0) {
+                messages[messageName].placeholders = {};
+
+                placeholderMatches.forEach(m => {
+                  messages[messageName].placeholders[m[1]] = {
+                    content: '$1',
+                  };
+                });
+              }
             }
 
             return JSON.stringify(messages, null, 2);

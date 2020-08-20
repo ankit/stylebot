@@ -20,7 +20,6 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { t } from '@stylebot/i18n';
 
 import TheBasicsTab from './components/TheBasicsTab.vue';
 import TheStylesTab from './components/TheStylesTab.vue';
