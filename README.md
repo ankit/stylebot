@@ -22,14 +22,14 @@ Stylebot is a browser extension that lets you change the appearance of the web i
 
 [Buy me a coffee](https://ko-fi.com/stylebot) via Ko-fi
 
-### Translate to your language
+### Translate
 
-Add support for your language via the following steps
+Add support for a locale via the following steps
 
-- Fork the repository and copy [`src/_locales/en.config`](src/_locales/en.config) to `src/_locales/[locale].config` where locale is one of the [supported locales](https://developer.chrome.com/webstore/i18n#localeTable)
-- Update strings in `src/_locales/[locale].config` to your language
-- Create a pull request
+- See [supported locales](https://developer.chrome.com/webstore/i18n#localeTable)
 - If `src/_locales/[locale].config` already exists, please help improve translations
+- If not, copy [`src/_locales/en.config`](src/_locales/en.config) to `src/_locales/[locale].config`
+- Update strings in `src/_locales/[locale].config` to match the locale
 
 ### Add new features or fix bugs
 
