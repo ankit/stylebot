@@ -2,7 +2,9 @@
   <div class="navigation">
     <div class="header mb-3">
       stylebot
-      <span class="light ml-1 d-md-inline-flex d-none">{{ currentTab }}</span>
+      <span class="light ml-1 d-md-inline-flex d-none">
+        {{ t(`${currentTab}_options`) }}
+      </span>
     </div>
 
     <b-list-group class="navigation-list">
@@ -14,7 +16,7 @@
         :active="currentTab === tab"
         @click="$emit('select', tab)"
       >
-        {{ tab }}
+        {{ t(`${tab}_options`) }}
       </b-list-group-item>
     </b-list-group>
 

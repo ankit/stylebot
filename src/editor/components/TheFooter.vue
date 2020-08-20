@@ -1,7 +1,7 @@
 <template>
-  <div class="footer justify-content-md-between" no-gutters>
-    <the-editor-mode-actions />
-  </div>
+  <b-row class="footer" align-v="center" no-gutters>
+    <b-col><the-editor-mode-actions /></b-col>
+  </b-row>
 </template>
 
 <script lang="ts">
@@ -20,7 +20,7 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .footer {
   width: 100%;
-  padding: 20px;
+  height: 80px;
   text-align: center;
   background: #eee;
 }

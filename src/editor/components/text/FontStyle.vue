@@ -118,10 +118,10 @@ export default Vue.extend({
           }
         }
       } else if (style) {
-        return 'Italic';
+        return t('italic');
       }
 
-      return 'Default';
+      return t('default');
     },
 
     disabled(): boolean {
