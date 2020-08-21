@@ -80,6 +80,6 @@ export default Vue.extend({
 
 .stylebot-body {
   overflow: auto;
-  height: calc(100% - 146px);
+  height: calc(100% - 130px);
 }
 </style>

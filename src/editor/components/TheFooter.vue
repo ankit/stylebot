@@ -20,7 +20,7 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .footer {
   width: 100%;
-  height: 80px;
+  height: 62px;
   text-align: center;
   background: #eee;
 }
