@@ -1,15 +1,14 @@
-name: CI
-on: [push]
+name: build
+on: push
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Begin CI...
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-      - name: Use Node 12
+      - name: Use Node 12.x
         uses: actions/setup-node@v1
         with:
           node-version: 12.x
@@ -24,12 +23,6 @@ jobs:
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
-
-      - name: Lint
-        run: yarn lint
-
-      - name: Test
-        run: yarn test
 
       - name: Build
         run: yarn build
