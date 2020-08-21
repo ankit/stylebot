@@ -16,6 +16,7 @@
     "build": "cross-env NODE_ENV=production webpack --hide-modules",
     "lint": "eslint --ext .js,.ts,.vue src",
     "test": "jest",
+    "test:coverage": "jest --coverage",
     "watch": "cross-env NODE_ENV=development webpack --hide-modules --watch"
   },
   "jest": {
