@@ -1,12 +1,14 @@
-import BackgroundPageUtils from './utils';
+import { t } from '@stylebot/i18n';
 import { OpenStylebotFromContextMenu } from '@stylebot/types';
+
+import BackgroundPageUtils from './utils';
 
 const CONTEXT_MENU_ID = 'stylebot-contextmenu';
 
 const StyleElementContextMenu = () => {
   chrome.contextMenus.create({
     contexts: ['all'],
-    title: 'Style Element',
+    title: t('style_element'),
     parentId: CONTEXT_MENU_ID,
 
     onclick: (_info: chrome.contextMenus.OnClickData, tab: chrome.tabs.Tab) => {
@@ -32,7 +34,7 @@ const ParentContextMenu = () => {
 const ViewOptionsContextMenu = () => {
   chrome.contextMenus.create({
     contexts: ['all'],
-    title: 'Options...',
+    title: t('view_options'),
     parentId: CONTEXT_MENU_ID,
     onclick: () => {
       chrome.tabs.create({
