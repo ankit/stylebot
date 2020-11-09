@@ -1,3 +1,7 @@
+## Version 3.0.5
+
+- Enable localization for German, Spanish, French, Italian, Japanese, Korean, Russian, Chinese (China) and Chinese (Taiwan)
+
 ## Version 3
 
 - Re-wrote extension from scratch using modern tools ([PostCSS](ttps://postcss.org/), [Vue.js](https://vuejs.org/))
