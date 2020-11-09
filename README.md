@@ -5,15 +5,15 @@
 [![Chrome Webstore Version](https://img.shields.io/chrome-web-store/v/oiaejidbmkiecgbjeifoejpgmdaleoha)](https://chrome.google.com/webstore/detail/stylebot/oiaejidbmkiecgbjeifoejpgmdaleoha)
 [![Chrome Users](https://badgen.net/chrome-web-store/users/oiaejidbmkiecgbjeifoejpgmdaleoha)](https://chrome.google.com/webstore/detail/stylebot/oiaejidbmkiecgbjeifoejpgmdaleoha)
 [![Webstore Rating](https://img.shields.io/chrome-web-store/stars/oiaejidbmkiecgbjeifoejpgmdaleoha)](https://chrome.google.com/webstore/detail/stylebot/oiaejidbmkiecgbjeifoejpgmdaleoha)
-[![Follow Stylebot](https://badgen.net/twitter/follow/stylebot)](https://twitter.com/stylebot)
+[![Follow on Twitter](https://badgen.net/twitter/follow/ahujaankit)](https://twitter.com/ahujaankit)
 ![License](https://img.shields.io/github/license/ankit/stylebot)
 
 Stylebot is a browser extension that lets you change the appearance of the web instantly. Currently only available on [Chrome Web Store](https://chrome.google.com/webstore/detail/stylebot/oiaejidbmkiecgbjeifoejpgmdaleoha).
 
 - Easy to use: Pick and style elements using UI actions
 - Simple & Quick: Changes are saved instantly
-- Code editor - Write your own CSS 
-- Readability Mode - Make articles on any site readable by hiding non-essential page elements like sidebars, footers and ads. 
+- Code editor - Write your own CSS
+- Readability Mode - Make articles on any site readable by hiding non-essential page elements like sidebars, footers and ads.
 - Grayscale Mode - Turn on grayscale to reduce strain from websites
 
 ## How to contribute
