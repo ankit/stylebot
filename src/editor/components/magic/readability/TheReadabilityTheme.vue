@@ -41,7 +41,7 @@ export default Vue.extend({
   },
 
   computed: {
-    theme(): number {
+    theme(): ReadabilityTheme {
       return this.$store.state.readabilitySettings.theme;
     },
   },

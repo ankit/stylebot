@@ -18,7 +18,7 @@ const Chrome = () => {
       href="https://chrome.google.com/webstore/detail/stylebot/oiaejidbmkiecgbjeifoejpgmdaleoha"
       target="_blank"
       rel="noreferrer"
-      class="chrome-install-link"
+      className="chrome-install-link"
     >
       <img
         src={chromeImg}

@@ -14,7 +14,7 @@ const Header = ({ siteTitle }) => (
         maxWidth: 960,
         display: "flex",
         justifyContent: "end",
-        padding: `1.45rem 1.0875rem 0.7em`,
+        padding: `1.45rem 1.0875rem 0.7em`
       }}
     >
       <h1 style={{ margin: 0 }}>
@@ -22,7 +22,7 @@ const Header = ({ siteTitle }) => (
           to="/"
           style={{
             color: `#333`,
-            textDecoration: `none`,
+            textDecoration: `none`
           }}
         >
           {siteTitle}
@@ -35,7 +35,7 @@ const Header = ({ siteTitle }) => (
           target="_blank"
           rel="noreferrer"
           title="Fork on Github"
-          class="header-link"
+          className="header-link"
         >
           <img src={githubImg} alt="Github" />
         </a>
@@ -45,7 +45,7 @@ const Header = ({ siteTitle }) => (
           href="https://twitter.com/stylebot"
           target="_blank"
           rel="noreferrer"
-          class="header-link"
+          className="header-link"
         >
           <img src={twitterImg} alt="Twitter" />
         </a>
@@ -55,7 +55,7 @@ const Header = ({ siteTitle }) => (
           href="https://ko-fi.com/stylebot"
           target="_blank"
           rel="noreferrer"
-          class="header-link"
+          className="header-link"
         >
           Donate
         </a>
@@ -65,11 +65,11 @@ const Header = ({ siteTitle }) => (
 )
 
 Header.propTypes = {
-  siteTitle: PropTypes.string,
+  siteTitle: PropTypes.string
 }
 
 Header.defaultProps = {
-  siteTitle: ``,
+  siteTitle: ``
 }
 
 export default Header
