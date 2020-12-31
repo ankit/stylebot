@@ -21,8 +21,7 @@ export const set = (value: ReadabilitySettings): Promise<void> => {
     chrome.storage.local.set({ 'readability-settings': value }, () => {
       resolve();
 
-      // notify reader in current tab to update
-      chrome.tabs.getSelected(tab => {
+      chrome.tabs.query({ active: true }, ([tab]) => {
         if (tab && tab.url && tab.id) {
           const message: UpdateReader = {
             name: 'UpdateReader',

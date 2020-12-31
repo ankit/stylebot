@@ -32,7 +32,7 @@ export default Vue.extend({
 
   methods: {
     toggle(): void {
-      chrome.tabs.getSelected(tab => {
+      chrome.tabs.query({ active: true }, ([tab]) => {
         if (tab.id) {
           const message: ToggleReadabilityForTab = {
             name: 'ToggleReadabilityForTab',

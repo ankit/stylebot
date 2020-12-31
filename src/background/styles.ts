@@ -60,7 +60,7 @@ class BackgroundPageStyles {
       styles: this.styles,
     });
 
-    chrome.tabs.getSelected(tab => {
+    chrome.tabs.query({ active: true }, ([tab]) => {
       if (tab && tab.url && tab.id) {
         const { styles, defaultStyle } = this.getStylesForPage(tab.url);
         this.updateIcon(tab, styles, defaultStyle);
@@ -87,7 +87,7 @@ class BackgroundPageStyles {
       styles: this.styles,
     });
 
-    chrome.tabs.getSelected(tab => {
+    chrome.tabs.query({ active: true }, ([tab]) => {
       if (tab && tab.url && tab.id) {
         const { styles, defaultStyle } = this.getStylesForPage(tab.url);
         this.updateIcon(tab, styles, defaultStyle);
