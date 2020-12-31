@@ -8,7 +8,7 @@
 [![Follow on Twitter](https://badgen.net/twitter/follow/ahujaankit)](https://twitter.com/ahujaankit)
 ![License](https://img.shields.io/github/license/ankit/stylebot)
 
-Stylebot is a browser extension that lets you change the appearance of the web instantly. Currently only available on [Chrome Web Store](https://chrome.google.com/webstore/detail/stylebot/oiaejidbmkiecgbjeifoejpgmdaleoha).
+Stylebot is a browser extension that lets you change the appearance of the web instantly. Available on [Firefox](https://addons.mozilla.org/en-US/firefox/addon/stylebot-web/) and [Chrome](https://chrome.google.com/webstore/detail/stylebot/oiaejidbmkiecgbjeifoejpgmdaleoha).
 
 - Easy to use: Pick and style elements using UI actions
 - Simple & Quick: Changes are saved instantly
