@@ -7,6 +7,7 @@ import Readability from "../components/readability"
 import Code from "../components/code"
 import Shortcuts from "../components/shortcuts"
 import Chrome from "../components/chrome"
+import Firefox from "../components/firefox"
 import SEO from "../components/seo"
 
 import {
@@ -27,7 +28,10 @@ const IndexPage = () => (
       Change the appearance of the web instantly
     </h2>
 
-    <Chrome />
+    <div className="download-link-list">
+      <Firefox />
+      <Chrome />
+    </div>
 
     <CarouselProvider
       isPlaying
