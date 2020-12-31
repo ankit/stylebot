@@ -53,6 +53,8 @@ If you would like to <strong>add a new feature</strong> to Stylebot or <strong>f
 
 ### Patches
 
+Patches to dependencies are located under `/patches` and are automatically applied on running `yarn` using [patch-package](https://github.com/ds300/patch-package).
+
 - `bootstrap-vue+2.21.1.patch` - Patch to work around a [requestAnimationFrame issue](https://github.com/facebook/react/issues/16606) in Firefox extensions.
 
 ## License
