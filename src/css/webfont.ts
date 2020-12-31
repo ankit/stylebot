@@ -48,7 +48,8 @@ export const addGoogleWebFont = async (
 
         resolve(root.toString());
       })
-      .catch(() => {
+      .catch(err => {
+        console.error(err);
         resolve(css);
       });
   });
