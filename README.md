@@ -35,15 +35,25 @@ Add support for a locale via the following steps
 
 If you would like to <strong>add a new feature</strong> to Stylebot or <strong>fix a bug</strong>, <strong>submit an issue</strong> in GitHub (if there is no existing one), discuss it, and wait for <strong>approval</strong>.
 
-#### Chrome
+## Development
 
-- Run `yarn` to install dependencies
+### Chrome
+
 - Run `yarn watch` to build locally
-- Open the chrome://extensions page.
+- Open `chrome://extensions` page.
 - Disable the official Stylebot version.
 - Enable the Developer mode.
 - Click Load unpacked extension button
 - Navigate to the project's `dist/` folder
+
+### Firefox
+
+- Run `yarn watch` to build locally
+- Run `yarn start:firefox` to launch Firefox with development build
+
+### Patches
+
+- `bootstrap-vue+2.21.1.patch` - Patch to work around a [requestAnimationFrame issue](https://github.com/facebook/react/issues/16606) in Firefox extensions.
 
 ## License
 
