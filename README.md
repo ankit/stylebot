@@ -51,6 +51,12 @@ If you would like to <strong>add a new feature</strong> to Stylebot or <strong>f
 - Run `yarn watch` to build locally
 - Run `yarn start:firefox` to launch Firefox with development build
 
+### Release
+
+- Add entry to `CHANGELOG`
+- Update version in `package.json` and `src/extension/manifest.json`
+- Run `yarn build` and manually create zip for distribution from `dist/`
+
 ### Patches
 
 Patches to dependencies are located under `/patches` and are automatically applied on running `yarn` using [patch-package](https://github.com/ds300/patch-package).
