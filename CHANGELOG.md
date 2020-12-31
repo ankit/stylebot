@@ -1,3 +1,9 @@
+## Version 3.0.6
+
+- Add Firefox support
+- Improvements to German translation (#604)
+- Bugfixes (#596)
+
 ## Version 3.0.5
 
 - Enable localization for German, Spanish, French, Italian, Japanese, Korean, Russian, Chinese (China) and Chinese (Taiwan)
