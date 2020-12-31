@@ -1,0 +1,13 @@
+diff --git a/node_modules/bootstrap-vue/esm/utils/dom.js b/node_modules/bootstrap-vue/esm/utils/dom.js
+index b461e87..c582830 100644
+--- a/node_modules/bootstrap-vue/esm/utils/dom.js
++++ b/node_modules/bootstrap-vue/esm/utils/dom.js
+@@ -34,7 +34,7 @@ export var closestEl = ELEMENT_PROTO.closest || function (sel) {
+ 
+ /* istanbul ignore next: JSDOM always returns the first option */
+ 
+-export var requestAF = WINDOW.requestAnimationFrame || WINDOW.webkitRequestAnimationFrame || WINDOW.mozRequestAnimationFrame || WINDOW.msRequestAnimationFrame || WINDOW.oRequestAnimationFrame || // Fallback, but not a true polyfill
++export var requestAF = WINDOW.requestAnimationFrame.bind(window) || WINDOW.webkitRequestAnimationFrame || WINDOW.mozRequestAnimationFrame || WINDOW.msRequestAnimationFrame || WINDOW.oRequestAnimationFrame || // Fallback, but not a true polyfill
+ // Only needed for Opera Mini
+ 
+ /* istanbul ignore next */
