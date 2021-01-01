@@ -18,6 +18,12 @@ class BackgroundPageStyles {
     this.styles = styles;
   }
 
+  persistStorage(): void {
+    chrome.storage.local.set({
+      styles: this.styles,
+    });
+  }
+
   get(url: string): StyleWithoutUrl {
     return this.styles[url];
   }
@@ -28,10 +34,7 @@ class BackgroundPageStyles {
 
   setAll(styles: StyleMap): void {
     this.styles = styles;
-
-    chrome.storage.local.set({
-      styles: this.styles,
-    });
+    this.persistStorage();
   }
 
   set(url: string, css: string, readability: boolean): void {
@@ -45,9 +48,7 @@ class BackgroundPageStyles {
       };
     }
 
-    chrome.storage.local.set({
-      styles: this.styles,
-    });
+    this.persistStorage();
   }
 
   enable(url: string): void {
@@ -56,9 +57,7 @@ class BackgroundPageStyles {
     }
 
     this.styles[url].enabled = true;
-    chrome.storage.local.set({
-      styles: this.styles,
-    });
+    this.persistStorage();
 
     chrome.tabs.query({ active: true }, ([tab]) => {
       if (tab && tab.url && tab.id) {
@@ -83,9 +82,7 @@ class BackgroundPageStyles {
     }
 
     this.styles[url].enabled = false;
-    chrome.storage.local.set({
-      styles: this.styles,
-    });
+    this.persistStorage();
 
     chrome.tabs.query({ active: true }, ([tab]) => {
       if (tab && tab.url && tab.id) {
@@ -113,9 +110,7 @@ class BackgroundPageStyles {
       };
     }
 
-    chrome.storage.local.set({
-      styles: this.styles,
-    });
+    this.persistStorage();
   }
 
   import(styles: StyleMap): void {
@@ -123,9 +118,7 @@ class BackgroundPageStyles {
       this.styles[url] = styles[url];
     }
 
-    chrome.storage.local.set({
-      styles: this.styles,
-    });
+    this.persistStorage();
   }
 
   move(src: string, dest: string): void {
@@ -133,9 +126,7 @@ class BackgroundPageStyles {
       this.styles[dest] = JSON.parse(JSON.stringify(this.styles[src]));
       delete this.styles[src];
 
-      chrome.storage.local.set({
-        styles: this.styles,
-      });
+      this.persistStorage();
     }
   }
 

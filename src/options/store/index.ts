@@ -4,7 +4,11 @@ import Vuex from 'vuex';
 import * as postcss from 'postcss';
 
 import { defaultCommands } from '@stylebot/settings';
-import { StylebotOptions, StylebotCommands } from '@stylebot/types';
+import {
+  StylebotOptions,
+  StylebotCommands,
+  GoogleDriveSyncMetadata,
+} from '@stylebot/types';
 
 import {
   getAllStyles,
@@ -28,6 +32,9 @@ type State = {
 
   options: StylebotOptions | null;
   commands: StylebotCommands;
+
+  googleDriveSyncEnabled: boolean;
+  googleDriveSyncMetadata: GoogleDriveSyncMetadata | null;
 };
 
 export default new Vuex.Store<State>({
@@ -35,6 +42,8 @@ export default new Vuex.Store<State>({
     styles: {},
     options: null,
     commands: defaultCommands,
+    googleDriveSyncEnabled: false,
+    googleDriveSyncMetadata: null,
   },
 
   actions: {
@@ -160,6 +169,10 @@ export default new Vuex.Store<State>({
     setCommands({ state }, commands: StylebotCommands) {
       state.commands = commands;
       setCommands(commands);
+    },
+
+    setGoogleDriveSyncEnabled({ state }, enabled: boolean) {
+      state.googleDriveSyncEnabled = enabled;
     },
   },
 });

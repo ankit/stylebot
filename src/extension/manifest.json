@@ -48,11 +48,16 @@
     "128": "img/icon128.png"
   },
 
-  "permissions": ["tabs", "contextMenus", "storage", "unlimitedStorage", "https://fonts.googleapis.com/*"],
+  "permissions": ["tabs", "contextMenus", "storage", "unlimitedStorage", "https://fonts.googleapis.com/*", "identity", "https://apis.google.com/js/api.js"],
 
   "web_accessible_resources": [
     "editor/index.css",
     "readability/index.css",
     "monaco-editor/*"
-  ]
+  ],
+  
+  "oauth2": {
+    "client_id": "662998053209-9truvlo75sa4kmniuvchqp7k8blcalbn.apps.googleusercontent.com",
+    "scopes": ["https://www.googleapis.com/auth/drive.file"]
+  }
 }

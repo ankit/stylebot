@@ -12,7 +12,7 @@ const isNewFormat = (styles: any) => {
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 const backupV2Styles = (styles: any) => {
-  return new Promise(resolve => {
+  return new Promise<void>(resolve => {
     chrome.storage.local.set({ backup_v2_styles: styles }, () => {
       resolve();
     });
@@ -83,7 +83,7 @@ export const getMigratedStyles = (): Promise<StyleMap> => {
 
 export const getMigratedOptions = (): Promise<StylebotOptions> => {
   return new Promise(resolve => {
-    chrome.storage.local.get('options', async items => {
+    chrome.storage.local.get('options', items => {
       const options = items['options'];
 
       if (!options || !['basic', 'magic', 'code'].includes(options.mode)) {

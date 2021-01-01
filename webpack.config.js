@@ -32,6 +32,7 @@ const config = {
   },
 
   entry: {
+    'sync/index': './sync/index.ts',
     'popup/index': './popup/index.ts',
     'editor/index': './editor/index.ts',
     'options/index': './options/index.ts',
@@ -52,6 +53,7 @@ const config = {
     alias: {
       '@stylebot/css': path.resolve(__dirname, './src/css/index'),
       '@stylebot/i18n': path.resolve(__dirname, './src/i18n/index'),
+      '@stylebot/sync': path.resolve(__dirname, './src/sync/index'),
       '@stylebot/types': path.resolve(__dirname, './src/types/index'),
       '@stylebot/dark-mode': path.resolve(__dirname, './src/dark-mode/index'),
       '@stylebot/settings': path.resolve(__dirname, './src/settings/index'),

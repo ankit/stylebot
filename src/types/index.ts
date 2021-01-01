@@ -80,6 +80,11 @@ export type StylebotEditorCommands = {
   [key in StylebotEditorCommandName]: string;
 };
 
+export type GoogleDriveSyncMetadata = {
+  id: string;
+  modifiedTime: string;
+};
+
 export * from './TabMessage';
 export * from './BackgroundPageMessage';
 export * from './BackgroundPageMessageResponse';
