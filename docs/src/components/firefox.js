@@ -1,5 +1,5 @@
 import React from "react"
-import chromeImg from "../images/chrome.svg"
+import firefoxImg from "../images/firefox.svg"
 
 /*
  * This component is built using `gatsby-image` to automatically serve optimized
@@ -12,23 +12,23 @@ import chromeImg from "../images/chrome.svg"
  * - `useStaticQuery`: https://www.gatsbyjs.org/docs/use-static-query/
  */
 
-const Chrome = () => {
+const Firefox = () => {
   return (
     <a
-      href="https://chrome.google.com/webstore/detail/stylebot/oiaejidbmkiecgbjeifoejpgmdaleoha"
+      href="https://addons.mozilla.org/en-US/firefox/addon/stylebot-web/"
       target="_blank"
       rel="noreferrer"
       className="download-link"
     >
       <img
-        src={chromeImg}
-        alt="Stylebot for Chrome"
+        src={firefoxImg}
+        alt="Stylebot for Firefox"
         style={{ height: "45px", marginRight: "10px", marginBottom: 0 }}
       />
 
-      <div style={{ height: "45px", lineHeight: "45px" }}>Chrome</div>
+      <div style={{ height: "45px", lineHeight: "45px" }}>Firefox</div>
     </a>
   )
 }
 
-export default Chrome
+export default Firefox
