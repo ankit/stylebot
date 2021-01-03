@@ -1,4 +1,5 @@
 import * as postcss from 'postcss';
+import { format } from 'date-fns';
 import { appendImportantToDeclarations } from '@stylebot/css';
 
 import BackgroundPageUtils from './utils';
@@ -9,6 +10,7 @@ import {
   StyleWithoutUrl,
   EnableStyleForTab,
   DisableStyleForTab,
+  Timestamp,
 } from '@stylebot/types';
 
 class BackgroundPageStyles {
@@ -18,9 +20,17 @@ class BackgroundPageStyles {
     this.styles = styles;
   }
 
+  getFormattedTimestamp(): Timestamp {
+    return format(new Date(), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
+  }
+
   persistStorage(): void {
     chrome.storage.local.set({
       styles: this.styles,
+
+      'styles-metadata': {
+        modifiedTime: this.getFormattedTimestamp(),
+      },
     });
   }
 
@@ -45,6 +55,7 @@ class BackgroundPageStyles {
         css,
         readability,
         enabled: true,
+        modifiedTime: this.getFormattedTimestamp(),
       };
     }
 
@@ -107,6 +118,7 @@ class BackgroundPageStyles {
         readability: value,
         enabled: true,
         css: '',
+        modifiedTime: this.getFormattedTimestamp(),
       };
     }
 
@@ -157,8 +169,8 @@ class BackgroundPageStyles {
           ? appendImportantToDeclarations(this.styles[url].css)
           : this.styles[url].css;
 
-        const { enabled, readability } = this.styles[url];
-        const style = { url, css, enabled, readability };
+        const { enabled, readability, modifiedTime } = this.styles[url];
+        const style = { url, css, enabled, readability, modifiedTime };
 
         if (url !== '*') {
           if (!defaultStyle || url.length > defaultStyle.url.length) {

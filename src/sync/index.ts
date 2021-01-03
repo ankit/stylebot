@@ -1,5 +1,8 @@
 export {
-  runGoogleDriveSync,
   getGoogleDriveSyncEnabled,
   setGoogleDriveSyncEnabled,
-} from './googledrive';
+  getGoogleDriveSyncMetadata,
+  setGoogleDriveSyncMetadata,
+} from './google-drive/sync-metadata';
+
+export { runGoogleDriveSync } from './google-drive/sync';

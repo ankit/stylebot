@@ -104,6 +104,7 @@ export default Vue.extend({
             css: stylesObj[url].css,
             enabled: stylesObj[url].enabled,
             readability: stylesObj[url].readability,
+            modifiedTime: stylesObj[url].modifiedTime,
           });
         }
       }

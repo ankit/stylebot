@@ -11,6 +11,7 @@ import {
   SetCommands,
   GetCommandsResponse,
   StylebotCommands,
+  Timestamp,
 } from '@stylebot/types';
 
 type Styles = {
@@ -18,6 +19,7 @@ type Styles = {
     css: string;
     enabled: boolean;
     readability: boolean;
+    modifiedTime: Timestamp;
   };
 };
 

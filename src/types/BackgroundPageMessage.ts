@@ -2,6 +2,7 @@ import {
   StylebotOptions,
   StylebotCommands,
   ReadabilitySettings,
+  Timestamp,
 } from '@stylebot/types';
 
 export type SetStyle = {

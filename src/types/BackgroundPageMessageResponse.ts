@@ -3,6 +3,7 @@ import {
   StylebotOptions,
   StylebotCommands,
   ReadabilitySettings,
+  Timestamp,
 } from '@stylebot/types';
 
 export type GetAllOptionsResponse = StylebotOptions;
@@ -13,6 +14,7 @@ export type GetAllStylesResponse = {
     css: string;
     enabled: boolean;
     readability: boolean;
+    modifiedTime: Timestamp;
   };
 };
 

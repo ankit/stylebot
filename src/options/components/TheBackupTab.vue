@@ -4,13 +4,53 @@
       <h2>Sync via Google Drive</h2>
     </b-row>
 
-    <b-row no-gutters>
-      <app-button class="mr-4" variant="primary" @click="syncGoogleDrive">
+    <b-row
+      v-if="googleDriveSyncLastModifiedTime && !syncInProgress"
+      no-gutters
+      class="sync-metadata"
+    >
+      Synced {{ googleDriveSyncLastModifiedTime }}. View&nbsp;
+      <a :href="googleDriveSyncFileLink" target="_blank">backup</a>
+      .
+    </b-row>
+
+    <b-row
+      v-if="googleDriveSyncLastModifiedTime && syncInProgress"
+      no-gutters
+      class="sync-metadata"
+    >
+      Syncing... View&nbsp;
+      <a :href="googleDriveSyncFileLink" target="_blank">backup</a>
+      .
+    </b-row>
+
+    <b-row no-gutters class="mt-2">
+      <app-button
+        v-if="googleDriveSyncEnabled"
+        class="mr-4"
+        variant="primary"
+        :disabled="syncInProgress"
+        @click="syncGoogleDrive"
+      >
         Sync Now
       </app-button>
 
-      <app-button class="mr-4" variant="primary" @click="toggleGoogleDriveSync">
-        Enable Sync
+      <app-button
+        v-if="googleDriveSyncEnabled"
+        class="mr-4"
+        variant="secondary"
+        @click="disableGoogleDriveSync"
+      >
+        Disable Google Drive Sync
+      </app-button>
+
+      <app-button
+        v-if="!googleDriveSyncEnabled"
+        class="mr-4"
+        variant="primary"
+        @click="enableGoogleDriveSync"
+      >
+        Enable Google Drive Sync
       </app-button>
     </b-row>
 
@@ -37,6 +77,8 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import { formatDistanceToNow } from 'date-fns';
+
 import { setGoogleDriveSyncEnabled, runGoogleDriveSync } from '@stylebot/sync';
 
 import AppButton from './AppButton.vue';
@@ -56,30 +98,77 @@ export default Vue.extend({
   data(): {
     importModal: boolean;
     exportModal: boolean;
+    syncInProgress: boolean;
   } {
     return {
       importModal: false,
       exportModal: false,
+      syncInProgress: false,
     };
   },
 
   computed: {
     googleDriveSyncEnabled: {
       get(): boolean {
-        return this.googleDriveSyncEnabled;
+        return this.$store.state.googleDriveSyncEnabled;
+      },
+
+      async set(val: boolean) {
+        setGoogleDriveSyncEnabled(val);
+        if (val) {
+          this.syncGoogleDrive();
+        }
+      },
+    },
+
+    googleDriveSyncFileLink: {
+      get(): string {
+        if (this.$store.state.googleDriveSyncMetadata) {
+          return this.$store.state.googleDriveSyncMetadata.webContentLink;
+        }
+
+        return '';
+      },
+    },
+
+    googleDriveSyncLastModifiedTime: {
+      get(): string {
+        if (this.$store.state.googleDriveSyncMetadata) {
+          return formatDistanceToNow(
+            new Date(this.$store.state.googleDriveSyncMetadata.modifiedTime),
+            { addSuffix: true }
+          );
+        }
+
+        return '';
       },
     },
   },
 
   methods: {
-    syncGoogleDrive() {
-      runGoogleDriveSync(this.$store.state.styles);
+    async syncGoogleDrive() {
+      this.syncInProgress = true;
+      await runGoogleDriveSync(this.$store.state.styles);
+
+      this.$store.dispatch('getGoogleDriveSyncMetadata');
+      this.syncInProgress = false;
     },
 
-    toggleGoogleDriveSync() {
-      setGoogleDriveSyncEnabled(true);
-      runGoogleDriveSync(this.$store.state.styles);
+    enableGoogleDriveSync() {
+      this.googleDriveSyncEnabled = true;
+    },
+
+    disableGoogleDriveSync() {
+      this.googleDriveSyncEnabled = false;
     },
   },
 });
 </script>
+
+<style lang="scss" scoped>
+.sync-metadata {
+  color: #555;
+  font-style: italic;
+  font-size: 12px;
+}
+</style>

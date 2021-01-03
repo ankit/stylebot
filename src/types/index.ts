@@ -1,3 +1,6 @@
+// format: yyyy-MM-dd'T'HH:mm:ss.SSSxxx
+export type Timestamp = string;
+
 export type StylebotEditingMode = 'basic' | 'magic' | 'code';
 
 export type StylebotBasicModeSections = {
@@ -20,6 +23,7 @@ export type Style = {
   css: string;
   enabled: boolean;
   readability: boolean;
+  modifiedTime: Timestamp;
 };
 
 export type StyleWithoutUrl = Omit<Style, 'url'>;
@@ -83,6 +87,8 @@ export type StylebotEditorCommands = {
 export type GoogleDriveSyncMetadata = {
   id: string;
   modifiedTime: string;
+  webViewLink: string;
+  webContentLink: string;
 };
 
 export * from './TabMessage';

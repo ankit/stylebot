@@ -8,6 +8,7 @@ import {
   StylebotOptions,
   StylebotCommands,
   GoogleDriveSyncMetadata,
+  Timestamp,
 } from '@stylebot/types';
 
 import {
@@ -19,6 +20,11 @@ import {
   setCommands,
 } from '../utils';
 
+import {
+  getGoogleDriveSyncEnabled,
+  getGoogleDriveSyncMetadata,
+} from '@stylebot/sync';
+
 Vue.use(Vuex);
 
 type State = {
@@ -27,6 +33,7 @@ type State = {
       css: string;
       enabled: boolean;
       readability: boolean;
+      modifiedTime: Timestamp;
     };
   };
 
@@ -34,7 +41,7 @@ type State = {
   commands: StylebotCommands;
 
   googleDriveSyncEnabled: boolean;
-  googleDriveSyncMetadata: GoogleDriveSyncMetadata | null;
+  googleDriveSyncMetadata: GoogleDriveSyncMetadata | undefined;
 };
 
 export default new Vuex.Store<State>({
@@ -43,23 +50,27 @@ export default new Vuex.Store<State>({
     options: null,
     commands: defaultCommands,
     googleDriveSyncEnabled: false,
-    googleDriveSyncMetadata: null,
+    googleDriveSyncMetadata: undefined,
   },
 
   actions: {
     async getAllStyles({ state }) {
-      const styles = await getAllStyles();
-      state.styles = styles;
+      state.styles = await getAllStyles();
     },
 
     async getAllOptions({ state }) {
-      const options = await getAllOptions();
-      state.options = options;
+      state.options = await getAllOptions();
     },
 
     async getCommands({ state }) {
-      const commands = await getCommands();
-      state.commands = commands;
+      state.commands = await getCommands();
+    },
+
+    async getGoogleDriveSyncMetadata({ state }) {
+      state.googleDriveSyncEnabled = await getGoogleDriveSyncEnabled();
+      if (state.googleDriveSyncEnabled) {
+        state.googleDriveSyncMetadata = await getGoogleDriveSyncMetadata();
+      }
     },
 
     setAllStyles(

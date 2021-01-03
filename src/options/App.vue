@@ -60,6 +60,7 @@ export default Vue.extend({
     this.$store.dispatch('getAllStyles');
     this.$store.dispatch('getAllOptions');
     this.$store.dispatch('getCommands');
+    this.$store.dispatch('getGoogleDriveSyncMetadata');
   },
 });
 </script>
