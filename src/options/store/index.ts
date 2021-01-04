@@ -5,11 +5,16 @@ import * as postcss from 'postcss';
 
 import { defaultCommands } from '@stylebot/settings';
 import {
+  StyleMap,
   StylebotOptions,
   StylebotCommands,
   GoogleDriveSyncMetadata,
-  Timestamp,
 } from '@stylebot/types';
+import {
+  getGoogleDriveSyncEnabled,
+  getGoogleDriveSyncMetadata,
+} from '@stylebot/sync';
+import { getCurrentTimestamp } from '@stylebot/utils';
 
 import {
   getAllStyles,
@@ -20,22 +25,10 @@ import {
   setCommands,
 } from '../utils';
 
-import {
-  getGoogleDriveSyncEnabled,
-  getGoogleDriveSyncMetadata,
-} from '@stylebot/sync';
-
 Vue.use(Vuex);
 
 type State = {
-  styles: {
-    [url: string]: {
-      css: string;
-      enabled: boolean;
-      readability: boolean;
-      modifiedTime: Timestamp;
-    };
-  };
+  styles: StyleMap;
 
   options: StylebotOptions | null;
   commands: StylebotCommands;
@@ -73,16 +66,7 @@ export default new Vuex.Store<State>({
       }
     },
 
-    setAllStyles(
-      { state },
-      styles: {
-        [url: string]: {
-          css: string;
-          enabled: boolean;
-          readability: boolean;
-        };
-      }
-    ) {
+    setAllStyles({ state }, styles: StyleMap) {
       state.styles = styles;
       setAllStyles(styles);
     },
@@ -104,6 +88,7 @@ export default new Vuex.Store<State>({
           css,
           readability: styles[url] ? styles[url].readability : false,
           enabled: styles[url] ? styles[url].enabled : true,
+          modifiedTime: getCurrentTimestamp(),
         };
 
         if (initialUrl && initialUrl !== url) {

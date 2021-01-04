@@ -1,17 +1,16 @@
 import * as postcss from 'postcss';
-import { format } from 'date-fns';
+
+import { getCurrentTimestamp } from '@stylebot/utils';
 import { appendImportantToDeclarations } from '@stylebot/css';
-
-import BackgroundPageUtils from './utils';
-
 import {
   Style,
   StyleMap,
   StyleWithoutUrl,
   EnableStyleForTab,
   DisableStyleForTab,
-  Timestamp,
 } from '@stylebot/types';
+
+import BackgroundPageUtils from './utils';
 
 class BackgroundPageStyles {
   styles: StyleMap;
@@ -20,16 +19,12 @@ class BackgroundPageStyles {
     this.styles = styles;
   }
 
-  getFormattedTimestamp(): Timestamp {
-    return format(new Date(), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
-  }
-
   persistStorage(): void {
     chrome.storage.local.set({
       styles: this.styles,
 
       'styles-metadata': {
-        modifiedTime: this.getFormattedTimestamp(),
+        modifiedTime: getCurrentTimestamp(),
       },
     });
   }
@@ -55,7 +50,7 @@ class BackgroundPageStyles {
         css,
         readability,
         enabled: true,
-        modifiedTime: this.getFormattedTimestamp(),
+        modifiedTime: getCurrentTimestamp(),
       };
     }
 
@@ -118,7 +113,7 @@ class BackgroundPageStyles {
         readability: value,
         enabled: true,
         css: '',
-        modifiedTime: this.getFormattedTimestamp(),
+        modifiedTime: getCurrentTimestamp(),
       };
     }
 

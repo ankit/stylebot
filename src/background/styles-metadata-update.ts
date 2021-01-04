@@ -1,4 +1,4 @@
-import { format } from 'date-fns';
+import { getCurrentTimestamp } from '@stylebot/utils';
 
 const StylesMetadataUpdate = async (): Promise<void> => {
   return new Promise(resolve => {
@@ -6,10 +6,7 @@ const StylesMetadataUpdate = async (): Promise<void> => {
       if (!items['styles-metadata']) {
         chrome.storage.local.set(
           {
-            'styles-metadata': format(
-              new Date(),
-              "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
-            ),
+            'styles-metadata': getCurrentTimestamp(),
           },
           () => {
             resolve();

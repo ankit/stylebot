@@ -2,7 +2,7 @@ import {
   StylebotOptions,
   StylebotCommands,
   ReadabilitySettings,
-  Timestamp,
+  StyleMap,
 } from '@stylebot/types';
 
 export type SetStyle = {
@@ -28,13 +28,7 @@ export type GetAllStyles = {
 
 export type SetAllStyles = {
   name: 'SetAllStyles';
-  styles: {
-    [url: string]: {
-      css: string;
-      enabled: boolean;
-      readability: boolean;
-    };
-  };
+  styles: StyleMap;
 };
 
 export type MoveStyle = {

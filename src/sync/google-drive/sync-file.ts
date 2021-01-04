@@ -1,5 +1,6 @@
-import { format } from 'date-fns';
+import { getCurrentTimestamp } from '@stylebot/utils';
 import { GoogleDriveSyncMetadata, StyleMap } from '@stylebot/types';
+
 import { AccessToken } from './get-access-token';
 
 const GOOGLE_DRIVE_FILE_GET_API = `https://www.googleapis.com/drive/v3/files`;
@@ -67,7 +68,7 @@ const createBackup = async (
     name: SYNC_FILE_NAME,
     parents: [folderId],
     mimeType: 'application/json',
-    modifiedTime: format(new Date(), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"),
+    modifiedTime: getCurrentTimestamp(),
   };
   const metadataBlob = new Blob([JSON.stringify(metadata)], {
     type: 'application/json',
@@ -93,7 +94,7 @@ const patchBackup = async (
 ): Promise<GoogleDriveSyncMetadata> => {
   const form = new FormData();
   const metadata = {
-    modifiedTime: format(new Date(), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"),
+    modifiedTime: getCurrentTimestamp(),
   };
   const metadataBlob = new Blob([JSON.stringify(metadata)], {
     type: 'application/json',

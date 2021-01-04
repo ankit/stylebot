@@ -1,4 +1,4 @@
-import { format } from 'date-fns';
+import { getCurrentTimestamp } from '@stylebot/utils';
 
 const StylesModifiedTimeUpdate = async (): Promise<void> => {
   return new Promise(resolve => {
@@ -10,10 +10,7 @@ const StylesModifiedTimeUpdate = async (): Promise<void> => {
           const style = styles[url];
 
           if (!style.modifiedTime) {
-            styles[url].modifiedTime = format(
-              new Date(),
-              "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
-            );
+            styles[url].modifiedTime = getCurrentTimestamp();
           }
         }
 

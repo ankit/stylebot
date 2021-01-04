@@ -55,6 +55,7 @@ const config = {
       '@stylebot/i18n': path.resolve(__dirname, './src/i18n/index'),
       '@stylebot/sync': path.resolve(__dirname, './src/sync/index'),
       '@stylebot/types': path.resolve(__dirname, './src/types/index'),
+      '@stylebot/utils': path.resolve(__dirname, './src/utils/index'),
       '@stylebot/dark-mode': path.resolve(__dirname, './src/dark-mode/index'),
       '@stylebot/settings': path.resolve(__dirname, './src/settings/index'),
 

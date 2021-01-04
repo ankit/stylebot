@@ -1,20 +1,19 @@
-import { compareAsc, format } from 'date-fns';
+import { compareAsc } from 'date-fns';
 
 import {
-  GoogleDriveSyncMetadata,
   StyleMap,
   SetAllStyles,
+  GoogleDriveSyncMetadata,
 } from '@stylebot/types';
+import { getCurrentTimestamp } from '@stylebot/utils';
 
 import mergeStyles from './merge-styles';
 import getAccessToken from './get-access-token';
-
 import {
   getGoogleDriveSyncMetadata,
   getLocalStylesMetadata,
   setGoogleDriveSyncMetadata,
 } from './sync-metadata';
-
 import {
   getSyncFileMetadata,
   downloadSyncFile,
@@ -23,8 +22,6 @@ import {
 
 const getStylesBlob = (styles: StyleMap) =>
   new Blob([JSON.stringify(styles)], { type: 'application/json' });
-
-const getTimestamp = () => format(new Date(), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
 
 /**
  * Copy local styles to remote and update sync metadata
@@ -60,7 +57,7 @@ const writeToLocal = async (
 
   return setGoogleDriveSyncMetadata({
     ...syncMetadata,
-    modifiedTime: getTimestamp(),
+    modifiedTime: getCurrentTimestamp(),
   });
 };
 
