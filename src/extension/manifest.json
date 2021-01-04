@@ -49,15 +49,15 @@
   },
 
   "permissions": [
-    "tabs", 
-    "contextMenus", 
-    "storage", 
-    "unlimitedStorage", 
-    "https://fonts.googleapis.com/*", 
-    "identity", 
-    "https://apis.google.com/js/api.js", 
-    "https://www.googleapis.com/*", 
-    "https://drive.google.com/*"
+    "tabs",
+    "storage",
+    "identity",
+    "contextMenus",
+    "unlimitedStorage",
+    "https://drive.google.com/*",
+    "https://www.googleapis.com/*",
+    "https://fonts.googleapis.com/*",
+    "https://apis.google.com/js/api.js"
   ],
 
   "web_accessible_resources": [
