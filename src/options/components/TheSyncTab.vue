@@ -26,6 +26,11 @@
       <a :href="googleDriveSyncDownloadLink" target="_blank">Download</a>
     </b-row>
 
+    <b-row v-if="googleDriveSyncEnabled" no-gutters class="sync-metadata">
+      Styles are automatically backed up when you modify them and remote is
+      checked for updates once per day.
+    </b-row>
+
     <b-row no-gutters class="mt-2">
       <app-button
         v-if="googleDriveSyncEnabled"
