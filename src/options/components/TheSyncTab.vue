@@ -9,9 +9,10 @@
       no-gutters
       class="sync-metadata"
     >
-      Synced {{ googleDriveSyncLastModifiedTime }}. View&nbsp;
-      <a :href="googleDriveSyncFileLink" target="_blank">backup</a>
-      .
+      Synced {{ googleDriveSyncLastModifiedTime }}&nbsp;·&nbsp;
+      <a :href="googleDriveSyncViewLink" target="_blank">View</a>
+      &nbsp;·&nbsp;
+      <a :href="googleDriveSyncDownloadLink" target="_blank">Download</a>
     </b-row>
 
     <b-row
@@ -19,9 +20,10 @@
       no-gutters
       class="sync-metadata"
     >
-      Syncing... View&nbsp;
-      <a :href="googleDriveSyncFileLink" target="_blank">backup</a>
-      .
+      Syncing...&nbsp;·&nbsp;
+      <a :href="googleDriveSyncViewLink" target="_blank">View</a>
+      &nbsp;·&nbsp;
+      <a :href="googleDriveSyncDownloadLink" target="_blank">Download</a>
     </b-row>
 
     <b-row no-gutters class="mt-2">
@@ -58,7 +60,7 @@
     <the-export-modal v-model="exportModal" @close="exportModal = false" />
 
     <b-row no-gutters class="mt-5">
-      <h2>Backup</h2>
+      <h2>Manual Backup</h2>
     </b-row>
 
     <b-row no-gutters>
@@ -121,27 +123,31 @@ export default Vue.extend({
       },
     },
 
-    googleDriveSyncFileLink: {
-      get(): string {
-        if (this.$store.state.googleDriveSyncMetadata) {
-          return this.$store.state.googleDriveSyncMetadata.webContentLink;
-        }
+    googleDriveSyncViewLink(): string {
+      if (this.$store.state.googleDriveSyncMetadata) {
+        return this.$store.state.googleDriveSyncMetadata.webViewLink;
+      }
 
-        return '';
-      },
+      return '';
     },
 
-    googleDriveSyncLastModifiedTime: {
-      get(): string {
-        if (this.$store.state.googleDriveSyncMetadata) {
-          return formatDistanceToNow(
-            new Date(this.$store.state.googleDriveSyncMetadata.modifiedTime),
-            { addSuffix: true }
-          );
-        }
+    googleDriveSyncDownloadLink(): string {
+      if (this.$store.state.googleDriveSyncMetadata) {
+        return this.$store.state.googleDriveSyncMetadata.webContentLink;
+      }
 
-        return '';
-      },
+      return '';
+    },
+
+    googleDriveSyncLastModifiedTime(): string {
+      if (this.$store.state.googleDriveSyncMetadata) {
+        return formatDistanceToNow(
+          new Date(this.$store.state.googleDriveSyncMetadata.modifiedTime),
+          { addSuffix: true }
+        );
+      }
+
+      return '';
     },
   },
 
@@ -168,7 +174,6 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .sync-metadata {
   color: #555;
-  font-style: italic;
   font-size: 12px;
 }
 </style>
