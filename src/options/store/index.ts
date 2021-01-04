@@ -181,7 +181,8 @@ export default new Vuex.Store<State>({
 
     async syncWithGoogleDrive({ state, dispatch }) {
       await runGoogleDriveSync(state.styles);
-      return dispatch('getGoogleDriveSyncMetadata');
+      await dispatch('getGoogleDriveSyncMetadata');
+      await dispatch('getAllStyles');
     },
   },
 });
