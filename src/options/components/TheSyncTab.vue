@@ -32,7 +32,7 @@
         class="mr-4"
         variant="primary"
         :disabled="syncInProgress"
-        @click="syncGoogleDrive"
+        @click="syncWithGoogleDrive"
       >
         Sync Now
       </app-button>
@@ -41,7 +41,7 @@
         v-if="googleDriveSyncEnabled"
         class="mr-4"
         variant="secondary"
-        @click="disableGoogleDriveSync"
+        @click="googleDriveSyncEnabled = false"
       >
         Disable Google Drive Sync
       </app-button>
@@ -50,7 +50,7 @@
         v-if="!googleDriveSyncEnabled"
         class="mr-4"
         variant="primary"
-        @click="enableGoogleDriveSync"
+        @click="googleDriveSyncEnabled = true"
       >
         Enable Google Drive Sync
       </app-button>
@@ -80,8 +80,6 @@
 <script lang="ts">
 import Vue from 'vue';
 import { formatDistanceToNow } from 'date-fns';
-
-import { setGoogleDriveSyncEnabled, runGoogleDriveSync } from '@stylebot/sync';
 
 import AppButton from './AppButton.vue';
 
@@ -115,11 +113,8 @@ export default Vue.extend({
         return this.$store.state.googleDriveSyncEnabled;
       },
 
-      async set(val: boolean) {
-        setGoogleDriveSyncEnabled(val);
-        if (val) {
-          this.syncGoogleDrive();
-        }
+      set(val: boolean) {
+        this.$store.dispatch('setGoogleDriveSyncEnabled', val);
       },
     },
 
@@ -152,20 +147,10 @@ export default Vue.extend({
   },
 
   methods: {
-    async syncGoogleDrive() {
+    async syncWithGoogleDrive() {
       this.syncInProgress = true;
-      await runGoogleDriveSync(this.$store.state.styles);
-
-      this.$store.dispatch('getGoogleDriveSyncMetadata');
+      await this.$store.dispatch('syncWithGoogleDrive');
       this.syncInProgress = false;
-    },
-
-    enableGoogleDriveSync() {
-      this.googleDriveSyncEnabled = true;
-    },
-
-    disableGoogleDriveSync() {
-      this.googleDriveSyncEnabled = false;
     },
   },
 });

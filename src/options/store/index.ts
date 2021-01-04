@@ -15,6 +15,7 @@ import {
   getGoogleDriveSyncMetadata,
 } from '@stylebot/sync';
 import { getCurrentTimestamp } from '@stylebot/utils';
+import { setGoogleDriveSyncEnabled, runGoogleDriveSync } from '@stylebot/sync';
 
 import {
   getAllStyles,
@@ -167,8 +168,20 @@ export default new Vuex.Store<State>({
       setCommands(commands);
     },
 
-    setGoogleDriveSyncEnabled({ state }, enabled: boolean) {
+    setGoogleDriveSyncEnabled({ state, dispatch }, enabled: boolean) {
       state.googleDriveSyncEnabled = enabled;
+      setGoogleDriveSyncEnabled(enabled);
+
+      if (enabled) {
+        dispatch('syncWithGoogleDrive');
+      } else {
+        state.googleDriveSyncMetadata = undefined;
+      }
+    },
+
+    async syncWithGoogleDrive({ state, dispatch }) {
+      await runGoogleDriveSync(state.styles);
+      return dispatch('getGoogleDriveSyncMetadata');
     },
   },
 });

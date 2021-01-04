@@ -140,4 +140,9 @@ export const runGoogleDriveSync = async (styles: StyleMap): Promise<void> => {
     console.log('local was updated since last sync, updating remote...');
     return writeToRemote(accessToken, syncMetadata, styles);
   }
+
+  return setGoogleDriveSyncMetadata({
+    ...syncMetadata,
+    modifiedTime: getCurrentTimestamp(),
+  });
 };
