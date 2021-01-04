@@ -16,6 +16,8 @@
       <b-form-checkbox v-model="enabled" @change="$emit('toggle')">
         {{ url }}
       </b-form-checkbox>
+
+      <span class="style-timestamp">updated {{ formattedTimestamp }}</span>
     </b-col>
 
     <b-col cols="5">
@@ -37,6 +39,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import { formatDistanceToNow } from 'date-fns';
 
 import AppButton from '../AppButton.vue';
 import StyleEditor from './StyleEditor.vue';
@@ -60,6 +63,10 @@ export default Vue.extend({
       type: String,
       required: true,
     },
+    modifiedTime: {
+      type: String,
+      required: true,
+    },
     initialEnabled: Boolean,
     initialReadability: Boolean,
   },
@@ -74,6 +81,14 @@ export default Vue.extend({
       enabled: this.initialEnabled,
       readability: this.initialReadability,
     };
+  },
+
+  computed: {
+    formattedTimestamp(): string {
+      return formatDistanceToNow(new Date(this.modifiedTime), {
+        addSuffix: true,
+      });
+    },
   },
 
   watch: {
@@ -91,5 +106,12 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .style {
   border-bottom: 1px solid #ddd;
+}
+
+.style-timestamp {
+  color: #555;
+  font-size: 12px;
+  font-style: italic;
+  margin-left: 24px;
 }
 </style>

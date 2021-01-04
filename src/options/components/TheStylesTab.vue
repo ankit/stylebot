@@ -52,6 +52,7 @@
           :key="style.url"
           :css="style.css"
           :url="style.url"
+          :modified-time="style.modifiedTime"
           :initial-enabled="style.enabled"
           @save="saveStyle"
           @delete="deleteStyle(style)"
@@ -64,10 +65,11 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import { compareAsc } from 'date-fns';
+
 import { Style } from '@stylebot/types';
 
 import AppButton from './AppButton.vue';
-
 import StyleComponent from './styles/Style.vue';
 import StyleEditor from './styles/StyleEditor.vue';
 import TheDeleteAllStylesButton from './styles/TheDeleteAllStylesButton.vue';
@@ -108,6 +110,10 @@ export default Vue.extend({
           });
         }
       }
+
+      styles.sort((s1, s2) =>
+        compareAsc(new Date(s2.modifiedTime), new Date(s1.modifiedTime))
+      );
 
       return styles;
     },
