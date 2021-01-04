@@ -9,6 +9,7 @@ import {
   EnableStyleForTab,
   DisableStyleForTab,
 } from '@stylebot/types';
+import { scheduleGoogleDriveSync } from '@stylebot/sync';
 
 import BackgroundPageUtils from './utils';
 
@@ -20,13 +21,18 @@ class BackgroundPageStyles {
   }
 
   persistStorage(): void {
-    chrome.storage.local.set({
-      styles: this.styles,
+    chrome.storage.local.set(
+      {
+        styles: this.styles,
 
-      'styles-metadata': {
-        modifiedTime: getCurrentTimestamp(),
+        'styles-metadata': {
+          modifiedTime: getCurrentTimestamp(),
+        },
       },
-    });
+      () => {
+        scheduleGoogleDriveSync();
+      }
+    );
   }
 
   get(url: string): StyleWithoutUrl {
