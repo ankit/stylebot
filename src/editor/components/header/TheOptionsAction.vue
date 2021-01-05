@@ -86,7 +86,7 @@ export default Vue.extend({
     border: none !important;
     font-size: 15.5px !important;
     padding: 0 !important;
-    line-height: 20px !important;
+    line-height: 20.5px !important;
 
     .b-icon.bi {
       display: inline-block !important;
