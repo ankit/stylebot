@@ -8,7 +8,7 @@ export const scheduleGoogleDriveSync = async (): Promise<void> => {
   chrome.alarms.clear('google-drive-sync', () => {
     if (googleDriveSyncEnabled) {
       chrome.alarms.create('google-drive-sync', {
-        delayInMinutes: 2,
+        delayInMinutes: 1,
       });
     }
   });
