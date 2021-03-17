@@ -1,6 +1,6 @@
 <template>
   <b-list-group-item>
-    <b-form-checkbox v-model="readability" switch @change="toggle">
+    <b-form-checkbox v-model="readability" switch @change="onChange">
       {{ t('readability') }}
     </b-form-checkbox>
   </b-list-group-item>
@@ -31,7 +31,7 @@ export default Vue.extend({
   },
 
   methods: {
-    toggle(): void {
+    onChange(): void {
       chrome.tabs.query({ active: true }, ([tab]) => {
         if (tab.id) {
           const message: ToggleReadabilityForTab = {

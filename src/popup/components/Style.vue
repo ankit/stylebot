@@ -4,7 +4,7 @@
       v-model="enabled"
       switch
       :disabled="disableToggle"
-      @change="toggle"
+      @change="onChange"
     >
       {{ url }}
     </b-form-checkbox>
@@ -39,11 +39,11 @@ export default Vue.extend({
   },
 
   methods: {
-    toggle(): void {
+    onChange(): void {
       if (this.enabled) {
-        this.disable();
-      } else {
         this.enable();
+      } else {
+        this.disable();
       }
     },
 
@@ -54,7 +54,6 @@ export default Vue.extend({
       };
 
       chrome.runtime.sendMessage(message);
-      this.enabled = true;
     },
 
     disable(): void {
@@ -64,7 +63,6 @@ export default Vue.extend({
       };
 
       chrome.runtime.sendMessage(message);
-      this.enabled = false;
     },
   },
 });

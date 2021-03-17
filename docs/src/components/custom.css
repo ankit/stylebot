@@ -30,7 +30,13 @@
   opacity: 1;
 }
 
-.chrome-install-link {
+.download-link-list {
+  display: flex;
+  width: 400px;
+  margin: 0 auto;
+}
+
+.download-link {
   display: flex;
   margin: 0 auto;
   align-items: center;
@@ -44,11 +50,11 @@
   margin-top: 20px;
 }
 
-.chrome-install-link:hover {
+.download-link:hover {
   background: #eee;
 }
 
-.chrome-install-link:visited {
+.download-link:visited {
   color: #333;
 }
 

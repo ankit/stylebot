@@ -30,11 +30,10 @@ export default Vue.extend({
   padding: 0;
   border: none;
   font-size: 15px;
-  line-height: 18px;
   background: none;
   position: absolute;
   top: 0;
-  left: 5px;
+  left: 5.5px;
 
   &.move-window-action {
     left: 24px;

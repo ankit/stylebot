@@ -1,3 +1,8 @@
+## Version 3.0.7
+
+- Fix style toggle switch bug in popup (#612)
+- Improvements to Japanese translation
+
 ## Version 3.0.6
 
 - Add Firefox support
