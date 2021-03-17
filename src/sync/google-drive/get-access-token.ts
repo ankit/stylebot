@@ -1,7 +1,6 @@
 // Code from https://github.com/mdn/webextensions-examples/tree/master/google-userinfo
 export type AccessToken = string;
 
-// TODO: Make this hidden
 const CLIENT_ID =
   '662998053209-s49tq55ic3td87m08gi8vpjqm5t7r9st.apps.googleusercontent.com';
 
