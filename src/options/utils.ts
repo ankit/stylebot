@@ -11,19 +11,11 @@ import {
   SetCommands,
   GetCommandsResponse,
   StylebotCommands,
-  Timestamp,
+  StyleMap,
+  RunGoogleDriveSync,
 } from '@stylebot/types';
 
-type Styles = {
-  [url: string]: {
-    css: string;
-    enabled: boolean;
-    readability: boolean;
-    modifiedTime: Timestamp;
-  };
-};
-
-export const getAllStyles = async (): Promise<Styles> => {
+export const getAllStyles = async (): Promise<GetAllStylesResponse> => {
   const message: GetAllStyles = {
     name: 'GetAllStyles',
   };
@@ -47,7 +39,7 @@ export const getAllOptions = async (): Promise<StylebotOptions> => {
   });
 };
 
-export const setAllStyles = (styles: Styles): void => {
+export const setAllStyles = (styles: StyleMap): void => {
   const message: SetAllStyles = {
     name: 'SetAllStyles',
     styles,
@@ -99,4 +91,16 @@ export const setCommands = (commands: StylebotCommands): void => {
   };
 
   chrome.runtime.sendMessage(message);
+};
+
+export const runGoogleDriveSync = async (): Promise<void> => {
+  const message: RunGoogleDriveSync = {
+    name: 'RunGoogleDriveSync',
+  };
+
+  return new Promise(resolve => {
+    chrome.runtime.sendMessage(message, () => {
+      resolve();
+    });
+  });
 };

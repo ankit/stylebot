@@ -1,6 +1,5 @@
-import BackgroundPageStyles from 'background/styles';
-
 import { runGoogleDriveSync, getGoogleDriveSyncEnabled } from '@stylebot/sync';
+import BackgroundPageStyles from 'background/styles';
 
 export const scheduleGoogleDriveSync = async (): Promise<void> => {
   const googleDriveSyncEnabled = await getGoogleDriveSyncEnabled();
@@ -8,6 +7,7 @@ export const scheduleGoogleDriveSync = async (): Promise<void> => {
   if (googleDriveSyncEnabled) {
     chrome.alarms.create('google-drive-sync', {
       delayInMinutes: 1,
+      periodInMinutes: 720,
     });
   }
 };
@@ -20,7 +20,7 @@ export const initGoogleDriveSyncScheduler = (
       const googleDriveSyncEnabled = await getGoogleDriveSyncEnabled();
 
       if (googleDriveSyncEnabled) {
-        runGoogleDriveSync(styles.getAll());
+        runGoogleDriveSync(styles);
       }
     }
   });

@@ -21,6 +21,7 @@ import {
   GetReadabilitySettings,
   SetReadabilitySettings,
   GetImportCss,
+  RunGoogleDriveSync,
 } from './messages';
 
 import {
@@ -30,7 +31,10 @@ import {
 } from '@stylebot/types';
 
 import BackgroundPageOptions from './options';
-import { initGoogleDriveSyncScheduler } from '@stylebot/sync';
+import {
+  initGoogleDriveSyncScheduler,
+  scheduleGoogleDriveSync,
+} from '@stylebot/sync';
 
 /**
  * Initialize listeners for the background page
@@ -108,6 +112,9 @@ const init = (
         case 'GetImportCss':
           GetImportCss(message, styles, sendResponse);
           break;
+        case 'RunGoogleDriveSync':
+          RunGoogleDriveSync(message, styles, sendResponse);
+          break;
       }
 
       return true;
@@ -144,6 +151,7 @@ const init = (
   });
 
   initGoogleDriveSyncScheduler(styles);
+  scheduleGoogleDriveSync();
 };
 
 export default { init };

@@ -27,6 +27,7 @@ export type GetCommandsResponse = StylebotCommands;
 export type GetReadabilitySettingsResponse = ReadabilitySettings;
 
 export type GetImportCssResponse = string;
+export type RunGoogleDriveSyncResponse = void;
 
 type BackgroundPageMessageResponse =
   | GetAllOptionsResponse
@@ -35,6 +36,7 @@ type BackgroundPageMessageResponse =
   | GetStylesForPageResponse
   | GetCommandsResponse
   | GetReadabilitySettingsResponse
-  | GetImportCssResponse;
+  | GetImportCssResponse
+  | RunGoogleDriveSyncResponse;
 
 export default BackgroundPageMessageResponse;

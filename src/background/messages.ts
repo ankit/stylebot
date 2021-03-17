@@ -16,6 +16,7 @@ import {
   SetReadability as SetReadabilityType,
   SetReadabilitySettings as SetReadabilitySettingsType,
   GetImportCss as GetImportCssType,
+  RunGoogleDriveSync as RunGoogleDriveSyncType,
   GetCommandsResponse,
   GetAllOptionsResponse,
   GetAllStylesResponse,
@@ -23,7 +24,9 @@ import {
   GetStylesForPageResponse,
   GetReadabilitySettingsResponse,
   GetImportCssResponse,
+  RunGoogleDriveSyncResponse,
 } from '@stylebot/types';
+import { runGoogleDriveSync } from '@stylebot/sync';
 
 import {
   get as getReadabilitySettings,
@@ -164,6 +167,15 @@ export const GetImportCss = async (
 ): Promise<void> => {
   const css = await styles.getImportCss(message.url);
   sendResponse(css);
+};
+
+export const RunGoogleDriveSync = async (
+  _message: RunGoogleDriveSyncType,
+  styles: BackgroundPageStyles,
+  sendResponse: (response: RunGoogleDriveSyncResponse) => void
+): Promise<void> => {
+  await runGoogleDriveSync(styles);
+  sendResponse();
 };
 
 export const CopyToClipboard = (text: string): void => {

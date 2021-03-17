@@ -105,6 +105,10 @@ export type GetImportCss = {
   url: string;
 };
 
+export type RunGoogleDriveSync = {
+  name: 'RunGoogleDriveSync';
+};
+
 type BackgroundPageMessage =
   | SetStyle
   | EnableStyle
@@ -124,6 +128,7 @@ type BackgroundPageMessage =
   | SetCommands
   | GetReadabilitySettings
   | SetReadabilitySettings
-  | GetImportCss;
+  | GetImportCss
+  | RunGoogleDriveSync;
 
 export default BackgroundPageMessage;
