@@ -64,7 +64,7 @@ export const SetAllStyles = (
   message: SetAllStylesType,
   styles: BackgroundPageStyles
 ): void => {
-  styles.setAll(message.styles);
+  styles.setAll(message.styles, message.shouldPersist);
 };
 
 export const GetStylesForIframe = (

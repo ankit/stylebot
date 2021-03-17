@@ -43,9 +43,12 @@ class BackgroundPageStyles {
     return this.styles;
   }
 
-  setAll(styles: StyleMap): void {
+  setAll(styles: StyleMap, shouldPersist = true): void {
     this.styles = styles;
-    this.persistStorage();
+
+    if (shouldPersist) {
+      this.persistStorage();
+    }
   }
 
   set(url: string, css: string, readability: boolean): void {

@@ -51,6 +51,7 @@ const writeToLocal = async (
   const message: SetAllStyles = {
     name: 'SetAllStyles',
     styles: styles,
+    shouldPersist: false,
   };
 
   chrome.runtime.sendMessage(message);
@@ -87,62 +88,65 @@ const merge = async (
  */
 export const runGoogleDriveSync = async (styles: StyleMap): Promise<void> => {
   const accessToken = await getAccessToken();
-  const syncMetadata = await getSyncFileMetadata(accessToken);
+  const remoteSyncMetadata = await getSyncFileMetadata(accessToken);
 
-  console.log('syncing with google drive...', syncMetadata);
+  console.debug('syncing with google drive...');
 
-  if (!syncMetadata) {
-    console.log('did not find remote sync file, updating remote...');
+  if (!remoteSyncMetadata) {
+    console.debug('did not find remote sync file, updating remote...');
 
     const blob = getStylesBlob(styles);
-    const syncMetadata = await writeSyncFile(accessToken, blob);
-    return setGoogleDriveSyncMetadata(syncMetadata);
+    const remoteSyncMetadata = await writeSyncFile(accessToken, blob);
+    return setGoogleDriveSyncMetadata(remoteSyncMetadata);
   }
 
   const localSyncMetadata = await getGoogleDriveSyncMetadata();
 
   if (!localSyncMetadata) {
-    console.log('no local sync metadata found. merging local and remote...');
-    return merge(accessToken, syncMetadata, styles);
+    console.debug('no local sync metadata found. merging local and remote...');
+    return merge(accessToken, remoteSyncMetadata, styles);
   }
 
   const localStylesMetadata = await getLocalStylesMetadata();
 
-  if (
-    compareAsc(
-      new Date(syncMetadata.modifiedTime),
-      new Date(localSyncMetadata.modifiedTime)
-    ) > 0
-  ) {
-    if (
-      compareAsc(
-        new Date(localStylesMetadata.modifiedTime),
-        new Date(syncMetadata.modifiedTime)
-      ) > 0
-    ) {
-      console.log(
+  const localSyncTime = new Date(localSyncMetadata.modifiedTime);
+  const remoteSyncTime = new Date(remoteSyncMetadata.modifiedTime);
+  const localStylesModifiedTime = new Date(localStylesMetadata.modifiedTime);
+
+  console.debug('sync info', {
+    localSyncTime,
+    remoteSyncTime,
+    localStylesModifiedTime,
+  });
+
+  // check if the remote is newer v/s local
+  if (compareAsc(remoteSyncTime, localSyncTime) > 0) {
+    // check if local styles were modified v/s remote
+    if (compareAsc(localStylesModifiedTime, remoteSyncTime) > 0) {
+      console.debug(
         'both local and remote were updated since last sync, merging local and remote...'
       );
-      return merge(accessToken, syncMetadata, styles);
+
+      return merge(accessToken, remoteSyncMetadata, styles);
     }
 
-    console.log('remote was updated since last sync, updating local...');
-    const remoteStyles = await downloadSyncFile(accessToken, syncMetadata.id);
-    return writeToLocal(syncMetadata, remoteStyles);
+    console.debug('remote was updated since last sync, updating local...');
+    const remoteStyles = await downloadSyncFile(
+      accessToken,
+      remoteSyncMetadata.id
+    );
+
+    return writeToLocal(remoteSyncMetadata, remoteStyles);
   }
 
-  if (
-    compareAsc(
-      new Date(localStylesMetadata.modifiedTime),
-      new Date(syncMetadata.modifiedTime)
-    ) > 0
-  ) {
-    console.log('local was updated since last sync, updating remote...');
-    return writeToRemote(accessToken, syncMetadata, styles);
+  // check if local styles were modified v/s remote
+  if (compareAsc(localStylesModifiedTime, remoteSyncTime) > 0) {
+    console.debug('local was updated since last sync, updating remote...');
+    return writeToRemote(accessToken, remoteSyncMetadata, styles);
   }
 
   return setGoogleDriveSyncMetadata({
-    ...syncMetadata,
+    ...remoteSyncMetadata,
     modifiedTime: getCurrentTimestamp(),
   });
 };

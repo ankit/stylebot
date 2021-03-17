@@ -29,6 +29,7 @@ export type GetAllStyles = {
 export type SetAllStyles = {
   name: 'SetAllStyles';
   styles: StyleMap;
+  shouldPersist?: boolean;
 };
 
 export type MoveStyle = {
