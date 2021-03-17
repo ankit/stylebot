@@ -1,7 +1,7 @@
 <template>
   <div class="pt-3">
     <b-row no-gutters class="mt-5">
-      <h2>Sync via Google Drive</h2>
+      <h2>Sync via Google Drive (experimental)</h2>
     </b-row>
 
     <b-row
