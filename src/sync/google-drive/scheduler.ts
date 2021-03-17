@@ -5,13 +5,11 @@ import { runGoogleDriveSync, getGoogleDriveSyncEnabled } from '@stylebot/sync';
 export const scheduleGoogleDriveSync = async (): Promise<void> => {
   const googleDriveSyncEnabled = await getGoogleDriveSyncEnabled();
 
-  chrome.alarms.clear('google-drive-sync', () => {
-    if (googleDriveSyncEnabled) {
-      chrome.alarms.create('google-drive-sync', {
-        delayInMinutes: 1,
-      });
-    }
-  });
+  if (googleDriveSyncEnabled) {
+    chrome.alarms.create('google-drive-sync', {
+      delayInMinutes: 1,
+    });
+  }
 };
 
 export const initGoogleDriveSyncScheduler = (

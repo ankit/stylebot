@@ -96,6 +96,7 @@ const patchBackup = async (
   const metadata = {
     modifiedTime: getCurrentTimestamp(),
   };
+
   const metadataBlob = new Blob([JSON.stringify(metadata)], {
     type: 'application/json',
   });
@@ -122,6 +123,7 @@ export const getSyncFileMetadata = async (
 ): Promise<GoogleDriveSyncMetadata | null> => {
   const query = `name = '${SYNC_FILE_NAME}'`;
   const url = `${GOOGLE_DRIVE_FILE_GET_API}?q=${encodeURIComponent(query)}`;
+
   const response = await fetch(url, {
     method: 'GET',
     headers: getAuthorizationHeaders(accessToken),
