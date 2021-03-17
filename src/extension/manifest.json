@@ -57,8 +57,7 @@
     "unlimitedStorage",
     "https://drive.google.com/*",
     "https://www.googleapis.com/*",
-    "https://fonts.googleapis.com/*",
-    "https://apis.google.com/js/api.js"
+    "https://fonts.googleapis.com/*"
   ],
 
   "web_accessible_resources": [
