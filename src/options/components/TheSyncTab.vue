@@ -1,7 +1,7 @@
 <template>
   <div class="pt-3">
     <b-row no-gutters class="mt-5">
-      <h2>Sync via Google Drive (experimental)</h2>
+      <h2>{{ t('sync_via_google_drive') }}</h2>
     </b-row>
 
     <b-row
@@ -9,10 +9,14 @@
       no-gutters
       class="sync-metadata"
     >
-      Synced {{ googleDriveSyncLastModifiedTime }}&nbsp;·&nbsp;
-      <a :href="googleDriveSyncViewLink" target="_blank">View</a>
+      {{ t('synced_at_time', [googleDriveSyncLastModifiedTime]) }}&nbsp;·&nbsp;
+      <a :href="googleDriveSyncViewLink" target="_blank">
+        {{ t('view_synced_file') }}
+      </a>
       &nbsp;·&nbsp;
-      <a :href="googleDriveSyncDownloadLink" target="_blank">Download</a>
+      <a :href="googleDriveSyncDownloadLink" target="_blank">
+        {{ t('download_synced_file') }}
+      </a>
     </b-row>
 
     <b-row
@@ -20,15 +24,18 @@
       no-gutters
       class="sync-metadata"
     >
-      Syncing...&nbsp;·&nbsp;
-      <a :href="googleDriveSyncViewLink" target="_blank">View</a>
+      {{ t('sync_in_progress') }}&nbsp;·&nbsp;
+      <a :href="googleDriveSyncViewLink" target="_blank">
+        {{ t('view_synced_file') }}
+      </a>
       &nbsp;·&nbsp;
-      <a :href="googleDriveSyncDownloadLink" target="_blank">Download</a>
+      <a :href="googleDriveSyncDownloadLink" target="_blank">
+        {{ t('download_synced_file') }}
+      </a>
     </b-row>
 
     <b-row v-if="googleDriveSyncEnabled" no-gutters class="sync-metadata">
-      Styles are automatically backed up when you modify them and remote is
-      checked for updates once per day.
+      {{ t('sync_enabled_description') }}
     </b-row>
 
     <b-row no-gutters class="mt-2">
@@ -39,7 +46,7 @@
         :disabled="syncInProgress"
         @click="syncWithGoogleDrive"
       >
-        Sync Now
+        {{ t('sync_now') }}
       </app-button>
 
       <app-button
@@ -48,7 +55,7 @@
         variant="secondary"
         @click="googleDriveSyncEnabled = false"
       >
-        Disable Google Drive Sync
+        {{ t('disable_google_drive_sync') }}
       </app-button>
 
       <app-button
@@ -57,7 +64,7 @@
         variant="primary"
         @click="googleDriveSyncEnabled = true"
       >
-        Enable Google Drive Sync
+        {{ t('enable_google_drive_sync') }}
       </app-button>
     </b-row>
 
@@ -65,7 +72,7 @@
     <the-export-modal v-model="exportModal" @close="exportModal = false" />
 
     <b-row no-gutters class="mt-5">
-      <h2>Manual Backup</h2>
+      <h2>{{ t('manual_backup') }}</h2>
     </b-row>
 
     <b-row no-gutters>
