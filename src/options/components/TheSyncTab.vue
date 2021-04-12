@@ -1,11 +1,11 @@
 <template>
   <div class="pt-3">
     <b-alert v-model="showImportSuccessAlert" variant="success" dismissible>
-      Styles successfully imported.
+      {{ t('import_success') }}
     </b-alert>
 
     <b-alert v-model="showImportErrorAlert" variant="danger" dismissible>
-      Could not import styles. {{ importError }}
+      {{ t('import_error', [importError]) }}
     </b-alert>
 
     <b-row no-gutters class="mt-5 mb-1">
@@ -59,7 +59,7 @@
         />
 
         <span class="pl-2">
-          {{ syncInProgress ? 'Syncing...' : t('sync_now') }}
+          {{ syncInProgress ? t('sync_in_progress') : t('sync_now') }}
         </span>
       </app-button>
 
@@ -87,7 +87,7 @@
     </b-row>
 
     <b-row no-gutters class="description mb-4">
-      Export / import styles as json
+      {{ t('backup_description') }}
     </b-row>
 
     <b-row no-gutters>
