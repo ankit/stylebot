@@ -35,7 +35,7 @@
     </b-row>
 
     <b-row v-if="googleDriveSyncEnabled" no-gutters class="sync-metadata">
-      {{ t('sync_enabled_description') }}
+      {{ t('sync_description') }}
     </b-row>
 
     <b-row no-gutters class="mt-2">
@@ -46,7 +46,14 @@
         :disabled="syncInProgress"
         @click="syncWithGoogleDrive"
       >
-        {{ t('sync_now') }}
+        <b-icon
+          icon="arrow-repeat"
+          :animation="syncInProgress ? 'spin' : undefined"
+        />
+
+        <span class="pl-2">
+          {{ syncInProgress ? 'Syncing...' : t('sync_now') }}
+        </span>
       </app-button>
 
       <app-button
