@@ -12,7 +12,7 @@
       <h2>{{ t('sync_via_google_drive') }}</h2>
     </b-row>
 
-    <b-row no-gutters class="description mb-4">
+    <b-row no-gutters class="description mb-1">
       <div v-if="googleDriveSyncLastModifiedTime && !syncInProgress">
         {{
           t('synced_at_time', [googleDriveSyncLastModifiedTime])
@@ -39,10 +39,10 @@
           {{ t('download_synced_file') }}
         </a>
       </div>
+    </b-row>
 
-      <div v-if="googleDriveSyncEnabled">
-        {{ t('sync_description') }}
-      </div>
+    <b-row v-if="googleDriveSyncEnabled" no-gutters class="description mb-4">
+      {{ t('sync_description') }}
     </b-row>
 
     <b-row no-gutters>
