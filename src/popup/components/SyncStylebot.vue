@@ -11,7 +11,7 @@
     />
 
     <span class="pl-2">
-      {{ syncInProgress ? 'Syncing...' : 'Sync Now' }}
+      {{ syncInProgress ? t('sync_in_progress') : t('sync_now') }}
 
       <span class="sync-metadata pl-1">
         {{ syncInProgress ? undefined : syncTime }}
