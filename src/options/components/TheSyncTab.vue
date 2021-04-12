@@ -1,44 +1,51 @@
 <template>
   <div class="pt-3">
-    <b-row no-gutters class="mt-5">
+    <b-alert v-model="showImportSuccessAlert" variant="success" dismissible>
+      Styles successfully imported.
+    </b-alert>
+
+    <b-alert v-model="showImportErrorAlert" variant="danger" dismissible>
+      Could not import styles. {{ importError }}
+    </b-alert>
+
+    <b-row no-gutters class="mt-5 mb-1">
       <h2>{{ t('sync_via_google_drive') }}</h2>
     </b-row>
 
-    <b-row
-      v-if="googleDriveSyncLastModifiedTime && !syncInProgress"
-      no-gutters
-      class="sync-metadata"
-    >
-      {{ t('synced_at_time', [googleDriveSyncLastModifiedTime]) }}&nbsp;·&nbsp;
-      <a :href="googleDriveSyncViewLink" target="_blank">
-        {{ t('view_synced_file') }}
-      </a>
-      &nbsp;·&nbsp;
-      <a :href="googleDriveSyncDownloadLink" target="_blank">
-        {{ t('download_synced_file') }}
-      </a>
+    <b-row no-gutters class="description mb-4">
+      <div v-if="googleDriveSyncLastModifiedTime && !syncInProgress">
+        {{
+          t('synced_at_time', [googleDriveSyncLastModifiedTime])
+        }}&nbsp;·&nbsp;
+
+        <a :href="googleDriveSyncViewLink" target="_blank">
+          {{ t('view_synced_file') }}
+        </a>
+
+        &nbsp;·&nbsp;
+        <a :href="googleDriveSyncDownloadLink" target="_blank">
+          {{ t('download_synced_file') }}
+        </a>
+      </div>
+
+      <div v-if="googleDriveSyncLastModifiedtime && syncInProgress">
+        {{ t('sync_in_progress') }}&nbsp;·&nbsp;
+        <a :href="googleDriveSyncViewLink" target="_blank">
+          {{ t('view_synced_file') }}
+        </a>
+        &nbsp;·&nbsp;
+
+        <a :href="googleDriveSyncDownloadLink" target="_blank">
+          {{ t('download_synced_file') }}
+        </a>
+      </div>
+
+      <div v-if="googleDriveSyncEnabled">
+        {{ t('sync_description') }}
+      </div>
     </b-row>
 
-    <b-row
-      v-if="googleDriveSyncLastModifiedTime && syncInProgress"
-      no-gutters
-      class="sync-metadata"
-    >
-      {{ t('sync_in_progress') }}&nbsp;·&nbsp;
-      <a :href="googleDriveSyncViewLink" target="_blank">
-        {{ t('view_synced_file') }}
-      </a>
-      &nbsp;·&nbsp;
-      <a :href="googleDriveSyncDownloadLink" target="_blank">
-        {{ t('download_synced_file') }}
-      </a>
-    </b-row>
-
-    <b-row v-if="googleDriveSyncEnabled" no-gutters class="sync-metadata">
-      {{ t('sync_description') }}
-    </b-row>
-
-    <b-row no-gutters class="mt-2">
+    <b-row no-gutters>
       <app-button
         v-if="googleDriveSyncEnabled"
         class="mr-4"
@@ -75,21 +82,22 @@
       </app-button>
     </b-row>
 
-    <the-import-modal v-model="importModal" @close="importModal = false" />
-    <the-export-modal v-model="exportModal" @close="exportModal = false" />
+    <b-row no-gutters class="mt-5 mb-1">
+      <h2>{{ t('backup') }}</h2>
+    </b-row>
 
-    <b-row no-gutters class="mt-5">
-      <h2>{{ t('manual_backup') }}</h2>
+    <b-row no-gutters class="description mb-4">
+      Export / import styles as json
     </b-row>
 
     <b-row no-gutters>
       <b-col>
-        <app-button class="mr-4" variant="primary" @click="exportModal = true">
-          {{ t('open_export_dialog') }}
+        <app-button class="mr-4" variant="primary" @click="exportJson">
+          {{ t('export') }}
         </app-button>
 
-        <app-button @click="importModal = true">
-          {{ t('open_import_dialog') }}
+        <app-button @click="importJson">
+          {{ t('import') }}
         </app-button>
       </b-col>
     </b-row>
@@ -102,27 +110,24 @@ import { formatDistanceToNow } from 'date-fns';
 
 import AppButton from './AppButton.vue';
 
-import TheImportModal from './backup/TheImportModal.vue';
-import TheExportModal from './backup/TheExportModal.vue';
-
 export default Vue.extend({
   name: 'TheBackupTab',
 
   components: {
     AppButton,
-    TheImportModal,
-    TheExportModal,
   },
 
   data(): {
-    importModal: boolean;
-    exportModal: boolean;
     syncInProgress: boolean;
+    showImportErrorAlert: boolean;
+    showImportSuccessAlert: boolean;
+    importError: string | DOMException | null;
   } {
     return {
-      importModal: false,
-      exportModal: false,
+      importError: null,
       syncInProgress: false,
+      showImportErrorAlert: false,
+      showImportSuccessAlert: false,
     };
   },
 
@@ -171,13 +176,69 @@ export default Vue.extend({
       await this.$store.dispatch('syncWithGoogleDrive');
       this.syncInProgress = false;
     },
+
+    exportJson(): void {
+      const json = JSON.stringify(this.$store.state.styles);
+      const dataStr =
+        'data:text/json;charset=utf-8,' + encodeURIComponent(json);
+      const downloadAnchorNode = document.createElement('a');
+      downloadAnchorNode.setAttribute('href', dataStr);
+      downloadAnchorNode.setAttribute('download', 'stylebot_backup.json');
+      document.body.appendChild(downloadAnchorNode);
+      downloadAnchorNode.click();
+      downloadAnchorNode.remove();
+    },
+
+    importJson(): void {
+      const fileInput = document.createElement('input');
+      fileInput.type = 'file';
+
+      fileInput.addEventListener('change', (event: Event) => {
+        const files = (event.target as HTMLInputElement).files;
+        if (files && files[0]) {
+          const file = files[0];
+          if (file.type && file.type !== 'application/json') {
+            this.importError = 'Only JSON format is supported.';
+            this.showImportErrorAlert = true;
+            this.showImportSuccessAlert = false;
+            return;
+          }
+
+          const reader = new FileReader();
+          reader.readAsText(file);
+
+          reader.onload = () => {
+            try {
+              const styles = JSON.parse(reader.result as string);
+              this.$store.dispatch('setAllStyles', styles);
+              this.showImportErrorAlert = false;
+              this.showImportSuccessAlert = true;
+            } catch (e) {
+              this.importError = e;
+              this.showImportErrorAlert = true;
+              this.showImportSuccessAlert = false;
+            }
+          };
+
+          reader.onerror = () => {
+            this.importError = reader.error;
+            this.showImportErrorAlert = true;
+            this.showImportSuccessAlert = false;
+          };
+        }
+      });
+
+      document.body.appendChild(fileInput);
+      fileInput.click();
+      fileInput.remove();
+    },
   },
 });
 </script>
 
 <style lang="scss" scoped>
-.sync-metadata {
+.description {
   color: #555;
-  font-size: 12px;
+  font-size: 15px;
 }
 </style>
