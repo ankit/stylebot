@@ -11,7 +11,6 @@ import Vue from 'vue';
 
 import TheMoveAction from './TheMoveAction.vue';
 import TheCloseAction from './TheCloseAction.vue';
-import TheOptionsAction from './TheOptionsAction.vue';
 
 export default Vue.extend({
   name: 'TheWindowActions',
@@ -19,21 +18,20 @@ export default Vue.extend({
   components: {
     TheMoveAction,
     TheCloseAction,
-    TheOptionsAction,
   },
 });
 </script>
 
 <style lang="scss" scoped>
 .window-action {
+  top: 0;
   margin: 0;
   padding: 0;
+  left: 5.5px;
   border: none;
   font-size: 15px;
   background: none;
   position: absolute;
-  top: 0;
-  left: 5.5px;
 
   &.move-window-action {
     left: 24px;
