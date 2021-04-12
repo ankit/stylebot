@@ -50,7 +50,6 @@
 
   "permissions": [
     "tabs",
-    "alarms",
     "storage",
     "identity",
     "contextMenus",

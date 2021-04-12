@@ -31,10 +31,6 @@ import {
 } from '@stylebot/types';
 
 import BackgroundPageOptions from './options';
-import {
-  initGoogleDriveSyncScheduler,
-  scheduleGoogleDriveSync,
-} from '@stylebot/sync';
 
 /**
  * Initialize listeners for the background page
@@ -149,9 +145,6 @@ const init = (
       });
     }
   });
-
-  initGoogleDriveSyncScheduler(styles);
-  scheduleGoogleDriveSync();
 };
 
 export default { init };
