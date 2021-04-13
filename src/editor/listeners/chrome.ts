@@ -42,7 +42,6 @@ const initChromeListener = (store: Store<State>): void => {
       } else if (message.name === 'ToggleReadabilityForTab') {
         toggleReadability({ state, dispatch });
       } else if (message.name === 'ApplyStylesToTab') {
-        console.log('ApplyStylesToTab', message);
         applyStyles({ dispatch }, message.defaultStyle, message.styles);
       }
     }
