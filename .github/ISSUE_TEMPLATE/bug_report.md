@@ -7,20 +7,23 @@ assignees: ''
 
 ---
 
-**Describe the bug**
+### Describe the bug
 A clear and concise description of what the bug is.
 
-**To Reproduce**
+### Browser
+Include the browser's version you are using including the operating system
+
+### To Reproduce
 Steps to reproduce the behavior:
 - Go to '...'
 - Click on '....'
 - Scroll down to '....'
 
-**Expected behavior**
+### Expected behavior
 A clear and concise description of what you expected to happen.
 
-**Screenshots**
+### Screenshots
 If applicable, add screenshots to help explain your problem.
 
-**Additional context**
+### Additional context
 Add any other context about the problem here.
