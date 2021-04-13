@@ -1,6 +1,5 @@
 <template>
   <div>
-    <the-options-action class="window-action" />
     <the-move-action class="window-action move-window-action" />
     <the-close-action class="window-action close-window-action" />
   </div>
