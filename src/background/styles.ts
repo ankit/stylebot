@@ -199,7 +199,7 @@ class BackgroundPageStyles {
     chrome.tabs.query({}, tabs => {
       tabs.forEach(tab => {
         if (tab && tab.url && tab.id) {
-          const { styles, defaultStyle } = this.getStylesForPage(tab.url, true);
+          const { styles, defaultStyle } = this.getStylesForPage(tab.url);
 
           const message: ApplyStylesToTab = {
             name: 'ApplyStylesToTab',
