@@ -2,7 +2,6 @@ import ContextMenu from './contextmenu';
 import BackgroundPageStyles from './styles';
 
 import {
-  CopyToClipboard,
   GetCommands,
   SetCommands,
   GetOption,
@@ -46,10 +45,6 @@ const init = (
       sendResponse: (response: BackgroundPageMessageResponse) => void
     ) => {
       switch (message.name) {
-        case 'CopyToClipboard':
-          CopyToClipboard(message.text);
-          break;
-
         case 'GetCommands':
           GetCommands(sendResponse);
           break;

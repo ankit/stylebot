@@ -71,11 +71,6 @@ export type OpenOptionsPage = {
   name: 'OpenOptionsPage';
 };
 
-export type CopyToClipboard = {
-  name: 'CopyToClipboard';
-  text: string;
-};
-
 export type SetReadability = {
   name: 'SetReadability';
   url: string;
@@ -122,7 +117,6 @@ type BackgroundPageMessage =
   | GetOption
   | SetOption
   | OpenOptionsPage
-  | CopyToClipboard
   | SetReadability
   | GetCommands
   | SetCommands

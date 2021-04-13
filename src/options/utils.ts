@@ -6,7 +6,6 @@ import {
   GetAllStylesResponse,
   GetAllOptionsResponse,
   StylebotOptions,
-  CopyToClipboard,
   GetCommands,
   SetCommands,
   GetCommandsResponse,
@@ -63,15 +62,6 @@ export const setOption = (
   chrome.runtime.sendMessage(message);
 };
 
-export const copyToClipboard = (text: string): void => {
-  const message: CopyToClipboard = {
-    name: 'CopyToClipboard',
-    text,
-  };
-
-  chrome.runtime.sendMessage(message);
-};
-
 export const getCommands = async (): Promise<GetCommandsResponse> => {
   const message: GetCommands = {
     name: 'GetCommands',
@@ -103,4 +93,53 @@ export const runGoogleDriveSync = async (): Promise<void> => {
       resolve();
     });
   });
+};
+
+export const importStylesWithFilePicker = (): Promise<StyleMap> => {
+  return new Promise((resolve, reject) => {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+
+    fileInput.addEventListener('change', (event: Event) => {
+      const files = (event.target as HTMLInputElement).files;
+      if (files && files[0]) {
+        const file = files[0];
+        if (file.type && file.type !== 'application/json') {
+          reject('Only JSON format is supported.');
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.readAsText(file);
+
+        reader.onload = () => {
+          try {
+            const styles = JSON.parse(reader.result as string);
+            resolve(styles);
+          } catch (e) {
+            reject(e);
+          }
+        };
+
+        reader.onerror = () => {
+          reject(reader.error);
+        };
+      }
+    });
+
+    document.body.appendChild(fileInput);
+    fileInput.click();
+    fileInput.remove();
+  });
+};
+
+export const exportAsJSONFile = (styles: StyleMap): void => {
+  const json = JSON.stringify(styles);
+  const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(json);
+  const downloadAnchorNode = document.createElement('a');
+  downloadAnchorNode.setAttribute('href', dataStr);
+  downloadAnchorNode.setAttribute('download', 'stylebot_backup.json');
+  document.body.appendChild(downloadAnchorNode);
+  downloadAnchorNode.click();
+  downloadAnchorNode.remove();
 };

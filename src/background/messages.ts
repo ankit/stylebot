@@ -1,4 +1,3 @@
-import BackgroundPageUtils from './utils';
 import BackgroundPageStyles from './styles';
 import BackgroundPageOptions from './options';
 
@@ -176,8 +175,4 @@ export const RunGoogleDriveSync = async (
 ): Promise<void> => {
   await runGoogleDriveSync(styles);
   sendResponse();
-};
-
-export const CopyToClipboard = (text: string): void => {
-  BackgroundPageUtils.copyToClipboard(text);
 };
