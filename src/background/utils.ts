@@ -126,15 +126,6 @@ class BackgroundPageUtils {
 
     return true;
   }
-
-  static copyToClipboard(str: string): void {
-    const copyTextarea = document.createElement('textarea');
-    document.body.appendChild(copyTextarea);
-    copyTextarea.value = str;
-    copyTextarea.select();
-    document.execCommand('copy');
-    document.body.removeChild(copyTextarea);
-  }
 }
 
 export default BackgroundPageUtils;

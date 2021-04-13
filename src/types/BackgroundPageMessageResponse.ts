@@ -3,6 +3,7 @@ import {
   StylebotOptions,
   StylebotCommands,
   ReadabilitySettings,
+  Timestamp,
 } from '@stylebot/types';
 
 export type GetAllOptionsResponse = StylebotOptions;
@@ -13,6 +14,7 @@ export type GetAllStylesResponse = {
     css: string;
     enabled: boolean;
     readability: boolean;
+    modifiedTime: Timestamp;
   };
 };
 
@@ -25,6 +27,7 @@ export type GetCommandsResponse = StylebotCommands;
 export type GetReadabilitySettingsResponse = ReadabilitySettings;
 
 export type GetImportCssResponse = string;
+export type RunGoogleDriveSyncResponse = void;
 
 type BackgroundPageMessageResponse =
   | GetAllOptionsResponse
@@ -33,6 +36,7 @@ type BackgroundPageMessageResponse =
   | GetStylesForPageResponse
   | GetCommandsResponse
   | GetReadabilitySettingsResponse
-  | GetImportCssResponse;
+  | GetImportCssResponse
+  | RunGoogleDriveSyncResponse;
 
 export default BackgroundPageMessageResponse;

@@ -48,7 +48,16 @@
     "128": "img/icon128.png"
   },
 
-  "permissions": ["tabs", "contextMenus", "storage", "unlimitedStorage", "https://fonts.googleapis.com/*"],
+  "permissions": [
+    "tabs",
+    "storage",
+    "identity",
+    "contextMenus",
+    "unlimitedStorage",
+    "https://drive.google.com/*",
+    "https://www.googleapis.com/*",
+    "https://fonts.googleapis.com/*"
+  ],
 
   "web_accessible_resources": [
     "editor/index.css",

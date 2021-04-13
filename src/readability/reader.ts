@@ -67,6 +67,7 @@ export const initReader = async (): Promise<void> => {
   return new Promise(async (resolve, reject) => {
     if (!isProbablyReaderable(document)) {
       reject();
+      return;
     }
 
     try {

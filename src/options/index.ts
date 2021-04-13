@@ -15,6 +15,7 @@ import {
   ModalPlugin,
   FormTextareaPlugin,
   FormGroupPlugin,
+  AlertPlugin,
 } from 'bootstrap-vue';
 
 Vue.use(IconsPlugin);
@@ -27,6 +28,7 @@ Vue.use(ListGroupPlugin);
 Vue.use(ModalPlugin);
 Vue.use(FormTextareaPlugin);
 Vue.use(FormGroupPlugin);
+Vue.use(AlertPlugin);
 
 Vue.mixin({
   methods: {

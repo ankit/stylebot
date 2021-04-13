@@ -1,4 +1,3 @@
-import BackgroundPageUtils from './utils';
 import BackgroundPageStyles from './styles';
 import BackgroundPageOptions from './options';
 
@@ -16,6 +15,7 @@ import {
   SetReadability as SetReadabilityType,
   SetReadabilitySettings as SetReadabilitySettingsType,
   GetImportCss as GetImportCssType,
+  RunGoogleDriveSync as RunGoogleDriveSyncType,
   GetCommandsResponse,
   GetAllOptionsResponse,
   GetAllStylesResponse,
@@ -23,7 +23,9 @@ import {
   GetStylesForPageResponse,
   GetReadabilitySettingsResponse,
   GetImportCssResponse,
+  RunGoogleDriveSyncResponse,
 } from '@stylebot/types';
+import { runGoogleDriveSync } from '@stylebot/sync';
 
 import {
   get as getReadabilitySettings,
@@ -64,7 +66,7 @@ export const SetAllStyles = (
   message: SetAllStylesType,
   styles: BackgroundPageStyles
 ): void => {
-  styles.setAll(message.styles);
+  styles.setAll(message.styles, message.shouldPersist);
 };
 
 export const GetStylesForIframe = (
@@ -166,6 +168,11 @@ export const GetImportCss = async (
   sendResponse(css);
 };
 
-export const CopyToClipboard = (text: string): void => {
-  BackgroundPageUtils.copyToClipboard(text);
+export const RunGoogleDriveSync = async (
+  _message: RunGoogleDriveSyncType,
+  styles: BackgroundPageStyles,
+  sendResponse: (response: RunGoogleDriveSyncResponse) => void
+): Promise<void> => {
+  await runGoogleDriveSync(styles);
+  sendResponse();
 };

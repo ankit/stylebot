@@ -23,7 +23,7 @@ import Vue from 'vue';
 
 import TheBasicsTab from './components/TheBasicsTab.vue';
 import TheStylesTab from './components/TheStylesTab.vue';
-import TheBackupTab from './components/TheBackupTab.vue';
+import TheSyncTab from './components/TheSyncTab.vue';
 import TheHelpTab from './components/TheHelpTab.vue';
 import TheNavigation from './components/TheNavigation.vue';
 import InjectMonacoEditorIframe from './components/styles/InjectMonacoEditorIframe.vue';
@@ -34,7 +34,7 @@ export default Vue.extend({
   components: {
     TheBasicsTab,
     TheStylesTab,
-    TheBackupTab,
+    TheSyncTab,
     TheHelpTab,
     TheNavigation,
     InjectMonacoEditorIframe,
@@ -46,7 +46,7 @@ export default Vue.extend({
   } {
     return {
       currentTab: 'basics',
-      tabs: ['basics', 'styles', 'backup', 'help'],
+      tabs: ['basics', 'styles', 'sync', 'help'],
     };
   },
 
@@ -60,6 +60,7 @@ export default Vue.extend({
     this.$store.dispatch('getAllStyles');
     this.$store.dispatch('getAllOptions');
     this.$store.dispatch('getCommands');
+    this.$store.dispatch('getGoogleDriveSyncMetadata');
   },
 });
 </script>

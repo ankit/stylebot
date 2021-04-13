@@ -3,12 +3,14 @@ import 'crx-hotreload';
 import Cache from './cache';
 import Listeners from './listeners';
 import ContextMenu from './contextmenu';
-import MigrateOldFormat from './migrate';
 import DefaultShortcutUpdate from './default-shortcut-update';
+import StylesMetadataUpdate from './styles-metadata-update';
+import StylesModifiedTimeUpdate from './styles-modified-time-update';
 
 (async () => {
-  await MigrateOldFormat();
   await DefaultShortcutUpdate();
+  await StylesMetadataUpdate();
+  await StylesModifiedTimeUpdate();
 
   const { styles, options } = await Cache.init();
 

@@ -1,4 +1,4 @@
-import { ReadabilitySettings } from '@stylebot/types';
+import { ReadabilitySettings, Style } from '@stylebot/types';
 
 export type ToggleStylebot = {
   name: 'ToggleStylebot';
@@ -12,19 +12,14 @@ export type OpenStylebotFromContextMenu = {
   name: 'OpenStylebotFromContextMenu';
 };
 
-export type EnableStyleForTab = {
-  name: 'EnableStyleForTab';
-  css: string;
-  url: string;
-};
-
-export type DisableStyleForTab = {
-  name: 'DisableStyleForTab';
-  url: string;
-};
-
 export type ToggleReadabilityForTab = {
   name: 'ToggleReadabilityForTab';
+};
+
+export type ApplyStylesToTab = {
+  name: 'ApplyStylesToTab';
+  defaultStyle?: Style;
+  styles: Style[];
 };
 
 export type TabUpdated = {
@@ -44,9 +39,8 @@ type TabMessage =
   | ToggleStylebot
   | OpenStylebot
   | OpenStylebotFromContextMenu
-  | EnableStyleForTab
-  | DisableStyleForTab
   | ToggleReadabilityForTab
+  | ApplyStylesToTab
   | TabUpdated
   | GetIsStylebotOpen
   | UpdateReader;

@@ -12,6 +12,9 @@
       <readability :initial-readability="readability" />
 
       <toggle-stylebot :is-open="isOpen" :tab="tab" />
+
+      <sync-stylebot v-if="googleDriveSyncEnabled" />
+
       <view-options />
     </b-list-group>
   </div>
@@ -23,9 +26,13 @@ import Vue from 'vue';
 import StyleComponent from './components/Style.vue';
 import ViewOptions from './components/ViewOptions.vue';
 import Readability from './components/Readability.vue';
+import SyncStylebot from './components/SyncStylebot.vue';
 import ToggleStylebot from './components/ToggleStylebot.vue';
 
 import { getStyles, getCurrentTab, getIsStylebotOpen } from './utils';
+
+import { getGoogleDriveSyncEnabled } from '@stylebot/sync';
+import { GoogleDriveSyncMetadata } from '@stylebot/types';
 
 export default Vue.extend({
   name: 'App',
@@ -35,6 +42,7 @@ export default Vue.extend({
     StyleComponent,
     ToggleStylebot,
     Readability,
+    SyncStylebot,
   },
 
   data(): {
@@ -42,17 +50,21 @@ export default Vue.extend({
     readability: boolean;
     tab?: chrome.tabs.Tab;
     styles: Array<{ url: string; css: string; enabled: boolean }>;
+    googleDriveSyncEnabled: boolean;
+    googleDriveSyncMetadata?: GoogleDriveSyncMetadata;
   } {
     return {
       styles: [],
       isOpen: false,
       tab: undefined,
       readability: false,
+      googleDriveSyncEnabled: false,
+      googleDriveSyncMetadata: undefined,
     };
   },
 
   created() {
-    getCurrentTab(tab => {
+    getCurrentTab(async tab => {
       this.tab = tab;
 
       getIsStylebotOpen(this.tab, isOpen => {
@@ -63,6 +75,8 @@ export default Vue.extend({
         this.styles = styles.filter(style => style.css);
         this.readability = !!defaultStyle && defaultStyle.readability;
       });
+
+      this.googleDriveSyncEnabled = await getGoogleDriveSyncEnabled();
     });
   },
 });
@@ -79,7 +93,7 @@ span {
 }
 
 .popup {
-  width: 250px;
+  width: 280px;
 }
 
 .list-group {

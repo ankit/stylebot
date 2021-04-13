@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
+const fs = require('fs');
 const ejs = require('ejs');
 const path = require('path');
 const webpack = require('webpack');
@@ -12,9 +13,9 @@ const ProgressBarPlugin = require('progress-bar-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 
 const config = {
-  mode: process.env.NODE_ENV,
-  context: __dirname + '/src',
   stats: 'errors-only',
+  mode: process.env.NODE_ENV,
+  context: `${__dirname}/src`,
 
   optimization: {
     minimize: process.env.NODE_ENV === 'production',
@@ -32,6 +33,7 @@ const config = {
   },
 
   entry: {
+    'sync/index': './sync/index.ts',
     'popup/index': './popup/index.ts',
     'editor/index': './editor/index.ts',
     'options/index': './options/index.ts',
@@ -42,9 +44,9 @@ const config = {
   },
 
   output: {
-    path: __dirname + '/dist',
-    filename: '[name].js',
     publicPath: '/',
+    filename: '[name].js',
+    path: `${__dirname}/${process.env.BROWSER}-dist`,
   },
 
   resolve: {
@@ -52,7 +54,9 @@ const config = {
     alias: {
       '@stylebot/css': path.resolve(__dirname, './src/css/index'),
       '@stylebot/i18n': path.resolve(__dirname, './src/i18n/index'),
+      '@stylebot/sync': path.resolve(__dirname, './src/sync/index'),
       '@stylebot/types': path.resolve(__dirname, './src/types/index'),
+      '@stylebot/utils': path.resolve(__dirname, './src/utils/index'),
       '@stylebot/dark-mode': path.resolve(__dirname, './src/dark-mode/index'),
       '@stylebot/settings': path.resolve(__dirname, './src/settings/index'),
 
@@ -211,11 +215,20 @@ const config = {
           to: 'manifest.json',
 
           transform: content => {
-            const jsonContent = JSON.parse(content);
+            let jsonContent = JSON.parse(content);
 
             if (config.mode === 'development') {
               jsonContent['content_security_policy'] =
                 "script-src 'self' 'unsafe-eval'; object-src 'self'";
+            }
+
+            if (process.env.BROWSER === 'firefox') {
+              const firefoxJsonContent = JSON.parse(
+                fs.readFileSync(
+                  `${__dirname}/src/extension/manifest-firefox.json`
+                )
+              );
+              jsonContent = { ...jsonContent, ...firefoxJsonContent };
             }
 
             return JSON.stringify(jsonContent, null, 2);

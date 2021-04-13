@@ -2,7 +2,6 @@ import ContextMenu from './contextmenu';
 import BackgroundPageStyles from './styles';
 
 import {
-  CopyToClipboard,
   GetCommands,
   SetCommands,
   GetOption,
@@ -21,6 +20,7 @@ import {
   GetReadabilitySettings,
   SetReadabilitySettings,
   GetImportCss,
+  RunGoogleDriveSync,
 } from './messages';
 
 import {
@@ -45,10 +45,6 @@ const init = (
       sendResponse: (response: BackgroundPageMessageResponse) => void
     ) => {
       switch (message.name) {
-        case 'CopyToClipboard':
-          CopyToClipboard(message.text);
-          break;
-
         case 'GetCommands':
           GetCommands(sendResponse);
           break;
@@ -106,6 +102,9 @@ const init = (
 
         case 'GetImportCss':
           GetImportCss(message, styles, sendResponse);
+          break;
+        case 'RunGoogleDriveSync':
+          RunGoogleDriveSync(message, styles, sendResponse);
           break;
       }
 

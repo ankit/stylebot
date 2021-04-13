@@ -8,7 +8,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { ToggleReadabilityForTab } from '../../types';
+import { ToggleReadabilityForTab } from '@stylebot/types';
 
 export default Vue.extend({
   name: 'Readability',

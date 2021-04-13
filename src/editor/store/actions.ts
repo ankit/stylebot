@@ -18,6 +18,7 @@ import {
 } from '@stylebot/readability';
 
 import {
+  Style,
   StylebotEditingMode,
   FilterEffect,
   ReadabilitySettings,
@@ -43,21 +44,12 @@ import { initEditor } from '../utils/init-editor';
 
 export default {
   async initialize(
-    { commit }: { commit: Commit },
+    { commit, dispatch }: { commit: Commit; dispatch: Dispatch },
     store: Store<State>
   ): Promise<void> {
     const { defaultStyle } = await getStylesForPage(false);
-
     if (defaultStyle) {
-      const { url, enabled, css, readability } = defaultStyle;
-
-      commit('setUrl', url);
-      commit('setCss', css);
-      commit('setEnabled', enabled);
-      commit('setReadability', readability);
-
-      const root = postcss.parse(defaultStyle.css);
-      commit('setSelectors', root);
+      dispatch('initializeDefaultStyle', defaultStyle);
     }
 
     const options = await getAllOptions();
@@ -74,6 +66,21 @@ export default {
     commit('setReadabilitySettings', readabilitySettings);
 
     initListeners(store);
+  },
+
+  initializeDefaultStyle(
+    { commit }: { commit: Commit },
+    defaultStyle: Style
+  ): void {
+    const { url, enabled, css, readability } = defaultStyle;
+
+    commit('setUrl', url);
+    commit('setCss', css);
+    commit('setEnabled', enabled);
+    commit('setReadability', readability);
+
+    const root = postcss.parse(defaultStyle.css);
+    commit('setSelectors', root);
   },
 
   openStylebot(

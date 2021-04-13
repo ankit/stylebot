@@ -4,7 +4,18 @@ import Vuex from 'vuex';
 import * as postcss from 'postcss';
 
 import { defaultCommands } from '@stylebot/settings';
-import { StylebotOptions, StylebotCommands } from '@stylebot/types';
+import {
+  StyleMap,
+  StylebotOptions,
+  StylebotCommands,
+  GoogleDriveSyncMetadata,
+} from '@stylebot/types';
+import {
+  getGoogleDriveSyncEnabled,
+  getGoogleDriveSyncMetadata,
+} from '@stylebot/sync';
+import { getCurrentTimestamp } from '@stylebot/utils';
+import { setGoogleDriveSyncEnabled } from '@stylebot/sync';
 
 import {
   getAllStyles,
@@ -13,21 +24,19 @@ import {
   getAllOptions,
   getCommands,
   setCommands,
+  runGoogleDriveSync,
 } from '../utils';
 
 Vue.use(Vuex);
 
 type State = {
-  styles: {
-    [url: string]: {
-      css: string;
-      enabled: boolean;
-      readability: boolean;
-    };
-  };
+  styles: StyleMap;
 
   options: StylebotOptions | null;
   commands: StylebotCommands;
+
+  googleDriveSyncEnabled: boolean;
+  googleDriveSyncMetadata: GoogleDriveSyncMetadata | undefined;
 };
 
 export default new Vuex.Store<State>({
@@ -35,34 +44,31 @@ export default new Vuex.Store<State>({
     styles: {},
     options: null,
     commands: defaultCommands,
+    googleDriveSyncEnabled: false,
+    googleDriveSyncMetadata: undefined,
   },
 
   actions: {
     async getAllStyles({ state }) {
-      const styles = await getAllStyles();
-      state.styles = styles;
+      state.styles = await getAllStyles();
     },
 
     async getAllOptions({ state }) {
-      const options = await getAllOptions();
-      state.options = options;
+      state.options = await getAllOptions();
     },
 
     async getCommands({ state }) {
-      const commands = await getCommands();
-      state.commands = commands;
+      state.commands = await getCommands();
     },
 
-    setAllStyles(
-      { state },
-      styles: {
-        [url: string]: {
-          css: string;
-          enabled: boolean;
-          readability: boolean;
-        };
+    async getGoogleDriveSyncMetadata({ state }) {
+      state.googleDriveSyncEnabled = await getGoogleDriveSyncEnabled();
+      if (state.googleDriveSyncEnabled) {
+        state.googleDriveSyncMetadata = await getGoogleDriveSyncMetadata();
       }
-    ) {
+    },
+
+    setAllStyles({ state }, styles: StyleMap) {
       state.styles = styles;
       setAllStyles(styles);
     },
@@ -84,6 +90,7 @@ export default new Vuex.Store<State>({
           css,
           readability: styles[url] ? styles[url].readability : false,
           enabled: styles[url] ? styles[url].enabled : true,
+          modifiedTime: getCurrentTimestamp(),
         };
 
         if (initialUrl && initialUrl !== url) {
@@ -160,6 +167,23 @@ export default new Vuex.Store<State>({
     setCommands({ state }, commands: StylebotCommands) {
       state.commands = commands;
       setCommands(commands);
+    },
+
+    setGoogleDriveSyncEnabled({ state, dispatch }, enabled: boolean) {
+      state.googleDriveSyncEnabled = enabled;
+      setGoogleDriveSyncEnabled(enabled);
+
+      if (enabled) {
+        dispatch('syncWithGoogleDrive');
+      } else {
+        state.googleDriveSyncMetadata = undefined;
+      }
+    },
+
+    async syncWithGoogleDrive({ dispatch }) {
+      await runGoogleDriveSync();
+      await dispatch('getGoogleDriveSyncMetadata');
+      await dispatch('getAllStyles');
     },
   },
 });

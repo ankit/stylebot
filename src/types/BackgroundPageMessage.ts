@@ -2,6 +2,7 @@ import {
   StylebotOptions,
   StylebotCommands,
   ReadabilitySettings,
+  StyleMap,
 } from '@stylebot/types';
 
 export type SetStyle = {
@@ -27,13 +28,8 @@ export type GetAllStyles = {
 
 export type SetAllStyles = {
   name: 'SetAllStyles';
-  styles: {
-    [url: string]: {
-      css: string;
-      enabled: boolean;
-      readability: boolean;
-    };
-  };
+  styles: StyleMap;
+  shouldPersist?: boolean;
 };
 
 export type MoveStyle = {
@@ -75,11 +71,6 @@ export type OpenOptionsPage = {
   name: 'OpenOptionsPage';
 };
 
-export type CopyToClipboard = {
-  name: 'CopyToClipboard';
-  text: string;
-};
-
 export type SetReadability = {
   name: 'SetReadability';
   url: string;
@@ -109,6 +100,10 @@ export type GetImportCss = {
   url: string;
 };
 
+export type RunGoogleDriveSync = {
+  name: 'RunGoogleDriveSync';
+};
+
 type BackgroundPageMessage =
   | SetStyle
   | EnableStyle
@@ -122,12 +117,12 @@ type BackgroundPageMessage =
   | GetOption
   | SetOption
   | OpenOptionsPage
-  | CopyToClipboard
   | SetReadability
   | GetCommands
   | SetCommands
   | GetReadabilitySettings
   | SetReadabilitySettings
-  | GetImportCss;
+  | GetImportCss
+  | RunGoogleDriveSync;
 
 export default BackgroundPageMessage;
