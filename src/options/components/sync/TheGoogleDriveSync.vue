@@ -16,7 +16,7 @@
         </a>
       </div>
 
-      <div v-if="googleDriveSyncLastModifiedtime && syncInProgress">
+      <div v-if="googleDriveSyncLastModifiedTime && syncInProgress">
         {{ t('sync_in_progress') }}&nbsp;·&nbsp;
         <a :href="googleDriveSyncViewLink" target="_blank">
           {{ t('view_synced_file') }}
@@ -79,7 +79,7 @@ import { formatDistanceToNow } from 'date-fns';
 import AppButton from '../AppButton.vue';
 
 export default Vue.extend({
-  name: 'TheBackupTab',
+  name: 'TheGoogleDriveSync',
 
   components: {
     AppButton,
