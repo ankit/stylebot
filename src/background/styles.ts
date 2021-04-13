@@ -6,8 +6,7 @@ import {
   Style,
   StyleMap,
   StyleWithoutUrl,
-  EnableStyleForTab,
-  DisableStyleForTab,
+  ApplyStylesToTab,
 } from '@stylebot/types';
 
 import BackgroundPageUtils from './utils';
@@ -43,6 +42,8 @@ class BackgroundPageStyles {
     if (shouldPersist) {
       this.persistStorage();
     }
+
+    this.updateAllTabs();
   }
 
   set(url: string, css: string, readability: boolean): void {
@@ -67,22 +68,7 @@ class BackgroundPageStyles {
 
     this.styles[url].enabled = true;
     this.persistStorage();
-
-    chrome.tabs.query({ active: true }, ([tab]) => {
-      if (tab && tab.url && tab.id) {
-        const { styles, defaultStyle } = this.getStylesForPage(tab.url);
-        this.updateIcon(tab, styles, defaultStyle);
-
-        const css = appendImportantToDeclarations(this.styles[url].css);
-        const message: EnableStyleForTab = {
-          name: 'EnableStyleForTab',
-          url,
-          css,
-        };
-
-        chrome.tabs.sendMessage(tab.id, message);
-      }
-    });
+    this.updateAllTabs();
   }
 
   disable(url: string): void {
@@ -92,20 +78,7 @@ class BackgroundPageStyles {
 
     this.styles[url].enabled = false;
     this.persistStorage();
-
-    chrome.tabs.query({ active: true }, ([tab]) => {
-      if (tab && tab.url && tab.id) {
-        const { styles, defaultStyle } = this.getStylesForPage(tab.url);
-        this.updateIcon(tab, styles, defaultStyle);
-
-        const message: DisableStyleForTab = {
-          name: 'DisableStyleForTab',
-          url,
-        };
-
-        chrome.tabs.sendMessage(tab.id, message);
-      }
-    });
+    this.updateAllTabs();
   }
 
   setReadability(url: string, value: boolean): void {
@@ -113,19 +86,11 @@ class BackgroundPageStyles {
       this.styles[url].readability = value;
     } else {
       this.styles[url] = {
-        readability: value,
-        enabled: true,
         css: '',
+        enabled: true,
+        readability: value,
         modifiedTime: getCurrentTimestamp(),
       };
-    }
-
-    this.persistStorage();
-  }
-
-  import(styles: StyleMap): void {
-    for (const url in styles) {
-      this.styles[url] = styles[url];
     }
 
     this.persistStorage();
@@ -228,6 +193,28 @@ class BackgroundPageStyles {
     } else {
       chrome.browserAction.setBadgeText({ text: '', tabId: tab.id });
     }
+  }
+
+  updateAllTabs(): void {
+    chrome.tabs.query({}, tabs => {
+      tabs.forEach(tab => {
+        if (tab && tab.url && tab.id) {
+          const { styles, defaultStyle } = this.getStylesForPage(tab.url, true);
+
+          const message: ApplyStylesToTab = {
+            name: 'ApplyStylesToTab',
+            defaultStyle,
+            styles,
+          };
+
+          chrome.tabs.sendMessage(tab.id, message);
+
+          if (tab.active) {
+            this.updateIcon(tab, styles, defaultStyle);
+          }
+        }
+      });
+    });
   }
 }
 

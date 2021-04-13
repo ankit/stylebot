@@ -6,10 +6,9 @@ import { TabMessage } from '@stylebot/types';
 import { apply as applyReadability } from '@stylebot/readability';
 
 import {
+  applyStyles,
   toggleStylebot,
   toggleReadability,
-  enableStyle,
-  disableStyle,
   updateSelectorWithContextMenuSelector,
 } from './common';
 
@@ -34,18 +33,17 @@ const initChromeListener = (store: Store<State>): void => {
         if (!state.visible) {
           toggleStylebot(store, false);
         }
-      } else if (message.name === 'EnableStyleForTab') {
-        enableStyle({ state, commit }, message.css, message.url);
-      } else if (message.name === 'DisableStyleForTab') {
-        disableStyle({ state, commit }, message.url);
+      } else if (message.name === 'GetIsStylebotOpen') {
+        sendResponse(state.visible);
       } else if (message.name === 'TabUpdated') {
         if (state.readability) {
           applyReadability();
         }
-      } else if (message.name === 'GetIsStylebotOpen') {
-        sendResponse(state.visible);
       } else if (message.name === 'ToggleReadabilityForTab') {
         toggleReadability({ state, dispatch });
+      } else if (message.name === 'ApplyStylesToTab') {
+        console.log('ApplyStylesToTab', message);
+        applyStyles({ dispatch }, message.defaultStyle, message.styles);
       }
     }
   );

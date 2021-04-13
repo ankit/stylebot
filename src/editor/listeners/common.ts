@@ -1,6 +1,7 @@
 import { Store, Dispatch, Commit, GetterTree } from 'vuex';
 import { State } from 'editor/store';
 import { injectCSSIntoDocument } from '@stylebot/css';
+import { Style } from '@stylebot/types';
 
 import {
   enableStyle as sendEnableStyleMessage,
@@ -55,26 +56,27 @@ export const toggleGrayscale = ({
   });
 };
 
-export const enableStyle = (
-  { state, commit }: { state: State; commit: Commit },
-  css: string,
-  url: string
+export const applyStyles = (
+  { dispatch }: { dispatch: Dispatch },
+  defaultStyle: Style | undefined,
+  styles: Style[]
 ): void => {
-  injectCSSIntoDocument(css, url);
+  styles.forEach(style => {
+    if (style.enabled) {
+      injectCSSIntoDocument(style.css, style.url);
+    } else {
+      injectCSSIntoDocument('', style.url);
+    }
+  });
 
-  if (url === state.url) {
-    commit('setEnabled', true);
-  }
-};
+  if (defaultStyle) {
+    if (defaultStyle.readability) {
+      dispatch('applyReadability', true);
+    } else {
+      dispatch('applyReadability', false);
+    }
 
-export const disableStyle = (
-  { state, commit }: { state: State; commit: Commit },
-  url: string
-): void => {
-  injectCSSIntoDocument('', url);
-
-  if (url === state.url) {
-    commit('setEnabled', false);
+    dispatch('initializeDefaultStyle', defaultStyle);
   }
 };
 
