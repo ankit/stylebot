@@ -12,6 +12,11 @@ const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const ProgressBarPlugin = require('progress-bar-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 
+const getOutputPath = () =>
+  process.env.BROWSER
+    ? `${__dirname}/${process.env.BROWSER}-dist`
+    : `${__dirname}/dist`;
+
 const config = {
   stats: 'errors-only',
   mode: process.env.NODE_ENV,
@@ -46,7 +51,7 @@ const config = {
   output: {
     publicPath: '/',
     filename: '[name].js',
-    path: `${__dirname}/${process.env.BROWSER}-dist`,
+    path: getOutputPath(),
   },
 
   resolve: {

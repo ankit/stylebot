@@ -6,7 +6,6 @@ Icon?
 .Trashes
 dist
 firefox-dist
-chrome-dist
 node_modules
 yarn-error.log
 coverage
