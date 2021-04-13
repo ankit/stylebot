@@ -13,12 +13,14 @@
   "license": "MIT",
   "author": "Ankit Ahuja",
   "scripts": {
-    "build": "cross-env NODE_ENV=production webpack --hide-modules",
+    "build:chrome": "cross-env NODE_ENV=production BROWSER=chrome webpack --hide-modules",
+    "build:firefox": "cross-env NODE_ENV=production BROWSER=firefox webpack --hide-modules",
+    "watch:chrome": "cross-env NODE_ENV=development BROWSER=chrome webpack --hide-modules --watch",
+    "watch:firefox": "cross-env NODE_ENV=development BROWSER=firefox webpack --hide-modules --watch",
+    "start:firefox": "web-ext run --source-dir ./firefox-dist/",
     "lint": "eslint --ext .js,.ts,.vue src",
     "test": "jest",
     "test:coverage": "jest --coverage",
-    "watch": "cross-env NODE_ENV=development webpack --hide-modules --watch",
-    "start:firefox": "web-ext run --source-dir ./dist/",
     "postinstall": "patch-package"
   },
   "jest": {

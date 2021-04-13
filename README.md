@@ -39,23 +39,24 @@ If you would like to <strong>add a new feature</strong> to Stylebot or <strong>f
 
 ### Chrome
 
-- Run `yarn watch` to build locally
+- Run `yarn watch:chrome` to build locally
 - Open `chrome://extensions` page.
 - Disable the official Stylebot version.
 - Enable the Developer mode.
 - Click Load unpacked extension button
-- Navigate to the project's `dist/` folder
+- Navigate to the project's `chrome-dist/` folder
 
 ### Firefox
 
-- Run `yarn watch` to build locally
+- Run `yarn watch:firefox` to build locally
 - Run `yarn start:firefox` to launch Firefox with development build
 
 ### Release
 
 - Add entry to `CHANGELOG`
 - Update version in `package.json` and `src/extension/manifest.json`
-- Run `yarn build` and manually create zip for distribution from `dist/`
+- Run `yarn build:chrome` and manually create zip for distribution from `chrome-dist/`
+- Run `yarn build:firefox` and manually create zip for distribution from `firefox-dist/`
 
 ### Patches
 

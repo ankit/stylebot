@@ -63,11 +63,5 @@
     "editor/index.css",
     "readability/index.css",
     "monaco-editor/*"
-  ],
-
-  "browser_specific_settings": {
-    "gecko": {
-      "id": "stylebot@example.com"
-    }
-  }
+  ]
 }
