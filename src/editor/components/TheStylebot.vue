@@ -2,10 +2,10 @@
   <vue-draggable-resizable
     class="stylebot"
     :z="100000000"
-    :w="width"
-    :h="height"
-    :x="x"
-    :y="y"
+    :w="coordinates.width"
+    :h="coordinates.height"
+    :x="coordinates.x"
+    :y="coordinates.y"
     :drag-handle="`.move-window-action`"
     @dragging="onDragging"
     @dragstop="onDragStop"
@@ -38,7 +38,7 @@ import TheMagicEditor from './TheMagicEditor.vue';
 
 import TheHelpDialog from './shortcuts/TheHelpDialog.vue';
 
-import { StylebotPlacement, StylebotEditingMode } from '@stylebot/types';
+import { StylebotCoordinates, StylebotEditingMode } from '@stylebot/types';
 
 export default Vue.extend({
   name: 'TheStylebot',
@@ -54,10 +54,6 @@ export default Vue.extend({
 
   data: () => {
     return {
-      width: 320,
-      height: window.innerHeight - 60,
-      x: window.innerWidth - 380,
-      y: 30,
       dragging: false,
       resizing: false,
     };
@@ -68,8 +64,8 @@ export default Vue.extend({
       return this.$store.state.options.mode;
     },
 
-    position(): StylebotPlacement {
-      return this.$store.state.position;
+    coordinates(): StylebotCoordinates {
+      return this.$store.state.options.coordinates;
     },
 
     help(): boolean {
@@ -78,18 +74,20 @@ export default Vue.extend({
   },
 
   methods: {
-    onDragging() {
+    onDragging(x: number, y: number) {
+      this.$store.dispatch('setCoordinates', { ...this.coordinates, x, y });
       this.dragging = true;
     },
     onDragStop(x: number, y: number) {
-      console.log(x, y);
+      this.$store.dispatch('setCoordinates', { ...this.coordinates, x, y });
       this.dragging = false;
     },
-    onResizing() {
+    onResizing(x: number, y: number, width: number, height: number) {
+      this.$store.dispatch('setCoordinates', { x, y, width, height });
       this.resizing = true;
     },
     onResizeStop(x: number, y: number, width: number, height: number) {
-      console.log(x, y, width, height);
+      this.$store.dispatch('setCoordinates', { x, y, width, height });
       this.resizing = false;
     },
   },

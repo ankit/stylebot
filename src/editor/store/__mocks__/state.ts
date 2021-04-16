@@ -16,10 +16,9 @@ const mockState: State = {
   activeSelector: '',
   contextMenuSelector: '',
 
-  visible: false,
-  position: 'right',
-  inspecting: false,
   help: false,
+  visible: false,
+  inspecting: false,
   readability: false,
 
   options: defaultOptions,

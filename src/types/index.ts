@@ -10,13 +10,19 @@ export type StylebotBasicModeSections = {
   border: boolean;
 };
 
+export type StylebotCoordinates = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
 export type StylebotOptions = {
   contextMenu: boolean;
   mode: StylebotEditingMode;
+  coordinates: StylebotCoordinates;
   basicModeSections: StylebotBasicModeSections;
 };
-
-export type StylebotPlacement = 'left' | 'right';
 
 export type Style = {
   url: string;

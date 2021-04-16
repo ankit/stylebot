@@ -14,6 +14,12 @@ export const defaultOptions: StylebotOptions = {
     layout: true,
     border: false,
   },
+  coordinates: {
+    x: window.innerWidth - 380,
+    y: 30,
+    width: 320,
+    height: window.innerHeight - 60,
+  },
 };
 
 export const defaultCommands: StylebotCommands = {

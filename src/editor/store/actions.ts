@@ -23,6 +23,7 @@ import {
   FilterEffect,
   ReadabilitySettings,
   StylebotBasicModeSections,
+  StylebotCoordinates,
 } from '@stylebot/types';
 
 import { defaultOptions } from '@stylebot/settings';
@@ -55,6 +56,9 @@ export default {
     const options = await getAllOptions();
     if (!options.basicModeSections) {
       options.basicModeSections = defaultOptions.basicModeSections;
+    }
+    if (!options.coordinates) {
+      options.coordinates = defaultOptions.coordinates;
     }
 
     commit('setOptions', options);
@@ -110,6 +114,14 @@ export default {
   ): void {
     setOption('mode', mode);
     commit('setOptions', { ...state.options, mode });
+  },
+
+  setCoordinates(
+    { state, commit }: { state: State; commit: Commit },
+    coordinates: StylebotCoordinates
+  ): void {
+    setOption('coordinates', coordinates);
+    commit('setOptions', { ...state.options, coordinates });
   },
 
   setBasicModeSections(
