@@ -4,12 +4,12 @@
       <the-inspector @select="inspect($event)" />
     </b-col>
 
-    <b-col cols="8" align-self="center" class="px-2">
+    <b-col cols="7" align-self="center" class="px-2">
       <the-css-selector-dropdown />
       <div class="url">{{ url }}</div>
     </b-col>
 
-    <b-col cols="2">
+    <b-col cols="3">
       <the-window-actions />
     </b-col>
   </b-row>

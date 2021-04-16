@@ -1,12 +1,6 @@
 <template>
-  <button
-    :title="`${t('close')} (esc)`"
-    @click="onClick"
-    @mouseenter="isHovered = true"
-    @mouseleave="isHovered = false"
-  >
-    <b-icon v-if="!isHovered" icon="x-circle" />
-    <b-icon v-if="isHovered" icon="x-circle-fill" />
+  <button :title="`${t('close')} (esc)`" @click="onClick">
+    <b-icon icon="x-circle" />
   </button>
 </template>
 
@@ -15,12 +9,6 @@ import Vue from 'vue';
 
 export default Vue.extend({
   name: 'TheCloseAction',
-
-  data(): { isHovered: boolean } {
-    return {
-      isHovered: false,
-    };
-  },
 
   methods: {
     onClick(): void {

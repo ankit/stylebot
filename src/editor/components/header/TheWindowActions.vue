@@ -1,5 +1,8 @@
 <template>
   <div class="window-actions">
+    <the-dock-to-right-action
+      class="window-action dock-to-right-window-action"
+    />
     <the-move-action class="window-action move-window-action" />
     <the-close-action class="window-action close-window-action" />
   </div>
@@ -10,6 +13,7 @@ import Vue from 'vue';
 
 import TheMoveAction from './TheMoveAction.vue';
 import TheCloseAction from './TheCloseAction.vue';
+import TheDockToRightAction from './TheDockToRightAction.vue';
 
 export default Vue.extend({
   name: 'TheWindowActions',
@@ -17,6 +21,7 @@ export default Vue.extend({
   components: {
     TheMoveAction,
     TheCloseAction,
+    TheDockToRightAction,
   },
 });
 </script>
@@ -31,8 +36,13 @@ export default Vue.extend({
   background: none;
   position: absolute;
 
+  &.dock-to-right-window-action {
+    right: 40px;
+  }
+
   &.move-window-action {
     right: 20px;
+    font-size: 14px;
   }
 
   &.close-window-action {

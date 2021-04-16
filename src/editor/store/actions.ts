@@ -124,6 +124,13 @@ export default {
     commit('setOptions', { ...state.options, coordinates });
   },
 
+  resetCoordinates({ state, commit }: { state: State; commit: Commit }): void {
+    const { coordinates } = defaultOptions;
+
+    setOption('coordinates', coordinates);
+    commit('setOptions', { ...state.options, coordinates });
+  },
+
   setBasicModeSections(
     { state, commit }: { state: State; commit: Commit },
     basicModeSections: StylebotBasicModeSections

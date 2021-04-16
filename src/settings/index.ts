@@ -17,7 +17,7 @@ export const defaultOptions: StylebotOptions = {
   coordinates: {
     x: window.innerWidth - 380,
     y: 30,
-    width: 320,
+    width: 350,
     height: window.innerHeight - 60,
   },
 };
