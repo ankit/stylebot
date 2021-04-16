@@ -1,15 +1,11 @@
 <template>
   <button
-    :title="right ? `${t('move_left')} (p)` : `${t('move_right')} (p)`"
-    @click="onClick"
+    :title="`${t('move_and_resize')}`"
     @mouseenter="isHovered = true"
     @mouseleave="isHovered = false"
   >
-    <b-icon v-if="right && !isHovered" icon="arrow-left-circle" />
-    <b-icon v-if="right && isHovered" icon="arrow-left-circle-fill" />
-
-    <b-icon v-if="!right && !isHovered" icon="arrow-right-circle" />
-    <b-icon v-if="!right && isHovered" icon="arrow-right-circle-fill" />
+    <b-icon v-if="!isHovered" icon="arrows-move" />
+    <b-icon v-if="isHovered" icon="arrows-move" />
   </button>
 </template>
 
@@ -23,24 +19,6 @@ export default Vue.extend({
     return {
       isHovered: false,
     };
-  },
-
-  computed: {
-    right(): boolean {
-      return this.$store.state.position === 'right';
-    },
-  },
-
-  methods: {
-    onClick(): void {
-      this.isHovered = false;
-
-      if (this.right) {
-        this.$store.commit('setPosition', 'left');
-      } else {
-        this.$store.commit('setPosition', 'right');
-      }
-    },
   },
 });
 </script>

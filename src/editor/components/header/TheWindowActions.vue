@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="window-actions">
     <the-move-action class="window-action move-window-action" />
     <the-close-action class="window-action close-window-action" />
   </div>
@@ -26,18 +26,17 @@ export default Vue.extend({
   top: 0;
   margin: 0;
   padding: 0;
-  left: 5.5px;
   border: none;
   font-size: 15px;
   background: none;
   position: absolute;
 
   &.move-window-action {
-    left: 24px;
+    right: 20px;
   }
 
   &.close-window-action {
-    left: 42px;
+    right: 0;
   }
 }
 </style>

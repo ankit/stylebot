@@ -1,5 +1,5 @@
 <template>
-  <b-row class="header px-3 py-2 justify-content-md-between" no-gutters>
+  <b-row class="header pl-3 pr-2 py-2 justify-content-md-between" no-gutters>
     <b-col cols="2" class="p-0">
       <the-inspector @select="inspect($event)" />
     </b-col>

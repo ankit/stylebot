@@ -10359,6 +10359,11 @@ vue-color@ankit/vue-color#2.7.1-release-with-css:
     material-colors "^1.0.0"
     tinycolor2 "^1.1.2"
 
+vue-draggable-resizable@^2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/vue-draggable-resizable/-/vue-draggable-resizable-2.3.0.tgz#94c433ca748bc1a4d0959ba1c5c0e1c3536cee5b"
+  integrity sha512-77CLRj1TPwB30pwsjOf3pkd1UzYanCdKXbqhILJ0Oo5QQl50lvBfyQCXxMFzwWwTc3sbBbQH3FfWSV+BkoSElA==
+
 vue-eslint-parser@^7.0.0, vue-eslint-parser@^7.1.0, vue-eslint-parser@~7.1.0:
   version "7.1.0"
   resolved "https://registry.yarnpkg.com/vue-eslint-parser/-/vue-eslint-parser-7.1.0.tgz#9cdbcc823e656b087507a1911732b867ac101e83"

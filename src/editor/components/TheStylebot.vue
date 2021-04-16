@@ -1,17 +1,29 @@
 <template>
-  <b-container class="stylebot" :class="position">
+  <vue-draggable-resizable
+    class="stylebot"
+    :z="100000000"
+    :w="width"
+    :h="height"
+    :x="x"
+    :y="y"
+    :drag-handle="`.move-window-action`"
+    @dragging="onDragging"
+    @dragstop="onDragStop"
+    @resizing="onResizing"
+    @resizestop="onResizeStop"
+  >
     <the-header />
 
     <div class="stylebot-body">
       <the-basic-editor v-if="mode === 'basic'" />
       <the-magic-editor v-else-if="mode === 'magic'" />
-      <the-code-editor v-else-if="mode === 'code'" />
+      <the-code-editor v-else-if="mode === 'code' && !dragging && !resizing" />
     </div>
 
     <the-footer />
 
     <the-help-dialog v-if="help" />
-  </b-container>
+  </vue-draggable-resizable>
 </template>
 
 <script lang="ts">
@@ -40,6 +52,17 @@ export default Vue.extend({
     TheHelpDialog,
   },
 
+  data: () => {
+    return {
+      width: 320,
+      height: window.innerHeight - 60,
+      x: window.innerWidth - 380,
+      y: 30,
+      dragging: false,
+      resizing: false,
+    };
+  },
+
   computed: {
     mode(): StylebotEditingMode {
       return this.$store.state.options.mode;
@@ -53,33 +76,40 @@ export default Vue.extend({
       return this.$store.state.help;
     },
   },
+
+  methods: {
+    onDragging() {
+      this.dragging = true;
+    },
+    onDragStop(x: number, y: number) {
+      console.log(x, y);
+      this.dragging = false;
+    },
+    onResizing() {
+      this.resizing = true;
+    },
+    onResizeStop(x: number, y: number, width: number, height: number) {
+      console.log(x, y, width, height);
+      this.resizing = false;
+    },
+  },
 });
 </script>
 
 <style lang="scss">
 .stylebot {
   top: 0;
-  color: #000;
-  height: 100%;
-  position: fixed;
+  left: 0;
   padding: 0;
-  background: #fff;
+  color: #000;
   line-height: 20px;
-  width: 320px;
-  z-index: 100000000;
-  border: 1px solid #ccc;
-
-  &.left {
-    left: 0;
-  }
-
-  &.right {
-    right: 0;
-  }
+  background: #fff;
+  position: fixed !important;
+  border: 1px solid #ccc !important;
 }
 
 .stylebot-body {
   overflow: auto;
-  height: calc(100% - 130px);
+  height: calc(100% - 131px);
 }
 </style>
