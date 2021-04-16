@@ -80,13 +80,6 @@
               </b-tr>
 
               <b-tr>
-                <b-td>{{ t('move_editor') }}</b-td>
-                <b-td class="stylebot-key">
-                  {{ editorCommands['position'] }}
-                </b-td>
-              </b-tr>
-
-              <b-tr>
                 <b-td>{{ t('set_basic_mode') }}</b-td>
                 <b-td class="stylebot-key">{{ editorCommands['basic'] }}</b-td>
               </b-tr>

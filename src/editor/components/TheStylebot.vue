@@ -21,8 +21,6 @@
     </div>
 
     <the-footer />
-
-    <the-help-dialog v-if="help" />
   </vue-draggable-resizable>
 </template>
 
@@ -36,8 +34,6 @@ import TheCodeEditor from './TheCodeEditor.vue';
 import TheBasicEditor from './TheBasicEditor.vue';
 import TheMagicEditor from './TheMagicEditor.vue';
 
-import TheHelpDialog from './shortcuts/TheHelpDialog.vue';
-
 import { StylebotCoordinates, StylebotEditingMode } from '@stylebot/types';
 
 export default Vue.extend({
@@ -49,7 +45,6 @@ export default Vue.extend({
     TheBasicEditor,
     TheMagicEditor,
     TheCodeEditor,
-    TheHelpDialog,
   },
 
   data: () => {
@@ -66,10 +61,6 @@ export default Vue.extend({
 
     coordinates(): StylebotCoordinates {
       return this.$store.state.options.coordinates;
-    },
-
-    help(): boolean {
-      return this.$store.state.help;
     },
   },
 

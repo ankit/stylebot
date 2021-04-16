@@ -79,7 +79,6 @@ export type StylebotCommands = {
 
 export type StylebotEditorCommandName =
   | 'inspect'
-  | 'position'
   | 'basic'
   | 'magic'
   | 'code'
