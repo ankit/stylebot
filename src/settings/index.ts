@@ -31,7 +31,6 @@ export const defaultCommands: StylebotCommands = {
 
 export const defaultEditorCommands: StylebotEditorCommands = {
   inspect: 'i',
-  position: 'p',
   basic: 'b',
   magic: 'm',
   code: 'c',
