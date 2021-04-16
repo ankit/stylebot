@@ -6,7 +6,7 @@
 import Vue from 'vue';
 
 import { Declaration, Rule } from 'postcss';
-import { StylebotEditingMode, StylebotPlacement } from '@stylebot/types';
+import { StylebotEditingMode } from '@stylebot/types';
 
 // todo: use hotkeys-js and editorCommands
 export default Vue.extend({
@@ -21,9 +21,6 @@ export default Vue.extend({
     },
     mode(): StylebotEditingMode {
       return this.$store.state.options.mode;
-    },
-    position(): StylebotPlacement {
-      return this.$store.state.position;
     },
     activeSelector(): string {
       return this.$store.state.activeSelector;
@@ -59,13 +56,6 @@ export default Vue.extend({
       if (this.mode === 'basic') {
         this.$store.commit('setInspecting', !this.inspecting);
       }
-    },
-
-    togglePosition(): void {
-      this.$store.commit(
-        'setPosition',
-        this.position === 'left' ? 'right' : 'left'
-      );
     },
 
     toggleVisibilityOfActiveSelector(): void {
@@ -117,14 +107,6 @@ export default Vue.extend({
         event.stopPropagation();
 
         this.toggleInspect();
-      }
-
-      // p - Toggle editor position
-      if (event.keyCode === 80) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        this.togglePosition();
       }
 
       // h - Toggle visibility css of selected element(s)
