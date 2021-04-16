@@ -1,5 +1,5 @@
 <template>
-  <div class="pt-3">
+  <div class="pt-3 pb-5">
     <style-editor
       v-if="addStyleDialog"
       @save="

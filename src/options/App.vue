@@ -13,8 +13,6 @@
         <component :is="currentTabComponent" />
       </b-col>
     </b-row>
-
-    <InjectMonacoEditorIframe />
   </b-container>
 </template>
 
@@ -26,7 +24,6 @@ import TheStylesTab from './components/TheStylesTab.vue';
 import TheSyncTab from './components/TheSyncTab.vue';
 import TheHelpTab from './components/TheHelpTab.vue';
 import TheNavigation from './components/TheNavigation.vue';
-import InjectMonacoEditorIframe from './components/styles/InjectMonacoEditorIframe.vue';
 
 export default Vue.extend({
   name: 'App',
@@ -37,7 +34,6 @@ export default Vue.extend({
     TheSyncTab,
     TheHelpTab,
     TheNavigation,
-    InjectMonacoEditorIframe,
   },
 
   data(): {

@@ -42,16 +42,22 @@ class MonacEditorIframe {
     this.editor = window.monaco.editor.create(container, {
       theme,
       value: '',
+      wordWrap: 'on',
       scrollBeyondLastLine: false,
       language: 'css',
-      folding: true,
+      folding: false,
+      renderLineHighlight: 'none',
+      suggestOnTriggerCharacters: false,
       cursorBlinking: 'smooth',
-      dragAndDrop: true,
-      mouseWheelZoom: true,
-      wordWrap: 'on',
+      mouseWheelZoom: false,
+      lineNumbers: 'off',
       minimap: {
         enabled: false,
       },
+      hover: {
+        enabled: false,
+      },
+      codeLens: false,
     });
 
     this.editor.getModel().updateOptions({ tabSize: 2 });
