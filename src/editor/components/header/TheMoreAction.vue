@@ -15,21 +15,24 @@
         <span style="height: 10px; width: 16px; display: inline-block;">
           <b-icon v-if="!dockedRight" icon="check" font-scale="1.1" />
         </span>
-        Dock to Left
+
+        {{ t('dock_to_left') }}
       </b-dropdown-item>
 
       <b-dropdown-item @click="dockToRight">
         <span style="height: 10px; width: 16px; display: inline-block;">
           <b-icon v-if="dockedRight" icon="check" font-scale="1.1" />
         </span>
-        Dock to Right
+
+        {{ t('dock_to_right') }}
       </b-dropdown-item>
 
       <b-dropdown-item @click="toggleSquishPage">
         <span style="height: 10px; width: 16px; display: inline-block;">
           <b-icon v-if="squishPage" icon="check" font-scale="1.1" />
         </span>
-        Squish rest of the page
+
+        {{ t('squish_page') }}
       </b-dropdown-item>
     </b-dropdown>
   </dropdown-hack-to-support-shadow-dom>
