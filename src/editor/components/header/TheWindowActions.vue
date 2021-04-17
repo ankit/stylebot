@@ -38,6 +38,7 @@ export default Vue.extend({
     border: none !important;
     background: none !important;
     position: absolute !important;
+    line-height: 21px !important;
 
     &:focus {
       box-shadow: none !important;
@@ -45,11 +46,15 @@ export default Vue.extend({
   }
 
   &.more-action .btn-group {
-    right: 55px !important;
+    right: 60px !important;
+
+    .btn .b-icon {
+      font-size: 14px !important;
+    }
   }
 
   &.resize-action {
-    right: 20px !important;
+    right: 24px !important;
 
     &.btn .b-icon {
       font-size: 14px !important;

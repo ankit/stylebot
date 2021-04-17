@@ -16,7 +16,7 @@
           <b-icon v-if="!dockedRight" icon="check" font-scale="1.1" />
         </span>
 
-        {{ t('dock_to_left') }}
+        {{ t('dock_to_left') }} (l)
       </b-dropdown-item>
 
       <b-dropdown-item @click="dockToRight">
@@ -24,7 +24,7 @@
           <b-icon v-if="dockedRight" icon="check" font-scale="1.1" />
         </span>
 
-        {{ t('dock_to_right') }}
+        {{ t('dock_to_right') }} (r)
       </b-dropdown-item>
 
       <b-dropdown-item @click="toggleAdjustPageLayout">
@@ -32,7 +32,7 @@
           <b-icon v-if="adjustPageLayout" icon="check" font-scale="1.1" />
         </span>
 
-        {{ t('adjust_page_layout') }}
+        {{ t('adjust_page_layout') }} (p)
       </b-dropdown-item>
 
       <b-dropdown-divider />
@@ -40,7 +40,7 @@
       <b-dropdown-item @click="keyboardShortcuts">
         <span style="height: 10px; width: 16px; display: inline-block;" />
 
-        {{ t('view_keyboard_shortcuts') }}
+        {{ t('view_keyboard_shortcuts') }} (?)
       </b-dropdown-item>
 
       <b-dropdown-item @click="optionsPage">
