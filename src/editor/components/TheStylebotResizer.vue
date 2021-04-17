@@ -123,6 +123,7 @@ export default Vue.extend({
     },
 
     adjustPageLayout() {
+      // todo: this needs a lot of work to be more robust.
       if (this.layout.adjustPageLayout && this.visible) {
         if (this.layout.dockLocation === 'left') {
           document.body.style.width = ``;
