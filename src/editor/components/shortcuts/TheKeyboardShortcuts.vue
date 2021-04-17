@@ -6,7 +6,7 @@
 import Vue from 'vue';
 
 import { Declaration, Rule } from 'postcss';
-import { StylebotEditingMode } from '@stylebot/types';
+import { StylebotEditingMode, StylebotLayout } from '@stylebot/types';
 
 // todo: use hotkeys-js and editorCommands
 export default Vue.extend({
@@ -30,6 +30,9 @@ export default Vue.extend({
     },
     help(): boolean {
       return this.$store.state.help;
+    },
+    layout(): StylebotLayout {
+      return this.$store.state.options.layout;
     },
   },
 
@@ -80,6 +83,27 @@ export default Vue.extend({
       this.$store.commit('setHelp', !this.help);
     },
 
+    dockLeft(): void {
+      this.$store.dispatch('setLayout', {
+        ...this.layout,
+        dockLocation: 'left',
+      });
+    },
+
+    dockRight(): void {
+      this.$store.dispatch('setLayout', {
+        ...this.layout,
+        dockLocation: 'right',
+      });
+    },
+
+    toggleSquishPage(): void {
+      this.$store.dispatch('setLayout', {
+        ...this.layout,
+        squishPage: !this.layout.squishPage,
+      });
+    },
+
     handleEscape(): void {
       if (this.help) {
         this.$store.commit('setHelp', false);
@@ -90,6 +114,7 @@ export default Vue.extend({
     },
 
     handleStylebotShortcut(event: KeyboardEvent): void {
+      console.log(event.keyCode);
       const target = event.composedPath()[0] as HTMLElement;
       const tagName = target.tagName.toLowerCase();
 
@@ -147,6 +172,30 @@ export default Vue.extend({
         event.stopPropagation();
 
         this.toggleHelp();
+      }
+
+      // l - dock stylebot to the left
+      if (event.keyCode === 76) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        this.dockLeft();
+      }
+
+      // r - dock stylebot to the right
+      if (event.keyCode === 82) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        this.dockRight();
+      }
+
+      // s - toggle squishing for the page
+      if (event.keyCode === 83) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        this.toggleSquishPage();
       }
 
       // esc - if help is visible, close help. else, close stylebot

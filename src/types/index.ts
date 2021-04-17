@@ -82,7 +82,10 @@ export type StylebotEditorCommandName =
   | 'magic'
   | 'code'
   | 'help'
-  | 'hide';
+  | 'hide'
+  | 'dockLeft'
+  | 'dockRight'
+  | 'squishPage';
 
 export type StylebotEditorCommands = {
   [key in StylebotEditorCommandName]: string;

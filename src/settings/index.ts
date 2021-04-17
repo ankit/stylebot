@@ -35,6 +35,9 @@ export const defaultEditorCommands: StylebotEditorCommands = {
   code: 'c',
   help: '?',
   hide: 'h',
+  dockLeft: 'l',
+  dockRight: 'r',
+  squishPage: 's',
 };
 
 export const defaultReadabilitySettings: ReadabilitySettings = {

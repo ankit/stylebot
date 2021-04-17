@@ -95,6 +95,27 @@
               </b-tr>
 
               <b-tr>
+                <b-td>{{ t('dock_to_left') }}</b-td>
+                <b-td class="stylebot-key">
+                  {{ editorCommands['dockLeft'] }}
+                </b-td>
+              </b-tr>
+
+              <b-tr>
+                <b-td>{{ t('dock_to_right') }}</b-td>
+                <b-td class="stylebot-key">
+                  {{ editorCommands['dockRight'] }}
+                </b-td>
+              </b-tr>
+
+              <b-tr>
+                <b-td>{{ t('squish_page') }}</b-td>
+                <b-td class="stylebot-key">
+                  {{ editorCommands['squishPage'] }}
+                </b-td>
+              </b-tr>
+
+              <b-tr>
                 <b-td>{{ t('show_help') }}</b-td>
                 <b-td class="stylebot-key">{{ editorCommands['help'] }}</b-td>
               </b-tr>
