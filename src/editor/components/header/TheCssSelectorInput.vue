@@ -61,6 +61,7 @@ export default Vue.extend({
 
       if (validateSelector(selector)) {
         this.highlighter?.highlight(selector);
+        window.addEventListener('scroll', this.onWindowScroll, true);
       } else {
         this.highlighter?.unhighlight();
       }
@@ -68,6 +69,13 @@ export default Vue.extend({
 
     blur(): void {
       this.highlighter?.unhighlight();
+      window.removeEventListener('scroll', this.onWindowScroll, true);
+    },
+
+    onWindowScroll(): void {
+      if (this.activeSelector) {
+        this.highlighter?.highlight(this.activeSelector);
+      }
     },
   },
 });
