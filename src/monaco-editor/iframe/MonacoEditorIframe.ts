@@ -16,7 +16,8 @@ class MonacEditorIframe {
   constructor() {
     this.loadEditor(() => {
       this.attachWindowListeners();
-      this.initializeEditor();
+      this.defineThemes();
+      this.initEditor();
       this.postMessage({ type: 'stylebotMonacoIframeLoaded' });
     });
   }
@@ -33,16 +34,40 @@ class MonacEditorIframe {
     window.require(['vs/editor/editor.main'], callback);
   }
 
-  initializeEditor(): void {
-    const theme = 'custom-light';
-    const container = document.getElementById('container');
+  defineThemes(): void {
+    window.monaco.editor.defineTheme('custom-light', CustomLight);
+  }
 
-    window.monaco.editor.defineTheme(theme, CustomLight);
+  initEditor(): void {
+    const container = this.getContainer();
+    const editorOptions = this.getEditorOptions();
 
-    this.editor = window.monaco.editor.create(container, {
-      theme,
+    this.editor = window.monaco.editor.create(container, editorOptions);
+    this.editor.onDidChangeModelContent(() => {
+      this.postMessage({
+        css: this.editor.getValue(),
+        type: 'stylebotMonacoIframeCssUpdated',
+      });
+    });
+  }
+
+  getContainer(): HTMLDivElement {
+    // DOM element is guaranteed to exist, so typecasting it.
+    return document.getElementById('container') as HTMLDivElement;
+  }
+
+  getEditorOptions(): any {
+    const container = this.getContainer();
+    // todo: find a more robust / accurate way to compute;
+    // might not work for some cases
+    const wordWrapColumn = Math.round(container.offsetWidth / 8);
+
+    return {
       value: '',
-      wordWrap: 'on',
+      tabSize: 2,
+      theme: 'custom-light',
+      wordWrap: 'bounded',
+      wordWrapColumn,
       scrollBeyondLastLine: false,
       language: 'css',
       folding: false,
@@ -58,53 +83,50 @@ class MonacEditorIframe {
         enabled: false,
       },
       codeLens: false,
-    });
-
-    this.editor.getModel().updateOptions({ tabSize: 2 });
-
-    this.editor.onDidChangeModelContent(() => {
-      const css = this.editor.getValue();
-      this.postMessage({ type: 'stylebotMonacoIframeCssUpdated', css });
-    });
+    };
   }
 
   postMessage(message: IframeMessage): void {
     window.parent.postMessage(message, '*');
   }
 
+  handleStylebotCssUpdate(css: string, selector?: string): void {
+    this.editor.setValue(css);
+    this.editor.focus();
+
+    if (selector) {
+      const regex = `^${selector}\\s\\{\\n\\s*(?!\\}).*$`;
+      const match = this.editor.getModel().findNextMatch(
+        regex,
+        {
+          column: 1,
+          lineNumber: 1,
+        },
+        true
+      );
+
+      if (match) {
+        this.editor.setSelection({
+          startColumn: match.range.endColumn,
+          startLineNumber: match.range.endLineNumber,
+          endColumn: match.range.endColumn,
+          endLineNumber: match.range.endLineNumber,
+        });
+      }
+    }
+  }
+
   attachWindowListeners(): void {
     window.addEventListener('resize', () => {
       this.editor.layout();
+      this.editor.updateOptions(this.getEditorOptions());
     });
 
     window.addEventListener(
       'message',
       (message: { data: ParentUpdateCssMessage }) => {
         if (message.data.type === 'stylebotCssUpdate') {
-          this.editor.setValue(message.data.css);
-          this.editor.focus();
-
-          if (message.data.selector) {
-            const regex = `^${message.data.selector}\\s\\{\\n\\s*(?!\\}).*$`;
-
-            const match = this.editor.getModel().findNextMatch(
-              regex,
-              {
-                column: 1,
-                lineNumber: 1,
-              },
-              true
-            );
-
-            if (match) {
-              this.editor.setSelection({
-                startColumn: match.range.endColumn,
-                startLineNumber: match.range.endLineNumber,
-                endColumn: match.range.endColumn,
-                endLineNumber: match.range.endLineNumber,
-              });
-            }
-          }
+          this.handleStylebotCssUpdate(message.data.css, message.data.selector);
         }
       }
     );
