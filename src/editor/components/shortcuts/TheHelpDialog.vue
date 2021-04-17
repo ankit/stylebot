@@ -109,9 +109,9 @@
               </b-tr>
 
               <b-tr>
-                <b-td>{{ t('squish_page') }}</b-td>
+                <b-td>{{ t('adjust_page_layout') }}</b-td>
                 <b-td class="stylebot-key">
-                  {{ editorCommands['squishPage'] }}
+                  {{ editorCommands['adjustPageLayout'] }}
                 </b-td>
               </b-tr>
 

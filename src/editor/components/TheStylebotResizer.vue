@@ -79,7 +79,7 @@ export default Vue.extend({
 
   watch: {
     layout() {
-      this.updateDocSquishing();
+      this.adjustPageLayout();
     },
   },
 
@@ -88,7 +88,7 @@ export default Vue.extend({
   },
 
   destroyed() {
-    this.updateDocSquishing();
+    this.adjustPageLayout();
     window.removeEventListener('resize', this.onWindowResize);
   },
 
@@ -96,7 +96,7 @@ export default Vue.extend({
     onWindowResize() {
       this.windowWidth = window.innerWidth;
       this.windowHeight = window.innerHeight;
-      this.updateDocSquishing();
+      this.adjustPageLayout();
     },
 
     onActivated() {
@@ -121,8 +121,8 @@ export default Vue.extend({
       this.resizing = false;
     },
 
-    updateDocSquishing() {
-      if (this.layout.squishPage && this.visible) {
+    adjustPageLayout() {
+      if (this.layout.adjustPageLayout && this.visible) {
         if (this.layout.dockLocation === 'left') {
           document.body.style.width = ``;
           document.body.style.marginLeft = `${this.layout.width}px`;

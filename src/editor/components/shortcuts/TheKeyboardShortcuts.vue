@@ -97,10 +97,10 @@ export default Vue.extend({
       });
     },
 
-    toggleSquishPage(): void {
+    toggleAdjustPageLayout(): void {
       this.$store.dispatch('setLayout', {
         ...this.layout,
-        squishPage: !this.layout.squishPage,
+        adjustPageLayout: !this.layout.adjustPageLayout,
       });
     },
 
@@ -114,7 +114,6 @@ export default Vue.extend({
     },
 
     handleStylebotShortcut(event: KeyboardEvent): void {
-      console.log(event.keyCode);
       const target = event.composedPath()[0] as HTMLElement;
       const tagName = target.tagName.toLowerCase();
 
@@ -190,12 +189,12 @@ export default Vue.extend({
         this.dockRight();
       }
 
-      // s - toggle squishing for the page
-      if (event.keyCode === 83) {
+      // p - toggle page layout adjustment
+      if (event.keyCode === 80) {
         event.preventDefault();
         event.stopPropagation();
 
-        this.toggleSquishPage();
+        this.toggleAdjustPageLayout();
       }
 
       // esc - if help is visible, close help. else, close stylebot

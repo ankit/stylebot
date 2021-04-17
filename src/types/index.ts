@@ -12,7 +12,7 @@ export type StylebotBasicModeSections = {
 
 export type StylebotLayout = {
   width: number;
-  squishPage: boolean;
+  adjustPageLayout: boolean;
   dockLocation: 'left' | 'right';
 };
 
@@ -85,7 +85,7 @@ export type StylebotEditorCommandName =
   | 'hide'
   | 'dockLeft'
   | 'dockRight'
-  | 'squishPage';
+  | 'adjustPageLayout';
 
 export type StylebotEditorCommands = {
   [key in StylebotEditorCommandName]: string;

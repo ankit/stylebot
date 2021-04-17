@@ -27,12 +27,12 @@
         {{ t('dock_to_right') }}
       </b-dropdown-item>
 
-      <b-dropdown-item @click="toggleSquishPage">
+      <b-dropdown-item @click="toggleAdjustPageLayout">
         <span style="height: 10px; width: 16px; display: inline-block;">
-          <b-icon v-if="squishPage" icon="check" font-scale="1.1" />
+          <b-icon v-if="adjustPageLayout" icon="check" font-scale="1.1" />
         </span>
 
-        {{ t('squish_page') }}
+        {{ t('adjust_page_layout') }}
       </b-dropdown-item>
 
       <b-dropdown-divider />
@@ -84,8 +84,8 @@ export default Vue.extend({
       return this.layout.dockLocation === 'right';
     },
 
-    squishPage(): boolean {
-      return this.layout.squishPage;
+    adjustPageLayout(): boolean {
+      return this.layout.adjustPageLayout;
     },
   },
 
@@ -104,10 +104,10 @@ export default Vue.extend({
       });
     },
 
-    toggleSquishPage(): void {
+    toggleAdjustPageLayout(): void {
       this.$store.dispatch('setLayout', {
         ...this.layout,
-        squishPage: !this.squishPage,
+        adjustPageLayout: !this.adjustPageLayout,
       });
     },
 

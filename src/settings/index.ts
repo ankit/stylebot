@@ -16,7 +16,7 @@ export const defaultOptions: StylebotOptions = {
   },
   layout: {
     width: 350,
-    squishPage: false,
+    adjustPageLayout: false,
     dockLocation: 'right',
   },
 };
@@ -37,7 +37,7 @@ export const defaultEditorCommands: StylebotEditorCommands = {
   hide: 'h',
   dockLeft: 'l',
   dockRight: 'r',
-  squishPage: 's',
+  adjustPageLayout: 'p',
 };
 
 export const defaultReadabilitySettings: ReadabilitySettings = {
