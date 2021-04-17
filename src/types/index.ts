@@ -11,10 +11,8 @@ export type StylebotBasicModeSections = {
 };
 
 export type StylebotCoordinates = {
-  x: number;
-  y: number;
   width: number;
-  height: number;
+  dockLocation: 'left' | 'right';
 };
 
 export type StylebotOptions = {

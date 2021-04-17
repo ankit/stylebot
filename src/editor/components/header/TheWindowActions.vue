@@ -1,27 +1,25 @@
 <template>
-  <div class="window-actions">
-    <the-dock-to-right-action
-      class="window-action dock-to-right-window-action"
-    />
-    <the-move-action class="window-action move-window-action" />
-    <the-close-action class="window-action close-window-action" />
+  <div>
+    <the-dock-action class="window-action dock-action" />
+    <the-resize-action class="window-action resize-action" />
+    <the-close-action class="window-action close-action" />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 
-import TheMoveAction from './TheMoveAction.vue';
+import TheDockAction from './TheDockAction.vue';
 import TheCloseAction from './TheCloseAction.vue';
-import TheDockToRightAction from './TheDockToRightAction.vue';
+import TheResizeAction from './TheResizeAction.vue';
 
 export default Vue.extend({
   name: 'TheWindowActions',
 
   components: {
-    TheMoveAction,
+    TheDockAction,
     TheCloseAction,
-    TheDockToRightAction,
+    TheResizeAction,
   },
 });
 </script>
@@ -36,16 +34,16 @@ export default Vue.extend({
   background: none;
   position: absolute;
 
-  &.dock-to-right-window-action {
+  &.dock-action {
     right: 40px;
   }
 
-  &.move-window-action {
+  &.resize-action {
     right: 20px;
     font-size: 14px;
   }
 
-  &.close-window-action {
+  &.close-action {
     right: 0;
   }
 }

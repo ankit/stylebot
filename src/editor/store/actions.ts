@@ -120,13 +120,7 @@ export default {
     { state, commit }: { state: State; commit: Commit },
     coordinates: StylebotCoordinates
   ): void {
-    setOption('coordinates', coordinates);
-    commit('setOptions', { ...state.options, coordinates });
-  },
-
-  resetCoordinates({ state, commit }: { state: State; commit: Commit }): void {
-    const { coordinates } = defaultOptions;
-
+    console.log('coordinates', coordinates);
     setOption('coordinates', coordinates);
     commit('setOptions', { ...state.options, coordinates });
   },

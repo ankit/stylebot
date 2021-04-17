@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="stylebot-basic-editor">
     <b-row class="section" no-gutters>
       <b-col cols="12">
         <b-btn class="collapse-btn px-3 py-2" @click="text = !text">

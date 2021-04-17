@@ -1,6 +1,6 @@
 <template>
-  <button :title="`${t('drag_and_resize')}`">
-    <b-icon icon="arrows-move" />
+  <button :title="`${t('resize')}`">
+    <b-icon icon="arrows-expand" rotate="90" />
   </button>
 </template>
 
@@ -8,6 +8,6 @@
 import Vue from 'vue';
 
 export default Vue.extend({
-  name: 'TheMoveAction',
+  name: 'TheResizeAction',
 });
 </script>

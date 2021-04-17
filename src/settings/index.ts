@@ -15,10 +15,8 @@ export const defaultOptions: StylebotOptions = {
     border: false,
   },
   coordinates: {
-    x: window.innerWidth - 380,
-    y: 30,
     width: 350,
-    height: window.innerHeight - 60,
+    dockLocation: 'right',
   },
 };
 
