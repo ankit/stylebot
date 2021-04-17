@@ -16,6 +16,7 @@ export const defaultOptions: StylebotOptions = {
   },
   coordinates: {
     width: 350,
+    squishPage: false,
     dockLocation: 'right',
   },
 };

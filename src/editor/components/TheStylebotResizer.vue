@@ -44,6 +44,10 @@ export default Vue.extend({
       return this.$store.state.options.coordinates;
     },
 
+    visible(): boolean {
+      return this.$store.state.visible;
+    },
+
     dockedRight(): boolean {
       if (this.coordinates.dockLocation === 'right') {
         return true;
@@ -62,14 +66,20 @@ export default Vue.extend({
 
     x(): number {
       if (this.dockedRight) {
-        return this.windowWidth - this.width - 23;
+        return this.windowWidth - this.width - 15;
       }
 
-      return -10;
+      return 0;
     },
 
     handles(): Array<'ml' | 'mr'> {
       return this.dockedRight ? ['ml'] : ['mr'];
+    },
+  },
+
+  watch: {
+    coordinates() {
+      this.updateDocSquishing();
     },
   },
 
@@ -78,6 +88,7 @@ export default Vue.extend({
   },
 
   destroyed() {
+    this.updateDocSquishing();
     window.removeEventListener('resize', this.onWindowResize);
   },
 
@@ -85,6 +96,7 @@ export default Vue.extend({
     onWindowResize() {
       this.windowWidth = window.innerWidth;
       this.windowHeight = window.innerHeight;
+      this.updateDocSquishing();
     },
 
     onActivated() {
@@ -107,6 +119,21 @@ export default Vue.extend({
       });
 
       this.resizing = false;
+    },
+
+    updateDocSquishing() {
+      if (this.coordinates.squishPage && this.visible) {
+        if (this.coordinates.dockLocation === 'left') {
+          document.body.style.width = ``;
+          document.body.style.marginLeft = `${this.coordinates.width}px`;
+        } else {
+          document.body.style.marginLeft = ``;
+          document.body.style.width = `calc(100% - ${this.coordinates.width}px)`;
+        }
+      } else {
+        document.body.style.width = ``;
+        document.body.style.marginLeft = ``;
+      }
     },
   },
 });
@@ -136,6 +163,10 @@ export default Vue.extend({
 
     .handle-mr {
       right: -20px;
+    }
+
+    &.left {
+      left: 0;
     }
   }
 }

@@ -1,15 +1,16 @@
 <template>
   <div>
-    <the-dock-action class="window-action dock-action" />
-    <the-resize-action class="window-action resize-action" />
-    <the-close-action class="window-action close-action" />
+    <the-more-action class="stylebot-window-action more-action" />
+    <the-resize-action class="stylebot-window-action resize-action" />
+    <the-close-action class="stylebot-window-action close-action" />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 
-import TheDockAction from './TheDockAction.vue';
+import TheMoreAction from './TheMoreAction.vue';
+// import TheDockAction from './TheDockAction.vue';
 import TheCloseAction from './TheCloseAction.vue';
 import TheResizeAction from './TheResizeAction.vue';
 
@@ -17,34 +18,50 @@ export default Vue.extend({
   name: 'TheWindowActions',
 
   components: {
-    TheDockAction,
+    TheMoreAction,
+    // TheDockAction,
     TheCloseAction,
     TheResizeAction,
   },
 });
 </script>
 
-<style lang="scss" scoped>
-.window-action {
-  top: 0;
-  margin: 0;
-  padding: 0;
-  border: none;
-  font-size: 15px;
-  background: none;
-  position: absolute;
+<style lang="scss">
+.stylebot-window-action {
+  & .btn-group,
+  &.btn-sm,
+  & .btn-group > .btn.btn-sm {
+    top: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: auto !important;
+    border: none !important;
+    background: none !important;
+    position: absolute !important;
 
-  &.dock-action {
-    right: 40px;
+    &:focus {
+      box-shadow: none !important;
+    }
+  }
+
+  &.more-action .btn-group {
+    right: 55px !important;
   }
 
   &.resize-action {
-    right: 20px;
-    font-size: 14px;
+    right: 20px !important;
+
+    &.btn .b-icon {
+      font-size: 14px !important;
+    }
   }
 
   &.close-action {
-    right: 0;
+    right: 0 !important;
+
+    &.btn .b-icon {
+      font-size: 15px !important;
+    }
   }
 }
 </style>

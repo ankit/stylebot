@@ -1,7 +1,7 @@
 <template>
-  <button :title="`${t('resize')}`">
+  <b-button :title="`${t('resize')}`" variant="sm">
     <b-icon icon="arrows-expand" rotate="90" />
-  </button>
+  </b-button>
 </template>
 
 <script lang="ts">

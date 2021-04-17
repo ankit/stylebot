@@ -1,7 +1,7 @@
 <template>
-  <button :title="`${t('close')} (esc)`" @click="onClick">
+  <b-button :title="`${t('close')} (esc)`" variant="sm" @click="onClick">
     <b-icon icon="x-circle" />
-  </button>
+  </b-button>
 </template>
 
 <script lang="ts">

@@ -12,6 +12,7 @@ export type StylebotBasicModeSections = {
 
 export type StylebotCoordinates = {
   width: number;
+  squishPage: boolean;
   dockLocation: 'left' | 'right';
 };
 
