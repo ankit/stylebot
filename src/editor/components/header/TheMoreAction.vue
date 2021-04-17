@@ -34,6 +34,28 @@
 
         {{ t('squish_page') }}
       </b-dropdown-item>
+
+      <b-dropdown-divider />
+
+      <b-dropdown-item @click="keyboardShortcuts">
+        <span style="height: 10px; width: 16px; display: inline-block;" />
+
+        {{ t('view_keyboard_shortcuts') }}
+      </b-dropdown-item>
+
+      <b-dropdown-item @click="optionsPage">
+        <span style="height: 10px; width: 16px; display: inline-block;" />
+
+        {{ t('view_options') }}
+      </b-dropdown-item>
+
+      <b-dropdown-divider />
+
+      <b-dropdown-item @click="donate">
+        <span style="height: 10px; width: 16px; display: inline-block;" />
+
+        {{ t('donate') }}
+      </b-dropdown-item>
     </b-dropdown>
   </dropdown-hack-to-support-shadow-dom>
 </template>
@@ -43,6 +65,8 @@ import Vue from 'vue';
 
 import { StylebotLayout } from '@stylebot/types';
 import DropdownHackToSupportShadowDom from '../DropdownHackToSupportShadowDom.vue';
+
+import { openOptionsPage, openDonatePage } from '../../utils/chrome';
 
 export default Vue.extend({
   name: 'TheMoreAction',
@@ -85,6 +109,18 @@ export default Vue.extend({
         ...this.layout,
         squishPage: !this.squishPage,
       });
+    },
+
+    keyboardShortcuts(): void {
+      this.$store.commit('setHelp', true);
+    },
+
+    optionsPage(): void {
+      openOptionsPage();
+    },
+
+    donate(): void {
+      openDonatePage();
     },
   },
 });

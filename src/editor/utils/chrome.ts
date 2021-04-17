@@ -16,6 +16,7 @@ import {
   GetReadabilitySettings,
   SetReadabilitySettings,
   ReadabilitySettings,
+  OpenDonatePage,
 } from '@stylebot/types';
 
 export const getAllOptions = async (): Promise<StylebotOptions> => {
@@ -66,6 +67,14 @@ export const getStylesForPage = async (
 export const openOptionsPage = (): void => {
   const message: OpenOptionsPage = {
     name: 'OpenOptionsPage',
+  };
+
+  chrome.runtime.sendMessage(message);
+};
+
+export const openDonatePage = (): void => {
+  const message: OpenDonatePage = {
+    name: 'OpenDonatePage',
   };
 
   chrome.runtime.sendMessage(message);

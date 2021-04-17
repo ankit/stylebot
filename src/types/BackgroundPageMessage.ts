@@ -71,6 +71,10 @@ export type OpenOptionsPage = {
   name: 'OpenOptionsPage';
 };
 
+export type OpenDonatePage = {
+  name: 'OpenDonatePage';
+};
+
 export type SetReadability = {
   name: 'SetReadability';
   url: string;
@@ -117,6 +121,7 @@ type BackgroundPageMessage =
   | GetOption
   | SetOption
   | OpenOptionsPage
+  | OpenDonatePage
   | SetReadability
   | GetCommands
   | SetCommands
