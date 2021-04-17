@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import VueDraggableResizable from 'vue-draggable-resizable';
 import { Store } from 'vuex';
 import { t } from '@stylebot/i18n';
 
@@ -38,6 +39,7 @@ Vue.use(FormCheckboxPlugin);
 Vue.use(ListGroupPlugin);
 Vue.use(TableSimplePlugin);
 Vue.use(CollapsePlugin);
+Vue.component('vue-draggable-resizable', VueDraggableResizable);
 
 Vue.mixin({
   methods: {

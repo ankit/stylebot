@@ -1,5 +1,5 @@
 <template>
-  <code-editor-iframe id="stylebot-selector-css" />
+  <code-editor-iframe id="stylebot-selector-css" class="mt-2" />
 </template>
 
 <script lang="ts">

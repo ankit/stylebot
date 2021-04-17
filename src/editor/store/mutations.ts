@@ -3,7 +3,6 @@ import * as postcss from 'postcss';
 import {
   StylebotOptions,
   StylebotCommands,
-  StylebotPlacement,
   ReadabilitySettings,
 } from '@stylebot/types';
 
@@ -12,10 +11,6 @@ import { State, CssSelectorMetadata } from './';
 export default {
   setVisible(state: State, visible: boolean): void {
     state.visible = visible;
-  },
-
-  setPosition(state: State, position: StylebotPlacement): void {
-    state.position = position;
   },
 
   setOptions(state: State, options: StylebotOptions): void {
@@ -40,6 +35,10 @@ export default {
 
   setInspecting(state: State, inspecting: boolean): void {
     state.inspecting = inspecting;
+  },
+
+  setResize(state: State, resize: boolean): void {
+    state.resize = resize;
   },
 
   setSelectors(state: State, root: postcss.Root): void {

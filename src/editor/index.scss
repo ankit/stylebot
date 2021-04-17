@@ -1,6 +1,7 @@
 @import '../../node_modules/vue-color/dist/vue-color.min.css';
+@import '../../node_modules/vue-draggable-resizable/dist/VueDraggableResizable.css';
 
-.stylebot {
+.stylebot-app {
   @import 'scss/theme.scss';
 
   @import '~bootstrap';

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="stylebot-basic-editor">
     <b-row class="section" no-gutters>
       <b-col cols="12">
         <b-btn class="collapse-btn px-3 py-2" @click="text = !text">
@@ -7,11 +7,11 @@
         </b-btn>
       </b-col>
 
-      <b-col cols="12" class="px-3">
-        <b-collapse v-model="text">
+      <b-collapse v-model="text" class="collapse-content">
+        <b-col cols="12" class="px-3 py-2">
           <the-text-properties class="pb-4 pt-2" />
-        </b-collapse>
-      </b-col>
+        </b-col>
+      </b-collapse>
     </b-row>
 
     <b-row class="section" no-gutters>
@@ -21,11 +21,11 @@
         </b-btn>
       </b-col>
 
-      <b-col cols="12" class="px-3">
-        <b-collapse v-model="colors">
+      <b-collapse v-model="colors" class="collapse-content">
+        <b-col cols="12" class="px-3 py-2">
           <the-color-properties class="pb-4 pt-2" />
-        </b-collapse>
-      </b-col>
+        </b-col>
+      </b-collapse>
     </b-row>
 
     <b-row class="section" no-gutters>
@@ -35,11 +35,11 @@
         </b-btn>
       </b-col>
 
-      <b-col cols="12" class="px-3">
-        <b-collapse v-model="layout">
+      <b-collapse v-model="layout" class="collapse-content">
+        <b-col cols="12" class="px-3 py-2">
           <the-layout-properties class="pb-4 pt-2" />
-        </b-collapse>
-      </b-col>
+        </b-col>
+      </b-collapse>
     </b-row>
 
     <b-row class="section" no-gutters>
@@ -49,11 +49,11 @@
         </b-btn>
       </b-col>
 
-      <b-col cols="12" class="px-3">
-        <b-collapse v-model="border">
+      <b-collapse v-model="border" class="collapse-content">
+        <b-col cols="12" class="px-3 py-2">
           <the-border-properties class="pb-5 pt-2" />
-        </b-collapse>
-      </b-col>
+        </b-col>
+      </b-collapse>
     </b-row>
   </div>
 </template>
@@ -150,5 +150,9 @@ export default Vue.extend({
     border: none !important;
     box-shadow: none !important;
   }
+}
+
+.collapse-content {
+  width: 100%;
 }
 </style>

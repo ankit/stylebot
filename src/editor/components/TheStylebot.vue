@@ -1,17 +1,15 @@
 <template>
-  <b-container class="stylebot" :class="position">
+  <the-stylebot-resizer>
     <the-header />
 
     <div class="stylebot-body">
       <the-basic-editor v-if="mode === 'basic'" />
       <the-magic-editor v-else-if="mode === 'magic'" />
-      <the-code-editor v-else-if="mode === 'code'" />
+      <the-code-editor v-else-if="mode === 'code' && !resize" />
     </div>
 
     <the-footer />
-
-    <the-help-dialog v-if="help" />
-  </b-container>
+  </the-stylebot-resizer>
 </template>
 
 <script lang="ts">
@@ -19,14 +17,12 @@ import Vue from 'vue';
 
 import TheHeader from './TheHeader.vue';
 import TheFooter from './TheFooter.vue';
-
 import TheCodeEditor from './TheCodeEditor.vue';
 import TheBasicEditor from './TheBasicEditor.vue';
 import TheMagicEditor from './TheMagicEditor.vue';
+import TheStylebotResizer from './TheStylebotResizer.vue';
 
-import TheHelpDialog from './shortcuts/TheHelpDialog.vue';
-
-import { StylebotPlacement, StylebotEditingMode } from '@stylebot/types';
+import { StylebotEditingMode } from '@stylebot/types';
 
 export default Vue.extend({
   name: 'TheStylebot',
@@ -37,20 +33,16 @@ export default Vue.extend({
     TheBasicEditor,
     TheMagicEditor,
     TheCodeEditor,
-    TheHelpDialog,
+    TheStylebotResizer,
   },
 
   computed: {
+    resize(): boolean {
+      return this.$store.state.resize;
+    },
+
     mode(): StylebotEditingMode {
       return this.$store.state.options.mode;
-    },
-
-    position(): StylebotPlacement {
-      return this.$store.state.position;
-    },
-
-    help(): boolean {
-      return this.$store.state.help;
     },
   },
 });
@@ -59,27 +51,14 @@ export default Vue.extend({
 <style lang="scss">
 .stylebot {
   top: 0;
-  color: #000;
-  height: 100%;
-  position: fixed;
   padding: 0;
-  background: #fff;
+  color: #000;
   line-height: 20px;
-  width: 320px;
-  z-index: 100000000;
-  border: 1px solid #ccc;
-
-  &.left {
-    left: 0;
-  }
-
-  &.right {
-    right: 0;
-  }
+  background: #fff;
 }
 
 .stylebot-body {
   overflow: auto;
-  height: calc(100% - 130px);
+  height: calc(100% - 131px);
 }
 </style>

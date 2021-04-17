@@ -121,6 +121,10 @@ export const OpenOptionsPage = (): void => {
   chrome.runtime.openOptionsPage();
 };
 
+export const OpenDonatePage = (): void => {
+  chrome.tabs.create({ url: 'https://ko-fi.com/stylebot' });
+};
+
 export const SetOption = (
   message: SetOptionType,
   options: BackgroundPageOptions

@@ -10,13 +10,18 @@ export type StylebotBasicModeSections = {
   border: boolean;
 };
 
+export type StylebotLayout = {
+  width: number;
+  adjustPageLayout: boolean;
+  dockLocation: 'left' | 'right';
+};
+
 export type StylebotOptions = {
   contextMenu: boolean;
+  layout: StylebotLayout;
   mode: StylebotEditingMode;
   basicModeSections: StylebotBasicModeSections;
 };
-
-export type StylebotPlacement = 'left' | 'right';
 
 export type Style = {
   url: string;
@@ -73,12 +78,15 @@ export type StylebotCommands = {
 
 export type StylebotEditorCommandName =
   | 'inspect'
-  | 'position'
   | 'basic'
   | 'magic'
   | 'code'
   | 'help'
-  | 'hide';
+  | 'hide'
+  | 'dockLeft'
+  | 'dockRight'
+  | 'resize'
+  | 'adjustPageLayout';
 
 export type StylebotEditorCommands = {
   [key in StylebotEditorCommandName]: string;

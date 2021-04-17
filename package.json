@@ -111,6 +111,7 @@
     "typescript": "^3.9.7",
     "vue": "^2.6.11",
     "vue-color": "ankit/vue-color#2.7.1-release-with-css",
+    "vue-draggable-resizable": "^2.3.0",
     "vue-eslint-parser": "^7.1.0",
     "vue-jest": "^3.0.6",
     "vue-loader": "^15.9.2",

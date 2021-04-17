@@ -23,6 +23,7 @@ import {
   FilterEffect,
   ReadabilitySettings,
   StylebotBasicModeSections,
+  StylebotLayout,
 } from '@stylebot/types';
 
 import { defaultOptions } from '@stylebot/settings';
@@ -55,6 +56,9 @@ export default {
     const options = await getAllOptions();
     if (!options.basicModeSections) {
       options.basicModeSections = defaultOptions.basicModeSections;
+    }
+    if (!options.layout) {
+      options.layout = defaultOptions.layout;
     }
 
     commit('setOptions', options);
@@ -110,6 +114,14 @@ export default {
   ): void {
     setOption('mode', mode);
     commit('setOptions', { ...state.options, mode });
+  },
+
+  setLayout(
+    { state, commit }: { state: State; commit: Commit },
+    layout: StylebotLayout
+  ): void {
+    setOption('layout', layout);
+    commit('setOptions', { ...state.options, layout });
   },
 
   setBasicModeSections(

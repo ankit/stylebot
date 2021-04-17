@@ -4,7 +4,6 @@ import Vuex from 'vuex';
 import {
   StylebotOptions,
   StylebotCommands,
-  StylebotPlacement,
   ReadabilitySettings,
   StylebotEditorCommands,
 } from '@stylebot/types';
@@ -40,7 +39,7 @@ export type State = {
   help: boolean;
   visible: boolean;
   inspecting: boolean;
-  position: StylebotPlacement;
+  resize: boolean;
 
   options: StylebotOptions;
   commands: StylebotCommands | null;
@@ -62,7 +61,7 @@ export default new Vuex.Store<State>({
     help: false,
     visible: false,
     inspecting: false,
-    position: 'right',
+    resize: false,
 
     commands: null,
     options: defaultOptions,

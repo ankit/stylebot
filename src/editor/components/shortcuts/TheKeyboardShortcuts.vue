@@ -6,7 +6,7 @@
 import Vue from 'vue';
 
 import { Declaration, Rule } from 'postcss';
-import { StylebotEditingMode, StylebotPlacement } from '@stylebot/types';
+import { StylebotEditingMode, StylebotLayout } from '@stylebot/types';
 
 // todo: use hotkeys-js and editorCommands
 export default Vue.extend({
@@ -19,11 +19,11 @@ export default Vue.extend({
     inspecting(): boolean {
       return this.$store.state.inspecting;
     },
+    resize(): boolean {
+      return this.$store.state.resize;
+    },
     mode(): StylebotEditingMode {
       return this.$store.state.options.mode;
-    },
-    position(): StylebotPlacement {
-      return this.$store.state.position;
     },
     activeSelector(): string {
       return this.$store.state.activeSelector;
@@ -33,6 +33,9 @@ export default Vue.extend({
     },
     help(): boolean {
       return this.$store.state.help;
+    },
+    layout(): StylebotLayout {
+      return this.$store.state.options.layout;
     },
   },
 
@@ -61,11 +64,8 @@ export default Vue.extend({
       }
     },
 
-    togglePosition(): void {
-      this.$store.commit(
-        'setPosition',
-        this.position === 'left' ? 'right' : 'left'
-      );
+    toggleResize(): void {
+      this.$store.commit('setResize', !this.resize);
     },
 
     toggleVisibilityOfActiveSelector(): void {
@@ -88,6 +88,27 @@ export default Vue.extend({
     toggleHelp(): void {
       this.$store.commit('setInspecting', false);
       this.$store.commit('setHelp', !this.help);
+    },
+
+    dockLeft(): void {
+      this.$store.dispatch('setLayout', {
+        ...this.layout,
+        dockLocation: 'left',
+      });
+    },
+
+    dockRight(): void {
+      this.$store.dispatch('setLayout', {
+        ...this.layout,
+        dockLocation: 'right',
+      });
+    },
+
+    toggleAdjustPageLayout(): void {
+      this.$store.dispatch('setLayout', {
+        ...this.layout,
+        adjustPageLayout: !this.layout.adjustPageLayout,
+      });
     },
 
     handleEscape(): void {
@@ -117,14 +138,6 @@ export default Vue.extend({
         event.stopPropagation();
 
         this.toggleInspect();
-      }
-
-      // p - Toggle editor position
-      if (event.keyCode === 80) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        this.togglePosition();
       }
 
       // h - Toggle visibility css of selected element(s)
@@ -165,6 +178,38 @@ export default Vue.extend({
         event.stopPropagation();
 
         this.toggleHelp();
+      }
+
+      // l - dock stylebot to the left
+      if (event.keyCode === 76) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        this.dockLeft();
+      }
+
+      // d - dock stylebot to the right
+      if (event.keyCode === 68) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        this.dockRight();
+      }
+
+      // p - toggle page layout adjustment
+      if (event.keyCode === 80) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        this.toggleAdjustPageLayout();
+      }
+
+      // r - toggle resize
+      if (event.keyCode === 82) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        this.toggleResize();
       }
 
       // esc - if help is visible, close help. else, close stylebot

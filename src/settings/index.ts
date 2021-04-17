@@ -14,6 +14,11 @@ export const defaultOptions: StylebotOptions = {
     layout: true,
     border: false,
   },
+  layout: {
+    width: 350,
+    adjustPageLayout: false,
+    dockLocation: 'right',
+  },
 };
 
 export const defaultCommands: StylebotCommands = {
@@ -25,12 +30,15 @@ export const defaultCommands: StylebotCommands = {
 
 export const defaultEditorCommands: StylebotEditorCommands = {
   inspect: 'i',
-  position: 'p',
   basic: 'b',
   magic: 'm',
   code: 'c',
   help: '?',
   hide: 'h',
+  resize: 'r',
+  dockLeft: 'l',
+  dockRight: 'd',
+  adjustPageLayout: 'p',
 };
 
 export const defaultReadabilitySettings: ReadabilitySettings = {

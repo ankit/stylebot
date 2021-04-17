@@ -8,6 +8,7 @@ import {
   SetOption,
   GetAllOptions,
   OpenOptionsPage,
+  OpenDonatePage,
   SetStyle,
   MoveStyle,
   GetAllStyles,
@@ -63,6 +64,9 @@ const init = (
           break;
         case 'OpenOptionsPage':
           OpenOptionsPage();
+          break;
+        case 'OpenDonatePage':
+          OpenDonatePage();
           break;
 
         case 'SetStyle':

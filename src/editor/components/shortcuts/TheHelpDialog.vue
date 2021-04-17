@@ -80,13 +80,6 @@
               </b-tr>
 
               <b-tr>
-                <b-td>{{ t('move_editor') }}</b-td>
-                <b-td class="stylebot-key">
-                  {{ editorCommands['position'] }}
-                </b-td>
-              </b-tr>
-
-              <b-tr>
                 <b-td>{{ t('set_basic_mode') }}</b-td>
                 <b-td class="stylebot-key">{{ editorCommands['basic'] }}</b-td>
               </b-tr>
@@ -99,6 +92,32 @@
               <b-tr>
                 <b-td>{{ t('set_code_mode') }}</b-td>
                 <b-td class="stylebot-key">{{ editorCommands['code'] }}</b-td>
+              </b-tr>
+
+              <b-tr>
+                <b-td>{{ t('resize') }}</b-td>
+                <b-td class="stylebot-key">{{ editorCommands['resize'] }}</b-td>
+              </b-tr>
+
+              <b-tr>
+                <b-td>{{ t('dock_to_left') }}</b-td>
+                <b-td class="stylebot-key">
+                  {{ editorCommands['dockLeft'] }}
+                </b-td>
+              </b-tr>
+
+              <b-tr>
+                <b-td>{{ t('dock_to_right') }}</b-td>
+                <b-td class="stylebot-key">
+                  {{ editorCommands['dockRight'] }}
+                </b-td>
+              </b-tr>
+
+              <b-tr>
+                <b-td>{{ t('adjust_page_layout') }}</b-td>
+                <b-td class="stylebot-key">
+                  {{ editorCommands['adjustPageLayout'] }}
+                </b-td>
               </b-tr>
 
               <b-tr>
