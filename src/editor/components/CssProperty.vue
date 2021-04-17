@@ -14,7 +14,7 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .css-property {
-  font-size: 12px;
+  font-size: 13px;
   text-align: right;
   padding-left: 0 !important;
   padding-right: 15px !important;
