@@ -12,6 +12,7 @@
     :draggable="false"
     :handles="handles"
     @resizing="onResizing"
+    @activated="onActivated"
     @resizestop="onResizeStop"
   >
     <slot></slot>
@@ -86,9 +87,13 @@ export default Vue.extend({
       this.windowHeight = window.innerHeight;
     },
 
+    onActivated() {
+      this.$store.commit('setInspecting', false);
+    },
+
     onResizing(x: number, y: number, width: number) {
       this.$store.dispatch('setCoordinates', {
-        dockLocation: 'right',
+        ...this.coordinates,
         width,
       });
 
@@ -97,7 +102,7 @@ export default Vue.extend({
 
     onResizeStop(x: number, y: number, width: number) {
       this.$store.dispatch('setCoordinates', {
-        dockLocation: 'right',
+        ...this.coordinates,
         width,
       });
 
