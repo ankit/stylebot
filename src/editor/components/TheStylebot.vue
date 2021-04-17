@@ -22,7 +22,7 @@ import TheBasicEditor from './TheBasicEditor.vue';
 import TheMagicEditor from './TheMagicEditor.vue';
 import TheStylebotResizer from './TheStylebotResizer.vue';
 
-import { StylebotCoordinates, StylebotEditingMode } from '@stylebot/types';
+import { StylebotEditingMode } from '@stylebot/types';
 
 export default Vue.extend({
   name: 'TheStylebot',

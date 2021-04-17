@@ -14,7 +14,7 @@ export const defaultOptions: StylebotOptions = {
     layout: true,
     border: false,
   },
-  coordinates: {
+  layout: {
     width: 350,
     squishPage: false,
     dockLocation: 'right',

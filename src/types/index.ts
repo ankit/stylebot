@@ -10,7 +10,7 @@ export type StylebotBasicModeSections = {
   border: boolean;
 };
 
-export type StylebotCoordinates = {
+export type StylebotLayout = {
   width: number;
   squishPage: boolean;
   dockLocation: 'left' | 'right';
@@ -18,8 +18,8 @@ export type StylebotCoordinates = {
 
 export type StylebotOptions = {
   contextMenu: boolean;
+  layout: StylebotLayout;
   mode: StylebotEditingMode;
-  coordinates: StylebotCoordinates;
   basicModeSections: StylebotBasicModeSections;
 };
 

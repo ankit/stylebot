@@ -41,7 +41,7 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { StylebotCoordinates } from '@stylebot/types';
+import { StylebotLayout } from '@stylebot/types';
 import DropdownHackToSupportShadowDom from '../DropdownHackToSupportShadowDom.vue';
 
 export default Vue.extend({
@@ -52,37 +52,37 @@ export default Vue.extend({
   },
 
   computed: {
-    coordinates(): StylebotCoordinates {
-      return this.$store.state.options.coordinates;
+    layout(): StylebotLayout {
+      return this.$store.state.options.layout;
     },
 
     dockedRight(): boolean {
-      return this.coordinates.dockLocation === 'right';
+      return this.layout.dockLocation === 'right';
     },
 
     squishPage(): boolean {
-      return this.coordinates.squishPage;
+      return this.layout.squishPage;
     },
   },
 
   methods: {
     dockToRight(): void {
-      this.$store.dispatch('setCoordinates', {
-        ...this.coordinates,
+      this.$store.dispatch('setLayout', {
+        ...this.layout,
         dockLocation: 'right',
       });
     },
 
     dockToLeft(): void {
-      this.$store.dispatch('setCoordinates', {
-        ...this.coordinates,
+      this.$store.dispatch('setLayout', {
+        ...this.layout,
         dockLocation: 'left',
       });
     },
 
     toggleSquishPage(): void {
-      this.$store.dispatch('setCoordinates', {
-        ...this.coordinates,
+      this.$store.dispatch('setLayout', {
+        ...this.layout,
         squishPage: !this.squishPage,
       });
     },

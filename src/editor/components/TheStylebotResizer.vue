@@ -1,6 +1,6 @@
 <template>
   <vue-draggable-resizable
-    :class="`stylebot ${coordinates.dockLocation}`"
+    :class="`stylebot ${layout.dockLocation}`"
     class-name-resizing="stylebot-resizing"
     class-name-active="stylebot-resizing-active"
     drag-handle=".resize-action"
@@ -22,7 +22,7 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { StylebotCoordinates, StylebotEditingMode } from '@stylebot/types';
+import { StylebotLayout, StylebotEditingMode } from '@stylebot/types';
 
 export default Vue.extend({
   name: 'TheStylebotResizer',
@@ -40,8 +40,8 @@ export default Vue.extend({
       return this.$store.state.options.mode;
     },
 
-    coordinates(): StylebotCoordinates {
-      return this.$store.state.options.coordinates;
+    layout(): StylebotLayout {
+      return this.$store.state.options.layout;
     },
 
     visible(): boolean {
@@ -49,7 +49,7 @@ export default Vue.extend({
     },
 
     dockedRight(): boolean {
-      if (this.coordinates.dockLocation === 'right') {
+      if (this.layout.dockLocation === 'right') {
         return true;
       }
 
@@ -57,7 +57,7 @@ export default Vue.extend({
     },
 
     width(): number {
-      return this.coordinates.width;
+      return this.layout.width;
     },
 
     height(): number {
@@ -78,7 +78,7 @@ export default Vue.extend({
   },
 
   watch: {
-    coordinates() {
+    layout() {
       this.updateDocSquishing();
     },
   },
@@ -104,8 +104,8 @@ export default Vue.extend({
     },
 
     onResizing(x: number, y: number, width: number) {
-      this.$store.dispatch('setCoordinates', {
-        ...this.coordinates,
+      this.$store.dispatch('setLayout', {
+        ...this.layout,
         width,
       });
 
@@ -113,8 +113,8 @@ export default Vue.extend({
     },
 
     onResizeStop(x: number, y: number, width: number) {
-      this.$store.dispatch('setCoordinates', {
-        ...this.coordinates,
+      this.$store.dispatch('setLayout', {
+        ...this.layout,
         width,
       });
 
@@ -122,13 +122,13 @@ export default Vue.extend({
     },
 
     updateDocSquishing() {
-      if (this.coordinates.squishPage && this.visible) {
-        if (this.coordinates.dockLocation === 'left') {
+      if (this.layout.squishPage && this.visible) {
+        if (this.layout.dockLocation === 'left') {
           document.body.style.width = ``;
-          document.body.style.marginLeft = `${this.coordinates.width}px`;
+          document.body.style.marginLeft = `${this.layout.width}px`;
         } else {
           document.body.style.marginLeft = ``;
-          document.body.style.width = `calc(100% - ${this.coordinates.width}px)`;
+          document.body.style.width = `calc(100% - ${this.layout.width}px)`;
         }
       } else {
         document.body.style.width = ``;
