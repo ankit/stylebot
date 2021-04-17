@@ -5,7 +5,7 @@
     <div class="stylebot-body">
       <the-basic-editor v-if="mode === 'basic'" />
       <the-magic-editor v-else-if="mode === 'magic'" />
-      <the-code-editor v-else-if="mode === 'code' && !resizing" />
+      <the-code-editor v-else-if="mode === 'code' && !resize" />
     </div>
 
     <the-footer />
@@ -37,6 +37,10 @@ export default Vue.extend({
   },
 
   computed: {
+    resize(): boolean {
+      return this.$store.state.resize;
+    },
+
     mode(): StylebotEditingMode {
       return this.$store.state.options.mode;
     },

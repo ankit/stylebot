@@ -85,6 +85,7 @@ export type StylebotEditorCommandName =
   | 'hide'
   | 'dockLeft'
   | 'dockRight'
+  | 'resize'
   | 'adjustPageLayout';
 
 export type StylebotEditorCommands = {

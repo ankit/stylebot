@@ -19,6 +19,9 @@ export default Vue.extend({
     inspecting(): boolean {
       return this.$store.state.inspecting;
     },
+    resize(): boolean {
+      return this.$store.state.resize;
+    },
     mode(): StylebotEditingMode {
       return this.$store.state.options.mode;
     },
@@ -59,6 +62,10 @@ export default Vue.extend({
       if (this.mode === 'basic') {
         this.$store.commit('setInspecting', !this.inspecting);
       }
+    },
+
+    toggleResize(): void {
+      this.$store.commit('setResize', !this.resize);
     },
 
     toggleVisibilityOfActiveSelector(): void {
@@ -181,8 +188,8 @@ export default Vue.extend({
         this.dockLeft();
       }
 
-      // r - dock stylebot to the right
-      if (event.keyCode === 82) {
+      // d - dock stylebot to the right
+      if (event.keyCode === 68) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -195,6 +202,14 @@ export default Vue.extend({
         event.stopPropagation();
 
         this.toggleAdjustPageLayout();
+      }
+
+      // r - toggle resize
+      if (event.keyCode === 82) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        this.toggleResize();
       }
 
       // esc - if help is visible, close help. else, close stylebot

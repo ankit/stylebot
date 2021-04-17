@@ -35,8 +35,9 @@ export const defaultEditorCommands: StylebotEditorCommands = {
   code: 'c',
   help: '?',
   hide: 'h',
+  resize: 'r',
   dockLeft: 'l',
-  dockRight: 'r',
+  dockRight: 'd',
   adjustPageLayout: 'p',
 };
 

@@ -37,6 +37,10 @@ export default {
     state.inspecting = inspecting;
   },
 
+  setResize(state: State, resize: boolean): void {
+    state.resize = resize;
+  },
+
   setSelectors(state: State, root: postcss.Root): void {
     const selectors: Array<CssSelectorMetadata> = [];
     let index = 1;

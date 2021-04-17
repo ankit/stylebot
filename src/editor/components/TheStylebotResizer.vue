@@ -3,13 +3,15 @@
     :class="`stylebot ${layout.dockLocation}`"
     class-name-resizing="stylebot-resizing"
     class-name-active="stylebot-resizing-active"
-    drag-handle=".resize-action"
+    drag-handle=".stylebot-null"
     :x="x"
     :w="width"
     :h="height"
     :z="100000000"
     :min-width="300"
+    :active="resize"
     :draggable="false"
+    :prevent-deactivation="true"
     :handles="handles"
     @resizing="onResizing"
     @activated="onActivated"
@@ -29,13 +31,16 @@ export default Vue.extend({
 
   data: () => {
     return {
-      resizing: false,
       windowWidth: window.innerWidth,
       windowHeight: window.innerHeight,
     };
   },
 
   computed: {
+    resize(): boolean {
+      return this.$store.state.resize;
+    },
+
     mode(): StylebotEditingMode {
       return this.$store.state.options.mode;
     },
@@ -108,8 +113,6 @@ export default Vue.extend({
         ...this.layout,
         width,
       });
-
-      this.resizing = true;
     },
 
     onResizeStop(x: number, y: number, width: number) {
@@ -117,8 +120,6 @@ export default Vue.extend({
         ...this.layout,
         width,
       });
-
-      this.resizing = false;
     },
 
     adjustPageLayout() {

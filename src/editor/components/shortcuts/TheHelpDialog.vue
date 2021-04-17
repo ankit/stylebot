@@ -95,6 +95,11 @@
               </b-tr>
 
               <b-tr>
+                <b-td>{{ t('resize') }}</b-td>
+                <b-td class="stylebot-key">{{ editorCommands['resize'] }}</b-td>
+              </b-tr>
+
+              <b-tr>
                 <b-td>{{ t('dock_to_left') }}</b-td>
                 <b-td class="stylebot-key">
                   {{ editorCommands['dockLeft'] }}
