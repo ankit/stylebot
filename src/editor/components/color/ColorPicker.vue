@@ -30,7 +30,7 @@ import VSwatches from 'vue-swatches';
 import { Declaration } from 'postcss';
 
 export default Vue.extend({
-  name: 'ColorPickerWithInput',
+  name: 'ColorPicker',
 
   components: {
     VSwatches,
@@ -143,6 +143,7 @@ export default Vue.extend({
     padding-bottom: 0;
     background: #fff;
     border: 1px solid #ccc;
+    z-index: 10000000000000;
   }
 }
 </style>
