@@ -2,16 +2,20 @@
   <b-row no-gutters class="color-picker">
     <b-col cols="12">
       <div class="stylebot-color-picker">
-        <basic-color-palette v-if="open && basicColorPalette" v-model="value" />
+        <basic-color-palette v-if="open && basicColorPalette" v-model="value">
+          <color-palette-footer v-model="value" />
+        </basic-color-palette>
 
         <material-color-palette
           v-if="open && materialColorPalette"
           v-model="value"
-        />
+        >
+          <color-palette-footer v-model="value" />
+        </material-color-palette>
       </div>
 
       <color-picker-toggle v-model="value" @click="onOpen" />
-      <color-input v-model="value" class="ml-2" />
+      <color-text-input v-model="value" class="ml-2" />
     </b-col>
   </b-row>
 </template>
@@ -20,19 +24,21 @@
 import Vue from 'vue';
 import { Declaration } from 'postcss';
 
-import ColorInput from './ColorInput.vue';
+import ColorTextInput from './ColorTextInput.vue';
 import ColorPickerToggle from './ColorPickerToggle.vue';
 import BasicColorPalette from './BasicColorPalette.vue';
 import MaterialColorPalette from './MaterialColorPalette.vue';
+import ColorPaletteFooter from './ColorPaletteFooter.vue';
 
 export default Vue.extend({
   name: 'ColorPicker',
 
   components: {
-    ColorInput,
+    ColorTextInput,
     ColorPickerToggle,
     BasicColorPalette,
     MaterialColorPalette,
+    ColorPaletteFooter,
   },
 
   props: {

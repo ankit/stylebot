@@ -2,9 +2,10 @@
   <b-form-input
     v-model="value"
     size="sm"
-    type="color"
-    class="color-input"
+    class="color-text-input"
     :debounce="150"
+    :disabled="disabled"
+    @focus="focus"
   />
 </template>
 
@@ -12,7 +13,7 @@
 import Vue from 'vue';
 
 export default Vue.extend({
-  name: 'ColorInput',
+  name: 'ColorTextInput',
 
   props: {
     value: {
@@ -21,18 +22,31 @@ export default Vue.extend({
     },
   },
 
+  computed: {
+    disabled(): boolean {
+      return !this.$store.state.activeSelector;
+    },
+  },
+
   watch: {
     value() {
       this.$emit('input', this.value);
+    },
+  },
+
+  methods: {
+    focus(event: FocusEvent): void {
+      (event.target as HTMLInputElement).select();
     },
   },
 });
 </script>
 
 <style lang="scss" scoped>
-.color-input {
+.color-text-input {
   &.form-control {
-    width: 50px;
+    float: left;
+    width: 100px;
   }
 }
 </style>

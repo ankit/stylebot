@@ -9,14 +9,13 @@
       :swatch-style="{ borderRadius: 0 }"
     />
 
-    <color-palette-picker class="mt-1" />
+    <slot></slot>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import VSwatches from 'vue-swatches';
-import ColorPalettePicker from './ColorPalettePicker.vue';
 import { materialSwatches as swatches } from '../../utils/swatches';
 
 export default Vue.extend({
@@ -24,7 +23,6 @@ export default Vue.extend({
 
   components: {
     VSwatches,
-    ColorPalettePicker,
   },
 
   props: {

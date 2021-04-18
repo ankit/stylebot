@@ -1,21 +1,19 @@
 <template>
   <div class="basic-color-palette">
     <v-swatches v-model="value" inline swatches="text-advanced" />
-    <color-palette-picker class="mt-1" />
+    <slot></slot>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import VSwatches from 'vue-swatches';
-import ColorPalettePicker from './ColorPalettePicker.vue';
 
 export default Vue.extend({
   name: 'BasicColorPalette',
 
   components: {
     VSwatches,
-    ColorPalettePicker,
   },
 
   props: {
