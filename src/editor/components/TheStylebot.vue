@@ -2,10 +2,13 @@
   <the-stylebot-resizer>
     <the-header />
 
-    <div class="stylebot-body">
+    <div
+      class="stylebot-body"
+      :style="colorPickerVisible ? 'pointer-events: none' : ''"
+    >
       <the-basic-editor v-if="mode === 'basic'" />
       <the-magic-editor v-else-if="mode === 'magic'" />
-      <the-code-editor v-else-if="mode === 'code' && !resize" />
+      <the-code-editor v-else-if="mode === 'code' && !resizing" />
     </div>
 
     <the-footer />
@@ -37,12 +40,16 @@ export default Vue.extend({
   },
 
   computed: {
-    resize(): boolean {
-      return this.$store.state.resize;
+    resizing(): boolean {
+      return this.$store.state.resizing;
     },
 
     mode(): StylebotEditingMode {
       return this.$store.state.options.mode;
+    },
+
+    colorPickerVisible(): boolean {
+      return this.$store.state.colorPickerVisible;
     },
   },
 });
@@ -59,6 +66,6 @@ export default Vue.extend({
 
 .stylebot-body {
   overflow: auto;
-  height: calc(100% - 131px);
+  height: calc(100% - 125px);
 }
 </style>

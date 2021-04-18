@@ -37,8 +37,12 @@ export default {
     state.inspecting = inspecting;
   },
 
-  setResize(state: State, resize: boolean): void {
-    state.resize = resize;
+  setResizing(state: State, resizing: boolean): void {
+    state.resizing = resizing;
+  },
+
+  setColorPickerVisible(state: State, colorPickerVisible: boolean): void {
+    state.colorPickerVisible = colorPickerVisible;
   },
 
   setSelectors(state: State, root: postcss.Root): void {

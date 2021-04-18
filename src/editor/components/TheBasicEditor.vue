@@ -8,7 +8,7 @@
       </b-col>
 
       <b-collapse v-model="text" class="collapse-content">
-        <b-col cols="12" class="px-3 py-2">
+        <b-col cols="12" class="px-3 pt-2">
           <the-text-properties class="pb-4 pt-2" />
         </b-col>
       </b-collapse>
@@ -22,7 +22,7 @@
       </b-col>
 
       <b-collapse v-model="colors" class="collapse-content">
-        <b-col cols="12" class="px-3 py-2">
+        <b-col cols="12" class="px-3 pt-2">
           <the-color-properties class="pb-4 pt-2" />
         </b-col>
       </b-collapse>
@@ -36,7 +36,7 @@
       </b-col>
 
       <b-collapse v-model="layout" class="collapse-content">
-        <b-col cols="12" class="px-3 py-2">
+        <b-col cols="12" class="px-3 pt-2">
           <the-layout-properties class="pb-4 pt-2" />
         </b-col>
       </b-collapse>
@@ -50,7 +50,7 @@
       </b-col>
 
       <b-collapse v-model="border" class="collapse-content">
-        <b-col cols="12" class="px-3 py-2">
+        <b-col cols="12" class="px-3 pt-2">
           <the-border-properties class="pb-5 pt-2" />
         </b-col>
       </b-collapse>

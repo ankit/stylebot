@@ -19,8 +19,8 @@ export default Vue.extend({
     inspecting(): boolean {
       return this.$store.state.inspecting;
     },
-    resize(): boolean {
-      return this.$store.state.resize;
+    resizing(): boolean {
+      return this.$store.state.resizing;
     },
     mode(): StylebotEditingMode {
       return this.$store.state.options.mode;
@@ -65,7 +65,7 @@ export default Vue.extend({
     },
 
     toggleResize(): void {
-      this.$store.commit('setResize', !this.resize);
+      this.$store.commit('setResizing', !this.resizing);
     },
 
     toggleVisibilityOfActiveSelector(): void {

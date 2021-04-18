@@ -24,6 +24,7 @@ import {
   ReadabilitySettings,
   StylebotBasicModeSections,
   StylebotLayout,
+  StylebotColorPalette,
 } from '@stylebot/types';
 
 import { defaultOptions } from '@stylebot/settings';
@@ -59,6 +60,9 @@ export default {
     }
     if (!options.layout) {
       options.layout = defaultOptions.layout;
+    }
+    if (!options.colorPalette) {
+      options.colorPalette = defaultOptions.colorPalette;
     }
 
     commit('setOptions', options);
@@ -122,6 +126,14 @@ export default {
   ): void {
     setOption('layout', layout);
     commit('setOptions', { ...state.options, layout });
+  },
+
+  setColorPalette(
+    { state, commit }: { state: State; commit: Commit },
+    colorPalette: StylebotColorPalette
+  ): void {
+    setOption('colorPalette', colorPalette);
+    commit('setOptions', { ...state.options, colorPalette });
   },
 
   setBasicModeSections(

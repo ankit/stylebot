@@ -11,14 +11,14 @@ export default Vue.extend({
   name: 'TheResizeAction',
 
   computed: {
-    resize(): boolean {
-      return this.$store.state.resize;
+    resizing(): boolean {
+      return this.$store.state.resizing;
     },
   },
 
   methods: {
     toggleResize(): void {
-      this.$store.commit('setResize', !this.resize);
+      this.$store.commit('setResizing', !this.resizing);
     },
   },
 });

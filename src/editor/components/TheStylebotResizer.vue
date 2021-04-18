@@ -9,7 +9,7 @@
     :h="height"
     :z="100000000"
     :min-width="300"
-    :active="resize"
+    :active="resizing"
     :draggable="false"
     :prevent-deactivation="true"
     :handles="handles"
@@ -37,8 +37,8 @@ export default Vue.extend({
   },
 
   computed: {
-    resize(): boolean {
-      return this.$store.state.resize;
+    resizing(): boolean {
+      return this.$store.state.resizing;
     },
 
     mode(): StylebotEditingMode {
