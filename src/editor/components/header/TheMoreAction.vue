@@ -12,7 +12,7 @@
       </template>
 
       <b-dropdown-item @click="dockToLeft">
-        <span style="height: 10px; width: 16px; display: inline-block;">
+        <span class="more-action-check-icon">
           <b-icon v-if="!dockedRight" icon="check" font-scale="1.1" />
         </span>
 
@@ -20,7 +20,7 @@
       </b-dropdown-item>
 
       <b-dropdown-item @click="dockToRight">
-        <span style="height: 10px; width: 16px; display: inline-block;">
+        <span class="more-action-check-icon">
           <b-icon v-if="dockedRight" icon="check" font-scale="1.1" />
         </span>
 
@@ -28,7 +28,7 @@
       </b-dropdown-item>
 
       <b-dropdown-item @click="toggleAdjustPageLayout">
-        <span style="height: 10px; width: 16px; display: inline-block;">
+        <span class="more-action-check-icon">
           <b-icon v-if="adjustPageLayout" icon="check" font-scale="1.1" />
         </span>
 
@@ -38,13 +38,13 @@
       <b-dropdown-divider />
 
       <b-dropdown-item @click="keyboardShortcuts">
-        <span style="height: 10px; width: 16px; display: inline-block;" />
+        <span class="more-action-check-icon" />
 
         {{ t('view_keyboard_shortcuts') }} (?)
       </b-dropdown-item>
 
       <b-dropdown-item @click="optionsPage">
-        <span style="height: 10px; width: 16px; display: inline-block;" />
+        <span class="more-action-check-icon" />
 
         {{ t('view_options') }}
       </b-dropdown-item>
@@ -52,7 +52,7 @@
       <b-dropdown-divider />
 
       <b-dropdown-item @click="donate">
-        <span style="height: 10px; width: 16px; display: inline-block;" />
+        <span class="more-action-check-icon" />
 
         {{ t('donate') }}
       </b-dropdown-item>
@@ -126,4 +126,10 @@ export default Vue.extend({
 });
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.more-action-check-icon {
+  height: 10px;
+  width: 16px;
+  display: inline-block;
+}
+</style>
