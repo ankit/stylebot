@@ -19,8 +19,9 @@ const mockState: State = {
   help: false,
   visible: false,
   inspecting: false,
-  resize: false,
+  resizing: false,
   readability: false,
+  colorPickerVisible: false,
 
   options: defaultOptions,
   commands: defaultCommands,
