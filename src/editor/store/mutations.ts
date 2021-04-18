@@ -41,6 +41,10 @@ export default {
     state.resize = resize;
   },
 
+  setColorPickerVisible(state: State, colorPickerVisible: boolean): void {
+    state.colorPickerVisible = colorPickerVisible;
+  },
+
   setSelectors(state: State, root: postcss.Root): void {
     const selectors: Array<CssSelectorMetadata> = [];
     let index = 1;

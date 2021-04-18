@@ -40,6 +40,7 @@ export type State = {
   visible: boolean;
   inspecting: boolean;
   resize: boolean;
+  colorPickerVisible: boolean;
 
   options: StylebotOptions;
   commands: StylebotCommands | null;
@@ -62,6 +63,7 @@ export default new Vuex.Store<State>({
     visible: false,
     inspecting: false,
     resize: false,
+    colorPickerVisible: false,
 
     commands: null,
     options: defaultOptions,
