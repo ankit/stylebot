@@ -36,6 +36,7 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .color-palette-picker {
   float: left;
+  margin-left: -2px;
 }
 
 .color-input {
