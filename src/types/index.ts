@@ -16,11 +16,14 @@ export type StylebotLayout = {
   dockLocation: 'left' | 'right';
 };
 
+export type StylebotColorPalette = 'basic' | 'material';
+
 export type StylebotOptions = {
   contextMenu: boolean;
   layout: StylebotLayout;
   mode: StylebotEditingMode;
   basicModeSections: StylebotBasicModeSections;
+  colorPalette: StylebotColorPalette;
 };
 
 export type Style = {

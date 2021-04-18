@@ -1,39 +1,38 @@
 <template>
-  <b-row no-gutters class="stylebot-color-picker">
+  <b-row no-gutters class="color-picker">
     <b-col cols="12">
-      <div v-if="open" class="stylebot-color-picker-swatches">
-        <v-swatches v-model="value" inline swatches="text-advanced" />
+      <div class="stylebot-color-picker">
+        <basic-color-palette v-if="open && basicColorPalette" v-model="value" />
+
+        <material-color-palette
+          v-if="open && materialColorPalette"
+          v-model="value"
+        />
       </div>
 
-      <button
-        :disabled="disabled"
-        class="stylebot-color-picker-trigger"
-        :style="{ background: `${value}` }"
-        @click="onOpen"
-      />
-
-      <b-form-input
-        v-model="value"
-        size="sm"
-        class="stylebot-color-picker-input ml-2"
-        :debounce="150"
-        :disabled="disabled"
-        @focus="onFocus"
-      />
+      <color-picker-toggle v-model="value" @click="onOpen" />
+      <color-input v-model="value" class="ml-2" />
     </b-col>
   </b-row>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import VSwatches from 'vue-swatches';
 import { Declaration } from 'postcss';
+
+import ColorInput from './ColorInput.vue';
+import ColorPickerToggle from './ColorPickerToggle.vue';
+import BasicColorPalette from './BasicColorPalette.vue';
+import MaterialColorPalette from './MaterialColorPalette.vue';
 
 export default Vue.extend({
   name: 'ColorPicker',
 
   components: {
-    VSwatches,
+    ColorInput,
+    ColorPickerToggle,
+    BasicColorPalette,
+    MaterialColorPalette,
   },
 
   props: {
@@ -43,7 +42,7 @@ export default Vue.extend({
     },
   },
 
-  data: () => {
+  data() {
     return {
       open: false,
     };
@@ -75,6 +74,14 @@ export default Vue.extend({
     disabled(): boolean {
       return !this.$store.state.activeSelector;
     },
+
+    basicColorPalette(): boolean {
+      return this.$store.state.options.colorPalette === 'basic';
+    },
+
+    materialColorPalette(): boolean {
+      return this.$store.state.options.colorPalette === 'material';
+    },
   },
 
   methods: {
@@ -85,6 +92,7 @@ export default Vue.extend({
     onOpen(): void {
       this.open = true;
       this.$store.commit('setColorPickerVisible', true);
+
       setTimeout(() => {
         document.addEventListener('click', this.onDocumentClick);
       }, 0);
@@ -93,6 +101,7 @@ export default Vue.extend({
     onClose(): void {
       this.open = false;
       this.$store.commit('setColorPickerVisible', false);
+
       setTimeout(() => {
         document.removeEventListener('click', this.onDocumentClick);
       }, 0);
@@ -100,9 +109,7 @@ export default Vue.extend({
 
     onDocumentClick(e: MouseEvent): void {
       const colorPickerSwatches = e.composedPath().find(el => {
-        return (el as HTMLElement).className?.includes(
-          'stylebot-color-picker-swatches'
-        );
+        return (el as HTMLElement).className?.includes('stylebot-color-picker');
       });
 
       if (!colorPickerSwatches) {
@@ -113,37 +120,8 @@ export default Vue.extend({
 });
 </script>
 
-<style lang="scss">
-.stylebot-app {
-  .stylebot-color-picker {
-    pointer-events: all;
-  }
-
-  .stylebot-color-picker-input {
-    &.form-control {
-      float: left;
-      width: 100px;
-    }
-  }
-
-  .stylebot-color-picker-trigger {
-    width: 45px;
-    height: 28px;
-    padding: 4px;
-    border: none;
-    float: left;
-    background: #eee;
-  }
-
-  .stylebot-color-picker-swatches {
-    position: absolute;
-    left: -90px;
-    bottom: 36px;
-    padding: 10px;
-    padding-bottom: 0;
-    background: #fff;
-    border: 1px solid #ccc;
-    z-index: 10000000000000;
-  }
+<style lang="scss" scoped>
+.color-picker {
+  pointer-events: all;
 }
 </style>
