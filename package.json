@@ -19,6 +19,7 @@
     "watch:firefox": "cross-env NODE_ENV=development BROWSER=firefox webpack --hide-modules --watch",
     "start:firefox": "web-ext run --source-dir ./firefox-dist/",
     "lint": "eslint --ext .js,.ts,.vue src",
+    "lint:fix": "yarn lint --fix",
     "test": "jest",
     "test:coverage": "jest --coverage",
     "postinstall": "patch-package"
@@ -44,9 +45,14 @@
       "\\.(css|scss)$": "<rootDir>/__mocks__/styleMock.js"
     }
   },
+  "lint-staged": {
+    "src/**/*.{js,ts,vue}": [
+      "yarn lint:fix"
+    ]
+  },
   "husky": {
     "hooks": {
-      "pre-commit": "yarn test && yarn lint"
+      "pre-commit": "lint-staged"
     }
   },
   "devDependencies": {
@@ -88,6 +94,7 @@
     "jest-cli": "^26.1.0",
     "jest-environment-jsdom": "^26.1.0",
     "jest-fetch-mock": "^3.0.3",
+    "lint-staged": "^10.5.4",
     "lodash": "^4.17.19",
     "mini-css-extract-plugin": "^0.9.0",
     "monaco-editor": "^0.20.0",
