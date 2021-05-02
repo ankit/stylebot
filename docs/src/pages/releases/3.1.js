@@ -7,12 +7,13 @@ import resizeGIF from '../../images/3.1/resize.gif'
 import colorsGIF from '../../images/3.1/colors.gif'
 
 const IndexPage = () => (
-  <Layout>
+  <Layout subtitle="Release 3.1">
     <SEO title="Stylebot 3.1 Release" />
 
-    <h2 style={{ marginTop: '24px' }}>
-      What's new in <strong>v3.1</strong>
+    <h2 style={{ marginTop: '48px' }}>
+      What's new in 3.1
     </h2>
+    <hr />
 
     <h3>Sync and backup via Google Drive</h3>
     <div style={{ margin: '24px auto', textAlign: 'center' }}>
@@ -49,6 +50,7 @@ const IndexPage = () => (
     <p>
       Improved color picker with color palettes to make it easier to pick beautiful colors.
     </p>
+    <hr />
 
     <h3>And lots of <a href="https://github.com/ankit/stylebot/blob/main/CHANGELOG.md" target="_blank" rel="noreferrer">bugfixes</a>...</h3>
 

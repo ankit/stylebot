@@ -6,8 +6,7 @@ import PropTypes from "prop-types"
 import githubImg from "../images/github.svg"
 import twitterImg from "../images/twitter.svg"
 
-const Header = ({ siteTitle }) => {
-
+const Header = ({ title, subtitle }) => {
   return (
     <header class="header">
       <h1 style={{ margin: 0 }}>
@@ -18,8 +17,10 @@ const Header = ({ siteTitle }) => {
             textDecoration: `none`
           }}
         >
-          {siteTitle}
+          {title}
         </Link>
+
+        <span style={{ fontWeight: 200, paddingLeft: '12px' }}>{subtitle}</span>
       </h1>
 
       <div style={{ marginLeft: "auto", marginTop: "10px" }}>
@@ -44,7 +45,7 @@ const Header = ({ siteTitle }) => {
         </a>
 
         <a
-          title="Buy me a coffee"
+          title="Donate"
           href="https://ko-fi.com/stylebot"
           target="_blank"
           rel="noreferrer"

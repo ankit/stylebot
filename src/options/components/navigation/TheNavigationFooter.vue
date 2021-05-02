@@ -1,7 +1,7 @@
 <template>
   <div class="caption">
     v3 •
-    <a target="_blank" href="https://stylebot.dev">Stylebot</a>
+    <a target="_blank" href="https://stylebot.dev/help">Help</a>
     •
     <a target="_blank" href="http://github.com/ankit/stylebot">Github</a>
     •

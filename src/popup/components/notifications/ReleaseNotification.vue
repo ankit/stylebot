@@ -26,7 +26,6 @@ export default Vue.extend({
 
   async created() {
     this.seen = await getNotification('release/3.1');
-    this.seen = false;
   },
 
   methods: {

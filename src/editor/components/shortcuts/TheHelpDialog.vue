@@ -121,29 +121,13 @@
               </b-tr>
 
               <b-tr>
+                <b-td>{{ t('hide_element') }}</b-td>
+                <b-td class="stylebot-key">{{ editorCommands.hide }}</b-td>
+              </b-tr>
+
+              <b-tr>
                 <b-td>{{ t('show_help') }}</b-td>
                 <b-td class="stylebot-key">{{ editorCommands.help }}</b-td>
-              </b-tr>
-            </b-tbody>
-          </b-table-simple>
-        </b-col>
-      </b-row>
-
-      <b-row>
-        <b-col cols="6">
-          <b-table-simple>
-            <b-thead>
-              <b-tr>
-                <b-th colspan="2">{{ t('styling') }}</b-th>
-              </b-tr>
-            </b-thead>
-
-            <b-tbody>
-              <b-tr>
-                <b-td>{{ t('hide_element') }}</b-td>
-                <b-td class="stylebot-key">
-                  {{ editorCommands['hide'] }}
-                </b-td>
               </b-tr>
             </b-tbody>
           </b-table-simple>
@@ -185,7 +169,7 @@ export default Vue.extend({
     mousedown(event: MouseEvent): void {
       const el = event.composedPath()[0] as HTMLElement;
 
-      if (!el.closest('.help-dialog-content')) {
+      if (!el.closest('.stylebot-help-dialog')) {
         this.close();
       }
     },
