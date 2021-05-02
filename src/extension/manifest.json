@@ -5,49 +5,56 @@
   "author": "Ankit Ahuja",
   "description": "__MSG_extension_description__",
   "default_locale": "en",
-
   "background": {
-    "scripts": ["background/index.js"]
+    "scripts": [
+      "background/index.js"
+    ]
   },
-
   "options_ui": {
     "page": "options/index.html",
     "open_in_tab": true
   },
-
   "content_scripts": [
     {
-      "js": ["editor/index.js"],
-      "matches": ["<all_urls>"],
-      "exclude_matches": ["*://*/*.xml"],
+      "js": [
+        "editor/index.js"
+      ],
+      "matches": [
+        "<all_urls>"
+      ],
+      "exclude_matches": [
+        "*://*/*.xml"
+      ],
       "run_at": "document_idle"
     },
     {
       "all_frames": true,
-      "js": ["inject-css/index.js"],
-      "matches": ["<all_urls>"],
-      "exclude_matches": ["*://*/*.xml"],
+      "js": [
+        "inject-css/index.js"
+      ],
+      "matches": [
+        "<all_urls>"
+      ],
+      "exclude_matches": [
+        "*://*/*.xml"
+      ],
       "run_at": "document_start"
     }
   ],
-
   "browser_action": {
     "default_icon": {
       "16": "img/icon16.png",
       "24": "img/icon24.png",
       "32": "img/icon32.png"
     },
-
     "default_title": "Stylebot",
     "default_popup": "popup/index.html"
   },
-
   "icons": {
     "16": "img/icon16.png",
     "48": "img/icon48.png",
     "128": "img/icon128.png"
   },
-
   "permissions": [
     "tabs",
     "storage",
@@ -58,7 +65,6 @@
     "https://www.googleapis.com/*",
     "https://fonts.googleapis.com/*"
   ],
-
   "web_accessible_resources": [
     "editor/index.css",
     "readability/index.css",
