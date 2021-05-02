@@ -124,3 +124,12 @@
   color: #0095dd;
   opacity: 1;
 }
+
+hr {
+  margin: 24px 0;
+  background: #eee !important;
+}
+
+p {
+  max-width: 750px;
+}
