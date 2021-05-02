@@ -1,3 +1,11 @@
+## Version 3.1 (TBR)
+
+- Added ability to resize stylebot editor
+- Added support for syncing and backing up styles using Google Drive
+- Added ability to reduce page's width when stylebot is opened
+- Add color palettes for easier color selection
+- Bugfixes (#629, #626, #607, #595)
+
 ## Version 3.0.7
 
 - Fix style toggle switch bug in popup (#612)
