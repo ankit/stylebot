@@ -13,10 +13,10 @@ import Img from "gatsby-image"
  * - `useStaticQuery`: https://www.gatsbyjs.org/docs/use-static-query/
  */
 
-const Shortcuts = () => {
+const Sync = () => {
   const data = useStaticQuery(graphql`
     query {
-      file(relativePath: { eq: "shortcuts.png" }) {
+      file(relativePath: { eq: "sync.png" }) {
         childImageSharp {
           fixed(height: 600) {
             ...GatsbyImageSharpFixed
@@ -34,9 +34,9 @@ const Shortcuts = () => {
           marginBottom: "10px",
         }}
       />
-      <h3>Use shortcuts to easily toggle styling</h3>
+      <h3>Sync your styles</h3>
     </div>
   )
 }
 
-export default Shortcuts
+export default Sync

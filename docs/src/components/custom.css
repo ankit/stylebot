@@ -58,6 +58,10 @@
   color: #333;
 }
 
+.slider img { 
+  border: 1px solid #eee;
+}
+
 .footer {
   margin-top: 40px;
   padding-top: 10px;

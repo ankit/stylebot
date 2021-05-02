@@ -5,7 +5,7 @@ import Demo from "../components/demo"
 import BasicMode from "../components/basic-mode"
 import Readability from "../components/readability"
 import Code from "../components/code"
-import Shortcuts from "../components/shortcuts"
+import Sync from "../components/sync"
 import Chrome from "../components/chrome"
 import Firefox from "../components/firefox"
 import SEO from "../components/seo"
@@ -39,21 +39,21 @@ const IndexPage = () => (
       naturalSlideWidth={1200}
       naturalSlideHeight={890}
     >
-      <Slider>
+      <Slider className="slider">
         <Slide index={0}>
           <BasicMode />
         </Slide>
 
         <Slide index={1}>
-          <Readability />
-        </Slide>
-
-        <Slide index={2}>
           <Code />
         </Slide>
 
+        <Slide index={2}>
+          <Readability />
+        </Slide>
+
         <Slide index={3}>
-          <Shortcuts />
+          <Sync />
         </Slide>
 
         <Slide index={4}>
