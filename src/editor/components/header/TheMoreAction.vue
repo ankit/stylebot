@@ -16,7 +16,7 @@
           <b-icon v-if="!dockedRight" icon="check" font-scale="1.1" />
         </span>
 
-        {{ t('dock_to_left') }} (l)
+        {{ t('dock_to_left') }} ({{ editorCommands.dockLeft }})
       </b-dropdown-item>
 
       <b-dropdown-item @click="dockToRight">
@@ -32,7 +32,7 @@
           <b-icon v-if="adjustPageLayout" icon="check" font-scale="1.1" />
         </span>
 
-        {{ t('adjust_page_layout') }} (p)
+        {{ t('adjust_page_layout') }} ({{ editorCommands.pageLayout }})
       </b-dropdown-item>
 
       <b-dropdown-divider />
@@ -40,7 +40,7 @@
       <b-dropdown-item @click="keyboardShortcuts">
         <span class="more-action-check-icon" />
 
-        {{ t('view_keyboard_shortcuts') }} (?)
+        {{ t('view_keyboard_shortcuts') }} ({{ editorCommands.help }})
       </b-dropdown-item>
 
       <b-dropdown-item @click="optionsPage">
@@ -63,7 +63,7 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { StylebotLayout } from '@stylebot/types';
+import { StylebotEditorCommands, StylebotLayout } from '@stylebot/types';
 import DropdownHackToSupportShadowDom from '../DropdownHackToSupportShadowDom.vue';
 
 import { openOptionsPage, openDonatePage } from '../../utils/chrome';
@@ -78,6 +78,10 @@ export default Vue.extend({
   computed: {
     layout(): StylebotLayout {
       return this.$store.state.options.layout;
+    },
+
+    editorCommands(): StylebotEditorCommands {
+      return this.$store.state.editorCommands;
     },
 
     dockedRight(): boolean {

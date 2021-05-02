@@ -1,12 +1,12 @@
 <template>
-  <div class="stylebot-help-dialog">
-    <div class="help-dialog-content p-4">
+  <div class="stylebot-help-dialog-overlay">
+    <div class="stylebot-help-dialog p-4">
       <b-row>
         <b-col cols="11">
           <h1 class="title mb-4">Stylebot {{ t('keyboard_shortcuts') }}</h1>
         </b-col>
 
-        <b-col cols="1" style="text-align: right;">
+        <b-col cols="1" style="text-align: right">
           <button class="close-btn" @click="close">
             <b-icon icon="x-circle" />
           </button>
@@ -35,28 +35,28 @@
               <b-tr>
                 <b-td>{{ t('toggle_editor') }}</b-td>
                 <b-td class="stylebot-key">
-                  {{ commands['stylebot'] }}
+                  {{ commands.stylebot }}
                 </b-td>
               </b-tr>
 
               <b-tr>
                 <b-td>{{ t('toggle_styling') }}</b-td>
                 <b-td class="stylebot-key">
-                  {{ commands['style'] }}
+                  {{ commands.style }}
                 </b-td>
               </b-tr>
 
               <b-tr>
                 <b-td>{{ t('toggle_readability') }}</b-td>
                 <b-td class="stylebot-key">
-                  {{ commands['readability'] }}
+                  {{ commands.readability }}
                 </b-td>
               </b-tr>
 
               <b-tr>
                 <b-td>{{ t('toggle_grayscale') }}</b-td>
                 <b-td class="stylebot-key">
-                  {{ commands['grayscale'] }}
+                  {{ commands.grayscale }}
                 </b-td>
               </b-tr>
             </b-tbody>
@@ -75,54 +75,54 @@
               <b-tr>
                 <b-td>{{ t('toggle_inspector') }}</b-td>
                 <b-td class="stylebot-key">
-                  {{ editorCommands['inspect'] }}
+                  {{ editorCommands.inspect }}
                 </b-td>
               </b-tr>
 
               <b-tr>
                 <b-td>{{ t('set_basic_mode') }}</b-td>
-                <b-td class="stylebot-key">{{ editorCommands['basic'] }}</b-td>
+                <b-td class="stylebot-key">{{ editorCommands.basic }}</b-td>
               </b-tr>
 
               <b-tr>
                 <b-td>{{ t('set_magic_mode') }}</b-td>
-                <b-td class="stylebot-key">{{ editorCommands['magic'] }}</b-td>
+                <b-td class="stylebot-key">{{ editorCommands.magic }}</b-td>
               </b-tr>
 
               <b-tr>
                 <b-td>{{ t('set_code_mode') }}</b-td>
-                <b-td class="stylebot-key">{{ editorCommands['code'] }}</b-td>
+                <b-td class="stylebot-key">{{ editorCommands.code }}</b-td>
               </b-tr>
 
               <b-tr>
                 <b-td>{{ t('resize') }}</b-td>
-                <b-td class="stylebot-key">{{ editorCommands['resize'] }}</b-td>
+                <b-td class="stylebot-key">{{ editorCommands.resize }}</b-td>
               </b-tr>
 
               <b-tr>
                 <b-td>{{ t('dock_to_left') }}</b-td>
                 <b-td class="stylebot-key">
-                  {{ editorCommands['dockLeft'] }}
+                  {{ editorCommands.dockLeft }}
                 </b-td>
               </b-tr>
 
               <b-tr>
                 <b-td>{{ t('dock_to_right') }}</b-td>
                 <b-td class="stylebot-key">
-                  {{ editorCommands['dockRight'] }}
+                  {{ editorCommands.dockRight }}
                 </b-td>
               </b-tr>
 
               <b-tr>
                 <b-td>{{ t('adjust_page_layout') }}</b-td>
                 <b-td class="stylebot-key">
-                  {{ editorCommands['adjustPageLayout'] }}
+                  {{ editorCommands.pageLayout }}
                 </b-td>
               </b-tr>
 
               <b-tr>
                 <b-td>{{ t('show_help') }}</b-td>
-                <b-td class="stylebot-key">{{ editorCommands['help'] }}</b-td>
+                <b-td class="stylebot-key">{{ editorCommands.help }}</b-td>
               </b-tr>
             </b-tbody>
           </b-table-simple>
@@ -203,7 +203,7 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-.stylebot-help-dialog {
+.stylebot-help-dialog-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -217,7 +217,7 @@ export default Vue.extend({
   background: #000000b3;
 }
 
-.help-dialog-content {
+.stylebot-help-dialog {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -226,7 +226,9 @@ export default Vue.extend({
   pointer-events: auto;
   background-color: #fff;
   outline: 0;
-  margin: 200px auto;
+  margin: 40px auto;
+  max-height: calc(100% - 80px);
+  overflow: auto;
 }
 
 .title {

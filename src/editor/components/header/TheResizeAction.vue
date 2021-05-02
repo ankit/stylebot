@@ -1,5 +1,9 @@
-<template>
-  <b-button :title="`${t('resize')} (r)`" variant="sm" @click="toggleResize">
+  <template>
+  <b-button
+    :title="`${t('resize')} (${resizeCommand})`"
+    variant="sm"
+    @click="toggleResize"
+  >
     <b-icon icon="arrows-expand" rotate="90" />
   </b-button>
 </template>
@@ -13,6 +17,10 @@ export default Vue.extend({
   computed: {
     resizing(): boolean {
       return this.$store.state.resizing;
+    },
+
+    resizeCommand(): string {
+      return this.$store.state.editorCommands.resize;
     },
   },
 

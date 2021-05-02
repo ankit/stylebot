@@ -36,10 +36,11 @@ export const defaultEditorCommands: StylebotEditorCommands = {
   code: 'c',
   help: '?',
   hide: 'h',
-  resize: 'r',
+  resize: 's',
   dockLeft: 'l',
-  dockRight: 'd',
-  adjustPageLayout: 'p',
+  dockRight: 'r',
+  pageLayout: 'p',
+  close: 'Escape'
 };
 
 export const defaultReadabilitySettings: ReadabilitySettings = {

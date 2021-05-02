@@ -6,9 +6,12 @@
 import Vue from 'vue';
 
 import { Declaration, Rule } from 'postcss';
-import { StylebotEditingMode, StylebotLayout } from '@stylebot/types';
+import {
+  StylebotEditingMode,
+  StylebotLayout,
+  StylebotEditorCommands,
+} from '@stylebot/types';
 
-// todo: use hotkeys-js and editorCommands
 export default Vue.extend({
   name: 'TheKeyboardShortcuts',
 
@@ -36,6 +39,9 @@ export default Vue.extend({
     },
     layout(): StylebotLayout {
       return this.$store.state.options.layout;
+    },
+    editorCommands(): StylebotEditorCommands {
+      return this.$store.state.editorCommands;
     },
   },
 
@@ -132,88 +138,88 @@ export default Vue.extend({
         return;
       }
 
-      // i - Toggle inspect
-      if (event.keyCode === 73) {
+      // Toggle inspect
+      if (event.key === this.editorCommands.inspect) {
         event.preventDefault();
         event.stopPropagation();
 
         this.toggleInspect();
       }
 
-      // h - Toggle visibility css of selected element(s)
-      if (event.keyCode === 72) {
+      // Toggle visibility css of selected element(s)
+      if (event.key === this.editorCommands.hide) {
         event.preventDefault();
         event.stopPropagation();
 
         this.toggleVisibilityOfActiveSelector();
       }
 
-      // b - switch to basic editor
-      if (event.keyCode === 66) {
+      // Switch to basic editor
+      if (event.key === this.editorCommands.basic) {
         event.preventDefault();
         event.stopPropagation();
 
         this.$store.dispatch('setMode', 'basic');
       }
 
-      // c - switch to code editor
-      if (event.keyCode === 67) {
+      // Switch to code editor
+      if (event.key === this.editorCommands.code) {
         event.preventDefault();
         event.stopPropagation();
 
         this.$store.dispatch('setMode', 'code');
       }
 
-      // m - switch to magic editor
-      if (event.keyCode === 77) {
+      // Switch to magic editor
+      if (event.key === this.editorCommands.magic) {
         event.preventDefault();
         event.stopPropagation();
 
         this.$store.dispatch('setMode', 'magic');
       }
 
-      // ? - show shortcut help
-      if (event.keyCode === 191 && event.shiftKey) {
+      // Show shortcut help
+      if (event.key === this.editorCommands.help) {
         event.preventDefault();
         event.stopPropagation();
 
         this.toggleHelp();
       }
 
-      // l - dock stylebot to the left
-      if (event.keyCode === 76) {
+      // Dock stylebot to the left
+      if (event.key === this.editorCommands.dockLeft) {
         event.preventDefault();
         event.stopPropagation();
 
         this.dockLeft();
       }
 
-      // d - dock stylebot to the right
-      if (event.keyCode === 68) {
+      // Dock stylebot to the right
+      if (event.key === this.editorCommands.dockRight) {
         event.preventDefault();
         event.stopPropagation();
 
         this.dockRight();
       }
 
-      // p - toggle page layout adjustment
-      if (event.keyCode === 80) {
+      // Toggle page layout adjustment
+      if (event.key === this.editorCommands.pageLayout) {
         event.preventDefault();
         event.stopPropagation();
 
         this.toggleAdjustPageLayout();
       }
 
-      // r - toggle resize
-      if (event.keyCode === 82) {
+      // Toggle resizing
+      if (event.key === this.editorCommands.resize) {
         event.preventDefault();
         event.stopPropagation();
 
         this.toggleResize();
       }
 
-      // esc - if help is visible, close help. else, close stylebot
-      if (event.keyCode === 27) {
+      // Hide help / stylebot
+      if (event.key === this.editorCommands.close) {
         event.preventDefault();
         event.stopPropagation();
 
