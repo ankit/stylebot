@@ -1,22 +1,15 @@
 import { Link } from "gatsby"
 
-import PropTypes from "prop-types"
 import React from "react"
+import PropTypes from "prop-types"
 
 import githubImg from "../images/github.svg"
 import twitterImg from "../images/twitter.svg"
 
-const Header = ({ siteTitle }) => (
-  <header>
-    <div
-      style={{
-        margin: `0 auto`,
-        maxWidth: 960,
-        display: "flex",
-        justifyContent: "end",
-        padding: `1.45rem 1.0875rem 0.7em`
-      }}
-    >
+const Header = ({ siteTitle }) => {
+
+  return (
+    <header class="header">
       <h1 style={{ margin: 0 }}>
         <Link
           to="/"
@@ -55,14 +48,14 @@ const Header = ({ siteTitle }) => (
           href="https://ko-fi.com/stylebot"
           target="_blank"
           rel="noreferrer"
-          className="header-link"
+          className="header-link buy-coffee"
         >
           Donate
         </a>
       </div>
-    </div>
-  </header>
-)
+    </header>
+  )
+}
 
 Header.propTypes = {
   siteTitle: PropTypes.string

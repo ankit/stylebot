@@ -1,24 +1,21 @@
 import React from "react"
-import { useStaticQuery, graphql } from "gatsby"
 import Img from "gatsby-image"
-
-/*
- * This component is built using `gatsby-image` to automatically serve optimized
- * images with lazy loading and reduced file sizes. The image is loaded using a
- * `useStaticQuery`, which allows us to load the image from directly within this
- * component, rather than having to pass the image data down from pages.
- *
- * For more information, see the docs:
- * - `gatsby-image`: https://gatsby.dev/gatsby-image
- * - `useStaticQuery`: https://www.gatsbyjs.org/docs/use-static-query/
- */
+import { useStaticQuery, graphql } from "gatsby"
 
 const Sync = () => {
   const data = useStaticQuery(graphql`
     query {
-      file(relativePath: { eq: "sync.png" }) {
+      sync1: file(relativePath: { eq: "sync1.png" }) {
         childImageSharp {
-          fixed(height: 600) {
+          fixed(height: 250) {
+            ...GatsbyImageSharpFixed
+          }
+        }
+      }
+
+      sync2: file(relativePath: { eq: "sync2.png" }) {
+        childImageSharp {
+          fixed(height: 200) {
             ...GatsbyImageSharpFixed
           }
         }
@@ -27,14 +24,27 @@ const Sync = () => {
   `)
 
   return (
-    <div style={{ textAlign: "center" }}>
-      <Img
-        fixed={data.file.childImageSharp.fixed}
-        style={{
-          marginBottom: "10px",
-        }}
-      />
-      <h3>Sync your styles</h3>
+    <div className="feature">
+      <div className="feature-img" style={{ marginRight: '24px' }}>
+        <div style={{ display: 'flex' }}>
+          <Img fixed={data.sync1.childImageSharp.fixed} />
+          <Img fixed={data.sync2.childImageSharp.fixed} />
+        </div>
+      </div>
+      <div className="feature-desc">
+        <h3>
+          <strong>Sync</strong> your styles across browsers.
+        </h3>
+
+        <p>
+          Enable sync via Google Drive and keep your styles across profiles
+          and browsers in sync and backed up.
+        </p>
+
+        <p>
+          Or download your styles locally.
+        </p>
+      </div>
     </div>
   )
 }

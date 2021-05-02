@@ -11,6 +11,14 @@
   background: #eee;
 }
 
+.header {
+  margin: 0 auto;
+  max-width: 960px;
+  display: flex;
+  justify-content: end;
+  padding: 1.45rem 1.0875rem 0.7em;
+}
+
 .header-link {
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
@@ -30,17 +38,30 @@
   opacity: 1;
 }
 
-.download-link-list {
-  display: flex;
-  width: 400px;
-  margin: 0 auto;
+.buy-coffee {
+  background-color: #0062cc;
+  padding: 4px 12px;
+  border-radius: 16px;
+  color: #fff;
 }
 
-.download-link {
+.intro {
+  margin: 48px 0 24px 0;
+  font-size: 24px; 
+  line-height: 36px;
+}
+
+.downloads {
+  display: flex;
+  width: 600px;
+  margin: 0 auto;
+  margin-bottom: 24px;
+}
+
+.download {
   display: flex;
   margin: 0 auto;
   align-items: center;
-  width: 260px;
   text-decoration: none;
   padding: 10px 20px;
   margin-bottom: 20px;
@@ -48,18 +69,38 @@
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
   color: #333;
   margin-top: 20px;
+  border: 1px solid #ccc;
+  margin-right: 12px;
+  border-radius: 32px;
 }
 
-.download-link:hover {
+.download:hover {
   background: #eee;
 }
 
-.download-link:visited {
+.download:visited {
   color: #333;
 }
 
-.slider img { 
-  border: 1px solid #eee;
+.download img {
+  height: 45px;
+  margin-right: 10px;
+  margin-bottom: 0;
+}
+
+.feature {
+  display: flex; 
+  padding: 48px 0;
+  border-top: 1px solid #eee;
+}
+
+.feature-img {
+  margin-bottom: 12px;
+  box-shadow: 1px 0px 24px 0px rgba(51, 51, 51, 0.3);
+}
+
+.feature-desc {
+  min-width: 400px;
 }
 
 .footer {
