@@ -202,53 +202,48 @@ const HelpPage = () => (
     <section id="url-syntax-rules">
       <h3>URL Syntax Rules</h3>
 
+      <h4>URL without any wildcards (default)</h4>
+      <p>By default, Stylebot editor uses the site's domain name to match styles to websites.</p>
+
+
+      <h4>Wildcards</h4>
       <ul>
         <li>
-          <strong>URL without any wildcards (default)</strong> - By default, Stylebot editor uses the site's domain name to match styles to websites.
-      </li>
-
+          <code>**</code> matches any character sequence.
+          </li>
         <li>
-          <strong>Wildcards</strong>
-          <ul>
-            <li>
-              <code>**</code> matches any character sequence.
+          <code>*</code> matches any character sequence, until a <code>/</code> is found
           </li>
-            <li>
-              <code>*</code> matches any character sequence, until a <code>/</code> is found
-          </li>
-            <li>
-              <code>,</code> separates a list of patterns. Matches a URL if any sub-pattern matches it.
-          </li>
-            <li>
-              <code>^</code> at the beginning of the URL turns it into a regular expression.
-          </li>
-          </ul>
-        </li>
-
         <li>
-          <strong>Examples</strong>
-          <ul>
-            <li>
-              <code>docs.google.com</code>: Any URL with <code>docs.google.com</code> anywhere in it.
+          <code>,</code> separates a list of patterns. Matches a URL if any sub-pattern matches it.
           </li>
-            <li>
-              <code>docs**</code>: Any URL beginning with <code>docs</code>.
+        <li>
+          <code>^</code> at the beginning of the URL turns it into a regular expression.
           </li>
-            <li>
-              <code>docs*.google.com</code>: <code>http://docs.google.com</code>, <code>http://docs1.google.com</code>, <code>http://docs2.google.com</code> and so on.
-          </li>
-            <li>
-              <code>*.ycombinator.com</code>: <code>http://news.ycombinator.com</code> and <code>http://apps.ycombinator.com</code>.
-          </li>
-            <li>
-              <code>docs.google.com, spreadsheets.google.com</code>: Any URL with <code>docs.google.com</code> or <code>spreadsheets.google.com</code> in it.
-          </li>
-            <li>
-              <code>^http://www.reddit.com/$</code>: Reddit homepage.
-          </li>
-          </ul>
-        </li>
       </ul>
+
+      <h4>Examples</h4>
+      <ul>
+        <li>
+          <code>docs.google.com</code>: Any URL with <code>docs.google.com</code> anywhere in it.
+          </li>
+        <li>
+          <code>docs**</code>: Any URL beginning with <code>docs</code>.
+          </li>
+        <li>
+          <code>docs*.google.com</code>: <code>http://docs.google.com</code>, <code>http://docs1.google.com</code>, <code>http://docs2.google.com</code> and so on.
+          </li>
+        <li>
+          <code>*.ycombinator.com</code>: <code>http://news.ycombinator.com</code> and <code>http://apps.ycombinator.com</code>.
+          </li>
+        <li>
+          <code>docs.google.com, spreadsheets.google.com</code>: Any URL with <code>docs.google.com</code> or <code>spreadsheets.google.com</code> in it.
+          </li>
+        <li>
+          <code>^http://www.reddit.com/$</code>: Reddit homepage.
+          </li>
+      </ul>
+
     </section>
 
     <hr />
@@ -277,7 +272,7 @@ const HelpPage = () => (
         Support Stylebot by <a href="https://ko-fi.com/stylebot" target="_blank" rel="noreferrer">buying me a coffee</a>.
       </p>
     </section>
-  </Layout>
+  </Layout >
 )
 
 export default HelpPage

@@ -2,21 +2,15 @@ import React from "react"
 import Img from "gatsby-image"
 import { useStaticQuery, graphql } from "gatsby"
 
+import { Feature, FeatureDescription, FeatureImage, FeatureSpacer } from './feature'
+
 const Sync = () => {
   const data = useStaticQuery(graphql`
     query {
-      sync1: file(relativePath: { eq: "sync1.png" }) {
+      sync: file(relativePath: { eq: "sync2.png" }) {
         childImageSharp {
-          fixed(height: 250) {
-            ...GatsbyImageSharpFixed
-          }
-        }
-      }
-
-      sync2: file(relativePath: { eq: "sync2.png" }) {
-        childImageSharp {
-          fixed(height: 200) {
-            ...GatsbyImageSharpFixed
+          fluid {
+            ...GatsbyImageSharpFluid
           }
         }
       }
@@ -24,14 +18,8 @@ const Sync = () => {
   `)
 
   return (
-    <div className="feature">
-      <div className="feature-img" style={{ marginRight: '24px' }}>
-        <div style={{ display: 'flex' }}>
-          <Img fixed={data.sync1.childImageSharp.fixed} />
-          <Img fixed={data.sync2.childImageSharp.fixed} />
-        </div>
-      </div>
-      <div className="feature-desc">
+    <Feature>
+      <FeatureDescription>
         <h3>
           <strong>Sync</strong> your styles across browsers.
         </h3>
@@ -44,8 +32,14 @@ const Sync = () => {
         <p>
           Or download your styles locally.
         </p>
-      </div>
-    </div>
+      </FeatureDescription>
+
+      <FeatureSpacer />
+
+      <FeatureImage>
+        <Img fluid={data.sync.childImageSharp.fluid} />
+      </FeatureImage>
+    </Feature>
   )
 }
 

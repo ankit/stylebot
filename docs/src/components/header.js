@@ -1,60 +1,125 @@
-import { Link } from "gatsby"
-
 import React from "react"
 import PropTypes from "prop-types"
+import styled from "@emotion/styled"
+import { Link } from "gatsby"
 
 import githubImg from "../images/github.svg"
 import twitterImg from "../images/twitter.svg"
 
+const StyledHeader = styled.header`
+  margin: 0 auto;
+  max-width: 960px;
+  display: flex;
+  justify-content: end;
+  padding: 1.45rem 1.0875rem 0.7em;
+`
+
+const Title = styled.h1`
+  margin: 0;
+
+  & a {
+    color: #333;
+    text-decoration: none;
+  }
+`
+
+const Subtitle = styled.span`
+  font-weight: 200; 
+  padding-left: 12px;
+`
+
+const LinksContainer = styled.div`
+  margin-top: 10px;
+  margin-left: auto;
+`
+
+const HeaderLink = styled.a`
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  color: #131313;
+  opacity: 0.8;
+  font-size: 15px;
+  margin-left: 12px;
+  text-decoration: none;
+
+  &:hover {
+    opacity: 1;
+  }
+
+  & img {
+    height: 20px;
+    margin-bottom: -4px;
+  }
+`
+
+const BuyCoffeeLink = styled.a`
+  background-color: #0062cc;
+  padding: 3px 12px 4px 12px;
+  border-radius: 16px;
+  color: #fff;
+  margin-left: 8px;
+  text-decoration: none;
+  font-size: 15px;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+`
+
+const HelpLink = styled.a`
+  background-color: #ddd;
+  padding: 3px 12px 4px 12px;
+  border-radius: 16px;
+  color: #333;
+  margin-left: 16px;
+  text-decoration: none;
+  font-size: 15px;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+`
+
 const Header = ({ title, subtitle }) => {
   return (
-    <header class="header">
-      <h1 style={{ margin: 0 }}>
-        <Link
-          to="/"
-          style={{
-            color: `#333`,
-            textDecoration: `none`
-          }}
-        >
+    <StyledHeader>
+      <Title>
+        <Link to="/">
           {title}
         </Link>
 
-        <span style={{ fontWeight: 200, paddingLeft: '12px' }}>{subtitle}</span>
-      </h1>
+        <Subtitle>{subtitle}</Subtitle>
+      </Title>
 
-      <div style={{ marginLeft: "auto", marginTop: "10px" }}>
-        <a
-          href="https://github.com/ankit/stylebot"
+      <LinksContainer>
+        <HeaderLink
           target="_blank"
           rel="noreferrer"
           title="Fork on Github"
-          className="header-link"
+          href="https://github.com/ankit/stylebot"
         >
           <img src={githubImg} alt="Github" />
-        </a>
+        </HeaderLink>
 
-        <a
+        <HeaderLink
+          target="_blank"
+          rel="noreferrer"
           title="@stylebot"
           href="https://twitter.com/stylebot"
-          target="_blank"
-          rel="noreferrer"
-          className="header-link"
         >
           <img src={twitterImg} alt="Twitter" />
-        </a>
+        </HeaderLink>
 
-        <a
+        <HelpLink href="/help" title="Help">
+          Help
+        </HelpLink>
+
+        <BuyCoffeeLink
           title="Donate"
-          href="https://ko-fi.com/stylebot"
           target="_blank"
           rel="noreferrer"
-          className="header-link buy-coffee"
+          href="https://ko-fi.com/stylebot"
         >
           Donate
-        </a>
-      </div>
-    </header>
+        </BuyCoffeeLink>
+      </LinksContainer>
+    </StyledHeader>
   )
 }
 

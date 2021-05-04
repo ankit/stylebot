@@ -2,13 +2,15 @@ import React from "react"
 import Img from "gatsby-image"
 import { useStaticQuery, graphql } from "gatsby"
 
+import { Feature, FeatureImage, FeatureDescription, FeatureSpacer } from './feature'
+
 const Readability = () => {
   const data = useStaticQuery(graphql`
     query {
       file(relativePath: { eq: "readability1.png" }) {
         childImageSharp {
-          fixed(height: 320) {
-            ...GatsbyImageSharpFixed
+          fluid {
+            ...GatsbyImageSharpFluid
           }
         }
       }
@@ -16,8 +18,14 @@ const Readability = () => {
   `)
 
   return (
-    <div className="feature" style={{ marginRight: "24px" }}>
-      <div className="feature-desc">
+    <Feature>
+      <FeatureImage>
+        <Img fluid={data.file.childImageSharp.fluid} />
+      </FeatureImage>
+
+      <FeatureSpacer />
+
+      <FeatureDescription>
         <h3>
           Enable <strong>readability</strong> for articles.
         </h3>
@@ -29,11 +37,8 @@ const Readability = () => {
         <p>
           Pick between Light, Dark and Sepia themes. Use any custom font available on Google Fonts.
         </p>
-      </div>
-      <div className="feature-img">
-        <Img fixed={data.file.childImageSharp.fixed} />
-      </div>
-    </div>
+      </FeatureDescription>
+    </Feature>
   )
 }
 
