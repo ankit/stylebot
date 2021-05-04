@@ -27,10 +27,12 @@ import { setNotification } from '@stylebot/utils';
   });
 })();
 
-chrome.runtime.onInstalled.addListener(async ({ reason, previousVersion }) => {
+chrome.runtime.onInstalled.addListener(async ({ reason }) => {
   if (reason === 'install') {
     chrome.tabs.create({
       url: 'https://stylebot.dev/help'
     });
   }
 });
+
+chrome.runtime.setUninstallURL('https://stylebot.dev/goodbye');
