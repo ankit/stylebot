@@ -18,8 +18,6 @@
       <view-options />
 
       <release-notification />
-
-      <donate-notification />
     </b-list-group>
   </div>
 </template>
@@ -33,7 +31,6 @@ import Readability from './components/Readability.vue';
 import SyncStylebot from './components/SyncStylebot.vue';
 import ToggleStylebot from './components/ToggleStylebot.vue';
 import ReleaseNotification from './components/notifications/ReleaseNotification.vue';
-import DonateNotification from './components/notifications/DonateNotification.vue';
 
 import { getStyles, getCurrentTab, getIsStylebotOpen } from './utils';
 
@@ -50,7 +47,6 @@ export default Vue.extend({
     Readability,
     SyncStylebot,
     ReleaseNotification,
-    DonateNotification,
   },
 
   data(): {

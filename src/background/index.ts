@@ -32,6 +32,8 @@ chrome.runtime.onInstalled.addListener(async ({ reason }) => {
     chrome.tabs.create({
       url: 'https://stylebot.dev/help'
     });
+
+    setNotification('release/3.1', true);
   }
 });
 
