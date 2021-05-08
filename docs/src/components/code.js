@@ -1,42 +1,44 @@
-import React from "react"
-import { useStaticQuery, graphql } from "gatsby"
-import Img from "gatsby-image"
+import React from "react";
+import Img from "gatsby-image";
+import { useStaticQuery, graphql } from "gatsby";
 
-/*
- * This component is built using `gatsby-image` to automatically serve optimized
- * images with lazy loading and reduced file sizes. The image is loaded using a
- * `useStaticQuery`, which allows us to load the image from directly within this
- * component, rather than having to pass the image data down from pages.
- *
- * For more information, see the docs:
- * - `gatsby-image`: https://gatsby.dev/gatsby-image
- * - `useStaticQuery`: https://www.gatsbyjs.org/docs/use-static-query/
- */
+import {
+  Feature,
+  FeatureDescription,
+  FeatureImage,
+  FeatureSpacer,
+} from "./feature";
 
-const BasicMode = () => {
+const Code = () => {
   const data = useStaticQuery(graphql`
     query {
       file(relativePath: { eq: "code.png" }) {
         childImageSharp {
-          fixed(height: 600) {
-            ...GatsbyImageSharpFixed
+          fluid {
+            ...GatsbyImageSharpFluid
           }
         }
       }
     }
-  `)
+  `);
 
   return (
-    <div style={{ textAlign: "center" }}>
-      <Img
-        fixed={data.file.childImageSharp.fixed}
-        style={{
-          marginBottom: "10px",
-        }}
-      />
-      <h3>Code your own custom css</h3>
-    </div>
-  )
-}
+    <Feature>
+      <FeatureDescription>
+        <h3>
+          <strong>Code</strong> your own CSS.
+        </h3>
 
-export default BasicMode
+        <p>Use the Code editor to write your own custom CSS for the page.</p>
+      </FeatureDescription>
+
+      <FeatureSpacer />
+
+      <FeatureImage>
+        <Img fluid={data.file.childImageSharp.fluid} />
+      </FeatureImage>
+    </Feature>
+  );
+};
+
+export default Code;

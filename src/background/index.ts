@@ -7,6 +7,8 @@ import DefaultShortcutUpdate from './default-shortcut-update';
 import StylesMetadataUpdate from './styles-metadata-update';
 import StylesModifiedTimeUpdate from './styles-modified-time-update';
 
+import { setNotification } from '@stylebot/utils';
+
 (async () => {
   await DefaultShortcutUpdate();
   await StylesMetadataUpdate();
@@ -24,3 +26,15 @@ import StylesModifiedTimeUpdate from './styles-modified-time-update';
     color: '#555',
   });
 })();
+
+chrome.runtime.onInstalled.addListener(async ({ reason }) => {
+  if (reason === 'install') {
+    chrome.tabs.create({
+      url: 'https://stylebot.dev/help'
+    });
+
+    setNotification('release/3.1', true);
+  }
+});
+
+chrome.runtime.setUninstallURL('https://stylebot.dev/goodbye');

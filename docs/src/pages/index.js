@@ -1,71 +1,51 @@
 import React from "react"
+import styled from "@emotion/styled"
 
 import Layout from "../components/layout"
-import Demo from "../components/demo"
-import BasicMode from "../components/basic-mode"
+import Basic from "../components/basic"
 import Readability from "../components/readability"
 import Code from "../components/code"
-import Shortcuts from "../components/shortcuts"
-import Chrome from "../components/chrome"
-import Firefox from "../components/firefox"
+import Sync from "../components/sync"
+import ChromeDownload from "../components/chrome"
+import FirefoxDownload from "../components/firefox"
 import SEO from "../components/seo"
 
-import {
-  CarouselProvider,
-  Slider,
-  Slide,
-  ButtonBack,
-  ButtonNext,
-} from "pure-react-carousel"
+const IntroH2 = styled.h2`
+  font-size: 24px; 
+  line-height: 36px;
+  margin: 48px 0 24px 0;
+`
 
-import "pure-react-carousel/dist/react-carousel.es.css"
+const Downloads = styled.div`
+  display: flex;
+  width: 600px;
+  margin: 0 auto;
+  margin-bottom: 24px;
+`
 
 const IndexPage = () => (
   <Layout>
     <SEO title="Home" />
 
-    <h2 style={{ paddingBottom: "20px" }}>
-      Change the appearance of the web instantly
-    </h2>
+    <IntroH2>
+      Stylebot is a browser extension which lets you modify the appearance of any
+      webpage and sync your changes across browsers.
+    </IntroH2>
 
-    <div className="download-link-list">
-      <Firefox />
-      <Chrome />
-    </div>
+    <Downloads>
+      <FirefoxDownload />
+      <ChromeDownload />
+    </Downloads>
 
-    <CarouselProvider
-      isPlaying
-      totalSlides={5}
-      naturalSlideWidth={1200}
-      naturalSlideHeight={890}
-    >
-      <Slider>
-        <Slide index={0}>
-          <BasicMode />
-        </Slide>
+    <Basic />
+    <Code />
+    <Readability />
+    <Sync />
 
-        <Slide index={1}>
-          <Readability />
-        </Slide>
-
-        <Slide index={2}>
-          <Code />
-        </Slide>
-
-        <Slide index={3}>
-          <Shortcuts />
-        </Slide>
-
-        <Slide index={4}>
-          <Demo />
-        </Slide>
-      </Slider>
-
-      <div style={{ textAlign: "center" }}>
-        <ButtonBack className="btn">Back</ButtonBack>
-        <ButtonNext className="btn">Next</ButtonNext>
-      </div>
-    </CarouselProvider>
+    <p>
+      Stylebot is an open source and free browser extension. Trusted by more than 200,000 users. <br />
+      Developed since 2011. Support Stylebot by <a href="https://ko-fi.com/stylebot" target="_blank" rel="noreferrer">buying me a coffee</a>.
+    </p>
   </Layout>
 )
 

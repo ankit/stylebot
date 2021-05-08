@@ -22,7 +22,6 @@ import Vue from 'vue';
 import TheBasicsTab from './components/TheBasicsTab.vue';
 import TheStylesTab from './components/TheStylesTab.vue';
 import TheSyncTab from './components/TheSyncTab.vue';
-import TheHelpTab from './components/TheHelpTab.vue';
 import TheNavigation from './components/TheNavigation.vue';
 
 export default Vue.extend({
@@ -32,7 +31,6 @@ export default Vue.extend({
     TheBasicsTab,
     TheStylesTab,
     TheSyncTab,
-    TheHelpTab,
     TheNavigation,
   },
 
@@ -42,7 +40,7 @@ export default Vue.extend({
   } {
     return {
       currentTab: 'basics',
-      tabs: ['basics', 'styles', 'sync', 'help'],
+      tabs: ['basics', 'styles', 'sync'],
     };
   },
 

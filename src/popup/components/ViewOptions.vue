@@ -14,6 +14,7 @@ export default Vue.extend({
   methods: {
     open(): void {
       chrome.runtime.openOptionsPage();
+      window.close();
     },
   },
 });

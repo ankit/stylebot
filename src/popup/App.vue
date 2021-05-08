@@ -16,6 +16,8 @@
       <sync-stylebot v-if="googleDriveSyncEnabled" />
 
       <view-options />
+
+      <release-notification />
     </b-list-group>
   </div>
 </template>
@@ -28,6 +30,7 @@ import ViewOptions from './components/ViewOptions.vue';
 import Readability from './components/Readability.vue';
 import SyncStylebot from './components/SyncStylebot.vue';
 import ToggleStylebot from './components/ToggleStylebot.vue';
+import ReleaseNotification from './components/notifications/ReleaseNotification.vue';
 
 import { getStyles, getCurrentTab, getIsStylebotOpen } from './utils';
 
@@ -43,6 +46,7 @@ export default Vue.extend({
     ToggleStylebot,
     Readability,
     SyncStylebot,
+    ReleaseNotification,
   },
 
   data(): {

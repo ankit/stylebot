@@ -1,19 +1,41 @@
-/**
- * Layout component that queries for data
- * with Gatsby's useStaticQuery component
- *
- * See: https://www.gatsbyjs.org/docs/use-static-query/
- */
+import React from "react";
+import PropTypes from "prop-types";
+import styled from "@emotion/styled";
+import { useStaticQuery, graphql } from "gatsby";
 
-import React from "react"
-import PropTypes from "prop-types"
-import { useStaticQuery, graphql } from "gatsby"
+import Header from "./header";
 
-import Header from "./header"
-import "./custom.css"
-import "./layout.css"
+import "./layout.css";
 
-const Layout = ({ children }) => {
+const Content = styled.div`
+  margin: 0 auto;
+  max-width: 960px;
+  padding: 0 1.0875rem 1.45rem;
+`;
+
+const Footer = styled.footer`
+  margin-top: 40px;
+  padding-top: 10px;
+  border-top: 1px solid #eee;
+  text-align: center;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  line-height: 30px;
+  font-size: 16px;
+
+  & a {
+    color: #131313;
+    opacity: 0.8;
+    text-decoration: none;
+
+    &:hover {
+      color: #0095dd;
+      opacity: 1;
+    }
+  }
+`;
+
+const Layout = ({ subtitle, children }) => {
   const data = useStaticQuery(graphql`
     query SiteTitleQuery {
       site {
@@ -22,32 +44,26 @@ const Layout = ({ children }) => {
         }
       }
     }
-  `)
+  `);
 
   return (
     <>
-      <Header siteTitle={data.site.siteMetadata.title} />
-      <div
-        style={{
-          margin: `0 auto`,
-          maxWidth: 960,
-          padding: `0 1.0875rem 1.45rem`,
-        }}
-      >
+      <Header title={data.site.siteMetadata.title} subtitle={subtitle} />
+      <Content>
         <main>{children}</main>
-        <footer className="footer">
+        <Footer>
           © {new Date().getFullYear()}{" "}
           <a href="http://ankitahuja.com" target="_blank" rel="noreferrer">
             Ankit Ahuja
           </a>
-        </footer>
-      </div>
+        </Footer>
+      </Content>
     </>
-  )
-}
+  );
+};
 
 Layout.propTypes = {
   children: PropTypes.node.isRequired,
-}
+};
 
-export default Layout
+export default Layout;
