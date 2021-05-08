@@ -1,4 +1,4 @@
-## Version 3.1 (TBR)
+## Version 3.1 (May 2021)
 
 - Added ability to resize stylebot editor
 - Added support for syncing and backing up styles using Google Drive
