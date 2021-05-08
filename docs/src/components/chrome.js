@@ -1,6 +1,6 @@
-import React from "react"
-import Download from './download'
-import chrome from "../images/chrome.svg"
+import React from "react";
+import Download from "./download";
+import chrome from "../images/chrome.svg";
 
 const ChromeDownload = () => (
   <Download
@@ -10,7 +10,6 @@ const ChromeDownload = () => (
   >
     Stylebot for <strong>Chrome</strong>
   </Download>
-)
+);
 
-
-export default ChromeDownload
+export default ChromeDownload;

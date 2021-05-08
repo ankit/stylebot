@@ -1,8 +1,13 @@
-import React from "react"
-import Img from "gatsby-image"
-import { useStaticQuery, graphql } from "gatsby"
+import React from "react";
+import Img from "gatsby-image";
+import { useStaticQuery, graphql } from "gatsby";
 
-import { Feature, FeatureDescription, FeatureImage, FeatureSpacer } from './feature'
+import {
+  Feature,
+  FeatureDescription,
+  FeatureImage,
+  FeatureSpacer,
+} from "./feature";
 
 const Code = () => {
   const data = useStaticQuery(graphql`
@@ -15,7 +20,7 @@ const Code = () => {
         }
       }
     }
-  `)
+  `);
 
   return (
     <Feature>
@@ -24,9 +29,7 @@ const Code = () => {
           <strong>Code</strong> your own CSS.
         </h3>
 
-        <p>
-          Use the Code editor to write your own custom CSS for the page.
-        </p>
+        <p>Use the Code editor to write your own custom CSS for the page.</p>
       </FeatureDescription>
 
       <FeatureSpacer />
@@ -35,7 +38,7 @@ const Code = () => {
         <Img fluid={data.file.childImageSharp.fluid} />
       </FeatureImage>
     </Feature>
-  )
-}
+  );
+};
 
-export default Code
+export default Code;

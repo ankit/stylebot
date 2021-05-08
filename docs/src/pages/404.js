@@ -1,18 +1,18 @@
-import React from "react"
-import styled from "@emotion/styled"
+import React from "react";
+import styled from "@emotion/styled";
 
-import Layout from "../components/layout"
-import SEO from "../components/seo"
+import Layout from "../components/layout";
+import SEO from "../components/seo";
 
-import LostImage from "../images/404.svg"
+import LostImage from "../images/404.svg";
 
 const Image = styled.img`
   margin: 48px auto;
-`
+`;
 
 const Container = styled.div`
-  text-align: center
-`
+  text-align: center;
+`;
 
 const NotFoundPage = () => (
   <Layout>
@@ -21,6 +21,6 @@ const NotFoundPage = () => (
       <Image src={LostImage} height={300} />
     </Container>
   </Layout>
-)
+);
 
-export default NotFoundPage
+export default NotFoundPage;

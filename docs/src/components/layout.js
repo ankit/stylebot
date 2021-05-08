@@ -1,17 +1,17 @@
-import React from "react"
-import PropTypes from "prop-types"
-import styled from "@emotion/styled"
-import { useStaticQuery, graphql } from "gatsby"
+import React from "react";
+import PropTypes from "prop-types";
+import styled from "@emotion/styled";
+import { useStaticQuery, graphql } from "gatsby";
 
-import Header from "./header"
+import Header from "./header";
 
-import "./layout.css"
+import "./layout.css";
 
 const Content = styled.div`
   margin: 0 auto;
   max-width: 960px;
   padding: 0 1.0875rem 1.45rem;
-`
+`;
 
 const Footer = styled.footer`
   margin-top: 40px;
@@ -33,7 +33,7 @@ const Footer = styled.footer`
       opacity: 1;
     }
   }
-`
+`;
 
 const Layout = ({ subtitle, children }) => {
   const data = useStaticQuery(graphql`
@@ -44,7 +44,7 @@ const Layout = ({ subtitle, children }) => {
         }
       }
     }
-  `)
+  `);
 
   return (
     <>
@@ -59,11 +59,11 @@ const Layout = ({ subtitle, children }) => {
         </Footer>
       </Content>
     </>
-  )
-}
+  );
+};
 
 Layout.propTypes = {
   children: PropTypes.node.isRequired,
-}
+};
 
-export default Layout
+export default Layout;

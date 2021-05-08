@@ -1,8 +1,13 @@
-import React from "react"
-import Img from "gatsby-image"
-import { useStaticQuery, graphql } from "gatsby"
+import React from "react";
+import Img from "gatsby-image";
+import { useStaticQuery, graphql } from "gatsby";
 
-import { Feature, FeatureDescription, FeatureImage, FeatureSpacer } from './feature'
+import {
+  Feature,
+  FeatureDescription,
+  FeatureImage,
+  FeatureSpacer,
+} from "./feature";
 
 const Sync = () => {
   const data = useStaticQuery(graphql`
@@ -15,7 +20,7 @@ const Sync = () => {
         }
       }
     }
-  `)
+  `);
 
   return (
     <Feature>
@@ -25,13 +30,11 @@ const Sync = () => {
         </h3>
 
         <p>
-          Enable sync via Google Drive and keep your styles across profiles
-          and browsers in sync and backed up.
+          Enable sync via Google Drive and keep your styles across profiles and
+          browsers in sync and backed up.
         </p>
 
-        <p>
-          Or download your styles locally.
-        </p>
+        <p>Or download your styles locally.</p>
       </FeatureDescription>
 
       <FeatureSpacer />
@@ -40,7 +43,7 @@ const Sync = () => {
         <Img fluid={data.sync.childImageSharp.fluid} />
       </FeatureImage>
     </Feature>
-  )
-}
+  );
+};
 
-export default Sync
+export default Sync;

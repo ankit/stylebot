@@ -1,6 +1,6 @@
-import React from "react"
-import Download from './download'
-import firefox from "../images/firefox.svg"
+import React from "react";
+import Download from "./download";
+import firefox from "../images/firefox.svg";
 
 const FirefoxDownload = () => (
   <Download
@@ -10,7 +10,6 @@ const FirefoxDownload = () => (
   >
     Stylebot for <strong>Firefox</strong>
   </Download>
-)
+);
 
-
-export default FirefoxDownload
+export default FirefoxDownload;

@@ -1,5 +1,5 @@
-import React from "react"
-import styled from "@emotion/styled"
+import React from "react";
+import styled from "@emotion/styled";
 
 const DownloadLink = styled.a`
   display: flex;
@@ -29,12 +29,12 @@ const DownloadLink = styled.a`
     margin-right: 10px;
     margin-bottom: 0;
   }
-`
+`;
 const Download = ({ href, children, altText, src }) => (
   <DownloadLink href={href} target="_blank" rel="noreferrer">
     <img alt={altText} src={src} />
     <span>{children}</span>
   </DownloadLink>
-)
+);
 
-export default Download
+export default Download;

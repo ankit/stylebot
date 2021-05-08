@@ -1,4 +1,4 @@
-import React from "react"
+import React from "react";
 
 const Demo = () => {
   return (
@@ -12,7 +12,7 @@ const Demo = () => {
         allowFullScreen
       ></iframe>
     </div>
-  )
-}
+  );
+};
 
-export default Demo
+export default Demo;

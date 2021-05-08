@@ -1,8 +1,13 @@
-import React from "react"
-import Img from "gatsby-image"
-import { useStaticQuery, graphql } from "gatsby"
+import React from "react";
+import Img from "gatsby-image";
+import { useStaticQuery, graphql } from "gatsby";
 
-import { Feature, FeatureImage, FeatureDescription, FeatureSpacer } from './feature'
+import {
+  Feature,
+  FeatureImage,
+  FeatureDescription,
+  FeatureSpacer,
+} from "./feature";
 
 const Readability = () => {
   const data = useStaticQuery(graphql`
@@ -15,7 +20,7 @@ const Readability = () => {
         }
       }
     }
-  `)
+  `);
 
   return (
     <Feature>
@@ -31,15 +36,17 @@ const Readability = () => {
         </h3>
 
         <p>
-          If enabled for a site, Stylebot will automatically hide clutter on all articles for readability.
+          If enabled for a site, Stylebot will automatically hide clutter on all
+          articles for readability.
         </p>
 
         <p>
-          Pick between Light, Dark and Sepia themes. Use any custom font available on Google Fonts.
+          Pick between Light, Dark and Sepia themes. Use any custom font
+          available on Google Fonts.
         </p>
       </FeatureDescription>
     </Feature>
-  )
-}
+  );
+};
 
-export default Readability
+export default Readability;
