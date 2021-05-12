@@ -24,3 +24,15 @@ export const setNotification = (id: NotificationId, value: boolean): Promise<voi
     });
   });
 }
+
+type Browser = 'Chrome' | 'Firefox' | 'Safari';
+export const getBrowser = (): Browser => {
+  const url = chrome.extension.getURL("/");
+  if (url.indexOf('moz')  === 0) {
+    return 'Firefox';
+  } else if (url.indexOf('safari') === 0) {
+    return 'Safari';
+  }
+
+  return 'Chrome';
+}

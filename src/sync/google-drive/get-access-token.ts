@@ -1,8 +1,11 @@
+import { getBrowser } from '@stylebot/utils';
+
 // Code from https://github.com/mdn/webextensions-examples/tree/master/google-userinfo
 export type AccessToken = string;
 
 const CLIENT_ID =
   '662998053209-s49tq55ic3td87m08gi8vpjqm5t7r9st.apps.googleusercontent.com';
+const OAUTH_CALLBACK_URL = 'https://stylebot.dev/oauth-callback';
 
 const extractAccessToken = (redirectUri: string) => {
   const m = redirectUri.match(/[#?](.*)/);
@@ -63,26 +66,61 @@ const validate = async (redirectURL?: string): Promise<AccessToken> => {
   return checkResponse(response);
 };
 
-const authorize = (): Promise<string | undefined> => {
-  return new Promise(resolve => {
-    const redirectURL = chrome.identity.getRedirectURL();
-    const scopes = ['https://www.googleapis.com/auth/drive.file'];
+const getRedirectURL = () => {
+  const browser = getBrowser();
+  if (browser === 'Safari') {
+    return OAUTH_CALLBACK_URL;
+  }
 
-    let authURL = 'https://accounts.google.com/o/oauth2/auth';
-    authURL += `?client_id=${CLIENT_ID}`;
-    authURL += `&response_type=token`;
-    authURL += `&redirect_uri=${encodeURIComponent(redirectURL)}`;
-    authURL += `&scope=${encodeURIComponent(scopes.join(' '))}`;
-
-    return chrome.identity.launchWebAuthFlow(
-      {
-        interactive: true,
-        url: authURL,
-      },
-      responseURL => resolve(responseURL)
-    );
-  });
+  return chrome.identity.getRedirectURL();
 };
+
+const getAuthURL = () => {
+  const redirect = getRedirectURL();
+  const scopes = ['https://www.googleapis.com/auth/drive.file'];
+
+  let url = 'https://accounts.google.com/o/oauth2/auth';
+  url += `?client_id=${CLIENT_ID}`;
+  url += `&response_type=token`;
+  url += `&redirect_uri=${encodeURIComponent(redirect)}`;
+  url += `&scope=${encodeURIComponent(scopes.join(' '))}`;
+
+  return url;
+};
+
+const launchOAuthFlow = (
+  authURL: string,
+  resolve: (value: string | PromiseLike<string | undefined> | undefined) => void
+) => {
+  const browser = getBrowser();
+
+  const onUpdated = (tabId: number, changeInfo: chrome.tabs.TabChangeInfo) => {
+    if (changeInfo.url?.indexOf(OAUTH_CALLBACK_URL) === 0) {
+      resolve(changeInfo.url);
+      chrome.tabs.remove(tabId);
+      chrome.tabs.onUpdated.removeListener(onUpdated);
+    }
+  };
+
+  if (browser === 'Safari') {
+    chrome.tabs.onUpdated.addListener(onUpdated);
+
+    chrome.tabs.create({
+      active: true,
+      url: authURL,
+    });
+
+    return;
+  }
+
+  return chrome.identity.launchWebAuthFlow(
+    { url: authURL, interactive: true },
+    resolve
+  );
+};
+
+const authorize = (): Promise<string | undefined> =>
+  new Promise(resolve => launchOAuthFlow(getAuthURL(), resolve));
 
 export default async (): Promise<AccessToken> => {
   const redirectURL = await authorize();

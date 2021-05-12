@@ -1,4 +1,4 @@
-import 'crx-hotreload';
+// import 'crx-hotreload';
 
 import Cache from './cache';
 import Listeners from './listeners';
@@ -30,7 +30,7 @@ import { setNotification } from '@stylebot/utils';
 chrome.runtime.onInstalled.addListener(async ({ reason }) => {
   if (reason === 'install') {
     chrome.tabs.create({
-      url: 'https://stylebot.dev/help'
+      url: 'https://stylebot.dev/help',
     });
 
     setNotification('release/3.1', true);

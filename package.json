@@ -14,6 +14,7 @@
   "author": "Ankit Ahuja",
   "scripts": {
     "build": "cross-env NODE_ENV=production webpack --hide-modules",
+    "build:safari": "xcrun safari-web-extension-converter ./dist --project-location ./safari-dist/ --force --swift --bundle-identifier com.stylebot.Stylebot; xcodebuild -list -project safari-dist/Stylebot/Stylebot.xcodeproj/",
     "build:firefox": "cross-env NODE_ENV=production BROWSER=firefox webpack --hide-modules",
     "watch": "cross-env NODE_ENV=development webpack --hide-modules --watch",
     "watch:firefox": "cross-env NODE_ENV=development BROWSER=firefox webpack --hide-modules --watch",
