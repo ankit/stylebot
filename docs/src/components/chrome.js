@@ -2,7 +2,7 @@ import React from "react";
 import Download from "./download";
 import chrome from "../images/chrome.svg";
 
-const ChromeDownload = () => (
+const Chrome = () => (
   <Download
     src={chrome}
     altText="Stylebot for Chrome"
@@ -12,4 +12,4 @@ const ChromeDownload = () => (
   </Download>
 );
 
-export default ChromeDownload;
+export default Chrome;

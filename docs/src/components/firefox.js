@@ -2,7 +2,7 @@ import React from "react";
 import Download from "./download";
 import firefox from "../images/firefox.svg";
 
-const FirefoxDownload = () => (
+const Firefox = () => (
   <Download
     src={firefox}
     altText="Stylebot for Firefox"
@@ -12,4 +12,4 @@ const FirefoxDownload = () => (
   </Download>
 );
 
-export default FirefoxDownload;
+export default Firefox;
