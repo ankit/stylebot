@@ -74,6 +74,7 @@ export default Vue.extend({
 
 <style lang="scss">
 .style-editor {
+  position: relative;
   z-index: 100000;
 }
 
