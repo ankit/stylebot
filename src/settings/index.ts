@@ -8,6 +8,16 @@ import {
 export const defaultOptions: StylebotOptions = {
   mode: 'basic',
   contextMenu: true,
+  fonts: [
+    'Helvetica',
+    'Montserrat',
+    'Droid Sans',
+    'Droid Serif',
+    'Merriweather',
+    'Playfair Display',
+    'Fira Code',
+    'Inconsolata',
+  ],
   basicModeSections: {
     text: true,
     colors: true,
@@ -40,7 +50,7 @@ export const defaultEditorCommands: StylebotEditorCommands = {
   dockLeft: 'l',
   dockRight: 'r',
   pageLayout: 'p',
-  close: 'Escape'
+  close: 'Escape',
 };
 
 export const defaultReadabilitySettings: ReadabilitySettings = {
