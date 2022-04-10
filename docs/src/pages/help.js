@@ -300,8 +300,8 @@ const HelpPage = () => (
       <h4>Examples</h4>
       <ul>
         <li>
-          <code>docs.google.com</code>: Any URL with{" "}
-          <code>docs.google.com</code> anywhere in it.
+          <code>docs.google.com</code>: The domain <code>docs.google.com</code>{" "}
+          or any of its subdomains.
         </li>
         <li>
           <code>docs**</code>: Any URL beginning with <code>docs</code>.
@@ -317,9 +317,9 @@ const HelpPage = () => (
           <code>http://apps.ycombinator.com</code>.
         </li>
         <li>
-          <code>docs.google.com, spreadsheets.google.com</code>: Any URL with{" "}
+          <code>docs.google.com, spreadsheets.google.com</code>: The domains{" "}
           <code>docs.google.com</code> or <code>spreadsheets.google.com</code>{" "}
-          in it.
+          or any of their subdomains.
         </li>
         <li>
           <code>^http://www.reddit.com/$</code>: Reddit homepage.
