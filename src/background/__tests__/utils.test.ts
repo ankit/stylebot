@@ -135,19 +135,19 @@ describe('matchesHostname', () => {
       );
     });
 
-    it('is false on port mismatch when port specified', () => {
+    it('is false on port mismatch', () => {
       expect(matchesSubUrl('http://localhost:5000', 'localhost:3000')).toBe(
         false
       );
     });
 
-    it('is false on hash mismatch when hash specified', () => {
+    it('is false on hash mismatch', () => {
       expect(
         matchesSubUrl('http://example.com/#wrong', 'example.com/#hash')
       ).toBe(false);
     });
 
-    it('is false on pathname mismatch when pathname specified', () => {
+    it('is false on pathname mismatch', () => {
       expect(
         matchesSubUrl('http://example.com/wrong', 'example.com/path')
       ).toBe(false);
