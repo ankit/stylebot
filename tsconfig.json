@@ -5,7 +5,8 @@
   "compilerOptions": {
     "strict": true,
     "module": "esnext",
-    "lib": ["dom", "esnext"],
+    "lib": ["dom", "esnext", "dom.iterable", "es2019"],
+    "downlevelIteration": true,
     "moduleResolution": "node",
     "esModuleInterop": true,
     "types": ["chrome", "jest", "node"],
