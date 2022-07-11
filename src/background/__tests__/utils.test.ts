@@ -111,7 +111,7 @@ describe('matchesHostname', () => {
       );
     });
 
-    it('is false for partial match on TLD #2', () => {
+    it('is false for partial match on top-level domain #2', () => {
       expect(matchesSubUrl('https://www.example.co', 'example.co.uk')).toBe(
         false
       );
