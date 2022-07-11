@@ -23,22 +23,60 @@ class BackgroundPageUtils {
   }
 
   /**
-   * Check if the given url matches with the  pattern.
+   * Check if the url matches with an individual subUrl.
    */
-  private static matchesBasicPattern = (url: string, pattern: string) => {
-    let isFound = false;
-    const subUrls = pattern.split(',');
-    const len = subUrls.length;
+  private static matchesSubUrl(url: string, subUrl: string) {
+    const exactMatchParts: (keyof URL)[] = [
+      'username',
+      'password',
+      'port',
+      'hash',
+    ];
 
-    for (let i = 0; i < len; i++) {
-      if (url.indexOf(subUrls[i].trim()) != -1) {
-        isFound = true;
-        break;
+    try {
+      subUrl = subUrl.trim();
+
+      let protocol: null | string = null;
+      const matches = subUrl.match(/^(\w+:)\/\/(.+)$/);
+
+      if (matches) {
+        [protocol, subUrl] = matches.slice(1);
       }
-    }
 
-    return isFound;
-  };
+      const pageUrl = new URL(url);
+      const matcherUrl = new URL(`${protocol ?? 'http:'}//${subUrl}`);
+
+      const hasPathname = matcherUrl.pathname.length > 1;
+      const shouldMatchHostLoosely = !protocol && !hasPathname;
+
+      const hostMatches = shouldMatchHostLoosely
+        ? ('.' + pageUrl.hostname).endsWith('.' + matcherUrl.hostname)
+        : pageUrl.host === matcherUrl.host;
+
+      return (
+        hostMatches &&
+        (!hasPathname ||
+          (pageUrl.pathname + '/').endsWith(matcherUrl.pathname + '/')) &&
+        (!protocol || pageUrl.protocol === matcherUrl.protocol) &&
+        exactMatchParts.every(
+          part => !matcherUrl[part] || pageUrl[part] === matcherUrl[part]
+        ) &&
+        [...matcherUrl.searchParams].every(
+          ([k, v]) => pageUrl.searchParams.get(k) === v
+        )
+      );
+    } catch {
+      // fall-through in case `url` or `subUrl` are malformed
+      return false;
+    }
+  }
+
+  /**
+   * Check if the given url matches with the pattern.
+   */
+  private static matchesBasicPattern(url: string, pattern: string) {
+    return pattern.split(',').some(subUrl => this.matchesSubUrl(url, subUrl));
+  }
 
   /***
    * Guess if the given URL is valid HTML by comparing URL extension
@@ -72,7 +110,7 @@ class BackgroundPageUtils {
           .replace(/,/g, '|')
           /* Allows use of the ** wildcard, matches anything */
           .replace(/\*\*/g, '.*')
-          /* 
+          /*
             Allows use of the * wildcard, matches anything but /
             Because we replace ** with .*, we have to make sure we
             don't replace an .* Therefore, we should replace an *
