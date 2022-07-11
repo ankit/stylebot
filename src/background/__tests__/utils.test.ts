@@ -16,7 +16,7 @@ describe('matchesHostname', () => {
       );
     });
 
-    it('is true for full match on TLD', () => {
+    it('is true for full match on top-level domain', () => {
       expect(matchesSubUrl('https://www.example.co.uk', 'example.co.uk')).toBe(
         true
       );
