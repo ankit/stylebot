@@ -5,21 +5,12 @@
     <css-property-value>
       <b-row no-gutters>
         <b-col cols="10">
-          <b-input-group class="font-input-group">
-            <b-form-input
-              v-model="value"
-              size="sm"
-              :debounce="400"
-              :disabled="disabled"
-              @focus="focus"
-            />
-
-            <font-family-dropdown
-              :fonts="fonts"
-              :disabled="disabled"
-              @select="select"
-            />
-          </b-input-group>
+          <font-family-dropdown
+            :value="value"
+            :fonts="fonts"
+            :disabled="disabled"
+            @select="select"
+          />
         </b-col>
       </b-row>
     </css-property-value>
@@ -29,6 +20,8 @@
 <script lang="ts">
 import Vue from 'vue';
 import { Declaration } from 'postcss';
+
+import { StylebotFonts } from '@stylebot/types';
 
 import CssProperty from '../CssProperty.vue';
 import CssPropertyValue from '../CssPropertyValue.vue';
@@ -41,26 +34,6 @@ export default Vue.extend({
     CssProperty,
     CssPropertyValue,
     FontFamilyDropdown,
-  },
-
-  data(): { fonts: Array<string> } {
-    return {
-      fonts: [
-        'Calibri',
-        'Crimson Text',
-        'Droid Sans',
-        'Droid Serif',
-        'Fira Code',
-        'Helvetica',
-        'Inconsolata',
-        'Lato',
-        'Lora',
-        'Merriweather',
-        'Monaco',
-        'Muli',
-        'Roboto',
-      ],
-    };
   },
 
   computed: {
@@ -85,6 +58,10 @@ export default Vue.extend({
 
     disabled(): boolean {
       return !this.$store.state.activeSelector;
+    },
+
+    fonts(): StylebotFonts {
+      return this.$store.state.options.fonts;
     },
   },
 

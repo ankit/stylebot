@@ -17,9 +17,11 @@ export type StylebotLayout = {
 };
 
 export type StylebotColorPalette = 'basic' | 'material';
+export type StylebotFonts = Array<string>;
 
 export type StylebotOptions = {
   contextMenu: boolean;
+  fonts: StylebotFonts;
   layout: StylebotLayout;
   mode: StylebotEditingMode;
   basicModeSections: StylebotBasicModeSections;

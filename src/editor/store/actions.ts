@@ -64,6 +64,9 @@ export default {
     if (!options.colorPalette) {
       options.colorPalette = defaultOptions.colorPalette;
     }
+    if (!options.fonts) {
+      options.fonts = defaultOptions.fonts;
+    }
 
     commit('setOptions', options);
 

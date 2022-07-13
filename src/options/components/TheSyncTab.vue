@@ -14,7 +14,7 @@
 
     <the-google-drive-sync />
 
-    <b-row no-gutters class="mt-5 mb-1">
+    <b-row no-gutters class="mt-5">
       <h2>{{ t('backup') }}</h2>
     </b-row>
 
@@ -88,7 +88,7 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .description {
-  color: #555;
-  font-size: 15px;
+  color: #888;
+  font-size: 14px;
 }
 </style>
