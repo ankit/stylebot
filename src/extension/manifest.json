@@ -1,14 +1,12 @@
 {
   "manifest_version": 2,
   "name": "Stylebot",
-  "version": "3.1",
+  "version": "3.1.1",
   "author": "Ankit Ahuja",
   "description": "__MSG_extension_description__",
   "default_locale": "en",
   "background": {
-    "scripts": [
-      "background/index.js"
-    ]
+    "scripts": ["background/index.js"]
   },
   "options_ui": {
     "page": "options/index.html",
@@ -16,28 +14,16 @@
   },
   "content_scripts": [
     {
-      "js": [
-        "editor/index.js"
-      ],
-      "matches": [
-        "<all_urls>"
-      ],
-      "exclude_matches": [
-        "*://*/*.xml"
-      ],
+      "js": ["editor/index.js"],
+      "matches": ["<all_urls>"],
+      "exclude_matches": ["*://*/*.xml"],
       "run_at": "document_idle"
     },
     {
       "all_frames": true,
-      "js": [
-        "inject-css/index.js"
-      ],
-      "matches": [
-        "<all_urls>"
-      ],
-      "exclude_matches": [
-        "*://*/*.xml"
-      ],
+      "js": ["inject-css/index.js"],
+      "matches": ["<all_urls>"],
+      "exclude_matches": ["*://*/*.xml"],
       "run_at": "document_start"
     }
   ],

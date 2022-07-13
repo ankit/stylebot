@@ -1,3 +1,11 @@
+## Version 3.1.1 (July 2022)
+
+- Allow adding custom fonts via Options page (#707)
+- Fix issues and improve domain matching logic. Thanks @lionel-rowe (#690)
+- Fix style editor in Options page. Thanks @senocular (#669)
+- Add Portuguese translation. Thanks @salomaogabriel (#673)
+- Translation fixes. Thanks @WofWca @Gitoffthelawn (#697, #683, #679)
+
 ## Version 3.1 (May 2021)
 
 - Added ability to resize stylebot editor
