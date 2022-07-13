@@ -125,7 +125,7 @@ class BackgroundPageStyles {
     let defaultStyle: Style | undefined;
 
     for (const url in this.styles) {
-      const matches = BackgroundPageUtils.matchesPattern(pageUrl, url);
+      const matches = BackgroundPageUtils.matches(pageUrl, url);
 
       if (matches && this.styles[url]) {
         const css = important

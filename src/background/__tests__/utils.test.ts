@@ -1,64 +1,55 @@
 import BackgroundPageUtils from '../utils';
 
-describe('matchesHostname', () => {
-  const matchesSubUrl = BackgroundPageUtils['matchesSubUrl'].bind(
+describe('matchesUrl', () => {
+  const matchesUrl = BackgroundPageUtils['matchesUrl'].bind(
     BackgroundPageUtils
   );
 
   describe('matches', () => {
     it('is true for exact matching domains', () => {
-      expect(matchesSubUrl('https://example.com', 'example.com')).toBe(true);
+      expect(matchesUrl('https://example.com', 'example.com')).toBe(true);
     });
 
     it('is true for matching subdomain', () => {
-      expect(matchesSubUrl('https://www.example.com', 'example.com')).toBe(
-        true
-      );
+      expect(matchesUrl('https://www.example.com', 'example.com')).toBe(true);
     });
 
     it('is true for full match on top-level domain', () => {
-      expect(matchesSubUrl('https://www.example.co.uk', 'example.co.uk')).toBe(
+      expect(matchesUrl('https://www.example.co.uk', 'example.co.uk')).toBe(
         true
       );
     });
 
     it('is true for any port if port unspecified', () => {
-      expect(matchesSubUrl('http://localhost:5000', 'localhost')).toBe(true);
+      expect(matchesUrl('http://localhost:5000', 'localhost')).toBe(true);
     });
 
     it('is true when port specified and matches', () => {
-      expect(matchesSubUrl('http://localhost:5000', 'localhost:5000')).toBe(
-        true
-      );
+      expect(matchesUrl('http://localhost:5000', 'localhost:5000')).toBe(true);
     });
 
     it('is true when protocol specified', () => {
-      expect(matchesSubUrl('file:///a/b/c.gif', 'file:///a/b/c.gif')).toBe(
-        true
-      );
+      expect(matchesUrl('file:///a/b/c.gif', 'file:///a/b/c.gif')).toBe(true);
     });
 
     it('is true when unknown query params in page url', () => {
       expect(
-        matchesSubUrl(
-          'https://example.com/?q=p&unknown=true',
-          'example.com/?q=p'
-        )
+        matchesUrl('https://example.com/?q=p&unknown=true', 'example.com/?q=p')
       ).toBe(true);
     });
 
-    it('is true with all `url` parts and no `subUrl` parts specified', () => {
+    it('is true with no url parts specified', () => {
       expect(
-        matchesSubUrl(
+        matchesUrl(
           'https://user:pass@www.example.com:8080/path?q=p#hash',
           'example.com'
         )
       ).toBe(true);
     });
 
-    it('is true with all `url` parts and all `subUrl` parts specified', () => {
+    it('is true with all url parts specified', () => {
       expect(
-        matchesSubUrl(
+        matchesUrl(
           'https://user:pass@www.example.com:8080/path?q=p#hash',
           'https://user:pass@www.example.com:8080/path?q=p#hash'
         )
@@ -67,38 +58,35 @@ describe('matchesHostname', () => {
 
     it('matches strictly', () => {
       expect(
-        matchesSubUrl(
-          'https://www.example.com/path',
-          'https://www.example.com/'
-        )
+        matchesUrl('https://www.example.com/path', 'https://www.example.com/')
       ).toBe(true);
     });
   });
 
   describe('non-matches', () => {
     it('is false for empty inputs', () => {
-      expect(matchesSubUrl('', '')).toBe(false);
+      expect(matchesUrl('', '')).toBe(false);
     });
 
-    it('is false for empty `url`', () => {
-      expect(matchesSubUrl('', 'example.com')).toBe(false);
+    it('is false for empty page url', () => {
+      expect(matchesUrl('', 'example.com')).toBe(false);
     });
 
-    it('is false for empty `subUrl`', () => {
-      expect(matchesSubUrl('https://example.com', '')).toBe(false);
+    it('is false for empty url', () => {
+      expect(matchesUrl('https://example.com', '')).toBe(false);
     });
 
-    it('is false for malformed `url`', () => {
-      expect(matchesSubUrl('https:////', 'example.com')).toBe(false);
+    it('is false for malformed page url', () => {
+      expect(matchesUrl('https:////', 'example.com')).toBe(false);
     });
 
-    it('is false for malformed `subUrl`', () => {
-      expect(matchesSubUrl('https://example.com', '//')).toBe(false);
+    it('is false for malformed url', () => {
+      expect(matchesUrl('https://example.com', '//')).toBe(false);
     });
 
-    it('is false where domain appears outside hostname', () => {
+    it('is false when domain appears outside hostname', () => {
       expect(
-        matchesSubUrl(
+        matchesUrl(
           'https://web.archive.org/web/*/https://www.example.com/',
           'www.example.com'
         )
@@ -106,68 +94,162 @@ describe('matchesHostname', () => {
     });
 
     it('is false for partial match on top-level domain', () => {
-      expect(matchesSubUrl('https://www.example.co.uk', 'example.co')).toBe(
-        false
-      );
+      expect(matchesUrl('https://www.example.co.uk', 'example.co')).toBe(false);
     });
 
     it('is false for partial match on top-level domain #2', () => {
-      expect(matchesSubUrl('https://www.example.co', 'example.co.uk')).toBe(
-        false
-      );
+      expect(matchesUrl('https://www.example.co', 'example.co.uk')).toBe(false);
     });
 
     it('is false where subUrl is more specific than url', () => {
-      expect(matchesSubUrl('https://example.com', 'www.example.com')).toBe(
-        false
-      );
+      expect(matchesUrl('https://example.com', 'www.example.com')).toBe(false);
     });
 
     it('is false for partial subdomain match', () => {
-      expect(matchesSubUrl('https://wwwexample.com', 'example.com')).toBe(
-        false
-      );
+      expect(matchesUrl('https://wwwexample.com', 'example.com')).toBe(false);
     });
 
     it('is false on protocol mismatch when protocol specified', () => {
-      expect(matchesSubUrl('http://example.com/', 'https://example.com/')).toBe(
+      expect(matchesUrl('http://example.com/', 'https://example.com/')).toBe(
         false
       );
     });
 
     it('is false on port mismatch', () => {
-      expect(matchesSubUrl('http://localhost:5000', 'localhost:3000')).toBe(
+      expect(matchesUrl('http://localhost:5000', 'localhost:3000')).toBe(false);
+    });
+
+    it('is false on hash mismatch', () => {
+      expect(matchesUrl('http://example.com/#wrong', 'example.com/#hash')).toBe(
         false
       );
     });
 
-    it('is false on hash mismatch', () => {
-      expect(
-        matchesSubUrl('http://example.com/#wrong', 'example.com/#hash')
-      ).toBe(false);
-    });
-
     it('is false on pathname mismatch', () => {
-      expect(
-        matchesSubUrl('http://example.com/wrong', 'example.com/path')
-      ).toBe(false);
+      expect(matchesUrl('http://example.com/wrong', 'example.com/path')).toBe(
+        false
+      );
     });
 
     it('is false on query param mismatch', () => {
-      expect(matchesSubUrl('example.com/q=false', 'example.com/q=true')).toBe(
+      expect(matchesUrl('example.com/q=false', 'example.com/q=true')).toBe(
         false
       );
     });
 
     it('uses strict matching of hostname if protocol specified', () => {
       expect(
-        matchesSubUrl('https://example.com/', 'https://www.example.com/')
+        matchesUrl('https://example.com/', 'https://www.example.com/')
       ).toBe(false);
     });
 
     it('uses strict matching of hostname if pathname specified', () => {
       expect(
-        matchesSubUrl('https://example.com/path', 'www.example.com/path')
+        matchesUrl('https://example.com/path', 'www.example.com/path')
+      ).toBe(false);
+    });
+  });
+});
+
+describe('matchesWildcard', () => {
+  const matchesWildcard = BackgroundPageUtils['matchesWildcard'].bind(
+    BackgroundPageUtils
+  );
+
+  describe('**', () => {
+    it('matches at the end of url', () => {
+      expect(
+        matchesWildcard(
+          'https://github.com/ankit/stylebot',
+          'https://github.com/**'
+        )
+      ).toBe(true);
+    });
+
+    it('matches in the middle of url', () => {
+      expect(
+        matchesWildcard(
+          'https://github.com/ankit/stylebot',
+          'https://github.com/**/stylebot'
+        )
+      ).toBe(true);
+    });
+
+    it('matches in the beginning of url', () => {
+      expect(
+        matchesWildcard('https://github.com/ankit/stylebot', '**/stylebot')
+      ).toBe(true);
+    });
+
+    it('matches without protocol', () => {
+      expect(
+        matchesWildcard('http://news.ycombinator.com', '**ycombinator.com')
+      ).toBe(true);
+    });
+
+    it('non-matching url', () => {
+      expect(
+        matchesWildcard('http://news.ycombinator.com', '**apps.ycombinator.com')
+      ).toBe(false);
+    });
+
+    it('non-matching protocol', () => {
+      expect(
+        matchesWildcard(
+          'http://news.ycombinator.com',
+          'https://**.ycombinator.com'
+        )
+      ).toBe(false);
+    });
+  });
+
+  describe('*', () => {
+    it('matches at the end of url', () => {
+      expect(
+        matchesWildcard(
+          'https://github.com/ankit/stylebot',
+          'https://github.com/*/stylebot'
+        )
+      ).toBe(true);
+    });
+
+    it('matches in the middle of url', () => {
+      expect(
+        matchesWildcard(
+          'https://github.com/ankit/stylebot',
+          'https://github.com/*/stylebot'
+        )
+      ).toBe(true);
+
+      expect(
+        matchesWildcard('https://docs1.google.com', 'doc*.google.com')
+      ).toBe(true);
+    });
+
+    it('matches in the beginning of url', () => {
+      expect(
+        matchesWildcard(
+          'https://github.com/ankit/stylebot',
+          '*github.com/*/stylebot'
+        )
+      ).toBe(true);
+    });
+
+    it('matches without protocol', () => {
+      expect(
+        matchesWildcard('http://news.ycombinator.com', '*.ycombinator.com')
+      ).toBe(true);
+    });
+
+    it('non-matching url', () => {
+      expect(
+        matchesWildcard('https://docs1.google.com', 'docs2*.google.com')
+      ).toBe(false);
+    });
+
+    it('non-matching protocol', () => {
+      expect(
+        matchesWildcard('https://docs1.google.com', 'http://docs*.google.com')
       ).toBe(false);
     });
   });
