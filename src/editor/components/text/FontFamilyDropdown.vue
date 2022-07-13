@@ -10,7 +10,7 @@
         class="font-family-dropdown"
       >
         <b-dropdown-item @click="$emit('select', '')">
-          Default
+          {{ t('default') }}
         </b-dropdown-item>
 
         <b-dropdown-item
@@ -22,7 +22,7 @@
         </b-dropdown-item>
 
         <b-dropdown-item @click="editFonts">
-          Edit font list...
+          {{ t('fonts_edit_list') }}
         </b-dropdown-item>
       </b-dropdown>
     </dropdown-hack-to-support-shadow-dom>
@@ -31,6 +31,8 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import { t } from '@stylebot/i18n';
+
 import { openOptionsPage } from '../../utils/chrome';
 
 import DropdownHackToSupportShadowDom from './../DropdownHackToSupportShadowDom.vue';
@@ -61,7 +63,7 @@ export default Vue.extend({
     text: {
       get(): string {
         if (!this.value) {
-          return 'Default';
+          return t('default');
         }
 
         return this.value;

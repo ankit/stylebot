@@ -21,10 +21,11 @@
 import Vue from 'vue';
 import { Declaration } from 'postcss';
 
+import { StylebotFonts } from '@stylebot/types';
+
 import CssProperty from '../CssProperty.vue';
 import CssPropertyValue from '../CssPropertyValue.vue';
 import FontFamilyDropdown from './FontFamilyDropdown.vue';
-import { StylebotFonts } from 'types';
 
 export default Vue.extend({
   name: 'FontFamily',
