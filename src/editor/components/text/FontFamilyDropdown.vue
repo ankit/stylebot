@@ -9,7 +9,7 @@
         variant="outline-secondary"
         class="font-family-dropdown"
       >
-        <b-dropdown-item @click="$emit('select', '')">
+        <b-dropdown-item v-if="!hideDefault" @click="$emit('select', '')">
           {{ t('default') }}
         </b-dropdown-item>
 
@@ -56,6 +56,10 @@ export default Vue.extend({
     fonts: {
       type: Array,
       required: true,
+    },
+    hideDefault: {
+      type: Boolean,
+      required: false,
     },
   },
 

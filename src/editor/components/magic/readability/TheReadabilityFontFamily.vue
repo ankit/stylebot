@@ -1,16 +1,10 @@
 <template>
   <b-input-group>
-    <b-form-input
-      v-model="value"
-      size="sm"
-      :debounce="400"
-      :disabled="disabled"
-      @focus="focus"
-    />
-
     <font-family-dropdown
+      :value="value"
       :fonts="fonts"
       :disabled="disabled"
+      hide-default
       @select="select"
     />
   </b-input-group>
@@ -18,6 +12,9 @@
 
 <script lang="ts">
 import Vue from 'vue';
+
+import { StylebotFonts } from '@stylebot/types';
+
 import FontFamilyDropdown from '../../text/FontFamilyDropdown.vue';
 
 export default Vue.extend({
@@ -29,12 +26,6 @@ export default Vue.extend({
 
   props: {
     disabled: Boolean,
-  },
-
-  data(): { fonts: Array<string> } {
-    return {
-      fonts: ['Georgia', 'Helvetica', 'Lato', 'Lora', 'Open Sans', 'Quicksand'],
-    };
   },
 
   computed: {
@@ -49,6 +40,10 @@ export default Vue.extend({
           font: value,
         });
       },
+    },
+
+    fonts(): StylebotFonts {
+      return this.$store.state.options.fonts;
     },
   },
 
