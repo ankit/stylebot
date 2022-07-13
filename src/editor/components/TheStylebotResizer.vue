@@ -89,6 +89,7 @@ export default Vue.extend({
   },
 
   created() {
+    this.adjustPageLayout();
     window.addEventListener('resize', this.onWindowResize);
   },
 
