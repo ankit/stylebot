@@ -1,12 +1,13 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "Stylebot",
   "version": "3.1.1",
   "author": "Ankit Ahuja",
   "description": "__MSG_extension_description__",
   "default_locale": "en",
   "background": {
-    "scripts": ["background/index.js"]
+    "service_worker": "background/index.js",
+    "type": "module"
   },
   "options_ui": {
     "page": "options/index.html",
@@ -27,7 +28,7 @@
       "run_at": "document_start"
     }
   ],
-  "browser_action": {
+  "action": {
     "default_icon": {
       "16": "img/icon16.png",
       "24": "img/icon24.png",
@@ -46,14 +47,21 @@
     "storage",
     "identity",
     "contextMenus",
-    "unlimitedStorage",
+    "unlimitedStorage"
+  ],
+  "host_permissions": [
     "https://drive.google.com/*",
     "https://www.googleapis.com/*",
     "https://fonts.googleapis.com/*"
   ],
   "web_accessible_resources": [
-    "editor/index.css",
-    "readability/index.css",
-    "monaco-editor/*"
+    {
+      "resources": [
+        "monaco-editor/*",
+        "editor/index.css",
+        "readability/index.css"
+      ],
+      "matches": ["<all_urls>"]
+    }
   ]
 }
