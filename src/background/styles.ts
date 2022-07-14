@@ -2,6 +2,7 @@ import * as postcss from 'postcss';
 
 import { getCurrentTimestamp } from '@stylebot/utils';
 import { appendImportantToDeclarations } from '@stylebot/css';
+
 import {
   Style,
   StyleMap,
@@ -11,203 +12,210 @@ import {
 
 import BackgroundPageUtils from './utils';
 
-class BackgroundPageStyles {
-  styles: StyleMap;
+export const updateIcon = (
+  tab: chrome.tabs.Tab,
+  styles: Array<Style>,
+  defaultStyle?: Style
+): void => {
+  const enabledStyles = styles.filter(style => style.enabled);
 
-  constructor(styles: StyleMap) {
-    this.styles = styles;
-  }
-
-  persistStorage(): void {
-    chrome.storage.local.set({
-      styles: this.styles,
-
-      'styles-metadata': {
-        modifiedTime: getCurrentTimestamp(),
-      },
+  if (defaultStyle && defaultStyle.readability) {
+    chrome.action.setBadgeText({
+      text: `R`,
+      tabId: tab.id,
     });
+  } else if (enabledStyles.length > 0) {
+    chrome.action.setBadgeText({
+      text: `${enabledStyles.length}`,
+      tabId: tab.id,
+    });
+  } else {
+    chrome.action.setBadgeText({ text: '', tabId: tab.id });
   }
+};
 
-  get(url: string): StyleWithoutUrl {
-    return this.styles[url];
-  }
+export const updateAllTabs = async (): Promise<void> => {
+  const allStyles = await getAll();
 
-  getAll(): StyleMap {
-    return this.styles;
-  }
+  chrome.tabs.query({}, tabs => {
+    tabs.forEach(tab => {
+      if (tab && tab.url && tab.id) {
+        const { styles, defaultStyle } = getStylesForPage(tab.url, allStyles);
 
-  setAll(styles: StyleMap, shouldPersist = true): void {
-    this.styles = styles;
+        const message: ApplyStylesToTab = {
+          name: 'ApplyStylesToTab',
+          defaultStyle,
+          styles,
+        };
 
-    if (shouldPersist) {
-      this.persistStorage();
-    }
+        chrome.tabs.sendMessage(tab.id, message);
 
-    this.updateAllTabs();
-  }
-
-  set(url: string, css: string, readability: boolean): void {
-    if (!css) {
-      delete this.styles[url];
-    } else {
-      this.styles[url] = {
-        css,
-        readability,
-        enabled: true,
-        modifiedTime: getCurrentTimestamp(),
-      };
-    }
-
-    this.persistStorage();
-  }
-
-  enable(url: string): void {
-    if (!this.styles[url]) {
-      return;
-    }
-
-    this.styles[url].enabled = true;
-    this.persistStorage();
-    this.updateAllTabs();
-  }
-
-  disable(url: string): void {
-    if (!this.styles[url]) {
-      return;
-    }
-
-    this.styles[url].enabled = false;
-    this.persistStorage();
-    this.updateAllTabs();
-  }
-
-  setReadability(url: string, value: boolean): void {
-    if (this.styles[url]) {
-      this.styles[url].readability = value;
-    } else {
-      this.styles[url] = {
-        css: '',
-        enabled: true,
-        readability: value,
-        modifiedTime: getCurrentTimestamp(),
-      };
-    }
-
-    this.persistStorage();
-  }
-
-  move(src: string, dest: string): void {
-    if (this.styles[src]) {
-      this.styles[dest] = JSON.parse(JSON.stringify(this.styles[src]));
-      delete this.styles[src];
-
-      this.persistStorage();
-    }
-  }
-
-  getStylesForPage(
-    pageUrl: string,
-    important = false
-  ): {
-    styles: Array<Style>;
-    defaultStyle?: Style;
-  } {
-    if (!pageUrl) {
-      return { styles: [] };
-    }
-
-    if (!BackgroundPageUtils.isValidHTML(pageUrl)) {
-      return { styles: [] };
-    }
-
-    const styles = [];
-
-    let defaultStyle: Style | undefined;
-
-    for (const url in this.styles) {
-      const matches = BackgroundPageUtils.matches(pageUrl, url);
-
-      if (matches && this.styles[url]) {
-        const css = important
-          ? appendImportantToDeclarations(this.styles[url].css)
-          : this.styles[url].css;
-
-        const { enabled, readability, modifiedTime } = this.styles[url];
-        const style = { url, css, enabled, readability, modifiedTime };
-
-        if (url !== '*') {
-          if (!defaultStyle || url.length > defaultStyle.url.length) {
-            defaultStyle = style;
-          }
-        }
-
-        if (style.css) {
-          styles.push(style);
+        if (tab.active) {
+          updateIcon(tab, styles, defaultStyle);
         }
       }
-    }
-
-    return { styles, defaultStyle };
-  }
-
-  getImportCss(url: string): Promise<string> {
-    return new Promise(resolve => {
-      fetch(url)
-        .then(response => response.text())
-        .then(css => {
-          postcss.parse(css);
-          resolve(css);
-        })
-        .catch(() => {
-          // if css is invalid, return back empty css
-          resolve('');
-        });
     });
+  });
+};
+
+export const getAll = (): Promise<StyleMap> =>
+  new Promise(resolve => {
+    chrome.storage.local.get('styles', items => {
+      if (items['styles']) {
+        resolve(items['styles']);
+      } else {
+        resolve({});
+      }
+    });
+  });
+
+export const get = async (url: string): Promise<StyleWithoutUrl> => {
+  const styles = await getAll();
+  return styles[url];
+};
+
+export const getStylesForPage = (
+  pageUrl: string,
+  allStyles: StyleMap,
+  important = false
+): {
+  styles: Array<Style>;
+  defaultStyle?: Style;
+} => {
+  if (!pageUrl) {
+    return { styles: [] };
   }
 
-  updateIcon(
-    tab: chrome.tabs.Tab,
-    styles: Array<Style>,
-    defaultStyle?: Style
-  ): void {
-    const enabledStyles = styles.filter(style => style.enabled);
-
-    if (defaultStyle && defaultStyle.readability) {
-      chrome.action.setBadgeText({
-        text: `R`,
-        tabId: tab.id,
-      });
-    } else if (enabledStyles.length > 0) {
-      chrome.action.setBadgeText({
-        text: `${enabledStyles.length}`,
-        tabId: tab.id,
-      });
-    } else {
-      chrome.action.setBadgeText({ text: '', tabId: tab.id });
-    }
+  if (!BackgroundPageUtils.isValidHTML(pageUrl)) {
+    return { styles: [] };
   }
 
-  updateAllTabs(): void {
-    chrome.tabs.query({}, tabs => {
-      tabs.forEach(tab => {
-        if (tab && tab.url && tab.id) {
-          const { styles, defaultStyle } = this.getStylesForPage(tab.url);
+  const styles = [];
+  let defaultStyle: Style | undefined;
 
-          const message: ApplyStylesToTab = {
-            name: 'ApplyStylesToTab',
-            defaultStyle,
-            styles,
-          };
+  for (const url in allStyles) {
+    const matches = BackgroundPageUtils.matches(pageUrl, url);
 
-          chrome.tabs.sendMessage(tab.id, message);
+    if (matches && allStyles[url]) {
+      const css = important
+        ? appendImportantToDeclarations(allStyles[url].css)
+        : allStyles[url].css;
 
-          if (tab.active) {
-            this.updateIcon(tab, styles, defaultStyle);
-          }
+      const { enabled, readability, modifiedTime } = allStyles[url];
+      const style = { url, css, enabled, readability, modifiedTime };
+
+      if (url !== '*') {
+        if (!defaultStyle || url.length > defaultStyle.url.length) {
+          defaultStyle = style;
         }
-      });
-    });
-  }
-}
+      }
 
-export default BackgroundPageStyles;
+      if (style.css) {
+        styles.push(style);
+      }
+    }
+  }
+
+  return { styles, defaultStyle };
+};
+
+export const setAll = async (styles: StyleMap): Promise<void> => {
+  chrome.storage.local.set({
+    styles,
+
+    'styles-metadata': {
+      modifiedTime: getCurrentTimestamp(),
+    },
+  });
+
+  return updateAllTabs();
+};
+
+export const set = async (
+  url: string,
+  css: string,
+  readability: boolean
+): Promise<void> => {
+  const styles = await getAll();
+
+  if (!css) {
+    delete styles[url];
+  } else {
+    styles[url] = {
+      css,
+      readability,
+      enabled: true,
+      modifiedTime: getCurrentTimestamp(),
+    };
+  }
+
+  return setAll(styles);
+};
+
+export const enable = async (url: string): Promise<void> => {
+  const styles = await getAll();
+
+  if (!styles[url]) {
+    return;
+  }
+
+  styles[url].enabled = true;
+  return setAll(styles);
+};
+
+export const disable = async (url: string): Promise<void> => {
+  const styles = await getAll();
+
+  if (!styles[url]) {
+    return;
+  }
+
+  styles[url].enabled = false;
+  return setAll(styles);
+};
+
+export const setReadability = async (
+  url: string,
+  value: boolean
+): Promise<void> => {
+  const styles = await getAll();
+
+  if (styles[url]) {
+    styles[url].readability = value;
+  } else {
+    styles[url] = {
+      css: '',
+      enabled: true,
+      readability: value,
+      modifiedTime: getCurrentTimestamp(),
+    };
+  }
+
+  return setAll(styles);
+};
+
+export const move = async (src: string, dest: string): Promise<void> => {
+  const styles = await getAll();
+
+  if (styles[src]) {
+    styles[dest] = JSON.parse(JSON.stringify(styles[src]));
+    delete styles[src];
+
+    return setAll(styles);
+  }
+};
+
+export const getImportCss = (url: string): Promise<string> => {
+  return new Promise(resolve => {
+    fetch(url)
+      .then(response => response.text())
+      .then(css => {
+        postcss.parse(css);
+        resolve(css);
+      })
+      .catch(() => {
+        // if css is invalid, return back empty css
+        resolve('');
+      });
+  });
+};

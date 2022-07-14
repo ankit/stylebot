@@ -15,7 +15,10 @@ import {
   downloadSyncFile,
   writeSyncFile,
 } from './sync-file';
-import BackgroundPageStyles from 'background/styles';
+import {
+  setAll as setAllStyles,
+  getAll as getAllStyles,
+} from '../../background/styles';
 
 const getStylesBlob = (styles: StyleMap) =>
   new Blob([JSON.stringify(styles)], { type: 'application/json' });
@@ -43,10 +46,9 @@ const writeToRemote = async (
  */
 const writeToLocal = async (
   syncMetadata: GoogleDriveSyncMetadata,
-  styles: StyleMap,
-  backgroundPageStyles: BackgroundPageStyles
+  styles: StyleMap
 ) => {
-  backgroundPageStyles.setAll(styles, false);
+  await setAllStyles(styles);
 
   return setGoogleDriveSyncMetadata({
     ...syncMetadata,
@@ -59,14 +61,13 @@ const writeToLocal = async (
  */
 const merge = async (
   accessToken: string,
-  syncMetadata: GoogleDriveSyncMetadata,
-  backgroundPageStyles: BackgroundPageStyles
+  syncMetadata: GoogleDriveSyncMetadata
 ) => {
-  const localStyles = backgroundPageStyles.getAll();
+  const localStyles = await getAllStyles();
   const remoteStyles = await downloadSyncFile(accessToken, syncMetadata.id);
   const mergedStyles = mergeStyles(localStyles, remoteStyles);
 
-  await writeToLocal(syncMetadata, mergedStyles, backgroundPageStyles);
+  await writeToLocal(syncMetadata, mergedStyles);
   await writeToRemote(accessToken, syncMetadata, mergedStyles);
 };
 
@@ -79,9 +80,8 @@ const merge = async (
  *    - Else, write remote styles to local
  * 4) If local styles' modified timestamp > remote sync timestamp, write local styles to remote.
  */
-export const runGoogleDriveSync = async (
-  backgroundPageStyles: BackgroundPageStyles
-): Promise<void> => {
+export const runGoogleDriveSync = async (): Promise<void> => {
+  const styles = await getAllStyles();
   const accessToken = await getAccessToken();
   const remoteSyncMetadata = await getSyncFileMetadata(accessToken);
 
@@ -90,7 +90,7 @@ export const runGoogleDriveSync = async (
   if (!remoteSyncMetadata) {
     console.debug('did not find remote sync file, updating remote...');
 
-    const blob = getStylesBlob(backgroundPageStyles.getAll());
+    const blob = getStylesBlob(styles);
     const remoteSyncMetadata = await writeSyncFile(accessToken, blob);
     return setGoogleDriveSyncMetadata(remoteSyncMetadata);
   }
@@ -99,7 +99,7 @@ export const runGoogleDriveSync = async (
 
   if (!localSyncMetadata) {
     console.debug('no local sync metadata found. merging local and remote...');
-    return merge(accessToken, remoteSyncMetadata, backgroundPageStyles);
+    return merge(accessToken, remoteSyncMetadata);
   }
 
   const localStylesMetadata = await getLocalStylesMetadata();
@@ -122,7 +122,7 @@ export const runGoogleDriveSync = async (
         'both local and remote were updated since last sync, merging local and remote...'
       );
 
-      return merge(accessToken, remoteSyncMetadata, backgroundPageStyles);
+      return merge(accessToken, remoteSyncMetadata);
     }
 
     console.debug('remote was updated since last sync, updating local...');
@@ -131,17 +131,13 @@ export const runGoogleDriveSync = async (
       remoteSyncMetadata.id
     );
 
-    return writeToLocal(remoteSyncMetadata, remoteStyles, backgroundPageStyles);
+    return writeToLocal(remoteSyncMetadata, remoteStyles);
   }
 
   // check if local styles were modified v/s remote
   if (compareAsc(localStylesModifiedTime, remoteSyncTime) > 0) {
     console.debug('local was updated since last sync, updating remote...');
-    return writeToRemote(
-      accessToken,
-      remoteSyncMetadata,
-      backgroundPageStyles.getAll()
-    );
+    return writeToRemote(accessToken, remoteSyncMetadata, styles);
   }
 
   return setGoogleDriveSyncMetadata({
