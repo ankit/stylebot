@@ -152,24 +152,16 @@ class BackgroundPageStyles {
 
   getImportCss(url: string): Promise<string> {
     return new Promise(resolve => {
-      const xhr = new XMLHttpRequest();
-      xhr.open('GET', url, true);
-
-      xhr.onreadystatechange = () => {
-        if (xhr.readyState == 4) {
-          try {
-            const css = xhr.responseText;
-            // validate css by parsing
-            postcss.parse(css);
-            resolve(css);
-          } catch (e) {
-            // if css is invalid, return back empty css
-            resolve('');
-          }
-        }
-      };
-
-      xhr.send();
+      fetch(url)
+        .then(response => response.text())
+        .then(css => {
+          postcss.parse(css);
+          resolve(css);
+        })
+        .catch(() => {
+          // if css is invalid, return back empty css
+          resolve('');
+        });
     });
   }
 
@@ -181,17 +173,17 @@ class BackgroundPageStyles {
     const enabledStyles = styles.filter(style => style.enabled);
 
     if (defaultStyle && defaultStyle.readability) {
-      chrome.browserAction.setBadgeText({
+      chrome.action.setBadgeText({
         text: `R`,
         tabId: tab.id,
       });
     } else if (enabledStyles.length > 0) {
-      chrome.browserAction.setBadgeText({
+      chrome.action.setBadgeText({
         text: `${enabledStyles.length}`,
         tabId: tab.id,
       });
     } else {
-      chrome.browserAction.setBadgeText({ text: '', tabId: tab.id });
+      chrome.action.setBadgeText({ text: '', tabId: tab.id });
     }
   }
 

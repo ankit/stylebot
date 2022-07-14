@@ -22,7 +22,7 @@ import { setNotification } from '@stylebot/utils';
 
   Listeners.init(styles, options);
 
-  chrome.browserAction.setBadgeBackgroundColor({
+  chrome.action.setBadgeBackgroundColor({
     color: '#555',
   });
 })();
@@ -30,7 +30,7 @@ import { setNotification } from '@stylebot/utils';
 chrome.runtime.onInstalled.addListener(async ({ reason }) => {
   if (reason === 'install') {
     chrome.tabs.create({
-      url: 'https://stylebot.dev/help'
+      url: 'https://stylebot.dev/help',
     });
 
     setNotification('release/3.1', true);
