@@ -29,8 +29,8 @@ const mockExampleCss = dedent`
 `;
 
 global.chrome = {
-  /* @ts-ignore */
   runtime: {
+    /* @ts-ignore */
     sendMessage: (message: any, callback: any) => {
       if (message.url === 'https://fonts.googleapis.com/css?family=Lato') {
         callback(mockFontCss);
