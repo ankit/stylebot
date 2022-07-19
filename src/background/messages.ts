@@ -9,6 +9,7 @@ import {
   updateIcon,
   setReadability,
   getImportCss,
+  applyStylesToAllTabs,
 } from './styles';
 
 import {
@@ -50,11 +51,17 @@ import {
 
 import { get as getCommands, set as setCommands } from './commands';
 
-export const DisableStyle = (message: DisableStyleType): Promise<void> =>
-  disable(message.url);
+export const DisableStyle = async (
+  message: DisableStyleType
+): Promise<void> => {
+  await disable(message.url);
+  return applyStylesToAllTabs();
+};
 
-export const EnableStyle = (message: EnableStyleType): Promise<void> =>
-  enable(message.url);
+export const EnableStyle = async (message: EnableStyleType): Promise<void> => {
+  await enable(message.url);
+  return applyStylesToAllTabs();
+};
 
 export const SetStyle = (message: SetStyleType): Promise<void> =>
   set(message.url, message.css, message.readability);
@@ -66,8 +73,11 @@ export const GetAllStyles = async (
   sendResponse(styles);
 };
 
-export const SetAllStyles = (message: SetAllStylesType): void => {
-  setAll(message.styles);
+export const SetAllStyles = async (
+  message: SetAllStylesType
+): Promise<void> => {
+  await setAll(message.styles);
+  return applyStylesToAllTabs();
 };
 
 export const GetStylesForIframe = async (

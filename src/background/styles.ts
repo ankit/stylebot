@@ -34,7 +34,7 @@ export const updateIcon = (
   }
 };
 
-export const updateAllTabs = async (): Promise<void> => {
+export const applyStylesToAllTabs = async (): Promise<void> => {
   const allStyles = await getAll();
 
   chrome.tabs.query({}, tabs => {
@@ -127,8 +127,6 @@ export const setAll = async (styles: StyleMap): Promise<void> => {
       modifiedTime: getCurrentTimestamp(),
     },
   });
-
-  return updateAllTabs();
 };
 
 export const set = async (
