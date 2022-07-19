@@ -54,13 +54,13 @@ chrome.tabs.onUpdated.addListener(async (tabId, _, tab) => {
 
   if (option && tab.status === 'complete') {
     ContextMenu.update(tab);
+
+    const message: TabUpdated = {
+      name: 'TabUpdated',
+    };
+
+    chrome.tabs.sendMessage(tabId, message);
   }
-
-  const message: TabUpdated = {
-    name: 'TabUpdated',
-  };
-
-  chrome.tabs.sendMessage(tabId, message);
 });
 
 /**
