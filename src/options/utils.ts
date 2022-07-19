@@ -99,6 +99,7 @@ export const importStylesWithFilePicker = (): Promise<StyleMap> => {
   return new Promise((resolve, reject) => {
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
+    fileInput.accept = 'application/json';
 
     fileInput.addEventListener('change', (event: Event) => {
       const files = (event.target as HTMLInputElement).files;
