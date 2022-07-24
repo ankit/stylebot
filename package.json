@@ -114,7 +114,7 @@
     "tinycolor2": "^1.4.1",
     "ts-jest": "^26.1.1",
     "ts-loader": "^8.0.1",
-    "typescript": "^3.9.7",
+    "typescript": "4.7",
     "vue": "^2.6.11",
     "vue-draggable-resizable": "^2.3.0",
     "vue-eslint-parser": "^7.1.0",
