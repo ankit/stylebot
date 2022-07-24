@@ -1,3 +1,13 @@
+## Version 3.1.3 (July 2022)
+
+- Skip 3.1.2 to align Firefox and Chrome Version
+- Improved Japanese translation (#714)
+- Restrict import file type to json (#708)
+- Fix bug to correctly adjust page layout when stylebot is first opened on a page
+- Fix font picker for readability
+- Fix bug with wildcard usage (#700)
+- Fix Portuguese locale configs to match locale code supported by extensions
+
 ## Version 3.1.1 (July 2022)
 
 - Allow adding custom fonts via Options page (#707)
