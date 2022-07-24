@@ -97,7 +97,7 @@
     "lint-staged": "^10.5.4",
     "lodash": "^4.17.19",
     "mini-css-extract-plugin": "^0.9.0",
-    "monaco-editor": "^0.33.0",
+    "monaco-editor": "^0.20.0",
     "patch-package": "^6.2.2",
     "postcss": "^7.0.32",
     "postcss-loader": "^3.0.0",
