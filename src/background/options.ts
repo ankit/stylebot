@@ -1,41 +1,34 @@
-import ContextMenu from './contextmenu';
 import { StylebotOptions } from '@stylebot/types';
+import { defaultOptions } from '@stylebot/settings';
 
-class BackgroundPageOptions {
-  options: StylebotOptions;
-
-  constructor(options: StylebotOptions) {
-    this.options = options;
-  }
-
-  get(name: keyof StylebotOptions): StylebotOptions[keyof StylebotOptions] {
-    return this.options[name];
-  }
-
-  getAll(): StylebotOptions {
-    return this.options;
-  }
-
-  set(
-    name: keyof StylebotOptions,
-    value: StylebotOptions[keyof StylebotOptions]
-  ): void {
-    this.options = {
-      ...this.options,
-      [name]: value,
-    };
-
-    chrome.storage.local.set({ options: this.options });
-
-    // If the option was contextMenu, update it
-    if (name === 'contextMenu') {
-      if (value === false) {
-        ContextMenu.remove();
+export const getAll = (): Promise<StylebotOptions> =>
+  new Promise(resolve => {
+    chrome.storage.local.get('options', items => {
+      if (items['options']) {
+        resolve(items['options']);
       } else {
-        ContextMenu.init();
+        resolve(defaultOptions);
       }
-    }
-  }
-}
+    });
+  });
 
-export default BackgroundPageOptions;
+export const get = async (
+  name: keyof StylebotOptions
+): Promise<StylebotOptions[keyof StylebotOptions]> => {
+  const options = await getAll();
+  return options[name];
+};
+
+export const set = async (
+  name: keyof StylebotOptions,
+  value: StylebotOptions[keyof StylebotOptions]
+): Promise<void> => {
+  let options = await getAll();
+
+  options = {
+    ...options,
+    [name]: value,
+  };
+
+  chrome.storage.local.set({ options });
+};

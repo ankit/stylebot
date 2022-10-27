@@ -21,6 +21,7 @@ const config = {
   stats: 'errors-only',
   mode: process.env.NODE_ENV,
   context: `${__dirname}/src`,
+  devtool: 'inline-source-map',
 
   optimization: {
     minimize: process.env.NODE_ENV === 'production',
@@ -35,17 +36,6 @@ const config = {
         },
       }),
     ],
-  },
-
-  entry: {
-    'sync/index': './sync/index.ts',
-    'popup/index': './popup/index.ts',
-    'editor/index': './editor/index.ts',
-    'options/index': './options/index.ts',
-    'background/index': './background/index.ts',
-    'inject-css/index': './inject-css/index.ts',
-    'monaco-editor/iframe/index': './monaco-editor/iframe/index.ts',
-    'readability/index': './readability/index.ts',
   },
 
   output: {
@@ -126,9 +116,7 @@ const config = {
 
   plugins: [
     new ProgressBarPlugin(),
-    new webpack.DefinePlugin({
-      global: 'window',
-    }),
+
     new VueLoaderPlugin(),
     new ForkTsCheckerWebpackPlugin({
       typescript: {
@@ -223,8 +211,9 @@ const config = {
             let jsonContent = JSON.parse(content);
 
             if (config.mode === 'development') {
-              jsonContent['content_security_policy'] =
-                "script-src 'self' 'unsafe-eval'; object-src 'self'";
+              jsonContent['content_security_policy'] = {
+                extension_page: "script-src 'self'; object-src 'self'",
+              };
             }
 
             if (process.env.BROWSER === 'firefox') {
@@ -268,4 +257,29 @@ function transformHtml(content) {
   });
 }
 
-module.exports = config;
+const backgroundPageConfig = {
+  ...config,
+  entry: {
+    'background/index': './background/index.ts',
+  },
+  plugins: [
+    new webpack.DefinePlugin({
+      global: 'this',
+    }),
+  ],
+};
+
+const clientConfig = {
+  ...config,
+  entry: {
+    'sync/index': './sync/index.ts',
+    'popup/index': './popup/index.ts',
+    'editor/index': './editor/index.ts',
+    'options/index': './options/index.ts',
+    'inject-css/index': './inject-css/index.ts',
+    'monaco-editor/iframe/index': './monaco-editor/iframe/index.ts',
+    'readability/index': './readability/index.ts',
+  },
+};
+
+module.exports = [backgroundPageConfig, clientConfig];
