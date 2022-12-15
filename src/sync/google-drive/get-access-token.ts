@@ -65,6 +65,7 @@ const validate = async (redirectURL?: string): Promise<AccessToken> => {
 
 const authorize = (): Promise<string | undefined> => {
   return new Promise(resolve => {
+    console.debug('Extension redirectURL:', chrome.identity.getRedirectURL());
     const redirectURL = chrome.identity.getRedirectURL();
     const scopes = ['https://www.googleapis.com/auth/drive.file'];
 
