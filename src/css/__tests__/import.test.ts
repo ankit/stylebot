@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires, @typescript-eslint/no-explicit-any */
+
 const dedent = require('dedent');
 import { getCssWithExpandedImports } from '../import';
 
@@ -29,9 +30,10 @@ const mockExampleCss = dedent`
 `;
 
 global.chrome = {
-  /* @ts-ignore */
   runtime: {
-    sendMessage: (message: any, callback: any) => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error: not able to figure out how to override sendMessage here correctly.
+    sendMessage: (message: any, callback: (response: any) => void) => {
       if (message.url === 'https://fonts.googleapis.com/css?family=Lato') {
         callback(mockFontCss);
       } else if (message.url === 'https://example2.css') {

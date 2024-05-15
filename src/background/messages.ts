@@ -1,5 +1,22 @@
-import BackgroundPageStyles from './styles';
-import BackgroundPageOptions from './options';
+import {
+  set,
+  disable,
+  enable,
+  getAll,
+  setAll,
+  move,
+  getStylesForPage,
+  updateIcon,
+  setReadability,
+  getImportCss,
+  applyStylesToAllTabs,
+} from './styles';
+
+import {
+  get as getOption,
+  getAll as getAllOptions,
+  set as setOption,
+} from './options';
 
 import {
   GetOption as GetOptionType,
@@ -34,87 +51,80 @@ import {
 
 import { get as getCommands, set as setCommands } from './commands';
 
-export const DisableStyle = (
-  message: DisableStyleType,
-  styles: BackgroundPageStyles
-): void => {
-  styles.disable(message.url);
+export const DisableStyle = async (
+  message: DisableStyleType
+): Promise<void> => {
+  await disable(message.url);
+  return applyStylesToAllTabs();
 };
 
-export const EnableStyle = (
-  message: EnableStyleType,
-  styles: BackgroundPageStyles
-): void => {
-  styles.enable(message.url);
+export const EnableStyle = async (message: EnableStyleType): Promise<void> => {
+  await enable(message.url);
+  return applyStylesToAllTabs();
 };
 
-export const SetStyle = (
-  message: SetStyleType,
-  styles: BackgroundPageStyles
-): void => {
-  styles.set(message.url, message.css, message.readability);
-};
+export const SetStyle = (message: SetStyleType): Promise<void> =>
+  set(message.url, message.css, message.readability);
 
-export const GetAllStyles = (
-  styles: BackgroundPageStyles,
+export const GetAllStyles = async (
   sendResponse: (response: GetAllStylesResponse) => void
-): void => {
-  sendResponse(styles.getAll());
+): Promise<void> => {
+  const styles = await getAll();
+  sendResponse(styles);
 };
 
-export const SetAllStyles = (
-  message: SetAllStylesType,
-  styles: BackgroundPageStyles
-): void => {
-  styles.setAll(message.styles, message.shouldPersist);
+export const SetAllStyles = async (
+  message: SetAllStylesType
+): Promise<void> => {
+  await setAll(message.styles);
+  return applyStylesToAllTabs();
 };
 
-export const GetStylesForIframe = (
+export const GetStylesForIframe = async (
   message: GetStylesForIframeType,
-  styles: BackgroundPageStyles,
   sendResponse: (response: GetStylesForPageResponse) => void
-): void => {
-  sendResponse(styles.getStylesForPage(message.url, message.important));
+): Promise<void> => {
+  const styles = await getAll();
+  const pageStyles = getStylesForPage(message.url, styles, message.important);
+
+  sendResponse(pageStyles);
 };
 
-export const GetStylesForPage = (
+export const GetStylesForPage = async (
   message: GetStylesForPageType,
-  styles: BackgroundPageStyles,
   sender: chrome.runtime.MessageSender,
   sendResponse: (response: GetStylesForPageResponse) => void
-): void => {
+): Promise<void> => {
   const tab = sender.tab || message.tab;
 
   if (!tab || !tab.url) {
     return;
   }
 
-  const response = styles.getStylesForPage(tab.url, message.important);
-  styles.updateIcon(tab, response.styles, response.defaultStyle);
+  const styles = await getAll();
+  const response = getStylesForPage(tab.url, styles, message.important);
 
+  updateIcon(tab, response.styles, response.defaultStyle);
   sendResponse(response);
 };
 
-export const MoveStyle = (
-  message: MoveStyleType,
-  styles: BackgroundPageStyles
-): void => {
-  styles.move(message.sourceUrl, message.destinationUrl);
+export const MoveStyle = (message: MoveStyleType): void => {
+  move(message.sourceUrl, message.destinationUrl);
 };
 
-export const GetOption = (
+export const GetOption = async (
   message: GetOptionType,
-  options: BackgroundPageOptions,
   sendResponse: (response: GetOptionResponse) => void
-): void => {
-  sendResponse(options.get(message.optionName));
+): Promise<void> => {
+  const option = await getOption(message.optionName);
+  sendResponse(option);
 };
 
-export const GetAllOptions = (
-  options: BackgroundPageOptions,
+export const GetAllOptions = async (
   sendResponse: (response: GetAllOptionsResponse) => void
-): void => {
-  sendResponse(options.getAll());
+): Promise<void> => {
+  const options = await getAllOptions();
+  sendResponse(options);
 };
 
 export const OpenOptionsPage = (): void => {
@@ -125,11 +135,8 @@ export const OpenDonatePage = (): void => {
   chrome.tabs.create({ url: 'https://ko-fi.com/stylebot' });
 };
 
-export const SetOption = (
-  message: SetOptionType,
-  options: BackgroundPageOptions
-): void => {
-  options.set(message.option.name, message.option.value);
+export const SetOption = (message: SetOptionType): void => {
+  setOption(message.option.name, message.option.value);
 };
 
 export const GetCommands = async (
@@ -143,11 +150,8 @@ export const SetCommands = (message: SetCommandsType): void => {
   setCommands(message.value);
 };
 
-export const SetReadability = (
-  message: SetReadabilityType,
-  styles: BackgroundPageStyles
-): void => {
-  styles.setReadability(message.url, message.value);
+export const SetReadability = (message: SetReadabilityType): void => {
+  setReadability(message.url, message.value);
 };
 
 export const GetReadabilitySettings = async (
@@ -165,18 +169,17 @@ export const SetReadabilitySettings = (
 
 export const GetImportCss = async (
   message: GetImportCssType,
-  styles: BackgroundPageStyles,
+
   sendResponse: (response: GetImportCssResponse) => void
 ): Promise<void> => {
-  const css = await styles.getImportCss(message.url);
+  const css = await getImportCss(message.url);
   sendResponse(css);
 };
 
 export const RunGoogleDriveSync = async (
   _message: RunGoogleDriveSyncType,
-  styles: BackgroundPageStyles,
   sendResponse: (response: RunGoogleDriveSyncResponse) => void
 ): Promise<void> => {
-  await runGoogleDriveSync(styles);
+  await runGoogleDriveSync();
   sendResponse();
 };
