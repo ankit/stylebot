@@ -8,7 +8,6 @@ const { VueLoaderPlugin } = require('vue-loader');
 const CopyPlugin = require('copy-webpack-plugin');
 const ExtensionReloader = require('webpack-extension-reloader');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const ProgressBarPlugin = require('progress-bar-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 
@@ -116,16 +115,7 @@ const config = {
 
   plugins: [
     new ProgressBarPlugin(),
-
     new VueLoaderPlugin(),
-    new ForkTsCheckerWebpackPlugin({
-      typescript: {
-        configFile: '../tsconfig.json',
-        extensions: {
-          vue: true,
-        },
-      },
-    }),
     new MiniCssExtractPlugin({
       filename: '[name].css',
     }),
