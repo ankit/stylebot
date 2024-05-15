@@ -10,7 +10,7 @@ import { ReadabilityArticle } from '@stylebot/types';
 import { cacheDocument } from './cache';
 
 const initCss = async (root: ShadowRoot): Promise<void> => {
-  const cssUrl = chrome.extension.getURL('readability/index.css');
+  const cssUrl = chrome.runtime.getURL('readability/index.css');
 
   return new Promise(resolve => {
     fetch(cssUrl, { method: 'GET' })
