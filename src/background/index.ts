@@ -1,5 +1,3 @@
-import 'crx-hotreload';
-
 import './listeners';
 
 import ContextMenu from './contextmenu';

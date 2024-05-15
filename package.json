@@ -75,7 +75,6 @@
     "bootstrap-vue": "^2.15.0",
     "copy-webpack-plugin": "^6.0.1",
     "cross-env": "^7.0.2",
-    "crx-hotreload": "^1.0.4",
     "css-loader": "^3.5.3",
     "cssnano": "^4.1.10",
     "date-fns": "^2.16.1",
