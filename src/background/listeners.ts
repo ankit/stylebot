@@ -59,7 +59,9 @@ chrome.tabs.onUpdated.addListener(async (tabId, _, tab) => {
       name: 'TabUpdated',
     };
 
-    chrome.tabs.sendMessage(tabId, message);
+    if (!tab.url?.includes('chrome-extension://')) {
+      chrome.tabs.sendMessage(tabId, message);
+    }
   }
 });
 
