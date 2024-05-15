@@ -1,11 +1,10 @@
 # Stylebot
 
-![CI](https://github.com/ankit/stylebot/workflows/CI/badge.svg)
+![Build](https://github.com/ankit/stylebot/actions/workflows/build.yml/badge.svg)
 [![Kofi](https://badgen.net/badge/icon/kofi?icon=kofi&label)](https://ko-fi.com/stylebot)
 [![Chrome Webstore Version](https://img.shields.io/chrome-web-store/v/oiaejidbmkiecgbjeifoejpgmdaleoha)](https://chrome.google.com/webstore/detail/stylebot/oiaejidbmkiecgbjeifoejpgmdaleoha)
 [![Chrome Users](https://badgen.net/chrome-web-store/users/oiaejidbmkiecgbjeifoejpgmdaleoha)](https://chrome.google.com/webstore/detail/stylebot/oiaejidbmkiecgbjeifoejpgmdaleoha)
 [![Webstore Rating](https://img.shields.io/chrome-web-store/stars/oiaejidbmkiecgbjeifoejpgmdaleoha)](https://chrome.google.com/webstore/detail/stylebot/oiaejidbmkiecgbjeifoejpgmdaleoha)
-[![Follow on Twitter](https://badgen.net/twitter/follow/ahujaankit)](https://twitter.com/ahujaankit)
 ![License](https://img.shields.io/github/license/ankit/stylebot)
 
 Stylebot is a browser extension that lets you change the appearance of the web instantly.
@@ -50,8 +49,7 @@ If you would like to <strong>add a new feature</strong> to Stylebot or <strong>f
 - Open `chrome://extensions` page.
 - Disable the official Stylebot version.
 - Enable the Developer mode.
-- Click Load unpacked extension button
-- Navigate to the project's `dist/` folder
+- Load unpacked `dist/` as extension
 
 ### Release
 
