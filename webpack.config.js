@@ -6,7 +6,7 @@ const webpack = require('webpack');
 
 const { VueLoaderPlugin } = require('vue-loader');
 const CopyPlugin = require('copy-webpack-plugin');
-const ExtensionReloader = require('webpack-extension-reloader');
+
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const ProgressBarPlugin = require('progress-bar-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
@@ -200,12 +200,6 @@ const config = {
           transform: content => {
             let jsonContent = JSON.parse(content);
 
-            if (config.mode === 'development') {
-              jsonContent['content_security_policy'] = {
-                extension_page: "script-src 'self'; object-src 'self'",
-              };
-            }
-
             if (process.env.BROWSER === 'firefox') {
               const firefoxJsonContent = JSON.parse(
                 fs.readFileSync(
@@ -229,14 +223,6 @@ if (config.mode === 'production') {
       'process.env': {
         NODE_ENV: '"production"',
       },
-    }),
-  ]);
-}
-
-if (process.env.HMR === 'true') {
-  config.plugins = (config.plugins || []).concat([
-    new ExtensionReloader({
-      manifest: __dirname + '/src/extension/manifest.json',
     }),
   ]);
 }
