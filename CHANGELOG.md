@@ -1,3 +1,9 @@
+## Version 3.1.4 (May 2024)
+
+- Chrome and Edge Only release
+- Migrate extension to use [Manifest v3](https://developer.chrome.com/docs/extensions/develop/migrate/what-is-mv3)
+- Improve translations (#758, #755, #734)
+
 ## Version 3.1.3 (July 2022)
 
 - Skip 3.1.2 to align Firefox and Chrome Version
