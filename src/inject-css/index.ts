@@ -44,18 +44,12 @@ const injectCss = (
 };
 
 const run = () => {
-  if (window === window.top) {
-    injectCss({
-      name: 'GetStylesForPage',
-      important: true,
-    });
-  } else {
-    injectCss({
-      name: 'GetStylesForIframe',
-      url: window.location.href,
-      important: true,
-    });
-  }
+  injectCss({
+    name: 'GetStylesForPage',
+    important: true,
+  });
 };
 
-run();
+document.addEventListener('DOMContentLoaded', () => {
+  run();
+});
