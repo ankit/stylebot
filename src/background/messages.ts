@@ -25,7 +25,6 @@ import {
   EnableStyle as EnableStyleType,
   SetStyle as SetStyleType,
   GetStylesForPage as GetStylesForPageType,
-  GetStylesForIframe as GetStylesForIframeType,
   MoveStyle as MoveStyleType,
   SetAllStyles as SetAllStylesType,
   SetCommands as SetCommandsType,
@@ -78,16 +77,6 @@ export const SetAllStyles = async (
 ): Promise<void> => {
   await setAll(message.styles);
   return applyStylesToAllTabs();
-};
-
-export const GetStylesForIframe = async (
-  message: GetStylesForIframeType,
-  sendResponse: (response: GetStylesForPageResponse) => void
-): Promise<void> => {
-  const styles = await getAll();
-  const pageStyles = getStylesForPage(message.url, styles, message.important);
-
-  sendResponse(pageStyles);
 };
 
 export const GetStylesForPage = async (

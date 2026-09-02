@@ -44,12 +44,6 @@ export type GetStylesForPage = {
   important?: boolean;
 };
 
-export type GetStylesForIframe = {
-  name: 'GetStylesForIframe';
-  url: string;
-  important?: boolean;
-};
-
 export type GetAllOptions = {
   name: 'GetAllOptions';
 };
@@ -116,7 +110,6 @@ type BackgroundPageMessage =
   | SetAllStyles
   | MoveStyle
   | GetStylesForPage
-  | GetStylesForIframe
   | GetAllOptions
   | GetOption
   | SetOption
