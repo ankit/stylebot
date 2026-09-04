@@ -13,7 +13,6 @@ import {
   GetAllStyles,
   SetAllStyles,
   GetStylesForPage,
-  GetStylesForIframe,
   EnableStyle,
   DisableStyle,
   SetReadability,
@@ -23,6 +22,8 @@ import {
   RunGoogleDriveSync,
 } from './messages';
 
+import { getAll, updateIcon } from './styles';
+import { getStylesForPage } from '@stylebot/styles';
 import { get as getOption } from './options';
 
 import {
@@ -47,9 +48,18 @@ chrome.runtime.onInstalled.addListener(async ({ reason }) => {
 });
 
 /**
- * When an existing tab is updated, refresh the context-menu and action.
+ * When an existing tab is updated, refresh the context-menu, badge and
+ * action. The badge is refreshed here (rather than in response to the
+ * content script's own initial styles lookup) since that lookup now reads
+ * chrome.storage.local directly and no longer messages the background page.
  */
 chrome.tabs.onUpdated.addListener(async (tabId, _, tab) => {
+  if (tab.status === 'complete' && tab.url) {
+    const allStyles = await getAll();
+    const { styles, defaultStyle } = getStylesForPage(tab.url, allStyles);
+    updateIcon(tab, styles, defaultStyle);
+  }
+
   const option = await getOption('contextMenu');
 
   if (option && tab.status === 'complete') {
@@ -123,9 +133,6 @@ chrome.runtime.onMessage.addListener(
         break;
       case 'GetStylesForPage':
         GetStylesForPage(message, sender, sendResponse);
-        break;
-      case 'GetStylesForIframe':
-        GetStylesForIframe(message, sendResponse);
         break;
       case 'EnableStyle':
         EnableStyle(message);

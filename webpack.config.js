@@ -68,6 +68,7 @@ const config = {
       '@stylebot/sync': path.resolve(__dirname, './src/sync/index'),
       '@stylebot/types': path.resolve(__dirname, './src/types/index'),
       '@stylebot/utils': path.resolve(__dirname, './src/utils/index'),
+      '@stylebot/styles': path.resolve(__dirname, './src/styles/index'),
       '@stylebot/dark-mode': path.resolve(__dirname, './src/dark-mode/index'),
       '@stylebot/settings': path.resolve(__dirname, './src/settings/index'),
 
