@@ -1,20 +1,30 @@
 /**
- * This content script injects any custom style for the page (if it exists)
- * as soon as the document starts loading.
- *
- * Styles are read directly from chrome.storage.local instead of via
- * chrome.runtime.sendMessage to the background service worker. The service
- * worker can be asleep when a page starts loading, and waking it up (plus
- * the round trip) is slow enough to cause a visible flash of unstyled
- * content. chrome.storage.local is handled by the browser itself and
- * doesn't require the service worker to be running.
+ * Injects custom CSS for the page as soon as it starts loading. Applies the
+ * localStorage cache (cache.ts) immediately if there is one, otherwise hides
+ * the page (hide-page.ts) until chrome.storage.local.get resolves.
  */
-import { injectCSSIntoDocument } from '@stylebot/css';
-import { apply as applyReadability } from '@stylebot/readability';
 import { getStylesForPage } from '@stylebot/styles';
 import { StyleMap } from '@stylebot/types';
 
+import { applyState } from './apply-state';
+import { CachedState, readCache, writeCache } from './cache';
+import { hidePage, revealPage } from './hide-page';
+
+// Fallback if the storage read (or an @import fetch) stalls — real
+// completion almost always wins the race and reveals sooner.
+const REVEAL_TIMEOUT_MS = 150;
+
 const run = () => {
+  const cached = readCache();
+
+  if (cached) {
+    applyState(cached);
+  } else {
+    hidePage();
+  }
+
+  const revealTimeout = setTimeout(revealPage, REVEAL_TIMEOUT_MS);
+
   chrome.storage.local.get('styles', items => {
     const allStyles: StyleMap = items['styles'] || {};
     const { styles, defaultStyle } = getStylesForPage(
@@ -23,15 +33,23 @@ const run = () => {
       true
     );
 
-    styles.forEach(style => {
-      if (style.enabled) {
-        injectCSSIntoDocument(style.css, style.url);
-      }
-    });
+    const freshState: CachedState = {
+      styles: styles.map(({ url, css, enabled }) => ({ url, css, enabled })),
+      readability: Boolean(defaultStyle && defaultStyle.readability),
+    };
 
-    if (defaultStyle && defaultStyle.readability) {
-      applyReadability();
+    const finish = () => {
+      writeCache(freshState);
+      clearTimeout(revealTimeout);
+      revealPage();
+    };
+
+    if (cached && JSON.stringify(cached) === JSON.stringify(freshState)) {
+      finish();
+      return;
     }
+
+    applyState(freshState).then(finish);
   });
 };
 

@@ -16,12 +16,26 @@ const getOutputPath = () =>
     ? `${__dirname}/${process.env.BROWSER}-dist`
     : `${__dirname}/dist`;
 
-// Writes a marker file after each error-free build, so tools outside webpack
-// (e.g. scripts/launch-chrome.mjs) know exactly when a build is ready.
+// Writes a marker once every compiler has built successfully, so tools like
+// scripts/launch-chrome.mjs never see it before manifest.json exists.
+const compilersDone = {};
+
 class WriteBuildMarkerPlugin {
+  constructor(compilerKey) {
+    this.compilerKey = compilerKey;
+  }
+
   apply(compiler) {
+    compilersDone[this.compilerKey] = false;
+
     compiler.hooks.done.tap('WriteBuildMarkerPlugin', stats => {
       if (stats.hasErrors()) {
+        return;
+      }
+
+      compilersDone[this.compilerKey] = true;
+
+      if (!Object.values(compilersDone).every(Boolean)) {
         return;
       }
 
@@ -133,7 +147,7 @@ const config = {
 
   plugins: [
     new ProgressBarPlugin(),
-    new WriteBuildMarkerPlugin(),
+    new WriteBuildMarkerPlugin('client'),
     new VueLoaderPlugin(),
     new MiniCssExtractPlugin({
       filename: '[name].css',
@@ -258,7 +272,7 @@ const backgroundPageConfig = {
     'background/index': './background/index.ts',
   },
   plugins: [
-    new WriteBuildMarkerPlugin(),
+    new WriteBuildMarkerPlugin('background'),
     new webpack.DefinePlugin({
       global: 'this',
     }),
