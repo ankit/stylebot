@@ -7,6 +7,7 @@ Icon?
 dist
 firefox-dist
 node_modules
+.chrome-dev-profile
 yarn-error.log
 coverage
 .history

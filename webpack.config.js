@@ -16,6 +16,37 @@ const getOutputPath = () =>
     ? `${__dirname}/${process.env.BROWSER}-dist`
     : `${__dirname}/dist`;
 
+// Writes a marker once every compiler has built successfully, so tools like
+// scripts/launch-chrome.mjs never see it before manifest.json exists.
+const compilersDone = {};
+
+class WriteBuildMarkerPlugin {
+  constructor(compilerKey) {
+    this.compilerKey = compilerKey;
+  }
+
+  apply(compiler) {
+    compilersDone[this.compilerKey] = false;
+
+    compiler.hooks.done.tap('WriteBuildMarkerPlugin', stats => {
+      if (stats.hasErrors()) {
+        return;
+      }
+
+      compilersDone[this.compilerKey] = true;
+
+      if (!Object.values(compilersDone).every(Boolean)) {
+        return;
+      }
+
+      fs.writeFileSync(
+        path.join(getOutputPath(), '.build-complete'),
+        String(Date.now())
+      );
+    });
+  }
+}
+
 const config = {
   stats: 'errors-only',
   mode: process.env.NODE_ENV,
@@ -51,6 +82,7 @@ const config = {
       '@stylebot/sync': path.resolve(__dirname, './src/sync/index'),
       '@stylebot/types': path.resolve(__dirname, './src/types/index'),
       '@stylebot/utils': path.resolve(__dirname, './src/utils/index'),
+      '@stylebot/styles': path.resolve(__dirname, './src/styles/index'),
       '@stylebot/dark-mode': path.resolve(__dirname, './src/dark-mode/index'),
       '@stylebot/settings': path.resolve(__dirname, './src/settings/index'),
 
@@ -115,6 +147,7 @@ const config = {
 
   plugins: [
     new ProgressBarPlugin(),
+    new WriteBuildMarkerPlugin('client'),
     new VueLoaderPlugin(),
     new MiniCssExtractPlugin({
       filename: '[name].css',
@@ -239,6 +272,7 @@ const backgroundPageConfig = {
     'background/index': './background/index.ts',
   },
   plugins: [
+    new WriteBuildMarkerPlugin('background'),
     new webpack.DefinePlugin({
       global: 'this',
     }),
