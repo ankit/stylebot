@@ -3,7 +3,7 @@
 // disabled that flag, and extensions loaded with it can't be reloaded.
 
 import { chromium } from 'playwright';
-import { existsSync, readFileSync, watch } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, watch } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -25,6 +25,10 @@ const readMarker = () => (existsSync(buildMarkerPath) ? readFileSync(buildMarker
 // Resolves once the marker file's content differs from `baseline`.
 const waitForMarkerChange = (baseline) =>
   new Promise((resolve) => {
+    // fs.watch throws ENOENT if the directory doesn't exist yet, which is
+    // the case on a fresh checkout before `yarn watch` has run once.
+    mkdirSync(extensionPath, { recursive: true });
+
     const checkNow = () => {
       if (readMarker() !== baseline) {
         watcher.close();
