@@ -98,13 +98,13 @@ describe('inject-css run()', () => {
 
   it('patches to the fresh state when it differs from a stale cache', async () => {
     const cached = {
-      styles: [{ url: 'a', css: '.a{old}', enabled: true }],
+      styles: [{ url: 'a', css: '.a{color:old}', enabled: true }],
       readability: false,
     };
 
     (cacheModule.readCache as jest.Mock).mockReturnValue(cached);
     (stylesModule.getStylesForPage as jest.Mock).mockReturnValue({
-      styles: [{ url: 'a', css: '.a{new}', enabled: true }],
+      styles: [{ url: 'a', css: '.a{color:new}', enabled: true }],
       defaultStyle: undefined,
     });
 
@@ -112,7 +112,7 @@ describe('inject-css run()', () => {
     await flushPromises();
 
     const freshState = {
-      styles: [{ url: 'a', css: '.a{new}', enabled: true }],
+      styles: [{ url: 'a', css: '.a{color:new}', enabled: true }],
       readability: false,
     };
 
