@@ -16,9 +16,8 @@ const getOutputPath = () =>
     ? `${__dirname}/${process.env.BROWSER}-dist`
     : `${__dirname}/dist`;
 
-// Writes a marker file once every compiler has produced an error-free build,
-// so tools outside webpack (e.g. scripts/launch-chrome.mjs) never see it
-// before manifest.json and all bundles exist.
+// Writes a marker once every compiler has built successfully, so tools like
+// scripts/launch-chrome.mjs never see it before manifest.json exists.
 const compilersDone = {};
 
 class WriteBuildMarkerPlugin {
