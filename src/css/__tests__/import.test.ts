@@ -1,7 +1,11 @@
 /* eslint-disable @typescript-eslint/no-var-requires, @typescript-eslint/no-explicit-any */
 
 const dedent = require('dedent');
-import { getCssWithExpandedImports } from '../import';
+import {
+  fetchImportCss,
+  getCssWithExpandedImports,
+  pruneImportCache,
+} from '../import';
 
 const mockFontCss = dedent`
   /* latin-ext */
@@ -46,6 +50,10 @@ global.chrome = {
 };
 
 describe('import', () => {
+  afterEach(() => {
+    localStorage.clear();
+  });
+
   describe('getCssWithExpandedImports', () => {
     it('correctly parses @import url(<url>)', async () => {
       const css = dedent`
@@ -223,6 +231,105 @@ describe('import', () => {
         color: red;
       }
     `);
+    });
+  });
+
+  describe('fetchImportCss', () => {
+    const originalSendMessage = global.chrome.runtime.sendMessage;
+
+    afterEach(() => {
+      global.chrome.runtime.sendMessage = originalSendMessage;
+    });
+
+    it('fetches and caches the response when nothing is cached', async () => {
+      const sendMessage = jest.fn(
+        (_message: any, callback: (response: string) => void) => {
+          callback('.a{color:red}');
+        }
+      );
+      global.chrome.runtime.sendMessage = sendMessage as any;
+
+      const result = await fetchImportCss('https://example.com/a.css');
+
+      expect(result).toBe('.a{color:red}');
+      expect(sendMessage).toHaveBeenCalledTimes(1);
+      expect(
+        localStorage.getItem('stylebot-import-cache:https://example.com/a.css')
+      ).toBe('.a{color:red}');
+    });
+
+    it('resolves from the cache without waiting on the fetch to complete', async () => {
+      localStorage.setItem(
+        'stylebot-import-cache:https://example.com/a.css',
+        '.cached{}'
+      );
+
+      let deliver: (response: string) => void = () => undefined;
+      const sendMessage = jest.fn(
+        (_message: any, callback: (response: string) => void) => {
+          deliver = callback;
+        }
+      );
+      global.chrome.runtime.sendMessage = sendMessage as any;
+
+      const result = await fetchImportCss('https://example.com/a.css');
+
+      expect(result).toBe('.cached{}');
+      // still refreshes the cache in the background
+      expect(sendMessage).toHaveBeenCalledTimes(1);
+
+      deliver('.fresh{}');
+    });
+
+    it('does not cache an empty response', async () => {
+      const sendMessage = jest.fn(
+        (_message: any, callback: (response: string) => void) => {
+          callback('');
+        }
+      );
+      global.chrome.runtime.sendMessage = sendMessage as any;
+
+      await fetchImportCss('https://example.com/missing.css');
+
+      expect(
+        localStorage.getItem(
+          'stylebot-import-cache:https://example.com/missing.css'
+        )
+      ).toBeNull();
+    });
+  });
+
+  describe('pruneImportCache', () => {
+    it('removes cache entries for urls that are no longer live', () => {
+      localStorage.setItem(
+        'stylebot-import-cache:https://example.com/still-used.css',
+        '.a{}'
+      );
+      localStorage.setItem(
+        'stylebot-import-cache:https://example.com/removed.css',
+        '.b{}'
+      );
+
+      pruneImportCache(new Set(['https://example.com/still-used.css']));
+
+      expect(
+        localStorage.getItem(
+          'stylebot-import-cache:https://example.com/still-used.css'
+        )
+      ).toBe('.a{}');
+      expect(
+        localStorage.getItem(
+          'stylebot-import-cache:https://example.com/removed.css'
+        )
+      ).toBeNull();
+    });
+
+    it('leaves unrelated localStorage keys alone', () => {
+      localStorage.setItem('some-other-key', 'value');
+
+      pruneImportCache(new Set());
+
+      expect(localStorage.getItem('some-other-key')).toBe('value');
     });
   });
 });

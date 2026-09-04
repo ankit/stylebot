@@ -3,6 +3,7 @@
  * localStorage cache (cache.ts) immediately if there is one, otherwise hides
  * the page (hide-page.ts) until chrome.storage.local.get resolves.
  */
+import { extractImports, pruneImportCache } from '@stylebot/css';
 import { getStylesForPage } from '@stylebot/styles';
 import { StyleMap } from '@stylebot/types';
 
@@ -40,6 +41,14 @@ const run = () => {
 
     const finish = () => {
       writeCache(freshState);
+
+      const liveImportUrls = new Set(
+        freshState.styles.flatMap(
+          style => extractImports(style.css).importUrls
+        )
+      );
+      pruneImportCache(liveImportUrls);
+
       clearTimeout(revealTimeout);
       revealPage();
     };
