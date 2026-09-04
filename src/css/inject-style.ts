@@ -1,22 +1,17 @@
 import * as postcss from 'postcss';
 import { appendImportantToDeclarations } from './declaration';
-import { getCssWithExpandedImports } from './import';
+import { extractImports, fetchImportCss } from './import';
 
 const getStylesheetId = (id: string) => {
   return `stylebot-css-${id}`;
 };
 
-export const injectCSSIntoDocument = async (
-  css: string,
-  id: string
-): Promise<void> => {
-  const cssWithExpandedImports = await getCssWithExpandedImports(css);
-
+const setStylesheetContent = (id: string, css: string): void => {
   const stylesheetId = getStylesheetId(id);
   const el = document.getElementById(stylesheetId);
 
   if (el) {
-    el.innerHTML = cssWithExpandedImports;
+    el.innerHTML = css;
     return;
   }
 
@@ -24,9 +19,33 @@ export const injectCSSIntoDocument = async (
 
   style.type = 'text/css';
   style.setAttribute('id', stylesheetId);
-  style.appendChild(document.createTextNode(cssWithExpandedImports));
+  style.appendChild(document.createTextNode(css));
 
   document.documentElement.appendChild(style);
+};
+
+// Applies the non-`@import` CSS immediately and patches in any `@import`
+// content once it's fetched, so a slow import fetch (e.g. a cold background
+// service worker) never blocks the rest of the stylesheet from applying.
+export const injectCSSIntoDocument = async (
+  css: string,
+  id: string
+): Promise<void> => {
+  const { css: withoutImports, importUrls } = extractImports(css);
+
+  setStylesheetContent(id, withoutImports);
+
+  if (importUrls.length === 0) {
+    return;
+  }
+
+  Promise.all(importUrls.map(fetchImportCss)).then(values => {
+    const merged = values.join('\n\n');
+
+    if (merged) {
+      setStylesheetContent(id, `${merged}\n\n${withoutImports}`);
+    }
+  });
 };
 
 export const injectRootIntoDocument = (
