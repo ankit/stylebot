@@ -1,3 +1,12 @@
+const escapeSelectorToken = (value: string): string => {
+  if (typeof CSS !== 'undefined' && CSS.escape) {
+    return CSS.escape(value);
+  }
+
+  // Fallback escape for special characters when CSS.escape is unavailable
+  return value.replace(/([ !"#$%&'()*+,./:;<=>?@[\\\]^`{|}~])/g, '\\$1');
+};
+
 export const getClassBasedSelector = (el: HTMLElement): string | null => {
   const className = el
     .getAttribute('class')
@@ -11,7 +20,7 @@ export const getClassBasedSelector = (el: HTMLElement): string | null => {
     let selector = el.tagName.toLowerCase();
     for (let i = 0; i < len; i++) {
       // todo: optimize class selection to be more specific here
-      selector += '.' + classes[i];
+      selector += '.' + escapeSelectorToken(classes[i]);
     }
 
     return selector;
@@ -23,7 +32,7 @@ export const getClassBasedSelector = (el: HTMLElement): string | null => {
 export const getIdBasedSelector = (el: HTMLElement): string | null => {
   const id = el.getAttribute('id');
   if (id) {
-    return `#${id}`;
+    return `#${escapeSelectorToken(id)}`;
   }
 
   return null;
