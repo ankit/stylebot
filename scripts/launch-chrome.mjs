@@ -3,7 +3,7 @@
 // disabled that flag, and extensions loaded with it can't be reloaded.
 
 import { chromium } from 'playwright';
-import { existsSync, mkdirSync, readFileSync, watch } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, watch, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -59,6 +59,21 @@ const waitForBuild = async () => {
 
 await waitForBuild();
 
+// `kill 0` on exit doesn't let Chrome shut down cleanly, so it shows a "Restore
+// pages?" bubble on the next launch. Reset the exit flags in the profile first.
+const clearCrashFlags = () => {
+  const prefsPath = path.join(userDataDir, 'Default', 'Preferences');
+  if (!existsSync(prefsPath)) return;
+  try {
+    const prefs = JSON.parse(readFileSync(prefsPath, 'utf8'));
+    prefs.profile = { ...prefs.profile, exit_type: 'Normal', exited_cleanly: true };
+    writeFileSync(prefsPath, JSON.stringify(prefs));
+  } catch {
+    // Malformed or locked prefs — not worth failing the launch over.
+  }
+};
+clearCrashFlags();
+
 const context = await chromium.launchPersistentContext(userDataDir, {
   headless: false,
   // Playwright's bundled "Chrome for Testing" build gets flagged as a bot by some sites.
@@ -67,17 +82,34 @@ const context = await chromium.launchPersistentContext(userDataDir, {
   chromiumSandbox: true,
   // Without this, Playwright pins a fixed emulated viewport and the window can't resize.
   viewport: null,
-  // Playwright disables extensions by default, which would block our CDP-loaded one.
-  ignoreDefaultArgs: ['--disable-extensions'],
-  // Required for Extensions.loadUnpacked.
-  args: ['--enable-unsafe-extension-debugging', '--start-maximized'],
+  ignoreDefaultArgs: [
+    // Playwright disables extensions by default, which would block our CDP-loaded one.
+    '--disable-extensions',
+    // Playwright's default; sets navigator.webdriver=true, flagged as a bot by Google.
+    '--enable-automation',
+  ],
+  args: [
+    // Required for Extensions.loadUnpacked.
+    '--enable-unsafe-extension-debugging',
+    '--start-maximized',
+  ],
 });
 
 const cdp = await context.browser().newBrowserCDPSession();
 
+// Dropping --enable-automation still leaves navigator.webdriver=true (CDP sets it);
+// spoof it here rather than via --disable-blink-features, which nags with an infobar.
+await context.addInitScript(() => {
+  Object.defineProperty(navigator, 'webdriver', { get: () => false });
+});
+
 // Stamp a small corner badge with the worktree name on every page, so this dev window is
 // identifiable at a glance (including in the Cmd+Tab window-preview thumbnail on macOS).
 await context.addInitScript((label) => {
+  // Only badge the top frame, never iframes (e.g. stylebot's monaco editor).
+  if (window.top !== window) {
+    return;
+  }
   const addBadge = () => {
     const badge = document.createElement('div');
     badge.textContent = `🌲 ${label}`;
