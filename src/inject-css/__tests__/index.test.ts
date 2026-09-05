@@ -3,6 +3,7 @@ jest.mock('../apply-state');
 jest.mock('../cache');
 jest.mock('../hide-page');
 jest.mock('@stylebot/styles');
+jest.mock('@stylebot/readability');
 
 const flushPromises = () => new Promise(resolve => setTimeout(resolve, 0));
 
@@ -24,6 +25,7 @@ describe('inject-css run()', () => {
 
     (global as any).chrome = {
       storage: { local: { get: jest.fn() } },
+      runtime: { onMessage: { addListener: jest.fn() } },
     };
   });
 

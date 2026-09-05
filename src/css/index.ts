@@ -9,7 +9,11 @@ export {
   removeCSSFromDocument,
 } from './inject-style';
 
-export { extractImports, pruneImportCache } from './import';
+export {
+  extractImports,
+  pruneImportCache,
+  getCssWithExpandedImports,
+} from './import';
 
 export {
   getSelector,

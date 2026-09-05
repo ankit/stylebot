@@ -3,11 +3,13 @@ import actions from '../actions';
 
 import mockState from '../__mocks__/state';
 import * as stylebotCss from '@stylebot/css';
+import * as stylebotReadability from '@stylebot/readability';
 import * as chromeUtils from '../../utils/chrome';
 import { readCache, writeCache } from '../../../inject-css/cache';
 
 jest.mock('postcss');
 jest.mock('@stylebot/css');
+jest.mock('@stylebot/readability');
 jest.mock('../../utils/chrome');
 
 const mockRoot = ({
@@ -127,6 +129,34 @@ describe('actions', () => {
         ],
         readability: false,
       });
+    });
+  });
+
+  describe('applyReadability', () => {
+    afterEach(() => {
+      localStorage.clear();
+    });
+
+    it('does nothing to the cache when nothing is cached yet', () => {
+      actions.applyReadability({ commit: mockCommit, state: mockState }, true);
+
+      expect(readCache()).toBeNull();
+    });
+
+    it('updates the cached readability flag in place', () => {
+      writeCache({
+        styles: [{ url: mockState.url, css: 'a { color: blue; }', enabled: true }],
+        readability: false,
+      });
+
+      actions.applyReadability({ commit: mockCommit, state: mockState }, true);
+
+      expect(readCache()).toEqual({
+        styles: [{ url: mockState.url, css: 'a { color: blue; }', enabled: true }],
+        readability: true,
+      });
+      expect(stylebotReadability.apply).toBeCalledWith(true);
+      expect(chromeUtils.setReadability).toBeCalledWith(mockState.url, true);
     });
   });
 

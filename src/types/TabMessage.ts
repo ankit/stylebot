@@ -30,6 +30,10 @@ export type GetIsStylebotOpen = {
   name: 'GetIsStylebotOpen';
 };
 
+export type GetIsPageReaderable = {
+  name: 'GetIsPageReaderable';
+};
+
 export type UpdateReader = {
   name: 'UpdateReader';
   value: ReadabilitySettings;
@@ -43,6 +47,7 @@ type TabMessage =
   | ApplyStylesToTab
   | TabUpdated
   | GetIsStylebotOpen
+  | GetIsPageReaderable
   | UpdateReader;
 
 export default TabMessage;

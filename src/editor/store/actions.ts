@@ -237,6 +237,13 @@ export default {
 
     commit('setReadability', value);
     setReadability(state.url, value);
+
+    // Keep the localStorage cache in sync so a refresh right after
+    // toggling doesn't apply the stale readability state.
+    const cached = readCache();
+    if (cached) {
+      writeCache({ ...cached, readability: value });
+    }
   },
 
   setReadabilitySettings(

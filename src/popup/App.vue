@@ -9,7 +9,10 @@
         :initial-enabled="style.enabled"
       />
 
-      <readability :initial-readability="readability" />
+      <readability
+        :initial-readability="readability"
+        :disabled="!pageReaderable"
+      />
 
       <toggle-stylebot :is-open="isOpen" :tab="tab" />
 
@@ -32,7 +35,12 @@ import SyncStylebot from './components/SyncStylebot.vue';
 import ToggleStylebot from './components/ToggleStylebot.vue';
 import ReleaseNotification from './components/notifications/ReleaseNotification.vue';
 
-import { getStyles, getCurrentTab, getIsStylebotOpen } from './utils';
+import {
+  getStyles,
+  getCurrentTab,
+  getIsStylebotOpen,
+  getIsPageReaderable,
+} from './utils';
 
 // Bypasses @stylebot/sync, whose barrel also drags in runGoogleDriveSync's postcss dependency chain.
 import { getGoogleDriveSyncEnabled } from '../sync/google-drive/sync-metadata';
@@ -53,6 +61,7 @@ export default Vue.extend({
   data(): {
     isOpen: boolean;
     readability: boolean;
+    pageReaderable: boolean;
     tab?: chrome.tabs.Tab;
     styles: Array<{ url: string; css: string; enabled: boolean }>;
     googleDriveSyncEnabled: boolean;
@@ -63,6 +72,7 @@ export default Vue.extend({
       isOpen: false,
       tab: undefined,
       readability: false,
+      pageReaderable: true,
       googleDriveSyncEnabled: false,
       googleDriveSyncMetadata: undefined,
     };
@@ -74,6 +84,10 @@ export default Vue.extend({
 
       getIsStylebotOpen(this.tab, isOpen => {
         this.isOpen = isOpen;
+      });
+
+      getIsPageReaderable(this.tab, isReaderable => {
+        this.pageReaderable = isReaderable;
       });
 
       getStyles(this.tab, ({ styles, defaultStyle }) => {
@@ -137,5 +151,9 @@ span {
 
 .full-row-toggle {
   cursor: pointer;
+
+  &.disabled {
+    cursor: default;
+  }
 }
 </style>
