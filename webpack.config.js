@@ -123,6 +123,16 @@ const config = {
         },
       },
       {
+        // Ships modern syntax (e.g. `??`) that webpack 4's parser can't
+        // read; nothing else in node_modules needs this, so scope it down.
+        test: /\.js$/,
+        include: /node_modules[\\/]@mozilla[\\/]readability/,
+        loader: 'babel-loader',
+        options: {
+          presets: ['@babel/preset-env'],
+        },
+      },
+      {
         test: /\.((c|sa|sc)ss)$/i,
         use: [
           MiniCssExtractPlugin.loader,
