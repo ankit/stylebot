@@ -1,7 +1,4 @@
-import Readability from 'readability';
-
-/* @ts-ignore */
-import { isProbablyReaderable } from '../../node_modules/readability/Readability-readerable';
+import { Readability, isProbablyReaderable } from '@mozilla/readability';
 
 import { ReadabilityArticle } from '@stylebot/types';
 
@@ -59,9 +56,14 @@ export const getReadabilityArticle = async (): Promise<ReadabilityArticle> => {
   const doc = document.cloneNode(true) as Document;
   const article = new Readability(doc).parse();
 
-  if (!article?.content) {
+  if (!article || !article.content) {
     throw new Error('Readability failed to parse the page');
   }
 
-  return article;
+  return {
+    title: article.title ?? '',
+    byline: article.byline ?? '',
+    content: article.content,
+    siteName: article.siteName ?? '',
+  };
 };
