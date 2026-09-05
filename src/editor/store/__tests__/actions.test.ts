@@ -4,6 +4,7 @@ import actions from '../actions';
 import mockState from '../__mocks__/state';
 import * as stylebotCss from '@stylebot/css';
 import * as chromeUtils from '../../utils/chrome';
+import { readCache, writeCache } from '../../../inject-css/cache';
 
 jest.mock('postcss');
 jest.mock('@stylebot/css');
@@ -68,6 +69,64 @@ describe('actions', () => {
         css,
         mockState.readability
       );
+    });
+
+    afterEach(() => {
+      localStorage.clear();
+    });
+
+    it('does nothing to the cache when nothing is cached yet', () => {
+      const css = 'a { color: red; }';
+      jest.spyOn(stylebotCss, 'removeEmptyRules').mockReturnValue(css);
+
+      actions.applyCss({ commit: mockCommit, state: mockState }, { css });
+
+      expect(readCache()).toBeNull();
+    });
+
+    it('updates the matching cached style in place', () => {
+      const css = 'a { color: red; }';
+      jest.spyOn(stylebotCss, 'removeEmptyRules').mockReturnValue(css);
+
+      writeCache({
+        styles: [
+          { url: mockState.url, css: 'a { color: blue; }', enabled: true },
+          { url: 'other.example.com', css: 'b { color: green; }', enabled: true },
+        ],
+        readability: false,
+      });
+
+      actions.applyCss({ commit: mockCommit, state: mockState }, { css });
+
+      expect(readCache()).toEqual({
+        styles: [
+          { url: mockState.url, css, enabled: mockState.enabled },
+          { url: 'other.example.com', css: 'b { color: green; }', enabled: true },
+        ],
+        readability: false,
+      });
+    });
+
+    it('appends a cached style if none exists yet for this url', () => {
+      const css = 'a { color: red; }';
+      jest.spyOn(stylebotCss, 'removeEmptyRules').mockReturnValue(css);
+
+      writeCache({
+        styles: [
+          { url: 'other.example.com', css: 'b { color: green; }', enabled: true },
+        ],
+        readability: false,
+      });
+
+      actions.applyCss({ commit: mockCommit, state: mockState }, { css });
+
+      expect(readCache()).toEqual({
+        styles: [
+          { url: 'other.example.com', css: 'b { color: green; }', enabled: true },
+          { url: mockState.url, css, enabled: mockState.enabled },
+        ],
+        readability: false,
+      });
     });
   });
 
