@@ -67,6 +67,13 @@ const initEditor = (store: Store<State>): void => {
 
   const stylebotAppHost = document.createElement('div');
   stylebotAppHost.id = 'stylebot';
+
+  // stylebotAppHost only ever gets a shadow root, so :empty matches it
+  // forever — a page rule as common as `:empty { display: none }` would
+  // otherwise hide the entire editor. An inline !important beats any
+  // non-inline-!important page rule regardless of selector.
+  stylebotAppHost.style.setProperty('display', 'block', 'important');
+
   document.body.appendChild(stylebotAppHost);
 
   const shadowRoot = stylebotAppHost.attachShadow({ mode: 'open' });
