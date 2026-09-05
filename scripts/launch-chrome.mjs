@@ -166,7 +166,7 @@ await page.goto(startUrl);
 
 console.log(`\n🎉 Stylebot loaded on Hacker News — extension id: ${extensionId}`);
 console.log('  👀 Watching ./dist — the extension hot-reloads in place on rebuild.');
-console.log(headless ? '  ⌨️  Press Ctrl+C to exit.\n' : '  🪟 Close the browser window to exit.\n');
+console.log(headless ? '  🛑 Press Ctrl+C to exit.\n' : '  🪟 Close the browser window to exit.\n');
 
 let reloading = false;
 let pending = false;
