@@ -17,6 +17,7 @@ class MonacEditorIframe {
     this.loadEditor(() => {
       this.attachWindowListeners();
       this.defineThemes();
+      this.configureDiagnostics();
       this.initEditor();
       this.postMessage({ type: 'stylebotMonacoIframeLoaded' });
     });
@@ -36,6 +37,14 @@ class MonacEditorIframe {
 
   defineThemes(): void {
     window.monaco.editor.defineTheme('custom-light', CustomLight);
+  }
+
+  configureDiagnostics(): void {
+    // Both fire on normal Stylebot usage (empty rules on element pick,
+    // single-browser vendor-prefixed hacks) rather than real mistakes.
+    window.monaco.languages.css.cssDefaults.setDiagnosticsOptions({
+      lint: { emptyRules: 'ignore', vendorPrefix: 'ignore' },
+    });
   }
 
   initEditor(): void {
@@ -80,7 +89,7 @@ class MonacEditorIframe {
         enabled: false,
       },
       hover: {
-        enabled: false,
+        enabled: true,
       },
       codeLens: false,
     };
