@@ -47,10 +47,10 @@ Vue.mixin({
   },
 });
 
-const injectCss = (shadowRoot: ShadowRoot): void => {
+const injectCss = (shadowRoot: ShadowRoot): Promise<void> => {
   const url = chrome.runtime.getURL('editor/index.css');
 
-  fetch(url, { method: 'GET' })
+  return fetch(url, { method: 'GET' })
     .then(response => response.text())
     .then(css => {
       const styleEl = document.createElement('style');
@@ -87,12 +87,15 @@ const initEditor = (store: Store<State>): void => {
   stylebotApp.id = 'stylebot-app';
   shadowRoot.appendChild(stylebotApp);
 
-  injectCss(shadowRoot);
-
-  new Vue({
-    store,
-    el: stylebotApp,
-    render: h => h(TheStylebotApp),
+  // Wait for the stylesheet to land before mounting — otherwise Vue's
+  // synchronous mount renders the unstyled markup first, causing a
+  // visible flash whenever the CSS fetch is slower than the mount.
+  injectCss(shadowRoot).then(() => {
+    new Vue({
+      store,
+      el: stylebotApp,
+      render: h => h(TheStylebotApp),
+    });
   });
 };
 
