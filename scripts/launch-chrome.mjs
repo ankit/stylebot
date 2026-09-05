@@ -18,8 +18,6 @@ const startUrl = 'https://news.ycombinator.com';
 // starts, rather than trusting a marker left over from a previous run.
 const waitForFreshBuild = process.env.STYLEBOT_FRESH_BUILD === '1';
 
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
 const readMarker = () => (existsSync(buildMarkerPath) ? readFileSync(buildMarkerPath, 'utf8') : null);
 
 // Resolves once the marker file's content differs from `baseline`.
@@ -127,29 +125,11 @@ const reloadTabs = () =>
       .map((p) => p.reload().catch(() => {}))
   );
 
-// Open the Stylebot editor via its in-page shortcut. This works without the
-// background service worker, which is dormant right after a CDP install.
-const openEditor = async (p) => {
-  try {
-    await p.bringToFront();
-    await p.click('body', { position: { x: 5, y: 5 } }).catch(() => {});
-    // Give the content script a moment to register its hotkeys.
-    await sleep(500);
-    await p.keyboard.press('Alt+Shift+M');
-    // #stylebot is a 0-height host (its panel is fixed-positioned), so wait for
-    // it to be attached rather than visible.
-    await p.waitForSelector('#stylebot', { state: 'attached', timeout: 5000 }).catch(() => {});
-  } catch {
-    // The page may have navigated away mid-open; ignore.
-  }
-};
-
 const extensionId = await loadExtension();
 
 // Navigate after installing so the content script injects on load.
 const page = context.pages()[0] ?? (await context.newPage());
 await page.goto(startUrl);
-await openEditor(page);
 
 console.log(`\n✓ Stylebot loaded on Hacker News — extension id: ${extensionId}`);
 console.log('  Watching ./dist — the extension hot-reloads in place on rebuild.');
