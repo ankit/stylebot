@@ -18,8 +18,6 @@ const startUrl = 'https://news.ycombinator.com';
 // starts, rather than trusting a marker left over from a previous run.
 const waitForFreshBuild = process.env.STYLEBOT_FRESH_BUILD === '1';
 
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
 const readMarker = () => (existsSync(buildMarkerPath) ? readFileSync(buildMarkerPath, 'utf8') : null);
 
 // Resolves once the marker file's content differs from `baseline`.
@@ -63,6 +61,10 @@ await waitForBuild();
 
 const context = await chromium.launchPersistentContext(userDataDir, {
   headless: false,
+  // Playwright's bundled "Chrome for Testing" build gets flagged as a bot by some sites.
+  channel: 'chrome',
+  // Otherwise Playwright adds --no-sandbox, which real Chrome (unlike "for Testing") nags about.
+  chromiumSandbox: true,
   // Without this, Playwright pins a fixed emulated viewport and the window can't resize.
   viewport: null,
   // Playwright disables extensions by default, which would block our CDP-loaded one.
@@ -72,6 +74,41 @@ const context = await chromium.launchPersistentContext(userDataDir, {
 });
 
 const cdp = await context.browser().newBrowserCDPSession();
+
+// Stamp a small corner badge with the worktree name on every page, so this dev window is
+// identifiable at a glance (including in the Cmd+Tab window-preview thumbnail on macOS).
+await context.addInitScript((label) => {
+  const addBadge = () => {
+    const badge = document.createElement('div');
+    badge.textContent = `🌲 ${label}`;
+    Object.assign(badge.style, {
+      position: 'fixed',
+      top: '8px',
+      left: '8px',
+      zIndex: 2147483647,
+      background: '#4b2e83',
+      color: '#fff',
+      font: '15px -apple-system, sans-serif',
+      padding: '5px 10px',
+      borderRadius: '6px',
+      pointerEvents: 'none',
+      opacity: '0.85',
+    });
+    document.documentElement.append(badge);
+  };
+  document.addEventListener('DOMContentLoaded', addBadge);
+}, path.basename(rootDir));
+
+// The extension opens this tab on fresh install (onInstalled); auto-close it in dev.
+const closeHelpTab = (p) => {
+  if (/^https:\/\/stylebot\.dev\/help/.test(p.url())) {
+    p.close().catch(() => {});
+  }
+};
+context.on('page', (p) => {
+  closeHelpTab(p);
+  p.once('framenavigated', () => closeHelpTab(p));
+});
 
 // Install the extension, or reload it in place if already installed.
 const loadExtension = async () => {
@@ -88,29 +125,11 @@ const reloadTabs = () =>
       .map((p) => p.reload().catch(() => {}))
   );
 
-// Open the Stylebot editor via its in-page shortcut. This works without the
-// background service worker, which is dormant right after a CDP install.
-const openEditor = async (p) => {
-  try {
-    await p.bringToFront();
-    await p.click('body', { position: { x: 5, y: 5 } }).catch(() => {});
-    // Give the content script a moment to register its hotkeys.
-    await sleep(500);
-    await p.keyboard.press('Alt+Shift+M');
-    // #stylebot is a 0-height host (its panel is fixed-positioned), so wait for
-    // it to be attached rather than visible.
-    await p.waitForSelector('#stylebot', { state: 'attached', timeout: 5000 }).catch(() => {});
-  } catch {
-    // The page may have navigated away mid-open; ignore.
-  }
-};
-
 const extensionId = await loadExtension();
 
 // Navigate after installing so the content script injects on load.
 const page = context.pages()[0] ?? (await context.newPage());
 await page.goto(startUrl);
-await openEditor(page);
 
 console.log(`\n✓ Stylebot loaded on Hacker News — extension id: ${extensionId}`);
 console.log('  Watching ./dist — the extension hot-reloads in place on rebuild.');
@@ -129,7 +148,6 @@ const hotReload = async () => {
   try {
     await loadExtension();
     await reloadTabs();
-    await openEditor(page);
     console.log(`↻ reloaded  ${new Date().toLocaleTimeString()}`);
   } catch (err) {
     console.error('reload failed:', err.message);
