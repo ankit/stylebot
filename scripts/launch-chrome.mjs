@@ -63,6 +63,10 @@ await waitForBuild();
 
 const context = await chromium.launchPersistentContext(userDataDir, {
   headless: false,
+  // Playwright's bundled "Chrome for Testing" build gets flagged as a bot by some sites.
+  channel: 'chrome',
+  // Otherwise Playwright adds --no-sandbox, which real Chrome (unlike "for Testing") nags about.
+  chromiumSandbox: true,
   // Without this, Playwright pins a fixed emulated viewport and the window can't resize.
   viewport: null,
   // Playwright disables extensions by default, which would block our CDP-loaded one.
@@ -72,6 +76,41 @@ const context = await chromium.launchPersistentContext(userDataDir, {
 });
 
 const cdp = await context.browser().newBrowserCDPSession();
+
+// Stamp a small corner badge with the worktree name on every page, so this dev window is
+// identifiable at a glance (including in the Cmd+Tab window-preview thumbnail on macOS).
+await context.addInitScript((label) => {
+  const addBadge = () => {
+    const badge = document.createElement('div');
+    badge.textContent = `🌲 ${label}`;
+    Object.assign(badge.style, {
+      position: 'fixed',
+      top: '8px',
+      left: '8px',
+      zIndex: 2147483647,
+      background: '#4b2e83',
+      color: '#fff',
+      font: '15px -apple-system, sans-serif',
+      padding: '5px 10px',
+      borderRadius: '6px',
+      pointerEvents: 'none',
+      opacity: '0.85',
+    });
+    document.documentElement.append(badge);
+  };
+  document.addEventListener('DOMContentLoaded', addBadge);
+}, path.basename(rootDir));
+
+// The extension opens this tab on fresh install (onInstalled); auto-close it in dev.
+const closeHelpTab = (p) => {
+  if (/^https:\/\/stylebot\.dev\/help/.test(p.url())) {
+    p.close().catch(() => {});
+  }
+};
+context.on('page', (p) => {
+  closeHelpTab(p);
+  p.once('framenavigated', () => closeHelpTab(p));
+});
 
 // Install the extension, or reload it in place if already installed.
 const loadExtension = async () => {
@@ -129,7 +168,6 @@ const hotReload = async () => {
   try {
     await loadExtension();
     await reloadTabs();
-    await openEditor(page);
     console.log(`↻ reloaded  ${new Date().toLocaleTimeString()}`);
   } catch (err) {
     console.error('reload failed:', err.message);
