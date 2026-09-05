@@ -58,6 +58,10 @@ const config = {
     minimizer: [
       new TerserPlugin({
         parallel: true,
+        // The monaco-editor package under min/vs is copied in pre-minified
+        // (see CopyPlugin below) and uses syntax newer than this project's
+        // pinned Terser can parse, so re-minifying it just breaks the build.
+        exclude: /monaco-editor\/iframe\/node_modules\/monaco-editor/,
         terserOptions: {
           ecma: 6,
           output: {
