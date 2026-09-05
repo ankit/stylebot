@@ -1,4 +1,8 @@
 import Readability from 'readability';
+
+/* @ts-ignore */
+import { isProbablyReaderable } from '../../node_modules/readability/Readability-readerable';
+
 import { ReadabilityArticle } from '@stylebot/types';
 
 export const getDomainUrlAndSource = (): { url: string; source: string } => {
@@ -36,44 +40,28 @@ export const shouldRunOnUrl = (): boolean => {
   return true;
 };
 
+export const isReaderable = (): boolean => {
+  // Once mounted, the original content is stripped and the article lives
+  // in a shadow root `querySelectorAll` can't see — short-circuit instead.
+  if (document.getElementById('stylebot-reader')) {
+    return true;
+  }
+
+  return shouldRunOnUrl() && isProbablyReaderable(document);
+};
+
 /**
- * Fetch document object and apply readability
- *
- * Fetching url via XHR since document response is different v/s document loaded in browser.
- * same as https://dxr.mozilla.org/mozilla-central/source/toolkit/components/reader/ReaderMode.jsm#261
+ * Parse a clone of the live document — Readability mutates whatever it's
+ * given (strips scripts/styles etc.), so the original document must stay
+ * intact until reader mode is confirmed to apply.
  */
 export const getReadabilityArticle = async (): Promise<ReadabilityArticle> => {
-  return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', window.location.href, true);
-    xhr.responseType = 'document';
+  const doc = document.cloneNode(true) as Document;
+  const article = new Readability(doc).parse();
 
-    xhr.onload = () => {
-      if (xhr.status !== 200) {
-        reject();
-        return;
-      }
+  if (!article?.content) {
+    throw new Error('Readability failed to parse the page');
+  }
 
-      const doc = xhr.responseXML;
-      if (!doc) {
-        reject();
-        return;
-      }
-
-      try {
-        const article = new Readability(doc).parse();
-
-        if (article.content) {
-          resolve(article);
-          return;
-        }
-
-        reject();
-      } catch (e) {
-        reject();
-      }
-    };
-
-    xhr.send();
-  });
+  return article;
 };

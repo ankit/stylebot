@@ -1,5 +1,5 @@
 import { initReader } from './reader';
-import { shouldRunOnUrl } from './utils';
+import { shouldRunOnUrl, isReaderable } from './utils';
 import { showLoader, hideLoader } from './loader';
 import { cacheUrl, didUrlChange, revertToCachedDocument } from './cache';
 
@@ -46,3 +46,5 @@ export const remove = (): void => {
   revertToCachedDocument();
   document.getElementById('stylebot-reader')?.remove();
 };
+
+export { isReaderable };

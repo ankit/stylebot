@@ -12,7 +12,7 @@ import { cacheDocument } from './cache';
 const initCss = async (root: ShadowRoot): Promise<void> => {
   const cssUrl = chrome.runtime.getURL('readability/index.css');
 
-  return new Promise(resolve => {
+  return new Promise((resolve, reject) => {
     fetch(cssUrl, { method: 'GET' })
       .then(response => response.text())
       .then(css => {
@@ -21,7 +21,8 @@ const initCss = async (root: ShadowRoot): Promise<void> => {
         el.innerHTML = css;
         root.appendChild(el);
         resolve();
-      });
+      })
+      .catch(reject);
   });
 };
 
@@ -75,7 +76,7 @@ export const initReader = async (): Promise<void> => {
       const article = await getReadabilityArticle();
 
       cacheDocument();
-      initVueApp(url, source, article);
+      await initVueApp(url, source, article);
       resolve();
     } catch (e) {
       reject();

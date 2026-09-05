@@ -1,9 +1,14 @@
 <template>
-  <b-list-group-item class="full-row-toggle" @click="onRowClick">
+  <b-list-group-item
+    class="full-row-toggle"
+    :class="{ disabled }"
+    @click="onRowClick"
+  >
     <b-form-checkbox
       ref="checkbox"
       v-model="readability"
       switch
+      :disabled="disabled"
       @change="onChange"
     >
       {{ t('readability') }}
@@ -19,6 +24,7 @@ export default Vue.extend({
   name: 'Readability',
   props: {
     initialReadability: Boolean,
+    disabled: Boolean,
   },
 
   data(): {
@@ -37,6 +43,10 @@ export default Vue.extend({
 
   methods: {
     onRowClick(event: MouseEvent): void {
+      if (this.disabled) {
+        return;
+      }
+
       const target = event.target as HTMLElement;
 
       // Already handled natively by the label/input itself.
