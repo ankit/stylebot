@@ -43,6 +43,7 @@ import {
 
 import { initListeners } from '../listeners';
 import { initEditor } from '../utils/init-editor';
+import { readCache, writeCache } from '../../inject-css/cache';
 
 export default {
   async initialize(
@@ -161,6 +162,24 @@ export default {
       // when saving, cleanup any empty rules
       const cleanCss = removeEmptyRules(css);
       setStyle(state.url, cleanCss, state.readability);
+
+      // Keep the localStorage cache (read synchronously on the next page
+      // load, before chrome.storage.local resolves) in sync with edits, so
+      // reloading right after a change doesn't flash the pre-edit CSS.
+      const cached = readCache();
+      if (cached) {
+        const entry = { url: state.url, css: cleanCss, enabled: state.enabled };
+        const exists = cached.styles.some(style => style.url === state.url);
+
+        writeCache({
+          ...cached,
+          styles: exists
+            ? cached.styles.map(style =>
+                style.url === state.url ? entry : style
+              )
+            : [...cached.styles, entry],
+        });
+      }
     } catch (e) {
       //
     }
