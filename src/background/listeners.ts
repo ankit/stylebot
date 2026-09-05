@@ -142,7 +142,7 @@ chrome.runtime.onMessage.addListener(
         break;
 
       case 'SetReadability':
-        SetReadability(message);
+        SetReadability(message, sender);
         break;
       case 'GetReadabilitySettings':
         GetReadabilitySettings(sendResponse);

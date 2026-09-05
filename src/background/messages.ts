@@ -139,8 +139,20 @@ export const SetCommands = (message: SetCommandsType): void => {
   setCommands(message.value);
 };
 
-export const SetReadability = (message: SetReadabilityType): void => {
-  setReadability(message.url, message.value);
+export const SetReadability = async (
+  message: SetReadabilityType,
+  sender: chrome.runtime.MessageSender
+): Promise<void> => {
+  await setReadability(message.url, message.value);
+
+  const tab = sender.tab;
+  if (!tab || !tab.url) {
+    return;
+  }
+
+  const allStyles = await getAll();
+  const { styles, defaultStyle } = getStylesForPage(tab.url, allStyles);
+  updateIcon(tab, styles, defaultStyle);
 };
 
 export const GetReadabilitySettings = async (
