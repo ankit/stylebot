@@ -8,6 +8,7 @@
     width="30"
     height="30"
     viewBox="0 0 747 640"
+    class="popup-icon"
   >
     <path
       fill="#000"

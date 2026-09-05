@@ -38,13 +38,8 @@ export default Vue.extend({
 
 <style lang="scss">
 .open-stylebot {
-  svg {
-    height: 18px;
-    width: 18px;
-
-    path {
-      fill: #495057;
-    }
+  svg path {
+    fill: #495057;
   }
 }
 </style>
