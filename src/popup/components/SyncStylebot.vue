@@ -5,10 +5,7 @@
     :disabled="syncInProgress"
     @click="sync"
   >
-    <b-icon
-      icon="arrow-repeat"
-      :animation="syncInProgress ? 'spin' : undefined"
-    />
+    <arrow-repeat-icon :spinning="syncInProgress" />
 
     <span class="pl-2">
       {{ syncInProgress ? t('sync_in_progress') : t('sync_now') }}
@@ -24,11 +21,18 @@
 import Vue from 'vue';
 import { formatDistanceToNow } from 'date-fns';
 
-import { getGoogleDriveSyncMetadata } from '@stylebot/sync';
+// Bypasses @stylebot/sync, whose barrel also drags in runGoogleDriveSync's postcss dependency chain.
+import { getGoogleDriveSyncMetadata } from '../../sync/google-drive/sync-metadata';
 import { RunGoogleDriveSync } from '@stylebot/types';
+
+import ArrowRepeatIcon from './icons/ArrowRepeatIcon.vue';
 
 export default Vue.extend({
   name: 'SyncStylebot',
+
+  components: {
+    ArrowRepeatIcon,
+  },
 
   data(): {
     syncTime: string;

@@ -1,10 +1,10 @@
 <template>
   <b-list-group-item v-if="!seen" button @click="open">
-    <b-icon icon="broadcast" />
+    <broadcast-icon />
     <span class="pl-2">{{ t('see_whats_new_3_1') }}</span>
 
     <b-button class="dismiss-btn" :title="t('hide')" @click="dismiss">
-      <b-icon icon="x" scale="1.4" />
+      <x-icon :scale="1.4" />
     </b-button>
   </b-list-group-item>
 </template>
@@ -13,8 +13,16 @@
 import Vue from 'vue';
 import { getNotification, setNotification } from '@stylebot/utils';
 
+import BroadcastIcon from '../icons/BroadcastIcon.vue';
+import XIcon from '../icons/XIcon.vue';
+
 export default Vue.extend({
   name: 'ReleaseNotification',
+
+  components: {
+    BroadcastIcon,
+    XIcon,
+  },
 
   data(): {
     seen?: boolean;

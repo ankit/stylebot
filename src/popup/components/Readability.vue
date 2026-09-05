@@ -1,6 +1,11 @@
 <template>
-  <b-list-group-item>
-    <b-form-checkbox v-model="readability" switch @change="onChange">
+  <b-list-group-item class="full-row-toggle" @click="onRowClick">
+    <b-form-checkbox
+      ref="checkbox"
+      v-model="readability"
+      switch
+      @change="onChange"
+    >
       {{ t('readability') }}
     </b-form-checkbox>
   </b-list-group-item>
@@ -31,6 +36,19 @@ export default Vue.extend({
   },
 
   methods: {
+    onRowClick(event: MouseEvent): void {
+      const target = event.target as HTMLElement;
+
+      // Already handled natively by the label/input itself.
+      if (target.closest('label, input')) {
+        return;
+      }
+
+      const checkbox = this.$refs.checkbox as Vue;
+      const input = checkbox.$el.querySelector('input');
+      input?.click();
+    },
+
     onChange(): void {
       chrome.tabs.query({ active: true }, ([tab]) => {
         if (tab.id) {

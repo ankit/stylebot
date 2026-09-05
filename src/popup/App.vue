@@ -34,7 +34,8 @@ import ReleaseNotification from './components/notifications/ReleaseNotification.
 
 import { getStyles, getCurrentTab, getIsStylebotOpen } from './utils';
 
-import { getGoogleDriveSyncEnabled } from '@stylebot/sync';
+// Bypasses @stylebot/sync, whose barrel also drags in runGoogleDriveSync's postcss dependency chain.
+import { getGoogleDriveSyncEnabled } from '../sync/google-drive/sync-metadata';
 import { GoogleDriveSyncMetadata } from '@stylebot/types';
 
 export default Vue.extend({
@@ -68,7 +69,7 @@ export default Vue.extend({
   },
 
   created() {
-    getCurrentTab(async tab => {
+    getCurrentTab(tab => {
       this.tab = tab;
 
       getIsStylebotOpen(this.tab, isOpen => {
@@ -79,16 +80,32 @@ export default Vue.extend({
         this.styles = styles.filter(style => style.css);
         this.readability = !!defaultStyle && defaultStyle.readability;
       });
+    });
 
-      this.googleDriveSyncEnabled = await getGoogleDriveSyncEnabled();
+    getGoogleDriveSyncEnabled().then(enabled => {
+      this.googleDriveSyncEnabled = enabled;
     });
   },
 });
 </script>
 
 <style lang="scss">
-@import '~bootstrap';
-@import '~bootstrap-vue';
+// Only the pieces this popup's components use, not the full frameworks.
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/variables';
+@import '~bootstrap/scss/mixins';
+@import '~bootstrap/scss/root';
+@import '~bootstrap/scss/reboot';
+@import '~bootstrap/scss/type';
+@import '~bootstrap/scss/transitions';
+@import '~bootstrap/scss/buttons';
+@import '~bootstrap/scss/custom-forms';
+@import '~bootstrap/scss/list-group';
+
+@import '~bootstrap-vue/src/variables';
+@import '~bootstrap-vue/src/utilities';
+@import '~bootstrap-vue/src/custom-controls';
+@import '~bootstrap-vue/src/components/form-checkbox/index';
 
 body,
 span {
@@ -108,5 +125,17 @@ span {
       outline: none;
     }
   }
+}
+
+.popup-icon {
+  width: 18px;
+  height: 18px;
+  margin-left: 5px;
+  margin-right: 9px;
+  vertical-align: -0.25em;
+}
+
+.full-row-toggle {
+  cursor: pointer;
 }
 </style>

@@ -3,13 +3,9 @@ import { t } from '@stylebot/i18n';
 
 import App from './App.vue';
 
-import {
-  IconsPlugin,
-  ListGroupPlugin,
-  FormCheckboxPlugin,
-} from 'bootstrap-vue';
+import { ListGroupPlugin } from 'bootstrap-vue/esm/components/list-group';
+import { FormCheckboxPlugin } from 'bootstrap-vue/esm/components/form-checkbox';
 
-Vue.use(IconsPlugin);
 Vue.use(ListGroupPlugin);
 Vue.use(FormCheckboxPlugin);
 

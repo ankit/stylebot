@@ -1,6 +1,7 @@
 <template>
-  <b-list-group-item>
+  <b-list-group-item class="full-row-toggle" @click="onRowClick">
     <b-form-checkbox
+      ref="checkbox"
       v-model="enabled"
       switch
       :disabled="disableToggle"
@@ -39,6 +40,23 @@ export default Vue.extend({
   },
 
   methods: {
+    onRowClick(event: MouseEvent): void {
+      if (this.disableToggle) {
+        return;
+      }
+
+      const target = event.target as HTMLElement;
+
+      // Already handled natively by the label/input itself.
+      if (target.closest('label, input')) {
+        return;
+      }
+
+      const checkbox = this.$refs.checkbox as Vue;
+      const input = checkbox.$el.querySelector('input');
+      input?.click();
+    },
+
     onChange(): void {
       if (this.enabled) {
         this.enable();
