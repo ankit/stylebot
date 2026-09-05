@@ -1,6 +1,5 @@
-// Launches Chrome with the Stylebot extension and hot-reloads it in place on
-// every rebuild. Uses CDP instead of --load-extension since Chrome 137+
-// disabled that flag, and extensions loaded with it can't be reloaded.
+// Launches Chrome with the Stylebot extension and hot-reloads it on every rebuild.
+// Uses CDP instead of --load-extension since Chrome 137+ disabled that flag.
 
 import { chromium } from 'playwright';
 import { existsSync, mkdirSync, readFileSync, watch, writeFileSync } from 'node:fs';
@@ -17,6 +16,8 @@ const startUrl = 'https://news.ycombinator.com';
 // Set by `yarn dev:chrome`: wait for a build that finishes after this script
 // starts, rather than trusting a marker left over from a previous run.
 const waitForFreshBuild = process.env.STYLEBOT_FRESH_BUILD === '1';
+// Set by `yarn dev:chrome:headless`: no window, for hands-off verification runs.
+const headless = process.env.STYLEBOT_HEADLESS === '1';
 
 const readMarker = () => (existsSync(buildMarkerPath) ? readFileSync(buildMarkerPath, 'utf8') : null);
 
@@ -51,8 +52,8 @@ const waitForBuild = async () => {
 
   console.log(
     waitForFreshBuild
-      ? 'Waiting for the initial build from `yarn watch`...'
-      : 'Waiting for the build (dist/) — run `yarn build` or `yarn watch`...'
+      ? '⏳ Waiting for the initial build from `yarn watch`...'
+      : '⏳ Waiting for the build (dist/) — run `yarn build` or `yarn watch`...'
   );
   await waitForMarkerChange(baseline);
 };
@@ -75,7 +76,7 @@ const clearCrashFlags = () => {
 clearCrashFlags();
 
 const context = await chromium.launchPersistentContext(userDataDir, {
-  headless: false,
+  headless,
   // Playwright's bundled "Chrome for Testing" build gets flagged as a bot by some sites.
   channel: 'chrome',
   // Otherwise Playwright adds --no-sandbox, which real Chrome (unlike "for Testing") nags about.
@@ -91,7 +92,7 @@ const context = await chromium.launchPersistentContext(userDataDir, {
   args: [
     // Required for Extensions.loadUnpacked.
     '--enable-unsafe-extension-debugging',
-    '--start-maximized',
+    ...(headless ? [] : ['--start-maximized']),
   ],
 });
 
@@ -163,9 +164,9 @@ const extensionId = await loadExtension();
 const page = context.pages()[0] ?? (await context.newPage());
 await page.goto(startUrl);
 
-console.log(`\n✓ Stylebot loaded on Hacker News — extension id: ${extensionId}`);
-console.log('  Watching ./dist — the extension hot-reloads in place on rebuild.');
-console.log('  Close the browser window to exit.\n');
+console.log(`\n🎉 Stylebot loaded on Hacker News — extension id: ${extensionId}`);
+console.log('👀 Watching ./dist — the extension hot-reloads in place on rebuild.');
+console.log(headless ? '🛑 Press Ctrl+C to exit.\n' : '🪟 Close the browser window to exit.\n');
 
 let reloading = false;
 let pending = false;
@@ -180,9 +181,9 @@ const hotReload = async () => {
   try {
     await loadExtension();
     await reloadTabs();
-    console.log(`↻ reloaded  ${new Date().toLocaleTimeString()}`);
+    console.log(`🔄 reloaded  ${new Date().toLocaleTimeString()}`);
   } catch (err) {
-    console.error('reload failed:', err.message);
+    console.error('❌ reload failed:', err.message);
   } finally {
     reloading = false;
     if (pending) {
