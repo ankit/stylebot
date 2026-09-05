@@ -14,7 +14,7 @@
 
     <b-col cols="7">
       <b-form-checkbox v-model="enabled" @change="$emit('toggle')">
-        {{ url }}
+        <span class="style-url">{{ url }}</span>
       </b-form-checkbox>
 
       <span class="style-timestamp">updated {{ formattedTimestamp }}</span>
@@ -106,6 +106,10 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .style {
   border-bottom: 1px solid #ddd;
+}
+
+.style-url {
+  overflow-wrap: anywhere;
 }
 
 .style-timestamp {
