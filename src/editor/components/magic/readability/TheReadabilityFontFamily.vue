@@ -14,7 +14,7 @@
 import Vue from 'vue';
 
 import { StylebotFonts } from '@stylebot/types';
-import { readabilityFonts } from '@stylebot/settings';
+import { readabilityFonts } from '@stylebot/readability';
 
 import FontFamilyDropdown from '../../text/FontFamilyDropdown.vue';
 

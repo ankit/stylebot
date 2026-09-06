@@ -6,13 +6,13 @@ import {
   setAll,
   move,
   getStylesForPage,
-  updateIcon,
   setReadability,
-  getIsReadabilityActive,
   refreshBadgeForTab,
   getImportCss,
   applyStylesToAllTabs,
 } from './styles';
+
+import { getIsReadabilityActive, updateIcon } from './badge';
 
 import {
   get as getOption,
