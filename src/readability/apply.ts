@@ -1,7 +1,16 @@
 import { initReader } from './reader';
-import { shouldRunOnUrl } from './utils';
+import { shouldRunOnUrl, isMediaWikiMainPage } from './heuristics';
 import { showLoader, hideLoader } from './loader';
 import { cacheUrl, didUrlChange, revertToCachedDocument } from './cache';
+
+import { ReadabilityActiveChanged } from '@stylebot/types';
+
+// Tells the background to refresh the badge — carries no state itself,
+// it re-queries the live DOM instead of trusting a passed value.
+const reportChanged = (): void => {
+  const message: ReadabilityActiveChanged = { name: 'ReadabilityActiveChanged' };
+  chrome.runtime.sendMessage(message);
+};
 
 // Client-rendered pages can still be empty right after load — retry a few
 // times before giving up, so hydration has a chance to finish.
@@ -20,6 +29,17 @@ const clearPendingRetry = (): void => {
   }
 };
 
+// Checked once, not retried like initReader()'s heuristic — more waiting
+// won't change whether this is the wiki's main page.
+const startIfEligible = (myGeneration: number): void => {
+  if (isMediaWikiMainPage()) {
+    remove();
+    return;
+  }
+
+  run(myGeneration);
+};
+
 const run = async (myGeneration: number, attempt = 0): Promise<void> => {
   if (myGeneration !== generation) {
     return;
@@ -27,6 +47,7 @@ const run = async (myGeneration: number, attempt = 0): Promise<void> => {
 
   try {
     await initReader();
+    reportChanged();
   } catch (e) {
     if (myGeneration !== generation) {
       return;
@@ -70,17 +91,36 @@ export const apply = async (forceApply = false): Promise<void> => {
   // mid-load) means it never fires, leaving the loader up forever.
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-      run(myGeneration);
+      startIfEligible(myGeneration);
     });
   } else {
-    run(myGeneration);
+    startIfEligible(myGeneration);
   }
 };
+
+// Kept in sync with the `.stylebot-reader.closing` transition duration.
+const CLOSE_TRANSITION_MS = 250;
 
 export const remove = (): void => {
   generation++;
   clearPendingRetry();
   hideLoader();
   revertToCachedDocument();
-  document.getElementById('stylebot-reader')?.remove();
+
+  const host = document.getElementById('stylebot-reader');
+  const panel = host?.shadowRoot?.querySelector<HTMLElement>('.stylebot-reader');
+
+  if (!panel) {
+    host?.remove();
+    reportChanged();
+    return;
+  }
+
+  // The original page is already back underneath — fade the panel out
+  // before detaching it instead of cutting away abruptly.
+  panel.classList.add('closing');
+  setTimeout(() => {
+    host?.remove();
+    reportChanged();
+  }, CLOSE_TRANSITION_MS);
 };

@@ -3,42 +3,17 @@ import * as postcss from 'postcss';
 import { getCurrentTimestamp } from '@stylebot/utils';
 import { getStylesForPage } from '@stylebot/styles';
 
-import {
-  Style,
-  StyleMap,
-  StyleWithoutUrl,
-  ApplyStylesToTab,
-} from '@stylebot/types';
+import { StyleMap, StyleWithoutUrl, ApplyStylesToTab } from '@stylebot/types';
+
+import { getIsReadabilityActive, updateIcon } from './badge';
 
 export { getStylesForPage } from '@stylebot/styles';
-
-export const updateIcon = (
-  tab: chrome.tabs.Tab,
-  styles: Array<Style>,
-  defaultStyle?: Style
-): void => {
-  const enabledStyles = styles.filter(style => style.enabled);
-
-  if (defaultStyle && defaultStyle.readability) {
-    chrome.action.setBadgeText({
-      text: `R`,
-      tabId: tab.id,
-    });
-  } else if (enabledStyles.length > 0) {
-    chrome.action.setBadgeText({
-      text: `${enabledStyles.length}`,
-      tabId: tab.id,
-    });
-  } else {
-    chrome.action.setBadgeText({ text: '', tabId: tab.id });
-  }
-};
 
 export const applyStylesToAllTabs = async (): Promise<void> => {
   const allStyles = await getAll();
 
   chrome.tabs.query({}, tabs => {
-    tabs.forEach(tab => {
+    tabs.forEach(async tab => {
       if (tab && tab.url && tab.id) {
         const { styles, defaultStyle } = getStylesForPage(tab.url, allStyles);
 
@@ -51,11 +26,23 @@ export const applyStylesToAllTabs = async (): Promise<void> => {
         chrome.tabs.sendMessage(tab.id, message);
 
         if (tab.active) {
-          updateIcon(tab, styles, defaultStyle);
+          const readabilityActive = await getIsReadabilityActive(tab.id);
+          updateIcon(tab, styles, readabilityActive);
         }
       }
     });
   });
+};
+
+export const refreshBadgeForTab = async (tab: chrome.tabs.Tab): Promise<void> => {
+  if (!tab.url || tab.id === undefined) {
+    return;
+  }
+
+  const allStyles = await getAll();
+  const { styles } = getStylesForPage(tab.url, allStyles);
+  const readabilityActive = await getIsReadabilityActive(tab.id);
+  updateIcon(tab, styles, readabilityActive);
 };
 
 export const getAll = (): Promise<StyleMap> =>

@@ -19,6 +19,8 @@ if (window === window.top) {
     (message: TabMessage, _sender, sendResponse: (response: boolean) => void) => {
       if (message.name === 'GetIsPageReaderable') {
         sendResponse(isReaderable());
+      } else if (message.name === 'GetIsReadabilityActive') {
+        sendResponse(!!document.getElementById('stylebot-reader'));
       }
     }
   );

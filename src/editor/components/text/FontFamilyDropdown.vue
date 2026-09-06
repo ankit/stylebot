@@ -8,6 +8,7 @@
         :disabled="disabled"
         variant="outline-secondary"
         class="font-family-dropdown"
+        @hide="$emit('preview', null)"
       >
         <b-dropdown-item v-if="!hideDefault" @click="$emit('select', '')">
           {{ t('default') }}
@@ -17,11 +18,13 @@
           v-for="font in fonts"
           :key="font"
           @click="$emit('select', font)"
+          @mouseenter.native="$emit('preview', font)"
+          @mouseleave.native="$emit('preview', null)"
         >
           {{ font }}
         </b-dropdown-item>
 
-        <b-dropdown-item @click="editFonts">
+        <b-dropdown-item v-if="!hideEditFontList" @click="editFonts">
           {{ t('fonts_edit_list') }}
         </b-dropdown-item>
       </b-dropdown>
@@ -58,6 +61,10 @@ export default Vue.extend({
       required: true,
     },
     hideDefault: {
+      type: Boolean,
+      required: false,
+    },
+    hideEditFontList: {
       type: Boolean,
       required: false,
     },

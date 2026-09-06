@@ -16,14 +16,14 @@ import {
   EnableStyle,
   DisableStyle,
   SetReadability,
+  ReadabilityActiveChanged,
   GetReadabilitySettings,
   SetReadabilitySettings,
   GetImportCss,
   RunGoogleDriveSync,
 } from './messages';
 
-import { getAll, updateIcon } from './styles';
-import { getStylesForPage } from '@stylebot/styles';
+import { refreshBadgeForTab } from './styles';
 import { get as getOption } from './options';
 
 import {
@@ -48,16 +48,11 @@ chrome.runtime.onInstalled.addListener(async ({ reason }) => {
 });
 
 /**
- * When an existing tab is updated, refresh the context-menu, badge and
- * action. The badge is refreshed here (rather than in response to the
- * content script's own initial styles lookup) since that lookup now reads
- * chrome.storage.local directly and no longer messages the background page.
+ * When an existing tab is updated, refresh the context-menu and badge.
  */
 chrome.tabs.onUpdated.addListener(async (tabId, _, tab) => {
   if (tab.status === 'complete' && tab.url) {
-    const allStyles = await getAll();
-    const { styles, defaultStyle } = getStylesForPage(tab.url, allStyles);
-    updateIcon(tab, styles, defaultStyle);
+    await refreshBadgeForTab(tab);
   }
 
   const option = await getOption('contextMenu');
@@ -143,6 +138,9 @@ chrome.runtime.onMessage.addListener(
 
       case 'SetReadability':
         SetReadability(message, sender);
+        break;
+      case 'ReadabilityActiveChanged':
+        ReadabilityActiveChanged(message, sender);
         break;
       case 'GetReadabilitySettings':
         GetReadabilitySettings(sendResponse);

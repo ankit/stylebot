@@ -4,6 +4,7 @@
       size="sm"
       :title="`${t('basic_mode_description')} (b)`"
       :variant="mode === 'basic' ? 'secondary' : 'outline-secondary'"
+      :disabled="readability"
       @click="setMode('basic')"
     >
       <b-icon icon="image" aria-hidden="true" />
@@ -14,6 +15,7 @@
       size="sm"
       :title="`${t('code_mode_description')} (c)`"
       :variant="mode === 'code' ? 'secondary' : 'outline-secondary'"
+      :disabled="readability"
       @click="setMode('code')"
     >
       <b-icon icon="code" aria-hidden="true" />
@@ -41,6 +43,10 @@ export default Vue.extend({
   computed: {
     mode(): string {
       return this.$store.state.options.mode;
+    },
+
+    readability(): boolean {
+      return this.$store.getters.readabilityActive;
     },
   },
 

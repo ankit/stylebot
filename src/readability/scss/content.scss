@@ -19,22 +19,33 @@
   h1,
   h2,
   h3 {
-    font-weight: bold;
+    font-weight: 700;
+    margin: 1.8em 0 0.6em;
+
+    &:first-child {
+      margin-top: 0;
+    }
   }
 
   h1 {
     font-size: 1.6em;
-    line-height: 1.25em;
+    line-height: 1.3em;
   }
 
   h2 {
-    font-size: 1.2em;
-    line-height: 1.51em;
+    font-size: 1.3em;
+    line-height: 1.45em;
   }
 
   h3 {
-    font-size: 1em;
-    line-height: 1.66em;
+    font-size: 1.1em;
+    line-height: 1.5em;
+  }
+
+  hr {
+    border: 0;
+    border-top: 1px solid var(--border-color);
+    margin: 2em 0;
   }
 
   a:link {
@@ -45,11 +56,11 @@
   a:link,
   a:link:hover,
   a:link:active {
-    color: #0095dd;
+    color: var(--link-color, #0095dd);
   }
 
   a:visited {
-    color: #c2e;
+    color: var(--link-visited-color, #c2e);
   }
 
   * {
@@ -83,29 +94,55 @@
   p > img:only-child,
   p > a:only-child > img:only-child,
   .wp-caption img,
-  figure img {
-    display: block;
-  }
-
+  figure img,
   img[moz-reader-center] {
+    display: block;
     margin-inline: auto;
   }
 
+  p > img:only-child,
+  p > a:only-child > img:only-child,
+  td[colspan] img,
+  .wp-caption img,
+  figure img,
+  img[moz-reader-center] {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--main-foreground) 20%, transparent);
+  }
+
   .caption,
-  .wp-caption-text figcaption {
+  .wp-caption-text figcaption,
+  figcaption {
+    display: block;
+    margin-top: 0.6em;
+    text-align: center;
     font-size: 0.9em;
     line-height: 1.48em;
     font-style: italic;
+    color: var(--muted-foreground);
+  }
+
+  // Decorative credit/type icons (camera, play button, etc.) — the caption
+  // text already states this, and the icon loses its source page's spacing.
+  figcaption svg {
+    display: none;
   }
 
   code,
   pre {
     white-space: pre-wrap;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
+  }
+
+  pre {
+    background: color-mix(in srgb, var(--main-foreground) 6%, transparent);
   }
 
   blockquote {
     padding: 0;
     padding-inline-start: 16px;
+    border-inline-start: 3px solid var(--link-color);
+    color: var(--muted-foreground);
   }
 
   ul,
@@ -123,17 +160,48 @@
     list-style: decimal;
   }
 
-  table,
+  table {
+    width: 100% !important;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 1.5em 0;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
   th,
   td {
-    border: 1px solid currentColor;
-    border-collapse: collapse;
-    padding: 6px;
+    width: auto !important;
+    border: 0;
+    border-bottom: 1px solid var(--border-color);
+    border-inline-end: 1px solid var(--border-color);
+    padding: 8px 12px;
     vertical-align: top;
   }
 
-  table {
-    margin: 5px;
+  th {
+    background: color-mix(in srgb, var(--main-foreground) 6%, transparent);
+  }
+
+  // Infobox image rows span both columns via colspan — the image is often
+  // nested too deep for margin-auto, so center via the cell's text-align.
+  td[colspan] {
+    text-align: center;
+  }
+
+  td[colspan] img {
+    display: inline-block;
+  }
+
+  tr:last-child > td,
+  tr:last-child > th {
+    border-bottom: 0;
+  }
+
+  tr > td:last-child,
+  tr > th:last-child {
+    border-inline-end: 0;
   }
 
   /* Visually hide (but don't display: none) screen reader elements */

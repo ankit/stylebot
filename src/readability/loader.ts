@@ -5,9 +5,9 @@ import { ReadabilityTheme } from '@stylebot/types';
 const THEME_CACHE_KEY = 'stylebot-reader-theme';
 
 const THEME_BACKGROUNDS: Record<ReadabilityTheme, string> = {
-  light: '#fff',
+  light: '#faf8f3',
   sepia: '#f4ecd8',
-  dark: '#222',
+  dark: '#201f1d',
 };
 
 export const cacheTheme = (theme: ReadabilityTheme): void => {
