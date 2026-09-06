@@ -16,13 +16,14 @@ import {
   EnableStyle,
   DisableStyle,
   SetReadability,
+  ReadabilityActiveChanged,
   GetReadabilitySettings,
   SetReadabilitySettings,
   GetImportCss,
   RunGoogleDriveSync,
 } from './messages';
 
-import { getAll, updateIcon } from './styles';
+import { getAll, updateIcon, getIsReadabilityActive } from './styles';
 import { getStylesForPage } from '@stylebot/styles';
 import { get as getOption } from './options';
 
@@ -56,8 +57,9 @@ chrome.runtime.onInstalled.addListener(async ({ reason }) => {
 chrome.tabs.onUpdated.addListener(async (tabId, _, tab) => {
   if (tab.status === 'complete' && tab.url) {
     const allStyles = await getAll();
-    const { styles, defaultStyle } = getStylesForPage(tab.url, allStyles);
-    updateIcon(tab, styles, defaultStyle);
+    const { styles } = getStylesForPage(tab.url, allStyles);
+    const readabilityActive = await getIsReadabilityActive(tabId);
+    updateIcon(tab, styles, readabilityActive);
   }
 
   const option = await getOption('contextMenu');
@@ -143,6 +145,9 @@ chrome.runtime.onMessage.addListener(
 
       case 'SetReadability':
         SetReadability(message, sender);
+        break;
+      case 'ReadabilityActiveChanged':
+        ReadabilityActiveChanged(message, sender);
         break;
       case 'GetReadabilitySettings':
         GetReadabilitySettings(sendResponse);

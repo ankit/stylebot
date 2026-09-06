@@ -75,6 +75,13 @@ export type SetReadability = {
   value: boolean;
 };
 
+// Sent whenever the reader mounts or unmounts, so the background can
+// refresh the badge — carries no state itself; the background re-queries
+// GetIsReadabilityActive on the sender's tab for the live answer.
+export type ReadabilityActiveChanged = {
+  name: 'ReadabilityActiveChanged';
+};
+
 export type GetCommands = {
   name: 'GetCommands';
 };
@@ -116,6 +123,7 @@ type BackgroundPageMessage =
   | OpenOptionsPage
   | OpenDonatePage
   | SetReadability
+  | ReadabilityActiveChanged
   | GetCommands
   | SetCommands
   | GetReadabilitySettings

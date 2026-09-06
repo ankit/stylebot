@@ -8,9 +8,22 @@ import {
   StyleMap,
   StyleWithoutUrl,
   ApplyStylesToTab,
+  GetIsReadabilityActive,
 } from '@stylebot/types';
 
 export { getStylesForPage } from '@stylebot/styles';
+
+// Whether the reader is actually mounted on this tab right now — asked live
+// from the content script rather than tracked/persisted in the background,
+// so there's no stale cached value to race against.
+export const getIsReadabilityActive = (tabId: number): Promise<boolean> =>
+  new Promise(resolve => {
+    const message: GetIsReadabilityActive = { name: 'GetIsReadabilityActive' };
+
+    chrome.tabs.sendMessage(tabId, message, (response: boolean) => {
+      resolve(!!response);
+    });
+  });
 
 // Signals "styles are applied here" — readability doesn't need its own
 // color since the 📖 badge glyph already reads as distinct on its own.
@@ -20,11 +33,11 @@ const DEFAULT_BADGE_COLOR = '#555';
 export const updateIcon = (
   tab: chrome.tabs.Tab,
   styles: Array<Style>,
-  defaultStyle?: Style
+  readabilityActive: boolean
 ): void => {
   const enabledStyles = styles.filter(style => style.enabled);
 
-  if (defaultStyle && defaultStyle.readability) {
+  if (readabilityActive) {
     chrome.action.setBadgeBackgroundColor({
       color: DEFAULT_BADGE_COLOR,
       tabId: tab.id,
@@ -55,7 +68,7 @@ export const applyStylesToAllTabs = async (): Promise<void> => {
   const allStyles = await getAll();
 
   chrome.tabs.query({}, tabs => {
-    tabs.forEach(tab => {
+    tabs.forEach(async tab => {
       if (tab && tab.url && tab.id) {
         const { styles, defaultStyle } = getStylesForPage(tab.url, allStyles);
 
@@ -68,7 +81,8 @@ export const applyStylesToAllTabs = async (): Promise<void> => {
         chrome.tabs.sendMessage(tab.id, message);
 
         if (tab.active) {
-          updateIcon(tab, styles, defaultStyle);
+          const readabilityActive = await getIsReadabilityActive(tab.id);
+          updateIcon(tab, styles, readabilityActive);
         }
       }
     });

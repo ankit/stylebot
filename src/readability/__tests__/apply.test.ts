@@ -26,6 +26,10 @@ describe('readability apply()/remove()', () => {
     jest.resetModules();
     jest.useFakeTimers();
 
+    global.chrome = {
+      runtime: { sendMessage: jest.fn() },
+    } as unknown as typeof chrome;
+
     readerModule = require('../reader');
     heuristicsModule = require('../heuristics');
     loaderModule = require('../loader');
