@@ -122,6 +122,12 @@
     color: var(--muted-foreground);
   }
 
+  // Decorative credit/type icons (camera, play button, etc.) — the caption
+  // text already states this, and the icon loses its source page's spacing.
+  figcaption svg {
+    display: none;
+  }
+
   code,
   pre {
     white-space: pre-wrap;
