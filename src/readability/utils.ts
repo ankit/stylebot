@@ -14,7 +14,10 @@ export const getDomainUrlAndSource = (): { url: string; source: string } => {
  */
 export const getReadabilityArticle = async (): Promise<ReadabilityArticle> => {
   const doc = document.cloneNode(true) as Document;
-  const article = new Defuddle(doc).parse();
+
+  // The clone has no defaultView, so Defuddle's small-image filter can't read
+  // rendered size and falls back to (often-wrong) static width/height attrs.
+  const article = new Defuddle(doc, { removeSmallImages: false }).parse();
 
   if (!article || !article.content) {
     throw new Error('Defuddle failed to parse the page');
