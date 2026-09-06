@@ -93,19 +93,27 @@
 
   p > img:only-child,
   p > a:only-child > img:only-child,
-  td > img:only-child,
-  td > a:only-child > img:only-child,
   .wp-caption img,
   figure img,
   img[moz-reader-center] {
     display: block;
     margin-inline: auto;
+  }
+
+  p > img:only-child,
+  p > a:only-child > img:only-child,
+  td[colspan] img,
+  .wp-caption img,
+  figure img,
+  img[moz-reader-center] {
     border-radius: 8px;
     box-shadow: 0 2px 8px color-mix(in srgb, var(--main-foreground) 20%, transparent);
   }
 
   .caption,
-  .wp-caption-text figcaption {
+  .wp-caption-text figcaption,
+  figcaption {
+    display: block;
     margin-top: 0.6em;
     text-align: center;
     font-size: 0.9em;
@@ -168,6 +176,16 @@
 
   th {
     background: color-mix(in srgb, var(--main-foreground) 6%, transparent);
+  }
+
+  // Infobox image rows span both columns via colspan — the image is often
+  // nested too deep for margin-auto, so center via the cell's text-align.
+  td[colspan] {
+    text-align: center;
+  }
+
+  td[colspan] img {
+    display: inline-block;
   }
 
   tr:last-child > td,
