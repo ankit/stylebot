@@ -93,17 +93,21 @@
 
   p > img:only-child,
   p > a:only-child > img:only-child,
+  td > img:only-child,
+  td > a:only-child > img:only-child,
   .wp-caption img,
-  figure img {
-    display: block;
-  }
-
+  figure img,
   img[moz-reader-center] {
+    display: block;
     margin-inline: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--main-foreground) 20%, transparent);
   }
 
   .caption,
   .wp-caption-text figcaption {
+    margin-top: 0.6em;
+    text-align: center;
     font-size: 0.9em;
     line-height: 1.48em;
     font-style: italic;
