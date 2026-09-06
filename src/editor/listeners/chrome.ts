@@ -20,10 +20,8 @@ import { getStylesForPage } from '../utils/chrome';
 const initChromeListener = (store: Store<State>): void => {
   const { state, commit, dispatch } = store;
 
-  // chrome.tabs.onUpdated (and so 'TabUpdated') also fires for favicon/title
-  // changes with no navigation — only re-derive readability when the URL
-  // actually changed, so those don't race a just-persisted toggle. Starts
-  // null so the first 'TabUpdated' for this page load isn't skipped too.
+  // Re-derive readability only on real URL changes, not favicon/title-only
+  // TabUpdated events — null so the first event here still runs.
   let lastUrl: string | null = null;
 
   chrome.runtime.onMessage.addListener(

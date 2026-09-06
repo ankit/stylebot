@@ -17,9 +17,8 @@ export default {
     return getFilterEffectValueForPage('grayscale', state.css);
   },
 
-  // state.readability alone can be true domain-wide while this specific
-  // page doesn't actually qualify (e.g. a wiki's main page) — isReaderable()
-  // also accounts for whether the reader is already mounted.
+  // state.readability alone can be true domain-wide while this page
+  // doesn't actually qualify (e.g. a wiki's main page).
   readabilityActive: (state: State): boolean => {
     return state.readability && isReaderable();
   },
