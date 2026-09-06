@@ -5,7 +5,9 @@
       :fonts="fonts"
       :disabled="disabled"
       hide-default
+      hide-edit-font-list
       @select="select"
+      @preview="preview"
     />
   </b-input-group>
 </template>
@@ -14,6 +16,8 @@
 import Vue from 'vue';
 
 import { StylebotFonts } from '@stylebot/types';
+import { readabilityFonts } from '@stylebot/settings';
+import { previewReaderFont } from '@stylebot/readability';
 
 import FontFamilyDropdown from '../../text/FontFamilyDropdown.vue';
 
@@ -43,7 +47,7 @@ export default Vue.extend({
     },
 
     fonts(): StylebotFonts {
-      return this.$store.state.options.fonts;
+      return readabilityFonts;
     },
   },
 
@@ -53,6 +57,10 @@ export default Vue.extend({
         ...this.$store.state.readabilitySettings,
         font: value,
       });
+    },
+
+    preview(font: string | null): void {
+      previewReaderFont(font);
     },
 
     focus(event: FocusEvent): void {

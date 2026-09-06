@@ -1,8 +1,8 @@
 <template>
   <div
     v-if="font"
-    :class="`stylebot-reader ${theme}`"
-    :style="`font-family: ${font}; font-size: ${size}px; line-height: ${lineHeight}em`"
+    :class="[`stylebot-reader ${theme}`, { revealed }]"
+    :style="`font-family: ${previewFont || font}; font-size: ${size}px; line-height: ${lineHeight}em`"
   >
     <div class="stylebot-reader-body" :style="`max-width: ${width}em`">
       <the-reader-header
@@ -29,6 +29,7 @@ import {
 } from '@stylebot/css';
 
 import { hideLoader, cacheTheme } from '../loader';
+import { onPreviewReaderFont } from '../preview';
 
 import {
   GetReadabilitySettings,
@@ -69,8 +70,10 @@ export default Vue.extend({
     width: number;
     lineHeight: number;
     theme: ReadabilityTheme;
+    revealed: boolean;
+    previewFont: string | null;
   } {
-    return defaultReadabilitySettings;
+    return { ...defaultReadabilitySettings, revealed: false, previewFont: null };
   },
 
   async mounted(): Promise<void> {
@@ -94,6 +97,11 @@ export default Vue.extend({
       // Always reveal the reader — the original page is already gone,
       // so a stalled/failed fetch here would otherwise blank the page.
       hideLoader();
+
+      // The reader was just unhidden and never painted — force a reflow so
+      // the pre-fade style commits before we transition it.
+      void (this.$el as HTMLElement).offsetHeight;
+      this.revealed = true;
     }
 
     chrome.runtime.onMessage.addListener((message: UpdateReader) => {
@@ -106,6 +114,14 @@ export default Vue.extend({
 
         cacheTheme(message.value.theme);
         this.injectFont(this.font);
+      }
+    });
+
+    onPreviewReaderFont(font => {
+      this.previewFont = font;
+
+      if (font) {
+        this.injectFont(font);
       }
     });
   },

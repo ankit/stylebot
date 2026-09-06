@@ -12,6 +12,11 @@ import {
 
 export { getStylesForPage } from '@stylebot/styles';
 
+// Signals "styles are applied here" — readability doesn't need its own
+// color since the 📖 badge glyph already reads as distinct on its own.
+const STYLES_APPLIED_BADGE_COLOR = '#2e8b57';
+const DEFAULT_BADGE_COLOR = '#555';
+
 export const updateIcon = (
   tab: chrome.tabs.Tab,
   styles: Array<Style>,
@@ -20,16 +25,28 @@ export const updateIcon = (
   const enabledStyles = styles.filter(style => style.enabled);
 
   if (defaultStyle && defaultStyle.readability) {
+    chrome.action.setBadgeBackgroundColor({
+      color: DEFAULT_BADGE_COLOR,
+      tabId: tab.id,
+    });
     chrome.action.setBadgeText({
-      text: `R`,
+      text: `📖`,
       tabId: tab.id,
     });
   } else if (enabledStyles.length > 0) {
+    chrome.action.setBadgeBackgroundColor({
+      color: STYLES_APPLIED_BADGE_COLOR,
+      tabId: tab.id,
+    });
     chrome.action.setBadgeText({
       text: `${enabledStyles.length}`,
       tabId: tab.id,
     });
   } else {
+    chrome.action.setBadgeBackgroundColor({
+      color: DEFAULT_BADGE_COLOR,
+      tabId: tab.id,
+    });
     chrome.action.setBadgeText({ text: '', tabId: tab.id });
   }
 };

@@ -1,9 +1,8 @@
 import Vue from 'vue';
 
-import { isProbablyReaderable } from '@mozilla/readability';
-
 import App from './App.vue';
 import { getDomainUrlAndSource, getReadabilityArticle } from './utils';
+import { isProbablyAnArticle } from './heuristics';
 
 import { ReadabilityArticle } from '@stylebot/types';
 import { cacheDocument } from './cache';
@@ -65,7 +64,7 @@ const initVueApp = async (
 
 export const initReader = async (): Promise<void> => {
   return new Promise(async (resolve, reject) => {
-    if (!isProbablyReaderable(document)) {
+    if (!isProbablyAnArticle()) {
       reject();
       return;
     }

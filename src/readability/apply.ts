@@ -1,5 +1,5 @@
 import { initReader } from './reader';
-import { shouldRunOnUrl } from './utils';
+import { shouldRunOnUrl, isMediaWikiMainPage } from './heuristics';
 import { showLoader, hideLoader } from './loader';
 import { cacheUrl, didUrlChange, revertToCachedDocument } from './cache';
 
@@ -18,6 +18,18 @@ const clearPendingRetry = (): void => {
     clearTimeout(pendingRetry);
     pendingRetry = null;
   }
+};
+
+// Checked once when the DOM is ready, not retried like initReader()'s
+// Mozilla heuristic — waiting longer won't change whether this is the
+// wiki's main page, so retrying would just delay revealing the real page.
+const startIfEligible = (myGeneration: number): void => {
+  if (isMediaWikiMainPage()) {
+    remove();
+    return;
+  }
+
+  run(myGeneration);
 };
 
 const run = async (myGeneration: number, attempt = 0): Promise<void> => {
@@ -70,17 +82,32 @@ export const apply = async (forceApply = false): Promise<void> => {
   // mid-load) means it never fires, leaving the loader up forever.
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-      run(myGeneration);
+      startIfEligible(myGeneration);
     });
   } else {
-    run(myGeneration);
+    startIfEligible(myGeneration);
   }
 };
+
+// Kept in sync with the `.stylebot-reader.closing` transition duration.
+const CLOSE_TRANSITION_MS = 250;
 
 export const remove = (): void => {
   generation++;
   clearPendingRetry();
   hideLoader();
   revertToCachedDocument();
-  document.getElementById('stylebot-reader')?.remove();
+
+  const host = document.getElementById('stylebot-reader');
+  const panel = host?.shadowRoot?.querySelector<HTMLElement>('.stylebot-reader');
+
+  if (!panel) {
+    host?.remove();
+    return;
+  }
+
+  // The original page is already back underneath — fade the panel out
+  // before detaching it instead of cutting away abruptly.
+  panel.classList.add('closing');
+  setTimeout(() => host?.remove(), CLOSE_TRANSITION_MS);
 };

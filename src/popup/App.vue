@@ -5,13 +5,14 @@
         v-for="style in styles"
         :key="style.url"
         :url="style.url"
-        :disable-toggle="isOpen"
+        :disable-toggle="isOpen || (pageReaderable && readability)"
         :initial-enabled="style.enabled"
       />
 
       <readability
-        :initial-readability="readability"
+        :initial-readability="pageReaderable && readability"
         :disabled="!pageReaderable"
+        @change="readability = $event"
       />
 
       <toggle-stylebot :is-open="isOpen" :tab="tab" />
