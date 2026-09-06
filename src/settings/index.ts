@@ -1,7 +1,6 @@
 import {
   StylebotOptions,
   StylebotCommands,
-  StylebotFonts,
   ReadabilitySettings,
   StylebotEditorCommands,
 } from '@stylebot/types';
@@ -61,12 +60,3 @@ export const defaultReadabilitySettings: ReadabilitySettings = {
   lineHeight: 1.6,
   font: 'Merriweather',
 };
-
-// Kept apart from `defaultOptions.fonts`, which also powers the
-// general-purpose Text panel and needs display/code fonts too.
-export const readabilityFonts: StylebotFonts = [
-  'Merriweather',
-  'Georgia',
-  'Lora',
-  'Helvetica',
-];
