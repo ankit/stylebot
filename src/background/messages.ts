@@ -9,6 +9,7 @@ import {
   updateIcon,
   setReadability,
   getIsReadabilityActive,
+  refreshBadgeForTab,
   getImportCss,
   applyStylesToAllTabs,
 } from './styles';
@@ -151,30 +152,18 @@ export const SetReadability = async (
 ): Promise<void> => {
   await setReadability(message.url, message.value);
 
-  const tab = sender.tab;
-  if (!tab || !tab.url || tab.id === undefined) {
-    return;
+  if (sender.tab) {
+    await refreshBadgeForTab(sender.tab);
   }
-
-  const allStyles = await getAll();
-  const { styles } = getStylesForPage(tab.url, allStyles);
-  const readabilityActive = await getIsReadabilityActive(tab.id);
-  updateIcon(tab, styles, readabilityActive);
 };
 
 export const ReadabilityActiveChanged = async (
   _message: ReadabilityActiveChangedType,
   sender: chrome.runtime.MessageSender
 ): Promise<void> => {
-  const tab = sender.tab;
-  if (!tab || !tab.url || tab.id === undefined) {
-    return;
+  if (sender.tab) {
+    await refreshBadgeForTab(sender.tab);
   }
-
-  const allStyles = await getAll();
-  const { styles } = getStylesForPage(tab.url, allStyles);
-  const readabilityActive = await getIsReadabilityActive(tab.id);
-  updateIcon(tab, styles, readabilityActive);
 };
 
 export const GetReadabilitySettings = async (

@@ -49,11 +49,8 @@ export const shouldRunOnUrl = (): boolean => {
   return true;
 };
 
-// MediaWiki (Wikipedia and other wikis) embeds this flag on every page —
-// true only for the wiki's designated portal/home page, e.g. Main_Page.
-// Depends on script content, so it needs the DOM parsed — unlike
-// shouldRunOnUrl()'s checks, which only need the URL. Checked once, not
-// retried like isProbablyAnArticle(): more waiting won't change the answer.
+// MediaWiki embeds this flag on every page — true only for the wiki's
+// designated portal/home page, e.g. Main_Page.
 export const isMediaWikiMainPage = (): boolean =>
   [...document.scripts].some(script =>
     /"wgIsMainPage"\s*:\s*true/.test(script.textContent ?? '')

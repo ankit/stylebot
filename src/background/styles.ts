@@ -13,8 +13,7 @@ import {
 
 export { getStylesForPage } from '@stylebot/styles';
 
-// Whether the reader is actually mounted on this tab right now — asked live
-// from the content script rather than tracked/persisted in the background,
+// Asked live from the content script rather than tracked/persisted here,
 // so there's no stale cached value to race against.
 export const getIsReadabilityActive = (tabId: number): Promise<boolean> =>
   new Promise(resolve => {
@@ -87,6 +86,17 @@ export const applyStylesToAllTabs = async (): Promise<void> => {
       }
     });
   });
+};
+
+export const refreshBadgeForTab = async (tab: chrome.tabs.Tab): Promise<void> => {
+  if (!tab.url || tab.id === undefined) {
+    return;
+  }
+
+  const allStyles = await getAll();
+  const { styles } = getStylesForPage(tab.url, allStyles);
+  const readabilityActive = await getIsReadabilityActive(tab.id);
+  updateIcon(tab, styles, readabilityActive);
 };
 
 export const getAll = (): Promise<StyleMap> =>

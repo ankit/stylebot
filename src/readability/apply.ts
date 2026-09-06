@@ -5,9 +5,8 @@ import { cacheUrl, didUrlChange, revertToCachedDocument } from './cache';
 
 import { ReadabilityActiveChanged } from '@stylebot/types';
 
-// Tells the background to refresh the badge — carries no state itself, the
-// background re-queries the live DOM (GetIsReadabilityActive), so there's
-// no stale value to race against.
+// Tells the background to refresh the badge — carries no state itself,
+// it re-queries the live DOM instead of trusting a passed value.
 const reportChanged = (): void => {
   const message: ReadabilityActiveChanged = { name: 'ReadabilityActiveChanged' };
   chrome.runtime.sendMessage(message);
@@ -30,9 +29,8 @@ const clearPendingRetry = (): void => {
   }
 };
 
-// Checked once when the DOM is ready, not retried like initReader()'s
-// Mozilla heuristic — waiting longer won't change whether this is the
-// wiki's main page, so retrying would just delay revealing the real page.
+// Checked once, not retried like initReader()'s heuristic — more waiting
+// won't change whether this is the wiki's main page.
 const startIfEligible = (myGeneration: number): void => {
   if (isMediaWikiMainPage()) {
     remove();
