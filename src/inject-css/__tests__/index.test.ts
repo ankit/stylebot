@@ -12,6 +12,11 @@ describe('inject-css run()', () => {
   let cacheModule: typeof import('../cache');
   let hidePageModule: typeof import('../hide-page');
   let stylesModule: typeof import('@stylebot/styles');
+  let registeredListener: (
+    message: { name: string },
+    sender: unknown,
+    sendResponse: (response: boolean) => void
+  ) => void;
 
   beforeEach(() => {
     jest.resetModules();
@@ -25,7 +30,13 @@ describe('inject-css run()', () => {
 
     (global as any).chrome = {
       storage: { local: { get: jest.fn() } },
-      runtime: { onMessage: { addListener: jest.fn() } },
+      runtime: {
+        onMessage: {
+          addListener: (fn: typeof registeredListener) => {
+            registeredListener = fn;
+          },
+        },
+      },
     };
   });
 
@@ -140,5 +151,28 @@ describe('inject-css run()', () => {
       styles: [],
       readability: true,
     });
+  });
+
+  it('answers GetIsReadabilityActive based on whether #stylebot-reader is mounted', () => {
+    (cacheModule.readCache as jest.Mock).mockReturnValue(null);
+    (stylesModule.getStylesForPage as jest.Mock).mockReturnValue({
+      styles: [],
+      defaultStyle: undefined,
+    });
+
+    load({ styles: {} });
+
+    const sendResponse = jest.fn();
+    registeredListener({ name: 'GetIsReadabilityActive' }, {}, sendResponse);
+    expect(sendResponse).toHaveBeenLastCalledWith(false);
+
+    const host = document.createElement('div');
+    host.id = 'stylebot-reader';
+    document.body.appendChild(host);
+
+    registeredListener({ name: 'GetIsReadabilityActive' }, {}, sendResponse);
+    expect(sendResponse).toHaveBeenLastCalledWith(true);
+
+    host.remove();
   });
 });

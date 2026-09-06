@@ -34,6 +34,15 @@ export type GetIsPageReaderable = {
   name: 'GetIsPageReaderable';
 };
 
+// Whether the reader is actually mounted on this tab right now — distinct
+// from a style's stored readability preference, which can be true for a
+// whole domain while the current page doesn't actually qualify (e.g. a
+// listing page). Answered live from the DOM rather than tracked/persisted,
+// so there's no stale-state race to worry about.
+export type GetIsReadabilityActive = {
+  name: 'GetIsReadabilityActive';
+};
+
 export type UpdateReader = {
   name: 'UpdateReader';
   value: ReadabilitySettings;
@@ -48,6 +57,7 @@ type TabMessage =
   | TabUpdated
   | GetIsStylebotOpen
   | GetIsPageReaderable
+  | GetIsReadabilityActive
   | UpdateReader;
 
 export default TabMessage;

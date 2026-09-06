@@ -3,6 +3,16 @@ import { shouldRunOnUrl, isMediaWikiMainPage } from './heuristics';
 import { showLoader, hideLoader } from './loader';
 import { cacheUrl, didUrlChange, revertToCachedDocument } from './cache';
 
+import { ReadabilityActiveChanged } from '@stylebot/types';
+
+// Tells the background to refresh the badge — carries no state itself, the
+// background re-queries the live DOM (GetIsReadabilityActive), so there's
+// no stale value to race against.
+const reportChanged = (): void => {
+  const message: ReadabilityActiveChanged = { name: 'ReadabilityActiveChanged' };
+  chrome.runtime.sendMessage(message);
+};
+
 // Client-rendered pages can still be empty right after load — retry a few
 // times before giving up, so hydration has a chance to finish.
 export const RETRY_DELAYS_MS = [300, 600, 1200];
@@ -39,6 +49,7 @@ const run = async (myGeneration: number, attempt = 0): Promise<void> => {
 
   try {
     await initReader();
+    reportChanged();
   } catch (e) {
     if (myGeneration !== generation) {
       return;
@@ -103,11 +114,15 @@ export const remove = (): void => {
 
   if (!panel) {
     host?.remove();
+    reportChanged();
     return;
   }
 
   // The original page is already back underneath — fade the panel out
   // before detaching it instead of cutting away abruptly.
   panel.classList.add('closing');
-  setTimeout(() => host?.remove(), CLOSE_TRANSITION_MS);
+  setTimeout(() => {
+    host?.remove();
+    reportChanged();
+  }, CLOSE_TRANSITION_MS);
 };
