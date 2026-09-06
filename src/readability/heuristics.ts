@@ -56,9 +56,6 @@ export const isMediaWikiMainPage = (): boolean =>
     /"wgIsMainPage"\s*:\s*true/.test(script.textContent ?? '')
   );
 
-export const isProbablyAnArticle = (): boolean =>
-  isProbablyReaderable(document);
-
 export const isReaderable = (): boolean => {
   // Once mounted, the original content is stripped and the article lives
   // in a shadow root `querySelectorAll` can't see — short-circuit instead.
@@ -66,5 +63,7 @@ export const isReaderable = (): boolean => {
     return true;
   }
 
-  return shouldRunOnUrl() && !isMediaWikiMainPage() && isProbablyAnArticle();
+  return (
+    shouldRunOnUrl() && !isMediaWikiMainPage() && isProbablyReaderable(document)
+  );
 };
