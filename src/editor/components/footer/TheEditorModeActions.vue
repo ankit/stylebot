@@ -37,8 +37,6 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { isReaderable } from '@stylebot/readability';
-
 export default Vue.extend({
   name: 'TheEditorModeActions',
 
@@ -47,11 +45,8 @@ export default Vue.extend({
       return this.$store.state.options.mode;
     },
 
-    // state.readability alone can be true domain-wide while this specific
-    // page doesn't qualify (e.g. a MediaWiki main page) — isReaderable()
-    // also short-circuits true when the reader is already mounted.
     readability(): boolean {
-      return isReaderable() && this.$store.state.readability;
+      return this.$store.getters.readabilityActive;
     },
   },
 

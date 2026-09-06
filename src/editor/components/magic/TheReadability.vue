@@ -93,7 +93,7 @@ export default Vue.extend({
 
     value: {
       get(): boolean {
-        return this.pageReaderable && this.$store.state.readability;
+        return this.$store.getters.readabilityActive;
       },
 
       set(value: boolean): void {

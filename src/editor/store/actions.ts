@@ -1,5 +1,5 @@
 import * as postcss from 'postcss';
-import { Commit, Dispatch, Store } from 'vuex';
+import { Commit, Dispatch, GetterTree, Store } from 'vuex';
 
 import { State } from './';
 
@@ -96,7 +96,11 @@ export default {
   },
 
   openStylebot(
-    { state, commit }: { state: State; commit: Commit },
+    {
+      state,
+      commit,
+      getters,
+    }: { state: State; commit: Commit; getters: GetterTree<State, State> },
     { inspect = false, store }: { inspect: boolean; store: Store<State> }
   ): void {
     initEditor(store);
@@ -106,6 +110,13 @@ export default {
     }
 
     commit('setVisible', true);
+
+    // Editing page CSS has no effect while readability is running — show
+    // the Magic panel instead, without persisting over the user's actual
+    // mode preference for when they open Stylebot elsewhere.
+    if (getters.readabilityActive && state.options.mode !== 'magic') {
+      commit('setOptions', { ...state.options, mode: 'magic' });
+    }
 
     if (state.options.mode === 'basic' && inspect) {
       commit('setInspecting', true);
