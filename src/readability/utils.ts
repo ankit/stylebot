@@ -62,6 +62,18 @@ const withLeadImage = (content: string, imageUrl?: string): string => {
 
 const normalizeText = (text: string): string => text.replace(/\s+/g, ' ').trim();
 
+// Ad-slot labels (e.g. NYT's "Advertisement" / "SKIP ADVERTISEMENT") that sit
+// inline in the article flow and read as real content to Defuddle.
+const AD_MARKER_PATTERN = /^(advertisement|skip advertisement)$/i;
+
+const removeAdMarkers = (doc: Document): void => {
+  doc.querySelectorAll('p, div, span, a, h1, h2, h3, h4, h5, h6').forEach(el => {
+    if (el.children.length === 0 && AD_MARKER_PATTERN.test(normalizeText(el.textContent || ''))) {
+      el.remove();
+    }
+  });
+};
+
 // Defuddle's hero-block cleanup can drop a real subheadline as empty chrome;
 // article.description survives that removal, so recover it here.
 const withDescription = (content: string, description?: string): string => {
@@ -85,6 +97,8 @@ const withDescription = (content: string, description?: string): string => {
 // document must stay intact until reader mode is confirmed to apply.
 export const getReadabilityArticle = async (): Promise<ReadabilityArticle> => {
   const doc = document.cloneNode(true) as Document;
+
+  removeAdMarkers(doc);
 
   // The clone has no defaultView, so Defuddle's small-image filter can't
   // measure rendered size — copy naturalWidth/Height from the live images.
