@@ -31,6 +31,7 @@ import {
   SetAllStyles as SetAllStylesType,
   SetCommands as SetCommandsType,
   SetReadability as SetReadabilityType,
+  ReadabilityStateChanged,
   ReadabilityActiveChanged as ReadabilityActiveChangedType,
   SetReadabilitySettings as SetReadabilitySettingsType,
   GetImportCss as GetImportCssType,
@@ -154,6 +155,14 @@ export const SetReadability = async (
 
   if (sender.tab) {
     await refreshBadgeForTab(sender.tab);
+
+    if (sender.tab.id) {
+      const relay: ReadabilityStateChanged = {
+        name: 'ReadabilityStateChanged',
+        value: message.value,
+      };
+      chrome.tabs.sendMessage(sender.tab.id, relay);
+    }
   }
 };
 

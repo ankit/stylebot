@@ -64,6 +64,16 @@ const initChromeListener = (store: Store<State>): void => {
         });
       } else if (message.name === 'ToggleReadabilityForTab') {
         toggleReadability({ state, dispatch });
+      } else if (message.name === 'ReadabilityStateChanged') {
+        // Keep local state in sync when a change originates outside this
+        // action (e.g. the reader's own dock), so the next toggle isn't stale.
+        commit('setReadability', message.value);
+
+        if (message.value) {
+          applyReadability();
+        } else {
+          removeReadability();
+        }
       } else if (message.name === 'ApplyStylesToTab') {
         applyStyles({ dispatch }, message.defaultStyle, message.styles);
       }

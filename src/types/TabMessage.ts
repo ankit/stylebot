@@ -45,6 +45,13 @@ export type UpdateReader = {
   value: ReadabilitySettings;
 };
 
+// Relayed by the background after SetReadability persists, so a change
+// initiated outside the editor (e.g. the reader's own dock) stays in sync.
+export type ReadabilityStateChanged = {
+  name: 'ReadabilityStateChanged';
+  value: boolean;
+};
+
 type TabMessage =
   | ToggleStylebot
   | OpenStylebot
@@ -55,6 +62,7 @@ type TabMessage =
   | GetIsStylebotOpen
   | GetIsPageReaderable
   | GetIsReadabilityActive
-  | UpdateReader;
+  | UpdateReader
+  | ReadabilityStateChanged;
 
 export default TabMessage;
