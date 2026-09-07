@@ -7,10 +7,8 @@ export const getDomainUrlAndSource = (): { url: string; source: string } => {
   return { url: `${parts[0]}//${parts[2]}`, source: parts[2] };
 };
 
-// Sites often serve the same photo under multiple resized-variant URLs (a
-// different filename suffix, e.g. NYT's "-facebookJumbo" vs
-// "-mobileMasterAt3x", or a different resize query param) — comparing raw
-// URLs misses these, so compare directory + filename-prefix instead.
+// Sites serve the same photo under multiple resized-variant URLs, so compare
+// directory + filename-prefix instead of raw URLs.
 const imageIdentity = (url: string): { directory: string; stem: string } => {
   const withoutQuery = url.split('?')[0];
   const lastSlash = withoutQuery.lastIndexOf('/');
@@ -21,9 +19,8 @@ const imageIdentity = (url: string): { directory: string; stem: string } => {
   };
 };
 
-// A shared directory alone isn't enough — WordPress groups a whole month's
-// unrelated uploads under one directory — so also require the filenames to
-// share a meaningful prefix (the part before a size/variant suffix).
+// A shared directory alone isn't enough (WordPress groups a month's uploads
+// together), so also require a shared filename prefix.
 const isSameImage = (a: string, b: string): boolean => {
   const idA = imageIdentity(a);
   const idB = imageIdentity(b);
@@ -40,10 +37,8 @@ const isSameImage = (a: string, b: string): boolean => {
   return sharedPrefixLength >= Math.min(idA.stem.length, idB.stem.length) * 0.5;
 };
 
-// WordPress (and others) often render the hero image as a sibling of the
-// content container Defuddle scopes to, so it's resolved in metadata but
-// missing from `content` — build the tag via the DOM so the URL is safely
-// escaped, rather than interpolating it into an HTML string.
+// The hero image is often resolved in metadata but missing from `content`;
+// build the tag via the DOM so the URL is safely escaped.
 const withLeadImage = (content: string, imageUrl?: string): string => {
   if (!imageUrl || !/^https?:\/\//.test(imageUrl)) {
     return content;
@@ -67,10 +62,8 @@ const withLeadImage = (content: string, imageUrl?: string): string => {
 
 const normalizeText = (text: string): string => text.replace(/\s+/g, ' ').trim();
 
-// Defuddle's own "hero header block" cleanup treats a title+time+dek wrapper
-// as empty metadata chrome and deletes it whenever the dek reads as under 30
-// words of "prose" — dropping real subheadline text along with it. Its
-// article.description metadata survives that removal, so recover it here.
+// Defuddle's hero-block cleanup can drop a real subheadline as empty chrome;
+// article.description survives that removal, so recover it here.
 const withDescription = (content: string, description?: string): string => {
   if (!description) {
     return content;
@@ -88,23 +81,13 @@ const withDescription = (content: string, description?: string): string => {
   return `${p.outerHTML}${content}`;
 };
 
-/**
- * Parse a clone of the live document — Defuddle mutates whatever it's
- * given (strips scripts/styles etc.), so the original document must stay
- * intact until reader mode is confirmed to apply.
- */
+// Parse a clone — Defuddle mutates whatever it's given, so the original
+// document must stay intact until reader mode is confirmed to apply.
 export const getReadabilityArticle = async (): Promise<ReadabilityArticle> => {
   const doc = document.cloneNode(true) as Document;
 
-  // Defuddle's small-image filter (icons, tracking pixels) needs each image's
-  // rendered size, but it only measures when doc.defaultView === window — and a
-  // cloned document has no defaultView. Measuring the live DOM wouldn't help
-  // either: by parse time the loader has display:none'd the page, so
-  // getBoundingClientRect reads 0. naturalWidth/Height is immune to both (it's
-  // the intrinsic pixel size of the decoded image), so copy it from the live
-  // images onto the clone as width/height attributes — the same attributes the
-  // filter reads — replacing any misleading authored dimensions. cloneNode
-  // preserves image order, so the collections line up by index.
+  // The clone has no defaultView, so Defuddle's small-image filter can't
+  // measure rendered size — copy naturalWidth/Height from the live images.
   const liveImages = document.images;
   const clonedImages = doc.images;
 

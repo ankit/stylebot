@@ -15,10 +15,6 @@
   --border-color: #e4ddcf;
   --link-color: #0b6fb3;
   --link-visited-color: #7c3fa8;
-  // Soft, two-layer drop shadow tinted with the theme's ink — a tight contact
-  // shadow plus a wider ambient one, so images sit on the page rather than
-  // float. On dark, a plain shadow vanishes against near-black, so the first
-  // layer is a hairline light ring that defines the image edge instead.
   --image-shadow: 0 1px 3px rgba(43, 41, 38, 0.1),
     0 10px 28px rgba(43, 41, 38, 0.14);
 

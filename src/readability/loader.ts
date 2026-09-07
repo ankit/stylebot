@@ -38,12 +38,7 @@ export const cacheTheme = (theme: ReadabilityTheme): void => {
   }
 };
 
-/**
- * Hide document content until reader is ready
- * todo: optimize performance and UX when loading stylebot reader
- * currently, sometimes the page flashes before the reader content is loaded.
- * or a white screen appears for a prolonged period, especially for slower websites.
- */
+// Hide document content until reader is ready.
 export const showLoader = (): void => {
   let cachedTheme: ReadabilityTheme | null = null;
 
@@ -56,11 +51,8 @@ export const showLoader = (): void => {
   const background = (cachedTheme && THEME_BACKGROUNDS[cachedTheme]) || THEME_BACKGROUNDS.light;
   const foreground = (cachedTheme && THEME_FOREGROUNDS[cachedTheme]) || THEME_FOREGROUNDS.light;
 
-  // Paint the themed background inline on documentElement, synchronously and
-  // ahead of any stylesheet parse. An injected <style> only takes effect after
-  // a CSSOM parse + style recalc; an inline root style commits immediately, so
-  // the browser has the theme color for its first paint rather than the default
-  // white canvas.
+  // Set inline (not via <style>) so it commits before any CSSOM parse/recalc,
+  // ahead of the browser's first paint.
   document.documentElement.style.setProperty('background', background, 'important');
 
   const style = document.createElement('style');
