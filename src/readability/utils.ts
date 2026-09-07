@@ -96,11 +96,28 @@ const withDescription = (content: string, description?: string): string => {
 export const getReadabilityArticle = async (): Promise<ReadabilityArticle> => {
   const doc = document.cloneNode(true) as Document;
 
-  const article = new Defuddle(doc, {
-    // The clone has no defaultView, so Defuddle's small-image filter can't
-    // read rendered size and falls back to (often-wrong) width/height attrs.
-    removeSmallImages: false,
-  }).parse();
+  // Defuddle's small-image filter (icons, tracking pixels) needs each image's
+  // rendered size, but it only measures when doc.defaultView === window — and a
+  // cloned document has no defaultView. Measuring the live DOM wouldn't help
+  // either: by parse time the loader has display:none'd the page, so
+  // getBoundingClientRect reads 0. naturalWidth/Height is immune to both (it's
+  // the intrinsic pixel size of the decoded image), so copy it from the live
+  // images onto the clone as width/height attributes — the same attributes the
+  // filter reads — replacing any misleading authored dimensions. cloneNode
+  // preserves image order, so the collections line up by index.
+  const liveImages = document.images;
+  const clonedImages = doc.images;
+
+  for (let i = 0; i < clonedImages.length; i++) {
+    const live = liveImages[i];
+
+    if (live && live.naturalWidth > 0 && live.naturalHeight > 0) {
+      clonedImages[i].setAttribute('width', String(live.naturalWidth));
+      clonedImages[i].setAttribute('height', String(live.naturalHeight));
+    }
+  }
+
+  const article = new Defuddle(doc).parse();
 
   if (!article || !article.content) {
     throw new Error('Defuddle failed to parse the page');
