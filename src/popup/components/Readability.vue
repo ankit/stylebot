@@ -11,7 +11,8 @@
       :disabled="disabled"
       @change="onChange"
     >
-      {{ t('readability') }}
+      <div>{{ t('readability') }}</div>
+      <div v-if="domain" class="readability-domain">{{ domain }}</div>
     </b-form-checkbox>
   </b-list-group-item>
 </template>
@@ -23,6 +24,10 @@ import { ToggleReadabilityForTab } from '@stylebot/types';
 export default Vue.extend({
   name: 'Readability',
   props: {
+    domain: {
+      type: String,
+      default: '',
+    },
     initialReadability: Boolean,
     disabled: Boolean,
   },
@@ -75,3 +80,11 @@ export default Vue.extend({
   },
 });
 </script>
+
+<style lang="scss" scoped>
+.readability-domain {
+  font-size: 12px;
+  color: #888;
+  margin-top: 2px;
+}
+</style>

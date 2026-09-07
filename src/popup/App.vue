@@ -10,6 +10,7 @@
       />
 
       <readability
+        :domain="domain"
         :initial-readability="pageReaderable && readability"
         :disabled="!pageReaderable"
         @change="readability = $event"
@@ -77,6 +78,16 @@ export default Vue.extend({
       googleDriveSyncEnabled: false,
       googleDriveSyncMetadata: undefined,
     };
+  },
+
+  computed: {
+    domain(): string {
+      try {
+        return this.tab?.url ? new URL(this.tab.url).hostname : '';
+      } catch {
+        return '';
+      }
+    },
   },
 
   created() {
