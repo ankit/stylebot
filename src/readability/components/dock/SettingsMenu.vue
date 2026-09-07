@@ -4,41 +4,9 @@
 
     <font-picker :font="font" @pick="pickFont" />
 
-    <segmented
-      :prev-disabled="sizeIndex === 0"
-      :next-disabled="sizeIndex === SIZES.length - 1"
-      @prev="sizeDown"
-      @next="sizeUp"
-    >
-      <template #prev>
-        <span style="font: 400 11px/1 system-ui;">A</span>
-      </template>
-      <template #next>
-        <span style="font: 400 17px/1 system-ui;">A</span>
-      </template>
-    </segmented>
+    <font-size-picker :size="size" @pick="pickSize" />
 
-    <segmented
-      :prev-disabled="widthIndex === 0"
-      :next-disabled="widthIndex === WIDTHS.length - 1"
-      @prev="widthDown"
-      @next="widthUp"
-    >
-      <template #prev>
-        <span style="font: 400 12px/1 system-ui;">&rarr;&larr;</span>
-      </template>
-      <template #next>
-        <span
-          style="
-            font: 400 12px/1 system-ui;
-            display: inline-block;
-            transform: scaleX(2.1);
-          "
-        >
-          &harr;
-        </span>
-      </template>
-    </segmented>
+    <width-picker :width="width" @pick="pickWidth" />
 
     <justify-toggle :justify="justify" @pick="pickJustify" />
 
@@ -52,13 +20,13 @@
 import Vue, { PropType } from 'vue';
 
 import { defaultReadabilitySettings } from '@stylebot/settings';
-import { SIZES, WIDTHS, nearestStepIndex } from '@stylebot/readability';
 import { ReadabilitySettings, ReadabilityTheme } from '@stylebot/types';
 
 import MenuBox from './MenuBox.vue';
 import ThemePicker from './ThemePicker.vue';
 import FontPicker from './FontPicker.vue';
-import Segmented from './Segmented.vue';
+import FontSizePicker from './FontSizePicker.vue';
+import WidthPicker from './WidthPicker.vue';
 import JustifyToggle from './JustifyToggle.vue';
 
 export default Vue.extend({
@@ -68,7 +36,8 @@ export default Vue.extend({
     MenuBox,
     ThemePicker,
     FontPicker,
-    Segmented,
+    FontSizePicker,
+    WidthPicker,
     JustifyToggle,
   },
 
@@ -104,19 +73,6 @@ export default Vue.extend({
     },
   },
 
-  computed: {
-    SIZES: () => SIZES,
-    WIDTHS: () => WIDTHS,
-
-    sizeIndex(): number {
-      return nearestStepIndex(SIZES, this.size);
-    },
-
-    widthIndex(): number {
-      return nearestStepIndex(WIDTHS, this.width);
-    },
-  },
-
   methods: {
     emitUpdate(patch: Partial<ReadabilitySettings>): void {
       const value: ReadabilitySettings = {
@@ -143,24 +99,12 @@ export default Vue.extend({
       this.emitUpdate({ justify });
     },
 
-    sizeDown(): void {
-      this.emitUpdate({ size: SIZES[Math.max(0, this.sizeIndex - 1)] });
+    pickSize(size: number): void {
+      this.emitUpdate({ size });
     },
 
-    sizeUp(): void {
-      this.emitUpdate({
-        size: SIZES[Math.min(SIZES.length - 1, this.sizeIndex + 1)],
-      });
-    },
-
-    widthDown(): void {
-      this.emitUpdate({ width: WIDTHS[Math.max(0, this.widthIndex - 1)] });
-    },
-
-    widthUp(): void {
-      this.emitUpdate({
-        width: WIDTHS[Math.min(WIDTHS.length - 1, this.widthIndex + 1)],
-      });
+    pickWidth(width: number): void {
+      this.emitUpdate({ width });
     },
 
     reset(): void {
