@@ -8,6 +8,7 @@ import {
   GetAllOptions,
   OpenOptionsPage,
   OpenDonatePage,
+  OpenReportIssuePage,
   SetStyle,
   MoveStyle,
   GetAllStyles,
@@ -112,6 +113,9 @@ chrome.runtime.onMessage.addListener(
         break;
       case 'OpenDonatePage':
         OpenDonatePage();
+        break;
+      case 'OpenReportIssuePage':
+        OpenReportIssuePage();
         break;
 
       case 'SetStyle':

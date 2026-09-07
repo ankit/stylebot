@@ -53,3 +53,15 @@ export const sendReadabilitySettings = (value: ReadabilitySettings): void => {
   };
   chrome.runtime.sendMessage(message);
 };
+
+export const openOptionsPage = (): void => {
+  chrome.runtime.sendMessage({ name: 'OpenOptionsPage' });
+};
+
+export const openReportIssuePage = (): void => {
+  chrome.runtime.sendMessage({ name: 'OpenReportIssuePage' });
+};
+
+export const openDonatePage = (): void => {
+  chrome.runtime.sendMessage({ name: 'OpenDonatePage' });
+};

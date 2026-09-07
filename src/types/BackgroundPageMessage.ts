@@ -69,6 +69,10 @@ export type OpenDonatePage = {
   name: 'OpenDonatePage';
 };
 
+export type OpenReportIssuePage = {
+  name: 'OpenReportIssuePage';
+};
+
 export type SetReadability = {
   name: 'SetReadability';
   url: string;
@@ -121,6 +125,7 @@ type BackgroundPageMessage =
   | SetOption
   | OpenOptionsPage
   | OpenDonatePage
+  | OpenReportIssuePage
   | SetReadability
   | ReadabilityActiveChanged
   | GetCommands

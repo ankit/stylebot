@@ -7,20 +7,25 @@
         @mouseenter="showTip($event, closeTipText)"
         @mouseleave="hideTip"
       >
-        <svg width="18" height="18" viewBox="0 0 20 20">
-          <line x1="4.6" y1="4.6" x2="15.4" y2="15.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-          <line x1="15.4" y1="4.6" x2="4.6" y2="15.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-        </svg>
+        <icon-close />
       </button>
 
       <button
         class="stylebot-reader-dock-btn stylebot-reader-dock-aa"
         :class="{ active: open }"
-        @click="open = !open"
+        @click="toggleSettings"
         @mouseenter="showTip($event, 'Reading settings')"
         @mouseleave="hideTip"
       >
         Aa
+      </button>
+
+      <button
+        class="stylebot-reader-dock-btn stylebot-reader-dock-more-btn"
+        :class="{ active: moreOpen }"
+        @click="toggleMore"
+      >
+        &#8942;
       </button>
     </div>
 
@@ -73,24 +78,14 @@
           :class="{ active: !justify }"
           @click="pickJustify(false)"
         >
-          <svg width="18" height="13" viewBox="0 0 22 16">
-            <rect x="0" y="0" width="22" height="1.8" rx="0.9" fill="currentColor" />
-            <rect x="0" y="4.4" width="13.64" height="1.8" rx="0.9" fill="currentColor" />
-            <rect x="0" y="8.8" width="19.36" height="1.8" rx="0.9" fill="currentColor" />
-            <rect x="0" y="13.2" width="11" height="1.8" rx="0.9" fill="currentColor" />
-          </svg>
+          <icon-align-left />
         </button>
         <button
           class="stylebot-reader-dock-align"
           :class="{ active: justify }"
           @click="pickJustify(true)"
         >
-          <svg width="18" height="13" viewBox="0 0 22 16">
-            <rect x="0" y="0" width="22" height="1.8" rx="0.9" fill="currentColor" />
-            <rect x="0" y="4.4" width="22" height="1.8" rx="0.9" fill="currentColor" />
-            <rect x="0" y="8.8" width="22" height="1.8" rx="0.9" fill="currentColor" />
-            <rect x="0" y="13.2" width="22" height="1.8" rx="0.9" fill="currentColor" />
-          </svg>
+          <icon-align-justify />
         </button>
       </div>
 
@@ -99,10 +94,25 @@
       </div>
     </div>
 
+    <div v-else-if="moreOpen" class="stylebot-reader-dock-panel stylebot-reader-dock-more">
+      <button class="stylebot-reader-dock-more-item" @click="openOptions">
+        <icon-options />
+        Options
+      </button>
+      <button class="stylebot-reader-dock-more-item" @click="reportIssue">
+        <icon-flag />
+        Report an issue
+      </button>
+      <button class="stylebot-reader-dock-more-item" @click="donate">
+        <icon-coffee />
+        Donate
+      </button>
+    </div>
+
     <div
       v-if="tip"
       class="stylebot-reader-dock-tooltip"
-      :style="{ top: tipTop + 'px', right: tipRight + 'px' }"
+      :style="{ top: tipTop + 'px', left: tipLeft + 'px' }"
     >
       {{ tip }}
     </div>
@@ -121,8 +131,20 @@ import {
 } from '@stylebot/css';
 import { ReadabilitySettings, ReadabilityTheme } from '@stylebot/types';
 
-import { closeReader } from '../dock-actions';
+import {
+  closeReader,
+  openOptionsPage,
+  openReportIssuePage,
+  openDonatePage,
+} from '../dock-actions';
 import { THEME_BACKGROUNDS } from '../theme-colors';
+
+import IconClose from '../icons/IconClose.vue';
+import IconAlignLeft from '../icons/IconAlignLeft.vue';
+import IconAlignJustify from '../icons/IconAlignJustify.vue';
+import IconOptions from '../icons/IconOptions.vue';
+import IconFlag from '../icons/IconFlag.vue';
+import IconCoffee from '../icons/IconCoffee.vue';
 
 // Icons stay lit while the pointer is within this many px of the dock.
 const WAKE_RADIUS = 220;
@@ -130,6 +152,15 @@ const IDLE_DELAY_MS = 2600;
 
 export default Vue.extend({
   name: 'TheReaderDock',
+
+  components: {
+    IconClose,
+    IconAlignLeft,
+    IconAlignJustify,
+    IconOptions,
+    IconFlag,
+    IconCoffee,
+  },
 
   props: {
     theme: { type: String as PropType<ReadabilityTheme>, required: true },
@@ -142,19 +173,21 @@ export default Vue.extend({
 
   data(): {
     open: boolean;
+    moreOpen: boolean;
     idle: boolean;
     tip: string;
     tipTop: number;
-    tipRight: number;
+    tipLeft: number;
     idleTimeout: ReturnType<typeof setTimeout> | null;
     fontsPreloaded: boolean;
   } {
     return {
       open: false,
+      moreOpen: false,
       idle: false,
       tip: '',
       tipTop: 0,
-      tipRight: 0,
+      tipLeft: 0,
       idleTimeout: null,
       fontsPreloaded: false,
     };
@@ -182,8 +215,12 @@ export default Vue.extend({
       return nearestStepIndex(WIDTHS, this.width);
     },
 
+    anyPanelOpen(): boolean {
+      return this.open || this.moreOpen;
+    },
+
     dockOpacity(): number {
-      return this.idle && !this.open ? 0.45 : 1;
+      return this.idle && !this.anyPanelOpen ? 0.45 : 1;
     },
 
     closeTipText(): string {
@@ -199,8 +236,10 @@ export default Vue.extend({
         this.fontsPreloaded = true;
         this.preloadFonts();
       }
+    },
 
-      // Only listen while open, so a closed panel costs nothing.
+    anyPanelOpen(isOpen: boolean): void {
+      // Only listen while a panel is open, so a closed dock costs nothing.
       if (isOpen) {
         document.addEventListener('click', this.onDocumentClick);
       } else {
@@ -230,6 +269,7 @@ export default Vue.extend({
     onDocumentClick(event: MouseEvent): void {
       if (!event.composedPath().includes(this.$el)) {
         this.open = false;
+        this.moreOpen = false;
       }
     },
 
@@ -250,11 +290,11 @@ export default Vue.extend({
         }
         clearTimeout(this.idleTimeout);
         this.idleTimeout = setTimeout(() => {
-          if (!this.open) {
+          if (!this.anyPanelOpen) {
             this.idle = true;
           }
         }, IDLE_DELAY_MS);
-      } else if (!this.idle && !this.open) {
+      } else if (!this.idle && !this.anyPanelOpen) {
         clearTimeout(this.idleTimeout);
         this.idle = true;
       }
@@ -271,10 +311,14 @@ export default Vue.extend({
     },
 
     showTip(event: MouseEvent, text: string): void {
+      if (this.anyPanelOpen) {
+        return;
+      }
+
       const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
       this.tip = text;
-      this.tipTop = Math.round(rect.top + rect.height / 2);
-      this.tipRight = Math.round(window.innerWidth - rect.left + 10);
+      this.tipTop = Math.round(rect.bottom + 8);
+      this.tipLeft = Math.round(rect.left + rect.width / 2);
     },
 
     hideTip(): void {
@@ -283,6 +327,33 @@ export default Vue.extend({
 
     close(): void {
       closeReader();
+    },
+
+    toggleSettings(): void {
+      this.moreOpen = false;
+      this.open = !this.open;
+      this.hideTip();
+    },
+
+    toggleMore(): void {
+      this.open = false;
+      this.moreOpen = !this.moreOpen;
+      this.hideTip();
+    },
+
+    openOptions(): void {
+      this.moreOpen = false;
+      openOptionsPage();
+    },
+
+    reportIssue(): void {
+      this.moreOpen = false;
+      openReportIssuePage();
+    },
+
+    donate(): void {
+      this.moreOpen = false;
+      openDonatePage();
     },
 
     emitUpdate(patch: Partial<ReadabilitySettings>): void {
@@ -375,6 +446,15 @@ export default Vue.extend({
 
 .stylebot-reader-dock-aa {
   font: 500 15px/1 system-ui, -apple-system, sans-serif;
+
+  &.active {
+    background: color-mix(in srgb, var(--main-foreground) 6%, transparent);
+    color: var(--main-foreground);
+  }
+}
+
+.stylebot-reader-dock-more-btn {
+  font: 700 18px/1 system-ui, -apple-system, sans-serif;
 
   &.active {
     background: color-mix(in srgb, var(--main-foreground) 6%, transparent);
@@ -507,9 +587,40 @@ export default Vue.extend({
   color: var(--muted-foreground);
 }
 
+.stylebot-reader-dock-more {
+  width: 148px;
+  padding: 4px;
+  border-radius: 11px;
+  gap: 1px;
+}
+
+.stylebot-reader-dock-more-item {
+  all: unset;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 3px 7px;
+  border-radius: 7px;
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--main-foreground);
+
+  &:hover {
+    background: color-mix(in srgb, var(--main-foreground) 6%, transparent);
+  }
+
+  svg {
+    flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+    color: var(--muted-foreground);
+  }
+}
+
 .stylebot-reader-dock-tooltip {
   position: fixed;
-  transform: translateY(-50%);
+  transform: translateX(-50%);
   z-index: 70;
   pointer-events: none;
   white-space: nowrap;

@@ -132,6 +132,10 @@ export const OpenDonatePage = (): void => {
   chrome.tabs.create({ url: 'https://ko-fi.com/stylebot' });
 };
 
+export const OpenReportIssuePage = (): void => {
+  chrome.tabs.create({ url: 'https://github.com/ankit/stylebot/issues' });
+};
+
 export const SetOption = (message: SetOptionType): void => {
   setOption(message.option.name, message.option.value);
 };
