@@ -98,9 +98,7 @@ export const apply = async (forceApply = false): Promise<void> => {
 const FULL_LOAD_TIMEOUT_MS = 5000;
 
 const scheduleStart = (myGeneration: number): void => {
-  // Sites that populate their article images lazily (see shouldWaitForFullLoad)
-  // hand Defuddle placeholder srcs at DOMContentLoaded — wait for the window
-  // `load` event, by which the images have resolved, before parsing.
+  // Lazy-image sites: wait for window `load` so real srcs have resolved.
   if (shouldWaitForFullLoad()) {
     if (document.readyState === 'complete') {
       startIfEligible(myGeneration);
@@ -128,9 +126,7 @@ const scheduleStart = (myGeneration: number): void => {
     return;
   }
 
-  // DOMContentLoaded only fires once, on the loading -> interactive
-  // transition — attaching this listener after that point (e.g. toggled
-  // mid-load) means it never fires, leaving the loader up forever.
+  // DOMContentLoaded fires once; attach only while still loading.
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
       startIfEligible(myGeneration);

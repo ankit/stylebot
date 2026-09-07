@@ -68,6 +68,15 @@
     height: auto;
   }
 
+  img {
+    display: block;
+    width: auto;
+    max-height: 60vh;
+    max-width: 92%;
+    margin-inline: auto;
+    margin-bottom: 20px;
+  }
+
   p,
   code,
   pre,
@@ -93,21 +102,12 @@
 
   p > img:only-child,
   p > a:only-child > img:only-child,
-  .wp-caption img,
-  figure img,
-  img[moz-reader-center] {
-    display: block;
-    margin-inline: auto;
-  }
-
-  p > img:only-child,
-  p > a:only-child > img:only-child,
   td[colspan] img,
   .wp-caption img,
   figure img,
   img[moz-reader-center] {
     border-radius: 8px;
-    box-shadow: 0 2px 8px color-mix(in srgb, var(--main-foreground) 20%, transparent);
+    box-shadow: var(--image-shadow);
   }
 
   .caption,
@@ -115,6 +115,7 @@
   figcaption {
     display: block;
     margin-top: 0.6em;
+    margin-bottom: 20px;
     text-align: center;
     font-size: 0.9em;
     line-height: 1.48em;
@@ -122,8 +123,6 @@
     color: var(--muted-foreground);
   }
 
-  // Decorative credit/type icons (camera, play button, etc.) — the caption
-  // text already states this, and the icon loses its source page's spacing.
   figcaption svg {
     display: none;
   }
@@ -139,10 +138,21 @@
   }
 
   blockquote {
-    padding: 0;
-    padding-inline-start: 16px;
+    margin: 8px 0 28px;
+    padding-block: 14px;
+    padding-inline: 20px;
     border-inline-start: 3px solid var(--link-color);
-    color: var(--muted-foreground);
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--link-color) 8%, transparent);
+    color: var(--main-foreground);
+  }
+
+  blockquote > :first-child {
+    margin-top: 0;
+  }
+
+  blockquote > :last-child {
+    margin-bottom: 0;
   }
 
   ul,
@@ -184,8 +194,6 @@
     background: color-mix(in srgb, var(--main-foreground) 6%, transparent);
   }
 
-  // Infobox image rows span both columns via colspan — the image is often
-  // nested too deep for margin-auto, so center via the cell's text-align.
   td[colspan] {
     text-align: center;
   }
@@ -204,7 +212,6 @@
     border-inline-end: 0;
   }
 
-  /* Visually hide (but don't display: none) screen reader elements */
   .visually-hidden,
   .visuallyhidden,
   .sr-only {
@@ -217,19 +224,15 @@
     border-width: 0;
   }
 
-  /* Hide elements with common "hidden" class names */
   .hidden,
   .invisible {
     display: none;
   }
 
-  /* Enforce wordpress and similar emoji/smileys aren't sized to be full-width,
- * see bug 1399616 for context. */
   img.wp-smiley,
   img.emoji {
     display: inline-block;
     border-width: 0;
-    /* height: auto is implied from `.stylebot-reader-content *` rule. */
     width: 1em;
     margin: 0 0.07em;
     padding: 0;
