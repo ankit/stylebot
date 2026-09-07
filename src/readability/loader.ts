@@ -36,11 +36,21 @@ export const showLoader = (): void => {
 
   const background = (cachedTheme && THEME_BACKGROUNDS[cachedTheme]) || THEME_BACKGROUNDS.light;
 
+  // Paint the themed background inline on documentElement, synchronously and
+  // ahead of any stylesheet parse. An injected <style> only takes effect after
+  // a CSSOM parse + style recalc; an inline root style commits immediately, so
+  // the browser has the theme color for its first paint rather than the default
+  // white canvas.
+  document.documentElement.style.setProperty('background', background, 'important');
+
   style.type = 'text/css';
   style.setAttribute('id', 'stylebot-reader-loading');
   style.appendChild(
     document.createTextNode(
-      `html { background: ${background} !important; } ` +
+      // Also paint body: the page's own <body> parses after document_start and
+      // may carry an opaque (often white) background that would otherwise paint
+      // over the themed html background before the reader mounts.
+      `html, body { background: ${background} !important; } ` +
         'body { border: 0 !important; box-shadow: none !important; } ' +
         'body *:not(#stylebot) { display: none; }'
     )
@@ -51,4 +61,7 @@ export const showLoader = (): void => {
 
 export const hideLoader = (): void => {
   document.getElementById('stylebot-reader-loading')?.remove();
+  // Drop the inline background set in showLoader so the original page (on
+  // revert) isn't left with the loader's theme color painted over it.
+  document.documentElement.style.removeProperty('background');
 };
