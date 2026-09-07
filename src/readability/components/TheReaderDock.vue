@@ -1,5 +1,5 @@
 <template>
-  <div class="stylebot-reader-dock" :style="{ opacity: dockOpacity }">
+  <div class="stylebot-reader-dock" :style="{ opacity: dockOpacity }" @focusin="wake">
     <div class="stylebot-reader-dock-buttons">
       <button
         class="stylebot-reader-dock-btn"
@@ -147,7 +147,7 @@ import IconFlag from '../icons/IconFlag.vue';
 import IconCoffee from '../icons/IconCoffee.vue';
 
 // Icons stay lit while the pointer is within this many px of the dock.
-const WAKE_RADIUS = 220;
+const WAKE_RADIUS = 340;
 const IDLE_DELAY_MS = 2600;
 
 export default Vue.extend({
@@ -275,12 +275,13 @@ export default Vue.extend({
 
     // Proximity: icons stay lit while the pointer is near the top-right dock,
     // and fade after IDLE_DELAY_MS of inactivity once it's out of reach.
-    wake(event?: MouseEvent): void {
+    wake(event?: MouseEvent | FocusEvent): void {
       let near = true;
 
       if (event && event.type === 'mousemove') {
-        const dx = Math.max(0, window.innerWidth - 60 - event.clientX);
-        const dy = Math.max(0, event.clientY - 40);
+        const mouseEvent = event as MouseEvent;
+        const dx = Math.max(0, window.innerWidth - 60 - mouseEvent.clientX);
+        const dy = Math.max(0, mouseEvent.clientY - 40);
         near = Math.sqrt(dx * dx + dy * dy) < WAKE_RADIUS;
       }
 
@@ -447,6 +448,10 @@ export default Vue.extend({
     background: color-mix(in srgb, var(--main-foreground) 6%, transparent);
     color: var(--main-foreground);
   }
+
+  &:focus-visible {
+    box-shadow: inset 0 0 0 2px var(--link-color);
+  }
 }
 
 .stylebot-reader-dock-aa {
@@ -512,6 +517,10 @@ export default Vue.extend({
   &.selected {
     border: 2px solid var(--link-color);
   }
+
+  &:focus-visible {
+    box-shadow: inset 0 0 0 2px var(--link-color);
+  }
 }
 
 .stylebot-reader-dock-fonts {
@@ -538,6 +547,10 @@ export default Vue.extend({
   &.selected {
     background: color-mix(in srgb, var(--main-foreground) 6%, transparent);
     color: var(--link-color);
+  }
+
+  &:focus-visible {
+    box-shadow: inset 0 0 0 2px var(--link-color);
   }
 }
 
@@ -570,6 +583,10 @@ export default Vue.extend({
     &:not(:disabled):hover {
       background: color-mix(in srgb, var(--main-foreground) 5%, transparent);
     }
+
+    &:focus-visible {
+      box-shadow: inset 0 0 0 2px var(--link-color);
+    }
   }
 }
 
@@ -590,6 +607,11 @@ export default Vue.extend({
   cursor: pointer;
   text-decoration: underline;
   color: var(--muted-foreground);
+
+  &:focus-visible {
+    outline: 2px solid var(--link-color);
+    outline-offset: 2px;
+  }
 }
 
 .stylebot-reader-dock-more {
@@ -614,6 +636,10 @@ export default Vue.extend({
 
   &:hover {
     background: color-mix(in srgb, var(--main-foreground) 6%, transparent);
+  }
+
+  &:focus-visible {
+    box-shadow: inset 0 0 0 2px var(--link-color);
   }
 
   svg {
