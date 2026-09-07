@@ -2,19 +2,40 @@ import { remove } from './apply';
 import { readCache, writeCache } from '../inject-css/cache';
 
 import {
+  GetStylesForPage,
+  GetStylesForPageResponse,
   ReadabilitySettings,
   SetReadability,
   SetReadabilitySettings,
 } from '@stylebot/types';
 
+// The key readability was actually enabled under (usually just the domain,
+// see editor/store/index.ts's state.url default) — falling back to
+// window.location.href here would silently create a new per-URL entry
+// instead of clearing the existing one.
+const getExistingStyleUrl = (): Promise<string> => {
+  const message: GetStylesForPage = { name: 'GetStylesForPage' };
+
+  return new Promise(resolve => {
+    chrome.runtime.sendMessage(
+      message,
+      (response: GetStylesForPageResponse) => {
+        resolve(response?.defaultStyle?.url ?? document.domain);
+      }
+    );
+  });
+};
+
 // Mirrors the editor's applyReadability(false) action, so this persists the
 // same way the popup checkbox does, not just tearing down the current DOM.
-export const closeReader = (): void => {
+export const closeReader = async (): Promise<void> => {
   remove();
+
+  const url = await getExistingStyleUrl();
 
   const message: SetReadability = {
     name: 'SetReadability',
-    url: window.location.href,
+    url,
     value: false,
   };
   chrome.runtime.sendMessage(message);
