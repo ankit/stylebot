@@ -4,7 +4,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import TheReader from './components/TheReader.vue';
+import TheReader from './TheReader.vue';
 
 export default Vue.extend({
   name: 'App',
