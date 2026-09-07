@@ -49,6 +49,16 @@ export const shouldRunOnUrl = (): boolean => {
   return true;
 };
 
+// Sites that attach or populate their article images lazily, after the initial
+// DOM is parsed (e.g. NYTimes swaps in real srcs post-load) — Defuddle run at
+// DOMContentLoaded captures placeholder/missing srcs. For these, defer the
+// parse to the window `load` event, by which the above-the-fold images have
+// resolved their real srcs.
+const DEFERRED_IMAGE_HOSTS = ['nytimes.com'];
+
+export const shouldWaitForFullLoad = (): boolean =>
+  DEFERRED_IMAGE_HOSTS.some(host => document.domain.endsWith(host));
+
 // MediaWiki embeds this flag on every page — true only for the wiki's
 // designated portal/home page, e.g. Main_Page.
 export const isMediaWikiMainPage = (): boolean =>
