@@ -138,7 +138,10 @@ describe('actions', () => {
     });
 
     it('does nothing to the cache when nothing is cached yet', () => {
-      actions.applyReadability({ commit: mockCommit, state: mockState }, true);
+      actions.applyReadability(
+        { commit: mockCommit, state: mockState, dispatch: mockDispatch },
+        true
+      );
 
       expect(readCache()).toBeNull();
     });
@@ -149,7 +152,10 @@ describe('actions', () => {
         readability: false,
       });
 
-      actions.applyReadability({ commit: mockCommit, state: mockState }, true);
+      actions.applyReadability(
+        { commit: mockCommit, state: mockState, dispatch: mockDispatch },
+        true
+      );
 
       expect(readCache()).toEqual({
         styles: [{ url: mockState.url, css: 'a { color: blue; }', enabled: true }],
@@ -157,6 +163,37 @@ describe('actions', () => {
       });
       expect(stylebotReadability.apply).toBeCalledWith(true);
       expect(chromeUtils.setReadability).toBeCalledWith(mockState.url, true);
+    });
+
+    it('switches out of basic/code mode since editing page CSS has no effect there', () => {
+      actions.applyReadability(
+        { commit: mockCommit, state: mockState, dispatch: mockDispatch },
+        true
+      );
+
+      expect(mockDispatch).toBeCalledWith('setMode', 'magic');
+    });
+
+    it('leaves the mode alone when turning readability off', () => {
+      actions.applyReadability(
+        { commit: mockCommit, state: mockState, dispatch: mockDispatch },
+        false
+      );
+
+      expect(mockDispatch).not.toBeCalledWith('setMode', 'magic');
+    });
+
+    it('leaves the mode alone when already in magic mode', () => {
+      actions.applyReadability(
+        {
+          commit: mockCommit,
+          state: { ...mockState, options: { ...mockState.options, mode: 'magic' } },
+          dispatch: mockDispatch,
+        },
+        true
+      );
+
+      expect(mockDispatch).not.toBeCalledWith('setMode', 'magic');
     });
   });
 

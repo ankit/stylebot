@@ -60,6 +60,8 @@ export default Vue.extend({
     },
 
     onChange(): void {
+      this.$emit('change', this.readability);
+
       chrome.tabs.query({ active: true }, ([tab]) => {
         if (tab.id) {
           const message: ToggleReadabilityForTab = {

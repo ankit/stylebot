@@ -6,11 +6,13 @@ import {
   setAll,
   move,
   getStylesForPage,
-  updateIcon,
   setReadability,
+  refreshBadgeForTab,
   getImportCss,
   applyStylesToAllTabs,
 } from './styles';
+
+import { getIsReadabilityActive, updateIcon } from './badge';
 
 import {
   get as getOption,
@@ -29,6 +31,7 @@ import {
   SetAllStyles as SetAllStylesType,
   SetCommands as SetCommandsType,
   SetReadability as SetReadabilityType,
+  ReadabilityActiveChanged as ReadabilityActiveChangedType,
   SetReadabilitySettings as SetReadabilitySettingsType,
   GetImportCss as GetImportCssType,
   RunGoogleDriveSync as RunGoogleDriveSyncType,
@@ -93,8 +96,12 @@ export const GetStylesForPage = async (
   const styles = await getAll();
   const response = getStylesForPage(tab.url, styles, message.important);
 
-  updateIcon(tab, response.styles, response.defaultStyle);
   sendResponse(response);
+
+  if (tab.id !== undefined) {
+    const readabilityActive = await getIsReadabilityActive(tab.id);
+    updateIcon(tab, response.styles, readabilityActive);
+  }
 };
 
 export const MoveStyle = (message: MoveStyleType): void => {
@@ -145,14 +152,18 @@ export const SetReadability = async (
 ): Promise<void> => {
   await setReadability(message.url, message.value);
 
-  const tab = sender.tab;
-  if (!tab || !tab.url) {
-    return;
+  if (sender.tab) {
+    await refreshBadgeForTab(sender.tab);
   }
+};
 
-  const allStyles = await getAll();
-  const { styles, defaultStyle } = getStylesForPage(tab.url, allStyles);
-  updateIcon(tab, styles, defaultStyle);
+export const ReadabilityActiveChanged = async (
+  _message: ReadabilityActiveChangedType,
+  sender: chrome.runtime.MessageSender
+): Promise<void> => {
+  if (sender.tab) {
+    await refreshBadgeForTab(sender.tab);
+  }
 };
 
 export const GetReadabilitySettings = async (

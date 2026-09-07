@@ -75,6 +75,12 @@ export type SetReadability = {
   value: boolean;
 };
 
+// Sent when the reader mounts/unmounts — carries no state, the background
+// re-queries GetIsReadabilityActive on the sender's tab for the live answer.
+export type ReadabilityActiveChanged = {
+  name: 'ReadabilityActiveChanged';
+};
+
 export type GetCommands = {
   name: 'GetCommands';
 };
@@ -116,6 +122,7 @@ type BackgroundPageMessage =
   | OpenOptionsPage
   | OpenDonatePage
   | SetReadability
+  | ReadabilityActiveChanged
   | GetCommands
   | SetCommands
   | GetReadabilitySettings

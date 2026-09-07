@@ -1,5 +1,4 @@
 import Vue from 'vue';
-
 import { isProbablyReaderable } from '@mozilla/readability';
 
 import App from './App.vue';

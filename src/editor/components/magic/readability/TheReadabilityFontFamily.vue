@@ -14,6 +14,7 @@
 import Vue from 'vue';
 
 import { StylebotFonts } from '@stylebot/types';
+import { readabilityFonts } from '@stylebot/readability';
 
 import FontFamilyDropdown from '../../text/FontFamilyDropdown.vue';
 
@@ -43,7 +44,7 @@ export default Vue.extend({
     },
 
     fonts(): StylebotFonts {
-      return this.$store.state.options.fonts;
+      return readabilityFonts;
     },
   },
 

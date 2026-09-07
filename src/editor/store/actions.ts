@@ -2,6 +2,11 @@ import * as postcss from 'postcss';
 import { Commit, Dispatch, Store } from 'vuex';
 
 import { State } from './';
+import storeGetters from './getters';
+
+type Getters = {
+  [K in keyof typeof storeGetters]: ReturnType<(typeof storeGetters)[K]>;
+};
 
 import {
   addDeclaration,
@@ -96,7 +101,11 @@ export default {
   },
 
   openStylebot(
-    { state, commit }: { state: State; commit: Commit },
+    {
+      state,
+      commit,
+      getters,
+    }: { state: State; commit: Commit; getters: Getters },
     { inspect = false, store }: { inspect: boolean; store: Store<State> }
   ): void {
     initEditor(store);
@@ -106,6 +115,12 @@ export default {
     }
 
     commit('setVisible', true);
+
+    // Show Magic instead of the useless Basic/Code panel, without
+    // persisting over the user's actual mode preference elsewhere.
+    if (getters.readabilityActive && state.options.mode !== 'magic') {
+      commit('setOptions', { ...state.options, mode: 'magic' });
+    }
 
     if (state.options.mode === 'basic' && inspect) {
       commit('setInspecting', true);
@@ -226,13 +241,23 @@ export default {
   },
 
   applyReadability(
-    { state, commit }: { state: State; commit: Commit },
+    {
+      state,
+      commit,
+      dispatch,
+    }: { state: State; commit: Commit; dispatch: Dispatch },
     value: boolean
   ): void {
     if (value) {
       applyReadability(true);
     } else {
       removeReadability();
+    }
+
+    // Editing page CSS has no effect while readability is running — its DOM
+    // is detached from the document, not just hidden.
+    if (value && ['basic', 'code'].includes(state.options.mode)) {
+      dispatch('setMode', 'magic');
     }
 
     commit('setReadability', value);

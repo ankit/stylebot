@@ -9,17 +9,29 @@
 
   @import './scss/content.scss';
 
-  --main-background: #fff;
-  --main-foreground: #333;
+  --main-background: #faf8f3;
+  --main-foreground: #2b2926;
+  --muted-foreground: #6f6a5f;
+  --border-color: #e4ddcf;
+  --link-color: #0b6fb3;
+  --link-visited-color: #7c3fa8;
 
   &.sepia {
     --main-background: #f4ecd8;
     --main-foreground: #5b4636;
+    --muted-foreground: #8a7360;
+    --border-color: #e0cfab;
+    --link-color: #9c5c1f;
+    --link-visited-color: #7a4518;
   }
 
   &.dark {
-    --main-background: #222;
-    --main-foreground: #bababa;
+    --main-background: #201f1d;
+    --main-foreground: #cac5bc;
+    --muted-foreground: #96918a;
+    --border-color: #3c3a36;
+    --link-color: #6cb6ff;
+    --link-visited-color: #c792ea;
   }
 }
 
@@ -30,13 +42,24 @@
 
   color: var(--main-foreground);
   background-color: var(--main-background);
+  transition: background-color 0.2s ease, color 0.2s ease, opacity 0.25s ease;
 
   width: 100%;
   height: 100%;
   overflow: auto;
+
+  &.closing {
+    opacity: 0;
+  }
 }
 
 .stylebot-reader-body {
   margin: 0 auto;
   padding: var(--body-padding);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.stylebot-reader.revealed .stylebot-reader-body {
+  opacity: 1;
 }

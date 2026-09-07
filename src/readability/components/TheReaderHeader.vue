@@ -44,26 +44,37 @@ export default Vue.extend({
 .stylebot-reader-header {
   > h1 {
     font-size: 1.6em;
-    line-height: 1.25em;
+    line-height: 1.3em;
+    font-weight: 700;
     width: 100%;
-    margin-top: 30px;
+    margin-top: 24px;
     margin-bottom: 10px;
     padding: 0;
   }
 }
 
 .stylebot-reader-domain {
-  font-size: 0.9em;
-  line-height: 1.48em;
+  display: inline-block;
+  font-size: 0.85em;
+  line-height: 1.4em;
   padding-bottom: 4px;
   text-decoration: none;
-  border-bottom: 1px solid #333;
-  color: #45a1ff;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted-foreground);
+  border-bottom: 1px solid var(--border-color);
+  transition: color 0.15s ease, border-color 0.15s ease;
+
+  &:hover {
+    color: var(--link-color);
+    border-color: var(--link-color);
+  }
 }
 
 .stylebot-reader-byline {
   font-size: 1em;
   font-weight: 300;
+  color: var(--muted-foreground);
   margin-bottom: 30px;
 }
 </style>

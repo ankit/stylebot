@@ -1,17 +1,11 @@
 jest.mock('../styles');
 
-import { SetReadability } from '../messages';
+import { SetReadability, ReadabilityActiveChanged } from '../messages';
 import * as stylesModule from '../styles';
 
 describe('SetReadability', () => {
   beforeEach(() => {
     jest.resetAllMocks();
-
-    (stylesModule.getAll as jest.Mock).mockResolvedValue({});
-    (stylesModule.getStylesForPage as jest.Mock).mockReturnValue({
-      styles: [],
-      defaultStyle: { url: 'example.com', css: '', enabled: true, readability: true },
-    });
   });
 
   it('persists the value and refreshes the badge for the sending tab', async () => {
@@ -23,15 +17,7 @@ describe('SetReadability', () => {
     );
 
     expect(stylesModule.setReadability).toBeCalledWith('example.com', true);
-    expect(stylesModule.getStylesForPage).toBeCalledWith(
-      tab.url,
-      expect.anything()
-    );
-    expect(stylesModule.updateIcon).toBeCalledWith(
-      tab,
-      [],
-      expect.objectContaining({ readability: true })
-    );
+    expect(stylesModule.refreshBadgeForTab).toBeCalledWith(tab);
   });
 
   it('does not attempt to update the badge when there is no sending tab', async () => {
@@ -41,6 +27,26 @@ describe('SetReadability', () => {
     );
 
     expect(stylesModule.setReadability).toBeCalledWith('example.com', true);
-    expect(stylesModule.updateIcon).not.toBeCalled();
+    expect(stylesModule.refreshBadgeForTab).not.toBeCalled();
+  });
+});
+
+describe('ReadabilityActiveChanged', () => {
+  beforeEach(() => {
+    jest.resetAllMocks();
+  });
+
+  it('refreshes the badge for the sending tab', async () => {
+    const tab = { id: 1, url: 'https://example.com/article' } as chrome.tabs.Tab;
+
+    await ReadabilityActiveChanged({ name: 'ReadabilityActiveChanged' }, { tab });
+
+    expect(stylesModule.refreshBadgeForTab).toBeCalledWith(tab);
+  });
+
+  it('does nothing when there is no sending tab', async () => {
+    await ReadabilityActiveChanged({ name: 'ReadabilityActiveChanged' }, {});
+
+    expect(stylesModule.refreshBadgeForTab).not.toBeCalled();
   });
 });
