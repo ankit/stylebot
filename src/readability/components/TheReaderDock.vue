@@ -11,8 +11,11 @@
       </button>
 
       <button
+        ref="aaBtn"
         class="stylebot-reader-dock-btn stylebot-reader-dock-aa"
         :class="{ active: open }"
+        aria-haspopup="true"
+        :aria-expanded="open"
         @click="toggleSettings"
         @mouseenter="showTip($event, 'Reading settings')"
         @mouseleave="hideTip"
@@ -21,15 +24,18 @@
       </button>
 
       <button
+        ref="moreBtn"
         class="stylebot-reader-dock-btn stylebot-reader-dock-more-btn"
         :class="{ active: moreOpen }"
+        aria-haspopup="true"
+        :aria-expanded="moreOpen"
         @click="toggleMore"
       >
         &#8942;
       </button>
     </div>
 
-    <div v-if="open" class="stylebot-reader-dock-panel">
+    <div v-if="open" ref="settingsPanel" class="stylebot-reader-dock-panel">
       <div class="stylebot-reader-dock-swatches">
         <button
           v-for="t in themeList"
@@ -94,7 +100,11 @@
       </div>
     </div>
 
-    <div v-else-if="moreOpen" class="stylebot-reader-dock-panel stylebot-reader-dock-more">
+    <div
+      v-else-if="moreOpen"
+      ref="morePanel"
+      class="stylebot-reader-dock-panel stylebot-reader-dock-more"
+    >
       <button class="stylebot-reader-dock-more-item" @click="openOptions">
         <icon-options />
         Stylebot Options
@@ -242,8 +252,10 @@ export default Vue.extend({
       // Only listen while a panel is open, so a closed dock costs nothing.
       if (isOpen) {
         document.addEventListener('click', this.onDocumentClick);
+        document.addEventListener('keydown', this.onDocumentKeydown);
       } else {
         document.removeEventListener('click', this.onDocumentClick);
+        document.removeEventListener('keydown', this.onDocumentKeydown);
       }
     },
   },
@@ -260,6 +272,7 @@ export default Vue.extend({
     window.removeEventListener('scroll', this.wake);
     window.removeEventListener('touchstart', this.wake);
     document.removeEventListener('click', this.onDocumentClick);
+    document.removeEventListener('keydown', this.onDocumentKeydown);
     clearTimeout(this.idleTimeout);
   },
 
@@ -271,6 +284,31 @@ export default Vue.extend({
         this.open = false;
         this.moreOpen = false;
       }
+    },
+
+    onDocumentKeydown(event: KeyboardEvent): void {
+      if (event.key !== 'Escape') {
+        return;
+      }
+
+      // Return focus to whichever button opened the panel, rather than
+      // dropping it back to the document.
+      const trigger = this.open ? 'aaBtn' : this.moreOpen ? 'moreBtn' : null;
+      this.open = false;
+      this.moreOpen = false;
+
+      if (trigger) {
+        (this.$refs[trigger] as HTMLElement).focus();
+      }
+    },
+
+    // Moves focus into the panel once it's rendered, so keyboard users land
+    // somewhere usable instead of on nothing.
+    focusFirstIn(ref: string): void {
+      this.$nextTick(() => {
+        const panel = this.$refs[ref] as HTMLElement | undefined;
+        panel?.querySelector<HTMLElement>('button')?.focus();
+      });
     },
 
     // Proximity: icons stay lit while the pointer is near the top-right dock,
@@ -334,12 +372,20 @@ export default Vue.extend({
       this.moreOpen = false;
       this.open = !this.open;
       this.hideTip();
+
+      if (this.open) {
+        this.focusFirstIn('settingsPanel');
+      }
     },
 
     toggleMore(): void {
       this.open = false;
       this.moreOpen = !this.moreOpen;
       this.hideTip();
+
+      if (this.moreOpen) {
+        this.focusFirstIn('morePanel');
+      }
     },
 
     openOptions(): void {
@@ -450,6 +496,7 @@ export default Vue.extend({
   }
 
   &:focus-visible {
+    outline: none;
     box-shadow: inset 0 0 0 2px var(--link-color);
   }
 }
@@ -519,6 +566,7 @@ export default Vue.extend({
   }
 
   &:focus-visible {
+    outline: none;
     box-shadow: inset 0 0 0 2px var(--link-color);
   }
 }
@@ -544,12 +592,21 @@ export default Vue.extend({
     border-top: 1px solid var(--border-color);
   }
 
+  &:first-child {
+    border-radius: 8px 8px 0 0;
+  }
+
+  &:last-child {
+    border-radius: 0 0 8px 8px;
+  }
+
   &.selected {
     background: color-mix(in srgb, var(--main-foreground) 6%, transparent);
     color: var(--link-color);
   }
 
   &:focus-visible {
+    outline: none;
     box-shadow: inset 0 0 0 2px var(--link-color);
   }
 }
@@ -573,6 +630,11 @@ export default Vue.extend({
 
     &:first-child {
       border-right: 1px solid var(--border-color);
+      border-radius: 8px 0 0 8px;
+    }
+
+    &:last-child {
+      border-radius: 0 8px 8px 0;
     }
 
     &:disabled {
@@ -585,6 +647,7 @@ export default Vue.extend({
     }
 
     &:focus-visible {
+      outline: none;
       box-shadow: inset 0 0 0 2px var(--link-color);
     }
   }
@@ -639,6 +702,7 @@ export default Vue.extend({
   }
 
   &:focus-visible {
+    outline: none;
     box-shadow: inset 0 0 0 2px var(--link-color);
   }
 
