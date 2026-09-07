@@ -1,6 +1,7 @@
 <template>
   <div
     v-if="font"
+    tabindex="-1"
     :class="[`stylebot-reader ${theme}`, { revealed }]"
     :style="`font-family: ${font}; font-size: ${size}px; line-height: ${lineHeight}em`"
   >
@@ -117,6 +118,10 @@ export default Vue.extend({
       // the pre-fade style commits before we transition it.
       void (this.$el as HTMLElement).offsetHeight;
       this.revealed = true;
+
+      // Focus the scrollable panel itself so arrow/space/Page Up/Down/Home/
+      // End scroll it, instead of going to the (now-hidden) original page.
+      (this.$el as HTMLElement).focus();
     }
 
     chrome.runtime.onMessage.addListener((message: UpdateReader) => {
