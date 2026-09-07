@@ -15,6 +15,14 @@
   }
 }
 
+.stylebot-reader-content.justify {
+  p,
+  li {
+    text-align: justify;
+    hyphens: auto;
+  }
+}
+
 .stylebot-reader-content {
   h1,
   h2,

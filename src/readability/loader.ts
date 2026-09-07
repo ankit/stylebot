@@ -1,24 +1,11 @@
 import { ReadabilityTheme } from '@stylebot/types';
 
 import { loaderCss, LOADER_ART_ID } from './loader-styles';
+import { THEME_BACKGROUNDS, THEME_FOREGROUNDS } from './theme-colors';
 
 // Read synchronously so the loading screen can match the reader's theme
 // immediately, instead of flashing white until settings are fetched.
 const THEME_CACHE_KEY = 'stylebot-reader-theme';
-
-const THEME_BACKGROUNDS: Record<ReadabilityTheme, string> = {
-  light: '#faf8f3',
-  sepia: '#f4ecd8',
-  dark: '#201f1d',
-};
-
-// Muted foreground per theme (matches the reader's own body text tones) —
-// used for the faint skeleton lines so they read against the themed background.
-const THEME_FOREGROUNDS: Record<ReadabilityTheme, string> = {
-  light: '#2b2926',
-  sepia: '#5b4636',
-  dark: '#cac5bc',
-};
 
 // Skeleton article: an accent title line over paragraph lines of varied width
 // (the last one short, like a paragraph's final line). Widths in %.

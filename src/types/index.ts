@@ -70,6 +70,7 @@ export type ReadabilitySettings = {
   width: number;
   lineHeight: number;
   theme: ReadabilityTheme;
+  justify: boolean;
 };
 
 export type StylebotCommandName =

@@ -54,9 +54,10 @@ export const defaultEditorCommands: StylebotEditorCommands = {
 };
 
 export const defaultReadabilitySettings: ReadabilitySettings = {
-  size: 16,
+  size: 17,
   width: 40,
   theme: 'light',
   lineHeight: 1.6,
+  justify: false,
   font: 'Merriweather',
 };
