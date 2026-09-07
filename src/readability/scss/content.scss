@@ -69,9 +69,12 @@
   }
 
   img {
+    display: block;
     width: auto;
     max-height: 60vh;
     max-width: 92%;
+    margin-inline: auto;
+    margin-bottom: 20px;
   }
 
   p,
@@ -99,15 +102,6 @@
 
   p > img:only-child,
   p > a:only-child > img:only-child,
-  .wp-caption img,
-  figure img,
-  img[moz-reader-center] {
-    display: block;
-    margin-inline: auto;
-  }
-
-  p > img:only-child,
-  p > a:only-child > img:only-child,
   td[colspan] img,
   .wp-caption img,
   figure img,
@@ -121,6 +115,7 @@
   figcaption {
     display: block;
     margin-top: 0.6em;
+    margin-bottom: 20px;
     text-align: center;
     font-size: 0.9em;
     line-height: 1.48em;
