@@ -143,10 +143,21 @@
   }
 
   blockquote {
-    padding: 0;
-    padding-inline-start: 16px;
+    margin: 8px 0 28px;
+    padding-block: 14px;
+    padding-inline: 20px;
     border-inline-start: 3px solid var(--link-color);
-    color: var(--muted-foreground);
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--link-color) 8%, transparent);
+    color: var(--main-foreground);
+  }
+
+  blockquote > :first-child {
+    margin-top: 0;
+  }
+
+  blockquote > :last-child {
+    margin-bottom: 0;
   }
 
   ul,
