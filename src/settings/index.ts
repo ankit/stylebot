@@ -58,5 +58,6 @@ export const defaultReadabilitySettings: ReadabilitySettings = {
   width: 40,
   theme: 'light',
   lineHeight: 1.6,
+  justify: false,
   font: 'Merriweather',
 };

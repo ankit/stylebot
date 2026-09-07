@@ -15,6 +15,14 @@
   }
 }
 
+.stylebot-reader-content.justify {
+  p,
+  li {
+    text-align: justify;
+    hyphens: auto;
+  }
+}
+
 .stylebot-reader-content {
   h1,
   h2,
@@ -63,9 +71,16 @@
     color: var(--link-visited-color, #c2e);
   }
 
+  a:focus-visible {
+    outline: 2px solid var(--link-color);
+    outline-offset: 2px;
+  }
+
   * {
     max-width: 100%;
     height: auto;
+    transition: background-color 0.2s ease, color 0.2s ease,
+      border-color 0.2s ease, box-shadow 0.2s ease;
   }
 
   img {

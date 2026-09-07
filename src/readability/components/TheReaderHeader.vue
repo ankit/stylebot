@@ -98,6 +98,11 @@ export default Vue.extend({
     color: var(--link-color);
     border-color: var(--link-color);
   }
+
+  &:focus-visible {
+    outline: 2px solid var(--link-color);
+    outline-offset: 2px;
+  }
 }
 
 .stylebot-reader-byline {

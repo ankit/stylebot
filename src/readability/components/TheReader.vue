@@ -1,9 +1,20 @@
 <template>
   <div
     v-if="font"
+    tabindex="-1"
     :class="[`stylebot-reader ${theme}`, { revealed }]"
     :style="`font-family: ${font}; font-size: ${size}px; line-height: ${lineHeight}em`"
   >
+    <the-reader-dock
+      :theme="theme"
+      :font="font"
+      :size="size"
+      :width="width"
+      :justify="justify"
+      :line-height="lineHeight"
+      @update="onUpdateSettings"
+    />
+
     <div class="stylebot-reader-body" :style="`max-width: ${width}em`">
       <the-reader-header
         :url="url"
@@ -14,7 +25,7 @@
       />
 
       <!-- eslint-disable vue/no-v-html - html is generated with the readability project -->
-      <div class="stylebot-reader-content" v-html="article.content" />
+      <div class="stylebot-reader-content" :class="{ justify }" v-html="article.content" />
     </div>
   </div>
 </template>
@@ -30,21 +41,25 @@ import {
 } from '@stylebot/css';
 
 import { hideLoader, cacheTheme } from '../loader';
+import { sendReadabilitySettings } from '../dock-actions';
 
 import {
   GetReadabilitySettings,
   GetReadabilitySettingsResponse,
+  ReadabilitySettings,
   UpdateReader,
   ReadabilityTheme,
 } from '@stylebot/types';
 
 import TheReaderHeader from './TheReaderHeader.vue';
+import TheReaderDock from './TheReaderDock.vue';
 
 export default Vue.extend({
   name: 'TheReader',
 
   components: {
     TheReaderHeader,
+    TheReaderDock,
   },
 
   props: {
@@ -70,6 +85,7 @@ export default Vue.extend({
     width: number;
     lineHeight: number;
     theme: ReadabilityTheme;
+    justify: boolean;
     revealed: boolean;
   } {
     return { ...defaultReadabilitySettings, revealed: false };
@@ -84,6 +100,7 @@ export default Vue.extend({
       this.theme = settings.theme;
       this.width = settings.width;
       this.lineHeight = settings.lineHeight;
+      this.justify = settings.justify;
 
       cacheTheme(settings.theme);
 
@@ -101,6 +118,10 @@ export default Vue.extend({
       // the pre-fade style commits before we transition it.
       void (this.$el as HTMLElement).offsetHeight;
       this.revealed = true;
+
+      // Focus the scrollable panel itself so arrow/space/Page Up/Down/Home/
+      // End scroll it, instead of going to the (now-hidden) original page.
+      (this.$el as HTMLElement).focus();
     }
 
     chrome.runtime.onMessage.addListener((message: UpdateReader) => {
@@ -110,6 +131,7 @@ export default Vue.extend({
         this.theme = message.value.theme;
         this.width = message.value.width;
         this.lineHeight = message.value.lineHeight;
+        this.justify = message.value.justify;
 
         cacheTheme(message.value.theme);
         this.injectFont(this.font);
@@ -118,6 +140,19 @@ export default Vue.extend({
   },
 
   methods: {
+    onUpdateSettings(value: ReadabilitySettings): void {
+      this.size = value.size;
+      this.font = value.font;
+      this.theme = value.theme;
+      this.width = value.width;
+      this.lineHeight = value.lineHeight;
+      this.justify = value.justify;
+
+      cacheTheme(value.theme);
+      this.injectFont(value.font);
+      sendReadabilitySettings(value);
+    },
+
     async injectFont(font: string): Promise<void> {
       const css = await addGoogleWebFont(font, '');
       const expandedCss = await getCssWithExpandedImports(css);
