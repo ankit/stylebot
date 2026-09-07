@@ -1,5 +1,9 @@
 import { initReader } from './reader';
-import { shouldRunOnUrl, isMediaWikiMainPage } from './heuristics';
+import {
+  shouldRunOnUrl,
+  isMediaWikiMainPage,
+  shouldWaitForFullLoad,
+} from './heuristics';
 import { showLoader, hideLoader } from './loader';
 import { cacheUrl, didUrlChange, revertToCachedDocument } from './cache';
 
@@ -85,6 +89,44 @@ export const apply = async (forceApply = false): Promise<void> => {
   const myGeneration = generation;
 
   showLoader();
+
+  scheduleStart(myGeneration);
+};
+
+// Ceiling on the deferred-parse wait: if a stray resource never resolves,
+// parse anyway rather than leaving the themed loader up indefinitely.
+const FULL_LOAD_TIMEOUT_MS = 5000;
+
+const scheduleStart = (myGeneration: number): void => {
+  // Sites that populate their article images lazily (see shouldWaitForFullLoad)
+  // hand Defuddle placeholder srcs at DOMContentLoaded — wait for the window
+  // `load` event, by which the images have resolved, before parsing.
+  if (shouldWaitForFullLoad()) {
+    if (document.readyState === 'complete') {
+      startIfEligible(myGeneration);
+      return;
+    }
+
+    let started = false;
+    const start = (): void => {
+      if (started) {
+        return;
+      }
+      started = true;
+      startIfEligible(myGeneration);
+    };
+
+    const timeout = setTimeout(start, FULL_LOAD_TIMEOUT_MS);
+    window.addEventListener(
+      'load',
+      () => {
+        clearTimeout(timeout);
+        start();
+      },
+      { once: true }
+    );
+    return;
+  }
 
   // DOMContentLoaded only fires once, on the loading -> interactive
   // transition — attaching this listener after that point (e.g. toggled
