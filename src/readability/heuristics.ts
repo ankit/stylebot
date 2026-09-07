@@ -1,4 +1,4 @@
-import { isProbablyReaderable } from '@mozilla/readability';
+import { isProbablyReaderable } from './is-probably-readerable';
 
 // A single short, barely-hyphenated path segment reads as a section/category
 // name (e.g. "tech", "news") rather than a full article slug.

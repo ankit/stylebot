@@ -62,7 +62,6 @@
     "@babel/core": "^7.10.1",
     "@babel/plugin-proposal-optional-chaining": "^7.10.1",
     "@babel/preset-env": "^7.10.1",
-    "@mozilla/readability": "^0.6.0",
     "@types/chrome": "^0.0.193",
     "@types/dedent": "^0.7.0",
     "@types/jest": "^26.0.4",
