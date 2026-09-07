@@ -5,7 +5,10 @@
     </a>
 
     <h1>{{ title }}</h1>
-    <div class="stylebot-reader-byline">{{ byline }}</div>
+    <div class="stylebot-reader-byline">
+      <span v-if="byline">{{ byline }}</span>
+      <span v-if="formattedDate" class="stylebot-reader-date">{{ formattedDate }}</span>
+    </div>
   </div>
 </template>
 
@@ -27,6 +30,12 @@ export default Vue.extend({
       default: '',
     },
 
+    published: {
+      type: String,
+      required: false,
+      default: '',
+    },
+
     url: {
       type: String,
       required: true,
@@ -35,6 +44,26 @@ export default Vue.extend({
     source: {
       type: String,
       required: true,
+    },
+  },
+
+  computed: {
+    formattedDate(): string {
+      if (!this.published) {
+        return '';
+      }
+
+      const date = new Date(this.published);
+
+      if (Number.isNaN(date.getTime())) {
+        return '';
+      }
+
+      return date.toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      });
     },
   },
 });
@@ -72,9 +101,18 @@ export default Vue.extend({
 }
 
 .stylebot-reader-byline {
-  font-size: 1em;
+  font-size: 0.85em;
   font-weight: 300;
   color: var(--muted-foreground);
   margin-bottom: 30px;
+
+  > span:not(:first-child)::before {
+    content: '·';
+    margin: 0 6px;
+  }
+}
+
+.stylebot-reader-date {
+  opacity: 0.7;
 }
 </style>

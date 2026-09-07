@@ -60,6 +60,7 @@ export type ReadabilityArticle = {
   byline: string;
   content: string;
   siteName: string;
+  published: string;
 };
 
 export type ReadabilityTheme = 'light' | 'dark' | 'sepia';

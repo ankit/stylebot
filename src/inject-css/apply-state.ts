@@ -11,6 +11,15 @@ import { CachedState } from './cache';
 let appliedUrls = new Set<string>();
 
 export const applyState = (state: CachedState): Promise<void> => {
+  // Called synchronously, ahead of CSS injection below — readability's own
+  // showLoader() needs to hide the page before the browser's first paint,
+  // and waiting on style injection (which may fetch @imports) risks missing it.
+  if (state.readability) {
+    applyReadability();
+  } else {
+    removeReadability();
+  }
+
   const enabled = state.styles.filter(style => style.enabled);
   const nextUrls = new Set(enabled.map(style => style.url));
 
@@ -26,11 +35,5 @@ export const applyState = (state: CachedState): Promise<void> => {
 
   return Promise.all(injections).then(() => {
     appliedUrls = nextUrls;
-
-    if (state.readability) {
-      applyReadability();
-    } else {
-      removeReadability();
-    }
   });
 };

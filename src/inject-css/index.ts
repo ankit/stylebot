@@ -4,7 +4,10 @@
  * the page (hide-page.ts) until chrome.storage.local.get resolves.
  */
 import { extractImports, pruneImportCache } from '@stylebot/css';
-import { isReaderable } from '@stylebot/readability';
+// Bypasses the @stylebot/readability barrel, whose side-effectful SCSS
+// import defeats tree-shaking and would pull the whole apply/reader/Defuddle
+// stack into this document_start bundle just for this one heuristic.
+import { isReaderable } from '../readability/heuristics';
 import { getStylesForPage } from '@stylebot/styles';
 import { StyleMap, TabMessage } from '@stylebot/types';
 

@@ -10,6 +10,7 @@
         :source="source"
         :title="article.title"
         :byline="article.byline"
+        :published="article.published"
       />
 
       <!-- eslint-disable vue/no-v-html - html is generated with the readability project -->
