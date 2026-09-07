@@ -46,12 +46,17 @@ export default Vue.extend({
   },
 
   watch: {
-    visible(newValue: boolean): void {
-      if (newValue) {
-        this.attachStylebotShortcuts();
-      } else {
-        this.detachStylebotShortcuts();
-      }
+    visible: {
+      // `visible` can already be true by the time this mounts, so a
+      // non-immediate watcher would miss attaching the listener.
+      immediate: true,
+      handler(newValue: boolean): void {
+        if (newValue) {
+          this.attachStylebotShortcuts();
+        } else {
+          this.detachStylebotShortcuts();
+        }
+      },
     },
   },
 
