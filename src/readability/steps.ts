@@ -1,6 +1,6 @@
 // Discrete size/width steps for the reader's segmented +/- controls.
-// 17 is the default; two steps sit below it so "smaller" isn't disabled.
-export const SIZES = [15, 16, 17, 18, 19, 21, 23, 25];
+// 16 is the default; two steps sit below it so "smaller" isn't disabled.
+export const SIZES = [14, 15, 16, 17, 18, 19, 21, 23, 25];
 
 // In em (not the design's raw px) so the column keeps scaling with font size,
 // matching the reader's existing max-width:${width}em convention.
