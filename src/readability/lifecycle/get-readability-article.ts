@@ -2,13 +2,10 @@ import Defuddle from 'defuddle';
 
 import { ReadabilityArticle } from '@stylebot/types';
 
-export const getDomainUrlAndSource = (): { url: string; source: string } => {
-  const parts = window.location.href.split('/');
-  return { url: `${parts[0]}//${parts[2]}`, source: parts[2] };
-};
-
-// Sites serve the same photo under multiple resized-variant URLs, so compare
-// directory + filename-prefix instead of raw URLs.
+/**
+ * Sites serve the same photo under multiple resized-variant URLs, so compare
+ * directory + filename-prefix instead of raw URLs.
+ */
 const imageIdentity = (url: string): { directory: string; stem: string } => {
   const withoutQuery = url.split('?')[0];
   const lastSlash = withoutQuery.lastIndexOf('/');
@@ -19,8 +16,10 @@ const imageIdentity = (url: string): { directory: string; stem: string } => {
   };
 };
 
-// A shared directory alone isn't enough (WordPress groups a month's uploads
-// together), so also require a shared filename prefix.
+/**
+ * A shared directory alone isn't enough (WordPress groups a month's uploads
+ * together), so also require a shared filename prefix.
+ */
 const isSameImage = (a: string, b: string): boolean => {
   const idA = imageIdentity(a);
   const idB = imageIdentity(b);
@@ -37,8 +36,10 @@ const isSameImage = (a: string, b: string): boolean => {
   return sharedPrefixLength >= Math.min(idA.stem.length, idB.stem.length) * 0.5;
 };
 
-// The hero image is often resolved in metadata but missing from `content`;
-// build the tag via the DOM so the URL is safely escaped.
+/**
+ * The hero image is often resolved in metadata but missing from `content`;
+ * build the tag via the DOM so the URL is safely escaped.
+ */
 const withLeadImage = (content: string, imageUrl?: string): string => {
   if (!imageUrl || !/^https?:\/\//.test(imageUrl)) {
     return content;
@@ -60,12 +61,19 @@ const withLeadImage = (content: string, imageUrl?: string): string => {
   return `${figure.outerHTML}${content}`;
 };
 
+/**
+ * Collapses whitespace so text pulled from different DOM shapes can be compared.
+ */
 const normalizeText = (text: string): string => text.replace(/\s+/g, ' ').trim();
 
 // Ad-slot labels (e.g. NYT's "Advertisement" / "SKIP ADVERTISEMENT") that sit
 // inline in the article flow and read as real content to Defuddle.
 const AD_MARKER_PATTERN = /^(advertisement|skip advertisement)$/i;
 
+/**
+ * Strips ad-slot labels that sit inline in the article flow and would
+ * otherwise read as real content to Defuddle.
+ */
 const removeAdMarkers = (doc: Document): void => {
   doc.querySelectorAll('p, div, span, a, h1, h2, h3, h4, h5, h6').forEach(el => {
     if (el.children.length === 0 && AD_MARKER_PATTERN.test(normalizeText(el.textContent || ''))) {
@@ -74,8 +82,10 @@ const removeAdMarkers = (doc: Document): void => {
   });
 };
 
-// Defuddle's hero-block cleanup can drop a real subheadline as empty chrome;
-// article.description survives that removal, so recover it here.
+/**
+ * Defuddle's hero-block cleanup can drop a real subheadline as empty chrome;
+ * article.description survives that removal, so recover it here.
+ */
 const withDescription = (content: string, description?: string): string => {
   if (!description) {
     return content;
@@ -93,8 +103,10 @@ const withDescription = (content: string, description?: string): string => {
   return `${p.outerHTML}${content}`;
 };
 
-// Parse a clone — Defuddle mutates whatever it's given, so the original
-// document must stay intact until reader mode is confirmed to apply.
+/**
+ * Parses a clone — Defuddle mutates whatever it's given, so the original
+ * document must stay intact until reader mode is confirmed to apply.
+ */
 export const getReadabilityArticle = async (): Promise<ReadabilityArticle> => {
   const doc = document.cloneNode(true) as Document;
 

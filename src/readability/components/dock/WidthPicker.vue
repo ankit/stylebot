@@ -15,9 +15,13 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { WIDTHS, nearestStepIndex } from '@stylebot/readability';
+import { nearestStepIndex } from './utils/nearest-step-index';
 
 import Segmented from './Segmented.vue';
+
+// In em (not the design's raw px) so the column keeps scaling with font size,
+// matching the reader's existing max-width:${width}em convention.
+const WIDTHS = [32, 36, 40, 44, 48];
 
 export default Vue.extend({
   name: 'WidthPicker',

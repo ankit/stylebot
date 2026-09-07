@@ -11,7 +11,9 @@ export type LoaderColors = {
   foreground: string;
 };
 
-// Build the loading-screen CSS for the given theme colors and line count.
+/**
+ * Builds the loading-screen CSS for the given theme colors and line count.
+ */
 export const loaderCss = (
   { background, foreground }: LoaderColors,
   lineCount: number

@@ -41,7 +41,7 @@ import Vue, { PropType } from 'vue';
 
 import { ReadabilityTheme } from '@stylebot/types';
 
-import { closeReader } from '../../dock-actions';
+import { closeReader } from '../../utils/close-reader';
 
 import CloseButton from './CloseButton.vue';
 import TypographyButton from './TypographyButton.vue';

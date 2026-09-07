@@ -44,8 +44,8 @@ import {
   injectCSSIntoDocument,
 } from '@stylebot/css';
 
-import { hideLoader, cacheTheme } from '../loader';
-import { sendReadabilitySettings } from '../dock-actions';
+import { hideLoader, cacheTheme } from '../loading-screen/loader';
+import { sendReadabilitySettings } from '../utils/send-readability-settings';
 
 import {
   GetReadabilitySettings,
