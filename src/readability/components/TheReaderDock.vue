@@ -97,7 +97,7 @@
     <div v-else-if="moreOpen" class="stylebot-reader-dock-panel stylebot-reader-dock-more">
       <button class="stylebot-reader-dock-more-item" @click="openOptions">
         <icon-options />
-        Options
+        Stylebot Options
       </button>
       <button class="stylebot-reader-dock-more-item" @click="reportIssue">
         <icon-flag />
@@ -418,6 +418,11 @@ export default Vue.extend({
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Ubuntu,
     'Helvetica Neue', sans-serif;
   transition: opacity 0.32s ease;
+
+  * {
+    transition: background-color 0.2s ease, color 0.2s ease,
+      border-color 0.2s ease, box-shadow 0.2s ease;
+  }
 }
 
 .stylebot-reader-dock-buttons {
@@ -588,7 +593,7 @@ export default Vue.extend({
 }
 
 .stylebot-reader-dock-more {
-  width: 148px;
+  width: 176px;
   padding: 4px;
   border-radius: 11px;
   gap: 1px;
@@ -603,6 +608,7 @@ export default Vue.extend({
   padding: 3px 7px;
   border-radius: 7px;
   font-size: 13px;
+  white-space: nowrap;
   cursor: pointer;
   color: var(--main-foreground);
 
