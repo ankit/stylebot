@@ -1,13 +1,13 @@
 <template>
-  <div class="stylebot-reader-header">
-    <a :href="url" class="stylebot-reader-domain">
+  <div class="header">
+    <a :href="url" class="domain">
       {{ source }}
     </a>
 
     <h1>{{ title }}</h1>
-    <div class="stylebot-reader-byline">
+    <div class="byline">
       <span v-if="byline">{{ byline }}</span>
-      <span v-if="formattedDate" class="stylebot-reader-date">{{ formattedDate }}</span>
+      <span v-if="formattedDate" class="date">{{ formattedDate }}</span>
     </div>
   </div>
 </template>
@@ -70,7 +70,7 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-.stylebot-reader-header {
+.header {
   > h1 {
     font-size: 1.6em;
     line-height: 1.3em;
@@ -82,7 +82,7 @@ export default Vue.extend({
   }
 }
 
-.stylebot-reader-domain {
+.domain {
   display: inline-block;
   font-size: 0.85em;
   line-height: 1.4em;
@@ -105,7 +105,7 @@ export default Vue.extend({
   }
 }
 
-.stylebot-reader-byline {
+.byline {
   font-size: 0.85em;
   font-weight: 300;
   color: var(--muted-foreground);
@@ -117,7 +117,7 @@ export default Vue.extend({
   }
 }
 
-.stylebot-reader-date {
+.date {
   opacity: 0.7;
 }
 </style>

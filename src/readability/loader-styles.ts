@@ -30,7 +30,7 @@ export const loaderCss = (
     'body *:not(#stylebot) { display: none; }' +
     `#${LOADER_ART_ID} {` +
     '  position: fixed; inset: 0; margin: auto;' +
-    '  width: 130px; height: -moz-fit-content; height: fit-content;' +
+    '  width: 130px; height: fit-content;' +
     '  display: flex; flex-direction: column; gap: 8px;' +
     '  z-index: 2147483647; pointer-events: none; opacity: 0;' +
     // Fade in only after a delay, so fast loads show nothing.

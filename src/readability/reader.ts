@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { isProbablyReaderable } from './is-probably-readerable';
 
-import App from './App.vue';
+import App from './components/App.vue';
 import { getDomainUrlAndSource, getReadabilityArticle } from './utils';
 
 import { ReadabilityArticle } from '@stylebot/types';

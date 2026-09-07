@@ -25,7 +25,11 @@
       />
 
       <!-- eslint-disable vue/no-v-html - html is generated with the readability project -->
-      <div class="stylebot-reader-content" :class="{ justify }" v-html="article.content" />
+      <div
+        class="stylebot-reader-content"
+        :class="{ justify }"
+        v-html="article.content"
+      />
     </div>
   </div>
 </template>
@@ -52,7 +56,7 @@ import {
 } from '@stylebot/types';
 
 import TheReaderHeader from './TheReaderHeader.vue';
-import TheReaderDock from './TheReaderDock.vue';
+import TheReaderDock from './dock/TheReaderDock.vue';
 
 export default Vue.extend({
   name: 'TheReader',

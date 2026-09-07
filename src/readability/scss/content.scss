@@ -119,8 +119,7 @@
   p > a:only-child > img:only-child,
   td[colspan] img,
   .wp-caption img,
-  figure img,
-  img[moz-reader-center] {
+  figure img {
     border-radius: 8px;
     box-shadow: var(--image-shadow);
   }
