@@ -68,6 +68,17 @@
     height: auto;
   }
 
+  img {
+    // Cap tall/portrait images — regardless of how they're wrapped — so a single
+    // hero, infographic, or full-page scan can't exceed the viewport and shove
+    // the article far down. width is already bounded to the reading column by
+    // the `*` rule; width:auto + max-height lets the browser scale height down
+    // here while preserving aspect ratio. max-height only ever shrinks, so tiny
+    // icons/emoji are unaffected.
+    width: auto;
+    max-height: 80vh;
+  }
+
   p,
   code,
   pre,
