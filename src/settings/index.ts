@@ -1,6 +1,7 @@
 import {
   StylebotOptions,
   StylebotCommands,
+  StylebotFonts,
   ReadabilitySettings,
   StylebotEditorCommands,
 } from '@stylebot/types';
@@ -55,8 +56,17 @@ export const defaultEditorCommands: StylebotEditorCommands = {
 
 export const defaultReadabilitySettings: ReadabilitySettings = {
   size: 16,
-  width: 36,
+  width: 40,
   theme: 'light',
   lineHeight: 1.6,
-  font: 'Helvetica',
+  font: 'Merriweather',
 };
+
+// Kept apart from `defaultOptions.fonts`, which also powers the
+// general-purpose Text panel and needs display/code fonts too.
+export const readabilityFonts: StylebotFonts = [
+  'Merriweather',
+  'Georgia',
+  'Lora',
+  'Helvetica',
+];

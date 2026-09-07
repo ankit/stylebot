@@ -1,7 +1,7 @@
 export {};
 
 jest.mock('../reader');
-jest.mock('../utils');
+jest.mock('../heuristics');
 jest.mock('../loader');
 jest.mock('../cache');
 
@@ -9,7 +9,7 @@ const flushPromises = () => new Promise(resolve => setImmediate(resolve));
 
 describe('readability apply()/remove()', () => {
   let readerModule: typeof import('../reader');
-  let utilsModule: typeof import('../utils');
+  let heuristicsModule: typeof import('../heuristics');
   let loaderModule: typeof import('../loader');
   let cacheModule: typeof import('../cache');
   let apply: typeof import('../apply').apply;
@@ -27,12 +27,12 @@ describe('readability apply()/remove()', () => {
     jest.useFakeTimers();
 
     readerModule = require('../reader');
-    utilsModule = require('../utils');
+    heuristicsModule = require('../heuristics');
     loaderModule = require('../loader');
     cacheModule = require('../cache');
 
     (cacheModule.didUrlChange as jest.Mock).mockReturnValue(true);
-    (utilsModule.shouldRunOnUrl as jest.Mock).mockReturnValue(true);
+    (heuristicsModule.shouldRunOnUrl as jest.Mock).mockReturnValue(true);
     (readerModule.initReader as jest.Mock).mockResolvedValue(undefined);
 
     setReadyState('complete');
@@ -54,7 +54,7 @@ describe('readability apply()/remove()', () => {
   });
 
   it('reverts and skips mounting when the url should not run', async () => {
-    (utilsModule.shouldRunOnUrl as jest.Mock).mockReturnValue(false);
+    (heuristicsModule.shouldRunOnUrl as jest.Mock).mockReturnValue(false);
 
     await apply();
 
@@ -84,6 +84,17 @@ describe('readability apply()/remove()', () => {
     await flushPromises();
 
     expect(readerModule.initReader).toBeCalledTimes(1);
+  });
+
+  it('reverts immediately without retrying on a MediaWiki main page', async () => {
+    (heuristicsModule.isMediaWikiMainPage as jest.Mock).mockReturnValue(true);
+
+    await apply();
+    await flushPromises();
+
+    expect(readerModule.initReader).not.toBeCalled();
+    expect(loaderModule.hideLoader).toBeCalled();
+    expect(cacheModule.revertToCachedDocument).toBeCalled();
   });
 
   it('retries a bounded number of times before giving up', async () => {

@@ -1,6 +1,11 @@
 <template>
   <div class="the-readability">
-    <b-form-checkbox v-model="value" switch class="enable-readability">
+    <b-form-checkbox
+      v-model="value"
+      switch
+      class="enable-readability"
+      :disabled="!pageReaderable"
+    >
       {{ t('enable_readability') }}
     </b-form-checkbox>
 
@@ -57,6 +62,8 @@
 <script lang="ts">
 import Vue from 'vue';
 
+import { isReaderable } from '@stylebot/readability';
+
 import CssProperty from '../CssProperty.vue';
 import CssPropertyValue from '../CssPropertyValue.vue';
 
@@ -80,9 +87,13 @@ export default Vue.extend({
   },
 
   computed: {
+    pageReaderable(): boolean {
+      return isReaderable();
+    },
+
     value: {
       get(): boolean {
-        return this.$store.state.readability;
+        return this.pageReaderable && this.$store.state.readability;
       },
 
       set(value: boolean): void {

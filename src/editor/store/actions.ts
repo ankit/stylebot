@@ -226,13 +226,23 @@ export default {
   },
 
   applyReadability(
-    { state, commit }: { state: State; commit: Commit },
+    {
+      state,
+      commit,
+      dispatch,
+    }: { state: State; commit: Commit; dispatch: Dispatch },
     value: boolean
   ): void {
     if (value) {
       applyReadability(true);
     } else {
       removeReadability();
+    }
+
+    // Editing page CSS has no effect while readability is running — its DOM
+    // is detached from the document, not just hidden.
+    if (value && ['basic', 'code'].includes(state.options.mode)) {
+      dispatch('setMode', 'magic');
     }
 
     commit('setReadability', value);
