@@ -9,7 +9,7 @@ jest.mock('../document-cache');
 
 const flushPromises = () => new Promise(resolve => setImmediate(resolve));
 
-describe('applyReadability()/removeReadability()', () => {
+describe('applyReadability()', () => {
   let mountReaderModule: typeof import('../mount-reader');
   let shouldRunOnUrlModule: typeof import('../../eligibility/should-run-on-url');
   let isBlockedAfterLoadModule: typeof import('../../eligibility/is-blocked-after-load');
