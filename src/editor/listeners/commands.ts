@@ -2,7 +2,7 @@ import { Store } from 'vuex';
 import hotkeys from 'hotkeys-js';
 
 import { State } from 'editor/store';
-import { StylebotCommandName, StylebotCommands } from '@stylebot/types';
+import { StylebotCommandName } from '@stylebot/types';
 
 import {
   toggleStylebot,
@@ -61,7 +61,7 @@ const initCommandListener = (store: Store<State>): void => {
   // while this page is already open — re-bind so they take effect immediately.
   chrome.storage.onChanged.addListener((changes, areaName) => {
     if (areaName === 'local' && changes.commands) {
-      store.commit('setCommands', changes.commands.newValue as StylebotCommands);
+      store.commit('setCommands', changes.commands.newValue);
       bindCommands(store);
     }
   });
