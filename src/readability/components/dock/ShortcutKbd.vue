@@ -44,7 +44,12 @@ export default Vue.extend({
 }
 
 kbd {
-  font: 400 13px/1 -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI', sans-serif;
+  // Browsers default kbd/code/pre/samp to monospace, overriding normal
+  // inheritance — re-enable it explicitly rather than repeating the stack.
+  font-family: inherit;
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 1;
   letter-spacing: 0.3px;
 }
 

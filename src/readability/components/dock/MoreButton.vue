@@ -39,7 +39,9 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .more-btn {
-  font: 700 18px/1 system-ui, -apple-system, sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 1;
 
   &.active {
     background: color-mix(in srgb, var(--main-foreground) 6%, transparent);

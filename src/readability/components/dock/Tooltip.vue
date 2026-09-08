@@ -67,7 +67,9 @@ export default Vue.extend({
   background: var(--main-background);
   color: var(--main-foreground);
   border: 1px solid var(--border-color);
-  font: 400 11.5px/1.2 system-ui, -apple-system, sans-serif;
+  font-weight: 400;
+  font-size: 11.5px;
+  line-height: 1.2;
   box-shadow: 0 5px 14px rgba(0, 0, 0, 0.14);
 }
 </style>

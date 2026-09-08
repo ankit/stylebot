@@ -191,7 +191,9 @@ export default Vue.extend({
 }
 
 .title {
-  font: 600 12.5px/1.3 -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 12.5px;
+  line-height: 1.3;
   color: var(--main-foreground);
 }
 
@@ -235,7 +237,9 @@ export default Vue.extend({
 }
 
 .desc {
-  font: 400 11.5px/1.4 -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  font-weight: 400;
+  font-size: 11.5px;
+  line-height: 1.4;
   color: var(--muted-foreground);
   margin: 4px 0 14px;
 }
@@ -248,7 +252,9 @@ export default Vue.extend({
   align-items: center;
   justify-content: center;
   gap: 7px;
-  font: 400 12px/1 -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 1;
   color: var(--main-foreground);
   background: color-mix(in srgb, var(--main-foreground) 6%, transparent);
   border-radius: 7px;
@@ -296,7 +302,9 @@ export default Vue.extend({
   display: block;
   width: calc(100% + 16px);
   margin: 0 -8px;
-  font: 400 12.5px/1 -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  font-weight: 400;
+  font-size: 12.5px;
+  line-height: 1;
   color: var(--main-foreground);
   padding: 9px 8px;
   border-radius: 6px;
@@ -339,14 +347,18 @@ export default Vue.extend({
 
 .placeholder {
   color: var(--muted-foreground);
-  font: 400 13px/1 -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 1;
   animation: shortcut-cursor-blink 1s step-end infinite;
 }
 
 .cancel {
   all: unset;
   box-sizing: border-box;
-  font: 400 11.5px/1 -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  font-weight: 400;
+  font-size: 11.5px;
+  line-height: 1;
   color: var(--muted-foreground);
   cursor: pointer;
   padding: 4px;
@@ -357,7 +369,9 @@ export default Vue.extend({
 }
 
 .helper {
-  font: 400 11px/1.4 -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  font-weight: 400;
+  font-size: 11px;
+  line-height: 1.4;
   color: var(--muted-foreground);
   margin: 9px 0 0;
 }
