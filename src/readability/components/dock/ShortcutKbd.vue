@@ -1,5 +1,5 @@
 <template>
-  <span class="shortcut-kbd">
+  <span class="shortcut-kbd" :class="{ small }">
     <template v-for="(part, index) in formatted.parts">
       <kbd :key="index">{{ part }}</kbd
       ><span v-if="index < formatted.parts.length - 1" :key="`joiner-${index}`" class="joiner">{{
@@ -22,6 +22,11 @@ export default Vue.extend({
       type: String,
       required: true,
     },
+
+    small: {
+      type: Boolean,
+      default: false,
+    },
   },
 
   computed: {
@@ -41,6 +46,11 @@ export default Vue.extend({
 kbd {
   font: 400 13px/1 -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI', sans-serif;
   letter-spacing: 0.3px;
+}
+
+.small kbd {
+  font-size: 11px;
+  letter-spacing: -0.2px;
 }
 
 .joiner {

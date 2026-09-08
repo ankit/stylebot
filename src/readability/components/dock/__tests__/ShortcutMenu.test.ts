@@ -25,12 +25,21 @@ describe('ShortcutMenu.vue', () => {
     shortcutStore.state.recording = false;
     (getCommands as jest.Mock).mockResolvedValue(commands(''));
     (setCommands as jest.Mock).mockClear();
+
+    global.chrome = {
+      storage: {
+        local: {
+          get: jest.fn((_key, callback) => callback({})),
+          set: jest.fn(),
+        },
+      },
+    } as unknown as typeof chrome;
   });
 
   it('shows the invite to record a shortcut when unset', () => {
     const wrapper = mountMenu('');
 
-    expect(wrapper.text()).toContain('Record a shortcut');
+    expect(wrapper.text()).toContain('Record shortcut');
     expect(wrapper.text()).not.toContain('Change…');
   });
 

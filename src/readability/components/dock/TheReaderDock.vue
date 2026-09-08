@@ -17,14 +17,6 @@
         @unhover="hideTip"
       />
 
-      <shortcut-keycap
-        ref="shortcutKeycap"
-        :recording="recording"
-        @click="toggleMenu('shortcut')"
-        @hover="showTip($event, shortcutTooltip)"
-        @unhover="hideTip"
-      />
-
       <more-button
         ref="moreBtn"
         :active="activeMenu === 'more'"
@@ -45,9 +37,16 @@
       @update="$emit('update', $event)"
     />
 
-    <more-menu v-else-if="activeMenu === 'more'" ref="moreMenu" @close="activeMenu = null" />
+    <more-menu
+      v-else-if="activeMenu === 'more'"
+      ref="moreMenu"
+      @close="activeMenu = null"
+      @open-shortcut="toggleMenu('shortcut')"
+    />
 
     <shortcut-menu v-else-if="activeMenu === 'shortcut'" ref="shortcutMenu" />
+
+    <shortcut-menu v-else-if="showShortcutPrompt" dismissible />
 
     <tooltip v-if="tip" :text="tip" :top="tipTop" :left="tipLeft" />
   </div>
@@ -66,7 +65,6 @@ import TypographyButton from './TypographyButton.vue';
 import MoreButton from './MoreButton.vue';
 import SettingsMenu from './SettingsMenu.vue';
 import MoreMenu from './MoreMenu.vue';
-import ShortcutKeycap from './ShortcutKeycap.vue';
 import ShortcutMenu from './ShortcutMenu.vue';
 import Tooltip from './Tooltip.vue';
 
@@ -78,10 +76,12 @@ const WAKE_EVENTS = ['mousemove', 'scroll', 'touchstart'] as const;
 type MenuName = 'settings' | 'more' | 'shortcut';
 
 // Which button opens each menu, and which ref to return focus to on Escape.
+// The shortcut menu has no dedicated toolbar button (it opens from the More
+// menu, or from the prompt), so Escape returns focus to the More button.
 const MENUS: Record<MenuName, { triggerRef: string; menuRef: string }> = {
   settings: { triggerRef: 'typographyBtn', menuRef: 'settingsMenu' },
   more: { triggerRef: 'moreBtn', menuRef: 'moreMenu' },
-  shortcut: { triggerRef: 'shortcutKeycap', menuRef: 'shortcutMenu' },
+  shortcut: { triggerRef: 'moreBtn', menuRef: 'shortcutMenu' },
 };
 
 export default Vue.extend({
@@ -93,7 +93,6 @@ export default Vue.extend({
     MoreButton,
     SettingsMenu,
     MoreMenu,
-    ShortcutKeycap,
     ShortcutMenu,
     Tooltip,
   },
@@ -154,7 +153,7 @@ export default Vue.extend({
     },
 
     dockOpacity(): number {
-      return this.idle && !this.anyMenuOpen ? 0.45 : 1;
+      return this.idle && !this.anyMenuOpen && !this.showShortcutPrompt ? 0.45 : 1;
     },
 
     closeTipText(): string {
@@ -165,8 +164,11 @@ export default Vue.extend({
       return shortcutStore.state.recording;
     },
 
-    shortcutTooltip(): string {
-      return shortcutStore.tooltip;
+    // Nudges the user to set a shortcut until they either set one or
+    // dismiss it — hidden while any menu (including the shortcut menu
+    // itself) is open, so it never overlaps another panel.
+    showShortcutPrompt(): boolean {
+      return !shortcutStore.state.promptDismissed && !shortcutStore.value && !this.anyMenuOpen;
     },
   },
 
@@ -287,10 +289,17 @@ export default Vue.extend({
     },
 
     close(): void {
+      shortcutStore.dismissPrompt();
       closeReader();
     },
 
     toggleMenu(menu: MenuName): void {
+      // Using any other dock control counts as having seen the invite —
+      // don't keep nudging once the user's engaged with the dock at all.
+      if (menu !== 'shortcut') {
+        shortcutStore.dismissPrompt();
+      }
+
       this.activeMenu = this.activeMenu === menu ? null : menu;
       this.hideTip();
 

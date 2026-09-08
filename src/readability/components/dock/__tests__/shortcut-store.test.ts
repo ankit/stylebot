@@ -14,6 +14,8 @@ describe('shortcutStore', () => {
   let getCommandsModule: typeof import('../../../utils/get-commands');
   let setCommandsModule: typeof import('../../../utils/set-commands');
   let shortcutStore: typeof import('../shortcut-store').shortcutStore;
+  let storageGet: jest.Mock;
+  let storageSet: jest.Mock;
 
   beforeEach(() => {
     jest.resetModules();
@@ -21,6 +23,12 @@ describe('shortcutStore', () => {
     getCommandsModule = require('../../../utils/get-commands');
     setCommandsModule = require('../../../utils/set-commands');
     (getCommandsModule.getCommands as jest.Mock).mockResolvedValue(commands(''));
+
+    storageGet = jest.fn((_key, callback) => callback({}));
+    storageSet = jest.fn();
+    global.chrome = {
+      storage: { local: { get: storageGet, set: storageSet } },
+    } as unknown as typeof chrome;
 
     ({ shortcutStore } = require('../shortcut-store'));
   });
@@ -30,6 +38,7 @@ describe('shortcutStore', () => {
     await shortcutStore.ensureLoaded();
 
     expect(getCommandsModule.getCommands).toHaveBeenCalledTimes(1);
+    expect(storageGet).toHaveBeenCalledTimes(1);
   });
 
   it('value is empty before load and reflects the fetched shortcut after', async () => {
@@ -41,17 +50,22 @@ describe('shortcutStore', () => {
     expect(shortcutStore.value).toBe('alt+shift+r');
   });
 
-  it('tooltip invites setting a shortcut when unset', () => {
-    expect(shortcutStore.tooltip).toBe('Set a shortcut to toggle readability on a site');
-  });
+  it('promptDismissed is false before load and reflects the stored flag after', async () => {
+    expect(shortcutStore.state.promptDismissed).toBe(false);
 
-  it('tooltip includes the formatted shortcut when set', async () => {
-    (getCommandsModule.getCommands as jest.Mock).mockResolvedValue(commands('alt+shift+r'));
+    storageGet.mockImplementation((_key, callback) =>
+      callback({ readabilityShortcutPromptDismissed: true })
+    );
     await shortcutStore.ensureLoaded();
 
-    // formatShortcut's own mac/non-mac rendering is covered separately —
-    // just assert the store weaves its output into the sentence.
-    expect(shortcutStore.tooltip).toMatch(/^Modify shortcut \(.+\) to toggle readability on a site$/);
+    expect(shortcutStore.state.promptDismissed).toBe(true);
+  });
+
+  it('dismissPrompt sets and persists the dismissed flag', () => {
+    shortcutStore.dismissPrompt();
+
+    expect(shortcutStore.state.promptDismissed).toBe(true);
+    expect(storageSet).toHaveBeenCalledWith({ readabilityShortcutPromptDismissed: true });
   });
 
   it('setRecording updates state.recording', () => {
@@ -74,5 +88,22 @@ describe('shortcutStore', () => {
 
     expect(shortcutStore.value).toBe('alt+shift+r');
     expect(setCommandsModule.setCommands).toHaveBeenCalledWith(commands('alt+shift+r'));
+  });
+
+  it('update() with a non-empty value also dismisses the prompt', async () => {
+    await shortcutStore.ensureLoaded();
+
+    shortcutStore.update('alt+shift+r');
+
+    expect(shortcutStore.state.promptDismissed).toBe(true);
+    expect(storageSet).toHaveBeenCalledWith({ readabilityShortcutPromptDismissed: true });
+  });
+
+  it('update() with an empty value (Remove) does not dismiss the prompt', async () => {
+    await shortcutStore.ensureLoaded();
+
+    shortcutStore.update('');
+
+    expect(shortcutStore.state.promptDismissed).toBe(false);
   });
 });
