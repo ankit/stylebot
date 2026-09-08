@@ -60,6 +60,7 @@ kbd {
 
 .joiner {
   font-size: 11px;
+  line-height: 1;
   margin: 0 1px;
   color: var(--muted-foreground);
 }

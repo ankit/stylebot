@@ -1,5 +1,5 @@
 <template>
-  <menu-box dense :width="184">
+  <menu-box dense :min-width="184">
     <button class="item" @click="openShortcut">
       <icon-keyboard />
       <span class="label">{{ shortcutLabel }}</span>
@@ -113,6 +113,9 @@ export default Vue.extend({
 
 .label {
   flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .item:hover .chip {

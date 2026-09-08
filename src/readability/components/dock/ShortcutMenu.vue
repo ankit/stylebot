@@ -1,6 +1,6 @@
 <template>
   <div ref="root" class="menu-root" tabindex="-1" @keydown="onKeydown" @keyup="onKeyup">
-    <menu-box dense :width="232">
+    <menu-box dense :min-width="232">
       <div v-if="recording" class="content">
         <div class="capture-row">
           <span class="capture-field">
