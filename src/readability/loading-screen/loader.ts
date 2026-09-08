@@ -1,7 +1,7 @@
 import { ReadabilityTheme } from '@stylebot/types';
 
 import { loaderCss, LOADER_ART_ID } from './loader-styles';
-import { THEME_BACKGROUNDS, THEME_FOREGROUNDS } from './theme-colors';
+import { THEME_BACKGROUNDS, THEME_FOREGROUNDS } from '../theme-colors';
 
 // Read synchronously so the loading screen can match the reader's theme
 // immediately, instead of flashing white until settings are fetched.
@@ -17,6 +17,9 @@ const LOADER_LINES: Array<{ width: number; title?: boolean }> = [
   { width: 82 },
 ];
 
+/**
+ * Remembers the reader's theme so the next loader paint can match it.
+ */
 export const cacheTheme = (theme: ReadabilityTheme): void => {
   try {
     localStorage.setItem(THEME_CACHE_KEY, theme);
@@ -25,7 +28,9 @@ export const cacheTheme = (theme: ReadabilityTheme): void => {
   }
 };
 
-// Hide document content until reader is ready.
+/**
+ * Hides document content and paints a themed loading screen until reader is ready.
+ */
 export const showLoader = (): void => {
   let cachedTheme: ReadabilityTheme | null = null;
 
@@ -63,6 +68,9 @@ export const showLoader = (): void => {
   document.documentElement.appendChild(art);
 };
 
+/**
+ * Removes the loading screen and its inline background override.
+ */
 export const hideLoader = (): void => {
   document.getElementById('stylebot-reader-loading')?.remove();
   document.getElementById(LOADER_ART_ID)?.remove();

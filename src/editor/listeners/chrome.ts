@@ -3,10 +3,7 @@ import { Store } from 'vuex';
 import { State } from 'editor/store';
 import { TabMessage } from '@stylebot/types';
 
-import {
-  apply as applyReadability,
-  remove as removeReadability,
-} from '@stylebot/readability';
+import { applyReadability, removeReadability } from '@stylebot/readability';
 
 import {
   applyStyles,

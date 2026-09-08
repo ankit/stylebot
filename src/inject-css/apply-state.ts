@@ -1,8 +1,5 @@
 import { injectCSSIntoDocument, removeCSSFromDocument } from '@stylebot/css';
-import {
-  apply as applyReadability,
-  remove as removeReadability,
-} from '@stylebot/readability';
+import { applyReadability, removeReadability } from '@stylebot/readability';
 
 import { CachedState } from './cache';
 

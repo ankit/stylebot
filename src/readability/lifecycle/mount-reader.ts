@@ -1,12 +1,16 @@
 import Vue from 'vue';
-import { isProbablyReaderable } from './is-probably-readerable';
+import { hasReaderableContent } from '../eligibility/has-readerable-content';
 
-import App from './components/App.vue';
-import { getDomainUrlAndSource, getReadabilityArticle } from './utils';
+import App from '../components/App.vue';
+import { getDomainUrlAndSource } from './get-domain-url-and-source';
+import { getReadabilityArticle } from './get-readability-article';
 
 import { ReadabilityArticle } from '@stylebot/types';
-import { cacheDocument } from './cache';
+import { cacheDocument } from './document-cache';
 
+/**
+ * Fetches the reader's compiled stylesheet and injects it into the shadow root.
+ */
 const initCss = async (root: ShadowRoot): Promise<void> => {
   const cssUrl = chrome.runtime.getURL('readability/index.css');
 
@@ -24,6 +28,9 @@ const initCss = async (root: ShadowRoot): Promise<void> => {
   });
 };
 
+/**
+ * Creates the shadow DOM host the reader app mounts into, isolated from page styles.
+ */
 const initShadowDOM = async (): Promise<HTMLElement> => {
   const host = document.createElement('div');
   const hostStyle =
@@ -43,6 +50,9 @@ const initShadowDOM = async (): Promise<HTMLElement> => {
   return app;
 };
 
+/**
+ * Instantiates the reader's Vue app inside the shadow DOM host.
+ */
 const initVueApp = async (
   url: string,
   source: string,
@@ -62,9 +72,13 @@ const initVueApp = async (
   });
 };
 
-export const initReader = async (): Promise<void> => {
+/**
+ * Parses the current page into an article and mounts the reader UI
+ * into a shadow DOM host on top of it.
+ */
+export const mountReader = async (): Promise<void> => {
   return new Promise(async (resolve, reject) => {
-    if (!isProbablyReaderable(document)) {
+    if (!hasReaderableContent(document)) {
       reject();
       return;
     }

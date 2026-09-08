@@ -11,7 +11,9 @@ const UNLIKELY_CANDIDATES =
   /-ad-|ai2html|banner|breadcrumbs|combx|comment|community|cover-wrap|disqus|extra|footer|gdpr|header|legends|menu|related|remark|replies|rss|shoutbox|sidebar|skyscraper|social|sponsor|supplemental|ad-break|agegate|pagination|pager|popup|yom-remote/i;
 const OK_MAYBE_ITS_A_CANDIDATE = /and|article|body|column|content|main|shadow/i;
 
-// Have to null-check style/className for SVG and MathML nodes.
+/**
+ * Whether a node is visible; has to null-check style/className for SVG and MathML nodes.
+ */
 const isNodeVisible = (node: Element): boolean =>
   (!(node as HTMLElement).style || (node as HTMLElement).style.display !== 'none') &&
   !node.hasAttribute('hidden') &&
@@ -20,16 +22,18 @@ const isNodeVisible = (node: Element): boolean =>
     // Wikimedia math images rely on a visible "fallback-image" node.
     !!node.className?.includes?.('fallback-image'));
 
-export type IsProbablyReaderableOptions = {
+export type HasReaderableContentOptions = {
   minScore?: number;
   minContentLength?: number;
   visibilityChecker?: (node: Element) => boolean;
 };
 
-// Decides whether a document is reader-able without parsing the whole thing.
-export const isProbablyReaderable = (
+/**
+ * Decides whether a document is reader-able without parsing the whole thing.
+ */
+export const hasReaderableContent = (
   doc: Document,
-  options: IsProbablyReaderableOptions = {}
+  options: HasReaderableContentOptions = {}
 ): boolean => {
   const {
     minScore = 20,

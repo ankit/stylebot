@@ -161,7 +161,7 @@ describe('actions', () => {
         styles: [{ url: mockState.url, css: 'a { color: blue; }', enabled: true }],
         readability: true,
       });
-      expect(stylebotReadability.apply).toBeCalledWith(true);
+      expect(stylebotReadability.applyReadability).toBeCalledWith(true);
       expect(chromeUtils.setReadability).toBeCalledWith(mockState.url, true);
     });
 

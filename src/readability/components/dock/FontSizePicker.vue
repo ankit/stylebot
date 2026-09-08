@@ -13,9 +13,13 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { SIZES, nearestStepIndex } from '@stylebot/readability';
+import { nearestStepIndex } from './utils/nearest-step-index';
 
 import Segmented from './Segmented.vue';
+
+// Discrete font-size steps for the segmented +/- control.
+// 16 is the default; two steps sit below it so "smaller" isn't disabled.
+const SIZES = [14, 15, 16, 17, 18, 19, 21, 23, 25];
 
 export default Vue.extend({
   name: 'FontSizePicker',

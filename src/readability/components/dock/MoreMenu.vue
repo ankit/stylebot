@@ -18,11 +18,9 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import {
-  openOptionsPage,
-  openReportIssuePage,
-  openDonatePage,
-} from '../../dock-actions';
+import { openOptionsPage } from '../../utils/open-options-page';
+import { openReportIssuePage } from '../../utils/open-report-issue-page';
+import { openDonatePage } from '../../utils/open-donate-page';
 
 import MenuBox from './MenuBox.vue';
 import IconOptions from '../icons/IconOptions.vue';

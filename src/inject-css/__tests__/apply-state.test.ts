@@ -38,15 +38,15 @@ describe('applyState', () => {
   it('applies readability when the state calls for it', async () => {
     await applyState({ styles: [], readability: true });
 
-    expect(readability.apply).toHaveBeenCalledTimes(1);
-    expect(readability.remove).not.toHaveBeenCalled();
+    expect(readability.applyReadability).toHaveBeenCalledTimes(1);
+    expect(readability.removeReadability).not.toHaveBeenCalled();
   });
 
   it('removes readability when the state does not call for it', async () => {
     await applyState({ styles: [], readability: false });
 
-    expect(readability.remove).toHaveBeenCalledTimes(1);
-    expect(readability.apply).not.toHaveBeenCalled();
+    expect(readability.removeReadability).toHaveBeenCalledTimes(1);
+    expect(readability.applyReadability).not.toHaveBeenCalled();
   });
 
   it('removes a stylesheet that is no longer enabled on a later call', async () => {
