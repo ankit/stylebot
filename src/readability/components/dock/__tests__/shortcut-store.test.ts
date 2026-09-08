@@ -42,12 +42,12 @@ describe('shortcutStore', () => {
   });
 
   it('value is empty before load and reflects the fetched shortcut after', async () => {
-    expect(shortcutStore.value).toBe('');
+    expect(shortcutStore.value()).toBe('');
 
     (getCommandsModule.getCommands as jest.Mock).mockResolvedValue(commands('alt+shift+r'));
     await shortcutStore.ensureLoaded();
 
-    expect(shortcutStore.value).toBe('alt+shift+r');
+    expect(shortcutStore.value()).toBe('alt+shift+r');
   });
 
   it('promptDismissed is false before load and reflects the stored flag after', async () => {
@@ -86,7 +86,7 @@ describe('shortcutStore', () => {
 
     shortcutStore.update('alt+shift+r');
 
-    expect(shortcutStore.value).toBe('alt+shift+r');
+    expect(shortcutStore.value()).toBe('alt+shift+r');
     expect(setCommandsModule.setCommands).toHaveBeenCalledWith(commands('alt+shift+r'));
   });
 

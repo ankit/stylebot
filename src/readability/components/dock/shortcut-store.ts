@@ -43,7 +43,7 @@ export const shortcutStore = {
   state,
   ensureLoaded,
 
-  get value(): string {
+  value(): string {
     return state.commands?.readability ?? '';
   },
 

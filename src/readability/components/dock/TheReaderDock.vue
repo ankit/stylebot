@@ -168,7 +168,7 @@ export default Vue.extend({
     // dismiss it — hidden while any menu (including the shortcut menu
     // itself) is open, so it never overlaps another panel.
     showShortcutPrompt(): boolean {
-      return !shortcutStore.state.promptDismissed && !shortcutStore.value && !this.anyMenuOpen;
+      return !shortcutStore.state.promptDismissed && !shortcutStore.value() && !this.anyMenuOpen;
     },
   },
 

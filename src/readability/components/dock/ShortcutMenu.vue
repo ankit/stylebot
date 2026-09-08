@@ -98,7 +98,7 @@ export default Vue.extend({
 
   computed: {
     value(): string {
-      return shortcutStore.value;
+      return shortcutStore.value();
     },
 
     hasValue(): boolean {

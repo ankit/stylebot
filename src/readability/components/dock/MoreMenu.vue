@@ -49,7 +49,7 @@ export default Vue.extend({
 
   computed: {
     shortcutValue(): string {
-      return shortcutStore.value;
+      return shortcutStore.value();
     },
 
     shortcutLabel(): string {
