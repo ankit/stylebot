@@ -1,6 +1,6 @@
-import * as dedent from 'dedent';
+import dedent from 'dedent';
 import * as postcss from 'postcss';
-import * as tinycolor from 'tinycolor2';
+import tinycolor from 'tinycolor2';
 
 import { getSelector } from '@stylebot/css';
 
