@@ -23,6 +23,7 @@
     "dev:chrome:headless": "yarn watch & cross-env STYLEBOT_FRESH_BUILD=1 STYLEBOT_HEADLESS=1 yarn start:chrome; kill 0",
     "lint": "eslint --ext .js,.ts,.vue src",
     "lint:fix": "yarn lint --fix",
+    "typecheck": "tsc --noEmit",
     "test": "jest",
     "test:coverage": "jest --coverage",
     "postinstall": "patch-package"
