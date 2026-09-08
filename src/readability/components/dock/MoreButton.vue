@@ -2,6 +2,7 @@
   <dock-button
     class="more-btn"
     :class="{ active }"
+    :disabled="disabled"
     aria-haspopup="true"
     :aria-expanded="active"
     @click="$emit('click')"
@@ -26,6 +27,11 @@ export default Vue.extend({
     active: {
       type: Boolean,
       required: true,
+    },
+
+    disabled: {
+      type: Boolean,
+      default: false,
     },
   },
 });

@@ -1,5 +1,5 @@
 <template>
-  <div class="menu" :class="{ dense }">
+  <div class="menu" :class="{ dense }" :style="{ width: `${width}px` }">
     <slot />
   </div>
 </template>
@@ -15,13 +15,17 @@ export default Vue.extend({
       type: Boolean,
       default: false,
     },
+
+    width: {
+      type: Number,
+      default: 176,
+    },
   },
 });
 </script>
 
 <style lang="scss" scoped>
 .menu {
-  width: 176px;
   max-height: calc(100vh - 92px);
   overflow-y: auto;
   overscroll-behavior: contain;
