@@ -2,6 +2,7 @@
   <dock-button
     class="more-btn"
     :class="{ active }"
+    :disabled="disabled"
     aria-haspopup="true"
     :aria-expanded="active"
     @click="$emit('click')"
@@ -27,13 +28,20 @@ export default Vue.extend({
       type: Boolean,
       required: true,
     },
+
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
   },
 });
 </script>
 
 <style lang="scss" scoped>
 .more-btn {
-  font: 700 18px/1 system-ui, -apple-system, sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 1;
 
   &.active {
     background: color-mix(in srgb, var(--main-foreground) 6%, transparent);

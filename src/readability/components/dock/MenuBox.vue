@@ -1,5 +1,5 @@
 <template>
-  <div class="menu" :class="{ dense }">
+  <div class="menu" :class="{ dense }" :style="{ minWidth: `${minWidth}px` }">
     <slot />
   </div>
 </template>
@@ -15,14 +15,21 @@ export default Vue.extend({
       type: Boolean,
       default: false,
     },
+
+    // A floor, not a fixed width — the box grows to fit wider content
+    // (e.g. the longer Windows-style "Alt+Shift+R" vs. Mac's "⌥⇧R").
+    minWidth: {
+      type: Number,
+      default: 176,
+    },
   },
 });
 </script>
 
 <style lang="scss" scoped>
 .menu {
-  width: 176px;
   max-height: calc(100vh - 92px);
+  overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
   padding: 12px;

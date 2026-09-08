@@ -1,6 +1,7 @@
 <template>
   <button
     class="btn"
+    :disabled="disabled"
     @click="$emit('click')"
     @mouseenter="$emit('hover', $event)"
     @mouseleave="$emit('unhover')"
@@ -14,6 +15,13 @@ import Vue from 'vue';
 
 export default Vue.extend({
   name: 'DockButton',
+
+  props: {
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+  },
 });
 </script>
 
@@ -39,6 +47,12 @@ export default Vue.extend({
   &:focus-visible {
     outline: none;
     box-shadow: inset 0 0 0 2px var(--link-color);
+  }
+
+  &:disabled {
+    cursor: default;
+    pointer-events: none;
+    opacity: 0.35;
   }
 }
 </style>

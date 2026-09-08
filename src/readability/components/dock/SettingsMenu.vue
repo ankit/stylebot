@@ -131,7 +131,9 @@ export default Vue.extend({
 
 .reset {
   all: unset;
-  font: 400 11px/1.2 system-ui, -apple-system, sans-serif;
+  font-weight: 400;
+  font-size: 11px;
+  line-height: 1.2;
   cursor: pointer;
   text-decoration: underline;
   color: var(--muted-foreground);

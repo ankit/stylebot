@@ -1,11 +1,17 @@
 <template>
   <div class="dock" :style="{ opacity: dockOpacity }" @focusin="wake">
     <div class="buttons">
-      <close-button @click="close" @hover="showTip($event, closeTipText)" @unhover="hideTip" />
+      <close-button
+        :disabled="recording"
+        @click="close"
+        @hover="showTip($event, closeTipText)"
+        @unhover="hideTip"
+      />
 
       <typography-button
         ref="typographyBtn"
         :active="activeMenu === 'settings'"
+        :disabled="recording"
         @click="toggleMenu('settings')"
         @hover="showTip($event, 'Reading settings')"
         @unhover="hideTip"
@@ -14,6 +20,7 @@
       <more-button
         ref="moreBtn"
         :active="activeMenu === 'more'"
+        :disabled="recording"
         @click="toggleMenu('more')"
       />
     </div>
@@ -30,7 +37,16 @@
       @update="$emit('update', $event)"
     />
 
-    <more-menu v-else-if="activeMenu === 'more'" ref="moreMenu" @close="activeMenu = null" />
+    <more-menu
+      v-else-if="activeMenu === 'more'"
+      ref="moreMenu"
+      @close="activeMenu = null"
+      @open-shortcut="toggleMenu('shortcut')"
+    />
+
+    <shortcut-menu v-else-if="activeMenu === 'shortcut'" ref="shortcutMenu" />
+
+    <shortcut-menu v-else-if="showShortcutPrompt" dismissible />
 
     <tooltip v-if="tip" :text="tip" :top="tipTop" :left="tipLeft" />
   </div>
@@ -42,12 +58,14 @@ import Vue, { PropType } from 'vue';
 import { ReadabilityTheme } from '@stylebot/types';
 
 import { closeReader } from '../../utils/close-reader';
+import { shortcutStore } from './shortcut-store';
 
 import CloseButton from './CloseButton.vue';
 import TypographyButton from './TypographyButton.vue';
 import MoreButton from './MoreButton.vue';
 import SettingsMenu from './SettingsMenu.vue';
 import MoreMenu from './MoreMenu.vue';
+import ShortcutMenu from './ShortcutMenu.vue';
 import Tooltip from './Tooltip.vue';
 
 // Icons stay lit while the pointer is within this many px of the dock.
@@ -55,12 +73,15 @@ const WAKE_RADIUS = 340;
 const IDLE_DELAY_MS = 2600;
 const WAKE_EVENTS = ['mousemove', 'scroll', 'touchstart'] as const;
 
-type MenuName = 'settings' | 'more';
+type MenuName = 'settings' | 'more' | 'shortcut';
 
 // Which button opens each menu, and which ref to return focus to on Escape.
+// The shortcut menu has no dedicated toolbar button (it opens from the More
+// menu, or from the prompt), so Escape returns focus to the More button.
 const MENUS: Record<MenuName, { triggerRef: string; menuRef: string }> = {
   settings: { triggerRef: 'typographyBtn', menuRef: 'settingsMenu' },
   more: { triggerRef: 'moreBtn', menuRef: 'moreMenu' },
+  shortcut: { triggerRef: 'moreBtn', menuRef: 'shortcutMenu' },
 };
 
 export default Vue.extend({
@@ -72,6 +93,7 @@ export default Vue.extend({
     MoreButton,
     SettingsMenu,
     MoreMenu,
+    ShortcutMenu,
     Tooltip,
   },
 
@@ -131,15 +153,34 @@ export default Vue.extend({
     },
 
     dockOpacity(): number {
-      return this.idle && !this.anyMenuOpen ? 0.45 : 1;
+      return this.idle && !this.anyMenuOpen && !this.showShortcutPrompt ? 0.45 : 1;
     },
 
     closeTipText(): string {
       return `Turn off readability for ${document.domain}`;
     },
+
+    recording(): boolean {
+      return shortcutStore.state.recording;
+    },
+
+    // Nudges the user to set a shortcut until they either set one or
+    // dismiss it — hidden while any menu (including the shortcut menu
+    // itself) is open, so it never overlaps another panel.
+    showShortcutPrompt(): boolean {
+      return !shortcutStore.state.promptDismissed && !shortcutStore.value() && !this.anyMenuOpen;
+    },
   },
 
   watch: {
+    // A click outside the dock can tear the menu down mid-recording, so
+    // reset here instead of relying on the menu's own cleanup.
+    activeMenu(menu: MenuName | null): void {
+      if (menu !== 'shortcut') {
+        shortcutStore.setRecording(false);
+      }
+    },
+
     anyMenuOpen(isOpen: boolean): void {
       // Only listen while a menu is open, so a closed dock costs nothing.
       if (isOpen) {
@@ -155,6 +196,7 @@ export default Vue.extend({
   mounted() {
     this.wake();
     WAKE_EVENTS.forEach(event => window.addEventListener(event, this.wake, { passive: true }));
+    shortcutStore.ensureLoaded();
   },
 
   beforeDestroy() {
@@ -247,10 +289,17 @@ export default Vue.extend({
     },
 
     close(): void {
+      shortcutStore.dismissPrompt();
       closeReader();
     },
 
     toggleMenu(menu: MenuName): void {
+      // Using any other dock control counts as having seen the invite —
+      // don't keep nudging once the user's engaged with the dock at all.
+      if (menu !== 'shortcut') {
+        shortcutStore.dismissPrompt();
+      }
+
       this.activeMenu = this.activeMenu === menu ? null : menu;
       this.hideTip();
 
@@ -284,6 +333,7 @@ export default Vue.extend({
 
 .buttons {
   display: flex;
+  align-items: center;
   gap: 4px;
 }
 </style>

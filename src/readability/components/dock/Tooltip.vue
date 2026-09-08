@@ -1,11 +1,14 @@
 <template>
-  <div class="tooltip" :style="{ top: top + 'px', left: left + 'px' }">
+  <div ref="el" class="tooltip" :style="{ top: `${top}px`, left: `${left + offsetX}px` }">
     {{ text }}
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
+
+// Minimum gap kept between the tooltip and the viewport edge.
+const EDGE_MARGIN = 8;
 
 export default Vue.extend({
   name: 'Tooltip',
@@ -26,6 +29,29 @@ export default Vue.extend({
       required: true,
     },
   },
+
+  data(): {
+    offsetX: number;
+  } {
+    return {
+      offsetX: 0,
+    };
+  },
+
+  mounted() {
+    // Centered under the trigger by default (see the .tooltip transform);
+    // nudge back on-screen if that would run past a viewport edge.
+    this.$nextTick(() => {
+      const el = this.$refs.el as HTMLElement;
+      const rect = el.getBoundingClientRect();
+
+      if (rect.right > window.innerWidth - EDGE_MARGIN) {
+        this.offsetX = window.innerWidth - EDGE_MARGIN - rect.right;
+      } else if (rect.left < EDGE_MARGIN) {
+        this.offsetX = EDGE_MARGIN - rect.left;
+      }
+    });
+  },
 });
 </script>
 
@@ -41,7 +67,9 @@ export default Vue.extend({
   background: var(--main-background);
   color: var(--main-foreground);
   border: 1px solid var(--border-color);
-  font: 400 11.5px/1.2 system-ui, -apple-system, sans-serif;
+  font-weight: 400;
+  font-size: 11.5px;
+  line-height: 1.2;
   box-shadow: 0 5px 14px rgba(0, 0, 0, 0.14);
 }
 </style>

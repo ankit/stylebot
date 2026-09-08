@@ -2,6 +2,7 @@
   <dock-button
     class="typography"
     :class="{ active }"
+    :disabled="disabled"
     aria-haspopup="true"
     :aria-expanded="active"
     @click="$emit('click')"
@@ -29,13 +30,20 @@ export default Vue.extend({
       type: Boolean,
       required: true,
     },
+
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
   },
 });
 </script>
 
 <style lang="scss" scoped>
 .typography {
-  font: 500 15px/1 system-ui, -apple-system, sans-serif;
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 1;
 
   &.active {
     background: color-mix(in srgb, var(--main-foreground) 6%, transparent);
