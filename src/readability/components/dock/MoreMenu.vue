@@ -24,12 +24,14 @@
 import Vue from 'vue';
 
 import { shortcutStore } from './shortcut-store';
-import { openOptionsPage } from '../../utils/open-options-page';
-import { openReportIssuePage } from '../../utils/open-report-issue-page';
-import { openDonatePage } from '../../utils/open-donate-page';
+import {
+  openOptionsPage,
+  openReportIssuePage,
+  openDonatePage,
+} from '@stylebot/utils';
 
 import MenuBox from './MenuBox.vue';
-import ShortcutChip from './ShortcutChip.vue';
+import { ShortcutChip } from '@stylebot/components';
 import IconOptions from '../icons/IconOptions.vue';
 import IconFlag from '../icons/IconFlag.vue';
 import IconCoffee from '../icons/IconCoffee.vue';

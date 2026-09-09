@@ -11,7 +11,7 @@
 import Vue from 'vue';
 import { toggleStylebot } from '../utils';
 import PopupButton from './PopupButton.vue';
-import ShortcutChip from '../../readability/components/dock/ShortcutChip.vue';
+import { ShortcutChip } from '@stylebot/components';
 
 export default Vue.extend({
   name: 'ToggleStylebot',

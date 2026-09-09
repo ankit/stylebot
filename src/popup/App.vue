@@ -216,13 +216,6 @@ export default Vue.extend({
 
   --popup-accent: #2a5fd6;
 
-  --popup-switch-track-off: #d3d6dd;
-  --popup-switch-thumb-on: #fff;
-  --popup-switch-thumb-off: #fff;
-  --popup-switch-track-disabled: #f0f1f3;
-  --popup-switch-track-disabled-border: #e3e5ea;
-  --popup-switch-thumb-disabled: #c7cad0;
-
   --popup-icon-btn-border: #dfe1e6;
   --popup-icon-btn-fg: #6a7180;
 
@@ -245,13 +238,6 @@ export default Vue.extend({
     --popup-hover-bg: #26282e;
 
     --popup-accent: #4d80f0;
-
-    --popup-switch-track-off: #3d4048;
-    --popup-switch-thumb-on: #fff;
-    --popup-switch-thumb-off: #9aa1ae;
-    --popup-switch-track-disabled: #24262b;
-    --popup-switch-track-disabled-border: #34363d;
-    --popup-switch-thumb-disabled: #4a4d55;
 
     --popup-icon-btn-border: #34363d;
     --popup-icon-btn-fg: #9aa1ae;

@@ -81,6 +81,10 @@ const config = {
   resolve: {
     extensions: ['.ts', '.js', '.vue'],
     alias: {
+      '@stylebot/components': path.resolve(
+        __dirname,
+        './src/components/index'
+      ),
       '@stylebot/css': path.resolve(__dirname, './src/css/index'),
       '@stylebot/i18n': path.resolve(__dirname, './src/i18n/index'),
       '@stylebot/sync': path.resolve(__dirname, './src/sync/index'),

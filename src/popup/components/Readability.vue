@@ -23,7 +23,7 @@ import Vue from 'vue';
 import { ToggleReadabilityForTab } from '@stylebot/types';
 import PopupRow from './PopupRow.vue';
 import ToggleSwitch from './ToggleSwitch.vue';
-import ShortcutChip from '../../readability/components/dock/ShortcutChip.vue';
+import { ShortcutChip } from '@stylebot/components';
 
 export default Vue.extend({
   name: 'Readability',

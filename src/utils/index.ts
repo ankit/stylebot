@@ -31,3 +31,15 @@ export const getReleaseVersion = (): string =>
 
 export const getReleaseNotificationId = (): NotificationId =>
   `release/${getReleaseVersion()}`;
+
+export const openOptionsPage = (): void => {
+  chrome.runtime.sendMessage({ name: 'OpenOptionsPage' });
+};
+
+export const openReportIssuePage = (): void => {
+  chrome.runtime.sendMessage({ name: 'OpenReportIssuePage' });
+};
+
+export const openDonatePage = (): void => {
+  chrome.runtime.sendMessage({ name: 'OpenDonatePage' });
+};

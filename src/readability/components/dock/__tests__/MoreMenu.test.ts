@@ -3,9 +3,11 @@ import { mount } from '@vue/test-utils';
 import { shortcutStore } from '../shortcut-store';
 import MoreMenu from '../MoreMenu.vue';
 
-jest.mock('../../../utils/open-options-page');
-jest.mock('../../../utils/open-report-issue-page');
-jest.mock('../../../utils/open-donate-page');
+jest.mock('@stylebot/utils', () => ({
+  openOptionsPage: jest.fn(),
+  openReportIssuePage: jest.fn(),
+  openDonatePage: jest.fn(),
+}));
 
 describe('MoreMenu.vue', () => {
   beforeEach(() => {

@@ -55,8 +55,26 @@ export default Vue.extend({
   width: 100%;
   cursor: pointer;
 
+  --track-off: #d3d6dd;
+  --thumb-on: #fff;
+  --thumb-off: #fff;
+  --track-disabled: #f0f1f3;
+  --track-disabled-border: #e3e5ea;
+  --thumb-disabled: #c7cad0;
+
   &.disabled {
     cursor: default;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .switch {
+    --track-off: #3d4048;
+    --thumb-on: #fff;
+    --thumb-off: #9aa1ae;
+    --track-disabled: #24262b;
+    --track-disabled-border: #34363d;
+    --thumb-disabled: #4a4d55;
   }
 }
 
@@ -72,7 +90,7 @@ input {
 .track {
   flex-shrink: 0;
   position: relative;
-  background: var(--popup-switch-track-off);
+  background: var(--track-off);
   transition: background 0.15s ease;
 }
 
@@ -80,7 +98,7 @@ input {
   display: block;
   position: absolute;
   border-radius: 50%;
-  background: var(--popup-switch-thumb-off);
+  background: var(--thumb-off);
   transition: transform 0.15s ease;
 }
 
@@ -89,7 +107,7 @@ input:checked ~ .track {
 }
 
 input:checked ~ .track .thumb {
-  background: var(--popup-switch-thumb-on);
+  background: var(--thumb-on);
 }
 
 .switch--sm .track {
@@ -129,12 +147,12 @@ input:checked ~ .track .thumb {
 }
 
 .disabled .track {
-  background: var(--popup-switch-track-disabled);
-  border: 1px solid var(--popup-switch-track-disabled-border);
+  background: var(--track-disabled);
+  border: 1px solid var(--track-disabled-border);
 }
 
 .disabled .thumb {
-  background: var(--popup-switch-thumb-disabled);
+  background: var(--thumb-disabled);
   top: 1px;
   left: 1px;
 }

@@ -8,9 +8,11 @@ import {
   GetStylesForPageResponse,
 } from '@stylebot/types';
 
-import { openOptionsPage } from '../readability/utils/open-options-page';
-import { openReportIssuePage } from '../readability/utils/open-report-issue-page';
-import { openDonatePage } from '../readability/utils/open-donate-page';
+import {
+  openOptionsPage,
+  openReportIssuePage,
+  openDonatePage,
+} from '@stylebot/utils';
 
 export const getCurrentTab = (
   callback: (tab: chrome.tabs.Tab) => void
