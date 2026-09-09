@@ -1,10 +1,10 @@
-import { onEnterOrSpace } from '../utils';
+import { onEnterOrSpace } from './utils';
 
 const keydown = (key: string): KeyboardEvent =>
   new KeyboardEvent('keydown', { key });
 
 describe('onEnterOrSpace', () => {
-  it('calls the handler and prevents default on Enter', () => {
+  it('should call the handler and prevent default on Enter', () => {
     const event = keydown('Enter');
     const preventDefault = jest.spyOn(event, 'preventDefault');
     const handler = jest.fn();
@@ -15,7 +15,7 @@ describe('onEnterOrSpace', () => {
     expect(preventDefault).toHaveBeenCalledTimes(1);
   });
 
-  it('calls the handler and prevents default on Space', () => {
+  it('should call the handler and prevent default on Space', () => {
     const event = keydown(' ');
     const preventDefault = jest.spyOn(event, 'preventDefault');
     const handler = jest.fn();
@@ -26,7 +26,7 @@ describe('onEnterOrSpace', () => {
     expect(preventDefault).toHaveBeenCalledTimes(1);
   });
 
-  it('ignores other keys', () => {
+  it('should ignore other keys', () => {
     const event = keydown('Tab');
     const preventDefault = jest.spyOn(event, 'preventDefault');
     const handler = jest.fn();

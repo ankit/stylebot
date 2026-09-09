@@ -1,9 +1,9 @@
 import { mount } from '@vue/test-utils';
 
-import ToggleStylebot from '../ToggleStylebot.vue';
-import { toggleStylebot } from '../../utils';
+import ToggleStylebot from './ToggleStylebot.vue';
+import { toggleStylebot } from '../utils';
 
-jest.mock('../../utils', () => ({
+jest.mock('../utils', () => ({
   toggleStylebot: jest.fn(),
 }));
 
@@ -14,7 +14,7 @@ describe('ToggleStylebot.vue', () => {
     jest.clearAllMocks();
   });
 
-  it('shows the "style this page" label when closed', () => {
+  it('should show the "style this page" label when closed', () => {
     const wrapper = mount(ToggleStylebot, {
       propsData: { tab, isOpen: false },
     });
@@ -23,7 +23,7 @@ describe('ToggleStylebot.vue', () => {
     expect(wrapper.text()).not.toContain('close_stylebot');
   });
 
-  it('shows the "close" label when open', () => {
+  it('should show the "close" label when open', () => {
     const wrapper = mount(ToggleStylebot, {
       propsData: { tab, isOpen: true },
     });
@@ -32,7 +32,7 @@ describe('ToggleStylebot.vue', () => {
     expect(wrapper.text()).not.toContain('style_this_page');
   });
 
-  it('calls toggleStylebot with the tab on click', async () => {
+  it('should call toggleStylebot with the tab on click', async () => {
     const wrapper = mount(ToggleStylebot, {
       propsData: { tab, isOpen: false },
     });
@@ -42,7 +42,7 @@ describe('ToggleStylebot.vue', () => {
     expect(toggleStylebot).toHaveBeenCalledWith(tab);
   });
 
-  it('shows the shortcut chip only when a shortcut is bound', () => {
+  it('should show the shortcut chip only when a shortcut is bound', () => {
     const withShortcut = mount(ToggleStylebot, {
       propsData: { tab, isOpen: false, shortcut: 'alt+shift+m' },
     });

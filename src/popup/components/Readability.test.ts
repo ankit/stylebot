@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils';
 
-import Readability from '../Readability.vue';
+import Readability from './Readability.vue';
 
 describe('Readability.vue', () => {
   beforeEach(() => {
@@ -12,7 +12,7 @@ describe('Readability.vue', () => {
     } as unknown as typeof chrome;
   });
 
-  it('shows "articles only" and no shortcut chip when disabled', () => {
+  it('should show "articles only" and no shortcut chip when disabled', () => {
     const wrapper = mount(Readability, {
       propsData: { disabled: true, shortcut: 'alt+shift+r' },
     });
@@ -21,7 +21,7 @@ describe('Readability.vue', () => {
     expect(wrapper.find('kbd').exists()).toBe(false);
   });
 
-  it('shows the shortcut chip when enabled and a shortcut is bound', () => {
+  it('should show the shortcut chip when enabled and a shortcut is bound', () => {
     const wrapper = mount(Readability, {
       propsData: { disabled: false, shortcut: 'alt+shift+r' },
     });
@@ -30,7 +30,7 @@ describe('Readability.vue', () => {
     expect(wrapper.text()).not.toContain('articles_only');
   });
 
-  it('shows neither when enabled with no shortcut bound', () => {
+  it('should show neither when enabled with no shortcut bound', () => {
     const wrapper = mount(Readability, {
       propsData: { disabled: false, shortcut: '' },
     });
@@ -39,7 +39,7 @@ describe('Readability.vue', () => {
     expect(wrapper.text()).not.toContain('articles_only');
   });
 
-  it('toggling emits change and messages the active tab', async () => {
+  it('should emit change and message the active tab when toggled', async () => {
     const wrapper = mount(Readability, {
       propsData: { initialReadability: false, disabled: false },
     });
@@ -56,7 +56,7 @@ describe('Readability.vue', () => {
     });
   });
 
-  it('re-syncs from initialReadability when the prop changes', async () => {
+  it('should re-sync from initialReadability when the prop changes', async () => {
     const wrapper = mount(Readability, {
       propsData: { initialReadability: false, disabled: false },
     });
