@@ -26,9 +26,13 @@
     "typecheck": "tsc --noEmit",
     "test": "jest",
     "test:coverage": "jest --coverage",
+    "test:e2e": "yarn build && playwright test",
     "postinstall": "patch-package"
   },
   "jest": {
+    "roots": [
+      "<rootDir>/src"
+    ],
     "moduleFileExtensions": [
       "js",
       "ts",
@@ -63,6 +67,7 @@
     "@babel/core": "^7.10.1",
     "@babel/plugin-proposal-optional-chaining": "^7.10.1",
     "@babel/preset-env": "^7.10.1",
+    "@playwright/test": "1.63.0",
     "@types/chrome": "^0.0.193",
     "@types/dedent": "^0.7.0",
     "@types/jest": "^26.0.4",
@@ -102,7 +107,7 @@
     "mini-css-extract-plugin": "^0.9.0",
     "monaco-editor": "^0.56.0",
     "patch-package": "^6.2.2",
-    "playwright": "^1.62.1",
+    "playwright": "1.63.0",
     "postcss": "^7.0.32",
     "postcss-loader": "^3.0.0",
     "postcss-rem-to-pixel": "^4.1.2",

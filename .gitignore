@@ -10,3 +10,5 @@ node_modules
 yarn-error.log
 coverage
 .history
+test-results
+playwright-report
