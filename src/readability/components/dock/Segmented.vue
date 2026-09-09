@@ -63,7 +63,7 @@ export default Vue.extend({
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    color: var(--main-foreground);
+    color: var(--foreground);
 
     &:first-child {
       border-right: 1px solid var(--border-color);
@@ -80,11 +80,11 @@ export default Vue.extend({
     }
 
     &:not(:disabled):hover {
-      background: color-mix(in srgb, var(--main-foreground) 5%, transparent);
+      background: color-mix(in srgb, var(--foreground) 5%, transparent);
     }
 
     &.active {
-      background: color-mix(in srgb, var(--main-foreground) 6%, transparent);
+      background: color-mix(in srgb, var(--foreground) 6%, transparent);
       color: var(--link-color);
     }
 

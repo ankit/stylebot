@@ -5,16 +5,16 @@
     <template v-else>
       <div v-if="restricted">
         <div class="popup-header">
-          <div class="popup-header-domain popup-header-domain--muted">
+          <heading as="h1" size="sm" class="popup-header-domain popup-header-domain--muted">
             {{ tab.url }}
-          </div>
+          </heading>
         </div>
 
         <div class="popup-divider" />
 
-        <div class="popup-restricted-message">
+        <text-block variant="muted" class="popup-restricted-message">
           {{ t('restricted_page_description') }}
-        </div>
+        </text-block>
 
         <div class="popup-divider" />
 
@@ -34,10 +34,10 @@
           :shortcut="styleShortcut"
         />
         <div v-else class="popup-header">
-          <div class="popup-header-domain">{{ domain }}</div>
-          <div class="popup-caption popup-header-subtitle">
+          <heading as="h1" size="sm" class="popup-header-domain">{{ domain }}</heading>
+          <text-block size="caption" variant="muted" class="popup-header-subtitle">
             {{ t('no_style_saved_for_site') }}
-          </div>
+          </text-block>
         </div>
 
         <div class="popup-divider" />
@@ -80,6 +80,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import { Heading, TextBlock } from '@stylebot/components';
 
 import StyleComponent from './components/Style.vue';
 import MoreButton from './components/MoreButton.vue';
@@ -108,6 +109,8 @@ export default Vue.extend({
   name: 'App',
 
   components: {
+    Heading,
+    TextBlock,
     MoreButton,
     PopupMoreMenu,
     StyleComponent,
@@ -205,47 +208,7 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
-:root {
-  color-scheme: light dark;
-
-  --popup-bg: #fff;
-  --popup-fg: #191b1f;
-  --popup-fg-muted: #767676;
-  --popup-border: #e9eaee;
-  --popup-hover-bg: #f2f3f6;
-
-  --popup-accent: #2a5fd6;
-
-  --popup-icon-btn-border: #dfe1e6;
-  --popup-icon-btn-fg: #6a7180;
-
-  --popup-notification-bg: #eef3ff;
-  --popup-notification-border: #dbe4fb;
-
-  --popup-focus-ring: var(--popup-accent);
-
-  // ShortcutChip (shared with the readability dock) reads these directly.
-  --main-foreground: var(--popup-fg);
-  --muted-foreground: var(--popup-fg-muted);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --popup-bg: #1c1d21;
-    --popup-fg: #eceef2;
-    --popup-fg-muted: #7d838f;
-    --popup-border: #2c2e34;
-    --popup-hover-bg: #26282e;
-
-    --popup-accent: #4d80f0;
-
-    --popup-icon-btn-border: #34363d;
-    --popup-icon-btn-fg: #9aa1ae;
-
-    --popup-notification-bg: #1f2740;
-    --popup-notification-border: #2b3654;
-  }
-}
+@import '../styles/theme';
 
 * {
   box-sizing: border-box;
@@ -261,8 +224,8 @@ body {
   margin: 0;
   font-family: 'Public Sans', system-ui, sans-serif;
   font-size: 14px;
-  background: var(--popup-bg);
-  color: var(--popup-fg);
+  background: var(--background);
+  color: var(--foreground);
 }
 
 .popup {
@@ -276,39 +239,35 @@ body {
 .popup-header-domain {
   min-width: 0;
   flex: 1;
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 1.25;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.popup-header-domain--muted {
-  color: var(--popup-fg-muted);
+// Compound selector so this beats Heading's own scoped color rule
+// regardless of stylesheet order (same specificity would otherwise tie).
+.popup-header-domain.popup-header-domain--muted {
+  color: var(--muted-foreground);
 }
 
 // Small muted caption/meta text — trailing hints, subtitles, timestamps.
+// Also used (as a plain span) by Readability.vue and SyncStylebot.vue.
 .popup-caption {
   font-size: 11.5px;
-  color: var(--popup-fg-muted);
+  color: var(--muted-foreground);
 }
 
 .popup-header-subtitle {
-  line-height: 1.4;
   margin-top: 3px;
 }
 
 .popup-restricted-message {
   padding: 16px;
-  font-size: 13px;
-  line-height: 1.5;
-  color: var(--popup-fg-muted);
 }
 
 .popup-divider {
   height: 1px;
-  background: var(--popup-border);
+  background: var(--border);
 }
 
 .popup-menu {

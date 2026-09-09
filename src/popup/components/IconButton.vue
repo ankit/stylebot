@@ -40,11 +40,11 @@ export default Vue.extend({
   cursor: pointer;
 
   &:hover {
-    background: var(--popup-hover-bg);
+    background: var(--accent);
   }
 
   &:focus-visible {
-    outline: 2px solid var(--popup-focus-ring);
+    outline: 2px solid var(--ring);
     outline-offset: 1px;
   }
 
@@ -52,9 +52,9 @@ export default Vue.extend({
     flex: none;
     width: 38px;
     padding: 0;
-    border: 1px solid var(--popup-icon-btn-border);
+    border: 1px solid var(--input);
     border-radius: 8px;
-    color: var(--popup-icon-btn-fg);
+    color: var(--muted-foreground);
   }
 }
 </style>

@@ -9,13 +9,13 @@
           </span>
           <button type="button" class="cancel" @click="cancelRecording">Cancel</button>
         </div>
-        <p class="helper">
+        <text-block size="caption" variant="muted" class="helper">
           Press a key to finish · Esc
           <template v-if="hasValue">
             keeps <span class="chip chip-inline"><shortcut-kbd :value="value" /></span>
           </template>
           <template v-else>cancels</template>
-        </p>
+        </text-block>
       </div>
 
       <div v-else-if="hasValue" class="content">
@@ -23,7 +23,7 @@
           <div class="title">Readability shortcut</div>
           <shortcut-chip :value="value" />
         </div>
-        <p class="desc">Toggle readability for articles on a site</p>
+        <text-block size="caption" variant="muted" class="desc">Toggle readability for articles on a site</text-block>
         <div class="divider" />
         <button type="button" class="row" @click="startRecording">Change…</button>
         <button type="button" class="row danger" @click="remove">Remove</button>
@@ -42,7 +42,7 @@
             <icon-x />
           </button>
         </div>
-        <p class="desc">Toggle readability for articles on a site</p>
+        <text-block size="caption" variant="muted" class="desc">Toggle readability for articles on a site</text-block>
         <button type="button" class="record-btn" @click="startRecording">
           <icon-keyboard />
           Record shortcut
@@ -63,7 +63,7 @@ import {
 import { shortcutStore } from './shortcut-store';
 
 import MenuBox from './MenuBox.vue';
-import { ShortcutChip, ShortcutKbd } from '@stylebot/components';
+import { ShortcutChip, ShortcutKbd, TextBlock } from '@stylebot/components';
 import IconKeyboard from '../icons/IconKeyboard.vue';
 import IconX from '../icons/IconX.vue';
 
@@ -74,6 +74,7 @@ export default Vue.extend({
     MenuBox,
     ShortcutKbd,
     ShortcutChip,
+    TextBlock,
     IconKeyboard,
     IconX,
   },
@@ -193,7 +194,7 @@ export default Vue.extend({
   font-weight: 600;
   font-size: 12.5px;
   line-height: 1.3;
-  color: var(--main-foreground);
+  color: var(--foreground);
 }
 
 .header-row {
@@ -225,8 +226,8 @@ export default Vue.extend({
   }
 
   &:hover {
-    background: color-mix(in srgb, var(--main-foreground) 6%, transparent);
-    color: var(--main-foreground);
+    background: color-mix(in srgb, var(--foreground) 6%, transparent);
+    color: var(--foreground);
   }
 
   &:focus-visible {
@@ -236,10 +237,6 @@ export default Vue.extend({
 }
 
 .desc {
-  font-weight: 400;
-  font-size: 11.5px;
-  line-height: 1.4;
-  color: var(--muted-foreground);
   margin: 4px 0 14px;
 }
 
@@ -254,8 +251,8 @@ export default Vue.extend({
   font-weight: 400;
   font-size: 12px;
   line-height: 1;
-  color: var(--main-foreground);
-  background: color-mix(in srgb, var(--main-foreground) 6%, transparent);
+  color: var(--foreground);
+  background: color-mix(in srgb, var(--foreground) 6%, transparent);
   border-radius: 7px;
   padding: 10px;
   cursor: pointer;
@@ -267,7 +264,7 @@ export default Vue.extend({
   }
 
   &:hover {
-    background: color-mix(in srgb, var(--main-foreground) 10%, transparent);
+    background: color-mix(in srgb, var(--foreground) 10%, transparent);
   }
 
   &:focus-visible {
@@ -279,7 +276,7 @@ export default Vue.extend({
 .chip {
   display: inline-flex;
   align-items: center;
-  background: color-mix(in srgb, var(--main-foreground) 7%, transparent);
+  background: color-mix(in srgb, var(--foreground) 7%, transparent);
   border-radius: 6px;
   padding: 4px 8px;
 }
@@ -304,13 +301,13 @@ export default Vue.extend({
   font-weight: 400;
   font-size: 12.5px;
   line-height: 1;
-  color: var(--main-foreground);
+  color: var(--foreground);
   padding: 9px 8px;
   border-radius: 6px;
   cursor: pointer;
 
   &:hover {
-    background: color-mix(in srgb, var(--main-foreground) 6%, transparent);
+    background: color-mix(in srgb, var(--foreground) 6%, transparent);
   }
 
   &:focus-visible {
@@ -338,7 +335,7 @@ export default Vue.extend({
   display: flex;
   align-items: center;
   gap: 2px;
-  background: color-mix(in srgb, var(--main-foreground) 6%, transparent);
+  background: color-mix(in srgb, var(--foreground) 6%, transparent);
   border-radius: 6px;
   padding: 8px 9px;
   box-shadow: 0 0 0 2px var(--link-color);
@@ -363,15 +360,11 @@ export default Vue.extend({
   padding: 4px;
 
   &:hover {
-    color: var(--main-foreground);
+    color: var(--foreground);
   }
 }
 
 .helper {
-  font-weight: 400;
-  font-size: 11px;
-  line-height: 1.4;
-  color: var(--muted-foreground);
   margin: 9px 0 0;
 }
 

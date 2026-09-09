@@ -10,7 +10,7 @@
   @import './content.scss';
 
   --main-background: #faf8f3;
-  --main-foreground: #2b2926;
+  --foreground: #2b2926;
   --muted-foreground: #6f6a5f;
   --border-color: #e4ddcf;
   --link-color: #0b6fb3;
@@ -20,7 +20,7 @@
 
   &.sepia {
     --main-background: #f4ecd8;
-    --main-foreground: #5b4636;
+    --foreground: #5b4636;
     --muted-foreground: #8a7360;
     --border-color: #e0cfab;
     --link-color: #9c5c1f;
@@ -31,7 +31,7 @@
 
   &.dark {
     --main-background: #201f1d;
-    --main-foreground: #cac5bc;
+    --foreground: #cac5bc;
     --muted-foreground: #96918a;
     --border-color: #3c3a36;
     --link-color: #6197d0;
@@ -46,7 +46,7 @@
   left: 0;
   z-index: 100;
 
-  color: var(--main-foreground);
+  color: var(--foreground);
   background-color: var(--main-background);
   transition: background-color 0.2s ease, color 0.2s ease, opacity 0.25s ease;
 

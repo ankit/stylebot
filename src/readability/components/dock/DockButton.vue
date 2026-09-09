@@ -40,8 +40,8 @@ export default Vue.extend({
   transition: color 0.18s ease, background-color 0.18s ease;
 
   &:hover {
-    background: color-mix(in srgb, var(--main-foreground) 6%, transparent);
-    color: var(--main-foreground);
+    background: color-mix(in srgb, var(--foreground) 6%, transparent);
+    color: var(--foreground);
   }
 
   &:focus-visible {

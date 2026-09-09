@@ -85,7 +85,7 @@ export default Vue.extend({
   font-size: 14px;
   text-align: center;
   cursor: pointer;
-  color: var(--main-foreground);
+  color: var(--foreground);
 
   & + & {
     border-top: 1px solid var(--border-color);
@@ -100,7 +100,7 @@ export default Vue.extend({
   }
 
   &.selected {
-    background: color-mix(in srgb, var(--main-foreground) 6%, transparent);
+    background: color-mix(in srgb, var(--foreground) 6%, transparent);
     color: var(--link-color);
   }
 

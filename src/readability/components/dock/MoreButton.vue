@@ -44,8 +44,8 @@ export default Vue.extend({
   line-height: 1;
 
   &.active {
-    background: color-mix(in srgb, var(--main-foreground) 6%, transparent);
-    color: var(--main-foreground);
+    background: color-mix(in srgb, var(--foreground) 6%, transparent);
+    color: var(--foreground);
   }
 }
 </style>
