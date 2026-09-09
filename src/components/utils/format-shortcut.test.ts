@@ -1,4 +1,4 @@
-import { formatShortcut } from '../format-shortcut';
+import { formatShortcut } from './format-shortcut';
 
 describe('formatShortcut', () => {
   it('renders compact symbols with no separator on macOS', () => {

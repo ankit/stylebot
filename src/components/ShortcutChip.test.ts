@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils';
 
-import ShortcutChip from '../ShortcutChip.vue';
+import ShortcutChip from './ShortcutChip.vue';
 
 describe('ShortcutChip.vue', () => {
   it('renders the formatted value and no "small" class by default', () => {
