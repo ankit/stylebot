@@ -31,7 +31,7 @@ export default Vue.extend({
   }
 
   &:focus-visible {
-    outline: 2px solid var(--popup-focus-ring);
+    outline: 2px solid var(--ui-focus-ring);
     outline-offset: 1px;
   }
 }

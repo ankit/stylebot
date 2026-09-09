@@ -7,8 +7,7 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import MoreIcon from './icons/MoreIcon.vue';
-import IconButton from './IconButton.vue';
+import { MoreIcon, IconButton } from '@stylebot/components';
 
 export default Vue.extend({
   name: 'MoreButton',

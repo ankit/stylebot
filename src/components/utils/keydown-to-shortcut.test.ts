@@ -2,7 +2,7 @@ import {
   keydownToShortcut,
   modifiersFromEvent,
   MODIFIER_KEYS,
-} from '../keydown-to-shortcut';
+} from './keydown-to-shortcut';
 
 describe('modifiersFromEvent', () => {
   it('returns held modifiers in hotkeys-js word order', () => {

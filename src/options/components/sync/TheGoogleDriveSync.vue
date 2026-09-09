@@ -1,80 +1,43 @@
 <template>
-  <div>
-    <b-row no-gutters class="description mb-1">
-      <div v-if="googleDriveSyncLastModifiedTime && !syncInProgress">
-        {{
-          t('synced_at_time', [googleDriveSyncLastModifiedTime])
-        }}&nbsp;·&nbsp;
+  <div class="card">
+    <div class="text">
+      <heading as="h2" size="sm">Google Drive</heading>
 
-        <a :href="googleDriveSyncViewLink" target="_blank">
-          {{ t('view_synced_file') }}
-        </a>
+      <text-block v-if="!googleDriveSyncEnabled" size="caption" class="description">
+        Not connected. Styles stay on this computer only.
+      </text-block>
 
-        &nbsp;·&nbsp;
-        <a :href="googleDriveSyncDownloadLink" target="_blank">
-          {{ t('download_synced_file') }}
-        </a>
-      </div>
+      <text-block v-else size="caption" class="description">
+        {{ t('synced_at_time', [googleDriveSyncLastModifiedTime]) }}
+        <template v-if="syncInProgress"> · {{ t('sync_in_progress') }}</template>
+        <template v-if="googleDriveSyncViewLink">
+          ·
+          <a :href="googleDriveSyncViewLink" target="_blank">{{ t('view_synced_file') }}</a>
+          ·
+          <a :href="googleDriveSyncDownloadLink" target="_blank">{{ t('download_synced_file') }}</a>
+        </template>
+      </text-block>
+    </div>
 
-      <div v-if="googleDriveSyncLastModifiedTime && syncInProgress">
-        {{ t('sync_in_progress') }}&nbsp;·&nbsp;
-        <a :href="googleDriveSyncViewLink" target="_blank">
-          {{ t('view_synced_file') }}
-        </a>
-        &nbsp;·&nbsp;
+    <app-button v-if="googleDriveSyncEnabled" :disabled="syncInProgress" @click="syncWithGoogleDrive">
+      <arrow-repeat-icon :spinning="syncInProgress" />
+      <span>{{ syncInProgress ? t('sync_in_progress') : t('sync_now') }}</span>
+    </app-button>
 
-        <a :href="googleDriveSyncDownloadLink" target="_blank">
-          {{ t('download_synced_file') }}
-        </a>
-      </div>
-    </b-row>
+    <app-button v-if="googleDriveSyncEnabled" @click="googleDriveSyncEnabled = false">
+      {{ t('disable_google_drive_sync') }}
+    </app-button>
 
-    <b-row v-if="googleDriveSyncEnabled" no-gutters class="description mb-4">
-      {{ t('sync_description') }}
-    </b-row>
-
-    <b-row no-gutters>
-      <app-button
-        v-if="googleDriveSyncEnabled"
-        class="mr-4"
-        variant="primary"
-        :disabled="syncInProgress"
-        @click="syncWithGoogleDrive"
-      >
-        <b-icon
-          icon="arrow-repeat"
-          :animation="syncInProgress ? 'spin' : undefined"
-        />
-
-        <span class="pl-2">
-          {{ syncInProgress ? t('sync_in_progress') : t('sync_now') }}
-        </span>
-      </app-button>
-
-      <app-button
-        v-if="googleDriveSyncEnabled"
-        class="mr-4"
-        variant="secondary"
-        @click="googleDriveSyncEnabled = false"
-      >
-        {{ t('disable_google_drive_sync') }}
-      </app-button>
-
-      <app-button
-        v-if="!googleDriveSyncEnabled"
-        class="mr-4"
-        variant="primary"
-        @click="googleDriveSyncEnabled = true"
-      >
-        {{ t('enable_google_drive_sync') }}
-      </app-button>
-    </b-row>
+    <app-button v-if="!googleDriveSyncEnabled" @click="googleDriveSyncEnabled = true">
+      {{ t('enable_google_drive_sync') }}
+    </app-button>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import { formatDistanceToNow } from 'date-fns';
+import { ArrowRepeatIcon, Heading, TextBlock } from '@stylebot/components';
 
 import AppButton from '../AppButton.vue';
 
@@ -83,6 +46,9 @@ export default Vue.extend({
 
   components: {
     AppButton,
+    ArrowRepeatIcon,
+    Heading,
+    TextBlock,
   },
 
   data(): {
@@ -143,8 +109,22 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
+.card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 16px;
+  padding: 14px;
+  border: 1px solid var(--ui-border);
+  border-radius: 10px;
+}
+
+.text {
+  flex: 1;
+  min-width: 0;
+}
+
 .description {
-  color: #555;
-  font-size: 15px;
+  margin-top: 2px;
 }
 </style>

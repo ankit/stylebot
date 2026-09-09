@@ -1,0 +1,92 @@
+// Shared light/dark CSS custom properties for the popup and options pages.
+// Keep in sync in one place instead of duplicating across bundles.
+//
+// Three states, driven by the "theme" option (StylebotOptions.theme):
+// - auto (default): follows the OS via prefers-color-scheme.
+// - light / dark: forced via a `data-theme` attribute stamped on <html> by
+//   options/App.vue and popup/App.vue, overriding the OS preference.
+@mixin light-vars {
+  --ui-bg: #fff;
+  --ui-fg: #191b1f;
+  --ui-fg-muted: #767676;
+  --ui-border: #e9eaee;
+  --ui-hover-bg: #f2f3f6;
+  --ui-active-bg: #eceef2;
+  --ui-row-hover-bg: #fafbfc;
+  // The style editor's code area — subtly distinct from --ui-bg, and mirrored
+  // by MonacoEditorIframe.ts's 'custom-light' theme / options-index.html.
+  --ui-editor-bg: #fcfcfd;
+
+  --ui-accent: #2a5fd6;
+
+  --ui-icon-btn-border: #dfe1e6;
+  --ui-icon-btn-fg: #6a7180;
+
+  --ui-notification-bg: #eef3ff;
+  --ui-notification-border: #dbe4fb;
+}
+
+@mixin dark-vars {
+  --ui-bg: #1c1d21;
+  --ui-fg: #eceef2;
+  --ui-fg-muted: #7d838f;
+  --ui-border: #2c2e34;
+  --ui-hover-bg: #26282e;
+  --ui-active-bg: #2b2d34;
+  --ui-row-hover-bg: #202126;
+  // Mirrored by MonacoEditorIframe.ts's 'custom-dark' theme / options-index.html.
+  --ui-editor-bg: #1a1b1e;
+
+  --ui-accent: #4d80f0;
+
+  --ui-icon-btn-border: #34363d;
+  --ui-icon-btn-fg: #9aa1ae;
+
+  --ui-notification-bg: #1f2740;
+  --ui-notification-border: #2b3654;
+}
+
+:root {
+  color-scheme: light dark;
+
+  @include light-vars;
+
+  --ui-focus-ring: var(--ui-accent);
+
+  // Shared src/components/ primitives (built for the readability dock's own
+  // theme vars) read these generic names directly — alias them here so the
+  // same components work unmodified in the popup/options bundles.
+  --main-foreground: var(--ui-fg);
+  --muted-foreground: var(--ui-fg-muted);
+  --main-background: var(--ui-bg);
+  --border-color: var(--ui-border);
+  --link-color: var(--ui-accent);
+}
+
+// Default inline sizing for the shared src/components/icons/* SVG icon
+// components — keeps them a consistent 18px regardless of surrounding
+// font-size, with a baseline nudge so they sit centered next to text.
+.ui-icon {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  vertical-align: -0.25em;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    @include dark-vars;
+  }
+}
+
+// Explicit overrides win regardless of OS preference — higher specificity
+// than the plain `:root` above, so source order doesn't matter here.
+:root[data-theme='light'] {
+  color-scheme: light;
+  @include light-vars;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  @include dark-vars;
+}

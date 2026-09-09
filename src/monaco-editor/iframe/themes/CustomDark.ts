@@ -1,0 +1,68 @@
+export default {
+  base: 'vs-dark',
+  inherit: false,
+  rules: [
+    { token: '', foreground: 'e4e6eb', background: '1a1b1e' },
+    { token: 'invalid', foreground: 'f14c4c' },
+    { token: 'emphasis', fontStyle: 'italic' },
+    { token: 'strong', fontStyle: 'bold' },
+
+    { token: 'variable', foreground: '9cdcfe' },
+    { token: 'variable.predefined', foreground: '7fb3e0' },
+    { token: 'constant', foreground: 'f28b82' },
+    { token: 'comment', foreground: '7d838f' },
+    { token: 'number', foreground: 'b5cea8' },
+    { token: 'number.hex', foreground: '8bc4f0' },
+    { token: 'regexp', foreground: 'd16969' },
+    { token: 'annotation', foreground: '9aa1ae' },
+    { token: 'type', foreground: '4ec9b0' },
+
+    { token: 'delimiter', foreground: 'e4e6eb' },
+    { token: 'delimiter.html', foreground: 'c2c4c9' },
+    { token: 'delimiter.xml', foreground: '6fa8f5' },
+
+    { token: 'tag', foreground: 'e07b8f' },
+    { token: 'tag.id.pug', foreground: '7fb3e0' },
+    { token: 'tag.class.pug', foreground: '7fb3e0' },
+    { token: 'meta.scss', foreground: 'e07b8f' },
+    { token: 'metatag', foreground: 'f28b82' },
+    { token: 'metatag.content.html', foreground: 'ec6f9c' },
+    { token: 'metatag.html', foreground: '9aa1ae' },
+    { token: 'metatag.xml', foreground: '9aa1ae' },
+    { token: 'metatag.php', fontStyle: 'bold' },
+
+    { token: 'key', foreground: 'dcb67a' },
+    { token: 'string.key.json', foreground: 'ce9178' },
+    { token: 'string.value.json', foreground: '6fa8f5' },
+
+    { token: 'attribute.name', foreground: 'ec6f9c' },
+    { token: 'attribute.value', foreground: '6fa8f5' },
+    { token: 'attribute.value.number', foreground: 'b5cea8' },
+    { token: 'attribute.value.unit', foreground: 'b5cea8' },
+    { token: 'attribute.value.html', foreground: '6fa8f5' },
+    { token: 'attribute.value.xml', foreground: '6fa8f5' },
+
+    { token: 'string', foreground: 'ce9178' },
+    { token: 'string.html', foreground: '6fa8f5' },
+    { token: 'string.sql', foreground: 'ec6f9c' },
+    { token: 'string.yaml', foreground: '6fa8f5' },
+
+    { token: 'keyword', foreground: '6fa8f5' },
+    { token: 'keyword.json', foreground: '6fa8f5' },
+    { token: 'keyword.flow', foreground: 'c586c0' },
+    { token: 'keyword.flow.scss', foreground: '6fa8f5' },
+
+    { token: 'operator.scss', foreground: 'b0b3ba' },
+    { token: 'operator.sql', foreground: '9aabb8' },
+    { token: 'operator.swift', foreground: 'b0b3ba' },
+    { token: 'predefined.sql', foreground: 'e394e3' },
+  ],
+  colors: {
+    editorBackground: '#1a1b1e',
+    editorForeground: '#e4e6eb',
+    editorInactiveSelection: '#2c3a4d',
+    editorIndentGuides: '#3c3d42',
+    editorActiveIndentGuides: '#57585e',
+    editorSelectionHighlight: '#3a577a4d',
+  },
+};

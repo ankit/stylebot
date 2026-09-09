@@ -4,7 +4,7 @@
     width="1em"
     height="1em"
     fill="currentColor"
-    class="popup-icon"
+    class="ui-icon"
     :class="{ spinning }"
   >
     <path

@@ -2,10 +2,12 @@ import {
   ToggleStylebot,
   GetCommands,
   GetCommandsResponse,
+  GetAllOptions,
   GetStylesForPage,
   GetIsStylebotOpen,
   GetIsPageReaderable,
   GetStylesForPageResponse,
+  StylebotOptions,
 } from '@stylebot/types';
 
 import {
@@ -90,6 +92,16 @@ export const getCommands = (
 ): void => {
   const message: GetCommands = {
     name: 'GetCommands',
+  };
+
+  chrome.runtime.sendMessage(message, callback);
+};
+
+export const getOptions = (
+  callback: (options: StylebotOptions) => void
+): void => {
+  const message: GetAllOptions = {
+    name: 'GetAllOptions',
   };
 
   chrome.runtime.sendMessage(message, callback);

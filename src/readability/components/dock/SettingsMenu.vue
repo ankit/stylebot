@@ -22,7 +22,7 @@ import Vue, { PropType } from 'vue';
 import { defaultReadabilitySettings } from '@stylebot/settings';
 import { ReadabilitySettings, ReadabilityTheme } from '@stylebot/types';
 
-import MenuBox from './MenuBox.vue';
+import { MenuBox } from '@stylebot/components';
 import ThemePicker from './ThemePicker.vue';
 import FontPicker from './FontPicker.vue';
 import FontSizePicker from './FontSizePicker.vue';

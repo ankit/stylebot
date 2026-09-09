@@ -1,18 +1,26 @@
 <template>
-  <div>
-    <h2>{{ t('context_menu') }}</h2>
+  <div class="card">
+    <toggle-switch bare size="lg" :value="contextMenu" @change="contextMenu = $event" />
 
-    <b-form-checkbox v-model="contextMenu" switch>
-      {{ t('enable_right_click_menu') }}
-    </b-form-checkbox>
+    <div class="text">
+      <heading as="h2" size="sm">{{ t('right_click_menu') }}</heading>
+      <text-block size="caption" class="description">{{ t('right_click_menu_description') }}</text-block>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
+import { ToggleSwitch, Heading, TextBlock } from '@stylebot/components';
 
 export default Vue.extend({
   name: 'TheContextMenu',
+
+  components: {
+    ToggleSwitch,
+    Heading,
+    TextBlock,
+  },
 
   computed: {
     contextMenu: {
@@ -27,3 +35,24 @@ export default Vue.extend({
   },
 });
 </script>
+
+<style lang="scss" scoped>
+.card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 12px 14px;
+  border: 1px solid var(--ui-border);
+  border-radius: 10px;
+}
+
+.text {
+  flex: 1;
+  min-width: 0;
+}
+
+.description {
+  margin-top: 2px;
+}
+</style>

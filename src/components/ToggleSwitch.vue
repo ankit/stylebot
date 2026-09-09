@@ -1,5 +1,5 @@
 <template>
-  <label class="switch" :class="[`switch--${size}`, { disabled }]">
+  <label class="switch" :class="[`switch--${size}`, { disabled, bare }]">
     <input
       ref="input"
       type="checkbox"
@@ -33,6 +33,8 @@ export default Vue.extend({
       type: String as PropType<Size>,
       default: 'sm',
     },
+    // For use without a slotted label — sizes to just the track.
+    bare: Boolean,
   },
 
   methods: {
@@ -64,6 +66,11 @@ export default Vue.extend({
 
   &.disabled {
     cursor: default;
+  }
+
+  &.bare {
+    width: auto;
+    gap: 0;
   }
 }
 
@@ -103,7 +110,7 @@ input {
 }
 
 input:checked ~ .track {
-  background: var(--popup-accent);
+  background: var(--ui-accent);
 }
 
 input:checked ~ .track .thumb {
@@ -167,7 +174,7 @@ input:checked ~ .track .thumb {
 }
 
 input:focus-visible ~ .track {
-  outline: 2px solid var(--popup-focus-ring);
+  outline: 2px solid var(--ui-focus-ring);
   outline-offset: 2px;
 }
 

@@ -30,12 +30,10 @@ import {
   openDonatePage,
 } from '@stylebot/utils';
 
-import MenuBox from './MenuBox.vue';
-import { ShortcutChip } from '@stylebot/components';
+import { ShortcutChip, IconKeyboard, MenuBox } from '@stylebot/components';
 import IconOptions from '../icons/IconOptions.vue';
 import IconFlag from '../icons/IconFlag.vue';
 import IconCoffee from '../icons/IconCoffee.vue';
-import IconKeyboard from '../icons/IconKeyboard.vue';
 
 export default Vue.extend({
   name: 'MoreMenu',

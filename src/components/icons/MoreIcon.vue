@@ -4,7 +4,7 @@
     width="1em"
     height="1em"
     fill="currentColor"
-    class="popup-icon"
+    class="ui-icon"
   >
     <circle cx="3" cy="8" r="1.5" />
     <circle cx="8" cy="8" r="1.5" />

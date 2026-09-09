@@ -71,18 +71,18 @@ export default Vue.extend({
     cursor: pointer;
 
     &:hover {
-      background: var(--popup-hover-bg);
+      background: var(--ui-hover-bg);
     }
   }
 
   &.button:not(.disabled):focus-visible {
-    outline: 2px solid var(--popup-focus-ring);
+    outline: 2px solid var(--ui-focus-ring);
     outline-offset: -2px;
   }
 
   &.disabled {
     cursor: default;
-    color: var(--popup-fg-muted);
+    color: var(--ui-fg-muted);
   }
 }
 </style>

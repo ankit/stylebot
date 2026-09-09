@@ -59,13 +59,10 @@ import {
   keydownToShortcut,
   modifiersFromEvent,
   MODIFIER_KEYS,
-} from './utils/keydown-to-shortcut';
+} from '../../../components/utils/keydown-to-shortcut';
 import { shortcutStore } from './shortcut-store';
 
-import MenuBox from './MenuBox.vue';
-import { ShortcutChip, ShortcutKbd } from '@stylebot/components';
-import IconKeyboard from '../icons/IconKeyboard.vue';
-import IconX from '../icons/IconX.vue';
+import { ShortcutChip, ShortcutKbd, IconKeyboard, IconX, MenuBox } from '@stylebot/components';
 
 export default Vue.extend({
   name: 'ShortcutMenu',

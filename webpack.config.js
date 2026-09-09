@@ -182,6 +182,11 @@ const config = {
           transform: transformHtml,
         },
         {
+          from: 'monaco-editor/iframe/options-index.html',
+          to: 'monaco-editor/iframe/options-index.html',
+          transform: transformHtml,
+        },
+        {
           from: '../node_modules/monaco-editor/min/**/*',
           to: 'monaco-editor/iframe/monaco-editor/',
         },
@@ -296,6 +301,7 @@ const clientConfig = {
     'options/index': './options/index.ts',
     'inject-css/index': './inject-css/index.ts',
     'monaco-editor/iframe/index': './monaco-editor/iframe/index.ts',
+    'monaco-editor/iframe/options-index': './monaco-editor/iframe/options-index.ts',
     'readability/index': './readability/index.ts',
   },
 };

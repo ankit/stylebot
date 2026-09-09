@@ -1,37 +1,36 @@
 <template>
   <div class="navigation">
-    <div class="header mb-3">
-      stylebot
-      <span class="light ml-1 d-md-inline-flex d-none">
-        {{ t(`${currentTab}_options`) }}
-      </span>
-    </div>
+    <heading as="div" size="md" class="wordmark">Stylebot</heading>
 
-    <b-list-group class="navigation-list">
-      <b-list-group-item
+    <nav class="nav-list">
+      <button
         v-for="tab in tabs"
         :key="tab"
-        button
-        class="navigation-item"
-        :active="currentTab === tab"
+        type="button"
+        class="nav-item"
+        :class="{ active: currentTab === tab }"
         @click="$emit('select', tab)"
       >
         {{ t(`${tab}_options`) }}
-      </b-list-group-item>
-    </b-list-group>
+      </button>
+    </nav>
 
-    <the-navigation-footer class="mt-4" />
+    <div class="spacer" />
+
+    <the-navigation-footer />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
+import { Heading } from '@stylebot/components';
 import TheNavigationFooter from './navigation/TheNavigationFooter.vue';
 
 export default Vue.extend({
   name: 'TheNavigation',
 
   components: {
+    Heading,
     TheNavigationFooter,
   },
 
@@ -50,33 +49,56 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-.header {
-  font-size: 34px;
-
-  .light {
-    font-weight: 200;
-    text-transform: lowercase;
-  }
-}
-
 .navigation {
-  height: 100%;
-  border-right: 1px solid #eee;
+  flex: none;
+  width: 216px;
+  border-right: 1px solid var(--ui-border);
+  padding: 20px 12px;
+  display: flex;
+  flex-direction: column;
 }
 
-.navigation-list {
-  border-radius: 0;
+.wordmark {
+  padding: 0 12px 20px;
 }
 
-.navigation-item {
-  border: none;
+.nav-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
 
-  &:focus {
-    outline: none;
+.nav-item {
+  all: unset;
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-weight: 400;
+  font-size: 13.5px;
+  line-height: 1.3;
+  color: var(--ui-fg-muted);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--ui-hover-bg);
   }
 
-  &:hover:not(.active) {
-    background: #ddd;
+  &:focus-visible {
+    outline: 2px solid var(--ui-focus-ring);
+    outline-offset: -2px;
   }
+
+  &.active {
+    font-weight: 600;
+    color: var(--ui-fg);
+    background: var(--ui-active-bg);
+  }
+}
+
+.spacer {
+  flex: 1;
+  min-height: 120px;
 }
 </style>

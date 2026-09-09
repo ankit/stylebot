@@ -1,56 +1,49 @@
 <template>
   <div>
-    <h2>{{ t('keyboard_shortcuts') }}</h2>
+    <heading as="h2">{{ t('keyboard_shortcuts') }}</heading>
+    <text-block class="description">{{ t('keyboard_shortcuts_description') }}</text-block>
 
-    <b-row align-v="center" class="mb-4">
-      <b-col cols="12" class="help">
-        <kbd>shift</kbd>
-        <kbd>option</kbd>
-        <kbd>alt</kbd>
-        <kbd>ctrl</kbd>
-        <kbd>command</kbd>
-        +
-        <kbd>a-z</kbd>
-      </b-col>
-    </b-row>
+    <div class="rows">
+      <shortcut-row :label="t('toggle_editor')">
+        <shortcut-recorder-field :value="commands.stylebot" @update="input('stylebot', $event)" />
+      </shortcut-row>
 
-    <shortcut
-      id="stylebot"
-      :label="t('toggle_editor')"
-      @input="input('stylebot', $event)"
-    />
+      <shortcut-row :label="t('toggle_styling')">
+        <shortcut-recorder-field :value="commands.style" @update="input('style', $event)" />
+      </shortcut-row>
 
-    <shortcut
-      id="style"
-      :label="t('toggle_styling')"
-      @input="input('style', $event)"
-    />
+      <shortcut-row :label="t('toggle_readability')">
+        <shortcut-recorder-field :value="commands.readability" @update="input('readability', $event)" />
+      </shortcut-row>
 
-    <shortcut
-      id="readability"
-      :label="t('toggle_readability')"
-      @input="input('readability', $event)"
-    />
-
-    <shortcut
-      id="grayscale"
-      :label="t('toggle_grayscale')"
-      @input="input('grayscale', $event)"
-    />
+      <shortcut-row :label="t('toggle_grayscale')">
+        <shortcut-recorder-field :value="commands.grayscale" @update="input('grayscale', $event)" />
+      </shortcut-row>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import { StylebotCommandName } from '@stylebot/types';
+import { StylebotCommandName, StylebotCommands } from '@stylebot/types';
+import { ShortcutRecorderField, Heading, TextBlock } from '@stylebot/components';
 
-import Shortcut from './Shortcut.vue';
+import ShortcutRow from './ShortcutRow.vue';
 
 export default Vue.extend({
   name: 'TheKeyboardShortcuts',
 
   components: {
-    Shortcut,
+    ShortcutRow,
+    ShortcutRecorderField,
+    Heading,
+    TextBlock,
+  },
+
+  computed: {
+    commands(): StylebotCommands {
+      return this.$store.state.commands;
+    },
   },
 
   methods: {
@@ -64,15 +57,12 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-kbd {
-  font-size: 11px;
-  margin: 0 1px;
-  display: inline-block;
-  height: 20px;
+.description {
+  margin-top: 4px;
+  max-width: 520px;
 }
 
-.help {
-  color: #555;
-  font-size: 12px;
+.rows {
+  margin-top: 12px;
 }
 </style>

@@ -19,6 +19,9 @@ export type StylebotLayout = {
 export type StylebotColorPalette = 'basic' | 'material';
 export type StylebotFonts = Array<string>;
 
+// Controls the appearance of Stylebot's own UI, not the sites it styles.
+export type StylebotTheme = 'auto' | 'light' | 'dark';
+
 export type StylebotOptions = {
   contextMenu: boolean;
   fonts: StylebotFonts;
@@ -26,6 +29,7 @@ export type StylebotOptions = {
   mode: StylebotEditingMode;
   basicModeSections: StylebotBasicModeSections;
   colorPalette: StylebotColorPalette;
+  theme: StylebotTheme;
 };
 
 export type Style = {
