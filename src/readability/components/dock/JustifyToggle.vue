@@ -14,8 +14,7 @@
 import Vue from 'vue';
 
 import Segmented from './Segmented.vue';
-import IconAlignLeft from '../icons/IconAlignLeft.vue';
-import IconAlignJustify from '../icons/IconAlignJustify.vue';
+import { IconAlignLeft, IconAlignJustify } from '@stylebot/icons';
 
 export default Vue.extend({
   name: 'JustifyToggle',

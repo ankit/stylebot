@@ -13,7 +13,7 @@
 import Vue from 'vue';
 
 import DockButton from './DockButton.vue';
-import IconToggle from '../icons/IconToggle.vue';
+import { IconToggle } from '@stylebot/icons';
 
 export default Vue.extend({
   name: 'CloseButton',
