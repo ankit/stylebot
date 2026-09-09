@@ -1,23 +1,45 @@
 <template>
-  <b-list-group-item class="full-row-toggle" @click="onRowClick">
-    <b-form-checkbox
-      ref="checkbox"
+  <div v-if="header" class="popup-header">
+    <toggle-switch
       v-model="enabled"
-      switch
+      size="lg"
+      :disabled="disableToggle"
+      @change="onChange"
+    >
+      <div class="popup-header-domain">{{ url }}</div>
+      <template #trailing>
+        <shortcut-chip v-if="shortcut" small muted :value="shortcut" />
+      </template>
+    </toggle-switch>
+  </div>
+
+  <popup-row v-else hover :disabled="disableToggle">
+    <toggle-switch
+      v-model="enabled"
       :disabled="disableToggle"
       @change="onChange"
     >
       {{ url }}
-    </b-form-checkbox>
-  </b-list-group-item>
+    </toggle-switch>
+  </popup-row>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import { EnableStyle, DisableStyle } from '@stylebot/types';
+import PopupRow from './PopupRow.vue';
+import ToggleSwitch from './ToggleSwitch.vue';
+import ShortcutChip from '../../readability/components/dock/ShortcutChip.vue';
 
 export default Vue.extend({
   name: 'Style',
+
+  components: {
+    PopupRow,
+    ToggleSwitch,
+    ShortcutChip,
+  },
+
   props: {
     url: {
       type: String,
@@ -28,6 +50,13 @@ export default Vue.extend({
     },
     initialEnabled: {
       type: Boolean,
+    },
+    header: {
+      type: Boolean,
+    },
+    shortcut: {
+      type: String,
+      default: '',
     },
   },
 
@@ -40,23 +69,6 @@ export default Vue.extend({
   },
 
   methods: {
-    onRowClick(event: MouseEvent): void {
-      if (this.disableToggle) {
-        return;
-      }
-
-      const target = event.target as HTMLElement;
-
-      // Already handled natively by the label/input itself.
-      if (target.closest('label, input')) {
-        return;
-      }
-
-      const checkbox = this.$refs.checkbox as Vue;
-      const input = checkbox.$el.querySelector('input');
-      input?.click();
-    },
-
     onChange(): void {
       if (this.enabled) {
         this.enable();

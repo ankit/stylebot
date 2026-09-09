@@ -1,22 +1,24 @@
 <template>
-  <b-list-group-item button class="open-stylebot" @click="toggle">
-    <inspector-icon />
-
-    <span v-if="isOpen" class="pl-2">{{ t('close_stylebot') }}</span>
-    <span v-else class="pl-2">{{ t('open_stylebot') }}</span>
-  </b-list-group-item>
+  <popup-button @click="toggle">
+    {{ label }}
+    <template v-if="shortcut" #trailing>
+      <shortcut-chip small muted :value="shortcut" />
+    </template>
+  </popup-button>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import { toggleStylebot } from '../utils';
-import InspectorIcon from './InspectorIcon.vue';
+import PopupButton from './PopupButton.vue';
+import ShortcutChip from '../../readability/components/dock/ShortcutChip.vue';
 
 export default Vue.extend({
   name: 'ToggleStylebot',
 
   components: {
-    InspectorIcon,
+    PopupButton,
+    ShortcutChip,
   },
 
   props: {
@@ -26,6 +28,18 @@ export default Vue.extend({
     },
 
     isOpen: Boolean,
+    shortcut: {
+      type: String,
+      default: '',
+    },
+  },
+
+  computed: {
+    label(): string {
+      return this.isOpen
+        ? this.t('close_stylebot')
+        : this.t('style_this_page');
+    },
   },
 
   methods: {
@@ -35,11 +49,3 @@ export default Vue.extend({
   },
 });
 </script>
-
-<style lang="scss">
-.open-stylebot {
-  svg path {
-    fill: #495057;
-  }
-}
-</style>

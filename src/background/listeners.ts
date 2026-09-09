@@ -33,7 +33,7 @@ import {
   BackgroundPageMessageResponse,
 } from '@stylebot/types';
 
-import { setNotification } from '@stylebot/utils';
+import { setNotification, getReleaseNotificationId } from '@stylebot/utils';
 
 /**
  * Open Help page on installation
@@ -44,7 +44,7 @@ chrome.runtime.onInstalled.addListener(async ({ reason }) => {
       url: 'https://stylebot.dev/help',
     });
 
-    setNotification('release/3.1', true);
+    setNotification(getReleaseNotificationId(), true);
   }
 });
 

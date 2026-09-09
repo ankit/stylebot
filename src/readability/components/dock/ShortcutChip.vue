@@ -1,5 +1,5 @@
 <template>
-  <span class="chip" :class="{ small }">
+  <span class="chip" :class="{ small, muted }">
     <shortcut-kbd :small="small" :value="value" />
   </span>
 </template>
@@ -26,6 +26,13 @@ export default Vue.extend({
       type: Boolean,
       default: false,
     },
+
+    // No background/border — just muted-colored keys, for contexts (like a
+    // button) that already provide their own surface.
+    muted: {
+      type: Boolean,
+      default: false,
+    },
   },
 });
 </script>
@@ -41,6 +48,11 @@ export default Vue.extend({
 
   &.small {
     padding: 5px 5px;
+  }
+
+  &.muted {
+    background: transparent;
+    color: var(--muted-foreground);
   }
 }
 </style>
