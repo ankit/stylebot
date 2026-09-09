@@ -39,15 +39,15 @@ describe('ShortcutMenu.vue', () => {
   it('shows the invite to record a shortcut when unset', () => {
     const wrapper = mountMenu('');
 
-    expect(wrapper.text()).toContain('Record shortcut');
-    expect(wrapper.text()).not.toContain('Change…');
+    expect(wrapper.text()).toContain('record_shortcut');
+    expect(wrapper.text()).not.toContain('change_shortcut');
   });
 
   it('shows the current shortcut with Change/Remove when set', () => {
     const wrapper = mountMenu('alt+shift+r');
 
-    expect(wrapper.text()).toContain('Change…');
-    expect(wrapper.text()).toContain('Remove');
+    expect(wrapper.text()).toContain('change_shortcut');
+    expect(wrapper.text()).toContain('remove');
   });
 
   it('clicking "Record a shortcut" starts recording', async () => {
@@ -56,13 +56,13 @@ describe('ShortcutMenu.vue', () => {
     await wrapper.find('.record-btn').trigger('click');
 
     expect(shortcutStore.state.recording).toBe(true);
-    expect(wrapper.text()).toContain('Press a key to finish');
+    expect(wrapper.text()).toContain('press_key_to_finish');
   });
 
   it('capturing a key combo persists it and stops recording', async () => {
     const wrapper = mountMenu('alt+shift+r');
 
-    await wrapper.findAll('.row').at(0).trigger('click'); // "Change…"
+    await wrapper.findAll('.row').at(0).trigger('click'); // "change_shortcut"
     expect(shortcutStore.state.recording).toBe(true);
 
     wrapper.element.dispatchEvent(

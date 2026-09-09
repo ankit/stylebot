@@ -11,7 +11,7 @@
     <justify-toggle :justify="justify" @pick="pickJustify" />
 
     <div class="reset-row">
-      <button class="reset" @click="reset">Reset</button>
+      <button class="reset" @click="reset">{{ t('reset') }}</button>
     </div>
   </menu-box>
 </template>

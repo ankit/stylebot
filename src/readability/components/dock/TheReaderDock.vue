@@ -13,7 +13,7 @@
         :active="activeMenu === 'settings'"
         :disabled="recording"
         @click="toggleMenu('settings')"
-        @hover="showTip($event, 'Reading settings')"
+        @hover="showTip($event, t('reading_settings'))"
         @unhover="hideTip"
       />
 
@@ -157,7 +157,7 @@ export default Vue.extend({
     },
 
     closeTipText(): string {
-      return `Turn off readability for ${document.domain}`;
+      return this.t('turn_off_readability_for_domain', [document.domain]);
     },
 
     recording(): boolean {
