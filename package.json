@@ -30,6 +30,9 @@
     "postinstall": "patch-package"
   },
   "jest": {
+    "roots": [
+      "<rootDir>/src"
+    ],
     "moduleFileExtensions": [
       "js",
       "ts",
