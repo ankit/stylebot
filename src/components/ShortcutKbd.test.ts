@@ -1,11 +1,11 @@
 import { mount } from '@vue/test-utils';
 
-jest.mock('../utils/format-shortcut', () => ({
+jest.mock('./utils/format-shortcut', () => ({
   formatShortcut: jest.fn(),
 }));
 
-import { formatShortcut } from '../utils/format-shortcut';
-import ShortcutKbd from '../ShortcutKbd.vue';
+import { formatShortcut } from './utils/format-shortcut';
+import ShortcutKbd from './ShortcutKbd.vue';
 
 describe('ShortcutKbd.vue', () => {
   it('renders one <kbd> per part with the joiner between them', () => {

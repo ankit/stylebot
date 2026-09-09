@@ -5,7 +5,7 @@ export const getCurrentTimestamp = (): Timestamp =>
   format(new Date(), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
 
 
-type NotificationId = 'release/3.1' | 'donate';
+type NotificationId = string;
 
 const getNotificationKey = (id: NotificationId) => `notification~${id}`;
 
@@ -24,3 +24,22 @@ export const setNotification = (id: NotificationId, value: boolean): Promise<voi
     });
   });
 }
+
+// e.g. "3.1.4" -> "3.1", matching how releases are grouped on stylebot.dev.
+export const getReleaseVersion = (): string =>
+  chrome.runtime.getManifest().version.split('.').slice(0, 2).join('.');
+
+export const getReleaseNotificationId = (): NotificationId =>
+  `release/${getReleaseVersion()}`;
+
+export const openOptionsPage = (): void => {
+  chrome.runtime.sendMessage({ name: 'OpenOptionsPage' });
+};
+
+export const openReportIssuePage = (): void => {
+  chrome.runtime.sendMessage({ name: 'OpenReportIssuePage' });
+};
+
+export const openDonatePage = (): void => {
+  chrome.runtime.sendMessage({ name: 'OpenDonatePage' });
+};

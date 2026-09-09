@@ -1,6 +1,6 @@
 # `popup`
 
-This package includes code for the stylebot popup. Built using [bootstrap-vue](https://bootstrap-vue.org/)
+This package includes code for the stylebot popup. Uses plain Vue components and scoped CSS (no UI framework) to keep the popup bundle small.
 
 - **`components`**: Vue components for rendering the options page
 

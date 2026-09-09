@@ -1,5 +1,5 @@
 <template>
-  <b-list-group-item
+  <popup-row
     button
     :title="t('sync_description')"
     :disabled="syncInProgress"
@@ -7,14 +7,14 @@
   >
     <arrow-repeat-icon :spinning="syncInProgress" />
 
-    <span class="pl-2">
+    <span class="row-label">
       {{ syncInProgress ? t('sync_in_progress') : t('sync_now') }}
 
-      <span class="sync-metadata pl-1">
+      <span class="popup-caption sync-metadata">
         {{ syncInProgress ? undefined : syncTime }}
       </span>
     </span>
-  </b-list-group-item>
+  </popup-row>
 </template>
 
 <script lang="ts">
@@ -26,12 +26,14 @@ import { getGoogleDriveSyncMetadata } from '../../sync/google-drive/sync-metadat
 import { RunGoogleDriveSync } from '@stylebot/types';
 
 import ArrowRepeatIcon from './icons/ArrowRepeatIcon.vue';
+import PopupRow from './PopupRow.vue';
 
 export default Vue.extend({
   name: 'SyncStylebot',
 
   components: {
     ArrowRepeatIcon,
+    PopupRow,
   },
 
   data(): {
@@ -78,8 +80,7 @@ export default Vue.extend({
 
 <style lang="scss">
 .sync-metadata {
-  color: #777;
-  font-size: 12px;
+  margin-left: 4px;
   font-style: italic;
 }
 </style>

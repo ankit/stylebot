@@ -63,8 +63,7 @@ import {
 import { shortcutStore } from './shortcut-store';
 
 import MenuBox from './MenuBox.vue';
-import ShortcutKbd from './ShortcutKbd.vue';
-import ShortcutChip from './ShortcutChip.vue';
+import { ShortcutChip, ShortcutKbd } from '@stylebot/components';
 import IconKeyboard from '../icons/IconKeyboard.vue';
 import IconX from '../icons/IconX.vue';
 
