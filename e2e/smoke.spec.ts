@@ -1,0 +1,19 @@
+import { test, expect } from './fixtures';
+
+test('reveals the page after the content script runs', async ({ context }) => {
+  const page = await context.newPage();
+  await page.goto('https://example.com');
+
+  // hide-page.ts adds this at document_start, removes it once storage resolves.
+  // A leftover element means the reveal hung — the load white flash bug.
+  await expect(page.locator('#stylebot-hide-page')).toHaveCount(0);
+});
+
+test('popup mounts and renders the open-editor toggle', async ({ context, extensionId }) => {
+  const popup = await context.newPage();
+  await popup.goto(`chrome-extension://${extensionId}/popup/index.html`);
+
+  // Proves the popup's Vue app mounts without throwing — the direct symptom
+  // of the "won't open" bug cluster is a blank or broken popup here.
+  await expect(popup.locator('.open-stylebot')).toBeVisible();
+});
