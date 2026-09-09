@@ -7,15 +7,15 @@
     </button>
     <button class="item" @click="openOptions">
       <icon-options />
-      Stylebot Options
+      {{ t('view_options') }}
     </button>
     <button class="item" @click="reportIssue">
       <icon-flag />
-      Report an issue
+      {{ t('report_an_issue') }}
     </button>
     <button class="item" @click="donate">
       <icon-coffee />
-      Donate
+      {{ t('donate') }}
     </button>
   </menu-box>
 </template>
@@ -55,7 +55,7 @@ export default Vue.extend({
     },
 
     shortcutLabel(): string {
-      return this.shortcutValue ? 'Modify shortcut' : 'Set shortcut';
+      return this.shortcutValue ? this.t('modify_shortcut') : this.t('set_shortcut');
     },
   },
 
