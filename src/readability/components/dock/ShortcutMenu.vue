@@ -64,8 +64,7 @@ import { shortcutStore } from './shortcut-store';
 
 import MenuBox from './MenuBox.vue';
 import { ShortcutChip, ShortcutKbd } from '@stylebot/components';
-import IconKeyboard from '../icons/IconKeyboard.vue';
-import IconX from '../icons/IconX.vue';
+import { IconKeyboard, IconX } from '@stylebot/icons';
 
 export default Vue.extend({
   name: 'ShortcutMenu',
