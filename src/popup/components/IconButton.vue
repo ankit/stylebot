@@ -50,11 +50,27 @@ export default Vue.extend({
 
   &.bordered {
     flex: none;
-    width: 38px;
+    width: 46px;
     padding: 0;
-    border: 1px solid var(--input);
+    border: 1px solid #d3d6dd;
     border-radius: 8px;
+    background: #fff;
     color: var(--muted-foreground);
+
+    &:hover {
+      background: #f2f3f6;
+    }
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .icon-button.bordered {
+    border-color: #3a3d45;
+    background: #26282e;
+
+    &:hover {
+      background: #31343b;
+    }
   }
 }
 </style>

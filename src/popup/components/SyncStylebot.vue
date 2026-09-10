@@ -5,7 +5,9 @@
     :disabled="syncInProgress"
     @click="sync"
   >
-    <arrow-repeat-icon :spinning="syncInProgress" />
+    <span class="sync-icon">
+      <arrow-repeat-icon :spinning="syncInProgress" />
+    </span>
 
     <span class="row-label">
       {{ syncInProgress ? t('sync_in_progress') : t('sync_now') }}
@@ -82,5 +84,12 @@ export default Vue.extend({
 .sync-metadata {
   margin-left: 4px;
   font-style: italic;
+}
+
+.sync-icon {
+  display: inline-flex;
+  flex: none;
+  justify-content: center;
+  width: 28px;
 }
 </style>
