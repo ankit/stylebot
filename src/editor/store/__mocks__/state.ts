@@ -23,6 +23,9 @@ const mockState: State = {
   readability: false,
   colorPickerVisible: false,
 
+  aiGenerating: false,
+  aiError: null,
+
   options: defaultOptions,
   commands: defaultCommands,
   editorCommands: defaultEditorCommands,

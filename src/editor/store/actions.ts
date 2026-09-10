@@ -41,6 +41,7 @@ import {
   getCommands,
   getReadabilitySettings,
   setReadabilitySettings,
+  generateCss,
 } from '../utils/chrome';
 
 import { initListeners } from '../listeners';
@@ -297,5 +298,28 @@ export default {
         percent
       ),
     });
+  },
+
+  async generateCssWithAi(
+    {
+      state,
+      commit,
+      dispatch,
+    }: { state: State; commit: Commit; dispatch: Dispatch },
+    prompt: string
+  ): Promise<void> {
+    commit('setAiGenerating', true);
+    commit('setAiError', null);
+
+    const response = await generateCss(prompt, state.css, state.url);
+
+    commit('setAiGenerating', false);
+
+    if (response.error) {
+      commit('setAiError', response.error);
+      return;
+    }
+
+    dispatch('applyCss', { css: response.css });
   },
 };

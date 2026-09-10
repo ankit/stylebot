@@ -11,6 +11,10 @@
     <b-row no-gutters class="mt-5">
       <the-keyboard-shortcuts />
     </b-row>
+
+    <b-row no-gutters class="mt-5">
+      <the-claude-api-key />
+    </b-row>
   </div>
 </template>
 
@@ -20,6 +24,7 @@ import Vue from 'vue';
 import TheFonts from './basics/TheFonts.vue';
 import TheContextMenu from './basics/TheContextMenu.vue';
 import TheKeyboardShortcuts from './basics/TheKeyboardShortcuts.vue';
+import TheClaudeApiKey from './basics/TheClaudeApiKey.vue';
 
 export default Vue.extend({
   name: 'TheBasicsTab',
@@ -28,6 +33,7 @@ export default Vue.extend({
     TheFonts,
     TheContextMenu,
     TheKeyboardShortcuts,
+    TheClaudeApiKey,
   },
 
   computed: {

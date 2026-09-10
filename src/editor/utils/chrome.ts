@@ -17,6 +17,8 @@ import {
   SetReadabilitySettings,
   ReadabilitySettings,
   OpenDonatePage,
+  GenerateCss,
+  GenerateCssResponse,
 } from '@stylebot/types';
 
 export const getAllOptions = async (): Promise<StylebotOptions> => {
@@ -159,4 +161,23 @@ export const setReadabilitySettings = (value: ReadabilitySettings): void => {
   };
 
   chrome.runtime.sendMessage(message);
+};
+
+export const generateCss = async (
+  prompt: string,
+  css: string,
+  url: string
+): Promise<GenerateCssResponse> => {
+  const message: GenerateCss = {
+    name: 'GenerateCss',
+    prompt,
+    css,
+    url,
+  };
+
+  return new Promise(resolve => {
+    chrome.runtime.sendMessage(message, (response: GenerateCssResponse) => {
+      resolve(response);
+    });
+  });
 };

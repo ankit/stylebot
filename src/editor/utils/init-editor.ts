@@ -15,6 +15,7 @@ import {
   DropdownPlugin,
   FormRadioPlugin,
   FormInputPlugin,
+  FormTextareaPlugin,
   InputGroupPlugin,
   ButtonPlugin,
   ButtonGroupPlugin,
@@ -31,6 +32,7 @@ Vue.use(LayoutPlugin);
 Vue.use(DropdownPlugin);
 Vue.use(FormRadioPlugin);
 Vue.use(FormInputPlugin);
+Vue.use(FormTextareaPlugin);
 Vue.use(InputGroupPlugin);
 Vue.use(ButtonPlugin);
 Vue.use(ButtonGroupPlugin);

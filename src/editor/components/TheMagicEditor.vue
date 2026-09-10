@@ -1,6 +1,11 @@
 <template>
   <div>
     <div class="mt-3 px-3 magic-section">
+      <h1 class="magic-title">{{ t('css_generator') }}</h1>
+      <the-css-generator />
+    </div>
+
+    <div class="mt-4 px-3 magic-section">
       <the-readability />
     </div>
 
@@ -16,6 +21,7 @@ import Vue from 'vue';
 
 import TheGrayscale from './magic/TheGrayscale.vue';
 import TheReadability from './magic/TheReadability.vue';
+import TheCssGenerator from './magic/TheCssGenerator.vue';
 
 export default Vue.extend({
   name: 'TheMagicEditor',
@@ -23,6 +29,7 @@ export default Vue.extend({
   components: {
     TheGrayscale,
     TheReadability,
+    TheCssGenerator,
   },
 });
 </script>

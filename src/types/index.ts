@@ -26,6 +26,7 @@ export type StylebotOptions = {
   mode: StylebotEditingMode;
   basicModeSections: StylebotBasicModeSections;
   colorPalette: StylebotColorPalette;
+  claudeApiKey: string;
 };
 
 export type Style = {

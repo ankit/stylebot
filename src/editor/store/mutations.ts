@@ -92,4 +92,12 @@ export default {
   setContextMenuSelector(state: State, value: string): void {
     state.contextMenuSelector = value;
   },
+
+  setAiGenerating(state: State, value: boolean): void {
+    state.aiGenerating = value;
+  },
+
+  setAiError(state: State, value: string | null): void {
+    state.aiError = value;
+  },
 };

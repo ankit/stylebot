@@ -41,4 +41,20 @@ describe('mutations', () => {
       ]);
     });
   });
+
+  describe('setAiGenerating', () => {
+    it('sets the aiGenerating flag', () => {
+      const state = { ...mockState };
+      mutations.setAiGenerating(state, true);
+      expect(state.aiGenerating).toBe(true);
+    });
+  });
+
+  describe('setAiError', () => {
+    it('sets the aiError message', () => {
+      const state = { ...mockState };
+      mutations.setAiError(state, 'invalid_api_key');
+      expect(state.aiError).toBe('invalid_api_key');
+    });
+  });
 });

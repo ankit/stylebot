@@ -36,6 +36,7 @@ import {
   SetReadabilitySettings as SetReadabilitySettingsType,
   GetImportCss as GetImportCssType,
   RunGoogleDriveSync as RunGoogleDriveSyncType,
+  GenerateCss as GenerateCssType,
   GetCommandsResponse,
   GetAllOptionsResponse,
   GetAllStylesResponse,
@@ -44,8 +45,10 @@ import {
   GetReadabilitySettingsResponse,
   GetImportCssResponse,
   RunGoogleDriveSyncResponse,
+  GenerateCssResponse,
 } from '@stylebot/types';
 import { runGoogleDriveSync } from '@stylebot/sync';
+import { generateCss, getErrorCode } from './ai';
 
 import {
   get as getReadabilitySettings,
@@ -207,4 +210,20 @@ export const RunGoogleDriveSync = async (
 ): Promise<void> => {
   await runGoogleDriveSync();
   sendResponse();
+};
+
+export const GenerateCss = async (
+  message: GenerateCssType,
+  sendResponse: (response: GenerateCssResponse) => void
+): Promise<void> => {
+  try {
+    const css = await generateCss({
+      prompt: message.prompt,
+      css: message.css,
+      url: message.url,
+    });
+    sendResponse({ css });
+  } catch (e) {
+    sendResponse({ error: getErrorCode(e) });
+  }
 };

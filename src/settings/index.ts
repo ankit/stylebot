@@ -30,6 +30,7 @@ export const defaultOptions: StylebotOptions = {
     dockLocation: 'right',
   },
   colorPalette: 'basic',
+  claudeApiKey: '',
 };
 
 export const defaultCommands: StylebotCommands = {

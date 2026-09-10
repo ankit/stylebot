@@ -52,7 +52,8 @@
   "host_permissions": [
     "https://drive.google.com/*",
     "https://www.googleapis.com/*",
-    "https://fonts.googleapis.com/*"
+    "https://fonts.googleapis.com/*",
+    "https://api.anthropic.com/*"
   ],
   "web_accessible_resources": [
     {

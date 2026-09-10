@@ -22,6 +22,7 @@ import {
   SetReadabilitySettings,
   GetImportCss,
   RunGoogleDriveSync,
+  GenerateCss,
 } from './messages';
 
 import { refreshBadgeForTab } from './styles';
@@ -159,6 +160,10 @@ chrome.runtime.onMessage.addListener(
 
       case 'RunGoogleDriveSync':
         RunGoogleDriveSync(message, sendResponse);
+        break;
+
+      case 'GenerateCss':
+        GenerateCss(message, sendResponse);
         break;
     }
 

@@ -238,4 +238,45 @@ describe('actions', () => {
       });
     });
   });
+
+  describe('generateCssWithAi', () => {
+    it('applies the generated css on success', async () => {
+      (chromeUtils.generateCss as jest.Mock).mockResolvedValue({
+        css: 'a { color: red; }',
+      });
+
+      await actions.generateCssWithAi(
+        { state: mockState, commit: mockCommit, dispatch: mockDispatch },
+        'make links red'
+      );
+
+      expect(chromeUtils.generateCss).toBeCalledWith(
+        'make links red',
+        mockState.css,
+        mockState.url
+      );
+
+      expect(mockCommit).toHaveBeenNthCalledWith(1, 'setAiGenerating', true);
+      expect(mockCommit).toHaveBeenNthCalledWith(2, 'setAiError', null);
+      expect(mockCommit).toHaveBeenNthCalledWith(3, 'setAiGenerating', false);
+
+      expect(mockDispatch).toBeCalledWith('applyCss', {
+        css: 'a { color: red; }',
+      });
+    });
+
+    it('sets an error and does not apply css on failure', async () => {
+      (chromeUtils.generateCss as jest.Mock).mockResolvedValue({
+        error: 'invalid_api_key',
+      });
+
+      await actions.generateCssWithAi(
+        { state: mockState, commit: mockCommit, dispatch: mockDispatch },
+        'make links red'
+      );
+
+      expect(mockCommit).toHaveBeenNthCalledWith(4, 'setAiError', 'invalid_api_key');
+      expect(mockDispatch).not.toBeCalled();
+    });
+  });
 });

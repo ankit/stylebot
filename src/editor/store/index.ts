@@ -42,6 +42,9 @@ export type State = {
   resizing: boolean;
   colorPickerVisible: boolean;
 
+  aiGenerating: boolean;
+  aiError: string | null;
+
   options: StylebotOptions;
   commands: StylebotCommands | null;
   editorCommands: StylebotEditorCommands;
@@ -64,6 +67,9 @@ export default new Vuex.Store<State>({
     inspecting: false,
     resizing: false,
     colorPickerVisible: false,
+
+    aiGenerating: false,
+    aiError: null,
 
     commands: null,
     options: defaultOptions,

@@ -1,7 +1,9 @@
 jest.mock('../styles');
+jest.mock('../ai');
 
-import { SetReadability, ReadabilityActiveChanged } from '../messages';
+import { SetReadability, ReadabilityActiveChanged, GenerateCss } from '../messages';
 import * as stylesModule from '../styles';
+import * as aiModule from '../ai';
 
 describe('SetReadability', () => {
   beforeEach(() => {
@@ -65,5 +67,48 @@ describe('ReadabilityActiveChanged', () => {
     await ReadabilityActiveChanged({ name: 'ReadabilityActiveChanged' }, {});
 
     expect(stylesModule.refreshBadgeForTab).not.toBeCalled();
+  });
+});
+
+describe('GenerateCss', () => {
+  beforeEach(() => {
+    jest.resetAllMocks();
+  });
+
+  it('responds with the generated css on success', async () => {
+    (aiModule.generateCss as jest.Mock).mockResolvedValue('a { color: red; }');
+    const sendResponse = jest.fn();
+
+    await GenerateCss(
+      {
+        name: 'GenerateCss',
+        prompt: 'make links red',
+        css: '',
+        url: 'example.com',
+      },
+      sendResponse
+    );
+
+    expect(aiModule.generateCss).toBeCalledWith({
+      prompt: 'make links red',
+      css: '',
+      url: 'example.com',
+    });
+    expect(sendResponse).toBeCalledWith({ css: 'a { color: red; }' });
+  });
+
+  it('responds with an error code when generation fails', async () => {
+    const error = new Error('boom');
+    (aiModule.generateCss as jest.Mock).mockRejectedValue(error);
+    (aiModule.getErrorCode as jest.Mock).mockReturnValue('unknown_error');
+    const sendResponse = jest.fn();
+
+    await GenerateCss(
+      { name: 'GenerateCss', prompt: 'x', css: '', url: 'example.com' },
+      sendResponse
+    );
+
+    expect(aiModule.getErrorCode).toBeCalledWith(error);
+    expect(sendResponse).toBeCalledWith({ error: 'unknown_error' });
   });
 });

@@ -112,6 +112,13 @@ export type RunGoogleDriveSync = {
   name: 'RunGoogleDriveSync';
 };
 
+export type GenerateCss = {
+  name: 'GenerateCss';
+  prompt: string;
+  css: string;
+  url: string;
+};
+
 type BackgroundPageMessage =
   | SetStyle
   | EnableStyle
@@ -133,6 +140,7 @@ type BackgroundPageMessage =
   | GetReadabilitySettings
   | SetReadabilitySettings
   | GetImportCss
-  | RunGoogleDriveSync;
+  | RunGoogleDriveSync
+  | GenerateCss;
 
 export default BackgroundPageMessage;

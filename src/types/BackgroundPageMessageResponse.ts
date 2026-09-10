@@ -29,6 +29,10 @@ export type GetReadabilitySettingsResponse = ReadabilitySettings;
 export type GetImportCssResponse = string;
 export type RunGoogleDriveSyncResponse = void;
 
+export type GenerateCssResponse =
+  | { css: string; error?: undefined }
+  | { css?: undefined; error: string };
+
 type BackgroundPageMessageResponse =
   | GetAllOptionsResponse
   | GetOptionResponse
@@ -37,6 +41,7 @@ type BackgroundPageMessageResponse =
   | GetCommandsResponse
   | GetReadabilitySettingsResponse
   | GetImportCssResponse
-  | RunGoogleDriveSyncResponse;
+  | RunGoogleDriveSyncResponse
+  | GenerateCssResponse;
 
 export default BackgroundPageMessageResponse;
