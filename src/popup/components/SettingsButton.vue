@@ -9,7 +9,7 @@ import Vue from 'vue';
 
 import { IconOptions } from '@stylebot/icons';
 import { openOptions } from '../utils';
-import IconButton from './IconButton.vue';
+import { IconButton } from '@stylebot/components';
 
 export default Vue.extend({
   name: 'SettingsButton',
