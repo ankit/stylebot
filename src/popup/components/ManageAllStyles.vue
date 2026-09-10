@@ -1,19 +1,19 @@
 <template>
-  <popup-button @click="openOptions">
+  <pill-button @click="openOptions">
     {{ t('manage_all_styles') }}
-  </popup-button>
+  </pill-button>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import { openOptions } from '../utils';
-import { PopupButton } from '@stylebot/components';
+import { PillButton } from '@stylebot/components';
 
 export default Vue.extend({
   name: 'ManageAllStyles',
 
   components: {
-    PopupButton,
+    PillButton,
   },
 
   methods: {
