@@ -65,7 +65,7 @@ export default Vue.extend({
   padding: 4px 7px;
   border-radius: 6px;
   background: var(--main-background);
-  color: var(--main-foreground);
+  color: var(--foreground);
   border: 1px solid var(--border-color);
   font-weight: 400;
   font-size: 11.5px;

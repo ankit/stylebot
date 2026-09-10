@@ -18,6 +18,7 @@ export default Vue.extend({
   display: flex;
   align-items: center;
   flex: 1;
+  min-height: 40px;
   padding: 9px 12px;
   border-radius: 8px;
   border: 1px solid #d3d6dd;

@@ -9,13 +9,13 @@
           </span>
           <button type="button" class="cancel" @click="cancelRecording">{{ t('cancel') }}</button>
         </div>
-        <p class="helper">
+        <text-block size="caption" class="helper">
           {{ t('press_key_to_finish') }}
           <template v-if="hasValue">
             {{ t('esc_keeps') }} <span class="chip chip-inline"><shortcut-kbd :value="value" /></span>
           </template>
           <template v-else>{{ t('esc_cancels') }}</template>
-        </p>
+        </text-block>
       </div>
 
       <div v-else-if="hasValue" class="content">
@@ -23,7 +23,7 @@
           <div class="title">{{ t('readability_shortcut') }}</div>
           <shortcut-chip :value="value" />
         </div>
-        <p class="desc">{{ t('readability_shortcut_description') }}</p>
+        <text-block size="caption" class="desc">{{ t('readability_shortcut_description') }}</text-block>
         <div class="divider" />
         <button type="button" class="row" @click="startRecording">{{ t('change_shortcut') }}</button>
         <button type="button" class="row danger" @click="remove">{{ t('remove') }}</button>
@@ -42,7 +42,7 @@
             <icon-x />
           </button>
         </div>
-        <p class="desc">{{ t('readability_shortcut_description') }}</p>
+        <text-block size="caption" class="desc">{{ t('readability_shortcut_description') }}</text-block>
         <button type="button" class="record-btn" @click="startRecording">
           <icon-keyboard />
           {{ t('record_shortcut') }}
@@ -62,7 +62,7 @@ import {
 } from '../../../components/utils/keydown-to-shortcut';
 import { shortcutStore } from './shortcut-store';
 
-import { ShortcutChip, ShortcutKbd, MenuBox } from '@stylebot/components';
+import { ShortcutChip, ShortcutKbd, MenuBox, TextBlock } from '@stylebot/components';
 import { IconKeyboard, IconX } from '@stylebot/icons';
 
 export default Vue.extend({
@@ -72,6 +72,7 @@ export default Vue.extend({
     MenuBox,
     ShortcutKbd,
     ShortcutChip,
+    TextBlock,
     IconKeyboard,
     IconX,
   },
@@ -234,10 +235,6 @@ export default Vue.extend({
 }
 
 .desc {
-  font-weight: 400;
-  font-size: 11.5px;
-  line-height: 1.4;
-  color: var(--muted-foreground);
   margin: 4px 0 14px;
 }
 
@@ -366,10 +363,6 @@ export default Vue.extend({
 }
 
 .helper {
-  font-weight: 400;
-  font-size: 11px;
-  line-height: 1.4;
-  color: var(--muted-foreground);
   margin: 9px 0 0;
 }
 

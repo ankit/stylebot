@@ -56,7 +56,7 @@ export default Vue.extend({
 
   &.bordered {
     flex: none;
-    width: 38px;
+    width: 46px;
     padding: 0;
     border: 1px solid var(--ui-icon-btn-border);
     border-radius: 8px;

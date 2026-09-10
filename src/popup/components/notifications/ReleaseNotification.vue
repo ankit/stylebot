@@ -9,7 +9,7 @@
   >
     <span class="release-dot" />
 
-    <text-block class="release-text">
+    <text-block :muted="false" class="release-text">
       {{ t('new_in_version', [version]) }}
       <span class="release-sep">—</span>
       <span class="release-link">{{ t('see_what_changed') }}</span>
@@ -91,7 +91,7 @@ export default Vue.extend({
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 12px 16px;
+  padding: 12px 8px 12px 16px;
   background: var(--ui-notification-bg);
   border-top: 1px solid var(--ui-notification-border);
   cursor: pointer;
@@ -126,5 +126,9 @@ export default Vue.extend({
 
 .release-dismiss {
   flex: none;
+}
+
+.release-banner .release-dismiss:hover {
+  background: var(--ui-notification-border);
 }
 </style>
