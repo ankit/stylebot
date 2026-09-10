@@ -7,7 +7,8 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { IconButton, MoreIcon } from '@stylebot/components';
+import { IconButton } from '@stylebot/components';
+import { MoreIcon } from '@stylebot/icons';
 
 export default Vue.extend({
   name: 'IconMenuTrigger',

@@ -37,7 +37,8 @@
 <script lang="ts">
 import Vue from 'vue';
 import { formatDistanceToNow } from 'date-fns';
-import { ArrowRepeatIcon, Heading, TextBlock } from '@stylebot/components';
+import { Heading, TextBlock } from '@stylebot/components';
+import { ArrowRepeatIcon } from '@stylebot/icons';
 
 import AppButton from '../AppButton.vue';
 

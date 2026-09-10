@@ -7,15 +7,15 @@
     </button>
     <button class="item" @click="openOptions">
       <icon-options />
-      Stylebot Options
+      {{ t('view_options') }}
     </button>
     <button class="item" @click="reportIssue">
       <icon-flag />
-      Report an issue
+      {{ t('report_an_issue') }}
     </button>
     <button class="item" @click="donate">
       <icon-coffee />
-      Donate
+      {{ t('donate') }}
     </button>
   </menu-box>
 </template>
@@ -30,10 +30,8 @@ import {
   openDonatePage,
 } from '@stylebot/utils';
 
-import { ShortcutChip, IconKeyboard, MenuBox } from '@stylebot/components';
-import IconOptions from '../icons/IconOptions.vue';
-import IconFlag from '../icons/IconFlag.vue';
-import IconCoffee from '../icons/IconCoffee.vue';
+import { ShortcutChip, MenuBox } from '@stylebot/components';
+import { IconOptions, IconFlag, IconCoffee, IconKeyboard } from '@stylebot/icons';
 
 export default Vue.extend({
   name: 'MoreMenu',
@@ -53,7 +51,7 @@ export default Vue.extend({
     },
 
     shortcutLabel(): string {
-      return this.shortcutValue ? 'Modify shortcut' : 'Set shortcut';
+      return this.shortcutValue ? this.t('modify_shortcut') : this.t('set_shortcut');
     },
   },
 

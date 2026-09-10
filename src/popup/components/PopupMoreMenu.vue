@@ -34,7 +34,7 @@
 import Vue from 'vue';
 import { openOptions, reportIssue, donate } from '../utils';
 import PopupRow from './PopupRow.vue';
-import { ChevronLeftIcon } from '@stylebot/components';
+import { ChevronLeftIcon } from '@stylebot/icons';
 
 export default Vue.extend({
   name: 'PopupMoreMenu',

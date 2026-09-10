@@ -6,8 +6,3 @@ export { default as ShortcutRecorderField } from './ShortcutRecorderField.vue';
 export { default as MenuBox } from './MenuBox.vue';
 export { default as ToggleSwitch } from './ToggleSwitch.vue';
 export { default as IconButton } from './IconButton.vue';
-export { default as IconKeyboard } from './icons/IconKeyboard.vue';
-export { default as IconX } from './icons/IconX.vue';
-export { default as ChevronLeftIcon } from './icons/ChevronLeftIcon.vue';
-export { default as MoreIcon } from './icons/MoreIcon.vue';
-export { default as ArrowRepeatIcon } from './icons/ArrowRepeatIcon.vue';

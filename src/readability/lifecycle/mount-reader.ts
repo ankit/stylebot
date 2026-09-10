@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import { t } from '@stylebot/i18n';
 import { hasReaderableContent } from '../eligibility/has-readerable-content';
 
 import App from '../components/App.vue';
@@ -7,6 +8,12 @@ import { getReadabilityArticle } from './get-readability-article';
 
 import { ReadabilityArticle } from '@stylebot/types';
 import { cacheDocument } from './document-cache';
+
+Vue.mixin({
+  methods: {
+    t,
+  },
+});
 
 /**
  * Fetches the reader's compiled stylesheet and injects it into the shadow root.

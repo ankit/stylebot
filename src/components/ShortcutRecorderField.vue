@@ -39,8 +39,7 @@ import {
 } from './utils/keydown-to-shortcut';
 
 import ShortcutKbd from './ShortcutKbd.vue';
-import IconKeyboard from './icons/IconKeyboard.vue';
-import IconX from './icons/IconX.vue';
+import { IconKeyboard, IconX } from '@stylebot/icons';
 
 export default Vue.extend({
   name: 'ShortcutRecorderField',

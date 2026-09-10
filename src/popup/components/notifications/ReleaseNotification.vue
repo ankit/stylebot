@@ -9,7 +9,7 @@
   >
     <span class="release-dot" />
 
-    <text-block :muted="false" class="release-text">
+    <text-block class="release-text">
       {{ t('new_in_version', [version]) }}
       <span class="release-sep">—</span>
       <span class="release-link">{{ t('see_what_changed') }}</span>
@@ -31,7 +31,7 @@ import {
 } from '@stylebot/utils';
 
 import { onEnterOrSpace } from '../../utils';
-import XIcon from '../icons/XIcon.vue';
+import { XIcon } from '@stylebot/icons';
 import { IconButton, TextBlock } from '@stylebot/components';
 
 export default Vue.extend({

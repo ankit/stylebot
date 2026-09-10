@@ -40,7 +40,8 @@
 <script lang="ts">
 import Vue from 'vue';
 import { defaultOptions } from '@stylebot/settings';
-import { IconX, Heading, TextBlock } from '@stylebot/components';
+import { Heading, TextBlock } from '@stylebot/components';
+import { IconX } from '@stylebot/icons';
 
 export default Vue.extend({
   name: 'TheFonts',

@@ -62,7 +62,8 @@ import * as postcss from 'postcss';
 import { formatDistanceToNow } from 'date-fns';
 
 import { StyleWithoutUrl } from '@stylebot/types';
-import { ToggleSwitch, ChevronLeftIcon, IconButton } from '@stylebot/components';
+import { ToggleSwitch, IconButton } from '@stylebot/components';
+import { ChevronLeftIcon } from '@stylebot/icons';
 
 import AppButton from '../AppButton.vue';
 import ConfirmDialog from '../ConfirmDialog.vue';
