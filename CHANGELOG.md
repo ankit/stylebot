@@ -1,3 +1,14 @@
+## Version 3.2.0 (September 2026)
+
+- Overhaul Readability mode: customizable theme and font, an inline settings dock, an animated loading experience, a keyboard shortcut, and localized menus (#857, #855, #866, #870, #852)
+- Fix Readability blank page, flashing, and mid-load/hydrating-page toggle bugs (#848, #850)
+- Redesign the popup UI with a direct settings button and fully clickable toggle rows (#867, #876, #845)
+- Fix flash of unstyled content on page load and in the CSS editor (#833, #834, #841, #842)
+- Fix false syntax errors in the CSS editor by upgrading Monaco (#838)
+- Fix CSS selector escaping and `@import` handling bugs (#821, #835)
+- Wrap long URLs in the styles overview (#837)
+- Revise zh-TW translations (#793)
+
 ## Version 3.1.4 (May 2024)
 
 - Chrome and Edge Only release
