@@ -25,7 +25,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { getGoogleDriveSyncMetadata } from '../../sync/google-drive/sync-metadata';
 import { RunGoogleDriveSync } from '@stylebot/types';
 
-import ArrowRepeatIcon from './icons/ArrowRepeatIcon.vue';
+import { ArrowRepeatIcon } from '@stylebot/icons';
 import PopupRow from './PopupRow.vue';
 
 export default Vue.extend({

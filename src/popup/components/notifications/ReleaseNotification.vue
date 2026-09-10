@@ -31,7 +31,7 @@ import {
 } from '@stylebot/utils';
 
 import { onEnterOrSpace } from '../../utils';
-import XIcon from '../icons/XIcon.vue';
+import { XIcon } from '@stylebot/icons';
 import IconButton from '../IconButton.vue';
 import { TextBlock } from '@stylebot/components';
 

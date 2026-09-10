@@ -102,11 +102,11 @@ input {
   transition: transform 0.15s ease;
 }
 
-input:checked ~ .track {
+input:checked:not(:disabled) ~ .track {
   background: var(--primary);
 }
 
-input:checked ~ .track .thumb {
+input:checked:not(:disabled) ~ .track .thumb {
   background: var(--thumb-on);
 }
 
