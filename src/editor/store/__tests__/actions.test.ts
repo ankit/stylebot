@@ -138,10 +138,7 @@ describe('actions', () => {
     });
 
     it('does nothing to the cache when nothing is cached yet', () => {
-      actions.applyReadability(
-        { commit: mockCommit, state: mockState, dispatch: mockDispatch },
-        true
-      );
+      actions.applyReadability({ commit: mockCommit, state: mockState }, true);
 
       expect(readCache()).toBeNull();
     });
@@ -152,10 +149,7 @@ describe('actions', () => {
         readability: false,
       });
 
-      actions.applyReadability(
-        { commit: mockCommit, state: mockState, dispatch: mockDispatch },
-        true
-      );
+      actions.applyReadability({ commit: mockCommit, state: mockState }, true);
 
       expect(readCache()).toEqual({
         styles: [{ url: mockState.url, css: 'a { color: blue; }', enabled: true }],
@@ -165,22 +159,23 @@ describe('actions', () => {
       expect(chromeUtils.setReadability).toBeCalledWith(mockState.url, true);
     });
 
-    it('switches out of basic/code mode since editing page CSS has no effect there', () => {
-      actions.applyReadability(
-        { commit: mockCommit, state: mockState, dispatch: mockDispatch },
-        true
-      );
+    it('switches out of basic/code mode since editing page CSS has no effect there, without persisting the mode change', () => {
+      actions.applyReadability({ commit: mockCommit, state: mockState }, true);
 
-      expect(mockDispatch).toBeCalledWith('setMode', 'magic');
+      expect(mockCommit).toBeCalledWith('setOptions', {
+        ...mockState.options,
+        mode: 'magic',
+      });
+      expect(chromeUtils.setOption).not.toBeCalledWith('mode', 'magic');
     });
 
     it('leaves the mode alone when turning readability off', () => {
-      actions.applyReadability(
-        { commit: mockCommit, state: mockState, dispatch: mockDispatch },
-        false
-      );
+      actions.applyReadability({ commit: mockCommit, state: mockState }, false);
 
-      expect(mockDispatch).not.toBeCalledWith('setMode', 'magic');
+      expect(mockCommit).not.toBeCalledWith(
+        'setOptions',
+        expect.objectContaining({ mode: 'magic' })
+      );
     });
 
     it('leaves the mode alone when already in magic mode', () => {
@@ -188,12 +183,14 @@ describe('actions', () => {
         {
           commit: mockCommit,
           state: { ...mockState, options: { ...mockState.options, mode: 'magic' } },
-          dispatch: mockDispatch,
         },
         true
       );
 
-      expect(mockDispatch).not.toBeCalledWith('setMode', 'magic');
+      expect(mockCommit).not.toBeCalledWith(
+        'setOptions',
+        expect.objectContaining({ mode: 'magic' })
+      );
     });
   });
 

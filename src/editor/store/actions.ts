@@ -238,11 +238,7 @@ export default {
   },
 
   applyReadability(
-    {
-      state,
-      commit,
-      dispatch,
-    }: { state: State; commit: Commit; dispatch: Dispatch },
+    { state, commit }: { state: State; commit: Commit },
     value: boolean
   ): void {
     if (value) {
@@ -252,9 +248,11 @@ export default {
     }
 
     // Editing page CSS has no effect while readability is running — its DOM
-    // is detached from the document, not just hidden.
+    // is detached from the document, not just hidden. Switch the panel to
+    // Magic locally without persisting over the user's global mode
+    // preference (mirrors openStylebot's readabilityActive handling above).
     if (value && ['basic', 'code'].includes(state.options.mode)) {
-      dispatch('setMode', 'magic');
+      commit('setOptions', { ...state.options, mode: 'magic' });
     }
 
     commit('setReadability', value);
