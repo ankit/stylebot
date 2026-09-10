@@ -1,80 +1,75 @@
 <template>
   <div class="popup">
-    <popup-more-menu v-if="showMore" @back="showMore = false" />
+    <div v-if="restricted">
+      <div class="popup-header">
+        <heading as="h1" size="sm" class="popup-header-domain popup-header-domain--muted">
+          {{ tab.url }}
+        </heading>
+      </div>
 
-    <template v-else>
-      <div v-if="restricted">
-        <div class="popup-header">
-          <heading as="h1" size="sm" class="popup-header-domain popup-header-domain--muted">
-            {{ tab.url }}
-          </heading>
-        </div>
+      <div class="popup-divider" />
 
-        <div class="popup-divider" />
+      <text-block variant="muted" class="popup-restricted-message">
+        {{ t('restricted_page_description') }}
+      </text-block>
 
-        <text-block variant="muted" class="popup-restricted-message">
-          {{ t('restricted_page_description') }}
+      <div class="popup-divider" />
+
+      <div class="popup-footer">
+        <manage-all-styles />
+      </div>
+    </div>
+
+    <div v-else-if="tab && tab.id">
+      <style-component
+        v-if="styles.length"
+        header
+        :url="styles[0].url"
+        :disable-toggle="isOpen || (pageReaderable && readability)"
+        :initial-enabled="styles[0].enabled"
+        :shortcut="styleShortcut"
+      />
+      <div v-else class="popup-header">
+        <heading as="h1" size="sm" class="popup-header-domain">{{ domain }}</heading>
+        <text-block size="caption" variant="muted">
+          {{ t('no_style_saved_for_site') }}
         </text-block>
-
-        <div class="popup-divider" />
-
-        <div class="popup-footer">
-          <manage-all-styles />
-          <more-button @click="showMore = true" />
-        </div>
       </div>
 
-      <div v-else-if="tab && tab.id">
-        <style-component
-          v-if="styles.length"
-          header
-          :url="styles[0].url"
-          :disable-toggle="isOpen || (pageReaderable && readability)"
-          :initial-enabled="styles[0].enabled"
-          :shortcut="styleShortcut"
+      <div class="popup-divider" />
+
+      <div class="popup-menu">
+        <readability
+          :initial-readability="pageReaderable && readability"
+          :disabled="!pageReaderable"
+          :shortcut="readabilityShortcut"
+          @change="readability = $event"
         />
-        <div v-else class="popup-header">
-          <heading as="h1" size="sm" class="popup-header-domain">{{ domain }}</heading>
-          <text-block size="caption" variant="muted" class="popup-header-subtitle">
-            {{ t('no_style_saved_for_site') }}
-          </text-block>
-        </div>
 
-        <div class="popup-divider" />
+        <style-component
+          v-for="style in styles.slice(1)"
+          :key="style.url"
+          :url="style.url"
+          :disable-toggle="isOpen || (pageReaderable && readability)"
+          :initial-enabled="style.enabled"
+        />
 
-        <div class="popup-menu">
-          <readability
-            :initial-readability="pageReaderable && readability"
-            :disabled="!pageReaderable"
-            :shortcut="readabilityShortcut"
-            @change="readability = $event"
-          />
-
-          <style-component
-            v-for="style in styles.slice(1)"
-            :key="style.url"
-            :url="style.url"
-            :disable-toggle="isOpen || (pageReaderable && readability)"
-            :initial-enabled="style.enabled"
-          />
-
-          <sync-stylebot v-if="googleDriveSyncEnabled" />
-        </div>
-
-        <div class="popup-divider" />
-
-        <div class="popup-footer">
-          <toggle-stylebot
-            :is-open="isOpen"
-            :tab="tab"
-            :shortcut="stylebotShortcut"
-          />
-          <more-button @click="showMore = true" />
-        </div>
-
-        <release-notification />
+        <sync-stylebot v-if="googleDriveSyncEnabled" />
       </div>
-    </template>
+
+      <div class="popup-divider" />
+
+      <div class="popup-footer">
+        <toggle-stylebot
+          :is-open="isOpen"
+          :tab="tab"
+          :shortcut="stylebotShortcut"
+        />
+        <settings-button />
+      </div>
+
+      <release-notification />
+    </div>
   </div>
 </template>
 
@@ -83,8 +78,7 @@ import Vue from 'vue';
 import { Heading, TextBlock } from '@stylebot/components';
 
 import StyleComponent from './components/Style.vue';
-import MoreButton from './components/MoreButton.vue';
-import PopupMoreMenu from './components/PopupMoreMenu.vue';
+import SettingsButton from './components/SettingsButton.vue';
 import Readability from './components/Readability.vue';
 import SyncStylebot from './components/SyncStylebot.vue';
 import ToggleStylebot from './components/ToggleStylebot.vue';
@@ -111,8 +105,7 @@ export default Vue.extend({
   components: {
     Heading,
     TextBlock,
-    MoreButton,
-    PopupMoreMenu,
+    SettingsButton,
     StyleComponent,
     ToggleStylebot,
     Readability,
@@ -130,7 +123,6 @@ export default Vue.extend({
     googleDriveSyncEnabled: boolean;
     googleDriveSyncMetadata?: GoogleDriveSyncMetadata;
     commands?: GetCommandsResponse;
-    showMore: boolean;
   } {
     return {
       styles: [],
@@ -141,7 +133,6 @@ export default Vue.extend({
       googleDriveSyncEnabled: false,
       googleDriveSyncMetadata: undefined,
       commands: undefined,
-      showMore: false,
     };
   },
 
@@ -233,6 +224,9 @@ body {
 }
 
 .popup-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
   padding: 14px 16px;
 }
 
@@ -255,10 +249,6 @@ body {
 .popup-caption {
   font-size: 11.5px;
   color: var(--muted-foreground);
-}
-
-.popup-header-subtitle {
-  margin-top: 3px;
 }
 
 .popup-restricted-message {

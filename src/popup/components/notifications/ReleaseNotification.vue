@@ -92,7 +92,7 @@ export default Vue.extend({
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 12px 16px;
+  padding: 12px 8px 12px 16px;
   background: var(--info);
   border-top: 1px solid var(--info-border);
   cursor: pointer;
@@ -127,5 +127,9 @@ export default Vue.extend({
 
 .release-dismiss {
   flex: none;
+}
+
+.release-banner .release-dismiss:hover {
+  background: var(--info-border);
 }
 </style>

@@ -1,8 +1,7 @@
 import { shallowMount } from '@vue/test-utils';
 
 import App from './App.vue';
-import MoreButton from './components/MoreButton.vue';
-import PopupMoreMenu from './components/PopupMoreMenu.vue';
+import SettingsButton from './components/SettingsButton.vue';
 import { getCurrentTab, getStyles, getCommands } from './utils';
 
 jest.mock('./utils', () => ({
@@ -69,40 +68,18 @@ describe('App.vue', () => {
     expect(getStyles).toHaveBeenCalled();
   });
 
-  it('should start on the main view', () => {
+  it('should show the settings button on the main view', () => {
     currentTab('https://news.ycombinator.com');
     const wrapper = shallowMount(App);
 
-    expect(wrapper.findComponent(PopupMoreMenu).exists()).toBe(false);
+    expect(wrapper.findComponent(SettingsButton).exists()).toBe(true);
   });
 
-  it('should switch to the More menu when the more button is clicked', async () => {
-    currentTab('https://news.ycombinator.com');
-    const wrapper = shallowMount(App);
-
-    await wrapper.findComponent(MoreButton).vm.$emit('click');
-
-    expect(wrapper.findComponent(PopupMoreMenu).exists()).toBe(true);
-  });
-
-  it('should return to the main view on "back"', async () => {
-    currentTab('https://news.ycombinator.com');
-    const wrapper = shallowMount(App);
-
-    await wrapper.findComponent(MoreButton).vm.$emit('click');
-    await wrapper.findComponent(PopupMoreMenu).vm.$emit('back');
-
-    expect(wrapper.findComponent(PopupMoreMenu).exists()).toBe(false);
-    expect(wrapper.findComponent(MoreButton).exists()).toBe(true);
-  });
-
-  it('should show the More menu from the restricted view too', async () => {
+  it('should not show the settings button on the restricted view', () => {
     currentTab('chrome://extensions');
     const wrapper = shallowMount(App);
 
-    await wrapper.findComponent(MoreButton).vm.$emit('click');
-
-    expect(wrapper.findComponent(PopupMoreMenu).exists()).toBe(true);
+    expect(wrapper.findComponent(SettingsButton).exists()).toBe(false);
   });
 
   it('should fetch keyboard shortcuts on load', () => {
