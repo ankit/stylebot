@@ -103,7 +103,7 @@ input {
 }
 
 input:checked:not(:disabled) ~ .track {
-  background: var(--popup-accent);
+  background: var(--primary);
 }
 
 input:checked:not(:disabled) ~ .track .thumb {
@@ -167,7 +167,7 @@ input:checked:not(:disabled) ~ .track .thumb {
 }
 
 input:focus-visible ~ .track {
-  outline: 2px solid var(--popup-focus-ring);
+  outline: 2px solid var(--ring);
   outline-offset: 2px;
 }
 

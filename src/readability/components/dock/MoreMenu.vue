@@ -91,10 +91,10 @@ export default Vue.extend({
   font-size: 13px;
   white-space: nowrap;
   cursor: pointer;
-  color: var(--main-foreground);
+  color: var(--foreground);
 
   &:hover {
-    background: color-mix(in srgb, var(--main-foreground) 6%, transparent);
+    background: color-mix(in srgb, var(--foreground) 6%, transparent);
   }
 
   &:focus-visible {

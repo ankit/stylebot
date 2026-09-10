@@ -65,7 +65,7 @@ export default Vue.extend({
   text-align: left;
 
   &:focus-visible {
-    outline: 2px solid var(--popup-focus-ring);
+    outline: 2px solid var(--ring);
     outline-offset: -2px;
   }
 }

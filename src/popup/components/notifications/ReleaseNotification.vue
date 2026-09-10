@@ -9,11 +9,11 @@
   >
     <span class="release-dot" />
 
-    <span class="release-text">
+    <text-block class="release-text">
       {{ t('new_in_version', [version]) }}
       <span class="release-sep">—</span>
       <span class="release-link">{{ t('see_what_changed') }}</span>
-    </span>
+    </text-block>
 
     <icon-button class="release-dismiss" :title="t('hide')" @click="dismiss">
       <x-icon :scale="1.2" />
@@ -33,6 +33,7 @@ import {
 import { onEnterOrSpace } from '../../utils';
 import { XIcon } from '@stylebot/icons';
 import IconButton from '../IconButton.vue';
+import { TextBlock } from '@stylebot/components';
 
 export default Vue.extend({
   name: 'ReleaseNotification',
@@ -40,6 +41,7 @@ export default Vue.extend({
   components: {
     XIcon,
     IconButton,
+    TextBlock,
   },
 
   data(): {
@@ -91,12 +93,12 @@ export default Vue.extend({
   align-items: center;
   gap: 10px;
   padding: 12px 16px;
-  background: var(--popup-notification-bg);
-  border-top: 1px solid var(--popup-notification-border);
+  background: var(--info);
+  border-top: 1px solid var(--info-border);
   cursor: pointer;
 
   &:focus-visible {
-    outline: 2px solid var(--popup-focus-ring);
+    outline: 2px solid var(--ring);
     outline-offset: -2px;
   }
 }
@@ -106,22 +108,21 @@ export default Vue.extend({
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--popup-accent);
+  background: var(--primary);
 }
 
 .release-text {
   flex: 1;
   min-width: 0;
-  font-size: 13px;
 }
 
 .release-sep {
-  color: var(--popup-fg-muted);
+  color: var(--muted-foreground);
   margin: 0 2px;
 }
 
 .release-link {
-  color: var(--popup-accent);
+  color: var(--primary);
 }
 
 .release-dismiss {
