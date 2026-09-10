@@ -10,8 +10,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { toggleStylebot } from '../utils';
-import PopupButton from './PopupButton.vue';
-import { ShortcutChip } from '@stylebot/components';
+import { PopupButton, ShortcutChip } from '@stylebot/components';
 
 export default Vue.extend({
   name: 'ToggleStylebot',

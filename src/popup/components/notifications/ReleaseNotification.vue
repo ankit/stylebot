@@ -32,8 +32,7 @@ import {
 
 import { onEnterOrSpace } from '../../utils';
 import { XIcon } from '@stylebot/icons';
-import IconButton from '../IconButton.vue';
-import { TextBlock } from '@stylebot/components';
+import { IconButton, TextBlock } from '@stylebot/components';
 
 export default Vue.extend({
   name: 'ReleaseNotification',

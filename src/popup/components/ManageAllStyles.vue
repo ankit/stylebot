@@ -7,7 +7,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { openOptions } from '../utils';
-import PopupButton from './PopupButton.vue';
+import { PopupButton } from '@stylebot/components';
 
 export default Vue.extend({
   name: 'ManageAllStyles',
