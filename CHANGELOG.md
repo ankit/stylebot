@@ -1,3 +1,7 @@
+## Version 3.2.1 (September 2026)
+
+- Fix Readability toggle silently setting Magic as the global default mode (#877)
+
 ## Version 3.2.0 (September 2026)
 
 - Fix flash of unstyled content on page load and in the CSS editor (#833, #834, #841, #842)
