@@ -12,6 +12,12 @@ Browser extension (Chrome/Edge/Firefox) that lets users change the appearance of
 - `docs/` — stylebot.dev static site
 - `patches/` — patch-package patches applied to dependencies on install
 
+## Workflow
+
+Always make changes in a new worktree, never directly on `main` or the checkout the
+session started in. Use the `EnterWorktree` tool before starting any edits, unless the
+session is already inside a worktree.
+
 ## Commands
 
 - `yarn watch` — build for Chrome/Edge in watch mode
