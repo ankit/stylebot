@@ -13,7 +13,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { onEnterOrSpace } from '../utils';
+import { onEnterOrSpace, forwardClickToInput } from '../utils';
 
 export default Vue.extend({
   name: 'PopupRow',
@@ -34,13 +34,7 @@ export default Vue.extend({
       }
 
       if (this.hover) {
-        const target = event.target as HTMLElement;
-
-        if (!target.closest('label, input')) {
-          const input = this.$el.querySelector('input') as HTMLInputElement | null;
-          input?.click();
-        }
-
+        forwardClickToInput(event, this.$el);
         return;
       }
 

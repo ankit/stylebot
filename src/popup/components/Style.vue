@@ -1,5 +1,10 @@
 <template>
-  <div v-if="header" class="popup-header">
+  <div
+    v-if="header"
+    class="popup-header"
+    :class="{ disabled: disableToggle }"
+    @click="onHeaderClick"
+  >
     <toggle-switch
       v-model="enabled"
       size="lg"
@@ -30,6 +35,7 @@ import { EnableStyle, DisableStyle } from '@stylebot/types';
 import PopupRow from './PopupRow.vue';
 import ToggleSwitch from './ToggleSwitch.vue';
 import { ShortcutChip } from '@stylebot/components';
+import { forwardClickToInput } from '../utils';
 
 export default Vue.extend({
   name: 'Style',
@@ -69,6 +75,14 @@ export default Vue.extend({
   },
 
   methods: {
+    onHeaderClick(event: MouseEvent): void {
+      if (this.disableToggle) {
+        return;
+      }
+
+      forwardClickToInput(event, this.$el);
+    },
+
     onChange(): void {
       if (this.enabled) {
         this.enable();
@@ -97,3 +111,13 @@ export default Vue.extend({
   },
 });
 </script>
+
+<style lang="scss" scoped>
+.popup-header {
+  cursor: pointer;
+
+  &.disabled {
+    cursor: default;
+  }
+}
+</style>
