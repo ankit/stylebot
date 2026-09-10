@@ -32,6 +32,7 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .text {
+  margin: 0;
   font-weight: 400;
   color: var(--foreground);
 }
