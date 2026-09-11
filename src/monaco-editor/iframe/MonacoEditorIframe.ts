@@ -111,6 +111,9 @@ class MonacEditorIframe {
       cursorBlinking: 'smooth',
       mouseWheelZoom: false,
       lineNumbers: isOptions ? 'on' : 'off',
+      // Lets the scrollbar reach the container's true edges instead of an
+      // outer CSS padding clipping it; no horizontal equivalent in Monaco.
+      padding: isOptions ? { top: 14, bottom: 18 } : undefined,
       minimap: {
         enabled: false,
       },
@@ -118,6 +121,9 @@ class MonacEditorIframe {
         enabled: true,
       },
       codeLens: false,
+      // Tab-inserts-indentation traps keyboard focus, and the toggle
+      // (Ctrl+M) is swallowed by macOS as "minimize window" in-browser.
+      tabFocusMode: true,
     };
   }
 
@@ -125,9 +131,12 @@ class MonacEditorIframe {
     window.parent.postMessage(message, '*');
   }
 
-  handleStylebotCssUpdate(css: string, selector?: string): void {
+  handleStylebotCssUpdate(css: string, selector?: string, focus = true): void {
     this.editor.setValue(css);
-    this.editor.focus();
+
+    if (focus) {
+      this.editor.focus();
+    }
 
     if (selector) {
       const regex = `^${selector}\\s\\{\\n\\s*(?!\\}).*$`;
@@ -161,7 +170,11 @@ class MonacEditorIframe {
       'message',
       (message: { data: ParentUpdateCssMessage }) => {
         if (message.data.type === 'stylebotCssUpdate') {
-          this.handleStylebotCssUpdate(message.data.css, message.data.selector);
+          this.handleStylebotCssUpdate(
+            message.data.css,
+            message.data.selector,
+            message.data.focus ?? true
+          );
         }
       }
     );

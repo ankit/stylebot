@@ -88,7 +88,6 @@ import ReleaseNotification from './components/notifications/ReleaseNotification.
 import {
   getStyles,
   getCommands,
-  getOptions,
   getCurrentTab,
   getIsStylebotOpen,
   getIsPageReaderable,
@@ -146,9 +145,8 @@ export default Vue.extend({
       }
     },
 
-    // Pages Stylebot's content script can't run on (chrome://, the Chrome
-    // Web Store, PDFs, JSON/XML documents) — same check the background page
-    // uses to decide whether it can inject styles at all.
+    // Pages the content script can't run on (chrome://, Web Store, PDFs) —
+    // same check the background page uses to decide whether it can inject.
     restricted(): boolean {
       return !!this.tab?.url && !BackgroundPageUtils.isValidUrl(this.tab.url);
     },
@@ -195,12 +193,6 @@ export default Vue.extend({
     getCommands(commands => {
       this.commands = commands;
     });
-
-    getOptions(options => {
-      if (options.theme && options.theme !== 'auto') {
-        document.documentElement.dataset.theme = options.theme;
-      }
-    });
   },
 });
 </script>
@@ -212,7 +204,6 @@ export default Vue.extend({
   box-sizing: border-box;
 }
 
-// Buttons don't inherit font-family or color from the page by default.
 button {
   font-family: inherit;
   color: inherit;
@@ -245,14 +236,10 @@ body {
   white-space: nowrap;
 }
 
-// Compound selector so this beats Heading's own scoped color rule
-// regardless of stylesheet order (same specificity would otherwise tie).
 .popup-header-domain.popup-header-domain--muted {
   color: var(--ui-fg-muted);
 }
 
-// Small muted caption/meta text — trailing hints, subtitles, timestamps.
-// Also used (as a plain span) by Readability.vue and SyncStylebot.vue.
 .popup-caption {
   font-size: 11.5px;
   color: var(--ui-fg-muted);

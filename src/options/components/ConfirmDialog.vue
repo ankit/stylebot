@@ -1,11 +1,18 @@
 <template>
   <div class="backdrop" @click.self="$emit('cancel')">
-    <div class="card">
-      <heading as="h2" size="md">{{ title }}</heading>
-      <text-block size="caption" class="message">{{ message }}</text-block>
+    <div
+      ref="card"
+      class="card"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="confirm-dialog-title"
+      aria-describedby="confirm-dialog-message"
+    >
+      <heading id="confirm-dialog-title" as="h2" size="md">{{ title }}</heading>
+      <text-block id="confirm-dialog-message" size="caption" class="message">{{ message }}</text-block>
 
       <div class="actions">
-        <app-button variant="ghost" @click="$emit('cancel')">
+        <app-button ref="cancelButton" variant="ghost" @click="$emit('cancel')">
           {{ cancelLabel }}
         </app-button>
 
@@ -54,18 +61,60 @@ export default Vue.extend({
     },
   },
 
+  data(): { previouslyFocused: HTMLElement | null } {
+    return {
+      // So focus returns to whatever opened the dialog (e.g. a menu item)
+      // once it closes, instead of falling back to <body>.
+      previouslyFocused: null,
+    };
+  },
+
   mounted() {
     document.addEventListener('keydown', this.onKeydown);
+
+    this.previouslyFocused = document.activeElement as HTMLElement | null;
+
+    const cancelButton = this.$refs.cancelButton as Vue | undefined;
+    (cancelButton?.$el as HTMLElement | undefined)?.focus();
   },
 
   beforeDestroy() {
     document.removeEventListener('keydown', this.onKeydown);
+    this.previouslyFocused?.focus();
   },
 
   methods: {
+    focusableElements(): Array<HTMLElement> {
+      const card = this.$refs.card as HTMLElement;
+      return Array.from(card.querySelectorAll<HTMLElement>('button, a[href], [tabindex]'));
+    },
+
     onKeydown(event: KeyboardEvent): void {
       if (event.key === 'Escape') {
         this.$emit('cancel');
+        return;
+      }
+
+      // Traps Tab within the dialog — without this, Tab walks out into the
+      // (still-present) page behind the backdrop.
+      if (event.key !== 'Tab') {
+        return;
+      }
+
+      const focusable = this.focusableElements();
+      if (!focusable.length) {
+        return;
+      }
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
       }
     },
   },

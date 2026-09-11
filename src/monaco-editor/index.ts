@@ -15,4 +15,6 @@ export type ParentUpdateCssMessage = {
   type: 'stylebotCssUpdate';
   css: string;
   selector?: string;
+  // Defaults to true (existing behavior) when omitted.
+  focus?: boolean;
 };

@@ -1,10 +1,3 @@
-// Shared light/dark CSS custom properties for the popup and options pages.
-// Keep in sync in one place instead of duplicating across bundles.
-//
-// Three states, driven by the "theme" option (StylebotOptions.theme):
-// - auto (default): follows the OS via prefers-color-scheme.
-// - light / dark: forced via a `data-theme` attribute stamped on <html> by
-//   options/App.vue and popup/App.vue, overriding the OS preference.
 @mixin light-vars {
   --ui-bg: #fff;
   --ui-fg: #191b1f;
@@ -13,8 +6,6 @@
   --ui-hover-bg: #f2f3f6;
   --ui-active-bg: #eceef2;
   --ui-row-hover-bg: #fafbfc;
-  // The style editor's code area — subtly distinct from --ui-bg, and mirrored
-  // by MonacoEditorIframe.ts's 'custom-light' theme / options-index.html.
   --ui-editor-bg: #fcfcfd;
 
   --ui-accent: #2a5fd6;
@@ -34,7 +25,6 @@
   --ui-hover-bg: #26282e;
   --ui-active-bg: #2b2d34;
   --ui-row-hover-bg: #202126;
-  // Mirrored by MonacoEditorIframe.ts's 'custom-dark' theme / options-index.html.
   --ui-editor-bg: #1a1b1e;
 
   --ui-accent: #4d80f0;
@@ -53,9 +43,6 @@
 
   --ui-focus-ring: var(--ui-accent);
 
-  // Shared src/components/ primitives (built for the readability dock's own
-  // theme vars) read these generic names directly — alias them here so the
-  // same components work unmodified in the popup/options bundles.
   --main-foreground: var(--ui-fg);
   --muted-foreground: var(--ui-fg-muted);
   --main-background: var(--ui-bg);
@@ -63,9 +50,6 @@
   --link-color: var(--ui-accent);
 }
 
-// Default inline sizing for the shared src/components/icons/* SVG icon
-// components — keeps them a consistent 18px regardless of surrounding
-// font-size, with a baseline nudge so they sit centered next to text.
 .ui-icon {
   width: 18px;
   height: 18px;
@@ -77,16 +61,4 @@
   :root {
     @include dark-vars;
   }
-}
-
-// Explicit overrides win regardless of OS preference — higher specificity
-// than the plain `:root` above, so source order doesn't matter here.
-:root[data-theme='light'] {
-  color-scheme: light;
-  @include light-vars;
-}
-
-:root[data-theme='dark'] {
-  color-scheme: dark;
-  @include dark-vars;
 }

@@ -1,5 +1,5 @@
 <template>
-  <icon-button bordered :size="size" :title="title" @click="$emit('click', $event)">
+  <icon-button :bordered="bordered" :size="size" :title="title" @click="$emit('click', $event)">
     <more-icon />
   </icon-button>
 </template>
@@ -28,6 +28,13 @@ export default Vue.extend({
     title: {
       type: String,
       default: '',
+    },
+
+    // Per-row triggers sit next to Edit and don't need a border; the
+    // standalone bulk-actions trigger has no neighbor, so it keeps one.
+    bordered: {
+      type: Boolean,
+      default: true,
     },
   },
 });

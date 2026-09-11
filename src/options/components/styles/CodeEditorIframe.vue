@@ -12,12 +12,11 @@ export default Vue.extend({
   name: 'CodeEditorIframe',
 
   data(): { src: string; ready: boolean } {
-    // The iframe is a separate document, so the effective theme has to be
-    // passed in explicitly — read once, since it can't change while open.
-    const explicitTheme = document.documentElement.dataset.theme;
-    const theme =
-      explicitTheme ||
-      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    // The iframe is a separate document, so the theme has to be passed in
+    // explicitly — read once, since it can't change while open.
+    const theme = window.matchMedia('(prefers-color-scheme: dark)').matches
+      ? 'dark'
+      : 'light';
 
     return {
       // Separate entry from the in-page editor's iframe (index.html) — see MonacoEditorIframe.ts.

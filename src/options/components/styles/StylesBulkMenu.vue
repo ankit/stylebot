@@ -9,6 +9,7 @@
         <button
           type="button"
           class="row"
+          role="menuitem"
           @click="
             $emit('enable-all');
             close();
@@ -20,6 +21,7 @@
         <button
           type="button"
           class="row"
+          role="menuitem"
           @click="
             $emit('disable-all');
             close();
@@ -33,6 +35,7 @@
         <button
           type="button"
           class="row danger"
+          role="menuitem"
           @click="
             $emit('delete-all');
             close();

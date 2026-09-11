@@ -4,7 +4,7 @@
       <div class="title-block">
         <heading as="h1">{{ t('styles_options') }}</heading>
         <div class="subtitle">
-          {{ t('sites_count', [String(totalCount)]) }} ·
+          {{ t(totalCount === 1 ? 'sites_count_one' : 'sites_count_other', [String(totalCount)]) }} ·
           {{ t('enabled_count', [String(enabledCount)]) }}
         </div>
       </div>
@@ -150,6 +150,7 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .styles-tab {
+  max-width: 760px;
   height: 100%;
   display: flex;
   flex-direction: column;

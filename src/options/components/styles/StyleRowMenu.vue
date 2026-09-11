@@ -1,7 +1,7 @@
 <template>
   <anchored-menu>
     <template #trigger="{ toggle }">
-      <icon-menu-trigger :size="size" title="More actions" @click="toggle" />
+      <icon-menu-trigger :size="size" :bordered="false" title="More actions" @click="toggle" />
     </template>
 
     <template #default="{ close }">
@@ -9,6 +9,7 @@
         <button
           type="button"
           class="row"
+          role="menuitem"
           @click="
             $emit('open-site');
             close();
@@ -20,6 +21,7 @@
         <button
           type="button"
           class="row"
+          role="menuitem"
           @click="
             $emit('copy-css');
             close();
@@ -33,6 +35,7 @@
         <button
           type="button"
           class="row danger"
+          role="menuitem"
           @click="
             $emit('delete');
             close();

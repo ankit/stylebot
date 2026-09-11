@@ -3,7 +3,6 @@
     <heading as="h1">{{ t('basics_options') }}</heading>
 
     <the-context-menu />
-    <the-appearance />
 
     <div class="section">
       <the-fonts />
@@ -21,7 +20,6 @@ import Vue from 'vue';
 import { Heading } from '@stylebot/components';
 import TheFonts from './basics/TheFonts.vue';
 import TheContextMenu from './basics/TheContextMenu.vue';
-import TheAppearance from './basics/TheAppearance.vue';
 import TheKeyboardShortcuts from './basics/TheKeyboardShortcuts.vue';
 
 export default Vue.extend({
@@ -31,7 +29,6 @@ export default Vue.extend({
     Heading,
     TheFonts,
     TheContextMenu,
-    TheAppearance,
     TheKeyboardShortcuts,
   },
 
@@ -45,10 +42,11 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .basics-tab {
+  max-width: 760px;
   padding: 20px 22px 26px;
 }
 
 .section {
-  margin-top: 30px;
+  margin-top: 40px;
 }
 </style>

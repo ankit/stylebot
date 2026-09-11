@@ -2,12 +2,10 @@ import {
   ToggleStylebot,
   GetCommands,
   GetCommandsResponse,
-  GetAllOptions,
   GetStylesForPage,
   GetIsStylebotOpen,
   GetIsPageReaderable,
   GetStylesForPageResponse,
-  StylebotOptions,
 } from '@stylebot/types';
 
 import {
@@ -97,16 +95,6 @@ export const getCommands = (
   chrome.runtime.sendMessage(message, callback);
 };
 
-export const getOptions = (
-  callback: (options: StylebotOptions) => void
-): void => {
-  const message: GetAllOptions = {
-    name: 'GetAllOptions',
-  };
-
-  chrome.runtime.sendMessage(message, callback);
-};
-
 export const openOptions = (): void => {
   openOptionsPage();
   window.close();
@@ -134,9 +122,8 @@ export const onEnterOrSpace = (
   }
 };
 
-// A ToggleSwitch's own hit target is just its <label>, which shrink-wraps its
-// content — clicks in a wrapping container's padding (e.g. above/below it)
-// otherwise land nowhere. Extends the hit target to that whole container.
+// A ToggleSwitch's <label> shrink-wraps its content, so clicks in a
+// wrapping container's padding land nowhere — this extends the hit target.
 export const forwardClickToInput = (
   event: MouseEvent,
   container: Element

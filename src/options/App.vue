@@ -9,6 +9,7 @@
     <div class="content">
       <the-style-editor-page
         v-if="currentTab === 'styles' && editingUrl !== null"
+        ref="editorPage"
         :initial-url="editingUrl"
         @back="editingUrl = null"
         @save="onSaveStyle"
@@ -16,6 +17,15 @@
 
       <component :is="currentTabComponent" v-else @edit="editingUrl = $event" />
     </div>
+
+    <confirm-dialog
+      v-if="pendingTab !== null"
+      :title="t('discard_changes')"
+      :message="t('unsaved_changes_warning')"
+      :confirm-label="t('discard_changes')"
+      @cancel="pendingTab = null"
+      @confirm="confirmSwitchTab"
+    />
   </div>
 </template>
 
@@ -26,6 +36,7 @@ import TheBasicsTab from './components/TheBasicsTab.vue';
 import TheStylesTab from './components/TheStylesTab.vue';
 import TheSyncTab from './components/TheSyncTab.vue';
 import TheNavigation from './components/TheNavigation.vue';
+import ConfirmDialog from './components/ConfirmDialog.vue';
 import TheStyleEditorPage from './components/styles/TheStyleEditorPage.vue';
 
 export default Vue.extend({
@@ -36,6 +47,7 @@ export default Vue.extend({
     TheStylesTab,
     TheSyncTab,
     TheNavigation,
+    ConfirmDialog,
     TheStyleEditorPage,
   },
 
@@ -44,34 +56,19 @@ export default Vue.extend({
     tabs: Array<string>;
     // null = styles list, '' = new style, else the url being edited.
     editingUrl: string | null;
+    pendingTab: string | null;
   } {
     return {
       currentTab: 'basics',
       tabs: ['basics', 'styles', 'sync'],
       editingUrl: null,
+      pendingTab: null,
     };
   },
 
   computed: {
     currentTabComponent(): string {
       return `the-${this.currentTab}-tab`;
-    },
-
-    theme(): string {
-      return this.$store.state.options?.theme ?? 'auto';
-    },
-  },
-
-  watch: {
-    theme: {
-      immediate: true,
-      handler(value: string): void {
-        if (value === 'auto') {
-          delete document.documentElement.dataset.theme;
-        } else {
-          document.documentElement.dataset.theme = value;
-        }
-      },
     },
   },
 
@@ -84,8 +81,21 @@ export default Vue.extend({
 
   methods: {
     selectTab(tab: string): void {
+      const editorPage = this.$refs.editorPage as { isDirty: boolean } | undefined;
+
+      if (this.editingUrl !== null && editorPage?.isDirty) {
+        this.pendingTab = tab;
+        return;
+      }
+
       this.currentTab = tab;
       this.editingUrl = null;
+    },
+
+    confirmSwitchTab(): void {
+      this.currentTab = this.pendingTab as string;
+      this.editingUrl = null;
+      this.pendingTab = null;
     },
 
     onSaveStyle({

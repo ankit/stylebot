@@ -82,6 +82,7 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .sync-tab {
+  max-width: 760px;
   padding: 20px 22px 26px;
 }
 
@@ -91,9 +92,7 @@ export default Vue.extend({
 }
 
 .section {
-  margin-top: 26px;
-  padding-top: 24px;
-  border-top: 1px solid var(--ui-border);
+  margin-top: 40px;
 }
 
 .buttons {

@@ -1,13 +1,13 @@
 <template>
   <div class="editor-page">
     <div class="editor-header">
-      <icon-button class="back" title="Back" @click="$emit('back')">
+      <icon-button class="back" title="Back" @click="attemptLeave">
         <chevron-left-icon />
       </icon-button>
 
       <div class="title-block">
         <div class="breadcrumb">
-          <a href="#" @click.prevent="$emit('back')">{{ t('styles_options') }}</a> ›
+          <a href="#" @click.prevent="attemptLeave">{{ t('styles_options') }}</a> ›
         </div>
 
         <input
@@ -27,16 +27,16 @@
     </div>
 
     <div class="editor-code-area">
-      <code-editor :css="css" @update="css = $event" />
+      <code-editor :css="css" :autofocus="!!existingStyle" @update="css = $event" />
     </div>
 
     <div class="editor-footer">
       <div class="stats">
-        {{ lineCount }} lines · {{ ruleCountLabel }}
+        {{ lineCountLabel }} · {{ ruleCountLabel }}
         <template v-if="savedLabel"> · {{ savedLabel }}</template>
       </div>
 
-      <app-button variant="ghost" @click="$emit('back')">
+      <app-button variant="ghost" :disabled="!isDirty" @click="$emit('back')">
         {{ t('discard_changes') }}
       </app-button>
 
@@ -52,6 +52,15 @@
       :confirm-label="t('delete')"
       @cancel="showDeleteConfirm = false"
       @confirm="confirmDelete"
+    />
+
+    <confirm-dialog
+      v-if="showLeaveConfirm"
+      :title="t('discard_changes')"
+      :message="t('unsaved_changes_warning')"
+      :confirm-label="t('discard_changes')"
+      @cancel="showLeaveConfirm = false"
+      @confirm="$emit('back')"
     />
   </div>
 </template>
@@ -95,6 +104,7 @@ export default Vue.extend({
     url: string;
     css: string;
     showDeleteConfirm: boolean;
+    showLeaveConfirm: boolean;
   } {
     const existing = this.$store.state.styles[this.initialUrl];
 
@@ -102,6 +112,7 @@ export default Vue.extend({
       url: this.initialUrl,
       css: existing ? existing.css : '',
       showDeleteConfirm: false,
+      showLeaveConfirm: false,
     };
   },
 
@@ -110,8 +121,17 @@ export default Vue.extend({
       return this.$store.state.styles[this.initialUrl];
     },
 
+    isDirty(): boolean {
+      const savedCss = this.existingStyle ? this.existingStyle.css : '';
+      return this.url !== this.initialUrl || this.css !== savedCss;
+    },
+
     lineCount(): number {
       return this.css.length ? this.css.split('\n').length : 0;
+    },
+
+    lineCountLabel(): string {
+      return `${this.lineCount} line${this.lineCount === 1 ? '' : 's'}`;
     },
 
     ruleCount(): number | null {
@@ -123,7 +143,7 @@ export default Vue.extend({
     },
 
     ruleCountLabel(): string {
-      return this.ruleCount === null ? '—' : `${this.ruleCount} rules`;
+      return this.ruleCount === null ? '—' : `${this.ruleCount} rule${this.ruleCount === 1 ? '' : 's'}`;
     },
 
     savedLabel(): string {
@@ -142,6 +162,14 @@ export default Vue.extend({
   },
 
   methods: {
+    attemptLeave(): void {
+      if (this.isDirty) {
+        this.showLeaveConfirm = true;
+      } else {
+        this.$emit('back');
+      }
+    },
+
     onToggleEnabled(enabled: boolean): void {
       this.$store.dispatch(enabled ? 'enableStyle' : 'disableStyle', this.initialUrl);
     },
@@ -230,7 +258,6 @@ export default Vue.extend({
 .editor-code-area {
   flex: 1;
   min-height: 0;
-  padding: 14px 18px 18px;
   background: var(--ui-editor-bg);
 }
 
@@ -245,7 +272,6 @@ export default Vue.extend({
 .stats {
   flex: 1;
   min-width: 0;
-  font-family: 'IBM Plex Mono', monospace;
   font-size: 12px;
   color: var(--ui-fg-muted);
 }

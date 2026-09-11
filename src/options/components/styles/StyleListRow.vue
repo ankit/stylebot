@@ -6,7 +6,7 @@
 
     <div class="timestamp">{{ formattedTimestamp }}</div>
 
-    <app-button variant="default" @click="$emit('edit', url)">{{ t('edit') }}</app-button>
+    <app-button variant="ghost" @click="$emit('edit', url)">{{ t('edit') }}</app-button>
 
     <style-row-menu :url="url" @open-site="openSite" @copy-css="copyCss" @delete="showDeleteConfirm = true" />
 
@@ -102,10 +102,6 @@ export default Vue.extend({
   gap: 14px;
   padding: 13px 18px;
   border-bottom: 1px solid var(--ui-border);
-
-  &:hover {
-    background: var(--ui-hover-bg);
-  }
 }
 
 .domain {
@@ -126,7 +122,6 @@ export default Vue.extend({
 
 .timestamp {
   flex: none;
-  font-family: 'IBM Plex Mono', monospace;
   font-size: 12px;
   color: var(--ui-fg-muted);
 }

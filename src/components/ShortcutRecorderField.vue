@@ -234,7 +234,8 @@ export default Vue.extend({
   font-size: 12px;
   line-height: 1;
   color: var(--main-foreground);
-  background: color-mix(in srgb, var(--main-foreground) 6%, transparent);
+  background: color-mix(in srgb, var(--main-foreground) 8%, transparent);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 10px;
   cursor: pointer;
@@ -246,7 +247,7 @@ export default Vue.extend({
   }
 
   &:hover {
-    background: color-mix(in srgb, var(--main-foreground) 10%, transparent);
+    background: color-mix(in srgb, var(--main-foreground) 12%, transparent);
   }
 
   &:focus-visible {

@@ -78,7 +78,7 @@ export default Vue.extend({
   font-weight: 400;
   font-size: 13.5px;
   line-height: 1.3;
-  color: var(--ui-fg-muted);
+  color: color-mix(in srgb, var(--ui-fg-muted) 65%, var(--ui-fg));
   cursor: pointer;
 
   &:hover {
