@@ -15,6 +15,7 @@
 import Vue from 'vue';
 
 import { Highlighter } from '@stylebot/highlighter';
+import { getRuleForSelector, getExistingSelector } from '@stylebot/css';
 import { StylebotEditingMode } from '@stylebot/types';
 
 import InspectorIcon from './InspectorIcon.vue';
@@ -69,7 +70,11 @@ export default Vue.extend({
   },
 
   created() {
-    this.highlighter = new Highlighter({ onSelect: this.select });
+    this.highlighter = new Highlighter({
+      onSelect: this.select,
+      getStylebotDeclarations: this.getStylebotDeclarations,
+      getExistingSelector: this.findExistingSelector,
+    });
 
     if (this.active) {
       this.highlighter?.startInspecting();
@@ -94,6 +99,27 @@ export default Vue.extend({
     select(selector: string): void {
       this.toggle();
       this.$emit('select', selector);
+    },
+
+    getStylebotDeclarations(
+      selector: string
+    ): Array<{ property: string; value: string }> | null {
+      const rule = getRuleForSelector(this.$store.state.css, selector);
+
+      if (!rule) {
+        return null;
+      }
+
+      const declarations: Array<{ property: string; value: string }> = [];
+      rule.walkDecls(decl => {
+        declarations.push({ property: decl.prop, value: decl.value });
+      });
+
+      return declarations.length > 0 ? declarations : null;
+    },
+
+    findExistingSelector(el: HTMLElement): string | null {
+      return getExistingSelector(el, this.$store.state.css);
     },
   },
 });
