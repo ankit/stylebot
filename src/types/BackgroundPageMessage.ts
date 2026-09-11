@@ -3,6 +3,8 @@ import {
   StylebotCommands,
   ReadabilitySettings,
   StyleMap,
+  ClaudeConversationTurn,
+  ClaudeModel,
 } from '@stylebot/types';
 
 export type SetStyle = {
@@ -117,6 +119,9 @@ export type GenerateCss = {
   prompt: string;
   css: string;
   url: string;
+  dom: string;
+  history: Array<ClaudeConversationTurn>;
+  model: ClaudeModel;
 };
 
 type BackgroundPageMessage =

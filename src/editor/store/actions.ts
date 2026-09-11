@@ -27,6 +27,7 @@ import {
   StylebotBasicModeSections,
   StylebotLayout,
   StylebotColorPalette,
+  ClaudeModel,
 } from '@stylebot/types';
 
 import { defaultOptions } from '@stylebot/settings';
@@ -44,6 +45,7 @@ import {
   generateCss,
 } from '../utils/chrome';
 
+import { getDomSnapshot } from '../utils/dom-snapshot';
 import { initListeners } from '../listeners';
 import { initEditor } from '../utils/init-editor';
 import { readCache, writeCache } from '../../inject-css/cache';
@@ -70,6 +72,9 @@ export default {
     }
     if (!options.fonts) {
       options.fonts = defaultOptions.fonts;
+    }
+    if (!options.claudeModel) {
+      options.claudeModel = defaultOptions.claudeModel;
     }
 
     commit('setOptions', options);
@@ -159,6 +164,14 @@ export default {
   ): void {
     setOption('basicModeSections', basicModeSections);
     commit('setOptions', { ...state.options, basicModeSections });
+  },
+
+  setClaudeModel(
+    { state, commit }: { state: State; commit: Commit },
+    claudeModel: ClaudeModel
+  ): void {
+    setOption('claudeModel', claudeModel);
+    commit('setOptions', { ...state.options, claudeModel });
   },
 
   applyCss(
@@ -252,7 +265,7 @@ export default {
     // is detached from the document, not just hidden. Switch the panel to
     // Magic locally without persisting over the user's global mode
     // preference (mirrors openStylebot's readabilityActive handling above).
-    if (value && ['basic', 'code'].includes(state.options.mode)) {
+    if (value && ['basic', 'code', 'chat'].includes(state.options.mode)) {
       commit('setOptions', { ...state.options, mode: 'magic' });
     }
 
@@ -300,7 +313,7 @@ export default {
     });
   },
 
-  async generateCssWithAi(
+  async sendChatMessage(
     {
       state,
       commit,
@@ -308,18 +321,52 @@ export default {
     }: { state: State; commit: Commit; dispatch: Dispatch },
     prompt: string
   ): Promise<void> {
+    commit('pushChatMessage', { role: 'user', text: prompt });
     commit('setAiGenerating', true);
-    commit('setAiError', null);
 
-    const response = await generateCss(prompt, state.css, state.url);
+    // Claude retains earlier turns' DOM outlines via the conversation
+    // history — only resend it when the page structure has actually
+    // changed since the last turn, to avoid paying for it every message.
+    const dom = getDomSnapshot();
+    const domChanged = dom !== state.lastSentDom;
+
+    const response = await generateCss(
+      prompt,
+      state.css,
+      state.url,
+      domChanged ? dom : '',
+      state.apiHistory,
+      state.options.claudeModel
+    );
 
     commit('setAiGenerating', false);
 
     if (response.error) {
-      commit('setAiError', response.error);
+      commit('pushChatMessage', {
+        role: 'assistant',
+        status: 'error',
+        error: response.error,
+      });
       return;
     }
 
+    if (domChanged) {
+      commit('setLastSentDom', dom);
+    }
+
+    commit('addSessionCost', response.cost);
+    commit('appendApiHistory', { role: 'user', content: response.userContent });
+    commit('appendApiHistory', {
+      role: 'assistant',
+      content: response.assistantContent,
+    });
+
+    commit('pushChatMessage', {
+      role: 'assistant',
+      status: 'success',
+      message: response.message,
+      css: response.css,
+    });
     dispatch('applyCss', { css: response.css });
   },
 };

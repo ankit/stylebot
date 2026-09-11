@@ -217,13 +217,17 @@ export const GenerateCss = async (
   sendResponse: (response: GenerateCssResponse) => void
 ): Promise<void> => {
   try {
-    const css = await generateCss({
+    const result = await generateCss({
       prompt: message.prompt,
       css: message.css,
       url: message.url,
+      dom: message.dom,
+      history: message.history,
+      model: message.model,
     });
-    sendResponse({ css });
+    sendResponse(result);
   } catch (e) {
+    console.error('[Stylebot] generateCss failed:', e);
     sendResponse({ error: getErrorCode(e) });
   }
 };

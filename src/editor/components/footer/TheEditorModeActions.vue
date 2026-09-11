@@ -31,6 +31,17 @@
       <b-icon icon="star" aria-hidden="true" />
       <span class="pl-1">{{ t('magic_mode') }}</span>
     </b-button>
+
+    <b-button
+      size="sm"
+      :title="t('chat_mode_description')"
+      :variant="mode === 'chat' ? 'secondary' : 'outline-secondary'"
+      :disabled="readability"
+      @click="setMode('chat')"
+    >
+      <b-icon icon="chat-dots" aria-hidden="true" />
+      <span class="pl-1">{{ t('chat_mode') }}</span>
+    </b-button>
   </b-button-group>
 </template>
 

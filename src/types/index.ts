@@ -1,7 +1,17 @@
 // format: yyyy-MM-dd'T'HH:mm:ss.SSSxxx
 export type Timestamp = string;
 
-export type StylebotEditingMode = 'basic' | 'magic' | 'code';
+export type StylebotEditingMode = 'basic' | 'magic' | 'code' | 'chat';
+
+// One turn of the raw conversation sent to/received from Claude for the
+// CSS-generation chat — distinct from the UI's ChatMessage list, which
+// tracks display state (loading, errors) that Claude never sees.
+export type ClaudeConversationTurn = {
+  role: 'user' | 'assistant';
+  content: string;
+};
+
+export type ClaudeModel = 'claude-haiku-4-5' | 'claude-sonnet-5' | 'claude-opus-4-8';
 
 export type StylebotBasicModeSections = {
   text: boolean;
@@ -27,6 +37,7 @@ export type StylebotOptions = {
   basicModeSections: StylebotBasicModeSections;
   colorPalette: StylebotColorPalette;
   claudeApiKey: string;
+  claudeModel: ClaudeModel;
 };
 
 export type Style = {

@@ -48,7 +48,7 @@ export default Vue.extend({
     },
 
     disabled(): boolean {
-      return this.mode !== 'basic' && this.mode !== 'code';
+      return this.mode !== 'basic' && this.mode !== 'code' && this.mode !== 'chat';
     },
   },
 
@@ -62,7 +62,7 @@ export default Vue.extend({
     },
 
     mode(newValue: StylebotEditingMode): void {
-      if (newValue !== 'basic' && this.active) {
+      if (newValue !== 'basic' && newValue !== 'chat' && this.active) {
         this.$store.commit('setInspecting', false);
       }
     },

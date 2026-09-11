@@ -30,8 +30,22 @@ export type GetImportCssResponse = string;
 export type RunGoogleDriveSyncResponse = void;
 
 export type GenerateCssResponse =
-  | { css: string; error?: undefined }
-  | { css?: undefined; error: string };
+  | {
+      css: string;
+      message: string;
+      userContent: string;
+      assistantContent: string;
+      cost: number;
+      error?: undefined;
+    }
+  | {
+      css?: undefined;
+      message?: undefined;
+      userContent?: undefined;
+      assistantContent?: undefined;
+      cost?: undefined;
+      error: string;
+    };
 
 type BackgroundPageMessageResponse =
   | GetAllOptionsResponse

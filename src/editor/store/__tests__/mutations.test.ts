@@ -50,11 +50,49 @@ describe('mutations', () => {
     });
   });
 
-  describe('setAiError', () => {
-    it('sets the aiError message', () => {
+  describe('pushChatMessage', () => {
+    it('appends a message to the chat history', () => {
+      const state = { ...mockState, chatMessages: [] };
+
+      mutations.pushChatMessage(state, { role: 'user', text: 'make links red' });
+      mutations.pushChatMessage(state, {
+        role: 'assistant',
+        status: 'success',
+        message: 'Made links red.',
+        css: 'a { color: red; }',
+      });
+
+      expect(state.chatMessages).toEqual([
+        { role: 'user', text: 'make links red' },
+        {
+          role: 'assistant',
+          status: 'success',
+          message: 'Made links red.',
+          css: 'a { color: red; }',
+        },
+      ]);
+    });
+  });
+
+  describe('appendApiHistory', () => {
+    it('appends a turn to the api conversation history', () => {
+      const state = { ...mockState, apiHistory: [] };
+
+      mutations.appendApiHistory(state, { role: 'user', content: 'hello' });
+      mutations.appendApiHistory(state, { role: 'assistant', content: 'hi' });
+
+      expect(state.apiHistory).toEqual([
+        { role: 'user', content: 'hello' },
+        { role: 'assistant', content: 'hi' },
+      ]);
+    });
+  });
+
+  describe('setLastSentDom', () => {
+    it('sets the last sent dom snapshot', () => {
       const state = { ...mockState };
-      mutations.setAiError(state, 'invalid_api_key');
-      expect(state.aiError).toBe('invalid_api_key');
+      mutations.setLastSentDom(state, 'body\n  a');
+      expect(state.lastSentDom).toBe('body\n  a');
     });
   });
 });

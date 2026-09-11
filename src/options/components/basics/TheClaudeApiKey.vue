@@ -32,7 +32,7 @@ export default Vue.extend({
       set(value: string): void {
         this.$store.dispatch('setOption', {
           name: 'claudeApiKey',
-          value,
+          value: value.trim(),
         });
       },
     },

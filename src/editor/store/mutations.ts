@@ -4,9 +4,10 @@ import {
   StylebotOptions,
   StylebotCommands,
   ReadabilitySettings,
+  ClaudeConversationTurn,
 } from '@stylebot/types';
 
-import { State, CssSelectorMetadata } from './';
+import { State, CssSelectorMetadata, ChatMessage } from './';
 
 export default {
   setVisible(state: State, visible: boolean): void {
@@ -97,7 +98,23 @@ export default {
     state.aiGenerating = value;
   },
 
-  setAiError(state: State, value: string | null): void {
-    state.aiError = value;
+  pushChatMessage(state: State, message: ChatMessage): void {
+    state.chatMessages.push(message);
+  },
+
+  appendApiHistory(state: State, turn: ClaudeConversationTurn): void {
+    state.apiHistory.push(turn);
+  },
+
+  setLastSentDom(state: State, value: string): void {
+    state.lastSentDom = value;
+  },
+
+  setChatSelectedElement(state: State, value: string | null): void {
+    state.chatSelectedElement = value;
+  },
+
+  addSessionCost(state: State, amount: number): void {
+    state.sessionCost += amount;
   },
 };

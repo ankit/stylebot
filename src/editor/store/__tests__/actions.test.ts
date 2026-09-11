@@ -6,6 +6,7 @@ import * as stylebotCss from '@stylebot/css';
 import * as stylebotReadability from '@stylebot/readability';
 import * as chromeUtils from '../../utils/chrome';
 import { readCache, writeCache } from '../../../inject-css/cache';
+import { getDomSnapshot } from '../../utils/dom-snapshot';
 
 jest.mock('postcss');
 jest.mock('@stylebot/css');
@@ -169,6 +170,21 @@ describe('actions', () => {
       expect(chromeUtils.setOption).not.toBeCalledWith('mode', 'magic');
     });
 
+    it('switches out of chat mode for the same reason', () => {
+      actions.applyReadability(
+        {
+          commit: mockCommit,
+          state: { ...mockState, options: { ...mockState.options, mode: 'chat' } },
+        },
+        true
+      );
+
+      expect(mockCommit).toBeCalledWith('setOptions', {
+        ...mockState.options,
+        mode: 'magic',
+      });
+    });
+
     it('leaves the mode alone when turning readability off', () => {
       actions.applyReadability({ commit: mockCommit, state: mockState }, false);
 
@@ -239,13 +255,17 @@ describe('actions', () => {
     });
   });
 
-  describe('generateCssWithAi', () => {
-    it('applies the generated css on success', async () => {
+  describe('sendChatMessage', () => {
+    it('applies the generated css on success and records the conversation turn', async () => {
       (chromeUtils.generateCss as jest.Mock).mockResolvedValue({
         css: 'a { color: red; }',
+        message: 'Made links red.',
+        userContent: 'Page: ...\n\nRequest: make links red',
+        assistantContent: '{"message":"Made links red.","css":"a { color: red; }"}',
+        cost: 0.000123,
       });
 
-      await actions.generateCssWithAi(
+      await actions.sendChatMessage(
         { state: mockState, commit: mockCommit, dispatch: mockDispatch },
         'make links red'
       );
@@ -253,16 +273,71 @@ describe('actions', () => {
       expect(chromeUtils.generateCss).toBeCalledWith(
         'make links red',
         mockState.css,
-        mockState.url
+        mockState.url,
+        expect.any(String),
+        mockState.apiHistory,
+        mockState.options.claudeModel
       );
 
-      expect(mockCommit).toHaveBeenNthCalledWith(1, 'setAiGenerating', true);
-      expect(mockCommit).toHaveBeenNthCalledWith(2, 'setAiError', null);
+      expect(mockCommit).toHaveBeenNthCalledWith(1, 'pushChatMessage', {
+        role: 'user',
+        text: 'make links red',
+      });
+      expect(mockCommit).toHaveBeenNthCalledWith(2, 'setAiGenerating', true);
       expect(mockCommit).toHaveBeenNthCalledWith(3, 'setAiGenerating', false);
+      expect(mockCommit).toHaveBeenNthCalledWith(
+        4,
+        'setLastSentDom',
+        expect.any(String)
+      );
+      expect(mockCommit).toHaveBeenNthCalledWith(5, 'addSessionCost', 0.000123);
+      expect(mockCommit).toHaveBeenNthCalledWith(6, 'appendApiHistory', {
+        role: 'user',
+        content: 'Page: ...\n\nRequest: make links red',
+      });
+      expect(mockCommit).toHaveBeenNthCalledWith(7, 'appendApiHistory', {
+        role: 'assistant',
+        content: '{"message":"Made links red.","css":"a { color: red; }"}',
+      });
+      expect(mockCommit).toHaveBeenNthCalledWith(8, 'pushChatMessage', {
+        role: 'assistant',
+        status: 'success',
+        message: 'Made links red.',
+        css: 'a { color: red; }',
+      });
 
       expect(mockDispatch).toBeCalledWith('applyCss', {
         css: 'a { color: red; }',
       });
+    });
+
+    it('does not resend the dom outline when it has not changed', async () => {
+      (chromeUtils.generateCss as jest.Mock).mockResolvedValue({
+        css: 'a { color: red; }',
+        message: 'Made links red.',
+        userContent: 'Page: ...',
+        assistantContent: '{"message":"Made links red.","css":"a { color: red; }"}',
+        cost: 0.000123,
+      });
+
+      // Simulate a previous turn having already sent the current DOM shape.
+      const state = { ...mockState, lastSentDom: getDomSnapshot() };
+
+      await actions.sendChatMessage(
+        { state, commit: mockCommit, dispatch: mockDispatch },
+        'now make it bigger'
+      );
+
+      expect(chromeUtils.generateCss).toBeCalledWith(
+        'now make it bigger',
+        state.css,
+        state.url,
+        '',
+        state.apiHistory,
+        state.options.claudeModel
+      );
+
+      expect(mockCommit).not.toBeCalledWith('setLastSentDom', expect.anything());
     });
 
     it('sets an error and does not apply css on failure', async () => {
@@ -270,12 +345,16 @@ describe('actions', () => {
         error: 'invalid_api_key',
       });
 
-      await actions.generateCssWithAi(
+      await actions.sendChatMessage(
         { state: mockState, commit: mockCommit, dispatch: mockDispatch },
         'make links red'
       );
 
-      expect(mockCommit).toHaveBeenNthCalledWith(4, 'setAiError', 'invalid_api_key');
+      expect(mockCommit).toHaveBeenNthCalledWith(4, 'pushChatMessage', {
+        role: 'assistant',
+        status: 'error',
+        error: 'invalid_api_key',
+      });
       expect(mockDispatch).not.toBeCalled();
     });
   });

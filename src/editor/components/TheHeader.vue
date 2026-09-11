@@ -22,6 +22,8 @@ import TheInspector from './header/TheInspector.vue';
 import TheWindowActions from './header/TheWindowActions.vue';
 import TheCssSelectorDropdown from './header/TheCssSelectorDropdown.vue';
 
+import { StylebotEditingMode } from '@stylebot/types';
+
 export default Vue.extend({
   name: 'TheHeader',
 
@@ -43,10 +45,19 @@ export default Vue.extend({
     url(): string {
       return this.$store.state.url;
     },
+
+    mode(): StylebotEditingMode {
+      return this.$store.state.options.mode;
+    },
   },
 
   methods: {
     inspect(selector: string): void {
+      if (this.mode === 'chat') {
+        this.$store.commit('setChatSelectedElement', selector);
+        return;
+      }
+
       this.$store.commit('setActiveSelector', selector);
     },
   },

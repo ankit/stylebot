@@ -76,7 +76,14 @@ describe('GenerateCss', () => {
   });
 
   it('responds with the generated css on success', async () => {
-    (aiModule.generateCss as jest.Mock).mockResolvedValue('a { color: red; }');
+    const result = {
+      css: 'a { color: red; }',
+      message: 'Made links red.',
+      userContent: 'Page: example.com\n\nRequest: make links red',
+      assistantContent: '{"message":"Made links red.","css":"a { color: red; }"}',
+      cost: 0.000123,
+    };
+    (aiModule.generateCss as jest.Mock).mockResolvedValue(result);
     const sendResponse = jest.fn();
 
     await GenerateCss(
@@ -85,6 +92,9 @@ describe('GenerateCss', () => {
         prompt: 'make links red',
         css: '',
         url: 'example.com',
+        dom: 'body\n  a.link',
+        history: [],
+        model: 'claude-haiku-4-5',
       },
       sendResponse
     );
@@ -93,8 +103,11 @@ describe('GenerateCss', () => {
       prompt: 'make links red',
       css: '',
       url: 'example.com',
+      dom: 'body\n  a.link',
+      history: [],
+      model: 'claude-haiku-4-5',
     });
-    expect(sendResponse).toBeCalledWith({ css: 'a { color: red; }' });
+    expect(sendResponse).toBeCalledWith(result);
   });
 
   it('responds with an error code when generation fails', async () => {
@@ -104,7 +117,15 @@ describe('GenerateCss', () => {
     const sendResponse = jest.fn();
 
     await GenerateCss(
-      { name: 'GenerateCss', prompt: 'x', css: '', url: 'example.com' },
+      {
+        name: 'GenerateCss',
+        prompt: 'x',
+        css: '',
+        url: 'example.com',
+        dom: '',
+        history: [],
+        model: 'claude-haiku-4-5',
+      },
       sendResponse
     );
 

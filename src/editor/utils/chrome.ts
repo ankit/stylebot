@@ -19,6 +19,8 @@ import {
   OpenDonatePage,
   GenerateCss,
   GenerateCssResponse,
+  ClaudeConversationTurn,
+  ClaudeModel,
 } from '@stylebot/types';
 
 export const getAllOptions = async (): Promise<StylebotOptions> => {
@@ -166,13 +168,19 @@ export const setReadabilitySettings = (value: ReadabilitySettings): void => {
 export const generateCss = async (
   prompt: string,
   css: string,
-  url: string
+  url: string,
+  dom: string,
+  history: Array<ClaudeConversationTurn>,
+  model: ClaudeModel
 ): Promise<GenerateCssResponse> => {
   const message: GenerateCss = {
     name: 'GenerateCss',
     prompt,
     css,
     url,
+    dom,
+    history,
+    model,
   };
 
   return new Promise(resolve => {

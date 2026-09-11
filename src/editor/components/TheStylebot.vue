@@ -9,6 +9,7 @@
       <the-basic-editor v-if="mode === 'basic'" />
       <the-magic-editor v-else-if="mode === 'magic'" />
       <the-code-editor v-else-if="mode === 'code' && !resizing" />
+      <the-chat-editor v-else-if="mode === 'chat'" />
     </div>
 
     <the-footer />
@@ -23,6 +24,7 @@ import TheFooter from './TheFooter.vue';
 import TheCodeEditor from './TheCodeEditor.vue';
 import TheBasicEditor from './TheBasicEditor.vue';
 import TheMagicEditor from './TheMagicEditor.vue';
+import TheChatEditor from './TheChatEditor.vue';
 import TheStylebotResizer from './TheStylebotResizer.vue';
 
 import { StylebotEditingMode } from '@stylebot/types';
@@ -36,6 +38,7 @@ export default Vue.extend({
     TheBasicEditor,
     TheMagicEditor,
     TheCodeEditor,
+    TheChatEditor,
     TheStylebotResizer,
   },
 

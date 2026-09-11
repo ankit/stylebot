@@ -31,6 +31,7 @@ export const defaultOptions: StylebotOptions = {
   },
   colorPalette: 'basic',
   claudeApiKey: '',
+  claudeModel: 'claude-haiku-4-5',
 };
 
 export const defaultCommands: StylebotCommands = {

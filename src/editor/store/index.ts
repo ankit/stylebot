@@ -6,6 +6,7 @@ import {
   StylebotCommands,
   ReadabilitySettings,
   StylebotEditorCommands,
+  ClaudeConversationTurn,
 } from '@stylebot/types';
 
 import {
@@ -26,6 +27,11 @@ export type CssSelectorMetadata = {
   count: number;
 };
 
+export type ChatMessage =
+  | { role: 'user'; text: string }
+  | { role: 'assistant'; status: 'success'; message: string; css: string }
+  | { role: 'assistant'; status: 'error'; error: string };
+
 export type State = {
   url: string;
   css: string;
@@ -43,7 +49,11 @@ export type State = {
   colorPickerVisible: boolean;
 
   aiGenerating: boolean;
-  aiError: string | null;
+  chatMessages: Array<ChatMessage>;
+  apiHistory: Array<ClaudeConversationTurn>;
+  lastSentDom: string | null;
+  chatSelectedElement: string | null;
+  sessionCost: number;
 
   options: StylebotOptions;
   commands: StylebotCommands | null;
@@ -69,7 +79,11 @@ export default new Vuex.Store<State>({
     colorPickerVisible: false,
 
     aiGenerating: false,
-    aiError: null,
+    chatMessages: [],
+    apiHistory: [],
+    lastSentDom: null,
+    chatSelectedElement: null,
+    sessionCost: 0,
 
     commands: null,
     options: defaultOptions,

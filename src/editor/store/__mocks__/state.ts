@@ -24,7 +24,11 @@ const mockState: State = {
   colorPickerVisible: false,
 
   aiGenerating: false,
-  aiError: null,
+  chatMessages: [],
+  apiHistory: [],
+  lastSentDom: null,
+  chatSelectedElement: null,
+  sessionCost: 0,
 
   options: defaultOptions,
   commands: defaultCommands,
