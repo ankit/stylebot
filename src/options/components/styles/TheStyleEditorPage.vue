@@ -18,10 +18,15 @@
         />
       </div>
 
-      <div v-if="existingStyle" class="enabled-toggle">
-        <toggle-switch bare size="lg" :value="existingStyle.enabled" @change="onToggleEnabled" />
+      <toggle-switch
+        v-if="existingStyle"
+        class="enabled-toggle"
+        size="lg"
+        :value="existingStyle.enabled"
+        @change="onToggleEnabled"
+      >
         <span class="enabled-label">{{ t('enabled') }}</span>
-      </div>
+      </toggle-switch>
 
       <style-row-menu :url="url" :size="30" @open-site="openSite" @copy-css="copyCss" @delete="showDeleteConfirm = true" />
     </div>
@@ -241,11 +246,9 @@ export default Vue.extend({
   margin-top: 2px;
 }
 
-.enabled-toggle {
-  display: flex;
-  align-items: center;
-  gap: 9px;
+.switch.enabled-toggle {
   flex: none;
+  width: auto;
 }
 
 .enabled-label {

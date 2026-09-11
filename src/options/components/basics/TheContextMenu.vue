@@ -1,11 +1,9 @@
 <template>
   <div class="card">
-    <toggle-switch bare size="lg" :value="contextMenu" @change="contextMenu = $event" />
-
-    <div class="text">
+    <toggle-switch size="lg" :value="contextMenu" @change="contextMenu = $event">
       <heading as="h2" size="sm">{{ t('right_click_menu') }}</heading>
       <text-block size="caption" variant="muted" class="description">{{ t('right_click_menu_description') }}</text-block>
-    </div>
+    </toggle-switch>
   </div>
 </template>
 
@@ -38,18 +36,10 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .card {
-  display: flex;
-  align-items: center;
-  gap: 12px;
   margin-top: 16px;
   padding: 12px 14px;
   border: 1px solid var(--border);
   border-radius: 10px;
-}
-
-.text {
-  flex: 1;
-  min-width: 0;
 }
 
 .description {

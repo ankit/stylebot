@@ -1,8 +1,8 @@
 <template>
   <div class="row">
-    <toggle-switch bare :value="enabled" @change="onToggle" />
-
-    <div class="domain" :class="{ disabled: !enabled }">{{ url }}</div>
+    <toggle-switch class="row-toggle" :value="enabled" @change="onToggle">
+      <div class="domain" :class="{ disabled: !enabled }">{{ url }}</div>
+    </toggle-switch>
 
     <div class="timestamp">{{ formattedTimestamp }}</div>
 
@@ -104,9 +104,13 @@ export default Vue.extend({
   border-bottom: 1px solid var(--border);
 }
 
-.domain {
+.switch.row-toggle {
   flex: 1;
   min-width: 0;
+  width: auto;
+}
+
+.domain {
   font-weight: 500;
   font-size: 14px;
   line-height: 1.3;
