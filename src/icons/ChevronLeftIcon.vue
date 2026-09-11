@@ -8,7 +8,7 @@
     stroke-width="1.6"
     stroke-linecap="round"
     stroke-linejoin="round"
-    class="ui-icon"
+    class="icon"
   >
     <path d="M9.5 3.5 5 8l4.5 4.5" />
   </svg>

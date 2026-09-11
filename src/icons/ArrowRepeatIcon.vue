@@ -4,7 +4,7 @@
     width="1em"
     height="1em"
     fill="currentColor"
-    class="ui-icon"
+    class="icon"
     :class="{ spinning }"
   >
     <path

@@ -1,4 +1,6 @@
-@mixin light-vars {
+:root {
+  color-scheme: light dark;
+
   --background: #fff;
   --foreground: #191b1f;
   --muted-foreground: #767676;
@@ -13,29 +15,6 @@
 
   --info: #eef3ff;
   --info-border: #dbe4fb;
-}
-
-@mixin dark-vars {
-  --background: #1c1d21;
-  --foreground: #eceef2;
-  --muted-foreground: #7d838f;
-  --border: #2c2e34;
-  --accent: #26282e;
-  --active: #2b2d34;
-
-  --primary: #4d80f0;
-
-  --input: #34363d;
-  --icon-foreground: #9aa1ae;
-
-  --info: #1f2740;
-  --info-border: #2b3654;
-}
-
-:root {
-  color-scheme: light dark;
-
-  @include light-vars;
 
   --ring: var(--primary);
 
@@ -45,7 +24,7 @@
   --link-color: var(--primary);
 }
 
-.ui-icon {
+.icon {
   width: 18px;
   height: 18px;
   flex: none;
@@ -54,6 +33,19 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    @include dark-vars;
+    --background: #1c1d21;
+    --foreground: #eceef2;
+    --muted-foreground: #7d838f;
+    --border: #2c2e34;
+    --accent: #26282e;
+    --active: #2b2d34;
+
+    --primary: #4d80f0;
+
+    --input: #34363d;
+    --icon-foreground: #9aa1ae;
+
+    --info: #1f2740;
+    --info-border: #2b3654;
   }
 }
