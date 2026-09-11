@@ -1,6 +1,6 @@
 <template>
-  <button type="button" class="popup-btn" @click="$emit('click', $event)">
-    <span class="popup-btn-label"><slot /></span>
+  <button type="button" class="pill-btn" @click="$emit('click', $event)">
+    <span class="pill-btn-label"><slot /></span>
     <slot name="trailing" />
   </button>
 </template>
@@ -9,12 +9,12 @@
 import Vue from 'vue';
 
 export default Vue.extend({
-  name: 'PopupButton',
+  name: 'PillButton',
 });
 </script>
 
 <style lang="scss" scoped>
-.popup-btn {
+.pill-btn {
   display: flex;
   align-items: center;
   flex: 1;
@@ -38,7 +38,7 @@ export default Vue.extend({
 }
 
 @media (prefers-color-scheme: dark) {
-  .popup-btn {
+  .pill-btn {
     border-color: #3a3d45;
     background: #26282e;
 
@@ -48,7 +48,7 @@ export default Vue.extend({
   }
 }
 
-.popup-btn-label {
+.pill-btn-label {
   flex: 1;
   text-align: center;
 }

@@ -5,4 +5,5 @@ export { default as ShortcutKbd } from './ShortcutKbd.vue';
 export { default as ShortcutRecorderField } from './ShortcutRecorderField.vue';
 export { default as MenuBox } from './MenuBox.vue';
 export { default as ToggleSwitch } from './ToggleSwitch.vue';
+export { default as PillButton } from './PillButton.vue';
 export { default as IconButton } from './IconButton.vue';
