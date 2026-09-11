@@ -3,11 +3,11 @@
     <div class="text">
       <heading as="h2" size="sm">Google Drive</heading>
 
-      <text-block v-if="!googleDriveSyncEnabled" size="caption" class="description">
+      <text-block v-if="!googleDriveSyncEnabled" size="caption" variant="muted" class="description">
         Not connected. Styles stay on this computer only.
       </text-block>
 
-      <text-block v-else size="caption" class="description">
+      <text-block v-else size="caption" variant="muted" class="description">
         {{ t('synced_at_time', [googleDriveSyncLastModifiedTime]) }}
         <template v-if="syncInProgress"> · {{ t('sync_in_progress') }}</template>
         <template v-if="googleDriveSyncViewLink">

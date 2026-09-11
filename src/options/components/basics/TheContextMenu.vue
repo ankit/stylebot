@@ -4,7 +4,7 @@
 
     <div class="text">
       <heading as="h2" size="sm">{{ t('right_click_menu') }}</heading>
-      <text-block size="caption" class="description">{{ t('right_click_menu_description') }}</text-block>
+      <text-block size="caption" variant="muted" class="description">{{ t('right_click_menu_description') }}</text-block>
     </div>
   </div>
 </template>

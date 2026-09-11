@@ -9,7 +9,7 @@
 
       <div class="popup-divider" />
 
-      <text-block class="popup-restricted-message">
+      <text-block variant="muted" class="popup-restricted-message">
         {{ t('restricted_page_description') }}
       </text-block>
 
@@ -31,7 +31,7 @@
       />
       <div v-else class="popup-header">
         <heading as="h1" size="sm" class="popup-header-domain">{{ domain }}</heading>
-        <text-block size="caption">
+        <text-block size="caption" variant="muted">
           {{ t('no_style_saved_for_site') }}
         </text-block>
       </div>

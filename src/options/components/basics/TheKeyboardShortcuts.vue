@@ -1,7 +1,7 @@
 <template>
   <div>
     <heading as="h2">{{ t('keyboard_shortcuts') }}</heading>
-    <text-block class="description">{{ t('keyboard_shortcuts_description') }}</text-block>
+    <text-block variant="muted" class="description">{{ t('keyboard_shortcuts_description') }}</text-block>
 
     <div class="rows">
       <shortcut-row :label="t('toggle_editor')">

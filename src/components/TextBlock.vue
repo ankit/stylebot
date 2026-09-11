@@ -1,5 +1,5 @@
 <template>
-  <p class="text" :class="[size, { muted }]">
+  <p class="text" :class="[size, variant]">
     <slot />
   </p>
 </template>
@@ -8,6 +8,7 @@
 import Vue, { PropType } from 'vue';
 
 type Size = 'body' | 'caption';
+type Variant = 'muted' | 'default';
 
 export default Vue.extend({
   // Named TextBlock, not Text — Vue 2 treats <text> as a reserved SVG tag,
@@ -20,11 +21,9 @@ export default Vue.extend({
       default: 'body',
     },
 
-    // Almost every current usage is secondary/muted copy; opt out for the
-    // rare full-emphasis case (e.g. a notification's main sentence).
-    muted: {
-      type: Boolean,
-      default: true,
+    variant: {
+      type: String as PropType<Variant>,
+      default: 'default',
     },
   },
 });
@@ -34,7 +33,7 @@ export default Vue.extend({
 .text {
   margin: 0;
   font-weight: 400;
-  color: var(--main-foreground);
+  color: var(--foreground);
 }
 
 .muted {

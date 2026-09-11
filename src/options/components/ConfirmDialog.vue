@@ -9,7 +9,7 @@
       aria-describedby="confirm-dialog-message"
     >
       <heading id="confirm-dialog-title" as="h2" size="md">{{ title }}</heading>
-      <text-block id="confirm-dialog-message" size="caption" class="message">{{ message }}</text-block>
+      <text-block id="confirm-dialog-message" size="caption" variant="muted" class="message">{{ message }}</text-block>
 
       <div class="actions">
         <app-button ref="cancelButton" variant="ghost" @click="$emit('cancel')">

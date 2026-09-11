@@ -9,7 +9,7 @@
           </span>
           <button type="button" class="cancel" @click="cancelRecording">{{ t('cancel') }}</button>
         </div>
-        <text-block size="caption" class="helper">
+        <text-block size="caption" variant="muted" class="helper">
           {{ t('press_key_to_finish') }}
           <template v-if="hasValue">
             {{ t('esc_keeps') }} <span class="chip chip-inline"><shortcut-kbd :value="value" /></span>
@@ -23,7 +23,7 @@
           <div class="title">{{ t('readability_shortcut') }}</div>
           <shortcut-chip :value="value" />
         </div>
-        <text-block size="caption" class="desc">{{ t('readability_shortcut_description') }}</text-block>
+        <text-block size="caption" variant="muted" class="desc">{{ t('readability_shortcut_description') }}</text-block>
         <div class="divider" />
         <button type="button" class="row" @click="startRecording">{{ t('change_shortcut') }}</button>
         <button type="button" class="row danger" @click="remove">{{ t('remove') }}</button>
@@ -42,7 +42,7 @@
             <icon-x />
           </button>
         </div>
-        <text-block size="caption" class="desc">{{ t('readability_shortcut_description') }}</text-block>
+        <text-block size="caption" variant="muted" class="desc">{{ t('readability_shortcut_description') }}</text-block>
         <button type="button" class="record-btn" @click="startRecording">
           <icon-keyboard />
           {{ t('record_shortcut') }}

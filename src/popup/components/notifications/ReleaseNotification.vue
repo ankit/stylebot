@@ -9,7 +9,7 @@
   >
     <span class="release-dot" />
 
-    <text-block :muted="false" class="release-text">
+    <text-block class="release-text">
       {{ t('new_in_version', [version]) }}
       <span class="release-sep">—</span>
       <span class="release-link">{{ t('see_what_changed') }}</span>

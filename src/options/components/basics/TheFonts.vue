@@ -1,7 +1,7 @@
 <template>
   <div>
     <heading as="h2">{{ t('fonts') }}</heading>
-    <text-block class="description">{{ t('fonts_description') }}</text-block>
+    <text-block variant="muted" class="description">{{ t('fonts_description') }}</text-block>
 
     <div class="fonts-box" @click="focusInput">
       <span

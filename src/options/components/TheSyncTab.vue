@@ -10,14 +10,14 @@
 
     <div>
       <heading as="h1">{{ t('sync_options') }}</heading>
-      <text-block class="description">Keep your styles on every computer you sign in to.</text-block>
+      <text-block variant="muted" class="description">Keep your styles on every computer you sign in to.</text-block>
 
       <the-google-drive-sync />
     </div>
 
     <div class="section">
       <heading as="h2">{{ t('backup') }}</heading>
-      <text-block class="description">{{ t('backup_description') }}</text-block>
+      <text-block variant="muted" class="description">{{ t('backup_description') }}</text-block>
 
       <div class="buttons">
         <app-button @click="exportJson">{{ t('export') }}</app-button>
