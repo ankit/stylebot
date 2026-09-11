@@ -1,39 +1,35 @@
 @mixin light-vars {
-  --ui-bg: #fff;
-  --ui-fg: #191b1f;
-  --ui-fg-muted: #767676;
-  --ui-border: #e9eaee;
-  --ui-hover-bg: #f2f3f6;
-  --ui-active-bg: #eceef2;
-  --ui-row-hover-bg: #fafbfc;
-  --ui-editor-bg: #fcfcfd;
+  --background: #fff;
+  --foreground: #191b1f;
+  --muted-foreground: #767676;
+  --border: #e9eaee;
+  --accent: #f2f3f6;
+  --active: #eceef2;
 
-  --ui-accent: #2a5fd6;
+  --primary: #2a5fd6;
 
-  --ui-icon-btn-border: #dfe1e6;
-  --ui-icon-btn-fg: #6a7180;
+  --input: #dfe1e6;
+  --icon-foreground: #6a7180;
 
-  --ui-notification-bg: #eef3ff;
-  --ui-notification-border: #dbe4fb;
+  --info: #eef3ff;
+  --info-border: #dbe4fb;
 }
 
 @mixin dark-vars {
-  --ui-bg: #1c1d21;
-  --ui-fg: #eceef2;
-  --ui-fg-muted: #7d838f;
-  --ui-border: #2c2e34;
-  --ui-hover-bg: #26282e;
-  --ui-active-bg: #2b2d34;
-  --ui-row-hover-bg: #202126;
-  --ui-editor-bg: #1a1b1e;
+  --background: #1c1d21;
+  --foreground: #eceef2;
+  --muted-foreground: #7d838f;
+  --border: #2c2e34;
+  --accent: #26282e;
+  --active: #2b2d34;
 
-  --ui-accent: #4d80f0;
+  --primary: #4d80f0;
 
-  --ui-icon-btn-border: #34363d;
-  --ui-icon-btn-fg: #9aa1ae;
+  --input: #34363d;
+  --icon-foreground: #9aa1ae;
 
-  --ui-notification-bg: #1f2740;
-  --ui-notification-border: #2b3654;
+  --info: #1f2740;
+  --info-border: #2b3654;
 }
 
 :root {
@@ -41,13 +37,12 @@
 
   @include light-vars;
 
-  --ui-focus-ring: var(--ui-accent);
+  --ring: var(--primary);
 
-  --main-foreground: var(--ui-fg);
-  --muted-foreground: var(--ui-fg-muted);
-  --main-background: var(--ui-bg);
-  --border-color: var(--ui-border);
-  --link-color: var(--ui-accent);
+  --main-foreground: var(--foreground);
+  --main-background: var(--background);
+  --border-color: var(--border);
+  --link-color: var(--primary);
 }
 
 .ui-icon {

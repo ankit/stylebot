@@ -101,7 +101,7 @@ export default Vue.extend({
   align-items: center;
   gap: 14px;
   padding: 13px 18px;
-  border-bottom: 1px solid var(--ui-border);
+  border-bottom: 1px solid var(--border);
 }
 
 .domain {
@@ -110,19 +110,19 @@ export default Vue.extend({
   font-weight: 500;
   font-size: 14px;
   line-height: 1.3;
-  color: var(--ui-fg);
+  color: var(--foreground);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 
   &.disabled {
-    color: var(--ui-fg-muted);
+    color: var(--muted-foreground);
   }
 }
 
 .timestamp {
   flex: none;
   font-size: 12px;
-  color: var(--ui-fg-muted);
+  color: var(--muted-foreground);
 }
 </style>

@@ -172,7 +172,7 @@ export default Vue.extend({
   font-weight: 400;
   font-size: 12.5px;
   line-height: 1.4;
-  color: var(--ui-fg-muted);
+  color: var(--muted-foreground);
   margin-top: 3px;
 }
 
@@ -190,9 +190,9 @@ export default Vue.extend({
   gap: 9px;
   padding: 9px 12px;
   border-radius: 9px;
-  background: var(--ui-hover-bg);
-  border: 1px solid var(--ui-border);
-  color: var(--ui-fg-muted);
+  background: var(--accent);
+  border: 1px solid var(--border);
+  color: var(--muted-foreground);
 
   input {
     all: unset;
@@ -201,10 +201,10 @@ export default Vue.extend({
     font-weight: 400;
     font-size: 13px;
     line-height: 1.2;
-    color: var(--ui-fg);
+    color: var(--foreground);
 
     &::placeholder {
-      color: var(--ui-fg-muted);
+      color: var(--muted-foreground);
     }
   }
 }
@@ -213,6 +213,6 @@ export default Vue.extend({
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  border-top: 1px solid var(--ui-border);
+  border-top: 1px solid var(--border);
 }
 </style>

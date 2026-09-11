@@ -207,7 +207,7 @@ export default Vue.extend({
   align-items: center;
   gap: 12px;
   padding: 16px 18px;
-  border-bottom: 1px solid var(--ui-border);
+  border-bottom: 1px solid var(--border);
 }
 
 .back {
@@ -223,7 +223,7 @@ export default Vue.extend({
   font-weight: 400;
   font-size: 12px;
   line-height: 1.3;
-  color: var(--ui-fg-muted);
+  color: var(--muted-foreground);
 }
 
 .url-input {
@@ -234,7 +234,7 @@ export default Vue.extend({
   font-size: 15.5px;
   line-height: 1.25;
   letter-spacing: -0.01em;
-  color: var(--ui-fg);
+  color: var(--foreground);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -252,13 +252,19 @@ export default Vue.extend({
   font-weight: 400;
   font-size: 13px;
   line-height: 1.3;
-  color: var(--ui-fg-muted);
+  color: var(--muted-foreground);
 }
 
 .editor-code-area {
   flex: 1;
   min-height: 0;
-  background: var(--ui-editor-bg);
+  background: #fcfcfd;
+}
+
+@media (prefers-color-scheme: dark) {
+  .editor-code-area {
+    background: #1a1b1e;
+  }
 }
 
 .editor-footer {
@@ -266,13 +272,13 @@ export default Vue.extend({
   align-items: center;
   gap: 10px;
   padding: 12px 18px;
-  border-top: 1px solid var(--ui-border);
+  border-top: 1px solid var(--border);
 }
 
 .stats {
   flex: 1;
   min-width: 0;
   font-size: 12px;
-  color: var(--ui-fg-muted);
+  color: var(--muted-foreground);
 }
 </style>

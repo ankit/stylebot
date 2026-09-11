@@ -43,7 +43,7 @@ export default Vue.extend({
   gap: 12px;
   margin-top: 16px;
   padding: 12px 14px;
-  border: 1px solid var(--ui-border);
+  border: 1px solid var(--border);
   border-radius: 10px;
 }
 

@@ -129,8 +129,8 @@ body {
 
 body {
   font-family: 'Public Sans', system-ui, sans-serif;
-  background: var(--ui-bg);
-  color: var(--ui-fg);
+  background: var(--background);
+  color: var(--foreground);
 }
 
 #app {
@@ -138,7 +138,7 @@ body {
 }
 
 a {
-  color: var(--ui-accent);
+  color: var(--primary);
   text-decoration: none;
 
   &:hover {

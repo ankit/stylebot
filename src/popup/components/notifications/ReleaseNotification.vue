@@ -92,12 +92,12 @@ export default Vue.extend({
   align-items: center;
   gap: 10px;
   padding: 12px 8px 12px 16px;
-  background: var(--ui-notification-bg);
-  border-top: 1px solid var(--ui-notification-border);
+  background: var(--info);
+  border-top: 1px solid var(--info-border);
   cursor: pointer;
 
   &:focus-visible {
-    outline: 2px solid var(--ui-focus-ring);
+    outline: 2px solid var(--ring);
     outline-offset: -2px;
   }
 }
@@ -107,7 +107,7 @@ export default Vue.extend({
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--ui-accent);
+  background: var(--primary);
 }
 
 .release-text {
@@ -116,12 +116,12 @@ export default Vue.extend({
 }
 
 .release-sep {
-  color: var(--ui-fg-muted);
+  color: var(--muted-foreground);
   margin: 0 2px;
 }
 
 .release-link {
-  color: var(--ui-accent);
+  color: var(--primary);
 }
 
 .release-dismiss {
@@ -129,6 +129,6 @@ export default Vue.extend({
 }
 
 .release-banner .release-dismiss:hover {
-  background: var(--ui-notification-border);
+  background: var(--info-border);
 }
 </style>

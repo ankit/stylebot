@@ -157,8 +157,8 @@ export default Vue.extend({
   margin-top: 14px;
   padding: 8px;
   border-radius: 9px;
-  border: 1px solid var(--ui-border);
-  background: var(--ui-hover-bg);
+  border: 1px solid var(--border);
+  background: var(--accent);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -172,10 +172,10 @@ export default Vue.extend({
   gap: 6px;
   padding: 6px 6px 6px 11px;
   border-radius: 7px;
-  background: var(--ui-bg);
-  border: 1px solid color-mix(in srgb, var(--ui-icon-btn-border) 50%, var(--ui-fg-muted));
+  background: var(--background);
+  border: 1px solid color-mix(in srgb, var(--input) 50%, var(--muted-foreground));
   font-size: 14px;
-  color: var(--ui-fg);
+  color: var(--foreground);
 }
 
 .chip-label {
@@ -190,7 +190,7 @@ export default Vue.extend({
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  color: var(--ui-fg-muted);
+  color: var(--muted-foreground);
   cursor: pointer;
 
   svg {
@@ -199,8 +199,8 @@ export default Vue.extend({
   }
 
   &:hover {
-    background: var(--ui-hover-bg);
-    color: var(--ui-fg);
+    background: var(--accent);
+    color: var(--foreground);
   }
 }
 
@@ -211,10 +211,10 @@ export default Vue.extend({
   padding: 4px;
   font-size: 14px;
   line-height: 1.4;
-  color: var(--ui-fg);
+  color: var(--foreground);
 
   &::placeholder {
-    color: var(--ui-fg-muted);
+    color: var(--muted-foreground);
   }
 }
 

@@ -28,7 +28,7 @@ export default Vue.extend({
   align-items: center;
   gap: 16px;
   padding: 11px 0;
-  border-bottom: 1px solid var(--ui-hover-bg);
+  border-bottom: 1px solid var(--accent);
 
   &:last-child {
     border-bottom: none;
@@ -40,7 +40,7 @@ export default Vue.extend({
   font-weight: 400;
   font-size: 13.5px;
   line-height: 1.3;
-  color: var(--ui-fg);
+  color: var(--foreground);
 }
 
 .control {

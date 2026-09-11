@@ -46,11 +46,11 @@ export default Vue.extend({
   cursor: pointer;
 
   &:hover {
-    background: var(--ui-hover-bg);
+    background: var(--accent);
   }
 
   &:focus-visible {
-    outline: 2px solid var(--ui-focus-ring);
+    outline: 2px solid var(--ring);
     outline-offset: 1px;
   }
 
@@ -58,9 +58,9 @@ export default Vue.extend({
     flex: none;
     width: 46px;
     padding: 0;
-    border: 1px solid var(--ui-icon-btn-border);
+    border: 1px solid var(--input);
     border-radius: 8px;
-    color: var(--ui-icon-btn-fg);
+    color: var(--icon-foreground);
   }
 }
 </style>

@@ -110,7 +110,7 @@ input {
 }
 
 input:checked:not(:disabled) ~ .track {
-  background: var(--ui-accent);
+  background: var(--primary);
 }
 
 input:checked:not(:disabled) ~ .track .thumb {
@@ -174,7 +174,7 @@ input:checked:not(:disabled) ~ .track .thumb {
 }
 
 input:focus-visible ~ .track {
-  outline: 2px solid var(--ui-focus-ring);
+  outline: 2px solid var(--ring);
   outline-offset: 2px;
 }
 

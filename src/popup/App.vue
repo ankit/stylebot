@@ -213,8 +213,8 @@ body {
   margin: 0;
   font-family: 'Public Sans', system-ui, sans-serif;
   font-size: 14px;
-  background: var(--ui-bg);
-  color: var(--ui-fg);
+  background: var(--background);
+  color: var(--foreground);
 }
 
 .popup {
@@ -237,12 +237,12 @@ body {
 }
 
 .popup-header-domain.popup-header-domain--muted {
-  color: var(--ui-fg-muted);
+  color: var(--muted-foreground);
 }
 
 .popup-caption {
   font-size: 11.5px;
-  color: var(--ui-fg-muted);
+  color: var(--muted-foreground);
 }
 
 .popup-restricted-message {
@@ -251,7 +251,7 @@ body {
 
 .popup-divider {
   height: 1px;
-  background: var(--ui-border);
+  background: var(--border);
 }
 
 .popup-menu {

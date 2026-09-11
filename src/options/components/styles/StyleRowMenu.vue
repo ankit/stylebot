@@ -91,13 +91,13 @@ export default Vue.extend({
   font-weight: 400;
   font-size: 13.5px;
   line-height: 1.3;
-  color: var(--ui-fg);
+  color: var(--foreground);
   padding: 10px;
   border-radius: 8px;
   cursor: pointer;
 
   &:hover {
-    background: var(--ui-hover-bg);
+    background: var(--accent);
   }
 
   &.danger {
@@ -111,7 +111,7 @@ export default Vue.extend({
 
 .divider {
   height: 1px;
-  background: var(--ui-border);
+  background: var(--border);
   margin: 5px 10px;
 }
 </style>

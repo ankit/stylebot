@@ -52,7 +52,7 @@ export default Vue.extend({
 .navigation {
   flex: none;
   width: 216px;
-  border-right: 1px solid var(--ui-border);
+  border-right: 1px solid var(--border);
   padding: 20px 12px;
   display: flex;
   flex-direction: column;
@@ -78,22 +78,22 @@ export default Vue.extend({
   font-weight: 400;
   font-size: 13.5px;
   line-height: 1.3;
-  color: color-mix(in srgb, var(--ui-fg-muted) 65%, var(--ui-fg));
+  color: color-mix(in srgb, var(--muted-foreground) 65%, var(--foreground));
   cursor: pointer;
 
   &:hover {
-    background: var(--ui-hover-bg);
+    background: var(--accent);
   }
 
   &:focus-visible {
-    outline: 2px solid var(--ui-focus-ring);
+    outline: 2px solid var(--ring);
     outline-offset: -2px;
   }
 
   &.active {
     font-weight: 600;
-    color: var(--ui-fg);
-    background: var(--ui-active-bg);
+    color: var(--foreground);
+    background: var(--active);
   }
 }
 

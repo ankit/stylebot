@@ -52,7 +52,7 @@ export default Vue.extend({
   font-weight: 600;
   font-size: 13px;
   line-height: 1;
-  color: var(--ui-fg);
+  color: var(--foreground);
   background: transparent;
   cursor: pointer;
 
@@ -62,23 +62,23 @@ export default Vue.extend({
   }
 
   &:focus-visible {
-    outline: 2px solid var(--ui-focus-ring);
+    outline: 2px solid var(--ring);
     outline-offset: 1px;
   }
 }
 
 .app-button.default {
-  background: var(--ui-bg);
-  border-color: var(--ui-icon-btn-border);
+  background: var(--background);
+  border-color: var(--input);
 
   &:hover:not(:disabled) {
-    background: var(--ui-hover-bg);
+    background: var(--accent);
   }
 }
 
 .app-button.ghost {
   &:hover:not(:disabled) {
-    background: var(--ui-hover-bg);
+    background: var(--accent);
   }
 }
 

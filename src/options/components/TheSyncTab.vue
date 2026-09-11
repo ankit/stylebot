@@ -109,9 +109,9 @@ export default Vue.extend({
 }
 
 .banner.success {
-  background: var(--ui-notification-bg);
-  border: 1px solid var(--ui-notification-border);
-  color: var(--ui-fg);
+  background: var(--info);
+  border: 1px solid var(--info-border);
+  color: var(--foreground);
 }
 
 .banner.error {
