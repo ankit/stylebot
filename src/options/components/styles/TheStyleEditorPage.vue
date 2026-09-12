@@ -36,10 +36,10 @@
     </div>
 
     <div class="editor-footer">
-      <text-block size="caption" variant="muted" class="stats">
+      <s-text size="caption" variant="muted" class="stats">
         {{ lineCountLabel }} · {{ ruleCountLabel }}
         <template v-if="savedLabel"> · {{ savedLabel }}</template>
-      </text-block>
+      </s-text>
 
       <s-button variant="ghost" :disabled="!isDirty" @click="$emit('back')">
         {{ t('discard_changes') }}
@@ -76,7 +76,7 @@ import * as postcss from 'postcss';
 import { formatDistanceToNow } from 'date-fns';
 
 import { StyleWithoutUrl } from '@stylebot/types';
-import { ToggleSwitch, IconButton, TextBlock, SButton, ConfirmDialog } from '@stylebot/components';
+import { ToggleSwitch, IconButton, SText, SButton, ConfirmDialog } from '@stylebot/components';
 import { ChevronLeftIcon } from '@stylebot/icons';
 
 import StyleRowMenu from './StyleRowMenu.vue';
@@ -89,7 +89,7 @@ export default Vue.extend({
     ToggleSwitch,
     ChevronLeftIcon,
     IconButton,
-    TextBlock,
+    SText,
     SButton,
     ConfirmDialog,
     StyleRowMenu,

@@ -1,5 +1,5 @@
 export { default as Heading } from './Heading.vue';
-export { default as TextBlock } from './TextBlock.vue';
+export { default as SText } from './SText.vue';
 export { default as ShortcutChip } from './ShortcutChip.vue';
 export { default as ShortcutKbd } from './ShortcutKbd.vue';
 export { default as ShortcutRecorderField } from './ShortcutRecorderField.vue';

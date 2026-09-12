@@ -9,13 +9,13 @@
           </span>
           <button type="button" class="cancel" @click="cancelRecording">{{ t('cancel') }}</button>
         </div>
-        <text-block size="caption" variant="muted" class="helper">
+        <s-text size="caption" variant="muted" class="helper">
           {{ t('press_key_to_finish') }}
           <template v-if="hasValue">
             {{ t('esc_keeps') }} <span class="chip chip-inline"><shortcut-kbd :value="value" /></span>
           </template>
           <template v-else>{{ t('esc_cancels') }}</template>
-        </text-block>
+        </s-text>
       </div>
 
       <div v-else-if="hasValue" class="content">
@@ -23,7 +23,7 @@
           <div class="title">{{ t('readability_shortcut') }}</div>
           <shortcut-chip :value="value" />
         </div>
-        <text-block size="caption" variant="muted" class="desc">{{ t('readability_shortcut_description') }}</text-block>
+        <s-text size="caption" variant="muted" class="desc">{{ t('readability_shortcut_description') }}</s-text>
         <div class="divider" />
         <button type="button" class="row" @click="startRecording">{{ t('change_shortcut') }}</button>
         <button type="button" class="row danger" @click="remove">{{ t('remove') }}</button>
@@ -42,7 +42,7 @@
             <icon-x />
           </button>
         </div>
-        <text-block size="caption" variant="muted" class="desc">{{ t('readability_shortcut_description') }}</text-block>
+        <s-text size="caption" variant="muted" class="desc">{{ t('readability_shortcut_description') }}</s-text>
         <button type="button" class="record-btn" @click="startRecording">
           <icon-keyboard />
           {{ t('record_shortcut') }}
@@ -66,7 +66,7 @@ import {
   MenuBox,
   ShortcutChip,
   ShortcutKbd,
-  TextBlock,
+  SText,
 } from '@stylebot/components';
 import { IconKeyboard, IconX } from '@stylebot/icons';
 
@@ -77,7 +77,7 @@ export default Vue.extend({
     MenuBox,
     ShortcutKbd,
     ShortcutChip,
-    TextBlock,
+    SText,
     IconKeyboard,
     IconX,
   },

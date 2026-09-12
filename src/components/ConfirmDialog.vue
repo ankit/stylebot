@@ -9,7 +9,7 @@
       aria-describedby="confirm-dialog-message"
     >
       <heading id="confirm-dialog-title" as="h2" size="md">{{ title }}</heading>
-      <text-block id="confirm-dialog-message" size="caption" variant="muted" class="message">{{ message }}</text-block>
+      <s-text id="confirm-dialog-message" size="caption" variant="muted" class="message">{{ message }}</s-text>
 
       <div class="actions">
         <s-button ref="cancelButton" variant="ghost" @click="$emit('cancel')">
@@ -26,7 +26,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { Heading, TextBlock, SButton } from '@stylebot/components';
+import { Heading, SText, SButton } from '@stylebot/components';
 
 export default Vue.extend({
   name: 'ConfirmDialog',
@@ -34,7 +34,7 @@ export default Vue.extend({
   components: {
     SButton,
     Heading,
-    TextBlock,
+    SText,
   },
 
   props: {

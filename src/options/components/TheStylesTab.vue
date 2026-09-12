@@ -3,10 +3,10 @@
     <div class="header">
       <div class="title-block">
         <heading as="h1">{{ t('styles_options') }}</heading>
-        <text-block variant="muted" class="subtitle">
+        <s-text variant="muted" class="subtitle">
           {{ t(totalCount === 1 ? 'sites_count_one' : 'sites_count_other', [String(totalCount)]) }} ·
           {{ t('enabled_count', [String(enabledCount)]) }}
-        </text-block>
+        </s-text>
       </div>
 
       <s-button @click="$emit('edit', '')">{{ t('add_a_style') }}</s-button>
@@ -57,7 +57,7 @@ import Vue from 'vue';
 import { compareAsc } from 'date-fns';
 
 import { Style } from '@stylebot/types';
-import { Heading, TextBlock, SButton, ConfirmDialog } from '@stylebot/components';
+import { Heading, SText, SButton, ConfirmDialog } from '@stylebot/components';
 
 import StyleListRow from './styles/StyleListRow.vue';
 import StylesBulkMenu from './styles/StylesBulkMenu.vue';
@@ -67,7 +67,7 @@ export default Vue.extend({
 
   components: {
     Heading,
-    TextBlock,
+    SText,
     SButton,
     ConfirmDialog,
     StyleListRow,

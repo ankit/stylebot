@@ -9,11 +9,11 @@
   >
     <span class="release-dot" />
 
-    <text-block class="release-text">
+    <s-text class="release-text">
       {{ t('new_in_version', [version]) }}
       <span class="release-sep">—</span>
       <span class="release-link">{{ t('see_what_changed') }}</span>
-    </text-block>
+    </s-text>
 
     <icon-button class="release-dismiss" :title="t('hide')" @click="dismiss">
       <x-icon :size="22" />
@@ -32,7 +32,7 @@ import {
 
 import { onEnterOrSpace } from '../../utils';
 import { XIcon } from '@stylebot/icons';
-import { IconButton, TextBlock } from '@stylebot/components';
+import { IconButton, SText } from '@stylebot/components';
 
 export default Vue.extend({
   name: 'ReleaseNotification',
@@ -40,7 +40,7 @@ export default Vue.extend({
   components: {
     XIcon,
     IconButton,
-    TextBlock,
+    SText,
   },
 
   data(): {

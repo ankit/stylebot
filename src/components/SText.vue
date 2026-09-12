@@ -11,9 +11,7 @@ type Size = 'body' | 'caption';
 type Variant = 'muted' | 'default';
 
 export default Vue.extend({
-  // Named TextBlock, not Text — Vue 2 treats <text> as a reserved SVG tag,
-  // so a component registered/used as <text> silently renders as inert SVG.
-  name: 'TextBlock',
+  name: 'SText',
 
   props: {
     size: {

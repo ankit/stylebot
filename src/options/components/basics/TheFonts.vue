@@ -1,7 +1,7 @@
 <template>
   <div>
     <heading as="h2">{{ t('fonts') }}</heading>
-    <text-block variant="muted" class="description">{{ t('fonts_description') }}</text-block>
+    <s-text variant="muted" class="description">{{ t('fonts_description') }}</s-text>
 
     <div class="fonts-box" @click="focusInput">
       <span
@@ -44,7 +44,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { defaultOptions } from '@stylebot/settings';
-import { Heading, TextBlock } from '@stylebot/components';
+import { Heading, SText } from '@stylebot/components';
 import { IconX } from '@stylebot/icons';
 
 export default Vue.extend({
@@ -53,7 +53,7 @@ export default Vue.extend({
   components: {
     IconX,
     Heading,
-    TextBlock,
+    SText,
   },
 
   data(): { newFont: string } {
