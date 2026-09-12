@@ -60,7 +60,6 @@ export default Vue.extend({
     },
 
     onDocMousedown(event: MouseEvent): void {
-      // composedPath()[0], not event.target, is the true origin inside a shadow tree.
       const origin = event.composedPath()[0];
       if (!(origin instanceof Node && this.$el.contains(origin))) {
         this.close();
