@@ -1,6 +1,7 @@
 <template>
   <div class="options-app">
     <the-navigation
+      class="nav"
       :tabs="tabs"
       :current-tab="currentTab"
       @select="selectTab"
@@ -16,6 +17,10 @@
       />
 
       <component :is="currentTabComponent" v-else @edit="editingUrl = $event" />
+    </div>
+
+    <div class="nav-footer">
+      <the-navigation-footer />
     </div>
 
     <confirm-dialog
@@ -36,8 +41,10 @@ import TheBasicsTab from './components/TheBasicsTab.vue';
 import TheStylesTab from './components/TheStylesTab.vue';
 import TheSyncTab from './components/TheSyncTab.vue';
 import TheNavigation from './components/TheNavigation.vue';
-import ConfirmDialog from './components/ConfirmDialog.vue';
+import TheNavigationFooter from './components/navigation/TheNavigationFooter.vue';
 import TheStyleEditorPage from './components/styles/TheStyleEditorPage.vue';
+
+import { ConfirmDialog } from '@stylebot/components';
 
 export default Vue.extend({
   name: 'App',
@@ -47,6 +54,7 @@ export default Vue.extend({
     TheStylesTab,
     TheSyncTab,
     TheNavigation,
+    TheNavigationFooter,
     ConfirmDialog,
     TheStyleEditorPage,
   },
@@ -147,12 +155,27 @@ a {
 }
 
 .options-app {
-  display: flex;
+  display: grid;
+  grid-template-columns: 216px 1fr;
+  grid-template-rows: 1fr auto;
   min-height: 100vh;
 }
 
+.nav {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.nav-footer {
+  grid-column: 1;
+  grid-row: 2;
+  padding: 0 12px 16px;
+  border-right: 1px solid var(--border);
+}
+
 .content {
-  flex: 1;
+  grid-column: 2;
+  grid-row: 1 / -1;
   min-width: 0;
 }
 </style>

@@ -14,24 +14,18 @@
         {{ t(`${tab}_options`) }}
       </button>
     </nav>
-
-    <div class="spacer" />
-
-    <the-navigation-footer />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import { Heading } from '@stylebot/components';
-import TheNavigationFooter from './navigation/TheNavigationFooter.vue';
 
 export default Vue.extend({
   name: 'TheNavigation',
 
   components: {
     Heading,
-    TheNavigationFooter,
   },
 
   props: {
@@ -95,10 +89,5 @@ export default Vue.extend({
     color: var(--foreground);
     background: var(--active);
   }
-}
-
-.spacer {
-  flex: 1;
-  min-height: 120px;
 }
 </style>

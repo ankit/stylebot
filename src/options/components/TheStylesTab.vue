@@ -9,7 +9,7 @@
         </text-block>
       </div>
 
-      <app-button @click="$emit('edit', '')">{{ t('add_a_style') }}</app-button>
+      <s-button @click="$emit('edit', '')">{{ t('add_a_style') }}</s-button>
     </div>
 
     <div class="search-row">
@@ -57,10 +57,8 @@ import Vue from 'vue';
 import { compareAsc } from 'date-fns';
 
 import { Style } from '@stylebot/types';
-import { Heading, TextBlock } from '@stylebot/components';
+import { Heading, TextBlock, SButton, ConfirmDialog } from '@stylebot/components';
 
-import AppButton from './AppButton.vue';
-import ConfirmDialog from './ConfirmDialog.vue';
 import StyleListRow from './styles/StyleListRow.vue';
 import StylesBulkMenu from './styles/StylesBulkMenu.vue';
 
@@ -70,7 +68,7 @@ export default Vue.extend({
   components: {
     Heading,
     TextBlock,
-    AppButton,
+    SButton,
     ConfirmDialog,
     StyleListRow,
     StylesBulkMenu,

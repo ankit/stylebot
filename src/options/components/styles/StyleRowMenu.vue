@@ -6,43 +6,36 @@
 
     <template #default="{ close }">
       <menu-box dense :min-width="200">
-        <button
-          type="button"
-          class="row"
-          role="menuitem"
+        <menu-item
+          class="truncate"
           @click="
             $emit('open-site');
             close();
           "
         >
           Open {{ url }}
-        </button>
+        </menu-item>
 
-        <button
-          type="button"
-          class="row"
-          role="menuitem"
+        <menu-item
           @click="
             $emit('copy-css');
             close();
           "
         >
           Copy CSS
-        </button>
+        </menu-item>
 
         <div class="divider" />
 
-        <button
-          type="button"
-          class="row danger"
-          role="menuitem"
+        <menu-item
+          danger
           @click="
             $emit('delete');
             close();
           "
         >
           Delete this site's style
-        </button>
+        </menu-item>
       </menu-box>
     </template>
   </anchored-menu>
@@ -51,8 +44,7 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { MenuBox } from '@stylebot/components';
-import AnchoredMenu from '../AnchoredMenu.vue';
+import { AnchoredMenu, MenuBox, MenuItem } from '@stylebot/components';
 import IconMenuTrigger from '../IconMenuTrigger.vue';
 
 export default Vue.extend({
@@ -62,6 +54,7 @@ export default Vue.extend({
     AnchoredMenu,
     IconMenuTrigger,
     MenuBox,
+    MenuItem,
   },
 
   props: {
@@ -79,34 +72,11 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-.row {
-  all: unset;
-  box-sizing: border-box;
-  display: block;
-  width: 100%;
+.truncate {
   max-width: 220px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-weight: 400;
-  font-size: 13.5px;
-  line-height: 1.3;
-  color: var(--foreground);
-  padding: 10px;
-  border-radius: 8px;
-  cursor: pointer;
-
-  &:hover {
-    background: var(--accent);
-  }
-
-  &.danger {
-    color: #b3261e;
-
-    &:hover {
-      background: #fdf1f0;
-    }
-  }
 }
 
 .divider {

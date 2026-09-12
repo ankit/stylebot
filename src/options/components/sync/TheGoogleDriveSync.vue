@@ -19,34 +19,32 @@
       </text-block>
     </div>
 
-    <app-button v-if="googleDriveSyncEnabled" :disabled="syncInProgress" @click="syncWithGoogleDrive">
+    <s-button v-if="googleDriveSyncEnabled" :disabled="syncInProgress" @click="syncWithGoogleDrive">
       <arrow-repeat-icon :spinning="syncInProgress" />
       <span>{{ syncInProgress ? t('sync_in_progress') : t('sync_now') }}</span>
-    </app-button>
+    </s-button>
 
-    <app-button v-if="googleDriveSyncEnabled" @click="googleDriveSyncEnabled = false">
+    <s-button v-if="googleDriveSyncEnabled" @click="googleDriveSyncEnabled = false">
       {{ t('disable_google_drive_sync') }}
-    </app-button>
+    </s-button>
 
-    <app-button v-if="!googleDriveSyncEnabled" @click="googleDriveSyncEnabled = true">
+    <s-button v-if="!googleDriveSyncEnabled" @click="googleDriveSyncEnabled = true">
       {{ t('enable_google_drive_sync') }}
-    </app-button>
+    </s-button>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import { formatDistanceToNow } from 'date-fns';
-import { Heading, TextBlock } from '@stylebot/components';
+import { Heading, TextBlock, SButton } from '@stylebot/components';
 import { ArrowRepeatIcon } from '@stylebot/icons';
-
-import AppButton from '../AppButton.vue';
 
 export default Vue.extend({
   name: 'TheGoogleDriveSync',
 
   components: {
-    AppButton,
+    SButton,
     ArrowRepeatIcon,
     Heading,
     TextBlock,

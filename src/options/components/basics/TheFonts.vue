@@ -9,7 +9,7 @@
         :key="font"
         class="chip"
       >
-        <span class="chip-label" :style="{ fontFamily: font }">{{ font }}</span>
+        {{ font }}
         <button
           type="button"
           class="chip-remove"
@@ -47,10 +47,6 @@ import { defaultOptions } from '@stylebot/settings';
 import { Heading, TextBlock } from '@stylebot/components';
 import { IconX } from '@stylebot/icons';
 
-// Chip labels preview in their own font, which requires actually loading it —
-// font-family alone only renders if the browser already has the font.
-const FONT_PREVIEW_LINK_ID = 'stylebot-font-preview-link';
-
 export default Vue.extend({
   name: 'TheFonts',
 
@@ -72,42 +68,7 @@ export default Vue.extend({
     },
   },
 
-  watch: {
-    fonts: {
-      immediate: true,
-      handler(): void {
-        this.loadFontPreviews();
-      },
-    },
-  },
-
-  beforeDestroy() {
-    document.getElementById(FONT_PREVIEW_LINK_ID)?.remove();
-  },
-
   methods: {
-    loadFontPreviews(): void {
-      if (!this.fonts.length) {
-        document.getElementById(FONT_PREVIEW_LINK_ID)?.remove();
-        return;
-      }
-
-      const families = this.fonts
-        .map(font => `family=${encodeURIComponent(font).replace(/%20/g, '+')}`)
-        .join('&');
-      const href = `https://fonts.googleapis.com/css2?${families}&display=swap`;
-
-      let link = document.getElementById(FONT_PREVIEW_LINK_ID) as HTMLLinkElement | null;
-
-      if (!link) {
-        link = document.createElement('link');
-        link.id = FONT_PREVIEW_LINK_ID;
-        link.rel = 'stylesheet';
-        document.head.appendChild(link);
-      }
-
-      link.href = href;
-    },
     setFonts(fonts: Array<string>): void {
       this.$store.dispatch('setOption', { name: 'fonts', value: fonts });
     },
@@ -158,7 +119,6 @@ export default Vue.extend({
   padding: 8px;
   border-radius: 9px;
   border: 1px solid var(--border);
-  background: var(--accent);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -170,37 +130,39 @@ export default Vue.extend({
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 6px 6px 11px;
-  border-radius: 7px;
-  background: var(--background);
-  border: 1px solid color-mix(in srgb, var(--input) 50%, var(--muted-foreground));
-  font-size: 14px;
+  padding: 6px 6px 6px 14px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--foreground) 4%, var(--background));
+  border: 1px solid var(--border);
+  font-size: 13px;
   color: var(--foreground);
-}
-
-.chip-label {
-  line-height: 20px;
 }
 
 .chip-remove {
   all: unset;
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   color: var(--muted-foreground);
   cursor: pointer;
 
   svg {
-    width: 11px;
-    height: 11px;
+    width: 12px;
+    height: 12px;
   }
 
   &:hover {
-    background: var(--accent);
+    background: color-mix(in srgb, var(--foreground) 8%, var(--background));
     color: var(--foreground);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 1px;
   }
 }
 

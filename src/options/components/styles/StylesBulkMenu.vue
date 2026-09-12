@@ -6,43 +6,35 @@
 
     <template #default="{ close }">
       <menu-box dense :min-width="176">
-        <button
-          type="button"
-          class="row"
-          role="menuitem"
+        <menu-item
           @click="
             $emit('enable-all');
             close();
           "
         >
           Enable all
-        </button>
+        </menu-item>
 
-        <button
-          type="button"
-          class="row"
-          role="menuitem"
+        <menu-item
           @click="
             $emit('disable-all');
             close();
           "
         >
           Disable all
-        </button>
+        </menu-item>
 
         <div class="divider" />
 
-        <button
-          type="button"
-          class="row danger"
-          role="menuitem"
+        <menu-item
+          danger
           @click="
             $emit('delete-all');
             close();
           "
         >
           Delete all styles
-        </button>
+        </menu-item>
       </menu-box>
     </template>
   </anchored-menu>
@@ -51,8 +43,7 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { MenuBox } from '@stylebot/components';
-import AnchoredMenu from '../AnchoredMenu.vue';
+import { AnchoredMenu, MenuBox, MenuItem } from '@stylebot/components';
 import IconMenuTrigger from '../IconMenuTrigger.vue';
 
 export default Vue.extend({
@@ -62,37 +53,12 @@ export default Vue.extend({
     AnchoredMenu,
     IconMenuTrigger,
     MenuBox,
+    MenuItem,
   },
 });
 </script>
 
 <style lang="scss" scoped>
-.row {
-  all: unset;
-  box-sizing: border-box;
-  display: block;
-  width: 100%;
-  font-weight: 400;
-  font-size: 13.5px;
-  line-height: 1.3;
-  color: var(--foreground);
-  padding: 10px;
-  border-radius: 8px;
-  cursor: pointer;
-
-  &:hover {
-    background: var(--accent);
-  }
-
-  &.danger {
-    color: #b3261e;
-
-    &:hover {
-      background: #fdf1f0;
-    }
-  }
-}
-
 .divider {
   height: 1px;
   background: var(--border);

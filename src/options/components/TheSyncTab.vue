@@ -20,8 +20,8 @@
       <text-block variant="muted" class="description">{{ t('backup_description') }}</text-block>
 
       <div class="buttons">
-        <app-button @click="exportJson">{{ t('export') }}</app-button>
-        <app-button @click="importJson">{{ t('import') }}</app-button>
+        <s-button @click="exportJson">{{ t('export') }}</s-button>
+        <s-button @click="importJson">{{ t('import') }}</s-button>
       </div>
     </div>
   </div>
@@ -30,8 +30,7 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { Heading, TextBlock } from '@stylebot/components';
-import AppButton from './AppButton.vue';
+import { Heading, TextBlock, SButton } from '@stylebot/components';
 import TheGoogleDriveSync from './sync/TheGoogleDriveSync.vue';
 
 import { importStylesWithFilePicker, exportAsJSONFile } from '../utils';
@@ -42,7 +41,7 @@ export default Vue.extend({
   components: {
     Heading,
     TextBlock,
-    AppButton,
+    SButton,
     TheGoogleDriveSync,
   },
 
@@ -115,8 +114,8 @@ export default Vue.extend({
 }
 
 .banner.error {
-  background: #fdf1f0;
-  border: 1px solid #f6cfcb;
-  color: #b3261e;
+  background: var(--danger-background);
+  border: 1px solid var(--danger-border);
+  color: var(--danger);
 }
 </style>

@@ -1,7 +1,7 @@
 <template>
   <button
     type="button"
-    class="app-button"
+    class="button"
     :class="variant"
     :title="title"
     :disabled="disabled"
@@ -18,7 +18,7 @@ import Vue, { PropType } from 'vue';
 type Variant = 'default' | 'ghost' | 'danger';
 
 export default Vue.extend({
-  name: 'AppButton',
+  name: 'SButton',
 
   props: {
     disabled: {
@@ -40,7 +40,7 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-.app-button {
+.button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -67,7 +67,7 @@ export default Vue.extend({
   }
 }
 
-.app-button.default {
+.button.default {
   background: var(--background);
   border-color: var(--input);
 
@@ -76,17 +76,17 @@ export default Vue.extend({
   }
 }
 
-.app-button.ghost {
+.button.ghost {
   &:hover:not(:disabled) {
     background: var(--accent);
   }
 }
 
-.app-button.danger {
-  color: #b3261e;
+.button.danger {
+  color: var(--danger);
 
   &:hover:not(:disabled) {
-    background: #fdf1f0;
+    background: var(--danger-background);
   }
 }
 </style>

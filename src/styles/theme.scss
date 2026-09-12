@@ -16,6 +16,10 @@
   --info: #eef3ff;
   --info-border: #dbe4fb;
 
+  --danger: #b3261e;
+  --danger-background: #fdf1f0;
+  --danger-border: #f6cfcb;
+
   --ring: var(--primary);
 }
 
@@ -35,5 +39,9 @@
 
     --info: #1f2740;
     --info-border: #2b3654;
+
+    --danger: #f2726a;
+    --danger-background: #3a2220;
+    --danger-border: #4a2b28;
   }
 }

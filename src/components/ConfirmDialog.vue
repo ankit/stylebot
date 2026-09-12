@@ -3,7 +3,7 @@
     <div
       ref="card"
       class="card"
-      role="dialog"
+      role="alertdialog"
       aria-modal="true"
       aria-labelledby="confirm-dialog-title"
       aria-describedby="confirm-dialog-message"
@@ -12,13 +12,13 @@
       <text-block id="confirm-dialog-message" size="caption" variant="muted" class="message">{{ message }}</text-block>
 
       <div class="actions">
-        <app-button ref="cancelButton" variant="ghost" @click="$emit('cancel')">
+        <s-button ref="cancelButton" variant="ghost" @click="$emit('cancel')">
           {{ cancelLabel }}
-        </app-button>
+        </s-button>
 
-        <app-button variant="danger" @click="$emit('confirm')">
+        <s-button variant="danger" @click="$emit('confirm')">
           {{ confirmLabel }}
-        </app-button>
+        </s-button>
       </div>
     </div>
   </div>
@@ -26,15 +26,13 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { Heading, TextBlock } from '@stylebot/components';
-
-import AppButton from './AppButton.vue';
+import { Heading, TextBlock, SButton } from '@stylebot/components';
 
 export default Vue.extend({
   name: 'ConfirmDialog',
 
   components: {
-    AppButton,
+    SButton,
     Heading,
     TextBlock,
   },
@@ -74,13 +72,23 @@ export default Vue.extend({
 
     this.previouslyFocused = document.activeElement as HTMLElement | null;
 
-    const cancelButton = this.$refs.cancelButton as Vue | undefined;
-    (cancelButton?.$el as HTMLElement | undefined)?.focus();
+    // Deferred a tick so it wins over the closing menu's own focus-restore,
+    // which runs in the same reactivity flush and would otherwise steal it back.
+    this.$nextTick(() => {
+      const cancelButton = this.$refs.cancelButton as Vue | undefined;
+      (cancelButton?.$el as HTMLElement | undefined)?.focus();
+    });
   },
 
   beforeDestroy() {
     document.removeEventListener('keydown', this.onKeydown);
-    this.previouslyFocused?.focus();
+
+    // The trigger may have been removed from the DOM by the confirmed action.
+    if (this.previouslyFocused?.isConnected) {
+      this.previouslyFocused.focus();
+    } else {
+      document.body.focus();
+    }
   },
 
   methods: {

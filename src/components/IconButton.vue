@@ -3,7 +3,7 @@
     type="button"
     class="icon-button"
     :class="{ bordered }"
-    :style="bordered && size ? { width: `${size}px`, height: `${size}px` } : undefined"
+    :style="size ? { width: `${size}px`, height: `${size}px` } : undefined"
     :title="title"
     @click.stop="$emit('click', $event)"
   >
@@ -39,6 +39,7 @@ export default Vue.extend({
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  flex: none;
   padding: 4px;
   border: none;
   border-radius: 4px;
@@ -55,7 +56,6 @@ export default Vue.extend({
   }
 
   &.bordered {
-    flex: none;
     width: 46px;
     padding: 0;
     border: 1px solid var(--input);

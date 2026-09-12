@@ -8,17 +8,20 @@
       <button type="button" class="cancel" @click="stopRecording">Cancel</button>
     </div>
 
-    <button
+    <div
       v-else-if="hasValue"
-      type="button"
       class="field has-value"
+      role="button"
+      tabindex="0"
       @click="startRecording"
+      @keydown.enter="startRecording"
+      @keydown.space.prevent="startRecording"
     >
       <shortcut-kbd :value="value" />
-      <span class="clear" aria-label="Clear shortcut" @click.stop="clear">
+      <button type="button" class="clear" aria-label="Clear shortcut" @click.stop="clear">
         <icon-x />
-      </span>
-    </button>
+      </button>
+    </div>
 
     <button v-else type="button" class="record-btn" @click="startRecording">
       <icon-keyboard />
@@ -185,24 +188,32 @@ export default Vue.extend({
 }
 
 .clear {
+  all: unset;
+  box-sizing: border-box;
   flex: none;
   margin-left: auto;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   color: var(--muted-foreground);
+  cursor: pointer;
 
   &:hover {
     background: color-mix(in srgb, var(--foreground) 10%, transparent);
     color: var(--foreground);
   }
 
+  &:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 1px;
+  }
+
   svg {
-    width: 9px;
-    height: 9px;
+    width: 12px;
+    height: 12px;
   }
 }
 
@@ -234,7 +245,7 @@ export default Vue.extend({
   font-size: 12px;
   line-height: 1;
   color: var(--foreground);
-  background: color-mix(in srgb, var(--foreground) 8%, transparent);
+  background: color-mix(in srgb, var(--foreground) 4%, var(--background));
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 10px;
@@ -247,7 +258,7 @@ export default Vue.extend({
   }
 
   &:hover {
-    background: color-mix(in srgb, var(--foreground) 12%, transparent);
+    background: color-mix(in srgb, var(--foreground) 8%, var(--background));
   }
 
   &:focus-visible {

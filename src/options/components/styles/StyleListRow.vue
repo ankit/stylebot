@@ -6,9 +6,9 @@
 
     <text-block size="caption" variant="muted" class="timestamp">{{ formattedTimestamp }}</text-block>
 
-    <app-button variant="ghost" @click="$emit('edit', url)">{{ t('edit') }}</app-button>
+    <s-button variant="ghost" @click="$emit('edit', url)">{{ t('edit') }}</s-button>
 
-    <style-row-menu :url="url" @open-site="openSite" @copy-css="copyCss" @delete="showDeleteConfirm = true" />
+    <style-row-menu :url="url" :size="32" @open-site="openSite" @copy-css="copyCss" @delete="showDeleteConfirm = true" />
 
     <confirm-dialog
       v-if="showDeleteConfirm"
@@ -28,9 +28,7 @@
 import Vue from 'vue';
 import { formatDistanceToNow } from 'date-fns';
 
-import { ToggleSwitch, TextBlock } from '@stylebot/components';
-import AppButton from '../AppButton.vue';
-import ConfirmDialog from '../ConfirmDialog.vue';
+import { ToggleSwitch, TextBlock, SButton, ConfirmDialog } from '@stylebot/components';
 import StyleRowMenu from './StyleRowMenu.vue';
 
 export default Vue.extend({
@@ -39,7 +37,7 @@ export default Vue.extend({
   components: {
     ToggleSwitch,
     TextBlock,
-    AppButton,
+    SButton,
     ConfirmDialog,
     StyleRowMenu,
   },

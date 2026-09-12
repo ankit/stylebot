@@ -41,13 +41,13 @@
         <template v-if="savedLabel"> · {{ savedLabel }}</template>
       </text-block>
 
-      <app-button variant="ghost" :disabled="!isDirty" @click="$emit('back')">
+      <s-button variant="ghost" :disabled="!isDirty" @click="$emit('back')">
         {{ t('discard_changes') }}
-      </app-button>
+      </s-button>
 
-      <app-button :disabled="!valid" @click="save">
+      <s-button :disabled="!valid" @click="save">
         {{ t('save') }}
-      </app-button>
+      </s-button>
     </div>
 
     <confirm-dialog
@@ -76,11 +76,9 @@ import * as postcss from 'postcss';
 import { formatDistanceToNow } from 'date-fns';
 
 import { StyleWithoutUrl } from '@stylebot/types';
-import { ToggleSwitch, IconButton, TextBlock } from '@stylebot/components';
+import { ToggleSwitch, IconButton, TextBlock, SButton, ConfirmDialog } from '@stylebot/components';
 import { ChevronLeftIcon } from '@stylebot/icons';
 
-import AppButton from '../AppButton.vue';
-import ConfirmDialog from '../ConfirmDialog.vue';
 import StyleRowMenu from './StyleRowMenu.vue';
 import CodeEditor from './CodeEditor.vue';
 
@@ -92,7 +90,7 @@ export default Vue.extend({
     ChevronLeftIcon,
     IconButton,
     TextBlock,
-    AppButton,
+    SButton,
     ConfirmDialog,
     StyleRowMenu,
     CodeEditor,
@@ -245,6 +243,11 @@ export default Vue.extend({
   text-overflow: ellipsis;
   white-space: nowrap;
   margin-top: 2px;
+
+  &::placeholder {
+    font-weight: 400;
+    color: var(--muted-foreground);
+  }
 }
 
 .switch.enabled-toggle {

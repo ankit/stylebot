@@ -7,3 +7,7 @@ export { default as MenuBox } from './MenuBox.vue';
 export { default as ToggleSwitch } from './ToggleSwitch.vue';
 export { default as PillButton } from './PillButton.vue';
 export { default as IconButton } from './IconButton.vue';
+export { default as SButton } from './SButton.vue';
+export { default as AnchoredMenu } from './AnchoredMenu.vue';
+export { default as MenuItem } from './MenuItem.vue';
+export { default as ConfirmDialog } from './ConfirmDialog.vue';
