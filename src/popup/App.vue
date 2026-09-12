@@ -1,5 +1,5 @@
 <template>
-  <div class="popup">
+  <theme-provider class="popup">
     <div v-if="restricted">
       <div class="popup-header">
         <heading as="h1" size="sm" class="popup-header-domain popup-header-domain--muted">
@@ -70,12 +70,12 @@
 
       <release-notification />
     </div>
-  </div>
+  </theme-provider>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import { Heading, SText } from '@stylebot/components';
+import { Heading, SText, ThemeProvider } from '@stylebot/components';
 
 import StyleComponent from './components/Style.vue';
 import SettingsButton from './components/SettingsButton.vue';
@@ -105,6 +105,7 @@ export default Vue.extend({
   components: {
     Heading,
     SText,
+    ThemeProvider,
     SettingsButton,
     StyleComponent,
     ToggleStylebot,
@@ -198,7 +199,10 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
-@import '../styles/theme';
+html,
+body {
+  color-scheme: light dark;
+}
 
 * {
   box-sizing: border-box;
@@ -213,8 +217,6 @@ body {
   margin: 0;
   font-family: 'Public Sans', system-ui, sans-serif;
   font-size: 14px;
-  background: var(--background);
-  color: var(--foreground);
 }
 
 .popup {

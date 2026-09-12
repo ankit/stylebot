@@ -1,5 +1,5 @@
 <template>
-  <div class="options-app">
+  <theme-provider class="options-app">
     <the-navigation
       class="nav"
       :tabs="tabs"
@@ -31,7 +31,7 @@
       @cancel="pendingTab = null"
       @confirm="confirmSwitchTab"
     />
-  </div>
+  </theme-provider>
 </template>
 
 <script lang="ts">
@@ -44,7 +44,7 @@ import TheNavigation from './components/TheNavigation.vue';
 import TheNavigationFooter from './components/navigation/TheNavigationFooter.vue';
 import TheStyleEditorPage from './components/styles/TheStyleEditorPage.vue';
 
-import { ConfirmDialog } from '@stylebot/components';
+import { ConfirmDialog, ThemeProvider } from '@stylebot/components';
 
 export default Vue.extend({
   name: 'App',
@@ -56,6 +56,7 @@ export default Vue.extend({
     TheNavigation,
     TheNavigationFooter,
     ConfirmDialog,
+    ThemeProvider,
     TheStyleEditorPage,
   },
 
@@ -123,12 +124,11 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
-@import '../styles/theme';
-
 html,
 body {
   margin: 0;
   height: 100%;
+  color-scheme: light dark;
 }
 
 * {
@@ -137,8 +137,6 @@ body {
 
 body {
   font-family: 'Public Sans', system-ui, sans-serif;
-  background: var(--background);
-  color: var(--foreground);
 }
 
 #app {
