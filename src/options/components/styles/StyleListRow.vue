@@ -4,7 +4,7 @@
       <div class="domain" :class="{ disabled: !enabled }">{{ url }}</div>
     </toggle-switch>
 
-    <div class="timestamp">{{ formattedTimestamp }}</div>
+    <text-block size="caption" variant="muted" class="timestamp">{{ formattedTimestamp }}</text-block>
 
     <app-button variant="ghost" @click="$emit('edit', url)">{{ t('edit') }}</app-button>
 
@@ -28,7 +28,7 @@
 import Vue from 'vue';
 import { formatDistanceToNow } from 'date-fns';
 
-import { ToggleSwitch } from '@stylebot/components';
+import { ToggleSwitch, TextBlock } from '@stylebot/components';
 import AppButton from '../AppButton.vue';
 import ConfirmDialog from '../ConfirmDialog.vue';
 import StyleRowMenu from './StyleRowMenu.vue';
@@ -38,6 +38,7 @@ export default Vue.extend({
 
   components: {
     ToggleSwitch,
+    TextBlock,
     AppButton,
     ConfirmDialog,
     StyleRowMenu,
@@ -126,7 +127,5 @@ export default Vue.extend({
 
 .timestamp {
   flex: none;
-  font-size: 12px;
-  color: var(--muted-foreground);
 }
 </style>

@@ -36,10 +36,10 @@
     </div>
 
     <div class="editor-footer">
-      <div class="stats">
+      <text-block size="caption" variant="muted" class="stats">
         {{ lineCountLabel }} · {{ ruleCountLabel }}
         <template v-if="savedLabel"> · {{ savedLabel }}</template>
-      </div>
+      </text-block>
 
       <app-button variant="ghost" :disabled="!isDirty" @click="$emit('back')">
         {{ t('discard_changes') }}
@@ -76,7 +76,7 @@ import * as postcss from 'postcss';
 import { formatDistanceToNow } from 'date-fns';
 
 import { StyleWithoutUrl } from '@stylebot/types';
-import { ToggleSwitch, IconButton } from '@stylebot/components';
+import { ToggleSwitch, IconButton, TextBlock } from '@stylebot/components';
 import { ChevronLeftIcon } from '@stylebot/icons';
 
 import AppButton from '../AppButton.vue';
@@ -91,6 +91,7 @@ export default Vue.extend({
     ToggleSwitch,
     ChevronLeftIcon,
     IconButton,
+    TextBlock,
     AppButton,
     ConfirmDialog,
     StyleRowMenu,
@@ -281,7 +282,5 @@ export default Vue.extend({
 .stats {
   flex: 1;
   min-width: 0;
-  font-size: 12px;
-  color: var(--muted-foreground);
 }
 </style>
