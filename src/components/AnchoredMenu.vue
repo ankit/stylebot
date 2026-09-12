@@ -26,7 +26,7 @@ export default Vue.extend({
   watch: {
     open(isOpen: boolean): void {
       if (isOpen) {
-        this.previouslyFocused = document.activeElement as HTMLElement | null;
+        this.previouslyFocused = this.activeElement();
         document.addEventListener('mousedown', this.onDocMousedown);
         document.addEventListener('keydown', this.onDocKeydown);
         this.$emit('open');
@@ -60,9 +60,17 @@ export default Vue.extend({
     },
 
     onDocMousedown(event: MouseEvent): void {
-      if (!this.$el.contains(event.target as Node)) {
+      // composedPath()[0], not event.target, is the true origin inside a shadow tree.
+      const origin = event.composedPath()[0];
+      if (!(origin instanceof Node && this.$el.contains(origin))) {
         this.close();
       }
+    },
+
+    activeElement(): HTMLElement | null {
+      const root = this.$el.getRootNode();
+      const active = root instanceof ShadowRoot ? root.activeElement : document.activeElement;
+      return active instanceof HTMLElement ? active : null;
     },
 
     onDocKeydown(event: KeyboardEvent): void {
@@ -82,7 +90,8 @@ export default Vue.extend({
 
       event.preventDefault();
 
-      const currentIndex = items.indexOf(document.activeElement as HTMLElement);
+      const active = this.activeElement();
+      const currentIndex = active ? items.indexOf(active) : -1;
       const delta = event.key === 'ArrowDown' ? 1 : -1;
       const nextIndex = (currentIndex + delta + items.length) % items.length;
       items[nextIndex].focus();
