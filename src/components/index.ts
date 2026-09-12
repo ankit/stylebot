@@ -14,3 +14,4 @@ export { default as ConfirmDialog } from './ConfirmDialog.vue';
 export { default as ThemeProvider } from './ThemeProvider.vue';
 export { default as SAutocomplete } from './SAutocomplete.vue';
 export { default as SSegmentedControl } from './SSegmentedControl.vue';
+export { default as STabs } from './STabs.vue';

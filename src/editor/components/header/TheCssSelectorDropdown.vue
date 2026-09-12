@@ -6,7 +6,7 @@
     :items="filteredSelectors"
     :disabled="disabled"
     :min-width="300"
-    :placeholder="t('enter_css_selector')"
+    :placeholder="t('pick_an_element')"
     @input="setSelector"
     @select="pickSelector"
     @click.native="stopInspecting"
