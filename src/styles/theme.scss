@@ -17,18 +17,6 @@
   --info-border: #dbe4fb;
 
   --ring: var(--primary);
-
-  --main-foreground: var(--foreground);
-  --main-background: var(--background);
-  --border-color: var(--border);
-  --link-color: var(--primary);
-}
-
-.icon {
-  width: 18px;
-  height: 18px;
-  flex: none;
-  vertical-align: -0.25em;
 }
 
 @media (prefers-color-scheme: dark) {

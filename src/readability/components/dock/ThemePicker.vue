@@ -53,7 +53,7 @@ export default Vue.extend({
   height: 24px;
   border-radius: 7px;
   cursor: pointer;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--border);
 
   &.selected {
     border: 2px solid var(--link-color);

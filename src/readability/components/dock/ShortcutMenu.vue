@@ -59,10 +59,15 @@ import {
   keydownToShortcut,
   modifiersFromEvent,
   MODIFIER_KEYS,
-} from '../../../components/utils/keydown-to-shortcut';
+} from '@stylebot/utils';
 import { shortcutStore } from './shortcut-store';
 
-import { ShortcutChip, ShortcutKbd, MenuBox, TextBlock } from '@stylebot/components';
+import {
+  MenuBox,
+  ShortcutChip,
+  ShortcutKbd,
+  TextBlock,
+} from '@stylebot/components';
 import { IconKeyboard, IconX } from '@stylebot/icons';
 
 export default Vue.extend({
@@ -192,7 +197,7 @@ export default Vue.extend({
   font-weight: 600;
   font-size: 12.5px;
   line-height: 1.3;
-  color: var(--main-foreground);
+  color: var(--foreground);
 }
 
 .header-row {
@@ -224,8 +229,8 @@ export default Vue.extend({
   }
 
   &:hover {
-    background: color-mix(in srgb, var(--main-foreground) 6%, transparent);
-    color: var(--main-foreground);
+    background: color-mix(in srgb, var(--foreground) 6%, transparent);
+    color: var(--foreground);
   }
 
   &:focus-visible {
@@ -249,8 +254,8 @@ export default Vue.extend({
   font-weight: 400;
   font-size: 12px;
   line-height: 1;
-  color: var(--main-foreground);
-  background: color-mix(in srgb, var(--main-foreground) 6%, transparent);
+  color: var(--foreground);
+  background: color-mix(in srgb, var(--foreground) 6%, transparent);
   border-radius: 7px;
   padding: 10px;
   cursor: pointer;
@@ -262,7 +267,7 @@ export default Vue.extend({
   }
 
   &:hover {
-    background: color-mix(in srgb, var(--main-foreground) 10%, transparent);
+    background: color-mix(in srgb, var(--foreground) 10%, transparent);
   }
 
   &:focus-visible {
@@ -274,7 +279,7 @@ export default Vue.extend({
 .chip {
   display: inline-flex;
   align-items: center;
-  background: color-mix(in srgb, var(--main-foreground) 7%, transparent);
+  background: color-mix(in srgb, var(--foreground) 7%, transparent);
   border-radius: 6px;
   padding: 4px 8px;
 }
@@ -287,7 +292,7 @@ export default Vue.extend({
 .divider {
   height: 1px;
   margin: 8px 0 4px;
-  background: var(--border-color);
+  background: var(--border);
 }
 
 .row {
@@ -299,13 +304,13 @@ export default Vue.extend({
   font-weight: 400;
   font-size: 12.5px;
   line-height: 1;
-  color: var(--main-foreground);
+  color: var(--foreground);
   padding: 9px 8px;
   border-radius: 6px;
   cursor: pointer;
 
   &:hover {
-    background: color-mix(in srgb, var(--main-foreground) 6%, transparent);
+    background: color-mix(in srgb, var(--foreground) 6%, transparent);
   }
 
   &:focus-visible {
@@ -333,7 +338,7 @@ export default Vue.extend({
   display: flex;
   align-items: center;
   gap: 2px;
-  background: color-mix(in srgb, var(--main-foreground) 6%, transparent);
+  background: color-mix(in srgb, var(--foreground) 6%, transparent);
   border-radius: 6px;
   padding: 8px 9px;
   box-shadow: 0 0 0 2px var(--link-color);
@@ -358,7 +363,7 @@ export default Vue.extend({
   padding: 4px;
 
   &:hover {
-    color: var(--main-foreground);
+    color: var(--foreground);
   }
 }
 

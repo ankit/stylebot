@@ -37,8 +37,8 @@ export default Vue.extend({
   display: flex;
   flex-direction: column;
   gap: 14px;
-  background: var(--main-background);
-  border: 1px solid var(--border-color);
+  background: var(--background);
+  border: 1px solid var(--border);
   color: var(--foreground);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.14);
   animation: dock-menu-in 0.16s ease-out;

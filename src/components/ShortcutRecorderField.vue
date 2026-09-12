@@ -36,7 +36,7 @@ import {
   keydownToShortcut,
   modifiersFromEvent,
   MODIFIER_KEYS,
-} from './utils/keydown-to-shortcut';
+} from '@stylebot/utils';
 
 import ShortcutKbd from './ShortcutKbd.vue';
 import { IconKeyboard, IconX } from '@stylebot/icons';
@@ -147,24 +147,24 @@ export default Vue.extend({
   gap: 8px;
   padding: 7px 9px;
   border-radius: 8px;
-  border: 1px solid var(--border-color);
-  background: color-mix(in srgb, var(--main-foreground) 4%, var(--main-background));
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--foreground) 4%, var(--background));
   cursor: pointer;
 }
 
 .field.has-value {
   &:hover {
-    background: color-mix(in srgb, var(--main-foreground) 8%, var(--main-background));
+    background: color-mix(in srgb, var(--foreground) 8%, var(--background));
   }
 
   &:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 2px var(--link-color);
+    box-shadow: 0 0 0 2px var(--primary);
   }
 }
 
 .field.recording {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--link-color) 18%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 18%, transparent);
   cursor: default;
 }
 
@@ -196,8 +196,8 @@ export default Vue.extend({
   color: var(--muted-foreground);
 
   &:hover {
-    background: color-mix(in srgb, var(--main-foreground) 10%, transparent);
-    color: var(--main-foreground);
+    background: color-mix(in srgb, var(--foreground) 10%, transparent);
+    color: var(--foreground);
   }
 
   svg {
@@ -218,7 +218,7 @@ export default Vue.extend({
   padding: 4px;
 
   &:hover {
-    color: var(--main-foreground);
+    color: var(--foreground);
   }
 }
 
@@ -233,9 +233,9 @@ export default Vue.extend({
   font-weight: 400;
   font-size: 12px;
   line-height: 1;
-  color: var(--main-foreground);
-  background: color-mix(in srgb, var(--main-foreground) 8%, transparent);
-  border: 1px solid var(--border-color);
+  color: var(--foreground);
+  background: color-mix(in srgb, var(--foreground) 8%, transparent);
+  border: 1px solid var(--border);
   border-radius: 8px;
   padding: 10px;
   cursor: pointer;
@@ -247,12 +247,12 @@ export default Vue.extend({
   }
 
   &:hover {
-    background: color-mix(in srgb, var(--main-foreground) 12%, transparent);
+    background: color-mix(in srgb, var(--foreground) 12%, transparent);
   }
 
   &:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 2px var(--link-color);
+    box-shadow: 0 0 0 2px var(--primary);
   }
 }
 

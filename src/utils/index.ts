@@ -1,6 +1,12 @@
 import { format } from 'date-fns';
 import { Timestamp } from '@stylebot/types';
 
+export {
+  MODIFIER_KEYS,
+  modifiersFromEvent,
+  keydownToShortcut,
+} from './keydown-to-shortcut';
+
 export const getCurrentTimestamp = (): Timestamp =>
   format(new Date(), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
 

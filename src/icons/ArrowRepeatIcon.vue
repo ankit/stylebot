@@ -1,10 +1,9 @@
 <template>
   <svg
     viewBox="0 0 16 16"
-    width="1em"
-    height="1em"
+    :width="size"
+    :height="size"
     fill="currentColor"
-    class="icon"
     :class="{ spinning }"
   >
     <path
@@ -25,6 +24,10 @@ export default Vue.extend({
 
   props: {
     spinning: Boolean,
+    size: {
+      type: Number,
+      default: 18,
+    },
   },
 });
 </script>

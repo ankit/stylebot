@@ -32,7 +32,7 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .heading {
   margin: 0;
-  color: var(--main-foreground);
+  color: var(--foreground);
 }
 
 .lg {

@@ -52,7 +52,7 @@
 
   hr {
     border: 0;
-    border-top: 1px solid var(--border-color);
+    border-top: 1px solid var(--border);
     margin: 2em 0;
   }
 
@@ -189,7 +189,7 @@
     border-collapse: separate;
     border-spacing: 0;
     margin: 1.5em 0;
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--border);
     border-radius: 8px;
     overflow: hidden;
   }
@@ -198,8 +198,8 @@
   td {
     width: auto !important;
     border: 0;
-    border-bottom: 1px solid var(--border-color);
-    border-inline-end: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border);
+    border-inline-end: 1px solid var(--border);
     padding: 8px 12px;
     vertical-align: top;
   }

@@ -91,7 +91,7 @@ export default Vue.extend({
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--muted-foreground);
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border);
   transition: color 0.15s ease, border-color 0.15s ease;
 
   &:hover {
