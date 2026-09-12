@@ -1,14 +1,14 @@
 <template>
-  <b-btn
+  <button
+    type="button"
     class="stylebot-inspector"
     :class="{ active }"
     :disabled="disabled"
     :title="`${t('inspect_description')} (i)`"
-    :variant="active ? 'primary' : 'outline-secondary'"
     @click="toggle"
   >
     <inspector-icon />
-  </b-btn>
+  </button>
 </template>
 
 <script lang="ts">
@@ -101,31 +101,34 @@ export default Vue.extend({
 
 <style lang="scss">
 .stylebot-inspector {
-  height: 53px !important;
-  outline: none !important;
-  font-size: 21px !important;
-  border-color: #ccc !important;
-  line-height: 29px !important;
+  all: unset;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 53px;
+  height: 53px;
+  cursor: pointer;
+  color: var(--icon-foreground);
+  border-right: 1px solid var(--border);
 
-  &:hover,
-  &:focus {
-    outline: none;
+  &:hover:not(:disabled):not(.active) {
+    background: var(--active);
   }
 
-  svg {
-    // todo: avoid this pixel pushing
-    margin-left: 1px !important;
+  &:disabled {
+    cursor: default;
+    opacity: 0.5;
   }
 
-  path {
-    fill: #555;
-  }
-
-  &:hover:not(:disabled),
   &.active {
-    path {
-      fill: #fff;
-    }
+    background: var(--primary);
+    color: #fff;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: -2px;
   }
 }
 </style>

@@ -84,9 +84,13 @@ export default Vue.extend({
 <style lang="scss">
 .css-selector-input {
   padding: 4px !important;
+  background: var(--background) !important;
+  color: var(--foreground) !important;
+  border-color: var(--input) !important;
 
   &:focus {
     box-shadow: none !important;
+    border-color: var(--primary) !important;
   }
 
   &.form-control {

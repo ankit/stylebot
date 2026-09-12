@@ -1,18 +1,14 @@
 <template>
-  <b-row class="header pl-3 pr-2 py-2 justify-content-md-between" no-gutters>
-    <b-col cols="2" class="p-0">
-      <the-inspector @select="inspect($event)" />
-    </b-col>
+  <div class="header">
+    <the-inspector @select="inspect($event)" />
 
-    <b-col cols="7" align-self="center" class="px-2">
+    <div class="header-selector">
       <the-css-selector-dropdown />
       <div class="url">{{ url }}</div>
-    </b-col>
+    </div>
 
-    <b-col cols="3">
-      <the-window-actions />
-    </b-col>
-  </b-row>
+    <the-window-actions />
+  </div>
 </template>
 
 <script lang="ts">
@@ -55,11 +51,21 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .header {
-  background: #eee;
+  display: flex;
+  align-items: center;
+  padding-right: 8px;
+  background: var(--accent);
+  border-bottom: 1px solid var(--border);
+}
+
+.header-selector {
+  flex: 1;
+  min-width: 0;
+  padding: 0 8px;
 }
 
 .url {
-  color: #333;
+  color: var(--muted-foreground);
   font-size: 12px;
   padding: 0 8px;
   margin-top: 3px;
