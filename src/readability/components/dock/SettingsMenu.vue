@@ -1,5 +1,5 @@
 <template>
-  <menu-box>
+  <s-menu>
     <theme-picker :theme="theme" @pick="pickTheme" />
 
     <font-picker :font="font" @pick="pickFont" />
@@ -13,7 +13,7 @@
     <div class="reset-row">
       <button class="reset" @click="reset">{{ t('reset') }}</button>
     </div>
-  </menu-box>
+  </s-menu>
 </template>
 
 <script lang="ts">
@@ -22,7 +22,7 @@ import Vue, { PropType } from 'vue';
 import { defaultReadabilitySettings } from '@stylebot/settings';
 import { ReadabilitySettings, ReadabilityTheme } from '@stylebot/types';
 
-import { MenuBox } from '@stylebot/components';
+import { SMenu } from '@stylebot/components';
 import ThemePicker from './ThemePicker.vue';
 import FontPicker from './FontPicker.vue';
 import FontSizePicker from './FontSizePicker.vue';
@@ -33,7 +33,7 @@ export default Vue.extend({
   name: 'SettingsMenu',
 
   components: {
-    MenuBox,
+    SMenu,
     ThemePicker,
     FontPicker,
     FontSizePicker,

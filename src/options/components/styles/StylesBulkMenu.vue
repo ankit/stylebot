@@ -5,7 +5,7 @@
     </template>
 
     <template #default="{ close }">
-      <menu-box dense :min-width="176">
+      <s-menu dense :min-width="176">
         <menu-item
           @click="
             $emit('enable-all');
@@ -35,7 +35,7 @@
         >
           Delete all styles
         </menu-item>
-      </menu-box>
+      </s-menu>
     </template>
   </anchored-menu>
 </template>
@@ -43,7 +43,7 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { AnchoredMenu, MenuBox, MenuItem } from '@stylebot/components';
+import { AnchoredMenu, SMenu, MenuItem } from '@stylebot/components';
 import IconMenuTrigger from '../IconMenuTrigger.vue';
 
 export default Vue.extend({
@@ -52,7 +52,7 @@ export default Vue.extend({
   components: {
     AnchoredMenu,
     IconMenuTrigger,
-    MenuBox,
+    SMenu,
     MenuItem,
   },
 });

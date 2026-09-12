@@ -5,7 +5,7 @@
     </template>
 
     <template #default="{ close }">
-      <menu-box dense :min-width="200">
+      <s-menu dense :min-width="200">
         <menu-item
           class="truncate"
           @click="
@@ -36,7 +36,7 @@
         >
           Delete this site's style
         </menu-item>
-      </menu-box>
+      </s-menu>
     </template>
   </anchored-menu>
 </template>
@@ -44,7 +44,7 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { AnchoredMenu, MenuBox, MenuItem } from '@stylebot/components';
+import { AnchoredMenu, SMenu, MenuItem } from '@stylebot/components';
 import IconMenuTrigger from '../IconMenuTrigger.vue';
 
 export default Vue.extend({
@@ -53,7 +53,7 @@ export default Vue.extend({
   components: {
     AnchoredMenu,
     IconMenuTrigger,
-    MenuBox,
+    SMenu,
     MenuItem,
   },
 
