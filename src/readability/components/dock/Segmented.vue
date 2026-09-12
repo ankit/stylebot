@@ -53,7 +53,7 @@ export default Vue.extend({
   grid-template-columns: 1fr 1fr;
   border-radius: 9px;
   overflow: hidden;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--border);
 
   > button {
     all: unset;
@@ -66,7 +66,7 @@ export default Vue.extend({
     color: var(--foreground);
 
     &:first-child {
-      border-right: 1px solid var(--border-color);
+      border-right: 1px solid var(--border);
       border-radius: 8px 0 0 8px;
     }
 

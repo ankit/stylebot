@@ -33,8 +33,7 @@
 import Vue from 'vue';
 import { EnableStyle, DisableStyle } from '@stylebot/types';
 import PopupRow from './PopupRow.vue';
-import ToggleSwitch from './ToggleSwitch.vue';
-import { ShortcutChip } from '@stylebot/components';
+import { ShortcutChip, ToggleSwitch } from '@stylebot/components';
 import { forwardClickToInput } from '../utils';
 
 export default Vue.extend({

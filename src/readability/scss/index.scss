@@ -9,20 +9,20 @@
 
   @import './content.scss';
 
-  --main-background: #faf8f3;
+  --background: #faf8f3;
   --foreground: #2b2926;
   --muted-foreground: #6f6a5f;
-  --border-color: #e4ddcf;
+  --border: #e4ddcf;
   --link-color: #0b6fb3;
   --link-visited-color: #7c3fa8;
   --image-shadow: 0 1px 3px rgba(43, 41, 38, 0.1),
     0 10px 28px rgba(43, 41, 38, 0.14);
 
   &.sepia {
-    --main-background: #f4ecd8;
+    --background: #f4ecd8;
     --foreground: #5b4636;
     --muted-foreground: #8a7360;
-    --border-color: #e0cfab;
+    --border: #e0cfab;
     --link-color: #9c5c1f;
     --link-visited-color: #7a4518;
     --image-shadow: 0 1px 3px rgba(91, 70, 54, 0.12),
@@ -30,10 +30,10 @@
   }
 
   &.dark {
-    --main-background: #201f1d;
+    --background: #201f1d;
     --foreground: #cac5bc;
     --muted-foreground: #96918a;
-    --border-color: #3c3a36;
+    --border: #3c3a36;
     --link-color: #6197d0;
     --link-visited-color: #a87fc4;
     --image-shadow: 0 0 0 1px rgba(202, 197, 188, 0.08),
@@ -47,7 +47,7 @@
   z-index: 100;
 
   color: var(--foreground);
-  background-color: var(--main-background);
+  background-color: var(--background);
   transition: background-color 0.2s ease, color 0.2s ease, opacity 0.25s ease;
 
   width: 100%;

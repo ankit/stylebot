@@ -30,8 +30,7 @@ import {
   openDonatePage,
 } from '@stylebot/utils';
 
-import MenuBox from './MenuBox.vue';
-import { ShortcutChip } from '@stylebot/components';
+import { MenuBox, ShortcutChip } from '@stylebot/components';
 import { IconOptions, IconFlag, IconCoffee, IconKeyboard } from '@stylebot/icons';
 
 export default Vue.extend({
