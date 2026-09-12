@@ -1,46 +1,41 @@
 <template>
-  <div @click="stopInspecting">
-    <b-input-group class="css-selector-input-group">
-      <the-css-selector-input :disabled="disabled" />
-
-      <template #append>
-        <dropdown-hack-to-support-shadow-dom>
-          <b-dropdown
-            right
-            size="sm"
-            :disabled="disabled"
-            variant="outline-secondary"
-            class="css-selector-dropdown"
-            @show="stopInspecting"
-          >
-            <the-css-selector-dropdown-item
-              v-for="s in selectors"
-              :key="s.id"
-              :count="s.count"
-              :selector="s.value"
-            />
-          </b-dropdown>
-        </dropdown-hack-to-support-shadow-dom>
-      </template>
-    </b-input-group>
-  </div>
+  <s-autocomplete
+    mono
+    class="selector-autocomplete"
+    :value="activeSelector"
+    :items="filteredSelectors"
+    :disabled="disabled"
+    :min-width="300"
+    :placeholder="t('pick_an_element')"
+    @input="setSelector"
+    @select="pickSelector"
+    @click.native="stopInspecting"
+  >
+    <template #item="{ item, select }">
+      <the-css-selector-dropdown-item
+        :selector="item.value"
+        :count="item.count"
+        @select="select"
+      />
+    </template>
+  </s-autocomplete>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
+import { SAutocomplete } from '@stylebot/components';
 import { StylebotEditingMode } from '@stylebot/types';
 
-import TheCssSelectorInput from './TheCssSelectorInput.vue';
 import TheCssSelectorDropdownItem from './TheCssSelectorDropdownItem.vue';
-import DropdownHackToSupportShadowDom from './../DropdownHackToSupportShadowDom.vue';
+
+type CssSelectorMetadata = { id: number; value: string; count: number };
 
 export default Vue.extend({
   name: 'TheCssSelectorDropdown',
 
   components: {
-    TheCssSelectorInput,
+    SAutocomplete,
     TheCssSelectorDropdownItem,
-    DropdownHackToSupportShadowDom,
   },
 
   computed: {
@@ -48,8 +43,24 @@ export default Vue.extend({
       return this.$store.state.options.mode;
     },
 
-    selectors(): Array<{ value: string; count: number }> {
+    activeSelector(): string {
+      return this.$store.state.activeSelector;
+    },
+
+    selectors(): Array<CssSelectorMetadata> {
       return this.$store.state.selectors;
+    },
+
+    filteredSelectors(): Array<CssSelectorMetadata> {
+      const query = this.activeSelector.trim().toLowerCase();
+      if (!query) {
+        return this.selectors;
+      }
+
+      return this.selectors.filter(s => {
+        const value = s.value.toLowerCase();
+        return value.includes(query) && value !== query;
+      });
     },
 
     disabled(): boolean {
@@ -58,17 +69,17 @@ export default Vue.extend({
   },
 
   methods: {
+    setSelector(value: string): void {
+      this.$store.commit('setActiveSelector', value);
+    },
+
+    pickSelector(item: CssSelectorMetadata): void {
+      this.$store.commit('setActiveSelector', item.value);
+    },
+
     stopInspecting(): void {
       this.$store.commit('setInspecting', false);
     },
   },
 });
 </script>
-
-<style lang="scss">
-.css-selector-input-group {
-  .dropdown-toggle {
-    line-height: 21px !important;
-  }
-}
-</style>

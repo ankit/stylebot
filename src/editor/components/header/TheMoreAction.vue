@@ -1,78 +1,79 @@
 <template>
-  <dropdown-hack-to-support-shadow-dom>
-    <b-dropdown
-      right
-      no-caret
-      size="sm"
-      variant="button"
-      toggle-class="text-decoration-none"
-    >
-      <template #button-content>
-        <b-icon icon="three-dots" />
-      </template>
+  <anchored-menu class="more-action-anchor">
+    <template #trigger="{ toggle }">
+      <icon-button :size="24" :title="t('view_options')" @click="toggle">
+        <more-icon />
+      </icon-button>
+    </template>
 
-      <b-dropdown-item @click="dockToLeft">
-        <span class="more-action-check-icon">
-          <b-icon v-if="!dockedRight" icon="check" font-scale="1.1" />
-        </span>
+    <template #default="{ close }">
+      <s-menu class="more-menu">
+        <s-segmented-control
+          class="dock-toggle"
+          :value="layout.dockLocation"
+          :options="dockOptions"
+          @change="dock($event); close();"
+        />
 
-        {{ t('dock_to_left') }} ({{ editorCommands.dockLeft }})
-      </b-dropdown-item>
+        <div class="push-page-row">
+          <div class="push-page-copy">
+            <s-text>{{ t('adjust_page_layout') }}</s-text>
+            <s-text size="caption" variant="muted">{{ t('adjust_page_layout_description') }}</s-text>
+          </div>
 
-      <b-dropdown-item @click="dockToRight">
-        <span class="more-action-check-icon">
-          <b-icon v-if="dockedRight" icon="check" font-scale="1.1" />
-        </span>
+          <toggle-switch :value="adjustPageLayout" size="lg" @change="toggleAdjustPageLayout" />
+        </div>
 
-        {{ t('dock_to_right') }} (r)
-      </b-dropdown-item>
+        <hr class="more-menu-divider" />
 
-      <b-dropdown-item @click="toggleAdjustPageLayout">
-        <span class="more-action-check-icon">
-          <b-icon v-if="adjustPageLayout" icon="check" font-scale="1.1" />
-        </span>
+        <menu-item dense @click="keyboardShortcuts(); close();">
+          <span class="menu-item-row">
+            <span>{{ t('view_keyboard_shortcuts') }}</span>
+            <span class="menu-item-hint">{{ editorCommands.help }}</span>
+          </span>
+        </menu-item>
 
-        {{ t('adjust_page_layout') }} ({{ editorCommands.pageLayout }})
-      </b-dropdown-item>
-
-      <b-dropdown-divider />
-
-      <b-dropdown-item @click="keyboardShortcuts">
-        <span class="more-action-check-icon" />
-
-        {{ t('view_keyboard_shortcuts') }} ({{ editorCommands.help }})
-      </b-dropdown-item>
-
-      <b-dropdown-item @click="optionsPage">
-        <span class="more-action-check-icon" />
-
-        {{ t('view_options') }}
-      </b-dropdown-item>
-
-      <b-dropdown-divider />
-
-      <b-dropdown-item @click="donate">
-        <span class="more-action-check-icon" />
-
-        {{ t('donate') }}
-      </b-dropdown-item>
-    </b-dropdown>
-  </dropdown-hack-to-support-shadow-dom>
+        <menu-item dense @click="optionsPage(); close();">
+          <span class="menu-item-row">
+            <span>{{ t('view_all_styles_and_settings') }}</span>
+            <external-link-icon />
+          </span>
+        </menu-item>
+      </s-menu>
+    </template>
+  </anchored-menu>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
+import {
+  AnchoredMenu,
+  SMenu,
+  MenuItem,
+  IconButton,
+  ToggleSwitch,
+  SSegmentedControl,
+  SText,
+} from '@stylebot/components';
+import { MoreIcon, ExternalLinkIcon } from '@stylebot/icons';
 
 import { StylebotEditorCommands, StylebotLayout } from '@stylebot/types';
-import DropdownHackToSupportShadowDom from '../DropdownHackToSupportShadowDom.vue';
 
-import { openOptionsPage, openDonatePage } from '../../utils/chrome';
+import { openOptionsPage } from '../../utils/chrome';
 
 export default Vue.extend({
   name: 'TheMoreAction',
 
   components: {
-    DropdownHackToSupportShadowDom,
+    AnchoredMenu,
+    SMenu,
+    MenuItem,
+    IconButton,
+    ToggleSwitch,
+    SSegmentedControl,
+    SText,
+    MoreIcon,
+    ExternalLinkIcon,
   },
 
   computed: {
@@ -84,8 +85,19 @@ export default Vue.extend({
       return this.$store.state.editorCommands;
     },
 
-    dockedRight(): boolean {
-      return this.layout.dockLocation === 'right';
+    dockOptions(): Array<{ value: string; label: string; title: string }> {
+      return [
+        {
+          value: 'left',
+          label: this.t('dock_to_left'),
+          title: `${this.t('dock_to_left')} (${this.editorCommands.dockLeft})`,
+        },
+        {
+          value: 'right',
+          label: this.t('dock_to_right'),
+          title: `${this.t('dock_to_right')} (r)`,
+        },
+      ];
     },
 
     adjustPageLayout(): boolean {
@@ -94,17 +106,10 @@ export default Vue.extend({
   },
 
   methods: {
-    dockToRight(): void {
+    dock(dockLocation: string): void {
       this.$store.dispatch('setLayout', {
         ...this.layout,
-        dockLocation: 'right',
-      });
-    },
-
-    dockToLeft(): void {
-      this.$store.dispatch('setLayout', {
-        ...this.layout,
-        dockLocation: 'left',
+        dockLocation,
       });
     },
 
@@ -122,18 +127,59 @@ export default Vue.extend({
     optionsPage(): void {
       openOptionsPage();
     },
-
-    donate(): void {
-      openDonatePage();
-    },
   },
 });
 </script>
 
 <style lang="scss" scoped>
-.more-action-check-icon {
-  height: 10px;
-  width: 16px;
-  display: inline-block;
+.more-menu {
+  width: 230px;
+  padding: 8px 10px !important;
+  gap: 0 !important;
+}
+
+.dock-toggle {
+  margin: 0 8px;
+}
+
+.push-page-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 16px 8px 6px;
+
+  ::v-deep .switch {
+    width: auto;
+    gap: 0;
+    margin-top: 2px;
+  }
+}
+
+.push-page-copy {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.more-menu-divider {
+  margin: 10px -10px;
+  border: none;
+  border-top: 1px solid var(--border);
+}
+
+.menu-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+}
+
+.menu-item-hint {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--muted-foreground);
 }
 </style>

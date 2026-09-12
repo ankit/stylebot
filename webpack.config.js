@@ -148,7 +148,15 @@ const config = {
               ],
             },
           },
-          'sass-loader',
+          {
+            loader: 'sass-loader',
+            options: {
+              prependData: `@import "mixins";`,
+              sassOptions: {
+                includePaths: [path.resolve(__dirname, 'src/styles')],
+              },
+            },
+          },
         ],
       },
     ],

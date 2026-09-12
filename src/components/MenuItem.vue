@@ -1,5 +1,5 @@
 <template>
-  <button type="button" class="menu-item" :class="{ danger }" role="menuitem" @click="$emit('click', $event)">
+  <button type="button" class="menu-item" :class="{ danger, dense }" role="menuitem" @click="$emit('click', $event)">
     <slot />
   </button>
 </template>
@@ -15,16 +15,21 @@ export default Vue.extend({
       type: Boolean,
       default: false,
     },
+
+    dense: {
+      type: Boolean,
+      default: false,
+    },
   },
 });
 </script>
 
 <style lang="scss" scoped>
 .menu-item {
-  all: unset;
-  box-sizing: border-box;
+  @include button-reset;
   display: block;
   width: 100%;
+  flex-shrink: 0;
   font-weight: 400;
   font-size: 13.5px;
   line-height: 1.3;
@@ -48,6 +53,12 @@ export default Vue.extend({
     &:hover {
       background: var(--danger-background);
     }
+  }
+
+  &.dense {
+    padding: 7px 8px;
+    font-size: 12.5px;
+    border-radius: 6px;
   }
 }
 </style>
