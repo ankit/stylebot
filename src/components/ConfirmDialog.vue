@@ -70,7 +70,7 @@ export default Vue.extend({
   mounted() {
     document.addEventListener('keydown', this.onKeydown);
 
-    this.previouslyFocused = document.activeElement as HTMLElement | null;
+    this.previouslyFocused = this.activeElement();
 
     // Deferred a tick so it wins over the closing menu's own focus-restore,
     // which runs in the same reactivity flush and would otherwise steal it back.
@@ -97,6 +97,12 @@ export default Vue.extend({
       return Array.from(card.querySelectorAll<HTMLElement>('button, a[href], [tabindex]'));
     },
 
+    activeElement(): HTMLElement | null {
+      const root = this.$el.getRootNode();
+      const active = root instanceof ShadowRoot ? root.activeElement : document.activeElement;
+      return active instanceof HTMLElement ? active : null;
+    },
+
     onKeydown(event: KeyboardEvent): void {
       if (event.key === 'Escape') {
         this.$emit('cancel');
@@ -116,11 +122,12 @@ export default Vue.extend({
 
       const first = focusable[0];
       const last = focusable[focusable.length - 1];
+      const active = this.activeElement();
 
-      if (event.shiftKey && document.activeElement === first) {
+      if (event.shiftKey && active === first) {
         event.preventDefault();
         last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
+      } else if (!event.shiftKey && active === last) {
         event.preventDefault();
         first.focus();
       }
