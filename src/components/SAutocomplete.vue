@@ -1,5 +1,5 @@
 <template>
-  <anchored-menu ref="menu" class="autocomplete" retain-focus @dismiss="onDismiss">
+  <anchored-menu ref="menu" class="autocomplete" retain-focus @cancel="onCancel">
     <template #trigger="{ open }">
       <div class="autocomplete-pill" :class="{ disabled }">
         <textarea
@@ -10,7 +10,7 @@
           :disabled="disabled"
           :value="value"
           :placeholder="placeholder"
-          @keydown.enter.prevent
+          @keydown.enter.prevent="onEnter"
           @focus="onFocus"
           @input="onInput($event.target.value)"
         />
@@ -176,10 +176,19 @@ export default Vue.extend({
       this.hideMenu();
     },
 
-    onDismiss(): void {
+    onEnter(): void {
+      // Confirm the typed value (which may be a custom entry not in `items`):
+      // keep it, close, and make it the new revert baseline.
+      this.suppressReopen = true;
+      this.previousValue = this.value;
+      this.hideMenu();
+      this.$emit('submit', this.value);
+    },
+
+    onCancel(): void {
       // Escape / click-outside revert to the value from before this editing
       // session and keep the menu closed (the refocus-on-close would otherwise
-      // reopen it).
+      // reopen it). Enter (onEnter) commits instead.
       this.suppressReopen = true;
       this.$emit('input', this.previousValue);
     },

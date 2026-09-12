@@ -99,8 +99,9 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .css-selector-dropdown-item {
-  padding: 8px !important;
-  border-radius: 0 6px 6px 0 !important;
+  padding: 8px 12px !important;
+  margin: 0 -4px !important;
+  border-radius: 0 !important;
 }
 
 .css-selector-dropdown-item:hover,
