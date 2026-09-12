@@ -10,14 +10,14 @@
 
     <div>
       <heading as="h1">{{ t('sync_options') }}</heading>
-      <text-block variant="muted" class="description">Keep your styles on every computer you sign in to.</text-block>
+      <s-text variant="muted" class="description">Keep your styles on every computer you sign in to.</s-text>
 
       <the-google-drive-sync />
     </div>
 
     <div class="section">
       <heading as="h2">{{ t('backup') }}</heading>
-      <text-block variant="muted" class="description">{{ t('backup_description') }}</text-block>
+      <s-text variant="muted" class="description">{{ t('backup_description') }}</s-text>
 
       <div class="buttons">
         <s-button @click="exportJson">{{ t('export') }}</s-button>
@@ -30,7 +30,7 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { Heading, TextBlock, SButton } from '@stylebot/components';
+import { Heading, SText, SButton } from '@stylebot/components';
 import TheGoogleDriveSync from './sync/TheGoogleDriveSync.vue';
 
 import { importStylesWithFilePicker, exportAsJSONFile } from '../utils';
@@ -40,7 +40,7 @@ export default Vue.extend({
 
   components: {
     Heading,
-    TextBlock,
+    SText,
     SButton,
     TheGoogleDriveSync,
   },

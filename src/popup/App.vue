@@ -9,9 +9,9 @@
 
       <div class="popup-divider" />
 
-      <text-block variant="muted" class="popup-restricted-message">
+      <s-text variant="muted" class="popup-restricted-message">
         {{ t('restricted_page_description') }}
-      </text-block>
+      </s-text>
 
       <div class="popup-divider" />
 
@@ -31,9 +31,9 @@
       />
       <div v-else class="popup-header">
         <heading as="h1" size="sm" class="popup-header-domain">{{ domain }}</heading>
-        <text-block size="caption" variant="muted">
+        <s-text size="caption" variant="muted">
           {{ t('no_style_saved_for_site') }}
-        </text-block>
+        </s-text>
       </div>
 
       <div class="popup-divider" />
@@ -75,7 +75,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { Heading, TextBlock } from '@stylebot/components';
+import { Heading, SText } from '@stylebot/components';
 
 import StyleComponent from './components/Style.vue';
 import SettingsButton from './components/SettingsButton.vue';
@@ -104,7 +104,7 @@ export default Vue.extend({
 
   components: {
     Heading,
-    TextBlock,
+    SText,
     SettingsButton,
     StyleComponent,
     ToggleStylebot,

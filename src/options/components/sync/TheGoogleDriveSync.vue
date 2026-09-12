@@ -3,11 +3,11 @@
     <div class="text">
       <heading as="h2" size="sm">Google Drive</heading>
 
-      <text-block v-if="!googleDriveSyncEnabled" size="caption" variant="muted" class="description">
+      <s-text v-if="!googleDriveSyncEnabled" size="caption" variant="muted" class="description">
         Not connected. Styles stay on this computer only.
-      </text-block>
+      </s-text>
 
-      <text-block v-else size="caption" variant="muted" class="description">
+      <s-text v-else size="caption" variant="muted" class="description">
         {{ t('synced_at_time', [googleDriveSyncLastModifiedTime]) }}
         <template v-if="syncInProgress"> · {{ t('sync_in_progress') }}</template>
         <template v-if="googleDriveSyncViewLink">
@@ -16,7 +16,7 @@
           ·
           <a :href="googleDriveSyncDownloadLink" target="_blank">{{ t('download_synced_file') }}</a>
         </template>
-      </text-block>
+      </s-text>
     </div>
 
     <s-button v-if="googleDriveSyncEnabled" :disabled="syncInProgress" @click="syncWithGoogleDrive">
@@ -37,7 +37,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { formatDistanceToNow } from 'date-fns';
-import { Heading, TextBlock, SButton } from '@stylebot/components';
+import { Heading, SText, SButton } from '@stylebot/components';
 import { ArrowRepeatIcon } from '@stylebot/icons';
 
 export default Vue.extend({
@@ -47,7 +47,7 @@ export default Vue.extend({
     SButton,
     ArrowRepeatIcon,
     Heading,
-    TextBlock,
+    SText,
   },
 
   data(): {

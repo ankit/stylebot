@@ -1,7 +1,7 @@
 <template>
   <div>
     <heading as="h2">{{ t('keyboard_shortcuts') }}</heading>
-    <text-block variant="muted" class="description">{{ t('keyboard_shortcuts_description') }}</text-block>
+    <s-text variant="muted" class="description">{{ t('keyboard_shortcuts_description') }}</s-text>
 
     <div class="rows">
       <shortcut-row :label="t('toggle_editor')">
@@ -26,7 +26,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { StylebotCommandName, StylebotCommands } from '@stylebot/types';
-import { ShortcutRecorderField, Heading, TextBlock } from '@stylebot/components';
+import { ShortcutRecorderField, Heading, SText } from '@stylebot/components';
 
 import ShortcutRow from './ShortcutRow.vue';
 
@@ -37,7 +37,7 @@ export default Vue.extend({
     ShortcutRow,
     ShortcutRecorderField,
     Heading,
-    TextBlock,
+    SText,
   },
 
   computed: {
