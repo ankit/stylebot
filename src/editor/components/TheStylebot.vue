@@ -1,17 +1,17 @@
 <template>
   <the-stylebot-resizer>
-    <the-header />
+    <div class="stylebot-content">
+      <the-header />
 
-    <div
-      class="stylebot-body"
-      :style="colorPickerVisible ? 'pointer-events: none' : ''"
-    >
-      <the-basic-editor v-if="mode === 'basic'" />
-      <the-magic-editor v-else-if="mode === 'magic'" />
-      <the-code-editor v-else-if="mode === 'code' && !resizing" />
+      <div
+        class="stylebot-body"
+        :style="colorPickerVisible ? 'pointer-events: none' : ''"
+      >
+        <the-basic-editor v-if="mode === 'basic'" />
+        <the-magic-editor v-else-if="mode === 'magic'" />
+        <the-code-editor v-else-if="mode === 'code' && !resizing" />
+      </div>
     </div>
-
-    <the-footer />
   </the-stylebot-resizer>
 </template>
 
@@ -19,7 +19,6 @@
 import Vue from 'vue';
 
 import TheHeader from './TheHeader.vue';
-import TheFooter from './TheFooter.vue';
 import TheCodeEditor from './TheCodeEditor.vue';
 import TheBasicEditor from './TheBasicEditor.vue';
 import TheMagicEditor from './TheMagicEditor.vue';
@@ -32,7 +31,6 @@ export default Vue.extend({
 
   components: {
     TheHeader,
-    TheFooter,
     TheBasicEditor,
     TheMagicEditor,
     TheCodeEditor,
@@ -64,8 +62,17 @@ export default Vue.extend({
   background: var(--background);
 }
 
+.stylebot-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
 .stylebot-body {
+  flex: 1;
+  min-height: 0;
   overflow: auto;
-  height: calc(100% - 125px);
 }
 </style>

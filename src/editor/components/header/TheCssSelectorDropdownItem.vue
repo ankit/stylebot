@@ -1,22 +1,22 @@
 <template>
-  <div @mouseenter="mouseenter" @mouseleave="mouseleave">
-    <b-dropdown-item
-      :title="`${selector} (${count})`"
-      class="css-selector-dropdown-item"
-      @click="click"
-    >
-      {{ `${selector} (${count})` }}
-    </b-dropdown-item>
-  </div>
+  <menu-item class="css-selector-dropdown-item" @click="click" @mouseenter.native="mouseenter" @mouseleave.native="mouseleave">
+    {{ `${selector} (${count})` }}
+  </menu-item>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
+import { MenuItem } from '@stylebot/components';
 import { validateSelector } from '@stylebot/css';
 import { Highlighter } from '@stylebot/highlighter';
 
 export default Vue.extend({
   name: 'TheCssSelectorDropdownItem',
+
+  components: {
+    MenuItem,
+  },
+
   props: {
     selector: {
       type: String,
@@ -45,6 +45,7 @@ export default Vue.extend({
   methods: {
     click(): void {
       this.$store.commit('setActiveSelector', this.selector);
+      this.$emit('select');
     },
 
     mouseenter(): void {
@@ -64,6 +65,10 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .css-selector-dropdown-item {
-  font-family: Monaco, monospace;
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: Menlo, Monaco, Consolas, monospace;
 }
 </style>

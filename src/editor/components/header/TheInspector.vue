@@ -1,14 +1,16 @@
 <template>
-  <b-btn
+  <button
+    type="button"
     class="stylebot-inspector"
     :class="{ active }"
     :disabled="disabled"
     :title="`${t('inspect_description')} (i)`"
-    :variant="active ? 'primary' : 'outline-secondary'"
     @click="toggle"
   >
-    <inspector-icon />
-  </b-btn>
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor">
+      <path d="M4.5 3.9 14.7 9.3 10.1 10.5 8.6 15.1z" />
+    </svg>
+  </button>
 </template>
 
 <script lang="ts">
@@ -17,14 +19,8 @@ import Vue from 'vue';
 import { Highlighter } from '@stylebot/highlighter';
 import { StylebotEditingMode } from '@stylebot/types';
 
-import InspectorIcon from './InspectorIcon.vue';
-
 export default Vue.extend({
   name: 'TheInspector',
-
-  components: {
-    InspectorIcon,
-  },
 
   data(): {
     highlighter: Highlighter | null;
@@ -101,31 +97,36 @@ export default Vue.extend({
 
 <style lang="scss">
 .stylebot-inspector {
-  height: 53px !important;
-  outline: none !important;
-  font-size: 21px !important;
-  border-color: #ccc !important;
-  line-height: 29px !important;
+  all: unset;
+  box-sizing: border-box;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
+  cursor: pointer;
+  background: var(--accent);
+  color: var(--icon-foreground);
 
-  &:hover,
-  &:focus {
-    outline: none;
+  &:hover:not(:disabled):not(.active) {
+    background: var(--active);
   }
 
-  svg {
-    // todo: avoid this pixel pushing
-    margin-left: 1px !important;
+  &:disabled {
+    cursor: default;
+    opacity: 0.5;
   }
 
-  path {
-    fill: #555;
-  }
-
-  &:hover:not(:disabled),
   &.active {
-    path {
-      fill: #fff;
-    }
+    background: var(--primary);
+    color: #fff;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
   }
 }
 </style>
