@@ -62,7 +62,7 @@ describe('ShortcutMenu.vue', () => {
   it('capturing a key combo persists it and stops recording', async () => {
     const wrapper = mountMenu('alt+shift+r');
 
-    await wrapper.findAll('.row').at(0).trigger('click'); // "change_shortcut"
+    await wrapper.findAll('.menu-item').at(0).trigger('click'); // "change_shortcut"
     expect(shortcutStore.state.recording).toBe(true);
 
     wrapper.element.dispatchEvent(
@@ -90,7 +90,7 @@ describe('ShortcutMenu.vue', () => {
   it('clicking Remove clears the shortcut', async () => {
     const wrapper = mountMenu('alt+shift+r');
 
-    await wrapper.find('.row.danger').trigger('click');
+    await wrapper.find('.menu-item.danger').trigger('click');
 
     expect(setCommands).toHaveBeenCalledWith(expect.objectContaining({ readability: '' }));
   });

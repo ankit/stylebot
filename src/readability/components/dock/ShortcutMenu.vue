@@ -25,8 +25,8 @@
         </div>
         <s-text size="caption" variant="muted" class="desc">{{ t('readability_shortcut_description') }}</s-text>
         <div class="divider" />
-        <button type="button" class="row" @click="startRecording">{{ t('change_shortcut') }}</button>
-        <button type="button" class="row danger" @click="remove">{{ t('remove') }}</button>
+        <menu-item @click="startRecording">{{ t('change_shortcut') }}</menu-item>
+        <menu-item danger @click="remove">{{ t('remove') }}</menu-item>
       </div>
 
       <div v-else class="content">
@@ -63,9 +63,10 @@ import {
 import { shortcutStore } from './shortcut-store';
 
 import {
-  SMenu,
+  MenuItem,
   ShortcutChip,
   ShortcutKbd,
+  SMenu,
   SText,
 } from '@stylebot/components';
 import { IconKeyboard, IconX } from '@stylebot/icons';
@@ -74,9 +75,10 @@ export default Vue.extend({
   name: 'ShortcutMenu',
 
   components: {
-    SMenu,
+    MenuItem,
     ShortcutKbd,
     ShortcutChip,
+    SMenu,
     SText,
     IconKeyboard,
     IconX,
@@ -293,38 +295,6 @@ export default Vue.extend({
   height: 1px;
   margin: 8px 0 4px;
   background: var(--border);
-}
-
-.row {
-  all: unset;
-  box-sizing: border-box;
-  display: block;
-  width: calc(100% + 16px);
-  margin: 0 -8px;
-  font-weight: 400;
-  font-size: 12.5px;
-  line-height: 1;
-  color: var(--foreground);
-  padding: 9px 8px;
-  border-radius: 6px;
-  cursor: pointer;
-
-  &:hover {
-    background: color-mix(in srgb, var(--foreground) 6%, transparent);
-  }
-
-  &:focus-visible {
-    outline: none;
-    box-shadow: inset 0 0 0 2px var(--link-color);
-  }
-
-  &.danger {
-    color: #d1453d;
-
-    &:hover {
-      background: rgba(209, 69, 61, 0.1);
-    }
-  }
 }
 
 .capture-row {
