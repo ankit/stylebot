@@ -17,6 +17,6 @@ export default Vue.extend({ name: 'IconToggle' });
 }
 
 .thumb {
-  fill: var(--main-background);
+  fill: var(--background);
 }
 </style>

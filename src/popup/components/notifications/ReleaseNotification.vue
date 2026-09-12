@@ -16,7 +16,7 @@
     </text-block>
 
     <icon-button class="release-dismiss" :title="t('hide')" @click="dismiss">
-      <x-icon :scale="1.2" />
+      <x-icon :size="22" />
     </icon-button>
   </div>
 </template>

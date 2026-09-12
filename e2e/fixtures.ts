@@ -28,6 +28,8 @@ export const test = base.extend<{
       channel: 'chrome',
       chromiumSandbox: true,
       viewport: null,
+      // null leaves prefers-color-scheme unemulated, matching the real OS setting.
+      colorScheme: null,
       ignoreDefaultArgs: [
         // Playwright disables extensions by default, which would block our CDP-loaded one.
         '--disable-extensions',

@@ -73,7 +73,7 @@ export default Vue.extend({
 .fonts {
   border-radius: 9px;
   overflow: hidden;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--border);
   display: flex;
   flex-direction: column;
 }
@@ -88,7 +88,7 @@ export default Vue.extend({
   color: var(--foreground);
 
   & + & {
-    border-top: 1px solid var(--border-color);
+    border-top: 1px solid var(--border);
   }
 
   &:first-child {

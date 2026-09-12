@@ -59,11 +59,15 @@ import {
   keydownToShortcut,
   modifiersFromEvent,
   MODIFIER_KEYS,
-} from './utils/keydown-to-shortcut';
+} from '@stylebot/utils';
 import { shortcutStore } from './shortcut-store';
 
-import MenuBox from './MenuBox.vue';
-import { ShortcutChip, ShortcutKbd, TextBlock } from '@stylebot/components';
+import {
+  MenuBox,
+  ShortcutChip,
+  ShortcutKbd,
+  TextBlock,
+} from '@stylebot/components';
 import { IconKeyboard, IconX } from '@stylebot/icons';
 
 export default Vue.extend({
@@ -288,7 +292,7 @@ export default Vue.extend({
 .divider {
   height: 1px;
   margin: 8px 0 4px;
-  background: var(--border-color);
+  background: var(--border);
 }
 
 .row {

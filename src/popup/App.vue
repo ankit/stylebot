@@ -275,11 +275,4 @@ body {
   flex: 1;
   font-size: 13.5px;
 }
-
-.popup-icon {
-  width: 18px;
-  height: 18px;
-  flex: none;
-  vertical-align: -0.25em;
-}
 </style>
