@@ -1,6 +1,19 @@
 <template>
-  <menu-item class="css-selector-dropdown-item" @click="click" @mouseenter.native="mouseenter" @mouseleave.native="mouseleave">
-    {{ `${selector} (${count})` }}
+  <menu-item
+    dense
+    class="css-selector-dropdown-item"
+    @click="click"
+    @mouseenter.native="preview"
+    @mouseleave.native="clearPreview"
+    @focus.native="preview"
+    @blur.native="clearPreview"
+  >
+    <span class="item-row">
+      <span class="chips">
+        <span v-for="(part, i) in parts" :key="i" class="chip">{{ part }}</span>
+      </span>
+      <span v-if="count > 0" class="count">{{ count }}</span>
+    </span>
   </menu-item>
 </template>
 
@@ -34,6 +47,15 @@ export default Vue.extend({
     };
   },
 
+  computed: {
+    parts(): Array<string> {
+      return this.selector
+        .split(',')
+        .map(part => part.trim())
+        .filter(Boolean);
+    },
+  },
+
   created() {
     this.highlighter = new Highlighter({
       onSelect: () => {
@@ -42,13 +64,25 @@ export default Vue.extend({
     });
   },
 
+  beforeDestroy() {
+    // The menu unmounts on select/close, so the pointer/focus leave events
+    // may never fire to clear a preview highlight — clear it here.
+    this.highlighter?.unhighlight();
+  },
+
   methods: {
     click(): void {
-      this.$store.commit('setActiveSelector', this.selector);
       this.$emit('select');
     },
 
-    mouseenter(): void {
+    preview(): void {
+      // Skip whole-page selectors — highlighting them just floods the page.
+      const wholePage = ['*', 'body', 'html', ':root'];
+      if (this.parts.some(part => wholePage.includes(part))) {
+        this.highlighter?.unhighlight();
+        return;
+      }
+
       if (validateSelector(this.selector)) {
         this.highlighter?.highlight(this.selector);
       } else {
@@ -56,7 +90,7 @@ export default Vue.extend({
       }
     },
 
-    mouseleave(): void {
+    clearPreview(): void {
       this.highlighter?.unhighlight();
     },
   },
@@ -65,10 +99,54 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .css-selector-dropdown-item {
-  max-width: 320px;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  padding: 8px 8px 8px 5px !important;
+  border-left: 3px solid transparent !important;
+  border-radius: 0 6px 6px 0 !important;
+}
+
+.css-selector-dropdown-item:hover,
+.css-selector-dropdown-item:focus-visible {
+  background: var(--accent) !important;
+  border-left-color: var(--primary) !important;
+  box-shadow: none !important;
+}
+
+.item-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+}
+
+.chips {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.chip {
+  padding: 2px 6px;
+  border-radius: 5px;
+  background: var(--accent);
+  font-family: 'Fira Code', Menlo, Monaco, Consolas, monospace;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--foreground);
   white-space: nowrap;
-  font-family: Menlo, Monaco, Consolas, monospace;
+}
+
+.count {
+  flex: none;
+  margin-top: 2px;
+  font-family: 'Fira Code', Menlo, Monaco, Consolas, monospace;
+  font-size: 11px;
+  color: var(--muted-foreground);
+}
+
+.css-selector-dropdown-item:hover .chip,
+.css-selector-dropdown-item:focus-visible .chip {
+  background: var(--background);
 }
 </style>

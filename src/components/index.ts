@@ -12,3 +12,5 @@ export { default as AnchoredMenu } from './AnchoredMenu.vue';
 export { default as MenuItem } from './MenuItem.vue';
 export { default as ConfirmDialog } from './ConfirmDialog.vue';
 export { default as ThemeProvider } from './ThemeProvider.vue';
+export { default as SAutocomplete } from './SAutocomplete.vue';
+export { default as SSegmentedControl } from './SSegmentedControl.vue';

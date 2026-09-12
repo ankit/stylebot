@@ -44,6 +44,7 @@ export default Vue.extend({
   border: none;
   border-radius: 4px;
   background: transparent;
+  color: inherit;
   cursor: pointer;
 
   &:hover {

@@ -26,5 +26,6 @@ export default Vue.extend({
   display: flex;
   align-items: center;
   gap: 4px;
+  color: var(--icon-foreground);
 }
 </style>

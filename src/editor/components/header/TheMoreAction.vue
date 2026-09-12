@@ -8,27 +8,12 @@
 
     <template #default="{ close }">
       <s-menu class="more-menu">
-        <div class="dock-toggle" role="group">
-          <button
-            type="button"
-            class="dock-option"
-            :class="{ active: !dockedRight }"
-            :title="`${t('dock_to_left')} (${editorCommands.dockLeft})`"
-            @click="dockToLeft(); close();"
-          >
-            {{ t('dock_to_left') }}
-          </button>
-
-          <button
-            type="button"
-            class="dock-option"
-            :class="{ active: dockedRight }"
-            :title="`${t('dock_to_right')} (r)`"
-            @click="dockToRight(); close();"
-          >
-            {{ t('dock_to_right') }}
-          </button>
-        </div>
+        <s-segmented-control
+          class="dock-toggle"
+          :value="layout.dockLocation"
+          :options="dockOptions"
+          @change="dock($event); close();"
+        />
 
         <div class="push-page-row">
           <div class="push-page-copy">
@@ -41,14 +26,14 @@
 
         <hr class="more-menu-divider" />
 
-        <menu-item @click="keyboardShortcuts(); close();">
+        <menu-item dense @click="keyboardShortcuts(); close();">
           <span class="menu-item-row">
             <span>{{ t('view_keyboard_shortcuts') }}</span>
             <span class="menu-item-hint">{{ editorCommands.help }}</span>
           </span>
         </menu-item>
 
-        <menu-item @click="optionsPage(); close();">
+        <menu-item dense @click="optionsPage(); close();">
           <span class="menu-item-row">
             <span>{{ t('view_all_styles_and_settings') }}</span>
             <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
@@ -63,7 +48,14 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { AnchoredMenu, SMenu, MenuItem, IconButton, ToggleSwitch } from '@stylebot/components';
+import {
+  AnchoredMenu,
+  SMenu,
+  MenuItem,
+  IconButton,
+  ToggleSwitch,
+  SSegmentedControl,
+} from '@stylebot/components';
 import { MoreIcon } from '@stylebot/icons';
 
 import { StylebotEditorCommands, StylebotLayout } from '@stylebot/types';
@@ -79,6 +71,7 @@ export default Vue.extend({
     MenuItem,
     IconButton,
     ToggleSwitch,
+    SSegmentedControl,
     MoreIcon,
   },
 
@@ -91,8 +84,19 @@ export default Vue.extend({
       return this.$store.state.editorCommands;
     },
 
-    dockedRight(): boolean {
-      return this.layout.dockLocation === 'right';
+    dockOptions(): Array<{ value: string; label: string; title: string }> {
+      return [
+        {
+          value: 'left',
+          label: this.t('dock_to_left'),
+          title: `${this.t('dock_to_left')} (${this.editorCommands.dockLeft})`,
+        },
+        {
+          value: 'right',
+          label: this.t('dock_to_right'),
+          title: `${this.t('dock_to_right')} (r)`,
+        },
+      ];
     },
 
     adjustPageLayout(): boolean {
@@ -101,17 +105,10 @@ export default Vue.extend({
   },
 
   methods: {
-    dockToRight(): void {
+    dock(dockLocation: string): void {
       this.$store.dispatch('setLayout', {
         ...this.layout,
-        dockLocation: 'right',
-      });
-    },
-
-    dockToLeft(): void {
-      this.$store.dispatch('setLayout', {
-        ...this.layout,
-        dockLocation: 'left',
+        dockLocation,
       });
     },
 
@@ -135,52 +132,24 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .more-menu {
-  width: 250px;
-  padding: 11px 12px 10px !important;
+  width: 230px;
+  padding: 8px 10px !important;
   gap: 0 !important;
 }
 
 .dock-toggle {
-  display: flex;
-  gap: 2px;
-  padding: 2px;
-  border-radius: 8px;
-  background: var(--accent);
-}
-
-.dock-option {
-  flex: 1;
-  text-align: center;
-  padding: 6px 0;
-  border: none;
-  border-radius: 6px;
-  background: none;
-  font-family: inherit;
-  font-size: 12px;
-  color: var(--muted-foreground);
-  cursor: pointer;
-
-  &.active {
-    font-weight: 600;
-    color: var(--foreground);
-    background: var(--background);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  }
-
-  &:focus-visible {
-    outline: 2px solid var(--ring);
-    outline-offset: -2px;
-  }
+  margin: 0 8px;
 }
 
 .push-page-row {
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  margin: 11px 0 5px;
+  margin: 16px 8px 6px;
 
   ::v-deep .switch {
     width: auto;
+    gap: 0;
     margin-top: 2px;
   }
 }
@@ -203,7 +172,7 @@ export default Vue.extend({
 }
 
 .more-menu-divider {
-  margin: 10px -12px;
+  margin: 10px -10px;
   border: none;
   border-top: 1px solid var(--border);
 }

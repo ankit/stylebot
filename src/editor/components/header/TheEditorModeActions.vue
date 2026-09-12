@@ -67,13 +67,13 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .mode-tabs {
   display: flex;
-  gap: 20px;
-  padding: 0 14px;
+  gap: 6px;
+  padding: 0 10px;
   border-bottom: 1px solid var(--border);
 }
 
 .mode-tab {
-  padding: 11px 0 10px;
+  padding: 6px 6px 5px;
   border: none;
   background: none;
   font-family: inherit;

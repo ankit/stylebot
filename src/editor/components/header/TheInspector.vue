@@ -105,13 +105,13 @@ export default Vue.extend({
   justify-content: center;
   width: 30px;
   height: 30px;
-  border-radius: 10px;
+  border-radius: 8px !important;
   cursor: pointer;
-  background: var(--accent);
-  color: var(--icon-foreground);
+  background: var(--active);
+  color: var(--foreground);
 
   &:hover:not(:disabled):not(.active) {
-    background: var(--active);
+    background: var(--border);
   }
 
   &:disabled {

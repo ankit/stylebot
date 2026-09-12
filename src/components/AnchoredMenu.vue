@@ -1,6 +1,6 @@
 <template>
   <div ref="root" class="anchored-menu">
-    <slot name="trigger" :toggle="toggleOpen" :open="open" />
+    <slot name="trigger" :toggle="toggleOpen" :open="open" :show="show" :hide="close" />
 
     <div v-if="open" ref="panel" class="anchored-menu-panel">
       <slot :close="close" />
@@ -13,6 +13,15 @@ import Vue from 'vue';
 
 export default Vue.extend({
   name: 'AnchoredMenu',
+
+  props: {
+    // For combobox-style triggers (a text input), keep focus in the trigger
+    // when the menu opens instead of moving it to the first item.
+    retainFocus: {
+      type: Boolean,
+      default: false,
+    },
+  },
 
   data(): { open: boolean; previouslyFocused: HTMLElement | null } {
     return {
@@ -28,12 +37,16 @@ export default Vue.extend({
       if (isOpen) {
         this.previouslyFocused = this.activeElement();
         document.addEventListener('mousedown', this.onDocMousedown);
-        document.addEventListener('keydown', this.onDocKeydown);
+        // Capture phase so Escape closes this menu before the editor's
+        // global keydown handler (bubble phase) treats it as "close editor".
+        document.addEventListener('keydown', this.onDocKeydown, true);
         this.$emit('open');
-        this.$nextTick(() => this.focusableItems()[0]?.focus());
+        if (!this.retainFocus) {
+          this.$nextTick(() => this.focusableItems()[0]?.focus());
+        }
       } else {
         document.removeEventListener('mousedown', this.onDocMousedown);
-        document.removeEventListener('keydown', this.onDocKeydown);
+        document.removeEventListener('keydown', this.onDocKeydown, true);
         this.$emit('close');
         this.previouslyFocused?.focus();
       }
@@ -42,12 +55,16 @@ export default Vue.extend({
 
   beforeDestroy() {
     document.removeEventListener('mousedown', this.onDocMousedown);
-    document.removeEventListener('keydown', this.onDocKeydown);
+    document.removeEventListener('keydown', this.onDocKeydown, true);
   },
 
   methods: {
     toggleOpen(): void {
       this.open = !this.open;
+    },
+
+    show(): void {
+      this.open = true;
     },
 
     close(): void {
@@ -62,6 +79,7 @@ export default Vue.extend({
     onDocMousedown(event: MouseEvent): void {
       const origin = event.composedPath()[0];
       if (!(origin instanceof Node && this.$el.contains(origin))) {
+        this.$emit('dismiss');
         this.close();
       }
     },
@@ -74,6 +92,8 @@ export default Vue.extend({
 
     onDocKeydown(event: KeyboardEvent): void {
       if (event.key === 'Escape') {
+        event.stopPropagation();
+        this.$emit('dismiss');
         this.close();
         return;
       }
