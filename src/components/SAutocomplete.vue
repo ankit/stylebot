@@ -260,8 +260,7 @@ export default Vue.extend({
 }
 
 .autocomplete-chevron {
-  all: unset;
-  box-sizing: border-box;
+  @include button-reset;
   flex: none;
   align-self: stretch;
   display: inline-flex;

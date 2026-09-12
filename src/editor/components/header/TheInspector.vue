@@ -100,8 +100,7 @@ export default Vue.extend({
 
 <style lang="scss">
 .stylebot-inspector {
-  all: unset;
-  box-sizing: border-box;
+  @include button-reset;
   flex: none;
   display: inline-flex;
   align-items: center;
@@ -127,9 +126,6 @@ export default Vue.extend({
     color: #fff;
   }
 
-  &:focus-visible {
-    outline: 2px solid var(--ring);
-    outline-offset: 2px;
-  }
+  @include focus-ring(2px);
 }
 </style>

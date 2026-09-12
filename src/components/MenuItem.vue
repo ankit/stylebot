@@ -26,8 +26,7 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .menu-item {
-  all: unset;
-  box-sizing: border-box;
+  @include button-reset;
   display: block;
   width: 100%;
   flex-shrink: 0;

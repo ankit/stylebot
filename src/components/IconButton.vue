@@ -51,10 +51,7 @@ export default Vue.extend({
     background: var(--accent);
   }
 
-  &:focus-visible {
-    outline: 2px solid var(--ring);
-    outline-offset: 1px;
-  }
+  @include focus-ring;
 
   &.bordered {
     width: 46px;

@@ -73,9 +73,6 @@ export default Vue.extend({
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   }
 
-  &:focus-visible {
-    outline: 2px solid var(--ring);
-    outline-offset: -2px;
-  }
+  @include focus-ring(-2px);
 }
 </style>

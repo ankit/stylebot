@@ -61,10 +61,7 @@ export default Vue.extend({
     opacity: 0.5;
   }
 
-  &:focus-visible {
-    outline: 2px solid var(--ring);
-    outline-offset: 1px;
-  }
+  @include focus-ring;
 }
 
 .button.default {
