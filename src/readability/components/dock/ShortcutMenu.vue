@@ -1,6 +1,6 @@
 <template>
   <div ref="root" class="menu-root" tabindex="-1" @keydown="onKeydown" @keyup="onKeyup">
-    <menu-box dense :min-width="232">
+    <s-menu dense :min-width="232">
       <div v-if="recording" class="content">
         <div class="capture-row">
           <span class="capture-field">
@@ -48,7 +48,7 @@
           {{ t('record_shortcut') }}
         </button>
       </div>
-    </menu-box>
+    </s-menu>
   </div>
 </template>
 
@@ -63,7 +63,7 @@ import {
 import { shortcutStore } from './shortcut-store';
 
 import {
-  MenuBox,
+  SMenu,
   ShortcutChip,
   ShortcutKbd,
   TextBlock,
@@ -74,7 +74,7 @@ export default Vue.extend({
   name: 'ShortcutMenu',
 
   components: {
-    MenuBox,
+    SMenu,
     ShortcutKbd,
     ShortcutChip,
     TextBlock,

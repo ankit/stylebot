@@ -1,5 +1,5 @@
 <template>
-  <menu-box dense :min-width="184">
+  <s-menu dense :min-width="184">
     <button class="item" @click="openShortcut">
       <icon-keyboard />
       <span class="label">{{ shortcutLabel }}</span>
@@ -17,7 +17,7 @@
       <icon-coffee />
       {{ t('donate') }}
     </button>
-  </menu-box>
+  </s-menu>
 </template>
 
 <script lang="ts">
@@ -30,14 +30,14 @@ import {
   openDonatePage,
 } from '@stylebot/utils';
 
-import { MenuBox, ShortcutChip } from '@stylebot/components';
+import { SMenu, ShortcutChip } from '@stylebot/components';
 import { IconOptions, IconFlag, IconCoffee, IconKeyboard } from '@stylebot/icons';
 
 export default Vue.extend({
   name: 'MoreMenu',
 
   components: {
-    MenuBox,
+    SMenu,
     ShortcutChip,
     IconOptions,
     IconFlag,
