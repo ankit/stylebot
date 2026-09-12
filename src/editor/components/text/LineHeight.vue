@@ -1,27 +1,21 @@
 <template>
-  <b-row align-content="center" no-gutters>
-    <css-property>{{ t('line_height') }}</css-property>
-
-    <css-property-value>
-      <length property="line-height" :sizes="sizes" />
-    </css-property-value>
-  </b-row>
+  <property-row :label="t('line_height')">
+    <length property="line-height" :sizes="sizes" />
+  </property-row>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 
 import Length from '../Length.vue';
-import CssProperty from '../CssProperty.vue';
-import CssPropertyValue from '../CssPropertyValue.vue';
+import PropertyRow from '../basic/PropertyRow.vue';
 
 export default Vue.extend({
   name: 'LineHeight',
 
   components: {
     Length,
-    CssProperty,
-    CssPropertyValue,
+    PropertyRow,
   },
 
   data(): {

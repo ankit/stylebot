@@ -6,6 +6,7 @@ export { default as XIcon } from './XIcon.vue';
 export { default as ExternalLinkIcon } from './ExternalLinkIcon.vue';
 export { default as CursorIcon } from './CursorIcon.vue';
 export { default as SearchIcon } from './SearchIcon.vue';
+export { default as CheckIcon } from './CheckIcon.vue';
 export { default as IconAlignJustify } from './IconAlignJustify.vue';
 export { default as IconAlignLeft } from './IconAlignLeft.vue';
 export { default as IconCoffee } from './IconCoffee.vue';

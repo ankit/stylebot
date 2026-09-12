@@ -1,14 +1,27 @@
 <template>
-  <button type="button" class="menu-item" :class="{ danger, dense }" role="menuitem" @click="$emit('click', $event)">
-    <slot />
+  <button
+    type="button"
+    class="menu-item"
+    :class="{ danger, dense, selected }"
+    role="menuitem"
+    @click="$emit('click', $event)"
+  >
+    <span class="menu-item-content"><slot /></span>
+    <check-icon v-if="selected" :size="12" class="menu-item-check" />
   </button>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 
+import { CheckIcon } from '@stylebot/icons';
+
 export default Vue.extend({
   name: 'MenuItem',
+
+  components: {
+    CheckIcon,
+  },
 
   props: {
     danger: {
@@ -20,6 +33,12 @@ export default Vue.extend({
       type: Boolean,
       default: false,
     },
+
+    // Marks the item as the current choice — shows a trailing check.
+    selected: {
+      type: Boolean,
+      default: false,
+    },
   },
 });
 </script>
@@ -27,7 +46,9 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .menu-item {
   @include button-reset;
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   width: 100%;
   flex-shrink: 0;
   font-weight: 400;
@@ -60,5 +81,19 @@ export default Vue.extend({
     font-size: 12.5px;
     border-radius: 6px;
   }
+
+  &.selected {
+    background: color-mix(in srgb, var(--primary) 8%, transparent);
+  }
+}
+
+.menu-item-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.menu-item-check {
+  flex: none;
+  color: var(--primary);
 }
 </style>

@@ -1,60 +1,36 @@
 <template>
-  <div class="stylebot-basic-editor">
-    <b-row class="section" no-gutters>
-      <b-col cols="12">
-        <b-btn class="collapse-btn px-3 py-2" @click="text = !text">
-          {{ t('text_properties') }}
-        </b-btn>
-      </b-col>
+  <div class="basic-editor">
+    <property-card
+      :label="t('text_properties')"
+      :collapsed="!sections.text"
+      @toggle="toggle('text')"
+    >
+      <the-text-properties />
+    </property-card>
 
-      <b-collapse v-model="text" class="collapse-content">
-        <b-col cols="12" class="px-3 pt-2">
-          <the-text-properties class="pb-4 pt-2" />
-        </b-col>
-      </b-collapse>
-    </b-row>
+    <property-card
+      :label="t('color_properties')"
+      :collapsed="!sections.colors"
+      @toggle="toggle('colors')"
+    >
+      <the-color-properties />
+    </property-card>
 
-    <b-row class="section" no-gutters>
-      <b-col cols="12">
-        <b-btn class="collapse-btn px-3 py-2" @click="colors = !colors">
-          {{ t('color_properties') }}
-        </b-btn>
-      </b-col>
+    <property-card
+      :label="t('layout_properties')"
+      :collapsed="!sections.layout"
+      @toggle="toggle('layout')"
+    >
+      <the-layout-properties />
+    </property-card>
 
-      <b-collapse v-model="colors" class="collapse-content">
-        <b-col cols="12" class="px-3 pt-2">
-          <the-color-properties class="pb-4 pt-2" />
-        </b-col>
-      </b-collapse>
-    </b-row>
-
-    <b-row class="section" no-gutters>
-      <b-col cols="12">
-        <b-btn class="collapse-btn px-3 py-2" @click="layout = !layout">
-          {{ t('layout_properties') }}
-        </b-btn>
-      </b-col>
-
-      <b-collapse v-model="layout" class="collapse-content">
-        <b-col cols="12" class="px-3 pt-2">
-          <the-layout-properties class="pb-4 pt-2" />
-        </b-col>
-      </b-collapse>
-    </b-row>
-
-    <b-row class="section" no-gutters>
-      <b-col cols="12">
-        <b-btn class="collapse-btn px-3 py-2" @click="border = !border">
-          {{ t('border_properties') }}
-        </b-btn>
-      </b-col>
-
-      <b-collapse v-model="border" class="collapse-content">
-        <b-col cols="12" class="px-3 pt-2">
-          <the-border-properties class="pb-5 pt-2" />
-        </b-col>
-      </b-collapse>
-    </b-row>
+    <property-card
+      :label="t('border_properties')"
+      :collapsed="!sections.border"
+      @toggle="toggle('border')"
+    >
+      <the-border-properties />
+    </property-card>
   </div>
 </template>
 
@@ -62,6 +38,7 @@
 import Vue from 'vue';
 import { StylebotBasicModeSections } from '@stylebot/types';
 
+import PropertyCard from './basic/PropertyCard.vue';
 import TheTextProperties from './TheTextProperties.vue';
 import TheColorProperties from './TheColorProperties.vue';
 import TheLayoutProperties from './TheLayoutProperties.vue';
@@ -71,6 +48,7 @@ export default Vue.extend({
   name: 'TheBasicEditor',
 
   components: {
+    PropertyCard,
     TheTextProperties,
     TheColorProperties,
     TheLayoutProperties,
@@ -78,47 +56,16 @@ export default Vue.extend({
   },
 
   computed: {
-    text: {
-      get(): boolean {
-        return this.$store.state.options.basicModeSections.text;
-      },
-      set(value: boolean) {
-        this.set('text', value);
-      },
-    },
-    colors: {
-      get(): boolean {
-        return this.$store.state.options.basicModeSections.colors;
-      },
-      set(value: boolean) {
-        this.set('colors', value);
-      },
-    },
-    layout: {
-      get(): boolean {
-        return this.$store.state.options.basicModeSections.layout;
-      },
-      set(value: boolean) {
-        this.set('layout', value);
-      },
-    },
-    border: {
-      get(): boolean {
-        return this.$store.state.options.basicModeSections.border;
-      },
-      set(value: boolean) {
-        this.set('border', value);
-      },
+    sections(): StylebotBasicModeSections {
+      return this.$store.state.options.basicModeSections;
     },
   },
 
   methods: {
-    set(name: keyof StylebotBasicModeSections, value: boolean) {
-      const sections = this.$store.state.options.basicModeSections;
-
+    toggle(name: keyof StylebotBasicModeSections): void {
       this.$store.dispatch('setBasicModeSections', {
-        ...sections,
-        [name]: value,
+        ...this.sections,
+        [name]: !this.sections[name],
       });
     },
   },
@@ -126,33 +73,11 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-.section {
-  border-top: 1px solid #ddd;
-
-  &:first-of-type {
-    border: none;
-    margin-top: 0;
-  }
-}
-
-.collapse-btn {
-  background: none !important;
-  border-radius: 0 !important;
-  border: none !important;
-  color: #333 !important;
-  padding: 0 !important;
-  width: 100% !important;
-  font-size: 14px !important;
-  font-weight: 500 !important;
-  text-align: left !important;
-
-  &:focus {
-    border: none !important;
-    box-shadow: none !important;
-  }
-}
-
-.collapse-content {
-  width: 100%;
+.basic-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  background: var(--accent);
 }
 </style>

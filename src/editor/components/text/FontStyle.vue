@@ -1,67 +1,55 @@
 <template>
-  <b-row align-content="center" no-gutters>
-    <css-property>
-      {{ t('font_style') }}
-    </css-property>
-
-    <dropdown-hack-to-support-shadow-dom>
-      <b-dropdown
-        size="sm"
-        :text="text"
-        :disabled="disabled"
-        class="font-style-dropdown"
-        variant="outline-secondary"
-      >
-        <b-dropdown-item
+  <property-row :label="t('font_style')">
+    <s-select :text="text" :muted="!weight && !style" :disabled="disabled">
+      <template #default="{ close }">
+        <menu-item
           v-for="option in boldOptions"
           :key="option.title"
-          @click="select(option)"
+          dense
+          :selected="isSelected(option)"
+          @click="select(option); close();"
         >
           {{ option.title }}
-        </b-dropdown-item>
+        </menu-item>
 
-        <b-dropdown-divider></b-dropdown-divider>
+        <hr class="menu-divider" />
 
-        <b-dropdown-item
+        <menu-item
           v-for="option in italicOptions"
           :key="option.title"
-          @click="select(option)"
+          dense
+          :selected="isSelected(option)"
+          @click="select(option); close();"
         >
           {{ option.title }}
-        </b-dropdown-item>
-      </b-dropdown>
-    </dropdown-hack-to-support-shadow-dom>
-  </b-row>
+        </menu-item>
+      </template>
+    </s-select>
+  </property-row>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import { t } from '@stylebot/i18n';
 import { Declaration } from 'postcss';
+import { SSelect, MenuItem } from '@stylebot/components';
 
-import CssProperty from '../CssProperty.vue';
-import DropdownHackToSupportShadowDom from '../DropdownHackToSupportShadowDom.vue';
+import PropertyRow from '../basic/PropertyRow.vue';
+
+type FontStyleOption = { title: string; weight: string; style: string };
 
 export default Vue.extend({
   name: 'FontStyle',
 
   components: {
-    CssProperty,
-    DropdownHackToSupportShadowDom,
+    SSelect,
+    MenuItem,
+    PropertyRow,
   },
 
   data(): {
-    boldOptions: Array<{
-      title: string;
-      weight: string;
-      style: string;
-    }>;
-
-    italicOptions: Array<{
-      title: string;
-      weight: string;
-      style: string;
-    }>;
+    boldOptions: Array<FontStyleOption>;
+    italicOptions: Array<FontStyleOption>;
   } {
     return {
       boldOptions: [
@@ -85,39 +73,32 @@ export default Vue.extend({
   },
 
   computed: {
+    weight(): string {
+      return this.declValue('font-weight');
+    },
+
+    style(): string {
+      return this.declValue('font-style');
+    },
+
     text(): string {
-      const activeRule = this.$store.getters.activeRule;
-
-      let weight = '';
-      let style = '';
-
-      if (activeRule) {
-        activeRule.clone().walkDecls('font-weight', (decl: Declaration) => {
-          weight = decl.value;
-        });
-
-        activeRule.clone().walkDecls('font-style', (decl: Declaration) => {
-          style = decl.value;
-        });
-      }
-
-      if (weight) {
-        if (style === 'italic') {
+      if (this.weight) {
+        if (this.style === 'italic') {
           const option = this.italicOptions.find(
-            o => o.weight === weight && o.style === style
+            o => o.weight === this.weight && o.style === this.style
           );
 
           if (option) {
             return option.title;
           }
         } else {
-          const option = this.boldOptions.find(o => o.weight === weight);
+          const option = this.boldOptions.find(o => o.weight === this.weight);
 
           if (option) {
             return option.title;
           }
         }
-      } else if (style) {
+      } else if (this.style) {
         return t('italic');
       }
 
@@ -130,7 +111,24 @@ export default Vue.extend({
   },
 
   methods: {
-    select({ weight, style }: { weight: string; style: string }): void {
+    declValue(property: string): string {
+      const activeRule = this.$store.getters.activeRule;
+      let value = '';
+
+      if (activeRule) {
+        activeRule.clone().walkDecls(property, (decl: Declaration) => {
+          value = decl.value;
+        });
+      }
+
+      return value;
+    },
+
+    isSelected(option: FontStyleOption): boolean {
+      return option.weight === this.weight && option.style === this.style;
+    },
+
+    select({ weight, style }: FontStyleOption): void {
       this.$store.dispatch('applyDeclaration', {
         property: 'font-weight',
         value: weight,
@@ -145,11 +143,10 @@ export default Vue.extend({
 });
 </script>
 
-<style lang="scss">
-.font-style-dropdown {
-  .dropdown-toggle {
-    border-top-left-radius: 3.2px !important;
-    border-bottom-left-radius: 3.2px !important;
-  }
+<style lang="scss" scoped>
+.menu-divider {
+  margin: 4px 2px;
+  border: none;
+  border-top: 1px solid var(--border);
 }
 </style>
