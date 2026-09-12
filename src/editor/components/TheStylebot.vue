@@ -59,9 +59,9 @@ export default Vue.extend({
 .stylebot {
   top: 0;
   padding: 0;
-  color: #000;
+  color: var(--foreground);
   line-height: 20px;
-  background: #fff;
+  background: var(--background);
 }
 
 .stylebot-body {
