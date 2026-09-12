@@ -1,3 +1,9 @@
+## Version 3.2.2 (September 2026)
+
+- Redesign the options page with dark mode support and drop bootstrap-vue (#873)
+- Fix unclickable top/bottom edges on the popup's main style toggle (#881)
+- Reduce extension size by disabling inline source maps in production builds (#892)
+
 ## Version 3.2.1 (September 2026)
 
 - Fix Readability toggle silently setting Magic as the global default mode (#877)
