@@ -13,6 +13,8 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .theme-provider {
   color-scheme: light dark;
+  background: var(--background);
+  color: var(--foreground);
 
   --background: #fff;
   --foreground: #191b1f;
