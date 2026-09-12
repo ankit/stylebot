@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import CustomLight from './themes/CustomLight';
+import CustomDark from './themes/CustomDark';
 import { IframeMessage, ParentUpdateCssMessage } from '@stylebot/monaco-editor';
 
 declare global {
@@ -9,11 +10,16 @@ declare global {
   }
 }
 
+export type MonacoEditorVariant = 'default' | 'options';
+
 class MonacEditorIframe {
   // todo: import monaco types
   editor?: any;
+  variant: MonacoEditorVariant;
 
-  constructor() {
+  constructor(variant: MonacoEditorVariant = 'default') {
+    this.variant = variant;
+
     this.loadEditor(() => {
       this.attachWindowListeners();
       this.defineThemes();
@@ -37,6 +43,14 @@ class MonacEditorIframe {
 
   defineThemes(): void {
     window.monaco.editor.defineTheme('custom-light', CustomLight);
+    window.monaco.editor.defineTheme('custom-dark', CustomDark);
+  }
+
+  // The in-page editor doesn't support dark mode yet — defaults to light.
+  getMonacoTheme(): 'custom-light' | 'custom-dark' {
+    return new URLSearchParams(window.location.search).get('theme') === 'dark'
+      ? 'custom-dark'
+      : 'custom-light';
   }
 
   configureDiagnostics(): void {
@@ -58,6 +72,9 @@ class MonacEditorIframe {
         type: 'stylebotMonacoIframeCssUpdated',
       });
     });
+
+    // Layout may still be settling at creation time — re-measure after paint.
+    requestAnimationFrame(() => this.editor.layout());
   }
 
   getContainer(): HTMLDivElement {
@@ -67,16 +84,25 @@ class MonacEditorIframe {
 
   getEditorOptions(): any {
     const container = this.getContainer();
-    // todo: find a more robust / accurate way to compute;
-    // might not work for some cases
-    const wordWrapColumn = Math.round(container.offsetWidth / 8);
+    // Options gets a full code-editor look (line numbers, soft-wrap); the
+    // in-page panel keeps its original bounded word-wrap, no line numbers.
+    const isOptions = this.variant === 'options';
+
+    // 'on' wraps at the editor's actual width, avoiding a horizontal scrollbar.
+    const wrapOptions = isOptions
+      ? { wordWrap: 'on' as const }
+      : {
+          wordWrap: 'bounded' as const,
+          // todo: find a more robust / accurate way to compute;
+          // might not work for some cases
+          wordWrapColumn: Math.round(container.offsetWidth / 8),
+        };
 
     return {
       value: '',
       tabSize: 2,
-      theme: 'custom-light',
-      wordWrap: 'bounded',
-      wordWrapColumn,
+      theme: this.getMonacoTheme(),
+      ...wrapOptions,
       scrollBeyondLastLine: false,
       language: 'css',
       folding: false,
@@ -84,7 +110,10 @@ class MonacEditorIframe {
       suggestOnTriggerCharacters: false,
       cursorBlinking: 'smooth',
       mouseWheelZoom: false,
-      lineNumbers: 'off',
+      lineNumbers: isOptions ? 'on' : 'off',
+      // Lets the scrollbar reach the container's true edges instead of an
+      // outer CSS padding clipping it; no horizontal equivalent in Monaco.
+      padding: isOptions ? { top: 14, bottom: 18 } : undefined,
       minimap: {
         enabled: false,
       },
@@ -92,6 +121,9 @@ class MonacEditorIframe {
         enabled: true,
       },
       codeLens: false,
+      // Tab-inserts-indentation traps keyboard focus, and the toggle
+      // (Ctrl+M) is swallowed by macOS as "minimize window" in-browser.
+      tabFocusMode: true,
     };
   }
 
@@ -99,9 +131,12 @@ class MonacEditorIframe {
     window.parent.postMessage(message, '*');
   }
 
-  handleStylebotCssUpdate(css: string, selector?: string): void {
+  handleStylebotCssUpdate(css: string, selector?: string, focus = true): void {
     this.editor.setValue(css);
-    this.editor.focus();
+
+    if (focus) {
+      this.editor.focus();
+    }
 
     if (selector) {
       const regex = `^${selector}\\s\\{\\n\\s*(?!\\}).*$`;
@@ -135,7 +170,11 @@ class MonacEditorIframe {
       'message',
       (message: { data: ParentUpdateCssMessage }) => {
         if (message.data.type === 'stylebotCssUpdate') {
-          this.handleStylebotCssUpdate(message.data.css, message.data.selector);
+          this.handleStylebotCssUpdate(
+            message.data.css,
+            message.data.selector,
+            message.data.focus ?? true
+          );
         }
       }
     );

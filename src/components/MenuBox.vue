@@ -1,5 +1,5 @@
 <template>
-  <div class="menu" :class="{ dense }" :style="{ minWidth: `${minWidth}px` }">
+  <div class="menu" role="menu" :class="{ dense }" :style="{ minWidth: `${minWidth}px` }">
     <slot />
   </div>
 </template>

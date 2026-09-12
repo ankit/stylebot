@@ -83,6 +83,10 @@ const context = await chromium.launchPersistentContext(userDataDir, {
   chromiumSandbox: true,
   // Without this, Playwright pins a fixed emulated viewport and the window can't resize.
   viewport: null,
+  // Playwright defaults this to 'light', forcing every tab to prefers-color-scheme:
+  // light regardless of the OS setting. null leaves it unemulated so tabs match the
+  // real OS preference, same as extension surfaces Playwright doesn't manage (the popup).
+  colorScheme: null,
   ignoreDefaultArgs: [
     // Playwright disables extensions by default, which would block our CDP-loaded one.
     '--disable-extensions',

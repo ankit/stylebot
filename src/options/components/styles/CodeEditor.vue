@@ -21,6 +21,13 @@ export default Vue.extend({
       type: String,
       required: true,
     },
+
+    // False for a brand-new style, so the URL field (which still needs
+    // filling in) keeps focus instead of the editor stealing it on load.
+    autofocus: {
+      type: Boolean,
+      default: true,
+    },
   },
 
   created() {
@@ -55,6 +62,7 @@ export default Vue.extend({
       const message: ParentUpdateCssMessage = {
         css: this.css,
         type: 'stylebotCssUpdate',
+        focus: this.autofocus,
       };
 
       const contentWindow = this.getIframeContentWindow();

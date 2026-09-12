@@ -122,9 +122,8 @@ export const onEnterOrSpace = (
   }
 };
 
-// A ToggleSwitch's own hit target is just its <label>, which shrink-wraps its
-// content — clicks in a wrapping container's padding (e.g. above/below it)
-// otherwise land nowhere. Extends the hit target to that whole container.
+// A ToggleSwitch's <label> shrink-wraps its content, so clicks in a
+// wrapping container's padding land nowhere — this extends the hit target.
 export const forwardClickToInput = (
   event: MouseEvent,
   container: Element

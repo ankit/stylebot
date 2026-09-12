@@ -1,54 +1,47 @@
 <template>
-  <div class="pt-3">
-    <b-alert v-model="showImportSuccessAlert" variant="success" dismissible>
+  <div class="sync-tab">
+    <div v-if="showImportSuccessAlert" class="banner success">
       {{ t('import_success') }}
-    </b-alert>
+    </div>
 
-    <b-alert v-model="showImportErrorAlert" variant="danger" dismissible>
-      {{ t('import_error', [importError]) }}
-    </b-alert>
+    <div v-if="showImportErrorAlert" class="banner error">
+      {{ t('import_error', [String(importError)]) }}
+    </div>
 
-    <b-row no-gutters class="mt-5 mb-1">
-      <h2>{{ t('sync_via_google_drive') }}</h2>
-    </b-row>
+    <div>
+      <heading as="h1">{{ t('sync_options') }}</heading>
+      <text-block variant="muted" class="description">Keep your styles on every computer you sign in to.</text-block>
 
-    <the-google-drive-sync />
+      <the-google-drive-sync />
+    </div>
 
-    <b-row no-gutters class="mt-5">
-      <h2>{{ t('backup') }}</h2>
-    </b-row>
+    <div class="section">
+      <heading as="h2">{{ t('backup') }}</heading>
+      <text-block variant="muted" class="description">{{ t('backup_description') }}</text-block>
 
-    <b-row no-gutters class="description mb-4">
-      {{ t('backup_description') }}
-    </b-row>
-
-    <b-row no-gutters>
-      <b-col>
-        <app-button class="mr-4" variant="primary" @click="exportJson">
-          {{ t('export') }}
-        </app-button>
-
-        <app-button @click="importJson">
-          {{ t('import') }}
-        </app-button>
-      </b-col>
-    </b-row>
+      <div class="buttons">
+        <s-button @click="exportJson">{{ t('export') }}</s-button>
+        <s-button @click="importJson">{{ t('import') }}</s-button>
+      </div>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 
-import AppButton from './AppButton.vue';
+import { Heading, TextBlock, SButton } from '@stylebot/components';
 import TheGoogleDriveSync from './sync/TheGoogleDriveSync.vue';
 
 import { importStylesWithFilePicker, exportAsJSONFile } from '../utils';
 
 export default Vue.extend({
-  name: 'TheBackupTab',
+  name: 'TheSyncTab',
 
   components: {
-    AppButton,
+    Heading,
+    TextBlock,
+    SButton,
     TheGoogleDriveSync,
   },
 
@@ -87,8 +80,42 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
+.sync-tab {
+  max-width: 760px;
+  padding: 20px 22px 26px;
+}
+
 .description {
-  color: #888;
-  font-size: 14px;
+  margin-top: 4px;
+  max-width: 520px;
+}
+
+.section {
+  margin-top: 40px;
+}
+
+.buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.banner {
+  padding: 10px 14px;
+  border-radius: 9px;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.banner.success {
+  background: var(--info);
+  border: 1px solid var(--info-border);
+  color: var(--foreground);
+}
+
+.banner.error {
+  background: var(--danger-background);
+  border: 1px solid var(--danger-border);
+  color: var(--danger);
 }
 </style>

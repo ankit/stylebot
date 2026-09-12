@@ -3,6 +3,7 @@
     type="button"
     class="icon-button"
     :class="{ bordered }"
+    :style="size ? { width: `${size}px`, height: `${size}px` } : undefined"
     :title="title"
     @click.stop="$emit('click', $event)"
   >
@@ -24,6 +25,11 @@ export default Vue.extend({
     // Fixed-size square with a border, for standalone footer buttons (e.g.
     // the "..." more button) rather than an inline dismiss icon.
     bordered: Boolean,
+    // Overrides the bordered variant's default 38px square.
+    size: {
+      type: Number,
+      default: 0,
+    },
   },
 });
 </script>
@@ -33,6 +39,7 @@ export default Vue.extend({
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  flex: none;
   padding: 4px;
   border: none;
   border-radius: 4px;
@@ -49,28 +56,11 @@ export default Vue.extend({
   }
 
   &.bordered {
-    flex: none;
     width: 46px;
     padding: 0;
-    border: 1px solid #d3d6dd;
+    border: 1px solid var(--input);
     border-radius: 8px;
-    background: #fff;
-    color: var(--muted-foreground);
-
-    &:hover {
-      background: #f2f3f6;
-    }
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  .icon-button.bordered {
-    border-color: #3a3d45;
-    background: #26282e;
-
-    &:hover {
-      background: #31343b;
-    }
+    color: var(--icon-foreground);
   }
 }
 </style>
