@@ -35,7 +35,7 @@ export default Vue.extend({
 }
 
 .version {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: var(--font-mono);
 }
 
 a {

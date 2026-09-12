@@ -14,10 +14,7 @@
 
     <div class="search-row">
       <div class="search">
-        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-          <circle cx="7" cy="7" r="4.3" />
-          <path d="M10.2 10.2 13.5 13.5" />
-        </svg>
+        <search-icon />
         <input v-model="urlFilter" type="text" :placeholder="t('search_sites')" />
       </div>
 
@@ -58,6 +55,7 @@ import { compareAsc } from 'date-fns';
 
 import { Style } from '@stylebot/types';
 import { Heading, SText, SButton, ConfirmDialog } from '@stylebot/components';
+import { SearchIcon } from '@stylebot/icons';
 
 import StyleListRow from './styles/StyleListRow.vue';
 import StylesBulkMenu from './styles/StylesBulkMenu.vue';
@@ -70,6 +68,7 @@ export default Vue.extend({
     SText,
     SButton,
     ConfirmDialog,
+    SearchIcon,
     StyleListRow,
     StylesBulkMenu,
   },

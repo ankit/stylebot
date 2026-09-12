@@ -7,20 +7,23 @@
     :title="`${t('inspect_description')} (i)`"
     @click="toggle"
   >
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor">
-      <path d="M4.5 3.9 14.7 9.3 10.1 10.5 8.6 15.1z" />
-    </svg>
+    <cursor-icon />
   </button>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 
+import { CursorIcon } from '@stylebot/icons';
 import { Highlighter } from '@stylebot/highlighter';
 import { StylebotEditingMode } from '@stylebot/types';
 
 export default Vue.extend({
   name: 'TheInspector',
+
+  components: {
+    CursorIcon,
+  },
 
   data(): {
     highlighter: Highlighter | null;

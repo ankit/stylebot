@@ -22,9 +22,7 @@
           :disabled="disabled"
           @click="open ? hideMenu() : showAll()"
         >
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 4.5 6 7.5 9 4.5" />
-          </svg>
+          <chevron-down-icon />
         </button>
       </div>
     </template>
@@ -40,6 +38,8 @@
 <script lang="ts">
 import Vue, { PropType } from 'vue';
 
+import { ChevronDownIcon } from '@stylebot/icons';
+
 import AnchoredMenu from './AnchoredMenu.vue';
 import SMenu from './SMenu.vue';
 
@@ -51,6 +51,7 @@ export default Vue.extend({
   components: {
     AnchoredMenu,
     SMenu,
+    ChevronDownIcon,
   },
 
   model: {
@@ -236,7 +237,7 @@ export default Vue.extend({
   color: var(--foreground);
 
   &.mono {
-    font-family: 'Fira Code', Menlo, Monaco, Consolas, monospace;
+    font-family: var(--font-mono);
     font-weight: 600;
   }
 

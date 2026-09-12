@@ -34,6 +34,8 @@ export default Vue.extend({
   --danger-border: #f6cfcb;
 
   --ring: var(--primary);
+
+  --font-mono: 'Fira Code', Menlo, Monaco, Consolas, monospace;
 }
 
 @media (prefers-color-scheme: dark) {

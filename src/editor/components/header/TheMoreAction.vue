@@ -36,9 +36,7 @@
         <menu-item dense @click="optionsPage(); close();">
           <span class="menu-item-row">
             <span>{{ t('view_all_styles_and_settings') }}</span>
-            <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M4 2.5h5.5V8M9.5 2.5 3 9" />
-            </svg>
+            <external-link-icon />
           </span>
         </menu-item>
       </s-menu>
@@ -56,7 +54,7 @@ import {
   ToggleSwitch,
   SSegmentedControl,
 } from '@stylebot/components';
-import { MoreIcon } from '@stylebot/icons';
+import { MoreIcon, ExternalLinkIcon } from '@stylebot/icons';
 
 import { StylebotEditorCommands, StylebotLayout } from '@stylebot/types';
 
@@ -73,6 +71,7 @@ export default Vue.extend({
     ToggleSwitch,
     SSegmentedControl,
     MoreIcon,
+    ExternalLinkIcon,
   },
 
   computed: {
@@ -186,7 +185,7 @@ export default Vue.extend({
 }
 
 .menu-item-hint {
-  font-family: Menlo, Monaco, Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 11px;
   color: var(--muted-foreground);
 }

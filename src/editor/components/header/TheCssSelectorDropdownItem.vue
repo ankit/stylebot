@@ -130,7 +130,7 @@ export default Vue.extend({
   padding: 2px 6px;
   border-radius: 5px;
   background: var(--accent);
-  font-family: 'Fira Code', Menlo, Monaco, Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 11.5px;
   line-height: 1.5;
   color: var(--foreground);
@@ -140,7 +140,7 @@ export default Vue.extend({
 .count {
   flex: none;
   margin-top: 2px;
-  font-family: 'Fira Code', Menlo, Monaco, Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 11px;
   color: var(--muted-foreground);
 }
