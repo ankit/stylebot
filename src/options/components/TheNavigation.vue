@@ -1,6 +1,6 @@
 <template>
   <div class="navigation">
-    <heading as="div" size="md" class="wordmark">Stylebot</heading>
+    <heading as="div" class="wordmark">Stylebot</heading>
 
     <nav class="nav-list">
       <button
