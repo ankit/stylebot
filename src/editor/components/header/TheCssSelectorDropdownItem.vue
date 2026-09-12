@@ -99,22 +99,20 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .css-selector-dropdown-item {
-  padding: 8px 8px 8px 5px !important;
-  border-left: 3px solid transparent !important;
+  padding: 8px !important;
   border-radius: 0 6px 6px 0 !important;
 }
 
 .css-selector-dropdown-item:hover,
 .css-selector-dropdown-item:focus-visible {
   background: var(--accent) !important;
-  border-left-color: var(--primary) !important;
-  box-shadow: none !important;
+  box-shadow: inset 4px 0 0 var(--primary) !important;
 }
 
 .item-row {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
+  gap: 12px;
   width: 100%;
 }
 
@@ -123,25 +121,26 @@ export default Vue.extend({
   min-width: 0;
   display: flex;
   flex-wrap: wrap;
-  gap: 5px;
+  gap: 6px;
 }
 
 .chip {
+  min-width: 0;
   padding: 2px 6px;
-  border-radius: 5px;
+  border-radius: 6px;
   background: var(--accent);
   font-family: var(--font-mono);
-  font-size: 11.5px;
+  font-size: 12px;
   line-height: 1.5;
   color: var(--foreground);
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 
 .count {
   flex: none;
   margin-top: 2px;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   color: var(--muted-foreground);
 }
 

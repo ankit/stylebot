@@ -58,7 +58,7 @@ export default Vue.extend({
 }
 
 .tab {
-  padding: 6px 6px 5px;
+  padding: 6px 6px 4px;
   border: none;
   background: none;
   font-family: inherit;

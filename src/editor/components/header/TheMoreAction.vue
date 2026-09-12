@@ -17,8 +17,8 @@
 
         <div class="push-page-row">
           <div class="push-page-copy">
-            <div class="push-page-title">{{ t('adjust_page_layout') }}</div>
-            <div class="push-page-description">{{ t('adjust_page_layout_description') }}</div>
+            <s-text>{{ t('adjust_page_layout') }}</s-text>
+            <s-text size="caption" variant="muted">{{ t('adjust_page_layout_description') }}</s-text>
           </div>
 
           <toggle-switch :value="adjustPageLayout" size="lg" @change="toggleAdjustPageLayout" />
@@ -53,6 +53,7 @@ import {
   IconButton,
   ToggleSwitch,
   SSegmentedControl,
+  SText,
 } from '@stylebot/components';
 import { MoreIcon, ExternalLinkIcon } from '@stylebot/icons';
 
@@ -70,6 +71,7 @@ export default Vue.extend({
     IconButton,
     ToggleSwitch,
     SSegmentedControl,
+    SText,
     MoreIcon,
     ExternalLinkIcon,
   },
@@ -156,18 +158,9 @@ export default Vue.extend({
 .push-page-copy {
   flex: 1;
   min-width: 0;
-}
-
-.push-page-title {
-  font-size: 12.5px;
-  color: var(--foreground);
-}
-
-.push-page-description {
-  font-size: 11px;
-  line-height: 1.4;
-  color: var(--muted-foreground);
-  margin-top: 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .more-menu-divider {
@@ -186,7 +179,7 @@ export default Vue.extend({
 
 .menu-item-hint {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   color: var(--muted-foreground);
 }
 </style>
