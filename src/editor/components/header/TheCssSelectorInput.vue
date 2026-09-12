@@ -1,13 +1,12 @@
 <template>
-  <b-form-input
+  <input
     :disabled="disabled"
     :value="activeSelector"
-    size="sm"
-    class="css-selector-input"
+    class="selector-text"
     :placeholder="t('enter_css_selector')"
     @blur="blur"
     @focus="focus"
-    @input="input"
+    @input="input($event.target.value)"
   />
 </template>
 
@@ -81,20 +80,24 @@ export default Vue.extend({
 });
 </script>
 
-<style lang="scss">
-.css-selector-input {
-  padding: 4px !important;
-  background: var(--background) !important;
-  color: var(--foreground) !important;
-  border-color: var(--input) !important;
+<style lang="scss" scoped>
+.selector-text {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 0;
+  font: 500 12.5px/1.3 Menlo, Monaco, Consolas, monospace;
+  color: var(--foreground);
 
-  &:focus {
-    box-shadow: none !important;
-    border-color: var(--primary) !important;
+  &::placeholder {
+    font-family: 'Public Sans', system-ui, sans-serif;
+    color: var(--muted-foreground);
   }
 
-  &.form-control {
-    margin-left: 8px !important;
+  &:disabled {
+    opacity: 0.6;
   }
 }
 </style>

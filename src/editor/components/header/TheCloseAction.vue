@@ -1,6 +1,6 @@
 <template>
-  <icon-button :size="32" :title="`${t('close')} (esc)`" @click="onClick">
-    <x-icon :size="16" />
+  <icon-button :size="24" :title="`${t('close')} (esc)`" @click="onClick">
+    <x-icon :size="13" />
   </icon-button>
 </template>
 

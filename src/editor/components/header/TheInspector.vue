@@ -7,7 +7,9 @@
     :title="`${t('inspect_description')} (i)`"
     @click="toggle"
   >
-    <inspector-icon />
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor">
+      <path d="M4.5 3.9 14.7 9.3 10.1 10.5 8.6 15.1z" />
+    </svg>
   </button>
 </template>
 
@@ -17,14 +19,8 @@ import Vue from 'vue';
 import { Highlighter } from '@stylebot/highlighter';
 import { StylebotEditingMode } from '@stylebot/types';
 
-import InspectorIcon from './InspectorIcon.vue';
-
 export default Vue.extend({
   name: 'TheInspector',
-
-  components: {
-    InspectorIcon,
-  },
 
   data(): {
     highlighter: Highlighter | null;
@@ -103,14 +99,16 @@ export default Vue.extend({
 .stylebot-inspector {
   all: unset;
   box-sizing: border-box;
+  flex: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 53px;
-  height: 53px;
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
   cursor: pointer;
+  background: var(--accent);
   color: var(--icon-foreground);
-  border-right: 1px solid var(--border);
 
   &:hover:not(:disabled):not(.active) {
     background: var(--active);
@@ -128,7 +126,7 @@ export default Vue.extend({
 
   &:focus-visible {
     outline: 2px solid var(--ring);
-    outline-offset: -2px;
+    outline-offset: 2px;
   }
 }
 </style>
