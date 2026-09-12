@@ -1,18 +1,17 @@
 <template>
-  <b-row class="header pl-3 pr-2 py-2 justify-content-md-between" no-gutters>
-    <b-col cols="2" class="p-0">
-      <the-inspector @select="inspect($event)" />
-    </b-col>
-
-    <b-col cols="7" align-self="center" class="px-2">
-      <the-css-selector-dropdown />
+  <div class="header">
+    <div class="header-top">
       <div class="url">{{ url }}</div>
-    </b-col>
-
-    <b-col cols="3">
       <the-window-actions />
-    </b-col>
-  </b-row>
+    </div>
+
+    <div class="selector-row">
+      <the-inspector @select="inspect($event)" />
+      <the-css-selector-dropdown />
+    </div>
+
+    <the-editor-mode-actions />
+  </div>
 </template>
 
 <script lang="ts">
@@ -21,6 +20,7 @@ import Vue from 'vue';
 import TheInspector from './header/TheInspector.vue';
 import TheWindowActions from './header/TheWindowActions.vue';
 import TheCssSelectorDropdown from './header/TheCssSelectorDropdown.vue';
+import TheEditorModeActions from './header/TheEditorModeActions.vue';
 
 export default Vue.extend({
   name: 'TheHeader',
@@ -29,14 +29,7 @@ export default Vue.extend({
     TheInspector,
     TheWindowActions,
     TheCssSelectorDropdown,
-  },
-
-  data(): {
-    selector: string | null;
-  } {
-    return {
-      selector: null,
-    };
+    TheEditorModeActions,
   },
 
   computed: {
@@ -55,13 +48,35 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .header {
-  background: #eee;
+  display: flex;
+  flex-direction: column;
+  background: var(--background);
+  border-bottom: 1px solid var(--border);
+}
+
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 8px 7px 14px;
+  border-bottom: 1px solid var(--border);
 }
 
 .url {
-  color: #333;
-  font-size: 12px;
-  padding: 0 8px;
-  margin-top: 3px;
+  flex: none;
+  max-width: 150px;
+  font-size: 11.5px;
+  color: var(--muted-foreground);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.selector-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
 }
 </style>

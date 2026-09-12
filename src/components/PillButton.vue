@@ -31,10 +31,7 @@ export default Vue.extend({
     background: #f2f3f6;
   }
 
-  &:focus-visible {
-    outline: 2px solid var(--ring);
-    outline-offset: 1px;
-  }
+  @include focus-ring;
 }
 
 @media (prefers-color-scheme: dark) {

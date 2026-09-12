@@ -44,16 +44,14 @@ export default Vue.extend({
   border: none;
   border-radius: 4px;
   background: transparent;
+  color: inherit;
   cursor: pointer;
 
   &:hover {
     background: var(--accent);
   }
 
-  &:focus-visible {
-    outline: 2px solid var(--ring);
-    outline-offset: 1px;
-  }
+  @include focus-ring;
 
   &.bordered {
     width: 46px;
