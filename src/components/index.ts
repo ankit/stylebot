@@ -11,3 +11,4 @@ export { default as SButton } from './SButton.vue';
 export { default as AnchoredMenu } from './AnchoredMenu.vue';
 export { default as MenuItem } from './MenuItem.vue';
 export { default as ConfirmDialog } from './ConfirmDialog.vue';
+export { default as ThemeProvider } from './ThemeProvider.vue';
