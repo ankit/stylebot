@@ -1,4 +1,5 @@
-// Launches Chrome with the Stylebot extension and hot-reloads it on every rebuild.
+// Launches Chrome (or Edge, via STYLEBOT_BROWSER=edge) with the Stylebot extension
+// and hot-reloads it on every rebuild.
 // Uses CDP instead of --load-extension since Chrome 137+ disabled that flag.
 
 import { chromium } from 'playwright';
@@ -10,8 +11,12 @@ const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const extensionPath = path.join(rootDir, 'dist');
 // Written by WriteBuildMarkerPlugin (webpack.config.js) after each successful build.
 const buildMarkerPath = path.join(extensionPath, '.build-complete');
-const userDataDir = path.join(rootDir, '.chrome-dev-profile');
 const startUrl = 'https://news.ycombinator.com';
+
+// Set by `yarn dev:edge`: launch Edge instead of Chrome. Separate profile dir
+// since the two browsers can't share one.
+const channel = process.env.STYLEBOT_BROWSER === 'edge' ? 'msedge' : 'chrome';
+const userDataDir = path.join(rootDir, channel === 'msedge' ? '.edge-dev-profile' : '.chrome-dev-profile');
 
 // Set by `yarn dev:chrome`: wait for a build that finishes after this script
 // starts, rather than trusting a marker left over from a previous run.
@@ -78,7 +83,7 @@ clearCrashFlags();
 const context = await chromium.launchPersistentContext(userDataDir, {
   headless,
   // Playwright's bundled "Chrome for Testing" build gets flagged as a bot by some sites.
-  channel: 'chrome',
+  channel,
   // Otherwise Playwright adds --no-sandbox, which real Chrome (unlike "for Testing") nags about.
   chromiumSandbox: true,
   // Without this, Playwright pins a fixed emulated viewport and the window can't resize.
@@ -168,7 +173,7 @@ const extensionId = await loadExtension();
 const page = context.pages()[0] ?? (await context.newPage());
 await page.goto(startUrl);
 
-console.log(`\n🎉 Stylebot loaded on Hacker News — extension id: ${extensionId}`);
+console.log(`\n🎉 Stylebot loaded on Hacker News (${channel}) — extension id: ${extensionId}`);
 console.log('👀 Watching ./dist — the extension hot-reloads in place on rebuild.');
 console.log(headless ? '🛑 Press Ctrl+C to exit.\n' : '🪟 Close the browser window to exit.\n');
 
