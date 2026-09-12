@@ -51,7 +51,8 @@ const config = {
   stats: 'errors-only',
   mode: process.env.NODE_ENV,
   context: `${__dirname}/src`,
-  devtool: 'inline-source-map',
+  // Inline sourcemaps in production bloat every content script (see #890).
+  devtool: process.env.NODE_ENV === 'production' ? false : 'inline-source-map',
 
   optimization: {
     minimize: process.env.NODE_ENV === 'production',
