@@ -128,6 +128,17 @@ export default {
     commit('setVisible', false);
   },
 
+  escape(
+    { state, commit, dispatch }: { state: State; commit: Commit; dispatch: Dispatch }
+  ): void {
+    if (state.help) {
+      commit('setHelp', false);
+      return;
+    }
+
+    dispatch('closeStylebot');
+  },
+
   setMode(
     { state, commit }: { state: State; commit: Commit },
     mode: StylebotEditingMode

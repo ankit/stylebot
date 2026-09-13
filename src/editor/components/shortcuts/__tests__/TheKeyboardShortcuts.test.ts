@@ -44,7 +44,7 @@ describe('TheKeyboardShortcuts.vue', () => {
       new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })
     );
 
-    expect(store.dispatch).toHaveBeenCalledWith('closeStylebot');
+    expect(store.dispatch).toHaveBeenCalledWith('escape');
   });
 
   it('does not attach the shortcut listener when mounted with the editor hidden', () => {

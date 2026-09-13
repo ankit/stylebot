@@ -9,7 +9,11 @@ export type IframeLoadedMessage = {
   type: 'stylebotMonacoIframeLoaded';
 };
 
-export type IframeMessage = IframeCssUpdatedMessage | IframeLoadedMessage;
+export type IframeEscapeMessage = {
+  type: 'stylebotEscapePressed';
+};
+
+export type IframeMessage = IframeCssUpdatedMessage | IframeLoadedMessage | IframeEscapeMessage;
 
 export type ParentUpdateCssMessage = {
   type: 'stylebotCssUpdate';

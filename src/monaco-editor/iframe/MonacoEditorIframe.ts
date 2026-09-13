@@ -176,6 +176,13 @@ class MonacEditorIframe {
       this.editor.updateOptions(this.getEditorOptions());
     });
 
+    // The parent's Escape listener never sees this — separate document. Monaco stops propagation when it handles Escape internally.
+    window.addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
+        this.postMessage({ type: 'stylebotEscapePressed' });
+      }
+    });
+
     window.addEventListener(
       'message',
       (message: { data: ParentMessage }) => {
