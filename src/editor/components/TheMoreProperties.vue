@@ -1,8 +1,8 @@
 <template>
   <div class="more-properties">
     <div v-for="decl in declarations" :key="decl.property" class="more-property-row">
-      <span class="more-property-key">{{ decl.property }}</span>
-      <span class="more-property-value">{{ decl.value }}</span>
+      <s-text class="more-property-key">{{ decl.property }}</s-text>
+      <s-text variant="primary" class="more-property-value">{{ decl.value }}</s-text>
 
       <button
         type="button"
@@ -54,6 +54,7 @@ import Vue from 'vue';
 import { Declaration } from 'postcss';
 
 import { XIcon, CheckIcon } from '@stylebot/icons';
+import { SText } from '@stylebot/components';
 import { KNOWN_PROPERTIES } from '../utils/basic-properties';
 
 export default Vue.extend({
@@ -62,6 +63,7 @@ export default Vue.extend({
   components: {
     XIcon,
     CheckIcon,
+    SText,
   },
 
   data(): { adding: boolean; newProperty: string; newValue: string } {
@@ -134,13 +136,11 @@ export default Vue.extend({
   gap: 9px;
   padding: 6px 0;
   border-bottom: 1px solid color-mix(in srgb, var(--foreground) 7%, transparent);
-  font-size: 12.5px;
 }
 
 .more-property-key {
   flex: none;
   font-family: var(--font-mono);
-  color: var(--foreground);
 }
 
 .more-property-value {
@@ -150,7 +150,6 @@ export default Vue.extend({
   text-overflow: ellipsis;
   white-space: nowrap;
   font-family: var(--font-mono);
-  color: var(--primary);
 }
 
 .more-property-remove {

@@ -8,7 +8,7 @@
 import Vue, { PropType } from 'vue';
 
 type Size = 'label' | 'body' | 'caption' | 'small';
-type Variant = 'muted' | 'default';
+type Variant = 'muted' | 'default' | 'primary';
 
 export default Vue.extend({
   name: 'SText',
@@ -43,6 +43,10 @@ export default Vue.extend({
 
 .muted {
   color: var(--muted-foreground);
+}
+
+.primary {
+  color: var(--primary);
 }
 
 .label {
