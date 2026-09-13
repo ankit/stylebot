@@ -79,13 +79,16 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .select {
   display: flex;
+  min-width: 0;
 }
 
 .select.full-width {
   flex: 1;
+  min-width: 0;
 
   .select-trigger {
     width: 100%;
+    min-width: 0;
   }
 }
 
