@@ -11,7 +11,10 @@
       <span class="chips">
         <span v-for="(part, i) in parts" :key="i" class="chip">{{ part }}</span>
       </span>
-      <span v-if="count > 0" class="count">{{ count }}</span>
+      <span v-if="styleCount > 0" class="style-count">
+        <span class="dot" />
+        {{ styleCount }}
+      </span>
     </span>
   </menu-item>
 </template>
@@ -34,7 +37,7 @@ export default Vue.extend({
       type: String,
       required: true,
     },
-    count: {
+    styleCount: {
       type: Number,
       required: true,
     },
@@ -124,12 +127,22 @@ export default Vue.extend({
   overflow-wrap: anywhere;
 }
 
-.count {
+.style-count {
   flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   margin-top: 2px;
   font-family: var(--font-mono);
   font-size: 12px;
   color: var(--muted-foreground);
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--primary);
 }
 
 .css-selector-dropdown-item:hover .chip,

@@ -14,7 +14,7 @@
     <template #item="{ item, select }">
       <the-css-selector-dropdown-item
         :selector="item.value"
-        :count="item.count"
+        :style-count="item.styleCount"
         @select="select"
       />
     </template>
@@ -26,9 +26,8 @@ import Vue from 'vue';
 import { SAutocomplete } from '@stylebot/components';
 import { StylebotEditingMode } from '@stylebot/types';
 
+import { CssSelectorMetadata } from '../../store';
 import TheCssSelectorDropdownItem from './TheCssSelectorDropdownItem.vue';
-
-type CssSelectorMetadata = { id: number; value: string; count: number };
 
 export default Vue.extend({
   name: 'TheCssSelectorDropdown',

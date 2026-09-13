@@ -51,18 +51,23 @@ export default {
 
     root.walkRules(rule => {
       try {
+        let styleCount = 0;
+        rule.walkDecls(() => {
+          styleCount++;
+        });
+
         selectors.push({
           id: index++,
           value: rule.selector,
-          count: document.querySelectorAll(rule.selector).length,
+          styleCount,
         });
       } catch (e) {}
     });
 
-    // sort in descending order of number of affected elements
+    // sort in descending order of number of declared styles
     selectors.sort((a, b) => {
-      if (b.count !== a.count) {
-        return b.count - a.count;
+      if (b.styleCount !== a.styleCount) {
+        return b.styleCount - a.styleCount;
       } else if (b.value > a.value) {
         return -1;
       } else {
