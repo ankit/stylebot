@@ -17,6 +17,8 @@
           :placeholder="placeholder"
           spellcheck="false"
           @keydown.enter.prevent="onEnter"
+          @keydown.down="onArrowKey(open, $event)"
+          @keydown.up="onArrowKey(open, $event)"
           @focus="onFocus"
           @input="onInput($event.target.value)"
         />
@@ -137,6 +139,14 @@ export default Vue.extend({
 
     showMenu(): void {
       this.menu().show();
+    },
+
+    // Reopens on Up/Down when closed, like the chevron — items.length can't gate this since an exact-match value filters to zero.
+    onArrowKey(open: boolean, event: KeyboardEvent): void {
+      if (!open) {
+        event.preventDefault();
+        this.showAll();
+      }
     },
 
     hideMenu(): void {

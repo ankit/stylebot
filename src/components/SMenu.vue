@@ -2,6 +2,7 @@
   <div
     class="menu"
     role="menu"
+    tabindex="-1"
     :class="{ dense }"
     :style="{ minWidth: `${minWidth}px`, maxHeight: maxHeight ? `${maxHeight}px` : undefined }"
   >
