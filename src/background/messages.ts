@@ -36,6 +36,8 @@ import {
   SetReadabilitySettings as SetReadabilitySettingsType,
   GetImportCss as GetImportCssType,
   RunGoogleDriveSync as RunGoogleDriveSyncType,
+  RequestEditorInjection as RequestEditorInjectionType,
+  RunCommand,
   GetCommandsResponse,
   GetAllOptionsResponse,
   GetAllStylesResponse,
@@ -46,6 +48,7 @@ import {
   RunGoogleDriveSyncResponse,
 } from '@stylebot/types';
 import { runGoogleDriveSync } from '@stylebot/sync';
+import { ensureEditorInjected } from '@stylebot/utils';
 
 import {
   get as getReadabilitySettings,
@@ -207,4 +210,20 @@ export const RunGoogleDriveSync = async (
 ): Promise<void> => {
   await runGoogleDriveSync();
   sendResponse();
+};
+
+export const RequestEditorInjection = async (
+  message: RequestEditorInjectionType,
+  sender: chrome.runtime.MessageSender
+): Promise<void> => {
+  const tabId = sender.tab?.id;
+
+  if (tabId === undefined) {
+    return;
+  }
+
+  await ensureEditorInjected(tabId);
+
+  const relay: RunCommand = { name: 'RunCommand', command: message.command };
+  chrome.tabs.sendMessage(tabId, relay);
 };

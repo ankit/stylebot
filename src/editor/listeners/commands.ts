@@ -11,7 +11,10 @@ import {
   sendToggleStyleMessage,
 } from './common';
 
-const handleCommand = (store: Store<State>, name: StylebotCommandName) => {
+export const handleCommand = (
+  store: Store<State>,
+  name: StylebotCommandName
+): void => {
   switch (name) {
     case 'stylebot':
       toggleStylebot(store);
@@ -56,6 +59,11 @@ const bindCommands = (store: Store<State>): void => {
 
 const initCommandListener = (store: Store<State>): void => {
   bindCommands(store);
+
+  // Signals inject-css's own (always-present) hotkey listener to stand
+  // down — otherwise both would fire for the same keypress once this page
+  // has an editor loaded.
+  window.__stylebotHotkeysBound = true;
 
   // Shortcuts can be changed elsewhere (the reader dock, the options page)
   // while this page is already open — re-bind so they take effect immediately.

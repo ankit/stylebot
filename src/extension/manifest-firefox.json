@@ -8,5 +8,35 @@
     "gecko": {
       "id": "stylebot@stylebot.dev"
     }
-  }
+  },
+
+  "content_scripts": [
+    {
+      "js": ["editor/index.js"],
+      "matches": ["<all_urls>"],
+      "exclude_matches": ["*://*/*.xml"],
+      "run_at": "document_idle"
+    },
+    {
+      "all_frames": true,
+      "js": ["inject-css/index.js"],
+      "matches": ["<all_urls>"],
+      "exclude_matches": ["*://*/*.xml"],
+      "run_at": "document_start"
+    }
+  ],
+
+  "permissions": [
+    "tabs",
+    "storage",
+    "identity",
+    "contextMenus",
+    "unlimitedStorage"
+  ],
+
+  "host_permissions": [
+    "https://drive.google.com/*",
+    "https://www.googleapis.com/*",
+    "https://fonts.googleapis.com/*"
+  ]
 }

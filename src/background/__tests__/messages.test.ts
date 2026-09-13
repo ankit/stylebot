@@ -1,7 +1,13 @@
 jest.mock('../styles');
+jest.mock('@stylebot/utils');
 
-import { SetReadability, ReadabilityActiveChanged } from '../messages';
+import {
+  SetReadability,
+  ReadabilityActiveChanged,
+  RequestEditorInjection,
+} from '../messages';
 import * as stylesModule from '../styles';
+import * as utilsModule from '@stylebot/utils';
 
 describe('SetReadability', () => {
   beforeEach(() => {
@@ -65,5 +71,41 @@ describe('ReadabilityActiveChanged', () => {
     await ReadabilityActiveChanged({ name: 'ReadabilityActiveChanged' }, {});
 
     expect(stylesModule.refreshBadgeForTab).not.toBeCalled();
+  });
+});
+
+describe('RequestEditorInjection', () => {
+  beforeEach(() => {
+    jest.resetAllMocks();
+    global.chrome = {
+      tabs: { sendMessage: jest.fn() },
+    } as unknown as typeof chrome;
+    (utilsModule.ensureEditorInjected as jest.Mock).mockResolvedValue(
+      undefined
+    );
+  });
+
+  it('injects the editor then relays the matched command to the sending tab', async () => {
+    const tab = { id: 7, url: 'https://example.com' } as chrome.tabs.Tab;
+
+    await RequestEditorInjection(
+      { name: 'RequestEditorInjection', command: 'stylebot' },
+      { tab }
+    );
+
+    expect(utilsModule.ensureEditorInjected).toBeCalledWith(7);
+    expect(chrome.tabs.sendMessage).toBeCalledWith(7, {
+      name: 'RunCommand',
+      command: 'stylebot',
+    });
+  });
+
+  it('does nothing when there is no sending tab', async () => {
+    await RequestEditorInjection(
+      { name: 'RequestEditorInjection', command: 'stylebot' },
+      {}
+    );
+
+    expect(utilsModule.ensureEditorInjected).not.toBeCalled();
   });
 });

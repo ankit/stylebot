@@ -7,6 +7,8 @@ export {
   keydownToShortcut,
 } from './keydown-to-shortcut';
 
+export { ensureEditorInjected } from './ensure-editor-injected';
+
 export const getCurrentTimestamp = (): Timestamp =>
   format(new Date(), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
 

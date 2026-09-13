@@ -1,6 +1,7 @@
 import { t } from '@stylebot/i18n';
 import { OpenStylebotFromContextMenu } from '@stylebot/types';
 import { BackgroundPageUtils } from '@stylebot/styles';
+import { ensureEditorInjected } from '@stylebot/utils';
 
 const CONTEXT_MENU_ID = 'stylebot-contextmenu';
 const VIEW_OPTIONS_MENU_ITEM_ID = 'view-options';
@@ -61,11 +62,14 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   switch (info.menuItemId) {
     case STYLE_ELEMENT_MENU_ITEM_ID:
       if (tab?.id) {
+        const tabId = tab.id;
         const message: OpenStylebotFromContextMenu = {
           name: 'OpenStylebotFromContextMenu',
         };
 
-        chrome.tabs.sendMessage(tab.id, message);
+        ensureEditorInjected(tabId).then(() => {
+          chrome.tabs.sendMessage(tabId, message);
+        });
       }
 
       break;

@@ -12,6 +12,7 @@ import {
   openOptionsPage,
   openReportIssuePage,
   openDonatePage,
+  ensureEditorInjected,
 } from '@stylebot/utils';
 
 export const getCurrentTab = (
@@ -76,12 +77,18 @@ export const getIsPageReaderable = (
 
 export const toggleStylebot = (tab: chrome.tabs.Tab): void => {
   if (tab.id) {
+    const tabId = tab.id;
     const message: ToggleStylebot = {
       name: 'ToggleStylebot',
     };
 
-    chrome.tabs.sendMessage(tab.id, message);
-    window.close();
+    // window.close() tears down this page immediately — closing before
+    // chrome.scripting.executeScript resolves can drop the injection
+    // entirely, unlike the old fire-and-forget sendMessage this replaced.
+    ensureEditorInjected(tabId).then(() => {
+      chrome.tabs.sendMessage(tabId, message);
+      window.close();
+    });
   }
 };
 

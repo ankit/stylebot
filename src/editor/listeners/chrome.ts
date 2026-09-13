@@ -12,6 +12,7 @@ import {
   updateSelectorWithContextMenuSelector,
 } from './common';
 
+import { handleCommand } from './commands';
 import { getStylesForPage } from '../utils/chrome';
 
 const initChromeListener = (store: Store<State>): void => {
@@ -34,11 +35,21 @@ const initChromeListener = (store: Store<State>): void => {
           toggleStylebot(store);
         }
       } else if (message.name === 'OpenStylebotFromContextMenu') {
+        // Set by inject-css's contextmenu listener, which keeps running for
+        // the tab's whole lifetime — so this is correct even for a second
+        // right-click after the editor's already open, not just the first.
+        const selector = window.__stylebotPendingContextMenuSelector;
+        if (selector) {
+          commit('setContextMenuSelector', selector);
+        }
+
         updateSelectorWithContextMenuSelector({ state, commit });
 
         if (!state.visible) {
           toggleStylebot(store, false);
         }
+      } else if (message.name === 'RunCommand') {
+        handleCommand(store, message.command);
       } else if (message.name === 'GetIsStylebotOpen') {
         sendResponse(state.visible);
       } else if (message.name === 'TabUpdated') {

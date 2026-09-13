@@ -1,6 +1,7 @@
 import {
   StylebotOptions,
   StylebotCommands,
+  StylebotCommandName,
   ReadabilitySettings,
   StyleMap,
 } from '@stylebot/types';
@@ -112,6 +113,14 @@ export type RunGoogleDriveSync = {
   name: 'RunGoogleDriveSync';
 };
 
+// Sent by inject-css's hotkey listener — it can't call chrome.scripting
+// itself, so it asks the background to inject editor/index.js and then
+// relay a RunCommand to it once loaded.
+export type RequestEditorInjection = {
+  name: 'RequestEditorInjection';
+  command: StylebotCommandName;
+};
+
 type BackgroundPageMessage =
   | SetStyle
   | EnableStyle
@@ -133,6 +142,7 @@ type BackgroundPageMessage =
   | GetReadabilitySettings
   | SetReadabilitySettings
   | GetImportCss
-  | RunGoogleDriveSync;
+  | RunGoogleDriveSync
+  | RequestEditorInjection;
 
 export default BackgroundPageMessage;

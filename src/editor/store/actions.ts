@@ -43,7 +43,8 @@ import {
   setReadabilitySettings,
 } from '../utils/chrome';
 
-import { initListeners } from '../listeners';
+import initChromeListener from '../listeners/chrome';
+import initCommandListener from '../listeners/commands';
 import { initEditor } from '../utils/init-editor';
 import { readCache, writeCache } from '../../inject-css/cache';
 
@@ -52,9 +53,24 @@ export default {
     { commit, dispatch }: { commit: Commit; dispatch: Dispatch },
     store: Store<State>
   ): Promise<void> {
+    // Registered synchronously, ahead of the async data-fetching below — a
+    // tab that just got on-demand injected needs this listener live the
+    // instant the injecting caller's follow-up message can arrive, not
+    // after several sequential chrome.runtime round-trips.
+    initChromeListener(store);
+
     const { defaultStyle } = await getStylesForPage(false);
     if (defaultStyle) {
       dispatch('initializeDefaultStyle', defaultStyle);
+
+      // On-demand injection can happen well after the page's own load —
+      // if a same-tab SPA navigation changed the readerable URL before the
+      // editor script was around to catch the background's TabUpdated
+      // broadcast, self-correct readability state right now instead of
+      // waiting for the next one.
+      if (document.readyState === 'complete') {
+        dispatch('applyReadability', Boolean(defaultStyle.readability));
+      }
     }
 
     const options = await getAllOptions();
@@ -79,7 +95,7 @@ export default {
     const readabilitySettings = await getReadabilitySettings();
     commit('setReadabilitySettings', readabilitySettings);
 
-    initListeners(store);
+    initCommandListener(store);
   },
 
   initializeDefaultStyle(

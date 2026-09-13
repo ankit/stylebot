@@ -29,13 +29,17 @@ describe('inject-css run()', () => {
     (applyStateModule.applyState as jest.Mock).mockResolvedValue(undefined);
 
     (global as any).chrome = {
-      storage: { local: { get: jest.fn() } },
+      storage: {
+        local: { get: jest.fn() },
+        onChanged: { addListener: jest.fn() },
+      },
       runtime: {
         onMessage: {
           addListener: (fn: typeof registeredListener) => {
             registeredListener = fn;
           },
         },
+        sendMessage: jest.fn(),
       },
     };
   });
@@ -174,5 +178,97 @@ describe('inject-css run()', () => {
     expect(sendResponse).toHaveBeenLastCalledWith(true);
 
     host.remove();
+  });
+
+  describe('hotkey listener', () => {
+    const commands = {
+      stylebot: 'alt+shift+m',
+      style: '',
+      readability: '',
+      grayscale: '',
+    };
+
+    const keydown = (init: KeyboardEventInit) =>
+      document.dispatchEvent(new KeyboardEvent('keydown', init));
+
+    beforeEach(() => {
+      (cacheModule.readCache as jest.Mock).mockReturnValue(null);
+      (stylesModule.getStylesForPage as jest.Mock).mockReturnValue({
+        styles: [],
+        defaultStyle: undefined,
+      });
+    });
+
+    it('requests editor injection when a bound combo is pressed', () => {
+      load({ styles: {}, commands });
+
+      keydown({ key: 'm', altKey: true, shiftKey: true });
+
+      expect((global as any).chrome.runtime.sendMessage).toHaveBeenCalledWith({
+        name: 'RequestEditorInjection',
+        command: 'stylebot',
+      });
+    });
+
+    it('ignores keydowns on editable targets', () => {
+      load({ styles: {}, commands });
+
+      const input = document.createElement('input');
+      document.body.appendChild(input);
+
+      input.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          key: 'm',
+          altKey: true,
+          shiftKey: true,
+          bubbles: true,
+        })
+      );
+
+      expect(
+        (global as any).chrome.runtime.sendMessage
+      ).not.toHaveBeenCalled();
+
+      input.remove();
+    });
+
+    it('ignores combos that match no configured command', () => {
+      load({ styles: {}, commands });
+
+      keydown({ key: 'z', ctrlKey: true });
+
+      expect(
+        (global as any).chrome.runtime.sendMessage
+      ).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('contextmenu listener', () => {
+    beforeEach(() => {
+      (cacheModule.readCache as jest.Mock).mockReturnValue(null);
+      (stylesModule.getStylesForPage as jest.Mock).mockReturnValue({
+        styles: [],
+        defaultStyle: undefined,
+      });
+    });
+
+    it('stashes the right-clicked element selector on window', () => {
+      load({ styles: {} });
+
+      const target = document.createElement('div');
+      target.id = 'some-target';
+      document.body.appendChild(target);
+
+      target.dispatchEvent(
+        new MouseEvent('contextmenu', { bubbles: true })
+      );
+
+      expect(window.__stylebotPendingContextMenuSelector).toContain(
+        'some-target'
+      );
+
+      target.remove();
+      delete window.__stylebotPendingContextMenuSelector;
+    });
   });
 });

@@ -1,4 +1,8 @@
-import { ReadabilitySettings, Style } from '@stylebot/types';
+import {
+  ReadabilitySettings,
+  Style,
+  StylebotCommandName,
+} from '@stylebot/types';
 
 export type ToggleStylebot = {
   name: 'ToggleStylebot';
@@ -52,6 +56,14 @@ export type ReadabilityStateChanged = {
   value: boolean;
 };
 
+// Relayed by the background once editor/index.js has been on-demand
+// injected in response to a keyboard shortcut, so the matched command
+// actually runs.
+export type RunCommand = {
+  name: 'RunCommand';
+  command: StylebotCommandName;
+};
+
 type TabMessage =
   | ToggleStylebot
   | OpenStylebot
@@ -63,6 +75,7 @@ type TabMessage =
   | GetIsPageReaderable
   | GetIsReadabilityActive
   | UpdateReader
-  | ReadabilityStateChanged;
+  | ReadabilityStateChanged
+  | RunCommand;
 
 export default TabMessage;
