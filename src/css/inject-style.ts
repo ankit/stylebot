@@ -6,12 +6,8 @@ const getStylesheetId = (id: string) => {
   return `stylebot-css-${id}`;
 };
 
-// Injection runs at document_start, often before the page has parsed its own
-// <head>, so a plain appendChild can land our stylesheet ahead of the page's
-// styles instead of after them. Since Stylebot's rules are all `!important`,
-// losing that ordering means an equally-`!important` page rule can win the
-// cascade tie. Keep every Stylebot stylesheet as the last child of <html>
-// until the initial parse finishes, so ours always comes after the page's.
+// document_start injection can land ahead of the page's own <head>; keep our
+// stylesheet last so an equally-`!important` page rule can't win the tie.
 const stylebotElements: HTMLStyleElement[] = [];
 let reorderObserver: MutationObserver | null = null;
 

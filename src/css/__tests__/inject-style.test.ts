@@ -12,9 +12,7 @@ const setReadyState = (readyState: DocumentReadyState) => {
   });
 };
 
-// The module keeps a singleton MutationObserver/element list to reposition
-// stylesheets while the document is parsing (see keepStylebotStylesLast).
-// Re-requiring it fresh per test avoids that state leaking between tests.
+// keepStylebotStylesLast keeps singleton state; re-require fresh per test.
 let injectCSSIntoDocument: typeof InjectStyle.injectCSSIntoDocument;
 let removeCSSFromDocument: typeof InjectStyle.removeCSSFromDocument;
 
