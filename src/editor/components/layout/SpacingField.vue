@@ -62,6 +62,6 @@ export default Vue.extend({
 
 .spacing-field ::v-deep .number-field {
   width: 100%;
-  max-width: 160px;
+  max-width: 108px;
 }
 </style>
