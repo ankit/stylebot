@@ -7,21 +7,32 @@
   >
     <template #trigger="{ open }">
       <div class="autocomplete-pill" :class="{ disabled }">
-        <textarea
-          ref="input"
-          rows="1"
-          class="autocomplete-input"
-          :class="{ mono }"
-          :disabled="disabled"
-          :value="value"
-          :placeholder="placeholder"
-          spellcheck="false"
-          @keydown.enter.prevent="onEnter"
-          @keydown.down="onArrowKey(open, $event)"
-          @keydown.up="onArrowKey(open, $event)"
-          @focus="onFocus"
-          @input="onInput($event.target.value)"
-        />
+        <div class="autocomplete-field">
+          <textarea
+            ref="input"
+            rows="1"
+            class="autocomplete-input"
+            :class="{ mono }"
+            :disabled="disabled"
+            :value="value"
+            :placeholder="placeholder"
+            spellcheck="false"
+            @keydown.enter.prevent="onEnter"
+            @keydown.down="onArrowKey(open, $event)"
+            @keydown.up="onArrowKey(open, $event)"
+            @focus="onFocus"
+            @blur="onBlur"
+            @input="onInput($event.target.value)"
+          />
+
+          <div
+            v-if="chips && !focused && !open && chipParts.length"
+            class="autocomplete-chips"
+            @click="focusInput"
+          >
+            <span v-for="(part, i) in chipParts" :key="i" class="chip">{{ part }}</span>
+          </div>
+        </div>
 
         <slot name="suffix" />
 
@@ -115,15 +126,32 @@ export default Vue.extend({
       type: Boolean,
       default: false,
     },
+
+    // Render a comma-separated value as pills when not being edited (e.g.
+    // for a multi-part CSS selector), instead of the raw wrapped text.
+    chips: {
+      type: Boolean,
+      default: false,
+    },
   },
 
-  data(): { suppressReopen: boolean; previousValue: string } {
+  data(): { suppressReopen: boolean; previousValue: string; focused: boolean } {
     return {
       suppressReopen: false,
       // Value to revert to on Escape / click-outside — captured at the start
       // of each editing session (focus / chevron-open).
       previousValue: '',
+      focused: false,
     };
+  },
+
+  computed: {
+    chipParts(): Array<string> {
+      return this.value
+        .split(',')
+        .map(part => part.trim())
+        .filter(Boolean);
+    },
   },
 
   watch: {
@@ -190,8 +218,17 @@ export default Vue.extend({
     },
 
     onFocus(): void {
+      this.focused = true;
       this.previousValue = this.value;
       this.syncMenu();
+    },
+
+    onBlur(): void {
+      this.focused = false;
+    },
+
+    focusInput(): void {
+      (this.$refs.input as HTMLTextAreaElement | undefined)?.focus();
     },
 
     onSelect(item: Record<string, unknown>): void {
@@ -254,10 +291,41 @@ export default Vue.extend({
   }
 }
 
-.autocomplete-input {
-  box-sizing: border-box;
+.autocomplete-field {
+  position: relative;
   flex: 1;
   min-width: 0;
+}
+
+.autocomplete-chips {
+  box-sizing: border-box;
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center;
+  gap: 6px;
+  padding: 6px 8px 4px 10px;
+  background: var(--background);
+  cursor: text;
+}
+
+.chip {
+  min-width: 0;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--foreground);
+  overflow-wrap: anywhere;
+}
+
+.autocomplete-input {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
   height: 30px;
   border: none;
   outline: none;

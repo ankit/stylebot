@@ -1,6 +1,7 @@
 <template>
   <s-autocomplete
     mono
+    chips
     class="selector-autocomplete"
     :value="activeSelector"
     :items="filteredSelectors"
