@@ -4,16 +4,16 @@
       <s-segmented-control fit :value="mode" :options="modeOptions" @change="selectMode" />
     </property-row>
 
-    <div v-if="mode === 'all'" class="spacing-grid spacing-grid-1">
+    <div v-if="mode === 'all'" class="spacing-grid">
       <spacing-field :label="t('all')" :value="all" :disabled="disabled" @input="setAll" />
     </div>
 
-    <div v-else-if="mode === 'xy'" class="spacing-grid spacing-grid-2">
+    <div v-else-if="mode === 'xy'" class="spacing-grid">
       <spacing-field :label="t('vertical')" :value="vertical" :disabled="disabled" @input="setVertical" />
       <spacing-field :label="t('horizontal')" :value="horizontal" :disabled="disabled" @input="setHorizontal" />
     </div>
 
-    <div v-else-if="mode === 'individual'" class="spacing-grid spacing-grid-2">
+    <div v-else-if="mode === 'individual'" class="spacing-grid">
       <spacing-field :label="t('top')" :value="top" :disabled="disabled" @input="setSide('top', $event)" />
       <spacing-field :label="t('right')" :value="right" :disabled="disabled" @input="setSide('right', $event)" />
       <spacing-field :label="t('bottom')" :value="bottom" :disabled="disabled" @input="setSide('bottom', $event)" />
@@ -226,16 +226,14 @@ export default Vue.extend({
 }
 
 .spacing-grid {
-  display: grid;
+  display: flex;
+  flex-wrap: wrap;
   gap: 14px;
   padding-top: 2px;
 }
 
-.spacing-grid-1 {
-  grid-template-columns: 1fr;
-}
-
-.spacing-grid-2 {
-  grid-template-columns: 1fr 1fr;
+.spacing-grid ::v-deep .spacing-field {
+  flex: 1 1 120px;
+  min-width: 120px;
 }
 </style>
