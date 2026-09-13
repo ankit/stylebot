@@ -18,6 +18,7 @@ export default Vue.extend({
 
   --background: #fff;
   --foreground: #191b1f;
+  --foreground-secondary: #3f434c;
   --muted-foreground: #767676;
   --border: #e9eaee;
   --accent: #f2f3f6;
@@ -44,6 +45,7 @@ export default Vue.extend({
   .theme-provider {
     --background: #1c1d21;
     --foreground: #eceef2;
+    --foreground-secondary: #c7cad3;
     --muted-foreground: #7d838f;
     --border: #2c2e34;
     --accent: #26282e;

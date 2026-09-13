@@ -8,6 +8,7 @@ export { default as CursorIcon } from './CursorIcon.vue';
 export { default as SearchIcon } from './SearchIcon.vue';
 export { default as CheckIcon } from './CheckIcon.vue';
 export { default as DropletIcon } from './DropletIcon.vue';
+export { default as EyeOffIcon } from './EyeOffIcon.vue';
 export { default as AlignLeftIcon } from './AlignLeftIcon.vue';
 export { default as AlignCenterIcon } from './AlignCenterIcon.vue';
 export { default as AlignRightIcon } from './AlignRightIcon.vue';

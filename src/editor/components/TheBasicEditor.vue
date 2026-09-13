@@ -1,5 +1,7 @@
 <template>
   <div class="basic-editor">
+    <the-basic-editor-actions />
+
     <property-card
       :label="t('text_properties')"
       :collapsed="!sections.text"
@@ -23,14 +25,6 @@
     >
       <the-layout-properties />
     </property-card>
-
-    <property-card
-      :label="t('border_properties')"
-      :collapsed="!sections.border"
-      @toggle="toggle('border')"
-    >
-      <the-border-properties />
-    </property-card>
   </div>
 </template>
 
@@ -39,20 +33,20 @@ import Vue from 'vue';
 import { StylebotBasicModeSections } from '@stylebot/types';
 
 import PropertyCard from './basic/PropertyCard.vue';
+import TheBasicEditorActions from './basic/TheBasicEditorActions.vue';
 import TheTextProperties from './TheTextProperties.vue';
 import TheColorProperties from './TheColorProperties.vue';
 import TheLayoutProperties from './TheLayoutProperties.vue';
-import TheBorderProperties from './TheBorderProperties.vue';
 
 export default Vue.extend({
   name: 'TheBasicEditor',
 
   components: {
     PropertyCard,
+    TheBasicEditorActions,
     TheTextProperties,
     TheColorProperties,
     TheLayoutProperties,
-    TheBorderProperties,
   },
 
   computed: {

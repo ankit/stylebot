@@ -3,6 +3,7 @@
     <font-family />
     <font-size />
     <line-height />
+    <color />
     <text-decoration />
     <text-align />
   </div>
@@ -14,6 +15,7 @@ import Vue from 'vue';
 import FontSize from './text/FontSize.vue';
 import LineHeight from './text/LineHeight.vue';
 import FontFamily from './text/FontFamily.vue';
+import Color from './color/Color.vue';
 import TextDecoration from './text/TextDecoration.vue';
 import TextAlign from './text/TextAlign.vue';
 
@@ -23,6 +25,7 @@ export default Vue.extend({
     FontFamily,
     FontSize,
     LineHeight,
+    Color,
     TextDecoration,
     TextAlign,
   },

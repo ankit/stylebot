@@ -43,7 +43,10 @@ export default Vue.extend({
 .property-row-label {
   flex: 1;
   min-width: 0;
-  font-size: 12.5px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 13px;
   line-height: 1.3;
   color: var(--muted-foreground);
 }

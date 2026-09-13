@@ -67,9 +67,9 @@ export default Vue.extend({
   min-width: 0;
   text-align: left;
   font-weight: 600;
-  font-size: 11px;
+  font-size: 13px;
   line-height: 1;
-  color: var(--muted-foreground);
+  color: var(--foreground-secondary);
 }
 
 .property-card-chevron {

@@ -1,17 +1,22 @@
 <template>
-  <property-row :label="t('border_style')">
-    <s-select :text="text" :muted="!value" :disabled="disabled" :menu-min-width="140">
-      <template #default="{ close }">
-        <menu-item
-          v-for="option in options"
-          :key="option.value"
-          :selected="option.value === value"
-          @click="select(option.value); close();"
-        >
-          {{ option.title }}
-        </menu-item>
-      </template>
-    </s-select>
+  <property-row :label="t('border')" last>
+    <div class="border-control">
+      <s-select class="border-style" :text="text" :muted="!styleValue" :disabled="disabled" :menu-min-width="140">
+        <template #default="{ close }">
+          <menu-item
+            v-for="option in options"
+            :key="option.value"
+            :selected="option.value === styleValue"
+            @click="selectStyle(option.value); close();"
+          >
+            {{ option.title }}
+          </menu-item>
+        </template>
+      </s-select>
+
+      <length class="border-width" property="border-width" />
+      <color-picker class="border-color" property="border-color" />
+    </div>
   </property-row>
 </template>
 
@@ -22,14 +27,18 @@ import { Declaration } from 'postcss';
 import { SSelect, MenuItem } from '@stylebot/components';
 
 import PropertyRow from '../basic/PropertyRow.vue';
+import Length from '../Length.vue';
+import ColorPicker from '../color/ColorPicker.vue';
 
 export default Vue.extend({
-  name: 'BorderStyle',
+  name: 'BorderControl',
 
   components: {
     PropertyRow,
     SSelect,
     MenuItem,
+    Length,
+    ColorPicker,
   },
 
   data(): {
@@ -54,7 +63,7 @@ export default Vue.extend({
   },
 
   computed: {
-    value(): string {
+    styleValue(): string {
       const activeRule = this.$store.getters.activeRule;
 
       let value = '';
@@ -68,7 +77,7 @@ export default Vue.extend({
     },
 
     text(): string {
-      const option = this.options.find(o => o.value === this.value);
+      const option = this.options.find(o => o.value === this.styleValue);
       return option ? option.title : t('default');
     },
 
@@ -78,7 +87,7 @@ export default Vue.extend({
   },
 
   methods: {
-    select(value: string): void {
+    selectStyle(value: string): void {
       this.$store.dispatch('applyDeclaration', {
         property: 'border-style',
         value,
@@ -87,3 +96,31 @@ export default Vue.extend({
   },
 });
 </script>
+
+<style lang="scss" scoped>
+.border-control {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.border-style ::v-deep .select-trigger {
+  min-width: 0;
+  width: 96px;
+}
+
+.border-control .border-width {
+  min-width: 0;
+  width: 60px;
+}
+
+.border-color ::v-deep .color-field {
+  width: 27px;
+  height: 27px;
+}
+
+.border-color ::v-deep .color-hex {
+  display: none;
+}
+</style>
