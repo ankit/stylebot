@@ -23,6 +23,18 @@ import { applyState } from './apply-state';
 import { CachedState, readCache, writeCache } from './cache';
 import { hidePage, revealPage } from './hide-page';
 
+// A content script's document is the page's own origin, so webpack's default
+// (page-relative) chunk-loading URL would try to fetch the dynamically
+// imported readability chunk from the target site instead of the extension.
+// Guarded: this identifier only exists once webpack's compiler rewrites it —
+// under ts-jest (no webpack) it's a genuinely undeclared global, and typeof
+// is the one reference form that's safe to use on those.
+declare let __webpack_public_path__: string;
+if (typeof __webpack_public_path__ !== 'undefined') {
+  // eslint-disable-next-line prefer-const -- webpack's chunk-loading runtime looks for an assignment to this exact name.
+  __webpack_public_path__ = chrome.runtime.getURL('/');
+}
+
 // editor/index.js is on-demand injected (Chrome/Edge only — Firefox keeps it
 // static), so the first keyboard-shortcut press on a page has to be caught
 // here instead, before it exists.
