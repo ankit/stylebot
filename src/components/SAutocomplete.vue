@@ -250,13 +250,13 @@ export default Vue.extend({
   border: none;
   outline: none;
   background: transparent;
-  padding: 0 0 0 10px;
+  padding: 6px 0 4px 10px;
   margin: 0;
   resize: none;
   overflow: hidden;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
-  font: 400 12.5px/32px 'Public Sans', system-ui, sans-serif;
+  font: 400 12.5px/22px 'Public Sans', system-ui, sans-serif;
   color: var(--foreground);
 
   &.mono {
