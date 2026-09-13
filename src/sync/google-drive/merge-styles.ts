@@ -1,4 +1,3 @@
-import { without } from 'lodash';
 import { compareAsc } from 'date-fns';
 import { StyleMap } from '@stylebot/types';
 
@@ -28,7 +27,7 @@ export default (local: StyleMap, remote: StyleMap): StyleMap => {
     styles[url] = local[url];
   });
 
-  const remainingUrls = without(Object.keys(remote), ...urls);
+  const remainingUrls = Object.keys(remote).filter(url => !urls.includes(url));
   remainingUrls.forEach(url => {
     styles[url] = remote[url];
   });
