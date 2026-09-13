@@ -7,6 +7,8 @@ export {
   keydownToShortcut,
 } from './keydown-to-shortcut';
 
+export { debounce } from './debounce';
+
 export const getCurrentTimestamp = (): Timestamp =>
   format(new Date(), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
 
