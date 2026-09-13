@@ -68,13 +68,11 @@ export default Vue.extend({
   justify-content: space-between;
   gap: 8px;
   padding: 7px 12px;
-  border: 1px solid var(--input);
-  border-radius: 9px;
+  @include field-border(9px);
   background: var(--background);
 
   &:focus-within {
-    border-color: var(--primary);
-    box-shadow: inset 0 0 0 1px var(--primary);
+    @include field-active-border;
   }
 
   &.disabled {

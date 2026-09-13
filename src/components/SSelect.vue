@@ -98,8 +98,7 @@ export default Vue.extend({
   gap: 6px;
   min-width: 108px;
   padding: 5px 8px;
-  border: 1px solid var(--input);
-  border-radius: 7px;
+  @include field-border;
   font-size: 12.5px;
   line-height: 1.2;
   color: var(--foreground);
@@ -116,8 +115,7 @@ export default Vue.extend({
 
   &.open,
   &:focus-visible {
-    border-color: var(--primary);
-    box-shadow: inset 0 0 0 1px var(--primary);
+    @include field-active-border;
   }
 
   @include focus-ring;

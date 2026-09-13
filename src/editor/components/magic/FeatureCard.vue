@@ -1,5 +1,5 @@
 <template>
-  <div class="feature-card">
+  <s-card class="feature-card">
     <div class="feature-card-header">
       <heading as="h3" size="sm">{{ label }}</heading>
       <slot name="toggle" />
@@ -8,18 +8,19 @@
     <div class="feature-card-body">
       <slot />
     </div>
-  </div>
+  </s-card>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import { Heading } from '@stylebot/components';
+import { Heading, SCard } from '@stylebot/components';
 
 export default Vue.extend({
   name: 'FeatureCard',
 
   components: {
     Heading,
+    SCard,
   },
 
   props: {
@@ -34,9 +35,6 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .feature-card {
   padding: 14px 16px;
-  border: 1px solid var(--border);
-  border-radius: 11px;
-  background: var(--background);
 }
 
 .feature-card-header {

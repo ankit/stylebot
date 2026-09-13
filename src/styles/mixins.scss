@@ -13,3 +13,22 @@
   all: unset;
   box-sizing: border-box;
 }
+
+// Shared chrome for field-like containers (selects, number/color/text inputs).
+@mixin field-border($radius: 7px) {
+  border: 1px solid var(--input);
+  border-radius: $radius;
+}
+
+// Active/focused state for the same fields — pair with field-border.
+@mixin field-active-border {
+  border-color: var(--primary);
+  box-shadow: inset 0 0 0 1px var(--primary);
+}
+
+// Shared surface for card-like containers (property groups, feature cards).
+@mixin card-surface($radius: 11px) {
+  border: 1px solid var(--border);
+  border-radius: $radius;
+  background: var(--background);
+}

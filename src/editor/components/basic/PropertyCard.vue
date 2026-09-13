@@ -1,5 +1,5 @@
 <template>
-  <div class="property-card">
+  <s-card class="property-card">
     <button
       type="button"
       class="property-card-header"
@@ -13,18 +13,20 @@
     <div v-show="!collapsed" class="property-card-body">
       <slot />
     </div>
-  </div>
+  </s-card>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import { ChevronDownIcon } from '@stylebot/icons';
+import { SCard } from '@stylebot/components';
 
 export default Vue.extend({
   name: 'PropertyCard',
 
   components: {
     ChevronDownIcon,
+    SCard,
   },
 
   props: {
@@ -42,12 +44,6 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-.property-card {
-  border: 1px solid var(--border);
-  border-radius: 11px;
-  background: var(--background);
-}
-
 .property-card-header {
   @include button-reset;
   display: flex;

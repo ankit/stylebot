@@ -122,14 +122,12 @@ export default Vue.extend({
   width: 108px;
   font-size: 12.5px;
   line-height: 1.2;
-  border: 1px solid var(--input);
-  border-radius: 7px;
+  @include field-border;
 
   // Only the numeric input highlights the whole field — the chevron button
   // gets its own focus ring instead (see .number-chevron).
   &:has(.number-input:focus) {
-    border-color: var(--primary);
-    box-shadow: inset 0 0 0 1px var(--primary);
+    @include field-active-border;
   }
 
   &.disabled {

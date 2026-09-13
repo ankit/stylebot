@@ -154,15 +154,13 @@ export default Vue.extend({
   display: flex;
   align-items: stretch;
   width: 108px;
-  border: 1px solid var(--input);
-  border-radius: 7px;
+  @include field-border;
 
   // Only the hex text field highlights the whole pill — the swatch button
   // (which opens the picker) gets its own focus ring instead.
   &:has(.color-hex:focus),
   &.open {
-    border-color: var(--primary);
-    box-shadow: inset 0 0 0 1px var(--primary);
+    @include field-active-border;
   }
 
   &.disabled {
