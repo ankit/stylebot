@@ -79,6 +79,7 @@ export default Vue.extend({
 
 .value-option {
   @include button-reset;
+
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -88,6 +89,7 @@ export default Vue.extend({
   font-size: 12px;
   line-height: 1.2;
   color: var(--muted-foreground);
+  outline: none;
   cursor: pointer;
 
   &:hover:not(:disabled):not(.active) {
@@ -106,6 +108,10 @@ export default Vue.extend({
     opacity: 0.6;
   }
 
-  @include focus-ring(-2px);
+  &:focus-visible {
+    color: var(--foreground);
+  }
+
+  @include focus-ring;
 }
 </style>

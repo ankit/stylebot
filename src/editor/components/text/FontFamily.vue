@@ -8,21 +8,20 @@
       :disabled="disabled"
     >
       <template #default="{ close }">
-        <menu-item dense :selected="!value" @click="select(''); close();">
+        <menu-item :selected="!value" @click="select(''); close();">
           {{ t('default') }}
         </menu-item>
 
         <menu-item
           v-for="font in fonts"
           :key="font"
-          dense
           :selected="value === font"
           @click="select(font); close();"
         >
-          <span :style="{ fontFamily: font }">{{ font }}</span>
+          {{ font }}
         </menu-item>
 
-        <menu-item dense class="edit-fonts" @click="editFonts(); close();">
+        <menu-item class="edit-fonts" @click="editFonts(); close();">
           {{ t('fonts_edit_list') }}
         </menu-item>
       </template>

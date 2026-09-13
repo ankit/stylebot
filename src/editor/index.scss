@@ -3,11 +3,5 @@
 @import '../../node_modules/vue-draggable-resizable/dist/VueDraggableResizable.css';
 
 .stylebot-app {
-  @import 'scss/theme.scss';
-
-  @import '~bootstrap';
-  @import '~bootstrap-vue';
-
-  @import 'scss/overrides.scss';
   @import 'scss/typography.scss';
 }

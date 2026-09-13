@@ -74,8 +74,10 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .basic-editor {
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
+  min-height: 100%;
   gap: 10px;
   padding: 12px;
   background: var(--accent);

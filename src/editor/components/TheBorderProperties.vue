@@ -1,7 +1,7 @@
 <template>
   <div>
     <border-style />
-    <border-color class="mt-3" />
+    <border-color />
   </div>
 </template>
 

@@ -1,7 +1,7 @@
 <template>
-  <div>
-    <color-palette-picker class="color-palette-picker mt-1" />
-    <color-input v-model="value" class="color-input mt-1 ml-2" />
+  <div class="color-palette-footer">
+    <color-palette-picker />
+    <color-input v-model="value" />
   </div>
 </template>
 
@@ -34,12 +34,11 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-.color-palette-picker {
-  float: left;
-  margin-left: -2px;
-}
-
-.color-input {
-  float: right;
+.color-palette-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 8px;
 }
 </style>

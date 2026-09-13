@@ -1,11 +1,10 @@
 <template>
   <property-row :label="t('font_style')">
-    <s-select :text="text" :muted="!weight && !style" :disabled="disabled">
+    <s-select :text="text" :muted="!weight && !style" :disabled="disabled" :menu-min-width="150">
       <template #default="{ close }">
         <menu-item
           v-for="option in boldOptions"
           :key="option.title"
-          dense
           :selected="isSelected(option)"
           @click="select(option); close();"
         >
@@ -17,7 +16,6 @@
         <menu-item
           v-for="option in italicOptions"
           :key="option.title"
-          dense
           :selected="isSelected(option)"
           @click="select(option); close();"
         >

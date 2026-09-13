@@ -22,7 +22,7 @@
       </template>
 
       <template #default="{ close }">
-        <s-menu dense :min-width="menuMinWidth">
+        <s-menu dense :min-width="menuMinWidth" :max-height="260">
           <menu-item
             v-for="preset in presets"
             :key="preset"
@@ -116,16 +116,20 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .number-field {
   box-sizing: border-box;
+  position: relative;
   display: flex;
   align-items: stretch;
-  min-width: 108px;
+  width: 108px;
+  font-size: 12.5px;
+  line-height: 1.2;
   border: 1px solid var(--input);
   border-radius: 7px;
-  overflow: hidden;
 
-  &:focus-within {
+  // Only the numeric input highlights the whole field — the chevron button
+  // gets its own focus ring instead (see .number-chevron).
+  &:has(.number-input:focus) {
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 16%, transparent);
+    box-shadow: inset 0 0 0 1px var(--primary);
   }
 
   &.disabled {
@@ -134,9 +138,17 @@ export default Vue.extend({
 }
 
 .number-input {
-  @include button-reset;
-  flex: 1;
+  flex: 1 1 0;
+  width: 0;
   min-width: 0;
+  box-sizing: border-box;
+  border-radius: 7px 0 0 7px;
+  margin: 0;
+  border: none;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
   padding: 5px 8px;
   font-family: var(--font-mono);
   font-size: 12.5px;
@@ -164,6 +176,11 @@ export default Vue.extend({
   color: var(--muted-foreground);
 }
 
+.number-presets {
+  flex: none;
+  display: flex;
+}
+
 .number-chevron {
   @include button-reset;
   flex: none;
@@ -172,6 +189,8 @@ export default Vue.extend({
   justify-content: center;
   width: 22px;
   border-left: 1px solid var(--border);
+  border-radius: 0 6px 6px 0;
+  outline: none;
   color: var(--muted-foreground);
   cursor: pointer;
 
@@ -179,6 +198,8 @@ export default Vue.extend({
     background: var(--accent);
     color: var(--foreground);
   }
+
+  @include focus-ring;
 
   &:disabled {
     cursor: default;

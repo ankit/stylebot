@@ -14,7 +14,7 @@
     </template>
 
     <template #default="{ close }">
-      <s-menu dense :min-width="menuMinWidth">
+      <s-menu dense :min-width="menuMinWidth" :max-height="menuMaxHeight">
         <slot :close="close" />
       </s-menu>
     </template>
@@ -66,6 +66,12 @@ export default Vue.extend({
       type: Number,
       default: 108,
     },
+
+    // Caps the menu's height and makes long lists (e.g. many custom fonts) scroll.
+    menuMaxHeight: {
+      type: Number,
+      default: 260,
+    },
   },
 });
 </script>
@@ -97,27 +103,29 @@ export default Vue.extend({
   font-size: 12.5px;
   line-height: 1.2;
   color: var(--foreground);
+  outline: none;
   cursor: pointer;
 
   &.muted {
     color: var(--muted-foreground);
   }
 
-  &:hover:not(:disabled) {
+  &:hover:not(:disabled):not(.open) {
     border-color: var(--muted-foreground);
   }
 
-  &.open {
+  &.open,
+  &:focus-visible {
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 16%, transparent);
+    box-shadow: inset 0 0 0 1px var(--primary);
   }
+
+  @include focus-ring;
 
   &:disabled {
     cursor: default;
     opacity: 0.6;
   }
-
-  @include focus-ring;
 }
 
 .select-value {

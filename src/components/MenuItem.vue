@@ -2,7 +2,7 @@
   <button
     type="button"
     class="menu-item"
-    :class="{ danger, dense, selected }"
+    :class="{ danger, selected }"
     role="menuitem"
     @click="$emit('click', $event)"
   >
@@ -29,11 +29,6 @@ export default Vue.extend({
       default: false,
     },
 
-    dense: {
-      type: Boolean,
-      default: false,
-    },
-
     // Marks the item as the current choice — shows a trailing check.
     selected: {
       type: Boolean,
@@ -49,37 +44,32 @@ export default Vue.extend({
   display: flex;
   align-items: center;
   gap: 8px;
-  width: 100%;
   flex-shrink: 0;
   font-weight: 400;
-  font-size: 13.5px;
+  font-size: var(--menu-item-font-size, 13.5px);
   line-height: 1.3;
   color: var(--foreground);
-  padding: 10px;
-  border-radius: 8px;
+  margin: 0 calc(-1 * var(--menu-padding, 12px));
+  padding: var(--menu-item-padding-y, 10px) 12px;
+  border-radius: 0;
+  outline: none;
   cursor: pointer;
 
-  &:hover {
-    background: var(--accent);
-  }
-
+  &:hover,
+  &:focus,
   &:focus-visible {
     outline: none;
-    box-shadow: inset 0 0 0 2px var(--ring);
+    background: var(--accent);
+    box-shadow: inset 4px 0 0 var(--primary);
   }
 
   &.danger {
     color: var(--danger);
 
-    &:hover {
+    &:hover,
+    &:focus-visible {
       background: var(--danger-background);
     }
-  }
-
-  &.dense {
-    padding: 7px 8px;
-    font-size: 12.5px;
-    border-radius: 6px;
   }
 
   &.selected {

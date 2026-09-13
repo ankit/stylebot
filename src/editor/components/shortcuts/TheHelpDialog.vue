@@ -1,150 +1,127 @@
 <template>
   <div class="stylebot-help-dialog-overlay">
-    <div class="stylebot-help-dialog p-4">
-      <b-row>
-        <b-col cols="11">
-          <h1 class="title mb-4">Stylebot {{ t('keyboard_shortcuts') }}</h1>
-        </b-col>
+    <div class="stylebot-help-dialog">
+      <div class="header-row">
+        <h1 class="title">Stylebot {{ t('keyboard_shortcuts') }}</h1>
 
-        <b-col cols="1" style="text-align: right">
-          <button class="close-btn" @click="close">
-            <b-icon icon="x-circle" />
-          </button>
-        </b-col>
-      </b-row>
+        <button class="close-btn" @click="close">
+          <x-icon :size="20" />
+        </button>
+      </div>
 
-      <b-row>
-        <b-col cols="6">
-          <b-table-simple>
-            <b-thead>
-              <b-tr>
-                <b-th colspan="2">
-                  {{ t('global') }}
-                  <a
-                    href="#"
-                    class="customize"
-                    @click="customizeGlobalCommands"
-                  >
-                    {{ t('customize') }}
-                  </a>
-                </b-th>
-              </b-tr>
-            </b-thead>
+      <div class="tables-row">
+        <table class="shortcuts-table">
+          <thead>
+            <tr>
+              <th colspan="2">
+                {{ t('global') }}
+                <a href="#" class="customize" @click="customizeGlobalCommands">
+                  {{ t('customize') }}
+                </a>
+              </th>
+            </tr>
+          </thead>
 
-            <b-tbody>
-              <b-tr>
-                <b-td>{{ t('toggle_editor') }}</b-td>
-                <b-td class="stylebot-key">
-                  {{ commands.stylebot }}
-                </b-td>
-              </b-tr>
+          <tbody>
+            <tr>
+              <td>{{ t('toggle_editor') }}</td>
+              <td class="stylebot-key">{{ commands.stylebot }}</td>
+            </tr>
 
-              <b-tr>
-                <b-td>{{ t('toggle_styling') }}</b-td>
-                <b-td class="stylebot-key">
-                  {{ commands.style }}
-                </b-td>
-              </b-tr>
+            <tr>
+              <td>{{ t('toggle_styling') }}</td>
+              <td class="stylebot-key">{{ commands.style }}</td>
+            </tr>
 
-              <b-tr>
-                <b-td>{{ t('toggle_readability') }}</b-td>
-                <b-td class="stylebot-key">
-                  {{ commands.readability }}
-                </b-td>
-              </b-tr>
+            <tr>
+              <td>{{ t('toggle_readability') }}</td>
+              <td class="stylebot-key">{{ commands.readability }}</td>
+            </tr>
 
-              <b-tr>
-                <b-td>{{ t('toggle_grayscale') }}</b-td>
-                <b-td class="stylebot-key">
-                  {{ commands.grayscale }}
-                </b-td>
-              </b-tr>
-            </b-tbody>
-          </b-table-simple>
-        </b-col>
+            <tr>
+              <td>{{ t('toggle_grayscale') }}</td>
+              <td class="stylebot-key">{{ commands.grayscale }}</td>
+            </tr>
+          </tbody>
+        </table>
 
-        <b-col cols="6">
-          <b-table-simple>
-            <b-thead>
-              <b-tr>
-                <b-th colspan="2">{{ t('editor') }}</b-th>
-              </b-tr>
-            </b-thead>
+        <table class="shortcuts-table">
+          <thead>
+            <tr>
+              <th colspan="2">{{ t('editor') }}</th>
+            </tr>
+          </thead>
 
-            <b-tbody>
-              <b-tr>
-                <b-td>{{ t('toggle_inspector') }}</b-td>
-                <b-td class="stylebot-key">
-                  {{ editorCommands.inspect }}
-                </b-td>
-              </b-tr>
+          <tbody>
+            <tr>
+              <td>{{ t('toggle_inspector') }}</td>
+              <td class="stylebot-key">{{ editorCommands.inspect }}</td>
+            </tr>
 
-              <b-tr>
-                <b-td>{{ t('set_basic_mode') }}</b-td>
-                <b-td class="stylebot-key">{{ editorCommands.basic }}</b-td>
-              </b-tr>
+            <tr>
+              <td>{{ t('set_basic_mode') }}</td>
+              <td class="stylebot-key">{{ editorCommands.basic }}</td>
+            </tr>
 
-              <b-tr>
-                <b-td>{{ t('set_magic_mode') }}</b-td>
-                <b-td class="stylebot-key">{{ editorCommands.magic }}</b-td>
-              </b-tr>
+            <tr>
+              <td>{{ t('set_magic_mode') }}</td>
+              <td class="stylebot-key">{{ editorCommands.magic }}</td>
+            </tr>
 
-              <b-tr>
-                <b-td>{{ t('set_code_mode') }}</b-td>
-                <b-td class="stylebot-key">{{ editorCommands.code }}</b-td>
-              </b-tr>
+            <tr>
+              <td>{{ t('set_code_mode') }}</td>
+              <td class="stylebot-key">{{ editorCommands.code }}</td>
+            </tr>
 
-              <b-tr>
-                <b-td>{{ t('resize') }}</b-td>
-                <b-td class="stylebot-key">{{ editorCommands.resize }}</b-td>
-              </b-tr>
+            <tr>
+              <td>{{ t('resize') }}</td>
+              <td class="stylebot-key">{{ editorCommands.resize }}</td>
+            </tr>
 
-              <b-tr>
-                <b-td>{{ t('dock_to_left') }}</b-td>
-                <b-td class="stylebot-key">
-                  {{ editorCommands.dockLeft }}
-                </b-td>
-              </b-tr>
+            <tr>
+              <td>{{ t('dock_to_left') }}</td>
+              <td class="stylebot-key">{{ editorCommands.dockLeft }}</td>
+            </tr>
 
-              <b-tr>
-                <b-td>{{ t('dock_to_right') }}</b-td>
-                <b-td class="stylebot-key">
-                  {{ editorCommands.dockRight }}
-                </b-td>
-              </b-tr>
+            <tr>
+              <td>{{ t('dock_to_right') }}</td>
+              <td class="stylebot-key">{{ editorCommands.dockRight }}</td>
+            </tr>
 
-              <b-tr>
-                <b-td>{{ t('adjust_page_layout') }}</b-td>
-                <b-td class="stylebot-key">
-                  {{ editorCommands.pageLayout }}
-                </b-td>
-              </b-tr>
+            <tr>
+              <td>{{ t('adjust_page_layout') }}</td>
+              <td class="stylebot-key">{{ editorCommands.pageLayout }}</td>
+            </tr>
 
-              <b-tr>
-                <b-td>{{ t('hide_element') }}</b-td>
-                <b-td class="stylebot-key">{{ editorCommands.hide }}</b-td>
-              </b-tr>
+            <tr>
+              <td>{{ t('hide_element') }}</td>
+              <td class="stylebot-key">{{ editorCommands.hide }}</td>
+            </tr>
 
-              <b-tr>
-                <b-td>{{ t('show_help') }}</b-td>
-                <b-td class="stylebot-key">{{ editorCommands.help }}</b-td>
-              </b-tr>
-            </b-tbody>
-          </b-table-simple>
-        </b-col>
-      </b-row>
+            <tr>
+              <td>{{ t('show_help') }}</td>
+              <td class="stylebot-key">{{ editorCommands.help }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
+import { XIcon } from '@stylebot/icons';
 import { StylebotCommands, StylebotEditorCommands } from '@stylebot/types';
 
 import { openOptionsPage } from '../../utils/chrome';
 
 export default Vue.extend({
   name: 'TheHelpDialog',
+
+  components: {
+    XIcon,
+  },
 
   computed: {
     commands(): StylebotCommands {
@@ -192,13 +169,9 @@ export default Vue.extend({
   top: 0;
   left: 0;
   z-index: 1000000000;
-  display: block;
   width: 100%;
   height: 100%;
-  overflow: hidden;
-  outline: 0;
-  font-size: 15px;
-  background: #000000b3;
+  background: rgba(0, 0, 0, 0.7);
 }
 
 .stylebot-help-dialog {
@@ -207,35 +180,75 @@ export default Vue.extend({
   flex-direction: column;
   width: 65%;
   max-width: 900px;
-  pointer-events: auto;
-  background-color: #fff;
-  outline: 0;
   margin: 40px auto;
   max-height: calc(100% - 80px);
   overflow: auto;
+  padding: 24px;
+  border-radius: 14px;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 16px;
 }
 
 .title {
-  color: #000;
+  margin: 0;
   font-size: 24px;
-  font-weight: 250;
+  font-weight: 600;
 }
 
 .close-btn {
-  margin: 0;
-  padding: 0;
-  border: none;
-  font-size: 24px;
-  background: none;
-  color: #666;
+  @include button-reset;
+  display: inline-flex;
+  padding: 4px;
+  border-radius: 6px;
+  color: var(--muted-foreground);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--accent);
+    color: var(--foreground);
+  }
+}
+
+.tables-row {
+  display: flex;
+  gap: 24px;
+}
+
+.shortcuts-table {
+  flex: 1;
+  min-width: 0;
+  border-collapse: collapse;
+
+  th {
+    padding-bottom: 8px;
+    text-align: left;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  td {
+    padding: 6px 0;
+    border-top: 1px solid var(--border);
+    font-size: 14px;
+  }
 }
 
 .customize {
   float: right;
   font-weight: normal;
+  color: var(--primary);
 }
 
 .stylebot-key {
   text-align: right;
+  font-family: var(--font-mono);
+  color: var(--muted-foreground);
 }
 </style>

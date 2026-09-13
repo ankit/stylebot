@@ -1,54 +1,43 @@
 <template>
-  <div class="the-readability">
-    <b-form-checkbox
-      v-model="value"
-      switch
-      class="enable-readability"
-      :disabled="!pageReaderable"
-    >
-      {{ t('enable_readability') }}
-    </b-form-checkbox>
+  <feature-card :label="t('readability')">
+    <template #toggle>
+      <toggle-switch size="lg" :value="value" :disabled="!pageReaderable" @change="setValue" />
+    </template>
 
-    <p class="lead pt-2">
-      {{ t('readability_description') }}
-    </p>
-  </div>
+    <s-text variant="muted">{{ t('readability_description') }}</s-text>
+  </feature-card>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
+import { ToggleSwitch, SText } from '@stylebot/components';
 
 import { isReaderable } from '@stylebot/readability';
+import FeatureCard from './FeatureCard.vue';
 
 export default Vue.extend({
   name: 'TheReadability',
+
+  components: {
+    FeatureCard,
+    ToggleSwitch,
+    SText,
+  },
 
   computed: {
     pageReaderable(): boolean {
       return isReaderable();
     },
 
-    value: {
-      get(): boolean {
-        return this.$store.getters.readabilityActive;
-      },
+    value(): boolean {
+      return this.$store.getters.readabilityActive;
+    },
+  },
 
-      set(value: boolean): void {
-        this.$store.dispatch('applyReadability', value);
-      },
+  methods: {
+    setValue(value: boolean): void {
+      this.$store.dispatch('applyReadability', value);
     },
   },
 });
 </script>
-
-<style lang="scss" scoped>
-.the-readability {
-  line-height: 21px;
-}
-
-.enable-readability {
-  &.custom-switch {
-    font-size: 14px;
-  }
-}
-</style>

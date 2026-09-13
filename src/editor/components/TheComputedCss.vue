@@ -2,12 +2,9 @@
   <div v-if="selector" class="stylebot-computed-css">
     <h1>{{ selector }}</h1>
 
-    <b-list-group>
-      <b-list-group-item
-        v-for="decl in computedCss"
-        :key="decl.property"
-      >{{ decl.property }}: {{ decl.value }}</b-list-group-item>
-    </b-list-group>
+    <ul class="computed-css-list">
+      <li v-for="decl in computedCss" :key="decl.property">{{ decl.property }}: {{ decl.value }}</li>
+    </ul>
   </div>
 </template>
 
@@ -61,12 +58,31 @@ export default Vue.extend({
   right: 350px;
   position: absolute;
   top: 0;
-  background: #fff;
+  background: var(--background);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+  border-radius: 8px;
   z-index: 100000000000;
   font-size: 13px;
   max-height: 400px;
   overflow-y: scroll;
   width: 300px;
   word-break: break-word;
+  padding: 12px;
+}
+
+.computed-css-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    padding: 4px 0;
+    border-top: 1px solid var(--border);
+
+    &:first-child {
+      border-top: none;
+    }
+  }
 }
 </style>

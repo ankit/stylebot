@@ -1,6 +1,11 @@
 <template>
   <div class="property-card">
-    <button type="button" class="property-card-header" @click="$emit('toggle')">
+    <button
+      type="button"
+      class="property-card-header"
+      :class="{ collapsed }"
+      @click="$emit('toggle')"
+    >
       <span class="property-card-label">{{ label }}</span>
       <chevron-down-icon :size="11" class="property-card-chevron" :class="{ collapsed }" />
     </button>
@@ -50,7 +55,15 @@ export default Vue.extend({
   gap: 8px;
   width: 100%;
   padding: 9px 12px;
+  border-radius: 10px 10px 0 0;
+  outline: none;
   cursor: pointer;
+
+  &.collapsed {
+    border-radius: 10px;
+  }
+
+  @include focus-ring;
 }
 
 .property-card-label {

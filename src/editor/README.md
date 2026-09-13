@@ -1,12 +1,10 @@
 # `editor`
 
-This package includes code for the stylebot editor displayed on the page. Built using [bootstrap-vue](https://bootstrap-vue.org/)
+This package includes code for the stylebot editor displayed on the page.
 
 - **`components`**: Vue components for rendering the editor
 
-- **`icons`**: Custom icons not available in [bootstrap-vue](https://bootstrap-vue.org/)
-
-- **`scss`**: Theme and typography overrides for bootstrap css
+- **`scss`**: Typography overrides
 
 - **`store`**: [Vuex](https://vuex.vuejs.org/) store to manage editor state
 

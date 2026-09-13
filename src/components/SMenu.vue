@@ -1,5 +1,10 @@
 <template>
-  <div class="menu" role="menu" :class="{ dense }" :style="{ minWidth: `${minWidth}px` }">
+  <div
+    class="menu"
+    role="menu"
+    :class="{ dense }"
+    :style="{ minWidth: `${minWidth}px`, maxHeight: maxHeight ? `${maxHeight}px` : undefined }"
+  >
     <slot />
   </div>
 </template>
@@ -22,17 +27,28 @@ export default Vue.extend({
       type: Number,
       default: 176,
     },
+
+    // Caps the menu's height (px) and makes it scroll instead of growing
+    // unbounded. Omit to fall back to the viewport-relative default.
+    maxHeight: {
+      type: Number,
+      default: 0,
+    },
   },
 });
 </script>
 
 <style lang="scss" scoped>
 .menu {
+  --menu-padding: 12px;
+  --menu-item-padding-y: 10px;
+  --menu-item-font-size: 13.5px;
+
   max-height: calc(100vh - 92px);
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: 12px;
+  padding: var(--menu-padding);
   border-radius: 14px;
   display: flex;
   flex-direction: column;
@@ -44,7 +60,10 @@ export default Vue.extend({
   animation: dock-menu-in 0.16s ease-out;
 
   &.dense {
-    padding: 4px;
+    --menu-padding: 4px;
+    --menu-item-padding-y: 7px;
+    --menu-item-font-size: 12.5px;
+    padding: var(--menu-padding);
     border-radius: 11px;
     gap: 1px;
   }
