@@ -1,16 +1,33 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { injectCSSIntoDocument, removeCSSFromDocument } from '../inject-style';
+import type * as InjectStyle from '../inject-style';
 
 const stylesheetId = (id: string) => `stylebot-css-${id}`;
 
 const flush = () => new Promise(resolve => setTimeout(resolve, 0));
 
+const setReadyState = (readyState: DocumentReadyState) => {
+  Object.defineProperty(document, 'readyState', {
+    configurable: true,
+    value: readyState,
+  });
+};
+
+// keepStylebotStylesLast keeps singleton state; re-require fresh per test.
+let injectCSSIntoDocument: typeof InjectStyle.injectCSSIntoDocument;
+let removeCSSFromDocument: typeof InjectStyle.removeCSSFromDocument;
+
 describe('inject-style', () => {
+  beforeEach(() => {
+    jest.resetModules();
+    ({ injectCSSIntoDocument, removeCSSFromDocument } = require('../inject-style'));
+  });
+
   afterEach(() => {
     document
       .querySelectorAll('style[id^="stylebot-css-"]')
       .forEach(el => el.remove());
     delete (global as any).chrome;
+    setReadyState('complete');
   });
 
   describe('injectCSSIntoDocument', () => {
@@ -75,6 +92,50 @@ describe('inject-style', () => {
 
       expect(style?.textContent).toContain('@font-face');
       expect(style?.textContent).toContain('color: red');
+    });
+  });
+
+  describe('style ordering while the document is still parsing', () => {
+    it('keeps the injected style as the last child of <html>, even if the page attaches a node ahead of it', async () => {
+      setReadyState('loading');
+
+      await injectCSSIntoDocument('a { color: blue !important; }', 'example');
+
+      const style = document.getElementById(
+        stylesheetId('example')
+      ) as HTMLStyleElement;
+
+      // Simulate document_start injection racing ahead of the parser: our
+      // style ends up before a node the page hasn't attached yet.
+      document.documentElement.insertBefore(
+        style,
+        document.documentElement.firstChild
+      );
+      expect(document.documentElement.firstChild).toBe(style);
+
+      await flush();
+
+      expect(document.documentElement.lastChild).toBe(style);
+    });
+
+    it('stops repositioning the style once the document has finished parsing', async () => {
+      setReadyState('loading');
+
+      await injectCSSIntoDocument('a { color: blue !important; }', 'example');
+
+      setReadyState('complete');
+      document.dispatchEvent(new Event('readystatechange'));
+
+      const style = document.getElementById(
+        stylesheetId('example')
+      ) as HTMLStyleElement;
+      const lateNode = document.createElement('div');
+
+      document.documentElement.appendChild(lateNode);
+      await flush();
+
+      expect(document.documentElement.lastChild).toBe(lateNode);
+      expect(document.documentElement.lastChild).not.toBe(style);
     });
   });
 
