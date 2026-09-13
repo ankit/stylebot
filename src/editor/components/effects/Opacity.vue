@@ -3,7 +3,7 @@
     <div class="opacity-control">
       <s-slider :value="value" :min="0" :max="1" :step="0.05" :disabled="disabled" @input="apply" />
 
-      <span class="opacity-value">{{ value }}</span>
+      <s-text as="span" class="opacity-value">{{ value }}</s-text>
     </div>
   </property-row>
 </template>
@@ -11,7 +11,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { Declaration } from 'postcss';
-import { SSlider } from '@stylebot/components';
+import { SSlider, SText } from '@stylebot/components';
 
 import PropertyRow from '../basic/PropertyRow.vue';
 
@@ -21,6 +21,7 @@ export default Vue.extend({
   components: {
     PropertyRow,
     SSlider,
+    SText,
   },
 
   computed: {
@@ -77,7 +78,5 @@ export default Vue.extend({
   flex: none;
   width: 24px;
   font-family: var(--font-mono);
-  font-size: 12.5px;
-  color: var(--foreground);
 }
 </style>

@@ -1,7 +1,7 @@
 <template>
-  <p class="text" :class="[size, variant]">
+  <component :is="as" class="text" :class="[size, variant]">
     <slot />
-  </p>
+  </component>
 </template>
 
 <script lang="ts">
@@ -22,6 +22,13 @@ export default Vue.extend({
     variant: {
       type: String as PropType<Variant>,
       default: 'default',
+    },
+
+    // Rendered tag — use 'span' for inline/phrasing contexts (e.g. inside
+    // a <button>), where the default 'p' isn't valid HTML.
+    as: {
+      type: String,
+      default: 'p',
     },
   },
 });
