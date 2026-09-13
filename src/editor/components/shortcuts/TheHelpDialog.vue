@@ -1,116 +1,107 @@
 <template>
-  <div class="stylebot-help-dialog-overlay">
-    <div class="stylebot-help-dialog">
+  <s-dialog @cancel="close">
+    <div class="stylebot-help-dialog" role="dialog" aria-modal="true" aria-labelledby="help-dialog-title">
       <div class="header-row">
-        <h1 class="title">Stylebot {{ t('keyboard_shortcuts') }}</h1>
+        <heading id="help-dialog-title" as="h1" size="md">{{ t('keyboard_shortcuts') }}</heading>
 
-        <button class="close-btn" @click="close">
-          <x-icon :size="20" />
-        </button>
+        <icon-button :size="26" :title="t('close')" @click="close">
+          <x-icon :size="18" />
+        </icon-button>
       </div>
 
-      <div class="tables-row">
-        <table class="shortcuts-table">
-          <thead>
-            <tr>
-              <th colspan="2">
-                {{ t('global') }}
-                <a href="#" class="customize" @click="customizeGlobalCommands">
-                  {{ t('customize') }}
-                </a>
-              </th>
-            </tr>
-          </thead>
+      <div class="section">
+        <div class="section-header">
+          <s-text size="caption" variant="muted" class="section-label">{{ t('global') }}</s-text>
+          <a href="#" class="customize" @click="customizeGlobalCommands">{{ t('customize') }}</a>
+        </div>
 
-          <tbody>
-            <tr>
-              <td>{{ t('toggle_editor') }}</td>
-              <td class="stylebot-key">{{ commands.stylebot }}</td>
-            </tr>
+        <div class="rows">
+          <div class="row">
+            <s-text class="row-label">{{ t('toggle_editor') }}</s-text>
+            <shortcut-chip small class="row-chip" :value="commands.stylebot" />
+          </div>
 
-            <tr>
-              <td>{{ t('toggle_styling') }}</td>
-              <td class="stylebot-key">{{ commands.style }}</td>
-            </tr>
+          <div class="row">
+            <s-text class="row-label">{{ t('toggle_styling') }}</s-text>
+            <shortcut-chip small class="row-chip" :value="commands.style" />
+          </div>
 
-            <tr>
-              <td>{{ t('toggle_readability') }}</td>
-              <td class="stylebot-key">{{ commands.readability }}</td>
-            </tr>
+          <div class="row">
+            <s-text class="row-label">{{ t('toggle_readability') }}</s-text>
+            <shortcut-chip small class="row-chip" :value="commands.readability" />
+          </div>
 
-            <tr>
-              <td>{{ t('toggle_grayscale') }}</td>
-              <td class="stylebot-key">{{ commands.grayscale }}</td>
-            </tr>
-          </tbody>
-        </table>
+          <div class="row">
+            <s-text class="row-label">{{ t('toggle_grayscale') }}</s-text>
+            <shortcut-chip small class="row-chip" :value="commands.grayscale" />
+          </div>
+        </div>
+      </div>
 
-        <table class="shortcuts-table">
-          <thead>
-            <tr>
-              <th colspan="2">{{ t('editor') }}</th>
-            </tr>
-          </thead>
+      <div class="section">
+        <div class="section-header">
+          <s-text size="caption" variant="muted" class="section-label">{{ t('editor') }}</s-text>
+        </div>
 
-          <tbody>
-            <tr>
-              <td>{{ t('toggle_inspector') }}</td>
-              <td class="stylebot-key">{{ editorCommands.inspect }}</td>
-            </tr>
+        <div class="rows">
+          <div class="row">
+            <s-text class="row-label">{{ t('toggle_inspector') }}</s-text>
+            <shortcut-chip small class="row-chip" :value="editorCommands.inspect" />
+          </div>
 
-            <tr>
-              <td>{{ t('set_basic_mode') }}</td>
-              <td class="stylebot-key">{{ editorCommands.basic }}</td>
-            </tr>
+          <div class="row">
+            <s-text class="row-label">{{ t('set_basic_mode') }}</s-text>
+            <shortcut-chip small class="row-chip" :value="editorCommands.basic" />
+          </div>
 
-            <tr>
-              <td>{{ t('set_magic_mode') }}</td>
-              <td class="stylebot-key">{{ editorCommands.magic }}</td>
-            </tr>
+          <div class="row">
+            <s-text class="row-label">{{ t('set_magic_mode') }}</s-text>
+            <shortcut-chip small class="row-chip" :value="editorCommands.magic" />
+          </div>
 
-            <tr>
-              <td>{{ t('set_code_mode') }}</td>
-              <td class="stylebot-key">{{ editorCommands.code }}</td>
-            </tr>
+          <div class="row">
+            <s-text class="row-label">{{ t('set_code_mode') }}</s-text>
+            <shortcut-chip small class="row-chip" :value="editorCommands.code" />
+          </div>
 
-            <tr>
-              <td>{{ t('resize') }}</td>
-              <td class="stylebot-key">{{ editorCommands.resize }}</td>
-            </tr>
+          <div class="row">
+            <s-text class="row-label">{{ t('resize') }}</s-text>
+            <shortcut-chip small class="row-chip" :value="editorCommands.resize" />
+          </div>
 
-            <tr>
-              <td>{{ t('dock_to_left') }}</td>
-              <td class="stylebot-key">{{ editorCommands.dockLeft }}</td>
-            </tr>
+          <div class="row">
+            <s-text class="row-label">{{ t('dock_to_left') }}</s-text>
+            <shortcut-chip small class="row-chip" :value="editorCommands.dockLeft" />
+          </div>
 
-            <tr>
-              <td>{{ t('dock_to_right') }}</td>
-              <td class="stylebot-key">{{ editorCommands.dockRight }}</td>
-            </tr>
+          <div class="row">
+            <s-text class="row-label">{{ t('dock_to_right') }}</s-text>
+            <shortcut-chip small class="row-chip" :value="editorCommands.dockRight" />
+          </div>
 
-            <tr>
-              <td>{{ t('adjust_page_layout') }}</td>
-              <td class="stylebot-key">{{ editorCommands.pageLayout }}</td>
-            </tr>
+          <div class="row">
+            <s-text class="row-label">{{ t('adjust_page_layout') }}</s-text>
+            <shortcut-chip small class="row-chip" :value="editorCommands.pageLayout" />
+          </div>
 
-            <tr>
-              <td>{{ t('hide_element') }}</td>
-              <td class="stylebot-key">{{ editorCommands.hide }}</td>
-            </tr>
+          <div class="row">
+            <s-text class="row-label">{{ t('hide_element') }}</s-text>
+            <shortcut-chip small class="row-chip" :value="editorCommands.hide" />
+          </div>
 
-            <tr>
-              <td>{{ t('show_help') }}</td>
-              <td class="stylebot-key">{{ editorCommands.help }}</td>
-            </tr>
-          </tbody>
-        </table>
+          <div class="row">
+            <s-text class="row-label">{{ t('show_help') }}</s-text>
+            <shortcut-chip small class="row-chip" :value="editorCommands.help" />
+          </div>
+        </div>
       </div>
     </div>
-  </div>
+  </s-dialog>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
+import { Heading, IconButton, ShortcutChip, SDialog, SText } from '@stylebot/components';
 import { XIcon } from '@stylebot/icons';
 import { StylebotCommands, StylebotEditorCommands } from '@stylebot/types';
 
@@ -120,6 +111,11 @@ export default Vue.extend({
   name: 'TheHelpDialog',
 
   components: {
+    Heading,
+    IconButton,
+    ShortcutChip,
+    SDialog,
+    SText,
     XIcon,
   },
 
@@ -135,22 +131,9 @@ export default Vue.extend({
 
   mounted() {
     this.$store.commit('setInspecting', false);
-    document.addEventListener('mousedown', this.mousedown);
-  },
-
-  beforeDestroy() {
-    document.removeEventListener('mousedown', this.mousedown);
   },
 
   methods: {
-    mousedown(event: MouseEvent): void {
-      const el = event.composedPath()[0] as HTMLElement;
-
-      if (!el.closest('.stylebot-help-dialog')) {
-        this.close();
-      }
-    },
-
     customizeGlobalCommands(event: MouseEvent): void {
       event.preventDefault();
       openOptionsPage();
@@ -164,91 +147,73 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-.stylebot-help-dialog-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 1000000000;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.7);
-}
-
 .stylebot-help-dialog {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  width: 65%;
-  max-width: 900px;
-  margin: 40px auto;
-  max-height: calc(100% - 80px);
-  overflow: auto;
-  padding: 24px;
+  width: 400px;
+  height: fit-content;
+  padding: 18px 22px;
+  border: 1px solid var(--border);
   border-radius: 14px;
   background: var(--background);
   color: var(--foreground);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.3);
 }
 
 .header-row {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  margin-bottom: 16px;
+  gap: 12px;
+  margin-bottom: 6px;
 }
 
-.title {
-  margin: 0;
-  font-size: 24px;
-  font-weight: 600;
+.section {
+  margin-top: 16px;
 }
 
-.close-btn {
-  @include button-reset;
-  display: inline-flex;
-  padding: 4px;
-  border-radius: 6px;
-  color: var(--muted-foreground);
-  cursor: pointer;
-
-  &:hover {
-    background: var(--accent);
-    color: var(--foreground);
-  }
-}
-
-.tables-row {
+.section-header {
   display: flex;
-  gap: 24px;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 6px;
 }
 
-.shortcuts-table {
+.section-label {
   flex: 1;
-  min-width: 0;
-  border-collapse: collapse;
-
-  th {
-    padding-bottom: 8px;
-    text-align: left;
-    font-size: 14px;
-    font-weight: 600;
-  }
-
-  td {
-    padding: 6px 0;
-    border-top: 1px solid var(--border);
-    font-size: 14px;
-  }
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
 }
 
 .customize {
-  float: right;
-  font-weight: normal;
+  flex: none;
+  font-size: 11.5px;
+  font-weight: 500;
   color: var(--primary);
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
-.stylebot-key {
-  text-align: right;
-  font-family: var(--font-mono);
-  color: var(--muted-foreground);
+.row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--border);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.row-label {
+  flex: 1;
+  min-width: 0;
+}
+
+.row-chip {
+  min-width: 24px;
+  justify-content: center;
 }
 </style>

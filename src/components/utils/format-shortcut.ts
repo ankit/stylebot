@@ -32,7 +32,11 @@ export type FormattedShortcut = {
  * symbols on macOS (⌥⇧R), or words joined by "+" elsewhere (Alt+Shift+R).
  */
 export const formatShortcut = (combo: string, mac = isMac()): FormattedShortcut => {
-  const raw = combo === '' ? [] : combo.split('+');
+  if (combo === '') {
+    return { parts: ['–'], joiner: '' };
+  }
+
+  const raw = combo.split('+');
 
   return mac
     ? { parts: raw.map(part => MAC_SYMBOLS[part] ?? part.toUpperCase()), joiner: '' }
