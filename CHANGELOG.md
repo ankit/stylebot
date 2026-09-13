@@ -1,3 +1,7 @@
+## Version 3.2.3 (September 2026)
+
+- Fix injected CSS losing !important cascade priority (#896)
+
 ## Version 3.2.2 (September 2026)
 
 - Redesign the options page with dark mode support and drop bootstrap-vue (#873)
