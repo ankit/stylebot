@@ -10,10 +10,12 @@ export const TEXT_PROPERTIES = [
 export const COLOR_PROPERTIES = ['background-color'];
 
 export const LAYOUT_PROPERTIES = [
+  'padding',
   'padding-top',
   'padding-right',
   'padding-bottom',
   'padding-left',
+  'margin',
   'margin-top',
   'margin-right',
   'margin-bottom',
@@ -21,6 +23,7 @@ export const LAYOUT_PROPERTIES = [
   'border-style',
   'border-width',
   'border-color',
+  'border-radius',
 ];
 
 export const EFFECTS_PROPERTIES = ['opacity', 'filter'];

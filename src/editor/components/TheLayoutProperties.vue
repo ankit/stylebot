@@ -21,6 +21,8 @@
     />
 
     <border-control />
+
+    <radius />
   </div>
 </template>
 
@@ -28,6 +30,7 @@
 import Vue from 'vue';
 import SpacingControl from './layout/SpacingControl.vue';
 import BorderControl from './layout/BorderControl.vue';
+import Radius from './layout/Radius.vue';
 
 export default Vue.extend({
   name: 'TheLayoutProperties',
@@ -35,6 +38,7 @@ export default Vue.extend({
   components: {
     SpacingControl,
     BorderControl,
+    Radius,
   },
 });
 </script>

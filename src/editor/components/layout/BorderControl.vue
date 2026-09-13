@@ -1,5 +1,5 @@
 <template>
-  <property-row :label="t('border')" last>
+  <property-row :label="t('border')">
     <div class="border-control">
       <s-select class="border-style" :text="text" :muted="!styleValue" :disabled="disabled" :menu-min-width="140">
         <template #default="{ close }">

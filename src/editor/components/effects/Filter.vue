@@ -52,7 +52,7 @@ const FILTER_CONFIG: Record<Exclude<FilterType, 'none'>, FilterConfig> = {
 const FILTER_VALUE_REGEX = /^(grayscale|invert|blur)\(([\d.]+)(%|px)?\)$/;
 
 export default Vue.extend({
-  name: 'Filter',
+  name: 'FilterControl',
 
   components: {
     PropertyRow,

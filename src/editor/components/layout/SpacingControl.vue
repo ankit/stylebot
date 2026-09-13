@@ -30,10 +30,9 @@ import { SSegmentedControl } from '@stylebot/components';
 
 import PropertyRow from '../basic/PropertyRow.vue';
 import SpacingField from './SpacingField.vue';
+import { Side, Sides, parseLength, expandShorthand, resolveSpacingDeclarations } from '../../utils/spacing';
 
 type Mode = 'none' | 'all' | 'xy' | 'individual';
-type Side = 'top' | 'right' | 'bottom' | 'left';
-type Properties = Record<Side, string>;
 
 export default Vue.extend({
   name: 'SpacingControl',
@@ -53,7 +52,7 @@ export default Vue.extend({
     // Maps each side to the CSS property it controls, e.g.
     // { top: 'margin-top', right: 'margin-right', ... }.
     properties: {
-      type: Object as PropType<Properties>,
+      type: Object as PropType<Sides>,
       required: true,
     },
 
@@ -88,20 +87,52 @@ export default Vue.extend({
       return this.$store.state.activeSelector;
     },
 
+    // The shorthand property (e.g. 'padding') derived from the longhand
+    // names, so a shorthand declaration is parsed into the same sides.
+    shorthandProperty(): string {
+      return this.properties.top.replace(/-top$/, '');
+    },
+
+    rawSides(): Sides {
+      const sides: Sides = { top: '', right: '', bottom: '', left: '' };
+      const activeRule = this.$store.getters.activeRule;
+
+      if (!activeRule) {
+        return sides;
+      }
+
+      activeRule.clone().walkDecls((decl: Declaration) => {
+        if (decl.prop === this.shorthandProperty) {
+          const expanded = expandShorthand(decl.value);
+          if (expanded) {
+            Object.assign(sides, expanded);
+          }
+        } else {
+          (Object.keys(this.properties) as Array<Side>).forEach(side => {
+            if (decl.prop === this.properties[side]) {
+              sides[side] = decl.value;
+            }
+          });
+        }
+      });
+
+      return sides;
+    },
+
     top(): string {
-      return this.readSide(this.properties.top);
+      return parseLength(this.rawSides.top);
     },
 
     right(): string {
-      return this.readSide(this.properties.right);
+      return parseLength(this.rawSides.right);
     },
 
     bottom(): string {
-      return this.readSide(this.properties.bottom);
+      return parseLength(this.rawSides.bottom);
     },
 
     left(): string {
-      return this.readSide(this.properties.left);
+      return parseLength(this.rawSides.left);
     },
 
     all(): string {
@@ -129,29 +160,6 @@ export default Vue.extend({
   },
 
   methods: {
-    readSide(property: string): string {
-      const activeRule = this.$store.getters.activeRule;
-      let value = '';
-
-      if (activeRule) {
-        activeRule.clone().walkDecls(property, (decl: Declaration) => {
-          value = decl.value;
-        });
-      }
-
-      if (!value) {
-        return '';
-      }
-
-      const [length, unit] = value.split(/(-?\d+)/).filter(Boolean);
-
-      if (unit !== 'px') {
-        return '';
-      }
-
-      return length;
-    },
-
     deriveMode(): Mode {
       const { top, right, bottom, left } = this;
 
@@ -178,32 +186,29 @@ export default Vue.extend({
       }
     },
 
-    apply(property: string, length: string): void {
-      this.$store.dispatch('applyDeclaration', {
-        property,
-        value: length ? `${length}px` : '',
-      });
+    applySides(sides: Sides): void {
+      resolveSpacingDeclarations(sides, this.properties, this.shorthandProperty).forEach(
+        ({ property, value }) => {
+          this.$store.dispatch('applyDeclaration', { property, value });
+        }
+      );
     },
 
     setAll(length: string): void {
-      this.apply(this.properties.top, length);
-      this.apply(this.properties.right, length);
-      this.apply(this.properties.bottom, length);
-      this.apply(this.properties.left, length);
+      this.applySides({ top: length, right: length, bottom: length, left: length });
     },
 
     setVertical(length: string): void {
-      this.apply(this.properties.top, length);
-      this.apply(this.properties.bottom, length);
+      this.applySides({ top: length, right: this.right, bottom: length, left: this.left });
     },
 
     setHorizontal(length: string): void {
-      this.apply(this.properties.left, length);
-      this.apply(this.properties.right, length);
+      this.applySides({ top: this.top, right: length, bottom: this.bottom, left: length });
     },
 
     setSide(side: Side, length: string): void {
-      this.apply(this.properties[side], length);
+      const sides = { top: this.top, right: this.right, bottom: this.bottom, left: this.left };
+      this.applySides({ ...sides, [side]: length });
     },
   },
 });
