@@ -227,7 +227,7 @@ export default Vue.extend({
 
 .spacing-grid {
   display: grid;
-  gap: 8px;
+  gap: 14px;
   padding-top: 2px;
 }
 

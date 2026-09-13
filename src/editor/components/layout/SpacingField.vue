@@ -1,27 +1,27 @@
 <template>
-  <div class="spacing-field" :class="{ disabled }">
+  <div class="spacing-field">
     <span class="spacing-field-label">{{ label }}</span>
 
-    <div class="spacing-field-value">
-      <input
-        :value="value"
-        :disabled="disabled"
-        inputmode="decimal"
-        placeholder="0"
-        @focus="onFocus"
-        @keydown="onKeydown"
-        @input="$emit('input', $event.target.value)"
-      />
-      <span class="spacing-field-unit">px</span>
-    </div>
+    <s-number-field
+      unit="px"
+      :value="value"
+      :presets="sizes"
+      :disabled="disabled"
+      @input="$emit('input', $event)"
+    />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
+import { SNumberField } from '@stylebot/components';
 
 export default Vue.extend({
   name: 'SpacingField',
+
+  components: {
+    SNumberField,
+  },
 
   props: {
     label: {
@@ -40,81 +40,27 @@ export default Vue.extend({
     },
   },
 
-  methods: {
-    onFocus(event: FocusEvent): void {
-      (event.target as HTMLInputElement).select();
-    },
-
-    onKeydown(event: KeyboardEvent): void {
-      if (event.key === 'ArrowUp') {
-        event.preventDefault();
-        event.stopPropagation();
-        this.$emit('input', `${this.value ? parseInt(this.value, 10) + 1 : 1}`);
-      } else if (event.key === 'ArrowDown') {
-        event.preventDefault();
-        event.stopPropagation();
-        this.$emit('input', `${this.value ? parseInt(this.value, 10) - 1 : -1}`);
-      }
-    },
+  data(): { sizes: Array<string> } {
+    return {
+      sizes: ['0', '2', '4', '8', '12', '16', '24', '32'],
+    };
   },
 });
 </script>
 
 <style lang="scss" scoped>
 .spacing-field {
-  box-sizing: border-box;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 7px 12px;
-  @include field-border(9px);
-  background: var(--background);
-
-  &:focus-within {
-    @include field-active-border;
-  }
-
-  &.disabled {
-    opacity: 0.6;
-  }
+  flex-direction: column;
+  gap: 5px;
 }
 
 .spacing-field-label {
-  min-width: 0;
   font-size: 12.5px;
   color: var(--muted-foreground);
 }
 
-.spacing-field-value {
-  flex: none;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.spacing-field-value input {
-  width: 32px;
-  margin: 0;
-  padding: 0;
-  border: none;
-  outline: none;
-  appearance: none;
-  -webkit-appearance: none;
-  background: transparent;
-  text-align: right;
-  font-family: var(--font-mono);
-  font-size: 12.5px;
-  line-height: 1.2;
-  color: var(--foreground);
-
-  &::placeholder {
-    color: var(--muted-foreground);
-  }
-}
-
-.spacing-field-unit {
-  font-size: 11.5px;
-  color: var(--muted-foreground);
+.spacing-field ::v-deep .number-field {
+  width: 100%;
 }
 </style>
