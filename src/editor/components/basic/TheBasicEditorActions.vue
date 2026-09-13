@@ -72,6 +72,10 @@ export default Vue.extend({
   font-size: 11.5px;
 }
 
+.basic-editor-actions .action-button {
+  color: var(--muted-foreground);
+}
+
 .hide-button.active {
   color: #fff;
   background: var(--primary);
