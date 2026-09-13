@@ -1,5 +1,5 @@
 <template>
-  <div ref="root" class="anchored-menu">
+  <div ref="root" class="anchored-menu" @focusout="onFocusOut">
     <slot name="trigger" :toggle="toggleOpen" :open="open" :show="show" :hide="close" />
 
     <div
@@ -37,6 +37,9 @@ export default Vue.extend({
     // Hides the panel until its position (flipUp) is resolved, to avoid a
     // visible jump from the default (below) placement to the flipped one.
     positioned: boolean;
+    // Set right before closing due to focus already having moved elsewhere
+    // (e.g. Tab) — restoring focus to the trigger there would fight it.
+    skipRestoreFocus: boolean;
   } {
     return {
       open: false,
@@ -45,6 +48,7 @@ export default Vue.extend({
       previouslyFocused: null,
       flipUp: false,
       positioned: false,
+      skipRestoreFocus: false,
     };
   },
 
@@ -68,7 +72,11 @@ export default Vue.extend({
         document.removeEventListener('mousedown', this.onDocMousedown);
         document.removeEventListener('keydown', this.onDocKeydown, true);
         this.$emit('close');
-        this.previouslyFocused?.focus();
+
+        if (!this.skipRestoreFocus) {
+          this.previouslyFocused?.focus();
+        }
+        this.skipRestoreFocus = false;
       }
     },
   },
@@ -105,13 +113,39 @@ export default Vue.extend({
       this.open = true;
     },
 
-    close(): void {
+    close(options: { skipRestoreFocus?: boolean } = {}): void {
+      this.skipRestoreFocus = !!options.skipRestoreFocus;
       this.open = false;
     },
 
     focusableItems(): Array<HTMLElement> {
       const panel = this.$refs.panel as HTMLElement | undefined;
-      return panel ? Array.from(panel.querySelectorAll<HTMLElement>('button, a[href], [tabindex]')) : [];
+      return panel
+        ? Array.from(
+            panel.querySelectorAll<HTMLElement>(
+              'button, a[href], input, [tabindex]:not([tabindex="-1"])'
+            )
+          )
+        : [];
+    },
+
+    // Closes on focus leaving via Tab — retainFocus closes on leaving the input itself, except into the panel (arrow-key nav).
+    onFocusOut(event: FocusEvent): void {
+      if (!this.open) {
+        return;
+      }
+
+      const next = event.relatedTarget;
+      const panel = this.$refs.panel as HTMLElement | undefined;
+      const movedIntoPanel = next instanceof Node && !!panel?.contains(next);
+
+      if (movedIntoPanel) {
+        return;
+      }
+
+      if (this.retainFocus || !(next instanceof Node && this.$el.contains(next))) {
+        this.close({ skipRestoreFocus: true });
+      }
     },
 
     onDocMousedown(event: MouseEvent): void {

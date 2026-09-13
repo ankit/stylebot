@@ -17,6 +17,8 @@
           :placeholder="placeholder"
           spellcheck="false"
           @keydown.enter.prevent="onEnter"
+          @keydown.down="onArrowKey(open, $event)"
+          @keydown.up="onArrowKey(open, $event)"
           @focus="onFocus"
           @input="onInput($event.target.value)"
         />
@@ -137,6 +139,15 @@ export default Vue.extend({
 
     showMenu(): void {
       this.menu().show();
+    },
+
+    // Reopens the suggestion list on Up/Down when it's closed (e.g. right
+    // after selecting an item) instead of leaving arrow keys as a no-op.
+    onArrowKey(open: boolean, event: KeyboardEvent): void {
+      if (!open && this.items.length) {
+        event.preventDefault();
+        this.showMenu();
+      }
     },
 
     hideMenu(): void {

@@ -4,6 +4,7 @@
     class="menu-item"
     :class="{ danger, selected }"
     role="menuitem"
+    tabindex="-1"
     @click="$emit('click', $event)"
   >
     <span class="menu-item-content"><slot /></span>
