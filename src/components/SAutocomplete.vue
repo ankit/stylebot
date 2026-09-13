@@ -7,32 +7,31 @@
   >
     <template #trigger="{ open }">
       <div class="autocomplete-pill" :class="{ disabled }">
-        <div class="autocomplete-field">
-          <textarea
-            ref="input"
-            rows="1"
-            class="autocomplete-input"
-            :class="{ mono }"
-            :disabled="disabled"
-            :value="value"
-            :placeholder="placeholder"
-            spellcheck="false"
-            @keydown.enter.prevent="onEnter"
-            @keydown.down="onArrowKey(open, $event)"
-            @keydown.up="onArrowKey(open, $event)"
-            @focus="onFocus"
-            @blur="onBlur"
-            @input="onInput($event.target.value)"
-          />
-
-          <div
-            v-if="chips && !focused && !open && chipParts.length"
-            class="autocomplete-chips"
-            @click="focusInput"
-          >
-            <span v-for="(part, i) in chipParts" :key="i" class="chip">{{ part }}</span>
-          </div>
+        <div
+          v-if="chips && !focused && !open && chipParts.length"
+          class="autocomplete-chips"
+          @mousedown.prevent="revealInput"
+        >
+          <span v-for="(part, i) in chipParts" :key="i" class="chip">{{ part }}</span>
         </div>
+
+        <textarea
+          v-else
+          ref="input"
+          rows="1"
+          class="autocomplete-input"
+          :class="{ mono }"
+          :disabled="disabled"
+          :value="value"
+          :placeholder="placeholder"
+          spellcheck="false"
+          @keydown.enter.prevent="onEnter"
+          @keydown.down="onArrowKey(open, $event)"
+          @keydown.up="onArrowKey(open, $event)"
+          @focus="onFocus"
+          @blur="onBlur"
+          @input="onInput($event.target.value)"
+        />
 
         <slot name="suffix" />
 
@@ -227,8 +226,13 @@ export default Vue.extend({
       this.focused = false;
     },
 
-    focusInput(): void {
-      (this.$refs.input as HTMLTextAreaElement | undefined)?.focus();
+    // Switches from the pill display back to the raw editable textarea
+    // and focuses it, once it exists on the next render.
+    revealInput(): void {
+      this.focused = true;
+      this.$nextTick(() => {
+        (this.$refs.input as HTMLTextAreaElement | undefined)?.focus();
+      });
     },
 
     onSelect(item: Record<string, unknown>): void {
@@ -291,22 +295,15 @@ export default Vue.extend({
   }
 }
 
-.autocomplete-field {
-  position: relative;
-  flex: 1;
-  min-width: 0;
-}
-
 .autocomplete-chips {
   box-sizing: border-box;
-  position: absolute;
-  inset: 0;
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-wrap: wrap;
   align-content: center;
   gap: 6px;
   padding: 6px 8px 4px 10px;
-  background: var(--background);
   cursor: text;
 }
 
@@ -324,8 +321,8 @@ export default Vue.extend({
 
 .autocomplete-input {
   box-sizing: border-box;
-  display: block;
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   height: 30px;
   border: none;
   outline: none;
