@@ -25,6 +25,12 @@ export default Vue.extend({
     TheKeyboardShortcuts,
   },
 
+  data(): { previouslyFocused: HTMLElement | null } {
+    return {
+      previouslyFocused: null,
+    };
+  },
+
   computed: {
     visible(): boolean {
       return this.$store.state.visible;
@@ -36,6 +42,27 @@ export default Vue.extend({
 
     help(): boolean {
       return this.$store.state.help;
+    },
+  },
+
+  watch: {
+    // immediate: initEditor's async mount means `visible` is already true the first time this watcher is set up.
+    visible: {
+      immediate: true,
+      handler(visible: boolean): void {
+        if (visible) {
+          this.previouslyFocused =
+            document.activeElement instanceof HTMLElement ? document.activeElement : null;
+
+          this.$nextTick(() => {
+            const inspector = this.$el.querySelector<HTMLElement>('.stylebot-inspector');
+            inspector?.focus();
+          });
+        } else {
+          this.previouslyFocused?.focus();
+          this.previouslyFocused = null;
+        }
+      },
     },
   },
 });

@@ -123,12 +123,7 @@ export default Vue.extend({
     },
 
     handleEscape(): void {
-      if (this.help) {
-        this.$store.commit('setHelp', false);
-        return;
-      }
-
-      this.$store.dispatch('closeStylebot');
+      this.$store.dispatch('escape');
     },
 
     handleStylebotShortcut(event: KeyboardEvent): void {

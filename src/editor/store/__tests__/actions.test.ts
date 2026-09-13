@@ -238,4 +238,24 @@ describe('actions', () => {
       });
     });
   });
+
+  describe('escape', () => {
+    it('closes the help dialog instead of Stylebot when it is open', () => {
+      const state = { ...mockState, help: true };
+
+      actions.escape({ state, commit: mockCommit, dispatch: mockDispatch });
+
+      expect(mockCommit).toBeCalledWith('setHelp', false);
+      expect(mockDispatch).not.toBeCalled();
+    });
+
+    it('closes Stylebot when the help dialog is not open', () => {
+      const state = { ...mockState, help: false };
+
+      actions.escape({ state, commit: mockCommit, dispatch: mockDispatch });
+
+      expect(mockDispatch).toBeCalledWith('closeStylebot');
+      expect(mockCommit).not.toBeCalled();
+    });
+  });
 });

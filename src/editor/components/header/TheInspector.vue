@@ -105,8 +105,8 @@ export default Vue.extend({
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 30px;
+  width: 34px;
+  height: 34px;
   border-radius: 8px !important;
   cursor: pointer;
   background: var(--active);
@@ -126,6 +126,6 @@ export default Vue.extend({
     color: #fff;
   }
 
-  @include focus-ring;
+  @include focus-ring(2px);
 }
 </style>
