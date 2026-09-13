@@ -1,15 +1,20 @@
 <template>
   <div class="property-row" :class="{ last }">
-    <div class="property-row-label">{{ label }}</div>
+    <s-text size="label" variant="muted" class="property-row-label">{{ label }}</s-text>
     <div class="property-row-control"><slot /></div>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
+import { SText } from '@stylebot/components';
 
 export default Vue.extend({
   name: 'PropertyRow',
+
+  components: {
+    SText,
+  },
 
   props: {
     label: {
@@ -48,9 +53,6 @@ export default Vue.extend({
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  font-size: 13px;
-  line-height: 1.3;
-  color: var(--muted-foreground);
 }
 
 .property-row-control {

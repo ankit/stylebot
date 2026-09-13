@@ -1,7 +1,7 @@
 <template>
   <div class="header">
     <div class="header-top">
-      <div class="url">{{ url }}</div>
+      <s-text size="small" variant="muted" class="url">{{ url }}</s-text>
       <the-window-actions />
     </div>
 
@@ -16,6 +16,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import { SText } from '@stylebot/components';
 
 import TheInspector from './header/TheInspector.vue';
 import TheWindowActions from './header/TheWindowActions.vue';
@@ -26,6 +27,7 @@ export default Vue.extend({
   name: 'TheHeader',
 
   components: {
+    SText,
     TheInspector,
     TheWindowActions,
     TheCssSelectorDropdown,
@@ -66,8 +68,6 @@ export default Vue.extend({
 .url {
   flex: none;
   max-width: 150px;
-  font-size: 11.5px;
-  color: var(--muted-foreground);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

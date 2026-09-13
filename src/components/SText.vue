@@ -7,7 +7,7 @@
 <script lang="ts">
 import Vue, { PropType } from 'vue';
 
-type Size = 'body' | 'caption';
+type Size = 'label' | 'body' | 'caption' | 'small';
 type Variant = 'muted' | 'default';
 
 export default Vue.extend({
@@ -38,6 +38,11 @@ export default Vue.extend({
   color: var(--muted-foreground);
 }
 
+.label {
+  font-size: 13px;
+  line-height: 1.3;
+}
+
 .body {
   font-size: 12.5px;
   line-height: 1.45;
@@ -46,5 +51,10 @@ export default Vue.extend({
 .caption {
   font-size: 12px;
   line-height: 1.4;
+}
+
+.small {
+  font-size: 11.5px;
+  line-height: 1.3;
 }
 </style>

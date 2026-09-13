@@ -1,6 +1,6 @@
 <template>
   <div class="spacing-field">
-    <span class="spacing-field-label">{{ label }}</span>
+    <s-text variant="muted" class="spacing-field-label">{{ label }}</s-text>
 
     <s-number-field
       unit="px"
@@ -13,13 +13,14 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { SNumberField } from '@stylebot/components';
+import { SNumberField, SText } from '@stylebot/components';
 
 export default Vue.extend({
   name: 'SpacingField',
 
   components: {
     SNumberField,
+    SText,
   },
 
   props: {
@@ -46,11 +47,6 @@ export default Vue.extend({
   display: flex;
   flex-direction: column;
   gap: 5px;
-}
-
-.spacing-field-label {
-  font-size: 12.5px;
-  color: var(--muted-foreground);
 }
 
 .spacing-field ::v-deep .number-field {

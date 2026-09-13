@@ -9,7 +9,7 @@
     <div v-if="active" class="grayscale-slider-row">
       <s-slider :value="percent" :min="1" :max="100" :step="1" @input="setPercent" />
 
-      <span class="grayscale-value">{{ percent }} %</span>
+      <s-text size="body" class="grayscale-value">{{ percent }} %</s-text>
     </div>
   </feature-card>
 </template>
@@ -81,7 +81,5 @@ export default Vue.extend({
 .grayscale-value {
   flex: none;
   font-family: var(--font-mono);
-  font-size: 12.5px;
-  color: var(--foreground);
 }
 </style>
