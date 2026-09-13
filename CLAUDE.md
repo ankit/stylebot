@@ -35,3 +35,7 @@ Always validate UI/extension changes with headless Playwright, not manual/headed
 ## Comments
 
 Avoid comments by default. Only add one to state something non-obvious — a hidden constraint, a workaround, a reason that isn't clear from the code itself. Never add comments in CSS. When a comment is warranted, keep it to 1-2 lines max, and use `/* */` for multiline comments.
+
+## i18n
+
+Keep each key in `src/_locales/*.config` matching its English string (e.g. `@box` → `Box`, not a stale `@layout_properties` → `Box`). When a string's copy changes, rename the key to match in the same change, across all 15 locale files. If two keys end up with the identical string in every locale, collapse them into one key instead of keeping duplicates.

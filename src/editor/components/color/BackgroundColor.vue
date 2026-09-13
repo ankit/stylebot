@@ -1,5 +1,5 @@
 <template>
-  <property-row :label="t('background_color')">
+  <property-row :label="t('color')">
     <color-picker property="background-color" />
   </property-row>
 </template>

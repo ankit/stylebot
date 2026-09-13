@@ -12,7 +12,7 @@
     </property-card>
 
     <property-card
-      :label="t('color_properties')"
+      :label="t('background')"
       :collapsed="!sections.colors"
       :count="colorCount"
       @toggle="toggle('colors')"
@@ -21,7 +21,7 @@
     </property-card>
 
     <property-card
-      :label="t('layout_properties')"
+      :label="t('box')"
       :collapsed="!sections.layout"
       :count="layoutCount"
       @toggle="toggle('layout')"
