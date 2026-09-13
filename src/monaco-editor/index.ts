@@ -18,3 +18,11 @@ export type ParentUpdateCssMessage = {
   // Defaults to true (existing behavior) when omitted.
   focus?: boolean;
 };
+
+// Focuses without touching the model, unlike stylebotCssUpdate — safe to send
+// just because the editor became visible again.
+export type ParentFocusEditorMessage = {
+  type: 'stylebotFocusEditor';
+};
+
+export type ParentMessage = ParentUpdateCssMessage | ParentFocusEditorMessage;
