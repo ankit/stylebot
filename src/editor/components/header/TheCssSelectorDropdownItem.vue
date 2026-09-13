@@ -11,17 +11,14 @@
       <span class="chips">
         <span v-for="(part, i) in parts" :key="i" class="chip">{{ part }}</span>
       </span>
-      <span v-if="styleCount > 0" class="style-count">
-        <span class="dot" />
-        {{ styleCount }}
-      </span>
+      <s-count-badge v-if="styleCount > 0" :count="styleCount" class="style-count" />
     </span>
   </menu-item>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import { MenuItem } from '@stylebot/components';
+import { MenuItem, SCountBadge } from '@stylebot/components';
 import { validateSelector } from '@stylebot/css';
 import { Highlighter } from '@stylebot/highlighter';
 
@@ -30,6 +27,7 @@ export default Vue.extend({
 
   components: {
     MenuItem,
+    SCountBadge,
   },
 
   props: {
@@ -128,21 +126,7 @@ export default Vue.extend({
 }
 
 .style-count {
-  flex: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
   margin-top: 2px;
-  font-family: var(--font-mono);
-  font-size: 12px;
-  color: var(--muted-foreground);
-}
-
-.dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--primary);
 }
 
 .css-selector-dropdown-item:hover .chip,

@@ -6,7 +6,10 @@
       :class="{ collapsed }"
       @click="$emit('toggle')"
     >
-      <span class="property-card-label">{{ label }}</span>
+      <span class="property-card-title">
+        <span class="property-card-label">{{ label }}</span>
+        <s-count-badge v-if="count > 0" :count="count" />
+      </span>
       <chevron-down-icon :size="11" class="property-card-chevron" :class="{ collapsed }" />
     </button>
 
@@ -19,7 +22,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { ChevronDownIcon } from '@stylebot/icons';
-import { SCard } from '@stylebot/components';
+import { SCard, SCountBadge } from '@stylebot/components';
 
 export default Vue.extend({
   name: 'PropertyCard',
@@ -27,6 +30,7 @@ export default Vue.extend({
   components: {
     ChevronDownIcon,
     SCard,
+    SCountBadge,
   },
 
   props: {
@@ -38,6 +42,11 @@ export default Vue.extend({
     collapsed: {
       type: Boolean,
       default: false,
+    },
+
+    count: {
+      type: Number,
+      default: 0,
     },
   },
 });
@@ -62,8 +71,16 @@ export default Vue.extend({
   @include focus-ring;
 }
 
-.property-card-label {
+.property-card-title {
   flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.property-card-label {
+  flex: none;
   min-width: 0;
   text-align: left;
   font-weight: 600;

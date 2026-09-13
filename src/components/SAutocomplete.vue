@@ -23,6 +23,8 @@
           @input="onInput($event.target.value)"
         />
 
+        <slot name="suffix" />
+
         <button
           type="button"
           class="autocomplete-chevron"

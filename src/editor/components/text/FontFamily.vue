@@ -91,4 +91,9 @@ export default Vue.extend({
 .edit-fonts {
   color: var(--primary);
 }
+
+.property-row ::v-deep .property-row-control {
+  min-width: 0;
+  flex-shrink: 1;
+}
 </style>
