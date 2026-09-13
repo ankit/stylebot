@@ -40,6 +40,7 @@ describe('inject-css run()', () => {
           },
         },
         sendMessage: jest.fn(),
+        getURL: (path: string) => `chrome-extension://test-id${path}`,
       },
     };
   });

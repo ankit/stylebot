@@ -1,5 +1,8 @@
 import { injectCSSIntoDocument, removeCSSFromDocument } from '@stylebot/css';
-import { applyReadability, removeReadability } from '@stylebot/readability';
+// removeReadability alone doesn't need Defuddle or the reader's Vue app —
+// bypassing the @stylebot/readability barrel (see applyReadability below)
+// keeps this eager import cheap for the common case (readability off).
+import { removeReadability } from '../readability/lifecycle/remove-readability';
 
 import { CachedState } from './cache';
 
@@ -8,11 +11,17 @@ import { CachedState } from './cache';
 let appliedUrls = new Set<string>();
 
 export const applyState = (state: CachedState): Promise<void> => {
-  // Called synchronously, ahead of CSS injection below — readability's own
+  // Fired here, ahead of CSS injection below — readability's own
   // showLoader() needs to hide the page before the browser's first paint,
-  // and waiting on style injection (which may fetch @imports) risks missing it.
+  // and waiting on style injection (which may fetch @imports) risks missing
+  // it. Not awaited: this must stay fire-and-forget, matching the
+  // synchronous call it replaces — the dynamic import only defers pulling
+  // in Defuddle and the reader's own Vue app until a page actually needs
+  // them, which is a small minority of page loads.
   if (state.readability) {
-    applyReadability();
+    import(
+      /* webpackChunkName: "readability-lazy" */ '@stylebot/readability'
+    ).then(({ applyReadability }) => applyReadability());
   } else {
     removeReadability();
   }

@@ -55,7 +55,8 @@
       "resources": [
         "monaco-editor/*",
         "editor/index.css",
-        "readability/index.css"
+        "readability/index.css",
+        "*.chunk.js"
       ],
       "matches": ["<all_urls>"]
     }
