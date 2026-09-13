@@ -46,7 +46,6 @@ class MonacEditorIframe {
     window.monaco.editor.defineTheme('custom-dark', CustomDark);
   }
 
-  // The in-page editor doesn't support dark mode yet — defaults to light.
   getMonacoTheme(): 'custom-light' | 'custom-dark' {
     return new URLSearchParams(window.location.search).get('theme') === 'dark'
       ? 'custom-dark'

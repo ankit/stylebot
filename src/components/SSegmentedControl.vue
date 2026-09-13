@@ -1,5 +1,5 @@
 <template>
-  <div class="segmented" role="group">
+  <div class="segmented" :class="{ fit }" role="group">
     <button
       v-for="option in options"
       :key="option.value"
@@ -41,6 +41,13 @@ export default Vue.extend({
       type: Array as PropType<Array<Option>>,
       required: true,
     },
+
+    // Segments hug their own label instead of sharing equal width — for
+    // text options of varying length (icon-based segments want equal width).
+    fit: {
+      type: Boolean,
+      default: false,
+    },
   },
 });
 </script>
@@ -52,11 +59,17 @@ export default Vue.extend({
   padding: 2px;
   border-radius: 8px;
   background: var(--accent);
+
+  &.fit .segment {
+    flex: none;
+    padding: 4px 10px;
+  }
 }
 
 .segment {
   flex: 1;
   text-align: center;
+  white-space: nowrap;
   padding: 4px 0;
   border: none;
   border-radius: 6px;
@@ -64,6 +77,7 @@ export default Vue.extend({
   font-family: inherit;
   font-size: 12px;
   color: var(--muted-foreground);
+  outline: none;
   cursor: pointer;
 
   &.active {
@@ -73,6 +87,10 @@ export default Vue.extend({
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   }
 
-  @include focus-ring(-2px);
+  &:focus-visible {
+    color: var(--foreground);
+  }
+
+  @include focus-ring;
 }
 </style>

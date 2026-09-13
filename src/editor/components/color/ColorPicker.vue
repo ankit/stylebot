@@ -1,31 +1,42 @@
 <template>
-  <b-row no-gutters class="color-picker">
-    <b-col cols="12">
-      <div class="stylebot-color-picker">
-        <basic-color-palette v-if="open && basicColorPalette" v-model="value">
-          <color-palette-footer v-model="value" />
-        </basic-color-palette>
+  <div class="color-picker">
+    <div class="color-field" :class="{ open, disabled }">
+      <button
+        type="button"
+        class="color-swatch"
+        :class="{ empty: !value }"
+        :style="value ? { background: value } : undefined"
+        :disabled="disabled"
+        @click="toggle"
+      />
 
-        <material-color-palette
-          v-if="open && materialColorPalette"
-          v-model="value"
-        >
-          <color-palette-footer v-model="value" />
-        </material-color-palette>
-      </div>
+      <input
+        class="color-hex"
+        :value="value"
+        :disabled="disabled"
+        placeholder="—"
+        spellcheck="false"
+        @focus="onFocus"
+        @input="onInput"
+      />
+    </div>
 
-      <color-picker-toggle v-model="value" @click="onOpen" />
-      <color-text-input v-model="value" class="ml-2" />
-    </b-col>
-  </b-row>
+    <div v-if="open" class="color-popover stylebot-color-picker">
+      <basic-color-palette v-if="basicColorPalette" v-model="value">
+        <color-palette-footer v-model="value" />
+      </basic-color-palette>
+
+      <material-color-palette v-else v-model="value">
+        <color-palette-footer v-model="value" />
+      </material-color-palette>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import { Declaration } from 'postcss';
 
-import ColorTextInput from './ColorTextInput.vue';
-import ColorPickerToggle from './ColorPickerToggle.vue';
 import BasicColorPalette from './BasicColorPalette.vue';
 import MaterialColorPalette from './MaterialColorPalette.vue';
 import ColorPaletteFooter from './ColorPaletteFooter.vue';
@@ -34,8 +45,6 @@ export default Vue.extend({
   name: 'ColorPicker',
 
   components: {
-    ColorTextInput,
-    ColorPickerToggle,
     BasicColorPalette,
     MaterialColorPalette,
     ColorPaletteFooter,
@@ -84,15 +93,23 @@ export default Vue.extend({
     basicColorPalette(): boolean {
       return this.$store.state.options.colorPalette === 'basic';
     },
-
-    materialColorPalette(): boolean {
-      return this.$store.state.options.colorPalette === 'material';
-    },
   },
 
   methods: {
     onFocus(event: FocusEvent): void {
       (event.target as HTMLInputElement).select();
+    },
+
+    onInput(event: Event): void {
+      this.value = (event.target as HTMLInputElement).value;
+    },
+
+    toggle(): void {
+      if (this.open) {
+        this.onClose();
+      } else {
+        this.onOpen();
+      }
     },
 
     onOpen(): void {
@@ -114,11 +131,11 @@ export default Vue.extend({
     },
 
     onDocumentClick(e: MouseEvent): void {
-      const colorPickerSwatches = e.composedPath().find(el => {
-        return (el as HTMLElement).className?.includes('stylebot-color-picker');
+      const insidePicker = e.composedPath().find(el => {
+        return (el as HTMLElement).className?.includes?.('color-picker');
       });
 
-      if (!colorPickerSwatches) {
+      if (!insidePicker) {
         this.onClose();
       }
     },
@@ -128,6 +145,77 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .color-picker {
+  position: relative;
   pointer-events: all;
+}
+
+.color-field {
+  box-sizing: border-box;
+  display: flex;
+  align-items: stretch;
+  width: 108px;
+  @include field-border;
+
+  // Only the hex text field highlights the whole pill — the swatch button
+  // (which opens the picker) gets its own focus ring instead.
+  &:has(.color-hex:focus),
+  &.open {
+    @include field-active-border;
+  }
+
+  &.disabled {
+    opacity: 0.6;
+  }
+}
+
+.color-swatch {
+  @include button-reset;
+  flex: none;
+  width: 26px;
+  align-self: stretch;
+  border-right: 1px solid var(--border);
+  border-radius: 6px 0 0 6px;
+  outline: none;
+  cursor: pointer;
+
+  &.empty {
+    background: repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 4px,
+      var(--border) 4px,
+      var(--border) 5px
+    );
+  }
+
+  @include focus-ring;
+
+  &:disabled {
+    cursor: default;
+  }
+}
+
+.color-hex {
+  @include button-reset;
+  flex: 1;
+  min-width: 0;
+  padding: 5px 8px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.2;
+  color: var(--foreground);
+  outline: none;
+  cursor: text;
+
+  &::placeholder {
+    color: var(--muted-foreground);
+  }
+}
+
+.color-popover {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 20;
 }
 </style>

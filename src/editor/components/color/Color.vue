@@ -1,29 +1,21 @@
 <template>
-  <b-row align-content="center" no-gutters>
-    <css-property>
-      {{ t('text_color') }}
-    </css-property>
-
-    <css-property-value>
-      <color-picker :property="'color'" />
-    </css-property-value>
-  </b-row>
+  <property-row :label="t('text_color')">
+    <color-picker property="color" />
+  </property-row>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 
-import CssProperty from '../CssProperty.vue';
-import CssPropertyValue from '../CssPropertyValue.vue';
+import PropertyRow from '../basic/PropertyRow.vue';
 import ColorPicker from './ColorPicker.vue';
 
 export default Vue.extend({
   name: 'Color',
 
   components: {
+    PropertyRow,
     ColorPicker,
-    CssProperty,
-    CssPropertyValue,
   },
 });
 </script>

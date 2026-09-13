@@ -1,9 +1,7 @@
 // Shared SCSS mixins, auto-injected into every stylesheet via sass-loader's
 // prependData (see webpack.config.js). Defines mixins only — emits no CSS.
 
-// Keyboard focus ring. Use a positive offset for standalone controls and a
-// negative one for controls that sit flush against an edge or border.
-@mixin focus-ring($offset: 1px) {
+@mixin focus-ring($offset: -2px) {
   &:focus-visible {
     outline: 2px solid var(--ring);
     outline-offset: $offset;
@@ -14,4 +12,16 @@
 @mixin button-reset {
   all: unset;
   box-sizing: border-box;
+}
+
+// Shared chrome for field-like containers (selects, number/color/text inputs).
+@mixin field-border($radius: 7px) {
+  border: 1px solid var(--input);
+  border-radius: $radius;
+}
+
+// Active/focused state for the same fields — pair with field-border.
+@mixin field-active-border {
+  border-color: var(--primary);
+  box-shadow: inset 0 0 0 1px var(--primary);
 }

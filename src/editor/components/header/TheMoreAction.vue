@@ -7,7 +7,7 @@
     </template>
 
     <template #default="{ close }">
-      <s-menu class="more-menu">
+      <s-menu dense class="more-menu">
         <s-segmented-control
           class="dock-toggle"
           :value="layout.dockLocation"
@@ -26,14 +26,14 @@
 
         <hr class="more-menu-divider" />
 
-        <menu-item dense @click="keyboardShortcuts(); close();">
+        <menu-item @click="keyboardShortcuts(); close();">
           <span class="menu-item-row">
             <span>{{ t('view_keyboard_shortcuts') }}</span>
             <span class="menu-item-hint">{{ editorCommands.help }}</span>
           </span>
         </menu-item>
 
-        <menu-item dense @click="optionsPage(); close();">
+        <menu-item @click="optionsPage(); close();">
           <span class="menu-item-row">
             <span>{{ t('view_all_styles_and_settings') }}</span>
             <external-link-icon />
@@ -134,7 +134,8 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .more-menu {
   width: 230px;
-  padding: 8px 10px !important;
+  --menu-padding: 10px;
+  padding: 8px var(--menu-padding) !important;
   gap: 0 !important;
 }
 

@@ -1,16 +1,16 @@
 <template>
-  <editor-theme-provider class="stylebot-app">
+  <theme-provider class="stylebot-app">
     <the-stylebot v-if="visible" />
     <the-keyboard-shortcuts />
     <the-help-dialog v-if="help" />
-  </editor-theme-provider>
+  </theme-provider>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import { StylebotCommands } from '@stylebot/types';
+import { ThemeProvider } from '@stylebot/components';
 
-import EditorThemeProvider from './EditorThemeProvider.vue';
 import TheStylebot from './TheStylebot.vue';
 import TheHelpDialog from './shortcuts/TheHelpDialog.vue';
 import TheKeyboardShortcuts from './shortcuts/TheKeyboardShortcuts.vue';
@@ -19,7 +19,7 @@ export default Vue.extend({
   name: 'App',
 
   components: {
-    EditorThemeProvider,
+    ThemeProvider,
     TheStylebot,
     TheHelpDialog,
     TheKeyboardShortcuts,

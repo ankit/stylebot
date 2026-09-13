@@ -9,7 +9,7 @@
     :w="width"
     :h="height"
     :z="100000000"
-    :min-width="300"
+    :min-width="minWidth"
     :active="resizing"
     :draggable="false"
     :prevent-deactivation="true"
@@ -28,6 +28,7 @@ import Vue from 'vue';
 import { StylebotLayout, StylebotEditingMode } from '@stylebot/types';
 
 const MARGIN = 12;
+const MIN_WIDTH = 340;
 
 export default Vue.extend({
   name: 'TheStylebotResizer',
@@ -64,8 +65,13 @@ export default Vue.extend({
       return false;
     },
 
+    minWidth(): number {
+      return MIN_WIDTH;
+    },
+
     width(): number {
-      return this.layout.width;
+      // Guards against a width persisted before MIN_WIDTH was raised.
+      return Math.max(this.layout.width, MIN_WIDTH);
     },
 
     height(): number {
@@ -133,7 +139,7 @@ export default Vue.extend({
     adjustPageLayout() {
       // todo: this needs a lot of work to be more robust.
       if (this.layout.adjustPageLayout && this.visible) {
-        const reserved = this.layout.width + MARGIN;
+        const reserved = this.width + MARGIN;
 
         if (this.layout.dockLocation === 'left') {
           document.body.style.width = ``;

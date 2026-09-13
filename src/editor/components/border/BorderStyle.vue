@@ -1,43 +1,35 @@
 <template>
-  <b-row align-content="center" no-gutters>
-    <css-property>
-      {{ t('border_style') }}
-    </css-property>
-
-    <dropdown-hack-to-support-shadow-dom>
-      <b-dropdown
-        size="sm"
-        :text="text"
-        :disabled="disabled"
-        class="border-style-dropdown"
-        variant="outline-secondary"
-      >
-        <b-dropdown-item
+  <property-row :label="t('border_style')">
+    <s-select :text="text" :muted="!value" :disabled="disabled" :menu-min-width="140">
+      <template #default="{ close }">
+        <menu-item
           v-for="option in options"
-          :key="option.title"
-          @click="select(option.value)"
+          :key="option.value"
+          :selected="option.value === value"
+          @click="select(option.value); close();"
         >
           {{ option.title }}
-        </b-dropdown-item>
-      </b-dropdown>
-    </dropdown-hack-to-support-shadow-dom>
-  </b-row>
+        </menu-item>
+      </template>
+    </s-select>
+  </property-row>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import { t } from '@stylebot/i18n';
 import { Declaration } from 'postcss';
+import { SSelect, MenuItem } from '@stylebot/components';
 
-import CssProperty from '../CssProperty.vue';
-import DropdownHackToSupportShadowDom from '../DropdownHackToSupportShadowDom.vue';
+import PropertyRow from '../basic/PropertyRow.vue';
 
 export default Vue.extend({
   name: 'BorderStyle',
 
   components: {
-    CssProperty,
-    DropdownHackToSupportShadowDom,
+    PropertyRow,
+    SSelect,
+    MenuItem,
   },
 
   data(): {
@@ -62,7 +54,7 @@ export default Vue.extend({
   },
 
   computed: {
-    text(): string {
+    value(): string {
       const activeRule = this.$store.getters.activeRule;
 
       let value = '';
@@ -72,14 +64,12 @@ export default Vue.extend({
         });
       }
 
-      if (value) {
-        const option = this.options.find(o => o.value === value);
-        if (option) {
-          return option.title;
-        }
-      }
+      return value;
+    },
 
-      return t('default');
+    text(): string {
+      const option = this.options.find(o => o.value === this.value);
+      return option ? option.title : t('default');
     },
 
     disabled(): boolean {
@@ -97,12 +87,3 @@ export default Vue.extend({
   },
 });
 </script>
-
-<style lang="scss">
-.border-style-dropdown {
-  .dropdown-toggle {
-    border-top-left-radius: 3.2px !important;
-    border-bottom-left-radius: 3.2px !important;
-  }
-}
-</style>

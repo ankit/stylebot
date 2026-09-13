@@ -1,27 +1,21 @@
 <template>
-  <b-row align-content="center" no-gutters>
-    <css-property>{{ t('font_size') }}</css-property>
-
-    <css-property-value>
-      <length property="font-size" :sizes="sizes" />
-    </css-property-value>
-  </b-row>
+  <property-row :label="t('font_size')">
+    <length property="font-size" :sizes="sizes" />
+  </property-row>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 
 import Length from '../Length.vue';
-import CssProperty from '../CssProperty.vue';
-import CssPropertyValue from '../CssPropertyValue.vue';
+import PropertyRow from '../basic/PropertyRow.vue';
 
 export default Vue.extend({
   name: 'FontSize',
 
   components: {
     Length,
-    CssProperty,
-    CssPropertyValue,
+    PropertyRow,
   },
 
   data(): {

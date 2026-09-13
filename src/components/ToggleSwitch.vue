@@ -88,6 +88,7 @@ input {
 }
 
 .track {
+  box-sizing: border-box;
   flex-shrink: 0;
   position: relative;
   background: var(--track-off);
@@ -155,15 +156,6 @@ input:checked:not(:disabled) ~ .track .thumb {
   background: var(--thumb-disabled);
   top: 1px;
   left: 1px;
-}
-
-.disabled.switch--sm input:checked ~ .track .thumb {
-  transform: translateX(11px);
-}
-
-.disabled.switch--lg input:checked ~ .track .thumb {
-  transform: translateX(15px);
-  box-shadow: none;
 }
 
 input:focus-visible ~ .track {

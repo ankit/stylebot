@@ -126,6 +126,6 @@ export default Vue.extend({
     color: #fff;
   }
 
-  @include focus-ring(2px);
+  @include focus-ring;
 }
 </style>

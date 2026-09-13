@@ -1,33 +1,22 @@
 <template>
-  <b-row align-content="center" no-gutters>
-    <css-property>{{ t('visibility') }}</css-property>
-
-    <css-property-value>
-      <b-button
-        size="sm"
-        :disabled="disabled"
-        :variant="isHidden ? 'secondary' : 'outline-secondary'"
-        @click="toggle"
-      >
-        {{ t('hide') }}
-      </b-button>
-    </css-property-value>
-  </b-row>
+  <property-row :label="t('visibility')">
+    <toggle-switch class="visibility-toggle" :value="!isHidden" :disabled="disabled" @change="toggle" />
+  </property-row>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import { Declaration } from 'postcss';
+import { ToggleSwitch } from '@stylebot/components';
 
-import CssProperty from '../CssProperty.vue';
-import CssPropertyValue from '../CssPropertyValue.vue';
+import PropertyRow from '../basic/PropertyRow.vue';
 
 export default Vue.extend({
   name: 'Visibility',
 
   components: {
-    CssProperty,
-    CssPropertyValue,
+    PropertyRow,
+    ToggleSwitch,
   },
 
   computed: {
@@ -50,14 +39,22 @@ export default Vue.extend({
   },
 
   methods: {
-    toggle(): void {
-      let value = this.isHidden ? '' : 'none';
-
+    toggle(visible: boolean): void {
       this.$store.dispatch('applyDeclaration', {
         property: 'display',
-        value,
+        value: visible ? '' : 'none',
       });
     },
   },
 });
 </script>
+
+<style lang="scss" scoped>
+.visibility-toggle {
+  width: auto;
+}
+
+.visibility-toggle ::v-deep .label {
+  display: none;
+}
+</style>

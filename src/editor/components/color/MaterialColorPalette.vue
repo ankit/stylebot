@@ -49,13 +49,11 @@ export default Vue.extend({
 <style lang="scss">
 .material-color-palette {
   width: 202px;
-  left: -80px;
-  bottom: 36px;
   padding: 10px;
-  background: #fff;
-  border: 1px solid #ccc;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
   line-height: 0;
-  position: absolute;
-  z-index: 10000000000000;
 }
 </style>
