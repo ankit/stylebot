@@ -13,8 +13,8 @@
   >
     <template v-if="filteredSelectors.length" #header>
       <div class="dropdown-header">
-        <s-text size="caption" variant="muted" class="dropdown-header-label">{{ t('rules_on_this_page') }}</s-text>
-        <s-text size="caption" variant="muted" class="dropdown-header-label">{{ t('declarations') }}</s-text>
+        <s-text size="caption" variant="muted" class="dropdown-header-label">{{ t('selector') }}</s-text>
+        <s-text size="caption" variant="muted" class="dropdown-header-label">{{ t('properties') }}</s-text>
       </div>
     </template>
 
