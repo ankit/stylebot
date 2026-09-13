@@ -7,7 +7,7 @@
     </template>
 
     <template #default="{ close }">
-      <s-menu class="more-menu">
+      <s-menu dense class="more-menu">
         <s-segmented-control
           class="dock-toggle"
           :value="layout.dockLocation"
@@ -135,8 +135,6 @@ export default Vue.extend({
 .more-menu {
   width: 230px;
   --menu-padding: 10px;
-  --menu-item-padding-y: 7px;
-  --menu-item-font-size: 12.5px;
   padding: 8px var(--menu-padding) !important;
   gap: 0 !important;
 }
