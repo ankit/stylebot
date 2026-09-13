@@ -196,6 +196,10 @@ const config = {
           transform: transformHtml,
         },
         {
+          from: 'monaco-editor/iframe/theme-init.js',
+          to: 'monaco-editor/iframe/theme-init.js',
+        },
+        {
           from: '../node_modules/monaco-editor/min/**/*',
           to: 'monaco-editor/iframe/monaco-editor/',
         },
