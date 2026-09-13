@@ -228,12 +228,12 @@ export default Vue.extend({
 .spacing-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 14px;
-  padding-top: 2px;
+  row-gap: 8px;
+  column-gap: 12px;
+  padding-top: 8px;
 }
 
 .spacing-grid ::v-deep .spacing-field {
   flex: 1 1 120px;
-  min-width: 120px;
 }
 </style>

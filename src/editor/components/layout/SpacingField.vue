@@ -5,7 +5,6 @@
     <s-number-field
       unit="px"
       :value="value"
-      :presets="sizes"
       :disabled="disabled"
       @input="$emit('input', $event)"
     />
@@ -39,12 +38,6 @@ export default Vue.extend({
       default: false,
     },
   },
-
-  data(): { sizes: Array<string> } {
-    return {
-      sizes: ['0', '2', '4', '8', '12', '16', '24', '32'],
-    };
-  },
 });
 </script>
 
@@ -62,6 +55,5 @@ export default Vue.extend({
 
 .spacing-field ::v-deep .number-field {
   width: 100%;
-  max-width: 108px;
 }
 </style>
