@@ -15,6 +15,7 @@ import {
   injectRootIntoDocument,
   getCssAfterApplyingFilterEffectToPage,
   removeEmptyRules,
+  removeRule,
 } from '@stylebot/css';
 
 import { applyReadability, removeReadability } from '@stylebot/readability';
@@ -223,6 +224,15 @@ export default {
       state.css
     );
 
+    dispatch('applyCss', { css });
+  },
+
+  resetActiveRule({ state, dispatch }: { state: State; dispatch: Dispatch }): void {
+    if (!state.activeSelector) {
+      return;
+    }
+
+    const css = removeRule(state.css, state.activeSelector);
     dispatch('applyCss', { css });
   },
 

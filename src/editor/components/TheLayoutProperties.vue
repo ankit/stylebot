@@ -1,7 +1,5 @@
 <template>
   <div class="layout-properties">
-    <visibility />
-
     <spacing-control
       :label="t('padding')"
       :properties="{
@@ -14,7 +12,6 @@
 
     <spacing-control
       :label="t('margin')"
-      last
       :properties="{
         top: 'margin-top',
         right: 'margin-right',
@@ -22,20 +19,26 @@
         left: 'margin-left',
       }"
     />
+
+    <border-control />
+
+    <radius />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import SpacingControl from './layout/SpacingControl.vue';
-import Visibility from './layout/Visibility.vue';
+import BorderControl from './layout/BorderControl.vue';
+import Radius from './layout/Radius.vue';
 
 export default Vue.extend({
   name: 'TheLayoutProperties',
 
   components: {
     SpacingControl,
-    Visibility,
+    BorderControl,
+    Radius,
   },
 });
 </script>

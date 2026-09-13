@@ -3,9 +3,8 @@
     <font-family />
     <font-size />
     <line-height />
-    <font-style />
+    <color />
     <text-decoration />
-    <text-transform />
     <text-align />
   </div>
 </template>
@@ -15,10 +14,9 @@ import Vue from 'vue';
 
 import FontSize from './text/FontSize.vue';
 import LineHeight from './text/LineHeight.vue';
-import FontStyle from './text/FontStyle.vue';
 import FontFamily from './text/FontFamily.vue';
+import Color from './color/Color.vue';
 import TextDecoration from './text/TextDecoration.vue';
-import TextTransform from './text/TextTransform.vue';
 import TextAlign from './text/TextAlign.vue';
 
 export default Vue.extend({
@@ -27,9 +25,8 @@ export default Vue.extend({
     FontFamily,
     FontSize,
     LineHeight,
-    FontStyle,
+    Color,
     TextDecoration,
-    TextTransform,
     TextAlign,
   },
 });

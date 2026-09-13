@@ -1,14 +1,14 @@
 <template>
-  <p class="text" :class="[size, variant]">
+  <component :is="as" class="text" :class="[size, variant]">
     <slot />
-  </p>
+  </component>
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from 'vue';
 
-type Size = 'body' | 'caption';
-type Variant = 'muted' | 'default';
+type Size = 'label' | 'body' | 'caption' | 'small';
+type Variant = 'muted' | 'default' | 'primary';
 
 export default Vue.extend({
   name: 'SText',
@@ -22,6 +22,13 @@ export default Vue.extend({
     variant: {
       type: String as PropType<Variant>,
       default: 'default',
+    },
+
+    // Rendered tag — use 'span' for inline/phrasing contexts (e.g. inside
+    // a <button>), where the default 'p' isn't valid HTML.
+    as: {
+      type: String,
+      default: 'p',
     },
   },
 });
@@ -38,6 +45,15 @@ export default Vue.extend({
   color: var(--muted-foreground);
 }
 
+.primary {
+  color: var(--primary);
+}
+
+.label {
+  font-size: 13px;
+  line-height: 1.3;
+}
+
 .body {
   font-size: 12.5px;
   line-height: 1.45;
@@ -46,5 +62,10 @@ export default Vue.extend({
 .caption {
   font-size: 12px;
   line-height: 1.4;
+}
+
+.small {
+  font-size: 11.5px;
+  line-height: 1.3;
 }
 </style>

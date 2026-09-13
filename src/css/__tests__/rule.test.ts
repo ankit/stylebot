@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const dedent = require('dedent');
-import { getRule, addEmptyRule, removeEmptyRules } from '../';
+import { getRule, addEmptyRule, removeEmptyRules, removeRule } from '../';
 
 describe('rule', () => {
   describe('getRule', () => {
@@ -142,7 +142,7 @@ describe('rule', () => {
         }
 
         .mock-selector-2 {
-          
+
         }`;
 
       const output = dedent`
@@ -152,6 +152,62 @@ describe('rule', () => {
       `;
 
       expect(removeEmptyRules(css)).toEqual(output);
+    });
+  });
+
+  describe('removeRule', () => {
+    it('removes the rule matching the selector', () => {
+      const css = dedent`
+        .mock-selector-1 {
+          color: red;
+        }
+
+        .mock-selector-2 {
+          color: green;
+        }
+      `;
+
+      const output = dedent`
+        .mock-selector-1 {
+          color: red;
+        }
+      `;
+
+      expect(removeRule(css, '.mock-selector-2')).toEqual(output);
+    });
+
+    it('leaves css unchanged when the selector is not found', () => {
+      const css = dedent`
+        .mock-selector-1 {
+          color: red;
+        }
+      `;
+
+      expect(removeRule(css, '.mock-selector-2')).toEqual(css);
+    });
+
+    it('removes every rule matching the selector', () => {
+      const css = dedent`
+        .mock-selector-1 {
+          color: red;
+        }
+
+        .mock-selector-2 {
+          color: blue;
+        }
+
+        .mock-selector-1 {
+          background: yellow;
+        }
+      `;
+
+      const output = dedent`
+        .mock-selector-2 {
+          color: blue;
+        }
+      `;
+
+      expect(removeRule(css, '.mock-selector-1')).toEqual(output);
     });
   });
 });

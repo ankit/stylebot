@@ -23,3 +23,9 @@ export const removeEmptyRules = (css: string): string => {
   });
   return root.toString();
 };
+
+export const removeRule = (css: string, selector: string): string => {
+  const root = postcss.parse(css);
+  root.walkRules(selector, rule => rule.remove());
+  return root.toString();
+};

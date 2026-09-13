@@ -23,6 +23,8 @@ export const defaultOptions: StylebotOptions = {
     colors: true,
     layout: true,
     border: false,
+    more: false,
+    effects: false,
   },
   layout: {
     width: 350,

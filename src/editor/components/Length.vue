@@ -12,6 +12,7 @@
 import Vue, { PropType } from 'vue';
 import { Declaration } from 'postcss';
 import { SNumberField } from '@stylebot/components';
+import { extractLength } from '../utils/css-value';
 
 export default Vue.extend({
   name: 'Length',
@@ -31,6 +32,13 @@ export default Vue.extend({
       type: String,
       required: true,
     },
+
+    // Raw value of a shorthand property (e.g. border: 1px solid red) to
+    // pull a length from when `property` itself isn't declared.
+    fallback: {
+      type: String,
+      default: '',
+    },
   },
 
   computed: {
@@ -43,6 +51,10 @@ export default Vue.extend({
           activeRule.clone().walkDecls(this.property, (decl: Declaration) => {
             value = decl.value;
           });
+        }
+
+        if (!value && this.fallback) {
+          value = extractLength(this.fallback);
         }
 
         if (!value) {

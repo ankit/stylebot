@@ -40,6 +40,7 @@ import { Declaration } from 'postcss';
 import BasicColorPalette from './BasicColorPalette.vue';
 import MaterialColorPalette from './MaterialColorPalette.vue';
 import ColorPaletteFooter from './ColorPaletteFooter.vue';
+import { extractColor } from '../../utils/css-value';
 
 export default Vue.extend({
   name: 'ColorPicker',
@@ -54,6 +55,13 @@ export default Vue.extend({
     property: {
       type: String,
       required: true,
+    },
+
+    // Raw value of a shorthand property (e.g. border: 1px solid red) to
+    // pull a color from when `property` itself isn't declared.
+    fallback: {
+      type: String,
+      default: '',
     },
   },
 
@@ -73,6 +81,10 @@ export default Vue.extend({
           activeRule.clone().walkDecls(this.property, (decl: Declaration) => {
             value = decl.value;
           });
+        }
+
+        if (!value && this.fallback) {
+          value = extractColor(this.fallback);
         }
 
         return value;

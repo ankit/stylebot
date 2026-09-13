@@ -19,3 +19,5 @@ export { default as STabs } from './STabs.vue';
 export { default as SSelect } from './SSelect.vue';
 export { default as SNumberField } from './SNumberField.vue';
 export { default as SCard } from './SCard.vue';
+export { default as SCountBadge } from './SCountBadge.vue';
+export { default as SSlider } from './SSlider.vue';

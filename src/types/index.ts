@@ -8,6 +8,8 @@ export type StylebotBasicModeSections = {
   colors: boolean;
   layout: boolean;
   border: boolean;
+  more: boolean;
+  effects: boolean;
 };
 
 export type StylebotLayout = {

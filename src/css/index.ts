@@ -25,4 +25,4 @@ export {
 
 export { addGoogleWebFont, cleanGoogleWebFonts } from './webfont';
 export { addDeclaration, appendImportantToDeclarations } from './declaration';
-export { getRule, addEmptyRule, removeEmptyRules } from './rule';
+export { getRule, addEmptyRule, removeEmptyRules, removeRule } from './rule';

@@ -11,6 +11,10 @@
     @select="pickSelector"
     @click.native="stopInspecting"
   >
+    <template v-if="activeStyleCount > 0" #suffix>
+      <s-count-badge :count="activeStyleCount" class="active-style-count" />
+    </template>
+
     <template v-if="filteredSelectors.length" #header>
       <div class="dropdown-header">
         <s-text size="caption" variant="muted" class="dropdown-header-label">{{ t('selector') }}</s-text>
@@ -30,7 +34,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { SAutocomplete, SText } from '@stylebot/components';
+import { SAutocomplete, SText, SCountBadge } from '@stylebot/components';
 import { StylebotEditingMode } from '@stylebot/types';
 
 import { CssSelectorMetadata } from '../../store';
@@ -42,6 +46,7 @@ export default Vue.extend({
   components: {
     SAutocomplete,
     SText,
+    SCountBadge,
     TheCssSelectorDropdownItem,
   },
 
@@ -56,6 +61,11 @@ export default Vue.extend({
 
     selectors(): Array<CssSelectorMetadata> {
       return this.$store.state.selectors;
+    },
+
+    activeStyleCount(): number {
+      const match = this.selectors.find(s => s.value === this.activeSelector);
+      return match ? match.styleCount : 0;
     },
 
     filteredSelectors(): Array<CssSelectorMetadata> {
@@ -108,5 +118,9 @@ export default Vue.extend({
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+.active-style-count {
+  margin: 0 2px;
 }
 </style>
