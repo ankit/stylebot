@@ -1,12 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import CustomLight from './themes/CustomLight';
 import CustomDark from './themes/CustomDark';
-import { IframeMessage, ParentUpdateCssMessage } from '@stylebot/monaco-editor';
+import { IframeMessage, ParentMessage } from '@stylebot/monaco-editor';
 
 declare global {
   interface Window {
     monaco: any;
     require: any;
+  }
+
+  // Not in TS 3.9's lib.dom.d.ts.
+  class ResizeObserver {
+    constructor(callback: () => void);
+    observe(target: Element): void;
   }
 }
 
@@ -74,6 +80,10 @@ class MonacEditorIframe {
 
     // Layout may still be settling at creation time — re-measure after paint.
     requestAnimationFrame(() => this.editor.layout());
+
+    // Container can resize with no window resize event to catch it (e.g. the panel
+    // resizer) since it's same-document, not the iframe's own viewport.
+    new ResizeObserver(() => this.editor.layout()).observe(container);
   }
 
   getContainer(): HTMLDivElement {
@@ -168,13 +178,15 @@ class MonacEditorIframe {
 
     window.addEventListener(
       'message',
-      (message: { data: ParentUpdateCssMessage }) => {
+      (message: { data: ParentMessage }) => {
         if (message.data.type === 'stylebotCssUpdate') {
           this.handleStylebotCssUpdate(
             message.data.css,
             message.data.selector,
             message.data.focus ?? true
           );
+        } else if (message.data.type === 'stylebotFocusEditor') {
+          this.editor.focus();
         }
       }
     );

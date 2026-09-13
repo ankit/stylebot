@@ -9,7 +9,9 @@
       >
         <the-basic-editor v-if="mode === 'basic'" />
         <the-magic-editor v-else-if="mode === 'magic'" />
-        <the-code-editor v-else-if="mode === 'code' && !resizing" />
+
+        <!-- Stays mounted (just hidden) once opened — Monaco is too expensive to reload on every mode switch/resize. -->
+        <the-code-editor v-if="codeEditorMounted" v-show="mode === 'code' && !resizing" />
       </div>
     </div>
   </the-stylebot-resizer>
@@ -37,6 +39,12 @@ export default Vue.extend({
     TheStylebotResizer,
   },
 
+  data(): { codeEditorMounted: boolean } {
+    return {
+      codeEditorMounted: false,
+    };
+  },
+
   computed: {
     resizing(): boolean {
       return this.$store.state.resizing;
@@ -48,6 +56,17 @@ export default Vue.extend({
 
     colorPickerVisible(): boolean {
       return this.$store.state.colorPickerVisible;
+    },
+  },
+
+  watch: {
+    mode: {
+      immediate: true,
+      handler(mode: StylebotEditingMode): void {
+        if (mode === 'code') {
+          this.codeEditorMounted = true;
+        }
+      },
     },
   },
 });

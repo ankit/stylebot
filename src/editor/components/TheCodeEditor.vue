@@ -6,7 +6,11 @@
 import Vue from 'vue';
 
 import { getRule, addEmptyRule, removeEmptyRules } from '@stylebot/css';
-import { IframeMessage, ParentUpdateCssMessage } from '@stylebot/monaco-editor';
+import {
+  IframeMessage,
+  ParentUpdateCssMessage,
+  ParentFocusEditorMessage,
+} from '@stylebot/monaco-editor';
 
 import CodeEditorIframe from './code/CodeEditorIframe.vue';
 
@@ -25,6 +29,10 @@ export default Vue.extend({
     activeSelector(): string {
       return this.$store.state.activeSelector;
     },
+
+    mode(): string {
+      return this.$store.state.options.mode;
+    },
   },
 
   watch: {
@@ -36,6 +44,14 @@ export default Vue.extend({
       }
 
       this.handleActiveSelectorChange(selector);
+    },
+
+    // The editor stays mounted across mode switches, so re-entering Code mode
+    // doesn't naturally refocus it the way a fresh mount used to.
+    mode(mode: string): void {
+      if (mode === 'code') {
+        this.focusIframe();
+      }
     },
 
     css(value: string): void {
@@ -73,6 +89,15 @@ export default Vue.extend({
       };
 
       contentWindow.postMessage(message, chrome.runtime.getURL('*'));
+    },
+
+    focusIframe(): void {
+      const contentWindow = this.getIframeContentWindow();
+
+      if (contentWindow) {
+        const message: ParentFocusEditorMessage = { type: 'stylebotFocusEditor' };
+        contentWindow.postMessage(message, chrome.runtime.getURL('*'));
+      }
     },
 
     handleMessage(message: {
