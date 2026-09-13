@@ -143,6 +143,11 @@ export default Vue.extend({
   height: 27px;
 }
 
+.border-color ::v-deep .color-swatch {
+  border-right: none;
+  border-radius: 6px;
+}
+
 .border-style-option {
   display: flex;
   align-items: center;
