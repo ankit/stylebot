@@ -62,11 +62,13 @@ export default Vue.extend({
 
   methods: {
     attachStylebotShortcuts(): void {
-      document.addEventListener('keydown', this.handleStylebotShortcut);
+      // Capture phase: some sites (e.g. GitHub) bind their own shortcuts on
+      // document in the bubble phase, which would otherwise win the race.
+      document.addEventListener('keydown', this.handleStylebotShortcut, true);
     },
 
     detachStylebotShortcuts(): void {
-      document.removeEventListener('keydown', this.handleStylebotShortcut);
+      document.removeEventListener('keydown', this.handleStylebotShortcut, true);
     },
 
     toggleInspect(): void {

@@ -34,7 +34,8 @@ describe('formatShortcut', () => {
     expect(formatShortcut('x', false)).toEqual({ parts: ['X'], joiner: '+' });
   });
 
-  it('returns no parts for an empty combo', () => {
-    expect(formatShortcut('', true)).toEqual({ parts: [], joiner: '' });
+  it('renders a dash for an empty combo', () => {
+    expect(formatShortcut('', true)).toEqual({ parts: ['–'], joiner: '' });
+    expect(formatShortcut('', false)).toEqual({ parts: ['–'], joiner: '' });
   });
 });
