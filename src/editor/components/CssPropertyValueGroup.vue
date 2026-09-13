@@ -10,17 +10,18 @@
       :title="option.title"
       @click="select(option.value)"
     >
+      <component :is="option.icon" v-if="option.icon" />
       <!-- eslint-disable-next-line vue/no-v-html -->
-      <span v-html="option.html" />
+      <span v-else v-html="option.html" />
     </button>
   </div>
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from 'vue';
+import Vue, { PropType, Component } from 'vue';
 import { Declaration } from 'postcss';
 
-type Option = { title: string; html: string; value: string };
+type Option = { title: string; value: string; html?: string; icon?: Component };
 
 export default Vue.extend({
   name: 'CssPropertyValueGroup',

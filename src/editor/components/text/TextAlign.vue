@@ -5,13 +5,11 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+import Vue, { Component } from 'vue';
 
+import { AlignLeftIcon, AlignCenterIcon, AlignRightIcon } from '@stylebot/icons';
 import CssPropertyValueGroup from '../CssPropertyValueGroup.vue';
 import PropertyRow from '../basic/PropertyRow.vue';
-
-const icon = (paths: string): string =>
-  `<svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="${paths}"></path></svg>`;
 
 export default Vue.extend({
   name: 'TextAlign',
@@ -22,13 +20,13 @@ export default Vue.extend({
   },
 
   data(): {
-    options: Array<{ title: string; html: string; value: string }>;
+    options: Array<{ title: string; value: string; icon: Component }>;
   } {
     return {
       options: [
-        { title: 'Align Left', value: 'left', html: icon('M2 3.5h10M2 7h6.5M2 10.5h9') },
-        { title: 'Align Center', value: 'center', html: icon('M2 3.5h10M3.7 7h6.5M2.5 10.5h9') },
-        { title: 'Align Right', value: 'right', html: icon('M2 3.5h10M5.5 7H12M3 10.5h9') },
+        { title: 'Align Left', value: 'left', icon: AlignLeftIcon },
+        { title: 'Align Center', value: 'center', icon: AlignCenterIcon },
+        { title: 'Align Right', value: 'right', icon: AlignRightIcon },
       ],
     };
   },
