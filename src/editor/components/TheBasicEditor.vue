@@ -30,6 +30,15 @@
     </property-card>
 
     <property-card
+      :label="t('effects_properties')"
+      :collapsed="!sections.effects"
+      :count="effectsCount"
+      @toggle="toggle('effects')"
+    >
+      <the-effects-properties />
+    </property-card>
+
+    <property-card
       :label="t('more_properties')"
       :collapsed="!sections.more"
       :count="moreCount"
@@ -50,12 +59,14 @@ import TheBasicEditorActions from './basic/TheBasicEditorActions.vue';
 import TheTextProperties from './TheTextProperties.vue';
 import TheColorProperties from './TheColorProperties.vue';
 import TheLayoutProperties from './TheLayoutProperties.vue';
+import TheEffectsProperties from './TheEffectsProperties.vue';
 import TheMoreProperties from './TheMoreProperties.vue';
 
 import {
   TEXT_PROPERTIES,
   COLOR_PROPERTIES,
   LAYOUT_PROPERTIES,
+  EFFECTS_PROPERTIES,
   KNOWN_PROPERTIES,
 } from '../utils/basic-properties';
 
@@ -68,6 +79,7 @@ export default Vue.extend({
     TheTextProperties,
     TheColorProperties,
     TheLayoutProperties,
+    TheEffectsProperties,
     TheMoreProperties,
   },
 
@@ -94,6 +106,10 @@ export default Vue.extend({
 
     layoutCount(): number {
       return this.countDeclarations(prop => LAYOUT_PROPERTIES.includes(prop));
+    },
+
+    effectsCount(): number {
+      return this.countDeclarations(prop => EFFECTS_PROPERTIES.includes(prop));
     },
 
     moreCount(): number {
@@ -134,13 +150,21 @@ export default Vue.extend({
       const text = this.textCount > 0;
       const colors = this.colorCount > 0;
       const layout = this.layoutCount > 0;
+      const effects = this.effectsCount > 0;
       const more = this.moreCount > 0;
 
       this.$store.dispatch(
         'setBasicModeSections',
-        text || colors || layout || more
-          ? { ...this.sections, text, colors, layout, more }
-          : { ...this.sections, text: true, colors: false, layout: false, more: false }
+        text || colors || layout || effects || more
+          ? { ...this.sections, text, colors, layout, effects, more }
+          : {
+              ...this.sections,
+              text: true,
+              colors: false,
+              layout: false,
+              effects: false,
+              more: false,
+            }
       );
     },
 

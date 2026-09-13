@@ -23,6 +23,8 @@ export const LAYOUT_PROPERTIES = [
   'border-color',
 ];
 
+export const EFFECTS_PROPERTIES = ['opacity', 'filter'];
+
 // Toggled via the Hide/Reset action toolbar, not a property panel.
 const OTHER_KNOWN_PROPERTIES = ['display'];
 
@@ -30,5 +32,6 @@ export const KNOWN_PROPERTIES = [
   ...TEXT_PROPERTIES,
   ...COLOR_PROPERTIES,
   ...LAYOUT_PROPERTIES,
+  ...EFFECTS_PROPERTIES,
   ...OTHER_KNOWN_PROPERTIES,
 ];

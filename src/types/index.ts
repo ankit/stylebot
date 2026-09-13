@@ -9,6 +9,7 @@ export type StylebotBasicModeSections = {
   layout: boolean;
   border: boolean;
   more: boolean;
+  effects: boolean;
 };
 
 export type StylebotLayout = {

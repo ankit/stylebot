@@ -7,15 +7,7 @@
     <s-text variant="muted">{{ t('grayscale_description') }}</s-text>
 
     <div v-if="active" class="grayscale-slider-row">
-      <input
-        :value="percent"
-        type="range"
-        class="grayscale-range"
-        min="1"
-        max="100"
-        step="1"
-        @input="setPercent($event.target.valueAsNumber)"
-      />
+      <s-slider :value="percent" :min="1" :max="100" :step="1" @input="setPercent" />
 
       <span class="grayscale-value">{{ percent }} %</span>
     </div>
@@ -24,7 +16,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { ToggleSwitch, SText } from '@stylebot/components';
+import { ToggleSwitch, SText, SSlider } from '@stylebot/components';
 
 import FeatureCard from './FeatureCard.vue';
 
@@ -35,6 +27,7 @@ export default Vue.extend({
     FeatureCard,
     ToggleSwitch,
     SText,
+    SSlider,
   },
 
   data(): { lastPercent: number } {
@@ -90,52 +83,5 @@ export default Vue.extend({
   font-family: var(--font-mono);
   font-size: 12.5px;
   color: var(--foreground);
-}
-
-.grayscale-range {
-  flex: 1;
-  min-width: 0;
-  height: 16px;
-  margin: 0;
-  appearance: none;
-  -webkit-appearance: none;
-  background: transparent;
-
-  &::-webkit-slider-runnable-track {
-    height: 4px;
-    border-radius: 2px;
-    background: var(--accent);
-  }
-
-  &::-webkit-slider-thumb {
-    appearance: none;
-    -webkit-appearance: none;
-    width: 16px;
-    height: 16px;
-    margin-top: -6px;
-    border-radius: 50%;
-    background: var(--primary);
-    cursor: pointer;
-  }
-
-  &::-moz-range-track {
-    height: 4px;
-    border-radius: 2px;
-    background: var(--accent);
-  }
-
-  &::-moz-range-thumb {
-    width: 16px;
-    height: 16px;
-    border: none;
-    border-radius: 50%;
-    background: var(--primary);
-    cursor: pointer;
-  }
-
-  &:focus-visible::-webkit-slider-thumb {
-    outline: 2px solid var(--ring);
-    outline-offset: 1px;
-  }
 }
 </style>
