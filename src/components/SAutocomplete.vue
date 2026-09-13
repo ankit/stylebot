@@ -141,12 +141,11 @@ export default Vue.extend({
       this.menu().show();
     },
 
-    // Reopens the suggestion list on Up/Down when it's closed (e.g. right
-    // after selecting an item) instead of leaving arrow keys as a no-op.
+    // Reopens on Up/Down when closed, like the chevron — items.length can't gate this since an exact-match value filters to zero.
     onArrowKey(open: boolean, event: KeyboardEvent): void {
-      if (!open && this.items.length) {
+      if (!open) {
         event.preventDefault();
-        this.showMenu();
+        this.showAll();
       }
     },
 
