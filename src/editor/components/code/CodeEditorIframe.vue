@@ -11,8 +11,14 @@ export default Vue.extend({
   name: 'CodeEditorIframe',
 
   data(): { src: string } {
+    // The iframe is a separate document, so the theme has to be passed in
+    // explicitly — read once, since it can't change while open.
+    const theme = window.matchMedia('(prefers-color-scheme: dark)').matches
+      ? 'dark'
+      : 'light';
+
     return {
-      src: chrome.runtime.getURL('monaco-editor/iframe/index.html'),
+      src: chrome.runtime.getURL(`monaco-editor/iframe/index.html?theme=${theme}`),
     };
   },
 });

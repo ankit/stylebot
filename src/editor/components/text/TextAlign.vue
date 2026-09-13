@@ -1,36 +1,32 @@
 <template>
-  <b-row align-content="center" no-gutters>
-    <css-property>{{ t('text_align') }}</css-property>
+  <property-row :label="t('text_align')">
     <css-property-value-group property="text-align" :options="options" />
-  </b-row>
+  </property-row>
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+import Vue, { Component } from 'vue';
 
-import CssProperty from '../CssProperty.vue';
+import { AlignLeftIcon, AlignCenterIcon, AlignRightIcon } from '@stylebot/icons';
 import CssPropertyValueGroup from '../CssPropertyValueGroup.vue';
+import PropertyRow from '../basic/PropertyRow.vue';
 
 export default Vue.extend({
   name: 'TextAlign',
 
   components: {
-    CssProperty,
     CssPropertyValueGroup,
+    PropertyRow,
   },
 
   data(): {
-    options: Array<{
-      title: string;
-      value: string;
-      icon: string;
-    }>;
+    options: Array<{ title: string; value: string; icon: Component }>;
   } {
     return {
       options: [
-        { title: 'Align Left', value: 'left', icon: 'text-left' },
-        { title: 'Align Center', value: 'center', icon: 'text-center' },
-        { title: 'Align Right', value: 'right', icon: 'text-right' },
+        { title: 'Align Left', value: 'left', icon: AlignLeftIcon },
+        { title: 'Align Center', value: 'center', icon: AlignCenterIcon },
+        { title: 'Align Right', value: 'right', icon: AlignRightIcon },
       ],
     };
   },

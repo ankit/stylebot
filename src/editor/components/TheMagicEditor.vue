@@ -1,13 +1,7 @@
 <template>
-  <div>
-    <div class="mt-3 px-3 magic-section">
-      <the-readability />
-    </div>
-
-    <div class="mt-4 px-3 magic-section">
-      <h1 class="magic-title">{{ t('grayscale') }}</h1>
-      <the-grayscale />
-    </div>
+  <div class="magic-editor">
+    <the-readability />
+    <the-grayscale />
   </div>
 </template>
 
@@ -28,14 +22,13 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-.magic-title {
-  font-size: 14px;
-  font-weight: 400;
-}
-
-.magic-section {
-  &:first-of-type {
-    margin-top: 0;
-  }
+.magic-editor {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  gap: 10px;
+  padding: 12px;
+  background: var(--accent);
 }
 </style>

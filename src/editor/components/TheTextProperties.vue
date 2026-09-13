@@ -1,12 +1,12 @@
 <template>
   <div>
-    <font-family class="mt=3" />
-    <font-size class="mt-3" />
-    <line-height class="mt-3" />
-    <font-style class="mt-3" />
-    <text-decoration class="mt-3" />
-    <text-transform class="mt-3" />
-    <text-align class="mt-3" />
+    <font-family />
+    <font-size />
+    <line-height />
+    <font-style />
+    <text-decoration />
+    <text-transform />
+    <text-align />
   </div>
 </template>
 

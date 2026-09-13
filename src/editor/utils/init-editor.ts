@@ -8,37 +8,6 @@ import TheStylebotApp from '../components/TheStylebotApp.vue';
 
 import '../index.scss';
 
-import {
-  IconsPlugin,
-  TooltipPlugin,
-  LayoutPlugin,
-  DropdownPlugin,
-  FormRadioPlugin,
-  FormInputPlugin,
-  InputGroupPlugin,
-  ButtonPlugin,
-  ButtonGroupPlugin,
-  FormGroupPlugin,
-  FormCheckboxPlugin,
-  ListGroupPlugin,
-  TableSimplePlugin,
-  CollapsePlugin,
-} from 'bootstrap-vue';
-
-Vue.use(IconsPlugin);
-Vue.use(TooltipPlugin);
-Vue.use(LayoutPlugin);
-Vue.use(DropdownPlugin);
-Vue.use(FormRadioPlugin);
-Vue.use(FormInputPlugin);
-Vue.use(InputGroupPlugin);
-Vue.use(ButtonPlugin);
-Vue.use(ButtonGroupPlugin);
-Vue.use(FormGroupPlugin);
-Vue.use(FormCheckboxPlugin);
-Vue.use(ListGroupPlugin);
-Vue.use(TableSimplePlugin);
-Vue.use(CollapsePlugin);
 Vue.component('vue-draggable-resizable', VueDraggableResizable);
 
 Vue.mixin({

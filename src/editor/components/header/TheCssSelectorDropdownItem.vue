@@ -1,6 +1,5 @@
 <template>
   <menu-item
-    dense
     class="css-selector-dropdown-item"
     @click="click"
     @mouseenter.native="preview"
@@ -98,18 +97,6 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-.css-selector-dropdown-item {
-  padding: 8px 12px !important;
-  margin: 0 -4px !important;
-  border-radius: 0 !important;
-}
-
-.css-selector-dropdown-item:hover,
-.css-selector-dropdown-item:focus-visible {
-  background: var(--accent) !important;
-  box-shadow: inset 4px 0 0 var(--primary) !important;
-}
-
 .item-row {
   display: flex;
   align-items: flex-start;

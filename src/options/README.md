@@ -1,6 +1,6 @@
 # `options`
 
-This package includes code for the stylebot options page. Built using [bootstrap-vue](https://bootstrap-vue.org/)
+This package includes code for the stylebot options page.
 
 - **`components`**: Vue components for rendering the options page
 

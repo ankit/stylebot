@@ -1,7 +1,7 @@
 <template>
   <div>
     <color />
-    <background-color class="mt-3" />
+    <background-color />
   </div>
 </template>
 

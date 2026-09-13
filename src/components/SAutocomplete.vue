@@ -1,5 +1,10 @@
 <template>
-  <anchored-menu ref="menu" class="autocomplete" retain-focus @cancel="onCancel">
+  <anchored-menu
+    ref="menu"
+    class="autocomplete"
+    retain-focus
+    @cancel="onCancel"
+  >
     <template #trigger="{ open }">
       <div class="autocomplete-pill" :class="{ disabled }">
         <textarea
@@ -10,6 +15,7 @@
           :disabled="disabled"
           :value="value"
           :placeholder="placeholder"
+          spellcheck="false"
           @keydown.enter.prevent="onEnter"
           @focus="onFocus"
           @input="onInput($event.target.value)"
@@ -28,7 +34,11 @@
     </template>
 
     <s-menu dense :min-width="minWidth" class="autocomplete-menu">
-      <div v-for="(item, index) in items" :key="itemKey ? item[itemKey] : index" class="autocomplete-option">
+      <div
+        v-for="(item, index) in items"
+        :key="itemKey ? item[itemKey] : index"
+        class="autocomplete-option"
+      >
         <slot name="item" :item="item" :select="() => onSelect(item)" />
       </div>
     </s-menu>
@@ -122,7 +132,7 @@ export default Vue.extend({
 
   methods: {
     menu(): AnchoredMenuRef {
-      return this.$refs.menu as unknown as AnchoredMenuRef;
+      return (this.$refs.menu as unknown) as AnchoredMenuRef;
     },
 
     showMenu(): void {
@@ -140,7 +150,7 @@ export default Vue.extend({
       }
 
       el.style.height = 'auto';
-      el.style.height = `${el.scrollHeight}px`;
+      el.style.height = `${Math.max(el.scrollHeight, 30)}px`;
     },
 
     syncMenu(): void {
@@ -216,13 +226,13 @@ export default Vue.extend({
   width: 100%;
   min-height: 30px;
   min-width: 0;
-  border: 1px solid var(--input);
-  border-radius: 9px;
+  @include field-border(9px);
   background: var(--background);
-  overflow: hidden;
 
+  // Only the text field itself highlights the whole pill — the chevron
+  // button gets its own focus ring instead (see .autocomplete-chevron).
   &:has(.autocomplete-input:focus) {
-    border-color: var(--primary);
+    @include field-active-border;
   }
 
   &.disabled {
@@ -231,18 +241,20 @@ export default Vue.extend({
 }
 
 .autocomplete-input {
+  box-sizing: border-box;
   flex: 1;
   min-width: 0;
+  height: 30px;
   border: none;
   outline: none;
   background: transparent;
-  padding: 6px 0 6px 10px;
+  padding: 6px 0 4px 10px;
   margin: 0;
   resize: none;
   overflow: hidden;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
-  font: 400 12.5px/1.35 'Public Sans', system-ui, sans-serif;
+  font: 400 12.5px/22px 'Public Sans', system-ui, sans-serif;
   color: var(--foreground);
 
   &.mono {
@@ -269,6 +281,7 @@ export default Vue.extend({
   width: 30px;
   border-left: 1px solid var(--input);
   border-radius: 0 8px 8px 0;
+  outline: none;
   color: var(--muted-foreground);
   cursor: pointer;
 
@@ -285,10 +298,7 @@ export default Vue.extend({
     transform: rotate(180deg);
   }
 
-  &:focus-visible {
-    outline: none;
-    box-shadow: inset 0 0 0 2px var(--ring);
-  }
+  @include focus-ring;
 
   &:disabled {
     cursor: default;

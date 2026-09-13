@@ -1,29 +1,21 @@
 <template>
-  <b-row class="border-color" align-content="center" no-gutters>
-    <css-property>
-      {{ t('border_color') }}
-    </css-property>
-
-    <css-property-value>
-      <color-picker :property="'border-color'" />
-    </css-property-value>
-  </b-row>
+  <property-row :label="t('border_color')">
+    <color-picker property="border-color" />
+  </property-row>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 
-import CssProperty from '../CssProperty.vue';
-import CssPropertyValue from '../CssPropertyValue.vue';
+import PropertyRow from '../basic/PropertyRow.vue';
 import ColorPicker from '../color/ColorPicker.vue';
 
 export default Vue.extend({
   name: 'BorderColor',
 
   components: {
+    PropertyRow,
     ColorPicker,
-    CssProperty,
-    CssPropertyValue,
   },
 });
 </script>

@@ -1,45 +1,39 @@
 <template>
-  <dropdown-hack-to-support-shadow-dom>
-    <b-dropdown
-      right
-      size="sm"
-      variant="button"
-      class="color-palette-dropdown"
-      toggle-class="text-decoration-none"
-    >
-      <template #button-content>
-        <b-icon icon="droplet" />
-      </template>
+  <anchored-menu class="color-palette-picker">
+    <template #trigger="{ toggle }">
+      <icon-button title="Color palette" @click="toggle">
+        <droplet-icon />
+      </icon-button>
+    </template>
 
-      <b-dropdown-item @click="setBasicColorPalette">
-        <span class="color-palette-dropdown-check-icon">
-          <b-icon v-if="basicColorPalette" icon="check" font-scale="1.1" />
-        </span>
+    <template #default="{ close }">
+      <s-menu dense :min-width="140">
+        <menu-item :selected="basicColorPalette" @click="setBasicColorPalette(); close();">
+          Basic
+        </menu-item>
 
-        Basic
-      </b-dropdown-item>
-
-      <b-dropdown-item @click="setMaterialColorPalette">
-        <span class="color-palette-dropdown-check-icon">
-          <b-icon v-if="materialColorPalette" icon="check" font-scale="1.1" />
-        </span>
-
-        Material
-      </b-dropdown-item>
-    </b-dropdown>
-  </dropdown-hack-to-support-shadow-dom>
+        <menu-item :selected="materialColorPalette" @click="setMaterialColorPalette(); close();">
+          Material
+        </menu-item>
+      </s-menu>
+    </template>
+  </anchored-menu>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-
-import DropdownHackToSupportShadowDom from '../DropdownHackToSupportShadowDom.vue';
+import { AnchoredMenu, SMenu, MenuItem, IconButton } from '@stylebot/components';
+import { DropletIcon } from '@stylebot/icons';
 
 export default Vue.extend({
   name: 'ColorPalettePicker',
 
   components: {
-    DropdownHackToSupportShadowDom,
+    AnchoredMenu,
+    SMenu,
+    MenuItem,
+    IconButton,
+    DropletIcon,
   },
 
   computed: {
@@ -63,19 +57,3 @@ export default Vue.extend({
   },
 });
 </script>
-
-<style lang="scss">
-.stylebot-app {
-  .color-palette-dropdown {
-    .btn-sm {
-      padding: 0;
-    }
-  }
-
-  .color-palette-dropdown-check-icon {
-    height: 10px;
-    width: 16px;
-    display: inline-block;
-  }
-}
-</style>

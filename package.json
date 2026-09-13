@@ -81,8 +81,6 @@
     "babel-core": "^7.0.0-bridge.0",
     "babel-jest": "^26.1.0",
     "babel-loader": "^8.4.1",
-    "bootstrap": "^4.5.0",
-    "bootstrap-vue": "^2.15.0",
     "copy-webpack-plugin": "^6.0.1",
     "cross-env": "^7.0.2",
     "css-loader": "^3.5.3",
