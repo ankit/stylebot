@@ -12,7 +12,7 @@
           class="autocomplete-chips"
           @mousedown.prevent="revealInput"
         >
-          <span v-for="(part, i) in chipParts" :key="i" class="chip">{{ part }}</span>
+          <s-chip v-for="(part, i) in chipParts" :key="i">{{ part }}</s-chip>
         </div>
 
         <textarea
@@ -68,6 +68,7 @@ import { ChevronDownIcon } from '@stylebot/icons';
 
 import AnchoredMenu from './AnchoredMenu.vue';
 import SMenu from './SMenu.vue';
+import SChip from './SChip.vue';
 
 type AnchoredMenuRef = { show(): void; close(): void };
 
@@ -77,6 +78,7 @@ export default Vue.extend({
   components: {
     AnchoredMenu,
     SMenu,
+    SChip,
     ChevronDownIcon,
   },
 
@@ -303,20 +305,8 @@ export default Vue.extend({
   flex-wrap: wrap;
   align-content: center;
   gap: 6px;
-  padding: 6px 8px 4px 10px;
+  padding: 6px 8px 6px 6px;
   cursor: text;
-}
-
-.chip {
-  min-width: 0;
-  padding: 2px 6px;
-  border-radius: 6px;
-  background: var(--accent);
-  font-family: var(--font-mono);
-  font-size: 12px;
-  line-height: 1.5;
-  color: var(--foreground);
-  overflow-wrap: anywhere;
 }
 
 .autocomplete-input {

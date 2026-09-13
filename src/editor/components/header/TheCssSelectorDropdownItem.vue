@@ -9,7 +9,7 @@
   >
     <span class="item-row">
       <span class="chips">
-        <span v-for="(part, i) in parts" :key="i" class="chip">{{ part }}</span>
+        <s-chip v-for="(part, i) in parts" :key="i">{{ part }}</s-chip>
       </span>
       <s-count-badge v-if="styleCount > 0" :count="styleCount" class="style-count" />
     </span>
@@ -18,7 +18,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { MenuItem, SCountBadge } from '@stylebot/components';
+import { MenuItem, SCountBadge, SChip } from '@stylebot/components';
 import { validateSelector } from '@stylebot/css';
 import { Highlighter } from '@stylebot/highlighter';
 
@@ -28,6 +28,7 @@ export default Vue.extend({
   components: {
     MenuItem,
     SCountBadge,
+    SChip,
   },
 
   props: {
@@ -111,18 +112,6 @@ export default Vue.extend({
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-}
-
-.chip {
-  min-width: 0;
-  padding: 2px 6px;
-  border-radius: 6px;
-  background: var(--accent);
-  font-family: var(--font-mono);
-  font-size: 12px;
-  line-height: 1.5;
-  color: var(--foreground);
-  overflow-wrap: anywhere;
 }
 
 .style-count {
