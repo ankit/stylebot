@@ -38,4 +38,6 @@ Avoid comments by default. Only add one to state something non-obvious — a hid
 
 ## i18n
 
-Keep each key in `src/_locales/*.config` matching its English string (e.g. `@box` → `Box`, not a stale `@layout_properties` → `Box`). When a string's copy changes, rename the key to match in the same change, across all 15 locale files. If two keys end up with the identical string in every locale, collapse them into one key instead of keeping duplicates.
+Never hardcode user-facing strings — always add an i18n key in `src/_locales/*.config` (all 15 locales) and reference it via `t('key')`. This applies to every string a user sees: labels, placeholders, titles, aria-labels, error messages.
+
+Keep each key matching its English string (e.g. `@box` → `Box`, not a stale `@layout_properties` → `Box`). When a string's copy changes, rename the key to match in the same change, across all 15 locale files. If two keys end up with the identical string in every locale, collapse them into one key instead of keeping duplicates.
