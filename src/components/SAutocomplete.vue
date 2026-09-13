@@ -36,6 +36,8 @@
     </template>
 
     <s-menu dense :min-width="minWidth" class="autocomplete-menu">
+      <slot name="header" />
+
       <div
         v-for="(item, index) in items"
         :key="itemKey ? item[itemKey] : index"

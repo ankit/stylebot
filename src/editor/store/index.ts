@@ -23,7 +23,7 @@ Vue.use(Vuex);
 export type CssSelectorMetadata = {
   id: number;
   value: string;
-  count: number;
+  styleCount: number;
 };
 
 export type State = {
