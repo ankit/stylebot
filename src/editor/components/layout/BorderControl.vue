@@ -1,7 +1,7 @@
 <template>
   <property-row :label="t('border')">
     <div class="border-control">
-      <s-select class="border-style" :text="text" :muted="!styleValue" :disabled="disabled" :menu-min-width="140">
+      <s-select class="border-style" :text="text" :muted="!styleValue" :disabled="disabled" :menu-min-width="160">
         <template #default="{ close }">
           <menu-item
             v-for="option in options"
@@ -9,13 +9,16 @@
             :selected="option.value === styleValue"
             @click="selectStyle(option.value); close();"
           >
-            {{ option.title }}
+            <span class="border-style-option">
+              <span class="border-style-preview" :style="{ borderBottomStyle: option.value }" />
+              {{ option.title }}
+            </span>
           </menu-item>
         </template>
       </s-select>
 
-      <length class="border-width" property="border-width" />
-      <color-picker class="border-color" property="border-color" />
+      <length class="border-width" property="border-width" :fallback="shorthandValue" />
+      <color-picker class="border-color" property="border-color" :fallback="shorthandValue" />
     </div>
   </property-row>
 </template>
@@ -29,6 +32,7 @@ import { SSelect, MenuItem } from '@stylebot/components';
 import PropertyRow from '../basic/PropertyRow.vue';
 import Length from '../Length.vue';
 import ColorPicker from '../color/ColorPicker.vue';
+import { extractBorderStyle } from '../../utils/css-value';
 
 export default Vue.extend({
   name: 'BorderControl',
@@ -63,6 +67,21 @@ export default Vue.extend({
   },
 
   computed: {
+    // Raw value of the border shorthand (e.g. '1px solid #44475a'), used
+    // to fall back to when the specific longhand isn't declared.
+    shorthandValue(): string {
+      const activeRule = this.$store.getters.activeRule;
+
+      let value = '';
+      if (activeRule) {
+        activeRule.clone().walkDecls('border', (decl: Declaration) => {
+          value = decl.value;
+        });
+      }
+
+      return value;
+    },
+
     styleValue(): string {
       const activeRule = this.$store.getters.activeRule;
 
@@ -71,6 +90,10 @@ export default Vue.extend({
         activeRule.clone().walkDecls('border-style', (decl: Declaration) => {
           value = decl.value;
         });
+      }
+
+      if (!value && this.shorthandValue) {
+        value = extractBorderStyle(this.shorthandValue);
       }
 
       return value;
@@ -118,6 +141,20 @@ export default Vue.extend({
 .border-color ::v-deep .color-field {
   width: 27px;
   height: 27px;
+}
+
+.border-style-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.border-style-preview {
+  flex: none;
+  width: 36px;
+  height: 0;
+  border-bottom: 3px solid var(--muted-foreground);
 }
 
 .border-color ::v-deep .color-hex {

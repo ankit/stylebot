@@ -20,6 +20,7 @@ export const LAYOUT_PROPERTIES = [
   'margin-right',
   'margin-bottom',
   'margin-left',
+  'border',
   'border-style',
   'border-width',
   'border-color',
