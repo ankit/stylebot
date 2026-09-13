@@ -6,6 +6,42 @@ const getStylesheetId = (id: string) => {
   return `stylebot-css-${id}`;
 };
 
+// Injection runs at document_start, often before the page has parsed its own
+// <head>, so a plain appendChild can land our stylesheet ahead of the page's
+// styles instead of after them. Since Stylebot's rules are all `!important`,
+// losing that ordering means an equally-`!important` page rule can win the
+// cascade tie. Keep every Stylebot stylesheet as the last child of <html>
+// until the initial parse finishes, so ours always comes after the page's.
+const stylebotElements: HTMLStyleElement[] = [];
+let reorderObserver: MutationObserver | null = null;
+
+const keepStylebotStylesLast = (style: HTMLStyleElement): void => {
+  stylebotElements.push(style);
+
+  if (document.readyState !== 'loading' || reorderObserver) {
+    return;
+  }
+
+  reorderObserver = new MutationObserver(() => {
+    const lastStylebotElement = stylebotElements[stylebotElements.length - 1];
+
+    if (document.documentElement.lastChild === lastStylebotElement) {
+      return;
+    }
+
+    stylebotElements.forEach(el => document.documentElement.appendChild(el));
+  });
+
+  reorderObserver.observe(document.documentElement, { childList: true });
+
+  document.addEventListener('readystatechange', () => {
+    if (document.readyState !== 'loading') {
+      reorderObserver?.disconnect();
+      reorderObserver = null;
+    }
+  });
+};
+
 const setStylesheetContent = (id: string, css: string): void => {
   const stylesheetId = getStylesheetId(id);
   const el = document.getElementById(stylesheetId);
@@ -22,6 +58,7 @@ const setStylesheetContent = (id: string, css: string): void => {
   style.appendChild(document.createTextNode(css));
 
   document.documentElement.appendChild(style);
+  keepStylebotStylesLast(style);
 };
 
 // Applies the non-`@import` CSS immediately and patches in any `@import`
