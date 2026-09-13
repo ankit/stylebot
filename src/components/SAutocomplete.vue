@@ -7,7 +7,16 @@
   >
     <template #trigger="{ open }">
       <div class="autocomplete-pill" :class="{ disabled }">
+        <div
+          v-if="chips && !focused && !open && chipParts.length"
+          class="autocomplete-chips"
+          @mousedown.prevent="revealInput"
+        >
+          <s-chip v-for="(part, i) in chipParts" :key="i">{{ part }}</s-chip>
+        </div>
+
         <textarea
+          v-else
           ref="input"
           rows="1"
           class="autocomplete-input"
@@ -20,6 +29,7 @@
           @keydown.down="onArrowKey(open, $event)"
           @keydown.up="onArrowKey(open, $event)"
           @focus="onFocus"
+          @blur="onBlur"
           @input="onInput($event.target.value)"
         />
 
@@ -58,6 +68,7 @@ import { ChevronDownIcon } from '@stylebot/icons';
 
 import AnchoredMenu from './AnchoredMenu.vue';
 import SMenu from './SMenu.vue';
+import SChip from './SChip.vue';
 
 type AnchoredMenuRef = { show(): void; close(): void };
 
@@ -67,6 +78,7 @@ export default Vue.extend({
   components: {
     AnchoredMenu,
     SMenu,
+    SChip,
     ChevronDownIcon,
   },
 
@@ -115,15 +127,32 @@ export default Vue.extend({
       type: Boolean,
       default: false,
     },
+
+    // Render a comma-separated value as pills when not being edited (e.g.
+    // for a multi-part CSS selector), instead of the raw wrapped text.
+    chips: {
+      type: Boolean,
+      default: false,
+    },
   },
 
-  data(): { suppressReopen: boolean; previousValue: string } {
+  data(): { suppressReopen: boolean; previousValue: string; focused: boolean } {
     return {
       suppressReopen: false,
       // Value to revert to on Escape / click-outside — captured at the start
       // of each editing session (focus / chevron-open).
       previousValue: '',
+      focused: false,
     };
+  },
+
+  computed: {
+    chipParts(): Array<string> {
+      return this.value
+        .split(',')
+        .map(part => part.trim())
+        .filter(Boolean);
+    },
   },
 
   watch: {
@@ -190,8 +219,22 @@ export default Vue.extend({
     },
 
     onFocus(): void {
+      this.focused = true;
       this.previousValue = this.value;
       this.syncMenu();
+    },
+
+    onBlur(): void {
+      this.focused = false;
+    },
+
+    // Switches from the pill display back to the raw editable textarea
+    // and focuses it, once it exists on the next render.
+    revealInput(): void {
+      this.focused = true;
+      this.$nextTick(() => {
+        (this.$refs.input as HTMLTextAreaElement | undefined)?.focus();
+      });
     },
 
     onSelect(item: Record<string, unknown>): void {
@@ -252,6 +295,18 @@ export default Vue.extend({
   &.disabled {
     opacity: 0.6;
   }
+}
+
+.autocomplete-chips {
+  box-sizing: border-box;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center;
+  gap: 6px;
+  padding: 6px 8px 6px 6px;
+  cursor: text;
 }
 
 .autocomplete-input {
