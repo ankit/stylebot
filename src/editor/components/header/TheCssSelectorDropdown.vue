@@ -11,6 +11,13 @@
     @select="pickSelector"
     @click.native="stopInspecting"
   >
+    <template v-if="filteredSelectors.length" #header>
+      <div class="dropdown-header">
+        <s-text size="caption" variant="muted" class="dropdown-header-label">{{ t('rules_on_this_page') }}</s-text>
+        <s-text size="caption" variant="muted" class="dropdown-header-label">{{ t('declarations') }}</s-text>
+      </div>
+    </template>
+
     <template #item="{ item, select }">
       <the-css-selector-dropdown-item
         :selector="item.value"
@@ -23,7 +30,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { SAutocomplete } from '@stylebot/components';
+import { SAutocomplete, SText } from '@stylebot/components';
 import { StylebotEditingMode } from '@stylebot/types';
 
 import { CssSelectorMetadata } from '../../store';
@@ -34,6 +41,7 @@ export default Vue.extend({
 
   components: {
     SAutocomplete,
+    SText,
     TheCssSelectorDropdownItem,
   },
 
@@ -82,3 +90,23 @@ export default Vue.extend({
   },
 });
 </script>
+
+<style lang="scss" scoped>
+.dropdown-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: -4px -4px 4px;
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--accent);
+}
+
+.dropdown-header-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+</style>
