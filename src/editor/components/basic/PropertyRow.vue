@@ -41,7 +41,9 @@ export default Vue.extend({
 }
 
 .property-row-label {
-  flex: 1;
+  // grow to push the control to the row's end, but never shrink below the
+  // label's own text (a long control shrinks instead — see .property-row-control).
+  flex: 1 0 auto;
   min-width: 0;
   overflow: hidden;
   white-space: nowrap;
