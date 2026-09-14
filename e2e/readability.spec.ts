@@ -1,9 +1,9 @@
 import http from 'node:http';
 import type { AddressInfo } from 'node:net';
-import { test, expect, type Page } from './fixtures';
+import { test, expect, closeServer, type Page } from './fixtures';
 
-// Loading the unpacked extension fresh per test can cold-start slowly under
-// heavy parallel CPU load, delaying the content script's readiness check.
+// Content script / background worker readiness can lag under heavy parallel CPU
+// load (multiple worker-owned browsers competing for CPU), delaying this check.
 test.describe.configure({ retries: 2 });
 
 // Long enough to pass hasReaderableContent; path has 2 segments so
@@ -34,9 +34,7 @@ test.beforeAll(async () => {
   baseUrl = `http://localhost:${(server.address() as AddressInfo).port}/articles/a-test-article`;
 });
 
-test.afterAll(async () => {
-  await new Promise<void>(resolve => server.close(() => resolve()));
-});
+test.afterAll(() => closeServer(server));
 
 const readabilityToggle = (popup: Page) =>
   popup.locator('text=Readability').locator('..');
