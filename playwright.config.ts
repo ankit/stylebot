@@ -8,6 +8,4 @@ export default defineConfig({
   // Playwright can freely interleave them across workers instead of file-by-file.
   fullyParallel: true,
   reporter: [['list'], ['html', { open: 'never' }]],
-  // Browser launch + extension loading happens once per worker in e2e/fixtures.ts,
-  // not per test — see the worker-scoped `context`/`extensionId` fixtures there.
 });
