@@ -34,6 +34,11 @@ export default Vue.extend({
   },
 
   props: {
+    tab: {
+      type: Object,
+      required: true,
+    },
+
     initialReadability: Boolean,
     disabled: Boolean,
     shortcut: {
@@ -60,15 +65,13 @@ export default Vue.extend({
     onChange(): void {
       this.$emit('change', this.readability);
 
-      chrome.tabs.query({ active: true }, ([tab]) => {
-        if (tab.id) {
-          const message: ToggleReadabilityForTab = {
-            name: 'ToggleReadabilityForTab',
-          };
+      if (this.tab.id) {
+        const message: ToggleReadabilityForTab = {
+          name: 'ToggleReadabilityForTab',
+        };
 
-          chrome.tabs.sendMessage(tab.id, message);
-        }
-      });
+        chrome.tabs.sendMessage(this.tab.id, message);
+      }
     },
   },
 });
