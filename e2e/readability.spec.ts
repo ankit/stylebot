@@ -21,17 +21,32 @@ const ARTICLE_HTML = `
   </html>
 `;
 
+// SPA-style: 2 path segments avoid shouldRunOnUrl's section filter, but no
+// <p>/<article> content means hasReaderableContent fails and always will.
+const APP_HTML = `
+  <!doctype html>
+  <html>
+    <head><title>Test App</title></head>
+    <body>
+      <div id="dashboard">Dashboard</div>
+    </body>
+  </html>
+`;
+
 let server: http.Server;
 let baseUrl: string;
+let appUrl: string;
 
 test.beforeAll(async () => {
-  server = http.createServer((_req, res) => {
+  server = http.createServer((req, res) => {
     res.writeHead(200, { 'Content-Type': 'text/html' });
-    res.end(ARTICLE_HTML);
+    res.end(req.url?.startsWith('/app/') ? APP_HTML : ARTICLE_HTML);
   });
 
   await new Promise<void>(resolve => server.listen(0, resolve));
-  baseUrl = `http://localhost:${(server.address() as AddressInfo).port}/articles/a-test-article`;
+  const port = (server.address() as AddressInfo).port;
+  baseUrl = `http://localhost:${port}/articles/a-test-article`;
+  appUrl = `http://localhost:${port}/app/dashboard`;
 });
 
 test.afterAll(() => closeServer(server));
@@ -114,4 +129,65 @@ test('toggling readability with a second window open targets the popup\'s own ta
   await expect(pageA.locator('body > #stylebot-reader')).toHaveCount(0);
 
   await cdp.detach();
+});
+
+// Regression test for #911: the reader's loading overlay used to flash on
+// every reload of a page it could never turn into an article.
+test('does not show the loading overlay when reloading a page already proven not to be an article', async ({
+  context,
+  openPopup,
+}) => {
+  test.setTimeout(30000);
+
+  const page = await context.newPage();
+  await page.goto(baseUrl);
+  await page.bringToFront();
+
+  const popup = await openPopup();
+  const toggle = readabilityToggle(popup).locator('input[type="checkbox"]');
+  await expect(toggle).toBeEnabled({ timeout: 15000 });
+  await readabilityToggle(popup).locator('.track').click();
+  await expect(toggle).toBeChecked();
+  await popup.close();
+
+  // Wait for the mount, not just the popup's checkbox, so the domain-wide
+  // flag is guaranteed to have reached storage before navigating away.
+  await expect(page.locator('body > #stylebot-reader')).toHaveCount(1, {
+    timeout: 10000,
+  });
+
+  // Its shape doesn't match the article pattern just learned, so the loader
+  // should be skipped even on this first visit — the attempt still runs silently.
+  await page.goto(appUrl);
+
+  await expect(page.locator('#stylebot-reader-loading-art')).toHaveCount(0);
+  await expect(page.locator('#dashboard')).toBeVisible();
+
+  // It can't find an article either, so it should eventually give up and
+  // record that this exact url is ineligible.
+  await expect
+    .poll(
+      () =>
+        page.evaluate(url => {
+          try {
+            const store = JSON.parse(
+              localStorage.getItem('stylebot-reader-eligibility') || '{}'
+            );
+            return store.urls?.[new URL(url).origin + new URL(url).pathname] === false;
+          } catch {
+            return false;
+          }
+        }, appUrl),
+      { timeout: 10000 }
+    )
+    .toBe(true);
+
+  await page.reload();
+
+  // Past the full retry window, so a wrongly-repeated attempt would have shown by now.
+  await page.waitForTimeout(2500);
+
+  await expect(page.locator('#stylebot-reader-loading-art')).toHaveCount(0);
+  await expect(page.locator('#stylebot-reader')).toHaveCount(0);
+  await expect(page.locator('#dashboard')).toBeVisible();
 });
