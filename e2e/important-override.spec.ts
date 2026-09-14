@@ -1,6 +1,6 @@
 import http from 'node:http';
 import type { AddressInfo } from 'node:net';
-import { test, expect } from './fixtures';
+import { test, expect, closeServer } from './fixtures';
 
 const PAGE_HTML = `
   <!doctype html>
@@ -27,9 +27,7 @@ test.beforeAll(async () => {
   baseUrl = `http://localhost:${(server.address() as AddressInfo).port}/`;
 });
 
-test.afterAll(async () => {
-  await new Promise<void>(resolve => server.close(() => resolve()));
-});
+test.afterAll(() => closeServer(server));
 
 test('overrides a page rule that also uses !important (regression: #894)', async ({
   context,
