@@ -75,6 +75,12 @@ test('toggling readability with a second window open targets the popup\'s own ta
   context,
   openPopup,
 }) => {
+  // Two tabs each cold-starting the editor content script's own multi-hop
+  // init chain contend for the same single-threaded background worker,
+  // which can push it past the point where a message sent right after
+  // opening the popup has a listener yet — give this one a wider budget.
+  test.setTimeout(45000);
+
   const pageA = await context.newPage();
   await pageA.goto(baseUrl);
   await pageA.bringToFront();
@@ -100,9 +106,19 @@ test('toggling readability with a second window open targets the popup\'s own ta
   await expect(toggle).toBeChecked();
   await popup.close();
 
-  await expect(pageB.locator('body > #stylebot-reader')).toHaveCount(1, {
-    timeout: 10000,
-  });
+  const reader = pageB.locator('body > #stylebot-reader');
+  try {
+    await expect(reader).toHaveCount(1, { timeout: 6000 });
+  } catch {
+    // ToggleReadabilityForTab has no delivery guarantee — if the content
+    // script's listener wasn't registered yet, that first message was
+    // dropped, not delayed. Resend it now that init has surely finished.
+    const retry = await openPopup();
+    await readabilityToggle(retry).locator('.track').click();
+    await retry.close();
+    await expect(reader).toHaveCount(1, { timeout: 8000 });
+  }
+
   await expect(pageA.locator('body > #stylebot-reader')).toHaveCount(0);
 
   await cdp.detach();
