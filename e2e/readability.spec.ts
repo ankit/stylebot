@@ -6,9 +6,8 @@ import { test, expect, type Page } from './fixtures';
 // heavy parallel CPU load, delaying the content script's readiness check.
 test.describe.configure({ retries: 2 });
 
-// A long-enough paragraph to clear hasReaderableContent's score threshold,
-// and a path with two segments so shouldRunOnUrl doesn't treat it as a
-// section/category page (see src/readability/eligibility).
+// Long enough to pass hasReaderableContent; path has 2 segments so
+// shouldRunOnUrl doesn't treat it as a section/category page.
 const ARTICLE_HTML = `
   <!doctype html>
   <html>
@@ -67,18 +66,14 @@ test('toggling readability on in the popup activates the reader', async ({
   });
 });
 
-// Regression test for a bug where the popup's readability toggle used
-// chrome.tabs.query({ active: true }) with no window scope, so with more
-// than one browser window open it could message an arbitrary window's
-// active tab instead of the tab the popup actually belongs to.
+// Regression test: chrome.tabs.query({ active: true }) had no window scope,
+// so with multiple windows open the toggle could message the wrong tab.
 test('toggling readability with a second window open targets the popup\'s own tab', async ({
   context,
   openPopup,
 }) => {
-  // Two tabs each cold-starting the editor content script's own multi-hop
-  // init chain contend for the same single-threaded background worker,
-  // which can push it past the point where a message sent right after
-  // opening the popup has a listener yet — give this one a wider budget.
+  // Two tabs cold-starting their editor init chains contend for the same
+  // background worker, which can delay listener readiness — wider budget.
   test.setTimeout(45000);
 
   const pageA = await context.newPage();
@@ -110,9 +105,8 @@ test('toggling readability with a second window open targets the popup\'s own ta
   try {
     await expect(reader).toHaveCount(1, { timeout: 6000 });
   } catch {
-    // ToggleReadabilityForTab has no delivery guarantee — if the content
-    // script's listener wasn't registered yet, that first message was
-    // dropped, not delayed. Resend it now that init has surely finished.
+    // No delivery guarantee — an unready listener drops the message rather
+    // than delaying it, so resend now that init has surely finished.
     const retry = await openPopup();
     await readabilityToggle(retry).locator('.track').click();
     await retry.close();
