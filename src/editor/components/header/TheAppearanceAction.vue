@@ -29,6 +29,7 @@
 import Vue from 'vue';
 import { AnchoredMenu, SMenu, MenuItem, IconButton } from '@stylebot/components';
 import { SunIcon, MoonIcon, MonitorIcon } from '@stylebot/icons';
+import { resolveAppearance } from '@stylebot/utils';
 
 import { StylebotAppearance } from '@stylebot/types';
 
@@ -60,11 +61,7 @@ export default Vue.extend({
     // What the trigger button's own icon should show — resolves 'system'
     // against the OS's current setting, since there's nothing else to show.
     resolvedTheme(): 'light' | 'dark' {
-      return this.appearance === 'system'
-        ? this.systemPrefersDark
-          ? 'dark'
-          : 'light'
-        : this.appearance;
+      return resolveAppearance(this.appearance, this.systemPrefersDark);
     },
   },
 
