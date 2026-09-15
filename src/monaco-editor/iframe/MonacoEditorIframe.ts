@@ -30,10 +30,10 @@ class MonacEditorIframe {
     });
   }
 
-  /* Monaco wraps each worker's same-origin URL in a blob that does
-     importScripts(realUrl) — Chrome refuses that from inside a blob-sourced
-     worker, so workers (and CSS suggestions/color swatches) silently die.
-     Unwrap it: resolve the blob back to its real extension URL. */
+  /**
+   * Monaco's blob-wrapped worker URLs fail to `importScripts` a same-origin
+   * chrome-extension:// URL, silently killing suggestions/color swatches.
+   */
   patchBlobWorkerLoading(): void {
     const blobContents = new WeakMap<Blob, string>();
     const NativeBlob = window.Blob;
