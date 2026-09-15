@@ -81,7 +81,7 @@ export default Vue.extend({
 
 .divider {
   height: 1px;
-  background: var(--border);
+  background: var(--panel-border);
   margin: 5px 10px;
 }
 </style>

@@ -120,6 +120,6 @@ export default Vue.extend({
 
 .css-selector-dropdown-item:hover .chip,
 .css-selector-dropdown-item:focus-visible .chip {
-  background: var(--background);
+  background: var(--panel-surface);
 }
 </style>

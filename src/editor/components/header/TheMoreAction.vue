@@ -167,7 +167,7 @@ export default Vue.extend({
 .more-menu-divider {
   margin: 10px -10px;
   border: none;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--panel-border);
 }
 
 .menu-item-row {
@@ -181,6 +181,6 @@ export default Vue.extend({
 .menu-item-hint {
   font-family: var(--font-mono);
   font-size: 12px;
-  color: var(--muted-foreground);
+  color: var(--text-muted);
 }
 </style>

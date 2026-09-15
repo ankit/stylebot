@@ -157,7 +157,7 @@ export default Vue.extend({
   gap: 1px;
   padding: 1px;
   border-radius: 7px;
-  background: var(--tab-wash);
+  background: var(--tab-surface);
 }
 
 .value-option {
@@ -172,17 +172,17 @@ export default Vue.extend({
   border-radius: 6px;
   font-size: 12px;
   line-height: 1.2;
-  color: var(--muted-foreground);
+  color: var(--text-muted);
   outline: none;
   cursor: pointer;
 
   &:hover:not(:disabled):not(.active) {
-    color: var(--foreground);
+    color: var(--text-primary);
   }
 
   &.active {
     font-weight: 600;
-    color: var(--foreground);
+    color: var(--text-primary);
     background: var(--card-surface);
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   }
@@ -193,7 +193,7 @@ export default Vue.extend({
   }
 
   &:focus-visible {
-    color: var(--foreground);
+    color: var(--text-primary);
   }
 
   @include focus-ring;
@@ -210,6 +210,6 @@ export default Vue.extend({
   width: 32px;
   font-family: var(--font-mono);
   font-size: 12.5px;
-  color: var(--foreground);
+  color: var(--text-primary);
 }
 </style>

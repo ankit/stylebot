@@ -110,7 +110,7 @@ export default Vue.extend({
 .banner.success {
   background: var(--info);
   border: 1px solid var(--info-border);
-  color: var(--foreground);
+  color: var(--text-primary);
 }
 
 .banner.error {

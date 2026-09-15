@@ -150,24 +150,24 @@ export default Vue.extend({
   gap: 8px;
   padding: 7px 9px;
   border-radius: 8px;
-  border: 1px solid var(--border);
-  background: color-mix(in srgb, var(--foreground) 4%, var(--background));
+  border: 1px solid var(--panel-border);
+  background: color-mix(in srgb, var(--text-primary) 4%, var(--panel-surface));
   cursor: pointer;
 }
 
 .field.has-value {
   &:hover {
-    background: color-mix(in srgb, var(--foreground) 8%, var(--background));
+    background: color-mix(in srgb, var(--text-primary) 8%, var(--panel-surface));
   }
 
   &:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 2px var(--primary);
+    box-shadow: 0 0 0 2px var(--accent);
   }
 }
 
 .field.recording {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 18%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
   cursor: default;
 }
 
@@ -180,7 +180,7 @@ export default Vue.extend({
 }
 
 .placeholder {
-  color: var(--muted-foreground);
+  color: var(--text-muted);
   font-weight: 400;
   font-size: 13px;
   line-height: 1;
@@ -198,12 +198,12 @@ export default Vue.extend({
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  color: var(--muted-foreground);
+  color: var(--text-muted);
   cursor: pointer;
 
   &:hover {
-    background: color-mix(in srgb, var(--foreground) 10%, transparent);
-    color: var(--foreground);
+    background: color-mix(in srgb, var(--text-primary) 10%, transparent);
+    color: var(--text-primary);
   }
 
   @include focus-ring;
@@ -221,12 +221,12 @@ export default Vue.extend({
   font-weight: 400;
   font-size: 11.5px;
   line-height: 1;
-  color: var(--muted-foreground);
+  color: var(--text-muted);
   cursor: pointer;
   padding: 4px;
 
   &:hover {
-    color: var(--foreground);
+    color: var(--text-primary);
   }
 }
 
@@ -241,9 +241,9 @@ export default Vue.extend({
   font-weight: 400;
   font-size: 12px;
   line-height: 1;
-  color: var(--foreground);
-  background: color-mix(in srgb, var(--foreground) 4%, var(--background));
-  border: 1px solid var(--border);
+  color: var(--text-primary);
+  background: color-mix(in srgb, var(--text-primary) 4%, var(--panel-surface));
+  border: 1px solid var(--panel-border);
   border-radius: 8px;
   padding: 10px;
   cursor: pointer;
@@ -255,12 +255,12 @@ export default Vue.extend({
   }
 
   &:hover {
-    background: color-mix(in srgb, var(--foreground) 8%, var(--background));
+    background: color-mix(in srgb, var(--text-primary) 8%, var(--panel-surface));
   }
 
   &:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 2px var(--primary);
+    box-shadow: 0 0 0 2px var(--accent);
   }
 }
 
@@ -268,7 +268,7 @@ export default Vue.extend({
   font-weight: 400;
   font-size: 11px;
   line-height: 1.4;
-  color: var(--muted-foreground);
+  color: var(--text-muted);
   margin: 6px 0 0;
 }
 

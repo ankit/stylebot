@@ -38,7 +38,7 @@ export default Vue.extend({
 .card {
   margin-top: 16px;
   padding: 12px 14px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--panel-border);
   border-radius: 10px;
 }
 

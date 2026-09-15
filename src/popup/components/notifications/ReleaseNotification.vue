@@ -107,7 +107,7 @@ export default Vue.extend({
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--primary);
+  background: var(--accent);
 }
 
 .release-text {
@@ -116,12 +116,12 @@ export default Vue.extend({
 }
 
 .release-sep {
-  color: var(--muted-foreground);
+  color: var(--text-muted);
   margin: 0 2px;
 }
 
 .release-link {
-  color: var(--primary);
+  color: var(--accent);
 }
 
 .release-dismiss {

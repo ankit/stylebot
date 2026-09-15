@@ -65,7 +65,7 @@ export default Vue.extend({
     cursor: pointer;
 
     &:hover {
-      background: var(--accent);
+      background: var(--hover-tint);
     }
   }
 
@@ -76,7 +76,7 @@ export default Vue.extend({
 
   &.disabled {
     cursor: default;
-    color: var(--muted-foreground);
+    color: var(--text-muted);
   }
 }
 </style>

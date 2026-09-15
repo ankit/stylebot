@@ -217,7 +217,7 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .spacing-control {
   padding-bottom: 6px;
-  border-bottom: 1px solid color-mix(in srgb, var(--foreground) 7%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--text-primary) 7%, transparent);
 
   &.last {
     padding-bottom: 2px;

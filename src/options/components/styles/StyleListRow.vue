@@ -100,7 +100,7 @@ export default Vue.extend({
   align-items: center;
   gap: 14px;
   padding: 13px 18px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--panel-border);
 }
 
 .switch.row-toggle {
@@ -113,13 +113,13 @@ export default Vue.extend({
   font-weight: 500;
   font-size: 14px;
   line-height: 1.3;
-  color: var(--foreground);
+  color: var(--text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 
   &.disabled {
-    color: var(--muted-foreground);
+    color: var(--text-muted);
   }
 }
 

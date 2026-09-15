@@ -56,7 +56,7 @@ export default Vue.extend({
   gap: 14px;
   background: var(--menu-surface);
   border: 1px solid var(--menu-border);
-  color: var(--foreground);
+  color: var(--text-primary);
   box-shadow: 0 6px 16px var(--menu-shadow);
   animation: dock-menu-in 0.16s ease-out;
 

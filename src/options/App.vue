@@ -150,7 +150,7 @@ body {
 }
 
 a {
-  color: var(--primary);
+  color: var(--accent);
   text-decoration: none;
 
   &:hover {
@@ -174,7 +174,7 @@ a {
   grid-column: 1;
   grid-row: 2;
   padding: 0 12px 16px;
-  border-right: 1px solid var(--border);
+  border-right: 1px solid var(--panel-border);
 }
 
 .content {

@@ -28,30 +28,30 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 @mixin dark-theme-vars {
-  --background: #1c1e22;
-  --foreground: #f2f4f7;
-  --foreground-secondary: #a3aab6;
-  --muted-foreground: #a3aab6;
+  --panel-surface: #1c1e22;
+  --text-primary: #f2f4f7;
+  --text-secondary: #a3aab6;
+  --text-muted: #a3aab6;
   --text-faint: #8d95a2;
-  --border: #2c2f35;
-  --accent: #2e3238;
+  --panel-border: #2c2f35;
+  --hover-tint: #2e3238;
   --active: #2a2d33;
 
-  --primary: #3d7bff;
-  --ink-on-accent: #0f1114;
+  --accent: #3d7bff;
+  --accent-ink: #0f1114;
   --accent-tint: #1e2a44;
   --accent-tint-ink: #8ab0ff;
 
-  --input: #3a3e46;
-  --input-hover: #4a4f58;
-  --input-selector: #3a3e46;
+  --field-border: #3a3e46;
+  --field-border-hover: #4a4f58;
+  --field-border-selector: #3a3e46;
   --field-fill: #15171a;
-  --unit-divider: #2c2f35;
-  --track: #3a3e46;
-  --icon-foreground: #9aa1ae;
+  --field-divider: #2c2f35;
+  --slider-track: #3a3e46;
+  --icon-color: #9aa1ae;
 
   --card-surface: #212429;
-  --tab-wash: #181a1e;
+  --tab-surface: #181a1e;
   --panel-shadow: rgb(0 0 0 / 34%);
 
   --menu-surface: #23262b;
@@ -68,33 +68,33 @@ export default Vue.extend({
 
 .theme-provider {
   color-scheme: light dark;
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--panel-surface);
+  color: var(--text-primary);
 
-  --background: #fff;
-  --foreground: #191b1f;
-  --foreground-secondary: #5f6672;
-  --muted-foreground: #6b7280;
+  --panel-surface: #fff;
+  --text-primary: #191b1f;
+  --text-secondary: #5f6672;
+  --text-muted: #6b7280;
   --text-faint: #8b909b;
-  --border: #e9eaee;
-  --accent: #f2f3f6;
+  --panel-border: #e9eaee;
+  --hover-tint: #f2f3f6;
   --active: #eef0f4;
 
-  --primary: #2a5fd6;
-  --ink-on-accent: #fff;
+  --accent: #2a5fd6;
+  --accent-ink: #fff;
   --accent-tint: #f4f7fe;
   --accent-tint-ink: #2a5fd6;
 
-  --input: #dcdfe5;
-  --input-hover: #b9bec8;
-  --input-selector: #d3d6dd;
+  --field-border: #dcdfe5;
+  --field-border-hover: #b9bec8;
+  --field-border-selector: #d3d6dd;
   --field-fill: transparent;
-  --unit-divider: #ecedf0;
-  --track: #e4e7ed;
-  --icon-foreground: #6a7180;
+  --field-divider: #ecedf0;
+  --slider-track: #e4e7ed;
+  --icon-color: #6a7180;
 
   --card-surface: #fff;
-  --tab-wash: #f7f8fa;
+  --tab-surface: #f7f8fa;
   --panel-shadow: rgb(0 0 0 / 16%);
 
   --menu-surface: #fff;
@@ -108,7 +108,7 @@ export default Vue.extend({
   --danger-background: #fdf1f0;
   --danger-border: #f6cfcb;
 
-  --ring: var(--primary);
+  --ring: var(--accent);
 
   --font-mono: 'Fira Code', Menlo, Monaco, Consolas, monospace;
 }

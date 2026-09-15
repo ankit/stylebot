@@ -48,7 +48,7 @@ export default Vue.extend({
   cursor: pointer;
 
   &:hover {
-    background: var(--accent);
+    background: var(--hover-tint);
   }
 
   @include focus-ring;
@@ -56,9 +56,9 @@ export default Vue.extend({
   &.bordered {
     width: 46px;
     padding: 0;
-    border: 1px solid var(--input);
+    border: 1px solid var(--field-border);
     border-radius: 8px;
-    color: var(--icon-foreground);
+    color: var(--icon-color);
   }
 }
 </style>

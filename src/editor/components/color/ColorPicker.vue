@@ -185,7 +185,7 @@ export default Vue.extend({
   flex: none;
   width: 26px;
   align-self: stretch;
-  border-right: 1px solid var(--border);
+  border-right: 1px solid var(--panel-border);
   border-radius: 6px 0 0 6px;
   outline: none;
   cursor: pointer;
@@ -196,8 +196,8 @@ export default Vue.extend({
       -45deg,
       transparent,
       transparent 4px,
-      var(--border) 4px,
-      var(--border) 5px
+      var(--panel-border) 4px,
+      var(--panel-border) 5px
     );
   }
 
@@ -216,12 +216,12 @@ export default Vue.extend({
   font-family: var(--font-mono);
   font-size: 12.5px;
   line-height: 1.2;
-  color: var(--foreground);
+  color: var(--text-primary);
   outline: none;
   cursor: text;
 
   &::placeholder {
-    color: var(--muted-foreground);
+    color: var(--text-muted);
   }
 }
 

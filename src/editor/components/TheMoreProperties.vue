@@ -135,7 +135,7 @@ export default Vue.extend({
   align-items: center;
   gap: 9px;
   padding: 6px 0;
-  border-bottom: 1px solid color-mix(in srgb, var(--foreground) 7%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--text-primary) 7%, transparent);
 }
 
 .more-property-key {
@@ -158,12 +158,12 @@ export default Vue.extend({
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--muted-foreground);
+  color: var(--text-muted);
   outline: none;
   cursor: pointer;
 
   &:hover {
-    color: var(--foreground);
+    color: var(--text-primary);
   }
 
   @include focus-ring;
@@ -184,11 +184,11 @@ export default Vue.extend({
   padding: 5px 8px;
   font-family: var(--font-mono);
   font-size: 12px;
-  color: var(--foreground);
+  color: var(--text-primary);
   background: var(--field-fill);
 
   &::placeholder {
-    color: var(--muted-foreground);
+    color: var(--text-muted);
   }
 
   &:focus {
@@ -206,12 +206,12 @@ export default Vue.extend({
   width: 27px;
   height: 27px;
   @include field-border(6px);
-  color: var(--primary);
+  color: var(--accent);
   outline: none;
   cursor: pointer;
 
   &:hover {
-    background: var(--accent);
+    background: var(--hover-tint);
   }
 
   @include focus-ring;
@@ -226,16 +226,16 @@ export default Vue.extend({
   width: 100%;
   margin-top: 2px;
   padding: 7px;
-  border: 1px dashed var(--border);
+  border: 1px dashed var(--panel-border);
   border-radius: 6px;
   font-size: 12px;
-  color: var(--muted-foreground);
+  color: var(--text-muted);
   outline: none;
   cursor: pointer;
 
   &:hover:not(:disabled) {
-    color: var(--foreground);
-    border-color: var(--input-hover);
+    color: var(--text-primary);
+    border-color: var(--field-border-hover);
   }
 
   @include focus-ring;

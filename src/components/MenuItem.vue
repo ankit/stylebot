@@ -49,7 +49,7 @@ export default Vue.extend({
   font-weight: 400;
   font-size: var(--menu-item-font-size, 13.5px);
   line-height: 1.3;
-  color: var(--foreground);
+  color: var(--text-primary);
   margin: 0 calc(-1 * var(--menu-padding, 12px));
   padding: var(--menu-item-padding-y, 10px) 12px;
   border-radius: 0;
@@ -60,8 +60,8 @@ export default Vue.extend({
   &:focus,
   &:focus-visible {
     outline: none;
-    background: var(--accent);
-    box-shadow: inset 4px 0 0 var(--primary);
+    background: var(--hover-tint);
+    box-shadow: inset 4px 0 0 var(--accent);
   }
 
   &.danger {
@@ -74,7 +74,7 @@ export default Vue.extend({
   }
 
   &.selected {
-    background: color-mix(in srgb, var(--primary) 8%, transparent);
+    background: color-mix(in srgb, var(--accent) 8%, transparent);
   }
 }
 
@@ -85,6 +85,6 @@ export default Vue.extend({
 
 .menu-item-check {
   flex: none;
-  color: var(--primary);
+  color: var(--accent);
 }
 </style>

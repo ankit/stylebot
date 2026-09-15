@@ -58,7 +58,7 @@ export default Vue.extend({
   gap: 2px;
   padding: 2px;
   border-radius: 8px;
-  background: var(--tab-wash);
+  background: var(--tab-surface);
 
   &.fit .segment {
     flex: none;
@@ -76,19 +76,19 @@ export default Vue.extend({
   background: none;
   font-family: inherit;
   font-size: 12px;
-  color: var(--muted-foreground);
+  color: var(--text-muted);
   outline: none;
   cursor: pointer;
 
   &.active {
     font-weight: 600;
-    color: var(--foreground);
+    color: var(--text-primary);
     background: var(--card-surface);
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   }
 
   &:focus-visible {
-    color: var(--foreground);
+    color: var(--text-primary);
   }
 
   @include focus-ring;

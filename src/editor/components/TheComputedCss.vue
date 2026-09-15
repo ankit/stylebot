@@ -59,7 +59,7 @@ export default Vue.extend({
   position: absolute;
   top: 0;
   background: var(--menu-surface);
-  color: var(--foreground);
+  color: var(--text-primary);
   border: 1px solid var(--menu-border);
   border-radius: 8px;
   box-shadow: 0 8px 24px var(--menu-shadow);
@@ -79,7 +79,7 @@ export default Vue.extend({
 
   li {
     padding: 4px 0;
-    border-top: 1px solid var(--border);
+    border-top: 1px solid var(--panel-border);
 
     &:first-child {
       border-top: none;

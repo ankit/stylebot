@@ -118,7 +118,7 @@ export default Vue.extend({
   margin-top: 14px;
   padding: 8px;
   border-radius: 9px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--panel-border);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -132,10 +132,10 @@ export default Vue.extend({
   gap: 6px;
   padding: 6px 6px 6px 14px;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--foreground) 4%, var(--background));
-  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--text-primary) 4%, var(--panel-surface));
+  border: 1px solid var(--panel-border);
   font-size: 13px;
-  color: var(--foreground);
+  color: var(--text-primary);
 }
 
 .chip-remove {
@@ -147,7 +147,7 @@ export default Vue.extend({
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  color: var(--muted-foreground);
+  color: var(--text-muted);
   cursor: pointer;
 
   svg {
@@ -156,8 +156,8 @@ export default Vue.extend({
   }
 
   &:hover {
-    background: color-mix(in srgb, var(--foreground) 8%, var(--background));
-    color: var(--foreground);
+    background: color-mix(in srgb, var(--text-primary) 8%, var(--panel-surface));
+    color: var(--text-primary);
   }
 
   &:focus-visible {
@@ -173,10 +173,10 @@ export default Vue.extend({
   padding: 4px;
   font-size: 14px;
   line-height: 1.4;
-  color: var(--foreground);
+  color: var(--text-primary);
 
   &::placeholder {
-    color: var(--muted-foreground);
+    color: var(--text-muted);
   }
 }
 

@@ -154,7 +154,7 @@ export default Vue.extend({
   border: 1px solid var(--menu-border);
   border-radius: 14px;
   background: var(--menu-surface);
-  color: var(--foreground);
+  color: var(--text-primary);
   box-shadow: 0 24px 64px var(--menu-shadow);
 }
 
@@ -189,7 +189,7 @@ export default Vue.extend({
   flex: none;
   font-size: 11.5px;
   font-weight: 500;
-  color: var(--primary);
+  color: var(--accent);
 
   &:hover {
     text-decoration: underline;
@@ -201,7 +201,7 @@ export default Vue.extend({
   align-items: center;
   gap: 16px;
   padding: 9px 0;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--panel-border);
 
   &:last-child {
     border-bottom: none;
@@ -211,7 +211,7 @@ export default Vue.extend({
 .row-label {
   flex: 1;
   min-width: 0;
-  color: var(--foreground-secondary);
+  color: var(--text-secondary);
 }
 
 .row-chip {

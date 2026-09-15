@@ -283,7 +283,7 @@ export default Vue.extend({
   width: 100%;
   min-height: 30px;
   min-width: 0;
-  border: 1px solid var(--input-selector);
+  border: 1px solid var(--field-border-selector);
   border-radius: 9px;
   background: var(--field-fill);
 
@@ -325,7 +325,7 @@ export default Vue.extend({
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   font: 400 12.5px/22px 'Public Sans', system-ui, sans-serif;
-  color: var(--foreground);
+  color: var(--text-primary);
 
   &.mono {
     font-family: var(--font-mono);
@@ -333,7 +333,7 @@ export default Vue.extend({
   }
 
   &::placeholder {
-    color: var(--muted-foreground);
+    color: var(--text-muted);
   }
 
   &:disabled {
@@ -349,10 +349,10 @@ export default Vue.extend({
   align-items: center;
   justify-content: center;
   width: 30px;
-  border-left: 1px solid var(--input);
+  border-left: 1px solid var(--field-border);
   border-radius: 0 8px 8px 0;
   outline: none;
-  color: var(--muted-foreground);
+  color: var(--text-muted);
   cursor: pointer;
 
   svg {
@@ -360,8 +360,8 @@ export default Vue.extend({
   }
 
   &:hover:not(:disabled) {
-    background: var(--accent);
-    color: var(--foreground);
+    background: var(--hover-tint);
+    color: var(--text-primary);
   }
 
   &.open svg {

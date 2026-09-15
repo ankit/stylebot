@@ -25,11 +25,11 @@ export default Vue.extend({
   justify-content: center;
   padding: 2px 6px;
   border-radius: 20px;
-  background: color-mix(in srgb, var(--primary) 14%, transparent);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
   font-size: 11px;
   font-weight: 700;
   line-height: 1.4;
-  color: var(--primary);
+  color: var(--accent);
   min-width: 18px;
   text-align: center;
 }

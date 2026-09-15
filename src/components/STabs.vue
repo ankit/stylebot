@@ -54,7 +54,7 @@ export default Vue.extend({
   display: flex;
   gap: 6px;
   padding: 0 10px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--panel-border);
 }
 
 .tab {
@@ -66,13 +66,13 @@ export default Vue.extend({
   font-size: 13px;
   font-weight: 400;
   line-height: 1.3;
-  color: var(--muted-foreground);
+  color: var(--text-muted);
   outline: none;
   cursor: pointer;
   box-shadow: inset 0 -2px 0 transparent;
 
   &:hover:not(:disabled):not(.active) {
-    color: var(--foreground);
+    color: var(--text-primary);
   }
 
   &:disabled {
@@ -82,8 +82,8 @@ export default Vue.extend({
 
   &.active {
     font-weight: 600;
-    color: var(--foreground);
-    box-shadow: inset 0 -2px 0 var(--primary);
+    color: var(--text-primary);
+    box-shadow: inset 0 -2px 0 var(--accent);
   }
 
   &:focus-visible {

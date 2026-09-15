@@ -52,8 +52,8 @@ export default Vue.extend({
 .header {
   display: flex;
   flex-direction: column;
-  background: var(--background);
-  border-bottom: 1px solid var(--border);
+  background: var(--panel-surface);
+  border-bottom: 1px solid var(--panel-border);
 }
 
 .header-top {
@@ -62,7 +62,7 @@ export default Vue.extend({
   justify-content: space-between;
   gap: 8px;
   padding: 7px 8px 7px 14px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--panel-border);
 }
 
 .url {
