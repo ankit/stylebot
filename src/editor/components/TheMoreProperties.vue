@@ -10,7 +10,7 @@
         :aria-label="t('remove')"
         @click="remove(decl.property)"
       >
-        <x-icon :size="15" />
+        <icon-x :size="15" />
       </button>
     </div>
 
@@ -53,7 +53,7 @@
 import Vue from 'vue';
 import { Declaration } from 'postcss';
 
-import { XIcon, CheckIcon } from '@stylebot/icons';
+import { IconX, CheckIcon } from '@stylebot/icons';
 import { SText } from '@stylebot/components';
 import { KNOWN_PROPERTIES } from '../utils/basic-properties';
 
@@ -61,7 +61,7 @@ export default Vue.extend({
   name: 'TheMoreProperties',
 
   components: {
-    XIcon,
+    IconX,
     CheckIcon,
     SText,
   },

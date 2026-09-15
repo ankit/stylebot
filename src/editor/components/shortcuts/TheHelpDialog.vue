@@ -5,7 +5,7 @@
         <heading id="help-dialog-title" as="h1" size="md">{{ t('keyboard_shortcuts') }}</heading>
 
         <icon-button :size="26" :title="t('close')" @click="close">
-          <x-icon :size="18" />
+          <icon-x :size="18" />
         </icon-button>
       </div>
 
@@ -102,7 +102,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { Heading, IconButton, ShortcutChip, SDialog, SText } from '@stylebot/components';
-import { XIcon } from '@stylebot/icons';
+import { IconX } from '@stylebot/icons';
 import { StylebotCommands, StylebotEditorCommands } from '@stylebot/types';
 
 import { openOptionsPage } from '../../utils/chrome';
@@ -116,7 +116,7 @@ export default Vue.extend({
     ShortcutChip,
     SDialog,
     SText,
-    XIcon,
+    IconX,
   },
 
   computed: {
