@@ -40,7 +40,7 @@ export default Vue.extend({
   align-items: center;
   justify-content: center;
   flex: none;
-  padding: 4px;
+  padding: 2px;
   border: none;
   border-radius: 4px;
   background: transparent;
