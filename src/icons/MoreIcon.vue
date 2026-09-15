@@ -1,8 +1,8 @@
 <template>
   <svg viewBox="0 0 16 16" :width="size" :height="size" fill="currentColor">
-    <circle cx="3" cy="8" r="1.5" />
-    <circle cx="8" cy="8" r="1.5" />
-    <circle cx="13" cy="8" r="1.5" />
+    <path
+      d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3"
+    />
   </svg>
 </template>
 
