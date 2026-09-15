@@ -221,10 +221,8 @@ export default Vue.extend({
     onFocus(): void {
       this.focused = true;
       this.previousValue = this.value;
-      // The chips-to-textarea swap (see `chips` prop) mounts a fresh
-      // textarea pinned at the static 30px CSS height — without this it
-      // only grows to fit its content on the next keystroke, producing a
-      // visible jump the instant a long/multi-part value is focused.
+      // The freshly-mounted textarea (see `chips` prop) starts pinned at
+      // the static 30px CSS height until this resizes it to fit.
       this.resize();
       this.syncMenu();
     },
