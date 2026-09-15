@@ -54,10 +54,10 @@ export default Vue.extend({
   display: flex;
   flex-direction: column;
   gap: 14px;
-  background: var(--background);
-  border: 1px solid var(--border);
+  background: var(--menu-surface);
+  border: 1px solid var(--menu-border);
   color: var(--foreground);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.14);
+  box-shadow: 0 6px 16px var(--menu-shadow);
   animation: dock-menu-in 0.16s ease-out;
 
   &.dense {

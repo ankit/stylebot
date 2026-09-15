@@ -1,6 +1,11 @@
 <template>
   <div class="basic-color-palette">
-    <v-swatches v-model="value" inline swatches="text-advanced" />
+    <v-swatches
+      v-model="value"
+      inline
+      swatches="text-advanced"
+      :swatch-style="{ boxShadow: 'inset 0 0 0 1px rgb(0 0 0 / 10%)' }"
+    />
     <slot></slot>
   </div>
 </template>
@@ -35,10 +40,10 @@ export default Vue.extend({
 .basic-color-palette {
   width: 262px;
   padding: 10px;
-  background: var(--background);
-  border: 1px solid var(--border);
+  background: var(--menu-surface);
+  border: 1px solid var(--menu-border);
   border-radius: 9px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+  box-shadow: 0 8px 24px var(--menu-shadow);
   line-height: 0;
 }
 </style>

@@ -75,7 +75,7 @@ export default Vue.extend({
   gap: 1px;
   padding: 1px;
   border-radius: 7px;
-  background: var(--accent);
+  background: var(--tab-wash);
 }
 
 .value-option {
@@ -100,7 +100,7 @@ export default Vue.extend({
   &.active {
     font-weight: 600;
     color: var(--foreground);
-    background: var(--background);
+    background: var(--card-surface);
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   }
 

@@ -151,11 +151,11 @@ export default Vue.extend({
   width: 400px;
   height: fit-content;
   padding: 18px 22px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--menu-border);
   border-radius: 14px;
-  background: var(--background);
+  background: var(--menu-surface);
   color: var(--foreground);
-  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 24px 64px var(--menu-shadow);
 }
 
 .header-row {
@@ -182,6 +182,7 @@ export default Vue.extend({
   font-weight: 600;
   letter-spacing: 0.09em;
   text-transform: uppercase;
+  color: var(--text-faint);
 }
 
 .customize {
@@ -210,6 +211,7 @@ export default Vue.extend({
 .row-label {
   flex: 1;
   min-width: 0;
+  color: var(--foreground-secondary);
 }
 
 .row-chip {

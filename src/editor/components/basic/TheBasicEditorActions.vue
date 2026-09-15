@@ -77,7 +77,7 @@ export default Vue.extend({
 }
 
 .hide-button.active {
-  color: #fff;
+  color: var(--ink-on-accent);
   background: var(--primary);
   border-color: var(--primary);
 

@@ -185,7 +185,7 @@ export default Vue.extend({
   font-family: var(--font-mono);
   font-size: 12px;
   color: var(--foreground);
-  background: var(--background);
+  background: var(--field-fill);
 
   &::placeholder {
     color: var(--muted-foreground);
@@ -235,7 +235,7 @@ export default Vue.extend({
 
   &:hover:not(:disabled) {
     color: var(--foreground);
-    border-color: var(--muted-foreground);
+    border-color: var(--input-hover);
   }
 
   @include focus-ring;

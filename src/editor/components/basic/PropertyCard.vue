@@ -53,6 +53,10 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
+.property-card {
+  --background: var(--card-surface);
+}
+
 .property-card-header {
   @include button-reset;
   display: flex;

@@ -163,7 +163,7 @@ export default Vue.extend({
     position: fixed;
     border: 1px solid var(--border);
     border-radius: 14px;
-    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.16);
+    box-shadow: 0 14px 40px var(--panel-shadow);
 
     &.stylebot-resizing,
     &.stylebot-resizing-active {

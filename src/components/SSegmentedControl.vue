@@ -58,7 +58,7 @@ export default Vue.extend({
   gap: 2px;
   padding: 2px;
   border-radius: 8px;
-  background: var(--accent);
+  background: var(--tab-wash);
 
   &.fit .segment {
     flex: none;
@@ -83,7 +83,7 @@ export default Vue.extend({
   &.active {
     font-weight: 600;
     color: var(--foreground);
-    background: var(--background);
+    background: var(--card-surface);
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   }
 

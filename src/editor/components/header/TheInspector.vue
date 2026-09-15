@@ -123,7 +123,7 @@ export default Vue.extend({
 
   &.active {
     background: var(--primary);
-    color: #fff;
+    color: var(--ink-on-accent);
   }
 
   @include focus-ring(2px);

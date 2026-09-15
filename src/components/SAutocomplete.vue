@@ -283,8 +283,9 @@ export default Vue.extend({
   width: 100%;
   min-height: 30px;
   min-width: 0;
-  @include field-border(9px);
-  background: var(--background);
+  border: 1px solid var(--input-selector);
+  border-radius: 9px;
+  background: var(--field-fill);
 
   // Only the text field itself highlights the whole pill — the chevron
   // button gets its own focus ring instead (see .autocomplete-chevron).

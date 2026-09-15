@@ -59,7 +59,7 @@ export default Vue.extend({
   &::-webkit-slider-runnable-track {
     height: 4px;
     border-radius: 2px;
-    background: var(--accent);
+    background: var(--track);
   }
 
   &::-webkit-slider-thumb {
@@ -76,7 +76,7 @@ export default Vue.extend({
   &::-moz-range-track {
     height: 4px;
     border-radius: 2px;
-    background: var(--accent);
+    background: var(--track);
   }
 
   &::-moz-range-thumb {

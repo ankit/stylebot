@@ -189,6 +189,7 @@ export default Vue.extend({
   border-radius: 6px 0 0 6px;
   outline: none;
   cursor: pointer;
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 10%);
 
   &.empty {
     background: repeating-linear-gradient(

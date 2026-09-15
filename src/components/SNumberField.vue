@@ -168,7 +168,7 @@ export default Vue.extend({
   display: flex;
   align-items: center;
   padding: 5px 7px;
-  border-left: 1px solid var(--border);
+  border-left: 1px solid var(--unit-divider);
   font-family: var(--font-mono);
   font-size: 11.5px;
   color: var(--muted-foreground);
@@ -186,7 +186,7 @@ export default Vue.extend({
   align-items: center;
   justify-content: center;
   width: 22px;
-  border-left: 1px solid var(--border);
+  border-left: 1px solid var(--unit-divider);
   border-radius: 0 6px 6px 0;
   outline: none;
   color: var(--muted-foreground);

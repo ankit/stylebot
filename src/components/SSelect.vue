@@ -113,7 +113,7 @@ export default Vue.extend({
   }
 
   &:hover:not(:disabled):not(.open) {
-    border-color: var(--muted-foreground);
+    border-color: var(--input-hover);
   }
 
   &.open,

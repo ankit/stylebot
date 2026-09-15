@@ -29,6 +29,6 @@ export default Vue.extend({
   min-height: 100%;
   gap: 10px;
   padding: 12px;
-  background: var(--accent);
+  background: var(--tab-wash);
 }
 </style>

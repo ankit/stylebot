@@ -58,10 +58,11 @@ export default Vue.extend({
   right: 350px;
   position: absolute;
   top: 0;
-  background: var(--background);
+  background: var(--menu-surface);
   color: var(--foreground);
-  border: 1px solid var(--border);
+  border: 1px solid var(--menu-border);
   border-radius: 8px;
+  box-shadow: 0 8px 24px var(--menu-shadow);
   z-index: 100000000000;
   font-size: 13px;
   max-height: 400px;
