@@ -146,12 +146,12 @@ export default Vue.extend({
   height: 26px;
   border-radius: 6px;
   background: transparent;
-  border: 1px dashed var(--input);
+  border: 1px dashed var(--field-border);
 }
 
 .recent-section.divided {
   margin-top: 12px;
   padding-top: 12px;
-  border-top: 1px solid var(--accent);
+  border-top: 1px solid var(--field-divider);
 }
 </style>

@@ -158,10 +158,10 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .color-picker-popover {
   width: 344px;
-  background: var(--background);
-  border: 1px solid var(--border);
+  background: var(--menu-surface);
+  border: 1px solid var(--menu-border);
   border-radius: 13px;
-  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 18px 44px var(--menu-shadow);
   // No overflow: hidden — the Palette tab's scheme-search dropdown needs to
   // extend past this box, and nothing inside paints past its rounded corners
   // anyway (matches the old popovers, which never clipped either).

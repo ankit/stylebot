@@ -107,7 +107,7 @@ export default Vue.extend({
   min-width: 0;
   padding: 6px 10px;
   font: 400 13px/1.2 var(--font-mono);
-  color: var(--foreground);
+  color: var(--text-primary);
 
   &:focus {
     @include field-active-border;

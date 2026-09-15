@@ -45,28 +45,11 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
+// STabs now ships its own animated sliding-underline indicator — reuse it
+// as-is (matches the rest of the app, e.g. TheEditorModeActions) rather
+// than re-skinning it into a filled-pill look; only the horizontal inset
+// needs adjusting for this popover's padding.
 .color-picker-tabs ::v-deep .tabs {
-  gap: 2px;
   padding: 10px 14px 0;
-  border-bottom: none;
-}
-
-// Only re-skins the shape (equal-width pill tabs) — typography (size,
-// weight, color per state) stays whatever STabs itself already defines.
-.color-picker-tabs ::v-deep .tab {
-  flex: 1;
-  text-align: center;
-  padding: 6px 0;
-  border-radius: 7px;
-  box-shadow: none;
-
-  &:hover:not(:disabled):not(.active) {
-    background: var(--accent);
-  }
-
-  &.active {
-    background: var(--accent);
-    box-shadow: none;
-  }
 }
 </style>

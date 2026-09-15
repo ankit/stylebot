@@ -122,6 +122,6 @@ export default Vue.extend({
   width: 34px;
   text-align: right;
   font: 400 11.5px/1.2 var(--font-mono);
-  color: var(--muted-foreground);
+  color: var(--text-muted);
 }
 </style>

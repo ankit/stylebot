@@ -72,7 +72,7 @@ export default Vue.extend({
   align-items: center;
   gap: 9px;
   padding: 12px 14px;
-  border-bottom: 1px solid var(--accent);
+  border-bottom: 1px solid var(--field-divider);
 }
 
 .swatch {
@@ -83,7 +83,7 @@ export default Vue.extend({
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
 
   &.empty {
-    background: var(--background);
+    background: var(--menu-surface);
     box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.14);
   }
 }
@@ -98,13 +98,13 @@ export default Vue.extend({
 
 .hex {
   font: 500 13.5px/1.2 var(--font-mono);
-  color: var(--foreground);
+  color: var(--text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 
   &.not-set {
-    color: var(--muted-foreground);
+    color: var(--text-muted);
   }
 }
 
@@ -115,17 +115,17 @@ export default Vue.extend({
   align-items: center;
   gap: 5px;
   padding: 5px 9px;
-  border: 1px solid var(--input);
+  border: 1px solid var(--field-border);
   border-radius: 7px;
   font-size: 12px;
   font-weight: 500;
   line-height: 1.2;
-  color: var(--foreground-secondary);
+  color: var(--text-secondary);
   cursor: pointer;
 
   &:hover {
-    border-color: var(--muted-foreground);
-    color: var(--foreground);
+    border-color: var(--field-border-hover);
+    color: var(--text-primary);
   }
 
   @include focus-ring;
