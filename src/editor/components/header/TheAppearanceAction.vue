@@ -1,7 +1,7 @@
 <template>
   <anchored-menu class="appearance-action-anchor">
     <template #trigger="{ toggle }">
-      <icon-button :size="24" :title="t('panel_appearance')" @click="toggle">
+      <icon-button :size="20" :title="t('panel_appearance')" @click="toggle">
         <sun-icon v-if="resolvedTheme === 'light'" />
         <moon-icon v-else />
       </icon-button>
