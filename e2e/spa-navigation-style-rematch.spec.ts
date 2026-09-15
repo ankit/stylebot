@@ -28,13 +28,8 @@ test.afterAll(async () => {
   await server.close();
 });
 
-// KNOWN GAP, LOCKED IN AS A BASELINE — do not treat this test passing as
-// confirmation the behavior is correct. src/editor/listeners/chrome.ts's
-// TabUpdated handler only re-derives readability on a URL change; it never
-// re-runs CSS style matching/injection. A style scoped to the old path stays
-// applied after an in-page route change, and a style newly scoped to the new
-// path is never picked up. If this is fixed, this test's assertions should
-// flip and its comments should be updated accordingly.
+// KNOWN GAP, LOCKED IN AS A BASELINE: src/editor/listeners/chrome.ts's TabUpdated
+// handler re-derives readability on nav but never re-runs CSS matching/injection.
 test('CSS style matching does not re-run on a same-tab SPA navigation (documents a known gap)', async ({
   context,
   extensionId: _extensionId,

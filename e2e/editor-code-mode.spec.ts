@@ -1,9 +1,8 @@
 import { test, expect } from './fixtures';
 import { openEditor, switchEditorMode, getMonacoFrame } from './helpers';
 
-// Loading Monaco in an iframe is CPU-heavy; under a full parallel worker
-// fleet this can occasionally starve the popup's own tab and drop the
-// editor-open flow (see e2e/readability.spec.ts for the same pattern).
+// Loading Monaco in an iframe is CPU-heavy and can starve the popup's own
+// tab under a full parallel worker fleet (see e2e/readability.spec.ts).
 test.describe.configure({ retries: 2 });
 
 const PAGE_HTML = `

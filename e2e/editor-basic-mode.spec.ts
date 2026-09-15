@@ -1,9 +1,8 @@
 import { test, expect } from './fixtures';
 import { openEditor } from './helpers';
 
-// Editor-open depends on the popup's tab-messaging round trip, which can lag
-// under a full parallel worker fleet (see e2e/readability.spec.ts for the
-// same pattern).
+// Editor-open depends on a popup tab-messaging round trip, which can lag
+// under a full parallel worker fleet (see e2e/readability.spec.ts).
 test.describe.configure({ retries: 2 });
 
 const PAGE_HTML = `
@@ -29,9 +28,8 @@ test('picking an element and editing a color in basic mode applies live and pers
 
   const editorRoot = await openEditor(page, openPopup);
 
-  // openStylebot (triggered by the popup's "Style this page" button) starts
-  // in inspecting mode already, so the inspector is already active — no
-  // extra click needed before picking an element on the page.
+  // openStylebot starts in inspecting mode already, so no extra click is
+  // needed before picking an element on the page.
   await expect(editorRoot.locator('.stylebot-inspector')).toHaveClass(/active/);
   await page.locator('h1').click({ force: true });
   await expect(editorRoot.locator('.css-selector-input')).toHaveValue(/h1$/);

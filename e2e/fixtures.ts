@@ -6,13 +6,8 @@ import path from 'node:path';
 
 const DIST_PATH = path.resolve(__dirname, '..', 'dist');
 
-// --ui mode force-sets `use.trace` to a live object ({mode: 'on', live: true})
-// and manages its own full tracing lifecycle per test (for its Actions/timeline
-// panel) on every context that exists, regardless of which fixture created it
-// — including our manually-launched one below. Fighting it for control of the
-// same context.tracing object throws ("Must start tracing before stopping" /
-// "already started"), so when this live mode is detected, we don't touch
-// tracing ourselves at all and let it own the whole lifecycle.
+// --ui mode force-manages tracing (a live `use.trace` flag) on every context,
+// including ours — fighting it for control throws, so skip ours when detected.
 function isLiveTraceMode(use: { trace?: unknown }): boolean {
   return (
     typeof use.trace === 'object' &&
@@ -21,10 +16,8 @@ function isLiveTraceMode(use: { trace?: unknown }): boolean {
   );
 }
 
-// Tracing here is purely a debugging aid — an attached trace.zip on a failed
-// test — never a functional requirement, so every call is still best-effort
-// on top of the up-front skip above (e.g. for other external trace modes,
-// like a `--trace on-first-retry` CLI flag, that this skip doesn't cover).
+// Tracing is a debugging aid only, never a functional requirement — best-effort
+// on top of the skip above, for other external trace modes it doesn't catch.
 async function safeTracing(op: () => Promise<unknown>): Promise<boolean> {
   try {
     await op();

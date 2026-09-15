@@ -31,24 +31,11 @@ test('disabling/enabling a style propagates live to every open tab on that host'
   await tabB.goto('http://localhost/');
   await expect(tabB.locator('h1')).toHaveCSS('color', 'rgb(255, 0, 128)');
 
-  // Sends the exact message Style.vue's toggle switch sends
-  // (chrome.runtime.sendMessage({name: 'EnableStyle' | 'DisableStyle', url})),
-  // from the popup's own extension page context rather than by clicking its
-  // checkbox. The checkbox itself can't be exercised in this harness: the
-  // popup is opened as a real background tab (via CDP Target.createTarget,
-  // see fixtures.ts), which makes chrome.runtime's sender.tab resolve to the
-  // popup's own tab instead of the page under test — breaking
-  // GetStylesForPage's tab lookup, so the popup never learns a style already
-  // exists for this site and stays on its "no style saved" branch, never
-  // rendering the toggle. A real toolbar popup has no associated tab and
-  // doesn't hit this. EnableStyle/DisableStyle don't depend on sender.tab, so
-  // sending the message directly still exercises the real background handler
-  // and cross-tab broadcast this test is about.
+  // The popup's toggle can't be clicked: this harness's popup is a real tab, so
+  // sender.tab breaks GetStylesForPage. Send the same message its toggle sends.
   const popup = await openPopup();
-  // Not returning sendMessage's promise: the background listener (see
-  // src/background/listeners.ts) unconditionally returns true from every
-  // message case, including these fire-and-forget ones that never call
-  // sendResponse — awaiting the promise here would hang until GC.
+  // Not awaited: the background listener always returns true without ever
+  // calling sendResponse for these, so awaiting would hang until GC.
   await popup.evaluate(() => {
     chrome.runtime.sendMessage({ name: 'DisableStyle', url: 'localhost' });
   });

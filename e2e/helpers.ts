@@ -61,9 +61,8 @@ export const seedStyles = async (
   );
 };
 
-// Wraps the popup "Style this page" toggle flow from open-in-current-tab.spec.ts
-// (including its bringToFront + dispatchEvent gotchas) and waits for the Vue app
-// to actually mount inside the shadow root, not just the host element to attach.
+// Wraps the popup's "Style this page" toggle flow (see open-in-current-tab.spec.ts)
+// and waits for the Vue app to actually mount, not just the host to attach.
 export const openEditor = async (
   page: Page,
   openPopup: () => Promise<Page>
