@@ -65,10 +65,8 @@ export default Vue.extend({
   &.disabled {
     cursor: default;
   }
-}
 
-@media (prefers-color-scheme: dark) {
-  .switch {
+  @include dark-mode {
     --track-off: #3d4048;
     --thumb-on: #fff;
     --thumb-off: #9aa1ae;

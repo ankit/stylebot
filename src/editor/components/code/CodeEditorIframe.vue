@@ -7,6 +7,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { IframeMessage } from '@stylebot/monaco-editor';
+import { resolveAppearance, getSystemPreference } from '@stylebot/utils';
 
 export default Vue.extend({
   name: 'CodeEditorIframe',
@@ -14,9 +15,8 @@ export default Vue.extend({
   data(): { src: string; ready: boolean } {
     // The iframe is a separate document, so the theme has to be passed in
     // explicitly — read once, since it can't change while open.
-    const theme = window.matchMedia('(prefers-color-scheme: dark)').matches
-      ? 'dark'
-      : 'light';
+    const appearance = this.$store.state.options?.appearance ?? 'system';
+    const theme = resolveAppearance(appearance, getSystemPreference());
 
     return {
       src: chrome.runtime.getURL(`monaco-editor/iframe/index.html?theme=${theme}`),

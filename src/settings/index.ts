@@ -32,6 +32,7 @@ export const defaultOptions: StylebotOptions = {
     dockLocation: 'right',
   },
   colorPalette: 'basic',
+  appearance: 'system',
 };
 
 export const defaultCommands: StylebotCommands = {

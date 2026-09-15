@@ -32,10 +32,8 @@ export default Vue.extend({
   }
 
   @include focus-ring;
-}
 
-@media (prefers-color-scheme: dark) {
-  .pill-btn {
+  @include dark-mode {
     border-color: #3a3d45;
     background: #26282e;
 

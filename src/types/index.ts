@@ -20,6 +20,7 @@ export type StylebotLayout = {
 
 export type StylebotColorPalette = 'basic' | 'material';
 export type StylebotFonts = Array<string>;
+export type StylebotAppearance = 'light' | 'dark' | 'system';
 
 export type StylebotOptions = {
   contextMenu: boolean;
@@ -28,6 +29,7 @@ export type StylebotOptions = {
   mode: StylebotEditingMode;
   basicModeSections: StylebotBasicModeSections;
   colorPalette: StylebotColorPalette;
+  appearance: StylebotAppearance;
 };
 
 export type Style = {

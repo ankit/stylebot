@@ -8,6 +8,7 @@ jest.mock('./utils', () => ({
   getCurrentTab: jest.fn(),
   getStyles: jest.fn(),
   getCommands: jest.fn(),
+  getOption: jest.fn(),
   getIsStylebotOpen: jest.fn(),
   getIsPageReaderable: jest.fn(),
 }));

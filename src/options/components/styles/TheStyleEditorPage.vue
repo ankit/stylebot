@@ -266,10 +266,8 @@ export default Vue.extend({
   flex: 1;
   min-height: 0;
   background: #fcfcfd;
-}
 
-@media (prefers-color-scheme: dark) {
-  .editor-code-area {
+  @include dark-mode {
     background: #1a1b1e;
   }
 }
