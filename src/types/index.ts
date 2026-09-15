@@ -18,7 +18,6 @@ export type StylebotLayout = {
   dockLocation: 'left' | 'right';
 };
 
-export type StylebotColorPalette = 'basic' | 'material';
 export type StylebotFonts = Array<string>;
 export type StylebotAppearance = 'light' | 'dark' | 'system';
 
@@ -28,8 +27,11 @@ export type StylebotOptions = {
   layout: StylebotLayout;
   mode: StylebotEditingMode;
   basicModeSections: StylebotBasicModeSections;
-  colorPalette: StylebotColorPalette;
   appearance: StylebotAppearance;
+  // Key of the option last picked in the color picker's Palette tab — either
+  // a built-in set ('neutrals' | 'hues' | 'reading' | 'dark-mode') or the
+  // name of a scheme from colorSchemes in editor/utils/color-schemes.
+  lastColorSet: string;
 };
 
 export type Style = {

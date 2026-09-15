@@ -1,0 +1,133 @@
+<template>
+  <div class="header">
+    <div class="swatch" :class="{ empty: !value }" :style="value ? { background: value } : undefined" />
+
+    <div class="info">
+      <div class="hex" :class="{ 'not-set': !value }">{{ value || t('color_picker_not_set') }}</div>
+      <s-text size="small" variant="muted" as="span">{{ roleLabel }}</s-text>
+    </div>
+
+    <button v-if="value" type="button" class="pick clear" @click="$emit('clear')">
+      {{ t('color_picker_clear') }}
+    </button>
+
+    <button v-if="eyeDropperSupported" type="button" class="pick" @click="pick">
+      <eyedropper-icon :size="13" />
+      {{ t('color_picker_pick') }}
+    </button>
+  </div>
+</template>
+
+<script lang="ts">
+import Vue from 'vue';
+import { SText } from '@stylebot/components';
+import { EyedropperIcon } from '@stylebot/icons';
+
+export default Vue.extend({
+  name: 'ColorPickerHeader',
+
+  components: {
+    SText,
+    EyedropperIcon,
+  },
+
+  props: {
+    value: {
+      type: String,
+      default: '',
+    },
+
+    roleLabel: {
+      type: String,
+      required: true,
+    },
+  },
+
+  computed: {
+    eyeDropperSupported(): boolean {
+      return typeof window.EyeDropper !== 'undefined';
+    },
+  },
+
+  methods: {
+    async pick(): Promise<void> {
+      if (!window.EyeDropper) {
+        return;
+      }
+
+      try {
+        const result = await new window.EyeDropper().open();
+        this.$emit('input', result.sRGBHex);
+      } catch {
+        // The user cancelled the pick (Escape) — nothing to do.
+      }
+    },
+  },
+});
+</script>
+
+<style lang="scss" scoped>
+.header {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--accent);
+}
+
+.swatch {
+  width: 30px;
+  height: 30px;
+  flex: none;
+  border-radius: 7px;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+
+  &.empty {
+    background: var(--background);
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.14);
+  }
+}
+
+.info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.hex {
+  font: 500 13.5px/1.2 var(--font-mono);
+  color: var(--foreground);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  &.not-set {
+    color: var(--muted-foreground);
+  }
+}
+
+.pick {
+  @include button-reset;
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 9px;
+  border: 1px solid var(--input);
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--foreground-secondary);
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--muted-foreground);
+    color: var(--foreground);
+  }
+
+  @include focus-ring;
+}
+</style>

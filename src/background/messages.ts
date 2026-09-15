@@ -36,6 +36,7 @@ import {
   SetReadabilitySettings as SetReadabilitySettingsType,
   GetImportCss as GetImportCssType,
   RunGoogleDriveSync as RunGoogleDriveSyncType,
+  AddRecentColor as AddRecentColorType,
   GetCommandsResponse,
   GetAllOptionsResponse,
   GetAllStylesResponse,
@@ -44,6 +45,8 @@ import {
   GetReadabilitySettingsResponse,
   GetImportCssResponse,
   RunGoogleDriveSyncResponse,
+  GetRecentColorsResponse,
+  AddRecentColorResponse,
 } from '@stylebot/types';
 import { runGoogleDriveSync } from '@stylebot/sync';
 
@@ -53,6 +56,11 @@ import {
 } from './readability-settings';
 
 import { get as getCommands, set as setCommands } from './commands';
+
+import {
+  getAll as getAllRecentColors,
+  add as addRecentColorToHistory,
+} from './color-history';
 
 export const DisableStyle = async (
   message: DisableStyleType
@@ -207,4 +215,19 @@ export const RunGoogleDriveSync = async (
 ): Promise<void> => {
   await runGoogleDriveSync();
   sendResponse();
+};
+
+export const GetRecentColors = async (
+  sendResponse: (response: GetRecentColorsResponse) => void
+): Promise<void> => {
+  const colors = await getAllRecentColors();
+  sendResponse(colors);
+};
+
+export const AddRecentColor = async (
+  message: AddRecentColorType,
+  sendResponse: (response: AddRecentColorResponse) => void
+): Promise<void> => {
+  const colors = await addRecentColorToHistory(message.color);
+  sendResponse(colors);
 };

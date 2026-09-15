@@ -38,3 +38,51 @@
     @content;
   }
 }
+
+// Shared look for a small color-swatch button: a hairline border for pale
+// colors (so white still reads as a swatch against a white popup, toggled
+// via a `.light` class since it depends on the swatch's own color) and a
+// transient hover ring. The *current* color is marked with a checkmark
+// (see swatch-check below) rather than a ring — a ring there collided
+// visually with both the hover ring and keyboard focus. Keyboard focus
+// gets its own neutral outline rather than the shared `focus-ring` mixin
+// (which reuses `--primary`, i.e. the same blue as the old selected ring).
+@mixin swatch-states {
+  position: relative;
+  cursor: pointer;
+
+  &.light {
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+  }
+
+  &:hover:not(:disabled) {
+    &.light {
+      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1), 0 0 0 2px var(--primary);
+    }
+
+    &:not(.light) {
+      box-shadow: 0 0 0 2px var(--primary);
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--foreground);
+    outline-offset: 2px;
+  }
+}
+
+// Checkmark overlay marking a swatch as the current color — pair with an
+// icon element carrying this class, sized by the caller, inside a `.swatch`
+// that also gets `.light` (see swatch-states) when its color is pale.
+@mixin swatch-check {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #fff;
+  pointer-events: none;
+
+  .light & {
+    color: #191b1f;
+  }
+}

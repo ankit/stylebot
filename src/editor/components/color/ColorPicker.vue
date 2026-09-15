@@ -21,14 +21,13 @@
       />
     </div>
 
-    <div v-if="open" class="color-popover stylebot-color-picker">
-      <basic-color-palette v-if="basicColorPalette" v-model="value">
-        <color-palette-footer v-model="value" />
-      </basic-color-palette>
-
-      <material-color-palette v-else v-model="value">
-        <color-palette-footer v-model="value" />
-      </material-color-palette>
+    <div
+      v-if="open"
+      ref="popover"
+      class="color-popover stylebot-color-picker"
+      :style="{ top: popoverTop + 'px', left: popoverLeft + 'px', visibility: positioned ? 'visible' : 'hidden' }"
+    >
+      <color-picker-popover :value="value" :role-label="roleLabel" @input="value = $event" />
     </div>
   </div>
 </template>
@@ -37,18 +36,20 @@
 import Vue from 'vue';
 import { Declaration } from 'postcss';
 
-import BasicColorPalette from './BasicColorPalette.vue';
-import MaterialColorPalette from './MaterialColorPalette.vue';
-import ColorPaletteFooter from './ColorPaletteFooter.vue';
+import ColorPickerPopover from './ColorPickerPopover.vue';
 import { extractColor } from '../../utils/css-value';
+
+const ROLE_LABEL_KEYS: Record<string, string> = {
+  color: 'color_picker_subtitle_text',
+  'background-color': 'color_picker_subtitle_background',
+  'border-color': 'color_picker_subtitle_border',
+};
 
 export default Vue.extend({
   name: 'ColorPicker',
 
   components: {
-    BasicColorPalette,
-    MaterialColorPalette,
-    ColorPaletteFooter,
+    ColorPickerPopover,
   },
 
   props: {
@@ -65,9 +66,19 @@ export default Vue.extend({
     },
   },
 
-  data() {
+  data(): {
+    open: boolean;
+    popoverTop: number;
+    popoverLeft: number;
+    positioned: boolean;
+    popoverResizeObserver: ResizeObserver | null;
+  } {
     return {
       open: false,
+      popoverTop: 0,
+      popoverLeft: 0,
+      positioned: false,
+      popoverResizeObserver: null,
     };
   },
 
@@ -102,9 +113,13 @@ export default Vue.extend({
       return !this.$store.state.activeSelector;
     },
 
-    basicColorPalette(): boolean {
-      return this.$store.state.options.colorPalette === 'basic';
+    roleLabel(): string {
+      return this.t(ROLE_LABEL_KEYS[this.property] || ROLE_LABEL_KEYS.color);
     },
+  },
+
+  beforeDestroy() {
+    this.popoverResizeObserver?.disconnect();
   },
 
   methods: {
@@ -126,7 +141,21 @@ export default Vue.extend({
 
     onOpen(): void {
       this.open = true;
+      this.positioned = false;
       this.$store.commit('setColorPickerVisible', true);
+
+      this.$nextTick(() => {
+        this.positionPopover();
+
+        // Content height varies a lot by active tab (Custom's sliders vs.
+        // Palette's search+grid vs. Already-used's role rows), so re-clamp
+        // on any resize rather than only once at open.
+        const popover = this.$refs.popover as HTMLElement | undefined;
+        if (popover) {
+          this.popoverResizeObserver = new ResizeObserver(() => this.positionPopover());
+          this.popoverResizeObserver.observe(popover);
+        }
+      });
 
       setTimeout(() => {
         document.addEventListener('click', this.onDocumentClick);
@@ -136,10 +165,60 @@ export default Vue.extend({
     onClose(): void {
       this.open = false;
       this.$store.commit('setColorPickerVisible', false);
+      this.popoverResizeObserver?.disconnect();
+      this.popoverResizeObserver = null;
 
       setTimeout(() => {
         document.removeEventListener('click', this.onDocumentClick);
       }, 0);
+    },
+
+    // The popover is much wider than the editor dock, and the dock itself
+    // scrolls (`overflow: auto`) — a normally-flowed `position: absolute`
+    // popover gets clipped by that ancestor the moment it extends past the
+    // dock's own edge, no matter how it's offset. `position: fixed` (set in
+    // the scoped style below) is meant to escape that clipping, but the
+    // dock is wrapped in `vue-draggable-resizable`, which positions itself
+    // via a CSS `transform` — that turns any descendant's `position: fixed`
+    // into "fixed relative to that transformed ancestor" instead of the
+    // true viewport (per the CSS spec). Rather than hunting for that
+    // ancestor, render once with our naive viewport-space guess, measure
+    // where it actually landed, and correct the drift.
+    positionPopover(): void {
+      const popover = this.$refs.popover as HTMLElement | undefined;
+      const field = this.$el.querySelector('.color-field') as HTMLElement | null;
+      if (!popover || !field) {
+        return;
+      }
+
+      const margin = 8;
+      const fieldRect = field.getBoundingClientRect();
+
+      const desiredLeft = Math.min(
+        Math.max(fieldRect.right - popover.offsetWidth, margin),
+        window.innerWidth - popover.offsetWidth - margin
+      );
+
+      // Prefer below the trigger; flip above it if it doesn't fit below but
+      // does fit above (mirrors AnchoredMenu's own flip-up rule), then clamp
+      // either way so a very short viewport still keeps it on-screen.
+      const spaceBelow = window.innerHeight - fieldRect.bottom;
+      const spaceAbove = fieldRect.top;
+      const flipUp = popover.offsetHeight + 6 + margin > spaceBelow && spaceAbove > spaceBelow;
+
+      const desiredTop = flipUp
+        ? Math.max(fieldRect.top - popover.offsetHeight - 6, margin)
+        : Math.min(fieldRect.bottom + 6, window.innerHeight - popover.offsetHeight - margin);
+
+      this.popoverLeft = desiredLeft;
+      this.popoverTop = desiredTop;
+
+      this.$nextTick(() => {
+        const actualRect = popover.getBoundingClientRect();
+        this.popoverLeft += desiredLeft - actualRect.left;
+        this.popoverTop += desiredTop - actualRect.top;
+        this.positioned = true;
+      });
     },
 
     onDocumentClick(e: MouseEvent): void {
@@ -166,6 +245,7 @@ export default Vue.extend({
   display: flex;
   align-items: stretch;
   width: 108px;
+  height: 27px;
   @include field-border;
 
   // Only the hex text field highlights the whole pill — the swatch button
@@ -226,9 +306,7 @@ export default Vue.extend({
 }
 
 .color-popover {
-  position: absolute;
-  top: calc(100% + 6px);
-  right: 0;
+  position: fixed;
   z-index: 20;
 }
 </style>
