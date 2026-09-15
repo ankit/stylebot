@@ -20,6 +20,7 @@ class MonacEditorIframe {
   constructor(variant: MonacoEditorVariant = 'default') {
     this.variant = variant;
 
+    this.patchBlobWorkerLoading();
     this.loadEditor(() => {
       this.attachWindowListeners();
       this.defineThemes();
@@ -27,6 +28,52 @@ class MonacEditorIframe {
       this.initEditor();
       this.postMessage({ type: 'stylebotMonacoIframeLoaded' });
     });
+  }
+
+  /**
+   * Monaco's blob-wrapped worker URLs fail to `importScripts` a same-origin
+   * chrome-extension:// URL, silently killing suggestions/color swatches.
+   */
+  patchBlobWorkerLoading(): void {
+    const blobContents = new WeakMap<Blob, string>();
+    const NativeBlob = window.Blob;
+
+    // Plain functions, not `class extends`: ES5-downleveled classes can't extend natives.
+    window.Blob = function (parts?: BlobPart[], options?: BlobPropertyBag): Blob {
+      const blob = new NativeBlob(parts, options);
+      if (parts?.every(part => typeof part === 'string')) {
+        blobContents.set(blob, (parts as string[]).join(''));
+      }
+      return blob;
+    } as unknown as typeof Blob;
+
+    const realWorkerUrlsByBlobUrl = new Map<string, string>();
+    const nativeCreateObjectURL = URL.createObjectURL.bind(URL);
+
+    URL.createObjectURL = (blob: Blob): string => {
+      const objectUrl = nativeCreateObjectURL(blob);
+      const content = blobContents.get(blob);
+      const match = content?.match(/importScripts\([^)]*?(chrome-extension:\/\/[^"')]+)/);
+
+      if (match) {
+        realWorkerUrlsByBlobUrl.set(objectUrl, match[1]);
+      }
+
+      return objectUrl;
+    };
+
+    const NativeWorker = window.Worker;
+
+    window.Worker = function (
+      scriptURL: string | URL,
+      options?: WorkerOptions
+    ): Worker {
+      const requestedUrl =
+        typeof scriptURL === 'string' ? scriptURL : scriptURL.href;
+      const realUrl = realWorkerUrlsByBlobUrl.get(requestedUrl);
+
+      return new NativeWorker(realUrl ?? scriptURL, options);
+    } as unknown as typeof Worker;
   }
 
   loadEditor(callback: () => void): void {
