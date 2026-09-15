@@ -25,3 +25,18 @@
   border-color: var(--primary);
   box-shadow: inset 0 0 0 1px var(--primary);
 }
+
+// Dark styling that respects ThemeProvider's manual light/dark override,
+// not just the OS setting. `&` must resolve to a normal selector (the
+// element itself or a descendant), not a loop/placeholder context.
+@mixin dark-mode {
+  @media (prefers-color-scheme: dark) {
+    .theme-provider:not([data-theme]) & {
+      @content;
+    }
+  }
+
+  .theme-provider[data-theme='dark'] & {
+    @content;
+  }
+}

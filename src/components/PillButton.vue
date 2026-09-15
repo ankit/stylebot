@@ -32,25 +32,15 @@ export default Vue.extend({
   }
 
   @include focus-ring;
-}
 
-@mixin pill-btn-dark {
-  border-color: #3a3d45;
-  background: #26282e;
+  @include dark-mode {
+    border-color: #3a3d45;
+    background: #26282e;
 
-  &:hover {
-    background: #31343b;
+    &:hover {
+      background: #31343b;
+    }
   }
-}
-
-@media (prefers-color-scheme: dark) {
-  .theme-provider:not([data-theme]) .pill-btn {
-    @include pill-btn-dark;
-  }
-}
-
-.theme-provider[data-theme='dark'] .pill-btn {
-  @include pill-btn-dark;
 }
 
 .pill-btn-label {
