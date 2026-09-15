@@ -2,20 +2,17 @@ import { resolveAppearance } from './resolve-appearance';
 
 describe('resolveAppearance', () => {
   it('returns light unchanged', () => {
-    expect(resolveAppearance('light', true)).toBe('light');
-    expect(resolveAppearance('light', false)).toBe('light');
+    expect(resolveAppearance('light', 'dark')).toBe('light');
+    expect(resolveAppearance('light', 'light')).toBe('light');
   });
 
   it('returns dark unchanged', () => {
-    expect(resolveAppearance('dark', true)).toBe('dark');
-    expect(resolveAppearance('dark', false)).toBe('dark');
+    expect(resolveAppearance('dark', 'dark')).toBe('dark');
+    expect(resolveAppearance('dark', 'light')).toBe('dark');
   });
 
-  it('resolves system to dark when the OS prefers dark', () => {
-    expect(resolveAppearance('system', true)).toBe('dark');
-  });
-
-  it('resolves system to light when the OS prefers light', () => {
-    expect(resolveAppearance('system', false)).toBe('light');
+  it('resolves system to the system preference', () => {
+    expect(resolveAppearance('system', 'dark')).toBe('dark');
+    expect(resolveAppearance('system', 'light')).toBe('light');
   });
 });

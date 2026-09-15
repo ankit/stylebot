@@ -8,7 +8,7 @@ export {
 } from './keydown-to-shortcut';
 
 export { debounce } from './debounce';
-export { resolveAppearance } from './resolve-appearance';
+export { resolveAppearance, getSystemPreference } from './resolve-appearance';
 
 export const getCurrentTimestamp = (): Timestamp =>
   format(new Date(), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");

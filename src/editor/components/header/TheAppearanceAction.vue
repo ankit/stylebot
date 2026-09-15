@@ -29,7 +29,7 @@
 import Vue from 'vue';
 import { AnchoredMenu, SMenu, MenuItem, IconButton } from '@stylebot/components';
 import { SunIcon, MoonIcon, MonitorIcon } from '@stylebot/icons';
-import { resolveAppearance } from '@stylebot/utils';
+import { resolveAppearance, getSystemPreference } from '@stylebot/utils';
 
 import { StylebotAppearance } from '@stylebot/types';
 
@@ -46,9 +46,9 @@ export default Vue.extend({
     MonitorIcon,
   },
 
-  data(): { systemPrefersDark: boolean; mql: MediaQueryList | null } {
+  data(): { systemPreference: 'light' | 'dark'; mql: MediaQueryList | null } {
     return {
-      systemPrefersDark: window.matchMedia('(prefers-color-scheme: dark)').matches,
+      systemPreference: getSystemPreference(),
       mql: null,
     };
   },
@@ -61,7 +61,7 @@ export default Vue.extend({
     // What the trigger button's own icon should show — resolves 'system'
     // against the OS's current setting, since there's nothing else to show.
     resolvedTheme(): 'light' | 'dark' {
-      return resolveAppearance(this.appearance, this.systemPrefersDark);
+      return resolveAppearance(this.appearance, this.systemPreference);
     },
   },
 
@@ -76,7 +76,7 @@ export default Vue.extend({
 
   methods: {
     onSystemThemeChange(event: MediaQueryListEvent): void {
-      this.systemPrefersDark = event.matches;
+      this.systemPreference = event.matches ? 'dark' : 'light';
     },
 
     setAppearance(appearance: StylebotAppearance): void {
