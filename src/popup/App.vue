@@ -250,12 +250,12 @@ body {
 }
 
 .popup-header-domain.popup-header-domain--muted {
-  color: var(--muted-foreground);
+  color: var(--text-muted);
 }
 
 .popup-caption {
   font-size: 11.5px;
-  color: var(--muted-foreground);
+  color: var(--text-muted);
 }
 
 .popup-restricted-message {
@@ -264,7 +264,7 @@ body {
 
 .popup-divider {
   height: 1px;
-  background: var(--border);
+  background: var(--panel-border);
 }
 
 .popup-menu {

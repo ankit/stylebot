@@ -53,6 +53,10 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
+.property-card {
+  --panel-surface: var(--card-surface);
+}
+
 .property-card-header {
   @include button-reset;
   display: flex;
@@ -86,12 +90,12 @@ export default Vue.extend({
   font-weight: 600;
   font-size: 13px;
   line-height: 1;
-  color: var(--foreground-secondary);
+  color: var(--text-secondary);
 }
 
 .property-card-chevron {
   flex: none;
-  color: var(--muted-foreground);
+  color: var(--text-muted);
   transition: transform 0.15s ease;
 
   &:not(.collapsed) {

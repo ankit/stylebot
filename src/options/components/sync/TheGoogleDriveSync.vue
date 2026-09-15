@@ -114,7 +114,7 @@ export default Vue.extend({
   gap: 14px;
   margin-top: 16px;
   padding: 14px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--panel-border);
   border-radius: 10px;
 }
 

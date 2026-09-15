@@ -161,19 +161,19 @@ export default Vue.extend({
 .stylebot {
   &.vdr {
     position: fixed;
-    border: 1px solid var(--border);
+    border: 1px solid var(--panel-border);
     border-radius: 14px;
-    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.16);
+    box-shadow: 0 14px 40px var(--panel-shadow);
 
     &.stylebot-resizing,
     &.stylebot-resizing-active {
-      border: 5px solid var(--primary);
+      border: 5px solid var(--accent);
     }
 
     .handle {
       width: 20px;
       height: 20px;
-      background: var(--primary);
+      background: var(--accent);
       border: none;
     }
 

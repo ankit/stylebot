@@ -2,7 +2,6 @@ export { default as ArrowRepeatIcon } from './ArrowRepeatIcon.vue';
 export { default as ChevronLeftIcon } from './ChevronLeftIcon.vue';
 export { default as ChevronDownIcon } from './ChevronDownIcon.vue';
 export { default as MoreIcon } from './MoreIcon.vue';
-export { default as XIcon } from './XIcon.vue';
 export { default as ExternalLinkIcon } from './ExternalLinkIcon.vue';
 export { default as CursorIcon } from './CursorIcon.vue';
 export { default as SearchIcon } from './SearchIcon.vue';

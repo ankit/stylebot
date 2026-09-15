@@ -102,7 +102,7 @@ input {
 }
 
 input:checked:not(:disabled) ~ .track {
-  background: var(--primary);
+  background: var(--accent);
 }
 
 input:checked:not(:disabled) ~ .track .thumb {

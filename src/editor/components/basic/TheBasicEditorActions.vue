@@ -73,16 +73,16 @@ export default Vue.extend({
 }
 
 .basic-editor-actions .action-button {
-  color: var(--muted-foreground);
+  color: var(--text-muted);
 }
 
 .hide-button.active {
-  color: #fff;
-  background: var(--primary);
-  border-color: var(--primary);
+  color: var(--accent-ink);
+  background: var(--accent);
+  border-color: var(--accent);
 
   &:hover:not(:disabled) {
-    background: var(--primary);
+    background: var(--accent);
   }
 }
 </style>

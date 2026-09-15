@@ -159,7 +159,7 @@ export default Vue.extend({
   flex: none;
   width: 36px;
   height: 0;
-  border-bottom: 3px solid var(--muted-foreground);
+  border-bottom: 3px solid var(--text-muted);
 }
 
 .border-color ::v-deep .color-hex {

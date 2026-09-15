@@ -59,7 +59,7 @@ export default Vue.extend({
   &::-webkit-slider-runnable-track {
     height: 4px;
     border-radius: 2px;
-    background: var(--accent);
+    background: var(--slider-track);
   }
 
   &::-webkit-slider-thumb {
@@ -69,14 +69,14 @@ export default Vue.extend({
     height: 16px;
     margin-top: -6px;
     border-radius: 50%;
-    background: var(--primary);
+    background: var(--accent);
     cursor: pointer;
   }
 
   &::-moz-range-track {
     height: 4px;
     border-radius: 2px;
-    background: var(--accent);
+    background: var(--slider-track);
   }
 
   &::-moz-range-thumb {
@@ -84,7 +84,7 @@ export default Vue.extend({
     height: 16px;
     border: none;
     border-radius: 50%;
-    background: var(--primary);
+    background: var(--accent);
     cursor: pointer;
   }
 

@@ -39,9 +39,9 @@ export default Vue.extend({
   width: 32px;
   height: 30px;
   padding: 2px;
-  border: 1px solid var(--input);
+  border: 1px solid var(--field-border);
   border-radius: 7px;
-  background: var(--background);
+  background: var(--field-fill);
   cursor: pointer;
 
   &::-webkit-color-swatch-wrapper {

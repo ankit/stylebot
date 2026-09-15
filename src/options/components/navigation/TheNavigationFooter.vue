@@ -31,7 +31,7 @@ export default Vue.extend({
   font-weight: 400;
   font-size: 12px;
   line-height: 1.4;
-  color: var(--muted-foreground);
+  color: var(--text-muted);
 }
 
 .version {
@@ -39,7 +39,7 @@ export default Vue.extend({
 }
 
 a {
-  color: var(--primary);
+  color: var(--accent);
   text-decoration: none;
 
   &:hover {

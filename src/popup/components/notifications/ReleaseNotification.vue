@@ -16,7 +16,7 @@
     </s-text>
 
     <icon-button class="release-dismiss" :title="t('hide')" @click="dismiss">
-      <x-icon :size="22" />
+      <icon-x :size="22" />
     </icon-button>
   </div>
 </template>
@@ -31,14 +31,14 @@ import {
 } from '@stylebot/utils';
 
 import { onEnterOrSpace } from '../../utils';
-import { XIcon } from '@stylebot/icons';
+import { IconX } from '@stylebot/icons';
 import { IconButton, SText } from '@stylebot/components';
 
 export default Vue.extend({
   name: 'ReleaseNotification',
 
   components: {
-    XIcon,
+    IconX,
     IconButton,
     SText,
   },
@@ -107,7 +107,7 @@ export default Vue.extend({
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--primary);
+  background: var(--accent);
 }
 
 .release-text {
@@ -116,12 +116,12 @@ export default Vue.extend({
 }
 
 .release-sep {
-  color: var(--muted-foreground);
+  color: var(--text-muted);
   margin: 0 2px;
 }
 
 .release-link {
-  color: var(--primary);
+  color: var(--accent);
 }
 
 .release-dismiss {

@@ -16,14 +16,14 @@
 
 // Shared chrome for field-like containers (selects, number/color/text inputs).
 @mixin field-border($radius: 7px) {
-  border: 1px solid var(--input);
+  border: 1px solid var(--field-border);
   border-radius: $radius;
 }
 
 // Active/focused state for the same fields — pair with field-border.
 @mixin field-active-border {
-  border-color: var(--primary);
-  box-shadow: inset 0 0 0 1px var(--primary);
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
 }
 
 // Dark styling that respects ThemeProvider's manual override, not just the OS setting.

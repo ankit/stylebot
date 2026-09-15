@@ -12,8 +12,8 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .card {
-  border: 1px solid var(--border);
+  border: 1px solid var(--panel-border);
   border-radius: 11px;
-  background: var(--background);
+  background: var(--panel-surface);
 }
 </style>

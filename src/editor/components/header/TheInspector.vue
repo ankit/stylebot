@@ -110,10 +110,10 @@ export default Vue.extend({
   border-radius: 8px !important;
   cursor: pointer;
   background: var(--active);
-  color: var(--foreground);
+  color: var(--text-primary);
 
   &:hover:not(:disabled):not(.active) {
-    background: var(--border);
+    background: var(--panel-border);
   }
 
   &:disabled {
@@ -122,8 +122,8 @@ export default Vue.extend({
   }
 
   &.active {
-    background: var(--primary);
-    color: #fff;
+    background: var(--accent);
+    color: var(--accent-ink);
   }
 
   @include focus-ring(2px);

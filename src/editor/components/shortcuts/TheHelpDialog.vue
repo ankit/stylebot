@@ -5,7 +5,7 @@
         <heading id="help-dialog-title" as="h1" size="md">{{ t('keyboard_shortcuts') }}</heading>
 
         <icon-button :size="26" :title="t('close')" @click="close">
-          <x-icon :size="18" />
+          <icon-x :size="18" />
         </icon-button>
       </div>
 
@@ -102,7 +102,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { Heading, IconButton, ShortcutChip, SDialog, SText } from '@stylebot/components';
-import { XIcon } from '@stylebot/icons';
+import { IconX } from '@stylebot/icons';
 import { StylebotCommands, StylebotEditorCommands } from '@stylebot/types';
 
 import { openOptionsPage } from '../../utils/chrome';
@@ -116,7 +116,7 @@ export default Vue.extend({
     ShortcutChip,
     SDialog,
     SText,
-    XIcon,
+    IconX,
   },
 
   computed: {
@@ -151,11 +151,11 @@ export default Vue.extend({
   width: 400px;
   height: fit-content;
   padding: 18px 22px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--menu-border);
   border-radius: 14px;
-  background: var(--background);
-  color: var(--foreground);
-  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.3);
+  background: var(--menu-surface);
+  color: var(--text-primary);
+  box-shadow: 0 24px 64px var(--menu-shadow);
 }
 
 .header-row {
@@ -182,13 +182,14 @@ export default Vue.extend({
   font-weight: 600;
   letter-spacing: 0.09em;
   text-transform: uppercase;
+  color: var(--text-faint);
 }
 
 .customize {
   flex: none;
   font-size: 11.5px;
   font-weight: 500;
-  color: var(--primary);
+  color: var(--accent);
 
   &:hover {
     text-decoration: underline;
@@ -200,7 +201,7 @@ export default Vue.extend({
   align-items: center;
   gap: 16px;
   padding: 9px 0;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--panel-border);
 
   &:last-child {
     border-bottom: none;
@@ -210,6 +211,7 @@ export default Vue.extend({
 .row-label {
   flex: 1;
   min-width: 0;
+  color: var(--text-secondary);
 }
 
 .row-chip {

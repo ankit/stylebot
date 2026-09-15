@@ -89,7 +89,7 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .edit-fonts {
-  color: var(--primary);
+  color: var(--accent);
 }
 
 .property-row ::v-deep .property-row-control {

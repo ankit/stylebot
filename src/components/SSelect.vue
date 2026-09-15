@@ -104,16 +104,16 @@ export default Vue.extend({
   @include field-border;
   font-size: 12.5px;
   line-height: 1.2;
-  color: var(--foreground);
+  color: var(--text-primary);
   outline: none;
   cursor: pointer;
 
   &.muted {
-    color: var(--muted-foreground);
+    color: var(--text-muted);
   }
 
   &:hover:not(:disabled):not(.open) {
-    border-color: var(--muted-foreground);
+    border-color: var(--field-border-hover);
   }
 
   &.open,
@@ -139,7 +139,7 @@ export default Vue.extend({
 
 .select-chevron {
   flex: none;
-  color: var(--muted-foreground);
+  color: var(--text-muted);
   transition: transform 0.15s ease;
 
   &.open {

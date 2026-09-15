@@ -38,15 +38,15 @@ export default Vue.extend({
 .text {
   margin: 0;
   font-weight: 400;
-  color: var(--foreground);
+  color: var(--text-primary);
 }
 
 .muted {
-  color: var(--muted-foreground);
+  color: var(--text-muted);
 }
 
 .primary {
-  color: var(--primary);
+  color: var(--accent);
 }
 
 .label {

@@ -37,7 +37,7 @@ export default Vue.extend({
   align-items: center;
   gap: 12px;
   padding: 6px 0;
-  border-bottom: 1px solid color-mix(in srgb, var(--foreground) 7%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--text-primary) 7%, transparent);
 
   &.last {
     padding-bottom: 2px;

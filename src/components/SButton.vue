@@ -52,7 +52,7 @@ export default Vue.extend({
   font-weight: 600;
   font-size: 13px;
   line-height: 1;
-  color: var(--foreground);
+  color: var(--text-primary);
   background: transparent;
   cursor: pointer;
 
@@ -65,17 +65,17 @@ export default Vue.extend({
 }
 
 .button.default {
-  background: var(--background);
-  border-color: var(--input);
+  background: var(--panel-surface);
+  border-color: var(--field-border);
 
   &:hover:not(:disabled) {
-    background: var(--accent);
+    background: var(--hover-tint);
   }
 }
 
 .button.ghost {
   &:hover:not(:disabled) {
-    background: var(--accent);
+    background: var(--hover-tint);
   }
 }
 

@@ -42,7 +42,7 @@ export default Vue.extend({
   display: inline-flex;
   align-items: center;
   flex-shrink: 0;
-  background: color-mix(in srgb, var(--foreground) 6%, transparent);
+  background: color-mix(in srgb, var(--text-primary) 6%, transparent);
   border-radius: 5px;
   padding: 4px 8px;
 
@@ -52,7 +52,7 @@ export default Vue.extend({
 
   &.muted {
     background: transparent;
-    color: var(--muted-foreground);
+    color: var(--text-muted);
   }
 }
 </style>

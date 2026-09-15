@@ -110,8 +110,8 @@ export default Vue.extend({
   gap: 12px;
   margin: -4px -4px 4px;
   padding: 9px 12px;
-  border-bottom: 1px solid var(--border);
-  background: var(--accent);
+  border-bottom: 1px solid var(--panel-border);
+  background: var(--hover-tint);
 }
 
 .dropdown-header-label {
