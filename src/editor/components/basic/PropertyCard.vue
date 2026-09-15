@@ -1,11 +1,6 @@
 <template>
   <s-card class="property-card">
-    <button
-      type="button"
-      class="property-card-header"
-      :class="{ collapsed }"
-      @click="$emit('toggle')"
-    >
+    <button type="button" class="property-card-header" @click="$emit('toggle')">
       <span class="property-card-title">
         <span class="property-card-label">{{ label }}</span>
         <s-count-badge v-if="count > 0" :count="count" />
@@ -13,8 +8,10 @@
       <chevron-down-icon :size="11" class="property-card-chevron" :class="{ collapsed }" />
     </button>
 
-    <div v-show="!collapsed" class="property-card-body">
-      <slot />
+    <div class="property-card-collapse" :class="{ collapsed }" :inert="collapsed">
+      <div class="property-card-body">
+        <slot />
+      </div>
     </div>
   </s-card>
 </template>
@@ -64,13 +61,8 @@ export default Vue.extend({
   gap: 8px;
   width: 100%;
   padding: 9px 12px;
-  border-radius: 10px 10px 0 0;
   outline: none;
   cursor: pointer;
-
-  &.collapsed {
-    border-radius: 10px;
-  }
 
   @include focus-ring;
 }
@@ -78,6 +70,7 @@ export default Vue.extend({
 .property-card-title {
   flex: 1;
   min-width: 0;
+  min-height: 20px;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -96,15 +89,44 @@ export default Vue.extend({
 .property-card-chevron {
   flex: none;
   color: var(--text-muted);
-  transition: transform 0.15s ease;
+  transition: transform 0.24s cubic-bezier(0.4, 0, 0.2, 1);
 
   &:not(.collapsed) {
     transform: rotate(180deg);
   }
 }
 
+.property-card-collapse {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 0.24s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &.collapsed {
+    grid-template-rows: 0fr;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
 .property-card-body {
+  min-height: 0;
+  overflow: hidden;
   padding: 0 12px 8px;
+  opacity: 1;
+  transition: padding-bottom 0.24s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.16s ease 0.08s;
+
+  .property-card-collapse.collapsed & {
+    padding-bottom: 0;
+    opacity: 0;
+    transition: padding-bottom 0.24s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.1s ease;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
 }
 
 // The final property row in a card drops its divider.

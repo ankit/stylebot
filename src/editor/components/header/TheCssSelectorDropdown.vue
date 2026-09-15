@@ -122,6 +122,6 @@ export default Vue.extend({
 }
 
 .active-style-count {
-  margin: 0 2px;
+  margin: 0 6px;
 }
 </style>
