@@ -3,7 +3,7 @@ import type { AddressInfo } from 'node:net';
 import type { BrowserContext, Locator, Page } from '@playwright/test';
 import { closeServer } from './fixtures';
 
-// Generalizes the inline http.createServer pattern from important-override.spec.ts
+// Generalizes the inline http.createServer pattern from style-important-override.spec.ts
 // to serve multiple paths, for tests that need real multi-page navigation.
 export const startTestServer = async (
   routes: Record<string, string>
@@ -34,7 +34,7 @@ type SeededStyle = {
 };
 
 // Generalizes the worker.evaluate(chrome.storage.local.set(...)) pattern from
-// important-override.spec.ts to seed multiple, arbitrarily-keyed style patterns.
+// style-important-override.spec.ts to seed multiple, arbitrarily-keyed style patterns.
 export const seedStyles = async (
   context: BrowserContext,
   styles: Record<string, SeededStyle>
@@ -61,7 +61,7 @@ export const seedStyles = async (
   );
 };
 
-// Wraps the popup's "Style this page" toggle flow (see open-in-current-tab.spec.ts)
+// Wraps the popup's "Style this page" toggle flow (see editor-open.spec.ts)
 // and waits for the Vue app to actually mount, not just the host to attach.
 export const openEditor = async (
   page: Page,
