@@ -6,6 +6,35 @@ import path from 'node:path';
 
 const DIST_PATH = path.resolve(__dirname, '..', 'dist');
 
+// --ui mode force-sets `use.trace` to a live object ({mode: 'on', live: true})
+// and manages its own full tracing lifecycle per test (for its Actions/timeline
+// panel) on every context that exists, regardless of which fixture created it
+// — including our manually-launched one below. Fighting it for control of the
+// same context.tracing object throws ("Must start tracing before stopping" /
+// "already started"), so when this live mode is detected, we don't touch
+// tracing ourselves at all and let it own the whole lifecycle.
+function isLiveTraceMode(use: { trace?: unknown }): boolean {
+  return (
+    typeof use.trace === 'object' &&
+    use.trace !== null &&
+    (use.trace as { live?: boolean }).live === true
+  );
+}
+
+// Tracing here is purely a debugging aid — an attached trace.zip on a failed
+// test — never a functional requirement, so every call is still best-effort
+// on top of the up-front skip above (e.g. for other external trace modes,
+// like a `--trace on-first-retry` CLI flag, that this skip doesn't cover).
+async function safeTracing(op: () => Promise<unknown>): Promise<boolean> {
+  try {
+    await op();
+    return true;
+  } catch {
+    // Ignored — see comment above.
+    return false;
+  }
+}
+
 // The extension's browser now outlives each test (see the worker-scoped `sharedContext`
 // fixture below), so it can keep a local test server's connection open in its keep-alive
 // pool — plain server.close() then hangs until that connection times out. Use this in
@@ -75,11 +104,16 @@ export const test = base.extend<
 
       // Our custom context bypasses Playwright's default trace/video wiring, so start it
       // manually; isolatePage below saves one chunk per test via startChunk/stopChunk.
-      await context.tracing.start({ screenshots: true, snapshots: true });
+      const liveTraceMode = isLiveTraceMode(workerInfo.project.use);
+      if (!liveTraceMode) {
+        await safeTracing(() => context.tracing.start({ screenshots: true, snapshots: true }));
+      }
 
       await use(context);
 
-      await context.tracing.stop();
+      if (!liveTraceMode) {
+        await safeTracing(() => context.tracing.stop());
+      }
       await context.close();
       fs.rmSync(userDataDir, { recursive: true, force: true });
     },
@@ -99,7 +133,11 @@ export const test = base.extend<
   // Test-scoped wrapper around the shared worker context: saves a per-test trace
   // chunk and resets tabs/storage after so state can't leak into the next test.
   context: async ({ sharedContext }, use, testInfo) => {
-    await sharedContext.tracing.startChunk();
+    const liveTraceMode = isLiveTraceMode(testInfo.project.use);
+
+    if (!liveTraceMode) {
+      await safeTracing(() => sharedContext.tracing.startChunk());
+    }
 
     const pagesBefore = new Set(sharedContext.pages());
 
@@ -107,13 +145,17 @@ export const test = base.extend<
 
     // Retain-on-failure: saving screenshots/snapshots for every passing test doesn't
     // scale as the suite grows, so only keep the trace when there's something to debug.
-    if (testInfo.status !== testInfo.expectedStatus) {
-      const tracePath = testInfo.outputPath('trace.zip');
-      await sharedContext.tracing.stopChunk({ path: tracePath });
-      // Named 'trace' so the HTML reporter shows its built-in "View trace" button.
-      await testInfo.attach('trace', { path: tracePath, contentType: 'application/zip' });
-    } else {
-      await sharedContext.tracing.stopChunk();
+    if (!liveTraceMode) {
+      if (testInfo.status !== testInfo.expectedStatus) {
+        const tracePath = testInfo.outputPath('trace.zip');
+        const saved = await safeTracing(() => sharedContext.tracing.stopChunk({ path: tracePath }));
+        if (saved) {
+          // Named 'trace' so the HTML reporter shows its built-in "View trace" button.
+          await testInfo.attach('trace', { path: tracePath, contentType: 'application/zip' });
+        }
+      } else {
+        await safeTracing(() => sharedContext.tracing.stopChunk());
+      }
     }
 
     await Promise.all(
