@@ -1,5 +1,5 @@
 <template>
-  <theme-provider class="stylebot-app">
+  <theme-provider class="stylebot-app" :mode="appearance">
     <the-stylebot v-if="visible" />
     <the-keyboard-shortcuts />
     <the-help-dialog v-if="help" />
@@ -8,7 +8,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { StylebotCommands } from '@stylebot/types';
+import { StylebotCommands, StylebotAppearance } from '@stylebot/types';
 import { ThemeProvider } from '@stylebot/components';
 
 import TheStylebot from './TheStylebot.vue';
@@ -42,6 +42,10 @@ export default Vue.extend({
 
     help(): boolean {
       return this.$store.state.help;
+    },
+
+    appearance(): StylebotAppearance {
+      return this.$store.state.options?.appearance ?? 'system';
     },
   },
 

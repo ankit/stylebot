@@ -67,15 +67,23 @@ export default Vue.extend({
   }
 }
 
+@mixin switch-dark-vars {
+  --track-off: #3d4048;
+  --thumb-on: #fff;
+  --thumb-off: #9aa1ae;
+  --track-disabled: #24262b;
+  --track-disabled-border: #34363d;
+  --thumb-disabled: #4a4d55;
+}
+
 @media (prefers-color-scheme: dark) {
-  .switch {
-    --track-off: #3d4048;
-    --thumb-on: #fff;
-    --thumb-off: #9aa1ae;
-    --track-disabled: #24262b;
-    --track-disabled-border: #34363d;
-    --thumb-disabled: #4a4d55;
+  .theme-provider:not([data-theme]) .switch {
+    @include switch-dark-vars;
   }
+}
+
+.theme-provider[data-theme='dark'] .switch {
+  @include switch-dark-vars;
 }
 
 input {

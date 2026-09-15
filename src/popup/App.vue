@@ -1,5 +1,5 @@
 <template>
-  <theme-provider class="popup">
+  <theme-provider class="popup" :mode="appearance">
     <div v-if="restricted">
       <div class="popup-header">
         <heading as="h1" size="sm" class="popup-header-domain popup-header-domain--muted">
@@ -88,6 +88,7 @@ import ReleaseNotification from './components/notifications/ReleaseNotification.
 import {
   getStyles,
   getCommands,
+  getOption,
   getCurrentTab,
   getIsStylebotOpen,
   getIsPageReaderable,
@@ -97,7 +98,11 @@ import {
 import { getGoogleDriveSyncEnabled } from '../sync/google-drive/sync-metadata';
 // Bypasses @stylebot/styles' barrel, whose page.ts export drags in @stylebot/css's postcss chain.
 import BackgroundPageUtils from '../styles/utils';
-import { GoogleDriveSyncMetadata, GetCommandsResponse } from '@stylebot/types';
+import {
+  GoogleDriveSyncMetadata,
+  GetCommandsResponse,
+  StylebotAppearance,
+} from '@stylebot/types';
 
 export default Vue.extend({
   name: 'App',
@@ -124,6 +129,7 @@ export default Vue.extend({
     googleDriveSyncEnabled: boolean;
     googleDriveSyncMetadata?: GoogleDriveSyncMetadata;
     commands?: GetCommandsResponse;
+    appearance: StylebotAppearance;
   } {
     return {
       styles: [],
@@ -134,6 +140,7 @@ export default Vue.extend({
       googleDriveSyncEnabled: false,
       googleDriveSyncMetadata: undefined,
       commands: undefined,
+      appearance: 'system',
     };
   },
 
@@ -193,6 +200,10 @@ export default Vue.extend({
 
     getCommands(commands => {
       this.commands = commands;
+    });
+
+    getOption('appearance', appearance => {
+      this.appearance = (appearance as StylebotAppearance) ?? 'system';
     });
   },
 });

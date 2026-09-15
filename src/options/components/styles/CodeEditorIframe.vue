@@ -14,9 +14,13 @@ export default Vue.extend({
   data(): { src: string; ready: boolean } {
     // The iframe is a separate document, so the theme has to be passed in
     // explicitly — read once, since it can't change while open.
-    const theme = window.matchMedia('(prefers-color-scheme: dark)').matches
-      ? 'dark'
-      : 'light';
+    const appearance = this.$store.state.options?.appearance ?? 'system';
+    const theme =
+      appearance === 'system'
+        ? window.matchMedia('(prefers-color-scheme: dark)').matches
+          ? 'dark'
+          : 'light'
+        : appearance;
 
     return {
       // Separate entry from the in-page editor's iframe (index.html) — see MonacoEditorIframe.ts.

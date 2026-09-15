@@ -28,6 +28,7 @@ import {
   StylebotBasicModeSections,
   StylebotLayout,
   StylebotColorPalette,
+  StylebotAppearance,
 } from '@stylebot/types';
 
 import { defaultOptions } from '@stylebot/settings';
@@ -162,6 +163,14 @@ export default {
   ): void {
     setOption('colorPalette', colorPalette);
     commit('setOptions', { ...state.options, colorPalette });
+  },
+
+  setAppearance(
+    { state, commit }: { state: State; commit: Commit },
+    appearance: StylebotAppearance
+  ): void {
+    setOption('appearance', appearance);
+    commit('setOptions', { ...state.options, appearance });
   },
 
   setBasicModeSections(

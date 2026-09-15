@@ -269,9 +269,13 @@ export default Vue.extend({
 }
 
 @media (prefers-color-scheme: dark) {
-  .editor-code-area {
+  .theme-provider:not([data-theme]) .editor-code-area {
     background: #1a1b1e;
   }
+}
+
+.theme-provider[data-theme='dark'] .editor-code-area {
+  background: #1a1b1e;
 }
 
 .editor-footer {

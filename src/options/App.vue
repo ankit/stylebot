@@ -1,5 +1,5 @@
 <template>
-  <theme-provider class="options-app">
+  <theme-provider class="options-app" :mode="appearance">
     <the-navigation
       class="nav"
       :tabs="tabs"
@@ -36,6 +36,8 @@
 
 <script lang="ts">
 import Vue from 'vue';
+
+import { StylebotAppearance } from '@stylebot/types';
 
 import TheBasicsTab from './components/TheBasicsTab.vue';
 import TheStylesTab from './components/TheStylesTab.vue';
@@ -78,6 +80,10 @@ export default Vue.extend({
   computed: {
     currentTabComponent(): string {
       return `the-${this.currentTab}-tab`;
+    },
+
+    appearance(): StylebotAppearance {
+      return this.$store.state.options?.appearance ?? 'system';
     },
   },
 
