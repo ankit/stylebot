@@ -97,6 +97,12 @@ export default Vue.extend({
     opacity: 0.6;
 
     &::-webkit-slider-thumb {
+      background: var(--text-muted);
+      cursor: default;
+    }
+
+    &::-moz-range-thumb {
+      background: var(--text-muted);
       cursor: default;
     }
   }

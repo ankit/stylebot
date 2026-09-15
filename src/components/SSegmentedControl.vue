@@ -1,15 +1,19 @@
 <template>
-  <div class="segmented" :class="{ fit }" role="group">
+  <div ref="root" class="segmented" :class="{ fit }" role="group">
+    <span class="segment-indicator" :class="{ ready }" :style="indicatorStyle" />
+
     <button
       v-for="option in options"
+      ref="segments"
       :key="option.value"
       type="button"
       class="segment"
       :class="{ active: option.value === value }"
+      :disabled="disabled"
       :title="option.title"
       @click="$emit('change', option.value)"
     >
-      {{ option.label }}
+      <slot name="option" :option="option">{{ option.label }}</slot>
     </button>
   </div>
 </template>
@@ -19,7 +23,7 @@ import Vue, { PropType } from 'vue';
 
 type Option = {
   value: string | number;
-  label: string;
+  label?: string;
   title?: string;
 };
 
@@ -48,12 +52,81 @@ export default Vue.extend({
       type: Boolean,
       default: false,
     },
+
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+  },
+
+  data(): {
+    indicatorLeft: number;
+    indicatorWidth: number;
+    ready: boolean;
+    resizeObserver: ResizeObserver | null;
+  } {
+    return {
+      indicatorLeft: 0,
+      indicatorWidth: 0,
+      // Held back until the first measurement lands, so the indicator
+      // doesn't visibly slide in from the top-left corner on mount.
+      ready: false,
+      resizeObserver: null,
+    };
+  },
+
+  computed: {
+    indicatorStyle(): { transform: string; width: string } {
+      return {
+        transform: `translateX(${this.indicatorLeft}px)`,
+        width: `${this.indicatorWidth}px`,
+      };
+    },
+  },
+
+  watch: {
+    value: {
+      immediate: true,
+      handler(): void {
+        this.$nextTick(this.measure);
+      },
+    },
+
+    options(): void {
+      this.$nextTick(this.measure);
+    },
+  },
+
+  mounted() {
+    this.resizeObserver = new ResizeObserver(() => this.measure());
+    this.resizeObserver.observe(this.$refs.root as HTMLElement);
+  },
+
+  beforeDestroy() {
+    this.resizeObserver?.disconnect();
+  },
+
+  methods: {
+    measure(): void {
+      const segments = this.$refs.segments as HTMLElement[] | undefined;
+      const index = this.options.findIndex(option => option.value === this.value);
+      const active = segments?.[index];
+
+      if (!active) {
+        return;
+      }
+
+      this.indicatorLeft = active.offsetLeft;
+      this.indicatorWidth = active.offsetWidth;
+      this.ready = true;
+    },
   },
 });
 </script>
 
 <style lang="scss" scoped>
 .segmented {
+  position: relative;
   display: flex;
   gap: 2px;
   padding: 2px;
@@ -66,7 +139,27 @@ export default Vue.extend({
   }
 }
 
+.segment-indicator {
+  position: absolute;
+  top: 2px;
+  left: 0;
+  bottom: 2px;
+  border-radius: 6px;
+  background: var(--card-surface);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 10%), inset 0 0 0 1px color-mix(in srgb, var(--text-primary) 12%, transparent);
+  pointer-events: none;
+
+  &.ready {
+    transition: transform 0.2s ease, width 0.2s ease;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
 .segment {
+  position: relative;
   flex: 1;
   text-align: center;
   white-space: nowrap;
@@ -79,16 +172,32 @@ export default Vue.extend({
   color: var(--text-muted);
   outline: none;
   cursor: pointer;
+  transition: color 0.15s ease, font-weight 0.15s ease;
 
   &.active {
     font-weight: 600;
     color: var(--text-primary);
-    background: var(--card-surface);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+
+  ::v-deep svg {
+    transition: stroke-width 0.15s ease;
+  }
+
+  &.active ::v-deep svg {
+    stroke-width: 1.9;
+  }
+
+  ::v-deep span {
+    font-weight: inherit;
   }
 
   &:focus-visible {
     color: var(--text-primary);
+  }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.6;
   }
 
   @include focus-ring;

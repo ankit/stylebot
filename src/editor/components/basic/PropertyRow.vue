@@ -56,6 +56,7 @@ export default Vue.extend({
 .property-row-control {
   flex: none;
   display: flex;
+  align-items: center;
   justify-content: flex-end;
   min-width: 108px;
 }

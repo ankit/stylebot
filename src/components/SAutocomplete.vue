@@ -221,6 +221,11 @@ export default Vue.extend({
     onFocus(): void {
       this.focused = true;
       this.previousValue = this.value;
+      // The chips-to-textarea swap (see `chips` prop) mounts a fresh
+      // textarea pinned at the static 30px CSS height — without this it
+      // only grows to fit its content on the next keystroke, producing a
+      // visible jump the instant a long/multi-part value is focused.
+      this.resize();
       this.syncMenu();
     },
 
@@ -306,7 +311,7 @@ export default Vue.extend({
   flex-wrap: wrap;
   align-content: center;
   gap: 6px;
-  padding: 6px 8px 6px 6px;
+  padding: 6px 8px 4px 6px;
   cursor: text;
 }
 
@@ -329,7 +334,6 @@ export default Vue.extend({
 
   &.mono {
     font-family: var(--font-mono);
-    font-weight: 600;
   }
 
   &::placeholder {

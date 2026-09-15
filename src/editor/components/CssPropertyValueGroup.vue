@@ -1,30 +1,33 @@
 <template>
-  <div class="value-group" role="group">
-    <button
-      v-for="option in options"
-      :key="option.value"
-      type="button"
-      class="value-option"
-      :class="{ active: value === option.value }"
-      :disabled="disabled"
-      :title="option.title"
-      @click="select(option.value)"
-    >
+  <s-segmented-control
+    class="value-group"
+    fit
+    :value="value"
+    :options="options"
+    :disabled="disabled"
+    @change="select"
+  >
+    <template #option="{ option }">
       <component :is="option.icon" v-if="option.icon" />
       <!-- eslint-disable-next-line vue/no-v-html -->
       <span v-else v-html="option.html" />
-    </button>
-  </div>
+    </template>
+  </s-segmented-control>
 </template>
 
 <script lang="ts">
 import Vue, { PropType, Component } from 'vue';
 import { Declaration } from 'postcss';
+import { SSegmentedControl } from '@stylebot/components';
 
 type Option = { title: string; value: string; html?: string; icon?: Component };
 
 export default Vue.extend({
   name: 'CssPropertyValueGroup',
+
+  components: {
+    SSegmentedControl,
+  },
 
   props: {
     property: {
@@ -70,49 +73,8 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-.value-group {
-  display: flex;
-  gap: 1px;
-  padding: 1px;
-  border-radius: 7px;
-  background: var(--tab-surface);
-}
-
-.value-option {
-  @include button-reset;
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+.value-group ::v-deep .segment {
   min-width: 27px;
   padding: 5px 6px;
-  border-radius: 6px;
-  font-size: 12px;
-  line-height: 1.2;
-  color: var(--text-muted);
-  outline: none;
-  cursor: pointer;
-
-  &:hover:not(:disabled):not(.active) {
-    color: var(--text-primary);
-  }
-
-  &.active {
-    font-weight: 600;
-    color: var(--text-primary);
-    background: var(--card-surface);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  }
-
-  &:disabled {
-    cursor: default;
-    opacity: 0.6;
-  }
-
-  &:focus-visible {
-    color: var(--text-primary);
-  }
-
-  @include focus-ring;
 }
 </style>

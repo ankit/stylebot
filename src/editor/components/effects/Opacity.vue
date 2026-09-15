@@ -67,6 +67,10 @@ export default Vue.extend({
   min-width: 0;
 }
 
+.property-row {
+  border-bottom: none;
+}
+
 .opacity-control {
   display: flex;
   align-items: center;
