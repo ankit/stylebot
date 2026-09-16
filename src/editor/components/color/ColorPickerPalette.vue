@@ -237,6 +237,8 @@ export default Vue.extend({
   // Tall enough for Hues' 5 rows (the largest set) without scrolling.
   max-height: 200px;
   overflow-y: auto;
+  padding: 4px;
+  margin: -4px;
 }
 
 .swatch {
