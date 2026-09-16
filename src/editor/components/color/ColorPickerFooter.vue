@@ -8,30 +8,16 @@
       @input="onInput"
       @blur="onBlur"
     />
-
-    <s-segmented-control v-model="format" fit class="format-toggle" :options="formatOptions" />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import tinycolor from 'tinycolor2';
-import { SSegmentedControl } from '@stylebot/components';
 import { tinycolorToCssColor } from '../../utils/hsv-color';
-
-type Format = 'hex' | 'rgb';
-
-const FORMAT_OPTIONS: Array<{ value: Format; label: string }> = [
-  { value: 'hex', label: 'HEX' },
-  { value: 'rgb', label: 'RGB' },
-];
 
 export default Vue.extend({
   name: 'ColorPickerFooter',
-
-  components: {
-    SSegmentedControl,
-  },
 
   props: {
     value: {
@@ -40,26 +26,17 @@ export default Vue.extend({
     },
   },
 
-  data(): { format: Format; focused: boolean; draft: string } {
+  data(): { focused: boolean; draft: string } {
     return {
-      format: 'hex',
       focused: false,
       draft: '',
     };
   },
 
   computed: {
-    formatOptions(): Array<{ value: Format; label: string }> {
-      return FORMAT_OPTIONS;
-    },
-
     displayValue(): string {
       const color = tinycolor(this.value);
-      if (!color.isValid()) {
-        return this.value;
-      }
-
-      return this.format === 'rgb' ? color.toRgbString() : color.toHexString();
+      return color.isValid() ? tinycolorToCssColor(color) : this.value;
     },
   },
 
@@ -93,17 +70,14 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .footer {
-  display: flex;
-  align-items: center;
-  gap: 8px;
   padding: 10px 14px;
 }
 
 .value-field {
   @include button-reset;
   @include field-border(8px);
-  flex: 1;
-  min-width: 0;
+  display: block;
+  width: 100%;
   padding: 6px 10px;
   font: 400 13px/1.2 var(--font-mono);
   color: var(--text-primary);
@@ -111,9 +85,5 @@ export default Vue.extend({
   &:focus {
     @include field-active-border;
   }
-}
-
-.format-toggle {
-  flex: none;
 }
 </style>
