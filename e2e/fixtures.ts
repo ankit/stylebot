@@ -58,12 +58,16 @@ class BrowserPool {
     }
 
     // Concurrent fixtures (context, extensionId) can both notice a dead browser in
-    // the same tick — share one relaunch instead of racing two.
-    this.launching ??= this.launch().then(instance => {
-      this.current = instance;
-      this.launching = null;
-      return instance;
-    });
+    // the same tick — share one relaunch instead of racing two. finally, not just
+    // the success .then(), so a failed launch doesn't wedge every future get().
+    this.launching ??= this.launch()
+      .then(instance => {
+        this.current = instance;
+        return instance;
+      })
+      .finally(() => {
+        this.launching = null;
+      });
 
     return this.launching;
   }
