@@ -11,6 +11,8 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const ProgressBarPlugin = require('progress-bar-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 
+const { parseLocaleConfig } = require('./scripts/lib/parse-locale-config');
+
 const getOutputPath = () =>
   process.env.BROWSER
     ? `${__dirname}/${process.env.BROWSER}-dist`
@@ -216,42 +218,7 @@ const config = {
           to: '_locales/[name]/messages.json',
 
           transform: raw => {
-            const content = raw.toString().replace(/^#.*?$/gm, '');
-            const messages = {};
-            const regex = /@([a-z0-9_]+)/gi;
-
-            let match;
-
-            while ((match = regex.exec(content))) {
-              const messageName = match[1];
-              const messageStart = match.index + match[0].length;
-
-              let messageEnd = content.indexOf('@', messageStart);
-
-              if (messageEnd < 0) {
-                messageEnd = content.length;
-              }
-
-              const message = content
-                .substring(messageStart, messageEnd)
-                .trim();
-
-              messages[messageName] = {
-                message,
-              };
-
-              const placeholderMatches = [...message.matchAll(/\$([^$]+)\$/g)];
-
-              if (placeholderMatches.length > 0) {
-                messages[messageName].placeholders = {};
-
-                placeholderMatches.forEach(m => {
-                  messages[messageName].placeholders[m[1]] = {
-                    content: '$1',
-                  };
-                });
-              }
-            }
+            const { messages } = parseLocaleConfig(raw.toString());
 
             return JSON.stringify(messages, null, 2);
           },

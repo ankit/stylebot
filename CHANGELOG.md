@@ -1,3 +1,9 @@
+## Version 3.2.4 (September 2026)
+
+- Fix CSS autocomplete and color swatches not working in the code editor (#921)
+- Fix Readability being unable to be turned off on non-article pages (#915)
+- Fix Readability toggle in the popup not working with multiple windows open (#913)
+
 ## Version 3.2.3 (September 2026)
 
 - Fix injected CSS losing !important cascade priority (#896)
