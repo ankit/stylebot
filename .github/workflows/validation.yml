@@ -36,3 +36,6 @@ jobs:
 
       - name: Test
         run: yarn test
+
+      - name: Validate locales
+        run: yarn validate-locales
