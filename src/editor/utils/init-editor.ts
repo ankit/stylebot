@@ -16,10 +16,6 @@ Vue.mixin({
   },
 });
 
-// Google's CDN @import can't be used here — this stylesheet is injected
-// into the host page's own document (via the shadow root), so its font
-// fetch is subject to THAT page's CSP, not the extension's. Self-hosted
-// files loaded through chrome.runtime.getURL() sidestep that entirely.
 const SELF_HOSTED_FONTS = [
   { family: 'Fira Code', file: 'fira-code', weights: [400, 500, 600] },
   { family: 'Geist', file: 'geist', weights: [400, 500, 600, 700] },
