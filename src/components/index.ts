@@ -22,3 +22,4 @@ export { default as SCard } from './SCard.vue';
 export { default as SCountBadge } from './SCountBadge.vue';
 export { default as SSlider } from './SSlider.vue';
 export { default as SChip } from './SChip.vue';
+export { default as STooltip } from './STooltip.vue';

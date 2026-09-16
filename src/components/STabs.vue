@@ -2,36 +2,46 @@
   <div ref="root" class="tabs" role="tablist">
     <span class="tab-indicator" :class="{ ready }" :style="indicatorStyle" />
 
-    <button
+    <s-tooltip
       v-for="tab in tabs"
       ref="tabButtons"
       :key="tab.value"
-      type="button"
-      class="tab"
-      :class="{ active: tab.value === value }"
-      :disabled="tab.disabled"
-      role="tab"
-      :aria-selected="tab.value === value"
-      :title="tab.title"
-      @click="$emit('change', tab.value)"
+      :text="tab.title"
+      :shortcut="tab.shortcut"
     >
-      {{ tab.label }}
-    </button>
+      <button
+        type="button"
+        class="tab"
+        :class="{ active: tab.value === value }"
+        :disabled="tab.disabled"
+        role="tab"
+        :aria-selected="tab.value === value"
+        @click="$emit('change', tab.value)"
+      >
+        {{ tab.label }}
+      </button>
+    </s-tooltip>
   </div>
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from 'vue';
+import STooltip from './STooltip.vue';
 
 type Tab = {
   value: string | number;
   label: string;
   title?: string;
+  shortcut?: string;
   disabled?: boolean;
 };
 
 export default Vue.extend({
   name: 'STabs',
+
+  components: {
+    STooltip,
+  },
 
   model: {
     prop: 'value',
@@ -99,9 +109,9 @@ export default Vue.extend({
 
   methods: {
     measure(): void {
-      const buttons = this.$refs.tabButtons as HTMLElement[] | undefined;
+      const buttons = this.$refs.tabButtons as Vue[] | undefined;
       const index = this.tabs.findIndex(tab => tab.value === this.value);
-      const active = buttons?.[index];
+      const active = buttons?.[index]?.$el as HTMLElement | undefined;
 
       if (!active) {
         this.indicatorWidth = 0;

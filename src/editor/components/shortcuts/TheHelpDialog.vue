@@ -4,9 +4,11 @@
       <div class="header-row">
         <heading id="help-dialog-title" as="h1" size="md">{{ t('keyboard_shortcuts') }}</heading>
 
-        <icon-button :size="26" :title="t('close')" @click="close">
-          <icon-x :size="18" />
-        </icon-button>
+        <s-tooltip :text="t('close')">
+          <icon-button :size="26" @click="close">
+            <icon-x :size="18" />
+          </icon-button>
+        </s-tooltip>
       </div>
 
       <div class="section">
@@ -55,7 +57,7 @@
           </div>
 
           <div class="row">
-            <s-text class="row-label">{{ t('set_magic_mode') }}</s-text>
+            <s-text class="row-label">{{ t('set_presets_mode') }}</s-text>
             <shortcut-chip small class="row-chip" :value="editorCommands.magic" />
           </div>
 
@@ -101,7 +103,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { Heading, IconButton, ShortcutChip, SDialog, SText } from '@stylebot/components';
+import { Heading, IconButton, ShortcutChip, SDialog, SText, STooltip } from '@stylebot/components';
 import { IconX } from '@stylebot/icons';
 import { StylebotCommands, StylebotEditorCommands } from '@stylebot/types';
 
@@ -116,6 +118,7 @@ export default Vue.extend({
     ShortcutChip,
     SDialog,
     SText,
+    STooltip,
     IconX,
   },
 

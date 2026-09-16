@@ -1,27 +1,33 @@
 <template>
   <div class="basic-editor-actions">
-    <s-button class="action-button hide-button" :class="{ active: isHidden }" :disabled="disabled" @click="toggleHidden">
-      <eye-off-icon :size="12" />
-      {{ t('hide') }}
-    </s-button>
+    <s-tooltip :text="hideTooltipText" :shortcut="editorCommands.hide">
+      <s-button class="action-button hide-button" :class="{ active: isHidden }" :disabled="disabled" @click="toggleHidden">
+        <eye-off-icon :size="12" />
+        {{ t('hide') }}
+      </s-button>
+    </s-tooltip>
 
-    <s-button class="action-button" :disabled="disabled" @click="reset">
-      {{ t('reset') }}
-    </s-button>
+    <s-tooltip :text="t('reset_style_description')">
+      <s-button class="action-button" :disabled="resetDisabled" @click="reset">
+        {{ t('reset') }}
+      </s-button>
+    </s-tooltip>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import { Declaration } from 'postcss';
-import { SButton } from '@stylebot/components';
+import { SButton, STooltip } from '@stylebot/components';
 import { EyeOffIcon } from '@stylebot/icons';
+import { StylebotEditorCommands } from '@stylebot/types';
 
 export default Vue.extend({
   name: 'TheBasicEditorActions',
 
   components: {
     SButton,
+    STooltip,
     EyeOffIcon,
   },
 
@@ -41,6 +47,19 @@ export default Vue.extend({
 
     disabled(): boolean {
       return !this.$store.state.activeSelector;
+    },
+
+    // Nothing to reset until the active selector actually has a rule.
+    resetDisabled(): boolean {
+      return this.disabled || !this.$store.getters.activeRule;
+    },
+
+    editorCommands(): StylebotEditorCommands {
+      return this.$store.state.editorCommands;
+    },
+
+    hideTooltipText(): string {
+      return this.isHidden ? this.t('show_selected_element') : this.t('hide_selected_element');
     },
   },
 

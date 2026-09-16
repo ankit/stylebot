@@ -2,33 +2,44 @@
   <div ref="root" class="segmented" :class="{ fit }" role="group">
     <span class="segment-indicator" :class="{ ready }" :style="indicatorStyle" />
 
-    <button
+    <s-tooltip
       v-for="option in options"
       ref="segments"
       :key="option.value"
-      type="button"
-      class="segment"
-      :class="{ active: option.value === value }"
-      :disabled="disabled"
-      :title="option.title"
-      @click="$emit('change', option.value)"
+      :grow="!fit"
+      :text="option.title"
+      :shortcut="option.shortcut"
     >
-      <slot name="option" :option="option">{{ option.label }}</slot>
-    </button>
+      <button
+        type="button"
+        class="segment"
+        :class="{ active: option.value === value }"
+        :disabled="disabled"
+        @click="$emit('change', option.value)"
+      >
+        <slot name="option" :option="option">{{ option.label }}</slot>
+      </button>
+    </s-tooltip>
   </div>
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from 'vue';
+import STooltip from './STooltip.vue';
 
 type Option = {
   value: string | number;
   label?: string;
   title?: string;
+  shortcut?: string;
 };
 
 export default Vue.extend({
   name: 'SSegmentedControl',
+
+  components: {
+    STooltip,
+  },
 
   model: {
     prop: 'value',
@@ -108,9 +119,9 @@ export default Vue.extend({
 
   methods: {
     measure(): void {
-      const segments = this.$refs.segments as HTMLElement[] | undefined;
+      const segments = this.$refs.segments as Vue[] | undefined;
       const index = this.options.findIndex(option => option.value === this.value);
-      const active = segments?.[index];
+      const active = segments?.[index]?.$el as HTMLElement | undefined;
 
       if (!active) {
         return;
@@ -160,7 +171,6 @@ export default Vue.extend({
 
 .segment {
   position: relative;
-  flex: 1;
   text-align: center;
   white-space: nowrap;
   padding: 4px 0;

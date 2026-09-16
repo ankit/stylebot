@@ -1,9 +1,11 @@
 <template>
   <anchored-menu class="color-palette-picker">
     <template #trigger="{ toggle }">
-      <icon-button title="Color palette" @click="toggle">
-        <droplet-icon />
-      </icon-button>
+      <s-tooltip text="Color palette">
+        <icon-button @click="toggle">
+          <droplet-icon />
+        </icon-button>
+      </s-tooltip>
     </template>
 
     <template #default="{ close }">
@@ -22,7 +24,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { AnchoredMenu, SMenu, MenuItem, IconButton } from '@stylebot/components';
+import { AnchoredMenu, SMenu, MenuItem, IconButton, STooltip } from '@stylebot/components';
 import { DropletIcon } from '@stylebot/icons';
 
 export default Vue.extend({
@@ -33,6 +35,7 @@ export default Vue.extend({
     SMenu,
     MenuItem,
     IconButton,
+    STooltip,
     DropletIcon,
   },
 

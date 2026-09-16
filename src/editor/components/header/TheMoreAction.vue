@@ -1,9 +1,11 @@
 <template>
   <anchored-menu class="more-action-anchor">
     <template #trigger="{ toggle }">
-      <icon-button :size="20" :title="t('view_options')" @click="toggle">
-        <more-icon :size="20" />
-      </icon-button>
+      <s-tooltip :text="t('view_options')">
+        <icon-button :size="20" @click="toggle">
+          <more-icon :size="20" />
+        </icon-button>
+      </s-tooltip>
     </template>
 
     <template #default="{ close }">
@@ -51,6 +53,7 @@ import {
   SMenu,
   MenuItem,
   IconButton,
+  STooltip,
   ToggleSwitch,
   SSegmentedControl,
   SText,
@@ -69,6 +72,7 @@ export default Vue.extend({
     SMenu,
     MenuItem,
     IconButton,
+    STooltip,
     ToggleSwitch,
     SSegmentedControl,
     SText,
@@ -85,17 +89,19 @@ export default Vue.extend({
       return this.$store.state.editorCommands;
     },
 
-    dockOptions(): Array<{ value: string; label: string; title: string }> {
+    dockOptions(): Array<{ value: string; label: string; title: string; shortcut: string }> {
       return [
         {
           value: 'left',
           label: this.t('dock_to_left'),
-          title: `${this.t('dock_to_left')} (${this.editorCommands.dockLeft})`,
+          title: this.t('dock_to_left'),
+          shortcut: this.editorCommands.dockLeft,
         },
         {
           value: 'right',
           label: this.t('dock_to_right'),
-          title: `${this.t('dock_to_right')} (r)`,
+          title: this.t('dock_to_right'),
+          shortcut: 'r',
         },
       ];
     },

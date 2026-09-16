@@ -1,19 +1,21 @@
 <template>
-  <button
-    type="button"
-    class="stylebot-inspector"
-    :class="{ active }"
-    :disabled="disabled"
-    :title="`${t('inspect_description')} (i)`"
-    @click="toggle"
-  >
-    <cursor-icon />
-  </button>
+  <s-tooltip :text="t('inspect_description')" shortcut="i">
+    <button
+      type="button"
+      class="stylebot-inspector"
+      :class="{ active }"
+      :disabled="disabled"
+      @click="toggle"
+    >
+      <cursor-icon />
+    </button>
+  </s-tooltip>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 
+import { STooltip } from '@stylebot/components';
 import { CursorIcon } from '@stylebot/icons';
 import { Highlighter } from '@stylebot/highlighter';
 import { StylebotEditingMode } from '@stylebot/types';
@@ -23,6 +25,7 @@ export default Vue.extend({
 
   components: {
     CursorIcon,
+    STooltip,
   },
 
   data(): {
