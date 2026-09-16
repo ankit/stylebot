@@ -32,11 +32,11 @@ test('picking an element and editing a color in basic mode applies live and pers
   // needed before picking an element on the page.
   await expect(editorRoot.locator('.stylebot-inspector')).toHaveClass(/active/);
   await page.locator('h1').click({ force: true });
-  await expect(editorRoot.locator('.css-selector-input')).toHaveValue(/h1$/);
+  await expect(editorRoot.locator('.autocomplete-chips .chip').first()).toHaveText(/h1$/);
 
-  await editorRoot.getByRole('button', { name: 'Colors', exact: true }).click();
-
-  const colorInput = editorRoot.locator('.color-picker .color-text-input').first();
+  // A freshly picked element with no existing declarations auto-expands the
+  // Text panel, which now hosts the text-color picker (see TheTextProperties.vue).
+  const colorInput = editorRoot.locator('.color-picker .color-hex').first();
   await colorInput.fill('#ff0080');
   await colorInput.blur();
 

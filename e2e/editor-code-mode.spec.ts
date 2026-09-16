@@ -66,7 +66,6 @@ test('typing a CSS property offers autocomplete and a color value shows a swatch
 
   await page.keyboard.press('Escape');
   await page.keyboard.type('lay: none; color: red; }');
-  await page.keyboard.press('Escape');
 
   await expect(monaco.locator('.colorpicker-color-decoration')).toBeVisible();
 });

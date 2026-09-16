@@ -87,7 +87,7 @@ export const switchEditorMode = async (
   mode: keyof typeof MODE_LABEL
 ): Promise<void> => {
   await editorRoot
-    .getByRole('button', { name: MODE_LABEL[mode], exact: true })
+    .getByRole('tab', { name: MODE_LABEL[mode], exact: true })
     .click();
 };
 
