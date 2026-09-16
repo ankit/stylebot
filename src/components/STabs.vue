@@ -109,17 +109,25 @@ export default Vue.extend({
 
   methods: {
     measure(): void {
+      const root = this.$refs.root as HTMLElement | undefined;
       const buttons = this.$refs.tabButtons as Vue[] | undefined;
       const index = this.tabs.findIndex(tab => tab.value === this.value);
       const active = buttons?.[index]?.$el as HTMLElement | undefined;
 
-      if (!active) {
+      if (!root || !active) {
         this.indicatorWidth = 0;
         return;
       }
 
-      this.indicatorLeft = active.offsetLeft;
-      this.indicatorWidth = active.offsetWidth;
+      // getBoundingClientRect (sub-pixel) rather than offsetLeft/offsetWidth
+      // (integer-rounded) — the rounding error is small per tab but
+      // accumulates across preceding siblings, visibly misaligning the
+      // indicator under tabs further to the right.
+      const rootRect = root.getBoundingClientRect();
+      const activeRect = active.getBoundingClientRect();
+
+      this.indicatorLeft = activeRect.left - rootRect.left;
+      this.indicatorWidth = activeRect.width;
       this.ready = true;
     },
   },
@@ -165,7 +173,7 @@ export default Vue.extend({
   color: var(--text-muted);
   outline: none;
   cursor: pointer;
-  transition: color 0.15s ease, font-weight 0.15s ease;
+  transition: color 0.15s ease;
 
   &:hover:not(:disabled):not(.active) {
     color: var(--text-primary);
