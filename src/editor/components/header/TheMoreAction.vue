@@ -2,7 +2,7 @@
   <anchored-menu class="more-action-anchor">
     <template #trigger="{ toggle }">
       <s-tooltip :text="t('view_options')">
-        <icon-button :size="20" @click="toggle">
+        <icon-button :size="20" :aria-label="t('view_options')" @click="toggle">
           <more-icon :size="20" />
         </icon-button>
       </s-tooltip>

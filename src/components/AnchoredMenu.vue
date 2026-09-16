@@ -58,9 +58,9 @@ export default Vue.extend({
         this.previouslyFocused = this.activeElement();
         this.positioned = false;
         document.addEventListener('mousedown', this.onDocMousedown);
-        // Capture phase so Escape closes this menu before the editor's
-        // global keydown handler (bubble phase) treats it as "close editor".
-        document.addEventListener('keydown', this.onDocKeydown, true);
+        // window, not document: capture on window always fires before the
+        // editor's own capture-phase document listener, regardless of attach order.
+        window.addEventListener('keydown', this.onDocKeydown, true);
         this.$emit('open');
         this.$nextTick(() => {
           this.position();
@@ -70,7 +70,7 @@ export default Vue.extend({
         });
       } else {
         document.removeEventListener('mousedown', this.onDocMousedown);
-        document.removeEventListener('keydown', this.onDocKeydown, true);
+        window.removeEventListener('keydown', this.onDocKeydown, true);
         this.$emit('close');
 
         if (!this.skipRestoreFocus) {
@@ -83,7 +83,7 @@ export default Vue.extend({
 
   beforeDestroy() {
     document.removeEventListener('mousedown', this.onDocMousedown);
-    document.removeEventListener('keydown', this.onDocKeydown, true);
+    window.removeEventListener('keydown', this.onDocKeydown, true);
   },
 
   methods: {

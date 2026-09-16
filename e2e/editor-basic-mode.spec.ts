@@ -45,3 +45,29 @@ test('picking an element and editing a color in basic mode applies live and pers
   await page.reload();
   await expect(page.locator('h1')).toHaveCSS('color', 'rgb(255, 0, 128)');
 });
+
+test('Escape closes an open header dropdown instead of the whole editor', async ({
+  context,
+  openPopup,
+}) => {
+  await context.route('http://localhost/**', route =>
+    route.fulfill({ contentType: 'text/html', body: PAGE_HTML })
+  );
+
+  const page = await context.newPage();
+  await page.goto('http://localhost/');
+
+  const editorRoot = await openEditor(page, openPopup);
+
+  await editorRoot.getByRole('button', { name: 'Options' }).click();
+  const menu = editorRoot.locator('.more-menu');
+  await expect(menu).toBeVisible();
+
+  await page.keyboard.press('Escape');
+  await expect(menu).toBeHidden();
+  // The editor itself must stay open — only the dropdown should have closed.
+  await expect(editorRoot.locator('.stylebot-content')).toHaveCount(1);
+
+  await page.keyboard.press('Escape');
+  await expect(editorRoot.locator('.stylebot-content')).toHaveCount(0);
+});
