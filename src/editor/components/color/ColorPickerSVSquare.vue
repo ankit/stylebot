@@ -98,6 +98,8 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
+@import './color-picker-mixins';
+
 .sv-square {
   position: relative;
   height: 132px;

@@ -10,7 +10,12 @@
         :style="{ background: color }"
         @click="$emit('select', color)"
       >
-        <check-icon v-if="color === value" :size="12" class="swatch-check" />
+        <check-icon
+          v-if="color === value"
+          :size="12"
+          class="swatch-check"
+          :style="{ color: checkMarkColor(color) }"
+        />
       </button>
     </div>
 
@@ -30,7 +35,7 @@ import { SText } from '@stylebot/components';
 import { CheckIcon } from '@stylebot/icons';
 import { RoleColorGroups } from '@stylebot/css';
 import ColorPickerRecent from './ColorPickerRecent.vue';
-import { needsHairline } from '../../utils/hsv-color';
+import { needsHairline, checkMarkColor } from '../../utils/hsv-color';
 
 export default Vue.extend({
   name: 'ColorPickerFirstTab',
@@ -59,9 +64,7 @@ export default Vue.extend({
   },
 
   computed: {
-    // Text and surface colors are just different CSS properties on the same
-    // site — splitting them into separate rows added structure without
-    // adding information, so they're deduped into one flat row.
+    // Text/surface are just different properties on the same site — dedupe into one flat row.
     usedColors(): Array<string> {
       return Array.from(new Set([...this.colors.text, ...this.colors.surface]));
     },
@@ -69,11 +72,14 @@ export default Vue.extend({
 
   methods: {
     needsHairline,
+    checkMarkColor,
   },
 });
 </script>
 
 <style lang="scss" scoped>
+@import './color-picker-mixins';
+
 .first-tab {
   padding: 12px 14px;
 }

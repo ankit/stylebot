@@ -38,7 +38,12 @@
             :style="{ background: color }"
             @click="$emit('select', color)"
           >
-            <check-icon v-if="color === value" :size="14" class="swatch-check" />
+            <check-icon
+              v-if="color === value"
+              :size="14"
+              class="swatch-check"
+              :style="{ color: checkMarkColor(color) }"
+            />
           </button>
         </div>
       </div>
@@ -54,30 +59,30 @@
         :style="{ background: color }"
         @click="$emit('select', color)"
       >
-        <check-icon v-if="color === value" :size="14" class="swatch-check" />
+        <check-icon
+          v-if="color === value"
+          :size="14"
+          class="swatch-check"
+          :style="{ color: checkMarkColor(color) }"
+        />
       </button>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-// The design spec's 6-set dropdown, minus Recent (cross-site history, now
-// in the Already-used tab) and flattened into one search/select rather than
-// a set picker with a scheme picker nested inside it — the "closest scheme
-// to this page" matching heuristic is still a follow-up phase.
+// Flattened into one search/select rather than a nested set+scheme picker.
 import Vue from 'vue';
 import { SAutocomplete, SText, MenuItem } from '@stylebot/components';
 import { CheckIcon } from '@stylebot/icons';
 import { colorSchemes } from '../../utils/color-schemes';
 import { neutralRamps, hueGrid, readingRow, darkModeRow, ColorRamp } from '../../utils/color-sets';
-import { needsHairline } from '../../utils/hsv-color';
+import { needsHairline, checkMarkColor } from '../../utils/hsv-color';
 
 type PaletteOption = { key: string; label: string; preview: Array<string> };
 type PaletteOptionMeta = { key: string; labelKey: string; preview: Array<string> };
 
-// Translated once in data() below (via this.t()) rather than at module
-// scope, so this never calls chrome.i18n directly at import time — Jest
-// mocks `t` per-component rather than providing a global `chrome`.
+// Translated in data() via this.t(), not at module scope — Jest mocks t() per-component, not a global chrome.
 const SET_OPTION_META: Array<PaletteOptionMeta> = [
   { key: 'neutrals', labelKey: 'color_picker_set_neutrals', preview: neutralRamps[0].colors.slice(0, 6) },
   { key: 'hues', labelKey: 'color_picker_set_hues', preview: hueGrid[2].slice(0, 6) },
@@ -165,6 +170,7 @@ export default Vue.extend({
 
   methods: {
     needsHairline,
+    checkMarkColor,
 
     selectOption(option: PaletteOption): void {
       this.activeKey = option.key;
@@ -176,6 +182,8 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
+@import './color-picker-mixins';
+
 .palette {
   padding: 12px 14px;
   display: flex;

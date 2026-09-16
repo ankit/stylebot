@@ -11,7 +11,12 @@
         :style="{ background: color }"
         @click="$emit('select', color)"
       >
-        <check-icon v-if="color === value" :size="12" class="swatch-check" />
+        <check-icon
+          v-if="color === value"
+          :size="12"
+          class="swatch-check"
+          :style="{ color: checkMarkColor(color) }"
+        />
       </button>
     </div>
   </div>
@@ -21,7 +26,7 @@
 import Vue, { PropType } from 'vue';
 import { SText } from '@stylebot/components';
 import { CheckIcon } from '@stylebot/icons';
-import { needsHairline } from '../../utils/hsv-color';
+import { needsHairline, checkMarkColor } from '../../utils/hsv-color';
 
 export default Vue.extend({
   name: 'ColorPickerRecent',
@@ -45,11 +50,14 @@ export default Vue.extend({
 
   methods: {
     needsHairline,
+    checkMarkColor,
   },
 });
 </script>
 
 <style lang="scss" scoped>
+@import './color-picker-mixins';
+
 .recent-row {
   display: flex;
   flex-direction: column;
@@ -66,7 +74,7 @@ export default Vue.extend({
   gap: 4px;
 }
 
-// Matches the role rows above it and the Palette tab's grid — 36px squares.
+// Matches the used-colors row above it and the Palette tab's grid — 36px squares.
 .swatch {
   @include button-reset;
   width: 36px;

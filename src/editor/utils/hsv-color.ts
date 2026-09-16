@@ -29,3 +29,15 @@ export const needsHairline = (value: string): boolean => {
   const color = tinycolor(value);
   return color.isValid() && color.getBrightness() > HAIRLINE_BRIGHTNESS_THRESHOLD;
 };
+
+// Selection checkmark color for a swatch — picks whichever of white/ink
+// actually has readable contrast against this specific color, rather than
+// needsHairline's coarser threshold (tuned for a border, not an icon).
+export const checkMarkColor = (value: string): string => {
+  const color = tinycolor(value);
+  if (!color.isValid()) {
+    return '#fff';
+  }
+
+  return tinycolor.mostReadable(color, ['#ffffff', '#191b1f']).toHexString();
+};

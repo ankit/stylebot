@@ -44,6 +44,8 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
+@import './color-picker-mixins';
+
 .alpha-slider-row {
   display: flex;
   align-items: center;

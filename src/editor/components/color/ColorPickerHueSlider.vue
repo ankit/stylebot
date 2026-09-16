@@ -37,6 +37,8 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
+@import './color-picker-mixins';
+
 .hue-slider-row {
   display: flex;
   align-items: center;
