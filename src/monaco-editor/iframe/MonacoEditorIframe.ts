@@ -105,6 +105,13 @@ class MonacEditorIframe {
       : 'custom-light';
   }
 
+  setTheme(theme: 'light' | 'dark'): void {
+    // Keeps the pre-Monaco-load background (see theme-init.js) in sync too,
+    // in case the parent's theme changes again before the editor is ready.
+    document.documentElement.classList.toggle('theme-dark', theme === 'dark');
+    window.monaco.editor.setTheme(theme === 'dark' ? 'custom-dark' : 'custom-light');
+  }
+
   configureDiagnostics(): void {
     // Both fire on normal Stylebot usage (empty rules on element pick,
     // single-browser vendor-prefixed hacks) rather than real mistakes.
@@ -242,6 +249,8 @@ class MonacEditorIframe {
           );
         } else if (message.data.type === 'stylebotFocusEditor') {
           this.editor.focus();
+        } else if (message.data.type === 'stylebotThemeUpdate') {
+          this.setTheme(message.data.theme);
         }
       }
     );
