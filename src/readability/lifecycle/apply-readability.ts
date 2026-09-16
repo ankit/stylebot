@@ -9,6 +9,7 @@ import { cacheUrl, didUrlChange } from './document-cache';
 import { removeReadability } from './remove-readability';
 import { reportChanged } from './report-changed';
 import { nextGeneration, isStaleGeneration, setPendingRetry } from './state';
+import { getEligibility, markEligible, markIneligible } from './eligibility-cache';
 
 // Client-rendered pages can still be empty right after load — retry a few
 // times before giving up, so hydration has a chance to finish.
@@ -20,6 +21,7 @@ export const RETRY_DELAYS_MS = [300, 600, 1200];
  */
 const startIfEligible = (myGeneration: number): void => {
   if (isBlockedAfterLoad()) {
+    markIneligible(window.location.href);
     removeReadability();
     return;
   }
@@ -37,6 +39,7 @@ const run = async (myGeneration: number, attempt = 0): Promise<void> => {
 
   try {
     await mountReader();
+    markEligible(window.location.href);
     reportChanged();
   } catch (e) {
     if (isStaleGeneration(myGeneration)) {
@@ -48,6 +51,7 @@ const run = async (myGeneration: number, attempt = 0): Promise<void> => {
         setTimeout(() => run(myGeneration, attempt + 1), RETRY_DELAYS_MS[attempt])
       );
     } else {
+      markIneligible(window.location.href);
       removeReadability();
     }
   }
@@ -73,9 +77,22 @@ export const applyReadability = async (forceApply = false): Promise<void> => {
     return;
   }
 
+  const eligibility = forceApply ? null : getEligibility(window.location.href);
+
+  // A known-bad exact URL never gets retried automatically.
+  if (eligibility?.isKnownIneligible) {
+    removeReadability();
+    return;
+  }
+
   const myGeneration = nextGeneration();
 
-  showLoader();
+  // Only paint the loader when we have reason to expect an article: a
+  // forced apply, or a URL shape that's produced one before. Otherwise the
+  // attempt still runs silently, so a new shape can still work and be learned.
+  if (forceApply || eligibility?.matchesKnownPattern) {
+    showLoader();
+  }
 
   scheduleStart(myGeneration);
 };

@@ -32,6 +32,10 @@ session is already inside a worktree.
 
 Always validate UI/extension changes with headless Playwright, not manual/headed browser interaction — the e2e harness in `e2e/fixtures.ts` already loads the real unpacked extension via CDP. Run `yarn test:e2e` (or a targeted Playwright test) to confirm a change works end-to-end before calling it done.
 
+## Commit messages
+
+Use [Conventional Commits](https://www.conventionalcommits.org/) format: `<type>[optional scope]: <description>` (e.g. `fix: correct Firefox extension launch`, `feat(editor): add JS snippet execution`). Common types: `feat`, `fix`, `refactor`, `chore`, `docs`, `test`.
+
 ## Comments
 
 Avoid comments by default. Only add one to state something non-obvious — a hidden constraint, a workaround, a reason that isn't clear from the code itself. Never add comments in CSS. When a comment is warranted, keep it to 1-2 lines max, and use `/* */` for multiline comments.

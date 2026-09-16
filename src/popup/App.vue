@@ -40,8 +40,9 @@
 
       <div class="popup-menu">
         <readability
-          :initial-readability="pageReaderable && readability"
-          :disabled="!pageReaderable"
+          :tab="tab"
+          :initial-readability="readability"
+          :disabled="!pageReaderable && !readability"
           :shortcut="readabilityShortcut"
           @change="readability = $event"
         />
