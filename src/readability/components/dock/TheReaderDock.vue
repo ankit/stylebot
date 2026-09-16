@@ -300,6 +300,10 @@ export default Vue.extend({
   --tooltip-bg: var(--background);
   --tooltip-fg: var(--foreground);
   --tooltip-border: var(--border);
+  --menu-surface: var(--background);
+  --menu-border: var(--border);
+  --menu-shadow: rgb(0 0 0 / 30%);
+  --text-primary: var(--foreground);
 
   * {
     transition: background-color 0.2s ease, color 0.2s ease,
