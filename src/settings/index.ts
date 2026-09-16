@@ -33,6 +33,7 @@ export const defaultOptions: StylebotOptions = {
   },
   appearance: 'system',
   lastColorSet: 'neutrals',
+  lastColorPickerTab: 'already-used',
 };
 
 export const defaultCommands: StylebotCommands = {

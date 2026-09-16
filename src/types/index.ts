@@ -32,6 +32,8 @@ export type StylebotOptions = {
   // a built-in set ('neutrals' | 'hues' | 'reading' | 'dark-mode') or the
   // name of a scheme from colorSchemes in editor/utils/color-schemes.
   lastColorSet: string;
+  // Last tab open in the color picker ('already-used' | 'palette' | 'custom').
+  lastColorPickerTab: string;
 };
 
 export type Style = {

@@ -71,6 +71,9 @@ export default {
     if (!options.lastColorSet) {
       options.lastColorSet = defaultOptions.lastColorSet;
     }
+    if (!options.lastColorPickerTab) {
+      options.lastColorPickerTab = defaultOptions.lastColorPickerTab;
+    }
 
     commit('setOptions', options);
 
@@ -178,6 +181,14 @@ export default {
   ): void {
     setOption('lastColorSet', lastColorSet);
     commit('setOptions', { ...state.options, lastColorSet });
+  },
+
+  setLastColorPickerTab(
+    { state, commit }: { state: State; commit: Commit },
+    lastColorPickerTab: string
+  ): void {
+    setOption('lastColorPickerTab', lastColorPickerTab);
+    commit('setOptions', { ...state.options, lastColorPickerTab });
   },
 
   applyCss(

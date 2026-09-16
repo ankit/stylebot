@@ -115,7 +115,10 @@ export default Vue.extend({
       this.pageColors = getPageColors();
     }
 
-    this.activeTab = this.firstTabDisabled ? 'custom' : 'already-used';
+    const lastTab = this.$store.state.options.lastColorPickerTab as Tab;
+    const canRestoreLastTab = lastTab !== 'already-used' || !this.firstTabDisabled;
+
+    this.activeTab = canRestoreLastTab ? lastTab : this.firstTabDisabled ? 'custom' : 'already-used';
 
     getRecentColors().then(colors => {
       this.recentColors = colors;
@@ -134,6 +137,7 @@ export default Vue.extend({
   methods: {
     setTab(tab: Tab): void {
       this.activeTab = tab;
+      this.$store.dispatch('setLastColorPickerTab', tab);
     },
 
     setColor(color: string): void {
