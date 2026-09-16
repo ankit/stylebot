@@ -29,4 +29,14 @@ export type ParentFocusEditorMessage = {
   type: 'stylebotFocusEditor';
 };
 
-export type ParentMessage = ParentUpdateCssMessage | ParentFocusEditorMessage;
+// Pushed whenever the panel's light/dark appearance changes — the iframe is a
+// separate document, so it can't just re-read the parent's Vuex state.
+export type ParentThemeUpdateMessage = {
+  type: 'stylebotThemeUpdate';
+  theme: 'light' | 'dark';
+};
+
+export type ParentMessage =
+  | ParentUpdateCssMessage
+  | ParentFocusEditorMessage
+  | ParentThemeUpdateMessage;

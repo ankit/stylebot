@@ -41,6 +41,44 @@ test('typing CSS into the code-mode Monaco editor applies live and persists', as
   await expect(page.locator('h1')).toHaveCSS('color', 'rgb(255, 0, 128)');
 });
 
+test('toggling the panel appearance updates the Monaco editor theme immediately', async ({
+  context,
+  extensionId: _extensionId,
+  openPopup,
+}) => {
+  test.slow();
+
+  await context.route('http://localhost/**', route =>
+    route.fulfill({ contentType: 'text/html', body: PAGE_HTML })
+  );
+
+  const page = await context.newPage();
+  await page.goto('http://localhost/');
+
+  const editorRoot = await openEditor(page, openPopup);
+  await switchEditorMode(editorRoot, 'code');
+
+  const monacoBackground = getMonacoFrame(page).locator('.monaco-editor-background');
+  await expect(monacoBackground).toBeVisible();
+
+  // Pin to a known starting mode rather than assuming the test host's own
+  // OS-level color-scheme preference (which "system" would otherwise follow).
+  await editorRoot.getByTitle('Panel appearance').click();
+  await editorRoot.getByRole('menuitem', { name: 'Light' }).click();
+  await expect(monacoBackground).toHaveCSS('background-color', 'rgb(255, 255, 255)');
+
+  await editorRoot.getByTitle('Panel appearance').click();
+  await editorRoot.getByRole('menuitem', { name: 'Dark' }).click();
+
+  // Without a reload — the editor iframe stays mounted throughout.
+  await expect(monacoBackground).toHaveCSS('background-color', 'rgb(30, 30, 30)');
+
+  await editorRoot.getByTitle('Panel appearance').click();
+  await editorRoot.getByRole('menuitem', { name: 'Light' }).click();
+
+  await expect(monacoBackground).toHaveCSS('background-color', 'rgb(255, 255, 255)');
+});
+
 test('typing a CSS property offers autocomplete and a color value shows a swatch', async ({
   context,
   extensionId: _extensionId,
