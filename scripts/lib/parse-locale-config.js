@@ -1,8 +1,5 @@
-// Parses Stylebot's `src/_locales/*.config` authoring format into the Chrome
-// extension `_locales/<locale>/messages.json` shape. Shared by the webpack
-// build (which needs `messages`) and scripts/validate-locales.mjs (which also
-// needs `duplicateKeys`, since a repeated `@key` silently overwrites the
-// earlier entry below).
+// Shared by the webpack build and validate-locales.mjs; duplicateKeys exists
+// because a repeated `@key` below silently overwrites the earlier entry.
 function parseLocaleConfig(raw) {
   const content = raw.replace(/^#.*?$/gm, '');
   const messages = {};

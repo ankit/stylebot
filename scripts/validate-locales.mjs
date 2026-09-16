@@ -1,11 +1,5 @@
-// Validates src/_locales/*.config against the same parsing rules the webpack
-// build uses (scripts/lib/parse-locale-config.js), plus cross-checks against
-// how message keys are actually referenced from source. Run via `yarn
-// validate-locales`; wired into CI in .github/workflows/validation.yml.
-//
-// Exits 1 if any ERROR-level finding exists. Missing translations in
-// non-base locales are reported as warnings only, since translation lag is
-// expected for a community-translated extension.
+// Cross-checks src/_locales/*.config against how message keys are referenced
+// from source. Exits 1 on errors; missing translations are warnings only.
 
 import { readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
@@ -22,9 +16,7 @@ const manifestPath = path.join(rootDir, 'src/extension/manifest.json');
 
 const KEY_PATTERN = /^[a-z][a-z0-9_]*$/;
 
-// Returns the text of a call's first argument, up to the top-level `,` or
-// `)` that ends it — e.g. for `t(a ? 'x' : 'y', [z])` starting right after
-// the opening `(`, returns `a ? 'x' : 'y'`.
+// Returns a call's first argument text, e.g. `a ? 'x' : 'y'` for `t(a ? 'x' : 'y', [z])`.
 function extractFirstArg(text, startIdx) {
   let depth = 0;
 
