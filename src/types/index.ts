@@ -28,9 +28,7 @@ export type StylebotOptions = {
   mode: StylebotEditingMode;
   basicModeSections: StylebotBasicModeSections;
   appearance: StylebotAppearance;
-  // Key of the option last picked in the color picker's Palette tab — either
-  // a built-in set ('neutrals' | 'hues' | 'reading' | 'dark-mode') or the
-  // name of a scheme from colorSchemes in editor/utils/color-schemes.
+  // Key of the last-picked Palette option — a built-in set, or a scheme name from color-schemes.ts.
   lastColorSet: string;
   // Last tab open in the color picker ('already-used' | 'palette' | 'custom').
   lastColorPickerTab: string;

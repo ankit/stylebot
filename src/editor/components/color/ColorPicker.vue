@@ -147,9 +147,7 @@ export default Vue.extend({
       this.$nextTick(() => {
         this.positionPopover();
 
-        // Content height varies a lot by active tab (Custom's sliders vs.
-        // Palette's search+grid vs. Already-used's role rows), so re-clamp
-        // on any resize rather than only once at open.
+        // Content height varies by tab, so re-clamp on any resize, not just at open.
         const popover = this.$refs.popover as HTMLElement | undefined;
         if (popover) {
           this.popoverResizeObserver = new ResizeObserver(() => this.positionPopover());
@@ -173,17 +171,8 @@ export default Vue.extend({
       }, 0);
     },
 
-    // The popover is much wider than the editor dock, and the dock itself
-    // scrolls (`overflow: auto`) — a normally-flowed `position: absolute`
-    // popover gets clipped by that ancestor the moment it extends past the
-    // dock's own edge, no matter how it's offset. `position: fixed` (set in
-    // the scoped style below) is meant to escape that clipping, but the
-    // dock is wrapped in `vue-draggable-resizable`, which positions itself
-    // via a CSS `transform` — that turns any descendant's `position: fixed`
-    // into "fixed relative to that transformed ancestor" instead of the
-    // true viewport (per the CSS spec). Rather than hunting for that
-    // ancestor, render once with our naive viewport-space guess, measure
-    // where it actually landed, and correct the drift.
+    // vue-draggable-resizable's CSS transform on the dock breaks position:
+    // fixed — render our best guess, then measure and correct the drift.
     positionPopover(): void {
       const popover = this.$refs.popover as HTMLElement | undefined;
       const field = this.$el.querySelector('.color-field') as HTMLElement | null;
@@ -199,9 +188,8 @@ export default Vue.extend({
         window.innerWidth - popover.offsetWidth - margin
       );
 
-      // Prefer below the trigger; flip above it if it doesn't fit below but
-      // does fit above (mirrors AnchoredMenu's own flip-up rule), then clamp
-      // either way so a very short viewport still keeps it on-screen.
+      // Flip above the trigger if it doesn't fit below but does fit above
+      // (mirrors AnchoredMenu), clamped either way to stay on-screen.
       const spaceBelow = window.innerHeight - fieldRect.bottom;
       const spaceAbove = fieldRect.top;
       const flipUp = popover.offsetHeight + 6 + margin > spaceBelow && spaceAbove > spaceBelow;
@@ -295,9 +283,8 @@ export default Vue.extend({
   flex: 1;
   min-width: 0;
   padding: 1px 8px 0;
-  // Digits have no descenders, so a mathematically-centered line box still
-  // reads as sitting slightly high — nudge down 1px against the field's
-  // inner height (27px - 2px border) to optically center it instead.
+  // Digits have no descenders, so a mathematically-centered box still reads
+  // high — nudge down 1px to optically center it instead.
   line-height: 24px;
   font-family: var(--font-mono);
   font-size: 12.5px;

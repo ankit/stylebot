@@ -119,10 +119,7 @@ export default Vue.extend({
         return;
       }
 
-      // getBoundingClientRect (sub-pixel) rather than offsetLeft/offsetWidth
-      // (integer-rounded) — the rounding error is small per tab but
-      // accumulates across preceding siblings, visibly misaligning the
-      // indicator under tabs further to the right.
+      // getBoundingClientRect, not offsetLeft/offsetWidth — integer rounding accumulates across siblings.
       const rootRect = root.getBoundingClientRect();
       const activeRect = active.getBoundingClientRect();
 

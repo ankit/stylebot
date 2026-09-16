@@ -23,9 +23,7 @@ const tally = (counts: Map<string, number>, color: string): void => {
   counts.set(color, (counts.get(color) || 0) + 1);
 };
 
-// Stylebot's own editor UI is mounted into an open shadow root
-// (see init-editor.ts), so a plain querySelectorAll('*') on the page never
-// descends into it and never samples the editor's own chrome.
+// Editor UI lives in its own open shadow root, so querySelectorAll('*') never samples it.
 export const getPageColors = (root: ParentNode = document): RoleColorGroups => {
   const textCounts = new Map<string, number>();
   const surfaceCounts = new Map<string, number>();

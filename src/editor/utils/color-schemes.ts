@@ -3,9 +3,7 @@ export type ColorScheme = {
   colors: Array<string>;
 };
 
-// Canonical published palettes for each theme (not the design doc's partial
-// 6-8 "headline" values — those only cover Dracula in full, so the rest are
-// backfilled here from each theme's own official/public color list).
+// Canonical published palettes — the design doc only had full values for Dracula.
 export const colorSchemes: Array<ColorScheme> = [
   {
     name: 'Dracula',

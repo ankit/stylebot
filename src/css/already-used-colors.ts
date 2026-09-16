@@ -14,9 +14,7 @@ const ROLE_CAP = 4;
 const COLOR_FUNCTION_REGEX = /\b(?:rgb|rgba|hsl|hsla)\([^)]*\)/i;
 const HEX_COLOR_REGEX = /#[0-9a-fA-F]{3,8}\b/;
 
-// Mirrors editor/utils/css-value.ts's extractColor — duplicated rather than
-// imported so src/css/ (a lower-level module editor/utils depends on) never
-// depends back on src/editor/utils/.
+// Mirrors editor/utils/css-value.ts's extractColor, duplicated to avoid a reverse dependency.
 const extractColorFromShorthand = (value: string): string => {
   const fn = value.match(COLOR_FUNCTION_REGEX);
   if (fn) {

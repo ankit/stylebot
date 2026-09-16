@@ -36,9 +36,7 @@ export const neutralRamps: Array<ColorRamp> = [
   },
 ];
 
-// Eight hues by five lightnesses. Hue is held per column (red, orange,
-// yellow, green, teal, blue, violet, pink), lightness per row, row 1
-// lightest to row 5 darkest.
+// Eight hues per column, five lightnesses per row, row 1 lightest to row 5 darkest.
 export const hueGrid: Array<Array<string>> = [
   ['#fde8e6', '#fdeade', '#fcf3d9', '#e3f2de', '#dcf0ee', '#deeafa', '#e7e3f7', '#f9e2ef'],
   ['#f6b4ad', '#f7bd93', '#f2dc90', '#aed9a4', '#9fd6d0', '#a6c6f0', '#b9afe4', '#eeadd1'],
@@ -59,9 +57,7 @@ export const readingRow: Array<string> = [
   '#1b1714',
 ];
 
-// The one set that reverses direction — dark to light — since its first
-// steps are page/card/raised surfaces and its last are muted/secondary/
-// primary text.
+// Reverses direction (dark to light): starts at page/card surfaces, ends at primary text.
 export const darkModeRow: Array<string> = [
   '#0b0d10',
   '#14171c',

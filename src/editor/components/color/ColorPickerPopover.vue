@@ -77,10 +77,7 @@ export default Vue.extend({
   } {
     return {
       activeTab: 'already-used',
-      // A snapshot, not a live store getter — this tab must not reshuffle
-      // out from under the user while they're still dragging/typing a color
-      // for the very property these colors are drawn from. Only refreshed
-      // when the popover itself re-mounts (i.e. next time it's opened).
+      // A snapshot, not a live getter — must not reshuffle while the user is still picking.
       alreadyUsedColors: EMPTY_COLORS,
       pageColors: EMPTY_COLORS,
       recentColors: [],
@@ -126,9 +123,7 @@ export default Vue.extend({
   },
 
   beforeDestroy() {
-    // Recent only gets the color the user actually settled on — not every
-    // intermediate swatch/drag-release they tried on the way there — so
-    // it's recorded once, when the popover closes, rather than per commit.
+    // Only the color the user settled on goes to Recent — recorded once, on close, not per commit.
     if (this.lastCommittedColor) {
       addRecentColor(this.lastCommittedColor);
     }
@@ -159,8 +154,6 @@ export default Vue.extend({
   border: 1px solid var(--menu-border);
   border-radius: 13px;
   box-shadow: 0 18px 44px var(--menu-shadow);
-  // No overflow: hidden — the Palette tab's scheme-search dropdown needs to
-  // extend past this box, and nothing inside paints past its rounded corners
-  // anyway (matches the old popovers, which never clipped either).
+  // No overflow: hidden — the Palette tab's search dropdown needs to extend past this box.
 }
 </style>
