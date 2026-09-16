@@ -1,10 +1,5 @@
 <template>
-  <dock-button
-    :disabled="disabled"
-    @click="$emit('click')"
-    @hover="$emit('hover', $event)"
-    @unhover="$emit('unhover')"
-  >
+  <dock-button :disabled="disabled" @click="$emit('click')">
     <icon-toggle />
   </dock-button>
 </template>

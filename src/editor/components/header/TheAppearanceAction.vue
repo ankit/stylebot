@@ -1,10 +1,12 @@
 <template>
   <anchored-menu class="appearance-action-anchor">
     <template #trigger="{ toggle }">
-      <icon-button :size="20" :title="t('panel_appearance')" @click="toggle">
-        <sun-icon v-if="resolvedTheme === 'light'" />
-        <moon-icon v-else />
-      </icon-button>
+      <s-tooltip :text="t('panel_appearance')">
+        <icon-button :size="20" @click="toggle">
+          <sun-icon v-if="resolvedTheme === 'light'" />
+          <moon-icon v-else />
+        </icon-button>
+      </s-tooltip>
     </template>
 
     <template #default="{ close }">
@@ -27,7 +29,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { AnchoredMenu, SMenu, MenuItem, IconButton } from '@stylebot/components';
+import { AnchoredMenu, SMenu, MenuItem, IconButton, STooltip } from '@stylebot/components';
 import { SunIcon, MoonIcon, MonitorIcon } from '@stylebot/icons';
 import { resolveAppearance, getSystemPreference } from '@stylebot/utils';
 
@@ -41,6 +43,7 @@ export default Vue.extend({
     SMenu,
     MenuItem,
     IconButton,
+    STooltip,
     SunIcon,
     MoonIcon,
     MonitorIcon,

@@ -8,7 +8,7 @@
         :style="colorPickerVisible ? 'pointer-events: none' : ''"
       >
         <the-basic-editor v-if="mode === 'basic'" />
-        <the-magic-editor v-else-if="mode === 'magic'" />
+        <the-presets-editor v-else-if="mode === 'magic'" />
 
         <!-- Stays mounted (just hidden) once opened — Monaco is too expensive to reload on every mode switch/resize. -->
         <the-code-editor v-if="codeEditorMounted" v-show="mode === 'code' && !resizing" />
@@ -23,7 +23,7 @@ import Vue from 'vue';
 import TheHeader from './TheHeader.vue';
 import TheCodeEditor from './TheCodeEditor.vue';
 import TheBasicEditor from './TheBasicEditor.vue';
-import TheMagicEditor from './TheMagicEditor.vue';
+import ThePresetsEditor from './ThePresetsEditor.vue';
 import TheStylebotResizer from './TheStylebotResizer.vue';
 
 import { StylebotEditingMode } from '@stylebot/types';
@@ -34,7 +34,7 @@ export default Vue.extend({
   components: {
     TheHeader,
     TheBasicEditor,
-    TheMagicEditor,
+    ThePresetsEditor,
     TheCodeEditor,
     TheStylebotResizer,
   },

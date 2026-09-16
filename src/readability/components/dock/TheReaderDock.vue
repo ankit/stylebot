@@ -1,21 +1,18 @@
 <template>
   <div class="dock" :style="{ opacity: dockOpacity }" @focusin="wake">
     <div class="buttons">
-      <close-button
-        :disabled="recording"
-        @click="close"
-        @hover="showTip($event, closeTipText)"
-        @unhover="hideTip"
-      />
+      <s-tooltip :text="closeTipText">
+        <close-button :disabled="recording" @click="close" />
+      </s-tooltip>
 
-      <typography-button
-        ref="typographyBtn"
-        :active="activeMenu === 'settings'"
-        :disabled="recording"
-        @click="toggleMenu('settings')"
-        @hover="showTip($event, t('reading_settings'))"
-        @unhover="hideTip"
-      />
+      <s-tooltip :text="t('reading_settings')">
+        <typography-button
+          ref="typographyBtn"
+          :active="activeMenu === 'settings'"
+          :disabled="recording"
+          @click="toggleMenu('settings')"
+        />
+      </s-tooltip>
 
       <more-button
         ref="moreBtn"
@@ -47,8 +44,6 @@
     <shortcut-menu v-else-if="activeMenu === 'shortcut'" ref="shortcutMenu" />
 
     <shortcut-menu v-else-if="showShortcutPrompt" dismissible />
-
-    <tooltip v-if="tip" :text="tip" :top="tipTop" :left="tipLeft" />
   </div>
 </template>
 
@@ -66,7 +61,7 @@ import MoreButton from './MoreButton.vue';
 import SettingsMenu from './SettingsMenu.vue';
 import MoreMenu from './MoreMenu.vue';
 import ShortcutMenu from './ShortcutMenu.vue';
-import Tooltip from './Tooltip.vue';
+import STooltip from '../../../components/STooltip.vue';
 
 // Icons stay lit while the pointer is within this many px of the dock.
 const WAKE_RADIUS = 340;
@@ -94,7 +89,7 @@ export default Vue.extend({
     SettingsMenu,
     MoreMenu,
     ShortcutMenu,
-    Tooltip,
+    STooltip,
   },
 
   props: {
@@ -132,17 +127,11 @@ export default Vue.extend({
   data(): {
     activeMenu: MenuName | null;
     idle: boolean;
-    tip: string;
-    tipTop: number;
-    tipLeft: number;
     idleTimeout: ReturnType<typeof setTimeout> | null;
   } {
     return {
       activeMenu: null,
       idle: false,
-      tip: '',
-      tipTop: 0,
-      tipLeft: 0,
       idleTimeout: null,
     };
   },
@@ -273,21 +262,6 @@ export default Vue.extend({
       }
     },
 
-    showTip(event: MouseEvent, text: string): void {
-      if (this.anyMenuOpen) {
-        return;
-      }
-
-      const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
-      this.tip = text;
-      this.tipTop = Math.round(rect.bottom + 8);
-      this.tipLeft = Math.round(rect.left + rect.width / 2);
-    },
-
-    hideTip(): void {
-      this.tip = '';
-    },
-
     close(): void {
       shortcutStore.dismissPrompt();
       closeReader();
@@ -301,7 +275,6 @@ export default Vue.extend({
       }
 
       this.activeMenu = this.activeMenu === menu ? null : menu;
-      this.hideTip();
 
       if (this.activeMenu === menu) {
         this.focusFirstIn(MENUS[menu].menuRef);
@@ -324,6 +297,9 @@ export default Vue.extend({
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Ubuntu,
     'Helvetica Neue', sans-serif;
   transition: opacity 0.32s ease;
+  --tooltip-bg: var(--background);
+  --tooltip-fg: var(--foreground);
+  --tooltip-border: var(--border);
 
   * {
     transition: background-color 0.2s ease, color 0.2s ease,

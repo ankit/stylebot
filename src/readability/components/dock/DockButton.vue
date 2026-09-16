@@ -1,11 +1,5 @@
 <template>
-  <button
-    class="btn"
-    :disabled="disabled"
-    @click="$emit('click')"
-    @mouseenter="$emit('hover', $event)"
-    @mouseleave="$emit('unhover')"
-  >
+  <button class="btn" :disabled="disabled" @click="$emit('click')">
     <slot />
   </button>
 </template>
