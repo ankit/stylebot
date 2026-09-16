@@ -21,6 +21,11 @@ import { tinycolorToCssColor } from '../../utils/hsv-color';
 
 type Format = 'hex' | 'rgb';
 
+const FORMAT_OPTIONS: Array<{ value: Format; label: string }> = [
+  { value: 'hex', label: 'HEX' },
+  { value: 'rgb', label: 'RGB' },
+];
+
 export default Vue.extend({
   name: 'ColorPickerFooter',
 
@@ -45,10 +50,7 @@ export default Vue.extend({
 
   computed: {
     formatOptions(): Array<{ value: Format; label: string }> {
-      return [
-        { value: 'hex', label: this.t('color_picker_format_hex') },
-        { value: 'rgb', label: this.t('color_picker_format_rgb') },
-      ];
+      return FORMAT_OPTIONS;
     },
 
     displayValue(): string {
