@@ -103,6 +103,9 @@ class BrowserPool {
         // Trims memory per worker — several of these run concurrently on CI.
         '--disable-dev-shm-usage',
         '--disable-gpu',
+        // headless Chrome's default window is small enough (~780x490 on CI) to push
+        // header controls out of reach; viewport: null means this is the real size.
+        '--window-size=1400,900',
       ],
     });
 
