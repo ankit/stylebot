@@ -67,7 +67,7 @@ test('falls back to page colors, then switches to already-used colors once a rul
 
   // No Stylebot rule exists for this site yet, so the first tab falls back
   // to the live page's own colors rather than showing empty/disabled.
-  await expect(firstTab).toHaveText('On this page');
+  await expect(firstTab).toHaveText('Page colors');
   await expect(firstTab).toHaveClass(/active/);
   await expect(popover.locator('.first-tab .swatch').first()).toBeVisible();
 
@@ -93,9 +93,8 @@ test('falls back to page colors, then switches to already-used colors once a rul
   await swatch.click();
   await swatch.click();
 
-  await expect(firstTab).toHaveText('Already used');
-  await expect(popover.locator('.first-tab').getByText('In your styles for this site')).toBeVisible();
-  await expect(popover.locator('.roles .swatch[style*="17, 34, 51"]')).toBeVisible();
+  await expect(firstTab).toHaveText('Your colors');
+  await expect(popover.locator('.used-colors .swatch[style*="17, 34, 51"]')).toBeVisible();
 
   // The just-applied color was also the one the popover closed on, so it
   // should be recorded in Recent — now shown in this same tab, not Custom.

@@ -13,7 +13,6 @@
       <color-picker-first-tab
         v-if="activeTab === 'already-used'"
         :colors="firstTabColors"
-        :heading="firstTabHeading"
         :recent-colors="recentColors"
         :value="value"
         @select="commit"
@@ -104,14 +103,8 @@ export default Vue.extend({
 
     firstTabLabel(): string {
       return this.firstTabSource === 'rules'
-        ? this.t('color_picker_tab_already_used')
-        : this.t('color_picker_tab_on_page');
-    },
-
-    firstTabHeading(): string {
-      return this.firstTabSource === 'rules'
-        ? this.t('color_picker_already_used_heading')
-        : this.t('color_picker_on_page_heading');
+        ? this.t('color_picker_tab_your_colors')
+        : this.t('color_picker_tab_page_colors');
     },
   },
 

@@ -1,6 +1,6 @@
 <template>
   <div v-if="colors.length" class="recent-row">
-    <s-text size="small" variant="muted" as="span" class="label">{{ t('color_picker_recent') }}</s-text>
+    <s-text size="small" variant="muted" as="span" class="heading">{{ t('color_picker_recent') }}</s-text>
     <div class="swatches">
       <button
         v-for="color in colors"
@@ -11,7 +11,7 @@
         :style="{ background: color }"
         @click="$emit('select', color)"
       >
-        <check-icon v-if="color === value" :size="10" class="swatch-check" />
+        <check-icon v-if="color === value" :size="12" class="swatch-check" />
       </button>
     </div>
   </div>
@@ -52,23 +52,25 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .recent-row {
   display: flex;
-  align-items: center;
-  gap: 6px;
+  flex-direction: column;
+  gap: 9px;
 }
 
-.label {
-  flex: none;
+.heading {
+  display: block;
 }
 
 .swatches {
   display: flex;
+  flex-wrap: wrap;
   gap: 4px;
 }
 
+// Matches the role rows above it and the Palette tab's grid — 36px squares.
 .swatch {
   @include button-reset;
-  width: 22px;
-  height: 22px;
+  width: 36px;
+  height: 36px;
   border-radius: 5px;
   @include swatch-states;
 }
