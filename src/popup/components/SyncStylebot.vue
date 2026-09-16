@@ -1,22 +1,19 @@
 <template>
-  <popup-row
-    button
-    :title="t('sync_description')"
-    :disabled="syncInProgress"
-    @click="sync"
-  >
-    <span class="sync-icon">
-      <arrow-repeat-icon :spinning="syncInProgress" />
-    </span>
-
-    <span class="row-label">
-      {{ syncInProgress ? t('sync_in_progress') : t('sync_now') }}
-
-      <span class="popup-caption sync-metadata">
-        {{ syncInProgress ? undefined : syncTime }}
+  <s-tooltip grow :text="t('sync_description')">
+    <popup-row button :disabled="syncInProgress" @click="sync">
+      <span class="sync-icon">
+        <arrow-repeat-icon :spinning="syncInProgress" />
       </span>
-    </span>
-  </popup-row>
+
+      <span class="row-label">
+        {{ syncInProgress ? t('sync_in_progress') : t('sync_now') }}
+
+        <span class="popup-caption sync-metadata">
+          {{ syncInProgress ? undefined : syncTime }}
+        </span>
+      </span>
+    </popup-row>
+  </s-tooltip>
 </template>
 
 <script lang="ts">
@@ -28,6 +25,7 @@ import { getGoogleDriveSyncMetadata } from '../../sync/google-drive/sync-metadat
 import { RunGoogleDriveSync } from '@stylebot/types';
 
 import { ArrowRepeatIcon } from '@stylebot/icons';
+import { STooltip } from '@stylebot/components';
 import PopupRow from './PopupRow.vue';
 
 export default Vue.extend({
@@ -35,6 +33,7 @@ export default Vue.extend({
 
   components: {
     ArrowRepeatIcon,
+    STooltip,
     PopupRow,
   },
 

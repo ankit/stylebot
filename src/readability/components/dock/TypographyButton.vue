@@ -6,8 +6,6 @@
     aria-haspopup="true"
     :aria-expanded="active"
     @click="$emit('click')"
-    @hover="$emit('hover', $event)"
-    @unhover="$emit('unhover')"
   >
     Aa
   </dock-button>

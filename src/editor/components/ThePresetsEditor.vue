@@ -1,5 +1,5 @@
 <template>
-  <div class="magic-editor">
+  <div class="presets-editor">
     <the-readability />
     <the-grayscale />
   </div>
@@ -8,11 +8,11 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import TheGrayscale from './magic/TheGrayscale.vue';
-import TheReadability from './magic/TheReadability.vue';
+import TheGrayscale from './presets/TheGrayscale.vue';
+import TheReadability from './presets/TheReadability.vue';
 
 export default Vue.extend({
-  name: 'TheMagicEditor',
+  name: 'ThePresetsEditor',
 
   components: {
     TheGrayscale,
@@ -22,7 +22,7 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-.magic-editor {
+.presets-editor {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;

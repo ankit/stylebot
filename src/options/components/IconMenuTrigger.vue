@@ -1,13 +1,15 @@
 <template>
-  <icon-button :bordered="bordered" :size="size" :title="title" @click="$emit('click', $event)">
-    <more-icon />
-  </icon-button>
+  <s-tooltip :text="title">
+    <icon-button :bordered="bordered" :size="size" @click="$emit('click', $event)">
+      <more-icon />
+    </icon-button>
+  </s-tooltip>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 
-import { IconButton } from '@stylebot/components';
+import { IconButton, STooltip } from '@stylebot/components';
 import { MoreIcon } from '@stylebot/icons';
 
 export default Vue.extend({
@@ -15,6 +17,7 @@ export default Vue.extend({
 
   components: {
     IconButton,
+    STooltip,
     MoreIcon,
   },
 

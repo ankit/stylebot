@@ -1,12 +1,14 @@
 <template>
-  <icon-button :size="20" :title="`${t('close')} (esc)`" @click="onClick">
-    <icon-x :size="14" />
-  </icon-button>
+  <s-tooltip :text="t('close')" shortcut="esc">
+    <icon-button :size="20" @click="onClick">
+      <icon-x :size="14" />
+    </icon-button>
+  </s-tooltip>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import { IconButton } from '@stylebot/components';
+import { IconButton, STooltip } from '@stylebot/components';
 import { IconX } from '@stylebot/icons';
 
 export default Vue.extend({
@@ -14,6 +16,7 @@ export default Vue.extend({
 
   components: {
     IconButton,
+    STooltip,
     IconX,
   },
 

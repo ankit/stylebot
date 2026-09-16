@@ -22,24 +22,33 @@ export default Vue.extend({
       return this.$store.getters.readabilityActive;
     },
 
-    tabs(): Array<{ value: string; label: string; title: string; disabled: boolean }> {
+    tabs(): Array<{
+      value: string;
+      label: string;
+      title: string;
+      shortcut: string;
+      disabled: boolean;
+    }> {
       return [
         {
           value: 'basic',
           label: this.t('basic_mode'),
-          title: `${this.t('basic_mode_description')} (b)`,
+          title: this.t('basic_mode_description'),
+          shortcut: 'b',
           disabled: this.readability,
         },
         {
           value: 'code',
           label: this.t('code_mode'),
-          title: `${this.t('code_mode_description')} (c)`,
+          title: this.t('code_mode_description'),
+          shortcut: 'c',
           disabled: this.readability,
         },
         {
           value: 'magic',
-          label: this.t('magic_mode'),
-          title: `${this.t('magic_mode_description')} (m)`,
+          label: this.t('presets_mode'),
+          title: this.t('presets_mode_description'),
+          shortcut: 'm',
           disabled: false,
         },
       ];

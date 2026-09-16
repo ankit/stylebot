@@ -15,9 +15,11 @@
       <span class="release-link">{{ t('see_what_changed') }}</span>
     </s-text>
 
-    <icon-button class="release-dismiss" :title="t('hide')" @click="dismiss">
-      <icon-x :size="22" />
-    </icon-button>
+    <s-tooltip class="release-dismiss" :text="t('hide')">
+      <icon-button @click="dismiss">
+        <icon-x :size="22" />
+      </icon-button>
+    </s-tooltip>
   </div>
 </template>
 
@@ -32,7 +34,7 @@ import {
 
 import { onEnterOrSpace } from '../../utils';
 import { IconX } from '@stylebot/icons';
-import { IconButton, SText } from '@stylebot/components';
+import { IconButton, SText, STooltip } from '@stylebot/components';
 
 export default Vue.extend({
   name: 'ReleaseNotification',
@@ -41,6 +43,7 @@ export default Vue.extend({
     IconX,
     IconButton,
     SText,
+    STooltip,
   },
 
   data(): {
@@ -126,9 +129,9 @@ export default Vue.extend({
 
 .release-dismiss {
   flex: none;
-}
 
-.release-banner .release-dismiss:hover {
-  background: var(--info-border);
+  ::v-deep .icon-button:hover {
+    background: var(--info-border);
+  }
 }
 </style>
