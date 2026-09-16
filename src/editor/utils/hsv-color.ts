@@ -14,9 +14,13 @@ export const parseToHsva = (value: string): Hsva => {
   return { h: hsv.h, s: hsv.s, v: hsv.v, a: hsv.a };
 };
 
+// Opaque colors read as hex, transparent ones as rgb() (hex has no alpha).
+export const tinycolorToCssColor = (color: tinycolor.Instance): string => {
+  return color.getAlpha() < 1 ? color.toRgbString() : color.toHexString();
+};
+
 export const toCssColor = (hsva: Hsva): string => {
-  const color = tinycolor({ h: hsva.h, s: hsva.s, v: hsva.v, a: hsva.a });
-  return hsva.a < 1 ? color.toRgbString() : color.toHexString();
+  return tinycolorToCssColor(tinycolor({ h: hsva.h, s: hsva.s, v: hsva.v, a: hsva.a }));
 };
 
 // Matches the design spec's swatch rule: colors lighter than #e8e8e8 get a

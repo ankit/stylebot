@@ -17,6 +17,7 @@
 import Vue from 'vue';
 import tinycolor from 'tinycolor2';
 import { SSegmentedControl } from '@stylebot/components';
+import { tinycolorToCssColor } from '../../utils/hsv-color';
 
 type Format = 'hex' | 'rgb';
 
@@ -72,7 +73,7 @@ export default Vue.extend({
 
       const color = tinycolor(this.draft);
       if (color.isValid()) {
-        this.$emit('input', this.toCssColor(color));
+        this.$emit('input', tinycolorToCssColor(color));
       }
     },
 
@@ -81,12 +82,8 @@ export default Vue.extend({
 
       const color = tinycolor(this.draft);
       if (color.isValid()) {
-        this.$emit('commit', this.toCssColor(color));
+        this.$emit('commit', tinycolorToCssColor(color));
       }
-    },
-
-    toCssColor(color: tinycolor.Instance): string {
-      return color.getAlpha() < 1 ? color.toRgbString() : color.toHexString();
     },
   },
 });

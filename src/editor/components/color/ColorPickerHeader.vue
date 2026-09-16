@@ -7,7 +7,7 @@
       <s-text size="small" variant="muted" as="span">{{ roleLabel }}</s-text>
     </div>
 
-    <button v-if="value" type="button" class="pick clear" @click="$emit('clear')">
+    <button v-if="value" type="button" class="pick" @click="$emit('clear')">
       {{ t('color_picker_clear') }}
     </button>
 

@@ -63,36 +63,28 @@ export default Vue.extend({
   &::-webkit-slider-runnable-track {
     height: 11px;
     border-radius: 6px;
-    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+    @include picker-track-edge;
     background: var(--track-background);
   }
 
   &::-webkit-slider-thumb {
     appearance: none;
     -webkit-appearance: none;
-    width: 15px;
-    height: 15px;
     margin-top: -2px;
-    border-radius: 50%;
-    border: 2.5px solid #fff;
+    @include picker-thumb;
     background: var(--thumb-color);
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
   }
 
   &::-moz-range-track {
     height: 11px;
     border-radius: 6px;
-    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+    @include picker-track-edge;
     background: var(--track-background);
   }
 
   &::-moz-range-thumb {
-    width: 15px;
-    height: 15px;
-    border: 2.5px solid #fff;
-    border-radius: 50%;
+    @include picker-thumb;
     background: var(--thumb-color);
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
   }
 
   &:focus-visible::-webkit-slider-thumb {
@@ -107,10 +99,6 @@ export default Vue.extend({
 }
 
 .readout {
-  flex: none;
-  width: 34px;
-  text-align: right;
-  font: 400 11.5px/1.2 var(--font-mono);
-  color: var(--text-muted);
+  @include picker-readout;
 }
 </style>

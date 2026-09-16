@@ -98,11 +98,6 @@ export default Vue.extend({
       this.onAlphaInput(alpha);
       this.$emit('commit', this.currentColor);
     },
-
-    selectRecent(color: string): void {
-      this.hsva = parseToHsva(color);
-      this.$emit('commit', this.currentColor);
-    },
   },
 });
 </script>

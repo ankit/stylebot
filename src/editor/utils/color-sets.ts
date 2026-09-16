@@ -1,5 +1,7 @@
 export type ColorRamp = {
-  label: string;
+  // An i18n key (see @stylebot/i18n's t()), not display text — translate at
+  // the point of render.
+  labelKey: string;
   colors: Array<string>;
 };
 
@@ -7,7 +9,7 @@ export type ColorRamp = {
 // that opens when nothing is remembered.
 export const neutralRamps: Array<ColorRamp> = [
   {
-    label: 'Warm',
+    labelKey: 'color_picker_ramp_warm',
     colors: [
       '#ffffff',
       '#f7f5f2',
@@ -20,7 +22,7 @@ export const neutralRamps: Array<ColorRamp> = [
     ],
   },
   {
-    label: 'Cool',
+    labelKey: 'color_picker_ramp_cool',
     colors: [
       '#ffffff',
       '#f5f7fa',

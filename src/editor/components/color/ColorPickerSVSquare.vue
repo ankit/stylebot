@@ -102,19 +102,15 @@ export default Vue.extend({
   position: relative;
   height: 132px;
   border-radius: 9px;
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+  @include picker-track-edge;
   cursor: crosshair;
   touch-action: none;
 }
 
 .thumb {
   position: absolute;
-  width: 15px;
-  height: 15px;
   margin: -7.5px 0 0 -7.5px;
-  border-radius: 9px;
-  border: 2.5px solid #fff;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  @include picker-thumb(9px);
   pointer-events: none;
 }
 </style>

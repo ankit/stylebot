@@ -26,8 +26,8 @@
     </s-autocomplete>
 
     <div v-if="activeKey === 'neutrals'" class="ramps">
-      <div v-for="ramp in neutralRamps" :key="ramp.label" class="ramp">
-        <s-text size="small" variant="muted" as="span">{{ ramp.label }}</s-text>
+      <div v-for="ramp in neutralRamps" :key="ramp.labelKey" class="ramp">
+        <s-text size="small" variant="muted" as="span">{{ t(ramp.labelKey) }}</s-text>
         <div class="set-grid">
           <button
             v-for="color in ramp.colors"
@@ -73,12 +73,16 @@ import { neutralRamps, hueGrid, readingRow, darkModeRow, ColorRamp } from '../..
 import { needsHairline } from '../../utils/hsv-color';
 
 type PaletteOption = { key: string; label: string; preview: Array<string> };
+type PaletteOptionMeta = { key: string; labelKey: string; preview: Array<string> };
 
-const SET_OPTIONS: Array<PaletteOption> = [
-  { key: 'neutrals', label: 'Neutrals', preview: neutralRamps[0].colors.slice(0, 6) },
-  { key: 'hues', label: 'Hues', preview: hueGrid[2].slice(0, 6) },
-  { key: 'reading', label: 'Reading', preview: readingRow.slice(0, 6) },
-  { key: 'dark-mode', label: 'Dark mode', preview: darkModeRow.slice(0, 6) },
+// Translated once in data() below (via this.t()) rather than at module
+// scope, so this never calls chrome.i18n directly at import time — Jest
+// mocks `t` per-component rather than providing a global `chrome`.
+const SET_OPTION_META: Array<PaletteOptionMeta> = [
+  { key: 'neutrals', labelKey: 'color_picker_set_neutrals', preview: neutralRamps[0].colors.slice(0, 6) },
+  { key: 'hues', labelKey: 'color_picker_set_hues', preview: hueGrid[2].slice(0, 6) },
+  { key: 'reading', labelKey: 'color_picker_set_reading', preview: readingRow.slice(0, 6) },
+  { key: 'dark-mode', labelKey: 'color_picker_set_dark_mode', preview: darkModeRow.slice(0, 6) },
 ];
 
 const SCHEME_OPTIONS: Array<PaletteOption> = colorSchemes.map(scheme => ({
@@ -86,8 +90,6 @@ const SCHEME_OPTIONS: Array<PaletteOption> = colorSchemes.map(scheme => ({
   label: scheme.name,
   preview: scheme.colors.slice(0, 6),
 }));
-
-const ALL_OPTIONS: Array<PaletteOption> = [...SET_OPTIONS, ...SCHEME_OPTIONS];
 
 export default Vue.extend({
   name: 'ColorPickerPalette',
@@ -106,28 +108,43 @@ export default Vue.extend({
     },
   },
 
-  data(): { activeKey: string; query: string; neutralRamps: Array<ColorRamp> } {
+  data(): {
+    activeKey: string;
+    query: string;
+    neutralRamps: Array<ColorRamp>;
+    allOptions: Array<PaletteOption>;
+  } {
+    const allOptions: Array<PaletteOption> = [
+      ...SET_OPTION_META.map(option => ({
+        key: option.key,
+        label: this.t(option.labelKey),
+        preview: option.preview,
+      })),
+      ...SCHEME_OPTIONS,
+    ];
+
     const lastColorSet = this.$store.state.options.lastColorSet;
-    const activeKey = ALL_OPTIONS.some(option => option.key === lastColorSet)
+    const activeKey = allOptions.some(option => option.key === lastColorSet)
       ? lastColorSet
       : 'neutrals';
 
     return {
       activeKey,
-      query: ALL_OPTIONS.find(option => option.key === activeKey)?.label || '',
+      query: allOptions.find(option => option.key === activeKey)?.label || '',
       neutralRamps,
+      allOptions,
     };
   },
 
   computed: {
     filteredOptions(): Array<PaletteOption> {
       const query = this.query.trim().toLowerCase();
-      const activeLabel = ALL_OPTIONS.find(option => option.key === this.activeKey)?.label || '';
+      const activeLabel = this.allOptions.find(option => option.key === this.activeKey)?.label || '';
       if (!query || query === activeLabel.toLowerCase()) {
-        return ALL_OPTIONS;
+        return this.allOptions;
       }
 
-      return ALL_OPTIONS.filter(option => option.label.toLowerCase().includes(query));
+      return this.allOptions.filter(option => option.label.toLowerCase().includes(query));
     },
 
     activeColors(): Array<string> {
