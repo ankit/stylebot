@@ -168,6 +168,10 @@ export default Vue.extend({
 
 .palette-search {
   width: 100%;
+
+  ::v-deep .autocomplete-input {
+    line-height: 18px;
+  }
 }
 
 .option-row {

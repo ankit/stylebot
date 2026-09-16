@@ -80,11 +80,13 @@ export default Vue.extend({
   height: 30px;
   flex: none;
   border-radius: 7px;
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+  // A literal black ring reads fine on a light panel but vanishes on a dark
+  // one — mix against --text-primary so it stays visible in both themes.
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--text-primary) 12%, transparent);
 
   &.empty {
     background: var(--menu-surface);
-    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.14);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--text-primary) 18%, transparent);
   }
 }
 

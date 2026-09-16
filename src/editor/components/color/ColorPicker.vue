@@ -269,15 +269,17 @@ export default Vue.extend({
   border-radius: 6px 0 0 6px;
   outline: none;
   cursor: pointer;
-  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 10%);
+  // A literal black ring reads fine on a light panel but vanishes on a dark
+  // one — mix against --text-primary so it stays visible in both themes.
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--text-primary) 12%, transparent);
 
   &.empty {
     background: repeating-linear-gradient(
       -45deg,
       transparent,
       transparent 4px,
-      var(--panel-border) 4px,
-      var(--panel-border) 5px
+      color-mix(in srgb, var(--text-primary) 20%, transparent) 4px,
+      color-mix(in srgb, var(--text-primary) 20%, transparent) 5px
     );
   }
 
@@ -292,10 +294,13 @@ export default Vue.extend({
   @include button-reset;
   flex: 1;
   min-width: 0;
-  padding: 5px 8px;
+  padding: 1px 8px 0;
+  // Digits have no descenders, so a mathematically-centered line box still
+  // reads as sitting slightly high — nudge down 1px against the field's
+  // inner height (27px - 2px border) to optically center it instead.
+  line-height: 24px;
   font-family: var(--font-mono);
   font-size: 12.5px;
-  line-height: 1.2;
   color: var(--text-primary);
   outline: none;
   cursor: text;

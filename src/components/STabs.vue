@@ -101,6 +101,12 @@ export default Vue.extend({
   mounted() {
     this.resizeObserver = new ResizeObserver(() => this.measure());
     this.resizeObserver.observe(this.$refs.root as HTMLElement);
+
+    // Self-hosted fonts load async with font-display: swap — an initial
+    // measurement can land on fallback-font metrics, then go stale once the
+    // real font swaps in and reflows tab widths. ResizeObserver won't catch
+    // this if the swap doesn't change the container's own size.
+    document.fonts?.ready.then(() => this.measure());
   },
 
   beforeDestroy() {
