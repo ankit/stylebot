@@ -3,7 +3,7 @@ export { default as ChevronLeftIcon } from './ChevronLeftIcon.vue';
 export { default as ChevronDownIcon } from './ChevronDownIcon.vue';
 export { default as MoreIcon } from './MoreIcon.vue';
 export { default as ExternalLinkIcon } from './ExternalLinkIcon.vue';
-export { default as CursorIcon } from './CursorIcon.vue';
+export { default as InspectorIcon } from './InspectorIcon.vue';
 export { default as SearchIcon } from './SearchIcon.vue';
 export { default as CheckIcon } from './CheckIcon.vue';
 export { default as SunIcon } from './SunIcon.vue';

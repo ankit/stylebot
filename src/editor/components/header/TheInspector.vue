@@ -7,7 +7,7 @@
       :disabled="disabled"
       @click="toggle"
     >
-      <cursor-icon />
+      <inspector-icon :size="16" />
     </button>
   </s-tooltip>
 </template>
@@ -16,7 +16,7 @@
 import Vue from 'vue';
 
 import { STooltip } from '@stylebot/components';
-import { CursorIcon } from '@stylebot/icons';
+import { InspectorIcon } from '@stylebot/icons';
 import { Highlighter } from '@stylebot/highlighter';
 import { StylebotEditingMode } from '@stylebot/types';
 
@@ -24,7 +24,7 @@ export default Vue.extend({
   name: 'TheInspector',
 
   components: {
-    CursorIcon,
+    InspectorIcon,
     STooltip,
   },
 
