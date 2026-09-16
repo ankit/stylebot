@@ -309,7 +309,7 @@ export default Vue.extend({
   flex-wrap: wrap;
   align-content: center;
   gap: 6px;
-  padding: 6px 8px 4px 6px;
+  padding: 5px 8px 5px 6px;
   cursor: text;
 }
 
@@ -327,11 +327,12 @@ export default Vue.extend({
   overflow: hidden;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
-  font: 400 12.5px/22px 'Public Sans', system-ui, sans-serif;
+  font: 400 12.5px/22px 'Geist', system-ui, sans-serif;
   color: var(--text-primary);
 
   &.mono {
     font-family: var(--font-mono);
+    font-weight: 400;
   }
 
   &::placeholder {

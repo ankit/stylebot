@@ -59,6 +59,7 @@
       "resources": [
         "monaco-editor/*",
         "editor/index.css",
+        "fonts/*",
         "readability/index.css"
       ],
       "matches": ["<all_urls>"]

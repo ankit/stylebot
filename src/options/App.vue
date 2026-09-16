@@ -142,7 +142,7 @@ body {
 }
 
 body {
-  font-family: 'Public Sans', system-ui, sans-serif;
+  font-family: 'Geist', system-ui, sans-serif;
 }
 
 #app {
