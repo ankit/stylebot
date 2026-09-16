@@ -177,6 +177,10 @@ const config = {
           to: 'img',
         },
         {
+          from: 'fonts',
+          to: 'fonts',
+        },
+        {
           from: 'options/index.html',
           to: 'options/index.html',
           transform: transformHtml,

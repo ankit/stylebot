@@ -16,6 +16,26 @@ Vue.mixin({
   },
 });
 
+const SELF_HOSTED_FONTS = [
+  { family: 'Fira Code', file: 'fira-code', weights: [400, 500, 600] },
+  { family: 'Geist', file: 'geist', weights: [400, 500, 600, 700] },
+];
+
+const fontFaceCss = (): string =>
+  SELF_HOSTED_FONTS.flatMap(({ family, file, weights }) =>
+    weights.map(
+      weight => `
+        @font-face {
+          font-family: '${family}';
+          font-style: normal;
+          font-weight: ${weight};
+          font-display: swap;
+          src: url('${chrome.runtime.getURL(`fonts/${file}-${weight}.woff2`)}') format('woff2');
+        }
+      `
+    )
+  ).join('');
+
 const injectCss = (shadowRoot: ShadowRoot): Promise<void> => {
   const url = chrome.runtime.getURL('editor/index.css');
 
@@ -24,7 +44,7 @@ const injectCss = (shadowRoot: ShadowRoot): Promise<void> => {
     .then(css => {
       const styleEl = document.createElement('style');
       styleEl.setAttribute('id', 'stylebot-editor-css');
-      styleEl.innerHTML = css;
+      styleEl.innerHTML = fontFaceCss() + css;
       shadowRoot.appendChild(styleEl);
     });
 };

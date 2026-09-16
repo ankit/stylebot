@@ -8,8 +8,13 @@
       <chevron-down-icon :size="11" class="property-card-chevron" :class="{ collapsed }" />
     </button>
 
-    <div class="property-card-collapse" :class="{ collapsed }" :inert="collapsed">
-      <div class="property-card-body">
+    <div
+      class="property-card-collapse"
+      :class="{ collapsed }"
+      :inert="collapsed"
+      @transitionend="onTransitionEnd"
+    >
+      <div class="property-card-body" :class="{ 'clip-while-animating': !settled }">
         <slot />
       </div>
     </div>
@@ -44,6 +49,31 @@ export default Vue.extend({
     count: {
       type: Number,
       default: 0,
+    },
+  },
+
+  data(): { settled: boolean } {
+    return {
+      // Overflow only needs to clip while the height is actively animating
+      // (so shrinking content doesn't poke out); at rest it'd otherwise
+      // needlessly clip dropdowns opened from a field inside the card.
+      settled: !this.collapsed,
+    };
+  },
+
+  watch: {
+    collapsed(value: boolean): void {
+      if (value) {
+        this.settled = false;
+      }
+    },
+  },
+
+  methods: {
+    onTransitionEnd(event: TransitionEvent): void {
+      if (event.propertyName === 'grid-template-rows' && !this.collapsed) {
+        this.settled = true;
+      }
     },
   },
 });
@@ -112,11 +142,15 @@ export default Vue.extend({
 
 .property-card-body {
   min-height: 0;
-  overflow: hidden;
+  min-width: 0;
   padding: 0 12px 8px;
   opacity: 1;
   transition: padding-bottom 0.24s cubic-bezier(0.4, 0, 0.2, 1),
     opacity 0.16s ease 0.08s;
+
+  &.clip-while-animating {
+    overflow: hidden;
+  }
 
   .property-card-collapse.collapsed & {
     padding-bottom: 0;
