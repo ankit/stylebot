@@ -11,6 +11,8 @@
     @input="setSelector"
     @select="pickSelector"
     @click.native="stopInspecting"
+    @focus="onFocus"
+    @blur="onBlur"
   >
     <template v-if="activeStyleCount > 0" #suffix>
       <s-count-badge :count="activeStyleCount" class="active-style-count" />
@@ -40,6 +42,8 @@
 <script lang="ts">
 import Vue from 'vue';
 import { SAutocomplete, SText, SCountBadge } from '@stylebot/components';
+import { validateSelector, getRuleForSelector } from '@stylebot/css';
+import { Highlighter } from '@stylebot/highlighter';
 import { StylebotEditingMode } from '@stylebot/types';
 
 import { CssSelectorMetadata } from '../../store';
@@ -53,6 +57,13 @@ export default Vue.extend({
     SText,
     SCountBadge,
     TheCssSelectorDropdownItem,
+  },
+
+  data(): { highlighter: Highlighter | null; focused: boolean } {
+    return {
+      highlighter: null,
+      focused: false,
+    };
   },
 
   computed: {
@@ -90,6 +101,30 @@ export default Vue.extend({
     },
   },
 
+  watch: {
+    // Re-preview on every keystroke while focused, not just on select —
+    // setSelector already updates activeSelector as the user types.
+    activeSelector(): void {
+      if (this.focused) {
+        this.previewActiveSelector();
+      }
+    },
+  },
+
+  created() {
+    this.highlighter = new Highlighter({
+      onSelect: () => {
+        return;
+      },
+      getStylebotDeclarations: this.getStylebotDeclarations,
+      getMountRoot: () => this.$root.$el as HTMLElement,
+    });
+  },
+
+  beforeDestroy() {
+    this.highlighter?.unhighlight();
+  },
+
   methods: {
     setSelector(value: string): void {
       this.$store.commit('setActiveSelector', value);
@@ -101,6 +136,52 @@ export default Vue.extend({
 
     stopInspecting(): void {
       this.$store.commit('setInspecting', false);
+    },
+
+    onFocus(): void {
+      this.focused = true;
+      this.previewActiveSelector();
+    },
+
+    onBlur(): void {
+      this.focused = false;
+      this.highlighter?.unhighlight();
+    },
+
+    previewActiveSelector(): void {
+      const selector = this.activeSelector.trim();
+
+      // Skip whole-page selectors — highlighting them just floods the page.
+      const wholePage = ['*', 'body', 'html', ':root'];
+      const parts = selector.split(',').map(part => part.trim());
+
+      if (!selector || parts.some(part => wholePage.includes(part))) {
+        this.highlighter?.unhighlight();
+        return;
+      }
+
+      if (validateSelector(selector)) {
+        this.highlighter?.highlight(selector);
+      } else {
+        this.highlighter?.unhighlight();
+      }
+    },
+
+    getStylebotDeclarations(
+      selector: string
+    ): Array<{ property: string; value: string }> | null {
+      const rule = getRuleForSelector(this.$store.state.css, selector);
+
+      if (!rule) {
+        return null;
+      }
+
+      const declarations: Array<{ property: string; value: string }> = [];
+      rule.walkDecls(decl => {
+        declarations.push({ property: decl.prop, value: decl.value });
+      });
+
+      return declarations.length > 0 ? declarations : null;
     },
   },
 });

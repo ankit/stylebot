@@ -30,6 +30,13 @@ export const getRuleForSelector = (
   return found;
 };
 
+// Interaction-state pseudo-classes: matching one of these only means "the
+// inspector's own cursor/focus happens to be on this element right now"
+// (hovering it *is* what triggered the match), not "this selector targets
+// the element's normal appearance" — so they're never a selector worth
+// reusing, even though el.matches() would happily return true for them.
+const STATE_PSEUDO_CLASSES = /:(hover|focus(-visible|-within)?|active)\b/i;
+
 // Finds an already-authored selector that happens to match this specific
 // element — via the browser's own selector matching, not string equality —
 // so picking an element that's already targeted by a hand-written selector
@@ -49,6 +56,10 @@ export const getExistingSelector = (
     }
 
     for (const candidate of rule.selectors) {
+      if (STATE_PSEUDO_CLASSES.test(candidate)) {
+        continue;
+      }
+
       try {
         if (el.matches(candidate)) {
           match = candidate;
@@ -62,6 +73,38 @@ export const getExistingSelector = (
   });
 
   return match;
+};
+
+// Splits `selector` out of whatever grouped, comma-separated rule it
+// belongs to (e.g. `.foo, .bar { ... }`) into its own standalone rule
+// directly after the original, carrying over the declarations the group
+// already gave it — so editing an element styled only via a shared rule
+// doesn't silently affect its groupmates, and doesn't lose what it
+// already had either. No-ops if `selector` already has its own rule, or
+// isn't part of any rule at all. Mirrors getRuleForSelector's "last match
+// wins" choice when a selector is grouped in more than one place.
+export const splitSelectorFromGroup = (css: string, selector: string): string => {
+  const root = postcss.parse(css);
+  const matches: Array<postcss.Rule> = [];
+
+  root.walkRules(rule => {
+    if (rule.selector !== selector && rule.selectors.includes(selector)) {
+      matches.push(rule);
+    }
+  });
+
+  const group = matches.length > 0 ? matches[matches.length - 1] : null;
+
+  if (!group) {
+    return css;
+  }
+
+  const split = group.clone();
+  split.selectors = [selector];
+  group.after(split);
+  group.selectors = group.selectors.filter(part => part !== selector);
+
+  return root.toString();
 };
 
 export const addEmptyRule = (css: string, selector: string): string => {

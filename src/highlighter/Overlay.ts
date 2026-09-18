@@ -10,12 +10,15 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+import Vue from 'vue';
+
 import {
   getElementDimensions,
   getNestedBoundingClientRect,
   Rect,
   Dimensions,
 } from './utils';
+import InspectorCard from './InspectorCard.vue';
 
 type Box = {
   top: number;
@@ -31,14 +34,13 @@ function hasKey<O>(obj: O, key: string | number | symbol): key is keyof O {
   return key in obj;
 }
 
-// Note that the Overlay components are not affected by the active Theme,
-// because they highlight elements in the main Chrome window (outside of devtools).
-// The colors below were chosen to roughly match those used by Chrome devtools.
+// OverlayRect's colors are fixed to roughly match Chrome devtools,
+// deliberately independent of Stylebot's own active theme.
 
-// A translucent fill is useful for a normal-sized element, but once the
-// highlighted box covers most of the viewport (e.g. a container the size
-// of the whole page) it just tints everything and reads as broken rather
-// than as a highlight — drop the fill and keep only the outline.
+/**
+ * Drops the translucent fill once the box covers most of the viewport,
+ * since tinting the whole page reads as broken rather than highlighted.
+ */
 function coversViewport(box: { width: number; height: number }): boolean {
   const viewportArea = window.innerWidth * window.innerHeight;
   return viewportArea > 0 && (box.width * box.height) / viewportArea > 0.6;
@@ -133,508 +135,171 @@ class OverlayRect {
 }
 
 
-type AncestorInfo = {
+type NextAncestorInfo = {
   label: string;
-  matchCount: number;
-  styled: boolean;
+  styleCount: number;
 };
 
 type StylebotDeclaration = { property: string; value: string };
 
-// Colors and type scale lifted from the "Inspect Readout" design (variant
-// 8a, "more than one ancestor") — claude.ai/design project
-// e089904e-9efa-456b-80df-0139baf91935.
-const READOUT = {
-  accent: '#2a5fd6', // the "styled" dot only
-  ink: '#191b1f', // class/id parts, detail values
-  muted: '#5f6672', // tag parts, detail labels, "styled" text, ancestor counts
-  faint: '#8b919c', // ANCESTORS section label
-  hollowDot: '#d3d6dd', // dot outline for an unstyled ancestor
-  border: '#e4e6ea',
-  rule: '#ecedf0',
-  keycapBorder: '#dfe1e6',
-  keycapBg: '#f7f8fa',
+/**
+ * The instance shape InspectorCard.vue exposes (shims.vue.d.ts types
+ * `.vue` imports generically), for what's driven imperatively here.
+ */
+type InspectorCardInstance = Vue & {
+  name: string;
+  matchCount: number | undefined;
+  styleCount: number;
+  declarations: Array<StylebotDeclaration> | null;
+  nextAncestor: NextAncestorInfo | null;
+  top: number;
+  left: number;
+  placement: 'above' | 'below' | null;
 };
 
-// Friendlier labels for the declaration rows, matching Stylebot's own
-// property-group naming (Text/Color/Layout/Border) where one exists —
-// anything not listed here just falls back to its raw CSS property name.
-const PROPERTY_LABELS: Record<string, string> = {
-  color: 'Color',
-  'background-color': 'Background',
-  'font-family': 'Font',
-  'font-size': 'Size',
-  'font-weight': 'Weight',
-  'font-style': 'Style',
-  'line-height': 'Line height',
-  'text-align': 'Alignment',
-  'text-decoration': 'Decoration',
-  'text-transform': 'Transform',
-  width: 'Width',
-  height: 'Height',
-  margin: 'Margin',
-  padding: 'Padding',
-  border: 'Border',
-  display: 'Display',
-  visibility: 'Visibility',
-};
-
-type SelectorPart = { text: string; kind: 'tag' | 'class' | 'id' };
-
-// Splits a single compound selector ("span.titleline", "td.title#row")
-// into tag/class/id parts so the tag can be de-emphasized relative to the
-// class/id, which is usually the part worth scanning for. A multi-token
-// descendant selector ("td span a", from the tag-chain fallback) isn't one
-// element's parts, so it's left as plain text rather than guessed at.
-function parseSelectorParts(selector: string): Array<SelectorPart> | null {
-  if (/\s/.test(selector)) {
-    return null;
-  }
-
-  const parts: Array<SelectorPart> = [];
-  const regex = /(^[a-zA-Z][\w-]*)|(\.[\w-]+)|(#[\w-]+)/g;
-  let match: RegExpExecArray | null;
-  let consumed = 0;
-
-  while ((match = regex.exec(selector))) {
-    const text = match[0];
-    const kind = text.startsWith('#') ? 'id' : text.startsWith('.') ? 'class' : 'tag';
-    parts.push({ text, kind });
-    consumed += text.length;
-  }
-
-  return consumed === selector.length && parts.length > 0 ? parts : null;
-}
-
-// Weight/color per part, not a hue per part — class and id both read as
-// "the specific bit", the tag as background context.
-const PART_COLORS: Record<SelectorPart['kind'], string> = {
-  tag: READOUT.muted,
-  class: READOUT.ink,
-  id: READOUT.ink,
-};
-
-const ARROW_SIZE = 11;
-
+/**
+ * A thin bridge to InspectorCard.vue, mounted into the editor's own
+ * theme-provider subtree so it inherits real theme CSS/fonts — unlike
+ * OverlayRect, which stays native in document.body.
+ */
 class OverlayTip {
-  tip: HTMLElement;
-  arrow: HTMLElement;
+  vm: InspectorCardInstance;
 
-  currentRow: HTMLElement;
-  currentDot: HTMLElement;
-  nameSpan: HTMLElement;
-  styledBadge: HTMLElement;
-  declarationsContainer: HTMLElement;
+  constructor(container: HTMLElement) {
+    const mountEl = document.createElement('div');
+    container.appendChild(mountEl);
 
-  matchesRow: HTMLElement;
-  matchesValueSpan: HTMLElement;
-
-  ancestorsDivider: HTMLElement;
-  ancestorsContainer: HTMLElement;
-
-  constructor(doc: Document, container: HTMLElement) {
-    this.tip = doc.createElement('div');
-
-    Object.assign(this.tip.style, {
-      display: 'flex',
-      flexFlow: 'column nowrap',
-      backgroundColor: '#fff',
-      border: `1px solid ${READOUT.border}`,
-      borderRadius: '10px',
-      boxShadow: '0 10px 30px rgba(0, 0, 0, 0.18)',
-      fontFamily:
-        '"SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace',
-      padding: '12px 14px 13px',
-      // The whole card follows the cursor while inspecting, so nothing in
-      // it can be hovered or clicked — climbing to the parent is done with
-      // the keyboard (ArrowUp/ArrowLeft), not by clicking a row here.
-      pointerEvents: 'none',
-      position: 'fixed',
-      fontSize: '11px',
-      lineHeight: '1.35',
-      whiteSpace: 'nowrap',
-      color: READOUT.ink,
-    });
-
-    this.arrow = doc.createElement('div');
-    Object.assign(this.arrow.style, {
-      position: 'absolute',
-      width: `${ARROW_SIZE}px`,
-      height: `${ARROW_SIZE}px`,
-      left: '16px',
-      display: 'none',
-      backgroundColor: '#fff',
-      borderRadius: '2px',
-      transform: 'rotate(45deg)',
-    });
-    this.tip.appendChild(this.arrow);
-
-    const current = this.buildIdentityRow();
-    this.currentRow = current.row;
-    this.currentDot = current.dot;
-    this.nameSpan = current.name;
-    Object.assign(this.nameSpan.style, {
-      fontWeight: 'bold',
-      fontSize: '12.5px',
-      lineHeight: '1.25',
-    });
-    this.tip.appendChild(this.currentRow);
-
-    this.styledBadge = doc.createElement('span');
-    this.styledBadge.textContent = 'styled';
-    Object.assign(this.styledBadge.style, {
-      display: 'none',
-      flex: 'none',
-      fontSize: '10px',
-      lineHeight: '1.25',
-      color: READOUT.muted,
-    });
-    this.currentRow.appendChild(this.styledBadge);
-
-    const details = doc.createElement('div');
-    Object.assign(details.style, {
-      display: 'flex',
-      flexFlow: 'column nowrap',
-      gap: '4px',
-      marginTop: '9px',
-    });
-    this.tip.appendChild(details);
-
-    this.declarationsContainer = doc.createElement('div');
-    Object.assign(this.declarationsContainer.style, {
-      display: 'flex',
-      flexFlow: 'column nowrap',
-      gap: '4px',
-    });
-    details.appendChild(this.declarationsContainer);
-
-    const matches = this.buildDetailRow('Matches');
-    this.matchesRow = matches.row;
-    this.matchesValueSpan = matches.value;
-    Object.assign(this.matchesRow.style, { display: 'none' });
-    details.appendChild(this.matchesRow);
-
-    // A labeled hairline, not a peer row — ancestors are their own section,
-    // not more detail about the element above it. The "↑" is a keycap
-    // hint (press ArrowUp to climb), not a clickable control.
-    this.ancestorsDivider = doc.createElement('div');
-    Object.assign(this.ancestorsDivider.style, {
-      display: 'none',
-      flexFlow: 'row nowrap',
-      alignItems: 'center',
-      gap: '9px',
-      margin: '13px 0 8px',
-    });
-    this.tip.appendChild(this.ancestorsDivider);
-
-    const ancestorsLabel = doc.createElement('div');
-    ancestorsLabel.textContent = 'ANCESTORS';
-    Object.assign(ancestorsLabel.style, {
-      fontSize: '10px',
-      lineHeight: '1.4',
-      letterSpacing: '0.1em',
-      textTransform: 'uppercase',
-      color: READOUT.faint,
-    });
-    this.ancestorsDivider.appendChild(ancestorsLabel);
-
-    const ancestorsKeycap = doc.createElement('div');
-    ancestorsKeycap.textContent = '↑';
-    Object.assign(ancestorsKeycap.style, {
-      flex: 'none',
-      padding: '1px 5px 2px',
-      borderRadius: '4px',
-      border: `1px solid ${READOUT.keycapBorder}`,
-      backgroundColor: READOUT.keycapBg,
-      fontSize: '10px',
-      lineHeight: '1.4',
-      color: READOUT.muted,
-    });
-    this.ancestorsDivider.appendChild(ancestorsKeycap);
-
-    const ancestorsRule = doc.createElement('div');
-    Object.assign(ancestorsRule.style, {
-      flex: '1',
-      height: '1px',
-      backgroundColor: READOUT.rule,
-    });
-    this.ancestorsDivider.appendChild(ancestorsRule);
-
-    // Rebuilt on every hover — length varies (0 to a few levels), and each
-    // row steps out one more indent than the last, nearest ancestor first.
-    this.ancestorsContainer = doc.createElement('div');
-    Object.assign(this.ancestorsContainer.style, {
-      display: 'none',
-      flexFlow: 'column nowrap',
-      gap: '5px',
-    });
-    this.tip.appendChild(this.ancestorsContainer);
-
-    // Above OverlayRect's z-index (10000000) — both are appended to the
-    // same container and OverlayRect instances are added later (per
-    // hover), so without a higher z-index here the highlight box's own
-    // translucent fill would paint over the tip and tint it.
-    this.tip.style.zIndex = '10000001';
-    container.appendChild(this.tip);
-  }
-
-  // A bulleted selector name that takes up the remaining row width (with
-  // ellipsis for long selectors) — the shape shared by the current
-  // element's row and the parent's row. The dot is a "styled" indicator,
-  // not decoration — hidden unless the caller turns it on.
-  private buildIdentityRow(): {
-    row: HTMLElement;
-    dot: HTMLElement;
-    name: HTMLElement;
-  } {
-    const row = document.createElement('div');
-    Object.assign(row.style, {
-      display: 'flex',
-      flexFlow: 'row nowrap',
-      alignItems: 'center',
-      gap: '8px',
-    });
-
-    const dot = document.createElement('span');
-    Object.assign(dot.style, {
-      display: 'none',
-      width: '7px',
-      height: '7px',
-      borderRadius: '3.5px',
-      backgroundColor: READOUT.accent,
-      flexShrink: '0',
-    });
-    row.appendChild(dot);
-
-    const name = document.createElement('span');
-    Object.assign(name.style, {
-      flex: '1',
-      minWidth: '0',
-      overflow: 'hidden',
-      textOverflow: 'ellipsis',
-      whiteSpace: 'nowrap',
-    });
-    row.appendChild(name);
-
-    return { row, dot, name };
-  }
-
-  // A label/value pair — "Font", "Matches", and every parsed declaration
-  // share this shape.
-  private buildDetailRow(label: string): { row: HTMLElement; value: HTMLElement } {
-    const row = document.createElement('div');
-    Object.assign(row.style, {
-      display: 'flex',
-      flexFlow: 'row nowrap',
-      alignItems: 'baseline',
-      gap: '12px',
-    });
-
-    const labelEl = document.createElement('div');
-    labelEl.textContent = label;
-    Object.assign(labelEl.style, { flex: '1', color: READOUT.muted });
-    row.appendChild(labelEl);
-
-    const value = document.createElement('div');
-    Object.assign(value.style, { color: READOUT.ink });
-    row.appendChild(value);
-
-    return { row, value };
-  }
-
-  // Colors each tag/class/id part of a compound selector on its own hue;
-  // falls back to plain text for anything parseSelectorParts can't split.
-  private renderSelectorName(target: HTMLElement, selector: string) {
-    target.innerHTML = '';
-    const parts = parseSelectorParts(selector);
-
-    if (!parts) {
-      target.textContent = selector;
-      return;
-    }
-
-    parts.forEach(part => {
-      const span = document.createElement('span');
-      span.textContent = part.text;
-      span.style.color = PART_COLORS[part.kind];
-      target.appendChild(span);
-    });
+    this.vm = new InspectorCard().$mount(mountEl) as InspectorCardInstance;
   }
 
   remove() {
-    if (this.tip.parentNode) {
-      this.tip.parentNode.removeChild(this.tip);
-    }
+    this.vm.$destroy();
+    this.vm.$el.parentNode?.removeChild(this.vm.$el);
   }
 
   showSummary(
     name: string,
-    matchCount?: number,
-    ancestors?: Array<AncestorInfo>,
-    declarations?: Array<StylebotDeclaration> | null
+    matchCount: number | undefined,
+    nextAncestor: NextAncestorInfo | null | undefined,
+    styleCount: number | undefined,
+    declarations: Array<StylebotDeclaration> | null | undefined
   ) {
-    this.renderSelectorName(this.nameSpan, name);
-
-    const isStyled = !!declarations && declarations.length > 0;
-    this.currentDot.style.display = isStyled ? 'inline-block' : 'none';
-    this.styledBadge.style.display = isStyled ? 'inline' : 'none';
-
-    this.declarationsContainer.innerHTML = '';
-    if (declarations && declarations.length > 0) {
-      this.renderDeclarations(declarations);
-    }
-
-    if (matchCount !== undefined && matchCount > 1) {
-      this.matchesRow.style.display = 'flex';
-      this.matchesValueSpan.textContent = `${matchCount} elements`;
-    } else {
-      this.matchesRow.style.display = 'none';
-    }
-
-    if (ancestors && ancestors.length > 0) {
-      this.ancestorsDivider.style.display = 'flex';
-      this.ancestorsContainer.style.display = 'flex';
-      this.renderAncestors(ancestors);
-    } else {
-      this.ancestorsDivider.style.display = 'none';
-      this.ancestorsContainer.style.display = 'none';
-    }
+    this.vm.name = name;
+    this.vm.matchCount = matchCount;
+    this.vm.nextAncestor = nextAncestor ?? null;
+    this.vm.styleCount = styleCount ?? 0;
+    this.vm.declarations = declarations ?? null;
   }
 
-  // One row per ancestor, nearest first, each indented one step further
-  // than the last so the list reads as containment. A solid dot means
-  // Stylebot has rules there; a hollow one means it doesn't.
-  private renderAncestors(ancestors: Array<AncestorInfo>) {
-    this.ancestorsContainer.innerHTML = '';
-
-    ancestors.forEach((ancestor, index) => {
-      const row = document.createElement('div');
-      Object.assign(row.style, {
-        display: 'flex',
-        flexFlow: 'row nowrap',
-        alignItems: 'center',
-        gap: '8px',
-        paddingLeft: `${index * 11}px`,
+  /**
+   * avoidHorizontal (the editor panel's viewport-relative left/right, if
+   * given) shifts the card to whichever side has more room when it would
+   * otherwise land on top of the panel.
+   */
+  updatePosition(
+    dims: Box,
+    bounds: Box,
+    avoidHorizontal?: { left: number; right: number } | null
+  ) {
+    // Vue patches the content set above asynchronously — wait a tick so
+    // the size measured below reflects it, not the previous hover.
+    this.vm.$nextTick(() => {
+      const tipRect = (this.vm.$el as HTMLElement).getBoundingClientRect();
+      const tipPos = findTipPos(dims, bounds, {
+        width: tipRect.width,
+        height: tipRect.height,
       });
 
-      const dot = document.createElement('span');
-      Object.assign(dot.style, {
-        display: 'inline-block',
-        width: '7px',
-        height: '7px',
-        borderRadius: '3.5px',
-        flexShrink: '0',
-        boxSizing: 'border-box',
-        backgroundColor: ancestor.styled ? READOUT.accent : 'transparent',
-        border: ancestor.styled ? 'none' : `1px solid ${READOUT.hollowDot}`,
-      });
-      row.appendChild(dot);
+      let left = parseFloat(tipPos.style.left);
 
-      const name = document.createElement('span');
-      Object.assign(name.style, {
-        flex: '1',
-        minWidth: '0',
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        whiteSpace: 'nowrap',
-      });
-      row.appendChild(name);
-      this.renderSelectorName(name, ancestor.label);
+      if (avoidHorizontal) {
+        const overlaps =
+          left < avoidHorizontal.right && left + tipRect.width > avoidHorizontal.left;
 
-      const count = document.createElement('span');
-      count.textContent =
-        ancestor.matchCount > 1 ? String(ancestor.matchCount) : '';
-      Object.assign(count.style, {
-        flex: 'none',
-        marginLeft: '12px',
-        color: READOUT.muted,
-      });
-      row.appendChild(count);
+        if (overlaps) {
+          const margin = 8;
+          const spaceLeft = avoidHorizontal.left;
+          const spaceRight = window.innerWidth - avoidHorizontal.right;
 
-      this.ancestorsContainer.appendChild(row);
-    });
-  }
+          left =
+            spaceLeft >= tipRect.width + margin || spaceLeft > spaceRight
+              ? avoidHorizontal.left - tipRect.width - margin
+              : avoidHorizontal.right + margin;
 
-  private renderDeclarations(declarations: Array<StylebotDeclaration>) {
-    declarations.forEach(({ property, value }) => {
-      const { row, value: valueEl } = this.buildDetailRow(
-        PROPERTY_LABELS[property] ?? property
-      );
-
-      if (property.toLowerCase().includes('color')) {
-        const swatch = document.createElement('span');
-        Object.assign(swatch.style, {
-          display: 'inline-block',
-          width: '10px',
-          height: '10px',
-          borderRadius: '2px',
-          border: '1px solid #ccc',
-          backgroundColor: value,
-          marginRight: '4px',
-          verticalAlign: 'middle',
-        });
-        valueEl.appendChild(swatch);
+          left = Math.max(margin, Math.min(left, window.innerWidth - tipRect.width - margin));
+        }
       }
 
-      valueEl.appendChild(document.createTextNode(value));
-      this.declarationsContainer.appendChild(row);
+      this.vm.top = parseFloat(tipPos.style.top);
+      this.vm.left = left;
+      this.vm.placement = tipPos.placement;
     });
   }
 
-  updatePosition(dims: Box, bounds: Box) {
-    const tipRect = this.tip.getBoundingClientRect();
-    const tipPos = findTipPos(dims, bounds, {
-      width: tipRect.width,
-      height: tipRect.height,
+  /**
+   * For a selector preview (typing/hovering in the editor) rather than
+   * picking an element — sits beside the panel instead of near wherever
+   * the selector happens to match, which may be scattered or off-screen.
+   */
+  updatePositionNextToPanel(panelEl: HTMLElement | null) {
+    this.vm.$nextTick(() => {
+      const tipRect = (this.vm.$el as HTMLElement).getBoundingClientRect();
+      const panelRect = panelEl?.getBoundingClientRect();
+      const margin = 16;
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+
+      let left: number;
+      let top: number;
+
+      if (panelRect) {
+        // Prefer whichever side of the panel has more open space.
+        const spaceLeft = panelRect.left;
+        const spaceRight = viewportWidth - panelRect.right;
+
+        left =
+          spaceLeft >= tipRect.width + margin || spaceLeft > spaceRight
+            ? panelRect.left - tipRect.width - margin
+            : panelRect.right + margin;
+
+        top = panelRect.top;
+      } else {
+        // Panel not found (shouldn't normally happen) — a corner beats
+        // leaving the card wherever it last was.
+        left = viewportWidth - tipRect.width - margin;
+        top = margin;
+      }
+
+      this.vm.left = Math.max(margin, Math.min(left, viewportWidth - tipRect.width - margin));
+      this.vm.top = Math.max(margin, Math.min(top, viewportHeight - tipRect.height - margin));
+      this.vm.placement = null;
     });
-
-    Object.assign(this.tip.style, tipPos.style);
-
-    // A rotated square, not a CSS-border triangle — its border only on
-    // the two edges facing the element it points at, so it reads as a
-    // notch continuous with the card's own border.
-    if (tipPos.placement === 'below') {
-      Object.assign(this.arrow.style, {
-        display: 'block',
-        top: `${-ARROW_SIZE / 2}px`,
-        bottom: '',
-        borderLeft: `1px solid ${READOUT.border}`,
-        borderTop: `1px solid ${READOUT.border}`,
-        borderRight: '',
-        borderBottom: '',
-      });
-    } else if (tipPos.placement === 'above') {
-      Object.assign(this.arrow.style, {
-        display: 'block',
-        bottom: `${-ARROW_SIZE / 2}px`,
-        top: '',
-        borderRight: `1px solid ${READOUT.border}`,
-        borderBottom: `1px solid ${READOUT.border}`,
-        borderLeft: '',
-        borderTop: '',
-      });
-    } else {
-      this.arrow.style.display = 'none';
-    }
   }
 }
 
 export default class Overlay {
   container: HTMLElement;
+  mountRoot?: HTMLElement;
   tip: OverlayTip;
   rects: Array<OverlayRect>;
 
-  constructor() {
+  /**
+   * Highlight rects stay native in this.container; the tip is Vue-rendered
+   * into mountRoot when given, so it inherits the editor's real theme.
+   * mountRoot is kept (not just handed to OverlayTip) so inspect() can
+   * also find the editor panel within it.
+   */
+  constructor(mountRoot?: HTMLElement) {
     const doc = window.document;
 
     this.container = doc.createElement('div');
     this.container.id = 'stylebot-overlay';
     this.container.style.zIndex = '10000000';
-
-    this.tip = new OverlayTip(doc, this.container);
-    this.rects = [];
-
     doc.body.appendChild(this.container);
+
+    this.mountRoot = mountRoot;
+    this.tip = new OverlayTip(mountRoot ?? this.container);
+    this.rects = [];
   }
 
   remove(): void {
@@ -654,17 +319,24 @@ export default class Overlay {
     cssSelector: string,
     property?: LayoutProperty,
     picking?: {
-      primary: HTMLElement;
-      ancestors?: Array<AncestorInfo>;
+      primary?: HTMLElement;
+      nextAncestor?: NextAncestorInfo | null;
+      styleCount?: number;
       declarations?: Array<StylebotDeclaration> | null;
+      /**
+       * A selector preview rather than picking an element — see
+       * OverlayTip.updatePositionNextToPanel.
+       */
+      anchorToPanel?: boolean;
     }
   ): void {
     const primary = picking?.primary;
-    const ancestors = picking?.ancestors;
+    const nextAncestor = picking?.nextAncestor;
+    const styleCount = picking?.styleCount;
     const declarations = picking?.declarations;
+    const anchorToPanel = picking?.anchorToPanel ?? false;
 
-    // A pure technical safety net against pathological cases (thousands of
-    // DOM nodes rebuilt on every hover) — not a design choice.
+    // A safety net against pathological cases, not a design choice.
     const maxElements = 1000;
 
     const candidates = nodes.filter(
@@ -673,10 +345,8 @@ export default class Overlay {
 
     const rawMatchCount = candidates.length;
 
-    // While picking, only the element under the cursor gets highlighted —
-    // other matches are reported via the "Matches" count in the tooltip,
-    // not drawn on the page. Outside picking (BoxModel hover, selector
-    // preview), every matched element gets the full treatment, as before.
+    // While picking, only the hovered element is highlighted; other
+    // matches are reported via the tooltip's match count instead.
     const elements = primary ? [primary] : candidates.slice(0, maxElements);
 
     while (this.rects.length > elements.length) {
@@ -733,45 +403,59 @@ export default class Overlay {
     });
 
     if (!property) {
-      // A primary element (interactive picking) anchors the tooltip to
-      // itself, not the union of every matched element — otherwise a
-      // selector matching scattered elements would fling the tooltip
-      // toward whatever their combined bounding box happens to cover.
-      const tipBox =
-        primaryBox && primaryBox.left !== Number.POSITIVE_INFINITY
-          ? primaryBox
-          : outerBox;
-
       this.tip.showSummary(
         cssSelector,
-        primary ? rawMatchCount : undefined,
-        ancestors,
+        // Shown for any picking/preview payload, not just active picking.
+        picking ? rawMatchCount : undefined,
+        nextAncestor,
+        styleCount,
         declarations
       );
 
-      const tipBounds = getNestedBoundingClientRect(
-        window.document.documentElement,
-        window
-      );
+      const panelEl =
+        this.mountRoot?.querySelector<HTMLElement>('.stylebot') ?? null;
 
-      this.tip.updatePosition(
-        {
-          top: tipBox.top,
-          left: tipBox.left,
-          height: tipBox.bottom - tipBox.top,
-          width: tipBox.right - tipBox.left,
-        },
-        {
-          top: tipBounds.top + window.scrollY,
-          left: tipBounds.left + window.scrollX,
-          height: window.innerHeight,
-          width: window.innerWidth,
-        }
-      );
+      if (anchorToPanel) {
+        this.tip.updatePositionNextToPanel(panelEl);
+      } else {
+        // Anchors to the primary element itself, not the union of every
+        // match, so scattered matches don't fling the tooltip around.
+        const tipBox =
+          primaryBox && primaryBox.left !== Number.POSITIVE_INFINITY
+            ? primaryBox
+            : outerBox;
+
+        const tipBounds = getNestedBoundingClientRect(
+          window.document.documentElement,
+          window
+        );
+
+        const panelRect = panelEl?.getBoundingClientRect() ?? null;
+
+        this.tip.updatePosition(
+          {
+            top: tipBox.top,
+            left: tipBox.left,
+            height: tipBox.bottom - tipBox.top,
+            width: tipBox.right - tipBox.left,
+          },
+          {
+            top: tipBounds.top + window.scrollY,
+            left: tipBounds.left + window.scrollX,
+            height: window.innerHeight,
+            width: window.innerWidth,
+          },
+          panelRect && { left: panelRect.left, right: panelRect.right }
+        );
+      }
     }
   }
 }
 
+/**
+ * Prefers placing the tip below the element, above only if there's no
+ * room below, matching the reference design.
+ */
 function findTipPos(
   dims: Box,
   bounds: Box,
@@ -781,9 +465,6 @@ function findTipPos(
   const tipWidth = Math.max(tipSize.width, 60);
   const margin = 8;
 
-  // Prefer sitting below the element, falling back to above only when
-  // there isn't room below (matches the reference design, which always
-  // places the card below).
   let top;
   let placement: 'above' | 'below' | null;
 
@@ -801,8 +482,8 @@ function findTipPos(
     placement = null;
   }
 
-  // Align flush with the element's left edge rather than offsetting by
-  // `margin` (that's meant as a vertical gap, not a horizontal one).
+  // Flush with the element's left edge, not offset by `margin` (that's a
+  // vertical gap only).
   let left = dims.left;
   if (dims.left < bounds.left) {
     left = bounds.left + margin;

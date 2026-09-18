@@ -7,6 +7,102 @@ const escapeSelectorToken = (value: string): string => {
   return value.replace(/([ !"#$%&'()*+,./:;<=>?@[\\\]^`{|}~])/g, '\\$1');
 };
 
+function escapeAttributeValue(value: string): string {
+  return value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+}
+
+/**
+ * Conventions test frameworks/component libraries use for a stable,
+ * intentional targeting hook, checked most-specific first.
+ */
+const TEST_ID_ATTRIBUTES = ['data-testid', 'data-test-id', 'data-test', 'data-cy', 'data-qa'];
+
+export const getTestIdBasedSelector = (el: HTMLElement): string | null => {
+  for (const attribute of TEST_ID_ATTRIBUTES) {
+    const value = el.getAttribute(attribute);
+    if (value) {
+      return `${el.tagName.toLowerCase()}[${attribute}="${escapeAttributeValue(value)}"]`;
+    }
+  }
+
+  return null;
+};
+
+/**
+ * `name` predates data-testid but serves the same role on form elements:
+ * an identifier, not a human/screen-reader description like aria-label.
+ */
+export const getNameBasedSelector = (el: HTMLElement): string | null => {
+  const name = el.getAttribute('name');
+  if (name) {
+    return `${el.tagName.toLowerCase()}[name="${escapeAttributeValue(name)}"]`;
+  }
+
+  return null;
+};
+
+/**
+ * Flags build-tool-generated class names (CSS Modules, styled-components,
+ * Closure Compiler) by shape, since they carry no stable meaning.
+ */
+function looksHashed(className: string): boolean {
+  if (/^(css|sc|jsx|emotion|styled|chakra)-/i.test(className)) {
+    return true;
+  }
+
+  // An intentional separator means an authored name, whatever its shape.
+  if (/[-_]/.test(className)) {
+    return false;
+  }
+
+  // A hex-like hash, e.g. CSS Modules' "_1a2b3c".
+  if (/^_?[0-9a-f]{5,}$/i.test(className)) {
+    return true;
+  }
+
+  if (className.length < 4 || className.length > 12) {
+    return false;
+  }
+
+  // camelCase words have 1-2 case transitions; hashes have far more.
+  let transitions = 0;
+  for (let i = 1; i < className.length; i++) {
+    const prevUpper = className[i - 1] !== className[i - 1].toLowerCase();
+    const curUpper = className[i] !== className[i].toLowerCase();
+    if (prevUpper !== curUpper) {
+      transitions++;
+    }
+  }
+
+  return transitions / className.length > 0.3;
+}
+
+/**
+ * The first class that isn't hashed, so a stable but non-first class
+ * doesn't lose out to a hashed one earlier in the list.
+ */
+export const getNonHashedClassBasedSelector = (el: HTMLElement): string | null => {
+  const className = el
+    .getAttribute('class')
+    ?.trim()
+    .replace(/\s{2,}/g, ' ');
+
+  if (!className) {
+    return null;
+  }
+
+  const usableClass = className.split(' ').find(candidate => !looksHashed(candidate));
+  if (!usableClass) {
+    return null;
+  }
+
+  return `${el.tagName.toLowerCase()}.${escapeSelectorToken(usableClass)}`;
+};
+
+/**
+ * Just the first class, hashed or not — the fallback once nothing more
+ * stable (non-hashed class, test-id, name) is available.
+ */
 export const getClassBasedSelector = (el: HTMLElement): string | null => {
   const className = el
     .getAttribute('class')
@@ -14,16 +110,8 @@ export const getClassBasedSelector = (el: HTMLElement): string | null => {
     .replace(/\s{2,}/g, ' ');
 
   if (className) {
-    const classes = className.split(' ');
-    const len = classes.length;
-
-    let selector = el.tagName.toLowerCase();
-    for (let i = 0; i < len; i++) {
-      // todo: optimize class selection to be more specific here
-      selector += '.' + escapeSelectorToken(classes[i]);
-    }
-
-    return selector;
+    const firstClass = className.split(' ')[0];
+    return `${el.tagName.toLowerCase()}.${escapeSelectorToken(firstClass)}`;
   }
 
   return null;
@@ -58,18 +146,79 @@ export const getTagNameBasedSelector = (
   return tagName;
 };
 
+/**
+ * Non-hashed class, test-id, or name — deliberately excludes #id and a
+ * hashed class, so a real ancestor match (see getAncestorBasedSelector)
+ * still outranks the element's own id or a meaningless hash.
+ */
+function getGoodOwnSelector(el: HTMLElement): string | null {
+  return (
+    getNonHashedClassBasedSelector(el) ??
+    getTestIdBasedSelector(el) ??
+    getNameBasedSelector(el)
+  );
+}
+
+/**
+ * Climbs up to 2 levels, stopping at the first ancestor getOwnSelector
+ * likes, instead of always reaching a fixed depth.
+ */
+function climbToNearestUsableAncestor(
+  el: HTMLElement,
+  getOwnSelector: (el: HTMLElement) => string | null
+): string | null {
+  const tagChain: Array<string> = [el.tagName.toLowerCase()];
+  let current = el;
+
+  for (let level = 0; level < 2; level++) {
+    const parent = current.parentElement;
+    if (!parent) {
+      return null;
+    }
+
+    const parentSelector = getOwnSelector(parent);
+    if (parentSelector) {
+      return [parentSelector, ...tagChain].join(' ');
+    }
+
+    tagChain.unshift(parent.tagName.toLowerCase());
+    current = parent;
+  }
+
+  return null;
+}
+
+/**
+ * Like getTagNameBasedSelector, but stops at the nearest ancestor (within
+ * 2 levels) with a real class/test-id/name, e.g. `div.mw-heading h2` once
+ * the immediate parent already qualifies.
+ */
+export const getAncestorBasedSelector = (el: HTMLElement): string | null =>
+  climbToNearestUsableAncestor(el, getGoodOwnSelector);
+
+/**
+ * The same climb as getAncestorBasedSelector, but accepting a hashed
+ * class too — only reached once nothing better is available anywhere.
+ */
+function getAncestorHashedClassSelector(el: HTMLElement): string | null {
+  return climbToNearestUsableAncestor(el, getClassBasedSelector);
+}
+
+/**
+ * Priority: own non-hashed class/test-id/name, a real ancestor match, own
+ * #id, own hashed class, an ancestor's hashed class, then a bare tag
+ * chain. #id ranks above a hash (far more reliable) but below anything
+ * genuinely authored, own or an ancestor's.
+ */
 export const getSelector = (el: HTMLElement): string => {
-  let selector = getClassBasedSelector(el);
-
-  if (!selector) {
-    selector = getIdBasedSelector(el);
-  }
-
-  if (!selector) {
-    return getTagNameBasedSelector(el);
-  }
-
-  return selector;
+  return (
+    getGoodOwnSelector(el) ??
+    getAncestorBasedSelector(el) ??
+    getIdBasedSelector(el) ??
+    getClassBasedSelector(el) ??
+    getAncestorHashedClassSelector(el) ??
+    getTagNameBasedSelector(el)
+  );
 };
 
 export const validateSelector = (selector: string): boolean => {

@@ -23,7 +23,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { MenuItem, SCountBadge, SChip } from '@stylebot/components';
-import { validateSelector } from '@stylebot/css';
+import { validateSelector, getRuleForSelector } from '@stylebot/css';
 import { Highlighter } from '@stylebot/highlighter';
 
 export default Vue.extend({
@@ -66,6 +66,8 @@ export default Vue.extend({
       onSelect: () => {
         return;
       },
+      getStylebotDeclarations: this.getStylebotDeclarations,
+      getMountRoot: () => this.$root.$el as HTMLElement,
     });
   },
 
@@ -97,6 +99,23 @@ export default Vue.extend({
 
     clearPreview(): void {
       this.highlighter?.unhighlight();
+    },
+
+    getStylebotDeclarations(
+      selector: string
+    ): Array<{ property: string; value: string }> | null {
+      const rule = getRuleForSelector(this.$store.state.css, selector);
+
+      if (!rule) {
+        return null;
+      }
+
+      const declarations: Array<{ property: string; value: string }> = [];
+      rule.walkDecls(decl => {
+        declarations.push({ property: decl.prop, value: decl.value });
+      });
+
+      return declarations.length > 0 ? declarations : null;
     },
   },
 });

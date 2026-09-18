@@ -17,9 +17,13 @@ export {
 
 export {
   getSelector,
+  getTestIdBasedSelector,
+  getNameBasedSelector,
+  getNonHashedClassBasedSelector,
   getIdBasedSelector,
   getClassBasedSelector,
   getTagNameBasedSelector,
+  getAncestorBasedSelector,
   validateSelector,
 } from './selector';
 
@@ -29,6 +33,7 @@ export {
   getRule,
   getRuleForSelector,
   getExistingSelector,
+  splitSelectorFromGroup,
   addEmptyRule,
   removeEmptyRules,
   removeRule,

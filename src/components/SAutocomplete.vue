@@ -225,10 +225,12 @@ export default Vue.extend({
       // the static 30px CSS height until this resizes it to fit.
       this.resize();
       this.syncMenu();
+      this.$emit('focus');
     },
 
     onBlur(): void {
       this.focused = false;
+      this.$emit('blur');
     },
 
     // Switches from the pill display back to the raw editable textarea

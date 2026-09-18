@@ -1,4 +1,5 @@
 import Overlay from './Overlay';
+import { getComputedDeclarations } from './utils';
 import { getSelector } from '@stylebot/css';
 
 type LayoutProperty = 'margin' | 'border' | 'padding' | 'height' | 'width';
@@ -12,38 +13,58 @@ class Highlighter {
     selector: string
   ) => Array<StylebotDeclaration> | null;
   getExistingSelector?: (el: HTMLElement) => string | null;
+  getMountRoot?: () => HTMLElement;
   currentElement: HTMLElement | null;
   drillStack: HTMLElement[];
+  /**
+   * Element/value currently suppressed by suppressTitle, if any.
+   */
+  titleSuppressedElement: HTMLElement | null;
+  suppressedTitleValue: string | null;
+  /**
+   * The `<style>` forcing a plain cursor while inspecting, if any.
+   */
+  cursorStyleElement: HTMLStyleElement | null;
 
   constructor({
     onSelect,
     getStylebotDeclarations,
     getExistingSelector,
+    getMountRoot,
   }: {
     onSelect: (selector: string) => void;
     getStylebotDeclarations?: (
       selector: string
     ) => Array<StylebotDeclaration> | null;
     getExistingSelector?: (el: HTMLElement) => string | null;
+    /**
+     * The editor's theme-provider element, for the on-page tip to mount into.
+     */
+    getMountRoot?: () => HTMLElement;
   }) {
     this.overlay = null;
     this.onSelect = onSelect;
     this.getStylebotDeclarations = getStylebotDeclarations;
     this.getExistingSelector = getExistingSelector;
+    this.getMountRoot = getMountRoot;
     this.currentElement = null;
     this.drillStack = [];
+    this.titleSuppressedElement = null;
+    this.suppressedTitleValue = null;
+    this.cursorStyleElement = null;
   }
 
-  // Prefers a selector the user has already authored CSS against — via the
-  // browser's own matching, not just an exact-string check — over
-  // generating a fresh one, so picking an already-styled element continues
-  // editing its existing rule instead of starting an unrelated new one.
+  /**
+   * Prefers a selector the user has already authored CSS against over
+   * generating a fresh one, so editing continues an existing rule.
+   */
   getSelectorFor = (el: HTMLElement): string => {
     return this.getExistingSelector?.(el) ?? getSelector(el);
   };
 
   startInspecting = (): void => {
     this.addWindowListeners();
+    this.suppressCursor();
   };
 
   stopInspecting = (): void => {
@@ -51,6 +72,73 @@ class Highlighter {
     this.removeWindowListeners();
     this.drillStack = [];
     this.currentElement = null;
+    this.restoreSuppressedTitle();
+    this.restoreCursor();
+  };
+
+  /**
+   * Forces a plain cursor site-wide, so the page's own cursor styling
+   * doesn't bleed through while inspecting.
+   */
+  suppressCursor = (): void => {
+    if (this.cursorStyleElement) {
+      return;
+    }
+
+    const style = document.createElement('style');
+    style.textContent = '* { cursor: default !important; }';
+    document.head.appendChild(style);
+    this.cursorStyleElement = style;
+  };
+
+  restoreCursor = (): void => {
+    this.cursorStyleElement?.remove();
+    this.cursorStyleElement = null;
+  };
+
+  /**
+   * Restores the element's native `title`, suppressed to keep the
+   * browser's own tooltip from fighting with our overlay.
+   */
+  restoreSuppressedTitle = (): void => {
+    if (this.titleSuppressedElement && this.suppressedTitleValue !== null) {
+      this.titleSuppressedElement.setAttribute('title', this.suppressedTitleValue);
+    }
+
+    this.titleSuppressedElement = null;
+    this.suppressedTitleValue = null;
+  };
+
+  suppressTitle = (el: HTMLElement): void => {
+    // The tooltip belongs to whichever ancestor (inclusive) has the
+    // attribute, not necessarily el itself.
+    const titledElement = el.closest('[title]') as HTMLElement | null;
+
+    if (!titledElement) {
+      return;
+    }
+
+    const title = titledElement.getAttribute('title');
+
+    if (title !== null) {
+      this.titleSuppressedElement = titledElement;
+      this.suppressedTitleValue = title;
+      titledElement.removeAttribute('title');
+    }
+  };
+
+  /**
+   * Restores the previous element's title and suppresses the new one's,
+   * on hover or ArrowUp/Down drilling alike.
+   */
+  setCurrentElement = (el: HTMLElement): void => {
+    if (el === this.currentElement) {
+      return;
+    }
+
+    this.restoreSuppressedTitle();
+    this.suppressTitle(el);
+    this.currentElement = el;
   };
 
   highlight = (selector: string, property?: LayoutProperty): void => {
@@ -59,14 +147,27 @@ class Highlighter {
     }
 
     if (!this.overlay) {
-      this.overlay = new Overlay();
+      this.overlay = new Overlay(this.getMountRoot?.());
     }
 
     const elements = Array.prototype.slice.call(
       document.querySelectorAll(selector)
-    );
+    ) as HTMLElement[];
 
-    this.overlay.inspect(elements, selector, property);
+    const authoredDeclarations = this.getStylebotDeclarations?.(selector) ?? null;
+
+    this.overlay.inspect(elements, selector, property, {
+      // A selector preview, not picking one specific element — anchor
+      // beside the panel rather than near wherever it matches.
+      anchorToPanel: true,
+      styleCount: authoredDeclarations?.length ?? 0,
+      declarations:
+        authoredDeclarations && authoredDeclarations.length > 0
+          ? authoredDeclarations
+          : elements[0]
+            ? getComputedDeclarations(elements[0])
+            : null,
+    });
   };
 
   unhighlight = (): void => {
@@ -99,32 +200,25 @@ class Highlighter {
     this.onSelect(this.getSelectorFor(el));
   };
 
-  // Nearest ancestor first. Capped at 3 levels — past that the card starts
-  // competing with the subject for attention.
-  getAncestorsInfo = (
+  /**
+   * Info about the immediate parent, offered as the single next step
+   * upward rather than listing several levels at once.
+   */
+  getNextAncestorInfo = (
     el: HTMLElement
-  ): Array<{ label: string; matchCount: number; styled: boolean }> => {
-    const ancestors: Array<{
-      label: string;
-      matchCount: number;
-      styled: boolean;
-    }> = [];
+  ): { label: string; styleCount: number } | null => {
+    const parent = el.parentElement;
 
-    let node = el.parentElement;
-
-    while (node && !this.isStylebotElement(node) && ancestors.length < 3) {
-      const selector = this.getSelectorFor(node);
-
-      ancestors.push({
-        label: selector,
-        matchCount: document.querySelectorAll(selector).length,
-        styled: !!this.getStylebotDeclarations?.(selector),
-      });
-
-      node = node.parentElement;
+    if (!parent || this.isStylebotElement(parent)) {
+      return null;
     }
 
-    return ancestors;
+    const selector = this.getSelectorFor(parent);
+
+    return {
+      label: selector,
+      styleCount: this.getStylebotDeclarations?.(selector)?.length ?? 0,
+    };
   };
 
   onKeyDown = (event: KeyboardEvent): void => {
@@ -141,7 +235,7 @@ class Highlighter {
         event.stopPropagation();
 
         this.drillStack.push(this.currentElement);
-        this.currentElement = parent;
+        this.setCurrentElement(parent);
         this.showOverlay(parent);
       }
     } else if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
@@ -151,7 +245,7 @@ class Highlighter {
         event.preventDefault();
         event.stopPropagation();
 
-        this.currentElement = child;
+        this.setCurrentElement(child);
         this.showOverlay(child);
       }
     } else if (event.key === 'Enter') {
@@ -205,7 +299,7 @@ class Highlighter {
       this.drillStack = [];
     }
 
-    this.currentElement = el;
+    this.setCurrentElement(el);
     this.showOverlay(el);
   };
 
@@ -218,7 +312,7 @@ class Highlighter {
 
   showOverlay = (el: HTMLElement): void => {
     if (!this.overlay) {
-      this.overlay = new Overlay();
+      this.overlay = new Overlay(this.getMountRoot?.());
     }
 
     const selector = this.getSelectorFor(el);
@@ -226,10 +320,18 @@ class Highlighter {
       document.querySelectorAll(selector)
     ) as HTMLElement[];
 
+    const authoredDeclarations = this.getStylebotDeclarations?.(selector) ?? null;
+
     this.overlay.inspect(matches, selector, undefined, {
       primary: el,
-      ancestors: this.getAncestorsInfo(el),
-      declarations: this.getStylebotDeclarations?.(selector) ?? null,
+      nextAncestor: this.getNextAncestorInfo(el),
+      // Falls back to a computed-style preview when nothing's authored,
+      // rather than showing an empty card.
+      styleCount: authoredDeclarations?.length ?? 0,
+      declarations:
+        authoredDeclarations && authoredDeclarations.length > 0
+          ? authoredDeclarations
+          : getComputedDeclarations(el),
     });
   };
 

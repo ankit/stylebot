@@ -76,6 +76,7 @@ export default Vue.extend({
       onSelect: this.select,
       getStylebotDeclarations: this.getStylebotDeclarations,
       getExistingSelector: this.findExistingSelector,
+      getMountRoot: () => this.$root.$el as HTMLElement,
     });
 
     if (this.active) {

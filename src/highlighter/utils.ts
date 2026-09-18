@@ -151,3 +151,19 @@ export function getElementDimensions(domElement: HTMLElement): Dimensions {
     paddingBottom: parseInt(calculatedStyle.paddingBottom, 10),
   };
 }
+
+// A minimal preview of how the element currently renders, for when
+// Stylebot hasn't authored any declarations for it yet — otherwise the
+// inspect card would show nothing at all below the selector.
+const PREVIEW_PROPERTIES = ['color', 'font-size', 'line-height'];
+
+export function getComputedDeclarations(
+  el: HTMLElement
+): Array<{ property: string; value: string }> {
+  const computedStyle = window.getComputedStyle(el);
+
+  return PREVIEW_PROPERTIES.map(property => ({
+    property,
+    value: computedStyle.getPropertyValue(property),
+  }));
+}
