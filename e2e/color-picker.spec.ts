@@ -1,6 +1,5 @@
-import http from 'node:http';
-import type { AddressInfo } from 'node:net';
 import { test, expect } from './fixtures';
+import { openEditor } from './helpers';
 
 const PAGE_HTML = `
   <!doctype html>
@@ -13,23 +12,6 @@ const PAGE_HTML = `
   </html>
 `;
 
-let server: http.Server;
-let baseUrl: string;
-
-test.beforeAll(async () => {
-  server = http.createServer((_req, res) => {
-    res.writeHead(200, { 'Content-Type': 'text/html' });
-    res.end(PAGE_HTML);
-  });
-
-  await new Promise<void>(resolve => server.listen(0, resolve));
-  baseUrl = `http://localhost:${(server.address() as AddressInfo).port}/`;
-});
-
-test.afterAll(async () => {
-  await new Promise<void>(resolve => server.close(() => resolve()));
-});
-
 test('falls back to page colors, then switches to already-used colors once a rule is set', async ({
   context,
   openPopup,
@@ -38,23 +20,22 @@ test('falls back to page colors, then switches to already-used colors once a rul
   // reopen) — give it more headroom under parallel-worker CPU contention.
   testInfo.setTimeout(60_000);
 
+  await context.route('http://localhost/**', route =>
+    route.fulfill({ contentType: 'text/html', body: PAGE_HTML })
+  );
+
   const page = await context.newPage();
-  await page.goto(baseUrl);
-  await page.bringToFront();
+  await page.goto('http://localhost/');
 
-  const popup = await openPopup();
-
-  // The extension's onInstalled help tab can grab focus between the calls
-  // above and here, especially under load — reclaim it right before the
-  // toggle click so the message lands on our page, not the help tab.
-  await page.bringToFront();
-  await popup.getByRole('button', { name: /^Style this page/ }).dispatchEvent('click');
-  await expect(page.locator('#stylebot')).toBeAttached({ timeout: 30_000 });
+  await openEditor(page, openPopup);
 
   // Enables the (otherwise disabled) property fields — ColorPicker.vue reads
   // `activeSelector` to gate itself, same as every other property control.
   await page.getByPlaceholder('Pick an element').fill('h1');
 
+  // page-scoped, not editorRoot-scoped: chaining .filter({ has }) off a
+  // locator that's already pierced the #stylebot shadow root once breaks
+  // the containment check across that boundary a second time.
   const textCard = page
     .locator('.property-card')
     .filter({ has: page.locator('.property-card-label', { hasText: /^Text$/ }) });
