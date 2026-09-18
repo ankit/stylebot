@@ -19,14 +19,8 @@ export const get = async (
   return options[name];
 };
 
-/**
- * Chains every write onto the previous one so a set() call always reads
- * options *after* the prior set() has finished writing. Without this,
- * concurrent SetOption messages (e.g. rapid layout updates while dragging
- * the resize handle) can each read the same stale snapshot and the last
- * write to land clobbers an unrelated field changed in between, such as
- * silently reverting the editor mode the user just picked.
- */
+/* Chains writes so each set() reads options only after the prior one
+ * finished, preventing concurrent writes from clobbering each other. */
 let pendingWrite = Promise.resolve();
 
 export const set = (
