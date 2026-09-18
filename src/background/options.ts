@@ -19,8 +19,10 @@ export const get = async (
   return options[name];
 };
 
-/* Chains writes so each set() reads options only after the prior one
- * finished, preventing concurrent writes from clobbering each other. */
+/**
+ * Chains writes so each set() reads options only after the prior one
+ * finished, preventing concurrent writes from clobbering each other.
+ */
 let pendingWrite = Promise.resolve();
 
 export const set = (
