@@ -1,5 +1,6 @@
 import http from 'node:http';
 import type { AddressInfo } from 'node:net';
+import zlib from 'node:zlib';
 import { test, expect, closeServer, type Page } from './fixtures';
 
 // Content script / background worker readiness can lag under heavy parallel CPU
@@ -35,20 +36,104 @@ const APP_HTML = `
   </html>
 `;
 
+const HERO_IMAGE_PATH = '/images/hero.png';
+
+const pngChunk = (type: string, data: Buffer) => {
+  const length = Buffer.alloc(4);
+  length.writeUInt32BE(data.length);
+
+  const typed = Buffer.concat([Buffer.from(type, 'ascii'), data]);
+  const crc = Buffer.alloc(4);
+  crc.writeUInt32BE(zlib.crc32(typed));
+
+  return Buffer.concat([length, typed, crc]);
+};
+
+// Defuddle drops images that measure small, and getReadabilityArticle() sizes the
+// parsed clone from naturalWidth/Height — so the hero has to be a real, big image.
+const solidPng = (width: number, height: number) => {
+  const ihdr = Buffer.alloc(13);
+  ihdr.writeUInt32BE(width, 0);
+  ihdr.writeUInt32BE(height, 4);
+  ihdr[8] = 8; // 8-bit grayscale, one byte per pixel
+
+  const raw = Buffer.alloc(height * (width + 1), 0xc8);
+  for (let y = 0; y < height; y++) {
+    raw[y * (width + 1)] = 0; // per-scanline filter byte
+  }
+
+  return Buffer.concat([
+    Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
+    pngChunk('IHDR', ihdr),
+    pngChunk('IDAT', zlib.deflateSync(raw)),
+    pngChunk('IEND', Buffer.alloc(0)),
+  ]);
+};
+
+const HERO_IMAGE = solidPng(1200, 800);
+
+const HERO_PARAGRAPH = `<p>${'This is a long paragraph of article content used to satisfy the readability heuristic. '.repeat(
+  10
+)}</p>`;
+
+// The og:image also appears in the body — the case isSameImage() exists to dedupe,
+// and the one that used to spin forever. Defuddle strips a bare leading image as
+// hero chrome, so it sits mid-article in a captioned figure to survive extraction.
+const heroHtml = (imageUrl: string) => `
+  <!doctype html>
+  <html>
+    <head>
+      <title>Hero Article</title>
+      <meta property="og:image" content="${imageUrl}">
+    </head>
+    <body>
+      <article>
+        <h1>A Hero Article</h1>
+        ${HERO_PARAGRAPH}
+        ${HERO_PARAGRAPH}
+        <figure>
+          <img src="${imageUrl}" width="1200" height="800" alt="Hero">
+          <figcaption>A caption for the hero photograph.</figcaption>
+        </figure>
+        ${HERO_PARAGRAPH}
+      </article>
+    </body>
+  </html>
+`;
+
 let server: http.Server;
 let baseUrl: string;
 let appUrl: string;
+let heroUrl: string;
+let heroImageUrl: string;
 
 test.beforeAll(async () => {
   server = http.createServer((req, res) => {
+    const url = req.url ?? '';
+
+    if (url.startsWith(HERO_IMAGE_PATH)) {
+      res.writeHead(200, { 'Content-Type': 'image/png' });
+      res.end(HERO_IMAGE);
+      return;
+    }
+
     res.writeHead(200, { 'Content-Type': 'text/html' });
-    res.end(req.url?.startsWith('/app/') ? APP_HTML : ARTICLE_HTML);
+
+    if (url.startsWith('/app/')) {
+      res.end(APP_HTML);
+    } else if (url.startsWith('/hero/')) {
+      res.end(heroHtml(heroImageUrl));
+    } else {
+      res.end(ARTICLE_HTML);
+    }
   });
 
   await new Promise<void>(resolve => server.listen(0, resolve));
   const port = (server.address() as AddressInfo).port;
   baseUrl = `http://localhost:${port}/articles/a-test-article`;
   appUrl = `http://localhost:${port}/app/dashboard`;
+  heroUrl = `http://localhost:${port}/hero/a-hero-article`;
+  heroImageUrl = `http://localhost:${port}${HERO_IMAGE_PATH}`;
 });
 
 test.afterAll(() => closeServer(server));
@@ -79,6 +164,38 @@ test('toggling readability on in the popup activates the reader', async ({
   await expect(page.locator('body > #stylebot-reader')).toHaveCount(1, {
     timeout: 10000,
   });
+});
+
+// Regression test: isSameImage()'s shared-prefix scan had no upper bound, so two
+// identical filename stems compared undefined === undefined forever. mountReader()
+// awaits getReadabilityArticle() before creating the host, so the content script
+// spun on the page's main thread and the reader never appeared.
+test('activates the reader on an article whose hero image also appears in the body', async ({
+  context,
+  openPopup,
+}) => {
+  const page = await context.newPage();
+  await page.goto(heroUrl);
+  await page.bringToFront();
+
+  const popup = await openPopup();
+  const toggle = readabilityToggle(popup).locator('input[type="checkbox"]');
+
+  await expect(toggle).toBeEnabled({ timeout: 15000 });
+  await readabilityToggle(popup).locator('.track').click();
+  await expect(toggle).toBeChecked();
+  await popup.close();
+
+  const reader = page.locator('body > #stylebot-reader');
+  await expect(reader).toHaveCount(1, { timeout: 10000 });
+
+  // Exactly one copy, and it is the body's — withLeadImage() builds its figure
+  // from src alone, so the surviving alt proves the og:image was deduped away
+  // rather than Defuddle having dropped the body image.
+  await expect(reader.locator(`img[src="${heroImageUrl}"]`)).toHaveCount(1);
+  await expect(
+    reader.locator(`img[src="${heroImageUrl}"][alt="Hero"]`)
+  ).toHaveCount(1);
 });
 
 // Regression test: chrome.tabs.query({ active: true }) had no window scope,
