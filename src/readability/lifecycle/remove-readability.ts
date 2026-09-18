@@ -16,7 +16,8 @@ export const removeReadability = (): void => {
   revertToCachedDocument();
 
   const host = document.getElementById('stylebot-reader');
-  const panel = host?.shadowRoot?.querySelector<HTMLElement>('.stylebot-reader');
+  const panel =
+    host?.shadowRoot?.querySelector<HTMLElement>('.stylebot-reader');
 
   if (!panel) {
     host?.remove();

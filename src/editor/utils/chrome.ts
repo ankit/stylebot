@@ -135,22 +135,21 @@ export const getCommands = async (): Promise<GetCommandsResponse> => {
   });
 };
 
-export const getReadabilitySettings = async (): Promise<
-  GetReadabilitySettingsResponse
-> => {
-  const message: GetReadabilitySettings = {
-    name: 'GetReadabilitySettings',
-  };
+export const getReadabilitySettings =
+  async (): Promise<GetReadabilitySettingsResponse> => {
+    const message: GetReadabilitySettings = {
+      name: 'GetReadabilitySettings',
+    };
 
-  return new Promise(resolve => {
-    chrome.runtime.sendMessage(
-      message,
-      (response: GetReadabilitySettingsResponse) => {
-        resolve(response);
-      }
-    );
-  });
-};
+    return new Promise(resolve => {
+      chrome.runtime.sendMessage(
+        message,
+        (response: GetReadabilitySettingsResponse) => {
+          resolve(response);
+        }
+      );
+    });
+  };
 
 export const setReadabilitySettings = (value: ReadabilitySettings): void => {
   const message: SetReadabilitySettings = {

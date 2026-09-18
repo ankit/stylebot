@@ -5,9 +5,19 @@
     @prev="pickPrev"
     @next="pickNext"
   >
-    <template #prev><span style="font: 400 12px/1 system-ui">&rarr;&larr;</span></template>
+    <template #prev>
+      <span style="font: 400 12px/1 system-ui">&rarr;&larr;</span>
+    </template>
     <template #next>
-      <span style="font: 400 12px/1 system-ui; display: inline-block; transform: scaleX(2.1)">&harr;</span>
+      <span
+        style="
+          font: 400 12px/1 system-ui;
+          display: inline-block;
+          transform: scaleX(2.1);
+        "
+      >
+        &harr;
+      </span>
     </template>
   </segmented>
 </template>
@@ -51,7 +61,10 @@ export default Vue.extend({
     },
 
     pickNext(): void {
-      this.$emit('pick', WIDTHS[Math.min(WIDTHS.length - 1, this.widthIndex + 1)]);
+      this.$emit(
+        'pick',
+        WIDTHS[Math.min(WIDTHS.length - 1, this.widthIndex + 1)]
+      );
     },
   },
 });

@@ -35,23 +35,33 @@ export const showLoader = (): void => {
   let cachedTheme: ReadabilityTheme | null = null;
 
   try {
-    cachedTheme = localStorage.getItem(THEME_CACHE_KEY) as ReadabilityTheme | null;
+    cachedTheme = localStorage.getItem(
+      THEME_CACHE_KEY
+    ) as ReadabilityTheme | null;
   } catch {
     // localStorage may be unavailable; the loader just falls back to light.
   }
 
-  const background = (cachedTheme && THEME_BACKGROUNDS[cachedTheme]) || THEME_BACKGROUNDS.light;
-  const foreground = (cachedTheme && THEME_FOREGROUNDS[cachedTheme]) || THEME_FOREGROUNDS.light;
+  const background =
+    (cachedTheme && THEME_BACKGROUNDS[cachedTheme]) || THEME_BACKGROUNDS.light;
+  const foreground =
+    (cachedTheme && THEME_FOREGROUNDS[cachedTheme]) || THEME_FOREGROUNDS.light;
 
   // Set inline (not via <style>) so it commits before any CSSOM parse/recalc,
   // ahead of the browser's first paint.
-  document.documentElement.style.setProperty('background', background, 'important');
+  document.documentElement.style.setProperty(
+    'background',
+    background,
+    'important'
+  );
 
   const style = document.createElement('style');
   style.type = 'text/css';
   style.setAttribute('id', 'stylebot-reader-loading');
   style.appendChild(
-    document.createTextNode(loaderCss({ background, foreground }, LOADER_LINES.length))
+    document.createTextNode(
+      loaderCss({ background, foreground }, LOADER_LINES.length)
+    )
   );
   document.documentElement.appendChild(style);
 

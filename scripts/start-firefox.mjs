@@ -12,17 +12,29 @@ import { spawn } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const rootDir = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  '..'
+);
 
 const macFirefoxCandidates = [
   '/Applications/Firefox.app/Contents/MacOS/firefox',
-  path.join(process.env.HOME ?? '', 'Applications/Firefox.app/Contents/MacOS/firefox'),
+  path.join(
+    process.env.HOME ?? '',
+    'Applications/Firefox.app/Contents/MacOS/firefox'
+  ),
 ];
 
 const firefoxBinary =
-  process.platform === 'darwin' ? macFirefoxCandidates.find(existsSync) : undefined;
+  process.platform === 'darwin'
+    ? macFirefoxCandidates.find(existsSync)
+    : undefined;
 
-const webExtBin = path.join(rootDir, 'node_modules/.bin', process.platform === 'win32' ? 'web-ext.cmd' : 'web-ext');
+const webExtBin = path.join(
+  rootDir,
+  'node_modules/.bin',
+  process.platform === 'win32' ? 'web-ext.cmd' : 'web-ext'
+);
 
 const args = ['run', '--source-dir', './firefox-dist/'];
 if (firefoxBinary) {

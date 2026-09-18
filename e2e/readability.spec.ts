@@ -15,7 +15,9 @@ const ARTICLE_HTML = `
     <body>
       <article>
         <h1>A Test Article</h1>
-        <p>${'This is a long paragraph of article content used to satisfy the readability heuristic. '.repeat(10)}</p>
+        <p>${'This is a long paragraph of article content used to satisfy the readability heuristic. '.repeat(
+          10
+        )}</p>
       </article>
     </body>
   </html>
@@ -81,7 +83,7 @@ test('toggling readability on in the popup activates the reader', async ({
 
 // Regression test: chrome.tabs.query({ active: true }) had no window scope,
 // so with multiple windows open the toggle could message the wrong tab.
-test('toggling readability with a second window open targets the popup\'s own tab', async ({
+test("toggling readability with a second window open targets the popup's own tab", async ({
   context,
   openPopup,
 }) => {
@@ -98,9 +100,7 @@ test('toggling readability with a second window open targets the popup\'s own ta
     url: `${baseUrl}-2`,
     newWindow: true,
   });
-  const pageB = await context.waitForEvent('page', p =>
-    p.url().endsWith('-2')
-  );
+  const pageB = await context.waitForEvent('page', p => p.url().endsWith('-2'));
   await pageB.bringToFront();
 
   // The popup opens in whichever window is frontmost — window B here —
@@ -173,7 +173,10 @@ test('does not show the loading overlay when reloading a page already proven not
             const store = JSON.parse(
               localStorage.getItem('stylebot-reader-eligibility') || '{}'
             );
-            return store.urls?.[new URL(url).origin + new URL(url).pathname] === false;
+            return (
+              store.urls?.[new URL(url).origin + new URL(url).pathname] ===
+              false
+            );
           } catch {
             return false;
           }

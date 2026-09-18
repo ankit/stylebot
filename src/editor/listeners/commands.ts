@@ -32,7 +32,7 @@ const handleCommand = (store: Store<State>, name: StylebotCommandName) => {
 };
 
 // Combos currently bound via hotkeys(), so a later re-bind can unbind them first.
-let boundCombos: string[] = [];
+let boundCombos: Array<string> = [];
 
 const bindCommands = (store: Store<State>): void => {
   boundCombos.forEach(combo => hotkeys.unbind(combo));
@@ -44,7 +44,7 @@ const bindCommands = (store: Store<State>): void => {
     return;
   }
 
-  (Object.keys(commands) as StylebotCommandName[]).forEach(name => {
+  (Object.keys(commands) as Array<StylebotCommandName>).forEach(name => {
     const combo = commands[name];
 
     if (combo) {

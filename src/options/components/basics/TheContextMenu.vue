@@ -1,8 +1,14 @@
 <template>
   <div class="card">
-    <toggle-switch size="lg" :value="contextMenu" @change="contextMenu = $event">
+    <toggle-switch
+      size="lg"
+      :value="contextMenu"
+      @change="contextMenu = $event"
+    >
       <heading as="h2" size="sm">{{ t('right_click_menu') }}</heading>
-      <s-text size="caption" variant="muted" class="description">{{ t('right_click_menu_description') }}</s-text>
+      <s-text size="caption" variant="muted" class="description">
+        {{ t('right_click_menu_description') }}
+      </s-text>
     </toggle-switch>
   </div>
 </template>

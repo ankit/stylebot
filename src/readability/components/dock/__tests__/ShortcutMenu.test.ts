@@ -66,7 +66,12 @@ describe('ShortcutMenu.vue', () => {
     expect(shortcutStore.state.recording).toBe(true);
 
     wrapper.element.dispatchEvent(
-      new KeyboardEvent('keydown', { key: 't', code: 'KeyT', ctrlKey: true, shiftKey: true })
+      new KeyboardEvent('keydown', {
+        key: 't',
+        code: 'KeyT',
+        ctrlKey: true,
+        shiftKey: true,
+      })
     );
     await wrapper.vm.$nextTick();
 
@@ -80,7 +85,9 @@ describe('ShortcutMenu.vue', () => {
     const wrapper = mountMenu('');
 
     await wrapper.find('.record-btn').trigger('click');
-    wrapper.element.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    wrapper.element.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Escape' })
+    );
     await wrapper.vm.$nextTick();
 
     expect(shortcutStore.state.recording).toBe(false);
@@ -92,6 +99,8 @@ describe('ShortcutMenu.vue', () => {
 
     await wrapper.find('.menu-item.danger').trigger('click');
 
-    expect(setCommands).toHaveBeenCalledWith(expect.objectContaining({ readability: '' }));
+    expect(setCommands).toHaveBeenCalledWith(
+      expect.objectContaining({ readability: '' })
+    );
   });
 });

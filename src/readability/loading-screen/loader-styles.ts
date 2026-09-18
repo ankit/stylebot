@@ -22,7 +22,9 @@ export const loaderCss = (
   const lineDelays = Array.from(
     { length: lineCount },
     (_, i) =>
-      `#${LOADER_ART_ID} > i:nth-child(${i + 1}) { animation-delay: ${i * 0.14}s; }`
+      `#${LOADER_ART_ID} > i:nth-child(${i + 1}) { animation-delay: ${
+        i * 0.14
+      }s; }`
   ).join(' ');
 
   return (

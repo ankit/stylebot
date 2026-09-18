@@ -3,10 +3,9 @@
     <h1>{{ selector }}</h1>
 
     <b-list-group>
-      <b-list-group-item
-        v-for="decl in computedCss"
-        :key="decl.property"
-      >{{ decl.property }}: {{ decl.value }}</b-list-group-item>
+      <b-list-group-item v-for="decl in computedCss" :key="decl.property">
+        {{ decl.property }}: {{ decl.value }}
+      </b-list-group-item>
     </b-list-group>
   </div>
 </template>

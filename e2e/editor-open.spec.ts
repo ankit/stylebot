@@ -1,11 +1,32 @@
 import { test, expect } from './fixtures';
+import { startTestServer } from './helpers';
+
+const PAGE_HTML = `
+  <!doctype html>
+  <html>
+    <body>
+      <h1>Test page</h1>
+    </body>
+  </html>
+`;
+
+let baseUrl: string;
+let closePageServer: () => Promise<void>;
+
+test.beforeAll(async () => {
+  ({ baseUrl, close: closePageServer } = await startTestServer({
+    '/': PAGE_HTML,
+  }));
+});
+
+test.afterAll(() => closePageServer());
 
 test('opening Stylebot from the popup opens the editor in the current tab', async ({
   context,
   openPopup,
 }) => {
   const page = await context.newPage();
-  await page.goto('https://example.com');
+  await page.goto(baseUrl);
 
   // init-editor.ts mounts the editor under this host once ToggleStylebot reaches it.
   await expect(page.locator('#stylebot')).toHaveCount(0);

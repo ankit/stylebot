@@ -13,7 +13,12 @@ describe('modifiersFromEvent', () => {
       metaKey: true,
     });
 
-    expect(modifiersFromEvent(event)).toEqual(['ctrl', 'alt', 'shift', 'command']);
+    expect(modifiersFromEvent(event)).toEqual([
+      'ctrl',
+      'alt',
+      'shift',
+      'command',
+    ]);
   });
 
   it('returns an empty array when no modifier is held', () => {
@@ -63,7 +68,10 @@ describe('keydownToShortcut', () => {
   });
 
   it('falls back to event.key for keys with no code mapping', () => {
-    const event = new KeyboardEvent('keydown', { key: 'ArrowUp', code: 'ArrowUp' });
+    const event = new KeyboardEvent('keydown', {
+      key: 'ArrowUp',
+      code: 'ArrowUp',
+    });
     expect(keydownToShortcut(event)).toBe('arrowup');
   });
 });

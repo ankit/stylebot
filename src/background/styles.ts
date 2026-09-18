@@ -18,7 +18,7 @@ export const applyStylesToAllTabs = async (): Promise<void> => {
 
   chrome.tabs.query({}, tabs => {
     tabs.forEach(async tab => {
-      if (tab && tab.url && tab.id) {
+      if (tab?.url && tab.id) {
         const { styles, defaultStyle } = getStylesForPage(tab.url, allStyles);
 
         const message: ApplyStylesToTab = {
@@ -42,7 +42,9 @@ export const applyStylesToAllTabs = async (): Promise<void> => {
  * Refreshes the toolbar badge for a single tab based on its styles
  * and readability state.
  */
-export const refreshBadgeForTab = async (tab: chrome.tabs.Tab): Promise<void> => {
+export const refreshBadgeForTab = async (
+  tab: chrome.tabs.Tab
+): Promise<void> => {
   if (!tab.url || tab.id === undefined) {
     return;
   }
@@ -207,6 +209,15 @@ export const move = (src: string, dest: string): Promise<void> =>
 
     return styles;
   });
+
+/**
+ * Checks whether a Google Web Fonts stylesheet url resolves to a real font.
+ */
+export const getGoogleWebFontExists = (url: string): Promise<boolean> => {
+  return fetch(url)
+    .then(response => response.status !== 400)
+    .catch(() => false);
+};
 
 /**
  * Fetches CSS from a url for import, resolving to an empty string on

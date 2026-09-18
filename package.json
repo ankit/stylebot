@@ -24,13 +24,16 @@
     "dev:chrome:headless": "yarn install && (yarn watch & cross-env STYLEBOT_FRESH_BUILD=1 STYLEBOT_HEADLESS=1 yarn start:chrome; kill 0)",
     "dev:edge": "yarn install && (yarn watch & cross-env STYLEBOT_FRESH_BUILD=1 yarn start:edge; kill 0)",
     "dev:firefox": "yarn install && (yarn watch:firefox & node scripts/wait-for-firefox-build.mjs && yarn start:firefox; kill 0)",
-    "lint": "eslint --ext .js,.ts,.vue src",
+    "lint": "eslint --ext .js,.mjs,.ts,.vue .",
     "lint:fix": "yarn lint --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit",
     "test": "jest",
     "validate-locales": "node scripts/validate-locales.mjs",
     "test:coverage": "jest --coverage",
     "test:e2e": "yarn build && playwright test",
+    "test:e2e:edge": "cross-env STYLEBOT_BROWSER=edge yarn test:e2e",
     "test:e2e:ui": "yarn build && playwright test --ui",
     "postinstall": "patch-package"
   },
@@ -59,8 +62,12 @@
     }
   },
   "lint-staged": {
-    "src/**/*.{js,ts,vue}": [
-      "yarn lint:fix"
+    "*.{js,mjs,ts,vue}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,scss,css,md,yml,yaml}": [
+      "prettier --write"
     ]
   },
   "husky": {
@@ -113,7 +120,7 @@
     "postcss-loader": "^3.0.0",
     "postcss-rem-to-pixel": "^4.1.2",
     "postinstall-postinstall": "^2.1.0",
-    "prettier": "^2.0.5",
+    "prettier": "^2.8.8",
     "prettier-eslint": "^11.0.0",
     "progress-bar-webpack-plugin": "^2.1.0",
     "requirejs": "^2.3.6",

@@ -153,7 +153,9 @@ export default Vue.extend({
     },
 
     dockOpacity(): number {
-      return this.idle && !this.anyMenuOpen && !this.showShortcutPrompt ? 0.45 : 1;
+      return this.idle && !this.anyMenuOpen && !this.showShortcutPrompt
+        ? 0.45
+        : 1;
     },
 
     closeTipText(): string {
@@ -168,7 +170,11 @@ export default Vue.extend({
     // dismiss it — hidden while any menu (including the shortcut menu
     // itself) is open, so it never overlaps another panel.
     showShortcutPrompt(): boolean {
-      return !shortcutStore.state.promptDismissed && !shortcutStore.value() && !this.anyMenuOpen;
+      return (
+        !shortcutStore.state.promptDismissed &&
+        !shortcutStore.value() &&
+        !this.anyMenuOpen
+      );
     },
   },
 
@@ -195,7 +201,9 @@ export default Vue.extend({
 
   mounted() {
     this.wake();
-    WAKE_EVENTS.forEach(event => window.addEventListener(event, this.wake, { passive: true }));
+    WAKE_EVENTS.forEach(event =>
+      window.addEventListener(event, this.wake, { passive: true })
+    );
     shortcutStore.ensureLoaded();
   },
 
@@ -233,7 +241,9 @@ export default Vue.extend({
     focusFirstIn(ref: string): void {
       this.$nextTick(() => {
         const menu = this.$refs[ref] as Vue | undefined;
-        (menu?.$el as HTMLElement | undefined)?.querySelector<HTMLElement>('button')?.focus();
+        (menu?.$el as HTMLElement | undefined)
+          ?.querySelector<HTMLElement>('button')
+          ?.focus();
       });
     },
 
@@ -321,8 +331,8 @@ export default Vue.extend({
   flex-direction: column;
   align-items: flex-end;
   gap: 10px;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Ubuntu,
-    'Helvetica Neue', sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    Ubuntu, 'Helvetica Neue', sans-serif;
   transition: opacity 0.32s ease;
 
   * {

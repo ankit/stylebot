@@ -65,11 +65,11 @@ export const appendImportantToDeclarations = (css: string): string => {
   const isAncestorAnAtRule = (node: postcss.Node): boolean => {
     if (node.type === 'atrule') {
       return true;
-    } else if (node.type === 'decl' || node.type === 'rule') {
-      return isAncestorAnAtRule(node.parent);
-    } else {
-      return false;
     }
+    if (node.type === 'decl' || node.type === 'rule') {
+      return isAncestorAnAtRule(node.parent);
+    }
+    return false;
   };
 
   root.walkDecls(decl => {

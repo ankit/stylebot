@@ -11,10 +11,10 @@ export const extractImports = (
   const importUrls: Array<string> = [];
 
   root.walkAtRules('import', (atRule: postcss.AtRule) => {
-    const regex = /^(url\()?([^\)]*)(\))?$/;
+    const regex = /^(url\()?([^)]*)(\))?$/;
     const paramsWithoutQuotes = atRule.params
       .replace(/"/g, '')
-      .replace(/\'/g, '');
+      .replace(/'/g, '');
     const matches = paramsWithoutQuotes.match(regex);
 
     if (matches) {
@@ -57,8 +57,7 @@ export const pruneImportCache = (liveUrls: ReadonlySet<string>): void => {
       const key = localStorage.key(i);
 
       if (
-        key &&
-        key.startsWith(IMPORT_CACHE_PREFIX) &&
+        key?.startsWith(IMPORT_CACHE_PREFIX) &&
         !liveUrls.has(key.slice(IMPORT_CACHE_PREFIX.length))
       ) {
         staleKeys.push(key);

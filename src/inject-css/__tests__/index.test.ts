@@ -41,10 +41,9 @@ describe('inject-css run()', () => {
   });
 
   const load = (storedItems: Record<string, unknown>) => {
-    (
-      (global as any).chrome.storage.local.get as jest.Mock
-    ).mockImplementation((_key: string, callback: (items: unknown) => void) =>
-      callback(storedItems)
+    ((global as any).chrome.storage.local.get as jest.Mock).mockImplementation(
+      (_key: string, callback: (items: unknown) => void) =>
+        callback(storedItems)
     );
 
     require('../index');
@@ -130,10 +129,7 @@ describe('inject-css run()', () => {
     };
 
     expect(applyStateModule.applyState).toHaveBeenNthCalledWith(1, cached);
-    expect(applyStateModule.applyState).toHaveBeenNthCalledWith(
-      2,
-      freshState
-    );
+    expect(applyStateModule.applyState).toHaveBeenNthCalledWith(2, freshState);
     expect(cacheModule.writeCache).toHaveBeenCalledWith(freshState);
   });
 

@@ -19,16 +19,26 @@ export const get = async (
   return options[name];
 };
 
-export const set = async (
+/**
+ * Chains writes so each set() reads options only after the prior one
+ * finished, preventing concurrent writes from clobbering each other.
+ */
+let pendingWrite = Promise.resolve();
+
+export const set = (
   name: keyof StylebotOptions,
   value: StylebotOptions[keyof StylebotOptions]
 ): Promise<void> => {
-  let options = await getAll();
+  pendingWrite = pendingWrite.then(async () => {
+    const options = {
+      ...(await getAll()),
+      [name]: value,
+    };
 
-  options = {
-    ...options,
-    [name]: value,
-  };
+    await new Promise<void>(resolve => {
+      chrome.storage.local.set({ options }, resolve);
+    });
+  });
 
-  chrome.storage.local.set({ options });
+  return pendingWrite;
 };

@@ -84,21 +84,17 @@ const initVueApp = async (
  * into a shadow DOM host on top of it.
  */
 export const mountReader = async (): Promise<void> => {
-  return new Promise(async (resolve, reject) => {
-    if (!hasReaderableContent(document)) {
-      reject();
-      return;
-    }
+  if (!hasReaderableContent(document)) {
+    return Promise.reject();
+  }
 
-    try {
-      const { url, source } = getDomainUrlAndSource();
-      const article = await getReadabilityArticle();
+  try {
+    const { url, source } = getDomainUrlAndSource();
+    const article = await getReadabilityArticle();
 
-      cacheDocument();
-      await initVueApp(url, source, article);
-      resolve();
-    } catch (e) {
-      reject();
-    }
-  });
+    cacheDocument();
+    await initVueApp(url, source, article);
+  } catch (e) {
+    return Promise.reject();
+  }
 };

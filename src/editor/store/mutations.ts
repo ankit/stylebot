@@ -56,7 +56,9 @@ export default {
           value: rule.selector,
           count: document.querySelectorAll(rule.selector).length,
         });
-      } catch (e) {}
+      } catch (e) {
+        // querySelectorAll throws on selectors it can't parse; skip those rules.
+      }
     });
 
     // sort in descending order of number of affected elements
@@ -65,9 +67,8 @@ export default {
         return b.count - a.count;
       } else if (b.value > a.value) {
         return -1;
-      } else {
-        return 1;
       }
+      return 1;
     });
 
     state.selectors = selectors;
