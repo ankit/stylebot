@@ -20,7 +20,9 @@ export default Vue.extend({
 
     return {
       // Separate entry from the in-page editor's iframe (index.html) — see MonacoEditorIframe.ts.
-      src: chrome.runtime.getURL(`monaco-editor/iframe/options-index.html?theme=${theme}`),
+      src: chrome.runtime.getURL(
+        `monaco-editor/iframe/options-index.html?theme=${theme}`
+      ),
       ready: false,
     };
   },

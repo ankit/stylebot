@@ -7,9 +7,9 @@
     >
       {{ t('readability') }}
       <template v-if="disabled" #trailing>
-        <span class="popup-caption articles-only-label">{{
-          t('articles_only')
-        }}</span>
+        <span class="popup-caption articles-only-label">
+          {{ t('articles_only') }}
+        </span>
       </template>
       <template v-else-if="shortcut" #trailing>
         <shortcut-chip small muted :value="shortcut" />

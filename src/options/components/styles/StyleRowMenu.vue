@@ -1,7 +1,12 @@
 <template>
   <anchored-menu>
     <template #trigger="{ toggle }">
-      <icon-menu-trigger :size="size" :bordered="false" title="More actions" @click="toggle" />
+      <icon-menu-trigger
+        :size="size"
+        :bordered="false"
+        title="More actions"
+        @click="toggle"
+      />
     </template>
 
     <template #default="{ close }">

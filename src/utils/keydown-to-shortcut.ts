@@ -1,4 +1,11 @@
-export const MODIFIER_KEYS = new Set(['Shift', 'Control', 'Alt', 'Meta', 'OS', 'AltGraph']);
+export const MODIFIER_KEYS = new Set([
+  'Shift',
+  'Control',
+  'Alt',
+  'Meta',
+  'OS',
+  'AltGraph',
+]);
 
 // event.key is layout-remapped (Option turns "R" into "‰" on macOS), so
 // letters/digits are read from event.code instead.
@@ -30,7 +37,10 @@ export const keydownToShortcut = (event: KeyboardEvent): string | null => {
     return null;
   }
 
-  const key = event.key === ' ' ? 'space' : codeToKey(event.code) ?? event.key.toLowerCase();
+  const key =
+    event.key === ' '
+      ? 'space'
+      : codeToKey(event.code) ?? event.key.toLowerCase();
 
   return [...modifiersFromEvent(event), key].join('+');
 };

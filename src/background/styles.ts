@@ -34,7 +34,9 @@ export const applyStylesToAllTabs = async (): Promise<void> => {
   });
 };
 
-export const refreshBadgeForTab = async (tab: chrome.tabs.Tab): Promise<void> => {
+export const refreshBadgeForTab = async (
+  tab: chrome.tabs.Tab
+): Promise<void> => {
   if (!tab.url || tab.id === undefined) {
     return;
   }

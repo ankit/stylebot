@@ -9,7 +9,14 @@
       aria-describedby="confirm-dialog-message"
     >
       <heading id="confirm-dialog-title" as="h2" size="md">{{ title }}</heading>
-      <s-text id="confirm-dialog-message" size="caption" variant="muted" class="message">{{ message }}</s-text>
+      <s-text
+        id="confirm-dialog-message"
+        size="caption"
+        variant="muted"
+        class="message"
+      >
+        {{ message }}
+      </s-text>
 
       <div class="actions">
         <s-button ref="cancelButton" variant="ghost" @click="$emit('cancel')">
@@ -94,7 +101,9 @@ export default Vue.extend({
   methods: {
     focusableElements(): Array<HTMLElement> {
       const card = this.$refs.card as HTMLElement;
-      return Array.from(card.querySelectorAll<HTMLElement>('button, a[href], [tabindex]'));
+      return Array.from(
+        card.querySelectorAll<HTMLElement>('button, a[href], [tabindex]')
+      );
     },
 
     onKeydown(event: KeyboardEvent): void {

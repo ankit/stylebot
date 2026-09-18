@@ -9,7 +9,10 @@ import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 const { parseLocaleConfig } = require('./lib/parse-locale-config.js');
 
-const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const rootDir = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  '..'
+);
 const localesDir = path.join(rootDir, 'src/_locales');
 const srcDir = path.join(rootDir, 'src');
 const manifestPath = path.join(rootDir, 'src/extension/manifest.json');
@@ -149,7 +152,9 @@ function main() {
 
     for (const key of Object.keys(messages)) {
       if (!(key in baseMessages)) {
-        errors.push(`${locale}.config: "@${key}" does not exist in ${baseLocale}.config`);
+        errors.push(
+          `${locale}.config: "@${key}" does not exist in ${baseLocale}.config`
+        );
       }
     }
 
@@ -168,14 +173,18 @@ function main() {
 
       if (mismatch) {
         errors.push(
-          `${locale}.config: "@${key}" placeholders [${[...localePlaceholders]}] don't match ${baseLocale}.config [${[...basePlaceholders]}]`
+          `${locale}.config: "@${key}" placeholders [${[
+            ...localePlaceholders,
+          ]}] don't match ${baseLocale}.config [${[...basePlaceholders]}]`
         );
       }
     }
   }
 
   if (dynamicCalls.length > 0) {
-    console.log(`Skipped ${dynamicCalls.length} dynamic (non-literal) key reference(s), not statically checkable:`);
+    console.log(
+      `Skipped ${dynamicCalls.length} dynamic (non-literal) key reference(s), not statically checkable:`
+    );
     dynamicCalls.forEach(call => console.log(`  - ${call}`));
     console.log('');
   }

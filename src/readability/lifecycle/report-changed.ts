@@ -5,6 +5,8 @@ import { ReadabilityActiveChanged } from '@stylebot/types';
  * it re-queries the live DOM instead of trusting a passed value.
  */
 export const reportChanged = (): void => {
-  const message: ReadabilityActiveChanged = { name: 'ReadabilityActiveChanged' };
+  const message: ReadabilityActiveChanged = {
+    name: 'ReadabilityActiveChanged',
+  };
   chrome.runtime.sendMessage(message);
 };

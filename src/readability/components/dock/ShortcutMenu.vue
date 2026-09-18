@@ -1,5 +1,11 @@
 <template>
-  <div ref="root" class="menu-root" tabindex="-1" @keydown="onKeydown" @keyup="onKeyup">
+  <div
+    ref="root"
+    class="menu-root"
+    tabindex="-1"
+    @keydown="onKeydown"
+    @keyup="onKeyup"
+  >
     <s-menu dense :min-width="232">
       <div v-if="recording" class="content">
         <div class="capture-row">
@@ -7,12 +13,17 @@
             <shortcut-kbd v-if="liveModifiers" :value="liveModifiers" />
             <span class="placeholder">_</span>
           </span>
-          <button type="button" class="cancel" @click="cancelRecording">{{ t('cancel') }}</button>
+          <button type="button" class="cancel" @click="cancelRecording">
+            {{ t('cancel') }}
+          </button>
         </div>
         <s-text size="caption" variant="muted" class="helper">
           {{ t('press_key_to_finish') }}
           <template v-if="hasValue">
-            {{ t('esc_keeps') }} <span class="chip chip-inline"><shortcut-kbd :value="value" /></span>
+            {{ t('esc_keeps') }}
+            <span class="chip chip-inline">
+              <shortcut-kbd :value="value" />
+            </span>
           </template>
           <template v-else>{{ t('esc_cancels') }}</template>
         </s-text>
@@ -23,9 +34,13 @@
           <div class="title">{{ t('readability_shortcut') }}</div>
           <shortcut-chip :value="value" />
         </div>
-        <s-text size="caption" variant="muted" class="desc">{{ t('readability_shortcut_description') }}</s-text>
+        <s-text size="caption" variant="muted" class="desc">
+          {{ t('readability_shortcut_description') }}
+        </s-text>
         <div class="divider" />
-        <menu-item @click="startRecording">{{ t('change_shortcut') }}</menu-item>
+        <menu-item @click="startRecording">
+          {{ t('change_shortcut') }}
+        </menu-item>
         <menu-item danger @click="remove">{{ t('remove') }}</menu-item>
       </div>
 
@@ -42,7 +57,9 @@
             <icon-x />
           </button>
         </div>
-        <s-text size="caption" variant="muted" class="desc">{{ t('readability_shortcut_description') }}</s-text>
+        <s-text size="caption" variant="muted" class="desc">
+          {{ t('readability_shortcut_description') }}
+        </s-text>
         <button type="button" class="record-btn" @click="startRecording">
           <icon-keyboard />
           {{ t('record_shortcut') }}
@@ -342,10 +359,12 @@ export default Vue.extend({
 }
 
 @keyframes shortcut-cursor-blink {
-  0%, 50% {
+  0%,
+  50% {
     opacity: 1;
   }
-  51%, 100% {
+  51%,
+  100% {
     opacity: 0;
   }
 }

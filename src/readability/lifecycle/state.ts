@@ -22,7 +22,9 @@ export const isStaleGeneration = (myGeneration: number): boolean =>
 /**
  * Remembers the retry timer handle so a later removeReadability() can cancel it.
  */
-export const setPendingRetry = (handle: ReturnType<typeof setTimeout>): void => {
+export const setPendingRetry = (
+  handle: ReturnType<typeof setTimeout>
+): void => {
   pendingRetry = handle;
 };
 

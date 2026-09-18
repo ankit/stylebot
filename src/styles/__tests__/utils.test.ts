@@ -1,9 +1,8 @@
 import BackgroundPageUtils from '../utils';
 
 describe('matchesUrl', () => {
-  const matchesUrl = BackgroundPageUtils['matchesUrl'].bind(
-    BackgroundPageUtils
-  );
+  const matchesUrl =
+    BackgroundPageUtils['matchesUrl'].bind(BackgroundPageUtils);
 
   describe('matches', () => {
     it('is true for exact matching domains', () => {
@@ -152,9 +151,8 @@ describe('matchesUrl', () => {
 });
 
 describe('matchesWildcard', () => {
-  const matchesWildcard = BackgroundPageUtils['matchesWildcard'].bind(
-    BackgroundPageUtils
-  );
+  const matchesWildcard =
+    BackgroundPageUtils['matchesWildcard'].bind(BackgroundPageUtils);
 
   describe('**', () => {
     it('matches at the end of url', () => {

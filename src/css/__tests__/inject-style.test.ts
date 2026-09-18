@@ -19,7 +19,10 @@ let removeCSSFromDocument: typeof InjectStyle.removeCSSFromDocument;
 describe('inject-style', () => {
   beforeEach(() => {
     jest.resetModules();
-    ({ injectCSSIntoDocument, removeCSSFromDocument } = require('../inject-style'));
+    ({
+      injectCSSIntoDocument,
+      removeCSSFromDocument,
+    } = require('../inject-style'));
   });
 
   afterEach(() => {
@@ -44,9 +47,7 @@ describe('inject-style', () => {
       await injectCSSIntoDocument('a { color: red; }', 'example');
       await injectCSSIntoDocument('a { color: blue; }', 'example');
 
-      const elements = document.querySelectorAll(
-        `#${stylesheetId('example')}`
-      );
+      const elements = document.querySelectorAll(`#${stylesheetId('example')}`);
 
       expect(elements).toHaveLength(1);
       expect(elements[0].textContent).toContain('color: blue');
@@ -57,9 +58,7 @@ describe('inject-style', () => {
 
       await injectCSSIntoDocument('a { color: red; }', 'example');
 
-      expect(
-        (global as any).chrome.runtime.sendMessage
-      ).not.toHaveBeenCalled();
+      expect((global as any).chrome.runtime.sendMessage).not.toHaveBeenCalled();
     });
 
     it('applies the rest of the css immediately, without waiting on an @import fetch', async () => {

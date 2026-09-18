@@ -56,7 +56,11 @@ export default Vue.extend({
 
     focusableItems(): Array<HTMLElement> {
       const panel = this.$refs.panel as HTMLElement | undefined;
-      return panel ? Array.from(panel.querySelectorAll<HTMLElement>('button, a[href], [tabindex]')) : [];
+      return panel
+        ? Array.from(
+            panel.querySelectorAll<HTMLElement>('button, a[href], [tabindex]')
+          )
+        : [];
     },
 
     onDocMousedown(event: MouseEvent): void {

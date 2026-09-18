@@ -1,5 +1,9 @@
 <template>
-  <div ref="el" class="tooltip" :style="{ top: `${top}px`, left: `${left + offsetX}px` }">
+  <div
+    ref="el"
+    class="tooltip"
+    :style="{ top: `${top}px`, left: `${left + offsetX}px` }"
+  >
     {{ text }}
   </div>
 </template>

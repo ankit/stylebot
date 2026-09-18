@@ -3,11 +3,20 @@
 // Uses CDP instead of --load-extension since Chrome 137+ disabled that flag.
 
 import { chromium } from 'playwright';
-import { existsSync, mkdirSync, readFileSync, watch, writeFileSync } from 'node:fs';
+import {
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  watch,
+  writeFileSync,
+} from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const rootDir = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  '..'
+);
 const extensionPath = path.join(rootDir, 'dist');
 // Written by WriteBuildMarkerPlugin (webpack.config.js) after each successful build.
 const buildMarkerPath = path.join(extensionPath, '.build-complete');
@@ -16,7 +25,10 @@ const startUrl = 'https://news.ycombinator.com';
 // Set by `yarn dev:edge`: launch Edge instead of Chrome. Separate profile dir
 // since the two browsers can't share one.
 const channel = process.env.STYLEBOT_BROWSER === 'edge' ? 'msedge' : 'chrome';
-const userDataDir = path.join(rootDir, channel === 'msedge' ? '.edge-dev-profile' : '.chrome-dev-profile');
+const userDataDir = path.join(
+  rootDir,
+  channel === 'msedge' ? '.edge-dev-profile' : '.chrome-dev-profile'
+);
 
 // Set by `yarn dev:chrome`: wait for a build that finishes after this script
 // starts, rather than trusting a marker left over from a previous run.
@@ -24,11 +36,12 @@ const waitForFreshBuild = process.env.STYLEBOT_FRESH_BUILD === '1';
 // Set by `yarn dev:chrome:headless`: no window, for hands-off verification runs.
 const headless = process.env.STYLEBOT_HEADLESS === '1';
 
-const readMarker = () => (existsSync(buildMarkerPath) ? readFileSync(buildMarkerPath, 'utf8') : null);
+const readMarker = () =>
+  existsSync(buildMarkerPath) ? readFileSync(buildMarkerPath, 'utf8') : null;
 
 // Resolves once the marker file's content differs from `baseline`.
-const waitForMarkerChange = (baseline) =>
-  new Promise((resolve) => {
+const waitForMarkerChange = baseline =>
+  new Promise(resolve => {
     // fs.watch throws ENOENT if the directory doesn't exist yet, which is
     // the case on a fresh checkout before `yarn watch` has run once.
     mkdirSync(extensionPath, { recursive: true });
@@ -72,7 +85,11 @@ const clearCrashFlags = () => {
   if (!existsSync(prefsPath)) return;
   try {
     const prefs = JSON.parse(readFileSync(prefsPath, 'utf8'));
-    prefs.profile = { ...prefs.profile, exit_type: 'Normal', exited_cleanly: true };
+    prefs.profile = {
+      ...prefs.profile,
+      exit_type: 'Normal',
+      exited_cleanly: true,
+    };
     writeFileSync(prefsPath, JSON.stringify(prefs));
   } catch {
     // Malformed or locked prefs — not worth failing the launch over.
@@ -115,7 +132,7 @@ await context.addInitScript(() => {
 
 // Stamp a small corner badge with the worktree name on every page, so this dev window is
 // identifiable at a glance (including in the Cmd+Tab window-preview thumbnail on macOS).
-await context.addInitScript((label) => {
+await context.addInitScript(label => {
   // Only badge the top frame, never iframes (e.g. stylebot's monaco editor).
   if (window.top !== window) {
     return;
@@ -142,19 +159,21 @@ await context.addInitScript((label) => {
 }, path.basename(rootDir));
 
 // The extension opens this tab on fresh install (onInstalled); auto-close it in dev.
-const closeHelpTab = (p) => {
+const closeHelpTab = p => {
   if (/^https:\/\/stylebot\.dev\/help/.test(p.url())) {
     p.close().catch(() => {});
   }
 };
-context.on('page', (p) => {
+context.on('page', p => {
   closeHelpTab(p);
   p.once('framenavigated', () => closeHelpTab(p));
 });
 
 // Install the extension, or reload it in place if already installed.
 const loadExtension = async () => {
-  const { id } = await cdp.send('Extensions.loadUnpacked', { path: extensionPath });
+  const { id } = await cdp.send('Extensions.loadUnpacked', {
+    path: extensionPath,
+  });
   return id;
 };
 
@@ -163,8 +182,8 @@ const reloadTabs = () =>
   Promise.all(
     context
       .pages()
-      .filter((p) => /^https?:/.test(p.url()))
-      .map((p) => p.reload().catch(() => {}))
+      .filter(p => /^https?:/.test(p.url()))
+      .map(p => p.reload().catch(() => {}))
   );
 
 const extensionId = await loadExtension();
@@ -173,9 +192,17 @@ const extensionId = await loadExtension();
 const page = context.pages()[0] ?? (await context.newPage());
 await page.goto(startUrl);
 
-console.log(`\n🎉 Stylebot loaded on Hacker News (${channel}) — extension id: ${extensionId}`);
-console.log('👀 Watching ./dist — the extension hot-reloads in place on rebuild.');
-console.log(headless ? '🛑 Press Ctrl+C to exit.\n' : '🪟 Close the browser window to exit.\n');
+console.log(
+  `\n🎉 Stylebot loaded on Hacker News (${channel}) — extension id: ${extensionId}`
+);
+console.log(
+  '👀 Watching ./dist — the extension hot-reloads in place on rebuild.'
+);
+console.log(
+  headless
+    ? '🛑 Press Ctrl+C to exit.\n'
+    : '🪟 Close the browser window to exit.\n'
+);
 
 let reloading = false;
 let pending = false;
@@ -209,5 +236,5 @@ const watcher = watch(extensionPath, (event, filename) => {
 });
 
 // Keep the process alive until the user closes the browser.
-await new Promise((resolve) => context.on('close', resolve));
+await new Promise(resolve => context.on('close', resolve));
 watcher.close();

@@ -39,7 +39,10 @@ class MonacEditorIframe {
     const NativeBlob = window.Blob;
 
     // Plain functions, not `class extends`: ES5-downleveled classes can't extend natives.
-    window.Blob = function (parts?: BlobPart[], options?: BlobPropertyBag): Blob {
+    window.Blob = function (
+      parts?: BlobPart[],
+      options?: BlobPropertyBag
+    ): Blob {
       const blob = new NativeBlob(parts, options);
       if (parts?.every(part => typeof part === 'string')) {
         blobContents.set(blob, (parts as string[]).join(''));
@@ -53,7 +56,9 @@ class MonacEditorIframe {
     URL.createObjectURL = (blob: Blob): string => {
       const objectUrl = nativeCreateObjectURL(blob);
       const content = blobContents.get(blob);
-      const match = content?.match(/importScripts\([^)]*?(chrome-extension:\/\/[^"')]+)/);
+      const match = content?.match(
+        /importScripts\([^)]*?(chrome-extension:\/\/[^"')]+)/
+      );
 
       if (match) {
         realWorkerUrlsByBlobUrl.set(objectUrl, match[1]);

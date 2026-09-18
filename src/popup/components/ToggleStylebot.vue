@@ -35,9 +35,7 @@ export default Vue.extend({
 
   computed: {
     label(): string {
-      return this.isOpen
-        ? this.t('close_stylebot')
-        : this.t('style_this_page');
+      return this.isOpen ? this.t('close_stylebot') : this.t('style_this_page');
     },
   },
 

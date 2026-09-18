@@ -94,7 +94,12 @@ describe('initCommandListener', () => {
     });
     initCommandListener(store);
 
-    const newCommands = { readability: 'ctrl+shift+t', style: '', stylebot: '', grayscale: '' };
+    const newCommands = {
+      readability: 'ctrl+shift+t',
+      style: '',
+      stylebot: '',
+      grayscale: '',
+    };
     onChangedListener({ commands: { newValue: newCommands } }, 'local');
 
     expect(hotkeys.unbind).toHaveBeenCalledWith('alt+shift+r');
@@ -113,7 +118,16 @@ describe('initCommandListener', () => {
 
     onChangedListener({ someOtherKey: { newValue: 1 } }, 'local');
     onChangedListener(
-      { commands: { newValue: { readability: 'ctrl+shift+t', style: '', stylebot: '', grayscale: '' } } },
+      {
+        commands: {
+          newValue: {
+            readability: 'ctrl+shift+t',
+            style: '',
+            stylebot: '',
+            grayscale: '',
+          },
+        },
+      },
       'sync'
     );
 
