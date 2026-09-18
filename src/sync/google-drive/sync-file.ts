@@ -20,6 +20,16 @@ const getAuthorizationHeaders = (accessToken: AccessToken) =>
     Authorization: `Bearer ${accessToken}`,
   });
 
+const parseJsonResponse = async <T>(response: Response): Promise<T> => {
+  if (!response.ok) {
+    throw new Error(
+      `Google Drive API request failed (${response.status} ${response.statusText})`
+    );
+  }
+
+  return response.json();
+};
+
 export const getFileMetadata = async (
   id: string,
   accessToken: AccessToken
@@ -30,7 +40,7 @@ export const getFileMetadata = async (
     headers: getAuthorizationHeaders(accessToken),
   });
 
-  return await response.json();
+  return parseJsonResponse<GoogleDriveSyncMetadata | null>(response);
 };
 
 const createBackupFolder = async (
@@ -54,7 +64,7 @@ const createBackupFolder = async (
     body: form,
   });
 
-  const { id } = await response.json();
+  const { id } = await parseJsonResponse<{ id: string }>(response);
   return id;
 };
 
@@ -84,7 +94,7 @@ const createBackup = async (
     body: form,
   });
 
-  return await response.json();
+  return parseJsonResponse<GoogleDriveSyncMetadata>(response);
 };
 
 const patchBackup = async (
@@ -111,7 +121,7 @@ const patchBackup = async (
     body: form,
   });
 
-  return await response.json();
+  return parseJsonResponse<GoogleDriveSyncMetadata>(response);
 };
 
 /**
@@ -129,7 +139,9 @@ export const getSyncFileMetadata = async (
     headers: getAuthorizationHeaders(accessToken),
   });
 
-  const { files } = await response.json();
+  const { files } = await parseJsonResponse<{ files?: { id: string }[] }>(
+    response
+  );
   if (!files || files.length === 0) {
     return null;
   }
@@ -155,7 +167,7 @@ export const downloadSyncFile = async (
     headers: getAuthorizationHeaders(accessToken),
   });
 
-  return await response.json();
+  return parseJsonResponse<StyleMap>(response);
 };
 
 /**
