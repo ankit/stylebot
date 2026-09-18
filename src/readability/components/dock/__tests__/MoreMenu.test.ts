@@ -11,7 +11,12 @@ jest.mock('@stylebot/utils', () => ({
 
 describe('MoreMenu.vue', () => {
   beforeEach(() => {
-    shortcutStore.state.commands = { readability: '', style: '', stylebot: '', grayscale: '' };
+    shortcutStore.state.commands = {
+      readability: '',
+      style: '',
+      stylebot: '',
+      grayscale: '',
+    };
   });
 
   it('shows "set_shortcut" with no chip when unset', () => {

@@ -44,7 +44,7 @@ const validate = async (redirectURL?: string): Promise<AccessToken> => {
 
   const checkResponse = (response: Response) => {
     return new Promise<AccessToken>((resolve, reject) => {
-      if (response.status != 200) {
+      if (response.status !== 200) {
         reject('Token validation error');
         return;
       }

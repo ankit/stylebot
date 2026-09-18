@@ -31,7 +31,12 @@ import {
 } from '@stylebot/utils';
 
 import { SMenu, ShortcutChip } from '@stylebot/components';
-import { IconOptions, IconFlag, IconCoffee, IconKeyboard } from '@stylebot/icons';
+import {
+  IconOptions,
+  IconFlag,
+  IconCoffee,
+  IconKeyboard,
+} from '@stylebot/icons';
 
 export default Vue.extend({
   name: 'MoreMenu',
@@ -51,7 +56,9 @@ export default Vue.extend({
     },
 
     shortcutLabel(): string {
-      return this.shortcutValue ? this.t('modify_shortcut') : this.t('set_shortcut');
+      return this.shortcutValue
+        ? this.t('modify_shortcut')
+        : this.t('set_shortcut');
     },
   },
 

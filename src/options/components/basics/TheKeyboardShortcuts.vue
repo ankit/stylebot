@@ -1,23 +1,37 @@
 <template>
   <div>
     <heading as="h2">{{ t('keyboard_shortcuts') }}</heading>
-    <s-text variant="muted" class="description">{{ t('keyboard_shortcuts_description') }}</s-text>
+    <s-text variant="muted" class="description">
+      {{ t('keyboard_shortcuts_description') }}
+    </s-text>
 
     <div class="rows">
       <shortcut-row :label="t('toggle_editor')">
-        <shortcut-recorder-field :value="commands.stylebot" @update="input('stylebot', $event)" />
+        <shortcut-recorder-field
+          :value="commands.stylebot"
+          @update="input('stylebot', $event)"
+        />
       </shortcut-row>
 
       <shortcut-row :label="t('toggle_styling')">
-        <shortcut-recorder-field :value="commands.style" @update="input('style', $event)" />
+        <shortcut-recorder-field
+          :value="commands.style"
+          @update="input('style', $event)"
+        />
       </shortcut-row>
 
       <shortcut-row :label="t('toggle_readability')">
-        <shortcut-recorder-field :value="commands.readability" @update="input('readability', $event)" />
+        <shortcut-recorder-field
+          :value="commands.readability"
+          @update="input('readability', $event)"
+        />
       </shortcut-row>
 
       <shortcut-row :label="t('toggle_grayscale')">
-        <shortcut-recorder-field :value="commands.grayscale" @update="input('grayscale', $event)" />
+        <shortcut-recorder-field
+          :value="commands.grayscale"
+          @update="input('grayscale', $event)"
+        />
       </shortcut-row>
     </div>
   </div>

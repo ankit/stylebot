@@ -22,7 +22,9 @@ describe('shortcutStore', () => {
 
     getCommandsModule = require('../../../utils/get-commands');
     setCommandsModule = require('../../../utils/set-commands');
-    (getCommandsModule.getCommands as jest.Mock).mockResolvedValue(commands(''));
+    (getCommandsModule.getCommands as jest.Mock).mockResolvedValue(
+      commands('')
+    );
 
     storageGet = jest.fn((_key, callback) => callback({}));
     storageSet = jest.fn();
@@ -44,7 +46,9 @@ describe('shortcutStore', () => {
   it('value is empty before load and reflects the fetched shortcut after', async () => {
     expect(shortcutStore.value()).toBe('');
 
-    (getCommandsModule.getCommands as jest.Mock).mockResolvedValue(commands('alt+shift+r'));
+    (getCommandsModule.getCommands as jest.Mock).mockResolvedValue(
+      commands('alt+shift+r')
+    );
     await shortcutStore.ensureLoaded();
 
     expect(shortcutStore.value()).toBe('alt+shift+r');
@@ -65,7 +69,9 @@ describe('shortcutStore', () => {
     shortcutStore.dismissPrompt();
 
     expect(shortcutStore.state.promptDismissed).toBe(true);
-    expect(storageSet).toHaveBeenCalledWith({ readabilityShortcutPromptDismissed: true });
+    expect(storageSet).toHaveBeenCalledWith({
+      readabilityShortcutPromptDismissed: true,
+    });
   });
 
   it('setRecording updates state.recording', () => {
@@ -87,7 +93,9 @@ describe('shortcutStore', () => {
     shortcutStore.update('alt+shift+r');
 
     expect(shortcutStore.value()).toBe('alt+shift+r');
-    expect(setCommandsModule.setCommands).toHaveBeenCalledWith(commands('alt+shift+r'));
+    expect(setCommandsModule.setCommands).toHaveBeenCalledWith(
+      commands('alt+shift+r')
+    );
   });
 
   it('update() with a non-empty value also dismisses the prompt', async () => {
@@ -96,7 +104,9 @@ describe('shortcutStore', () => {
     shortcutStore.update('alt+shift+r');
 
     expect(shortcutStore.state.promptDismissed).toBe(true);
-    expect(storageSet).toHaveBeenCalledWith({ readabilityShortcutPromptDismissed: true });
+    expect(storageSet).toHaveBeenCalledWith({
+      readabilityShortcutPromptDismissed: true,
+    });
   });
 
   it('update() with an empty value (Remove) does not dismiss the prompt', async () => {

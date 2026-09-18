@@ -1,6 +1,9 @@
 import { test, expect } from './fixtures';
 
-test('popup mounts and renders the open-editor toggle', async ({ context, openPopup }) => {
+test('popup mounts and renders the open-editor toggle', async ({
+  context,
+  openPopup,
+}) => {
   // A real page must be the active tab first — otherwise the popup's own
   // chrome-extension:// tab becomes "the current tab" and it renders the
   // restricted-page state instead of the toggle.

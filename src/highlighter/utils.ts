@@ -129,9 +129,8 @@ export function getNestedBoundingClientRect(
     }
 
     return mergeRectOffsets(rects);
-  } else {
-    return node.getBoundingClientRect();
   }
+  return node.getBoundingClientRect();
 }
 
 export function getElementDimensions(domElement: HTMLElement): Dimensions {

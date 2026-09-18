@@ -15,7 +15,8 @@ const OK_MAYBE_ITS_A_CANDIDATE = /and|article|body|column|content|main|shadow/i;
  * Whether a node is visible; has to null-check style/className for SVG and MathML nodes.
  */
 const isNodeVisible = (node: Element): boolean =>
-  (!(node as HTMLElement).style || (node as HTMLElement).style.display !== 'none') &&
+  (!(node as HTMLElement).style ||
+    (node as HTMLElement).style.display !== 'none') &&
   !node.hasAttribute('hidden') &&
   (!node.hasAttribute('aria-hidden') ||
     node.getAttribute('aria-hidden') !== 'true' ||
@@ -41,7 +42,9 @@ export const hasReaderableContent = (
     visibilityChecker = isNodeVisible,
   } = options;
 
-  let nodes: Element[] = Array.from(doc.querySelectorAll('p, pre, article'));
+  let nodes: Array<Element> = Array.from(
+    doc.querySelectorAll('p, pre, article')
+  );
 
   // Some articles' DOM looks like <div>Sentence<br><br>Sentence<br></div> —
   // fold in the parent <div> of any <br> so those still count.

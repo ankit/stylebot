@@ -1,5 +1,11 @@
 <template>
-  <button type="button" class="menu-item" :class="{ danger }" role="menuitem" @click="$emit('click', $event)">
+  <button
+    type="button"
+    class="menu-item"
+    :class="{ danger }"
+    role="menuitem"
+    @click="$emit('click', $event)"
+  >
     <slot />
   </button>
 </template>

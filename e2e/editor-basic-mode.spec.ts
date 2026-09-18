@@ -36,7 +36,9 @@ test('picking an element and editing a color in basic mode applies live and pers
 
   await editorRoot.getByRole('button', { name: 'Colors', exact: true }).click();
 
-  const colorInput = editorRoot.locator('.color-picker .color-text-input').first();
+  const colorInput = editorRoot
+    .locator('.color-picker .color-text-input')
+    .first();
   await colorInput.fill('#ff0080');
   await colorInput.blur();
 

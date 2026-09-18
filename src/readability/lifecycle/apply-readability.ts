@@ -9,7 +9,11 @@ import { cacheUrl, didUrlChange } from './document-cache';
 import { removeReadability } from './remove-readability';
 import { reportChanged } from './report-changed';
 import { nextGeneration, isStaleGeneration, setPendingRetry } from './state';
-import { getEligibility, markEligible, markIneligible } from './eligibility-cache';
+import {
+  getEligibility,
+  markEligible,
+  markIneligible,
+} from './eligibility-cache';
 
 // Client-rendered pages can still be empty right after load — retry a few
 // times before giving up, so hydration has a chance to finish.
@@ -48,7 +52,10 @@ const run = async (myGeneration: number, attempt = 0): Promise<void> => {
 
     if (attempt < RETRY_DELAYS_MS.length) {
       setPendingRetry(
-        setTimeout(() => run(myGeneration, attempt + 1), RETRY_DELAYS_MS[attempt])
+        setTimeout(
+          () => run(myGeneration, attempt + 1),
+          RETRY_DELAYS_MS[attempt]
+        )
       );
     } else {
       markIneligible(window.location.href);

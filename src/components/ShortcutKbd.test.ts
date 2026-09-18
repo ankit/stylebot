@@ -9,7 +9,10 @@ import ShortcutKbd from './ShortcutKbd.vue';
 
 describe('ShortcutKbd.vue', () => {
   it('renders one <kbd> per part with the joiner between them', () => {
-    (formatShortcut as jest.Mock).mockReturnValue({ parts: ['Alt', 'Shift', 'R'], joiner: '+' });
+    (formatShortcut as jest.Mock).mockReturnValue({
+      parts: ['Alt', 'Shift', 'R'],
+      joiner: '+',
+    });
 
     const wrapper = mount(ShortcutKbd, { propsData: { value: 'alt+shift+r' } });
     const kbds = wrapper.findAll('kbd');
@@ -22,7 +25,10 @@ describe('ShortcutKbd.vue', () => {
   });
 
   it('renders empty separators when the joiner is empty', () => {
-    (formatShortcut as jest.Mock).mockReturnValue({ parts: ['⌥', '⇧', 'R'], joiner: '' });
+    (formatShortcut as jest.Mock).mockReturnValue({
+      parts: ['⌥', '⇧', 'R'],
+      joiner: '',
+    });
 
     const wrapper = mount(ShortcutKbd, { propsData: { value: 'alt+shift+r' } });
 

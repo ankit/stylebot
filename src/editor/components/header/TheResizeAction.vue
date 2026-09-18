@@ -1,4 +1,4 @@
-  <template>
+<template>
   <b-button
     :title="`${t('resize')} (${resizeCommand})`"
     variant="sm"

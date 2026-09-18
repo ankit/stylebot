@@ -12,7 +12,10 @@ const imageIdentity = (url: string): { directory: string; stem: string } => {
 
   return {
     directory: withoutQuery.slice(0, lastSlash),
-    stem: withoutQuery.slice(lastSlash + 1).replace(/\.[a-z0-9]+$/i, '').toLowerCase(),
+    stem: withoutQuery
+      .slice(lastSlash + 1)
+      .replace(/\.[a-z0-9]+$/i, '')
+      .toLowerCase(),
   };
 };
 
@@ -64,7 +67,8 @@ const withLeadImage = (content: string, imageUrl?: string): string => {
 /**
  * Collapses whitespace so text pulled from different DOM shapes can be compared.
  */
-const normalizeText = (text: string): string => text.replace(/\s+/g, ' ').trim();
+const normalizeText = (text: string): string =>
+  text.replace(/\s+/g, ' ').trim();
 
 // Ad-slot labels (e.g. NYT's "Advertisement" / "SKIP ADVERTISEMENT") that sit
 // inline in the article flow and read as real content to Defuddle.
@@ -75,11 +79,16 @@ const AD_MARKER_PATTERN = /^(advertisement|skip advertisement)$/i;
  * otherwise read as real content to Defuddle.
  */
 const removeAdMarkers = (doc: Document): void => {
-  doc.querySelectorAll('p, div, span, a, h1, h2, h3, h4, h5, h6').forEach(el => {
-    if (el.children.length === 0 && AD_MARKER_PATTERN.test(normalizeText(el.textContent || ''))) {
-      el.remove();
-    }
-  });
+  doc
+    .querySelectorAll('p, div, span, a, h1, h2, h3, h4, h5, h6')
+    .forEach(el => {
+      if (
+        el.children.length === 0 &&
+        AD_MARKER_PATTERN.test(normalizeText(el.textContent || ''))
+      ) {
+        el.remove();
+      }
+    });
 };
 
 /**

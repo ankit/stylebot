@@ -40,7 +40,7 @@ describe('Readability.vue', () => {
     expect(wrapper.text()).not.toContain('articles_only');
   });
 
-  it('should emit change and message the popup\'s own tab when toggled', async () => {
+  it("should emit change and message the popup's own tab when toggled", async () => {
     const wrapper = mount(Readability, {
       propsData: { tab, initialReadability: false, disabled: false },
     });

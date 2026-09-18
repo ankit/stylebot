@@ -45,7 +45,11 @@ test('CSS style matching does not re-run on a same-tab SPA navigation (documents
   await tabPage.goto(`${server.baseUrl}/old`);
   await expect(tabPage.locator('h1')).toHaveCSS('color', 'rgb(255, 0, 128)');
 
-  await tabPage.evaluate(() => (window as unknown as { spaNavigate: (p: string) => void }).spaNavigate('/new'));
+  await tabPage.evaluate(() =>
+    (window as unknown as { spaNavigate: (p: string) => void }).spaNavigate(
+      '/new'
+    )
+  );
   // Give the background's chrome.tabs.onUpdated -> TabUpdated round trip a
   // moment to land, so this isn't just "we checked before it could apply".
   await tabPage.waitForTimeout(500);

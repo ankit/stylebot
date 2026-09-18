@@ -1,5 +1,10 @@
 <template>
-  <icon-button :bordered="bordered" :size="size" :title="title" @click="$emit('click', $event)">
+  <icon-button
+    :bordered="bordered"
+    :size="size"
+    :title="title"
+    @click="$emit('click', $event)"
+  >
     <more-icon />
   </icon-button>
 </template>
