@@ -1,4 +1,4 @@
-import { Store, Dispatch, Commit, GetterTree } from 'vuex';
+import { Store, Dispatch, Commit } from 'vuex';
 import { State } from 'editor/store';
 import {
   injectCSSIntoDocument,
@@ -45,12 +45,12 @@ export const toggleGrayscale = ({
   getters,
   dispatch,
 }: {
-  getters: GetterTree<State, State>;
+  getters: { grayscale: number };
   dispatch: Dispatch;
 }): void => {
-  let percent = 0;
+  let percent = '0';
   if (!getters.grayscale) {
-    percent = 100;
+    percent = '100';
   }
 
   dispatch('applyFilter', {
