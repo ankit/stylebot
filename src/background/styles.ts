@@ -14,7 +14,7 @@ export const applyStylesToAllTabs = async (): Promise<void> => {
 
   chrome.tabs.query({}, tabs => {
     tabs.forEach(async tab => {
-      if (tab && tab.url && tab.id) {
+      if (tab?.url && tab.id) {
         const { styles, defaultStyle } = getStylesForPage(tab.url, allStyles);
 
         const message: ApplyStylesToTab = {

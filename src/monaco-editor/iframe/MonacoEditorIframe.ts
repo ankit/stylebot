@@ -4,6 +4,8 @@ import CustomDark from './themes/CustomDark';
 import { IframeMessage, ParentUpdateCssMessage } from '@stylebot/monaco-editor';
 
 declare global {
+  // Must stay an interface: augmenting Window relies on declaration merging.
+  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
   interface Window {
     monaco: any;
     require: any;
@@ -40,12 +42,12 @@ class MonacEditorIframe {
 
     // Plain functions, not `class extends`: ES5-downleveled classes can't extend natives.
     window.Blob = function (
-      parts?: BlobPart[],
+      parts?: Array<BlobPart>,
       options?: BlobPropertyBag
     ): Blob {
       const blob = new NativeBlob(parts, options);
       if (parts?.every(part => typeof part === 'string')) {
-        blobContents.set(blob, (parts as string[]).join(''));
+        blobContents.set(blob, (parts as Array<string>).join(''));
       }
       return blob;
     } as unknown as typeof Blob;

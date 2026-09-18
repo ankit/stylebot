@@ -42,7 +42,9 @@ export const hasReaderableContent = (
     visibilityChecker = isNodeVisible,
   } = options;
 
-  let nodes: Element[] = Array.from(doc.querySelectorAll('p, pre, article'));
+  let nodes: Array<Element> = Array.from(
+    doc.querySelectorAll('p, pre, article')
+  );
 
   // Some articles' DOM looks like <div>Sentence<br><br>Sentence<br></div> —
   // fold in the parent <div> of any <br> so those still count.

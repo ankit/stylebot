@@ -24,7 +24,7 @@ const WORD_LABELS: Record<string, string> = {
 };
 
 export type FormattedShortcut = {
-  parts: string[];
+  parts: Array<string>;
   joiner: string;
 };
 

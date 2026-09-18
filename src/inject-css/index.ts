@@ -58,7 +58,7 @@ const run = () => {
 
     const freshState: CachedState = {
       styles: styles.map(({ url, css, enabled }) => ({ url, css, enabled })),
-      readability: Boolean(defaultStyle && defaultStyle.readability),
+      readability: Boolean(defaultStyle?.readability),
     };
 
     const finish = () => {

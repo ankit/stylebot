@@ -29,7 +29,9 @@ function extractFirstArg(text, startIdx) {
     if (c === '(' || c === '[' || c === '{') {
       depth++;
     } else if (c === ')' || c === ']' || c === '}') {
-      if (depth === 0) return text.slice(startIdx, i);
+      if (depth === 0) {
+        return text.slice(startIdx, i);
+      }
       depth--;
     } else if (c === ',' && depth === 0) {
       return text.slice(startIdx, i);
@@ -59,7 +61,9 @@ function findReferencedKeys(text) {
     }
 
     literals.forEach(key => {
-      if (KEY_PATTERN.test(key)) staticKeys.add(key);
+      if (KEY_PATTERN.test(key)) {
+        staticKeys.add(key);
+      }
     });
   }
 
@@ -148,7 +152,9 @@ function main() {
 
   // Per-locale: orphan keys, missing translations, placeholder mismatches.
   for (const [locale, { messages }] of Object.entries(parsedByLocale)) {
-    if (locale === baseLocale) continue;
+    if (locale === baseLocale) {
+      continue;
+    }
 
     for (const key of Object.keys(messages)) {
       if (!(key in baseMessages)) {

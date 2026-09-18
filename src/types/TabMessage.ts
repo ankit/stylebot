@@ -19,7 +19,7 @@ export type ToggleReadabilityForTab = {
 export type ApplyStylesToTab = {
   name: 'ApplyStylesToTab';
   defaultStyle?: Style;
-  styles: Style[];
+  styles: Array<Style>;
 };
 
 export type TabUpdated = {

@@ -62,7 +62,7 @@ export const toggleGrayscale = ({
 export const applyStyles = (
   { dispatch }: { dispatch: Dispatch },
   defaultStyle: Style | undefined,
-  styles: Style[]
+  styles: Array<Style>
 ): void => {
   styles.forEach(style => {
     if (style.enabled) {

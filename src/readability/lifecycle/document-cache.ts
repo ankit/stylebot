@@ -1,4 +1,6 @@
 declare global {
+  // Must stay an interface: augmenting Window relies on declaration merging.
+  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
   interface Window {
     stylebotReaderUrl: string;
     stylebotReaderOriginalDocumentBodyElements: Array<Node>;

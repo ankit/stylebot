@@ -8,7 +8,7 @@ const getStylesheetId = (id: string) => {
 
 // document_start injection can land ahead of the page's own <head>; keep our
 // stylesheet last so an equally-`!important` page rule can't win the tie.
-const stylebotElements: HTMLStyleElement[] = [];
+const stylebotElements: Array<HTMLStyleElement> = [];
 let reorderObserver: MutationObserver | null = null;
 
 const keepStylebotStylesLast = (style: HTMLStyleElement): void => {

@@ -82,7 +82,9 @@ await waitForBuild();
 // pages?" bubble on the next launch. Reset the exit flags in the profile first.
 const clearCrashFlags = () => {
   const prefsPath = path.join(userDataDir, 'Default', 'Preferences');
-  if (!existsSync(prefsPath)) return;
+  if (!existsSync(prefsPath)) {
+    return;
+  }
   try {
     const prefs = JSON.parse(readFileSync(prefsPath, 'utf8'));
     prefs.profile = {

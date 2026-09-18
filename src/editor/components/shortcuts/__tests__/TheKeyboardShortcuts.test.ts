@@ -3,9 +3,9 @@ import { shallowMount } from '@vue/test-utils';
 import { defaultEditorCommands } from '@stylebot/settings';
 import TheKeyboardShortcuts from '../TheKeyboardShortcuts.vue';
 
-interface TheKeyboardShortcutsInstance extends Vue {
+type TheKeyboardShortcutsInstance = {
   detachStylebotShortcuts(): void;
-}
+} & Vue;
 
 const buildMockStore = (visible: boolean) => ({
   state: {

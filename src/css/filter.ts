@@ -57,7 +57,7 @@ export const getFilterEffectValueForPage = (
         rule.walkDecls('filter', (decl: postcss.Declaration) => {
           const matches = decl.value.match(regex);
 
-          if (matches && matches[1]) {
+          if (matches?.[1]) {
             value = parseInt(matches[1]);
           }
         });
