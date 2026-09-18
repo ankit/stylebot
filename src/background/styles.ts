@@ -61,89 +61,113 @@ export const get = async (url: string): Promise<StyleWithoutUrl> => {
   return styles[url];
 };
 
-export const setAll = async (styles: StyleMap): Promise<void> => {
-  chrome.storage.local.set({
-    styles,
+const writeToStorage = (styles: StyleMap): Promise<void> =>
+  new Promise(resolve => {
+    chrome.storage.local.set(
+      {
+        styles,
 
-    'styles-metadata': {
-      modifiedTime: getCurrentTimestamp(),
-    },
+        'styles-metadata': {
+          modifiedTime: getCurrentTimestamp(),
+        },
+      },
+      resolve
+    );
   });
+
+/**
+ * Chains writes so each mutation reads styles only after the prior write
+ * finished, preventing concurrent writes (e.g. rapid keystrokes in the code
+ * editor) from clobbering each other.
+ */
+let pendingWrite = Promise.resolve();
+
+export const setAll = (styles: StyleMap): Promise<void> => {
+  pendingWrite = pendingWrite.then(() => writeToStorage(styles));
+  return pendingWrite;
 };
 
-export const set = async (
+const update = (
+  mutate: (styles: StyleMap) => StyleMap | undefined
+): Promise<void> => {
+  pendingWrite = pendingWrite.then(async () => {
+    const styles = mutate(await getAll());
+
+    if (styles) {
+      await writeToStorage(styles);
+    }
+  });
+
+  return pendingWrite;
+};
+
+export const set = (
   url: string,
   css: string,
   readability: boolean
-): Promise<void> => {
-  const styles = await getAll();
+): Promise<void> =>
+  update(styles => {
+    if (!css) {
+      delete styles[url];
+    } else {
+      styles[url] = {
+        css,
+        readability,
+        enabled: true,
+        modifiedTime: getCurrentTimestamp(),
+      };
+    }
 
-  if (!css) {
-    delete styles[url];
-  } else {
-    styles[url] = {
-      css,
-      readability,
-      enabled: true,
-      modifiedTime: getCurrentTimestamp(),
-    };
-  }
+    return styles;
+  });
 
-  return setAll(styles);
-};
+export const enable = (url: string): Promise<void> =>
+  update(styles => {
+    if (!styles[url]) {
+      return undefined;
+    }
 
-export const enable = async (url: string): Promise<void> => {
-  const styles = await getAll();
+    styles[url].enabled = true;
+    return styles;
+  });
 
-  if (!styles[url]) {
-    return;
-  }
+export const disable = (url: string): Promise<void> =>
+  update(styles => {
+    if (!styles[url]) {
+      return undefined;
+    }
 
-  styles[url].enabled = true;
-  return setAll(styles);
-};
+    styles[url].enabled = false;
+    return styles;
+  });
 
-export const disable = async (url: string): Promise<void> => {
-  const styles = await getAll();
+export const setReadability = (url: string, value: boolean): Promise<void> =>
+  update(styles => {
+    if (styles[url]) {
+      styles[url].readability = value;
+    } else {
+      styles[url] = {
+        css: '',
+        enabled: true,
+        readability: value,
+        modifiedTime: getCurrentTimestamp(),
+      };
+    }
 
-  if (!styles[url]) {
-    return;
-  }
+    return styles;
+  });
 
-  styles[url].enabled = false;
-  return setAll(styles);
-};
+export const move = (src: string, dest: string): Promise<void> =>
+  update(styles => {
+    if (!styles[src]) {
+      return undefined;
+    }
 
-export const setReadability = async (
-  url: string,
-  value: boolean
-): Promise<void> => {
-  const styles = await getAll();
-
-  if (styles[url]) {
-    styles[url].readability = value;
-  } else {
-    styles[url] = {
-      css: '',
-      enabled: true,
-      readability: value,
-      modifiedTime: getCurrentTimestamp(),
-    };
-  }
-
-  return setAll(styles);
-};
-
-export const move = async (src: string, dest: string): Promise<void> => {
-  const styles = await getAll();
-
-  if (styles[src]) {
     styles[dest] = JSON.parse(JSON.stringify(styles[src]));
     delete styles[src];
 
-    return setAll(styles);
-  }
-};
+    return styles;
+  });
 
 export const getImportCss = (url: string): Promise<string> => {
   return new Promise(resolve => {
