@@ -1,7 +1,12 @@
 import * as postcss from 'postcss';
 
 import { State } from './';
-import { getRule, getFilterEffectValueForPage } from '@stylebot/css';
+import {
+  getRule,
+  getFilterEffectValueForPage,
+  getAlreadyUsedColors,
+  RoleColorGroups,
+} from '@stylebot/css';
 import { isReaderable } from '@stylebot/readability';
 
 export default {
@@ -12,6 +17,8 @@ export default {
 
     return getRule(state.css, state.activeSelector);
   },
+
+  alreadyUsedColors: (state: State): RoleColorGroups => getAlreadyUsedColors(state.css),
 
   grayscale: (state: State): number => {
     return getFilterEffectValueForPage('grayscale', state.css);

@@ -112,6 +112,15 @@ export type RunGoogleDriveSync = {
   name: 'RunGoogleDriveSync';
 };
 
+export type GetRecentColors = {
+  name: 'GetRecentColors';
+};
+
+export type AddRecentColor = {
+  name: 'AddRecentColor';
+  color: string;
+};
+
 type BackgroundPageMessage =
   | SetStyle
   | EnableStyle
@@ -133,6 +142,8 @@ type BackgroundPageMessage =
   | GetReadabilitySettings
   | SetReadabilitySettings
   | GetImportCss
-  | RunGoogleDriveSync;
+  | RunGoogleDriveSync
+  | GetRecentColors
+  | AddRecentColor;
 
 export default BackgroundPageMessage;

@@ -27,7 +27,6 @@ import {
   ReadabilitySettings,
   StylebotBasicModeSections,
   StylebotLayout,
-  StylebotColorPalette,
   StylebotAppearance,
 } from '@stylebot/types';
 
@@ -66,11 +65,14 @@ export default {
     if (!options.layout) {
       options.layout = defaultOptions.layout;
     }
-    if (!options.colorPalette) {
-      options.colorPalette = defaultOptions.colorPalette;
-    }
     if (!options.fonts) {
       options.fonts = defaultOptions.fonts;
+    }
+    if (!options.lastColorSet) {
+      options.lastColorSet = defaultOptions.lastColorSet;
+    }
+    if (!options.lastColorPickerTab) {
+      options.lastColorPickerTab = defaultOptions.lastColorPickerTab;
     }
 
     commit('setOptions', options);
@@ -157,14 +159,6 @@ export default {
     commit('setOptions', { ...state.options, layout });
   },
 
-  setColorPalette(
-    { state, commit }: { state: State; commit: Commit },
-    colorPalette: StylebotColorPalette
-  ): void {
-    setOption('colorPalette', colorPalette);
-    commit('setOptions', { ...state.options, colorPalette });
-  },
-
   setAppearance(
     { state, commit }: { state: State; commit: Commit },
     appearance: StylebotAppearance
@@ -179,6 +173,22 @@ export default {
   ): void {
     setOption('basicModeSections', basicModeSections);
     commit('setOptions', { ...state.options, basicModeSections });
+  },
+
+  setLastColorSet(
+    { state, commit }: { state: State; commit: Commit },
+    lastColorSet: string
+  ): void {
+    setOption('lastColorSet', lastColorSet);
+    commit('setOptions', { ...state.options, lastColorSet });
+  },
+
+  setLastColorPickerTab(
+    { state, commit }: { state: State; commit: Commit },
+    lastColorPickerTab: string
+  ): void {
+    setOption('lastColorPickerTab', lastColorPickerTab);
+    commit('setOptions', { ...state.options, lastColorPickerTab });
   },
 
   applyCss(

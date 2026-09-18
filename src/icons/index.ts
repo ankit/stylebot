@@ -10,6 +10,7 @@ export { default as SunIcon } from './SunIcon.vue';
 export { default as MoonIcon } from './MoonIcon.vue';
 export { default as MonitorIcon } from './MonitorIcon.vue';
 export { default as DropletIcon } from './DropletIcon.vue';
+export { default as EyedropperIcon } from './EyedropperIcon.vue';
 export { default as EyeOffIcon } from './EyeOffIcon.vue';
 export { default as AlignLeftIcon } from './AlignLeftIcon.vue';
 export { default as AlignCenterIcon } from './AlignCenterIcon.vue';

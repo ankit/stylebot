@@ -1,0 +1,57 @@
+// Hairline border for pale swatches, hover ring, and a checkmark (not a
+// ring) for the current color — a ring there collided with hover/focus.
+@mixin swatch-states {
+  position: relative;
+  cursor: pointer;
+
+  &.light {
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+  }
+
+  &:hover:not(:disabled) {
+    &.light {
+      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1), 0 0 0 2px var(--accent);
+    }
+
+    &:not(.light) {
+      box-shadow: 0 0 0 2px var(--accent);
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--text-primary);
+    outline-offset: 2px;
+  }
+}
+
+// Checkmark overlay for the current color — pair with hsv-color.ts's
+// checkMarkColor() for the icon's actual color (contrast-dependent).
+@mixin swatch-check {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+// Shared track edge + white-ringed thumb for the Custom tab's pickers. $radius: 50% for round thumbs.
+@mixin picker-track-edge {
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+@mixin picker-thumb($radius: 50%) {
+  width: 15px;
+  height: 15px;
+  border-radius: $radius;
+  border: 2.5px solid #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+}
+
+// The numeric readout next to a hue/alpha slider (e.g. "180°", "50%").
+@mixin picker-readout {
+  flex: none;
+  width: 34px;
+  text-align: right;
+  font: 400 11.5px/1.2 var(--font-mono);
+  color: var(--text-muted);
+}

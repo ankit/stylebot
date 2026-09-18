@@ -22,6 +22,8 @@ import {
   SetReadabilitySettings,
   GetImportCss,
   RunGoogleDriveSync,
+  GetRecentColors,
+  AddRecentColor,
 } from './messages';
 
 import { refreshBadgeForTab } from './styles';
@@ -159,6 +161,13 @@ chrome.runtime.onMessage.addListener(
 
       case 'RunGoogleDriveSync':
         RunGoogleDriveSync(message, sendResponse);
+        break;
+
+      case 'GetRecentColors':
+        GetRecentColors(sendResponse);
+        break;
+      case 'AddRecentColor':
+        AddRecentColor(message, sendResponse);
         break;
     }
 

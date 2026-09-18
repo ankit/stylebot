@@ -21,14 +21,13 @@
       />
     </div>
 
-    <div v-if="open" class="color-popover stylebot-color-picker">
-      <basic-color-palette v-if="basicColorPalette" v-model="value">
-        <color-palette-footer v-model="value" />
-      </basic-color-palette>
-
-      <material-color-palette v-else v-model="value">
-        <color-palette-footer v-model="value" />
-      </material-color-palette>
+    <div
+      v-if="open"
+      ref="popover"
+      class="color-popover stylebot-color-picker"
+      :style="{ top: popoverTop + 'px', left: popoverLeft + 'px', visibility: positioned ? 'visible' : 'hidden' }"
+    >
+      <color-picker-popover :value="value" :role-label="roleLabel" @input="value = $event" />
     </div>
   </div>
 </template>
@@ -37,18 +36,20 @@
 import Vue from 'vue';
 import { Declaration } from 'postcss';
 
-import BasicColorPalette from './BasicColorPalette.vue';
-import MaterialColorPalette from './MaterialColorPalette.vue';
-import ColorPaletteFooter from './ColorPaletteFooter.vue';
+import ColorPickerPopover from './ColorPickerPopover.vue';
 import { extractColor } from '../../utils/css-value';
+
+const ROLE_LABEL_KEYS: Record<string, string> = {
+  color: 'color_picker_subtitle_text',
+  'background-color': 'color_picker_subtitle_background',
+  'border-color': 'color_picker_subtitle_border',
+};
 
 export default Vue.extend({
   name: 'ColorPicker',
 
   components: {
-    BasicColorPalette,
-    MaterialColorPalette,
-    ColorPaletteFooter,
+    ColorPickerPopover,
   },
 
   props: {
@@ -65,9 +66,19 @@ export default Vue.extend({
     },
   },
 
-  data() {
+  data(): {
+    open: boolean;
+    popoverTop: number;
+    popoverLeft: number;
+    positioned: boolean;
+    popoverResizeObserver: ResizeObserver | null;
+  } {
     return {
       open: false,
+      popoverTop: 0,
+      popoverLeft: 0,
+      positioned: false,
+      popoverResizeObserver: null,
     };
   },
 
@@ -102,9 +113,13 @@ export default Vue.extend({
       return !this.$store.state.activeSelector;
     },
 
-    basicColorPalette(): boolean {
-      return this.$store.state.options.colorPalette === 'basic';
+    roleLabel(): string {
+      return this.t(ROLE_LABEL_KEYS[this.property] || ROLE_LABEL_KEYS.color);
     },
+  },
+
+  beforeDestroy() {
+    this.popoverResizeObserver?.disconnect();
   },
 
   methods: {
@@ -126,7 +141,19 @@ export default Vue.extend({
 
     onOpen(): void {
       this.open = true;
+      this.positioned = false;
       this.$store.commit('setColorPickerVisible', true);
+
+      this.$nextTick(() => {
+        this.positionPopover();
+
+        // Content height varies by tab, so re-clamp on any resize, not just at open.
+        const popover = this.$refs.popover as HTMLElement | undefined;
+        if (popover) {
+          this.popoverResizeObserver = new ResizeObserver(() => this.positionPopover());
+          this.popoverResizeObserver.observe(popover);
+        }
+      });
 
       setTimeout(() => {
         document.addEventListener('click', this.onDocumentClick);
@@ -136,10 +163,50 @@ export default Vue.extend({
     onClose(): void {
       this.open = false;
       this.$store.commit('setColorPickerVisible', false);
+      this.popoverResizeObserver?.disconnect();
+      this.popoverResizeObserver = null;
 
       setTimeout(() => {
         document.removeEventListener('click', this.onDocumentClick);
       }, 0);
+    },
+
+    // vue-draggable-resizable's CSS transform on the dock breaks position:
+    // fixed — render our best guess, then measure and correct the drift.
+    positionPopover(): void {
+      const popover = this.$refs.popover as HTMLElement | undefined;
+      const field = this.$el.querySelector('.color-field') as HTMLElement | null;
+      if (!popover || !field) {
+        return;
+      }
+
+      const margin = 8;
+      const fieldRect = field.getBoundingClientRect();
+
+      const desiredLeft = Math.min(
+        Math.max(fieldRect.right - popover.offsetWidth, margin),
+        window.innerWidth - popover.offsetWidth - margin
+      );
+
+      // Flip above the trigger if it doesn't fit below but does fit above
+      // (mirrors AnchoredMenu), clamped either way to stay on-screen.
+      const spaceBelow = window.innerHeight - fieldRect.bottom;
+      const spaceAbove = fieldRect.top;
+      const flipUp = popover.offsetHeight + 6 + margin > spaceBelow && spaceAbove > spaceBelow;
+
+      const desiredTop = flipUp
+        ? Math.max(fieldRect.top - popover.offsetHeight - 6, margin)
+        : Math.min(fieldRect.bottom + 6, window.innerHeight - popover.offsetHeight - margin);
+
+      this.popoverLeft = desiredLeft;
+      this.popoverTop = desiredTop;
+
+      this.$nextTick(() => {
+        const actualRect = popover.getBoundingClientRect();
+        this.popoverLeft += desiredLeft - actualRect.left;
+        this.popoverTop += desiredTop - actualRect.top;
+        this.positioned = true;
+      });
     },
 
     onDocumentClick(e: MouseEvent): void {
@@ -166,6 +233,7 @@ export default Vue.extend({
   display: flex;
   align-items: stretch;
   width: 108px;
+  height: 27px;
   @include field-border;
 
   // Only the hex text field highlights the whole pill — the swatch button
@@ -189,15 +257,17 @@ export default Vue.extend({
   border-radius: 6px 0 0 6px;
   outline: none;
   cursor: pointer;
-  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 10%);
+  // A literal black ring reads fine on a light panel but vanishes on a dark
+  // one — mix against --text-primary so it stays visible in both themes.
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--text-primary) 12%, transparent);
 
   &.empty {
     background: repeating-linear-gradient(
       -45deg,
       transparent,
       transparent 4px,
-      var(--panel-border) 4px,
-      var(--panel-border) 5px
+      color-mix(in srgb, var(--text-primary) 20%, transparent) 4px,
+      color-mix(in srgb, var(--text-primary) 20%, transparent) 5px
     );
   }
 
@@ -212,10 +282,12 @@ export default Vue.extend({
   @include button-reset;
   flex: 1;
   min-width: 0;
-  padding: 5px 8px;
+  padding: 1px 8px 0;
+  // Digits have no descenders, so a mathematically-centered box still reads
+  // high — nudge down 1px to optically center it instead.
+  line-height: 24px;
   font-family: var(--font-mono);
   font-size: 12.5px;
-  line-height: 1.2;
   color: var(--text-primary);
   outline: none;
   cursor: text;
@@ -226,9 +298,7 @@ export default Vue.extend({
 }
 
 .color-popover {
-  position: absolute;
-  top: calc(100% + 6px);
-  right: 0;
+  position: fixed;
   z-index: 20;
 }
 </style>

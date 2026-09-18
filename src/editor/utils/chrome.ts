@@ -17,6 +17,10 @@ import {
   SetReadabilitySettings,
   ReadabilitySettings,
   OpenDonatePage,
+  GetRecentColors,
+  AddRecentColor,
+  GetRecentColorsResponse,
+  AddRecentColorResponse,
 } from '@stylebot/types';
 
 export const getAllOptions = async (): Promise<StylebotOptions> => {
@@ -159,4 +163,31 @@ export const setReadabilitySettings = (value: ReadabilitySettings): void => {
   };
 
   chrome.runtime.sendMessage(message);
+};
+
+export const getRecentColors = async (): Promise<GetRecentColorsResponse> => {
+  const message: GetRecentColors = {
+    name: 'GetRecentColors',
+  };
+
+  return new Promise(resolve => {
+    chrome.runtime.sendMessage(message, (response: GetRecentColorsResponse) => {
+      resolve(response);
+    });
+  });
+};
+
+export const addRecentColor = async (
+  color: string
+): Promise<AddRecentColorResponse> => {
+  const message: AddRecentColor = {
+    name: 'AddRecentColor',
+    color,
+  };
+
+  return new Promise(resolve => {
+    chrome.runtime.sendMessage(message, (response: AddRecentColorResponse) => {
+      resolve(response);
+    });
+  });
 };

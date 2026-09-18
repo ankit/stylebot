@@ -31,8 +31,9 @@ export const defaultOptions: StylebotOptions = {
     adjustPageLayout: false,
     dockLocation: 'right',
   },
-  colorPalette: 'basic',
   appearance: 'system',
+  lastColorSet: 'neutrals',
+  lastColorPickerTab: 'already-used',
 };
 
 export const defaultCommands: StylebotCommands = {

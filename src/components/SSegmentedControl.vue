@@ -119,16 +119,21 @@ export default Vue.extend({
 
   methods: {
     measure(): void {
+      const root = this.$refs.root as HTMLElement | undefined;
       const segments = this.$refs.segments as Vue[] | undefined;
       const index = this.options.findIndex(option => option.value === this.value);
       const active = segments?.[index]?.$el as HTMLElement | undefined;
 
-      if (!active) {
+      if (!root || !active) {
         return;
       }
 
-      this.indicatorLeft = active.offsetLeft;
-      this.indicatorWidth = active.offsetWidth;
+      // getBoundingClientRect, not offsetLeft/offsetWidth — integer rounding accumulates across siblings.
+      const rootRect = root.getBoundingClientRect();
+      const activeRect = active.getBoundingClientRect();
+
+      this.indicatorLeft = activeRect.left - rootRect.left;
+      this.indicatorWidth = activeRect.width;
       this.ready = true;
     },
   },
@@ -182,7 +187,7 @@ export default Vue.extend({
   color: var(--text-muted);
   outline: none;
   cursor: pointer;
-  transition: color 0.15s ease, font-weight 0.15s ease;
+  transition: color 0.15s ease;
 
   &.active {
     font-weight: 600;

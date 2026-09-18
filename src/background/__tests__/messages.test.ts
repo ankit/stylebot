@@ -1,7 +1,14 @@
 jest.mock('../styles');
+jest.mock('../color-history');
 
-import { SetReadability, ReadabilityActiveChanged } from '../messages';
+import {
+  SetReadability,
+  ReadabilityActiveChanged,
+  GetRecentColors,
+  AddRecentColor,
+} from '../messages';
 import * as stylesModule from '../styles';
+import * as colorHistoryModule from '../color-history';
 
 describe('SetReadability', () => {
   beforeEach(() => {
@@ -65,5 +72,39 @@ describe('ReadabilityActiveChanged', () => {
     await ReadabilityActiveChanged({ name: 'ReadabilityActiveChanged' }, {});
 
     expect(stylesModule.refreshBadgeForTab).not.toBeCalled();
+  });
+});
+
+describe('GetRecentColors', () => {
+  beforeEach(() => {
+    jest.resetAllMocks();
+  });
+
+  it('responds with the stored recent colors', async () => {
+    (colorHistoryModule.getAll as jest.Mock).mockResolvedValue(['#ff0000']);
+    const sendResponse = jest.fn();
+
+    await GetRecentColors(sendResponse);
+
+    expect(sendResponse).toBeCalledWith(['#ff0000']);
+  });
+});
+
+describe('AddRecentColor', () => {
+  beforeEach(() => {
+    jest.resetAllMocks();
+  });
+
+  it('adds the color to history and responds with the updated list', async () => {
+    (colorHistoryModule.add as jest.Mock).mockResolvedValue([
+      '#00ff00',
+      '#ff0000',
+    ]);
+    const sendResponse = jest.fn();
+
+    await AddRecentColor({ name: 'AddRecentColor', color: '#00ff00' }, sendResponse);
+
+    expect(colorHistoryModule.add).toBeCalledWith('#00ff00');
+    expect(sendResponse).toBeCalledWith(['#00ff00', '#ff0000']);
   });
 });
