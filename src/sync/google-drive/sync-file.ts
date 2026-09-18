@@ -3,6 +3,7 @@ import { compareAsc } from 'date-fns';
 import { getCurrentTimestamp } from '@stylebot/utils';
 import { GoogleDriveSyncMetadata, StyleMap } from '@stylebot/types';
 
+import { syncError } from '../errors';
 import { AccessToken } from './get-access-token';
 
 const GOOGLE_DRIVE_FILE_GET_API = `https://www.googleapis.com/drive/v3/files`;
@@ -48,8 +49,9 @@ const getAuthorizationHeaders = (accessToken: AccessToken) =>
 
 const parseJsonResponse = async <T>(response: Response): Promise<T> => {
   if (!response.ok) {
-    throw new Error(
-      `Google Drive API request failed (${response.status} ${response.statusText})`
+    throw syncError(
+      `Google Drive API request failed (${response.status} ${response.statusText})`,
+      response.status === 401 || response.status === 403 ? 'auth' : 'unknown'
     );
   }
 
