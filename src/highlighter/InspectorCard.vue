@@ -6,7 +6,9 @@
       <span class="chips">
         <s-chip v-for="(part, i) in nameChips" :key="i">{{ part }}</s-chip>
       </span>
-      <span v-if="styleCount > 0" class="pill pill-accent">{{ styleCountLabel }}</span>
+      <span v-if="styleCount > 0" class="pill pill-accent">
+        {{ styleCountLabel }}
+      </span>
     </div>
 
     <div v-if="detailRows.length" class="details">
@@ -17,7 +19,8 @@
             v-if="row.swatch"
             class="swatch"
             :style="{ backgroundColor: row.swatch }"
-          />{{ row.value }}
+          />
+          {{ row.value }}
         </div>
       </div>
     </div>
@@ -31,11 +34,13 @@
       <div class="row next-row">
         <shortcut-chip value="arrowup" small />
         <span class="chips">
-          <s-chip v-for="(part, i) in ancestorChips" :key="i">{{ part }}</s-chip>
+          <s-chip v-for="(part, i) in ancestorChips" :key="i">
+            {{ part }}
+          </s-chip>
         </span>
-        <span v-if="nextAncestor.styleCount > 0" class="pill pill-accent">{{
-          ancestorStyleCountLabel
-        }}</span>
+        <span v-if="nextAncestor.styleCount > 0" class="pill pill-accent">
+          {{ ancestorStyleCountLabel }}
+        </span>
       </div>
     </template>
   </div>
@@ -112,7 +117,9 @@ export default Vue.extend({
     },
 
     ancestorStyleCountLabel(): string {
-      return this.nextAncestor ? pluralize(this.nextAncestor.styleCount, 'style') : '';
+      return this.nextAncestor
+        ? pluralize(this.nextAncestor.styleCount, 'style')
+        : '';
     },
 
     showMatchCount(): boolean {
@@ -263,7 +270,14 @@ export default Vue.extend({
   white-space: nowrap;
   // Raw CSS property names read as code, not prose, so they get the same
   // font as everything else CSS-shaped in the card.
-  font-family: var(--font-mono, 'Fira Code', Menlo, Monaco, Consolas, monospace);
+  font-family: var(
+    --font-mono,
+    'Fira Code',
+    Menlo,
+    Monaco,
+    Consolas,
+    monospace
+  );
   color: var(--text-secondary);
 }
 
@@ -274,7 +288,14 @@ export default Vue.extend({
   text-align: right;
   // Falls back explicitly rather than relying solely on --font-mono being
   // in scope, since this card renders outside the editor panel proper.
-  font-family: var(--font-mono, 'Fira Code', Menlo, Monaco, Consolas, monospace);
+  font-family: var(
+    --font-mono,
+    'Fira Code',
+    Menlo,
+    Monaco,
+    Consolas,
+    monospace
+  );
   // text-secondary rather than text-primary (near-white in dark mode) —
   // still a real editor token, just dimmer for a value that isn't the
   // card's main subject.

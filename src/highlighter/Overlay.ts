@@ -123,7 +123,6 @@ class OverlayRect {
   }
 }
 
-
 type NextAncestorInfo = {
   label: string;
   styleCount: number;
@@ -203,7 +202,8 @@ class OverlayTip {
 
       if (avoidHorizontal) {
         const overlaps =
-          left < avoidHorizontal.right && left + tipRect.width > avoidHorizontal.left;
+          left < avoidHorizontal.right &&
+          left + tipRect.width > avoidHorizontal.left;
 
         if (overlaps) {
           const margin = 8;
@@ -215,7 +215,10 @@ class OverlayTip {
               ? avoidHorizontal.left - tipRect.width - margin
               : avoidHorizontal.right + margin;
 
-          left = Math.max(margin, Math.min(left, window.innerWidth - tipRect.width - margin));
+          left = Math.max(
+            margin,
+            Math.min(left, window.innerWidth - tipRect.width - margin)
+          );
         }
       }
 
@@ -259,8 +262,14 @@ class OverlayTip {
         top = margin;
       }
 
-      this.vm.left = Math.max(margin, Math.min(left, viewportWidth - tipRect.width - margin));
-      this.vm.top = Math.max(margin, Math.min(top, viewportHeight - tipRect.height - margin));
+      this.vm.left = Math.max(
+        margin,
+        Math.min(left, viewportWidth - tipRect.width - margin)
+      );
+      this.vm.top = Math.max(
+        margin,
+        Math.min(top, viewportHeight - tipRect.height - margin)
+      );
       this.vm.placement = null;
     });
   }

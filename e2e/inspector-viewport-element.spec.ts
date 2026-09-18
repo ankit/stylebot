@@ -22,7 +22,10 @@ test('picking a viewport-sized element highlights it like any other', async ({
 
     const content = page.locator('#stylebot-overlay > div > div > div > div');
     await expect(content).toHaveCount(1);
-    await expect(content).toHaveCSS('background-color', 'rgba(120, 170, 210, 0.7)');
+    await expect(content).toHaveCSS(
+      'background-color',
+      'rgba(120, 170, 210, 0.7)'
+    );
     const box = await content.boundingBox();
     const viewportHeight = await page.evaluate(() => window.innerHeight);
     expect(box?.height).toBeGreaterThan(viewportHeight);

@@ -15,13 +15,21 @@ function escapeAttributeValue(value: string): string {
  * Conventions test frameworks/component libraries use for a stable,
  * intentional targeting hook, checked most-specific first.
  */
-const TEST_ID_ATTRIBUTES = ['data-testid', 'data-test-id', 'data-test', 'data-cy', 'data-qa'];
+const TEST_ID_ATTRIBUTES = [
+  'data-testid',
+  'data-test-id',
+  'data-test',
+  'data-cy',
+  'data-qa',
+];
 
 export const getTestIdBasedSelector = (el: HTMLElement): string | null => {
   for (const attribute of TEST_ID_ATTRIBUTES) {
     const value = el.getAttribute(attribute);
     if (value) {
-      return `${el.tagName.toLowerCase()}[${attribute}="${escapeAttributeValue(value)}"]`;
+      return `${el.tagName.toLowerCase()}[${attribute}="${escapeAttributeValue(
+        value
+      )}"]`;
     }
   }
 
@@ -81,7 +89,9 @@ function looksHashed(className: string): boolean {
  * The first class that isn't hashed, so a stable but non-first class
  * doesn't lose out to a hashed one earlier in the list.
  */
-export const getNonHashedClassBasedSelector = (el: HTMLElement): string | null => {
+export const getNonHashedClassBasedSelector = (
+  el: HTMLElement
+): string | null => {
   const className = el
     .getAttribute('class')
     ?.trim()
@@ -91,7 +101,9 @@ export const getNonHashedClassBasedSelector = (el: HTMLElement): string | null =
     return null;
   }
 
-  const usableClass = className.split(' ').find(candidate => !looksHashed(candidate));
+  const usableClass = className
+    .split(' ')
+    .find(candidate => !looksHashed(candidate));
   if (!usableClass) {
     return null;
   }

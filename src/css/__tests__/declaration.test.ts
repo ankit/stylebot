@@ -150,7 +150,12 @@ describe('declaration', () => {
           }
         `;
 
-        const output = addDeclaration('background', 'blue', '.mock-selector-1', css);
+        const output = addDeclaration(
+          'background',
+          'blue',
+          '.mock-selector-1',
+          css
+        );
 
         expect(getRule(output, '.mock-selector-1')?.toString()).toBe(dedent`
           .mock-selector-1 {
@@ -167,7 +172,12 @@ describe('declaration', () => {
           }
         `;
 
-        const output = addDeclaration('background', 'blue', '.mock-selector-1', css);
+        const output = addDeclaration(
+          'background',
+          'blue',
+          '.mock-selector-1',
+          css
+        );
 
         expect(getRule(output, '.mock-selector-2')?.toString()).toBe(dedent`
           .mock-selector-2 {
@@ -183,7 +193,12 @@ describe('declaration', () => {
           }
         `;
 
-        const output = addDeclaration('color', 'green', '.mock-selector-1', css);
+        const output = addDeclaration(
+          'color',
+          'green',
+          '.mock-selector-1',
+          css
+        );
 
         expect(getRule(output, '.mock-selector-1')?.toString()).toBe(dedent`
           .mock-selector-1 {

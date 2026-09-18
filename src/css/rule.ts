@@ -83,7 +83,10 @@ export const getExistingSelector = (
 // already had either. No-ops if `selector` already has its own rule, or
 // isn't part of any rule at all. Mirrors getRuleForSelector's "last match
 // wins" choice when a selector is grouped in more than one place.
-export const splitSelectorFromGroup = (css: string, selector: string): string => {
+export const splitSelectorFromGroup = (
+  css: string,
+  selector: string
+): string => {
   const root = postcss.parse(css);
   const matches: Array<postcss.Rule> = [];
 

@@ -119,7 +119,8 @@ describe('rule', () => {
 
       const output = splitSelectorFromGroup(css, '.mock-selector-1');
 
-      expect(getRuleForSelector(output, '.mock-selector-1')?.toString()).toEqual(dedent`
+      expect(getRuleForSelector(output, '.mock-selector-1')?.toString())
+        .toEqual(dedent`
         .mock-selector-1 {
           color: blue;
         }

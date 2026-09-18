@@ -26,7 +26,9 @@ describe('selector', () => {
       const el = document.createElement('button');
       el.setAttribute('data-testid', 'submit-button');
 
-      expect(getTestIdBasedSelector(el)).toBe('button[data-testid="submit-button"]');
+      expect(getTestIdBasedSelector(el)).toBe(
+        'button[data-testid="submit-button"]'
+      );
     });
 
     it.each(['data-testid', 'data-test-id', 'data-test', 'data-cy', 'data-qa'])(

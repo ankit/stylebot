@@ -15,7 +15,7 @@ class Highlighter {
   getExistingSelector?: (el: HTMLElement) => string | null;
   getMountRoot?: () => HTMLElement;
   currentElement: HTMLElement | null;
-  drillStack: HTMLElement[];
+  drillStack: Array<HTMLElement>;
   /**
    * Element/value currently suppressed by suppressTitle, if any.
    */
@@ -102,7 +102,10 @@ class Highlighter {
    */
   restoreSuppressedTitle = (): void => {
     if (this.titleSuppressedElement && this.suppressedTitleValue !== null) {
-      this.titleSuppressedElement.setAttribute('title', this.suppressedTitleValue);
+      this.titleSuppressedElement.setAttribute(
+        'title',
+        this.suppressedTitleValue
+      );
     }
 
     this.titleSuppressedElement = null;
@@ -152,9 +155,10 @@ class Highlighter {
 
     const elements = Array.prototype.slice.call(
       document.querySelectorAll(selector)
-    ) as HTMLElement[];
+    ) as Array<HTMLElement>;
 
-    const authoredDeclarations = this.getStylebotDeclarations?.(selector) ?? null;
+    const authoredDeclarations =
+      this.getStylebotDeclarations?.(selector) ?? null;
 
     this.overlay.inspect(elements, selector, property, {
       // A selector preview, not picking one specific element — anchor
@@ -165,8 +169,8 @@ class Highlighter {
         authoredDeclarations && authoredDeclarations.length > 0
           ? authoredDeclarations
           : elements[0]
-            ? getComputedDeclarations(elements[0])
-            : null,
+          ? getComputedDeclarations(elements[0])
+          : null,
     });
   };
 
@@ -318,9 +322,10 @@ class Highlighter {
     const selector = this.getSelectorFor(el);
     const matches = Array.prototype.slice.call(
       document.querySelectorAll(selector)
-    ) as HTMLElement[];
+    ) as Array<HTMLElement>;
 
-    const authoredDeclarations = this.getStylebotDeclarations?.(selector) ?? null;
+    const authoredDeclarations =
+      this.getStylebotDeclarations?.(selector) ?? null;
 
     this.overlay.inspect(matches, selector, undefined, {
       primary: el,
@@ -351,7 +356,10 @@ class Highlighter {
       return false;
     }
 
-    return this.isStylebotPanel(element) || element.closest('#stylebot-overlay') !== null;
+    return (
+      this.isStylebotPanel(element) ||
+      element.closest('#stylebot-overlay') !== null
+    );
   };
 }
 

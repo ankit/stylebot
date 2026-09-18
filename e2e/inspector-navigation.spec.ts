@@ -29,7 +29,10 @@ test('arrow keys and the breadcrumb navigate ancestors while picking an element'
   await expect(inspectorButton).toHaveClass(/active/);
   await pageLink.hover();
   await page.waitForTimeout(300);
-  console.log('breadcrumb count', await page.locator('.inspector-breadcrumb').count());
+  console.log(
+    'breadcrumb count',
+    await page.locator('.inspector-breadcrumb').count()
+  );
   console.log('crumb count', await page.locator('.crumb').count());
   console.log('crumb texts', await page.locator('.crumb').allTextContents());
 
