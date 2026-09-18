@@ -33,9 +33,21 @@ export const getGoogleDriveSyncEnabled = (): Promise<boolean> => {
   });
 };
 
+/* Sorts before any real timestamp, so styles with no recorded modified time
+   never look newer than the remote copy and never trigger an upload. */
+const NEVER_MODIFIED = new Date(0).toISOString();
+
 export const getLocalStylesMetadata = (): Promise<{ modifiedTime: string }> =>
   new Promise(resolve => {
-    chrome.storage.local.get('styles-metadata', async items => {
-      resolve(items['styles-metadata']);
+    chrome.storage.local.get('styles-metadata', items => {
+      const stylesMetadata = items['styles-metadata'];
+
+      if (typeof stylesMetadata?.modifiedTime === 'string') {
+        resolve({ modifiedTime: stylesMetadata.modifiedTime });
+      } else if (typeof stylesMetadata === 'string') {
+        resolve({ modifiedTime: stylesMetadata });
+      } else {
+        resolve({ modifiedTime: NEVER_MODIFIED });
+      }
     });
   });
