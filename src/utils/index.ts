@@ -9,6 +9,8 @@ export {
 
 export { debounce } from './debounce';
 
+export { formatSyncTime } from './format-sync-time';
+
 export const getCurrentTimestamp = (): Timestamp =>
   format(new Date(), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
 

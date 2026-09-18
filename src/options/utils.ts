@@ -12,6 +12,7 @@ import {
   StylebotCommands,
   StyleMap,
   RunGoogleDriveSync,
+  RunGoogleDriveSyncResponse,
 } from '@stylebot/types';
 
 export const getAllStyles = async (): Promise<GetAllStylesResponse> => {
@@ -83,17 +84,33 @@ export const setCommands = (commands: StylebotCommands): void => {
   chrome.runtime.sendMessage(message);
 };
 
-export const runGoogleDriveSync = async (): Promise<void> => {
-  const message: RunGoogleDriveSync = {
-    name: 'RunGoogleDriveSync',
-  };
+export const runGoogleDriveSync =
+  async (): Promise<RunGoogleDriveSyncResponse> => {
+    const message: RunGoogleDriveSync = {
+      name: 'RunGoogleDriveSync',
+    };
 
-  return new Promise(resolve => {
-    chrome.runtime.sendMessage(message, () => {
-      resolve();
+    return new Promise(resolve => {
+      chrome.runtime.sendMessage(
+        message,
+        (response?: RunGoogleDriveSyncResponse) => {
+          // A service worker torn down mid-sync answers with undefined and
+          // sets lastError. Without this the caller waits forever.
+          if (chrome.runtime.lastError || !response) {
+            resolve({
+              ok: false,
+              errorKey: 'sync_error_unknown',
+              errorDetail: chrome.runtime.lastError?.message,
+            });
+
+            return;
+          }
+
+          resolve(response);
+        }
+      );
     });
-  });
-};
+  };
 
 export const importStylesWithFilePicker = (): Promise<StyleMap> => {
   return new Promise((resolve, reject) => {

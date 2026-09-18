@@ -9,6 +9,7 @@ import {
   StylebotOptions,
   StylebotCommands,
   GoogleDriveSyncMetadata,
+  SyncErrorKey,
 } from '@stylebot/types';
 import {
   getGoogleDriveSyncEnabled,
@@ -29,6 +30,11 @@ import {
 
 Vue.use(Vuex);
 
+export type SyncStatus =
+  | { type: 'success'; messageKey: 'sync_success' }
+  | { type: 'error'; messageKey: SyncErrorKey; detail?: string }
+  | null;
+
 type State = {
   styles: StyleMap;
 
@@ -37,6 +43,9 @@ type State = {
 
   googleDriveSyncEnabled: boolean;
   googleDriveSyncMetadata: GoogleDriveSyncMetadata | undefined;
+
+  syncInProgress: boolean;
+  syncStatus: SyncStatus;
 };
 
 export default new Vuex.Store<State>({
@@ -46,6 +55,8 @@ export default new Vuex.Store<State>({
     commands: defaultCommands,
     googleDriveSyncEnabled: false,
     googleDriveSyncMetadata: undefined,
+    syncInProgress: false,
+    syncStatus: null,
   },
 
   actions: {
@@ -180,10 +191,32 @@ export default new Vuex.Store<State>({
       }
     },
 
-    async syncWithGoogleDrive({ dispatch }) {
-      await runGoogleDriveSync();
-      await dispatch('getGoogleDriveSyncMetadata');
-      await dispatch('getAllStyles');
+    async syncWithGoogleDrive({ state, dispatch }) {
+      if (state.syncInProgress) {
+        return;
+      }
+
+      state.syncInProgress = true;
+      state.syncStatus = null;
+
+      try {
+        const response = await runGoogleDriveSync();
+
+        if (response?.ok) {
+          state.syncStatus = { type: 'success', messageKey: 'sync_success' };
+        } else {
+          state.syncStatus = {
+            type: 'error',
+            messageKey: response?.errorKey ?? 'sync_error_unknown',
+            detail: response?.errorDetail,
+          };
+        }
+
+        await dispatch('getGoogleDriveSyncMetadata');
+        await dispatch('getAllStyles');
+      } finally {
+        state.syncInProgress = false;
+      }
     },
   },
 });

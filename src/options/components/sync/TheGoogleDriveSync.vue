@@ -1,14 +1,16 @@
 <template>
   <div class="card">
     <div class="text">
-      <heading as="h2" size="sm">Google Drive</heading>
+      <heading as="h2" size="sm">{{ t('google_drive') }}</heading>
 
       <s-text v-if="!googleDriveSyncEnabled" size="caption" variant="muted" class="description">
-        Not connected. Styles stay on this computer only.
+        {{ t('sync_not_connected') }}
       </s-text>
 
       <s-text v-else size="caption" variant="muted" class="description">
-        {{ t('synced_at_time', [googleDriveSyncLastModifiedTime]) }}
+        <template v-if="googleDriveSyncLastModifiedTime">
+          {{ t('synced_at_time', [googleDriveSyncLastModifiedTime]) }}
+        </template>
         <template v-if="syncInProgress"> · {{ t('sync_in_progress') }}</template>
         <template v-if="googleDriveSyncViewLink">
           ·
@@ -36,9 +38,9 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { formatDistanceToNow } from 'date-fns';
 import { Heading, SText, SButton } from '@stylebot/components';
 import { ArrowRepeatIcon } from '@stylebot/icons';
+import { formatSyncTime } from '@stylebot/utils';
 
 export default Vue.extend({
   name: 'TheGoogleDriveSync',
@@ -50,15 +52,11 @@ export default Vue.extend({
     SText,
   },
 
-  data(): {
-    syncInProgress: boolean;
-  } {
-    return {
-      syncInProgress: false,
-    };
-  },
-
   computed: {
+    syncInProgress(): boolean {
+      return this.$store.state.syncInProgress;
+    },
+
     googleDriveSyncEnabled: {
       get(): boolean {
         return this.$store.state.googleDriveSyncEnabled;
@@ -86,22 +84,15 @@ export default Vue.extend({
     },
 
     googleDriveSyncLastModifiedTime(): string {
-      if (this.$store.state.googleDriveSyncMetadata) {
-        return formatDistanceToNow(
-          new Date(this.$store.state.googleDriveSyncMetadata.modifiedTime),
-          { addSuffix: true }
-        );
-      }
-
-      return '';
+      return formatSyncTime(
+        this.$store.state.googleDriveSyncMetadata?.modifiedTime
+      );
     },
   },
 
   methods: {
-    async syncWithGoogleDrive() {
-      this.syncInProgress = true;
-      await this.$store.dispatch('syncWithGoogleDrive');
-      this.syncInProgress = false;
+    syncWithGoogleDrive() {
+      return this.$store.dispatch('syncWithGoogleDrive');
     },
   },
 });
