@@ -9,6 +9,10 @@ import { getIsReadabilityActive, updateIcon } from './badge';
 
 export { getStylesForPage } from '@stylebot/styles';
 
+/**
+ * Pushes the current styles to every open tab and refreshes the badge
+ * for the active one.
+ */
 export const applyStylesToAllTabs = async (): Promise<void> => {
   const allStyles = await getAll();
 
@@ -34,6 +38,10 @@ export const applyStylesToAllTabs = async (): Promise<void> => {
   });
 };
 
+/**
+ * Refreshes the toolbar badge for a single tab based on its styles
+ * and readability state.
+ */
 export const refreshBadgeForTab = async (
   tab: chrome.tabs.Tab
 ): Promise<void> => {
@@ -47,6 +55,9 @@ export const refreshBadgeForTab = async (
   updateIcon(tab, styles, readabilityActive);
 };
 
+/**
+ * Reads the full style map from storage, defaulting to an empty map.
+ */
 export const getAll = (): Promise<StyleMap> =>
   new Promise(resolve => {
     chrome.storage.local.get('styles', items => {
@@ -58,101 +69,160 @@ export const getAll = (): Promise<StyleMap> =>
     });
   });
 
+/**
+ * Reads the stored style for a single url.
+ */
 export const get = async (url: string): Promise<StyleWithoutUrl> => {
   const styles = await getAll();
   return styles[url];
 };
 
-export const setAll = async (styles: StyleMap): Promise<void> => {
-  chrome.storage.local.set({
-    styles,
+/**
+ * Writes the style map, plus its modified-time metadata, to storage.
+ */
+const writeToStorage = (styles: StyleMap): Promise<void> =>
+  new Promise(resolve => {
+    chrome.storage.local.set(
+      {
+        styles,
 
-    'styles-metadata': {
-      modifiedTime: getCurrentTimestamp(),
-    },
+        'styles-metadata': {
+          modifiedTime: getCurrentTimestamp(),
+        },
+      },
+      resolve
+    );
   });
+
+/**
+ * Chains writes so each mutation reads styles only after the prior write
+ * finished, preventing concurrent writes (e.g. rapid keystrokes in the code
+ * editor) from clobbering each other.
+ */
+let pendingWrite = Promise.resolve();
+
+/**
+ * Replaces the entire style map.
+ */
+export const setAll = (styles: StyleMap): Promise<void> => {
+  pendingWrite = pendingWrite.then(() => writeToStorage(styles));
+  return pendingWrite;
 };
 
-export const set = async (
+/**
+ * Runs a read-mutate-write against the style map through the pendingWrite
+ * chain. `mutate` returns the updated map, or undefined to skip the write.
+ */
+const update = (
+  mutate: (styles: StyleMap) => StyleMap | undefined
+): Promise<void> => {
+  pendingWrite = pendingWrite.then(async () => {
+    const styles = mutate(await getAll());
+
+    if (styles) {
+      await writeToStorage(styles);
+    }
+  });
+
+  return pendingWrite;
+};
+
+/**
+ * Saves the style for a url, or removes it if css is empty.
+ */
+export const set = (
   url: string,
   css: string,
   readability: boolean
-): Promise<void> => {
-  const styles = await getAll();
+): Promise<void> =>
+  update(styles => {
+    if (!css) {
+      delete styles[url];
+    } else {
+      styles[url] = {
+        css,
+        readability,
+        enabled: true,
+        modifiedTime: getCurrentTimestamp(),
+      };
+    }
 
-  if (!css) {
-    delete styles[url];
-  } else {
-    styles[url] = {
-      css,
-      readability,
-      enabled: true,
-      modifiedTime: getCurrentTimestamp(),
-    };
-  }
+    return styles;
+  });
 
-  return setAll(styles);
-};
+/**
+ * Enables an existing style for a url. No-op if none exists.
+ */
+export const enable = (url: string): Promise<void> =>
+  update(styles => {
+    if (!styles[url]) {
+      return undefined;
+    }
 
-export const enable = async (url: string): Promise<void> => {
-  const styles = await getAll();
+    styles[url].enabled = true;
+    return styles;
+  });
 
-  if (!styles[url]) {
-    return;
-  }
+/**
+ * Disables an existing style for a url. No-op if none exists.
+ */
+export const disable = (url: string): Promise<void> =>
+  update(styles => {
+    if (!styles[url]) {
+      return undefined;
+    }
 
-  styles[url].enabled = true;
-  return setAll(styles);
-};
+    styles[url].enabled = false;
+    return styles;
+  });
 
-export const disable = async (url: string): Promise<void> => {
-  const styles = await getAll();
+/**
+ * Sets readability for a url, creating a blank style entry if none exists.
+ */
+export const setReadability = (url: string, value: boolean): Promise<void> =>
+  update(styles => {
+    if (styles[url]) {
+      styles[url].readability = value;
+    } else {
+      styles[url] = {
+        css: '',
+        enabled: true,
+        readability: value,
+        modifiedTime: getCurrentTimestamp(),
+      };
+    }
 
-  if (!styles[url]) {
-    return;
-  }
+    return styles;
+  });
 
-  styles[url].enabled = false;
-  return setAll(styles);
-};
+/**
+ * Renames a style's url, moving its entry from src to dest.
+ */
+export const move = (src: string, dest: string): Promise<void> =>
+  update(styles => {
+    if (!styles[src]) {
+      return undefined;
+    }
 
-export const setReadability = async (
-  url: string,
-  value: boolean
-): Promise<void> => {
-  const styles = await getAll();
-
-  if (styles[url]) {
-    styles[url].readability = value;
-  } else {
-    styles[url] = {
-      css: '',
-      enabled: true,
-      readability: value,
-      modifiedTime: getCurrentTimestamp(),
-    };
-  }
-
-  return setAll(styles);
-};
-
-export const move = async (src: string, dest: string): Promise<void> => {
-  const styles = await getAll();
-
-  if (styles[src]) {
     styles[dest] = JSON.parse(JSON.stringify(styles[src]));
     delete styles[src];
 
-    return setAll(styles);
-  }
-};
+    return styles;
+  });
 
+/**
+ * Checks whether a Google Web Fonts stylesheet url resolves to a real font.
+ */
 export const getGoogleWebFontExists = (url: string): Promise<boolean> => {
   return fetch(url)
     .then(response => response.status !== 400)
     .catch(() => false);
 };
 
+/**
+ * Fetches CSS from a url for import, resolving to an empty string on
+ * failure or invalid CSS.
+ */
 export const getImportCss = (url: string): Promise<string> => {
   return new Promise(resolve => {
     fetch(url)
