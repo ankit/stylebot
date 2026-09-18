@@ -112,5 +112,60 @@ describe('filter', () => {
         `);
       });
     });
+
+    describe('choosing which elements to target', () => {
+      // Hacker News wraps its page in a bare <center>, with no class or id.
+      const UNIDENTIFIED_BODY = '<center><table id="hnmain"></table></center>';
+
+      it('falls back to a tag-name selector when there is no class or id', () => {
+        document.body.innerHTML = UNIDENTIFIED_BODY;
+
+        const output = getCssAfterApplyingFilterEffectToPage(
+          'grayscale',
+          '',
+          '100'
+        );
+
+        expect(output).toBe(dedent`
+          html body center {
+            filter: grayscale(100%);
+          }
+        `);
+      });
+
+      it('uses the id when the element has no class', () => {
+        document.body.innerHTML = '<div id="wrapper"></div>';
+
+        const output = getCssAfterApplyingFilterEffectToPage(
+          'grayscale',
+          '',
+          '100'
+        );
+
+        expect(output).toBe(dedent`
+          #wrapper {
+            filter: grayscale(100%);
+          }
+        `);
+      });
+
+      it('removes a tag-name-targeted rule when the effect returns to 0', () => {
+        document.body.innerHTML = UNIDENTIFIED_BODY;
+
+        const css = dedent`
+          html body center {
+            filter: grayscale(100%);
+          }
+        `;
+
+        const output = getCssAfterApplyingFilterEffectToPage(
+          'grayscale',
+          css,
+          '0'
+        );
+
+        expect(output).toBe('');
+      });
+    });
   });
 });

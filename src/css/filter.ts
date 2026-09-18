@@ -1,10 +1,6 @@
 import * as postcss from 'postcss';
 
-import {
-  addDeclaration,
-  getClassBasedSelector,
-  getIdBasedSelector,
-} from '@stylebot/css';
+import { addDeclaration, getSelector } from '@stylebot/css';
 
 import { FilterEffect } from '@stylebot/types';
 
@@ -35,11 +31,7 @@ const getSelectorsToAttachFilterForPage = (): Array<string> => {
     return true;
   });
 
-  const selectors = filteredNodes.map(
-    node => getClassBasedSelector(node) || getIdBasedSelector(node)
-  );
-
-  return selectors.filter((s): s is string => s !== null);
+  return filteredNodes.map(node => getSelector(node));
 };
 
 export const getFilterEffectValueForPage = (

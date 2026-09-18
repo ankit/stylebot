@@ -18,6 +18,17 @@ const PAGE_HTML = `
   </html>
 `;
 
+// Hacker News wraps its page in a bare <center>, giving the filter no class or
+// id to hang off.
+const UNIDENTIFIED_PAGE_HTML = `
+  <!doctype html>
+  <html>
+    <body>
+      <center><table id="hnmain"><tr><td>Test page</td></tr></table></center>
+    </body>
+  </html>
+`;
+
 const setRangeValue = (slider: Locator, value: string): Promise<void> =>
   slider.evaluate((el, next) => {
     (el as HTMLInputElement).value = next;
@@ -74,4 +85,32 @@ test('taking grayscale back to 0 keeps the rest of the rule in the saved style',
   await page.reload();
   await expect(article).toHaveCSS('color', 'rgb(255, 0, 128)');
   await expect(article).toHaveCSS('filter', 'none');
+});
+
+test('grayscale applies on a page whose body child has no class or id', async ({
+  context,
+  extensionId: _extensionId,
+  openPopup,
+}) => {
+  test.slow();
+
+  await context.route('http://localhost/**', route =>
+    route.fulfill({ contentType: 'text/html', body: UNIDENTIFIED_PAGE_HTML })
+  );
+
+  const page = await context.newPage();
+  await page.goto('http://localhost/');
+
+  const wrapper = page.locator('center');
+  const editorRoot = await openEditor(page, openPopup);
+
+  await switchEditorMode(editorRoot, 'magic');
+  const slider = editorRoot.locator('input[type="range"]');
+  await slider.waitFor({ state: 'attached' });
+
+  await setRangeValue(slider, '100');
+  await expect(wrapper).toHaveCSS('filter', 'grayscale(1)');
+
+  await setRangeValue(slider, '0');
+  await expect(wrapper).toHaveCSS('filter', 'none');
 });
