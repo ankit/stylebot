@@ -7,9 +7,9 @@ import {
 } from '@stylebot/types';
 import { getCurrentTimestamp } from '@stylebot/utils';
 
-import { toSyncErrorKey, toSyncErrorDetail } from '../errors';
+import { toSyncErrorKey, toSyncErrorDetail, isSyncError } from '../errors';
 import mergeStyles from './merge-styles';
-import getAccessToken from './get-access-token';
+import getAccessToken, { clearCachedToken } from './get-access-token';
 import {
   getGoogleDriveSyncMetadata,
   getLocalStylesMetadata,
@@ -160,6 +160,16 @@ const reconcile = async (): Promise<GoogleDriveSyncMetadata> => {
   return touchedSyncMetadata;
 };
 
+const toFailure = (e: unknown): RunGoogleDriveSyncResponse => {
+  console.debug('google drive sync failed', e);
+
+  return {
+    ok: false,
+    errorKey: toSyncErrorKey(e),
+    errorDetail: toSyncErrorDetail(e),
+  };
+};
+
 /**
  * Never rejects. Callers are message handlers whose sendResponse must always
  * fire, so failures come back as a result rather than an exception.
@@ -169,12 +179,18 @@ export const runGoogleDriveSync =
     try {
       return { ok: true, metadata: await reconcile() };
     } catch (e) {
-      console.debug('google drive sync failed', e);
+      if (isSyncError(e) && e.code === 'auth') {
+        // The cached token may simply have been revoked. Drop it and give the
+        // user one chance to re-consent before reporting a failure.
+        await clearCachedToken();
 
-      return {
-        ok: false,
-        errorKey: toSyncErrorKey(e),
-        errorDetail: toSyncErrorDetail(e),
-      };
+        try {
+          return { ok: true, metadata: await reconcile() };
+        } catch (retryError) {
+          return toFailure(retryError);
+        }
+      }
+
+      return toFailure(e);
     }
   };

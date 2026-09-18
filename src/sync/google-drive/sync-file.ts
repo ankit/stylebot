@@ -3,6 +3,7 @@ import { compareAsc } from 'date-fns';
 import { getCurrentTimestamp } from '@stylebot/utils';
 import { GoogleDriveSyncMetadata, StyleMap } from '@stylebot/types';
 
+import { syncError } from '../errors';
 import { AccessToken } from './get-access-token';
 
 const GOOGLE_DRIVE_FILE_GET_API = `https://www.googleapis.com/drive/v3/files`;
@@ -48,13 +49,34 @@ const getAuthorizationHeaders = (accessToken: AccessToken) =>
 
 const parseJsonResponse = async <T>(response: Response): Promise<T> => {
   if (!response.ok) {
-    throw new Error(
-      `Google Drive API request failed (${response.status} ${response.statusText})`
+    throw syncError(
+      `Google Drive API request failed (${response.status} ${response.statusText})`,
+      response.status === 401 || response.status === 403 ? 'auth' : 'unknown'
     );
   }
 
-  return response.json();
+  try {
+    return await response.json();
+  } catch {
+    throw syncError('Google Drive returned invalid JSON', 'parse');
+  }
 };
+
+/**
+ * The file is the user's, so it can hold anything by the time it is read
+ * back: a hand edit in Drive, or an empty body. Only a map of style objects
+ * may reach the merge.
+ */
+const isStyleMap = (value: unknown): value is StyleMap =>
+  typeof value === 'object' &&
+  value !== null &&
+  !Array.isArray(value) &&
+  Object.values(value).every(
+    style =>
+      typeof style === 'object' &&
+      style !== null &&
+      typeof (style as { css?: unknown }).css === 'string'
+  );
 
 export const getFileMetadata = async (
   id: string,
@@ -191,7 +213,10 @@ export const getSyncFileMetadata = async (
   }
 
   const newest = files.reduce((latest, file) =>
-    compareAsc(new Date(file.modifiedTime ?? 0), new Date(latest.modifiedTime ?? 0)) > 0
+    compareAsc(
+      new Date(file.modifiedTime ?? 0),
+      new Date(latest.modifiedTime ?? 0)
+    ) > 0
       ? file
       : latest
   );
@@ -212,7 +237,13 @@ export const downloadSyncFile = async (
     headers: getAuthorizationHeaders(accessToken),
   });
 
-  return parseJsonResponse<StyleMap>(response);
+  const styles = await parseJsonResponse<unknown>(response);
+
+  if (!isStyleMap(styles)) {
+    throw syncError('The synced file is not a map of styles', 'parse');
+  }
+
+  return styles;
 };
 
 /**

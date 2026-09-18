@@ -1,6 +1,11 @@
 import fetchMock from 'jest-fetch-mock';
 
-import { getSyncFileMetadata, writeSyncFile } from '../sync-file';
+import {
+  getSyncFileMetadata,
+  writeSyncFile,
+  downloadSyncFile,
+} from '../sync-file';
+import { isSyncError } from '../../errors';
 
 const ACCESS_TOKEN = 'access-token';
 
@@ -170,5 +175,55 @@ describe('writeSyncFile', () => {
     );
 
     expect(folderCreates).toHaveLength(1);
+  });
+});
+
+describe('downloadSyncFile', () => {
+  beforeEach(() => {
+    fetchMock.resetMocks();
+  });
+
+  const codeOf = async (promise: Promise<unknown>) => {
+    try {
+      await promise;
+      return 'resolved';
+    } catch (e) {
+      return isSyncError(e) ? e.code : 'not-a-sync-error';
+    }
+  };
+
+  it('returns the style map', async () => {
+    const styles = {
+      'example.com': { css: 'a {}', enabled: true, readability: false },
+    };
+    fetchMock.mockResponseOnce(JSON.stringify(styles));
+
+    await expect(downloadSyncFile(ACCESS_TOKEN, 'file-id')).resolves.toEqual(
+      styles
+    );
+  });
+
+  it('reports a parse error rather than handing a null body to the merge', async () => {
+    fetchMock.mockResponseOnce('null');
+
+    expect(await codeOf(downloadSyncFile(ACCESS_TOKEN, 'file-id'))).toBe(
+      'parse'
+    );
+  });
+
+  it('reports a parse error for a body that is not JSON', async () => {
+    fetchMock.mockResponseOnce('not json');
+
+    expect(await codeOf(downloadSyncFile(ACCESS_TOKEN, 'file-id'))).toBe(
+      'parse'
+    );
+  });
+
+  it('reports a parse error when an entry is not a style', async () => {
+    fetchMock.mockResponseOnce(JSON.stringify({ 'example.com': 'a {}' }));
+
+    expect(await codeOf(downloadSyncFile(ACCESS_TOKEN, 'file-id'))).toBe(
+      'parse'
+    );
   });
 });
