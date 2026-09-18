@@ -9,6 +9,10 @@ import { getIsReadabilityActive, updateIcon } from './badge';
 
 export { getStylesForPage } from '@stylebot/styles';
 
+/**
+ * Pushes the current styles to every open tab and refreshes the badge
+ * for the active one.
+ */
 export const applyStylesToAllTabs = async (): Promise<void> => {
   const allStyles = await getAll();
 
@@ -34,6 +38,10 @@ export const applyStylesToAllTabs = async (): Promise<void> => {
   });
 };
 
+/**
+ * Refreshes the toolbar badge for a single tab based on its styles
+ * and readability state.
+ */
 export const refreshBadgeForTab = async (tab: chrome.tabs.Tab): Promise<void> => {
   if (!tab.url || tab.id === undefined) {
     return;
@@ -45,6 +53,9 @@ export const refreshBadgeForTab = async (tab: chrome.tabs.Tab): Promise<void> =>
   updateIcon(tab, styles, readabilityActive);
 };
 
+/**
+ * Reads the full style map from storage, defaulting to an empty map.
+ */
 export const getAll = (): Promise<StyleMap> =>
   new Promise(resolve => {
     chrome.storage.local.get('styles', items => {
@@ -56,11 +67,17 @@ export const getAll = (): Promise<StyleMap> =>
     });
   });
 
+/**
+ * Reads the stored style for a single url.
+ */
 export const get = async (url: string): Promise<StyleWithoutUrl> => {
   const styles = await getAll();
   return styles[url];
 };
 
+/**
+ * Writes the style map, plus its modified-time metadata, to storage.
+ */
 const writeToStorage = (styles: StyleMap): Promise<void> =>
   new Promise(resolve => {
     chrome.storage.local.set(
@@ -82,11 +99,18 @@ const writeToStorage = (styles: StyleMap): Promise<void> =>
  */
 let pendingWrite = Promise.resolve();
 
+/**
+ * Replaces the entire style map.
+ */
 export const setAll = (styles: StyleMap): Promise<void> => {
   pendingWrite = pendingWrite.then(() => writeToStorage(styles));
   return pendingWrite;
 };
 
+/**
+ * Runs a read-mutate-write against the style map through the pendingWrite
+ * chain. `mutate` returns the updated map, or undefined to skip the write.
+ */
 const update = (
   mutate: (styles: StyleMap) => StyleMap | undefined
 ): Promise<void> => {
@@ -101,6 +125,9 @@ const update = (
   return pendingWrite;
 };
 
+/**
+ * Saves the style for a url, or removes it if css is empty.
+ */
 export const set = (
   url: string,
   css: string,
@@ -121,6 +148,9 @@ export const set = (
     return styles;
   });
 
+/**
+ * Enables an existing style for a url. No-op if none exists.
+ */
 export const enable = (url: string): Promise<void> =>
   update(styles => {
     if (!styles[url]) {
@@ -131,6 +161,9 @@ export const enable = (url: string): Promise<void> =>
     return styles;
   });
 
+/**
+ * Disables an existing style for a url. No-op if none exists.
+ */
 export const disable = (url: string): Promise<void> =>
   update(styles => {
     if (!styles[url]) {
@@ -141,6 +174,9 @@ export const disable = (url: string): Promise<void> =>
     return styles;
   });
 
+/**
+ * Sets readability for a url, creating a blank style entry if none exists.
+ */
 export const setReadability = (url: string, value: boolean): Promise<void> =>
   update(styles => {
     if (styles[url]) {
@@ -157,6 +193,9 @@ export const setReadability = (url: string, value: boolean): Promise<void> =>
     return styles;
   });
 
+/**
+ * Renames a style's url, moving its entry from src to dest.
+ */
 export const move = (src: string, dest: string): Promise<void> =>
   update(styles => {
     if (!styles[src]) {
@@ -169,6 +208,10 @@ export const move = (src: string, dest: string): Promise<void> =>
     return styles;
   });
 
+/**
+ * Fetches CSS from a url for import, resolving to an empty string on
+ * failure or invalid CSS.
+ */
 export const getImportCss = (url: string): Promise<string> => {
   return new Promise(resolve => {
     fetch(url)
