@@ -35,7 +35,16 @@ export const getGoogleDriveSyncEnabled = (): Promise<boolean> => {
 
 export const getLocalStylesMetadata = (): Promise<{ modifiedTime: string }> =>
   new Promise(resolve => {
-    chrome.storage.local.get('styles-metadata', async items => {
-      resolve(items['styles-metadata']);
+    chrome.storage.local.get('styles-metadata', items => {
+      const metadata = items['styles-metadata'];
+
+      if (typeof metadata?.modifiedTime === 'string') {
+        resolve(metadata);
+        return;
+      }
+
+      // StylesMetadataUpdate repairs this on startup, but a caller racing it
+      // must not be handed something it will dereference into Invalid Date.
+      resolve({ modifiedTime: '' });
     });
   });

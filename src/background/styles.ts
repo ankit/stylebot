@@ -61,15 +61,19 @@ export const get = async (url: string): Promise<StyleWithoutUrl> => {
   return styles[url];
 };
 
-export const setAll = async (styles: StyleMap): Promise<void> => {
-  chrome.storage.local.set({
-    styles,
+export const setAll = (styles: StyleMap): Promise<void> =>
+  new Promise(resolve => {
+    chrome.storage.local.set(
+      {
+        styles,
 
-    'styles-metadata': {
-      modifiedTime: getCurrentTimestamp(),
-    },
+        'styles-metadata': {
+          modifiedTime: getCurrentTimestamp(),
+        },
+      },
+      resolve
+    );
   });
-};
 
 export const set = async (
   url: string,

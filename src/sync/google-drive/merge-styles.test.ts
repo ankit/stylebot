@@ -36,6 +36,32 @@ describe('mergeStyles', () => {
     });
   });
 
+  it('keeps the local style when the remote timestamp is missing', () => {
+    const local: StyleMap = {
+      'example.com': style('color: red', '2024-01-01T00:00:00.000Z'),
+    };
+    const remote = {
+      'example.com': { css: 'color: blue', enabled: true, readability: false },
+    } as unknown as StyleMap;
+
+    expect(mergeStyles(local, remote)).toEqual({
+      'example.com': local['example.com'],
+    });
+  });
+
+  it('keeps the local style when either timestamp is unparseable', () => {
+    const local: StyleMap = {
+      'example.com': style('color: red', 'not-a-date'),
+    };
+    const remote: StyleMap = {
+      'example.com': style('color: blue', '2024-01-02T00:00:00.000Z'),
+    };
+
+    expect(mergeStyles(local, remote)).toEqual({
+      'example.com': local['example.com'],
+    });
+  });
+
   it('keeps styles that only exist on one side', () => {
     const local: StyleMap = {
       'local-only.com': style('color: red', '2024-01-01T00:00:00.000Z'),
