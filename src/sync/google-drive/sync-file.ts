@@ -1,6 +1,5 @@
 import { compareAsc } from 'date-fns';
 
-import { getCurrentTimestamp } from '@stylebot/utils';
 import { GoogleDriveSyncMetadata, StyleMap } from '@stylebot/types';
 
 import { syncError } from '../errors';
@@ -118,11 +117,13 @@ const createBackup = async (
   folderId: string
 ): Promise<GoogleDriveSyncMetadata> => {
   const form = new FormData();
+  // modifiedTime is deliberately left to Drive. The sync algorithm treats it
+  // as the server's revision marker, so stamping it from this machine's clock
+  // would make two machines disagree about which copy is current.
   const metadata = {
     name: SYNC_FILE_NAME,
     parents: [folderId],
     mimeType: 'application/json',
-    modifiedTime: getCurrentTimestamp(),
   };
   const metadataBlob = new Blob([JSON.stringify(metadata)], {
     type: 'application/json',
@@ -147,11 +148,10 @@ const patchBackup = async (
   blob: Blob
 ): Promise<GoogleDriveSyncMetadata> => {
   const form = new FormData();
-  const metadata = {
-    modifiedTime: getCurrentTimestamp(),
-  };
 
-  const metadataBlob = new Blob([JSON.stringify(metadata)], {
+  // Empty metadata, for the reason given in createBackup. A media upload
+  // always creates a new Drive revision, so modifiedTime still moves.
+  const metadataBlob = new Blob([JSON.stringify({})], {
     type: 'application/json',
   });
 

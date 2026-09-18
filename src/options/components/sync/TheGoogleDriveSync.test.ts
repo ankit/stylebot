@@ -1,4 +1,5 @@
 import { mount } from '@vue/test-utils';
+import { SyncState } from '@stylebot/types';
 
 import TheGoogleDriveSync from './TheGoogleDriveSync.vue';
 
@@ -9,18 +10,24 @@ const mountCard = (state: Record<string, unknown>) =>
     },
   });
 
-const metadata = (modifiedTime: unknown) => ({
-  id: 'file-id',
-  modifiedTime,
-  webViewLink: 'https://drive.google.com/view',
-  webContentLink: 'https://drive.google.com/download',
-});
+const syncState = (lastSyncedAt: unknown): SyncState =>
+  ({
+    remoteRevision: '2024-01-01T00:00:00.000Z',
+    localRevision: 'local-1',
+    lastSyncedAt,
+    metadata: {
+      id: 'file-id',
+      modifiedTime: '2024-01-01T00:00:00.000Z',
+      webViewLink: 'https://drive.google.com/view',
+      webContentLink: 'https://drive.google.com/download',
+    },
+  }) as SyncState;
 
 describe('TheGoogleDriveSync.vue', () => {
   it('renders the not-connected copy from a locale key when sync is off', () => {
     const wrapper = mountCard({
       googleDriveSyncEnabled: false,
-      googleDriveSyncMetadata: undefined,
+      googleDriveSyncState: undefined,
       syncInProgress: false,
     });
 
@@ -30,7 +37,7 @@ describe('TheGoogleDriveSync.vue', () => {
   it('renders without throwing when the stored timestamp is unparseable', () => {
     const wrapper = mountCard({
       googleDriveSyncEnabled: true,
-      googleDriveSyncMetadata: metadata('not-a-date'),
+      googleDriveSyncState: syncState('not-a-date'),
       syncInProgress: false,
     });
 
@@ -44,27 +51,42 @@ describe('TheGoogleDriveSync.vue', () => {
   it('renders without throwing when there is no timestamp at all', () => {
     const wrapper = mountCard({
       googleDriveSyncEnabled: true,
-      googleDriveSyncMetadata: metadata(undefined),
+      googleDriveSyncState: syncState(undefined),
       syncInProgress: false,
     });
 
+    expect(wrapper.text()).toContain('google_drive');
     expect(wrapper.text()).not.toContain('Invalid Date');
   });
 
   it('shows the synced-at line for a valid timestamp', () => {
     const wrapper = mountCard({
       googleDriveSyncEnabled: true,
-      googleDriveSyncMetadata: metadata(new Date().toISOString()),
+      googleDriveSyncState: syncState(new Date().toISOString()),
       syncInProgress: false,
     });
 
     expect(wrapper.text()).toContain('synced_at_time');
   });
 
+  it('shows the view and download links from the stored metadata', () => {
+    const wrapper = mountCard({
+      googleDriveSyncEnabled: true,
+      googleDriveSyncState: syncState(new Date().toISOString()),
+      syncInProgress: false,
+    });
+
+    const hrefs = wrapper.findAll('a').wrappers.map(a => a.attributes('href'));
+    expect(hrefs).toEqual([
+      'https://drive.google.com/view',
+      'https://drive.google.com/download',
+    ]);
+  });
+
   it('disables Sync Now while a sync is already running', () => {
     const wrapper = mountCard({
       googleDriveSyncEnabled: true,
-      googleDriveSyncMetadata: metadata(new Date().toISOString()),
+      googleDriveSyncState: syncState(new Date().toISOString()),
       syncInProgress: true,
     });
 

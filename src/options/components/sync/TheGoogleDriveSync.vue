@@ -68,25 +68,19 @@ export default Vue.extend({
     },
 
     googleDriveSyncViewLink(): string {
-      if (this.$store.state.googleDriveSyncMetadata) {
-        return this.$store.state.googleDriveSyncMetadata.webViewLink;
-      }
-
-      return '';
+      return this.$store.state.googleDriveSyncState?.metadata.webViewLink ?? '';
     },
 
     googleDriveSyncDownloadLink(): string {
-      if (this.$store.state.googleDriveSyncMetadata) {
-        return this.$store.state.googleDriveSyncMetadata.webContentLink;
-      }
-
-      return '';
+      return (
+        this.$store.state.googleDriveSyncState?.metadata.webContentLink ?? ''
+      );
     },
 
+    // lastSyncedAt, not the file's modifiedTime: the latter is Drive's revision
+    // marker and can predate the last time this machine actually checked.
     googleDriveSyncLastModifiedTime(): string {
-      return formatSyncTime(
-        this.$store.state.googleDriveSyncMetadata?.modifiedTime
-      );
+      return formatSyncTime(this.$store.state.googleDriveSyncState?.lastSyncedAt);
     },
   },
 

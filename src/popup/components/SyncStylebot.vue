@@ -27,7 +27,7 @@
 import Vue from 'vue';
 
 // Bypasses @stylebot/sync, whose barrel also drags in runGoogleDriveSync's postcss dependency chain.
-import { getGoogleDriveSyncMetadata } from '../../sync/google-drive/sync-metadata';
+import { getSyncLastSyncedAt } from '../../sync/google-drive/sync-metadata';
 import {
   RunGoogleDriveSync,
   RunGoogleDriveSyncResponse,
@@ -64,8 +64,7 @@ export default Vue.extend({
 
   methods: {
     async updateSyncTime() {
-      const googleDriveSyncMetadata = await getGoogleDriveSyncMetadata();
-      this.syncTime = formatSyncTime(googleDriveSyncMetadata?.modifiedTime);
+      this.syncTime = formatSyncTime(await getSyncLastSyncedAt());
     },
 
     sync() {

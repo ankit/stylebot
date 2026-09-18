@@ -8,15 +8,15 @@ import {
   StyleMap,
   StylebotOptions,
   StylebotCommands,
-  GoogleDriveSyncMetadata,
+  SyncState,
   SyncErrorKey,
 } from '@stylebot/types';
 import {
   getGoogleDriveSyncEnabled,
-  getGoogleDriveSyncMetadata,
+  getSyncState,
 } from '@stylebot/sync';
 import { getCurrentTimestamp } from '@stylebot/utils';
-import { setGoogleDriveSyncEnabled } from '@stylebot/sync';
+import { setGoogleDriveSyncEnabled, clearSyncState } from '@stylebot/sync';
 
 import {
   getAllStyles,
@@ -42,7 +42,7 @@ type State = {
   commands: StylebotCommands;
 
   googleDriveSyncEnabled: boolean;
-  googleDriveSyncMetadata: GoogleDriveSyncMetadata | undefined;
+  googleDriveSyncState: SyncState | undefined;
 
   syncInProgress: boolean;
   syncStatus: SyncStatus;
@@ -54,7 +54,7 @@ export default new Vuex.Store<State>({
     options: null,
     commands: defaultCommands,
     googleDriveSyncEnabled: false,
-    googleDriveSyncMetadata: undefined,
+    googleDriveSyncState: undefined,
     syncInProgress: false,
     syncStatus: null,
   },
@@ -75,7 +75,7 @@ export default new Vuex.Store<State>({
     async getGoogleDriveSyncMetadata({ state }) {
       state.googleDriveSyncEnabled = await getGoogleDriveSyncEnabled();
       if (state.googleDriveSyncEnabled) {
-        state.googleDriveSyncMetadata = await getGoogleDriveSyncMetadata();
+        state.googleDriveSyncState = await getSyncState();
       }
     },
 
@@ -180,15 +180,21 @@ export default new Vuex.Store<State>({
       setCommands(commands);
     },
 
-    setGoogleDriveSyncEnabled({ state, dispatch }, enabled: boolean) {
+    async setGoogleDriveSyncEnabled({ state, dispatch }, enabled: boolean) {
       state.googleDriveSyncEnabled = enabled;
       setGoogleDriveSyncEnabled(enabled);
 
       if (enabled) {
-        dispatch('syncWithGoogleDrive');
-      } else {
-        state.googleDriveSyncMetadata = undefined;
+        return dispatch('syncWithGoogleDrive');
       }
+
+      state.googleDriveSyncState = undefined;
+      state.syncStatus = null;
+
+      // Leaving the stored state behind meant re-enabling picked up a stale
+      // record of a sync that may no longer reflect either side. The Drive file
+      // itself is the user's backup and is left alone.
+      await clearSyncState();
     },
 
     async syncWithGoogleDrive({ state, dispatch }) {

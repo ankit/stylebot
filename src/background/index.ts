@@ -4,11 +4,13 @@ import ContextMenu from './contextmenu';
 import DefaultShortcutUpdate from './default-shortcut-update';
 import StylesMetadataUpdate from './styles-metadata-update';
 import StylesModifiedTimeUpdate from './styles-modified-time-update';
+import SyncStorageUpdate from './sync-storage-update';
 
 (async () => {
   await DefaultShortcutUpdate();
   await StylesMetadataUpdate();
   await StylesModifiedTimeUpdate();
+  await SyncStorageUpdate();
 })();
 
 chrome.runtime.setUninstallURL('https://stylebot.dev/goodbye');
