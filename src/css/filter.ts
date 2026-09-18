@@ -93,7 +93,7 @@ export const getCssAfterApplyingFilterEffectToPage = (
                 decl.value = value;
               } else {
                 decl.remove();
-                if (!rule.some(node => node.type !== 'decl')) {
+                if (!rule.nodes?.length) {
                   rule.remove();
                 }
               }
