@@ -4,11 +4,21 @@
       <div class="domain" :class="{ disabled: !enabled }">{{ url }}</div>
     </toggle-switch>
 
+    <span v-if="readability" class="readability-badge">{{ t('readability') }}</span>
+
     <s-text size="caption" variant="muted" class="timestamp">{{ formattedTimestamp }}</s-text>
 
     <s-button variant="ghost" @click="$emit('edit', url)">{{ t('edit') }}</s-button>
 
-    <style-row-menu :url="url" :size="32" @open-site="openSite" @copy-css="copyCss" @delete="showDeleteConfirm = true" />
+    <style-row-menu
+      :url="url"
+      :size="32"
+      :readability="readability"
+      @open-site="openSite"
+      @copy-css="copyCss"
+      @toggle-readability="$emit('toggle-readability')"
+      @delete="showDeleteConfirm = true"
+    />
 
     <confirm-dialog
       v-if="showDeleteConfirm"
@@ -61,6 +71,11 @@ export default Vue.extend({
     enabled: {
       type: Boolean,
       required: true,
+    },
+
+    readability: {
+      type: Boolean,
+      default: false,
     },
   },
 
@@ -121,6 +136,19 @@ export default Vue.extend({
   &.disabled {
     color: var(--muted-foreground);
   }
+}
+
+.readability-badge {
+  flex: none;
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--foreground) 4%, var(--background));
+  font-weight: 500;
+  font-size: 11.5px;
+  line-height: 1.3;
+  color: var(--muted-foreground);
+  white-space: nowrap;
 }
 
 .timestamp {

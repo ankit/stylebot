@@ -25,6 +25,17 @@
           Copy CSS
         </menu-item>
 
+        <menu-item
+          v-if="readability"
+          class="truncate"
+          @click="
+            $emit('toggle-readability');
+            close();
+          "
+        >
+          {{ t('turn_off_readability_for_domain', [url]) }}
+        </menu-item>
+
         <div class="divider" />
 
         <menu-item
@@ -66,6 +77,11 @@ export default Vue.extend({
     size: {
       type: Number,
       default: 30,
+    },
+
+    readability: {
+      type: Boolean,
+      default: false,
     },
   },
 });

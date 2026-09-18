@@ -3,12 +3,11 @@ import { Store } from 'vuex';
 import { State } from 'editor/store';
 import { TabMessage } from '@stylebot/types';
 
-import { applyReadability, removeReadability } from '@stylebot/readability';
-
 import {
   applyStyles,
   toggleStylebot,
   toggleReadability,
+  syncReadabilityState,
   updateSelectorWithContextMenuSelector,
 } from './common';
 
@@ -50,29 +49,20 @@ const initChromeListener = (store: Store<State>): void => {
         // A same-tab SPA navigation still fires this — re-derive readability
         // for the new URL instead of trusting the previous page's flag.
         getStylesForPage(false).then(({ defaultStyle }) => {
-          const readability = Boolean(defaultStyle?.readability);
-          commit('setReadability', readability);
-
-          if (readability) {
-            applyReadability();
-          } else {
-            removeReadability();
-          }
+          syncReadabilityState({ commit }, Boolean(defaultStyle?.readability));
         });
       } else if (message.name === 'ToggleReadabilityForTab') {
         toggleReadability({ state, dispatch });
       } else if (message.name === 'ReadabilityStateChanged') {
         // Keep local state in sync when a change originates outside this
         // action (e.g. the reader's own dock), so the next toggle isn't stale.
-        commit('setReadability', message.value);
-
-        if (message.value) {
-          applyReadability();
-        } else {
-          removeReadability();
-        }
+        syncReadabilityState({ commit }, message.value);
       } else if (message.name === 'ApplyStylesToTab') {
-        applyStyles({ dispatch }, message.defaultStyle, message.styles);
+        applyStyles(
+          { state, commit, dispatch },
+          message.defaultStyle,
+          message.styles
+        );
       }
     }
   );

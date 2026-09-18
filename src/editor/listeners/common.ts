@@ -5,6 +5,7 @@ import {
   appendImportantToDeclarations,
 } from '@stylebot/css';
 import { Style } from '@stylebot/types';
+import { applyReadability, removeReadability } from '@stylebot/readability';
 
 import {
   enableStyle as sendEnableStyleMessage,
@@ -59,8 +60,29 @@ export const toggleGrayscale = ({
   });
 };
 
+// Applies a readability change that originated elsewhere (the options page,
+// the reader's own dock, an SPA navigation). Unlike the applyReadability
+// action it never persists: the value already came from storage, and writing
+// it back would re-create an entry the user just deleted.
+export const syncReadabilityState = (
+  { commit }: { commit: Commit },
+  value: boolean
+): void => {
+  commit('setReadability', value);
+
+  if (value) {
+    applyReadability();
+  } else {
+    removeReadability();
+  }
+};
+
 export const applyStyles = (
-  { dispatch }: { dispatch: Dispatch },
+  {
+    state,
+    commit,
+    dispatch,
+  }: { state: State; commit: Commit; dispatch: Dispatch },
   defaultStyle: Style | undefined,
   styles: Style[]
 ): void => {
@@ -75,13 +97,18 @@ export const applyStyles = (
     }
   });
 
-  if (defaultStyle) {
-    if (defaultStyle.readability) {
-      dispatch('applyReadability', true);
-    } else {
-      dispatch('applyReadability', false);
-    }
+  // Read from defaultStyle rather than guarded by it: when the last matching
+  // style is deleted it becomes undefined, and the reader still has to come
+  // down. Only on an actual change — removeReadability() bumps the generation
+  // counter, so running it on every broadcast would cancel a reader mount
+  // racing with an unrelated style edit.
+  const readability = Boolean(defaultStyle?.readability);
 
+  if (readability !== state.readability) {
+    syncReadabilityState({ commit }, readability);
+  }
+
+  if (defaultStyle) {
     dispatch('initializeDefaultStyle', defaultStyle);
   }
 };

@@ -149,6 +149,30 @@ export default new Vuex.Store<State>({
       setAllStyles(state.styles);
     },
 
+    setStyleReadability(
+      { state },
+      { url, value }: { url: string; value: boolean }
+    ) {
+      const style = state.styles[url];
+
+      if (!style) {
+        return;
+      }
+
+      const styles = { ...state.styles };
+
+      // A style that only ever existed to carry the readability flag has
+      // nothing left to represent once it's off.
+      if (!value && !style.css) {
+        delete styles[url];
+      } else {
+        styles[url] = { ...style, readability: value };
+      }
+
+      state.styles = styles;
+      setAllStyles(styles);
+    },
+
     setOption(
       { state },
       {

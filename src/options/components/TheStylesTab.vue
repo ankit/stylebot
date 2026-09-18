@@ -21,6 +21,17 @@
         <input v-model="urlFilter" type="text" :placeholder="t('search_sites')" />
       </div>
 
+      <button
+        v-if="readabilityCount > 0"
+        type="button"
+        class="filter-chip"
+        :class="{ active: readabilityOnly }"
+        :aria-pressed="String(readabilityOnly)"
+        @click="readabilityOnly = !readabilityOnly"
+      >
+        {{ t('readability') }} ({{ readabilityCount }})
+      </button>
+
       <styles-bulk-menu @enable-all="enableAll" @disable-all="disableAll" @delete-all="showDeleteAllConfirm = true" />
     </div>
 
@@ -32,8 +43,10 @@
         :url="style.url"
         :modified-time="style.modifiedTime"
         :enabled="style.enabled"
+        :readability="style.readability"
         @edit="$emit('edit', $event)"
         @toggle="toggleStyle(style)"
+        @toggle-readability="turnOffReadability(style)"
         @delete="deleteStyle(style)"
       />
     </div>
@@ -76,10 +89,12 @@ export default Vue.extend({
 
   data(): {
     urlFilter: string;
+    readabilityOnly: boolean;
     showDeleteAllConfirm: boolean;
   } {
     return {
       urlFilter: '',
+      readabilityOnly: false,
       showDeleteAllConfirm: false,
     };
   },
@@ -104,7 +119,9 @@ export default Vue.extend({
 
     styles(): Array<Style> {
       const styles = this.allStyles.filter(
-        style => style.url.indexOf(this.urlFilter) !== -1
+        style =>
+          style.url.indexOf(this.urlFilter) !== -1 &&
+          (!this.readabilityOnly || style.readability)
       );
 
       styles.sort((s1, s2) =>
@@ -121,6 +138,10 @@ export default Vue.extend({
     enabledCount(): number {
       return this.allStyles.filter(style => style.enabled).length;
     },
+
+    readabilityCount(): number {
+      return this.allStyles.filter(style => style.readability).length;
+    },
   },
 
   methods: {
@@ -130,6 +151,13 @@ export default Vue.extend({
 
     toggleStyle(style: Style): void {
       this.$store.dispatch(style.enabled ? 'disableStyle' : 'enableStyle', style.url);
+    },
+
+    turnOffReadability(style: Style): void {
+      this.$store.dispatch('setStyleReadability', {
+        url: style.url,
+        value: false,
+      });
     },
 
     enableAll(): void {
@@ -201,6 +229,37 @@ export default Vue.extend({
     &::placeholder {
       color: var(--muted-foreground);
     }
+  }
+}
+
+.filter-chip {
+  all: unset;
+  box-sizing: border-box;
+  flex: none;
+  padding: 9px 13px;
+  border-radius: 9px;
+  border: 1px solid var(--border);
+  background: var(--accent);
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 1.2;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover {
+    color: var(--foreground);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 1px;
+  }
+
+  &.active {
+    background: var(--active);
+    border-color: color-mix(in srgb, var(--foreground) 22%, var(--border));
+    color: var(--foreground);
   }
 }
 
