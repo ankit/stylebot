@@ -110,7 +110,7 @@ export default Vue.extend({
   methods: {
     measure(): void {
       const root = this.$refs.root as HTMLElement | undefined;
-      const buttons = this.$refs.tabButtons as Vue[] | undefined;
+      const buttons = this.$refs.tabButtons as Array<Vue> | undefined;
       const index = this.tabs.findIndex(tab => tab.value === this.value);
       const active = buttons?.[index]?.$el as HTMLElement | undefined;
 

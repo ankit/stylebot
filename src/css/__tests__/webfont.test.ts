@@ -1,14 +1,31 @@
-import 'jest-fetch-mock';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { addGoogleWebFont, cleanGoogleWebFonts } from '../webfont';
 
 const fontUrl =
   'https://fonts.googleapis.com/css2?family=Muli:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap';
 
+let fontExists: boolean;
+const sendMessage = jest.fn(
+  (_message: any, callback: (response: any) => void) => callback(fontExists)
+);
+
+global.chrome = {
+  runtime: {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error: not able to figure out how to override sendMessage here correctly.
+    sendMessage,
+  },
+};
+
 describe('webfont', () => {
+  beforeEach(() => {
+    fontExists = true;
+    sendMessage.mockClear();
+  });
+
   describe('addGoogleWebFont', () => {
     it('adds @import rule for font at the top of css', async () => {
-      fetchMock.mockResponse(() => Promise.resolve({ status: 200 }));
-
       const css = 'a { font-family: Muli; }';
       const output = await addGoogleWebFont('Muli', css);
 
@@ -17,26 +34,24 @@ describe('webfont', () => {
       );
     });
 
-    it('does not add @import rule if it already exists', async () => {
-      fetchMock.mockResponse(() => Promise.resolve({ status: 200 }));
+    it('checks the font via the background page, not a content script fetch', async () => {
+      await addGoogleWebFont('Muli', 'a { font-family: Muli; }');
 
+      expect(sendMessage).toHaveBeenCalledWith(
+        { name: 'GetGoogleWebFontExists', url: fontUrl },
+        expect.any(Function)
+      );
+    });
+
+    it('does not add @import rule if it already exists', async () => {
       const css = `@import url(${fontUrl});\n\na { font-family: Muli }`;
       const output = await addGoogleWebFont('Muli', css);
 
       expect(output).toBe(css);
     });
 
-    it('does not add @import rule if google web font API returns 400', async () => {
-      fetchMock.mockResponse(() => Promise.resolve({ status: 400 }));
-
-      const css = 'a { font-family: Roboto; }';
-      const output = await addGoogleWebFont('Invalid', css);
-
-      expect(output).toBe(css);
-    });
-
-    it('does not add @import rule if google web font API request fails', async () => {
-      fetchMock.mockResponse(() => Promise.reject());
+    it('does not add @import rule if the font does not exist', async () => {
+      fontExists = false;
 
       const css = 'a { font-family: Roboto; }';
       const output = await addGoogleWebFont('Invalid', css);

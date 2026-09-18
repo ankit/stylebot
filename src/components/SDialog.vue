@@ -44,12 +44,17 @@ export default Vue.extend({
   methods: {
     focusableElements(): Array<HTMLElement> {
       const root = this.$refs.root as HTMLElement;
-      return Array.from(root.querySelectorAll<HTMLElement>('button, a[href], [tabindex]'));
+      return Array.from(
+        root.querySelectorAll<HTMLElement>('button, a[href], [tabindex]')
+      );
     },
 
     activeElement(): HTMLElement | null {
       const root = this.$el.getRootNode();
-      const active = root instanceof ShadowRoot ? root.activeElement : document.activeElement;
+      const active =
+        root instanceof ShadowRoot
+          ? root.activeElement
+          : document.activeElement;
       return active instanceof HTMLElement ? active : null;
     },
 

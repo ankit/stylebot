@@ -4,7 +4,12 @@
       <div class="title-block">
         <heading as="h1">{{ t('styles_options') }}</heading>
         <s-text variant="muted" class="subtitle">
-          {{ t(totalCount === 1 ? 'sites_count_one' : 'sites_count_other', [String(totalCount)]) }} ·
+          {{
+            t(totalCount === 1 ? 'sites_count_one' : 'sites_count_other', [
+              String(totalCount),
+            ])
+          }}
+          ·
           {{ t('enabled_count', [String(enabledCount)]) }}
         </s-text>
       </div>
@@ -15,10 +20,18 @@
     <div class="search-row">
       <div class="search">
         <search-icon />
-        <input v-model="urlFilter" type="text" :placeholder="t('search_sites')" />
+        <input
+          v-model="urlFilter"
+          type="text"
+          :placeholder="t('search_sites')"
+        />
       </div>
 
-      <styles-bulk-menu @enable-all="enableAll" @disable-all="disableAll" @delete-all="showDeleteAllConfirm = true" />
+      <styles-bulk-menu
+        @enable-all="enableAll"
+        @disable-all="disableAll"
+        @delete-all="showDeleteAllConfirm = true"
+      />
     </div>
 
     <div class="list">
@@ -128,7 +141,10 @@ export default Vue.extend({
     },
 
     toggleStyle(style: Style): void {
-      this.$store.dispatch(style.enabled ? 'disableStyle' : 'enableStyle', style.url);
+      this.$store.dispatch(
+        style.enabled ? 'disableStyle' : 'enableStyle',
+        style.url
+      );
     },
 
     enableAll(): void {

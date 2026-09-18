@@ -1,7 +1,13 @@
 <template>
   <property-row :label="t('filter')" last>
     <div class="filter-control">
-      <s-segmented-control fit :value="type" :options="options" :disabled="disabled" @change="select" />
+      <s-segmented-control
+        fit
+        :value="type"
+        :options="options"
+        :disabled="disabled"
+        @change="select"
+      />
 
       <div v-if="type !== 'none'" class="filter-amount-row">
         <s-slider
@@ -29,7 +35,13 @@ import PropertyRow from '../basic/PropertyRow.vue';
 
 type FilterType = 'grayscale' | 'invert' | 'blur' | 'none';
 
-type FilterConfig = { min: number; max: number; step: number; default: number; unit: string };
+type FilterConfig = {
+  min: number;
+  max: number;
+  step: number;
+  default: number;
+  unit: string;
+};
 
 const FILTER_CONFIG: Record<Exclude<FilterType, 'none'>, FilterConfig> = {
   grayscale: { min: 0, max: 100, step: 1, default: 50, unit: '%' },
@@ -84,7 +96,9 @@ export default Vue.extend({
     },
 
     config(): FilterConfig {
-      return this.type === 'none' ? FILTER_CONFIG.grayscale : FILTER_CONFIG[this.type];
+      return this.type === 'none'
+        ? FILTER_CONFIG.grayscale
+        : FILTER_CONFIG[this.type];
     },
 
     disabled(): boolean {
@@ -95,7 +109,10 @@ export default Vue.extend({
   methods: {
     select(type: FilterType): void {
       if (type === 'none' || type === this.type) {
-        this.$store.dispatch('applyDeclaration', { property: 'filter', value: '' });
+        this.$store.dispatch('applyDeclaration', {
+          property: 'filter',
+          value: '',
+        });
         return;
       }
 

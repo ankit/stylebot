@@ -96,7 +96,9 @@ export default Vue.extend({
 
   methods: {
     selectTab(tab: string): void {
-      const editorPage = this.$refs.editorPage as { isDirty: boolean } | undefined;
+      const editorPage = this.$refs.editorPage as
+        | { isDirty: boolean }
+        | undefined;
 
       if (this.editingUrl !== null && editorPage?.isDirty) {
         this.pendingTab = tab;

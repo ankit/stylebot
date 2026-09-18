@@ -1,8 +1,12 @@
 <template>
   <div class="footer">
     <span class="version">v{{ version }}</span>
-    <a target="_blank" href="https://stylebot.dev/help">{{ t('help_options') }}</a>
-    <a target="_blank" href="http://github.com/ankit/stylebot">{{ t('github') }}</a>
+    <a target="_blank" href="https://stylebot.dev/help">
+      {{ t('help_options') }}
+    </a>
+    <a target="_blank" href="http://github.com/ankit/stylebot">
+      {{ t('github') }}
+    </a>
     <a target="_blank" href="https://ko-fi.com/stylebot">{{ t('donate') }}</a>
   </div>
 </template>

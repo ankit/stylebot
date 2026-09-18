@@ -18,7 +18,8 @@ export default {
     return getRule(state.css, state.activeSelector);
   },
 
-  alreadyUsedColors: (state: State): RoleColorGroups => getAlreadyUsedColors(state.css),
+  alreadyUsedColors: (state: State): RoleColorGroups =>
+    getAlreadyUsedColors(state.css),
 
   grayscale: (state: State): number => {
     return getFilterEffectValueForPage('grayscale', state.css);

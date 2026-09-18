@@ -1,6 +1,10 @@
 <template>
   <div ref="root" class="segmented" :class="{ fit }" role="group">
-    <span class="segment-indicator" :class="{ ready }" :style="indicatorStyle" />
+    <span
+      class="segment-indicator"
+      :class="{ ready }"
+      :style="indicatorStyle"
+    />
 
     <s-tooltip
       v-for="option in options"
@@ -120,8 +124,10 @@ export default Vue.extend({
   methods: {
     measure(): void {
       const root = this.$refs.root as HTMLElement | undefined;
-      const segments = this.$refs.segments as Vue[] | undefined;
-      const index = this.options.findIndex(option => option.value === this.value);
+      const segments = this.$refs.segments as Array<Vue> | undefined;
+      const index = this.options.findIndex(
+        option => option.value === this.value
+      );
       const active = segments?.[index]?.$el as HTMLElement | undefined;
 
       if (!root || !active) {
@@ -162,7 +168,8 @@ export default Vue.extend({
   bottom: 2px;
   border-radius: 6px;
   background: var(--card-surface);
-  box-shadow: 0 1px 2px rgb(0 0 0 / 10%), inset 0 0 0 1px color-mix(in srgb, var(--text-primary) 12%, transparent);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 10%),
+    inset 0 0 0 1px color-mix(in srgb, var(--text-primary) 12%, transparent);
   pointer-events: none;
 
   &.ready {

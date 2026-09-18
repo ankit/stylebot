@@ -24,7 +24,9 @@ describe('extractColor', () => {
   });
 
   it('extracts an rgba() color', () => {
-    expect(extractColor('1px solid rgba(68, 71, 90, 0.5)')).toBe('rgba(68, 71, 90, 0.5)');
+    expect(extractColor('1px solid rgba(68, 71, 90, 0.5)')).toBe(
+      'rgba(68, 71, 90, 0.5)'
+    );
   });
 
   it('returns empty when no color is present', () => {

@@ -4,7 +4,10 @@
     role="menu"
     tabindex="-1"
     :class="{ dense }"
-    :style="{ minWidth: `${minWidth}px`, maxHeight: maxHeight ? `${maxHeight}px` : undefined }"
+    :style="{
+      minWidth: `${minWidth}px`,
+      maxHeight: maxHeight ? `${maxHeight}px` : undefined,
+    }"
   >
     <slot />
   </div>

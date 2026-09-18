@@ -2,7 +2,11 @@
   <theme-provider class="popup" :mode="appearance">
     <div v-if="restricted">
       <div class="popup-header">
-        <heading as="h1" size="sm" class="popup-header-domain popup-header-domain--muted">
+        <heading
+          as="h1"
+          size="sm"
+          class="popup-header-domain popup-header-domain--muted"
+        >
           {{ tab.url }}
         </heading>
       </div>
@@ -30,7 +34,9 @@
         :shortcut="styleShortcut"
       />
       <div v-else class="popup-header">
-        <heading as="h1" size="sm" class="popup-header-domain">{{ domain }}</heading>
+        <heading as="h1" size="sm" class="popup-header-domain">
+          {{ domain }}
+        </heading>
         <s-text size="caption" variant="muted">
           {{ t('no_style_saved_for_site') }}
         </s-text>

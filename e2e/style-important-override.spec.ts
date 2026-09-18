@@ -34,7 +34,8 @@ test('overrides a page rule that also uses !important (regression: #894)', async
   extensionId: _extensionId,
 }) => {
   const worker =
-    context.serviceWorkers()[0] ?? (await context.waitForEvent('serviceworker'));
+    context.serviceWorkers()[0] ??
+    (await context.waitForEvent('serviceworker'));
 
   await worker.evaluate(() =>
     chrome.storage.local.set({

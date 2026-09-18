@@ -1,24 +1,44 @@
 <template>
   <property-row :label="t('border')">
     <div class="border-control">
-      <s-select class="border-style" :text="text" :muted="!styleValue" :disabled="disabled" :menu-min-width="160">
+      <s-select
+        class="border-style"
+        :text="text"
+        :muted="!styleValue"
+        :disabled="disabled"
+        :menu-min-width="160"
+      >
         <template #default="{ close }">
           <menu-item
             v-for="option in options"
             :key="option.value"
             :selected="option.value === styleValue"
-            @click="selectStyle(option.value); close();"
+            @click="
+              selectStyle(option.value);
+              close();
+            "
           >
             <span class="border-style-option">
-              <span class="border-style-preview" :style="{ borderBottomStyle: option.value }" />
+              <span
+                class="border-style-preview"
+                :style="{ borderBottomStyle: option.value }"
+              />
               {{ option.title }}
             </span>
           </menu-item>
         </template>
       </s-select>
 
-      <length class="border-width" property="border-width" :fallback="shorthandValue" />
-      <color-picker class="border-color" property="border-color" :fallback="shorthandValue" />
+      <length
+        class="border-width"
+        property="border-width"
+        :fallback="shorthandValue"
+      />
+      <color-picker
+        class="border-color"
+        property="border-color"
+        :fallback="shorthandValue"
+      />
     </div>
   </property-row>
 </template>

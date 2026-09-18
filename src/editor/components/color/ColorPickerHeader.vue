@@ -1,9 +1,15 @@
 <template>
   <div class="header">
-    <div class="swatch" :class="{ empty: !value }" :style="value ? { background: value } : undefined" />
+    <div
+      class="swatch"
+      :class="{ empty: !value }"
+      :style="value ? { background: value } : undefined"
+    />
 
     <div class="info">
-      <div class="hex" :class="{ 'not-set': !value }">{{ value || t('color_picker_not_set') }}</div>
+      <div class="hex" :class="{ 'not-set': !value }">
+        {{ value || t('color_picker_not_set') }}
+      </div>
       <s-text size="small" variant="muted" as="span">{{ roleLabel }}</s-text>
     </div>
 
@@ -82,11 +88,13 @@ export default Vue.extend({
   border-radius: 7px;
   // A literal black ring reads fine on a light panel but vanishes on a dark
   // one — mix against --text-primary so it stays visible in both themes.
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--text-primary) 12%, transparent);
+  box-shadow: inset 0 0 0 1px
+    color-mix(in srgb, var(--text-primary) 12%, transparent);
 
   &.empty {
     background: var(--menu-surface);
-    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--text-primary) 18%, transparent);
+    box-shadow: inset 0 0 0 1px
+      color-mix(in srgb, var(--text-primary) 18%, transparent);
   }
 }
 

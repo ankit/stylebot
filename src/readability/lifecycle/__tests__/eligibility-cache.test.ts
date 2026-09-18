@@ -1,4 +1,8 @@
-import { getEligibility, markEligible, markIneligible } from '../eligibility-cache';
+import {
+  getEligibility,
+  markEligible,
+  markIneligible,
+} from '../eligibility-cache';
 
 describe('eligibility-cache', () => {
   beforeEach(() => {
@@ -15,13 +19,15 @@ describe('eligibility-cache', () => {
   it('should remember an exact url as ineligible once marked, across query/hash variants', () => {
     markIneligible('https://example.com/app?tab=1');
 
-    expect(getEligibility('https://example.com/app?tab=2').isKnownIneligible).toBe(
-      true
+    expect(
+      getEligibility('https://example.com/app?tab=2').isKnownIneligible
+    ).toBe(true);
+    expect(
+      getEligibility('https://example.com/app#section').isKnownIneligible
+    ).toBe(true);
+    expect(getEligibility('https://example.com/other').isKnownIneligible).toBe(
+      false
     );
-    expect(getEligibility('https://example.com/app#section').isKnownIneligible).toBe(
-      true
-    );
-    expect(getEligibility('https://example.com/other').isKnownIneligible).toBe(false);
   });
 
   it('should generalize a learned pattern to other urls under the same shape, wildcarding numeric segments', () => {
@@ -48,7 +54,8 @@ describe('eligibility-cache', () => {
     markEligible('https://theverge.com/tech/995079/some-article');
 
     expect(
-      getEligibility('https://example.com/tech/1/some-article').matchesKnownPattern
+      getEligibility('https://example.com/tech/1/some-article')
+        .matchesKnownPattern
     ).toBe(false);
   });
 
@@ -62,7 +69,9 @@ describe('eligibility-cache', () => {
   });
 
   it('should generalize date-prefixed urls across different dates in the same section', () => {
-    markEligible('https://www.nytimes.com/2026/09/14/health/ai-doctors-medicare-fda.html');
+    markEligible(
+      'https://www.nytimes.com/2026/09/14/health/ai-doctors-medicare-fda.html'
+    );
 
     expect(
       getEligibility(
@@ -80,7 +89,9 @@ describe('eligibility-cache', () => {
     markIneligible('https://example.com/app');
     markEligible('https://example.com/app');
 
-    expect(getEligibility('https://example.com/app').isKnownIneligible).toBe(false);
+    expect(getEligibility('https://example.com/app').isKnownIneligible).toBe(
+      false
+    );
   });
 
   it('should not throw when localStorage access fails', () => {

@@ -94,7 +94,12 @@ describe('initCommandListener', () => {
     });
     initCommandListener(store);
 
-    const newCommands = { readability: 'ctrl+shift+t', style: '', stylebot: '', grayscale: '' };
+    const newCommands = {
+      readability: 'ctrl+shift+t',
+      style: '',
+      stylebot: '',
+      grayscale: '',
+    };
     onChangedListener({ commands: { newValue: newCommands } }, 'local');
 
     expect(hotkeys.unbind).toHaveBeenCalledWith('alt+shift+r');
@@ -113,11 +118,48 @@ describe('initCommandListener', () => {
 
     onChangedListener({ someOtherKey: { newValue: 1 } }, 'local');
     onChangedListener(
-      { commands: { newValue: { readability: 'ctrl+shift+t', style: '', stylebot: '', grayscale: '' } } },
+      {
+        commands: {
+          newValue: {
+            readability: 'ctrl+shift+t',
+            style: '',
+            stylebot: '',
+            grayscale: '',
+          },
+        },
+      },
       'sync'
     );
 
     expect(store.state.commands?.readability).toBe('alt+shift+r');
     expect(hotkeys.unbind).not.toHaveBeenCalled();
+  });
+});
+
+describe('toggleGrayscale', () => {
+  const { toggleGrayscale } = jest.requireActual(
+    '../common'
+  ) as typeof import('../common');
+
+  it('dispatches percent as a string when turning grayscale on', () => {
+    const dispatch = jest.fn();
+
+    toggleGrayscale({ getters: { grayscale: 0 }, dispatch });
+
+    expect(dispatch).toHaveBeenCalledWith('applyFilter', {
+      effectName: 'grayscale',
+      percent: '100',
+    });
+  });
+
+  it('dispatches percent as a string when turning grayscale off', () => {
+    const dispatch = jest.fn();
+
+    toggleGrayscale({ getters: { grayscale: 100 }, dispatch });
+
+    expect(dispatch).toHaveBeenCalledWith('applyFilter', {
+      effectName: 'grayscale',
+      percent: '0',
+    });
   });
 });

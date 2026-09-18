@@ -5,7 +5,11 @@ import { getAlreadyUsedColors } from '../already-used-colors';
 describe('already-used-colors', () => {
   describe('getAlreadyUsedColors', () => {
     it('returns all-empty result for empty css', () => {
-      expect(getAlreadyUsedColors('')).toEqual({ text: [], surface: [], total: 0 });
+      expect(getAlreadyUsedColors('')).toEqual({
+        text: [],
+        surface: [],
+        total: 0,
+      });
     });
 
     it('buckets color into text and background-color/border-color into surface', () => {
@@ -31,7 +35,11 @@ describe('already-used-colors', () => {
         }
       `;
 
-      expect(getAlreadyUsedColors(css)).toEqual({ text: ['red'], surface: [], total: 1 });
+      expect(getAlreadyUsedColors(css)).toEqual({
+        text: ['red'],
+        surface: [],
+        total: 1,
+      });
     });
 
     it('extracts a color out of the border/background shorthand', () => {
@@ -63,7 +71,11 @@ describe('already-used-colors', () => {
         }
       `;
 
-      expect(getAlreadyUsedColors(css)).toEqual({ text: ['#FFFFFF'], surface: [], total: 1 });
+      expect(getAlreadyUsedColors(css)).toEqual({
+        text: ['#FFFFFF'],
+        surface: [],
+        total: 1,
+      });
     });
 
     it('caps each role at 4 colors', () => {
@@ -88,7 +100,11 @@ describe('already-used-colors', () => {
         }
       `;
 
-      expect(getAlreadyUsedColors(css)).toEqual({ text: [], surface: [], total: 0 });
+      expect(getAlreadyUsedColors(css)).toEqual({
+        text: [],
+        surface: [],
+        total: 0,
+      });
     });
   });
 });

@@ -4,11 +4,21 @@
       <div class="domain" :class="{ disabled: !enabled }">{{ url }}</div>
     </toggle-switch>
 
-    <s-text size="caption" variant="muted" class="timestamp">{{ formattedTimestamp }}</s-text>
+    <s-text size="caption" variant="muted" class="timestamp">
+      {{ formattedTimestamp }}
+    </s-text>
 
-    <s-button variant="ghost" @click="$emit('edit', url)">{{ t('edit') }}</s-button>
+    <s-button variant="ghost" @click="$emit('edit', url)">
+      {{ t('edit') }}
+    </s-button>
 
-    <style-row-menu :url="url" :size="32" @open-site="openSite" @copy-css="copyCss" @delete="showDeleteConfirm = true" />
+    <style-row-menu
+      :url="url"
+      :size="32"
+      @open-site="openSite"
+      @copy-css="copyCss"
+      @delete="showDeleteConfirm = true"
+    />
 
     <confirm-dialog
       v-if="showDeleteConfirm"
@@ -28,7 +38,12 @@
 import Vue from 'vue';
 import { formatDistanceToNow } from 'date-fns';
 
-import { ToggleSwitch, SText, SButton, ConfirmDialog } from '@stylebot/components';
+import {
+  ToggleSwitch,
+  SText,
+  SButton,
+  ConfirmDialog,
+} from '@stylebot/components';
 import StyleRowMenu from './StyleRowMenu.vue';
 
 export default Vue.extend({

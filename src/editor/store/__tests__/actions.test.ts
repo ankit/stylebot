@@ -12,12 +12,12 @@ jest.mock('@stylebot/css');
 jest.mock('@stylebot/readability');
 jest.mock('../../utils/chrome');
 
-const mockRoot = ({
+const mockRoot = {
   some: jest.fn(),
   walkRules: jest.fn(),
   append: jest.fn(),
   toString: jest.fn(),
-} as never) as postcss.Root;
+} as never as postcss.Root;
 
 const mockCommit = jest.fn();
 const mockDispatch = jest.fn();
@@ -93,7 +93,11 @@ describe('actions', () => {
       writeCache({
         styles: [
           { url: mockState.url, css: 'a { color: blue; }', enabled: true },
-          { url: 'other.example.com', css: 'b { color: green; }', enabled: true },
+          {
+            url: 'other.example.com',
+            css: 'b { color: green; }',
+            enabled: true,
+          },
         ],
         readability: false,
       });
@@ -103,7 +107,11 @@ describe('actions', () => {
       expect(readCache()).toEqual({
         styles: [
           { url: mockState.url, css, enabled: mockState.enabled },
-          { url: 'other.example.com', css: 'b { color: green; }', enabled: true },
+          {
+            url: 'other.example.com',
+            css: 'b { color: green; }',
+            enabled: true,
+          },
         ],
         readability: false,
       });
@@ -115,7 +123,11 @@ describe('actions', () => {
 
       writeCache({
         styles: [
-          { url: 'other.example.com', css: 'b { color: green; }', enabled: true },
+          {
+            url: 'other.example.com',
+            css: 'b { color: green; }',
+            enabled: true,
+          },
         ],
         readability: false,
       });
@@ -124,7 +136,11 @@ describe('actions', () => {
 
       expect(readCache()).toEqual({
         styles: [
-          { url: 'other.example.com', css: 'b { color: green; }', enabled: true },
+          {
+            url: 'other.example.com',
+            css: 'b { color: green; }',
+            enabled: true,
+          },
           { url: mockState.url, css, enabled: mockState.enabled },
         ],
         readability: false,
@@ -145,14 +161,18 @@ describe('actions', () => {
 
     it('updates the cached readability flag in place', () => {
       writeCache({
-        styles: [{ url: mockState.url, css: 'a { color: blue; }', enabled: true }],
+        styles: [
+          { url: mockState.url, css: 'a { color: blue; }', enabled: true },
+        ],
         readability: false,
       });
 
       actions.applyReadability({ commit: mockCommit, state: mockState }, true);
 
       expect(readCache()).toEqual({
-        styles: [{ url: mockState.url, css: 'a { color: blue; }', enabled: true }],
+        styles: [
+          { url: mockState.url, css: 'a { color: blue; }', enabled: true },
+        ],
         readability: true,
       });
       expect(stylebotReadability.applyReadability).toBeCalledWith(true);
@@ -182,7 +202,10 @@ describe('actions', () => {
       actions.applyReadability(
         {
           commit: mockCommit,
-          state: { ...mockState, options: { ...mockState.options, mode: 'magic' } },
+          state: {
+            ...mockState,
+            options: { ...mockState.options, mode: 'magic' },
+          },
         },
         true
       );

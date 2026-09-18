@@ -1,11 +1,19 @@
 <template>
-  <div ref="root" class="recorder" tabindex="-1" @keydown="onKeydown" @keyup="onKeyup">
+  <div
+    ref="root"
+    class="recorder"
+    tabindex="-1"
+    @keydown="onKeydown"
+    @keyup="onKeyup"
+  >
     <div v-if="recording" class="field recording">
       <span class="capture">
         <shortcut-kbd v-if="liveModifiers" :value="liveModifiers" />
         <span class="placeholder">_</span>
       </span>
-      <button type="button" class="cancel" @click="stopRecording">Cancel</button>
+      <button type="button" class="cancel" @click="stopRecording">
+        Cancel
+      </button>
     </div>
 
     <div
@@ -18,7 +26,12 @@
       @keydown.space.prevent="startRecording"
     >
       <shortcut-kbd :value="value" />
-      <button type="button" class="clear" aria-label="Clear shortcut" @click.stop="clear">
+      <button
+        type="button"
+        class="clear"
+        aria-label="Clear shortcut"
+        @click.stop="clear"
+      >
         <icon-x />
       </button>
     </div>
@@ -157,7 +170,11 @@ export default Vue.extend({
 
 .field.has-value {
   &:hover {
-    background: color-mix(in srgb, var(--text-primary) 8%, var(--panel-surface));
+    background: color-mix(
+      in srgb,
+      var(--text-primary) 8%,
+      var(--panel-surface)
+    );
   }
 
   &:focus-visible {
@@ -255,7 +272,11 @@ export default Vue.extend({
   }
 
   &:hover {
-    background: color-mix(in srgb, var(--text-primary) 8%, var(--panel-surface));
+    background: color-mix(
+      in srgb,
+      var(--text-primary) 8%,
+      var(--panel-surface)
+    );
   }
 
   &:focus-visible {
@@ -273,10 +294,12 @@ export default Vue.extend({
 }
 
 @keyframes shortcut-recorder-blink {
-  0%, 50% {
+  0%,
+  50% {
     opacity: 1;
   }
-  51%, 100% {
+  51%,
+  100% {
     opacity: 0;
   }
 }

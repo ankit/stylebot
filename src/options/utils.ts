@@ -103,7 +103,7 @@ export const importStylesWithFilePicker = (): Promise<StyleMap> => {
 
     fileInput.addEventListener('change', (event: Event) => {
       const files = (event.target as HTMLInputElement).files;
-      if (files && files[0]) {
+      if (files?.[0]) {
         const file = files[0];
         if (file.type && file.type !== 'application/json') {
           reject('Only JSON format is supported.');

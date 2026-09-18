@@ -56,10 +56,14 @@ export default Vue.extend({
       handler(visible: boolean): void {
         if (visible) {
           this.previouslyFocused =
-            document.activeElement instanceof HTMLElement ? document.activeElement : null;
+            document.activeElement instanceof HTMLElement
+              ? document.activeElement
+              : null;
 
           this.$nextTick(() => {
-            const inspector = this.$el.querySelector<HTMLElement>('.stylebot-inspector');
+            const inspector = this.$el.querySelector<HTMLElement>(
+              '.stylebot-inspector'
+            );
             inspector?.focus();
           });
         } else {

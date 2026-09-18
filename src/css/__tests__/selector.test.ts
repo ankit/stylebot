@@ -39,9 +39,7 @@ describe('selector', () => {
       expect(getClassBasedSelector(el)).toBe(
         'p.text-lg.sm\\:text-xl.text-gray-200'
       );
-      expect(validateSelector(getClassBasedSelector(el) as string)).toBe(
-        true
-      );
+      expect(validateSelector(getClassBasedSelector(el) as string)).toBe(true);
     });
 
     it('escapes other tailwind-style special characters, like slashes and brackets', () => {

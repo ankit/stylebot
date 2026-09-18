@@ -25,9 +25,17 @@
       v-if="open"
       ref="popover"
       class="color-popover stylebot-color-picker"
-      :style="{ top: popoverTop + 'px', left: popoverLeft + 'px', visibility: positioned ? 'visible' : 'hidden' }"
+      :style="{
+        top: popoverTop + 'px',
+        left: popoverLeft + 'px',
+        visibility: positioned ? 'visible' : 'hidden',
+      }"
     >
-      <color-picker-popover :value="value" :role-label="roleLabel" @input="value = $event" />
+      <color-picker-popover
+        :value="value"
+        :role-label="roleLabel"
+        @input="value = $event"
+      />
     </div>
   </div>
 </template>
@@ -150,7 +158,9 @@ export default Vue.extend({
         // Content height varies by tab, so re-clamp on any resize, not just at open.
         const popover = this.$refs.popover as HTMLElement | undefined;
         if (popover) {
-          this.popoverResizeObserver = new ResizeObserver(() => this.positionPopover());
+          this.popoverResizeObserver = new ResizeObserver(() =>
+            this.positionPopover()
+          );
           this.popoverResizeObserver.observe(popover);
         }
       });
@@ -175,7 +185,9 @@ export default Vue.extend({
     // fixed — render our best guess, then measure and correct the drift.
     positionPopover(): void {
       const popover = this.$refs.popover as HTMLElement | undefined;
-      const field = this.$el.querySelector('.color-field') as HTMLElement | null;
+      const field = this.$el.querySelector(
+        '.color-field'
+      ) as HTMLElement | null;
       if (!popover || !field) {
         return;
       }
@@ -192,11 +204,16 @@ export default Vue.extend({
       // (mirrors AnchoredMenu), clamped either way to stay on-screen.
       const spaceBelow = window.innerHeight - fieldRect.bottom;
       const spaceAbove = fieldRect.top;
-      const flipUp = popover.offsetHeight + 6 + margin > spaceBelow && spaceAbove > spaceBelow;
+      const flipUp =
+        popover.offsetHeight + 6 + margin > spaceBelow &&
+        spaceAbove > spaceBelow;
 
       const desiredTop = flipUp
         ? Math.max(fieldRect.top - popover.offsetHeight - 6, margin)
-        : Math.min(fieldRect.bottom + 6, window.innerHeight - popover.offsetHeight - margin);
+        : Math.min(
+            fieldRect.bottom + 6,
+            window.innerHeight - popover.offsetHeight - margin
+          );
 
       this.popoverLeft = desiredLeft;
       this.popoverTop = desiredTop;
@@ -259,7 +276,8 @@ export default Vue.extend({
   cursor: pointer;
   // A literal black ring reads fine on a light panel but vanishes on a dark
   // one — mix against --text-primary so it stays visible in both themes.
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--text-primary) 12%, transparent);
+  box-shadow: inset 0 0 0 1px
+    color-mix(in srgb, var(--text-primary) 12%, transparent);
 
   &.empty {
     background: repeating-linear-gradient(

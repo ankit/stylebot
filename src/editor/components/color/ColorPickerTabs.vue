@@ -35,7 +35,11 @@ export default Vue.extend({
   computed: {
     tabs(): Array<{ value: string; label: string; disabled?: boolean }> {
       return [
-        { value: 'already-used', label: this.firstTabLabel, disabled: this.firstTabDisabled },
+        {
+          value: 'already-used',
+          label: this.firstTabLabel,
+          disabled: this.firstTabDisabled,
+        },
         { value: 'palette', label: this.t('color_picker_tab_palette') },
         { value: 'custom', label: this.t('color_picker_tab_custom') },
       ];

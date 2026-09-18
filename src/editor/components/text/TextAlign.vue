@@ -7,7 +7,11 @@
 <script lang="ts">
 import Vue, { Component } from 'vue';
 
-import { AlignLeftIcon, AlignCenterIcon, AlignRightIcon } from '@stylebot/icons';
+import {
+  AlignLeftIcon,
+  AlignCenterIcon,
+  AlignRightIcon,
+} from '@stylebot/icons';
 import CssPropertyValueGroup from '../CssPropertyValueGroup.vue';
 import PropertyRow from '../basic/PropertyRow.vue';
 

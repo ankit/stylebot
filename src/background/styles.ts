@@ -14,7 +14,7 @@ export const applyStylesToAllTabs = async (): Promise<void> => {
 
   chrome.tabs.query({}, tabs => {
     tabs.forEach(async tab => {
-      if (tab && tab.url && tab.id) {
+      if (tab?.url && tab.id) {
         const { styles, defaultStyle } = getStylesForPage(tab.url, allStyles);
 
         const message: ApplyStylesToTab = {
@@ -34,7 +34,9 @@ export const applyStylesToAllTabs = async (): Promise<void> => {
   });
 };
 
-export const refreshBadgeForTab = async (tab: chrome.tabs.Tab): Promise<void> => {
+export const refreshBadgeForTab = async (
+  tab: chrome.tabs.Tab
+): Promise<void> => {
   if (!tab.url || tab.id === undefined) {
     return;
   }
@@ -143,6 +145,12 @@ export const move = async (src: string, dest: string): Promise<void> => {
 
     return setAll(styles);
   }
+};
+
+export const getGoogleWebFontExists = (url: string): Promise<boolean> => {
+  return fetch(url)
+    .then(response => response.status !== 400)
+    .catch(() => false);
 };
 
 export const getImportCss = (url: string): Promise<string> => {

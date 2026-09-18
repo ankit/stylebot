@@ -36,9 +36,9 @@ test('falls back to page colors, then switches to already-used colors once a rul
   // page-scoped, not editorRoot-scoped: chaining .filter({ has }) off a
   // locator that's already pierced the #stylebot shadow root once breaks
   // the containment check across that boundary a second time.
-  const textCard = page
-    .locator('.property-card')
-    .filter({ has: page.locator('.property-card-label', { hasText: /^Text$/ }) });
+  const textCard = page.locator('.property-card').filter({
+    has: page.locator('.property-card-label', { hasText: /^Text$/ }),
+  });
   const swatch = textCard.locator('.color-swatch');
 
   await swatch.click();
@@ -52,7 +52,9 @@ test('falls back to page colors, then switches to already-used colors once a rul
   await expect(firstTab).toHaveClass(/active/);
   await expect(popover.locator('.first-tab .swatch').first()).toBeVisible();
 
-  const supportsEyeDropper = await page.evaluate(() => typeof window.EyeDropper !== 'undefined');
+  const supportsEyeDropper = await page.evaluate(
+    () => typeof window.EyeDropper !== 'undefined'
+  );
   const pickButton = popover.locator('.pick');
   if (supportsEyeDropper) {
     await expect(pickButton).toBeVisible();
@@ -75,10 +77,14 @@ test('falls back to page colors, then switches to already-used colors once a rul
   await swatch.click();
 
   await expect(firstTab).toHaveText('Your colors');
-  await expect(popover.locator('.used-colors .swatch[style*="17, 34, 51"]')).toBeVisible();
+  await expect(
+    popover.locator('.used-colors .swatch[style*="17, 34, 51"]')
+  ).toBeVisible();
 
   // The just-applied color was also the one the popover closed on, so it
   // should be recorded in Recent — now shown in this same tab, not Custom.
   await expect(popover.locator('.recent-section')).toBeVisible();
-  await expect(popover.locator('.recent-section .swatch[style*="17, 34, 51"]')).toBeVisible();
+  await expect(
+    popover.locator('.recent-section .swatch[style*="17, 34, 51"]')
+  ).toBeVisible();
 });

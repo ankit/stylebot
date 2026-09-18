@@ -132,9 +132,15 @@ export default {
     commit('setVisible', false);
   },
 
-  escape(
-    { state, commit, dispatch }: { state: State; commit: Commit; dispatch: Dispatch }
-  ): void {
+  escape({
+    state,
+    commit,
+    dispatch,
+  }: {
+    state: State;
+    commit: Commit;
+    dispatch: Dispatch;
+  }): void {
     if (state.help) {
       commit('setHelp', false);
       return;
@@ -246,7 +252,13 @@ export default {
     dispatch('applyCss', { css });
   },
 
-  resetActiveRule({ state, dispatch }: { state: State; dispatch: Dispatch }): void {
+  resetActiveRule({
+    state,
+    dispatch,
+  }: {
+    state: State;
+    dispatch: Dispatch;
+  }): void {
     if (!state.activeSelector) {
       return;
     }

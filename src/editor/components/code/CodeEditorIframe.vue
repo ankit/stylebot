@@ -6,7 +6,10 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { IframeMessage, ParentThemeUpdateMessage } from '@stylebot/monaco-editor';
+import {
+  IframeMessage,
+  ParentThemeUpdateMessage,
+} from '@stylebot/monaco-editor';
 import { resolveAppearance, getSystemPreference } from '@stylebot/utils';
 import { StylebotAppearance } from '@stylebot/types';
 
@@ -26,7 +29,9 @@ export default Vue.extend({
     const theme = resolveAppearance(appearance, getSystemPreference());
 
     return {
-      src: chrome.runtime.getURL(`monaco-editor/iframe/index.html?theme=${theme}`),
+      src: chrome.runtime.getURL(
+        `monaco-editor/iframe/index.html?theme=${theme}`
+      ),
       ready: false,
       systemPreference: getSystemPreference(),
       mql: null,
@@ -79,8 +84,14 @@ export default Vue.extend({
     },
 
     postTheme(theme: 'light' | 'dark'): void {
-      const message: ParentThemeUpdateMessage = { type: 'stylebotThemeUpdate', theme };
-      (this.$refs.iframe as HTMLIFrameElement).contentWindow?.postMessage(message, '*');
+      const message: ParentThemeUpdateMessage = {
+        type: 'stylebotThemeUpdate',
+        theme,
+      };
+      (this.$refs.iframe as HTMLIFrameElement).contentWindow?.postMessage(
+        message,
+        '*'
+      );
     },
   },
 });

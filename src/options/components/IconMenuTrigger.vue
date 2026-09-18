@@ -1,6 +1,10 @@
 <template>
   <s-tooltip :text="title">
-    <icon-button :bordered="bordered" :size="size" @click="$emit('click', $event)">
+    <icon-button
+      :bordered="bordered"
+      :size="size"
+      @click="$emit('click', $event)"
+    >
       <more-icon />
     </icon-button>
   </s-tooltip>

@@ -3,7 +3,9 @@
     <h1>{{ selector }}</h1>
 
     <ul class="computed-css-list">
-      <li v-for="decl in computedCss" :key="decl.property">{{ decl.property }}: {{ decl.value }}</li>
+      <li v-for="decl in computedCss" :key="decl.property">
+        {{ decl.property }}: {{ decl.value }}
+      </li>
     </ul>
   </div>
 </template>

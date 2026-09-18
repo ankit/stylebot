@@ -27,6 +27,7 @@ export type GetCommandsResponse = StylebotCommands;
 export type GetReadabilitySettingsResponse = ReadabilitySettings;
 
 export type GetImportCssResponse = string;
+export type GetGoogleWebFontExistsResponse = boolean;
 export type RunGoogleDriveSyncResponse = void;
 
 export type GetRecentColorsResponse = Array<string>;
@@ -40,6 +41,7 @@ type BackgroundPageMessageResponse =
   | GetCommandsResponse
   | GetReadabilitySettingsResponse
   | GetImportCssResponse
+  | GetGoogleWebFontExistsResponse
   | RunGoogleDriveSyncResponse
   | GetRecentColorsResponse
   | AddRecentColorResponse;

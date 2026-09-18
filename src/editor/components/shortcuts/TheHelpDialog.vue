@@ -1,8 +1,15 @@
 <template>
   <s-dialog @cancel="close">
-    <div class="stylebot-help-dialog" role="dialog" aria-modal="true" aria-labelledby="help-dialog-title">
+    <div
+      class="stylebot-help-dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="help-dialog-title"
+    >
       <div class="header-row">
-        <heading id="help-dialog-title" as="h1" size="md">{{ t('keyboard_shortcuts') }}</heading>
+        <heading id="help-dialog-title" as="h1" size="md">
+          {{ t('keyboard_shortcuts') }}
+        </heading>
 
         <s-tooltip :text="t('close')">
           <icon-button :size="26" @click="close">
@@ -13,8 +20,12 @@
 
       <div class="section">
         <div class="section-header">
-          <s-text size="caption" variant="muted" class="section-label">{{ t('global') }}</s-text>
-          <a href="#" class="customize" @click="customizeGlobalCommands">{{ t('customize') }}</a>
+          <s-text size="caption" variant="muted" class="section-label">
+            {{ t('global') }}
+          </s-text>
+          <a href="#" class="customize" @click="customizeGlobalCommands">
+            {{ t('customize') }}
+          </a>
         </div>
 
         <div class="rows">
@@ -30,7 +41,11 @@
 
           <div class="row">
             <s-text class="row-label">{{ t('toggle_readability') }}</s-text>
-            <shortcut-chip small class="row-chip" :value="commands.readability" />
+            <shortcut-chip
+              small
+              class="row-chip"
+              :value="commands.readability"
+            />
           </div>
 
           <div class="row">
@@ -42,58 +57,100 @@
 
       <div class="section">
         <div class="section-header">
-          <s-text size="caption" variant="muted" class="section-label">{{ t('editor') }}</s-text>
+          <s-text size="caption" variant="muted" class="section-label">
+            {{ t('editor') }}
+          </s-text>
         </div>
 
         <div class="rows">
           <div class="row">
             <s-text class="row-label">{{ t('toggle_inspector') }}</s-text>
-            <shortcut-chip small class="row-chip" :value="editorCommands.inspect" />
+            <shortcut-chip
+              small
+              class="row-chip"
+              :value="editorCommands.inspect"
+            />
           </div>
 
           <div class="row">
             <s-text class="row-label">{{ t('set_basic_mode') }}</s-text>
-            <shortcut-chip small class="row-chip" :value="editorCommands.basic" />
+            <shortcut-chip
+              small
+              class="row-chip"
+              :value="editorCommands.basic"
+            />
           </div>
 
           <div class="row">
             <s-text class="row-label">{{ t('set_presets_mode') }}</s-text>
-            <shortcut-chip small class="row-chip" :value="editorCommands.magic" />
+            <shortcut-chip
+              small
+              class="row-chip"
+              :value="editorCommands.magic"
+            />
           </div>
 
           <div class="row">
             <s-text class="row-label">{{ t('set_code_mode') }}</s-text>
-            <shortcut-chip small class="row-chip" :value="editorCommands.code" />
+            <shortcut-chip
+              small
+              class="row-chip"
+              :value="editorCommands.code"
+            />
           </div>
 
           <div class="row">
             <s-text class="row-label">{{ t('resize') }}</s-text>
-            <shortcut-chip small class="row-chip" :value="editorCommands.resize" />
+            <shortcut-chip
+              small
+              class="row-chip"
+              :value="editorCommands.resize"
+            />
           </div>
 
           <div class="row">
             <s-text class="row-label">{{ t('dock_to_left') }}</s-text>
-            <shortcut-chip small class="row-chip" :value="editorCommands.dockLeft" />
+            <shortcut-chip
+              small
+              class="row-chip"
+              :value="editorCommands.dockLeft"
+            />
           </div>
 
           <div class="row">
             <s-text class="row-label">{{ t('dock_to_right') }}</s-text>
-            <shortcut-chip small class="row-chip" :value="editorCommands.dockRight" />
+            <shortcut-chip
+              small
+              class="row-chip"
+              :value="editorCommands.dockRight"
+            />
           </div>
 
           <div class="row">
             <s-text class="row-label">{{ t('adjust_page_layout') }}</s-text>
-            <shortcut-chip small class="row-chip" :value="editorCommands.pageLayout" />
+            <shortcut-chip
+              small
+              class="row-chip"
+              :value="editorCommands.pageLayout"
+            />
           </div>
 
           <div class="row">
             <s-text class="row-label">{{ t('hide_element') }}</s-text>
-            <shortcut-chip small class="row-chip" :value="editorCommands.hide" />
+            <shortcut-chip
+              small
+              class="row-chip"
+              :value="editorCommands.hide"
+            />
           </div>
 
           <div class="row">
             <s-text class="row-label">{{ t('show_help') }}</s-text>
-            <shortcut-chip small class="row-chip" :value="editorCommands.help" />
+            <shortcut-chip
+              small
+              class="row-chip"
+              :value="editorCommands.help"
+            />
           </div>
         </div>
       </div>
@@ -103,7 +160,14 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { Heading, IconButton, ShortcutChip, SDialog, SText, STooltip } from '@stylebot/components';
+import {
+  Heading,
+  IconButton,
+  ShortcutChip,
+  SDialog,
+  SText,
+  STooltip,
+} from '@stylebot/components';
 import { IconX } from '@stylebot/icons';
 import { StylebotCommands, StylebotEditorCommands } from '@stylebot/types';
 

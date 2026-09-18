@@ -1,7 +1,14 @@
 <template>
   <property-row :label="t('opacity')">
     <div class="opacity-control">
-      <s-slider :value="value" :min="0" :max="1" :step="0.05" :disabled="disabled" @input="apply" />
+      <s-slider
+        :value="value"
+        :min="0"
+        :max="1"
+        :step="0.05"
+        :disabled="disabled"
+        @input="apply"
+      />
 
       <s-text as="span" class="opacity-value">{{ value }}</s-text>
     </div>

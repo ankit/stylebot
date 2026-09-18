@@ -9,7 +9,13 @@
       @input="query = $event"
     >
       <template #item="{ item, select }">
-        <menu-item :selected="item.key === activeKey" @click="selectOption(item); select();">
+        <menu-item
+          :selected="item.key === activeKey"
+          @click="
+            selectOption(item);
+            select();
+          "
+        >
           <span class="option-row">
             <span class="option-bars">
               <span
@@ -27,7 +33,9 @@
 
     <div v-if="activeKey === 'neutrals'" class="ramps">
       <div v-for="ramp in neutralRamps" :key="ramp.labelKey" class="ramp">
-        <s-text size="small" variant="muted" as="span">{{ t(ramp.labelKey) }}</s-text>
+        <s-text size="small" variant="muted" as="span">
+          {{ t(ramp.labelKey) }}
+        </s-text>
         <div class="set-grid">
           <button
             v-for="color in ramp.colors"
@@ -76,18 +84,44 @@ import Vue from 'vue';
 import { SAutocomplete, SText, MenuItem } from '@stylebot/components';
 import { CheckIcon } from '@stylebot/icons';
 import { colorSchemes } from '../../utils/color-schemes';
-import { neutralRamps, hueGrid, readingRow, darkModeRow, ColorRamp } from '../../utils/color-sets';
+import {
+  neutralRamps,
+  hueGrid,
+  readingRow,
+  darkModeRow,
+  ColorRamp,
+} from '../../utils/color-sets';
 import { needsHairline, checkMarkColor } from '../../utils/hsv-color';
 
 type PaletteOption = { key: string; label: string; preview: Array<string> };
-type PaletteOptionMeta = { key: string; labelKey: string; preview: Array<string> };
+type PaletteOptionMeta = {
+  key: string;
+  labelKey: string;
+  preview: Array<string>;
+};
 
 // Translated in data() via this.t(), not at module scope — Jest mocks t() per-component, not a global chrome.
 const SET_OPTION_META: Array<PaletteOptionMeta> = [
-  { key: 'neutrals', labelKey: 'color_picker_set_neutrals', preview: neutralRamps[0].colors.slice(0, 6) },
-  { key: 'hues', labelKey: 'color_picker_set_hues', preview: hueGrid[2].slice(0, 6) },
-  { key: 'reading', labelKey: 'color_picker_set_reading', preview: readingRow.slice(0, 6) },
-  { key: 'dark-mode', labelKey: 'color_picker_set_dark_mode', preview: darkModeRow.slice(0, 6) },
+  {
+    key: 'neutrals',
+    labelKey: 'color_picker_set_neutrals',
+    preview: neutralRamps[0].colors.slice(0, 6),
+  },
+  {
+    key: 'hues',
+    labelKey: 'color_picker_set_hues',
+    preview: hueGrid[2].slice(0, 6),
+  },
+  {
+    key: 'reading',
+    labelKey: 'color_picker_set_reading',
+    preview: readingRow.slice(0, 6),
+  },
+  {
+    key: 'dark-mode',
+    labelKey: 'color_picker_set_dark_mode',
+    preview: darkModeRow.slice(0, 6),
+  },
 ];
 
 const SCHEME_OPTIONS: Array<PaletteOption> = colorSchemes.map(scheme => ({
@@ -144,12 +178,16 @@ export default Vue.extend({
   computed: {
     filteredOptions(): Array<PaletteOption> {
       const query = this.query.trim().toLowerCase();
-      const activeLabel = this.allOptions.find(option => option.key === this.activeKey)?.label || '';
+      const activeLabel =
+        this.allOptions.find(option => option.key === this.activeKey)?.label ||
+        '';
       if (!query || query === activeLabel.toLowerCase()) {
         return this.allOptions;
       }
 
-      return this.allOptions.filter(option => option.label.toLowerCase().includes(query));
+      return this.allOptions.filter(option =>
+        option.label.toLowerCase().includes(query)
+      );
     },
 
     activeColors(): Array<string> {

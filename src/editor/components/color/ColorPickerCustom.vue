@@ -9,9 +9,18 @@
       @change="onSVChange"
     />
 
-    <color-picker-hue-slider :hue="hsva.h" @input="onHueInput" @change="onHueChange" />
+    <color-picker-hue-slider
+      :hue="hsva.h"
+      @input="onHueInput"
+      @change="onHueChange"
+    />
 
-    <color-picker-alpha-slider :alpha="hsva.a" :color="opaqueColor" @input="onAlphaInput" @change="onAlphaChange" />
+    <color-picker-alpha-slider
+      :alpha="hsva.a"
+      :color="opaqueColor"
+      @input="onAlphaInput"
+      @change="onAlphaChange"
+    />
   </div>
 </template>
 
@@ -52,7 +61,11 @@ export default Vue.extend({
     },
 
     opaqueColor(): string {
-      return tinycolor({ h: this.hsva.h, s: this.hsva.s, v: this.hsva.v }).toHexString();
+      return tinycolor({
+        h: this.hsva.h,
+        s: this.hsva.s,
+        v: this.hsva.v,
+      }).toHexString();
     },
 
     currentColor(): string {

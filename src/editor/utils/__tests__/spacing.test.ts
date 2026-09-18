@@ -32,7 +32,12 @@ describe('parseLength', () => {
 
 describe('expandShorthand', () => {
   it('expands a 1-value shorthand to all sides', () => {
-    expect(expandShorthand('4px')).toEqual({ top: '4px', right: '4px', bottom: '4px', left: '4px' });
+    expect(expandShorthand('4px')).toEqual({
+      top: '4px',
+      right: '4px',
+      bottom: '4px',
+      left: '4px',
+    });
   });
 
   it('expands a 2-value shorthand to vertical/horizontal', () => {
@@ -70,23 +75,27 @@ describe('expandShorthand', () => {
 
 describe('collapseToShorthand', () => {
   it('collapses to a single value when all sides match', () => {
-    expect(collapseToShorthand({ top: '4', right: '4', bottom: '4', left: '4' })).toBe('4px');
+    expect(
+      collapseToShorthand({ top: '4', right: '4', bottom: '4', left: '4' })
+    ).toBe('4px');
   });
 
   it('collapses to a 2-value form when vertical/horizontal pairs match', () => {
-    expect(collapseToShorthand({ top: '2', right: '4', bottom: '2', left: '4' })).toBe('2px 4px');
+    expect(
+      collapseToShorthand({ top: '2', right: '4', bottom: '2', left: '4' })
+    ).toBe('2px 4px');
   });
 
   it('collapses to a 3-value form when only left/right match', () => {
-    expect(collapseToShorthand({ top: '2', right: '4', bottom: '6', left: '4' })).toBe(
-      '2px 4px 6px'
-    );
+    expect(
+      collapseToShorthand({ top: '2', right: '4', bottom: '6', left: '4' })
+    ).toBe('2px 4px 6px');
   });
 
   it('falls back to the full 4-value form', () => {
-    expect(collapseToShorthand({ top: '1', right: '2', bottom: '3', left: '4' })).toBe(
-      '1px 2px 3px 4px'
-    );
+    expect(
+      collapseToShorthand({ top: '1', right: '2', bottom: '3', left: '4' })
+    ).toBe('1px 2px 3px 4px');
   });
 });
 
@@ -104,7 +113,9 @@ describe('resolveSpacingDeclarations', () => {
   });
 
   it('clears every declaration when no side is set', () => {
-    expect(resolveSpacingDeclarations(EMPTY_SIDES, properties, 'padding')).toEqual([
+    expect(
+      resolveSpacingDeclarations(EMPTY_SIDES, properties, 'padding')
+    ).toEqual([
       { property: 'padding', value: '' },
       { property: 'padding-top', value: '' },
       { property: 'padding-right', value: '' },

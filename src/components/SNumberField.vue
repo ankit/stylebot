@@ -16,7 +16,13 @@
 
     <anchored-menu v-if="presets.length" class="number-presets">
       <template #trigger="{ toggle, open }">
-        <button type="button" class="number-chevron" :class="{ open }" :disabled="disabled" @click="toggle">
+        <button
+          type="button"
+          class="number-chevron"
+          :class="{ open }"
+          :disabled="disabled"
+          @click="toggle"
+        >
           <chevron-down-icon :size="10" />
         </button>
       </template>
@@ -26,7 +32,10 @@
           <menu-item
             v-for="preset in presets"
             :key="preset"
-            @click="pick(preset); close();"
+            @click="
+              pick(preset);
+              close();
+            "
           >
             {{ preset }}
           </menu-item>

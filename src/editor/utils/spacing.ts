@@ -29,7 +29,12 @@ export const expandShorthand = (value: string): Sides | null => {
 
 // Collapses four (unitless) side lengths into the shortest equivalent
 // 1-4 value shorthand form, mirroring how a human would write it by hand.
-export const collapseToShorthand = ({ top, right, bottom, left }: Sides): string => {
+export const collapseToShorthand = ({
+  top,
+  right,
+  bottom,
+  left,
+}: Sides): string => {
   if (top === right && right === bottom && bottom === left) {
     return `${top}px`;
   }
@@ -52,7 +57,9 @@ export const resolveSpacingDeclarations = (
   properties: Sides,
   shorthandProperty: string
 ): Array<{ property: string; value: string }> => {
-  const setSides = (Object.keys(sides) as Array<Side>).filter(side => sides[side]);
+  const setSides = (Object.keys(sides) as Array<Side>).filter(
+    side => sides[side]
+  );
 
   if (setSides.length >= 2) {
     const filled: Sides = {
@@ -74,8 +81,14 @@ export const resolveSpacingDeclarations = (
   return [
     { property: shorthandProperty, value: '' },
     { property: properties.top, value: sides.top ? `${sides.top}px` : '' },
-    { property: properties.right, value: sides.right ? `${sides.right}px` : '' },
-    { property: properties.bottom, value: sides.bottom ? `${sides.bottom}px` : '' },
+    {
+      property: properties.right,
+      value: sides.right ? `${sides.right}px` : '',
+    },
+    {
+      property: properties.bottom,
+      value: sides.bottom ? `${sides.bottom}px` : '',
+    },
     { property: properties.left, value: sides.left ? `${sides.left}px` : '' },
   ];
 };

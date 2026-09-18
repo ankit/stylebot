@@ -20,14 +20,18 @@ export const tinycolorToCssColor = (color: tinycolor.Instance): string => {
 };
 
 export const toCssColor = (hsva: Hsva): string => {
-  return tinycolorToCssColor(tinycolor({ h: hsva.h, s: hsva.s, v: hsva.v, a: hsva.a }));
+  return tinycolorToCssColor(
+    tinycolor({ h: hsva.h, s: hsva.s, v: hsva.v, a: hsva.a })
+  );
 };
 
 // Matches the design spec's swatch rule: colors lighter than #e8e8e8 get a
 // hairline border so a near-white swatch still reads against a white popup.
 export const needsHairline = (value: string): boolean => {
   const color = tinycolor(value);
-  return color.isValid() && color.getBrightness() > HAIRLINE_BRIGHTNESS_THRESHOLD;
+  return (
+    color.isValid() && color.getBrightness() > HAIRLINE_BRIGHTNESS_THRESHOLD
+  );
 };
 
 // Selection checkmark color for a swatch — picks whichever of white/ink

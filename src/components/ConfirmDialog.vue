@@ -8,7 +8,14 @@
       aria-describedby="confirm-dialog-message"
     >
       <heading id="confirm-dialog-title" as="h2" size="md">{{ title }}</heading>
-      <s-text id="confirm-dialog-message" size="caption" variant="muted" class="message">{{ message }}</s-text>
+      <s-text
+        id="confirm-dialog-message"
+        size="caption"
+        variant="muted"
+        class="message"
+      >
+        {{ message }}
+      </s-text>
 
       <div class="actions">
         <s-button variant="ghost" @click="$emit('cancel')">

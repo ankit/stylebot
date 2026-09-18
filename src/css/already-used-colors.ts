@@ -7,7 +7,12 @@ export type RoleColorGroups = {
 };
 
 const TEXT_ROLE_PROPERTIES = ['color'];
-const SURFACE_ROLE_PROPERTIES = ['background-color', 'border-color', 'background', 'border'];
+const SURFACE_ROLE_PROPERTIES = [
+  'background-color',
+  'border-color',
+  'background',
+  'border',
+];
 const SHORTHAND_PROPERTIES = ['background', 'border'];
 const ROLE_CAP = 4;
 
@@ -25,7 +30,11 @@ const extractColorFromShorthand = (value: string): string => {
   return hex ? hex[0] : '';
 };
 
-const addColor = (list: Array<string>, seen: Set<string>, color: string): void => {
+const addColor = (
+  list: Array<string>,
+  seen: Set<string>,
+  color: string
+): void => {
   const key = color.toLowerCase();
   if (!color || seen.has(key)) {
     return;

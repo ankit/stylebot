@@ -1,0 +1,63 @@
+name: release
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: create github release
+    if: github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'release/')
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The squashed commit on main, not the now-stale PR merge ref.
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
+
+      - name: Read version and changelog entry
+        id: release
+        run: |
+          set -euo pipefail
+
+          version="$(node -p "require('./package.json').version")"
+          tag="v${version}"
+
+          manifest_version="$(node -p "require('./src/extension/manifest.json').version")"
+          if [ "$manifest_version" != "$version" ]; then
+            echo "::error::package.json ($version) and manifest.json ($manifest_version) disagree on the version."
+            exit 1
+          fi
+
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "::error::Release $tag already exists."
+            exit 1
+          fi
+
+          # The CHANGELOG section for this version becomes the release body.
+          awk -v ver="$version" '
+            BEGIN { prefix = "## Version " ver " (" }
+            index($0, prefix) == 1 { found = 1; next }
+            found && /^## / { exit }
+            found { print }
+          ' CHANGELOG.md > notes.md
+
+          if [ ! -s notes.md ]; then
+            echo "::error::No '## Version $version (...)' section found in CHANGELOG.md."
+            exit 1
+          fi
+
+          echo "tag=${tag}" >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create release
+        run: gh release create "$TAG" --title "$TAG" --notes-file notes.md
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.release.outputs.tag }}

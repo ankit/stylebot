@@ -1,6 +1,12 @@
 <template>
   <div ref="root" class="anchored-menu" @focusout="onFocusOut">
-    <slot name="trigger" :toggle="toggleOpen" :open="open" :show="show" :hide="close" />
+    <slot
+      name="trigger"
+      :toggle="toggleOpen"
+      :open="open"
+      :show="show"
+      :hide="close"
+    />
 
     <div
       v-if="open"
@@ -99,7 +105,8 @@ export default Vue.extend({
         const spaceBelow = window.innerHeight - rootRect.bottom;
         const spaceAbove = rootRect.top;
 
-        this.flipUp = panel.offsetHeight + margin > spaceBelow && spaceAbove > spaceBelow;
+        this.flipUp =
+          panel.offsetHeight + margin > spaceBelow && spaceAbove > spaceBelow;
       }
 
       this.positioned = true;
@@ -143,7 +150,10 @@ export default Vue.extend({
         return;
       }
 
-      if (this.retainFocus || !(next instanceof Node && this.$el.contains(next))) {
+      if (
+        this.retainFocus ||
+        !(next instanceof Node && this.$el.contains(next))
+      ) {
         this.close({ skipRestoreFocus: true });
       }
     },
@@ -158,7 +168,10 @@ export default Vue.extend({
 
     activeElement(): HTMLElement | null {
       const root = this.$el.getRootNode();
-      const active = root instanceof ShadowRoot ? root.activeElement : document.activeElement;
+      const active =
+        root instanceof ShadowRoot
+          ? root.activeElement
+          : document.activeElement;
       return active instanceof HTMLElement ? active : null;
     },
 

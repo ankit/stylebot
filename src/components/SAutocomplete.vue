@@ -167,7 +167,7 @@ export default Vue.extend({
 
   methods: {
     menu(): AnchoredMenuRef {
-      return (this.$refs.menu as unknown) as AnchoredMenuRef;
+      return this.$refs.menu as unknown as AnchoredMenuRef;
     },
 
     showMenu(): void {

@@ -7,7 +7,10 @@
 
       <div class="title-block">
         <div class="breadcrumb">
-          <a href="#" @click.prevent="attemptLeave">{{ t('styles_options') }}</a> ›
+          <a href="#" @click.prevent="attemptLeave">
+            {{ t('styles_options') }}
+          </a>
+          ›
         </div>
 
         <input
@@ -28,17 +31,27 @@
         <span class="enabled-label">{{ t('enabled') }}</span>
       </toggle-switch>
 
-      <style-row-menu :url="url" :size="30" @open-site="openSite" @copy-css="copyCss" @delete="showDeleteConfirm = true" />
+      <style-row-menu
+        :url="url"
+        :size="30"
+        @open-site="openSite"
+        @copy-css="copyCss"
+        @delete="showDeleteConfirm = true"
+      />
     </div>
 
     <div class="editor-code-area">
-      <code-editor :css="css" :autofocus="!!existingStyle" @update="css = $event" />
+      <code-editor
+        :css="css"
+        :autofocus="!!existingStyle"
+        @update="css = $event"
+      />
     </div>
 
     <div class="editor-footer">
       <s-text size="caption" variant="muted" class="stats">
         {{ lineCountLabel }} · {{ ruleCountLabel }}
-        <template v-if="savedLabel"> · {{ savedLabel }}</template>
+        <template v-if="savedLabel">· {{ savedLabel }}</template>
       </s-text>
 
       <s-button variant="ghost" :disabled="!isDirty" @click="$emit('back')">
@@ -76,7 +89,13 @@ import * as postcss from 'postcss';
 import { formatDistanceToNow } from 'date-fns';
 
 import { StyleWithoutUrl } from '@stylebot/types';
-import { ToggleSwitch, IconButton, SText, SButton, ConfirmDialog } from '@stylebot/components';
+import {
+  ToggleSwitch,
+  IconButton,
+  SText,
+  SButton,
+  ConfirmDialog,
+} from '@stylebot/components';
 import { ChevronLeftIcon } from '@stylebot/icons';
 
 import StyleRowMenu from './StyleRowMenu.vue';
@@ -147,7 +166,9 @@ export default Vue.extend({
     },
 
     ruleCountLabel(): string {
-      return this.ruleCount === null ? '—' : `${this.ruleCount} rule${this.ruleCount === 1 ? '' : 's'}`;
+      return this.ruleCount === null
+        ? '—'
+        : `${this.ruleCount} rule${this.ruleCount === 1 ? '' : 's'}`;
     },
 
     savedLabel(): string {
@@ -155,9 +176,12 @@ export default Vue.extend({
         return '';
       }
 
-      return `saved ${formatDistanceToNow(new Date(this.existingStyle.modifiedTime), {
-        addSuffix: true,
-      })}`;
+      return `saved ${formatDistanceToNow(
+        new Date(this.existingStyle.modifiedTime),
+        {
+          addSuffix: true,
+        }
+      )}`;
     },
 
     valid(): boolean {
@@ -175,7 +199,10 @@ export default Vue.extend({
     },
 
     onToggleEnabled(enabled: boolean): void {
-      this.$store.dispatch(enabled ? 'enableStyle' : 'disableStyle', this.initialUrl);
+      this.$store.dispatch(
+        enabled ? 'enableStyle' : 'disableStyle',
+        this.initialUrl
+      );
     },
 
     openSite(): void {
@@ -193,7 +220,11 @@ export default Vue.extend({
     },
 
     save(): void {
-      this.$emit('save', { initialUrl: this.initialUrl, url: this.url, css: this.css });
+      this.$emit('save', {
+        initialUrl: this.initialUrl,
+        url: this.url,
+        css: this.css,
+      });
     },
   },
 });

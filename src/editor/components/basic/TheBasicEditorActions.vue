@@ -1,7 +1,12 @@
 <template>
   <div class="basic-editor-actions">
     <s-tooltip :text="hideTooltipText" :shortcut="editorCommands.hide">
-      <s-button class="action-button hide-button" :class="{ active: isHidden }" :disabled="disabled" @click="toggleHidden">
+      <s-button
+        class="action-button hide-button"
+        :class="{ active: isHidden }"
+        :disabled="disabled"
+        @click="toggleHidden"
+      >
         <eye-off-icon :size="12" />
         {{ t('hide') }}
       </s-button>
@@ -59,7 +64,9 @@ export default Vue.extend({
     },
 
     hideTooltipText(): string {
-      return this.isHidden ? this.t('show_selected_element') : this.t('hide_selected_element');
+      return this.isHidden
+        ? this.t('show_selected_element')
+        : this.t('hide_selected_element');
     },
   },
 

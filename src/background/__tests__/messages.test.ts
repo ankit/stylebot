@@ -19,7 +19,10 @@ describe('SetReadability', () => {
   });
 
   it('persists the value and refreshes the badge for the sending tab', async () => {
-    const tab = { id: 1, url: 'https://example.com/article' } as chrome.tabs.Tab;
+    const tab = {
+      id: 1,
+      url: 'https://example.com/article',
+    } as chrome.tabs.Tab;
 
     await SetReadability(
       { name: 'SetReadability', url: 'example.com', value: true },
@@ -31,7 +34,10 @@ describe('SetReadability', () => {
   });
 
   it('relays the change to the sending tab so other content scripts stay in sync', async () => {
-    const tab = { id: 1, url: 'https://example.com/article' } as chrome.tabs.Tab;
+    const tab = {
+      id: 1,
+      url: 'https://example.com/article',
+    } as chrome.tabs.Tab;
 
     await SetReadability(
       { name: 'SetReadability', url: 'example.com', value: true },
@@ -61,9 +67,15 @@ describe('ReadabilityActiveChanged', () => {
   });
 
   it('refreshes the badge for the sending tab', async () => {
-    const tab = { id: 1, url: 'https://example.com/article' } as chrome.tabs.Tab;
+    const tab = {
+      id: 1,
+      url: 'https://example.com/article',
+    } as chrome.tabs.Tab;
 
-    await ReadabilityActiveChanged({ name: 'ReadabilityActiveChanged' }, { tab });
+    await ReadabilityActiveChanged(
+      { name: 'ReadabilityActiveChanged' },
+      { tab }
+    );
 
     expect(stylesModule.refreshBadgeForTab).toBeCalledWith(tab);
   });
@@ -102,7 +114,10 @@ describe('AddRecentColor', () => {
     ]);
     const sendResponse = jest.fn();
 
-    await AddRecentColor({ name: 'AddRecentColor', color: '#00ff00' }, sendResponse);
+    await AddRecentColor(
+      { name: 'AddRecentColor', color: '#00ff00' },
+      sendResponse
+    );
 
     expect(colorHistoryModule.add).toBeCalledWith('#00ff00');
     expect(sendResponse).toBeCalledWith(['#00ff00', '#ff0000']);

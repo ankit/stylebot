@@ -8,7 +8,13 @@
       :disabled="disabled"
     >
       <template #default="{ close }">
-        <menu-item :selected="!value" @click="select(''); close();">
+        <menu-item
+          :selected="!value"
+          @click="
+            select('');
+            close();
+          "
+        >
           {{ t('default') }}
         </menu-item>
 
@@ -16,12 +22,21 @@
           v-for="font in fonts"
           :key="font"
           :selected="value === font"
-          @click="select(font); close();"
+          @click="
+            select(font);
+            close();
+          "
         >
           {{ font }}
         </menu-item>
 
-        <menu-item class="edit-fonts" @click="editFonts(); close();">
+        <menu-item
+          class="edit-fonts"
+          @click="
+            editFonts();
+            close();
+          "
+        >
           {{ t('fonts_edit_list') }}
         </menu-item>
       </template>

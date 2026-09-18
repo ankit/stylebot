@@ -24,7 +24,11 @@
     </s-text>
 
     <div v-if="recentColors.length" class="recent-section">
-      <color-picker-recent :colors="recentColors" :value="value" @select="$emit('select', $event)" />
+      <color-picker-recent
+        :colors="recentColors"
+        :value="value"
+        @select="$emit('select', $event)"
+      />
     </div>
   </div>
 </template>

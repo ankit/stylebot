@@ -68,7 +68,11 @@ export default Vue.extend({
     },
 
     detachStylebotShortcuts(): void {
-      document.removeEventListener('keydown', this.handleStylebotShortcut, true);
+      document.removeEventListener(
+        'keydown',
+        this.handleStylebotShortcut,
+        true
+      );
     },
 
     toggleInspect(): void {

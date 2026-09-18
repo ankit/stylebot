@@ -1,23 +1,63 @@
 <template>
   <div class="spacing-control" :class="{ last }">
     <property-row :label="label" last>
-      <s-segmented-control fit :value="mode" :options="modeOptions" @change="selectMode" />
+      <s-segmented-control
+        fit
+        :value="mode"
+        :options="modeOptions"
+        @change="selectMode"
+      />
     </property-row>
 
     <div v-if="mode === 'all'" class="spacing-grid">
-      <spacing-field :label="t('all')" :value="all" :disabled="disabled" @input="setAll" />
+      <spacing-field
+        :label="t('all')"
+        :value="all"
+        :disabled="disabled"
+        @input="setAll"
+      />
     </div>
 
     <div v-else-if="mode === 'xy'" class="spacing-grid">
-      <spacing-field :label="t('vertical')" :value="vertical" :disabled="disabled" @input="setVertical" />
-      <spacing-field :label="t('horizontal')" :value="horizontal" :disabled="disabled" @input="setHorizontal" />
+      <spacing-field
+        :label="t('vertical')"
+        :value="vertical"
+        :disabled="disabled"
+        @input="setVertical"
+      />
+      <spacing-field
+        :label="t('horizontal')"
+        :value="horizontal"
+        :disabled="disabled"
+        @input="setHorizontal"
+      />
     </div>
 
     <div v-else-if="mode === 'individual'" class="spacing-grid">
-      <spacing-field :label="t('top')" :value="top" :disabled="disabled" @input="setSide('top', $event)" />
-      <spacing-field :label="t('right')" :value="right" :disabled="disabled" @input="setSide('right', $event)" />
-      <spacing-field :label="t('bottom')" :value="bottom" :disabled="disabled" @input="setSide('bottom', $event)" />
-      <spacing-field :label="t('left')" :value="left" :disabled="disabled" @input="setSide('left', $event)" />
+      <spacing-field
+        :label="t('top')"
+        :value="top"
+        :disabled="disabled"
+        @input="setSide('top', $event)"
+      />
+      <spacing-field
+        :label="t('right')"
+        :value="right"
+        :disabled="disabled"
+        @input="setSide('right', $event)"
+      />
+      <spacing-field
+        :label="t('bottom')"
+        :value="bottom"
+        :disabled="disabled"
+        @input="setSide('bottom', $event)"
+      />
+      <spacing-field
+        :label="t('left')"
+        :value="left"
+        :disabled="disabled"
+        @input="setSide('left', $event)"
+      />
     </div>
   </div>
 </template>
@@ -30,7 +70,13 @@ import { SSegmentedControl } from '@stylebot/components';
 
 import PropertyRow from '../basic/PropertyRow.vue';
 import SpacingField from './SpacingField.vue';
-import { Side, Sides, parseLength, expandShorthand, resolveSpacingDeclarations } from '../../utils/spacing';
+import {
+  Side,
+  Sides,
+  parseLength,
+  expandShorthand,
+  resolveSpacingDeclarations,
+} from '../../utils/spacing';
 
 type Mode = 'none' | 'all' | 'xy' | 'individual';
 
@@ -136,7 +182,9 @@ export default Vue.extend({
     },
 
     all(): string {
-      return this.top === this.right && this.right === this.bottom && this.bottom === this.left
+      return this.top === this.right &&
+        this.right === this.bottom &&
+        this.bottom === this.left
         ? this.top
         : '';
     },
@@ -187,27 +235,49 @@ export default Vue.extend({
     },
 
     applySides(sides: Sides): void {
-      resolveSpacingDeclarations(sides, this.properties, this.shorthandProperty).forEach(
-        ({ property, value }) => {
-          this.$store.dispatch('applyDeclaration', { property, value });
-        }
-      );
+      resolveSpacingDeclarations(
+        sides,
+        this.properties,
+        this.shorthandProperty
+      ).forEach(({ property, value }) => {
+        this.$store.dispatch('applyDeclaration', { property, value });
+      });
     },
 
     setAll(length: string): void {
-      this.applySides({ top: length, right: length, bottom: length, left: length });
+      this.applySides({
+        top: length,
+        right: length,
+        bottom: length,
+        left: length,
+      });
     },
 
     setVertical(length: string): void {
-      this.applySides({ top: length, right: this.right, bottom: length, left: this.left });
+      this.applySides({
+        top: length,
+        right: this.right,
+        bottom: length,
+        left: this.left,
+      });
     },
 
     setHorizontal(length: string): void {
-      this.applySides({ top: this.top, right: length, bottom: this.bottom, left: length });
+      this.applySides({
+        top: this.top,
+        right: length,
+        bottom: this.bottom,
+        left: length,
+      });
     },
 
     setSide(side: Side, length: string): void {
-      const sides = { top: this.top, right: this.right, bottom: this.bottom, left: this.left };
+      const sides = {
+        top: this.top,
+        right: this.right,
+        bottom: this.bottom,
+        left: this.left,
+      };
       this.applySides({ ...sides, [side]: length });
     },
   },
@@ -217,7 +287,8 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .spacing-control {
   padding-bottom: 6px;
-  border-bottom: 1px solid color-mix(in srgb, var(--text-primary) 7%, transparent);
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--text-primary) 7%, transparent);
 
   &.last {
     padding-bottom: 2px;

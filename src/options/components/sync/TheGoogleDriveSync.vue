@@ -3,32 +3,51 @@
     <div class="text">
       <heading as="h2" size="sm">Google Drive</heading>
 
-      <s-text v-if="!googleDriveSyncEnabled" size="caption" variant="muted" class="description">
+      <s-text
+        v-if="!googleDriveSyncEnabled"
+        size="caption"
+        variant="muted"
+        class="description"
+      >
         Not connected. Styles stay on this computer only.
       </s-text>
 
       <s-text v-else size="caption" variant="muted" class="description">
         {{ t('synced_at_time', [googleDriveSyncLastModifiedTime]) }}
-        <template v-if="syncInProgress"> · {{ t('sync_in_progress') }}</template>
+        <template v-if="syncInProgress">· {{ t('sync_in_progress') }}</template>
         <template v-if="googleDriveSyncViewLink">
           ·
-          <a :href="googleDriveSyncViewLink" target="_blank">{{ t('view_synced_file') }}</a>
+          <a :href="googleDriveSyncViewLink" target="_blank">
+            {{ t('view_synced_file') }}
+          </a>
           ·
-          <a :href="googleDriveSyncDownloadLink" target="_blank">{{ t('download_synced_file') }}</a>
+          <a :href="googleDriveSyncDownloadLink" target="_blank">
+            {{ t('download_synced_file') }}
+          </a>
         </template>
       </s-text>
     </div>
 
-    <s-button v-if="googleDriveSyncEnabled" :disabled="syncInProgress" @click="syncWithGoogleDrive">
+    <s-button
+      v-if="googleDriveSyncEnabled"
+      :disabled="syncInProgress"
+      @click="syncWithGoogleDrive"
+    >
       <arrow-repeat-icon :spinning="syncInProgress" />
       <span>{{ syncInProgress ? t('sync_in_progress') : t('sync_now') }}</span>
     </s-button>
 
-    <s-button v-if="googleDriveSyncEnabled" @click="googleDriveSyncEnabled = false">
+    <s-button
+      v-if="googleDriveSyncEnabled"
+      @click="googleDriveSyncEnabled = false"
+    >
       {{ t('disable_google_drive_sync') }}
     </s-button>
 
-    <s-button v-if="!googleDriveSyncEnabled" @click="googleDriveSyncEnabled = true">
+    <s-button
+      v-if="!googleDriveSyncEnabled"
+      @click="googleDriveSyncEnabled = true"
+    >
       {{ t('enable_google_drive_sync') }}
     </s-button>
   </div>

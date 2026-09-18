@@ -19,7 +19,11 @@ import { hidePage, revealPage } from './hide-page';
 // gated behind async init) so the popup always gets a response.
 if (window === window.top) {
   chrome.runtime.onMessage.addListener(
-    (message: TabMessage, _sender, sendResponse: (response: boolean) => void) => {
+    (
+      message: TabMessage,
+      _sender,
+      sendResponse: (response: boolean) => void
+    ) => {
       if (message.name === 'GetIsPageReaderable') {
         sendResponse(isReaderable());
       } else if (message.name === 'GetIsReadabilityActive') {
@@ -54,16 +58,14 @@ const run = () => {
 
     const freshState: CachedState = {
       styles: styles.map(({ url, css, enabled }) => ({ url, css, enabled })),
-      readability: Boolean(defaultStyle && defaultStyle.readability),
+      readability: Boolean(defaultStyle?.readability),
     };
 
     const finish = () => {
       writeCache(freshState);
 
       const liveImportUrls = new Set(
-        freshState.styles.flatMap(
-          style => extractImports(style.css).importUrls
-        )
+        freshState.styles.flatMap(style => extractImports(style.css).importUrls)
       );
       pruneImportCache(liveImportUrls);
 

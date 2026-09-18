@@ -49,7 +49,7 @@ export const getFilterEffectValueForPage = (
         rule.walkDecls('filter', (decl: postcss.Declaration) => {
           const matches = decl.value.match(regex);
 
-          if (matches && matches[1]) {
+          if (matches?.[1]) {
             value = parseInt(matches[1]);
           }
         });
@@ -85,7 +85,7 @@ export const getCssAfterApplyingFilterEffectToPage = (
                 decl.value = value;
               } else {
                 decl.remove();
-                if (!rule.some(node => node.type !== 'decl')) {
+                if (!rule.nodes?.length) {
                   rule.remove();
                 }
               }

@@ -84,10 +84,7 @@ const config = {
   resolve: {
     extensions: ['.ts', '.js', '.vue'],
     alias: {
-      '@stylebot/components': path.resolve(
-        __dirname,
-        './src/components/index'
-      ),
+      '@stylebot/components': path.resolve(__dirname, './src/components/index'),
       '@stylebot/icons': path.resolve(__dirname, './src/icons/index'),
       '@stylebot/css': path.resolve(__dirname, './src/css/index'),
       '@stylebot/i18n': path.resolve(__dirname, './src/i18n/index'),
@@ -285,7 +282,8 @@ const clientConfig = {
     'options/index': './options/index.ts',
     'inject-css/index': './inject-css/index.ts',
     'monaco-editor/iframe/index': './monaco-editor/iframe/index.ts',
-    'monaco-editor/iframe/options-index': './monaco-editor/iframe/options-index.ts',
+    'monaco-editor/iframe/options-index':
+      './monaco-editor/iframe/options-index.ts',
     'readability/index': './readability/index.ts',
   },
 };

@@ -1,4 +1,5 @@
-const isMac = (): boolean => /mac/i.test(navigator.platform || navigator.userAgent);
+const isMac = (): boolean =>
+  /mac/i.test(navigator.platform || navigator.userAgent);
 
 const MAC_SYMBOLS: Record<string, string> = {
   alt: '⌥',
@@ -23,7 +24,7 @@ const WORD_LABELS: Record<string, string> = {
 };
 
 export type FormattedShortcut = {
-  parts: string[];
+  parts: Array<string>;
   joiner: string;
 };
 
@@ -31,7 +32,10 @@ export type FormattedShortcut = {
  * Splits a combo string (e.g. "alt+shift+r") into display parts: compact
  * symbols on macOS (⌥⇧R), or words joined by "+" elsewhere (Alt+Shift+R).
  */
-export const formatShortcut = (combo: string, mac = isMac()): FormattedShortcut => {
+export const formatShortcut = (
+  combo: string,
+  mac = isMac()
+): FormattedShortcut => {
   if (combo === '') {
     return { parts: ['–'], joiner: '' };
   }
@@ -39,6 +43,12 @@ export const formatShortcut = (combo: string, mac = isMac()): FormattedShortcut 
   const raw = combo.split('+');
 
   return mac
-    ? { parts: raw.map(part => MAC_SYMBOLS[part] ?? part.toUpperCase()), joiner: '' }
-    : { parts: raw.map(part => WORD_LABELS[part] ?? part.toUpperCase()), joiner: '+' };
+    ? {
+        parts: raw.map(part => MAC_SYMBOLS[part] ?? part.toUpperCase()),
+        joiner: '',
+      }
+    : {
+        parts: raw.map(part => WORD_LABELS[part] ?? part.toUpperCase()),
+        joiner: '+',
+      };
 };

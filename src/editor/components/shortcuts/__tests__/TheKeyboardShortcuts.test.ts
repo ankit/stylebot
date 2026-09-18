@@ -3,9 +3,9 @@ import { shallowMount } from '@vue/test-utils';
 import { defaultEditorCommands } from '@stylebot/settings';
 import TheKeyboardShortcuts from '../TheKeyboardShortcuts.vue';
 
-interface TheKeyboardShortcutsInstance extends Vue {
+type TheKeyboardShortcutsInstance = {
   detachStylebotShortcuts(): void;
-}
+} & Vue;
 
 const buildMockStore = (visible: boolean) => ({
   state: {
@@ -31,7 +31,9 @@ describe('TheKeyboardShortcuts.vue', () => {
   afterEach(() => {
     // the shortcut listener is attached directly on `document`, outside of
     // Vue's lifecycle, so it must be detached manually between tests.
-    (wrapper?.vm as TheKeyboardShortcutsInstance | undefined)?.detachStylebotShortcuts();
+    (
+      wrapper?.vm as TheKeyboardShortcutsInstance | undefined
+    )?.detachStylebotShortcuts();
     wrapper?.destroy();
     wrapper = undefined;
   });

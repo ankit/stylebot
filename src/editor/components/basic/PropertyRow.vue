@@ -1,6 +1,8 @@
 <template>
   <div class="property-row" :class="{ last }">
-    <s-text size="label" variant="muted" class="property-row-label">{{ label }}</s-text>
+    <s-text size="label" variant="muted" class="property-row-label">
+      {{ label }}
+    </s-text>
     <div class="property-row-control"><slot /></div>
   </div>
 </template>
@@ -37,7 +39,8 @@ export default Vue.extend({
   align-items: center;
   gap: 12px;
   padding: 6px 0;
-  border-bottom: 1px solid color-mix(in srgb, var(--text-primary) 7%, transparent);
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--text-primary) 7%, transparent);
 
   &.last {
     padding-bottom: 2px;

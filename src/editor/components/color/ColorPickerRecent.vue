@@ -1,6 +1,8 @@
 <template>
   <div v-if="colors.length" class="recent-row">
-    <s-text size="small" variant="muted" as="span" class="heading">{{ t('color_picker_recent') }}</s-text>
+    <s-text size="small" variant="muted" as="span" class="heading">
+      {{ t('color_picker_recent') }}
+    </s-text>
     <div class="swatches">
       <button
         v-for="color in colors"

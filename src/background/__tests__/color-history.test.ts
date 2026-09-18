@@ -13,10 +13,12 @@ describe('color-history', () => {
           get: jest.fn((key: string, callback: (items: unknown) => void) => {
             callback({ [key]: stored[key] });
           }),
-          set: jest.fn((items: Record<string, unknown>, callback?: () => void) => {
-            Object.assign(stored, items);
-            callback?.();
-          }),
+          set: jest.fn(
+            (items: Record<string, unknown>, callback?: () => void) => {
+              Object.assign(stored, items);
+              callback?.();
+            }
+          ),
         },
       },
     };

@@ -38,11 +38,56 @@ export const neutralRamps: Array<ColorRamp> = [
 
 // Eight hues per column, five lightnesses per row, row 1 lightest to row 5 darkest.
 export const hueGrid: Array<Array<string>> = [
-  ['#fde8e6', '#fdeade', '#fcf3d9', '#e3f2de', '#dcf0ee', '#deeafa', '#e7e3f7', '#f9e2ef'],
-  ['#f6b4ad', '#f7bd93', '#f2dc90', '#aed9a4', '#9fd6d0', '#a6c6f0', '#b9afe4', '#eeadd1'],
-  ['#e4685e', '#e5813f', '#d9b53c', '#5fa952', '#4aa49c', '#4b87d8', '#7a6bc9', '#d267a4'],
-  ['#a83b34', '#a85722', '#9c7d1c', '#3d7434', '#2c7069', '#2c5b98', '#50438f', '#93416f'],
-  ['#5c1f1b', '#5c2f13', '#54430f', '#213f1c', '#173c38', '#173152', '#2b244e', '#50233c'],
+  [
+    '#fde8e6',
+    '#fdeade',
+    '#fcf3d9',
+    '#e3f2de',
+    '#dcf0ee',
+    '#deeafa',
+    '#e7e3f7',
+    '#f9e2ef',
+  ],
+  [
+    '#f6b4ad',
+    '#f7bd93',
+    '#f2dc90',
+    '#aed9a4',
+    '#9fd6d0',
+    '#a6c6f0',
+    '#b9afe4',
+    '#eeadd1',
+  ],
+  [
+    '#e4685e',
+    '#e5813f',
+    '#d9b53c',
+    '#5fa952',
+    '#4aa49c',
+    '#4b87d8',
+    '#7a6bc9',
+    '#d267a4',
+  ],
+  [
+    '#a83b34',
+    '#a85722',
+    '#9c7d1c',
+    '#3d7434',
+    '#2c7069',
+    '#2c5b98',
+    '#50438f',
+    '#93416f',
+  ],
+  [
+    '#5c1f1b',
+    '#5c2f13',
+    '#54430f',
+    '#213f1c',
+    '#173c38',
+    '#173152',
+    '#2b244e',
+    '#50233c',
+  ],
 ];
 
 // Single ramp, light to dark: backgrounds, then text.

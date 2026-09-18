@@ -17,10 +17,18 @@
       role="tooltip"
       class="s-tooltip-bubble"
       :class="{ 'placement-bottom': isBottom }"
-      :style="{ visibility: positioned ? 'visible' : 'hidden', transform: bubbleTransform }"
+      :style="{
+        visibility: positioned ? 'visible' : 'hidden',
+        transform: bubbleTransform,
+      }"
     >
       <span class="tooltip-text">{{ text }}</span>
-      <shortcut-kbd v-if="shortcut" small class="tooltip-shortcut" :value="shortcut" />
+      <shortcut-kbd
+        v-if="shortcut"
+        small
+        class="tooltip-shortcut"
+        :value="shortcut"
+      />
     </div>
   </span>
 </template>
@@ -41,7 +49,11 @@ let activeInstance: { hide(): void } | null = null;
 // :focus-visible isn't precise enough — Chrome marks a programmatic
 // .focus() call as visible too. Track an actual Tab press instead.
 let lastKeyWasTab = false;
-document.addEventListener('keydown', event => (lastKeyWasTab = event.key === 'Tab'), true);
+document.addEventListener(
+  'keydown',
+  event => (lastKeyWasTab = event.key === 'Tab'),
+  true
+);
 
 export default Vue.extend({
   name: 'STooltip',
@@ -192,13 +204,22 @@ export default Vue.extend({
     // A tooltip can overflow its nearest clipping ancestor (e.g. the panel's
     // own rounded-corner overflow) while still inside the viewport.
     clipRect(): { top: number; right: number; bottom: number; left: number } {
-      const rect = { top: 0, right: window.innerWidth, bottom: window.innerHeight, left: 0 };
+      const rect = {
+        top: 0,
+        right: window.innerWidth,
+        bottom: window.innerHeight,
+        left: 0,
+      };
       let node = (this.$el as HTMLElement).parentElement;
 
       while (node) {
         const style = getComputedStyle(node);
 
-        if (style.overflow !== 'visible' || style.overflowX !== 'visible' || style.overflowY !== 'visible') {
+        if (
+          style.overflow !== 'visible' ||
+          style.overflowX !== 'visible' ||
+          style.overflowY !== 'visible'
+        ) {
           const nodeRect = node.getBoundingClientRect();
           rect.top = Math.max(rect.top, nodeRect.top);
           rect.right = Math.min(rect.right, nodeRect.right);

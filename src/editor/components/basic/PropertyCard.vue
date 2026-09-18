@@ -5,7 +5,11 @@
         <span class="property-card-label">{{ label }}</span>
         <s-count-badge v-if="count > 0" :count="count" />
       </span>
-      <chevron-down-icon :size="11" class="property-card-chevron" :class="{ collapsed }" />
+      <chevron-down-icon
+        :size="11"
+        class="property-card-chevron"
+        :class="{ collapsed }"
+      />
     </button>
 
     <div
@@ -14,7 +18,10 @@
       :inert="collapsed"
       @transitionend="onTransitionEnd"
     >
-      <div class="property-card-body" :class="{ 'clip-while-animating': !settled }">
+      <div
+        class="property-card-body"
+        :class="{ 'clip-while-animating': !settled }"
+      >
         <slot />
       </div>
     </div>
@@ -155,7 +162,8 @@ export default Vue.extend({
   .property-card-collapse.collapsed & {
     padding-bottom: 0;
     opacity: 0;
-    transition: padding-bottom 0.24s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.1s ease;
+    transition: padding-bottom 0.24s cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 0.1s ease;
   }
 
   @media (prefers-reduced-motion: reduce) {

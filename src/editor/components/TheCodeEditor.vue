@@ -95,7 +95,9 @@ export default Vue.extend({
       const contentWindow = this.getIframeContentWindow();
 
       if (contentWindow) {
-        const message: ParentFocusEditorMessage = { type: 'stylebotFocusEditor' };
+        const message: ParentFocusEditorMessage = {
+          type: 'stylebotFocusEditor',
+        };
         contentWindow.postMessage(message, chrome.runtime.getURL('*'));
       }
     },

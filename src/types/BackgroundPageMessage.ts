@@ -108,6 +108,11 @@ export type GetImportCss = {
   url: string;
 };
 
+export type GetGoogleWebFontExists = {
+  name: 'GetGoogleWebFontExists';
+  url: string;
+};
+
 export type RunGoogleDriveSync = {
   name: 'RunGoogleDriveSync';
 };
@@ -142,6 +147,7 @@ type BackgroundPageMessage =
   | GetReadabilitySettings
   | SetReadabilitySettings
   | GetImportCss
+  | GetGoogleWebFontExists
   | RunGoogleDriveSync
   | GetRecentColors
   | AddRecentColor;

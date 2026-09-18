@@ -30,7 +30,9 @@ const fontFaceCss = (): string =>
           font-style: normal;
           font-weight: ${weight};
           font-display: swap;
-          src: url('${chrome.runtime.getURL(`fonts/${file}-${weight}.woff2`)}') format('woff2');
+          src: url('${chrome.runtime.getURL(
+            `fonts/${file}-${weight}.woff2`
+          )}') format('woff2');
         }
       `
     )

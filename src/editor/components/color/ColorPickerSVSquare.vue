@@ -7,7 +7,10 @@
     @pointermove="onPointerMove"
     @pointerup="onPointerUp"
   >
-    <div class="thumb" :style="{ left: thumbLeft, top: thumbTop, background: color }" />
+    <div
+      class="thumb"
+      :style="{ left: thumbLeft, top: thumbTop, background: color }"
+    />
   </div>
 </template>
 

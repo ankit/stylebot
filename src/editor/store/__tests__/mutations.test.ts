@@ -21,7 +21,9 @@ describe('mutations', () => {
     });
 
     it('selectors sorted alphabetically when style count is the same', () => {
-      const root = postcss.parse('b { color: red; } a { color: green; } c { color: blue; }');
+      const root = postcss.parse(
+        'b { color: red; } a { color: green; } c { color: blue; }'
+      );
       const state = { ...mockState };
 
       mutations.setSelectors(state, root);

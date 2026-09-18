@@ -9,7 +9,11 @@
         @click="toggle"
       >
         <span class="select-value">{{ text }}</span>
-        <chevron-down-icon :size="10" class="select-chevron" :class="{ open }" />
+        <chevron-down-icon
+          :size="10"
+          class="select-chevron"
+          :class="{ open }"
+        />
       </button>
     </template>
 

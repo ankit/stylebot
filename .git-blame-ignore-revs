@@ -1,0 +1,6 @@
+# Revisions to skip when running `git blame`.
+# Enable locally with:
+#   git config blame.ignoreRevsFile .git-blame-ignore-revs
+
+# style: format the repo with Prettier
+60ed891687c6a6fff278cc25b4c7f7c51ea32cb8

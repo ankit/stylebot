@@ -11,7 +11,10 @@
         <the-presets-editor v-else-if="mode === 'magic'" />
 
         <!-- Stays mounted (just hidden) once opened — Monaco is too expensive to reload on every mode switch/resize. -->
-        <the-code-editor v-if="codeEditorMounted" v-show="mode === 'code' && !resizing" />
+        <the-code-editor
+          v-if="codeEditorMounted"
+          v-show="mode === 'code' && !resizing"
+        />
       </div>
     </div>
   </the-stylebot-resizer>

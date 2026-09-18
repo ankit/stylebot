@@ -91,7 +91,9 @@ describe('applyReadability()', () => {
     await applyReadability();
     await flushPromises();
 
-    expect(eligibilityCacheModule.markEligible).toBeCalledWith(window.location.href);
+    expect(eligibilityCacheModule.markEligible).toBeCalledWith(
+      window.location.href
+    );
   });
 
   it('should show the loader when the url matches a pattern already learned for this origin', async () => {
@@ -158,7 +160,9 @@ describe('applyReadability()', () => {
   });
 
   it('should revert immediately without retrying when blocked after load', async () => {
-    (isBlockedAfterLoadModule.isBlockedAfterLoad as jest.Mock).mockReturnValue(true);
+    (isBlockedAfterLoadModule.isBlockedAfterLoad as jest.Mock).mockReturnValue(
+      true
+    );
 
     await applyReadability();
     await flushPromises();
@@ -193,7 +197,9 @@ describe('applyReadability()', () => {
   });
 
   it('should cancel a pending retry when readability is turned off in the meantime', async () => {
-    (mountReaderModule.mountReader as jest.Mock).mockRejectedValueOnce(undefined);
+    (mountReaderModule.mountReader as jest.Mock).mockRejectedValueOnce(
+      undefined
+    );
 
     await applyReadability();
     await flushPromises();

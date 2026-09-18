@@ -1,0 +1,15 @@
+dist
+firefox-dist
+node_modules
+coverage
+test-results
+playwright-report
+patches
+yarn.lock
+CHANGELOG.md
+
+# Separate Gatsby project with its own toolchain.
+docs
+
+# Prompt content — the manual line wrapping there is deliberate.
+.claude

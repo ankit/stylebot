@@ -40,7 +40,8 @@ export const seedStyles = async (
   styles: Record<string, SeededStyle>
 ): Promise<void> => {
   const worker =
-    context.serviceWorkers()[0] ?? (await context.waitForEvent('serviceworker'));
+    context.serviceWorkers()[0] ??
+    (await context.waitForEvent('serviceworker'));
 
   await worker.evaluate(
     seeded =>
@@ -70,7 +71,9 @@ export const openEditor = async (
   await page.bringToFront();
 
   const popup = await openPopup();
-  await popup.getByRole('button', { name: /^Style this page/ }).dispatchEvent('click');
+  await popup
+    .getByRole('button', { name: /^Style this page/ })
+    .dispatchEvent('click');
 
   const editorRoot = page.locator('#stylebot');
   // Vue mounts TheStylebotApp by replacing the #stylebot-app mount div with
@@ -80,7 +83,11 @@ export const openEditor = async (
   return editorRoot;
 };
 
-const MODE_LABEL = { basic: 'Basic', code: 'Code', magic: 'Magic' } as const;
+const MODE_LABEL = {
+  basic: 'Basic',
+  code: 'Code',
+  presets: 'Presets',
+} as const;
 
 export const switchEditorMode = async (
   editorRoot: Locator,
@@ -93,4 +100,5 @@ export const switchEditorMode = async (
 
 // The Monaco iframe is nested inside the editor's open shadow root; Playwright's
 // selector engine pierces open shadow roots, so a plain CSS selector reaches it.
-export const getMonacoFrame = (page: Page) => page.frameLocator('#stylebot iframe');
+export const getMonacoFrame = (page: Page) =>
+  page.frameLocator('#stylebot iframe');

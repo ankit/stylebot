@@ -11,16 +11,43 @@
 
     <template #default="{ close }">
       <s-menu dense class="appearance-menu">
-        <menu-item :selected="appearance === 'light'" @click="setAppearance('light'); close();">
-          <span class="menu-item-row"><sun-icon /><span>{{ t('appearance_light') }}</span></span>
+        <menu-item
+          :selected="appearance === 'light'"
+          @click="
+            setAppearance('light');
+            close();
+          "
+        >
+          <span class="menu-item-row">
+            <sun-icon />
+            <span>{{ t('appearance_light') }}</span>
+          </span>
         </menu-item>
 
-        <menu-item :selected="appearance === 'dark'" @click="setAppearance('dark'); close();">
-          <span class="menu-item-row"><moon-icon /><span>{{ t('appearance_dark') }}</span></span>
+        <menu-item
+          :selected="appearance === 'dark'"
+          @click="
+            setAppearance('dark');
+            close();
+          "
+        >
+          <span class="menu-item-row">
+            <moon-icon />
+            <span>{{ t('appearance_dark') }}</span>
+          </span>
         </menu-item>
 
-        <menu-item :selected="appearance === 'system'" @click="setAppearance('system'); close();">
-          <span class="menu-item-row"><monitor-icon /><span>{{ t('appearance_system') }}</span></span>
+        <menu-item
+          :selected="appearance === 'system'"
+          @click="
+            setAppearance('system');
+            close();
+          "
+        >
+          <span class="menu-item-row">
+            <monitor-icon />
+            <span>{{ t('appearance_system') }}</span>
+          </span>
         </menu-item>
       </s-menu>
     </template>
@@ -29,7 +56,13 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { AnchoredMenu, SMenu, MenuItem, IconButton, STooltip } from '@stylebot/components';
+import {
+  AnchoredMenu,
+  SMenu,
+  MenuItem,
+  IconButton,
+  STooltip,
+} from '@stylebot/components';
 import { SunIcon, MoonIcon, MonitorIcon } from '@stylebot/icons';
 import { resolveAppearance, getSystemPreference } from '@stylebot/utils';
 

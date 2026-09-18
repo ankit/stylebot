@@ -1,10 +1,14 @@
 <template>
   <span class="shortcut-kbd" :class="{ small }">
     <template v-for="(part, index) in formatted.parts">
-      <kbd :key="index">{{ part }}</kbd
-      ><span v-if="index < formatted.parts.length - 1" :key="`joiner-${index}`" class="joiner">{{
-        formatted.joiner
-      }}</span>
+      <kbd :key="index">{{ part }}</kbd>
+      <span
+        v-if="index < formatted.parts.length - 1"
+        :key="`joiner-${index}`"
+        class="joiner"
+      >
+        {{ formatted.joiner }}
+      </span>
     </template>
   </span>
 </template>

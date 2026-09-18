@@ -14,28 +14,47 @@
           class="dock-toggle"
           :value="layout.dockLocation"
           :options="dockOptions"
-          @change="dock($event); close();"
+          @change="
+            dock($event);
+            close();
+          "
         />
 
         <div class="push-page-row">
           <div class="push-page-copy">
             <s-text>{{ t('adjust_page_layout') }}</s-text>
-            <s-text size="caption" variant="muted">{{ t('adjust_page_layout_description') }}</s-text>
+            <s-text size="caption" variant="muted">
+              {{ t('adjust_page_layout_description') }}
+            </s-text>
           </div>
 
-          <toggle-switch :value="adjustPageLayout" size="lg" @change="toggleAdjustPageLayout" />
+          <toggle-switch
+            :value="adjustPageLayout"
+            size="lg"
+            @change="toggleAdjustPageLayout"
+          />
         </div>
 
         <hr class="more-menu-divider" />
 
-        <menu-item @click="keyboardShortcuts(); close();">
+        <menu-item
+          @click="
+            keyboardShortcuts();
+            close();
+          "
+        >
           <span class="menu-item-row">
             <span>{{ t('view_keyboard_shortcuts') }}</span>
             <span class="menu-item-hint">{{ editorCommands.help }}</span>
           </span>
         </menu-item>
 
-        <menu-item @click="optionsPage(); close();">
+        <menu-item
+          @click="
+            optionsPage();
+            close();
+          "
+        >
           <span class="menu-item-row">
             <span>{{ t('view_all_styles_and_settings') }}</span>
             <external-link-icon />
@@ -89,7 +108,12 @@ export default Vue.extend({
       return this.$store.state.editorCommands;
     },
 
-    dockOptions(): Array<{ value: string; label: string; title: string; shortcut: string }> {
+    dockOptions(): Array<{
+      value: string;
+      label: string;
+      title: string;
+      shortcut: string;
+    }> {
       return [
         {
           value: 'left',

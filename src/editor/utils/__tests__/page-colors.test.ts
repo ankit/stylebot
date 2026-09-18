@@ -46,7 +46,11 @@ describe('page-colors', () => {
         <div style="background-color: transparent; color: #555555;">transparent-bg</div>
       `;
 
-      expect(getPageColors(root)).toEqual({ text: ['rgb(85, 85, 85)'], surface: [], total: 1 });
+      expect(getPageColors(root)).toEqual({
+        text: ['rgb(85, 85, 85)'],
+        surface: [],
+        total: 1,
+      });
     });
 
     it('ranks a color repeated across more elements above one seen once', () => {

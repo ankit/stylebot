@@ -1,8 +1,14 @@
 <template>
   <div class="more-properties">
-    <div v-for="decl in declarations" :key="decl.property" class="more-property-row">
+    <div
+      v-for="decl in declarations"
+      :key="decl.property"
+      class="more-property-row"
+    >
       <s-text class="more-property-key">{{ decl.property }}</s-text>
-      <s-text variant="primary" class="more-property-value">{{ decl.value }}</s-text>
+      <s-text variant="primary" class="more-property-value">
+        {{ decl.value }}
+      </s-text>
 
       <button
         type="button"
@@ -44,7 +50,8 @@
       :disabled="disabled"
       @click="startAdd"
     >
-      <span class="add-property-plus">+</span> {{ t('add_property') }}
+      <span class="add-property-plus">+</span>
+      {{ t('add_property') }}
     </button>
   </div>
 </template>
@@ -135,7 +142,8 @@ export default Vue.extend({
   align-items: center;
   gap: 9px;
   padding: 6px 0;
-  border-bottom: 1px solid color-mix(in srgb, var(--text-primary) 7%, transparent);
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--text-primary) 7%, transparent);
 }
 
 .more-property-key {

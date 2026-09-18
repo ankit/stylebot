@@ -15,7 +15,7 @@ class BackgroundPageUtils {
    * Check if a given string is a regular expression (starts with ^)
    */
   private static isRegex(str: string) {
-    return str.indexOf('^') == 0;
+    return str.indexOf('^') === 0;
   }
 
   /***
@@ -35,7 +35,7 @@ class BackgroundPageUtils {
    * Check if the page url matches with a single url string.
    */
   private static matchesUrl(pageUrlString: string, url: string) {
-    const exactMatchParts: (keyof URL)[] = [
+    const exactMatchParts: Array<keyof URL> = [
       'username',
       'password',
       'port',
@@ -113,7 +113,7 @@ class BackgroundPageUtils {
           That's why I replaced the * with an ^ to check
           for patterns of the form `*something`
         */
-        .replace(/(^|\\\.|[^\.])\*/g, '$1[^/]*');
+        .replace(/(^|\\\.|[^.])\*/g, '$1[^/]*');
       /* Enclose the pattern in ( ) if it has several urls separated by , */
       pattern = hasComma ? '(' + pattern + ')' : pattern;
 

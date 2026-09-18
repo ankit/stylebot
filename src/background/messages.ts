@@ -9,6 +9,7 @@ import {
   setReadability,
   refreshBadgeForTab,
   getImportCss,
+  getGoogleWebFontExists,
   applyStylesToAllTabs,
 } from './styles';
 
@@ -35,6 +36,7 @@ import {
   ReadabilityActiveChanged as ReadabilityActiveChangedType,
   SetReadabilitySettings as SetReadabilitySettingsType,
   GetImportCss as GetImportCssType,
+  GetGoogleWebFontExists as GetGoogleWebFontExistsType,
   RunGoogleDriveSync as RunGoogleDriveSyncType,
   AddRecentColor as AddRecentColorType,
   GetCommandsResponse,
@@ -44,6 +46,7 @@ import {
   GetStylesForPageResponse,
   GetReadabilitySettingsResponse,
   GetImportCssResponse,
+  GetGoogleWebFontExistsResponse,
   RunGoogleDriveSyncResponse,
   GetRecentColorsResponse,
   AddRecentColorResponse,
@@ -207,6 +210,15 @@ export const GetImportCss = async (
 ): Promise<void> => {
   const css = await getImportCss(message.url);
   sendResponse(css);
+};
+
+export const GetGoogleWebFontExists = async (
+  message: GetGoogleWebFontExistsType,
+
+  sendResponse: (response: GetGoogleWebFontExistsResponse) => void
+): Promise<void> => {
+  const exists = await getGoogleWebFontExists(message.url);
+  sendResponse(exists);
 };
 
 export const RunGoogleDriveSync = async (

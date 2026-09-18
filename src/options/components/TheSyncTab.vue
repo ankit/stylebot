@@ -10,14 +10,18 @@
 
     <div>
       <heading as="h1">{{ t('sync_options') }}</heading>
-      <s-text variant="muted" class="description">Keep your styles on every computer you sign in to.</s-text>
+      <s-text variant="muted" class="description">
+        Keep your styles on every computer you sign in to.
+      </s-text>
 
       <the-google-drive-sync />
     </div>
 
     <div class="section">
       <heading as="h2">{{ t('backup') }}</heading>
-      <s-text variant="muted" class="description">{{ t('backup_description') }}</s-text>
+      <s-text variant="muted" class="description">
+        {{ t('backup_description') }}
+      </s-text>
 
       <div class="buttons">
         <s-button @click="exportJson">{{ t('export') }}</s-button>

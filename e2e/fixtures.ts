@@ -1,10 +1,21 @@
-import { test as base, chromium, type BrowserContext, type Page, type TestInfo, type WorkerInfo } from '@playwright/test';
+import {
+  test as base,
+  chromium,
+  type BrowserContext,
+  type Page,
+  type TestInfo,
+  type WorkerInfo,
+} from '@playwright/test';
 import fs from 'node:fs';
 import type http from 'node:http';
 import os from 'node:os';
 import path from 'node:path';
 
 const DIST_PATH = path.resolve(__dirname, '..', 'dist');
+
+// Mirrors scripts/launch-chrome.mjs — `yarn test:e2e:edge` runs the suite on Edge,
+// which uses the same dist/ build as Chrome.
+const CHANNEL = process.env.STYLEBOT_BROWSER === 'edge' ? 'msedge' : 'chrome';
 
 // --ui mode force-manages tracing (a live `use.trace` flag) on every context,
 // including ours — fighting it for control throws, so skip ours when detected.
@@ -38,7 +49,11 @@ export async function closeServer(server: http.Server): Promise<void> {
   await closed;
 }
 
-type Instance = { context: BrowserContext; userDataDir: string; extensionId: string };
+type Instance = {
+  context: BrowserContext;
+  userDataDir: string;
+  extensionId: string;
+};
 
 // One browser+extension instance per worker, reused across every test file that worker
 // runs — get() relaunches it on demand if the shared Chrome process died mid-suite.
@@ -87,7 +102,7 @@ class BrowserPool {
     // Chrome 137+ removed --load-extension; CDP's Extensions domain replaces it below.
     const context = await chromium.launchPersistentContext(userDataDir, {
       headless,
-      channel: 'chrome',
+      channel: CHANNEL,
       chromiumSandbox: true,
       viewport: null,
       // null leaves prefers-color-scheme unemulated, matching the real OS setting.
@@ -125,11 +140,15 @@ class BrowserPool {
     // Screenshots are the expensive part of continuous per-worker tracing; DOM
     // snapshots alone are cheap and still enough to debug a failure from.
     if (!this.liveTraceMode) {
-      await safeTracing(() => context.tracing.start({ screenshots: false, snapshots: true }));
+      await safeTracing(() =>
+        context.tracing.start({ screenshots: false, snapshots: true })
+      );
     }
 
     const cdp = await context.browser()!.newBrowserCDPSession();
-    const { id: extensionId } = await cdp.send('Extensions.loadUnpacked', { path: DIST_PATH });
+    const { id: extensionId } = await cdp.send('Extensions.loadUnpacked', {
+      path: DIST_PATH,
+    });
 
     const instance: Instance = { context, userDataDir, extensionId };
     this.instances.push(instance);
@@ -167,7 +186,10 @@ export const test = base.extend<
 >({
   browserPool: [
     async ({}, use, workerInfo) => {
-      const pool = new BrowserPool(workerInfo, isLiveTraceMode(workerInfo.project.use));
+      const pool = new BrowserPool(
+        workerInfo,
+        isLiveTraceMode(workerInfo.project.use)
+      );
       await use(pool);
       await pool.closeAll();
     },
@@ -200,10 +222,15 @@ export const test = base.extend<
     if (!liveTraceMode) {
       if (testInfo.status !== testInfo.expectedStatus) {
         const tracePath = testInfo.outputPath('trace.zip');
-        const saved = await safeTracing(() => context.tracing.stopChunk({ path: tracePath }));
+        const saved = await safeTracing(() =>
+          context.tracing.stopChunk({ path: tracePath })
+        );
         if (saved) {
           // Named 'trace' so the HTML reporter shows its built-in "View trace" button.
-          await testInfo.attach('trace', { path: tracePath, contentType: 'application/zip' });
+          await testInfo.attach('trace', {
+            path: tracePath,
+            contentType: 'application/zip',
+          });
         }
       } else {
         await safeTracing(() => context.tracing.stopChunk());
@@ -238,8 +265,14 @@ export const test = base.extend<
 
     const open = async (): Promise<Page> => {
       // Filtered so the onInstalled help tab can't win this race instead.
-      const pagePromise = context.waitForEvent('page', p => p.url() === popupUrl);
-      await cdp.send('Target.createTarget', { url: popupUrl, background: true });
+      const pagePromise = context.waitForEvent(
+        'page',
+        p => p.url() === popupUrl
+      );
+      await cdp.send('Target.createTarget', {
+        url: popupUrl,
+        background: true,
+      });
       return pagePromise;
     };
 

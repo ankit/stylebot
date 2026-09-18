@@ -1,7 +1,12 @@
 <template>
   <feature-card :label="t('readability')">
     <template #toggle>
-      <toggle-switch size="lg" :value="value" :disabled="!pageReaderable" @change="setValue" />
+      <toggle-switch
+        size="lg"
+        :value="value"
+        :disabled="!pageReaderable"
+        @change="setValue"
+      />
     </template>
 
     <s-text variant="muted">{{ t('readability_description') }}</s-text>

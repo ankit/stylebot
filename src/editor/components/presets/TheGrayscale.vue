@@ -7,7 +7,13 @@
     <s-text variant="muted">{{ t('grayscale_description') }}</s-text>
 
     <div v-if="active" class="grayscale-slider-row">
-      <s-slider :value="percent" :min="1" :max="100" :step="1" @input="setPercent" />
+      <s-slider
+        :value="percent"
+        :min="1"
+        :max="100"
+        :step="1"
+        @input="setPercent"
+      />
 
       <s-text size="body" class="grayscale-value">{{ percent }} %</s-text>
     </div>
@@ -61,9 +67,10 @@ export default Vue.extend({
     },
 
     apply(percent: number): void {
+      // applyFilter compares against the string '0' to decide removal.
       this.$store.dispatch('applyFilter', {
         effectName: 'grayscale',
-        percent,
+        percent: String(percent),
       });
     },
   },

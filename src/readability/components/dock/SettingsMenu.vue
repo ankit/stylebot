@@ -108,14 +108,8 @@ export default Vue.extend({
     },
 
     reset(): void {
-      const {
-        theme,
-        font,
-        size,
-        width,
-        justify,
-        lineHeight,
-      } = defaultReadabilitySettings;
+      const { theme, font, size, width, justify, lineHeight } =
+        defaultReadabilitySettings;
       this.emitUpdate({ theme, font, size, width, justify, lineHeight });
     },
   },

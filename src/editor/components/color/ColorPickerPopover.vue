@@ -1,6 +1,11 @@
 <template>
   <div class="color-picker-popover">
-    <color-picker-header :value="value" :role-label="roleLabel" @input="commit" @clear="setColor('')" />
+    <color-picker-header
+      :value="value"
+      :role-label="roleLabel"
+      @input="commit"
+      @clear="setColor('')"
+    />
 
     <color-picker-tabs
       :value="activeTab"
@@ -18,9 +23,18 @@
         @select="commit"
       />
 
-      <color-picker-palette v-else-if="activeTab === 'palette'" :value="value" @select="commit" />
+      <color-picker-palette
+        v-else-if="activeTab === 'palette'"
+        :value="value"
+        @select="commit"
+      />
 
-      <color-picker-custom v-else :value="value" @input="setColor" @commit="commit" />
+      <color-picker-custom
+        v-else
+        :value="value"
+        @input="setColor"
+        @commit="commit"
+      />
     </div>
 
     <color-picker-footer :value="value" @input="setColor" @commit="commit" />
@@ -91,7 +105,9 @@ export default Vue.extend({
     },
 
     firstTabColors(): RoleColorGroups {
-      return this.firstTabSource === 'rules' ? this.alreadyUsedColors : this.pageColors;
+      return this.firstTabSource === 'rules'
+        ? this.alreadyUsedColors
+        : this.pageColors;
     },
 
     firstTabDisabled(): boolean {
@@ -113,9 +129,14 @@ export default Vue.extend({
     }
 
     const lastTab = this.$store.state.options.lastColorPickerTab as Tab;
-    const canRestoreLastTab = lastTab !== 'already-used' || !this.firstTabDisabled;
+    const canRestoreLastTab =
+      lastTab !== 'already-used' || !this.firstTabDisabled;
 
-    this.activeTab = canRestoreLastTab ? lastTab : this.firstTabDisabled ? 'custom' : 'already-used';
+    this.activeTab = canRestoreLastTab
+      ? lastTab
+      : this.firstTabDisabled
+      ? 'custom'
+      : 'already-used';
 
     getRecentColors().then(colors => {
       this.recentColors = colors;

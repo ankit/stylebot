@@ -1,14 +1,12 @@
 <template>
   <div>
     <heading as="h2">{{ t('fonts') }}</heading>
-    <s-text variant="muted" class="description">{{ t('fonts_description') }}</s-text>
+    <s-text variant="muted" class="description">
+      {{ t('fonts_description') }}
+    </s-text>
 
     <div class="fonts-box" @click="focusInput">
-      <span
-        v-for="(font, index) in fonts"
-        :key="font"
-        class="chip"
-      >
+      <span v-for="(font, index) in fonts" :key="font" class="chip">
         {{ font }}
         <button
           type="button"
@@ -31,11 +29,7 @@
       />
     </div>
 
-    <a
-      class="link"
-      target="_blank"
-      href="https://fonts.google.com/"
-    >
+    <a class="link" target="_blank" href="https://fonts.google.com/">
       {{ t('browse_google_fonts') }}
     </a>
   </div>
@@ -156,7 +150,11 @@ export default Vue.extend({
   }
 
   &:hover {
-    background: color-mix(in srgb, var(--text-primary) 8%, var(--panel-surface));
+    background: color-mix(
+      in srgb,
+      var(--text-primary) 8%,
+      var(--panel-surface)
+    );
     color: var(--text-primary);
   }
 

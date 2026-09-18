@@ -22,7 +22,7 @@ export const set = (value: ReadabilitySettings): Promise<void> => {
       resolve();
 
       chrome.tabs.query({ active: true }, ([tab]) => {
-        if (tab && tab.url && tab.id) {
+        if (tab?.url && tab.id) {
           const message: UpdateReader = {
             name: 'UpdateReader',
             value,

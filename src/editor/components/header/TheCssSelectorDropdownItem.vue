@@ -11,7 +11,11 @@
       <span class="chips">
         <s-chip v-for="(part, i) in parts" :key="i">{{ part }}</s-chip>
       </span>
-      <s-count-badge v-if="styleCount > 0" :count="styleCount" class="style-count" />
+      <s-count-badge
+        v-if="styleCount > 0"
+        :count="styleCount"
+        class="style-count"
+      />
     </span>
   </menu-item>
 </template>

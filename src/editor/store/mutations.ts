@@ -61,7 +61,9 @@ export default {
           value: rule.selector,
           styleCount,
         });
-      } catch (e) {}
+      } catch (e) {
+        // querySelectorAll throws on selectors it can't parse; skip those rules.
+      }
     });
 
     // sort in descending order of number of declared styles
@@ -70,9 +72,8 @@ export default {
         return b.styleCount - a.styleCount;
       } else if (b.value > a.value) {
         return -1;
-      } else {
-        return 1;
       }
+      return 1;
     });
 
     state.selectors = selectors;
