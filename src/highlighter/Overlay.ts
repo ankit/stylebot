@@ -37,15 +37,6 @@ function hasKey<O>(obj: O, key: string | number | symbol): key is keyof O {
 // OverlayRect's colors are fixed to roughly match Chrome devtools,
 // deliberately independent of Stylebot's own active theme.
 
-/**
- * Drops the translucent fill once the box covers most of the viewport,
- * since tinting the whole page reads as broken rather than highlighted.
- */
-function coversViewport(box: { width: number; height: number }): boolean {
-  const viewportArea = window.innerWidth * window.innerHeight;
-  return viewportArea > 0 && (box.width * box.height) / viewportArea > 0.6;
-}
-
 class OverlayRect {
   node: HTMLElement;
   border: HTMLElement;
@@ -105,9 +96,7 @@ class OverlayRect {
         'px',
     });
 
-    this.content.style.backgroundColor = coversViewport(box)
-      ? 'transparent'
-      : overlayStyles.background;
+    this.content.style.backgroundColor = overlayStyles.background;
 
     if (property) {
       if (property !== 'height' && property !== 'width') {
