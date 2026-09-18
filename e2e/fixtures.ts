@@ -13,6 +13,10 @@ import path from 'node:path';
 
 const DIST_PATH = path.resolve(__dirname, '..', 'dist');
 
+// Mirrors scripts/launch-chrome.mjs — `yarn test:e2e:edge` runs the suite on Edge,
+// which uses the same dist/ build as Chrome.
+const CHANNEL = process.env.STYLEBOT_BROWSER === 'edge' ? 'msedge' : 'chrome';
+
 // --ui mode force-manages tracing (a live `use.trace` flag) on every context,
 // including ours — fighting it for control throws, so skip ours when detected.
 function isLiveTraceMode(use: { trace?: unknown }): boolean {
@@ -94,7 +98,7 @@ class BrowserPool {
     // Chrome 137+ removed --load-extension; CDP's Extensions domain replaces it below.
     const context = await chromium.launchPersistentContext(userDataDir, {
       headless,
-      channel: 'chrome',
+      channel: CHANNEL,
       chromiumSandbox: true,
       viewport: null,
       // null leaves prefers-color-scheme unemulated, matching the real OS setting.
