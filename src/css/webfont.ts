@@ -1,5 +1,27 @@
 import { parse } from 'postcss';
 
+import {
+  GetGoogleWebFontExists,
+  GetGoogleWebFontExistsResponse,
+} from '@stylebot/types';
+
+/**
+ * Checked from the background page because a content script's fetch runs in
+ * the page's context, where Firefox enforces the page's CSP on it (see #754).
+ */
+const googleWebFontExists = (url: string): Promise<boolean> =>
+  new Promise(resolve => {
+    const message: GetGoogleWebFontExists = {
+      name: 'GetGoogleWebFontExists',
+      url,
+    };
+
+    chrome.runtime.sendMessage(
+      message,
+      (response: GetGoogleWebFontExistsResponse) => resolve(!!response)
+    );
+  });
+
 const getGoogleFontUrlAndParams = (
   value: string
 ): { url: string; params: string } => {
@@ -21,38 +43,28 @@ export const addGoogleWebFont = async (
   const root = parse(css);
   const { url, params } = getGoogleFontUrlAndParams(value);
 
-  return new Promise(resolve => {
-    fetch(url)
-      .then(response => {
-        if (response.status === 400) {
-          resolve(css);
-          return;
-        }
+  if (!(await googleWebFontExists(url))) {
+    return css;
+  }
 
-        let importExists = false;
-        root.walkAtRules('import', atRule => {
-          if (atRule.params === params) {
-            importExists = true;
-          }
-        });
-
-        if (!importExists) {
-          const rule = parse(`@import ${params};`);
-          root.prepend(rule);
-
-          const next = root.first?.next();
-          if (next) {
-            next.raws.before = '\n\n';
-          }
-        }
-
-        resolve(root.toString());
-      })
-      .catch(err => {
-        console.error(err);
-        resolve(css);
-      });
+  let importExists = false;
+  root.walkAtRules('import', atRule => {
+    if (atRule.params === params) {
+      importExists = true;
+    }
   });
+
+  if (!importExists) {
+    const rule = parse(`@import ${params};`);
+    root.prepend(rule);
+
+    const next = root.first?.next();
+    if (next) {
+      next.raws.before = '\n\n';
+    }
+  }
+
+  return root.toString();
 };
 
 /**

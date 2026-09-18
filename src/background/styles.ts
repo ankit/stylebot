@@ -147,6 +147,12 @@ export const move = async (src: string, dest: string): Promise<void> => {
   }
 };
 
+export const getGoogleWebFontExists = (url: string): Promise<boolean> => {
+  return fetch(url)
+    .then(response => response.status !== 400)
+    .catch(() => false);
+};
+
 export const getImportCss = (url: string): Promise<string> => {
   return new Promise(resolve => {
     fetch(url)
