@@ -76,7 +76,7 @@ Releases go through a pull request from a `release/vX.Y.Z` branch — the `relea
 - Add entry to `CHANGELOG`
 - Update version in `package.json` and `src/extension/manifest.json`
 - Open the PR and wait for `build`, `validation`, `e2e` and `e2e (edge)` to pass
-- Squash-merge, then create the GitHub Release with tag `vX.Y.Z`
+- Squash-merge — the GitHub Release and its `vX.Y.Z` tag are then created automatically from the changelog entry
 - Chrome and Edge: Run `yarn build` and manually create zip for distribution from `dist/`
 - Firefox: Run `yarn build:firefox` and manually create zip for distribution from `firefox-dist/`
 

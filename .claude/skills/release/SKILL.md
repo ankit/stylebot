@@ -31,6 +31,9 @@ Prepend a new section to `CHANGELOG.md` (newest first):
 - Short description of the change (#PR)
 ```
 
+Keep that heading format exactly — `.github/workflows/release.yml` parses it to build the
+release body, and a heading it can't match fails the release.
+
 Write entries from the user's perspective — what changed for someone using the
 extension, not what changed in the code. Every bullet ends with its `(#PR)` reference.
 `git log --oneline <last-release-tag>..HEAD` gives you the raw material; PR numbers are
@@ -74,11 +77,16 @@ Four checks must pass before merging:
 If `e2e (edge)` shows as *skipped*, the branch name is wrong: it must start with
 `release/`. A skipped run is not a passed run.
 
-## 6. Merge and tag
+## 6. Merge
 
-Squash-merge the PR, then create the GitHub Release against the resulting commit on
-`main` with tag `vX.Y.Z` (matching the existing `v3.2.0`–`v3.2.4` tags). Use the
-changelog section as the release body.
+Squash-merge the PR. `.github/workflows/release.yml` then creates the GitHub Release
+automatically: it reads the version from `package.json`, tags the squashed commit
+`vX.Y.Z`, and uses that version's `CHANGELOG.md` section as the release body.
+
+Nothing to do by hand — but check the workflow went green. It fails loudly rather than
+publishing something wrong if the tag already exists, if `package.json` and
+`src/extension/manifest.json` disagree on the version, or if the changelog section is
+missing.
 
 ## 7. Build the store packages
 
