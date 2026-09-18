@@ -22,9 +22,9 @@ export default (local: StyleMap, remote: StyleMap): StyleMap => {
       compareModifiedTime(remote[url].modifiedTime, local[url].modifiedTime) > 0
     ) {
       styles[url] = remote[url];
+    } else {
+      styles[url] = local[url];
     }
-
-    styles[url] = local[url];
   });
 
   const remainingUrls = Object.keys(remote).filter(url => !urls.includes(url));
