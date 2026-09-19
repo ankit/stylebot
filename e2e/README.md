@@ -27,8 +27,8 @@ yarn e2e --edge --headed style-host-path
 yarn e2e --firefox --debug --no-build style-important-override
 ```
 
-`yarn test:e2e` is an alias for `yarn e2e`. Failing tests attach a trace, which the HTML
-report (`playwright-report/`) opens with "View trace".
+Failing tests attach a trace, which the HTML report (`playwright-report/`) opens with
+"View trace".
 
 ## How the extension gets loaded
 

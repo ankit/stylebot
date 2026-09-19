@@ -14,9 +14,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { FirefoxExtension } from './firefox-rdp';
 
-// Mirrors scripts/launch-chrome.mjs — `yarn test:e2e:edge` runs the suite on Edge,
-// which uses the same dist/ build as Chrome. `yarn test:e2e:firefox` runs it on
-// Firefox against the separate firefox-dist/ build.
+// Set by scripts/e2e.mjs (`yarn e2e --edge` / `--firefox`). Edge uses the same
+// dist/ build as Chrome; Firefox runs against the separate firefox-dist/ build.
 const BROWSER = process.env.STYLEBOT_BROWSER ?? 'chrome';
 export const IS_FIREFOX = BROWSER === 'firefox';
 const CHANNEL = BROWSER === 'edge' ? 'msedge' : 'chrome';
@@ -125,7 +124,7 @@ class BrowserPool {
   private async launch(): Promise<Instance> {
     if (!fs.existsSync(DIST_PATH)) {
       throw new Error(
-        `No build found at ${DIST_PATH} — run \`yarn build\` before the e2e suite (\`yarn test:e2e\` does this for you).`
+        `No build found at ${DIST_PATH} — run \`yarn build\` before the e2e suite (\`yarn e2e\` does this for you).`
       );
     }
 
