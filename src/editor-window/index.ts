@@ -55,6 +55,16 @@ const start = async (): Promise<void> => {
     }
   });
 
+  // Picking an element happens in the page's window; bring the editor back
+  // in front so the pick can be styled right away, as devtools does.
+  bridge.on('select', () => {
+    chrome.windows.getCurrent().then(current => {
+      if (current.id !== undefined) {
+        chrome.windows.update(current.id, { focused: true });
+      }
+    });
+  });
+
   await bridge.connect();
   await store.dispatch('initialize');
   await store.dispatch('openStylebot', { inspect: false });
