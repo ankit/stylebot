@@ -18,17 +18,6 @@
       <s-count-badge :count="activeStyleCount" class="active-style-count" />
     </template>
 
-    <template v-if="filteredSelectors.length" #header>
-      <div class="dropdown-header">
-        <s-text size="caption" variant="muted" class="dropdown-header-label">
-          {{ t('selector') }}
-        </s-text>
-        <s-text size="caption" variant="muted" class="dropdown-header-label">
-          {{ t('properties') }}
-        </s-text>
-      </div>
-    </template>
-
     <template #item="{ item, select }">
       <the-css-selector-dropdown-item
         :selector="item.value"
@@ -41,12 +30,8 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { SAutocomplete, SText, SCountBadge } from '@stylebot/components';
-import {
-  validateSelector,
-  getDeclarationsForSelector,
-  splitSelectorList,
-} from '@stylebot/css';
+import { SAutocomplete, SCountBadge } from '@stylebot/components';
+import { validateSelector, getDeclarationsForSelector } from '@stylebot/css';
 import { Highlighter } from '@stylebot/highlighter';
 import { CssDeclaration, StylebotEditingMode } from '@stylebot/types';
 
@@ -58,7 +43,6 @@ export default Vue.extend({
 
   components: {
     SAutocomplete,
-    SText,
     SCountBadge,
     TheCssSelectorDropdownItem,
   },
@@ -84,8 +68,7 @@ export default Vue.extend({
     },
 
     activeStyleCount(): number {
-      const match = this.selectors.find(s => s.value === this.activeSelector);
-      return match ? match.styleCount : 0;
+      return this.getStylebotDeclarations(this.activeSelector)?.length ?? 0;
     },
 
     filteredSelectors(): Array<CssSelectorMetadata> {
@@ -155,11 +138,7 @@ export default Vue.extend({
     previewActiveSelector(): void {
       const selector = this.activeSelector.trim();
 
-      // Skip whole-page selectors — highlighting them just floods the page.
-      const wholePage = ['*', 'body', 'html', ':root'];
-      const parts = splitSelectorList(selector);
-
-      if (!selector || parts.some(part => wholePage.includes(part))) {
+      if (!selector) {
         this.highlighter?.unhighlight();
         return;
       }
@@ -179,24 +158,6 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-.dropdown-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin: -4px -4px 4px;
-  padding: 9px 12px;
-  border-bottom: 1px solid var(--panel-border);
-  background: var(--hover-tint);
-}
-
-.dropdown-header-label {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
 .active-style-count {
   margin: 0 6px;
 }

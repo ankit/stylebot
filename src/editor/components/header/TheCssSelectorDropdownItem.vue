@@ -85,13 +85,6 @@ export default Vue.extend({
     },
 
     preview(): void {
-      // Skip whole-page selectors — highlighting them just floods the page.
-      const wholePage = ['*', 'body', 'html', ':root'];
-      if (this.parts.some(part => wholePage.includes(part))) {
-        this.highlighter?.unhighlight();
-        return;
-      }
-
       if (validateSelector(this.selector)) {
         this.highlighter?.highlight(this.selector);
       } else {
