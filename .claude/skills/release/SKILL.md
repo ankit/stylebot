@@ -72,6 +72,7 @@ Four checks must pass before merging:
 | `build` | `yarn build` |
 | `validation` | lint, typecheck, unit tests, locale validation |
 | `e2e` | Playwright suite on Chrome |
+| `e2e (firefox)` | Playwright suite on Firefox |
 | `e2e (edge)` | Playwright suite on Edge — **release PRs only** |
 
 If `e2e (edge)` shows as *skipped*, the branch name is wrong: it must start with

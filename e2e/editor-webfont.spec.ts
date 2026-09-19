@@ -1,6 +1,7 @@
 import http from 'node:http';
 import type { AddressInfo } from 'node:net';
-import { test, expect, closeServer } from './fixtures';
+import type { BrowserContext, Page } from '@playwright/test';
+import { test, expect, closeServer, type Popup } from './fixtures';
 import { openEditor } from './helpers';
 
 // Editor-open depends on a popup tab-messaging round trip, which can lag
@@ -48,12 +49,15 @@ test.beforeAll(async () => {
 
 test.afterAll(() => closeServer(server));
 
-test('selecting a font looks it up from the background and inlines its @font-face', async ({
-  context,
-  extensionId: _extensionId,
-  openPopup,
-}) => {
-  const fontRequests: Array<{ url: string; fromServiceWorker: boolean }> = [];
+type FontRequest = { url: string; fromServiceWorker: boolean };
+
+// Serves FONT_CSS for the family and records who asked for it. On Firefox the
+// background's requests aren't observable, so the lookup goes to the real
+// Google Fonts and nothing is recorded.
+const interceptFontLookups = async (
+  context: BrowserContext
+): Promise<FontRequest[]> => {
+  const fontRequests: FontRequest[] = [];
 
   await context.route('https://fonts.googleapis.com/**', route => {
     const request = route.request();
@@ -68,9 +72,13 @@ test('selecting a font looks it up from the background and inlines its @font-fac
     return route.fulfill({ contentType: 'text/css', body: FONT_CSS });
   });
 
-  const page = await context.newPage();
-  await page.goto(baseUrl);
+  return fontRequests;
+};
 
+const selectMontserrat = async (
+  page: Page,
+  openPopup: () => Promise<Popup>
+): Promise<void> => {
   const editorRoot = await openEditor(page, openPopup);
 
   await expect(editorRoot.locator('.stylebot-inspector')).toHaveClass(/active/);
@@ -88,14 +96,44 @@ test('selecting a font looks it up from the background and inlines its @font-fac
   await dropdown
     .locator('a.dropdown-item', { hasText: 'Montserrat' })
     .dispatchEvent('click');
+};
+
+test('selecting a font inlines its @font-face despite the page CSP', async ({
+  context,
+  openPopup,
+}) => {
+  await interceptFontLookups(context);
+
+  const page = await context.newPage();
+  await page.goto(baseUrl);
+
+  await selectMontserrat(page, openPopup);
 
   await expect(page.locator('h1')).toHaveCSS('font-family', 'Montserrat');
 
   const stylesheet = page.locator('style[id^="stylebot-css-"]').first();
   await expect.poll(() => stylesheet.textContent()).toContain('@font-face');
   await expect.poll(() => stylesheet.textContent()).toContain('Montserrat');
+});
 
-  // Every lookup of the family comes from the background page.
+test('every font lookup comes from the background, not the page', async ({
+  context,
+  engine,
+  openPopup,
+}) => {
+  test.skip(
+    !engine.routesExtensionRequests,
+    "Playwright can't observe the extension's own requests on this engine"
+  );
+
+  const fontRequests = await interceptFontLookups(context);
+
+  const page = await context.newPage();
+  await page.goto(baseUrl);
+
+  await selectMontserrat(page, openPopup);
+  await expect(page.locator('h1')).toHaveCSS('font-family', 'Montserrat');
+
   expect(fontRequests.length).toBeGreaterThan(0);
   expect(fontRequests.every(request => request.fromServiceWorker)).toBe(true);
 });

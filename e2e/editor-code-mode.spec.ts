@@ -16,7 +16,6 @@ const PAGE_HTML = `
 
 test('typing CSS into the code-mode Monaco editor applies live and persists', async ({
   context,
-  extensionId: _extensionId,
   openPopup,
 }) => {
   test.slow();
@@ -43,7 +42,6 @@ test('typing CSS into the code-mode Monaco editor applies live and persists', as
 
 test('typing a CSS property offers autocomplete and a color value shows a swatch', async ({
   context,
-  extensionId: _extensionId,
   openPopup,
 }) => {
   test.slow();

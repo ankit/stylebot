@@ -36,7 +36,9 @@ test('popup mounts and renders the open-editor toggle', async ({
 
   // Proves the popup's Vue app mounts without throwing — the direct symptom
   // of the "won't open" bug cluster is a blank or broken popup here.
-  await expect(
-    popup.getByRole('button', { name: /^Style this page/ })
-  ).toBeVisible();
+  await expect
+    .poll(() =>
+      popup.locator('button', { hasText: 'Style this page' }).isVisible()
+    )
+    .toBe(true);
 });

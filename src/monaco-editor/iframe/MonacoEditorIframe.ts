@@ -34,7 +34,8 @@ class MonacEditorIframe {
 
   /**
    * Monaco's blob-wrapped worker URLs fail to `importScripts` a same-origin
-   * chrome-extension:// URL, silently killing suggestions/color swatches.
+   * extension URL (and Firefox's extension CSP blocks blob workers outright),
+   * silently killing suggestions/color swatches.
    */
   patchBlobWorkerLoading(): void {
     const blobContents = new WeakMap<Blob, string>();
@@ -59,7 +60,7 @@ class MonacEditorIframe {
       const objectUrl = nativeCreateObjectURL(blob);
       const content = blobContents.get(blob);
       const match = content?.match(
-        /importScripts\([^)]*?(chrome-extension:\/\/[^"')]+)/
+        /importScripts\([^)]*?((?:chrome|moz)-extension:\/\/[^"')]+)/
       );
 
       if (match) {

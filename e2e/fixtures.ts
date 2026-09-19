@@ -1,6 +1,5 @@
 import {
   test as base,
-  chromium,
   type BrowserContext,
   type Page,
   type TestInfo,
@@ -10,12 +9,19 @@ import fs from 'node:fs';
 import type http from 'node:http';
 import os from 'node:os';
 import path from 'node:path';
+import { ChromiumEngine } from './chromium/engine';
+import type { Engine, Extension, Popup } from './engine';
 
-const DIST_PATH = path.resolve(__dirname, '..', 'dist');
+export type { Extension, Popup, PopupLocator } from './engine';
+import { FirefoxEngine } from './firefox/engine';
 
-// Mirrors scripts/launch-chrome.mjs — `yarn test:e2e:edge` runs the suite on Edge,
-// which uses the same dist/ build as Chrome.
-const CHANNEL = process.env.STYLEBOT_BROWSER === 'edge' ? 'msedge' : 'chrome';
+// Set by scripts/e2e.mjs (`yarn e2e --firefox`; `--edge` is handled inside chromium/).
+const engine: Engine =
+  process.env.STYLEBOT_BROWSER === 'firefox'
+    ? new FirefoxEngine()
+    : new ChromiumEngine();
+
+const DIST_PATH = path.resolve(__dirname, '..', engine.distDir);
 
 // --ui mode force-manages tracing (a live `use.trace` flag) on every context,
 // including ours — fighting it for control throws, so skip ours when detected.
@@ -52,7 +58,7 @@ export async function closeServer(server: http.Server): Promise<void> {
 type Instance = {
   context: BrowserContext;
   userDataDir: string;
-  extensionId: string;
+  extension: Extension;
 };
 
 // One browser+extension instance per worker, reused across every test file that worker
@@ -72,7 +78,7 @@ class BrowserPool {
       return this.current;
     }
 
-    // Concurrent fixtures (context, extensionId) can both notice a dead browser in
+    // Concurrent fixtures (context, extension) can both notice a dead browser in
     // the same tick — share one relaunch instead of racing two.
     this.launching ??= this.launch().then(instance => {
       this.current = instance;
@@ -86,36 +92,21 @@ class BrowserPool {
   private async launch(): Promise<Instance> {
     if (!fs.existsSync(DIST_PATH)) {
       throw new Error(
-        `No build found at ${DIST_PATH} — run \`yarn build\` before the e2e suite (\`yarn test:e2e\` does this for you).`
+        `No build found at ${DIST_PATH} — run \`yarn build\` before the e2e suite (\`yarn e2e\` does this for you).`
       );
     }
 
     const userDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'stylebot-e2e-'));
 
-    // --headed/--debug don't reach our manual browser launch, but they do flip this.
-    const headless = this.workerInfo.project.use.headless ?? true;
-
-    // Chrome 137+ removed --load-extension; CDP's Extensions domain replaces it below.
-    const context = await chromium.launchPersistentContext(userDataDir, {
-      headless,
-      channel: CHANNEL,
-      chromiumSandbox: true,
+    const launchOptions = {
+      // --headed/--debug don't reach our manual browser launch, but they do flip this.
+      headless: this.workerInfo.project.use.headless ?? true,
       viewport: null,
       // null leaves prefers-color-scheme unemulated, matching the real OS setting.
       colorScheme: null,
-      ignoreDefaultArgs: [
-        // Playwright disables extensions by default, which would block our CDP-loaded one.
-        '--disable-extensions',
-        '--enable-automation',
-      ],
-      args: [
-        // Required for Extensions.loadUnpacked.
-        '--enable-unsafe-extension-debugging',
-        // Trims memory per worker — several of these run concurrently on CI.
-        '--disable-dev-shm-usage',
-        '--disable-gpu',
-      ],
-    });
+    };
+
+    const context = await engine.launch(userDataDir, launchOptions);
 
     // The extension opens this on fresh install, stealing tab focus.
     const closeHelpTab = (p: Page) => {
@@ -138,12 +129,9 @@ class BrowserPool {
       );
     }
 
-    const cdp = await context.browser()!.newBrowserCDPSession();
-    const { id: extensionId } = await cdp.send('Extensions.loadUnpacked', {
-      path: DIST_PATH,
-    });
+    const extension = await engine.loadExtension(context, DIST_PATH);
 
-    const instance: Instance = { context, userDataDir, extensionId };
+    const instance: Instance = { context, userDataDir, extension };
     this.instances.push(instance);
     return instance;
   }
@@ -152,7 +140,8 @@ class BrowserPool {
   // a mid-suite relaunch leaves earlier instances orphaned otherwise.
   async closeAll(): Promise<void> {
     await Promise.all(
-      this.instances.map(async ({ context, userDataDir }) => {
+      this.instances.map(async ({ context, userDataDir, extension }) => {
+        extension.close();
         if (context.browser()?.isConnected()) {
           if (!this.liveTraceMode) {
             await safeTracing(() => context.tracing.stop());
@@ -170,8 +159,9 @@ export const test = base.extend<
     // Overrides Playwright's built-in test-scoped `context` fixture: it wraps the
     // worker-scoped browser pool's current context with per-test trace/tab/storage isolation.
     context: BrowserContext;
-    extensionId: string;
-    openPopup: () => Promise<Page>;
+    engine: Engine;
+    extension: Extension;
+    openPopup: () => Promise<Popup>;
   },
   {
     browserPool: BrowserPool;
@@ -191,9 +181,9 @@ export const test = base.extend<
 
   // Test-scoped so it always matches whatever context the same test's `context`
   // fixture resolved to, including right after a mid-suite relaunch.
-  extensionId: async ({ browserPool }, use) => {
-    const { extensionId } = await browserPool.get();
-    await use(extensionId);
+  extension: async ({ browserPool }, use) => {
+    const { extension } = await browserPool.get();
+    await use(extension);
   },
 
   // Saves a per-test trace chunk and resets tabs/storage after so state can't leak
@@ -243,33 +233,22 @@ export const test = base.extend<
     );
     await context.clearCookies();
 
-    const worker = context.serviceWorkers()[0];
-    if (worker) {
-      await worker.evaluate(() => chrome.storage.local.clear());
+    // An idle-terminated background has nothing left to clear, and waiting for it
+    // to come back would stall teardown.
+    const { extension } = await browserPool.get();
+    if (extension.isRunning()) {
+      await extension.evaluate(() => chrome.storage.local.clear());
     }
   },
 
-  // Opens the popup by URL (Playwright can't click a real toolbar icon), in the
-  // background so it doesn't steal "current tab" from the page under test.
-  openPopup: async ({ context, extensionId }, use) => {
-    const cdp = await context.browser()!.newBrowserCDPSession();
+  // For the rare spec that must know what the engine can observe.
+  engine: async ({}, use) => {
+    await use(engine);
+  },
 
-    const popupUrl = `chrome-extension://${extensionId}/popup/index.html`;
-
-    const open = async (): Promise<Page> => {
-      // Filtered so the onInstalled help tab can't win this race instead.
-      const pagePromise = context.waitForEvent(
-        'page',
-        p => p.url() === popupUrl
-      );
-      await cdp.send('Target.createTarget', {
-        url: popupUrl,
-        background: true,
-      });
-      return pagePromise;
-    };
-
-    await use(open);
+  openPopup: async ({ browserPool }, use) => {
+    const { context, extension } = await browserPool.get();
+    await use(() => engine.openPopup(context, extension));
   },
 });
 

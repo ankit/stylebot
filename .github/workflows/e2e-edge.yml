@@ -48,7 +48,7 @@ jobs:
         run: npx playwright install-deps msedge
 
       - name: Run e2e tests
-        run: yarn test:e2e:edge
+        run: yarn e2e --edge
 
       - name: Upload Playwright report
         if: ${{ !cancelled() }}

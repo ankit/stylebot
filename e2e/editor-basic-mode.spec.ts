@@ -16,7 +16,6 @@ const PAGE_HTML = `
 
 test('picking an element and editing a color in basic mode applies live and persists', async ({
   context,
-  extensionId: _extensionId,
   openPopup,
 }) => {
   await context.route('http://localhost/**', route =>
