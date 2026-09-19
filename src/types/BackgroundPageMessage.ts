@@ -149,7 +149,7 @@ export type CloseEditorWindow = {
 
 export type GetIsEditorWindowOpen = {
   name: 'GetIsEditorWindowOpen';
-  tabId: number;
+  tabId?: number;
 };
 
 type BackgroundPageMessage =

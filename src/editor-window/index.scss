@@ -1,0 +1,24 @@
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+#app {
+  height: 100%;
+}
+
+.stylebot-app {
+  position: relative;
+  height: 100%;
+}
+
+.editor-window-unavailable {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  font-family: system-ui, sans-serif;
+  color: #666;
+}

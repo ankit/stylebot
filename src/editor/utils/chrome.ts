@@ -25,6 +25,8 @@ import {
   OpenEditorWindow,
   ToggleEditorWindow,
   CloseEditorWindow,
+  GetIsEditorWindowOpen,
+  GetIsEditorWindowOpenResponse,
 } from '@stylebot/types';
 
 export const getAllOptions = (): Promise<StylebotOptions> => {
@@ -204,4 +206,18 @@ export const toggleEditorWindow = (tabId?: number): void => {
 export const closeEditorWindow = (tabId?: number): void => {
   const message: CloseEditorWindow = { name: 'CloseEditorWindow', tabId };
   chrome.runtime.sendMessage(message);
+};
+
+export const getIsEditorWindowOpen = (
+  tabId?: number
+): Promise<GetIsEditorWindowOpenResponse> => {
+  const message: GetIsEditorWindowOpen = {
+    name: 'GetIsEditorWindowOpen',
+    tabId,
+  };
+
+  return chrome.runtime.sendMessage<
+    GetIsEditorWindowOpen,
+    GetIsEditorWindowOpenResponse
+  >(message);
 };

@@ -1,5 +1,6 @@
 jest.mock('../styles');
 jest.mock('../color-history');
+jest.mock('../editor-window');
 
 import {
   SetReadability,

@@ -239,7 +239,7 @@ chrome.runtime.onMessage.addListener(
         CloseEditorWindow(message, sender);
         break;
       case 'GetIsEditorWindowOpen':
-        GetIsEditorWindowOpen(message, sendResponse);
+        GetIsEditorWindowOpen(message, sender, sendResponse);
         break;
     }
 

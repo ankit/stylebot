@@ -108,6 +108,27 @@ const getBounds = async (tab: chrome.tabs.Tab): Promise<EditorWindowBounds> => {
   };
 };
 
+/**
+ * Chrome refuses bounds that aren't mostly on a visible screen — a saved
+ * position from a monitor that's gone, say — so fall back to letting it
+ * place the window, keeping the size, then to its defaults.
+ */
+const createWindow = (
+  base: chrome.windows.CreateData,
+  bounds: EditorWindowBounds
+): Promise<chrome.windows.Window | undefined> => {
+  const fallbacks: Array<Partial<EditorWindowBounds>> = [
+    { width: bounds.width, height: bounds.height },
+    {},
+  ];
+
+  return fallbacks.reduce(
+    (attempt, fallback) =>
+      attempt.catch(() => chrome.windows.create({ ...base, ...fallback })),
+    chrome.windows.create({ ...base, ...bounds })
+  );
+};
+
 export const isOpen = async (tabId: number): Promise<boolean> =>
   (await getLiveWindowId(tabId)) !== undefined;
 
@@ -142,12 +163,14 @@ const openWindow = async (tabId: number): Promise<void> => {
     return;
   }
 
-  const created = await chrome.windows.create({
-    url: chrome.runtime.getURL(`editor-window/index.html?tabId=${tabId}`),
-    type: 'popup',
-    focused: true,
-    ...(await getBounds(tab)),
-  });
+  const created = await createWindow(
+    {
+      url: chrome.runtime.getURL(`editor-window/index.html?tabId=${tabId}`),
+      type: 'popup',
+      focused: true,
+    },
+    await getBounds(tab)
+  );
 
   if (created?.id !== undefined) {
     await saveRegistry({ ...(await loadRegistry()), [tabId]: created.id });

@@ -201,6 +201,11 @@ const config = {
           transform: transformHtml,
         },
         {
+          from: 'editor-window/index.html',
+          to: 'editor-window/index.html',
+          transform: transformHtml,
+        },
+        {
           from: 'monaco-editor/iframe/index.html',
           to: 'monaco-editor/iframe/index.html',
           transform: transformHtml,
@@ -292,6 +297,7 @@ const clientConfig = {
     'popup/index': './popup/index.ts',
     'editor/index': './editor/index.ts',
     options: './options/index.ts',
+    'editor-window/index': './editor-window/index.ts',
     'inject-css/index': './inject-css/index.ts',
     'monaco-editor/iframe/index': './monaco-editor/iframe/index.ts',
     'monaco-editor/iframe/options-index':
