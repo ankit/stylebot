@@ -63,11 +63,13 @@ class FirefoxRdpClient {
     }
   }
 
-  request(packet: { to: string; type: string } & Record<string, unknown>) {
+  request<T extends object = Record<string, never>>(
+    packet: { to: string; type: string } & Record<string, unknown>
+  ): Promise<Packet & T> {
     const json = JSON.stringify(packet);
     const reply = this.expect(packet.to);
     this.socket.write(`${Buffer.byteLength(json)}:${json}`);
-    return reply;
+    return reply as Promise<Packet & T>;
   }
 
   onEvent(type: string, handler: (packet: Packet) => void): void {
@@ -140,24 +142,21 @@ type EvaluationResult = {
   result?: unknown;
 };
 
+type Addon = { id: string; actor: string; manifestURL: string };
+
 /**
  * A temporarily installed extension plus a console into its background page,
  * which is the Firefox stand-in for Chromium's `context.serviceWorkers()[0].evaluate()`.
  */
 export class FirefoxExtension {
   private background: TargetForm | null = null;
-  private backgroundWaiters: (() => void)[] = [];
-  // Results can land in the same TCP chunk as the request's ack, i.e. before the
-  // caller has seen its resultID — so they're parked here until claimed.
-  private readonly results = new Map<string, EvaluationResult>();
-  private readonly resultWaiters = new Map<
-    string,
-    (result: EvaluationResult) => void
-  >();
+  // Armed before each evaluateJSAsync is sent: its result can land in the same TCP
+  // chunk as the request's ack, i.e. before the caller has resumed.
+  private onResult: ((result: EvaluationResult) => void) | null = null;
 
   private constructor(
     private readonly client: FirefoxRdpClient,
-    readonly uuid: string
+    readonly id: string
   ) {}
 
   static async load(
@@ -166,22 +165,42 @@ export class FirefoxExtension {
   ): Promise<FirefoxExtension> {
     const client = await FirefoxRdpClient.connect(port);
 
-    const root = await client.request({ to: 'root', type: 'getRoot' });
-    const installed = await client.request({
-      to: root.addonsActor as string,
+    const root = await client.request<{ addonsActor: string }>({
+      to: 'root',
+      type: 'getRoot',
+    });
+    const installed = await client.request<{ addon: { id: string } }>({
+      to: root.addonsActor,
       type: 'installTemporaryAddon',
       addonPath,
     });
-    const addonId = (installed.addon as { id: string }).id;
-
-    const { addons } = (await client.request({
+    const { addons } = await client.request<{ addons: Addon[] }>({
       to: 'root',
       type: 'listAddons',
-    })) as { addons: { id: string; actor: string; manifestURL: string }[] };
-    const addon = addons.find(a => a.id === addonId)!;
-    const uuid = new URL(addon.manifestURL).host;
+    });
+    const addon = addons.find(a => a.id === installed.addon.id)!;
 
-    const extension = new FirefoxExtension(client, uuid);
+    const extension = new FirefoxExtension(
+      client,
+      new URL(addon.manifestURL).host
+    );
+
+    let onBackground!: () => void;
+    const backgroundReady = new Promise<void>((resolve, reject) => {
+      const timer = setTimeout(
+        () =>
+          reject(
+            new Error(
+              `Extension ${addon.id} installed but its background page never appeared.`
+            )
+          ),
+        10_000
+      );
+      onBackground = () => {
+        clearTimeout(timer);
+        resolve();
+      };
+    });
 
     // Target lifecycle events come from the watcher; the background page is one
     // "frame" target among the descriptor's (the other is DevTools' fallback page).
@@ -189,7 +208,7 @@ export class FirefoxExtension {
       const target = packet.target as TargetForm;
       if (target.url.includes('_generated_background_page')) {
         extension.background = target;
-        extension.backgroundWaiters.splice(0).forEach(wake => wake());
+        onBackground();
       }
     });
     client.onEvent('target-destroyed-form', packet => {
@@ -199,54 +218,26 @@ export class FirefoxExtension {
       }
     });
     client.onEvent('evaluationResult', packet => {
-      const result = packet as unknown as EvaluationResult;
-      const waiter = extension.resultWaiters.get(result.resultID);
-      if (waiter) {
-        extension.resultWaiters.delete(result.resultID);
-        waiter(result);
-      } else {
-        extension.results.set(result.resultID, result);
-      }
+      extension.onResult?.(packet as unknown as EvaluationResult);
     });
 
-    const watcher = await client.request({
+    const watcher = await client.request<{ actor: string }>({
       to: addon.actor,
       type: 'getWatcher',
       isServerTargetSwitchingEnabled: true,
     });
     await client.request({
-      to: watcher.actor as string,
+      to: watcher.actor,
       type: 'watchTargets',
       targetType: 'frame',
     });
+    await backgroundReady;
 
-    await extension.waitForBackground(addonId);
     return extension;
   }
 
-  private waitForBackground(
-    addonId: string,
-    timeoutMs = 10_000
-  ): Promise<void> {
-    if (this.background) {
-      return Promise.resolve();
-    }
-
-    return new Promise((resolve, reject) => {
-      const timer = setTimeout(
-        () =>
-          reject(
-            new Error(
-              `Extension ${addonId} installed but its background page never appeared.`
-            )
-          ),
-        timeoutMs
-      );
-      this.backgroundWaiters.push(() => {
-        clearTimeout(timer);
-        resolve();
-      });
-    });
+  isRunning(): boolean {
+    return this.background !== null;
   }
 
   /**
@@ -267,19 +258,18 @@ export class FirefoxExtension {
       arg ?? null
     )})))()`;
 
-    const { resultID } = (await this.client.request({
+    const resultPromise = new Promise<EvaluationResult>(resolve => {
+      this.onResult = resolve;
+    });
+    await this.client.request({
       to: this.background.consoleActor,
       type: 'evaluateJSAsync',
       text,
       mapped: { await: true },
-    })) as { resultID: string };
+    });
+    const result = await resultPromise;
+    this.onResult = null;
 
-    const result =
-      this.results.get(resultID) ??
-      (await new Promise<EvaluationResult>(resolve =>
-        this.resultWaiters.set(resultID, resolve)
-      ));
-    this.results.delete(resultID);
     if (result.hasException) {
       throw new Error(result.exceptionMessage);
     }

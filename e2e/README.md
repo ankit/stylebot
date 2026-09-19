@@ -68,7 +68,7 @@ Import `test`/`expect` from `./fixtures`, not `@playwright/test`.
 | `context`                  | the shared `BrowserContext`; tabs opened during a test are closed after it                                                                                                     |
 | `runInExtension(fn, arg?)` | run `fn` with the extension's privileges (service worker on Chromium, background page on Firefox) and get its JSON-serializable result — how tests read/write `chrome.storage` |
 | `openPopup()`              | open the popup as a page, in the background so the page under test stays the "current tab"; skips the test on Firefox                                                          |
-| `extensionId`              | the extension's id / Firefox UUID                                                                                                                                              |
+| `extensionId`              | the extension's id (its `moz-extension://` UUID on Firefox)                                                                                                                    |
 
 Helpers in `helpers.ts`: `startTestServer(routes)` for local pages (use `closeServer` in
 `afterAll` — the shared browser keeps connections alive), `seedStyles(runInExtension, …)`,

@@ -3,10 +3,17 @@
 //   yarn e2e [--edge | --firefox] [--headed | --ui | --debug] [--no-build] [playwright args]
 //
 // Picks the right build (dist/ vs firefox-dist/), sets STYLEBOT_BROWSER for
-// e2e/fixtures.ts, and runs --headed/--debug on a single worker so only one
-// browser window opens. Anything unrecognized is passed through to `playwright test`.
+// e2e/fixtures.ts, and runs --headed on a single worker so only one browser
+// window opens. Everything else is passed through to `playwright test`.
 
 import { spawnSync } from 'node:child_process';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const rootDir = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  '..'
+);
 
 const USAGE = `usage: yarn e2e [--edge | --firefox] [--headed | --ui | --debug] [--no-build] [playwright test args]
 
@@ -20,44 +27,33 @@ const USAGE = `usage: yarn e2e [--edge | --firefox] [--headed | --ui | --debug] 
   --no-build  skip the rebuild (dist must already be current)
 `;
 
-const flags = new Set();
-const passthrough = [];
+const OWN_FLAGS = ['--edge', '--firefox', '--no-build'];
+const args = process.argv.slice(2);
 
-for (const arg of process.argv.slice(2)) {
-  if (
-    [
-      '--edge',
-      '--firefox',
-      '--headed',
-      '--ui',
-      '--debug',
-      '--no-build',
-    ].includes(arg)
-  ) {
-    flags.add(arg);
-  } else if (arg === '--help' || arg === '-h') {
-    process.stdout.write(USAGE);
-    process.exit(0);
-  } else {
-    passthrough.push(arg);
-  }
+if (args.includes('--help') || args.includes('-h')) {
+  process.stdout.write(USAGE);
+  process.exit(0);
 }
 
-if (flags.has('--edge') && flags.has('--firefox')) {
+if (args.includes('--edge') && args.includes('--firefox')) {
   console.error('Pick one of --edge or --firefox.');
   process.exit(1);
 }
 
 let browser = 'chrome';
-if (flags.has('--firefox')) {
+if (args.includes('--firefox')) {
   browser = 'firefox';
-} else if (flags.has('--edge')) {
+} else if (args.includes('--edge')) {
   browser = 'edge';
 }
 
-const run = (command, args) => {
-  const { status } = spawnSync(command, args, {
+// Windows has no bare `yarn`/`playwright` executables, only .cmd shims.
+const bin = name => (process.platform === 'win32' ? `${name}.cmd` : name);
+
+const run = (command, commandArgs) => {
+  const { status } = spawnSync(command, commandArgs, {
     stdio: 'inherit',
+    cwd: rootDir,
     env: { ...process.env, STYLEBOT_BROWSER: browser },
   });
   if (status !== 0) {
@@ -65,19 +61,18 @@ const run = (command, args) => {
   }
 };
 
-if (!flags.has('--no-build')) {
-  run('yarn', [browser === 'firefox' ? 'build:firefox' : 'build']);
+if (!args.includes('--no-build')) {
+  run(bin('yarn'), [browser === 'firefox' ? 'build:firefox' : 'build']);
 }
 
-const playwrightArgs = ['test'];
-if (flags.has('--ui')) {
-  playwrightArgs.push('--ui');
-}
-if (flags.has('--headed')) {
-  playwrightArgs.push('--headed', '--workers=1');
-}
-if (flags.has('--debug')) {
-  playwrightArgs.push('--debug', '--workers=1');
+const playwrightArgs = args.filter(arg => !OWN_FLAGS.includes(arg));
+// --debug already implies a single worker; --headed doesn't, and four windows
+// opening at once is not what anyone asking for a headed run wants.
+if (args.includes('--headed')) {
+  playwrightArgs.push('--workers=1');
 }
 
-run('node_modules/.bin/playwright', [...playwrightArgs, ...passthrough]);
+run(path.join(rootDir, 'node_modules', '.bin', bin('playwright')), [
+  'test',
+  ...playwrightArgs,
+]);

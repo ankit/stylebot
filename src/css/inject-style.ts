@@ -31,15 +31,18 @@ const keepStylebotStylesLast = (style: HTMLStyleElement): void => {
   reorderObserver = new MutationObserver(reorder);
   reorderObserver.observe(document.documentElement, { childList: true });
 
-  document.addEventListener('readystatechange', () => {
-    if (document.readyState !== 'loading') {
-      // Firefox can flush <head>, <body> and this readyState change in one batch;
-      // disconnect() would discard the still-queued records, so reorder once more.
+  // Fires first for 'interactive', i.e. once parsing is done. Observer records are
+  // delivered as a microtask, which may not have run yet when the parser finishes
+  // in one go — and disconnect() discards them — so reorder explicitly.
+  document.addEventListener(
+    'readystatechange',
+    () => {
       reorder();
       reorderObserver?.disconnect();
       reorderObserver = null;
-    }
-  });
+    },
+    { once: true }
+  );
 };
 
 const setStylesheetContent = (id: string, css: string): void => {

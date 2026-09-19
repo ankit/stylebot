@@ -26,7 +26,7 @@ session is already inside a worktree.
 - `yarn lint` / `yarn lint:fix` — ESLint
 - `yarn typecheck` — `tsc --noEmit`
 - `yarn test` — Jest unit tests
-- `yarn e2e` — builds the extension then runs the Playwright e2e suite headless on Chrome, as CI does. `--edge` / `--firefox` switch browser, `--headed` / `--ui` / `--debug` switch mode, `--no-build` skips the rebuild; see `e2e/README.md`. On Firefox, Playwright can't attach to extension pages, so tests that use the `openPopup` fixture are skipped there and only the storage-seeded content-script tests run
+- `yarn e2e` — builds the extension then runs the Playwright e2e suite headless on Chrome, as CI does. `--edge` / `--firefox` switch browser, `--headed` / `--ui` / `--debug` switch mode, `--no-build` skips the rebuild; see `e2e/README.md`.
 
 ## Validation
 

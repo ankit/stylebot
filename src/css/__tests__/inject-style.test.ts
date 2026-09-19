@@ -117,7 +117,7 @@ describe('inject-style', () => {
       expect(document.documentElement.lastChild).toBe(style);
     });
 
-    it('still repositions the style if parsing finishes before the observer ran (Firefox batches these)', async () => {
+    it('still repositions the style if parsing finishes before the observer callback ran', async () => {
       setReadyState('loading');
 
       await injectCSSIntoDocument('a { color: blue !important; }', 'example');
@@ -126,8 +126,9 @@ describe('inject-style', () => {
         stylesheetId('example')
       ) as HTMLStyleElement;
 
-      // No flush() between the reorder-worthy mutation and readystatechange:
-      // the observer's record is still queued when disconnect() would drop it.
+      // No flush() between the reorder-worthy mutation and readystatechange: the
+      // observer's record is still queued when disconnect() would drop it, which
+      // is what happens when the parser finishes without yielding (Firefox does).
       document.documentElement.insertBefore(
         style,
         document.documentElement.firstChild
@@ -143,7 +144,7 @@ describe('inject-style', () => {
 
       await injectCSSIntoDocument('a { color: blue !important; }', 'example');
 
-      setReadyState('complete');
+      setReadyState('interactive');
       document.dispatchEvent(new Event('readystatechange'));
 
       const style = document.getElementById(
@@ -153,6 +154,10 @@ describe('inject-style', () => {
 
       document.documentElement.appendChild(lateNode);
       await flush();
+
+      // The second readystatechange ('complete') must not reorder either.
+      setReadyState('complete');
+      document.dispatchEvent(new Event('readystatechange'));
 
       expect(document.documentElement.lastChild).toBe(lateNode);
       expect(document.documentElement.lastChild).not.toBe(style);

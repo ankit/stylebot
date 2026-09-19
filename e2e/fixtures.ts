@@ -58,14 +58,44 @@ export async function closeServer(server: http.Server): Promise<void> {
   await closed;
 }
 
+type ExtensionFunction<A, R> = (arg: A) => R | Promise<R>;
+
+// The Chromium counterpart of FirefoxExtension: same surface, backed by the MV3
+// service worker that CDP's Extensions.loadUnpacked started.
+class ChromiumExtension {
+  private constructor(
+    private readonly context: BrowserContext,
+    readonly id: string
+  ) {}
+
+  static async load(
+    context: BrowserContext,
+    path: string
+  ): Promise<ChromiumExtension> {
+    const cdp = await context.browser()!.newBrowserCDPSession();
+    const { id } = await cdp.send('Extensions.loadUnpacked', { path });
+    return new ChromiumExtension(context, id);
+  }
+
+  isRunning(): boolean {
+    return this.context.serviceWorkers().length > 0;
+  }
+
+  async evaluate<A, R>(fn: ExtensionFunction<A, R>, arg?: A): Promise<R> {
+    const worker =
+      this.context.serviceWorkers()[0] ??
+      (await this.context.waitForEvent('serviceworker'));
+    return worker.evaluate(fn as (arg: A) => R, arg as A);
+  }
+
+  close(): void {}
+}
+
 type Instance = {
   context: BrowserContext;
   userDataDir: string;
-  extensionId: string;
-  firefoxExtension: FirefoxExtension | null;
+  extension: ChromiumExtension | FirefoxExtension;
 };
-
-type ExtensionFunction<A, R> = (arg: A) => R | Promise<R>;
 export type RunInExtension = <A, R>(
   fn: ExtensionFunction<A, R>,
   arg?: A
@@ -118,15 +148,18 @@ class BrowserPool {
 
     const userDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'stylebot-e2e-'));
 
-    // --headed/--debug don't reach our manual browser launch, but they do flip this.
-    const headless = this.workerInfo.project.use.headless ?? true;
+    const launchOptions = {
+      // --headed/--debug don't reach our manual browser launch, but they do flip this.
+      headless: this.workerInfo.project.use.headless ?? true,
+      viewport: null,
+      // null leaves prefers-color-scheme unemulated, matching the real OS setting.
+      colorScheme: null,
+    };
 
     const rdpPort = IS_FIREFOX ? await freePort() : null;
     const context = IS_FIREFOX
       ? await firefox.launchPersistentContext(userDataDir, {
-          headless,
-          viewport: null,
-          colorScheme: null,
+          ...launchOptions,
           // Playwright can't install extensions into Firefox; the debugger server
           // exposes the same protocol about:debugging uses to load one temporarily.
           args: [`--start-debugger-server=${rdpPort}`],
@@ -142,12 +175,9 @@ class BrowserPool {
         })
       : // Chrome 137+ removed --load-extension; CDP's Extensions domain replaces it below.
         await chromium.launchPersistentContext(userDataDir, {
-          headless,
+          ...launchOptions,
           channel: CHANNEL,
           chromiumSandbox: true,
-          viewport: null,
-          // null leaves prefers-color-scheme unemulated, matching the real OS setting.
-          colorScheme: null,
           ignoreDefaultArgs: [
             // Playwright disables extensions by default, which would block our CDP-loaded one.
             '--disable-extensions',
@@ -183,38 +213,13 @@ class BrowserPool {
       );
     }
 
-    const instance = rdpPort
-      ? await this.loadFirefoxExtension(context, userDataDir, rdpPort)
-      : await this.loadChromiumExtension(context, userDataDir);
+    const extension = rdpPort
+      ? await FirefoxExtension.load(rdpPort, DIST_PATH)
+      : await ChromiumExtension.load(context, DIST_PATH);
+
+    const instance: Instance = { context, userDataDir, extension };
     this.instances.push(instance);
     return instance;
-  }
-
-  private async loadChromiumExtension(
-    context: BrowserContext,
-    userDataDir: string
-  ): Promise<Instance> {
-    const cdp = await context.browser()!.newBrowserCDPSession();
-    const { id: extensionId } = await cdp.send('Extensions.loadUnpacked', {
-      path: DIST_PATH,
-    });
-
-    return { context, userDataDir, extensionId, firefoxExtension: null };
-  }
-
-  private async loadFirefoxExtension(
-    context: BrowserContext,
-    userDataDir: string,
-    rdpPort: number
-  ): Promise<Instance> {
-    const firefoxExtension = await FirefoxExtension.load(rdpPort, DIST_PATH);
-
-    return {
-      context,
-      userDataDir,
-      extensionId: firefoxExtension.uuid,
-      firefoxExtension,
-    };
   }
 
   /**
@@ -222,24 +227,16 @@ class BrowserPool {
    * service worker on Chromium, or the background page on Firefox.
    */
   async runInExtension<A, R>(fn: ExtensionFunction<A, R>, arg?: A): Promise<R> {
-    const { context, firefoxExtension } = await this.get();
-
-    if (firefoxExtension) {
-      return firefoxExtension.evaluate(fn, arg);
-    }
-
-    const worker =
-      context.serviceWorkers()[0] ??
-      (await context.waitForEvent('serviceworker'));
-    return worker.evaluate(fn as (arg: A) => R, arg as A);
+    const { extension } = await this.get();
+    return extension.evaluate(fn, arg);
   }
 
   // Tears down every instance this worker ever launched, not just the current one —
   // a mid-suite relaunch leaves earlier instances orphaned otherwise.
   async closeAll(): Promise<void> {
     await Promise.all(
-      this.instances.map(async ({ context, userDataDir, firefoxExtension }) => {
-        firefoxExtension?.close();
+      this.instances.map(async ({ context, userDataDir, extension }) => {
+        extension.close();
         if (context.browser()?.isConnected()) {
           if (!this.liveTraceMode) {
             await safeTracing(() => context.tracing.stop());
@@ -280,8 +277,8 @@ export const test = base.extend<
   // Test-scoped so it always matches whatever context the same test's `context`
   // fixture resolved to, including right after a mid-suite relaunch.
   extensionId: async ({ browserPool }, use) => {
-    const { extensionId } = await browserPool.get();
-    await use(extensionId);
+    const { extension } = await browserPool.get();
+    await use(extension.id);
   },
 
   // Saves a per-test trace chunk and resets tabs/storage after so state can't leak
@@ -331,10 +328,11 @@ export const test = base.extend<
     );
     await context.clearCookies();
 
-    // On Chromium an idle-terminated service worker has nothing left to clear, and
-    // waiting for it to come back would stall teardown.
-    if (IS_FIREFOX || context.serviceWorkers().length > 0) {
-      await browserPool.runInExtension(() => chrome.storage.local.clear());
+    // An idle-terminated background has nothing left to clear, and waiting for it
+    // to come back would stall teardown.
+    const { extension } = await browserPool.get();
+    if (extension.isRunning()) {
+      await extension.evaluate(() => chrome.storage.local.clear());
     }
   },
 
@@ -345,9 +343,8 @@ export const test = base.extend<
   // Opens the popup by URL (Playwright can't click a real toolbar icon), in the
   // background so it doesn't steal "current tab" from the page under test.
   openPopup: async ({ context, extensionId }, use) => {
-    // Neither of Playwright's Firefox drivers can attach to moz-extension:// documents
-    // (Juggler skips them; BiDi excludes extension contexts, bug 1755014), so any test
-    // that needs the popup is skipped there simply by depending on this fixture.
+    // Playwright can't attach to moz-extension:// pages (see e2e/README.md), so any
+    // test that needs the popup is skipped there simply by depending on this fixture.
     test.skip(
       IS_FIREFOX,
       'Playwright cannot drive extension pages (the popup) in Firefox'
