@@ -4,7 +4,7 @@ import SDialog from './SDialog.vue';
 import SCard from './SCard.vue';
 import Heading from './Heading.vue';
 import SText from './SText.vue';
-import { fromTemplate } from '@sb/story-helpers';
+import { fromTemplate } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
   title: 'Primitives/Overlays/SDialog',

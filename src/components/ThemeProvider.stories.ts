@@ -2,7 +2,7 @@ import type { Meta } from '@storybook/vue';
 
 import ThemeProvider from './ThemeProvider.vue';
 import Heading from './Heading.vue';
-import { fromTemplate } from '@sb/story-helpers';
+import { fromTemplate } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
   title: 'Primitives/Theme/ThemeProvider',

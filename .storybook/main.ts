@@ -67,7 +67,6 @@ const config: StorybookConfig = {
             find: `@stylebot/${name}`,
             replacement: src(`${name}/index`),
           })),
-          { find: '@sb', replacement: __dirname },
         ],
       },
       css: {

@@ -6,8 +6,8 @@ import { getCssAfterApplyingFilterEffectToPage } from '@stylebot/css';
 import {
   createEditorStore,
   EditorStateOverrides,
-} from '@sb/mocks/editor-store';
-import { nextFrame } from '@sb/story-helpers';
+} from '@stylebot/storybook/mocks/editor-store';
+import { nextFrame } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
   title: 'Editor/Panel',

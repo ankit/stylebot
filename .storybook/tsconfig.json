@@ -5,8 +5,8 @@
     "types": ["chrome", "node"],
     "baseUrl": "../src",
     "paths": {
-      "@stylebot/*": ["*/index"],
-      "@sb/*": ["../.storybook/*"]
+      "@stylebot/storybook/*": ["../.storybook/*"],
+      "@stylebot/*": ["*/index"]
     }
   }
 }
