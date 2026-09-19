@@ -40,9 +40,13 @@ import {
   getCommands,
   getReadabilitySettings,
   setReadabilitySettings,
+  closeEditorWindow,
 } from '../utils/chrome';
 
-import { getPageBridge } from '@stylebot/page-bridge';
+import {
+  getPageBridge,
+  RemotePageBridgeSyncedState,
+} from '@stylebot/page-bridge';
 
 const RECENT_FONTS_LIMIT = 10;
 const isBundledGoogleFont = async (family: string): Promise<boolean> =>
@@ -78,18 +82,34 @@ export default {
   },
 
   initializeDefaultStyle(
-    { commit }: { commit: Commit },
+    { dispatch }: { dispatch: Dispatch },
     defaultStyle: Style
   ): void {
     const { url, enabled, css, readability } = defaultStyle;
+    dispatch('syncFromPage', { url, enabled, css, readability });
+  },
 
-    commit('setUrl', url);
-    commit('setCss', css);
-    commit('setEnabled', enabled);
-    commit('setReadability', readability);
-
-    const root = postcss.parse(defaultStyle.css);
-    commit('setSelectors', root);
+  /**
+   * Mirrors state the page owns — from its stored style, or, in the window
+   * host, whatever the tab reports over the port.
+   */
+  syncFromPage(
+    { commit }: { commit: Commit },
+    state: Partial<RemotePageBridgeSyncedState>
+  ): void {
+    if (state.url !== undefined) {
+      commit('setUrl', state.url);
+    }
+    if (state.enabled !== undefined) {
+      commit('setEnabled', state.enabled);
+    }
+    if (state.readability !== undefined) {
+      commit('setReadability', state.readability);
+    }
+    if (state.css !== undefined) {
+      commit('setCss', state.css);
+      commit('setSelectors', postcss.parse(state.css));
+    }
   },
 
   async openStylebot(
@@ -125,7 +145,12 @@ export default {
     }
   },
 
-  closeStylebot({ commit }: { commit: Commit }): void {
+  closeStylebot({ state, commit }: { state: State; commit: Commit }): void {
+    if (state.host === 'window') {
+      closeEditorWindow();
+      return;
+    }
+
     commit('setVisible', false);
   },
 

@@ -22,6 +22,9 @@ import {
   AddRecentColor,
   GetRecentColorsResponse,
   AddRecentColorResponse,
+  OpenEditorWindow,
+  ToggleEditorWindow,
+  CloseEditorWindow,
 } from '@stylebot/types';
 
 export const getAllOptions = (): Promise<StylebotOptions> => {
@@ -184,4 +187,21 @@ export const addRecentColor = async (
       resolve(response);
     });
   });
+};
+
+// From a content script the background resolves the tab itself; the window
+// host passes the tab it drives.
+export const openEditorWindow = (tabId?: number): void => {
+  const message: OpenEditorWindow = { name: 'OpenEditorWindow', tabId };
+  chrome.runtime.sendMessage(message);
+};
+
+export const toggleEditorWindow = (tabId?: number): void => {
+  const message: ToggleEditorWindow = { name: 'ToggleEditorWindow', tabId };
+  chrome.runtime.sendMessage(message);
+};
+
+export const closeEditorWindow = (tabId?: number): void => {
+  const message: CloseEditorWindow = { name: 'CloseEditorWindow', tabId };
+  chrome.runtime.sendMessage(message);
 };

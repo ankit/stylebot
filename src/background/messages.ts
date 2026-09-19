@@ -311,9 +311,13 @@ export const ToggleEditorWindow = async (
 };
 
 export const CloseEditorWindow = async (
-  message: CloseEditorWindowType
+  message: CloseEditorWindowType,
+  sender: chrome.runtime.MessageSender
 ): Promise<void> => {
-  await editorWindow.close(message.tabId);
+  const tabId = message.tabId ?? sender.tab?.id;
+  if (tabId !== undefined) {
+    await editorWindow.close(tabId);
+  }
 };
 
 export const GetIsEditorWindowOpen = async (

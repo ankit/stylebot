@@ -37,6 +37,11 @@ export type CssSelectorMetadata = {
 export type State = {
   host: EditorHost;
   page: PageSnapshot;
+  // Whether the page can be reached: always in the page host; in the window
+  // host, whether the port to the tab is up.
+  pageConnected: boolean;
+  // Whether a separate editor window is attached to this page; page host only.
+  windowConnected: boolean;
 
   url: string;
   css: string;
@@ -64,6 +69,8 @@ export const createStore = (host: EditorHost): Store<State> =>
     state: {
       host,
       page: emptyPageSnapshot(),
+      pageConnected: host === 'page',
+      windowConnected: false,
 
       css: '',
       enabled: true,

@@ -18,6 +18,14 @@ export default {
     state.page = page;
   },
 
+  setPageConnected(state: State, value: boolean): void {
+    state.pageConnected = value;
+  },
+
+  setWindowConnected(state: State, value: boolean): void {
+    state.windowConnected = value;
+  },
+
   setOptions(state: State, options: StylebotOptions): void {
     state.options = options;
   },
