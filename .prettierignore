@@ -4,6 +4,7 @@ node_modules
 coverage
 test-results
 playwright-report
+storybook-static
 patches
 yarn.lock
 CHANGELOG.md

@@ -13,6 +13,7 @@ export default tseslint.config(
       'coverage',
       'test-results',
       'playwright-report',
+      'storybook-static',
       'patches',
       '.chrome-dev-profile',
       '.edge-dev-profile',
@@ -116,6 +117,19 @@ export default tseslint.config(
     },
     rules: {
       '@typescript-eslint/prefer-optional-chain': 'error',
+    },
+  },
+
+  {
+    // Stories and Storybook config are typed against their own tsconfig,
+    // since the root one excludes them from the extension build.
+    files: ['src/**/*.stories.ts', '.storybook/**/*.ts'],
+    languageOptions: {
+      parserOptions: {
+        projectService: false,
+        project: '.storybook/tsconfig.json',
+        tsconfigRootDir: import.meta.dirname,
+      },
     },
   },
 

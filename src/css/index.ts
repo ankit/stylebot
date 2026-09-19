@@ -40,8 +40,8 @@ export {
   quoteFamily,
   replaceToken,
   unquoteFamily,
-  FontValueToken,
 } from './font-family';
+export type { FontValueToken } from './font-family';
 export { addDeclaration, appendImportantToDeclarations } from './declaration';
 export {
   getRule,
@@ -54,4 +54,5 @@ export {
   removeRule,
 } from './rule';
 
-export { getAlreadyUsedColors, RoleColorGroups } from './already-used-colors';
+export { getAlreadyUsedColors } from './already-used-colors';
+export type { RoleColorGroups } from './already-used-colors';

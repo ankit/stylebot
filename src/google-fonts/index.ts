@@ -1,8 +1,4 @@
-export {
-  GoogleFont,
-  GoogleFontCategory,
-  loadGoogleFonts,
-  matchGoogleFonts,
-  matchesFontQuery,
-} from './fonts';
-export { suggestFonts, FontSuggestion } from './suggest';
+export { loadGoogleFonts, matchGoogleFonts, matchesFontQuery } from './fonts';
+export type { GoogleFont, GoogleFontCategory } from './fonts';
+export { suggestFonts } from './suggest';
+export type { FontSuggestion } from './suggest';

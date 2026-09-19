@@ -13,4 +13,5 @@ coverage
 .history
 test-results
 playwright-report
+storybook-static
 .claude/worktrees
