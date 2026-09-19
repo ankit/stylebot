@@ -5,6 +5,7 @@ import { addons } from '@storybook/preview-api';
 import {
   FORCE_REMOUNT,
   GLOBALS_UPDATED,
+  SET_GLOBALS,
   STORY_RENDERED,
 } from '@storybook/core-events';
 import type { Preview } from '@storybook/vue';
@@ -27,13 +28,21 @@ installChrome();
    stores to pick it up. */
 const channel = addons.getChannel();
 let currentStoryId: string | undefined;
+let currentTheme: string | undefined;
 
 channel.on(STORY_RENDERED, (storyId: string) => {
   currentStoryId = storyId;
 });
 
-channel.on(GLOBALS_UPDATED, () => {
-  if (currentStoryId) {
+channel.on(SET_GLOBALS, ({ globals }: { globals: { theme?: string } }) => {
+  currentTheme = globals.theme;
+});
+
+channel.on(GLOBALS_UPDATED, ({ globals }: { globals: { theme?: string } }) => {
+  const themeChanged = globals.theme !== currentTheme;
+  currentTheme = globals.theme;
+
+  if (themeChanged && currentStoryId) {
     channel.emit(FORCE_REMOUNT, { storyId: currentStoryId });
   }
 });

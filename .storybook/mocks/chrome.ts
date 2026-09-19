@@ -27,8 +27,9 @@ export type ChromeShimOptions = {
 
 type Callback = (response?: unknown) => void;
 
-/* Pinned so screenshots don't churn on every release. */
+/* Pinned so stories don't churn on every release. */
 const MANIFEST_VERSION = '3.2.0';
+const RELEASE_VERSION = MANIFEST_VERSION.split('.').slice(0, 2).join('.');
 
 const getMessage = (key: string, substitutions: Array<string> = []) => {
   const entry = messages[key];
@@ -61,7 +62,7 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
     ...overrides.readabilitySettings,
   };
   const storage: Record<string, unknown> = {
-    [`notification~release/3.2`]: true,
+    [`notification~release/${RELEASE_VERSION}`]: true,
     ...overrides.storage,
   };
   const tab = {
