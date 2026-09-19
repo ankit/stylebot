@@ -131,6 +131,27 @@ export type AddRecentColor = {
   color: string;
 };
 
+// tabId defaults to the sending tab, for messages from a content script.
+export type OpenEditorWindow = {
+  name: 'OpenEditorWindow';
+  tabId?: number;
+};
+
+export type ToggleEditorWindow = {
+  name: 'ToggleEditorWindow';
+  tabId?: number;
+};
+
+export type CloseEditorWindow = {
+  name: 'CloseEditorWindow';
+  tabId: number;
+};
+
+export type GetIsEditorWindowOpen = {
+  name: 'GetIsEditorWindowOpen';
+  tabId: number;
+};
+
 type BackgroundPageMessage =
   | SetStyle
   | EnableStyle
@@ -156,6 +177,10 @@ type BackgroundPageMessage =
   | GetGoogleWebFontExists
   | RunGoogleDriveSync
   | GetRecentColors
-  | AddRecentColor;
+  | AddRecentColor
+  | OpenEditorWindow
+  | ToggleEditorWindow
+  | CloseEditorWindow
+  | GetIsEditorWindowOpen;
 
 export default BackgroundPageMessage;

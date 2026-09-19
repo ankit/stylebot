@@ -6,6 +6,8 @@ This package includes code for the extension background page.
 
 - **`contextmenu`**: Setup and update right-click context menu
 
+- **`editor-window`**: Opens, focuses and closes the separate editor window for a tab, and keeps the tab → window registry
+
 - **`listeners`**: Setup `chrome.runtime.onMessage` listeners to respond to messages from content scripts and options page
 
 - **`messages`**: All message handlers for `chrome.runtime.onMessage`
