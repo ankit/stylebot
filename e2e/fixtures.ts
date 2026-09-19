@@ -1,7 +1,5 @@
 import {
   test as base,
-  chromium,
-  firefox,
   type BrowserContext,
   type Page,
   type TestInfo,
@@ -9,22 +7,17 @@ import {
 } from '@playwright/test';
 import fs from 'node:fs';
 import type http from 'node:http';
-import net from 'node:net';
 import os from 'node:os';
 import path from 'node:path';
-import { FirefoxExtension } from './firefox-rdp';
+import { ChromiumEngine } from './chromium';
+import type { Engine, Extension, ExtensionFunction } from './engine';
+import { FirefoxEngine } from './firefox';
 
-// Set by scripts/e2e.mjs (`yarn e2e --edge` / `--firefox`). Edge uses the same
-// dist/ build as Chrome; Firefox runs against the separate firefox-dist/ build.
-const BROWSER = process.env.STYLEBOT_BROWSER ?? 'chrome';
-export const IS_FIREFOX = BROWSER === 'firefox';
-const CHANNEL = BROWSER === 'edge' ? 'msedge' : 'chrome';
+// Set by scripts/e2e.mjs (`yarn e2e --firefox`; `--edge` is handled inside chromium.ts).
+export const IS_FIREFOX = process.env.STYLEBOT_BROWSER === 'firefox';
+const engine: Engine = IS_FIREFOX ? new FirefoxEngine() : new ChromiumEngine();
 
-const DIST_PATH = path.resolve(
-  __dirname,
-  '..',
-  IS_FIREFOX ? 'firefox-dist' : 'dist'
-);
+const DIST_PATH = path.resolve(__dirname, '..', engine.distDir);
 
 // --ui mode force-manages tracing (a live `use.trace` flag) on every context,
 // including ours — fighting it for control throws, so skip ours when detected.
@@ -58,58 +51,15 @@ export async function closeServer(server: http.Server): Promise<void> {
   await closed;
 }
 
-type ExtensionFunction<A, R> = (arg: A) => R | Promise<R>;
-
-// The Chromium counterpart of FirefoxExtension: same surface, backed by the MV3
-// service worker that CDP's Extensions.loadUnpacked started.
-class ChromiumExtension {
-  private constructor(
-    private readonly context: BrowserContext,
-    readonly id: string
-  ) {}
-
-  static async load(
-    context: BrowserContext,
-    path: string
-  ): Promise<ChromiumExtension> {
-    const cdp = await context.browser()!.newBrowserCDPSession();
-    const { id } = await cdp.send('Extensions.loadUnpacked', { path });
-    return new ChromiumExtension(context, id);
-  }
-
-  isRunning(): boolean {
-    return this.context.serviceWorkers().length > 0;
-  }
-
-  async evaluate<A, R>(fn: ExtensionFunction<A, R>, arg?: A): Promise<R> {
-    const worker =
-      this.context.serviceWorkers()[0] ??
-      (await this.context.waitForEvent('serviceworker'));
-    return worker.evaluate(fn as (arg: A) => R, arg as A);
-  }
-
-  close(): void {}
-}
-
 type Instance = {
   context: BrowserContext;
   userDataDir: string;
-  extension: ChromiumExtension | FirefoxExtension;
+  extension: Extension;
 };
 export type RunInExtension = <A, R>(
   fn: ExtensionFunction<A, R>,
   arg?: A
 ) => Promise<R>;
-
-function freePort(): Promise<number> {
-  return new Promise(resolve => {
-    const server = net.createServer();
-    server.listen(0, () => {
-      const { port } = server.address() as net.AddressInfo;
-      server.close(() => resolve(port));
-    });
-  });
-}
 
 // One browser+extension instance per worker, reused across every test file that worker
 // runs — get() relaunches it on demand if the shared Chrome process died mid-suite.
@@ -156,41 +106,7 @@ class BrowserPool {
       colorScheme: null,
     };
 
-    const rdpPort = IS_FIREFOX ? await freePort() : null;
-    const context = IS_FIREFOX
-      ? await firefox.launchPersistentContext(userDataDir, {
-          ...launchOptions,
-          // Playwright can't install extensions into Firefox; the debugger server
-          // exposes the same protocol about:debugging uses to load one temporarily.
-          args: [`--start-debugger-server=${rdpPort}`],
-          firefoxUserPrefs: {
-            'devtools.debugger.prompt-connection': false,
-            // MV3 treats <all_urls> content scripts as optional host permissions
-            // that a user would normally have to grant on install.
-            'extensions.originControls.grantByDefault': true,
-            // Firefox terminates idle event pages after 30s, which would take
-            // the console we run chrome.storage calls through with it.
-            'extensions.background.idle.timeout': 3_600_000,
-          },
-        })
-      : // Chrome 137+ removed --load-extension; CDP's Extensions domain replaces it below.
-        await chromium.launchPersistentContext(userDataDir, {
-          ...launchOptions,
-          channel: CHANNEL,
-          chromiumSandbox: true,
-          ignoreDefaultArgs: [
-            // Playwright disables extensions by default, which would block our CDP-loaded one.
-            '--disable-extensions',
-            '--enable-automation',
-          ],
-          args: [
-            // Required for Extensions.loadUnpacked.
-            '--enable-unsafe-extension-debugging',
-            // Trims memory per worker — several of these run concurrently on CI.
-            '--disable-dev-shm-usage',
-            '--disable-gpu',
-          ],
-        });
+    const context = await engine.launch(userDataDir, launchOptions);
 
     // The extension opens this on fresh install, stealing tab focus.
     const closeHelpTab = (p: Page) => {
@@ -213,9 +129,7 @@ class BrowserPool {
       );
     }
 
-    const extension = rdpPort
-      ? await FirefoxExtension.load(rdpPort, DIST_PATH)
-      : await ChromiumExtension.load(context, DIST_PATH);
+    const extension = await engine.loadExtension(context, DIST_PATH);
 
     const instance: Instance = { context, userDataDir, extension };
     this.instances.push(instance);

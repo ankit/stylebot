@@ -6,7 +6,7 @@ Browser extension (Chrome/Edge/Firefox) that lets users change the appearance of
 
 - `src/` — extension source (background, content scripts, popup, options UI, editor)
 - `src/_locales/` — i18n strings per locale
-- `e2e/` — Playwright end-to-end tests, driven against a real built extension: via CDP (`Extensions.loadUnpacked`) on Chrome/Edge, via Firefox's remote debugging protocol (`e2e/firefox-rdp.ts`) on Firefox
+- `e2e/` — Playwright end-to-end tests, driven against a real built extension: via CDP (`Extensions.loadUnpacked`) on Chrome/Edge, via Firefox's remote debugging protocol on Firefox; engine-specific code lives in `e2e/chromium.ts` / `e2e/firefox.ts` behind `e2e/engine.ts`
 - `__mocks__/` — Jest mocks
 - `dist/` — Chrome/Edge build output; `firefox-dist/` — Firefox build output
 - `docs/` — stylebot.dev static site
