@@ -1,6 +1,13 @@
 import 'jest-fetch-mock';
 
-import { set, enable, getGoogleWebFontExists } from '../styles';
+import {
+  set,
+  enable,
+  disable,
+  move,
+  setReadability,
+  getGoogleWebFontExists,
+} from '../styles';
 
 describe('set', () => {
   let store: Record<string, unknown>;
@@ -57,6 +64,93 @@ describe('set', () => {
     const styles = store.styles as Record<string, { enabled: boolean }>;
     expect(styles['other.com']).toBeTruthy();
     expect(styles['example.com'].enabled).toBe(true);
+  });
+});
+
+describe('style edits', () => {
+  type StoredStyle = {
+    css: string;
+    enabled: boolean;
+    readability: boolean;
+    modifiedTime: string;
+  };
+
+  let store: { styles: Record<string, StoredStyle> };
+  const stored = (url: string) => store.styles[url];
+  const writes = () =>
+    (chrome.storage.local.set as jest.Mock).mock.calls.length;
+
+  beforeEach(() => {
+    jest.resetModules();
+
+    store = {
+      styles: {
+        'example.com': {
+          css: 'body { color: red; }',
+          readability: false,
+          enabled: true,
+          modifiedTime: '2024-01-01T00:00:00.000Z',
+        },
+      },
+    };
+
+    global.chrome = {
+      storage: {
+        local: {
+          get: jest.fn(async (key: string) => ({
+            [key]: JSON.parse(JSON.stringify(store[key as 'styles'])),
+          })),
+          set: jest.fn(async (items: Record<string, unknown>) => {
+            Object.assign(store, items);
+          }),
+        },
+      },
+    } as unknown as typeof chrome;
+  });
+
+  // Sync merges by per-style modifiedTime, so a toggle that leaves it alone
+  // loses to any older edit of the same style on another device.
+  it('stamps modifiedTime when a style is disabled, enabled or moved', async () => {
+    await disable('example.com');
+    expect(stored('example.com').enabled).toBe(false);
+    expect(stored('example.com').modifiedTime).not.toBe(
+      '2024-01-01T00:00:00.000Z'
+    );
+
+    store.styles['example.com'].modifiedTime = '2024-01-01T00:00:00.000Z';
+    await enable('example.com');
+    expect(stored('example.com').modifiedTime).not.toBe(
+      '2024-01-01T00:00:00.000Z'
+    );
+
+    store.styles['example.com'].modifiedTime = '2024-01-01T00:00:00.000Z';
+    await move('example.com', 'moved.com');
+    expect(stored('example.com')).toBeUndefined();
+    expect(stored('moved.com').modifiedTime).not.toBe(
+      '2024-01-01T00:00:00.000Z'
+    );
+  });
+
+  it('skips the write when enabling or disabling changes nothing', async () => {
+    await enable('example.com');
+    await disable('missing.com');
+
+    expect(writes()).toBe(0);
+  });
+
+  it('skips the write when readability is already at the requested value', async () => {
+    await setReadability('example.com', false);
+    await setReadability('missing.com', false);
+
+    expect(writes()).toBe(0);
+    expect(stored('missing.com')).toBeUndefined();
+  });
+
+  it('creates a blank style when readability is turned on for a new url', async () => {
+    await setReadability('new.com', true);
+
+    expect(stored('new.com')).toMatchObject({ css: '', readability: true });
+    expect(writes()).toBe(1);
   });
 });
 
