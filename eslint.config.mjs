@@ -13,6 +13,7 @@ export default tseslint.config(
       'coverage',
       'test-results',
       'playwright-report',
+      'storybook-static',
       'patches',
       '.chrome-dev-profile',
       '.edge-dev-profile',

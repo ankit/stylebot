@@ -1,6 +1,6 @@
 {
   "include": ["./*.d.ts", "./src/**/*"],
-  "exclude": ["node_modules"],
+  "exclude": ["node_modules", "src/**/*.stories.ts"],
 
   "compilerOptions": {
     "strict": true,

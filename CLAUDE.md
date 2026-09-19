@@ -27,10 +27,13 @@ session is already inside a worktree.
 - `yarn typecheck` — `tsc --noEmit`
 - `yarn test` — Jest unit tests
 - `yarn e2e` — builds the extension then runs the Playwright e2e suite headless on Chrome, as CI does. `--edge` / `--firefox` switch browser, `--headed` / `--ui` / `--debug` switch mode, `--no-build` skips the rebuild; see `e2e/README.md`.
+- `yarn storybook` — Storybook 7.6 (last line with Vue 2 support) for the shared primitives and popup/options/editor composites, with a light/dark toolbar
 
 ## Validation
 
 Always validate UI/extension changes with headless Playwright, not manual/headed browser interaction — the e2e harness in `e2e/fixtures.ts` already loads the real unpacked extension via CDP. Run `yarn e2e` (or a targeted test, e.g. `yarn e2e --no-build editor-open`) to confirm a change works end-to-end before calling it done.
+
+Stories live beside their component as `*.stories.ts`; give new shared primitives a story.
 
 ## Commit messages
 

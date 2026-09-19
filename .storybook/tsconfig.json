@@ -1,0 +1,8 @@
+{
+  "extends": "../tsconfig.json",
+  "include": ["./**/*", "../src/**/*.stories.ts", "../shims.vue.d.ts"],
+  "compilerOptions": {
+    "types": ["chrome", "node"],
+    "baseUrl": "../src"
+  }
+}
