@@ -1,20 +1,24 @@
 <template>
-  <div class="inspect-card" :style="{ top: `${top}px`, left: `${left}px` }">
+  <div
+    v-show="hasContent"
+    class="inspect-card"
+    :style="{ top: `${top}px`, left: `${left}px` }"
+  >
     <div v-if="placement" class="arrow" :class="placement" />
 
-    <div class="row">
-      <span class="chips">
+    <div v-if="showSelector || styleCount > 0" class="row">
+      <span v-if="showSelector" class="chips">
         <s-chip v-for="(part, i) in nameChips" :key="i">{{ part }}</s-chip>
       </span>
-      <span v-if="styleCount > 0" class="pill pill-accent">
+      <s-count-badge v-if="styleCount > 0" :count="styleCount">
         {{ styleCountLabel }}
-      </span>
+      </s-count-badge>
     </div>
 
     <div v-if="detailRows.length" class="details">
       <div v-for="row in detailRows" :key="row.label" class="detail-row">
         <div class="detail-label">{{ row.label }}</div>
-        <div class="detail-value" :class="{ 'align-left': row.wraps }">
+        <div class="detail-value">
           <span
             v-if="row.swatch"
             class="swatch"
@@ -22,6 +26,9 @@
           />
           {{ row.value }}
         </div>
+      </div>
+      <div v-if="hiddenDeclarationCount > 0" class="detail-more">
+        {{ t('count_more', [String(hiddenDeclarationCount)]) }}
       </div>
     </div>
 
@@ -38,9 +45,12 @@
             {{ part }}
           </s-chip>
         </span>
-        <span v-if="nextAncestor.styleCount > 0" class="pill pill-accent">
+        <s-count-badge
+          v-if="nextAncestor.styleCount > 0"
+          :count="nextAncestor.styleCount"
+        >
           {{ ancestorStyleCountLabel }}
-        </span>
+        </s-count-badge>
       </div>
     </template>
   </div>
@@ -48,9 +58,11 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { SChip, ShortcutChip } from '@stylebot/components';
+import { SChip, SCountBadge, ShortcutChip } from '@stylebot/components';
 import { splitSelectorList } from '@stylebot/css';
 import { CssDeclaration } from '@stylebot/types';
+
+const MAX_DETAIL_ROWS = 4;
 type NextAncestorInfo = { label: string; styleCount: number };
 
 function pluralize(count: number, word: string): string {
@@ -66,11 +78,15 @@ export default Vue.extend({
 
   components: {
     SChip,
+    SCountBadge,
     ShortcutChip,
   },
 
   data(): {
     name: string;
+    // Off for selector previews beside the panel, where the selector is
+    // already visible in the dropdown row or input being previewed.
+    showSelector: boolean;
     matchCount: number | undefined;
     styleCount: number;
     declarations: Array<CssDeclaration> | null;
@@ -81,6 +97,7 @@ export default Vue.extend({
   } {
     return {
       name: '',
+      showSelector: true,
       matchCount: undefined,
       styleCount: 0,
       declarations: null,
@@ -92,6 +109,15 @@ export default Vue.extend({
   },
 
   computed: {
+    hasContent(): boolean {
+      return (
+        this.showSelector ||
+        this.styleCount > 0 ||
+        this.showMatchCount ||
+        this.nextAncestor !== null
+      );
+    },
+
     nameChips(): Array<string> {
       return splitSelectorList(this.name);
     },
@@ -126,18 +152,21 @@ export default Vue.extend({
       label: string;
       value: string;
       swatch: string | null;
-      wraps: boolean;
     }> {
-      return (this.declarations ?? []).map(({ property, value }) => ({
-        label: property,
-        // The quotes are needed in the actual CSS value but just add noise
-        // in a list meant to be scanned, not copied.
-        value: property === 'font-family' ? value.replace(/['"]/g, '') : value,
-        swatch: property.toLowerCase().includes('color') ? value : null,
-        // A font stack is the one value long enough to wrap; wrapped text
-        // reads better left-aligned.
-        wraps: property === 'font-family',
-      }));
+      return (this.declarations ?? [])
+        .slice(0, MAX_DETAIL_ROWS)
+        .map(({ property, value }) => ({
+          label: property,
+          // The quotes are needed in the actual CSS value but just add noise
+          // in a list meant to be scanned, not copied.
+          value:
+            property === 'font-family' ? value.replace(/['"]/g, '') : value,
+          swatch: property.toLowerCase().includes('color') ? value : null,
+        }));
+    },
+
+    hiddenDeclarationCount(): number {
+      return Math.max(0, (this.declarations?.length ?? 0) - MAX_DETAIL_ROWS);
     },
   },
 });
@@ -206,37 +235,19 @@ export default Vue.extend({
   color: var(--text-secondary);
 }
 
-.pill {
-  flex: none;
-  display: inline-flex;
-  align-items: center;
-  padding: 2px 8px;
-  border-radius: 999px;
-  font-size: 10.5px;
-  font-weight: 500;
-}
-
-.pill-accent {
-  background: color-mix(in srgb, var(--accent) 14%, transparent);
-  color: var(--accent);
-}
-
 .details {
-  display: flex;
-  flex-flow: column nowrap;
-  gap: 5px;
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  column-gap: 16px;
+  row-gap: 5px;
   margin-top: 9px;
 }
 
 .detail-row {
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: baseline;
-  gap: 12px;
+  display: contents;
 }
 
 .detail-label {
-  flex: none;
   white-space: nowrap;
   font-family: var(
     --font-mono,
@@ -250,10 +261,11 @@ export default Vue.extend({
 }
 
 .detail-value {
-  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
   min-width: 0;
-  overflow-wrap: break-word;
-  text-align: right;
+  overflow-wrap: anywhere;
   font-family: var(
     --font-mono,
     'Fira Code',
@@ -265,26 +277,26 @@ export default Vue.extend({
   color: var(--text-secondary);
 }
 
-.detail-value.align-left {
-  flex: 0 1 auto;
-  margin-left: auto;
-  text-align: left;
-  line-height: 1.6;
-}
-
 .swatch {
-  display: inline-block;
+  flex: none;
   width: 9px;
   height: 9px;
   border-radius: 2px;
   border: 1px solid var(--panel-border);
-  margin-right: 4px;
-  vertical-align: middle;
+}
+
+.detail-more {
+  grid-column: 1 / -1;
+  color: var(--text-secondary);
 }
 
 .matches-row {
   margin-top: 10px;
   color: var(--text-secondary);
+
+  &:first-child {
+    margin-top: 0;
+  }
 }
 
 .divider {

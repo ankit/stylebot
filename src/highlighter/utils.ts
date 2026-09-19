@@ -10,8 +10,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import { CssDeclaration } from '@stylebot/types';
-
 export type Rect = {
   bottom: number;
   height: number;
@@ -153,21 +151,4 @@ export function getElementDimensions(domElement: HTMLElement): Dimensions {
     paddingTop: parseInt(calculatedStyle.paddingTop, 10),
     paddingBottom: parseInt(calculatedStyle.paddingBottom, 10),
   };
-}
-
-/**
- * A preview of how the element currently renders, so the inspect card
- * isn't empty when Stylebot has no declarations for it yet.
- */
-const PREVIEW_PROPERTIES = ['color', 'font-size', 'line-height'];
-
-export function getComputedDeclarations(
-  el: HTMLElement
-): Array<CssDeclaration> {
-  const computedStyle = window.getComputedStyle(el);
-
-  return PREVIEW_PROPERTIES.map(property => ({
-    property,
-    value: computedStyle.getPropertyValue(property),
-  }));
 }

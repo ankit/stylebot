@@ -1,9 +1,12 @@
 import Overlay from './Overlay';
-import { getComputedDeclarations } from './utils';
-import { getSelector } from '@stylebot/css';
+import { LayoutProperty, NextAncestorInfo } from './types';
+import { getSelector, splitSelectorList } from '@stylebot/css';
 import { CssDeclaration } from '@stylebot/types';
 
-type LayoutProperty = 'margin' | 'border' | 'padding' | 'height' | 'width';
+const WHOLE_PAGE_SELECTORS = ['*', 'body', 'html', ':root'];
+
+const isWholePageSelector = (selector: string): boolean =>
+  splitSelectorList(selector).some(part => WHOLE_PAGE_SELECTORS.includes(part));
 
 class Highlighter {
   overlay: Overlay | null;
@@ -83,6 +86,7 @@ class Highlighter {
     }
 
     const style = document.createElement('style');
+    style.id = 'stylebot-inspect-cursor';
     style.textContent = '* { cursor: default !important; }';
     document.head.appendChild(style);
     this.cursorStyleElement = style;
@@ -153,24 +157,14 @@ class Highlighter {
     return Array.from(document.querySelectorAll<HTMLElement>(selector));
   };
 
-  /**
-   * The user's authored declarations for the selector, falling back to a
-   * computed-style preview of `el` so the card isn't empty.
-   */
   getCardDeclarations = (
-    selector: string,
-    el: HTMLElement | undefined
+    selector: string
   ): { styleCount: number; declarations: Array<CssDeclaration> | null } => {
-    const authored = this.getStylebotDeclarations?.(selector) ?? null;
+    const declarations = this.getStylebotDeclarations?.(selector) ?? null;
 
     return {
-      styleCount: authored?.length ?? 0,
-      declarations:
-        authored && authored.length > 0
-          ? authored
-          : el
-          ? getComputedDeclarations(el)
-          : null,
+      styleCount: declarations?.length ?? 0,
+      declarations,
     };
   };
 
@@ -179,13 +173,17 @@ class Highlighter {
       return;
     }
 
-    const elements = this.queryMatches(selector);
+    // Boxing a whole-page selector just floods the page; the card alone
+    // still says what it styles.
+    const elements = isWholePageSelector(selector)
+      ? []
+      : this.queryMatches(selector);
 
     this.ensureOverlay().inspect(elements, selector, property, {
       // A selector preview, not picking one specific element — anchor
       // beside the panel rather than near wherever it matches.
       anchorToPanel: true,
-      ...this.getCardDeclarations(selector, elements[0]),
+      ...this.getCardDeclarations(selector),
     });
   };
 
@@ -223,9 +221,7 @@ class Highlighter {
    * Info about the immediate parent, offered as the single next step
    * upward rather than listing several levels at once.
    */
-  getNextAncestorInfo = (
-    el: HTMLElement
-  ): { label: string; styleCount: number } | null => {
+  getNextAncestorInfo = (el: HTMLElement): NextAncestorInfo | null => {
     const parent = el.parentElement;
 
     if (!parent || this.isStylebotElement(parent)) {
@@ -276,11 +272,21 @@ class Highlighter {
   };
 
   onClick = (event: MouseEvent): void => {
-    if (!this.isStylebotElement(event.target)) {
-      event.preventDefault();
-      event.stopPropagation();
+    if (this.isStylebotPanel(event.target)) {
+      return;
+    }
 
-      this.selectElement(this.currentElement ?? (event.target as HTMLElement));
+    event.preventDefault();
+    event.stopPropagation();
+
+    // A click on our own overlay (shielding an iframe) still means "this
+    // one" — the hovered element, never the overlay itself.
+    const el = this.isStylebotElement(event.target)
+      ? this.currentElement
+      : this.currentElement ?? (event.target as HTMLElement);
+
+    if (el) {
+      this.selectElement(el);
     }
   };
 
@@ -339,7 +345,7 @@ class Highlighter {
       {
         primary: el,
         nextAncestor: this.getNextAncestorInfo(el),
-        ...this.getCardDeclarations(selector, el),
+        ...this.getCardDeclarations(selector),
       }
     );
   };

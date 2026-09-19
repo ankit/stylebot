@@ -10,243 +10,62 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import Vue from 'vue';
-
+import OverlayRect from './OverlayRect';
+import OverlayTip from './OverlayTip';
 import {
   getElementDimensions,
   getNestedBoundingClientRect,
   Rect,
   Dimensions,
 } from './utils';
-import InspectorCard from './InspectorCard.vue';
+import { Box, LayoutProperty, NextAncestorInfo } from './types';
 import { CssDeclaration } from '@stylebot/types';
 
-type Box = {
-  top: number;
-  left: number;
-  width: number;
-  height: number;
-};
+type Edges = { top: number; right: number; bottom: number; left: number };
 
-type LayoutProperty = 'margin' | 'border' | 'padding' | 'height' | 'width';
-
-// https://dev.to/kingdaro/indexing-objects-in-typescript-1cgi
-function hasKey<O>(obj: O, key: string | number | symbol): key is keyof O {
-  return key in obj;
-}
-
-// OverlayRect's colors are fixed to roughly match Chrome devtools,
-// deliberately independent of Stylebot's own active theme.
-
-class OverlayRect {
-  node: HTMLElement;
-  border: HTMLElement;
-  padding: HTMLElement;
-  content: HTMLElement;
-
-  constructor(doc: Document, container: HTMLElement) {
-    this.node = doc.createElement('div');
-    this.border = doc.createElement('div');
-    this.padding = doc.createElement('div');
-    this.content = doc.createElement('div');
-
-    this.border.style.borderColor = overlayStyles.border;
-    this.padding.style.borderColor = overlayStyles.padding;
-    this.content.style.backgroundColor = overlayStyles.background;
-
-    Object.assign(this.node.style, {
-      borderColor: overlayStyles.margin,
-      pointerEvents: 'none',
-      position: 'fixed',
-    });
-
-    this.node.style.zIndex = '10000000';
-
-    this.node.appendChild(this.border);
-    this.border.appendChild(this.padding);
-    this.padding.appendChild(this.content);
-
-    container.appendChild(this.node);
-  }
-
-  remove() {
-    if (this.node.parentNode) {
-      this.node.parentNode.removeChild(this.node);
-    }
-  }
-
-  update(box: Rect, dims: Dimensions, property?: LayoutProperty) {
-    boxWrap(dims, 'margin', this.node);
-    boxWrap(dims, 'border', this.border);
-    boxWrap(dims, 'padding', this.padding);
-
-    Object.assign(this.content.style, {
-      height:
-        box.height -
-        dims.borderTop -
-        dims.borderBottom -
-        dims.paddingTop -
-        dims.paddingBottom +
-        'px',
-      width:
-        box.width -
-        dims.borderLeft -
-        dims.borderRight -
-        dims.paddingLeft -
-        dims.paddingRight +
-        'px',
-    });
-
-    this.content.style.backgroundColor = overlayStyles.background;
-
-    if (property) {
-      if (property !== 'height' && property !== 'width') {
-        this.content.style.backgroundColor = 'transparent';
-      }
-
-      if (property !== 'margin') {
-        this.node.style.borderColor = 'transparent';
-      }
-
-      if (property !== 'padding') {
-        this.padding.style.borderColor = 'transparent';
-      }
-
-      if (property !== 'border') {
-        this.border.style.borderColor = 'transparent';
-      }
-    }
-
-    Object.assign(this.node.style, {
-      top: box.top - dims.marginTop + 'px',
-      left: box.left - dims.marginLeft + 'px',
-    });
-  }
-}
-
-type NextAncestorInfo = {
-  label: string;
-  styleCount: number;
-};
-
-/**
- * The instance shape InspectorCard.vue exposes (shims.vue.d.ts types
- * `.vue` imports generically), for what's driven imperatively here.
- */
-type InspectorCardInstance = Vue & {
-  name: string;
-  matchCount: number | undefined;
-  styleCount: number;
-  declarations: Array<CssDeclaration> | null;
-  nextAncestor: NextAncestorInfo | null;
-  top: number;
-  left: number;
-  placement: 'above' | 'below' | null;
-};
-
-/**
- * A thin bridge to InspectorCard.vue, mounted into the editor's own
- * theme-provider subtree so it inherits the real theme CSS/fonts.
- */
-class OverlayTip {
-  vm: InspectorCardInstance;
-
-  constructor(container: HTMLElement) {
-    const mountEl = document.createElement('div');
-    container.appendChild(mountEl);
-
-    this.vm = new InspectorCard().$mount(mountEl) as InspectorCardInstance;
-  }
-
-  remove() {
-    this.vm.$destroy();
-    this.vm.$el.parentNode?.removeChild(this.vm.$el);
-  }
-
-  showSummary(
-    name: string,
-    matchCount: number | undefined,
-    nextAncestor: NextAncestorInfo | null | undefined,
-    styleCount: number | undefined,
-    declarations: Array<CssDeclaration> | null | undefined
-  ) {
-    this.vm.name = name;
-    this.vm.matchCount = matchCount;
-    this.vm.nextAncestor = nextAncestor ?? null;
-    this.vm.styleCount = styleCount ?? 0;
-    this.vm.declarations = declarations ?? null;
-  }
-
+type PickingOptions = {
+  primary?: HTMLElement;
+  nextAncestor?: NextAncestorInfo | null;
+  styleCount?: number;
+  declarations?: Array<CssDeclaration> | null;
   /**
-   * avoidHorizontal (the editor panel's left/right) shifts the card to
-   * whichever side has more room when it would land on top of the panel.
+   * A selector preview rather than picking an element — see
+   * OverlayTip.updatePositionNextToPanel.
    */
-  updatePosition(
-    dims: Box,
-    bounds: Box,
-    avoidHorizontal?: { left: number; right: number } | null
-  ) {
-    // Vue patches the content set above asynchronously — wait a tick so
-    // the size measured below reflects it, not the previous hover.
-    this.vm.$nextTick(() => {
-      const tipRect = (this.vm.$el as HTMLElement).getBoundingClientRect();
-      const tipPos = findTipPos(dims, bounds, {
-        width: tipRect.width,
-        height: tipRect.height,
-      });
+  anchorToPanel?: boolean;
+};
 
-      let left = parseFloat(tipPos.style.left);
+// A safety net against pathological cases, not a design choice.
+const MAX_ELEMENTS = 1000;
 
-      if (avoidHorizontal) {
-        const overlaps =
-          left < avoidHorizontal.right &&
-          left + tipRect.width > avoidHorizontal.left;
+const emptyEdges = (): Edges => ({
+  top: Number.POSITIVE_INFINITY,
+  right: Number.NEGATIVE_INFINITY,
+  bottom: Number.NEGATIVE_INFINITY,
+  left: Number.POSITIVE_INFINITY,
+});
 
-        if (overlaps) {
-          left = leftBesidePanel(avoidHorizontal, tipRect.width, 8);
-        }
-      }
+const isEmpty = (edges: Edges) => edges.left === Number.POSITIVE_INFINITY;
 
-      this.vm.top = parseFloat(tipPos.style.top);
-      this.vm.left = left;
-      this.vm.placement = tipPos.placement;
-    });
-  }
+const extend = (target: Edges, box: Rect, dims: Dimensions) => {
+  target.top = Math.min(target.top, box.top - dims.marginTop);
+  target.right = Math.max(
+    target.right,
+    box.left + box.width + dims.marginRight
+  );
+  target.bottom = Math.max(
+    target.bottom,
+    box.top + box.height + dims.marginBottom
+  );
+  target.left = Math.min(target.left, box.left - dims.marginLeft);
+};
 
-  /**
-   * For a selector preview rather than picking an element — sits beside the
-   * panel instead of near matches that may be scattered or off-screen.
-   */
-  updatePositionNextToPanel(panelEl: HTMLElement | null) {
-    this.vm.$nextTick(() => {
-      const tipRect = (this.vm.$el as HTMLElement).getBoundingClientRect();
-      const panelRect = panelEl?.getBoundingClientRect();
-      const margin = 16;
-      const viewportWidth = window.innerWidth;
-      const viewportHeight = window.innerHeight;
-
-      let left: number;
-      let top: number;
-
-      if (panelRect) {
-        left = leftBesidePanel(panelRect, tipRect.width, margin);
-        top = panelRect.top;
-      } else {
-        // Panel not found (shouldn't normally happen) — a corner beats
-        // leaving the card wherever it last was.
-        left = Math.max(margin, viewportWidth - tipRect.width - margin);
-        top = margin;
-      }
-
-      this.vm.left = left;
-      this.vm.top = Math.max(
-        margin,
-        Math.min(top, viewportHeight - tipRect.height - margin)
-      );
-      this.vm.placement = null;
-    });
-  }
-}
+const toBox = (edges: Edges): Box => ({
+  top: edges.top,
+  left: edges.left,
+  height: edges.bottom - edges.top,
+  width: edges.right - edges.left,
+});
 
 export default class Overlay {
   container: HTMLElement;
@@ -287,234 +106,108 @@ export default class Overlay {
     nodes: Array<HTMLElement>,
     cssSelector: string,
     property?: LayoutProperty,
-    picking?: {
-      primary?: HTMLElement;
-      nextAncestor?: NextAncestorInfo | null;
-      styleCount?: number;
-      declarations?: Array<CssDeclaration> | null;
-      /**
-       * A selector preview rather than picking an element — see
-       * OverlayTip.updatePositionNextToPanel.
-       */
-      anchorToPanel?: boolean;
-    }
+    picking?: PickingOptions
   ): void {
     const primary = picking?.primary;
-    const nextAncestor = picking?.nextAncestor;
-    const styleCount = picking?.styleCount;
-    const declarations = picking?.declarations;
     const anchorToPanel = picking?.anchorToPanel ?? false;
-
-    // A safety net against pathological cases, not a design choice.
-    const maxElements = 1000;
 
     const candidates = nodes.filter(
       node => node.nodeType === Node.ELEMENT_NODE
     ) as Array<HTMLElement>;
 
-    const rawMatchCount = candidates.length;
-
     // While picking, only the hovered element is highlighted; other
     // matches are reported via the tooltip's match count instead.
-    const elements = primary ? [primary] : candidates.slice(0, maxElements);
+    const elements = primary ? [primary] : candidates.slice(0, MAX_ELEMENTS);
 
-    while (this.rects.length > elements.length) {
-      const rect = this.rects.pop();
-      rect?.remove();
+    // Beside the panel the card stands on its own, e.g. for a selector
+    // that matches nothing right now (:hover) or is deliberately unboxed.
+    if (elements.length === 0 && !anchorToPanel) {
+      this.drawRects([], property);
+      return;
     }
 
-    if (elements.length === 0) {
+    const { outer, primaryEdges } = this.drawRects(elements, property, primary);
+
+    if (property) {
       return;
+    }
+
+    this.tip.showSummary({
+      name: cssSelector,
+      showSelector: !anchorToPanel,
+      // Shown for any picking/preview payload, not just active picking.
+      matchCount: picking ? candidates.length : undefined,
+      nextAncestor: picking?.nextAncestor,
+      styleCount: picking?.styleCount,
+      declarations: picking?.declarations,
+    });
+
+    const panelEl =
+      this.mountRoot?.querySelector<HTMLElement>('.stylebot') ?? null;
+
+    if (anchorToPanel) {
+      this.tip.updatePositionNextToPanel(panelEl);
+      return;
+    }
+
+    // Anchors to the primary element itself, not the union of every
+    // match, so scattered matches don't fling the tooltip around.
+    const anchor =
+      primaryEdges && !isEmpty(primaryEdges) ? primaryEdges : outer;
+
+    const docRect = getNestedBoundingClientRect(
+      window.document.documentElement,
+      window
+    );
+
+    const panelRect = panelEl?.getBoundingClientRect() ?? null;
+
+    this.tip.updatePosition(
+      toBox(anchor),
+      {
+        top: docRect.top + window.scrollY,
+        left: docRect.left + window.scrollX,
+        height: window.innerHeight,
+        width: window.innerWidth,
+      },
+      panelRect && { left: panelRect.left, right: panelRect.right }
+    );
+  }
+
+  /**
+   * Draws one rect per element, reusing existing ones, and returns the
+   * margin-inclusive edges of all of them and of `primary` alone.
+   */
+  drawRects(
+    elements: Array<HTMLElement>,
+    property?: LayoutProperty,
+    primary?: HTMLElement
+  ): { outer: Edges; primaryEdges: Edges | null } {
+    while (this.rects.length > elements.length) {
+      this.rects.pop()?.remove();
     }
 
     while (this.rects.length < elements.length) {
       this.rects.push(new OverlayRect(window.document, this.container));
     }
 
-    const emptyBox = () => ({
-      top: Number.POSITIVE_INFINITY,
-      right: Number.NEGATIVE_INFINITY,
-      bottom: Number.NEGATIVE_INFINITY,
-      left: Number.POSITIVE_INFINITY,
-    });
-
-    const outerBox = emptyBox();
-    const primaryBox = primary ? emptyBox() : null;
-
-    const accumulate = (
-      target: ReturnType<typeof emptyBox>,
-      box: Rect,
-      dims: Dimensions
-    ) => {
-      target.top = Math.min(target.top, box.top - dims.marginTop);
-      target.right = Math.max(
-        target.right,
-        box.left + box.width + dims.marginRight
-      );
-      target.bottom = Math.max(
-        target.bottom,
-        box.top + box.height + dims.marginBottom
-      );
-      target.left = Math.min(target.left, box.left - dims.marginLeft);
-    };
+    const outer = emptyEdges();
+    const primaryEdges = primary ? emptyEdges() : null;
 
     elements.forEach((element, index) => {
       const box = getNestedBoundingClientRect(element, window);
       const dims = getElementDimensions(element);
 
-      accumulate(outerBox, box, dims);
+      extend(outer, box, dims);
 
-      if (primaryBox && element === primary) {
-        accumulate(primaryBox, box, dims);
+      if (primaryEdges && element === primary) {
+        extend(primaryEdges, box, dims);
       }
 
       this.rects[index].update(box, dims, property);
+      this.rects[index].shield(element.tagName === 'IFRAME');
     });
 
-    if (!property) {
-      this.tip.showSummary(
-        cssSelector,
-        // Shown for any picking/preview payload, not just active picking.
-        picking ? rawMatchCount : undefined,
-        nextAncestor,
-        styleCount,
-        declarations
-      );
-
-      const panelEl =
-        this.mountRoot?.querySelector<HTMLElement>('.stylebot') ?? null;
-
-      if (anchorToPanel) {
-        this.tip.updatePositionNextToPanel(panelEl);
-      } else {
-        // Anchors to the primary element itself, not the union of every
-        // match, so scattered matches don't fling the tooltip around.
-        const tipBox =
-          primaryBox && primaryBox.left !== Number.POSITIVE_INFINITY
-            ? primaryBox
-            : outerBox;
-
-        const tipBounds = getNestedBoundingClientRect(
-          window.document.documentElement,
-          window
-        );
-
-        const panelRect = panelEl?.getBoundingClientRect() ?? null;
-
-        this.tip.updatePosition(
-          {
-            top: tipBox.top,
-            left: tipBox.left,
-            height: tipBox.bottom - tipBox.top,
-            width: tipBox.right - tipBox.left,
-          },
-          {
-            top: tipBounds.top + window.scrollY,
-            left: tipBounds.left + window.scrollX,
-            height: window.innerHeight,
-            width: window.innerWidth,
-          },
-          panelRect && { left: panelRect.left, right: panelRect.right }
-        );
-      }
-    }
+    return { outer, primaryEdges };
   }
 }
-
-/**
- * The tip's left edge when placed beside the panel, on whichever side has
- * more room, clamped to the viewport.
- */
-function leftBesidePanel(
-  panel: { left: number; right: number },
-  tipWidth: number,
-  margin: number
-): number {
-  const spaceLeft = panel.left;
-  const spaceRight = window.innerWidth - panel.right;
-
-  const left =
-    spaceLeft >= tipWidth + margin || spaceLeft > spaceRight
-      ? panel.left - tipWidth - margin
-      : panel.right + margin;
-
-  return Math.max(
-    margin,
-    Math.min(left, window.innerWidth - tipWidth - margin)
-  );
-}
-
-/**
- * Prefers placing the tip below the element, above only if there's no
- * room below, matching the reference design.
- */
-function findTipPos(
-  dims: Box,
-  bounds: Box,
-  tipSize: { width: number; height: number }
-) {
-  const tipHeight = Math.max(tipSize.height, 20);
-  const tipWidth = Math.max(tipSize.width, 60);
-  const margin = 8;
-
-  let top;
-  let placement: 'above' | 'below' | null;
-
-  if (
-    dims.top + dims.height + tipHeight + margin <=
-    bounds.top + bounds.height
-  ) {
-    top = dims.top + dims.height + margin;
-    placement = 'below';
-  } else if (dims.top - tipHeight - margin >= bounds.top) {
-    top = dims.top - tipHeight - margin;
-    placement = 'above';
-  } else {
-    top = bounds.top + margin;
-    placement = null;
-  }
-
-  // Flush with the element's left edge, not offset by `margin` (that's a
-  // vertical gap only).
-  let left = dims.left;
-  if (dims.left < bounds.left) {
-    left = bounds.left + margin;
-  }
-  if (dims.left + tipWidth > bounds.left + bounds.width) {
-    left = bounds.left + bounds.width - tipWidth - margin;
-  }
-
-  return {
-    style: { top: `${top}px`, left: `${left}px` },
-    placement,
-  };
-}
-
-function boxWrap(dims: Dimensions, what: string, node: HTMLElement) {
-  const topIndex = `${what}Top`;
-  const leftIndex = `${what}Left`;
-  const rightIndex = `${what}Right`;
-  const bottomIndex = `${what}Bottom`;
-
-  if (
-    hasKey<Dimensions>(dims, topIndex) &&
-    hasKey<Dimensions>(dims, leftIndex) &&
-    hasKey<Dimensions>(dims, rightIndex) &&
-    hasKey<Dimensions>(dims, bottomIndex)
-  ) {
-    Object.assign(node.style, {
-      borderTopWidth: dims[topIndex] + 'px',
-      borderLeftWidth: dims[leftIndex] + 'px',
-      borderRightWidth: dims[rightIndex] + 'px',
-      borderBottomWidth: dims[bottomIndex] + 'px',
-      borderStyle: 'solid',
-    });
-  }
-}
-
-const overlayStyles = {
-  background: 'rgba(120, 170, 210, 0.7)',
-  padding: 'rgba(77, 200, 0, 0.3)',
-  margin: 'rgba(255, 155, 0, 0.3)',
-  border: 'rgba(255, 200, 50, 0.3)',
-};
