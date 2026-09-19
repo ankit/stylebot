@@ -16,24 +16,16 @@ type NotificationId = string;
 
 const getNotificationKey = (id: NotificationId) => `notification~${id}`;
 
-export const getNotification = (id: NotificationId): Promise<boolean> => {
-  return new Promise(resolve => {
-    chrome.storage.local.get(getNotificationKey(id), items => {
-      resolve(items[getNotificationKey(id)]);
-    });
-  });
+export const getNotification = async (id: NotificationId): Promise<boolean> => {
+  const items = await chrome.storage.local.get(getNotificationKey(id));
+  return items[getNotificationKey(id)];
 };
 
 export const setNotification = (
   id: NotificationId,
   value: boolean
-): Promise<void> => {
-  return new Promise(resolve => {
-    chrome.storage.local.set({ [getNotificationKey(id)]: value }, () => {
-      resolve();
-    });
-  });
-};
+): Promise<void> =>
+  chrome.storage.local.set({ [getNotificationKey(id)]: value });
 
 // e.g. "3.1.4" -> "3.1", matching how releases are grouped on stylebot.dev.
 export const getReleaseVersion = (): string =>

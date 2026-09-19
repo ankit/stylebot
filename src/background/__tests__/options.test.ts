@@ -16,18 +16,22 @@ describe('set', () => {
     global.chrome = {
       storage: {
         local: {
-          get: jest.fn((key: string, callback: (items: unknown) => void) => {
-            // Simulate the read taking a tick, so a second set() call can
-            // start before the first one's read-modify-write finishes.
-            setTimeout(() => callback({ [key]: store[key] }), 10);
-          }),
+          get: jest.fn(
+            (key: string) =>
+              new Promise(resolve => {
+                // Simulate the read taking a tick, so a second set() call can
+                // start before the first one's read-modify-write finishes.
+                setTimeout(() => resolve({ [key]: store[key] }), 10);
+              })
+          ),
           set: jest.fn(
-            (items: Record<string, unknown>, callback?: () => void) => {
-              setTimeout(() => {
-                Object.assign(store, items);
-                callback?.();
-              }, 0);
-            }
+            (items: Record<string, unknown>) =>
+              new Promise<void>(resolve => {
+                setTimeout(() => {
+                  Object.assign(store, items);
+                  resolve();
+                }, 0);
+              })
           ),
         },
       },

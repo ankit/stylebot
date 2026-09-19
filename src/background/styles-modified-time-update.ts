@@ -1,27 +1,21 @@
 import { getCurrentTimestamp } from '@stylebot/utils';
 
 const StylesModifiedTimeUpdate = async (): Promise<void> => {
-  return new Promise(resolve => {
-    chrome.storage.local.get(items => {
-      if (items['styles']) {
-        const styles = items['styles'];
+  const { styles } = await chrome.storage.local.get('styles');
 
-        for (const url in styles) {
-          const style = styles[url];
+  if (!styles) {
+    return;
+  }
 
-          if (!style.modifiedTime) {
-            styles[url].modifiedTime = getCurrentTimestamp();
-          }
-        }
+  for (const url in styles) {
+    const style = styles[url];
 
-        chrome.storage.local.set({ styles }, () => {
-          resolve();
-        });
-      } else {
-        resolve();
-      }
-    });
-  });
+    if (!style.modifiedTime) {
+      styles[url].modifiedTime = getCurrentTimestamp();
+    }
+  }
+
+  await chrome.storage.local.set({ styles });
 };
 
 export default StylesModifiedTimeUpdate;

@@ -6,17 +6,13 @@ const fontUrl =
   'https://fonts.googleapis.com/css2?family=Muli:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap';
 
 let fontExists: boolean;
-const sendMessage = jest.fn(
-  (_message: any, callback: (response: any) => void) => callback(fontExists)
-);
+const sendMessage = jest.fn((_message: any) => Promise.resolve(fontExists));
 
 global.chrome = {
   runtime: {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error: not able to figure out how to override sendMessage here correctly.
     sendMessage,
   },
-};
+} as unknown as typeof chrome;
 
 describe('webfont', () => {
   beforeEach(() => {
@@ -37,10 +33,10 @@ describe('webfont', () => {
     it('checks the font via the background page, not a content script fetch', async () => {
       await addGoogleWebFont('Muli', 'a { font-family: Muli; }');
 
-      expect(sendMessage).toHaveBeenCalledWith(
-        { name: 'GetGoogleWebFontExists', url: fontUrl },
-        expect.any(Function)
-      );
+      expect(sendMessage).toHaveBeenCalledWith({
+        name: 'GetGoogleWebFontExists',
+        url: fontUrl,
+      });
     });
 
     it('does not add @import rule if it already exists', async () => {
@@ -55,6 +51,17 @@ describe('webfont', () => {
 
       const css = 'a { font-family: Roboto; }';
       const output = await addGoogleWebFont('Invalid', css);
+
+      expect(output).toBe(css);
+    });
+
+    it('returns the css unchanged if the background is unreachable', async () => {
+      sendMessage.mockRejectedValueOnce(
+        new Error('Could not establish connection.')
+      );
+
+      const css = 'a { font-family: Muli; }';
+      const output = await addGoogleWebFont('Muli', css);
 
       expect(output).toBe(css);
     });

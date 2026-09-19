@@ -72,18 +72,19 @@ export const pruneImportCache = (liveUrls: ReadonlySet<string>): void => {
 
 // Fetches one @import's CSS via the background service worker, to get
 // around CORS.
-const fetchAndCacheImportCss = (url: string): Promise<string> =>
-  new Promise(resolve => {
-    const message: GetImportCss = { name: 'GetImportCss', url };
+const fetchAndCacheImportCss = async (url: string): Promise<string> => {
+  const message: GetImportCss = { name: 'GetImportCss', url };
 
-    chrome.runtime.sendMessage(message, (response: GetImportCssResponse) => {
-      if (response) {
-        writeImportCache(url, response);
-      }
+  const response = await chrome.runtime
+    .sendMessage<GetImportCss, GetImportCssResponse>(message)
+    .catch(() => '');
 
-      resolve(response);
-    });
-  });
+  if (response) {
+    writeImportCache(url, response);
+  }
+
+  return response;
+};
 
 // Imported CSS (e.g. a Google Font) rarely changes and fetching it always
 // goes through the background service worker, which can be slow to wake

@@ -19,16 +19,14 @@ import {
   OpenDonatePage,
 } from '@stylebot/types';
 
-export const getAllOptions = async (): Promise<StylebotOptions> => {
+export const getAllOptions = (): Promise<StylebotOptions> => {
   const message: GetAllOptions = {
     name: 'GetAllOptions',
   };
 
-  return new Promise(resolve => {
-    chrome.runtime.sendMessage(message, (response: GetAllOptionsResponse) => {
-      resolve(response);
-    });
-  });
+  return chrome.runtime.sendMessage<GetAllOptions, GetAllOptionsResponse>(
+    message
+  );
 };
 
 export const setOption = (
@@ -46,7 +44,7 @@ export const setOption = (
   chrome.runtime.sendMessage(message);
 };
 
-export const getStylesForPage = async (
+export const getStylesForPage = (
   important: boolean
 ): Promise<GetStylesForPageResponse> => {
   const message: GetStylesForPage = {
@@ -54,14 +52,9 @@ export const getStylesForPage = async (
     important,
   };
 
-  return new Promise(resolve => {
-    chrome.runtime.sendMessage(
-      message,
-      (response: GetStylesForPageResponse) => {
-        resolve(response);
-      }
-    );
-  });
+  return chrome.runtime.sendMessage<GetStylesForPage, GetStylesForPageResponse>(
+    message
+  );
 };
 
 export const openOptionsPage = (): void => {
@@ -123,32 +116,24 @@ export const setReadability = (url: string, value: boolean): void => {
   chrome.runtime.sendMessage(message);
 };
 
-export const getCommands = async (): Promise<GetCommandsResponse> => {
+export const getCommands = (): Promise<GetCommandsResponse> => {
   const message: GetCommands = {
     name: 'GetCommands',
   };
 
-  return new Promise(resolve => {
-    chrome.runtime.sendMessage(message, (response: GetCommandsResponse) => {
-      resolve(response);
-    });
-  });
+  return chrome.runtime.sendMessage<GetCommands, GetCommandsResponse>(message);
 };
 
 export const getReadabilitySettings =
-  async (): Promise<GetReadabilitySettingsResponse> => {
+  (): Promise<GetReadabilitySettingsResponse> => {
     const message: GetReadabilitySettings = {
       name: 'GetReadabilitySettings',
     };
 
-    return new Promise(resolve => {
-      chrome.runtime.sendMessage(
-        message,
-        (response: GetReadabilitySettingsResponse) => {
-          resolve(response);
-        }
-      );
-    });
+    return chrome.runtime.sendMessage<
+      GetReadabilitySettings,
+      GetReadabilitySettingsResponse
+    >(message);
   };
 
 export const setReadabilitySettings = (value: ReadabilitySettings): void => {

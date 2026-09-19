@@ -26,7 +26,7 @@ describe('shortcutStore', () => {
       commands('')
     );
 
-    storageGet = jest.fn((_key, callback) => callback({}));
+    storageGet = jest.fn(() => Promise.resolve({}));
     storageSet = jest.fn();
     global.chrome = {
       storage: { local: { get: storageGet, set: storageSet } },
@@ -57,9 +57,7 @@ describe('shortcutStore', () => {
   it('promptDismissed is false before load and reflects the stored flag after', async () => {
     expect(shortcutStore.state.promptDismissed).toBe(false);
 
-    storageGet.mockImplementation((_key, callback) =>
-      callback({ readabilityShortcutPromptDismissed: true })
-    );
+    storageGet.mockResolvedValue({ readabilityShortcutPromptDismissed: true });
     await shortcutStore.ensureLoaded();
 
     expect(shortcutStore.state.promptDismissed).toBe(true);

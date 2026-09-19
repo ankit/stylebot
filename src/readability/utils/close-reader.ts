@@ -11,17 +11,15 @@ import {
  * The key readability was actually enabled under (usually just the domain) —
  * falling back to window.location.href would silently create a new entry.
  */
-const getExistingStyleUrl = (): Promise<string> => {
+const getExistingStyleUrl = async (): Promise<string> => {
   const message: GetStylesForPage = { name: 'GetStylesForPage' };
 
-  return new Promise(resolve => {
-    chrome.runtime.sendMessage(
-      message,
-      (response: GetStylesForPageResponse) => {
-        resolve(response?.defaultStyle?.url ?? document.domain);
-      }
-    );
-  });
+  const response = await chrome.runtime.sendMessage<
+    GetStylesForPage,
+    GetStylesForPageResponse
+  >(message);
+
+  return response?.defaultStyle?.url ?? document.domain;
 };
 
 /**

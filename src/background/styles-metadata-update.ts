@@ -1,22 +1,13 @@
 import { getCurrentTimestamp } from '@stylebot/utils';
 
 const StylesMetadataUpdate = async (): Promise<void> => {
-  return new Promise(resolve => {
-    chrome.storage.local.get(items => {
-      if (!items['styles-metadata']) {
-        chrome.storage.local.set(
-          {
-            'styles-metadata': getCurrentTimestamp(),
-          },
-          () => {
-            resolve();
-          }
-        );
-      } else {
-        resolve();
-      }
+  const items = await chrome.storage.local.get('styles-metadata');
+
+  if (!items['styles-metadata']) {
+    await chrome.storage.local.set({
+      'styles-metadata': getCurrentTimestamp(),
     });
-  });
+  }
 };
 
 export default StylesMetadataUpdate;

@@ -1,25 +1,10 @@
 import { defaultCommands } from '@stylebot/settings';
 import { StylebotCommands } from '@stylebot/types';
 
-export const get = (): Promise<StylebotCommands> => {
-  return new Promise(resolve => {
-    chrome.storage.local.get('commands', items => {
-      const commands = items['commands'];
-
-      if (commands) {
-        resolve(commands);
-        return;
-      }
-
-      resolve(defaultCommands);
-    });
-  });
+export const get = async (): Promise<StylebotCommands> => {
+  const items = await chrome.storage.local.get('commands');
+  return items['commands'] || defaultCommands;
 };
 
-export const set = (value: StylebotCommands): Promise<void> => {
-  return new Promise(resolve => {
-    chrome.storage.local.set({ commands: value }, () => {
-      resolve();
-    });
-  });
-};
+export const set = (value: StylebotCommands): Promise<void> =>
+  chrome.storage.local.set({ commands: value });
