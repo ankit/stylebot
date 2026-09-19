@@ -117,6 +117,27 @@ describe('inject-style', () => {
       expect(document.documentElement.lastChild).toBe(style);
     });
 
+    it('still repositions the style if parsing finishes before the observer ran (Firefox batches these)', async () => {
+      setReadyState('loading');
+
+      await injectCSSIntoDocument('a { color: blue !important; }', 'example');
+
+      const style = document.getElementById(
+        stylesheetId('example')
+      ) as HTMLStyleElement;
+
+      // No flush() between the reorder-worthy mutation and readystatechange:
+      // the observer's record is still queued when disconnect() would drop it.
+      document.documentElement.insertBefore(
+        style,
+        document.documentElement.firstChild
+      );
+      setReadyState('interactive');
+      document.dispatchEvent(new Event('readystatechange'));
+
+      expect(document.documentElement.lastChild).toBe(style);
+    });
+
     it('stops repositioning the style once the document has finished parsing', async () => {
       setReadyState('loading');
 

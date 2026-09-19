@@ -18,7 +18,7 @@ const keepStylebotStylesLast = (style: HTMLStyleElement): void => {
     return;
   }
 
-  reorderObserver = new MutationObserver(() => {
+  const reorder = () => {
     const lastStylebotElement = stylebotElements[stylebotElements.length - 1];
 
     if (document.documentElement.lastChild === lastStylebotElement) {
@@ -26,12 +26,16 @@ const keepStylebotStylesLast = (style: HTMLStyleElement): void => {
     }
 
     stylebotElements.forEach(el => document.documentElement.appendChild(el));
-  });
+  };
 
+  reorderObserver = new MutationObserver(reorder);
   reorderObserver.observe(document.documentElement, { childList: true });
 
   document.addEventListener('readystatechange', () => {
     if (document.readyState !== 'loading') {
+      // Firefox can flush <head>, <body> and this readyState change in one batch;
+      // disconnect() would discard the still-queued records, so reorder once more.
+      reorder();
       reorderObserver?.disconnect();
       reorderObserver = null;
     }
