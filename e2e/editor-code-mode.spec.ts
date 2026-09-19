@@ -58,8 +58,10 @@ test('toggling the panel appearance updates the Monaco editor theme immediately'
   const editorRoot = await openEditor(page, openPopup);
   await switchEditorMode(editorRoot, 'code');
 
+  // Firefox lacks the EditContext API, so Monaco falls back to a textarea
+  // whose cover element also carries .monaco-editor-background.
   const monacoBackground = getMonacoFrame(page).locator(
-    '.monaco-editor-background'
+    '.lines-content.monaco-editor-background'
   );
   await expect(monacoBackground).toBeVisible();
 

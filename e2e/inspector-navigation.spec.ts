@@ -124,14 +124,14 @@ test('clicking an iframe while picking selects it instead of activating its cont
 
   await expect(inspectorButton).toHaveClass(/active/);
 
-  await frame.hover();
+  // force: the shielding overlay is meant to intercept pointer events over
+  // the frame, which Playwright's hit-target check (Firefox) would wait out.
+  await frame.hover({ force: true });
   await expect(
     page.locator('.inspect-card .row').first().locator('.chip').last()
   ).toHaveText(/iframe/);
 
   // The ad link sits under the pointer, inside the frame's own document.
-  // force: the shielding overlay is meant to intercept this click, which
-  // Playwright's actionability check would otherwise wait out.
   await frame.click({ force: true });
 
   await expect(inspectorButton).not.toHaveClass(/active/);
