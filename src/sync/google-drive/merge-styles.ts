@@ -1,8 +1,20 @@
 import { compareAsc } from 'date-fns';
 import { StyleMap } from '@stylebot/types';
 
-const compareModifiedTime = (t1: string, t2: string) => {
-  return compareAsc(new Date(t1), new Date(t2));
+/**
+ * Returns 0 for an unparseable timestamp on either side, so the caller's
+ * `> 0` test falls through to keeping the local style rather than comparing
+ * against an Invalid Date.
+ */
+const compareModifiedTime = (t1?: string, t2?: string) => {
+  const d1 = new Date(t1 ?? '');
+  const d2 = new Date(t2 ?? '');
+
+  if (Number.isNaN(d1.getTime()) || Number.isNaN(d2.getTime())) {
+    return 0;
+  }
+
+  return compareAsc(d1, d2);
 };
 
 /**

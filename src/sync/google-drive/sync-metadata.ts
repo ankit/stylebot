@@ -25,5 +25,13 @@ export const getLocalStylesMetadata = async (): Promise<{
   modifiedTime: string;
 }> => {
   const items = await chrome.storage.local.get('styles-metadata');
-  return items['styles-metadata'];
+  const metadata = items['styles-metadata'];
+
+  if (typeof metadata?.modifiedTime === 'string') {
+    return metadata;
+  }
+
+  // StylesMetadataUpdate repairs this on startup, but a caller racing it
+  // must not be handed something it will dereference into Invalid Date.
+  return { modifiedTime: '' };
 };
