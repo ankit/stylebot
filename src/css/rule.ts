@@ -1,4 +1,5 @@
 import * as postcss from 'postcss';
+import { CssDeclaration } from '@stylebot/types';
 
 export const getRule = (css: string, selector: string): postcss.Rule | null => {
   const root = postcss.parse(css);
@@ -26,6 +27,24 @@ export const getRuleForSelector = (
   });
 
   return found;
+};
+
+export const getDeclarationsForSelector = (
+  css: string,
+  selector: string
+): Array<CssDeclaration> | null => {
+  const rule = getRuleForSelector(css, selector);
+
+  if (!rule) {
+    return null;
+  }
+
+  const declarations: Array<CssDeclaration> = [];
+  rule.walkDecls(decl => {
+    declarations.push({ property: decl.prop, value: decl.value });
+  });
+
+  return declarations.length > 0 ? declarations : null;
 };
 
 /**

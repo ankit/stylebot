@@ -24,6 +24,7 @@ export {
   getClassBasedSelector,
   getTagNameBasedSelector,
   getAncestorBasedSelector,
+  splitSelectorList,
   validateSelector,
 } from './selector';
 
@@ -32,6 +33,7 @@ export { addDeclaration, appendImportantToDeclarations } from './declaration';
 export {
   getRule,
   getRuleForSelector,
+  getDeclarationsForSelector,
   getExistingSelector,
   splitSelectorFromGroup,
   addEmptyRule,

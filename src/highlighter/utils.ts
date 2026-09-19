@@ -9,6 +9,9 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
+
+import { CssDeclaration } from '@stylebot/types';
+
 export type Rect = {
   bottom: number;
   height: number;
@@ -160,7 +163,7 @@ const PREVIEW_PROPERTIES = ['color', 'font-size', 'line-height'];
 
 export function getComputedDeclarations(
   el: HTMLElement
-): Array<{ property: string; value: string }> {
+): Array<CssDeclaration> {
   const computedStyle = window.getComputedStyle(el);
 
   return PREVIEW_PROPERTIES.map(property => ({

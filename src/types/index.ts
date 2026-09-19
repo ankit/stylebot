@@ -3,6 +3,8 @@ export type Timestamp = string;
 
 export type StylebotEditingMode = 'basic' | 'magic' | 'code';
 
+export type CssDeclaration = { property: string; value: string };
+
 export type StylebotBasicModeSections = {
   text: boolean;
   colors: boolean;

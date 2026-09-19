@@ -23,8 +23,13 @@
 <script lang="ts">
 import Vue from 'vue';
 import { MenuItem, SCountBadge, SChip } from '@stylebot/components';
-import { validateSelector, getRuleForSelector } from '@stylebot/css';
+import {
+  validateSelector,
+  getDeclarationsForSelector,
+  splitSelectorList,
+} from '@stylebot/css';
 import { Highlighter } from '@stylebot/highlighter';
+import { CssDeclaration } from '@stylebot/types';
 
 export default Vue.extend({
   name: 'TheCssSelectorDropdownItem',
@@ -54,10 +59,7 @@ export default Vue.extend({
 
   computed: {
     parts(): Array<string> {
-      return this.selector
-        .split(',')
-        .map(part => part.trim())
-        .filter(Boolean);
+      return splitSelectorList(this.selector);
     },
   },
 
@@ -101,21 +103,8 @@ export default Vue.extend({
       this.highlighter?.unhighlight();
     },
 
-    getStylebotDeclarations(
-      selector: string
-    ): Array<{ property: string; value: string }> | null {
-      const rule = getRuleForSelector(this.$store.state.css, selector);
-
-      if (!rule) {
-        return null;
-      }
-
-      const declarations: Array<{ property: string; value: string }> = [];
-      rule.walkDecls(decl => {
-        declarations.push({ property: decl.prop, value: decl.value });
-      });
-
-      return declarations.length > 0 ? declarations : null;
+    getStylebotDeclarations(selector: string): Array<CssDeclaration> | null {
+      return getDeclarationsForSelector(this.$store.state.css, selector);
     },
   },
 });

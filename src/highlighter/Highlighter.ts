@@ -1,17 +1,14 @@
 import Overlay from './Overlay';
 import { getComputedDeclarations } from './utils';
 import { getSelector } from '@stylebot/css';
+import { CssDeclaration } from '@stylebot/types';
 
 type LayoutProperty = 'margin' | 'border' | 'padding' | 'height' | 'width';
-
-type StylebotDeclaration = { property: string; value: string };
 
 class Highlighter {
   overlay: Overlay | null;
   onSelect: (selector: string) => void;
-  getStylebotDeclarations?: (
-    selector: string
-  ) => Array<StylebotDeclaration> | null;
+  getStylebotDeclarations?: (selector: string) => Array<CssDeclaration> | null;
   getExistingSelector?: (el: HTMLElement) => string | null;
   getMountRoot?: () => HTMLElement;
   currentElement: HTMLElement | null;
@@ -35,7 +32,7 @@ class Highlighter {
     onSelect: (selector: string) => void;
     getStylebotDeclarations?: (
       selector: string
-    ) => Array<StylebotDeclaration> | null;
+    ) => Array<CssDeclaration> | null;
     getExistingSelector?: (el: HTMLElement) => string | null;
     /**
      * The editor's theme-provider element, for the on-page tip to mount into.
@@ -144,33 +141,51 @@ class Highlighter {
     this.currentElement = el;
   };
 
+  ensureOverlay = (): Overlay => {
+    if (!this.overlay) {
+      this.overlay = new Overlay(this.getMountRoot?.());
+    }
+
+    return this.overlay;
+  };
+
+  queryMatches = (selector: string): Array<HTMLElement> => {
+    return Array.from(document.querySelectorAll<HTMLElement>(selector));
+  };
+
+  /**
+   * The user's authored declarations for the selector, falling back to a
+   * computed-style preview of `el` so the card isn't empty.
+   */
+  getCardDeclarations = (
+    selector: string,
+    el: HTMLElement | undefined
+  ): { styleCount: number; declarations: Array<CssDeclaration> | null } => {
+    const authored = this.getStylebotDeclarations?.(selector) ?? null;
+
+    return {
+      styleCount: authored?.length ?? 0,
+      declarations:
+        authored && authored.length > 0
+          ? authored
+          : el
+          ? getComputedDeclarations(el)
+          : null,
+    };
+  };
+
   highlight = (selector: string, property?: LayoutProperty): void => {
     if (!selector) {
       return;
     }
 
-    if (!this.overlay) {
-      this.overlay = new Overlay(this.getMountRoot?.());
-    }
+    const elements = this.queryMatches(selector);
 
-    const elements = Array.prototype.slice.call(
-      document.querySelectorAll(selector)
-    ) as Array<HTMLElement>;
-
-    const authoredDeclarations =
-      this.getStylebotDeclarations?.(selector) ?? null;
-
-    this.overlay.inspect(elements, selector, property, {
+    this.ensureOverlay().inspect(elements, selector, property, {
       // A selector preview, not picking one specific element — anchor
       // beside the panel rather than near wherever it matches.
       anchorToPanel: true,
-      styleCount: authoredDeclarations?.length ?? 0,
-      declarations:
-        authoredDeclarations && authoredDeclarations.length > 0
-          ? authoredDeclarations
-          : elements[0]
-          ? getComputedDeclarations(elements[0])
-          : null,
+      ...this.getCardDeclarations(selector, elements[0]),
     });
   };
 
@@ -315,29 +330,18 @@ class Highlighter {
   };
 
   showOverlay = (el: HTMLElement): void => {
-    if (!this.overlay) {
-      this.overlay = new Overlay(this.getMountRoot?.());
-    }
-
     const selector = this.getSelectorFor(el);
-    const matches = Array.prototype.slice.call(
-      document.querySelectorAll(selector)
-    ) as Array<HTMLElement>;
 
-    const authoredDeclarations =
-      this.getStylebotDeclarations?.(selector) ?? null;
-
-    this.overlay.inspect(matches, selector, undefined, {
-      primary: el,
-      nextAncestor: this.getNextAncestorInfo(el),
-      // Falls back to a computed-style preview when nothing's authored,
-      // rather than showing an empty card.
-      styleCount: authoredDeclarations?.length ?? 0,
-      declarations:
-        authoredDeclarations && authoredDeclarations.length > 0
-          ? authoredDeclarations
-          : getComputedDeclarations(el),
-    });
+    this.ensureOverlay().inspect(
+      this.queryMatches(selector),
+      selector,
+      undefined,
+      {
+        primary: el,
+        nextAncestor: this.getNextAncestorInfo(el),
+        ...this.getCardDeclarations(selector, el),
+      }
+    );
   };
 
   hideOverlay = (): void => {

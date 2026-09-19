@@ -18,8 +18,8 @@ import Vue from 'vue';
 import { STooltip } from '@stylebot/components';
 import { InspectorIcon } from '@stylebot/icons';
 import { Highlighter } from '@stylebot/highlighter';
-import { getRuleForSelector, getExistingSelector } from '@stylebot/css';
-import { StylebotEditingMode } from '@stylebot/types';
+import { getDeclarationsForSelector, getExistingSelector } from '@stylebot/css';
+import { CssDeclaration, StylebotEditingMode } from '@stylebot/types';
 
 export default Vue.extend({
   name: 'TheInspector',
@@ -104,21 +104,8 @@ export default Vue.extend({
       this.$emit('select', selector);
     },
 
-    getStylebotDeclarations(
-      selector: string
-    ): Array<{ property: string; value: string }> | null {
-      const rule = getRuleForSelector(this.$store.state.css, selector);
-
-      if (!rule) {
-        return null;
-      }
-
-      const declarations: Array<{ property: string; value: string }> = [];
-      rule.walkDecls(decl => {
-        declarations.push({ property: decl.prop, value: decl.value });
-      });
-
-      return declarations.length > 0 ? declarations : null;
+    getStylebotDeclarations(selector: string): Array<CssDeclaration> | null {
+      return getDeclarationsForSelector(this.$store.state.css, selector);
     },
 
     findExistingSelector(el: HTMLElement): string | null {

@@ -42,9 +42,13 @@
 <script lang="ts">
 import Vue from 'vue';
 import { SAutocomplete, SText, SCountBadge } from '@stylebot/components';
-import { validateSelector, getRuleForSelector } from '@stylebot/css';
+import {
+  validateSelector,
+  getDeclarationsForSelector,
+  splitSelectorList,
+} from '@stylebot/css';
 import { Highlighter } from '@stylebot/highlighter';
-import { StylebotEditingMode } from '@stylebot/types';
+import { CssDeclaration, StylebotEditingMode } from '@stylebot/types';
 
 import { CssSelectorMetadata } from '../../store';
 import TheCssSelectorDropdownItem from './TheCssSelectorDropdownItem.vue';
@@ -153,7 +157,7 @@ export default Vue.extend({
 
       // Skip whole-page selectors — highlighting them just floods the page.
       const wholePage = ['*', 'body', 'html', ':root'];
-      const parts = selector.split(',').map(part => part.trim());
+      const parts = splitSelectorList(selector);
 
       if (!selector || parts.some(part => wholePage.includes(part))) {
         this.highlighter?.unhighlight();
@@ -167,21 +171,8 @@ export default Vue.extend({
       }
     },
 
-    getStylebotDeclarations(
-      selector: string
-    ): Array<{ property: string; value: string }> | null {
-      const rule = getRuleForSelector(this.$store.state.css, selector);
-
-      if (!rule) {
-        return null;
-      }
-
-      const declarations: Array<{ property: string; value: string }> = [];
-      rule.walkDecls(decl => {
-        declarations.push({ property: decl.prop, value: decl.value });
-      });
-
-      return declarations.length > 0 ? declarations : null;
+    getStylebotDeclarations(selector: string): Array<CssDeclaration> | null {
+      return getDeclarationsForSelector(this.$store.state.css, selector);
     },
   },
 });

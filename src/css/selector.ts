@@ -85,49 +85,32 @@ function looksHashed(className: string): boolean {
   return transitions / className.length > 0.3;
 }
 
+const getClassNames = (el: HTMLElement): Array<string> =>
+  (el.getAttribute('class') ?? '').split(/\s+/).filter(Boolean);
+
+const classSelector = (el: HTMLElement, className: string | undefined) =>
+  className
+    ? `${el.tagName.toLowerCase()}.${escapeSelectorToken(className)}`
+    : null;
+
 /**
  * The first class that isn't hashed, so a stable but non-first class
  * doesn't lose out to a hashed one earlier in the list.
  */
 export const getNonHashedClassBasedSelector = (
   el: HTMLElement
-): string | null => {
-  const className = el
-    .getAttribute('class')
-    ?.trim()
-    .replace(/\s{2,}/g, ' ');
-
-  if (!className) {
-    return null;
-  }
-
-  const usableClass = className
-    .split(' ')
-    .find(candidate => !looksHashed(candidate));
-  if (!usableClass) {
-    return null;
-  }
-
-  return `${el.tagName.toLowerCase()}.${escapeSelectorToken(usableClass)}`;
-};
+): string | null =>
+  classSelector(
+    el,
+    getClassNames(el).find(candidate => !looksHashed(candidate))
+  );
 
 /**
  * Just the first class, hashed or not — the fallback once nothing more
  * stable (non-hashed class, test-id, name) is available.
  */
-export const getClassBasedSelector = (el: HTMLElement): string | null => {
-  const className = el
-    .getAttribute('class')
-    ?.trim()
-    .replace(/\s{2,}/g, ' ');
-
-  if (className) {
-    const firstClass = className.split(' ')[0];
-    return `${el.tagName.toLowerCase()}.${escapeSelectorToken(firstClass)}`;
-  }
-
-  return null;
-};
+export const getClassBasedSelector = (el: HTMLElement): string | null =>
+  classSelector(el, getClassNames(el)[0]);
 
 export const getIdBasedSelector = (el: HTMLElement): string | null => {
   const id = el.getAttribute('id');
@@ -228,6 +211,15 @@ export const getSelector = (el: HTMLElement): string => {
     getTagNameBasedSelector(el)
   );
 };
+
+/**
+ * The members of a comma-separated selector list, trimmed.
+ */
+export const splitSelectorList = (selector: string): Array<string> =>
+  selector
+    .split(',')
+    .map(part => part.trim())
+    .filter(Boolean);
 
 export const validateSelector = (selector: string): boolean => {
   if (!selector) {

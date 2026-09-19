@@ -49,17 +49,9 @@
 <script lang="ts">
 import Vue from 'vue';
 import { SChip, ShortcutChip } from '@stylebot/components';
-
-type StylebotDeclaration = { property: string; value: string };
+import { splitSelectorList } from '@stylebot/css';
+import { CssDeclaration } from '@stylebot/types';
 type NextAncestorInfo = { label: string; styleCount: number };
-
-// The same split TheCssSelectorDropdownItem.vue uses to render pills.
-function splitSelector(selector: string): Array<string> {
-  return selector
-    .split(',')
-    .map(part => part.trim())
-    .filter(Boolean);
-}
 
 function pluralize(count: number, word: string): string {
   return `${count} ${word}${count === 1 ? '' : 's'}`;
@@ -81,7 +73,7 @@ export default Vue.extend({
     name: string;
     matchCount: number | undefined;
     styleCount: number;
-    declarations: Array<StylebotDeclaration> | null;
+    declarations: Array<CssDeclaration> | null;
     nextAncestor: NextAncestorInfo | null;
     top: number;
     left: number;
@@ -101,11 +93,13 @@ export default Vue.extend({
 
   computed: {
     nameChips(): Array<string> {
-      return splitSelector(this.name);
+      return splitSelectorList(this.name);
     },
 
     ancestorChips(): Array<string> {
-      return this.nextAncestor ? splitSelector(this.nextAncestor.label) : [];
+      return this.nextAncestor
+        ? splitSelectorList(this.nextAncestor.label)
+        : [];
     },
 
     styleCountLabel(): string {

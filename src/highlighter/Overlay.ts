@@ -19,6 +19,7 @@ import {
   Dimensions,
 } from './utils';
 import InspectorCard from './InspectorCard.vue';
+import { CssDeclaration } from '@stylebot/types';
 
 type Box = {
   top: number;
@@ -128,8 +129,6 @@ type NextAncestorInfo = {
   styleCount: number;
 };
 
-type StylebotDeclaration = { property: string; value: string };
-
 /**
  * The instance shape InspectorCard.vue exposes (shims.vue.d.ts types
  * `.vue` imports generically), for what's driven imperatively here.
@@ -138,7 +137,7 @@ type InspectorCardInstance = Vue & {
   name: string;
   matchCount: number | undefined;
   styleCount: number;
-  declarations: Array<StylebotDeclaration> | null;
+  declarations: Array<CssDeclaration> | null;
   nextAncestor: NextAncestorInfo | null;
   top: number;
   left: number;
@@ -169,7 +168,7 @@ class OverlayTip {
     matchCount: number | undefined,
     nextAncestor: NextAncestorInfo | null | undefined,
     styleCount: number | undefined,
-    declarations: Array<StylebotDeclaration> | null | undefined
+    declarations: Array<CssDeclaration> | null | undefined
   ) {
     this.vm.name = name;
     this.vm.matchCount = matchCount;
@@ -204,19 +203,7 @@ class OverlayTip {
           left + tipRect.width > avoidHorizontal.left;
 
         if (overlaps) {
-          const margin = 8;
-          const spaceLeft = avoidHorizontal.left;
-          const spaceRight = window.innerWidth - avoidHorizontal.right;
-
-          left =
-            spaceLeft >= tipRect.width + margin || spaceLeft > spaceRight
-              ? avoidHorizontal.left - tipRect.width - margin
-              : avoidHorizontal.right + margin;
-
-          left = Math.max(
-            margin,
-            Math.min(left, window.innerWidth - tipRect.width - margin)
-          );
+          left = leftBesidePanel(avoidHorizontal, tipRect.width, 8);
         }
       }
 
@@ -242,27 +229,16 @@ class OverlayTip {
       let top: number;
 
       if (panelRect) {
-        // Prefer whichever side of the panel has more open space.
-        const spaceLeft = panelRect.left;
-        const spaceRight = viewportWidth - panelRect.right;
-
-        left =
-          spaceLeft >= tipRect.width + margin || spaceLeft > spaceRight
-            ? panelRect.left - tipRect.width - margin
-            : panelRect.right + margin;
-
+        left = leftBesidePanel(panelRect, tipRect.width, margin);
         top = panelRect.top;
       } else {
         // Panel not found (shouldn't normally happen) — a corner beats
         // leaving the card wherever it last was.
-        left = viewportWidth - tipRect.width - margin;
+        left = Math.max(margin, viewportWidth - tipRect.width - margin);
         top = margin;
       }
 
-      this.vm.left = Math.max(
-        margin,
-        Math.min(left, viewportWidth - tipRect.width - margin)
-      );
+      this.vm.left = left;
       this.vm.top = Math.max(
         margin,
         Math.min(top, viewportHeight - tipRect.height - margin)
@@ -315,7 +291,7 @@ export default class Overlay {
       primary?: HTMLElement;
       nextAncestor?: NextAncestorInfo | null;
       styleCount?: number;
-      declarations?: Array<StylebotDeclaration> | null;
+      declarations?: Array<CssDeclaration> | null;
       /**
        * A selector preview rather than picking an element — see
        * OverlayTip.updatePositionNextToPanel.
@@ -443,6 +419,29 @@ export default class Overlay {
       }
     }
   }
+}
+
+/**
+ * The tip's left edge when placed beside the panel, on whichever side has
+ * more room, clamped to the viewport.
+ */
+function leftBesidePanel(
+  panel: { left: number; right: number },
+  tipWidth: number,
+  margin: number
+): number {
+  const spaceLeft = panel.left;
+  const spaceRight = window.innerWidth - panel.right;
+
+  const left =
+    spaceLeft >= tipWidth + margin || spaceLeft > spaceRight
+      ? panel.left - tipWidth - margin
+      : panel.right + margin;
+
+  return Math.max(
+    margin,
+    Math.min(left, window.innerWidth - tipWidth - margin)
+  );
 }
 
 /**
