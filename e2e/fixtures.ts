@@ -9,9 +9,9 @@ import fs from 'node:fs';
 import type http from 'node:http';
 import os from 'node:os';
 import path from 'node:path';
-import { ChromiumEngine } from './chromium';
+import { ChromiumEngine } from './chromium/engine';
 import type { Engine, Extension, ExtensionFunction } from './engine';
-import { FirefoxEngine } from './firefox';
+import { FirefoxEngine } from './firefox/engine';
 
 // Set by scripts/e2e.mjs (`yarn e2e --firefox`; `--edge` is handled inside chromium.ts).
 export const IS_FIREFOX = process.env.STYLEBOT_BROWSER === 'firefox';
