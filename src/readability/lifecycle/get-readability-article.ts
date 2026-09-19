@@ -31,12 +31,17 @@ const isSameImage = (a: string, b: string): boolean => {
     return false;
   }
 
+  const maxLength = Math.min(idA.stem.length, idB.stem.length);
+
   let sharedPrefixLength = 0;
-  while (idA.stem[sharedPrefixLength] === idB.stem[sharedPrefixLength]) {
+  while (
+    sharedPrefixLength < maxLength &&
+    idA.stem[sharedPrefixLength] === idB.stem[sharedPrefixLength]
+  ) {
     sharedPrefixLength++;
   }
 
-  return sharedPrefixLength >= Math.min(idA.stem.length, idB.stem.length) * 0.5;
+  return sharedPrefixLength >= maxLength * 0.5;
 };
 
 /**
