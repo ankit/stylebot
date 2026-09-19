@@ -17,7 +17,7 @@ module.exports = {
     'prettier/vue',
   ],
 
-  plugins: ['@typescript-eslint', 'vue'],
+  plugins: ['@typescript-eslint', 'vue', 'jsdoc'],
 
   rules: {
     'vue/html-indent': 'off',
@@ -37,6 +37,24 @@ module.exports = {
       { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
     ],
     '@typescript-eslint/prefer-optional-chain': 'error',
+
+    'jsdoc/multiline-blocks': [
+      'error',
+      { noSingleLineBlocks: true, noZeroLineText: true, noFinalLineText: true },
+    ],
+    'jsdoc/no-restricted-syntax': [
+      'error',
+      {
+        contexts: [
+          {
+            comment: 'JsdocBlock:has(JsdocTag)',
+            context: 'any',
+            message:
+              'JSDoc @ tags are not allowed; describe the function in prose and let the TypeScript signature document params and return types.',
+          },
+        ],
+      },
+    ],
 
     'vue/component-name-in-template-casing': [
       'error',
