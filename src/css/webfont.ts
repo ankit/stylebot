@@ -1,33 +1,37 @@
 import { parse } from 'postcss';
 
+import { getPrimaryFontFamily } from './font-family';
+
 import {
   GetGoogleWebFontExists,
   GetGoogleWebFontExistsResponse,
 } from '@stylebot/types';
 
-/**
- * Checked from the background page because a content script's fetch runs in
- * the page's context, where Firefox enforces the page's CSP on it (see #754).
- */
-const googleWebFontExists = async (url: string): Promise<boolean> => {
-  const message: GetGoogleWebFontExists = {
-    name: 'GetGoogleWebFontExists',
-    url,
-  };
-
-  const response = await chrome.runtime
-    .sendMessage<GetGoogleWebFontExists, GetGoogleWebFontExistsResponse>(
-      message
-    )
-    .catch(() => false);
-
-  return !!response;
-};
+// Generic and global font-family keywords, which are never Google Fonts.
+const CSS_FAMILY_KEYWORDS = new Set([
+  'serif',
+  'sans-serif',
+  'monospace',
+  'cursive',
+  'fantasy',
+  'system-ui',
+  'ui-serif',
+  'ui-sans-serif',
+  'ui-monospace',
+  'ui-rounded',
+  'math',
+  'emoji',
+  'fangsong',
+  'inherit',
+  'initial',
+  'unset',
+  'revert',
+]);
 
 const getGoogleFontUrlAndParams = (
   value: string
 ): { url: string; params: string } => {
-  const arg = value.replace(' ', '+');
+  const arg = value.replace(/ /g, '+');
   const url = `https://fonts.googleapis.com/css2?family=${arg}:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap`;
   const params = `url(${url})`;
 
@@ -35,19 +39,12 @@ const getGoogleFontUrlAndParams = (
 };
 
 /**
- * If font exists in https://developers.google.com/fonts, add relevant @import to the css.
- * Guards against duplicate @import and invalid fonts.
+ * Adds the Google Fonts import for a family to the top of the css without
+ * checking that the family exists. Guards against a duplicate import.
  */
-export const addGoogleWebFont = async (
-  value: string,
-  css: string
-): Promise<string> => {
+export const addGoogleWebFontImport = (family: string, css: string): string => {
   const root = parse(css);
-  const { url, params } = getGoogleFontUrlAndParams(value);
-
-  if (!(await googleWebFontExists(url))) {
-    return css;
-  }
+  const { params } = getGoogleFontUrlAndParams(family);
 
   let importExists = false;
   root.walkAtRules('import', atRule => {
@@ -70,22 +67,54 @@ export const addGoogleWebFont = async (
 };
 
 /**
- * Remove unused google web fonts from given css.
+ * Whether a family is served by https://fonts.google.com. Checked from the
+ * background page because a content script's fetch runs in the page's
+ * context, where Firefox enforces the page's CSP on it (see #754).
+ */
+export const googleWebFontExists = async (family: string): Promise<boolean> => {
+  if (CSS_FAMILY_KEYWORDS.has(family.toLowerCase())) {
+    return false;
+  }
+
+  const message: GetGoogleWebFontExists = {
+    name: 'GetGoogleWebFontExists',
+    url: getGoogleFontUrlAndParams(family).url,
+  };
+
+  const response = await chrome.runtime
+    .sendMessage<GetGoogleWebFontExists, GetGoogleWebFontExistsResponse>(
+      message
+    )
+    .catch(() => false);
+
+  return !!response;
+};
+
+/**
+ * If the family exists on https://fonts.google.com, add its import to the css.
+ */
+export const addGoogleWebFont = async (
+  family: string,
+  css: string
+): Promise<string> =>
+  (await googleWebFontExists(family))
+    ? addGoogleWebFontImport(family, css)
+    : css;
+
+/**
+ * Remove google web font imports that no declaration uses as its first
+ * family; fallbacks further down a stack are never loaded.
  */
 export const cleanGoogleWebFonts = (css: string): string => {
   const root = parse(css);
   const fonts: Array<string> = [];
 
   root.walkDecls('font-family', decl => {
-    const declFonts = decl.value.split(',');
+    const family = getPrimaryFontFamily(decl.value);
 
-    declFonts.forEach(value => {
-      const trimmedValue = value.trim();
-
-      if (trimmedValue && fonts.indexOf(trimmedValue) === -1) {
-        fonts.push(trimmedValue);
-      }
-    });
+    if (family && fonts.indexOf(family) === -1) {
+      fonts.push(family);
+    }
   });
 
   const fontParams = fonts.map(font => getGoogleFontUrlAndParams(font).params);

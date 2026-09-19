@@ -3,14 +3,18 @@
     ref="menu"
     class="autocomplete"
     retain-focus
+    :trigger-field="() => $refs.input"
     @cancel="onCancel"
+    @leave="$emit('leave', value)"
   >
     <template #trigger="{ open }">
       <div class="autocomplete-pill" :class="{ disabled }">
         <div
           v-if="chips && !focused && !open && chipParts.length"
           class="autocomplete-chips"
+          tabindex="0"
           @mousedown.prevent="revealInput"
+          @focus="revealInput"
         >
           <s-chip v-for="(part, i) in chipParts" :key="i">{{ part }}</s-chip>
         </div>
@@ -30,6 +34,8 @@
           @keydown.up="onArrowKey(open, $event)"
           @focus="onFocus"
           @blur="onBlur"
+          @mousedown="onMouseDown"
+          @mouseup="onMouseUp"
           @input="onInput($event.target.value)"
         />
 
@@ -40,7 +46,9 @@
           class="autocomplete-chevron"
           :class="{ open }"
           :disabled="disabled"
-          @click="open ? hideMenu() : showAll()"
+          tabindex="-1"
+          @mousedown.prevent
+          @click="open ? hideMenu() : showAll(true)"
         >
           <chevron-down-icon />
         </button>
@@ -70,7 +78,11 @@ import AnchoredMenu from './AnchoredMenu.vue';
 import SMenu from './SMenu.vue';
 import SChip from './SChip.vue';
 
-type AnchoredMenuRef = { show(): void; close(): void };
+type AnchoredMenuRef = {
+  open: boolean;
+  show(): void;
+  close(options?: { skipRestoreFocus?: boolean }): void;
+};
 
 export default Vue.extend({
   name: 'SAutocomplete',
@@ -134,15 +146,39 @@ export default Vue.extend({
       type: Boolean,
       default: false,
     },
+
+    // Formats each pill's text (e.g. to drop the quotes around a font name).
+    chipLabel: {
+      type: Function as PropType<(part: string) => string>,
+      default: (part: string) => part,
+    },
+
+    // Select the whole value on focus, so typing replaces it (e.g. picking a
+    // different font) while the caret can still be placed with a second click.
+    selectOnFocus: {
+      type: Boolean,
+      default: false,
+    },
+
+    // Leave the field after a pick or Enter instead of keeping the caret in
+    // it, so the committed value shows (e.g. as chips) right away.
+    blurOnCommit: {
+      type: Boolean,
+      default: false,
+    },
   },
 
-  data(): { suppressReopen: boolean; previousValue: string; focused: boolean } {
+  data(): {
+    suppressReopen: boolean;
+    focused: boolean;
+    keepSelectionOnMouseUp: boolean;
+  } {
     return {
       suppressReopen: false,
-      // Value to revert to on Escape / click-outside — captured at the start
-      // of each editing session (focus / chevron-open).
-      previousValue: '',
       focused: false,
+      // The mouseup that ends a focusing click would collapse the
+      // select-on-focus selection to a caret; swallow that one mouseup.
+      keepSelectionOnMouseUp: false,
     };
   },
 
@@ -151,7 +187,8 @@ export default Vue.extend({
       return this.value
         .split(',')
         .map(part => part.trim())
-        .filter(Boolean);
+        .filter(Boolean)
+        .map(this.chipLabel);
     },
   },
 
@@ -178,7 +215,7 @@ export default Vue.extend({
     onArrowKey(open: boolean, event: KeyboardEvent): void {
       if (!open) {
         event.preventDefault();
-        this.showAll();
+        this.showAll(false);
       }
     },
 
@@ -220,17 +257,50 @@ export default Vue.extend({
 
     onFocus(): void {
       this.focused = true;
-      this.previousValue = this.value;
       // The freshly-mounted textarea (see `chips` prop) starts pinned at
       // the static 30px CSS height until this resizes it to fit.
       this.resize();
-      this.syncMenu();
+
+      // Arrow keys bring focus back from the menu's items mid-session: keep
+      // the menu as it is and put the caret at the end rather than
+      // re-selecting everything.
+      if (this.menu().open) {
+        const input = this.$refs.input as HTMLTextAreaElement | undefined;
+        input?.setSelectionRange(this.value.length, this.value.length);
+        this.$emit('focus');
+        return;
+      }
+
+      this.startSession();
+    },
+
+    // Begins editing in the (focused) field: selects the value if asked to,
+    // then opens the menu once `items` reflect the consumer's reaction to
+    // focus (e.g. listing everything while the value is untouched).
+    startSession(select = this.selectOnFocus): void {
+      if (select) {
+        (this.$refs.input as HTMLTextAreaElement | undefined)?.select();
+      }
+
       this.$emit('focus');
+      this.$nextTick(this.syncMenu);
     },
 
     onBlur(): void {
       this.focused = false;
+      this.keepSelectionOnMouseUp = false;
       this.$emit('blur');
+    },
+
+    onMouseDown(): void {
+      this.keepSelectionOnMouseUp = this.selectOnFocus && !this.focused;
+    },
+
+    onMouseUp(event: MouseEvent): void {
+      if (this.keepSelectionOnMouseUp) {
+        event.preventDefault();
+        this.keepSelectionOnMouseUp = false;
+      }
     },
 
     // Switches from the pill display back to the raw editable textarea
@@ -243,33 +313,49 @@ export default Vue.extend({
     },
 
     onSelect(item: Record<string, unknown>): void {
-      this.suppressReopen = true;
       this.$emit('select', item);
-      this.hideMenu();
+      this.finishCommit();
     },
 
+    // Confirms the typed value, which may be a custom entry not in `items`.
+    // Emitted before the blur that blur-on-commit triggers, so a consumer
+    // that also applies on leave sees the value as already committed.
     onEnter(): void {
-      // Confirm the typed value (which may be a custom entry not in `items`):
-      // keep it, close, and make it the new revert baseline.
-      this.suppressReopen = true;
-      this.previousValue = this.value;
-      this.hideMenu();
       this.$emit('submit', this.value);
+      this.finishCommit();
+    },
+
+    finishCommit(): void {
+      if (this.blurOnCommit) {
+        this.menu().close({ skipRestoreFocus: true });
+        (this.$refs.input as HTMLTextAreaElement | undefined)?.blur();
+        return;
+      }
+
+      // The refocus-on-close would otherwise reopen the menu.
+      this.suppressReopen = true;
+      this.hideMenu();
     },
 
     onCancel(): void {
-      // Escape / click-outside revert to the value from before this editing
-      // session and keep the menu closed (the refocus-on-close would otherwise
-      // reopen it). Enter (onEnter) commits instead.
+      // Escape / click-outside close the menu and keep the text as typed;
+      // the refocus-on-close must not reopen it.
       this.suppressReopen = true;
-      this.$emit('input', this.previousValue);
+      this.$emit('cancel');
     },
 
-    showAll(): void {
-      this.previousValue = this.value;
+    // Opens the menu from the chevron or Up/Down, like a click on the field:
+    // the value is kept, and the consumer lists everything while it's
+    // untouched. The chevron also re-selects the value like a click would;
+    // the arrow keys leave the caret where the user was typing.
+    showAll(select: boolean): void {
       this.suppressReopen = false;
-      this.$emit('input', '');
-      this.$nextTick(this.showMenu);
+
+      if (this.focused) {
+        this.startSession(select && this.selectOnFocus);
+      } else {
+        this.revealInput();
+      }
     },
   },
 });

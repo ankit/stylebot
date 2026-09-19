@@ -1,5 +1,5 @@
 import { test, expect } from './fixtures';
-import { openEditor } from './helpers';
+import { openEditor, seedStyles } from './helpers';
 
 // Editor-open depends on a popup tab-messaging round trip, which can lag
 // under a full parallel worker fleet (see e2e/readability.spec.ts).
@@ -71,4 +71,62 @@ test('Escape closes an open header dropdown instead of the whole editor', async 
 
   await page.keyboard.press('Escape');
   await expect(editorRoot.locator('.stylebot-content')).toHaveCount(0);
+});
+
+test('arrow keys return from the selector suggestions to the selector field', async ({
+  context,
+  extension,
+  openPopup,
+}) => {
+  await context.route('http://localhost/**', route =>
+    route.fulfill({ contentType: 'text/html', body: PAGE_HTML })
+  );
+  // Suggestions are the page's existing selectors, so seed a couple.
+  await seedStyles(extension, {
+    localhost: {
+      css: 'h1 { color: red; }\n\np { color: blue; }',
+      enabled: true,
+    },
+  });
+
+  const page = await context.newPage();
+  await page.goto('http://localhost/');
+
+  const editorRoot = await openEditor(page, openPopup);
+
+  const selector = editorRoot.locator('.selector-autocomplete');
+  const input = selector.locator('.autocomplete-input');
+  await page.locator('h1').click({ force: true });
+  const chips = selector.locator('.autocomplete-chips');
+  await expect(chips.locator('.chip').first()).toHaveText(/h1$/);
+
+  // The chips are a tab stop that hands focus to the input.
+  await chips.evaluate(el => (el as HTMLElement).focus());
+  await expect(input).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(editorRoot.getByRole('menu')).toHaveCount(0);
+
+  // The chevron focuses the field, keeps its value and lists every selector.
+  await selector.locator('.autocomplete-chevron').click();
+  await expect(editorRoot.getByRole('menu')).toBeVisible();
+  await expect(input).toBeFocused();
+  await expect(input).toHaveValue(/h1$/);
+  await expect(editorRoot.locator('.css-selector-dropdown-item')).toHaveCount(
+    2
+  );
+
+  await page.keyboard.press('ArrowDown');
+  await expect(
+    editorRoot.locator('.css-selector-dropdown-item').first()
+  ).toBeFocused();
+
+  await page.keyboard.press('ArrowUp');
+  await expect(input).toBeFocused();
+  await expect(editorRoot.getByRole('menu')).toBeVisible();
+
+  // Escape closes the list and leaves the selector as it was.
+  await page.keyboard.press('Escape');
+  await expect(editorRoot.getByRole('menu')).toHaveCount(0);
+  await expect(input).toHaveValue(/h1$/);
+  await expect(editorRoot.locator('.stylebot-content')).toHaveCount(1);
 });

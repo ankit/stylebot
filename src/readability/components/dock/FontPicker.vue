@@ -23,8 +23,8 @@ import {
   injectCSSIntoDocument,
 } from '@stylebot/css';
 
-// Kept apart from `defaultOptions.fonts`, which also powers the
-// general-purpose Text panel and needs display/code fonts too.
+// Kept apart from the editor's recently used fonts, which follow whatever
+// the user last picked and include display/code fonts.
 const READABILITY_FONTS: StylebotFonts = [
   'Merriweather',
   'Georgia',

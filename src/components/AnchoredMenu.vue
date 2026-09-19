@@ -1,5 +1,7 @@
 <template>
-  <div ref="root" class="anchored-menu" @focusout="onFocusOut">
+  <!-- blur, captured: a trigger that re-renders on blur (chips ↔ input)
+       has detached the field by the time focusout would bubble here. -->
+  <div ref="root" class="anchored-menu" @blur.capture="onFocusOut">
     <slot
       name="trigger"
       :toggle="toggleOpen"
@@ -21,7 +23,7 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+import Vue, { PropType } from 'vue';
 
 export default Vue.extend({
   name: 'AnchoredMenu',
@@ -32,6 +34,13 @@ export default Vue.extend({
     retainFocus: {
       type: Boolean,
       default: false,
+    },
+
+    // Returns that text field, so arrow keys cycle through it along with
+    // the items.
+    triggerField: {
+      type: Function as PropType<() => HTMLElement | null | undefined>,
+      default: () => null,
     },
   },
 
@@ -136,17 +145,28 @@ export default Vue.extend({
         : [];
     },
 
-    // Closes on focus leaving via Tab — retainFocus closes on leaving the input itself, except into the panel (arrow-key nav).
+    field(): HTMLElement | null {
+      return (this.retainFocus && this.triggerField()) || null;
+    },
+
+    // Closes on focus leaving via Tab — retainFocus closes on leaving the input itself, except into the panel (arrow-key nav) or back from it.
     onFocusOut(event: FocusEvent): void {
+      const next = event.relatedTarget;
+      const panel = this.$refs.panel as HTMLElement | undefined;
+      const movedIntoPanel = next instanceof Node && !!panel?.contains(next);
+      const field = this.field();
+
+      // `leave`: focus went from anywhere in the widget (field, chevron or
+      // a row) to outside it, or to nothing at all.
+      if (!(next instanceof Node && this.$el.contains(next))) {
+        this.$emit('leave');
+      }
+
       if (!this.open) {
         return;
       }
 
-      const next = event.relatedTarget;
-      const panel = this.$refs.panel as HTMLElement | undefined;
-      const movedIntoPanel = next instanceof Node && !!panel?.contains(next);
-
-      if (movedIntoPanel) {
+      if (movedIntoPanel || (!!next && next === field)) {
         return;
       }
 
@@ -158,9 +178,11 @@ export default Vue.extend({
       }
     },
 
+    // The path is fixed when the event is dispatched, so a trigger that
+    // re-rendered on this very mousedown (e.g. chips → input) still counts
+    // as inside.
     onDocMousedown(event: MouseEvent): void {
-      const origin = event.composedPath()[0];
-      if (!(origin instanceof Node && this.$el.contains(origin))) {
+      if (!event.composedPath().includes(this.$el)) {
         this.$emit('cancel');
         this.close();
       }
@@ -194,11 +216,23 @@ export default Vue.extend({
 
       event.preventDefault();
 
+      // A combobox's text field sits at the top of the cycle, so Up from the
+      // first item (or Down past the last) returns to it.
+      const field = this.field();
+      const cycle = field ? [field, ...items] : items;
+
       const active = this.activeElement();
-      const currentIndex = active ? items.indexOf(active) : -1;
+      const currentIndex = active ? cycle.indexOf(active) : -1;
       const delta = event.key === 'ArrowDown' ? 1 : -1;
-      const nextIndex = (currentIndex + delta + items.length) % items.length;
-      items[nextIndex].focus();
+
+      if (currentIndex === -1) {
+        // Nothing in the cycle has focus yet: enter it at the first or last item.
+        (delta > 0 ? items[0] : items[items.length - 1]).focus();
+        return;
+      }
+
+      const nextIndex = (currentIndex + delta + cycle.length) % cycle.length;
+      cycle[nextIndex].focus();
     },
   },
 });

@@ -10,13 +10,18 @@ type Getters = {
 
 import {
   addDeclaration,
-  addGoogleWebFont,
+  addGoogleWebFontImport,
   cleanGoogleWebFonts,
+  getPrimaryFontFamily,
+  googleWebFontExists,
   injectRootIntoDocument,
+  removeCSSFromDocument,
   getCssAfterApplyingFilterEffectToPage,
   removeEmptyRules,
   removeRule,
 } from '@stylebot/css';
+
+import { loadGoogleFonts } from '@stylebot/google-fonts';
 
 import { applyReadability, removeReadability } from '@stylebot/readability';
 
@@ -47,6 +52,17 @@ import {
 import { initListeners } from '../listeners';
 import { initEditor } from '../utils/init-editor';
 import { readCache, writeCache } from '../../inject-css/cache';
+
+const RECENT_FONTS_LIMIT = 10;
+const FONT_PREVIEW_ID = 'font-preview';
+
+const isBundledGoogleFont = async (family: string): Promise<boolean> =>
+  (await loadGoogleFonts()).some(font => font.family === family);
+
+// Bumped per apply/preview so that, after its awaits, a call superseded by a
+// newer one does nothing: the latest one owns the stylesheet.
+let fontRequest = 0;
+let previewRequest = 0;
 
 export default {
   async initialize(
@@ -197,6 +213,23 @@ export default {
     commit('setOptions', { ...state.options, lastColorPickerTab });
   },
 
+  /**
+   * Moves a font to the front of the recently used list, which the font
+   * picker shows by default.
+   */
+  rememberFont(
+    { state, commit }: { state: State; commit: Commit },
+    font: string
+  ): void {
+    const fonts = [
+      font,
+      ...state.options.fonts.filter(item => item !== font),
+    ].slice(0, RECENT_FONTS_LIMIT);
+
+    setOption('fonts', fonts);
+    commit('setOptions', { ...state.options, fonts });
+  },
+
   applyCss(
     { commit, state }: { commit: Commit; state: State },
     { css }: { css: string }
@@ -267,25 +300,82 @@ export default {
     dispatch('applyCss', { css });
   },
 
+  /**
+   * Applies a font-family value right away, then adds the Google Fonts import
+   * for its first family: synchronously when the family is in the bundled
+   * list, otherwise once the existence check comes back. Only explicit picks
+   * are remembered as recents, not text applied by leaving the field.
+   */
   async applyFontFamily(
     { state, dispatch }: { state: State; dispatch: Dispatch },
-    value: string
+    { value, remember = false }: { value: string; remember?: boolean }
   ): Promise<void> {
-    let css = state.css;
-
-    if (value) {
-      css = await addGoogleWebFont(value, css);
-    }
-
-    if (css !== state.css) {
-      dispatch('applyCss', { css });
-    }
+    const request = ++fontRequest;
+    const family = getPrimaryFontFamily(value);
 
     dispatch('applyDeclaration', { property: 'font-family', value });
 
-    css = cleanGoogleWebFonts(state.css);
+    if (family && remember) {
+      dispatch('rememberFont', family);
+    }
+
+    const shouldImport =
+      !!family &&
+      ((await isBundledGoogleFont(family)) ||
+        (await googleWebFontExists(family)));
+
+    if (request !== fontRequest) {
+      return;
+    }
+
+    // Read the css only now: other edits may have landed during the awaits.
+    const withImport = shouldImport
+      ? addGoogleWebFontImport(family, state.css)
+      : state.css;
+    const css = cleanGoogleWebFonts(withImport);
+
     if (css !== state.css) {
       dispatch('applyCss', { css });
+    }
+
+    removeCSSFromDocument(FONT_PREVIEW_ID);
+  },
+
+  /**
+   * Shows a font-family value on the active selector without saving it, via
+   * a separate stylesheet. An empty value removes the preview.
+   */
+  async previewFontFamily(
+    { state }: { state: State },
+    value: string
+  ): Promise<void> {
+    const request = ++previewRequest;
+
+    if (!state.activeSelector) {
+      return;
+    }
+
+    if (!value) {
+      removeCSSFromDocument(FONT_PREVIEW_ID);
+      return;
+    }
+
+    const family = getPrimaryFontFamily(value);
+    let css = `${state.activeSelector} { font-family: ${value}; }`;
+
+    if (family && (await isBundledGoogleFont(family))) {
+      css = addGoogleWebFontImport(family, css);
+    }
+
+    if (request !== previewRequest) {
+      return;
+    }
+
+    // Typed text may not be valid CSS; then there's nothing to preview.
+    try {
+      injectRootIntoDocument(postcss.parse(css), FONT_PREVIEW_ID);
+    } catch {
+      return;
     }
   },
 

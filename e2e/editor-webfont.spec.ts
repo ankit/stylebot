@@ -2,7 +2,7 @@ import http from 'node:http';
 import type { AddressInfo } from 'node:net';
 import type { BrowserContext, Page } from '@playwright/test';
 import { test, expect, closeServer, type Popup } from './fixtures';
-import { openEditor } from './helpers';
+import { openEditor, pickElement } from './helpers';
 
 // Editor-open depends on a popup tab-messaging round trip, which can lag
 // under a full parallel worker fleet (see e2e/readability.spec.ts).
@@ -80,21 +80,18 @@ const selectMontserrat = async (
   openPopup: () => Promise<Popup>
 ): Promise<void> => {
   const editorRoot = await openEditor(page, openPopup);
-
-  await expect(editorRoot.locator('.stylebot-inspector')).toHaveClass(/active/);
-  await page.locator('h1').click({ force: true });
-  await expect(
-    editorRoot.locator('.autocomplete-chips .chip').first()
-  ).toHaveText(/h1$/);
+  await pickElement(page, editorRoot, 'h1');
 
   // A freshly picked element with no existing declarations auto-expands the
-  // Text panel, which hosts the font-family select (see TheTextProperties.vue).
+  // Text panel, which hosts the font-family picker (see TheTextProperties.vue).
   // page-scoped, not editorRoot-scoped: see e2e/color-picker.spec.ts.
   const textCard = page.locator('.property-card').filter({
     has: page.locator('.property-card-label', { hasText: /^Text$/ }),
   });
-  await textCard.locator('.select-trigger').first().click();
-  await page.getByRole('menuitem', { name: 'Montserrat', exact: true }).click();
+  await textCard
+    .locator('.font-family-autocomplete .autocomplete-chevron')
+    .click();
+  await page.getByRole('menuitem', { name: /^Montserrat/ }).click();
 };
 
 test('selecting a font inlines its @font-face despite the page CSP', async ({

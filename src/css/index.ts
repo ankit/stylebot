@@ -28,7 +28,20 @@ export {
   validateSelector,
 } from './selector';
 
-export { addGoogleWebFont, cleanGoogleWebFonts } from './webfont';
+export {
+  addGoogleWebFont,
+  addGoogleWebFontImport,
+  cleanGoogleWebFonts,
+  googleWebFontExists,
+} from './webfont';
+export {
+  getPrimaryFontFamily,
+  getTokenAtCaret,
+  quoteFamily,
+  replaceToken,
+  unquoteFamily,
+  FontValueToken,
+} from './font-family';
 export { addDeclaration, appendImportantToDeclarations } from './declaration';
 export {
   getRule,
