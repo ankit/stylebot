@@ -7,6 +7,8 @@
       :items="filteredOptions"
       :placeholder="t('color_picker_search_palettes')"
       @input="query = $event"
+      @focus="openingQuery = query"
+      @cancel="query = activeLabel"
     >
       <template #item="{ item, select }">
         <menu-item
@@ -150,6 +152,7 @@ export default Vue.extend({
   data(): {
     activeKey: string;
     query: string;
+    openingQuery: string;
     neutralRamps: Array<ColorRamp>;
     allOptions: Array<PaletteOption>;
   } {
@@ -170,18 +173,29 @@ export default Vue.extend({
     return {
       activeKey,
       query: allOptions.find(option => option.key === activeKey)?.label || '',
+      // The query as it was when editing began (focus or chevron); until
+      // it's changed, every palette is listed rather than filtering by it.
+      openingQuery: '',
       neutralRamps,
       allOptions,
     };
   },
 
   computed: {
+    activeLabel(): string {
+      return (
+        this.allOptions.find(option => option.key === this.activeKey)?.label ||
+        ''
+      );
+    },
+
     filteredOptions(): Array<PaletteOption> {
       const query = this.query.trim().toLowerCase();
-      const activeLabel =
-        this.allOptions.find(option => option.key === this.activeKey)?.label ||
-        '';
-      if (!query || query === activeLabel.toLowerCase()) {
+      if (
+        !query ||
+        this.query === this.openingQuery ||
+        query === this.activeLabel.toLowerCase()
+      ) {
         return this.allOptions;
       }
 

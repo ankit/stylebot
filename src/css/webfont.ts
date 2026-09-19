@@ -7,24 +7,26 @@ import {
   GetGoogleWebFontExistsResponse,
 } from '@stylebot/types';
 
-/**
- * Checked from the background page because a content script's fetch runs in
- * the page's context, where Firefox enforces the page's CSP on it (see #754).
- */
-const googleWebFontExists = async (url: string): Promise<boolean> => {
-  const message: GetGoogleWebFontExists = {
-    name: 'GetGoogleWebFontExists',
-    url,
-  };
-
-  const response = await chrome.runtime
-    .sendMessage<GetGoogleWebFontExists, GetGoogleWebFontExistsResponse>(
-      message
-    )
-    .catch(() => false);
-
-  return !!response;
-};
+// Generic and global font-family keywords, which are never Google Fonts.
+const CSS_FAMILY_KEYWORDS = new Set([
+  'serif',
+  'sans-serif',
+  'monospace',
+  'cursive',
+  'fantasy',
+  'system-ui',
+  'ui-serif',
+  'ui-sans-serif',
+  'ui-monospace',
+  'ui-rounded',
+  'math',
+  'emoji',
+  'fangsong',
+  'inherit',
+  'initial',
+  'unset',
+  'revert',
+]);
 
 const getGoogleFontUrlAndParams = (
   value: string
@@ -64,26 +66,29 @@ export const addGoogleWebFontImport = (family: string, css: string): string => {
   return root.toString();
 };
 
-// Generic and global font-family keywords, which are never Google Fonts.
-const CSS_FAMILY_KEYWORDS = new Set([
-  'serif',
-  'sans-serif',
-  'monospace',
-  'cursive',
-  'fantasy',
-  'system-ui',
-  'ui-serif',
-  'ui-sans-serif',
-  'ui-monospace',
-  'ui-rounded',
-  'math',
-  'emoji',
-  'fangsong',
-  'inherit',
-  'initial',
-  'unset',
-  'revert',
-]);
+/**
+ * Whether a family is served by https://fonts.google.com. Checked from the
+ * background page because a content script's fetch runs in the page's
+ * context, where Firefox enforces the page's CSP on it (see #754).
+ */
+export const googleWebFontExists = async (family: string): Promise<boolean> => {
+  if (CSS_FAMILY_KEYWORDS.has(family.toLowerCase())) {
+    return false;
+  }
+
+  const message: GetGoogleWebFontExists = {
+    name: 'GetGoogleWebFontExists',
+    url: getGoogleFontUrlAndParams(family).url,
+  };
+
+  const response = await chrome.runtime
+    .sendMessage<GetGoogleWebFontExists, GetGoogleWebFontExistsResponse>(
+      message
+    )
+    .catch(() => false);
+
+  return !!response;
+};
 
 /**
  * If the family exists on https://fonts.google.com, add its import to the css.
@@ -91,19 +96,10 @@ const CSS_FAMILY_KEYWORDS = new Set([
 export const addGoogleWebFont = async (
   family: string,
   css: string
-): Promise<string> => {
-  if (CSS_FAMILY_KEYWORDS.has(family.toLowerCase())) {
-    return css;
-  }
-
-  const { url } = getGoogleFontUrlAndParams(family);
-
-  if (!(await googleWebFontExists(url))) {
-    return css;
-  }
-
-  return addGoogleWebFontImport(family, css);
-};
+): Promise<string> =>
+  (await googleWebFontExists(family))
+    ? addGoogleWebFontImport(family, css)
+    : css;
 
 /**
  * Remove google web font imports that no declaration uses as its first

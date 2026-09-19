@@ -32,6 +32,7 @@ export {
   addGoogleWebFont,
   addGoogleWebFontImport,
   cleanGoogleWebFonts,
+  googleWebFontExists,
 } from './webfont';
 export {
   getPrimaryFontFamily,

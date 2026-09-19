@@ -37,8 +37,7 @@ export default Vue.extend({
     },
 
     // Returns that text field, so arrow keys cycle through it along with
-    // the items and `leave` fires when focus goes from it to anywhere but
-    // the panel.
+    // the items.
     triggerField: {
       type: Function as PropType<() => HTMLElement | null | undefined>,
       default: () => null,
@@ -157,7 +156,9 @@ export default Vue.extend({
       const movedIntoPanel = next instanceof Node && !!panel?.contains(next);
       const field = this.field();
 
-      if (field && event.target === field && !movedIntoPanel) {
+      // `leave`: focus went from anywhere in the widget (field, chevron or
+      // a row) to outside it, or to nothing at all.
+      if (!(next instanceof Node && this.$el.contains(next))) {
         this.$emit('leave');
       }
 

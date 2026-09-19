@@ -199,6 +199,7 @@ test('a category name lists that category, and the browse row opens Google Fonts
 
 test('arrow keys move between the field and the suggestions', async ({
   context,
+  extension,
   openPopup,
 }) => {
   const { page, font } = await setup(context, openPopup);
@@ -223,15 +224,46 @@ test('arrow keys move between the field and the suggestions', async ({
   await page.keyboard.press('ArrowDown');
   await expect(input).toBeFocused();
 
-  // Escape only closes the list; the text stays and applies on leaving.
+  // Escape only closes the list; the text stays, and reopening with Down
+  // keeps the caret rather than re-selecting the text.
   await page.keyboard.press('Escape');
   await expect(page.getByRole('menu')).toHaveCount(0);
   await expect(input).toHaveValue('playfa');
   await expect(input).toBeFocused();
+  await page.keyboard.press('ArrowDown');
+  await expect(page.getByRole('menu')).toBeVisible();
+  await page.keyboard.type('i');
+  await expect(input).toHaveValue('playfai');
 
+  // Leaving from a row applies the typed text just like leaving from the
+  // field, and a half-typed name is applied but not remembered.
+  await page.keyboard.press('ArrowDown');
   await page.keyboard.press('Tab');
-  await expect(font.locator('.autocomplete-chips .chip')).toHaveText('playfa');
-  await expect(page.locator('h1')).toHaveCSS('font-family', /playfa/);
+  await expect(font.locator('.autocomplete-chips .chip')).toHaveText('playfai');
+  await expect(page.locator('h1')).toHaveCSS('font-family', /playfai/);
+  expect((await readRecentFonts(extension)) ?? []).not.toContain('playfai');
+});
+
+test('browsing Google Fonts discards typed text instead of showing it unapplied', async ({
+  context,
+  openPopup,
+}) => {
+  await context.route('https://fonts.google.com/**', route =>
+    route.fulfill({ contentType: 'text/html', body: '<title>Fonts</title>' })
+  );
+
+  const { page, font } = await setup(context, openPopup);
+
+  await openPicker(font);
+  await page.keyboard.type('playf');
+
+  const opened = context.waitForEvent('page');
+  await menuItem(page, 'Browse Google Fonts').click();
+  await opened;
+
+  await expect(font.locator('.autocomplete-chips')).toHaveCount(0);
+  await expect(font.locator('.autocomplete-input')).toHaveValue('');
+  await expect(page.locator('h1')).not.toHaveCSS('font-family', /playf/);
 });
 
 test('escape closes the picker without closing the editor', async ({

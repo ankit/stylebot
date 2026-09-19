@@ -46,8 +46,9 @@
           class="autocomplete-chevron"
           :class="{ open }"
           :disabled="disabled"
+          tabindex="-1"
           @mousedown.prevent
-          @click="open ? hideMenu() : showAll()"
+          @click="open ? hideMenu() : showAll(true)"
         >
           <chevron-down-icon />
         </button>
@@ -214,7 +215,7 @@ export default Vue.extend({
     onArrowKey(open: boolean, event: KeyboardEvent): void {
       if (!open) {
         event.preventDefault();
-        this.showAll();
+        this.showAll(false);
       }
     },
 
@@ -276,8 +277,8 @@ export default Vue.extend({
     // Begins editing in the (focused) field: selects the value if asked to,
     // then opens the menu once `items` reflect the consumer's reaction to
     // focus (e.g. listing everything while the value is untouched).
-    startSession(): void {
-      if (this.selectOnFocus) {
+    startSession(select = this.selectOnFocus): void {
+      if (select) {
         (this.$refs.input as HTMLTextAreaElement | undefined)?.select();
       }
 
@@ -344,12 +345,14 @@ export default Vue.extend({
     },
 
     // Opens the menu from the chevron or Up/Down, like a click on the field:
-    // the value is kept, and the consumer lists everything while it's untouched.
-    showAll(): void {
+    // the value is kept, and the consumer lists everything while it's
+    // untouched. The chevron also re-selects the value like a click would;
+    // the arrow keys leave the caret where the user was typing.
+    showAll(select: boolean): void {
       this.suppressReopen = false;
 
       if (this.focused) {
-        this.startSession();
+        this.startSession(select && this.selectOnFocus);
       } else {
         this.revealInput();
       }

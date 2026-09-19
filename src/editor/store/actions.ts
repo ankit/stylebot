@@ -10,10 +10,10 @@ type Getters = {
 
 import {
   addDeclaration,
-  addGoogleWebFont,
   addGoogleWebFontImport,
   cleanGoogleWebFonts,
   getPrimaryFontFamily,
+  googleWebFontExists,
   injectRootIntoDocument,
   removeCSSFromDocument,
   getCssAfterApplyingFilterEffectToPage,
@@ -56,8 +56,13 @@ import { readCache, writeCache } from '../../inject-css/cache';
 const RECENT_FONTS_LIMIT = 10;
 const FONT_PREVIEW_ID = 'font-preview';
 
-const isGoogleFont = async (family: string): Promise<boolean> =>
+const isBundledGoogleFont = async (family: string): Promise<boolean> =>
   (await loadGoogleFonts()).some(font => font.family === family);
+
+// Bumped per apply/preview so that, after its awaits, a call superseded by a
+// newer one does nothing: the latest one owns the stylesheet.
+let fontRequest = 0;
+let previewRequest = 0;
 
 export default {
   async initialize(
@@ -298,26 +303,37 @@ export default {
   /**
    * Applies a font-family value right away, then adds the Google Fonts import
    * for its first family: synchronously when the family is in the bundled
-   * list, otherwise once the existence check comes back.
+   * list, otherwise once the existence check comes back. Only explicit picks
+   * are remembered as recents, not text applied by leaving the field.
    */
   async applyFontFamily(
     { state, dispatch }: { state: State; dispatch: Dispatch },
-    value: string
+    { value, remember = false }: { value: string; remember?: boolean }
   ): Promise<void> {
+    const request = ++fontRequest;
+    const family = getPrimaryFontFamily(value);
+
     dispatch('applyDeclaration', { property: 'font-family', value });
 
-    const family = getPrimaryFontFamily(value);
-    let css = state.css;
-
-    if (family) {
+    if (family && remember) {
       dispatch('rememberFont', family);
-
-      css = (await isGoogleFont(family))
-        ? addGoogleWebFontImport(family, css)
-        : await addGoogleWebFont(family, css);
     }
 
-    css = cleanGoogleWebFonts(css);
+    const shouldImport =
+      !!family &&
+      ((await isBundledGoogleFont(family)) ||
+        (await googleWebFontExists(family)));
+
+    if (request !== fontRequest) {
+      return;
+    }
+
+    // Read the css only now: other edits may have landed during the awaits.
+    const withImport = shouldImport
+      ? addGoogleWebFontImport(family, state.css)
+      : state.css;
+    const css = cleanGoogleWebFonts(withImport);
+
     if (css !== state.css) {
       dispatch('applyCss', { css });
     }
@@ -333,6 +349,8 @@ export default {
     { state }: { state: State },
     value: string
   ): Promise<void> {
+    const request = ++previewRequest;
+
     if (!state.activeSelector) {
       return;
     }
@@ -345,11 +363,20 @@ export default {
     const family = getPrimaryFontFamily(value);
     let css = `${state.activeSelector} { font-family: ${value}; }`;
 
-    if (family && (await isGoogleFont(family))) {
+    if (family && (await isBundledGoogleFont(family))) {
       css = addGoogleWebFontImport(family, css);
     }
 
-    injectRootIntoDocument(postcss.parse(css), FONT_PREVIEW_ID);
+    if (request !== previewRequest) {
+      return;
+    }
+
+    // Typed text may not be valid CSS; then there's nothing to preview.
+    try {
+      injectRootIntoDocument(postcss.parse(css), FONT_PREVIEW_ID);
+    } catch {
+      return;
+    }
   },
 
   applyReadability(

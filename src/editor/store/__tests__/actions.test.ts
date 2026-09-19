@@ -349,14 +349,14 @@ describe('actions', () => {
         .mockImplementation(css => css);
       jest
         .spyOn(stylebotCss, 'addGoogleWebFontImport')
-        .mockReturnValue('withImport');
-      jest.spyOn(stylebotCss, 'addGoogleWebFont').mockResolvedValue('checked');
+        .mockImplementation((family, css) => `@import ${family};\n${css}`);
+      jest.spyOn(stylebotCss, 'googleWebFontExists').mockResolvedValue(false);
     });
 
-    it('applies the declaration before adding a bundled font import', async () => {
+    it('applies the declaration, remembers a pick, and imports a bundled font', async () => {
       await actions.applyFontFamily(
         { state, dispatch: mockDispatch },
-        'Inter, sans-serif'
+        { value: 'Inter, sans-serif', remember: true }
       );
 
       expect(mockDispatch).toHaveBeenNthCalledWith(1, 'applyDeclaration', {
@@ -364,32 +364,100 @@ describe('actions', () => {
         value: 'Inter, sans-serif',
       });
       expect(mockDispatch).toHaveBeenNthCalledWith(2, 'rememberFont', 'Inter');
+      expect(stylebotCss.googleWebFontExists).not.toBeCalled();
+      expect(mockDispatch).toHaveBeenNthCalledWith(3, 'applyCss', {
+        css: '@import Inter;\na { }',
+      });
+    });
+
+    it('does not remember text applied by leaving the field', async () => {
+      await actions.applyFontFamily(
+        { state, dispatch: mockDispatch },
+        { value: 'Inter' }
+      );
+
+      expect(mockDispatch).not.toBeCalledWith(
+        'rememberFont',
+        expect.anything()
+      );
+    });
+
+    it('checks fonts outside the bundled list before importing', async () => {
+      jest.spyOn(stylebotCss, 'googleWebFontExists').mockResolvedValue(true);
+
+      await actions.applyFontFamily(
+        { state, dispatch: mockDispatch },
+        { value: 'Some Font' }
+      );
+
+      expect(stylebotCss.googleWebFontExists).toBeCalledWith('Some Font');
+      expect(mockDispatch).toBeCalledWith('applyCss', {
+        css: '@import Some Font;\na { }',
+      });
+    });
+
+    it('leaves the css alone for a font that does not exist', async () => {
+      await actions.applyFontFamily(
+        { state, dispatch: mockDispatch },
+        { value: 'Some Local' }
+      );
+
+      expect(stylebotCss.addGoogleWebFontImport).not.toBeCalled();
+      expect(mockDispatch).not.toBeCalledWith('applyCss', expect.anything());
+    });
+
+    it('adds the import to the css as it is after the lookup, not before', async () => {
+      const live = { ...state };
+      jest
+        .spyOn(stylebotCss, 'googleWebFontExists')
+        .mockImplementation(async () => {
+          // Another edit lands while the lookup is in flight.
+          live.css = 'a { color: red; }';
+          return true;
+        });
+
+      await actions.applyFontFamily(
+        { state: live, dispatch: mockDispatch },
+        { value: 'Some Font' }
+      );
+
+      expect(mockDispatch).toBeCalledWith('applyCss', {
+        css: '@import Some Font;\na { color: red; }',
+      });
+    });
+
+    it('lets a newer apply win when lookups resolve out of order', async () => {
+      let resolveFirst: (exists: boolean) => void = () => undefined;
+      jest.spyOn(stylebotCss, 'googleWebFontExists').mockImplementationOnce(
+        () =>
+          new Promise(resolve => {
+            resolveFirst = resolve;
+          })
+      );
+
+      const first = actions.applyFontFamily(
+        { state, dispatch: mockDispatch },
+        { value: 'Slow Font' }
+      );
+      await actions.applyFontFamily(
+        { state, dispatch: mockDispatch },
+        { value: 'Inter' }
+      );
+      resolveFirst(true);
+      await first;
+
+      expect(stylebotCss.addGoogleWebFontImport).toBeCalledTimes(1);
       expect(stylebotCss.addGoogleWebFontImport).toBeCalledWith(
         'Inter',
         'a { }'
       );
-      expect(stylebotCss.addGoogleWebFont).not.toBeCalled();
-      expect(mockDispatch).toHaveBeenNthCalledWith(3, 'applyCss', {
-        css: 'withImport',
-      });
-    });
-
-    it('checks fonts outside the bundled list before importing', async () => {
-      await actions.applyFontFamily(
-        { state, dispatch: mockDispatch },
-        'Some Local'
-      );
-
-      expect(stylebotCss.addGoogleWebFont).toBeCalledWith(
-        'Some Local',
-        'a { }'
-      );
-      expect(stylebotCss.addGoogleWebFontImport).not.toBeCalled();
-      expect(mockDispatch).toBeCalledWith('applyCss', { css: 'checked' });
     });
 
     it('clears the font without remembering or importing anything', async () => {
-      await actions.applyFontFamily({ state, dispatch: mockDispatch }, '');
+      await actions.applyFontFamily(
+        { state, dispatch: mockDispatch },
+        { value: '', remember: true }
+      );
 
       expect(mockDispatch).not.toBeCalledWith(
         'rememberFont',
@@ -399,7 +467,7 @@ describe('actions', () => {
         property: 'font-family',
         value: '',
       });
-      expect(stylebotCss.addGoogleWebFont).not.toBeCalled();
+      expect(stylebotCss.googleWebFontExists).not.toBeCalled();
       expect(stylebotCss.addGoogleWebFontImport).not.toBeCalled();
     });
   });
@@ -448,6 +516,35 @@ describe('actions', () => {
       await actions.previewFontFamily({ state }, '');
 
       expect(stylebotCss.removeCSSFromDocument).toBeCalledWith('font-preview');
+      expect(stylebotCss.injectRootIntoDocument).not.toBeCalled();
+    });
+
+    it('drops a preview that was cleared while the font list was loading', async () => {
+      let resolveFonts: (fonts: Array<googleFonts.GoogleFont>) => void = () =>
+        undefined;
+      jest.spyOn(googleFonts, 'loadGoogleFonts').mockImplementation(
+        () =>
+          new Promise(resolve => {
+            resolveFonts = resolve;
+          })
+      );
+
+      const pending = actions.previewFontFamily({ state }, 'Inter');
+      await actions.previewFontFamily({ state }, '');
+      resolveFonts([{ family: 'Inter', category: 'sans-serif' }]);
+      await pending;
+
+      expect(stylebotCss.injectRootIntoDocument).not.toBeCalled();
+    });
+
+    it('ignores text that is not valid css', async () => {
+      jest.spyOn(postcss, 'parse').mockImplementation(() => {
+        throw new Error('CssSyntaxError');
+      });
+
+      await expect(
+        actions.previewFontFamily({ state }, 'Lora }')
+      ).resolves.toBeUndefined();
       expect(stylebotCss.injectRootIntoDocument).not.toBeCalled();
     });
   });

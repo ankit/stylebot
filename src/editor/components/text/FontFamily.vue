@@ -12,7 +12,7 @@
       :placeholder="t('default')"
       :chip-label="unquoteFamily"
       @select="pick"
-      @submit="submit"
+      @submit="submit($event, true)"
       @leave="submit"
       @cancel="clearPreview"
     >
@@ -151,28 +151,32 @@ export default Vue.extend({
       }
     },
 
-    apply(value: string): void {
+    apply(value: string, remember: boolean): void {
       this.previewFont.cancel();
-      this.$store.dispatch('applyFontFamily', value);
+      this.$store.dispatch('applyFontFamily', { value, remember });
     },
 
     pick(row: Row): void {
       if (row.kind === 'link') {
+        // The panel goes away with the focused row, so no leave follows:
+        // drop any typed text rather than leave it on show unapplied.
+        this.draft = this.value;
         this.clearPreview();
         openGoogleFontsPage();
       } else {
-        this.apply(row.value);
+        this.apply(row.value, true);
       }
     },
 
-    // Enter, or leaving the field, applies the text as typed. When it's
-    // already the applied value (e.g. the blur after a pick, or leaving
-    // after only browsing) there's nothing to apply, so any preview goes.
-    submit(text: string): void {
+    // Enter applies the text as typed and remembers it; leaving the field
+    // applies it too, but a half-typed name isn't worth remembering. When
+    // it's already the applied value there's nothing to apply, so any
+    // preview goes.
+    submit(text: string, remember = false): void {
       const value = text.trim();
 
       if (value !== this.value) {
-        this.apply(value);
+        this.apply(value, remember);
       } else {
         this.clearPreview();
       }

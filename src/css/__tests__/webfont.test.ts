@@ -4,6 +4,7 @@ import {
   addGoogleWebFont,
   addGoogleWebFontImport,
   cleanGoogleWebFonts,
+  googleWebFontExists,
 } from '../webfont';
 
 const fontUrl =
@@ -77,7 +78,7 @@ describe('webfont', () => {
       const css = 'a { font-family: system-ui; }';
 
       expect(await addGoogleWebFont('system-ui', css)).toBe(css);
-      expect(await addGoogleWebFont('Serif', css)).toBe(css);
+      expect(await googleWebFontExists('Serif')).toBe(false);
       expect(sendMessage).not.toHaveBeenCalled();
     });
 
