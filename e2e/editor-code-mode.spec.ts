@@ -84,6 +84,45 @@ test('toggling the panel appearance updates the Monaco editor theme immediately'
   );
 });
 
+test('the appearance menu checks System on a profile whose options predate the setting', async ({
+  context,
+  extension,
+  openPopup,
+}) => {
+  test.slow();
+
+  // Options persisted by a build before the appearance switch existed have
+  // no `appearance` key at all, so this must fall through to the default.
+  await extension.evaluate(() =>
+    chrome.storage.local.set({
+      options: {
+        mode: 'basic',
+        useShortcutKey: true,
+        shortcutKey: 77,
+        shortcutMetaKey: 'alt',
+        contextMenu: true,
+      },
+    })
+  );
+
+  await context.route('http://localhost/**', route =>
+    route.fulfill({ contentType: 'text/html', body: PAGE_HTML })
+  );
+
+  const page = await context.newPage();
+  await page.goto('http://localhost/');
+
+  const editorRoot = await openEditor(page, openPopup);
+  await editorRoot.locator('.appearance-action-anchor button').click();
+
+  await expect(
+    editorRoot.getByRole('menuitem', { name: 'System' })
+  ).toHaveClass(/selected/);
+  await expect(
+    editorRoot.getByRole('menuitem', { name: 'Light' })
+  ).not.toHaveClass(/selected/);
+});
+
 test('typing a CSS property offers autocomplete and a color value shows a swatch', async ({
   context,
   openPopup,
