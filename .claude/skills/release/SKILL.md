@@ -73,7 +73,7 @@ Four checks must pass before merging:
 | `validation` | lint, typecheck, unit tests, locale validation |
 | `e2e` | Playwright suite on Chrome |
 | `e2e (edge)` | Playwright suite on Edge — **release PRs only** |
-| `e2e (firefox)` | Playwright suite on Firefox (the tests that don't drive the popup) — **release PRs only** |
+| `e2e (firefox)` | Playwright suite on Firefox — **release PRs only** |
 
 If `e2e (edge)` or `e2e (firefox)` shows as *skipped*, the branch name is wrong: it
 must start with `release/`. A skipped run is not a passed run.

@@ -1,7 +1,7 @@
 import type { Extension, ExtensionFunction } from '../engine';
 import { FirefoxRdpClient } from './rdp-client';
 
-type TargetForm = { actor: string; url: string; consoleActor: string };
+export type TargetForm = { actor: string; url: string; consoleActor: string };
 
 type EvaluationResult = {
   resultID: string;
@@ -12,15 +12,29 @@ type EvaluationResult = {
 
 type Addon = { id: string; actor: string; manifestURL: string };
 
+type TargetWaiter = {
+  matches: (target: TargetForm) => boolean;
+  resolve: (target: TargetForm) => void;
+};
+
+const BACKGROUND_URL_MARKER = '_generated_background_page';
+
 /**
- * A temporarily installed extension plus a console into its background page,
- * which is the Firefox stand-in for Chromium's `context.serviceWorkers()[0].evaluate()`.
+ * A temporarily installed extension plus DevTools consoles into its pages: the
+ * background page (the Firefox stand-in for Chromium's service worker) and any
+ * extension page open in a tab, such as the popup.
  */
 export class FirefoxExtension implements Extension {
-  private background: TargetForm | null = null;
-  // Armed before each evaluateJSAsync is sent: its result can land in the same TCP
-  // chunk as the request's ack, i.e. before the caller has resumed.
-  private onResult: ((result: EvaluationResult) => void) | null = null;
+  // Every live extension page, keyed by target actor.
+  private readonly targets = new Map<string, TargetForm>();
+  private targetWaiters: TargetWaiter[] = [];
+  // An evaluation's result can land in the same TCP chunk as the request's ack,
+  // i.e. before the caller knows its resultID — so unclaimed results are parked.
+  private readonly results = new Map<string, EvaluationResult>();
+  private readonly resultWaiters = new Map<
+    string,
+    (result: EvaluationResult) => void
+  >();
 
   private constructor(
     private readonly client: FirefoxRdpClient,
@@ -53,42 +67,22 @@ export class FirefoxExtension implements Extension {
       new URL(addon.manifestURL).host
     );
 
-    let onBackground!: () => void;
-    const backgroundReady = new Promise<void>((resolve, reject) => {
-      const timer = setTimeout(
-        () =>
-          reject(
-            new Error(
-              `Extension ${addon.id} installed but its background page never appeared.`
-            )
-          ),
-        10_000
-      );
-      onBackground = () => {
-        clearTimeout(timer);
-        resolve();
-      };
-    });
-
-    // Target lifecycle events come from the watcher; the background page is one
-    // "frame" target among the descriptor's (the other is DevTools' fallback page).
     client.onEvent('target-available-form', packet => {
-      const target = packet.target as TargetForm;
-      if (target.url.includes('_generated_background_page')) {
-        extension.background = target;
-        onBackground();
-      }
+      extension.onTargetAvailable(packet.target as TargetForm);
     });
     client.onEvent('target-destroyed-form', packet => {
-      const target = packet.target as TargetForm;
-      if (extension.background?.actor === target.actor) {
-        extension.background = null;
-      }
+      extension.targets.delete((packet.target as TargetForm).actor);
     });
     client.onEvent('evaluationResult', packet => {
-      extension.onResult?.(packet as unknown as EvaluationResult);
+      extension.onEvaluationResult(packet as unknown as EvaluationResult);
     });
 
+    // The watcher reports every "frame" target of the descriptor — the background
+    // page, DevTools' own fallback page, and any extension page open in a tab.
+    const backgroundReady = extension.waitForTarget(
+      target => target.url.includes(BACKGROUND_URL_MARKER),
+      `Extension ${addon.id} installed but its background page never appeared.`
+    );
     const watcher = await client.request<{ actor: string }>({
       to: addon.actor,
       type: 'getWatcher',
@@ -104,21 +98,38 @@ export class FirefoxExtension implements Extension {
     return extension;
   }
 
+  private get background(): TargetForm | undefined {
+    return [...this.targets.values()].find(target =>
+      target.url.includes(BACKGROUND_URL_MARKER)
+    );
+  }
+
   isRunning(): boolean {
-    return this.background !== null;
+    return this.background !== undefined;
   }
 
   /**
-   * Runs `fn(arg)` inside the extension's background page and returns its
-   * (JSON-serializable) result, mirroring Playwright's `worker.evaluate(fn, arg)`.
+   * Runs `fn(arg)` inside the extension's background page.
    */
-  async evaluate<A, R>(fn: ExtensionFunction<A, R>, arg?: A): Promise<R> {
-    if (!this.background) {
+  evaluate<A, R>(fn: ExtensionFunction<A, R>, arg?: A): Promise<R> {
+    const { background } = this;
+    if (!background) {
       throw new Error(
         'The extension background page is not running — it was terminated or never started.'
       );
     }
+    return this.evaluateIn(background, fn, arg);
+  }
 
+  /**
+   * Runs `fn(arg)` inside the given extension page and returns its
+   * (JSON-serializable) result, mirroring Playwright's `page.evaluate(fn, arg)`.
+   */
+  async evaluateIn<A, R>(
+    target: TargetForm,
+    fn: ExtensionFunction<A, R>,
+    arg?: A
+  ): Promise<R> {
     // The console actor returns objects as remote grips, not values, so the
     // evaluated code serializes the result itself. `mapped.await` makes the actor
     // wait for the async IIFE's promise like DevTools does for top-level await.
@@ -126,17 +137,19 @@ export class FirefoxExtension implements Extension {
       arg ?? null
     )})))()`;
 
-    const resultPromise = new Promise<EvaluationResult>(resolve => {
-      this.onResult = resolve;
-    });
-    await this.client.request({
-      to: this.background.consoleActor,
+    const { resultID } = await this.client.request<{ resultID: string }>({
+      to: target.consoleActor,
       type: 'evaluateJSAsync',
       text,
       mapped: { await: true },
     });
-    const result = await resultPromise;
-    this.onResult = null;
+
+    const result =
+      this.results.get(resultID) ??
+      (await new Promise<EvaluationResult>(resolve =>
+        this.resultWaiters.set(resultID, resolve)
+      ));
+    this.results.delete(resultID);
 
     if (result.hasException) {
       throw new Error(result.exceptionMessage);
@@ -147,7 +160,55 @@ export class FirefoxExtension implements Extension {
       : (undefined as R);
   }
 
+  /**
+   * Resolves with the first live extension page matching `matches`, whether it
+   * already exists or appears later.
+   */
+  waitForTarget(
+    matches: (target: TargetForm) => boolean,
+    timeoutMessage: string,
+    timeoutMs = 10_000
+  ): Promise<TargetForm> {
+    const existing = [...this.targets.values()].find(matches);
+    if (existing) {
+      return Promise.resolve(existing);
+    }
+
+    return new Promise((resolve, reject) => {
+      const timer = setTimeout(() => {
+        this.targetWaiters = this.targetWaiters.filter(w => w !== waiter);
+        reject(new Error(timeoutMessage));
+      }, timeoutMs);
+      const waiter: TargetWaiter = {
+        matches,
+        resolve: target => {
+          clearTimeout(timer);
+          resolve(target);
+        },
+      };
+      this.targetWaiters.push(waiter);
+    });
+  }
+
   close(): void {
     this.client.close();
+  }
+
+  private onTargetAvailable(target: TargetForm): void {
+    this.targets.set(target.actor, target);
+
+    const matched = this.targetWaiters.filter(w => w.matches(target));
+    this.targetWaiters = this.targetWaiters.filter(w => !matched.includes(w));
+    matched.forEach(waiter => waiter.resolve(target));
+  }
+
+  private onEvaluationResult(result: EvaluationResult): void {
+    const waiter = this.resultWaiters.get(result.resultID);
+    if (waiter) {
+      this.resultWaiters.delete(result.resultID);
+      waiter(result);
+    } else {
+      this.results.set(result.resultID, result);
+    }
   }
 }

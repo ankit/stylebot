@@ -1,12 +1,14 @@
-import { chromium, type BrowserContext, type Page } from '@playwright/test';
-import type { Engine, Extension, LaunchOptions } from '../engine';
+import { chromium, type BrowserContext } from '@playwright/test';
+import type { Engine, Extension, LaunchOptions, Popup } from '../engine';
 import { ChromiumExtension } from './extension';
+import { ChromiumPopup } from './popup';
 
 // Set by scripts/e2e.mjs (`yarn e2e --edge`). Edge uses the same dist/ build as Chrome.
 const CHANNEL = process.env.STYLEBOT_BROWSER === 'edge' ? 'msedge' : 'chrome';
 
 export class ChromiumEngine implements Engine {
   readonly distDir = 'dist';
+  readonly routesExtensionRequests = true;
 
   launch(userDataDir: string, options: LaunchOptions): Promise<BrowserContext> {
     // Chrome 137+ removed --load-extension; CDP's Extensions domain replaces it
@@ -45,13 +47,13 @@ export class ChromiumEngine implements Engine {
   async openPopup(
     context: BrowserContext,
     extension: Extension
-  ): Promise<Page> {
+  ): Promise<Popup> {
     const popupUrl = `chrome-extension://${extension.id}/popup/index.html`;
 
     // Filtered so the onInstalled help tab can't win this race instead.
     const pagePromise = context.waitForEvent('page', p => p.url() === popupUrl);
     const cdp = await context.browser()!.newBrowserCDPSession();
     await cdp.send('Target.createTarget', { url: popupUrl, background: true });
-    return pagePromise;
+    return new ChromiumPopup(await pagePromise);
   }
 }

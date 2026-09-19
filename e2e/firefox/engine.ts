@@ -1,7 +1,8 @@
 import { firefox, type BrowserContext } from '@playwright/test';
 import net from 'node:net';
-import type { Engine, Extension, LaunchOptions } from '../engine';
+import type { Engine, Extension, LaunchOptions, Popup } from '../engine';
 import { FirefoxExtension } from './extension';
+import { FirefoxPopup } from './popup';
 
 /*
  * Playwright can't load extensions into Firefox, so this engine starts Firefox
@@ -22,6 +23,7 @@ function freePort(): Promise<number> {
 
 export class FirefoxEngine implements Engine {
   readonly distDir = 'firefox-dist';
+  readonly routesExtensionRequests = false;
   // Chosen at launch, needed again at loadExtension time.
   private rdpPort = 0;
 
@@ -53,6 +55,25 @@ export class FirefoxEngine implements Engine {
     return FirefoxExtension.load(this.rdpPort, distPath);
   }
 
-  // No openPopup: neither of Playwright's Firefox drivers can attach to
-  // moz-extension:// documents (see e2e/README.md).
+  // Neither of Playwright's Firefox drivers can attach to moz-extension://
+  // documents (see e2e/README.md), so the popup is opened by the extension itself
+  // and driven through its DevTools console rather than as a Playwright page.
+  async openPopup(
+    _context: BrowserContext,
+    extension: Extension
+  ): Promise<Popup> {
+    const firefoxExtension = extension as FirefoxExtension;
+    const popupUrl = `moz-extension://${extension.id}/popup/index.html`;
+
+    const popupReady = firefoxExtension.waitForTarget(
+      target => target.url === popupUrl,
+      'The popup tab never appeared as a DevTools target.'
+    );
+    const tabId = await firefoxExtension.evaluate(
+      url => chrome.tabs.create({ url, active: false }).then(tab => tab.id!),
+      popupUrl
+    );
+
+    return new FirefoxPopup(firefoxExtension, await popupReady, tabId);
+  }
 }

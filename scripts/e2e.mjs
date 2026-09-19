@@ -19,7 +19,7 @@ const USAGE = `usage: yarn e2e [--edge | --firefox] [--headed | --ui | --debug] 
 
   (default)   Chrome, headless — what CI runs
   --edge      Microsoft Edge (same dist/ build as Chrome)
-  --firefox   Firefox (firefox-dist/ build; popup-driven specs are skipped)
+  --firefox   Firefox (firefox-dist/ build)
 
   --headed    real browser window, one worker
   --ui        Playwright UI mode

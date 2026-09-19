@@ -1,7 +1,7 @@
 import http from 'node:http';
 import type { AddressInfo } from 'node:net';
 import type { Locator, Page } from '@playwright/test';
-import { closeServer, type RunInExtension } from './fixtures';
+import { closeServer, type Popup, type RunInExtension } from './fixtures';
 
 // Generalizes the inline http.createServer pattern from style-important-override.spec.ts
 // to serve multiple paths, for tests that need real multi-page navigation.
@@ -62,14 +62,12 @@ export const seedStyles = async (
 // and waits for the Vue app to actually mount, not just the host to attach.
 export const openEditor = async (
   page: Page,
-  openPopup: () => Promise<Page>
+  openPopup: () => Promise<Popup>
 ): Promise<Locator> => {
   await page.bringToFront();
 
   const popup = await openPopup();
-  await popup
-    .getByRole('button', { name: /^Style this page/ })
-    .dispatchEvent('click');
+  await popup.locator('button', { hasText: 'Style this page' }).click();
 
   const editorRoot = page.locator('#stylebot');
   // Vue mounts TheStylebotApp by replacing the #stylebot-app mount div with

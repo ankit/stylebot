@@ -1,4 +1,5 @@
 import type { BrowserContext } from '@playwright/test';
+import type { PageFunction } from 'playwright-core/types/structs';
 import type { Extension, ExtensionFunction } from '../engine';
 
 // Backed by the MV3 service worker that CDP's Extensions.loadUnpacked started.
@@ -13,7 +14,7 @@ export class ChromiumExtension implements Extension {
     const worker =
       this.context.serviceWorkers()[0] ??
       (await this.context.waitForEvent('serviceworker'));
-    return worker.evaluate(fn as (arg: A) => R, arg as A);
+    return worker.evaluate(fn as PageFunction<A, R>, arg as A);
   }
 
   close(): void {}

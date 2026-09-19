@@ -10,7 +10,9 @@ import type http from 'node:http';
 import os from 'node:os';
 import path from 'node:path';
 import { ChromiumEngine } from './chromium/engine';
-import type { Engine, Extension, ExtensionFunction } from './engine';
+import type { Engine, Extension, ExtensionFunction, Popup } from './engine';
+
+export type { Popup, PopupLocator } from './engine';
 import { FirefoxEngine } from './firefox/engine';
 
 // Set by scripts/e2e.mjs (`yarn e2e --firefox`; `--edge` is handled inside chromium/).
@@ -170,9 +172,10 @@ export const test = base.extend<
     // Overrides Playwright's built-in test-scoped `context` fixture: it wraps the
     // worker-scoped browser pool's current context with per-test trace/tab/storage isolation.
     context: BrowserContext;
+    engine: Engine;
     extensionId: string;
     runInExtension: RunInExtension;
-    openPopup: () => Promise<Page>;
+    openPopup: () => Promise<Popup>;
   },
   {
     browserPool: BrowserPool;
@@ -252,20 +255,18 @@ export const test = base.extend<
     }
   },
 
+  // For the rare spec that must know what the engine can observe.
+  engine: async ({}, use) => {
+    await use(engine);
+  },
+
   runInExtension: async ({ browserPool }, use) => {
     await use((fn, arg) => browserPool.runInExtension(fn, arg));
   },
 
-  // Any test that needs the popup is skipped on engines without one simply by
-  // depending on this fixture.
   openPopup: async ({ browserPool }, use) => {
-    test.skip(
-      !engine.openPopup,
-      'Playwright cannot drive extension pages (the popup) in this browser'
-    );
-
     const { context, extension } = await browserPool.get();
-    await use(() => engine.openPopup!(context, extension));
+    await use(() => engine.openPopup(context, extension));
   },
 });
 

@@ -49,18 +49,19 @@ popup as a real page via `Target.createTarget`.
 temporary add-on and evaluates JS in the extension's background page through the DevTools
 console actor.
 
-### What doesn't run on Firefox, and why
+### The popup on Firefox
 
 Neither of Playwright's Firefox drivers can attach to `moz-extension://` documents — its
 own build's Juggler skips them, and stock Firefox's BiDi excludes extension contexts
-([bug 1755014](https://bugzilla.mozilla.org/show_bug.cgi?id=1755014)). So the popup can't
-be driven as a page there, so `FirefoxEngine` has no `openPopup` and any test that uses the
-`openPopup` fixture is skipped by the fixture itself; the storage-seeded content-script specs (`style-*.spec.ts`)
-run on all three browsers.
+([bug 1755014](https://bugzilla.mozilla.org/show_bug.cgi?id=1755014)). So on Firefox the
+popup is not a Playwright page: `FirefoxEngine.openPopup` has the extension open it in a
+background tab (`chrome.tabs.create`) and drives its DOM through the same DevTools console
+channel as the background page. That's why tests get a `Popup` (below) rather than a
+`Page` — the smaller surface is what both engines can honour.
 
-If a new test can be written as "seed styles into storage, load a page, assert on the
-DOM", it gets Firefox coverage for free. If it needs the popup, just use `openPopup` —
-nothing else to declare.
+The one thing Firefox can't do is let `context.route()` see requests the extension itself
+makes from its background; a spec that needs that checks `engine.routesExtensionRequests`
+and skips otherwise (`editor-webfont.spec.ts`).
 
 ## Fixtures
 
@@ -70,8 +71,25 @@ Import `test`/`expect` from `./fixtures`, not `@playwright/test`.
 | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `context`                  | the shared `BrowserContext`; tabs opened during a test are closed after it                                                                                                     |
 | `runInExtension(fn, arg?)` | run `fn` with the extension's privileges (service worker on Chromium, background page on Firefox) and get its JSON-serializable result — how tests read/write `chrome.storage` |
-| `openPopup()`              | open the popup as a page via `engine.openPopup`, in the background so the page under test stays the "current tab"; skips the test on engines without it (Firefox)              |
+| `openPopup()`              | open the popup in the background (so the page under test stays the "current tab") and get a `Popup`                                                                            |
+| `engine`                   | the `Engine` in use, for the rare spec that must know what it can observe                                                                                                      |
 | `extensionId`              | the extension's id (its `moz-extension://` UUID on Firefox)                                                                                                                    |
+
+### Driving the popup
+
+`Popup` is deliberately small: `locator(selector, { hasText? })` (CSS selectors, chainable),
+and on a locator `click()` (a synthetic click — the popup closes itself right after some
+clicks, which a real click's stability wait would race), `isVisible()`, `isEnabled()`,
+`isChecked()`; plus `evaluate(fn, arg?)` and `close()` on the popup. The state checks don't
+auto-wait, so pair them with `expect.poll`:
+
+```ts
+const popup = await openPopup();
+await popup.locator('button', { hasText: 'Style this page' }).click();
+
+const toggle = popup.locator('label.switch', { hasText: 'Readability' });
+await expect.poll(() => toggle.locator('input').isChecked()).toBe(true);
+```
 
 Helpers in `helpers.ts`: `startTestServer(routes)` for local pages (use `closeServer` in
 `afterAll` — the shared browser keeps connections alive), `seedStyles(runInExtension, …)`,
