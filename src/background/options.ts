@@ -1,9 +1,13 @@
 import { StylebotOptions } from '@stylebot/types';
 import { defaultOptions } from '@stylebot/settings';
 
+/**
+ * Layers stored options over the defaults so keys added in later releases
+ * (e.g. `appearance`) resolve on profiles whose options predate them.
+ */
 export const getAll = async (): Promise<StylebotOptions> => {
   const items = await chrome.storage.local.get('options');
-  return items['options'] || defaultOptions;
+  return { ...defaultOptions, ...items['options'] };
 };
 
 export const get = async (

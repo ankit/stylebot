@@ -35,8 +35,6 @@ import {
   StylebotAppearance,
 } from '@stylebot/types';
 
-import { defaultOptions } from '@stylebot/settings';
-
 import {
   getAllOptions,
   setOption,
@@ -75,22 +73,6 @@ export default {
     }
 
     const options = await getAllOptions();
-    if (!options.basicModeSections) {
-      options.basicModeSections = defaultOptions.basicModeSections;
-    }
-    if (!options.layout) {
-      options.layout = defaultOptions.layout;
-    }
-    if (!options.fonts) {
-      options.fonts = defaultOptions.fonts;
-    }
-    if (!options.lastColorSet) {
-      options.lastColorSet = defaultOptions.lastColorSet;
-    }
-    if (!options.lastColorPickerTab) {
-      options.lastColorPickerTab = defaultOptions.lastColorPickerTab;
-    }
-
     commit('setOptions', options);
 
     const commands = await getCommands();
