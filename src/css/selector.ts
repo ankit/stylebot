@@ -229,7 +229,7 @@ export const validateSelector = (selector: string): boolean => {
   try {
     document.querySelector(selector);
     return true;
-  } catch (e) {
+  } catch {
     return false;
   }
 };

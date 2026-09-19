@@ -8,7 +8,7 @@ import TheStylebotApp from '../components/TheStylebotApp.vue';
 
 import '../index.scss';
 
-Vue.component('vue-draggable-resizable', VueDraggableResizable);
+Vue.component('VueDraggableResizable', VueDraggableResizable);
 
 Vue.mixin({
   methods: {

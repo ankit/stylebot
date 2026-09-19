@@ -94,7 +94,7 @@ export const mountReader = async (): Promise<void> => {
 
     cacheDocument();
     await initVueApp(url, source, article);
-  } catch (e) {
+  } catch {
     return Promise.reject();
   }
 };

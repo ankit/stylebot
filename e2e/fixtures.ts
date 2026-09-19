@@ -66,7 +66,7 @@ type Instance = {
 class BrowserPool {
   private current: Instance | null = null;
   private launching: Promise<Instance> | null = null;
-  private readonly instances: Instance[] = [];
+  private readonly instances: Array<Instance> = [];
 
   constructor(
     private readonly workerInfo: WorkerInfo,

@@ -46,7 +46,7 @@ describe('actions', () => {
           { commit: mockCommit, state: mockState },
           { css: 'invalid' }
         );
-      } catch (e) {
+      } catch {
         expect(mockCommit).toBeCalledTimes(0);
         expect(chromeUtils.setStyle).toBeCalledTimes(0);
         expect(stylebotCss.injectRootIntoDocument).toBeCalledTimes(0);

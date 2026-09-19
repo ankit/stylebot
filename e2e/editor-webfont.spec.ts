@@ -56,8 +56,8 @@ type FontRequest = { url: string; fromServiceWorker: boolean };
 // Google Fonts and nothing is recorded.
 const interceptFontLookups = async (
   context: BrowserContext
-): Promise<FontRequest[]> => {
-  const fontRequests: FontRequest[] = [];
+): Promise<Array<FontRequest>> => {
+  const fontRequests: Array<FontRequest> = [];
 
   await context.route('https://fonts.googleapis.com/**', route => {
     const request = route.request();

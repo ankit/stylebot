@@ -10,7 +10,6 @@ const fonts: Array<GoogleFont> = [
 ];
 
 global.chrome = {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-expect-error: only getURL is needed here.
   runtime: {
     getURL: (path: string) => `chrome-extension://id/${path}`,

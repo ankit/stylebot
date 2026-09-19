@@ -101,7 +101,7 @@ export const GetStylesForPage = async (
 ): Promise<void> => {
   const tab = sender.tab || message.tab;
 
-  if (!tab || !tab.url) {
+  if (!tab?.url) {
     return;
   }
 

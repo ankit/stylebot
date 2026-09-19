@@ -4,6 +4,7 @@
 
   "compilerOptions": {
     "strict": true,
+    "skipLibCheck": true,
     "module": "esnext",
     "lib": ["dom", "esnext", "dom.iterable", "es2019"],
     "downlevelIteration": true,

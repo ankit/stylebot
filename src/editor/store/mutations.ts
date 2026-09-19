@@ -61,7 +61,7 @@ export default {
           value: rule.selector,
           styleCount,
         });
-      } catch (e) {
+      } catch {
         // querySelectorAll throws on selectors it can't parse; skip those rules.
       }
     });

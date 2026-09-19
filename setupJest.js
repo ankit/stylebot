@@ -1,4 +1,3 @@
-/* eslint-disable */
 const fetchMock = require('jest-fetch-mock');
 const VueTestUtils = require('@vue/test-utils');
 

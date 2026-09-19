@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 const dedent = require('dedent');
 import {
   getRule,

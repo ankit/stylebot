@@ -18,7 +18,7 @@ const POLL_INTERVAL_MS = 100;
  * within the previous match, like Playwright's nested locators), then answers the
  * query; `null` means the element isn't there (yet).
  */
-function runQuery({ steps, query }: { steps: Step[]; query: Query }) {
+function runQuery({ steps, query }: { steps: Array<Step>; query: Query }) {
   const normalize = (text: string) => text.replace(/\s+/g, ' ').trim();
   const matchesText = (el: Element, hasText?: SerializedText) => {
     if (hasText === undefined) {
@@ -63,7 +63,7 @@ function runQuery({ steps, query }: { steps: Step[]; query: Query }) {
 class FirefoxPopupLocator implements PopupLocator {
   constructor(
     private readonly popup: FirefoxPopup,
-    private readonly steps: Step[]
+    private readonly steps: Array<Step>
   ) {}
 
   locator(selector: string, options?: LocatorOptions): PopupLocator {
@@ -108,7 +108,7 @@ function serializeText(hasText?: string | RegExp): SerializedText | undefined {
     : hasText;
 }
 
-function describe(steps: Step[]): string {
+function describe(steps: Array<Step>): string {
   return steps.map(step => step.selector).join(' >> ');
 }
 

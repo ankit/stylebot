@@ -243,7 +243,7 @@ export default Vue.extend({
     wake(event?: Event): void {
       let near = true;
 
-      if (event && event.type === 'mousemove') {
+      if (event?.type === 'mousemove') {
         const mouseEvent = event as MouseEvent;
         const dx = Math.max(0, window.innerWidth - 60 - mouseEvent.clientX);
         const dy = Math.max(0, mouseEvent.clientY - 40);

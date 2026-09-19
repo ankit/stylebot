@@ -99,7 +99,7 @@ export default new Vuex.Store<State>({
 
         setAllStyles(styles);
         state.styles = styles;
-      } catch (e) {
+      } catch {
         // todo
       }
     },
@@ -159,7 +159,7 @@ export default new Vuex.Store<State>({
         value: StylebotOptions[keyof StylebotOptions];
       }
     ) {
-      /* @ts-ignore */
+      // @ts-expect-error TS cannot correlate the key/value union members of StylebotOptions.
       state.options[name] = value;
       setOption(name, value);
     },

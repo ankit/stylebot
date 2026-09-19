@@ -165,6 +165,7 @@ export default Vue.extend({
         activeInstance.hide();
       }
 
+      // eslint-disable-next-line @typescript-eslint/no-this-alias
       activeInstance = this;
       this.visible = true;
       document.addEventListener('keydown', this.onKeydown);

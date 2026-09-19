@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 const fs = require('fs');
 const ejs = require('ejs');
 const path = require('path');
