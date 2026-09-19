@@ -115,7 +115,7 @@ chrome.runtime.onMessage.addListener(
         break;
 
       case 'OpenOptionsPage':
-        OpenOptionsPage();
+        OpenOptionsPage(message);
         break;
       case 'OpenDonatePage':
         OpenDonatePage();

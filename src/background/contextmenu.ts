@@ -2,6 +2,8 @@ import { t } from '@stylebot/i18n';
 import { OpenStylebotFromContextMenu } from '@stylebot/types';
 import { BackgroundPageUtils } from '@stylebot/styles';
 
+import { OpenOptionsPage } from './messages';
+
 const CONTEXT_MENU_ID = 'stylebot-contextmenu';
 const VIEW_OPTIONS_MENU_ITEM_ID = 'view-options';
 const STYLE_ELEMENT_MENU_ITEM_ID = 'style-element';
@@ -71,11 +73,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
       break;
 
     case VIEW_OPTIONS_MENU_ITEM_ID:
-      chrome.tabs.create({
-        active: true,
-        url: 'options/index.html',
-      });
-
+      OpenOptionsPage();
       break;
   }
 });

@@ -141,6 +141,7 @@
     "vue-draggable-resizable": "^2.3.0",
     "vue-eslint-parser": "^10",
     "vue-loader": "^15.9.2",
+    "vue-router": "^3.6.5",
     "vue-template-compiler": "^2.6.11",
     "vuex": "^3.5.1",
     "web-ext": "^5.4.1",

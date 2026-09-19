@@ -188,7 +188,7 @@ const config = {
         },
         {
           from: 'options/index.html',
-          to: 'options/index.html',
+          to: 'options.html',
           transform: transformHtml,
         },
         {
@@ -287,7 +287,7 @@ const clientConfig = {
     'sync/index': './sync/index.ts',
     'popup/index': './popup/index.ts',
     'editor/index': './editor/index.ts',
-    'options/index': './options/index.ts',
+    options: './options/index.ts',
     'inject-css/index': './inject-css/index.ts',
     'monaco-editor/iframe/index': './monaco-editor/iframe/index.ts',
     'monaco-editor/iframe/options-index':

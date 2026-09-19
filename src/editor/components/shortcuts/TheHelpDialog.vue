@@ -203,7 +203,7 @@ export default Vue.extend({
   methods: {
     customizeGlobalCommands(event: MouseEvent): void {
       event.preventDefault();
-      openOptionsPage();
+      openOptionsPage('/basics');
     },
 
     close(): void {

@@ -54,7 +54,7 @@
         <template v-if="savedLabel">· {{ savedLabel }}</template>
       </s-text>
 
-      <s-button variant="ghost" :disabled="!isDirty" @click="$emit('back')">
+      <s-button variant="ghost" :disabled="!isDirty" @click="discard">
         {{ t('discard_changes') }}
       </s-button>
 
@@ -77,14 +77,15 @@
       :title="t('discard_changes')"
       :message="t('unsaved_changes_warning')"
       :confirm-label="t('discard_changes')"
-      @cancel="showLeaveConfirm = false"
-      @confirm="$emit('back')"
+      @cancel="cancelLeave"
+      @confirm="confirmLeave"
     />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
+import { NavigationGuardNext, Route } from 'vue-router';
 import * as postcss from 'postcss';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -115,6 +116,14 @@ export default Vue.extend({
     CodeEditor,
   },
 
+  beforeRouteLeave(to: Route, from: Route, next: NavigationGuardNext) {
+    this.guardLeave(next);
+  },
+
+  beforeRouteUpdate(to: Route, from: Route, next: NavigationGuardNext) {
+    this.guardLeave(next);
+  },
+
   props: {
     // Empty string = a brand-new, unsaved style.
     initialUrl: {
@@ -128,6 +137,8 @@ export default Vue.extend({
     css: string;
     showDeleteConfirm: boolean;
     showLeaveConfirm: boolean;
+    leaving: boolean;
+    pendingNext: NavigationGuardNext | null;
   } {
     const existing = this.$store.state.styles[this.initialUrl];
 
@@ -136,6 +147,8 @@ export default Vue.extend({
       css: existing ? existing.css : '',
       showDeleteConfirm: false,
       showLeaveConfirm: false,
+      leaving: false,
+      pendingNext: null,
     };
   },
 
@@ -190,12 +203,37 @@ export default Vue.extend({
   },
 
   methods: {
-    attemptLeave(): void {
-      if (this.isDirty) {
+    guardLeave(next: NavigationGuardNext): void {
+      if (this.isDirty && !this.leaving) {
+        this.pendingNext = next;
         this.showLeaveConfirm = true;
-      } else {
-        this.$emit('back');
+        return;
       }
+
+      next();
+    },
+
+    attemptLeave(): void {
+      this.$emit('back');
+    },
+
+    cancelLeave(): void {
+      this.pendingNext?.(false);
+      this.pendingNext = null;
+      this.showLeaveConfirm = false;
+    },
+
+    confirmLeave(): void {
+      const next = this.pendingNext;
+      this.pendingNext = null;
+      this.showLeaveConfirm = false;
+      this.leaving = true;
+      next?.();
+    },
+
+    discard(): void {
+      this.leaving = true;
+      this.$emit('back');
     },
 
     onToggleEnabled(enabled: boolean): void {
@@ -216,10 +254,12 @@ export default Vue.extend({
     confirmDelete(): void {
       this.$store.dispatch('deleteStyle', this.initialUrl);
       this.showDeleteConfirm = false;
+      this.leaving = true;
       this.$emit('back');
     },
 
     save(): void {
+      this.leaving = true;
       this.$emit('save', {
         initialUrl: this.initialUrl,
         url: this.url,

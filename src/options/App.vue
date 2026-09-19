@@ -8,78 +8,54 @@
     />
 
     <div class="content">
-      <the-style-editor-page
-        v-if="currentTab === 'styles' && editingUrl !== null"
-        ref="editorPage"
-        :initial-url="editingUrl"
-        @back="editingUrl = null"
+      <router-view
+        v-if="stylesLoaded"
+        :key="$route.fullPath"
+        @edit="editStyle"
+        @back="navigate({ name: 'styles' })"
         @save="onSaveStyle"
       />
-
-      <component :is="currentTabComponent" v-else @edit="editingUrl = $event" />
     </div>
 
     <div class="nav-footer">
       <the-navigation-footer />
     </div>
-
-    <confirm-dialog
-      v-if="pendingTab !== null"
-      :title="t('discard_changes')"
-      :message="t('unsaved_changes_warning')"
-      :confirm-label="t('discard_changes')"
-      @cancel="pendingTab = null"
-      @confirm="confirmSwitchTab"
-    />
   </theme-provider>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
+import { RawLocation } from 'vue-router';
 
 import { StylebotAppearance } from '@stylebot/types';
+import { ThemeProvider } from '@stylebot/components';
 
-import TheBasicsTab from './components/TheBasicsTab.vue';
-import TheStylesTab from './components/TheStylesTab.vue';
-import TheSyncTab from './components/TheSyncTab.vue';
 import TheNavigation from './components/TheNavigation.vue';
 import TheNavigationFooter from './components/navigation/TheNavigationFooter.vue';
-import TheStyleEditorPage from './components/styles/TheStyleEditorPage.vue';
-
-import { ConfirmDialog, ThemeProvider } from '@stylebot/components';
+import { TABS } from './router';
 
 export default Vue.extend({
   name: 'App',
 
   components: {
-    TheBasicsTab,
-    TheStylesTab,
-    TheSyncTab,
     TheNavigation,
     TheNavigationFooter,
-    ConfirmDialog,
     ThemeProvider,
-    TheStyleEditorPage,
   },
 
   data(): {
-    currentTab: string;
     tabs: Array<string>;
-    // null = styles list, '' = new style, else the url being edited.
-    editingUrl: string | null;
-    pendingTab: string | null;
+    stylesLoaded: boolean;
   } {
     return {
-      currentTab: 'basics',
-      tabs: ['basics', 'styles', 'sync'],
-      editingUrl: null,
-      pendingTab: null,
+      tabs: [...TABS],
+      stylesLoaded: false,
     };
   },
 
   computed: {
-    currentTabComponent(): string {
-      return `the-${this.currentTab}-tab`;
+    currentTab(): string {
+      return (this.$route.meta?.tab as string | undefined) ?? 'basics';
     },
 
     appearance(): StylebotAppearance {
@@ -88,31 +64,30 @@ export default Vue.extend({
   },
 
   created() {
-    this.$store.dispatch('getAllStyles');
+    this.$store.dispatch('getAllStyles').then(() => {
+      this.stylesLoaded = true;
+    });
+
     this.$store.dispatch('getAllOptions');
     this.$store.dispatch('getCommands');
     this.$store.dispatch('getGoogleDriveSyncMetadata');
   },
 
   methods: {
-    selectTab(tab: string): void {
-      const editorPage = this.$refs.editorPage as
-        | { isDirty: boolean }
-        | undefined;
-
-      if (this.editingUrl !== null && editorPage?.isDirty) {
-        this.pendingTab = tab;
-        return;
-      }
-
-      this.currentTab = tab;
-      this.editingUrl = null;
+    navigate(location: RawLocation): void {
+      this.$router.push(location).catch(() => undefined);
     },
 
-    confirmSwitchTab(): void {
-      this.currentTab = this.pendingTab as string;
-      this.editingUrl = null;
-      this.pendingTab = null;
+    selectTab(tab: string): void {
+      if (this.$route.name !== tab) {
+        this.navigate({ name: tab });
+      }
+    },
+
+    editStyle(url: string): void {
+      this.navigate(
+        url ? { name: 'style-edit', query: { url } } : { name: 'style-edit' }
+      );
     },
 
     onSaveStyle({
@@ -125,7 +100,7 @@ export default Vue.extend({
       css: string;
     }): void {
       this.$store.dispatch('saveStyle', { initialUrl, url, css });
-      this.editingUrl = null;
+      this.navigate({ name: 'styles' });
     },
   },
 });

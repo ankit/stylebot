@@ -135,8 +135,33 @@ export const GetAllOptions = async (
   sendResponse(options);
 };
 
-export const OpenOptionsPage = (): void => {
-  chrome.runtime.openOptionsPage();
+/**
+ * Not chrome.runtime.openOptionsPage: it drops the hash on Chrome and
+ * won't reuse a tab on a different route on Firefox.
+ */
+export const OpenOptionsPage = async (message?: {
+  route?: string;
+}): Promise<void> => {
+  const base = chrome.runtime.getURL('options.html');
+  const url = message?.route ? `${base}#${message.route}` : base;
+
+  const tabs = await chrome.tabs.query({});
+  const existing = tabs.find(tab => tab.url?.startsWith(base));
+
+  if (existing?.id !== undefined) {
+    await chrome.tabs.update(existing.id, {
+      active: true,
+      ...(message?.route ? { url } : {}),
+    });
+
+    if (existing.windowId !== undefined) {
+      await chrome.windows.update(existing.windowId, { focused: true });
+    }
+
+    return;
+  }
+
+  await chrome.tabs.create({ url, active: true });
 };
 
 export const OpenDonatePage = (): void => {
