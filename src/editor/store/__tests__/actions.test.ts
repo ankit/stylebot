@@ -4,12 +4,14 @@ import actions from '../actions';
 import mockState from '../__mocks__/state';
 import * as stylebotCss from '@stylebot/css';
 import * as stylebotReadability from '@stylebot/readability';
+import * as googleFonts from '@stylebot/google-fonts';
 import * as chromeUtils from '../../utils/chrome';
 import { readCache, writeCache } from '../../../inject-css/cache';
 
 jest.mock('postcss');
 jest.mock('@stylebot/css');
 jest.mock('@stylebot/readability');
+jest.mock('@stylebot/google-fonts');
 jest.mock('../../utils/chrome');
 
 const mockRoot = {
@@ -279,6 +281,174 @@ describe('actions', () => {
 
       expect(mockDispatch).toBeCalledWith('closeStylebot');
       expect(mockCommit).not.toBeCalled();
+    });
+  });
+
+  describe('rememberFont', () => {
+    const stateWithFonts = (fonts: Array<string>) => ({
+      ...mockState,
+      options: { ...mockState.options, fonts },
+    });
+
+    it('moves an already listed font to the front', () => {
+      actions.rememberFont(
+        {
+          state: stateWithFonts(['Lora', 'Inter', 'Roboto']),
+          commit: mockCommit,
+        },
+        'Inter'
+      );
+
+      expect(chromeUtils.setOption).toBeCalledWith('fonts', [
+        'Inter',
+        'Lora',
+        'Roboto',
+      ]);
+      expect(mockCommit).toBeCalledWith(
+        'setOptions',
+        expect.objectContaining({ fonts: ['Inter', 'Lora', 'Roboto'] })
+      );
+    });
+
+    it('prepends a new font', () => {
+      actions.rememberFont(
+        { state: stateWithFonts(['Lora']), commit: mockCommit },
+        'Inter'
+      );
+
+      expect(chromeUtils.setOption).toBeCalledWith('fonts', ['Inter', 'Lora']);
+    });
+
+    it('keeps at most ten fonts', () => {
+      const fonts = Array.from({ length: 10 }, (_, i) => `Font ${i}`);
+
+      actions.rememberFont(
+        { state: stateWithFonts(fonts), commit: mockCommit },
+        'Inter'
+      );
+
+      expect(chromeUtils.setOption).toBeCalledWith('fonts', [
+        'Inter',
+        ...fonts.slice(0, 9),
+      ]);
+    });
+  });
+
+  describe('applyFontFamily', () => {
+    const state = { ...mockState, activeSelector: 'a', css: 'a { }' };
+
+    beforeEach(() => {
+      jest
+        .spyOn(googleFonts, 'loadGoogleFonts')
+        .mockResolvedValue([{ family: 'Inter', category: 'sans-serif' }]);
+      jest
+        .spyOn(stylebotCss, 'getPrimaryFontFamily')
+        .mockImplementation(value => value.split(',')[0].trim());
+      jest
+        .spyOn(stylebotCss, 'cleanGoogleWebFonts')
+        .mockImplementation(css => css);
+      jest
+        .spyOn(stylebotCss, 'addGoogleWebFontImport')
+        .mockReturnValue('withImport');
+      jest.spyOn(stylebotCss, 'addGoogleWebFont').mockResolvedValue('checked');
+    });
+
+    it('applies the declaration before adding a bundled font import', async () => {
+      await actions.applyFontFamily(
+        { state, dispatch: mockDispatch },
+        'Inter, sans-serif'
+      );
+
+      expect(mockDispatch).toHaveBeenNthCalledWith(1, 'applyDeclaration', {
+        property: 'font-family',
+        value: 'Inter, sans-serif',
+      });
+      expect(mockDispatch).toHaveBeenNthCalledWith(2, 'rememberFont', 'Inter');
+      expect(stylebotCss.addGoogleWebFontImport).toBeCalledWith(
+        'Inter',
+        'a { }'
+      );
+      expect(stylebotCss.addGoogleWebFont).not.toBeCalled();
+      expect(mockDispatch).toHaveBeenNthCalledWith(3, 'applyCss', {
+        css: 'withImport',
+      });
+    });
+
+    it('checks fonts outside the bundled list before importing', async () => {
+      await actions.applyFontFamily(
+        { state, dispatch: mockDispatch },
+        'Some Local'
+      );
+
+      expect(stylebotCss.addGoogleWebFont).toBeCalledWith(
+        'Some Local',
+        'a { }'
+      );
+      expect(stylebotCss.addGoogleWebFontImport).not.toBeCalled();
+      expect(mockDispatch).toBeCalledWith('applyCss', { css: 'checked' });
+    });
+
+    it('clears the font without remembering or importing anything', async () => {
+      await actions.applyFontFamily({ state, dispatch: mockDispatch }, '');
+
+      expect(mockDispatch).not.toBeCalledWith(
+        'rememberFont',
+        expect.anything()
+      );
+      expect(mockDispatch).toBeCalledWith('applyDeclaration', {
+        property: 'font-family',
+        value: '',
+      });
+      expect(stylebotCss.addGoogleWebFont).not.toBeCalled();
+      expect(stylebotCss.addGoogleWebFontImport).not.toBeCalled();
+    });
+  });
+
+  describe('previewFontFamily', () => {
+    const state = { ...mockState, activeSelector: 'h1' };
+
+    beforeEach(() => {
+      jest
+        .spyOn(googleFonts, 'loadGoogleFonts')
+        .mockResolvedValue([{ family: 'Inter', category: 'sans-serif' }]);
+      jest
+        .spyOn(stylebotCss, 'getPrimaryFontFamily')
+        .mockImplementation(value => value.split(',')[0].trim());
+      jest
+        .spyOn(stylebotCss, 'addGoogleWebFontImport')
+        .mockImplementation((_family, css) => `@import;\n${css}`);
+    });
+
+    it('no-ops without an active selector', async () => {
+      await actions.previewFontFamily({ state: mockState }, 'Inter');
+
+      expect(stylebotCss.injectRootIntoDocument).not.toBeCalled();
+    });
+
+    it('injects a preview stylesheet with the import for a bundled font', async () => {
+      await actions.previewFontFamily({ state }, 'Inter, sans-serif');
+
+      expect(postcss.parse).toBeCalledWith(
+        '@import;\nh1 { font-family: Inter, sans-serif; }'
+      );
+      expect(stylebotCss.injectRootIntoDocument).toBeCalledWith(
+        mockRoot,
+        'font-preview'
+      );
+    });
+
+    it('skips the import for an unknown font', async () => {
+      await actions.previewFontFamily({ state }, 'Some Local');
+
+      expect(postcss.parse).toBeCalledWith('h1 { font-family: Some Local; }');
+      expect(stylebotCss.addGoogleWebFontImport).not.toBeCalled();
+    });
+
+    it('removes the preview for an empty value', async () => {
+      await actions.previewFontFamily({ state }, '');
+
+      expect(stylebotCss.removeCSSFromDocument).toBeCalledWith('font-preview');
+      expect(stylebotCss.injectRootIntoDocument).not.toBeCalled();
     });
   });
 });

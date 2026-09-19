@@ -5,10 +5,6 @@
     <the-context-menu />
 
     <div class="section">
-      <the-fonts />
-    </div>
-
-    <div class="section">
       <the-keyboard-shortcuts />
     </div>
   </div>
@@ -18,7 +14,6 @@
 import Vue from 'vue';
 
 import { Heading } from '@stylebot/components';
-import TheFonts from './basics/TheFonts.vue';
 import TheContextMenu from './basics/TheContextMenu.vue';
 import TheKeyboardShortcuts from './basics/TheKeyboardShortcuts.vue';
 
@@ -27,7 +22,6 @@ export default Vue.extend({
 
   components: {
     Heading,
-    TheFonts,
     TheContextMenu,
     TheKeyboardShortcuts,
   },

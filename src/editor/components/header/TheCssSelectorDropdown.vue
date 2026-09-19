@@ -47,10 +47,17 @@ export default Vue.extend({
     TheCssSelectorDropdownItem,
   },
 
-  data(): { highlighter: Highlighter | null; focused: boolean } {
+  data(): {
+    highlighter: Highlighter | null;
+    focused: boolean;
+    openingSelector: string;
+  } {
     return {
       highlighter: null,
       focused: false,
+      // The selector as it was when editing began; until it's changed, the
+      // suggestions list everything rather than filtering by it.
+      openingSelector: '',
     };
   },
 
@@ -73,7 +80,7 @@ export default Vue.extend({
 
     filteredSelectors(): Array<CssSelectorMetadata> {
       const query = this.activeSelector.trim().toLowerCase();
-      if (!query) {
+      if (!query || this.activeSelector === this.openingSelector) {
         return this.selectors;
       }
 
@@ -127,6 +134,7 @@ export default Vue.extend({
 
     onFocus(): void {
       this.focused = true;
+      this.openingSelector = this.activeSelector;
       this.previewActiveSelector();
     },
 

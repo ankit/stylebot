@@ -1,7 +1,7 @@
 import http from 'node:http';
 import type { AddressInfo } from 'node:net';
 import type { Locator, Page } from '@playwright/test';
-import { closeServer, type Extension, type Popup } from './fixtures';
+import { expect, closeServer, type Extension, type Popup } from './fixtures';
 
 // Generalizes the inline http.createServer pattern from style-important-override.spec.ts
 // to serve multiple paths, for tests that need real multi-page navigation.
@@ -75,6 +75,20 @@ export const openEditor = async (
   await editorRoot.locator('.stylebot-app').waitFor({ state: 'attached' });
 
   return editorRoot;
+};
+
+// Picks an element with the inspector (active as soon as the editor opens)
+// and waits for the selector field to settle on it.
+export const pickElement = async (
+  page: Page,
+  editorRoot: Locator,
+  selector: string
+): Promise<void> => {
+  await expect(editorRoot.locator('.stylebot-inspector')).toHaveClass(/active/);
+  await page.locator(selector).click({ force: true });
+  await expect(
+    editorRoot.locator('.autocomplete-chips .chip').first()
+  ).toHaveText(new RegExp(`${selector}$`));
 };
 
 const MODE_LABEL = {

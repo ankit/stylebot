@@ -64,6 +64,16 @@ const setStylesheetContent = (id: string, css: string): void => {
   keepStylebotStylesLast(style);
 };
 
+// Bumped on every injection or removal per stylesheet, so an `@import` fetch
+// that resolves after the stylesheet changed again doesn't write stale css.
+const injectionVersions = new Map<string, number>();
+
+const bumpInjectionVersion = (id: string): number => {
+  const version = (injectionVersions.get(id) ?? 0) + 1;
+  injectionVersions.set(id, version);
+  return version;
+};
+
 // Applies the non-`@import` CSS immediately and patches in any `@import`
 // content once it's fetched, so a slow import fetch (e.g. a cold background
 // service worker) never blocks the rest of the stylesheet from applying.
@@ -72,6 +82,7 @@ export const injectCSSIntoDocument = async (
   id: string
 ): Promise<void> => {
   const { css: withoutImports, importUrls } = extractImports(css);
+  const version = bumpInjectionVersion(id);
 
   setStylesheetContent(id, withoutImports);
 
@@ -82,7 +93,7 @@ export const injectCSSIntoDocument = async (
   Promise.all(importUrls.map(fetchImportCss)).then(values => {
     const merged = values.join('\n\n');
 
-    if (merged) {
+    if (merged && injectionVersions.get(id) === version) {
       setStylesheetContent(id, `${merged}\n\n${withoutImports}`);
     }
   });
@@ -99,6 +110,8 @@ export const injectRootIntoDocument = (
 export const removeCSSFromDocument = (id: string): void => {
   const stylesheetId = getStylesheetId(id);
   const el = document.getElementById(stylesheetId);
+
+  bumpInjectionVersion(id);
 
   if (el) {
     el.innerHTML = '';

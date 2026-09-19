@@ -60,7 +60,8 @@
         "monaco-editor/*",
         "editor/index.css",
         "fonts/*",
-        "readability/index.css"
+        "readability/index.css",
+        "google-fonts/fonts.json"
       ],
       "matches": ["<all_urls>"]
     }

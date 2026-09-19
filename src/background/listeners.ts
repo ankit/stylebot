@@ -9,6 +9,7 @@ import {
   OpenOptionsPage,
   OpenDonatePage,
   OpenReportIssuePage,
+  OpenGoogleFontsPage,
   SetStyle,
   MoveStyle,
   GetAllStyles,
@@ -121,6 +122,9 @@ chrome.runtime.onMessage.addListener(
         break;
       case 'OpenReportIssuePage':
         OpenReportIssuePage();
+        break;
+      case 'OpenGoogleFontsPage':
+        OpenGoogleFontsPage();
         break;
 
       case 'SetStyle':

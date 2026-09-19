@@ -93,6 +93,62 @@ describe('inject-style', () => {
       expect(style?.textContent).toContain('@font-face');
       expect(style?.textContent).toContain('color: red');
     });
+
+    it('drops an @import fetch that resolves after the stylesheet was removed', async () => {
+      let deliverImport: (css: string) => void = () => undefined;
+
+      (global as any).chrome = {
+        runtime: {
+          sendMessage: jest.fn(
+            (_message: unknown) =>
+              new Promise<string>(resolve => {
+                deliverImport = resolve;
+              })
+          ),
+        },
+      };
+
+      await injectCSSIntoDocument(
+        '@import url(https://fonts.example.com/font.css); a { color: red; }',
+        'example'
+      );
+      removeCSSFromDocument('example');
+
+      deliverImport('@font-face { font-family: "Test"; }');
+      await flush();
+
+      expect(
+        document.getElementById(stylesheetId('example'))?.textContent
+      ).toBe('');
+    });
+
+    it('drops an @import fetch that resolves after a newer injection', async () => {
+      const callbacks: Array<(response: string) => void> = [];
+
+      (global as any).chrome = {
+        runtime: {
+          sendMessage: jest.fn(
+            (_message: unknown) =>
+              new Promise<string>(resolve => {
+                callbacks.push(resolve);
+              })
+          ),
+        },
+      };
+
+      await injectCSSIntoDocument(
+        '@import url(https://fonts.example.com/a.css); a { color: red; }',
+        'example'
+      );
+      await injectCSSIntoDocument('a { color: blue; }', 'example');
+
+      callbacks[0]('@font-face { font-family: "Stale"; }');
+      await flush();
+
+      const style = document.getElementById(stylesheetId('example'));
+      expect(style?.textContent).not.toContain('Stale');
+      expect(style?.textContent).toContain('color: blue');
+    });
   });
 
   describe('style ordering while the document is still parsing', () => {

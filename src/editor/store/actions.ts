@@ -11,12 +11,17 @@ type Getters = {
 import {
   addDeclaration,
   addGoogleWebFont,
+  addGoogleWebFontImport,
   cleanGoogleWebFonts,
+  getPrimaryFontFamily,
   injectRootIntoDocument,
+  removeCSSFromDocument,
   getCssAfterApplyingFilterEffectToPage,
   removeEmptyRules,
   removeRule,
 } from '@stylebot/css';
+
+import { loadGoogleFonts } from '@stylebot/google-fonts';
 
 import { applyReadability, removeReadability } from '@stylebot/readability';
 
@@ -47,6 +52,12 @@ import {
 import { initListeners } from '../listeners';
 import { initEditor } from '../utils/init-editor';
 import { readCache, writeCache } from '../../inject-css/cache';
+
+const RECENT_FONTS_LIMIT = 10;
+const FONT_PREVIEW_ID = 'font-preview';
+
+const isGoogleFont = async (family: string): Promise<boolean> =>
+  (await loadGoogleFonts()).some(font => font.family === family);
 
 export default {
   async initialize(
@@ -197,6 +208,23 @@ export default {
     commit('setOptions', { ...state.options, lastColorPickerTab });
   },
 
+  /**
+   * Moves a font to the front of the recently used list, which the font
+   * picker shows by default.
+   */
+  rememberFont(
+    { state, commit }: { state: State; commit: Commit },
+    font: string
+  ): void {
+    const fonts = [
+      font,
+      ...state.options.fonts.filter(item => item !== font),
+    ].slice(0, RECENT_FONTS_LIMIT);
+
+    setOption('fonts', fonts);
+    commit('setOptions', { ...state.options, fonts });
+  },
+
   applyCss(
     { commit, state }: { commit: Commit; state: State },
     { css }: { css: string }
@@ -267,26 +295,61 @@ export default {
     dispatch('applyCss', { css });
   },
 
+  /**
+   * Applies a font-family value right away, then adds the Google Fonts import
+   * for its first family: synchronously when the family is in the bundled
+   * list, otherwise once the existence check comes back.
+   */
   async applyFontFamily(
     { state, dispatch }: { state: State; dispatch: Dispatch },
     value: string
   ): Promise<void> {
-    let css = state.css;
-
-    if (value) {
-      css = await addGoogleWebFont(value, css);
-    }
-
-    if (css !== state.css) {
-      dispatch('applyCss', { css });
-    }
-
     dispatch('applyDeclaration', { property: 'font-family', value });
 
-    css = cleanGoogleWebFonts(state.css);
+    const family = getPrimaryFontFamily(value);
+    let css = state.css;
+
+    if (family) {
+      dispatch('rememberFont', family);
+
+      css = (await isGoogleFont(family))
+        ? addGoogleWebFontImport(family, css)
+        : await addGoogleWebFont(family, css);
+    }
+
+    css = cleanGoogleWebFonts(css);
     if (css !== state.css) {
       dispatch('applyCss', { css });
     }
+
+    removeCSSFromDocument(FONT_PREVIEW_ID);
+  },
+
+  /**
+   * Shows a font-family value on the active selector without saving it, via
+   * a separate stylesheet. An empty value removes the preview.
+   */
+  async previewFontFamily(
+    { state }: { state: State },
+    value: string
+  ): Promise<void> {
+    if (!state.activeSelector) {
+      return;
+    }
+
+    if (!value) {
+      removeCSSFromDocument(FONT_PREVIEW_ID);
+      return;
+    }
+
+    const family = getPrimaryFontFamily(value);
+    let css = `${state.activeSelector} { font-family: ${value}; }`;
+
+    if (family && (await isGoogleFont(family))) {
+      css = addGoogleWebFontImport(family, css);
+    }
+
+    injectRootIntoDocument(postcss.parse(css), FONT_PREVIEW_ID);
   },
 
   applyReadability(

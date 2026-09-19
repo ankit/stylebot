@@ -94,6 +94,11 @@ const config = {
       '@stylebot/styles': path.resolve(__dirname, './src/styles/index'),
       '@stylebot/settings': path.resolve(__dirname, './src/settings/index'),
 
+      '@stylebot/google-fonts': path.resolve(
+        __dirname,
+        './src/google-fonts/index'
+      ),
+
       '@stylebot/readability': path.resolve(
         __dirname,
         './src/readability/index'
@@ -177,6 +182,10 @@ const config = {
         {
           from: 'fonts',
           to: 'fonts',
+        },
+        {
+          from: 'google-fonts/fonts.json',
+          to: 'google-fonts/fonts.json',
         },
         {
           from: 'options/index.html',

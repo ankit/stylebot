@@ -13,3 +13,6 @@ docs
 
 # Prompt content — the manual line wrapping there is deliberate.
 .claude
+
+# Chrome profile created by yarn dev:chrome.
+.chrome-dev-profile

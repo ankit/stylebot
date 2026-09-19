@@ -147,6 +147,10 @@ export const OpenReportIssuePage = (): void => {
   chrome.tabs.create({ url: 'https://github.com/ankit/stylebot/issues' });
 };
 
+export const OpenGoogleFontsPage = (): void => {
+  chrome.tabs.create({ url: 'https://fonts.google.com' });
+};
+
 export const SetOption = (message: SetOptionType): void => {
   setOption(message.option.name, message.option.value);
 };

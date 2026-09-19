@@ -17,6 +17,7 @@ import {
   SetReadabilitySettings,
   ReadabilitySettings,
   OpenDonatePage,
+  OpenGoogleFontsPage,
   GetRecentColors,
   AddRecentColor,
   GetRecentColorsResponse,
@@ -72,6 +73,14 @@ export const openOptionsPage = (): void => {
 export const openDonatePage = (): void => {
   const message: OpenDonatePage = {
     name: 'OpenDonatePage',
+  };
+
+  chrome.runtime.sendMessage(message);
+};
+
+export const openGoogleFontsPage = (): void => {
+  const message: OpenGoogleFontsPage = {
+    name: 'OpenGoogleFontsPage',
   };
 
   chrome.runtime.sendMessage(message);
