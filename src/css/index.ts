@@ -54,4 +54,5 @@ export {
   removeRule,
 } from './rule';
 
-export { getAlreadyUsedColors, RoleColorGroups } from './already-used-colors';
+export { getAlreadyUsedColors } from './already-used-colors';
+export type { RoleColorGroups } from './already-used-colors';
