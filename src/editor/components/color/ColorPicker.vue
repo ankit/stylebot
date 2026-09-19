@@ -128,6 +128,8 @@ export default Vue.extend({
 
   beforeDestroy() {
     this.popoverResizeObserver?.disconnect();
+    window.removeEventListener('keydown', this.onWindowKeydown, true);
+    document.removeEventListener('click', this.onDocumentClick);
   },
 
   methods: {
@@ -165,6 +167,10 @@ export default Vue.extend({
         }
       });
 
+      // window capture, like AnchoredMenu: fires before the editor's
+      // document-level keydown handler, which would otherwise treat Escape as "close editor".
+      window.addEventListener('keydown', this.onWindowKeydown, true);
+
       setTimeout(() => {
         document.addEventListener('click', this.onDocumentClick);
       }, 0);
@@ -175,10 +181,27 @@ export default Vue.extend({
       this.$store.commit('setColorPickerVisible', false);
       this.popoverResizeObserver?.disconnect();
       this.popoverResizeObserver = null;
+      window.removeEventListener('keydown', this.onWindowKeydown, true);
 
       setTimeout(() => {
         document.removeEventListener('click', this.onDocumentClick);
       }, 0);
+    },
+
+    onWindowKeydown(event: KeyboardEvent): void {
+      if (event.key !== 'Escape') {
+        return;
+      }
+
+      // A dropdown inside the popover (e.g. the palette search) is open —
+      // its own Escape handler closes it; leave the picker alone.
+      const popover = this.$refs.popover as HTMLElement | undefined;
+      if (popover?.querySelector('.anchored-menu-panel')) {
+        return;
+      }
+
+      event.stopPropagation();
+      this.onClose();
     },
 
     // vue-draggable-resizable's CSS transform on the dock breaks position:
