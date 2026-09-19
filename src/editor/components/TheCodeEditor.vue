@@ -143,8 +143,8 @@ export default Vue.extend({
       }
 
       if (selector && !getRule(this.css, selector)) {
-        /* Already styled via a grouped rule — split it out rather than
-           appending a second, blank `.foo {}` at the bottom. */
+        // Already styled via a grouped rule — split it out rather than
+        // appending a second, blank `.foo {}` at the bottom.
         const css = getRuleForSelector(this.css, selector)
           ? splitSelectorFromGroup(this.css, selector)
           : addEmptyRule(this.css, selector);

@@ -138,8 +138,8 @@ export default Vue.extend({
         // in a list meant to be scanned, not copied.
         value: property === 'font-family' ? value.replace(/['"]/g, '') : value,
         swatch: property.toLowerCase().includes('color') ? value : null,
-        /* A font stack is the one value long enough to wrap; wrapped text
-           reads better left-aligned. */
+        // A font stack is the one value long enough to wrap; wrapped text
+        // reads better left-aligned.
         wraps: property === 'font-family',
       }));
     },
