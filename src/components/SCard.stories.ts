@@ -3,7 +3,7 @@ import type { Meta } from '@storybook/vue';
 import SCard from './SCard.vue';
 import Heading from './Heading.vue';
 import SText from './SText.vue';
-import { fromTemplate } from '../../.storybook/story-helpers';
+import { fromTemplate } from '@sb/story-helpers';
 
 const meta: Meta = {
   title: 'Primitives/SCard',

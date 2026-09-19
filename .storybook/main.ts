@@ -50,6 +50,7 @@ const config: StorybookConfig = {
       plugins: [createVuePlugin(), localePlugin()],
       resolve: {
         alias: [
+          { find: '@stylebot/storybook', replacement: __dirname },
           {
             find: '@stylebot/readability',
             replacement: mock('readability.ts'),
@@ -66,6 +67,7 @@ const config: StorybookConfig = {
             find: `@stylebot/${name}`,
             replacement: src(`${name}/index`),
           })),
+          { find: '@sb', replacement: __dirname },
         ],
       },
       css: {

@@ -1,7 +1,7 @@
 import type { Meta } from '@storybook/vue';
 
 import ConfirmDialog from './ConfirmDialog.vue';
-import { fromTemplate } from '../../.storybook/story-helpers';
+import { fromTemplate } from '@sb/story-helpers';
 
 const meta: Meta = {
   title: 'Primitives/ConfirmDialog',

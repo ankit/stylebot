@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue';
 
 import STooltip from './STooltip.vue';
 import SButton from './SButton.vue';
-import { focusViaTab, fromTemplate } from '../../.storybook/story-helpers';
+import { focusViaTab, fromTemplate } from '@sb/story-helpers';
 
 const meta: Meta = {
   title: 'Primitives/STooltip',

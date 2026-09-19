@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue';
 
 import SButton from './SButton.vue';
 import { ChevronDownIcon } from '@stylebot/icons';
-import { fromTemplate } from '../../.storybook/story-helpers';
+import { fromTemplate } from '@sb/story-helpers';
 
 const meta: Meta = {
   title: 'Primitives/SButton',

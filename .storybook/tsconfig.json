@@ -3,6 +3,10 @@
   "include": ["./**/*", "../src/**/*.stories.ts", "../shims.vue.d.ts"],
   "compilerOptions": {
     "types": ["chrome", "node"],
-    "baseUrl": "../src"
+    "baseUrl": "../src",
+    "paths": {
+      "@stylebot/*": ["*/index"],
+      "@sb/*": ["../.storybook/*"]
+    }
   }
 }

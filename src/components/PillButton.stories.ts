@@ -2,7 +2,7 @@ import type { Meta } from '@storybook/vue';
 
 import PillButton from './PillButton.vue';
 import ShortcutKbd from './ShortcutKbd.vue';
-import { fromTemplate } from '../../.storybook/story-helpers';
+import { fromTemplate } from '@sb/story-helpers';
 
 const meta: Meta = {
   title: 'Primitives/PillButton',

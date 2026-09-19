@@ -4,8 +4,8 @@ import App from './App.vue';
 import {
   createOptionsStore,
   OptionsStateOverrides,
-} from '../../.storybook/mocks/options-store';
-import { nextFrame } from '../../.storybook/story-helpers';
+} from '@sb/mocks/options-store';
+import { nextFrame } from '@sb/story-helpers';
 
 const meta: Meta = {
   title: 'Options',

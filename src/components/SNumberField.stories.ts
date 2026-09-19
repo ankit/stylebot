@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue';
 
 import SNumberField from './SNumberField.vue';
-import { fromTemplate, nextFrame } from '../../.storybook/story-helpers';
+import { fromTemplate, nextFrame } from '@sb/story-helpers';
 
 const meta: Meta = {
   title: 'Primitives/SNumberField',

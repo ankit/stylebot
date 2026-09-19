@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue';
 
 import App from './App.vue';
-import type { ChromeShimOptions } from '../../.storybook/mocks/chrome';
+import type { ChromeShimOptions } from '@sb/mocks/chrome';
 
 const meta: Meta = {
   title: 'Browser Action',

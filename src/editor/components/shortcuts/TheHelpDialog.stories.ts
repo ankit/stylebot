@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue';
 
 import TheHelpDialog from './TheHelpDialog.vue';
-import { createEditorStore } from '../../../../.storybook/mocks/editor-store';
+import { createEditorStore } from '@sb/mocks/editor-store';
 
 const meta: Meta = {
   title: 'Editor/TheHelpDialog',

@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue';
 
 import SAutocomplete from './SAutocomplete.vue';
 import MenuItem from './MenuItem.vue';
-import { fromTemplate, nextFrame } from '../../.storybook/story-helpers';
+import { fromTemplate, nextFrame } from '@sb/story-helpers';
 
 const meta: Meta = {
   title: 'Primitives/SAutocomplete',

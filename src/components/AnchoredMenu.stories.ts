@@ -4,7 +4,7 @@ import AnchoredMenu from './AnchoredMenu.vue';
 import SMenu from './SMenu.vue';
 import MenuItem from './MenuItem.vue';
 import SButton from './SButton.vue';
-import { fromTemplate, nextFrame } from '../../.storybook/story-helpers';
+import { fromTemplate, nextFrame } from '@sb/story-helpers';
 
 const meta: Meta = {
   title: 'Primitives/AnchoredMenu',

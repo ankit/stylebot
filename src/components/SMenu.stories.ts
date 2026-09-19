@@ -2,7 +2,7 @@ import type { Meta } from '@storybook/vue';
 
 import SMenu from './SMenu.vue';
 import MenuItem from './MenuItem.vue';
-import { fromTemplate } from '../../.storybook/story-helpers';
+import { fromTemplate } from '@sb/story-helpers';
 
 const meta: Meta = {
   title: 'Primitives/SMenu',

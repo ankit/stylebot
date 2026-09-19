@@ -4,8 +4,8 @@ import ColorPickerPopover from './ColorPickerPopover.vue';
 import {
   createEditorStore,
   EditorStateOverrides,
-} from '../../../../.storybook/mocks/editor-store';
-import type { ChromeShimOptions } from '../../../../.storybook/mocks/chrome';
+} from '@sb/mocks/editor-store';
+import type { ChromeShimOptions } from '@sb/mocks/chrome';
 
 const meta: Meta = {
   title: 'Editor/ColorPickerPopover',
