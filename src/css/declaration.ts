@@ -1,4 +1,5 @@
 import * as postcss from 'postcss';
+import { splitSelectorFromGroup } from './rule';
 
 /**
  * Add declaration for given selector and css
@@ -7,8 +8,11 @@ export const addDeclaration = (
   property: string,
   value: string,
   selector: string,
-  css: string
+  rawCss: string
 ): string => {
+  // A selector styled only via a grouped rule (`.foo, .bar`) gets its own
+  // rule first, so the walk below edits it instead of adding a second one.
+  const css = splitSelectorFromGroup(rawCss, selector);
   const root = postcss.parse(css);
   const rules: Array<postcss.Rule> = [];
 

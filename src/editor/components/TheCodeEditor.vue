@@ -5,7 +5,13 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { getRule, addEmptyRule, removeEmptyRules } from '@stylebot/css';
+import {
+  getRule,
+  getRuleForSelector,
+  splitSelectorFromGroup,
+  addEmptyRule,
+  removeEmptyRules,
+} from '@stylebot/css';
 import {
   IframeMessage,
   ParentUpdateCssMessage,
@@ -137,7 +143,12 @@ export default Vue.extend({
       }
 
       if (selector && !getRule(this.css, selector)) {
-        const css = addEmptyRule(this.css, selector);
+        // Already styled via a grouped rule — split it out rather than
+        // appending a second, blank `.foo {}` at the bottom.
+        const css = getRuleForSelector(this.css, selector)
+          ? splitSelectorFromGroup(this.css, selector)
+          : addEmptyRule(this.css, selector);
+
         this.$store.dispatch('applyCss', { css });
       }
 

@@ -3,6 +3,7 @@ import * as postcss from 'postcss';
 import { State } from './';
 import {
   getRule,
+  getRuleForSelector,
   getFilterEffectValueForPage,
   getAlreadyUsedColors,
   RoleColorGroups,
@@ -10,12 +11,19 @@ import {
 import { isReaderable } from '@stylebot/readability';
 
 export default {
+  /**
+   * Falls back to a grouped rule the selector belongs to, so Basic mode
+   * shows its declarations before any edit splits it into its own rule.
+   */
   activeRule: (state: State): postcss.Rule | null => {
     if (!state.activeSelector) {
       return null;
     }
 
-    return getRule(state.css, state.activeSelector);
+    return (
+      getRule(state.css, state.activeSelector) ??
+      getRuleForSelector(state.css, state.activeSelector)
+    );
   },
 
   alreadyUsedColors: (state: State): RoleColorGroups =>

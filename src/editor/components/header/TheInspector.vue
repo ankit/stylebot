@@ -18,7 +18,8 @@ import Vue from 'vue';
 import { STooltip } from '@stylebot/components';
 import { InspectorIcon } from '@stylebot/icons';
 import { Highlighter } from '@stylebot/highlighter';
-import { StylebotEditingMode } from '@stylebot/types';
+import { getDeclarationsForSelector, getExistingSelector } from '@stylebot/css';
+import { CssDeclaration, StylebotEditingMode } from '@stylebot/types';
 
 export default Vue.extend({
   name: 'TheInspector',
@@ -71,7 +72,12 @@ export default Vue.extend({
   },
 
   created() {
-    this.highlighter = new Highlighter({ onSelect: this.select });
+    this.highlighter = new Highlighter({
+      onSelect: this.select,
+      getStylebotDeclarations: this.getStylebotDeclarations,
+      getExistingSelector: this.findExistingSelector,
+      getMountRoot: () => this.$root.$el as HTMLElement,
+    });
 
     if (this.active) {
       this.highlighter?.startInspecting();
@@ -96,6 +102,14 @@ export default Vue.extend({
     select(selector: string): void {
       this.toggle();
       this.$emit('select', selector);
+    },
+
+    getStylebotDeclarations(selector: string): Array<CssDeclaration> | null {
+      return getDeclarationsForSelector(this.$store.state.css, selector);
+    },
+
+    findExistingSelector(el: HTMLElement): string | null {
+      return getExistingSelector(el, this.$store.state.css);
     },
   },
 });

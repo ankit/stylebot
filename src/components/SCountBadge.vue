@@ -1,5 +1,7 @@
 <template>
-  <span class="count-badge">{{ count }}</span>
+  <span class="count-badge">
+    <slot>{{ count }}</slot>
+  </span>
 </template>
 
 <script lang="ts">
@@ -23,14 +25,14 @@ export default Vue.extend({
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 2px 6px;
-  border-radius: 20px;
-  background: color-mix(in srgb, var(--accent) 14%, transparent);
-  font-size: 11px;
-  font-weight: 700;
-  line-height: 1.4;
-  color: var(--accent);
   min-width: 18px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  font-size: 10.5px;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--accent);
   text-align: center;
 }
 </style>

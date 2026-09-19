@@ -1,6 +1,15 @@
 const isMac = (): boolean =>
   /mac/i.test(navigator.platform || navigator.userAgent);
 
+// Arrow glyphs read the same everywhere — unlike the modifier keys below,
+// there's no OS-specific spelling to pick between.
+const ARROW_SYMBOLS: Record<string, string> = {
+  arrowup: '↑',
+  arrowdown: '↓',
+  arrowleft: '←',
+  arrowright: '→',
+};
+
 const MAC_SYMBOLS: Record<string, string> = {
   alt: '⌥',
   option: '⌥',
@@ -9,6 +18,7 @@ const MAC_SYMBOLS: Record<string, string> = {
   shift: '⇧',
   command: '⌘',
   meta: '⌘',
+  ...ARROW_SYMBOLS,
 };
 
 // Command/Meta on non-Mac keyboards is the Windows/Super key, so label it
@@ -21,6 +31,7 @@ const WORD_LABELS: Record<string, string> = {
   shift: 'Shift',
   command: 'Win',
   meta: 'Win',
+  ...ARROW_SYMBOLS,
 };
 
 export type FormattedShortcut = {

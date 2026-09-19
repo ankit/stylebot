@@ -224,6 +224,9 @@ class MonacEditorIframe {
       );
 
       if (match) {
+        // setSelection alone doesn't scroll the matched line into view if
+        // it's off-screen — reveal it explicitly, centered.
+        this.editor.revealRangeInCenter(match.range);
         this.editor.setSelection({
           startColumn: match.range.endColumn,
           startLineNumber: match.range.endLineNumber,

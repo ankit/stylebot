@@ -23,8 +23,13 @@
 <script lang="ts">
 import Vue from 'vue';
 import { MenuItem, SCountBadge, SChip } from '@stylebot/components';
-import { validateSelector } from '@stylebot/css';
+import {
+  validateSelector,
+  getDeclarationsForSelector,
+  splitSelectorList,
+} from '@stylebot/css';
 import { Highlighter } from '@stylebot/highlighter';
+import { CssDeclaration } from '@stylebot/types';
 
 export default Vue.extend({
   name: 'TheCssSelectorDropdownItem',
@@ -54,10 +59,7 @@ export default Vue.extend({
 
   computed: {
     parts(): Array<string> {
-      return this.selector
-        .split(',')
-        .map(part => part.trim())
-        .filter(Boolean);
+      return splitSelectorList(this.selector);
     },
   },
 
@@ -66,6 +68,8 @@ export default Vue.extend({
       onSelect: () => {
         return;
       },
+      getStylebotDeclarations: this.getStylebotDeclarations,
+      getMountRoot: () => this.$root.$el as HTMLElement,
     });
   },
 
@@ -81,13 +85,6 @@ export default Vue.extend({
     },
 
     preview(): void {
-      // Skip whole-page selectors — highlighting them just floods the page.
-      const wholePage = ['*', 'body', 'html', ':root'];
-      if (this.parts.some(part => wholePage.includes(part))) {
-        this.highlighter?.unhighlight();
-        return;
-      }
-
       if (validateSelector(this.selector)) {
         this.highlighter?.highlight(this.selector);
       } else {
@@ -97,6 +94,10 @@ export default Vue.extend({
 
     clearPreview(): void {
       this.highlighter?.unhighlight();
+    },
+
+    getStylebotDeclarations(selector: string): Array<CssDeclaration> | null {
+      return getDeclarationsForSelector(this.$store.state.css, selector);
     },
   },
 });

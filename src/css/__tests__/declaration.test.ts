@@ -3,6 +3,7 @@ const dedent = require('dedent');
 
 import 'jest-fetch-mock';
 import { addDeclaration, appendImportantToDeclarations } from '../declaration';
+import { getRule } from '../rule';
 
 describe('declaration', () => {
   describe('addDeclaration', () => {
@@ -139,6 +140,77 @@ describe('declaration', () => {
 
       const output = addDeclaration(property, value, selector, css);
       expect(output).toBe('');
+    });
+
+    describe('when the selector belongs to a grouped rule', () => {
+      it('splits it into its own rule, keeping what it already had and adding the new declaration', () => {
+        const css = dedent`
+          .mock-selector-1, .mock-selector-2 {
+            color: red;
+          }
+        `;
+
+        const output = addDeclaration(
+          'background',
+          'blue',
+          '.mock-selector-1',
+          css
+        );
+
+        expect(getRule(output, '.mock-selector-1')?.toString()).toBe(dedent`
+          .mock-selector-1 {
+            color: red;
+            background: blue;
+          }
+        `);
+      });
+
+      it('leaves the other group members styled by the original rule', () => {
+        const css = dedent`
+          .mock-selector-1, .mock-selector-2 {
+            color: red;
+          }
+        `;
+
+        const output = addDeclaration(
+          'background',
+          'blue',
+          '.mock-selector-1',
+          css
+        );
+
+        expect(getRule(output, '.mock-selector-2')?.toString()).toBe(dedent`
+          .mock-selector-2 {
+            color: red;
+          }
+        `);
+      });
+
+      it('modifies the shared declaration only on the split-out rule', () => {
+        const css = dedent`
+          .mock-selector-1, .mock-selector-2 {
+            color: red;
+          }
+        `;
+
+        const output = addDeclaration(
+          'color',
+          'green',
+          '.mock-selector-1',
+          css
+        );
+
+        expect(getRule(output, '.mock-selector-1')?.toString()).toBe(dedent`
+          .mock-selector-1 {
+            color: green;
+          }
+        `);
+        expect(getRule(output, '.mock-selector-2')?.toString()).toBe(dedent`
+          .mock-selector-2 {
+            color: red;
+          }
+        `);
+      });
     });
   });
 

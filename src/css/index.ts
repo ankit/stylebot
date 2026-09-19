@@ -17,14 +17,28 @@ export {
 
 export {
   getSelector,
+  getTestIdBasedSelector,
+  getNameBasedSelector,
+  getNonHashedClassBasedSelector,
   getIdBasedSelector,
   getClassBasedSelector,
   getTagNameBasedSelector,
+  getAncestorBasedSelector,
+  splitSelectorList,
   validateSelector,
 } from './selector';
 
 export { addGoogleWebFont, cleanGoogleWebFonts } from './webfont';
 export { addDeclaration, appendImportantToDeclarations } from './declaration';
-export { getRule, addEmptyRule, removeEmptyRules, removeRule } from './rule';
+export {
+  getRule,
+  getRuleForSelector,
+  getDeclarationsForSelector,
+  getExistingSelector,
+  splitSelectorFromGroup,
+  addEmptyRule,
+  removeEmptyRules,
+  removeRule,
+} from './rule';
 
 export { getAlreadyUsedColors, RoleColorGroups } from './already-used-colors';
