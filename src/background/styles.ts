@@ -6,6 +6,7 @@ import { getStylesForPage } from '@stylebot/styles';
 import { StyleMap, StyleWithoutUrl, ApplyStylesToTab } from '@stylebot/types';
 
 import { getIsReadabilityActive, updateIcon } from './badge';
+import { scheduleSyncAfterEdit } from './sync-scheduler';
 
 export { getStylesForPage } from '@stylebot/styles';
 
@@ -71,16 +72,24 @@ export const get = async (url: string): Promise<StyleWithoutUrl> => {
 };
 
 /**
- * Writes the style map, plus its modified-time metadata, to storage, and
- * returns the revision it stamped.
+ * Writes the style map, plus its modified-time metadata, to storage, lines
+ * up a sync for the edit unless the write came from sync itself, and returns
+ * the revision it stamped.
  */
-const writeToStorage = async (styles: StyleMap): Promise<string> => {
+const writeToStorage = async (
+  styles: StyleMap,
+  { fromSync }: { fromSync: boolean }
+): Promise<string> => {
   const modifiedTime = getCurrentTimestamp();
 
   await chrome.storage.local.set({
     styles,
     'styles-metadata': { modifiedTime },
   });
+
+  if (!fromSync) {
+    await scheduleSyncAfterEdit();
+  }
 
   return modifiedTime;
 };
@@ -93,10 +102,16 @@ const writeToStorage = async (styles: StyleMap): Promise<string> => {
 let pendingWrite = Promise.resolve();
 
 /**
- * Replaces the entire style map.
+ * Replaces the entire style map. Sync passes fromSync so the write it makes
+ * while pulling is not itself queued up as an edit to push.
  */
-export const setAll = (styles: StyleMap): Promise<void> => {
-  pendingWrite = pendingWrite.then(() => writeToStorage(styles).then());
+export const setAll = (
+  styles: StyleMap,
+  { fromSync = false }: { fromSync?: boolean } = {}
+): Promise<void> => {
+  pendingWrite = pendingWrite.then(() =>
+    writeToStorage(styles, { fromSync }).then()
+  );
   return pendingWrite;
 };
 
@@ -109,7 +124,8 @@ export const setAll = (styles: StyleMap): Promise<void> => {
  */
 export const setAllIfUnchanged = (
   styles: StyleMap,
-  revision: string
+  revision: string,
+  { fromSync = false }: { fromSync?: boolean } = {}
 ): Promise<string | null> => {
   const attempt = pendingWrite.then(async () => {
     const items = await chrome.storage.local.get('styles-metadata');
@@ -118,7 +134,7 @@ export const setAllIfUnchanged = (
       return null;
     }
 
-    return writeToStorage(styles);
+    return writeToStorage(styles, { fromSync });
   });
 
   pendingWrite = attempt.then(() => undefined);
@@ -136,7 +152,7 @@ const update = (
     const styles = mutate(await getAll());
 
     if (styles) {
-      await writeToStorage(styles);
+      await writeToStorage(styles, { fromSync: false });
     }
   });
 

@@ -47,7 +47,8 @@
     "storage",
     "identity",
     "contextMenus",
-    "unlimitedStorage"
+    "unlimitedStorage",
+    "alarms"
   ],
   "host_permissions": [
     "https://drive.google.com/*",

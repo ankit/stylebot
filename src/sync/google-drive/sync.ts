@@ -17,6 +17,7 @@ import getAccessToken, { clearCachedToken } from './get-access-token';
 import {
   getSyncState,
   setSyncState,
+  setSyncNeedsAuth,
   getLocalStylesMetadata,
   getGoogleDriveSyncEnabled,
 } from './sync-metadata';
@@ -73,7 +74,9 @@ const writeLocal = async (
   styles: StyleMap,
   localRevision: string
 ): Promise<string | null> => {
-  const revision = await setAllStylesIfUnchanged(styles, localRevision);
+  const revision = await setAllStylesIfUnchanged(styles, localRevision, {
+    fromSync: true,
+  });
 
   if (revision !== null) {
     await applyStylesToAllTabs();
@@ -243,7 +246,10 @@ const run = async (
   options: SyncOptions
 ): Promise<RunGoogleDriveSyncResponse> => {
   try {
-    return { ok: true, metadata: (await reconcile(options)).metadata };
+    const { metadata } = await reconcile(options);
+    await setSyncNeedsAuth(false);
+
+    return { ok: true, metadata };
   } catch (e) {
     if (isSyncError(e) && e.code === 'auth') {
       // The cached token may simply have been revoked. Drop it and give the
@@ -251,8 +257,21 @@ const run = async (
       await clearCachedToken();
 
       try {
-        return { ok: true, metadata: (await reconcile(options)).metadata };
+        const { metadata } = await reconcile(options);
+        await setSyncNeedsAuth(false);
+
+        return { ok: true, metadata };
       } catch (retryError) {
+        if (
+          !options.interactive &&
+          isSyncError(retryError) &&
+          retryError.code === 'auth'
+        ) {
+          // A scheduled run has nobody to show an auth window to. Leave a
+          // flag for the UI and let the next manual sync do the sign-in.
+          await setSyncNeedsAuth(true);
+        }
+
         return toFailure(retryError);
       }
     }

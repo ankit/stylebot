@@ -490,6 +490,25 @@ describe('runGoogleDriveSync', () => {
     expect(mockedWrite).toBeCalledTimes(2);
   });
 
+  it('flags that a sign-in is needed only when a scheduled run hits an auth failure', async () => {
+    seed({ styles: RED });
+    mockedGetRemote.mockRejectedValue(
+      Object.assign(new Error('Token validation error'), { code: 'auth' })
+    );
+
+    await runGoogleDriveSync({ interactive: true });
+    expect(store['google-drive-sync-needs-auth']).toBeUndefined();
+
+    await runGoogleDriveSync({ interactive: false });
+    expect(store['google-drive-sync-needs-auth']).toBe(true);
+
+    mockedGetRemote.mockResolvedValue(null);
+    mockedWrite.mockResolvedValue(remoteMetadata('remote-1'));
+
+    await runGoogleDriveSync({ interactive: false });
+    expect(store['google-drive-sync-needs-auth']).toBe(false);
+  });
+
   it('reports a failure as a result rather than rejecting', async () => {
     mockedGetRemote.mockRejectedValue(new TypeError('Failed to fetch'));
 

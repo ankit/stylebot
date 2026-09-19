@@ -3,6 +3,7 @@ import { GoogleDriveSyncMetadata, SyncState } from '@stylebot/types';
 const SYNC_STATE_KEY = 'google-drive-sync-state';
 const LEGACY_METADATA_KEY = 'google-drive-sync';
 const ACCESS_TOKEN_KEY = 'google-drive-access-token';
+const NEEDS_AUTH_KEY = 'google-drive-sync-needs-auth';
 
 export const getSyncState = async (): Promise<SyncState | undefined> => {
   const items = await chrome.storage.local.get(SYNC_STATE_KEY);
@@ -19,7 +20,37 @@ export const clearSyncState = (): Promise<void> =>
     SYNC_STATE_KEY,
     LEGACY_METADATA_KEY,
     ACCESS_TOKEN_KEY,
+    NEEDS_AUTH_KEY,
   ]);
+
+/**
+ * Drops a url from the recorded conflicts once the user has looked at it.
+ */
+export const dismissSyncConflict = async (url: string): Promise<void> => {
+  const state = await getSyncState();
+
+  if (!state?.conflicts) {
+    return;
+  }
+
+  await setSyncState({
+    ...state,
+    conflicts: state.conflicts.filter(conflict => conflict.url !== url),
+  });
+};
+
+/**
+ * Set when a scheduled sync could not get a token without showing an auth
+ * window, so the popup and Sync tab can ask for a sign-in instead of
+ * silently doing nothing until the next manual sync.
+ */
+export const setSyncNeedsAuth = (needsAuth: boolean): Promise<void> =>
+  chrome.storage.local.set({ [NEEDS_AUTH_KEY]: needsAuth });
+
+export const getSyncNeedsAuth = async (): Promise<boolean> => {
+  const items = await chrome.storage.local.get(NEEDS_AUTH_KEY);
+  return Boolean(items[NEEDS_AUTH_KEY]);
+};
 
 export const getGoogleDriveSyncMetadata = async (): Promise<
   GoogleDriveSyncMetadata | undefined
