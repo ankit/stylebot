@@ -4,7 +4,7 @@
 
     <property-card
       :label="t('text_properties')"
-      :collapsed="!sections.text"
+      :collapsed="!open.text"
       :count="textCount"
       @toggle="toggle('text')"
     >
@@ -13,7 +13,7 @@
 
     <property-card
       :label="t('background')"
-      :collapsed="!sections.colors"
+      :collapsed="!open.colors"
       :count="colorCount"
       @toggle="toggle('colors')"
     >
@@ -22,7 +22,7 @@
 
     <property-card
       :label="t('box')"
-      :collapsed="!sections.layout"
+      :collapsed="!open.layout"
       :count="layoutCount"
       @toggle="toggle('layout')"
     >
@@ -31,7 +31,7 @@
 
     <property-card
       :label="t('effects_properties')"
-      :collapsed="!sections.effects"
+      :collapsed="!open.effects"
       :count="effectsCount"
       @toggle="toggle('effects')"
     >
@@ -40,7 +40,7 @@
 
     <property-card
       :label="t('more_properties')"
-      :collapsed="!sections.more"
+      :collapsed="!open.more"
       :count="moreCount"
       @toggle="toggle('more')"
     >
@@ -83,13 +83,25 @@ export default Vue.extend({
     TheMoreProperties,
   },
 
+  data(): { open: StylebotBasicModeSections } {
+    return {
+      open: {
+        text: false,
+        colors: false,
+        layout: false,
+        effects: false,
+        more: false,
+      },
+    };
+  },
+
   computed: {
     activeSelector(): string {
       return this.$store.state.activeSelector;
     },
 
-    sections(): StylebotBasicModeSections {
-      return this.$store.state.options.basicModeSections;
+    userOpened(): StylebotBasicModeSections {
+      return this.$store.state.options.basicModeOpenedSections;
     },
 
     activeRule(): Rule | null {
@@ -118,9 +130,9 @@ export default Vue.extend({
   },
 
   watch: {
-    // Reflect what's actually styled on the newly picked element: open only
-    // the panels with matching declarations, and fall back to Text alone
-    // when nothing on the element is styled yet.
+    // Reflect what's actually styled on the newly picked element: open the
+    // panels with matching declarations (Text alone when nothing is styled
+    // yet), plus whichever panels the user opened by hand.
     activeSelector: {
       immediate: true,
       handler(): void {
@@ -152,26 +164,23 @@ export default Vue.extend({
       const layout = this.layoutCount > 0;
       const effects = this.effectsCount > 0;
       const more = this.moreCount > 0;
+      const styled = text || colors || layout || effects || more;
 
-      this.$store.dispatch(
-        'setBasicModeSections',
-        text || colors || layout || effects || more
-          ? { ...this.sections, text, colors, layout, effects, more }
-          : {
-              ...this.sections,
-              text: true,
-              colors: false,
-              layout: false,
-              effects: false,
-              more: false,
-            }
-      );
+      this.open = {
+        text: (styled ? text : true) || this.userOpened.text,
+        colors: colors || this.userOpened.colors,
+        layout: layout || this.userOpened.layout,
+        effects: effects || this.userOpened.effects,
+        more: more || this.userOpened.more,
+      };
     },
 
     toggle(name: keyof StylebotBasicModeSections): void {
-      this.$store.dispatch('setBasicModeSections', {
-        ...this.sections,
-        [name]: !this.sections[name],
+      const next = !this.open[name];
+      this.open = { ...this.open, [name]: next };
+      this.$store.dispatch('setBasicModeOpenedSections', {
+        ...this.userOpened,
+        [name]: next,
       });
     },
   },
