@@ -26,18 +26,6 @@ const DIST_PATH = path.resolve(
   IS_FIREFOX ? 'firefox-dist' : 'dist'
 );
 
-/**
- * Neither of Playwright's Firefox drivers can attach to moz-extension:// documents
- * (Juggler skips them; BiDi excludes extension contexts, bug 1755014), so tests that
- * click through the popup can't run there. Call at file scope in such specs.
- */
-export function skipWithoutPopup(): void {
-  test.skip(
-    IS_FIREFOX,
-    'Playwright cannot drive extension pages (the popup) in Firefox'
-  );
-}
-
 // --ui mode force-manages tracing (a live `use.trace` flag) on every context,
 // including ours — fighting it for control throws, so skip ours when detected.
 function isLiveTraceMode(use: { trace?: unknown }): boolean {
@@ -357,11 +345,13 @@ export const test = base.extend<
   // Opens the popup by URL (Playwright can't click a real toolbar icon), in the
   // background so it doesn't steal "current tab" from the page under test.
   openPopup: async ({ context, extensionId }, use) => {
-    if (IS_FIREFOX) {
-      throw new Error(
-        'openPopup is unavailable on Firefox — see skipWithoutPopup() in fixtures.ts.'
-      );
-    }
+    // Neither of Playwright's Firefox drivers can attach to moz-extension:// documents
+    // (Juggler skips them; BiDi excludes extension contexts, bug 1755014), so any test
+    // that needs the popup is skipped there simply by depending on this fixture.
+    test.skip(
+      IS_FIREFOX,
+      'Playwright cannot drive extension pages (the popup) in Firefox'
+    );
 
     const cdp = await context.browser()!.newBrowserCDPSession();
 

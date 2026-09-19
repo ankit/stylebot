@@ -1,7 +1,5 @@
-import { test, expect, skipWithoutPopup } from './fixtures';
+import { test, expect } from './fixtures';
 import { openEditor, switchEditorMode, getMonacoFrame } from './helpers';
-
-skipWithoutPopup();
 
 // Loading Monaco in an iframe is CPU-heavy and can starve the popup's own
 // tab under a full parallel worker fleet (see e2e/readability.spec.ts).

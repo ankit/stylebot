@@ -1,7 +1,5 @@
-import { test, expect, skipWithoutPopup } from './fixtures';
+import { test, expect } from './fixtures';
 import { seedStyles } from './helpers';
-
-skipWithoutPopup();
 
 const PAGE_HTML = `
   <!doctype html>
