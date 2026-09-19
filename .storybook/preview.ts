@@ -50,6 +50,25 @@ const preview: Preview = {
   parameters: {
     layout: 'fullscreen',
     controls: { expanded: false },
+    options: {
+      storySort: {
+        order: [
+          'Primitives',
+          [
+            'Theme',
+            'Typography',
+            'Buttons',
+            'Inputs',
+            'Navigation',
+            'Overlays',
+            'Display',
+          ],
+          'Editor',
+          'Options',
+          'Browser Action',
+        ],
+      },
+    },
   },
 
   decorators: [

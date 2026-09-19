@@ -7,7 +7,7 @@ import SText from './SText.vue';
 import { fromTemplate } from '@sb/story-helpers';
 
 const meta: Meta = {
-  title: 'Primitives/SDialog',
+  title: 'Primitives/Overlays/SDialog',
   component: SDialog,
   parameters: { padded: false },
 };

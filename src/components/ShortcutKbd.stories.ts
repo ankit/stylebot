@@ -1,24 +1,35 @@
 import type { Meta } from '@storybook/vue';
 
 import ShortcutKbd from './ShortcutKbd.vue';
-import { fromTemplate } from '@sb/story-helpers';
+import { matrix, playground } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
-  title: 'Primitives/ShortcutKbd',
+  title: 'Primitives/Display/ShortcutKbd',
   component: ShortcutKbd,
+  argTypes: {
+    value: { control: 'text' },
+    small: { control: 'boolean' },
+  },
+  args: { value: 'alt+shift+r', small: false },
 };
 
 export default meta;
 
-export const Combos = fromTemplate(
+export const Playground = playground(
   { ShortcutKbd },
-  `
-  <div class="sb-stack">
-    <shortcut-kbd value="alt+shift+r" />
-    <shortcut-kbd value="ctrl+k" />
-    <shortcut-kbd value="Escape" />
-    <shortcut-kbd value="?" />
-    <shortcut-kbd small value="alt+shift+r" />
-  </div>
-`
+  `<shortcut-kbd :value="value" :small="small" />`
 );
+
+export const Variants = matrix({
+  components: { ShortcutKbd },
+  rows: [
+    { label: 'alt+shift+r', attrs: 'value="alt+shift+r"' },
+    { label: 'ctrl+k', attrs: 'value="ctrl+k"' },
+    { label: 'Escape', attrs: 'value="Escape"' },
+    { label: '?', attrs: 'value="?"' },
+  ],
+  columns: [
+    { label: 'Default', cell: attrs => `<shortcut-kbd ${attrs} />` },
+    { label: 'Small', cell: attrs => `<shortcut-kbd ${attrs} small />` },
+  ],
+});

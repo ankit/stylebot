@@ -6,7 +6,7 @@ import SText from './SText.vue';
 import { fromTemplate } from '@sb/story-helpers';
 
 const meta: Meta = {
-  title: 'Primitives/SCard',
+  title: 'Primitives/Display/SCard',
   component: SCard,
 };
 

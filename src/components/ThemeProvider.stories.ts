@@ -5,7 +5,7 @@ import Heading from './Heading.vue';
 import { fromTemplate } from '@sb/story-helpers';
 
 const meta: Meta = {
-  title: 'Primitives/ThemeProvider',
+  title: 'Primitives/Theme/ThemeProvider',
   component: ThemeProvider,
 };
 

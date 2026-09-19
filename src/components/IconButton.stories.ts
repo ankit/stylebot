@@ -1,35 +1,58 @@
 import type { Meta } from '@storybook/vue';
 
 import IconButton from './IconButton.vue';
-import { MoreIcon, SunIcon, IconX } from '@stylebot/icons';
-import { fromTemplate } from '@sb/story-helpers';
+import { MoreIcon, SunIcon, InspectorIcon, IconX } from '@stylebot/icons';
+import { matrix, playground } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
-  title: 'Primitives/IconButton',
+  title: 'Primitives/Buttons/IconButton',
   component: IconButton,
+  argTypes: {
+    bordered: { control: 'boolean' },
+    size: { control: { type: 'number', min: 20, max: 48 } },
+    icon: {
+      control: 'select',
+      options: ['more-icon', 'sun-icon', 'inspector-icon', 'icon-x'],
+    },
+  },
+  args: { bordered: false, size: 0, icon: 'more-icon' },
 };
 
 export default meta;
 
-const components = { IconButton, MoreIcon, SunIcon, IconX };
+const components = { IconButton, MoreIcon, SunIcon, InspectorIcon, IconX };
 
-export const Default = fromTemplate(
+export const Playground = playground(
   components,
   `
-  <div class="sb-row">
-    <icon-button title="More"><more-icon :size="16" /></icon-button>
-    <icon-button title="Appearance"><sun-icon :size="16" /></icon-button>
-    <icon-button title="Close"><icon-x :size="22" /></icon-button>
-  </div>
+  <icon-button :bordered="bordered" :size="size || undefined" title="Action">
+    <component :is="icon" :size="16" />
+  </icon-button>
 `
 );
 
-export const Bordered = fromTemplate(
+export const Variants = matrix({
   components,
-  `
-  <div class="sb-row">
-    <icon-button bordered title="More"><more-icon :size="16" /></icon-button>
-    <icon-button bordered :size="26" title="More"><more-icon :size="14" /></icon-button>
-  </div>
-`
-);
+  rows: [
+    { label: 'default', attrs: '' },
+    { label: 'bordered', attrs: 'bordered' },
+    { label: 'bordered 26', attrs: 'bordered :size="26"' },
+  ],
+  columns: [
+    {
+      label: 'More',
+      cell: attrs =>
+        `<icon-button ${attrs} title="More"><more-icon :size="16" /></icon-button>`,
+    },
+    {
+      label: 'Appearance',
+      cell: attrs =>
+        `<icon-button ${attrs} title="Appearance"><sun-icon :size="16" /></icon-button>`,
+    },
+    {
+      label: 'Close',
+      cell: attrs =>
+        `<icon-button ${attrs} title="Close"><icon-x :size="22" /></icon-button>`,
+    },
+  ],
+});

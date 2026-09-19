@@ -7,7 +7,7 @@ import SButton from './SButton.vue';
 import { fromTemplate, nextFrame } from '@sb/story-helpers';
 
 const meta: Meta = {
-  title: 'Primitives/AnchoredMenu',
+  title: 'Primitives/Overlays/AnchoredMenu',
   component: AnchoredMenu,
 };
 

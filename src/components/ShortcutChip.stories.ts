@@ -1,23 +1,40 @@
 import type { Meta } from '@storybook/vue';
 
 import ShortcutChip from './ShortcutChip.vue';
-import { fromTemplate } from '@sb/story-helpers';
+import { matrix, playground } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
-  title: 'Primitives/ShortcutChip',
+  title: 'Primitives/Display/ShortcutChip',
   component: ShortcutChip,
+  argTypes: {
+    value: { control: 'text' },
+    small: { control: 'boolean' },
+    muted: { control: 'boolean' },
+  },
+  args: { value: 'alt+shift+m', small: false, muted: false },
 };
 
 export default meta;
 
-export const Variants = fromTemplate(
+export const Playground = playground(
   { ShortcutChip },
-  `
-  <div class="sb-row">
-    <shortcut-chip value="alt+shift+m" />
-    <shortcut-chip small value="i" />
-    <shortcut-chip muted value="Escape" />
-    <shortcut-chip small muted value="b" />
-  </div>
-`
+  `<shortcut-chip :value="value" :small="small" :muted="muted" />`
 );
+
+export const Variants = matrix({
+  components: { ShortcutChip },
+  rows: [
+    { label: 'default', attrs: '' },
+    { label: 'small', attrs: 'small' },
+  ],
+  columns: [
+    {
+      label: 'Default',
+      cell: attrs => `<shortcut-chip ${attrs} value="alt+shift+m" />`,
+    },
+    {
+      label: 'Muted',
+      cell: attrs => `<shortcut-chip ${attrs} muted value="Escape" />`,
+    },
+  ],
+});

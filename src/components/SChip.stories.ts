@@ -1,16 +1,20 @@
 import type { Meta } from '@storybook/vue';
 
 import SChip from './SChip.vue';
-import { fromTemplate } from '@sb/story-helpers';
+import { fromTemplate, playground } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
-  title: 'Primitives/SChip',
+  title: 'Primitives/Display/SChip',
   component: SChip,
+  argTypes: { text: { control: 'text' } },
+  args: { text: '.article-body' },
 };
 
 export default meta;
 
-export const Default = fromTemplate(
+export const Playground = playground({ SChip }, `<s-chip>{{ text }}</s-chip>`);
+
+export const Variants = fromTemplate(
   { SChip },
   `
   <div class="sb-row">

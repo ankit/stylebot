@@ -1,52 +1,106 @@
-import type { Meta, StoryObj } from '@storybook/vue';
+import type { Meta } from '@storybook/vue';
 
 import SAutocomplete from './SAutocomplete.vue';
 import MenuItem from './MenuItem.vue';
-import { fromTemplate, nextFrame } from '@sb/story-helpers';
+import {
+  fromTemplate,
+  matrix,
+  nextFrame,
+  playground,
+} from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
-  title: 'Primitives/SAutocomplete',
+  title: 'Primitives/Inputs/SAutocomplete',
   component: SAutocomplete,
+  argTypes: {
+    value: { control: 'text' },
+    placeholder: { control: 'text' },
+    mono: { control: 'boolean' },
+    chips: { control: 'boolean' },
+    disabled: { control: 'boolean' },
+  },
+  args: {
+    value: '#main > p',
+    placeholder: 'Select an element',
+    mono: true,
+    chips: false,
+    disabled: false,
+  },
 };
 
 export default meta;
 
 const components = { SAutocomplete, MenuItem };
 
-const items = [
-  { id: 1, value: 'h1' },
-  { id: 2, value: '.article-body' },
-  { id: 3, value: '#main > p' },
-];
+const data = () => ({
+  items: [
+    { id: 1, value: 'h1' },
+    { id: 2, value: '.article-body' },
+    { id: 3, value: '#main > p' },
+  ],
+});
 
-const field = (attrs: string): string => `
-  <s-autocomplete ${attrs} :items="items" style="width: 260px">
-    <template #item="{ item, select }">
-      <menu-item @click="select">{{ item.value }}</menu-item>
-    </template>
-  </s-autocomplete>
-`;
+const item = `
+  <template #item="{ item, select }">
+    <menu-item @click="select">{{ item.value }}</menu-item>
+  </template>`;
 
-export const Variants = fromTemplate(
+export const Playground = playground(
   components,
   `
-  <div class="sb-stack">
-    ${field('value="" placeholder="Search colors"')}
-    ${field('value="h1" mono')}
-    ${field('value="#main > p" mono chips')}
-    ${field('value="h1" disabled')}
-  </div>
+  <s-autocomplete
+    :value="value"
+    :placeholder="placeholder"
+    :mono="mono"
+    :chips="chips"
+    :disabled="disabled"
+    :items="items"
+    style="width: 260px"
+  >
+    ${item}
+  </s-autocomplete>
 `,
-  { data: () => ({ items }) }
+  data
 );
 
-export const Open: StoryObj = fromTemplate(
+export const Variants = matrix({
   components,
-  `<div style="padding-bottom: 160px">${field(
-    'value="" mono placeholder="Select an element"'
-  )}</div>`,
+  data,
+  rows: [
+    { label: 'default', attrs: '' },
+    { label: 'mono', attrs: 'mono' },
+    { label: 'chips', attrs: 'mono chips' },
+  ],
+  columns: [
+    {
+      label: 'Empty',
+      cell: attrs =>
+        `<s-autocomplete ${attrs} value="" placeholder="Search" :items="items" style="width: 240px">${item}</s-autocomplete>`,
+    },
+    {
+      label: 'Value',
+      cell: attrs =>
+        `<s-autocomplete ${attrs} value="#main > p" :items="items" style="width: 240px">${item}</s-autocomplete>`,
+    },
+    {
+      label: 'Disabled',
+      cell: attrs =>
+        `<s-autocomplete ${attrs} value="h1" disabled :items="items" style="width: 240px">${item}</s-autocomplete>`,
+    },
+  ],
+});
+
+export const Open = fromTemplate(
+  components,
+  `
+  <div style="padding-bottom: 160px">
+    <s-autocomplete value="" mono placeholder="Select an element" :items="items" style="width: 260px">
+      ${item}
+    </s-autocomplete>
+  </div>
+`,
   {
-    data: () => ({ items }),
+    data,
     play: async ({ canvasElement }) => {
       canvasElement
         .querySelector<HTMLElement>('.autocomplete-chevron')

@@ -1,39 +1,62 @@
-import type { Meta, StoryObj } from '@storybook/vue';
+import type { Meta } from '@storybook/vue';
 
 import SButton from './SButton.vue';
 import { ChevronDownIcon } from '@stylebot/icons';
-import { fromTemplate } from '@sb/story-helpers';
+import { matrix, playground } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
-  title: 'Primitives/SButton',
+  title: 'Primitives/Buttons/SButton',
   component: SButton,
+  argTypes: {
+    variant: { control: 'radio', options: ['default', 'ghost', 'danger'] },
+    disabled: { control: 'boolean' },
+    label: { control: 'text' },
+    trailingIcon: { control: 'boolean' },
+  },
+  args: {
+    variant: 'default',
+    disabled: false,
+    label: 'Save',
+    trailingIcon: false,
+  },
 };
 
 export default meta;
 
 const components = { SButton, ChevronDownIcon };
 
-const row = (buttons: string): StoryObj =>
-  fromTemplate(components, `<div class="sb-row">${buttons}</div>`);
-
-export const Default = row(`
-  <s-button>Save</s-button>
-  <s-button disabled>Save</s-button>
-`);
-
-export const Ghost = row(`
-  <s-button variant="ghost">Cancel</s-button>
-  <s-button variant="ghost" disabled>Cancel</s-button>
-`);
-
-export const Danger = row(`
-  <s-button variant="danger">Delete</s-button>
-  <s-button variant="danger" disabled>Delete</s-button>
-`);
-
-export const WithTrailing = row(`
-  <s-button>
-    Options
-    <template #trailing><chevron-down-icon :size="14" /></template>
+export const Playground = playground(
+  components,
+  `
+  <s-button :variant="variant" :disabled="disabled">
+    {{ label }}
+    <template v-if="trailingIcon" #trailing>
+      <chevron-down-icon :size="14" />
+    </template>
   </s-button>
-`);
+`
+);
+
+export const Variants = matrix({
+  components,
+  rows: [
+    { label: 'default', attrs: '' },
+    { label: 'ghost', attrs: 'variant="ghost"' },
+    { label: 'danger', attrs: 'variant="danger"' },
+  ],
+  columns: [
+    { label: 'Default', cell: attrs => `<s-button ${attrs}>Save</s-button>` },
+    {
+      label: 'Disabled',
+      cell: attrs => `<s-button ${attrs} disabled>Save</s-button>`,
+    },
+    {
+      label: 'With trailing',
+      cell: attrs => `
+        <s-button ${attrs}>
+          Options
+          <template #trailing><chevron-down-icon :size="14" /></template>
+        </s-button>`,
+    },
+  ],
+});

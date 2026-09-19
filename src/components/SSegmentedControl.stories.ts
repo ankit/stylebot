@@ -6,66 +6,74 @@ import {
   AlignCenterIcon,
   AlignRightIcon,
 } from '@stylebot/icons';
-import { fromTemplate } from '@sb/story-helpers';
+import { matrix, playground } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
-  title: 'Primitives/SSegmentedControl',
+  title: 'Primitives/Navigation/SSegmentedControl',
   component: SSegmentedControl,
+  argTypes: {
+    value: { control: 'radio', options: ['none', 'underline', 'line-through'] },
+    fit: { control: 'boolean' },
+    disabled: { control: 'boolean' },
+  },
+  args: { value: 'underline', fit: false, disabled: false },
 };
 
 export default meta;
 
-const textOptions = [
-  { value: 'none', label: 'None' },
-  { value: 'underline', label: 'Underline' },
-  { value: 'line-through', label: 'Strike' },
-];
+const components = {
+  SSegmentedControl,
+  AlignLeftIcon,
+  AlignCenterIcon,
+  AlignRightIcon,
+};
 
-export const Default = fromTemplate(
-  { SSegmentedControl },
+const data = () => ({
+  textOptions: [
+    { value: 'none', label: 'None' },
+    { value: 'underline', label: 'Underline' },
+    { value: 'line-through', label: 'Strike' },
+  ],
+  iconOptions: [
+    { value: 'left', title: 'Left', icon: 'align-left-icon' },
+    { value: 'center', title: 'Center', icon: 'align-center-icon' },
+    { value: 'right', title: 'Right', icon: 'align-right-icon' },
+  ],
+});
+
+export const Playground = playground(
+  components,
   `
   <div style="width: 280px">
-    <s-segmented-control :options="options" :value="value" @change="value = $event" />
+    <s-segmented-control :options="textOptions" :value="value" :fit="fit" :disabled="disabled" />
   </div>
 `,
-  { data: () => ({ value: 'underline', options: textOptions }) }
+  data
 );
 
-export const Fit = fromTemplate(
-  { SSegmentedControl },
-  `<s-segmented-control fit :options="options" :value="value" @change="value = $event" />`,
-  { data: () => ({ value: 'none', options: textOptions }) }
-);
+const iconSlot = `
+  <template #option="{ option }">
+    <component :is="option.icon" :size="14" />
+  </template>`;
 
-export const Disabled = fromTemplate(
-  { SSegmentedControl },
-  `
-  <div style="width: 280px">
-    <s-segmented-control disabled :options="options" :value="value" />
-  </div>
-`,
-  { data: () => ({ value: 'none', options: textOptions }) }
-);
-
-export const IconOptions = fromTemplate(
-  { SSegmentedControl, AlignLeftIcon, AlignCenterIcon, AlignRightIcon },
-  `
-  <div style="width: 200px">
-    <s-segmented-control :options="options" :value="value" @change="value = $event">
-      <template #option="{ option }">
-        <component :is="option.icon" :size="14" />
-      </template>
-    </s-segmented-control>
-  </div>
-`,
-  {
-    data: () => ({
-      value: 'center',
-      options: [
-        { value: 'left', title: 'Left', icon: 'align-left-icon' },
-        { value: 'center', title: 'Center', icon: 'align-center-icon' },
-        { value: 'right', title: 'Right', icon: 'align-right-icon' },
-      ],
-    }),
-  }
-);
+export const Variants = matrix({
+  components,
+  data,
+  rows: [
+    { label: 'text', attrs: ':options="textOptions" value="underline"' },
+    { label: 'fit', attrs: ':options="textOptions" value="none" fit' },
+    { label: 'icons', attrs: ':options="iconOptions" value="center"' },
+  ],
+  columns: [
+    {
+      label: 'Default',
+      cell: attrs =>
+        `<div style="width: 240px"><s-segmented-control ${attrs}>${iconSlot}</s-segmented-control></div>`,
+    },
+    {
+      label: 'Disabled',
+      cell: attrs =>
+        `<div style="width: 240px"><s-segmented-control ${attrs} disabled>${iconSlot}</s-segmented-control></div>`,
+    },
+  ],
+});

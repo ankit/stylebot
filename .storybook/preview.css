@@ -101,3 +101,25 @@ button {
   font-size: 16px;
   line-height: 1.6;
 }
+
+.sb-matrix {
+  display: grid;
+  grid-template-columns: max-content repeat(var(--sb-columns), max-content);
+  gap: 14px 28px;
+  align-items: center;
+}
+
+.sb-matrix-head,
+.sb-matrix-label {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.sb-matrix-label {
+  font-family: var(--font-mono);
+  text-transform: none;
+  letter-spacing: 0;
+}

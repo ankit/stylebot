@@ -2,45 +2,71 @@ import type { Meta } from '@storybook/vue';
 
 import ToggleSwitch from './ToggleSwitch.vue';
 import ShortcutKbd from './ShortcutKbd.vue';
-import { fromTemplate } from '@sb/story-helpers';
+import { matrix, playground } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
-  title: 'Primitives/ToggleSwitch',
+  title: 'Primitives/Inputs/ToggleSwitch',
   component: ToggleSwitch,
+  argTypes: {
+    value: { control: 'boolean' },
+    disabled: { control: 'boolean' },
+    size: { control: 'radio', options: ['sm', 'lg'] },
+    label: { control: 'text' },
+    shortcut: { control: 'text' },
+  },
+  args: {
+    value: true,
+    disabled: false,
+    size: 'sm',
+    label: 'Readability',
+    shortcut: '',
+  },
 };
 
 export default meta;
 
 const components = { ToggleSwitch, ShortcutKbd };
 
-export const Small = fromTemplate(
+export const Playground = playground(
   components,
   `
-  <div class="sb-stack">
-    <toggle-switch :value="false">Off</toggle-switch>
-    <toggle-switch :value="true">On</toggle-switch>
-    <toggle-switch :value="false" disabled>Disabled off</toggle-switch>
-    <toggle-switch :value="true" disabled>Disabled on</toggle-switch>
-  </div>
-`
-);
-
-export const Large = fromTemplate(
-  components,
-  `
-  <div class="sb-stack">
-    <toggle-switch size="lg" :value="false">Off</toggle-switch>
-    <toggle-switch size="lg" :value="true">On</toggle-switch>
-  </div>
-`
-);
-
-export const WithTrailing = fromTemplate(
-  components,
-  `
-  <toggle-switch :value="true">
-    Reader mode
-    <template #trailing><shortcut-kbd small value="alt+shift+r" /></template>
+  <toggle-switch :value="value" :disabled="disabled" :size="size">
+    {{ label }}
+    <template v-if="shortcut" #trailing>
+      <shortcut-kbd small :value="shortcut" />
+    </template>
   </toggle-switch>
 `
 );
+
+export const Variants = matrix({
+  components,
+  rows: [
+    { label: 'sm', attrs: 'size="sm"' },
+    { label: 'lg', attrs: 'size="lg"' },
+  ],
+  columns: [
+    {
+      label: 'Off',
+      cell: attrs =>
+        `<toggle-switch ${attrs} :value="false">Off</toggle-switch>`,
+    },
+    {
+      label: 'On',
+      cell: attrs => `<toggle-switch ${attrs} :value="true">On</toggle-switch>`,
+    },
+    {
+      label: 'Disabled',
+      cell: attrs =>
+        `<toggle-switch ${attrs} :value="true" disabled>Disabled</toggle-switch>`,
+    },
+    {
+      label: 'With trailing',
+      cell: attrs => `
+        <toggle-switch ${attrs} :value="true">
+          Reader mode
+          <template #trailing><shortcut-kbd small value="alt+shift+r" /></template>
+        </toggle-switch>`,
+    },
+  ],
+});
