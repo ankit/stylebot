@@ -83,6 +83,30 @@ describe('TheGoogleDriveSync.vue', () => {
       'https://drive.google.com/view',
       'https://drive.google.com/download',
     ]);
+    expect(wrapper.find('a').text()).toBe('stylebot/stylebot_v3_backup.json');
+  });
+
+  it('names the account the backup is saved to, when known', () => {
+    const wrapper = mountCard({
+      googleDriveSyncEnabled: true,
+      googleDriveSyncState: {
+        ...syncState(new Date().toISOString()),
+        account: { email: 'me@example.com' },
+      },
+      syncInProgress: false,
+    });
+
+    expect(wrapper.text()).toContain('me@example.com ›');
+  });
+
+  it('says where the backup will live before sync is turned on', () => {
+    const wrapper = mountCard({
+      googleDriveSyncEnabled: false,
+      googleDriveSyncState: undefined,
+      syncInProgress: false,
+    });
+
+    expect(wrapper.text()).toContain('sync_drive_location');
   });
 
   it('disables Sync Now while a sync is already running', () => {
