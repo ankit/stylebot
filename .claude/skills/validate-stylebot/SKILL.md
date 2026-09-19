@@ -46,6 +46,19 @@ when the **user** wants to look at the extension with their own eyes: visual/UI 
    hot-reload automatically. Let them drive from there — don't attempt to interact with
    this window via browser automation tools, since the point is the human looking at it.
 
+## Google sign-in flows (Drive sync)
+
+Google refuses to sign in inside any browser with a debugging port open, and
+`yarn dev:chrome` is driven over CDP, so the Sync tab's "Enable Google Drive
+Sync" always fails there with "This browser or app may not be secure". For that
+flow use `yarn chrome:plain` (also `run_in_background: true`): it launches a
+flag-free Chrome on the same dev profile. The first run needs a one-time manual
+Load unpacked from the `chrome://extensions` tab it opens (path is on the
+clipboard); tell the user that step is theirs, since the native folder picker
+cannot be scripted. No hot reload in that mode — tell the user to press ↻ on the
+extension card after a rebuild. The dev build only gets the store's extension id
+(which the OAuth client requires) when `.extension-key` exists; see README.
+
 ## Stopping
 
 The background task ends when the user closes the Chrome window. If they're done

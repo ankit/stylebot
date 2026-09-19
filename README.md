@@ -62,6 +62,8 @@ An unpacked build gets an extension id derived from its path, so Google's OAuth 
 
 **Pin the dev build to the store id (maintainers).** Put the store build's public key — Chrome Web Store developer dashboard → the item → Package → "Public key" — in a git-ignored `.extension-key` file at the repo root, or in `STYLEBOT_EXTENSION_KEY`. Development builds (`yarn watch`, `yarn dev:chrome`) then emit it as the manifest `key`, so the unpacked extension has the store id and the existing OAuth client accepts it. Production builds never include it. Chrome refuses to load two extensions with one id, so disable the store install in any profile that loads the dev build (`yarn dev:chrome` uses its own profile, so it is unaffected).
 
+Google also refuses to sign in inside any browser with a debugging port open ("This browser or app may not be secure"), which rules out the Playwright-driven `yarn dev:chrome` window. Use `yarn chrome:plain` instead: it launches Chrome on the dev profile with no flags at all. The first run opens `chrome://extensions` for a one-time Developer mode → Load unpacked → `dist/` (the path is on the clipboard); Chrome keeps hand-loaded extensions in the profile, so later runs go straight to the test page. There is no hot reload in that mode — press ↻ on the extension card after a rebuild. For a second "device", launch another Chrome with a different `--user-data-dir` and load the same `dist/`.
+
 **Register your own OAuth client (forks).** Create a Google Cloud project and OAuth consent screen for your extension:
 
 You can do so as follows:

@@ -23,6 +23,7 @@ session is already inside a worktree.
 - `yarn watch` — build for Chrome/Edge in watch mode
 - `yarn watch:firefox` — build for Firefox in watch mode
 - `yarn dev:chrome` — watch + launch a Chrome instance with the extension loaded
+- `yarn chrome:plain` — build + launch a flag-free Chrome (no debugging port) on the dev profile, for flows Google sign-in blocks in debugged browsers, e.g. Google Drive sync; one-time manual Load unpacked, no hot reload
 - `yarn lint` / `yarn lint:fix` — ESLint
 - `yarn typecheck` — `tsc --noEmit` for the extension, then again with `.storybook/tsconfig.json` for Storybook config and stories
 - `yarn test` — Jest unit tests
