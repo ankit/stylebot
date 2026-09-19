@@ -6,7 +6,7 @@ Browser extension (Chrome/Edge/Firefox) that lets users change the appearance of
 
 - `src/` — extension source (background, content scripts, popup, options UI, editor)
 - `src/_locales/` — i18n strings per locale
-- `e2e/` — Playwright end-to-end tests, driven against a real built extension via CDP (`Extensions.loadUnpacked`)
+- `e2e/` — Playwright end-to-end tests, driven against a real built extension: via CDP (`Extensions.loadUnpacked`) on Chrome/Edge, via Firefox's remote debugging protocol (`e2e/firefox-rdp.ts`) on Firefox
 - `__mocks__/` — Jest mocks
 - `dist/` — Chrome/Edge build output; `firefox-dist/` — Firefox build output
 - `docs/` — stylebot.dev static site
@@ -26,11 +26,11 @@ session is already inside a worktree.
 - `yarn lint` / `yarn lint:fix` — ESLint
 - `yarn typecheck` — `tsc --noEmit`
 - `yarn test` — Jest unit tests
-- `yarn test:e2e` — builds the extension then runs the Playwright e2e suite (headless by default; loads the unpacked extension into Chrome via CDP)
+- `yarn e2e` — builds the extension then runs the Playwright e2e suite headless on Chrome, as CI does. `--edge` / `--firefox` switch browser, `--headed` / `--ui` / `--debug` switch mode, `--no-build` skips the rebuild; see `e2e/README.md`.
 
 ## Validation
 
-Always validate UI/extension changes with headless Playwright, not manual/headed browser interaction — the e2e harness in `e2e/fixtures.ts` already loads the real unpacked extension via CDP. Run `yarn test:e2e` (or a targeted Playwright test) to confirm a change works end-to-end before calling it done.
+Always validate UI/extension changes with headless Playwright, not manual/headed browser interaction — the e2e harness in `e2e/fixtures.ts` already loads the real unpacked extension via CDP. Run `yarn e2e` (or a targeted test, e.g. `yarn e2e --no-build editor-open`) to confirm a change works end-to-end before calling it done.
 
 ## Commit messages
 

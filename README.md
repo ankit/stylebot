@@ -51,6 +51,11 @@ If you would like to <strong>add a new feature</strong> to Stylebot or <strong>f
 - Enable the Developer mode.
 - Load unpacked `dist/` as extension
 
+### Tests
+
+- Run `yarn test` for unit tests
+- Run `yarn e2e` for the Playwright end-to-end suite (headless Chrome, as in CI); `yarn e2e --firefox --ui` and friends for other browsers and modes — see [`e2e/README.md`](e2e/README.md)
+
 ### Google Drive Sync
 
 When running the extension from a local build, you will not be able to use the Google Drive Sync feature as the OAuth authenticator will not recognize your extension id.
@@ -70,12 +75,12 @@ That's it! Now you are ready to use the Google Drive Sync feature with your loca
 
 ### Release
 
-Releases go through a pull request from a `release/vX.Y.Z` branch — the `release/` prefix is what triggers the Edge e2e suite, which doesn't run on ordinary PRs.
+Releases go through a pull request from a `release/vX.Y.Z` branch — the `release/` prefix is what triggers the Edge and Firefox e2e suites, which don't run on ordinary PRs.
 
 - Branch off `main` as `release/vX.Y.Z`
 - Add entry to `CHANGELOG`
 - Update version in `package.json` and `src/extension/manifest.json`
-- Open the PR and wait for `build`, `validation`, `e2e` and `e2e (edge)` to pass
+- Open the PR and wait for `build`, `validation`, `e2e`, `e2e (edge)` and `e2e (firefox)` to pass
 - Squash-merge — the GitHub Release and its `vX.Y.Z` tag are then created automatically from the changelog entry
 - Chrome and Edge: Run `yarn build` and manually create zip for distribution from `dist/`
 - Firefox: Run `yarn build:firefox` and manually create zip for distribution from `firefox-dist/`

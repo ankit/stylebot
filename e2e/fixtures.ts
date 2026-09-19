@@ -1,6 +1,7 @@
 import {
   test as base,
   chromium,
+  firefox,
   type BrowserContext,
   type Page,
   type TestInfo,
@@ -8,14 +9,22 @@ import {
 } from '@playwright/test';
 import fs from 'node:fs';
 import type http from 'node:http';
+import net from 'node:net';
 import os from 'node:os';
 import path from 'node:path';
+import { FirefoxExtension } from './firefox-rdp';
 
-const DIST_PATH = path.resolve(__dirname, '..', 'dist');
+// Set by scripts/e2e.mjs (`yarn e2e --edge` / `--firefox`). Edge uses the same
+// dist/ build as Chrome; Firefox runs against the separate firefox-dist/ build.
+const BROWSER = process.env.STYLEBOT_BROWSER ?? 'chrome';
+export const IS_FIREFOX = BROWSER === 'firefox';
+const CHANNEL = BROWSER === 'edge' ? 'msedge' : 'chrome';
 
-// Mirrors scripts/launch-chrome.mjs — `yarn test:e2e:edge` runs the suite on Edge,
-// which uses the same dist/ build as Chrome.
-const CHANNEL = process.env.STYLEBOT_BROWSER === 'edge' ? 'msedge' : 'chrome';
+const DIST_PATH = path.resolve(
+  __dirname,
+  '..',
+  IS_FIREFOX ? 'firefox-dist' : 'dist'
+);
 
 // --ui mode force-manages tracing (a live `use.trace` flag) on every context,
 // including ours — fighting it for control throws, so skip ours when detected.
@@ -49,11 +58,58 @@ export async function closeServer(server: http.Server): Promise<void> {
   await closed;
 }
 
+type ExtensionFunction<A, R> = (arg: A) => R | Promise<R>;
+
+// The Chromium counterpart of FirefoxExtension: same surface, backed by the MV3
+// service worker that CDP's Extensions.loadUnpacked started.
+class ChromiumExtension {
+  private constructor(
+    private readonly context: BrowserContext,
+    readonly id: string
+  ) {}
+
+  static async load(
+    context: BrowserContext,
+    path: string
+  ): Promise<ChromiumExtension> {
+    const cdp = await context.browser()!.newBrowserCDPSession();
+    const { id } = await cdp.send('Extensions.loadUnpacked', { path });
+    return new ChromiumExtension(context, id);
+  }
+
+  isRunning(): boolean {
+    return this.context.serviceWorkers().length > 0;
+  }
+
+  async evaluate<A, R>(fn: ExtensionFunction<A, R>, arg?: A): Promise<R> {
+    const worker =
+      this.context.serviceWorkers()[0] ??
+      (await this.context.waitForEvent('serviceworker'));
+    return worker.evaluate(fn as (arg: A) => R, arg as A);
+  }
+
+  close(): void {}
+}
+
 type Instance = {
   context: BrowserContext;
   userDataDir: string;
-  extensionId: string;
+  extension: ChromiumExtension | FirefoxExtension;
 };
+export type RunInExtension = <A, R>(
+  fn: ExtensionFunction<A, R>,
+  arg?: A
+) => Promise<R>;
+
+function freePort(): Promise<number> {
+  return new Promise(resolve => {
+    const server = net.createServer();
+    server.listen(0, () => {
+      const { port } = server.address() as net.AddressInfo;
+      server.close(() => resolve(port));
+    });
+  });
+}
 
 // One browser+extension instance per worker, reused across every test file that worker
 // runs — get() relaunches it on demand if the shared Chrome process died mid-suite.
@@ -86,36 +142,55 @@ class BrowserPool {
   private async launch(): Promise<Instance> {
     if (!fs.existsSync(DIST_PATH)) {
       throw new Error(
-        `No build found at ${DIST_PATH} — run \`yarn build\` before the e2e suite (\`yarn test:e2e\` does this for you).`
+        `No build found at ${DIST_PATH} — run \`yarn build\` before the e2e suite (\`yarn e2e\` does this for you).`
       );
     }
 
     const userDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'stylebot-e2e-'));
 
-    // --headed/--debug don't reach our manual browser launch, but they do flip this.
-    const headless = this.workerInfo.project.use.headless ?? true;
-
-    // Chrome 137+ removed --load-extension; CDP's Extensions domain replaces it below.
-    const context = await chromium.launchPersistentContext(userDataDir, {
-      headless,
-      channel: CHANNEL,
-      chromiumSandbox: true,
+    const launchOptions = {
+      // --headed/--debug don't reach our manual browser launch, but they do flip this.
+      headless: this.workerInfo.project.use.headless ?? true,
       viewport: null,
       // null leaves prefers-color-scheme unemulated, matching the real OS setting.
       colorScheme: null,
-      ignoreDefaultArgs: [
-        // Playwright disables extensions by default, which would block our CDP-loaded one.
-        '--disable-extensions',
-        '--enable-automation',
-      ],
-      args: [
-        // Required for Extensions.loadUnpacked.
-        '--enable-unsafe-extension-debugging',
-        // Trims memory per worker — several of these run concurrently on CI.
-        '--disable-dev-shm-usage',
-        '--disable-gpu',
-      ],
-    });
+    };
+
+    const rdpPort = IS_FIREFOX ? await freePort() : null;
+    const context = IS_FIREFOX
+      ? await firefox.launchPersistentContext(userDataDir, {
+          ...launchOptions,
+          // Playwright can't install extensions into Firefox; the debugger server
+          // exposes the same protocol about:debugging uses to load one temporarily.
+          args: [`--start-debugger-server=${rdpPort}`],
+          firefoxUserPrefs: {
+            'devtools.debugger.prompt-connection': false,
+            // MV3 treats <all_urls> content scripts as optional host permissions
+            // that a user would normally have to grant on install.
+            'extensions.originControls.grantByDefault': true,
+            // Firefox terminates idle event pages after 30s, which would take
+            // the console we run chrome.storage calls through with it.
+            'extensions.background.idle.timeout': 3_600_000,
+          },
+        })
+      : // Chrome 137+ removed --load-extension; CDP's Extensions domain replaces it below.
+        await chromium.launchPersistentContext(userDataDir, {
+          ...launchOptions,
+          channel: CHANNEL,
+          chromiumSandbox: true,
+          ignoreDefaultArgs: [
+            // Playwright disables extensions by default, which would block our CDP-loaded one.
+            '--disable-extensions',
+            '--enable-automation',
+          ],
+          args: [
+            // Required for Extensions.loadUnpacked.
+            '--enable-unsafe-extension-debugging',
+            // Trims memory per worker — several of these run concurrently on CI.
+            '--disable-dev-shm-usage',
+            '--disable-gpu',
+          ],
+        });
 
     // The extension opens this on fresh install, stealing tab focus.
     const closeHelpTab = (p: Page) => {
@@ -138,21 +213,30 @@ class BrowserPool {
       );
     }
 
-    const cdp = await context.browser()!.newBrowserCDPSession();
-    const { id: extensionId } = await cdp.send('Extensions.loadUnpacked', {
-      path: DIST_PATH,
-    });
+    const extension = rdpPort
+      ? await FirefoxExtension.load(rdpPort, DIST_PATH)
+      : await ChromiumExtension.load(context, DIST_PATH);
 
-    const instance: Instance = { context, userDataDir, extensionId };
+    const instance: Instance = { context, userDataDir, extension };
     this.instances.push(instance);
     return instance;
+  }
+
+  /**
+   * Runs `fn(arg)` with the extension's own privileges — in the background
+   * service worker on Chromium, or the background page on Firefox.
+   */
+  async runInExtension<A, R>(fn: ExtensionFunction<A, R>, arg?: A): Promise<R> {
+    const { extension } = await this.get();
+    return extension.evaluate(fn, arg);
   }
 
   // Tears down every instance this worker ever launched, not just the current one —
   // a mid-suite relaunch leaves earlier instances orphaned otherwise.
   async closeAll(): Promise<void> {
     await Promise.all(
-      this.instances.map(async ({ context, userDataDir }) => {
+      this.instances.map(async ({ context, userDataDir, extension }) => {
+        extension.close();
         if (context.browser()?.isConnected()) {
           if (!this.liveTraceMode) {
             await safeTracing(() => context.tracing.stop());
@@ -171,6 +255,7 @@ export const test = base.extend<
     // worker-scoped browser pool's current context with per-test trace/tab/storage isolation.
     context: BrowserContext;
     extensionId: string;
+    runInExtension: RunInExtension;
     openPopup: () => Promise<Page>;
   },
   {
@@ -192,8 +277,8 @@ export const test = base.extend<
   // Test-scoped so it always matches whatever context the same test's `context`
   // fixture resolved to, including right after a mid-suite relaunch.
   extensionId: async ({ browserPool }, use) => {
-    const { extensionId } = await browserPool.get();
-    await use(extensionId);
+    const { extension } = await browserPool.get();
+    await use(extension.id);
   },
 
   // Saves a per-test trace chunk and resets tabs/storage after so state can't leak
@@ -243,15 +328,28 @@ export const test = base.extend<
     );
     await context.clearCookies();
 
-    const worker = context.serviceWorkers()[0];
-    if (worker) {
-      await worker.evaluate(() => chrome.storage.local.clear());
+    // An idle-terminated background has nothing left to clear, and waiting for it
+    // to come back would stall teardown.
+    const { extension } = await browserPool.get();
+    if (extension.isRunning()) {
+      await extension.evaluate(() => chrome.storage.local.clear());
     }
+  },
+
+  runInExtension: async ({ browserPool }, use) => {
+    await use((fn, arg) => browserPool.runInExtension(fn, arg));
   },
 
   // Opens the popup by URL (Playwright can't click a real toolbar icon), in the
   // background so it doesn't steal "current tab" from the page under test.
   openPopup: async ({ context, extensionId }, use) => {
+    // Playwright can't attach to moz-extension:// pages (see e2e/README.md), so any
+    // test that needs the popup is skipped there simply by depending on this fixture.
+    test.skip(
+      IS_FIREFOX,
+      'Playwright cannot drive extension pages (the popup) in Firefox'
+    );
+
     const cdp = await context.browser()!.newBrowserCDPSession();
 
     const popupUrl = `chrome-extension://${extensionId}/popup/index.html`;

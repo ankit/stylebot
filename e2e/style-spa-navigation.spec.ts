@@ -32,11 +32,11 @@ test.afterAll(async () => {
 // handler re-derives readability on nav but never re-runs CSS matching/injection.
 test('CSS style matching does not re-run on a same-tab SPA navigation (documents a known gap)', async ({
   context,
-  extensionId: _extensionId,
+  runInExtension,
 }) => {
   const host = new URL(server.baseUrl).host;
 
-  await seedStyles(context, {
+  await seedStyles(runInExtension, {
     [`${host}/old`]: { css: 'h1 { color: rgb(255, 0, 128); }', enabled: true },
     [`${host}/new`]: { css: 'h1 { color: rgb(0, 153, 255); }', enabled: true },
   });

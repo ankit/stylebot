@@ -12,14 +12,14 @@ const PAGE_HTML = `
 
 test('disabling/enabling a style propagates live to every open tab on that host', async ({
   context,
-  extensionId: _extensionId,
+  runInExtension,
   openPopup,
 }) => {
   await context.route('http://localhost/**', route =>
     route.fulfill({ contentType: 'text/html', body: PAGE_HTML })
   );
 
-  await seedStyles(context, {
+  await seedStyles(runInExtension, {
     localhost: { css: 'h1 { color: rgb(255, 0, 128); }', enabled: true },
   });
 
