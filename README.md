@@ -75,7 +75,7 @@ That's it! Now you are ready to use the Google Drive Sync feature with your loca
 
 ### Release
 
-Releases go through a pull request from a `release/vX.Y.Z` branch — the `release/` prefix is what triggers the Edge and Firefox e2e suites, which don't run on ordinary PRs.
+Releases go through a pull request from a `release/vX.Y.Z` branch — the `release/` prefix is what triggers the Edge e2e suite, which doesn't run on ordinary PRs.
 
 - Branch off `main` as `release/vX.Y.Z`
 - Add entry to `CHANGELOG`

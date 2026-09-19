@@ -6,8 +6,8 @@ description: Cut a Stylebot release — CHANGELOG entry, version bump, release P
 # Cut a Stylebot release
 
 Releases go through a **pull request**, not a direct push to `main`. The PR is what
-gates the release on CI — in particular the Edge and Firefox e2e suites, which only run
-on release PRs (`.github/workflows/e2e-edge.yml`, `.github/workflows/e2e-firefox.yml`).
+gates the release on CI — in particular the Edge e2e suite, which only runs on release
+PRs (`.github/workflows/e2e-edge.yml`).
 
 ## 1. Branch
 
@@ -17,9 +17,9 @@ Branch off the latest `main`:
 git fetch origin main && git checkout -b release/vX.Y.Z origin/main
 ```
 
-The `release/` prefix is **not** cosmetic — the Edge and Firefox e2e workflows gate on
-`startsWith(github.head_ref, 'release/')`. Any other branch name silently skips those
-runs, which are the whole point of the release PR.
+The `release/` prefix is **not** cosmetic — `.github/workflows/e2e-edge.yml` gates on
+`startsWith(github.head_ref, 'release/')`. Any other branch name silently skips the Edge
+run, which is the whole point of the release PR.
 
 ## 2. Changelog
 
@@ -72,11 +72,11 @@ Four checks must pass before merging:
 | `build` | `yarn build` |
 | `validation` | lint, typecheck, unit tests, locale validation |
 | `e2e` | Playwright suite on Chrome |
+| `e2e (firefox)` | Playwright suite on Firefox |
 | `e2e (edge)` | Playwright suite on Edge — **release PRs only** |
-| `e2e (firefox)` | Playwright suite on Firefox — **release PRs only** |
 
-If `e2e (edge)` or `e2e (firefox)` shows as *skipped*, the branch name is wrong: it
-must start with `release/`. A skipped run is not a passed run.
+If `e2e (edge)` shows as *skipped*, the branch name is wrong: it must start with
+`release/`. A skipped run is not a passed run.
 
 ## 6. Merge
 
