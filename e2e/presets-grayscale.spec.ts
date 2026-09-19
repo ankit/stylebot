@@ -69,9 +69,13 @@ test('taking grayscale back to 0 keeps the rest of the rule in the saved style',
   // switching it off takes grayscale back to 0.
   await toggle.click({ force: true });
   await expect(article).toHaveCSS('filter', 'grayscale(1)');
+  // Under load the second click can land before the switch has re-rendered as
+  // checked, so wait for it — a click on a still-unchecked switch turns it on again.
+  await expect(toggle).toBeChecked();
 
   await toggle.click({ force: true });
   await expect(article).toHaveCSS('filter', 'none');
+  await expect(toggle).not.toBeChecked();
 
   // The colour has to outlive the filter both live and in the persisted style.
   await expect(article).toHaveCSS('color', 'rgb(255, 0, 128)');
@@ -106,7 +110,11 @@ test('grayscale applies on a page whose body child has no class or id', async ({
 
   await toggle.click({ force: true });
   await expect(wrapper).toHaveCSS('filter', 'grayscale(1)');
+  // Under load the second click can land before the switch has re-rendered as
+  // checked, so wait for it — a click on a still-unchecked switch turns it on again.
+  await expect(toggle).toBeChecked();
 
   await toggle.click({ force: true });
   await expect(wrapper).toHaveCSS('filter', 'none');
+  await expect(toggle).not.toBeChecked();
 });

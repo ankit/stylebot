@@ -23,6 +23,9 @@ const engine: Engine =
 
 const DIST_PATH = path.resolve(__dirname, '..', engine.distDir);
 
+// How long a fresh launch waits for the extension's onInstalled help tab.
+const HELP_TAB_TIMEOUT_MS = 15_000;
+
 // --ui mode force-manages tracing (a live `use.trace` flag) on every context,
 // including ours — fighting it for control throws, so skip ours when detected.
 function isLiveTraceMode(use: { trace?: unknown }): boolean {
@@ -113,14 +116,20 @@ class BrowserPool {
     const context = await engine.launch(userDataDir, launchOptions);
 
     // The extension opens this on fresh install, stealing tab focus.
-    const closeHelpTab = (p: Page) => {
-      if (/^https:\/\/stylebot\.dev\/help/.test(p.url())) {
-        p.close().catch(() => {});
-      }
-    };
-    context.on('page', p => {
-      closeHelpTab(p);
-      p.once('framenavigated', () => closeHelpTab(p));
+    const helpTabClosed = new Promise<void>(resolve => {
+      const closeHelpTab = (p: Page) => {
+        if (/^https:\/\/stylebot\.dev\/help/.test(p.url())) {
+          // Resolve only once it's gone: a context.route() installed while the
+          // tab is still closing fails with a target-closed error.
+          p.close()
+            .catch(() => {})
+            .then(resolve);
+        }
+      };
+      context.on('page', p => {
+        closeHelpTab(p);
+        p.once('framenavigated', () => closeHelpTab(p));
+      });
     });
 
     // Our custom context bypasses Playwright's default trace/video wiring, so start it
@@ -134,6 +143,18 @@ class BrowserPool {
     }
 
     const extension = await engine.loadExtension(context, DIST_PATH);
+
+    // onInstalled fires once the background first spins up, which under
+    // parallel-worker load can be after the first test has already opened its
+    // page and popup — the help tab then becomes the active tab and the popup
+    // acts on it instead. Let it land and close before any test starts. Bounded,
+    // since an engine that never surfaces it must not stall the launch.
+    await Promise.race([
+      helpTabClosed,
+      new Promise<void>(resolve =>
+        setTimeout(resolve, HELP_TAB_TIMEOUT_MS).unref()
+      ),
+    ]);
 
     const instance: Instance = { context, userDataDir, extension };
     this.instances.push(instance);
