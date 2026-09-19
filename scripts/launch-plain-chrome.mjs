@@ -11,7 +11,7 @@
 // chrome://extensions after a rebuild.
 
 import { spawn } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync } from 'node:fs';
+import { mkdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -31,13 +31,6 @@ const CHROME_PATHS = {
 const chromePath =
   process.env.STYLEBOT_BROWSER_PATH ?? CHROME_PATHS[process.platform];
 
-if (!existsSync(path.join(extensionPath, 'manifest.json'))) {
-  console.error(
-    '❌ No build in dist/ — run `yarn build` or `yarn watch` first.'
-  );
-  process.exit(1);
-}
-
 const readJson = file => {
   try {
     return JSON.parse(readFileSync(file, 'utf8'));
@@ -45,6 +38,23 @@ const readJson = file => {
     return null;
   }
 };
+
+const manifest = readJson(path.join(extensionPath, 'manifest.json'));
+
+if (!manifest) {
+  console.error(
+    '❌ No build in dist/ — run `yarn build:dev` or `yarn watch` first.'
+  );
+  process.exit(1);
+}
+
+// Only development builds carry the store's public key (see webpack.config.js);
+// without it the extension id differs from the one the OAuth client knows.
+if (!manifest.key) {
+  console.warn(
+    '⚠️  dist/manifest.json has no `key`, so Google sign-in will fail with redirect_uri_mismatch.\n   Add .extension-key (README, "Google Drive Sync") and rebuild with `yarn build:dev`.'
+  );
+}
 
 // Chrome records unpacked extensions in Secure Preferences (Preferences on
 // some platforms) as location 4 with the directory they were loaded from. A
