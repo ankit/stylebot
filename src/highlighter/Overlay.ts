@@ -147,8 +147,7 @@ type InspectorCardInstance = Vue & {
 
 /**
  * A thin bridge to InspectorCard.vue, mounted into the editor's own
- * theme-provider subtree so it inherits real theme CSS/fonts — unlike
- * OverlayRect, which stays native in document.body.
+ * theme-provider subtree so it inherits the real theme CSS/fonts.
  */
 class OverlayTip {
   vm: InspectorCardInstance;
@@ -180,9 +179,8 @@ class OverlayTip {
   }
 
   /**
-   * avoidHorizontal (the editor panel's viewport-relative left/right, if
-   * given) shifts the card to whichever side has more room when it would
-   * otherwise land on top of the panel.
+   * avoidHorizontal (the editor panel's left/right) shifts the card to
+   * whichever side has more room when it would land on top of the panel.
    */
   updatePosition(
     dims: Box,
@@ -229,9 +227,8 @@ class OverlayTip {
   }
 
   /**
-   * For a selector preview (typing/hovering in the editor) rather than
-   * picking an element — sits beside the panel instead of near wherever
-   * the selector happens to match, which may be scattered or off-screen.
+   * For a selector preview rather than picking an element — sits beside the
+   * panel instead of near matches that may be scattered or off-screen.
    */
   updatePositionNextToPanel(panelEl: HTMLElement | null) {
     this.vm.$nextTick(() => {
@@ -282,10 +279,8 @@ export default class Overlay {
   rects: Array<OverlayRect>;
 
   /**
-   * Highlight rects stay native in this.container; the tip is Vue-rendered
-   * into mountRoot when given, so it inherits the editor's real theme.
-   * mountRoot is kept (not just handed to OverlayTip) so inspect() can
-   * also find the editor panel within it.
+   * The tip is Vue-rendered into mountRoot so it inherits the editor's theme;
+   * mountRoot is also kept so inspect() can find the editor panel within it.
    */
   constructor(mountRoot?: HTMLElement) {
     const doc = window.document;

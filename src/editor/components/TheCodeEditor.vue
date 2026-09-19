@@ -143,10 +143,8 @@ export default Vue.extend({
       }
 
       if (selector && !getRule(this.css, selector)) {
-        // Already styled via a grouped rule (`.foo, .bar { ... }`) — split
-        // it into its own rule instead of injecting an empty one, so Code
-        // mode shows what it already has rather than a second, blank
-        // `.foo {}` appended at the bottom of the stylesheet.
+        /* Already styled via a grouped rule — split it out rather than
+           appending a second, blank `.foo {}` at the bottom. */
         const css = getRuleForSelector(this.css, selector)
           ? splitSelectorFromGroup(this.css, selector)
           : addEmptyRule(this.css, selector);

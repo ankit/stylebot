@@ -11,10 +11,8 @@ import {
 import { isReaderable } from '@stylebot/readability';
 
 export default {
-  // Falls back to a grouped rule the selector is a member of (e.g.
-  // `.foo, .bar { ... }`) so the Basic editor shows those declarations as
-  // already set, rather than blank, before any edit splits it into its
-  // own rule (see addDeclaration/splitSelectorFromGroup).
+  /* Falls back to a grouped rule the selector belongs to, so Basic mode
+     shows its declarations before any edit splits it into its own rule. */
   activeRule: (state: State): postcss.Rule | null => {
     if (!state.activeSelector) {
       return null;

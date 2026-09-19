@@ -8,12 +8,8 @@ export const getRule = (css: string, selector: string): postcss.Rule | null => {
   return matchingRules.length > 0 ? matchingRules[0] : null;
 };
 
-// Unlike getRule, this also matches a selector grouped with others in a
-// comma-separated rule (e.g. `td.title, td.subtext { ... }` styles both
-// `td.title` and `td.subtext`, even though neither is the rule's full
-// selector text). Keeps the *last* match, not the first — for equal
-// specificity, later rules win the cascade, so that's the one whose
-// declarations are actually in effect.
+/* Unlike getRule, also matches a selector grouped in a comma-separated rule.
+   Keeps the last match: at equal specificity, later rules win the cascade. */
 export const getRuleForSelector = (
   css: string,
   selector: string
@@ -30,19 +26,12 @@ export const getRuleForSelector = (
   return found;
 };
 
-// Interaction-state pseudo-classes: matching one of these only means "the
-// inspector's own cursor/focus happens to be on this element right now"
-// (hovering it *is* what triggered the match), not "this selector targets
-// the element's normal appearance" — so they're never a selector worth
-// reusing, even though el.matches() would happily return true for them.
+/* Matching one of these only means the inspector's cursor/focus is on the
+   element right now, not that the selector targets its normal appearance. */
 const STATE_PSEUDO_CLASSES = /:(hover|focus(-visible|-within)?|active)\b/i;
 
-// Finds an already-authored selector that happens to match this specific
-// element — via the browser's own selector matching, not string equality —
-// so picking an element that's already targeted by a hand-written selector
-// (a descendant combinator, :nth-child, one member of a grouped selector,
-// etc.) reuses that selector instead of generating an unrelated new one
-// that would start a second, disconnected rule for the same element.
+/* Finds an authored selector matching this element via el.matches(), so
+   picking it keeps editing that rule instead of starting an unrelated one. */
 export const getExistingSelector = (
   el: HTMLElement,
   css: string
@@ -75,14 +64,8 @@ export const getExistingSelector = (
   return match;
 };
 
-// Splits `selector` out of whatever grouped, comma-separated rule it
-// belongs to (e.g. `.foo, .bar { ... }`) into its own standalone rule
-// directly after the original, carrying over the declarations the group
-// already gave it — so editing an element styled only via a shared rule
-// doesn't silently affect its groupmates, and doesn't lose what it
-// already had either. No-ops if `selector` already has its own rule, or
-// isn't part of any rule at all. Mirrors getRuleForSelector's "last match
-// wins" choice when a selector is grouped in more than one place.
+/* Moves `selector` out of a grouped rule (`.foo, .bar`) into its own rule right
+   after it, keeping its declarations so edits don't hit its groupmates. */
 export const splitSelectorFromGroup = (
   css: string,
   selector: string

@@ -10,11 +10,8 @@ export const addDeclaration = (
   selector: string,
   rawCss: string
 ): string => {
-  // If `selector` is only styled today via a grouped rule (`.foo, .bar`),
-  // split it into its own rule first — otherwise the exact-match walk
-  // below finds nothing and starts a second, disconnected `.foo` rule
-  // instead of editing the declarations it already has. A no-op when
-  // `selector` already has its own rule or none at all.
+  /* A selector styled only via a grouped rule (`.foo, .bar`) gets its own
+     rule first, so the walk below edits it instead of adding a second one. */
   const css = splitSelectorFromGroup(rawCss, selector);
   const root = postcss.parse(css);
   const rules: Array<postcss.Rule> = [];

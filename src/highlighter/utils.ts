@@ -152,9 +152,8 @@ export function getElementDimensions(domElement: HTMLElement): Dimensions {
   };
 }
 
-// A minimal preview of how the element currently renders, for when
-// Stylebot hasn't authored any declarations for it yet — otherwise the
-// inspect card would show nothing at all below the selector.
+/* A preview of how the element currently renders, so the inspect card
+   isn't empty when Stylebot has no declarations for it yet. */
 const PREVIEW_PROPERTIES = ['color', 'font-size', 'line-height'];
 
 export function getComputedDeclarations(

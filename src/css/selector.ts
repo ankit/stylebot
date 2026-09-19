@@ -159,9 +159,8 @@ export const getTagNameBasedSelector = (
 };
 
 /**
- * Non-hashed class, test-id, or name — deliberately excludes #id and a
- * hashed class, so a real ancestor match (see getAncestorBasedSelector)
- * still outranks the element's own id or a meaningless hash.
+ * Excludes #id and hashed classes on purpose, so a real ancestor match
+ * (see getAncestorBasedSelector) still outranks them.
  */
 function getGoodOwnSelector(el: HTMLElement): string | null {
   return (
@@ -202,8 +201,7 @@ function climbToNearestUsableAncestor(
 
 /**
  * Like getTagNameBasedSelector, but stops at the nearest ancestor (within
- * 2 levels) with a real class/test-id/name, e.g. `div.mw-heading h2` once
- * the immediate parent already qualifies.
+ * 2 levels) with a real class/test-id/name, e.g. `div.mw-heading h2`.
  */
 export const getAncestorBasedSelector = (el: HTMLElement): string | null =>
   climbToNearestUsableAncestor(el, getGoodOwnSelector);
@@ -217,10 +215,8 @@ function getAncestorHashedClassSelector(el: HTMLElement): string | null {
 }
 
 /**
- * Priority: own non-hashed class/test-id/name, a real ancestor match, own
- * #id, own hashed class, an ancestor's hashed class, then a bare tag
- * chain. #id ranks above a hash (far more reliable) but below anything
- * genuinely authored, own or an ancestor's.
+ * #id ranks above a hashed class but below anything genuinely authored,
+ * the element's own or an ancestor's. See src/css/README.md.
  */
 export const getSelector = (el: HTMLElement): string => {
   return (

@@ -53,9 +53,7 @@ import { SChip, ShortcutChip } from '@stylebot/components';
 type StylebotDeclaration = { property: string; value: string };
 type NextAncestorInfo = { label: string; styleCount: number };
 
-// Splits a (possibly grouped) selector into its comma-separated parts —
-// the same split TheCssSelectorDropdownItem.vue does to show a selector as
-// pills, reused here so the card's own selectors look the same way.
+// The same split TheCssSelectorDropdownItem.vue uses to render pills.
 function splitSelector(selector: string): Array<string> {
   return selector
     .split(',')
@@ -67,12 +65,8 @@ function pluralize(count: number, word: string): string {
   return `${count} ${word}${count === 1 ? '' : 's'}`;
 }
 
-// Rendered by Overlay.ts as a standalone Vue instance, mounted into the
-// editor's own theme-provider subtree (not passed here as props) — see
-// OverlayTip in Overlay.ts. That's what lets this component use the same
-// CSS variables (--accent, --text-primary, --font-mono, ...) and 'Geist'
-// base font as the rest of the editor, despite rendering over the page
-// itself rather than inside the editor panel.
+/* Mounted by OverlayTip (Overlay.ts) into the editor's theme-provider subtree,
+   which is what gives it the editor's CSS variables and fonts over the page. */
 export default Vue.extend({
   name: 'InspectorCard',
 
@@ -144,9 +138,8 @@ export default Vue.extend({
         // in a list meant to be scanned, not copied.
         value: property === 'font-family' ? value.replace(/['"]/g, '') : value,
         swatch: property.toLowerCase().includes('color') ? value : null,
-        // A font stack is the one value long enough to wrap — right-aligned
-        // wrapped text is ragged on the side you read from, so it gets
-        // left-aligned instead once it needs more than one line.
+        /* A font stack is the one value long enough to wrap; wrapped text
+           reads better left-aligned. */
         wraps: property === 'font-family',
       }));
     },
@@ -159,9 +152,6 @@ export default Vue.extend({
   position: fixed;
   top: 0;
   left: 0;
-  // Above the editor panel itself (TheStylebotResizer.vue sets z: 1e8),
-  // so the card is never visually cut off by it even if positioning
-  // still lands it nearby.
   z-index: 2147483647;
   display: flex;
   flex-flow: column nowrap;
@@ -175,9 +165,6 @@ export default Vue.extend({
   font-size: 12px;
   line-height: 1.35;
   color: var(--text-primary);
-  // The card follows the cursor while inspecting, so nothing in it can be
-  // hovered or clicked — climbing to the parent is done with the keyboard
-  // (ArrowUp/ArrowLeft), not by clicking a row here.
   pointer-events: none;
 }
 
@@ -210,10 +197,6 @@ export default Vue.extend({
   gap: 8px;
 }
 
-// Same shape as TheCssSelectorDropdownItem.vue's own .chips — each part of
-// a (possibly grouped) selector as its own pill, wrapping instead of
-// truncating. SChip supplies its own code font, so nothing extra needed
-// here for that.
 .chips {
   flex: 1;
   min-width: 0;
@@ -222,20 +205,11 @@ export default Vue.extend({
   gap: 6px;
 }
 
-// A bit bolder than SChip's own default (400) — the selector is the one
-// thing in the card worth making the most prominent. 500 is one of the
-// weights self-hosted for Fira Code (init-editor.ts); anything else would
-// synthesize a fake bold instead of rendering a real one.
 .chips ::v-deep .chip {
   font-weight: 500;
-  // Dimmed from SChip's own text-primary (near-white in dark mode) to
-  // text-secondary, matching the detail values below.
   color: var(--text-secondary);
 }
 
-// Smaller and lighter than SCountBadge (used for the same kind of count
-// elsewhere, e.g. the editor header's active-style-count) — a compact
-// pill fits better inline next to the selector than the default size.
 .pill {
   flex: none;
   display: inline-flex;
@@ -268,8 +242,6 @@ export default Vue.extend({
 .detail-label {
   flex: none;
   white-space: nowrap;
-  // Raw CSS property names read as code, not prose, so they get the same
-  // font as everything else CSS-shaped in the card.
   font-family: var(
     --font-mono,
     'Fira Code',
@@ -286,8 +258,6 @@ export default Vue.extend({
   min-width: 0;
   overflow-wrap: break-word;
   text-align: right;
-  // Falls back explicitly rather than relying solely on --font-mono being
-  // in scope, since this card renders outside the editor panel proper.
   font-family: var(
     --font-mono,
     'Fira Code',
@@ -296,17 +266,10 @@ export default Vue.extend({
     Consolas,
     monospace
   );
-  // text-secondary rather than text-primary (near-white in dark mode) —
-  // still a real editor token, just dimmer for a value that isn't the
-  // card's main subject.
   color: var(--text-secondary);
 }
 
 .detail-value.align-left {
-  // Shrinks to its content and hugs the right edge via the auto margin,
-  // rather than stretching across the row's full remaining width — so the
-  // block still sits flush right like every other value, even though the
-  // text inside it reads left-to-right once it wraps.
   flex: 0 1 auto;
   margin-left: auto;
   text-align: left;
@@ -323,9 +286,6 @@ export default Vue.extend({
   vertical-align: middle;
 }
 
-// A plain sentence rather than a label/value row — it's not a CSS
-// property, so it doesn't get the code font or the right-aligned value
-// column the way the declaration rows above it do.
 .matches-row {
   margin-top: 10px;
   color: var(--text-secondary);
