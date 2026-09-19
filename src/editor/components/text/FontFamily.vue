@@ -182,10 +182,10 @@ export default Vue.extend({
       }
     },
 
+    // The link row previews nothing, so moving onto it clears the last
+    // font's preview like the Default row does.
     preview(row: Row): void {
-      if (row.kind !== 'link') {
-        this.previewFont(row.value);
-      }
+      this.previewFont(row.kind === 'link' ? '' : row.value);
     },
 
     clearPreview(): void {

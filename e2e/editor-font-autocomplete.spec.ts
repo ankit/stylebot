@@ -314,6 +314,11 @@ test('highlighting a font previews it on the page until the picker is dismissed'
 
   await expect.poll(() => previewCss(page)).toContain('Lora');
   await expect(heading).toHaveCSS('font-family', /Lora/);
+
+  // Rows that aren't fonts (Browse, Default) preview nothing.
+  await menuItem(page, 'Browse Google Fonts').hover();
+  await expect.poll(() => previewCss(page)).toBe('');
+  await expect(heading).toHaveCSS('font-family', initialFont);
 });
 
 test('a stack written in code mode can be replaced or extended', async ({
