@@ -40,6 +40,17 @@ Use [Conventional Commits](https://www.conventionalcommits.org/) format: `<type>
 
 Avoid comments by default. Only add one to state something non-obvious — a hidden constraint, a workaround, a reason that isn't clear from the code itself. Never add comments in CSS. When a comment is warranted, keep it to 1-2 lines max, and use `/* */` for multiline comments.
 
+Comments on functions and methods use JSDoc style, always in this shape:
+
+```ts
+/**
+ * What the function does, in plain prose.
+ * A second line if the first doesn't fit.
+ */
+```
+
+`/**` and `*/` each go on their own line — never `/** text */` on one line. Up to 4 lines of prose is fine. Never use `@` tags (`@param`, `@returns`, `@throws`, etc.); the TypeScript signature already documents those.
+
 ## i18n
 
 Never hardcode user-facing strings — always add an i18n key in `src/_locales/*.config` (all 15 locales) and reference it via `t('key')`. This applies to every string a user sees: labels, placeholders, titles, aria-labels, error messages.

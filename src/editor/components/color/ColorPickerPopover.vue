@@ -132,11 +132,7 @@ export default Vue.extend({
     const canRestoreLastTab =
       lastTab !== 'already-used' || !this.firstTabDisabled;
 
-    this.activeTab = canRestoreLastTab
-      ? lastTab
-      : this.firstTabDisabled
-      ? 'custom'
-      : 'already-used';
+    this.activeTab = canRestoreLastTab ? lastTab : 'custom';
 
     getRecentColors().then(colors => {
       this.recentColors = colors;
