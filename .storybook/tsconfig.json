@@ -1,12 +1,18 @@
 {
   "extends": "../tsconfig.json",
-  "include": ["./**/*", "../src/**/*.stories.ts", "../shims.vue.d.ts"],
+  "include": [
+    "./**/*",
+    "../src/**/*.stories.ts",
+    "../shims.vue.d.ts",
+    "../src/editor/vue-draggable-resizable.d.ts"
+  ],
   "compilerOptions": {
     "types": ["chrome", "node"],
     "baseUrl": "../src",
     "paths": {
       "@stylebot/storybook/*": ["../.storybook/*"],
       "@stylebot/*": ["*/index"]
-    }
+    },
+    "skipLibCheck": true
   }
 }

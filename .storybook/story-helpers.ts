@@ -1,6 +1,7 @@
+import type { Component } from 'vue';
 import type { StoryObj } from '@storybook/vue';
 
-type Components = Record<string, unknown>;
+type Components = Record<string, Component>;
 type Data = () => Record<string, unknown>;
 
 /**

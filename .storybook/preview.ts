@@ -113,7 +113,7 @@ const preview: Preview = {
   },
 
   decorators: [
-    (story, { globals, parameters }) => {
+    (_story, { globals, parameters }) => {
       // Composites read their appearance from options, so the toolbar theme
       // flows through the shim as well as the outer ThemeProvider.
       installChrome({
@@ -122,7 +122,7 @@ const preview: Preview = {
       });
 
       return {
-        components: { story, ThemeProvider },
+        components: { ThemeProvider },
         data: () => ({
           mode: globals.theme,
           padded: parameters.padded !== false,

@@ -23,7 +23,7 @@ export const Variants = fromTemplate(
   <div class="sb-row">
     <s-count-badge :count="1" />
     <s-count-badge :count="12" />
-    <s-count-badge>99+</s-count-badge>
+    <s-count-badge :count="99">99+</s-count-badge>
   </div>
 `
 );

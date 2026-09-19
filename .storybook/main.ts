@@ -18,12 +18,15 @@ const aliasedPackages = [
   'utils',
   'styles',
   'settings',
+  'google-fonts',
   'highlighter',
 ];
 
 const config: StorybookConfig = {
   framework: '@storybook/vue-vite',
   stories: ['../src/**/*.stories.ts'],
+  // Serves what the extension reads via chrome.runtime.getURL().
+  staticDirs: [{ from: '../src/google-fonts', to: '/google-fonts' }],
   addons: [
     '@storybook/addon-toolbars',
     '@storybook/addon-controls',

@@ -38,17 +38,21 @@ const getMessage = (key: string, substitutions: Array<string> = []) => {
     return '';
   }
 
-  return entry.message.replace(/\$([^$]+)\$/g, (_, name) => {
+  return entry.message.replace(/\$([^$]+)\$/g, (_: string, name: string) => {
     const index = Number(entry.placeholders?.[name]?.content.slice(1)) - 1;
     return substitutions[index] ?? '';
   });
 };
 
-const respond = (callback: Callback | undefined, value: unknown) => {
-  if (callback) {
-    setTimeout(() => callback(value), 0);
-  }
-};
+/* Like Chrome, answers asynchronously through a callback when one is
+   passed and always resolves a promise, so both call styles work. */
+const respond = (callback: Callback | undefined, value: unknown) =>
+  new Promise<unknown>(resolve => {
+    setTimeout(() => {
+      callback?.(value);
+      resolve(value);
+    }, 0);
+  });
 
 /**
  * Installs a fresh in-memory window.chrome for the current story so
@@ -91,10 +95,9 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
 
   const shim = {
     runtime: {
-      sendMessage: (message: { name: string }, callback?: Callback) => {
-        respond(callback, runtimeResponses[message.name]?.(message));
-      },
-      getURL: (p: string) => `/stub/${p}`,
+      sendMessage: (message: { name: string }, callback?: Callback) =>
+        respond(callback, runtimeResponses[message.name]?.(message)),
+      getURL: (p: string) => `/${p}`,
       getManifest: () => ({ version: MANIFEST_VERSION }),
       onMessage: {
         addListener: () => undefined,
@@ -106,7 +109,7 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
 
     storage: {
       local: {
-        get: (keys: string | Array<string>, callback: Callback) => {
+        get: (keys: string | Array<string>, callback?: Callback) => {
           const list = Array.isArray(keys) ? keys : [keys];
           const items: Record<string, unknown> = {};
 
@@ -114,11 +117,11 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
             items[key] = storage[key];
           });
 
-          respond(callback, items);
+          return respond(callback, items);
         },
         set: (items: Record<string, unknown>, callback?: Callback) => {
           Object.assign(storage, items);
-          respond(callback, undefined);
+          return respond(callback, undefined);
         },
       },
     },
@@ -128,16 +131,13 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
         _id: number,
         message: { name: string },
         callback?: Callback
-      ) => {
-        respond(callback, tabResponses[message.name]?.());
-      },
-      create: () => undefined,
+      ) => respond(callback, tabResponses[message.name]?.()),
+      create: () => respond(undefined, undefined),
     },
 
     windows: {
-      getCurrent: (_info: unknown, callback: Callback) => {
-        respond(callback, { tabs: [tab] });
-      },
+      getCurrent: (_info: unknown, callback?: Callback) =>
+        respond(callback, { tabs: [tab] }),
     },
   };
 

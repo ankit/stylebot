@@ -1,5 +1,7 @@
 declare module 'virtual:stylebot-locale' {
-  import type { LocaleMessages } from '../scripts/lib/parse-locale-config';
-  const messages: LocaleMessages;
+  const messages: Record<
+    string,
+    { message: string; placeholders?: Record<string, { content: string }> }
+  >;
   export default messages;
 }

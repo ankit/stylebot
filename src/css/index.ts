@@ -40,8 +40,8 @@ export {
   quoteFamily,
   replaceToken,
   unquoteFamily,
-  FontValueToken,
 } from './font-family';
+export type { FontValueToken } from './font-family';
 export { addDeclaration, appendImportantToDeclarations } from './declaration';
 export {
   getRule,

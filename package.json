@@ -28,7 +28,7 @@
     "lint:fix": "yarn lint --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p .storybook",
     "test": "jest",
     "validate-locales": "node scripts/validate-locales.mjs",
     "update-google-fonts": "node scripts/update-google-fonts.mjs",

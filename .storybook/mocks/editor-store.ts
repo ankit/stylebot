@@ -23,6 +23,7 @@ const NOOP_ACTIONS = [
   'escape',
   'resetActiveRule',
   'applyFontFamily',
+  'previewFontFamily',
   'applyReadability',
   'setReadabilitySettings',
   'applyFilter',
@@ -57,6 +58,16 @@ export const createEditorStore = (
     setBasicModeSections: setOptionAction('basicModeSections'),
     setLastColorSet: setOptionAction('lastColorSet'),
     setLastColorPickerTab: setOptionAction('lastColorPickerTab'),
+
+    rememberFont(
+      { state, commit }: { state: State; commit: Commit },
+      font: string
+    ) {
+      commit('setOptions', {
+        ...state.options,
+        fonts: [font, ...state.options.fonts.filter(item => item !== font)],
+      });
+    },
 
     applyCss({ commit }, { css }: { css: string }) {
       commit('setCss', css);
