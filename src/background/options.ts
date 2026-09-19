@@ -38,3 +38,27 @@ export const set = (
 
   return pendingWrite;
 };
+
+/**
+ * Drops stored keys that are no longer part of StylebotOptions so retired
+ * options don't linger in storage.
+ */
+export const pruneRetired = (): Promise<void> => {
+  pendingWrite = pendingWrite.then(async () => {
+    const items = await chrome.storage.local.get('options');
+    const stored = items['options'];
+    if (!stored) {
+      return;
+    }
+
+    const options = Object.fromEntries(
+      Object.entries(stored).filter(([name]) => name in defaultOptions)
+    );
+
+    if (Object.keys(options).length !== Object.keys(stored).length) {
+      await chrome.storage.local.set({ options });
+    }
+  });
+
+  return pendingWrite;
+};

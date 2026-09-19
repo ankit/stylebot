@@ -55,7 +55,7 @@ export const createEditorStore = (
     setMode: setOptionAction('mode'),
     setLayout: setOptionAction('layout'),
     setAppearance: setOptionAction('appearance'),
-    setBasicModeSections: setOptionAction('basicModeSections'),
+    setBasicModeOpenedSections: setOptionAction('basicModeOpenedSections'),
     setLastColorSet: setOptionAction('lastColorSet'),
     setLastColorPickerTab: setOptionAction('lastColorPickerTab'),
 

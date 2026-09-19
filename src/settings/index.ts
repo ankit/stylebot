@@ -18,13 +18,12 @@ export const defaultOptions: StylebotOptions = {
     'system-ui',
     'Georgia',
   ],
-  basicModeSections: {
-    text: true,
-    colors: true,
-    layout: true,
-    border: false,
-    more: false,
+  basicModeOpenedSections: {
+    text: false,
+    colors: false,
+    layout: false,
     effects: false,
+    more: false,
   },
   layout: {
     width: 350,

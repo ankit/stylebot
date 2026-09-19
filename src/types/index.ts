@@ -9,9 +9,8 @@ export type StylebotBasicModeSections = {
   text: boolean;
   colors: boolean;
   layout: boolean;
-  border: boolean;
-  more: boolean;
   effects: boolean;
+  more: boolean;
 };
 
 export type StylebotLayout = {
@@ -28,7 +27,7 @@ export type StylebotOptions = {
   fonts: StylebotFonts;
   layout: StylebotLayout;
   mode: StylebotEditingMode;
-  basicModeSections: StylebotBasicModeSections;
+  basicModeOpenedSections: StylebotBasicModeSections;
   appearance: StylebotAppearance;
   // Key of the last-picked Palette option — a built-in set, or a scheme name from color-schemes.ts.
   lastColorSet: string;

@@ -29,7 +29,7 @@ import {
 } from './messages';
 
 import { refreshBadgeForTab } from './styles';
-import { get as getOption } from './options';
+import { get as getOption, pruneRetired } from './options';
 
 import {
   TabUpdated,
@@ -40,7 +40,7 @@ import {
 import { setNotification, getReleaseNotificationId } from '@stylebot/utils';
 
 /**
- * Open Help page on installation
+ * Open Help page on installation; clean up retired options on update.
  */
 chrome.runtime.onInstalled.addListener(async ({ reason }) => {
   if (reason === 'install') {
@@ -49,6 +49,10 @@ chrome.runtime.onInstalled.addListener(async ({ reason }) => {
     });
 
     setNotification(getReleaseNotificationId(), true);
+  }
+
+  if (reason === 'update') {
+    pruneRetired();
   }
 });
 

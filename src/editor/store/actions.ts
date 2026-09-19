@@ -171,12 +171,12 @@ export default {
     commit('setOptions', { ...state.options, appearance });
   },
 
-  setBasicModeSections(
+  setBasicModeOpenedSections(
     { state, commit }: { state: State; commit: Commit },
-    basicModeSections: StylebotBasicModeSections
+    basicModeOpenedSections: StylebotBasicModeSections
   ): void {
-    setOption('basicModeSections', basicModeSections);
-    commit('setOptions', { ...state.options, basicModeSections });
+    setOption('basicModeOpenedSections', basicModeOpenedSections);
+    commit('setOptions', { ...state.options, basicModeOpenedSections });
   },
 
   setLastColorSet(
