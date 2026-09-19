@@ -1,4 +1,4 @@
-import Vuex, { Commit, Store } from 'vuex';
+import Vuex, { ActionTree, Commit, Store } from 'vuex';
 import * as postcss from 'postcss';
 
 import { addDeclaration } from '@stylebot/css';
@@ -51,7 +51,7 @@ export const createEditorStore = (
     options: { ...mockState.options, ...overrides.options },
   };
 
-  const actions: Record<string, (...args: any[]) => void> = {
+  const actions: ActionTree<State, State> = {
     setMode: setOptionAction('mode'),
     setLayout: setOptionAction('layout'),
     setAppearance: setOptionAction('appearance'),

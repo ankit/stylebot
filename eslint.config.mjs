@@ -121,6 +121,19 @@ export default tseslint.config(
   },
 
   {
+    // Stories and Storybook config are typed against their own tsconfig,
+    // since the root one excludes them from the extension build.
+    files: ['src/**/*.stories.ts', '.storybook/**/*.ts'],
+    languageOptions: {
+      parserOptions: {
+        projectService: false,
+        project: '.storybook/tsconfig.json',
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+  },
+
+  {
     // Tests re-require modules after jest.resetModules().
     files: ['**/__tests__/**', '**/*.test.ts'],
     languageOptions: { globals: globals.jest },

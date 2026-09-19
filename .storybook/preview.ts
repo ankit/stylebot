@@ -19,7 +19,7 @@ import '../src/editor/index.scss';
 import './preview.css';
 
 Vue.use(Vuex);
-Vue.component('vue-draggable-resizable', VueDraggableResizable);
+Vue.component('VueDraggableResizable', VueDraggableResizable);
 Vue.mixin({ methods: { t } });
 installChrome();
 

@@ -75,13 +75,17 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
     url: overrides.tabUrl ?? 'https://example.com/article',
   };
 
-  const runtimeResponses: Record<string, (message: any) => unknown> = {
+  const runtimeResponses: Record<
+    string,
+    (message: { name: string; optionName?: keyof StylebotOptions }) => unknown
+  > = {
     GetStylesForPage: () => ({
       styles: overrides.styles ?? [],
       defaultStyle: overrides.defaultStyle,
     }),
     GetCommands: () => commands,
-    GetOption: message => options[message.optionName as keyof StylebotOptions],
+    GetOption: message =>
+      message.optionName ? options[message.optionName] : undefined,
     GetAllOptions: () => options,
     GetReadabilitySettings: () => readabilitySettings,
     GetRecentColors: () => overrides.recentColors ?? [],
@@ -141,5 +145,5 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
     },
   };
 
-  (window as any).chrome = shim;
+  (window as unknown as { chrome: typeof shim }).chrome = shim;
 };
