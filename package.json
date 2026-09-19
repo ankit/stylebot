@@ -32,10 +32,8 @@
     "test": "jest",
     "validate-locales": "node scripts/validate-locales.mjs",
     "test:coverage": "jest --coverage",
-    "test:e2e": "yarn build && playwright test",
-    "test:e2e:edge": "cross-env STYLEBOT_BROWSER=edge yarn test:e2e",
-    "test:e2e:firefox": "yarn build:firefox && cross-env STYLEBOT_BROWSER=firefox playwright test",
-    "test:e2e:ui": "yarn build && playwright test --ui",
+    "e2e": "node scripts/e2e.mjs",
+    "test:e2e": "node scripts/e2e.mjs",
     "postinstall": "patch-package"
   },
   "jest": {

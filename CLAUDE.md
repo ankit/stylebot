@@ -26,11 +26,11 @@ session is already inside a worktree.
 - `yarn lint` / `yarn lint:fix` — ESLint
 - `yarn typecheck` — `tsc --noEmit`
 - `yarn test` — Jest unit tests
-- `yarn test:e2e` — builds the extension then runs the Playwright e2e suite (headless by default; loads the unpacked extension into Chrome via CDP). `yarn test:e2e:edge` and `yarn test:e2e:firefox` run it on Edge and Firefox; on Firefox, Playwright can't attach to extension pages, so specs that click through the popup call `skipWithoutPopup()` and only the storage-seeded content-script tests run
+- `yarn e2e` (alias `yarn test:e2e`) — builds the extension then runs the Playwright e2e suite headless on Chrome, as CI does. `--edge` / `--firefox` switch browser, `--headed` / `--ui` / `--debug` switch mode, `--no-build` skips the rebuild; see `e2e/README.md`. On Firefox, Playwright can't attach to extension pages, so specs that click through the popup call `skipWithoutPopup()` and only the storage-seeded content-script tests run
 
 ## Validation
 
-Always validate UI/extension changes with headless Playwright, not manual/headed browser interaction — the e2e harness in `e2e/fixtures.ts` already loads the real unpacked extension via CDP. Run `yarn test:e2e` (or a targeted Playwright test) to confirm a change works end-to-end before calling it done.
+Always validate UI/extension changes with headless Playwright, not manual/headed browser interaction — the e2e harness in `e2e/fixtures.ts` already loads the real unpacked extension via CDP. Run `yarn e2e` (or a targeted test, e.g. `yarn e2e --no-build editor-open`) to confirm a change works end-to-end before calling it done.
 
 ## Commit messages
 

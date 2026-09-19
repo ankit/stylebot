@@ -51,6 +51,11 @@ If you would like to <strong>add a new feature</strong> to Stylebot or <strong>f
 - Enable the Developer mode.
 - Load unpacked `dist/` as extension
 
+### Tests
+
+- Run `yarn test` for unit tests
+- Run `yarn e2e` for the Playwright end-to-end suite (headless Chrome, as in CI); `yarn e2e --firefox --ui` and friends for other browsers and modes — see [`e2e/README.md`](e2e/README.md)
+
 ### Google Drive Sync
 
 When running the extension from a local build, you will not be able to use the Google Drive Sync feature as the OAuth authenticator will not recognize your extension id.

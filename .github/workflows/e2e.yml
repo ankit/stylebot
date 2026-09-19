@@ -44,7 +44,7 @@ jobs:
         run: npx playwright install-deps chrome
 
       - name: Run e2e tests
-        run: yarn test:e2e
+        run: yarn e2e
 
       - name: Upload Playwright report
         if: ${{ !cancelled() }}

@@ -49,7 +49,7 @@ jobs:
         run: npx playwright install-deps firefox
 
       - name: Run e2e tests
-        run: yarn test:e2e:firefox
+        run: yarn e2e --firefox
 
       - name: Upload Playwright report
         if: ${{ !cancelled() }}
