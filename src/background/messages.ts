@@ -254,8 +254,18 @@ export const RunGoogleDriveSync = async (
   _message: RunGoogleDriveSyncType,
   sendResponse: (response: RunGoogleDriveSyncResponse) => void
 ): Promise<void> => {
-  await runGoogleDriveSync();
-  sendResponse();
+  try {
+    sendResponse(await runGoogleDriveSync());
+  } catch (e) {
+    // runGoogleDriveSync already returns failures as a result, so this only
+    // fires if that contract breaks. Left in because a missed sendResponse
+    // leaves the caller's spinner stuck until its page is reloaded.
+    sendResponse({
+      ok: false,
+      errorKey: 'sync_error_unknown',
+      errorDetail: e instanceof Error ? e.message : undefined,
+    });
+  }
 };
 
 export const GetRecentColors = async (

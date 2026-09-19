@@ -4,6 +4,7 @@ import {
   StylebotCommands,
   ReadabilitySettings,
   Timestamp,
+  GoogleDriveSyncMetadata,
 } from '@stylebot/types';
 
 export type GetAllOptionsResponse = StylebotOptions;
@@ -28,7 +29,22 @@ export type GetReadabilitySettingsResponse = ReadabilitySettings;
 
 export type GetImportCssResponse = string;
 export type GetGoogleWebFontExistsResponse = boolean;
-export type RunGoogleDriveSyncResponse = void;
+
+/**
+ * Locale keys rather than raw messages, so a Drive failure can be shown in
+ * the user's language instead of English from the API response.
+ */
+export type SyncErrorKey =
+  | 'sync_error_auth'
+  | 'sync_error_network'
+  | 'sync_error_not_found'
+  | 'sync_error_parse'
+  | 'sync_error_not_enabled'
+  | 'sync_error_unknown';
+
+export type RunGoogleDriveSyncResponse =
+  | { ok: true; metadata: GoogleDriveSyncMetadata }
+  | { ok: false; errorKey: SyncErrorKey; errorDetail?: string };
 
 export type GetRecentColorsResponse = Array<string>;
 export type AddRecentColorResponse = Array<string>;
