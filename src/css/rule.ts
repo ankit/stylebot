@@ -29,11 +29,16 @@ export const getRuleForSelector = (
   return found;
 };
 
+/**
+ * Collects the declarations of the rule for this selector, whether it is
+ * a whole grouped selector or one member of a group. Returns null when
+ * there is no rule or it is empty.
+ */
 export const getDeclarationsForSelector = (
   css: string,
   selector: string
 ): Array<CssDeclaration> | null => {
-  const rule = getRuleForSelector(css, selector);
+  const rule = getRule(css, selector) ?? getRuleForSelector(css, selector);
 
   if (!rule) {
     return null;

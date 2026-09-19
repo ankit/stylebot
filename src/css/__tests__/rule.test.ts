@@ -3,6 +3,7 @@ const dedent = require('dedent');
 import {
   getRule,
   getRuleForSelector,
+  getDeclarationsForSelector,
   getExistingSelector,
   splitSelectorFromGroup,
   addEmptyRule,
@@ -48,6 +49,42 @@ describe('rule', () => {
 
       const selector = '.mock-selector-3';
       expect(getRule(css, selector)).toEqual(null);
+    });
+  });
+
+  describe('getDeclarationsForSelector', () => {
+    const css = dedent`
+      .mock-selector-1, .mock-selector-2 {
+        color: red;
+        background: blue;
+      }
+
+      .mock-selector-3 {
+      }
+    `;
+
+    it('returns the declarations of a whole grouped selector', () => {
+      expect(
+        getDeclarationsForSelector(css, '.mock-selector-1, .mock-selector-2')
+      ).toEqual([
+        { property: 'color', value: 'red' },
+        { property: 'background', value: 'blue' },
+      ]);
+    });
+
+    it('returns the declarations of a member of a grouped selector', () => {
+      expect(getDeclarationsForSelector(css, '.mock-selector-2')).toEqual([
+        { property: 'color', value: 'red' },
+        { property: 'background', value: 'blue' },
+      ]);
+    });
+
+    it('returns null for an empty rule', () => {
+      expect(getDeclarationsForSelector(css, '.mock-selector-3')).toEqual(null);
+    });
+
+    it('returns null if not found', () => {
+      expect(getDeclarationsForSelector(css, '.mock-selector-4')).toEqual(null);
     });
   });
 
