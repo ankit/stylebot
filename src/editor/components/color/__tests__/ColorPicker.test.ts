@@ -2,6 +2,14 @@ import { shallowMount, Wrapper } from '@vue/test-utils';
 
 import ColorPicker from '../ColorPicker.vue';
 
+// The real page module pulls in the readability package, whose module-level
+// Vue.mixin would override test-utils' mocked `t`.
+jest.mock('@stylebot/page-bridge', () => ({
+  getPageBridge: () => ({
+    getPageColors: () => Promise.resolve({ text: [], surface: [], total: 0 }),
+  }),
+}));
+
 const buildMockStore = () => ({
   state: { activeSelector: 'h1' },
   getters: { activeRule: undefined },

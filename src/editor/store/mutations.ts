@@ -7,10 +7,15 @@ import {
 } from '@stylebot/types';
 
 import { State, CssSelectorMetadata } from './';
+import { PageSnapshot } from '@stylebot/page-bridge';
 
 export default {
   setVisible(state: State, visible: boolean): void {
     state.visible = visible;
+  },
+
+  setPage(state: State, page: PageSnapshot): void {
+    state.page = page;
   },
 
   setOptions(state: State, options: StylebotOptions): void {

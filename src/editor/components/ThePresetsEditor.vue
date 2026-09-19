@@ -18,6 +18,12 @@ export default Vue.extend({
     TheGrayscale,
     TheReadability,
   },
+
+  // Readerability and the body children grayscale attaches to can have
+  // changed since the store last looked.
+  created() {
+    this.$store.dispatch('refreshPage');
+  },
 });
 </script>
 

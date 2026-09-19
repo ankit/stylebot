@@ -13,7 +13,7 @@ class Highlighter {
   onSelect: (selector: string) => void;
   getStylebotDeclarations?: (selector: string) => Array<CssDeclaration> | null;
   getExistingSelector?: (el: HTMLElement) => string | null;
-  getMountRoot?: () => HTMLElement;
+  getMountRoot?: () => HTMLElement | undefined;
   currentElement: HTMLElement | null;
   drillStack: Array<HTMLElement>;
   /**
@@ -40,7 +40,7 @@ class Highlighter {
     /**
      * The editor's theme-provider element, for the on-page tip to mount into.
      */
-    getMountRoot?: () => HTMLElement;
+    getMountRoot?: () => HTMLElement | undefined;
   }) {
     this.overlay = null;
     this.onSelect = onSelect;

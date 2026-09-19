@@ -51,7 +51,7 @@ import ColorPickerFirstTab from './ColorPickerFirstTab.vue';
 import ColorPickerPalette from './ColorPickerPalette.vue';
 import ColorPickerCustom from './ColorPickerCustom.vue';
 import ColorPickerFooter from './ColorPickerFooter.vue';
-import { getPageColors } from '../../utils/page-colors';
+import { getPageBridge } from '@stylebot/page-bridge';
 import { getRecentColors, addRecentColor } from '../../utils/chrome';
 
 type Tab = 'already-used' | 'palette' | 'custom';
@@ -121,11 +121,11 @@ export default Vue.extend({
     },
   },
 
-  created() {
+  async created() {
     this.alreadyUsedColors = this.$store.getters.alreadyUsedColors;
 
     if (this.alreadyUsedColors.total === 0) {
-      this.pageColors = getPageColors();
+      this.pageColors = await getPageBridge().getPageColors();
     }
 
     const lastTab = this.$store.state.options.lastColorPickerTab as Tab;

@@ -23,13 +23,9 @@
 <script lang="ts">
 import Vue from 'vue';
 import { MenuItem, SCountBadge, SChip } from '@stylebot/components';
-import {
-  validateSelector,
-  getDeclarationsForSelector,
-  splitSelectorList,
-} from '@stylebot/css';
-import { Highlighter } from '@stylebot/highlighter';
-import { CssDeclaration } from '@stylebot/types';
+import { splitSelectorList } from '@stylebot/css';
+
+import { getPageBridge } from '@stylebot/page-bridge';
 
 export default Vue.extend({
   name: 'TheCssSelectorDropdownItem',
@@ -51,32 +47,16 @@ export default Vue.extend({
     },
   },
 
-  data(): { highlighter: Highlighter | null } {
-    return {
-      highlighter: null,
-    };
-  },
-
   computed: {
     parts(): Array<string> {
       return splitSelectorList(this.selector);
     },
   },
 
-  created() {
-    this.highlighter = new Highlighter({
-      onSelect: () => {
-        return;
-      },
-      getStylebotDeclarations: this.getStylebotDeclarations,
-      getMountRoot: () => this.$root.$el as HTMLElement,
-    });
-  },
-
   beforeDestroy() {
     // The menu unmounts on select/close, so the pointer/focus leave events
     // may never fire to clear a preview highlight — clear it here.
-    this.highlighter?.unhighlight();
+    this.clearPreview();
   },
 
   methods: {
@@ -85,19 +65,14 @@ export default Vue.extend({
     },
 
     preview(): void {
-      if (validateSelector(this.selector)) {
-        this.highlighter?.highlight(this.selector);
-      } else {
-        this.highlighter?.unhighlight();
-      }
+      getPageBridge().highlight(this.selector);
     },
 
+    // The preview shares the page's single highlight with the dropdown's
+    // own active-selector preview, so hand it back once the hover ends.
     clearPreview(): void {
-      this.highlighter?.unhighlight();
-    },
-
-    getStylebotDeclarations(selector: string): Array<CssDeclaration> | null {
-      return getDeclarationsForSelector(this.$store.state.css, selector);
+      getPageBridge().unhighlight();
+      this.$emit('preview-end');
     },
   },
 });

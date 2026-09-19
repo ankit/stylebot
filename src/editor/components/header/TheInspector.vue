@@ -17,9 +17,9 @@ import Vue from 'vue';
 
 import { STooltip } from '@stylebot/components';
 import { InspectorIcon } from '@stylebot/icons';
-import { Highlighter } from '@stylebot/highlighter';
-import { getDeclarationsForSelector, getExistingSelector } from '@stylebot/css';
-import { CssDeclaration, StylebotEditingMode } from '@stylebot/types';
+import { StylebotEditingMode } from '@stylebot/types';
+
+import { getPageBridge } from '@stylebot/page-bridge';
 
 export default Vue.extend({
   name: 'TheInspector',
@@ -30,10 +30,10 @@ export default Vue.extend({
   },
 
   data(): {
-    highlighter: Highlighter | null;
+    unsubscribeSelect: (() => void) | null;
   } {
     return {
-      highlighter: null,
+      unsubscribeSelect: null,
     };
   },
 
@@ -58,9 +58,9 @@ export default Vue.extend({
   watch: {
     active(newValue: boolean): void {
       if (!newValue) {
-        this.highlighter?.stopInspecting();
+        getPageBridge().stopInspecting();
       } else {
-        this.highlighter?.startInspecting();
+        getPageBridge().startInspecting();
       }
     },
 
@@ -72,21 +72,21 @@ export default Vue.extend({
   },
 
   created() {
-    this.highlighter = new Highlighter({
-      onSelect: this.select,
-      getStylebotDeclarations: this.getStylebotDeclarations,
-      getExistingSelector: this.findExistingSelector,
-      getMountRoot: () => this.$root.$el as HTMLElement,
-    });
+    this.unsubscribeSelect = getPageBridge().on('select', this.select);
+  },
 
+  // On mount, not create: a replaced instance stops inspecting on destroy,
+  // which Vue runs after the replacement's created hook.
+  mounted() {
     if (this.active) {
-      this.highlighter?.startInspecting();
+      getPageBridge().startInspecting();
     }
   },
 
   beforeDestroy() {
+    this.unsubscribeSelect?.();
     this.$store.commit('setInspecting', false);
-    this.highlighter?.stopInspecting();
+    getPageBridge().stopInspecting();
   },
 
   methods: {
@@ -102,14 +102,6 @@ export default Vue.extend({
     select(selector: string): void {
       this.toggle();
       this.$emit('select', selector);
-    },
-
-    getStylebotDeclarations(selector: string): Array<CssDeclaration> | null {
-      return getDeclarationsForSelector(this.$store.state.css, selector);
-    },
-
-    findExistingSelector(el: HTMLElement): string | null {
-      return getExistingSelector(el, this.$store.state.css);
     },
   },
 });

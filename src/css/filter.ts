@@ -1,6 +1,6 @@
 import * as postcss from 'postcss';
 
-import { addDeclaration, getSelector } from '@stylebot/css';
+import { addDeclaration } from '@stylebot/css';
 
 import { FilterEffect } from '@stylebot/types';
 
@@ -8,39 +8,13 @@ const getEffectRegex = (name: FilterEffect) => new RegExp(`${name}\\((.*)\\)$`);
 const getEffectDeclarationValue = (name: FilterEffect, percent: string) =>
   `${name}(${percent}%)`;
 
-const getSelectorsToAttachFilterForPage = (): Array<string> => {
-  const el = document.querySelector('body');
-  const nodes: Array<HTMLElement> = Array.prototype.slice.call(el?.childNodes);
-
-  const filteredNodes = nodes.filter(node => {
-    if (!node.tagName) {
-      return false;
-    }
-
-    const tagName = node.tagName.toLowerCase();
-
-    if (
-      tagName === 'script' ||
-      tagName === 'style' ||
-      tagName === 'noscript' ||
-      node.id === 'stylebot'
-    ) {
-      return false;
-    }
-
-    return true;
-  });
-
-  return filteredNodes.map(node => getSelector(node));
-};
-
 export const getFilterEffectValueForPage = (
   effectName: FilterEffect,
-  css: string
+  css: string,
+  selectors: Array<string>
 ): number => {
   const root = postcss.parse(css);
   const regex = getEffectRegex(effectName);
-  const selectors = getSelectorsToAttachFilterForPage();
 
   let value = 0;
   selectors.forEach(selector => {
@@ -63,12 +37,12 @@ export const getFilterEffectValueForPage = (
 export const getCssAfterApplyingFilterEffectToPage = (
   effectName: FilterEffect,
   css: string,
-  percent: string
+  percent: string,
+  selectors: Array<string>
 ): string => {
   let root = postcss.parse(css);
 
   const regex = getEffectRegex(effectName);
-  const selectors = getSelectorsToAttachFilterForPage();
   const effectValue = getEffectDeclarationValue(effectName, percent);
 
   selectors.forEach(selector => {

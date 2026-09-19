@@ -17,7 +17,6 @@
 import Vue from 'vue';
 import { ToggleSwitch, SText } from '@stylebot/components';
 
-import { isReaderable } from '@stylebot/readability';
 import FeatureCard from './FeatureCard.vue';
 
 export default Vue.extend({
@@ -31,7 +30,7 @@ export default Vue.extend({
 
   computed: {
     pageReaderable(): boolean {
-      return isReaderable();
+      return this.$store.state.page.readerable;
     },
 
     value(): boolean {

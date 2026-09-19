@@ -8,13 +8,25 @@ import TheStylebotApp from '../components/TheStylebotApp.vue';
 
 import '../index.scss';
 
-Vue.component('VueDraggableResizable', VueDraggableResizable);
+let vueReady = false;
 
-Vue.mixin({
-  methods: {
-    t,
-  },
-});
+/**
+ * Registers the globals every editor host needs before mounting.
+ */
+const setupVue = (): void => {
+  if (vueReady) {
+    return;
+  }
+  vueReady = true;
+
+  Vue.component('VueDraggableResizable', VueDraggableResizable);
+
+  Vue.mixin({
+    methods: {
+      t,
+    },
+  });
+};
 
 const SELF_HOSTED_FONTS = [
   { family: 'Fira Code', file: 'fira-code', weights: [400, 500, 600] },
@@ -56,6 +68,8 @@ const initEditor = (store: Store<State>): void => {
     return;
   }
 
+  setupVue();
+
   const stylebotAppHost = document.createElement('div');
   stylebotAppHost.id = 'stylebot';
 
@@ -90,4 +104,4 @@ const initEditor = (store: Store<State>): void => {
   });
 };
 
-export { initEditor };
+export { initEditor, setupVue };

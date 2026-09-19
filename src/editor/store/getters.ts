@@ -8,7 +8,6 @@ import {
   getAlreadyUsedColors,
   RoleColorGroups,
 } from '@stylebot/css';
-import { isReaderable } from '@stylebot/readability';
 
 export default {
   /**
@@ -30,12 +29,16 @@ export default {
     getAlreadyUsedColors(state.css),
 
   grayscale: (state: State): number => {
-    return getFilterEffectValueForPage('grayscale', state.css);
+    return getFilterEffectValueForPage(
+      'grayscale',
+      state.css,
+      state.page.bodyChildSelectors
+    );
   },
 
   // state.readability alone can be true domain-wide while this page
   // doesn't actually qualify (e.g. a wiki's main page).
   readabilityActive: (state: State): boolean => {
-    return state.readability && isReaderable();
+    return state.readability && state.page.readerable;
   },
 };

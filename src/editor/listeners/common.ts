@@ -10,12 +10,14 @@ import {
   enableStyle as sendEnableStyleMessage,
   disableStyle as sendDisableStyleMessage,
 } from '../utils/chrome';
+import { initEditor } from '../utils/init-editor';
 
 export const toggleStylebot = (store: Store<State>, inspect = true): void => {
   if (store.state.visible) {
     store.dispatch('closeStylebot');
   } else {
-    store.dispatch('openStylebot', { store, inspect });
+    initEditor(store);
+    store.dispatch('openStylebot', { inspect });
   }
 };
 

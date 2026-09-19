@@ -26,6 +26,7 @@ export {
   getAncestorBasedSelector,
   splitSelectorList,
   validateSelector,
+  getBodyChildSelectors,
 } from './selector';
 
 export {

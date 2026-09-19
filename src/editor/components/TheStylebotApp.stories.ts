@@ -2,7 +2,10 @@ import type { Meta, StoryObj } from '@storybook/vue';
 import { expect, waitFor } from '@storybook/test';
 
 import TheStylebotApp from './TheStylebotApp.vue';
-import { getCssAfterApplyingFilterEffectToPage } from '@stylebot/css';
+import {
+  getCssAfterApplyingFilterEffectToPage,
+  getBodyChildSelectors,
+} from '@stylebot/css';
 import { editor, WITH_RULE } from '@stylebot/storybook/editor-story';
 import { collapseAllCards, storeOf } from '@stylebot/storybook/story-helpers';
 
@@ -33,8 +36,16 @@ export const MagicGrayscaleApplied: StoryObj = {
   ...editor({ options: { mode: 'magic' } }),
   play: async ({ canvasElement }) => {
     const store = storeOf(canvasElement);
+    const bodyChildSelectors = getBodyChildSelectors();
+
+    store.commit('setPage', { ...store.state.page, bodyChildSelectors });
     store.dispatch('applyCss', {
-      css: getCssAfterApplyingFilterEffectToPage('grayscale', '', '100'),
+      css: getCssAfterApplyingFilterEffectToPage(
+        'grayscale',
+        '',
+        '100',
+        bodyChildSelectors
+      ),
     });
     await waitFor(() => expect(store.getters.grayscale).toBe(100));
   },

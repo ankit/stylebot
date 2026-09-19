@@ -233,3 +233,33 @@ export const validateSelector = (selector: string): boolean => {
     return false;
   }
 };
+
+/**
+ * Selectors for body's rendered children (not scripts, styles or the
+ * editor's own host) — the elements page-wide effects attach to.
+ */
+export const getBodyChildSelectors = (): Array<string> => {
+  const el = document.querySelector('body');
+  const nodes: Array<HTMLElement> = Array.prototype.slice.call(el?.childNodes);
+
+  const filteredNodes = nodes.filter(node => {
+    if (!node.tagName) {
+      return false;
+    }
+
+    const tagName = node.tagName.toLowerCase();
+
+    if (
+      tagName === 'script' ||
+      tagName === 'style' ||
+      tagName === 'noscript' ||
+      node.id === 'stylebot'
+    ) {
+      return false;
+    }
+
+    return true;
+  });
+
+  return filteredNodes.map(node => getSelector(node));
+};
