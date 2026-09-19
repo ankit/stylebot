@@ -3,10 +3,12 @@ import { SyncState } from '@stylebot/types';
 
 import TheGoogleDriveSync from './TheGoogleDriveSync.vue';
 
+const dispatch = jest.fn();
+
 const mountCard = (state: Record<string, unknown>) =>
   mount(TheGoogleDriveSync, {
     mocks: {
-      $store: { state, dispatch: jest.fn() },
+      $store: { state, dispatch },
     },
   });
 
@@ -91,5 +93,54 @@ describe('TheGoogleDriveSync.vue', () => {
     });
 
     expect(wrapper.find('button[disabled]').exists()).toBe(true);
+  });
+
+  it('mentions the auto-sync cadence, or the sign-in that is needed instead', () => {
+    const enabled = {
+      googleDriveSyncEnabled: true,
+      googleDriveSyncState: syncState(new Date().toISOString()),
+      syncInProgress: false,
+    };
+
+    const auto = mountCard({ ...enabled, googleDriveSyncNeedsAuth: false });
+    expect(auto.text()).toContain('sync_auto_caption');
+    expect(auto.text()).not.toContain('sync_needs_sign_in');
+
+    const signIn = mountCard({ ...enabled, googleDriveSyncNeedsAuth: true });
+    expect(signIn.text()).toContain('sync_needs_sign_in');
+    expect(signIn.text()).not.toContain('sync_auto_caption');
+  });
+
+  it('lists conflicts with a way to open the style and to dismiss it', async () => {
+    dispatch.mockClear();
+
+    const wrapper = mountCard({
+      googleDriveSyncEnabled: true,
+      googleDriveSyncState: {
+        ...syncState(new Date().toISOString()),
+        conflicts: [{ url: 'example.com', at: '2026-09-18T00:00:00.000Z' }],
+      },
+      syncInProgress: false,
+    });
+
+    expect(wrapper.text()).toContain('sync_conflicts_title');
+    expect(wrapper.text()).toContain('example.com');
+
+    const buttons = wrapper.findAll('.conflict button');
+    await buttons.at(0).trigger('click');
+    expect(wrapper.emitted('edit')).toEqual([['example.com']]);
+
+    await buttons.at(1).trigger('click');
+    expect(dispatch).toBeCalledWith('dismissSyncConflict', 'example.com');
+  });
+
+  it('shows no conflict block when there are none', () => {
+    const wrapper = mountCard({
+      googleDriveSyncEnabled: true,
+      googleDriveSyncState: syncState(new Date().toISOString()),
+      syncInProgress: false,
+    });
+
+    expect(wrapper.text()).not.toContain('sync_conflicts_title');
   });
 });

@@ -165,4 +165,69 @@ test.describe('Sync tab', () => {
       .poll(async () => Object.keys(await readStorage(page, keys)))
       .toEqual([]);
   });
+
+  test('asks for a sign-in when a scheduled sync could not get a token', async ({
+    context,
+    extension,
+  }) => {
+    const page = await context.newPage();
+
+    await openSyncTab(page, extension, {
+      'google-drive-sync-enabled': true,
+      'google-drive-sync-state': syncState(new Date().toISOString()),
+      'google-drive-sync-needs-auth': true,
+    });
+
+    await expect(
+      page.getByText('Sign in to Google Drive to resume syncing.')
+    ).toBeVisible();
+    await expect(page.getByText(/Syncs every \d+ minutes/)).toHaveCount(0);
+  });
+
+  test('lists merge conflicts, opens the style to review, and dismisses it', async ({
+    context,
+    extension,
+  }) => {
+    const page = await context.newPage();
+    const css =
+      'a { color: blue; }\n\n/* Stylebot sync conflict on 2026-09-18: another device had\na { color: green; }\n*/\n';
+
+    await openSyncTab(page, extension, {
+      'google-drive-sync-enabled': true,
+      styles: {
+        'example.com': {
+          css,
+          enabled: true,
+          readability: false,
+          modifiedTime: '2026-09-18T00:00:00.000Z',
+        },
+      },
+      'google-drive-sync-state': {
+        ...syncState(new Date().toISOString()),
+        conflicts: [{ url: 'example.com', at: '2026-09-18T00:00:00.000Z' }],
+      },
+    });
+
+    const notice = page.getByText('Edits from another device were merged');
+    await expect(notice).toBeVisible();
+    await expect(page.getByText('example.com', { exact: true })).toBeVisible();
+
+    await page.getByRole('button', { name: 'Review' }).click();
+
+    // Review jumps to the Styles tab with that style open for editing.
+    await expect(page.locator('input.url-input')).toHaveValue('example.com');
+
+    await page.getByRole('button', { name: 'Sync', exact: true }).click();
+    await page.getByRole('button', { name: 'Dismiss' }).click();
+
+    await expect(notice).toHaveCount(0);
+    await expect
+      .poll(async () => {
+        const items = await readStorage(page, ['google-drive-sync-state']);
+        return (
+          items['google-drive-sync-state'] as { conflicts: Array<unknown> }
+        ).conflicts;
+      })
+      .toEqual([]);
+  });
 });

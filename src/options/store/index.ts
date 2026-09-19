@@ -11,9 +11,15 @@ import {
   SyncState,
   SyncErrorKey,
 } from '@stylebot/types';
-import { getGoogleDriveSyncEnabled, getSyncState } from '@stylebot/sync';
+import {
+  getGoogleDriveSyncEnabled,
+  getSyncState,
+  getSyncNeedsAuth,
+  setGoogleDriveSyncEnabled,
+  clearSyncState,
+  dismissSyncConflict,
+} from '@stylebot/sync';
 import { getCurrentTimestamp } from '@stylebot/utils';
-import { setGoogleDriveSyncEnabled, clearSyncState } from '@stylebot/sync';
 
 import {
   getAllStyles,
@@ -40,6 +46,7 @@ type State = {
 
   googleDriveSyncEnabled: boolean;
   googleDriveSyncState: SyncState | undefined;
+  googleDriveSyncNeedsAuth: boolean;
 
   syncInProgress: boolean;
   syncStatus: SyncStatus;
@@ -52,6 +59,7 @@ export default new Vuex.Store<State>({
     commands: defaultCommands,
     googleDriveSyncEnabled: false,
     googleDriveSyncState: undefined,
+    googleDriveSyncNeedsAuth: false,
     syncInProgress: false,
     syncStatus: null,
   },
@@ -73,7 +81,13 @@ export default new Vuex.Store<State>({
       state.googleDriveSyncEnabled = await getGoogleDriveSyncEnabled();
       if (state.googleDriveSyncEnabled) {
         state.googleDriveSyncState = await getSyncState();
+        state.googleDriveSyncNeedsAuth = await getSyncNeedsAuth();
       }
+    },
+
+    async dismissSyncConflict({ state }, url: string) {
+      await dismissSyncConflict(url);
+      state.googleDriveSyncState = await getSyncState();
     },
 
     setAllStyles({ state }, styles: StyleMap) {
@@ -186,6 +200,7 @@ export default new Vuex.Store<State>({
       }
 
       state.googleDriveSyncState = undefined;
+      state.googleDriveSyncNeedsAuth = false;
       state.syncStatus = null;
 
       // Leaving the stored state behind meant re-enabling picked up a stale
