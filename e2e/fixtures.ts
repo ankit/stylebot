@@ -10,9 +10,9 @@ import type http from 'node:http';
 import os from 'node:os';
 import path from 'node:path';
 import { ChromiumEngine } from './chromium/engine';
-import type { Engine, Extension, ExtensionFunction, Popup } from './engine';
+import type { Engine, Extension, Popup } from './engine';
 
-export type { Popup, PopupLocator } from './engine';
+export type { Extension, Popup, PopupLocator } from './engine';
 import { FirefoxEngine } from './firefox/engine';
 
 // Set by scripts/e2e.mjs (`yarn e2e --firefox`; `--edge` is handled inside chromium/).
@@ -60,10 +60,6 @@ type Instance = {
   userDataDir: string;
   extension: Extension;
 };
-export type RunInExtension = <A, R>(
-  fn: ExtensionFunction<A, R>,
-  arg?: A
-) => Promise<R>;
 
 // One browser+extension instance per worker, reused across every test file that worker
 // runs — get() relaunches it on demand if the shared Chrome process died mid-suite.
@@ -82,7 +78,7 @@ class BrowserPool {
       return this.current;
     }
 
-    // Concurrent fixtures (context, extensionId) can both notice a dead browser in
+    // Concurrent fixtures (context, extension) can both notice a dead browser in
     // the same tick — share one relaunch instead of racing two.
     this.launching ??= this.launch().then(instance => {
       this.current = instance;
@@ -140,15 +136,6 @@ class BrowserPool {
     return instance;
   }
 
-  /**
-   * Runs `fn(arg)` with the extension's own privileges — in the background
-   * service worker on Chromium, or the background page on Firefox.
-   */
-  async runInExtension<A, R>(fn: ExtensionFunction<A, R>, arg?: A): Promise<R> {
-    const { extension } = await this.get();
-    return extension.evaluate(fn, arg);
-  }
-
   // Tears down every instance this worker ever launched, not just the current one —
   // a mid-suite relaunch leaves earlier instances orphaned otherwise.
   async closeAll(): Promise<void> {
@@ -173,8 +160,7 @@ export const test = base.extend<
     // worker-scoped browser pool's current context with per-test trace/tab/storage isolation.
     context: BrowserContext;
     engine: Engine;
-    extensionId: string;
-    runInExtension: RunInExtension;
+    extension: Extension;
     openPopup: () => Promise<Popup>;
   },
   {
@@ -195,9 +181,9 @@ export const test = base.extend<
 
   // Test-scoped so it always matches whatever context the same test's `context`
   // fixture resolved to, including right after a mid-suite relaunch.
-  extensionId: async ({ browserPool }, use) => {
+  extension: async ({ browserPool }, use) => {
     const { extension } = await browserPool.get();
-    await use(extension.id);
+    await use(extension);
   },
 
   // Saves a per-test trace chunk and resets tabs/storage after so state can't leak
@@ -258,10 +244,6 @@ export const test = base.extend<
   // For the rare spec that must know what the engine can observe.
   engine: async ({}, use) => {
     await use(engine);
-  },
-
-  runInExtension: async ({ browserPool }, use) => {
-    await use((fn, arg) => browserPool.runInExtension(fn, arg));
   },
 
   openPopup: async ({ browserPool }, use) => {

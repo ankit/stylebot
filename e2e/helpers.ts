@@ -1,7 +1,7 @@
 import http from 'node:http';
 import type { AddressInfo } from 'node:net';
 import type { Locator, Page } from '@playwright/test';
-import { closeServer, type Popup, type RunInExtension } from './fixtures';
+import { closeServer, type Extension, type Popup } from './fixtures';
 
 // Generalizes the inline http.createServer pattern from style-important-override.spec.ts
 // to serve multiple paths, for tests that need real multi-page navigation.
@@ -33,13 +33,13 @@ type SeededStyle = {
   readability?: boolean;
 };
 
-// Generalizes the runInExtension(chrome.storage.local.set(...)) pattern from
+// Generalizes the extension.evaluate(chrome.storage.local.set(...)) pattern from
 // style-important-override.spec.ts to seed multiple, arbitrarily-keyed style patterns.
 export const seedStyles = async (
-  runInExtension: RunInExtension,
+  extension: Extension,
   styles: Record<string, SeededStyle>
 ): Promise<void> => {
-  await runInExtension(
+  await extension.evaluate(
     seeded =>
       chrome.storage.local.set({
         styles: Object.fromEntries(

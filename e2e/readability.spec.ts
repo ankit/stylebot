@@ -86,7 +86,7 @@ test('toggling readability on in the popup activates the reader', async ({
 test("toggling readability with a second window open targets the popup's own tab", async ({
   context,
   openPopup,
-  runInExtension,
+  extension,
 }) => {
   // Two tabs cold-starting their editor init chains contend for the same
   // background worker, which can delay listener readiness — wider budget.
@@ -99,7 +99,10 @@ test("toggling readability with a second window open targets the popup's own tab
   // The new window surfaces as about:blank first, so wait on the URL rather
   // than filtering the page event.
   const pageBPromise = context.waitForEvent('page');
-  await runInExtension(url => chrome.windows.create({ url }), `${baseUrl}-2`);
+  await extension.evaluate(
+    url => chrome.windows.create({ url }),
+    `${baseUrl}-2`
+  );
   const pageB = await pageBPromise;
   await pageB.waitForURL(`${baseUrl}-2`);
   await pageB.bringToFront();

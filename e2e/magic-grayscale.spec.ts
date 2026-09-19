@@ -38,7 +38,6 @@ const setRangeValue = (slider: Locator, value: string): Promise<void> =>
 
 test('taking grayscale back to 0 keeps the rest of the rule in the saved style', async ({
   context,
-  extensionId: _extensionId,
   openPopup,
 }) => {
   test.slow();
@@ -89,7 +88,6 @@ test('taking grayscale back to 0 keeps the rest of the rule in the saved style',
 
 test('grayscale applies on a page whose body child has no class or id', async ({
   context,
-  extensionId: _extensionId,
   openPopup,
 }) => {
   test.slow();

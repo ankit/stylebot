@@ -67,13 +67,12 @@ and skips otherwise (`editor-webfont.spec.ts`).
 
 Import `test`/`expect` from `./fixtures`, not `@playwright/test`.
 
-| fixture                    | use                                                                                                                                                                            |
-| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `context`                  | the shared `BrowserContext`; tabs opened during a test are closed after it                                                                                                     |
-| `runInExtension(fn, arg?)` | run `fn` with the extension's privileges (service worker on Chromium, background page on Firefox) and get its JSON-serializable result — how tests read/write `chrome.storage` |
-| `openPopup()`              | open the popup in the background (so the page under test stays the "current tab") and get a `Popup`                                                                            |
-| `engine`                   | the `Engine` in use, for the rare spec that must know what it can observe                                                                                                      |
-| `extensionId`              | the extension's id (its `moz-extension://` UUID on Firefox)                                                                                                                    |
+| fixture       | use                                                                                                                                                                                                                                                                                           |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `context`     | the shared `BrowserContext`; tabs opened during a test are closed after it                                                                                                                                                                                                                    |
+| `extension`   | the loaded `Extension`; `extension.evaluate(fn, arg?)` runs `fn` with its privileges (service worker on Chromium, background page on Firefox) and returns the JSON-serializable result — how tests read/write `chrome.storage`; `extension.id` is its id (`moz-extension://` UUID on Firefox) |
+| `openPopup()` | open the popup in the background (so the page under test stays the "current tab") and get a `Popup`                                                                                                                                                                                           |
+| `engine`      | the `Engine` in use, for the rare spec that must know what it can observe                                                                                                                                                                                                                     |
 
 ### Driving the popup
 
@@ -92,5 +91,5 @@ await expect.poll(() => toggle.locator('input').isChecked()).toBe(true);
 ```
 
 Helpers in `helpers.ts`: `startTestServer(routes)` for local pages (use `closeServer` in
-`afterAll` — the shared browser keeps connections alive), `seedStyles(runInExtension, …)`,
+`afterAll` — the shared browser keeps connections alive), `seedStyles(extension, …)`,
 `openEditor`, `switchEditorMode`, `getMonacoFrame`.

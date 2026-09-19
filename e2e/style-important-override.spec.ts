@@ -23,9 +23,9 @@ test.afterAll(() => server.close());
 
 test('overrides a page rule that also uses !important (regression: #894)', async ({
   context,
-  runInExtension,
+  extension,
 }) => {
-  await seedStyles(runInExtension, {
+  await seedStyles(extension, {
     localhost: {
       css: 'h1 { color: rgb(0, 0, 255) !important; }',
       enabled: true,
