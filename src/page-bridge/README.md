@@ -11,6 +11,9 @@ store, which persists it to the background.
 - **`PageBridge`**: the type, plus `PageSnapshot`, the page facts the store mirrors
 - **`LocalPageBridge`**: the implementation for a host that runs inside the page (the
   content script)
+- **`remote-page-bridge`**: the implementation for a host in its own extension window,
+  driving the tab's content script over a port — the class, the port name and the messages
+  that cross it in both directions
 - **`PageBridgeEmitter`**: the small typed emitter both implementations share
 - **`page-colors`**: samples the colors in use on the page for the color picker
 - **`index`**: `setPageBridge` / `getPageBridge`, the registry each host fills at boot
