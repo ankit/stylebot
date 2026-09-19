@@ -88,3 +88,45 @@ test('falls back to page colors, then switches to already-used colors once a rul
     popover.locator('.recent-section .swatch[style*="17, 34, 51"]')
   ).toBeVisible();
 });
+
+test('Escape closes the color picker popover instead of the whole editor', async ({
+  context,
+  openPopup,
+}) => {
+  await context.route('http://localhost/**', route =>
+    route.fulfill({ contentType: 'text/html', body: PAGE_HTML })
+  );
+
+  const page = await context.newPage();
+  await page.goto('http://localhost/');
+
+  const editorRoot = await openEditor(page, openPopup);
+  await page.getByPlaceholder('Pick an element').fill('h1');
+
+  const textCard = page.locator('.property-card').filter({
+    has: page.locator('.property-card-label', { hasText: /^Text$/ }),
+  });
+  await textCard.locator('.color-swatch').click();
+
+  const popover = page.locator('.color-picker-popover');
+  await expect(popover).toBeVisible();
+
+  // A dropdown inside the popover (palette search) takes the first Escape;
+  // the popover itself takes the next one.
+  await popover.locator('.tabs .tab', { hasText: 'Palette' }).click();
+  const search = popover.locator('.palette-search .autocomplete-input');
+  await search.click();
+  const searchMenu = popover.locator('.anchored-menu-panel');
+  await expect(searchMenu).toBeVisible();
+
+  await page.keyboard.press('Escape');
+  await expect(searchMenu).toBeHidden();
+  await expect(popover).toBeVisible();
+
+  await page.keyboard.press('Escape');
+  await expect(popover).toBeHidden();
+  await expect(editorRoot.locator('.stylebot-content')).toHaveCount(1);
+
+  await page.keyboard.press('Escape');
+  await expect(editorRoot.locator('.stylebot-content')).toHaveCount(0);
+});
