@@ -1,6 +1,12 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import VueDraggableResizable from 'vue-draggable-resizable';
+import { addons } from '@storybook/preview-api';
+import {
+  FORCE_REMOUNT,
+  GLOBALS_UPDATED,
+  STORY_RENDERED,
+} from '@storybook/core-events';
 import type { Preview } from '@storybook/vue';
 
 import { t } from '@stylebot/i18n';
@@ -15,6 +21,22 @@ Vue.use(Vuex);
 Vue.component('vue-draggable-resizable', VueDraggableResizable);
 Vue.mixin({ methods: { t } });
 installChrome();
+
+/* The Vue 2 renderer only pushes args into the mounted story on re-render,
+   so a toolbar theme change has to remount for the decorator and seeded
+   stores to pick it up. */
+const channel = addons.getChannel();
+let currentStoryId: string | undefined;
+
+channel.on(STORY_RENDERED, (storyId: string) => {
+  currentStoryId = storyId;
+});
+
+channel.on(GLOBALS_UPDATED, () => {
+  if (currentStoryId) {
+    channel.emit(FORCE_REMOUNT, { storyId: currentStoryId });
+  }
+});
 
 const FONTS = [
   '400 14px Geist',
