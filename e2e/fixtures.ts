@@ -13,9 +13,11 @@ import { ChromiumEngine } from './chromium/engine';
 import type { Engine, Extension, ExtensionFunction } from './engine';
 import { FirefoxEngine } from './firefox/engine';
 
-// Set by scripts/e2e.mjs (`yarn e2e --firefox`; `--edge` is handled inside chromium.ts).
-export const IS_FIREFOX = process.env.STYLEBOT_BROWSER === 'firefox';
-const engine: Engine = IS_FIREFOX ? new FirefoxEngine() : new ChromiumEngine();
+// Set by scripts/e2e.mjs (`yarn e2e --firefox`; `--edge` is handled inside chromium/).
+const engine: Engine =
+  process.env.STYLEBOT_BROWSER === 'firefox'
+    ? new FirefoxEngine()
+    : new ChromiumEngine();
 
 const DIST_PATH = path.resolve(__dirname, '..', engine.distDir);
 
@@ -254,34 +256,16 @@ export const test = base.extend<
     await use((fn, arg) => browserPool.runInExtension(fn, arg));
   },
 
-  // Opens the popup by URL (Playwright can't click a real toolbar icon), in the
-  // background so it doesn't steal "current tab" from the page under test.
-  openPopup: async ({ context, extensionId }, use) => {
-    // Playwright can't attach to moz-extension:// pages (see e2e/README.md), so any
-    // test that needs the popup is skipped there simply by depending on this fixture.
+  // Any test that needs the popup is skipped on engines without one simply by
+  // depending on this fixture.
+  openPopup: async ({ browserPool }, use) => {
     test.skip(
-      IS_FIREFOX,
-      'Playwright cannot drive extension pages (the popup) in Firefox'
+      !engine.openPopup,
+      'Playwright cannot drive extension pages (the popup) in this browser'
     );
 
-    const cdp = await context.browser()!.newBrowserCDPSession();
-
-    const popupUrl = `chrome-extension://${extensionId}/popup/index.html`;
-
-    const open = async (): Promise<Page> => {
-      // Filtered so the onInstalled help tab can't win this race instead.
-      const pagePromise = context.waitForEvent(
-        'page',
-        p => p.url() === popupUrl
-      );
-      await cdp.send('Target.createTarget', {
-        url: popupUrl,
-        background: true,
-      });
-      return pagePromise;
-    };
-
-    await use(open);
+    const { context, extension } = await browserPool.get();
+    await use(() => engine.openPopup!(context, extension));
   },
 });
 

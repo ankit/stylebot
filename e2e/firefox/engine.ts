@@ -52,4 +52,7 @@ export class FirefoxEngine implements Engine {
   ): Promise<Extension> {
     return FirefoxExtension.load(this.rdpPort, distPath);
   }
+
+  // No openPopup: neither of Playwright's Firefox drivers can attach to
+  // moz-extension:// documents (see e2e/README.md).
 }

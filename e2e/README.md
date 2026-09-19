@@ -54,8 +54,8 @@ console actor.
 Neither of Playwright's Firefox drivers can attach to `moz-extension://` documents — its
 own build's Juggler skips them, and stock Firefox's BiDi excludes extension contexts
 ([bug 1755014](https://bugzilla.mozilla.org/show_bug.cgi?id=1755014)). So the popup can't
-be driven as a page there. Any test that uses the `openPopup` fixture is skipped on
-Firefox by the fixture itself; the storage-seeded content-script specs (`style-*.spec.ts`)
+be driven as a page there, so `FirefoxEngine` has no `openPopup` and any test that uses the
+`openPopup` fixture is skipped by the fixture itself; the storage-seeded content-script specs (`style-*.spec.ts`)
 run on all three browsers.
 
 If a new test can be written as "seed styles into storage, load a page, assert on the
@@ -70,7 +70,7 @@ Import `test`/`expect` from `./fixtures`, not `@playwright/test`.
 | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `context`                  | the shared `BrowserContext`; tabs opened during a test are closed after it                                                                                                     |
 | `runInExtension(fn, arg?)` | run `fn` with the extension's privileges (service worker on Chromium, background page on Firefox) and get its JSON-serializable result — how tests read/write `chrome.storage` |
-| `openPopup()`              | open the popup as a page, in the background so the page under test stays the "current tab"; skips the test on Firefox                                                          |
+| `openPopup()`              | open the popup as a page via `engine.openPopup`, in the background so the page under test stays the "current tab"; skips the test on engines without it (Firefox)              |
 | `extensionId`              | the extension's id (its `moz-extension://` UUID on Firefox)                                                                                                                    |
 
 Helpers in `helpers.ts`: `startTestServer(routes)` for local pages (use `closeServer` in

@@ -1,4 +1,4 @@
-import { chromium, type BrowserContext } from '@playwright/test';
+import { chromium, type BrowserContext, type Page } from '@playwright/test';
 import type { Engine, Extension, LaunchOptions } from '../engine';
 import { ChromiumExtension } from './extension';
 
@@ -39,5 +39,19 @@ export class ChromiumEngine implements Engine {
       path: distPath,
     });
     return new ChromiumExtension(context, id);
+  }
+
+  // Playwright can't click a real toolbar icon, so the popup is opened by URL.
+  async openPopup(
+    context: BrowserContext,
+    extension: Extension
+  ): Promise<Page> {
+    const popupUrl = `chrome-extension://${extension.id}/popup/index.html`;
+
+    // Filtered so the onInstalled help tab can't win this race instead.
+    const pagePromise = context.waitForEvent('page', p => p.url() === popupUrl);
+    const cdp = await context.browser()!.newBrowserCDPSession();
+    await cdp.send('Target.createTarget', { url: popupUrl, background: true });
+    return pagePromise;
   }
 }

@@ -1,4 +1,4 @@
-import type { BrowserContext } from '@playwright/test';
+import type { BrowserContext, Page } from '@playwright/test';
 
 /*
  * What fixtures.ts needs from a browser engine: launch it, load the built
@@ -28,4 +28,8 @@ export interface Engine {
   distDir: string;
   launch(userDataDir: string, options: LaunchOptions): Promise<BrowserContext>;
   loadExtension(context: BrowserContext, distPath: string): Promise<Extension>;
+  // Opens the popup as a page, in the background so the page under test stays the
+  // "current tab". Absent on engines where Playwright can't drive extension pages;
+  // tests that depend on it are skipped there.
+  openPopup?(context: BrowserContext, extension: Extension): Promise<Page>;
 }
