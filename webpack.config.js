@@ -48,6 +48,22 @@ class WriteBuildMarkerPlugin {
   }
 }
 
+/**
+ * The store build's public key, from STYLEBOT_EXTENSION_KEY or a git-ignored
+ * .extension-key file at the repo root. See README, "Google Drive Sync".
+ */
+const getDevExtensionKey = () => {
+  if (process.env.STYLEBOT_EXTENSION_KEY) {
+    return process.env.STYLEBOT_EXTENSION_KEY.trim();
+  }
+
+  const keyPath = `${__dirname}/.extension-key`;
+
+  return fs.existsSync(keyPath)
+    ? fs.readFileSync(keyPath, 'utf8').trim()
+    : undefined;
+};
+
 const config = {
   stats: 'errors-only',
   mode: process.env.NODE_ENV,
@@ -242,6 +258,15 @@ const config = {
                 )
               );
               jsonContent = { ...jsonContent, ...firefoxJsonContent };
+            } else if (process.env.NODE_ENV !== 'production') {
+              // Pins the unpacked build to the store build's extension id, so
+              // Google Drive sync's OAuth redirect matches the registered one.
+              // Never in production: the store assigns the id itself.
+              const extensionKey = getDevExtensionKey();
+
+              if (extensionKey) {
+                jsonContent.key = extensionKey;
+              }
             }
 
             return JSON.stringify(jsonContent, null, 2);

@@ -58,9 +58,11 @@ If you would like to <strong>add a new feature</strong> to Stylebot or <strong>f
 
 ### Google Drive Sync
 
-When running the extension from a local build, you will not be able to use the Google Drive Sync feature as the OAuth authenticator will not recognize your extension id.
+An unpacked build gets an extension id derived from its path, so Google's OAuth redirect (`https://<id>.chromiumapp.org/`) does not match the one registered for the store build and sign-in fails with `redirect_uri_mismatch`. Two ways around it:
 
-If you want to use the Google Drive Sync feature locally, and/or for your own forked version of the extension, you must create a Google Cloud project and associated OAuth consent screen associated with the extension.
+**Pin the dev build to the store id (maintainers).** Put the store build's public key — Chrome Web Store developer dashboard → the item → Package → "Public key" — in a git-ignored `.extension-key` file at the repo root, or in `STYLEBOT_EXTENSION_KEY`. Development builds (`yarn watch`, `yarn dev:chrome`) then emit it as the manifest `key`, so the unpacked extension has the store id and the existing OAuth client accepts it. Production builds never include it. Chrome refuses to load two extensions with one id, so disable the store install in any profile that loads the dev build (`yarn dev:chrome` uses its own profile, so it is unaffected).
+
+**Register your own OAuth client (forks).** Create a Google Cloud project and OAuth consent screen for your extension:
 
 You can do so as follows:
 

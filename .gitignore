@@ -8,6 +8,7 @@ firefox-dist
 node_modules
 .chrome-dev-profile
 .edge-dev-profile
+.extension-key
 yarn-error.log
 coverage
 .history
