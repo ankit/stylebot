@@ -65,8 +65,10 @@ function pluralize(count: number, word: string): string {
   return `${count} ${word}${count === 1 ? '' : 's'}`;
 }
 
-/* Mounted by OverlayTip (Overlay.ts) into the editor's theme-provider subtree,
-   which is what gives it the editor's CSS variables and fonts over the page. */
+/**
+ * Mounted by OverlayTip (Overlay.ts) into the editor's theme-provider subtree,
+ * which is what gives it the editor's CSS variables and fonts over the page.
+ */
 export default Vue.extend({
   name: 'InspectorCard',
 

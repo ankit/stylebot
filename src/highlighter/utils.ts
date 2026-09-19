@@ -152,8 +152,10 @@ export function getElementDimensions(domElement: HTMLElement): Dimensions {
   };
 }
 
-/* A preview of how the element currently renders, so the inspect card
-   isn't empty when Stylebot has no declarations for it yet. */
+/**
+ * A preview of how the element currently renders, so the inspect card
+ * isn't empty when Stylebot has no declarations for it yet.
+ */
 const PREVIEW_PROPERTIES = ['color', 'font-size', 'line-height'];
 
 export function getComputedDeclarations(

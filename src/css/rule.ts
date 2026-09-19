@@ -8,8 +8,10 @@ export const getRule = (css: string, selector: string): postcss.Rule | null => {
   return matchingRules.length > 0 ? matchingRules[0] : null;
 };
 
-/* Unlike getRule, also matches a selector grouped in a comma-separated rule.
-   Keeps the last match: at equal specificity, later rules win the cascade. */
+/**
+ * Unlike getRule, also matches a selector grouped in a comma-separated rule.
+ * Keeps the last match: at equal specificity, later rules win the cascade.
+ */
 export const getRuleForSelector = (
   css: string,
   selector: string
@@ -26,12 +28,16 @@ export const getRuleForSelector = (
   return found;
 };
 
-/* Matching one of these only means the inspector's cursor/focus is on the
-   element right now, not that the selector targets its normal appearance. */
+/**
+ * Matching one of these only means the inspector's cursor/focus is on the
+ * element right now, not that the selector targets its normal appearance.
+ */
 const STATE_PSEUDO_CLASSES = /:(hover|focus(-visible|-within)?|active)\b/i;
 
-/* Finds an authored selector matching this element via el.matches(), so
-   picking it keeps editing that rule instead of starting an unrelated one. */
+/**
+ * Finds an authored selector matching this element via el.matches(), so
+ * picking it keeps editing that rule instead of starting an unrelated one.
+ */
 export const getExistingSelector = (
   el: HTMLElement,
   css: string
@@ -64,8 +70,10 @@ export const getExistingSelector = (
   return match;
 };
 
-/* Moves `selector` out of a grouped rule (`.foo, .bar`) into its own rule right
-   after it, keeping its declarations so edits don't hit its groupmates. */
+/**
+ * Moves `selector` out of a grouped rule (`.foo, .bar`) into its own rule right
+ * after it, keeping its declarations so edits don't hit its groupmates.
+ */
 export const splitSelectorFromGroup = (
   css: string,
   selector: string
