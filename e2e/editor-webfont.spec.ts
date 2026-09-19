@@ -1,7 +1,9 @@
 import http from 'node:http';
 import type { AddressInfo } from 'node:net';
-import { test, expect, closeServer } from './fixtures';
+import { test, expect, closeServer, skipWithoutPopup } from './fixtures';
 import { openEditor } from './helpers';
+
+skipWithoutPopup();
 
 // Editor-open depends on a popup tab-messaging round trip, which can lag
 // under a full parallel worker fleet (see e2e/readability.spec.ts).

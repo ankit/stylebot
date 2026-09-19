@@ -1,6 +1,14 @@
 import http from 'node:http';
 import type { AddressInfo } from 'node:net';
-import { test, expect, closeServer, type Page } from './fixtures';
+import {
+  test,
+  expect,
+  closeServer,
+  type Page,
+  skipWithoutPopup,
+} from './fixtures';
+
+skipWithoutPopup();
 
 // Content script / background worker readiness can lag under heavy parallel CPU
 // load (multiple worker-owned browsers competing for CPU), delaying this check.

@@ -6,7 +6,7 @@ Browser extension (Chrome/Edge/Firefox) that lets users change the appearance of
 
 - `src/` — extension source (background, content scripts, popup, options UI, editor)
 - `src/_locales/` — i18n strings per locale
-- `e2e/` — Playwright end-to-end tests, driven against a real built extension via CDP (`Extensions.loadUnpacked`)
+- `e2e/` — Playwright end-to-end tests, driven against a real built extension: via CDP (`Extensions.loadUnpacked`) on Chrome/Edge, via Firefox's remote debugging protocol (`e2e/firefox-rdp.ts`) on Firefox
 - `__mocks__/` — Jest mocks
 - `dist/` — Chrome/Edge build output; `firefox-dist/` — Firefox build output
 - `docs/` — stylebot.dev static site
@@ -26,7 +26,7 @@ session is already inside a worktree.
 - `yarn lint` / `yarn lint:fix` — ESLint
 - `yarn typecheck` — `tsc --noEmit`
 - `yarn test` — Jest unit tests
-- `yarn test:e2e` — builds the extension then runs the Playwright e2e suite (headless by default; loads the unpacked extension into Chrome via CDP)
+- `yarn test:e2e` — builds the extension then runs the Playwright e2e suite (headless by default; loads the unpacked extension into Chrome via CDP). `yarn test:e2e:edge` and `yarn test:e2e:firefox` run it on Edge and Firefox; on Firefox, Playwright can't attach to extension pages, so specs that click through the popup call `skipWithoutPopup()` and only the storage-seeded content-script tests run
 
 ## Validation
 

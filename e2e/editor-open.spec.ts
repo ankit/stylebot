@@ -1,5 +1,7 @@
-import { test, expect } from './fixtures';
+import { test, expect, skipWithoutPopup } from './fixtures';
 import { startTestServer } from './helpers';
+
+skipWithoutPopup();
 
 const PAGE_HTML = `
   <!doctype html>

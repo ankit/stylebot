@@ -31,13 +31,9 @@ test.afterAll(() => closeServer(server));
 
 test('overrides a page rule that also uses !important (regression: #894)', async ({
   context,
-  extensionId: _extensionId,
+  runInExtension,
 }) => {
-  const worker =
-    context.serviceWorkers()[0] ??
-    (await context.waitForEvent('serviceworker'));
-
-  await worker.evaluate(() =>
+  await runInExtension(() =>
     chrome.storage.local.set({
       styles: {
         localhost: {
