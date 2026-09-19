@@ -7,7 +7,7 @@ description: Cut a Stylebot release — CHANGELOG entry, version bump, release P
 
 Releases go through a **pull request**, not a direct push to `main`. The PR is what
 gates the release on CI — in particular the Edge and Firefox e2e suites, which only run
-on release PRs (`.github/workflows/e2e-release.yml`).
+on release PRs (`.github/workflows/e2e-edge.yml`, `.github/workflows/e2e-firefox.yml`).
 
 ## 1. Branch
 
@@ -17,9 +17,9 @@ Branch off the latest `main`:
 git fetch origin main && git checkout -b release/vX.Y.Z origin/main
 ```
 
-The `release/` prefix is **not** cosmetic — `.github/workflows/e2e-release.yml` gates on
-`startsWith(github.head_ref, 'release/')`. Any other branch name silently skips the Edge
-and Firefox runs, which are the whole point of the release PR.
+The `release/` prefix is **not** cosmetic — the Edge and Firefox e2e workflows gate on
+`startsWith(github.head_ref, 'release/')`. Any other branch name silently skips those
+runs, which are the whole point of the release PR.
 
 ## 2. Changelog
 

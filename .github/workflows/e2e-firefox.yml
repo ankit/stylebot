@@ -1,4 +1,4 @@
-name: e2e (release browsers)
+name: e2e (firefox)
 on:
   pull_request:
     branches:
@@ -6,22 +6,13 @@ on:
   workflow_dispatch:
 
 jobs:
-  e2e:
-    name: e2e (${{ matrix.browser }})
-    # Edge shares Chrome's dist/ build and Firefox changes far less often than the
-    # shared code the Chrome job covers on every PR, so these only earn their CI
-    # minutes at release time. github.head_ref is empty on workflow_dispatch, hence
-    # the first clause.
+  e2e-firefox:
+    name: e2e (firefox)
+    # Firefox is a separate build and store listing but changes far less often than
+    # the shared code the Chrome job already covers, so like Edge it runs at release
+    # time only. github.head_ref is empty on workflow_dispatch, hence the first clause.
     if: ${{ github.event_name == 'workflow_dispatch' || startsWith(github.head_ref, 'release/') }}
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - browser: edge
-            playwright: msedge
-          - browser: firefox
-            playwright: firefox
 
     steps:
       - uses: actions/checkout@v4
@@ -47,23 +38,23 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-${{ matrix.playwright }}-${{ hashFiles('**/yarn.lock') }}
+          key: playwright-firefox-${{ hashFiles('**/yarn.lock') }}
 
-      - name: Install Playwright ${{ matrix.browser }}
+      - name: Install Playwright Firefox
         if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps ${{ matrix.playwright }}
+        run: npx playwright install --with-deps firefox
 
       - name: Install Playwright system dependencies
         if: steps.playwright-cache.outputs.cache-hit == 'true'
-        run: npx playwright install-deps ${{ matrix.playwright }}
+        run: npx playwright install-deps firefox
 
       - name: Run e2e tests
-        run: yarn e2e --${{ matrix.browser }}
+        run: yarn e2e --firefox
 
       - name: Upload Playwright report
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report-${{ matrix.browser }}
+          name: playwright-report-firefox
           path: playwright-report/
           retention-days: 14
