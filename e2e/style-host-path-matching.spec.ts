@@ -25,11 +25,11 @@ test.afterAll(async () => {
 
 test('applies a host+path-scoped style only on the matching path, and to every tab on that path', async ({
   context,
-  extensionId: _extensionId,
+  extension,
 }) => {
   const host = new URL(server.baseUrl).host;
 
-  await seedStyles(context, {
+  await seedStyles(extension, {
     [`${host}/a`]: { css: 'h1 { color: rgb(255, 0, 128); }', enabled: true },
   });
 

@@ -15,12 +15,9 @@ const state = Vue.observable({
 
 const PROMPT_DISMISSED_KEY = 'readabilityShortcutPromptDismissed';
 
-const getPromptDismissed = (): Promise<boolean> => {
-  return new Promise(resolve => {
-    chrome.storage.local.get(PROMPT_DISMISSED_KEY, items => {
-      resolve(Boolean(items[PROMPT_DISMISSED_KEY]));
-    });
-  });
+const getPromptDismissed = async (): Promise<boolean> => {
+  const items = await chrome.storage.local.get(PROMPT_DISMISSED_KEY);
+  return Boolean(items[PROMPT_DISMISSED_KEY]);
 };
 
 let loadPromise: Promise<void> | null = null;

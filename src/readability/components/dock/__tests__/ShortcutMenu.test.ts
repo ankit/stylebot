@@ -29,7 +29,7 @@ describe('ShortcutMenu.vue', () => {
     global.chrome = {
       storage: {
         local: {
-          get: jest.fn((_key, callback) => callback({})),
+          get: jest.fn(() => Promise.resolve({})),
           set: jest.fn(),
         },
       },

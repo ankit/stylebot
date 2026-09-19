@@ -15,26 +15,25 @@ export { getStylesForPage } from '@stylebot/styles';
  */
 export const applyStylesToAllTabs = async (): Promise<void> => {
   const allStyles = await getAll();
+  const tabs = await chrome.tabs.query({});
 
-  chrome.tabs.query({}, tabs => {
-    tabs.forEach(async tab => {
-      if (tab?.url && tab.id) {
-        const { styles, defaultStyle } = getStylesForPage(tab.url, allStyles);
+  tabs.forEach(async tab => {
+    if (tab?.url && tab.id) {
+      const { styles, defaultStyle } = getStylesForPage(tab.url, allStyles);
 
-        const message: ApplyStylesToTab = {
-          name: 'ApplyStylesToTab',
-          defaultStyle,
-          styles,
-        };
+      const message: ApplyStylesToTab = {
+        name: 'ApplyStylesToTab',
+        defaultStyle,
+        styles,
+      };
 
-        chrome.tabs.sendMessage(tab.id, message);
+      chrome.tabs.sendMessage(tab.id, message);
 
-        if (tab.active) {
-          const readabilityActive = await getIsReadabilityActive(tab.id);
-          updateIcon(tab, styles, readabilityActive);
-        }
+      if (tab.active) {
+        const readabilityActive = await getIsReadabilityActive(tab.id);
+        updateIcon(tab, styles, readabilityActive);
       }
-    });
+    }
   });
 };
 
@@ -58,16 +57,10 @@ export const refreshBadgeForTab = async (
 /**
  * Reads the full style map from storage, defaulting to an empty map.
  */
-export const getAll = (): Promise<StyleMap> =>
-  new Promise(resolve => {
-    chrome.storage.local.get('styles', items => {
-      if (items['styles']) {
-        resolve(items['styles']);
-      } else {
-        resolve({});
-      }
-    });
-  });
+export const getAll = async (): Promise<StyleMap> => {
+  const items = await chrome.storage.local.get('styles');
+  return items['styles'] || {};
+};
 
 /**
  * Reads the stored style for a single url.
@@ -81,17 +74,12 @@ export const get = async (url: string): Promise<StyleWithoutUrl> => {
  * Writes the style map, plus its modified-time metadata, to storage.
  */
 const writeToStorage = (styles: StyleMap): Promise<void> =>
-  new Promise(resolve => {
-    chrome.storage.local.set(
-      {
-        styles,
+  chrome.storage.local.set({
+    styles,
 
-        'styles-metadata': {
-          modifiedTime: getCurrentTimestamp(),
-        },
-      },
-      resolve
-    );
+    'styles-metadata': {
+      modifiedTime: getCurrentTimestamp(),
+    },
   });
 
 /**

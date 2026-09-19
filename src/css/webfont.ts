@@ -9,18 +9,20 @@ import {
  * Checked from the background page because a content script's fetch runs in
  * the page's context, where Firefox enforces the page's CSP on it (see #754).
  */
-const googleWebFontExists = (url: string): Promise<boolean> =>
-  new Promise(resolve => {
-    const message: GetGoogleWebFontExists = {
-      name: 'GetGoogleWebFontExists',
-      url,
-    };
+const googleWebFontExists = async (url: string): Promise<boolean> => {
+  const message: GetGoogleWebFontExists = {
+    name: 'GetGoogleWebFontExists',
+    url,
+  };
 
-    chrome.runtime.sendMessage(
-      message,
-      (response: GetGoogleWebFontExistsResponse) => resolve(!!response)
-    );
-  });
+  const response = await chrome.runtime
+    .sendMessage<GetGoogleWebFontExists, GetGoogleWebFontExistsResponse>(
+      message
+    )
+    .catch(() => false);
+
+  return !!response;
+};
 
 const getGoogleFontUrlAndParams = (
   value: string

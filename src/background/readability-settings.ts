@@ -1,36 +1,22 @@
 import { defaultReadabilitySettings } from '@stylebot/settings';
 import { ReadabilitySettings, UpdateReader } from '@stylebot/types';
 
-export const get = (): Promise<ReadabilitySettings> => {
-  return new Promise(resolve => {
-    chrome.storage.local.get('readability-settings', items => {
-      const settings = items['readability-settings'];
-
-      if (settings) {
-        resolve(settings);
-        return;
-      }
-
-      resolve(defaultReadabilitySettings);
-    });
-  });
+export const get = async (): Promise<ReadabilitySettings> => {
+  const items = await chrome.storage.local.get('readability-settings');
+  return items['readability-settings'] || defaultReadabilitySettings;
 };
 
-export const set = (value: ReadabilitySettings): Promise<void> => {
-  return new Promise(resolve => {
-    chrome.storage.local.set({ 'readability-settings': value }, () => {
-      resolve();
+export const set = async (value: ReadabilitySettings): Promise<void> => {
+  await chrome.storage.local.set({ 'readability-settings': value });
 
-      chrome.tabs.query({ active: true }, ([tab]) => {
-        if (tab?.url && tab.id) {
-          const message: UpdateReader = {
-            name: 'UpdateReader',
-            value,
-          };
+  const [tab] = await chrome.tabs.query({ active: true });
 
-          chrome.tabs.sendMessage(tab.id, message);
-        }
-      });
-    });
-  });
+  if (tab?.url && tab.id) {
+    const message: UpdateReader = {
+      name: 'UpdateReader',
+      value,
+    };
+
+    chrome.tabs.sendMessage(tab.id, message);
+  }
 };

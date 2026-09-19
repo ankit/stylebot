@@ -14,28 +14,24 @@ import {
   RunGoogleDriveSync,
 } from '@stylebot/types';
 
-export const getAllStyles = async (): Promise<GetAllStylesResponse> => {
+export const getAllStyles = (): Promise<GetAllStylesResponse> => {
   const message: GetAllStyles = {
     name: 'GetAllStyles',
   };
 
-  return new Promise(resolve => {
-    chrome.runtime.sendMessage(message, (response: GetAllStylesResponse) => {
-      resolve(response);
-    });
-  });
+  return chrome.runtime.sendMessage<GetAllStyles, GetAllStylesResponse>(
+    message
+  );
 };
 
-export const getAllOptions = async (): Promise<StylebotOptions> => {
+export const getAllOptions = (): Promise<StylebotOptions> => {
   const message: GetAllOptions = {
     name: 'GetAllOptions',
   };
 
-  return new Promise(resolve => {
-    chrome.runtime.sendMessage(message, (response: GetAllOptionsResponse) => {
-      resolve(response);
-    });
-  });
+  return chrome.runtime.sendMessage<GetAllOptions, GetAllOptionsResponse>(
+    message
+  );
 };
 
 export const setAllStyles = (styles: StyleMap): void => {
@@ -62,16 +58,12 @@ export const setOption = (
   chrome.runtime.sendMessage(message);
 };
 
-export const getCommands = async (): Promise<GetCommandsResponse> => {
+export const getCommands = (): Promise<GetCommandsResponse> => {
   const message: GetCommands = {
     name: 'GetCommands',
   };
 
-  return new Promise(resolve => {
-    chrome.runtime.sendMessage(message, (response: GetCommandsResponse) => {
-      resolve(response);
-    });
-  });
+  return chrome.runtime.sendMessage<GetCommands, GetCommandsResponse>(message);
 };
 
 export const setCommands = (commands: StylebotCommands): void => {
@@ -88,11 +80,7 @@ export const runGoogleDriveSync = async (): Promise<void> => {
     name: 'RunGoogleDriveSync',
   };
 
-  return new Promise(resolve => {
-    chrome.runtime.sendMessage(message, () => {
-      resolve();
-    });
-  });
+  await chrome.runtime.sendMessage(message);
 };
 
 export const importStylesWithFilePicker = (): Promise<StyleMap> => {

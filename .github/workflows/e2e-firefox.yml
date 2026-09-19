@@ -1,4 +1,4 @@
-name: e2e
+name: e2e (firefox)
 on:
   push:
     branches:
@@ -6,7 +6,10 @@ on:
   pull_request:
 
 jobs:
-  e2e:
+  e2e-firefox:
+    name: e2e (firefox)
+    # Unlike Edge, Firefox is a separate build (firefox-dist/, event page, its own
+    # CSP rules), so it runs on every PR like Chrome rather than at release time.
     runs-on: ubuntu-latest
 
     steps:
@@ -33,23 +36,23 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-${{ hashFiles('**/yarn.lock') }}
+          key: playwright-firefox-${{ hashFiles('**/yarn.lock') }}
 
-      - name: Install Playwright Chrome
+      - name: Install Playwright Firefox
         if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps chrome
+        run: npx playwright install --with-deps firefox
 
       - name: Install Playwright system dependencies
         if: steps.playwright-cache.outputs.cache-hit == 'true'
-        run: npx playwright install-deps chrome
+        run: npx playwright install-deps firefox
 
       - name: Run e2e tests
-        run: yarn e2e
+        run: yarn e2e --firefox
 
       - name: Upload Playwright report
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report
+          name: playwright-report-firefox
           path: playwright-report/
           retention-days: 14

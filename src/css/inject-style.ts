@@ -18,7 +18,7 @@ const keepStylebotStylesLast = (style: HTMLStyleElement): void => {
     return;
   }
 
-  reorderObserver = new MutationObserver(() => {
+  const reorder = () => {
     const lastStylebotElement = stylebotElements[stylebotElements.length - 1];
 
     if (document.documentElement.lastChild === lastStylebotElement) {
@@ -26,16 +26,23 @@ const keepStylebotStylesLast = (style: HTMLStyleElement): void => {
     }
 
     stylebotElements.forEach(el => document.documentElement.appendChild(el));
-  });
+  };
 
+  reorderObserver = new MutationObserver(reorder);
   reorderObserver.observe(document.documentElement, { childList: true });
 
-  document.addEventListener('readystatechange', () => {
-    if (document.readyState !== 'loading') {
+  // Fires first for 'interactive', i.e. once parsing is done. Observer records are
+  // delivered as a microtask, which may not have run yet when the parser finishes
+  // in one go — and disconnect() discards them — so reorder explicitly.
+  document.addEventListener(
+    'readystatechange',
+    () => {
+      reorder();
       reorderObserver?.disconnect();
       reorderObserver = null;
-    }
-  });
+    },
+    { once: true }
+  );
 };
 
 const setStylesheetContent = (id: string, css: string): void => {

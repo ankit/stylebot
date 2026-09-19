@@ -16,7 +16,6 @@ const PAGE_HTML = `
 
 test('typing CSS into the code-mode Monaco editor applies live and persists', async ({
   context,
-  extensionId: _extensionId,
   openPopup,
 }) => {
   test.slow();
@@ -43,7 +42,6 @@ test('typing CSS into the code-mode Monaco editor applies live and persists', as
 
 test('toggling the panel appearance updates the Monaco editor theme immediately', async ({
   context,
-  extensionId: _extensionId,
   openPopup,
 }) => {
   // Two appearance-menu round trips on top of the usual editor boot needs
@@ -86,7 +84,6 @@ test('toggling the panel appearance updates the Monaco editor theme immediately'
 
 test('typing a CSS property offers autocomplete and a color value shows a swatch', async ({
   context,
-  extensionId: _extensionId,
   openPopup,
 }) => {
   test.slow();

@@ -1,6 +1,6 @@
 import http from 'node:http';
 import type { AddressInfo } from 'node:net';
-import { test, expect, closeServer, type Page } from './fixtures';
+import { test, expect, closeServer, type Popup } from './fixtures';
 
 // Content script / background worker readiness can lag under heavy parallel CPU
 // load (multiple worker-owned browsers competing for CPU), delaying this check.
@@ -53,8 +53,8 @@ test.beforeAll(async () => {
 
 test.afterAll(() => closeServer(server));
 
-const readabilityToggle = (popup: Page) =>
-  popup.locator('text=Readability').locator('..');
+const readabilityToggle = (popup: Popup) =>
+  popup.locator('label.switch', { hasText: 'Readability' });
 
 test('toggling readability on in the popup activates the reader', async ({
   context,
@@ -67,13 +67,13 @@ test('toggling readability on in the popup activates the reader', async ({
   const popup = await openPopup();
   const toggle = readabilityToggle(popup).locator('input[type="checkbox"]');
 
-  // toBeEnabled with a generous timeout: under heavy parallel CPU load the
-  // content script's GetIsPageReaderable can lag behind the popup opening.
-  await expect(toggle).toBeEnabled({ timeout: 15000 });
-  await expect(toggle).not.toBeChecked();
+  // A generous timeout: under heavy parallel CPU load the content script's
+  // GetIsPageReaderable can lag behind the popup opening.
+  await expect.poll(() => toggle.isEnabled(), { timeout: 15000 }).toBe(true);
+  expect(await toggle.isChecked()).toBe(false);
 
   await readabilityToggle(popup).locator('.track').click();
-  await expect(toggle).toBeChecked();
+  await expect.poll(() => toggle.isChecked()).toBe(true);
   await popup.close();
 
   await expect(page.locator('body > #stylebot-reader')).toHaveCount(1, {
@@ -86,6 +86,7 @@ test('toggling readability on in the popup activates the reader', async ({
 test("toggling readability with a second window open targets the popup's own tab", async ({
   context,
   openPopup,
+  extension,
 }) => {
   // Two tabs cold-starting their editor init chains contend for the same
   // background worker, which can delay listener readiness — wider budget.
@@ -95,12 +96,15 @@ test("toggling readability with a second window open targets the popup's own tab
   await pageA.goto(baseUrl);
   await pageA.bringToFront();
 
-  const cdp = await context.browser()!.newBrowserCDPSession();
-  await cdp.send('Target.createTarget', {
-    url: `${baseUrl}-2`,
-    newWindow: true,
-  });
-  const pageB = await context.waitForEvent('page', p => p.url().endsWith('-2'));
+  // The new window surfaces as about:blank first, so wait on the URL rather
+  // than filtering the page event.
+  const pageBPromise = context.waitForEvent('page');
+  await extension.evaluate(
+    url => chrome.windows.create({ url }),
+    `${baseUrl}-2`
+  );
+  const pageB = await pageBPromise;
+  await pageB.waitForURL(`${baseUrl}-2`);
   await pageB.bringToFront();
 
   // The popup opens in whichever window is frontmost — window B here —
@@ -108,10 +112,10 @@ test("toggling readability with a second window open targets the popup's own tab
   const popup = await openPopup();
   const toggle = readabilityToggle(popup).locator('input[type="checkbox"]');
 
-  await expect(toggle).toBeVisible({ timeout: 5000 });
-  await expect(toggle).toBeEnabled();
+  await expect.poll(() => toggle.isVisible(), { timeout: 5000 }).toBe(true);
+  await expect.poll(() => toggle.isEnabled()).toBe(true);
   await readabilityToggle(popup).locator('.track').click();
-  await expect(toggle).toBeChecked();
+  await expect.poll(() => toggle.isChecked()).toBe(true);
   await popup.close();
 
   const reader = pageB.locator('body > #stylebot-reader');
@@ -127,8 +131,6 @@ test("toggling readability with a second window open targets the popup's own tab
   }
 
   await expect(pageA.locator('body > #stylebot-reader')).toHaveCount(0);
-
-  await cdp.detach();
 });
 
 // Regression test for #911: the reader's loading overlay used to flash on
@@ -145,9 +147,9 @@ test('does not show the loading overlay when reloading a page already proven not
 
   const popup = await openPopup();
   const toggle = readabilityToggle(popup).locator('input[type="checkbox"]');
-  await expect(toggle).toBeEnabled({ timeout: 15000 });
+  await expect.poll(() => toggle.isEnabled(), { timeout: 15000 }).toBe(true);
   await readabilityToggle(popup).locator('.track').click();
-  await expect(toggle).toBeChecked();
+  await expect.poll(() => toggle.isChecked()).toBe(true);
   await popup.close();
 
   // Wait for the mount, not just the popup's checkbox, so the domain-wide

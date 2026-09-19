@@ -81,9 +81,11 @@ chrome.tabs.onActivated.addListener(async activeInfo => {
   const option = await getOption('contextMenu');
 
   if (option) {
-    chrome.tabs.get(activeInfo.tabId, tab => {
+    const tab = await chrome.tabs.get(activeInfo.tabId).catch(() => undefined);
+
+    if (tab) {
       ContextMenu.update(tab);
-    });
+    }
   }
 });
 

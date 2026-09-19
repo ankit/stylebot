@@ -34,12 +34,8 @@ test('opening Stylebot from the popup opens the editor in the current tab', asyn
   // Pins this as the "active" tab, in case the onInstalled help tab grabbed focus.
   await page.bringToFront();
 
-  // The popup calls window.close() right after sending the toggle message, which
-  // races a plain .click()'s post-click stability wait — dispatch instead.
   const popup = await openPopup();
-  await popup
-    .getByRole('button', { name: /^Style this page/ })
-    .dispatchEvent('click');
+  await popup.locator('button', { hasText: 'Style this page' }).click();
 
   // The host is deliberately 0x0 (see init-editor.ts) — assert presence, not visibility.
   await expect(page.locator('#stylebot')).toBeAttached();

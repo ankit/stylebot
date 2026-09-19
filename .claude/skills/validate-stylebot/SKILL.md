@@ -6,7 +6,7 @@ description: Launch Stylebot in a real, headed Chrome window (via `yarn dev:chro
 # Validate Stylebot manually
 
 Stylebot's CLAUDE.md defaults to Playwright e2e for verifying changes — use that
-(`yarn test:e2e`) when the goal is confirming correctness. Reach for this skill instead
+(`yarn e2e`) when the goal is confirming correctness. Reach for this skill instead
 when the **user** wants to look at the extension with their own eyes: visual/UI tweaks,
 "does this feel right" judgment calls, or anything the e2e suite doesn't cover.
 

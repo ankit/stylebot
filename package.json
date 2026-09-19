@@ -32,9 +32,7 @@
     "test": "jest",
     "validate-locales": "node scripts/validate-locales.mjs",
     "test:coverage": "jest --coverage",
-    "test:e2e": "yarn build && playwright test",
-    "test:e2e:edge": "cross-env STYLEBOT_BROWSER=edge yarn test:e2e",
-    "test:e2e:ui": "yarn build && playwright test --ui",
+    "e2e": "node scripts/e2e.mjs",
     "postinstall": "patch-package"
   },
   "jest": {
@@ -125,9 +123,9 @@
     "sass-loader": "^8.0.2",
     "terser-webpack-plugin": "^3.0.7",
     "tinycolor2": "^1.4.1",
-    "ts-jest": "^26.1.1",
+    "ts-jest": "^26.5.6",
     "ts-loader": "^8.0.1",
-    "typescript": "^3.9.7",
+    "typescript": "~4.9.5",
     "vue": "^2.6.11",
     "vue-draggable-resizable": "^2.3.0",
     "vue-eslint-parser": "^7.1.0",
