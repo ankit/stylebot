@@ -1,4 +1,4 @@
-export {};
+import { setImmediate } from 'timers';
 
 jest.mock('../mount-reader');
 jest.mock('../../eligibility/should-run-on-url');

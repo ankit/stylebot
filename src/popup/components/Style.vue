@@ -37,7 +37,7 @@ import { ShortcutChip, ToggleSwitch } from '@stylebot/components';
 import { forwardClickToInput } from '../utils';
 
 export default Vue.extend({
-  name: 'Style',
+  name: 'StyleComponent',
 
   components: {
     PopupRow,

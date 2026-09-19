@@ -17,5 +17,7 @@ export class ChromiumExtension implements Extension {
     return worker.evaluate(fn as PageFunction<A, R>, arg as A);
   }
 
-  close(): void {}
+  close(): void {
+    // The worker belongs to the browser context, which the fixture closes.
+  }
 }

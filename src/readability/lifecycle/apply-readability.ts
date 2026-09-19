@@ -45,7 +45,7 @@ const run = async (myGeneration: number, attempt = 0): Promise<void> => {
     await mountReader();
     markEligible(window.location.href);
     reportChanged();
-  } catch (e) {
+  } catch {
     if (isStaleGeneration(myGeneration)) {
       return;
     }

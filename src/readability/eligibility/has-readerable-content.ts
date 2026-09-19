@@ -15,8 +15,7 @@ const OK_MAYBE_ITS_A_CANDIDATE = /and|article|body|column|content|main|shadow/i;
  * Whether a node is visible; has to null-check style/className for SVG and MathML nodes.
  */
 const isNodeVisible = (node: Element): boolean =>
-  (!(node as HTMLElement).style ||
-    (node as HTMLElement).style.display !== 'none') &&
+  (node as HTMLElement).style?.display !== 'none' &&
   !node.hasAttribute('hidden') &&
   (!node.hasAttribute('aria-hidden') ||
     node.getAttribute('aria-hidden') !== 'true' ||

@@ -39,7 +39,7 @@ Vue.use(FormCheckboxPlugin);
 Vue.use(ListGroupPlugin);
 Vue.use(TableSimplePlugin);
 Vue.use(CollapsePlugin);
-Vue.component('vue-draggable-resizable', VueDraggableResizable);
+Vue.component('VueDraggableResizable', VueDraggableResizable);
 
 Vue.mixin({
   methods: {
