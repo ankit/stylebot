@@ -51,12 +51,13 @@ through the DevTools console actor.
 Neither of Playwright's Firefox drivers can attach to `moz-extension://` documents — its
 own build's Juggler skips them, and stock Firefox's BiDi excludes extension contexts
 ([bug 1755014](https://bugzilla.mozilla.org/show_bug.cgi?id=1755014)). So the popup can't
-be driven as a page there. Specs that click through the popup call `skipWithoutPopup()`
-at file scope and are skipped on Firefox; the storage-seeded content-script specs
-(`style-*.spec.ts`) run on all three browsers.
+be driven as a page there. Any test that uses the `openPopup` fixture is skipped on
+Firefox by the fixture itself; the storage-seeded content-script specs (`style-*.spec.ts`)
+run on all three browsers.
 
 If a new test can be written as "seed styles into storage, load a page, assert on the
-DOM", it gets Firefox coverage for free. If it needs the popup, call `skipWithoutPopup()`.
+DOM", it gets Firefox coverage for free. If it needs the popup, just use `openPopup` —
+nothing else to declare.
 
 ## Fixtures
 
@@ -66,7 +67,7 @@ Import `test`/`expect` from `./fixtures`, not `@playwright/test`.
 | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `context`                  | the shared `BrowserContext`; tabs opened during a test are closed after it                                                                                                     |
 | `runInExtension(fn, arg?)` | run `fn` with the extension's privileges (service worker on Chromium, background page on Firefox) and get its JSON-serializable result — how tests read/write `chrome.storage` |
-| `openPopup()`              | open the popup as a page, in the background so the page under test stays the "current tab" (Chromium only)                                                                     |
+| `openPopup()`              | open the popup as a page, in the background so the page under test stays the "current tab"; skips the test on Firefox                                                          |
 | `extensionId`              | the extension's id / Firefox UUID                                                                                                                                              |
 
 Helpers in `helpers.ts`: `startTestServer(routes)` for local pages (use `closeServer` in
