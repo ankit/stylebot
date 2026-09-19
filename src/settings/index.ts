@@ -52,6 +52,7 @@ export const defaultEditorCommands: StylebotEditorCommands = {
   resize: 's',
   dockLeft: 'l',
   dockRight: 'r',
+  dockWindow: 'w',
   pageLayout: 'p',
   close: 'Escape',
 };

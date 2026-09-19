@@ -5,6 +5,7 @@ import initChromeListener from './chrome';
 import initCommandListener from './commands';
 import initContextMenuListener from './context-menu';
 import initEditorWindowListener from './editor-window';
+import initOptionsListener from './options';
 
 /**
  * The message listener goes up synchronously so a popup click can't beat
@@ -17,6 +18,7 @@ const initListeners = (store: Store<State>, ready: Promise<void>): void => {
     initCommandListener(store);
     initContextMenuListener(store);
     initEditorWindowListener(store);
+    initOptionsListener(store);
   });
 };
 

@@ -8,11 +8,13 @@ import { applyReadability, removeReadability } from '@stylebot/readability';
 import {
   applyStyles,
   toggleStylebot,
+  openStylebot,
+  usesEditorWindow,
   toggleReadability,
   updateSelectorWithContextMenuSelector,
 } from './common';
 
-import { getStylesForPage } from '../utils/chrome';
+import { getStylesForPage, getIsEditorWindowOpen } from '../utils/chrome';
 
 const initChromeListener = (
   store: Store<State>,
@@ -44,17 +46,20 @@ const initChromeListener = (
     if (message.name === 'ToggleStylebot') {
       toggleStylebot(store);
     } else if (message.name === 'OpenStylebot') {
-      if (!state.visible) {
-        toggleStylebot(store);
-      }
+      openStylebot(store);
     } else if (message.name === 'OpenStylebotFromContextMenu') {
       updateSelectorWithContextMenuSelector({ state, commit });
-
-      if (!state.visible) {
-        toggleStylebot(store, false);
-      }
+      openStylebot(store, false);
     } else if (message.name === 'GetIsStylebotOpen') {
-      sendResponse(state.visible);
+      // A window that is open but still loading hasn't connected yet;
+      // the background knows either way.
+      if (state.visible || state.windowConnected) {
+        sendResponse(true);
+      } else if (usesEditorWindow(state)) {
+        getIsEditorWindowOpen().then(sendResponse);
+      } else {
+        sendResponse(false);
+      }
     } else if (message.name === 'TabUpdated') {
       if (window.location.href === lastUrl) {
         return;

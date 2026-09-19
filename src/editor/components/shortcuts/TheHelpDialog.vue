@@ -99,7 +99,7 @@
             />
           </div>
 
-          <div class="row">
+          <div v-if="host === 'page'" class="row">
             <s-text class="row-label">{{ t('resize') }}</s-text>
             <shortcut-chip
               small
@@ -127,6 +127,17 @@
           </div>
 
           <div class="row">
+            <s-text class="row-label">
+              {{ t('open_in_separate_window') }}
+            </s-text>
+            <shortcut-chip
+              small
+              class="row-chip"
+              :value="editorCommands.dockWindow"
+            />
+          </div>
+
+          <div v-if="host === 'page'" class="row">
             <s-text class="row-label">{{ t('adjust_page_layout') }}</s-text>
             <shortcut-chip
               small
@@ -187,6 +198,10 @@ export default Vue.extend({
   },
 
   computed: {
+    host(): string {
+      return this.$store.state.host;
+    },
+
     commands(): StylebotCommands {
       return this.$store.state.commands;
     },

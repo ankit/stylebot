@@ -9,13 +9,39 @@ import { Style } from '@stylebot/types';
 import {
   enableStyle as sendEnableStyleMessage,
   disableStyle as sendDisableStyleMessage,
+  openEditorWindow,
+  toggleEditorWindow,
 } from '../utils/chrome';
 import { initEditor } from '../utils/init-editor';
 
+/**
+ * Whether opening the editor for this page means its separate window: the
+ * user chose that dock, or a window is already attached to this tab.
+ */
+export const usesEditorWindow = (state: State): boolean =>
+  state.windowConnected || state.options.layout.dockLocation === 'window';
+
 export const toggleStylebot = (store: Store<State>, inspect = true): void => {
+  if (usesEditorWindow(store.state)) {
+    toggleEditorWindow();
+    return;
+  }
+
   if (store.state.visible) {
     store.dispatch('closeStylebot');
   } else {
+    initEditor(store);
+    store.dispatch('openStylebot', { inspect });
+  }
+};
+
+export const openStylebot = (store: Store<State>, inspect = true): void => {
+  if (usesEditorWindow(store.state)) {
+    openEditorWindow();
+    return;
+  }
+
+  if (!store.state.visible) {
     initEditor(store);
     store.dispatch('openStylebot', { inspect });
   }

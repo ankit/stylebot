@@ -108,6 +108,7 @@ export type StylebotEditorCommandName =
   | 'hide'
   | 'dockLeft'
   | 'dockRight'
+  | 'dockWindow'
   | 'resize'
   | 'pageLayout'
   | 'close';

@@ -18,6 +18,8 @@
         type="button"
         class="segment"
         :class="{ active: option.value === value }"
+        :aria-label="option.title"
+        :aria-pressed="option.value === value ? 'true' : 'false'"
         :disabled="disabled"
         @click="$emit('change', option.value)"
       >

@@ -41,6 +41,7 @@ import {
   getReadabilitySettings,
   setReadabilitySettings,
   closeEditorWindow,
+  openEditorWindow,
 } from '../utils/chrome';
 
 import {
@@ -147,7 +148,7 @@ export default {
 
   closeStylebot({ state, commit }: { state: State; commit: Commit }): void {
     if (state.host === 'window') {
-      closeEditorWindow();
+      closeEditorWindow(state.tabId ?? undefined);
       return;
     }
 
@@ -185,6 +186,28 @@ export default {
   ): void {
     setOption('layout', layout);
     commit('setOptions', { ...state.options, layout });
+  },
+
+  /**
+   * Persists the dock choice and moves the editor to match: the page hands
+   * off to a separate window, or a window hands back to the page.
+   */
+  setDockLocation(
+    {
+      state,
+      commit,
+      dispatch,
+    }: { state: State; commit: Commit; dispatch: Dispatch },
+    dockLocation: StylebotLayout['dockLocation']
+  ): void {
+    dispatch('setLayout', { ...state.options.layout, dockLocation });
+
+    if (state.host === 'page' && dockLocation === 'window') {
+      commit('setVisible', false);
+      openEditorWindow();
+    } else if (state.host === 'window' && dockLocation !== 'window') {
+      getPageBridge().openInPage();
+    }
   },
 
   setAppearance(
