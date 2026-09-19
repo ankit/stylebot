@@ -1,6 +1,6 @@
 import { defaultOptions } from '@stylebot/settings';
 
-import { getAll, set } from '../options';
+import { getAll, set, pruneRetired } from '../options';
 
 let store: Record<string, unknown>;
 
@@ -70,5 +70,28 @@ describe('getAll', () => {
       mode: 'basic',
       layout: { width: 300, adjustPageLayout: true, dockLocation: 'right' },
     });
+  });
+});
+
+describe('pruneRetired', () => {
+  it('drops keys that are no longer StylebotOptions and keeps the rest', async () => {
+    store.options = {
+      mode: 'code',
+      basicModeSections: { text: true, colors: true },
+    };
+
+    await pruneRetired();
+
+    expect(store.options).toEqual({ mode: 'code' });
+  });
+
+  it('leaves storage untouched when nothing is stored or nothing is retired', async () => {
+    store = {};
+    await pruneRetired();
+    expect(chrome.storage.local.set).not.toHaveBeenCalled();
+
+    store.options = { mode: 'code' };
+    await pruneRetired();
+    expect(chrome.storage.local.set).not.toHaveBeenCalled();
   });
 });
