@@ -35,19 +35,19 @@ const mockExampleCss = dedent`
 
 global.chrome = {
   runtime: {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error: not able to figure out how to override sendMessage here correctly.
-    sendMessage: (message: any, callback: (response: any) => void) => {
+    sendMessage: (message: any) => {
       if (message.url === 'https://fonts.googleapis.com/css?family=Lato') {
-        callback(mockFontCss);
-      } else if (message.url === 'https://example2.css') {
-        callback(mockExampleCss);
-      } else {
-        callback('');
+        return Promise.resolve(mockFontCss);
       }
+
+      if (message.url === 'https://example2.css') {
+        return Promise.resolve(mockExampleCss);
+      }
+
+      return Promise.resolve('');
     },
   },
-};
+} as unknown as typeof chrome;
 
 describe('import', () => {
   afterEach(() => {
@@ -242,10 +242,8 @@ describe('import', () => {
     });
 
     it('fetches and caches the response when nothing is cached', async () => {
-      const sendMessage = jest.fn(
-        (_message: any, callback: (response: string) => void) => {
-          callback('.a{color:red}');
-        }
+      const sendMessage = jest.fn((_message: any) =>
+        Promise.resolve('.a{color:red}')
       );
       global.chrome.runtime.sendMessage = sendMessage as any;
 
@@ -266,9 +264,10 @@ describe('import', () => {
 
       let deliver: (response: string) => void = () => undefined;
       const sendMessage = jest.fn(
-        (_message: any, callback: (response: string) => void) => {
-          deliver = callback;
-        }
+        (_message: any) =>
+          new Promise<string>(resolve => {
+            deliver = resolve;
+          })
       );
       global.chrome.runtime.sendMessage = sendMessage as any;
 
@@ -281,12 +280,24 @@ describe('import', () => {
       deliver('.fresh{}');
     });
 
-    it('does not cache an empty response', async () => {
-      const sendMessage = jest.fn(
-        (_message: any, callback: (response: string) => void) => {
-          callback('');
-        }
+    it('resolves empty and does not cache if the background is unreachable', async () => {
+      const sendMessage = jest.fn((_message: any) =>
+        Promise.reject(new Error('Could not establish connection.'))
       );
+      global.chrome.runtime.sendMessage = sendMessage as any;
+
+      const result = await fetchImportCss('https://example.com/down.css');
+
+      expect(result).toBe('');
+      expect(
+        localStorage.getItem(
+          'stylebot-import-cache:https://example.com/down.css'
+        )
+      ).toBeNull();
+    });
+
+    it('does not cache an empty response', async () => {
+      const sendMessage = jest.fn((_message: any) => Promise.resolve(''));
       global.chrome.runtime.sendMessage = sendMessage as any;
 
       await fetchImportCss('https://example.com/missing.css');

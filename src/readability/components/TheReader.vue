@@ -179,14 +179,10 @@ export default Vue.extend({
         name: 'GetReadabilitySettings',
       };
 
-      const response = new Promise<GetReadabilitySettingsResponse>(resolve => {
-        chrome.runtime.sendMessage(
-          message,
-          (response: GetReadabilitySettingsResponse) => {
-            resolve(response);
-          }
-        );
-      });
+      const response = chrome.runtime.sendMessage<
+        GetReadabilitySettings,
+        GetReadabilitySettingsResponse
+      >(message);
 
       // Falls back to defaults if the service worker never responds.
       const timeout = new Promise<GetReadabilitySettingsResponse>(resolve => {

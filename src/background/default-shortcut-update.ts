@@ -3,25 +3,18 @@ import { defaultCommands } from '@stylebot/settings';
 
 const defaultShortcutUpdate = async (): Promise<void> => {
   const key = `default_shortcut_update_complete`;
+  const items = await chrome.storage.local.get(key);
 
-  return new Promise(resolve => {
-    chrome.storage.local.get(key, async items => {
-      if (items[key]) {
-        // update has already been applied.
-        resolve();
-        return;
-      }
+  if (items[key]) {
+    // update has already been applied.
+    return;
+  }
 
-      // override default global shortcuts for all existing users
-      // since the previous default shortcuts conflict with languages
-      // and easy to accidentally press.
-      await setCommands(defaultCommands);
-
-      chrome.storage.local.set({ [key]: true }, () => {
-        resolve();
-      });
-    });
-  });
+  // override default global shortcuts for all existing users
+  // since the previous default shortcuts conflict with languages
+  // and easy to accidentally press.
+  await setCommands(defaultCommands);
+  await chrome.storage.local.set({ [key]: true });
 };
 
 export default defaultShortcutUpdate;

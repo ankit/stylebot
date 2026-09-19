@@ -1,16 +1,10 @@
 import { StylebotOptions } from '@stylebot/types';
 import { defaultOptions } from '@stylebot/settings';
 
-export const getAll = (): Promise<StylebotOptions> =>
-  new Promise(resolve => {
-    chrome.storage.local.get('options', items => {
-      if (items['options']) {
-        resolve(items['options']);
-      } else {
-        resolve(defaultOptions);
-      }
-    });
-  });
+export const getAll = async (): Promise<StylebotOptions> => {
+  const items = await chrome.storage.local.get('options');
+  return items['options'] || defaultOptions;
+};
 
 export const get = async (
   name: keyof StylebotOptions
@@ -35,9 +29,7 @@ export const set = (
       [name]: value,
     };
 
-    await new Promise<void>(resolve => {
-      chrome.storage.local.set({ options }, resolve);
-    });
+    await chrome.storage.local.set({ options });
   });
 
   return pendingWrite;

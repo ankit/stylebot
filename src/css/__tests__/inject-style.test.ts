@@ -67,9 +67,10 @@ describe('inject-style', () => {
       (global as any).chrome = {
         runtime: {
           sendMessage: jest.fn(
-            (_message: unknown, callback: (response: string) => void) => {
-              deliverImport = callback;
-            }
+            (_message: unknown) =>
+              new Promise<string>(resolve => {
+                deliverImport = resolve;
+              })
           ),
         },
       };

@@ -22,22 +22,26 @@ describe('set', () => {
     global.chrome = {
       storage: {
         local: {
-          get: jest.fn((key: string, callback: (items: unknown) => void) => {
-            // Simulate the read taking a tick, so a second write can start
-            // before the first one's read-modify-write finishes — mirroring
-            // rapid keystrokes in the code editor firing overlapping
-            // SetStyle messages. Deep-clone, since real chrome.storage.local
-            // returns a structured-clone copy, not a live reference.
-            const snapshot = JSON.parse(JSON.stringify(store[key]));
-            setTimeout(() => callback({ [key]: snapshot }), 10);
-          }),
+          get: jest.fn(
+            (key: string) =>
+              new Promise(resolve => {
+                // Simulate the read taking a tick, so a second write can start
+                // before the first one's read-modify-write finishes — mirroring
+                // rapid keystrokes in the code editor firing overlapping
+                // SetStyle messages. Deep-clone, since real chrome.storage.local
+                // returns a structured-clone copy, not a live reference.
+                const snapshot = JSON.parse(JSON.stringify(store[key]));
+                setTimeout(() => resolve({ [key]: snapshot }), 10);
+              })
+          ),
           set: jest.fn(
-            (items: Record<string, unknown>, callback?: () => void) => {
-              setTimeout(() => {
-                Object.assign(store, items);
-                callback?.();
-              }, 0);
-            }
+            (items: Record<string, unknown>) =>
+              new Promise<void>(resolve => {
+                setTimeout(() => {
+                  Object.assign(store, items);
+                  resolve();
+                }, 0);
+              })
           ),
         },
       },
