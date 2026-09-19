@@ -25,6 +25,7 @@ module.exports = {
     curly: ['error', 'all'],
     eqeqeq: ['error', 'always', { null: 'ignore' }],
     'no-else-return': 'error',
+    'no-nested-ternary': 'error',
 
     '@typescript-eslint/array-type': ['error', { default: 'generic' }],
     '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
