@@ -27,7 +27,7 @@ const BACKGROUND_URL_MARKER = '_generated_background_page';
 export class FirefoxExtension implements Extension {
   // Every live extension page, keyed by target actor.
   private readonly targets = new Map<string, TargetForm>();
-  private targetWaiters: TargetWaiter[] = [];
+  private targetWaiters: Array<TargetWaiter> = [];
   // An evaluation's result can land in the same TCP chunk as the request's ack,
   // i.e. before the caller knows its resultID — so unclaimed results are parked.
   private readonly results = new Map<string, EvaluationResult>();
@@ -56,7 +56,7 @@ export class FirefoxExtension implements Extension {
       type: 'installTemporaryAddon',
       addonPath,
     });
-    const { addons } = await client.request<{ addons: Addon[] }>({
+    const { addons } = await client.request<{ addons: Array<Addon> }>({
       to: 'root',
       type: 'listAddons',
     });

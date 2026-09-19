@@ -56,7 +56,7 @@ export default {
           value: rule.selector,
           count: document.querySelectorAll(rule.selector).length,
         });
-      } catch (e) {
+      } catch {
         // querySelectorAll throws on selectors it can't parse; skip those rules.
       }
     });

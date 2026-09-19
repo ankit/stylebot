@@ -137,7 +137,7 @@ export const getReadabilityArticle = async (): Promise<ReadabilityArticle> => {
 
   const article = new Defuddle(doc).parse();
 
-  if (!article || !article.content) {
+  if (!article?.content) {
     throw new Error('Defuddle failed to parse the page');
   }
 

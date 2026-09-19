@@ -192,7 +192,7 @@ export default {
             : [...cached.styles, entry],
         });
       }
-    } catch (e) {
+    } catch {
       //
     }
   },
