@@ -27,7 +27,10 @@ type Box = {
 type LayoutProperty = 'margin' | 'border' | 'padding' | 'height' | 'width';
 
 // https://dev.to/kingdaro/indexing-objects-in-typescript-1cgi
-function hasKey<O>(obj: O, key: string | number | symbol): key is keyof O {
+function hasKey<O extends Record<string, unknown>>(
+  obj: O,
+  key: string | number | symbol
+): key is keyof O {
   return key in obj;
 }
 
