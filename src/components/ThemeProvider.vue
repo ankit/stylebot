@@ -42,6 +42,9 @@ export default Vue.extend({
   --accent-tint: #1e2a44;
   --accent-tint-ink: #8ab0ff;
 
+  --selection: #2f4f8f;
+  --selection-ink: #f2f4f7;
+
   --field-border: #3a3e46;
   --field-border-hover: #4a4f58;
   --field-border-selector: #3a3e46;
@@ -85,6 +88,9 @@ export default Vue.extend({
   --accent-tint: #f4f7fe;
   --accent-tint-ink: #2a5fd6;
 
+  --selection: #c7dbff;
+  --selection-ink: #191b1f;
+
   --field-border: #dcdfe5;
   --field-border-hover: #b9bec8;
   --field-border-selector: #d3d6dd;
@@ -111,6 +117,11 @@ export default Vue.extend({
   --ring: var(--accent);
 
   --font-mono: 'Fira Code', Menlo, Monaco, Consolas, monospace;
+}
+
+.theme-provider ::v-deep ::selection {
+  background: var(--selection);
+  color: var(--selection-ink);
 }
 
 @media (prefers-color-scheme: dark) {
