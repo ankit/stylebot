@@ -171,3 +171,26 @@ export const switchEditorMode = async (
 // selector engine pierces open shadow roots, so a plain CSS selector reaches it.
 export const getMonacoFrame = (page: Page) =>
   page.frameLocator('#stylebot iframe');
+
+// Pops the open in-page editor out through its More menu and returns the
+// window's page. The window surfaces with its final URL already set, so
+// filtering the page event by URL sidesteps any other tab opening meanwhile.
+export const popOutEditor = async (
+  context: BrowserContext,
+  page: Page,
+  editorRoot: Locator
+): Promise<Page> => {
+  const popoutPromise = context.waitForEvent('page', p =>
+    p.url().includes('/editor-window/index.html')
+  );
+
+  await editorRoot.getByRole('button', { name: 'Options' }).click();
+  await editorRoot
+    .getByRole('button', { name: 'Open in separate window' })
+    .click();
+
+  const popout = await popoutPromise;
+  await popout.locator('.stylebot-window').waitFor();
+
+  return popout;
+};
