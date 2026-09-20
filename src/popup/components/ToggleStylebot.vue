@@ -2,7 +2,7 @@
   <pill-button @click="toggle">
     {{ label }}
     <template v-if="shortcut" #trailing>
-      <shortcut-chip small muted :value="shortcut" />
+      <shortcut-chip muted :value="shortcut" />
     </template>
   </pill-button>
 </template>

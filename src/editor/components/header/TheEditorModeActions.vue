@@ -48,7 +48,7 @@ export default Vue.extend({
           value: 'magic',
           label: this.t('presets_mode'),
           title: this.t('presets_mode_description'),
-          shortcut: 'm',
+          shortcut: 'p',
           disabled: false,
         },
       ];

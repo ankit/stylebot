@@ -131,7 +131,7 @@ const preview: Preview = {
             'Display',
           ],
           'Editor',
-          ['Panel', 'ColorPickerPopover', 'TheHelpDialog'],
+          ['Panel', 'ColorPickerPopover', 'TheKeyboardShortcutsView'],
           'Options',
           ['Basics', 'Styles', 'Sync'],
           'Browser Action',

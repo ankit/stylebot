@@ -26,3 +26,7 @@ export { default as IconX } from './IconX.vue';
 export { default as DockLeftIcon } from './DockLeftIcon.vue';
 export { default as DockRightIcon } from './DockRightIcon.vue';
 export { default as UndockIcon } from './UndockIcon.vue';
+export { default as OptionKeyIcon } from './OptionKeyIcon.vue';
+export { default as ShiftKeyIcon } from './ShiftKeyIcon.vue';
+export { default as CommandKeyIcon } from './CommandKeyIcon.vue';
+export { default as ControlKeyIcon } from './ControlKeyIcon.vue';

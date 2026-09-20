@@ -26,8 +26,8 @@ export default meta;
 
 const panel = (root: HTMLElement) => root.querySelector('.stylebot');
 const status = (root: HTMLElement) => root.querySelector('.window-status');
-const helpDialog = (root: HTMLElement) =>
-  root.querySelector('.stylebot-help-dialog');
+const shortcutsView = (root: HTMLElement) =>
+  root.querySelector('.keyboard-shortcuts-view');
 
 const sentMessages = () => spyOn(chrome.runtime, 'sendMessage');
 
@@ -122,24 +122,22 @@ export const PageOnlyShortcutsIgnored: StoryObj = {
     await pressKey('s');
     await expect(store.state.resizing).toBe(false);
 
-    await pressKey('p');
+    await pressKey('a');
     await expect(store.state.options.layout.adjustPageLayout).toBe(false);
   },
 };
 
-export const HelpDialogInWindow: StoryObj = {
+export const ShortcutsViewInWindow: StoryObj = {
   ...editorWindow(WITH_RULE),
-  name: 'the shortcuts dialog lists the window shortcut and omits page-only ones',
+  name: 'the shortcuts view lists the window shortcut and omits page-only ones',
   play: async ({ canvasElement }) => {
     await pressKey('?');
-    await waitFor(() => expect(helpDialog(canvasElement)).toBeVisible());
+    await waitFor(() => expect(shortcutsView(canvasElement)).toBeVisible());
 
-    const dialog = within(helpDialog(canvasElement) as HTMLElement);
-    await expect(
-      dialog.getByText('Open in separate window')
-    ).toBeInTheDocument();
-    await expect(dialog.queryByText('Resize')).toBeNull();
-    await expect(dialog.queryByText('Push the page aside')).toBeNull();
+    const view = within(shortcutsView(canvasElement) as HTMLElement);
+    await expect(view.getByText('Open in separate window')).toBeInTheDocument();
+    await expect(view.queryByText('Resize the panel')).toBeNull();
+    await expect(view.queryByText('Push the page aside')).toBeNull();
   },
 };
 

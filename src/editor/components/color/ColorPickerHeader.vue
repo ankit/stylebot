@@ -8,7 +8,7 @@
 
     <div class="info">
       <div class="hex" :class="{ 'not-set': !value }">
-        {{ value || t('color_picker_not_set') }}
+        {{ value || t('not_set') }}
       </div>
       <s-text size="small" variant="muted" as="span">{{ roleLabel }}</s-text>
     </div>

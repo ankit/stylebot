@@ -2,25 +2,29 @@
   <the-stylebot-resizer>
     <div class="stylebot-content">
       <the-window-tab-bar v-if="host === 'window'" />
-      <the-header />
-
       <the-window-status v-if="host === 'window' && !pageConnected" />
 
-      <div
-        class="stylebot-body"
-        :style="
-          colorPickerVisible || !pageConnected ? 'pointer-events: none' : ''
-        "
-      >
-        <the-basic-editor v-if="mode === 'basic'" />
-        <the-presets-editor v-else-if="mode === 'magic'" />
+      <the-keyboard-shortcuts-view v-if="help" />
 
-        <!-- Stays mounted (just hidden) once opened — Monaco is too expensive to reload on every mode switch/resize. -->
-        <the-code-editor
-          v-if="codeEditorMounted"
-          v-show="mode === 'code' && !resizing"
-        />
-      </div>
+      <template v-else>
+        <the-header />
+
+        <div
+          class="stylebot-body"
+          :style="
+            colorPickerVisible || !pageConnected ? 'pointer-events: none' : ''
+          "
+        >
+          <the-basic-editor v-if="mode === 'basic'" />
+          <the-presets-editor v-else-if="mode === 'magic'" />
+
+          <!-- Stays mounted (just hidden) once opened — Monaco is too expensive to reload on every mode switch/resize. -->
+          <the-code-editor
+            v-if="codeEditorMounted"
+            v-show="mode === 'code' && !resizing"
+          />
+        </div>
+      </template>
     </div>
   </the-stylebot-resizer>
 </template>
@@ -35,6 +39,7 @@ import ThePresetsEditor from './ThePresetsEditor.vue';
 import TheStylebotResizer from './TheStylebotResizer.vue';
 import TheWindowStatus from './TheWindowStatus.vue';
 import TheWindowTabBar from './TheWindowTabBar.vue';
+import TheKeyboardShortcutsView from './shortcuts/TheKeyboardShortcutsView.vue';
 
 import { StylebotEditingMode } from '@stylebot/types';
 
@@ -49,6 +54,7 @@ export default Vue.extend({
     TheStylebotResizer,
     TheWindowStatus,
     TheWindowTabBar,
+    TheKeyboardShortcutsView,
   },
 
   data(): { codeEditorMounted: boolean } {
@@ -76,6 +82,10 @@ export default Vue.extend({
 
     colorPickerVisible(): boolean {
       return this.$store.state.colorPickerVisible;
+    },
+
+    help(): boolean {
+      return this.$store.state.help;
     },
   },
 

@@ -12,7 +12,7 @@
         </span>
       </template>
       <template v-else-if="shortcut" #trailing>
-        <shortcut-chip small muted :value="shortcut" />
+        <shortcut-chip muted :value="shortcut" />
       </template>
     </toggle-switch>
   </popup-row>

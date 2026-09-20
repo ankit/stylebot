@@ -45,7 +45,7 @@ export const defaultCommands: StylebotCommands = {
 export const defaultEditorCommands: StylebotEditorCommands = {
   inspect: 'i',
   basic: 'b',
-  magic: 'm',
+  magic: 'p',
   code: 'c',
   help: '?',
   hide: 'h',
@@ -53,7 +53,7 @@ export const defaultEditorCommands: StylebotEditorCommands = {
   dockLeft: 'l',
   dockRight: 'r',
   dockWindow: 'w',
-  pageLayout: 'p',
+  pageLayout: 'a',
   close: 'Escape',
 };
 
