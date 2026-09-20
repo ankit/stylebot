@@ -55,6 +55,7 @@ export default Vue.extend({
 
   --card-surface: #212429;
   --tab-surface: #181a1e;
+  --raised-surface: #000;
   --panel-shadow: rgb(0 0 0 / 34%);
 
   --menu-surface: #23262b;
@@ -105,6 +106,7 @@ export default Vue.extend({
 
   --card-surface: #fff;
   --tab-surface: #f7f8fa;
+  --raised-surface: #fff;
   --panel-shadow: rgb(0 0 0 / 16%);
 
   --menu-surface: #fff;

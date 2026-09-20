@@ -53,7 +53,7 @@
           "
         >
           <span class="menu-item-row">
-            <span>{{ t('view_keyboard_shortcuts') }}</span>
+            <span>{{ t('keyboard_shortcuts') }}</span>
             <span class="menu-item-hint">{{ editorCommands.help }}</span>
           </span>
         </menu-item>

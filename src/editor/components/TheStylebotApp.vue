@@ -2,7 +2,6 @@
   <theme-provider class="stylebot-app" :mode="appearance">
     <the-stylebot v-if="visible" />
     <the-keyboard-shortcuts />
-    <the-help-dialog v-if="help" />
   </theme-provider>
 </template>
 
@@ -12,7 +11,6 @@ import { StylebotCommands, StylebotAppearance } from '@stylebot/types';
 import { ThemeProvider } from '@stylebot/components';
 
 import TheStylebot from './TheStylebot.vue';
-import TheHelpDialog from './shortcuts/TheHelpDialog.vue';
 import TheKeyboardShortcuts from './shortcuts/TheKeyboardShortcuts.vue';
 
 export default Vue.extend({
@@ -21,7 +19,6 @@ export default Vue.extend({
   components: {
     ThemeProvider,
     TheStylebot,
-    TheHelpDialog,
     TheKeyboardShortcuts,
   },
 
@@ -38,10 +35,6 @@ export default Vue.extend({
 
     commands(): StylebotCommands | undefined {
       return this.$store.state.commands;
-    },
-
-    help(): boolean {
-      return this.$store.state.help;
     },
 
     appearance(): StylebotAppearance {

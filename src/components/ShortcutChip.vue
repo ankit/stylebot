@@ -1,6 +1,6 @@
 <template>
   <span class="chip" :class="{ small, muted }">
-    <shortcut-kbd :small="small" :value="value" />
+    <shortcut-kbd :small="small" :value="value" :mac="mac" />
   </span>
 </template>
 
@@ -33,6 +33,12 @@ export default Vue.extend({
       type: Boolean,
       default: false,
     },
+
+    // Forces macOS vs non-Mac rendering; left unset to auto-detect.
+    mac: {
+      type: Boolean,
+      default: undefined,
+    },
   },
 });
 </script>
@@ -42,7 +48,9 @@ export default Vue.extend({
   display: inline-flex;
   align-items: center;
   flex-shrink: 0;
-  background: color-mix(in srgb, var(--text-primary) 6%, transparent);
+  background: var(--raised-surface);
+  border: 1px solid var(--field-border);
+  border-bottom-width: 2px;
   border-radius: 5px;
   padding: 4px 8px;
 
@@ -52,6 +60,7 @@ export default Vue.extend({
 
   &.muted {
     background: transparent;
+    border-color: transparent;
     color: var(--text-muted);
   }
 }

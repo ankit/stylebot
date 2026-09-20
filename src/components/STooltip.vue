@@ -298,7 +298,7 @@ export default Vue.extend({
   left: 50%;
   z-index: 60;
   display: flex;
-  align-items: center;
+  align-items: baseline;
   gap: 6px;
   padding: 3px 7px;
   border-radius: 6px;

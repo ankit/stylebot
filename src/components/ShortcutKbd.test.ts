@@ -10,7 +10,7 @@ import ShortcutKbd from './ShortcutKbd.vue';
 describe('ShortcutKbd.vue', () => {
   it('renders one <kbd> per part with the joiner between them', () => {
     (formatShortcut as jest.Mock).mockReturnValue({
-      parts: ['Alt', 'Shift', 'R'],
+      parts: [{ text: 'Alt' }, { text: 'Shift' }, { text: 'R' }],
       joiner: '+',
     });
 
@@ -26,7 +26,11 @@ describe('ShortcutKbd.vue', () => {
 
   it('renders empty separators when the joiner is empty', () => {
     (formatShortcut as jest.Mock).mockReturnValue({
-      parts: ['⌥', '⇧', 'R'],
+      parts: [
+        { text: '⌥', icon: 'option' },
+        { text: '⇧', icon: 'shift' },
+        { text: 'R' },
+      ],
       joiner: '',
     });
 
@@ -36,5 +40,20 @@ describe('ShortcutKbd.vue', () => {
     wrapper.findAll('.joiner').wrappers.forEach(joiner => {
       expect(joiner.text()).toBe('');
     });
+  });
+
+  it('renders an icon instead of text for a part that has one', () => {
+    (formatShortcut as jest.Mock).mockReturnValue({
+      parts: [{ text: '⌥', icon: 'option' }, { text: 'R' }],
+      joiner: '',
+    });
+
+    const wrapper = mount(ShortcutKbd, { propsData: { value: 'alt+r' } });
+    const kbds = wrapper.findAll('kbd');
+
+    expect(kbds.at(0).find('svg').exists()).toBe(true);
+    expect(kbds.at(0).text()).toBe('');
+    expect(kbds.at(1).find('svg').exists()).toBe(false);
+    expect(kbds.at(1).text()).toBe('R');
   });
 });

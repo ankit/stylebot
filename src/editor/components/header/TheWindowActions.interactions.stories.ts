@@ -21,8 +21,8 @@ export default meta;
 
 const panel = (root: HTMLElement) => root.querySelector('.stylebot');
 const content = (root: HTMLElement) => root.querySelector('.stylebot-content');
-const helpDialog = (root: HTMLElement) =>
-  root.querySelector('.stylebot-help-dialog');
+const shortcutsView = (root: HTMLElement) =>
+  root.querySelector('.keyboard-shortcuts-view');
 
 export const DockFromOptionsMenu: StoryObj = {
   ...editor(WITH_RULE),
@@ -69,7 +69,7 @@ export const DockShortcuts: StoryObj = {
    so this one has to leave it the way it found it. */
 export const AdjustPageLayout: StoryObj = {
   ...editor(WITH_RULE),
-  name: 'pushing the page aside reserves room in the body and p toggles it back',
+  name: 'pushing the page aside reserves room in the body and a toggles it back',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
@@ -85,7 +85,7 @@ export const AdjustPageLayout: StoryObj = {
     await pressKey('Escape');
     await expect(canvas.queryByRole('menu')).toBeNull();
 
-    await pressKey('p');
+    await pressKey('a');
     await expect(store.state.options.layout.adjustPageLayout).toBe(false);
     await waitFor(() => expect(document.body.style.width).toBe(''));
   },
@@ -158,9 +158,9 @@ export const EscapeClosesMenuBeforeEditor: StoryObj = {
   },
 };
 
-export const HelpDialogViaShortcut: StoryObj = {
+export const ShortcutsViewViaShortcut: StoryObj = {
   ...editor(WITH_RULE),
-  name: '? opens the shortcuts dialog and stops inspecting; Escape closes only the dialog',
+  name: '? opens the shortcuts view and stops inspecting; Escape closes only the view',
   play: async ({ canvasElement }) => {
     const store = storeOf(canvasElement);
 
@@ -168,32 +168,32 @@ export const HelpDialogViaShortcut: StoryObj = {
     await expect(store.state.inspecting).toBe(true);
 
     await pressKey('?');
-    await waitFor(() => expect(helpDialog(canvasElement)).toBeVisible());
+    await waitFor(() => expect(shortcutsView(canvasElement)).toBeVisible());
     await expect(store.state.inspecting).toBe(false);
 
     await pressKey('Escape');
-    await waitFor(() => expect(helpDialog(canvasElement)).toBeNull());
+    await waitFor(() => expect(shortcutsView(canvasElement)).toBeNull());
     await expect(content(canvasElement)).toBeInTheDocument();
   },
 };
 
-export const HelpDialogViaMenu: StoryObj = {
+export const ShortcutsViewViaMenu: StoryObj = {
   ...editor(WITH_RULE),
-  name: 'the Options menu opens the shortcuts dialog and its close button dismisses it',
+  name: 'the Options menu opens the shortcuts view and its back button dismisses it',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
     const menu = await openEditorMenu(canvas, 'Options');
     await user.click(
-      within(menu).getByRole('menuitem', { name: /View keyboard shortcuts/ })
+      within(menu).getByRole('menuitem', { name: /Keyboard shortcuts/ })
     );
-    await waitFor(() => expect(helpDialog(canvasElement)).toBeVisible());
+    await waitFor(() => expect(shortcutsView(canvasElement)).toBeVisible());
 
     await user.click(
-      within(helpDialog(canvasElement) as HTMLElement).getByRole('button', {
-        name: 'Close',
+      within(shortcutsView(canvasElement) as HTMLElement).getByRole('button', {
+        name: 'Back',
       })
     );
-    await waitFor(() => expect(helpDialog(canvasElement)).toBeNull());
+    await waitFor(() => expect(shortcutsView(canvasElement)).toBeNull());
   },
 };
