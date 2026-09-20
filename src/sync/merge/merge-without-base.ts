@@ -18,13 +18,15 @@ const compareModifiedTime = (t1?: string, t2?: string) => {
 };
 
 /**
- * Merge local and remote styles by comparing modifiedTime for each style.
- *
- * A few caveats:
- * - Conflicts in css for an individual style are not handled to keep logic simple.
- * - If a style is removed in either local or remote, it is retained since we don't record deletion timestamp.
+ * Merges local and remote with no record of what they last agreed on: the
+ * union of both, newest modifiedTime winning per style. Only right for a
+ * first sync or a reinstall — without a base a missing style cannot be told
+ * apart from a deleted one, so nothing is ever removed.
  */
-export default (local: StyleMap, remote: StyleMap): StyleMap => {
+export const mergeWithoutBase = (
+  local: StyleMap,
+  remote: StyleMap
+): StyleMap => {
   const styles: StyleMap = {};
   const urls = Object.keys(local);
 

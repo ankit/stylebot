@@ -12,7 +12,7 @@ import {
   toSyncErrorKey,
   toSyncErrorDetail,
 } from '../errors';
-import mergeStyles from './merge-styles';
+import { mergeWithoutBase as mergeStyles } from '../merge/merge-without-base';
 import getAccessToken, { clearCachedToken } from './get-access-token';
 import {
   getSyncState,
