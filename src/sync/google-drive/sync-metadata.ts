@@ -23,15 +23,10 @@ export const clearSyncState = (): Promise<void> =>
 
 export const getGoogleDriveSyncMetadata = async (): Promise<
   GoogleDriveSyncMetadata | undefined
-> => {
-  const items = await chrome.storage.local.get(LEGACY_METADATA_KEY);
-  return items[LEGACY_METADATA_KEY];
-};
+> => (await getSyncState())?.metadata;
 
-export const setGoogleDriveSyncMetadata = (
-  googleDriveSyncMetadata: GoogleDriveSyncMetadata
-): Promise<void> =>
-  chrome.storage.local.set({ [LEGACY_METADATA_KEY]: googleDriveSyncMetadata });
+export const getLastSyncedAt = async (): Promise<string | undefined> =>
+  (await getSyncState())?.lastSyncedAt;
 
 export const setGoogleDriveSyncEnabled = (enabled: boolean): void => {
   chrome.storage.local.set({ 'google-drive-sync-enabled': enabled });
