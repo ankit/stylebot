@@ -7,7 +7,12 @@ import {
   IFRAME_PAGE,
   INSPECT_PAGE,
 } from '@stylebot/storybook/editor-story';
-import { pressKey, storeOf, user } from '@stylebot/storybook/story-helpers';
+import {
+  hoverPage,
+  pressKey,
+  storeOf,
+  user,
+} from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
   title: 'Tests/Editor/Inspector',
@@ -66,7 +71,7 @@ export const PickSetsSelector: StoryObj = {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
 
-    await user.hover(canvas.getByRole('heading', { level: 1 }));
+    await hoverPage(canvas.getByRole('heading', { level: 1 }));
     await waitFor(() => expect(currentChip()).toMatch(/\bh1$/));
 
     await pressKey('Enter');
@@ -89,7 +94,7 @@ export const ArrowKeysClimbAncestors: StoryObj = {
     const link = canvas.getByRole('link', { name: 'Learn more' });
 
     await step('hovering shows the element and offers its parent', async () => {
-      await user.hover(link);
+      await hoverPage(link);
       await waitFor(() => expect(currentChip()).toMatch(/\ba$/));
       await expect(nextChip()).toMatch(/\bp$/);
     });
@@ -122,7 +127,7 @@ export const ArrowKeysClimbAncestors: StoryObj = {
 
       // The pointer is still over the link from before; leave and re-enter.
       await user.unhover(link);
-      await user.hover(link);
+      await hoverPage(link);
       await waitFor(() => expect(currentChip()).toMatch(/\ba$/));
 
       for (let i = 0; i < 10; i++) {
@@ -147,7 +152,7 @@ export const ClickOnIframeSelectsIt: StoryObj = {
     const store = storeOf(canvasElement);
     const frame = canvasElement.querySelector('iframe') as HTMLElement;
 
-    await user.hover(frame);
+    await hoverPage(frame);
     await waitFor(() => expect(currentChip()).toMatch(/iframe/));
 
     // The overlay rect shields the frame so the click stays in this

@@ -12,6 +12,7 @@
     "baseUrl": "../src",
     "paths": {
       "@stylebot/storybook/*": ["../.storybook/*"],
+      "@/*": ["*"],
       "@stylebot/*": ["*/index"]
     },
     "skipLibCheck": true

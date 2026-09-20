@@ -4,11 +4,11 @@ import * as postcss from 'postcss';
 import { getPrimaryFontFamily, injectRootIntoDocument } from '@stylebot/css';
 import type { StylebotOptions } from '@stylebot/types';
 
-import mockState from '../../src/editor/store/__mocks__/state';
-import actions from '../../src/editor/store/actions';
-import getters from '../../src/editor/store/getters';
-import mutations from '../../src/editor/store/mutations';
-import type { State } from '../../src/editor/store';
+import mockState from '@/editor/store/__mocks__/state';
+import actions from '@/editor/store/actions';
+import getters from '@/editor/store/getters';
+import mutations from '@/editor/store/mutations';
+import type { State } from '@/editor/store';
 
 export type EditorStateOverrides = Partial<Omit<State, 'options'>> & {
   options?: Partial<StylebotOptions>;

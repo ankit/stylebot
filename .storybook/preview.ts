@@ -13,7 +13,7 @@ import type { Preview } from '@storybook/vue';
 import { t } from '@stylebot/i18n';
 import { ThemeProvider } from '@stylebot/components';
 import { installChrome } from './mocks/chrome';
-import { setInteractionDelay } from './story-helpers';
+import { resetHoverSettled, setInteractionDelay } from './story-helpers';
 
 import '../src/fonts/fonts.css';
 import '../src/editor/index.scss';
@@ -138,6 +138,7 @@ const preview: Preview = {
       // Slow motion is for watching a play in the browser; the runner never
       // sets it, so CI stays instant.
       setInteractionDelay(globals.speed === 'slow' ? 250 : 0);
+      resetHoverSettled();
 
       // Composites read their appearance from options, so the toolbar theme
       // flows through the shim as well as the outer ThemeProvider.

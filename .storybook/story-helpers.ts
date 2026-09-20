@@ -5,7 +5,7 @@ import type { StoryObj } from '@storybook/vue';
 import { expect, fireEvent, userEvent, waitFor, within } from '@storybook/test';
 
 import { getDeclarationsForSelector } from '@stylebot/css';
-import type { State } from '../src/editor/store';
+import type { State } from '@/editor/store';
 
 type Components = Record<string, Component>;
 type Data = () => Record<string, unknown>;
@@ -128,11 +128,50 @@ export const pressKey = async (key: string): Promise<void> => {
   await user.keyboard(`{${key}}`);
 };
 
+let hoverSettled = false;
+
+export const resetHoverSettled = (): void => {
+  hoverSettled = false;
+};
+
+/**
+ * Waits for the browser to decide what the real cursor rests on. Headless
+ * Chromium on Linux keeps the never-moved cursor at the origin and
+ * re-evaluates it after the next layout change, firing pointerover on
+ * whatever sits there — which would displace a hover the test had just
+ * dispatched. Bounded, because on macOS the cursor counts as outside the
+ * window and nothing ever matches :hover.
+ */
+const settleHover = async (): Promise<void> => {
+  if (hoverSettled) {
+    return;
+  }
+
+  const deadline = Date.now() + 500;
+  while (
+    Date.now() < deadline &&
+    !document.querySelector('#storybook-root :hover')
+  ) {
+    await new Promise(resolve => requestAnimationFrame(() => resolve(null)));
+  }
+
+  hoverSettled = true;
+};
+
+/**
+ * Hovers a page element while inspecting, once the browser's own hover
+ * state can no longer interfere.
+ */
+export const hoverPage = async (element: HTMLElement): Promise<void> => {
+  await settleHover();
+  await user.hover(element);
+};
+
 /**
  * Picks a page element the way the inspector does: hover it, then Enter.
  */
 export const pick = async (element: HTMLElement): Promise<void> => {
-  await user.hover(element);
+  await hoverPage(element);
   await pressKey('Enter');
 };
 

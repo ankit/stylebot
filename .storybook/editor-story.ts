@@ -1,6 +1,6 @@
 import type { StoryObj } from '@storybook/vue';
 
-import TheStylebotApp from '../src/editor/components/TheStylebotApp.vue';
+import TheStylebotApp from '@/editor/components/TheStylebotApp.vue';
 import { createEditorStore, EditorStateOverrides } from './mocks/editor-store';
 
 export const RULE_CSS = `h1 {

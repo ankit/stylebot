@@ -55,6 +55,9 @@ const config: StorybookConfig = {
       resolve: {
         alias: [
           { find: '@stylebot/storybook', replacement: __dirname },
+          // Deep paths inside src for the mocks and helpers here; stories
+          // themselves keep to the package aliases below.
+          { find: /^@\//, replacement: `${src('')}/` },
           {
             find: '@stylebot/readability',
             replacement: mock('readability.ts'),

@@ -3,7 +3,7 @@ import messages from 'virtual:stylebot-locale';
 import {
   add as addRecentColor,
   getAll as getAllRecentColors,
-} from '../../src/background/color-history';
+} from '@/background/color-history';
 
 import {
   defaultOptions,
