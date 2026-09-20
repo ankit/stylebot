@@ -214,8 +214,9 @@ describe('RemotePageBridge', () => {
     global.chrome.windows = { update: windowsUpdate } as never;
 
     new RemotePageBridge(7, handlers).focusPage();
-    await Promise.resolve();
-    await Promise.resolve();
+    for (let i = 0; i < 6; i++) {
+      await Promise.resolve();
+    }
 
     expect(update).toBeCalledWith(7, { active: true });
     expect(windowsUpdate).toBeCalledWith(4, { focused: true });

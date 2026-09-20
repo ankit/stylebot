@@ -35,6 +35,8 @@ export type EditorHost = 'page' | 'window';
 export type EditorTab = {
   title: string;
   favIconUrl: string;
+  // Whether it is the selected tab of its window right now.
+  active: boolean;
 };
 
 export type CssSelectorMetadata = {

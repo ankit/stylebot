@@ -14,7 +14,11 @@ import {
 const handleCommand = (store: Store<State>, name: StylebotCommandName) => {
   switch (name) {
     case 'stylebot':
-      toggleStylebot(store);
+      if (store.state.host === 'window') {
+        store.dispatch('closeStylebot');
+      } else {
+        toggleStylebot(store);
+      }
       break;
 
     case 'style':

@@ -1,9 +1,17 @@
 <template>
   <s-tooltip :text="t('switch_to_tab')" class="window-tab-bar">
-    <button type="button" class="window-tab" @click="focusPage">
+    <button
+      type="button"
+      class="window-tab"
+      :class="{ background: inBackground }"
+      @click="focusPage"
+    >
       <img v-if="favIconUrl" class="window-tab-icon" :src="favIconUrl" alt="" />
       <span v-else class="window-tab-icon window-tab-icon-placeholder" />
       <s-text size="small" class="window-tab-title">{{ title }}</s-text>
+      <s-text v-if="inBackground" size="caption" class="window-tab-hint">
+        {{ t('tab_in_background') }}
+      </s-text>
     </button>
   </s-tooltip>
 </template>
@@ -29,6 +37,10 @@ export default Vue.extend({
 
     favIconUrl(): string {
       return this.$store.state.tab?.favIconUrl ?? '';
+    },
+
+    inBackground(): boolean {
+      return this.$store.state.tab?.active === false;
     },
   },
 
@@ -77,9 +89,25 @@ export default Vue.extend({
 }
 
 .window-tab-title {
+  flex: 1;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.window-tab.background {
+  .window-tab-icon,
+  .window-tab-title {
+    opacity: 0.55;
+  }
+}
+
+.window-tab-hint {
+  flex: none;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--panel-border);
+  color: var(--text-muted);
 }
 </style>
