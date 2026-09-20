@@ -71,16 +71,19 @@ export const get = async (url: string): Promise<StyleWithoutUrl> => {
 };
 
 /**
- * Writes the style map, plus its modified-time metadata, to storage.
+ * Writes the style map, plus its modified-time metadata, to storage, and
+ * returns the revision it stamped.
  */
-const writeToStorage = (styles: StyleMap): Promise<void> =>
-  chrome.storage.local.set({
-    styles,
+const writeToStorage = async (styles: StyleMap): Promise<string> => {
+  const modifiedTime = getCurrentTimestamp();
 
-    'styles-metadata': {
-      modifiedTime: getCurrentTimestamp(),
-    },
+  await chrome.storage.local.set({
+    styles,
+    'styles-metadata': { modifiedTime },
   });
+
+  return modifiedTime;
+};
 
 /**
  * Chains writes so each mutation reads styles only after the prior write
@@ -93,8 +96,33 @@ let pendingWrite = Promise.resolve();
  * Replaces the entire style map.
  */
 export const setAll = (styles: StyleMap): Promise<void> => {
-  pendingWrite = pendingWrite.then(() => writeToStorage(styles));
+  pendingWrite = pendingWrite.then(() => writeToStorage(styles).then());
   return pendingWrite;
+};
+
+/**
+ * Replaces the style map only if no write has landed since `revision` was
+ * read, and returns the revision stamped — or null when an edit got in
+ * first. The check runs inside the write chain, so nothing can slip in
+ * between it and the write. Sync uses this so a merge computed from a
+ * snapshot never overwrites an edit made while it was computing.
+ */
+export const setAllIfUnchanged = (
+  styles: StyleMap,
+  revision: string
+): Promise<string | null> => {
+  const attempt = pendingWrite.then(async () => {
+    const items = await chrome.storage.local.get('styles-metadata');
+
+    if (items['styles-metadata']?.modifiedTime !== revision) {
+      return null;
+    }
+
+    return writeToStorage(styles);
+  });
+
+  pendingWrite = attempt.then(() => undefined);
+  return attempt;
 };
 
 /**
