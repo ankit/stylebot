@@ -159,6 +159,19 @@ export const declaration = (
   )?.value;
 
 /**
+ * A computed style on the stand-in page, for asserting that the CSS the
+ * editor wrote is what the browser applies.
+ */
+export const pageStyle = (
+  root: HTMLElement,
+  selector: string,
+  property: string
+): string =>
+  getComputedStyle(
+    root.querySelector(`.sb-page ${selector}`) as Element
+  ).getPropertyValue(property);
+
+/**
  * The control column of a basic-mode property row, found by its label.
  */
 export const propertyControl = (canvas: Canvas, label: string): HTMLElement =>

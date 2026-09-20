@@ -5,6 +5,7 @@ import {
   addDeclaration,
   getCssAfterApplyingFilterEffectToPage,
   getPrimaryFontFamily,
+  injectRootIntoDocument,
   removeRule,
 } from '@stylebot/css';
 import type { FilterEffect, StylebotOptions } from '@stylebot/types';
@@ -40,8 +41,10 @@ type Context = { state: State; commit: Commit; dispatch: Dispatch };
  * A real Vuex store with the editor's getters and mutations but no
  * extension side effects, so composites render from seeded CSS and
  * stay interactive in the Storybook canvas. Actions that only touch
- * state are mirrored here; the ones that reach into the page or the
- * background are no-ops.
+ * state or the page's stylesheet are mirrored here — the style is
+ * injected into the canvas like the content script would, so the
+ * stand-in page restyles live; the ones that reach the background are
+ * no-ops.
  */
 export const createEditorStore = (
   overrides: EditorStateOverrides = {}
@@ -72,9 +75,11 @@ export const createEditorStore = (
       });
     },
 
-    applyCss({ commit }, { css }: { css: string }) {
+    applyCss({ state, commit }, { css }: { css: string }) {
+      const root = postcss.parse(css);
       commit('setCss', css);
-      commit('setSelectors', postcss.parse(css));
+      commit('setSelectors', root);
+      injectRootIntoDocument(root, state.url);
     },
 
     applyDeclaration(
@@ -150,7 +155,9 @@ export const createEditorStore = (
   const store = new Vuex.Store<State>({ state, getters, mutations, actions });
 
   if (state.css) {
-    store.commit('setSelectors', postcss.parse(state.css));
+    const root = postcss.parse(state.css);
+    store.commit('setSelectors', root);
+    injectRootIntoDocument(root, state.url);
   }
 
   return store;

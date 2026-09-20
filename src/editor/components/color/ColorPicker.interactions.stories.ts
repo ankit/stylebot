@@ -10,6 +10,7 @@ import {
   pressKey,
   propertyCard,
   propertyControl,
+  pageStyle,
   storeOf,
 } from '@stylebot/storybook/story-helpers';
 
@@ -63,6 +64,9 @@ export const HexFieldApplies: StoryObj = {
     await expect(color).toHaveValue('#2a5fd6');
     await userEvent.type(color, '#112233');
     await expect(declaration(store, 'h1', 'color')).toBe('#112233');
+    await expect(pageStyle(canvasElement, 'h1', 'color')).toBe(
+      'rgb(17, 34, 51)'
+    );
 
     // Background is collapsed for a rule without one; open it first.
     await userEvent.click(

@@ -12,6 +12,7 @@ import {
   declaration,
   pressKey,
   propertyCard,
+  pageStyle,
   storeOf,
 } from '@stylebot/storybook/story-helpers';
 
@@ -44,10 +45,12 @@ export const HideButton: StoryObj = {
 
     await userEvent.click(hide);
     await expect(declaration(store, 'h1', 'display')).toBe('none');
+    await expect(pageStyle(canvasElement, 'h1', 'display')).toBe('none');
     await waitFor(() => expect(hide).toHaveClass('active'));
 
     await pressKey('h');
     await expect(declaration(store, 'h1', 'display')).toBeUndefined();
+    await expect(pageStyle(canvasElement, 'h1', 'display')).toBe('block');
     await waitFor(() => expect(hide).not.toHaveClass('active'));
   },
 };
@@ -65,6 +68,9 @@ export const ResetButton: StoryObj = {
 
     await expect(store.getters.activeRule).toBeNull();
     await expect(store.state.css).not.toMatch(/h1\s*\{/);
+    await expect(pageStyle(canvasElement, 'h1', 'color')).not.toBe(
+      'rgb(42, 95, 214)'
+    );
     // The other rule is untouched.
     await expect(declaration(store, '.article-body', 'line-height')).toBe(
       '1.6'

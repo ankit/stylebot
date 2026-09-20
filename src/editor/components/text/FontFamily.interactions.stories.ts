@@ -7,6 +7,7 @@ import {
   declaration,
   findOpenMenu,
   pressKey,
+  pageStyle,
   storeOf,
 } from '@stylebot/storybook/story-helpers';
 
@@ -88,6 +89,9 @@ export const SuggestsAndApplies: StoryObj = {
     await waitFor(() => expect(canvas.queryByRole('menu')).toBeNull());
     await expect(declaration(store, 'h1', 'font-family')).toBe(
       'Playfair Display'
+    );
+    await expect(pageStyle(canvasElement, 'h1', 'font-family')).toMatch(
+      /Playfair Display/
     );
     await expect(store.state.options.fonts[0]).toBe('Playfair Display');
     await waitFor(() =>

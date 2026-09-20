@@ -33,6 +33,12 @@ export const GrayscaleToggleAndSlider: StoryObj = {
     await userEvent.click(toggle);
     await expect(store.getters.grayscale).toBe(100);
     await expect(store.state.css).toContain('filter: grayscale(100%)');
+    // The preset targets body's element children, which here is the
+    // Storybook root the page sits in.
+    await expect(
+      getComputedStyle(document.getElementById('storybook-root') as Element)
+        .filter
+    ).toBe('grayscale(1)');
     await waitFor(() => expect(toggle).toBeChecked());
     await waitFor(() =>
       expect(grayscaleSlider(canvasElement)).toBeInTheDocument()
@@ -47,6 +53,10 @@ export const GrayscaleToggleAndSlider: StoryObj = {
     await userEvent.click(toggle);
     await expect(store.getters.grayscale).toBe(0);
     await expect(store.state.css).not.toContain('grayscale(');
+    await expect(
+      getComputedStyle(document.getElementById('storybook-root') as Element)
+        .filter
+    ).toBe('none');
     await waitFor(() => expect(toggle).not.toBeChecked());
   },
 };

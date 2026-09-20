@@ -6,6 +6,7 @@ import { editor, RULE_CSS } from '@stylebot/storybook/editor-story';
 import {
   declaration,
   propertyControl,
+  pageStyle,
   storeOf,
 } from '@stylebot/storybook/story-helpers';
 
@@ -46,6 +47,7 @@ export const OpacitySlider: StoryObj = {
 
     await slide(slider(control), 0.5);
     await expect(declaration(store, 'h1', 'opacity')).toBe('0.5');
+    await expect(pageStyle(canvasElement, 'h1', 'opacity')).toBe('0.5');
     await waitFor(() =>
       expect(control.querySelector('.opacity-value')).toHaveTextContent('0.5')
     );
@@ -71,6 +73,7 @@ export const FilterControl: StoryObj = {
 
     await slide(slider(control), 10);
     await expect(declaration(store, 'h1', 'filter')).toBe('blur(10px)');
+    await expect(pageStyle(canvasElement, 'h1', 'filter')).toBe('blur(10px)');
 
     await userEvent.click(option('Gray'));
     await expect(declaration(store, 'h1', 'filter')).toBe('grayscale(50%)');

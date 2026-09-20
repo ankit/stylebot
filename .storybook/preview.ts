@@ -115,6 +115,12 @@ const preview: Preview = {
 
   decorators: [
     (_story, { globals, parameters }) => {
+      // The editor store mock injects the style into the document like the
+      // content script does; the previous story's must not bleed into this one.
+      document
+        .querySelectorAll('style[id^="stylebot-css-"]')
+        .forEach(el => el.remove());
+
       // Composites read their appearance from options, so the toolbar theme
       // flows through the shim as well as the outer ThemeProvider.
       installChrome({

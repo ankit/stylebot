@@ -7,6 +7,7 @@ import {
   declaration,
   findOpenMenu,
   propertyControl,
+  pageStyle,
   storeOf,
 } from '@stylebot/storybook/story-helpers';
 
@@ -58,6 +59,7 @@ export const SpacingModes: StoryObj = {
     });
     await userEvent.type(all, '8');
     await expect(declaration(store, 'h1', 'padding')).toBe('8px');
+    await expect(pageStyle(canvasElement, 'h1', 'padding')).toBe('8px');
 
     await userEvent.click(modeButton(padding, 'Individual'));
     const top = await waitFor(() => {
@@ -68,10 +70,13 @@ export const SpacingModes: StoryObj = {
     // Focusing a field selects its value, so typing replaces it.
     await userEvent.type(top, '4');
     await expect(declaration(store, 'h1', 'padding')).toBe('4px 8px 8px');
+    await expect(pageStyle(canvasElement, 'h1', 'padding-top')).toBe('4px');
+    await expect(pageStyle(canvasElement, 'h1', 'padding-left')).toBe('8px');
 
     await userEvent.click(modeButton(padding, 'None'));
     await expect(declaration(store, 'h1', 'padding')).toBeUndefined();
     await expect(declaration(store, 'h1', 'padding-top')).toBeUndefined();
+    await expect(pageStyle(canvasElement, 'h1', 'padding')).toBe('0px');
   },
 };
 
@@ -118,11 +123,18 @@ export const BorderControls: StoryObj = {
       })
     );
     await expect(declaration(store, 'h1', 'border-style')).toBe('dashed');
+    await expect(pageStyle(canvasElement, 'h1', 'border-top-style')).toBe(
+      'dashed'
+    );
     await waitFor(() => expect(style).toHaveTextContent('Dashed'));
 
+    // The longhand written after the shorthand is what wins on the page.
     const width = control.querySelector('.number-input') as HTMLInputElement;
     await userEvent.type(width, '2');
     await expect(declaration(store, 'h1', 'border-width')).toBe('2px');
+    await expect(pageStyle(canvasElement, 'h1', 'border-top-width')).toBe(
+      '2px'
+    );
   },
 };
 

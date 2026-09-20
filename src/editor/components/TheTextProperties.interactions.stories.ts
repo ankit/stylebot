@@ -7,6 +7,7 @@ import {
   declaration,
   findOpenMenu,
   propertyControl,
+  pageStyle,
   storeOf,
 } from '@stylebot/storybook/story-helpers';
 
@@ -43,6 +44,7 @@ export const FontSizeField: StoryObj = {
     await userEvent.clear(input);
     await userEvent.type(input, '20');
     await expect(declaration(store, 'h1', 'font-size')).toBe('20px');
+    await expect(pageStyle(canvasElement, 'h1', 'font-size')).toBe('20px');
 
     await userEvent.clear(input);
     await expect(declaration(store, 'h1', 'font-size')).toBeUndefined();
@@ -96,6 +98,7 @@ export const TextAlignSegmented: StoryObj = {
 
     await userEvent.click(left);
     await expect(declaration(store, 'h1', 'text-align')).toBe('left');
+    await expect(pageStyle(canvasElement, 'h1', 'text-align')).toBe('left');
     await waitFor(() => expect(left).toHaveClass('active'));
   },
 };
