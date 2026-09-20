@@ -4,6 +4,7 @@ import { t } from '@stylebot/i18n';
 import { createStore } from '../editor/store';
 import { setPageBridge, RemotePageBridge } from '@stylebot/page-bridge';
 import { setupVue } from '../editor/utils/init-editor';
+import initCommandListener from '../editor/listeners/commands';
 import TheStylebotApp from '../editor/components/TheStylebotApp.vue';
 
 import { initWindowListeners, initTabInfo } from './listeners';
@@ -72,6 +73,7 @@ const start = async (): Promise<void> => {
   await store.dispatch('openStylebot', { inspect: false });
 
   initWindowListeners(store);
+  initCommandListener(store);
 
   new Vue({
     store,

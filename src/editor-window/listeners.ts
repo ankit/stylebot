@@ -40,10 +40,12 @@ const initTabInfo = (store: Store<State>, tabId: number): void => {
     store.commit('setTab', {
       title: tab.title ?? '',
       favIconUrl: tab.favIconUrl ?? '',
+      active: tab.active,
     });
   };
 
-  chrome.tabs.get(tabId).then(update, () => undefined);
+  const refresh = () => chrome.tabs.get(tabId).then(update, () => undefined);
+  refresh();
 
   chrome.tabs.onUpdated.addListener((updatedTabId, changeInfo, tab) => {
     if (
@@ -53,6 +55,11 @@ const initTabInfo = (store: Store<State>, tabId: number): void => {
       update(tab);
     }
   });
+
+  // Another tab taking over the tab's window, or it being moved, changes
+  // whether the page being edited is actually on screen.
+  chrome.tabs.onActivated.addListener(refresh);
+  chrome.tabs.onAttached.addListener(refresh);
 };
 
 export { initWindowListeners, initTabInfo };

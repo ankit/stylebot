@@ -25,14 +25,18 @@ describe('initCommandListener', () => {
     areaName: string
   ) => void;
 
-  const buildStore = (commands: State['commands']): Store<State> =>
+  const buildStore = (
+    commands: State['commands'],
+    host: State['host'] = 'page'
+  ): Store<State> =>
     new Store<State>({
-      state: { ...mockState, commands },
+      state: { ...mockState, commands, host },
       mutations: {
         setCommands(state, value: State['commands']) {
           state.commands = value;
         },
       },
+      actions: { closeStylebot: jest.fn() },
     });
 
   beforeEach(() => {
@@ -83,6 +87,34 @@ describe('initCommandListener', () => {
     handler();
 
     expect(commonModule.toggleReadability).toHaveBeenCalledWith(store);
+  });
+
+  it('toggles the in-page editor for the stylebot combo', () => {
+    const store = buildStore({
+      readability: '',
+      style: '',
+      stylebot: 'alt+shift+m',
+      grayscale: '',
+    });
+    initCommandListener(store);
+
+    hotkeys.mock.calls[0][1]();
+
+    expect(commonModule.toggleStylebot).toHaveBeenCalledWith(store);
+  });
+
+  it('closes the editor window for the stylebot combo in the window host', () => {
+    const store = buildStore(
+      { readability: '', style: '', stylebot: 'alt+shift+m', grayscale: '' },
+      'window'
+    );
+    const dispatch = jest.spyOn(store, 'dispatch');
+    initCommandListener(store);
+
+    hotkeys.mock.calls[0][1]();
+
+    expect(dispatch).toHaveBeenCalledWith('closeStylebot');
+    expect(commonModule.toggleStylebot).not.toHaveBeenCalled();
   });
 
   it('re-binds hotkeys when chrome.storage reports a commands change', () => {

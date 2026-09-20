@@ -135,8 +135,9 @@ await context.addInitScript(() => {
 // Stamp a small corner badge with the worktree name on every page, so this dev window is
 // identifiable at a glance (including in the Cmd+Tab window-preview thumbnail on macOS).
 await context.addInitScript(label => {
-  // Only badge the top frame, never iframes (e.g. stylebot's monaco editor).
-  if (window.top !== window) {
+  // Only badge the top frame, never iframes (e.g. stylebot's monaco editor),
+  // and never the extension's own pages (popup, options, editor window).
+  if (window.top !== window || location.protocol === 'chrome-extension:') {
     return;
   }
   const addBadge = () => {
