@@ -28,6 +28,7 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 @mixin dark-theme-vars {
+  color-scheme: dark;
   --panel-surface: #1c1e22;
   --text-primary: #f2f4f7;
   --text-secondary: #a3aab6;
@@ -52,7 +53,6 @@ export default Vue.extend({
   --field-divider: #2c2f35;
   --slider-track: #3a3e46;
   --icon-color: #9aa1ae;
-  --key-fill: #000;
 
   --card-surface: #212429;
   --tab-surface: #181a1e;
@@ -103,7 +103,6 @@ export default Vue.extend({
   --field-divider: #ecedf0;
   --slider-track: #e4e7ed;
   --icon-color: #6a7180;
-  --key-fill: #fff;
 
   --card-surface: #fff;
   --tab-surface: #f7f8fa;
@@ -138,6 +137,10 @@ export default Vue.extend({
   .theme-provider:not([data-theme]) {
     @include dark-theme-vars;
   }
+}
+
+.theme-provider[data-theme='light'] {
+  color-scheme: light;
 }
 
 .theme-provider[data-theme='dark'] {

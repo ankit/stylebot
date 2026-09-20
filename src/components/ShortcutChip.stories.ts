@@ -40,8 +40,10 @@ export const Variants = matrix({
   ],
 });
 
-/* Every modifier gets its own icon on macOS; off Mac they fall back to
-   readable words instead (Alt/Shift/Win/Ctrl), so both need coverage. */
+/*
+ * Every modifier gets its own icon on macOS; off Mac they fall back to
+ * readable words instead (Alt/Shift/Win/Ctrl), so both need coverage.
+ */
 export const ModifierKeys = matrix({
   components: { ShortcutChip },
   rows: [

@@ -20,9 +20,11 @@ export const NoGlobalShortcuts: StoryObj = editor({
   commands: { style: '', stylebot: '', grayscale: '', readability: '' },
 });
 
-/* Windows shows word labels (Alt+Shift+M) instead of the Mac symbol icons
-   — the view itself doesn't otherwise differ, so this mounts it directly
-   rather than through the full editor() app shell. */
+/*
+ * Windows shows word labels (Alt+Shift+M) instead of the Mac symbol icons
+ * — the view itself doesn't otherwise differ, so this mounts it directly
+ * rather than through the full editor() app shell.
+ */
 export const Windows: StoryObj = {
   render: (_args, { globals }) => ({
     components: { TheKeyboardShortcutsView },

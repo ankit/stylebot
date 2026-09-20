@@ -48,7 +48,7 @@ export default Vue.extend({
   display: inline-flex;
   align-items: center;
   flex-shrink: 0;
-  background: var(--key-fill);
+  background: light-dark(#fff, #000);
   border: 1px solid var(--field-border);
   border-bottom-width: 2px;
   border-radius: 5px;
