@@ -73,3 +73,21 @@ the element right now.
 When a selector is only styled as part of a grouped rule (`.foo, .bar { … }`),
 `splitSelectorFromGroup` first moves it into its own rule, carrying over the
 declarations it already had, so an edit doesn't silently affect its groupmates.
+
+### Native CSS nesting
+
+postcss parses a nested rule (`.card { .title { … } & + & { … } }`) as a
+`Rule` child of a `Rule`, and prints it back verbatim, so nesting survives
+every transform here untouched. The helpers treat nested rules as opaque:
+
+- Lookups by selector (`getRule`, `getRuleForSelector`, `getExistingSelector`,
+  `removeRule`, …) skip them — `.title` inside `.card` means `.card .title`,
+  so a top-level `.title` edit must never land on it. `isNestedRule` and
+  `walkUnnestedRules` are the shared building blocks.
+- `addDeclaration` and the Basic-mode readers (`withOwnDeclarationsOnly`) only
+  touch a rule's own declarations, and a rule left with nothing but nested
+  blocks is kept.
+- `appendImportantToDeclarations` reaches into nested rules and into grouping
+  at-rules (`@media`, `@supports`, `@container`, `@layer`, `@scope`, …) at any
+  depth; only descriptor at-rules such as `@font-face` and `@keyframes`, where
+  `!important` is invalid, are left alone.

@@ -106,3 +106,62 @@ test('typing a CSS property offers autocomplete and a color value shows a swatch
 
   await expect(monaco.locator('.colorpicker-color-decoration')).toBeVisible();
 });
+
+test('native CSS nesting gets no error markers, keeps autocomplete inside the nested block, and applies (#782)', async ({
+  context,
+  openPopup,
+}) => {
+  test.slow();
+
+  await servePage(
+    context,
+    `
+      <!doctype html>
+      <html>
+        <body>
+          <h1>Test page</h1>
+          <p>Paragraph</p>
+        </body>
+      </html>
+    `
+  );
+
+  const page = await context.newPage();
+  await page.goto(PAGE_URL);
+
+  const editorRoot = await openEditor(page, openPopup);
+  await switchEditorMode(editorRoot, 'code');
+
+  const monaco = getMonacoFrame(page);
+  const editor = monaco.locator('.monaco-editor');
+  const countMarkers = () =>
+    editor.evaluate(() => {
+      const { monaco } = window as Window & {
+        monaco: { editor: { getModelMarkers(filter: object): Array<unknown> } };
+      };
+
+      return monaco.editor.getModelMarkers({}).length;
+    });
+
+  await editor.click();
+
+  // A real mistake first, proving the language service is validating at all
+  // before relying on it reporting nothing for the nested syntax.
+  await page.keyboard.type('h1 { color: ; }');
+  await expect.poll(countMarkers).toBeGreaterThan(0);
+
+  await page.keyboard.press('ControlOrMeta+a');
+  await page.keyboard.type('h1 { color: rgb(0, 0, 255); & + p { col');
+
+  await expect(monaco.locator('.suggest-widget.visible')).toBeVisible();
+  await page.keyboard.press('Escape');
+
+  await page.keyboard.type(
+    'or: rgb(0, 128, 0); } @media (min-width: 1px) { font-style: italic; } }'
+  );
+
+  await expect(page.locator('h1')).toHaveCSS('color', 'rgb(0, 0, 255)');
+  await expect(page.locator('h1')).toHaveCSS('font-style', 'italic');
+  await expect(page.locator('body > p')).toHaveCSS('color', 'rgb(0, 128, 0)');
+  await expect.poll(countMarkers).toBe(0);
+});

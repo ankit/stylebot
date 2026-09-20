@@ -1,13 +1,77 @@
 import * as postcss from 'postcss';
 import { CssDeclaration } from '@stylebot/types';
 
-export const getRule = (css: string, selector: string): postcss.Rule | null => {
-  const root = postcss.parse(css);
-  const matchingRules: Array<postcss.Rule> = [];
+/**
+ * Whether the rule sits inside another rule (native CSS nesting). Its
+ * selector is then relative to the parent — `.title` inside `.card` means
+ * `.card .title` — so it can't be looked up or edited by selector alone.
+ */
+export const isNestedRule = (rule: postcss.Rule): boolean => {
+  let parent = rule.parent;
 
-  root.walkRules(selector, rule => matchingRules.push(rule));
-  return matchingRules.length > 0 ? matchingRules[0] : null;
+  while (parent && parent.type !== 'root') {
+    if (parent.type === 'rule') {
+      return true;
+    }
+    parent = parent.parent;
+  }
+
+  return false;
 };
+
+/**
+ * Like root.walkRules, but skips rules nested inside another rule.
+ */
+export const walkUnnestedRules = (
+  root: postcss.Root,
+  callback: (rule: postcss.Rule) => void
+): void => {
+  root.walkRules(rule => {
+    if (!isNestedRule(rule)) {
+      callback(rule);
+    }
+  });
+};
+
+/**
+ * A copy of the rule holding only its own declarations, so readers that walk
+ * it don't pick up declarations belonging to a nested rule or at-rule.
+ */
+export const withOwnDeclarationsOnly = (rule: postcss.Rule): postcss.Rule => {
+  const copy = rule.clone();
+
+  copy.each(node => {
+    if (node.type !== 'decl') {
+      node.remove();
+    }
+  });
+  copy.raws.semicolon = true;
+
+  return copy;
+};
+
+/**
+ * The rule for this exact selector: the top-level one when there is one,
+ * otherwise the first inside an at-rule (e.g. `@media`). Rules nested inside
+ * another rule never count, whatever their selector.
+ */
+export const findRule = (
+  root: postcss.Root,
+  selector: string
+): postcss.Rule | null => {
+  const matches: Array<postcss.Rule> = [];
+
+  walkUnnestedRules(root, rule => {
+    if (rule.selector === selector) {
+      matches.push(rule);
+    }
+  });
+
+  return matches.find(rule => rule.parent === root) ?? matches[0] ?? null;
+};
+
+export const getRule = (css: string, selector: string): postcss.Rule | null =>
+  findRule(postcss.parse(css), selector);
 
 /**
  * Unlike getRule, also matches a selector grouped in a comma-separated rule.
@@ -20,7 +84,7 @@ export const getRuleForSelector = (
   const root = postcss.parse(css);
   let found: postcss.Rule | null = null;
 
-  root.walkRules(rule => {
+  walkUnnestedRules(root, rule => {
     if (rule.selectors.includes(selector)) {
       found = rule;
     }
@@ -45,7 +109,7 @@ export const getDeclarationsForSelector = (
   }
 
   const declarations: Array<CssDeclaration> = [];
-  rule.walkDecls(decl => {
+  withOwnDeclarationsOnly(rule).walkDecls(decl => {
     declarations.push({ property: decl.prop, value: decl.value });
   });
 
@@ -69,7 +133,7 @@ export const getExistingSelector = (
   const root = postcss.parse(css);
   let match: string | null = null;
 
-  root.walkRules(rule => {
+  walkUnnestedRules(root, rule => {
     if (match) {
       return;
     }
@@ -105,7 +169,7 @@ export const splitSelectorFromGroup = (
   const root = postcss.parse(css);
   const matches: Array<postcss.Rule> = [];
 
-  root.walkRules(rule => {
+  walkUnnestedRules(root, rule => {
     if (rule.selector !== selector && rule.selectors.includes(selector)) {
       matches.push(rule);
     }
@@ -133,16 +197,29 @@ export const addEmptyRule = (css: string, selector: string): string => {
 
 export const removeEmptyRules = (css: string): string => {
   const root = postcss.parse(css);
-  root.walkRules(rule => {
+  const rules: Array<postcss.Rule> = [];
+
+  root.walkRules(rule => rules.push(rule));
+
+  // Innermost first, so a rule left holding nothing but an empty nested
+  // rule is itself removed in the same pass.
+  rules.reverse().forEach(rule => {
     if (!rule.first) {
       rule.remove();
     }
   });
+
   return root.toString();
 };
 
 export const removeRule = (css: string, selector: string): string => {
   const root = postcss.parse(css);
-  root.walkRules(selector, rule => rule.remove());
+
+  walkUnnestedRules(root, rule => {
+    if (rule.selector === selector) {
+      rule.remove();
+    }
+  });
+
   return root.toString();
 };

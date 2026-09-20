@@ -34,6 +34,44 @@ describe('getters', () => {
     });
   });
 
+  describe('activeRule', () => {
+    const css = `.card {
+  color: red;
+  .title {
+    color: blue;
+  }
+  @media (min-width: 600px) {
+    padding: 1rem;
+  }
+}
+
+.title {
+  color: pink;
+}`;
+
+    it("carries only the rule's own declarations, not nested ones", () => {
+      const state = { ...mockState, css, activeSelector: '.card' };
+      const declarations: Array<[string, string]> = [];
+
+      getters.activeRule(state)?.walkDecls(decl => {
+        declarations.push([decl.prop, decl.value]);
+      });
+
+      expect(declarations).toEqual([['color', 'red']]);
+    });
+
+    it('resolves to the top-level rule, not a nested one with the same selector', () => {
+      const state = { ...mockState, css, activeSelector: '.title' };
+      const declarations: Array<[string, string]> = [];
+
+      getters.activeRule(state)?.walkDecls(decl => {
+        declarations.push([decl.prop, decl.value]);
+      });
+
+      expect(declarations).toEqual([['color', 'pink']]);
+    });
+  });
+
   describe('grayscale', () => {
     it('reads the percentage off the rules for the page snapshot selectors', () => {
       const state = {

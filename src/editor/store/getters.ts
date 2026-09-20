@@ -4,6 +4,7 @@ import { State } from './';
 import {
   getRule,
   getRuleForSelector,
+  withOwnDeclarationsOnly,
   getFilterEffectValueForPage,
   getAlreadyUsedColors,
   RoleColorGroups,
@@ -13,16 +14,19 @@ export default {
   /**
    * Falls back to a grouped rule the selector belongs to, so Basic mode
    * shows its declarations before any edit splits it into its own rule.
+   * Carries only the rule's own declarations, so the property controls
+   * don't read values from rules nested inside it.
    */
   activeRule: (state: State): postcss.Rule | null => {
     if (!state.activeSelector) {
       return null;
     }
 
-    return (
+    const rule =
       getRule(state.css, state.activeSelector) ??
-      getRuleForSelector(state.css, state.activeSelector)
-    );
+      getRuleForSelector(state.css, state.activeSelector);
+
+    return rule ? withOwnDeclarationsOnly(rule) : null;
   },
 
   alreadyUsedColors: (state: State): RoleColorGroups =>
