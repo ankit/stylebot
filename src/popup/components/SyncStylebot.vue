@@ -8,7 +8,14 @@
       <span class="row-label">
         {{ syncInProgress ? t('sync_in_progress') : t('sync_now') }}
 
-        <span class="popup-caption sync-metadata">
+        <span
+          v-if="!syncInProgress && errorKey"
+          class="popup-caption sync-error"
+        >
+          {{ t(errorKey) }}
+        </span>
+
+        <span v-else class="popup-caption sync-metadata">
           {{ syncInProgress ? undefined : syncTime }}
         </span>
       </span>
@@ -18,12 +25,16 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { formatDistanceToNow } from 'date-fns';
 
 // Bypasses @stylebot/sync, whose barrel also drags in runGoogleDriveSync's postcss dependency chain.
-import { getGoogleDriveSyncMetadata } from '../../sync/google-drive/sync-metadata';
-import { RunGoogleDriveSync } from '@stylebot/types';
+import { getLastSyncedAt } from '../../sync/google-drive/sync-metadata';
+import {
+  RunGoogleDriveSync,
+  RunGoogleDriveSyncResponse,
+  SyncErrorKey,
+} from '@stylebot/types';
 
+import { formatSyncTime } from '@stylebot/utils';
 import { ArrowRepeatIcon } from '@stylebot/icons';
 import { STooltip } from '@stylebot/components';
 import PopupRow from './PopupRow.vue';
@@ -40,10 +51,12 @@ export default Vue.extend({
   data(): {
     syncTime: string;
     syncInProgress: boolean;
+    errorKey: SyncErrorKey | null;
   } {
     return {
       syncTime: '',
       syncInProgress: false,
+      errorKey: null,
     };
   },
 
@@ -53,14 +66,7 @@ export default Vue.extend({
 
   methods: {
     async updateSyncTime() {
-      const googleDriveSyncMetadata = await getGoogleDriveSyncMetadata();
-
-      if (googleDriveSyncMetadata) {
-        this.syncTime = formatDistanceToNow(
-          new Date(googleDriveSyncMetadata.modifiedTime),
-          { addSuffix: true }
-        );
-      }
+      this.syncTime = formatSyncTime(await getLastSyncedAt());
     },
 
     sync() {
@@ -69,11 +75,23 @@ export default Vue.extend({
       };
 
       this.syncInProgress = true;
+      this.errorKey = null;
 
-      chrome.runtime.sendMessage(message, () => {
-        this.updateSyncTime();
-        this.syncInProgress = false;
-      });
+      chrome.runtime.sendMessage(
+        message,
+        (response?: RunGoogleDriveSyncResponse) => {
+          // A service worker torn down mid-sync answers with undefined and
+          // sets lastError, which would otherwise hang the spinner.
+          if (chrome.runtime.lastError || !response) {
+            this.errorKey = 'sync_error_unknown';
+          } else if (!response.ok) {
+            this.errorKey = response.errorKey;
+          }
+
+          this.updateSyncTime();
+          this.syncInProgress = false;
+        }
+      );
     },
   },
 });
@@ -83,6 +101,11 @@ export default Vue.extend({
 .sync-metadata {
   margin-left: 4px;
   font-style: italic;
+}
+
+.sync-error {
+  margin-left: 4px;
+  color: var(--danger);
 }
 
 .sync-icon {

@@ -86,6 +86,22 @@ const writeLocal = async (
 };
 
 /**
+ * Disconnecting clears the stored state, and a run that started before the
+ * click must not put it back: re-enabling would then pick up a record the
+ * user asked to be rid of.
+ */
+const recordSyncState = async (next: SyncState): Promise<void> => {
+  if (!(await getGoogleDriveSyncEnabled())) {
+    throw syncError(
+      'Google Drive sync was disabled during sync',
+      'not-enabled'
+    );
+  }
+
+  await setSyncState(next);
+};
+
+/**
  * Run sync on Google Drive:
  * 1) No backup on Drive — write local to remote and record it as the base
  * 2) Neither side changed since the last sync — record the check only
@@ -125,7 +141,7 @@ const reconcile = async (
       conflicts: state?.conflicts,
     };
 
-    await setSyncState(next);
+    await recordSyncState(next);
     return next;
   }
 
@@ -147,7 +163,7 @@ const reconcile = async (
       baseStyles: state.baseStyles ?? local,
     };
 
-    await setSyncState(next);
+    await recordSyncState(next);
     return next;
   }
 
@@ -223,7 +239,7 @@ const reconcile = async (
     ),
   };
 
-  await setSyncState(next);
+  await recordSyncState(next);
   return next;
 };
 

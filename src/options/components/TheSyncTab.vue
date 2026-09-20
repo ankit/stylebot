@@ -1,17 +1,21 @@
 <template>
   <div class="sync-tab">
-    <div v-if="showImportSuccessAlert" class="banner success">
+    <sync-status-banner v-if="showImportSuccessAlert">
       {{ t('import_success') }}
-    </div>
+    </sync-status-banner>
 
-    <div v-if="showImportErrorAlert" class="banner error">
+    <sync-status-banner v-if="showImportErrorAlert" variant="error">
       {{ t('import_error', [String(importError)]) }}
-    </div>
+    </sync-status-banner>
+
+    <sync-status-banner v-if="syncStatus" :variant="syncStatus.type">
+      {{ t(syncStatus.messageKey, [syncStatus.detail || '']) }}
+    </sync-status-banner>
 
     <div>
       <heading as="h1">{{ t('sync_options') }}</heading>
       <s-text variant="muted" class="description">
-        Keep your styles on every computer you sign in to.
+        {{ t('sync_tab_description') }}
       </s-text>
 
       <the-google-drive-sync />
@@ -36,8 +40,10 @@ import Vue from 'vue';
 
 import { Heading, SText, SButton } from '@stylebot/components';
 import TheGoogleDriveSync from './sync/TheGoogleDriveSync.vue';
+import SyncStatusBanner from './sync/SyncStatusBanner.vue';
 
 import { importStylesWithFilePicker, exportAsJSONFile } from '../utils';
+import { SyncStatus } from '../store/index';
 
 export default Vue.extend({
   name: 'TheSyncTab',
@@ -47,6 +53,7 @@ export default Vue.extend({
     SText,
     SButton,
     TheGoogleDriveSync,
+    SyncStatusBanner,
   },
 
   data(): {
@@ -59,6 +66,12 @@ export default Vue.extend({
       showImportErrorAlert: false,
       showImportSuccessAlert: false,
     };
+  },
+
+  computed: {
+    syncStatus(): SyncStatus {
+      return this.$store.state.syncStatus;
+    },
   },
 
   methods: {
@@ -102,24 +115,5 @@ export default Vue.extend({
   display: flex;
   gap: 8px;
   margin-top: 14px;
-}
-
-.banner {
-  padding: 10px 14px;
-  border-radius: 9px;
-  font-size: 13px;
-  margin-bottom: 16px;
-}
-
-.banner.success {
-  background: var(--info);
-  border: 1px solid var(--info-border);
-  color: var(--text-primary);
-}
-
-.banner.error {
-  background: var(--danger-background);
-  border: 1px solid var(--danger-border);
-  color: var(--danger);
 }
 </style>

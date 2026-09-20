@@ -1,7 +1,6 @@
 export {
   getGoogleDriveSyncEnabled,
   setGoogleDriveSyncEnabled,
-  getGoogleDriveSyncMetadata,
   getSyncState,
   clearSyncState,
   dismissSyncConflict,
