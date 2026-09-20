@@ -1,9 +1,11 @@
 import { test, expect } from './fixtures';
-import { openEditor, switchEditorMode } from './helpers';
-
-// Editor-open depends on a popup tab-messaging round trip, which can lag
-// under a full parallel worker fleet (see e2e/readability.spec.ts).
-test.describe.configure({ retries: 2 });
+import {
+  PAGE_URL,
+  openEditor,
+  pickElement,
+  servePage,
+  switchEditorMode,
+} from './helpers';
 
 // The filter effect attaches to body's element children, so the styled element
 // has to be one of them for grayscale to land on the user's own rule.
@@ -31,23 +33,15 @@ test('taking grayscale back to 0 keeps the rest of the rule in the saved style',
   context,
   openPopup,
 }) => {
-  test.slow();
-
-  await context.route('http://localhost/**', route =>
-    route.fulfill({ contentType: 'text/html', body: PAGE_HTML })
-  );
+  await servePage(context, PAGE_HTML);
 
   const page = await context.newPage();
-  await page.goto('http://localhost/');
+  await page.goto(PAGE_URL);
 
   const article = page.locator('div.article-body');
   const editorRoot = await openEditor(page, openPopup);
 
-  await expect(editorRoot.locator('.stylebot-inspector')).toHaveClass(/active/);
-  await article.click({ force: true });
-  await expect(
-    editorRoot.locator('.autocomplete-chips .chip').first()
-  ).toHaveText('div.article-body');
+  await pickElement(page, editorRoot, 'div.article-body');
 
   // A freshly picked element with no existing declarations auto-expands the
   // Text panel, which hosts the text-color picker (see TheTextProperties.vue).
@@ -89,14 +83,10 @@ test('grayscale applies on a page whose body child has no class or id', async ({
   context,
   openPopup,
 }) => {
-  test.slow();
-
-  await context.route('http://localhost/**', route =>
-    route.fulfill({ contentType: 'text/html', body: UNIDENTIFIED_PAGE_HTML })
-  );
+  await servePage(context, UNIDENTIFIED_PAGE_HTML);
 
   const page = await context.newPage();
-  await page.goto('http://localhost/');
+  await page.goto(PAGE_URL);
 
   const wrapper = page.locator('center');
   const editorRoot = await openEditor(page, openPopup);

@@ -26,6 +26,10 @@ const DIST_PATH = path.resolve(__dirname, '..', engine.distDir);
 // How long a fresh launch waits for the extension's onInstalled help tab.
 const HELP_TAB_TIMEOUT_MS = 15_000;
 
+// Launching a browser and installing the extension is the slowest thing a
+// worker does; it gets its own budget rather than the first test's 30s.
+const LAUNCH_TIMEOUT_MS = 60_000;
+
 // --ui mode force-manages tracing (a live `use.trace` flag) on every context,
 // including ours — fighting it for control throws, so skip ours when detected.
 function isLiveTraceMode(use: { trace?: unknown }): boolean {
@@ -198,10 +202,13 @@ export const test = base.extend<
         workerInfo,
         isLiveTraceMode(workerInfo.project.use)
       );
+      // Launch here, under this fixture's own timeout, so a cold start on a
+      // loaded CI runner doesn't eat into whichever test happens to run first.
+      await pool.get();
       await use(pool);
       await pool.closeAll();
     },
-    { scope: 'worker' },
+    { scope: 'worker', timeout: LAUNCH_TIMEOUT_MS },
   ],
 
   // Test-scoped so it always matches whatever context the same test's `context`
@@ -256,6 +263,9 @@ export const test = base.extend<
         .filter(p => !pagesBefore.has(p))
         .map(p => p.close().catch(() => {}))
     );
+    // Routes are context-wide, so without this every spec's stubs would pile
+    // up in the shared context for the rest of the worker's life.
+    await context.unrouteAll({ behavior: 'ignoreErrors' });
     await context.clearCookies();
 
     // An idle-terminated background has nothing left to clear, and waiting for it

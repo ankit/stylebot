@@ -1,10 +1,12 @@
 import type { BrowserContext, Locator, Page } from '@playwright/test';
 import { test, expect, type Extension, type Popup } from './fixtures';
-import { openEditor, pickElement, seedStyles } from './helpers';
-
-// Editor-open depends on a popup tab-messaging round trip, which can lag
-// under a full parallel worker fleet (see e2e/readability.spec.ts).
-test.describe.configure({ retries: 2 });
+import {
+  PAGE_URL,
+  openEditor,
+  pickElement,
+  seedStyles,
+  servePage,
+} from './helpers';
 
 const PAGE_HTML = `
   <!doctype html>
@@ -37,9 +39,7 @@ const setup = async (
   context: BrowserContext,
   openPopup: () => Promise<Popup>
 ): Promise<{ page: Page; editorRoot: Locator; font: Locator }> => {
-  await context.route('http://localhost/**', route =>
-    route.fulfill({ contentType: 'text/html', body: PAGE_HTML })
-  );
+  await servePage(context, PAGE_HTML);
   // Like the real endpoint, unknown families answer 400.
   await context.route('https://fonts.googleapis.com/**', route => {
     const family = requestedFamily(route.request().url());
@@ -50,7 +50,7 @@ const setup = async (
   });
 
   const page = await context.newPage();
-  await page.goto('http://localhost/');
+  await page.goto(PAGE_URL);
 
   const editorRoot = await openEditor(page, openPopup);
   await pickElement(page, editorRoot, 'h1');
@@ -97,6 +97,30 @@ const previewCss = (page: Page) =>
   page
     .locator(`#${PREVIEW_ID}`)
     .evaluateAll(els => els.map(el => el.textContent).join(''));
+
+const GOOGLE_FONTS_SITE = /^https:\/\/fonts\.google\.com/;
+
+/**
+ * Runs `action`, which makes the background open fonts.google.com in a new
+ * tab, and waits for that tab to appear. The real site is a heavy SPA, and
+ * context.route() can't reliably stub it — on Chromium the tab's request
+ * starts before Playwright attaches to it. Closing the tab here isn't safe
+ * either: on Firefox, closing an extension-opened tab can take the page under
+ * test down with it. The per-test teardown closes it instead.
+ */
+const expectGoogleFontsOpened = async (
+  context: BrowserContext,
+  action: () => Promise<void>
+): Promise<void> => {
+  await context.route(GOOGLE_FONTS_SITE, route =>
+    route.fulfill({ contentType: 'text/html', body: '<title>Fonts</title>' })
+  );
+
+  const opened = context.waitForEvent('page');
+  await action();
+  const fontsPage = await opened;
+  await expect.poll(() => fontsPage.url()).toMatch(GOOGLE_FONTS_SITE);
+};
 
 const readRecentFonts = (extension: Extension) =>
   extension.evaluate(async () => {
@@ -175,10 +199,6 @@ test('a category name lists that category, and the browse row opens Google Fonts
   context,
   openPopup,
 }) => {
-  await context.route('https://fonts.google.com/**', route =>
-    route.fulfill({ contentType: 'text/html', body: '<title>Fonts</title>' })
-  );
-
   const { page, font } = await setup(context, openPopup);
 
   await openPicker(font);
@@ -190,10 +210,9 @@ test('a category name lists that category, and the browse row opens Google Fonts
   expect(tags.length).toBeGreaterThan(3);
   expect(tags.every(text => text === 'monospace')).toBe(true);
 
-  const opened = context.waitForEvent('page');
-  await menuItem(page, 'Browse Google Fonts').click();
-  const fontsPage = await opened;
-  expect(fontsPage.url()).toMatch(/^https:\/\/fonts\.google\.com/);
+  await expectGoogleFontsOpened(context, () =>
+    menuItem(page, 'Browse Google Fonts').click()
+  );
   await expect(page.locator('h1')).not.toHaveCSS('font-family', /mono/i);
 });
 
@@ -248,18 +267,14 @@ test('browsing Google Fonts discards typed text instead of showing it unapplied'
   context,
   openPopup,
 }) => {
-  await context.route('https://fonts.google.com/**', route =>
-    route.fulfill({ contentType: 'text/html', body: '<title>Fonts</title>' })
-  );
-
   const { page, font } = await setup(context, openPopup);
 
   await openPicker(font);
   await page.keyboard.type('playf');
 
-  const opened = context.waitForEvent('page');
-  await menuItem(page, 'Browse Google Fonts').click();
-  await opened;
+  await expectGoogleFontsOpened(context, () =>
+    menuItem(page, 'Browse Google Fonts').click()
+  );
 
   await expect(font.locator('.autocomplete-chips')).toHaveCount(0);
   await expect(font.locator('.autocomplete-input')).toHaveValue('');
