@@ -3,6 +3,25 @@
     <title>Stylebot</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
+    <!-- Read before any script runs, so the browser's own first paint (not just ours) can already match -->
+    <meta name="color-scheme" content="light dark" />
+
+    <script>
+      (function () {
+        var appearance = new URLSearchParams(location.search).get(
+          'appearance'
+        );
+        var dark =
+          appearance === 'dark' ||
+          (appearance !== 'light' &&
+            matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.style.background = dark ? '#1c1e22' : '#fff';
+        document
+          .querySelector('meta[name="color-scheme"]')
+          .setAttribute('content', dark ? 'dark' : 'light');
+      })();
+    </script>
+
     <link href="../fonts/fonts.css" rel="stylesheet" />
     <link href="index.css" rel="stylesheet" />
   </head>

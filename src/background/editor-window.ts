@@ -163,9 +163,15 @@ const openWindow = async (tabId: number): Promise<void> => {
     return;
   }
 
+  // Passed on the URL, not read from storage by the window itself, so its
+  // first paint can already match instead of flashing the wrong theme.
+  const appearance = await getOption('appearance');
+
   const created = await createWindow(
     {
-      url: chrome.runtime.getURL(`editor-window/index.html?tabId=${tabId}`),
+      url: chrome.runtime.getURL(
+        `editor-window/index.html?tabId=${tabId}&appearance=${appearance}`
+      ),
       type: 'popup',
       focused: true,
     },
