@@ -27,13 +27,24 @@ session is already inside a worktree.
 - `yarn typecheck` — `tsc --noEmit` for the extension, then again with `.storybook/tsconfig.json` for Storybook config and stories
 - `yarn test` — Jest unit tests
 - `yarn e2e` — builds the extension then runs the Playwright e2e suite headless on Chrome, as CI does. `--edge` / `--firefox` switch browser, `--headed` / `--ui` / `--debug` switch mode, `--no-build` skips the rebuild; see `e2e/README.md`.
+- `yarn test:storybook` — builds Storybook and runs every story headless with `@storybook/test-runner`, asserting the `play` functions. `--no-build` reuses `storybook-static`; `--dev --watch <path>` runs against a `yarn storybook` already on :6006.
 - `yarn storybook` — Storybook 7.6 (last line with Vue 2 support) for the shared primitives and popup/options/editor composites, with a light/dark toolbar
 
 ## Validation
 
-Always validate UI/extension changes with headless Playwright, not manual/headed browser interaction — the e2e harness in `e2e/fixtures.ts` already loads the real unpacked extension via CDP. Run `yarn e2e` (or a targeted test, e.g. `yarn e2e --no-build editor-open`) to confirm a change works end-to-end before calling it done.
+Always validate UI/extension changes headless, not with manual/headed browser interaction, and confirm a change works with the relevant suite before calling it done.
 
-Stories live beside their component as `*.stories.ts`; give new shared primitives a story.
+- **Storybook interaction tests** (`yarn test:storybook`) cover behaviour that lives inside a Vue surface: the editor panel, popup, options page. Only what needs the real extension goes to e2e.
+- **Playwright e2e** (`yarn e2e`, or a targeted spec like `yarn e2e --no-build editor-open`) covers extension plumbing: popup/background/content-script messaging, storage persistence across reloads, CSS injected into a real page, web-font fetches, Firefox/Edge. `e2e/fixtures.ts` loads the real unpacked extension via CDP.
+
+Stories:
+
+- Stories live beside their component as `*.stories.ts`; give new shared primitives a story.
+- Visual stories only set up the state they show — a `play` may open a menu and wait for it, nothing more.
+- Interaction tests go in a separate `*.interactions.stories.ts` file titled `Tests/<Surface>/<Feature>` with `tags: ['test']`, so they sit in their own sidebar root.
+- Each test is an object literal spreading its factory (`...editor(state)`) with a spec-style `name` sentence and its `play`. Storybook only picks `name` up from the literal, not through a factory call.
+- Use `@storybook/test` (`within`, `expect`, `waitFor`) and the helpers in `.storybook/story-helpers.ts`; group longer plays into `step('…', …)` phases.
+- Drive input through the shared `user` from `story-helpers` (not `userEvent` directly) so the toolbar's Slow motion toggle applies, and hover page elements while inspecting via `hoverPage`/`pick`, which first let the browser settle its own hover state.
 
 ## Commit messages
 

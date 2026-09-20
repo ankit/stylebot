@@ -3,6 +3,19 @@
 Playwright tests that drive the real, built extension in a real browser. Chrome is the
 default; Chrome and Firefox run on every PR, Edge on release PRs (it shares Chrome's build).
 
+## What belongs here
+
+These tests are for what only the real extension can prove: the popup talking to the
+background and the content script, styles persisting across reloads and SPA navigations,
+CSS actually landing on the page, web fonts fetched from the background, iframes and
+cross-origin frames, and anything engine-specific. They are slow — every test launches
+the popup and waits for the editor's content script — so behaviour that lives entirely
+inside the panel (menus, shortcuts, property controls, the inspector's keyboard flow,
+the font and color pickers) is tested as Storybook interaction tests instead: the
+`*.interactions.stories.ts` files next to the components (the `Tests` root in the
+Storybook sidebar), run with `yarn test:storybook`.
+When a test here only needs the panel, it belongs there.
+
 ## Running
 
 ```

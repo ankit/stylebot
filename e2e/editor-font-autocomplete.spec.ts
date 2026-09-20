@@ -38,7 +38,7 @@ const PREVIEW_ID = 'stylebot-css-font-preview';
 const setup = async (
   context: BrowserContext,
   openPopup: () => Promise<Popup>
-): Promise<{ page: Page; editorRoot: Locator; font: Locator }> => {
+): Promise<{ page: Page; font: Locator }> => {
   await servePage(context, PAGE_HTML);
   // Like the real endpoint, unknown families answer 400.
   await context.route('https://fonts.googleapis.com/**', route => {
@@ -56,12 +56,12 @@ const setup = async (
   await pickElement(page, editorRoot, 'h1');
 
   // page-scoped, not editorRoot-scoped: see e2e/color-picker.spec.ts.
-  return { page, editorRoot, font: page.locator('.font-family-autocomplete') };
+  return { page, font: page.locator('.font-family-autocomplete') };
 };
 
 // Focusing the field opens the menu; with a value set it renders as chips
 // until clicked, and the revealed input starts fully selected.
-const openPicker = async (font: Locator): Promise<Locator> => {
+const openPicker = async (font: Locator): Promise<void> => {
   const chips = font.locator('.autocomplete-chips');
 
   if (await chips.count()) {
@@ -70,9 +70,7 @@ const openPicker = async (font: Locator): Promise<Locator> => {
     await font.locator('.autocomplete-input').click();
   }
 
-  const input = font.locator('.autocomplete-input');
-  await expect(input).toBeFocused();
-  return input;
+  await expect(font.locator('.autocomplete-input')).toBeFocused();
 };
 
 // A row's accessible name is its label plus, for Google Fonts, the category.
@@ -128,7 +126,11 @@ const readRecentFonts = (extension: Extension) =>
     return options?.fonts as Array<string> | undefined;
   });
 
-test('typing suggests Google Fonts; picking one applies it, imports it, and remembers it', async ({
+// What the picker shows and how its keyboard works is covered by the
+// Storybook interaction tests; the tests here prove what only the real
+// extension can — the page restyles, the font is imported, and the
+// background remembers it.
+test('picking a Google Font applies it, imports it, and remembers it', async ({
   context,
   extension,
   openPopup,
@@ -137,41 +139,17 @@ test('typing suggests Google Fonts; picking one applies it, imports it, and reme
 
   await openPicker(font);
   await page.keyboard.type('playf');
-
-  await expect(
-    menuItem(page, 'Playfair Display').locator('.font-row-category')
-  ).toHaveText('serif');
-
+  // The list fills once the font catalogue has loaded.
+  await expect(menuItem(page, 'Playfair Display')).toBeVisible();
   await page.keyboard.press('ArrowDown');
   await page.keyboard.press('Enter');
 
-  await expect(page.getByRole('menu')).toHaveCount(0);
   await expect(page.locator('h1')).toHaveCSS('font-family', /Playfair Display/);
-  await expect(font.locator('.autocomplete-chips .chip')).toHaveText(
-    'Playfair Display'
-  );
 
   const stylesheet = savedStylesheet(page);
   await expect.poll(() => stylesheet.textContent()).toContain('@font-face');
   await expect.poll(() => stylesheet.textContent()).toContain('Playfair');
   await expect.poll(() => previewCss(page)).toBe('');
-
-  // The chevron opens the picker like a click on the field: focused, value
-  // kept (and selected), recents shown.
-  await font.locator('.autocomplete-chevron').click();
-  const input = font.locator('.autocomplete-input');
-  await expect(input).toBeFocused();
-  await expect(input).toHaveValue('Playfair Display');
-  expect(
-    await input.evaluate(el => {
-      const { selectionStart, selectionEnd, value } = el as HTMLTextAreaElement;
-      return selectionStart === 0 && selectionEnd === value.length;
-    })
-  ).toBe(true);
-  const items = page.getByRole('menuitem');
-  await expect(items.nth(0)).toHaveText('Default');
-  await expect(items.nth(1)).toContainText('Playfair Display');
-  await expect(items.last()).toHaveText('Browse Google Fonts');
 
   await expect
     .poll(async () => (await readRecentFonts(extension))?.[0])
@@ -186,7 +164,6 @@ test('a font outside Google Fonts is applied as typed, without an import', async
 
   await openPicker(font);
   await page.keyboard.type('Nonexistent Font');
-  await expect(menuItem(page, 'Use "Nonexistent Font"')).toBeVisible();
   await page.keyboard.press('Enter');
 
   await expect(page.locator('h1')).toHaveCSS('font-family', /Nonexistent Font/);
@@ -195,75 +172,7 @@ test('a font outside Google Fonts is applied as typed, without an import', async
     .not.toContain('@font-face');
 });
 
-test('a category name lists that category, and the browse row opens Google Fonts', async ({
-  context,
-  openPopup,
-}) => {
-  const { page, font } = await setup(context, openPopup);
-
-  await openPicker(font);
-  await page.keyboard.type('mono');
-
-  const categories = page.locator('[role=menuitem] .font-row-category');
-  await expect(categories.first()).toHaveText('monospace');
-  const tags = (await categories.allTextContents()).map(text => text.trim());
-  expect(tags.length).toBeGreaterThan(3);
-  expect(tags.every(text => text === 'monospace')).toBe(true);
-
-  await expectGoogleFontsOpened(context, () =>
-    menuItem(page, 'Browse Google Fonts').click()
-  );
-  await expect(page.locator('h1')).not.toHaveCSS('font-family', /mono/i);
-});
-
-test('arrow keys move between the field and the suggestions', async ({
-  context,
-  extension,
-  openPopup,
-}) => {
-  const { page, font } = await setup(context, openPopup);
-  const input = await openPicker(font);
-  await page.keyboard.type('playf');
-
-  await page.keyboard.press('ArrowDown');
-  await expect(menuItem(page, 'Playfair Display')).toBeFocused();
-
-  await page.keyboard.press('ArrowUp');
-  await expect(input).toBeFocused();
-  await expect(page.getByRole('menu')).toBeVisible();
-  await expect(input).toHaveValue('playf');
-
-  // Editing continues from the end of the text, not from a re-selected value.
-  await page.keyboard.type('a');
-  await expect(input).toHaveValue('playfa');
-
-  // Up from the field wraps to the last row, Down past it comes back.
-  await page.keyboard.press('ArrowUp');
-  await expect(menuItem(page, 'Browse Google Fonts')).toBeFocused();
-  await page.keyboard.press('ArrowDown');
-  await expect(input).toBeFocused();
-
-  // Escape only closes the list; the text stays, and reopening with Down
-  // keeps the caret rather than re-selecting the text.
-  await page.keyboard.press('Escape');
-  await expect(page.getByRole('menu')).toHaveCount(0);
-  await expect(input).toHaveValue('playfa');
-  await expect(input).toBeFocused();
-  await page.keyboard.press('ArrowDown');
-  await expect(page.getByRole('menu')).toBeVisible();
-  await page.keyboard.type('i');
-  await expect(input).toHaveValue('playfai');
-
-  // Leaving from a row applies the typed text just like leaving from the
-  // field, and a half-typed name is applied but not remembered.
-  await page.keyboard.press('ArrowDown');
-  await page.keyboard.press('Tab');
-  await expect(font.locator('.autocomplete-chips .chip')).toHaveText('playfai');
-  await expect(page.locator('h1')).toHaveCSS('font-family', /playfai/);
-  expect((await readRecentFonts(extension)) ?? []).not.toContain('playfai');
-});
-
-test('browsing Google Fonts discards typed text instead of showing it unapplied', async ({
+test('the browse row opens Google Fonts in a new tab without applying anything', async ({
   context,
   openPopup,
 }) => {
@@ -276,25 +185,7 @@ test('browsing Google Fonts discards typed text instead of showing it unapplied'
     menuItem(page, 'Browse Google Fonts').click()
   );
 
-  await expect(font.locator('.autocomplete-chips')).toHaveCount(0);
-  await expect(font.locator('.autocomplete-input')).toHaveValue('');
   await expect(page.locator('h1')).not.toHaveCSS('font-family', /playf/);
-});
-
-test('escape closes the picker without closing the editor', async ({
-  context,
-  openPopup,
-}) => {
-  const { editorRoot, font, page } = await setup(context, openPopup);
-
-  await openPicker(font);
-  await expect(page.getByRole('menu')).toBeVisible();
-
-  await page.keyboard.press('Escape');
-
-  await expect(page.getByRole('menu')).toHaveCount(0);
-  // The editor itself must stay open — only the picker should have closed.
-  await expect(editorRoot.locator('.stylebot-content')).toHaveCount(1);
 });
 
 test('highlighting a font previews it on the page until the picker is dismissed', async ({
@@ -349,23 +240,16 @@ test('a stack written in code mode can be replaced or extended', async ({
   });
 
   const { page, font } = await setup(context, openPopup);
-  const chips = font.locator('.autocomplete-chips .chip');
 
-  // Chips show family names without their CSS quotes.
-  await expect(chips).toHaveText(['Playfair Display', 'Georgia', 'serif']);
-
-  const input = await openPicker(font);
-  await expect(input).toHaveValue('"Playfair Display", Georgia, serif');
+  await openPicker(font);
   await page.keyboard.type('Lora');
   await page.keyboard.press('Enter');
   await expect(page.locator('h1')).toHaveCSS('font-family', 'Lora');
-  await expect(chips).toHaveText(['Lora']);
 
   await openPicker(font);
   // ArrowRight collapses the pre-selected value to its end (End only scrolls on macOS).
   await page.keyboard.press('ArrowRight');
   await page.keyboard.type(', Georgia, serif');
-  await expect(menuItem(page, 'Use "Lora, Georgia, serif"')).toBeVisible();
   await page.keyboard.press('Enter');
   await expect(page.locator('h1')).toHaveCSS(
     'font-family',
@@ -382,6 +266,7 @@ test('a stack written in code mode can be replaced or extended', async ({
     'Lora, Georgia, serif, "Playfair Display"'
   );
 
+  // Only the primary family is imported.
   const css = await savedStylesheet(page).textContent();
   expect(css).toContain("font-family: 'Lora'");
   expect(css).not.toContain("font-family: 'Playfair Display'");

@@ -1,13 +1,14 @@
-import Vuex, { ActionTree, Commit, Store } from 'vuex';
+import Vuex, { Dispatch, Store } from 'vuex';
 import * as postcss from 'postcss';
 
-import { addDeclaration } from '@stylebot/css';
+import { getPrimaryFontFamily, injectRootIntoDocument } from '@stylebot/css';
 import type { StylebotOptions } from '@stylebot/types';
 
-import mockState from '../../src/editor/store/__mocks__/state';
-import getters from '../../src/editor/store/getters';
-import mutations from '../../src/editor/store/mutations';
-import type { State } from '../../src/editor/store';
+import mockState from '@/editor/store/__mocks__/state';
+import actions from '@/editor/store/actions';
+import getters from '@/editor/store/getters';
+import mutations from '@/editor/store/mutations';
+import type { State } from '@/editor/store';
 
 export type EditorStateOverrides = Partial<Omit<State, 'options'>> & {
   options?: Partial<StylebotOptions>;
@@ -15,30 +16,12 @@ export type EditorStateOverrides = Partial<Omit<State, 'options'>> & {
 
 const noop = () => undefined;
 
-const NOOP_ACTIONS = [
-  'initialize',
-  'initializeDefaultStyle',
-  'openStylebot',
-  'closeStylebot',
-  'escape',
-  'resetActiveRule',
-  'applyFontFamily',
-  'previewFontFamily',
-  'applyReadability',
-  'setReadabilitySettings',
-  'applyFilter',
-];
-
-const setOptionAction =
-  (key: keyof StylebotOptions) =>
-  ({ state, commit }: { state: State; commit: Commit }, value: unknown) => {
-    commit('setOptions', { ...state.options, [key]: value });
-  };
-
 /**
- * A real Vuex store with the editor's getters and mutations but no
- * extension side effects, so composites render from seeded CSS and
- * stay interactive in the Storybook canvas.
+ * A real Vuex store with the editor's own getters, mutations and actions,
+ * so composites render from seeded CSS and stay interactive in the
+ * Storybook canvas. The background calls the actions make land in the
+ * chrome shim; only the actions that mount the editor or fetch from
+ * Google Fonts are replaced.
  */
 export const createEditorStore = (
   overrides: EditorStateOverrides = {}
@@ -51,49 +34,37 @@ export const createEditorStore = (
     options: { ...mockState.options, ...overrides.options },
   };
 
-  const actions: ActionTree<State, State> = {
-    setMode: setOptionAction('mode'),
-    setLayout: setOptionAction('layout'),
-    setAppearance: setOptionAction('appearance'),
-    setBasicModeOpenedSections: setOptionAction('basicModeOpenedSections'),
-    setLastColorSet: setOptionAction('lastColorSet'),
-    setLastColorPickerTab: setOptionAction('lastColorPickerTab'),
+  const store = new Vuex.Store<State>({
+    state,
+    getters,
+    mutations,
+    actions: {
+      ...actions,
+      initialize: noop,
+      initializeDefaultStyle: noop,
+      openStylebot: noop,
+      previewFontFamily: noop,
 
-    rememberFont(
-      { state, commit }: { state: State; commit: Commit },
-      font: string
-    ) {
-      commit('setOptions', {
-        ...state.options,
-        fonts: [font, ...state.options.fonts.filter(item => item !== font)],
-      });
+      // The real one checks unknown families against fonts.googleapis.com;
+      // stories stay offline and just apply what was picked.
+      applyFontFamily(
+        { dispatch }: { dispatch: Dispatch },
+        { value, remember = false }: { value: string; remember?: boolean }
+      ) {
+        dispatch('applyDeclaration', { property: 'font-family', value });
+
+        const family = getPrimaryFontFamily(value);
+        if (family && remember) {
+          dispatch('rememberFont', family);
+        }
+      },
     },
-
-    applyCss({ commit }, { css }: { css: string }) {
-      commit('setCss', css);
-      commit('setSelectors', postcss.parse(css));
-    },
-
-    applyDeclaration(
-      { state, dispatch },
-      { property, value }: { property: string; value: string }
-    ) {
-      if (state.activeSelector) {
-        dispatch('applyCss', {
-          css: addDeclaration(property, value, state.activeSelector, state.css),
-        });
-      }
-    },
-  };
-
-  NOOP_ACTIONS.forEach(name => {
-    actions[name] = noop;
   });
 
-  const store = new Vuex.Store<State>({ state, getters, mutations, actions });
-
   if (state.css) {
-    store.commit('setSelectors', postcss.parse(state.css));
+    const root = postcss.parse(state.css);
+    store.commit('setSelectors', root);
+    injectRootIntoDocument(root, state.url);
   }
 
   return store;

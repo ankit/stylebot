@@ -1,11 +1,13 @@
 import type { Meta } from '@storybook/vue';
+import { within } from '@storybook/test';
 
 import SNumberField from './SNumberField.vue';
 import {
+  findOpenMenu,
   fromTemplate,
   matrix,
-  nextFrame,
   playground,
+  user,
 } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
@@ -76,8 +78,11 @@ export const PresetsOpen = fromTemplate(
   {
     data,
     play: async ({ canvasElement }) => {
-      canvasElement.querySelector<HTMLElement>('.number-chevron')?.click();
-      await nextFrame();
+      const canvas = within(canvasElement);
+      await user.click(
+        canvasElement.querySelector('.number-chevron') as HTMLElement
+      );
+      await findOpenMenu(canvas);
     },
   }
 );

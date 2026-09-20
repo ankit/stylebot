@@ -2,7 +2,7 @@ import { test, expect } from './fixtures';
 import {
   PAGE_URL,
   openEditor,
-  pickElement,
+  seedStyles,
   servePage,
   switchEditorMode,
 } from './helpers';
@@ -29,28 +29,26 @@ const UNIDENTIFIED_PAGE_HTML = `
   </html>
 `;
 
+// The toggle's own behaviour is covered by the Storybook interaction tests;
+// this proves the filter lands on the live page and the saved style survives
+// a reload with the rest of the rule intact.
 test('taking grayscale back to 0 keeps the rest of the rule in the saved style', async ({
   context,
+  extension,
   openPopup,
 }) => {
   await servePage(context, PAGE_HTML);
+  await seedStyles(extension, {
+    localhost: { css: 'div.article-body { color: #ff0080; }', enabled: true },
+  });
 
   const page = await context.newPage();
   await page.goto(PAGE_URL);
 
   const article = page.locator('div.article-body');
-  const editorRoot = await openEditor(page, openPopup);
-
-  await pickElement(page, editorRoot, 'div.article-body');
-
-  // A freshly picked element with no existing declarations auto-expands the
-  // Text panel, which hosts the text-color picker (see TheTextProperties.vue).
-  const colorInput = editorRoot.locator('.color-picker .color-hex').first();
-  await colorInput.fill('#ff0080');
-  await colorInput.blur();
-
   await expect(article).toHaveCSS('color', 'rgb(255, 0, 128)');
 
+  const editorRoot = await openEditor(page, openPopup);
   await switchEditorMode(editorRoot, 'presets');
 
   // page-scoped, not editorRoot-scoped: see e2e/color-picker.spec.ts.

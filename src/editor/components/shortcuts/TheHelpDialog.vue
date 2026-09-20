@@ -12,7 +12,7 @@
         </heading>
 
         <s-tooltip :text="t('close')">
-          <icon-button :size="26" @click="close">
+          <icon-button :size="26" :aria-label="t('close')" @click="close">
             <icon-x :size="18" />
           </icon-button>
         </s-tooltip>

@@ -1,6 +1,11 @@
 import messages from 'virtual:stylebot-locale';
 
 import {
+  add as addRecentColor,
+  getAll as getAllRecentColors,
+} from '@/background/color-history';
+
+import {
   defaultOptions,
   defaultCommands,
   defaultReadabilitySettings,
@@ -48,9 +53,10 @@ const getMessage = (key: string, substitutions: Array<string> = []) => {
    passed and always resolves a promise, so both call styles work. */
 const respond = (callback: Callback | undefined, value: unknown) =>
   new Promise<unknown>(resolve => {
-    setTimeout(() => {
-      callback?.(value);
-      resolve(value);
+    setTimeout(async () => {
+      const resolved = await value;
+      callback?.(resolved);
+      resolve(resolved);
     }, 0);
   });
 
@@ -67,6 +73,7 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
   };
   const storage: Record<string, unknown> = {
     [`notification~release/${RELEASE_VERSION}`]: true,
+    recentColors: overrides.recentColors ?? [],
     ...overrides.storage,
   };
   const tab = {
@@ -77,7 +84,11 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
 
   const runtimeResponses: Record<
     string,
-    (message: { name: string; optionName?: keyof StylebotOptions }) => unknown
+    (message: {
+      name: string;
+      optionName?: keyof StylebotOptions;
+      color?: string;
+    }) => unknown
   > = {
     GetStylesForPage: () => ({
       styles: overrides.styles ?? [],
@@ -88,8 +99,9 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
       message.optionName ? options[message.optionName] : undefined,
     GetAllOptions: () => options,
     GetReadabilitySettings: () => readabilitySettings,
-    GetRecentColors: () => overrides.recentColors ?? [],
-    AddRecentColor: () => overrides.recentColors ?? [],
+    // The background's own history, over the shim's storage.
+    GetRecentColors: () => getAllRecentColors(),
+    AddRecentColor: ({ color = '' }) => addRecentColor(color),
   };
 
   const tabResponses: Record<string, () => unknown> = {
@@ -127,6 +139,10 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
           Object.assign(storage, items);
           return respond(callback, undefined);
         },
+      },
+      onChanged: {
+        addListener: () => undefined,
+        removeListener: () => undefined,
       },
     },
 

@@ -153,8 +153,12 @@ class Highlighter {
     return this.overlay;
   };
 
+  // Elements that aren't rendered (display: none) have nothing to outline
+  // and don't count as matches.
   queryMatches = (selector: string): Array<HTMLElement> => {
-    return Array.from(document.querySelectorAll<HTMLElement>(selector));
+    return Array.from(document.querySelectorAll<HTMLElement>(selector)).filter(
+      el => el.checkVisibility()
+    );
   };
 
   getCardDeclarations = (
@@ -355,8 +359,11 @@ class Highlighter {
     this.overlay = null;
   };
 
+  // In the extension the panel's shadow root retargets events to the
+  // #stylebot host itself; anywhere it renders inline, the host is an
+  // ancestor instead.
   isStylebotPanel = (el: EventTarget | null): boolean => {
-    return (el as HTMLElement | null)?.id === 'stylebot';
+    return (el as HTMLElement | null)?.closest?.('#stylebot') != null;
   };
 
   isStylebotElement = (el: EventTarget | null): boolean => {

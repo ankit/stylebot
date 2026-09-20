@@ -1,12 +1,14 @@
 import type { Meta } from '@storybook/vue';
+import { within } from '@storybook/test';
 
 import SSelect from './SSelect.vue';
 import MenuItem from './MenuItem.vue';
 import {
+  findOpenMenu,
   fromTemplate,
   matrix,
-  nextFrame,
   playground,
+  user,
 } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
@@ -86,8 +88,9 @@ export const Open = fromTemplate(
   {
     data,
     play: async ({ canvasElement }) => {
-      canvasElement.querySelector<HTMLElement>('button')?.click();
-      await nextFrame();
+      const canvas = within(canvasElement);
+      await user.click(canvas.getByRole('button'));
+      await findOpenMenu(canvas);
     },
   }
 );

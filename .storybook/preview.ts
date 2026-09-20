@@ -13,6 +13,7 @@ import type { Preview } from '@storybook/vue';
 import { t } from '@stylebot/i18n';
 import { ThemeProvider } from '@stylebot/components';
 import { installChrome } from './mocks/chrome';
+import { resetHoverSettled, setInteractionDelay } from './story-helpers';
 
 import '../src/fonts/fonts.css';
 import '../src/editor/index.scss';
@@ -76,6 +77,18 @@ const preview: Preview = {
         dynamicTitle: true,
       },
     },
+    speed: {
+      description: 'Interaction test speed',
+      defaultValue: 'instant',
+      toolbar: {
+        icon: 'play',
+        items: [
+          { value: 'instant', title: 'Instant' },
+          { value: 'slow', title: 'Slow motion' },
+        ],
+        dynamicTitle: true,
+      },
+    },
   },
 
   parameters: {
@@ -107,6 +120,7 @@ const preview: Preview = {
             'Release Notification',
             'Restricted Page',
           ],
+          'Tests',
         ],
       },
     },
@@ -114,6 +128,18 @@ const preview: Preview = {
 
   decorators: [
     (_story, { globals, parameters }) => {
+      // The editor store injects the style into the document like the
+      // content script does; the previous story's must not bleed into this
+      // one. Emptied rather than removed so the next injection reuses it.
+      document
+        .querySelectorAll('style[id^="stylebot-css-"]')
+        .forEach(el => (el.textContent = ''));
+
+      // Slow motion is for watching a play in the browser; the runner never
+      // sets it, so CI stays instant.
+      setInteractionDelay(globals.speed === 'slow' ? 250 : 0);
+      resetHoverSettled();
+
       // Composites read their appearance from options, so the toolbar theme
       // flows through the shim as well as the outer ThemeProvider.
       installChrome({
