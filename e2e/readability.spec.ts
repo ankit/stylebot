@@ -1,10 +1,6 @@
-import http from 'node:http';
-import type { AddressInfo } from 'node:net';
-import { test, expect, closeServer, type Popup } from './fixtures';
-
-// Content script / background worker readiness can lag under heavy parallel CPU
-// load (multiple worker-owned browsers competing for CPU), delaying this check.
-test.describe.configure({ retries: 2 });
+import type { Page } from '@playwright/test';
+import { test, expect, type Popup } from './fixtures';
+import { startTestServer, waitForEditorListener } from './helpers';
 
 // Long enough to pass hasReaderableContent; path has 2 segments so
 // shouldRunOnUrl doesn't treat it as a section/category page.
@@ -35,50 +31,57 @@ const APP_HTML = `
   </html>
 `;
 
-let server: http.Server;
-let baseUrl: string;
+let server: Awaited<ReturnType<typeof startTestServer>>;
+let articleUrl: string;
+let secondArticleUrl: string;
 let appUrl: string;
 
 test.beforeAll(async () => {
-  server = http.createServer((req, res) => {
-    res.writeHead(200, { 'Content-Type': 'text/html' });
-    res.end(req.url?.startsWith('/app/') ? APP_HTML : ARTICLE_HTML);
+  server = await startTestServer({
+    '/articles/a-test-article': ARTICLE_HTML,
+    '/articles/a-test-article-2': ARTICLE_HTML,
+    '/app/dashboard': APP_HTML,
   });
-
-  await new Promise<void>(resolve => server.listen(0, resolve));
-  const port = (server.address() as AddressInfo).port;
-  baseUrl = `http://localhost:${port}/articles/a-test-article`;
-  appUrl = `http://localhost:${port}/app/dashboard`;
+  articleUrl = `${server.baseUrl}/articles/a-test-article`;
+  secondArticleUrl = `${server.baseUrl}/articles/a-test-article-2`;
+  appUrl = `${server.baseUrl}/app/dashboard`;
 });
 
-test.afterAll(() => closeServer(server));
+test.afterAll(() => server.close());
 
 const readabilityToggle = (popup: Popup) =>
   popup.locator('label.switch', { hasText: 'Readability' });
+
+// Flips the popup's Readability switch on for the popup's current tab.
+const enableReadability = async (
+  openPopup: () => Promise<Popup>
+): Promise<void> => {
+  const popup = await openPopup();
+  // ToggleReadabilityForTab is handled by the editor script, not inject-css.
+  await waitForEditorListener(popup);
+
+  const checkbox = readabilityToggle(popup).locator('input[type="checkbox"]');
+  await expect.poll(() => checkbox.isEnabled()).toBe(true);
+  expect(await checkbox.isChecked()).toBe(false);
+
+  await readabilityToggle(popup).locator('.track').click();
+  await expect.poll(() => checkbox.isChecked()).toBe(true);
+  await popup.close();
+};
+
+const reader = (page: Page) => page.locator('body > #stylebot-reader');
 
 test('toggling readability on in the popup activates the reader', async ({
   context,
   openPopup,
 }) => {
   const page = await context.newPage();
-  await page.goto(baseUrl);
+  await page.goto(articleUrl);
   await page.bringToFront();
 
-  const popup = await openPopup();
-  const toggle = readabilityToggle(popup).locator('input[type="checkbox"]');
+  await enableReadability(openPopup);
 
-  // A generous timeout: under heavy parallel CPU load the content script's
-  // GetIsPageReaderable can lag behind the popup opening.
-  await expect.poll(() => toggle.isEnabled(), { timeout: 15000 }).toBe(true);
-  expect(await toggle.isChecked()).toBe(false);
-
-  await readabilityToggle(popup).locator('.track').click();
-  await expect.poll(() => toggle.isChecked()).toBe(true);
-  await popup.close();
-
-  await expect(page.locator('body > #stylebot-reader')).toHaveCount(1, {
-    timeout: 10000,
-  });
+  await expect(reader(page)).toHaveCount(1);
 });
 
 // Regression test: chrome.tabs.query({ active: true }) had no window scope,
@@ -88,12 +91,8 @@ test("toggling readability with a second window open targets the popup's own tab
   openPopup,
   extension,
 }) => {
-  // Two tabs cold-starting their editor init chains contend for the same
-  // background worker, which can delay listener readiness — wider budget.
-  test.setTimeout(45000);
-
   const pageA = await context.newPage();
-  await pageA.goto(baseUrl);
+  await pageA.goto(articleUrl);
   await pageA.bringToFront();
 
   // The new window surfaces as about:blank first, so wait on the URL rather
@@ -101,36 +100,18 @@ test("toggling readability with a second window open targets the popup's own tab
   const pageBPromise = context.waitForEvent('page');
   await extension.evaluate(
     url => chrome.windows.create({ url }),
-    `${baseUrl}-2`
+    secondArticleUrl
   );
   const pageB = await pageBPromise;
-  await pageB.waitForURL(`${baseUrl}-2`);
+  await pageB.waitForURL(secondArticleUrl);
   await pageB.bringToFront();
 
   // The popup opens in whichever window is frontmost — window B here —
   // mirroring a real toolbar click in that window.
-  const popup = await openPopup();
-  const toggle = readabilityToggle(popup).locator('input[type="checkbox"]');
+  await enableReadability(openPopup);
 
-  await expect.poll(() => toggle.isVisible(), { timeout: 5000 }).toBe(true);
-  await expect.poll(() => toggle.isEnabled()).toBe(true);
-  await readabilityToggle(popup).locator('.track').click();
-  await expect.poll(() => toggle.isChecked()).toBe(true);
-  await popup.close();
-
-  const reader = pageB.locator('body > #stylebot-reader');
-  try {
-    await expect(reader).toHaveCount(1, { timeout: 6000 });
-  } catch {
-    // No delivery guarantee — an unready listener drops the message rather
-    // than delaying it, so resend now that init has surely finished.
-    const retry = await openPopup();
-    await readabilityToggle(retry).locator('.track').click();
-    await retry.close();
-    await expect(reader).toHaveCount(1, { timeout: 8000 });
-  }
-
-  await expect(pageA.locator('body > #stylebot-reader')).toHaveCount(0);
+  await expect(reader(pageB)).toHaveCount(1);
+  await expect(reader(pageA)).toHaveCount(0);
 });
 
 // Regression test for #911: the reader's loading overlay used to flash on
@@ -139,24 +120,15 @@ test('does not show the loading overlay when reloading a page already proven not
   context,
   openPopup,
 }) => {
-  test.setTimeout(30000);
-
   const page = await context.newPage();
-  await page.goto(baseUrl);
+  await page.goto(articleUrl);
   await page.bringToFront();
 
-  const popup = await openPopup();
-  const toggle = readabilityToggle(popup).locator('input[type="checkbox"]');
-  await expect.poll(() => toggle.isEnabled(), { timeout: 15000 }).toBe(true);
-  await readabilityToggle(popup).locator('.track').click();
-  await expect.poll(() => toggle.isChecked()).toBe(true);
-  await popup.close();
+  await enableReadability(openPopup);
 
   // Wait for the mount, not just the popup's checkbox, so the domain-wide
   // flag is guaranteed to have reached storage before navigating away.
-  await expect(page.locator('body > #stylebot-reader')).toHaveCount(1, {
-    timeout: 10000,
-  });
+  await expect(reader(page)).toHaveCount(1);
 
   // Its shape doesn't match the article pattern just learned, so the loader
   // should be skipped even on this first visit — the attempt still runs silently.
@@ -183,7 +155,7 @@ test('does not show the loading overlay when reloading a page already proven not
             return false;
           }
         }, appUrl),
-      { timeout: 10000 }
+      { timeout: 10_000 }
     )
     .toBe(true);
 

@@ -1,5 +1,5 @@
 import { test, expect } from './fixtures';
-import { seedStyles } from './helpers';
+import { PAGE_URL, seedStyles, servePage } from './helpers';
 
 const PAGE_HTML = `
   <!doctype html>
@@ -15,20 +15,18 @@ test('disabling/enabling a style propagates live to every open tab on that host'
   extension,
   openPopup,
 }) => {
-  await context.route('http://localhost/**', route =>
-    route.fulfill({ contentType: 'text/html', body: PAGE_HTML })
-  );
+  await servePage(context, PAGE_HTML);
 
   await seedStyles(extension, {
     localhost: { css: 'h1 { color: rgb(255, 0, 128); }', enabled: true },
   });
 
   const tabA = await context.newPage();
-  await tabA.goto('http://localhost/');
+  await tabA.goto(PAGE_URL);
   await expect(tabA.locator('h1')).toHaveCSS('color', 'rgb(255, 0, 128)');
 
   const tabB = await context.newPage();
-  await tabB.goto('http://localhost/');
+  await tabB.goto(PAGE_URL);
   await expect(tabB.locator('h1')).toHaveCSS('color', 'rgb(255, 0, 128)');
 
   // The popup's toggle can't be clicked: this harness's popup is a real tab, so

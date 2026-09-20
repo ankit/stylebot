@@ -1,9 +1,5 @@
 import { test, expect } from './fixtures';
-import { openEditor } from './helpers';
-
-// Editor-open depends on a popup tab-messaging round trip, which can lag
-// under a full parallel worker fleet (see e2e/readability.spec.ts).
-test.describe.configure({ retries: 2 });
+import { PAGE_URL, openEditor, servePage } from './helpers';
 
 const PAGE_HTML = `
   <!doctype html>
@@ -42,12 +38,10 @@ test('arrow keys climb and descend ancestors while picking an element', async ({
   context,
   openPopup,
 }) => {
-  await context.route('http://localhost/**', route =>
-    route.fulfill({ contentType: 'text/html', body: PAGE_HTML })
-  );
+  await servePage(context, PAGE_HTML);
 
   const page = await context.newPage();
-  await page.goto('http://localhost/');
+  await page.goto(PAGE_URL);
 
   const editorRoot = await openEditor(page, openPopup);
   const inspectorButton = editorRoot.locator('.stylebot-inspector');
@@ -114,7 +108,7 @@ test('clicking an iframe while picking selects it instead of activating its cont
   });
 
   const page = await context.newPage();
-  await page.goto('http://localhost/');
+  await page.goto(PAGE_URL);
   await page.frameLocator('iframe[name="ad"]').locator('#ad').waitFor();
 
   const editorRoot = await openEditor(page, openPopup);
@@ -141,5 +135,5 @@ test('clicking an iframe while picking selects it instead of activating its cont
   await expect(
     page.frameLocator('iframe[name="ad"]').locator('#ad')
   ).toBeAttached();
-  expect(page.url()).toBe('http://localhost/');
+  expect(page.url()).toBe(PAGE_URL);
 });

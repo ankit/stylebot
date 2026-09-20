@@ -1,24 +1,33 @@
 import http from 'node:http';
 import type { AddressInfo } from 'node:net';
-import type { Locator, Page } from '@playwright/test';
+import type { BrowserContext, Locator, Page } from '@playwright/test';
 import { expect, closeServer, type Extension, type Popup } from './fixtures';
 
-// Generalizes the inline http.createServer pattern from style-important-override.spec.ts
-// to serve multiple paths, for tests that need real multi-page navigation.
+// The editor content script registers its listener only after several async
+// round trips to a possibly cold background; on a loaded CI runner that can
+// take a while after the page itself has finished loading.
+const EDITOR_LISTENER_TIMEOUT_MS = 20_000;
+
+type Route = string | { body: string; headers?: Record<string, string> };
+
+// A real HTTP server for tests that need genuine navigation, several windows,
+// or response headers; `servePage` is enough for a single static page.
 export const startTestServer = async (
-  routes: Record<string, string>
+  routes: Record<string, Route>
 ): Promise<{ baseUrl: string; close: () => Promise<void> }> => {
   const server = http.createServer((req, res) => {
-    const html = routes[req.url ?? '/'];
+    const route = routes[req.url ?? '/'];
 
-    if (html === undefined) {
+    if (route === undefined) {
       res.writeHead(404);
       res.end();
       return;
     }
 
-    res.writeHead(200, { 'Content-Type': 'text/html' });
-    res.end(html);
+    const { body, headers } =
+      typeof route === 'string' ? { body: route, headers: {} } : route;
+    res.writeHead(200, { 'Content-Type': 'text/html', ...headers });
+    res.end(body);
   });
 
   await new Promise<void>(resolve => server.listen(0, resolve));
@@ -27,14 +36,24 @@ export const startTestServer = async (
   return { baseUrl, close: () => closeServer(server) };
 };
 
+export const PAGE_URL = 'http://localhost/';
+
+// Serves `html` for every http://localhost/ URL without a real server. The
+// fixtures unroute after each test, so this never leaks into the next one.
+export const servePage = (
+  context: BrowserContext,
+  html: string
+): Promise<void> =>
+  context.route('http://localhost/**', route =>
+    route.fulfill({ contentType: 'text/html', body: html })
+  );
+
 type SeededStyle = {
   css: string;
   enabled: boolean;
   readability?: boolean;
 };
 
-// Generalizes the extension.evaluate(chrome.storage.local.set(...)) pattern from
-// style-important-override.spec.ts to seed multiple, arbitrarily-keyed style patterns.
 export const seedStyles = async (
   extension: Extension,
   styles: Record<string, SeededStyle>
@@ -58,8 +77,46 @@ export const seedStyles = async (
   );
 };
 
-// Wraps the popup's "Style this page" toggle flow (see editor-open.spec.ts)
-// and waits for the Vue app to actually mount, not just the host to attach.
+/**
+ * Waits until the editor content script in the popup's target tab answers
+ * messages. Its listener is registered only after async init, and the popup's
+ * ToggleStylebot / ToggleReadabilityForTab are fire-and-forget — sent before
+ * that, they're dropped rather than queued, and the editor never opens.
+ */
+export const waitForEditorListener = async (popup: Popup): Promise<void> => {
+  await expect
+    .poll(
+      () =>
+        // Resolves the tab the same way the popup does (see popup/utils.ts), so
+        // this also proves the popup is looking at the page under test.
+        popup.evaluate(async () => {
+          const { tabs } = await chrome.windows.getCurrent({ populate: true });
+          const tab = tabs?.find(t => t.active);
+          if (!tab?.id) {
+            return false;
+          }
+
+          try {
+            const response = await chrome.tabs.sendMessage(tab.id, {
+              name: 'GetIsStylebotOpen',
+            });
+            // inject-css listens from document_start but ignores this message,
+            // so only a boolean means the editor script itself is listening.
+            return typeof response === 'boolean';
+          } catch {
+            return false;
+          }
+        }),
+      {
+        message: 'editor content script never started listening',
+        timeout: EDITOR_LISTENER_TIMEOUT_MS,
+      }
+    )
+    .toBe(true);
+};
+
+// Opens the editor through the popup's "Style this page" button and waits for
+// the Vue app to actually mount, not just the host to attach.
 export const openEditor = async (
   page: Page,
   openPopup: () => Promise<Popup>
@@ -67,6 +124,7 @@ export const openEditor = async (
   await page.bringToFront();
 
   const popup = await openPopup();
+  await waitForEditorListener(popup);
   await popup.locator('button', { hasText: 'Style this page' }).click();
 
   const editorRoot = page.locator('#stylebot');
@@ -76,6 +134,9 @@ export const openEditor = async (
 
   return editorRoot;
 };
+
+const escapeRegExp = (text: string): string =>
+  text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 // Picks an element with the inspector (active as soon as the editor opens)
 // and waits for the selector field to settle on it.
@@ -88,7 +149,7 @@ export const pickElement = async (
   await page.locator(selector).click({ force: true });
   await expect(
     editorRoot.locator('.autocomplete-chips .chip').first()
-  ).toHaveText(new RegExp(`${selector}$`));
+  ).toHaveText(new RegExp(`${escapeRegExp(selector)}$`));
 };
 
 const MODE_LABEL = {

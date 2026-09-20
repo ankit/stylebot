@@ -1,5 +1,5 @@
 import { test, expect } from './fixtures';
-import { openEditor } from './helpers';
+import { PAGE_URL, openEditor, servePage } from './helpers';
 
 const PAGE_HTML = `
   <!doctype html>
@@ -15,17 +15,11 @@ const PAGE_HTML = `
 test('falls back to page colors, then switches to already-used colors once a rule is set', async ({
   context,
   openPopup,
-}, testInfo) => {
-  // More sequential UI steps than the other specs (autocomplete, popover,
-  // reopen) — give it more headroom under parallel-worker CPU contention.
-  testInfo.setTimeout(60_000);
-
-  await context.route('http://localhost/**', route =>
-    route.fulfill({ contentType: 'text/html', body: PAGE_HTML })
-  );
+}) => {
+  await servePage(context, PAGE_HTML);
 
   const page = await context.newPage();
-  await page.goto('http://localhost/');
+  await page.goto(PAGE_URL);
 
   await openEditor(page, openPopup);
 
@@ -93,12 +87,10 @@ test('the palette search lists every palette again from the chevron, even after 
   context,
   openPopup,
 }) => {
-  await context.route('http://localhost/**', route =>
-    route.fulfill({ contentType: 'text/html', body: PAGE_HTML })
-  );
+  await servePage(context, PAGE_HTML);
 
   const page = await context.newPage();
-  await page.goto('http://localhost/');
+  await page.goto(PAGE_URL);
 
   await openEditor(page, openPopup);
   await page.getByPlaceholder('Pick an element').fill('h1');

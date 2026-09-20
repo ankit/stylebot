@@ -1,9 +1,11 @@
 import { test, expect } from './fixtures';
-import { openEditor, switchEditorMode, getMonacoFrame } from './helpers';
-
-// Loading Monaco in an iframe is CPU-heavy and can starve the popup's own
-// tab under a full parallel worker fleet (see e2e/readability.spec.ts).
-test.describe.configure({ retries: 2 });
+import {
+  PAGE_URL,
+  getMonacoFrame,
+  openEditor,
+  servePage,
+  switchEditorMode,
+} from './helpers';
 
 const PAGE_HTML = `
   <!doctype html>
@@ -18,14 +20,13 @@ test('typing CSS into the code-mode Monaco editor applies live and persists', as
   context,
   openPopup,
 }) => {
+  // Loading Monaco in an iframe is the heaviest thing the suite does.
   test.slow();
 
-  await context.route('http://localhost/**', route =>
-    route.fulfill({ contentType: 'text/html', body: PAGE_HTML })
-  );
+  await servePage(context, PAGE_HTML);
 
   const page = await context.newPage();
-  await page.goto('http://localhost/');
+  await page.goto(PAGE_URL);
 
   const editorRoot = await openEditor(page, openPopup);
   await switchEditorMode(editorRoot, 'code');
@@ -44,16 +45,12 @@ test('toggling the panel appearance updates the Monaco editor theme immediately'
   context,
   openPopup,
 }) => {
-  // Two appearance-menu round trips on top of the usual editor boot needs
-  // more room than test.slow()'s 3x under a CPU-starved CI worker fleet.
-  test.setTimeout(120_000);
+  test.slow();
 
-  await context.route('http://localhost/**', route =>
-    route.fulfill({ contentType: 'text/html', body: PAGE_HTML })
-  );
+  await servePage(context, PAGE_HTML);
 
   const page = await context.newPage();
-  await page.goto('http://localhost/');
+  await page.goto(PAGE_URL);
 
   const editorRoot = await openEditor(page, openPopup);
   await switchEditorMode(editorRoot, 'code');
@@ -90,12 +87,10 @@ test('typing a CSS property offers autocomplete and a color value shows a swatch
 }) => {
   test.slow();
 
-  await context.route('http://localhost/**', route =>
-    route.fulfill({ contentType: 'text/html', body: PAGE_HTML })
-  );
+  await servePage(context, PAGE_HTML);
 
   const page = await context.newPage();
-  await page.goto('http://localhost/');
+  await page.goto(PAGE_URL);
 
   const editorRoot = await openEditor(page, openPopup);
   await switchEditorMode(editorRoot, 'code');

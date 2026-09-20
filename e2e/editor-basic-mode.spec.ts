@@ -1,9 +1,11 @@
 import { test, expect } from './fixtures';
-import { openEditor, seedStyles } from './helpers';
-
-// Editor-open depends on a popup tab-messaging round trip, which can lag
-// under a full parallel worker fleet (see e2e/readability.spec.ts).
-test.describe.configure({ retries: 2 });
+import {
+  PAGE_URL,
+  openEditor,
+  pickElement,
+  seedStyles,
+  servePage,
+} from './helpers';
 
 const PAGE_HTML = `
   <!doctype html>
@@ -18,22 +20,14 @@ test('picking an element and editing a color in basic mode applies live and pers
   context,
   openPopup,
 }) => {
-  await context.route('http://localhost/**', route =>
-    route.fulfill({ contentType: 'text/html', body: PAGE_HTML })
-  );
+  await servePage(context, PAGE_HTML);
 
   const page = await context.newPage();
-  await page.goto('http://localhost/');
+  await page.goto(PAGE_URL);
 
   const editorRoot = await openEditor(page, openPopup);
 
-  // openStylebot starts in inspecting mode already, so no extra click is
-  // needed before picking an element on the page.
-  await expect(editorRoot.locator('.stylebot-inspector')).toHaveClass(/active/);
-  await page.locator('h1').click({ force: true });
-  await expect(
-    editorRoot.locator('.autocomplete-chips .chip').first()
-  ).toHaveText(/h1$/);
+  await pickElement(page, editorRoot, 'h1');
 
   // A freshly picked element with no existing declarations auto-expands the
   // Text panel, which now hosts the text-color picker (see TheTextProperties.vue).
@@ -51,12 +45,10 @@ test('Escape closes an open header dropdown instead of the whole editor', async 
   context,
   openPopup,
 }) => {
-  await context.route('http://localhost/**', route =>
-    route.fulfill({ contentType: 'text/html', body: PAGE_HTML })
-  );
+  await servePage(context, PAGE_HTML);
 
   const page = await context.newPage();
-  await page.goto('http://localhost/');
+  await page.goto(PAGE_URL);
 
   const editorRoot = await openEditor(page, openPopup);
 
@@ -78,9 +70,7 @@ test('arrow keys return from the selector suggestions to the selector field', as
   extension,
   openPopup,
 }) => {
-  await context.route('http://localhost/**', route =>
-    route.fulfill({ contentType: 'text/html', body: PAGE_HTML })
-  );
+  await servePage(context, PAGE_HTML);
   // Suggestions are the page's existing selectors, so seed a couple.
   await seedStyles(extension, {
     localhost: {
@@ -90,7 +80,7 @@ test('arrow keys return from the selector suggestions to the selector field', as
   });
 
   const page = await context.newPage();
-  await page.goto('http://localhost/');
+  await page.goto(PAGE_URL);
 
   const editorRoot = await openEditor(page, openPopup);
 
