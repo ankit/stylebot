@@ -2,6 +2,7 @@ import type { Meta } from '@storybook/vue';
 
 import ThemeProvider from './ThemeProvider.vue';
 import Heading from './Heading.vue';
+import SText from './SText.vue';
 import { fromTemplate } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
@@ -37,6 +38,10 @@ const TOKEN_GROUPS: Array<{ label: string; tokens: Array<string> }> = [
   {
     label: 'Accent',
     tokens: ['accent', 'accent-ink', 'accent-tint', 'accent-tint-ink', 'ring'],
+  },
+  {
+    label: 'Selection',
+    tokens: ['selection', 'selection-ink'],
   },
   {
     label: 'Fields',
@@ -82,4 +87,17 @@ export const Tokens = fromTemplate(
   </div>
 `,
   { data: () => ({ groups: TOKEN_GROUPS }) }
+);
+
+/* The paragraph pre-selected, so the highlight is visible in both themes. */
+export const Selection = fromTemplate(
+  { SText },
+  `<s-text style="width: 260px">Selected text keeps its contrast in light and dark mode.</s-text>`,
+  {
+    play: async ({ canvasElement }) => {
+      const range = document.createRange();
+      range.selectNodeContents(canvasElement.querySelector('p') as Node);
+      window.getSelection()?.addRange(range);
+    },
+  }
 );
