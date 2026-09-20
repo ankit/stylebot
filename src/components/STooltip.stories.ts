@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue';
+import { expect, within } from '@storybook/test';
 
 import STooltip from './STooltip.vue';
 import SButton from './SButton.vue';
@@ -23,8 +24,10 @@ export default meta;
 
 const components = { STooltip, SButton };
 
-const shown: StoryObj['play'] = async ({ canvasElement }) =>
+const shown: StoryObj['play'] = async ({ canvasElement }) => {
   focusViaTab(canvasElement);
+  await expect(await within(canvasElement).findByRole('tooltip')).toBeVisible();
+};
 
 export const Playground = {
   ...playground(

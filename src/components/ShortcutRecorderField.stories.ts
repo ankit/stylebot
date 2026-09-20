@@ -1,4 +1,5 @@
 import type { Meta } from '@storybook/vue';
+import { expect, userEvent } from '@storybook/test';
 
 import ShortcutRecorderField from './ShortcutRecorderField.vue';
 import { fromTemplate, playground } from '@stylebot/storybook/story-helpers';
@@ -34,7 +35,12 @@ export const Recording = fromTemplate(
   `<shortcut-recorder-field value="" style="width: 260px" />`,
   {
     play: async ({ canvasElement }) => {
-      canvasElement.querySelector<HTMLElement>('.record-btn')?.click();
+      await userEvent.click(
+        canvasElement.querySelector('.record-btn') as HTMLElement
+      );
+      await expect(
+        canvasElement.querySelector('.field.recording')
+      ).toBeVisible();
     },
   }
 );

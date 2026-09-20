@@ -1,11 +1,12 @@
 import type { Meta } from '@storybook/vue';
+import { userEvent, within } from '@storybook/test';
 
 import SAutocomplete from './SAutocomplete.vue';
 import MenuItem from './MenuItem.vue';
 import {
+  findOpenMenu,
   fromTemplate,
   matrix,
-  nextFrame,
   playground,
 } from '@stylebot/storybook/story-helpers';
 
@@ -102,10 +103,11 @@ export const Open = fromTemplate(
   {
     data,
     play: async ({ canvasElement }) => {
-      canvasElement
-        .querySelector<HTMLElement>('.autocomplete-chevron')
-        ?.click();
-      await nextFrame();
+      const canvas = within(canvasElement);
+      await userEvent.click(
+        canvasElement.querySelector('.autocomplete-chevron') as HTMLElement
+      );
+      await findOpenMenu(canvas);
     },
   }
 );

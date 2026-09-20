@@ -1,8 +1,13 @@
-import Vuex, { ActionTree, Commit, Store } from 'vuex';
+import Vuex, { ActionTree, Commit, Dispatch, Store } from 'vuex';
 import * as postcss from 'postcss';
 
-import { addDeclaration } from '@stylebot/css';
-import type { StylebotOptions } from '@stylebot/types';
+import {
+  addDeclaration,
+  getCssAfterApplyingFilterEffectToPage,
+  getPrimaryFontFamily,
+  removeRule,
+} from '@stylebot/css';
+import type { FilterEffect, StylebotOptions } from '@stylebot/types';
 
 import mockState from '../../src/editor/store/__mocks__/state';
 import getters from '../../src/editor/store/getters';
@@ -19,14 +24,8 @@ const NOOP_ACTIONS = [
   'initialize',
   'initializeDefaultStyle',
   'openStylebot',
-  'closeStylebot',
-  'escape',
-  'resetActiveRule',
-  'applyFontFamily',
   'previewFontFamily',
-  'applyReadability',
   'setReadabilitySettings',
-  'applyFilter',
 ];
 
 const setOptionAction =
@@ -35,10 +34,14 @@ const setOptionAction =
     commit('setOptions', { ...state.options, [key]: value });
   };
 
+type Context = { state: State; commit: Commit; dispatch: Dispatch };
+
 /**
  * A real Vuex store with the editor's getters and mutations but no
  * extension side effects, so composites render from seeded CSS and
- * stay interactive in the Storybook canvas.
+ * stay interactive in the Storybook canvas. Actions that only touch
+ * state are mirrored here; the ones that reach into the page or the
+ * background are no-ops.
  */
 export const createEditorStore = (
   overrides: EditorStateOverrides = {}
@@ -83,6 +86,60 @@ export const createEditorStore = (
           css: addDeclaration(property, value, state.activeSelector, state.css),
         });
       }
+    },
+
+    closeStylebot({ commit }: Context) {
+      commit('setVisible', false);
+    },
+
+    escape({ state, commit, dispatch }: Context) {
+      if (state.help) {
+        commit('setHelp', false);
+        return;
+      }
+
+      dispatch('closeStylebot');
+    },
+
+    resetActiveRule({ state, dispatch }: Context) {
+      if (state.activeSelector) {
+        dispatch('applyCss', {
+          css: removeRule(state.css, state.activeSelector),
+        });
+      }
+    },
+
+    applyFontFamily(
+      { dispatch }: Context,
+      { value, remember = false }: { value: string; remember?: boolean }
+    ) {
+      dispatch('applyDeclaration', { property: 'font-family', value });
+
+      const family = getPrimaryFontFamily(value);
+      if (family && remember) {
+        dispatch('rememberFont', family);
+      }
+    },
+
+    applyReadability({ state, commit }: Context, value: boolean) {
+      if (value && ['basic', 'code'].includes(state.options.mode)) {
+        commit('setOptions', { ...state.options, mode: 'magic' });
+      }
+
+      commit('setReadability', value);
+    },
+
+    applyFilter(
+      { state, dispatch }: Context,
+      { effectName, percent }: { effectName: FilterEffect; percent: string }
+    ) {
+      dispatch('applyCss', {
+        css: getCssAfterApplyingFilterEffectToPage(
+          effectName,
+          state.css,
+          percent
+        ),
+      });
     },
   };
 

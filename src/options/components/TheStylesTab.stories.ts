@@ -5,7 +5,7 @@ import {
   optionsPage,
   seededStyles,
 } from '@stylebot/storybook/mocks/options-page';
-import { nextFrame } from '@stylebot/storybook/story-helpers';
+import { expect, userEvent } from '@storybook/test';
 
 const meta: Meta = {
   title: 'Options/Styles',
@@ -26,7 +26,7 @@ export const Editor = optionsPage(
     const edit = Array.from(
       root.querySelectorAll<HTMLElement>('.row button')
     ).find(button => button.textContent?.trim() === 'Edit');
-    edit?.click();
-    await nextFrame();
+    await userEvent.click(edit as HTMLElement);
+    await expect(root.querySelector('.editor-page')).toBeVisible();
   }
 );

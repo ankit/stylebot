@@ -1,5 +1,10 @@
+import type Vue from 'vue';
 import type { Component } from 'vue';
+import type { Store } from 'vuex';
 import type { StoryObj } from '@storybook/vue';
+import { expect, userEvent, waitFor, within } from '@storybook/test';
+
+import type { State } from '../src/editor/store';
 
 type Components = Record<string, Component>;
 type Data = () => Record<string, unknown>;
@@ -95,5 +100,56 @@ export const focusViaTab = (root: HTMLElement, selector = 'button'): void => {
   root.querySelector<HTMLElement>(selector)?.focus();
 };
 
-export const nextFrame = (): Promise<void> =>
-  new Promise(resolve => requestAnimationFrame(() => resolve()));
+type Canvas = ReturnType<typeof within>;
+
+/**
+ * The seeded editor store, read off the Vue instance mounted on the app
+ * root — which stays mounted after the panel closes.
+ */
+export const storeOf = (root: HTMLElement): Store<State> =>
+  (root.querySelector('.stylebot-app') as HTMLElement & { __vue__: Vue })
+    .__vue__.$store;
+
+/**
+ * Presses an editor shortcut. user-event types into the active element,
+ * which the editor's document-level handler ignores when it's a text
+ * field — blur first if a test just typed into one.
+ */
+export const pressKey = async (key: string): Promise<void> => {
+  await userEvent.keyboard(key.length === 1 ? key : `{${key}}`);
+};
+
+export const blurActive = (): void =>
+  (document.activeElement as HTMLElement | null)?.blur();
+
+/**
+ * Resolves with the open menu once AnchoredMenu has positioned it — it
+ * renders hidden for a tick first, so presence alone isn't enough.
+ */
+export const findOpenMenu = async (canvas: Canvas): Promise<HTMLElement> => {
+  const menu = await canvas.findByRole('menu');
+  await waitFor(() => expect(menu).toBeVisible());
+  return menu;
+};
+
+/**
+ * Opens one of the header's window-action menus by its accessible name
+ * and resolves with the menu once it's shown.
+ */
+export const openEditorMenu = async (
+  canvas: Canvas,
+  name: string
+): Promise<HTMLElement> => {
+  await userEvent.click(canvas.getByRole('button', { name }));
+  return findOpenMenu(canvas);
+};
+
+export const propertyCard = (canvas: Canvas, label: string): HTMLElement =>
+  canvas
+    .getByText(label, { selector: '.property-card-label' })
+    .closest('.property-card') as HTMLElement;
+
+export const cardCollapse = (canvas: Canvas, label: string): HTMLElement =>
+  propertyCard(canvas, label).querySelector(
+    '.property-card-collapse'
+  ) as HTMLElement;

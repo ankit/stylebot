@@ -95,7 +95,7 @@ const preview: Preview = {
             'Display',
           ],
           'Editor',
-          ['Panel', 'ColorPickerPopover', 'TheHelpDialog'],
+          ['Panel', 'ColorPickerPopover', 'TheHelpDialog', 'Interactions'],
           'Options',
           ['Basics', 'Styles', 'Sync'],
           'Browser Action',

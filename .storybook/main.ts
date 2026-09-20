@@ -31,6 +31,7 @@ const config: StorybookConfig = {
     '@storybook/addon-toolbars',
     '@storybook/addon-controls',
     '@storybook/addon-viewport',
+    '@storybook/addon-interactions',
   ],
   docs: { autodocs: false },
   core: { disableTelemetry: true },
