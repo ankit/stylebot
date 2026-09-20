@@ -6,6 +6,7 @@ import {
   ReadabilityActiveChanged,
   GetRecentColors,
   AddRecentColor,
+  OpenOptionsPage,
 } from '../messages';
 import * as stylesModule from '../styles';
 import * as colorHistoryModule from '../color-history';
@@ -121,5 +122,69 @@ describe('AddRecentColor', () => {
 
     expect(colorHistoryModule.add).toBeCalledWith('#00ff00');
     expect(sendResponse).toBeCalledWith(['#00ff00', '#ff0000']);
+  });
+});
+
+describe('OpenOptionsPage', () => {
+  const base = 'chrome-extension://abc/options.html';
+
+  const mockChrome = (tabs: Array<Partial<chrome.tabs.Tab>>) => {
+    global.chrome = {
+      runtime: {
+        getURL: jest.fn((path: string) => `chrome-extension://abc/${path}`),
+      },
+      tabs: {
+        query: jest.fn().mockResolvedValue(tabs),
+        update: jest.fn().mockResolvedValue(undefined),
+        create: jest.fn().mockResolvedValue(undefined),
+      },
+      windows: { update: jest.fn().mockResolvedValue(undefined) },
+    } as unknown as typeof chrome;
+  };
+
+  beforeEach(() => {
+    jest.resetAllMocks();
+  });
+
+  it('opens a new tab when no options tab exists', async () => {
+    mockChrome([{ id: 1, url: 'https://example.com' }]);
+
+    await OpenOptionsPage();
+
+    expect(chrome.tabs.create).toBeCalledWith({ url: base, active: true });
+    expect(chrome.tabs.update).not.toBeCalled();
+  });
+
+  it('appends the requested route as the hash', async () => {
+    mockChrome([]);
+
+    await OpenOptionsPage({ route: '/styles/edit?url=example.com' });
+
+    expect(chrome.tabs.create).toBeCalledWith({
+      url: `${base}#/styles/edit?url=example.com`,
+      active: true,
+    });
+  });
+
+  it('focuses an existing options tab without touching its route', async () => {
+    mockChrome([{ id: 7, windowId: 3, url: `${base}#/sync` }]);
+
+    await OpenOptionsPage();
+
+    expect(chrome.tabs.update).toBeCalledWith(7, { active: true });
+    expect(chrome.windows.update).toBeCalledWith(3, { focused: true });
+    expect(chrome.tabs.create).not.toBeCalled();
+  });
+
+  it('routes an existing options tab when a route is requested', async () => {
+    mockChrome([{ id: 7, windowId: 3, url: `${base}#/sync` }]);
+
+    await OpenOptionsPage({ route: '/basics' });
+
+    expect(chrome.tabs.update).toBeCalledWith(7, {
+      active: true,
+      url: `${base}#/basics`,
+    });
+    expect(chrome.tabs.create).not.toBeCalled();
   });
 });

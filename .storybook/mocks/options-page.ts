@@ -1,6 +1,7 @@
 import type { StoryObj } from '@storybook/vue';
 
 import App from '../../src/options/App.vue';
+import { createRouter } from '../../src/options/router';
 import { createOptionsStore, OptionsStateOverrides } from './options-store';
 import { nextFrame } from '../story-helpers';
 
@@ -34,14 +35,20 @@ export const optionsPage = (
   overrides: OptionsStateOverrides = {},
   afterNavigate?: (root: HTMLElement) => Promise<void>
 ): StoryObj => ({
-  render: (_args, { globals }) => ({
-    components: { App },
-    store: createOptionsStore({
-      ...overrides,
-      options: { appearance: globals.theme, ...overrides.options },
-    }),
-    template: '<app />',
-  }),
+  render: (_args, { globals }) => {
+    const router = createRouter('abstract');
+    router.replace('/basics');
+
+    return {
+      components: { App },
+      router,
+      store: createOptionsStore({
+        ...overrides,
+        options: { appearance: globals.theme, ...overrides.options },
+      }),
+      template: '<app />',
+    };
+  },
   play: async ({ canvasElement }) => {
     const buttons = Array.from(
       canvasElement.querySelectorAll<HTMLElement>('.nav-item')

@@ -35,8 +35,11 @@ export const getReleaseVersion = (): string =>
 export const getReleaseNotificationId = (): NotificationId =>
   `release/${getReleaseVersion()}`;
 
-export const openOptionsPage = (): void => {
-  chrome.runtime.sendMessage({ name: 'OpenOptionsPage' });
+export const openOptionsPage = (route?: string): void => {
+  chrome.runtime.sendMessage({
+    name: 'OpenOptionsPage',
+    ...(route ? { route } : {}),
+  });
 };
 
 export const openReportIssuePage = (): void => {

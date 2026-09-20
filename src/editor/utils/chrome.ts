@@ -62,9 +62,10 @@ export const getStylesForPage = (
   );
 };
 
-export const openOptionsPage = (): void => {
+export const openOptionsPage = (route?: string): void => {
   const message: OpenOptionsPage = {
     name: 'OpenOptionsPage',
+    ...(route ? { route } : {}),
   };
 
   chrome.runtime.sendMessage(message);

@@ -63,6 +63,7 @@ export type SetOption = {
 
 export type OpenOptionsPage = {
   name: 'OpenOptionsPage';
+  route?: string;
 };
 
 export type OpenDonatePage = {
