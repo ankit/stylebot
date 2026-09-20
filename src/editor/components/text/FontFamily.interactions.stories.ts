@@ -1,4 +1,4 @@
-import type { Meta } from '@storybook/vue';
+import type { Meta, StoryObj } from '@storybook/vue';
 import { expect, userEvent, waitFor, within } from '@storybook/test';
 
 import FontFamily from './FontFamily.vue';
@@ -49,7 +49,9 @@ const menuItem = (canvas: Canvas, name: string) =>
     ),
   });
 
-export const EscapeClosesPickerNotEditor = editor(withRule, {
+export const EscapeClosesPickerNotEditor: StoryObj = {
+  ...editor(withRule),
+  name: 'Escape closes the picker without closing the editor',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
@@ -63,9 +65,11 @@ export const EscapeClosesPickerNotEditor = editor(withRule, {
       canvasElement.querySelector('.stylebot-content')
     ).toBeInTheDocument();
   },
-});
+};
 
-export const SuggestsAndApplies = editor(withRule, {
+export const SuggestsAndApplies: StoryObj = {
+  ...editor(withRule),
+  name: 'typing suggests Google Fonts; picking one applies it and lists it first next time',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
@@ -107,9 +111,11 @@ export const SuggestsAndApplies = editor(withRule, {
     await expect(items[1]).toHaveTextContent('Playfair Display');
     await expect(items.at(-1)).toHaveTextContent('Browse Google Fonts');
   },
-});
+};
 
-export const CategoryFilter = editor(withRule, {
+export const CategoryFilter: StoryObj = {
+  ...editor(withRule),
+  name: 'a category name lists that category',
   play: async ({ canvasElement }) => {
     await openPicker(canvasElement);
     await userEvent.keyboard('mono');
@@ -126,9 +132,11 @@ export const CategoryFilter = editor(withRule, {
     );
     await expect(categories.every(text => text === 'monospace')).toBe(true);
   },
-});
+};
 
-export const CustomValue = editor(withRule, {
+export const CustomValue: StoryObj = {
+  ...editor(withRule),
+  name: 'a font outside Google Fonts is applied as typed',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
@@ -146,10 +154,12 @@ export const CustomValue = editor(withRule, {
       expect(chips(canvasElement)).toEqual(['Nonexistent Font'])
     );
   },
-});
+};
 
-export const ArrowKeys = editor(withRule, {
-  play: async ({ canvasElement }) => {
+export const ArrowKeys: StoryObj = {
+  ...editor(withRule),
+  name: 'arrow keys move between the field and the suggestions',
+  play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
     const text = await openPicker(canvasElement);
@@ -157,103 +167,120 @@ export const ArrowKeys = editor(withRule, {
     await userEvent.keyboard('playf');
     const playfair = await menuItem(canvas, 'Playfair Display');
 
-    await pressKey('ArrowDown');
-    await waitFor(() => expect(playfair).toHaveFocus());
+    await step('Down focuses a row, Up returns to the field', async () => {
+      await pressKey('ArrowDown');
+      await waitFor(() => expect(playfair).toHaveFocus());
 
-    await pressKey('ArrowUp');
-    await waitFor(() => expect(text).toHaveFocus());
-    await findOpenMenu(canvas);
-    await expect(text).toHaveValue('playf');
+      await pressKey('ArrowUp');
+      await waitFor(() => expect(text).toHaveFocus());
+      await findOpenMenu(canvas);
+      await expect(text).toHaveValue('playf');
+    });
 
-    // Editing continues from the end of the text, not from a re-selected
-    // value.
-    await userEvent.keyboard('a');
-    await expect(text).toHaveValue('playfa');
+    await step('editing continues from the end of the text', async () => {
+      await userEvent.keyboard('a');
+      await expect(text).toHaveValue('playfa');
+    });
 
-    // Up from the field wraps to the last row, Down past it comes back.
-    await pressKey('ArrowUp');
-    await waitFor(() =>
-      expect(
-        canvas.getByRole('menuitem', { name: 'Browse Google Fonts' })
-      ).toHaveFocus()
+    await step('Up from the field wraps to the last row', async () => {
+      await pressKey('ArrowUp');
+      await waitFor(() =>
+        expect(
+          canvas.getByRole('menuitem', { name: 'Browse Google Fonts' })
+        ).toHaveFocus()
+      );
+      await pressKey('ArrowDown');
+      await waitFor(() => expect(text).toHaveFocus());
+    });
+
+    await step('Escape closes the list and keeps the text', async () => {
+      await pressKey('Escape');
+      await waitFor(() => expect(canvas.queryByRole('menu')).toBeNull());
+      await expect(text).toHaveValue('playfa');
+      await expect(text).toHaveFocus();
+    });
+
+    await step('Down reopens it without re-selecting the text', async () => {
+      await pressKey('ArrowDown');
+      await findOpenMenu(canvas);
+      await userEvent.keyboard('i');
+      await expect(text).toHaveValue('playfai');
+    });
+
+    await step(
+      'Tab from a row applies the typed text, unremembered',
+      async () => {
+        await pressKey('ArrowDown');
+        await pressKey('Tab');
+        await waitFor(() => expect(chips(canvasElement)).toEqual(['playfai']));
+        await expect(declaration(store, 'h1', 'font-family')).toBe('playfai');
+        await expect(store.state.options.fonts).not.toContain('playfai');
+      }
     );
-    await pressKey('ArrowDown');
-    await waitFor(() => expect(text).toHaveFocus());
-
-    // Escape only closes the list; the text stays, and reopening with Down
-    // keeps the caret rather than re-selecting the text.
-    await pressKey('Escape');
-    await waitFor(() => expect(canvas.queryByRole('menu')).toBeNull());
-    await expect(text).toHaveValue('playfa');
-    await expect(text).toHaveFocus();
-    await pressKey('ArrowDown');
-    await findOpenMenu(canvas);
-    await userEvent.keyboard('i');
-    await expect(text).toHaveValue('playfai');
-
-    // Leaving from a row applies the typed text just like leaving from the
-    // field, and a half-typed name is applied but not remembered.
-    await pressKey('ArrowDown');
-    await pressKey('Tab');
-    await waitFor(() => expect(chips(canvasElement)).toEqual(['playfai']));
-    await expect(declaration(store, 'h1', 'font-family')).toBe('playfai');
-    await expect(store.state.options.fonts).not.toContain('playfai');
   },
-});
+};
 
-export const BrowseDiscardsDraft = editor(
-  { css: 'h1 { color: red; }', activeSelector: 'h1' },
-  {
-    play: async ({ canvasElement }) => {
-      const canvas = within(canvasElement);
-      const store = storeOf(canvasElement);
+export const BrowseDiscardsDraft: StoryObj = {
+  ...editor({ css: 'h1 { color: red; }', activeSelector: 'h1' }),
+  name: 'browsing Google Fonts discards typed text instead of showing it unapplied',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
 
-      await openPicker(canvasElement);
-      await userEvent.keyboard('playf');
+    await openPicker(canvasElement);
+    await userEvent.keyboard('playf');
 
-      await userEvent.click(await menuItem(canvas, 'Browse Google Fonts'));
+    await userEvent.click(await menuItem(canvas, 'Browse Google Fonts'));
 
-      await waitFor(() => expect(input(canvasElement)).toHaveValue(''));
-      await expect(chips(canvasElement)).toEqual([]);
-      await expect(declaration(store, 'h1', 'font-family')).toBeUndefined();
-    },
-  }
-);
+    await waitFor(() => expect(input(canvasElement)).toHaveValue(''));
+    await expect(chips(canvasElement)).toEqual([]);
+    await expect(declaration(store, 'h1', 'font-family')).toBeUndefined();
+  },
+};
 
-export const StackEditing = editor(
-  {
+export const StackEditing: StoryObj = {
+  ...editor({
     css: 'h1 { font-family: "Playfair Display", Georgia, serif; }',
     activeSelector: 'h1',
-  },
-  {
-    play: async ({ canvasElement }) => {
-      const canvas = within(canvasElement);
-      const store = storeOf(canvasElement);
+  }),
+  name: 'a stack written in code mode can be replaced or extended',
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
 
-      // Chips show family names without their CSS quotes.
+    await step('chips show the families without their CSS quotes', async () => {
       await expect(chips(canvasElement)).toEqual([
         'Playfair Display',
         'Georgia',
         'serif',
       ]);
+    });
 
+    await step('typing over the raw value replaces the stack', async () => {
       const text = await openPicker(canvasElement);
       await expect(text).toHaveValue('"Playfair Display", Georgia, serif');
       await userEvent.keyboard('Lora');
       await pressKey('Enter');
       await expect(declaration(store, 'h1', 'font-family')).toBe('Lora');
       await waitFor(() => expect(chips(canvasElement)).toEqual(['Lora']));
+    });
 
-      await openPicker(canvasElement);
-      // ArrowRight collapses the pre-selected value to its end.
-      await pressKey('ArrowRight');
-      await userEvent.keyboard(', Georgia, serif');
-      await menuItem(canvas, 'Use "Lora, Georgia, serif"');
-      await pressKey('Enter');
-      await expect(declaration(store, 'h1', 'font-family')).toBe(
-        'Lora, Georgia, serif'
-      );
+    await step(
+      'appending offers the typed stack as a custom value',
+      async () => {
+        await openPicker(canvasElement);
+        // ArrowRight collapses the pre-selected value to its end.
+        await pressKey('ArrowRight');
+        await userEvent.keyboard(', Georgia, serif');
+        await menuItem(canvas, 'Use "Lora, Georgia, serif"');
+        await pressKey('Enter');
+        await expect(declaration(store, 'h1', 'font-family')).toBe(
+          'Lora, Georgia, serif'
+        );
+      }
+    );
 
+    await step('a suggestion appended to a stack is quoted', async () => {
       await openPicker(canvasElement);
       await pressKey('ArrowRight');
       await userEvent.keyboard(', playf');
@@ -263,6 +290,6 @@ export const StackEditing = editor(
       await expect(declaration(store, 'h1', 'font-family')).toBe(
         'Lora, Georgia, serif, "Playfair Display"'
       );
-    },
-  }
-);
+    });
+  },
+};

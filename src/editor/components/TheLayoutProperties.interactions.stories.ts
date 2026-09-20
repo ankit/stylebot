@@ -1,4 +1,4 @@
-import type { Meta } from '@storybook/vue';
+import type { Meta, StoryObj } from '@storybook/vue';
 import { expect, userEvent, waitFor, within } from '@storybook/test';
 
 import TheLayoutProperties from './TheLayoutProperties.vue';
@@ -37,7 +37,9 @@ const spacingInput = (control: HTMLElement, label: string) =>
     .closest('.spacing-field')
     ?.querySelector('.number-input') as HTMLInputElement;
 
-export const SpacingModes = editor(withRule, {
+export const SpacingModes: StoryObj = {
+  ...editor(withRule),
+  name: 'padding switches between All, X & Y, Individual and None and writes the right shorthand',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
@@ -71,9 +73,11 @@ export const SpacingModes = editor(withRule, {
     await expect(declaration(store, 'h1', 'padding')).toBeUndefined();
     await expect(declaration(store, 'h1', 'padding-top')).toBeUndefined();
   },
-});
+};
 
-export const MarginIndependent = editor(withRule, {
+export const MarginIndependent: StoryObj = {
+  ...editor(withRule),
+  name: 'margin is edited independently of padding',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
@@ -92,9 +96,11 @@ export const MarginIndependent = editor(withRule, {
     await expect(declaration(store, 'h1', 'margin')).toBe('10px');
     await expect(declaration(store, 'h1', 'padding')).toBe('12px 24px');
   },
-});
+};
 
-export const BorderControls = editor(withRule, {
+export const BorderControls: StoryObj = {
+  ...editor(withRule),
+  name: 'the border controls read through the shorthand and update style and width',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
@@ -118,24 +124,25 @@ export const BorderControls = editor(withRule, {
     await userEvent.type(width, '2');
     await expect(declaration(store, 'h1', 'border-width')).toBe('2px');
   },
-});
+};
 
-export const BorderWidthOnly = editor(
-  { css: 'h1 { border-width: 2px; }', activeSelector: 'h1' },
-  {
-    play: async ({ canvasElement }) => {
-      const canvas = within(canvasElement);
-      const control = propertyControl(canvas, 'Border');
+export const BorderWidthOnly: StoryObj = {
+  ...editor({ css: 'h1 { border-width: 2px; }', activeSelector: 'h1' }),
+  name: 'a border-width alone shows its width with no style selected',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const control = propertyControl(canvas, 'Border');
 
-      await expect(control.querySelector('.number-input')).toHaveValue('2');
-      await expect(control.querySelector('.border-style button')).toHaveClass(
-        'muted'
-      );
-    },
-  }
-);
+    await expect(control.querySelector('.number-input')).toHaveValue('2');
+    await expect(control.querySelector('.border-style button')).toHaveClass(
+      'muted'
+    );
+  },
+};
 
-export const RadiusField = editor(withRule, {
+export const RadiusField: StoryObj = {
+  ...editor(withRule),
+  name: 'the radius field applies typed and preset values',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
@@ -152,4 +159,4 @@ export const RadiusField = editor(withRule, {
     await userEvent.click(preset);
     await expect(declaration(store, 'h1', 'border-radius')).toBe(`${value}px`);
   },
-});
+};

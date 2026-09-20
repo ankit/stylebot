@@ -1,4 +1,4 @@
-import type { Meta } from '@storybook/vue';
+import type { Meta, StoryObj } from '@storybook/vue';
 import { expect, fireEvent, userEvent, waitFor, within } from '@storybook/test';
 
 import ColorPicker from './ColorPicker.vue';
@@ -52,7 +52,9 @@ const openPopover = async (
   });
 };
 
-export const HexFieldApplies = editor(withRule, {
+export const HexFieldApplies: StoryObj = {
+  ...editor(withRule),
+  name: 'the hex fields apply text and background colors live',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
@@ -74,50 +76,62 @@ export const HexFieldApplies = editor(withRule, {
     await userEvent.type(hexField(canvas, 'Background'), '#fafafa');
     await expect(declaration(store, 'h1', 'background-color')).toBe('#fafafa');
   },
-});
+};
 
-export const PopoverTabsFollowRule = editor(noRule, {
-  play: async ({ canvasElement }) => {
+export const PopoverTabsFollowRule: StoryObj = {
+  ...editor(noRule),
+  name: 'the popover falls back to page colors, then switches to already-used colors once a rule is set',
+  play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
 
     let panel = await openPopover(canvas, canvasElement, 'Text');
     const firstTab = () => panel.querySelector('.tabs .tab') as HTMLElement;
 
-    // No Stylebot rule exists for this site yet, so the first tab falls
-    // back to the live page's own colors rather than showing empty.
-    await expect(firstTab()).toHaveTextContent('Page colors');
-    await expect(firstTab()).toHaveClass('active');
-    await expect(panel.querySelector('.first-tab .swatch')).toBeVisible();
+    await step(
+      'with no rule yet, the first tab shows page colors',
+      async () => {
+        await expect(firstTab()).toHaveTextContent('Page colors');
+        await expect(firstTab()).toHaveClass('active');
+        await expect(panel.querySelector('.first-tab .swatch')).toBeVisible();
+      }
+    );
 
-    // The shared footer field (present on every tab) applies a real
-    // declaration, which is also what makes the tab flip over. Set in one
-    // go, as a paste would: typing it out would apply the partial hexes.
-    const valueField = panel.querySelector('.value-field') as HTMLInputElement;
-    valueField.focus();
-    await fireEvent.input(valueField, { target: { value: '#112233' } });
-    valueField.blur();
-    await expect(declaration(store, 'h1', 'color')).toBe('#112233');
+    await step('the footer field applies a declaration', async () => {
+      // Set in one go, as a paste would: typing it out would apply the
+      // partial hexes along the way.
+      const valueField = panel.querySelector(
+        '.value-field'
+      ) as HTMLInputElement;
+      valueField.focus();
+      await fireEvent.input(valueField, { target: { value: '#112233' } });
+      valueField.blur();
+      await expect(declaration(store, 'h1', 'color')).toBe('#112233');
+    });
 
-    await userEvent.click(swatch(canvas, 'Text'));
-    await waitFor(() => expect(popover(canvasElement)).toBeNull());
-    panel = await openPopover(canvas, canvasElement, 'Text');
+    await step('reopened, the first tab shows the used colors', async () => {
+      await userEvent.click(swatch(canvas, 'Text'));
+      await waitFor(() => expect(popover(canvasElement)).toBeNull());
+      panel = await openPopover(canvas, canvasElement, 'Text');
 
-    await expect(firstTab()).toHaveTextContent('Your colors');
-    await expect(
-      panel.querySelector('.used-colors .swatch[style*="17, 34, 51"]')
-    ).toBeVisible();
+      await expect(firstTab()).toHaveTextContent('Your colors');
+      await expect(
+        panel.querySelector('.used-colors .swatch[style*="17, 34, 51"]')
+      ).toBeVisible();
+    });
 
-    // The color the popover closed on is recorded as recent, shown in this
-    // same tab rather than under Custom.
-    await expect(panel.querySelector('.recent-section')).toBeVisible();
-    await expect(
-      panel.querySelector('.recent-section .swatch[style*="17, 34, 51"]')
-    ).toBeVisible();
+    await step('the color it closed on is listed as recent', async () => {
+      await expect(panel.querySelector('.recent-section')).toBeVisible();
+      await expect(
+        panel.querySelector('.recent-section .swatch[style*="17, 34, 51"]')
+      ).toBeVisible();
+    });
   },
-});
+};
 
-export const PaletteSearchChevron = editor(noRule, {
+export const PaletteSearchChevron: StoryObj = {
+  ...editor(noRule),
+  name: 'the palette search lists every palette again from the chevron, even after a dead-end query',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const panel = await openPopover(canvas, canvasElement, 'Text');
@@ -155,9 +169,11 @@ export const PaletteSearchChevron = editor(noRule, {
       1
     );
   },
-});
+};
 
-export const EscapeClosesPopoverNotEditor = editor(withRule, {
+export const EscapeClosesPopoverNotEditor: StoryObj = {
+  ...editor(withRule),
+  name: 'Escape closes the popover without closing the editor',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
@@ -173,11 +189,13 @@ export const EscapeClosesPopoverNotEditor = editor(withRule, {
       canvasElement.querySelector('.stylebot-content')
     ).toBeInTheDocument();
   },
-});
+};
 
 /* While a popover is open the rest of the body ignores the pointer, so a
    stray click can't edit another property behind it. */
-export const OpenPopoverBlocksBody = editor(withRule, {
+export const OpenPopoverBlocksBody: StoryObj = {
+  ...editor(withRule),
+  name: 'an open popover blocks pointer events on the rest of the panel',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const body = canvasElement.querySelector('.stylebot-body') as HTMLElement;
@@ -190,4 +208,4 @@ export const OpenPopoverBlocksBody = editor(withRule, {
     await pressKey('Escape');
     await waitFor(() => expect(body.style.pointerEvents).toBe(''));
   },
-});
+};

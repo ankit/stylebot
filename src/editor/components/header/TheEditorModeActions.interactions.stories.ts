@@ -1,4 +1,4 @@
-import type { Meta } from '@storybook/vue';
+import type { Meta, StoryObj } from '@storybook/vue';
 import { expect, userEvent, waitFor, within } from '@storybook/test';
 
 import TheEditorModeActions from './TheEditorModeActions.vue';
@@ -20,7 +20,9 @@ export default meta;
 
 const withRule = { css: RULE_CSS, activeSelector: 'h1' };
 
-export const TabsSwitchMode = editor(withRule, {
+export const TabsSwitchMode: StoryObj = {
+  ...editor(withRule),
+  name: 'the tabs switch between Basic, Code and Presets',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
@@ -44,9 +46,11 @@ export const TabsSwitchMode = editor(withRule, {
       canvasElement.querySelector('.basic-editor')
     ).toBeInTheDocument();
   },
-});
+};
 
-export const ShortcutsSwitchMode = editor(withRule, {
+export const ShortcutsSwitchMode: StoryObj = {
+  ...editor(withRule),
+  name: 'b, c and m switch modes; i only inspects in Basic',
   play: async ({ canvasElement }) => {
     const store = storeOf(canvasElement);
 
@@ -66,25 +70,26 @@ export const ShortcutsSwitchMode = editor(withRule, {
       expect(canvasElement.querySelector('.basic-editor')).toBeInTheDocument()
     );
   },
-});
+};
 
-export const ReadabilityDisablesTabs = editor(
-  { readability: true, options: { mode: 'magic' } },
-  {
-    play: async ({ canvasElement }) => {
-      const canvas = within(canvasElement);
+export const ReadabilityDisablesTabs: StoryObj = {
+  ...editor({ readability: true, options: { mode: 'magic' } }),
+  name: 'Basic and Code are disabled while readability is on',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
 
-      await expect(canvas.getByRole('tab', { name: 'Basic' })).toBeDisabled();
-      await expect(canvas.getByRole('tab', { name: 'Code' })).toBeDisabled();
+    await expect(canvas.getByRole('tab', { name: 'Basic' })).toBeDisabled();
+    await expect(canvas.getByRole('tab', { name: 'Code' })).toBeDisabled();
 
-      const presets = canvas.getByRole('tab', { name: 'Presets' });
-      await expect(presets).toBeEnabled();
-      await expect(presets).toHaveAttribute('aria-selected', 'true');
-    },
-  }
-);
+    const presets = canvas.getByRole('tab', { name: 'Presets' });
+    await expect(presets).toBeEnabled();
+    await expect(presets).toHaveAttribute('aria-selected', 'true');
+  },
+};
 
-export const ReadabilityToggleForcesPresets = editor(withRule, {
+export const ReadabilityToggleForcesPresets: StoryObj = {
+  ...editor(withRule),
+  name: 'turning readability on forces Presets mode and disables the other tabs',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
@@ -105,4 +110,4 @@ export const ReadabilityToggleForcesPresets = editor(withRule, {
       expect(canvas.getByRole('tab', { name: 'Basic' })).toBeEnabled()
     );
   },
-});
+};

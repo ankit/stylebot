@@ -1,4 +1,4 @@
-import type { Meta } from '@storybook/vue';
+import type { Meta, StoryObj } from '@storybook/vue';
 import { expect, userEvent, waitFor, within } from '@storybook/test';
 
 import TheTextProperties from './TheTextProperties.vue';
@@ -28,7 +28,9 @@ const numberInput = (control: HTMLElement) =>
 const segments = (control: HTMLElement) =>
   Array.from(control.querySelectorAll<HTMLElement>('.segment'));
 
-export const FontSizeField = editor(withRule, {
+export const FontSizeField: StoryObj = {
+  ...editor(withRule),
+  name: 'the size field applies px values live, clears them, and offers presets',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
@@ -53,32 +55,33 @@ export const FontSizeField = editor(withRule, {
       `${input.value}px`
     );
   },
-});
+};
 
 /* Only px is editable; a unitless or other-unit value renders empty and is
    replaced on edit. */
-export const LineHeightField = editor(
-  { css: RULE_CSS, activeSelector: '.article-body' },
-  {
-    play: async ({ canvasElement }) => {
-      const canvas = within(canvasElement);
-      const store = storeOf(canvasElement);
-      const input = numberInput(propertyControl(canvas, 'Line Height'));
+export const LineHeightField: StoryObj = {
+  ...editor({ css: RULE_CSS, activeSelector: '.article-body' }),
+  name: 'a non-px line height renders empty and is replaced on edit',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+    const input = numberInput(propertyControl(canvas, 'Line Height'));
 
-      await expect(declaration(store, '.article-body', 'line-height')).toBe(
-        '1.6'
-      );
-      await expect(input).toHaveValue('');
+    await expect(declaration(store, '.article-body', 'line-height')).toBe(
+      '1.6'
+    );
+    await expect(input).toHaveValue('');
 
-      await userEvent.type(input, '24');
-      await expect(declaration(store, '.article-body', 'line-height')).toBe(
-        '24px'
-      );
-    },
-  }
-);
+    await userEvent.type(input, '24');
+    await expect(declaration(store, '.article-body', 'line-height')).toBe(
+      '24px'
+    );
+  },
+};
 
-export const TextAlignSegmented = editor(withRule, {
+export const TextAlignSegmented: StoryObj = {
+  ...editor(withRule),
+  name: 'clicking the active alignment clears it; another applies it',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
@@ -95,9 +98,11 @@ export const TextAlignSegmented = editor(withRule, {
     await expect(declaration(store, 'h1', 'text-align')).toBe('left');
     await waitFor(() => expect(left).toHaveClass('active'));
   },
-});
+};
 
-export const TextDecorationSegmented = editor(withRule, {
+export const TextDecorationSegmented: StoryObj = {
+  ...editor(withRule),
+  name: 'a decoration applies on click and clears on a second click',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
@@ -110,4 +115,4 @@ export const TextDecorationSegmented = editor(withRule, {
     await userEvent.click(underline);
     await expect(declaration(store, 'h1', 'text-decoration')).toBeUndefined();
   },
-});
+};

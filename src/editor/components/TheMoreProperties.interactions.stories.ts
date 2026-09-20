@@ -1,4 +1,4 @@
-import type { Meta } from '@storybook/vue';
+import type { Meta, StoryObj } from '@storybook/vue';
 import { expect, userEvent, waitFor, within } from '@storybook/test';
 
 import TheMoreProperties from './TheMoreProperties.vue';
@@ -25,16 +25,20 @@ const rows = (card: HTMLElement) =>
     row.textContent?.replace(/\s+/g, ' ').trim()
   );
 
-export const ListsUnknownDeclarations = editor(withRule, {
+export const ListsUnknownDeclarations: StoryObj = {
+  ...editor(withRule),
+  name: 'lists the declarations no other panel edits',
   play: async ({ canvasElement }) => {
     const card = propertyCard(within(canvasElement), 'More Properties');
 
     // Only what no other panel edits shows up here.
     await expect(rows(card)).toEqual(['letter-spacing 1px']);
   },
-});
+};
 
-export const AddProperty = editor(withRule, {
+export const AddProperty: StoryObj = {
+  ...editor(withRule),
+  name: 'Enter adds a typed property and Escape abandons one',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
@@ -62,9 +66,11 @@ export const AddProperty = editor(withRule, {
     );
     await expect(declaration(store, 'h1', 'text-transform')).toBeUndefined();
   },
-});
+};
 
-export const RemoveProperty = editor(withRule, {
+export const RemoveProperty: StoryObj = {
+  ...editor(withRule),
+  name: 'removing a property keeps the rest of the rule',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
@@ -79,4 +85,4 @@ export const RemoveProperty = editor(withRule, {
     // The rule itself survives.
     await expect(declaration(store, 'h1', 'color')).toBe('#2a5fd6');
   },
-});
+};

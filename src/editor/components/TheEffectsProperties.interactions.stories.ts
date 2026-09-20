@@ -1,4 +1,4 @@
-import type { Meta } from '@storybook/vue';
+import type { Meta, StoryObj } from '@storybook/vue';
 import { expect, fireEvent, userEvent, waitFor, within } from '@storybook/test';
 
 import TheEffectsProperties from './TheEffectsProperties.vue';
@@ -30,7 +30,9 @@ const slide = async (input: HTMLInputElement, value: number) => {
   await fireEvent.input(input);
 };
 
-export const OpacitySlider = editor(withRule, {
+export const OpacitySlider: StoryObj = {
+  ...editor(withRule),
+  name: 'the opacity slider clears at 1 and applies other values',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
@@ -48,9 +50,11 @@ export const OpacitySlider = editor(withRule, {
       expect(control.querySelector('.opacity-value')).toHaveTextContent('0.5')
     );
   },
-});
+};
 
-export const FilterControl = editor(withRule, {
+export const FilterControl: StoryObj = {
+  ...editor(withRule),
+  name: 'picking a filter applies its default amount, the slider adjusts it, None clears it',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
@@ -75,4 +79,4 @@ export const FilterControl = editor(withRule, {
     await expect(declaration(store, 'h1', 'filter')).toBeUndefined();
     await waitFor(() => expect(slider(control)).toBeNull());
   },
-});
+};

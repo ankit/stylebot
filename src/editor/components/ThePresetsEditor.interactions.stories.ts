@@ -1,4 +1,4 @@
-import type { Meta } from '@storybook/vue';
+import type { Meta, StoryObj } from '@storybook/vue';
 import { expect, fireEvent, userEvent, waitFor, within } from '@storybook/test';
 
 import ThePresetsEditor from './ThePresetsEditor.vue';
@@ -19,7 +19,9 @@ const magic = { options: { mode: 'magic' as const } };
 const grayscaleSlider = (root: HTMLElement) =>
   root.querySelector('.presets-editor input[type="range"]') as HTMLInputElement;
 
-export const GrayscaleToggleAndSlider = editor(magic, {
+export const GrayscaleToggleAndSlider: StoryObj = {
+  ...editor(magic),
+  name: 'the grayscale toggle applies 100%, the slider adjusts it, and off clears it',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
@@ -47,30 +49,31 @@ export const GrayscaleToggleAndSlider = editor(magic, {
     await expect(store.state.css).not.toContain('grayscale(');
     await waitFor(() => expect(toggle).not.toBeChecked());
   },
-});
+};
 
 /* Turning the preset off strips only the filter, so a colour set on the
    same element in basic mode survives the round trip. */
-export const GrayscaleKeepsRestOfRule = editor(
-  { ...magic, css: '.article-body { color: #ff0080; }' },
-  {
-    play: async ({ canvasElement }) => {
-      const canvas = within(canvasElement);
-      const store = storeOf(canvasElement);
-      const toggle = featureSwitch(canvas, 'Grayscale');
+export const GrayscaleKeepsRestOfRule: StoryObj = {
+  ...editor({ ...magic, css: '.article-body { color: #ff0080; }' }),
+  name: 'taking grayscale back to 0 keeps the rest of the rule',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+    const toggle = featureSwitch(canvas, 'Grayscale');
 
-      await userEvent.click(toggle);
-      await expect(store.state.css).toContain('color: #ff0080');
-      await expect(store.state.css).toContain('grayscale(100%)');
+    await userEvent.click(toggle);
+    await expect(store.state.css).toContain('color: #ff0080');
+    await expect(store.state.css).toContain('grayscale(100%)');
 
-      await userEvent.click(toggle);
-      await expect(store.state.css).toContain('color: #ff0080');
-      await expect(store.state.css).not.toContain('grayscale(');
-    },
-  }
-);
+    await userEvent.click(toggle);
+    await expect(store.state.css).toContain('color: #ff0080');
+    await expect(store.state.css).not.toContain('grayscale(');
+  },
+};
 
-export const ReadabilityToggle = editor(magic, {
+export const ReadabilityToggle: StoryObj = {
+  ...editor(magic),
+  name: 'the readability toggle turns reader mode on and off',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
@@ -86,4 +89,4 @@ export const ReadabilityToggle = editor(magic, {
     await userEvent.click(toggle);
     await expect(store.state.readability).toBe(false);
   },
-});
+};

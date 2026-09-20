@@ -65,6 +65,9 @@ export const PANEL_STATE_PAGE = `
 
 type EditorStory = {
   page?: string;
+  /* A spec-style sentence for interaction tests, shown in the sidebar and
+     the runner's output in place of the export's name. */
+  name?: string;
   play?: StoryObj['play'];
 };
 
@@ -74,8 +77,9 @@ type EditorStory = {
  */
 export const editor = (
   overrides: EditorStateOverrides = {},
-  { page = PAGE, play }: EditorStory = {}
+  { page = PAGE, name, play }: EditorStory = {}
 ): StoryObj => ({
+  ...(name && { name }),
   render: (_args, { globals }) => ({
     components: { TheStylebotApp },
     store: createEditorStore({

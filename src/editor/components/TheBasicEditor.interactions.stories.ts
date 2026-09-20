@@ -1,4 +1,4 @@
-import type { Meta } from '@storybook/vue';
+import type { Meta, StoryObj } from '@storybook/vue';
 import { expect, userEvent, waitFor, within } from '@storybook/test';
 
 import TheBasicEditor from './TheBasicEditor.vue';
@@ -34,7 +34,9 @@ const pick = async (element: HTMLElement) => {
   await pressKey('Enter');
 };
 
-export const HideButton = editor(withRule, {
+export const HideButton: StoryObj = {
+  ...editor(withRule),
+  name: 'Hide and h toggle display: none on the picked element',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
@@ -48,9 +50,11 @@ export const HideButton = editor(withRule, {
     await expect(declaration(store, 'h1', 'display')).toBeUndefined();
     await waitFor(() => expect(hide).not.toHaveClass('active'));
   },
-});
+};
 
-export const ResetButton = editor(withRule, {
+export const ResetButton: StoryObj = {
+  ...editor(withRule),
+  name: "Reset removes the picked element's rule and leaves the others alone",
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
@@ -67,66 +71,65 @@ export const ResetButton = editor(withRule, {
     );
     await waitFor(() => expect(reset).toBeDisabled());
   },
-});
+};
 
-export const ResetDisabledWithoutRule = editor(
-  { activeSelector: 'h1' },
-  {
-    play: async ({ canvasElement }) => {
-      const canvas = within(canvasElement);
-      await expect(
-        canvas.getByRole('button', { name: 'Reset' })
-      ).toBeDisabled();
-    },
-  }
-);
+export const ResetDisabledWithoutRule: StoryObj = {
+  ...editor({ activeSelector: 'h1' }),
+  name: 'Reset is disabled when the picked element has no rule',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('button', { name: 'Reset' })).toBeDisabled();
+  },
+};
 
-export const PanelsAutoExpandPerElement = editor(
-  { css: 'h1 { margin: 10px; }', inspecting: true },
-  {
-    page: PANEL_STATE_PAGE,
-    play: async ({ canvasElement }) => {
-      const canvas = within(canvasElement);
+export const PanelsAutoExpandPerElement: StoryObj = {
+  ...editor(
+    { css: 'h1 { margin: 10px; }', inspecting: true },
+    { page: PANEL_STATE_PAGE }
+  ),
+  name: 'panels with declarations auto-expand and collapse per element',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
 
-      // The heading has a Box declaration, so Box opens and Text stays shut.
-      await pick(canvas.getByRole('heading', { level: 1 }));
-      await waitFor(() =>
-        expect(cardCollapse(canvas, 'Box')).not.toHaveClass('collapsed')
-      );
-      await expect(cardCollapse(canvas, 'Text')).toHaveClass('collapsed');
+    // The heading has a Box declaration, so Box opens and Text stays shut.
+    await pick(canvas.getByRole('heading', { level: 1 }));
+    await waitFor(() =>
+      expect(cardCollapse(canvas, 'Box')).not.toHaveClass('collapsed')
+    );
+    await expect(cardCollapse(canvas, 'Text')).toHaveClass('collapsed');
 
-      // The quote has nothing styled: Text opens as the default, Box shuts.
-      await pressKey('i');
-      await pick(canvas.getByText('Pick an element to start.'));
-      await waitFor(() =>
-        expect(cardCollapse(canvas, 'Box')).toHaveClass('collapsed')
-      );
-      await expect(cardCollapse(canvas, 'Text')).not.toHaveClass('collapsed');
-    },
-  }
-);
+    // The quote has nothing styled: Text opens as the default, Box shuts.
+    await pressKey('i');
+    await pick(canvas.getByText('Pick an element to start.'));
+    await waitFor(() =>
+      expect(cardCollapse(canvas, 'Box')).toHaveClass('collapsed')
+    );
+    await expect(cardCollapse(canvas, 'Text')).not.toHaveClass('collapsed');
+  },
+};
 
-export const ManualOpenPersistsAcrossPicks = editor(
-  { inspecting: true },
-  {
-    page: PANEL_STATE_PAGE,
-    play: async ({ canvasElement }) => {
-      const canvas = within(canvasElement);
-      const store = storeOf(canvasElement);
-      const heading = canvas.getByRole('heading', { level: 1 });
-      const quote = canvas.getByText('Pick an element to start.');
-      const boxHeader = () =>
-        propertyCard(canvas, 'Box').querySelector(
-          '.property-card-header'
-        ) as HTMLElement;
+export const ManualOpenPersistsAcrossPicks: StoryObj = {
+  ...editor({ inspecting: true }, { page: PANEL_STATE_PAGE }),
+  name: 'a manually opened panel stays open across element picks until closed by hand',
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+    const heading = canvas.getByRole('heading', { level: 1 });
+    const quote = canvas.getByText('Pick an element to start.');
+    const boxHeader = () =>
+      propertyCard(canvas, 'Box').querySelector(
+        '.property-card-header'
+      ) as HTMLElement;
 
+    await step('an unstyled element opens only Text', async () => {
       await pick(heading);
       await waitFor(() =>
         expect(cardCollapse(canvas, 'Text')).not.toHaveClass('collapsed')
       );
       await expect(cardCollapse(canvas, 'Box')).toHaveClass('collapsed');
+    });
 
-      // Opening Box by hand is remembered as a preference…
+    await step('opening Box by hand is remembered', async () => {
       await userEvent.click(boxHeader());
       await waitFor(() =>
         expect(cardCollapse(canvas, 'Box')).not.toHaveClass('collapsed')
@@ -134,16 +137,18 @@ export const ManualOpenPersistsAcrossPicks = editor(
       await expect(store.state.options.basicModeOpenedSections.layout).toBe(
         true
       );
+    });
 
-      // …so it stays open for the next element too.
+    await step('so it stays open for the next element', async () => {
       await pressKey('i');
       await pick(quote);
       await waitFor(() =>
         expect(cardCollapse(canvas, 'Text')).not.toHaveClass('collapsed')
       );
       await expect(cardCollapse(canvas, 'Box')).not.toHaveClass('collapsed');
+    });
 
-      // Closing it by hand forgets the preference again.
+    await step('closing it by hand forgets the preference', async () => {
       await userEvent.click(boxHeader());
       await waitFor(() =>
         expect(cardCollapse(canvas, 'Box')).toHaveClass('collapsed')
@@ -160,11 +165,13 @@ export const ManualOpenPersistsAcrossPicks = editor(
         expect(cardCollapse(canvas, 'Text')).not.toHaveClass('collapsed')
       );
       await expect(cardCollapse(canvas, 'Box')).toHaveClass('collapsed');
-    },
-  }
-);
+    });
+  },
+};
 
-export const CollapseAll = editor(withRule, {
+export const CollapseAll: StoryObj = {
+  ...editor(withRule),
+  name: 'every panel can be collapsed and none stays remembered as open',
   play: async ({ canvasElement }) => {
     const store = storeOf(canvasElement);
 
@@ -187,4 +194,4 @@ export const CollapseAll = editor(withRule, {
       Object.values(store.state.options.basicModeOpenedSections)
     ).not.toContain(true);
   },
-});
+};
