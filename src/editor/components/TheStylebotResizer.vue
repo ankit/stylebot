@@ -1,5 +1,10 @@
 <template>
+  <div v-if="host === 'window'" class="stylebot stylebot-window">
+    <slot></slot>
+  </div>
+
   <vue-draggable-resizable
+    v-else
     :class="`stylebot ${layout.dockLocation}`"
     class-name-resizing="stylebot-resizing"
     class-name-active="stylebot-resizing-active"
@@ -41,6 +46,10 @@ export default Vue.extend({
   },
 
   computed: {
+    host(): string {
+      return this.$store.state.host;
+    },
+
     resizing(): boolean {
       return this.$store.state.resizing;
     },
@@ -137,6 +146,10 @@ export default Vue.extend({
     },
 
     adjustPageLayout() {
+      if (this.host === 'window') {
+        return;
+      }
+
       // todo: this needs a lot of work to be more robust.
       if (this.layout.adjustPageLayout && this.visible) {
         const reserved = this.width + MARGIN;
@@ -159,6 +172,11 @@ export default Vue.extend({
 
 <style lang="scss">
 .stylebot {
+  &.stylebot-window {
+    position: absolute;
+    inset: 0;
+  }
+
   &.vdr {
     position: fixed;
     border: 1px solid var(--panel-border);

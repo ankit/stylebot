@@ -322,7 +322,9 @@ export const CloseEditorWindow = async (
 
 export const GetIsEditorWindowOpen = async (
   message: GetIsEditorWindowOpenType,
+  sender: chrome.runtime.MessageSender,
   sendResponse: (response: GetIsEditorWindowOpenResponse) => void
 ): Promise<void> => {
-  sendResponse(await editorWindow.isOpen(message.tabId));
+  const tabId = message.tabId ?? sender.tab?.id;
+  sendResponse(tabId !== undefined && (await editorWindow.isOpen(tabId)));
 };

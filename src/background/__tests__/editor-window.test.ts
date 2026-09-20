@@ -115,6 +115,24 @@ describe('editor-window', () => {
     );
   });
 
+  it('falls back to a placed window, then to defaults, when bounds are refused', async () => {
+    fake.api.windows.create
+      .mockRejectedValueOnce(new Error('Invalid value for bounds'))
+      .mockRejectedValueOnce(new Error('Invalid value for bounds'));
+
+    await editorWindow.open(7);
+
+    const calls = fake.api.windows.create.mock.calls.map(([info]) => info);
+    expect(calls).toHaveLength(3);
+    expect(calls[0]).toEqual(
+      expect.objectContaining({ width: 420, left: expect.any(Number) })
+    );
+    expect(calls[1]).toEqual(expect.objectContaining({ width: 420 }));
+    expect(calls[1]).not.toHaveProperty('left');
+    expect(calls[2]).not.toHaveProperty('width');
+    await expect(editorWindow.isOpen(7)).resolves.toBe(true);
+  });
+
   it('toggle closes an open window and opens a missing one', async () => {
     await editorWindow.toggle(7);
     expect(fake.api.windows.create).toBeCalledTimes(1);

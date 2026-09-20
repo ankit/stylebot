@@ -3,9 +3,13 @@
     <div class="stylebot-content">
       <the-header />
 
+      <the-window-status v-if="host === 'window' && !pageConnected" />
+
       <div
         class="stylebot-body"
-        :style="colorPickerVisible ? 'pointer-events: none' : ''"
+        :style="
+          colorPickerVisible || !pageConnected ? 'pointer-events: none' : ''
+        "
       >
         <the-basic-editor v-if="mode === 'basic'" />
         <the-presets-editor v-else-if="mode === 'magic'" />
@@ -28,6 +32,7 @@ import TheCodeEditor from './TheCodeEditor.vue';
 import TheBasicEditor from './TheBasicEditor.vue';
 import ThePresetsEditor from './ThePresetsEditor.vue';
 import TheStylebotResizer from './TheStylebotResizer.vue';
+import TheWindowStatus from './TheWindowStatus.vue';
 
 import { StylebotEditingMode } from '@stylebot/types';
 
@@ -40,6 +45,7 @@ export default Vue.extend({
     ThePresetsEditor,
     TheCodeEditor,
     TheStylebotResizer,
+    TheWindowStatus,
   },
 
   data(): { codeEditorMounted: boolean } {
@@ -49,6 +55,14 @@ export default Vue.extend({
   },
 
   computed: {
+    host(): string {
+      return this.$store.state.host;
+    },
+
+    pageConnected(): boolean {
+      return this.$store.state.pageConnected;
+    },
+
     resizing(): boolean {
       return this.$store.state.resizing;
     },

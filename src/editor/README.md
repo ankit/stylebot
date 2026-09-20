@@ -4,7 +4,7 @@ This package includes code for the stylebot editor displayed on the page.
 
 - **`components`**: Vue components for rendering the editor
 
-- **`listeners`**: Tab-message, hotkey and context-menu listeners for the content script
+- **`listeners`**: Tab-message, hotkey, context-menu and editor-window port listeners for the content script
 
 - **`scss`**: Typography overrides
 
@@ -30,3 +30,5 @@ This package includes code for the stylebot editor displayed on the page.
   persists it (`SetStyle`) and commits the css and its selectors.
 - All other page access — readability, inspecting, selector highlights, page colors — goes
   through the bridge too, so the store and components never touch the document themselves.
+- That is what lets `../editor-window` mount the same components in a separate window with
+  the remote bridge, while the `editor-window` listener here serves that window's port.
