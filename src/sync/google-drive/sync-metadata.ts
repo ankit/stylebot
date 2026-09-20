@@ -1,4 +1,4 @@
-import { GoogleDriveSyncMetadata, SyncState } from '@stylebot/types';
+import { SyncState } from '@stylebot/types';
 
 const SYNC_STATE_KEY = 'google-drive-sync-state';
 const LEGACY_METADATA_KEY = 'google-drive-sync';
@@ -51,10 +51,6 @@ export const getSyncNeedsAuth = async (): Promise<boolean> => {
   const items = await chrome.storage.local.get(NEEDS_AUTH_KEY);
   return Boolean(items[NEEDS_AUTH_KEY]);
 };
-
-export const getGoogleDriveSyncMetadata = async (): Promise<
-  GoogleDriveSyncMetadata | undefined
-> => (await getSyncState())?.metadata;
 
 export const getLastSyncedAt = async (): Promise<string | undefined> =>
   (await getSyncState())?.lastSyncedAt;

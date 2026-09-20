@@ -151,6 +151,22 @@ describe('runGoogleDriveSync', () => {
     expect(mockedWrite).not.toBeCalled();
   });
 
+  it('does not write state back after the user disconnected mid-run', async () => {
+    seed({ styles: RED });
+    mockedGetRemote.mockImplementation(async () => {
+      // Disconnect clears the flag and the stored state while Drive is slow.
+      store['google-drive-sync-enabled'] = false;
+      delete store[STATE_KEY];
+      return null;
+    });
+    mockedWrite.mockResolvedValue(remoteMetadata('remote-1'));
+
+    const response = await runGoogleDriveSync();
+
+    expect(response.ok).toBe(false);
+    expect(storedState()).toBeUndefined();
+  });
+
   it('creates the remote file when there is no backup yet', async () => {
     seed({ styles: RED });
     mockedGetRemote.mockResolvedValue(null);
