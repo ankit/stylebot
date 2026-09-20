@@ -14,7 +14,8 @@ import {
 } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
-  title: 'Editor/Interactions/Color picker',
+  title: 'Tests/Editor/Color picker',
+  tags: ['test'],
   component: ColorPicker,
   parameters: { padded: false },
 };

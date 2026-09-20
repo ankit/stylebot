@@ -16,7 +16,8 @@ import {
 } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
-  title: 'Editor/Interactions/Basic panels',
+  title: 'Tests/Editor/Basic panels',
+  tags: ['test'],
   component: TheBasicEditor,
   parameters: { padded: false },
 };

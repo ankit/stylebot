@@ -1,5 +1,5 @@
 import type { Meta } from '@storybook/vue';
-import { expect, userEvent, within } from '@storybook/test';
+import { userEvent, within } from '@storybook/test';
 
 import SSelect from './SSelect.vue';
 import MenuItem from './MenuItem.vue';
@@ -90,7 +90,6 @@ export const Open = fromTemplate(
       const canvas = within(canvasElement);
       await userEvent.click(canvas.getByRole('button'));
       await findOpenMenu(canvas);
-      await expect(canvas.getAllByRole('menuitem').length).toBeGreaterThan(1);
     },
   }
 );

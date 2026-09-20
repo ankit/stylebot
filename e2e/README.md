@@ -12,7 +12,8 @@ cross-origin frames, and anything engine-specific. They are slow — every test 
 the popup and waits for the editor's content script — so behaviour that lives entirely
 inside the panel (menus, shortcuts, property controls, the inspector's keyboard flow,
 the font and color pickers) is tested as Storybook interaction tests instead: the
-`*.interactions.stories.ts` files next to the components, run with `yarn test:storybook`.
+`*.interactions.stories.ts` files next to the components (the `Tests` root in the
+Storybook sidebar), run with `yarn test:storybook`.
 When a test here only needs the panel, it belongs there.
 
 ## Running

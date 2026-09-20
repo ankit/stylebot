@@ -10,7 +10,8 @@ import {
 } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
-  title: 'Editor/Interactions/Selector field',
+  title: 'Tests/Editor/Selector field',
+  tags: ['test'],
   component: TheCssSelectorDropdown,
   parameters: { padded: false },
 };

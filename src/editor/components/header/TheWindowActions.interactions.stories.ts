@@ -10,7 +10,8 @@ import {
 } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
-  title: 'Editor/Interactions/Window actions',
+  title: 'Tests/Editor/Window actions',
+  tags: ['test'],
   component: TheWindowActions,
   parameters: { padded: false },
 };

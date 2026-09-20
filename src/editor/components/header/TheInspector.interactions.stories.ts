@@ -14,7 +14,8 @@ import { pressKey, storeOf } from '@stylebot/storybook/story-helpers';
    these stories drive picking with hover + keyboard and only touch the
    panel once inspecting is off. */
 const meta: Meta = {
-  title: 'Editor/Interactions/Inspector',
+  title: 'Tests/Editor/Inspector',
+  tags: ['test'],
   component: TheInspector,
   parameters: { padded: false },
 };

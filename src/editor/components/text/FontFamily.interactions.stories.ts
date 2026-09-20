@@ -11,7 +11,8 @@ import {
 } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
-  title: 'Editor/Interactions/Font picker',
+  title: 'Tests/Editor/Font picker',
+  tags: ['test'],
   component: FontFamily,
   parameters: { padded: false },
 };

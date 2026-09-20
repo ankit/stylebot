@@ -10,7 +10,8 @@ import {
 } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
-  title: 'Editor/Interactions/More properties',
+  title: 'Tests/Editor/More properties',
+  tags: ['test'],
   component: TheMoreProperties,
   parameters: { padded: false },
 };

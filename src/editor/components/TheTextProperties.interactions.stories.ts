@@ -11,7 +11,8 @@ import {
 } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
-  title: 'Editor/Interactions/Text',
+  title: 'Tests/Editor/Text',
+  tags: ['test'],
   component: TheTextProperties,
   parameters: { padded: false },
 };

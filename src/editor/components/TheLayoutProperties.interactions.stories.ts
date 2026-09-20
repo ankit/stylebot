@@ -11,7 +11,8 @@ import {
 } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
-  title: 'Editor/Interactions/Box',
+  title: 'Tests/Editor/Box',
+  tags: ['test'],
   component: TheLayoutProperties,
   parameters: { padded: false },
 };

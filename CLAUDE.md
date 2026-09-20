@@ -34,7 +34,7 @@ session is already inside a worktree.
 
 Always validate UI/extension changes headless, not with manual/headed browser interaction. Behaviour that lives inside a Vue surface (the editor panel, popup, options page) is tested as Storybook interaction tests: `*.interactions.stories.ts` beside the component, with `play` functions using `@storybook/test` (`within`, `userEvent`, `expect`, `waitFor`) and the helpers in `.storybook/story-helpers.ts`; run `yarn test:storybook`. Only what needs the real extension — popup/background/content-script messaging, storage persistence across reloads, CSS injected into a real page, web-font fetches, Firefox/Edge — goes in the Playwright e2e suite (`e2e/fixtures.ts` loads the real unpacked extension via CDP); run `yarn e2e` (or a targeted spec, e.g. `yarn e2e --no-build editor-open`). Confirm a change works with the relevant suite before calling it done.
 
-Stories live beside their component as `*.stories.ts`; give new shared primitives a story. Visual stories stay static; interaction tests go in a separate `*.interactions.stories.ts` file.
+Stories live beside their component as `*.stories.ts`; give new shared primitives a story. Visual stories only set up the state they show (a `play` may open a menu and wait for it, nothing more); interaction tests go in a separate `*.interactions.stories.ts` file titled `Tests/<Surface>/<Feature>` with `tags: ['test']`, so they sit in their own sidebar root.
 
 ## Commit messages
 

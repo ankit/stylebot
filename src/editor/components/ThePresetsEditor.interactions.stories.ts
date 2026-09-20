@@ -6,7 +6,8 @@ import { editor } from '@stylebot/storybook/editor-story';
 import { featureSwitch, storeOf } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
-  title: 'Editor/Interactions/Presets',
+  title: 'Tests/Editor/Presets',
+  tags: ['test'],
   component: ThePresetsEditor,
   parameters: { padded: false },
 };
