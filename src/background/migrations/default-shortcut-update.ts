@@ -1,4 +1,4 @@
-import { set as setCommands } from './commands';
+import { set as setCommands } from '../commands';
 import { defaultCommands } from '@stylebot/settings';
 
 const defaultShortcutUpdate = async (): Promise<void> => {
