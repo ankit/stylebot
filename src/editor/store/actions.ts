@@ -54,20 +54,7 @@ let fontRequest = 0;
 let previewRequest = 0;
 
 export default {
-  async initialize({
-    state,
-    commit,
-    dispatch,
-  }: {
-    state: State;
-    commit: Commit;
-    dispatch: Dispatch;
-  }): Promise<void> {
-    await dispatch('refreshPage');
-    if (!state.url) {
-      commit('setUrl', state.page.domain);
-    }
-
+  async initialize({ commit }: { commit: Commit }): Promise<void> {
     const options = await getAllOptions();
     commit('setOptions', options);
 
@@ -79,10 +66,15 @@ export default {
   },
 
   /**
-   * Re-reads the page facts the store mirrors — the DOM may have changed.
+   * Re-reads the page facts the store mirrors; a page that can't answer
+   * (navigating away) keeps the last snapshot.
    */
   async refreshPage({ commit }: { commit: Commit }): Promise<void> {
-    commit('setPage', await getPageBridge().getSnapshot());
+    try {
+      commit('setPage', await getPageBridge().getSnapshot());
+    } catch {
+      //
+    }
   },
 
   initializeDefaultStyle(

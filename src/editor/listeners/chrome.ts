@@ -60,7 +60,9 @@ const initChromeListener = (
         return;
       }
       lastUrl = window.location.href;
-      dispatch('refreshPage');
+      if (state.visible) {
+        dispatch('refreshPage');
+      }
 
       // A same-tab SPA navigation still fires this — re-derive readability
       // for the new URL instead of trusting the previous page's flag.

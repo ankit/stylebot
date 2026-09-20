@@ -187,6 +187,15 @@ describe('actions', () => {
 
       expect(mockCommit).toBeCalledWith('setPage', snapshot);
     });
+
+    it('keeps the last snapshot when the page cannot answer', async () => {
+      mockBridge.getSnapshot.mockRejectedValue(new Error('Page disconnected'));
+
+      await expect(
+        actions.refreshPage({ commit: mockCommit })
+      ).resolves.toBeUndefined();
+      expect(mockCommit).not.toBeCalled();
+    });
   });
 
   describe('openStylebot', () => {

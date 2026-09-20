@@ -4,6 +4,7 @@ import { initListeners } from './listeners';
 import { getStylesForPage } from './utils/chrome';
 
 const store = createStore('page');
+store.commit('setUrl', document.domain);
 setPageBridge(new LocalPageBridge({ getStylebotCss: () => store.state.css }));
 
 const ready = (async () => {
