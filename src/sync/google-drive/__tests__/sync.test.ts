@@ -151,6 +151,7 @@ describe('runGoogleDriveSync', () => {
 
     expect(mockedWrite).toBeCalledTimes(1);
     expect(mockedDownload).not.toBeCalled();
+    expect(chrome.tabs.query).not.toBeCalled();
     expect(storedState()).toMatchObject({
       remoteRevision: 'remote-2',
       localRevision: 'local-2',
@@ -177,6 +178,9 @@ describe('runGoogleDriveSync', () => {
     expect(mockedDownload).toBeCalledTimes(1);
     expect(mockedWrite).not.toBeCalled();
     expect(Object.keys(storedStyles())).toEqual(['b.com']);
+    // Open tabs (and an open editor) must see the pulled styles right away,
+    // or a stale editor pushes what it last saw over what was just pulled.
+    expect(chrome.tabs.query).toBeCalledTimes(1);
   });
 
   it('merges when both sides changed', async () => {
@@ -205,6 +209,7 @@ describe('runGoogleDriveSync', () => {
     const uploaded = mockedWrite.mock.calls[0][1];
     expect(uploaded).toBeInstanceOf(Blob);
     expect(Object.keys(storedStyles()).sort()).toEqual(['a.com', 'b.com']);
+    expect(chrome.tabs.query).toBeCalledTimes(1);
   });
 
   it('writes nothing when neither side changed', async () => {

@@ -28,6 +28,7 @@ import {
 import {
   setAll as setAllStyles,
   getAll as getAllStyles,
+  applyStylesToAllTabs,
 } from '../../background/styles';
 
 const getStylesBlob = (styles: StyleMap) =>
@@ -76,6 +77,7 @@ const pull = async (
   styles: StyleMap
 ): Promise<SyncState> => {
   await setAllStyles(styles);
+  await applyStylesToAllTabs();
 
   const { modifiedTime } = await getLocalStylesMetadata();
   const state = toState(metadata, modifiedTime);
@@ -98,6 +100,7 @@ const mergeBoth = async (
   const merged = mergeStyles(localStyles, remoteStyles);
 
   await setAllStyles(merged);
+  await applyStylesToAllTabs();
   const { modifiedTime } = await getLocalStylesMetadata();
 
   return push(accessToken, merged, metadata, modifiedTime);

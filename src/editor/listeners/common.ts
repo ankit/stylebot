@@ -59,8 +59,14 @@ export const toggleGrayscale = ({
   });
 };
 
+/**
+ * Applies a fresh set of styles pushed by the background page. If the style
+ * the editor is showing is no longer among them (removed on another device
+ * and pulled by sync), its CSS is cleared from the page and the editor, or
+ * the next keystroke would save the stale copy back.
+ */
 export const applyStyles = (
-  { dispatch }: { dispatch: Dispatch },
+  { state, dispatch }: { state: State; dispatch: Dispatch },
   defaultStyle: Style | undefined,
   styles: Array<Style>
 ): void => {
@@ -75,6 +81,13 @@ export const applyStyles = (
     }
   });
 
+  const currentStyleRemoved =
+    state.css !== '' && !styles.some(style => style.url === state.url);
+
+  if (currentStyleRemoved) {
+    injectCSSIntoDocument('', state.url);
+  }
+
   if (defaultStyle) {
     if (defaultStyle.readability) {
       dispatch('applyReadability', true);
@@ -83,6 +96,18 @@ export const applyStyles = (
     }
 
     dispatch('initializeDefaultStyle', defaultStyle);
+  } else if (currentStyleRemoved) {
+    if (state.readability) {
+      dispatch('applyReadability', false);
+    }
+
+    dispatch('initializeDefaultStyle', {
+      url: state.url,
+      css: '',
+      enabled: true,
+      readability: false,
+      modifiedTime: '',
+    });
   }
 };
 

@@ -72,7 +72,7 @@ const initChromeListener = (store: Store<State>): void => {
           removeReadability();
         }
       } else if (message.name === 'ApplyStylesToTab') {
-        applyStyles({ dispatch }, message.defaultStyle, message.styles);
+        applyStyles({ state, dispatch }, message.defaultStyle, message.styles);
       }
     }
   );

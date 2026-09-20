@@ -27,6 +27,13 @@ export default Vue.extend({
     CodeEditorIframe,
   },
 
+  data(): { iframeCss: string | null } {
+    return {
+      // What the iframe last showed, whether it reported it or we sent it.
+      iframeCss: null,
+    };
+  },
+
   computed: {
     css(): string {
       return this.$store.state.css;
@@ -63,10 +70,12 @@ export default Vue.extend({
     css(value: string): void {
       const contentWindow = this.getIframeContentWindow();
 
-      // only handle the case where the css is deleted by the user
-      // from outside of the code editor. else, this will get invoked on every edit.
-      if (value === '' && contentWindow) {
-        this.updateIframeCss(contentWindow);
+      // Edits typed into Monaco reach the store through handleIframeCssUpdate
+      // and already match the iframe. Anything else changed the css from
+      // outside — a delete from basic mode, or a sync pull replacing the
+      // style — and has to be pushed down or the editor keeps stale text.
+      if (contentWindow && value !== this.iframeCss) {
+        this.updateIframeCss(contentWindow, false);
       }
     },
   },
@@ -87,13 +96,15 @@ export default Vue.extend({
       return this.$el.querySelector('iframe')?.contentWindow;
     },
 
-    updateIframeCss(contentWindow: Window): void {
+    updateIframeCss(contentWindow: Window, focus = true): void {
       const message: ParentUpdateCssMessage = {
         css: this.css,
         type: 'stylebotCssUpdate',
         selector: this.activeSelector,
+        focus,
       };
 
+      this.iframeCss = this.css;
       contentWindow.postMessage(message, chrome.runtime.getURL('*'));
     },
 
@@ -132,6 +143,15 @@ export default Vue.extend({
     },
 
     handleIframeCssUpdate(css: string): void {
+      this.iframeCss = css;
+
+      // Monaco echoes a setValue back as a content change. Re-applying it
+      // would save the css again and stamp a fresh modifiedTime on a style
+      // that was just pulled, making this device look like it edited it.
+      if (css === this.css) {
+        return;
+      }
+
       this.$store.dispatch('applyCss', { css });
     },
 

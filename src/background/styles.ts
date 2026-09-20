@@ -139,39 +139,55 @@ export const set = (
   });
 
 /**
- * Enables an existing style for a url. No-op if none exists.
+ * Enables an existing style for a url. No-op if none exists or it is
+ * already enabled.
  */
 export const enable = (url: string): Promise<void> =>
   update(styles => {
-    if (!styles[url]) {
+    if (!styles[url] || styles[url].enabled) {
       return undefined;
     }
 
     styles[url].enabled = true;
+    styles[url].modifiedTime = getCurrentTimestamp();
     return styles;
   });
 
 /**
- * Disables an existing style for a url. No-op if none exists.
+ * Disables an existing style for a url. No-op if none exists or it is
+ * already disabled.
  */
 export const disable = (url: string): Promise<void> =>
   update(styles => {
-    if (!styles[url]) {
+    if (!styles[url]?.enabled) {
       return undefined;
     }
 
     styles[url].enabled = false;
+    styles[url].modifiedTime = getCurrentTimestamp();
     return styles;
   });
 
 /**
  * Sets readability for a url, creating a blank style entry if none exists.
+ * Skips the write when nothing would change: every ApplyStylesToTab makes the
+ * editor re-persist readability, and a no-op write would still bump
+ * styles-metadata and read as a local edit to sync.
  */
 export const setReadability = (url: string, value: boolean): Promise<void> =>
   update(styles => {
     if (styles[url]) {
+      if (styles[url].readability === value) {
+        return undefined;
+      }
+
       styles[url].readability = value;
+      styles[url].modifiedTime = getCurrentTimestamp();
     } else {
+      if (!value) {
+        return undefined;
+      }
+
       styles[url] = {
         css: '',
         enabled: true,
@@ -193,6 +209,7 @@ export const move = (src: string, dest: string): Promise<void> =>
     }
 
     styles[dest] = JSON.parse(JSON.stringify(styles[src]));
+    styles[dest].modifiedTime = getCurrentTimestamp();
     delete styles[src];
 
     return styles;
