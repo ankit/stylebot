@@ -39,12 +39,19 @@ describe('getNestedBoundingClientRect', () => {
     spy.mockRestore();
   });
 
-  it('adds the frame offset for a node inside a child frame', () => {
+  it('adds the child frame offset, and stops at the boundary window', () => {
     const frame = document.createElement('iframe');
     frame.style.border = '0';
     document.body.appendChild(frame);
     const childDocument = frame.contentDocument as Document;
     frame.getBoundingClientRect = () => rect(100, 20, 500, 400);
+
+    // The boundary window is itself framed; that frame must not count.
+    const outer = document.createElement('iframe');
+    outer.getBoundingClientRect = () => rect(230, 40, 1000, 800);
+    const spy = jest
+      .spyOn(window, 'frameElement', 'get')
+      .mockReturnValue(outer);
 
     const node = childDocument.createElement('div');
     childDocument.body.appendChild(node);
@@ -56,6 +63,7 @@ describe('getNestedBoundingClientRect', () => {
     expect(nested.width).toBe(50);
     expect(nested.height).toBe(30);
 
+    spy.mockRestore();
     frame.remove();
   });
 });

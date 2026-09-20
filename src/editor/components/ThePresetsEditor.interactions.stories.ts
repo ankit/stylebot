@@ -1,10 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/vue';
-import { expect, fireEvent, waitFor, within } from '@storybook/test';
+import { expect, waitFor, within } from '@storybook/test';
 
 import ThePresetsEditor from './ThePresetsEditor.vue';
 import { editor } from '@stylebot/storybook/editor-story';
 import {
   featureSwitch,
+  setRange,
   storeOf,
   user,
 } from '@stylebot/storybook/story-helpers';
@@ -23,6 +24,11 @@ const magic = { options: { mode: 'magic' as const } };
 const grayscaleSlider = (root: HTMLElement) =>
   root.querySelector('.presets-editor input[type="range"]') as HTMLInputElement;
 
+// The preset targets body's element children, which here is the
+// Storybook root the page sits in.
+const rootFilter = () =>
+  getComputedStyle(document.getElementById('storybook-root') as Element).filter;
+
 export const GrayscaleToggleAndSlider: StoryObj = {
   ...editor(magic),
   name: 'the grayscale toggle applies 100%, the slider adjusts it, and off clears it',
@@ -37,30 +43,20 @@ export const GrayscaleToggleAndSlider: StoryObj = {
     await user.click(toggle);
     await expect(store.getters.grayscale).toBe(100);
     await expect(store.state.css).toContain('filter: grayscale(100%)');
-    // The preset targets body's element children, which here is the
-    // Storybook root the page sits in.
-    await expect(
-      getComputedStyle(document.getElementById('storybook-root') as Element)
-        .filter
-    ).toBe('grayscale(1)');
+    await expect(rootFilter()).toBe('grayscale(1)');
     await waitFor(() => expect(toggle).toBeChecked());
     await waitFor(() =>
       expect(grayscaleSlider(canvasElement)).toBeInTheDocument()
     );
 
-    const slider = grayscaleSlider(canvasElement);
-    slider.value = '40';
-    await fireEvent.input(slider);
+    await setRange(grayscaleSlider(canvasElement), 40);
     await expect(store.getters.grayscale).toBe(40);
     await expect(store.state.css).toContain('filter: grayscale(40%)');
 
     await user.click(toggle);
     await expect(store.getters.grayscale).toBe(0);
     await expect(store.state.css).not.toContain('grayscale(');
-    await expect(
-      getComputedStyle(document.getElementById('storybook-root') as Element)
-        .filter
-    ).toBe('none');
+    await expect(rootFilter()).toBe('none');
     await waitFor(() => expect(toggle).not.toBeChecked());
   },
 };

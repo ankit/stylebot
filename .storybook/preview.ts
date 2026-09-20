@@ -128,11 +128,12 @@ const preview: Preview = {
 
   decorators: [
     (_story, { globals, parameters }) => {
-      // The editor store mock injects the style into the document like the
-      // content script does; the previous story's must not bleed into this one.
+      // The editor store injects the style into the document like the
+      // content script does; the previous story's must not bleed into this
+      // one. Emptied rather than removed so the next injection reuses it.
       document
         .querySelectorAll('style[id^="stylebot-css-"]')
-        .forEach(el => el.remove());
+        .forEach(el => (el.textContent = ''));
 
       // Slow motion is for watching a play in the browser; the runner never
       // sets it, so CI stays instant.

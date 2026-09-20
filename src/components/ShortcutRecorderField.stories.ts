@@ -1,8 +1,12 @@
 import type { Meta } from '@storybook/vue';
-import { expect, userEvent } from '@storybook/test';
+import { expect } from '@storybook/test';
 
 import ShortcutRecorderField from './ShortcutRecorderField.vue';
-import { fromTemplate, playground } from '@stylebot/storybook/story-helpers';
+import {
+  fromTemplate,
+  playground,
+  user,
+} from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
   title: 'Primitives/Inputs/ShortcutRecorderField',
@@ -35,7 +39,7 @@ export const Recording = fromTemplate(
   `<shortcut-recorder-field value="" style="width: 260px" />`,
   {
     play: async ({ canvasElement }) => {
-      await userEvent.click(
+      await user.click(
         canvasElement.querySelector('.record-btn') as HTMLElement
       );
       await expect(

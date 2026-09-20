@@ -47,7 +47,7 @@ jobs:
         run: yarn build-storybook
 
       - name: Run interaction tests
-        run: yarn test:storybook --no-build --junit --maxWorkers=2
+        run: yarn test:storybook --no-build --junit
 
       - name: Upload test results
         if: failure()

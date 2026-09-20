@@ -6,14 +6,9 @@
 // it — every story is rendered and every play function's assertions run in
 // headless Chromium. Everything else is passed through to `test-storybook`.
 
-import { spawn, spawnSync } from 'node:child_process';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { spawn } from 'node:child_process';
 
-const rootDir = path.resolve(
-  path.dirname(fileURLToPath(import.meta.url)),
-  '..'
-);
+import { bin, localBin, rootDir, run, runOrExit } from './lib/cli.mjs';
 
 const USAGE = `usage: yarn test:storybook [--no-build | --dev] [test-storybook args]
 
@@ -35,19 +30,6 @@ if (args.includes('--help') || args.includes('-h')) {
 
 const dev = args.includes('--dev');
 
-// Windows has no bare `yarn`/`test-storybook` executables, only .cmd shims.
-const bin = name => (process.platform === 'win32' ? `${name}.cmd` : name);
-const localBin = name => path.join(rootDir, 'node_modules', '.bin', bin(name));
-
-const run = (command, commandArgs) =>
-  spawnSync(command, commandArgs, { stdio: 'inherit', cwd: rootDir }).status;
-
-const exitUnless = status => {
-  if (status !== 0) {
-    process.exit(status ?? 1);
-  }
-};
-
 const waitForServer = async url => {
   const deadline = Date.now() + 30_000;
 
@@ -68,7 +50,7 @@ const waitForServer = async url => {
 };
 
 if (!dev && !args.includes('--no-build')) {
-  exitUnless(run(bin('yarn'), ['build-storybook']));
+  runOrExit(bin('yarn'), ['build-storybook']);
 }
 
 let server;
@@ -95,4 +77,4 @@ const status = run(localBin('test-storybook'), [
 ]);
 
 server?.kill();
-process.exit(status ?? 1);
+process.exit(status);

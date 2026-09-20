@@ -63,30 +63,28 @@ export const PANEL_STATE_PAGE = `
   </div>
 `;
 
-type EditorStory = {
-  page?: string;
-  /* A spec-style sentence for interaction tests, shown in the sidebar and
-     the runner's output in place of the export's name. */
-  name?: string;
-  play?: StoryObj['play'];
+export const WITH_RULE: EditorStateOverrides = {
+  css: RULE_CSS,
+  activeSelector: 'h1',
 };
 
 /**
  * Mounts the full editor over a stand-in page with a seeded store, the
- * shape every Editor story takes.
+ * shape every Editor story takes; stories spread it and add their own
+ * `name` and `play`.
  */
 export const editor = (
   overrides: EditorStateOverrides = {},
-  { page = PAGE, name, play }: EditorStory = {}
+  { page = PAGE }: { page?: string } = {}
 ): StoryObj => ({
-  ...(name && { name }),
   render: (_args, { globals }) => ({
     components: { TheStylebotApp },
     store: createEditorStore({
       ...overrides,
       options: { appearance: globals.theme, ...overrides.options },
     }),
-    template: `<div>${page}<the-stylebot-app /></div>`,
+    // The host id is what the highlighter uses to tell the panel apart
+    // from page content.
+    template: `<div>${page}<div id="stylebot"><the-stylebot-app /></div></div>`,
   }),
-  play,
 });

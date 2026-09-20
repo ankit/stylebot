@@ -1,6 +1,11 @@
 import messages from 'virtual:stylebot-locale';
 
 import {
+  add as addRecentColor,
+  getAll as getAllRecentColors,
+} from '../../src/background/color-history';
+
+import {
   defaultOptions,
   defaultCommands,
   defaultReadabilitySettings,
@@ -48,9 +53,10 @@ const getMessage = (key: string, substitutions: Array<string> = []) => {
    passed and always resolves a promise, so both call styles work. */
 const respond = (callback: Callback | undefined, value: unknown) =>
   new Promise<unknown>(resolve => {
-    setTimeout(() => {
-      callback?.(value);
-      resolve(value);
+    setTimeout(async () => {
+      const resolved = await value;
+      callback?.(resolved);
+      resolve(resolved);
     }, 0);
   });
 
@@ -67,6 +73,7 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
   };
   const storage: Record<string, unknown> = {
     [`notification~release/${RELEASE_VERSION}`]: true,
+    recentColors: overrides.recentColors ?? [],
     ...overrides.storage,
   };
   const tab = {
@@ -74,7 +81,6 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
     active: true,
     url: overrides.tabUrl ?? 'https://example.com/article',
   };
-  let recentColors = overrides.recentColors ?? [];
 
   const runtimeResponses: Record<
     string,
@@ -93,16 +99,9 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
       message.optionName ? options[message.optionName] : undefined,
     GetAllOptions: () => options,
     GetReadabilitySettings: () => readabilitySettings,
-    GetRecentColors: () => recentColors,
-    // Mirrors the background's history: newest first, no duplicates, eight
-    // at most.
-    AddRecentColor: ({ color = '' }) => {
-      recentColors = [
-        color,
-        ...recentColors.filter(c => c.toLowerCase() !== color.toLowerCase()),
-      ].slice(0, 8);
-      return recentColors;
-    },
+    // The background's own history, over the shim's storage.
+    GetRecentColors: () => getAllRecentColors(),
+    AddRecentColor: ({ color = '' }) => addRecentColor(color),
   };
 
   const tabResponses: Record<string, () => unknown> = {

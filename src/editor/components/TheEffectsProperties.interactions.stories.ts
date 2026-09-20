@@ -1,12 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/vue';
-import { expect, fireEvent, waitFor, within } from '@storybook/test';
+import { expect, waitFor, within } from '@storybook/test';
 
 import TheEffectsProperties from './TheEffectsProperties.vue';
-import { editor, RULE_CSS } from '@stylebot/storybook/editor-story';
+import { editor, WITH_RULE } from '@stylebot/storybook/editor-story';
 import {
   declaration,
   pageStyle,
   propertyControl,
+  setRange,
   storeOf,
   user,
 } from '@stylebot/storybook/story-helpers';
@@ -20,20 +21,11 @@ const meta: Meta = {
 
 export default meta;
 
-const withRule = { css: RULE_CSS, activeSelector: 'h1' };
-
 const slider = (control: HTMLElement) =>
   control.querySelector('input[type="range"]') as HTMLInputElement;
 
-// A range input can't be dragged by user-event; set it like the browser
-// would and fire the input event the component listens for.
-const slide = async (input: HTMLInputElement, value: number) => {
-  input.value = String(value);
-  await fireEvent.input(input);
-};
-
 export const OpacitySlider: StoryObj = {
-  ...editor(withRule),
+  ...editor(WITH_RULE),
   name: 'the opacity slider clears at 1 and applies other values',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -43,10 +35,10 @@ export const OpacitySlider: StoryObj = {
     await expect(slider(control)).toHaveValue('0.9');
 
     // Fully opaque is the default, so it clears the declaration.
-    await slide(slider(control), 1);
+    await setRange(slider(control), 1);
     await expect(declaration(store, 'h1', 'opacity')).toBeUndefined();
 
-    await slide(slider(control), 0.5);
+    await setRange(slider(control), 0.5);
     await expect(declaration(store, 'h1', 'opacity')).toBe('0.5');
     await expect(pageStyle(canvasElement, 'h1', 'opacity')).toBe('0.5');
     await waitFor(() =>
@@ -56,7 +48,7 @@ export const OpacitySlider: StoryObj = {
 };
 
 export const FilterControl: StoryObj = {
-  ...editor(withRule),
+  ...editor(WITH_RULE),
   name: 'picking a filter applies its default amount, the slider adjusts it, None clears it',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -72,7 +64,7 @@ export const FilterControl: StoryObj = {
     await expect(declaration(store, 'h1', 'filter')).toBe('blur(4px)');
     await waitFor(() => expect(slider(control)).toBeInTheDocument());
 
-    await slide(slider(control), 10);
+    await setRange(slider(control), 10);
     await expect(declaration(store, 'h1', 'filter')).toBe('blur(10px)');
     await expect(pageStyle(canvasElement, 'h1', 'filter')).toBe('blur(10px)');
 

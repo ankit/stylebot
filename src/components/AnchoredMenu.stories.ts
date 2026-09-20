@@ -4,9 +4,13 @@ import AnchoredMenu from './AnchoredMenu.vue';
 import SMenu from './SMenu.vue';
 import MenuItem from './MenuItem.vue';
 import SButton from './SButton.vue';
-import { userEvent, within } from '@storybook/test';
+import { within } from '@storybook/test';
 
-import { findOpenMenu, fromTemplate } from '@stylebot/storybook/story-helpers';
+import {
+  findOpenMenu,
+  fromTemplate,
+  user,
+} from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
   title: 'Primitives/Overlays/AnchoredMenu',
@@ -39,7 +43,7 @@ const open = (template: string): StoryObj =>
   fromTemplate(components, template, {
     play: async ({ canvasElement }) => {
       const canvas = within(canvasElement);
-      await userEvent.click(canvas.getByRole('button', { name: 'Open menu' }));
+      await user.click(canvas.getByRole('button', { name: 'Open menu' }));
       await findOpenMenu(canvas);
     },
   });

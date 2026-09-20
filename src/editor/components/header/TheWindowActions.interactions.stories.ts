@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue';
 import { expect, waitFor, within } from '@storybook/test';
 
 import TheWindowActions from './TheWindowActions.vue';
-import { editor, RULE_CSS } from '@stylebot/storybook/editor-story';
+import { editor, WITH_RULE } from '@stylebot/storybook/editor-story';
 import {
   openEditorMenu,
   pressKey,
@@ -19,15 +19,13 @@ const meta: Meta = {
 
 export default meta;
 
-const withRule = { css: RULE_CSS, activeSelector: 'h1' };
-
 const panel = (root: HTMLElement) => root.querySelector('.stylebot');
 const content = (root: HTMLElement) => root.querySelector('.stylebot-content');
 const helpDialog = (root: HTMLElement) =>
   root.querySelector('.stylebot-help-dialog');
 
 export const DockFromOptionsMenu: StoryObj = {
-  ...editor(withRule),
+  ...editor(WITH_RULE),
   name: 'docks the panel left or right from the Options menu',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -52,7 +50,7 @@ export const DockFromOptionsMenu: StoryObj = {
 };
 
 export const DockShortcuts: StoryObj = {
-  ...editor(withRule),
+  ...editor(WITH_RULE),
   name: 'l and r dock the panel left and right',
   play: async ({ canvasElement }) => {
     const store = storeOf(canvasElement);
@@ -70,7 +68,7 @@ export const DockShortcuts: StoryObj = {
 /* Pushing the page aside writes to document.body, which every story shares,
    so this one has to leave it the way it found it. */
 export const AdjustPageLayout: StoryObj = {
-  ...editor(withRule),
+  ...editor(WITH_RULE),
   name: 'pushing the page aside reserves room in the body and p toggles it back',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -94,44 +92,34 @@ export const AdjustPageLayout: StoryObj = {
 };
 
 export const AppearanceMenu: StoryObj = {
-  ...editor(withRule),
+  ...editor(WITH_RULE),
   name: 'the appearance menu switches the panel between light, dark and system',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
     const app = canvasElement.querySelector('.stylebot-app') as HTMLElement;
 
-    await user.click(
-      within(await openEditorMenu(canvas, 'Panel appearance')).getByRole(
-        'menuitem',
-        { name: 'Dark' }
-      )
-    );
-    await expect(store.state.options.appearance).toBe('dark');
-    await waitFor(() => expect(app).toHaveAttribute('data-theme', 'dark'));
+    for (const [item, appearance] of [
+      ['Dark', 'dark'],
+      ['Light', 'light'],
+      ['System', 'system'],
+    ] as const) {
+      const menu = await openEditorMenu(canvas, 'Panel appearance');
+      await user.click(within(menu).getByRole('menuitem', { name: item }));
 
-    await user.click(
-      within(await openEditorMenu(canvas, 'Panel appearance')).getByRole(
-        'menuitem',
-        { name: 'Light' }
-      )
-    );
-    await expect(store.state.options.appearance).toBe('light');
-    await waitFor(() => expect(app).toHaveAttribute('data-theme', 'light'));
-
-    await user.click(
-      within(await openEditorMenu(canvas, 'Panel appearance')).getByRole(
-        'menuitem',
-        { name: 'System' }
-      )
-    );
-    await expect(store.state.options.appearance).toBe('system');
-    await waitFor(() => expect(app).not.toHaveAttribute('data-theme'));
+      await expect(store.state.options.appearance).toBe(appearance);
+      // System follows the OS, so the provider sets no theme of its own.
+      await waitFor(() =>
+        appearance === 'system'
+          ? expect(app).not.toHaveAttribute('data-theme')
+          : expect(app).toHaveAttribute('data-theme', appearance)
+      );
+    }
   },
 };
 
 export const CloseButton: StoryObj = {
-  ...editor(withRule),
+  ...editor(WITH_RULE),
   name: 'the close button closes the editor',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -145,7 +133,7 @@ export const CloseButton: StoryObj = {
 };
 
 export const EscapeClosesEditor: StoryObj = {
-  ...editor(withRule),
+  ...editor(WITH_RULE),
   name: 'Escape closes the editor',
   play: async ({ canvasElement }) => {
     await pressKey('Escape');
@@ -154,7 +142,7 @@ export const EscapeClosesEditor: StoryObj = {
 };
 
 export const EscapeClosesMenuBeforeEditor: StoryObj = {
-  ...editor(withRule),
+  ...editor(WITH_RULE),
   name: 'Escape closes an open header menu before the editor',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -171,7 +159,7 @@ export const EscapeClosesMenuBeforeEditor: StoryObj = {
 };
 
 export const HelpDialogViaShortcut: StoryObj = {
-  ...editor(withRule),
+  ...editor(WITH_RULE),
   name: '? opens the shortcuts dialog and stops inspecting; Escape closes only the dialog',
   play: async ({ canvasElement }) => {
     const store = storeOf(canvasElement);
@@ -190,7 +178,7 @@ export const HelpDialogViaShortcut: StoryObj = {
 };
 
 export const HelpDialogViaMenu: StoryObj = {
-  ...editor(withRule),
+  ...editor(WITH_RULE),
   name: 'the Options menu opens the shortcuts dialog and its close button dismisses it',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);

@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue';
 import { expect, waitFor, within } from '@storybook/test';
 
 import TheEditorModeActions from './TheEditorModeActions.vue';
-import { editor, RULE_CSS } from '@stylebot/storybook/editor-story';
+import { editor, WITH_RULE } from '@stylebot/storybook/editor-story';
 import {
   featureSwitch,
   pressKey,
@@ -19,10 +19,8 @@ const meta: Meta = {
 
 export default meta;
 
-const withRule = { css: RULE_CSS, activeSelector: 'h1' };
-
 export const TabsSwitchMode: StoryObj = {
-  ...editor(withRule),
+  ...editor(WITH_RULE),
   name: 'the tabs switch between Basic, Code and Presets',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -50,7 +48,7 @@ export const TabsSwitchMode: StoryObj = {
 };
 
 export const ShortcutsSwitchMode: StoryObj = {
-  ...editor(withRule),
+  ...editor(WITH_RULE),
   name: 'b, c and m switch modes; i only inspects in Basic',
   play: async ({ canvasElement }) => {
     const store = storeOf(canvasElement);
@@ -89,7 +87,7 @@ export const ReadabilityDisablesTabs: StoryObj = {
 };
 
 export const ReadabilityToggleForcesPresets: StoryObj = {
-  ...editor(withRule),
+  ...editor(WITH_RULE),
   name: 'turning readability on forces Presets mode and disables the other tabs',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);

@@ -6,14 +6,7 @@
 // e2e/fixtures.ts, and runs --headed on a single worker so only one browser
 // window opens. Everything else is passed through to `playwright test`.
 
-import { spawnSync } from 'node:child_process';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-
-const rootDir = path.resolve(
-  path.dirname(fileURLToPath(import.meta.url)),
-  '..'
-);
+import { bin, localBin, runOrExit } from './lib/cli.mjs';
 
 const USAGE = `usage: yarn e2e [--edge | --firefox] [--headed | --ui | --debug] [--no-build] [playwright test args]
 
@@ -47,19 +40,8 @@ if (args.includes('--firefox')) {
   browser = 'edge';
 }
 
-// Windows has no bare `yarn`/`playwright` executables, only .cmd shims.
-const bin = name => (process.platform === 'win32' ? `${name}.cmd` : name);
-
-const run = (command, commandArgs) => {
-  const { status } = spawnSync(command, commandArgs, {
-    stdio: 'inherit',
-    cwd: rootDir,
-    env: { ...process.env, STYLEBOT_BROWSER: browser },
-  });
-  if (status !== 0) {
-    process.exit(status ?? 1);
-  }
-};
+const run = (command, commandArgs) =>
+  runOrExit(command, commandArgs, { STYLEBOT_BROWSER: browser });
 
 if (!args.includes('--no-build')) {
   run(bin('yarn'), [browser === 'firefox' ? 'build:firefox' : 'build']);
@@ -72,7 +54,4 @@ if (args.includes('--headed')) {
   playwrightArgs.push('--workers=1');
 }
 
-run(path.join(rootDir, 'node_modules', '.bin', bin('playwright')), [
-  'test',
-  ...playwrightArgs,
-]);
+run(localBin('playwright'), ['test', ...playwrightArgs]);

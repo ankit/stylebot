@@ -61,7 +61,7 @@ const setup = async (
 
 // Focusing the field opens the menu; with a value set it renders as chips
 // until clicked, and the revealed input starts fully selected.
-const openPicker = async (font: Locator): Promise<Locator> => {
+const openPicker = async (font: Locator): Promise<void> => {
   const chips = font.locator('.autocomplete-chips');
 
   if (await chips.count()) {
@@ -70,9 +70,7 @@ const openPicker = async (font: Locator): Promise<Locator> => {
     await font.locator('.autocomplete-input').click();
   }
 
-  const input = font.locator('.autocomplete-input');
-  await expect(input).toBeFocused();
-  return input;
+  await expect(font.locator('.autocomplete-input')).toBeFocused();
 };
 
 // A row's accessible name is its label plus, for Google Fonts, the category.

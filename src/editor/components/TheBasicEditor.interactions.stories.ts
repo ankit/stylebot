@@ -5,14 +5,16 @@ import TheBasicEditor from './TheBasicEditor.vue';
 import {
   editor,
   PANEL_STATE_PAGE,
-  RULE_CSS,
+  WITH_RULE,
 } from '@stylebot/storybook/editor-story';
 import {
   cardCollapse,
+  cardHeader,
+  collapseAllCards,
   declaration,
   pageStyle,
+  pick,
   pressKey,
-  propertyCard,
   storeOf,
   user,
 } from '@stylebot/storybook/story-helpers';
@@ -26,18 +28,8 @@ const meta: Meta = {
 
 export default meta;
 
-const withRule = { css: RULE_CSS, activeSelector: 'h1' };
-
-/* Picks a page element the way the inspector does: hover, then Enter.
-   Clicking would be swallowed by the highlighter (see the Inspector
-   stories). */
-const pick = async (element: HTMLElement) => {
-  await user.hover(element);
-  await pressKey('Enter');
-};
-
 export const HideButton: StoryObj = {
-  ...editor(withRule),
+  ...editor(WITH_RULE),
   name: 'Hide and h toggle display: none on the picked element',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -57,7 +49,7 @@ export const HideButton: StoryObj = {
 };
 
 export const ResetButton: StoryObj = {
-  ...editor(withRule),
+  ...editor(WITH_RULE),
   name: "Reset removes the picked element's rule and leaves the others alone",
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -123,10 +115,7 @@ export const ManualOpenPersistsAcrossPicks: StoryObj = {
     const store = storeOf(canvasElement);
     const heading = canvas.getByRole('heading', { level: 1 });
     const quote = canvas.getByText('Pick an element to start.');
-    const boxHeader = () =>
-      propertyCard(canvas, 'Box').querySelector(
-        '.property-card-header'
-      ) as HTMLElement;
+    const boxHeader = () => cardHeader(canvas, 'Box');
 
     await step('an unstyled element opens only Text', async () => {
       await pick(heading);
@@ -177,26 +166,12 @@ export const ManualOpenPersistsAcrossPicks: StoryObj = {
 };
 
 export const CollapseAll: StoryObj = {
-  ...editor(withRule),
+  ...editor(WITH_RULE),
   name: 'every panel can be collapsed and none stays remembered as open',
   play: async ({ canvasElement }) => {
     const store = storeOf(canvasElement);
 
-    for (const card of canvasElement.querySelectorAll('.property-card')) {
-      if (!card.querySelector('.property-card-collapse.collapsed')) {
-        await user.click(
-          card.querySelector('.property-card-header') as HTMLElement
-        );
-      }
-    }
-
-    await waitFor(() =>
-      expect(
-        canvasElement.querySelectorAll(
-          '.property-card-collapse:not(.collapsed)'
-        )
-      ).toHaveLength(0)
-    );
+    await collapseAllCards(canvasElement);
     await expect(
       Object.values(store.state.options.basicModeOpenedSections)
     ).not.toContain(true);

@@ -3,7 +3,8 @@ import type { StoryObj } from '@storybook/vue';
 import App from '../../src/options/App.vue';
 import { createRouter } from '../../src/options/router';
 import { createOptionsStore, OptionsStateOverrides } from './options-store';
-import { expect, userEvent, waitFor } from '@storybook/test';
+import { expect, waitFor } from '@storybook/test';
+import { user } from '../story-helpers';
 
 const style = (css: string, enabled: boolean, modifiedTime: string) => ({
   css,
@@ -54,7 +55,7 @@ export const optionsPage = (
       canvasElement.querySelectorAll<HTMLElement>('.nav-item')
     );
     const button = buttons.find(el => el.textContent?.trim() === tab);
-    await userEvent.click(button as HTMLElement);
+    await user.click(button as HTMLElement);
     await waitFor(() => expect(button).toHaveClass('active'));
     await afterNavigate?.(canvasElement);
   },

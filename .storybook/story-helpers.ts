@@ -2,7 +2,7 @@ import type Vue from 'vue';
 import type { Component } from 'vue';
 import type { Store } from 'vuex';
 import type { StoryObj } from '@storybook/vue';
-import { expect, userEvent, waitFor, within } from '@storybook/test';
+import { expect, fireEvent, userEvent, waitFor, within } from '@storybook/test';
 
 import { getDeclarationsForSelector } from '@stylebot/css';
 import type { State } from '../src/editor/store';
@@ -101,7 +101,7 @@ export const focusViaTab = (root: HTMLElement, selector = 'button'): void => {
   root.querySelector<HTMLElement>(selector)?.focus();
 };
 
-type Canvas = ReturnType<typeof within>;
+export type Canvas = ReturnType<typeof within>;
 
 /* The user-event instance every interaction test drives; the preview
    decorator rebuilds it with a delay when the toolbar asks for slow
@@ -121,16 +121,35 @@ export const storeOf = (root: HTMLElement): Store<State> =>
     .__vue__.$store;
 
 /**
- * Presses an editor shortcut. user-event types into the active element,
- * which the editor's document-level handler ignores when it's a text
- * field — blur first if a test just typed into one.
+ * Presses a key by name. user-event types into the active element, which
+ * the editor's shortcut handler ignores when it's a text field.
  */
 export const pressKey = async (key: string): Promise<void> => {
-  await user.keyboard(key.length === 1 ? key : `{${key}}`);
+  await user.keyboard(`{${key}}`);
 };
 
-export const blurActive = (): void =>
-  (document.activeElement as HTMLElement | null)?.blur();
+/**
+ * Picks a page element the way the inspector does: hover it, then Enter.
+ */
+export const pick = async (element: HTMLElement): Promise<void> => {
+  await user.hover(element);
+  await pressKey('Enter');
+};
+
+/**
+ * Sets a range input the way a drag would end up, since user-event can't
+ * drag a slider.
+ */
+export const setRange = async (
+  input: HTMLInputElement,
+  value: number
+): Promise<void> => {
+  input.value = String(value);
+  await fireEvent.input(input);
+};
+
+export const numberInput = (control: HTMLElement): HTMLInputElement =>
+  control.querySelector('.number-input') as HTMLInputElement;
 
 /**
  * Resolves with the open menu once AnchoredMenu has positioned it — it
@@ -203,7 +222,32 @@ export const featureSwitch = (canvas: Canvas, label: string): HTMLElement =>
     .closest('.feature-card')
     ?.querySelector('input[type="checkbox"]') as HTMLElement;
 
+export const cardHeader = (canvas: Canvas, label: string): HTMLElement =>
+  propertyCard(canvas, label).querySelector(
+    '.property-card-header'
+  ) as HTMLElement;
+
 export const cardCollapse = (canvas: Canvas, label: string): HTMLElement =>
   propertyCard(canvas, label).querySelector(
     '.property-card-collapse'
   ) as HTMLElement;
+
+/**
+ * Collapses every open property card through its header, as a user
+ * would, and waits until none is left open.
+ */
+export const collapseAllCards = async (root: HTMLElement): Promise<void> => {
+  for (const card of root.querySelectorAll('.property-card')) {
+    if (!card.querySelector('.property-card-collapse.collapsed')) {
+      await user.click(
+        card.querySelector('.property-card-header') as HTMLElement
+      );
+    }
+  }
+
+  await waitFor(() =>
+    expect(
+      root.querySelectorAll('.property-card-collapse:not(.collapsed)')
+    ).toHaveLength(0)
+  );
+};

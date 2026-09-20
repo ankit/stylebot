@@ -2,9 +2,11 @@ import type { Meta, StoryObj } from '@storybook/vue';
 import { expect, fireEvent, waitFor, within } from '@storybook/test';
 
 import ColorPicker from './ColorPicker.vue';
-import { editor, RULE_CSS } from '@stylebot/storybook/editor-story';
+import { editor, WITH_RULE } from '@stylebot/storybook/editor-story';
 import {
+  Canvas,
   cardCollapse,
+  cardHeader,
   declaration,
   findOpenMenu,
   pageStyle,
@@ -24,9 +26,6 @@ const meta: Meta = {
 
 export default meta;
 
-type Canvas = ReturnType<typeof within>;
-
-const withRule = { css: RULE_CSS, activeSelector: 'h1' };
 // The pick-an-element state: the panel is enabled but nothing is styled yet.
 const noRule = { activeSelector: 'h1' };
 
@@ -41,12 +40,8 @@ const swatch = (canvas: Canvas, card: string) =>
 const popover = (root: HTMLElement) =>
   root.querySelector('.color-picker-popover') as HTMLElement | null;
 
-const openPopover = async (
-  canvas: Canvas,
-  root: HTMLElement,
-  label: string
-) => {
-  await user.click(swatch(canvas, label));
+const openPopover = async (root: HTMLElement, card: string) => {
+  await user.click(swatch(within(root), card));
   return waitFor(() => {
     const el = popover(root);
     expect(el).toBeVisible();
@@ -55,7 +50,7 @@ const openPopover = async (
 };
 
 export const HexFieldApplies: StoryObj = {
-  ...editor(withRule),
+  ...editor(WITH_RULE),
   name: 'the hex fields apply text and background colors live',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -70,11 +65,7 @@ export const HexFieldApplies: StoryObj = {
     );
 
     // Background is collapsed for a rule without one; open it first.
-    await user.click(
-      propertyCard(canvas, 'Background').querySelector(
-        '.property-card-header'
-      ) as HTMLElement
-    );
+    await user.click(cardHeader(canvas, 'Background'));
     await waitFor(() =>
       expect(cardCollapse(canvas, 'Background')).not.toHaveClass('collapsed')
     );
@@ -90,7 +81,7 @@ export const PopoverTabsFollowRule: StoryObj = {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
 
-    let panel = await openPopover(canvas, canvasElement, 'Text');
+    let panel = await openPopover(canvasElement, 'Text');
     const firstTab = () => panel.querySelector('.tabs .tab') as HTMLElement;
 
     await step(
@@ -117,7 +108,7 @@ export const PopoverTabsFollowRule: StoryObj = {
     await step('reopened, the first tab shows the used colors', async () => {
       await user.click(swatch(canvas, 'Text'));
       await waitFor(() => expect(popover(canvasElement)).toBeNull());
-      panel = await openPopover(canvas, canvasElement, 'Text');
+      panel = await openPopover(canvasElement, 'Text');
 
       await expect(firstTab()).toHaveTextContent('Your colors');
       await expect(
@@ -138,8 +129,7 @@ export const PaletteSearchChevron: StoryObj = {
   ...editor(noRule),
   name: 'the palette search lists every palette again from the chevron, even after a dead-end query',
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const panel = await openPopover(canvas, canvasElement, 'Text');
+    const panel = await openPopover(canvasElement, 'Text');
 
     await user.click(within(panel).getByRole('tab', { name: 'Palette' }));
     const search = await waitFor(() => {
@@ -175,13 +165,12 @@ export const PaletteSearchChevron: StoryObj = {
 };
 
 export const EscapeClosesPopoverNotEditor: StoryObj = {
-  ...editor(withRule),
+  ...editor(WITH_RULE),
   name: 'Escape closes the popover without closing the editor',
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
 
-    await openPopover(canvas, canvasElement, 'Text');
+    await openPopover(canvasElement, 'Text');
     await expect(store.state.colorPickerVisible).toBe(true);
 
     await pressKey('Escape');
@@ -197,15 +186,14 @@ export const EscapeClosesPopoverNotEditor: StoryObj = {
 /* While a popover is open the rest of the body ignores the pointer, so a
    stray click can't edit another property behind it. */
 export const OpenPopoverBlocksBody: StoryObj = {
-  ...editor(withRule),
+  ...editor(WITH_RULE),
   name: 'an open popover blocks pointer events on the rest of the panel',
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
     const body = canvasElement.querySelector('.stylebot-body') as HTMLElement;
 
     await expect(body.style.pointerEvents).toBe('');
 
-    await openPopover(canvas, canvasElement, 'Text');
+    await openPopover(canvasElement, 'Text');
     await waitFor(() => expect(body.style.pointerEvents).toBe('none'));
 
     await pressKey('Escape');

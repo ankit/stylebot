@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue';
 import { expect, waitFor, within } from '@storybook/test';
 
 import TheCssSelectorDropdown from './TheCssSelectorDropdown.vue';
-import { editor, RULE_CSS } from '@stylebot/storybook/editor-story';
+import { editor, WITH_RULE } from '@stylebot/storybook/editor-story';
 import {
   findOpenMenu,
   pressKey,
@@ -29,7 +29,7 @@ const items = (root: HTMLElement) =>
   root.querySelectorAll('.css-selector-dropdown-item');
 
 export const TypingCommitsSelector: StoryObj = {
-  ...editor({ css: RULE_CSS, activeSelector: 'h1' }),
+  ...editor(WITH_RULE),
   name: "typing a selector applies it and the list offers the style's other selectors",
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -117,7 +117,7 @@ export const ArrowKeysBetweenFieldAndList: StoryObj = {
 };
 
 export const DisabledOutsideBasicMode: StoryObj = {
-  ...editor({ css: RULE_CSS, activeSelector: 'h1' }),
+  ...editor(WITH_RULE),
   name: 'the selector field is disabled outside Basic mode',
   play: async ({ canvasElement }) => {
     await pressKey('c');

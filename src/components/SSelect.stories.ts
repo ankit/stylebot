@@ -1,5 +1,5 @@
 import type { Meta } from '@storybook/vue';
-import { userEvent, within } from '@storybook/test';
+import { within } from '@storybook/test';
 
 import SSelect from './SSelect.vue';
 import MenuItem from './MenuItem.vue';
@@ -8,6 +8,7 @@ import {
   fromTemplate,
   matrix,
   playground,
+  user,
 } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
@@ -88,7 +89,7 @@ export const Open = fromTemplate(
     data,
     play: async ({ canvasElement }) => {
       const canvas = within(canvasElement);
-      await userEvent.click(canvas.getByRole('button'));
+      await user.click(canvas.getByRole('button'));
       await findOpenMenu(canvas);
     },
   }

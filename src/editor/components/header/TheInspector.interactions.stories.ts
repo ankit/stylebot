@@ -9,10 +9,6 @@ import {
 } from '@stylebot/storybook/editor-story';
 import { pressKey, storeOf, user } from '@stylebot/storybook/story-helpers';
 
-/* While inspecting, the highlighter treats everything outside the real
-   extension's shadow host as page content — including the panel here. So
-   these stories drive picking with hover + keyboard and only touch the
-   panel once inspecting is off. */
 const meta: Meta = {
   title: 'Tests/Editor/Inspector',
   tags: ['test'],
@@ -49,12 +45,17 @@ export const ButtonAndShortcutToggle: StoryObj = {
     await expect(store.state.activeSelector).toBe('');
     await waitFor(() => expect(button).toHaveClass('active'));
 
-    await pressKey('i');
+    // The panel stays clickable while picking: this is the button, not
+    // an element being picked.
+    await user.click(button);
     await expect(store.state.inspecting).toBe(false);
     await waitFor(() => expect(button).not.toHaveClass('active'));
 
     await pressKey('i');
     await expect(store.state.inspecting).toBe(true);
+
+    await pressKey('i');
+    await expect(store.state.inspecting).toBe(false);
   },
 };
 

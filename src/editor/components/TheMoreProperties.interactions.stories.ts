@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue';
 import { expect, waitFor, within } from '@storybook/test';
 
 import TheMoreProperties from './TheMoreProperties.vue';
-import { editor, RULE_CSS } from '@stylebot/storybook/editor-story';
+import { editor, WITH_RULE } from '@stylebot/storybook/editor-story';
 import {
   declaration,
   propertyCard,
@@ -19,15 +19,13 @@ const meta: Meta = {
 
 export default meta;
 
-const withRule = { css: RULE_CSS, activeSelector: 'h1' };
-
 const rows = (card: HTMLElement) =>
   Array.from(card.querySelectorAll('.more-property-row')).map(row =>
     row.textContent?.replace(/\s+/g, ' ').trim()
   );
 
 export const ListsUnknownDeclarations: StoryObj = {
-  ...editor(withRule),
+  ...editor(WITH_RULE),
   name: 'lists the declarations no other panel edits',
   play: async ({ canvasElement }) => {
     const card = propertyCard(within(canvasElement), 'More Properties');
@@ -38,7 +36,7 @@ export const ListsUnknownDeclarations: StoryObj = {
 };
 
 export const AddProperty: StoryObj = {
-  ...editor(withRule),
+  ...editor(WITH_RULE),
   name: 'Enter adds a typed property and Escape abandons one',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -70,7 +68,7 @@ export const AddProperty: StoryObj = {
 };
 
 export const RemoveProperty: StoryObj = {
-  ...editor(withRule),
+  ...editor(WITH_RULE),
   name: 'removing a property keeps the rest of the rule',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);

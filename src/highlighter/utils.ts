@@ -99,42 +99,29 @@ export function mergeRectOffsets(rects: Array<Rect>): Rect {
 // taking into account any offsets caused by intermediate iframes.
 export function getNestedBoundingClientRect(
   node: HTMLElement,
-  boundaryWindow: HTMLElement | Window
+  boundaryWindow: Window
 ): Rect {
-  const ownerIframe = getOwnerIframe(node);
+  if (getOwnerWindow(node) === boundaryWindow) {
+    return node.getBoundingClientRect();
+  }
 
-  // Only walk up when the node lives in a different window than the
-  // boundary; a page that is itself framed (a same-origin embed, Storybook's
-  // preview) must not have its own frame's offset added.
-  if (ownerIframe && getOwnerWindow(node) !== boundaryWindow) {
-    const rects = [node.getBoundingClientRect()];
+  // Add each frame's offset up to the one that sits in the boundary window
+  // — and no further, so a page that is itself framed (a same-origin embed,
+  // Storybook's preview) never gets its own frame's offset added.
+  const rects: Array<Rect> = [node.getBoundingClientRect()];
+  let frame = getOwnerIframe(node);
 
-    let currentIframe: HTMLElement | null = ownerIframe;
-    let onlyOneMore = false;
+  while (frame) {
+    rects.push(getBoundingClientRectWithBorderOffset(frame));
 
-    while (currentIframe) {
-      const rect = getBoundingClientRectWithBorderOffset(
-        currentIframe
-      ) as DOMRect;
-
-      rects.push(rect);
-
-      currentIframe = getOwnerIframe(currentIframe);
-
-      if (onlyOneMore) {
-        break;
-      }
-      // We don't want to calculate iframe offsets upwards beyond
-      // the iframe containing the boundaryWindow, but we
-      // need to calculate the offset relative to the boundaryWindow.
-      if (currentIframe && getOwnerWindow(currentIframe) === boundaryWindow) {
-        onlyOneMore = true;
-      }
+    if (getOwnerWindow(frame) === boundaryWindow) {
+      break;
     }
 
-    return mergeRectOffsets(rects);
+    frame = getOwnerIframe(frame);
   }
-  return node.getBoundingClientRect();
+
+  return mergeRectOffsets(rects);
 }
 
 export function getElementDimensions(domElement: HTMLElement): Dimensions {

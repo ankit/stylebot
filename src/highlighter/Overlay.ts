@@ -111,11 +111,8 @@ export default class Overlay {
     const primary = picking?.primary;
     const anchorToPanel = picking?.anchorToPanel ?? false;
 
-    // A match that isn't rendered (display: none) has no box to outline;
-    // drawing it would put an empty margin-only rect at the origin.
     const candidates = nodes.filter(
-      node =>
-        node.nodeType === Node.ELEMENT_NODE && node.getClientRects().length > 0
+      node => node.nodeType === Node.ELEMENT_NODE
     ) as Array<HTMLElement>;
 
     // While picking, only the hovered element is highlighted; other

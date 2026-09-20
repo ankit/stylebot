@@ -2,10 +2,12 @@ import type { Meta, StoryObj } from '@storybook/vue';
 import { expect, waitFor, within } from '@storybook/test';
 
 import TheLayoutProperties from './TheLayoutProperties.vue';
-import { editor, RULE_CSS } from '@stylebot/storybook/editor-story';
+import { editor, WITH_RULE } from '@stylebot/storybook/editor-story';
 import {
+  Canvas,
   declaration,
   findOpenMenu,
+  numberInput,
   pageStyle,
   propertyControl,
   storeOf,
@@ -21,10 +23,6 @@ const meta: Meta = {
 
 export default meta;
 
-const withRule = { css: RULE_CSS, activeSelector: 'h1' };
-
-type Canvas = ReturnType<typeof within>;
-
 /* A spacing control is a mode row plus a grid of labelled fields; both
    live inside the same `.spacing-control` block as its label. */
 const spacing = (canvas: Canvas, label: string) =>
@@ -33,14 +31,18 @@ const spacing = (canvas: Canvas, label: string) =>
 const modeButton = (control: HTMLElement, label: string) =>
   within(control).getByRole('button', { name: label });
 
-const spacingInput = (control: HTMLElement, label: string) =>
-  within(control)
-    .getByText(label, { selector: '.spacing-field-label' })
-    .closest('.spacing-field')
-    ?.querySelector('.number-input') as HTMLInputElement;
+// Fields appear when a mode is picked, so this waits for the label.
+const spacingInput = async (control: HTMLElement, label: string) =>
+  numberInput(
+    (
+      await within(control).findByText(label, {
+        selector: '.spacing-field-label',
+      })
+    ).closest('.spacing-field') as HTMLElement
+  );
 
 export const SpacingModes: StoryObj = {
-  ...editor(withRule),
+  ...editor(WITH_RULE),
   name: 'padding switches between All, X & Y, Individual and None and writes the right shorthand',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -49,25 +51,17 @@ export const SpacingModes: StoryObj = {
 
     // `12px 24px` is a vertical/horizontal pair.
     await expect(modeButton(padding, 'X & Y')).toHaveClass('active');
-    await expect(spacingInput(padding, 'Vertical')).toHaveValue('12');
-    await expect(spacingInput(padding, 'Horizontal')).toHaveValue('24');
+    await expect(await spacingInput(padding, 'Vertical')).toHaveValue('12');
+    await expect(await spacingInput(padding, 'Horizontal')).toHaveValue('24');
 
     await user.click(modeButton(padding, 'All'));
-    const all = await waitFor(() => {
-      const input = spacingInput(padding, 'All');
-      expect(input).toBeInTheDocument();
-      return input;
-    });
+    const all = await spacingInput(padding, 'All');
     await user.type(all, '8');
     await expect(declaration(store, 'h1', 'padding')).toBe('8px');
     await expect(pageStyle(canvasElement, 'h1', 'padding')).toBe('8px');
 
     await user.click(modeButton(padding, 'Individual'));
-    const top = await waitFor(() => {
-      const input = spacingInput(padding, 'Top');
-      expect(input).toBeInTheDocument();
-      return input;
-    });
+    const top = await spacingInput(padding, 'Top');
     // Focusing a field selects its value, so typing replaces it.
     await user.type(top, '4');
     await expect(declaration(store, 'h1', 'padding')).toBe('4px 8px 8px');
@@ -82,7 +76,7 @@ export const SpacingModes: StoryObj = {
 };
 
 export const MarginIndependent: StoryObj = {
-  ...editor(withRule),
+  ...editor(WITH_RULE),
   name: 'margin is edited independently of padding',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -92,11 +86,7 @@ export const MarginIndependent: StoryObj = {
     await expect(modeButton(margin, 'None')).toHaveClass('active');
 
     await user.click(modeButton(margin, 'All'));
-    const all = await waitFor(() => {
-      const input = spacingInput(margin, 'All');
-      expect(input).toBeInTheDocument();
-      return input;
-    });
+    const all = await spacingInput(margin, 'All');
     await user.type(all, '10');
 
     await expect(declaration(store, 'h1', 'margin')).toBe('10px');
@@ -105,7 +95,7 @@ export const MarginIndependent: StoryObj = {
 };
 
 export const BorderControls: StoryObj = {
-  ...editor(withRule),
+  ...editor(WITH_RULE),
   name: 'the border controls read through the shorthand and update style and width',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -115,7 +105,7 @@ export const BorderControls: StoryObj = {
 
     // Reads through the `border` shorthand.
     await expect(style).toHaveTextContent('Solid');
-    await expect(control.querySelector('.number-input')).toHaveValue('1');
+    await expect(numberInput(control)).toHaveValue('1');
 
     await user.click(style);
     await user.click(
@@ -130,7 +120,7 @@ export const BorderControls: StoryObj = {
     await waitFor(() => expect(style).toHaveTextContent('Dashed'));
 
     // The longhand written after the shorthand is what wins on the page.
-    const width = control.querySelector('.number-input') as HTMLInputElement;
+    const width = numberInput(control);
     await user.type(width, '2');
     await expect(declaration(store, 'h1', 'border-width')).toBe('2px');
     await expect(pageStyle(canvasElement, 'h1', 'border-top-width')).toBe(
@@ -146,7 +136,7 @@ export const BorderWidthOnly: StoryObj = {
     const canvas = within(canvasElement);
     const control = propertyControl(canvas, 'Border');
 
-    await expect(control.querySelector('.number-input')).toHaveValue('2');
+    await expect(numberInput(control)).toHaveValue('2');
     await expect(control.querySelector('.border-style button')).toHaveClass(
       'muted'
     );
@@ -154,13 +144,13 @@ export const BorderWidthOnly: StoryObj = {
 };
 
 export const RadiusField: StoryObj = {
-  ...editor(withRule),
+  ...editor(WITH_RULE),
   name: 'the radius field applies typed and preset values',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
     const control = propertyControl(canvas, 'Radius');
-    const input = control.querySelector('.number-input') as HTMLInputElement;
+    const input = numberInput(control);
 
     await user.type(input, '8');
     await expect(declaration(store, 'h1', 'border-radius')).toBe('8px');

@@ -2,8 +2,9 @@ import type { Meta, StoryObj } from '@storybook/vue';
 import { expect, waitFor, within } from '@storybook/test';
 
 import FontFamily from './FontFamily.vue';
-import { editor, RULE_CSS } from '@stylebot/storybook/editor-story';
+import { editor, WITH_RULE } from '@stylebot/storybook/editor-story';
 import {
+  Canvas,
   declaration,
   findOpenMenu,
   pageStyle,
@@ -20,10 +21,6 @@ const meta: Meta = {
 };
 
 export default meta;
-
-const withRule = { css: RULE_CSS, activeSelector: 'h1' };
-
-type Canvas = ReturnType<typeof within>;
 
 const field = (root: HTMLElement) =>
   root.querySelector('.font-family-autocomplete') as HTMLElement;
@@ -52,7 +49,7 @@ const menuItem = (canvas: Canvas, name: string) =>
   });
 
 export const EscapeClosesPickerNotEditor: StoryObj = {
-  ...editor(withRule),
+  ...editor(WITH_RULE),
   name: 'Escape closes the picker without closing the editor',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -70,7 +67,7 @@ export const EscapeClosesPickerNotEditor: StoryObj = {
 };
 
 export const SuggestsAndApplies: StoryObj = {
-  ...editor(withRule),
+  ...editor(WITH_RULE),
   name: 'typing suggests Google Fonts; picking one applies it and lists it first next time',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -119,7 +116,7 @@ export const SuggestsAndApplies: StoryObj = {
 };
 
 export const CategoryFilter: StoryObj = {
-  ...editor(withRule),
+  ...editor(WITH_RULE),
   name: 'a category name lists that category',
   play: async ({ canvasElement }) => {
     await openPicker(canvasElement);
@@ -140,7 +137,7 @@ export const CategoryFilter: StoryObj = {
 };
 
 export const CustomValue: StoryObj = {
-  ...editor(withRule),
+  ...editor(WITH_RULE),
   name: 'a font outside Google Fonts is applied as typed',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -162,7 +159,7 @@ export const CustomValue: StoryObj = {
 };
 
 export const ArrowKeys: StoryObj = {
-  ...editor(withRule),
+  ...editor(WITH_RULE),
   name: 'arrow keys move between the field and the suggestions',
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement);

@@ -1,5 +1,5 @@
 import type { Meta } from '@storybook/vue';
-import { userEvent, within } from '@storybook/test';
+import { within } from '@storybook/test';
 
 import SAutocomplete from './SAutocomplete.vue';
 import MenuItem from './MenuItem.vue';
@@ -8,6 +8,7 @@ import {
   fromTemplate,
   matrix,
   playground,
+  user,
 } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
@@ -104,7 +105,7 @@ export const Open = fromTemplate(
     data,
     play: async ({ canvasElement }) => {
       const canvas = within(canvasElement);
-      await userEvent.click(
+      await user.click(
         canvasElement.querySelector('.autocomplete-chevron') as HTMLElement
       );
       await findOpenMenu(canvas);

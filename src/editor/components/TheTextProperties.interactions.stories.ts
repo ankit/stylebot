@@ -2,10 +2,11 @@ import type { Meta, StoryObj } from '@storybook/vue';
 import { expect, waitFor, within } from '@storybook/test';
 
 import TheTextProperties from './TheTextProperties.vue';
-import { editor, RULE_CSS } from '@stylebot/storybook/editor-story';
+import { editor, WITH_RULE } from '@stylebot/storybook/editor-story';
 import {
   declaration,
   findOpenMenu,
+  numberInput,
   pageStyle,
   propertyControl,
   storeOf,
@@ -21,17 +22,12 @@ const meta: Meta = {
 
 export default meta;
 
-const withRule = { css: RULE_CSS, activeSelector: 'h1' };
-
-const numberInput = (control: HTMLElement) =>
-  control.querySelector('.number-input') as HTMLInputElement;
-
 // Segment buttons are labelled by icon or glyph, so they go by position.
 const segments = (control: HTMLElement) =>
   Array.from(control.querySelectorAll<HTMLElement>('.segment'));
 
 export const FontSizeField: StoryObj = {
-  ...editor(withRule),
+  ...editor(WITH_RULE),
   name: 'the size field applies px values live, clears them, and offers presets',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -63,7 +59,7 @@ export const FontSizeField: StoryObj = {
 /* Only px is editable; a unitless or other-unit value renders empty and is
    replaced on edit. */
 export const LineHeightField: StoryObj = {
-  ...editor({ css: RULE_CSS, activeSelector: '.article-body' }),
+  ...editor({ ...WITH_RULE, activeSelector: '.article-body' }),
   name: 'a non-px line height renders empty and is replaced on edit',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -83,7 +79,7 @@ export const LineHeightField: StoryObj = {
 };
 
 export const TextAlignSegmented: StoryObj = {
-  ...editor(withRule),
+  ...editor(WITH_RULE),
   name: 'clicking the active alignment clears it; another applies it',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -105,7 +101,7 @@ export const TextAlignSegmented: StoryObj = {
 };
 
 export const TextDecorationSegmented: StoryObj = {
-  ...editor(withRule),
+  ...editor(WITH_RULE),
   name: 'a decoration applies on click and clears on a second click',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
