@@ -178,6 +178,25 @@ describe('actions', () => {
     });
   });
 
+  describe('closeStylebot', () => {
+    it('hides the in-page panel', () => {
+      actions.closeStylebot({ state: mockState, commit: mockCommit });
+
+      expect(mockCommit).toBeCalledWith('setVisible', false);
+      expect(chromeUtils.closeEditorWindow).not.toBeCalled();
+    });
+
+    it('closes the window for the tab it edits in the window host', () => {
+      actions.closeStylebot({
+        state: { ...mockState, host: 'window', tabId: 7 },
+        commit: mockCommit,
+      });
+
+      expect(chromeUtils.closeEditorWindow).toBeCalledWith(7);
+      expect(mockCommit).not.toBeCalled();
+    });
+  });
+
   describe('refreshPage', () => {
     it('commits the bridge snapshot', async () => {
       const snapshot = { ...mockState.page, readerable: true };

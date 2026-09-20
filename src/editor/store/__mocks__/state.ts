@@ -13,6 +13,7 @@ const mockState: State = {
   page: { ...emptyPageSnapshot(), domain: document.domain },
   pageConnected: true,
   windowConnected: false,
+  tabId: null,
 
   css: '',
   enabled: true,

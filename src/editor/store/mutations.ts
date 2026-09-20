@@ -26,6 +26,10 @@ export default {
     state.windowConnected = value;
   },
 
+  setTabId(state: State, tabId: number | null): void {
+    state.tabId = tabId;
+  },
+
   setOptions(state: State, options: StylebotOptions): void {
     state.options = options;
   },

@@ -31,6 +31,7 @@ const updateTitle = (href: string): void => {
 const start = async (): Promise<void> => {
   setupVue();
   const store = createStore('window');
+  store.commit('setTabId', tabId);
 
   const bridge = new RemotePageBridge(tabId, {
     onStateChanged: state => store.dispatch('syncFromPage', state),

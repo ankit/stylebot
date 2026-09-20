@@ -16,6 +16,9 @@ export default Vue.extend({
   name: 'TheKeyboardShortcuts',
 
   computed: {
+    host(): string {
+      return this.$store.state.host;
+    },
     visible(): boolean {
       return this.$store.state.visible;
     },
@@ -82,6 +85,10 @@ export default Vue.extend({
     },
 
     toggleResize(): void {
+      if (this.host === 'window') {
+        return;
+      }
+
       this.$store.commit('setResizing', !this.resizing);
     },
 
@@ -108,20 +115,22 @@ export default Vue.extend({
     },
 
     dockLeft(): void {
-      this.$store.dispatch('setLayout', {
-        ...this.layout,
-        dockLocation: 'left',
-      });
+      this.$store.dispatch('setDockLocation', 'left');
     },
 
     dockRight(): void {
-      this.$store.dispatch('setLayout', {
-        ...this.layout,
-        dockLocation: 'right',
-      });
+      this.$store.dispatch('setDockLocation', 'right');
+    },
+
+    dockWindow(): void {
+      this.$store.dispatch('setDockLocation', 'window');
     },
 
     toggleAdjustPageLayout(): void {
+      if (this.host === 'window') {
+        return;
+      }
+
       this.$store.dispatch('setLayout', {
         ...this.layout,
         adjustPageLayout: !this.layout.adjustPageLayout,
@@ -206,6 +215,14 @@ export default Vue.extend({
         event.stopPropagation();
 
         this.dockRight();
+      }
+
+      // Move stylebot into its own window
+      if (event.key === this.editorCommands.dockWindow) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        this.dockWindow();
       }
 
       // Toggle page layout adjustment

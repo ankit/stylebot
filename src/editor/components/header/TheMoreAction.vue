@@ -20,7 +20,7 @@
           "
         />
 
-        <div class="push-page-row">
+        <div v-if="host === 'page'" class="push-page-row">
           <div class="push-page-copy">
             <s-text>{{ t('adjust_page_layout') }}</s-text>
             <s-text size="caption" variant="muted">
@@ -100,6 +100,10 @@ export default Vue.extend({
   },
 
   computed: {
+    host(): string {
+      return this.$store.state.host;
+    },
+
     layout(): StylebotLayout {
       return this.$store.state.options.layout;
     },
@@ -117,15 +121,21 @@ export default Vue.extend({
       return [
         {
           value: 'left',
-          label: this.t('dock_to_left'),
+          label: this.t('left'),
           title: this.t('dock_to_left'),
           shortcut: this.editorCommands.dockLeft,
         },
         {
           value: 'right',
-          label: this.t('dock_to_right'),
+          label: this.t('right'),
           title: this.t('dock_to_right'),
-          shortcut: 'r',
+          shortcut: this.editorCommands.dockRight,
+        },
+        {
+          value: 'window',
+          label: this.t('window'),
+          title: this.t('open_in_separate_window'),
+          shortcut: this.editorCommands.dockWindow,
         },
       ];
     },
@@ -136,11 +146,8 @@ export default Vue.extend({
   },
 
   methods: {
-    dock(dockLocation: string): void {
-      this.$store.dispatch('setLayout', {
-        ...this.layout,
-        dockLocation,
-      });
+    dock(dockLocation: StylebotLayout['dockLocation']): void {
+      this.$store.dispatch('setDockLocation', dockLocation);
     },
 
     toggleAdjustPageLayout(): void {

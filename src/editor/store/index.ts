@@ -42,6 +42,8 @@ export type State = {
   pageConnected: boolean;
   // Whether a separate editor window is attached to this page; page host only.
   windowConnected: boolean;
+  // Window host: the tab this window edits.
+  tabId: number | null;
 
   url: string;
   css: string;
@@ -71,6 +73,7 @@ export const createStore = (host: EditorHost): Store<State> =>
       page: emptyPageSnapshot(),
       pageConnected: host === 'page',
       windowConnected: false,
+      tabId: null,
 
       css: '',
       enabled: true,
