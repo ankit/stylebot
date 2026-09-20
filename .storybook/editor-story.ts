@@ -68,6 +68,45 @@ export const WITH_RULE: EditorStateOverrides = {
   activeSelector: 'h1',
 };
 
+const FAVICON =
+  'data:image/svg+xml,' +
+  encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><rect width="16" height="16" rx="4" fill="#e63946"/></svg>'
+  );
+
+export const WINDOW_TAB = {
+  title: 'Stylebot lets you restyle any website',
+  favIconUrl: FAVICON,
+  active: true,
+};
+
+/**
+ * Mounts the editor the way its separate window does: the window host, a
+ * seeded tab, and a frame the size the background opens the window at.
+ */
+export const editorWindow = (
+  overrides: EditorStateOverrides = {}
+): StoryObj => ({
+  render: (_args, { globals }) => ({
+    components: { TheStylebotApp },
+    store: createEditorStore({
+      host: 'window',
+      tabId: 7,
+      tab: WINDOW_TAB,
+      page: {
+        domain: 'example.com',
+        href: 'https://example.com/article',
+        title: WINDOW_TAB.title,
+        readerable: true,
+        bodyChildSelectors: [],
+      },
+      ...overrides,
+      options: { appearance: globals.theme, ...overrides.options },
+    }),
+    template: `<div id="stylebot" class="sb-window"><the-stylebot-app /></div>`,
+  }),
+});
+
 /**
  * Mounts the full editor over a stand-in page with a seeded store, the
  * shape every Editor story takes; stories spread it and add their own

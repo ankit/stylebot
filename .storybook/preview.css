@@ -84,6 +84,23 @@ button {
   width: 320px;
 }
 
+/* The popup-type window the background opens, at its default size. */
+.sb-window {
+  position: relative;
+  width: 420px;
+  height: 720px;
+  margin: 24px;
+  overflow: hidden;
+  border: 1px solid var(--panel-border);
+  border-radius: 10px;
+  box-shadow: 0 14px 40px var(--panel-shadow);
+}
+
+.sb-window .stylebot-app {
+  position: relative;
+  height: 100%;
+}
+
 .sb-page {
   max-width: 560px;
   padding: 48px 40px;

@@ -75,7 +75,7 @@ channel as the background page. That's why tests get a `Popup` (below) rather th
 The same limit applies to every other extension page: `page.goto('chrome-extension://…')`
 fails on Firefox with `NS_ERROR_UNKNOWN_PROTOCOL`, and the `moz-extension://` URL can't be
 attached to either. A spec that drives the options page as a `Page` checks
-`engine.opensExtensionPages` and skips otherwise (`sync-tab.spec.ts`).
+`engine.opensExtensionPages` and skips otherwise (`sync-tab.spec.ts`, `editor-window.spec.ts`).
 
 The other thing Firefox can't do is let `context.route()` see requests the extension itself
 makes from its background; a spec that needs that checks `engine.routesExtensionRequests`
