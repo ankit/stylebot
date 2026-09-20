@@ -14,7 +14,10 @@ import {
 
 import { getStylesForPage } from '../utils/chrome';
 
-const initChromeListener = (store: Store<State>): void => {
+const initChromeListener = (
+  store: Store<State>,
+  ready: Promise<void>
+): void => {
   const { state, commit, dispatch } = store;
 
   // Re-derive readability only on real URL changes, not favicon/title-only
@@ -27,55 +30,68 @@ const initChromeListener = (store: Store<State>): void => {
         return;
       }
 
-      if (message.name === 'ToggleStylebot') {
+      // Handled once the store is initialized, so an early message isn't
+      // dropped. Only GetIsStylebotOpen answers, so only it holds the channel.
+      ready.then(() => handleMessage(message, sendResponse));
+      return message.name === 'GetIsStylebotOpen';
+    }
+  );
+
+  const handleMessage = (
+    message: TabMessage,
+    sendResponse: (response: boolean) => void
+  ): void => {
+    if (message.name === 'ToggleStylebot') {
+      toggleStylebot(store);
+    } else if (message.name === 'OpenStylebot') {
+      if (!state.visible) {
         toggleStylebot(store);
-      } else if (message.name === 'OpenStylebot') {
-        if (!state.visible) {
-          toggleStylebot(store);
-        }
-      } else if (message.name === 'OpenStylebotFromContextMenu') {
-        updateSelectorWithContextMenuSelector({ state, commit });
+      }
+    } else if (message.name === 'OpenStylebotFromContextMenu') {
+      updateSelectorWithContextMenuSelector({ state, commit });
 
-        if (!state.visible) {
-          toggleStylebot(store, false);
-        }
-      } else if (message.name === 'GetIsStylebotOpen') {
-        sendResponse(state.visible);
-      } else if (message.name === 'TabUpdated') {
-        if (window.location.href === lastUrl) {
-          return;
-        }
-        lastUrl = window.location.href;
+      if (!state.visible) {
+        toggleStylebot(store, false);
+      }
+    } else if (message.name === 'GetIsStylebotOpen') {
+      sendResponse(state.visible);
+    } else if (message.name === 'TabUpdated') {
+      if (window.location.href === lastUrl) {
+        return;
+      }
+      lastUrl = window.location.href;
+      if (state.visible) {
+        dispatch('refreshPage');
+      }
 
-        // A same-tab SPA navigation still fires this — re-derive readability
-        // for the new URL instead of trusting the previous page's flag.
-        getStylesForPage(false).then(({ defaultStyle }) => {
-          const readability = Boolean(defaultStyle?.readability);
-          commit('setReadability', readability);
+      // A same-tab SPA navigation still fires this — re-derive readability
+      // for the new URL instead of trusting the previous page's flag.
+      getStylesForPage(false).then(({ defaultStyle }) => {
+        const readability = Boolean(defaultStyle?.readability);
+        commit('setReadability', readability);
 
-          if (readability) {
-            applyReadability();
-          } else {
-            removeReadability();
-          }
-        });
-      } else if (message.name === 'ToggleReadabilityForTab') {
-        toggleReadability({ state, dispatch });
-      } else if (message.name === 'ReadabilityStateChanged') {
-        // Keep local state in sync when a change originates outside this
-        // action (e.g. the reader's own dock), so the next toggle isn't stale.
-        commit('setReadability', message.value);
-
-        if (message.value) {
+        if (readability) {
           applyReadability();
         } else {
           removeReadability();
         }
-      } else if (message.name === 'ApplyStylesToTab') {
-        applyStyles({ state, dispatch }, message.defaultStyle, message.styles);
+      });
+    } else if (message.name === 'ToggleReadabilityForTab') {
+      toggleReadability({ state, dispatch });
+    } else if (message.name === 'ReadabilityStateChanged') {
+      // Keep local state in sync when a change originates outside this
+      // action (e.g. the reader's own dock), so the next toggle isn't stale.
+      commit('setReadability', message.value);
+
+      if (message.value) {
+        applyReadability();
+      } else {
+        removeReadability();
       }
+    } else if (message.name === 'ApplyStylesToTab') {
+      applyStyles({ state, dispatch }, message.defaultStyle, message.styles);
     }
-  );
+  };
 };
 
 export default initChromeListener;

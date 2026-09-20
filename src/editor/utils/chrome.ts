@@ -1,12 +1,12 @@
 import {
+  SetStyle,
+  SetReadability,
   SetOption,
   GetAllOptions,
   OpenOptionsPage,
-  SetStyle,
   EnableStyle,
   DisableStyle,
   GetStylesForPage,
-  SetReadability,
   GetCommands,
   GetAllOptionsResponse,
   GetStylesForPageResponse,
@@ -44,6 +44,31 @@ export const setOption = (
       name,
       value,
     },
+  };
+
+  chrome.runtime.sendMessage(message);
+};
+
+export const setStyle = (
+  url: string,
+  css: string,
+  readability: boolean
+): void => {
+  const message: SetStyle = {
+    name: 'SetStyle',
+    url,
+    css,
+    readability,
+  };
+
+  chrome.runtime.sendMessage(message);
+};
+
+export const setReadability = (url: string, value: boolean): void => {
+  const message: SetReadability = {
+    name: 'SetReadability',
+    value,
+    url,
   };
 
   chrome.runtime.sendMessage(message);
@@ -87,21 +112,6 @@ export const openGoogleFontsPage = (): void => {
   chrome.runtime.sendMessage(message);
 };
 
-export const setStyle = (
-  url: string,
-  css: string,
-  readability: boolean
-): void => {
-  const message: SetStyle = {
-    name: 'SetStyle',
-    url,
-    css,
-    readability,
-  };
-
-  chrome.runtime.sendMessage(message);
-};
-
 export const enableStyle = (url: string): void => {
   const message: EnableStyle = {
     name: 'EnableStyle',
@@ -114,16 +124,6 @@ export const enableStyle = (url: string): void => {
 export const disableStyle = (url: string): void => {
   const message: DisableStyle = {
     name: 'DisableStyle',
-    url,
-  };
-
-  chrome.runtime.sendMessage(message);
-};
-
-export const setReadability = (url: string, value: boolean): void => {
-  const message: SetReadability = {
-    name: 'SetReadability',
-    value,
     url,
   };
 

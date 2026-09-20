@@ -1,6 +1,7 @@
 const dedent = require('dedent');
 
 import { getCssAfterApplyingFilterEffectToPage } from '../filter';
+import { getBodyChildSelectors } from '../selector';
 
 describe('filter', () => {
   describe('getCssAfterApplyingFilterEffectToPage', () => {
@@ -20,7 +21,8 @@ describe('filter', () => {
         const output = getCssAfterApplyingFilterEffectToPage(
           'grayscale',
           css,
-          '0'
+          '0',
+          getBodyChildSelectors()
         );
 
         expect(output).toBe(dedent`
@@ -40,7 +42,8 @@ describe('filter', () => {
         const output = getCssAfterApplyingFilterEffectToPage(
           'grayscale',
           css,
-          '0'
+          '0',
+          getBodyChildSelectors()
         );
 
         expect(output).toBe('');
@@ -56,7 +59,8 @@ describe('filter', () => {
         const output = getCssAfterApplyingFilterEffectToPage(
           'grayscale',
           css,
-          '0'
+          '0',
+          getBodyChildSelectors()
         );
 
         expect(output).toBe(dedent`
@@ -78,7 +82,8 @@ describe('filter', () => {
         const output = getCssAfterApplyingFilterEffectToPage(
           'grayscale',
           css,
-          '50'
+          '50',
+          getBodyChildSelectors()
         );
 
         expect(output).toBe(dedent`
@@ -100,7 +105,8 @@ describe('filter', () => {
         const output = getCssAfterApplyingFilterEffectToPage(
           'grayscale',
           css,
-          '50'
+          '50',
+          getBodyChildSelectors()
         );
 
         expect(output).toBe(dedent`
@@ -122,7 +128,8 @@ describe('filter', () => {
         const output = getCssAfterApplyingFilterEffectToPage(
           'grayscale',
           '',
-          '100'
+          '100',
+          getBodyChildSelectors()
         );
 
         expect(output).toBe(dedent`
@@ -138,7 +145,8 @@ describe('filter', () => {
         const output = getCssAfterApplyingFilterEffectToPage(
           'grayscale',
           '',
-          '100'
+          '100',
+          getBodyChildSelectors()
         );
 
         expect(output).toBe(dedent`
@@ -160,7 +168,8 @@ describe('filter', () => {
         const output = getCssAfterApplyingFilterEffectToPage(
           'grayscale',
           css,
-          '0'
+          '0',
+          getBodyChildSelectors()
         );
 
         expect(output).toBe('');

@@ -3,16 +3,15 @@ import actions from '../actions';
 
 import mockState from '../__mocks__/state';
 import * as stylebotCss from '@stylebot/css';
-import * as stylebotReadability from '@stylebot/readability';
 import * as googleFonts from '@stylebot/google-fonts';
 import * as chromeUtils from '../../utils/chrome';
-import { readCache, writeCache } from '../../../inject-css/cache';
+import * as page from '@stylebot/page-bridge';
 
 jest.mock('postcss');
 jest.mock('@stylebot/css');
-jest.mock('@stylebot/readability');
 jest.mock('@stylebot/google-fonts');
 jest.mock('../../utils/chrome');
+jest.mock('@stylebot/page-bridge');
 
 const mockRoot = {
   some: jest.fn(),
@@ -24,15 +23,25 @@ const mockRoot = {
 const mockCommit = jest.fn();
 const mockDispatch = jest.fn();
 
-describe('actions', () => {
-  beforeAll(() => {
-    jest.spyOn(stylebotCss, 'injectRootIntoDocument');
-    jest.spyOn(chromeUtils, 'setStyle');
-  });
+const mockBridge = {
+  getSnapshot: jest.fn(),
+  applyCss: jest.fn(),
+  setPreviewCss: jest.fn(),
+  applyReadability: jest.fn(),
+  startInspecting: jest.fn(),
+  stopInspecting: jest.fn(),
+  highlight: jest.fn(),
+  unhighlight: jest.fn(),
+  getPageColors: jest.fn(),
+  openInPage: jest.fn(),
+  on: jest.fn(),
+} as jest.Mocked<page.PageBridge>;
 
+describe('actions', () => {
   beforeEach(() => {
     jest.resetAllMocks();
     jest.spyOn(postcss, 'parse').mockReturnValue(mockRoot);
+    jest.spyOn(page, 'getPageBridge').mockReturnValue(mockBridge);
   });
 
   describe('applyCss', () => {
@@ -41,144 +50,44 @@ describe('actions', () => {
         throw new Error();
       });
 
-      try {
-        actions.applyCss(
-          { commit: mockCommit, state: mockState },
-          { css: 'invalid' }
-        );
-      } catch {
-        expect(mockCommit).toBeCalledTimes(0);
-        expect(chromeUtils.setStyle).toBeCalledTimes(0);
-        expect(stylebotCss.injectRootIntoDocument).toBeCalledTimes(0);
-      }
+      actions.applyCss(
+        { commit: mockCommit, state: mockState },
+        { css: 'invalid' }
+      );
+
+      expect(mockCommit).toBeCalledTimes(0);
+      expect(mockBridge.applyCss).toBeCalledTimes(0);
+      expect(chromeUtils.setStyle).toBeCalledTimes(0);
     });
 
-    it('invokes setStyle correctly', () => {
+    it('applies to the page, persists the cleaned css and commits it', () => {
       const css = 'a { color: red; }';
-      jest.spyOn(stylebotCss, 'removeEmptyRules').mockReturnValue(css);
+      jest.spyOn(stylebotCss, 'removeEmptyRules').mockReturnValue('clean');
 
       actions.applyCss({ commit: mockCommit, state: mockState }, { css });
 
-      expect(mockCommit).toHaveBeenNthCalledWith(1, 'setCss', css);
-      expect(mockCommit).toHaveBeenNthCalledWith(2, 'setSelectors', mockRoot);
-
-      expect(stylebotCss.injectRootIntoDocument).toBeCalledWith(
-        mockRoot,
-        mockState.url
-      );
-
-      expect(stylebotCss.removeEmptyRules).toBeCalledWith(css);
+      expect(mockBridge.applyCss).toBeCalledWith({
+        url: mockState.url,
+        css,
+        enabled: mockState.enabled,
+      });
       expect(chromeUtils.setStyle).toBeCalledWith(
         mockState.url,
-        css,
+        'clean',
         mockState.readability
       );
-    });
-
-    afterEach(() => {
-      localStorage.clear();
-    });
-
-    it('does nothing to the cache when nothing is cached yet', () => {
-      const css = 'a { color: red; }';
-      jest.spyOn(stylebotCss, 'removeEmptyRules').mockReturnValue(css);
-
-      actions.applyCss({ commit: mockCommit, state: mockState }, { css });
-
-      expect(readCache()).toBeNull();
-    });
-
-    it('updates the matching cached style in place', () => {
-      const css = 'a { color: red; }';
-      jest.spyOn(stylebotCss, 'removeEmptyRules').mockReturnValue(css);
-
-      writeCache({
-        styles: [
-          { url: mockState.url, css: 'a { color: blue; }', enabled: true },
-          {
-            url: 'other.example.com',
-            css: 'b { color: green; }',
-            enabled: true,
-          },
-        ],
-        readability: false,
-      });
-
-      actions.applyCss({ commit: mockCommit, state: mockState }, { css });
-
-      expect(readCache()).toEqual({
-        styles: [
-          { url: mockState.url, css, enabled: mockState.enabled },
-          {
-            url: 'other.example.com',
-            css: 'b { color: green; }',
-            enabled: true,
-          },
-        ],
-        readability: false,
-      });
-    });
-
-    it('appends a cached style if none exists yet for this url', () => {
-      const css = 'a { color: red; }';
-      jest.spyOn(stylebotCss, 'removeEmptyRules').mockReturnValue(css);
-
-      writeCache({
-        styles: [
-          {
-            url: 'other.example.com',
-            css: 'b { color: green; }',
-            enabled: true,
-          },
-        ],
-        readability: false,
-      });
-
-      actions.applyCss({ commit: mockCommit, state: mockState }, { css });
-
-      expect(readCache()).toEqual({
-        styles: [
-          {
-            url: 'other.example.com',
-            css: 'b { color: green; }',
-            enabled: true,
-          },
-          { url: mockState.url, css, enabled: mockState.enabled },
-        ],
-        readability: false,
-      });
+      expect(mockCommit).toHaveBeenNthCalledWith(1, 'setCss', css);
+      expect(mockCommit).toHaveBeenNthCalledWith(2, 'setSelectors', mockRoot);
     });
   });
 
   describe('applyReadability', () => {
-    afterEach(() => {
-      localStorage.clear();
-    });
-
-    it('does nothing to the cache when nothing is cached yet', () => {
+    it('applies to the page, persists the choice and commits the flag', () => {
       actions.applyReadability({ commit: mockCommit, state: mockState }, true);
 
-      expect(readCache()).toBeNull();
-    });
-
-    it('updates the cached readability flag in place', () => {
-      writeCache({
-        styles: [
-          { url: mockState.url, css: 'a { color: blue; }', enabled: true },
-        ],
-        readability: false,
-      });
-
-      actions.applyReadability({ commit: mockCommit, state: mockState }, true);
-
-      expect(readCache()).toEqual({
-        styles: [
-          { url: mockState.url, css: 'a { color: blue; }', enabled: true },
-        ],
-        readability: true,
-      });
-      expect(stylebotReadability.applyReadability).toBeCalledWith(true);
+      expect(mockBridge.applyReadability).toBeCalledWith(true);
       expect(chromeUtils.setReadability).toBeCalledWith(mockState.url, true);
+      expect(mockCommit).toBeCalledWith('setReadability', true);
     });
 
     it('switches out of basic/code mode since editing page CSS has no effect there, without persisting the mode change', () => {
@@ -216,6 +125,108 @@ describe('actions', () => {
         'setOptions',
         expect.objectContaining({ mode: 'magic' })
       );
+    });
+  });
+
+  describe('applyFilter', () => {
+    const state = {
+      ...mockState,
+      page: { ...mockState.page, bodyChildSelectors: ['div.a'] },
+    };
+
+    beforeEach(() => {
+      jest
+        .spyOn(stylebotCss, 'getCssAfterApplyingFilterEffectToPage')
+        .mockReturnValue('filtered');
+    });
+
+    it('reads the page right now when the bridge can', () => {
+      const fresh = { ...state.page, bodyChildSelectors: ['div.b'] };
+      mockBridge.getSnapshotSync = jest.fn(() => fresh);
+
+      actions.applyFilter(
+        { state, commit: mockCommit, dispatch: mockDispatch },
+        { effectName: 'grayscale', percent: '50' }
+      );
+
+      expect(mockCommit).toBeCalledWith('setPage', fresh);
+      expect(stylebotCss.getCssAfterApplyingFilterEffectToPage).toBeCalledWith(
+        'grayscale',
+        state.css,
+        '50',
+        ['div.b']
+      );
+      expect(mockDispatch).toBeCalledWith('applyCss', { css: 'filtered' });
+      expect(mockDispatch).not.toBeCalledWith('refreshPage');
+      delete mockBridge.getSnapshotSync;
+    });
+
+    it('uses the last snapshot and refreshes it otherwise', () => {
+      actions.applyFilter(
+        { state, commit: mockCommit, dispatch: mockDispatch },
+        { effectName: 'grayscale', percent: '50' }
+      );
+
+      expect(stylebotCss.getCssAfterApplyingFilterEffectToPage).toBeCalledWith(
+        'grayscale',
+        state.css,
+        '50',
+        ['div.a']
+      );
+      expect(mockDispatch).toBeCalledWith('refreshPage');
+      expect(mockDispatch).toBeCalledWith('applyCss', { css: 'filtered' });
+    });
+  });
+
+  describe('refreshPage', () => {
+    it('commits the bridge snapshot', async () => {
+      const snapshot = { ...mockState.page, readerable: true };
+      mockBridge.getSnapshot.mockResolvedValue(snapshot);
+
+      await actions.refreshPage({ commit: mockCommit });
+
+      expect(mockCommit).toBeCalledWith('setPage', snapshot);
+    });
+
+    it('keeps the last snapshot when the page cannot answer', async () => {
+      mockBridge.getSnapshot.mockRejectedValue(new Error('Page disconnected'));
+
+      await expect(
+        actions.refreshPage({ commit: mockCommit })
+      ).resolves.toBeUndefined();
+      expect(mockCommit).not.toBeCalled();
+    });
+  });
+
+  describe('openStylebot', () => {
+    const getters = { readabilityActive: false } as never;
+
+    it('refreshes the page, re-enables a disabled style and shows the panel', async () => {
+      const state = { ...mockState, enabled: false };
+
+      await actions.openStylebot(
+        { state, commit: mockCommit, dispatch: mockDispatch, getters },
+        { inspect: true }
+      );
+
+      expect(mockDispatch).toBeCalledWith('refreshPage');
+      expect(chromeUtils.enableStyle).toBeCalledWith(state.url);
+      expect(mockCommit).toBeCalledWith('setVisible', true);
+      expect(mockCommit).toBeCalledWith('setInspecting', true);
+    });
+
+    it('does not start inspecting outside basic mode', async () => {
+      const state = {
+        ...mockState,
+        options: { ...mockState.options, mode: 'code' as const },
+      };
+
+      await actions.openStylebot(
+        { state, commit: mockCommit, dispatch: mockDispatch, getters },
+        { inspect: true }
+      );
+
+      expect(mockCommit).not.toBeCalledWith('setInspecting', true);
     });
   });
 
@@ -490,7 +501,7 @@ describe('actions', () => {
     it('no-ops without an active selector', async () => {
       await actions.previewFontFamily({ state: mockState }, 'Inter');
 
-      expect(stylebotCss.injectRootIntoDocument).not.toBeCalled();
+      expect(mockBridge.setPreviewCss).not.toBeCalled();
     });
 
     it('injects a preview stylesheet with the import for a bundled font', async () => {
@@ -499,9 +510,8 @@ describe('actions', () => {
       expect(postcss.parse).toBeCalledWith(
         '@import;\nh1 { font-family: Inter, sans-serif; }'
       );
-      expect(stylebotCss.injectRootIntoDocument).toBeCalledWith(
-        mockRoot,
-        'font-preview'
+      expect(mockBridge.setPreviewCss).toBeCalledWith(
+        '@import;\nh1 { font-family: Inter, sans-serif; }'
       );
     });
 
@@ -515,8 +525,8 @@ describe('actions', () => {
     it('removes the preview for an empty value', async () => {
       await actions.previewFontFamily({ state }, '');
 
-      expect(stylebotCss.removeCSSFromDocument).toBeCalledWith('font-preview');
-      expect(stylebotCss.injectRootIntoDocument).not.toBeCalled();
+      expect(mockBridge.setPreviewCss).toBeCalledWith(null);
+      expect(mockBridge.setPreviewCss).toBeCalledTimes(1);
     });
 
     it('drops a preview that was cleared while the font list was loading', async () => {
@@ -534,7 +544,9 @@ describe('actions', () => {
       resolveFonts([{ family: 'Inter', category: 'sans-serif' }]);
       await pending;
 
-      expect(stylebotCss.injectRootIntoDocument).not.toBeCalled();
+      // Only the clearing call reached the page; the stale preview did not.
+      expect(mockBridge.setPreviewCss).toBeCalledTimes(1);
+      expect(mockBridge.setPreviewCss).toBeCalledWith(null);
     });
 
     it('ignores text that is not valid css', async () => {
@@ -545,7 +557,7 @@ describe('actions', () => {
       await expect(
         actions.previewFontFamily({ state }, 'Lora }')
       ).resolves.toBeUndefined();
-      expect(stylebotCss.injectRootIntoDocument).not.toBeCalled();
+      expect(mockBridge.setPreviewCss).not.toBeCalled();
     });
   });
 });

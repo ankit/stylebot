@@ -14,6 +14,7 @@ import { t } from '@stylebot/i18n';
 import { ThemeProvider } from '@stylebot/components';
 import { installChrome } from './mocks/chrome';
 import { resetHoverSettled, setInteractionDelay } from './story-helpers';
+import { setPageBridge, LocalPageBridge } from '@stylebot/page-bridge';
 
 import '../src/fonts/fonts.css';
 import '../src/editor/index.scss';
@@ -23,6 +24,28 @@ Vue.use(Vuex);
 Vue.component('VueDraggableResizable', VueDraggableResizable);
 Vue.mixin({ methods: { t } });
 installChrome();
+
+// The canvas is the "page"; the bridge reads the mounted story's css like the
+// content script reads its store's.
+const mountedStoryCss = (): string => {
+  const app = document.querySelector<HTMLElement & { __vue__?: Vue }>(
+    '#storybook-root .stylebot-app'
+  );
+
+  return app?.__vue__?.$store?.state.css ?? '';
+};
+
+// One bridge per story, or highlighter overlays and listeners outlive it.
+let pageBridge: LocalPageBridge | null = null;
+
+const resetPageBridge = (): void => {
+  pageBridge?.stopInspecting();
+  pageBridge?.unhighlight();
+  pageBridge = new LocalPageBridge({ getStylebotCss: mountedStoryCss });
+  setPageBridge(pageBridge);
+};
+
+resetPageBridge();
 
 /* The Vue 2 renderer only pushes args into the mounted story on re-render,
    so a toolbar theme change has to remount for the decorator and seeded
@@ -139,6 +162,7 @@ const preview: Preview = {
       // sets it, so CI stays instant.
       setInteractionDelay(globals.speed === 'slow' ? 250 : 0);
       resetHoverSettled();
+      resetPageBridge();
 
       // Composites read their appearance from options, so the toolbar theme
       // flows through the shim as well as the outer ThemeProvider.

@@ -23,6 +23,7 @@
         :selector="item.value"
         :style-count="item.styleCount"
         @select="select"
+        @preview-end="previewActiveSelector"
       />
     </template>
   </s-autocomplete>
@@ -31,11 +32,11 @@
 <script lang="ts">
 import Vue from 'vue';
 import { SAutocomplete, SCountBadge } from '@stylebot/components';
-import { validateSelector, getDeclarationsForSelector } from '@stylebot/css';
-import { Highlighter } from '@stylebot/highlighter';
+import { getDeclarationsForSelector } from '@stylebot/css';
 import { CssDeclaration, StylebotEditingMode } from '@stylebot/types';
 
 import { CssSelectorMetadata } from '../../store';
+import { getPageBridge } from '@stylebot/page-bridge';
 import TheCssSelectorDropdownItem from './TheCssSelectorDropdownItem.vue';
 
 export default Vue.extend({
@@ -47,13 +48,8 @@ export default Vue.extend({
     TheCssSelectorDropdownItem,
   },
 
-  data(): {
-    highlighter: Highlighter | null;
-    focused: boolean;
-    openingSelector: string;
-  } {
+  data(): { focused: boolean; openingSelector: string } {
     return {
-      highlighter: null,
       focused: false,
       // The selector as it was when editing began; until it's changed, the
       // suggestions list everything rather than filtering by it.
@@ -105,18 +101,8 @@ export default Vue.extend({
     },
   },
 
-  created() {
-    this.highlighter = new Highlighter({
-      onSelect: () => {
-        return;
-      },
-      getStylebotDeclarations: this.getStylebotDeclarations,
-      getMountRoot: () => this.$root.$el as HTMLElement,
-    });
-  },
-
   beforeDestroy() {
-    this.highlighter?.unhighlight();
+    getPageBridge().unhighlight();
   },
 
   methods: {
@@ -140,21 +126,20 @@ export default Vue.extend({
 
     onBlur(): void {
       this.focused = false;
-      this.highlighter?.unhighlight();
+      getPageBridge().unhighlight();
     },
 
     previewActiveSelector(): void {
-      const selector = this.activeSelector.trim();
-
-      if (!selector) {
-        this.highlighter?.unhighlight();
+      if (!this.focused) {
         return;
       }
 
-      if (validateSelector(selector)) {
-        this.highlighter?.highlight(selector);
+      const selector = this.activeSelector.trim();
+
+      if (selector) {
+        getPageBridge().highlight(selector);
       } else {
-        this.highlighter?.unhighlight();
+        getPageBridge().unhighlight();
       }
     },
 

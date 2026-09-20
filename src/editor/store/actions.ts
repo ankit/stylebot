@@ -1,5 +1,5 @@
 import * as postcss from 'postcss';
-import { Commit, Dispatch, Store } from 'vuex';
+import { Commit, Dispatch } from 'vuex';
 
 import { State } from './';
 import storeGetters from './getters';
@@ -14,16 +14,12 @@ import {
   cleanGoogleWebFonts,
   getPrimaryFontFamily,
   googleWebFontExists,
-  injectRootIntoDocument,
-  removeCSSFromDocument,
   getCssAfterApplyingFilterEffectToPage,
   removeEmptyRules,
   removeRule,
 } from '@stylebot/css';
 
 import { loadGoogleFonts } from '@stylebot/google-fonts';
-
-import { applyReadability, removeReadability } from '@stylebot/readability';
 
 import {
   Style,
@@ -39,21 +35,16 @@ import {
   getAllOptions,
   setOption,
   setStyle,
-  getStylesForPage,
-  enableStyle,
   setReadability,
+  enableStyle,
   getCommands,
   getReadabilitySettings,
   setReadabilitySettings,
 } from '../utils/chrome';
 
-import { initListeners } from '../listeners';
-import { initEditor } from '../utils/init-editor';
-import { readCache, writeCache } from '../../inject-css/cache';
+import { getPageBridge } from '@stylebot/page-bridge';
 
 const RECENT_FONTS_LIMIT = 10;
-const FONT_PREVIEW_ID = 'font-preview';
-
 const isBundledGoogleFont = async (family: string): Promise<boolean> =>
   (await loadGoogleFonts()).some(font => font.family === family);
 
@@ -63,15 +54,7 @@ let fontRequest = 0;
 let previewRequest = 0;
 
 export default {
-  async initialize(
-    { commit, dispatch }: { commit: Commit; dispatch: Dispatch },
-    store: Store<State>
-  ): Promise<void> {
-    const { defaultStyle } = await getStylesForPage(false);
-    if (defaultStyle) {
-      dispatch('initializeDefaultStyle', defaultStyle);
-    }
-
+  async initialize({ commit }: { commit: Commit }): Promise<void> {
     const options = await getAllOptions();
     commit('setOptions', options);
 
@@ -80,8 +63,18 @@ export default {
 
     const readabilitySettings = await getReadabilitySettings();
     commit('setReadabilitySettings', readabilitySettings);
+  },
 
-    initListeners(store);
+  /**
+   * Re-reads the page facts the store mirrors; a page that can't answer
+   * (navigating away) keeps the last snapshot.
+   */
+  async refreshPage({ commit }: { commit: Commit }): Promise<void> {
+    try {
+      commit('setPage', await getPageBridge().getSnapshot());
+    } catch {
+      //
+    }
   },
 
   initializeDefaultStyle(
@@ -99,15 +92,21 @@ export default {
     commit('setSelectors', root);
   },
 
-  openStylebot(
+  async openStylebot(
     {
       state,
       commit,
+      dispatch,
       getters,
-    }: { state: State; commit: Commit; getters: Getters },
-    { inspect = false, store }: { inspect: boolean; store: Store<State> }
-  ): void {
-    initEditor(store);
+    }: {
+      state: State;
+      commit: Commit;
+      dispatch: Dispatch;
+      getters: Getters;
+    },
+    { inspect = false }: { inspect?: boolean } = {}
+  ): Promise<void> {
+    await dispatch('refreshPage');
 
     if (!state.enabled) {
       enableStyle(state.url);
@@ -218,32 +217,16 @@ export default {
   ): void {
     try {
       const root = postcss.parse(css);
-      injectRootIntoDocument(root, state.url);
+
+      getPageBridge().applyCss({
+        url: state.url,
+        css,
+        enabled: state.enabled,
+      });
+      setStyle(state.url, removeEmptyRules(css), state.readability);
 
       commit('setCss', css);
       commit('setSelectors', root);
-
-      // when saving, cleanup any empty rules
-      const cleanCss = removeEmptyRules(css);
-      setStyle(state.url, cleanCss, state.readability);
-
-      // Keep the localStorage cache (read synchronously on the next page
-      // load, before chrome.storage.local resolves) in sync with edits, so
-      // reloading right after a change doesn't flash the pre-edit CSS.
-      const cached = readCache();
-      if (cached) {
-        const entry = { url: state.url, css: cleanCss, enabled: state.enabled };
-        const exists = cached.styles.some(style => style.url === state.url);
-
-        writeCache({
-          ...cached,
-          styles: exists
-            ? cached.styles.map(style =>
-                style.url === state.url ? entry : style
-              )
-            : [...cached.styles, entry],
-        });
-      }
     } catch {
       //
     }
@@ -320,7 +303,7 @@ export default {
       dispatch('applyCss', { css });
     }
 
-    removeCSSFromDocument(FONT_PREVIEW_ID);
+    getPageBridge().setPreviewCss(null);
   },
 
   /**
@@ -338,7 +321,7 @@ export default {
     }
 
     if (!value) {
-      removeCSSFromDocument(FONT_PREVIEW_ID);
+      getPageBridge().setPreviewCss(null);
       return;
     }
 
@@ -355,21 +338,20 @@ export default {
 
     // Typed text may not be valid CSS; then there's nothing to preview.
     try {
-      injectRootIntoDocument(postcss.parse(css), FONT_PREVIEW_ID);
+      postcss.parse(css);
     } catch {
       return;
     }
+
+    getPageBridge().setPreviewCss(css);
   },
 
   applyReadability(
     { state, commit }: { state: State; commit: Commit },
     value: boolean
   ): void {
-    if (value) {
-      applyReadability(true);
-    } else {
-      removeReadability();
-    }
+    getPageBridge().applyReadability(value);
+    setReadability(state.url, value);
 
     // Editing page CSS has no effect while readability is running — its DOM
     // is detached from the document, not just hidden. Switch the panel to
@@ -380,14 +362,6 @@ export default {
     }
 
     commit('setReadability', value);
-    setReadability(state.url, value);
-
-    // Keep the localStorage cache in sync so a refresh right after
-    // toggling doesn't apply the stale readability state.
-    const cached = readCache();
-    if (cached) {
-      writeCache({ ...cached, readability: value });
-    }
   },
 
   setReadabilitySettings(
@@ -401,9 +375,11 @@ export default {
   applyFilter(
     {
       state,
+      commit,
       dispatch,
     }: {
       state: State;
+      commit: Commit;
       dispatch: Dispatch;
     },
     {
@@ -414,11 +390,21 @@ export default {
       percent: string;
     }
   ): void {
+    // Filters attach to body's current children: read them now where the
+    // page is at hand, else use the last snapshot and refresh for next time.
+    const fresh = getPageBridge().getSnapshotSync?.();
+    if (fresh) {
+      commit('setPage', fresh);
+    } else {
+      dispatch('refreshPage');
+    }
+
     dispatch('applyCss', {
       css: getCssAfterApplyingFilterEffectToPage(
         effectName,
         state.css,
-        percent
+        percent,
+        (fresh ?? state.page).bodyChildSelectors
       ),
     });
   },

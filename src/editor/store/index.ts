@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import Vuex from 'vuex';
+import Vuex, { Store } from 'vuex';
 
 import {
   StylebotOptions,
@@ -14,11 +14,19 @@ import {
   defaultReadabilitySettings,
 } from '@stylebot/settings';
 
+import { PageSnapshot, emptyPageSnapshot } from '@stylebot/page-bridge';
+
 import getters from './getters';
 import actions from './actions';
 import mutations from './mutations';
 
 Vue.use(Vuex);
+
+/**
+ * Where the editor UI lives: injected into the styled page itself, or in a
+ * separate extension window driving that page over a tab port.
+ */
+export type EditorHost = 'page' | 'window';
 
 export type CssSelectorMetadata = {
   id: number;
@@ -27,6 +35,9 @@ export type CssSelectorMetadata = {
 };
 
 export type State = {
+  host: EditorHost;
+  page: PageSnapshot;
+
   url: string;
   css: string;
   enabled: boolean;
@@ -48,30 +59,34 @@ export type State = {
   readabilitySettings: ReadabilitySettings;
 };
 
-export default new Vuex.Store<State>({
-  state: {
-    css: '',
-    enabled: true,
-    readability: false,
-    url: document.domain,
+export const createStore = (host: EditorHost): Store<State> =>
+  new Vuex.Store<State>({
+    state: {
+      host,
+      page: emptyPageSnapshot(),
 
-    selectors: [],
-    activeSelector: '',
-    contextMenuSelector: '',
+      css: '',
+      enabled: true,
+      readability: false,
+      url: '',
 
-    help: false,
-    visible: false,
-    inspecting: false,
-    resizing: false,
-    colorPickerVisible: false,
+      selectors: [],
+      activeSelector: '',
+      contextMenuSelector: '',
 
-    commands: null,
-    options: defaultOptions,
-    editorCommands: defaultEditorCommands,
-    readabilitySettings: defaultReadabilitySettings,
-  },
+      help: false,
+      visible: false,
+      inspecting: false,
+      resizing: false,
+      colorPickerVisible: false,
 
-  getters,
-  actions,
-  mutations,
-});
+      commands: null,
+      options: defaultOptions,
+      editorCommands: defaultEditorCommands,
+      readabilitySettings: defaultReadabilitySettings,
+    },
+
+    getters,
+    actions,
+    mutations,
+  });

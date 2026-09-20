@@ -1,4 +1,5 @@
 import { State } from '..';
+import { emptyPageSnapshot } from '@stylebot/page-bridge';
 
 import {
   defaultOptions,
@@ -8,6 +9,9 @@ import {
 } from '@stylebot/settings';
 
 const mockState: State = {
+  host: 'page',
+  page: { ...emptyPageSnapshot(), domain: document.domain },
+
   css: '',
   enabled: true,
   url: document.domain,
