@@ -23,3 +23,6 @@ export { default as IconKeyboard } from './IconKeyboard.vue';
 export { default as IconOptions } from './IconOptions.vue';
 export { default as IconToggle } from './IconToggle.vue';
 export { default as IconX } from './IconX.vue';
+export { default as DockLeftIcon } from './DockLeftIcon.vue';
+export { default as DockRightIcon } from './DockRightIcon.vue';
+export { default as UndockIcon } from './UndockIcon.vue';

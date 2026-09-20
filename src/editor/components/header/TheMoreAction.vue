@@ -10,15 +10,24 @@
 
     <template #default="{ close }">
       <s-menu dense class="more-menu">
-        <s-segmented-control
-          class="dock-toggle"
-          :value="layout.dockLocation"
-          :options="dockOptions"
-          @change="
-            dock($event);
-            close();
-          "
-        />
+        <div class="dock-row">
+          <s-text>{{ t('dock_side') }}</s-text>
+
+          <s-segmented-control
+            fit
+            class="dock-toggle"
+            :value="layout.dockLocation"
+            :options="dockOptions"
+            @change="
+              dock($event);
+              close();
+            "
+          >
+            <template #option="{ option }">
+              <component :is="option.icon" :size="16" />
+            </template>
+          </s-segmented-control>
+        </div>
 
         <div v-if="host === 'page'" class="push-page-row">
           <div class="push-page-copy">
@@ -77,7 +86,13 @@ import {
   SSegmentedControl,
   SText,
 } from '@stylebot/components';
-import { MoreIcon, ExternalLinkIcon } from '@stylebot/icons';
+import {
+  MoreIcon,
+  ExternalLinkIcon,
+  DockLeftIcon,
+  DockRightIcon,
+  UndockIcon,
+} from '@stylebot/icons';
 
 import { StylebotEditorCommands, StylebotLayout } from '@stylebot/types';
 
@@ -97,6 +112,9 @@ export default Vue.extend({
     SText,
     MoreIcon,
     ExternalLinkIcon,
+    DockLeftIcon,
+    DockRightIcon,
+    UndockIcon,
   },
 
   computed: {
@@ -113,29 +131,29 @@ export default Vue.extend({
     },
 
     dockOptions(): Array<{
-      value: string;
-      label: string;
+      value: StylebotLayout['dockLocation'];
+      icon: string;
       title: string;
       shortcut: string;
     }> {
       return [
         {
+          value: 'window',
+          icon: 'undock-icon',
+          title: this.t('open_in_separate_window'),
+          shortcut: this.editorCommands.dockWindow,
+        },
+        {
           value: 'left',
-          label: this.t('left'),
+          icon: 'dock-left-icon',
           title: this.t('dock_to_left'),
           shortcut: this.editorCommands.dockLeft,
         },
         {
           value: 'right',
-          label: this.t('right'),
+          icon: 'dock-right-icon',
           title: this.t('dock_to_right'),
           shortcut: this.editorCommands.dockRight,
-        },
-        {
-          value: 'window',
-          label: this.t('window'),
-          title: this.t('open_in_separate_window'),
-          shortcut: this.editorCommands.dockWindow,
         },
       ];
     },
@@ -176,8 +194,23 @@ export default Vue.extend({
   gap: 0 !important;
 }
 
-.dock-toggle {
-  margin: 0 8px;
+.dock-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 8px;
+}
+
+.dock-toggle ::v-deep .segment {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+
+  &.active svg {
+    stroke-width: 1.5;
+  }
 }
 
 .push-page-row {
