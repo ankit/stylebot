@@ -1,15 +1,9 @@
 import './listeners';
 
 import ContextMenu from './contextmenu';
-import DefaultShortcutUpdate from './default-shortcut-update';
-import StylesMetadataUpdate from './styles-metadata-update';
-import StylesModifiedTimeUpdate from './styles-modified-time-update';
+import { runMigrations } from './migrations';
 
-(async () => {
-  await DefaultShortcutUpdate();
-  await StylesMetadataUpdate();
-  await StylesModifiedTimeUpdate();
-})();
+runMigrations();
 
 chrome.runtime.setUninstallURL('https://stylebot.dev/goodbye');
 chrome.action.setBadgeBackgroundColor({
