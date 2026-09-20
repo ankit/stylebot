@@ -4,6 +4,7 @@ import type { Store } from 'vuex';
 import type { StoryObj } from '@storybook/vue';
 import { expect, userEvent, waitFor, within } from '@storybook/test';
 
+import { getDeclarationsForSelector } from '@stylebot/css';
 import type { State } from '../src/editor/store';
 
 type Components = Record<string, Component>;
@@ -143,6 +144,28 @@ export const openEditorMenu = async (
   await userEvent.click(canvas.getByRole('button', { name }));
   return findOpenMenu(canvas);
 };
+
+/**
+ * The value a selector's rule sets for a property in the seeded style, or
+ * undefined when the rule has no such declaration.
+ */
+export const declaration = (
+  store: Store<State>,
+  selector: string,
+  property: string
+): string | undefined =>
+  getDeclarationsForSelector(store.state.css, selector)?.find(
+    decl => decl.property === property
+  )?.value;
+
+/**
+ * The control column of a basic-mode property row, found by its label.
+ */
+export const propertyControl = (canvas: Canvas, label: string): HTMLElement =>
+  canvas
+    .getByText(label, { selector: '.property-row-label' })
+    .closest('.property-row')
+    ?.querySelector('.property-row-control') as HTMLElement;
 
 export const propertyCard = (canvas: Canvas, label: string): HTMLElement =>
   canvas

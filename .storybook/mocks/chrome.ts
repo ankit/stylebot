@@ -74,10 +74,15 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
     active: true,
     url: overrides.tabUrl ?? 'https://example.com/article',
   };
+  let recentColors = overrides.recentColors ?? [];
 
   const runtimeResponses: Record<
     string,
-    (message: { name: string; optionName?: keyof StylebotOptions }) => unknown
+    (message: {
+      name: string;
+      optionName?: keyof StylebotOptions;
+      color?: string;
+    }) => unknown
   > = {
     GetStylesForPage: () => ({
       styles: overrides.styles ?? [],
@@ -88,8 +93,16 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
       message.optionName ? options[message.optionName] : undefined,
     GetAllOptions: () => options,
     GetReadabilitySettings: () => readabilitySettings,
-    GetRecentColors: () => overrides.recentColors ?? [],
-    AddRecentColor: () => overrides.recentColors ?? [],
+    GetRecentColors: () => recentColors,
+    // Mirrors the background's history: newest first, no duplicates, eight
+    // at most.
+    AddRecentColor: ({ color = '' }) => {
+      recentColors = [
+        color,
+        ...recentColors.filter(c => c.toLowerCase() !== color.toLowerCase()),
+      ].slice(0, 8);
+      return recentColors;
+    },
   };
 
   const tabResponses: Record<string, () => unknown> = {

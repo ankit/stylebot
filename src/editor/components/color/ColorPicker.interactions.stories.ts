@@ -1,0 +1,192 @@
+import type { Meta } from '@storybook/vue';
+import { expect, fireEvent, userEvent, waitFor, within } from '@storybook/test';
+
+import ColorPicker from './ColorPicker.vue';
+import { editor, RULE_CSS } from '@stylebot/storybook/editor-story';
+import {
+  cardCollapse,
+  declaration,
+  findOpenMenu,
+  pressKey,
+  propertyCard,
+  propertyControl,
+  storeOf,
+} from '@stylebot/storybook/story-helpers';
+
+const meta: Meta = {
+  title: 'Editor/Interactions/Color picker',
+  component: ColorPicker,
+  parameters: { padded: false },
+};
+
+export default meta;
+
+type Canvas = ReturnType<typeof within>;
+
+const withRule = { css: RULE_CSS, activeSelector: 'h1' };
+// The pick-an-element state: the panel is enabled but nothing is styled yet.
+const noRule = { activeSelector: 'h1' };
+
+// Both the Text and Background cards label their row "Color", so a picker
+// goes by its card.
+const picker = (canvas: Canvas, card: string) =>
+  propertyControl(within(propertyCard(canvas, card)), 'Color');
+const hexField = (canvas: Canvas, card: string) =>
+  picker(canvas, card).querySelector('.color-hex') as HTMLInputElement;
+const swatch = (canvas: Canvas, card: string) =>
+  picker(canvas, card).querySelector('.color-swatch') as HTMLElement;
+const popover = (root: HTMLElement) =>
+  root.querySelector('.color-picker-popover') as HTMLElement | null;
+
+const openPopover = async (
+  canvas: Canvas,
+  root: HTMLElement,
+  label: string
+) => {
+  await userEvent.click(swatch(canvas, label));
+  return waitFor(() => {
+    const el = popover(root);
+    expect(el).toBeVisible();
+    return el as HTMLElement;
+  });
+};
+
+export const HexFieldApplies = editor(withRule, {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+
+    const color = hexField(canvas, 'Text');
+    await expect(color).toHaveValue('#2a5fd6');
+    await userEvent.type(color, '#112233');
+    await expect(declaration(store, 'h1', 'color')).toBe('#112233');
+
+    // Background is collapsed for a rule without one; open it first.
+    await userEvent.click(
+      propertyCard(canvas, 'Background').querySelector(
+        '.property-card-header'
+      ) as HTMLElement
+    );
+    await waitFor(() =>
+      expect(cardCollapse(canvas, 'Background')).not.toHaveClass('collapsed')
+    );
+    await userEvent.type(hexField(canvas, 'Background'), '#fafafa');
+    await expect(declaration(store, 'h1', 'background-color')).toBe('#fafafa');
+  },
+});
+
+export const PopoverTabsFollowRule = editor(noRule, {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+
+    let panel = await openPopover(canvas, canvasElement, 'Text');
+    const firstTab = () => panel.querySelector('.tabs .tab') as HTMLElement;
+
+    // No Stylebot rule exists for this site yet, so the first tab falls
+    // back to the live page's own colors rather than showing empty.
+    await expect(firstTab()).toHaveTextContent('Page colors');
+    await expect(firstTab()).toHaveClass('active');
+    await expect(panel.querySelector('.first-tab .swatch')).toBeVisible();
+
+    // The shared footer field (present on every tab) applies a real
+    // declaration, which is also what makes the tab flip over. Set in one
+    // go, as a paste would: typing it out would apply the partial hexes.
+    const valueField = panel.querySelector('.value-field') as HTMLInputElement;
+    valueField.focus();
+    await fireEvent.input(valueField, { target: { value: '#112233' } });
+    valueField.blur();
+    await expect(declaration(store, 'h1', 'color')).toBe('#112233');
+
+    await userEvent.click(swatch(canvas, 'Text'));
+    await waitFor(() => expect(popover(canvasElement)).toBeNull());
+    panel = await openPopover(canvas, canvasElement, 'Text');
+
+    await expect(firstTab()).toHaveTextContent('Your colors');
+    await expect(
+      panel.querySelector('.used-colors .swatch[style*="17, 34, 51"]')
+    ).toBeVisible();
+
+    // The color the popover closed on is recorded as recent, shown in this
+    // same tab rather than under Custom.
+    await expect(panel.querySelector('.recent-section')).toBeVisible();
+    await expect(
+      panel.querySelector('.recent-section .swatch[style*="17, 34, 51"]')
+    ).toBeVisible();
+  },
+});
+
+export const PaletteSearchChevron = editor(noRule, {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const panel = await openPopover(canvas, canvasElement, 'Text');
+
+    await userEvent.click(within(panel).getByRole('tab', { name: 'Palette' }));
+    const search = await waitFor(() => {
+      const el = panel.querySelector('.palette-search') as HTMLElement;
+      expect(el).toBeInTheDocument();
+      return el;
+    });
+    const input = search.querySelector(
+      '.autocomplete-input'
+    ) as HTMLTextAreaElement;
+    const activeLabel = input.value;
+
+    // Escape on an open list restores the active palette's name...
+    await userEvent.clear(input);
+    await userEvent.keyboard(activeLabel.slice(0, 3));
+    await findOpenMenu(within(panel));
+    await pressKey('Escape');
+    await waitFor(() => expect(input).toHaveValue(activeLabel));
+
+    // ...and a query that matches nothing closes the list, but the chevron
+    // still lists every palette without touching the text.
+    await userEvent.clear(input);
+    await userEvent.keyboard('zzz');
+    await waitFor(() => expect(within(panel).queryByRole('menu')).toBeNull());
+
+    await userEvent.click(
+      search.querySelector('.autocomplete-chevron') as Element
+    );
+    await findOpenMenu(within(panel));
+    await expect(input).toHaveValue('zzz');
+    await expect(within(panel).getAllByRole('menuitem').length).toBeGreaterThan(
+      1
+    );
+  },
+});
+
+export const EscapeClosesPopoverNotEditor = editor(withRule, {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+
+    await openPopover(canvas, canvasElement, 'Text');
+    await expect(store.state.colorPickerVisible).toBe(true);
+
+    await pressKey('Escape');
+
+    await waitFor(() => expect(popover(canvasElement)).toBeNull());
+    await expect(store.state.colorPickerVisible).toBe(false);
+    await expect(
+      canvasElement.querySelector('.stylebot-content')
+    ).toBeInTheDocument();
+  },
+});
+
+/* While a popover is open the rest of the body ignores the pointer, so a
+   stray click can't edit another property behind it. */
+export const OpenPopoverBlocksBody = editor(withRule, {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const body = canvasElement.querySelector('.stylebot-body') as HTMLElement;
+
+    await expect(body.style.pointerEvents).toBe('');
+
+    await openPopover(canvas, canvasElement, 'Text');
+    await waitFor(() => expect(body.style.pointerEvents).toBe('none'));
+
+    await pressKey('Escape');
+    await waitFor(() => expect(body.style.pointerEvents).toBe(''));
+  },
+});
