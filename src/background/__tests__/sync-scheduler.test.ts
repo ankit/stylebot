@@ -68,7 +68,7 @@ describe('scheduleSyncAfterEdit', () => {
     expect(chrome.alarms.create).toBeCalledTimes(2);
     expect(chrome.alarms.create).toBeCalledWith(
       'google-drive-sync-after-edit',
-      { when: 1_060_000 }
+      { when: 1_030_000 }
     );
   });
 

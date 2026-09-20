@@ -67,6 +67,10 @@ export default Vue.extend({
   --danger: #f2726a;
   --danger-background: #3a2220;
   --danger-border: #4a2b28;
+
+  --success: #7fd3a5;
+  --success-background: #1e3129;
+  --success-border: #2f4d3e;
 }
 
 .theme-provider {
@@ -113,6 +117,10 @@ export default Vue.extend({
   --danger: #b3261e;
   --danger-background: #fdf1f0;
   --danger-border: #f6cfcb;
+
+  --success: #1a7f4b;
+  --success-background: #e8f5ee;
+  --success-border: #c3e6d1;
 
   --ring: var(--accent);
 

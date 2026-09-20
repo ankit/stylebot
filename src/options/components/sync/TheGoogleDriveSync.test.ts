@@ -33,7 +33,10 @@ describe('TheGoogleDriveSync.vue', () => {
       syncInProgress: false,
     });
 
+    expect(wrapper.text()).toContain('sync_disconnected_title');
     expect(wrapper.text()).toContain('sync_not_connected');
+    expect(wrapper.text()).toContain('sync_google_drive_description');
+    expect(wrapper.find('button.primary').text()).toBe('sync_connect');
   });
 
   it('renders without throwing when the stored timestamp is unparseable', () => {
@@ -43,9 +46,9 @@ describe('TheGoogleDriveSync.vue', () => {
       syncInProgress: false,
     });
 
-    // The heading proves the render completed rather than bailing out on a
+    // The title proves the render completed rather than bailing out on a
     // RangeError from date-fns, which is what the unguarded format did.
-    expect(wrapper.text()).toContain('google_drive');
+    expect(wrapper.text()).toContain('sync_connected_title');
     expect(wrapper.text()).not.toContain('Invalid Date');
     expect(wrapper.text()).not.toContain('synced_at_time');
   });
@@ -57,7 +60,7 @@ describe('TheGoogleDriveSync.vue', () => {
       syncInProgress: false,
     });
 
-    expect(wrapper.text()).toContain('google_drive');
+    expect(wrapper.text()).toContain('sync_connected_title');
     expect(wrapper.text()).not.toContain('Invalid Date');
   });
 
@@ -71,22 +74,7 @@ describe('TheGoogleDriveSync.vue', () => {
     expect(wrapper.text()).toContain('synced_at_time');
   });
 
-  it('shows the view and download links from the stored metadata', () => {
-    const wrapper = mountCard({
-      googleDriveSyncEnabled: true,
-      googleDriveSyncState: syncState(new Date().toISOString()),
-      syncInProgress: false,
-    });
-
-    const hrefs = wrapper.findAll('a').wrappers.map(a => a.attributes('href'));
-    expect(hrefs).toEqual([
-      'https://drive.google.com/view',
-      'https://drive.google.com/download',
-    ]);
-    expect(wrapper.find('a').text()).toBe('stylebot/stylebot_v3_backup.json');
-  });
-
-  it('names the account the backup is saved to, when known', () => {
+  it('links the backup path to the file on Drive, after the account it lives in', () => {
     const wrapper = mountCard({
       googleDriveSyncEnabled: true,
       googleDriveSyncState: {
@@ -96,17 +84,21 @@ describe('TheGoogleDriveSync.vue', () => {
       syncInProgress: false,
     });
 
-    expect(wrapper.text()).toContain('me@example.com ›');
+    const link = wrapper.find('a.path');
+    expect(link.attributes('href')).toBe('https://drive.google.com/view');
+    expect(link.text()).toContain('stylebot/stylebot_v3_backup.json');
+    expect(wrapper.text()).toContain('me@example.com');
   });
 
-  it('says where the backup will live before sync is turned on', () => {
+  it('shows the path without a link or account when neither is known yet', () => {
     const wrapper = mountCard({
-      googleDriveSyncEnabled: false,
+      googleDriveSyncEnabled: true,
       googleDriveSyncState: undefined,
       syncInProgress: false,
     });
 
-    expect(wrapper.text()).toContain('sync_drive_location');
+    expect(wrapper.find('a.path').exists()).toBe(false);
+    expect(wrapper.text()).toContain('stylebot/stylebot_v3_backup.json');
   });
 
   it('disables Sync Now while a sync is already running', () => {
@@ -119,20 +111,21 @@ describe('TheGoogleDriveSync.vue', () => {
     expect(wrapper.find('button[disabled]').exists()).toBe(true);
   });
 
-  it('mentions the auto-sync cadence, or the sign-in that is needed instead', () => {
+  it('states the schedule, and flags a pending sign-in in place of the synced pill', () => {
     const enabled = {
       googleDriveSyncEnabled: true,
       googleDriveSyncState: syncState(new Date().toISOString()),
       syncInProgress: false,
     };
 
-    const auto = mountCard({ ...enabled, googleDriveSyncNeedsAuth: false });
-    expect(auto.text()).toContain('sync_auto_caption');
-    expect(auto.text()).not.toContain('sync_needs_sign_in');
+    const synced = mountCard({ ...enabled, googleDriveSyncNeedsAuth: false });
+    expect(synced.text()).toContain('sync_schedule_value');
+    expect(synced.text()).toContain('synced_at_time');
+    expect(synced.text()).not.toContain('sync_needs_sign_in');
 
     const signIn = mountCard({ ...enabled, googleDriveSyncNeedsAuth: true });
     expect(signIn.text()).toContain('sync_needs_sign_in');
-    expect(signIn.text()).not.toContain('sync_auto_caption');
+    expect(signIn.text()).not.toContain('synced_at_time');
   });
 
   it('lists conflicts with a way to open the style and to dismiss it', async () => {

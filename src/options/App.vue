@@ -71,6 +71,25 @@ export default Vue.extend({
     this.$store.dispatch('getAllOptions');
     this.$store.dispatch('getCommands');
     this.$store.dispatch('getGoogleDriveSyncMetadata');
+
+    // Scheduled syncs run in the background while this page is open: re-read
+    // what they change so "Synced … ago" and the styles list stay true.
+    chrome.storage.onChanged.addListener((changes, area) => {
+      if (area !== 'local') {
+        return;
+      }
+
+      if (
+        'google-drive-sync-state' in changes ||
+        'google-drive-sync-needs-auth' in changes
+      ) {
+        this.$store.dispatch('getGoogleDriveSyncMetadata');
+      }
+
+      if ('styles' in changes) {
+        this.$store.dispatch('getAllStyles');
+      }
+    });
   },
 
   methods: {

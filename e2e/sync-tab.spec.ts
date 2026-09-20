@@ -50,15 +50,13 @@ test.describe('Sync tab', () => {
     });
 
     await expect(
-      page.getByText('Not connected. Styles stay on this computer only.')
+      page.getByText('Not connected', { exact: true })
     ).toBeVisible();
     await expect(
-      page.getByText(
-        /creates a single file, stylebot\/stylebot_v3_backup\.json/
-      )
+      page.getByText(/Saves stylebot_v3_backup\.json to your Drive/)
     ).toBeVisible();
     await expect(
-      page.getByRole('button', { name: 'Enable Google Drive Sync' })
+      page.getByRole('button', { name: 'Connect', exact: true })
     ).toBeVisible();
   });
 
@@ -78,14 +76,12 @@ test.describe('Sync tab', () => {
       'google-drive-sync-state': syncState('not-a-date'),
     });
 
+    await expect(page.getByText('Connected to Google Drive')).toBeVisible();
     await expect(
-      page.getByRole('heading', { name: 'Google Drive' })
+      page.getByRole('button', { name: 'Disconnect' })
     ).toBeVisible();
     await expect(
-      page.getByRole('button', { name: 'Disable Google Drive Sync' })
-    ).toBeVisible();
-    await expect(
-      page.getByRole('link', { name: 'stylebot/stylebot_v3_backup.json' })
+      page.getByRole('link', { name: /stylebot\/stylebot_v3_backup\.json/ })
     ).toBeVisible();
     await expect(page.getByText('Invalid Date')).toHaveCount(0);
     expect(pageErrors).toEqual([]);
@@ -122,15 +118,14 @@ test.describe('Sync tab', () => {
     });
 
     await page
-      .getByRole('button', { name: 'Enable Google Drive Sync' })
+      .getByRole('button', { name: 'Connect', exact: true })
       .dispatchEvent('click');
 
     await expect(
-      page.getByRole('button', { name: 'Disable Google Drive Sync' })
+      page.getByRole('button', { name: 'Disconnect' })
     ).toBeVisible();
-    await expect(
-      page.getByRole('button', { name: 'Syncing...' })
-    ).toBeDisabled();
+    await expect(page.getByRole('button', { name: 'Sync now' })).toBeDisabled();
+    await expect(page.getByText('Syncing...')).toBeVisible();
 
     await expect
       .poll(
@@ -161,16 +156,40 @@ test.describe('Sync tab', () => {
     });
 
     await page
-      .getByRole('button', { name: 'Disable Google Drive Sync' })
+      .getByRole('button', { name: 'Disconnect' })
       .dispatchEvent('click');
 
     await expect(
-      page.getByRole('button', { name: 'Enable Google Drive Sync' })
+      page.getByRole('button', { name: 'Connect', exact: true })
     ).toBeVisible();
 
     await expect
       .poll(async () => Object.keys(await readStorage(page, keys)))
       .toEqual([]);
+  });
+
+  test('updates the synced-at line when a background sync writes new state', async ({
+    context,
+    extension,
+  }) => {
+    const page = await context.newPage();
+
+    await openSyncTab(page, extension, {
+      'google-drive-sync-enabled': true,
+      'google-drive-sync-state': syncState(
+        new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString()
+      ),
+    });
+
+    await expect(page.getByText(/Synced about 3 hours ago/)).toBeVisible();
+
+    // What a scheduled run does from the service worker while the page is open.
+    await page.evaluate(
+      state => chrome.storage.local.set({ 'google-drive-sync-state': state }),
+      syncState(new Date().toISOString())
+    );
+
+    await expect(page.getByText(/Synced less than a minute ago/)).toBeVisible();
   });
 
   test('asks for a sign-in when a scheduled sync could not get a token', async ({
@@ -188,7 +207,7 @@ test.describe('Sync tab', () => {
     await expect(
       page.getByText('Sign in to Google Drive to resume syncing.')
     ).toBeVisible();
-    await expect(page.getByText(/Syncs every \d+ minutes/)).toHaveCount(0);
+    await expect(page.getByText(/Synced .* ago/)).toHaveCount(0);
   });
 
   test('lists merge conflicts, opens the style to review, and dismisses it', async ({

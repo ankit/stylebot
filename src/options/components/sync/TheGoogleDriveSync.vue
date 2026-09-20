@@ -1,85 +1,104 @@
 <template>
   <div>
     <div class="card">
-      <div class="text">
-        <heading as="h2" size="sm">{{ t('google_drive') }}</heading>
+      <div class="header">
+        <div class="status">
+          <span class="title">
+            {{
+              googleDriveSyncEnabled
+                ? t('sync_connected_title')
+                : t('sync_disconnected_title')
+            }}
+          </span>
 
-        <s-text
-          v-if="!googleDriveSyncEnabled"
-          size="caption"
-          variant="muted"
-          class="description"
+          <template v-if="googleDriveSyncEnabled">
+            <span v-if="needsAuth" class="pill danger">
+              {{ t('sync_needs_sign_in') }}
+            </span>
+            <span v-else-if="syncInProgress" class="pill muted">
+              <arrow-repeat-icon :size="12" spinning />
+              {{ t('sync_in_progress') }}
+            </span>
+            <span v-else-if="googleDriveSyncLastModifiedTime" class="pill ok">
+              <span class="dot" />
+              {{ t('synced_at_time', [googleDriveSyncLastModifiedTime]) }}
+            </span>
+          </template>
+
+          <span v-else class="subtitle">{{ t('sync_not_connected') }}</span>
+        </div>
+
+        <s-button
+          v-if="googleDriveSyncEnabled"
+          :disabled="syncInProgress"
+          @click="syncWithGoogleDrive"
         >
-          {{ t('sync_not_connected') }}
-          {{ t('sync_drive_location', [syncFilePath]) }}
-        </s-text>
+          <arrow-repeat-icon :size="15" :spinning="syncInProgress" />
+          <span>{{ t('sync_now') }}</span>
+        </s-button>
+      </div>
 
-        <s-text v-else size="caption" variant="muted" class="description">
-          <template v-if="googleDriveSyncLastModifiedTime">
-            {{ t('synced_at_time', [googleDriveSyncLastModifiedTime]) }}
-          </template>
-          <template v-if="syncInProgress">
-            · {{ t('sync_in_progress') }}
-          </template>
-          <template v-if="googleDriveSyncViewLink">
-            ·
-            <template v-if="account">{{ account.email }} ›</template>
+      <dl v-if="googleDriveSyncEnabled" class="rows">
+        <div class="row">
+          <dt>{{ t('sync_saved_to') }}</dt>
+          <dd class="saved-to">
+            <template v-if="account">
+              <span>{{ account.email }}</span>
+              <span class="separator">›</span>
+            </template>
             <a
+              v-if="googleDriveSyncViewLink"
+              class="path"
               :href="googleDriveSyncViewLink"
-              :title="t('view_synced_file')"
+              :title="t('sync_open_in_drive')"
               target="_blank"
             >
               {{ syncFilePath }}
+              <svg
+                class="external"
+                viewBox="0 0 12 12"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M4.5 2.5h5v5" />
+                <path d="M9.5 2.5 3 9" />
+              </svg>
             </a>
-            ·
-            <a :href="googleDriveSyncDownloadLink" target="_blank">
-              {{ t('download_synced_file') }}
-            </a>
-          </template>
-        </s-text>
+            <span v-else class="path">{{ syncFilePath }}</span>
+          </dd>
 
-        <s-text
-          v-if="googleDriveSyncEnabled && needsAuth"
-          size="caption"
-          class="description needs-auth"
-        >
-          {{ t('sync_needs_sign_in') }}
-        </s-text>
+          <button
+            type="button"
+            class="link-button"
+            @click="googleDriveSyncEnabled = false"
+          >
+            {{ t('sync_disconnect') }}
+          </button>
+        </div>
 
-        <s-text
-          v-else-if="googleDriveSyncEnabled"
-          size="caption"
-          variant="muted"
-          class="description"
-        >
-          {{ t('sync_auto_caption', [String(syncPeriodMinutes)]) }}
-        </s-text>
-      </div>
+        <div class="row">
+          <dt>{{ t('sync_schedule') }}</dt>
+          <dd>{{ t('sync_schedule_value', [String(syncPeriodMinutes)]) }}</dd>
+        </div>
+      </dl>
 
-      <s-button
-        v-if="googleDriveSyncEnabled"
-        :disabled="syncInProgress"
-        @click="syncWithGoogleDrive"
-      >
-        <arrow-repeat-icon :spinning="syncInProgress" />
-        <span>
-          {{ syncInProgress ? t('sync_in_progress') : t('sync_now') }}
-        </span>
-      </s-button>
-
-      <s-button
-        v-if="googleDriveSyncEnabled"
-        @click="googleDriveSyncEnabled = false"
-      >
-        {{ t('disable_google_drive_sync') }}
-      </s-button>
-
-      <s-button
-        v-if="!googleDriveSyncEnabled"
-        @click="googleDriveSyncEnabled = true"
-      >
-        {{ t('enable_google_drive_sync') }}
-      </s-button>
+      <ul v-else class="services">
+        <li class="service">
+          <div class="service-text">
+            <div class="service-name">{{ t('google_drive') }}</div>
+            <div class="service-description">
+              {{ t('sync_google_drive_description', [syncFileName]) }}
+            </div>
+          </div>
+          <s-button variant="primary" @click="googleDriveSyncEnabled = true">
+            {{ t('sync_connect') }}
+          </s-button>
+        </li>
+      </ul>
     </div>
 
     <div v-if="conflicts.length" class="conflicts">
@@ -110,7 +129,10 @@ import { ArrowRepeatIcon } from '@stylebot/icons';
 import { SyncAccount, SyncConflict } from '@stylebot/types';
 import { formatSyncTime } from '@stylebot/utils';
 import { SYNC_PERIOD_MINUTES } from '../../../background/sync-scheduler';
-import { SYNC_FILE_PATH } from '../../../sync/google-drive/constants';
+import {
+  SYNC_FILE_PATH,
+  SYNC_FILE_NAME,
+} from '../../../sync/google-drive/constants';
 
 export default Vue.extend({
   name: 'TheGoogleDriveSync',
@@ -122,10 +144,15 @@ export default Vue.extend({
     SText,
   },
 
-  data(): { syncPeriodMinutes: number; syncFilePath: string } {
+  data(): {
+    syncPeriodMinutes: number;
+    syncFilePath: string;
+    syncFileName: string;
+  } {
     return {
       syncPeriodMinutes: SYNC_PERIOD_MINUTES,
       syncFilePath: SYNC_FILE_PATH,
+      syncFileName: SYNC_FILE_NAME,
     };
   },
 
@@ -142,6 +169,10 @@ export default Vue.extend({
       return this.$store.state.googleDriveSyncState?.conflicts ?? [];
     },
 
+    account(): SyncAccount | undefined {
+      return this.$store.state.googleDriveSyncState?.account;
+    },
+
     googleDriveSyncEnabled: {
       get(): boolean {
         return this.$store.state.googleDriveSyncEnabled;
@@ -152,18 +183,8 @@ export default Vue.extend({
       },
     },
 
-    account(): SyncAccount | undefined {
-      return this.$store.state.googleDriveSyncState?.account;
-    },
-
     googleDriveSyncViewLink(): string {
       return this.$store.state.googleDriveSyncState?.metadata.webViewLink ?? '';
-    },
-
-    googleDriveSyncDownloadLink(): string {
-      return (
-        this.$store.state.googleDriveSyncState?.metadata.webContentLink ?? ''
-      );
     },
 
     // lastSyncedAt, not the file's modifiedTime: the latter is Drive's revision
@@ -189,34 +210,195 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .card {
+  margin-top: 20px;
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.header {
   display: flex;
   align-items: center;
   gap: 14px;
-  margin-top: 16px;
-  padding: 14px;
-  border: 1px solid var(--panel-border);
-  border-radius: 10px;
+  padding: 14px 18px;
+  background: var(--hover-tint);
+  border-bottom: 1px solid var(--panel-border);
 }
 
-.text {
+.status {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px 10px;
+}
+
+.title {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.subtitle {
+  flex-basis: 100%;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+.services {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.service {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 18px;
+}
+
+.service-text {
   flex: 1;
   min-width: 0;
 }
 
-.description {
-  margin-top: 2px;
+.service-name {
+  font-size: 14px;
+  font-weight: 600;
 }
 
-.needs-auth {
+.service-description {
+  margin-top: 2px;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--panel-border);
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.pill.ok {
+  color: var(--success);
+  background: var(--success-background);
+  border-color: var(--success-border);
+}
+
+.pill.danger {
   color: var(--danger);
+  background: var(--danger-background);
+  border-color: var(--danger-border);
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+  background: currentColor;
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 16px 18px;
+}
+
+.row {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+
+  dt {
+    flex: none;
+    width: 110px;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  dd {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    font-size: 13.5px;
+    line-height: 1.45;
+  }
+}
+
+.saved-to {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+}
+
+.separator {
+  color: var(--text-muted);
+}
+
+.path {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--accent);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.external {
+  width: 11px;
+  height: 11px;
+}
+
+.link-button {
+  flex: none;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--accent);
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
+}
+
+.description {
+  margin-top: 3px;
 }
 
 .conflicts {
   margin-top: 16px;
-  padding: 14px;
+  padding: 14px 18px;
   background: var(--info);
   border: 1px solid var(--info-border);
-  border-radius: 10px;
+  border-radius: 12px;
 }
 
 .conflict-list {
