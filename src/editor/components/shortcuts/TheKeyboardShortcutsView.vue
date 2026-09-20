@@ -109,8 +109,10 @@ import {
 } from '@stylebot/components';
 import { ChevronLeftIcon } from '@stylebot/icons';
 import type { StylebotCommands, StylebotEditorCommands } from '@stylebot/types';
+import { isMac } from '@stylebot/utils';
 
 import { openOptionsPage } from '../../utils/chrome';
+import { undoShortcuts } from '../../store/undo-stack';
 
 type ShortcutRow = { label: string; keys: Array<string> };
 
@@ -149,10 +151,16 @@ export default Vue.extend({
     },
 
     panelRows(): Array<ShortcutRow> {
+      const undo = undoShortcuts(this.mac ?? isMac());
+
       const rows: Array<ShortcutRow> = [
         {
           label: this.t('toggle_inspector'),
           keys: [this.editorCommands.inspect],
+        },
+        {
+          label: this.t('undo_redo'),
+          keys: [undo.undo, undo.redo],
         },
         {
           label: this.t('hide_selected_element'),

@@ -80,8 +80,134 @@ describe('actions', () => {
         mockState.readability,
         true
       );
-      expect(mockCommit).toHaveBeenNthCalledWith(1, 'setCss', css);
-      expect(mockCommit).toHaveBeenNthCalledWith(2, 'setSelectors', mockRoot);
+      expect(mockCommit).toHaveBeenNthCalledWith(1, 'setUndoStack', {
+        past: [{ css: mockState.css, source: 'edit', at: expect.any(Number) }],
+        future: [],
+      });
+      expect(mockCommit).toHaveBeenNthCalledWith(2, 'setCss', css);
+      expect(mockCommit).toHaveBeenNthCalledWith(3, 'setSelectors', mockRoot);
+    });
+
+    it('records the css it replaces under the given source', () => {
+      const state = { ...mockState, css: 'before' };
+
+      actions.applyCss(
+        { commit: mockCommit, state },
+        { css: 'after', source: 'code' }
+      );
+
+      expect(mockCommit).toBeCalledWith('setUndoStack', {
+        past: [{ css: 'before', source: 'code', at: expect.any(Number) }],
+        future: [],
+      });
+    });
+
+    it('extends the latest step when the same source changes the css again right away', () => {
+      const undoStack = {
+        past: [{ css: 'first', source: 'code', at: Date.now() }],
+        future: [],
+      };
+      const state = { ...mockState, css: 'before', undoStack };
+
+      actions.applyCss(
+        { commit: mockCommit, state },
+        { css: 'after', source: 'code' }
+      );
+
+      expect(mockCommit).toBeCalledWith('setUndoStack', {
+        past: [{ css: 'first', source: 'code', at: expect.any(Number) }],
+        future: [],
+      });
+    });
+
+    it('leaves the undo stack alone for a change that is not recorded', () => {
+      const state = { ...mockState, css: 'before' };
+
+      actions.applyCss(
+        { commit: mockCommit, state },
+        { css: 'after', record: false }
+      );
+
+      expect(mockCommit).not.toBeCalledWith('setUndoStack', expect.anything());
+      expect(mockCommit).toBeCalledWith('setCss', 'after');
+    });
+
+    it('leaves the undo stack alone when the css does not change', () => {
+      const state = { ...mockState, css: 'same' };
+
+      actions.applyCss({ commit: mockCommit, state }, { css: 'same' });
+
+      expect(mockCommit).not.toBeCalledWith('setUndoStack', expect.anything());
+    });
+  });
+
+  describe('undo', () => {
+    it('re-applies the previous css without recording it, keeping the current one for redo', () => {
+      const state = {
+        ...mockState,
+        css: 'current',
+        undoStack: {
+          past: [{ css: 'older', source: 'edit', at: 1 }],
+          future: [],
+        },
+      };
+
+      actions.undo({ state, commit: mockCommit, dispatch: mockDispatch });
+
+      expect(mockCommit).toBeCalledWith('setUndoStack', {
+        past: [],
+        future: [{ css: 'current', source: 'edit', at: 0 }],
+      });
+      expect(mockDispatch).toBeCalledWith('applyCss', {
+        css: 'older',
+        record: false,
+      });
+    });
+
+    it('does nothing with an empty stack', () => {
+      actions.undo({
+        state: mockState,
+        commit: mockCommit,
+        dispatch: mockDispatch,
+      });
+
+      expect(mockCommit).not.toBeCalled();
+      expect(mockDispatch).not.toBeCalled();
+    });
+  });
+
+  describe('redo', () => {
+    it('re-applies the undone css without recording it, keeping the current one for undo', () => {
+      const state = {
+        ...mockState,
+        css: 'current',
+        undoStack: {
+          past: [],
+          future: [{ css: 'newer', source: 'edit', at: 0 }],
+        },
+      };
+
+      actions.redo({ state, commit: mockCommit, dispatch: mockDispatch });
+
+      expect(mockCommit).toBeCalledWith('setUndoStack', {
+        past: [{ css: 'current', source: 'edit', at: 0 }],
+        future: [],
+      });
+      expect(mockDispatch).toBeCalledWith('applyCss', {
+        css: 'newer',
+        record: false,
+      });
+    });
+
+    it('does nothing with nothing undone', () => {
+      actions.redo({
+        state: mockState,
+        commit: mockCommit,
+        dispatch: mockDispatch,
+      });
+
+      expect(mockCommit).not.toBeCalled();
+      expect(mockDispatch).not.toBeCalled();
     });
 
     it('does not save an empty style when none was loaded, since that would delete it', () => {
@@ -206,7 +332,10 @@ describe('actions', () => {
         '50',
         ['div.b']
       );
-      expect(mockDispatch).toBeCalledWith('applyCss', { css: 'filtered' });
+      expect(mockDispatch).toBeCalledWith('applyCss', {
+        css: 'filtered',
+        source: 'filter:grayscale',
+      });
       expect(mockDispatch).not.toBeCalledWith('refreshPage');
       delete mockBridge.getSnapshotSync;
     });
@@ -224,7 +353,10 @@ describe('actions', () => {
         ['div.a']
       );
       expect(mockDispatch).toBeCalledWith('refreshPage');
-      expect(mockDispatch).toBeCalledWith('applyCss', { css: 'filtered' });
+      expect(mockDispatch).toBeCalledWith('applyCss', {
+        css: 'filtered',
+        source: 'filter:grayscale',
+      });
     });
   });
 
@@ -233,6 +365,10 @@ describe('actions', () => {
       actions.closeStylebot({ state: mockState, commit: mockCommit });
 
       expect(mockCommit).toBeCalledWith('setVisible', false);
+      expect(mockCommit).toBeCalledWith('setUndoStack', {
+        past: [],
+        future: [],
+      });
       expect(chromeUtils.closeEditorWindow).not.toBeCalled();
     });
 
@@ -340,6 +476,7 @@ describe('actions', () => {
 
       expect(mockDispatch).toBeCalledWith('applyCss', {
         css: 'outputOfAddDeclaration',
+        source: 'declaration:a:color',
       });
     });
   });
@@ -469,6 +606,7 @@ describe('actions', () => {
       expect(stylebotCss.googleWebFontExists).not.toBeCalled();
       expect(mockDispatch).toHaveBeenNthCalledWith(3, 'applyCss', {
         css: '@import Inter;\na { }',
+        record: false,
       });
     });
 
@@ -495,6 +633,7 @@ describe('actions', () => {
       expect(stylebotCss.googleWebFontExists).toBeCalledWith('Some Font');
       expect(mockDispatch).toBeCalledWith('applyCss', {
         css: '@import Some Font;\na { }',
+        record: false,
       });
     });
 
@@ -525,6 +664,7 @@ describe('actions', () => {
 
       expect(mockDispatch).toBeCalledWith('applyCss', {
         css: '@import Some Font;\na { color: red; }',
+        record: false,
       });
     });
 

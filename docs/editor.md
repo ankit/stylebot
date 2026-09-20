@@ -42,3 +42,27 @@ page, and mounts the same app with the remote bridge. Every page-touching operat
 travels over the port to the tab's content script.
 
 The window remembers its size and position, so it reopens where the user left it.
+
+## Undo and redo
+
+The editor keeps an undo stack of the page's CSS for as long as it is open: every edit
+records the CSS it replaced, and Cmd/Ctrl+Z walks back through those snapshots by
+re-applying them down the same path an edit takes, so the page and storage follow. Rapid
+changes from one control — a slider drag, a burst of typing — collapse into a single step,
+and housekeeping like pruning blank rules is never recorded. Nothing is persisted; closing
+the editor drops the stack.
+
+This is deliberately not the same thing as version history, which is the durable record
+of style changes the options page restores from. Undo is for taking back the gesture you
+just made: in memory, one step per gesture, gone when the editor closes. Version history
+is for recovering from something you did a while ago: saved, and folded so that a whole
+editing session is one entry. Undoing therefore never adds entries to the version list —
+an undo is just another write in the session already under way — and once the editor is
+closed, version history is what is left to recover from.
+
+The code editor is the exception to the keys. It runs in its own document, so they never
+reach the panel from inside it: there they stay the code editor's, working on its own
+model history. To keep that alive, CSS the panel pushes down is applied as an undoable
+edit rather than replacing the model outright, which would reset it. Undoing inside the
+code editor then reaches the panel as an ordinary code change, and becomes a new step in
+the panel's undo stack.

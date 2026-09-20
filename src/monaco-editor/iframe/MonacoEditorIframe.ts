@@ -18,6 +18,9 @@ class MonacEditorIframe {
   // todo: import monaco types
   editor?: any;
   variant: MonacoEditorVariant;
+  // Whether the panel has sent its css yet; the first send seeds the
+  // editor rather than being an edit the user could undo away.
+  populated = false;
 
   constructor(variant: MonacoEditorVariant = 'default') {
     this.variant = variant;
@@ -200,8 +203,23 @@ class MonacEditorIframe {
     window.parent.postMessage(message, '*');
   }
 
+  /**
+   * Applies the panel's css as an undoable edit, since setValue would reset
+   * Monaco's own history.
+   */
   handleStylebotCssUpdate(css: string, selector?: string, focus = true): void {
-    this.editor.setValue(css);
+    const model = this.editor.getModel();
+
+    if (!this.populated) {
+      this.populated = true;
+      this.editor.setValue(css);
+    } else if (model.getValue() !== css) {
+      this.editor.pushUndoStop();
+      this.editor.executeEdits('stylebot', [
+        { range: model.getFullModelRange(), text: css },
+      ]);
+      this.editor.pushUndoStop();
+    }
 
     if (focus) {
       this.editor.focus();
