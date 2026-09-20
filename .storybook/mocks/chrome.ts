@@ -140,6 +140,10 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
           return respond(callback, undefined);
         },
       },
+      onChanged: {
+        addListener: () => undefined,
+        removeListener: () => undefined,
+      },
     },
 
     tabs: {
