@@ -114,6 +114,19 @@ export type GoogleDriveSyncMetadata = {
   webContentLink: string;
 };
 
+/**
+ * What the last successful sync observed. remoteRevision is Drive's
+ * modifiedTime for the file and localRevision the styles-metadata stamp;
+ * both are opaque strings compared for equality only — never ordered — so
+ * that a clock on one machine is never measured against a clock on another.
+ */
+export type SyncState = {
+  remoteRevision: string;
+  localRevision: string;
+  lastSyncedAt: Timestamp;
+  metadata: GoogleDriveSyncMetadata;
+};
+
 export * from './TabMessage';
 export * from './BackgroundPageMessage';
 export * from './BackgroundPageMessageResponse';

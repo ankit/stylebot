@@ -1,16 +1,37 @@
-import { GoogleDriveSyncMetadata } from '@stylebot/types';
+import { GoogleDriveSyncMetadata, SyncState } from '@stylebot/types';
+
+const SYNC_STATE_KEY = 'google-drive-sync-state';
+const LEGACY_METADATA_KEY = 'google-drive-sync';
+const ACCESS_TOKEN_KEY = 'google-drive-access-token';
+
+export const getSyncState = async (): Promise<SyncState | undefined> => {
+  const items = await chrome.storage.local.get(SYNC_STATE_KEY);
+  return items[SYNC_STATE_KEY];
+};
+
+export const setSyncState = (state: SyncState): Promise<void> =>
+  chrome.storage.local.set({ [SYNC_STATE_KEY]: state });
+
+// The legacy key is only ever read by the migration; it is listed here so
+// disconnecting also sweeps it off profiles that upgraded.
+export const clearSyncState = (): Promise<void> =>
+  chrome.storage.local.remove([
+    SYNC_STATE_KEY,
+    LEGACY_METADATA_KEY,
+    ACCESS_TOKEN_KEY,
+  ]);
 
 export const getGoogleDriveSyncMetadata = async (): Promise<
   GoogleDriveSyncMetadata | undefined
 > => {
-  const items = await chrome.storage.local.get('google-drive-sync');
-  return items['google-drive-sync'];
+  const items = await chrome.storage.local.get(LEGACY_METADATA_KEY);
+  return items[LEGACY_METADATA_KEY];
 };
 
 export const setGoogleDriveSyncMetadata = (
   googleDriveSyncMetadata: GoogleDriveSyncMetadata
 ): Promise<void> =>
-  chrome.storage.local.set({ 'google-drive-sync': googleDriveSyncMetadata });
+  chrome.storage.local.set({ [LEGACY_METADATA_KEY]: googleDriveSyncMetadata });
 
 export const setGoogleDriveSyncEnabled = (enabled: boolean): void => {
   chrome.storage.local.set({ 'google-drive-sync-enabled': enabled });
