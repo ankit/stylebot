@@ -15,6 +15,13 @@
           {{ t(errorKey) }}
         </span>
 
+        <span
+          v-else-if="!syncInProgress && needsAuth"
+          class="popup-caption sync-error"
+        >
+          {{ t('sync_needs_sign_in') }}
+        </span>
+
         <span v-else class="popup-caption sync-metadata">
           {{ syncInProgress ? undefined : syncTime }}
         </span>
@@ -27,7 +34,10 @@
 import Vue from 'vue';
 
 // Bypasses @stylebot/sync, whose barrel also drags in runGoogleDriveSync's postcss dependency chain.
-import { getLastSyncedAt } from '../../sync/google-drive/sync-metadata';
+import {
+  getLastSyncedAt,
+  getSyncNeedsAuth,
+} from '../../sync/google-drive/sync-metadata';
 import {
   RunGoogleDriveSync,
   RunGoogleDriveSyncResponse,
@@ -52,11 +62,13 @@ export default Vue.extend({
     syncTime: string;
     syncInProgress: boolean;
     errorKey: SyncErrorKey | null;
+    needsAuth: boolean;
   } {
     return {
       syncTime: '',
       syncInProgress: false,
       errorKey: null,
+      needsAuth: false,
     };
   },
 
@@ -67,6 +79,7 @@ export default Vue.extend({
   methods: {
     async updateSyncTime() {
       this.syncTime = formatSyncTime(await getLastSyncedAt());
+      this.needsAuth = await getSyncNeedsAuth();
     },
 
     sync() {

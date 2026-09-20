@@ -18,7 +18,7 @@
         {{ t('sync_tab_description') }}
       </s-text>
 
-      <the-google-drive-sync />
+      <the-google-drive-sync @edit="$emit('edit', $event)" />
     </div>
 
     <div class="section">
