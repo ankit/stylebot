@@ -80,12 +80,12 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .shortcut-kbd {
   display: inline-flex;
-  align-items: center;
+  align-items: flex-end;
 }
 
 kbd {
   display: inline-flex;
-  align-items: center;
+  align-items: flex-end;
   font-family: var(--font-mono);
   font-weight: 500;
   font-size: 13px;

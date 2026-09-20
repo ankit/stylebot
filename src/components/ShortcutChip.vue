@@ -63,9 +63,5 @@ export default Vue.extend({
     border-color: transparent;
     color: var(--text-muted);
   }
-
-  &:not(.muted) ::v-deep kbd svg {
-    margin-top: -2px;
-  }
 }
 </style>

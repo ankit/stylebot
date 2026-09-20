@@ -13,7 +13,7 @@
     >
       <div class="popup-header-domain">{{ url }}</div>
       <template #trailing>
-        <shortcut-chip v-if="shortcut" small muted :value="shortcut" />
+        <shortcut-chip v-if="shortcut" muted :value="shortcut" />
       </template>
     </toggle-switch>
   </div>

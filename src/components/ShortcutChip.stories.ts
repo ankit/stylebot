@@ -51,6 +51,14 @@ export const ModifierKeys = matrix({
     { label: 'Control', attrs: 'value="ctrl"' },
     { label: 'Option + Shift + M', attrs: 'value="alt+shift+m"' },
     { label: 'Command + K', attrs: 'value="command+k"' },
+    { label: 'Shift + Control + K', attrs: 'value="shift+ctrl+k"' },
+    { label: 'Command + Shift + P', attrs: 'value="command+shift+p"' },
+    { label: 'Option + Escape', attrs: 'value="alt+Escape"' },
+    { label: 'Command + Arrow Up', attrs: 'value="command+arrowup"' },
+    {
+      label: 'Every modifier + R',
+      attrs: 'value="ctrl+alt+shift+command+r"',
+    },
   ],
   columns: [
     { label: 'macOS', cell: attrs => `<shortcut-chip ${attrs} mac />` },

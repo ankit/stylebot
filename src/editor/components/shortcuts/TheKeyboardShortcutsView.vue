@@ -12,11 +12,11 @@
         </icon-button>
       </s-tooltip>
 
-      <heading as="h1" size="md" class="title">
+      <heading as="h1" size="sm" class="title">
         {{ t('keyboard_shortcuts') }}
       </heading>
 
-      <shortcut-chip small :value="editorCommands.close" />
+      <shortcut-chip small :value="editorCommands.close" :mac="mac" />
     </div>
 
     <div class="view-body">
@@ -36,6 +36,7 @@
                   small
                   class="key-chip"
                   :value="key"
+                  :mac="mac"
                 />
                 <s-text
                   v-else
@@ -68,6 +69,7 @@
                   small
                   class="key-chip"
                   :value="key"
+                  :mac="mac"
                 />
                 <s-text
                   v-else
@@ -122,6 +124,15 @@ export default Vue.extend({
     SText,
     STooltip,
     ChevronLeftIcon,
+  },
+
+  props: {
+    // Forces macOS vs non-Mac rendering for every shortcut in the view;
+    // left unset to auto-detect.
+    mac: {
+      type: Boolean,
+      default: undefined,
+    },
   },
 
   computed: {
