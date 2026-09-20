@@ -13,10 +13,19 @@ export type StylebotBasicModeSections = {
   more: boolean;
 };
 
+export type EditorWindowBounds = {
+  width: number;
+  height: number;
+  left: number;
+  top: number;
+};
+
 export type StylebotLayout = {
   width: number;
   adjustPageLayout: boolean;
-  dockLocation: 'left' | 'right';
+  dockLocation: 'left' | 'right' | 'window';
+  // Where the separate editor window was last left, restored on next open.
+  window?: EditorWindowBounds;
 };
 
 export type StylebotFonts = Array<string>;

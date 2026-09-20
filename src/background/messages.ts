@@ -39,6 +39,11 @@ import {
   GetGoogleWebFontExists as GetGoogleWebFontExistsType,
   RunGoogleDriveSync as RunGoogleDriveSyncType,
   AddRecentColor as AddRecentColorType,
+  OpenEditorWindow as OpenEditorWindowType,
+  ToggleEditorWindow as ToggleEditorWindowType,
+  CloseEditorWindow as CloseEditorWindowType,
+  GetIsEditorWindowOpen as GetIsEditorWindowOpenType,
+  GetIsEditorWindowOpenResponse,
   GetCommandsResponse,
   GetAllOptionsResponse,
   GetAllStylesResponse,
@@ -64,6 +69,8 @@ import {
   getAll as getAllRecentColors,
   add as addRecentColorToHistory,
 } from './color-history';
+
+import * as editorWindow from './editor-window';
 
 export const DisableStyle = async (
   message: DisableStyleType
@@ -281,4 +288,37 @@ export const AddRecentColor = async (
 ): Promise<void> => {
   const colors = await addRecentColorToHistory(message.color);
   sendResponse(colors);
+};
+
+export const OpenEditorWindow = async (
+  message: OpenEditorWindowType,
+  sender: chrome.runtime.MessageSender
+): Promise<void> => {
+  const tabId = message.tabId ?? sender.tab?.id;
+  if (tabId !== undefined) {
+    await editorWindow.open(tabId);
+  }
+};
+
+export const ToggleEditorWindow = async (
+  message: ToggleEditorWindowType,
+  sender: chrome.runtime.MessageSender
+): Promise<void> => {
+  const tabId = message.tabId ?? sender.tab?.id;
+  if (tabId !== undefined) {
+    await editorWindow.toggle(tabId);
+  }
+};
+
+export const CloseEditorWindow = async (
+  message: CloseEditorWindowType
+): Promise<void> => {
+  await editorWindow.close(message.tabId);
+};
+
+export const GetIsEditorWindowOpen = async (
+  message: GetIsEditorWindowOpenType,
+  sendResponse: (response: GetIsEditorWindowOpenResponse) => void
+): Promise<void> => {
+  sendResponse(await editorWindow.isOpen(message.tabId));
 };

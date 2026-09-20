@@ -48,6 +48,7 @@ export type RunGoogleDriveSyncResponse =
 
 export type GetRecentColorsResponse = Array<string>;
 export type AddRecentColorResponse = Array<string>;
+export type GetIsEditorWindowOpenResponse = boolean;
 
 type BackgroundPageMessageResponse =
   | GetAllOptionsResponse
@@ -60,6 +61,7 @@ type BackgroundPageMessageResponse =
   | GetGoogleWebFontExistsResponse
   | RunGoogleDriveSyncResponse
   | GetRecentColorsResponse
-  | AddRecentColorResponse;
+  | AddRecentColorResponse
+  | GetIsEditorWindowOpenResponse;
 
 export default BackgroundPageMessageResponse;

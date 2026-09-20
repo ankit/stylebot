@@ -1,4 +1,5 @@
 import ContextMenu from './contextmenu';
+import * as editorWindow from './editor-window';
 
 import {
   GetCommands,
@@ -26,6 +27,10 @@ import {
   RunGoogleDriveSync,
   GetRecentColors,
   AddRecentColor,
+  OpenEditorWindow,
+  ToggleEditorWindow,
+  CloseEditorWindow,
+  GetIsEditorWindowOpen,
 } from './messages';
 
 import { refreshBadgeForTab } from './styles';
@@ -90,6 +95,15 @@ chrome.runtime.onStartup.addListener(async () => {
 /**
  * When an existing tab is updated, refresh the context-menu and badge.
  */
+// A closed tab takes its editor window with it; a closed window is forgotten.
+chrome.tabs.onRemoved.addListener(tabId => {
+  editorWindow.close(tabId);
+});
+
+chrome.windows.onRemoved.addListener(windowId => {
+  editorWindow.forgetWindow(windowId);
+});
+
 chrome.tabs.onUpdated.addListener(async (tabId, _, tab) => {
   if (tab.status === 'complete' && tab.url) {
     await refreshBadgeForTab(tab);
@@ -213,6 +227,19 @@ chrome.runtime.onMessage.addListener(
         break;
       case 'AddRecentColor':
         AddRecentColor(message, sendResponse);
+        break;
+
+      case 'OpenEditorWindow':
+        OpenEditorWindow(message, sender);
+        break;
+      case 'ToggleEditorWindow':
+        ToggleEditorWindow(message, sender);
+        break;
+      case 'CloseEditorWindow':
+        CloseEditorWindow(message);
+        break;
+      case 'GetIsEditorWindowOpen':
+        GetIsEditorWindowOpen(message, sendResponse);
         break;
     }
 
