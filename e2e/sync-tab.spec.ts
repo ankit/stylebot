@@ -40,6 +40,11 @@ const readStorage = (page: Page, keys: Array<string>) =>
   page.evaluate(names => chrome.storage.local.get(names), keys);
 
 test.describe('Sync tab', () => {
+  test.skip(
+    ({ engine }) => !engine.opensExtensionPages,
+    "Playwright can't open the options page as a page on this engine"
+  );
+
   test('renders the Google Drive card when sync has never been set up', async ({
     context,
     extension,

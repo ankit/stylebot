@@ -9,6 +9,7 @@ const CHANNEL = process.env.STYLEBOT_BROWSER === 'edge' ? 'msedge' : 'chrome';
 export class ChromiumEngine implements Engine {
   readonly distDir = 'dist';
   readonly routesExtensionRequests = true;
+  readonly opensExtensionPages = true;
 
   launch(userDataDir: string, options: LaunchOptions): Promise<BrowserContext> {
     // Chrome 137+ removed --load-extension; CDP's Extensions domain replaces it
