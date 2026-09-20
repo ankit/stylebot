@@ -30,6 +30,8 @@ import {
 
 import { refreshBadgeForTab } from './styles';
 import { get as getOption, pruneRetired } from './options';
+import { isSyncAlarm, updatePeriodicSync } from './sync-scheduler';
+import { runGoogleDriveSync, getGoogleDriveSyncEnabled } from '@stylebot/sync';
 
 import {
   TabUpdated,
@@ -53,6 +55,35 @@ chrome.runtime.onInstalled.addListener(async ({ reason }) => {
 
   if (reason === 'update') {
     pruneRetired();
+  }
+});
+
+/**
+ * Scheduled syncs run without a user in front of them, so they never open an
+ * auth window; a run that needs one leaves a flag for the UI instead.
+ */
+chrome.alarms.onAlarm.addListener(alarm => {
+  if (isSyncAlarm(alarm.name)) {
+    runGoogleDriveSync({ interactive: false });
+  }
+});
+
+/**
+ * The enabled flag is flipped from the options page; the alarms that follow
+ * it are owned here so they stay in step no matter which page changed it.
+ */
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === 'local' && changes['google-drive-sync-enabled']) {
+    updatePeriodicSync();
+  }
+});
+
+/**
+ * Pick up what other devices pushed while the browser was closed.
+ */
+chrome.runtime.onStartup.addListener(async () => {
+  if (await getGoogleDriveSyncEnabled()) {
+    runGoogleDriveSync({ interactive: false });
   }
 });
 

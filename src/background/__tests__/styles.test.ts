@@ -1,13 +1,19 @@
 import 'jest-fetch-mock';
 
+jest.mock('../sync-scheduler', () => ({
+  scheduleSyncAfterEdit: jest.fn().mockResolvedValue(undefined),
+}));
+
 import {
   set,
+  setAll,
   enable,
   disable,
   move,
   setReadability,
   getGoogleWebFontExists,
 } from '../styles';
+import { scheduleSyncAfterEdit } from '../sync-scheduler';
 
 describe('set', () => {
   let store: Record<string, unknown>;
@@ -151,6 +157,20 @@ describe('style edits', () => {
 
     expect(stored('new.com')).toMatchObject({ css: '', readability: true });
     expect(writes()).toBe(1);
+  });
+
+  it('lines up a sync after an edit, but not after a write sync itself made', async () => {
+    (scheduleSyncAfterEdit as jest.Mock).mockClear();
+
+    await disable('example.com');
+    await enable('missing.com');
+    expect(scheduleSyncAfterEdit).toBeCalledTimes(1);
+
+    await setAll({}, { fromSync: true });
+    expect(scheduleSyncAfterEdit).toBeCalledTimes(1);
+
+    await setAll({});
+    expect(scheduleSyncAfterEdit).toBeCalledTimes(2);
   });
 });
 
