@@ -86,6 +86,11 @@ export type PageBridge = {
   openInPage(): void;
 
   /**
+   * Brings the page's tab and window to the front; a no-op in-page.
+   */
+  focusPage(): void;
+
+  /**
    * Subscribes to a bridge event; returns the unsubscribe function.
    */
   on<E extends keyof PageBridgeEvents>(

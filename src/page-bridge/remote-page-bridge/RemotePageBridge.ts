@@ -236,4 +236,11 @@ export class RemotePageBridge extends PageBridgeEmitter implements PageBridge {
   openInPage(): void {
     this.send({ type: 'openInPage' });
   }
+
+  focusPage(): void {
+    chrome.tabs.get(this.tabId).then(tab => {
+      chrome.tabs.update(this.tabId, { active: true });
+      chrome.windows.update(tab.windowId, { focused: true });
+    });
+  }
 }

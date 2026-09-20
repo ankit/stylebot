@@ -6,7 +6,7 @@ import { setPageBridge, RemotePageBridge } from '@stylebot/page-bridge';
 import { setupVue } from '../editor/utils/init-editor';
 import TheStylebotApp from '../editor/components/TheStylebotApp.vue';
 
-import { initWindowListeners } from './listeners';
+import { initWindowListeners, initTabInfo } from './listeners';
 
 import './index.scss';
 
@@ -54,6 +54,18 @@ const start = async (): Promise<void> => {
       store.commit('setInspecting', false);
     }
   });
+
+  // Picking an element happens in the page's window; bring the editor back
+  // in front so the pick can be styled right away, as devtools does.
+  bridge.on('select', () => {
+    chrome.windows.getCurrent().then(current => {
+      if (current.id !== undefined) {
+        chrome.windows.update(current.id, { focused: true });
+      }
+    });
+  });
+
+  initTabInfo(store, tabId);
 
   await bridge.connect();
   await store.dispatch('initialize');

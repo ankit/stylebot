@@ -155,4 +155,8 @@ export class LocalPageBridge extends PageBridgeEmitter implements PageBridge {
   openInPage(): void {
     return;
   }
+
+  focusPage(): void {
+    return;
+  }
 }

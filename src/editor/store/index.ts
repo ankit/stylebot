@@ -28,6 +28,15 @@ Vue.use(Vuex);
  */
 export type EditorHost = 'page' | 'window';
 
+/**
+ * What the browser knows about the styled tab, for the window host to show
+ * which tab it belongs to.
+ */
+export type EditorTab = {
+  title: string;
+  favIconUrl: string;
+};
+
 export type CssSelectorMetadata = {
   id: number;
   value: string;
@@ -44,6 +53,7 @@ export type State = {
   windowConnected: boolean;
   // Window host: the tab this window edits.
   tabId: number | null;
+  tab: EditorTab | null;
 
   url: string;
   css: string;
@@ -74,6 +84,7 @@ export const createStore = (host: EditorHost): Store<State> =>
       pageConnected: host === 'page',
       windowConnected: false,
       tabId: null,
+      tab: null,
 
       css: '',
       enabled: true,

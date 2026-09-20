@@ -31,4 +31,28 @@ const initWindowListeners = (store: Store<State>): void => {
   window.addEventListener('pagehide', persistBounds);
 };
 
-export { initWindowListeners };
+/**
+ * Mirrors the tab's title and favicon into the store so the window can
+ * show which tab it is editing, following the tab as it navigates.
+ */
+const initTabInfo = (store: Store<State>, tabId: number): void => {
+  const update = (tab: chrome.tabs.Tab) => {
+    store.commit('setTab', {
+      title: tab.title ?? '',
+      favIconUrl: tab.favIconUrl ?? '',
+    });
+  };
+
+  chrome.tabs.get(tabId).then(update, () => undefined);
+
+  chrome.tabs.onUpdated.addListener((updatedTabId, changeInfo, tab) => {
+    if (
+      updatedTabId === tabId &&
+      (changeInfo.title !== undefined || changeInfo.favIconUrl !== undefined)
+    ) {
+      update(tab);
+    }
+  });
+};
+
+export { initWindowListeners, initTabInfo };

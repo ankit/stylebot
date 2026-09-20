@@ -14,6 +14,7 @@ const mockState: State = {
   pageConnected: true,
   windowConnected: false,
   tabId: null,
+  tab: null,
 
   css: '',
   enabled: true,

@@ -34,6 +34,7 @@ const mockBridge = {
   unhighlight: jest.fn(),
   getPageColors: jest.fn(),
   openInPage: jest.fn(),
+  focusPage: jest.fn(),
   on: jest.fn(),
 } as jest.Mocked<page.PageBridge>;
 

@@ -6,7 +6,7 @@ import {
   ReadabilitySettings,
 } from '@stylebot/types';
 
-import { State, CssSelectorMetadata } from './';
+import { State, CssSelectorMetadata, EditorTab } from './';
 import { PageSnapshot } from '@stylebot/page-bridge';
 
 export default {
@@ -28,6 +28,10 @@ export default {
 
   setTabId(state: State, tabId: number | null): void {
     state.tabId = tabId;
+  },
+
+  setTab(state: State, tab: EditorTab | null): void {
+    state.tab = tab;
   },
 
   setOptions(state: State, options: StylebotOptions): void {
