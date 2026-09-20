@@ -236,7 +236,7 @@ chrome.runtime.onMessage.addListener(
         ToggleEditorWindow(message, sender);
         break;
       case 'CloseEditorWindow':
-        CloseEditorWindow(message);
+        CloseEditorWindow(message, sender);
         break;
       case 'GetIsEditorWindowOpen':
         GetIsEditorWindowOpen(message, sendResponse);

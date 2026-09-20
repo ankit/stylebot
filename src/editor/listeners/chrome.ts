@@ -60,7 +60,7 @@ const initChromeListener = (
         return;
       }
       lastUrl = window.location.href;
-      if (state.visible) {
+      if (state.visible || state.windowConnected) {
         dispatch('refreshPage');
       }
 

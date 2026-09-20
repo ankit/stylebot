@@ -11,6 +11,8 @@ import {
 const mockState: State = {
   host: 'page',
   page: { ...emptyPageSnapshot(), domain: document.domain },
+  pageConnected: true,
+  windowConnected: false,
 
   css: '',
   enabled: true,

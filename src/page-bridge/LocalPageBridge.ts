@@ -151,4 +151,8 @@ export class LocalPageBridge extends PageBridgeEmitter implements PageBridge {
   getPageColors(): Promise<RoleColorGroups> {
     return Promise.resolve(getPageColors());
   }
+
+  openInPage(): void {
+    return;
+  }
 }

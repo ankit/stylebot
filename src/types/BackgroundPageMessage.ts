@@ -144,7 +144,7 @@ export type ToggleEditorWindow = {
 
 export type CloseEditorWindow = {
   name: 'CloseEditorWindow';
-  tabId: number;
+  tabId?: number;
 };
 
 export type GetIsEditorWindowOpen = {

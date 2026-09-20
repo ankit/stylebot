@@ -81,6 +81,11 @@ export type PageBridge = {
   getPageColors(): Promise<RoleColorGroups>;
 
   /**
+   * Asks the page to show its own panel again; a no-op for the in-page host.
+   */
+  openInPage(): void;
+
+  /**
    * Subscribes to a bridge event; returns the unsubscribe function.
    */
   on<E extends keyof PageBridgeEvents>(
