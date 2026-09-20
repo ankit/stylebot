@@ -1,3 +1,5 @@
+import { compareAsc } from 'date-fns';
+
 import { getCurrentTimestamp } from '@stylebot/utils';
 import { GoogleDriveSyncMetadata, StyleMap } from '@stylebot/types';
 
@@ -14,6 +16,30 @@ const GOOGLE_DRIVE_FILE_FIELDS = [
 
 const SYNC_FOLDER_NAME = 'stylebot';
 const SYNC_FILE_NAME = 'stylebot_v3_backup.json';
+const FOLDER_MIME_TYPE = 'application/vnd.google-apps.folder';
+
+const searchFiles = async (
+  query: string,
+  accessToken: AccessToken,
+  fields: string
+): Promise<Array<{ id: string; modifiedTime?: string }>> => {
+  const params = new URLSearchParams({
+    q: query,
+    spaces: 'drive',
+    fields: `files(${fields})`,
+  });
+
+  const response = await fetch(`${GOOGLE_DRIVE_FILE_GET_API}?${params}`, {
+    method: 'GET',
+    headers: getAuthorizationHeaders(accessToken),
+  });
+
+  const { files } = await parseJsonResponse<{
+    files?: Array<{ id: string; modifiedTime?: string }>;
+  }>(response);
+
+  return files ?? [];
+};
 
 const getAuthorizationHeaders = (accessToken: AccessToken) =>
   new Headers({
@@ -43,30 +69,46 @@ export const getFileMetadata = async (
   return parseJsonResponse<GoogleDriveSyncMetadata | null>(response);
 };
 
+const getBackupFolderId = async (
+  accessToken: AccessToken
+): Promise<string | null> => {
+  const query = `name = '${SYNC_FOLDER_NAME}' and mimeType = '${FOLDER_MIME_TYPE}' and trashed = false`;
+  const folders = await searchFiles(query, accessToken, 'id');
+
+  return folders[0]?.id ?? null;
+};
+
+/**
+ * A folder has no content, so it is created through files.create as JSON
+ * rather than the multipart upload endpoint.
+ */
 const createBackupFolder = async (
   accessToken: AccessToken
 ): Promise<string> => {
-  const form = new FormData();
-  const metadata = {
-    name: SYNC_FOLDER_NAME,
-    mimeType: 'application/vnd.google-apps.folder',
-  };
+  const headers = getAuthorizationHeaders(accessToken);
+  headers.set('Content-Type', 'application/json');
 
-  form.append(
-    'metadata',
-    new Blob([JSON.stringify(metadata)], { type: 'application/json' })
-  );
-
-  const url = `${GOOGLE_DRIVE_FILE_UPLOAD_API}?uploadType=multipart&fields=${GOOGLE_DRIVE_FILE_FIELDS}`;
-  const response = await fetch(url, {
+  const response = await fetch(`${GOOGLE_DRIVE_FILE_GET_API}?fields=id`, {
     method: 'POST',
-    headers: getAuthorizationHeaders(accessToken),
-    body: form,
+    headers,
+    body: JSON.stringify({
+      name: SYNC_FOLDER_NAME,
+      mimeType: FOLDER_MIME_TYPE,
+    }),
   });
 
   const { id } = await parseJsonResponse<{ id: string }>(response);
   return id;
 };
+
+/**
+ * Creating unconditionally left a duplicate `stylebot` folder behind every
+ * time the sync file had to be re-created.
+ */
+const getOrCreateBackupFolder = async (
+  accessToken: AccessToken
+): Promise<string> =>
+  (await getBackupFolderId(accessToken)) ?? createBackupFolder(accessToken);
 
 const createBackup = async (
   accessToken: AccessToken,
@@ -131,27 +173,30 @@ const patchBackup = async (
 export const getSyncFileMetadata = async (
   accessToken: AccessToken
 ): Promise<GoogleDriveSyncMetadata | null> => {
-  const query = `name = '${SYNC_FILE_NAME}'`;
-  const url = `${GOOGLE_DRIVE_FILE_GET_API}?q=${encodeURIComponent(query)}`;
+  const folderId = await getBackupFolderId(accessToken);
 
-  const response = await fetch(url, {
-    method: 'GET',
-    headers: getAuthorizationHeaders(accessToken),
-  });
+  // Without a folder there is nothing of ours to find, so skip the file search.
+  if (!folderId) {
+    return null;
+  }
 
-  const { files } = await parseJsonResponse<{ files?: Array<{ id: string }> }>(
-    response
+  // Scoped to our own folder and to untrashed files: an unscoped name search
+  // would happily return a deleted copy, or an unrelated file of the same name
+  // elsewhere in the user's Drive.
+  const query = `name = '${SYNC_FILE_NAME}' and '${folderId}' in parents and trashed = false`;
+  const files = await searchFiles(query, accessToken, 'id,modifiedTime');
+
+  if (files.length === 0) {
+    return null;
+  }
+
+  const newest = files.reduce((latest, file) =>
+    compareAsc(new Date(file.modifiedTime ?? 0), new Date(latest.modifiedTime ?? 0)) > 0
+      ? file
+      : latest
   );
-  if (!files || files.length === 0) {
-    return null;
-  }
 
-  const syncMetadata = await getFileMetadata(files[0].id, accessToken);
-  if (!syncMetadata) {
-    return null;
-  }
-
-  return syncMetadata;
+  return getFileMetadata(newest.id, accessToken);
 };
 
 /**
@@ -178,13 +223,10 @@ export const writeSyncFile = async (
   blob: Blob,
   fileId?: string
 ): Promise<GoogleDriveSyncMetadata> => {
-  let syncMetadata;
   if (fileId) {
-    syncMetadata = await patchBackup(fileId, accessToken, blob);
-  } else {
-    const folderId = await createBackupFolder(accessToken);
-    syncMetadata = await createBackup(accessToken, blob, folderId);
+    return patchBackup(fileId, accessToken, blob);
   }
 
-  return syncMetadata;
+  const folderId = await getOrCreateBackupFolder(accessToken);
+  return createBackup(accessToken, blob, folderId);
 };
