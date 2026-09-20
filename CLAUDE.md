@@ -27,13 +27,14 @@ session is already inside a worktree.
 - `yarn typecheck` — `tsc --noEmit` for the extension, then again with `.storybook/tsconfig.json` for Storybook config and stories
 - `yarn test` — Jest unit tests
 - `yarn e2e` — builds the extension then runs the Playwright e2e suite headless on Chrome, as CI does. `--edge` / `--firefox` switch browser, `--headed` / `--ui` / `--debug` switch mode, `--no-build` skips the rebuild; see `e2e/README.md`.
+- `yarn test:storybook` — builds Storybook and runs every story headless with `@storybook/test-runner`, asserting the `play` functions. `--no-build` reuses `storybook-static`; `--dev --watch <path>` runs against a `yarn storybook` already on :6006.
 - `yarn storybook` — Storybook 7.6 (last line with Vue 2 support) for the shared primitives and popup/options/editor composites, with a light/dark toolbar
 
 ## Validation
 
-Always validate UI/extension changes with headless Playwright, not manual/headed browser interaction — the e2e harness in `e2e/fixtures.ts` already loads the real unpacked extension via CDP. Run `yarn e2e` (or a targeted test, e.g. `yarn e2e --no-build editor-open`) to confirm a change works end-to-end before calling it done.
+Always validate UI/extension changes headless, not with manual/headed browser interaction. Behaviour that lives inside a Vue surface (the editor panel, popup, options page) is tested as Storybook interaction tests: `*.interactions.stories.ts` beside the component, with `play` functions using `@storybook/test` (`within`, `userEvent`, `expect`, `waitFor`) and the helpers in `.storybook/story-helpers.ts`; run `yarn test:storybook`. Only what needs the real extension — popup/background/content-script messaging, storage persistence across reloads, CSS injected into a real page, web-font fetches, Firefox/Edge — goes in the Playwright e2e suite (`e2e/fixtures.ts` loads the real unpacked extension via CDP); run `yarn e2e` (or a targeted spec, e.g. `yarn e2e --no-build editor-open`). Confirm a change works with the relevant suite before calling it done.
 
-Stories live beside their component as `*.stories.ts`; give new shared primitives a story.
+Stories live beside their component as `*.stories.ts`; give new shared primitives a story. Visual stories stay static; interaction tests go in a separate `*.interactions.stories.ts` file.
 
 ## Commit messages
 

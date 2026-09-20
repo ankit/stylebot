@@ -54,6 +54,7 @@ If you would like to <strong>add a new feature</strong> to Stylebot or <strong>f
 ### Tests
 
 - Run `yarn test` for unit tests
+- Run `yarn test:storybook` for the Storybook interaction tests (every story rendered headless, play functions asserted); `yarn test:storybook --dev --watch` against a running `yarn storybook` while writing them
 - Run `yarn e2e` for the Playwright end-to-end suite (headless Chrome, as in CI); `yarn e2e --firefox --ui` and friends for other browsers and modes — see [`e2e/README.md`](e2e/README.md)
 
 ### Google Drive Sync
@@ -67,7 +68,7 @@ Releases go through a pull request from a `release/vX.Y.Z` branch — the `relea
 - Branch off `main` as `release/vX.Y.Z`
 - Add entry to `CHANGELOG`
 - Update version in `package.json` and `src/extension/manifest.json`
-- Open the PR and wait for `build`, `validation`, `e2e`, `e2e (edge)` and `e2e (firefox)` to pass
+- Open the PR and wait for `build`, `validation`, `storybook`, `e2e`, `e2e (edge)` and `e2e (firefox)` to pass
 - Squash-merge — the GitHub Release and its `vX.Y.Z` tag are then created automatically from the changelog entry
 - Chrome and Edge: Run `yarn build` and manually create zip for distribution from `dist/`
 - Firefox: Run `yarn build:firefox` and manually create zip for distribution from `firefox-dist/`

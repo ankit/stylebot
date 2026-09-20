@@ -110,8 +110,6 @@ export const SuggestsAndApplies = editor(withRule, {
 
 export const CategoryFilter = editor(withRule, {
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-
     await openPicker(canvasElement);
     await userEvent.keyboard('mono');
 

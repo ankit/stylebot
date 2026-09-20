@@ -1,6 +1,6 @@
-import { Locator, Page } from '@playwright/test';
+import { Page } from '@playwright/test';
 import { test, expect } from './fixtures';
-import { openEditor, pickElement, seedStyles } from './helpers';
+import { openEditor, pickElement } from './helpers';
 
 // Editor-open depends on a popup tab-messaging round trip, which can lag
 // under a full parallel worker fleet (see e2e/readability.spec.ts).
@@ -11,7 +11,6 @@ const PAGE_HTML = `
   <html>
     <body>
       <h1>Test page</h1>
-      <blockquote>Some text</blockquote>
     </body>
   </html>
 `;
@@ -28,14 +27,9 @@ const card = (page: Page, label: string) =>
 const collapse = (page: Page, label: string) =>
   card(page, label).locator('.property-card-collapse');
 
-// Picking an element leaves inspecting mode, so re-enter it before picking
-// the next one.
-const pickNext = async (page: Page, editorRoot: Locator, selector: string) => {
-  await editorRoot.locator('.stylebot-inspector').click();
-  await pickElement(page, editorRoot, selector);
-};
-
-test('a manually opened panel stays open across element picks and reloads', async ({
+// How the opened panels follow element picks is covered by the Storybook
+// interaction tests; this only proves the preference survives a reload.
+test('a manually opened panel stays open across reloads', async ({
   context,
   openPopup,
 }) => {
@@ -50,50 +44,13 @@ test('a manually opened panel stays open across element picks and reloads', asyn
   await pickElement(page, editorRoot, 'h1');
 
   // Nothing is styled yet, so only Text auto-expands.
-  await expect(collapse(page, 'Text')).not.toHaveClass(/collapsed/);
   await expect(collapse(page, 'Box')).toHaveClass(/collapsed/);
 
   await card(page, 'Box').locator('.property-card-header').click();
-  await expect(collapse(page, 'Box')).not.toHaveClass(/collapsed/);
-
-  await pickNext(page, editorRoot, 'blockquote');
-  await expect(collapse(page, 'Text')).not.toHaveClass(/collapsed/);
   await expect(collapse(page, 'Box')).not.toHaveClass(/collapsed/);
 
   await page.reload();
   editorRoot = await openEditor(page, openPopup);
   await pickElement(page, editorRoot, 'h1');
   await expect(collapse(page, 'Box')).not.toHaveClass(/collapsed/);
-
-  // Closing it by hand forgets it again.
-  await card(page, 'Box').locator('.property-card-header').click();
-  await expect(collapse(page, 'Box')).toHaveClass(/collapsed/);
-
-  await pickNext(page, editorRoot, 'blockquote');
-  await expect(collapse(page, 'Box')).toHaveClass(/collapsed/);
-});
-
-test('panels with declarations still auto-expand and collapse per element', async ({
-  context,
-  extension,
-  openPopup,
-}) => {
-  await context.route('http://localhost/**', route =>
-    route.fulfill({ contentType: 'text/html', body: PAGE_HTML })
-  );
-  await seedStyles(extension, {
-    localhost: { css: 'h1 { margin: 10px; }', enabled: true },
-  });
-
-  const page = await context.newPage();
-  await page.goto('http://localhost/');
-
-  const editorRoot = await openEditor(page, openPopup);
-  await pickElement(page, editorRoot, 'h1');
-  await expect(collapse(page, 'Box')).not.toHaveClass(/collapsed/);
-  await expect(collapse(page, 'Text')).toHaveClass(/collapsed/);
-
-  await pickNext(page, editorRoot, 'blockquote');
-  await expect(collapse(page, 'Box')).toHaveClass(/collapsed/);
-  await expect(collapse(page, 'Text')).not.toHaveClass(/collapsed/);
 });

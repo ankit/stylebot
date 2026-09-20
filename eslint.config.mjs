@@ -14,6 +14,7 @@ export default tseslint.config(
       'test-results',
       'playwright-report',
       'storybook-static',
+      'junit.xml',
       'patches',
       '.chrome-dev-profile',
       '.edge-dev-profile',

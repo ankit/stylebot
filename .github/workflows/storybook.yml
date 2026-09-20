@@ -1,0 +1,58 @@
+name: storybook
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  storybook:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node from .nvmrc
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Use cached node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: nodeModules-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            nodeModules-
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Install Playwright Chromium
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Install Playwright system dependencies
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+
+      - name: Build Storybook
+        run: yarn build-storybook
+
+      - name: Run interaction tests
+        run: yarn test:storybook --no-build --junit --maxWorkers=2
+
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: storybook-test-results
+          path: junit.xml
+          retention-days: 14

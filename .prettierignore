@@ -5,6 +5,7 @@ coverage
 test-results
 playwright-report
 storybook-static
+junit.xml
 patches
 yarn.lock
 CHANGELOG.md
