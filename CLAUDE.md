@@ -32,9 +32,19 @@ session is already inside a worktree.
 
 ## Validation
 
-Always validate UI/extension changes headless, not with manual/headed browser interaction. Behaviour that lives inside a Vue surface (the editor panel, popup, options page) is tested as Storybook interaction tests: `*.interactions.stories.ts` beside the component, with `play` functions using `@storybook/test` (`within`, `userEvent`, `expect`, `waitFor`) and the helpers in `.storybook/story-helpers.ts`; run `yarn test:storybook`. Only what needs the real extension — popup/background/content-script messaging, storage persistence across reloads, CSS injected into a real page, web-font fetches, Firefox/Edge — goes in the Playwright e2e suite (`e2e/fixtures.ts` loads the real unpacked extension via CDP); run `yarn e2e` (or a targeted spec, e.g. `yarn e2e --no-build editor-open`). Confirm a change works with the relevant suite before calling it done.
+Always validate UI/extension changes headless, not with manual/headed browser interaction, and confirm a change works with the relevant suite before calling it done.
 
-Stories live beside their component as `*.stories.ts`; give new shared primitives a story. Visual stories only set up the state they show (a `play` may open a menu and wait for it, nothing more); interaction tests go in a separate `*.interactions.stories.ts` file titled `Tests/<Surface>/<Feature>` with `tags: ['test']`, so they sit in their own sidebar root. Each test is an object literal spreading its factory (`...editor(state)`) with a spec-style `name` sentence (Storybook only picks `name` up from the literal) and its `play`; group longer plays into `step('…', …)` phases. Drive input through the shared `user` from `story-helpers` (not `userEvent` directly) so the toolbar's Slow motion toggle applies.
+- **Storybook interaction tests** (`yarn test:storybook`) cover behaviour that lives inside a Vue surface: the editor panel, popup, options page. Only what needs the real extension goes to e2e.
+- **Playwright e2e** (`yarn e2e`, or a targeted spec like `yarn e2e --no-build editor-open`) covers extension plumbing: popup/background/content-script messaging, storage persistence across reloads, CSS injected into a real page, web-font fetches, Firefox/Edge. `e2e/fixtures.ts` loads the real unpacked extension via CDP.
+
+Stories:
+
+- Stories live beside their component as `*.stories.ts`; give new shared primitives a story.
+- Visual stories only set up the state they show — a `play` may open a menu and wait for it, nothing more.
+- Interaction tests go in a separate `*.interactions.stories.ts` file titled `Tests/<Surface>/<Feature>` with `tags: ['test']`, so they sit in their own sidebar root.
+- Each test is an object literal spreading its factory (`...editor(state)`) with a spec-style `name` sentence and its `play`. Storybook only picks `name` up from the literal, not through a factory call.
+- Use `@storybook/test` (`within`, `expect`, `waitFor`) and the helpers in `.storybook/story-helpers.ts`; group longer plays into `step('…', …)` phases.
+- Drive input through the shared `user` from `story-helpers` (not `userEvent` directly) so the toolbar's Slow motion toggle applies, and hover page elements while inspecting via `hoverPage`/`pick`, which first let the browser settle its own hover state.
 
 ## Commit messages
 
