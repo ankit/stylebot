@@ -109,6 +109,32 @@ describe('rule', () => {
       `);
     });
 
+    it('places the split-out rule right after the group, separated by a blank line', () => {
+      const css = dedent`
+        .mock-selector-1, .mock-selector-2 {
+          color: red;
+        }
+
+        .mock-selector-3 {
+          color: blue;
+        }
+      `;
+
+      expect(splitSelectorFromGroup(css, '.mock-selector-1')).toEqual(dedent`
+        .mock-selector-2 {
+          color: red;
+        }
+
+        .mock-selector-1 {
+          color: red;
+        }
+
+        .mock-selector-3 {
+          color: blue;
+        }
+      `);
+    });
+
     it('leaves the rest of the group styled by the original rule', () => {
       const css = dedent`
         .mock-selector-1, .mock-selector-2 {

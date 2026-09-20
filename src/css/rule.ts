@@ -183,6 +183,9 @@ export const splitSelectorFromGroup = (
 
   const split = group.clone();
   split.selectors = [selector];
+  // The clone inherits the group's leading whitespace, which is empty when
+  // the group opens the sheet and would print the new rule as `}.foo {`.
+  split.raws.before = '\n\n';
   group.after(split);
   group.selectors = group.selectors.filter(part => part !== selector);
 
