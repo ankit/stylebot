@@ -1,6 +1,6 @@
 import { StyleMap } from '@stylebot/types';
 
-import mergeStyles from './merge-styles';
+import { mergeWithoutBase as mergeStyles } from '../merge-without-base';
 
 const style = (css: string, modifiedTime: string) => ({
   css,
@@ -9,7 +9,7 @@ const style = (css: string, modifiedTime: string) => ({
   modifiedTime,
 });
 
-describe('mergeStyles', () => {
+describe('mergeWithoutBase', () => {
   it('keeps the remote style when it was modified more recently than local', () => {
     const local: StyleMap = {
       'example.com': style('color: red', '2024-01-01T00:00:00.000Z'),
