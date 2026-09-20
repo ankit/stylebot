@@ -1,26 +1,31 @@
-import Vuex, { Store } from 'vuex';
+import Vuex, { ActionTree, Store } from 'vuex';
 
 import { defaultOptions, defaultCommands } from '@stylebot/settings';
 import type {
   StyleMap,
   StylebotOptions,
   StylebotCommands,
-  GoogleDriveSyncMetadata,
+  SyncState,
 } from '@stylebot/types';
+import type { SyncStatus } from '@/options/store';
+import { runGoogleDriveSync } from '@/options/utils';
 
 export type OptionsState = {
   styles: StyleMap;
   options: StylebotOptions | null;
   commands: StylebotCommands;
   googleDriveSyncEnabled: boolean;
-  googleDriveSyncMetadata: GoogleDriveSyncMetadata | undefined;
+  googleDriveSyncState: SyncState | undefined;
+  googleDriveSyncNeedsAuth: boolean;
+  syncInProgress: boolean;
+  syncStatus: SyncStatus;
 };
 
 export type OptionsStateOverrides = Partial<Omit<OptionsState, 'options'>> & {
   options?: Partial<StylebotOptions>;
 };
 
-const ACTIONS = [
+const NOOP_ACTIONS = [
   'getAllStyles',
   'getAllOptions',
   'getCommands',
@@ -35,32 +40,92 @@ const ACTIONS = [
   'disableAllStyles',
   'setOption',
   'setCommands',
-  'setGoogleDriveSyncEnabled',
-  'syncWithGoogleDrive',
 ];
 
+const noop = () => undefined;
+
+const actions: ActionTree<OptionsState, OptionsState> = {
+  ...Object.fromEntries(NOOP_ACTIONS.map(name => [name, noop])),
+
+  setGoogleDriveSyncEnabled({ state, dispatch }, enabled: boolean) {
+    state.googleDriveSyncEnabled = enabled;
+
+    if (enabled) {
+      return dispatch('syncWithGoogleDrive');
+    }
+
+    state.googleDriveSyncState = undefined;
+    state.googleDriveSyncNeedsAuth = false;
+    state.syncStatus = null;
+  },
+
+  dismissSyncConflict({ state }, url: string) {
+    if (!state.googleDriveSyncState?.conflicts) {
+      return;
+    }
+
+    state.googleDriveSyncState = {
+      ...state.googleDriveSyncState,
+      conflicts: state.googleDriveSyncState.conflicts.filter(
+        conflict => conflict.url !== url
+      ),
+    };
+  },
+
+  async syncWithGoogleDrive({ state }) {
+    if (state.syncInProgress) {
+      return;
+    }
+
+    state.syncInProgress = true;
+    state.syncStatus = null;
+
+    try {
+      const response = await runGoogleDriveSync();
+
+      if (response.ok) {
+        state.googleDriveSyncState = {
+          remoteRevision: response.metadata.modifiedTime,
+          localRevision: response.metadata.modifiedTime,
+          lastSyncedAt: new Date().toISOString(),
+          metadata: response.metadata,
+          conflicts: state.googleDriveSyncState?.conflicts,
+          account: state.googleDriveSyncState?.account,
+        };
+        state.googleDriveSyncNeedsAuth = false;
+      } else {
+        state.syncStatus = {
+          type: 'error',
+          messageKey: response.errorKey,
+          detail: response.errorDetail,
+        };
+      }
+    } finally {
+      state.syncInProgress = false;
+    }
+  },
+};
+
 /**
- * Options-page store seeded up front; every action is a no-op so App.vue's
- * created() fetches leave the seeded state untouched.
+ * Options-page store seeded up front; the fetch actions App.vue's created()
+ * calls are no-ops so the seeded state survives mount, but the sync actions
+ * a story clicks through run for real against the chrome shim, so a sync
+ * driven from a story behaves like it does in production.
  */
 export const createOptionsStore = (
   overrides: OptionsStateOverrides = {}
-): Store<OptionsState> => {
-  const actions: Record<string, () => void> = {};
-
-  ACTIONS.forEach(name => {
-    actions[name] = () => undefined;
-  });
-
-  return new Vuex.Store<OptionsState>({
+): Store<OptionsState> =>
+  new Vuex.Store<OptionsState>({
     state: {
       styles: {},
       commands: defaultCommands,
       googleDriveSyncEnabled: false,
-      googleDriveSyncMetadata: undefined,
+      googleDriveSyncState: undefined,
+      googleDriveSyncNeedsAuth: false,
+      syncInProgress: false,
+      syncStatus: null,
       ...overrides,
       options: { ...defaultOptions, ...overrides.options },
     },
     actions,
   });
-};

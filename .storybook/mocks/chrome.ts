@@ -15,6 +15,7 @@ import type {
   StylebotOptions,
   StylebotCommands,
   ReadabilitySettings,
+  RunGoogleDriveSyncResponse,
 } from '@stylebot/types';
 
 export type ChromeShimOptions = {
@@ -28,6 +29,8 @@ export type ChromeShimOptions = {
   isOpen?: boolean;
   pageReaderable?: boolean;
   tabUrl?: string;
+  // 'pending' never resolves, for a story that shows a sync stuck in progress.
+  googleDriveSync?: RunGoogleDriveSyncResponse | 'pending';
 };
 
 type Callback = (response?: unknown) => void;
@@ -102,6 +105,33 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
     // The background's own history, over the shim's storage.
     GetRecentColors: () => getAllRecentColors(),
     AddRecentColor: ({ color = '' }) => addRecentColor(color),
+    // Mirrors the background's own side effects on a real sync, so the
+    // popup (which reads sync state back off storage) sees the result too.
+    RunGoogleDriveSync: () => {
+      if (overrides.googleDriveSync === 'pending') {
+        return new Promise(() => undefined);
+      }
+
+      const response = overrides.googleDriveSync ?? {
+        ok: false,
+        errorKey: 'sync_error_unknown',
+      };
+
+      if (response.ok) {
+        storage['google-drive-sync-needs-auth'] = false;
+        storage['google-drive-sync-state'] = {
+          ...(storage['google-drive-sync-state'] as
+            | Record<string, unknown>
+            | undefined),
+          remoteRevision: response.metadata.modifiedTime,
+          localRevision: response.metadata.modifiedTime,
+          lastSyncedAt: new Date().toISOString(),
+          metadata: response.metadata,
+        };
+      }
+
+      return response;
+    },
   };
 
   const tabResponses: Record<string, () => unknown> = {
