@@ -1,8 +1,13 @@
 import { compareAsc } from 'date-fns';
 
-import { StyleMap, GoogleDriveSyncMetadata } from '@stylebot/types';
+import {
+  StyleMap,
+  GoogleDriveSyncMetadata,
+  RunGoogleDriveSyncResponse,
+} from '@stylebot/types';
 import { getCurrentTimestamp } from '@stylebot/utils';
 
+import { toSyncErrorKey, toSyncErrorDetail } from '../errors';
 import mergeStyles from './merge-styles';
 import getAccessToken from './get-access-token';
 import {
@@ -30,7 +35,7 @@ const writeToRemote = async (
   accessToken: string,
   syncMetadata: GoogleDriveSyncMetadata,
   styles: StyleMap
-) => {
+): Promise<GoogleDriveSyncMetadata> => {
   const blob = getStylesBlob(styles);
   const updatedSyncMetadata = await writeSyncFile(
     accessToken,
@@ -38,7 +43,8 @@ const writeToRemote = async (
     syncMetadata.id
   );
 
-  return setGoogleDriveSyncMetadata(updatedSyncMetadata);
+  await setGoogleDriveSyncMetadata(updatedSyncMetadata);
+  return updatedSyncMetadata;
 };
 
 /**
@@ -47,13 +53,16 @@ const writeToRemote = async (
 const writeToLocal = async (
   syncMetadata: GoogleDriveSyncMetadata,
   styles: StyleMap
-) => {
+): Promise<GoogleDriveSyncMetadata> => {
   await setAllStyles(styles);
 
-  return setGoogleDriveSyncMetadata({
+  const updatedSyncMetadata = {
     ...syncMetadata,
     modifiedTime: getCurrentTimestamp(),
-  });
+  };
+
+  await setGoogleDriveSyncMetadata(updatedSyncMetadata);
+  return updatedSyncMetadata;
 };
 
 /**
@@ -62,13 +71,13 @@ const writeToLocal = async (
 const merge = async (
   accessToken: string,
   syncMetadata: GoogleDriveSyncMetadata
-) => {
+): Promise<GoogleDriveSyncMetadata> => {
   const localStyles = await getAllStyles();
   const remoteStyles = await downloadSyncFile(accessToken, syncMetadata.id);
   const mergedStyles = mergeStyles(localStyles, remoteStyles);
 
   await writeToLocal(syncMetadata, mergedStyles);
-  await writeToRemote(accessToken, syncMetadata, mergedStyles);
+  return writeToRemote(accessToken, syncMetadata, mergedStyles);
 };
 
 /**
@@ -80,7 +89,7 @@ const merge = async (
  *    - Else, write remote styles to local
  * 4) If local styles' modified timestamp > remote sync timestamp, write local styles to remote.
  */
-export const runGoogleDriveSync = async (): Promise<void> => {
+const reconcile = async (): Promise<GoogleDriveSyncMetadata> => {
   const styles = await getAllStyles();
   const accessToken = await getAccessToken();
   const remoteSyncMetadata = await getSyncFileMetadata(accessToken);
@@ -91,8 +100,10 @@ export const runGoogleDriveSync = async (): Promise<void> => {
     console.debug('did not find remote sync file, updating remote...');
 
     const blob = getStylesBlob(styles);
-    const remoteSyncMetadata = await writeSyncFile(accessToken, blob);
-    return setGoogleDriveSyncMetadata(remoteSyncMetadata);
+    const createdSyncMetadata = await writeSyncFile(accessToken, blob);
+
+    await setGoogleDriveSyncMetadata(createdSyncMetadata);
+    return createdSyncMetadata;
   }
 
   const localSyncMetadata = await getGoogleDriveSyncMetadata();
@@ -140,8 +151,30 @@ export const runGoogleDriveSync = async (): Promise<void> => {
     return writeToRemote(accessToken, remoteSyncMetadata, styles);
   }
 
-  return setGoogleDriveSyncMetadata({
+  const touchedSyncMetadata = {
     ...remoteSyncMetadata,
     modifiedTime: getCurrentTimestamp(),
-  });
+  };
+
+  await setGoogleDriveSyncMetadata(touchedSyncMetadata);
+  return touchedSyncMetadata;
 };
+
+/**
+ * Never rejects. Callers are message handlers whose sendResponse must always
+ * fire, so failures come back as a result rather than an exception.
+ */
+export const runGoogleDriveSync =
+  async (): Promise<RunGoogleDriveSyncResponse> => {
+    try {
+      return { ok: true, metadata: await reconcile() };
+    } catch (e) {
+      console.debug('google drive sync failed', e);
+
+      return {
+        ok: false,
+        errorKey: toSyncErrorKey(e),
+        errorDetail: toSyncErrorDetail(e),
+      };
+    }
+  };
