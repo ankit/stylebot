@@ -60,11 +60,14 @@
           :disable-toggle="isOpen || (pageReaderable && readability)"
           :initial-enabled="style.enabled"
         />
-
-        <sync-stylebot v-if="googleDriveSyncEnabled" />
       </div>
 
       <div class="popup-divider" />
+
+      <template v-if="googleDriveSyncEnabled">
+        <sync-stylebot />
+        <div class="popup-divider" />
+      </template>
 
       <div class="popup-footer">
         <toggle-stylebot

@@ -1,33 +1,30 @@
 <template>
-  <s-tooltip grow :text="t('sync_description')">
-    <popup-row button :disabled="syncInProgress" @click="sync">
-      <span class="sync-icon">
-        <arrow-repeat-icon :spinning="syncInProgress" />
-      </span>
+  <div class="sync-strip" :class="{ error: hasError }">
+    <span v-if="syncInProgress" class="sync-status">
+      {{ t('sync_in_progress') }}
+    </span>
+    <span v-else-if="errorKey" class="sync-status">
+      {{ t(errorKey) }}
+    </span>
+    <span v-else-if="needsAuth" class="sync-status">
+      {{ t('sync_needs_sign_in') }}
+    </span>
+    <span v-else class="sync-status">
+      <span class="dot" />
+      {{ syncTime ? t('synced_at_time', [syncTime]) : t('sync_never') }}
+    </span>
 
-      <span class="row-label">
-        {{ syncInProgress ? t('sync_in_progress') : t('sync_now') }}
-
-        <span
-          v-if="!syncInProgress && errorKey"
-          class="popup-caption sync-error"
-        >
-          {{ t(errorKey) }}
-        </span>
-
-        <span
-          v-else-if="!syncInProgress && needsAuth"
-          class="popup-caption sync-error"
-        >
-          {{ t('sync_needs_sign_in') }}
-        </span>
-
-        <span v-else class="popup-caption sync-metadata">
-          {{ syncInProgress ? undefined : syncTime }}
-        </span>
-      </span>
-    </popup-row>
-  </s-tooltip>
+    <button
+      type="button"
+      class="sync-button"
+      :title="t('sync_now')"
+      :disabled="syncInProgress"
+      @click="sync"
+    >
+      <arrow-repeat-icon :size="13" :spinning="syncInProgress" />
+      {{ t('sync_action') }}
+    </button>
+  </div>
 </template>
 
 <script lang="ts">
@@ -46,16 +43,12 @@ import {
 
 import { formatSyncTime } from '@stylebot/utils';
 import { ArrowRepeatIcon } from '@stylebot/icons';
-import { STooltip } from '@stylebot/components';
-import PopupRow from './PopupRow.vue';
 
 export default Vue.extend({
   name: 'SyncStylebot',
 
   components: {
     ArrowRepeatIcon,
-    STooltip,
-    PopupRow,
   },
 
   data(): {
@@ -70,6 +63,12 @@ export default Vue.extend({
       errorKey: null,
       needsAuth: false,
     };
+  },
+
+  computed: {
+    hasError(): boolean {
+      return !this.syncInProgress && (!!this.errorKey || this.needsAuth);
+    },
   },
 
   created() {
@@ -110,21 +109,64 @@ export default Vue.extend({
 });
 </script>
 
-<style lang="scss">
-.sync-metadata {
-  margin-left: 4px;
-  font-style: italic;
+<style lang="scss" scoped>
+.sync-strip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px 8px 16px;
 }
 
-.sync-error {
-  margin-left: 4px;
+.sync-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+  font-size: 12.5px;
+  line-height: 1.35;
+  color: var(--text-muted);
+}
+
+.error .sync-status {
   color: var(--danger);
 }
 
-.sync-icon {
+.dot {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--success);
+}
+
+.sync-button {
   display: inline-flex;
   flex: none;
-  justify-content: center;
-  width: 28px;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--text-primary);
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background: var(--hover-tint);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: -2px;
+  }
+
+  &:disabled {
+    cursor: default;
+    color: var(--text-muted);
+  }
 }
 </style>
