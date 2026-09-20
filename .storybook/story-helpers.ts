@@ -149,6 +149,15 @@ export const propertyCard = (canvas: Canvas, label: string): HTMLElement =>
     .getByText(label, { selector: '.property-card-label' })
     .closest('.property-card') as HTMLElement;
 
+/**
+ * The switch of a Presets feature card, found by its heading.
+ */
+export const featureSwitch = (canvas: Canvas, label: string): HTMLElement =>
+  canvas
+    .getByRole('heading', { name: label })
+    .closest('.feature-card')
+    ?.querySelector('input[type="checkbox"]') as HTMLElement;
+
 export const cardCollapse = (canvas: Canvas, label: string): HTMLElement =>
   propertyCard(canvas, label).querySelector(
     '.property-card-collapse'

@@ -1,6 +1,6 @@
 <template>
   <s-tooltip :text="t('close')" shortcut="esc">
-    <icon-button :size="20" @click="onClick">
+    <icon-button :size="20" :aria-label="t('close')" @click="onClick">
       <icon-x :size="14" />
     </icon-button>
   </s-tooltip>
