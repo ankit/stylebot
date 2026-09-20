@@ -66,8 +66,7 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-// Reuse STabs' own sliding-underline look as-is; only the top inset needs adjusting.
-.mode-actions ::v-deep .tabs {
-  padding-top: 10px;
+.mode-actions {
+  margin-top: 10px;
 }
 </style>
