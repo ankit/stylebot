@@ -28,7 +28,6 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 @mixin dark-theme-vars {
-  color-scheme: dark;
   --panel-surface: #1c1e22;
   --text-primary: #f2f4f7;
   --text-secondary: #a3aab6;
@@ -56,6 +55,7 @@ export default Vue.extend({
 
   --card-surface: #212429;
   --tab-surface: #181a1e;
+  --raised-surface: #000;
   --panel-shadow: rgb(0 0 0 / 34%);
 
   --menu-surface: #23262b;
@@ -106,6 +106,7 @@ export default Vue.extend({
 
   --card-surface: #fff;
   --tab-surface: #f7f8fa;
+  --raised-surface: #fff;
   --panel-shadow: rgb(0 0 0 / 16%);
 
   --menu-surface: #fff;
@@ -137,10 +138,6 @@ export default Vue.extend({
   .theme-provider:not([data-theme]) {
     @include dark-theme-vars;
   }
-}
-
-.theme-provider[data-theme='light'] {
-  color-scheme: light;
 }
 
 .theme-provider[data-theme='dark'] {
