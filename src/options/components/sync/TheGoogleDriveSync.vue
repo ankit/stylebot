@@ -11,6 +11,7 @@
           class="description"
         >
           {{ t('sync_not_connected') }}
+          {{ t('sync_drive_location', [syncFilePath]) }}
         </s-text>
 
         <s-text v-else size="caption" variant="muted" class="description">
@@ -22,8 +23,13 @@
           </template>
           <template v-if="googleDriveSyncViewLink">
             ·
-            <a :href="googleDriveSyncViewLink" target="_blank">
-              {{ t('view_synced_file') }}
+            <template v-if="account">{{ account.email }} ›</template>
+            <a
+              :href="googleDriveSyncViewLink"
+              :title="t('view_synced_file')"
+              target="_blank"
+            >
+              {{ syncFilePath }}
             </a>
             ·
             <a :href="googleDriveSyncDownloadLink" target="_blank">
@@ -101,9 +107,10 @@
 import Vue from 'vue';
 import { Heading, SText, SButton } from '@stylebot/components';
 import { ArrowRepeatIcon } from '@stylebot/icons';
-import { SyncConflict } from '@stylebot/types';
+import { SyncAccount, SyncConflict } from '@stylebot/types';
 import { formatSyncTime } from '@stylebot/utils';
 import { SYNC_PERIOD_MINUTES } from '../../../background/sync-scheduler';
+import { SYNC_FILE_PATH } from '../../../sync/google-drive/constants';
 
 export default Vue.extend({
   name: 'TheGoogleDriveSync',
@@ -115,8 +122,11 @@ export default Vue.extend({
     SText,
   },
 
-  data(): { syncPeriodMinutes: number } {
-    return { syncPeriodMinutes: SYNC_PERIOD_MINUTES };
+  data(): { syncPeriodMinutes: number; syncFilePath: string } {
+    return {
+      syncPeriodMinutes: SYNC_PERIOD_MINUTES,
+      syncFilePath: SYNC_FILE_PATH,
+    };
   },
 
   computed: {
@@ -140,6 +150,10 @@ export default Vue.extend({
       set(val: boolean) {
         this.$store.dispatch('setGoogleDriveSyncEnabled', val);
       },
+    },
+
+    account(): SyncAccount | undefined {
+      return this.$store.state.googleDriveSyncState?.account;
     },
 
     googleDriveSyncViewLink(): string {

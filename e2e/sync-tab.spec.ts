@@ -53,6 +53,11 @@ test.describe('Sync tab', () => {
       page.getByText('Not connected. Styles stay on this computer only.')
     ).toBeVisible();
     await expect(
+      page.getByText(
+        /creates a single file, stylebot\/stylebot_v3_backup\.json/
+      )
+    ).toBeVisible();
+    await expect(
       page.getByRole('button', { name: 'Enable Google Drive Sync' })
     ).toBeVisible();
   });
@@ -79,7 +84,9 @@ test.describe('Sync tab', () => {
     await expect(
       page.getByRole('button', { name: 'Disable Google Drive Sync' })
     ).toBeVisible();
-    await expect(page.getByRole('link', { name: 'View' })).toBeVisible();
+    await expect(
+      page.getByRole('link', { name: 'stylebot/stylebot_v3_backup.json' })
+    ).toBeVisible();
     await expect(page.getByText('Invalid Date')).toHaveCount(0);
     expect(pageErrors).toEqual([]);
   });

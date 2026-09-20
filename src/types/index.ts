@@ -128,6 +128,10 @@ export type SyncConflict = {
  * lets the next merge tell a deletion from an addition; it is absent on
  * profiles that synced before it was recorded.
  */
+export type SyncAccount = {
+  email: string;
+};
+
 export type SyncState = {
   remoteRevision: string;
   localRevision: string;
@@ -135,6 +139,7 @@ export type SyncState = {
   metadata: GoogleDriveSyncMetadata;
   baseStyles?: StyleMap;
   conflicts?: Array<SyncConflict>;
+  account?: SyncAccount;
 };
 
 export * from './TabMessage';

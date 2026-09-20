@@ -1,11 +1,17 @@
 import { compareAsc } from 'date-fns';
 
-import { GoogleDriveSyncMetadata, StyleMap } from '@stylebot/types';
+import {
+  GoogleDriveSyncMetadata,
+  StyleMap,
+  SyncAccount,
+} from '@stylebot/types';
 
 import { syncError } from '../errors';
 import { AccessToken } from './get-access-token';
+import { SYNC_FOLDER_NAME, SYNC_FILE_NAME } from './constants';
 
 const GOOGLE_DRIVE_FILE_GET_API = `https://www.googleapis.com/drive/v3/files`;
+const GOOGLE_DRIVE_ABOUT_API = `https://www.googleapis.com/drive/v3/about`;
 const GOOGLE_DRIVE_FILE_UPLOAD_API = `https://www.googleapis.com/upload/drive/v3/files`;
 const GOOGLE_DRIVE_FILE_FIELDS = [
   'id',
@@ -14,8 +20,6 @@ const GOOGLE_DRIVE_FILE_FIELDS = [
   'webContentLink',
 ].join(',');
 
-const SYNC_FOLDER_NAME = 'stylebot';
-const SYNC_FILE_NAME = 'stylebot_v3_backup.json';
 const FOLDER_MIME_TYPE = 'application/vnd.google-apps.folder';
 
 const searchFiles = async (
@@ -76,6 +80,27 @@ const isStyleMap = (value: unknown): value is StyleMap =>
       style !== null &&
       typeof (style as { css?: unknown }).css === 'string'
   );
+
+/**
+ * Which Google account the token belongs to, so the Sync tab can say where
+ * the backup lives. Null when Drive will not say; the tab then just omits it.
+ */
+export const getAccount = async (
+  accessToken: AccessToken
+): Promise<SyncAccount | null> => {
+  const url = `${GOOGLE_DRIVE_ABOUT_API}?fields=user(emailAddress)`;
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: getAuthorizationHeaders(accessToken),
+  });
+
+  if (!response.ok) {
+    return null;
+  }
+
+  const { user } = await response.json();
+  return user?.emailAddress ? { email: user.emailAddress } : null;
+};
 
 export const getFileMetadata = async (
   id: string,

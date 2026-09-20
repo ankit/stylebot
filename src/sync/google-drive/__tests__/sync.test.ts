@@ -7,6 +7,7 @@ jest.mock('../get-access-token', () => ({
 jest.mock('../sync-file', () => ({
   getSyncFileMetadata: jest.fn(),
   getFileMetadata: jest.fn(),
+  getAccount: jest.fn().mockResolvedValue({ email: 'me@example.com' }),
   downloadSyncFile: jest.fn(),
   writeSyncFile: jest.fn(),
 }));
@@ -17,6 +18,7 @@ import { runGoogleDriveSync } from '../sync';
 import {
   getSyncFileMetadata,
   getFileMetadata,
+  getAccount,
   downloadSyncFile,
   writeSyncFile,
 } from '../sync-file';
@@ -186,7 +188,23 @@ describe('runGoogleDriveSync', () => {
       remoteRevision: 'remote-1',
       localRevision: 'local-1',
       baseStyles: RED,
+      account: { email: 'me@example.com' },
     });
+  });
+
+  it('keeps the account it already knows rather than asking Drive again', async () => {
+    seed({
+      styles: RED,
+      state: synced('remote-1', 'local-1', RED, {
+        account: { email: 'first@example.com' },
+      }),
+    });
+    mockedGetRemote.mockResolvedValue(remoteMetadata('remote-1'));
+
+    await runGoogleDriveSync();
+
+    expect(getAccount).not.toBeCalled();
+    expect(storedState()?.account).toEqual({ email: 'first@example.com' });
   });
 
   it('pushes when only local changed, without downloading', async () => {

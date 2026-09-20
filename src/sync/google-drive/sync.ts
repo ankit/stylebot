@@ -24,6 +24,7 @@ import {
 import {
   getSyncFileMetadata,
   getFileMetadata,
+  getAccount,
   downloadSyncFile,
   writeSyncFile,
 } from './sync-file';
@@ -127,6 +128,9 @@ const reconcile = async (
   const accessToken = await getAccessToken({ interactive });
   const state = await getSyncState();
   const remote = await getSyncFileMetadata(accessToken);
+  // Fetched once; a token always belongs to the account that connected.
+  const account =
+    state?.account ?? (await getAccount(accessToken)) ?? undefined;
 
   if (!remote) {
     console.debug('did not find remote sync file, updating remote...');
@@ -139,6 +143,7 @@ const reconcile = async (
       lastSyncedAt: now,
       baseStyles: local,
       conflicts: state?.conflicts,
+      account,
     };
 
     await recordSyncState(next);
@@ -161,6 +166,7 @@ const reconcile = async (
       metadata: remote,
       lastSyncedAt: now,
       baseStyles: state.baseStyles ?? local,
+      account,
     };
 
     await recordSyncState(next);
@@ -237,6 +243,7 @@ const reconcile = async (
       conflicts,
       now
     ),
+    account,
   };
 
   await recordSyncState(next);
