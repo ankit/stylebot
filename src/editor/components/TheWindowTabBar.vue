@@ -105,7 +105,9 @@ export default Vue.extend({
 
 .window-tab-hint {
   flex: none;
-  padding: 1px 7px;
+  height: 16px;
+  padding: 0 7px;
+  line-height: 16px;
   border-radius: 999px;
   background: var(--panel-border);
   color: var(--text-muted);

@@ -71,7 +71,7 @@ describe('editor-window', () => {
 
     expect(fake.api.windows.create).toBeCalledWith(
       expect.objectContaining({
-        url: 'chrome-extension://id/editor-window/index.html?tabId=7',
+        url: 'chrome-extension://id/editor-window/index.html?tabId=7&appearance=system',
         type: 'popup',
         focused: true,
         width: 420,
@@ -102,7 +102,7 @@ describe('editor-window', () => {
   });
 
   it('restores saved bounds when the layout has them', async () => {
-    fake.api.storage.local.get.mockResolvedValueOnce({
+    fake.api.storage.local.get.mockResolvedValue({
       options: {
         layout: { window: { width: 500, height: 700, left: 40, top: 60 } },
       },
