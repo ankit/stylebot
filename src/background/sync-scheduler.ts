@@ -6,8 +6,9 @@ const AFTER_EDIT_ALARM = 'google-drive-sync-after-edit';
 export const SYNC_PERIOD_MINUTES = 30;
 
 // Long enough for a burst of keystrokes in the code editor to settle into one
-// upload, short enough that a second device sees the edit soon after.
-const AFTER_EDIT_DELAY_MS = 60 * 1000;
+// upload, and the shortest delay chrome.alarms honours for an installed
+// extension (Chrome 120+ clamps anything under 30s).
+const AFTER_EDIT_DELAY_MS = 30 * 1000;
 
 export const isSyncAlarm = (name: string): boolean =>
   name === PERIODIC_ALARM || name === AFTER_EDIT_ALARM;

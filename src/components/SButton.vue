@@ -15,7 +15,7 @@
 <script lang="ts">
 import Vue, { PropType } from 'vue';
 
-type Variant = 'default' | 'ghost' | 'danger';
+type Variant = 'default' | 'primary' | 'ghost' | 'danger';
 
 export default Vue.extend({
   name: 'SButton',
@@ -70,6 +70,16 @@ export default Vue.extend({
 
   &:hover:not(:disabled) {
     background: var(--hover-tint);
+  }
+}
+
+.button.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+
+  &:hover:not(:disabled) {
+    filter: brightness(0.92);
   }
 }
 

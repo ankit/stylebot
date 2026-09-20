@@ -26,16 +26,6 @@ describe('TheSyncTab.vue', () => {
     expect(wrapper.find('.banner').exists()).toBe(false);
   });
 
-  it('shows a success banner after a successful sync', () => {
-    const wrapper = mountTab({
-      syncStatus: { type: 'success', messageKey: 'sync_success' },
-    });
-
-    const banner = wrapper.find('.banner');
-    expect(banner.classes()).toContain('success');
-    expect(banner.text()).toContain('sync_success');
-  });
-
   it('shows an error banner carrying the failure key', () => {
     const wrapper = mountTab({
       syncStatus: {

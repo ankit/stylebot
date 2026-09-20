@@ -33,10 +33,12 @@ import {
 
 Vue.use(Vuex);
 
-export type SyncStatus =
-  | { type: 'success'; messageKey: 'sync_success' }
-  | { type: 'error'; messageKey: SyncErrorKey; detail?: string }
-  | null;
+// Only failures get a banner; success shows in the card's synced pill.
+export type SyncStatus = {
+  type: 'error';
+  messageKey: SyncErrorKey;
+  detail?: string;
+} | null;
 
 type State = {
   styles: StyleMap;
@@ -220,11 +222,9 @@ export default new Vuex.Store<State>({
       try {
         const response = await runGoogleDriveSync();
 
-        if (response?.ok) {
-          state.syncStatus = { type: 'success', messageKey: 'sync_success' };
-        } else if (state.googleDriveSyncEnabled) {
-          // A run that was in flight when the user disconnected reports
-          // not-enabled; there is no card left to show that on.
+        // A run that was in flight when the user disconnected reports
+        // not-enabled; there is no card left to show that on.
+        if (!response?.ok && state.googleDriveSyncEnabled) {
           state.syncStatus = {
             type: 'error',
             messageKey: response?.errorKey ?? 'sync_error_unknown',

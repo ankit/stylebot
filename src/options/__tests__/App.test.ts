@@ -46,6 +46,13 @@ const createStore = () =>
 
 const flush = () => new Promise(resolve => setTimeout(resolve, 0));
 
+beforeEach(() => {
+  // App subscribes to storage changes so background syncs refresh the page.
+  global.chrome = {
+    storage: { onChanged: { addListener: jest.fn() } },
+  } as unknown as typeof chrome;
+});
+
 const mountApp = async (initialRoute = '/') => {
   const router = createRouter('abstract');
   await router.replace(initialRoute).catch(() => undefined);
