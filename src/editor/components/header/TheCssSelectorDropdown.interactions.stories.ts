@@ -47,6 +47,14 @@ export const TypingCommitsSelector: StoryObj = {
     await waitFor(() => expect(items(canvasElement)).toHaveLength(1));
     await expect(items(canvasElement)[0]).toHaveTextContent('.article-body');
 
+    // Hovering a suggestion previews it on the page: the two paragraphs,
+    // and nothing that isn't rendered.
+    await user.hover(items(canvasElement)[0]);
+    await within(document.body).findByText('Matches 2 elements');
+    await expect(
+      document.querySelectorAll('#stylebot-overlay > div')
+    ).toHaveLength(2);
+
     // Picking keeps the field focused for further edits, so the value
     // shows in the input rather than as chips.
     await user.click(items(canvasElement)[0]);

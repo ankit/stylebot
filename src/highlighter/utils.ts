@@ -103,7 +103,10 @@ export function getNestedBoundingClientRect(
 ): Rect {
   const ownerIframe = getOwnerIframe(node);
 
-  if (ownerIframe && ownerIframe !== boundaryWindow) {
+  // Only walk up when the node lives in a different window than the
+  // boundary; a page that is itself framed (a same-origin embed, Storybook's
+  // preview) must not have its own frame's offset added.
+  if (ownerIframe && getOwnerWindow(node) !== boundaryWindow) {
     const rects = [node.getBoundingClientRect()];
 
     let currentIframe: HTMLElement | null = ownerIframe;
