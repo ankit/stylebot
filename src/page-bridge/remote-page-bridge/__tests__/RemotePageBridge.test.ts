@@ -205,6 +205,22 @@ describe('RemotePageBridge', () => {
     expect(handlers.onInspectingStopped).toBeCalled();
   });
 
+  it('brings the tab and its window to the front', async () => {
+    const update = jest.fn();
+    const windowsUpdate = jest.fn();
+    (chrome.tabs as unknown as { get: unknown; update: unknown }).get = () =>
+      Promise.resolve({ windowId: 4 });
+    (chrome.tabs as unknown as { update: unknown }).update = update;
+    global.chrome.windows = { update: windowsUpdate } as never;
+
+    new RemotePageBridge(7, handlers).focusPage();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(update).toBeCalledWith(7, { active: true });
+    expect(windowsUpdate).toBeCalledWith(4, { focused: true });
+  });
+
   it('sends page operations over the port', () => {
     const bridge = new RemotePageBridge(7, handlers);
     bridge.connect();

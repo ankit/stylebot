@@ -6,7 +6,7 @@ import { setPageBridge, RemotePageBridge } from '@stylebot/page-bridge';
 import { setupVue } from '../editor/utils/init-editor';
 import TheStylebotApp from '../editor/components/TheStylebotApp.vue';
 
-import { initWindowListeners } from './listeners';
+import { initWindowListeners, initTabInfo } from './listeners';
 
 import './index.scss';
 
@@ -64,6 +64,8 @@ const start = async (): Promise<void> => {
       }
     });
   });
+
+  initTabInfo(store, tabId);
 
   await bridge.connect();
   await store.dispatch('initialize');

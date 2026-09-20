@@ -1,6 +1,7 @@
 <template>
   <the-stylebot-resizer>
     <div class="stylebot-content">
+      <the-window-tab-bar v-if="host === 'window'" />
       <the-header />
 
       <the-window-status v-if="host === 'window' && !pageConnected" />
@@ -33,6 +34,7 @@ import TheBasicEditor from './TheBasicEditor.vue';
 import ThePresetsEditor from './ThePresetsEditor.vue';
 import TheStylebotResizer from './TheStylebotResizer.vue';
 import TheWindowStatus from './TheWindowStatus.vue';
+import TheWindowTabBar from './TheWindowTabBar.vue';
 
 import { StylebotEditingMode } from '@stylebot/types';
 
@@ -46,6 +48,7 @@ export default Vue.extend({
     TheCodeEditor,
     TheStylebotResizer,
     TheWindowStatus,
+    TheWindowTabBar,
   },
 
   data(): { codeEditorMounted: boolean } {

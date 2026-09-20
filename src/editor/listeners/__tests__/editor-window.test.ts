@@ -29,6 +29,7 @@ const bridge = {
   unhighlight: jest.fn(),
   getPageColors: jest.fn(),
   openInPage: jest.fn(),
+  focusPage: jest.fn(),
   on: jest.fn((event: string, listener: PageBridgeEvents['select']) => {
     if (event === 'select') {
       selectListeners.push(listener);
