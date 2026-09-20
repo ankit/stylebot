@@ -1,5 +1,7 @@
 <template>
-  <s-tabs :value="mode" :tabs="tabs" @change="setMode" />
+  <div class="mode-actions">
+    <s-tabs :value="mode" :tabs="tabs" @change="setMode" />
+  </div>
 </template>
 
 <script lang="ts">
@@ -62,3 +64,9 @@ export default Vue.extend({
   },
 });
 </script>
+
+<style lang="scss" scoped>
+.mode-actions {
+  margin-top: 10px;
+}
+</style>

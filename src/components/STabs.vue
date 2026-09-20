@@ -4,7 +4,6 @@
 
     <s-tooltip
       v-for="tab in tabs"
-      ref="tabButtons"
       :key="tab.value"
       :text="tab.title"
       :shortcut="tab.shortcut"
@@ -18,7 +17,7 @@
         :aria-selected="tab.value === value"
         @click="$emit('change', tab.value)"
       >
-        {{ tab.label }}
+        <span ref="tabLabels" class="tab-label">{{ tab.label }}</span>
       </button>
     </s-tooltip>
   </div>
@@ -110,9 +109,9 @@ export default Vue.extend({
   methods: {
     measure(): void {
       const root = this.$refs.root as HTMLElement | undefined;
-      const buttons = this.$refs.tabButtons as Array<Vue> | undefined;
+      const labels = this.$refs.tabLabels as Array<HTMLElement> | undefined;
       const index = this.tabs.findIndex(tab => tab.value === this.value);
-      const active = buttons?.[index]?.$el as HTMLElement | undefined;
+      const active = labels?.[index];
 
       if (!root || !active) {
         this.indicatorWidth = 0;
@@ -159,7 +158,7 @@ export default Vue.extend({
 
 .tab {
   position: relative;
-  padding: 4px 6px 3px;
+  padding: 6px 6px 8px;
   border: none;
   border-radius: 0;
   background: none;
