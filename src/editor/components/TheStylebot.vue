@@ -114,6 +114,7 @@ export default Vue.extend({
 <style lang="scss">
 .stylebot {
   top: 0;
+  left: 0;
   padding: 0;
   color: var(--text-primary);
   line-height: 20px;

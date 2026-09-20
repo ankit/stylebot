@@ -52,8 +52,12 @@ const initCss = async (root: ShadowRoot): Promise<void> => {
  */
 const initShadowDOM = async (): Promise<HTMLElement> => {
   const host = document.createElement('div');
+  // The reader's own UI is LTR; the page's direction is carried across the
+  // shadow boundary as a custom property so the article body still follows it.
+  const pageDirection = getComputedStyle(document.body).direction;
   const hostStyle =
-    'top: 0; height: 100%; width: 100%; position: fixed; z-index: 10000;';
+    'top: 0; left: 0; height: 100%; width: 100%; position: fixed; z-index: 10000; ' +
+    `direction: ltr; writing-mode: horizontal-tb; --stylebot-page-direction: ${pageDirection};`;
 
   host.id = 'stylebot-reader';
   host.setAttribute('style', hostStyle);

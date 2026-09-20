@@ -81,6 +81,7 @@ export default class Overlay {
     this.container = doc.createElement('div');
     this.container.id = 'stylebot-overlay';
     this.container.style.zIndex = '10000000';
+    this.container.style.direction = 'ltr';
     doc.body.appendChild(this.container);
 
     this.mountRoot = mountRoot;

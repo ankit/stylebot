@@ -156,14 +156,19 @@ export default Vue.extend({
 
         if (this.layout.dockLocation === 'left') {
           document.body.style.width = ``;
+          document.body.style.marginRight = ``;
           document.body.style.marginLeft = `${reserved}px`;
         } else {
           document.body.style.marginLeft = ``;
+          // An RTL page resolves the over-constrained body from its right
+          // edge, so the explicit margin (not just the width) keeps the gap on the right.
+          document.body.style.marginRight = `${reserved}px`;
           document.body.style.width = `calc(100% - ${reserved}px)`;
         }
       } else {
         document.body.style.width = ``;
         document.body.style.marginLeft = ``;
+        document.body.style.marginRight = ``;
       }
     },
   },
