@@ -28,7 +28,7 @@ const syncState = (lastSyncedAt: string) => ({
 });
 
 /**
- * Seeds storage from an extension page, then makes a real page the active
+ * Seeds storage through the background, then makes a real page the active
  * tab so the popup renders its main view rather than the restricted one.
  */
 const seedAndFocusPage = async (
@@ -36,10 +36,7 @@ const seedAndFocusPage = async (
   extension: Extension,
   items: Record<string, unknown>
 ) => {
-  const seed = await context.newPage();
-  await seed.goto(`chrome-extension://${extension.id}/options.html`);
-  await seed.evaluate(seeded => chrome.storage.local.set(seeded), items);
-  await seed.close();
+  await extension.evaluate(seeded => chrome.storage.local.set(seeded), items);
 
   const page = await context.newPage();
   await page.goto(baseUrl);

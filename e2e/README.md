@@ -59,7 +59,12 @@ background tab (`chrome.tabs.create`) and drives its DOM through the same DevToo
 channel as the background page. That's why tests get a `Popup` (below) rather than a
 `Page` — the smaller surface is what both engines can honour.
 
-The one thing Firefox can't do is let `context.route()` see requests the extension itself
+The same limit applies to every other extension page: `page.goto('chrome-extension://…')`
+fails on Firefox with `NS_ERROR_UNKNOWN_PROTOCOL`, and the `moz-extension://` URL can't be
+attached to either. A spec that drives the options page as a `Page` checks
+`engine.opensExtensionPages` and skips otherwise (`sync-tab.spec.ts`).
+
+The other thing Firefox can't do is let `context.route()` see requests the extension itself
 makes from its background; a spec that needs that checks `engine.routesExtensionRequests`
 and skips otherwise (`editor-webfont.spec.ts`).
 
