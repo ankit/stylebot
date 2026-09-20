@@ -1,9 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/vue';
-import { expect, fireEvent, userEvent, waitFor, within } from '@storybook/test';
+import { expect, fireEvent, waitFor, within } from '@storybook/test';
 
 import ThePresetsEditor from './ThePresetsEditor.vue';
 import { editor } from '@stylebot/storybook/editor-story';
-import { featureSwitch, storeOf } from '@stylebot/storybook/story-helpers';
+import {
+  featureSwitch,
+  storeOf,
+  user,
+} from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
   title: 'Tests/Editor/Presets',
@@ -30,7 +34,7 @@ export const GrayscaleToggleAndSlider: StoryObj = {
     await expect(store.getters.grayscale).toBe(0);
     await expect(grayscaleSlider(canvasElement)).toBeNull();
 
-    await userEvent.click(toggle);
+    await user.click(toggle);
     await expect(store.getters.grayscale).toBe(100);
     await expect(store.state.css).toContain('filter: grayscale(100%)');
     // The preset targets body's element children, which here is the
@@ -50,7 +54,7 @@ export const GrayscaleToggleAndSlider: StoryObj = {
     await expect(store.getters.grayscale).toBe(40);
     await expect(store.state.css).toContain('filter: grayscale(40%)');
 
-    await userEvent.click(toggle);
+    await user.click(toggle);
     await expect(store.getters.grayscale).toBe(0);
     await expect(store.state.css).not.toContain('grayscale(');
     await expect(
@@ -71,11 +75,11 @@ export const GrayscaleKeepsRestOfRule: StoryObj = {
     const store = storeOf(canvasElement);
     const toggle = featureSwitch(canvas, 'Grayscale');
 
-    await userEvent.click(toggle);
+    await user.click(toggle);
     await expect(store.state.css).toContain('color: #ff0080');
     await expect(store.state.css).toContain('grayscale(100%)');
 
-    await userEvent.click(toggle);
+    await user.click(toggle);
     await expect(store.state.css).toContain('color: #ff0080');
     await expect(store.state.css).not.toContain('grayscale(');
   },
@@ -92,11 +96,11 @@ export const ReadabilityToggle: StoryObj = {
     await expect(toggle).toBeEnabled();
     await expect(toggle).not.toBeChecked();
 
-    await userEvent.click(toggle);
+    await user.click(toggle);
     await expect(store.state.readability).toBe(true);
     await waitFor(() => expect(toggle).toBeChecked());
 
-    await userEvent.click(toggle);
+    await user.click(toggle);
     await expect(store.state.readability).toBe(false);
   },
 };

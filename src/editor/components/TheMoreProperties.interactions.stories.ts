@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue';
-import { expect, userEvent, waitFor, within } from '@storybook/test';
+import { expect, waitFor, within } from '@storybook/test';
 
 import TheMoreProperties from './TheMoreProperties.vue';
 import { editor, RULE_CSS } from '@stylebot/storybook/editor-story';
@@ -7,6 +7,7 @@ import {
   declaration,
   propertyCard,
   storeOf,
+  user,
 } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
@@ -44,9 +45,9 @@ export const AddProperty: StoryObj = {
     const store = storeOf(canvasElement);
     const card = within(propertyCard(canvas, 'More Properties'));
 
-    await userEvent.click(card.getByRole('button', { name: /Add property/ }));
-    await userEvent.type(card.getByPlaceholderText('Property'), 'cursor');
-    await userEvent.type(card.getByPlaceholderText('Value'), 'pointer{Enter}');
+    await user.click(card.getByRole('button', { name: /Add property/ }));
+    await user.type(card.getByPlaceholderText('Property'), 'cursor');
+    await user.type(card.getByPlaceholderText('Value'), 'pointer{Enter}');
 
     await expect(declaration(store, 'h1', 'cursor')).toBe('pointer');
     await waitFor(() =>
@@ -56,8 +57,8 @@ export const AddProperty: StoryObj = {
     );
 
     // Escape abandons a half-typed property.
-    await userEvent.click(card.getByRole('button', { name: /Add property/ }));
-    await userEvent.type(
+    await user.click(card.getByRole('button', { name: /Add property/ }));
+    await user.type(
       card.getByPlaceholderText('Property'),
       'text-transform{Escape}'
     );
@@ -76,7 +77,7 @@ export const RemoveProperty: StoryObj = {
     const store = storeOf(canvasElement);
     const card = within(propertyCard(canvas, 'More Properties'));
 
-    await userEvent.click(card.getByRole('button', { name: 'Remove' }));
+    await user.click(card.getByRole('button', { name: 'Remove' }));
 
     await expect(declaration(store, 'h1', 'letter-spacing')).toBeUndefined();
     await waitFor(() =>

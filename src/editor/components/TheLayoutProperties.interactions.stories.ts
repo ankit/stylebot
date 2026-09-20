@@ -1,14 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/vue';
-import { expect, userEvent, waitFor, within } from '@storybook/test';
+import { expect, waitFor, within } from '@storybook/test';
 
 import TheLayoutProperties from './TheLayoutProperties.vue';
 import { editor, RULE_CSS } from '@stylebot/storybook/editor-story';
 import {
   declaration,
   findOpenMenu,
-  propertyControl,
   pageStyle,
+  propertyControl,
   storeOf,
+  user,
 } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
@@ -51,29 +52,29 @@ export const SpacingModes: StoryObj = {
     await expect(spacingInput(padding, 'Vertical')).toHaveValue('12');
     await expect(spacingInput(padding, 'Horizontal')).toHaveValue('24');
 
-    await userEvent.click(modeButton(padding, 'All'));
+    await user.click(modeButton(padding, 'All'));
     const all = await waitFor(() => {
       const input = spacingInput(padding, 'All');
       expect(input).toBeInTheDocument();
       return input;
     });
-    await userEvent.type(all, '8');
+    await user.type(all, '8');
     await expect(declaration(store, 'h1', 'padding')).toBe('8px');
     await expect(pageStyle(canvasElement, 'h1', 'padding')).toBe('8px');
 
-    await userEvent.click(modeButton(padding, 'Individual'));
+    await user.click(modeButton(padding, 'Individual'));
     const top = await waitFor(() => {
       const input = spacingInput(padding, 'Top');
       expect(input).toBeInTheDocument();
       return input;
     });
     // Focusing a field selects its value, so typing replaces it.
-    await userEvent.type(top, '4');
+    await user.type(top, '4');
     await expect(declaration(store, 'h1', 'padding')).toBe('4px 8px 8px');
     await expect(pageStyle(canvasElement, 'h1', 'padding-top')).toBe('4px');
     await expect(pageStyle(canvasElement, 'h1', 'padding-left')).toBe('8px');
 
-    await userEvent.click(modeButton(padding, 'None'));
+    await user.click(modeButton(padding, 'None'));
     await expect(declaration(store, 'h1', 'padding')).toBeUndefined();
     await expect(declaration(store, 'h1', 'padding-top')).toBeUndefined();
     await expect(pageStyle(canvasElement, 'h1', 'padding')).toBe('0px');
@@ -90,13 +91,13 @@ export const MarginIndependent: StoryObj = {
 
     await expect(modeButton(margin, 'None')).toHaveClass('active');
 
-    await userEvent.click(modeButton(margin, 'All'));
+    await user.click(modeButton(margin, 'All'));
     const all = await waitFor(() => {
       const input = spacingInput(margin, 'All');
       expect(input).toBeInTheDocument();
       return input;
     });
-    await userEvent.type(all, '10');
+    await user.type(all, '10');
 
     await expect(declaration(store, 'h1', 'margin')).toBe('10px');
     await expect(declaration(store, 'h1', 'padding')).toBe('12px 24px');
@@ -116,8 +117,8 @@ export const BorderControls: StoryObj = {
     await expect(style).toHaveTextContent('Solid');
     await expect(control.querySelector('.number-input')).toHaveValue('1');
 
-    await userEvent.click(style);
-    await userEvent.click(
+    await user.click(style);
+    await user.click(
       within(await findOpenMenu(canvas)).getByRole('menuitem', {
         name: 'Dashed',
       })
@@ -130,7 +131,7 @@ export const BorderControls: StoryObj = {
 
     // The longhand written after the shorthand is what wins on the page.
     const width = control.querySelector('.number-input') as HTMLInputElement;
-    await userEvent.type(width, '2');
+    await user.type(width, '2');
     await expect(declaration(store, 'h1', 'border-width')).toBe('2px');
     await expect(pageStyle(canvasElement, 'h1', 'border-top-width')).toBe(
       '2px'
@@ -161,14 +162,14 @@ export const RadiusField: StoryObj = {
     const control = propertyControl(canvas, 'Radius');
     const input = control.querySelector('.number-input') as HTMLInputElement;
 
-    await userEvent.type(input, '8');
+    await user.type(input, '8');
     await expect(declaration(store, 'h1', 'border-radius')).toBe('8px');
 
-    await userEvent.click(control.querySelector('.number-chevron') as Element);
+    await user.click(control.querySelector('.number-chevron') as Element);
     const menu = await findOpenMenu(canvas);
     const preset = within(menu).getAllByRole('menuitem').at(-1) as HTMLElement;
     const value = preset.textContent?.trim();
-    await userEvent.click(preset);
+    await user.click(preset);
     await expect(declaration(store, 'h1', 'border-radius')).toBe(`${value}px`);
   },
 };

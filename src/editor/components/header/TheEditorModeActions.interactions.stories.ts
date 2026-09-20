@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue';
-import { expect, userEvent, waitFor, within } from '@storybook/test';
+import { expect, waitFor, within } from '@storybook/test';
 
 import TheEditorModeActions from './TheEditorModeActions.vue';
 import { editor, RULE_CSS } from '@stylebot/storybook/editor-story';
@@ -7,6 +7,7 @@ import {
   featureSwitch,
   pressKey,
   storeOf,
+  user,
 } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
@@ -27,20 +28,20 @@ export const TabsSwitchMode: StoryObj = {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
 
-    await userEvent.click(canvas.getByRole('tab', { name: 'Code' }));
+    await user.click(canvas.getByRole('tab', { name: 'Code' }));
     await expect(store.state.options.mode).toBe('code');
     await waitFor(() =>
       expect(canvasElement.querySelector('.code-editor-stub')).toBeVisible()
     );
     await expect(canvasElement.querySelector('.basic-editor')).toBeNull();
 
-    await userEvent.click(canvas.getByRole('tab', { name: 'Presets' }));
+    await user.click(canvas.getByRole('tab', { name: 'Presets' }));
     await expect(store.state.options.mode).toBe('magic');
     await expect(
       canvasElement.querySelector('.presets-editor')
     ).toBeInTheDocument();
 
-    await userEvent.click(canvas.getByRole('tab', { name: 'Basic' }));
+    await user.click(canvas.getByRole('tab', { name: 'Basic' }));
     await expect(store.state.options.mode).toBe('basic');
     await expect(
       canvasElement.querySelector('.basic-editor')
@@ -94,17 +95,17 @@ export const ReadabilityToggleForcesPresets: StoryObj = {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
 
-    await userEvent.click(canvas.getByRole('tab', { name: 'Presets' }));
+    await user.click(canvas.getByRole('tab', { name: 'Presets' }));
     const readability = featureSwitch(canvas, 'Readability');
 
-    await userEvent.click(readability);
+    await user.click(readability);
     await expect(store.state.readability).toBe(true);
     await waitFor(() =>
       expect(canvas.getByRole('tab', { name: 'Basic' })).toBeDisabled()
     );
     await expect(canvas.getByRole('tab', { name: 'Code' })).toBeDisabled();
 
-    await userEvent.click(readability);
+    await user.click(readability);
     await expect(store.state.readability).toBe(false);
     await waitFor(() =>
       expect(canvas.getByRole('tab', { name: 'Basic' })).toBeEnabled()

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue';
-import { expect, userEvent, waitFor, within } from '@storybook/test';
+import { expect, waitFor, within } from '@storybook/test';
 
 import TheInspector from './TheInspector.vue';
 import {
@@ -7,7 +7,7 @@ import {
   IFRAME_PAGE,
   INSPECT_PAGE,
 } from '@stylebot/storybook/editor-story';
-import { pressKey, storeOf } from '@stylebot/storybook/story-helpers';
+import { pressKey, storeOf, user } from '@stylebot/storybook/story-helpers';
 
 /* While inspecting, the highlighter treats everything outside the real
    extension's shadow host as page content — including the panel here. So
@@ -44,7 +44,7 @@ export const ButtonAndShortcutToggle: StoryObj = {
     const store = storeOf(canvasElement);
     const button = inspector(canvasElement);
 
-    await userEvent.click(button);
+    await user.click(button);
     await expect(store.state.inspecting).toBe(true);
     await expect(store.state.activeSelector).toBe('');
     await waitFor(() => expect(button).toHaveClass('active'));
@@ -65,7 +65,7 @@ export const PickSetsSelector: StoryObj = {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
 
-    await userEvent.hover(canvas.getByRole('heading', { level: 1 }));
+    await user.hover(canvas.getByRole('heading', { level: 1 }));
     await waitFor(() => expect(currentChip()).toMatch(/\bh1$/));
 
     await pressKey('Enter');
@@ -88,7 +88,7 @@ export const ArrowKeysClimbAncestors: StoryObj = {
     const link = canvas.getByRole('link', { name: 'Learn more' });
 
     await step('hovering shows the element and offers its parent', async () => {
-      await userEvent.hover(link);
+      await user.hover(link);
       await waitFor(() => expect(currentChip()).toMatch(/\ba$/));
       await expect(nextChip()).toMatch(/\bp$/);
     });
@@ -119,7 +119,9 @@ export const ArrowKeysClimbAncestors: StoryObj = {
       await pressKey('i');
       await expect(store.state.inspecting).toBe(true);
 
-      await userEvent.hover(link);
+      // The pointer is still over the link from before; leave and re-enter.
+      await user.unhover(link);
+      await user.hover(link);
       await waitFor(() => expect(currentChip()).toMatch(/\ba$/));
 
       for (let i = 0; i < 10; i++) {
@@ -144,7 +146,7 @@ export const ClickOnIframeSelectsIt: StoryObj = {
     const store = storeOf(canvasElement);
     const frame = canvasElement.querySelector('iframe') as HTMLElement;
 
-    await userEvent.hover(frame);
+    await user.hover(frame);
     await waitFor(() => expect(currentChip()).toMatch(/iframe/));
 
     // The overlay rect shields the frame so the click stays in this
@@ -154,7 +156,7 @@ export const ClickOnIframeSelectsIt: StoryObj = {
     ) as HTMLElement;
     await expect(rect.style.pointerEvents).toBe('auto');
 
-    await userEvent.click(rect);
+    await user.click(rect);
 
     await expect(store.state.inspecting).toBe(false);
     await expect(store.state.activeSelector).toBe('iframe[name="ad"]');

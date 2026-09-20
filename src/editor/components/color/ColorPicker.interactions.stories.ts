@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue';
-import { expect, fireEvent, userEvent, waitFor, within } from '@storybook/test';
+import { expect, fireEvent, waitFor, within } from '@storybook/test';
 
 import ColorPicker from './ColorPicker.vue';
 import { editor, RULE_CSS } from '@stylebot/storybook/editor-story';
@@ -7,11 +7,12 @@ import {
   cardCollapse,
   declaration,
   findOpenMenu,
+  pageStyle,
   pressKey,
   propertyCard,
   propertyControl,
-  pageStyle,
   storeOf,
+  user,
 } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
@@ -45,7 +46,7 @@ const openPopover = async (
   root: HTMLElement,
   label: string
 ) => {
-  await userEvent.click(swatch(canvas, label));
+  await user.click(swatch(canvas, label));
   return waitFor(() => {
     const el = popover(root);
     expect(el).toBeVisible();
@@ -62,14 +63,14 @@ export const HexFieldApplies: StoryObj = {
 
     const color = hexField(canvas, 'Text');
     await expect(color).toHaveValue('#2a5fd6');
-    await userEvent.type(color, '#112233');
+    await user.type(color, '#112233');
     await expect(declaration(store, 'h1', 'color')).toBe('#112233');
     await expect(pageStyle(canvasElement, 'h1', 'color')).toBe(
       'rgb(17, 34, 51)'
     );
 
     // Background is collapsed for a rule without one; open it first.
-    await userEvent.click(
+    await user.click(
       propertyCard(canvas, 'Background').querySelector(
         '.property-card-header'
       ) as HTMLElement
@@ -77,7 +78,7 @@ export const HexFieldApplies: StoryObj = {
     await waitFor(() =>
       expect(cardCollapse(canvas, 'Background')).not.toHaveClass('collapsed')
     );
-    await userEvent.type(hexField(canvas, 'Background'), '#fafafa');
+    await user.type(hexField(canvas, 'Background'), '#fafafa');
     await expect(declaration(store, 'h1', 'background-color')).toBe('#fafafa');
   },
 };
@@ -114,7 +115,7 @@ export const PopoverTabsFollowRule: StoryObj = {
     });
 
     await step('reopened, the first tab shows the used colors', async () => {
-      await userEvent.click(swatch(canvas, 'Text'));
+      await user.click(swatch(canvas, 'Text'));
       await waitFor(() => expect(popover(canvasElement)).toBeNull());
       panel = await openPopover(canvas, canvasElement, 'Text');
 
@@ -140,7 +141,7 @@ export const PaletteSearchChevron: StoryObj = {
     const canvas = within(canvasElement);
     const panel = await openPopover(canvas, canvasElement, 'Text');
 
-    await userEvent.click(within(panel).getByRole('tab', { name: 'Palette' }));
+    await user.click(within(panel).getByRole('tab', { name: 'Palette' }));
     const search = await waitFor(() => {
       const el = panel.querySelector('.palette-search') as HTMLElement;
       expect(el).toBeInTheDocument();
@@ -152,21 +153,19 @@ export const PaletteSearchChevron: StoryObj = {
     const activeLabel = input.value;
 
     // Escape on an open list restores the active palette's name...
-    await userEvent.clear(input);
-    await userEvent.keyboard(activeLabel.slice(0, 3));
+    await user.clear(input);
+    await user.keyboard(activeLabel.slice(0, 3));
     await findOpenMenu(within(panel));
     await pressKey('Escape');
     await waitFor(() => expect(input).toHaveValue(activeLabel));
 
     // ...and a query that matches nothing closes the list, but the chevron
     // still lists every palette without touching the text.
-    await userEvent.clear(input);
-    await userEvent.keyboard('zzz');
+    await user.clear(input);
+    await user.keyboard('zzz');
     await waitFor(() => expect(within(panel).queryByRole('menu')).toBeNull());
 
-    await userEvent.click(
-      search.querySelector('.autocomplete-chevron') as Element
-    );
+    await user.click(search.querySelector('.autocomplete-chevron') as Element);
     await findOpenMenu(within(panel));
     await expect(input).toHaveValue('zzz');
     await expect(within(panel).getAllByRole('menuitem').length).toBeGreaterThan(

@@ -13,6 +13,7 @@ import type { Preview } from '@storybook/vue';
 import { t } from '@stylebot/i18n';
 import { ThemeProvider } from '@stylebot/components';
 import { installChrome } from './mocks/chrome';
+import { setInteractionDelay } from './story-helpers';
 
 import '../src/fonts/fonts.css';
 import '../src/editor/index.scss';
@@ -76,6 +77,18 @@ const preview: Preview = {
         dynamicTitle: true,
       },
     },
+    speed: {
+      description: 'Interaction test speed',
+      defaultValue: 'instant',
+      toolbar: {
+        icon: 'play',
+        items: [
+          { value: 'instant', title: 'Instant' },
+          { value: 'slow', title: 'Slow motion' },
+        ],
+        dynamicTitle: true,
+      },
+    },
   },
 
   parameters: {
@@ -120,6 +133,10 @@ const preview: Preview = {
       document
         .querySelectorAll('style[id^="stylebot-css-"]')
         .forEach(el => el.remove());
+
+      // Slow motion is for watching a play in the browser; the runner never
+      // sets it, so CI stays instant.
+      setInteractionDelay(globals.speed === 'slow' ? 250 : 0);
 
       // Composites read their appearance from options, so the toolbar theme
       // flows through the shim as well as the outer ThemeProvider.

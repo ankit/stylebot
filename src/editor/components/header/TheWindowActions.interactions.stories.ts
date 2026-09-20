@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue';
-import { expect, userEvent, waitFor, within } from '@storybook/test';
+import { expect, waitFor, within } from '@storybook/test';
 
 import TheWindowActions from './TheWindowActions.vue';
 import { editor, RULE_CSS } from '@stylebot/storybook/editor-story';
@@ -7,6 +7,7 @@ import {
   openEditorMenu,
   pressKey,
   storeOf,
+  user,
 } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
@@ -35,7 +36,7 @@ export const DockFromOptionsMenu: StoryObj = {
     await expect(panel(canvasElement)).toHaveClass('right');
 
     const menu = await openEditorMenu(canvas, 'Options');
-    await userEvent.click(
+    await user.click(
       within(menu).getByRole('button', { name: 'Dock to Left' })
     );
 
@@ -44,9 +45,7 @@ export const DockFromOptionsMenu: StoryObj = {
     await expect(canvas.queryByRole('menu')).toBeNull();
 
     await openEditorMenu(canvas, 'Options');
-    await userEvent.click(
-      canvas.getByRole('button', { name: 'Dock to Right' })
-    );
+    await user.click(canvas.getByRole('button', { name: 'Dock to Right' }));
     await expect(store.state.options.layout.dockLocation).toBe('right');
     await waitFor(() => expect(panel(canvasElement)).toHaveClass('right'));
   },
@@ -78,7 +77,7 @@ export const AdjustPageLayout: StoryObj = {
     const store = storeOf(canvasElement);
 
     const menu = await openEditorMenu(canvas, 'Options');
-    await userEvent.click(within(menu).getByRole('checkbox'));
+    await user.click(within(menu).getByRole('checkbox'));
 
     await expect(store.state.options.layout.adjustPageLayout).toBe(true);
     await waitFor(() =>
@@ -102,7 +101,7 @@ export const AppearanceMenu: StoryObj = {
     const store = storeOf(canvasElement);
     const app = canvasElement.querySelector('.stylebot-app') as HTMLElement;
 
-    await userEvent.click(
+    await user.click(
       within(await openEditorMenu(canvas, 'Panel appearance')).getByRole(
         'menuitem',
         { name: 'Dark' }
@@ -111,7 +110,7 @@ export const AppearanceMenu: StoryObj = {
     await expect(store.state.options.appearance).toBe('dark');
     await waitFor(() => expect(app).toHaveAttribute('data-theme', 'dark'));
 
-    await userEvent.click(
+    await user.click(
       within(await openEditorMenu(canvas, 'Panel appearance')).getByRole(
         'menuitem',
         { name: 'Light' }
@@ -120,7 +119,7 @@ export const AppearanceMenu: StoryObj = {
     await expect(store.state.options.appearance).toBe('light');
     await waitFor(() => expect(app).toHaveAttribute('data-theme', 'light'));
 
-    await userEvent.click(
+    await user.click(
       within(await openEditorMenu(canvas, 'Panel appearance')).getByRole(
         'menuitem',
         { name: 'System' }
@@ -138,7 +137,7 @@ export const CloseButton: StoryObj = {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
 
-    await userEvent.click(canvas.getByRole('button', { name: 'Close' }));
+    await user.click(canvas.getByRole('button', { name: 'Close' }));
 
     await expect(store.state.visible).toBe(false);
     await waitFor(() => expect(content(canvasElement)).toBeNull());
@@ -197,12 +196,12 @@ export const HelpDialogViaMenu: StoryObj = {
     const canvas = within(canvasElement);
 
     const menu = await openEditorMenu(canvas, 'Options');
-    await userEvent.click(
+    await user.click(
       within(menu).getByRole('menuitem', { name: /View keyboard shortcuts/ })
     );
     await waitFor(() => expect(helpDialog(canvasElement)).toBeVisible());
 
-    await userEvent.click(
+    await user.click(
       within(helpDialog(canvasElement) as HTMLElement).getByRole('button', {
         name: 'Close',
       })

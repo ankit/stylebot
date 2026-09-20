@@ -1,14 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/vue';
-import { expect, userEvent, waitFor, within } from '@storybook/test';
+import { expect, waitFor, within } from '@storybook/test';
 
 import TheTextProperties from './TheTextProperties.vue';
 import { editor, RULE_CSS } from '@stylebot/storybook/editor-story';
 import {
   declaration,
   findOpenMenu,
-  propertyControl,
   pageStyle,
+  propertyControl,
   storeOf,
+  user,
 } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
@@ -41,17 +42,17 @@ export const FontSizeField: StoryObj = {
     await expect(input).toHaveValue('32');
 
     // Every keystroke applies, so the field is live rather than committed.
-    await userEvent.clear(input);
-    await userEvent.type(input, '20');
+    await user.clear(input);
+    await user.type(input, '20');
     await expect(declaration(store, 'h1', 'font-size')).toBe('20px');
     await expect(pageStyle(canvasElement, 'h1', 'font-size')).toBe('20px');
 
-    await userEvent.clear(input);
+    await user.clear(input);
     await expect(declaration(store, 'h1', 'font-size')).toBeUndefined();
 
-    await userEvent.click(control.querySelector('.number-chevron') as Element);
+    await user.click(control.querySelector('.number-chevron') as Element);
     const menu = await findOpenMenu(canvas);
-    await userEvent.click(within(menu).getAllByRole('menuitem')[0]);
+    await user.click(within(menu).getAllByRole('menuitem')[0]);
     await waitFor(() => expect(input.value).not.toBe(''));
     await expect(declaration(store, 'h1', 'font-size')).toBe(
       `${input.value}px`
@@ -74,7 +75,7 @@ export const LineHeightField: StoryObj = {
     );
     await expect(input).toHaveValue('');
 
-    await userEvent.type(input, '24');
+    await user.type(input, '24');
     await expect(declaration(store, '.article-body', 'line-height')).toBe(
       '24px'
     );
@@ -92,11 +93,11 @@ export const TextAlignSegmented: StoryObj = {
     await expect(center).toHaveClass('active');
 
     // Clicking the active option clears the declaration.
-    await userEvent.click(center);
+    await user.click(center);
     await expect(declaration(store, 'h1', 'text-align')).toBeUndefined();
     await waitFor(() => expect(center).not.toHaveClass('active'));
 
-    await userEvent.click(left);
+    await user.click(left);
     await expect(declaration(store, 'h1', 'text-align')).toBe('left');
     await expect(pageStyle(canvasElement, 'h1', 'text-align')).toBe('left');
     await waitFor(() => expect(left).toHaveClass('active'));
@@ -111,11 +112,11 @@ export const TextDecorationSegmented: StoryObj = {
     const store = storeOf(canvasElement);
     const [underline] = segments(propertyControl(canvas, 'Decoration'));
 
-    await userEvent.click(underline);
+    await user.click(underline);
     await expect(declaration(store, 'h1', 'text-decoration')).toBe('underline');
     await waitFor(() => expect(underline).toHaveClass('active'));
 
-    await userEvent.click(underline);
+    await user.click(underline);
     await expect(declaration(store, 'h1', 'text-decoration')).toBeUndefined();
   },
 };

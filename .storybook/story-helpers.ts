@@ -103,6 +103,15 @@ export const focusViaTab = (root: HTMLElement, selector = 'button'): void => {
 
 type Canvas = ReturnType<typeof within>;
 
+/* The user-event instance every interaction test drives; the preview
+   decorator rebuilds it with a delay when the toolbar asks for slow
+   motion, so a play can be watched at human speed. */
+export let user = userEvent.setup();
+
+export const setInteractionDelay = (ms: number): void => {
+  user = userEvent.setup({ delay: ms });
+};
+
 /**
  * The seeded editor store, read off the Vue instance mounted on the app
  * root — which stays mounted after the panel closes.
@@ -117,7 +126,7 @@ export const storeOf = (root: HTMLElement): Store<State> =>
  * field — blur first if a test just typed into one.
  */
 export const pressKey = async (key: string): Promise<void> => {
-  await userEvent.keyboard(key.length === 1 ? key : `{${key}}`);
+  await user.keyboard(key.length === 1 ? key : `{${key}}`);
 };
 
 export const blurActive = (): void =>
@@ -141,7 +150,7 @@ export const openEditorMenu = async (
   canvas: Canvas,
   name: string
 ): Promise<HTMLElement> => {
-  await userEvent.click(canvas.getByRole('button', { name }));
+  await user.click(canvas.getByRole('button', { name }));
   return findOpenMenu(canvas);
 };
 

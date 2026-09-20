@@ -1,14 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/vue';
-import { expect, userEvent, waitFor, within } from '@storybook/test';
+import { expect, waitFor, within } from '@storybook/test';
 
 import FontFamily from './FontFamily.vue';
 import { editor, RULE_CSS } from '@stylebot/storybook/editor-story';
 import {
   declaration,
   findOpenMenu,
-  pressKey,
   pageStyle,
+  pressKey,
   storeOf,
+  user,
 } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
@@ -37,7 +38,7 @@ const chips = (root: HTMLElement) =>
    until clicked, and the revealed input starts fully selected. */
 const openPicker = async (root: HTMLElement) => {
   const pill = field(root).querySelector('.autocomplete-chips') ?? input(root);
-  await userEvent.click(pill);
+  await user.click(pill);
   await waitFor(() => expect(input(root)).toHaveFocus());
   return input(root);
 };
@@ -76,7 +77,7 @@ export const SuggestsAndApplies: StoryObj = {
     const store = storeOf(canvasElement);
 
     await openPicker(canvasElement);
-    await userEvent.keyboard('playf');
+    await user.keyboard('playf');
 
     const row = await menuItem(canvas, 'Playfair Display');
     await expect(row.querySelector('.font-row-category')).toHaveTextContent(
@@ -100,7 +101,7 @@ export const SuggestsAndApplies: StoryObj = {
 
     // The chevron opens the picker like a click on the field: focused, value
     // kept (and selected), recents shown.
-    await userEvent.click(
+    await user.click(
       field(canvasElement).querySelector('.autocomplete-chevron') as Element
     );
     await findOpenMenu(canvas);
@@ -122,7 +123,7 @@ export const CategoryFilter: StoryObj = {
   name: 'a category name lists that category',
   play: async ({ canvasElement }) => {
     await openPicker(canvasElement);
-    await userEvent.keyboard('mono');
+    await user.keyboard('mono');
 
     await waitFor(() =>
       expect(
@@ -146,7 +147,7 @@ export const CustomValue: StoryObj = {
     const store = storeOf(canvasElement);
 
     await openPicker(canvasElement);
-    await userEvent.keyboard('Nonexistent Font');
+    await user.keyboard('Nonexistent Font');
     await menuItem(canvas, 'Use "Nonexistent Font"');
 
     await pressKey('Enter');
@@ -168,7 +169,7 @@ export const ArrowKeys: StoryObj = {
     const store = storeOf(canvasElement);
     const text = await openPicker(canvasElement);
 
-    await userEvent.keyboard('playf');
+    await user.keyboard('playf');
     const playfair = await menuItem(canvas, 'Playfair Display');
 
     await step('Down focuses a row, Up returns to the field', async () => {
@@ -182,7 +183,7 @@ export const ArrowKeys: StoryObj = {
     });
 
     await step('editing continues from the end of the text', async () => {
-      await userEvent.keyboard('a');
+      await user.keyboard('a');
       await expect(text).toHaveValue('playfa');
     });
 
@@ -207,7 +208,7 @@ export const ArrowKeys: StoryObj = {
     await step('Down reopens it without re-selecting the text', async () => {
       await pressKey('ArrowDown');
       await findOpenMenu(canvas);
-      await userEvent.keyboard('i');
+      await user.keyboard('i');
       await expect(text).toHaveValue('playfai');
     });
 
@@ -232,9 +233,9 @@ export const BrowseDiscardsDraft: StoryObj = {
     const store = storeOf(canvasElement);
 
     await openPicker(canvasElement);
-    await userEvent.keyboard('playf');
+    await user.keyboard('playf');
 
-    await userEvent.click(await menuItem(canvas, 'Browse Google Fonts'));
+    await user.click(await menuItem(canvas, 'Browse Google Fonts'));
 
     await waitFor(() => expect(input(canvasElement)).toHaveValue(''));
     await expect(chips(canvasElement)).toEqual([]);
@@ -263,7 +264,7 @@ export const StackEditing: StoryObj = {
     await step('typing over the raw value replaces the stack', async () => {
       const text = await openPicker(canvasElement);
       await expect(text).toHaveValue('"Playfair Display", Georgia, serif');
-      await userEvent.keyboard('Lora');
+      await user.keyboard('Lora');
       await pressKey('Enter');
       await expect(declaration(store, 'h1', 'font-family')).toBe('Lora');
       await waitFor(() => expect(chips(canvasElement)).toEqual(['Lora']));
@@ -275,7 +276,7 @@ export const StackEditing: StoryObj = {
         await openPicker(canvasElement);
         // ArrowRight collapses the pre-selected value to its end.
         await pressKey('ArrowRight');
-        await userEvent.keyboard(', Georgia, serif');
+        await user.keyboard(', Georgia, serif');
         await menuItem(canvas, 'Use "Lora, Georgia, serif"');
         await pressKey('Enter');
         await expect(declaration(store, 'h1', 'font-family')).toBe(
@@ -287,7 +288,7 @@ export const StackEditing: StoryObj = {
     await step('a suggestion appended to a stack is quoted', async () => {
       await openPicker(canvasElement);
       await pressKey('ArrowRight');
-      await userEvent.keyboard(', playf');
+      await user.keyboard(', playf');
       await menuItem(canvas, 'Playfair Display');
       await pressKey('ArrowDown');
       await pressKey('Enter');

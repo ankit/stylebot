@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue';
-import { expect, userEvent, waitFor, within } from '@storybook/test';
+import { expect, waitFor, within } from '@storybook/test';
 
 import TheCssSelectorDropdown from './TheCssSelectorDropdown.vue';
 import { editor, RULE_CSS } from '@stylebot/storybook/editor-story';
@@ -7,6 +7,7 @@ import {
   findOpenMenu,
   pressKey,
   storeOf,
+  user,
 } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
@@ -34,11 +35,11 @@ export const TypingCommitsSelector: StoryObj = {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
 
-    await userEvent.click(chips(canvasElement));
+    await user.click(chips(canvasElement));
     await waitFor(() => expect(input(canvasElement)).toHaveFocus());
 
-    await userEvent.clear(input(canvasElement));
-    await userEvent.type(input(canvasElement), 'art');
+    await user.clear(input(canvasElement));
+    await user.type(input(canvasElement), 'art');
     await expect(store.state.activeSelector).toBe('art');
 
     // Suggestions are the style's other selectors matching the query.
@@ -48,7 +49,7 @@ export const TypingCommitsSelector: StoryObj = {
 
     // Picking keeps the field focused for further edits, so the value
     // shows in the input rather than as chips.
-    await userEvent.click(items(canvasElement)[0]);
+    await user.click(items(canvasElement)[0]);
     await expect(store.state.activeSelector).toBe('.article-body');
     await waitFor(() =>
       expect(input(canvasElement)).toHaveValue('.article-body')
@@ -82,7 +83,7 @@ export const ArrowKeysBetweenFieldAndList: StoryObj = {
 
     // The chevron focuses the field, keeps its value and lists every
     // selector.
-    await userEvent.click(
+    await user.click(
       field(canvasElement).querySelector('.autocomplete-chevron') as Element
     );
     await findOpenMenu(canvas);

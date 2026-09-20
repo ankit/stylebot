@@ -1,13 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/vue';
-import { expect, fireEvent, userEvent, waitFor, within } from '@storybook/test';
+import { expect, fireEvent, waitFor, within } from '@storybook/test';
 
 import TheEffectsProperties from './TheEffectsProperties.vue';
 import { editor, RULE_CSS } from '@stylebot/storybook/editor-story';
 import {
   declaration,
-  propertyControl,
   pageStyle,
+  propertyControl,
   storeOf,
+  user,
 } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
@@ -67,7 +68,7 @@ export const FilterControl: StoryObj = {
     await expect(option('None')).toHaveClass('active');
     await expect(slider(control)).toBeNull();
 
-    await userEvent.click(option('Blur'));
+    await user.click(option('Blur'));
     await expect(declaration(store, 'h1', 'filter')).toBe('blur(4px)');
     await waitFor(() => expect(slider(control)).toBeInTheDocument());
 
@@ -75,10 +76,10 @@ export const FilterControl: StoryObj = {
     await expect(declaration(store, 'h1', 'filter')).toBe('blur(10px)');
     await expect(pageStyle(canvasElement, 'h1', 'filter')).toBe('blur(10px)');
 
-    await userEvent.click(option('Gray'));
+    await user.click(option('Gray'));
     await expect(declaration(store, 'h1', 'filter')).toBe('grayscale(50%)');
 
-    await userEvent.click(option('None'));
+    await user.click(option('None'));
     await expect(declaration(store, 'h1', 'filter')).toBeUndefined();
     await waitFor(() => expect(slider(control)).toBeNull());
   },

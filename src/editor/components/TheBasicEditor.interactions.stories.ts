@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue';
-import { expect, userEvent, waitFor, within } from '@storybook/test';
+import { expect, waitFor, within } from '@storybook/test';
 
 import TheBasicEditor from './TheBasicEditor.vue';
 import {
@@ -10,10 +10,11 @@ import {
 import {
   cardCollapse,
   declaration,
+  pageStyle,
   pressKey,
   propertyCard,
-  pageStyle,
   storeOf,
+  user,
 } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
@@ -31,7 +32,7 @@ const withRule = { css: RULE_CSS, activeSelector: 'h1' };
    Clicking would be swallowed by the highlighter (see the Inspector
    stories). */
 const pick = async (element: HTMLElement) => {
-  await userEvent.hover(element);
+  await user.hover(element);
   await pressKey('Enter');
 };
 
@@ -43,7 +44,7 @@ export const HideButton: StoryObj = {
     const store = storeOf(canvasElement);
     const hide = canvas.getByRole('button', { name: 'Hide' });
 
-    await userEvent.click(hide);
+    await user.click(hide);
     await expect(declaration(store, 'h1', 'display')).toBe('none');
     await expect(pageStyle(canvasElement, 'h1', 'display')).toBe('none');
     await waitFor(() => expect(hide).toHaveClass('active'));
@@ -64,7 +65,7 @@ export const ResetButton: StoryObj = {
     const reset = canvas.getByRole('button', { name: 'Reset' });
 
     await expect(reset).toBeEnabled();
-    await userEvent.click(reset);
+    await user.click(reset);
 
     await expect(store.getters.activeRule).toBeNull();
     await expect(store.state.css).not.toMatch(/h1\s*\{/);
@@ -136,7 +137,7 @@ export const ManualOpenPersistsAcrossPicks: StoryObj = {
     });
 
     await step('opening Box by hand is remembered', async () => {
-      await userEvent.click(boxHeader());
+      await user.click(boxHeader());
       await waitFor(() =>
         expect(cardCollapse(canvas, 'Box')).not.toHaveClass('collapsed')
       );
@@ -155,7 +156,7 @@ export const ManualOpenPersistsAcrossPicks: StoryObj = {
     });
 
     await step('closing it by hand forgets the preference', async () => {
-      await userEvent.click(boxHeader());
+      await user.click(boxHeader());
       await waitFor(() =>
         expect(cardCollapse(canvas, 'Box')).toHaveClass('collapsed')
       );
@@ -183,7 +184,7 @@ export const CollapseAll: StoryObj = {
 
     for (const card of canvasElement.querySelectorAll('.property-card')) {
       if (!card.querySelector('.property-card-collapse.collapsed')) {
-        await userEvent.click(
+        await user.click(
           card.querySelector('.property-card-header') as HTMLElement
         );
       }
