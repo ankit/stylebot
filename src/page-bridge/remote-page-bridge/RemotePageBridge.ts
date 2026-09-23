@@ -213,7 +213,12 @@ export class RemotePageBridge extends PageBridgeEmitter implements PageBridge {
     this.send({ type: 'applyReadability', value });
   }
 
+  /**
+   * Focuses the page first: Chrome drops mouse-move events for a window that
+   * is neither key nor main, so picking couldn't follow the cursor.
+   */
   startInspecting(): void {
+    this.focusPage();
     this.send({ type: 'startInspecting' });
   }
 

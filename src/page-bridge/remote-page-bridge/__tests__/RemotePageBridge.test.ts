@@ -52,12 +52,23 @@ const connectedMessage = (
     ...overrides,
   } as RemotePageBridgeMessageToWindow);
 
+/**
+ * Lets focusPage's chained tab and window updates resolve.
+ */
+const settle = async (): Promise<void> => {
+  for (let i = 0; i < 6; i++) {
+    await Promise.resolve();
+  }
+};
+
 describe('RemotePageBridge', () => {
   let ports: Array<FakePort>;
   let tabUpdated: Array<
     (tabId: number, changeInfo: chrome.tabs.TabChangeInfo) => void
   >;
   let handlers: jest.Mocked<RemotePageBridgeHandlers>;
+  let tabsUpdate: jest.Mock;
+  let windowsUpdate: jest.Mock;
 
   beforeEach(() => {
     jest.useFakeTimers();
@@ -70,6 +81,9 @@ describe('RemotePageBridge', () => {
       onInspectingStopped: jest.fn(),
     };
 
+    tabsUpdate = jest.fn();
+    windowsUpdate = jest.fn();
+
     global.chrome = {
       runtime: { lastError: undefined },
       tabs: {
@@ -78,10 +92,13 @@ describe('RemotePageBridge', () => {
           ports.push(port);
           return port;
         }),
+        get: jest.fn(() => Promise.resolve({ windowId: 4 })),
+        update: tabsUpdate,
         onUpdated: {
           addListener: (fn: (typeof tabUpdated)[number]) => tabUpdated.push(fn),
         },
       },
+      windows: { update: windowsUpdate },
     } as unknown as typeof chrome;
   });
 
@@ -206,20 +223,36 @@ describe('RemotePageBridge', () => {
   });
 
   it('brings the tab and its window to the front', async () => {
-    const update = jest.fn();
-    const windowsUpdate = jest.fn();
-    (chrome.tabs as unknown as { get: unknown; update: unknown }).get = () =>
-      Promise.resolve({ windowId: 4 });
-    (chrome.tabs as unknown as { update: unknown }).update = update;
-    global.chrome.windows = { update: windowsUpdate } as never;
-
     new RemotePageBridge(7, handlers).focusPage();
-    for (let i = 0; i < 6; i++) {
-      await Promise.resolve();
-    }
+    await settle();
 
-    expect(update).toBeCalledWith(7, { active: true });
+    expect(tabsUpdate).toBeCalledWith(7, { active: true });
     expect(windowsUpdate).toBeCalledWith(4, { focused: true });
+  });
+
+  // Chrome ignores mouse-move events for a window that is neither key nor
+  // main, so the page can't follow the cursor until it holds focus.
+  it('focuses the page when inspecting starts, so picking can follow the cursor', async () => {
+    const bridge = new RemotePageBridge(7, handlers);
+    bridge.connect();
+    ports[0].receive(connectedMessage());
+
+    bridge.startInspecting();
+    await settle();
+
+    expect(tabsUpdate).toBeCalledWith(7, { active: true });
+    expect(windowsUpdate).toBeCalledWith(4, { focused: true });
+  });
+
+  it('leaves focus alone when inspecting stops', async () => {
+    const bridge = new RemotePageBridge(7, handlers);
+    bridge.connect();
+    ports[0].receive(connectedMessage());
+
+    bridge.stopInspecting();
+    await settle();
+
+    expect(windowsUpdate).not.toBeCalled();
   });
 
   it('sends page operations over the port', () => {
