@@ -50,10 +50,8 @@ export default Vue.extend({
 
   watch: {
     activeSelector(selector: string): void {
-      // remove any previous injected empty rules if a new selector was selected
       if (selector) {
-        const css = removeEmptyRules(this.css);
-        this.$store.dispatch('applyCss', { css });
+        this.pruneEmptyRules();
       }
 
       this.handleActiveSelectorChange(selector);
@@ -82,9 +80,7 @@ export default Vue.extend({
 
   created() {
     window.addEventListener('message', this.handleMessage);
-    // remove any previous injected empty rules
-    const css = removeEmptyRules(this.css);
-    this.$store.dispatch('applyCss', { css });
+    this.pruneEmptyRules();
   },
 
   beforeDestroy() {
@@ -92,6 +88,18 @@ export default Vue.extend({
   },
 
   methods: {
+    /**
+     * Drops the blank rules a previous selector left behind, saving only if
+     * that changed something: saving empty css would delete the style.
+     */
+    pruneEmptyRules(): void {
+      const css = removeEmptyRules(this.css);
+
+      if (css !== this.css) {
+        this.$store.dispatch('applyCss', { css });
+      }
+    },
+
     getIframeContentWindow(): Window | null | undefined {
       return this.$el.querySelector('iframe')?.contentWindow;
     },

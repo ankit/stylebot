@@ -263,6 +263,12 @@ export default {
     { commit, state }: { commit: Commit; state: State },
     { css }: { css: string }
   ): void {
+    // Saving empty css deletes the style, and holding none may just mean the
+    // stored one never reached the editor rather than that there is none.
+    if (!css && !state.css) {
+      return;
+    }
+
     try {
       const root = postcss.parse(css);
 

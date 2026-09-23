@@ -80,6 +80,23 @@ describe('actions', () => {
       expect(mockCommit).toHaveBeenNthCalledWith(1, 'setCss', css);
       expect(mockCommit).toHaveBeenNthCalledWith(2, 'setSelectors', mockRoot);
     });
+
+    it('does not save an empty style when none was loaded, since that would delete it', () => {
+      actions.applyCss({ commit: mockCommit, state: mockState }, { css: '' });
+
+      expect(chromeUtils.setStyle).toBeCalledTimes(0);
+      expect(mockBridge.applyCss).toBeCalledTimes(0);
+      expect(mockCommit).toBeCalledTimes(0);
+    });
+
+    it('still clears a style the editor was showing', () => {
+      const state = { ...mockState, css: 'a { color: red; }' };
+      jest.spyOn(stylebotCss, 'removeEmptyRules').mockReturnValue('');
+
+      actions.applyCss({ commit: mockCommit, state }, { css: '' });
+
+      expect(chromeUtils.setStyle).toBeCalledWith(state.url, '', false);
+    });
   });
 
   describe('applyReadability', () => {
