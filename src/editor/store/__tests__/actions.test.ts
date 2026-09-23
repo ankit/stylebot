@@ -99,48 +99,6 @@ describe('actions', () => {
     });
   });
 
-  describe('refreshStyle', () => {
-    it('mirrors the stored style into the editor', async () => {
-      const defaultStyle = {
-        url: 'example.com',
-        css: 'a { color: red; }',
-        enabled: true,
-        readability: false,
-        modifiedTime: '',
-      };
-      jest
-        .spyOn(chromeUtils, 'getStylesForPage')
-        .mockResolvedValue({ styles: [], defaultStyle });
-
-      await actions.refreshStyle({ dispatch: mockDispatch });
-
-      expect(mockDispatch).toBeCalledWith(
-        'initializeDefaultStyle',
-        defaultStyle
-      );
-    });
-
-    it('leaves the editor alone when the page has no stored style', async () => {
-      jest
-        .spyOn(chromeUtils, 'getStylesForPage')
-        .mockResolvedValue({ styles: [] });
-
-      await actions.refreshStyle({ dispatch: mockDispatch });
-
-      expect(mockDispatch).toBeCalledTimes(0);
-    });
-
-    it('ignores a read that fails rather than taking it for no style', async () => {
-      jest
-        .spyOn(chromeUtils, 'getStylesForPage')
-        .mockRejectedValue(new Error('no receiving end'));
-
-      await actions.refreshStyle({ dispatch: mockDispatch });
-
-      expect(mockDispatch).toBeCalledTimes(0);
-    });
-  });
-
   describe('applyReadability', () => {
     it('applies to the page, persists the choice and commits the flag', () => {
       actions.applyReadability({ commit: mockCommit, state: mockState }, true);
@@ -292,30 +250,6 @@ describe('actions', () => {
       expect(chromeUtils.enableStyle).toBeCalledWith(state.url);
       expect(mockCommit).toBeCalledWith('setVisible', true);
       expect(mockCommit).toBeCalledWith('setInspecting', true);
-    });
-
-    it('re-reads the stored style, so a stale copy is not what gets edited', async () => {
-      await actions.openStylebot({
-        state: mockState,
-        commit: mockCommit,
-        dispatch: mockDispatch,
-        getters,
-      });
-
-      expect(mockDispatch).toBeCalledWith('refreshStyle');
-    });
-
-    it('leaves that to the page in the window host, which cannot ask the background', async () => {
-      const state = { ...mockState, host: 'window' as const };
-
-      await actions.openStylebot({
-        state,
-        commit: mockCommit,
-        dispatch: mockDispatch,
-        getters,
-      });
-
-      expect(mockDispatch).not.toBeCalledWith('refreshStyle');
     });
 
     it('does not start inspecting outside basic mode', async () => {

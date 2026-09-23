@@ -33,7 +33,6 @@ import {
 
 import {
   getAllOptions,
-  getStylesForPage,
   setOption,
   setStyle,
   setReadability,
@@ -92,22 +91,6 @@ export default {
   },
 
   /**
-   * Re-reads the stored style, which nothing pushes here when another tab
-   * saves it, so the editor never opens on a stale copy.
-   */
-  async refreshStyle({ dispatch }: { dispatch: Dispatch }): Promise<void> {
-    try {
-      const { defaultStyle } = await getStylesForPage(false);
-
-      if (defaultStyle) {
-        dispatch('initializeDefaultStyle', defaultStyle);
-      }
-    } catch {
-      //
-    }
-  },
-
-  /**
    * Mirrors state the page owns — from its stored style, or, in the window
    * host, whatever the tab reports over the port.
    */
@@ -145,11 +128,6 @@ export default {
     { inspect = false }: { inspect?: boolean } = {}
   ): Promise<void> {
     await dispatch('refreshPage');
-
-    // Only the page can ask the background; the window gets it over the port.
-    if (state.host === 'page') {
-      await dispatch('refreshStyle');
-    }
 
     if (!state.enabled) {
       enableStyle(state.url);

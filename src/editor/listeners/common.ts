@@ -21,21 +21,9 @@ import { initEditor } from '../utils/init-editor';
 export const usesEditorWindow = (state: State): boolean =>
   state.windowConnected || state.options.layout.dockLocation === 'window';
 
-/**
- * The window reads this store, so refresh it first; the in-page panel does
- * the same from openStylebot.
- */
-const openWindow = async (
-  store: Store<State>,
-  open: () => void
-): Promise<void> => {
-  await store.dispatch('refreshStyle');
-  open();
-};
-
 export const toggleStylebot = (store: Store<State>, inspect = true): void => {
   if (usesEditorWindow(store.state)) {
-    openWindow(store, toggleEditorWindow);
+    toggleEditorWindow();
     return;
   }
 
@@ -49,7 +37,7 @@ export const toggleStylebot = (store: Store<State>, inspect = true): void => {
 
 export const openStylebot = (store: Store<State>, inspect = true): void => {
   if (usesEditorWindow(store.state)) {
-    openWindow(store, openEditorWindow);
+    openEditorWindow();
     return;
   }
 
