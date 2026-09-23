@@ -1,6 +1,8 @@
 import * as postcss from 'postcss';
 import { CssDeclaration } from '@stylebot/types';
 
+import { getSelector } from './selector';
+
 /**
  * Whether the rule sits inside another rule (native CSS nesting). Its
  * selector is then relative to the parent — `.title` inside `.card` means
@@ -123,8 +125,51 @@ export const getDeclarationsForSelector = (
 const STATE_PSEUDO_CLASSES = /:(hover|focus(-visible|-within)?|active)\b/i;
 
 /**
+ * The rightmost compound of a selector — the part naming the element it
+ * styles, e.g. `a.link` in `nav > ul a.link`.
+ */
+const getSubjectCompound = (selector: string): string => {
+  let depth = 0;
+  let quote: string | null = null;
+  let start = 0;
+
+  for (let i = 0; i < selector.length; i++) {
+    const char = selector[i];
+
+    if (char === '\\') {
+      i++;
+    } else if (quote) {
+      if (char === quote) {
+        quote = null;
+      }
+    } else if (char === '"' || char === "'") {
+      quote = char;
+    } else if (char === '[' || char === '(') {
+      depth++;
+    } else if (char === ']' || char === ')') {
+      depth--;
+    } else if (depth === 0 && /[\s>+~]/.test(char)) {
+      start = i + 1;
+    }
+  }
+
+  return selector.slice(start);
+};
+
+const SPECIFIC_SUBJECT = /[#.[]|:(nth-|first-|last-|only-|is\(|where\(|has\()/i;
+
+/**
+ * Whether the selector's subject singles the element out by id, class,
+ * attribute or position, rather than by tag alone (`*`, `a`, `.card p`).
+ */
+const hasSpecificSubject = (selector: string): boolean =>
+  SPECIFIC_SUBJECT.test(getSubjectCompound(selector));
+
+/**
  * Finds an authored selector matching this element via el.matches(), so
  * picking it keeps editing that rule instead of starting an unrelated one.
+ * Only a selector that targets the element itself counts: a broad one like
+ * `*` or `.card p` would otherwise capture every element it happens to match.
  */
 export const getExistingSelector = (
   el: HTMLElement,
@@ -132,6 +177,7 @@ export const getExistingSelector = (
 ): string | null => {
   const root = postcss.parse(css);
   let match: string | null = null;
+  let generatedSelector: string | null = null;
 
   walkUnnestedRules(root, rule => {
     if (match) {
@@ -141,6 +187,13 @@ export const getExistingSelector = (
     for (const candidate of rule.selectors) {
       if (STATE_PSEUDO_CLASSES.test(candidate)) {
         continue;
+      }
+
+      if (!hasSpecificSubject(candidate)) {
+        generatedSelector = generatedSelector ?? getSelector(el);
+        if (candidate !== generatedSelector) {
+          continue;
+        }
       }
 
       try {

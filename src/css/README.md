@@ -70,6 +70,14 @@ disconnected one. Interaction pseudo-classes like `:hover` and `:focus` are
 excluded, since matching one of those only means the cursor happens to be on
 the element right now.
 
+Only selectors that target the element itself are reused: the subject (the
+rightmost compound) must carry a class, id, attribute or structural
+pseudo-class (`:nth-child`, `:first-of-type`, …). A broad selector like `*`,
+`a` or `.card p` would otherwise capture every element it matches and keep the
+user from styling the one they picked. A tag-only selector is still reused when
+it's exactly what `getSelector` would generate for the element anyway (e.g.
+`div.mw-heading h2`).
+
 When a selector is only styled as part of a grouped rule (`.foo, .bar { … }`),
 `splitSelectorFromGroup` first moves it into its own rule, carrying over the
 declarations it already had, so an edit doesn't silently affect its groupmates.
