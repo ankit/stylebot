@@ -83,7 +83,7 @@ export const ResetDisabledWithoutRule: StoryObj = {
 
 export const PanelsAutoExpandPerElement: StoryObj = {
   ...editor(
-    { css: 'h1 { margin: 10px; }', inspecting: true },
+    { css: 'div.sb-page h1 { margin: 10px; }', inspecting: true },
     { page: PANEL_STATE_PAGE }
   ),
   name: 'panels with declarations auto-expand and collapse per element',

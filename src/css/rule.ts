@@ -1,6 +1,9 @@
 import * as postcss from 'postcss';
 import { CssDeclaration } from '@stylebot/types';
 
+import { getSelector } from './selector';
+import { getSubjectCompound } from './get-subject-compound';
+
 /**
  * Whether the rule sits inside another rule (native CSS nesting). Its
  * selector is then relative to the parent — `.title` inside `.card` means
@@ -122,9 +125,20 @@ export const getDeclarationsForSelector = (
  */
 const STATE_PSEUDO_CLASSES = /:(hover|focus(-visible|-within)?|active)\b/i;
 
+const NARROWING_PARTS = /[#.[]|:(nth-|first-|last-|only-|is\(|where\(|has\()/i;
+
+/**
+ * Whether the selector picks its element by tag alone (`*`, `a`, `.card p`)
+ * rather than by id, class, attribute or position, so it matches broadly.
+ */
+const isBroadSelector = (selector: string): boolean =>
+  !NARROWING_PARTS.test(getSubjectCompound(selector));
+
 /**
  * Finds an authored selector matching this element via el.matches(), so
  * picking it keeps editing that rule instead of starting an unrelated one.
+ * Only a selector that targets the element itself counts: a broad one like
+ * `*` or `.card p` would otherwise capture every element it happens to match.
  */
 export const getExistingSelector = (
   el: HTMLElement,
@@ -132,6 +146,7 @@ export const getExistingSelector = (
 ): string | null => {
   const root = postcss.parse(css);
   let match: string | null = null;
+  let generatedSelector: string | null = null;
 
   walkUnnestedRules(root, rule => {
     if (match) {
@@ -141,6 +156,13 @@ export const getExistingSelector = (
     for (const candidate of rule.selectors) {
       if (STATE_PSEUDO_CLASSES.test(candidate)) {
         continue;
+      }
+
+      if (isBroadSelector(candidate)) {
+        generatedSelector = generatedSelector ?? getSelector(el);
+        if (candidate !== generatedSelector) {
+          continue;
+        }
       }
 
       try {
