@@ -206,6 +206,10 @@ const config = {
           transform: transformHtml,
         },
         {
+          from: 'editor-window/appearance-init.js',
+          to: 'editor-window/appearance-init.js',
+        },
+        {
           from: 'monaco-editor/iframe/index.html',
           to: 'monaco-editor/iframe/index.html',
           transform: transformHtml,
