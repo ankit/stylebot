@@ -80,6 +80,65 @@ describe('actions', () => {
       expect(mockCommit).toHaveBeenNthCalledWith(1, 'setCss', css);
       expect(mockCommit).toHaveBeenNthCalledWith(2, 'setSelectors', mockRoot);
     });
+
+    it('does not save an empty style when none was loaded, since that would delete it', () => {
+      actions.applyCss({ commit: mockCommit, state: mockState }, { css: '' });
+
+      expect(chromeUtils.setStyle).toBeCalledTimes(0);
+      expect(mockBridge.applyCss).toBeCalledTimes(0);
+      expect(mockCommit).toBeCalledTimes(0);
+    });
+
+    it('still clears a style the editor was showing', () => {
+      const state = { ...mockState, css: 'a { color: red; }' };
+      jest.spyOn(stylebotCss, 'removeEmptyRules').mockReturnValue('');
+
+      actions.applyCss({ commit: mockCommit, state }, { css: '' });
+
+      expect(chromeUtils.setStyle).toBeCalledWith(state.url, '', false);
+    });
+  });
+
+  describe('refreshStyle', () => {
+    it('mirrors the stored style into the editor', async () => {
+      const defaultStyle = {
+        url: 'example.com',
+        css: 'a { color: red; }',
+        enabled: true,
+        readability: false,
+        modifiedTime: '',
+      };
+      jest
+        .spyOn(chromeUtils, 'getStylesForPage')
+        .mockResolvedValue({ styles: [], defaultStyle });
+
+      await actions.refreshStyle({ dispatch: mockDispatch });
+
+      expect(mockDispatch).toBeCalledWith(
+        'initializeDefaultStyle',
+        defaultStyle
+      );
+    });
+
+    it('leaves the editor alone when the page has no stored style', async () => {
+      jest
+        .spyOn(chromeUtils, 'getStylesForPage')
+        .mockResolvedValue({ styles: [] });
+
+      await actions.refreshStyle({ dispatch: mockDispatch });
+
+      expect(mockDispatch).toBeCalledTimes(0);
+    });
+
+    it('ignores a read that fails rather than taking it for no style', async () => {
+      jest
+        .spyOn(chromeUtils, 'getStylesForPage')
+        .mockRejectedValue(new Error('no receiving end'));
+
+      await actions.refreshStyle({ dispatch: mockDispatch });
+
+      expect(mockDispatch).toBeCalledTimes(0);
+    });
   });
 
   describe('applyReadability', () => {
@@ -233,6 +292,30 @@ describe('actions', () => {
       expect(chromeUtils.enableStyle).toBeCalledWith(state.url);
       expect(mockCommit).toBeCalledWith('setVisible', true);
       expect(mockCommit).toBeCalledWith('setInspecting', true);
+    });
+
+    it('re-reads the stored style, so a stale copy is not what gets edited', async () => {
+      await actions.openStylebot({
+        state: mockState,
+        commit: mockCommit,
+        dispatch: mockDispatch,
+        getters,
+      });
+
+      expect(mockDispatch).toBeCalledWith('refreshStyle');
+    });
+
+    it('leaves that to the page in the window host, which cannot ask the background', async () => {
+      const state = { ...mockState, host: 'window' as const };
+
+      await actions.openStylebot({
+        state,
+        commit: mockCommit,
+        dispatch: mockDispatch,
+        getters,
+      });
+
+      expect(mockDispatch).not.toBeCalledWith('refreshStyle');
     });
 
     it('does not start inspecting outside basic mode', async () => {
