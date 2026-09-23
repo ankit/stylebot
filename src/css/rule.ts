@@ -125,14 +125,14 @@ export const getDeclarationsForSelector = (
  */
 const STATE_PSEUDO_CLASSES = /:(hover|focus(-visible|-within)?|active)\b/i;
 
-const SPECIFIC_SUBJECT = /[#.[]|:(nth-|first-|last-|only-|is\(|where\(|has\()/i;
+const NARROWING_PARTS = /[#.[]|:(nth-|first-|last-|only-|is\(|where\(|has\()/i;
 
 /**
- * Whether the selector's subject singles the element out by id, class,
- * attribute or position, rather than by tag alone (`*`, `a`, `.card p`).
+ * Whether the selector picks its element by tag alone (`*`, `a`, `.card p`)
+ * rather than by id, class, attribute or position, so it matches broadly.
  */
-const hasSpecificSubject = (selector: string): boolean =>
-  SPECIFIC_SUBJECT.test(getSubjectCompound(selector));
+const isBroadSelector = (selector: string): boolean =>
+  !NARROWING_PARTS.test(getSubjectCompound(selector));
 
 /**
  * Finds an authored selector matching this element via el.matches(), so
@@ -158,7 +158,7 @@ export const getExistingSelector = (
         continue;
       }
 
-      if (!hasSpecificSubject(candidate)) {
+      if (isBroadSelector(candidate)) {
         generatedSelector = generatedSelector ?? getSelector(el);
         if (candidate !== generatedSelector) {
           continue;
