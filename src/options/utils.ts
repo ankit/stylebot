@@ -13,6 +13,11 @@ import {
   StyleMap,
   RunGoogleDriveSync,
   RunGoogleDriveSyncResponse,
+  VersionHistory,
+  ScanVersionHistory,
+  ScanVersionHistoryResponse,
+  RestoreVersion,
+  RestoreVersionResponse,
 } from '@stylebot/types';
 
 export const getAllStyles = (): Promise<GetAllStylesResponse> => {
@@ -99,6 +104,43 @@ export const runGoogleDriveSync =
       };
     }
   };
+
+/**
+ * A torn-down worker answering with undefined is read as an empty history,
+ * which is what someone with no history has.
+ */
+export const scanVersionHistory = async (
+  limit?: number
+): Promise<VersionHistory> => {
+  const message: ScanVersionHistory = { name: 'ScanVersionHistory', limit };
+
+  const response = await chrome.runtime.sendMessage<
+    ScanVersionHistory,
+    ScanVersionHistoryResponse | undefined
+  >(message);
+
+  return (
+    response?.scan ?? { versions: [], previews: {}, changes: {}, total: 0 }
+  );
+};
+
+export const restoreVersion = async (
+  versionId: string,
+  urls?: Array<string>
+): Promise<boolean> => {
+  const message: RestoreVersion = {
+    name: 'RestoreVersion',
+    versionId,
+    urls,
+  };
+
+  const response = await chrome.runtime.sendMessage<
+    RestoreVersion,
+    RestoreVersionResponse | undefined
+  >(message);
+
+  return Boolean(response?.ok);
+};
 
 export const importStylesWithFilePicker = (): Promise<StyleMap> => {
   return new Promise((resolve, reject) => {

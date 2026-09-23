@@ -5,6 +5,7 @@ import {
   ReadabilitySettings,
   Timestamp,
   GoogleDriveSyncMetadata,
+  VersionHistory,
 } from '@stylebot/types';
 
 export type GetAllOptionsResponse = StylebotOptions;
@@ -46,6 +47,16 @@ export type RunGoogleDriveSyncResponse =
   | { ok: true; metadata: GoogleDriveSyncMetadata }
   | { ok: false; errorKey: SyncErrorKey; errorDetail?: string };
 
+export type SyncFailure = {
+  ok: false;
+  errorKey: SyncErrorKey;
+  errorDetail?: string;
+};
+
+export type ScanVersionHistoryResponse = { scan: VersionHistory };
+
+export type RestoreVersionResponse = { ok: boolean };
+
 export type GetRecentColorsResponse = Array<string>;
 export type AddRecentColorResponse = Array<string>;
 export type GetIsEditorWindowOpenResponse = boolean;
@@ -60,6 +71,8 @@ type BackgroundPageMessageResponse =
   | GetImportCssResponse
   | GetGoogleWebFontExistsResponse
   | RunGoogleDriveSyncResponse
+  | ScanVersionHistoryResponse
+  | RestoreVersionResponse
   | GetRecentColorsResponse
   | AddRecentColorResponse
   | GetIsEditorWindowOpenResponse;

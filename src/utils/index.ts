@@ -11,6 +11,13 @@ export { debounce } from './debounce';
 export { resolveAppearance, getSystemPreference } from './resolve-appearance';
 
 export { formatSyncTime } from './format-sync-time';
+export {
+  formatClockTime,
+  formatDay,
+  formatWeekday,
+  formatDayTime,
+  formatExact,
+} from './time-formatter';
 export { KEYBOARD_FOCUS, isFieldTarget, consumeFieldEscape } from './focus';
 
 export const getCurrentTimestamp = (): Timestamp =>

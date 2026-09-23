@@ -43,7 +43,11 @@ describe('set', () => {
                 // rapid keystrokes in the code editor firing overlapping
                 // SetStyle messages. Deep-clone, since real chrome.storage.local
                 // returns a structured-clone copy, not a live reference.
-                const snapshot = JSON.parse(JSON.stringify(store[key]));
+                const held = store[key];
+                const snapshot =
+                  held === undefined
+                    ? undefined
+                    : JSON.parse(JSON.stringify(held));
                 setTimeout(() => resolve({ [key]: snapshot }), 10);
               })
           ),
@@ -104,8 +108,12 @@ describe('style edits', () => {
 
   let store: { styles: Record<string, StoredStyle> };
   const stored = (url: string) => store.styles[url];
+  // Style writes only: each one also records a history entry, which is its
+  // own write to its own key.
   const writes = () =>
-    (chrome.storage.local.set as jest.Mock).mock.calls.length;
+    (chrome.storage.local.set as jest.Mock).mock.calls.filter(
+      ([items]) => 'styles' in items
+    ).length;
 
   beforeEach(() => {
     jest.resetModules();
@@ -124,9 +132,20 @@ describe('style edits', () => {
     global.chrome = {
       storage: {
         local: {
-          get: jest.fn(async (key: string) => ({
-            [key]: JSON.parse(JSON.stringify(store[key as 'styles'])),
-          })),
+          get: jest.fn(async (keys: string | Array<string>) => {
+            const items: Record<string, unknown> = {};
+
+            (Array.isArray(keys) ? keys : [keys]).forEach(key => {
+              const held = store[key as 'styles'];
+
+              items[key] =
+                held === undefined
+                  ? undefined
+                  : JSON.parse(JSON.stringify(held));
+            });
+
+            return items;
+          }),
           set: jest.fn(async (items: Record<string, unknown>) => {
             Object.assign(store, items);
           }),

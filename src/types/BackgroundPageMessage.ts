@@ -123,6 +123,19 @@ export type RunGoogleDriveSync = {
   name: 'RunGoogleDriveSync';
 };
 
+export type ScanVersionHistory = {
+  name: 'ScanVersionHistory';
+  // Absent asks for every version held.
+  limit?: number;
+};
+
+export type RestoreVersion = {
+  name: 'RestoreVersion';
+  versionId: string;
+  // Absent restores the whole version; a list restores only those sites.
+  urls?: Array<string>;
+};
+
 export type GetRecentColors = {
   name: 'GetRecentColors';
 };
@@ -177,6 +190,8 @@ type BackgroundPageMessage =
   | GetImportCss
   | GetGoogleWebFontExists
   | RunGoogleDriveSync
+  | ScanVersionHistory
+  | RestoreVersion
   | GetRecentColors
   | AddRecentColor
   | OpenEditorWindow

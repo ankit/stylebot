@@ -3,12 +3,13 @@ import VueRouter, { Route, RouteConfig } from 'vue-router';
 
 import TheBasicsTab from './components/TheBasicsTab.vue';
 import TheStylesTab from './components/TheStylesTab.vue';
+import TheHistoryTab from './components/TheHistoryTab.vue';
 import TheSyncTab from './components/TheSyncTab.vue';
 import TheStyleEditorPage from './components/styles/TheStyleEditorPage.vue';
 
 Vue.use(VueRouter);
 
-export const TABS = ['basics', 'styles', 'sync'] as const;
+export const TABS = ['basics', 'styles', 'history', 'sync'] as const;
 
 export type Tab = (typeof TABS)[number];
 
@@ -35,6 +36,12 @@ export const routes: Array<RouteConfig> = [
     component: TheStyleEditorPage,
     meta: { tab: 'styles' },
     props: route => ({ initialUrl: queryString(route.query.url) }),
+  },
+  {
+    path: '/history',
+    name: 'history',
+    component: TheHistoryTab,
+    meta: { tab: 'history' },
   },
   {
     path: '/sync',
