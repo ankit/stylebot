@@ -362,6 +362,119 @@ describe('runGoogleDriveSync', () => {
     expect(storedState()?.baseStyles).toEqual(RED);
   });
 
+  it('does not upload when the sides differ only in modifiedTime', async () => {
+    const touched = {
+      'a.com': style('a { color: red; }', '2024-05-01T00:00:00.000Z'),
+    };
+    seed({
+      styles: touched,
+      localRevision: 'local-2',
+      state: synced('remote-1', 'local-1', RED),
+    });
+
+    mockedGetRemote.mockResolvedValue(remoteMetadata('remote-1'));
+
+    await runGoogleDriveSync();
+
+    expect(mockedWrite).not.toBeCalled();
+    expect(mockedGetFile).not.toBeCalled();
+    expect(storedStyles()).toEqual(touched);
+    expect(storedState()).toMatchObject({
+      remoteRevision: 'remote-1',
+      localRevision: 'local-2',
+      baseStyles: RED,
+    });
+  });
+
+  it('writes neither side on a first sync that differs only in modifiedTime', async () => {
+    const newer = {
+      'a.com': style('a { color: red; }', '2024-05-01T00:00:00.000Z'),
+    };
+    seed({ styles: RED });
+
+    mockedGetRemote.mockResolvedValue(remoteMetadata('remote-1'));
+    mockedDownload.mockResolvedValue(newer);
+
+    await runGoogleDriveSync();
+
+    expect(mockedWrite).not.toBeCalled();
+    expect(chrome.tabs.query).not.toBeCalled();
+    expect(storedStyles()).toEqual(RED);
+    // The base is what Drive holds, so an unchanged remote can stand in for it.
+    expect(storedState()).toMatchObject({
+      remoteRevision: 'remote-1',
+      localRevision: 'local-1',
+      baseStyles: newer,
+    });
+  });
+
+  it('does not upload or pull a whitespace-only css change', async () => {
+    const reformatted = {
+      'a.com': style('a {\n  color: red;\n}\n', '2024-05-01T00:00:00.000Z'),
+    };
+    seed({
+      styles: reformatted,
+      localRevision: 'local-2',
+      state: synced('remote-1', 'local-1', RED),
+    });
+
+    mockedGetRemote.mockResolvedValue(remoteMetadata('remote-2'));
+    mockedDownload.mockResolvedValue(RED);
+
+    await runGoogleDriveSync();
+
+    expect(mockedWrite).not.toBeCalled();
+    expect(storedStyles()).toEqual(reformatted);
+    expect(storedState()).toMatchObject({
+      remoteRevision: 'remote-2',
+      localRevision: 'local-2',
+      baseStyles: RED,
+    });
+  });
+
+  it('still uploads a change to enabled', async () => {
+    const disabled = { 'a.com': { ...RED['a.com'], enabled: false } };
+    seed({
+      styles: disabled,
+      localRevision: 'local-2',
+      state: synced('remote-1', 'local-1', RED),
+    });
+
+    mockedGetRemote.mockResolvedValue(remoteMetadata('remote-1'));
+    mockedWrite.mockResolvedValue(remoteMetadata('remote-2'));
+
+    await runGoogleDriveSync();
+
+    expect(mockedWrite).toBeCalledTimes(1);
+    expect(uploadedStyles()).toEqual(disabled);
+    expect(storedState()?.baseStyles).toEqual(disabled);
+  });
+
+  it('settles on the run after a skipped upload', async () => {
+    seed({
+      styles: {
+        'a.com': style('a {\n  color: red;\n}', '2024-05-01T00:00:00.000Z'),
+      },
+      localRevision: 'local-2',
+      state: synced('remote-1', 'local-1', RED),
+    });
+
+    mockedGetRemote.mockResolvedValue(remoteMetadata('remote-1'));
+
+    await runGoogleDriveSync();
+    const afterFirst = storedState();
+
+    await runGoogleDriveSync();
+
+    expect(mockedWrite).not.toBeCalled();
+    expect(mockedDownload).not.toBeCalled();
+    expect(chrome.tabs.query).not.toBeCalled();
+    expect(storedState()).toEqual({
+      ...afterFirst,
+      lastSyncedAt: storedState()?.lastSyncedAt,
+    });
+  });
+
   // The bug this replaced: a pull stamped its own timestamp as the sync time
   // while setAll stamped styles-metadata a moment later, so the next run always
   // concluded local was newer and re-uploaded what it had just downloaded.

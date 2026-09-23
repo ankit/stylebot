@@ -12,7 +12,7 @@ import {
   toSyncErrorKey,
   toSyncErrorDetail,
 } from '../errors';
-import { mergeThreeWay } from '../merge/three-way';
+import { mergeThreeWay, isEquivalentStyleMap } from '../merge/three-way';
 import getAccessToken, { clearCachedToken } from './get-access-token';
 import {
   getSyncState,
@@ -42,15 +42,6 @@ export type SyncOptions = {
 
 const getStylesBlob = (styles: StyleMap) =>
   new Blob([JSON.stringify(styles)], { type: 'application/json' });
-
-const stableJson = (styles: StyleMap) =>
-  JSON.stringify(
-    Object.keys(styles)
-      .sort()
-      .map(url => [url, styles[url]])
-  );
-
-const isSameMap = (a: StyleMap, b: StyleMap) => stableJson(a) === stableJson(b);
 
 /**
  * Earlier conflicts stay listed until the user dismisses them; a url that
@@ -133,8 +124,6 @@ const reconcile = async (
     state?.account ?? (await getAccount(accessToken)) ?? undefined;
 
   if (!remote) {
-    console.debug('did not find remote sync file, updating remote...');
-
     const metadata = await writeSyncFile(accessToken, getStylesBlob(local));
     const next: SyncState = {
       metadata,
@@ -153,11 +142,7 @@ const reconcile = async (
   const remoteChanged = state?.remoteRevision !== remote.modifiedTime;
   const localChanged = state?.localRevision !== localRevision;
 
-  console.debug('sync info', { state, remote, remoteChanged, localChanged });
-
   if (state && !remoteChanged && !localChanged) {
-    console.debug('nothing changed since last sync');
-
     // Both sides still hold what they held at the last sync, so local is the
     // base — which also backfills it for profiles that synced before it was
     // recorded, without having to merge blind.
@@ -182,12 +167,14 @@ const reconcile = async (
 
   const { styles, conflicts } = mergeThreeWay(base, local, remoteStyles, now);
 
-  console.debug('merged', { base: Boolean(base), conflicts });
-
   let metadata = remote;
   let nextLocalRevision = localRevision;
 
-  if (!isSameMap(styles, remoteStyles)) {
+  // A side that differs only in timestamps or whitespace is left as it is.
+  const shouldUpdateRemote = !isEquivalentStyleMap(styles, remoteStyles);
+  const shouldUpdateLocal = !isEquivalentStyleMap(styles, local);
+
+  if (shouldUpdateRemote) {
     // Another device may have uploaded since the metadata was read. Merging
     // over its copy would drop its edits, so start over from a fresh read —
     // once. A second collision in a row is left for the next run.
@@ -198,13 +185,11 @@ const reconcile = async (
         throw syncError('Drive file changed during sync', 'unknown');
       }
 
-      console.debug('remote changed during sync, starting over...');
       return reconcile({ interactive }, true);
     }
   }
 
-  if (!isSameMap(styles, local)) {
-    console.debug('updating local...');
+  if (shouldUpdateLocal) {
     const written = await writeLocal(styles, localRevision);
 
     // Same story as the remote: an edit saved while this ran is not in the
@@ -214,15 +199,13 @@ const reconcile = async (
         throw syncError('Styles changed during sync', 'unknown');
       }
 
-      console.debug('local changed during sync, starting over...');
       return reconcile({ interactive }, true);
     }
 
     nextLocalRevision = written;
   }
 
-  if (!isSameMap(styles, remoteStyles)) {
-    console.debug('updating remote...');
+  if (shouldUpdateRemote) {
     metadata = await writeSyncFile(
       accessToken,
       getStylesBlob(styles),
@@ -235,7 +218,9 @@ const reconcile = async (
     remoteRevision: metadata.modifiedTime,
     localRevision: nextLocalRevision,
     lastSyncedAt: now,
-    baseStyles: styles,
+    // The base is kept byte for byte what Drive holds, so an unchanged remote
+    // can keep standing in for a download.
+    baseStyles: shouldUpdateRemote ? styles : remoteStyles,
     // Re-read rather than reuse `state`: a conflict dismissed from the Sync
     // tab while this ran must not come back.
     conflicts: mergeConflicts(
@@ -255,15 +240,11 @@ const reconcile = async (
 // options-page run just awaits the same result.
 let inFlight: Promise<RunGoogleDriveSyncResponse> | null = null;
 
-const toFailure = (e: unknown): RunGoogleDriveSyncResponse => {
-  console.debug('google drive sync failed', e);
-
-  return {
-    ok: false,
-    errorKey: toSyncErrorKey(e),
-    errorDetail: toSyncErrorDetail(e),
-  };
-};
+const toFailure = (e: unknown): RunGoogleDriveSyncResponse => ({
+  ok: false,
+  errorKey: toSyncErrorKey(e),
+  errorDetail: toSyncErrorDetail(e),
+});
 
 const run = async (
   options: SyncOptions
