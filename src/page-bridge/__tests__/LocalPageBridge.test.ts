@@ -115,13 +115,25 @@ describe('LocalPageBridge', () => {
   });
 
   describe('setPreviewCss', () => {
-    it('injects a scratch stylesheet', () => {
-      bridge.setPreviewCss('h1 { font-family: Inter; }');
+    it('injects a scratch stylesheet, forced like the style it previews', () => {
+      bridge.setPreviewCss({
+        css: 'h1 { font-family: Inter; }',
+        forceImportant: true,
+      });
+      bridge.setPreviewCss({
+        css: 'h1 { font-family: Lora; }',
+        forceImportant: false,
+      });
 
       expect(stylebotCss.injectCSSIntoDocument).toBeCalledWith(
         'h1 { font-family: Inter; }',
         'font-preview',
         { forceImportant: true }
+      );
+      expect(stylebotCss.injectCSSIntoDocument).toBeCalledWith(
+        'h1 { font-family: Lora; }',
+        'font-preview',
+        { forceImportant: false }
       );
     });
 

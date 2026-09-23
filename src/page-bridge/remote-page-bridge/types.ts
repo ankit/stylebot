@@ -23,7 +23,10 @@ export type RemotePageBridgeRequestResult = {
 export type RemotePageBridgeMessageToPage =
   | { type: 'request'; id: number; method: RemotePageBridgeRequestMethod }
   | { type: 'applyCss'; css: string; forceImportant: boolean }
-  | { type: 'previewCss'; css: string | null }
+  | {
+      type: 'previewCss';
+      preview: { css: string; forceImportant: boolean } | null;
+    }
   | { type: 'applyReadability'; value: boolean }
   | { type: 'startInspecting' }
   | { type: 'stopInspecting' }

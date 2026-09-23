@@ -49,10 +49,11 @@ export type PageBridge = {
   }): void;
 
   /**
-   * Shows css in a scratch stylesheet that is never saved (font previews);
-   * null removes it.
+   * Shows css in a scratch stylesheet that is never saved (font previews),
+   * forced like the style it previews so it shows what saving would; null
+   * removes it.
    */
-  setPreviewCss(css: string | null): void;
+  setPreviewCss(preview: { css: string; forceImportant: boolean } | null): void;
 
   /**
    * Turns the reader on or off for the page.

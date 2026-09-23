@@ -433,7 +433,10 @@ export default {
       return;
     }
 
-    getPageBridge().setPreviewCss(css);
+    getPageBridge().setPreviewCss({
+      css,
+      forceImportant: state.forceImportant,
+    });
   },
 
   applyReadability(

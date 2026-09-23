@@ -110,12 +110,15 @@ export class LocalPageBridge extends PageBridgeEmitter implements PageBridge {
     }
   }
 
-  setPreviewCss(css: string | null): void {
-    if (css === null) {
+  setPreviewCss(
+    preview: { css: string; forceImportant: boolean } | null
+  ): void {
+    if (preview === null) {
       removeCSSFromDocument(PREVIEW_ID);
     } else {
-      // Forced whatever the style's setting, so the font always shows.
-      injectCSSIntoDocument(css, PREVIEW_ID, { forceImportant: true });
+      injectCSSIntoDocument(preview.css, PREVIEW_ID, {
+        forceImportant: preview.forceImportant,
+      });
     }
   }
 

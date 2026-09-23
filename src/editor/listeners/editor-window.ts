@@ -150,7 +150,7 @@ const initEditorWindowListener = (store: Store<State>): void => {
           break;
 
         case 'previewCss':
-          bridge.setPreviewCss(message.css);
+          bridge.setPreviewCss(message.preview);
           break;
 
         case 'applyReadability':

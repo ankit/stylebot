@@ -277,7 +277,7 @@ describe('RemotePageBridge', () => {
 
     expect(ports[0].postMessage.mock.calls.map(([m]) => m)).toEqual([
       { type: 'applyCss', css: 'b {}', forceImportant: false },
-      { type: 'previewCss', css: null },
+      { type: 'previewCss', preview: null },
       { type: 'applyReadability', value: true },
       { type: 'startInspecting' },
       { type: 'highlight', selector: 'h1' },

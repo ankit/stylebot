@@ -208,8 +208,8 @@ export class RemotePageBridge extends PageBridgeEmitter implements PageBridge {
     this.send({ type: 'applyCss', css, forceImportant });
   }
 
-  setPreviewCss(css: string | null): void {
-    this.send({ type: 'previewCss', css });
+  setPreviewCss(preview: Parameters<PageBridge['setPreviewCss']>[0]): void {
+    this.send({ type: 'previewCss', preview });
   }
 
   applyReadability(value: boolean): void {

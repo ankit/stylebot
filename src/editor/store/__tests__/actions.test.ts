@@ -578,9 +578,22 @@ describe('actions', () => {
       expect(postcss.parse).toBeCalledWith(
         '@import;\nh1 { font-family: Inter, sans-serif; }'
       );
-      expect(mockBridge.setPreviewCss).toBeCalledWith(
-        '@import;\nh1 { font-family: Inter, sans-serif; }'
+      expect(mockBridge.setPreviewCss).toBeCalledWith({
+        css: '@import;\nh1 { font-family: Inter, sans-serif; }',
+        forceImportant: true,
+      });
+    });
+
+    it('previews unforced when the style has Override site styles off', async () => {
+      await actions.previewFontFamily(
+        { state: { ...state, forceImportant: false } },
+        'Some Local'
       );
+
+      expect(mockBridge.setPreviewCss).toBeCalledWith({
+        css: 'h1 { font-family: Some Local; }',
+        forceImportant: false,
+      });
     });
 
     it('skips the import for an unknown font', async () => {
