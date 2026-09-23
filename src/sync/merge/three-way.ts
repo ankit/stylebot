@@ -27,6 +27,7 @@ const isSameStyle = (a?: StyleWithoutUrl, b?: StyleWithoutUrl): boolean => {
   return (
     a.enabled === b.enabled &&
     a.readability === b.readability &&
+    (a.forceImportant !== false) === (b.forceImportant !== false) &&
     normalizeCss(a.css) === normalizeCss(b.css)
   );
 };
@@ -65,6 +66,7 @@ const mergeStyle = (
       enabled: newer.enabled,
       readability: newer.readability,
       modifiedTime: newer.modifiedTime,
+      ...(newer.forceImportant === false ? { forceImportant: false } : {}),
     },
     conflicted,
   };

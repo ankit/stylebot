@@ -10,7 +10,7 @@ setPageBridge(new LocalPageBridge({ getStylebotCss: () => store.state.css }));
 const ready = (async () => {
   await store.dispatch('initialize');
 
-  const { defaultStyle } = await getStylesForPage(false);
+  const { defaultStyle } = await getStylesForPage();
   if (defaultStyle) {
     store.dispatch('initializeDefaultStyle', defaultStyle);
   }

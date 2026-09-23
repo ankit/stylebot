@@ -71,11 +71,13 @@ describe('actions', () => {
         url: mockState.url,
         css,
         enabled: mockState.enabled,
+        forceImportant: true,
       });
       expect(chromeUtils.setStyle).toBeCalledWith(
         mockState.url,
         'clean',
-        mockState.readability
+        mockState.readability,
+        true
       );
       expect(mockCommit).toHaveBeenNthCalledWith(1, 'setCss', css);
       expect(mockCommit).toHaveBeenNthCalledWith(2, 'setSelectors', mockRoot);
@@ -95,7 +97,36 @@ describe('actions', () => {
 
       actions.applyCss({ commit: mockCommit, state }, { css: '' });
 
-      expect(chromeUtils.setStyle).toBeCalledWith(state.url, '', false);
+      expect(chromeUtils.setStyle).toBeCalledWith(state.url, '', false, true);
+    });
+
+    it('applies and persists a style with Override site styles off', () => {
+      const state = { ...mockState, forceImportant: false };
+      jest.spyOn(stylebotCss, 'removeEmptyRules').mockReturnValue('clean');
+
+      actions.applyCss({ commit: mockCommit, state }, { css: 'a {}' });
+
+      expect(mockBridge.applyCss).toBeCalledWith(
+        expect.objectContaining({ forceImportant: false })
+      );
+      expect(chromeUtils.setStyle).toBeCalledWith(
+        state.url,
+        'clean',
+        state.readability,
+        false
+      );
+    });
+  });
+
+  describe('setForceImportant', () => {
+    it('commits the setting and reapplies the current css with it', () => {
+      const state = { ...mockState, css: 'a { color: red; }' };
+      const dispatch = jest.fn();
+
+      actions.setForceImportant({ state, commit: mockCommit, dispatch }, false);
+
+      expect(mockCommit).toBeCalledWith('setForceImportant', false);
+      expect(dispatch).toBeCalledWith('applyCss', { css: 'a { color: red; }' });
     });
   });
 
@@ -547,9 +578,22 @@ describe('actions', () => {
       expect(postcss.parse).toBeCalledWith(
         '@import;\nh1 { font-family: Inter, sans-serif; }'
       );
-      expect(mockBridge.setPreviewCss).toBeCalledWith(
-        '@import;\nh1 { font-family: Inter, sans-serif; }'
+      expect(mockBridge.setPreviewCss).toBeCalledWith({
+        css: '@import;\nh1 { font-family: Inter, sans-serif; }',
+        forceImportant: true,
+      });
+    });
+
+    it('previews unforced when the style has Override site styles off', async () => {
+      await actions.previewFontFamily(
+        { state: { ...state, forceImportant: false } },
+        'Some Local'
       );
+
+      expect(mockBridge.setPreviewCss).toBeCalledWith({
+        css: 'h1 { font-family: Some Local; }',
+        forceImportant: false,
+      });
     });
 
     it('skips the import for an unknown font', async () => {

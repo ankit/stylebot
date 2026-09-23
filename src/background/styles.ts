@@ -160,22 +160,28 @@ const update = (
 };
 
 /**
- * Saves the style for a url, or removes it if css is empty.
+ * Saves the style for a url, or removes it if css is empty. An undefined
+ * forceImportant keeps the stored style's current value.
  */
 export const set = (
   url: string,
   css: string,
-  readability: boolean
+  readability: boolean,
+  forceImportant?: boolean
 ): Promise<void> =>
   update(styles => {
     if (!css) {
       delete styles[url];
     } else {
+      const keepForceImportant =
+        forceImportant ?? styles[url]?.forceImportant !== false;
+
       styles[url] = {
         css,
         readability,
         enabled: true,
         modifiedTime: getCurrentTimestamp(),
+        ...(keepForceImportant ? {} : { forceImportant: false }),
       };
     }
 

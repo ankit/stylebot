@@ -109,6 +109,10 @@ export default {
     state.readability = value;
   },
 
+  setForceImportant(state: State, value: boolean): void {
+    state.forceImportant = value;
+  },
+
   setReadabilitySettings(state: State, value: ReadabilitySettings): void {
     state.readabilitySettings = value;
   },

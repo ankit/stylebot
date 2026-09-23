@@ -2,7 +2,15 @@
 // last-applied result is cached here, one entry per origin.
 const CACHE_KEY = 'stylebot-cache';
 
-export type CachedStyle = { url: string; css: string; enabled: boolean };
+// Mirrors the stored style: css as the user wrote it, with `!important`
+// forced at injection. forceImportant is missing from caches written
+// before it, which means true.
+export type CachedStyle = {
+  url: string;
+  css: string;
+  enabled: boolean;
+  forceImportant?: boolean;
+};
 
 export type CachedState = {
   styles: Array<CachedStyle>;

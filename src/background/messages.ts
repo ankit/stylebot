@@ -85,7 +85,7 @@ export const EnableStyle = async (message: EnableStyleType): Promise<void> => {
 };
 
 export const SetStyle = (message: SetStyleType): Promise<void> =>
-  set(message.url, message.css, message.readability);
+  set(message.url, message.css, message.readability, message.forceImportant);
 
 export const GetAllStyles = async (
   sendResponse: (response: GetAllStylesResponse) => void
@@ -113,7 +113,7 @@ export const GetStylesForPage = async (
   }
 
   const styles = await getAll();
-  const response = getStylesForPage(tab.url, styles, message.important);
+  const response = getStylesForPage(tab.url, styles);
 
   sendResponse(response);
 

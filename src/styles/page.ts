@@ -1,12 +1,10 @@
-import { appendImportantToDeclarations } from '@stylebot/css';
 import { Style, StyleMap } from '@stylebot/types';
 
 import BackgroundPageUtils from './utils';
 
 export const getStylesForPage = (
   pageUrl: string,
-  allStyles: StyleMap,
-  important = false
+  allStyles: StyleMap
 ): {
   styles: Array<Style>;
   defaultStyle?: Style;
@@ -26,12 +24,7 @@ export const getStylesForPage = (
     const matches = BackgroundPageUtils.matches(pageUrl, url);
 
     if (matches && allStyles[url]) {
-      const css = important
-        ? appendImportantToDeclarations(allStyles[url].css)
-        : allStyles[url].css;
-
-      const { enabled, readability, modifiedTime } = allStyles[url];
-      const style = { url, css, enabled, readability, modifiedTime };
+      const style = { url, ...allStyles[url] };
 
       if (url !== '*') {
         if (!defaultStyle || url.length > defaultStyle.url.length) {

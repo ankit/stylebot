@@ -109,6 +109,27 @@ describe('mergeThreeWay', () => {
     expect(styles['a.com'].css).toContain('a { color: green; }\n\n/*');
   });
 
+  it('takes a change to Override site styles made on one side', () => {
+    const unforced = style(X.css, T2, { forceImportant: false });
+
+    expect(
+      merge({ 'a.com': X }, { 'a.com': X }, { 'a.com': unforced })
+    ).toEqual({ styles: { 'a.com': unforced }, conflicts: [] });
+  });
+
+  it("gives the newer edit's Override site styles setting when both sides changed", () => {
+    const local = style('a { color: blue; }', T1);
+    const remote = style('a { color: green; }', T2, { forceImportant: false });
+
+    const { styles } = merge(
+      { 'a.com': X },
+      { 'a.com': local },
+      { 'a.com': remote }
+    );
+
+    expect(styles['a.com'].forceImportant).toBe(false);
+  });
+
   it('deletes a style local removed', () => {
     expect(merge({ 'a.com': X }, {}, { 'a.com': X })).toEqual({
       styles: {},

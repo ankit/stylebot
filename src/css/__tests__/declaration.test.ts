@@ -1,8 +1,15 @@
 const dedent = require('dedent');
 
 import 'jest-fetch-mock';
-import { addDeclaration, appendImportantToDeclarations } from '../declaration';
+import * as postcss from 'postcss';
+import { addDeclaration, markDeclarationsImportant } from '../declaration';
 import { getRule } from '../rule';
+
+const appendImportantToDeclarations = (css: string): string => {
+  const root = postcss.parse(css);
+  markDeclarationsImportant(root);
+  return root.toString();
+};
 
 describe('declaration', () => {
   describe('addDeclaration', () => {
@@ -350,7 +357,7 @@ describe('declaration', () => {
     });
   });
 
-  describe('appendImportantToDeclarations', () => {
+  describe('markDeclarationsImportant', () => {
     it('appends !important inside nested rules and nested grouping at-rules', () => {
       const css = dedent`
         .card {

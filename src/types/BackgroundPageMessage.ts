@@ -10,6 +10,8 @@ export type SetStyle = {
   url: string;
   css: string;
   readability: boolean;
+  // Left out, the stored style keeps its current value.
+  forceImportant?: boolean;
 };
 
 export type EnableStyle = {
@@ -41,7 +43,6 @@ export type MoveStyle = {
 export type GetStylesForPage = {
   name: 'GetStylesForPage';
   tab?: chrome.tabs.Tab;
-  important?: boolean;
 };
 
 export type GetAllOptions = {

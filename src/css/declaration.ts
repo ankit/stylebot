@@ -110,14 +110,10 @@ const isInsideDescriptorAtRule = (decl: postcss.Declaration): boolean => {
  * at-rules (see isInsideDescriptorAtRule). Grouping at-rules such as
  * `@media` are transparent, whether top-level or nested inside a rule.
  */
-export const appendImportantToDeclarations = (css: string): string => {
-  const root = postcss.parse(css);
-
+export const markDeclarationsImportant = (root: postcss.Root): void => {
   root.walkDecls(decl => {
     if (!isInsideDescriptorAtRule(decl)) {
       decl.important = true;
     }
   });
-
-  return root.toString();
 };

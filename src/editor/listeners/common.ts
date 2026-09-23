@@ -1,9 +1,6 @@
 import { Store, Dispatch, Commit } from 'vuex';
 import { State } from 'editor/store';
-import {
-  injectCSSIntoDocument,
-  appendImportantToDeclarations,
-} from '@stylebot/css';
+import { injectCSSIntoDocument } from '@stylebot/css';
 import { Style } from '@stylebot/types';
 
 import {
@@ -100,10 +97,9 @@ export const applyStyles = (
 ): void => {
   styles.forEach(style => {
     if (style.enabled) {
-      injectCSSIntoDocument(
-        appendImportantToDeclarations(style.css),
-        style.url
-      );
+      injectCSSIntoDocument(style.css, style.url, {
+        forceImportant: style.forceImportant !== false,
+      });
     } else {
       injectCSSIntoDocument('', style.url);
     }

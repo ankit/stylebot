@@ -9,6 +9,7 @@ export type RemotePageBridgeSyncedState = {
   css: string;
   enabled: boolean;
   readability: boolean;
+  forceImportant: boolean;
 };
 
 export type RemotePageBridgeRequestMethod = 'getSnapshot' | 'getPageColors';
@@ -21,8 +22,11 @@ export type RemotePageBridgeRequestResult = {
 // What the window sends the page.
 export type RemotePageBridgeMessageToPage =
   | { type: 'request'; id: number; method: RemotePageBridgeRequestMethod }
-  | { type: 'applyCss'; css: string }
-  | { type: 'previewCss'; css: string | null }
+  | { type: 'applyCss'; css: string; forceImportant: boolean }
+  | {
+      type: 'previewCss';
+      preview: { css: string; forceImportant: boolean } | null;
+    }
   | { type: 'applyReadability'; value: boolean }
   | { type: 'startInspecting' }
   | { type: 'stopInspecting' }

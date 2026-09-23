@@ -2,12 +2,11 @@ import * as postcss from 'postcss';
 
 import { GetImportCss, GetImportCssResponse } from '@stylebot/types';
 
-// Strips @import rules out so the rest of the CSS can be applied without
-// waiting on a network fetch for them.
-export const extractImports = (
-  css: string
-): { css: string; importUrls: Array<string> } => {
-  const root = postcss.parse(css);
+/**
+ * Strips @import rules out of the parsed css, so the rest of it can be
+ * applied without waiting on a network fetch for them, and returns their urls.
+ */
+export const removeImports = (root: postcss.Root): Array<string> => {
   const importUrls: Array<string> = [];
 
   root.walkAtRules('import', (atRule: postcss.AtRule) => {
@@ -22,6 +21,15 @@ export const extractImports = (
       atRule.remove();
     }
   });
+
+  return importUrls;
+};
+
+export const extractImports = (
+  css: string
+): { css: string; importUrls: Array<string> } => {
+  const root = postcss.parse(css);
+  const importUrls = removeImports(root);
 
   return { css: root.toString(), importUrls };
 };

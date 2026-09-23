@@ -50,6 +50,9 @@ export type Style = {
   enabled: boolean;
   readability: boolean;
   modifiedTime: Timestamp;
+  // Whether `!important` is forced onto every declaration. Missing means
+  // true; only false is ever stored.
+  forceImportant?: boolean;
 };
 
 export type StyleWithoutUrl = Omit<Style, 'url'>;

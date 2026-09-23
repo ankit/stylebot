@@ -201,12 +201,15 @@ export class RemotePageBridge extends PageBridgeEmitter implements PageBridge {
   }
 
   // The page applies against its own url; only the payload crosses over.
-  applyCss({ css }: Parameters<PageBridge['applyCss']>[0]): void {
-    this.send({ type: 'applyCss', css });
+  applyCss({
+    css,
+    forceImportant,
+  }: Parameters<PageBridge['applyCss']>[0]): void {
+    this.send({ type: 'applyCss', css, forceImportant });
   }
 
-  setPreviewCss(css: string | null): void {
-    this.send({ type: 'previewCss', css });
+  setPreviewCss(preview: Parameters<PageBridge['setPreviewCss']>[0]): void {
+    this.send({ type: 'previewCss', preview });
   }
 
   applyReadability(value: boolean): void {

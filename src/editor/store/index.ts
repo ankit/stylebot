@@ -61,6 +61,7 @@ export type State = {
   css: string;
   enabled: boolean;
   readability: boolean;
+  forceImportant: boolean;
 
   activeSelector: string;
   contextMenuSelector: string;
@@ -91,6 +92,7 @@ export const createStore = (host: EditorHost): Store<State> =>
       css: '',
       enabled: true,
       readability: false,
+      forceImportant: true,
       url: '',
 
       selectors: [],

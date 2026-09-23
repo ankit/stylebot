@@ -1,7 +1,5 @@
-import * as postcss from 'postcss';
-
 import {
-  injectRootIntoDocument,
+  injectCSSIntoDocument,
   removeCSSFromDocument,
   removeEmptyRules,
   validateSelector,
@@ -82,18 +80,25 @@ export class LocalPageBridge extends PageBridgeEmitter implements PageBridge {
     url,
     css,
     enabled,
+    forceImportant,
   }: {
     url: string;
     css: string;
     enabled: boolean;
+    forceImportant: boolean;
   }): void {
-    injectRootIntoDocument(postcss.parse(css), url);
+    injectCSSIntoDocument(css, url, { forceImportant });
 
     // The localStorage cache is applied on the next load before storage
     // resolves; keep it current so a quick reload doesn't flash old CSS.
     const cached = readCache();
     if (cached) {
-      const entry = { url, css: removeEmptyRules(css), enabled };
+      const entry = {
+        url,
+        css: removeEmptyRules(css),
+        enabled,
+        forceImportant,
+      };
       const exists = cached.styles.some(style => style.url === url);
 
       writeCache({
@@ -105,11 +110,15 @@ export class LocalPageBridge extends PageBridgeEmitter implements PageBridge {
     }
   }
 
-  setPreviewCss(css: string | null): void {
-    if (css === null) {
+  setPreviewCss(
+    preview: { css: string; forceImportant: boolean } | null
+  ): void {
+    if (preview === null) {
       removeCSSFromDocument(PREVIEW_ID);
     } else {
-      injectRootIntoDocument(postcss.parse(css), PREVIEW_ID);
+      injectCSSIntoDocument(preview.css, PREVIEW_ID, {
+        forceImportant: preview.forceImportant,
+      });
     }
   }
 

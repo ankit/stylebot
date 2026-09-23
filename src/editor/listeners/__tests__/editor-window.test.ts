@@ -136,6 +136,7 @@ describe('initEditorWindowListener', () => {
         css: 'a { color: red; }',
         enabled: true,
         readability: false,
+        forceImportant: true,
       },
       snapshot: store.state.page,
       activeSelector: '',
@@ -146,12 +147,17 @@ describe('initEditorWindowListener', () => {
     const port = connect();
     port.postMessage.mockClear();
 
-    port.send({ type: 'applyCss', css: 'b { color: blue; }' });
+    port.send({
+      type: 'applyCss',
+      css: 'b { color: blue; }',
+      forceImportant: false,
+    });
 
     expect(applyCss).toBeCalledWith(expect.anything(), {
       css: 'b { color: blue; }',
     });
     expect(store.state.css).toBe('b { color: blue; }');
+    expect(store.state.forceImportant).toBe(false);
     expect(port.sent()).toEqual([]);
   });
 
@@ -213,8 +219,12 @@ describe('initEditorWindowListener', () => {
     port.send({ type: 'highlight', selector: 'h1' });
     expect(bridge.highlight).toBeCalledWith('h1');
 
-    port.send({ type: 'previewCss', css: 'h1 { font-family: Inter; }' });
-    expect(bridge.setPreviewCss).toBeCalledWith('h1 { font-family: Inter; }');
+    const preview = {
+      css: 'h1 { font-family: Inter; }',
+      forceImportant: false,
+    };
+    port.send({ type: 'previewCss', preview });
+    expect(bridge.setPreviewCss).toBeCalledWith(preview);
 
     port.send({ type: 'stopInspecting' });
     expect(store.state.inspecting).toBe(false);

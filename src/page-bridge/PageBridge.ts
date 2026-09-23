@@ -41,13 +41,19 @@ export type PageBridge = {
    * Injects the style into the page and keeps the page's load-time cache in
    * step. Persisting it is the caller's job.
    */
-  applyCss(args: { url: string; css: string; enabled: boolean }): void;
+  applyCss(args: {
+    url: string;
+    css: string;
+    enabled: boolean;
+    forceImportant: boolean;
+  }): void;
 
   /**
-   * Shows css in a scratch stylesheet that is never saved (font previews);
-   * null removes it.
+   * Shows css in a scratch stylesheet that is never saved (font previews),
+   * forced like the style it previews so it shows what saving would; null
+   * removes it.
    */
-  setPreviewCss(css: string | null): void;
+  setPreviewCss(preview: { css: string; forceImportant: boolean } | null): void;
 
   /**
    * Turns the reader on or off for the page.
