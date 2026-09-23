@@ -124,8 +124,6 @@ const reconcile = async (
     state?.account ?? (await getAccount(accessToken)) ?? undefined;
 
   if (!remote) {
-    console.debug('did not find remote sync file, updating remote...');
-
     const metadata = await writeSyncFile(accessToken, getStylesBlob(local));
     const next: SyncState = {
       metadata,
@@ -144,11 +142,7 @@ const reconcile = async (
   const remoteChanged = state?.remoteRevision !== remote.modifiedTime;
   const localChanged = state?.localRevision !== localRevision;
 
-  console.debug('sync info', { state, remote, remoteChanged, localChanged });
-
   if (state && !remoteChanged && !localChanged) {
-    console.debug('nothing changed since last sync');
-
     // Both sides still hold what they held at the last sync, so local is the
     // base — which also backfills it for profiles that synced before it was
     // recorded, without having to merge blind.
@@ -173,8 +167,6 @@ const reconcile = async (
 
   const { styles, conflicts } = mergeThreeWay(base, local, remoteStyles, now);
 
-  console.debug('merged', { base: Boolean(base), conflicts });
-
   let metadata = remote;
   let nextLocalRevision = localRevision;
 
@@ -193,13 +185,11 @@ const reconcile = async (
         throw syncError('Drive file changed during sync', 'unknown');
       }
 
-      console.debug('remote changed during sync, starting over...');
       return reconcile({ interactive }, true);
     }
   }
 
   if (shouldUpdateLocal) {
-    console.debug('updating local...');
     const written = await writeLocal(styles, localRevision);
 
     // Same story as the remote: an edit saved while this ran is not in the
@@ -209,7 +199,6 @@ const reconcile = async (
         throw syncError('Styles changed during sync', 'unknown');
       }
 
-      console.debug('local changed during sync, starting over...');
       return reconcile({ interactive }, true);
     }
 
@@ -217,7 +206,6 @@ const reconcile = async (
   }
 
   if (shouldUpdateRemote) {
-    console.debug('updating remote...');
     metadata = await writeSyncFile(
       accessToken,
       getStylesBlob(styles),
@@ -252,15 +240,11 @@ const reconcile = async (
 // options-page run just awaits the same result.
 let inFlight: Promise<RunGoogleDriveSyncResponse> | null = null;
 
-const toFailure = (e: unknown): RunGoogleDriveSyncResponse => {
-  console.debug('google drive sync failed', e);
-
-  return {
-    ok: false,
-    errorKey: toSyncErrorKey(e),
-    errorDetail: toSyncErrorDetail(e),
-  };
-};
+const toFailure = (e: unknown): RunGoogleDriveSyncResponse => ({
+  ok: false,
+  errorKey: toSyncErrorKey(e),
+  errorDetail: toSyncErrorDetail(e),
+});
 
 const run = async (
   options: SyncOptions
