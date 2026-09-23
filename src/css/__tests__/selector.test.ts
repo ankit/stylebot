@@ -9,6 +9,8 @@ import {
   getTagNameBasedSelector,
   getAncestorBasedSelector,
   validateSelector,
+  getSubjectCompound,
+  hasSpecificSubject,
 } from '../selector';
 
 describe('selector', () => {
@@ -442,5 +444,42 @@ describe('selector', () => {
     it('returns false for an invalid selector', () => {
       expect(validateSelector('div.foo:bar(')).toBe(false);
     });
+  });
+
+  describe('getSubjectCompound', () => {
+    it.each([
+      ['a.link', 'a.link'],
+      ['nav > ul a.link', 'a.link'],
+      ['h1 + p', 'p'],
+      ['h1 ~ p.lede', 'p.lede'],
+      ['.card\n  .title', '.title'],
+      ['.nav a[title="a b"]', 'a[title="a b"]'],
+      ['li:nth-child(2n + 1)', 'li:nth-child(2n + 1)'],
+      ['.nav li:is(.x, .y) a', 'a'],
+      ['.nav .a\\+b', '.a\\+b'],
+      ['.top-\\[10px\\] > span', 'span'],
+    ])('reads the subject of %j as %j', (selector, subject) => {
+      expect(getSubjectCompound(selector)).toBe(subject);
+    });
+  });
+
+  describe('hasSpecificSubject', () => {
+    it.each([
+      '.card .title',
+      'a#main',
+      'ul a[href="/x"]',
+      'li:nth-child(2)',
+      'p:first-of-type',
+      'div:is(.a, .b)',
+    ])('is true for %j', selector => {
+      expect(hasSpecificSubject(selector)).toBe(true);
+    });
+
+    it.each(['*', 'a', '.card p', 'body *', '.nav li:first-child a'])(
+      'is false for %j',
+      selector => {
+        expect(hasSpecificSubject(selector)).toBe(false);
+      }
+    );
   });
 });
