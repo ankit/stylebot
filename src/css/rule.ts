@@ -124,7 +124,6 @@ export const getDeclarationsForSelector = (
  */
 const STATE_PSEUDO_CLASSES = /:(hover|focus(-visible|-within)?|active)\b/i;
 
-const QUOTES = ['"', "'"];
 const COMBINATORS = ['>', '+', '~'];
 const BRACKET_DEPTH_CHANGE: Record<string, number> = {
   '[': 1,
@@ -136,7 +135,6 @@ const BRACKET_DEPTH_CHANGE: Record<string, number> = {
 type SubjectScan = {
   subject: string;
   depth: number;
-  quote: string | null;
   escaped: boolean;
 };
 
@@ -144,26 +142,12 @@ const isCombinator = (char: string): boolean =>
   char.trim() === '' || COMBINATORS.includes(char);
 
 /**
- * Adds one character to the subject being read, or starts a new subject on a
- * combinator outside brackets, parens, quotes and escapes.
+ * Adds one character to the subject being read, or starts a new subject on
+ * an unescaped combinator outside brackets and parens.
  */
 const readSubjectChar = (scan: SubjectScan, char: string): SubjectScan => {
-  const subject = scan.subject + char;
-
   if (scan.escaped) {
-    return { ...scan, subject, escaped: false };
-  }
-
-  if (char === '\\') {
-    return { ...scan, subject, escaped: true };
-  }
-
-  if (scan.quote) {
-    return { ...scan, subject, quote: char === scan.quote ? null : scan.quote };
-  }
-
-  if (QUOTES.includes(char)) {
-    return { ...scan, subject, quote: char };
+    return { ...scan, subject: scan.subject + char, escaped: false };
   }
 
   if (scan.depth === 0 && isCombinator(char)) {
@@ -171,9 +155,9 @@ const readSubjectChar = (scan: SubjectScan, char: string): SubjectScan => {
   }
 
   return {
-    ...scan,
-    subject,
+    subject: scan.subject + char,
     depth: scan.depth + (BRACKET_DEPTH_CHANGE[char] ?? 0),
+    escaped: char === '\\',
   };
 };
 
@@ -185,7 +169,6 @@ const getSubjectCompound = (selector: string): string =>
   Array.from(selector).reduce(readSubjectChar, {
     subject: '',
     depth: 0,
-    quote: null,
     escaped: false,
   }).subject;
 
