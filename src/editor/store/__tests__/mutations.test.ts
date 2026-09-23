@@ -34,5 +34,19 @@ describe('mutations', () => {
         { id: 3, value: 'c', styleCount: 1 },
       ]);
     });
+
+    it('lists only top-level selectors, not rules nested inside them', () => {
+      const root = postcss.parse(
+        'a { color: red; & + & { margin: 0; } b { color: blue; } } c { color: green; }'
+      );
+      const state = { ...mockState };
+
+      mutations.setSelectors(state, root);
+
+      expect(state.selectors).toEqual([
+        { id: 1, value: 'a', styleCount: 3 },
+        { id: 2, value: 'c', styleCount: 1 },
+      ]);
+    });
   });
 });

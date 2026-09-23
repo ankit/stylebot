@@ -6,6 +6,7 @@ import {
   ReadabilitySettings,
 } from '@stylebot/types';
 
+import { walkUnnestedRules } from '@stylebot/css';
 import { State, CssSelectorMetadata, EditorTab } from './';
 import { PageSnapshot } from '@stylebot/page-bridge';
 
@@ -70,7 +71,7 @@ export default {
     const selectors: Array<CssSelectorMetadata> = [];
     let index = 1;
 
-    root.walkRules(rule => {
+    walkUnnestedRules(root, rule => {
       try {
         let styleCount = 0;
         rule.walkDecls(() => {

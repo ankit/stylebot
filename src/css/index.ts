@@ -46,6 +46,10 @@ export type { FontValueToken } from './font-family';
 export { addDeclaration, appendImportantToDeclarations } from './declaration';
 export {
   getRule,
+  findRule,
+  isNestedRule,
+  walkUnnestedRules,
+  withOwnDeclarationsOnly,
   getRuleForSelector,
   getDeclarationsForSelector,
   getExistingSelector,

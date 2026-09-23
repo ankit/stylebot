@@ -1,6 +1,9 @@
 const dedent = require('dedent');
+import * as postcss from 'postcss';
 import {
   getRule,
+  isNestedRule,
+  withOwnDeclarationsOnly,
   getRuleForSelector,
   getDeclarationsForSelector,
   getExistingSelector,
@@ -102,6 +105,32 @@ describe('rule', () => {
         .mock-selector-1 {
           color: red;
           background: blue;
+        }
+      `);
+    });
+
+    it('places the split-out rule right after the group, separated by a blank line', () => {
+      const css = dedent`
+        .mock-selector-1, .mock-selector-2 {
+          color: red;
+        }
+
+        .mock-selector-3 {
+          color: blue;
+        }
+      `;
+
+      expect(splitSelectorFromGroup(css, '.mock-selector-1')).toEqual(dedent`
+        .mock-selector-2 {
+          color: red;
+        }
+
+        .mock-selector-1 {
+          color: red;
+        }
+
+        .mock-selector-3 {
+          color: blue;
         }
       `);
     });
@@ -408,6 +437,164 @@ describe('rule', () => {
       `;
 
       expect(removeRule(css, '.mock-selector-1')).toEqual(output);
+    });
+  });
+
+  describe('with native CSS nesting', () => {
+    const css = dedent`
+      .card {
+        color: red;
+        & + & {
+          margin-top: 8px;
+        }
+        .title, .subtitle {
+          color: blue;
+        }
+        @media (min-width: 600px) {
+          .title {
+            color: green;
+          }
+        }
+      }
+
+      .title {
+        color: pink;
+      }
+    `;
+
+    it('isNestedRule is true for rules inside a rule, at any depth', () => {
+      const nested: Array<boolean> = [];
+      postcss.parse(css).walkRules(rule => nested.push(isNestedRule(rule)));
+
+      expect(nested).toEqual([false, true, true, true, false]);
+    });
+
+    it('getRule returns the top-level rule, not a nested one with the same selector', () => {
+      expect(getRule(css, '.title')?.toString()).toEqual(dedent`
+        .title {
+          color: pink;
+        }
+      `);
+    });
+
+    it('getRule prefers a top-level rule over one inside an at-rule', () => {
+      const conditionalFirst = dedent`
+        @media (min-width: 600px) {
+          .title {
+            color: green;
+          }
+        }
+
+        .title {
+          color: pink;
+        }
+      `;
+
+      expect(getRule(conditionalFirst, '.title')?.parent?.type).toBe('root');
+    });
+
+    it('getRule returns null when the selector only exists nested', () => {
+      expect(getRule(css, '& + &')).toBeNull();
+      expect(getRule(css, '.subtitle')).toBeNull();
+    });
+
+    it('getRuleForSelector ignores nested grouped rules', () => {
+      expect(getRuleForSelector(css, '.subtitle')).toBeNull();
+    });
+
+    it("getDeclarationsForSelector returns only the rule's own declarations", () => {
+      expect(getDeclarationsForSelector(css, '.card')).toEqual([
+        { property: 'color', value: 'red' },
+      ]);
+    });
+
+    it('withOwnDeclarationsOnly drops nested rules and at-rules', () => {
+      const rule = getRule(css, '.card');
+
+      expect(rule && withOwnDeclarationsOnly(rule).toString()).toEqual(dedent`
+        .card {
+          color: red;
+        }
+      `);
+    });
+
+    it('getExistingSelector never returns a nested selector', () => {
+      const el = document.createElement('div');
+      el.matches = jest.fn(selector => selector === '.subtitle');
+
+      expect(getExistingSelector(el, css)).toBeNull();
+    });
+
+    it('splitSelectorFromGroup leaves a nested group alone', () => {
+      expect(splitSelectorFromGroup(css, '.subtitle')).toEqual(css);
+    });
+
+    it('splitSelectorFromGroup keeps nested blocks intact when splitting a top-level group', () => {
+      const grouped = dedent`
+        .a, .b {
+          color: red;
+          .title {
+            color: blue;
+          }
+        }
+      `;
+
+      const output = splitSelectorFromGroup(grouped, '.a');
+
+      expect(getRule(output, '.a')?.toString()).toEqual(dedent`
+        .a {
+          color: red;
+          .title {
+            color: blue;
+          }
+        }
+      `);
+      expect(getRule(output, '.b')?.toString()).toEqual(dedent`
+        .b {
+          color: red;
+          .title {
+            color: blue;
+          }
+        }
+      `);
+    });
+
+    it('removeRule removes the top-level rule only', () => {
+      expect(removeRule(css, '.title')).toEqual(dedent`
+        .card {
+          color: red;
+          & + & {
+            margin-top: 8px;
+          }
+          .title, .subtitle {
+            color: blue;
+          }
+          @media (min-width: 600px) {
+            .title {
+              color: green;
+            }
+          }
+        }
+      `);
+    });
+
+    it('removeEmptyRules removes a rule left holding only an empty nested rule', () => {
+      const emptyNested = dedent`
+        .card {
+          .title {
+          }
+        }
+
+        .other {
+          color: red;
+        }
+      `;
+
+      expect(removeEmptyRules(emptyNested)).toEqual(dedent`
+        .other {
+          color: red;
+        }
+      `);
     });
   });
 });

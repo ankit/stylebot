@@ -1,6 +1,9 @@
 const dedent = require('dedent');
 
-import { getCssAfterApplyingFilterEffectToPage } from '../filter';
+import {
+  getCssAfterApplyingFilterEffectToPage,
+  getFilterEffectValueForPage,
+} from '../filter';
 import { getBodyChildSelectors } from '../selector';
 
 describe('filter', () => {
@@ -173,6 +176,58 @@ describe('filter', () => {
         );
 
         expect(output).toBe('');
+      });
+    });
+
+    describe('with native CSS nesting', () => {
+      const css = dedent`
+        div.article-body {
+          filter: grayscale(40%);
+          .title {
+            filter: blur(2px);
+          }
+        }
+      `;
+
+      it('reads the value from the rule itself, not a nested rule', () => {
+        expect(
+          getFilterEffectValueForPage('grayscale', css, getBodyChildSelectors())
+        ).toBe(40);
+      });
+
+      it('updates the rule itself and leaves the nested rule alone', () => {
+        const output = getCssAfterApplyingFilterEffectToPage(
+          'grayscale',
+          css,
+          '100',
+          getBodyChildSelectors()
+        );
+
+        expect(output).toBe(dedent`
+          div.article-body {
+            filter: grayscale(100%);
+            .title {
+              filter: blur(2px);
+            }
+          }
+        `);
+      });
+
+      it('keeps the rule when the effect returns to 0 but nested rules remain', () => {
+        const output = getCssAfterApplyingFilterEffectToPage(
+          'grayscale',
+          css,
+          '0',
+          getBodyChildSelectors()
+        );
+
+        expect(output).toBe(dedent`
+          div.article-body {
+            .title {
+              filter: blur(2px);
+            }
+          }
+        `);
       });
     });
   });

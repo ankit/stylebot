@@ -2,6 +2,7 @@
 
 const dedent = require('dedent');
 import {
+  extractImports,
   fetchImportCss,
   getCssWithExpandedImports,
   pruneImportCache,
@@ -231,6 +232,41 @@ describe('import', () => {
         color: red;
       }
     `);
+    });
+
+    it('keeps nested rules intact after extracting the @import', async () => {
+      const css = dedent`
+      @import url(https://fonts.googleapis.com/css?family=Lato);
+
+      .card {
+        font-family: Lato;
+        & + & {
+          margin-top: 8px;
+        }
+        @media (min-width: 600px) {
+          .title {
+            color: red;
+          }
+        }
+      }
+    `;
+
+      expect(extractImports(css)).toEqual({
+        importUrls: ['https://fonts.googleapis.com/css?family=Lato'],
+        css: dedent`
+        .card {
+          font-family: Lato;
+          & + & {
+            margin-top: 8px;
+          }
+          @media (min-width: 600px) {
+            .title {
+              color: red;
+            }
+          }
+        }
+      `,
+      });
     });
   });
 
