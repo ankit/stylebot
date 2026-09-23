@@ -78,6 +78,8 @@ user from styling the one they picked. A tag-only selector is still reused when
 it's exactly what `getSelector` would generate for the element anyway (e.g.
 `div.mw-heading h2`).
 
+### Grouped selectors
+
 When a selector is only styled as part of a grouped rule (`.foo, .bar { … }`),
 `splitSelectorFromGroup` first moves it into its own rule, carrying over the
 declarations it already had, so an edit doesn't silently affect its groupmates.
