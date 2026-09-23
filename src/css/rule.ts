@@ -1,7 +1,8 @@
 import * as postcss from 'postcss';
 import { CssDeclaration } from '@stylebot/types';
 
-import { getSelector, hasSpecificSubject } from './selector';
+import { getSelector } from './selector';
+import { getSubjectCompound } from './get-subject-compound';
 
 /**
  * Whether the rule sits inside another rule (native CSS nesting). Its
@@ -123,6 +124,15 @@ export const getDeclarationsForSelector = (
  * element right now, not that the selector targets its normal appearance.
  */
 const STATE_PSEUDO_CLASSES = /:(hover|focus(-visible|-within)?|active)\b/i;
+
+const SPECIFIC_SUBJECT = /[#.[]|:(nth-|first-|last-|only-|is\(|where\(|has\()/i;
+
+/**
+ * Whether the selector's subject singles the element out by id, class,
+ * attribute or position, rather than by tag alone (`*`, `a`, `.card p`).
+ */
+const hasSpecificSubject = (selector: string): boolean =>
+  SPECIFIC_SUBJECT.test(getSubjectCompound(selector));
 
 /**
  * Finds an authored selector matching this element via el.matches(), so
