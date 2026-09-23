@@ -16,10 +16,13 @@ export type StyleMergeResult = {
 const normalizeCss = (css: string) => css.replace(/\s+/g, ' ').trim();
 
 /**
- * Two copies count as the same style when they would behave the same on a
+ * Two copies are equivalent when they would behave the same on a
  * page. modifiedTime is deliberately left out: it says when, not what.
  */
-const isSameStyle = (a?: StyleWithoutUrl, b?: StyleWithoutUrl): boolean => {
+export const isEquivalentStyle = (
+  a?: StyleWithoutUrl,
+  b?: StyleWithoutUrl
+): boolean => {
   if (!a || !b) {
     return !a && !b;
   }
@@ -29,6 +32,19 @@ const isSameStyle = (a?: StyleWithoutUrl, b?: StyleWithoutUrl): boolean => {
     a.readability === b.readability &&
     (a.forceImportant !== false) === (b.forceImportant !== false) &&
     normalizeCss(a.css) === normalizeCss(b.css)
+  );
+};
+
+/**
+ * Two maps are equivalent when they hold the same urls and every style
+ * would behave the same on a page, however its timestamps or whitespace differ.
+ */
+export const isEquivalentStyleMap = (a: StyleMap, b: StyleMap): boolean => {
+  const urls = Object.keys(a);
+
+  return (
+    urls.length === Object.keys(b).length &&
+    urls.every(url => url in b && isEquivalentStyle(a[url], b[url]))
   );
 };
 
@@ -111,8 +127,8 @@ export const mergeThreeWay = (
     const l = local[url];
     const r = remote[url];
 
-    const localChanged = !isSameStyle(b, l);
-    const remoteChanged = !isSameStyle(b, r);
+    const localChanged = !isEquivalentStyle(b, l);
+    const remoteChanged = !isEquivalentStyle(b, r);
 
     let result: StyleWithoutUrl | undefined;
 
@@ -126,7 +142,7 @@ export const mergeThreeWay = (
       // Deleted on one side and edited on the other keeps the edit; deleted
       // on both stays deleted.
       result = l ?? r;
-    } else if (isSameStyle(l, r)) {
+    } else if (isEquivalentStyle(l, r)) {
       result = parseTime(l.modifiedTime) >= parseTime(r.modifiedTime) ? l : r;
     } else {
       const merged = mergeStyle(b, l, r, at);

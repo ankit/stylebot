@@ -12,7 +12,7 @@ import {
   toSyncErrorKey,
   toSyncErrorDetail,
 } from '../errors';
-import { mergeThreeWay } from '../merge/three-way';
+import { mergeThreeWay, isEquivalentStyleMap } from '../merge/three-way';
 import getAccessToken, { clearCachedToken } from './get-access-token';
 import {
   getSyncState,
@@ -42,15 +42,6 @@ export type SyncOptions = {
 
 const getStylesBlob = (styles: StyleMap) =>
   new Blob([JSON.stringify(styles)], { type: 'application/json' });
-
-const stableJson = (styles: StyleMap) =>
-  JSON.stringify(
-    Object.keys(styles)
-      .sort()
-      .map(url => [url, styles[url]])
-  );
-
-const isSameMap = (a: StyleMap, b: StyleMap) => stableJson(a) === stableJson(b);
 
 /**
  * Earlier conflicts stay listed until the user dismisses them; a url that
@@ -187,7 +178,11 @@ const reconcile = async (
   let metadata = remote;
   let nextLocalRevision = localRevision;
 
-  if (!isSameMap(styles, remoteStyles)) {
+  // A side that differs only in timestamps or whitespace is left as it is.
+  const shouldUpdateRemote = !isEquivalentStyleMap(styles, remoteStyles);
+  const shouldUpdateLocal = !isEquivalentStyleMap(styles, local);
+
+  if (shouldUpdateRemote) {
     // Another device may have uploaded since the metadata was read. Merging
     // over its copy would drop its edits, so start over from a fresh read —
     // once. A second collision in a row is left for the next run.
@@ -203,7 +198,7 @@ const reconcile = async (
     }
   }
 
-  if (!isSameMap(styles, local)) {
+  if (shouldUpdateLocal) {
     console.debug('updating local...');
     const written = await writeLocal(styles, localRevision);
 
@@ -221,7 +216,7 @@ const reconcile = async (
     nextLocalRevision = written;
   }
 
-  if (!isSameMap(styles, remoteStyles)) {
+  if (shouldUpdateRemote) {
     console.debug('updating remote...');
     metadata = await writeSyncFile(
       accessToken,
@@ -235,7 +230,9 @@ const reconcile = async (
     remoteRevision: metadata.modifiedTime,
     localRevision: nextLocalRevision,
     lastSyncedAt: now,
-    baseStyles: styles,
+    // The base is kept byte for byte what Drive holds, so an unchanged remote
+    // can keep standing in for a download.
+    baseStyles: shouldUpdateRemote ? styles : remoteStyles,
     // Re-read rather than reuse `state`: a conflict dismissed from the Sync
     // tab while this ran must not come back.
     conflicts: mergeConflicts(
