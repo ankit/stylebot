@@ -75,3 +75,29 @@ test('injects native CSS nesting intact, with !important reaching nested rules a
   await expect(page.locator('h1')).toHaveCSS('font-style', 'italic');
   await expect(page.locator('p')).toHaveCSS('color', 'rgb(0, 128, 0)');
 });
+
+test('applies a style with Override site styles off exactly as written, on first and repeat visits', async ({
+  context,
+  extension,
+}) => {
+  await seedStyles(extension, {
+    localhost: {
+      css: 'h1 { color: rgb(0, 0, 255); font-style: italic !important; }',
+      enabled: true,
+      forceImportant: false,
+    },
+  });
+
+  const page = await context.newPage();
+  const h1 = page.locator('h1');
+
+  // The unforced color loses to the page's !important; the declaration the
+  // user marked !important themselves still wins the tie.
+  await page.goto(server.baseUrl);
+  await expect(h1).toHaveCSS('font-style', 'italic');
+  await expect(h1).toHaveCSS('color', 'rgb(255, 0, 0)');
+
+  await page.reload();
+  await expect(h1).toHaveCSS('font-style', 'italic');
+  await expect(h1).toHaveCSS('color', 'rgb(255, 0, 0)');
+});

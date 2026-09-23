@@ -136,6 +136,7 @@ describe('initEditorWindowListener', () => {
         css: 'a { color: red; }',
         enabled: true,
         readability: false,
+        forceImportant: true,
       },
       snapshot: store.state.page,
       activeSelector: '',
@@ -146,12 +147,17 @@ describe('initEditorWindowListener', () => {
     const port = connect();
     port.postMessage.mockClear();
 
-    port.send({ type: 'applyCss', css: 'b { color: blue; }' });
+    port.send({
+      type: 'applyCss',
+      css: 'b { color: blue; }',
+      forceImportant: false,
+    });
 
     expect(applyCss).toBeCalledWith(expect.anything(), {
       css: 'b { color: blue; }',
     });
     expect(store.state.css).toBe('b { color: blue; }');
+    expect(store.state.forceImportant).toBe(false);
     expect(port.sent()).toEqual([]);
   });
 

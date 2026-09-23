@@ -32,7 +32,30 @@ describe('applyState', () => {
     await applyState(state);
 
     expect(css.injectCSSIntoDocument).toHaveBeenCalledTimes(1);
-    expect(css.injectCSSIntoDocument).toHaveBeenCalledWith('.a{}', 'a');
+    expect(css.injectCSSIntoDocument).toHaveBeenCalledWith('.a{}', 'a', {
+      forceImportant: true,
+    });
+  });
+
+  it('forces !important unless the style turned Override site styles off', async () => {
+    await applyState({
+      styles: [
+        { url: 'a', css: '.a{}', enabled: true },
+        { url: 'b', css: '.b{}', enabled: true, forceImportant: true },
+        { url: 'c', css: '.c{}', enabled: true, forceImportant: false },
+      ],
+      readability: false,
+    });
+
+    expect(css.injectCSSIntoDocument).toHaveBeenCalledWith('.a{}', 'a', {
+      forceImportant: true,
+    });
+    expect(css.injectCSSIntoDocument).toHaveBeenCalledWith('.b{}', 'b', {
+      forceImportant: true,
+    });
+    expect(css.injectCSSIntoDocument).toHaveBeenCalledWith('.c{}', 'c', {
+      forceImportant: false,
+    });
   });
 
   it('applies readability when the state calls for it', async () => {
@@ -88,7 +111,8 @@ describe('applyState', () => {
     expect(css.removeCSSFromDocument).not.toHaveBeenCalled();
     expect(css.injectCSSIntoDocument).toHaveBeenLastCalledWith(
       '.a{updated}',
-      'a'
+      'a',
+      { forceImportant: true }
     );
   });
 });

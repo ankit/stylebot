@@ -52,25 +52,29 @@ const run = () => {
     const allStyles: StyleMap = items['styles'] || {};
     const { styles, defaultStyle } = getStylesForPage(
       window.location.href,
-      allStyles,
-      true
+      allStyles
     );
 
     const freshState: CachedState = {
-      styles: styles.map(({ url, css, enabled }) => ({ url, css, enabled })),
+      styles: styles.map(({ url, css, enabled, forceImportant }) => ({
+        url,
+        css,
+        enabled,
+        forceImportant: forceImportant !== false,
+      })),
       readability: Boolean(defaultStyle?.readability),
     };
 
     const finish = () => {
+      clearTimeout(revealTimeout);
+      revealPage();
+
       writeCache(freshState);
 
       const liveImportUrls = new Set(
         freshState.styles.flatMap(style => extractImports(style.css).importUrls)
       );
       pruneImportCache(liveImportUrls);
-
-      clearTimeout(revealTimeout);
-      revealPage();
     };
 
     if (cached && JSON.stringify(cached) === JSON.stringify(freshState)) {

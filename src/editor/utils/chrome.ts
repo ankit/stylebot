@@ -57,13 +57,15 @@ export const setOption = (
 export const setStyle = (
   url: string,
   css: string,
-  readability: boolean
+  readability: boolean,
+  forceImportant: boolean
 ): void => {
   const message: SetStyle = {
     name: 'SetStyle',
     url,
     css,
     readability,
+    forceImportant,
   };
 
   chrome.runtime.sendMessage(message);
@@ -79,12 +81,9 @@ export const setReadability = (url: string, value: boolean): void => {
   chrome.runtime.sendMessage(message);
 };
 
-export const getStylesForPage = (
-  important: boolean
-): Promise<GetStylesForPageResponse> => {
+export const getStylesForPage = (): Promise<GetStylesForPageResponse> => {
   const message: GetStylesForPage = {
     name: 'GetStylesForPage',
-    important,
   };
 
   return chrome.runtime.sendMessage<GetStylesForPage, GetStylesForPageResponse>(

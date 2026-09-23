@@ -71,6 +71,27 @@ describe('set', () => {
     expect(styles['other.com']).toBeTruthy();
     expect(styles['example.com'].enabled).toBe(true);
   });
+
+  it('keeps Override site styles off when a save leaves the setting out', async () => {
+    (store.styles as Record<string, { forceImportant?: boolean }>)[
+      'example.com'
+    ].forceImportant = false;
+
+    await set('example.com', 'body { color: blue; }', false);
+
+    const styles = store.styles as Record<string, { forceImportant?: boolean }>;
+    expect(styles['example.com'].forceImportant).toBe(false);
+  });
+
+  it('stores the setting a save passes, dropping the field when true', async () => {
+    await set('example.com', 'body { color: blue; }', false, false);
+    let styles = store.styles as Record<string, object>;
+    expect(styles['example.com']).toHaveProperty('forceImportant', false);
+
+    await set('example.com', 'body { color: blue; }', false, true);
+    styles = store.styles as Record<string, object>;
+    expect(styles['example.com']).not.toHaveProperty('forceImportant');
+  });
 });
 
 describe('style edits', () => {

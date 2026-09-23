@@ -75,7 +75,9 @@ export const AdjustPageLayout: StoryObj = {
     const store = storeOf(canvasElement);
 
     const menu = await openEditorMenu(canvas, 'Options');
-    await user.click(within(menu).getByRole('checkbox'));
+    await user.click(
+      within(menu).getByRole('checkbox', { name: 'Push the page aside' })
+    );
 
     await expect(store.state.options.layout.adjustPageLayout).toBe(true);
     await waitFor(() =>

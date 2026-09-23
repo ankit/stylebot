@@ -1,7 +1,7 @@
 import Vuex, { Dispatch, Store } from 'vuex';
 import * as postcss from 'postcss';
 
-import { getPrimaryFontFamily, injectRootIntoDocument } from '@stylebot/css';
+import { getPrimaryFontFamily, injectCSSIntoDocument } from '@stylebot/css';
 import type { StylebotOptions } from '@stylebot/types';
 
 import mockState from '@/editor/store/__mocks__/state';
@@ -64,7 +64,9 @@ export const createEditorStore = (
   if (state.css) {
     const root = postcss.parse(state.css);
     store.commit('setSelectors', root);
-    injectRootIntoDocument(root, state.url);
+    injectCSSIntoDocument(state.css, state.url, {
+      forceImportant: state.forceImportant,
+    });
   }
 
   return store;

@@ -261,7 +261,12 @@ describe('RemotePageBridge', () => {
     ports[0].receive(connectedMessage());
     ports[0].postMessage.mockClear();
 
-    bridge.applyCss({ url: 'example.com', css: 'b {}', enabled: true });
+    bridge.applyCss({
+      url: 'example.com',
+      css: 'b {}',
+      enabled: true,
+      forceImportant: false,
+    });
     bridge.setPreviewCss(null);
     bridge.applyReadability(true);
     bridge.startInspecting();
@@ -271,7 +276,7 @@ describe('RemotePageBridge', () => {
     bridge.openInPage();
 
     expect(ports[0].postMessage.mock.calls.map(([m]) => m)).toEqual([
-      { type: 'applyCss', css: 'b {}' },
+      { type: 'applyCss', css: 'b {}', forceImportant: false },
       { type: 'previewCss', css: null },
       { type: 'applyReadability', value: true },
       { type: 'startInspecting' },

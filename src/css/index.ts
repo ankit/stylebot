@@ -3,11 +3,7 @@ export {
   getCssAfterApplyingFilterEffectToPage,
 } from './filter';
 
-export {
-  injectCSSIntoDocument,
-  injectRootIntoDocument,
-  removeCSSFromDocument,
-} from './inject-style';
+export { injectCSSIntoDocument, removeCSSFromDocument } from './inject-style';
 
 export {
   extractImports,
@@ -43,7 +39,7 @@ export {
   unquoteFamily,
 } from './font-family';
 export type { FontValueToken } from './font-family';
-export { addDeclaration, appendImportantToDeclarations } from './declaration';
+export { addDeclaration, markDeclarationsImportant } from './declaration';
 export {
   getRule,
   findRule,

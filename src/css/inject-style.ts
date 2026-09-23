@@ -1,6 +1,6 @@
 import * as postcss from 'postcss';
-import { appendImportantToDeclarations } from './declaration';
-import { extractImports, fetchImportCss } from './import';
+import { markDeclarationsImportant } from './declaration';
+import { fetchImportCss, removeImports } from './import';
 
 const getStylesheetId = (id: string) => {
   return `stylebot-css-${id}`;
@@ -74,14 +74,25 @@ const bumpInjectionVersion = (id: string): number => {
   return version;
 };
 
-// Applies the non-`@import` CSS immediately and patches in any `@import`
-// content once it's fetched, so a slow import fetch (e.g. a cold background
-// service worker) never blocks the rest of the stylesheet from applying.
+/**
+ * Applies the non-`@import` CSS immediately and patches in any `@import`
+ * content once it's fetched, so a slow import fetch (e.g. a cold background
+ * service worker) never blocks the rest of the stylesheet from applying.
+ * forceImportant marks the stylesheet's own declarations `!important`.
+ */
 export const injectCSSIntoDocument = async (
   css: string,
-  id: string
+  id: string,
+  { forceImportant = false }: { forceImportant?: boolean } = {}
 ): Promise<void> => {
-  const { css: withoutImports, importUrls } = extractImports(css);
+  const root = postcss.parse(css);
+  const importUrls = removeImports(root);
+
+  if (forceImportant) {
+    markDeclarationsImportant(root);
+  }
+
+  const withoutImports = root.toString();
   const version = bumpInjectionVersion(id);
 
   setStylesheetContent(id, withoutImports);
@@ -97,14 +108,6 @@ export const injectCSSIntoDocument = async (
       setStylesheetContent(id, `${merged}\n\n${withoutImports}`);
     }
   });
-};
-
-export const injectRootIntoDocument = (
-  root: postcss.Root,
-  id: string
-): void => {
-  const css = appendImportantToDeclarations(root.toString());
-  injectCSSIntoDocument(css, id);
 };
 
 export const removeCSSFromDocument = (id: string): void => {

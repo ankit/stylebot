@@ -53,6 +53,46 @@ describe('inject-style', () => {
       expect(elements[0].textContent).toContain('color: blue');
     });
 
+    it('leaves the css as written by default', async () => {
+      await injectCSSIntoDocument('a { color: red; }', 'example');
+
+      const style = document.getElementById(stylesheetId('example'));
+
+      expect(style?.textContent).not.toContain('!important');
+    });
+
+    it('forces !important onto every declaration when asked', async () => {
+      await injectCSSIntoDocument('a { color: red; top: 0; }', 'example', {
+        forceImportant: true,
+      });
+
+      const style = document.getElementById(stylesheetId('example'));
+
+      expect(style?.textContent).toBe(
+        'a { color: red !important; top: 0 !important; }'
+      );
+    });
+
+    it('forces !important onto the css of its own but not onto fetched @import css', async () => {
+      (global as any).chrome = {
+        runtime: {
+          sendMessage: jest.fn(() => Promise.resolve('b { color: blue; }')),
+        },
+      };
+
+      const css = `@import url(https://example.com/base.css);
+a { color: red; }`;
+
+      await injectCSSIntoDocument(css, 'example', { forceImportant: true });
+      await flush();
+
+      const style = document.getElementById(stylesheetId('example'));
+
+      expect(style?.textContent).toContain('b { color: blue; }');
+      expect(style?.textContent).toContain('a { color: red !important; }');
+      expect(style?.textContent).not.toContain('@import');
+    });
+
     it('resolves without a background round trip when there is no @import', async () => {
       (global as any).chrome = { runtime: { sendMessage: jest.fn() } };
 

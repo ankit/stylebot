@@ -40,7 +40,35 @@
           <toggle-switch
             :value="adjustPageLayout"
             size="lg"
+            :aria-label="t('adjust_page_layout')"
             @change="toggleAdjustPageLayout"
+          />
+        </div>
+
+        <div class="push-page-row">
+          <div class="push-page-copy">
+            <s-text>{{ t('override_site_styles') }}</s-text>
+            <s-text v-if="forceImportant" size="caption" variant="muted">
+              <template v-for="(part, index) in overrideOnDescription">
+                <code
+                  v-if="part.code"
+                  :key="index"
+                  class="important-keyword"
+                  v-text="part.text"
+                />
+                <span v-else :key="index" v-text="part.text" />
+              </template>
+            </s-text>
+            <s-text v-else size="caption" variant="muted">
+              {{ t('override_site_styles_off_description') }}
+            </s-text>
+          </div>
+
+          <toggle-switch
+            :value="forceImportant"
+            size="lg"
+            :aria-label="t('override_site_styles')"
+            @change="setForceImportant"
           />
         </div>
 
@@ -97,6 +125,10 @@ import {
 import { StylebotEditorCommands, StylebotLayout } from '@stylebot/types';
 
 import { openOptionsPage } from '../../utils/chrome';
+
+// Stands in for `!important` in the translated caption, which is split around
+// it so the keyword can be set as code without any stray whitespace.
+const IMPORTANT_MARKER = '\uE000';
 
 export default Vue.extend({
   name: 'TheMoreAction',
@@ -161,6 +193,23 @@ export default Vue.extend({
     adjustPageLayout(): boolean {
       return this.layout.adjustPageLayout;
     },
+
+    forceImportant(): boolean {
+      return this.$store.state.forceImportant;
+    },
+
+    overrideOnDescription(): Array<{ text: string; code: boolean }> {
+      const [before, after = ''] = this.t(
+        'override_site_styles_on_description',
+        [IMPORTANT_MARKER]
+      ).split(IMPORTANT_MARKER);
+
+      return [
+        { text: before, code: false },
+        { text: '!important', code: true },
+        { text: after, code: false },
+      ];
+    },
   },
 
   methods: {
@@ -173,6 +222,10 @@ export default Vue.extend({
         ...this.layout,
         adjustPageLayout: !this.adjustPageLayout,
       });
+    },
+
+    setForceImportant(value: boolean): void {
+      this.$store.dispatch('setForceImportant', value);
     },
 
     keyboardShortcuts(): void {
@@ -224,6 +277,10 @@ export default Vue.extend({
     gap: 0;
     margin-top: 2px;
   }
+}
+
+.important-keyword {
+  font-family: var(--font-mono);
 }
 
 .push-page-copy {

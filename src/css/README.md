@@ -87,7 +87,17 @@ every transform here untouched. The helpers treat nested rules as opaque:
 - `addDeclaration` and the Basic-mode readers (`withOwnDeclarationsOnly`) only
   touch a rule's own declarations, and a rule left with nothing but nested
   blocks is kept.
-- `appendImportantToDeclarations` reaches into nested rules and into grouping
+- `markDeclarationsImportant` reaches into nested rules and into grouping
   at-rules (`@media`, `@supports`, `@container`, `@layer`, `@scope`, …) at any
   depth; only descriptor at-rules such as `@font-face` and `@keyframes`, where
   `!important` is invalid, are left alone.
+
+## Where `!important` comes from
+
+Styles are stored exactly as the user wrote them. `!important` is added only
+at injection: `injectCSSIntoDocument(css, id, { forceImportant })` parses the
+css once, strips its `@import`s and marks its declarations important in the
+same pass. Every caller injecting a user style passes the style's own
+`forceImportant`, which is missing (meaning true) unless the user turned off
+Override site styles for it. Fetched `@import` css is never forced.
+The load-time cache in `inject-css/cache.ts` holds the same unforced css.

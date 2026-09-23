@@ -71,7 +71,7 @@ const initChromeListener = (
 
       // A same-tab SPA navigation still fires this — re-derive readability
       // for the new URL instead of trusting the previous page's flag.
-      getStylesForPage(false).then(({ defaultStyle }) => {
+      getStylesForPage().then(({ defaultStyle }) => {
         const readability = Boolean(defaultStyle?.readability);
         commit('setReadability', readability);
 

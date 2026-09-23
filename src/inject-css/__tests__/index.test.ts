@@ -60,7 +60,7 @@ describe('inject-css run()', () => {
     await flushPromises();
 
     const expectedState = {
-      styles: [{ url: 'a', css: '.a{}', enabled: true }],
+      styles: [{ url: 'a', css: '.a{}', enabled: true, forceImportant: true }],
       readability: false,
     };
 
@@ -90,7 +90,7 @@ describe('inject-css run()', () => {
 
   it('does not re-apply when the fresh state matches the cache', async () => {
     const cached = {
-      styles: [{ url: 'a', css: '.a{}', enabled: true }],
+      styles: [{ url: 'a', css: '.a{}', enabled: true, forceImportant: true }],
       readability: false,
     };
 
@@ -124,13 +124,34 @@ describe('inject-css run()', () => {
     await flushPromises();
 
     const freshState = {
-      styles: [{ url: 'a', css: '.a{color:new}', enabled: true }],
+      styles: [
+        { url: 'a', css: '.a{color:new}', enabled: true, forceImportant: true },
+      ],
       readability: false,
     };
 
     expect(applyStateModule.applyState).toHaveBeenNthCalledWith(1, cached);
     expect(applyStateModule.applyState).toHaveBeenNthCalledWith(2, freshState);
     expect(cacheModule.writeCache).toHaveBeenCalledWith(freshState);
+  });
+
+  it("carries a style's Override site styles setting into the applied and cached state", async () => {
+    (cacheModule.readCache as jest.Mock).mockReturnValue(null);
+    (stylesModule.getStylesForPage as jest.Mock).mockReturnValue({
+      styles: [{ url: 'a', css: '.a{}', enabled: true, forceImportant: false }],
+      defaultStyle: undefined,
+    });
+
+    load({ styles: {} });
+    await flushPromises();
+
+    const expectedState = {
+      styles: [{ url: 'a', css: '.a{}', enabled: true, forceImportant: false }],
+      readability: false,
+    };
+
+    expect(applyStateModule.applyState).toHaveBeenCalledWith(expectedState);
+    expect(cacheModule.writeCache).toHaveBeenCalledWith(expectedState);
   });
 
   it('reads readability off the matched default style', async () => {

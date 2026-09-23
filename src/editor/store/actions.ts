@@ -87,7 +87,14 @@ export default {
     defaultStyle: Style
   ): void {
     const { url, enabled, css, readability } = defaultStyle;
-    dispatch('syncFromPage', { url, enabled, css, readability });
+    const forceImportant = defaultStyle.forceImportant !== false;
+    dispatch('syncFromPage', {
+      url,
+      enabled,
+      css,
+      readability,
+      forceImportant,
+    });
   },
 
   /**
@@ -106,6 +113,9 @@ export default {
     }
     if (state.readability !== undefined) {
       commit('setReadability', state.readability);
+    }
+    if (state.forceImportant !== undefined) {
+      commit('setForceImportant', state.forceImportant);
     }
     if (state.css !== undefined) {
       commit('setCss', state.css);
@@ -276,14 +286,40 @@ export default {
         url: state.url,
         css,
         enabled: state.enabled,
+        forceImportant: state.forceImportant,
       });
-      setStyle(state.url, removeEmptyRules(css), state.readability);
+      setStyle(
+        state.url,
+        removeEmptyRules(css),
+        state.readability,
+        state.forceImportant
+      );
 
       commit('setCss', css);
       commit('setSelectors', root);
     } catch {
       //
     }
+  },
+
+  /**
+   * Switches whether the style has `!important` forced onto every
+   * declaration or is applied exactly as written, and reapplies it.
+   */
+  setForceImportant(
+    {
+      state,
+      commit,
+      dispatch,
+    }: {
+      state: State;
+      commit: Commit;
+      dispatch: Dispatch;
+    },
+    value: boolean
+  ): void {
+    commit('setForceImportant', value);
+    dispatch('applyCss', { css: state.css });
   },
 
   applyDeclaration(

@@ -1,12 +1,9 @@
-import * as postcss from 'postcss';
-
 import * as stylebotCss from '@stylebot/css';
 import * as stylebotReadability from '@stylebot/readability';
 import { readCache, writeCache } from '../../inject-css/cache';
 
 import { LocalPageBridge } from '../LocalPageBridge';
 
-jest.mock('postcss');
 jest.mock('@stylebot/css');
 jest.mock('@stylebot/readability');
 
@@ -21,7 +18,6 @@ jest.mock('@stylebot/highlighter', () => ({
   Highlighter: jest.fn().mockImplementation(() => mockHighlighter),
 }));
 
-const mockRoot = {} as postcss.Root;
 const url = 'example.com';
 
 describe('LocalPageBridge', () => {
@@ -29,7 +25,6 @@ describe('LocalPageBridge', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    jest.spyOn(postcss, 'parse').mockReturnValue(mockRoot);
     localStorage.clear();
     bridge = new LocalPageBridge({ getStylebotCss: () => '' });
   });
@@ -41,14 +36,24 @@ describe('LocalPageBridge', () => {
       jest.spyOn(stylebotCss, 'removeEmptyRules').mockReturnValue(css);
     });
 
-    it('injects into the document', () => {
-      bridge.applyCss({ url, css, enabled: true });
+    it('injects into the document with !important forced', () => {
+      bridge.applyCss({ url, css, enabled: true, forceImportant: true });
 
-      expect(stylebotCss.injectRootIntoDocument).toBeCalledWith(mockRoot, url);
+      expect(stylebotCss.injectCSSIntoDocument).toBeCalledWith(css, url, {
+        forceImportant: true,
+      });
+    });
+
+    it('injects a style with Override site styles off without forcing it', () => {
+      bridge.applyCss({ url, css, enabled: true, forceImportant: false });
+
+      expect(stylebotCss.injectCSSIntoDocument).toBeCalledWith(css, url, {
+        forceImportant: false,
+      });
     });
 
     it('does nothing to the cache when nothing is cached yet', () => {
-      bridge.applyCss({ url, css, enabled: true });
+      bridge.applyCss({ url, css, enabled: true, forceImportant: true });
 
       expect(readCache()).toBeNull();
     });
@@ -66,11 +71,11 @@ describe('LocalPageBridge', () => {
         readability: false,
       });
 
-      bridge.applyCss({ url, css, enabled: true });
+      bridge.applyCss({ url, css, enabled: true, forceImportant: true });
 
       expect(readCache()).toEqual({
         styles: [
-          { url, css, enabled: true },
+          { url, css, enabled: true, forceImportant: true },
           {
             url: 'other.example.com',
             css: 'b { color: green; }',
@@ -93,7 +98,7 @@ describe('LocalPageBridge', () => {
         readability: false,
       });
 
-      bridge.applyCss({ url, css, enabled: true });
+      bridge.applyCss({ url, css, enabled: true, forceImportant: true });
 
       expect(readCache()).toEqual({
         styles: [
@@ -102,7 +107,7 @@ describe('LocalPageBridge', () => {
             css: 'b { color: green; }',
             enabled: true,
           },
-          { url, css, enabled: true },
+          { url, css, enabled: true, forceImportant: true },
         ],
         readability: false,
       });
@@ -113,9 +118,10 @@ describe('LocalPageBridge', () => {
     it('injects a scratch stylesheet', () => {
       bridge.setPreviewCss('h1 { font-family: Inter; }');
 
-      expect(stylebotCss.injectRootIntoDocument).toBeCalledWith(
-        mockRoot,
-        'font-preview'
+      expect(stylebotCss.injectCSSIntoDocument).toBeCalledWith(
+        'h1 { font-family: Inter; }',
+        'font-preview',
+        { forceImportant: true }
       );
     });
 
@@ -123,7 +129,7 @@ describe('LocalPageBridge', () => {
       bridge.setPreviewCss(null);
 
       expect(stylebotCss.removeCSSFromDocument).toBeCalledWith('font-preview');
-      expect(stylebotCss.injectRootIntoDocument).not.toBeCalled();
+      expect(stylebotCss.injectCSSIntoDocument).not.toBeCalled();
     });
   });
 

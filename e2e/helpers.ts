@@ -52,6 +52,7 @@ type SeededStyle = {
   css: string;
   enabled: boolean;
   readability?: boolean;
+  forceImportant?: boolean;
 };
 
 export const seedStyles = async (
@@ -69,6 +70,9 @@ export const seedStyles = async (
               enabled: style.enabled,
               readability: style.readability ?? false,
               modifiedTime: new Date().toISOString(),
+              ...(style.forceImportant === false
+                ? { forceImportant: false }
+                : {}),
             },
           ])
         ),

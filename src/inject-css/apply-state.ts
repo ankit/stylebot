@@ -27,7 +27,9 @@ export const applyState = (state: CachedState): Promise<void> => {
   });
 
   const injections = enabled.map(style =>
-    injectCSSIntoDocument(style.css, style.url)
+    injectCSSIntoDocument(style.css, style.url, {
+      forceImportant: style.forceImportant !== false,
+    })
   );
 
   return Promise.all(injections).then(() => {

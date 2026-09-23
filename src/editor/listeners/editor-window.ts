@@ -12,12 +12,13 @@ import { closeEditorWindow } from '../utils/chrome';
 
 const SYNCED_MUTATIONS: Record<
   string,
-  'url' | 'css' | 'enabled' | 'readability'
+  'url' | 'css' | 'enabled' | 'readability' | 'forceImportant'
 > = {
   setUrl: 'url',
   setCss: 'css',
   setEnabled: 'enabled',
   setReadability: 'readability',
+  setForceImportant: 'forceImportant',
 };
 
 /**
@@ -61,6 +62,7 @@ const initEditorWindowListener = (store: Store<State>): void => {
         css: store.state.css,
         enabled: store.state.enabled,
         readability: store.state.readability,
+        forceImportant: store.state.forceImportant,
       },
       snapshot: store.state.page,
       activeSelector: store.state.activeSelector,
@@ -140,6 +142,7 @@ const initEditorWindowListener = (store: Store<State>): void => {
         case 'applyCss':
           applyingFromWindow = true;
           try {
+            store.commit('setForceImportant', message.forceImportant);
             store.dispatch('applyCss', { css: message.css });
           } finally {
             applyingFromWindow = false;
