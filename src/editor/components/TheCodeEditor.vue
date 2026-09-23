@@ -17,8 +17,13 @@ import {
   ParentUpdateCssMessage,
   ParentFocusEditorMessage,
 } from '@stylebot/monaco-editor';
+import { debounce, Debounced } from '@stylebot/utils';
 
 import CodeEditorIframe from './code/CodeEditorIframe.vue';
+
+// Typing applies once it pauses, so the page doesn't flash through every
+// partial selector on the way (`d`, `di`, `div`).
+const TYPING_DEBOUNCE_MS = 200;
 
 export default Vue.extend({
   name: 'TheCodeEditor',
@@ -27,10 +32,17 @@ export default Vue.extend({
     CodeEditorIframe,
   },
 
-  data(): { iframeCss: string | null } {
+  data(): { iframeCss: string | null; applyTypedCss: Debounced<[string]> } {
     return {
       // What the iframe last showed, whether it reported it or we sent it.
       iframeCss: null,
+      applyTypedCss: debounce((css: string) => {
+        // Skips Monaco's echo of a setValue: re-saving it would stamp a fresh
+        // modifiedTime on a just-pulled style, as if this device edited it.
+        if (css !== this.$store.state.css) {
+          this.$store.dispatch('applyCss', { css });
+        }
+      }, TYPING_DEBOUNCE_MS),
     };
   },
 
@@ -50,6 +62,10 @@ export default Vue.extend({
 
   watch: {
     activeSelector(selector: string): void {
+      // Applies what was just typed before the css it is based on is read
+      // and pushed back into the editor.
+      this.applyTypedCss.flush();
+
       if (selector) {
         this.pruneEmptyRules();
       }
@@ -62,17 +78,25 @@ export default Vue.extend({
     mode(mode: string): void {
       if (mode === 'code') {
         this.focusIframe();
+      } else {
+        this.applyTypedCss.flush();
       }
     },
 
     css(value: string): void {
-      const contentWindow = this.getIframeContentWindow();
-
       // Edits typed into Monaco reach the store through handleIframeCssUpdate
       // and already match the iframe. Anything else changed the css from
       // outside — a delete from basic mode, or a sync pull replacing the
       // style — and has to be pushed down or the editor keeps stale text.
-      if (contentWindow && value !== this.iframeCss) {
+      if (value === this.iframeCss) {
+        return;
+      }
+
+      // The outside change wins over typing it is about to replace.
+      this.applyTypedCss.cancel();
+
+      const contentWindow = this.getIframeContentWindow();
+      if (contentWindow) {
         this.updateIframeCss(contentWindow, false);
       }
     },
@@ -84,6 +108,7 @@ export default Vue.extend({
   },
 
   beforeDestroy() {
+    this.applyTypedCss.flush();
     window.removeEventListener('message', this.handleMessage);
   },
 
@@ -141,6 +166,7 @@ export default Vue.extend({
           break;
 
         case 'stylebotEscapePressed':
+          this.applyTypedCss.flush();
           this.$store.dispatch('escape');
           break;
       }
@@ -152,15 +178,7 @@ export default Vue.extend({
 
     handleIframeCssUpdate(css: string): void {
       this.iframeCss = css;
-
-      // Monaco echoes a setValue back as a content change. Re-applying it
-      // would save the css again and stamp a fresh modifiedTime on a style
-      // that was just pulled, making this device look like it edited it.
-      if (css === this.css) {
-        return;
-      }
-
-      this.$store.dispatch('applyCss', { css });
+      this.applyTypedCss(css);
     },
 
     handleActiveSelectorChange(selector: string): void {
