@@ -124,15 +124,8 @@ export const getDeclarationsForSelector = (
  */
 const STATE_PSEUDO_CLASSES = /:(hover|focus(-visible|-within)?|active)\b/i;
 
-/**
- * Escapes, quoted strings, brackets, single combinator characters, and runs
- * of everything else, so a combinator inside `[…]`, `(…)` or quotes isn't split on.
- */
-const SELECTOR_TOKENS =
-  /\\.|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|[[\]()]|[\s>+~]|[^\\"'[\]()\s>+~]+/g;
-
-const COMBINATOR = /^[\s>+~]$/;
-
+const QUOTES = ['"', "'"];
+const COMBINATORS = ['>', '+', '~'];
 const BRACKET_DEPTH_CHANGE: Record<string, number> = {
   '[': 1,
   '(': 1,
@@ -140,18 +133,61 @@ const BRACKET_DEPTH_CHANGE: Record<string, number> = {
   ')': -1,
 };
 
+type SubjectScan = {
+  subject: string;
+  depth: number;
+  quote: string | null;
+  escaped: boolean;
+};
+
+const isCombinator = (char: string): boolean =>
+  char.trim() === '' || COMBINATORS.includes(char);
+
+/**
+ * Adds one character to the subject being read, or starts a new subject on a
+ * combinator outside brackets, parens, quotes and escapes.
+ */
+const readSubjectChar = (scan: SubjectScan, char: string): SubjectScan => {
+  const subject = scan.subject + char;
+
+  if (scan.escaped) {
+    return { ...scan, subject, escaped: false };
+  }
+
+  if (char === '\\') {
+    return { ...scan, subject, escaped: true };
+  }
+
+  if (scan.quote) {
+    return { ...scan, subject, quote: char === scan.quote ? null : scan.quote };
+  }
+
+  if (QUOTES.includes(char)) {
+    return { ...scan, subject, quote: char };
+  }
+
+  if (scan.depth === 0 && isCombinator(char)) {
+    return { ...scan, subject: '' };
+  }
+
+  return {
+    ...scan,
+    subject,
+    depth: scan.depth + (BRACKET_DEPTH_CHANGE[char] ?? 0),
+  };
+};
+
 /**
  * The rightmost compound of a selector — the part naming the element it
  * styles, e.g. `a.link` in `nav > ul a.link`.
  */
 const getSubjectCompound = (selector: string): string =>
-  (selector.match(SELECTOR_TOKENS) ?? []).reduce(
-    ({ depth, subject }, token) => ({
-      depth: depth + (BRACKET_DEPTH_CHANGE[token] ?? 0),
-      subject: depth === 0 && COMBINATOR.test(token) ? '' : subject + token,
-    }),
-    { depth: 0, subject: '' }
-  ).subject;
+  Array.from(selector).reduce(readSubjectChar, {
+    subject: '',
+    depth: 0,
+    quote: null,
+    escaped: false,
+  }).subject;
 
 const SPECIFIC_SUBJECT = /[#.[]|:(nth-|first-|last-|only-|is\(|where\(|has\()/i;
 
