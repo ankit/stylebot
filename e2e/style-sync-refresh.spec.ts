@@ -75,3 +75,54 @@ test('an open code editor picks up styles replaced behind it', async ({
   await expect(page.locator('h1')).not.toHaveCSS('color', 'rgb(0, 128, 255)');
   await expect(monaco.locator('.view-lines')).not.toContainText('0, 128, 255');
 });
+
+// Regression: a pull can also land the style with its css emptied, which
+// leaves the editor pointing at the style with nothing to show. Opening the
+// code editor then saved that empty css back, and an empty save deletes the
+// style outright -- a deletion sync would go on to fan out everywhere.
+test('opening the code editor on a style pulled back empty does not delete it', async ({
+  context,
+  extension,
+  openPopup,
+}) => {
+  test.slow();
+
+  await context.route('http://localhost/**', route =>
+    route.fulfill({ contentType: 'text/html', body: PAGE_HTML })
+  );
+
+  await seedStyles(extension, {
+    localhost: { css: 'h1 { color: rgb(255, 0, 128); }', enabled: true },
+  });
+
+  const page = await context.newPage();
+  await page.goto('http://localhost/');
+  await expect(page.locator('h1')).toHaveCSS('color', 'rgb(255, 0, 128)');
+
+  const popup = await openPopup();
+  await popup.evaluate(() => {
+    chrome.runtime.sendMessage({
+      name: 'SetAllStyles',
+      styles: {
+        localhost: {
+          css: '',
+          enabled: true,
+          readability: false,
+          modifiedTime: new Date().toISOString(),
+        },
+      },
+    });
+  });
+  await expect(page.locator('h1')).not.toHaveCSS('color', 'rgb(255, 0, 128)');
+
+  const editorRoot = await openEditor(page, openPopup);
+  await switchEditorMode(editorRoot, 'code');
+  await page.waitForTimeout(1000);
+
+  const styles = await extension.evaluate(async () => {
+    const items = await chrome.storage.local.get('styles');
+    return items['styles'] || {};
+  });
+
+  expect(Object.keys(styles)).toContain('localhost');
+});
