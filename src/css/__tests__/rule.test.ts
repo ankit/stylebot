@@ -325,6 +325,19 @@ describe('rule', () => {
           '.nav li a:first-child'
         );
       });
+
+      it("doesn't split on a combinator inside brackets, parens or quotes", () => {
+        const html =
+          '<ul class="nav"><li><a id="picked" title="a b" href="/x">x</a></li></ul>';
+
+        expect(pick(html, '.nav a[title="a b"] { color: red; }')).toBe(
+          '.nav a[title="a b"]'
+        );
+        expect(pick(html, '.nav a:nth-child(2n + 1) { color: red; }')).toBe(
+          '.nav a:nth-child(2n + 1)'
+        );
+        expect(pick(html, '.nav li:is(.x, li) a { color: red; }')).toBeNull();
+      });
     });
   });
 

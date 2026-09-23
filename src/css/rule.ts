@@ -125,36 +125,33 @@ export const getDeclarationsForSelector = (
 const STATE_PSEUDO_CLASSES = /:(hover|focus(-visible|-within)?|active)\b/i;
 
 /**
+ * Escapes, quoted strings, brackets, single combinator characters, and runs
+ * of everything else, so a combinator inside `[…]`, `(…)` or quotes isn't split on.
+ */
+const SELECTOR_TOKENS =
+  /\\.|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|[[\]()]|[\s>+~]|[^\\"'[\]()\s>+~]+/g;
+
+const COMBINATOR = /^[\s>+~]$/;
+
+const BRACKET_DEPTH_CHANGE: Record<string, number> = {
+  '[': 1,
+  '(': 1,
+  ']': -1,
+  ')': -1,
+};
+
+/**
  * The rightmost compound of a selector — the part naming the element it
  * styles, e.g. `a.link` in `nav > ul a.link`.
  */
-const getSubjectCompound = (selector: string): string => {
-  let depth = 0;
-  let quote: string | null = null;
-  let start = 0;
-
-  for (let i = 0; i < selector.length; i++) {
-    const char = selector[i];
-
-    if (char === '\\') {
-      i++;
-    } else if (quote) {
-      if (char === quote) {
-        quote = null;
-      }
-    } else if (char === '"' || char === "'") {
-      quote = char;
-    } else if (char === '[' || char === '(') {
-      depth++;
-    } else if (char === ']' || char === ')') {
-      depth--;
-    } else if (depth === 0 && /[\s>+~]/.test(char)) {
-      start = i + 1;
-    }
-  }
-
-  return selector.slice(start);
-};
+const getSubjectCompound = (selector: string): string =>
+  (selector.match(SELECTOR_TOKENS) ?? []).reduce(
+    ({ depth, subject }, token) => ({
+      depth: depth + (BRACKET_DEPTH_CHANGE[token] ?? 0),
+      subject: depth === 0 && COMBINATOR.test(token) ? '' : subject + token,
+    }),
+    { depth: 0, subject: '' }
+  ).subject;
 
 const SPECIFIC_SUBJECT = /[#.[]|:(nth-|first-|last-|only-|is\(|where\(|has\()/i;
 
