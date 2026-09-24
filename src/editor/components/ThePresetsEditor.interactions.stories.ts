@@ -100,3 +100,19 @@ export const ReadabilityToggle: StoryObj = {
     await expect(store.state.readability).toBe(false);
   },
 };
+
+export const ReadabilityUnavailable: StoryObj = {
+  ...editor(magic),
+  name: 'readability is disabled and marked articles only on a non-article page',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+    const toggle = featureSwitch(canvas, 'Readability');
+
+    store.commit('setPage', { ...store.state.page, readerable: false });
+    await waitFor(() => expect(toggle).toBeDisabled());
+    await expect(toggle.closest('.feature-card')).toHaveTextContent(
+      'Articles only'
+    );
+  },
+};
