@@ -7,7 +7,7 @@
       <the-keyboard-shortcuts-view v-if="help" />
 
       <template v-else>
-        <the-header />
+        <the-header ref="header" />
 
         <div
           class="stylebot-body"
@@ -22,6 +22,7 @@
           <the-code-editor
             v-if="codeEditorMounted"
             v-show="mode === 'code' && !resizing"
+            @leave="onCodeEditorLeave"
           />
         </div>
       </template>
@@ -42,6 +43,8 @@ import TheWindowTabBar from './TheWindowTabBar.vue';
 import TheKeyboardShortcutsView from './shortcuts/TheKeyboardShortcutsView.vue';
 
 import { StylebotEditingMode } from '@stylebot/types';
+
+type HeaderRef = { focusModeTab(): void };
 
 export default Vue.extend({
   name: 'TheStylebot',
@@ -97,6 +100,12 @@ export default Vue.extend({
           this.codeEditorMounted = true;
         }
       },
+    },
+  },
+
+  methods: {
+    onCodeEditorLeave(): void {
+      (this.$refs.header as unknown as HeaderRef).focusModeTab();
     },
   },
 });

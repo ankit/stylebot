@@ -9,6 +9,7 @@
       :shortcut="tab.shortcut"
     >
       <button
+        ref="tabButtons"
         type="button"
         class="tab"
         :class="{ active: tab.value === value }"
@@ -107,6 +108,16 @@ export default Vue.extend({
   },
 
   methods: {
+    focusSelectedTab(options?: FocusOptions): void {
+      const { tabButtons } = this.$refs;
+      const index = this.tabs.findIndex(tab => tab.value === this.value);
+      const button = Array.isArray(tabButtons) ? tabButtons[index] : undefined;
+
+      if (button instanceof HTMLElement) {
+        button.focus(options);
+      }
+    },
+
     measure(): void {
       const root = this.$refs.root as HTMLElement | undefined;
       const labels = this.$refs.tabLabels as Array<HTMLElement> | undefined;

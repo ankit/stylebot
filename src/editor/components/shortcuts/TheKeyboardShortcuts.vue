@@ -12,6 +12,8 @@ import {
   StylebotEditorCommands,
 } from '@stylebot/types';
 
+import { isFieldTarget } from '@stylebot/utils';
+
 export default Vue.extend({
   name: 'TheKeyboardShortcuts',
 
@@ -142,14 +144,15 @@ export default Vue.extend({
     },
 
     handleStylebotShortcut(event: KeyboardEvent): void {
-      const target = event.composedPath()[0] as HTMLElement;
-      const tagName = target.tagName.toLowerCase();
+      const target = event.composedPath()[0];
 
-      if (tagName === 'input' || tagName === 'textarea') {
+      if (event.metaKey || event.altKey || event.ctrlKey) {
         return;
       }
 
-      if (event.metaKey || event.altKey || event.ctrlKey) {
+      // Escape in a field is left to the section around it, which moves
+      // focus out of the field.
+      if (isFieldTarget(target)) {
         return;
       }
 

@@ -1,12 +1,16 @@
 <template>
   <div class="mode-actions">
-    <s-tabs :value="mode" :tabs="tabs" @change="setMode" />
+    <s-tabs ref="tabs" :value="mode" :tabs="tabs" @change="setMode" />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import { STabs } from '@stylebot/components';
+
+import { KEYBOARD_FOCUS } from '@stylebot/utils';
+
+type TabsRef = { focusSelectedTab(options: FocusOptions): void };
 
 export default Vue.extend({
   name: 'TheEditorModeActions',
@@ -58,6 +62,10 @@ export default Vue.extend({
   },
 
   methods: {
+    focusModeTab(): void {
+      (this.$refs.tabs as unknown as TabsRef).focusSelectedTab(KEYBOARD_FOCUS);
+    },
+
     setMode(mode: string): void {
       this.$store.dispatch('setMode', mode);
     },

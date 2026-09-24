@@ -1,10 +1,12 @@
 <template>
   <s-tooltip :text="t('inspect_description')" shortcut="i">
     <button
+      ref="button"
       type="button"
       class="stylebot-inspector"
       :class="{ active }"
       :disabled="disabled"
+      :aria-label="t('inspect_description')"
       @click="toggle"
     >
       <inspector-icon :size="16" />
@@ -20,6 +22,8 @@ import { InspectorIcon } from '@stylebot/icons';
 import { StylebotEditingMode } from '@stylebot/types';
 
 import { getPageBridge } from '@stylebot/page-bridge';
+
+import { KEYBOARD_FOCUS } from '@stylebot/utils';
 
 export default Vue.extend({
   name: 'TheInspector',
@@ -90,6 +94,14 @@ export default Vue.extend({
   },
 
   methods: {
+    focus(): void {
+      const { button } = this.$refs;
+
+      if (button instanceof HTMLElement) {
+        button.focus(KEYBOARD_FOCUS);
+      }
+    },
+
     toggle(): void {
       if (this.active) {
         this.$store.commit('setInspecting', false);
