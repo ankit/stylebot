@@ -5,6 +5,8 @@
       class="stylebot-inspector"
       :class="{ active }"
       :disabled="disabled"
+      :aria-label="t('inspect_description')"
+      data-focus-landing
       @click="toggle"
     >
       <inspector-icon :size="16" />

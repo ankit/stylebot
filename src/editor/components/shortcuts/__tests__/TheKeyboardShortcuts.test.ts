@@ -121,6 +121,23 @@ describe('TheKeyboardShortcuts.vue', () => {
       expect(document.activeElement).toBe(header);
     });
 
+    it('skips a landing that comes after the field', () => {
+      const store = buildMockStore(true);
+      wrapper = shallowMount(TheKeyboardShortcuts, {
+        mocks: { $store: store },
+      });
+      const row = document.createElement('div');
+      const later = document.createElement('button');
+      later.setAttribute('data-focus-landing', '');
+      row.append(field, later);
+      section.appendChild(row);
+      field.focus();
+
+      press('Escape');
+
+      expect(document.activeElement).toBe(section);
+    });
+
     it('leaves a field outside the editor alone on Escape', () => {
       const store = buildMockStore(true);
       wrapper = shallowMount(TheKeyboardShortcuts, {

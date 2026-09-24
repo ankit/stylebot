@@ -45,10 +45,14 @@ export const StepsOutOneLevelAtATime: StoryObj = {
       await expect(input()).toHaveFocus();
     });
 
-    await step('the second leaves the field for its row', async () => {
+    await step('the second leaves the field for the inspector', async () => {
       await pressKey('Escape');
       await waitFor(() =>
-        expect(canvasElement.querySelector('.selector-row')).toHaveFocus()
+        expect(
+          canvas.getByRole('button', {
+            name: 'Select an element in the page to style it',
+          })
+        ).toHaveFocus()
       );
       await expect(store.state.visible).toBe(true);
     });
