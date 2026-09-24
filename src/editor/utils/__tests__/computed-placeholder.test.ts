@@ -12,7 +12,9 @@ describe('computed-placeholder', () => {
       expect(toPlaceholder('-8px')).toBe('-8');
     });
 
-    it('is empty for anything that is not a px length', () => {
+    it('is empty for zero and anything that is not a px length', () => {
+      expect(toPlaceholder('0px')).toBe('');
+      expect(toPlaceholder('0.01px')).toBe('');
       expect(toPlaceholder('normal')).toBe('');
       expect(toPlaceholder('4px 8px')).toBe('');
       expect(toPlaceholder('')).toBe('');

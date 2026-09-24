@@ -27,11 +27,13 @@ export const sharedValue = (...values: Array<string>): string =>
 
 /**
  * A computed px length as a field placeholder, rounded to one decimal;
- * anything else (`normal`, elliptical radii) reads as empty.
+ * zero and anything else (`normal`, elliptical radii) read as empty.
  */
 export const toPlaceholder = (value = ''): string => {
   const match = value.match(/^(-?[\d.]+)px$/);
-  return match ? `${Math.round(parseFloat(match[1]) * 10) / 10}` : '';
+  const length = match ? Math.round(parseFloat(match[1]) * 10) / 10 : 0;
+
+  return length === 0 ? '' : `${length}`;
 };
 
 /**

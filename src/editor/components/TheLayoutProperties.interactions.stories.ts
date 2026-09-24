@@ -77,7 +77,7 @@ export const SpacingModes: StoryObj = {
 
 export const SpacingPlaceholders: StoryObj = {
   ...editor({ ...WITH_RULE, activeSelector: '.sb-page p' }),
-  name: "spacing fields show the page's computed sides, and a combined field only when they agree",
+  name: "spacing fields show the page's nonzero computed sides, and a combined field only when they agree",
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
@@ -89,7 +89,7 @@ export const SpacingPlaceholders: StoryObj = {
     await expect(bottom).toHaveValue('');
     await expect(await spacingInput(margin, 'Top')).toHaveAttribute(
       'placeholder',
-      '0'
+      '—'
     );
 
     // `0 0 12px` has no single value to show.
