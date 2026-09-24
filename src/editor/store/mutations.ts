@@ -55,6 +55,10 @@ export default {
     state.activeSelector = selector;
   },
 
+  setComputedStyles(state: State, styles: Record<string, string>): void {
+    state.computedStyles = styles;
+  },
+
   setInspecting(state: State, inspecting: boolean): void {
     state.inspecting = inspecting;
   },

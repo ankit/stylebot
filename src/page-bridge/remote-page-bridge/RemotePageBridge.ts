@@ -12,6 +12,8 @@ import {
   RemotePageBridgeHandlers,
   RemotePageBridgeMessageToPage,
   RemotePageBridgeMessageToWindow,
+  RemotePageBridgeRequest,
+  RemotePageBridgeRequestArgs,
   RemotePageBridgeRequestMethod,
   RemotePageBridgeRequestResult,
 } from './types';
@@ -182,7 +184,8 @@ export class RemotePageBridge extends PageBridgeEmitter implements PageBridge {
   }
 
   private request<M extends RemotePageBridgeRequestMethod>(
-    method: M
+    method: M,
+    ...args: RemotePageBridgeRequestArgs[M]
   ): Promise<RemotePageBridgeRequestResult[M]> {
     if (!this.port) {
       return Promise.reject(new Error('Page disconnected'));
@@ -192,7 +195,12 @@ export class RemotePageBridge extends PageBridgeEmitter implements PageBridge {
 
     return new Promise((resolve, reject) => {
       this.pending.set(id, { resolve, reject });
-      this.send({ type: 'request', id, method });
+      this.send({
+        type: 'request',
+        id,
+        method,
+        args,
+      } as RemotePageBridgeRequest);
     });
   }
 
@@ -239,6 +247,13 @@ export class RemotePageBridge extends PageBridgeEmitter implements PageBridge {
 
   getPageColors(): Promise<RoleColorGroups> {
     return this.request('getPageColors');
+  }
+
+  getComputedStyles(
+    selector: string,
+    properties: Array<string>
+  ): Promise<Record<string, string>> {
+    return this.request('getComputedStyles', selector, properties);
   }
 
   openInPage(): void {

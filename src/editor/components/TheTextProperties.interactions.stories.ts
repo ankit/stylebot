@@ -8,6 +8,7 @@ import {
   findOpenMenu,
   numberInput,
   pageStyle,
+  pressKey,
   propertyControl,
   storeOf,
   user,
@@ -74,6 +75,33 @@ export const LineHeightField: StoryObj = {
     await user.type(input, '24');
     await expect(declaration(store, '.article-body', 'line-height')).toBe(
       '24px'
+    );
+  },
+};
+
+export const ComputedPlaceholders: StoryObj = {
+  ...editor({ ...WITH_RULE, activeSelector: '.sb-page p' }),
+  name: "unset sizes show the page's computed px as placeholders, and arrows step from them",
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+    const size = numberInput(propertyControl(canvas, 'Size'));
+    const lineHeight = numberInput(propertyControl(canvas, 'Line Height'));
+
+    await waitFor(() => expect(size).toHaveAttribute('placeholder', '16'));
+    await expect(size).toHaveValue('');
+    await expect(lineHeight).toHaveAttribute('placeholder', '25.6');
+
+    await user.click(size);
+    await pressKey('ArrowUp');
+    await expect(declaration(store, '.sb-page p', 'font-size')).toBe('17px');
+    await waitFor(() =>
+      expect(lineHeight).toHaveAttribute('placeholder', '27.2')
+    );
+
+    await user.clear(size);
+    await waitFor(() =>
+      expect(lineHeight).toHaveAttribute('placeholder', '25.6')
     );
   },
 };

@@ -33,6 +33,7 @@ const mockBridge = {
   highlight: jest.fn(),
   unhighlight: jest.fn(),
   getPageColors: jest.fn(),
+  getComputedStyles: jest.fn(),
   openInPage: jest.fn(),
   focusPage: jest.fn(),
   on: jest.fn(),
@@ -661,6 +662,55 @@ describe('actions', () => {
         actions.previewFontFamily({ state }, 'Lora }')
       ).resolves.toBeUndefined();
       expect(mockBridge.setPreviewCss).not.toBeCalled();
+    });
+  });
+
+  describe('refreshComputedStyles', () => {
+    it('reads the placeholder properties for the active selector', async () => {
+      const state = { ...mockState, activeSelector: 'h1' };
+      mockBridge.getComputedStyles.mockResolvedValue({ 'font-size': '16px' });
+
+      await actions.refreshComputedStyles({ commit: mockCommit, state });
+
+      expect(mockBridge.getComputedStyles).toBeCalledWith(
+        'h1',
+        expect.arrayContaining(['font-size', 'padding-top'])
+      );
+      expect(mockCommit).toBeCalledWith('setComputedStyles', {
+        'font-size': '16px',
+      });
+    });
+
+    it('clears them without asking the page when nothing is selected', async () => {
+      await actions.refreshComputedStyles({
+        commit: mockCommit,
+        state: mockState,
+      });
+
+      expect(mockBridge.getComputedStyles).not.toBeCalled();
+      expect(mockCommit).toBeCalledWith('setComputedStyles', {});
+    });
+
+    it('drops a read overtaken by a newer one', async () => {
+      const state = { ...mockState, activeSelector: 'h1' };
+      let resolveFirst: (styles: Record<string, string>) => void = () =>
+        undefined;
+      mockBridge.getComputedStyles
+        .mockReturnValueOnce(new Promise(resolve => (resolveFirst = resolve)))
+        .mockResolvedValueOnce({ 'font-size': '20px' });
+
+      const first = actions.refreshComputedStyles({
+        commit: mockCommit,
+        state,
+      });
+      await actions.refreshComputedStyles({ commit: mockCommit, state });
+      resolveFirst({ 'font-size': '16px' });
+      await first;
+
+      expect(mockCommit).toBeCalledTimes(1);
+      expect(mockCommit).toBeCalledWith('setComputedStyles', {
+        'font-size': '20px',
+      });
     });
   });
 });

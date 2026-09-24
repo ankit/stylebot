@@ -75,6 +75,33 @@ export const SpacingModes: StoryObj = {
   },
 };
 
+export const SpacingPlaceholders: StoryObj = {
+  ...editor({ ...WITH_RULE, activeSelector: '.sb-page p' }),
+  name: "spacing fields show the page's computed sides, and a combined field only when they agree",
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+    const margin = spacing(canvas, 'Margin');
+
+    await user.click(modeButton(margin, 'Individual'));
+    const bottom = await spacingInput(margin, 'Bottom');
+    await waitFor(() => expect(bottom).toHaveAttribute('placeholder', '12'));
+    await expect(bottom).toHaveValue('');
+    await expect(await spacingInput(margin, 'Top')).toHaveAttribute(
+      'placeholder',
+      '0'
+    );
+
+    // `0 0 12px` has no single value to show.
+    await user.click(modeButton(margin, 'All'));
+    await expect(await spacingInput(margin, 'All')).toHaveAttribute(
+      'placeholder',
+      '—'
+    );
+    await expect(declaration(store, '.sb-page p', 'margin')).toBeUndefined();
+  },
+};
+
 export const MarginIndependent: StoryObj = {
   ...editor(WITH_RULE),
   name: 'margin is edited independently of padding',

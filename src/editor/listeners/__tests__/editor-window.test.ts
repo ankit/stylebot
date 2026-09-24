@@ -28,6 +28,7 @@ const bridge = {
   highlight: jest.fn(),
   unhighlight: jest.fn(),
   getPageColors: jest.fn(),
+  getComputedStyles: jest.fn(),
   openInPage: jest.fn(),
   focusPage: jest.fn(),
   on: jest.fn((event: string, listener: PageBridgeEvents['select']) => {
@@ -197,15 +198,25 @@ describe('initEditorWindowListener', () => {
       total: 1,
     });
 
-    port.send({ type: 'request', id: 3, method: 'getPageColors' });
+    bridge.getComputedStyles.mockResolvedValue({ 'font-size': '16px' });
+
+    port.send({ type: 'request', id: 3, method: 'getPageColors', args: [] });
+    port.send({
+      type: 'request',
+      id: 4,
+      method: 'getComputedStyles',
+      args: ['h1', ['font-size']],
+    });
     await new Promise(resolve => setTimeout(resolve, 0));
 
+    expect(bridge.getComputedStyles).toBeCalledWith('h1', ['font-size']);
     expect(port.sent()).toEqual([
       {
         type: 'response',
         id: 3,
         result: { text: ['red'], surface: [], total: 1 },
       },
+      { type: 'response', id: 4, result: { 'font-size': '16px' } },
     ]);
   });
 

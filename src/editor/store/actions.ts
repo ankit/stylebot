@@ -49,6 +49,8 @@ import {
   RemotePageBridgeSyncedState,
 } from '@stylebot/page-bridge';
 
+import { PLACEHOLDER_PROPERTIES } from '../utils/computed-placeholder';
+
 const RECENT_FONTS_LIMIT = 10;
 const isBundledGoogleFont = async (family: string): Promise<boolean> =>
   (await loadGoogleFonts()).some(font => font.family === family);
@@ -57,6 +59,7 @@ const isBundledGoogleFont = async (family: string): Promise<boolean> =>
 // newer one does nothing: the latest one owns the stylesheet.
 let fontRequest = 0;
 let previewRequest = 0;
+let computedStylesRequest = 0;
 
 export default {
   async initialize({ commit }: { commit: Commit }): Promise<void> {
@@ -328,6 +331,36 @@ export default {
   ): void {
     commit('setForceImportant', value);
     dispatch('applyCss', { css: state.css });
+  },
+
+  /**
+   * Re-reads the computed styles the basic editor shows as placeholders;
+   * a read overtaken by a newer one is dropped.
+   */
+  async refreshComputedStyles({
+    commit,
+    state,
+  }: {
+    commit: Commit;
+    state: State;
+  }): Promise<void> {
+    const request = ++computedStylesRequest;
+    let styles: Record<string, string> = {};
+
+    if (state.activeSelector && state.pageConnected) {
+      try {
+        styles = await getPageBridge().getComputedStyles(
+          state.activeSelector,
+          PLACEHOLDER_PROPERTIES
+        );
+      } catch {
+        //
+      }
+    }
+
+    if (request === computedStylesRequest) {
+      commit('setComputedStyles', styles);
+    }
   },
 
   applyDeclaration(

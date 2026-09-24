@@ -5,6 +5,7 @@
     <s-number-field
       unit="px"
       :value="value"
+      :placeholder="placeholder"
       :disabled="disabled"
       @input="$emit('input', $event)"
     />
@@ -30,6 +31,11 @@ export default Vue.extend({
     },
 
     value: {
+      type: String,
+      default: '',
+    },
+
+    placeholder: {
       type: String,
       default: '',
     },

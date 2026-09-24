@@ -13,6 +13,7 @@
       <spacing-field
         :label="t('all')"
         :value="all"
+        :placeholder="placeholders.all"
         :disabled="disabled"
         @input="setAll"
       />
@@ -22,12 +23,14 @@
       <spacing-field
         :label="t('vertical')"
         :value="vertical"
+        :placeholder="placeholders.vertical"
         :disabled="disabled"
         @input="setVertical"
       />
       <spacing-field
         :label="t('horizontal')"
         :value="horizontal"
+        :placeholder="placeholders.horizontal"
         :disabled="disabled"
         @input="setHorizontal"
       />
@@ -37,24 +40,28 @@
       <spacing-field
         :label="t('top')"
         :value="top"
+        :placeholder="placeholders.top"
         :disabled="disabled"
         @input="setSide('top', $event)"
       />
       <spacing-field
         :label="t('right')"
         :value="right"
+        :placeholder="placeholders.right"
         :disabled="disabled"
         @input="setSide('right', $event)"
       />
       <spacing-field
         :label="t('bottom')"
         :value="bottom"
+        :placeholder="placeholders.bottom"
         :disabled="disabled"
         @input="setSide('bottom', $event)"
       />
       <spacing-field
         :label="t('left')"
         :value="left"
+        :placeholder="placeholders.left"
         :disabled="disabled"
         @input="setSide('left', $event)"
       />
@@ -70,6 +77,7 @@ import { SSegmentedControl } from '@stylebot/components';
 
 import PropertyRow from '../basic/PropertyRow.vue';
 import SpacingField from './SpacingField.vue';
+import { computedSides, sharedValue } from '../../utils/computed-placeholder';
 import {
   Side,
   Sides,
@@ -163,6 +171,24 @@ export default Vue.extend({
       });
 
       return sides;
+    },
+
+    placeholders(): Sides & {
+      all: string;
+      vertical: string;
+      horizontal: string;
+    } {
+      const sides = computedSides(
+        this.$store.state.computedStyles,
+        this.properties
+      );
+
+      return {
+        ...sides,
+        all: sharedValue(sides.top, sides.right, sides.bottom, sides.left),
+        vertical: sharedValue(sides.top, sides.bottom),
+        horizontal: sharedValue(sides.left, sides.right),
+      };
     },
 
     top(): string {

@@ -20,6 +20,7 @@ import { readCache, writeCache } from '../inject-css/cache';
 import { PageBridge, PageSnapshot } from './PageBridge';
 import { PageBridgeEmitter } from './PageBridgeEmitter';
 import { getPageColors } from './page-colors';
+import { getComputedStyles } from './computed-styles';
 
 const PREVIEW_ID = 'font-preview';
 
@@ -159,6 +160,13 @@ export class LocalPageBridge extends PageBridgeEmitter implements PageBridge {
 
   getPageColors(): Promise<RoleColorGroups> {
     return Promise.resolve(getPageColors());
+  }
+
+  getComputedStyles(
+    selector: string,
+    properties: Array<string>
+  ): Promise<Record<string, string>> {
+    return Promise.resolve(getComputedStyles(selector, properties));
   }
 
   openInPage(): void {

@@ -138,10 +138,17 @@ describe('RemotePageBridge', () => {
 
     const colors = bridge.getPageColors();
     const snapshot = bridge.getSnapshot();
+    const styles = bridge.getComputedStyles('h1', ['font-size']);
     const requests = ports[0].postMessage.mock.calls.map(([m]) => m);
     expect(requests).toEqual([
-      { type: 'request', id: 1, method: 'getPageColors' },
-      { type: 'request', id: 2, method: 'getSnapshot' },
+      { type: 'request', id: 1, method: 'getPageColors', args: [] },
+      { type: 'request', id: 2, method: 'getSnapshot', args: [] },
+      {
+        type: 'request',
+        id: 3,
+        method: 'getComputedStyles',
+        args: ['h1', ['font-size']],
+      },
     ]);
 
     ports[0].receive({
@@ -157,6 +164,7 @@ describe('RemotePageBridge', () => {
 
     ports[0].drop();
     await expect(snapshot).rejects.toThrow('Page disconnected');
+    await expect(styles).rejects.toThrow('Page disconnected');
   });
 
   it('retries with backoff after a disconnect and reports the connection state', () => {

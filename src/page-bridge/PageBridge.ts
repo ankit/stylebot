@@ -87,6 +87,15 @@ export type PageBridge = {
   getPageColors(): Promise<RoleColorGroups>;
 
   /**
+   * Reads computed values of the given properties on the first element the
+   * selector matches; empty when nothing matches.
+   */
+  getComputedStyles(
+    selector: string,
+    properties: Array<string>
+  ): Promise<Record<string, string>>;
+
+  /**
    * Asks the page to show its own panel again; a no-op for the in-page host.
    */
   openInPage(): void;

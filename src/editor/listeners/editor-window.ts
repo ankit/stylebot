@@ -132,11 +132,16 @@ const initEditorWindowListener = (store: Store<State>): void => {
     incoming.onMessage.addListener((message: RemotePageBridgeMessageToPage) => {
       switch (message.type) {
         case 'request':
-          respond(message.id, () =>
-            message.method === 'getSnapshot'
-              ? bridge.getSnapshot()
-              : bridge.getPageColors()
-          );
+          respond(message.id, () => {
+            switch (message.method) {
+              case 'getSnapshot':
+                return bridge.getSnapshot();
+              case 'getPageColors':
+                return bridge.getPageColors();
+              case 'getComputedStyles':
+                return bridge.getComputedStyles(...message.args);
+            }
+          });
           break;
 
         case 'applyCss':
