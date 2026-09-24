@@ -1,9 +1,5 @@
 <template>
-  <code-editor-iframe
-    id="stylebot-selector-css"
-    data-focus-landing
-    tabindex="-1"
-  />
+  <code-editor-iframe id="stylebot-selector-css" />
 </template>
 
 <script lang="ts">
@@ -171,14 +167,23 @@ export default Vue.extend({
 
         case 'stylebotEscapePressed':
           this.applyTypedCss.flush();
-          // The keypress happened in the iframe, so the browser won't infer
-          // keyboard focus here on its own.
-          (this.$el as HTMLElement).focus({
-            preventScroll: true,
-            focusVisible: true,
-          });
+          this.focusModeTab();
           break;
       }
+    },
+
+    /**
+     * Hands focus from Monaco to the selected Code tab, the control that
+     * names this panel, so the next Escape closes the editor.
+     */
+    focusModeTab(): void {
+      const tab = this.$el
+        .closest('.stylebot-content')
+        ?.querySelector<HTMLElement>('.mode-actions [aria-selected="true"]');
+
+      // The keypress happened in the iframe, so the browser won't infer
+      // keyboard focus here on its own.
+      tab?.focus({ preventScroll: true, focusVisible: true });
     },
 
     handleIframeLoaded(): void {
@@ -212,19 +217,3 @@ export default Vue.extend({
   },
 });
 </script>
-
-<style lang="scss" scoped>
-.stylebot-code-editor-iframe {
-  position: relative;
-  outline: none;
-
-  &:focus-visible::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    border: 2px solid var(--ring);
-    pointer-events: none;
-  }
-}
-</style>

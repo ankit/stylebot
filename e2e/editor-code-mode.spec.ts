@@ -81,7 +81,7 @@ test('toggling the panel appearance updates the Monaco editor theme immediately'
   );
 });
 
-test('Tab indents in the code editor, Escape leaves it, and a second Escape closes the panel', async ({
+test('Tab indents in the code editor, Escape moves to the Code tab, and a second Escape closes the panel', async ({
   context,
   openPopup,
 }) => {
@@ -115,11 +115,9 @@ test('Tab indents in the code editor, Escape leaves it, and a second Escape clos
 
   await page.keyboard.press('Escape');
 
-  const codeEditor = editorRoot.locator('.stylebot-code-editor-iframe');
-  await expect(codeEditor).toBeFocused();
-  expect(await codeEditor.evaluate(el => el.matches(':focus-visible'))).toBe(
-    true
-  );
+  const codeTab = editorRoot.getByRole('tab', { name: 'Code' });
+  await expect(codeTab).toBeFocused();
+  expect(await codeTab.evaluate(el => el.matches(':focus-visible'))).toBe(true);
   await expect(editorRoot.locator('.stylebot-content')).toBeVisible();
 
   await page.keyboard.press('Escape');

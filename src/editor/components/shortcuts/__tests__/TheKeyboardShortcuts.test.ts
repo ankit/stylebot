@@ -103,5 +103,19 @@ describe('TheKeyboardShortcuts.vue', () => {
       expect(document.activeElement).toBe(section);
       expect(store.dispatch).not.toHaveBeenCalled();
     });
+
+    it("prefers the control marked as the section's focus target", () => {
+      const store = buildMockStore(true);
+      wrapper = shallowMount(TheKeyboardShortcuts, {
+        mocks: { $store: store },
+      });
+      const header = document.createElement('button');
+      header.setAttribute('data-focus-target', '');
+      section.prepend(header);
+
+      press('Escape');
+
+      expect(document.activeElement).toBe(header);
+    });
   });
 });

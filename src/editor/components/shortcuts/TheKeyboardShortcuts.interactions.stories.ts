@@ -62,7 +62,7 @@ export const StepsOutOneLevelAtATime: StoryObj = {
 
 export const LeavesFieldForItsCard: StoryObj = {
   ...editor(WITH_RULE),
-  name: 'Escape leaves a property field for its card, so shortcuts work again',
+  name: "Escape leaves a property field for its card's header, so shortcuts work again",
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
@@ -73,7 +73,11 @@ export const LeavesFieldForItsCard: StoryObj = {
     await expect(store.state.options.mode).toBe('basic');
 
     await pressKey('Escape');
-    await waitFor(() => expect(propertyCard(canvas, 'Text')).toHaveFocus());
+    await waitFor(() =>
+      expect(
+        propertyCard(canvas, 'Text').querySelector('.property-card-header')
+      ).toHaveFocus()
+    );
     await expect(store.state.visible).toBe(true);
 
     await pressKey('c');
@@ -83,17 +87,16 @@ export const LeavesFieldForItsCard: StoryObj = {
 
 export const LeavesCodeEditor: StoryObj = {
   ...editor({ ...WITH_RULE, options: { mode: 'code' } }),
-  name: 'Escape in the code editor leaves it rather than closing the editor',
+  name: 'Escape in the code editor moves to the Code tab rather than closing the editor',
   play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
 
     // Stands in for Monaco, which reports an Escape none of its widgets took.
     window.postMessage({ type: 'stylebotEscapePressed' }, '*');
 
     await waitFor(() =>
-      expect(
-        canvasElement.querySelector('.stylebot-code-editor-iframe')
-      ).toHaveFocus()
+      expect(canvas.getByRole('tab', { name: 'Code' })).toHaveFocus()
     );
     await expect(store.state.visible).toBe(true);
 

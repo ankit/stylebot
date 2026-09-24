@@ -1,6 +1,11 @@
 <template>
-  <s-card class="property-card" data-focus-landing tabindex="-1">
-    <button type="button" class="property-card-header" @click="$emit('toggle')">
+  <s-card class="property-card" data-focus-landing>
+    <button
+      type="button"
+      class="property-card-header"
+      data-focus-target
+      @click="$emit('toggle')"
+    >
       <span class="property-card-title">
         <span class="property-card-label">{{ label }}</span>
         <s-count-badge v-if="count > 0" :count="count" />
@@ -89,9 +94,6 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .property-card {
   --panel-surface: var(--card-surface);
-  outline: none;
-
-  @include focus-ring;
 }
 
 .property-card-header {

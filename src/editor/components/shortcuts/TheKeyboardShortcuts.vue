@@ -150,13 +150,16 @@ export default Vue.extend({
     },
 
     /**
-     * Moves focus from a field to the section around it, so shortcuts work
-     * again, the next Escape closes the editor, and Tab resumes from there.
+     * Moves focus from a field to the section around it, or to the control
+     * that names the section, so shortcuts work again and the next Escape
+     * closes the editor.
      */
     leaveField(field: HTMLElement): void {
-      const landing = field.parentElement?.closest<HTMLElement>(
+      const section = field.parentElement?.closest<HTMLElement>(
         '[data-focus-landing]'
       );
+      const landing =
+        section?.querySelector<HTMLElement>('[data-focus-target]') ?? section;
 
       if (landing) {
         landing.focus({ preventScroll: true, focusVisible: true });
