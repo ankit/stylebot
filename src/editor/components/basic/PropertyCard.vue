@@ -1,5 +1,5 @@
 <template>
-  <s-card class="property-card" @keydown.native.esc="onEscape">
+  <s-card class="property-card" @keydown.native.esc="onFieldEscape">
     <button
       ref="header"
       type="button"
@@ -38,7 +38,7 @@ import Vue from 'vue';
 import { ChevronDownIcon } from '@stylebot/icons';
 import { SCard, SCountBadge } from '@stylebot/components';
 
-import { claimFieldEscape, KEYBOARD_FOCUS } from '../../utils/field-escape';
+import { claimEscapeFromField, KEYBOARD_FOCUS } from '@stylebot/utils';
 
 export default Vue.extend({
   name: 'PropertyCard',
@@ -84,10 +84,10 @@ export default Vue.extend({
   },
 
   methods: {
-    onEscape(event: KeyboardEvent): void {
+    onFieldEscape(event: KeyboardEvent): void {
       const { header } = this.$refs;
 
-      if (claimFieldEscape(event) && header instanceof HTMLElement) {
+      if (claimEscapeFromField(event) && header instanceof HTMLElement) {
         header.focus(KEYBOARD_FOCUS);
       }
     },

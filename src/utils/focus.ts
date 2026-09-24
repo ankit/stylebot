@@ -9,7 +9,7 @@ export const KEYBOARD_FOCUS: FocusOptions & { focusVisible: boolean } = {
  * Whether keys pressed in the element are text entry, which single-key
  * shortcuts must leave alone.
  */
-export const isField = (target: EventTarget | null): boolean =>
+export const isTypingTarget = (target: EventTarget | null): boolean =>
   target instanceof HTMLElement &&
   (target.isContentEditable ||
     ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName));
@@ -18,8 +18,8 @@ export const isField = (target: EventTarget | null): boolean =>
  * Claims an Escape pressed in a field for the innermost section handling it,
  * so the sections around it leave it alone.
  */
-export const claimFieldEscape = (event: KeyboardEvent): boolean => {
-  if (event.defaultPrevented || !isField(event.target)) {
+export const claimEscapeFromField = (event: KeyboardEvent): boolean => {
+  if (event.defaultPrevented || !isTypingTarget(event.target)) {
     return false;
   }
 

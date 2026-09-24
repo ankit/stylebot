@@ -5,7 +5,7 @@
       <the-window-actions />
     </div>
 
-    <div class="selector-row" @keydown.esc="onSelectorEscape">
+    <div class="selector-row" @keydown.esc="onFieldEscape">
       <the-inspector ref="inspector" @select="inspect($event)" />
       <the-css-selector-dropdown />
     </div>
@@ -22,10 +22,10 @@ import TheInspector from './header/TheInspector.vue';
 import TheWindowActions from './header/TheWindowActions.vue';
 import TheCssSelectorDropdown from './header/TheCssSelectorDropdown.vue';
 import TheEditorModeActions from './header/TheEditorModeActions.vue';
-import { claimFieldEscape } from '../utils/field-escape';
+import { claimEscapeFromField } from '@stylebot/utils';
 
 type InspectorRef = { focus(): void };
-type ModeActionsRef = { focusSelected(): void };
+type ModeActionsRef = { focusModeTab(): void };
 
 export default Vue.extend({
   name: 'TheHeader',
@@ -49,14 +49,14 @@ export default Vue.extend({
       this.$store.commit('setActiveSelector', selector);
     },
 
-    onSelectorEscape(event: KeyboardEvent): void {
-      if (claimFieldEscape(event)) {
+    onFieldEscape(event: KeyboardEvent): void {
+      if (claimEscapeFromField(event)) {
         (this.$refs.inspector as unknown as InspectorRef).focus();
       }
     },
 
     focusModeTab(): void {
-      (this.$refs.modeActions as unknown as ModeActionsRef).focusSelected();
+      (this.$refs.modeActions as unknown as ModeActionsRef).focusModeTab();
     },
   },
 });

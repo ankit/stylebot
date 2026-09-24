@@ -22,7 +22,7 @@
           <the-code-editor
             v-if="codeEditorMounted"
             v-show="mode === 'code' && !resizing"
-            @leave="focusModeTab"
+            @leave="onCodeEditorLeave"
           />
         </div>
       </template>
@@ -104,7 +104,7 @@ export default Vue.extend({
   },
 
   methods: {
-    focusModeTab(): void {
+    onCodeEditorLeave(): void {
       (this.$refs.header as unknown as HeaderRef).focusModeTab();
     },
   },

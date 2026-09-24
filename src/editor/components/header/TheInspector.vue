@@ -23,7 +23,7 @@ import { StylebotEditingMode } from '@stylebot/types';
 
 import { getPageBridge } from '@stylebot/page-bridge';
 
-import { KEYBOARD_FOCUS } from '../../utils/field-escape';
+import { KEYBOARD_FOCUS } from '@stylebot/utils';
 
 export default Vue.extend({
   name: 'TheInspector',
