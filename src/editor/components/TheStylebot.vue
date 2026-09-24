@@ -1,6 +1,6 @@
 <template>
   <the-stylebot-resizer>
-    <div class="stylebot-content">
+    <div class="stylebot-content" data-focus-landing tabindex="-1">
       <the-window-tab-bar v-if="host === 'window'" />
       <the-window-status v-if="host === 'window' && !pageConnected" />
 
@@ -117,6 +117,9 @@ export default Vue.extend({
   height: 100%;
   overflow: hidden;
   border-radius: inherit;
+  outline: none;
+
+  @include focus-ring;
 }
 
 .stylebot-body {

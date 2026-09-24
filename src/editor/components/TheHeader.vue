@@ -5,7 +5,7 @@
       <the-window-actions />
     </div>
 
-    <div class="selector-row">
+    <div class="selector-row" data-focus-landing tabindex="-1">
       <the-inspector @select="inspect($event)" />
       <the-css-selector-dropdown />
     </div>
@@ -78,5 +78,8 @@ export default Vue.extend({
   align-items: center;
   gap: 8px;
   padding: 10px 14px;
+  outline: none;
+
+  @include focus-ring;
 }
 </style>

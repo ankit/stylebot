@@ -1,5 +1,9 @@
 <template>
-  <code-editor-iframe id="stylebot-selector-css" />
+  <code-editor-iframe
+    id="stylebot-selector-css"
+    data-focus-landing
+    tabindex="-1"
+  />
 </template>
 
 <script lang="ts">
@@ -167,7 +171,7 @@ export default Vue.extend({
 
         case 'stylebotEscapePressed':
           this.applyTypedCss.flush();
-          this.$store.dispatch('escape');
+          (this.$el as HTMLElement).focus({ preventScroll: true });
           break;
       }
     },
@@ -203,3 +207,10 @@ export default Vue.extend({
   },
 });
 </script>
+
+<style lang="scss" scoped>
+.stylebot-code-editor-iframe {
+  outline: none;
+  @include focus-ring;
+}
+</style>

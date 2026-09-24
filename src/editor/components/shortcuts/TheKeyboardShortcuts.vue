@@ -12,6 +12,14 @@ import {
   StylebotEditorCommands,
 } from '@stylebot/types';
 
+/**
+ * Whether keys pressed in the element are text entry, which single-key
+ * shortcuts must leave alone.
+ */
+const isField = (element: HTMLElement): boolean =>
+  element.isContentEditable ||
+  ['input', 'textarea', 'select'].includes(element.tagName.toLowerCase());
+
 export default Vue.extend({
   name: 'TheKeyboardShortcuts',
 
@@ -141,15 +149,34 @@ export default Vue.extend({
       this.$store.dispatch('escape');
     },
 
+    /**
+     * Moves focus from a field to the section around it, so shortcuts work
+     * again, the next Escape closes the editor, and Tab resumes from there.
+     */
+    leaveField(field: HTMLElement): void {
+      const landing = field.parentElement?.closest<HTMLElement>(
+        '[data-focus-landing]'
+      );
+
+      if (landing) {
+        landing.focus({ preventScroll: true });
+      } else {
+        field.blur();
+      }
+    },
+
     handleStylebotShortcut(event: KeyboardEvent): void {
       const target = event.composedPath()[0] as HTMLElement;
-      const tagName = target.tagName.toLowerCase();
 
-      if (tagName === 'input' || tagName === 'textarea') {
+      if (event.metaKey || event.altKey || event.ctrlKey) {
         return;
       }
 
-      if (event.metaKey || event.altKey || event.ctrlKey) {
+      if (isField(target)) {
+        if (event.key === 'Escape') {
+          this.leaveField(target);
+        }
+
         return;
       }
 

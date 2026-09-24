@@ -81,6 +81,35 @@ test('toggling the panel appearance updates the Monaco editor theme immediately'
   );
 });
 
+test('Escape leaves the code editor, and a second Escape closes the panel', async ({
+  context,
+  openPopup,
+}) => {
+  test.slow();
+
+  await servePage(context, PAGE_HTML);
+
+  const page = await context.newPage();
+  await page.goto(PAGE_URL);
+
+  const editorRoot = await openEditor(page, openPopup);
+  await switchEditorMode(editorRoot, 'code');
+
+  const monaco = getMonacoFrame(page);
+  await monaco.locator('.monaco-editor').click();
+  await page.keyboard.type('h1 { color: rgb(0, 0, 255); }');
+  await page.keyboard.press('Escape');
+
+  const codeEditor = editorRoot.locator('.stylebot-code-editor-iframe');
+  await expect(codeEditor).toBeFocused();
+  await expect(editorRoot.locator('.stylebot-content')).toBeVisible();
+
+  await page.keyboard.press('Escape');
+
+  await expect(editorRoot.locator('.stylebot-content')).toBeHidden();
+  await expect(page.locator('h1')).toHaveCSS('color', 'rgb(0, 0, 255)');
+});
+
 test('typing a CSS property offers autocomplete and a color value shows a swatch', async ({
   context,
   openPopup,

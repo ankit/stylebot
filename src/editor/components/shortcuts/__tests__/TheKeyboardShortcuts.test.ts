@@ -59,4 +59,49 @@ describe('TheKeyboardShortcuts.vue', () => {
 
     expect(store.dispatch).not.toHaveBeenCalled();
   });
+
+  describe('with focus in a field', () => {
+    let section: HTMLElement;
+    let field: HTMLInputElement;
+
+    beforeEach(() => {
+      section = document.createElement('div');
+      section.setAttribute('data-focus-landing', '');
+      section.tabIndex = -1;
+      field = document.createElement('input');
+      section.appendChild(field);
+      document.body.appendChild(section);
+      field.focus();
+    });
+
+    afterEach(() => {
+      section.remove();
+    });
+
+    const press = (key: string) =>
+      field.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }));
+
+    it('leaves single-key shortcuts to the field', () => {
+      const store = buildMockStore(true);
+      wrapper = shallowMount(TheKeyboardShortcuts, {
+        mocks: { $store: store },
+      });
+
+      press('c');
+
+      expect(store.dispatch).not.toHaveBeenCalled();
+    });
+
+    it('moves focus to the surrounding section on Escape instead of closing', () => {
+      const store = buildMockStore(true);
+      wrapper = shallowMount(TheKeyboardShortcuts, {
+        mocks: { $store: store },
+      });
+
+      press('Escape');
+
+      expect(document.activeElement).toBe(section);
+      expect(store.dispatch).not.toHaveBeenCalled();
+    });
+  });
 });
