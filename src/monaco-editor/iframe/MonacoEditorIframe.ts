@@ -190,9 +190,9 @@ class MonacEditorIframe {
         enabled: true,
       },
       codeLens: false,
-      // Tab-inserts-indentation traps keyboard focus, and the toggle
-      // (Ctrl+M) is swallowed by macOS as "minimize window" in-browser.
-      tabFocusMode: true,
+      // Tab indents only where Escape leaves the editor (the panel); elsewhere
+      // it would trap focus, since macOS swallows the Ctrl+M toggle in-browser.
+      tabFocusMode: isOptions,
     };
   }
 

@@ -81,7 +81,7 @@ test('toggling the panel appearance updates the Monaco editor theme immediately'
   );
 });
 
-test('Escape leaves the code editor, and a second Escape closes the panel', async ({
+test('Tab indents in the code editor, Escape leaves it, and a second Escape closes the panel', async ({
   context,
   openPopup,
 }) => {
@@ -96,8 +96,23 @@ test('Escape leaves the code editor, and a second Escape closes the panel', asyn
   await switchEditorMode(editorRoot, 'code');
 
   const monaco = getMonacoFrame(page);
-  await monaco.locator('.monaco-editor').click();
+  const editor = monaco.locator('.monaco-editor');
+  await editor.click();
+  await page.keyboard.press('Tab');
   await page.keyboard.type('h1 { color: rgb(0, 0, 255); }');
+
+  await expect
+    .poll(() =>
+      editor.evaluate(() => {
+        const { monaco } = window as Window & {
+          monaco: { editor: { getModels(): Array<{ getValue(): string }> } };
+        };
+
+        return monaco.editor.getModels()[0].getValue();
+      })
+    )
+    .toBe('  h1 { color: rgb(0, 0, 255); }');
+
   await page.keyboard.press('Escape');
 
   const codeEditor = editorRoot.locator('.stylebot-code-editor-iframe');
