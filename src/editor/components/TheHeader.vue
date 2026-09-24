@@ -5,7 +5,7 @@
       <the-window-actions />
     </div>
 
-    <div class="selector-row" @keydown.esc="onFieldEscape">
+    <div class="selector-row" @keydown.esc="onSelectorRowEscape">
       <the-inspector ref="inspector" @select="inspect($event)" />
       <the-css-selector-dropdown />
     </div>
@@ -49,7 +49,7 @@ export default Vue.extend({
       this.$store.commit('setActiveSelector', selector);
     },
 
-    onFieldEscape(event: KeyboardEvent): void {
+    onSelectorRowEscape(event: KeyboardEvent): void {
       if (consumeFieldEscape(event)) {
         (this.$refs.inspector as unknown as InspectorRef).focus();
       }

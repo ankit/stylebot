@@ -1,5 +1,5 @@
 <template>
-  <s-card class="property-card" @keydown.native.esc="onFieldEscape">
+  <s-card class="property-card" @keydown.native.esc="onEscape">
     <button
       ref="header"
       type="button"
@@ -84,7 +84,7 @@ export default Vue.extend({
   },
 
   methods: {
-    onFieldEscape(event: KeyboardEvent): void {
+    onEscape(event: KeyboardEvent): void {
       const { header } = this.$refs;
 
       if (consumeFieldEscape(event) && header instanceof HTMLElement) {
