@@ -1,4 +1,4 @@
-import { consumeFieldEscape, isTypingTarget } from '../focus';
+import { consumeFieldEscape, isFieldTarget } from '../focus';
 
 const escapeFrom = (target: HTMLElement): KeyboardEvent => {
   const event = new KeyboardEvent('keydown', {
@@ -10,21 +10,21 @@ const escapeFrom = (target: HTMLElement): KeyboardEvent => {
   return event;
 };
 
-describe('isTypingTarget', () => {
+describe('isFieldTarget', () => {
   it('counts text entry elements as fields', () => {
     const editable = document.createElement('div');
     editable.contentEditable = 'true';
     Object.defineProperty(editable, 'isContentEditable', { value: true });
 
-    expect(isTypingTarget(document.createElement('input'))).toBe(true);
-    expect(isTypingTarget(document.createElement('textarea'))).toBe(true);
-    expect(isTypingTarget(document.createElement('select'))).toBe(true);
-    expect(isTypingTarget(editable)).toBe(true);
+    expect(isFieldTarget(document.createElement('input'))).toBe(true);
+    expect(isFieldTarget(document.createElement('textarea'))).toBe(true);
+    expect(isFieldTarget(document.createElement('select'))).toBe(true);
+    expect(isFieldTarget(editable)).toBe(true);
   });
 
   it('does not count buttons or non-elements', () => {
-    expect(isTypingTarget(document.createElement('button'))).toBe(false);
-    expect(isTypingTarget(null)).toBe(false);
+    expect(isFieldTarget(document.createElement('button'))).toBe(false);
+    expect(isFieldTarget(null)).toBe(false);
   });
 });
 

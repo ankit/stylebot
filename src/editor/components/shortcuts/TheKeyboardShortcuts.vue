@@ -12,7 +12,7 @@ import {
   StylebotEditorCommands,
 } from '@stylebot/types';
 
-import { isTypingTarget } from '@stylebot/utils';
+import { isFieldTarget } from '@stylebot/utils';
 
 export default Vue.extend({
   name: 'TheKeyboardShortcuts',
@@ -152,7 +152,7 @@ export default Vue.extend({
 
       // Escape in a field is left to the section around it, which moves
       // focus out of the field.
-      if (isTypingTarget(target)) {
+      if (isFieldTarget(target)) {
         return;
       }
 
