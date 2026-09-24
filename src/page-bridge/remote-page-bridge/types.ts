@@ -12,16 +12,32 @@ export type RemotePageBridgeSyncedState = {
   forceImportant: boolean;
 };
 
-export type RemotePageBridgeRequestMethod = 'getSnapshot' | 'getPageColors';
+export type RemotePageBridgeRequestArgs = {
+  getSnapshot: [];
+  getPageColors: [];
+  getComputedStyles: [selector: string, properties: Array<string>];
+};
+
+export type RemotePageBridgeRequestMethod = keyof RemotePageBridgeRequestArgs;
 
 export type RemotePageBridgeRequestResult = {
   getSnapshot: PageSnapshot;
   getPageColors: RoleColorGroups;
+  getComputedStyles: Record<string, string>;
 };
+
+export type RemotePageBridgeRequest = {
+  [M in RemotePageBridgeRequestMethod]: {
+    type: 'request';
+    id: number;
+    method: M;
+    args: RemotePageBridgeRequestArgs[M];
+  };
+}[RemotePageBridgeRequestMethod];
 
 // What the window sends the page.
 export type RemotePageBridgeMessageToPage =
-  | { type: 'request'; id: number; method: RemotePageBridgeRequestMethod }
+  | RemotePageBridgeRequest
   | { type: 'applyCss'; css: string; forceImportant: boolean }
   | {
       type: 'previewCss';

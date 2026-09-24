@@ -127,6 +127,13 @@ export default Vue.extend({
     moreCount(): number {
       return this.countDeclarations(prop => !KNOWN_PROPERTIES.includes(prop));
     },
+
+    // Anything that can change what the page computes for the selector.
+    computedStylesInputs(): Array<unknown> {
+      const { activeSelector, css, enabled, forceImportant, pageConnected } =
+        this.$store.state;
+      return [activeSelector, css, enabled, forceImportant, pageConnected];
+    },
   },
 
   watch: {
@@ -137,6 +144,13 @@ export default Vue.extend({
       immediate: true,
       handler(): void {
         this.autoExpandSections();
+      },
+    },
+
+    computedStylesInputs: {
+      immediate: true,
+      handler(): void {
+        this.$store.dispatch('refreshComputedStyles');
       },
     },
   },

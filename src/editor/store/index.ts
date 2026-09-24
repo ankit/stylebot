@@ -64,6 +64,8 @@ export type State = {
   forceImportant: boolean;
 
   activeSelector: string;
+  // Computed values on the active selector's first match, for placeholders.
+  computedStyles: Record<string, string>;
   contextMenuSelector: string;
   selectors: Array<CssSelectorMetadata>;
 
@@ -97,6 +99,7 @@ export const createStore = (host: EditorHost): Store<State> =>
 
       selectors: [],
       activeSelector: '',
+      computedStyles: {},
       contextMenuSelector: '',
 
       help: false,

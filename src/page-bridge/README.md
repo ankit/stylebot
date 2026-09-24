@@ -16,4 +16,5 @@ store, which persists it to the background.
   that cross it in both directions
 - **`PageBridgeEmitter`**: the small typed emitter both implementations share
 - **`page-colors`**: samples the colors in use on the page for the color picker
+- **`computed-styles`**: reads a selector's computed values for the basic editor's placeholders
 - **`index`**: `setPageBridge` / `getPageBridge`, the registry each host fills at boot
