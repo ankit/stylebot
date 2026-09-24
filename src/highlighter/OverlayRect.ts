@@ -67,6 +67,7 @@ export default class OverlayRect {
     this.border = doc.createElement('div');
     this.padding = doc.createElement('div');
     this.content = doc.createElement('div');
+    this.node.className = 'stylebot-overlay-rect';
 
     this.border.style.borderColor = overlayStyles.border;
     this.padding.style.borderColor = overlayStyles.padding;
