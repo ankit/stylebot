@@ -23,3 +23,4 @@ export { default as SCountBadge } from './SCountBadge.vue';
 export { default as SSlider } from './SSlider.vue';
 export { default as SChip } from './SChip.vue';
 export { default as STooltip } from './STooltip.vue';
+export { isMac } from './utils/format-shortcut';

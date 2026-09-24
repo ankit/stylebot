@@ -179,6 +179,14 @@ export default {
       return;
     }
 
+    // A separate window closes with Cmd/Ctrl+W like any other, so Escape only backs out.
+    if (state.host === 'window') {
+      if (state.inspecting) {
+        commit('setInspecting', false);
+      }
+      return;
+    }
+
     dispatch('closeStylebot');
   },
 

@@ -1,4 +1,4 @@
-const isMac = (): boolean =>
+export const isMac = (): boolean =>
   /mac/i.test(navigator.platform || navigator.userAgent);
 
 // Arrow glyphs read the same everywhere — unlike the modifier keys below,

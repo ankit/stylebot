@@ -99,7 +99,7 @@ export const DockBackFromWindow: StoryObj = {
 
 export const CloseFromWindow: StoryObj = {
   ...editorWindow(WITH_RULE),
-  name: 'the close button and Escape close the window for its tab',
+  name: 'the close button closes the window for its tab',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const sendMessage = sentMessages();
@@ -109,13 +109,24 @@ export const CloseFromWindow: StoryObj = {
       name: 'CloseEditorWindow',
       tabId: 7,
     });
+  },
+};
 
-    sendMessage.mockClear();
+export const EscapeBacksOutInWindow: StoryObj = {
+  ...editorWindow(WITH_RULE),
+  name: 'Escape stops inspecting but leaves the window open',
+  play: async ({ canvasElement }) => {
+    const store = storeOf(canvasElement);
+    const sendMessage = sentMessages();
+
+    store.commit('setInspecting', true);
     await pressKey('Escape');
-    await expect(sendMessage).toHaveBeenCalledWith({
-      name: 'CloseEditorWindow',
-      tabId: 7,
-    });
+    await expect(store.state.inspecting).toBe(false);
+
+    await pressKey('Escape');
+    await expect(sendMessage).not.toHaveBeenCalledWith(
+      expect.objectContaining({ name: 'CloseEditorWindow' })
+    );
   },
 };
 
