@@ -15,10 +15,10 @@ export const isTypingTarget = (target: EventTarget | null): boolean =>
     ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName));
 
 /**
- * Claims an Escape pressed in a field for the innermost section handling it,
+ * Consumes an Escape pressed in a field for the innermost section handling it,
  * so the sections around it leave it alone.
  */
-export const claimEscapeFromField = (event: KeyboardEvent): boolean => {
+export const consumeFieldEscape = (event: KeyboardEvent): boolean => {
   if (event.defaultPrevented || !isTypingTarget(event.target)) {
     return false;
   }

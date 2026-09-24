@@ -1,4 +1,4 @@
-import { claimEscapeFromField, isTypingTarget } from '../focus';
+import { consumeFieldEscape, isTypingTarget } from '../focus';
 
 const escapeFrom = (target: HTMLElement): KeyboardEvent => {
   const event = new KeyboardEvent('keydown', {
@@ -28,19 +28,19 @@ describe('isTypingTarget', () => {
   });
 });
 
-describe('claimEscapeFromField', () => {
-  it('claims an Escape from a field once, for the innermost section', () => {
+describe('consumeFieldEscape', () => {
+  it('consumes an Escape from a field once, for the innermost section', () => {
     const event = escapeFrom(document.createElement('input'));
 
-    expect(claimEscapeFromField(event)).toBe(true);
+    expect(consumeFieldEscape(event)).toBe(true);
     expect(event.defaultPrevented).toBe(true);
-    expect(claimEscapeFromField(event)).toBe(false);
+    expect(consumeFieldEscape(event)).toBe(false);
   });
 
   it('leaves an Escape from a button alone', () => {
     const event = escapeFrom(document.createElement('button'));
 
-    expect(claimEscapeFromField(event)).toBe(false);
+    expect(consumeFieldEscape(event)).toBe(false);
     expect(event.defaultPrevented).toBe(false);
   });
 });

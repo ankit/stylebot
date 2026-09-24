@@ -22,7 +22,7 @@ import TheInspector from './header/TheInspector.vue';
 import TheWindowActions from './header/TheWindowActions.vue';
 import TheCssSelectorDropdown from './header/TheCssSelectorDropdown.vue';
 import TheEditorModeActions from './header/TheEditorModeActions.vue';
-import { claimEscapeFromField } from '@stylebot/utils';
+import { consumeFieldEscape } from '@stylebot/utils';
 
 type InspectorRef = { focus(): void };
 type ModeActionsRef = { focusModeTab(): void };
@@ -50,7 +50,7 @@ export default Vue.extend({
     },
 
     onFieldEscape(event: KeyboardEvent): void {
-      if (claimEscapeFromField(event)) {
+      if (consumeFieldEscape(event)) {
         (this.$refs.inspector as unknown as InspectorRef).focus();
       }
     },

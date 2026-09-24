@@ -11,7 +11,7 @@ export { debounce } from './debounce';
 export { resolveAppearance, getSystemPreference } from './resolve-appearance';
 
 export { formatSyncTime } from './format-sync-time';
-export { KEYBOARD_FOCUS, isTypingTarget, claimEscapeFromField } from './focus';
+export { KEYBOARD_FOCUS, isTypingTarget, consumeFieldEscape } from './focus';
 
 export const getCurrentTimestamp = (): Timestamp =>
   format(new Date(), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");

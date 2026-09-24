@@ -38,7 +38,7 @@ import Vue from 'vue';
 import { ChevronDownIcon } from '@stylebot/icons';
 import { SCard, SCountBadge } from '@stylebot/components';
 
-import { claimEscapeFromField, KEYBOARD_FOCUS } from '@stylebot/utils';
+import { consumeFieldEscape, KEYBOARD_FOCUS } from '@stylebot/utils';
 
 export default Vue.extend({
   name: 'PropertyCard',
@@ -87,7 +87,7 @@ export default Vue.extend({
     onFieldEscape(event: KeyboardEvent): void {
       const { header } = this.$refs;
 
-      if (claimEscapeFromField(event) && header instanceof HTMLElement) {
+      if (consumeFieldEscape(event) && header instanceof HTMLElement) {
         header.focus(KEYBOARD_FOCUS);
       }
     },
