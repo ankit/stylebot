@@ -10,6 +10,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+import OverlayHint from './OverlayHint';
 import OverlayRect from './OverlayRect';
 import OverlayTip from './OverlayTip';
 import {
@@ -72,6 +73,7 @@ export default class Overlay {
   mountRoot?: HTMLElement;
   tip: OverlayTip;
   rects: Array<OverlayRect>;
+  hints: Array<OverlayHint>;
 
   /**
    * The tip is Vue-rendered into mountRoot so it inherits the editor's theme;
@@ -88,6 +90,7 @@ export default class Overlay {
     this.mountRoot = mountRoot;
     this.tip = new OverlayTip(mountRoot ?? this.container);
     this.rects = [];
+    this.hints = [];
   }
 
   remove(): void {
@@ -97,6 +100,8 @@ export default class Overlay {
     });
 
     this.rects.length = 0;
+    this.hints.forEach(hint => hint.remove());
+    this.hints.length = 0;
     if (this.container.parentNode) {
       this.container.parentNode.removeChild(this.container);
     }
@@ -115,9 +120,20 @@ export default class Overlay {
       node => node.nodeType === Node.ELEMENT_NODE
     ) as Array<HTMLElement>;
 
-    // While picking, only the hovered element is highlighted; other
-    // matches are reported via the tooltip's match count instead.
-    const elements = primary ? [primary] : candidates.slice(0, MAX_ELEMENTS);
+    // Only a hovered element gets the full box; every other match, and every
+    // match of a selector previewed from the panel, gets a faint tint.
+    const hinting = !property && (primary !== undefined || anchorToPanel);
+    let elements: Array<HTMLElement> = [];
+    if (primary) {
+      elements = [primary];
+    } else if (!hinting) {
+      elements = candidates.slice(0, MAX_ELEMENTS);
+    }
+    this.drawHints(
+      hinting
+        ? candidates.filter(node => node !== primary).slice(0, MAX_ELEMENTS)
+        : []
+    );
 
     // Beside the panel the card stands on its own, e.g. for a selector
     // that matches nothing right now (:hover) or is deliberately unboxed.
@@ -135,8 +151,6 @@ export default class Overlay {
     this.tip.showSummary({
       name: cssSelector,
       showSelector: !anchorToPanel,
-      // Shown for any picking/preview payload, not just active picking.
-      matchCount: picking ? candidates.length : undefined,
       nextAncestor: picking?.nextAncestor,
       styleCount: picking?.styleCount,
       declarations: picking?.declarations,
@@ -172,6 +186,32 @@ export default class Overlay {
       },
       panelRect && { left: panelRect.left, right: panelRect.right }
     );
+  }
+
+  /**
+   * Tints each element that's in the viewport, reusing existing hints;
+   * off-screen matches aren't drawn at all.
+   */
+  drawHints(elements: Array<HTMLElement>): void {
+    const boxes = elements
+      .map(element => getNestedBoundingClientRect(element, window))
+      .filter(
+        box =>
+          box.top + box.height > 0 &&
+          box.top < window.innerHeight &&
+          box.left + box.width > 0 &&
+          box.left < window.innerWidth
+      );
+
+    while (this.hints.length > boxes.length) {
+      this.hints.pop()?.remove();
+    }
+
+    while (this.hints.length < boxes.length) {
+      this.hints.push(new OverlayHint(window.document, this.container));
+    }
+
+    boxes.forEach((box, index) => this.hints[index].update(box));
   }
 
   /**

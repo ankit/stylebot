@@ -32,10 +32,6 @@
       </div>
     </div>
 
-    <div v-if="showMatchCount" class="matches-row">
-      Matches {{ matchCountLabel }}
-    </div>
-
     <template v-if="nextAncestor">
       <div class="divider" />
       <div class="row next-row">
@@ -87,7 +83,6 @@ export default Vue.extend({
     // Off for selector previews beside the panel, where the selector is
     // already visible in the dropdown row or input being previewed.
     showSelector: boolean;
-    matchCount: number | undefined;
     styleCount: number;
     declarations: Array<CssDeclaration> | null;
     nextAncestor: NextAncestorInfo | null;
@@ -98,7 +93,6 @@ export default Vue.extend({
     return {
       name: '',
       showSelector: true,
-      matchCount: undefined,
       styleCount: 0,
       declarations: null,
       nextAncestor: null,
@@ -111,10 +105,7 @@ export default Vue.extend({
   computed: {
     hasContent(): boolean {
       return (
-        this.showSelector ||
-        this.styleCount > 0 ||
-        this.showMatchCount ||
-        this.nextAncestor !== null
+        this.showSelector || this.styleCount > 0 || this.nextAncestor !== null
       );
     },
 
@@ -136,14 +127,6 @@ export default Vue.extend({
       return this.nextAncestor
         ? pluralize(this.nextAncestor.styleCount, 'style')
         : '';
-    },
-
-    showMatchCount(): boolean {
-      return this.matchCount !== undefined && this.matchCount > 1;
-    },
-
-    matchCountLabel(): string {
-      return pluralize(this.matchCount ?? 0, 'element');
     },
 
     // Raw CSS property names, not prettified ones — this card is meant to
@@ -288,15 +271,6 @@ export default Vue.extend({
 .detail-more {
   grid-column: 1 / -1;
   color: var(--text-secondary);
-}
-
-.matches-row {
-  margin-top: 10px;
-  color: var(--text-secondary);
-
-  &:first-child {
-    margin-top: 0;
-  }
 }
 
 .divider {

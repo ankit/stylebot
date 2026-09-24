@@ -12,7 +12,6 @@ import { CssDeclaration } from '@stylebot/types';
 type InspectorCardInstance = Vue & {
   name: string;
   showSelector: boolean;
-  matchCount: number | undefined;
   styleCount: number;
   declarations: Array<CssDeclaration> | null;
   nextAncestor: NextAncestorInfo | null;
@@ -24,7 +23,6 @@ type InspectorCardInstance = Vue & {
 export type TipSummary = {
   name: string;
   showSelector: boolean;
-  matchCount: number | undefined;
   nextAncestor: NextAncestorInfo | null | undefined;
   styleCount: number | undefined;
   declarations: Array<CssDeclaration> | null | undefined;
@@ -52,7 +50,6 @@ export default class OverlayTip {
   showSummary(summary: TipSummary): void {
     this.vm.name = summary.name;
     this.vm.showSelector = summary.showSelector;
-    this.vm.matchCount = summary.matchCount;
     this.vm.nextAncestor = summary.nextAncestor ?? null;
     this.vm.styleCount = summary.styleCount ?? 0;
     this.vm.declarations = summary.declarations ?? null;

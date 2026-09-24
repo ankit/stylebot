@@ -85,6 +85,38 @@ export const PickSetsSelector: StoryObj = {
   },
 };
 
+export const HintsOtherMatches: StoryObj = {
+  ...editor({ inspecting: true }),
+  name: "hovering an element tints the selector's other matches on the page",
+  play: async ({ canvasElement }) => {
+    const [first, second] = Array.from(
+      canvasElement.querySelectorAll<HTMLElement>('.article-body')
+    );
+
+    await hoverPage(first);
+    await waitFor(() => expect(currentChip()).toMatch(/article-body$/));
+
+    const rects = document.querySelectorAll(
+      '#stylebot-overlay .stylebot-overlay-rect'
+    );
+    const hints = document.querySelectorAll<HTMLElement>(
+      '#stylebot-overlay .stylebot-overlay-hint'
+    );
+    await expect(rects).toHaveLength(1);
+    await expect(hints).toHaveLength(1);
+    await expect(hints[0].style.top).toBe(
+      `${second.getBoundingClientRect().top}px`
+    );
+
+    await hoverPage(canvasElement.querySelector('h1') as HTMLElement);
+    await waitFor(() =>
+      expect(
+        document.querySelectorAll('#stylebot-overlay .stylebot-overlay-hint')
+      ).toHaveLength(0)
+    );
+  },
+};
+
 export const ArrowKeysClimbAncestors: StoryObj = {
   ...editor({ inspecting: true }, { page: INSPECT_PAGE }),
   name: 'arrow keys climb and descend ancestors while picking an element',
@@ -158,7 +190,7 @@ export const ClickOnIframeSelectsIt: StoryObj = {
     // The overlay rect shields the frame so the click stays in this
     // document instead of reaching the ad inside.
     const rect = document.querySelector(
-      '#stylebot-overlay > div'
+      '#stylebot-overlay .stylebot-overlay-rect'
     ) as HTMLElement;
     await expect(rect.style.pointerEvents).toBe('auto');
 
