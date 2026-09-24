@@ -10,6 +10,8 @@ import { STabs } from '@stylebot/components';
 
 import { KEYBOARD_FOCUS } from '../../utils/field-escape';
 
+type TabsRef = { focusSelected(options: FocusOptions): void };
+
 export default Vue.extend({
   name: 'TheEditorModeActions',
 
@@ -61,11 +63,7 @@ export default Vue.extend({
 
   methods: {
     focusSelected(): void {
-      (
-        this.$refs.tabs as unknown as {
-          focusSelected(options: FocusOptions): void;
-        }
-      ).focusSelected(KEYBOARD_FOCUS);
+      (this.$refs.tabs as unknown as TabsRef).focusSelected(KEYBOARD_FOCUS);
     },
 
     setMode(mode: string): void {

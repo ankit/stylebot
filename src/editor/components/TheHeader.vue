@@ -24,6 +24,9 @@ import TheCssSelectorDropdown from './header/TheCssSelectorDropdown.vue';
 import TheEditorModeActions from './header/TheEditorModeActions.vue';
 import { claimFieldEscape } from '../utils/field-escape';
 
+type InspectorRef = { focus(): void };
+type ModeActionsRef = { focusSelected(): void };
+
 export default Vue.extend({
   name: 'TheHeader',
 
@@ -48,14 +51,12 @@ export default Vue.extend({
 
     onSelectorEscape(event: KeyboardEvent): void {
       if (claimFieldEscape(event)) {
-        (this.$refs.inspector as unknown as { focus(): void }).focus();
+        (this.$refs.inspector as unknown as InspectorRef).focus();
       }
     },
 
     focusModeTab(): void {
-      (
-        this.$refs.modeActions as unknown as { focusSelected(): void }
-      ).focusSelected();
+      (this.$refs.modeActions as unknown as ModeActionsRef).focusSelected();
     },
   },
 });

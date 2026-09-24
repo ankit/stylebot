@@ -95,7 +95,11 @@ export default Vue.extend({
 
   methods: {
     focus(): void {
-      (this.$refs.button as HTMLElement).focus(KEYBOARD_FOCUS);
+      const { button } = this.$refs;
+
+      if (button instanceof HTMLElement) {
+        button.focus(KEYBOARD_FOCUS);
+      }
     },
 
     toggle(): void {

@@ -109,10 +109,13 @@ export default Vue.extend({
 
   methods: {
     focusSelected(options?: FocusOptions): void {
-      const buttons = this.$refs.tabButtons as Array<HTMLElement> | undefined;
+      const { tabButtons } = this.$refs;
       const index = this.tabs.findIndex(tab => tab.value === this.value);
+      const button = Array.isArray(tabButtons) ? tabButtons[index] : undefined;
 
-      buttons?.[index]?.focus(options);
+      if (button instanceof HTMLElement) {
+        button.focus(options);
+      }
     },
 
     measure(): void {

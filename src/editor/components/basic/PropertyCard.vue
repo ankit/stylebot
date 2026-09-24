@@ -85,8 +85,10 @@ export default Vue.extend({
 
   methods: {
     onEscape(event: KeyboardEvent): void {
-      if (claimFieldEscape(event)) {
-        (this.$refs.header as HTMLElement).focus(KEYBOARD_FOCUS);
+      const { header } = this.$refs;
+
+      if (claimFieldEscape(event) && header instanceof HTMLElement) {
+        header.focus(KEYBOARD_FOCUS);
       }
     },
 

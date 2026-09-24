@@ -44,6 +44,8 @@ import TheKeyboardShortcutsView from './shortcuts/TheKeyboardShortcutsView.vue';
 
 import { StylebotEditingMode } from '@stylebot/types';
 
+type HeaderRef = { focusModeTab(): void };
+
 export default Vue.extend({
   name: 'TheStylebot',
 
@@ -103,7 +105,7 @@ export default Vue.extend({
 
   methods: {
     focusModeTab(): void {
-      (this.$refs.header as unknown as { focusModeTab(): void }).focusModeTab();
+      (this.$refs.header as unknown as HeaderRef).focusModeTab();
     },
   },
 });
