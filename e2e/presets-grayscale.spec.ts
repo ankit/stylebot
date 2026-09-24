@@ -53,7 +53,7 @@ test('taking grayscale back to 0 keeps the rest of the rule in the saved style',
 
   // page-scoped, not editorRoot-scoped: see e2e/color-picker.spec.ts.
   const grayscaleCard = page.locator('.feature-card').filter({
-    has: page.locator('h3', { hasText: /^Grayscale$/ }),
+    has: page.locator('h3', { hasText: /^\s*Grayscale\s*$/ }),
   });
   const toggle = grayscaleCard.locator('.switch input[type="checkbox"]');
 
@@ -92,7 +92,7 @@ test('grayscale applies on a page whose body child has no class or id', async ({
   await switchEditorMode(editorRoot, 'presets');
 
   const grayscaleCard = page.locator('.feature-card').filter({
-    has: page.locator('h3', { hasText: /^Grayscale$/ }),
+    has: page.locator('h3', { hasText: /^\s*Grayscale\s*$/ }),
   });
   const toggle = grayscaleCard.locator('.switch input[type="checkbox"]');
 
