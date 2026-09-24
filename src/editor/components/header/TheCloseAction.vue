@@ -1,5 +1,5 @@
 <template>
-  <s-tooltip :text="t('close')" shortcut="esc">
+  <s-tooltip :text="t('close')" :shortcut="shortcut">
     <icon-button :size="20" :aria-label="t('close')" @click="onClick">
       <icon-x :size="14" />
     </icon-button>
@@ -8,7 +8,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { IconButton, STooltip } from '@stylebot/components';
+import { IconButton, isMac, STooltip } from '@stylebot/components';
 import { IconX } from '@stylebot/icons';
 
 export default Vue.extend({
@@ -18,6 +18,16 @@ export default Vue.extend({
     IconButton,
     STooltip,
     IconX,
+  },
+
+  computed: {
+    shortcut(): string {
+      if (this.$store.state.host === 'window') {
+        return isMac() ? 'meta+w' : 'ctrl+w';
+      }
+
+      return 'esc';
+    },
   },
 
   methods: {

@@ -361,6 +361,28 @@ describe('actions', () => {
       expect(mockDispatch).toBeCalledWith('closeStylebot');
       expect(mockCommit).not.toBeCalled();
     });
+
+    it('stops inspecting instead of closing the separate window', () => {
+      actions.escape({
+        state: { ...mockState, host: 'window', inspecting: true },
+        commit: mockCommit,
+        dispatch: mockDispatch,
+      });
+
+      expect(mockCommit).toBeCalledWith('setInspecting', false);
+      expect(mockDispatch).not.toBeCalled();
+    });
+
+    it('leaves the separate window open when there is nothing to back out of', () => {
+      actions.escape({
+        state: { ...mockState, host: 'window', inspecting: false },
+        commit: mockCommit,
+        dispatch: mockDispatch,
+      });
+
+      expect(mockCommit).not.toBeCalled();
+      expect(mockDispatch).not.toBeCalled();
+    });
   });
 
   describe('rememberFont', () => {
