@@ -1,13 +1,13 @@
 <template>
   <the-stylebot-resizer>
-    <div class="stylebot-content" data-focus-landing tabindex="-1">
+    <div class="stylebot-content">
       <the-window-tab-bar v-if="host === 'window'" />
       <the-window-status v-if="host === 'window' && !pageConnected" />
 
       <the-keyboard-shortcuts-view v-if="help" />
 
       <template v-else>
-        <the-header />
+        <the-header ref="header" />
 
         <div
           class="stylebot-body"
@@ -22,6 +22,7 @@
           <the-code-editor
             v-if="codeEditorMounted"
             v-show="mode === 'code' && !resizing"
+            @leave="focusModeTab"
           />
         </div>
       </template>
@@ -99,6 +100,12 @@ export default Vue.extend({
       },
     },
   },
+
+  methods: {
+    focusModeTab(): void {
+      (this.$refs.header as unknown as { focusModeTab(): void }).focusModeTab();
+    },
+  },
 });
 </script>
 
@@ -117,9 +124,6 @@ export default Vue.extend({
   height: 100%;
   overflow: hidden;
   border-radius: inherit;
-  outline: none;
-
-  @include focus-ring;
 }
 
 .stylebot-body {

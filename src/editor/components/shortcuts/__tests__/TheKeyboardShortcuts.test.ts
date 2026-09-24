@@ -61,97 +61,32 @@ describe('TheKeyboardShortcuts.vue', () => {
   });
 
   describe('with focus in a field', () => {
-    let section: HTMLElement;
     let field: HTMLInputElement;
 
     beforeEach(() => {
-      section = document.createElement('div');
-      section.setAttribute('data-focus-landing', '');
-      section.tabIndex = -1;
       field = document.createElement('input');
-      section.appendChild(field);
-      document.body.appendChild(section);
+      document.body.appendChild(field);
       field.focus();
     });
 
     afterEach(() => {
-      section.remove();
+      field.remove();
     });
 
     const press = (key: string) =>
       field.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }));
 
-    it('leaves single-key shortcuts to the field', () => {
+    it('leaves single-key shortcuts and Escape to the field', () => {
       const store = buildMockStore(true);
       wrapper = shallowMount(TheKeyboardShortcuts, {
         mocks: { $store: store },
       });
 
       press('c');
+      press('Escape');
 
       expect(store.dispatch).not.toHaveBeenCalled();
-    });
-
-    it('moves focus to the surrounding section on Escape instead of closing', () => {
-      const store = buildMockStore(true);
-      wrapper = shallowMount(TheKeyboardShortcuts, {
-        mocks: { $store: store },
-      });
-
-      press('Escape');
-
-      expect(document.activeElement).toBe(section);
-      expect(store.dispatch).not.toHaveBeenCalled();
-    });
-
-    it('moves focus to the control heading the field on Escape', () => {
-      const store = buildMockStore(true);
-      wrapper = shallowMount(TheKeyboardShortcuts, {
-        mocks: { $store: store },
-      });
-      const card = document.createElement('div');
-      const header = document.createElement('button');
-      header.setAttribute('data-focus-landing', '');
-      card.append(header, field);
-      section.appendChild(card);
-      field.focus();
-
-      press('Escape');
-
-      expect(document.activeElement).toBe(header);
-    });
-
-    it('skips a landing that comes after the field', () => {
-      const store = buildMockStore(true);
-      wrapper = shallowMount(TheKeyboardShortcuts, {
-        mocks: { $store: store },
-      });
-      const row = document.createElement('div');
-      const later = document.createElement('button');
-      later.setAttribute('data-focus-landing', '');
-      row.append(field, later);
-      section.appendChild(row);
-      field.focus();
-
-      press('Escape');
-
-      expect(document.activeElement).toBe(section);
-    });
-
-    it('leaves a field outside the editor alone on Escape', () => {
-      const store = buildMockStore(true);
-      wrapper = shallowMount(TheKeyboardShortcuts, {
-        mocks: { $store: store },
-      });
-      section.remove();
-      document.body.appendChild(field);
-      field.focus();
-
-      press('Escape');
-
       expect(document.activeElement).toBe(field);
-      expect(store.dispatch).not.toHaveBeenCalled();
-      field.remove();
     });
   });
 });

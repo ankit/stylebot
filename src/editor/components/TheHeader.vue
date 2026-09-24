@@ -5,12 +5,12 @@
       <the-window-actions />
     </div>
 
-    <div class="selector-row">
-      <the-inspector @select="inspect($event)" />
+    <div class="selector-row" @keydown.esc="onSelectorEscape">
+      <the-inspector ref="inspector" @select="inspect($event)" />
       <the-css-selector-dropdown />
     </div>
 
-    <the-editor-mode-actions />
+    <the-editor-mode-actions ref="modeActions" />
   </div>
 </template>
 
@@ -22,6 +22,7 @@ import TheInspector from './header/TheInspector.vue';
 import TheWindowActions from './header/TheWindowActions.vue';
 import TheCssSelectorDropdown from './header/TheCssSelectorDropdown.vue';
 import TheEditorModeActions from './header/TheEditorModeActions.vue';
+import { claimFieldEscape } from '../utils/field-escape';
 
 export default Vue.extend({
   name: 'TheHeader',
@@ -43,6 +44,18 @@ export default Vue.extend({
   methods: {
     inspect(selector: string): void {
       this.$store.commit('setActiveSelector', selector);
+    },
+
+    onSelectorEscape(event: KeyboardEvent): void {
+      if (claimFieldEscape(event)) {
+        (this.$refs.inspector as unknown as { focus(): void }).focus();
+      }
+    },
+
+    focusModeTab(): void {
+      (
+        this.$refs.modeActions as unknown as { focusSelected(): void }
+      ).focusSelected();
     },
   },
 });

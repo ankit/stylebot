@@ -167,23 +167,9 @@ export default Vue.extend({
 
         case 'stylebotEscapePressed':
           this.applyTypedCss.flush();
-          this.focusModeTab();
+          this.$emit('leave');
           break;
       }
-    },
-
-    /**
-     * Hands focus from Monaco to the selected Code tab, the control that
-     * names this panel, so the next Escape closes the editor.
-     */
-    focusModeTab(): void {
-      const tab = this.$el
-        .closest('.stylebot-content')
-        ?.querySelector<HTMLElement>('.mode-actions [aria-selected="true"]');
-
-      // The keypress happened in the iframe, so the browser won't infer
-      // keyboard focus here on its own.
-      tab?.focus({ preventScroll: true, focusVisible: true });
     },
 
     handleIframeLoaded(): void {

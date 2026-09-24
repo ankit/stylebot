@@ -12,13 +12,7 @@ import {
   StylebotEditorCommands,
 } from '@stylebot/types';
 
-/**
- * Whether keys pressed in the element are text entry, which single-key
- * shortcuts must leave alone.
- */
-const isField = (element: HTMLElement): boolean =>
-  element.isContentEditable ||
-  ['input', 'textarea', 'select'].includes(element.tagName.toLowerCase());
+import { isField } from '../../utils/field-escape';
 
 export default Vue.extend({
   name: 'TheKeyboardShortcuts',
@@ -149,42 +143,16 @@ export default Vue.extend({
       this.$store.dispatch('escape');
     },
 
-    /**
-     * Moves focus from a field to the nearest landing: an enclosing section,
-     * or the control just before it in one (like a card's header), so
-     * shortcuts work again and the next Escape closes the editor.
-     */
-    leaveField(field: HTMLElement): void {
-      for (let el = field.parentElement; el; el = el.parentElement) {
-        const landing = el.matches('[data-focus-landing]')
-          ? el
-          : Array.from(el.querySelectorAll<HTMLElement>('[data-focus-landing]'))
-              .filter(
-                candidate =>
-                  candidate.compareDocumentPosition(field) &
-                  Node.DOCUMENT_POSITION_FOLLOWING
-              )
-              .pop();
-
-        if (landing) {
-          landing.focus({ preventScroll: true, focusVisible: true });
-          return;
-        }
-      }
-    },
-
     handleStylebotShortcut(event: KeyboardEvent): void {
-      const target = event.composedPath()[0] as HTMLElement;
+      const target = event.composedPath()[0];
 
       if (event.metaKey || event.altKey || event.ctrlKey) {
         return;
       }
 
+      // Escape in a field is left to the section around it, which moves
+      // focus out of the field.
       if (isField(target)) {
-        if (event.key === 'Escape') {
-          this.leaveField(target);
-        }
-
         return;
       }
 
