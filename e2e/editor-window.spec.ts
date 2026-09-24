@@ -121,6 +121,12 @@ test('inspecting from the window picks an element on the page', async ({
     'p.intro'
   );
   await expect(inspector).not.toHaveClass(/active/);
+
+  // Placeholders are read from the page over the port.
+  const size = popout
+    .locator('.property-row', { hasText: 'Size' })
+    .locator('.number-input');
+  await expect(size).toHaveAttribute('placeholder', '16');
 });
 
 test('once undocked, the popup opens and closes the window', async ({

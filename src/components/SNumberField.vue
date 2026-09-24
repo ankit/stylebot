@@ -5,7 +5,7 @@
       class="number-input"
       :value="value"
       :disabled="disabled"
-      placeholder="—"
+      :placeholder="placeholder || '—'"
       inputmode="decimal"
       @focus="onFocus"
       @keydown="onKeydown"
@@ -82,6 +82,13 @@ export default Vue.extend({
       default: () => [],
     },
 
+    // Shown while empty (e.g. the page's current value), and where arrow
+    // keys step from.
+    placeholder: {
+      type: String,
+      default: '',
+    },
+
     disabled: {
       type: Boolean,
       default: false,
@@ -103,7 +110,10 @@ export default Vue.extend({
     },
 
     step(delta: number): void {
-      const next = this.value ? parseInt(this.value, 10) + delta : delta;
+      const base = this.value
+        ? parseInt(this.value, 10)
+        : Math.round(parseFloat(this.placeholder));
+      const next = Number.isNaN(base) ? delta : base + delta;
       this.$emit('input', `${next}`);
     },
 

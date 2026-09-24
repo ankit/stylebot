@@ -167,7 +167,7 @@ export default Vue.extend({
 
         case 'stylebotEscapePressed':
           this.applyTypedCss.flush();
-          this.$store.dispatch('escape');
+          this.$emit('leave');
           break;
       }
     },

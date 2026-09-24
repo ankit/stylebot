@@ -1,7 +1,9 @@
 <template>
   <s-card class="feature-card">
     <div class="feature-card-header">
-      <heading as="h3" size="sm">{{ label }}</heading>
+      <heading as="h3" size="sm" :class="{ muted: disabled }">
+        {{ label }}
+      </heading>
       <slot name="toggle" />
     </div>
 
@@ -28,6 +30,8 @@ export default Vue.extend({
       type: String,
       required: true,
     },
+
+    disabled: Boolean,
   },
 });
 </script>
@@ -42,6 +46,10 @@ export default Vue.extend({
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+}
+
+.feature-card-header .muted {
+  color: var(--text-muted);
 }
 
 .feature-card-body {

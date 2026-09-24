@@ -81,6 +81,51 @@ test('toggling the panel appearance updates the Monaco editor theme immediately'
   );
 });
 
+test('Tab indents in the code editor, Escape moves to the Code tab, and a second Escape closes the panel', async ({
+  context,
+  openPopup,
+}) => {
+  test.slow();
+
+  await servePage(context, PAGE_HTML);
+
+  const page = await context.newPage();
+  await page.goto(PAGE_URL);
+
+  const editorRoot = await openEditor(page, openPopup);
+  await switchEditorMode(editorRoot, 'code');
+
+  const monaco = getMonacoFrame(page);
+  const editor = monaco.locator('.monaco-editor');
+  await editor.click();
+  await page.keyboard.press('Tab');
+  await page.keyboard.type('h1 { color: rgb(0, 0, 255); }');
+
+  await expect
+    .poll(() =>
+      editor.evaluate(() => {
+        const { monaco } = window as Window & {
+          monaco: { editor: { getModels(): Array<{ getValue(): string }> } };
+        };
+
+        return monaco.editor.getModels()[0].getValue();
+      })
+    )
+    .toBe('  h1 { color: rgb(0, 0, 255); }');
+
+  await page.keyboard.press('Escape');
+
+  const codeTab = editorRoot.getByRole('tab', { name: 'Code' });
+  await expect(codeTab).toBeFocused();
+  expect(await codeTab.evaluate(el => el.matches(':focus-visible'))).toBe(true);
+  await expect(editorRoot.locator('.stylebot-content')).toBeVisible();
+
+  await page.keyboard.press('Escape');
+
+  await expect(editorRoot.locator('.stylebot-content')).toBeHidden();
+  await expect(page.locator('h1')).toHaveCSS('color', 'rgb(0, 0, 255)');
+});
+
 test('typing a CSS property offers autocomplete and a color value shows a swatch', async ({
   context,
   openPopup,

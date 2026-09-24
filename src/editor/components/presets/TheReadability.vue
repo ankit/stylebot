@@ -1,12 +1,18 @@
 <template>
-  <feature-card :label="t('readability')">
+  <feature-card :label="t('readability')" :disabled="!pageReaderable">
     <template #toggle>
       <toggle-switch
         size="lg"
         :value="value"
         :disabled="!pageReaderable"
         @change="setValue"
-      />
+      >
+        <template v-if="!pageReaderable" #trailing>
+          <s-text as="span" size="small" variant="muted" class="articles-only">
+            {{ t('articles_only') }}
+          </s-text>
+        </template>
+      </toggle-switch>
     </template>
 
     <s-text variant="muted">{{ t('readability_description') }}</s-text>
@@ -45,3 +51,9 @@ export default Vue.extend({
   },
 });
 </script>
+
+<style lang="scss" scoped>
+.articles-only {
+  flex: none;
+}
+</style>

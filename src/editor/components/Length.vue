@@ -3,6 +3,7 @@
     :value="length"
     unit="px"
     :presets="sizes"
+    :placeholder="placeholder"
     :disabled="disabled"
     @input="length = $event"
   />
@@ -13,6 +14,7 @@ import Vue, { PropType } from 'vue';
 import { Declaration } from 'postcss';
 import { SNumberField } from '@stylebot/components';
 import { extractLength } from '../utils/css-value';
+import { computedPlaceholder } from '../utils/computed-placeholder';
 
 export default Vue.extend({
   name: 'Length',
@@ -80,6 +82,13 @@ export default Vue.extend({
           value,
         });
       },
+    },
+
+    placeholder(): string {
+      return computedPlaceholder(
+        this.$store.state.computedStyles,
+        this.property
+      );
     },
 
     disabled(): boolean {

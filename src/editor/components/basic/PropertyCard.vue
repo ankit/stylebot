@@ -1,6 +1,11 @@
 <template>
-  <s-card class="property-card">
-    <button type="button" class="property-card-header" @click="$emit('toggle')">
+  <s-card class="property-card" @keydown.native.esc="onEscape">
+    <button
+      ref="header"
+      type="button"
+      class="property-card-header"
+      @click="$emit('toggle')"
+    >
       <span class="property-card-title">
         <span class="property-card-label">{{ label }}</span>
         <s-count-badge v-if="count > 0" :count="count" />
@@ -32,6 +37,8 @@
 import Vue from 'vue';
 import { ChevronDownIcon } from '@stylebot/icons';
 import { SCard, SCountBadge } from '@stylebot/components';
+
+import { consumeFieldEscape, KEYBOARD_FOCUS } from '@stylebot/utils';
 
 export default Vue.extend({
   name: 'PropertyCard',
@@ -77,6 +84,14 @@ export default Vue.extend({
   },
 
   methods: {
+    onEscape(event: KeyboardEvent): void {
+      const { header } = this.$refs;
+
+      if (consumeFieldEscape(event) && header instanceof HTMLElement) {
+        header.focus(KEYBOARD_FOCUS);
+      }
+    },
+
     onTransitionEnd(event: TransitionEvent): void {
       if (event.propertyName === 'grid-template-rows' && !this.collapsed) {
         this.settled = true;
