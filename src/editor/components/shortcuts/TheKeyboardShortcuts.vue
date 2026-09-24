@@ -159,7 +159,7 @@ export default Vue.extend({
       );
 
       if (landing) {
-        landing.focus({ preventScroll: true });
+        landing.focus({ preventScroll: true, focusVisible: true });
       } else {
         field.blur();
       }

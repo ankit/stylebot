@@ -171,7 +171,12 @@ export default Vue.extend({
 
         case 'stylebotEscapePressed':
           this.applyTypedCss.flush();
-          (this.$el as HTMLElement).focus({ preventScroll: true });
+          // The keypress happened in the iframe, so the browser won't infer
+          // keyboard focus here on its own.
+          (this.$el as HTMLElement).focus({
+            preventScroll: true,
+            focusVisible: true,
+          });
           break;
       }
     },
@@ -210,7 +215,16 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .stylebot-code-editor-iframe {
+  position: relative;
   outline: none;
-  @include focus-ring;
+
+  &:focus-visible::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border: 2px solid var(--ring);
+    pointer-events: none;
+  }
 }
 </style>

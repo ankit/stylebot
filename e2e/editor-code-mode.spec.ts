@@ -117,6 +117,9 @@ test('Tab indents in the code editor, Escape leaves it, and a second Escape clos
 
   const codeEditor = editorRoot.locator('.stylebot-code-editor-iframe');
   await expect(codeEditor).toBeFocused();
+  expect(await codeEditor.evaluate(el => el.matches(':focus-visible'))).toBe(
+    true
+  );
   await expect(editorRoot.locator('.stylebot-content')).toBeVisible();
 
   await page.keyboard.press('Escape');
