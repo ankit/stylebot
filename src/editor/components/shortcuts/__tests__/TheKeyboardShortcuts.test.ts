@@ -104,18 +104,37 @@ describe('TheKeyboardShortcuts.vue', () => {
       expect(store.dispatch).not.toHaveBeenCalled();
     });
 
-    it("prefers the control marked as the section's focus target", () => {
+    it('moves focus to the control heading the field on Escape', () => {
       const store = buildMockStore(true);
       wrapper = shallowMount(TheKeyboardShortcuts, {
         mocks: { $store: store },
       });
+      const card = document.createElement('div');
       const header = document.createElement('button');
-      header.setAttribute('data-focus-target', '');
-      section.prepend(header);
+      header.setAttribute('data-focus-landing', '');
+      card.append(header, field);
+      section.appendChild(card);
+      field.focus();
 
       press('Escape');
 
       expect(document.activeElement).toBe(header);
+    });
+
+    it('leaves a field outside the editor alone on Escape', () => {
+      const store = buildMockStore(true);
+      wrapper = shallowMount(TheKeyboardShortcuts, {
+        mocks: { $store: store },
+      });
+      section.remove();
+      document.body.appendChild(field);
+      field.focus();
+
+      press('Escape');
+
+      expect(document.activeElement).toBe(field);
+      expect(store.dispatch).not.toHaveBeenCalled();
+      field.remove();
     });
   });
 });

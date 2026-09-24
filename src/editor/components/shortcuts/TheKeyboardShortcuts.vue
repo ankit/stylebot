@@ -150,21 +150,20 @@ export default Vue.extend({
     },
 
     /**
-     * Moves focus from a field to the section around it, or to the control
-     * that names the section, so shortcuts work again and the next Escape
-     * closes the editor.
+     * Moves focus from a field to the nearest landing: an enclosing section,
+     * or the control heading one (like a card's header), so shortcuts work
+     * again and the next Escape closes the editor.
      */
     leaveField(field: HTMLElement): void {
-      const section = field.parentElement?.closest<HTMLElement>(
-        '[data-focus-landing]'
-      );
-      const landing =
-        section?.querySelector<HTMLElement>('[data-focus-target]') ?? section;
+      for (let el = field.parentElement; el; el = el.parentElement) {
+        const landing = el.matches('[data-focus-landing]')
+          ? el
+          : el.querySelector<HTMLElement>(':scope > [data-focus-landing]');
 
-      if (landing) {
-        landing.focus({ preventScroll: true, focusVisible: true });
-      } else {
-        field.blur();
+        if (landing) {
+          landing.focus({ preventScroll: true, focusVisible: true });
+          return;
+        }
       }
     },
 

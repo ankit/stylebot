@@ -1,9 +1,9 @@
 <template>
-  <s-card class="property-card" data-focus-landing>
+  <s-card class="property-card">
     <button
       type="button"
       class="property-card-header"
-      data-focus-target
+      data-focus-landing
       @click="$emit('toggle')"
     >
       <span class="property-card-title">
