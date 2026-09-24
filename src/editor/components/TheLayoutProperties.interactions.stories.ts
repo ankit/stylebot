@@ -94,6 +94,26 @@ export const MarginIndependent: StoryObj = {
   },
 };
 
+export const IndividualSidesIsolated: StoryObj = {
+  ...editor(WITH_RULE),
+  name: 'setting some individual sides leaves the others unset instead of zeroing them',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+    const margin = spacing(canvas, 'Margin');
+
+    await user.click(modeButton(margin, 'Individual'));
+    await user.type(await spacingInput(margin, 'Top'), '10');
+    await user.type(await spacingInput(margin, 'Left'), '6');
+
+    await expect(declaration(store, 'h1', 'margin-top')).toBe('10px');
+    await expect(declaration(store, 'h1', 'margin-left')).toBe('6px');
+    await expect(declaration(store, 'h1', 'margin')).toBeUndefined();
+    await expect(declaration(store, 'h1', 'margin-right')).toBeUndefined();
+    await expect(declaration(store, 'h1', 'margin-bottom')).toBeUndefined();
+  },
+};
+
 export const BorderControls: StoryObj = {
   ...editor(WITH_RULE),
   name: 'the border controls read through the shorthand and update style and width',
