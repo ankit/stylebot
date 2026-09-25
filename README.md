@@ -14,7 +14,7 @@ Available on [Chrome](https://chrome.google.com/webstore/detail/stylebot/oiaejid
 > [!NOTE]
 > Stylebot 4 is under active development on the `v4` branch. The version in the stores is 3.x, released from `main`.
 
-![Stylebot's code editor restyling GitHub with a Dracula theme](.github/readme/editor-code-mode.webp)
+![Stylebot's visual editor open on GitHub in dark mode](.github/readme/editor-basic-mode.webp)
 
 - **Visual editor**: Pick any element and restyle it with UI controls. Empty fields show the page's current values, and other elements a selector matches are highlighted as you edit.
 - **Code editor**: Write your own CSS, with autocomplete, color swatches and native CSS nesting.
