@@ -39,7 +39,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { StylebotCommandName, StylebotCommands } from '@stylebot/types';
+import type { StylebotCommandName, StylebotCommands } from '@stylebot/types';
 import { ShortcutRecorderField, Heading, SText } from '@stylebot/components';
 
 import ShortcutRow from './ShortcutRow.vue';

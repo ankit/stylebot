@@ -1,4 +1,4 @@
-import { Rect } from './utils';
+import type { Rect } from './utils';
 
 /**
  * The faint tint drawn over another element the hovered one's selector

@@ -30,7 +30,7 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { StylebotLayout, StylebotEditingMode } from '@stylebot/types';
+import type { StylebotLayout, StylebotEditingMode } from '@stylebot/types';
 
 const MARGIN = 12;
 const MIN_WIDTH = 340;

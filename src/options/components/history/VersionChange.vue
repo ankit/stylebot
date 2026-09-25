@@ -20,11 +20,13 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from 'vue';
+import type { PropType } from 'vue';
+import Vue from 'vue';
 import { SBadge } from '@stylebot/components';
-import { Timestamp, VersionChange } from '@stylebot/types';
+import type { Timestamp, VersionChange } from '@stylebot/types';
 
-import { splitAround, Segment } from './split-around';
+import type { Segment } from './split-around';
+import { splitAround } from './split-around';
 
 type Part = {
   key: 'added' | 'edited' | 'deleted';

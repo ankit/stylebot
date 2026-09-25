@@ -1,4 +1,4 @@
-import { RoleColorGroups } from '@stylebot/css';
+import type { RoleColorGroups } from '@stylebot/css';
 
 /**
  * Facts about the page that the editor needs without touching its DOM.

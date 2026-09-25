@@ -40,11 +40,13 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from 'vue';
+import type { PropType } from 'vue';
+import Vue from 'vue';
 import { SButton, SCheckbox, SText } from '@stylebot/components';
-import { VersionPreview } from '@stylebot/types';
+import type { VersionPreview } from '@stylebot/types';
 
-import { splitAround, Segment } from './split-around';
+import type { Segment } from './split-around';
+import { splitAround } from './split-around';
 
 type Site = { url: string; segments: Array<Segment> };
 

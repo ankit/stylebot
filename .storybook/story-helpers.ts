@@ -2,7 +2,8 @@ import type Vue from 'vue';
 import type { Component } from 'vue';
 import type { Store } from 'vuex';
 import type { StoryObj } from '@storybook/vue';
-import { expect, fireEvent, userEvent, waitFor, within } from '@storybook/test';
+import type { within } from '@storybook/test';
+import { expect, fireEvent, userEvent, waitFor } from '@storybook/test';
 
 import { getDeclarationsForSelector } from '@stylebot/css';
 import type { State } from '@/editor/store';

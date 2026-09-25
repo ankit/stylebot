@@ -1,5 +1,5 @@
 import { compareAsc } from 'date-fns';
-import { StyleMap } from '@stylebot/types';
+import type { StyleMap } from '@stylebot/types';
 
 /**
  * Returns 0 for an unparseable timestamp on either side, so the caller's

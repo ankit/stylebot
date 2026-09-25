@@ -40,7 +40,7 @@ import { get as getOption, pruneRetired } from './options';
 import { isSyncAlarm, updatePeriodicSync } from './sync-scheduler';
 import { runGoogleDriveSync, getGoogleDriveSyncEnabled } from '@stylebot/sync';
 
-import {
+import type {
   TabUpdated,
   BackgroundPageMessage,
   BackgroundPageMessageResponse,

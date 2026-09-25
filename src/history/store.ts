@@ -1,5 +1,5 @@
 import { getCurrentTimestamp } from '@stylebot/utils';
-import {
+import type {
   VersionEntry,
   VersionSource,
   StyleMap,

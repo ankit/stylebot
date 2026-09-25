@@ -1,13 +1,13 @@
 import { compareAsc } from 'date-fns';
 
-import {
+import type {
   GoogleDriveSyncMetadata,
   StyleMap,
   SyncAccount,
 } from '@stylebot/types';
 
 import { syncError } from '../errors';
-import { AccessToken } from './get-access-token';
+import type { AccessToken } from './get-access-token';
 import { getAuthorizationHeaders, parseJsonResponse } from './http';
 import { isStyleMap } from './style-map';
 import { SYNC_FOLDER_NAME, SYNC_FILE_NAME } from './constants';

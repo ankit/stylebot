@@ -10,8 +10,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import { Rect, Dimensions } from './utils';
-import { LayoutProperty } from './types';
+import type { Rect, Dimensions } from './utils';
+import type { LayoutProperty } from './types';
 
 // https://dev.to/kingdaro/indexing-objects-in-typescript-1cgi
 function hasKey<O extends Record<string, unknown>>(

@@ -31,7 +31,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { EnableStyle, DisableStyle } from '@stylebot/types';
+import type { EnableStyle, DisableStyle } from '@stylebot/types';
 import PopupRow from './PopupRow.vue';
 import { ShortcutChip, ToggleSwitch } from '@stylebot/components';
 import { forwardClickToInput } from '../utils';

@@ -1,5 +1,5 @@
 import { defaultCommands } from '@stylebot/settings';
-import { StylebotCommands } from '@stylebot/types';
+import type { StylebotCommands } from '@stylebot/types';
 
 export const get = async (): Promise<StylebotCommands> => {
   const items = await chrome.storage.local.get('commands');

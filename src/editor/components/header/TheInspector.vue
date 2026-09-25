@@ -19,7 +19,7 @@ import Vue from 'vue';
 
 import { STooltip } from '@stylebot/components';
 import { InspectorIcon } from '@stylebot/icons';
-import { StylebotEditingMode } from '@stylebot/types';
+import type { StylebotEditingMode } from '@stylebot/types';
 
 import { getPageBridge } from '@stylebot/page-bridge';
 

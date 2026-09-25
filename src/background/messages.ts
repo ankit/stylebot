@@ -21,7 +21,7 @@ import {
   set as setOption,
 } from './options';
 
-import {
+import type {
   GetOption as GetOptionType,
   SetOption as SetOptionType,
   DisableStyle as DisableStyleType,

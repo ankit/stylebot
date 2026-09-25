@@ -1,11 +1,7 @@
 import { getTokenAtCaret, replaceToken } from '@stylebot/css';
 
-import {
-  GoogleFont,
-  GoogleFontCategory,
-  matchGoogleFonts,
-  matchesFontQuery,
-} from './fonts';
+import type { GoogleFont, GoogleFontCategory } from './fonts';
+import { matchGoogleFonts, matchesFontQuery } from './fonts';
 
 export type FontSuggestion =
   | { kind: 'default'; value: '' }

@@ -25,7 +25,8 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from 'vue';
+import type { PropType } from 'vue';
+import Vue from 'vue';
 import { SText } from '@stylebot/components';
 import { CheckIcon } from '@stylebot/icons';
 import { needsHairline, checkMarkColor } from '../../utils/hsv-color';

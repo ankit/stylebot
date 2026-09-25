@@ -20,7 +20,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { ToggleReadabilityForTab } from '@stylebot/types';
+import type { ToggleReadabilityForTab } from '@stylebot/types';
 import PopupRow from './PopupRow.vue';
 import { ShortcutChip, ToggleSwitch } from '@stylebot/components';
 

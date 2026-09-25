@@ -1,7 +1,7 @@
 import Overlay from './Overlay';
-import { LayoutProperty, NextAncestorInfo } from './types';
+import type { LayoutProperty, NextAncestorInfo } from './types';
 import { getSelector, splitSelectorList } from '@stylebot/css';
-import { CssDeclaration } from '@stylebot/types';
+import type { CssDeclaration } from '@stylebot/types';
 
 const WHOLE_PAGE_SELECTORS = ['*', 'body', 'html', ':root'];
 

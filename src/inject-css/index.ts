@@ -9,10 +9,11 @@ import { extractImports, pruneImportCache } from '@stylebot/css';
 // stack into this document_start bundle just for this one heuristic.
 import { isReaderable } from '../readability/eligibility';
 import { getStylesForPage } from '@stylebot/styles';
-import { StyleMap, TabMessage } from '@stylebot/types';
+import type { StyleMap, TabMessage } from '@stylebot/types';
 
 import { applyState } from './apply-state';
-import { CachedState, readCache, writeCache } from './cache';
+import type { CachedState } from './cache';
+import { readCache, writeCache } from './cache';
 import { hidePage, revealPage } from './hide-page';
 
 // Registered synchronously here (unlike the editor script's listener,

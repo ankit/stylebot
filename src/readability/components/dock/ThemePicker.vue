@@ -12,9 +12,10 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from 'vue';
+import type { PropType } from 'vue';
+import Vue from 'vue';
 
-import { ReadabilityTheme } from '@stylebot/types';
+import type { ReadabilityTheme } from '@stylebot/types';
 
 import { THEME_BACKGROUNDS } from '../../theme-colors';
 

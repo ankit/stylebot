@@ -1,10 +1,10 @@
+import type { Sides } from '../spacing';
 import {
   parseLength,
   expandShorthand,
   collapseToShorthand,
   resolveSpacingDeclarations,
   EMPTY_SIDES,
-  Sides,
 } from '../spacing';
 
 const properties: Sides = {

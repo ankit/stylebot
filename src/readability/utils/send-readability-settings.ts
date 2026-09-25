@@ -1,4 +1,7 @@
-import { ReadabilitySettings, SetReadabilitySettings } from '@stylebot/types';
+import type {
+  ReadabilitySettings,
+  SetReadabilitySettings,
+} from '@stylebot/types';
 
 /**
  * Persists the reader's typography/theme settings to the background.

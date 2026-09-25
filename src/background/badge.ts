@@ -1,4 +1,4 @@
-import { Style, GetIsReadabilityActive } from '@stylebot/types';
+import type { Style, GetIsReadabilityActive } from '@stylebot/types';
 
 // Asked live from the content script rather than tracked/persisted here,
 // so there's no stale cached value to race against.

@@ -1,11 +1,11 @@
 import Vue from 'vue';
 import Vuex, { Store } from 'vuex';
 
-import { State } from 'editor/store';
+import type { State } from 'editor/store';
 import mockState from '../../store/__mocks__/state';
 import mutations from '../../store/mutations';
-import { PageBridge, PageBridgeEvents } from '@stylebot/page-bridge';
-import {
+import type { PageBridge, PageBridgeEvents } from '@stylebot/page-bridge';
+import type {
   RemotePageBridgeMessageToWindow,
   RemotePageBridgeMessageToPage,
 } from '@stylebot/page-bridge';

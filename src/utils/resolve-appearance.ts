@@ -1,4 +1,4 @@
-import { StylebotAppearance } from '@stylebot/types';
+import type { StylebotAppearance } from '@stylebot/types';
 
 export const getSystemPreference = (): 'light' | 'dark' =>
   window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';

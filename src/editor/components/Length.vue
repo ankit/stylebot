@@ -10,8 +10,9 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from 'vue';
-import { Declaration } from 'postcss';
+import type { PropType } from 'vue';
+import Vue from 'vue';
+import type { Declaration } from 'postcss';
 import { SNumberField } from '@stylebot/components';
 import { extractLength } from '../utils/css-value';
 import { computedPlaceholder } from '../utils/computed-placeholder';

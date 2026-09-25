@@ -1,7 +1,8 @@
 import type { StoryObj } from '@storybook/vue';
 
 import TheStylebotApp from '@/editor/components/TheStylebotApp.vue';
-import { createEditorStore, EditorStateOverrides } from './mocks/editor-store';
+import type { EditorStateOverrides } from './mocks/editor-store';
+import { createEditorStore } from './mocks/editor-store';
 
 export const RULE_CSS = `h1 {
   color: #2a5fd6;

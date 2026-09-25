@@ -1,4 +1,4 @@
-import { RunGoogleDriveSyncResponse } from '@stylebot/types';
+import type { RunGoogleDriveSyncResponse } from '@stylebot/types';
 
 import { runGoogleDriveSync } from '../utils';
 

@@ -12,12 +12,13 @@ import {
   addEmptyRule,
   removeEmptyRules,
 } from '@stylebot/css';
-import {
+import type {
   IframeMessage,
   ParentUpdateCssMessage,
   ParentFocusEditorMessage,
 } from '@stylebot/monaco-editor';
-import { debounce, Debounced } from '@stylebot/utils';
+import type { Debounced } from '@stylebot/utils';
+import { debounce } from '@stylebot/utils';
 
 import CodeEditorIframe from './code/CodeEditorIframe.vue';
 

@@ -1,5 +1,6 @@
 import Vue from 'vue';
-import VueRouter, { Route, RouteConfig } from 'vue-router';
+import type { Route, RouteConfig } from 'vue-router';
+import VueRouter from 'vue-router';
 
 import TheBasicsTab from './components/TheBasicsTab.vue';
 import TheStylesTab from './components/TheStylesTab.vue';

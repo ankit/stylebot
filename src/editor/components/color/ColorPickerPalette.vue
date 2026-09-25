@@ -86,12 +86,12 @@ import Vue from 'vue';
 import { SAutocomplete, SText, MenuItem } from '@stylebot/components';
 import { CheckIcon } from '@stylebot/icons';
 import { colorSchemes } from '../../utils/color-schemes';
+import type { ColorRamp } from '../../utils/color-sets';
 import {
   neutralRamps,
   hueGrid,
   readingRow,
   darkModeRow,
-  ColorRamp,
 } from '../../utils/color-sets';
 import { needsHairline, checkMarkColor } from '../../utils/hsv-color';
 

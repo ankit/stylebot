@@ -10,7 +10,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import { Box, TipPlacement } from './types';
+import type { Box, TipPlacement } from './types';
 
 type Size = { width: number; height: number };
 

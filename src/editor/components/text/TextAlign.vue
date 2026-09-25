@@ -5,7 +5,8 @@
 </template>
 
 <script lang="ts">
-import Vue, { Component } from 'vue';
+import type { Component } from 'vue';
+import Vue from 'vue';
 
 import {
   AlignLeftIcon,

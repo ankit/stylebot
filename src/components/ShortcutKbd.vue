@@ -17,13 +17,11 @@
 </template>
 
 <script lang="ts">
-import Vue, { Component } from 'vue';
+import type { Component } from 'vue';
+import Vue from 'vue';
 
-import {
-  formatShortcut,
-  FormattedShortcut,
-  ModifierIcon,
-} from './utils/format-shortcut';
+import type { FormattedShortcut, ModifierIcon } from './utils/format-shortcut';
+import { formatShortcut } from './utils/format-shortcut';
 import {
   OptionKeyIcon,
   ShiftKeyIcon,

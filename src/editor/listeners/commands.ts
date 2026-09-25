@@ -1,8 +1,8 @@
-import { Store } from 'vuex';
+import type { Store } from 'vuex';
 import hotkeys from 'hotkeys-js';
 
-import { State } from 'editor/store';
-import { StylebotCommandName } from '@stylebot/types';
+import type { State } from 'editor/store';
+import type { StylebotCommandName } from '@stylebot/types';
 
 import {
   toggleStylebot,

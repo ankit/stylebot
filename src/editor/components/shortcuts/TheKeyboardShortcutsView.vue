@@ -108,7 +108,7 @@ import {
   STooltip,
 } from '@stylebot/components';
 import { ChevronLeftIcon } from '@stylebot/icons';
-import { StylebotCommands, StylebotEditorCommands } from '@stylebot/types';
+import type { StylebotCommands, StylebotEditorCommands } from '@stylebot/types';
 
 import { openOptionsPage } from '../../utils/chrome';
 

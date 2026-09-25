@@ -3,8 +3,8 @@ import { expect, waitFor, within } from '@storybook/test';
 
 import TheLayoutProperties from './TheLayoutProperties.vue';
 import { editor, WITH_RULE } from '@stylebot/storybook/editor-story';
+import type { Canvas } from '@stylebot/storybook/story-helpers';
 import {
-  Canvas,
   declaration,
   findOpenMenu,
   numberInput,

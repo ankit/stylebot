@@ -1,4 +1,5 @@
-import Vuex, { Dispatch, Store } from 'vuex';
+import type { Dispatch, Store } from 'vuex';
+import Vuex from 'vuex';
 import * as postcss from 'postcss';
 
 import { getPrimaryFontFamily, injectCSSIntoDocument } from '@stylebot/css';

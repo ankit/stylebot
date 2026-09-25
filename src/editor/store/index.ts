@@ -1,7 +1,8 @@
 import Vue from 'vue';
-import Vuex, { Store } from 'vuex';
+import type { Store } from 'vuex';
+import Vuex from 'vuex';
 
-import {
+import type {
   StylebotOptions,
   StylebotCommands,
   ReadabilitySettings,
@@ -14,7 +15,8 @@ import {
   defaultReadabilitySettings,
 } from '@stylebot/settings';
 
-import { PageSnapshot, emptyPageSnapshot } from '@stylebot/page-bridge';
+import type { PageSnapshot } from '@stylebot/page-bridge';
+import { emptyPageSnapshot } from '@stylebot/page-bridge';
 
 import getters from './getters';
 import actions from './actions';

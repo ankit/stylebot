@@ -1,7 +1,7 @@
-import { Store, Dispatch, Commit } from 'vuex';
-import { State } from 'editor/store';
+import type { Store, Dispatch, Commit } from 'vuex';
+import type { State } from 'editor/store';
 import { injectCSSIntoDocument } from '@stylebot/css';
-import { Style } from '@stylebot/types';
+import type { Style } from '@stylebot/types';
 
 import {
   enableStyle as sendEnableStyleMessage,

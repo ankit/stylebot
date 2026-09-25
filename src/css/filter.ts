@@ -3,7 +3,7 @@ import * as postcss from 'postcss';
 import { addDeclaration } from './declaration';
 import { findRule } from './rule';
 
-import { FilterEffect } from '@stylebot/types';
+import type { FilterEffect } from '@stylebot/types';
 
 const getEffectRegex = (name: FilterEffect) => new RegExp(`${name}\\((.*)\\)$`);
 const getEffectDeclarationValue = (name: FilterEffect, percent: string) =>

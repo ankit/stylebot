@@ -1,4 +1,5 @@
-import { CachedState, readCache, writeCache } from '../cache';
+import type { CachedState } from '../cache';
+import { readCache, writeCache } from '../cache';
 
 const CACHE_KEY = 'stylebot-cache';
 

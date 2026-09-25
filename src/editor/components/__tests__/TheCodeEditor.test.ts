@@ -1,5 +1,6 @@
 import Vue from 'vue';
-import { mount, Wrapper } from '@vue/test-utils';
+import type { Wrapper } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 
 import TheCodeEditor from '../TheCodeEditor.vue';
 

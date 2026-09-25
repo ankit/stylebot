@@ -1,7 +1,7 @@
-import { Store } from 'vuex';
+import type { Store } from 'vuex';
 
-import { State } from 'editor/store';
-import { TabMessage } from '@stylebot/types';
+import type { State } from 'editor/store';
+import type { TabMessage } from '@stylebot/types';
 
 import { applyReadability, removeReadability } from '@stylebot/readability';
 

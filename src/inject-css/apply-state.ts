@@ -1,7 +1,7 @@
 import { injectCSSIntoDocument, removeCSSFromDocument } from '@stylebot/css';
 import { applyReadability, removeReadability } from '@stylebot/readability';
 
-import { CachedState } from './cache';
+import type { CachedState } from './cache';
 
 // Tracks which stylesheets are currently injected so a later call (once the
 // real storage read resolves) can remove any that are no longer enabled.

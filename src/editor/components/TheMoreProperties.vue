@@ -58,7 +58,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { Declaration } from 'postcss';
+import type { Declaration } from 'postcss';
 
 import { IconX, CheckIcon } from '@stylebot/icons';
 import { SText } from '@stylebot/components';

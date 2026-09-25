@@ -1,5 +1,6 @@
-import { createLocalVue, mount, Wrapper } from '@vue/test-utils';
-import Vue from 'vue';
+import type { Wrapper } from '@vue/test-utils';
+import { createLocalVue, mount } from '@vue/test-utils';
+import type Vue from 'vue';
 import Vuex from 'vuex';
 import VueRouter from 'vue-router';
 

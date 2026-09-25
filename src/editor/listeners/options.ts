@@ -1,6 +1,6 @@
-import { Store } from 'vuex';
-import { State } from 'editor/store';
-import { StylebotOptions } from '@stylebot/types';
+import type { Store } from 'vuex';
+import type { State } from 'editor/store';
+import type { StylebotOptions } from '@stylebot/types';
 
 /**
  * The dock location (and window bounds) can change from the editor window

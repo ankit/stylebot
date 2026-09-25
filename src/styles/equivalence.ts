@@ -1,4 +1,4 @@
-import { StyleMap, StyleWithoutUrl } from '@stylebot/types';
+import type { StyleMap, StyleWithoutUrl } from '@stylebot/types';
 
 /**
  * Whitespace-insensitive view of a stylesheet, so reformatting on one device

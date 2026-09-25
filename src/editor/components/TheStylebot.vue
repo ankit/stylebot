@@ -42,7 +42,7 @@ import TheWindowStatus from './TheWindowStatus.vue';
 import TheWindowTabBar from './TheWindowTabBar.vue';
 import TheKeyboardShortcutsView from './shortcuts/TheKeyboardShortcutsView.vue';
 
-import { StylebotEditingMode } from '@stylebot/types';
+import type { StylebotEditingMode } from '@stylebot/types';
 
 type HeaderRef = { focusModeTab(): void };
 

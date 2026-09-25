@@ -6,7 +6,7 @@ import App from '../components/App.vue';
 import { getDomainUrlAndSource } from './get-domain-url-and-source';
 import { getReadabilityArticle } from './get-readability-article';
 
-import { ReadabilityArticle } from '@stylebot/types';
+import type { ReadabilityArticle } from '@stylebot/types';
 import { cacheDocument } from './document-cache';
 
 Vue.mixin({

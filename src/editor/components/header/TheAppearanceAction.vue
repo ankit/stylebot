@@ -70,7 +70,7 @@ import {
 import { SunIcon, MoonIcon, MonitorIcon } from '@stylebot/icons';
 import { resolveAppearance, getSystemPreference } from '@stylebot/utils';
 
-import { StylebotAppearance } from '@stylebot/types';
+import type { StylebotAppearance } from '@stylebot/types';
 
 export default Vue.extend({
   name: 'TheAppearanceAction',

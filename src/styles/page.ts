@@ -1,4 +1,4 @@
-import { Style, StyleMap } from '@stylebot/types';
+import type { Style, StyleMap } from '@stylebot/types';
 
 import BackgroundPageUtils from './utils';
 

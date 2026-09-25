@@ -1,4 +1,4 @@
-import { ReadabilityActiveChanged } from '@stylebot/types';
+import type { ReadabilityActiveChanged } from '@stylebot/types';
 
 /**
  * Tells the background to refresh the badge — carries no state itself,

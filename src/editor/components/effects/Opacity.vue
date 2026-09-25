@@ -17,7 +17,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { Declaration } from 'postcss';
+import type { Declaration } from 'postcss';
 import { SSlider, SText } from '@stylebot/components';
 
 import PropertyRow from '../basic/PropertyRow.vue';

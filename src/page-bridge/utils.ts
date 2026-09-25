@@ -1,4 +1,4 @@
-import { PageSnapshot } from './PageBridge';
+import type { PageSnapshot } from './PageBridge';
 
 /**
  * The snapshot a store starts from before its host has read the page.

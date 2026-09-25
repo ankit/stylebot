@@ -44,10 +44,11 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from 'vue';
+import type { PropType } from 'vue';
+import Vue from 'vue';
 import { SBadge } from '@stylebot/components';
 import { ChevronDownIcon } from '@stylebot/icons';
-import { Version, VersionChange, VersionPreview } from '@stylebot/types';
+import type { Version, VersionChange, VersionPreview } from '@stylebot/types';
 
 import { formatClockTime, formatExact } from '@stylebot/utils';
 

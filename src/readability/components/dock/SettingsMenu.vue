@@ -17,10 +17,11 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from 'vue';
+import type { PropType } from 'vue';
+import Vue from 'vue';
 
 import { defaultReadabilitySettings } from '@stylebot/settings';
-import { ReadabilitySettings, ReadabilityTheme } from '@stylebot/types';
+import type { ReadabilitySettings, ReadabilityTheme } from '@stylebot/types';
 
 import { SMenu } from '@stylebot/components';
 import ThemePicker from './ThemePicker.vue';

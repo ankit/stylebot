@@ -122,7 +122,7 @@
 import Vue from 'vue';
 import { Heading, SText, SButton, SLinkButton } from '@stylebot/components';
 import { ArrowRepeatIcon } from '@stylebot/icons';
-import { SyncAccount, SyncConflict } from '@stylebot/types';
+import type { SyncAccount, SyncConflict } from '@stylebot/types';
 import { formatSyncTime } from '@stylebot/utils';
 import { SYNC_PERIOD_MINUTES } from '../../../background/sync-scheduler';
 import {

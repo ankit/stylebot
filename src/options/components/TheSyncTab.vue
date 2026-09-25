@@ -50,7 +50,7 @@ import TheGoogleDriveSync from './sync/TheGoogleDriveSync.vue';
 import SyncStatusBanner from './sync/SyncStatusBanner.vue';
 
 import { importStylesWithFilePicker, exportAsJSONFile } from '../utils';
-import { SyncStatus } from '../store/index';
+import type { SyncStatus } from '../store/index';
 
 export default Vue.extend({
   name: 'TheSyncTab',

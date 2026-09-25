@@ -46,7 +46,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { t } from '@stylebot/i18n';
-import { Declaration } from 'postcss';
+import type { Declaration } from 'postcss';
 import { SSelect, MenuItem } from '@stylebot/components';
 
 import PropertyRow from '../basic/PropertyRow.vue';

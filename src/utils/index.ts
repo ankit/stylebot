@@ -1,5 +1,5 @@
 import { format } from 'date-fns';
-import { Timestamp } from '@stylebot/types';
+import type { Timestamp } from '@stylebot/types';
 
 export {
   MODIFIER_KEYS,

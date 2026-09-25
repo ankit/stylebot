@@ -1,12 +1,11 @@
-import { Store } from 'vuex';
-import { State } from 'editor/store';
+import type { Store } from 'vuex';
+import type { State } from 'editor/store';
 
-import {
-  getPageBridge,
-  REMOTE_PAGE_BRIDGE_PORT,
+import type {
   RemotePageBridgeMessageToWindow,
   RemotePageBridgeMessageToPage,
 } from '@stylebot/page-bridge';
+import { getPageBridge, REMOTE_PAGE_BRIDGE_PORT } from '@stylebot/page-bridge';
 import { initEditor } from '../utils/init-editor';
 import { closeEditorWindow } from '../utils/chrome';
 

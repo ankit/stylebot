@@ -1,4 +1,4 @@
-import { ReadabilityTheme } from '@stylebot/types';
+import type { ReadabilityTheme } from '@stylebot/types';
 
 import { loaderCss, LOADER_ART_ID } from './loader-styles';
 import { THEME_BACKGROUNDS, THEME_FOREGROUNDS } from '../theme-colors';

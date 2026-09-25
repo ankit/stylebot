@@ -1,4 +1,5 @@
-import { GoogleFont, matchGoogleFonts, matchesFontQuery } from '../fonts';
+import type { GoogleFont } from '../fonts';
+import { matchGoogleFonts, matchesFontQuery } from '../fonts';
 
 const fonts: Array<GoogleFont> = [
   { family: 'Roboto', category: 'sans-serif' },

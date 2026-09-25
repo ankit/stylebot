@@ -1,4 +1,4 @@
-import { StyleMap } from '@stylebot/types';
+import type { StyleMap } from '@stylebot/types';
 
 import { mergeWithoutBase as mergeStyles } from '../merge-without-base';
 

@@ -1,4 +1,4 @@
-import { GoogleFont } from '../fonts';
+import type { GoogleFont } from '../fonts';
 import { suggestFonts } from '../suggest';
 
 const google: Array<GoogleFont> = [

@@ -13,14 +13,10 @@
 import OverlayHint from './OverlayHint';
 import OverlayRect from './OverlayRect';
 import OverlayTip from './OverlayTip';
-import {
-  getElementDimensions,
-  getNestedBoundingClientRect,
-  Rect,
-  Dimensions,
-} from './utils';
-import { Box, LayoutProperty, NextAncestorInfo } from './types';
-import { CssDeclaration } from '@stylebot/types';
+import type { Rect, Dimensions } from './utils';
+import { getElementDimensions, getNestedBoundingClientRect } from './utils';
+import type { Box, LayoutProperty, NextAncestorInfo } from './types';
+import type { CssDeclaration } from '@stylebot/types';
 
 type Edges = { top: number; right: number; bottom: number; left: number };
 

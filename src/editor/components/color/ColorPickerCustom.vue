@@ -31,7 +31,8 @@ import tinycolor from 'tinycolor2';
 import ColorPickerSvSquare from './ColorPickerSVSquare.vue';
 import ColorPickerHueSlider from './ColorPickerHueSlider.vue';
 import ColorPickerAlphaSlider from './ColorPickerAlphaSlider.vue';
-import { parseToHsva, toCssColor, Hsva } from '../../utils/hsv-color';
+import type { Hsva } from '../../utils/hsv-color';
+import { parseToHsva, toCssColor } from '../../utils/hsv-color';
 
 export default Vue.extend({
   name: 'ColorPickerCustom',

@@ -1,5 +1,5 @@
 import { t } from '@stylebot/i18n';
-import { OpenStylebotFromContextMenu } from '@stylebot/types';
+import type { OpenStylebotFromContextMenu } from '@stylebot/types';
 import { BackgroundPageUtils } from '@stylebot/styles';
 
 import { OpenOptionsPage } from './messages';

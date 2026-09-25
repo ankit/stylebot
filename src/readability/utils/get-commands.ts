@@ -1,4 +1,4 @@
-import { GetCommands, GetCommandsResponse } from '@stylebot/types';
+import type { GetCommands, GetCommandsResponse } from '@stylebot/types';
 
 /**
  * Fetches the user's configured Stylebot keyboard shortcuts from the background.

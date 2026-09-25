@@ -1,4 +1,4 @@
-import { ReadabilityTheme } from '@stylebot/types';
+import type { ReadabilityTheme } from '@stylebot/types';
 
 // Shared with loader.ts (matches the reader's own theme background/text) and
 // the settings dock's theme swatches.

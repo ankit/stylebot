@@ -34,10 +34,11 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from 'vue';
+import type { PropType } from 'vue';
+import Vue from 'vue';
 import { SText } from '@stylebot/components';
 import { CheckIcon } from '@stylebot/icons';
-import { RoleColorGroups } from '@stylebot/css';
+import type { RoleColorGroups } from '@stylebot/css';
 import ColorPickerRecent from './ColorPickerRecent.vue';
 import { needsHairline, checkMarkColor } from '../../utils/hsv-color';
 

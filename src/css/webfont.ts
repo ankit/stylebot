@@ -2,7 +2,7 @@ import { parse } from 'postcss';
 
 import { getPrimaryFontFamily } from './font-family';
 
-import {
+import type {
   GetGoogleWebFontExists,
   GetGoogleWebFontExistsResponse,
 } from '@stylebot/types';

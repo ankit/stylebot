@@ -27,7 +27,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { Declaration } from 'postcss';
+import type { Declaration } from 'postcss';
 import { t } from '@stylebot/i18n';
 import { SSlider, SSegmentedControl } from '@stylebot/components';
 

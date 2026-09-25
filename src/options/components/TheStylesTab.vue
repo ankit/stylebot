@@ -66,7 +66,7 @@
 import Vue from 'vue';
 import { compareAsc } from 'date-fns';
 
-import { Style } from '@stylebot/types';
+import type { Style } from '@stylebot/types';
 import { Heading, SText, SButton, ConfirmDialog } from '@stylebot/components';
 import { SearchIcon } from '@stylebot/icons';
 
