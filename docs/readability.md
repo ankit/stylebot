@@ -2,10 +2,8 @@
 
 Readability mode turns an article into a clean reading view, built on [Defuddle](https://github.com/kepano/defuddle) for article extraction.
 
-The content scripts import only its light parts (eligibility, the loading screen, apply/remove); the reader itself, `reader.ts`, builds to `readability/reader.js`, which `lifecycle/load-reader.ts` imports on demand once a page qualifies.
+The content scripts carry only the light parts: deciding whether a page qualifies, the loading screen, and turning the reader on and off. The reader itself is a separate bundle, loaded on demand once a page qualifies, so pages that never use it don't pay for it.
 
-| Module                                                | What it does                                                                     |
-| :---------------------------------------------------- | :------------------------------------------------------------------------------- |
-| [`eligibility`](../src/readability/eligibility)       | Decides whether the reader runs on a page: URL rules, MediaWiki, content density |
-| [`lifecycle`](../src/readability/lifecycle)           | Swaps the page for the reader and back, caching the original document            |
-| [`loading-screen`](../src/readability/loading-screen) | The themed screen shown while the reader loads                                   |
+- **Eligibility** decides whether the reader should run on a page, from URL rules, MediaWiki detection and how dense the page's content is.
+- **Applying** swaps the live page for the reader, mounted in a shadow DOM, and caches the original document so turning the reader off restores it exactly.
+- **The loading screen** is themed to match the reader and covers the page while the article is extracted, so there's no flash of the original.

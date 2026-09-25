@@ -1,47 +1,41 @@
 # Editor
 
-The editor is one Vue app, `TheStylebotApp`, that runs in two hosts: docked inside the page, or in its own browser window. Everything it does to the page goes through a `PageBridge`, which is what lets the same components run in either place.
+The editor is one Vue app that runs in two hosts: docked inside the page, or in its own browser window. Everything it does to the page goes through a page bridge, which is what lets the same components run in either place.
 
 ## In the page
 
-- `editor/index` runs as a content script on every page: it creates the store, sets up
-  `@stylebot/page-bridge` with the local bridge, and registers the tab-message listener
-  right away so a popup click can't arrive before the store is ready.
-- Handling waits for `initialize` (options, commands, reader settings) and the page's saved
-  style; hotkeys and the context-menu listener are bound after that.
-- Nothing is mounted until the editor opens: `toggleStylebot` calls `initEditor`, which adds
-  the `#stylebot` host with a shadow root, fetches the editor stylesheet and mounts
-  `TheStylebotApp`.
-- `openStylebot` refreshes the page snapshot, re-enables the style if needed and shows the
-  panel; closing only hides it, the app stays mounted.
-- Every edit runs through `applyCss`: the bridge injects the CSS into the page, the store
-  persists it (`SetStyle`) and commits the css and its selectors.
+- The editor's content script runs on every page. It creates the store, sets up the local
+  page bridge, and starts listening for tab messages right away, so a click in the popup
+  can't arrive before the store is ready.
+- Messages are handled once options, shortcuts, reader settings and the page's saved style
+  have loaded; keyboard shortcuts and the context menu are bound after that.
+- Nothing is mounted until the editor first opens. Then it adds a host element with a
+  shadow root, fetches the editor stylesheet and mounts the app.
+- Opening refreshes what the store knows about the page, re-enables the style if needed
+  and shows the panel. Closing only hides it; the app stays mounted.
+- Every edit follows the same path: the bridge injects the CSS into the page, and the store
+  saves it to the background.
 
 ## The page bridge
 
 Everything an editor host does to the page it styles — injecting CSS, running the
-reader, inspecting and highlighting elements, sampling page colors — sits behind one
-`PageBridge` type, so the editor's store and components never touch the document
-themselves. The bridge only touches the page: the style itself lives in the editor's
-store, which persists it to the background.
+reader, inspecting and highlighting elements, sampling page colors, reading computed
+values — sits behind one interface, so the editor's store and components never touch the
+document themselves. The bridge only touches the page: the style itself lives in the
+editor's store, which saves it to the background.
 
-| Module                                                         | What it does                                                          |
-| :------------------------------------------------------------- | :-------------------------------------------------------------------- |
-| [`PageBridge`](../src/page-bridge/PageBridge.ts)               | The type, plus `PageSnapshot`, the page facts the store mirrors       |
-| [`LocalPageBridge`](../src/page-bridge/LocalPageBridge.ts)     | The implementation for a host inside the page (the content script)    |
-| [`remote-page-bridge`](../src/page-bridge/remote-page-bridge)  | The implementation for the editor window, driving the tab over a port |
-| [`PageBridgeEmitter`](../src/page-bridge/PageBridgeEmitter.ts) | The typed emitter both implementations share                          |
-| [`page-colors`](../src/page-bridge/page-colors.ts)             | Samples the page's colors for the color picker                        |
-| [`computed-styles`](../src/page-bridge/computed-styles.ts)     | Reads a selector's computed values for Basic mode's placeholders      |
-| [`index`](../src/page-bridge/index.ts)                         | `setPageBridge` / `getPageBridge`, filled by each host at boot        |
+There are two implementations:
+
+- **Local**, for the editor docked inside the page. It calls straight into the document.
+- **Remote**, for the editor in its own window. It sends each call over a port to the
+  tab's content script, which runs it against the page and sends back the result and any
+  page events.
 
 ## In its own window
 
-The background's `editor-window` module opens the window with `?tabId=` of the page it
-styles. `editor-window/index` connects a port to that tab, initializes the store from the
-page's connected message, and mounts the same `TheStylebotApp` tree with the store created
-for the `window` host and a `RemotePageBridge` in place of the local one. Every
-page-touching operation travels over the port to the tab's content script, where the
-editor's `editor-window` listener serves it.
+The background opens the window for a specific tab and keeps track of which window belongs
+to which tab. The window connects a port to that tab, loads its initial state from the
+page, and mounts the same app with the remote bridge. Every page-touching operation
+travels over the port to the tab's content script.
 
-`editor-window/listeners` persists the window's bounds into `options.layout.window`.
+The window remembers its size and position, so it reopens where the user left it.
