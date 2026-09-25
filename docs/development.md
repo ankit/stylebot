@@ -24,8 +24,6 @@ Each command builds in watch mode and opens a fresh browser profile with the ext
 - `yarn dev:edge`
 - `yarn dev:firefox`
 
-To load the build into your own Chrome or Edge instead, run `yarn watch`, open `chrome://extensions`, disable the store version of Stylebot, turn on Developer mode, and load `dist/` unpacked. For Firefox, `yarn watch:firefox` builds into `firefox-dist/`.
-
 ## Lint and typecheck
 
 - `yarn lint` (or `yarn lint:fix`)
