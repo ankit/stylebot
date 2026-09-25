@@ -1,22 +1,10 @@
-# `css`
+# Selectors and CSS
 
-CSS utility methods, aliased as `@stylebot/css`.
-
-## Modules
-
-| Module         | What it does                                                                                                                            |
-| -------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `declaration`  | Add a declaration for a selector to a CSS string, or append `!important` to every declaration.                                          |
-| `rule`         | Find, add, split, and remove rules in a CSS string (see [Reusing existing rules](#reusing-existing-rules)).                             |
-| `selector`     | Generate a CSS selector for a picked element (see [How selectors are generated](#how-selectors-are-generated)).                         |
-| `filter`       | Apply CSS filters (e.g. grayscale) to the whole page.                                                                                   |
-| `import`       | Extract `@import` URLs from CSS, fetch and cache them, and inline them so the rest of the CSS can apply without waiting on the network. |
-| `inject-style` | Insert and remove `<style>` elements carrying custom CSS for the page.                                                                  |
-| `webfont`      | Add and remove Google Web Fonts from CSS.                                                                                               |
+How Stylebot picks selectors for elements and transforms the user's CSS before it reaches the page.
 
 ## How selectors are generated
 
-`getSelector(el)` produces a selector for an element picked with the inspector.
+When the user picks an element with the inspector, Stylebot generates a selector for it.
 The goal is a selector that is **stable** (survives page rebuilds) and
 **meaningful** (reads like something the site author wrote), while still being
 specific enough to be useful.
@@ -48,21 +36,20 @@ Each strategy is tried in turn; the first one that returns something wins.
 
 ### What counts as a "hashed" class
 
-`looksHashed` flags class names that carry no stable meaning:
+A class name counts as hashed, carrying no stable meaning, when it has:
 
-- known library prefixes: `css-`, `sc-`, `jsx-`, `emotion-`, `styled-`,
+- a known library prefix: `css-`, `sc-`, `jsx-`, `emotion-`, `styled-`,
   `chakra-`
-- hex-like hashes such as CSS Modules' `_1a2b3c`
-- short (4–12 chars) names with an unusually high number of case transitions,
+- a hex-like hash such as CSS Modules' `_1a2b3c`
+- a short (4–12 chars) name with an unusually high number of case transitions,
   which separates a hash like `WwrzSb` from a camelCase word like `navBar`
 
 Anything containing `-` or `_` is treated as authored, whatever its shape.
 
 ### Reusing existing rules
 
-Before generating a fresh selector, the highlighter asks
-`getExistingSelector(el, css)` whether the user's CSS already has a selector
-that matches this element — via the browser's own `el.matches()`, not string
+Before generating a fresh selector, the inspector checks whether the user's
+CSS already has a selector that matches this element — via the browser's own `el.matches()`, not string
 comparison. That way picking an element already targeted by a hand-written
 selector (a descendant combinator, `:nth-child`, one member of a grouped
 selector, …) continues editing that rule instead of starting a second,
@@ -75,29 +62,27 @@ rightmost compound) must carry a class, id, attribute or structural
 pseudo-class (`:nth-child`, `:first-of-type`, …). A broad selector like `*`,
 `a` or `.card p` would otherwise capture every element it matches and keep the
 user from styling the one they picked. A tag-only selector is still reused when
-it's exactly what `getSelector` would generate for the element anyway (e.g.
+it's exactly what would be generated for the element anyway (e.g.
 `div.mw-heading h2`).
 
 ### Grouped selectors
 
 When a selector is only styled as part of a grouped rule (`.foo, .bar { … }`),
-`splitSelectorFromGroup` first moves it into its own rule, carrying over the
+an edit first moves it into its own rule, carrying over the
 declarations it already had, so an edit doesn't silently affect its groupmates.
 
 ### Native CSS nesting
 
 postcss parses a nested rule (`.card { .title { … } & + & { … } }`) as a
-`Rule` child of a `Rule`, and prints it back verbatim, so nesting survives
-every transform here untouched. The helpers treat nested rules as opaque:
+rule inside a rule, and prints it back verbatim, so nesting survives
+every transform untouched. Stylebot treats nested rules as opaque:
 
-- Lookups by selector (`getRule`, `getRuleForSelector`, `getExistingSelector`,
-  `removeRule`, …) skip them — `.title` inside `.card` means `.card .title`,
-  so a top-level `.title` edit must never land on it. `isNestedRule` and
-  `walkUnnestedRules` are the shared building blocks.
-- `addDeclaration` and the Basic-mode readers (`withOwnDeclarationsOnly`) only
+- Lookups by selector skip them — `.title` inside `.card` means `.card .title`,
+  so a top-level `.title` edit must never land on it.
+- Adding a declaration, and reading values for Basic mode, only
   touch a rule's own declarations, and a rule left with nothing but nested
   blocks is kept.
-- `markDeclarationsImportant` reaches into nested rules and into grouping
+- Marking declarations `!important` reaches into nested rules and into grouping
   at-rules (`@media`, `@supports`, `@container`, `@layer`, `@scope`, …) at any
   depth; only descriptor at-rules such as `@font-face` and `@keyframes`, where
   `!important` is invalid, are left alone.
@@ -105,9 +90,8 @@ every transform here untouched. The helpers treat nested rules as opaque:
 ## Where `!important` comes from
 
 Styles are stored exactly as the user wrote them. `!important` is added only
-at injection: `injectCSSIntoDocument(css, id, { forceImportant })` parses the
-css once, strips its `@import`s and marks its declarations important in the
-same pass. Every caller injecting a user style passes the style's own
-`forceImportant`, which is missing (meaning true) unless the user turned off
-Override site styles for it. Fetched `@import` css is never forced.
-The load-time cache in `inject-css/cache.ts` holds the same unforced css.
+when the CSS is injected into the page: it is parsed once, its `@import`s are
+stripped and its declarations marked important in the same pass. That happens
+for every style unless the user turned off Override site styles for it. CSS
+fetched through an `@import` is never forced, and the cache used at page load
+holds the same unforced CSS.

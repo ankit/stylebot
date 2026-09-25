@@ -7,78 +7,24 @@
 [![Webstore Rating](https://img.shields.io/chrome-web-store/stars/oiaejidbmkiecgbjeifoejpgmdaleoha)](https://chrome.google.com/webstore/detail/stylebot/oiaejidbmkiecgbjeifoejpgmdaleoha)
 ![License](https://img.shields.io/github/license/ankit/stylebot)
 
-Stylebot is a browser extension that lets you change the appearance of the web instantly.
+Change the appearance of any website. Available for [Chrome](https://chrome.google.com/webstore/detail/stylebot/oiaejidbmkiecgbjeifoejpgmdaleoha), [Firefox](https://addons.mozilla.org/firefox/addon/stylebot-web/) and [Edge](https://microsoftedge.microsoft.com/addons/detail/stylebot/mjolbpfednnbebfapicajpifliopnnai).
 
-Available on [Chrome](https://chrome.google.com/webstore/detail/stylebot/oiaejidbmkiecgbjeifoejpgmdaleoha), [Firefox](https://addons.mozilla.org/firefox/addon/stylebot-web/) and [Edge](https://microsoftedge.microsoft.com/addons/detail/stylebot/mjolbpfednnbebfapicajpifliopnnai).
+![Stylebot's visual editor open on GitHub in dark mode](docs/images/editor-basic-mode.webp)
 
-- Easy to use: Pick and style elements using UI actions
-- Simple & Quick: Changes are saved instantly
-- Code editor - Write your own CSS
-- Readability Mode - Make articles on any site readable by hiding non-essential page elements like sidebars, footers and ads.
-- Grayscale Mode - Turn on grayscale to reduce strain from websites
+- **Visual editor**: Pick any element and restyle it, no CSS needed. Dock it beside the page or pop it out.
+- **Code editor**: Write your own CSS with autocomplete and color swatches.
+- **Instant**: Every change applies as you make it and saves automatically.
+- **Presets**: Readability for distraction-free articles, Grayscale to mute color.
+- **Sync and history**: Keep styles in sync across browsers and restore any site's earlier versions.
 
-## How to contribute
+Stylebot 4 is in active development on the `v4` branch; the stores ship 3.x from `main`.
 
-### Donate
+## Contributing
 
-[Buy me a coffee](https://ko-fi.com/stylebot) via Ko-fi
-
-### Translate
-
-Add support for a locale via the following steps
-
-- See [supported locales](https://developer.chrome.com/webstore/i18n#localeTable)
-- If `src/_locales/[locale].config` already exists, please help improve translations
-- If not, copy [`src/_locales/en.config`](src/_locales/en.config) to `src/_locales/[locale].config`
-- Update strings in `src/_locales/[locale].config` to match the locale
-
-### Add new features or fix bugs
-
-If you would like to <strong>add a new feature</strong> to Stylebot or <strong>fix a bug</strong>, <strong>submit an issue</strong> in GitHub (if there is no existing one), discuss it, and wait for <strong>approval</strong>.
-
-## Development
-
-### Firefox
-
-- Run `yarn watch:firefox` to build locally
-- Run `yarn start:firefox` to launch Firefox with development build
-
-### Chrome/Edge
-
-- Run `yarn watch` to build locally
-- Open `chrome://extensions` page.
-- Disable the official Stylebot version.
-- Enable the Developer mode.
-- Load unpacked `dist/` as extension
-
-### Tests
-
-- Run `yarn test` for unit tests
-- Run `yarn test:storybook` for the Storybook interaction tests (every story rendered headless, play functions asserted); `yarn test:storybook --dev --watch` against a running `yarn storybook` while writing them
-- Run `yarn e2e` for the Playwright end-to-end suite (headless Chrome, as in CI); `yarn e2e --firefox --ui` and friends for other browsers and modes — see [`e2e/README.md`](e2e/README.md)
-
-### Google Drive Sync
-
-How sync works, and how to use it from a local build or a fork, is described in [`src/sync/README.md`](src/sync/README.md).
-
-### Release
-
-Releases go through a pull request from a `release/vX.Y.Z` branch — the `release/` prefix is what triggers the Edge e2e suite, which doesn't run on ordinary PRs.
-
-- Branch off `main` as `release/vX.Y.Z`
-- Add entry to `CHANGELOG`
-- Update version in `package.json` and `src/extension/manifest.json`
-- Open the PR and wait for `build`, `validation`, `storybook`, `e2e`, `e2e (edge)` and `e2e (firefox)` to pass
-- Squash-merge — the GitHub Release and its `vX.Y.Z` tag are then created automatically from the changelog entry
-- Chrome and Edge: Run `yarn build` and manually create zip for distribution from `dist/`
-- Firefox: Run `yarn build:firefox` and manually create zip for distribution from `firefox-dist/`
-
-### Patches
-
-Patches to dependencies are located under `/patches` and are automatically applied on running `yarn` using [patch-package](https://github.com/ds300/patch-package).
-
-- `bootstrap-vue+2.21.1.patch` - Patch to work around a [requestAnimationFrame issue](https://github.com/facebook/react/issues/16606) in Firefox extensions.
+- **Contribute**: bug fixes, features and translations are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md)
+- **Developer docs**: setup, architecture and testing in [docs/](docs/README.md)
+- **Support**: [buy me a coffee](https://ko-fi.com/stylebot) via Ko-fi
 
 ## License
 
-Stylebot is MIT licensed.
+Stylebot is released under the [MIT License](LICENSE).
