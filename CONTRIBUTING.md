@@ -14,4 +14,4 @@ If you'd like to **add a new feature** or **fix a bug**, first **open an issue**
 
 ## Development
 
-See [`docs/development.md`](docs/development.md) for setup, builds and tests, and [`docs/releases.md`](docs/releases.md) for cutting a release. Everything else is indexed in [`docs/`](docs/README.md).
+See [`docs/development.md`](docs/development.md) for setup, builds and tests. Everything else is indexed in [`docs/`](docs/README.md).
