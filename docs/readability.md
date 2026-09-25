@@ -6,6 +6,8 @@ Code: `src/readability`, aliased as `@stylebot/readability`.
 
 The content scripts import only its light parts (eligibility, the loading screen, apply/remove); the reader itself, `reader.ts`, builds to `readability/reader.js`, which `lifecycle/load-reader.ts` imports on demand once a page qualifies.
 
-- **Eligibility**: whether the reader should run on the current page (URL rules, MediaWiki detection, content-density scoring)
-- **Lifecycle**: turning the live page into the reader and back — applying/removing, mounting the Vue app into a shadow DOM, parsing the article, and caching/restoring the original document
-- **Loading screen**: the themed screen shown while the reader is being applied
+| Module           | What it does                                                                                                                                                   |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `eligibility`    | Whether the reader should run on the current page (URL rules, MediaWiki detection, content-density scoring)                                                    |
+| `lifecycle`      | Turning the live page into the reader and back: applying/removing, mounting the Vue app into a shadow DOM, parsing the article, caching/restoring the document |
+| `loading-screen` | The themed screen shown while the reader is being applied                                                                                                      |

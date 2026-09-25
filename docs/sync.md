@@ -4,15 +4,20 @@ Keeps a user's styles the same on every browser they sign in to, using a single 
 
 Code: `src/sync`.
 
-## Layout
+## Modules
 
-- **`google-drive/sync.ts`** — `runGoogleDriveSync()`, one sync run end to end
-- **`google-drive/sync-file.ts`** — the Drive client: find, download, upload, account lookup
-- **`google-drive/sync-metadata.ts`** — what is kept in `chrome.storage.local` between runs
-- **`google-drive/get-access-token.ts`** — OAuth token, cached
-- **`merge/three-way.ts`** — decides per url; **`merge/merge-css.ts`** — merges CSS text; **`merge/diff3.ts`** — vendored line diff3; **`merge/merge-without-base.ts`** — the fallback
-- **`errors.ts`** — `syncError(message, code)`, mapped to locale keys for the UI
-- `src/background/sync-scheduler.ts` — when runs happen
+| Module                             | What it does                                                 |
+| ---------------------------------- | ------------------------------------------------------------ |
+| `google-drive/sync.ts`             | `runGoogleDriveSync()`, one sync run end to end              |
+| `google-drive/sync-file.ts`        | The Drive client: find, download, upload, account lookup     |
+| `google-drive/sync-metadata.ts`    | What is kept in `chrome.storage.local` between runs          |
+| `google-drive/get-access-token.ts` | OAuth token, cached                                          |
+| `merge/three-way.ts`               | Decides per url                                              |
+| `merge/merge-css.ts`               | Merges CSS text                                              |
+| `merge/diff3.ts`                   | Vendored line diff3                                          |
+| `merge/merge-without-base.ts`      | The fallback when there is no base                           |
+| `errors.ts`                        | `syncError(message, code)`, mapped to locale keys for the UI |
+| `src/background/sync-scheduler.ts` | When runs happen                                             |
 
 ## What is stored
 
