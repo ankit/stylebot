@@ -47,12 +47,6 @@ export type RunGoogleDriveSyncResponse =
   | { ok: true; metadata: GoogleDriveSyncMetadata }
   | { ok: false; errorKey: SyncErrorKey; errorDetail?: string };
 
-export type SyncFailure = {
-  ok: false;
-  errorKey: SyncErrorKey;
-  errorDetail?: string;
-};
-
 export type ScanVersionHistoryResponse = { scan: VersionHistory };
 
 export type RestoreVersionResponse = { ok: boolean };

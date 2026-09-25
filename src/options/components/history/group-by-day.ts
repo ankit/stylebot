@@ -4,7 +4,7 @@ import { formatDay, formatWeekday } from '@stylebot/utils';
 
 export type DayGroup<T> = {
   label: string;
-  entries: Array<{ item: T; index: number }>;
+  entries: Array<T>;
 };
 
 /**
@@ -29,8 +29,7 @@ export const getDayLabel = (
 };
 
 /**
- * The items gathered under the day each falls on, in the order given. Each
- * keeps the index it came in, since the first is the one in force now.
+ * The items gathered under the day each falls on, in the order given.
  */
 export const groupByDay = <T>(
   items: Array<T>,
@@ -39,11 +38,11 @@ export const groupByDay = <T>(
 ): Array<DayGroup<T>> => {
   const days = new Map<string, DayGroup<T>['entries']>();
 
-  items.forEach((item, index) => {
+  items.forEach(item => {
     const day = label(dateOf(item));
     const entries = days.get(day) ?? [];
 
-    entries.push({ item, index });
+    entries.push(item);
     days.set(day, entries);
   });
 

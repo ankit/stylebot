@@ -188,7 +188,3 @@ export const getStylesAtEachVersion = (
 
   return versions;
 };
-
-export const clearHistory = async (): Promise<void> => {
-  await chrome.storage.local.remove([HISTORY_KEY, SESSION_KEY]);
-};

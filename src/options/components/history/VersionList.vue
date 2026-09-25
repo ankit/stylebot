@@ -4,15 +4,15 @@
       <div :key="group.label" class="day">{{ group.label }}</div>
 
       <version
-        v-for="entry in group.entries"
-        :key="entry.item.id"
-        :version="entry.item"
-        :is-current="entry.item.id === currentId"
-        :change="changes[entry.item.id] || null"
-        :preview="previews[entry.item.id] || null"
-        :expanded="expandedId === entry.item.id"
-        @toggle="$emit('toggle', entry.item)"
-        @restore="$emit('restore', entry.item, $event)"
+        v-for="version in group.entries"
+        :key="version.id"
+        :version="version"
+        :is-current="version.id === currentId"
+        :change="changes[version.id] || null"
+        :preview="previews[version.id] || null"
+        :expanded="expandedId === version.id"
+        @toggle="$emit('toggle', version)"
+        @restore="$emit('restore', version, $event)"
       />
     </template>
   </div>

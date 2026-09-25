@@ -1,7 +1,6 @@
 import { StyleMap } from '@stylebot/types';
 
 import {
-  clearHistory,
   getHistory,
   getStylesAtEachVersion,
   recordStyleChange,
@@ -57,7 +56,6 @@ describe('style history', () => {
     } as unknown as typeof chrome;
 
     jest.restoreAllMocks();
-    await clearHistory();
   });
 
   it('records only the styles a write touched', async () => {
