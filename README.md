@@ -16,14 +16,14 @@ Available on [Chrome](https://chrome.google.com/webstore/detail/stylebot/oiaejid
 
 ![Stylebot's visual editor open on GitHub in dark mode](.github/readme/editor-basic-mode.webp)
 
-- **Visual editor**: Pick any element and restyle it with UI controls. Empty fields show the page's current values, and other elements a selector matches are highlighted as you edit.
-- **Code editor**: Write your own CSS, with autocomplete, color swatches and native CSS nesting.
-- **Saved instantly**: Changes apply as you make them. Styles override the site's own by default, and you can turn that off for any style.
-- **Dock it or pop it out**: Dock the editor to the left or right of the page, or open it in its own window.
-- **Readability mode**: Turn articles into a clean reading view, with a theme and font you choose.
-- **Grayscale mode**: Remove color to reduce strain from websites.
-- **Google Drive sync**: Back up your styles and keep them in sync across browsers, with conflicts shown for you to resolve.
-- **Dark mode support**: The editor, popup and options page follow your system theme, and the editor can also be set to light or dark.
+- **Visual editor**: Pick any element and restyle it with UI controls.
+- **Code editor**: Write your own CSS, with autocomplete and color swatches.
+- **Saved instantly**: Changes apply as you type.
+- **Dock or pop out**: Dock the editor left or right, or open it in its own window.
+- **Readability mode**: Turn articles into a clean reading view.
+- **Grayscale mode**: Remove color to reduce eye strain.
+- **Google Drive sync**: Back up and sync your styles across browsers.
+- **Dark mode support**: The editor, popup and options page all come in dark.
 
 ## How to contribute
 
