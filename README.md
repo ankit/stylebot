@@ -24,9 +24,9 @@ Stylebot 4 is in active development on the `v4` branch; the stores ship 3.x from
 
 ## Contributing
 
-Bug fixes, features and translations are welcome — see [`CONTRIBUTING.md`](CONTRIBUTING.md). You can also [buy me a coffee](https://ko-fi.com/stylebot) via Ko-fi.
-
-Developer docs live in [`docs/`](docs/README.md).
+- **Contribute**: bug fixes, features and translations are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md)
+- **Developer docs**: setup, architecture and testing in [docs/](docs/README.md)
+- **Support**: [buy me a coffee](https://ko-fi.com/stylebot) via Ko-fi
 
 ## License
 
