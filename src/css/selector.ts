@@ -199,7 +199,7 @@ function getAncestorHashedClassSelector(el: HTMLElement): string | null {
 
 /**
  * #id ranks above a hashed class but below anything genuinely authored,
- * the element's own or an ancestor's. See docs/architecture/selectors-and-css.md.
+ * the element's own or an ancestor's. See docs/selectors-and-css.md.
  */
 export const getSelector = (el: HTMLElement): string => {
   return (

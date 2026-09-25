@@ -10,7 +10,7 @@ Browser extension (Chrome/Edge/Firefox) that lets users change the appearance of
 - `__mocks__/` — Jest mocks
 - `dist/` — Chrome/Edge build output; `firefox-dist/` — Firefox build output; `preview-dist/` — `yarn build:preview` output
 - `site/` — stylebot.dev static site
-- `docs/` — developer docs: setup, releases, translation, `architecture/` (editor, selectors and CSS, readability, sync), `testing/`
+- `docs/` — developer docs: setup, releases, translation, architecture (editor, selectors and CSS, readability, sync), `testing/`
 - `patches/` — patch-package patches applied to dependencies on install
 
 ## Workflow

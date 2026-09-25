@@ -41,7 +41,7 @@ Run `yarn storybook` to browse the popup, options page, editor and shared compon
 
 ## Google Drive Sync
 
-How sync works, and how to use it from a local build or a fork, is described in [`docs/architecture/sync.md`](architecture/sync.md).
+How sync works, and how to use it from a local build or a fork, is described in [`docs/sync.md`](sync.md).
 
 ## Patches
 

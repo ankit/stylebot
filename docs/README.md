@@ -12,7 +12,7 @@
 
 ## Architecture
 
-- [Editor](architecture/editor.md) — the in-page and windowed editor, and the page bridge between them
-- [Selectors and CSS](architecture/selectors-and-css.md) — how selectors are picked and CSS is transformed before injection
-- [Readability](architecture/readability.md) — the reader view and how it loads
-- [Sync](architecture/sync.md) — Google Drive sync and its three-way merge
+- [Editor](editor.md) — the in-page and windowed editor, and the page bridge between them
+- [Selectors and CSS](selectors-and-css.md) — how selectors are picked and CSS is transformed before injection
+- [Readability](readability.md) — the reader view and how it loads
+- [Sync](sync.md) — Google Drive sync and its three-way merge
