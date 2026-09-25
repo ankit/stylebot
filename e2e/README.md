@@ -1,7 +1,8 @@
 # e2e
 
 Playwright tests that drive the real, built extension in a real browser. Chrome is the
-default; Chrome and Firefox run on every PR, Edge on release PRs (it shares Chrome's build).
+default; Chrome runs on every PR, Firefox and Edge on release PRs (or manually via
+workflow_dispatch).
 
 ## What belongs here
 

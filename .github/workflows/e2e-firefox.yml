@@ -1,15 +1,16 @@
 name: e2e (firefox)
 on:
-  push:
+  pull_request:
     branches:
       - main
-  pull_request:
+  workflow_dispatch:
 
 jobs:
   e2e-firefox:
     name: e2e (firefox)
-    # Unlike Edge, Firefox is a separate build (firefox-dist/, event page, its own
-    # CSP rules), so it runs on every PR like Chrome rather than at release time.
+    # Only runs at release time to save CI minutes. github.head_ref is empty on
+    # workflow_dispatch, hence the first clause.
+    if: ${{ github.event_name == 'workflow_dispatch' || startsWith(github.head_ref, 'release/') }}
     runs-on: ubuntu-latest
 
     steps:
