@@ -2,7 +2,7 @@
   <button
     type="button"
     class="button"
-    :class="variant"
+    :class="[variant, `size-${size}`]"
     :title="title"
     :disabled="disabled"
     @click="$emit('click', $event)"
@@ -16,6 +16,7 @@
 import Vue, { PropType } from 'vue';
 
 type Variant = 'default' | 'primary' | 'ghost' | 'danger';
+type Size = 'default' | 'small';
 
 export default Vue.extend({
   name: 'SButton',
@@ -33,6 +34,11 @@ export default Vue.extend({
 
     variant: {
       type: String as PropType<Variant>,
+      default: 'default',
+    },
+
+    size: {
+      type: String as PropType<Size>,
       default: 'default',
     },
   },
@@ -64,6 +70,12 @@ export default Vue.extend({
   @include focus-ring;
 }
 
+.button.size-small {
+  gap: 5px;
+  padding: 7px 13px;
+  font-size: 12.5px;
+}
+
 .button.default {
   background: var(--panel-surface);
   border-color: var(--field-border);
@@ -76,7 +88,7 @@ export default Vue.extend({
 .button.primary {
   background: var(--accent);
   border-color: var(--accent);
-  color: var(--accent-ink);
+  color: #fff;
 
   &:hover:not(:disabled) {
     filter: brightness(0.92);

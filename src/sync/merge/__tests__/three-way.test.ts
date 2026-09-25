@@ -1,6 +1,6 @@
 import { StyleMap, StyleWithoutUrl } from '@stylebot/types';
 
-import { mergeThreeWay, isEquivalentStyleMap } from '../three-way';
+import { mergeThreeWay } from '../three-way';
 
 const AT = '2026-09-18T11:04:22.331Z';
 const T1 = '2024-01-01T00:00:00.000Z';
@@ -204,39 +204,5 @@ describe('mergeThreeWay', () => {
       styles: { 'a.com': X1, 'b.com': X, 'c.com': X },
       conflicts: [],
     });
-  });
-});
-
-describe('isEquivalentStyleMap', () => {
-  it('ignores modifiedTime and whitespace', () => {
-    expect(
-      isEquivalentStyleMap(
-        { 'a.com': style('a { color: red; }') },
-        { 'a.com': style('a {\n  color: red;\n}\n', T2) }
-      )
-    ).toBe(true);
-  });
-
-  it('tells apart added urls and changed flags or css', () => {
-    const a = { 'a.com': style('a { color: red; }') };
-
-    expect(isEquivalentStyleMap(a, {})).toBe(false);
-    expect(isEquivalentStyleMap({}, a)).toBe(false);
-    expect(
-      isEquivalentStyleMap(a, { 'b.com': style('a { color: red; }') })
-    ).toBe(false);
-    expect(
-      isEquivalentStyleMap(a, {
-        'a.com': style('a { color: red; }', T1, { enabled: false }),
-      })
-    ).toBe(false);
-    expect(
-      isEquivalentStyleMap(a, {
-        'a.com': style('a { color: red; }', T1, { readability: true }),
-      })
-    ).toBe(false);
-    expect(
-      isEquivalentStyleMap(a, { 'a.com': style('a { color: blue; }') })
-    ).toBe(false);
   });
 });

@@ -1,5 +1,9 @@
 <template>
   <div class="sync-tab">
+    <sync-status-banner v-if="showRestoreSuccess">
+      {{ t('restore_success') }}
+    </sync-status-banner>
+
     <sync-status-banner v-if="showImportSuccessAlert">
       {{ t('import_success') }}
     </sync-status-banner>
@@ -18,7 +22,10 @@
         {{ t('sync_tab_description') }}
       </s-text>
 
-      <the-google-drive-sync @edit="$emit('edit', $event)" />
+      <the-google-drive-sync
+        @edit="$emit('edit', $event)"
+        @restored="onRestored"
+      />
     </div>
 
     <div class="section">
@@ -60,11 +67,13 @@ export default Vue.extend({
     showImportErrorAlert: boolean;
     showImportSuccessAlert: boolean;
     importError: string | DOMException | null;
+    showRestoreSuccess: boolean;
   } {
     return {
       importError: null,
       showImportErrorAlert: false,
       showImportSuccessAlert: false,
+      showRestoreSuccess: false,
     };
   },
 
@@ -77,6 +86,10 @@ export default Vue.extend({
   methods: {
     exportJson(): void {
       exportAsJSONFile(this.$store.state.styles);
+    },
+
+    onRestored(): void {
+      this.showRestoreSuccess = true;
     },
 
     async importJson(): Promise<void> {

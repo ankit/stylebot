@@ -14,6 +14,7 @@ const aliasedPackages = [
   'css',
   'i18n',
   'sync',
+  'history',
   'types',
   'utils',
   'styles',

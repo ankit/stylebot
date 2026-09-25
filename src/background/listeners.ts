@@ -25,6 +25,8 @@ import {
   GetImportCss,
   GetGoogleWebFontExists,
   RunGoogleDriveSync,
+  ScanVersionHistory,
+  RestoreVersion,
   GetRecentColors,
   AddRecentColor,
   OpenEditorWindow,
@@ -220,6 +222,12 @@ chrome.runtime.onMessage.addListener(
 
       case 'RunGoogleDriveSync':
         RunGoogleDriveSync(message, sendResponse);
+        break;
+      case 'ScanVersionHistory':
+        ScanVersionHistory(message, sendResponse);
+        break;
+      case 'RestoreVersion':
+        RestoreVersion(message, sendResponse);
         break;
 
       case 'GetRecentColors':

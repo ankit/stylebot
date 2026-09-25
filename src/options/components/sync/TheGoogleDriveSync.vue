@@ -71,13 +71,9 @@
             <span v-else class="path">{{ syncFilePath }}</span>
           </dd>
 
-          <button
-            type="button"
-            class="link-button"
-            @click="googleDriveSyncEnabled = false"
-          >
+          <s-link-button @click="googleDriveSyncEnabled = false">
             {{ t('sync_disconnect') }}
-          </button>
+          </s-link-button>
         </div>
 
         <div class="row">
@@ -124,7 +120,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { Heading, SText, SButton } from '@stylebot/components';
+import { Heading, SText, SButton, SLinkButton } from '@stylebot/components';
 import { ArrowRepeatIcon } from '@stylebot/icons';
 import { SyncAccount, SyncConflict } from '@stylebot/types';
 import { formatSyncTime } from '@stylebot/utils';
@@ -139,6 +135,7 @@ export default Vue.extend({
 
   components: {
     SButton,
+    SLinkButton,
     ArrowRepeatIcon,
     Heading,
     SText,
@@ -365,28 +362,6 @@ export default Vue.extend({
 .external {
   width: 11px;
   height: 11px;
-}
-
-.link-button {
-  flex: none;
-  padding: 0;
-  border: 0;
-  background: none;
-  font: inherit;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--accent);
-  cursor: pointer;
-
-  &:hover {
-    text-decoration: underline;
-  }
-
-  &:focus-visible {
-    outline: 2px solid var(--ring);
-    outline-offset: 2px;
-    border-radius: 3px;
-  }
 }
 
 .description {

@@ -8,13 +8,18 @@ const meta: Meta = {
   title: 'Primitives/Buttons/SButton',
   component: SButton,
   argTypes: {
-    variant: { control: 'radio', options: ['default', 'ghost', 'danger'] },
+    variant: {
+      control: 'radio',
+      options: ['default', 'primary', 'ghost', 'danger'],
+    },
+    size: { control: 'radio', options: ['default', 'small'] },
     disabled: { control: 'boolean' },
     label: { control: 'text' },
     trailingIcon: { control: 'boolean' },
   },
   args: {
     variant: 'default',
+    size: 'default',
     disabled: false,
     label: 'Save',
     trailingIcon: false,
@@ -28,7 +33,7 @@ const components = { SButton, ChevronDownIcon };
 export const Playground = playground(
   components,
   `
-  <s-button :variant="variant" :disabled="disabled">
+  <s-button :variant="variant" :size="size" :disabled="disabled">
     {{ label }}
     <template v-if="trailingIcon" #trailing>
       <chevron-down-icon :size="14" />
@@ -41,6 +46,7 @@ export const Variants = matrix({
   components,
   rows: [
     { label: 'default', attrs: '' },
+    { label: 'primary', attrs: 'variant="primary"' },
     { label: 'ghost', attrs: 'variant="ghost"' },
     { label: 'danger', attrs: 'variant="danger"' },
   ],
@@ -57,6 +63,10 @@ export const Variants = matrix({
           Options
           <template #trailing><chevron-down-icon :size="14" /></template>
         </s-button>`,
+    },
+    {
+      label: 'Small',
+      cell: attrs => `<s-button ${attrs} size="small">Save</s-button>`,
     },
   ],
 });

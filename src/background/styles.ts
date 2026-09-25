@@ -3,9 +3,15 @@ import * as postcss from 'postcss';
 import { getCurrentTimestamp } from '@stylebot/utils';
 import { getStylesForPage } from '@stylebot/styles';
 
-import { StyleMap, StyleWithoutUrl, ApplyStylesToTab } from '@stylebot/types';
+import {
+  StyleMap,
+  StyleWithoutUrl,
+  ApplyStylesToTab,
+  Timestamp,
+} from '@stylebot/types';
 
 import { getIsReadabilityActive, updateIcon } from './badge';
+import { recordStyleChange } from '../history/store';
 import { scheduleSyncAfterEdit } from './sync-scheduler';
 
 export { getStylesForPage } from '@stylebot/styles';
@@ -72,20 +78,26 @@ export const get = async (url: string): Promise<StyleWithoutUrl> => {
 };
 
 /**
- * Writes the style map, plus its modified-time metadata, to storage, lines
- * up a sync for the edit unless the write came from sync itself, and returns
- * the revision it stamped.
+ * Writes the style map, records what it changed, and lines up a sync unless
+ * the write came from sync itself. `previous` saves a caller's read.
  */
 const writeToStorage = async (
   styles: StyleMap,
-  { fromSync }: { fromSync: boolean }
+  {
+    fromSync,
+    previous,
+    restoredFrom,
+  }: { fromSync: boolean; previous?: StyleMap; restoredFrom?: Timestamp }
 ): Promise<string> => {
   const modifiedTime = getCurrentTimestamp();
+  const before = previous ?? (await getAll());
 
   await chrome.storage.local.set({
     styles,
     'styles-metadata': { modifiedTime },
   });
+
+  await recordStyleChange(before, styles, { fromSync, restoredFrom });
 
   if (!fromSync) {
     await scheduleSyncAfterEdit();
@@ -103,14 +115,19 @@ let pendingWrite = Promise.resolve();
 
 /**
  * Replaces the entire style map. Sync passes fromSync so the write it makes
- * while pulling is not itself queued up as an edit to push.
+ * while pulling is not itself queued up as an edit to push. A restore names
+ * the version it put back, since that is its own act rather than a
+ * continuation of whatever was being edited.
  */
 export const setAll = (
   styles: StyleMap,
-  { fromSync = false }: { fromSync?: boolean } = {}
+  {
+    fromSync = false,
+    restoredFrom,
+  }: { fromSync?: boolean; restoredFrom?: Timestamp } = {}
 ): Promise<void> => {
   pendingWrite = pendingWrite.then(() =>
-    writeToStorage(styles, { fromSync }).then()
+    writeToStorage(styles, { fromSync, restoredFrom }).then()
   );
   return pendingWrite;
 };
@@ -128,18 +145,34 @@ export const setAllIfUnchanged = (
   { fromSync = false }: { fromSync?: boolean } = {}
 ): Promise<string | null> => {
   const attempt = pendingWrite.then(async () => {
-    const items = await chrome.storage.local.get('styles-metadata');
+    const items = await chrome.storage.local.get(['styles', 'styles-metadata']);
 
     if (items['styles-metadata']?.modifiedTime !== revision) {
       return null;
     }
 
-    return writeToStorage(styles, { fromSync });
+    return writeToStorage(styles, {
+      fromSync,
+      previous: items['styles'] || {},
+    });
   });
 
   pendingWrite = attempt.then(() => undefined);
   return attempt;
 };
+
+/**
+ * A style with fields changed and the time stamped as edited now. A new
+ * object, so the map the write was computed from is left as it was.
+ */
+const editStyle = (
+  style: StyleWithoutUrl,
+  changes: Partial<StyleWithoutUrl>
+): StyleWithoutUrl => ({
+  ...style,
+  ...changes,
+  modifiedTime: getCurrentTimestamp(),
+});
 
 /**
  * Runs a read-mutate-write against the style map through the pendingWrite
@@ -149,10 +182,11 @@ const update = (
   mutate: (styles: StyleMap) => StyleMap | undefined
 ): Promise<void> => {
   pendingWrite = pendingWrite.then(async () => {
-    const styles = mutate(await getAll());
+    const previous = await getAll();
+    const styles = mutate({ ...previous });
 
     if (styles) {
-      await writeToStorage(styles, { fromSync: false });
+      await writeToStorage(styles, { fromSync: false, previous });
     }
   });
 
@@ -198,8 +232,7 @@ export const enable = (url: string): Promise<void> =>
       return undefined;
     }
 
-    styles[url].enabled = true;
-    styles[url].modifiedTime = getCurrentTimestamp();
+    styles[url] = editStyle(styles[url], { enabled: true });
     return styles;
   });
 
@@ -213,8 +246,7 @@ export const disable = (url: string): Promise<void> =>
       return undefined;
     }
 
-    styles[url].enabled = false;
-    styles[url].modifiedTime = getCurrentTimestamp();
+    styles[url] = editStyle(styles[url], { enabled: false });
     return styles;
   });
 
@@ -231,8 +263,7 @@ export const setReadability = (url: string, value: boolean): Promise<void> =>
         return undefined;
       }
 
-      styles[url].readability = value;
-      styles[url].modifiedTime = getCurrentTimestamp();
+      styles[url] = editStyle(styles[url], { readability: value });
     } else {
       if (!value) {
         return undefined;
@@ -258,8 +289,7 @@ export const move = (src: string, dest: string): Promise<void> =>
       return undefined;
     }
 
-    styles[dest] = JSON.parse(JSON.stringify(styles[src]));
-    styles[dest].modifiedTime = getCurrentTimestamp();
+    styles[dest] = editStyle(styles[src], {});
     delete styles[src];
 
     return styles;

@@ -88,6 +88,7 @@ const config = {
       '@stylebot/css': path.resolve(__dirname, './src/css/index'),
       '@stylebot/i18n': path.resolve(__dirname, './src/i18n/index'),
       '@stylebot/sync': path.resolve(__dirname, './src/sync/index'),
+      '@stylebot/history': path.resolve(__dirname, './src/history/index'),
       '@stylebot/types': path.resolve(__dirname, './src/types/index'),
       '@stylebot/utils': path.resolve(__dirname, './src/utils/index'),
       '@stylebot/styles': path.resolve(__dirname, './src/styles/index'),

@@ -8,6 +8,8 @@ import {
 
 import { syncError } from '../errors';
 import { AccessToken } from './get-access-token';
+import { getAuthorizationHeaders, parseJsonResponse } from './http';
+import { isStyleMap } from './style-map';
 import { SYNC_FOLDER_NAME, SYNC_FILE_NAME } from './constants';
 
 const GOOGLE_DRIVE_FILE_GET_API = `https://www.googleapis.com/drive/v3/files`;
@@ -44,42 +46,6 @@ const searchFiles = async (
 
   return files ?? [];
 };
-
-const getAuthorizationHeaders = (accessToken: AccessToken) =>
-  new Headers({
-    Authorization: `Bearer ${accessToken}`,
-  });
-
-const parseJsonResponse = async <T>(response: Response): Promise<T> => {
-  if (!response.ok) {
-    throw syncError(
-      `Google Drive API request failed (${response.status} ${response.statusText})`,
-      response.status === 401 || response.status === 403 ? 'auth' : 'unknown'
-    );
-  }
-
-  try {
-    return await response.json();
-  } catch {
-    throw syncError('Google Drive returned invalid JSON', 'parse');
-  }
-};
-
-/**
- * The file is the user's, so it can hold anything by the time it is read
- * back: a hand edit in Drive, or an empty body. Only a map of style objects
- * may reach the merge.
- */
-const isStyleMap = (value: unknown): value is StyleMap =>
-  typeof value === 'object' &&
-  value !== null &&
-  !Array.isArray(value) &&
-  Object.values(value).every(
-    style =>
-      typeof style === 'object' &&
-      style !== null &&
-      typeof (style as { css?: unknown }).css === 'string'
-  );
 
 /**
  * Which Google account the token belongs to, so the Sync tab can say where

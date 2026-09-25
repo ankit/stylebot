@@ -12,7 +12,8 @@ import {
   toSyncErrorKey,
   toSyncErrorDetail,
 } from '../errors';
-import { mergeThreeWay, isEquivalentStyleMap } from '../merge/three-way';
+import { mergeThreeWay } from '../merge/three-way';
+import { isEquivalentStyleMap } from '@stylebot/styles';
 import getAccessToken, { clearCachedToken } from './get-access-token';
 import {
   getSyncState,

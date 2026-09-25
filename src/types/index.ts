@@ -155,6 +155,7 @@ export type SyncState = {
   account?: SyncAccount;
 };
 
+export * from './history';
 export * from './TabMessage';
 export * from './BackgroundPageMessage';
 export * from './BackgroundPageMessageResponse';

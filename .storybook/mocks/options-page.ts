@@ -32,7 +32,7 @@ export const seededStyles = {
  * given tab, so each tab's stories still exercise the real navigation.
  */
 export const optionsPage = (
-  tab: 'Basics' | 'Styles' | 'Sync',
+  tab: 'Basics' | 'Styles' | 'Version history' | 'Sync',
   overrides: OptionsStateOverrides = {},
   afterNavigate?: (root: HTMLElement) => Promise<void>
 ): StoryObj => ({

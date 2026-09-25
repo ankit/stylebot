@@ -16,7 +16,13 @@ import type {
   StylebotCommands,
   ReadabilitySettings,
   RunGoogleDriveSyncResponse,
+  VersionHistory,
 } from '@stylebot/types';
+
+/**
+ * A response a story can leave unresolved, to show the surface still waiting.
+ */
+type Pending<T> = T | 'pending';
 
 export type ChromeShimOptions = {
   styles?: Array<Style>;
@@ -29,8 +35,8 @@ export type ChromeShimOptions = {
   isOpen?: boolean;
   pageReaderable?: boolean;
   tabUrl?: string;
-  // 'pending' never resolves, for a story that shows a sync stuck in progress.
-  googleDriveSync?: RunGoogleDriveSyncResponse | 'pending';
+  googleDriveSync?: Pending<RunGoogleDriveSyncResponse>;
+  versionHistory?: Pending<VersionHistory>;
 };
 
 type Callback = (response?: unknown) => void;
@@ -132,6 +138,23 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
 
       return response;
     },
+
+    ScanVersionHistory: () => {
+      if (overrides.versionHistory === 'pending') {
+        return new Promise(() => undefined);
+      }
+
+      return {
+        scan: overrides.versionHistory ?? {
+          versions: [],
+          previews: {},
+          changes: {},
+          total: 0,
+        },
+      };
+    },
+
+    RestoreVersion: () => ({ ok: true }),
   };
 
   const tabResponses: Record<string, () => unknown> = {

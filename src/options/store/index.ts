@@ -29,6 +29,8 @@ import {
   getCommands,
   setCommands,
   runGoogleDriveSync,
+  scanVersionHistory,
+  restoreVersion,
 } from '../utils';
 
 Vue.use(Vuex);
@@ -85,6 +87,24 @@ export default new Vuex.Store<State>({
         state.googleDriveSyncState = await getSyncState();
         state.googleDriveSyncNeedsAuth = await getSyncNeedsAuth();
       }
+    },
+
+    scanVersionHistory(_context, limit?: number) {
+      return scanVersionHistory(limit);
+    },
+
+    /**
+     * The background page owns the write, so the restore rides the same chain
+     * as any other edit — which is what records it in the history too, making
+     * the restore itself something that can be put back.
+     */
+    async restoreVersion(
+      { dispatch },
+      { versionId, urls }: { versionId: string; urls?: Array<string> }
+    ) {
+      const ok = await restoreVersion(versionId, urls);
+      await dispatch('getAllStyles');
+      return ok;
     },
 
     async dismissSyncConflict({ state }, url: string) {

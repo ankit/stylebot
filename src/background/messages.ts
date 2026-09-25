@@ -38,6 +38,8 @@ import {
   GetImportCss as GetImportCssType,
   GetGoogleWebFontExists as GetGoogleWebFontExistsType,
   RunGoogleDriveSync as RunGoogleDriveSyncType,
+  ScanVersionHistory as ScanVersionHistoryType,
+  RestoreVersion as RestoreVersionType,
   AddRecentColor as AddRecentColorType,
   OpenEditorWindow as OpenEditorWindowType,
   ToggleEditorWindow as ToggleEditorWindowType,
@@ -53,10 +55,14 @@ import {
   GetImportCssResponse,
   GetGoogleWebFontExistsResponse,
   RunGoogleDriveSyncResponse,
+  ScanVersionHistoryResponse,
+  RestoreVersionResponse,
   GetRecentColorsResponse,
   AddRecentColorResponse,
 } from '@stylebot/types';
 import { runGoogleDriveSync } from '@stylebot/sync';
+
+import { scanVersionHistory, restoreVersion } from '@stylebot/history';
 
 import {
   get as getReadabilitySettings,
@@ -273,6 +279,22 @@ export const RunGoogleDriveSync = async (
       errorDetail: e instanceof Error ? e.message : undefined,
     });
   }
+};
+
+export const ScanVersionHistory = async (
+  message: ScanVersionHistoryType,
+  sendResponse: (response: ScanVersionHistoryResponse) => void
+): Promise<void> => {
+  sendResponse({ scan: await scanVersionHistory(message.limit) });
+};
+
+export const RestoreVersion = async (
+  message: RestoreVersionType,
+  sendResponse: (response: RestoreVersionResponse) => void
+): Promise<void> => {
+  sendResponse({
+    ok: await restoreVersion(message.versionId, message.urls),
+  });
 };
 
 export const GetRecentColors = async (

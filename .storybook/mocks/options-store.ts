@@ -8,7 +8,11 @@ import type {
   SyncState,
 } from '@stylebot/types';
 import type { SyncStatus } from '@/options/store';
-import { runGoogleDriveSync } from '@/options/utils';
+import {
+  runGoogleDriveSync,
+  scanVersionHistory,
+  restoreVersion,
+} from '@/options/utils';
 
 export type OptionsState = {
   styles: StyleMap;
@@ -70,6 +74,17 @@ const actions: ActionTree<OptionsState, OptionsState> = {
         conflict => conflict.url !== url
       ),
     };
+  },
+
+  scanVersionHistory(_context, limit?: number) {
+    return scanVersionHistory(limit);
+  },
+
+  restoreVersion(
+    _context,
+    { versionId, urls }: { versionId: string; urls?: Array<string> }
+  ) {
+    return restoreVersion(versionId, urls);
   },
 
   async syncWithGoogleDrive({ state }) {
