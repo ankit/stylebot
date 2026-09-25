@@ -2,8 +2,6 @@
 
 The editor is one Vue app, `TheStylebotApp`, that runs in two hosts: docked inside the page, or in its own browser window. Everything it does to the page goes through a `PageBridge`, which is what lets the same components run in either place.
 
-Code: `src/editor` (the app and the in-page host), `src/page-bridge` (`@stylebot/page-bridge`), `src/editor-window` (the window host).
-
 ## In the page
 
 - `editor/index` runs as a content script on every page: it creates the store, sets up

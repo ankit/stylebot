@@ -2,8 +2,6 @@
 
 How Stylebot picks selectors for elements and transforms the user's CSS before it reaches the page.
 
-Code: `src/css`, aliased as `@stylebot/css`.
-
 ## Modules
 
 | Module         | What it does                                                                                                                            |
