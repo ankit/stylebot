@@ -14,7 +14,7 @@ Available on [Chrome](https://chrome.google.com/webstore/detail/stylebot/oiaejid
 > [!NOTE]
 > Stylebot 4 is under active development on the `v4` branch. The version in the stores is 3.x, released from `main`.
 
-![Stylebot's visual editor open on GitHub in dark mode](.github/readme/editor-basic-mode.webp)
+![Stylebot's visual editor open on GitHub in dark mode](docs/images/editor-basic-mode.webp)
 
 - **Visual editor**: Pick any element and restyle it with UI controls.
 - **Code editor**: Write your own CSS, with autocomplete and color swatches.
