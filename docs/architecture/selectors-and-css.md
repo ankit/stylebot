@@ -1,6 +1,8 @@
-# `src/css`
+# Selectors and CSS
 
-CSS utility methods, aliased as `@stylebot/css`.
+How Stylebot picks selectors for elements and transforms the user's CSS before it reaches the page.
+
+Code: `src/css`, aliased as `@stylebot/css`.
 
 ## Modules
 

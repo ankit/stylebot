@@ -1,17 +1,11 @@
-# `src/readability`
+# Readability
 
-This package includes code for the stylebot reader. Built using [Defuddle](https://github.com/kepano/defuddle) for article extraction.
+Readability mode turns an article into a clean reading view, built on [Defuddle](https://github.com/kepano/defuddle) for article extraction.
 
-Aliased as `@stylebot/readability`. The content scripts import only its light parts (eligibility, the loading screen, apply/remove); the reader itself, `reader.ts`, builds to `readability/reader.js`, which `lifecycle/load-reader.ts` imports on demand once a page qualifies.
+Code: `src/readability`, aliased as `@stylebot/readability`.
 
-- **`eligibility`**: whether the reader should run on the current page (URL rules, MediaWiki detection, content-density scoring)
+The content scripts import only its light parts (eligibility, the loading screen, apply/remove); the reader itself, `reader.ts`, builds to `readability/reader.js`, which `lifecycle/load-reader.ts` imports on demand once a page qualifies.
 
-- **`lifecycle`**: turning the live page into the reader and back — applying/removing, mounting the Vue app into a shadow DOM, parsing the article, and caching/restoring the original document
-
-- **`loading-screen`**: the themed loading screen shown while the reader is being applied
-
-- **`utils`**: dock UI → background message bridge (closing the reader, sending settings, opening pages)
-
-- **`components`**: Vue components for rendering the stylebot reader
-
-- **`scss`**: CSS for stylebot reader
+- **Eligibility**: whether the reader should run on the current page (URL rules, MediaWiki detection, content-density scoring)
+- **Lifecycle**: turning the live page into the reader and back — applying/removing, mounting the Vue app into a shadow DOM, parsing the article, and caching/restoring the original document
+- **Loading screen**: the themed screen shown while the reader is being applied

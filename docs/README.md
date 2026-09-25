@@ -12,19 +12,7 @@
 
 ## Architecture
 
-One page per source folder:
-
-- [`src/background`](architecture/background.md)
-- [`src/css`](architecture/css.md)
-- [`src/editor`](architecture/editor.md)
-- [`src/editor-window`](architecture/editor-window.md)
-- [`src/extension`](architecture/extension.md)
-- [`src/highlighter`](architecture/highlighter.md)
-- [`src/inject-css`](architecture/inject-css.md)
-- [`src/monaco-editor`](architecture/monaco-editor.md)
-- [`src/options`](architecture/options.md)
-- [`src/page-bridge`](architecture/page-bridge.md)
-- [`src/popup`](architecture/popup.md)
-- [`src/readability`](architecture/readability.md)
-- [`src/sync`](architecture/sync.md)
-- [`src/types`](architecture/types.md)
+- [Editor](architecture/editor.md) — the in-page and windowed editor, and the page bridge between them
+- [Selectors and CSS](architecture/selectors-and-css.md) — how selectors are picked and CSS is transformed before injection
+- [Readability](architecture/readability.md) — the reader view and how it loads
+- [Sync](architecture/sync.md) — Google Drive sync and its three-way merge
