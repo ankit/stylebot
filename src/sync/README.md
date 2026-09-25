@@ -51,7 +51,11 @@ Scheduled runs are non-interactive: the token comes from the cache, then a silen
 
 ## Using sync from a local build or a fork
 
-Google's OAuth client is registered for the store extension's redirect URL, `https://<extension id>.chromiumapp.org/`. An unpacked build gets a different id from its path, so sign-in fails with `redirect_uri_mismatch`. A fork needs its own client:
+Google's OAuth client is registered for the store extension's redirect URL, `https://<extension id>.chromiumapp.org/`. An unpacked build gets a different id from its path, so sign-in fails with `redirect_uri_mismatch`.
+
+Dev builds (`yarn watch`, `yarn dev:chrome`) and `yarn build:preview` (a production build in `preview-dist/`) merge the store's public key from `src/extension/manifest-dev.json` into the manifest, so they get the store id and sign-in works. `yarn dev:chrome` runs in its own profile; if you load `dist/` unpacked in your everyday profile instead, disable the store install first, since the two share an id. Release builds (`yarn build`) leave the key out.
+
+A fork needs its own client:
 
 1. In the [Google Cloud console](https://cloud.google.com/cloud-console), create a project and enable the **Google Drive API**.
 2. Under **OAuth consent screen**, choose Internal (local use, or within an organisation) or External (a published fork), and add the scope `https://www.googleapis.com/auth/drive.file`.

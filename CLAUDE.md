@@ -8,7 +8,7 @@ Browser extension (Chrome/Edge/Firefox) that lets users change the appearance of
 - `src/_locales/` — i18n strings per locale
 - `e2e/` — Playwright end-to-end tests, driven against a real built extension: via CDP (`Extensions.loadUnpacked`) on Chrome/Edge, via Firefox's remote debugging protocol on Firefox; engine-specific code lives in `e2e/chromium/` and `e2e/firefox/` behind the `e2e/engine.ts` contract
 - `__mocks__/` — Jest mocks
-- `dist/` — Chrome/Edge build output; `firefox-dist/` — Firefox build output
+- `dist/` — Chrome/Edge build output; `firefox-dist/` — Firefox build output; `preview-dist/` — `yarn build:preview` output
 - `docs/` — stylebot.dev static site
 - `patches/` — patch-package patches applied to dependencies on install
 
@@ -22,6 +22,7 @@ session is already inside a worktree.
 
 - `yarn watch` — build for Chrome/Edge in watch mode
 - `yarn watch:firefox` — build for Firefox in watch mode
+- `yarn build:preview` — production build for local testing (not release) into `preview-dist/`, with the store's public key so it gets the store id
 - `yarn dev:chrome` — watch + launch a Chrome instance with the extension loaded
 - `yarn lint` / `yarn lint:fix` — ESLint
 - `yarn typecheck` — `tsc --noEmit` for the extension, then again with `.storybook/tsconfig.json` for Storybook config and stories

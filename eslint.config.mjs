@@ -10,6 +10,7 @@ export default tseslint.config(
     ignores: [
       'dist',
       'firefox-dist',
+      'preview-dist',
       'coverage',
       'test-results',
       'playwright-report',
