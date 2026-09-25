@@ -1,4 +1,4 @@
-# `readability`
+# `src/readability`
 
 This package includes code for the stylebot reader. Built using [Defuddle](https://github.com/kepano/defuddle) for article extraction.
 

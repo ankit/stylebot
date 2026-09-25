@@ -1,4 +1,4 @@
-# `editor-window`
+# `src/editor-window`
 
 Entry point for the editor in its own browser window, opened by the background's
 `editor-window` module with `?tabId=` of the page it styles. It mounts the same

@@ -1,4 +1,4 @@
-# `background`
+# `src/background`
 
 This package includes code for the extension background page.
 

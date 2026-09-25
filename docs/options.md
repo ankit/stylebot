@@ -1,4 +1,4 @@
-# `options`
+# `src/options`
 
 This package includes code for the stylebot options page.
 

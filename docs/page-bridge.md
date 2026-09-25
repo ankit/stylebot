@@ -1,4 +1,4 @@
-# `page-bridge`
+# `src/page-bridge`
 
 Aliased as `@stylebot/page-bridge`.
 

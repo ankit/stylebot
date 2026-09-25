@@ -1,4 +1,4 @@
-# `sync`
+# `src/sync`
 
 Keeps a user's styles the same on every browser they sign in to, using a single file in their Google Drive. This page is the summary; the code comments carry the detail.
 

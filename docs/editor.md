@@ -1,4 +1,4 @@
-# `editor`
+# `src/editor`
 
 This package includes code for the stylebot editor displayed on the page.
 

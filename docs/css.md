@@ -1,4 +1,4 @@
-# `css`
+# `src/css`
 
 CSS utility methods, aliased as `@stylebot/css`.
 

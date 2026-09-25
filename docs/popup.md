@@ -1,4 +1,4 @@
-# `popup`
+# `src/popup`
 
 This package includes code for the stylebot popup. Uses plain Vue components and scoped CSS (no UI framework) to keep the popup bundle small.
 

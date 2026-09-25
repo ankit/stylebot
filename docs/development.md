@@ -16,6 +16,24 @@ Stylebot is built with Vue 2, TypeScript and webpack.
 - `docs/` — developer docs
 - `patches/` — patches to dependencies
 
+## Module docs
+
+- [`e2e`](e2e.md)
+- [`src/background`](background.md)
+- [`src/css`](css.md)
+- [`src/editor`](editor.md)
+- [`src/editor-window`](editor-window.md)
+- [`src/extension`](extension.md)
+- [`src/highlighter`](highlighter.md)
+- [`src/inject-css`](inject-css.md)
+- [`src/monaco-editor`](monaco-editor.md)
+- [`src/options`](options.md)
+- [`src/page-bridge`](page-bridge.md)
+- [`src/popup`](popup.md)
+- [`src/readability`](readability.md)
+- [`src/sync`](sync.md)
+- [`src/types`](types.md)
+
 ## Run a development build
 
 Each command builds in watch mode and opens a fresh browser profile with the extension loaded:
@@ -37,11 +55,11 @@ Run `yarn storybook` to browse the popup, options page, editor and shared compon
 
 - Run `yarn test` for unit tests
 - Run `yarn test:storybook` for the Storybook interaction tests (every story rendered headless, play functions asserted); `yarn test:storybook --dev --watch` against a running `yarn storybook` while writing them
-- Run `yarn e2e` for the Playwright end-to-end suite (headless Chrome, as in CI); `yarn e2e --firefox --ui` and friends for other browsers and modes — see [`e2e/README.md`](../e2e/README.md)
+- Run `yarn e2e` for the Playwright end-to-end suite (headless Chrome, as in CI); `yarn e2e --firefox --ui` and friends for other browsers and modes — see [`docs/e2e.md`](e2e.md)
 
 ## Google Drive Sync
 
-How sync works, and how to use it from a local build or a fork, is described in [`src/sync/README.md`](../src/sync/README.md).
+How sync works, and how to use it from a local build or a fork, is described in [`docs/sync.md`](sync.md).
 
 ## Patches
 
