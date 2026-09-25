@@ -15,7 +15,7 @@ Change the appearance of any website. Available for [Chrome](https://chrome.goog
 - **Code editor**: Write your own CSS, with autocomplete and color swatches.
 - **Saved instantly**: Changes apply as you type.
 - **Dock or pop out**: Dock the editor left or right, or open it in its own window.
-- **Readability mode**: Turn articles into a clean reading view.
+- **Presets**: One-click Readability for a clean reading view of articles, and Grayscale to remove color.
 - **Sync**: Back up and sync your styles across browsers.
 - **Version history**: See every change to your styles and restore an earlier version of any site's style.
 - **Dark mode support**: The editor, popup and options page all come in dark.
