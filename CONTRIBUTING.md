@@ -10,7 +10,7 @@ Help translate Stylebot into your language — see [`docs/translation.md`](docs/
 
 ## Add new features or fix bugs
 
-If you'd like to **add a new feature** or **fix a bug**, first **open an issue** on GitHub (if one doesn't already exist), discuss it, and wait for **approval** before sending a pull request.
+If you'd like to **add a new feature** or **fix a bug**, first **open an issue** on GitHub (if one doesn't already exist) and discuss it before sending a pull request.
 
 ## Development
 
