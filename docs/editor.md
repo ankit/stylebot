@@ -25,15 +25,15 @@ reader, inspecting and highlighting elements, sampling page colors — sits behi
 themselves. The bridge only touches the page: the style itself lives in the editor's
 store, which persists it to the background.
 
-| Module               | What it does                                                                                                                        |
-| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| `PageBridge`         | The type, plus `PageSnapshot`, the page facts the store mirrors                                                                     |
-| `LocalPageBridge`    | The implementation for a host that runs inside the page (the content script)                                                        |
-| `remote-page-bridge` | The implementation for a host in its own extension window, driving the tab's content script over a port, plus the messages it sends |
-| `PageBridgeEmitter`  | The small typed emitter both implementations share                                                                                  |
-| `page-colors`        | Samples the colors in use on the page for the color picker                                                                          |
-| `computed-styles`    | Reads a selector's computed values for the basic editor's placeholders                                                              |
-| `index`              | `setPageBridge` / `getPageBridge`, the registry each host fills at boot                                                             |
+| Module                                                         | What it does                                                          |
+| :------------------------------------------------------------- | :-------------------------------------------------------------------- |
+| [`PageBridge`](../src/page-bridge/PageBridge.ts)               | The type, plus `PageSnapshot`, the page facts the store mirrors       |
+| [`LocalPageBridge`](../src/page-bridge/LocalPageBridge.ts)     | The implementation for a host inside the page (the content script)    |
+| [`remote-page-bridge`](../src/page-bridge/remote-page-bridge)  | The implementation for the editor window, driving the tab over a port |
+| [`PageBridgeEmitter`](../src/page-bridge/PageBridgeEmitter.ts) | The typed emitter both implementations share                          |
+| [`page-colors`](../src/page-bridge/page-colors.ts)             | Samples the page's colors for the color picker                        |
+| [`computed-styles`](../src/page-bridge/computed-styles.ts)     | Reads a selector's computed values for Basic mode's placeholders      |
+| [`index`](../src/page-bridge/index.ts)                         | `setPageBridge` / `getPageBridge`, filled by each host at boot        |
 
 ## In its own window
 

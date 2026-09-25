@@ -4,15 +4,15 @@ How Stylebot picks selectors for elements and transforms the user's CSS before i
 
 ## Modules
 
-| Module         | What it does                                                                                                                            |
-| -------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `declaration`  | Add a declaration for a selector to a CSS string, or append `!important` to every declaration.                                          |
-| `rule`         | Find, add, split, and remove rules in a CSS string (see [Reusing existing rules](#reusing-existing-rules)).                             |
-| `selector`     | Generate a CSS selector for a picked element (see [How selectors are generated](#how-selectors-are-generated)).                         |
-| `filter`       | Apply CSS filters (e.g. grayscale) to the whole page.                                                                                   |
-| `import`       | Extract `@import` URLs from CSS, fetch and cache them, and inline them so the rest of the CSS can apply without waiting on the network. |
-| `inject-style` | Insert and remove `<style>` elements carrying custom CSS for the page.                                                                  |
-| `webfont`      | Add and remove Google Web Fonts from CSS.                                                                                               |
+| Module                                       | What it does                                                                    |
+| :------------------------------------------- | :------------------------------------------------------------------------------ |
+| [`selector`](../src/css/selector.ts)         | Generates a selector for a picked element ([how](#how-selectors-are-generated)) |
+| [`rule`](../src/css/rule.ts)                 | Finds, adds, splits and removes rules ([reuse](#reusing-existing-rules))        |
+| [`declaration`](../src/css/declaration.ts)   | Adds declarations to a rule; marks them `!important`                            |
+| [`import`](../src/css/import.ts)             | Fetches, caches and inlines `@import`s so CSS applies without waiting           |
+| [`inject-style`](../src/css/inject-style.ts) | Adds and removes the page's `<style>` elements                                  |
+| [`filter`](../src/css/filter.ts)             | Applies page-wide filters like grayscale                                        |
+| [`webfont`](../src/css/webfont.ts)           | Adds and removes Google Fonts                                                   |
 
 ## How selectors are generated
 

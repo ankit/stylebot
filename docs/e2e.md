@@ -24,7 +24,7 @@ yarn e2e [--edge | --firefox] [--headed | --ui | --debug] [--no-build] [playwrig
 ```
 
 | command               | what you get                                                                                      |
-| --------------------- | ------------------------------------------------------------------------------------------------- |
+| :-------------------- | :------------------------------------------------------------------------------------------------ |
 | `yarn e2e`            | Chrome, headless — same as CI                                                                     |
 | `yarn e2e --edge`     | Edge, headless (same `dist/` build as Chrome)                                                     |
 | `yarn e2e --firefox`  | Firefox, headless (`firefox-dist/` build)                                                         |
@@ -87,7 +87,7 @@ and skips otherwise (`editor-webfont.spec.ts`).
 Import `test`/`expect` from `./fixtures`, not `@playwright/test`.
 
 | fixture       | use                                                                                                                                                                                                                                                                                           |
-| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| :------------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `context`     | the shared `BrowserContext`; tabs opened during a test are closed after it                                                                                                                                                                                                                    |
 | `extension`   | the loaded `Extension`; `extension.evaluate(fn, arg?)` runs `fn` with its privileges (service worker on Chromium, background page on Firefox) and returns the JSON-serializable result — how tests read/write `chrome.storage`; `extension.id` is its id (`moz-extension://` UUID on Firefox) |
 | `openPopup()` | open the popup in the background (so the page under test stays the "current tab") and get a `Popup`                                                                                                                                                                                           |

@@ -4,23 +4,23 @@ Keeps a user's styles the same on every browser they sign in to, using a single 
 
 ## Modules
 
-| Module                             | What it does                                                 |
-| ---------------------------------- | ------------------------------------------------------------ |
-| `google-drive/sync.ts`             | `runGoogleDriveSync()`, one sync run end to end              |
-| `google-drive/sync-file.ts`        | The Drive client: find, download, upload, account lookup     |
-| `google-drive/sync-metadata.ts`    | What is kept in `chrome.storage.local` between runs          |
-| `google-drive/get-access-token.ts` | OAuth token, cached                                          |
-| `merge/three-way.ts`               | Decides per url                                              |
-| `merge/merge-css.ts`               | Merges CSS text                                              |
-| `merge/diff3.ts`                   | Vendored line diff3                                          |
-| `merge/merge-without-base.ts`      | The fallback when there is no base                           |
-| `errors.ts`                        | `syncError(message, code)`, mapped to locale keys for the UI |
-| `src/background/sync-scheduler.ts` | When runs happen                                             |
+| Module                                                                             | What it does                                                 |
+| :--------------------------------------------------------------------------------- | :----------------------------------------------------------- |
+| [`google-drive/sync.ts`](../src/sync/google-drive/sync.ts)                         | `runGoogleDriveSync()`, one sync run end to end              |
+| [`google-drive/sync-file.ts`](../src/sync/google-drive/sync-file.ts)               | The Drive client: find, download, upload, account lookup     |
+| [`google-drive/sync-metadata.ts`](../src/sync/google-drive/sync-metadata.ts)       | What is kept in `chrome.storage.local` between runs          |
+| [`google-drive/get-access-token.ts`](../src/sync/google-drive/get-access-token.ts) | OAuth token, cached                                          |
+| [`merge/three-way.ts`](../src/sync/merge/three-way.ts)                             | Decides per url                                              |
+| [`merge/merge-css.ts`](../src/sync/merge/merge-css.ts)                             | Merges CSS text                                              |
+| [`merge/diff3.ts`](../src/sync/merge/diff3.ts)                                     | Vendored line diff3                                          |
+| [`merge/merge-without-base.ts`](../src/sync/merge/merge-without-base.ts)           | The fallback when there is no base                           |
+| [`errors.ts`](../src/sync/errors.ts)                                               | `syncError(message, code)`, mapped to locale keys for the UI |
+| [`background/sync-scheduler.ts`](../src/background/sync-scheduler.ts)              | When runs happen                                             |
 
 ## What is stored
 
 | Where | Key                                | What                                                                                                                                                                                                                       |
-| ----- | ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| :---- | :--------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Drive | `stylebot/stylebot_v3_backup.json` | the style map, bare — same format as every earlier version                                                                                                                                                                 |
 | local | `styles`                           | the live style map                                                                                                                                                                                                         |
 | local | `google-drive-sync-state`          | what the last successful run observed: the remote revision (Drive's `modifiedTime`), the local revision (the `styles-metadata` stamp), `lastSyncedAt`, the file metadata, the account, any conflicts, and **`baseStyles`** |
