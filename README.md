@@ -58,7 +58,7 @@ Stylebot is built with Vue 2, TypeScript and webpack.
 - `src/` — extension source (background, content scripts, popup, options page, editor)
 - `src/_locales/` — translations
 - `e2e/` — Playwright end-to-end tests
-- `docs/` — the [stylebot.dev](https://stylebot.dev) site
+- `site/` — the [stylebot.dev](https://stylebot.dev) site
 - `patches/` — patches to dependencies
 
 ### Run a development build
