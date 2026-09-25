@@ -11,14 +11,12 @@ Change the appearance of any website. Available for [Chrome](https://chrome.goog
 
 ![Stylebot's visual editor open on GitHub in dark mode](docs/images/editor-basic-mode.webp)
 
-- **Visual editor**: Pick any element and restyle it with UI controls.
+- **Visual editor**: Pick any element and restyle it with UI controls. Dock it left or right or pop it out into its own window, in light or dark mode.
 - **Code editor**: Write your own CSS, with autocomplete and color swatches.
 - **Saved instantly**: Changes apply as you type.
-- **Dock or pop out**: Dock the editor left or right, or open it in its own window.
 - **Presets**: One-click Readability for a clean reading view of articles, and Grayscale to remove color.
 - **Sync**: Back up and sync your styles across browsers.
 - **Version history**: See every change to your styles and restore an earlier version of any site's style.
-- **Dark mode support**: The editor, popup and options page all come in dark.
 
 Stylebot 4 is in active development on the `v4` branch; the stores ship 3.x from `main`.
 
