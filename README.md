@@ -46,69 +46,7 @@ If you'd like to **add a new feature** or **fix a bug**, first **open an issue**
 
 ## Development
 
-Stylebot is built with Vue 2, TypeScript and webpack.
-
-### Setup
-
-- Use the Node version in [`.nvmrc`](.nvmrc) (e.g. `nvm use`)
-- Run `yarn install`
-
-### Project layout
-
-- `src/` — extension source (background, content scripts, popup, options page, editor)
-- `src/_locales/` — translations
-- `e2e/` — Playwright end-to-end tests
-- `site/` — the [stylebot.dev](https://stylebot.dev) site
-- `patches/` — patches to dependencies
-
-### Run a development build
-
-Each command builds in watch mode and opens a fresh browser profile with the extension loaded:
-
-- `yarn dev:chrome`
-- `yarn dev:edge`
-- `yarn dev:firefox`
-
-To load the build into your own Chrome or Edge instead, run `yarn watch`, open `chrome://extensions`, disable the store version of Stylebot, turn on Developer mode, and load `dist/` unpacked. For Firefox, `yarn watch:firefox` builds into `firefox-dist/`.
-
-### Lint and typecheck
-
-- `yarn lint` (or `yarn lint:fix`)
-- `yarn typecheck`
-
-### Storybook
-
-Run `yarn storybook` to browse the popup, options page, editor and shared components on port 6006, with a light/dark toggle in the toolbar.
-
-### Tests
-
-- Run `yarn test` for unit tests
-- Run `yarn test:storybook` for the Storybook interaction tests (every story rendered headless, play functions asserted); `yarn test:storybook --dev --watch` against a running `yarn storybook` while writing them
-- Run `yarn e2e` for the Playwright end-to-end suite (headless Chrome, as in CI); `yarn e2e --firefox --ui` and friends for other browsers and modes — see [`e2e/README.md`](e2e/README.md)
-
-### Google Drive Sync
-
-How sync works, and how to use it from a local build or a fork, is described in [`src/sync/README.md`](src/sync/README.md).
-
-### Release
-
-Releases go through a pull request from a `release/vX.Y.Z` branch — the `release/` prefix is what triggers the Edge e2e suite, which doesn't run on ordinary PRs.
-
-Day-to-day pull requests target `v4`. 3.x releases ship from `main`, and the release workflow only runs on pull requests into it.
-
-- Branch off `main` as `release/vX.Y.Z`
-- Add entry to `CHANGELOG`
-- Update version in `package.json` and `src/extension/manifest.json`
-- Open the PR and wait for `build`, `validation`, `storybook`, `e2e`, `e2e (edge)` and `e2e (firefox)` to pass
-- Squash-merge — the GitHub Release and its `vX.Y.Z` tag are then created automatically from the changelog entry
-- Chrome and Edge: Run `yarn build` and manually create zip for distribution from `dist/`
-- Firefox: Run `yarn build:firefox` and manually create zip for distribution from `firefox-dist/`
-
-### Patches
-
-Patches to dependencies are located under `/patches` and are automatically applied on running `yarn` using [patch-package](https://github.com/ds300/patch-package).
-
-- `vue-draggable-resizable+2.3.0.patch` — removes a `Function("return this")()` call that the extension's Content Security Policy blocks.
+See [`docs/development.md`](docs/development.md) for setup, builds and tests, and [`docs/releases.md`](docs/releases.md) for cutting a release.
 
 ## License
 
