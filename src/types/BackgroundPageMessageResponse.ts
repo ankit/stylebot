@@ -1,12 +1,10 @@
-import {
-  Style,
-  StylebotOptions,
-  StylebotCommands,
-  ReadabilitySettings,
-  Timestamp,
-  GoogleDriveSyncMetadata,
-  VersionHistory,
-} from '@stylebot/types';
+import type { Timestamp } from './shared';
+import type { Style } from './styles';
+import type { StylebotOptions } from './options';
+import type { StylebotCommands } from './commands';
+import type { ReadabilitySettings } from './readability';
+import type { GoogleDriveSyncMetadata } from './sync';
+import type { VersionHistory } from './history';
 
 export type GetAllOptionsResponse = StylebotOptions;
 export type GetOptionResponse = StylebotOptions[keyof StylebotOptions];

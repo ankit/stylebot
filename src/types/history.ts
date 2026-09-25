@@ -1,4 +1,5 @@
-import { StyleWithoutUrl, Timestamp } from './index';
+import type { Timestamp } from './shared';
+import type { StyleWithoutUrl } from './styles';
 
 /**
  * Whether a change was made here or arrived from another computer.
