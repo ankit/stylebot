@@ -1,18 +1,10 @@
 # Stylebot
 
-![Build](https://github.com/ankit/stylebot/actions/workflows/build.yml/badge.svg)
-[![Kofi](https://badgen.net/badge/icon/kofi?icon=kofi&label)](https://ko-fi.com/stylebot)
-[![Chrome Webstore Version](https://img.shields.io/chrome-web-store/v/oiaejidbmkiecgbjeifoejpgmdaleoha)](https://chrome.google.com/webstore/detail/stylebot/oiaejidbmkiecgbjeifoejpgmdaleoha)
+[![Build](https://github.com/ankit/stylebot/actions/workflows/build.yml/badge.svg)](https://github.com/ankit/stylebot/actions/workflows/build.yml)
 [![Chrome Users](https://badgen.net/chrome-web-store/users/oiaejidbmkiecgbjeifoejpgmdaleoha)](https://chrome.google.com/webstore/detail/stylebot/oiaejidbmkiecgbjeifoejpgmdaleoha)
 [![Webstore Rating](https://img.shields.io/chrome-web-store/stars/oiaejidbmkiecgbjeifoejpgmdaleoha)](https://chrome.google.com/webstore/detail/stylebot/oiaejidbmkiecgbjeifoejpgmdaleoha)
-![License](https://img.shields.io/github/license/ankit/stylebot)
 
-Stylebot is a browser extension that lets you change the appearance of the web instantly.
-
-Available on [Chrome](https://chrome.google.com/webstore/detail/stylebot/oiaejidbmkiecgbjeifoejpgmdaleoha), [Firefox](https://addons.mozilla.org/firefox/addon/stylebot-web/) and [Edge](https://microsoftedge.microsoft.com/addons/detail/stylebot/mjolbpfednnbebfapicajpifliopnnai).
-
-> [!NOTE]
-> Stylebot 4 is under active development on the `v4` branch. The version in the stores is 3.x, released from `main`.
+Change the appearance of any website. Available for [Chrome](https://chrome.google.com/webstore/detail/stylebot/oiaejidbmkiecgbjeifoejpgmdaleoha), [Firefox](https://addons.mozilla.org/firefox/addon/stylebot-web/) and [Edge](https://microsoftedge.microsoft.com/addons/detail/stylebot/mjolbpfednnbebfapicajpifliopnnai).
 
 ![Stylebot's visual editor open on GitHub in dark mode](docs/images/editor-basic-mode.webp)
 
@@ -24,6 +16,8 @@ Available on [Chrome](https://chrome.google.com/webstore/detail/stylebot/oiaejid
 - **Grayscale mode**: Remove color to reduce eye strain.
 - **Google Drive sync**: Back up and sync your styles across browsers.
 - **Dark mode support**: The editor, popup and options page all come in dark.
+
+Stylebot 4 is in active development on the `v4` branch; the stores ship 3.x from `main`.
 
 ## Contributing
 
