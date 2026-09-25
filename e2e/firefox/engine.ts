@@ -63,7 +63,7 @@ export class FirefoxEngine implements Engine {
   }
 
   // Neither of Playwright's Firefox drivers can attach to moz-extension://
-  // documents (see docs/e2e.md), so the popup is opened by the extension itself
+  // documents (see docs/testing/e2e.md), so the popup is opened by the extension itself
   // and driven through its DevTools console rather than as a Playwright page.
   async openPopup(
     _context: BrowserContext,

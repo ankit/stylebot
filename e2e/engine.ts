@@ -60,7 +60,7 @@ export type Engine = {
   // background); Playwright only observes those on Chromium.
   routesExtensionRequests: boolean;
   // Whether extension pages (options, popup) can be opened as Playwright Pages via
-  // `page.goto`; Firefox can't attach to moz-extension:// documents (see docs/e2e.md).
+  // `page.goto`; Firefox can't attach to moz-extension:// documents (see docs/testing/e2e.md).
   opensExtensionPages: boolean;
   launch(userDataDir: string, options: LaunchOptions): Promise<BrowserContext>;
   loadExtension(context: BrowserContext, distPath: string): Promise<Extension>;

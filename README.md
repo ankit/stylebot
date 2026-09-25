@@ -25,23 +25,11 @@ Available on [Chrome](https://chrome.google.com/webstore/detail/stylebot/oiaejid
 - **Google Drive sync**: Back up and sync your styles across browsers.
 - **Dark mode support**: The editor, popup and options page all come in dark.
 
-## How to contribute
+## Contributing
 
-### Donate
+Bug fixes, features and translations are welcome — see [`CONTRIBUTING.md`](CONTRIBUTING.md). You can also [buy me a coffee](https://ko-fi.com/stylebot) via Ko-fi.
 
-[Buy me a coffee](https://ko-fi.com/stylebot) via Ko-fi
-
-### Translate
-
-Help translate Stylebot into your language — see [`docs/translation.md`](docs/translation.md).
-
-### Add new features or fix bugs
-
-If you'd like to **add a new feature** or **fix a bug**, first **open an issue** on GitHub (if one doesn't already exist), discuss it, and wait for **approval** before sending a pull request.
-
-## Development
-
-See [`docs/development.md`](docs/development.md) for setup, builds and tests, and [`docs/releases.md`](docs/releases.md) for cutting a release.
+Developer docs live in [`docs/`](docs/README.md).
 
 ## License
 

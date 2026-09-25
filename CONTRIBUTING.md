@@ -1,0 +1,17 @@
+# Contributing
+
+## Donate
+
+[Buy me a coffee](https://ko-fi.com/stylebot) via Ko-fi
+
+## Translate
+
+Help translate Stylebot into your language — see [`docs/translation.md`](docs/translation.md).
+
+## Add new features or fix bugs
+
+If you'd like to **add a new feature** or **fix a bug**, first **open an issue** on GitHub (if one doesn't already exist), discuss it, and wait for **approval** before sending a pull request.
+
+## Development
+
+See [`docs/development.md`](docs/development.md) for setup, builds and tests, and [`docs/releases.md`](docs/releases.md) for cutting a release. Everything else is indexed in [`docs/`](docs/README.md).
