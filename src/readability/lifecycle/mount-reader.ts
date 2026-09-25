@@ -19,7 +19,7 @@ Vue.mixin({
  * Fetches the reader's compiled stylesheet and injects it into the shadow root.
  */
 const initCss = async (root: ShadowRoot): Promise<void> => {
-  const cssUrl = chrome.runtime.getURL('readability/index.css');
+  const cssUrl = chrome.runtime.getURL('readability/reader.css');
 
   return new Promise((resolve, reject) => {
     fetch(cssUrl, { method: 'GET' })
