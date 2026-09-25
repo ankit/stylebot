@@ -12,7 +12,7 @@ Stylebot is a browser extension that lets you change the appearance of the web i
 Available on [Chrome](https://chrome.google.com/webstore/detail/stylebot/oiaejidbmkiecgbjeifoejpgmdaleoha), [Firefox](https://addons.mozilla.org/firefox/addon/stylebot-web/) and [Edge](https://microsoftedge.microsoft.com/addons/detail/stylebot/mjolbpfednnbebfapicajpifliopnnai).
 
 > [!NOTE]
-> Stylebot 4 is under active development on the `v4` branch. The version in the stores is 3.x, released from `main`, so some features below aren't available there yet.
+> Stylebot 4 is under active development on the `v4` branch. The version in the stores is 3.x, released from `main`.
 
 ![Stylebot's code editor restyling GitHub with a Dracula theme](.github/readme/editor-code-mode.webp)
 
