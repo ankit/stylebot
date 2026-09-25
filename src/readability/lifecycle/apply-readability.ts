@@ -1,4 +1,4 @@
-import { mountReader } from './mount-reader';
+import { loadReader } from './load-reader';
 import {
   shouldRunOnUrl,
   shouldWaitForFullLoad,
@@ -37,6 +37,22 @@ const startIfEligible = (myGeneration: number): void => {
  * Attempts to mount the reader, retrying on failure up to RETRY_DELAYS_MS.
  */
 const run = async (myGeneration: number, attempt = 0): Promise<void> => {
+  if (isStaleGeneration(myGeneration)) {
+    return;
+  }
+
+  let mountReader;
+
+  try {
+    mountReader = await loadReader();
+  } catch {
+    // A failed load says nothing about the page, so it isn't marked ineligible.
+    if (!isStaleGeneration(myGeneration)) {
+      removeReadability();
+    }
+    return;
+  }
+
   if (isStaleGeneration(myGeneration)) {
     return;
   }
@@ -93,6 +109,9 @@ export const applyReadability = async (forceApply = false): Promise<void> => {
   }
 
   const myGeneration = nextGeneration();
+
+  // Fetched now so it's ready by the time the page has loaded.
+  loadReader().catch(() => undefined);
 
   // Only paint the loader when we have reason to expect an article: a
   // forced apply, or a URL shape that's produced one before. Otherwise the

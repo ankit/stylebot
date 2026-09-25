@@ -323,7 +323,7 @@ const clientConfig = {
     'monaco-editor/iframe/index': './monaco-editor/iframe/index.ts',
     'monaco-editor/iframe/options-index':
       './monaco-editor/iframe/options-index.ts',
-    'readability/index': './readability/index.ts',
+    'readability/reader': './readability/reader.ts',
   },
 };
 

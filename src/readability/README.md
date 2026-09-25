@@ -2,7 +2,7 @@
 
 This package includes code for the stylebot reader. Built using [Defuddle](https://github.com/kepano/defuddle) for article extraction.
 
-Aliased as `@stylebot/readability`
+Aliased as `@stylebot/readability`. The content scripts import only its light parts (eligibility, the loading screen, apply/remove); the reader itself, `reader.ts`, builds to `readability/reader.js`, which `lifecycle/load-reader.ts` imports on demand once a page qualifies.
 
 - **`eligibility`**: whether the reader should run on the current page (URL rules, MediaWiki detection, content-density scoring)
 

@@ -1,6 +1,7 @@
 import { setImmediate } from 'timers';
 
 jest.mock('../mount-reader');
+jest.mock('../load-reader');
 jest.mock('../../eligibility/should-run-on-url');
 jest.mock('../../eligibility/should-wait-for-full-load');
 jest.mock('../../eligibility/is-blocked-after-load');
@@ -12,6 +13,7 @@ const flushPromises = () => new Promise(resolve => setImmediate(resolve));
 
 describe('applyReadability()', () => {
   let mountReaderModule: typeof import('../mount-reader');
+  let loadReaderModule: typeof import('../load-reader');
   let shouldRunOnUrlModule: typeof import('../../eligibility/should-run-on-url');
   let isBlockedAfterLoadModule: typeof import('../../eligibility/is-blocked-after-load');
   let loaderModule: typeof import('../../loading-screen/loader');
@@ -36,6 +38,7 @@ describe('applyReadability()', () => {
     } as unknown as typeof chrome;
 
     mountReaderModule = require('../mount-reader');
+    loadReaderModule = require('../load-reader');
     shouldRunOnUrlModule = require('../../eligibility/should-run-on-url');
     isBlockedAfterLoadModule = require('../../eligibility/is-blocked-after-load');
     loaderModule = require('../../loading-screen/loader');
@@ -45,6 +48,9 @@ describe('applyReadability()', () => {
     (documentCacheModule.didUrlChange as jest.Mock).mockReturnValue(true);
     (shouldRunOnUrlModule.shouldRunOnUrl as jest.Mock).mockReturnValue(true);
     (mountReaderModule.mountReader as jest.Mock).mockResolvedValue(undefined);
+    (loadReaderModule.loadReader as jest.Mock).mockResolvedValue(
+      mountReaderModule.mountReader
+    );
     (eligibilityCacheModule.getEligibility as jest.Mock).mockReturnValue({
       isKnownIneligible: false,
       matchesKnownPattern: false,
@@ -157,6 +163,28 @@ describe('applyReadability()', () => {
     await flushPromises();
 
     expect(mountReaderModule.mountReader).toBeCalledTimes(1);
+  });
+
+  it('should start loading the reader before the document has loaded', async () => {
+    setReadyState('loading');
+
+    await applyReadability(true);
+
+    expect(loadReaderModule.loadReader).toBeCalled();
+    expect(mountReaderModule.mountReader).not.toBeCalled();
+  });
+
+  it('should revert without marking the url ineligible when the reader fails to load', async () => {
+    (loadReaderModule.loadReader as jest.Mock).mockRejectedValue(
+      new Error('load failed')
+    );
+
+    await applyReadability(true);
+    await flushPromises();
+
+    expect(mountReaderModule.mountReader).not.toBeCalled();
+    expect(documentCacheModule.revertToCachedDocument).toBeCalled();
+    expect(eligibilityCacheModule.markIneligible).not.toBeCalled();
   });
 
   it('should revert immediately without retrying when blocked after load', async () => {

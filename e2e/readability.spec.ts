@@ -34,16 +34,22 @@ const APP_HTML = `
 let server: Awaited<ReturnType<typeof startTestServer>>;
 let articleUrl: string;
 let secondArticleUrl: string;
+let strictArticleUrl: string;
 let appUrl: string;
 
 test.beforeAll(async () => {
   server = await startTestServer({
     '/articles/a-test-article': ARTICLE_HTML,
     '/articles/a-test-article-2': ARTICLE_HTML,
+    '/articles/a-strict-article': {
+      body: ARTICLE_HTML,
+      headers: { 'Content-Security-Policy': "script-src 'none'" },
+    },
     '/app/dashboard': APP_HTML,
   });
   articleUrl = `${server.baseUrl}/articles/a-test-article`;
   secondArticleUrl = `${server.baseUrl}/articles/a-test-article-2`;
+  strictArticleUrl = `${server.baseUrl}/articles/a-strict-article`;
   appUrl = `${server.baseUrl}/app/dashboard`;
 });
 
@@ -82,6 +88,44 @@ test('toggling readability on in the popup activates the reader', async ({
   await enableReadability(openPopup);
 
   await expect(reader(page)).toHaveCount(1);
+});
+
+// Reader mode is saved for the whole site, so another article loads straight
+// into the reader: inject-css fetches the reader bundle with no popup involved.
+test('applies the reader when another page on the site loads', async ({
+  context,
+  openPopup,
+}) => {
+  const page = await context.newPage();
+  await page.goto(articleUrl);
+  await page.bringToFront();
+
+  await enableReadability(openPopup);
+  await expect(reader(page)).toHaveCount(1);
+
+  const nextPage = await context.newPage();
+  await nextPage.goto(secondArticleUrl);
+
+  await expect(reader(nextPage)).toHaveCount(1);
+});
+
+// The reader bundle is loaded with import() from the content script, which the
+// page's own CSP must not be able to block.
+test('applies the reader on a page whose CSP blocks scripts', async ({
+  context,
+  openPopup,
+}) => {
+  const page = await context.newPage();
+  await page.goto(articleUrl);
+  await page.bringToFront();
+
+  await enableReadability(openPopup);
+  await expect(reader(page)).toHaveCount(1);
+
+  const strictPage = await context.newPage();
+  await strictPage.goto(strictArticleUrl);
+
+  await expect(reader(strictPage)).toHaveCount(1);
 });
 
 // Regression test: chrome.tabs.query({ active: true }) had no window scope,
