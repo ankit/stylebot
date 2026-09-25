@@ -16,8 +16,8 @@ Change the appearance of any website. Available for [Chrome](https://chrome.goog
 - **Saved instantly**: Changes apply as you type.
 - **Dock or pop out**: Dock the editor left or right, or open it in its own window.
 - **Readability mode**: Turn articles into a clean reading view.
-- **Grayscale mode**: Remove color to reduce eye strain.
 - **Sync**: Back up and sync your styles across browsers.
+- **Version history**: See every change to your styles and restore an earlier version of any site's style.
 - **Dark mode support**: The editor, popup and options page all come in dark.
 
 Stylebot 4 is in active development on the `v4` branch; the stores ship 3.x from `main`.
