@@ -50,45 +50,27 @@ export const collapseToShorthand = ({
   return `${top}px ${right}px ${bottom}px ${left}px`;
 };
 
-// Prefers the shorthand once 2+ sides are set (unset sides default to 0),
-// otherwise uses the specific longhand property for the one side that is.
+// Uses the shorthand only when every side is set, otherwise writes a
+// longhand per set side so unset sides keep the page's own spacing.
 export const resolveSpacingDeclarations = (
   sides: Sides,
   properties: Sides,
   shorthandProperty: string
 ): Array<{ property: string; value: string }> => {
-  const setSides = (Object.keys(sides) as Array<Side>).filter(
-    side => sides[side]
-  );
+  const sideKeys = Object.keys(sides) as Array<Side>;
 
-  if (setSides.length >= 2) {
-    const filled: Sides = {
-      top: sides.top || '0',
-      right: sides.right || '0',
-      bottom: sides.bottom || '0',
-      left: sides.left || '0',
-    };
-
+  if (sideKeys.every(side => sides[side])) {
     return [
-      { property: shorthandProperty, value: collapseToShorthand(filled) },
-      { property: properties.top, value: '' },
-      { property: properties.right, value: '' },
-      { property: properties.bottom, value: '' },
-      { property: properties.left, value: '' },
+      { property: shorthandProperty, value: collapseToShorthand(sides) },
+      ...sideKeys.map(side => ({ property: properties[side], value: '' })),
     ];
   }
 
   return [
     { property: shorthandProperty, value: '' },
-    { property: properties.top, value: sides.top ? `${sides.top}px` : '' },
-    {
-      property: properties.right,
-      value: sides.right ? `${sides.right}px` : '',
-    },
-    {
-      property: properties.bottom,
-      value: sides.bottom ? `${sides.bottom}px` : '',
-    },
-    { property: properties.left, value: sides.left ? `${sides.left}px` : '' },
+    ...sideKeys.map(side => ({
+      property: properties[side],
+      value: sides[side] ? `${sides[side]}px` : '',
+    })),
   ];
 };

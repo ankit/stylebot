@@ -124,16 +124,26 @@ describe('resolveSpacingDeclarations', () => {
     ]);
   });
 
-  it('prefers the shorthand once two sides are set, defaulting the rest to 0', () => {
-    const sides: Sides = { top: '4', right: '', bottom: '4', left: '' };
+  it('uses a longhand per set side, leaving unset sides alone, until all four are set', () => {
+    const sides: Sides = { top: '4', right: '', bottom: '8', left: '' };
 
     expect(resolveSpacingDeclarations(sides, properties, 'padding')).toEqual([
-      { property: 'padding', value: '4px 0px' },
-      { property: 'padding-top', value: '' },
+      { property: 'padding', value: '' },
+      { property: 'padding-top', value: '4px' },
       { property: 'padding-right', value: '' },
-      { property: 'padding-bottom', value: '' },
+      { property: 'padding-bottom', value: '8px' },
       { property: 'padding-left', value: '' },
     ]);
+  });
+
+  it('keeps the page value for a side that is still unset', () => {
+    const sides: Sides = { top: '4', right: '4', bottom: '4', left: '' };
+
+    expect(
+      resolveSpacingDeclarations(sides, properties, 'padding').find(
+        ({ value }) => value.includes('0px')
+      )
+    ).toBeUndefined();
   });
 
   it('prefers the shorthand and collapses it optimally when all four sides are set', () => {
