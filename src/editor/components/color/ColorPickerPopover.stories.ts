@@ -1,10 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/vue';
 
 import ColorPickerPopover from './ColorPickerPopover.vue';
-import {
-  createEditorStore,
-  EditorStateOverrides,
-} from '@stylebot/storybook/mocks/editor-store';
+import type { EditorStateOverrides } from '@stylebot/storybook/mocks/editor-store';
+import { createEditorStore } from '@stylebot/storybook/mocks/editor-store';
 import type { ChromeShimOptions } from '@stylebot/storybook/mocks/chrome';
 
 const meta: Meta = {

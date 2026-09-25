@@ -5,7 +5,10 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { IframeMessage, ParentUpdateCssMessage } from '@stylebot/monaco-editor';
+import type {
+  IframeMessage,
+  ParentUpdateCssMessage,
+} from '@stylebot/monaco-editor';
 
 import CodeEditorIframe from './CodeEditorIframe.vue';
 

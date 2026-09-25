@@ -1,4 +1,4 @@
-import { StyleMap, StyleWithoutUrl } from '@stylebot/types';
+import type { StyleMap, StyleWithoutUrl } from '@stylebot/types';
 import { isEquivalentStyle } from '@stylebot/styles';
 
 import { mergeCss } from './merge-css';

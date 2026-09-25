@@ -35,7 +35,7 @@ import {
   getLastSyncedAt,
   getSyncNeedsAuth,
 } from '../../sync/google-drive/sync-metadata';
-import {
+import type {
   RunGoogleDriveSync,
   RunGoogleDriveSyncResponse,
   SyncErrorKey,

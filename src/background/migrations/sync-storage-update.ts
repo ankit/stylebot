@@ -1,4 +1,4 @@
-import { GoogleDriveSyncMetadata, SyncState } from '@stylebot/types';
+import type { GoogleDriveSyncMetadata, SyncState } from '@stylebot/types';
 
 /**
  * Seeds the sync state from the metadata earlier versions stored, so an

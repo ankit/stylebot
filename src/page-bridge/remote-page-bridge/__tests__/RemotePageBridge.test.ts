@@ -1,5 +1,5 @@
 import { RemotePageBridge } from '../RemotePageBridge';
-import {
+import type {
   RemotePageBridgeHandlers,
   RemotePageBridgeMessageToWindow,
 } from '../types';

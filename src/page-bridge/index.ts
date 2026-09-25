@@ -1,4 +1,4 @@
-import { PageBridge } from './PageBridge';
+import type { PageBridge } from './PageBridge';
 
 let bridge: PageBridge | null = null;
 

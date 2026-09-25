@@ -1,4 +1,4 @@
-import { StylebotOptions } from '@stylebot/types';
+import type { StylebotOptions } from '@stylebot/types';
 import { defaultOptions } from '@stylebot/settings';
 
 /**

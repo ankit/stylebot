@@ -1,5 +1,5 @@
 import { syncError } from '../errors';
-import { AccessToken } from './get-access-token';
+import type { AccessToken } from './get-access-token';
 
 export const getAuthorizationHeaders = (accessToken: AccessToken): Headers =>
   new Headers({

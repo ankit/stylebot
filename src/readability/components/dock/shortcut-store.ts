@@ -1,6 +1,6 @@
 import Vue from 'vue';
 
-import { StylebotCommands } from '@stylebot/types';
+import type { StylebotCommands } from '@stylebot/types';
 
 import { getCommands } from '../../utils/get-commands';
 import { setCommands } from '../../utils/set-commands';

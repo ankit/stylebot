@@ -1,5 +1,5 @@
-import { Store } from 'vuex';
-import { State } from 'editor/store';
+import type { Store } from 'vuex';
+import type { State } from 'editor/store';
 
 const BOUNDS_DEBOUNCE_MS = 300;
 

@@ -1,5 +1,5 @@
 import { BackgroundPageUtils } from '@stylebot/styles';
-import { EditorWindowBounds, StylebotLayout } from '@stylebot/types';
+import type { EditorWindowBounds, StylebotLayout } from '@stylebot/types';
 
 import { get as getOption } from './options';
 

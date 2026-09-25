@@ -3,7 +3,7 @@ import * as postcss from 'postcss';
 import { getCurrentTimestamp } from '@stylebot/utils';
 import { getStylesForPage } from '@stylebot/styles';
 
-import {
+import type {
   StyleMap,
   StyleWithoutUrl,
   ApplyStylesToTab,

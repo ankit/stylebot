@@ -4,7 +4,7 @@ import Vuex from 'vuex';
 import * as postcss from 'postcss';
 
 import { defaultCommands } from '@stylebot/settings';
-import {
+import type {
   StyleMap,
   StylebotOptions,
   StylebotCommands,

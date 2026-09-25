@@ -1,4 +1,4 @@
-import { State } from '..';
+import type { State } from '..';
 import { emptyPageSnapshot } from '@stylebot/page-bridge';
 
 import {

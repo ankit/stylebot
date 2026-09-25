@@ -37,7 +37,7 @@
 import Vue from 'vue';
 
 import { SText, SButton } from '@stylebot/components';
-import { VersionChange, VersionPreview, Version } from '@stylebot/types';
+import type { VersionChange, VersionPreview, Version } from '@stylebot/types';
 
 import VersionList from './VersionList.vue';
 

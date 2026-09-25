@@ -16,7 +16,7 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { StylebotFonts } from '@stylebot/types';
+import type { StylebotFonts } from '@stylebot/types';
 import {
   addGoogleWebFont,
   getCssWithExpandedImports,

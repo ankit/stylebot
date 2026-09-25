@@ -48,9 +48,10 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from 'vue';
+import type { PropType } from 'vue';
+import Vue from 'vue';
 
-import { ReadabilityTheme } from '@stylebot/types';
+import type { ReadabilityTheme } from '@stylebot/types';
 
 import { closeReader } from '../../utils/close-reader';
 import { shortcutStore } from './shortcut-store';

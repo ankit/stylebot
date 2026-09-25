@@ -34,7 +34,8 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from 'vue';
+import type { PropType } from 'vue';
+import Vue from 'vue';
 import ShortcutKbd from './ShortcutKbd.vue';
 
 // Delay before showing, to avoid flashing a tooltip on every incidental

@@ -1,9 +1,9 @@
-import Vue from 'vue';
+import type Vue from 'vue';
 
 import InspectorCard from './InspectorCard.vue';
 import { findTipPos, leftBesidePanel } from './tip-position';
-import { Box, NextAncestorInfo, TipPlacement } from './types';
-import { CssDeclaration } from '@stylebot/types';
+import type { Box, NextAncestorInfo, TipPlacement } from './types';
+import type { CssDeclaration } from '@stylebot/types';
 
 /**
  * The instance shape InspectorCard.vue exposes (shims.vue.d.ts types

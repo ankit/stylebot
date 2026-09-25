@@ -47,7 +47,7 @@ import {
 import { hideLoader, cacheTheme } from '../loading-screen/loader';
 import { sendReadabilitySettings } from '../utils/send-readability-settings';
 
-import {
+import type {
   GetReadabilitySettings,
   GetReadabilitySettingsResponse,
   ReadabilitySettings,

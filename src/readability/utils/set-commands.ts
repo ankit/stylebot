@@ -1,4 +1,4 @@
-import { SetCommands, StylebotCommands } from '@stylebot/types';
+import type { SetCommands, StylebotCommands } from '@stylebot/types';
 
 /**
  * Persists the user's Stylebot keyboard shortcuts to the background.

@@ -1,4 +1,4 @@
-import { StyleWithoutUrl } from '@stylebot/types';
+import type { StyleWithoutUrl } from '@stylebot/types';
 
 import { isEquivalentStyleMap } from '../equivalence';
 

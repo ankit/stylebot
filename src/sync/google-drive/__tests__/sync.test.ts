@@ -12,7 +12,7 @@ jest.mock('../sync-file', () => ({
   writeSyncFile: jest.fn(),
 }));
 
-import { StyleMap, SyncState } from '@stylebot/types';
+import type { StyleMap, SyncState } from '@stylebot/types';
 
 import { runGoogleDriveSync } from '../sync';
 import {

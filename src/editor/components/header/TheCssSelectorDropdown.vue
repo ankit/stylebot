@@ -33,9 +33,9 @@
 import Vue from 'vue';
 import { SAutocomplete, SCountBadge } from '@stylebot/components';
 import { getDeclarationsForSelector } from '@stylebot/css';
-import { CssDeclaration, StylebotEditingMode } from '@stylebot/types';
+import type { CssDeclaration, StylebotEditingMode } from '@stylebot/types';
 
-import { CssSelectorMetadata } from '../../store';
+import type { CssSelectorMetadata } from '../../store';
 import { getPageBridge } from '@stylebot/page-bridge';
 import TheCssSelectorDropdownItem from './TheCssSelectorDropdownItem.vue';
 

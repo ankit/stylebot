@@ -1,6 +1,6 @@
 import * as postcss from 'postcss';
 
-import { GetImportCss, GetImportCssResponse } from '@stylebot/types';
+import type { GetImportCss, GetImportCssResponse } from '@stylebot/types';
 
 /**
  * Strips @import rules out of the parsed css, so the rest of it can be

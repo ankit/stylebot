@@ -7,7 +7,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { StylebotCommands, StylebotAppearance } from '@stylebot/types';
+import type { StylebotCommands, StylebotAppearance } from '@stylebot/types';
 import { ThemeProvider } from '@stylebot/components';
 
 import TheStylebot from './TheStylebot.vue';

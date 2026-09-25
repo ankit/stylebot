@@ -5,8 +5,8 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { Declaration, Rule } from 'postcss';
-import {
+import type { Declaration, Rule } from 'postcss';
+import type {
   StylebotEditingMode,
   StylebotLayout,
   StylebotEditorCommands,

@@ -1,3 +1,4 @@
+import type { RoleColorGroups } from '@stylebot/css';
 import {
   injectCSSIntoDocument,
   removeCSSFromDocument,
@@ -6,7 +7,6 @@ import {
   getDeclarationsForSelector,
   getExistingSelector,
   getBodyChildSelectors,
-  RoleColorGroups,
 } from '@stylebot/css';
 import { Highlighter } from '@stylebot/highlighter';
 import {
@@ -17,7 +17,7 @@ import {
 
 import { readCache, writeCache } from '../inject-css/cache';
 
-import { PageBridge, PageSnapshot } from './PageBridge';
+import type { PageBridge, PageSnapshot } from './PageBridge';
 import { PageBridgeEmitter } from './PageBridgeEmitter';
 import { getPageColors } from './page-colors';
 import { getComputedStyles } from './computed-styles';

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import CustomLight from './themes/CustomLight';
 import CustomDark from './themes/CustomDark';
-import { IframeMessage, ParentMessage } from '@stylebot/monaco-editor';
+import type { IframeMessage, ParentMessage } from '@stylebot/monaco-editor';
 
 declare global {
   // Must stay an interface: augmenting Window relies on declaration merging.

@@ -1,4 +1,4 @@
-import { Commit } from 'vuex';
+import type { Commit } from 'vuex';
 import { getSelector } from '@stylebot/css';
 
 const initContextMenuListener = ({ commit }: { commit: Commit }): void => {

@@ -1,5 +1,5 @@
 import * as postcss from 'postcss';
-import { CssDeclaration } from '@stylebot/types';
+import type { CssDeclaration } from '@stylebot/types';
 
 import { getSelector } from './selector';
 import { getSubjectCompound } from './get-subject-compound';

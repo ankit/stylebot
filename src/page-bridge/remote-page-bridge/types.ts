@@ -1,5 +1,5 @@
-import { RoleColorGroups } from '@stylebot/css';
-import { PageSnapshot } from '../PageBridge';
+import type { RoleColorGroups } from '@stylebot/css';
+import type { PageSnapshot } from '../PageBridge';
 
 /**
  * The slice of editor state the page owns and the window mirrors.

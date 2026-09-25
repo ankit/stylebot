@@ -38,18 +38,15 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { Declaration } from 'postcss';
+import type { Declaration } from 'postcss';
 
 import { SAutocomplete, MenuItem } from '@stylebot/components';
 import { ExternalLinkIcon } from '@stylebot/icons';
 import { unquoteFamily } from '@stylebot/css';
-import { debounce, Debounced } from '@stylebot/utils';
-import {
-  FontSuggestion,
-  GoogleFont,
-  loadGoogleFonts,
-  suggestFonts,
-} from '@stylebot/google-fonts';
+import type { Debounced } from '@stylebot/utils';
+import { debounce } from '@stylebot/utils';
+import type { FontSuggestion, GoogleFont } from '@stylebot/google-fonts';
+import { loadGoogleFonts, suggestFonts } from '@stylebot/google-fonts';
 
 import PropertyRow from '../basic/PropertyRow.vue';
 import { openGoogleFontsPage } from '../../utils/chrome';

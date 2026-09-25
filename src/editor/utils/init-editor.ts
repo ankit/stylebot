@@ -1,9 +1,9 @@
 import Vue from 'vue';
 import VueDraggableResizable from 'vue-draggable-resizable';
-import { Store } from 'vuex';
+import type { Store } from 'vuex';
 import { t } from '@stylebot/i18n';
 
-import { State } from '../store';
+import type { State } from '../store';
 import TheStylebotApp from '../components/TheStylebotApp.vue';
 
 import '../index.scss';

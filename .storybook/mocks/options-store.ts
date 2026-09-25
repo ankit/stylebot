@@ -1,4 +1,5 @@
-import Vuex, { ActionTree, Store } from 'vuex';
+import type { ActionTree, Store } from 'vuex';
+import Vuex from 'vuex';
 
 import { defaultOptions, defaultCommands } from '@stylebot/settings';
 import type {

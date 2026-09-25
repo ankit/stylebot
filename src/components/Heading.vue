@@ -5,7 +5,8 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from 'vue';
+import type { PropType } from 'vue';
+import Vue from 'vue';
 
 type Size = 'lg' | 'md' | 'sm';
 type As = 'h1' | 'h2' | 'h3' | 'div';

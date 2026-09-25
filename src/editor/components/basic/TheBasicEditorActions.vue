@@ -22,10 +22,10 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { Declaration } from 'postcss';
+import type { Declaration } from 'postcss';
 import { SButton, STooltip } from '@stylebot/components';
 import { EyeOffIcon } from '@stylebot/icons';
-import { StylebotEditorCommands } from '@stylebot/types';
+import type { StylebotEditorCommands } from '@stylebot/types';
 
 export default Vue.extend({
   name: 'TheBasicEditorActions',

@@ -1,4 +1,4 @@
-import { SyncState } from '@stylebot/types';
+import type { SyncState } from '@stylebot/types';
 
 const SYNC_STATE_KEY = 'google-drive-sync-state';
 const LEGACY_METADATA_KEY = 'google-drive-sync';

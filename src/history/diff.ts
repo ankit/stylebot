@@ -1,4 +1,4 @@
-import { VersionChange, VersionPreview, StyleMap } from '@stylebot/types';
+import type { VersionChange, VersionPreview, StyleMap } from '@stylebot/types';
 
 import { isEquivalentStyle } from '@stylebot/styles';
 

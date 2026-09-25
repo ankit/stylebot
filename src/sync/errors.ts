@@ -1,4 +1,4 @@
-import { SyncErrorKey } from '@stylebot/types';
+import type { SyncErrorKey } from '@stylebot/types';
 
 export type SyncErrorCode =
   | 'auth'

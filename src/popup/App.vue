@@ -108,7 +108,7 @@ import {
 import { getGoogleDriveSyncEnabled } from '../sync/google-drive/sync-metadata';
 // Bypasses @stylebot/styles' barrel, whose page.ts export drags in @stylebot/css's postcss chain.
 import BackgroundPageUtils from '../styles/utils';
-import {
+import type {
   GoogleDriveSyncMetadata,
   GetCommandsResponse,
   StylebotAppearance,

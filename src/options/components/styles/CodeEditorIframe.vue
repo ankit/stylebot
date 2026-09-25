@@ -6,12 +6,12 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import {
+import type {
   IframeMessage,
   ParentThemeUpdateMessage,
 } from '@stylebot/monaco-editor';
 import { resolveAppearance, getSystemPreference } from '@stylebot/utils';
-import { StylebotAppearance } from '@stylebot/types';
+import type { StylebotAppearance } from '@stylebot/types';
 
 export default Vue.extend({
   name: 'CodeEditorIframe',

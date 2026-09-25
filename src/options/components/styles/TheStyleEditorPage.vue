@@ -85,11 +85,11 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { NavigationGuardNext, Route } from 'vue-router';
+import type { NavigationGuardNext, Route } from 'vue-router';
 import * as postcss from 'postcss';
 import { formatDistanceToNow } from 'date-fns';
 
-import { StyleWithoutUrl } from '@stylebot/types';
+import type { StyleWithoutUrl } from '@stylebot/types';
 import {
   ToggleSwitch,
   IconButton,

@@ -16,8 +16,9 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType, Component } from 'vue';
-import { Declaration } from 'postcss';
+import type { PropType, Component } from 'vue';
+import Vue from 'vue';
+import type { Declaration } from 'postcss';
 import { SSegmentedControl } from '@stylebot/components';
 
 type Option = { title: string; value: string; html?: string; icon?: Component };

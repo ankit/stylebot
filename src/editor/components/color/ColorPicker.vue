@@ -42,7 +42,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { Declaration } from 'postcss';
+import type { Declaration } from 'postcss';
 
 import ColorPickerPopover from './ColorPickerPopover.vue';
 import { extractColor } from '../../utils/css-value';

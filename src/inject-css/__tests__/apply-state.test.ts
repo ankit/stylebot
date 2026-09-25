@@ -1,4 +1,4 @@
-import { CachedState } from '../cache';
+import type { CachedState } from '../cache';
 
 jest.mock('@stylebot/css');
 jest.mock('@stylebot/readability');

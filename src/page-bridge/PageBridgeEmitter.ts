@@ -1,4 +1,4 @@
-import { PageBridgeEvents } from './PageBridge';
+import type { PageBridgeEvents } from './PageBridge';
 
 type Listeners = {
   [E in keyof PageBridgeEvents]: Set<PageBridgeEvents[E]>;

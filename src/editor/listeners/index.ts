@@ -1,5 +1,5 @@
-import { Store } from 'vuex';
-import { State } from 'editor/store';
+import type { Store } from 'vuex';
+import type { State } from 'editor/store';
 
 import initChromeListener from './chrome';
 import initCommandListener from './commands';

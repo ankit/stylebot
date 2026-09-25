@@ -56,7 +56,7 @@
 import Vue from 'vue';
 import { SChip, SCountBadge, ShortcutChip } from '@stylebot/components';
 import { splitSelectorList } from '@stylebot/css';
-import { CssDeclaration } from '@stylebot/types';
+import type { CssDeclaration } from '@stylebot/types';
 
 const MAX_DETAIL_ROWS = 4;
 type NextAncestorInfo = { label: string; styleCount: number };

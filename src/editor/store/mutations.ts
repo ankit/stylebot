@@ -1,14 +1,14 @@
-import * as postcss from 'postcss';
+import type * as postcss from 'postcss';
 
-import {
+import type {
   StylebotOptions,
   StylebotCommands,
   ReadabilitySettings,
 } from '@stylebot/types';
 
 import { walkUnnestedRules } from '@stylebot/css';
-import { State, CssSelectorMetadata, EditorTab } from './';
-import { PageSnapshot } from '@stylebot/page-bridge';
+import type { State, CssSelectorMetadata, EditorTab } from './';
+import type { PageSnapshot } from '@stylebot/page-bridge';
 
 export default {
   setVisible(state: State, visible: boolean): void {

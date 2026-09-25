@@ -51,8 +51,8 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { Declaration, Rule } from 'postcss';
-import { StylebotBasicModeSections } from '@stylebot/types';
+import type { Declaration, Rule } from 'postcss';
+import type { StylebotBasicModeSections } from '@stylebot/types';
 
 import PropertyCard from './basic/PropertyCard.vue';
 import TheBasicEditorActions from './basic/TheBasicEditorActions.vue';

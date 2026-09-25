@@ -1,4 +1,4 @@
-import { Sides } from './spacing';
+import type { Sides } from './spacing';
 
 const SIDES = ['top', 'right', 'bottom', 'left'];
 const CORNERS = ['top-left', 'top-right', 'bottom-right', 'bottom-left'];

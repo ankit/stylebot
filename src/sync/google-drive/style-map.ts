@@ -1,4 +1,4 @@
-import { StyleMap } from '@stylebot/types';
+import type { StyleMap } from '@stylebot/types';
 
 const isStyle = (value: unknown): boolean => {
   if (typeof value !== 'object' || value === null) {

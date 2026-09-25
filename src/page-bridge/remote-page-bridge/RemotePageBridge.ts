@@ -1,6 +1,6 @@
-import { RoleColorGroups } from '@stylebot/css';
+import type { RoleColorGroups } from '@stylebot/css';
 
-import { PageBridge, PageSnapshot } from '../PageBridge';
+import type { PageBridge, PageSnapshot } from '../PageBridge';
 import { PageBridgeEmitter } from '../PageBridgeEmitter';
 import {
   REMOTE_PAGE_BRIDGE_PORT,
@@ -8,7 +8,7 @@ import {
   RETRY_FACTOR,
   RETRY_MAX_MS,
 } from './constants';
-import {
+import type {
   RemotePageBridgeHandlers,
   RemotePageBridgeMessageToPage,
   RemotePageBridgeMessageToWindow,

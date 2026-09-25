@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Vuex, { Store } from 'vuex';
 
-import { State } from 'editor/store';
+import type { State } from 'editor/store';
 import mockState from '../../store/__mocks__/state';
 
 export {};

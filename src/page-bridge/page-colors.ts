@@ -1,4 +1,4 @@
-import { RoleColorGroups } from '@stylebot/css';
+import type { RoleColorGroups } from '@stylebot/css';
 
 const ROLE_CAP = 4;
 const TRANSPARENT_REGEX = /rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*0\s*\)/i;

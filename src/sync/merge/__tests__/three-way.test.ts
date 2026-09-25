@@ -1,4 +1,4 @@
-import { StyleMap, StyleWithoutUrl } from '@stylebot/types';
+import type { StyleMap, StyleWithoutUrl } from '@stylebot/types';
 
 import { mergeThreeWay } from '../three-way';
 

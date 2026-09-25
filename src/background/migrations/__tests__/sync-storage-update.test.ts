@@ -1,4 +1,4 @@
-import { SyncState } from '@stylebot/types';
+import type { SyncState } from '@stylebot/types';
 
 import SyncStorageUpdate from '../sync-storage-update';
 

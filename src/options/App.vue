@@ -25,9 +25,9 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { RawLocation } from 'vue-router';
+import type { RawLocation } from 'vue-router';
 
-import { StylebotAppearance } from '@stylebot/types';
+import type { StylebotAppearance } from '@stylebot/types';
 import { ThemeProvider } from '@stylebot/components';
 
 import TheNavigation from './components/TheNavigation.vue';

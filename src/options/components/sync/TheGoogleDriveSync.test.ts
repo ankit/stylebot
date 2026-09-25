@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils';
-import { SyncState } from '@stylebot/types';
+import type { SyncState } from '@stylebot/types';
 
 import TheGoogleDriveSync from './TheGoogleDriveSync.vue';
 

@@ -1,7 +1,7 @@
 import { removeReadability } from '../lifecycle';
 import { readCache, writeCache } from '../../inject-css/cache';
 
-import {
+import type {
   GetStylesForPage,
   GetStylesForPageResponse,
   SetReadability,

@@ -1,8 +1,8 @@
 import * as postcss from 'postcss';
-import { Commit, Dispatch } from 'vuex';
+import type { Commit, Dispatch } from 'vuex';
 
-import { State } from './';
-import storeGetters from './getters';
+import type { State } from './';
+import type storeGetters from './getters';
 
 type Getters = {
   [K in keyof typeof storeGetters]: ReturnType<(typeof storeGetters)[K]>;
@@ -21,7 +21,7 @@ import {
 
 import { loadGoogleFonts } from '@stylebot/google-fonts';
 
-import {
+import type {
   Style,
   StylebotEditingMode,
   FilterEffect,
@@ -44,10 +44,8 @@ import {
   openEditorWindow,
 } from '../utils/chrome';
 
-import {
-  getPageBridge,
-  RemotePageBridgeSyncedState,
-} from '@stylebot/page-bridge';
+import type { RemotePageBridgeSyncedState } from '@stylebot/page-bridge';
+import { getPageBridge } from '@stylebot/page-bridge';
 
 import { PLACEHOLDER_PROPERTIES } from '../utils/computed-placeholder';
 

@@ -43,7 +43,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { RoleColorGroups } from '@stylebot/css';
+import type { RoleColorGroups } from '@stylebot/css';
 
 import ColorPickerHeader from './ColorPickerHeader.vue';
 import ColorPickerTabs from './ColorPickerTabs.vue';

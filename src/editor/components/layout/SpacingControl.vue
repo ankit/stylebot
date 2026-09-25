@@ -70,17 +70,17 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from 'vue';
-import { Declaration } from 'postcss';
+import type { PropType } from 'vue';
+import Vue from 'vue';
+import type { Declaration } from 'postcss';
 import { t } from '@stylebot/i18n';
 import { SSegmentedControl } from '@stylebot/components';
 
 import PropertyRow from '../basic/PropertyRow.vue';
 import SpacingField from './SpacingField.vue';
 import { computedSides, sharedValue } from '../../utils/computed-placeholder';
+import type { Side, Sides } from '../../utils/spacing';
 import {
-  Side,
-  Sides,
   parseLength,
   expandShorthand,
   resolveSpacingDeclarations,

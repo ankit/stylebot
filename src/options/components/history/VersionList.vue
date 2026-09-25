@@ -19,10 +19,12 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from 'vue';
-import { Version, VersionChange, VersionPreview } from '@stylebot/types';
+import type { PropType } from 'vue';
+import Vue from 'vue';
+import type { Version, VersionChange, VersionPreview } from '@stylebot/types';
 
-import { getDayLabel, groupByDay, DayGroup } from './group-by-day';
+import type { DayGroup } from './group-by-day';
+import { getDayLabel, groupByDay } from './group-by-day';
 import VersionComponent from './Version.vue';
 
 export default Vue.extend({

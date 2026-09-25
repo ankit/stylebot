@@ -122,7 +122,7 @@ import {
   UndockIcon,
 } from '@stylebot/icons';
 
-import { StylebotEditorCommands, StylebotLayout } from '@stylebot/types';
+import type { StylebotEditorCommands, StylebotLayout } from '@stylebot/types';
 
 import { openOptionsPage } from '../../utils/chrome';
 

@@ -1,4 +1,5 @@
-import { shallowMount, Wrapper } from '@vue/test-utils';
+import type { Wrapper } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 
 import ColorPicker from '../ColorPicker.vue';
 

@@ -1,13 +1,13 @@
-import * as postcss from 'postcss';
+import type * as postcss from 'postcss';
 
-import { State } from './';
+import type { State } from './';
+import type { RoleColorGroups } from '@stylebot/css';
 import {
   getRule,
   getRuleForSelector,
   withOwnDeclarationsOnly,
   getFilterEffectValueForPage,
   getAlreadyUsedColors,
-  RoleColorGroups,
 } from '@stylebot/css';
 
 export default {
