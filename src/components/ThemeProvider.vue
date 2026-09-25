@@ -72,15 +72,6 @@ export default Vue.extend({
   --success: #7fd3a5;
   --success-background: #1e3129;
   --success-border: #2f4d3e;
-
-  --warning: #e3b774;
-
-  --code-surface: #16181b;
-
-  --code-selector: #e3b774;
-  --code-property: #9ab8f5;
-  --code-value: #a8e6c2;
-  --code-punctuation: #7c828d;
 }
 
 .theme-provider {
@@ -132,15 +123,6 @@ export default Vue.extend({
   --success: #1a7f4b;
   --success-background: #e8f5ee;
   --success-border: #c3e6d1;
-
-  --warning: #8a5a12;
-
-  --code-surface: #f7f8fa;
-
-  --code-selector: #8a5a12;
-  --code-property: #2a5fd6;
-  --code-value: #17734a;
-  --code-punctuation: #8b909b;
 
   --ring: var(--accent);
 
