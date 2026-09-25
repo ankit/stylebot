@@ -23,7 +23,7 @@ Available on [Chrome](https://chrome.google.com/webstore/detail/stylebot/oiaejid
 - **Readability mode**: Turn articles into a clean reading view, with a theme and font you choose.
 - **Grayscale mode**: Remove color to reduce strain from websites.
 - **Google Drive sync**: Back up your styles and keep them in sync across browsers, with conflicts shown for you to resolve.
-- **Dark mode support**: The editor, popup and options page follow your system theme.
+- **Dark mode support**: The editor, popup and options page follow your system theme, and the editor can also be set to light or dark.
 
 ## How to contribute
 
