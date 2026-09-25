@@ -14,6 +14,7 @@
   "author": "Ankit Ahuja",
   "scripts": {
     "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider NODE_ENV=production webpack --hide-modules",
+    "build:preview": "cross-env NODE_OPTIONS=--openssl-legacy-provider NODE_ENV=production STYLEBOT_PREVIEW=1 webpack --hide-modules",
     "build:firefox": "cross-env NODE_OPTIONS=--openssl-legacy-provider NODE_ENV=production BROWSER=firefox webpack --hide-modules",
     "watch": "cross-env NODE_OPTIONS=--openssl-legacy-provider NODE_ENV=development webpack --hide-modules --watch",
     "watch:firefox": "cross-env NODE_OPTIONS=--openssl-legacy-provider NODE_ENV=development BROWSER=firefox webpack --hide-modules --watch",

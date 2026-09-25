@@ -12,10 +12,17 @@ const TerserPlugin = require('terser-webpack-plugin');
 
 const { parseLocaleConfig } = require('./scripts/lib/parse-locale-config');
 
-const getOutputPath = () =>
-  process.env.BROWSER
+const isPreview = process.env.STYLEBOT_PREVIEW === '1';
+
+const getOutputPath = () => {
+  if (isPreview) {
+    return `${__dirname}/preview-dist`;
+  }
+
+  return process.env.BROWSER
     ? `${__dirname}/${process.env.BROWSER}-dist`
     : `${__dirname}/dist`;
+};
 
 // Writes a marker once every compiler has built successfully, so tools like
 // scripts/launch-chrome.mjs never see it before manifest.json exists.
@@ -256,6 +263,15 @@ const config = {
                 )
               );
               jsonContent = { ...jsonContent, ...firefoxJsonContent };
+            } else if (process.env.NODE_ENV === 'development' || isPreview) {
+              /*
+               * Store public key, for the store id that Drive sign-in's OAuth redirect needs.
+               * Release builds leave it out: the store rejects an uploaded manifest with a `key`.
+               */
+              const devJsonContent = JSON.parse(
+                fs.readFileSync(`${__dirname}/src/extension/manifest-dev.json`)
+              );
+              jsonContent = { ...jsonContent, ...devJsonContent };
             }
 
             return JSON.stringify(jsonContent, null, 2);

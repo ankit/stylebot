@@ -1,5 +1,6 @@
 dist
 firefox-dist
+preview-dist
 node_modules
 coverage
 test-results
