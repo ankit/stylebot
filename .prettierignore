@@ -12,7 +12,7 @@ yarn.lock
 CHANGELOG.md
 
 # Separate Gatsby project with its own toolchain.
-docs
+site
 
 # Prompt content — the manual line wrapping there is deliberate.
 .claude

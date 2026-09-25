@@ -9,7 +9,7 @@ Browser extension (Chrome/Edge/Firefox) that lets users change the appearance of
 - `e2e/` — Playwright end-to-end tests, driven against a real built extension: via CDP (`Extensions.loadUnpacked`) on Chrome/Edge, via Firefox's remote debugging protocol on Firefox; engine-specific code lives in `e2e/chromium/` and `e2e/firefox/` behind the `e2e/engine.ts` contract
 - `__mocks__/` — Jest mocks
 - `dist/` — Chrome/Edge build output; `firefox-dist/` — Firefox build output; `preview-dist/` — `yarn build:preview` output
-- `docs/` — stylebot.dev static site
+- `site/` — stylebot.dev static site
 - `patches/` — patch-package patches applied to dependencies on install
 
 ## Workflow
