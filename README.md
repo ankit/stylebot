@@ -11,6 +11,9 @@ Stylebot is a browser extension that lets you change the appearance of the web i
 
 Available on [Chrome](https://chrome.google.com/webstore/detail/stylebot/oiaejidbmkiecgbjeifoejpgmdaleoha), [Firefox](https://addons.mozilla.org/firefox/addon/stylebot-web/) and [Edge](https://microsoftedge.microsoft.com/addons/detail/stylebot/mjolbpfednnbebfapicajpifliopnnai).
 
+> [!NOTE]
+> Stylebot 4 is under active development on the `v4` branch. The version in the stores is 3.x, released from `main`, so some features below aren't available there yet.
+
 ![Stylebot's code editor restyling GitHub with a Dracula theme](.github/readme/editor-code-mode.webp)
 
 - **Visual editor**: Pick any element and restyle it with UI controls. Empty fields show the page's current values, and other elements a selector matches are highlighted as you edit.
@@ -20,7 +23,7 @@ Available on [Chrome](https://chrome.google.com/webstore/detail/stylebot/oiaejid
 - **Readability mode**: Turn articles into a clean reading view, with a theme and font you choose.
 - **Grayscale mode**: Remove color to reduce strain from websites.
 - **Google Drive sync**: Back up your styles and keep them in sync across browsers, with conflicts shown for you to resolve.
-- **Light and dark**: The popup and options page follow your system theme.
+- **Dark mode support**: The editor, popup and options page follow your system theme.
 
 ## How to contribute
 
@@ -91,7 +94,7 @@ How sync works, and how to use it from a local build or a fork, is described in 
 
 Releases go through a pull request from a `release/vX.Y.Z` branch — the `release/` prefix is what triggers the Edge e2e suite, which doesn't run on ordinary PRs.
 
-Day-to-day pull requests target `v4`. The release workflow only runs on pull requests into `main`.
+Day-to-day pull requests target `v4`. 3.x releases ship from `main`, and the release workflow only runs on pull requests into it.
 
 - Branch off `main` as `release/vX.Y.Z`
 - Add entry to `CHANGELOG`
