@@ -4,7 +4,7 @@
 //   node scripts/bundle-size.mjs measure <dist> > sizes.json
 //   node scripts/bundle-size.mjs report <base.json> <head.json> > report.md
 
-import { appendFileSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { gzipSync } from 'node:zlib';
 
@@ -152,20 +152,17 @@ function report(base, head) {
     ? 'This PR changes what the popup or content scripts load.'
     : 'No change to what the popup or content scripts load.';
 
-  return {
-    changed,
-    markdown: [
-      MARKER,
-      '### Bundle size',
-      '',
-      summary,
-      '',
-      '| Bundle | Size | Change | Gzip | Change |',
-      '| --- | ---: | ---: | ---: | ---: |',
-      ...rows,
-      '',
-    ].join('\n'),
-  };
+  return [
+    MARKER,
+    '### Bundle size',
+    '',
+    summary,
+    '',
+    '| Bundle | Size | Change | Gzip | Change |',
+    '| --- | ---: | ---: | ---: | ---: |',
+    ...rows,
+    '',
+  ].join('\n');
 }
 
 const [command, ...args] = process.argv.slice(2);
@@ -174,16 +171,12 @@ if (command === 'measure') {
   process.stdout.write(`${JSON.stringify(measure(args[0]), null, 2)}\n`);
 } else if (command === 'report') {
   const [basePath, headPath] = args;
-  const { changed, markdown } = report(
-    JSON.parse(readFileSync(basePath, 'utf8')),
-    JSON.parse(readFileSync(headPath, 'utf8'))
+  process.stdout.write(
+    report(
+      JSON.parse(readFileSync(basePath, 'utf8')),
+      JSON.parse(readFileSync(headPath, 'utf8'))
+    )
   );
-
-  if (process.env.GITHUB_OUTPUT) {
-    appendFileSync(process.env.GITHUB_OUTPUT, `changed=${changed}\n`);
-  }
-
-  process.stdout.write(markdown);
 } else {
   console.error(
     'Usage: bundle-size.mjs measure <dist> | report <base.json> <head.json>'

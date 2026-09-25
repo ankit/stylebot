@@ -55,9 +55,9 @@ jobs:
           node "$RUNNER_TEMP/bundle-size.mjs" measure dist > "$RUNNER_TEMP/base.json"
 
       - name: Compare
-        id: compare
         run: |
           node "$RUNNER_TEMP/bundle-size.mjs" report "$RUNNER_TEMP/base.json" "$RUNNER_TEMP/head.json" > "$RUNNER_TEMP/report.md"
+          cat "$RUNNER_TEMP/report.md"
           cat "$RUNNER_TEMP/report.md" >> "$GITHUB_STEP_SUMMARY"
 
       # Fork PRs get a read-only token, so they only get the job summary.
@@ -67,7 +67,6 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
           PR: ${{ github.event.pull_request.number }}
-          CHANGED: ${{ steps.compare.outputs.changed }}
         run: |
           comment_id=$(gh api "repos/$REPO/issues/$PR/comments" --paginate \
             --jq '.[] | select(.body | startswith("<!-- bundle-size-report -->")) | .id' | head -n 1)
@@ -75,7 +74,7 @@ jobs:
           if [ -n "$comment_id" ]; then
             gh api --method PATCH "repos/$REPO/issues/comments/$comment_id" \
               -F body=@"$RUNNER_TEMP/report.md" > /dev/null
-          elif [ "$CHANGED" = "true" ]; then
+          else
             gh api --method POST "repos/$REPO/issues/$PR/comments" \
               -F body=@"$RUNNER_TEMP/report.md" > /dev/null
           fi
