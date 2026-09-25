@@ -30,4 +30,4 @@ Developer docs live in [`docs/`](docs/README.md).
 
 ## License
 
-Stylebot is MIT licensed.
+Stylebot is released under the [MIT License](LICENSE).
