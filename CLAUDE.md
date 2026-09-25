@@ -10,7 +10,7 @@ Browser extension (Chrome/Edge/Firefox) that lets users change the appearance of
 - `__mocks__/` — Jest mocks
 - `dist/` — Chrome/Edge build output; `firefox-dist/` — Firefox build output; `preview-dist/` — `yarn build:preview` output
 - `site/` — stylebot.dev static site
-- `docs/` — developer docs: setup, releases, translation, architecture (editor, selectors and CSS, readability, sync), `testing/`
+- `docs/` — developer docs: setup, releases, translation, e2e, architecture (editor, selectors and CSS, readability, sync)
 - `patches/` — patch-package patches applied to dependencies on install
 
 ## Workflow
@@ -28,7 +28,7 @@ session is already inside a worktree.
 - `yarn lint` / `yarn lint:fix` — ESLint
 - `yarn typecheck` — `tsc --noEmit` for the extension, then again with `.storybook/tsconfig.json` for Storybook config and stories
 - `yarn test` — Jest unit tests
-- `yarn e2e` — builds the extension then runs the Playwright e2e suite headless on Chrome, as CI does. `--edge` / `--firefox` switch browser, `--headed` / `--ui` / `--debug` switch mode, `--no-build` skips the rebuild; see `docs/testing/e2e.md`.
+- `yarn e2e` — builds the extension then runs the Playwright e2e suite headless on Chrome, as CI does. `--edge` / `--firefox` switch browser, `--headed` / `--ui` / `--debug` switch mode, `--no-build` skips the rebuild; see `docs/e2e.md`.
 - `yarn test:storybook` — builds Storybook and runs every story headless with `@storybook/test-runner`, asserting the `play` functions. `--no-build` reuses `storybook-static`; `--dev --watch <path>` runs against a `yarn storybook` already on :6006.
 - `yarn storybook` — Storybook 7.6 (last line with Vue 2 support) for the shared primitives and popup/options/editor composites, with a light/dark toolbar
 

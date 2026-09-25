@@ -37,7 +37,7 @@ Run `yarn storybook` to browse the popup, options page, editor and shared compon
 
 - Run `yarn test` for unit tests
 - Run `yarn test:storybook` for the Storybook interaction tests (every story rendered headless, play functions asserted); `yarn test:storybook --dev --watch` against a running `yarn storybook` while writing them
-- Run `yarn e2e` for the Playwright end-to-end suite (headless Chrome, as in CI); `yarn e2e --firefox --ui` and friends for other browsers and modes — see [`docs/testing/e2e.md`](testing/e2e.md)
+- Run `yarn e2e` for the Playwright end-to-end suite (headless Chrome, as in CI); `yarn e2e --firefox --ui` and friends for other browsers and modes — see [`docs/e2e.md`](e2e.md)
 
 ## Google Drive Sync
 

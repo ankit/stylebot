@@ -8,7 +8,7 @@
 
 ## Testing
 
-- [e2e](testing/e2e.md) — the Playwright suite against the real extension
+- [e2e](e2e.md) — the Playwright suite against the real extension
 
 ## Architecture
 
