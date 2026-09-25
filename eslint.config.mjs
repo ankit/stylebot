@@ -23,7 +23,7 @@ export default tseslint.config(
       '.claude',
 
       // Separate Gatsby project with its own toolchain.
-      'docs',
+      'site',
     ],
   },
 

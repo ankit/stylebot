@@ -102,4 +102,4 @@ upload — this step is manual.
 ## Optional follow-up
 
 Minor releases (X.Y.0) usually get a marketing page under
-`docs/src/pages/releases/X.Y.js`. Patch releases don't.
+`site/src/pages/releases/X.Y.js`. Patch releases don't.
