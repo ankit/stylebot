@@ -1,4 +1,4 @@
-# `e2e`
+# e2e
 
 Playwright tests that drive the real, built extension in a real browser. Chrome is the
 default; Chrome runs on every PR, Firefox and Edge on release PRs (or manually via
