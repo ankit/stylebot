@@ -184,7 +184,7 @@ export default Vue.extend({
     suppressReopen: boolean;
     focused: boolean;
     keepSelectionOnMouseUp: boolean;
-    revealSelect: boolean;
+    openOnFocus: boolean;
     pointerPick: boolean;
     quietFocus: boolean;
     typedAhead: string | null;
@@ -192,7 +192,9 @@ export default Vue.extend({
     return {
       suppressReopen: false,
       focused: false,
-      revealSelect: true,
+      // Only a click on the field, or starting to edit from the chips, opens
+      // the menu as the field takes focus; tabbing onto it leaves it closed.
+      openOnFocus: false,
       // A pick made with the pointer hands focus back to the chips without
       // a focus ring, as it would have on any other click.
       pointerPick: false,
@@ -303,8 +305,19 @@ export default Vue.extend({
         return;
       }
 
-      this.startSession(this.selectOnFocus && this.revealSelect);
-      this.revealSelect = true;
+      const open = this.openOnFocus;
+      this.openOnFocus = false;
+
+      if (!open) {
+        this.suppressReopen = false;
+        if (this.selectOnFocus) {
+          (this.$refs.input as HTMLTextAreaElement | undefined)?.select();
+        }
+        this.$emit('focus');
+        return;
+      }
+
+      this.startSession();
     },
 
     // Begins editing in the (focused) field: selects the value if asked to,
@@ -326,10 +339,13 @@ export default Vue.extend({
     },
 
     onMouseDown(): void {
+      this.openOnFocus = !this.focused;
       this.keepSelectionOnMouseUp = this.selectOnFocus && !this.focused;
     },
 
     onMouseUp(event: MouseEvent): void {
+      this.openOnFocus = false;
+
       if (this.keepSelectionOnMouseUp) {
         event.preventDefault();
         this.keepSelectionOnMouseUp = false;
@@ -339,6 +355,7 @@ export default Vue.extend({
     // Switches from the pill display back to the raw editable textarea
     // and focuses it, once it exists on the next render.
     revealInput(): void {
+      this.openOnFocus = true;
       this.focused = true;
       this.$nextTick(() => {
         (this.$refs.input as HTMLTextAreaElement | undefined)?.focus();
@@ -374,8 +391,8 @@ export default Vue.extend({
     },
 
     // Keeps focus on the control once the committed value shows, so Tab
-    // carries on from here: on the chips, or on the field without reopening
-    // the menu when there's no value to show as chips.
+    // carries on from here: on the chips, or on the field when there's no
+    // value to show as chips.
     focusCommitted(quiet: boolean): void {
       const chips = this.$refs.chips as HTMLElement | undefined;
 
@@ -385,8 +402,6 @@ export default Vue.extend({
         return;
       }
 
-      this.suppressReopen = true;
-      this.revealSelect = false;
       (this.$refs.input as HTMLTextAreaElement | undefined)?.focus();
     },
 

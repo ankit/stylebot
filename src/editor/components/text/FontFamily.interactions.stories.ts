@@ -354,6 +354,29 @@ export const TabOntoChipsStaysClosed: StoryObj = {
   },
 };
 
+export const TabOntoEmptyFieldStaysClosed: StoryObj = {
+  ...editor({ css: 'h1 { color: red; }', activeSelector: 'h1' }),
+  name: 'tabbing onto an empty field focuses it without opening the list',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const text = input(canvasElement);
+
+    focusViaTab(canvasElement, '.font-family-autocomplete .autocomplete-input');
+    await expect(text).toHaveFocus();
+    await new Promise(resolve => setTimeout(resolve, 100));
+    await expect(canvas.queryByRole('menu')).toBeNull();
+
+    await pressKey('ArrowDown');
+    await findOpenMenu(canvas);
+    await pressKey('Escape');
+    await waitFor(() => expect(canvas.queryByRole('menu')).toBeNull());
+
+    await user.keyboard('lor');
+    await findOpenMenu(canvas);
+    await menuItem(canvas, 'Lora');
+  },
+};
+
 export const EnterOnChipsEdits: StoryObj = {
   ...editor(WITH_RULE),
   name: 'Enter on the chips after a pick starts editing, value selected',
