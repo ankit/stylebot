@@ -60,6 +60,21 @@ const fontFaceCss = (): string =>
     )
   ).join('');
 
+/**
+ * Registers the editor's fonts on the page's document, since browsers
+ * ignore font-face rules inside a shadow root.
+ */
+const injectFontFaces = (): void => {
+  if (document.getElementById('stylebot-editor-fonts')) {
+    return;
+  }
+
+  const styleEl = document.createElement('style');
+  styleEl.setAttribute('id', 'stylebot-editor-fonts');
+  styleEl.textContent = fontFaceCss();
+  (document.head || document.documentElement).appendChild(styleEl);
+};
+
 const injectCss = (shadowRoot: ShadowRoot): Promise<void> => {
   const url = chrome.runtime.getURL('editor/app.css');
 
@@ -68,7 +83,7 @@ const injectCss = (shadowRoot: ShadowRoot): Promise<void> => {
     .then(css => {
       const styleEl = document.createElement('style');
       styleEl.setAttribute('id', 'stylebot-editor-css');
-      styleEl.innerHTML = fontFaceCss() + css;
+      styleEl.innerHTML = css;
       shadowRoot.appendChild(styleEl);
     });
 };
@@ -103,6 +118,8 @@ const initEditor = (store: Store<State>): void => {
 
   stylebotApp.id = 'stylebot-app';
   shadowRoot.appendChild(stylebotApp);
+
+  injectFontFaces();
 
   // Wait for the stylesheet to land before mounting — otherwise Vue's
   // synchronous mount renders the unstyled markup first, causing a
