@@ -557,7 +557,7 @@ export default {
     // is detached from the document, not just hidden. Switch the panel to
     // Magic locally without persisting over the user's global mode
     // preference (mirrors openStylebot's readabilityActive handling above).
-    if (value && ['basic', 'code'].includes(state.options.mode)) {
+    if (value && ['basic', 'code', 'chat'].includes(state.options.mode)) {
       commit('setOptions', { ...state.options, mode: 'magic' });
     }
 

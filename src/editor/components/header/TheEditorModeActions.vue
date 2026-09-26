@@ -57,6 +57,13 @@ export default Vue.extend({
           shortcut: 'p',
           disabled: false,
         },
+        {
+          value: 'chat',
+          label: this.t('chat_mode'),
+          title: this.t('chat_mode_description'),
+          shortcut: 't',
+          disabled: this.readability,
+        },
       ];
     },
   },

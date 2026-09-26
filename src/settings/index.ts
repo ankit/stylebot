@@ -46,6 +46,7 @@ export const defaultEditorCommands: StylebotEditorCommands = {
   basic: 'b',
   magic: 'p',
   code: 'c',
+  chat: 't',
   help: '?',
   hide: 'h',
   dockLeft: 'l',

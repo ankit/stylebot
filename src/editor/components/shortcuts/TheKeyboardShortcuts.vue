@@ -218,6 +218,14 @@ export default Vue.extend({
         this.$store.dispatch('setMode', 'magic');
       }
 
+      // Switch to chat
+      if (event.key === this.editorCommands.chat) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        this.$store.dispatch('setMode', 'chat');
+      }
+
       // Show shortcut help
       if (event.key === this.editorCommands.help) {
         event.preventDefault();

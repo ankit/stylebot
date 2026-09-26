@@ -1,4 +1,4 @@
-export type StylebotEditingMode = 'basic' | 'magic' | 'code';
+export type StylebotEditingMode = 'basic' | 'magic' | 'code' | 'chat';
 
 export type StylebotBasicModeSections = {
   text: boolean;

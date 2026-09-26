@@ -13,6 +13,7 @@ export type StylebotEditorCommandName =
   | 'basic'
   | 'magic'
   | 'code'
+  | 'chat'
   | 'help'
   | 'hide'
   | 'dockLeft'

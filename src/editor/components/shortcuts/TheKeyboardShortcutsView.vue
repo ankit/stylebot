@@ -167,11 +167,14 @@ export default Vue.extend({
           keys: [this.editorCommands.hide],
         },
         {
-          label: this.t('basic_code_presets'),
+          label: ['basic_mode', 'code_mode', 'presets_mode', 'chat_mode']
+            .map(key => this.t(key))
+            .join(' · '),
           keys: [
             this.editorCommands.basic,
             this.editorCommands.code,
             this.editorCommands.magic,
+            this.editorCommands.chat,
           ],
         },
         {
