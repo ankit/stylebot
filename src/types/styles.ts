@@ -41,3 +41,33 @@ export type CompiledStyles = {
   revision: string;
   styles: CompiledStyleMap;
 };
+
+/**
+ * The background's stored styles, handed to sync and history so neither
+ * imports the background page.
+ */
+export type StyleStorage = {
+  getAll: () => Promise<StyleMap>;
+  /**
+   * Replaces every style. fromSync keeps the write from queueing a sync of
+   * its own; restoredFrom names the version a restore put back.
+   */
+  setAll: (
+    styles: StyleMap,
+    options?: { fromSync?: boolean; restoredFrom?: Timestamp }
+  ) => Promise<void>;
+  /**
+   * Writes only if nothing landed since `revision` was read, returning the
+   * new revision, or null when an edit got in first.
+   */
+  setAllIfUnchanged: (
+    styles: StyleMap,
+    revision: string,
+    options?: { fromSync?: boolean }
+  ) => Promise<string | null>;
+  /**
+   * Pushes the stored styles to every open tab, which writes don't do on
+   * their own.
+   */
+  applyStylesToAllTabs: () => Promise<void>;
+};
