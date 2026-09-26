@@ -5,6 +5,7 @@ import type {
   VersionEntry,
   Version,
   StyleMap,
+  StyleStorage,
 } from '@stylebot/types';
 
 import { diffStyles, getVersionPreview } from './diff';
@@ -14,12 +15,6 @@ import {
   getStylesAtEachVersion,
   getStylesBeforeChange,
 } from './store';
-// eslint-disable-next-line stylebot/package-entry-imports -- until the background passes in its style store
-import {
-  getAll as getAllStyles,
-  setAll as setAllStyles,
-  applyStylesToAllTabs,
-} from '../background/styles';
 
 /**
  * The versions the list shows, what each change did, and what restoring each
@@ -30,9 +25,13 @@ import {
  * oldest shown version is described against.
  */
 export const scanVersionHistory = async (
+  storage: StyleStorage,
   limit?: number
 ): Promise<VersionHistory> => {
-  const [current, entries] = await Promise.all([getAllStyles(), getHistory()]);
+  const [current, entries] = await Promise.all([
+    storage.getAll(),
+    getHistory(),
+  ]);
   const states = getStylesAtEachVersion(
     current,
     entries,
@@ -130,10 +129,14 @@ const applyVersion = (
  * restore itself undoable.
  */
 export const restoreVersion = async (
+  storage: StyleStorage,
   versionId: string,
   urls?: Array<string>
 ): Promise<boolean> => {
-  const [current, entries] = await Promise.all([getAllStyles(), getHistory()]);
+  const [current, entries] = await Promise.all([
+    storage.getAll(),
+    getHistory(),
+  ]);
 
   const entry = entries.find(({ id }) => id === versionId);
   const version = getStylesForVersion(current, entries, versionId);
@@ -142,10 +145,10 @@ export const restoreVersion = async (
     return false;
   }
 
-  await setAllStyles(applyVersion(current, version, urls), {
+  await storage.setAll(applyVersion(current, version, urls), {
     restoredFrom: entry.modifiedTime,
   });
-  await applyStylesToAllTabs();
+  await storage.applyStylesToAllTabs();
 
   return true;
 };
