@@ -188,7 +188,7 @@ export const initListeners = (): void => {
           SetAllStyles(message);
           break;
         case 'GetStylesForPage':
-          GetStylesForPage(message, sender, sendResponse);
+          GetStylesForPage(sender, sendResponse);
           break;
         case 'EnableStyle':
           EnableStyle(message);

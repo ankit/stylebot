@@ -29,7 +29,6 @@ import type {
   DisableStyle as DisableStyleType,
   EnableStyle as EnableStyleType,
   SetStyle as SetStyleType,
-  GetStylesForPage as GetStylesForPageType,
   MoveStyle as MoveStyleType,
   SetAllStyles as SetAllStylesType,
   SetCommands as SetCommandsType,
@@ -111,11 +110,10 @@ export const SetAllStyles = async (
 };
 
 export const GetStylesForPage = async (
-  message: GetStylesForPageType,
   sender: chrome.runtime.MessageSender,
   sendResponse: (response: GetStylesForPageResponse) => void
 ): Promise<void> => {
-  const tab = sender.tab || message.tab;
+  const tab = sender.tab;
 
   if (!tab?.url) {
     return;
