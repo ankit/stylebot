@@ -9,15 +9,20 @@ import type { EditorApp, EditorAppWindow } from './load-editor';
 import { createStore } from './store';
 import { onCommandsChanged } from './utils/bind-commands';
 import { getStylesForPage } from './utils/chrome';
+import { preloadEditorCss } from './utils/init-editor';
 
 const store = createStore('page');
 store.commit('setUrl', document.domain);
 setPageBridge(new LocalPageBridge({ getStylebotCss: () => store.state.css }));
 
-const ready = (async () => {
-  await store.dispatch('initialize');
+preloadEditorCss().catch(() => undefined);
 
-  const { defaultStyle } = await getStylesForPage();
+const ready = (async () => {
+  const [{ defaultStyle }] = await Promise.all([
+    getStylesForPage(),
+    store.dispatch('initialize'),
+  ]);
+
   if (defaultStyle) {
     store.dispatch('initializeDefaultStyle', defaultStyle);
   }

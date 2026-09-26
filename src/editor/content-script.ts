@@ -28,19 +28,32 @@ const EDITOR_MESSAGES: Array<TabMessage['name']> = [
 let contextMenuTarget: EventTarget | null = null;
 
 /**
+ * Runs fn once the page has parsed its body, which the editor and the
+ * reader mount into. This script starts earlier, so no keypress is missed.
+ */
+const whenDomReady = (fn: () => void): void => {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', fn, { once: true });
+  } else {
+    fn();
+  }
+};
+
+/**
  * Forwards an event to the editor, loading it first if needed. The first load
  * replays the last context menu target, which the editor didn't see.
  */
-const forwardToEditor = (forward: (editor: EditorApp) => void): void => {
-  const firstLoad = !isEditorLoading();
-  const loaded = loadEditor();
+const forwardToEditor = (forward: (editor: EditorApp) => void): void =>
+  whenDomReady(() => {
+    const firstLoad = !isEditorLoading();
+    const loaded = loadEditor();
 
-  if (firstLoad) {
-    loaded.then(editor => editor.handleContextMenu(contextMenuTarget));
-  }
+    if (firstLoad) {
+      loaded.then(editor => editor.handleContextMenu(contextMenuTarget));
+    }
 
-  loaded.then(forward).catch(() => undefined);
-};
+    loaded.then(forward).catch(() => undefined);
+  });
 
 // Re-derive readability only on real URL changes, not favicon/title-only
 // TabUpdated events — null so the first event here still runs.
@@ -94,6 +107,11 @@ chrome.runtime.onMessage.addListener(
 
     if (isEditorLoading() || EDITOR_MESSAGES.includes(message.name)) {
       forwardToEditor(editor => editor.handleMessage(message, sendResponse));
+      return message.name === 'GetIsStylebotOpen';
+    }
+
+    if (document.readyState === 'loading') {
+      whenDomReady(() => handlePageMessage(message, sendResponse));
       return message.name === 'GetIsStylebotOpen';
     }
 
