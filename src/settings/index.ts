@@ -1,7 +1,6 @@
 import type {
   StylebotOptions,
   StylebotCommands,
-  ReadabilitySettings,
   StylebotEditorCommands,
 } from '@stylebot/types';
 
@@ -56,23 +55,8 @@ export const defaultEditorCommands: StylebotEditorCommands = {
   close: 'Escape',
 };
 
-export const defaultReadabilitySettings: ReadabilitySettings = {
-  size: 16,
-  width: 40,
-  theme: 'light',
-  lineHeight: 1.6,
-  justify: false,
-  font: 'Merriweather',
-};
-
-export const READABILITY_SETTINGS_KEY = 'readability-settings';
-
-/**
- * The saved reader settings, read straight from storage so content scripts
- * don't depend on a possibly cold background to answer.
- */
-export const getReadabilitySettings =
-  async (): Promise<ReadabilitySettings> => {
-    const items = await chrome.storage.local.get(READABILITY_SETTINGS_KEY);
-    return items[READABILITY_SETTINGS_KEY] || defaultReadabilitySettings;
-  };
+export {
+  READABILITY_SETTINGS_KEY,
+  defaultReadabilitySettings,
+  getReadabilitySettings,
+} from './readability';
