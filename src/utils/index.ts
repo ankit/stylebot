@@ -38,9 +38,12 @@ export const setNotification = (
 ): Promise<void> =>
   chrome.storage.local.set({ [getNotificationKey(id)]: value });
 
+export const getExtensionVersion = (): string =>
+  chrome.runtime.getManifest().version;
+
 // e.g. "3.1.4" -> "3.1", matching how releases are grouped on stylebot.dev.
 export const getReleaseVersion = (): string =>
-  chrome.runtime.getManifest().version.split('.').slice(0, 2).join('.');
+  getExtensionVersion().split('.').slice(0, 2).join('.');
 
 export const getReleaseNotificationId = (): NotificationId =>
   `release/${getReleaseVersion()}`;
