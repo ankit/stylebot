@@ -2,7 +2,11 @@ const dedent = require('dedent');
 
 import 'jest-fetch-mock';
 import * as postcss from 'postcss';
-import { addDeclaration, markDeclarationsImportant } from '../declaration';
+import {
+  addDeclaration,
+  markDeclarationsImportant,
+  withoutImportant,
+} from '../declaration';
 import { getRule } from '../rule';
 
 const appendImportantToDeclarations = (css: string): string => {
@@ -528,5 +532,19 @@ describe('declaration', () => {
         }  
       `);
     });
+  });
+});
+
+describe('withoutImportant', () => {
+  it('drops a trailing !important, however it is spaced', () => {
+    expect(withoutImportant('red !important')).toBe('red');
+    expect(withoutImportant('red!IMPORTANT')).toBe('red');
+    expect(withoutImportant('red ! important ')).toBe('red');
+  });
+
+  it('leaves other values alone', () => {
+    expect(withoutImportant('url("a!important.png")')).toBe(
+      'url("a!important.png")'
+    );
   });
 });

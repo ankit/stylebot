@@ -70,6 +70,14 @@ export const addDeclaration = (
 };
 
 /**
+ * The value without a trailing `!important`, for values that come as text
+ * (from a model): addDeclaration would keep it in the value, and marking the
+ * declaration important as well would make it invalid.
+ */
+export const withoutImportant = (value: string): string =>
+  value.replace(/\s*!\s*important\s*$/i, '');
+
+/**
  * At-rules that only group ordinary style rules, so `!important` applies
  * inside them as it would at the top level, nested in a rule or not.
  */

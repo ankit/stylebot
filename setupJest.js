@@ -12,6 +12,13 @@ if (!globalThis.crypto?.randomUUID) {
   });
 }
 
+// Streamed provider replies are decoded with the browser's TextDecoder,
+// which jsdom leaves out.
+if (!globalThis.TextDecoder) {
+  const { TextDecoder, TextEncoder } = require('node:util');
+  Object.assign(globalThis, { TextDecoder, TextEncoder });
+}
+
 fetchMock.enableMocks();
 VueTestUtils.config.mocks['t'] = msg => msg;
 VueTestUtils.config.stubs = { 'b-row': true };
