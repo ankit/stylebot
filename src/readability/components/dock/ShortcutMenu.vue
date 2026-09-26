@@ -38,10 +38,12 @@
           {{ t('readability_shortcut_description') }}
         </s-text>
         <div class="divider" />
-        <menu-item @click="startRecording">
-          {{ t('change_shortcut') }}
-        </menu-item>
-        <menu-item danger @click="remove">{{ t('remove') }}</menu-item>
+        <div class="actions">
+          <menu-item @click="startRecording">
+            {{ t('change_shortcut') }}
+          </menu-item>
+          <menu-item danger @click="remove">{{ t('remove') }}</menu-item>
+        </div>
       </div>
 
       <div v-else class="content">
@@ -209,6 +211,7 @@ export default Vue.extend({
 }
 
 .content {
+  --menu-padding: 12px;
   padding: 8px;
 }
 
@@ -256,6 +259,11 @@ export default Vue.extend({
     outline: none;
     box-shadow: 0 0 0 2px var(--link-color);
   }
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
 }
 
 .desc {

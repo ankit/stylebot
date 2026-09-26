@@ -315,6 +315,11 @@ export default Vue.extend({
   --menu-border: var(--border);
   --menu-shadow: rgb(0 0 0 / 30%);
   --text-primary: var(--foreground);
+  --hover-tint: color-mix(in srgb, var(--foreground) 6%, transparent);
+  --accent: var(--link-color);
+  --accent-text: var(--link-color);
+  --danger: var(--foreground);
+  --danger-background: var(--hover-tint);
 
   * {
     transition: background-color 0.2s ease, color 0.2s ease,

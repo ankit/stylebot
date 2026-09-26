@@ -85,7 +85,7 @@ export default Vue.extend({
   font-size: 14px;
   text-align: center;
   cursor: pointer;
-  color: var(--foreground);
+  color: var(--muted-foreground);
 
   & + & {
     border-top: 1px solid var(--border);
@@ -99,9 +99,15 @@ export default Vue.extend({
     border-radius: 0 0 8px 8px;
   }
 
+  &:hover {
+    background: color-mix(in srgb, var(--foreground) 5%, transparent);
+    color: var(--foreground);
+  }
+
   &.selected {
-    background: color-mix(in srgb, var(--foreground) 6%, transparent);
-    color: var(--link-color);
+    background: color-mix(in srgb, var(--foreground) 8%, transparent);
+    color: var(--foreground);
+    font-weight: 700;
   }
 
   &:focus-visible {
