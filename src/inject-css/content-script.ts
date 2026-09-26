@@ -6,10 +6,10 @@
 import { isReaderable } from '@stylebot/readability';
 import type { TabMessage } from '@stylebot/types';
 
-import { applyState } from './apply-state';
 import { readCache } from './cache';
 import { hidePage, revealPage } from './hide-page';
-import { getCompiledStyles, getPageState, savePageState } from './saved-styles';
+import { applyPageState, getPageState, savePageState } from './page-state';
+import { getCompiledStyles } from './saved-styles';
 
 // Registered synchronously here (unlike the editor script's listener,
 // gated behind async init) so the popup always gets a response.
@@ -37,7 +37,7 @@ const run = () => {
   const cached = readCache();
 
   if (cached) {
-    applyState(cached);
+    applyPageState(cached);
   } else {
     hidePage();
   }
@@ -46,9 +46,10 @@ const run = () => {
 
   getCompiledStyles().then(compiled => {
     const freshState = getPageState(compiled);
+    const unchanged = JSON.stringify(cached) === JSON.stringify(freshState);
 
-    if (!cached || JSON.stringify(cached) !== JSON.stringify(freshState)) {
-      applyState(freshState);
+    if (!unchanged) {
+      applyPageState(freshState, cached);
     }
 
     clearTimeout(revealTimeout);
