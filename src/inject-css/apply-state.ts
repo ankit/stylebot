@@ -7,7 +7,15 @@ import { injectStylesheet, removeStylesheet } from './stylesheet';
 // real storage read resolves) can remove any that are no longer enabled.
 let appliedUrls = new Set<string>();
 
-export const applyState = (state: CachedState): void => {
+/**
+ * Applies a page state: the reader, then each enabled style. Stylesheets that
+ * this script applied before, or that `previous` had enabled, are removed if
+ * the state no longer enables them.
+ */
+export const applyState = (
+  state: CachedState,
+  previous?: CachedState | null
+): void => {
   // Called synchronously, ahead of CSS injection below — readability's own
   // showLoader() needs to hide the page before the browser's first paint,
   // and waiting on style injection (which may fetch @imports) risks missing it.
@@ -20,7 +28,12 @@ export const applyState = (state: CachedState): void => {
   const enabled = state.styles.filter(style => style.enabled);
   const nextUrls = new Set(enabled.map(style => style.url));
 
-  appliedUrls.forEach(url => {
+  const previousUrls = new Set(appliedUrls);
+  previous?.styles
+    .filter(style => style.enabled)
+    .forEach(style => previousUrls.add(style.url));
+
+  previousUrls.forEach(url => {
     if (!nextUrls.has(url)) {
       removeStylesheet(url);
     }

@@ -80,6 +80,15 @@ describe('applyState', () => {
     expect(stylesheet.removeStylesheet).toHaveBeenCalledWith('a');
   });
 
+  it('removes a stylesheet the previous state had enabled, even one this script never applied', () => {
+    applyState(
+      { styles: [], readability: false },
+      { styles: [style('a', '.a{}', true)], readability: false }
+    );
+
+    expect(stylesheet.removeStylesheet).toHaveBeenCalledWith('a');
+  });
+
   it('does not remove a stylesheet that remains enabled', () => {
     applyState({ styles: [style('a', '.a{}', true)], readability: false });
     applyState({

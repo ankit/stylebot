@@ -4,24 +4,12 @@
  * the page (hide-page.ts) until chrome.storage.local.get resolves.
  */
 import { isReaderable } from '@stylebot/readability';
-import {
-  COMPILED_STYLES_KEY,
-  STYLES_METADATA_KEY,
-  getStylesForPage,
-  isCompiledStylesCurrent,
-} from '@stylebot/styles';
-import type {
-  CompiledStyles,
-  GetCompiledStyles,
-  GetCompiledStylesResponse,
-  TabMessage,
-} from '@stylebot/types';
+import type { TabMessage } from '@stylebot/types';
 
 import { applyState } from './apply-state';
-import type { CachedState } from './cache';
-import { readCache, writeCache } from './cache';
+import { readCache } from './cache';
 import { hidePage, revealPage } from './hide-page';
-import { pruneImportCache } from './import-cache';
+import { getCompiledStyles, getPageState, savePageState } from './saved-styles';
 
 // Registered synchronously here (unlike the editor script's listener,
 // gated behind async init) so the popup always gets a response.
@@ -45,30 +33,6 @@ if (window === window.top) {
 // completion almost always wins the race and reveals sooner.
 const REVEAL_TIMEOUT_MS = 150;
 
-/**
- * The compiled styles from storage, or from the background when the stored
- * copy is missing or was built from other styles, as on the first load after
- * an update.
- */
-const getCompiledStyles = async (): Promise<CompiledStyles> => {
-  const items = await chrome.storage.local.get([
-    COMPILED_STYLES_KEY,
-    STYLES_METADATA_KEY,
-  ]);
-  const stored: CompiledStyles | undefined = items[COMPILED_STYLES_KEY];
-  const revision: string = items[STYLES_METADATA_KEY]?.modifiedTime ?? '';
-
-  if (stored && isCompiledStylesCurrent(stored, revision)) {
-    return stored;
-  }
-
-  const message: GetCompiledStyles = { name: 'GetCompiledStyles' };
-  return chrome.runtime.sendMessage<
-    GetCompiledStyles,
-    GetCompiledStylesResponse
-  >(message);
-};
-
 const run = () => {
   const cached = readCache();
 
@@ -81,20 +45,7 @@ const run = () => {
   const revealTimeout = setTimeout(revealPage, REVEAL_TIMEOUT_MS);
 
   getCompiledStyles().then(compiled => {
-    const { styles, defaultStyle } = getStylesForPage(
-      window.location.href,
-      compiled.styles
-    );
-
-    const freshState: CachedState = {
-      styles: styles.map(({ url, css, importUrls, enabled }) => ({
-        url,
-        css,
-        importUrls,
-        enabled,
-      })),
-      readability: Boolean(defaultStyle?.readability),
-    };
+    const freshState = getPageState(compiled);
 
     if (!cached || JSON.stringify(cached) !== JSON.stringify(freshState)) {
       applyState(freshState);
@@ -102,10 +53,7 @@ const run = () => {
 
     clearTimeout(revealTimeout);
     revealPage();
-    writeCache(freshState);
-    pruneImportCache(
-      new Set(freshState.styles.flatMap(style => style.importUrls))
-    );
+    savePageState(freshState);
   });
 };
 
