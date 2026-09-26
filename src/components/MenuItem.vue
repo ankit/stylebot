@@ -5,6 +5,8 @@
     :class="{ danger, selected }"
     role="menuitem"
     tabindex="-1"
+    :disabled="disabled"
+    :aria-disabled="disabled ? 'true' : undefined"
     @click="$emit('click', $event)"
   >
     <span class="menu-item-content"><slot /></span>
@@ -32,6 +34,11 @@ export default Vue.extend({
 
     // Marks the item as the current choice — shows a trailing check.
     selected: {
+      type: Boolean,
+      default: false,
+    },
+
+    disabled: {
       type: Boolean,
       default: false,
     },
@@ -73,6 +80,16 @@ export default Vue.extend({
 
   &.selected {
     background: color-mix(in srgb, var(--accent) 8%, transparent);
+  }
+
+  &:disabled {
+    color: var(--text-faint);
+    cursor: default;
+
+    &:hover {
+      background: none;
+      box-shadow: none;
+    }
   }
 }
 

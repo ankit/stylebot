@@ -104,6 +104,8 @@ export type ChatModelTier = 'balanced' | 'fastest' | 'best';
 export type ChatModel = {
   id: string;
   name: string;
+  // The name without the provider's, for where the provider is implied.
+  shortName: string;
   tier: ChatModelTier;
   // Extra request fields this model takes, merged into every request body.
   requestOptions?: Record<string, unknown>;

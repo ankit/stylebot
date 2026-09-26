@@ -35,17 +35,20 @@ export const anthropic: ChatProviderInfo = {
     {
       id: 'claude-sonnet-5',
       name: 'Claude Sonnet 5',
+      shortName: 'Sonnet 5',
       tier: 'balanced',
       requestOptions: { output_config: { effort: 'low' } },
     },
     {
       id: 'claude-haiku-4-5',
       name: 'Claude Haiku 4.5',
+      shortName: 'Haiku 4.5',
       tier: 'fastest',
     },
     {
       id: 'claude-opus-5',
       name: 'Claude Opus 5',
+      shortName: 'Opus 5',
       tier: 'best',
       requestOptions: { output_config: { effort: 'medium' } },
     },

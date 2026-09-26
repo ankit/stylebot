@@ -4,6 +4,10 @@
       <chat-input v-model="draft" @submit="send" />
 
       <div class="chat-composer-footer">
+        <chat-model-menu
+          @new-chat="$emit('new-chat')"
+          @change-key="$emit('change-key')"
+        />
         <span class="chat-composer-spacer" />
         <chat-send-button
           :pending="pending"
@@ -20,6 +24,7 @@
 import Vue from 'vue';
 
 import ChatInput from './ChatInput.vue';
+import ChatModelMenu from './ChatModelMenu.vue';
 import ChatSendButton from './ChatSendButton.vue';
 
 export default Vue.extend({
@@ -27,6 +32,7 @@ export default Vue.extend({
 
   components: {
     ChatInput,
+    ChatModelMenu,
     ChatSendButton,
   },
 
@@ -77,8 +83,7 @@ export default Vue.extend({
   flex-direction: column;
   gap: 6px;
   padding: 8px 8px 8px 12px;
-  border: 1px solid var(--field-border);
-  border-radius: 12px;
+  @include field-border(12px);
   background: var(--field-fill);
 
   &:hover {
@@ -86,8 +91,7 @@ export default Vue.extend({
   }
 
   &:focus-within {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 1px var(--accent);
+    @include field-active-border;
   }
 }
 

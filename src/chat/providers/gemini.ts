@@ -34,17 +34,20 @@ export const gemini: ChatProviderInfo = {
     {
       id: 'gemini-3.8-flash',
       name: 'Gemini 3.8 Flash',
+      shortName: '3.8 Flash',
       tier: 'balanced',
       requestOptions: { generation_config: { thinking_level: 'low' } },
     },
     {
       id: 'gemini-3.5-flash-lite',
       name: 'Gemini 3.5 Flash-Lite',
+      shortName: '3.5 Flash-Lite',
       tier: 'fastest',
     },
     {
       id: 'gemini-3.1-pro-preview',
       name: 'Gemini 3.1 Pro',
+      shortName: '3.1 Pro',
       tier: 'best',
       requestOptions: { generation_config: { thinking_level: 'low' } },
     },

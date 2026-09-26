@@ -29,6 +29,8 @@ import type {
   GetIsEditorWindowOpenResponse,
   ChatGetStatus,
   ChatConnect,
+  ChatDisconnect,
+  ChatSetModel,
   ChatGetThread,
   ChatSetThread,
   ChatStatusResponse,
@@ -255,3 +257,14 @@ export const chatSetThread = (url: string, turns: Array<ChatTurn>): void => {
   const message: ChatSetThread = { name: 'ChatSetThread', url, turns };
   chrome.runtime.sendMessage(message);
 };
+
+export const chatDisconnect = (): Promise<ChatStatusResponse> =>
+  chrome.runtime.sendMessage<ChatDisconnect, ChatStatusResponse>({
+    name: 'ChatDisconnect',
+  });
+
+export const chatSetModel = (model: string): Promise<ChatStatusResponse> =>
+  chrome.runtime.sendMessage<ChatSetModel, ChatStatusResponse>({
+    name: 'ChatSetModel',
+    model,
+  });

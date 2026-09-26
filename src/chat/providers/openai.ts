@@ -34,18 +34,21 @@ export const openai: ChatProviderInfo = {
     {
       id: 'gpt-5.6-terra',
       name: 'GPT-5.6 Terra',
+      shortName: 'GPT-5.6 Terra',
       tier: 'balanced',
       requestOptions: { reasoning: { effort: 'low' } },
     },
     {
       id: 'gpt-5.6-luna',
       name: 'GPT-5.6 Luna',
+      shortName: 'GPT-5.6 Luna',
       tier: 'fastest',
       requestOptions: { reasoning: { effort: 'low' } },
     },
     {
       id: 'gpt-5.6-sol',
       name: 'GPT-5.6 Sol',
+      shortName: 'GPT-5.6 Sol',
       tier: 'best',
       requestOptions: { reasoning: { effort: 'low' } },
     },

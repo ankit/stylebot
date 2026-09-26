@@ -16,8 +16,10 @@ import type {
 import type { State } from './';
 import {
   chatConnect,
+  chatDisconnect,
   chatGetStatus,
   chatGetThread,
+  chatSetModel,
   chatSetThread,
 } from '../utils/chrome';
 import { addFontImports, removeFontImports } from './chat-fonts';
@@ -261,24 +263,34 @@ export const createChatModule = (): Module<ChatState, State> => {
         }
       },
 
+      /**
+       * Checks the key with the provider and connects it; resolves to whether
+       * it worked. Does nothing for an empty key or while one is checked.
+       */
       async connect(
-        { commit }: Context,
+        { state, commit }: Context,
         { provider, key }: { provider: ChatProviderId; key: string }
-      ): Promise<void> {
+      ): Promise<boolean> {
+        if (!key.trim() || state.connecting) {
+          return false;
+        }
+
         commit('setConnecting', true);
         commit('setConnectError', null);
 
         try {
           const response = await chatConnect(provider, key);
 
-          if (response.ok) {
-            commit('setStatus', response.status);
-          } else {
+          if (!response.ok) {
             commit('setConnectError', {
               key: response.errorKey,
               detail: response.errorDetail,
             });
+            return false;
           }
+
+          commit('setStatus', response.status);
+          return true;
         } finally {
           commit('setConnecting', false);
         }
@@ -286,6 +298,30 @@ export const createChatModule = (): Module<ChatState, State> => {
 
       clearConnectError({ commit }: Context): void {
         commit('setConnectError', null);
+      },
+
+      async disconnect({ commit }: Context): Promise<void> {
+        closeReply();
+        commit('setPending', null);
+        commit('setStatus', await chatDisconnect());
+      },
+
+      async setModel({ commit }: Context, model: string): Promise<void> {
+        commit('setStatus', await chatSetModel(model));
+      },
+
+      /**
+       * Starts over on this site. Changes earlier replies made stay on the
+       * page; only the conversation is cleared.
+       */
+      newChat(context: Context): void {
+        const { state, commit } = context;
+
+        closeReply();
+        commit('setPending', null);
+        commit('setError', null);
+        commit('setThread', { url: state.url, turns: [] });
+        save(context);
       },
 
       /**
