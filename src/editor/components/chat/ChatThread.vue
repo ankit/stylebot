@@ -10,7 +10,13 @@
         :key="turn.id"
         :turn="turn"
       />
-      <chat-reply v-else :key="turn.id" :turn="turn" />
+      <chat-reply
+        v-else
+        :key="turn.id"
+        :turn="turn"
+        :latest="turn.id === latestReplyId"
+        :busy="!!pending"
+      />
     </template>
 
     <chat-pending v-if="pending" :pending="pending" />
@@ -44,6 +50,11 @@ export default Vue.extend({
   computed: {
     turns(): Array<ChatTurn> {
       return this.$store.state.chat.turns;
+    },
+
+    latestReplyId(): string {
+      const replies = this.turns.filter(turn => turn.role === 'assistant');
+      return replies[replies.length - 1]?.id ?? '';
     },
 
     pending(): ChatState['pending'] {

@@ -5,7 +5,7 @@ import {
 } from '@stylebot/css';
 import { resolveGoogleFont } from '@stylebot/google-fonts';
 
-import type { ChatCssEdit } from '@stylebot/types';
+import type { ChatCssEdit, ChatCssPreviousValue } from '@stylebot/types';
 
 /**
  * Adds Google Fonts imports for any family the edits name, as picking a font
@@ -34,3 +34,15 @@ export const addFontImports = async (
 
   return families.length ? cleanGoogleWebFonts(next) : css;
 };
+
+/**
+ * Drops the imports of fonts no longer used, once an undone reply has put
+ * back the font-family values its edits replaced.
+ */
+export const removeFontImports = (
+  css: string,
+  previous: Array<ChatCssPreviousValue>
+): string =>
+  previous.some(({ property }) => property === 'font-family')
+    ? cleanGoogleWebFonts(css)
+    : css;

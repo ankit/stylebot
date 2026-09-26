@@ -33,3 +33,4 @@ export { default as CommandKeyIcon } from './CommandKeyIcon.vue';
 export { default as ControlKeyIcon } from './ControlKeyIcon.vue';
 export { default as ArrowUpIcon } from './ArrowUpIcon.vue';
 export { default as StopIcon } from './StopIcon.vue';
+export { default as CodeIcon } from './CodeIcon.vue';

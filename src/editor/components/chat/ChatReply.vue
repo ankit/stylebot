@@ -7,6 +7,13 @@
         <span class="chat-reply-stopped">({{ t('stopped') }})</span>
       </template>
     </s-text>
+
+    <chat-change-card
+      v-if="turn.edits.length"
+      :turn="turn"
+      :latest="latest"
+      :busy="busy"
+    />
   </div>
 </template>
 
@@ -17,10 +24,13 @@ import Vue from 'vue';
 import { SText } from '@stylebot/components';
 import type { ChatAssistantTurn } from '@stylebot/types';
 
+import ChatChangeCard from './ChatChangeCard.vue';
+
 export default Vue.extend({
   name: 'ChatReply',
 
   components: {
+    ChatChangeCard,
     SText,
   },
 
@@ -28,6 +38,16 @@ export default Vue.extend({
     turn: {
       type: Object as PropType<ChatAssistantTurn>,
       required: true,
+    },
+
+    latest: {
+      type: Boolean,
+      default: false,
+    },
+
+    busy: {
+      type: Boolean,
+      default: false,
     },
   },
 });

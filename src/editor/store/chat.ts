@@ -1,8 +1,9 @@
 import type { ActionContext, Module } from 'vuex';
 
-import { applyEdits } from '@stylebot/chat';
+import { applyEdits, revertEdits } from '@stylebot/chat';
 import { getPageBridge } from '@stylebot/page-bridge';
 import type {
+  ChatAssistantTurn,
   ChatCssEdit,
   ChatCssPreviousValue,
   ChatErrorKey,
@@ -19,7 +20,7 @@ import {
   chatGetThread,
   chatSetThread,
 } from '../utils/chrome';
-import { addFontImports } from './chat-fonts';
+import { addFontImports, removeFontImports } from './chat-fonts';
 import {
   getStreamRequest,
   getTurnId,
@@ -209,6 +210,17 @@ export const createChatModule = (): Module<ChatState, State> => {
         state.turns = [...state.turns, turn];
       },
 
+      updateTurn(
+        state: ChatState,
+        { id, patch }: { id: string; patch: Partial<ChatAssistantTurn> }
+      ): void {
+        state.turns = state.turns.map(turn =>
+          turn.id === id && turn.role === 'assistant'
+            ? { ...turn, ...patch }
+            : turn
+        );
+      },
+
       setPending(state: ChatState, pending: ChatState['pending']): void {
         state.pending = pending;
       },
@@ -324,6 +336,40 @@ export const createChatModule = (): Module<ChatState, State> => {
         closeReply();
         commit('setPending', null);
         commit('addTurn', turn);
+        save(context);
+      },
+
+      /**
+       * Undoes one reply's changes, putting back what its edits replaced, or
+       * applies them again.
+       */
+      async toggleTurn(context: Context, id: string): Promise<void> {
+        const { state, commit, rootState } = context;
+        const turn = state.turns.find(
+          (item): item is ChatAssistantTurn =>
+            item.id === id && item.role === 'assistant'
+        );
+
+        if (!turn?.edits.length) {
+          return;
+        }
+
+        if (turn.applied) {
+          const reverted = revertEdits(rootState.css, turn.previous);
+          const css = removeFontImports(reverted, turn.previous);
+
+          commit('updateTurn', { id, patch: { applied: false } });
+          await applyCss(context, css, [], `chat:${id}`);
+        } else {
+          const result = applyEdits(rootState.css, turn.edits);
+
+          commit('updateTurn', {
+            id,
+            patch: { applied: true, previous: result.previous },
+          });
+          await applyCss(context, result.css, turn.edits, `chat:${id}`);
+        }
+
         save(context);
       },
 
