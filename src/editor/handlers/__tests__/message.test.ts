@@ -9,7 +9,7 @@ jest.mock('../../utils/chrome');
 jest.mock('@stylebot/readability');
 
 import * as common from '../common';
-import { createMessageHandler } from '../chrome';
+import { createMessageHandler } from '../message';
 
 const flushPromises = () => new Promise(resolve => setTimeout(resolve, 0));
 
