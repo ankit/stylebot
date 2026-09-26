@@ -4,12 +4,12 @@ import type {
   GetCommandsResponse,
   GetOption,
   GetOptionResponse,
-  GetStylesForPage,
   GetIsStylebotOpen,
   GetIsPageReaderable,
   GetStylesForPageResponse,
   StylebotOptions,
 } from '@stylebot/types';
+import { STYLES_KEY, getStylesForPage } from '@stylebot/styles';
 
 import {
   openOptionsPage,
@@ -31,17 +31,16 @@ export const getCurrentTab = (
   });
 };
 
+/**
+ * Reads the tab's styles straight from storage rather than through the
+ * background, which may first have to wake its service worker.
+ */
 export const getStyles = (
   tab: chrome.tabs.Tab,
   callback: (styles: GetStylesForPageResponse) => void
 ): void => {
-  const message: GetStylesForPage = {
-    name: 'GetStylesForPage',
-    tab,
-  };
-
-  chrome.runtime.sendMessage(message, response => {
-    callback(response);
+  chrome.storage.local.get(STYLES_KEY, items => {
+    callback(getStylesForPage(tab.url ?? '', items[STYLES_KEY] || {}));
   });
 };
 

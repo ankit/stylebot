@@ -40,7 +40,6 @@ export type MoveStyle = {
 
 export type GetStylesForPage = {
   name: 'GetStylesForPage';
-  tab?: chrome.tabs.Tab;
 };
 
 export type GetAllOptions = {
