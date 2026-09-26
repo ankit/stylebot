@@ -50,7 +50,7 @@ Stories:
 
 ## Side effects
 
-`package.json` declares only stylesheets as having `sideEffects`, so webpack drops any other module whose exports go unused, in development builds as well as production. Keep modules free of work on load: register listeners, call `Vue.use` / `Vue.mixin` and create stores from functions an entry point calls, never at a module's top level.
+`package.json` declares stylesheets and single-file components as having `sideEffects`, so webpack drops any other module whose exports go unused, in development builds as well as production. Components are listed because a treeshakeable component is free to have its `<style>` block emitted out of order, and a consumer's class on a shared component ties with that component's own class on specificity — so whichever lands last silently wins. Keep modules free of work on load: register listeners, call `Vue.use` / `Vue.mixin` and create stores from functions an entry point calls, never at a module's top level.
 
 Import another folder under `src/` only through its `@stylebot/` entry, never its files; the `stylebot/package-entry-imports` lint rule enforces it. With `sideEffects`, an entry import costs no more than a deep one.
 
