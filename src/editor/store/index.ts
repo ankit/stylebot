@@ -22,6 +22,7 @@ import getters from './getters';
 import actions from './actions';
 import mutations from './mutations';
 import type { UndoStack } from './undo-stack';
+import { createChatModule } from './chat';
 import { emptyUndoStack } from './undo-stack';
 
 /**
@@ -122,5 +123,9 @@ export const createStore = (host: EditorHost): Store<State> => {
     getters,
     actions,
     mutations,
+
+    modules: {
+      chat: createChatModule(),
+    },
   });
 };

@@ -27,6 +27,11 @@ import type {
   CloseEditorWindow,
   GetIsEditorWindowOpen,
   GetIsEditorWindowOpenResponse,
+  ChatGetStatus,
+  ChatConnect,
+  ChatStatusResponse,
+  ChatConnectResponse,
+  ChatProviderId,
 } from '@stylebot/types';
 
 export const getAllOptions = (): Promise<StylebotOptions> => {
@@ -220,3 +225,18 @@ export const getIsEditorWindowOpen = (
     GetIsEditorWindowOpenResponse
   >(message);
 };
+
+export const chatGetStatus = (): Promise<ChatStatusResponse> =>
+  chrome.runtime.sendMessage<ChatGetStatus, ChatStatusResponse>({
+    name: 'ChatGetStatus',
+  });
+
+export const chatConnect = (
+  provider: ChatProviderId,
+  key: string
+): Promise<ChatConnectResponse> =>
+  chrome.runtime.sendMessage<ChatConnect, ChatConnectResponse>({
+    name: 'ChatConnect',
+    provider,
+    key,
+  });
