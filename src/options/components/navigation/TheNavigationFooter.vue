@@ -13,14 +13,14 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { getReleaseVersion } from '@stylebot/utils';
+import { getExtensionVersion } from '@stylebot/utils';
 
 export default Vue.extend({
   name: 'TheNavigationFooter',
 
   data(): { version: string } {
     return {
-      version: getReleaseVersion(),
+      version: getExtensionVersion(),
     };
   },
 });
