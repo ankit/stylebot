@@ -19,8 +19,8 @@ when the **user** wants to look at the extension with their own eyes: visual/UI 
 - Uses a Chrome profile at `<checkout>/.chrome-dev-profile` — scoped to whichever
   worktree (or main) you run it from, so parallel sessions in different worktrees each
   get their own isolated browser instance with no port/profile collisions.
-- Stamps a corner badge on every page with `basename(rootDir)` (e.g. `🌲
-  fix-toggle-hitbox`), so if the user has several of these windows open they can tell
+- Stamps a corner badge on every page with the checked-out branch name (e.g. `🌲
+  claude/fix-toggle-hitbox-1a2b3c`; the checkout's folder name on a detached HEAD), so if the user has several of these windows open they can tell
   them apart at a glance, including in the Cmd+Tab thumbnail.
 - Hot-reloads the extension in place on every rebuild — no need to relaunch after edits.
 - Opens to Hacker News as a default test page; the user can navigate wherever they want

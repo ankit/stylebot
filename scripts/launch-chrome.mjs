@@ -3,6 +3,7 @@
 // Uses CDP instead of --load-extension since Chrome 137+ disabled that flag.
 
 import { chromium } from 'playwright';
+import { execFileSync } from 'node:child_process';
 import {
   existsSync,
   mkdirSync,
@@ -132,7 +133,22 @@ await context.addInitScript(() => {
   Object.defineProperty(navigator, 'webdriver', { get: () => false });
 });
 
-// Stamp a small corner badge with the worktree name on every page, so this dev window is
+/**
+ * Returns the checked-out branch, or the checkout's folder name on a detached HEAD.
+ */
+const getBadgeLabel = () => {
+  try {
+    const branch = execFileSync('git', ['branch', '--show-current'], {
+      cwd: rootDir,
+      encoding: 'utf8',
+    }).trim();
+    return branch || path.basename(rootDir);
+  } catch {
+    return path.basename(rootDir);
+  }
+};
+
+// Stamp a small corner badge with the branch name on every page, so this dev window is
 // identifiable at a glance (including in the Cmd+Tab window-preview thumbnail on macOS).
 await context.addInitScript(label => {
   // Only badge the top frame, never iframes (e.g. stylebot's monaco editor),
@@ -159,7 +175,7 @@ await context.addInitScript(label => {
     document.documentElement.append(badge);
   };
   document.addEventListener('DOMContentLoaded', addBadge);
-}, path.basename(rootDir));
+}, getBadgeLabel());
 
 // The extension opens this tab on fresh install (onInstalled); auto-close it in dev.
 const closeHelpTab = p => {
