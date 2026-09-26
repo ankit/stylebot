@@ -11,10 +11,16 @@
       <div class="autocomplete-pill" :class="{ disabled }">
         <div
           v-if="chips && !focused && !open && chipParts.length"
+          ref="chips"
           class="autocomplete-chips"
+          :class="{ quiet: quietFocus }"
+          role="combobox"
+          aria-expanded="false"
           tabindex="0"
           @mousedown.prevent="revealInput"
-          @focus="revealInput"
+          @focus="onChipsFocus"
+          @keydown="onChipsKeydown"
+          @blur="quietFocus = false"
         >
           <s-chip v-for="(part, i) in chipParts" :key="i">{{ part }}</s-chip>
         </div>
@@ -55,7 +61,13 @@
       </div>
     </template>
 
-    <s-menu dense :min-width="minWidth" class="autocomplete-menu">
+    <s-menu
+      dense
+      :min-width="minWidth"
+      class="autocomplete-menu"
+      @pointerdown.native="pointerPick = true"
+      @keydown.native="pointerPick = false"
+    >
       <slot name="header" />
 
       <div
@@ -173,10 +185,23 @@ export default Vue.extend({
     suppressReopen: boolean;
     focused: boolean;
     keepSelectionOnMouseUp: boolean;
+    revealSelect: boolean;
+    pointerPick: boolean;
+    quietFocus: boolean;
+    holdChipsFocus: boolean;
+    typedAhead: string | null;
   } {
     return {
       suppressReopen: false,
       focused: false,
+      revealSelect: true,
+      // A pick made with the pointer hands focus back to the chips without
+      // a focus ring, as it would have on any other click.
+      pointerPick: false,
+      quietFocus: false,
+      holdChipsFocus: false,
+      // Keys typed on the chips before the field they reveal has mounted.
+      typedAhead: null,
       // The mouseup that ends a focusing click would collapse the
       // select-on-focus selection to a caret; swallow that one mouseup.
       keepSelectionOnMouseUp: false,
@@ -272,7 +297,17 @@ export default Vue.extend({
         return;
       }
 
-      this.startSession();
+      // Keys typed on the chips only land now: had they changed the value
+      // while the chips were going away, leaving them would have applied it.
+      if (this.typedAhead !== null) {
+        this.$emit('input', this.typedAhead);
+        this.typedAhead = null;
+        this.startSession(false);
+        return;
+      }
+
+      this.startSession(this.selectOnFocus && this.revealSelect);
+      this.revealSelect = true;
     },
 
     // Begins editing in the (focused) field: selects the value if asked to,
@@ -315,7 +350,7 @@ export default Vue.extend({
 
     onSelect(item: Record<string, unknown>): void {
       this.$emit('select', item);
-      this.finishCommit();
+      this.finishCommit(this.pointerPick);
     },
 
     // Confirms the typed value, which may be a custom entry not in `items`.
@@ -326,16 +361,69 @@ export default Vue.extend({
       this.finishCommit();
     },
 
-    finishCommit(): void {
+    finishCommit(quiet = false): void {
+      this.pointerPick = false;
+
       if (this.blurOnCommit) {
         this.menu().close({ skipRestoreFocus: true });
         (this.$refs.input as HTMLTextAreaElement | undefined)?.blur();
+        this.$nextTick(() => this.focusCommitted(quiet));
         return;
       }
 
       // The refocus-on-close would otherwise reopen the menu.
       this.suppressReopen = true;
       this.hideMenu();
+    },
+
+    // Keeps focus on the control once the committed value shows, so Tab
+    // carries on from here: on the chips, or on the field without reopening
+    // the menu when there's no value to show as chips.
+    focusCommitted(quiet: boolean): void {
+      const chips = this.$refs.chips as HTMLElement | undefined;
+
+      if (chips) {
+        this.quietFocus = quiet;
+        this.holdChipsFocus = true;
+        chips.focus();
+        return;
+      }
+
+      this.suppressReopen = true;
+      this.revealSelect = false;
+      (this.$refs.input as HTMLTextAreaElement | undefined)?.focus();
+    },
+
+    // Tabbing onto the chips starts editing, but focus handed back to them
+    // after a commit stays put.
+    onChipsFocus(): void {
+      if (this.holdChipsFocus) {
+        this.holdChipsFocus = false;
+        return;
+      }
+
+      this.revealInput();
+    },
+
+    // While the chips hold focus after a commit, Enter, Space and the arrow
+    // keys start editing, and typing starts over from the typed text.
+    onChipsKeydown(event: KeyboardEvent): void {
+      this.quietFocus = false;
+
+      if (event.ctrlKey || event.metaKey || event.altKey) {
+        return;
+      }
+
+      if (['Enter', ' ', 'ArrowDown', 'ArrowUp'].includes(event.key)) {
+        event.preventDefault();
+        this.revealInput();
+      } else if (event.key.length === 1 || event.key === 'Backspace') {
+        event.preventDefault();
+        const text = this.typedAhead ?? (this.selectOnFocus ? '' : this.value);
+        this.typedAhead =
+          event.key === 'Backspace' ? text.slice(0, -1) : text + event.key;
+        this.revealInput();
+      }
     },
 
     // Escape / click-outside close the menu, leaving it to the consumer
@@ -382,7 +470,8 @@ export default Vue.extend({
 
   // Only the text field itself highlights the whole pill — the chevron
   // button gets its own focus ring instead (see .autocomplete-chevron).
-  &:has(.autocomplete-input:focus) {
+  &:has(.autocomplete-input:focus),
+  &:has(.autocomplete-chips:focus-visible:not(.quiet)) {
     @include field-active-border;
   }
 
@@ -401,6 +490,7 @@ export default Vue.extend({
   gap: 6px;
   padding: 5px 8px 5px 6px;
   cursor: text;
+  outline: none;
 }
 
 .autocomplete-input {

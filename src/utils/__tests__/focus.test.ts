@@ -22,6 +22,13 @@ describe('isFieldTarget', () => {
     expect(isFieldTarget(editable)).toBe(true);
   });
 
+  it('counts a combobox shown as something other than a text field', () => {
+    const combobox = document.createElement('div');
+    combobox.setAttribute('role', 'combobox');
+
+    expect(isFieldTarget(combobox)).toBe(true);
+  });
+
   it('does not count buttons or non-elements', () => {
     expect(isFieldTarget(document.createElement('button'))).toBe(false);
     expect(isFieldTarget(null)).toBe(false);
