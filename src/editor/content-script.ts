@@ -29,18 +29,18 @@ const EDITOR_MESSAGES: Array<TabMessage['name']> = [
 let contextMenuTarget: EventTarget | null = null;
 
 /**
- * Runs work against the editor, loading it first if needed. The first load
+ * Forwards an event to the editor, loading it first if needed. The first load
  * replays the last context menu target, which the editor didn't see.
  */
-const withEditor = (work: (app: EditorApp) => void): void => {
+const forwardToEditor = (forward: (editor: EditorApp) => void): void => {
   const firstLoad = !isEditorLoading();
-  const app = loadEditor();
+  const loaded = loadEditor();
 
   if (firstLoad) {
-    app.then(editor => editor.handleContextMenu(contextMenuTarget));
+    loaded.then(editor => editor.handleContextMenu(contextMenuTarget));
   }
 
-  app.then(work).catch(() => undefined);
+  loaded.then(forward).catch(() => undefined);
 };
 
 // Re-derive readability only on real URL changes, not favicon/title-only
@@ -94,7 +94,7 @@ chrome.runtime.onMessage.addListener(
     }
 
     if (isEditorLoading() || EDITOR_MESSAGES.includes(message.name)) {
-      withEditor(editor => editor.handleMessage(message, sendResponse));
+      forwardToEditor(editor => editor.handleMessage(message, sendResponse));
       return message.name === 'GetIsStylebotOpen';
     }
 
@@ -102,17 +102,17 @@ chrome.runtime.onMessage.addListener(
   }
 );
 
-const runCommand = (name: StylebotCommandName) =>
-  withEditor(editor => editor.handleCommand(name));
+const forwardCommand = (name: StylebotCommandName) =>
+  forwardToEditor(editor => editor.handleCommand(name));
 
-getCommands().then(commands => bindCommands(commands, runCommand));
-onCommandsChanged(commands => bindCommands(commands, runCommand));
+getCommands().then(commands => bindCommands(commands, forwardCommand));
+onCommandsChanged(commands => bindCommands(commands, forwardCommand));
 
 document.addEventListener('contextmenu', event => {
   contextMenuTarget = event.target;
 
   if (isEditorLoading()) {
-    withEditor(editor => editor.handleContextMenu(event.target));
+    forwardToEditor(editor => editor.handleContextMenu(event.target));
   }
 });
 
@@ -128,7 +128,7 @@ chrome.runtime.onConnect.addListener(port => {
     disconnected = true;
   });
 
-  withEditor(editor => {
+  forwardToEditor(editor => {
     if (!disconnected) {
       editor.handleEditorWindowPort(port);
     }
