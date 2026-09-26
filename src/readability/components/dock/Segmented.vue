@@ -1,5 +1,5 @@
 <template>
-  <div class="segmented">
+  <div class="segmented" :class="{ toggle: prevActive || nextActive }">
     <button
       :disabled="prevDisabled"
       :class="{ active: prevActive }"
@@ -55,6 +55,10 @@ export default Vue.extend({
   overflow: hidden;
   border: 1px solid var(--border);
 
+  &.toggle > button:not(.active) {
+    color: var(--muted-foreground);
+  }
+
   > button {
     all: unset;
     box-sizing: border-box;
@@ -81,11 +85,12 @@ export default Vue.extend({
 
     &:not(:disabled):hover {
       background: color-mix(in srgb, var(--foreground) 5%, transparent);
+      color: var(--foreground);
     }
 
     &.active {
-      background: color-mix(in srgb, var(--foreground) 6%, transparent);
-      color: var(--link-color);
+      background: color-mix(in srgb, var(--foreground) 8%, transparent);
+      color: var(--foreground);
     }
 
     &:focus-visible {

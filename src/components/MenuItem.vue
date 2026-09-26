@@ -57,9 +57,7 @@ export default Vue.extend({
   cursor: pointer;
 
   &:hover,
-  &:focus,
   &:focus-visible {
-    outline: none;
     background: var(--hover-tint);
     box-shadow: inset 4px 0 0 var(--accent);
   }
