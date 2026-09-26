@@ -49,7 +49,7 @@ describe('inject-css run()', () => {
         callback(storedItems)
     );
 
-    require('../index');
+    require('../content-script');
   };
 
   it('hides the page and applies the fresh state when there is no cache', async () => {

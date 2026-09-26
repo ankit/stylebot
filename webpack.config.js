@@ -93,6 +93,7 @@ const config = {
       '@stylebot/components': path.resolve(__dirname, './src/components/index'),
       '@stylebot/icons': path.resolve(__dirname, './src/icons/index'),
       '@stylebot/css': path.resolve(__dirname, './src/css/index'),
+      '@stylebot/inject-css': path.resolve(__dirname, './src/inject-css/index'),
       '@stylebot/i18n': path.resolve(__dirname, './src/i18n/index'),
       '@stylebot/sync': path.resolve(__dirname, './src/sync/index'),
       '@stylebot/history': path.resolve(__dirname, './src/history/index'),
@@ -319,7 +320,7 @@ const clientConfig = {
     'editor/index': './editor/index.ts',
     options: './options/index.ts',
     'editor-window/index': './editor-window/index.ts',
-    'inject-css/index': './inject-css/index.ts',
+    'inject-css/index': './inject-css/content-script.ts',
     'monaco-editor/iframe/index': './monaco-editor/iframe/index.ts',
     'monaco-editor/iframe/options-index':
       './monaco-editor/iframe/options-index.ts',

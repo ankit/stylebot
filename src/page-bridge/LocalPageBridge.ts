@@ -15,7 +15,7 @@ import {
   isReaderable,
 } from '@stylebot/readability';
 
-import { readCache, writeCache } from '../inject-css/cache';
+import { readCache, writeCache } from '@stylebot/inject-css';
 
 import type { PageBridge, PageSnapshot } from './PageBridge';
 import { PageBridgeEmitter } from './PageBridgeEmitter';
