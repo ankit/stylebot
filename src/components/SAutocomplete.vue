@@ -18,7 +18,6 @@
           aria-expanded="false"
           tabindex="0"
           @mousedown.prevent="revealInput"
-          @focus="onChipsFocus"
           @keydown="onChipsKeydown"
           @blur="quietFocus = false"
         >
@@ -188,7 +187,6 @@ export default Vue.extend({
     revealSelect: boolean;
     pointerPick: boolean;
     quietFocus: boolean;
-    holdChipsFocus: boolean;
     typedAhead: string | null;
   } {
     return {
@@ -199,7 +197,6 @@ export default Vue.extend({
       // a focus ring, as it would have on any other click.
       pointerPick: false,
       quietFocus: false,
-      holdChipsFocus: false,
       // Keys typed on the chips before the field they reveal has mounted.
       typedAhead: null,
       // The mouseup that ends a focusing click would collapse the
@@ -384,7 +381,6 @@ export default Vue.extend({
 
       if (chips) {
         this.quietFocus = quiet;
-        this.holdChipsFocus = true;
         chips.focus();
         return;
       }
@@ -394,19 +390,9 @@ export default Vue.extend({
       (this.$refs.input as HTMLTextAreaElement | undefined)?.focus();
     },
 
-    // Tabbing onto the chips starts editing, but focus handed back to them
-    // after a commit stays put.
-    onChipsFocus(): void {
-      if (this.holdChipsFocus) {
-        this.holdChipsFocus = false;
-        return;
-      }
-
-      this.revealInput();
-    },
-
-    // While the chips hold focus after a commit, Enter, Space and the arrow
-    // keys start editing, and typing starts over from the typed text.
+    // Focusing the chips leaves the menu closed, like a select: Enter, Space
+    // and the arrow keys start editing, and so does typing, from the typed
+    // text (or after the value, when the field doesn't select on focus).
     onChipsKeydown(event: KeyboardEvent): void {
       this.quietFocus = false;
 

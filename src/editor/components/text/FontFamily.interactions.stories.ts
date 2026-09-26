@@ -7,6 +7,7 @@ import type { Canvas } from '@stylebot/storybook/story-helpers';
 import {
   declaration,
   findOpenMenu,
+  focusViaTab,
   pageStyle,
   pressKey,
   storeOf,
@@ -335,6 +336,22 @@ const pickWithKeyboard = async (root: HTMLElement, query: string) => {
   await pressKey('ArrowDown');
   await pressKey('Enter');
   await waitFor(() => expect(chipsControl(root)).toHaveFocus());
+};
+
+export const TabOntoChipsStaysClosed: StoryObj = {
+  ...editor(WITH_RULE),
+  name: 'tabbing onto the chips focuses them without opening the list',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const control = chipsControl(canvasElement) as HTMLElement;
+
+    focusViaTab(canvasElement, '.font-family-autocomplete .autocomplete-chips');
+
+    await expect(control).toHaveFocus();
+    await expect(control).not.toHaveClass('quiet');
+    await expect(canvas.queryByRole('menu')).toBeNull();
+    await expect(chips(canvasElement)).toEqual(['Merriweather']);
+  },
 };
 
 export const EnterOnChipsEdits: StoryObj = {
