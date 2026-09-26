@@ -46,7 +46,11 @@ import { unquoteFamily } from '@stylebot/css';
 import type { Debounced } from '@stylebot/utils';
 import { debounce } from '@stylebot/utils';
 import type { FontSuggestion, GoogleFont } from '@stylebot/google-fonts';
-import { loadGoogleFonts, suggestFonts } from '@stylebot/google-fonts';
+import {
+  isDefaultFont,
+  loadGoogleFonts,
+  suggestFonts,
+} from '@stylebot/google-fonts';
 
 import PropertyRow from '../basic/PropertyRow.vue';
 import { openGoogleFontsPage } from '../../utils/chrome';
@@ -106,7 +110,8 @@ export default Vue.extend({
         this.draft,
         this.value,
         this.$store.state.options.fonts,
-        this.googleFonts
+        this.googleFonts,
+        this.t('default')
       );
 
       return [...suggestions, BROWSE_ROW];
@@ -168,9 +173,9 @@ export default Vue.extend({
     // Enter applies the text as typed and remembers it; leaving the field
     // applies it too, but a half-typed name isn't worth remembering. When
     // it's already the applied value there's nothing to apply, so any
-    // preview goes.
+    // preview goes. Typing the Default choice's name picks the default.
     submit(text: string, remember = false): void {
-      const value = text.trim();
+      const value = isDefaultFont(text, this.t('default')) ? '' : text.trim();
 
       if (value !== this.value) {
         this.apply(value, remember);

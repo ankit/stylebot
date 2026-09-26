@@ -1,5 +1,5 @@
 import type { GoogleFont } from '../fonts';
-import { suggestFonts } from '../suggest';
+import { isDefaultFont, suggestFonts } from '../suggest';
 
 const google: Array<GoogleFont> = [
   { family: 'Roboto', category: 'sans-serif' },
@@ -57,6 +57,30 @@ describe('suggestFonts', () => {
     expect(rows[1]).toMatchObject({ family: 'Playfair' });
   });
 
+  it('offers the default first while the text starts its label', () => {
+    expect(suggestFonts('def', '', recents, google)[0]).toEqual({
+      kind: 'default',
+      value: '',
+    });
+    expect(suggestFonts('Stan', '', [], google, 'Standard')[0]).toEqual({
+      kind: 'default',
+      value: '',
+    });
+    expect(suggestFonts('lo', '', recents, google)[0].kind).not.toBe('default');
+  });
+
+  it('keeps the default out of a stack', () => {
+    expect(
+      suggestFonts('Inter, def', '', [], google).map(row => row.kind)
+    ).not.toContain('default');
+  });
+
+  it('never offers the reserved "default" as a custom font', () => {
+    expect(suggestFonts('Default', '', [], google)).toEqual([
+      { kind: 'default', value: '' },
+    ]);
+  });
+
   it('offers the raw text unless a row already produces it', () => {
     expect(suggestFonts('Some Local', '', recents, google)).toEqual([
       { kind: 'custom', value: 'Some Local' },
@@ -64,5 +88,14 @@ describe('suggestFonts', () => {
     expect(
       suggestFonts('lora', '', recents, google).map(row => row.kind)
     ).toEqual(['font']);
+  });
+});
+
+describe('isDefaultFont', () => {
+  it('matches "default" and the localized label, in any case', () => {
+    expect(isDefaultFont(' DEFAULT ', 'Standard')).toBe(true);
+    expect(isDefaultFont('standard', 'Standard')).toBe(true);
+    expect(isDefaultFont('Defaults', 'Default')).toBe(false);
+    expect(isDefaultFont('Lora', 'Default')).toBe(false);
   });
 });

@@ -511,6 +511,42 @@ export const OpensScrolledToSelected: StoryObj = {
   },
 };
 
+export const TypingDefault: StoryObj = {
+  ...editor({ css: 'h1 { font-family: Georgia; }', activeSelector: 'h1' }),
+  name: 'typing "default" offers the default and clears the font',
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+
+    await step('the start of the label lists Default first', async () => {
+      await openPicker(canvasElement);
+      await user.keyboard('def');
+      await findOpenMenu(canvas);
+      await waitFor(() =>
+        expect(canvas.getAllByRole('menuitem')[0]).toHaveTextContent(
+          /^Default$/
+        )
+      );
+    });
+
+    await step('the full word never becomes a custom font', async () => {
+      await user.keyboard('ault');
+      await waitFor(() =>
+        expect(
+          canvas.queryByRole('menuitem', { name: /^Use "default"/ })
+        ).toBeNull()
+      );
+    });
+
+    await step('Enter clears the font instead of writing it', async () => {
+      await pressKey('Enter');
+      await waitFor(() =>
+        expect(declaration(store, 'h1', 'font-family')).toBeUndefined()
+      );
+    });
+  },
+};
+
 export const BrowseDiscardsDraft: StoryObj = {
   ...editor({ css: 'h1 { color: red; }', activeSelector: 'h1' }),
   name: 'browsing Google Fonts discards typed text instead of showing it unapplied',
