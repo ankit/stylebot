@@ -1,4 +1,4 @@
-export type ChatProviderId = 'anthropic';
+export type ChatProviderId = 'anthropic' | 'openai';
 
 /**
  * One property change the model asked for; an empty value removes the
