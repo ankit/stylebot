@@ -13,6 +13,7 @@ import {
   applyStylesToAllTabs,
   ensureCompiledStyles,
 } from './styles';
+import * as styleStorage from './styles';
 
 import { getIsReadabilityActive, updateIcon } from './badge';
 
@@ -276,7 +277,7 @@ export const RunGoogleDriveSync = async (
   sendResponse: (response: RunGoogleDriveSyncResponse) => void
 ): Promise<void> => {
   try {
-    sendResponse(await runGoogleDriveSync());
+    sendResponse(await runGoogleDriveSync(styleStorage));
   } catch (e) {
     // runGoogleDriveSync already returns failures as a result, so this only
     // fires if that contract breaks. Left in because a missed sendResponse
@@ -293,7 +294,7 @@ export const ScanVersionHistory = async (
   message: ScanVersionHistoryType,
   sendResponse: (response: ScanVersionHistoryResponse) => void
 ): Promise<void> => {
-  sendResponse({ scan: await scanVersionHistory(message.limit) });
+  sendResponse({ scan: await scanVersionHistory(styleStorage, message.limit) });
 };
 
 export const RestoreVersion = async (
@@ -301,7 +302,7 @@ export const RestoreVersion = async (
   sendResponse: (response: RestoreVersionResponse) => void
 ): Promise<void> => {
   sendResponse({
-    ok: await restoreVersion(message.versionId, message.urls),
+    ok: await restoreVersion(styleStorage, message.versionId, message.urls),
   });
 };
 

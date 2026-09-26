@@ -1,17 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import {
-  addGoogleWebFont,
-  addGoogleWebFontImport,
-  cleanGoogleWebFonts,
-  googleWebFontExists,
-} from '../webfont';
+import type * as Webfont from '../webfont';
+
+let addGoogleWebFont: typeof Webfont.addGoogleWebFont;
+let addGoogleWebFontImport: typeof Webfont.addGoogleWebFontImport;
+let cleanGoogleWebFonts: typeof Webfont.cleanGoogleWebFonts;
+let googleWebFontExists: typeof Webfont.googleWebFontExists;
 
 const fontUrl =
+  'https://fonts.googleapis.com/css2?family=Muli:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap';
+
+const legacyFontUrl =
   'https://fonts.googleapis.com/css2?family=Muli:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap';
 
 const multiWordFontUrl =
-  'https://fonts.googleapis.com/css2?family=Playfair+Display+SC:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap';
+  'https://fonts.googleapis.com/css2?family=Playfair+Display+SC:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap';
 
 let fontExists: boolean;
 const sendMessage = jest.fn((_message: any) => Promise.resolve(fontExists));
@@ -23,9 +26,18 @@ global.chrome = {
 } as unknown as typeof chrome;
 
 describe('webfont', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     fontExists = true;
     sendMessage.mockClear();
+
+    // A fresh module per test, so no lookup is remembered from another.
+    jest.resetModules();
+    ({
+      addGoogleWebFont,
+      addGoogleWebFontImport,
+      cleanGoogleWebFonts,
+      googleWebFontExists,
+    } = await import('../webfont'));
   });
 
   describe('addGoogleWebFont', () => {
@@ -82,6 +94,24 @@ describe('webfont', () => {
       expect(sendMessage).not.toHaveBeenCalled();
     });
 
+    it('remembers whether a family exists', async () => {
+      fontExists = false;
+
+      expect(await googleWebFontExists('Invalid')).toBe(false);
+      expect(await googleWebFontExists('Invalid')).toBe(false);
+      expect(sendMessage).toHaveBeenCalledTimes(1);
+    });
+
+    it('asks again after the background was unreachable', async () => {
+      sendMessage.mockRejectedValueOnce(
+        new Error('Could not establish connection.')
+      );
+
+      expect(await googleWebFontExists('Muli')).toBe(false);
+      expect(await googleWebFontExists('Muli')).toBe(true);
+      expect(sendMessage).toHaveBeenCalledTimes(2);
+    });
+
     it('encodes every space in a multi-word family', async () => {
       await addGoogleWebFont('Playfair Display SC', '');
 
@@ -107,6 +137,22 @@ describe('webfont', () => {
 
       expect(addGoogleWebFontImport('Muli', css)).toBe(css);
     });
+
+    it('replaces an import of the family that asks for other weights', () => {
+      const css = `@import url(${legacyFontUrl});\n\na { font-family: Muli }`;
+
+      expect(addGoogleWebFontImport('Muli', css)).toBe(
+        `@import url(${fontUrl});\n\na { font-family: Muli }`
+      );
+    });
+
+    it('keeps imports of other families', () => {
+      const css = `@import url(${multiWordFontUrl});\n\na { font-family: Muli }`;
+
+      expect(addGoogleWebFontImport('Muli', css)).toBe(
+        `@import url(${fontUrl});\n\n@import url(${multiWordFontUrl});\n\na { font-family: Muli }`
+      );
+    });
   });
 
   describe('cleanGoogleWebFonts', () => {
@@ -124,8 +170,26 @@ describe('webfont', () => {
       expect(output).toBe(css);
     });
 
+    it('keeps an import saved with an older weight list', () => {
+      const css = `@import url(${legacyFontUrl});\n\na { font-family: Muli; }`;
+
+      expect(cleanGoogleWebFonts(css)).toBe(css);
+    });
+
+    it('matches a multi-word family', () => {
+      const css = `@import url(${multiWordFontUrl});\n\na { font-family: "Playfair Display SC"; }`;
+
+      expect(cleanGoogleWebFonts(css)).toBe(css);
+    });
+
     it('keeps the @import when the first family is quoted', () => {
       const css = `@import url(${fontUrl});\n\na { font-family: "Muli", serif; }`;
+
+      expect(cleanGoogleWebFonts(css)).toBe(css);
+    });
+
+    it('keeps the @import for a family spelt in another case', () => {
+      const css = `@import url(${fontUrl});\n\na { font-family: muli; }`;
 
       expect(cleanGoogleWebFonts(css)).toBe(css);
     });

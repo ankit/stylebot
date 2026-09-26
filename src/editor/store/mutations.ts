@@ -8,6 +8,7 @@ import type {
 
 import { walkUnnestedRules } from '@stylebot/css';
 import type { State, CssSelectorMetadata, EditorTab } from './';
+import type { UndoStack } from './undo-stack';
 import type { PageSnapshot } from '@stylebot/page-bridge';
 
 export default {
@@ -51,6 +52,10 @@ export default {
     state.css = css;
   },
 
+  setUndoStack(state: State, undoStack: UndoStack): void {
+    state.undoStack = undoStack;
+  },
+
   setActiveSelector(state: State, selector: string): void {
     state.activeSelector = selector;
   },
@@ -61,10 +66,6 @@ export default {
 
   setInspecting(state: State, inspecting: boolean): void {
     state.inspecting = inspecting;
-  },
-
-  setResizing(state: State, resizing: boolean): void {
-    state.resizing = resizing;
   },
 
   setColorPickerVisible(state: State, colorPickerVisible: boolean): void {

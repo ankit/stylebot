@@ -13,13 +13,12 @@ import {
   addGoogleWebFontImport,
   cleanGoogleWebFonts,
   getPrimaryFontFamily,
-  googleWebFontExists,
   getCssAfterApplyingFilterEffectToPage,
   removeEmptyRules,
   removeRule,
 } from '@stylebot/css';
 
-import { loadGoogleFonts } from '@stylebot/google-fonts';
+import { resolveGoogleFont } from '@stylebot/google-fonts';
 
 import type {
   Style,
@@ -50,9 +49,24 @@ import { getPageBridge } from '@stylebot/page-bridge';
 import { PLACEHOLDER_PROPERTIES } from '../utils/computed-placeholder';
 import { isForceImportant } from '@stylebot/styles';
 
+import {
+  emptyUndoStack,
+  recordChange,
+  undoChange,
+  redoChange,
+} from './undo-stack';
+
+export type ApplyCssArgs = {
+  css: string;
+  // Groups rapid changes into one undo step: a drag or a burst of
+  // keystrokes on one control, each from the same source.
+  source?: string;
+  // False for housekeeping (empty-rule shuffling, import cleanup) and for
+  // undo/redo itself, which must not become steps of their own.
+  record?: boolean;
+};
+
 const RECENT_FONTS_LIMIT = 10;
-const isBundledGoogleFont = async (family: string): Promise<boolean> =>
-  (await loadGoogleFonts()).some(font => font.family === family);
 
 // Bumped per apply/preview so that, after its awaits, a call superseded by a
 // newer one does nothing: the latest one owns the stylesheet.
@@ -165,6 +179,7 @@ export default {
     }
 
     commit('setVisible', false);
+    commit('setUndoStack', emptyUndoStack());
   },
 
   escape({
@@ -281,7 +296,7 @@ export default {
 
   applyCss(
     { commit, state }: { commit: Commit; state: State },
-    { css }: { css: string }
+    { css, source = 'edit', record = true }: ApplyCssArgs
   ): void {
     // Saving empty css deletes the style, and holding none may just mean the
     // stored one never reached the editor rather than that there is none.
@@ -304,6 +319,13 @@ export default {
         state.readability,
         state.forceImportant
       );
+
+      if (record && css !== state.css) {
+        commit(
+          'setUndoStack',
+          recordChange(state.undoStack, state.css, source)
+        );
+      }
 
       commit('setCss', css);
       commit('setSelectors', root);
@@ -362,6 +384,48 @@ export default {
     }
   },
 
+  /**
+   * Steps the css back to before the latest change, through the same path
+   * an edit takes so the page and storage follow.
+   */
+  undo({
+    state,
+    commit,
+    dispatch,
+  }: {
+    state: State;
+    commit: Commit;
+    dispatch: Dispatch;
+  }): void {
+    const move = undoChange(state.undoStack, state.css);
+
+    if (!move) {
+      return;
+    }
+
+    commit('setUndoStack', move.undoStack);
+    dispatch('applyCss', { css: move.css, record: false });
+  },
+
+  redo({
+    state,
+    commit,
+    dispatch,
+  }: {
+    state: State;
+    commit: Commit;
+    dispatch: Dispatch;
+  }): void {
+    const move = redoChange(state.undoStack, state.css);
+
+    if (!move) {
+      return;
+    }
+
+    commit('setUndoStack', move.undoStack);
+    dispatch('applyCss', { css: move.css, record: false });
+  },
+
   applyDeclaration(
     { state, dispatch }: { state: State; dispatch: Dispatch },
     { property, value }: { property: string; value: string }
@@ -377,7 +441,10 @@ export default {
       state.css
     );
 
-    dispatch('applyCss', { css });
+    dispatch('applyCss', {
+      css,
+      source: `declaration:${state.activeSelector}:${property}`,
+    });
   },
 
   resetActiveRule({
@@ -392,14 +459,12 @@ export default {
     }
 
     const css = removeRule(state.css, state.activeSelector);
-    dispatch('applyCss', { css });
+    dispatch('applyCss', { css, source: 'reset' });
   },
 
   /**
-   * Applies a font-family value right away, then adds the Google Fonts import
-   * for its first family: synchronously when the family is in the bundled
-   * list, otherwise once the existence check comes back. Only explicit picks
-   * are remembered as recents, not text applied by leaving the field.
+   * Applies a font-family value, then imports its first family if Google
+   * serves it. Only explicit picks are remembered as recents.
    */
   async applyFontFamily(
     { state, dispatch }: { state: State; dispatch: Dispatch },
@@ -414,23 +479,22 @@ export default {
       dispatch('rememberFont', family);
     }
 
-    const shouldImport =
-      !!family &&
-      ((await isBundledGoogleFont(family)) ||
-        (await googleWebFontExists(family)));
+    const googleFont = family ? await resolveGoogleFont(family) : null;
 
     if (request !== fontRequest) {
       return;
     }
 
     // Read the css only now: other edits may have landed during the awaits.
-    const withImport = shouldImport
-      ? addGoogleWebFontImport(family, state.css)
+    const withImport = googleFont
+      ? addGoogleWebFontImport(googleFont, state.css)
       : state.css;
     const css = cleanGoogleWebFonts(withImport);
 
+    // The import belongs to the font pick the user already made; undoing
+    // that pick takes the import with it.
     if (css !== state.css) {
-      dispatch('applyCss', { css });
+      dispatch('applyCss', { css, record: false });
     }
 
     getPageBridge().setPreviewCss(null);
@@ -458,8 +522,10 @@ export default {
     const family = getPrimaryFontFamily(value);
     let css = `${state.activeSelector} { font-family: ${value}; }`;
 
-    if (family && (await isBundledGoogleFont(family))) {
-      css = addGoogleWebFontImport(family, css);
+    const googleFont = family ? await resolveGoogleFont(family) : null;
+
+    if (googleFont) {
+      css = addGoogleWebFontImport(googleFont, css);
     }
 
     if (request !== previewRequest) {
@@ -539,6 +605,7 @@ export default {
         percent,
         (fresh ?? state.page).bodyChildSelectors
       ),
+      source: `filter:${effectName}`,
     });
   },
 };

@@ -61,33 +61,25 @@ test.describe('popup sync strip', () => {
     expect(await popup.locator('.sync-strip').isVisible()).toBe(false);
   });
 
-  test('reports the last sync and offers a Sync button when on', async ({
+  test('is absent while sync is healthy', async ({
     context,
     extension,
     openPopup,
   }) => {
     await seedAndFocusPage(context, extension, {
       'google-drive-sync-enabled': true,
-      'google-drive-sync-state': syncState(
-        new Date(Date.now() - 6 * 60 * 1000).toISOString()
-      ),
+      'google-drive-sync-state': syncState(new Date().toISOString()),
     });
 
     const popup = await openPopup();
 
     await expect
-      .poll(() =>
-        popup
-          .locator('.sync-strip', { hasText: /Synced 6 minutes ago/ })
-          .isVisible()
-      )
+      .poll(() => popup.locator('.popup-footer').isVisible())
       .toBe(true);
-    expect(
-      await popup.locator('.sync-button', { hasText: 'Sync' }).isVisible()
-    ).toBe(true);
+    expect(await popup.locator('.sync-strip').isVisible()).toBe(false);
   });
 
-  test('asks for a sign-in when a scheduled sync could not get a token', async ({
+  test('asks for a sign-in when a scheduled sync could not get a token, and opens the Sync tab', async ({
     context,
     extension,
     openPopup,
@@ -109,5 +101,11 @@ test.describe('popup sync strip', () => {
           .isVisible()
       )
       .toBe(true);
+
+    const opened = context.waitForEvent('page');
+    await popup.locator('.sync-strip').click();
+    const options = await opened;
+
+    await expect.poll(() => options.url()).toMatch(/options\.html#\/sync$/);
   });
 });

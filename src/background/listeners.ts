@@ -37,6 +37,7 @@ import {
 } from './messages';
 
 import { refreshBadgeForTab } from './styles';
+import * as styleStorage from './styles';
 import { get as getOption, pruneRetired } from './options';
 import { isSyncAlarm, updatePeriodicSync } from './sync-scheduler';
 import { runGoogleDriveSync, getGoogleDriveSyncEnabled } from '@stylebot/sync';
@@ -73,7 +74,7 @@ export const initListeners = (): void => {
   // auth window; a run that needs one leaves a flag for the UI instead.
   chrome.alarms.onAlarm.addListener(alarm => {
     if (isSyncAlarm(alarm.name)) {
-      runGoogleDriveSync({ interactive: false });
+      runGoogleDriveSync(styleStorage, { interactive: false });
     }
   });
 
@@ -88,7 +89,7 @@ export const initListeners = (): void => {
   // Pick up what other devices pushed while the browser was closed.
   chrome.runtime.onStartup.addListener(async () => {
     if (await getGoogleDriveSyncEnabled()) {
-      runGoogleDriveSync({ interactive: false });
+      runGoogleDriveSync(styleStorage, { interactive: false });
     }
   });
 

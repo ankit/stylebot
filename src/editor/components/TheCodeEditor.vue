@@ -41,7 +41,7 @@ export default Vue.extend({
         // Skips Monaco's echo of a setValue: re-saving it would stamp a fresh
         // modifiedTime on a just-pulled style, as if this device edited it.
         if (css !== this.$store.state.css) {
-          this.$store.dispatch('applyCss', { css });
+          this.$store.dispatch('applyCss', { css, source: 'code' });
         }
       }, TYPING_DEBOUNCE_MS),
     };
@@ -122,7 +122,7 @@ export default Vue.extend({
       const css = removeEmptyRules(this.css);
 
       if (css !== this.css) {
-        this.$store.dispatch('applyCss', { css });
+        this.$store.dispatch('applyCss', { css, record: false });
       }
     },
 
@@ -196,7 +196,7 @@ export default Vue.extend({
           ? splitSelectorFromGroup(this.css, selector)
           : addEmptyRule(this.css, selector);
 
-        this.$store.dispatch('applyCss', { css });
+        this.$store.dispatch('applyCss', { css, record: false });
       }
 
       this.updateIframeCss(contentWindow);

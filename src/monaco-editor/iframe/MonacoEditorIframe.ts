@@ -18,6 +18,9 @@ class MonacEditorIframe {
   // todo: import monaco types
   editor?: any;
   variant: MonacoEditorVariant;
+  // Whether the panel has sent its css yet; the first send seeds the
+  // editor rather than being an edit the user could undo away.
+  populated = false;
 
   constructor(variant: MonacoEditorVariant = 'default') {
     this.variant = variant;
@@ -139,8 +142,8 @@ class MonacEditorIframe {
     // Layout may still be settling at creation time — re-measure after paint.
     requestAnimationFrame(() => this.editor.layout());
 
-    // Container can resize with no window resize event to catch it (e.g. the panel
-    // resizer) since it's same-document, not the iframe's own viewport.
+    // Container can resize with no window resize event to catch it (e.g. dragging the
+    // panel's edge) since it's same-document, not the iframe's own viewport.
     new ResizeObserver(() => this.editor.layout()).observe(container);
   }
 
@@ -200,8 +203,23 @@ class MonacEditorIframe {
     window.parent.postMessage(message, '*');
   }
 
+  /**
+   * Applies the panel's css as an undoable edit, since setValue would reset
+   * Monaco's own history.
+   */
   handleStylebotCssUpdate(css: string, selector?: string, focus = true): void {
-    this.editor.setValue(css);
+    const model = this.editor.getModel();
+
+    if (!this.populated) {
+      this.populated = true;
+      this.editor.setValue(css);
+    } else if (model.getValue() !== css) {
+      this.editor.pushUndoStop();
+      this.editor.executeEdits('stylebot', [
+        { range: model.getFullModelRange(), text: css },
+      ]);
+      this.editor.pushUndoStop();
+    }
 
     if (focus) {
       this.editor.focus();

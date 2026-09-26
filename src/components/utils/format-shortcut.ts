@@ -1,5 +1,6 @@
-export const isMac = (): boolean =>
-  /mac/i.test(navigator.platform || navigator.userAgent);
+import { isMac } from '@stylebot/utils';
+
+export { isMac };
 
 // Arrow glyphs read the same everywhere — unlike the modifier keys below,
 // there's no OS-specific spelling to pick between.

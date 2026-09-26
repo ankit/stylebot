@@ -145,7 +145,10 @@ export const createEditorWindowHandler = (
           applyingFromWindow = true;
           try {
             store.commit('setForceImportant', message.forceImportant);
-            store.dispatch('applyCss', { css: message.css });
+            store.dispatch('applyCss', {
+              css: message.css,
+              source: 'window',
+            });
           } finally {
             applyingFromWindow = false;
           }

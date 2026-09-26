@@ -21,6 +21,8 @@ import { emptyPageSnapshot } from '@stylebot/page-bridge';
 import getters from './getters';
 import actions from './actions';
 import mutations from './mutations';
+import type { UndoStack } from './undo-stack';
+import { emptyUndoStack } from './undo-stack';
 
 /**
  * Where the editor UI lives: injected into the styled page itself, or in a
@@ -59,6 +61,8 @@ export type State = {
 
   url: string;
   css: string;
+  // Undo/redo trail of css, kept only while the editor is open.
+  undoStack: UndoStack;
   enabled: boolean;
   readability: boolean;
   forceImportant: boolean;
@@ -72,7 +76,6 @@ export type State = {
   help: boolean;
   visible: boolean;
   inspecting: boolean;
-  resizing: boolean;
   colorPickerVisible: boolean;
 
   options: StylebotOptions;
@@ -94,6 +97,7 @@ export const createStore = (host: EditorHost): Store<State> => {
       tab: null,
 
       css: '',
+      undoStack: emptyUndoStack(),
       enabled: true,
       readability: false,
       forceImportant: true,
@@ -107,7 +111,6 @@ export const createStore = (host: EditorHost): Store<State> => {
       help: false,
       visible: false,
       inspecting: false,
-      resizing: false,
       colorPickerVisible: false,
 
       commands: null,

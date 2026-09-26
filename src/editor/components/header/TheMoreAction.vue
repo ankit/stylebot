@@ -29,24 +29,30 @@
           </s-segmented-control>
         </div>
 
-        <div v-if="host === 'page'" class="push-page-row">
-          <div class="push-page-copy">
+        <toggle-switch
+          v-if="host === 'page'"
+          class="setting-row"
+          :value="adjustPageLayout"
+          size="sm"
+          :aria-label="t('adjust_page_layout')"
+          @change="toggleAdjustPageLayout"
+        >
+          <span class="setting-copy">
             <s-text>{{ t('adjust_page_layout') }}</s-text>
             <s-text size="caption" variant="muted">
               {{ t('adjust_page_layout_description') }}
             </s-text>
-          </div>
+          </span>
+        </toggle-switch>
 
-          <toggle-switch
-            :value="adjustPageLayout"
-            size="lg"
-            :aria-label="t('adjust_page_layout')"
-            @change="toggleAdjustPageLayout"
-          />
-        </div>
-
-        <div class="push-page-row">
-          <div class="push-page-copy">
+        <toggle-switch
+          class="setting-row"
+          :value="forceImportant"
+          size="sm"
+          :aria-label="t('override_site_styles')"
+          @change="setForceImportant"
+        >
+          <span class="setting-copy">
             <s-text>{{ t('override_site_styles') }}</s-text>
             <s-text v-if="forceImportant" size="caption" variant="muted">
               <template v-for="(part, index) in overrideOnDescription">
@@ -62,15 +68,8 @@
             <s-text v-else size="caption" variant="muted">
               {{ t('override_site_styles_off_description') }}
             </s-text>
-          </div>
-
-          <toggle-switch
-            :value="forceImportant"
-            size="lg"
-            :aria-label="t('override_site_styles')"
-            @change="setForceImportant"
-          />
-        </div>
+          </span>
+        </toggle-switch>
 
         <hr class="more-menu-divider" />
 
@@ -241,7 +240,7 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .more-menu {
-  width: 230px;
+  width: 270px;
   --menu-padding: 10px;
   padding: 8px var(--menu-padding) !important;
   gap: 0 !important;
@@ -256,9 +255,6 @@ export default Vue.extend({
 }
 
 .dock-toggle ::v-deep .segment {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
   padding: 4px 8px;
 
   &.active svg {
@@ -266,15 +262,20 @@ export default Vue.extend({
   }
 }
 
-.push-page-row {
-  display: flex;
+.setting-row {
+  box-sizing: border-box;
+  width: 100%;
   align-items: flex-start;
   gap: 10px;
-  margin: 16px 8px 6px;
+  margin: 16px 0 6px;
+  padding: 0 8px;
 
-  ::v-deep .switch {
-    width: auto;
-    gap: 0;
+  ::v-deep .label {
+    order: 1;
+  }
+
+  ::v-deep .track {
+    order: 2;
     margin-top: 2px;
   }
 }
@@ -283,12 +284,11 @@ export default Vue.extend({
   font-family: var(--font-mono);
 }
 
-.push-page-copy {
-  flex: 1;
-  min-width: 0;
+.setting-copy {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  min-width: 0;
 }
 
 .more-menu-divider {

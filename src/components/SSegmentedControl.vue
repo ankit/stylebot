@@ -23,7 +23,13 @@
         :disabled="disabled"
         @click="$emit('change', option.value)"
       >
-        <slot name="option" :option="option">{{ option.label }}</slot>
+        <span class="segment-label">
+          <slot name="option" :option="option">{{ option.label }}</slot>
+        </span>
+        <!-- Reserves the bold width so selecting a segment doesn't shift the row. -->
+        <span class="segment-label segment-sizer" aria-hidden="true">
+          <slot name="option" :option="option">{{ option.label }}</slot>
+        </span>
       </button>
     </s-tooltip>
   </div>
@@ -134,16 +140,25 @@ export default Vue.extend({
       const active = segments?.[index]?.$el as HTMLElement | undefined;
 
       if (!root || !active) {
+        this.ready = false;
         return;
       }
 
       // getBoundingClientRect, not offsetLeft/offsetWidth — integer rounding accumulates across siblings.
       const rootRect = root.getBoundingClientRect();
       const activeRect = active.getBoundingClientRect();
+      // Undo any ancestor transform, e.g. a menu measured mid scale-in animation.
+      const scale = rootRect.width / root.offsetWidth || 1;
 
-      this.indicatorLeft = activeRect.left - rootRect.left;
-      this.indicatorWidth = activeRect.width;
-      this.ready = true;
+      this.indicatorLeft = (activeRect.left - rootRect.left) / scale;
+      this.indicatorWidth = activeRect.width / scale;
+
+      if (!this.ready) {
+        // A frame later, so the indicator appears in place rather than sliding from its last spot.
+        requestAnimationFrame(() => {
+          this.ready = this.options.some(option => option.value === this.value);
+        });
+      }
     },
   },
 });
@@ -175,6 +190,10 @@ export default Vue.extend({
     inset 0 0 0 1px color-mix(in srgb, var(--text-primary) 12%, transparent);
   pointer-events: none;
 
+  &:not(.ready) {
+    opacity: 0;
+  }
+
   &.ready {
     transition: transform 0.2s ease, width 0.2s ease;
   }
@@ -186,6 +205,8 @@ export default Vue.extend({
 
 .segment {
   position: relative;
+  display: grid;
+  place-items: center;
   text-align: center;
   white-space: nowrap;
   padding: 4px 0;
@@ -197,7 +218,11 @@ export default Vue.extend({
   color: var(--text-muted);
   outline: none;
   cursor: pointer;
-  transition: color 0.15s ease;
+  transition: color 0.15s ease, background-color 0.15s ease;
+
+  &:hover:not(.active):not(:disabled) {
+    background: color-mix(in srgb, var(--text-primary) 6%, transparent);
+  }
 
   &.active {
     font-weight: 600;
@@ -226,5 +251,17 @@ export default Vue.extend({
   }
 
   @include focus-ring;
+}
+
+.segment-label {
+  grid-area: 1 / 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.segment .segment-sizer {
+  visibility: hidden;
+  font-weight: 600;
 }
 </style>

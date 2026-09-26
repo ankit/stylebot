@@ -323,7 +323,6 @@ const backgroundPageConfig = {
 const clientConfig = {
   ...config,
   entry: {
-    'sync/index': './sync/index.ts',
     'popup/index': './popup/index.ts',
     'editor/index': './editor/content-script.ts',
     'editor/app': './editor/app.ts',
@@ -335,6 +334,13 @@ const clientConfig = {
       './monaco-editor/iframe/options-index.ts',
     'readability/reader': './readability/reader.ts',
   },
+  // Webpack's `global` shim falls back to `new Function` in the bundles loaded
+  // with import(), which a strict page CSP blocks and reports as an issue.
+  node: { global: false },
+  plugins: [
+    ...config.plugins,
+    new webpack.DefinePlugin({ global: 'globalThis' }),
+  ],
 };
 
 module.exports = [backgroundPageConfig, clientConfig];

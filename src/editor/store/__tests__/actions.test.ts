@@ -80,8 +80,134 @@ describe('actions', () => {
         mockState.readability,
         true
       );
-      expect(mockCommit).toHaveBeenNthCalledWith(1, 'setCss', css);
-      expect(mockCommit).toHaveBeenNthCalledWith(2, 'setSelectors', mockRoot);
+      expect(mockCommit).toHaveBeenNthCalledWith(1, 'setUndoStack', {
+        past: [{ css: mockState.css, source: 'edit', at: expect.any(Number) }],
+        future: [],
+      });
+      expect(mockCommit).toHaveBeenNthCalledWith(2, 'setCss', css);
+      expect(mockCommit).toHaveBeenNthCalledWith(3, 'setSelectors', mockRoot);
+    });
+
+    it('records the css it replaces under the given source', () => {
+      const state = { ...mockState, css: 'before' };
+
+      actions.applyCss(
+        { commit: mockCommit, state },
+        { css: 'after', source: 'code' }
+      );
+
+      expect(mockCommit).toBeCalledWith('setUndoStack', {
+        past: [{ css: 'before', source: 'code', at: expect.any(Number) }],
+        future: [],
+      });
+    });
+
+    it('extends the latest step when the same source changes the css again right away', () => {
+      const undoStack = {
+        past: [{ css: 'first', source: 'code', at: Date.now() }],
+        future: [],
+      };
+      const state = { ...mockState, css: 'before', undoStack };
+
+      actions.applyCss(
+        { commit: mockCommit, state },
+        { css: 'after', source: 'code' }
+      );
+
+      expect(mockCommit).toBeCalledWith('setUndoStack', {
+        past: [{ css: 'first', source: 'code', at: expect.any(Number) }],
+        future: [],
+      });
+    });
+
+    it('leaves the undo stack alone for a change that is not recorded', () => {
+      const state = { ...mockState, css: 'before' };
+
+      actions.applyCss(
+        { commit: mockCommit, state },
+        { css: 'after', record: false }
+      );
+
+      expect(mockCommit).not.toBeCalledWith('setUndoStack', expect.anything());
+      expect(mockCommit).toBeCalledWith('setCss', 'after');
+    });
+
+    it('leaves the undo stack alone when the css does not change', () => {
+      const state = { ...mockState, css: 'same' };
+
+      actions.applyCss({ commit: mockCommit, state }, { css: 'same' });
+
+      expect(mockCommit).not.toBeCalledWith('setUndoStack', expect.anything());
+    });
+  });
+
+  describe('undo', () => {
+    it('re-applies the previous css without recording it, keeping the current one for redo', () => {
+      const state = {
+        ...mockState,
+        css: 'current',
+        undoStack: {
+          past: [{ css: 'older', source: 'edit', at: 1 }],
+          future: [],
+        },
+      };
+
+      actions.undo({ state, commit: mockCommit, dispatch: mockDispatch });
+
+      expect(mockCommit).toBeCalledWith('setUndoStack', {
+        past: [],
+        future: [{ css: 'current', source: 'edit', at: 0 }],
+      });
+      expect(mockDispatch).toBeCalledWith('applyCss', {
+        css: 'older',
+        record: false,
+      });
+    });
+
+    it('does nothing with an empty stack', () => {
+      actions.undo({
+        state: mockState,
+        commit: mockCommit,
+        dispatch: mockDispatch,
+      });
+
+      expect(mockCommit).not.toBeCalled();
+      expect(mockDispatch).not.toBeCalled();
+    });
+  });
+
+  describe('redo', () => {
+    it('re-applies the undone css without recording it, keeping the current one for undo', () => {
+      const state = {
+        ...mockState,
+        css: 'current',
+        undoStack: {
+          past: [],
+          future: [{ css: 'newer', source: 'edit', at: 0 }],
+        },
+      };
+
+      actions.redo({ state, commit: mockCommit, dispatch: mockDispatch });
+
+      expect(mockCommit).toBeCalledWith('setUndoStack', {
+        past: [{ css: 'current', source: 'edit', at: 0 }],
+        future: [],
+      });
+      expect(mockDispatch).toBeCalledWith('applyCss', {
+        css: 'newer',
+        record: false,
+      });
+    });
+
+    it('does nothing with nothing undone', () => {
+      actions.redo({
+        state: mockState,
+        commit: mockCommit,
+        dispatch: mockDispatch,
+      });
+
+      expect(mockCommit).not.toBeCalled();
+      expect(mockDispatch).not.toBeCalled();
     });
 
     it('does not save an empty style when none was loaded, since that would delete it', () => {
@@ -206,7 +332,10 @@ describe('actions', () => {
         '50',
         ['div.b']
       );
-      expect(mockDispatch).toBeCalledWith('applyCss', { css: 'filtered' });
+      expect(mockDispatch).toBeCalledWith('applyCss', {
+        css: 'filtered',
+        source: 'filter:grayscale',
+      });
       expect(mockDispatch).not.toBeCalledWith('refreshPage');
       delete mockBridge.getSnapshotSync;
     });
@@ -224,7 +353,10 @@ describe('actions', () => {
         ['div.a']
       );
       expect(mockDispatch).toBeCalledWith('refreshPage');
-      expect(mockDispatch).toBeCalledWith('applyCss', { css: 'filtered' });
+      expect(mockDispatch).toBeCalledWith('applyCss', {
+        css: 'filtered',
+        source: 'filter:grayscale',
+      });
     });
   });
 
@@ -233,6 +365,10 @@ describe('actions', () => {
       actions.closeStylebot({ state: mockState, commit: mockCommit });
 
       expect(mockCommit).toBeCalledWith('setVisible', false);
+      expect(mockCommit).toBeCalledWith('setUndoStack', {
+        past: [],
+        future: [],
+      });
       expect(chromeUtils.closeEditorWindow).not.toBeCalled();
     });
 
@@ -340,6 +476,7 @@ describe('actions', () => {
 
       expect(mockDispatch).toBeCalledWith('applyCss', {
         css: 'outputOfAddDeclaration',
+        source: 'declaration:a:color',
       });
     });
   });
@@ -441,8 +578,10 @@ describe('actions', () => {
 
     beforeEach(() => {
       jest
-        .spyOn(googleFonts, 'loadGoogleFonts')
-        .mockResolvedValue([{ family: 'Inter', category: 'sans-serif' }]);
+        .spyOn(googleFonts, 'resolveGoogleFont')
+        .mockImplementation(async family =>
+          family.toLowerCase() === 'inter' ? 'Inter' : null
+        );
       jest
         .spyOn(stylebotCss, 'getPrimaryFontFamily')
         .mockImplementation(value => value.split(',')[0].trim());
@@ -452,7 +591,6 @@ describe('actions', () => {
       jest
         .spyOn(stylebotCss, 'addGoogleWebFontImport')
         .mockImplementation((family, css) => `@import ${family};\n${css}`);
-      jest.spyOn(stylebotCss, 'googleWebFontExists').mockResolvedValue(false);
     });
 
     it('applies the declaration, remembers a pick, and imports a bundled font', async () => {
@@ -466,9 +604,9 @@ describe('actions', () => {
         value: 'Inter, sans-serif',
       });
       expect(mockDispatch).toHaveBeenNthCalledWith(2, 'rememberFont', 'Inter');
-      expect(stylebotCss.googleWebFontExists).not.toBeCalled();
       expect(mockDispatch).toHaveBeenNthCalledWith(3, 'applyCss', {
         css: '@import Inter;\na { }',
+        record: false,
       });
     });
 
@@ -484,17 +622,16 @@ describe('actions', () => {
       );
     });
 
-    it('checks fonts outside the bundled list before importing', async () => {
-      jest.spyOn(stylebotCss, 'googleWebFontExists').mockResolvedValue(true);
-
+    it('imports a font under its Google Fonts spelling', async () => {
       await actions.applyFontFamily(
         { state, dispatch: mockDispatch },
-        { value: 'Some Font' }
+        { value: 'inter' }
       );
 
-      expect(stylebotCss.googleWebFontExists).toBeCalledWith('Some Font');
+      expect(googleFonts.resolveGoogleFont).toBeCalledWith('inter');
       expect(mockDispatch).toBeCalledWith('applyCss', {
-        css: '@import Some Font;\na { }',
+        css: '@import Inter;\na { }',
+        record: false,
       });
     });
 
@@ -511,11 +648,11 @@ describe('actions', () => {
     it('adds the import to the css as it is after the lookup, not before', async () => {
       const live = { ...state };
       jest
-        .spyOn(stylebotCss, 'googleWebFontExists')
-        .mockImplementation(async () => {
+        .spyOn(googleFonts, 'resolveGoogleFont')
+        .mockImplementation(async family => {
           // Another edit lands while the lookup is in flight.
           live.css = 'a { color: red; }';
-          return true;
+          return family;
         });
 
       await actions.applyFontFamily(
@@ -525,12 +662,13 @@ describe('actions', () => {
 
       expect(mockDispatch).toBeCalledWith('applyCss', {
         css: '@import Some Font;\na { color: red; }',
+        record: false,
       });
     });
 
     it('lets a newer apply win when lookups resolve out of order', async () => {
-      let resolveFirst: (exists: boolean) => void = () => undefined;
-      jest.spyOn(stylebotCss, 'googleWebFontExists').mockImplementationOnce(
+      let resolveFirst: (family: string) => void = () => undefined;
+      jest.spyOn(googleFonts, 'resolveGoogleFont').mockImplementationOnce(
         () =>
           new Promise(resolve => {
             resolveFirst = resolve;
@@ -545,7 +683,7 @@ describe('actions', () => {
         { state, dispatch: mockDispatch },
         { value: 'Inter' }
       );
-      resolveFirst(true);
+      resolveFirst('Slow Font');
       await first;
 
       expect(stylebotCss.addGoogleWebFontImport).toBeCalledTimes(1);
@@ -569,7 +707,7 @@ describe('actions', () => {
         property: 'font-family',
         value: '',
       });
-      expect(stylebotCss.googleWebFontExists).not.toBeCalled();
+      expect(googleFonts.resolveGoogleFont).not.toBeCalled();
       expect(stylebotCss.addGoogleWebFontImport).not.toBeCalled();
     });
   });
@@ -579,8 +717,12 @@ describe('actions', () => {
 
     beforeEach(() => {
       jest
-        .spyOn(googleFonts, 'loadGoogleFonts')
-        .mockResolvedValue([{ family: 'Inter', category: 'sans-serif' }]);
+        .spyOn(googleFonts, 'resolveGoogleFont')
+        .mockImplementation(async family =>
+          ['inter', 'zen kurenaido'].includes(family.toLowerCase())
+            ? family
+            : null
+        );
       jest
         .spyOn(stylebotCss, 'getPrimaryFontFamily')
         .mockImplementation(value => value.split(',')[0].trim());
@@ -619,6 +761,19 @@ describe('actions', () => {
       });
     });
 
+    it('imports a Google font outside the bundled list', async () => {
+      await actions.previewFontFamily({ state }, 'Zen Kurenaido');
+
+      expect(stylebotCss.addGoogleWebFontImport).toBeCalledWith(
+        'Zen Kurenaido',
+        'h1 { font-family: Zen Kurenaido; }'
+      );
+      expect(mockBridge.setPreviewCss).toBeCalledWith({
+        css: '@import;\nh1 { font-family: Zen Kurenaido; }',
+        forceImportant: true,
+      });
+    });
+
     it('skips the import for an unknown font', async () => {
       await actions.previewFontFamily({ state }, 'Some Local');
 
@@ -633,19 +788,18 @@ describe('actions', () => {
       expect(mockBridge.setPreviewCss).toBeCalledTimes(1);
     });
 
-    it('drops a preview that was cleared while the font list was loading', async () => {
-      let resolveFonts: (fonts: Array<googleFonts.GoogleFont>) => void = () =>
-        undefined;
-      jest.spyOn(googleFonts, 'loadGoogleFonts').mockImplementation(
+    it('drops a preview that was cleared while the font was resolving', async () => {
+      let resolveFont: (family: string) => void = () => undefined;
+      jest.spyOn(googleFonts, 'resolveGoogleFont').mockImplementation(
         () =>
           new Promise(resolve => {
-            resolveFonts = resolve;
+            resolveFont = resolve;
           })
       );
 
       const pending = actions.previewFontFamily({ state }, 'Inter');
       await actions.previewFontFamily({ state }, '');
-      resolveFonts([{ family: 'Inter', category: 'sans-serif' }]);
+      resolveFont('Inter');
       await pending;
 
       // Only the clearing call reached the page; the stale preview did not.

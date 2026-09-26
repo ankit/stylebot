@@ -64,7 +64,7 @@
 
       <div class="popup-divider" />
 
-      <template v-if="googleDriveSyncEnabled">
+      <template v-if="syncNeedsSignIn">
         <sync-stylebot />
         <div class="popup-divider" />
       </template>
@@ -104,15 +104,9 @@ import {
   getIsPageReaderable,
 } from './utils';
 
-// Bypasses @stylebot/sync, whose barrel also drags in runGoogleDriveSync's postcss dependency chain.
-import { getGoogleDriveSyncEnabled } from '../sync/google-drive/sync-metadata';
-// Bypasses @stylebot/styles' barrel, whose page.ts export drags in @stylebot/css's postcss chain.
-import BackgroundPageUtils from '../styles/utils';
-import type {
-  GoogleDriveSyncMetadata,
-  GetCommandsResponse,
-  StylebotAppearance,
-} from '@stylebot/types';
+import { getGoogleDriveSyncEnabled, getSyncNeedsAuth } from '@stylebot/sync';
+import { BackgroundPageUtils } from '@stylebot/styles';
+import type { GetCommandsResponse, StylebotAppearance } from '@stylebot/types';
 
 export default Vue.extend({
   name: 'App',
@@ -136,8 +130,7 @@ export default Vue.extend({
     pageReaderable: boolean;
     tab?: chrome.tabs.Tab;
     styles: Array<{ url: string; css: string; enabled: boolean }>;
-    googleDriveSyncEnabled: boolean;
-    googleDriveSyncMetadata?: GoogleDriveSyncMetadata;
+    syncNeedsSignIn: boolean;
     commands?: GetCommandsResponse;
     appearance: StylebotAppearance;
   } {
@@ -147,8 +140,7 @@ export default Vue.extend({
       tab: undefined,
       readability: false,
       pageReaderable: true,
-      googleDriveSyncEnabled: false,
-      googleDriveSyncMetadata: undefined,
+      syncNeedsSignIn: false,
       commands: undefined,
       appearance: 'system',
     };
@@ -204,9 +196,11 @@ export default Vue.extend({
       });
     });
 
-    getGoogleDriveSyncEnabled().then(enabled => {
-      this.googleDriveSyncEnabled = enabled;
-    });
+    Promise.all([getGoogleDriveSyncEnabled(), getSyncNeedsAuth()]).then(
+      ([enabled, needsAuth]) => {
+        this.syncNeedsSignIn = enabled && needsAuth;
+      }
+    );
 
     getCommands(commands => {
       this.commands = commands;

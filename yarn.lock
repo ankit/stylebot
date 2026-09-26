@@ -15760,11 +15760,6 @@ vue-docgen-api@^4.40.0:
     ts-map "^1.0.3"
     vue-inbrowser-compiler-independent-utils "^4.69.0"
 
-vue-draggable-resizable@^2.3.0:
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/vue-draggable-resizable/-/vue-draggable-resizable-2.3.0.tgz#94c433ca748bc1a4d0959ba1c5c0e1c3536cee5b"
-  integrity sha512-77CLRj1TPwB30pwsjOf3pkd1UzYanCdKXbqhILJ0Oo5QQl50lvBfyQCXxMFzwWwTc3sbBbQH3FfWSV+BkoSElA==
-
 vue-eslint-parser@^10:
   version "10.4.1"
   resolved "https://registry.yarnpkg.com/vue-eslint-parser/-/vue-eslint-parser-10.4.1.tgz#3d0aabb6604dac3fcd94f893291cb9e754cc392c"

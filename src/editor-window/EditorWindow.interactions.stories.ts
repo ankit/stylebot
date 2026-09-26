@@ -132,12 +132,9 @@ export const EscapeBacksOutInWindow: StoryObj = {
 
 export const PageOnlyShortcutsIgnored: StoryObj = {
   ...editorWindow(WITH_RULE),
-  name: 'resize and push-page-aside shortcuts do nothing in the window',
+  name: 'the push-page-aside shortcut does nothing in the window',
   play: async ({ canvasElement }) => {
     const store = storeOf(canvasElement);
-
-    await pressKey('s');
-    await expect(store.state.resizing).toBe(false);
 
     await pressKey('a');
     await expect(store.state.options.layout.adjustPageLayout).toBe(false);
@@ -153,7 +150,6 @@ export const ShortcutsViewInWindow: StoryObj = {
 
     const view = within(shortcutsView(canvasElement) as HTMLElement);
     await expect(view.getByText('Open in separate window')).toBeInTheDocument();
-    await expect(view.queryByText('Resize the panel')).toBeNull();
     await expect(view.queryByText('Push the page aside')).toBeNull();
   },
 };

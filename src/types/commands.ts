@@ -18,7 +18,6 @@ export type StylebotEditorCommandName =
   | 'dockLeft'
   | 'dockRight'
   | 'dockWindow'
-  | 'resize'
   | 'pageLayout'
   | 'close';
 

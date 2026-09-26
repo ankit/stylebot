@@ -1,5 +1,4 @@
 import Vue from 'vue';
-import VueDraggableResizable from 'vue-draggable-resizable';
 import type { Store } from 'vuex';
 import { t } from '@stylebot/i18n';
 
@@ -18,8 +17,6 @@ const setupVue = (): void => {
     return;
   }
   vueReady = true;
-
-  Vue.component('VueDraggableResizable', VueDraggableResizable);
 
   Vue.mixin({
     methods: {

@@ -18,10 +18,10 @@
           <the-basic-editor v-if="mode === 'basic'" />
           <the-presets-editor v-else-if="mode === 'magic'" />
 
-          <!-- Stays mounted (just hidden) once opened — Monaco is too expensive to reload on every mode switch/resize. -->
+          <!-- Stays mounted (just hidden) once opened — Monaco is too expensive to reload on every mode switch. -->
           <the-code-editor
             v-if="codeEditorMounted"
-            v-show="mode === 'code' && !resizing"
+            v-show="mode === 'code'"
             @leave="onCodeEditorLeave"
           />
         </div>
@@ -73,10 +73,6 @@ export default Vue.extend({
 
     pageConnected(): boolean {
       return this.$store.state.pageConnected;
-    },
-
-    resizing(): boolean {
-      return this.$store.state.resizing;
     },
 
     mode(): StylebotEditingMode {
