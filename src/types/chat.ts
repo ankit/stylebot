@@ -1,4 +1,4 @@
-export type ChatProviderId = 'anthropic' | 'openai';
+export type ChatProviderId = 'anthropic' | 'openai' | 'gemini';
 
 /**
  * One property change the model asked for; an empty value removes the
@@ -64,6 +64,9 @@ export type ChatAssistantTurn = {
   // Whether the reply's edits are on the page, flipped by Undo / Reapply.
   applied: boolean;
   model: string;
+  // The reply in the provider's own format, for providers that need it back
+  // unchanged when the thread is replayed.
+  replay?: Array<unknown>;
   usage?: ChatUsage;
 };
 
@@ -87,6 +90,9 @@ export type ChatStreamEvent =
   | { type: 'text'; delta: string }
   | { type: 'edits-start' }
   | { type: 'edits'; edits: Array<ChatCssEdit> }
+  // The reply in the provider's own format, for providers that need it back
+  // unchanged when the thread is replayed.
+  | { type: 'replay'; steps: Array<unknown> }
   | { type: 'usage'; usage: ChatUsage }
   | { type: 'done' }
   | { type: 'error'; errorKey: ChatErrorKey; detail?: string };
