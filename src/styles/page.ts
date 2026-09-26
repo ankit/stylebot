@@ -1,13 +1,20 @@
-import type { Style, StyleMap } from '@stylebot/types';
+import type { StyleMap } from '@stylebot/types';
 
 import BackgroundPageUtils from './utils';
 
-export const getStylesForPage = (
+type WithUrl<T> = T & { url: string };
+
+/**
+ * The styles whose url pattern matches the page, and the most specific
+ * non-global one as its default style. Works on the stored style map and on
+ * the compiled one alike.
+ */
+export const getStylesForPage = <T extends { css: string } = StyleMap[string]>(
   pageUrl: string,
-  allStyles: StyleMap
+  allStyles: { [url: string]: T }
 ): {
-  styles: Array<Style>;
-  defaultStyle?: Style;
+  styles: Array<WithUrl<T>>;
+  defaultStyle?: WithUrl<T>;
 } => {
   if (!pageUrl) {
     return { styles: [] };
@@ -17,8 +24,8 @@ export const getStylesForPage = (
     return { styles: [] };
   }
 
-  const styles = [];
-  let defaultStyle: Style | undefined;
+  const styles: Array<WithUrl<T>> = [];
+  let defaultStyle: WithUrl<T> | undefined;
 
   for (const url in allStyles) {
     const matches = BackgroundPageUtils.matches(pageUrl, url);

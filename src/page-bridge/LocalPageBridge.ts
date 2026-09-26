@@ -1,5 +1,6 @@
 import type { RoleColorGroups } from '@stylebot/css';
 import {
+  compileStyle,
   injectCSSIntoDocument,
   removeCSSFromDocument,
   removeEmptyRules,
@@ -15,7 +16,7 @@ import {
   isReaderable,
 } from '@stylebot/readability';
 
-import { readCache, writeCache } from '@stylebot/inject-css';
+import { injectStylesheet, readCache, writeCache } from '@stylebot/inject-css';
 
 import type { PageBridge, PageSnapshot } from './PageBridge';
 import { PageBridgeEmitter } from './PageBridgeEmitter';
@@ -23,6 +24,22 @@ import { getPageColors } from './page-colors';
 import { getComputedStyles } from './computed-styles';
 
 const PREVIEW_ID = 'font-preview';
+
+/**
+ * The style as the page gets it, compiled from the css as it's saved, or null
+ * when it doesn't parse yet (mid-edit). Compiled once per edit, since the
+ * save is only sent after applyCss returns.
+ */
+const compileForPage = (
+  css: string,
+  forceImportant: boolean
+): { css: string; importUrls: Array<string> } | null => {
+  try {
+    return compileStyle(removeEmptyRules(css), { forceImportant });
+  } catch {
+    return null;
+  }
+};
 
 /**
  * The editor's theme-provider element, for the highlighter's tip to inherit
@@ -88,18 +105,20 @@ export class LocalPageBridge extends PageBridgeEmitter implements PageBridge {
     enabled: boolean;
     forceImportant: boolean;
   }): void {
-    injectCSSIntoDocument(css, url, { forceImportant });
+    const compiled = compileForPage(css, forceImportant);
+
+    if (!compiled) {
+      return;
+    }
+
+    injectStylesheet(url, compiled.css, compiled.importUrls);
 
     // The localStorage cache is applied on the next load before storage
     // resolves; keep it current so a quick reload doesn't flash old CSS.
     const cached = readCache();
+
     if (cached) {
-      const entry = {
-        url,
-        css: removeEmptyRules(css),
-        enabled,
-        forceImportant,
-      };
+      const entry = { url, ...compiled, enabled };
       const exists = cached.styles.some(style => style.url === url);
 
       writeCache({

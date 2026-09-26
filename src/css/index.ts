@@ -4,10 +4,9 @@ export {
 } from './filter';
 
 export { injectCSSIntoDocument, removeCSSFromDocument } from './inject-style';
-
 export { compileStyle } from './compile';
 
-export { extractImports, getCssWithExpandedImports } from './import';
+export { getCssWithExpandedImports } from './import';
 
 export {
   getSelector,
