@@ -1,6 +1,3 @@
-import { format } from 'date-fns';
-import type { Timestamp } from '@stylebot/types';
-
 export {
   MODIFIER_KEYS,
   modifiersFromEvent,
@@ -20,8 +17,7 @@ export {
 } from './time-formatter';
 export { KEYBOARD_FOCUS, isFieldTarget, consumeFieldEscape } from './focus';
 
-export const getCurrentTimestamp = (): Timestamp =>
-  format(new Date(), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
+export { getCurrentTimestamp } from './timestamp';
 
 type NotificationId = string;
 
