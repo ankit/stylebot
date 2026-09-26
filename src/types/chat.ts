@@ -63,6 +63,8 @@ export type ChatAssistantTurn = {
   previous: Array<ChatCssPreviousValue>;
   // Whether the reply's edits are on the page, flipped by Undo / Reapply.
   applied: boolean;
+  // Stopped by the user before its edits arrived; the text is what came in.
+  stopped?: boolean;
   model: string;
   // The reply in the provider's own format, for providers that need it back
   // unchanged when the thread is replayed.

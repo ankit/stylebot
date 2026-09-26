@@ -29,9 +29,13 @@ import type {
   GetIsEditorWindowOpenResponse,
   ChatGetStatus,
   ChatConnect,
+  ChatGetThread,
+  ChatSetThread,
   ChatStatusResponse,
   ChatConnectResponse,
+  ChatGetThreadResponse,
   ChatProviderId,
+  ChatTurn,
 } from '@stylebot/types';
 
 export const getAllOptions = (): Promise<StylebotOptions> => {
@@ -240,3 +244,14 @@ export const chatConnect = (
     provider,
     key,
   });
+
+export const chatGetThread = (url: string): Promise<ChatGetThreadResponse> =>
+  chrome.runtime.sendMessage<ChatGetThread, ChatGetThreadResponse>({
+    name: 'ChatGetThread',
+    url,
+  });
+
+export const chatSetThread = (url: string, turns: Array<ChatTurn>): void => {
+  const message: ChatSetThread = { name: 'ChatSetThread', url, turns };
+  chrome.runtime.sendMessage(message);
+};

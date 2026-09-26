@@ -31,3 +31,5 @@ export { default as OptionKeyIcon } from './OptionKeyIcon.vue';
 export { default as ShiftKeyIcon } from './ShiftKeyIcon.vue';
 export { default as CommandKeyIcon } from './CommandKeyIcon.vue';
 export { default as ControlKeyIcon } from './ControlKeyIcon.vue';
+export { default as ArrowUpIcon } from './ArrowUpIcon.vue';
+export { default as StopIcon } from './StopIcon.vue';
