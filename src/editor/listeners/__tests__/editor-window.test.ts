@@ -122,7 +122,7 @@ describe('initEditorWindowListener', () => {
       actions: { applyCss, applyReadability, openStylebot },
     });
 
-    const { default: init } = await import('../editor-window');
+    const { initEditorWindowListener: init } = await import('../editor-window');
     init(store);
   });
 

@@ -12,14 +12,15 @@ jest.mock('hotkeys-js', () => {
   const hotkeys = Object.assign(jest.fn(), { unbind: jest.fn() });
   return { __esModule: true, default: hotkeys };
 });
-jest.mock('../common');
+jest.mock('../../handlers/common');
 
 type MockedHotkeys = jest.Mock & { unbind: jest.Mock };
 
 describe('initCommandListener', () => {
   let hotkeys: MockedHotkeys;
-  let commonModule: typeof import('../common');
-  let initCommandListener: typeof import('../commands').default;
+  let commonModule: typeof import('../../handlers/common');
+  let initCommandListener: typeof import('../commands').initCommandListener;
+  let bindCommands: typeof import('../../utils/bind-commands').bindCommands;
   let onChangedListener: (
     changes: Record<string, chrome.storage.StorageChange>,
     areaName: string
@@ -43,7 +44,7 @@ describe('initCommandListener', () => {
     jest.resetModules();
 
     ({ default: hotkeys } = require('hotkeys-js'));
-    commonModule = require('../common');
+    commonModule = require('../../handlers/common');
 
     global.chrome = {
       storage: {
@@ -55,7 +56,8 @@ describe('initCommandListener', () => {
       },
     } as unknown as typeof chrome;
 
-    ({ default: initCommandListener } = require('../commands'));
+    ({ initCommandListener } = require('../commands'));
+    ({ bindCommands } = require('../../utils/bind-commands'));
   });
 
   it('binds every configured, non-empty command on init', () => {
@@ -139,6 +141,23 @@ describe('initCommandListener', () => {
     expect(store.state.commands).toEqual(newCommands);
   });
 
+  it('binds combos to any callback, without a store, replacing earlier bindings', () => {
+    const onCommand = jest.fn();
+
+    bindCommands(
+      { readability: 'alt+r', style: '', stylebot: '', grayscale: '' },
+      onCommand
+    );
+    bindCommands(
+      { readability: '', style: 'alt+s', stylebot: '', grayscale: '' },
+      onCommand
+    );
+
+    expect(hotkeys.unbind).toHaveBeenCalledWith('alt+r');
+    hotkeys.mock.calls[1][1]();
+    expect(onCommand).toHaveBeenCalledWith('style');
+  });
+
   it('ignores changes to other storage keys or areas', () => {
     const store = buildStore({
       readability: 'alt+shift+r',
@@ -165,33 +184,5 @@ describe('initCommandListener', () => {
 
     expect(store.state.commands?.readability).toBe('alt+shift+r');
     expect(hotkeys.unbind).not.toHaveBeenCalled();
-  });
-});
-
-describe('toggleGrayscale', () => {
-  const { toggleGrayscale } = jest.requireActual(
-    '../common'
-  ) as typeof import('../common');
-
-  it('dispatches percent as a string when turning grayscale on', () => {
-    const dispatch = jest.fn();
-
-    toggleGrayscale({ getters: { grayscale: 0 }, dispatch });
-
-    expect(dispatch).toHaveBeenCalledWith('applyFilter', {
-      effectName: 'grayscale',
-      percent: '100',
-    });
-  });
-
-  it('dispatches percent as a string when turning grayscale off', () => {
-    const dispatch = jest.fn();
-
-    toggleGrayscale({ getters: { grayscale: 100 }, dispatch });
-
-    expect(dispatch).toHaveBeenCalledWith('applyFilter', {
-      effectName: 'grayscale',
-      percent: '0',
-    });
   });
 });

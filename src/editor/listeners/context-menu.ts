@@ -1,13 +1,8 @@
 import type { Commit } from 'vuex';
-import { getSelector } from '@stylebot/css';
 
-const initContextMenuListener = ({ commit }: { commit: Commit }): void => {
-  document.addEventListener('contextmenu', event => {
-    if (event.target) {
-      const selector = getSelector(event.target as HTMLElement);
-      commit('setContextMenuSelector', selector);
-    }
-  });
+import { createContextMenuHandler } from '../handlers/context-menu';
+
+export const initContextMenuListener = (store: { commit: Commit }): void => {
+  const handle = createContextMenuHandler(store);
+  document.addEventListener('contextmenu', event => handle(event.target));
 };
-
-export default initContextMenuListener;

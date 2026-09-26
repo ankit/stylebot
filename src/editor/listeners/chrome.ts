@@ -3,28 +3,13 @@ import type { Store } from 'vuex';
 import type { State } from 'editor/store';
 import type { TabMessage } from '@stylebot/types';
 
-import { applyReadability, removeReadability } from '@stylebot/readability';
+import { createMessageHandler } from '../handlers/message';
 
-import {
-  applyStyles,
-  toggleStylebot,
-  openStylebot,
-  usesEditorWindow,
-  toggleReadability,
-  updateSelectorWithContextMenuSelector,
-} from './common';
-
-import { getStylesForPage, getIsEditorWindowOpen } from '../utils/chrome';
-
-const initChromeListener = (
+export const initChromeListener = (
   store: Store<State>,
   ready: Promise<void>
 ): void => {
-  const { state, commit, dispatch } = store;
-
-  // Re-derive readability only on real URL changes, not favicon/title-only
-  // TabUpdated events — null so the first event here still runs.
-  let lastUrl: string | null = null;
+  const handle = createMessageHandler(store, ready);
 
   chrome.runtime.onMessage.addListener(
     (message: TabMessage, _, sendResponse: (response: boolean) => void) => {
@@ -32,71 +17,7 @@ const initChromeListener = (
         return;
       }
 
-      // Handled once the store is initialized, so an early message isn't
-      // dropped. Only GetIsStylebotOpen answers, so only it holds the channel.
-      ready.then(() => handleMessage(message, sendResponse));
-      return message.name === 'GetIsStylebotOpen';
+      return handle(message, sendResponse);
     }
   );
-
-  const handleMessage = (
-    message: TabMessage,
-    sendResponse: (response: boolean) => void
-  ): void => {
-    if (message.name === 'ToggleStylebot') {
-      toggleStylebot(store);
-    } else if (message.name === 'OpenStylebot') {
-      openStylebot(store);
-    } else if (message.name === 'OpenStylebotFromContextMenu') {
-      updateSelectorWithContextMenuSelector({ state, commit });
-      openStylebot(store, false);
-    } else if (message.name === 'GetIsStylebotOpen') {
-      // A window that is open but still loading hasn't connected yet;
-      // the background knows either way.
-      if (state.visible || state.windowConnected) {
-        sendResponse(true);
-      } else if (usesEditorWindow(state)) {
-        getIsEditorWindowOpen().then(sendResponse);
-      } else {
-        sendResponse(false);
-      }
-    } else if (message.name === 'TabUpdated') {
-      if (window.location.href === lastUrl) {
-        return;
-      }
-      lastUrl = window.location.href;
-      if (state.visible || state.windowConnected) {
-        dispatch('refreshPage');
-      }
-
-      // A same-tab SPA navigation still fires this — re-derive readability
-      // for the new URL instead of trusting the previous page's flag.
-      getStylesForPage().then(({ defaultStyle }) => {
-        const readability = Boolean(defaultStyle?.readability);
-        commit('setReadability', readability);
-
-        if (readability) {
-          applyReadability();
-        } else {
-          removeReadability();
-        }
-      });
-    } else if (message.name === 'ToggleReadabilityForTab') {
-      toggleReadability({ state, dispatch });
-    } else if (message.name === 'ReadabilityStateChanged') {
-      // Keep local state in sync when a change originates outside this
-      // action (e.g. the reader's own dock), so the next toggle isn't stale.
-      commit('setReadability', message.value);
-
-      if (message.value) {
-        applyReadability();
-      } else {
-        removeReadability();
-      }
-    } else if (message.name === 'ApplyStylesToTab') {
-      applyStyles({ state, dispatch }, message.defaultStyle, message.styles);
-    }
-  };
 };
-
-export default initChromeListener;

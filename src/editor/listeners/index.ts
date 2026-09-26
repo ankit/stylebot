@@ -1,10 +1,10 @@
 import type { Store } from 'vuex';
 import type { State } from 'editor/store';
 
-import initChromeListener from './chrome';
-import initCommandListener from './commands';
-import initContextMenuListener from './context-menu';
-import initEditorWindowListener from './editor-window';
+import { initChromeListener } from './chrome';
+import { initCommandListener } from './commands';
+import { initContextMenuListener } from './context-menu';
+import { initEditorWindowListener } from './editor-window';
 import initOptionsListener from './options';
 
 /**
