@@ -2,6 +2,7 @@ import type { StyleMap } from './styles';
 import type { StylebotOptions } from './options';
 import type { StylebotCommands } from './commands';
 import type { ReadabilitySettings } from './readability';
+import type { ChatProviderId } from './chat';
 
 export type SetStyle = {
   name: 'SetStyle';
@@ -167,6 +168,26 @@ export type GetIsEditorWindowOpen = {
   tabId?: number;
 };
 
+export type ChatGetStatus = {
+  name: 'ChatGetStatus';
+};
+
+// Checks the key with the provider before storing it.
+export type ChatConnect = {
+  name: 'ChatConnect';
+  provider: ChatProviderId;
+  key: string;
+};
+
+export type ChatDisconnect = {
+  name: 'ChatDisconnect';
+};
+
+export type ChatSetModel = {
+  name: 'ChatSetModel';
+  model: string;
+};
+
 type BackgroundPageMessage =
   | SetStyle
   | EnableStyle
@@ -199,6 +220,10 @@ type BackgroundPageMessage =
   | OpenEditorWindow
   | ToggleEditorWindow
   | CloseEditorWindow
-  | GetIsEditorWindowOpen;
+  | GetIsEditorWindowOpen
+  | ChatGetStatus
+  | ChatConnect
+  | ChatDisconnect
+  | ChatSetModel;
 
 export default BackgroundPageMessage;

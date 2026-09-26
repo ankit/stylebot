@@ -180,3 +180,15 @@ export type ChatProvider = {
    */
   stream(args: ChatStreamArgs): Promise<void>;
 };
+
+/**
+ * What the editor knows about the connection; the key itself never leaves
+ * the background.
+ */
+export type ChatStatus = {
+  connected: boolean;
+  provider: ChatProviderId;
+  model: string;
+  // Enough of the key to recognise it, with its middle hidden.
+  maskedKey?: string;
+};

@@ -34,6 +34,10 @@ import {
   ToggleEditorWindow,
   CloseEditorWindow,
   GetIsEditorWindowOpen,
+  ChatGetStatus,
+  ChatConnect,
+  ChatDisconnect,
+  ChatSetModel,
 } from './messages';
 
 import { refreshBadgeForTab } from './styles';
@@ -248,6 +252,19 @@ export const initListeners = (): void => {
           break;
         case 'GetIsEditorWindowOpen':
           GetIsEditorWindowOpen(message, sender, sendResponse);
+          break;
+
+        case 'ChatGetStatus':
+          ChatGetStatus(sendResponse);
+          break;
+        case 'ChatConnect':
+          ChatConnect(message, sendResponse);
+          break;
+        case 'ChatDisconnect':
+          ChatDisconnect(sendResponse);
+          break;
+        case 'ChatSetModel':
+          ChatSetModel(message, sendResponse);
           break;
       }
 
