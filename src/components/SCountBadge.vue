@@ -32,7 +32,7 @@ export default Vue.extend({
   font-size: 10.5px;
   font-weight: 500;
   line-height: 1;
-  color: var(--accent);
+  color: var(--accent-text);
   text-align: center;
 }
 </style>

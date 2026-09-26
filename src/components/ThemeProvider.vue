@@ -38,10 +38,7 @@ export default Vue.extend({
   --hover-tint: #2e3238;
   --active: #2a2d33;
 
-  --accent: #3d7bff;
-  --accent-ink: #0f1114;
-  --accent-tint: #1e2a44;
-  --accent-tint-ink: #8ab0ff;
+  --accent-text: #7fa4e1;
 
   --selection: #2f4f8f;
   --selection-ink: #f2f4f7;
@@ -89,10 +86,9 @@ export default Vue.extend({
   --hover-tint: #f2f3f6;
   --active: #eef0f4;
 
-  --accent: #2a5fd6;
+  --accent: #286cd8;
   --accent-ink: #fff;
-  --accent-tint: #f4f7fe;
-  --accent-tint-ink: #2a5fd6;
+  --accent-text: var(--accent);
 
   --selection: #c7dbff;
   --selection-ink: #191b1f;
@@ -124,8 +120,6 @@ export default Vue.extend({
   --success: #1a7f4b;
   --success-background: #e8f5ee;
   --success-border: #c3e6d1;
-
-  --ring: var(--accent);
 
   --font-mono: 'Fira Code', Menlo, Monaco, Consolas, monospace;
 }

@@ -230,7 +230,7 @@ export default Vue.extend({
 .font-link {
   margin-top: 3px;
   border-top: 1px solid var(--panel-border);
-  color: var(--accent);
+  color: var(--accent-text);
 
   svg {
     flex: none;

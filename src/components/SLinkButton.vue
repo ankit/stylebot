@@ -22,7 +22,7 @@ export default Vue.extend({
   font: inherit;
   font-size: 13px;
   font-weight: 500;
-  color: var(--accent-tint-ink);
+  color: var(--accent-text);
   white-space: nowrap;
   cursor: pointer;
 
