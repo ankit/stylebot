@@ -214,8 +214,9 @@ test('highlighting a font previews it on the page until the picker is dismissed'
   expect(await savedCss(page)).not.toContain('Playfair');
   expect((await readRecentFonts(extension))?.[0]).not.toBe('Playfair Display');
 
-  // Escape keeps the typed text; clearing it lists the recents again.
-  await font.locator('.autocomplete-input').fill('');
+  // Escape reverts the typed text; Down lists the recents again.
+  await expect(font.locator('.autocomplete-input')).toHaveValue('');
+  await page.keyboard.press('ArrowDown');
   await menuItem(page, 'Lora').hover();
 
   await expect.poll(() => previewCss(page)).toContain('Lora');
