@@ -20,6 +20,7 @@ describe('initCommandListener', () => {
   let hotkeys: MockedHotkeys;
   let commonModule: typeof import('../common');
   let initCommandListener: typeof import('../commands').default;
+  let bindCommands: typeof import('../commands').bindCommands;
   let onChangedListener: (
     changes: Record<string, chrome.storage.StorageChange>,
     areaName: string
@@ -55,7 +56,7 @@ describe('initCommandListener', () => {
       },
     } as unknown as typeof chrome;
 
-    ({ default: initCommandListener } = require('../commands'));
+    ({ default: initCommandListener, bindCommands } = require('../commands'));
   });
 
   it('binds every configured, non-empty command on init', () => {
@@ -137,6 +138,23 @@ describe('initCommandListener', () => {
     expect(hotkeys.unbind).toHaveBeenCalledWith('alt+shift+r');
     expect(hotkeys).toHaveBeenCalledWith('ctrl+shift+t', expect.any(Function));
     expect(store.state.commands).toEqual(newCommands);
+  });
+
+  it('binds combos to any callback, without a store, replacing earlier bindings', () => {
+    const onCommand = jest.fn();
+
+    bindCommands(
+      { readability: 'alt+r', style: '', stylebot: '', grayscale: '' },
+      onCommand
+    );
+    bindCommands(
+      { readability: '', style: 'alt+s', stylebot: '', grayscale: '' },
+      onCommand
+    );
+
+    expect(hotkeys.unbind).toHaveBeenCalledWith('alt+r');
+    hotkeys.mock.calls[1][1]();
+    expect(onCommand).toHaveBeenCalledWith('style');
   });
 
   it('ignores changes to other storage keys or areas', () => {

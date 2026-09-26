@@ -2,7 +2,7 @@ import type { Store } from 'vuex';
 import hotkeys from 'hotkeys-js';
 
 import type { State } from 'editor/store';
-import type { StylebotCommandName } from '@stylebot/types';
+import type { StylebotCommandName, StylebotCommands } from '@stylebot/types';
 
 import {
   toggleStylebot,
@@ -11,7 +11,13 @@ import {
   sendToggleStyleMessage,
 } from './common';
 
-const handleCommand = (store: Store<State>, name: StylebotCommandName) => {
+/**
+ * Runs a Stylebot keyboard shortcut against the editor store.
+ */
+export const handleCommand = (
+  store: Store<State>,
+  name: StylebotCommandName
+): void => {
   switch (name) {
     case 'stylebot':
       if (store.state.host === 'window') {
@@ -38,11 +44,16 @@ const handleCommand = (store: Store<State>, name: StylebotCommandName) => {
 // Combos currently bound via hotkeys(), so a later re-bind can unbind them first.
 let boundCombos: Array<string> = [];
 
-const bindCommands = (store: Store<State>): void => {
+/**
+ * Binds each shortcut's key combo to onCommand, replacing any combos bound
+ * by an earlier call.
+ */
+export const bindCommands = (
+  commands: StylebotCommands | null,
+  onCommand: (name: StylebotCommandName) => void
+): void => {
   boundCombos.forEach(combo => hotkeys.unbind(combo));
   boundCombos = [];
-
-  const commands = store.state.commands;
 
   if (!commands) {
     return;
@@ -52,21 +63,22 @@ const bindCommands = (store: Store<State>): void => {
     const combo = commands[name];
 
     if (combo) {
-      hotkeys(combo, () => handleCommand(store, name));
+      hotkeys(combo, () => onCommand(name));
       boundCombos.push(combo);
     }
   });
 };
 
 const initCommandListener = (store: Store<State>): void => {
-  bindCommands(store);
+  const onCommand = (name: StylebotCommandName) => handleCommand(store, name);
+  bindCommands(store.state.commands, onCommand);
 
   // Shortcuts can be changed elsewhere (the reader dock, the options page)
   // while this page is already open — re-bind so they take effect immediately.
   chrome.storage.onChanged.addListener((changes, areaName) => {
     if (areaName === 'local' && changes.commands) {
       store.commit('setCommands', changes.commands.newValue);
-      bindCommands(store);
+      bindCommands(store.state.commands, onCommand);
     }
   });
 };

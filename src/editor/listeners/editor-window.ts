@@ -21,20 +21,18 @@ const SYNCED_MUTATIONS: Record<
 };
 
 /**
- * Serves a separate editor window over its port: applies what it sends,
- * forwards page-side state and inspector picks back, and cleans up any
- * in-progress inspecting or highlight when the window goes away.
+ * Returns a handler that serves a separate editor window over its port:
+ * applies what it sends, forwards page-side state and inspector picks back,
+ * and cleans up any in-progress inspecting or highlight when it goes away.
  */
-const initEditorWindowListener = (store: Store<State>): void => {
+export const createEditorWindowHandler = (
+  store: Store<State>
+): ((incoming: chrome.runtime.Port) => void) => {
   // Tears down the current connection; disconnecting a port ourselves does
   // not fire our own onDisconnect, so a replacement has to call this.
   let teardown: (() => void) | null = null;
 
-  chrome.runtime.onConnect.addListener(incoming => {
-    if (incoming.name !== REMOTE_PAGE_BRIDGE_PORT) {
-      return;
-    }
-
+  return incoming => {
     // A second window for the same tab replaces the first.
     teardown?.();
 
@@ -196,6 +194,16 @@ const initEditorWindowListener = (store: Store<State>): void => {
     });
 
     incoming.onDisconnect.addListener(cleanup);
+  };
+};
+
+const initEditorWindowListener = (store: Store<State>): void => {
+  const handle = createEditorWindowHandler(store);
+
+  chrome.runtime.onConnect.addListener(incoming => {
+    if (incoming.name === REMOTE_PAGE_BRIDGE_PORT) {
+      handle(incoming);
+    }
   });
 };
 

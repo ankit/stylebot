@@ -16,28 +16,23 @@ import {
 
 import { getStylesForPage, getIsEditorWindowOpen } from '../utils/chrome';
 
-const initChromeListener = (
+/**
+ * Returns a handler for tab messages to the editor, which answers whether it
+ * will respond asynchronously. Messages are held until `ready`, so one sent
+ * before the store has initialized isn't dropped.
+ */
+export const createMessageHandler = (
   store: Store<State>,
   ready: Promise<void>
-): void => {
+): ((
+  message: TabMessage,
+  sendResponse: (response: boolean) => void
+) => boolean) => {
   const { state, commit, dispatch } = store;
 
   // Re-derive readability only on real URL changes, not favicon/title-only
   // TabUpdated events — null so the first event here still runs.
   let lastUrl: string | null = null;
-
-  chrome.runtime.onMessage.addListener(
-    (message: TabMessage, _, sendResponse: (response: boolean) => void) => {
-      if (window !== window.top) {
-        return;
-      }
-
-      // Handled once the store is initialized, so an early message isn't
-      // dropped. Only GetIsStylebotOpen answers, so only it holds the channel.
-      ready.then(() => handleMessage(message, sendResponse));
-      return message.name === 'GetIsStylebotOpen';
-    }
-  );
 
   const handleMessage = (
     message: TabMessage,
@@ -97,6 +92,29 @@ const initChromeListener = (
       applyStyles({ state, dispatch }, message.defaultStyle, message.styles);
     }
   };
+
+  // Only GetIsStylebotOpen answers, so only it holds the channel open.
+  return (message, sendResponse) => {
+    ready.then(() => handleMessage(message, sendResponse));
+    return message.name === 'GetIsStylebotOpen';
+  };
+};
+
+const initChromeListener = (
+  store: Store<State>,
+  ready: Promise<void>
+): void => {
+  const handle = createMessageHandler(store, ready);
+
+  chrome.runtime.onMessage.addListener(
+    (message: TabMessage, _, sendResponse: (response: boolean) => void) => {
+      if (window !== window.top) {
+        return;
+      }
+
+      return handle(message, sendResponse);
+    }
+  );
 };
 
 export default initChromeListener;
