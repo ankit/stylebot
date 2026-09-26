@@ -1,5 +1,5 @@
 import type { Timestamp } from './shared';
-import type { Style } from './styles';
+import type { CompiledStyles, Style } from './styles';
 import type { StylebotOptions } from './options';
 import type { StylebotCommands } from './commands';
 import type { ReadabilitySettings } from './readability';
@@ -27,6 +27,7 @@ export type GetCommandsResponse = StylebotCommands;
 export type GetReadabilitySettingsResponse = ReadabilitySettings;
 
 export type GetImportCssResponse = string;
+export type GetCompiledStylesResponse = CompiledStyles;
 export type GetGoogleWebFontExistsResponse = boolean;
 
 /**
@@ -61,6 +62,7 @@ type BackgroundPageMessageResponse =
   | GetCommandsResponse
   | GetReadabilitySettingsResponse
   | GetImportCssResponse
+  | GetCompiledStylesResponse
   | GetGoogleWebFontExistsResponse
   | RunGoogleDriveSyncResponse
   | ScanVersionHistoryResponse

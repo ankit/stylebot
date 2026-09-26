@@ -11,6 +11,7 @@ import {
   getImportCss,
   getGoogleWebFontExists,
   applyStylesToAllTabs,
+  ensureCompiledStyles,
 } from './styles';
 
 import { getIsReadabilityActive, updateIcon } from './badge';
@@ -36,6 +37,7 @@ import type {
   ReadabilityActiveChanged as ReadabilityActiveChangedType,
   SetReadabilitySettings as SetReadabilitySettingsType,
   GetImportCss as GetImportCssType,
+  GetCompiledStylesResponse,
   GetGoogleWebFontExists as GetGoogleWebFontExistsType,
   RunGoogleDriveSync as RunGoogleDriveSyncType,
   ScanVersionHistory as ScanVersionHistoryType,
@@ -252,6 +254,12 @@ export const GetImportCss = async (
 ): Promise<void> => {
   const css = await getImportCss(message.url);
   sendResponse(css);
+};
+
+export const GetCompiledStyles = async (
+  sendResponse: (response: GetCompiledStylesResponse) => void
+): Promise<void> => {
+  sendResponse(await ensureCompiledStyles());
 };
 
 export const GetGoogleWebFontExists = async (
