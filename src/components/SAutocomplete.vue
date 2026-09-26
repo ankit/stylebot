@@ -4,6 +4,7 @@
     class="autocomplete"
     retain-focus
     :trigger-field="() => $refs.input"
+    :current-item="currentItem"
     @cancel="onCancel"
     @leave="$emit('leave', value)"
   >
@@ -188,6 +189,7 @@ export default Vue.extend({
     pointerPick: boolean;
     quietFocus: boolean;
     typedAhead: string | null;
+    edited: boolean;
   } {
     return {
       suppressReopen: false,
@@ -201,6 +203,9 @@ export default Vue.extend({
       quietFocus: false,
       // Keys typed on the chips before the field they reveal has mounted.
       typedAhead: null,
+      // Whether the text changed since editing began; until it does, the
+      // selected item is the current one for the menu.
+      edited: false,
       // The mouseup that ends a focusing click would collapse the
       // select-on-focus selection to a caret; swallow that one mouseup.
       keepSelectionOnMouseUp: false,
@@ -230,6 +235,14 @@ export default Vue.extend({
   methods: {
     menu(): AnchoredMenuRef {
       return this.$refs.menu as unknown as AnchoredMenuRef;
+    },
+
+    currentItem(): HTMLElement | null {
+      return this.edited
+        ? null
+        : this.$el.querySelector<HTMLElement>(
+            '.autocomplete-menu .menu-item.selected'
+          );
     },
 
     showMenu(): void {
@@ -273,6 +286,7 @@ export default Vue.extend({
     },
 
     onInput(value: string): void {
+      this.edited = true;
       this.$emit('input', value);
       this.resize();
       // `items` updates on the parent's next render, so defer the open/close
@@ -302,6 +316,7 @@ export default Vue.extend({
         this.$emit('input', this.typedAhead);
         this.typedAhead = null;
         this.startSession(false);
+        this.edited = true;
         return;
       }
 
@@ -324,6 +339,8 @@ export default Vue.extend({
     // then opens the menu once `items` reflect the consumer's reaction to
     // focus (e.g. listing everything while the value is untouched).
     startSession(select = this.selectOnFocus): void {
+      this.edited = false;
+
       if (select) {
         (this.$refs.input as HTMLTextAreaElement | undefined)?.select();
       }

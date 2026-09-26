@@ -438,6 +438,79 @@ export const DefaultPickKeepsFocus: StoryObj = {
   },
 };
 
+const RECENTS = ['Lora', 'Merriweather', 'Playfair Display', 'Roboto'];
+
+export const ArrowsStartFromSelected: StoryObj = {
+  ...editor({
+    ...WITH_RULE,
+    options: { fonts: RECENTS },
+  }),
+  name: 'arrow keys start from the applied font until the text is edited',
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+    const text = await openPicker(canvasElement);
+    await findOpenMenu(canvas);
+
+    await step('Down moves to the font after the applied one', async () => {
+      await pressKey('ArrowDown');
+      await waitFor(() =>
+        expect(
+          canvas.getByRole('menuitem', { name: /^Playfair Display/ })
+        ).toHaveFocus()
+      );
+    });
+
+    await step('Up from the field moves to the font before it', async () => {
+      await pressKey('Escape');
+      await waitFor(() => expect(text).toHaveFocus());
+      await pressKey('ArrowDown');
+      await findOpenMenu(canvas);
+      await pressKey('ArrowUp');
+      await waitFor(() =>
+        expect(canvas.getByRole('menuitem', { name: /^Lora/ })).toHaveFocus()
+      );
+    });
+
+    await step('once edited, Down starts from the first match', async () => {
+      await pressKey('Escape');
+      await waitFor(() => expect(text).toHaveFocus());
+      await user.keyboard('ro');
+      await menuItem(canvas, 'Roboto');
+      await pressKey('ArrowDown');
+      await waitFor(() =>
+        expect(canvas.getAllByRole('menuitem')[0]).toHaveFocus()
+      );
+    });
+  },
+};
+
+const MANY_RECENTS = Array.from({ length: 30 }, (_, i) => `Font${i + 1}`);
+
+export const OpensScrolledToSelected: StoryObj = {
+  ...editor({
+    css: 'h1 { font-family: Font28; }',
+    activeSelector: 'h1',
+    options: { fonts: MANY_RECENTS },
+  }),
+  name: 'a long list opens scrolled to the applied font',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await openPicker(canvasElement);
+    const menu = await findOpenMenu(canvas);
+
+    const selected = menu.querySelector('.menu-item.selected') as HTMLElement;
+    await expect(selected).toHaveTextContent('Font28');
+
+    const list = menu.closest('.autocomplete-menu') ?? menu;
+    await waitFor(() => {
+      const box = list.getBoundingClientRect();
+      const row = selected.getBoundingClientRect();
+      expect(row.top).toBeGreaterThanOrEqual(box.top);
+      expect(row.bottom).toBeLessThanOrEqual(box.bottom);
+    });
+  },
+};
+
 export const BrowseDiscardsDraft: StoryObj = {
   ...editor({ css: 'h1 { color: red; }', activeSelector: 'h1' }),
   name: 'browsing Google Fonts discards typed text instead of showing it unapplied',
