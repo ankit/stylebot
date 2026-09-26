@@ -1,0 +1,58 @@
+---
+import Base from '../../layouts/Base.astro';
+import { LINKS } from '../../lib/links';
+---
+
+<Base title="What's new in 3.1">
+  <main class="prose">
+    <h1>What's new in 3.1</h1>
+
+    <h2>Sync and backup with Google Drive</h2>
+    <figure>
+      <img
+        src="/images/releases/3.1/sync.gif"
+        height="400"
+        alt="Syncing styles with Google Drive"
+      />
+    </figure>
+    <p>
+      Turn on and authorize sync with Google Drive from the Stylebot{' '}
+      <strong>Options page</strong>.
+    </p>
+    <p>
+      Once it's on, click <strong>Sync Now</strong> in the popup or the Options
+      page to sync your browser's styles with the ones backed up on Google
+      Drive.
+    </p>
+
+    <h2>Resize the Stylebot editor</h2>
+    <figure>
+      <img
+        src="/images/releases/3.1/resize.gif"
+        height="400"
+        alt="Resizing the Stylebot editor"
+      />
+    </figure>
+    <p>
+      You can now resize the Stylebot editor, and optionally have the page
+      shrink so its content doesn't sit under the editor.
+    </p>
+
+    <h2>Color palettes</h2>
+    <figure>
+      <img
+        src="/images/releases/3.1/colors.gif"
+        height="400"
+        alt="Picking a color from a palette"
+      />
+    </figure>
+    <p>
+      An improved color picker with palettes makes it easier to pick good
+      colors.
+    </p>
+
+    <h2>
+      And lots of <a href={LINKS.changelog}>bug fixes</a>
+    </h2>
+  </main>
+</Base>

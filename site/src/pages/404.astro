@@ -1,0 +1,271 @@
+---
+import Base from '../layouts/Base.astro';
+import NotFound from '../components/NotFound';
+---
+
+<Base title="Page not found" description="This page doesn't exist.">
+  <main class="nf-wrap">
+    <NotFound client:load />
+  </main>
+</Base>
+
+<style is:global>
+  .nf-wrap {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 56px 24px 0;
+  }
+
+  .nf-intro {
+    max-width: 640px;
+    margin-bottom: 28px;
+  }
+
+  .nf-code {
+    margin-bottom: 12px;
+    font: 500 12px/1 var(--mono);
+    color: var(--faint);
+  }
+
+  .nf-intro h1 {
+    margin: 0;
+    font: 700 clamp(26px, 3.2vw, 34px) / 1.15 var(--display);
+    letter-spacing: -0.025em;
+    color: var(--ink);
+    text-wrap: balance;
+  }
+
+  .nf-intro p {
+    margin: 10px 0 0;
+    font: 400 16px/1.55 var(--ui);
+    color: var(--muted);
+  }
+
+  .nf-body {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    align-items: flex-start;
+  }
+
+  .nf-window {
+    flex: 1 1 440px;
+    min-width: 0;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 18px 44px rgba(25, 27, 31, 0.1);
+  }
+
+  .nf-chrome {
+    height: 36px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 12px;
+    background: #eceef1;
+    border-bottom: 1px solid #dcdfe4;
+  }
+
+  .nf-lights {
+    display: flex;
+    gap: 5px;
+  }
+
+  .nf-lights span {
+    width: 9px;
+    height: 9px;
+    border-radius: 5px;
+    background: #cfd3d9;
+  }
+
+  .nf-url {
+    flex: 1;
+    max-width: 320px;
+    height: 22px;
+    border-radius: 11px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    font: 400 11px/1 var(--mono);
+    color: #5f6672;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .nf-page {
+    min-height: 420px;
+    display: flex;
+  }
+
+  .nf-hr {
+    margin: 16px 0 6px;
+    border: none;
+    border-top: 1px solid #aaa;
+  }
+
+  .nf-addr {
+    font:
+      italic 400 15px/1.3 'Times New Roman',
+      Times,
+      serif;
+    color: #000;
+  }
+
+  .nf-panel {
+    flex: 0 1 320px;
+    min-width: 280px;
+    background: #fff;
+    border: 1px solid #e4e6ea;
+    border-radius: 14px;
+    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.14);
+    overflow: hidden;
+    font-family: 'Public Sans', system-ui;
+  }
+
+  .nf-panel-head {
+    height: 44px;
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    border-bottom: 1px solid #e9eaee;
+    font:
+      400 13px/1 'Public Sans',
+      system-ui;
+    color: #3f4550;
+  }
+
+  .nf-panel-pick {
+    padding: 12px 14px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    border-bottom: 1px solid #e9eaee;
+  }
+
+  .nf-picker {
+    width: 36px;
+    height: 36px;
+    flex: none;
+    border-radius: 9px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f2f3f6;
+    color: #191b1f;
+  }
+
+  .nf-picker.is-on {
+    background: #2a5fd6;
+    color: #fff;
+    box-shadow:
+      0 0 0 2px #fff,
+      0 0 0 4px #2a5fd6;
+  }
+
+  .nf-selector {
+    flex: 1;
+    min-width: 0;
+    height: 36px;
+    border-radius: 9px;
+    border: 1px solid #d9dce2;
+    display: flex;
+    align-items: center;
+    padding: 0 11px;
+    font:
+      400 12px/1 'IBM Plex Mono',
+      monospace;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .nf-controls {
+    background: #f5f6f8;
+  }
+
+  .nf-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 14px;
+    border-bottom: 1px solid #ecedf0;
+  }
+
+  .nf-row > span {
+    width: 52px;
+    flex: none;
+    font:
+      400 12.5px/1 'Public Sans',
+      system-ui;
+    color: #3f4550;
+  }
+
+  .nf-row > div {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    justify-content: flex-end;
+  }
+
+  .nf-step {
+    width: 30px;
+    height: 28px;
+    border-radius: 7px;
+    border: 1px solid #d9dce2;
+    background: #fff;
+    cursor: pointer;
+    color: #3f4550;
+  }
+
+  .nf-size {
+    min-width: 48px;
+    text-align: center;
+    font:
+      500 12px/28px 'IBM Plex Mono',
+      monospace;
+    color: #191b1f;
+  }
+
+  .nf-actions {
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .nf-nice {
+    height: 40px;
+    border-radius: 9px;
+    border: none;
+    background: #191b1f;
+    color: #fff;
+    cursor: pointer;
+    font:
+      600 13.5px/1 'Public Sans',
+      system-ui;
+  }
+
+  .nf-nice:hover {
+    background: #3f4550;
+  }
+
+  .nf-reset {
+    height: 34px;
+    border-radius: 9px;
+    border: 1px solid #d9dce2;
+    background: #fff;
+    color: #3f4550;
+    cursor: pointer;
+    font:
+      600 12.5px/1 'Public Sans',
+      system-ui;
+  }
+
+  .nf-reset:hover {
+    background: #f2f3f6;
+  }
+</style>

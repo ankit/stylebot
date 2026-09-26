@@ -1,0 +1,524 @@
+---
+import CarouselNav from './CarouselNav.astro';
+
+const chevron = `<svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5"></path></svg>`;
+---
+
+<section id="features" class="section features">
+  <div class="section-inner">
+    <div class="section-head">
+      <h2 class="section-title" style="max-width:22ch">
+        Everything else you get.
+      </h2>
+      <CarouselNav target="features-track" label="feature" />
+    </div>
+    <div id="features-track" class="carousel features-track">
+      <article class="feature">
+        <div class="feature-mock" aria-hidden="true">
+          <div data-ed class="mock-card">
+            <div class="sync-head">
+              <span class="mock-title">Connected to Google Drive</span>
+              <span class="sync-pill">
+                <span class="dot"></span>Synced 17 minutes ago
+              </span>
+            </div>
+            <div class="sync-grid">
+              <span class="muted">Saved to</span>
+              <span class="sync-path">
+                you@gmail.com <span class="faint">›</span>
+                <span class="sync-file">stylebot/backup.json ↗</span>
+              </span>
+              <span class="muted">Schedule</span>
+              <span>Every 30 minutes, and right after you edit a style</span>
+            </div>
+            <div class="sync-actions">
+              <span class="mock-btn">
+                <svg
+                  width="13"
+                  height="13"
+                  viewBox="0 0 14 14"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.4"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M12 5.5A5 5 0 0 0 3 4M2 8.5A5 5 0 0 0 11 10"></path>
+                  <path d="M3 1.5V4h2.5M11 12.5V10H8.5"></path>
+                </svg>
+                Sync now
+              </span>
+              <span class="mock-link">Disconnect</span>
+            </div>
+          </div>
+        </div>
+        <div class="feature-text">
+          <h3>Sync</h3>
+          <p>
+            Connect Google Drive and your styles follow you to every computer
+            you sign in to. Stylebot syncs every 30 minutes and right after you
+            edit.
+          </p>
+        </div>
+      </article>
+
+      <article class="feature">
+        <div class="feature-mock" aria-hidden="true">
+          <div data-ed class="mock-card">
+            <div class="hist-day">Today, Sep 25</div>
+            <div class="hist-row">
+              <span class="hist-time">1:04 AM</span>
+              <span class="hist-what">
+                <span style="color:var(--ink2)">No changes</span>
+              </span>
+              <span class="faint">10 sites</span>
+              <span class="hist-current">Current</span>
+            </div>
+            <div class="hist-row">
+              <span class="hist-time">12:41 AM</span>
+              <span class="hist-what">
+                <span class="acc">Edited</span>&nbsp; <b>github.com</b>
+              </span>
+              <span class="faint">10 sites</span>
+              <span class="hist-chev" set:html={chevron} />
+            </div>
+            <div class="hist-day">Yesterday, Sep 24</div>
+            <div class="hist-row last">
+              <span class="hist-time">11:41 PM</span>
+              <span class="hist-what">
+                <span class="acc">Edited</span>&nbsp;{' '}
+                <b>news.ycombinator.com</b>
+              </span>
+              <span class="faint">10 sites</span>
+              <span class="hist-chev" set:html={chevron} />
+            </div>
+          </div>
+        </div>
+        <div class="feature-text">
+          <h3>Version history</h3>
+          <p>
+            Every change to your styles is kept, newest first. Open an entry to
+            see what changed and restore it in one click.
+          </p>
+        </div>
+      </article>
+
+      <article class="feature">
+        <div class="feature-mock" aria-hidden="true">
+          <div data-ed class="mock-card">
+            <div class="chat-log">
+              <div class="chat-bubble">
+                give this site an Everforest theme with nicer fonts
+              </div>
+              <div class="chat-reply">
+                Done. I switched the page to Everforest colours with Lora and
+                Newsreader, and added the CSS to your style.
+              </div>
+              <div class="chat-meta">
+                <span class="chat-added">+41 lines</span>
+                <span class="mock-link">View in Code</span>
+              </div>
+            </div>
+            <div class="chat-compose">
+              <div class="chat-input">
+                <span>Describe a change…</span>
+                <span class="chat-send">
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 12 12"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.6"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M6 10V2M2.5 5.5 6 2l3.5 3.5"></path>
+                  </svg>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="feature-text">
+          <h3>Stylebot agent</h3>
+          <p>
+            Describe the change you want. The agent finds the right elements,
+            writes the CSS, and adds it to the site's style, where you can undo
+            it or edit it by hand. Bring your own Claude or OpenAI key; it stays
+            in your browser.
+          </p>
+        </div>
+      </article>
+
+      <article class="feature">
+        <div class="feature-mock" aria-hidden="true">
+          <div data-ed class="preset-list">
+            <div class="mock-card preset">
+              <div class="preset-head">
+                <span class="mock-title">Readability</span>
+                <span class="switch on">
+                  <span></span>
+                </span>
+                <span class="preset-note">Articles only</span>
+              </div>
+              <div class="preset-body">
+                A clean reading view, with your choice of theme, font, and size.
+              </div>
+            </div>
+            <div class="mock-card preset">
+              <div class="preset-head">
+                <span class="mock-title">Grayscale</span>
+                <span class="switch">
+                  <span></span>
+                </span>
+              </div>
+              <div class="preset-body">Apply grayscale to the page.</div>
+            </div>
+          </div>
+        </div>
+        <div class="feature-text">
+          <h3>Presets</h3>
+          <p>
+            Readability and grayscale work on any site, and they stack with your
+            own changes.
+          </p>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<style>
+  .features {
+    background: var(--surface);
+  }
+
+  .features-track {
+    padding-bottom: 4px;
+  }
+
+  .feature {
+    flex: 0 0 min(440px, 86%);
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  .feature-text {
+    min-width: 0;
+    padding: 0 4px;
+  }
+
+  .feature-text h3 {
+    font: 600 20px/1.25 var(--display);
+    letter-spacing: -0.015em;
+    margin: 0 0 8px;
+    color: var(--ink);
+  }
+
+  .feature-text p {
+    font: 400 15px/1.6 var(--ui);
+    color: var(--muted);
+    margin: 0;
+    max-width: 44ch;
+    text-wrap: pretty;
+  }
+
+  .feature-mock {
+    height: 400px;
+    border-radius: 16px;
+    background: var(--fill);
+    border: 1px solid var(--border);
+    display: grid;
+    align-content: center;
+    padding: 24px;
+    overflow: hidden;
+    color: var(--ink);
+    font: 400 12.5px/1.4 var(--ui);
+  }
+
+  .feature-mock > [data-ed] {
+    color: var(--ink);
+  }
+
+  .mock-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .mock-title {
+    font: 600 14px/1.25 var(--ui);
+    color: var(--ink);
+  }
+
+  .mock-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 13px;
+    border-radius: 8px;
+    border: 1px solid var(--strong);
+    background: var(--surface);
+    font: 600 12.5px/1 var(--ui);
+    color: var(--ink);
+  }
+
+  .mock-link {
+    font: 600 12.5px/1 var(--ui);
+    color: var(--acc);
+  }
+
+  .muted {
+    color: var(--muted);
+  }
+
+  .faint {
+    color: var(--faint);
+    flex: none;
+  }
+
+  .acc {
+    color: var(--acc);
+  }
+
+  .sync-head {
+    padding: 14px 16px;
+    background: var(--fill);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .sync-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 9px;
+    border-radius: 12px;
+    border: 1px solid #bfe3cc;
+    background: #eef8f1;
+    font: 600 11.5px/1 var(--ui);
+    color: #1f7a45;
+  }
+
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 3px;
+    background: #1f8a4c;
+  }
+
+  .sync-grid {
+    padding: 14px 16px;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 10px 18px;
+  }
+
+  .sync-path {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .sync-file {
+    font: 400 11.5px/1.4 var(--mono);
+    color: var(--acc);
+  }
+
+  .sync-actions {
+    padding: 0 16px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .hist-day {
+    padding: 10px 16px;
+    background: var(--fill);
+    border-bottom: 1px solid var(--border);
+    color: var(--muted);
+    line-height: 1.2;
+  }
+
+  .hist-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    font: 400 13px/1.2 var(--ui);
+  }
+
+  .hist-row.last {
+    border-bottom: none;
+  }
+
+  .hist-row b {
+    font-weight: 600;
+  }
+
+  .hist-time {
+    width: 66px;
+    flex: none;
+    color: var(--muted);
+  }
+
+  .hist-what {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .hist-current {
+    padding: 4px 9px;
+    border-radius: 10px;
+    border: 1px solid var(--accline);
+    background: var(--acctint);
+    font: 600 11.5px/1 var(--ui);
+    color: var(--acc);
+    flex: none;
+  }
+
+  .hist-chev {
+    width: 52px;
+    flex: none;
+    display: flex;
+    justify-content: flex-end;
+    color: var(--faint);
+  }
+
+  .chat-log {
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .chat-bubble {
+    align-self: flex-end;
+    max-width: 86%;
+    padding: 9px 12px;
+    border-radius: 12px 12px 4px 12px;
+    background: var(--hover);
+    font: 400 13px/1.45 var(--ui);
+  }
+
+  .chat-reply {
+    font: 400 13px/1.5 var(--ui);
+    color: var(--ink2);
+    text-wrap: pretty;
+  }
+
+  .chat-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .chat-added {
+    font: 500 11.5px/1 var(--mono);
+    color: #1f8a4c;
+  }
+
+  .chat-compose {
+    padding: 10px 12px 12px;
+    border-top: 1px solid var(--border);
+  }
+
+  .chat-input {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 6px 6px 14px;
+    border-radius: 12px;
+    min-height: 44px;
+    border: 1px solid var(--strong);
+    background: var(--surface);
+    font: 400 13px/1.4 var(--ui);
+    color: var(--faint);
+  }
+
+  .chat-input > span:first-child {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .chat-send {
+    width: 30px;
+    height: 30px;
+    flex: none;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--ink);
+    color: var(--surface);
+  }
+
+  .preset-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .preset {
+    padding: 14px 16px;
+  }
+
+  .preset-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .preset-note {
+    margin-left: auto;
+    font: 400 12px/1 var(--ui);
+    color: var(--muted);
+  }
+
+  .preset-body {
+    margin-top: 8px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .switch {
+    width: 36px;
+    height: 20px;
+    border-radius: 10px;
+    flex: none;
+    position: relative;
+    background: var(--strong);
+  }
+
+  .switch > span {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  }
+
+  .switch.on {
+    background: var(--acc);
+  }
+
+  .switch.on > span {
+    left: 18px;
+  }
+</style>

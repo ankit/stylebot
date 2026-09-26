@@ -1,0 +1,53 @@
+---
+import { BROWSERS, STORES } from '../lib/links';
+
+type Props = {
+  index: 0 | 1 | 2;
+  format: 'add' | 'add-free' | 'name' | 'reinstall';
+  class?: string;
+};
+
+const { index, format, class: className } = Astro.props;
+const store = STORES[BROWSERS[index]];
+const label = {
+  add: `Add to ${store.name}`,
+  'add-free': `Add to ${store.name} — it’s free`,
+  name: store.name,
+  reinstall: `Reinstall for ${store.name}`,
+}[format];
+---
+
+<a
+  href={store.href}
+  class={className}
+  data-store-slot={index}
+  data-store-format={format}
+>
+  {label}
+</a>
+
+<script>
+  import { BROWSERS, STORES, type Browser } from '../lib/links';
+
+  const ua = navigator.userAgent;
+  const current: Browser = /Firefox\//.test(ua)
+    ? 'firefox'
+    : /Edg\//.test(ua)
+      ? 'edge'
+      : 'chrome';
+  const order = [current, ...BROWSERS.filter((b) => b !== current)];
+
+  document
+    .querySelectorAll<HTMLAnchorElement>('[data-store-slot]')
+    .forEach((link) => {
+      const store = STORES[order[Number(link.dataset.storeSlot)]];
+      link.href = store.href;
+      const labels: Record<string, string> = {
+        add: `Add to ${store.name}`,
+        'add-free': `Add to ${store.name} — it’s free`,
+        name: store.name,
+        reinstall: `Reinstall for ${store.name}`,
+      };
+      link.textContent = labels[link.dataset.storeFormat!];
+    });
+</script>

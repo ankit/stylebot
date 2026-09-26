@@ -2,42 +2,28 @@
   "name": "@stylebot/site",
   "private": true,
   "description": "Stylebot landing page",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": "Ankit Ahuja",
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "deploy": "astro build && gh-pages -d dist -b gh-pages -t"
+  },
   "dependencies": {
-    "@emotion/react": "^11.1.5",
-    "@emotion/styled": "^11.3.0",
-    "gatsby": "^2.23.12",
-    "gatsby-image": "^2.4.9",
-    "gatsby-plugin-emotion": "^6.4.0",
-    "gatsby-plugin-manifest": "^2.4.14",
-    "gatsby-plugin-offline": "^3.2.13",
-    "gatsby-plugin-react-helmet": "^3.3.6",
-    "gatsby-plugin-sharp": "^2.6.14",
-    "gatsby-source-filesystem": "^2.3.14",
-    "gatsby-transformer-sharp": "^2.5.7",
-    "prop-types": "^15.7.2",
-    "react": "^16.12.0",
-    "react-dom": "^16.12.0",
-    "react-helmet": "^6.1.0"
+    "@astrojs/preact": "^6.0.5",
+    "astro": "^7.3.5",
+    "preact": "^10.29.8"
   },
   "devDependencies": {
-    "gatsby-plugin-google-analytics": "^2.3.13",
-    "gh-pages": "^3.1.0",
-    "prettier": "2.0.5",
-    "pure-react-carousel": "^1.27.1"
-  },
-  "keywords": [
-    "gatsby"
-  ],
-  "scripts": {
-    "build": "gatsby build",
-    "develop": "gatsby develop",
-    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\"",
-    "start": "npm run develop",
-    "serve": "gatsby serve",
-    "clean": "gatsby clean",
-    "test": "echo \"Write tests! -> https://gatsby.dev/unit-testing\" && exit 1",
-    "deploy": "gatsby build && gh-pages -d public -b gh-pages"
+    "@astrojs/check": "^0.9.10",
+    "@emnapi/core": "^1.11.3",
+    "@emnapi/runtime": "^1.11.3",
+    "gh-pages": "^6.3.0",
+    "prettier": "^3.9.9",
+    "prettier-plugin-astro": "^1.1.0",
+    "typescript": "^6"
   }
 }

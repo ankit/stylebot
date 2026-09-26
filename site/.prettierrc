@@ -1,5 +1,7 @@
 {
   "semi": true,
-  "tabWidth": 2, 
-  "printWidth": 80
+  "singleQuote": true,
+  "tabWidth": 2,
+  "printWidth": 80,
+  "plugins": ["prettier-plugin-astro"]
 }

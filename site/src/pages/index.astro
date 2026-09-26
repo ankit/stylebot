@@ -1,0 +1,209 @@
+---
+import Base from '../layouts/Base.astro';
+import Demo from '../components/demo/Demo';
+import Gallery from '../components/Gallery.astro';
+import Features from '../components/Features.astro';
+import Footer from '../components/Footer.astro';
+import StoreLink from '../components/StoreLink.astro';
+import { LINKS } from '../lib/links';
+---
+
+<Base footer={false} storeCta>
+  <main>
+    <div class="hero">
+      <h1>Restyle any website.</h1>
+      <p>
+        Point at something on the page and change it, or just describe what you
+        want. Stylebot writes the CSS and loads your style every time you come
+        back.
+      </p>
+      <div class="cta">
+        <div class="cta-row">
+          <StoreLink index={0} format="add-free" class="btn btn-primary" />
+          <span class="cta-also">
+            Also on <StoreLink index={1} format="name" class="ink-link" /> and{' '}
+            <StoreLink index={2} format="name" class="ink-link" />
+          </span>
+        </div>
+        <div class="stats">
+          <span>
+            <strong>200,000+</strong> users
+          </span>
+          <span class="sep">·</span>
+          <a href={LINKS.github}>
+            <strong>1.6k</strong> stars on GitHub
+          </a>
+          <span class="sep">·</span>
+          <span>Open source since 2011</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="demo-wrap">
+      <Demo client:visible />
+    </div>
+
+    <Gallery />
+    <Features />
+
+    <section id="install" class="section">
+      <div class="install">
+        <h2>Install Stylebot</h2>
+        <p>
+          Free and open source since 2011. No account and no tracking. Your
+          styles live in your browser, and the code is on GitHub.
+        </p>
+        <div class="install-buttons">
+          <StoreLink index={0} format="add" class="btn btn-primary" />
+          <StoreLink index={1} format="name" class="btn btn-outline" />
+          <StoreLink index={2} format="name" class="btn btn-outline" />
+        </div>
+        <Footer />
+      </div>
+    </section>
+  </main>
+</Base>
+
+<style>
+  .hero {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 88px 24px 44px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .hero h1 {
+    font: 700 clamp(36px, 5.4vw, 58px) / 1.04 var(--display);
+    letter-spacing: -0.035em;
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  .hero p {
+    font: 400 18px/1.55 var(--ui);
+    color: var(--muted);
+    margin: 0;
+    max-width: 48ch;
+    text-wrap: pretty;
+  }
+
+  .cta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .cta-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+  }
+
+  .cta-also,
+  .stats {
+    font: 400 13px/1.4 var(--ui);
+    color: var(--muted);
+  }
+
+  .cta-also :global(.ink-link) {
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-color: var(--strong);
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1.5px;
+  }
+
+  .cta-also :global(.ink-link:hover) {
+    text-decoration-color: var(--ink);
+  }
+
+  .stats {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 6px 12px;
+    max-width: 100%;
+  }
+
+  .stats > * {
+    white-space: nowrap;
+  }
+
+  .stats strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .stats a {
+    color: var(--muted);
+  }
+
+  .stats a:hover {
+    color: var(--ink);
+  }
+
+  .stats .sep {
+    color: var(--faint);
+  }
+
+  .demo-wrap {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 24px 88px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  .install {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 80px 24px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 18px;
+  }
+
+  .install h2 {
+    font: 700 clamp(28px, 3.4vw, 40px) / 1.1 var(--display);
+    letter-spacing: -0.03em;
+    margin: 0;
+  }
+
+  .install p {
+    font: 400 16px/1.55 var(--ui);
+    color: var(--muted);
+    margin: 0;
+    max-width: 52ch;
+  }
+
+  .install-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 6px;
+  }
+
+  .install :global(.site-footer) {
+    width: 100%;
+  }
+
+  @media (max-width: 600px) {
+    .hero {
+      padding-top: 56px;
+    }
+
+    .demo-wrap {
+      padding-bottom: 64px;
+    }
+  }
+</style>

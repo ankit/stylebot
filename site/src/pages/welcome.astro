@@ -1,0 +1,26 @@
+---
+import Base from '../layouts/Base.astro';
+import Demo from '../components/demo/Demo';
+---
+
+<Base
+  title="Welcome"
+  description="How Stylebot works, start to finish, in about a minute."
+>
+  <main class="welcome">
+    <Demo
+      client:load
+      variant="welcome"
+      heading="Stylebot is installed."
+      lede="Here's how it works, start to finish, in about a minute."
+    />
+  </main>
+</Base>
+
+<style>
+  .welcome {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 56px 24px 64px;
+  }
+</style>

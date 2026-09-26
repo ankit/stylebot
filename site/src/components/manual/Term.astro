@@ -1,0 +1,11 @@
+---
+type Props = { term?: string };
+const { term } = Astro.props;
+---
+
+<div class="term">
+  <dt>{term ?? <slot name="term" />}</dt>
+  <dd>
+    <slot />
+  </dd>
+</div>

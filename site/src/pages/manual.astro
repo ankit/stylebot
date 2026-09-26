@@ -1,0 +1,618 @@
+---
+import Base from '../layouts/Base.astro';
+import Callout from '../components/manual/Callout.astro';
+import Keys from '../components/manual/Keys.astro';
+import Shot from '../components/manual/Shot.astro';
+import Term from '../components/manual/Term.astro';
+import Terms from '../components/manual/Terms.astro';
+import { LINKS } from '../lib/links';
+
+const toc = [
+  ['launch', 'Opening Stylebot'],
+  ['basic', 'Basic editor'],
+  ['code', 'Code editor'],
+  ['agent', 'Stylebot agent'],
+  ['presets', 'Presets'],
+  ['sync', 'Sync and backup'],
+  ['history', 'Version history'],
+  ['urls', 'URL rules'],
+  ['layout', 'Resizing and docking'],
+  ['shortcuts', 'Keyboard shortcuts'],
+  ['requests', 'Bugs and feature requests'],
+  ['support', 'Support Stylebot'],
+];
+
+const wildcards = [
+  ['**', 'Matches any character sequence.'],
+  ['*', 'Matches any character sequence until a / is found.'],
+  [',', 'Separates a list of patterns. A URL matches if any pattern matches.'],
+  ['^', 'At the start of a URL, turns it into a regular expression.'],
+];
+
+const examples = [
+  ['docs.google.com', 'The domain docs.google.com or any of its subdomains.'],
+  ['docs**', 'Any URL beginning with docs.'],
+  [
+    'docs*.google.com',
+    'docs.google.com, docs1.google.com, docs2.google.com and so on.',
+  ],
+  ['*.ycombinator.com', 'news.ycombinator.com and apps.ycombinator.com.'],
+  [
+    'docs.google.com, spreadsheets.google.com',
+    'Either domain, or any of their subdomains.',
+  ],
+  ['^http://www.reddit.com/$', 'The Reddit homepage only.'],
+];
+
+type Shortcut = [string, string[] | null, string?];
+
+const globalShortcuts: Shortcut[] = [
+  ['Toggle editor', ['alt', 'shift', 'M']],
+  ['Toggle styling', ['alt', 'shift', 'T']],
+  ['Toggle readability', null],
+  ['Toggle grayscale', null],
+];
+
+const editorShortcuts: Shortcut[] = [
+  ['Element picker', ['I']],
+  ['Basic tab', ['B']],
+  ['Code tab', ['C']],
+  ['Presets tab', ['P']],
+  ['Show or hide selected elements', ['H']],
+  ['Adjust page layout', ['A']],
+  ['Resize the editor', ['S']],
+  ['Dock left or right', ['L', 'R'], 'or'],
+  ['Open in a separate window', ['W']],
+  ['Show shortcuts', ['?']],
+];
+
+const shortcutGroups = [
+  { title: 'Global', rows: globalShortcuts },
+  { title: 'In the editor', rows: editorShortcuts },
+];
+---
+
+<Base
+  title="Manual"
+  description="How Stylebot works, from your first style to sync and shortcuts."
+  current="manual"
+>
+  <div class="manual">
+    <div class="manual-intro">
+      <h1>Manual</h1>
+      <p>How Stylebot works, from your first style to sync and shortcuts.</p>
+    </div>
+
+    <div class="manual-body">
+      <nav class="toc" aria-label="Manual sections">
+        {toc.map(([id, label], i) => (
+          <a
+            href={`#${id}`}
+            data-toc={id}
+            class:list={{ 'is-active': i === 0 }}
+          >
+            {label}
+          </a>
+        ))}
+      </nav>
+
+      <main class="sections">
+        <section id="launch">
+          <h2>Opening Stylebot</h2>
+          <p>
+            Click the Stylebot icon in the toolbar, then{' '}
+            <strong>Style this page</strong>. Or press{' '}
+            <Keys keys={['alt', 'shift', 'M']} /> on any tab.
+          </p>
+          <Callout>
+            Stylebot starts inside the extensions menu. Pin it to the toolbar so
+            it stays one click away. You can change the shortcut in Stylebot's
+            Options.
+          </Callout>
+          <Shot label="toolbar popup with Style this page" />
+        </section>
+
+        <section id="basic">
+          <h2>Basic editor</h2>
+          <Shot label="Basic tab with the element picker active" />
+          <Terms>
+            <Term term="Pick an element">
+              Click the picker, hover the page and click. Stylebot generates a
+              CSS selector that matches similar elements on the page.
+            </Term>
+            <Term term="Selector">
+              You can type your own CSS selector. Focusing the field highlights
+              every element it currently matches.
+            </Term>
+            <Term term="Apply styles">
+              Once an element is selected, set text, background, box and effects
+              in plain controls. Changes override the page's styling and are
+              saved automatically.
+            </Term>
+            <Term term="Fonts">
+              Pick a font from the list, or type any font installed on your
+              computer. Fonts from{' '}
+              <a href="https://fonts.google.com/">Google Fonts</a> work too.
+            </Term>
+            <Term term="Site URL">
+              By default styles match the site's domain. Edit the URL in Options
+              for more flexible matching; see <a href="#urls">URL rules</a>.
+            </Term>
+          </Terms>
+          <Callout>
+            Some sites use auto-generated class names that change when the site
+            updates. If a style stops working, pick the element again to get a
+            fresh selector.
+          </Callout>
+        </section>
+
+        <section id="code">
+          <h2>Code editor</h2>
+          <p>
+            The Code tab holds the full stylesheet for the site. Write any
+            modern CSS and the page updates as you type. Everything you set in
+            Basic, and everything the agent writes, appears here.
+          </p>
+          <Shot label="Code tab with a stylesheet" />
+        </section>
+
+        <section id="agent">
+          <h2>Stylebot agent</h2>
+          <p>
+            Describe the change you want in the Chat tab and the agent writes
+            the CSS for you, from small fixes to a whole new theme.
+          </p>
+          <Terms>
+            <Term term="Bring your own key">
+              Connect a Claude or OpenAI API key once. The key is stored in your
+              browser and only sent to the provider you choose.
+            </Term>
+            <Term term="Where changes go">
+              The agent adds its CSS to the site's stylesheet. Use{' '}
+              <strong>View in Code</strong> to review or edit it.
+            </Term>
+            <Term term="Undo">
+              Every agent change is saved in version history, so you can restore
+              the previous style.
+            </Term>
+          </Terms>
+        </section>
+
+        <section id="presets">
+          <h2>Presets</h2>
+          <Terms>
+            <Term term="Readability">
+              Removes noisy elements from articles on a site. It does not change
+              non-article pages. Choose a Dark, Sepia or Light theme, any font,
+              and set font size, line height and page width.
+            </Term>
+            <Term term="Grayscale">Applies grayscale to the current site.</Term>
+          </Terms>
+          <p>Presets stack with your own changes.</p>
+        </section>
+
+        <section id="sync">
+          <h2>Sync and backup</h2>
+          <Terms>
+            <Term term="Google Drive sync">
+              Turn on sync in Options and sign in with Google. Styles then sync
+              every 30 minutes and right after you edit. Use{' '}
+              <strong>Sync now</strong> in the popup to sync straight away.
+            </Term>
+            <Term term="Backup">
+              Export and import all your styles as JSON from Options.
+            </Term>
+            <Term term="Permissions">
+              Stylebot only asks to read and write its own files in your Drive.
+              There is no Stylebot server, so you may occasionally need to sign
+              in again.
+            </Term>
+          </Terms>
+          <Shot label="Sync settings in Options" />
+        </section>
+
+        <section id="history">
+          <h2>Version history</h2>
+          <p>
+            Every change to your styles is kept, newest first, grouped by day.
+            Open an entry to see what changed and restore it in one click.
+          </p>
+          <Shot label="Version history list" />
+        </section>
+
+        <section id="urls">
+          <h2>URL rules</h2>
+          <p>
+            By default, Stylebot matches styles to websites by domain name. Use
+            these patterns in Options for anything more specific.
+          </p>
+          <div class="table">
+            {wildcards.map(([pattern, meaning]) => (
+              <div class="table-row">
+                <span class="wildcard">
+                  <code>{pattern}</code>
+                </span>
+                <span>{meaning}</span>
+              </div>
+            ))}
+          </div>
+          <h3>Examples</h3>
+          <Terms>
+            {examples.map(([pattern, meaning]) => (
+              <Term>
+                <code slot="term">{pattern}</code>
+                {meaning}
+              </Term>
+            ))}
+          </Terms>
+        </section>
+
+        <section id="layout">
+          <h2>Resizing and docking</h2>
+          <Terms>
+            <Term term="Dock">
+              Dock the editor on the left or right of the window with{' '}
+              <Keys keys={['L']} /> or <Keys keys={['R']} />.
+            </Term>
+            <Term term="Resize">
+              Change the editor's width with <Keys keys={['S']} />.
+            </Term>
+            <Term term="Adjust page layout">
+              Press <Keys keys={['A']} /> to shrink the page so it doesn't sit
+              under the editor.
+            </Term>
+          </Terms>
+        </section>
+
+        <section id="shortcuts">
+          <h2>Keyboard shortcuts</h2>
+          <p>
+            Global shortcuts work on any page Stylebot can style. Editor
+            shortcuts work while the editor is open. Press <Keys keys={['?']} />{' '}
+            in the editor to see this list.
+          </p>
+          {shortcutGroups.map((group) => (
+            <div class="table">
+              <div class="table-head">{group.title}</div>
+              {group.rows.map(([action, keys, sep]) => (
+                <div class="table-row shortcut">
+                  <span class="shortcut-action">{action}</span>
+                  {keys ? (
+                    <Keys keys={keys} sep={sep} />
+                  ) : (
+                    <span class="shortcut-unset">
+                      Not set; assign in Options
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          ))}
+        </section>
+
+        <section id="requests">
+          <h2>Bugs and feature requests</h2>
+          <p>
+            Found a bug or have an idea? Open an issue on{' '}
+            <a href={LINKS.issues}>GitHub</a>.
+          </p>
+        </section>
+
+        <section id="support">
+          <h2>Support Stylebot</h2>
+          <p>
+            Stylebot is free and open source, used by more than 200,000 people,
+            and maintained since 2011. You can support it by{' '}
+            <a href={LINKS.donate}>buying me a coffee</a>.
+          </p>
+        </section>
+      </main>
+    </div>
+  </div>
+</Base>
+
+<script>
+  const links = [...document.querySelectorAll<HTMLAnchorElement>('[data-toc]')];
+  const sections = links
+    .map((link) => document.getElementById(link.dataset.toc!))
+    .filter((el): el is HTMLElement => !!el);
+
+  function setActive(id: string) {
+    links.forEach((link) =>
+      link.classList.toggle('is-active', link.dataset.toc === id),
+    );
+  }
+
+  function onScroll() {
+    let current = sections[0]?.id;
+    for (const section of sections) {
+      if (section.getBoundingClientRect().top < 140) current = section.id;
+    }
+    if (current) setActive(current);
+  }
+
+  links.forEach((link) =>
+    link.addEventListener('click', () => setActive(link.dataset.toc!)),
+  );
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+</script>
+
+<style>
+  .manual {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 64px 24px 0;
+  }
+
+  .manual-intro {
+    max-width: 720px;
+    margin-bottom: 36px;
+  }
+
+  .manual-intro h1 {
+    margin: 0 0 12px;
+    font: 700 clamp(34px, 4.6vw, 48px) / 1.05 var(--display);
+    letter-spacing: -0.03em;
+    color: var(--ink);
+  }
+
+  .manual-intro p {
+    margin: 0;
+    font: 400 18px/1.55 var(--ui);
+    color: var(--muted);
+  }
+
+  .manual-body {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 56px;
+    align-items: flex-start;
+  }
+
+  .toc {
+    flex: 0 0 220px;
+    position: sticky;
+    top: 84px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .toc a {
+    display: block;
+    padding: 7px 12px;
+    border-radius: 8px;
+    font: 400 14px/1.3 var(--ui);
+    color: var(--muted);
+  }
+
+  .toc a:hover {
+    background: var(--hover);
+    color: var(--ink);
+  }
+
+  .toc a.is-active {
+    font-weight: 600;
+    color: var(--ink);
+    background: var(--fill);
+  }
+
+  .sections {
+    flex: 1 1 480px;
+    min-width: 0;
+    max-width: 720px;
+  }
+
+  section {
+    scroll-margin-top: 88px;
+    padding: 44px 0;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  h2 {
+    margin: 0;
+    font: 700 26px/1.2 var(--display);
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+
+  h3 {
+    margin: 10px 0 0;
+    font: 600 16px/1.3 var(--ui);
+    color: var(--ink);
+  }
+
+  p {
+    margin: 0;
+    font: 400 16px/1.65 var(--ui);
+    color: var(--ink2);
+    text-wrap: pretty;
+  }
+
+  .sections :global(strong) {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .sections :global(code) {
+    padding: 1px 6px;
+    border-radius: 5px;
+    background: var(--fill);
+    border: 1px solid var(--border);
+    font: 400 0.88em/1.5 var(--mono);
+    color: var(--ink);
+  }
+
+  .sections :global(.keys) {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+
+  .sections :global(kbd) {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 5px;
+    background: var(--fill);
+    border: 1px solid var(--strong);
+    border-bottom-width: 2px;
+    font: 500 12px/1.4 var(--mono);
+    color: var(--ink2);
+  }
+
+  .sections :global(.keys-sep) {
+    font: 400 12px/1 var(--ui);
+    color: var(--faint);
+  }
+
+  .sections :global(.callout) {
+    display: flex;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 10px;
+    background: var(--fill);
+    border: 1px solid var(--border);
+    font: 400 14.5px/1.55 var(--ui);
+    color: var(--ink2);
+    text-wrap: pretty;
+  }
+
+  .sections :global(.callout-icon) {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    margin-top: 1px;
+    border-radius: 9px;
+    background: var(--muted);
+    color: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font: 700 11px/1 system-ui;
+  }
+
+  .sections :global(.shot) {
+    aspect-ratio: 16 / 9;
+    border-radius: 12px;
+    border: 1px dashed var(--strong);
+    background: var(--fill);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    text-align: center;
+    font: 400 13px/1.5 var(--mono);
+    color: var(--faint);
+  }
+
+  .sections :global(.terms) {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid var(--border);
+  }
+
+  .sections :global(.term) {
+    display: grid;
+    grid-template-columns: minmax(0, 180px) minmax(0, 1fr);
+    gap: 8px 24px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sections :global(.term dt) {
+    font: 600 14.5px/1.5 var(--ui);
+    color: var(--ink);
+  }
+
+  .sections :global(.term dd) {
+    margin: 0;
+    font: 400 15px/1.6 var(--ui);
+    color: var(--ink2);
+    text-wrap: pretty;
+  }
+
+  .table {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--surface);
+  }
+
+  .table-head {
+    padding: 10px 16px;
+    background: var(--fill);
+    border-bottom: 1px solid var(--border);
+    font: 600 12px/1 var(--ui);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .table-row {
+    display: flex;
+    gap: 16px;
+    align-items: baseline;
+    padding: 12px 16px;
+    font: 400 15px/1.55 var(--ui);
+    color: var(--ink2);
+  }
+
+  .table-row + .table-row {
+    border-top: 1px solid var(--border);
+  }
+
+  .wildcard {
+    width: 44px;
+    flex: none;
+  }
+
+  .shortcut {
+    align-items: center;
+    padding: 11px 16px;
+  }
+
+  .shortcut-action {
+    flex: 1;
+    font: 400 15px/1.4 var(--ui);
+    color: var(--ink);
+  }
+
+  .shortcut-unset {
+    font: 400 13px/1 var(--ui);
+    color: var(--faint);
+  }
+
+  @media (max-width: 760px) {
+    .manual {
+      padding-top: 40px;
+    }
+
+    .manual-body {
+      gap: 24px;
+    }
+
+    .toc {
+      position: static;
+      flex: 1 1 100%;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .toc a {
+      border: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .sections :global(.term) {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 4px;
+    }
+  }
+</style>

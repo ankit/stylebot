@@ -1,0 +1,41 @@
+---
+type Props = { target: string; label: string };
+const { target, label } = Astro.props;
+---
+
+<div class="carousel-nav" data-carousel-nav={target}>
+  <button class="round-btn" data-dir="-1" aria-label={`Previous ${label}`}>
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 14 14"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.6"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M8.5 2.5 4 7l4.5 4.5"></path>
+    </svg>
+  </button>
+  <button class="round-btn" data-dir="1" aria-label={`Next ${label}`}>
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 14 14"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.6"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M5.5 2.5 10 7l-4.5 4.5"></path>
+    </svg>
+  </button>
+</div>
+
+<script>
+  import '../scripts/carousel';
+</script>
