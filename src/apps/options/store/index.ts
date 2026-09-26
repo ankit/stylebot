@@ -32,7 +32,6 @@ import {
   scanVersionHistory,
   restoreVersion,
 } from '../utils';
-import { isForceImportant } from '@stylebot/saved-styles';
 
 // Only failures get a banner; success shows in the card's synced pill.
 export type SyncStatus = {
@@ -135,14 +134,12 @@ export const createStore = (): Store<State> => {
           postcss.parse(css);
           const styles = { ...state.styles };
 
+          const existing = styles[initialUrl || url] ?? styles[url];
+
           styles[url] = {
+            ...(existing ?? { readability: false, enabled: true }),
             css,
-            readability: styles[url] ? styles[url].readability : false,
-            enabled: styles[url] ? styles[url].enabled : true,
             modifiedTime: getCurrentTimestamp(),
-            ...(!isForceImportant(styles[url])
-              ? { forceImportant: false }
-              : {}),
           };
 
           if (initialUrl && initialUrl !== url) {

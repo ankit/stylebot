@@ -102,13 +102,7 @@ export default Vue.extend({
       const styles: Array<Style> = [];
 
       for (const url in stylesObj) {
-        styles.push({
-          url,
-          css: stylesObj[url].css,
-          enabled: stylesObj[url].enabled,
-          readability: stylesObj[url].readability,
-          modifiedTime: stylesObj[url].modifiedTime,
-        });
+        styles.push({ url, ...stylesObj[url] });
       }
 
       return styles;
