@@ -158,5 +158,10 @@
     "web-ext": "^5.4.1",
     "webpack": "^4.43.0",
     "webpack-cli": "^3.3.11"
-  }
+  },
+  "sideEffects": [
+    "*.css",
+    "*.scss",
+    "./src/background/listeners.ts"
+  ]
 }

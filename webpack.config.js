@@ -136,6 +136,10 @@ const config = {
         loader: 'vue-loader',
       },
       {
+        resourceQuery: /type=style/,
+        sideEffects: true,
+      },
+      {
         test: /\.ts$/,
         loader: 'ts-loader',
         exclude: /node_modules/,
