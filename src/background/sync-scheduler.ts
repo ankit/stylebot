@@ -1,9 +1,7 @@
-import { getGoogleDriveSyncEnabled } from '../sync/google-drive/sync-metadata';
+import { getGoogleDriveSyncEnabled, SYNC_PERIOD_MINUTES } from '@stylebot/sync';
 
 const PERIODIC_ALARM = 'google-drive-sync';
 const AFTER_EDIT_ALARM = 'google-drive-sync-after-edit';
-
-export const SYNC_PERIOD_MINUTES = 30;
 
 // Long enough for a burst of keystrokes in the code editor to settle into one
 // upload, and the shortest delay chrome.alarms honours for an installed

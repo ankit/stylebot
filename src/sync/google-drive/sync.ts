@@ -29,6 +29,7 @@ import {
   downloadSyncFile,
   writeSyncFile,
 } from './sync-file';
+// eslint-disable-next-line stylebot/package-entry-imports -- until the background passes in its style store
 import {
   setAllIfUnchanged as setAllStylesIfUnchanged,
   getAll as getAllStyles,

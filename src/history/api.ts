@@ -14,6 +14,7 @@ import {
   getStylesAtEachVersion,
   getStylesBeforeChange,
 } from './store';
+// eslint-disable-next-line stylebot/package-entry-imports -- until the background passes in its style store
 import {
   getAll as getAllStyles,
   setAll as setAllStyles,

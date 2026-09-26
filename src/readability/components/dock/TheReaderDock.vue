@@ -62,7 +62,7 @@ import MoreButton from './MoreButton.vue';
 import SettingsMenu from './SettingsMenu.vue';
 import MoreMenu from './MoreMenu.vue';
 import ShortcutMenu from './ShortcutMenu.vue';
-import STooltip from '../../../components/STooltip.vue';
+import { STooltip } from '@stylebot/components';
 
 // Icons stay lit while the pointer is within this many px of the dock.
 const WAKE_RADIUS = 340;
