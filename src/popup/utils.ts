@@ -1,8 +1,6 @@
 import type {
   ToggleStylebot,
-  GetCommands,
   GetCommandsResponse,
-  GetOption,
   GetOptionResponse,
   GetIsStylebotOpen,
   GetIsPageReaderable,
@@ -10,6 +8,7 @@ import type {
   StylebotOptions,
 } from '@stylebot/types';
 import { STYLES_KEY, getStylesForPage } from '@stylebot/styles';
+import { defaultCommands, defaultOptions } from '@stylebot/settings';
 
 import {
   openOptionsPage,
@@ -20,13 +19,9 @@ import {
 export const getCurrentTab = (
   callback: (tab: chrome.tabs.Tab) => void
 ): void => {
-  chrome.windows.getCurrent({ populate: true }, ({ tabs }) => {
-    if (tabs) {
-      for (let i = 0; i < tabs.length; i++) {
-        if (tabs[i].active) {
-          callback(tabs[i]);
-        }
-      }
+  chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
+    if (tab) {
+      callback(tab);
     }
   });
 };
@@ -87,26 +82,25 @@ export const toggleStylebot = (tab: chrome.tabs.Tab): void => {
   }
 };
 
+/**
+ * Reads commands and options straight from storage, like getStyles, so the
+ * popup's shortcuts and theme never wait on the background waking up.
+ */
 export const getCommands = (
   callback: (commands: GetCommandsResponse) => void
 ): void => {
-  const message: GetCommands = {
-    name: 'GetCommands',
-  };
-
-  chrome.runtime.sendMessage(message, callback);
+  chrome.storage.local.get('commands', items => {
+    callback(items['commands'] || defaultCommands);
+  });
 };
 
 export const getOption = <K extends keyof StylebotOptions>(
   optionName: K,
   callback: (value: GetOptionResponse) => void
 ): void => {
-  const message: GetOption = {
-    name: 'GetOption',
-    optionName,
-  };
-
-  chrome.runtime.sendMessage(message, callback);
+  chrome.storage.local.get('options', items => {
+    callback({ ...defaultOptions, ...items['options'] }[optionName]);
+  });
 };
 
 export const openOptions = (): void => {

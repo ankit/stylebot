@@ -95,8 +95,10 @@ export const waitForEditorListener = async (popup: Popup): Promise<void> => {
         // Resolves the tab the same way the popup does (see popup/utils.ts), so
         // this also proves the popup is looking at the page under test.
         popup.evaluate(async () => {
-          const { tabs } = await chrome.windows.getCurrent({ populate: true });
-          const tab = tabs?.find(t => t.active);
+          const [tab] = await chrome.tabs.query({
+            active: true,
+            currentWindow: true,
+          });
           if (!tab?.id) {
             return false;
           }
