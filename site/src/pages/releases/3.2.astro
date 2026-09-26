@@ -1,0 +1,52 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import { LINKS } from '../../lib/links';
+import readability from '../../assets/releases/3.2/readability.png';
+import popup from '../../assets/releases/3.2/popup.png';
+---
+
+<Base title="What's new in 3.2">
+  <main class="prose">
+    <h1>What's new in 3.2</h1>
+    <p class="lede">
+      Stylebot is back in active development, with more updates planned ahead.
+    </p>
+
+    <h2>Faster, flicker-free styling</h2>
+    <p>
+      CSS is now cached and applied instantly, so pages no longer flash unstyled
+      while your styles catch up, and everything feels snappier as a result.
+    </p>
+
+    <h2>A redesigned Readability mode</h2>
+    <figure>
+      <Image
+        src={readability}
+        height={400}
+        alt="Readability mode's new inline theme and typography controls"
+      />
+    </figure>
+    <ul>
+      <li>Newer article-extraction algorithm, better at cleaning up pages</li>
+      <li>Faster activation, applying before the rest of the page loads</li>
+      <li>Inline customization for theme and typography</li>
+      <li>Smoother loading animation</li>
+      <li>Keyboard shortcut to toggle it</li>
+    </ul>
+
+    <h2>A cleaner popup</h2>
+    <figure>
+      <Image src={popup} height={400} alt="Stylebot's redesigned popup" />
+    </figure>
+    <ul>
+      <li>Fully clickable toggle rows</li>
+      <li>Direct settings button</li>
+      <li>Dark mode support</li>
+    </ul>
+
+    <h2>
+      And lots of <a href={LINKS.changelog}>bug fixes</a>
+    </h2>
+  </main>
+</Base>

@@ -1,0 +1,78 @@
+---
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { STORAGE_KEY, themeStylesheet } from '../lib/themes';
+import '../styles/global.css';
+
+type Props = {
+  title?: string;
+  description?: string;
+  footer?: boolean;
+  current?: 'manual';
+  storeCta?: boolean;
+};
+
+const {
+  title,
+  description = 'Point at something on a page and change it, or describe what you want. Stylebot writes the CSS. Free and open source for Chrome, Firefox and Edge.',
+  footer = true,
+  current,
+  storeCta,
+} = Astro.props;
+
+const fullTitle = title
+  ? `${title} · Stylebot`
+  : 'Stylebot: restyle any website';
+const ogImage = new URL('/og-image.png', Astro.site);
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta name="theme-color" content="#f7f8fa" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Stylebot" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@stylebot" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <script is:inline define:vars={{ STORAGE_KEY }}>
+      try {
+        var saved = localStorage.getItem(STORAGE_KEY);
+      } catch (e) {}
+      document.documentElement.dataset.theme =
+        saved ||
+        (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Public+Sans:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Newsreader:opsz,wght@6..72,400;6..72,600;6..72,700&family=Space+Mono:wght@400;700&family=Syne:wght@500;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,600&family=Lora:ital,wght@0,400;0,700;1,500&family=Fira+Code:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <Fragment set:html={`<style>${themeStylesheet()}</style>`} />
+  </head>
+  <body>
+    <Header current={current} storeCta={storeCta} />
+    <slot />
+    {footer && (
+      <div class="container">
+        <Footer />
+      </div>
+    )}
+  </body>
+</html>
