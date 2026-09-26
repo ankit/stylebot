@@ -50,7 +50,7 @@ Stories:
 
 ## Side effects
 
-`package.json` declares `sideEffects`, so webpack drops modules whose exports go unused, in development builds as well as production. A module imported only for what it does on load (`import './listeners'`) has to be listed there; stylesheets and Vue style blocks already are.
+`package.json` declares only stylesheets as having `sideEffects`, so webpack drops any other module whose exports go unused, in development builds as well as production. Keep modules free of work on load: register listeners, call `Vue.use` / `Vue.mixin` and create stores from functions an entry point calls, never at a module's top level.
 
 ## Commit messages
 

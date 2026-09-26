@@ -161,7 +161,6 @@
   },
   "sideEffects": [
     "*.css",
-    "*.scss",
-    "./src/background/listeners.ts"
+    "*.scss"
   ]
 }
