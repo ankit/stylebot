@@ -148,3 +148,29 @@ export type ServerSentEvent = {
  * occupy them.
  */
 export type CssLineRange = { startLine: number; endLine: number };
+
+export type ChatStreamArgs = {
+  key: string;
+  model: ChatModel;
+  system: string;
+  turns: Array<ChatTurn>;
+  signal: AbortSignal;
+  onEvent: (event: ChatStreamEvent) => void;
+};
+
+/**
+ * One LLM API. Adapters translate Stylebot's provider-neutral turns and
+ * the apply_css tool into the provider's wire format and back.
+ */
+export type ChatProvider = {
+  /**
+   * Resolves when the key works, else rejects with a ChatProviderError.
+   */
+  validateKey(key: string): Promise<void>;
+
+  /**
+   * Streams one reply, emitting text as it arrives, the edits once the tool
+   * call completes, then usage and done. Failures arrive as an error event.
+   */
+  stream(args: ChatStreamArgs): Promise<void>;
+};

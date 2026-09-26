@@ -1,10 +1,11 @@
 import type {
   ChatModel,
+  ChatProvider,
   ChatProviderId,
   ChatProviderInfo,
 } from '@stylebot/types';
 
-import { anthropic } from './anthropic';
+import { anthropic, anthropicProvider } from './anthropic';
 
 export const chatProviders: Array<ChatProviderInfo> = [anthropic];
 
@@ -24,3 +25,9 @@ export const getModel = (provider: ChatProviderId, id: string): ChatModel => {
     info.models[0]
   );
 };
+
+const adapters: Record<ChatProviderId, ChatProvider> = {
+  anthropic: anthropicProvider,
+};
+
+export const getProvider = (id: ChatProviderId): ChatProvider => adapters[id];
