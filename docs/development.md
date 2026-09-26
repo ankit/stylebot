@@ -46,5 +46,3 @@ How sync works, and how to use it from a local build or a fork, is described in 
 ## Patches
 
 Patches to dependencies are located under `/patches` and are automatically applied on running `yarn` using [patch-package](https://github.com/ds300/patch-package).
-
-- `vue-draggable-resizable+2.3.0.patch` — removes a `Function("return this")()` call that the extension's Content Security Policy blocks.

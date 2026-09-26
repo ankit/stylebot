@@ -72,7 +72,6 @@ export type State = {
   help: boolean;
   visible: boolean;
   inspecting: boolean;
-  resizing: boolean;
   colorPickerVisible: boolean;
 
   options: StylebotOptions;
@@ -107,7 +106,6 @@ export const createStore = (host: EditorHost): Store<State> => {
       help: false,
       visible: false,
       inspecting: false,
-      resizing: false,
       colorPickerVisible: false,
 
       commands: null,

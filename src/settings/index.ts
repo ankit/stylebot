@@ -49,7 +49,6 @@ export const defaultEditorCommands: StylebotEditorCommands = {
   code: 'c',
   help: '?',
   hide: 'h',
-  resize: 's',
   dockLeft: 'l',
   dockRight: 'r',
   dockWindow: 'w',

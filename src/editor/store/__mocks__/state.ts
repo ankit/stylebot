@@ -28,7 +28,6 @@ const mockState: State = {
   help: false,
   visible: false,
   inspecting: false,
-  resizing: false,
   readability: false,
   forceImportant: true,
   colorPickerVisible: false,

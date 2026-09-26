@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import VueDraggableResizable from 'vue-draggable-resizable';
 import { addons } from '@storybook/preview-api';
 import {
   FORCE_REMOUNT,
@@ -21,7 +20,6 @@ import '../src/editor/index.scss';
 import './preview.css';
 
 Vue.use(Vuex);
-Vue.component('VueDraggableResizable', VueDraggableResizable);
 Vue.mixin({ methods: { t } });
 installChrome();
 

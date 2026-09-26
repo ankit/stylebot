@@ -99,12 +99,7 @@ const config: StorybookConfig = {
         },
       },
       optimizeDeps: {
-        include: [
-          'vue-draggable-resizable',
-          'tinycolor2',
-          'hotkeys-js',
-          'postcss',
-        ],
+        include: ['tinycolor2', 'hotkeys-js', 'postcss'],
       },
     });
   },

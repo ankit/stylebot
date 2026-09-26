@@ -12,7 +12,6 @@ const buildMockStore = (visible: boolean) => ({
     visible,
     help: false,
     inspecting: false,
-    resizing: false,
     activeSelector: '',
     options: {
       mode: 'basic',

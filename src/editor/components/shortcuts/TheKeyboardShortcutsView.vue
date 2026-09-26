@@ -172,13 +172,6 @@ export default Vue.extend({
         },
       ];
 
-      if (this.host === 'page') {
-        rows.push({
-          label: this.t('resize_the_panel'),
-          keys: [this.editorCommands.resize],
-        });
-      }
-
       rows.push({
         label: this.t('open_in_separate_window'),
         keys: [this.editorCommands.dockWindow],

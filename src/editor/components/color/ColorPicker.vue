@@ -204,8 +204,8 @@ export default Vue.extend({
       this.onClose();
     },
 
-    // vue-draggable-resizable's CSS transform on the dock breaks position:
-    // fixed — render our best guess, then measure and correct the drift.
+    // A page transform or filter on an ancestor breaks position: fixed —
+    // render our best guess, then measure and correct the drift.
     positionPopover(): void {
       const popover = this.$refs.popover as HTMLElement | undefined;
       const field = this.$el.querySelector(
