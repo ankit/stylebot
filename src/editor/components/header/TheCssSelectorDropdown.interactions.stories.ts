@@ -185,3 +185,36 @@ export const LongSelectorChips: StoryObj = {
     await expectTrimmedChips(items(canvasElement)[0] as HTMLElement);
   },
 };
+
+const GROUP = ['h1', 'h2', '.title', '.subtitle', '.byline'];
+
+export const LongSelectorGroups: StoryObj = {
+  ...editor({
+    css: `${GROUP.join(', ')} { color: red; }\n\np { color: blue; }`,
+    activeSelector: GROUP.join(', '),
+  }),
+  name: 'a selector group of more than three shows its first two and a "+N more" chip',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    const expectCollapsed = async (container: HTMLElement) => {
+      const chipEls = [
+        ...container.querySelectorAll('.chip'),
+      ] as Array<HTMLElement>;
+      await expect(chipEls.map(chip => chip.textContent?.trim())).toEqual([
+        'h1',
+        'h2',
+        '+3 more',
+      ]);
+      await expect(chipEls[2].title).toBe('.title\n.subtitle\n.byline');
+    };
+
+    await expectCollapsed(chips(canvasElement));
+
+    await user.click(chips(canvasElement));
+    await findOpenMenu(canvas);
+    await waitFor(() => expect(items(canvasElement)).toHaveLength(2));
+    await expectCollapsed(items(canvasElement)[0] as HTMLElement);
+    await expect(items(canvasElement)[1]).toHaveTextContent(/^\s*p\s*1\s*$/);
+  },
+};

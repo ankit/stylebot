@@ -22,9 +22,11 @@
           @keydown="onChipsKeydown"
           @blur="quietFocus = false"
         >
-          <s-chip v-for="(part, i) in chipParts" :key="i" :title="part">
-            {{ part }}
-          </s-chip>
+          <slot name="chips" :parts="chipParts">
+            <s-chip v-for="(part, i) in chipParts" :key="i" :title="part">
+              {{ part }}
+            </s-chip>
+          </slot>
         </div>
 
         <textarea
