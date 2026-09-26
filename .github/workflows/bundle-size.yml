@@ -47,7 +47,10 @@ jobs:
         run: |
           head_sha=$(git rev-parse HEAD)
           git checkout --force --detach HEAD^1
+          # From a clean node_modules: the PR's patches are already applied, and
+          # patch-package can't apply the base's on top of them.
           if ! git diff --quiet "$head_sha" HEAD -- yarn.lock patches; then
+            rm -rf node_modules
             yarn install --frozen-lockfile
           fi
           rm -rf dist
