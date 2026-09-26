@@ -61,6 +61,10 @@ import type {
   RestoreVersionResponse,
   GetRecentColorsResponse,
   AddRecentColorResponse,
+  ChatConnect as ChatConnectType,
+  ChatSetModel as ChatSetModelType,
+  ChatStatusResponse,
+  ChatConnectResponse,
 } from '@stylebot/types';
 import { runGoogleDriveSync } from '@stylebot/sync';
 
@@ -79,6 +83,12 @@ import {
 } from './color-history';
 
 import * as editorWindow from './editor-window';
+import {
+  getChatStatus,
+  connectChat,
+  disconnectChat,
+  setChatModel,
+} from './chat';
 
 export const DisableStyle = async (
   message: DisableStyleType
@@ -356,4 +366,39 @@ export const GetIsEditorWindowOpen = async (
 ): Promise<void> => {
   const tabId = message.tabId ?? sender.tab?.id;
   sendResponse(tabId !== undefined && (await editorWindow.isOpen(tabId)));
+};
+
+export const ChatGetStatus = async (
+  sendResponse: (response: ChatStatusResponse) => void
+): Promise<void> => {
+  sendResponse(await getChatStatus());
+};
+
+export const ChatConnect = async (
+  message: ChatConnectType,
+  sendResponse: (response: ChatConnectResponse) => void
+): Promise<void> => {
+  try {
+    sendResponse(await connectChat(message.provider, message.key));
+  } catch (e) {
+    // A missed sendResponse would leave the Connect button checking forever.
+    sendResponse({
+      ok: false,
+      errorKey: 'chat_error_provider',
+      errorDetail: e instanceof Error ? e.message : undefined,
+    });
+  }
+};
+
+export const ChatDisconnect = async (
+  sendResponse: (response: ChatStatusResponse) => void
+): Promise<void> => {
+  sendResponse(await disconnectChat());
+};
+
+export const ChatSetModel = async (
+  message: ChatSetModelType,
+  sendResponse: (response: ChatStatusResponse) => void
+): Promise<void> => {
+  sendResponse(await setChatModel(message.model));
 };
