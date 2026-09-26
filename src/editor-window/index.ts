@@ -1,11 +1,11 @@
-import Vue from 'vue';
 import { t } from '@stylebot/i18n';
-
-import { createStore } from '../editor/store';
 import { setPageBridge, RemotePageBridge } from '@stylebot/page-bridge';
-import { setupVue } from '../editor/utils/init-editor';
-import initCommandListener from '../editor/listeners/commands';
-import TheStylebotApp from '../editor/components/TheStylebotApp.vue';
+
+import {
+  createStore,
+  mountEditor,
+  initCommandListener,
+} from '@stylebot/editor';
 
 import { initWindowListeners, initTabInfo } from './listeners';
 
@@ -30,7 +30,6 @@ const updateTitle = (href: string): void => {
 };
 
 const start = async (): Promise<void> => {
-  setupVue();
   const store = createStore('window');
   store.commit('setTabId', tabId);
 
@@ -75,11 +74,10 @@ const start = async (): Promise<void> => {
   initWindowListeners(store);
   initCommandListener(store);
 
-  new Vue({
-    store,
-    el: '#app',
-    render: h => h(TheStylebotApp),
-  });
+  const app = document.getElementById('app');
+  if (app) {
+    mountEditor(store, app);
+  }
 };
 
 if (Number.isInteger(tabId) && tabId > 0) {

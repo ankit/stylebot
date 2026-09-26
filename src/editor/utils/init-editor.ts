@@ -28,6 +28,19 @@ const setupVue = (): void => {
   });
 };
 
+/**
+ * Mounts the editor app with its store onto an element.
+ */
+const mountEditor = (store: Store<State>, el: Element): Vue => {
+  setupVue();
+
+  return new Vue({
+    store,
+    el,
+    render: h => h(TheStylebotApp),
+  });
+};
+
 const SELF_HOSTED_FONTS = [
   { family: 'Fira Code', file: 'fira-code', weights: [400, 500, 600] },
   { family: 'Geist', file: 'geist', weights: [400, 500, 600, 700] },
@@ -68,8 +81,6 @@ const initEditor = (store: Store<State>): void => {
     return;
   }
 
-  setupVue();
-
   const stylebotAppHost = document.createElement('div');
   stylebotAppHost.id = 'stylebot';
 
@@ -95,13 +106,7 @@ const initEditor = (store: Store<State>): void => {
   // Wait for the stylesheet to land before mounting — otherwise Vue's
   // synchronous mount renders the unstyled markup first, causing a
   // visible flash whenever the CSS fetch is slower than the mount.
-  injectCss(shadowRoot).then(() => {
-    new Vue({
-      store,
-      el: stylebotApp,
-      render: h => h(TheStylebotApp),
-    });
-  });
+  injectCss(shadowRoot).then(() => mountEditor(store, stylebotApp));
 };
 
-export { initEditor, setupVue };
+export { initEditor, mountEditor };
