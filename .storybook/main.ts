@@ -12,6 +12,7 @@ const aliasedPackages = [
   'components',
   'icons',
   'css',
+  'inject-css',
   'i18n',
   'sync',
   'history',
