@@ -1,5 +1,7 @@
 <template>
-  <span class="chip"><slot /></span>
+  <span class="chip">
+    <slot>{{ label }}</slot>
+  </span>
 </template>
 
 <script lang="ts">
@@ -7,6 +9,13 @@ import Vue from 'vue';
 
 export default Vue.extend({
   name: 'SChip',
+
+  props: {
+    label: {
+      type: String,
+      default: '',
+    },
+  },
 });
 </script>
 

@@ -23,9 +23,12 @@
           @blur="quietFocus = false"
         >
           <slot name="chips" :parts="chipParts">
-            <s-chip v-for="(part, i) in chipParts" :key="i" :title="part">
-              {{ part }}
-            </s-chip>
+            <s-chip
+              v-for="(part, i) in chipParts"
+              :key="i"
+              :label="part"
+              :title="part"
+            />
           </slot>
         </div>
 

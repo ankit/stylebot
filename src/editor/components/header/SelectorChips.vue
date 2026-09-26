@@ -1,11 +1,12 @@
 <template>
   <span class="selector-chips">
-    <s-chip v-for="(part, i) in shown" :key="i" :title="part">
-      {{ part }}
-    </s-chip>
-    <s-chip v-if="hidden.length" class="more" :title="hidden.join('\n')">
-      {{ t('count_more', [String(hidden.length)]) }}
-    </s-chip>
+    <s-chip v-for="(part, i) in shown" :key="i" :label="part" :title="part" />
+    <s-chip
+      v-if="hidden.length"
+      class="more"
+      :label="t('count_more', [String(hidden.length)])"
+      :title="hiddenTitle"
+    />
   </span>
 </template>
 
@@ -42,6 +43,10 @@ export default Vue.extend({
 
     hidden(): Array<string> {
       return this.parts.slice(this.shown.length);
+    },
+
+    hiddenTitle(): string {
+      return this.hidden.join('\n');
     },
   },
 });
