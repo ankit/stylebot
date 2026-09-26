@@ -89,28 +89,40 @@ export const addGoogleWebFontImport = (family: string, css: string): string => {
   return root.toString();
 };
 
+const fontExistence = new Map<string, Promise<boolean>>();
+
 /**
- * Whether a family is served by https://fonts.google.com. Checked from the
- * background page because a content script's fetch runs in the page's
- * context, where Firefox enforces the page's CSP on it (see #754).
+ * Whether Google Fonts serves a family, remembered per family. Asked via the
+ * background page, since a content script's fetch is bound by the page's CSP.
  */
-export const googleWebFontExists = async (family: string): Promise<boolean> => {
+export const googleWebFontExists = (family: string): Promise<boolean> => {
   if (CSS_FAMILY_KEYWORDS.has(family.toLowerCase())) {
-    return false;
+    return Promise.resolve(false);
+  }
+
+  const { url } = getGoogleFontUrlAndParams(family);
+  const known = fontExistence.get(url);
+
+  if (known) {
+    return known;
   }
 
   const message: GetGoogleWebFontExists = {
     name: 'GetGoogleWebFontExists',
-    url: getGoogleFontUrlAndParams(family).url,
+    url,
   };
-
-  const response = await chrome.runtime
+  const exists = chrome.runtime
     .sendMessage<GetGoogleWebFontExists, GetGoogleWebFontExistsResponse>(
       message
     )
-    .catch(() => false);
+    .then(response => !!response)
+    .catch(() => {
+      fontExistence.delete(url);
+      return false;
+    });
 
-  return !!response;
+  fontExistence.set(url, exists);
+  return exists;
 };
 
 /**
@@ -126,7 +138,8 @@ export const addGoogleWebFont = async (
 
 /**
  * Remove google web font imports that no declaration uses as its first
- * family; fallbacks further down a stack are never loaded.
+ * family; fallbacks further down a stack are never loaded. Families match
+ * ignoring case, as in CSS, so "sriracha" keeps the import for "Sriracha".
  */
 export const cleanGoogleWebFonts = (css: string): string => {
   const root = parse(css);
@@ -136,14 +149,14 @@ export const cleanGoogleWebFonts = (css: string): string => {
     const family = getPrimaryFontFamily(decl.value);
 
     if (family) {
-      fonts.add(family);
+      fonts.add(family.toLowerCase());
     }
   });
 
   root.walkAtRules('import', atRule => {
     const family = getImportFamily(atRule.params);
 
-    if (!family || !fonts.has(family)) {
+    if (!family || !fonts.has(family.toLowerCase())) {
       atRule.remove();
     }
   });

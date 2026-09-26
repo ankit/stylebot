@@ -17,7 +17,13 @@ const PAGE_HTML = `
   </html>
 `;
 
-const GOOGLE_FONTS = ['Playfair Display', 'Lora', 'Merriweather'];
+// Zen Kurenaido is served by Google Fonts but not in the bundled list.
+const GOOGLE_FONTS = [
+  'Playfair Display',
+  'Lora',
+  'Merriweather',
+  'Zen Kurenaido',
+];
 
 const requestedFamily = (url: string): string =>
   decodeURIComponent(
@@ -170,6 +176,37 @@ test('a font outside Google Fonts is applied as typed, without an import', async
   await expect
     .poll(() => savedStylesheet(page).textContent())
     .not.toContain('@font-face');
+});
+
+test('a font typed in another case is imported under its Google Fonts name', async ({
+  context,
+  openPopup,
+}) => {
+  const { page, font } = await setup(context, openPopup);
+
+  await openPicker(font);
+  await page.keyboard.type('lora');
+  await page.keyboard.press('Enter');
+
+  await expect(page.locator('h1')).toHaveCSS('font-family', /lora/);
+  await expect
+    .poll(() => savedStylesheet(page).textContent())
+    .toContain('@font-face');
+});
+
+test('highlighting a Google Font outside the bundled list previews it with its import', async ({
+  context,
+  openPopup,
+}) => {
+  const { page, font } = await setup(context, openPopup);
+
+  await openPicker(font);
+  await page.keyboard.type('Zen Kurenaido');
+  await page.keyboard.press('ArrowDown');
+
+  await expect.poll(() => previewCss(page)).toContain('@font-face');
+  await expect(page.locator('h1')).toHaveCSS('font-family', /Zen Kurenaido/);
+  expect(await savedCss(page)).not.toContain('Zen Kurenaido');
 });
 
 test('the browse row opens Google Fonts in a new tab without applying anything', async ({

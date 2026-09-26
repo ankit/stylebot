@@ -128,3 +128,29 @@ describe('loadGoogleFonts', () => {
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 });
+
+describe('resolveGoogleFont', () => {
+  let resolveGoogleFont: typeof import('../fonts').resolveGoogleFont;
+  let googleWebFontExists: jest.Mock;
+
+  beforeEach(async () => {
+    fetchMock.resetMocks();
+    fetchMock.mockResponseOnce(JSON.stringify([['Sriracha', 'handwriting']]));
+    jest.resetModules();
+
+    googleWebFontExists = jest.fn(async (family: string) => family === 'Zen');
+    jest.doMock('@stylebot/css', () => ({ googleWebFontExists }));
+    ({ resolveGoogleFont } = await import('../fonts'));
+  });
+
+  it('returns the bundled spelling, ignoring case, without a lookup', async () => {
+    expect(await resolveGoogleFont('sriracha')).toBe('Sriracha');
+    expect(googleWebFontExists).not.toHaveBeenCalled();
+  });
+
+  it('looks up a family outside the bundled list', async () => {
+    expect(await resolveGoogleFont('Zen')).toBe('Zen');
+    expect(await resolveGoogleFont('Some Local')).toBeNull();
+    expect(googleWebFontExists).toHaveBeenCalledWith('Some Local');
+  });
+});
