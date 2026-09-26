@@ -10,19 +10,17 @@ const style = (
   importUrls: Array<string> = []
 ): CachedStyle => ({ url, css, importUrls, enabled });
 
-describe('applyState', () => {
+describe('applyPageState', () => {
   let stylesheet: typeof import('../stylesheet');
   let readability: typeof import('@stylebot/readability');
-  let applyState: typeof import('../apply-state').applyState;
+  let applyPageState: typeof import('../page-state').applyPageState;
 
   beforeEach(() => {
-    // appliedUrls is module-level state, tracking what's currently
-    // injected across calls — reset the module so each test starts clean.
     jest.resetModules();
 
     stylesheet = require('../stylesheet');
     readability = require('@stylebot/readability');
-    ({ applyState } = require('../apply-state'));
+    ({ applyPageState } = require('../page-state'));
   });
 
   it('injects only the enabled styles', () => {
@@ -31,14 +29,14 @@ describe('applyState', () => {
       readability: false,
     };
 
-    applyState(state);
+    applyPageState(state);
 
     expect(stylesheet.injectStylesheet).toHaveBeenCalledTimes(1);
     expect(stylesheet.injectStylesheet).toHaveBeenCalledWith('a', '.a{}', []);
   });
 
   it('passes the compiled css and its @import urls through unchanged', () => {
-    applyState({
+    applyPageState({
       styles: [
         style('a', '.a{color:red !important}', true, ['https://x.test/a.css']),
       ],
@@ -53,39 +51,47 @@ describe('applyState', () => {
   });
 
   it('applies readability when the state calls for it', () => {
-    applyState({ styles: [], readability: true });
+    applyPageState({ styles: [], readability: true });
 
     expect(readability.applyReadability).toHaveBeenCalledTimes(1);
     expect(readability.removeReadability).not.toHaveBeenCalled();
   });
 
   it('removes readability when the state does not call for it', () => {
-    applyState({ styles: [], readability: false });
+    applyPageState({ styles: [], readability: false });
 
     expect(readability.removeReadability).toHaveBeenCalledTimes(1);
     expect(readability.applyReadability).not.toHaveBeenCalled();
   });
 
-  it('removes a stylesheet that is no longer enabled on a later call', () => {
-    applyState({ styles: [style('a', '.a{}', true)], readability: false });
-    applyState({ styles: [], readability: false });
+  const applied = { styles: [style('a', '.a{}', true)], readability: false };
+
+  it('removes a stylesheet the previous state had enabled that is now gone', () => {
+    applyPageState({ styles: [], readability: false }, applied);
 
     expect(stylesheet.removeStylesheet).toHaveBeenCalledWith('a');
   });
 
-  it('removes a stylesheet that was disabled on a later call', () => {
-    applyState({ styles: [style('a', '.a{}', true)], readability: false });
-    applyState({ styles: [style('a', '.a{}', false)], readability: false });
+  it('removes a stylesheet the previous state had enabled that is now disabled', () => {
+    applyPageState(
+      { styles: [style('a', '.a{}', false)], readability: false },
+      applied
+    );
 
     expect(stylesheet.removeStylesheet).toHaveBeenCalledWith('a');
+  });
+
+  it('removes nothing without a previous state', () => {
+    applyPageState({ styles: [], readability: false });
+
+    expect(stylesheet.removeStylesheet).not.toHaveBeenCalled();
   });
 
   it('does not remove a stylesheet that remains enabled', () => {
-    applyState({ styles: [style('a', '.a{}', true)], readability: false });
-    applyState({
-      styles: [style('a', '.a{updated}', true)],
-      readability: false,
-    });
+    applyPageState(
+      { styles: [style('a', '.a{updated}', true)], readability: false },
+      applied
+    );
 
     expect(stylesheet.removeStylesheet).not.toHaveBeenCalled();
     expect(stylesheet.injectStylesheet).toHaveBeenLastCalledWith(

@@ -1,7 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { CompiledStyles } from '@stylebot/types';
 
-jest.mock('../apply-state');
+jest.mock('../page-state', () => ({
+  ...jest.requireActual('../page-state'),
+  applyPageState: jest.fn(),
+}));
 jest.mock('../cache');
 jest.mock('../hide-page');
 jest.mock('../import-cache');
@@ -27,7 +30,7 @@ const compiledStyles = (
 });
 
 describe('inject-css run()', () => {
-  let applyStateModule: typeof import('../apply-state');
+  let pageStateModule: typeof import('../page-state');
   let cacheModule: typeof import('../cache');
   let hidePageModule: typeof import('../hide-page');
   let importCacheModule: typeof import('../import-cache');
@@ -42,7 +45,7 @@ describe('inject-css run()', () => {
   beforeEach(() => {
     jest.resetModules();
 
-    applyStateModule = require('../apply-state');
+    pageStateModule = require('../page-state');
     cacheModule = require('../cache');
     hidePageModule = require('../hide-page');
     importCacheModule = require('../import-cache');
@@ -98,7 +101,10 @@ describe('inject-css run()', () => {
     };
 
     expect(hidePageModule.hidePage).toHaveBeenCalledTimes(1);
-    expect(applyStateModule.applyState).toHaveBeenCalledWith(expectedState);
+    expect(pageStateModule.applyPageState).toHaveBeenCalledWith(
+      expectedState,
+      null
+    );
     expect(cacheModule.writeCache).toHaveBeenCalledWith(expectedState);
     expect(hidePageModule.revealPage).toHaveBeenCalledTimes(1);
   });
@@ -154,7 +160,7 @@ describe('inject-css run()', () => {
     load();
 
     expect(hidePageModule.hidePage).not.toHaveBeenCalled();
-    expect(applyStateModule.applyState).toHaveBeenCalledWith(cached);
+    expect(pageStateModule.applyPageState).toHaveBeenCalledWith(cached);
   });
 
   it('does not re-apply when the fresh state matches the cache', async () => {
@@ -170,7 +176,7 @@ describe('inject-css run()', () => {
     await flushPromises();
 
     // Only the initial cache-hit application — nothing patched afterwards.
-    expect(applyStateModule.applyState).toHaveBeenCalledTimes(1);
+    expect(pageStateModule.applyPageState).toHaveBeenCalledTimes(1);
     expect(hidePageModule.revealPage).toHaveBeenCalledTimes(1);
   });
 
@@ -197,8 +203,12 @@ describe('inject-css run()', () => {
       readability: false,
     };
 
-    expect(applyStateModule.applyState).toHaveBeenNthCalledWith(1, cached);
-    expect(applyStateModule.applyState).toHaveBeenNthCalledWith(2, freshState);
+    expect(pageStateModule.applyPageState).toHaveBeenNthCalledWith(1, cached);
+    expect(pageStateModule.applyPageState).toHaveBeenNthCalledWith(
+      2,
+      freshState,
+      cached
+    );
     expect(cacheModule.writeCache).toHaveBeenCalledWith(freshState);
   });
 
@@ -228,10 +238,10 @@ describe('inject-css run()', () => {
     load();
     await flushPromises();
 
-    expect(applyStateModule.applyState).toHaveBeenCalledWith({
-      styles: [],
-      readability: true,
-    });
+    expect(pageStateModule.applyPageState).toHaveBeenCalledWith(
+      { styles: [], readability: true },
+      null
+    );
   });
 
   it('answers GetIsReadabilityActive based on whether #stylebot-reader is mounted', () => {
