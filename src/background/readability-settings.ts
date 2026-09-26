@@ -1,13 +1,13 @@
-import { defaultReadabilitySettings } from '@stylebot/settings';
+import {
+  READABILITY_SETTINGS_KEY,
+  getReadabilitySettings,
+} from '@stylebot/settings';
 import type { ReadabilitySettings, UpdateReader } from '@stylebot/types';
 
-export const get = async (): Promise<ReadabilitySettings> => {
-  const items = await chrome.storage.local.get('readability-settings');
-  return items['readability-settings'] || defaultReadabilitySettings;
-};
+export const get = getReadabilitySettings;
 
 export const set = async (value: ReadabilitySettings): Promise<void> => {
-  await chrome.storage.local.set({ 'readability-settings': value });
+  await chrome.storage.local.set({ [READABILITY_SETTINGS_KEY]: value });
 
   const [tab] = await chrome.tabs.query({ active: true });
 

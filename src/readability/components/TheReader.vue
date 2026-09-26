@@ -37,7 +37,10 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { defaultReadabilitySettings } from '@stylebot/settings';
+import {
+  defaultReadabilitySettings,
+  getReadabilitySettings,
+} from '@stylebot/settings';
 import {
   addGoogleWebFont,
   getCssWithExpandedImports,
@@ -48,8 +51,6 @@ import { hideLoader, cacheTheme } from '../loading-screen/loader';
 import { sendReadabilitySettings } from '../utils/send-readability-settings';
 
 import type {
-  GetReadabilitySettings,
-  GetReadabilitySettingsResponse,
   ReadabilitySettings,
   UpdateReader,
   ReadabilityTheme,
@@ -97,7 +98,7 @@ export default Vue.extend({
 
   async mounted(): Promise<void> {
     try {
-      const settings = await this.getReadabilitySettings();
+      const settings = await getReadabilitySettings();
 
       this.font = settings.font;
       this.size = settings.size;
@@ -172,24 +173,6 @@ export default Vue.extend({
           // font failed to load — reveal with whatever fallback is active
         }
       }
-    },
-
-    async getReadabilitySettings(): Promise<GetReadabilitySettingsResponse> {
-      const message: GetReadabilitySettings = {
-        name: 'GetReadabilitySettings',
-      };
-
-      const response = chrome.runtime.sendMessage<
-        GetReadabilitySettings,
-        GetReadabilitySettingsResponse
-      >(message);
-
-      // Falls back to defaults if the service worker never responds.
-      const timeout = new Promise<GetReadabilitySettingsResponse>(resolve => {
-        setTimeout(() => resolve(defaultReadabilitySettings), 1000);
-      });
-
-      return Promise.race([response, timeout]);
     },
   },
 });

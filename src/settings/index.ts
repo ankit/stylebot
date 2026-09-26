@@ -1,7 +1,6 @@
 import type {
   StylebotOptions,
   StylebotCommands,
-  ReadabilitySettings,
   StylebotEditorCommands,
 } from '@stylebot/types';
 
@@ -56,11 +55,8 @@ export const defaultEditorCommands: StylebotEditorCommands = {
   close: 'Escape',
 };
 
-export const defaultReadabilitySettings: ReadabilitySettings = {
-  size: 16,
-  width: 40,
-  theme: 'light',
-  lineHeight: 1.6,
-  justify: false,
-  font: 'Merriweather',
-};
+export {
+  READABILITY_SETTINGS_KEY,
+  defaultReadabilitySettings,
+  getReadabilitySettings,
+} from './readability';

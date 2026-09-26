@@ -1,3 +1,4 @@
+import { getReadabilitySettings } from '@stylebot/settings';
 import type { ReadabilityTheme } from '@stylebot/types';
 
 import { loaderCss, LOADER_ART_ID } from './loader-styles';
@@ -28,24 +29,26 @@ export const cacheTheme = (theme: ReadabilityTheme): void => {
   }
 };
 
-/**
- * Hides document content and paints a themed loading screen until reader is ready.
- */
-export const showLoader = (): void => {
-  let cachedTheme: ReadabilityTheme | null = null;
-
+const readCachedTheme = (): ReadabilityTheme | null => {
   try {
-    cachedTheme = localStorage.getItem(
-      THEME_CACHE_KEY
-    ) as ReadabilityTheme | null;
+    return localStorage.getItem(THEME_CACHE_KEY) as ReadabilityTheme | null;
   } catch {
     // localStorage may be unavailable; the loader just falls back to light.
+    return null;
   }
+};
 
+/**
+ * Paints the loading screen's background and skeleton in the given theme.
+ */
+const paintLoader = (
+  style: HTMLStyleElement,
+  theme: ReadabilityTheme | null
+): void => {
   const background =
-    (cachedTheme && THEME_BACKGROUNDS[cachedTheme]) || THEME_BACKGROUNDS.light;
+    (theme && THEME_BACKGROUNDS[theme]) || THEME_BACKGROUNDS.light;
   const foreground =
-    (cachedTheme && THEME_FOREGROUNDS[cachedTheme]) || THEME_FOREGROUNDS.light;
+    (theme && THEME_FOREGROUNDS[theme]) || THEME_FOREGROUNDS.light;
 
   // Set inline (not via <style>) so it commits before any CSSOM parse/recalc,
   // ahead of the browser's first paint.
@@ -54,15 +57,24 @@ export const showLoader = (): void => {
     background,
     'important'
   );
+  style.textContent = loaderCss(
+    { background, foreground },
+    LOADER_LINES.length
+  );
+};
+
+/**
+ * Hides document content and paints a themed loading screen until reader is ready.
+ * The first paint uses this site's cached theme, which goes stale when the theme
+ * is changed on another site, so it's repainted once the saved theme is read.
+ */
+export const showLoader = (): void => {
+  const cachedTheme = readCachedTheme();
 
   const style = document.createElement('style');
   style.type = 'text/css';
   style.setAttribute('id', 'stylebot-reader-loading');
-  style.appendChild(
-    document.createTextNode(
-      loaderCss({ background, foreground }, LOADER_LINES.length)
-    )
-  );
+  paintLoader(style, cachedTheme);
   document.documentElement.appendChild(style);
 
   const art = document.createElement('div');
@@ -76,6 +88,15 @@ export const showLoader = (): void => {
     art.appendChild(line);
   });
   document.documentElement.appendChild(art);
+
+  getReadabilitySettings()
+    .then(({ theme }) => {
+      if (theme !== cachedTheme && style.isConnected) {
+        paintLoader(style, theme);
+      }
+      cacheTheme(theme);
+    })
+    .catch(() => undefined);
 };
 
 /**
