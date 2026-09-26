@@ -184,7 +184,7 @@ export default Vue.extend({
     // as inside.
     onDocMousedown(event: MouseEvent): void {
       if (!event.composedPath().includes(this.$el)) {
-        this.$emit('cancel');
+        this.$emit('cancel', 'outside');
         this.close();
       }
     },
@@ -201,7 +201,7 @@ export default Vue.extend({
     onDocKeydown(event: KeyboardEvent): void {
       if (event.key === 'Escape') {
         event.stopPropagation();
-        this.$emit('cancel');
+        this.$emit('cancel', 'escape');
         this.close();
         return;
       }

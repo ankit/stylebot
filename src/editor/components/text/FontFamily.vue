@@ -14,7 +14,7 @@
       @select="pick"
       @submit="submit($event, true)"
       @leave="submit"
-      @cancel="clearPreview"
+      @cancel="cancel"
     >
       <template #item="{ item, select }">
         <menu-item
@@ -177,6 +177,16 @@ export default Vue.extend({
       } else {
         this.clearPreview();
       }
+    },
+
+    // Escape backs out of the edit: the typed text goes along with any
+    // preview. Clicking away only drops the preview, as leaving applies.
+    cancel(reason: 'escape' | 'outside'): void {
+      if (reason === 'escape') {
+        this.draft = this.value;
+      }
+
+      this.clearPreview();
     },
 
     // The link row previews nothing, so moving onto it clears the last

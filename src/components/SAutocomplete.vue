@@ -338,11 +338,12 @@ export default Vue.extend({
       this.hideMenu();
     },
 
-    onCancel(): void {
-      // Escape / click-outside close the menu and keep the text as typed;
-      // the refocus-on-close must not reopen it.
+    // Escape / click-outside close the menu, leaving it to the consumer
+    // (told which one) whether to keep the text as typed; the
+    // refocus-on-close must not reopen it.
+    onCancel(reason: 'escape' | 'outside'): void {
       this.suppressReopen = true;
-      this.$emit('cancel');
+      this.$emit('cancel', reason);
     },
 
     // Opens the menu from the chevron or Up/Down, like a click on the field:

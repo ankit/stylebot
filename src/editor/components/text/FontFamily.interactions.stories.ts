@@ -195,17 +195,17 @@ export const ArrowKeys: StoryObj = {
       await waitFor(() => expect(text).toHaveFocus());
     });
 
-    await step('Escape closes the list and keeps the text', async () => {
+    await step('Escape closes the list and reverts the text', async () => {
       await pressKey('Escape');
       await waitFor(() => expect(canvas.queryByRole('menu')).toBeNull());
-      await expect(text).toHaveValue('playfa');
+      await expect(text).toHaveValue('');
       await expect(text).toHaveFocus();
     });
 
-    await step('Down reopens it without re-selecting the text', async () => {
+    await step('Down reopens it', async () => {
       await pressKey('ArrowDown');
       await findOpenMenu(canvas);
-      await user.keyboard('i');
+      await user.keyboard('playfai');
       await expect(text).toHaveValue('playfai');
     });
 
@@ -219,6 +219,70 @@ export const ArrowKeys: StoryObj = {
         await expect(store.state.options.fonts).not.toContain('playfai');
       }
     );
+  },
+};
+
+export const EscapeRevertsDraft: StoryObj = {
+  ...editor({ css: 'h1 { font-family: Georgia; }', activeSelector: 'h1' }),
+  name: 'Escape reverts typed text and its preview to the applied font',
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+    const text = await openPicker(canvasElement);
+
+    await step('arrowing onto a suggestion previews it', async () => {
+      await user.keyboard('playf');
+      await menuItem(canvas, 'Playfair Display');
+      await pressKey('ArrowDown');
+      await waitFor(() =>
+        expect(pageStyle(canvasElement, 'h1', 'font-family')).toMatch(
+          /Playfair Display/
+        )
+      );
+    });
+
+    await step('Escape restores the text and the page', async () => {
+      await pressKey('Escape');
+      await waitFor(() => expect(canvas.queryByRole('menu')).toBeNull());
+      await expect(text).toHaveFocus();
+      await expect(text).toHaveValue('Georgia');
+      await waitFor(() =>
+        expect(pageStyle(canvasElement, 'h1', 'font-family')).toMatch(/Georgia/)
+      );
+    });
+
+    await step('Down reopens it with the caret at the end', async () => {
+      await pressKey('ArrowDown');
+      await findOpenMenu(canvas);
+      await expect(text.selectionStart).toBe(text.value.length);
+      await expect(text.selectionEnd).toBe(text.value.length);
+      await pressKey('Escape');
+    });
+
+    await step('leaving afterwards applies nothing', async () => {
+      await user.click(canvas.getByText('Font'));
+      await waitFor(() => expect(chips(canvasElement)).toEqual(['Georgia']));
+      await expect(declaration(store, 'h1', 'font-family')).toBe('Georgia');
+    });
+  },
+};
+
+export const ClickAwayApplies: StoryObj = {
+  ...editor({ css: 'h1 { font-family: Georgia; }', activeSelector: 'h1' }),
+  name: 'clicking away applies typed text rather than reverting it',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+
+    await openPicker(canvasElement);
+    await user.keyboard('Lora');
+    await findOpenMenu(canvas);
+
+    await user.click(canvas.getByText('Font'));
+
+    await waitFor(() => expect(canvas.queryByRole('menu')).toBeNull());
+    await waitFor(() => expect(chips(canvasElement)).toEqual(['Lora']));
+    await expect(declaration(store, 'h1', 'font-family')).toBe('Lora');
   },
 };
 
