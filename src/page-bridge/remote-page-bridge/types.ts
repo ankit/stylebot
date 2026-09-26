@@ -16,6 +16,8 @@ export type RemotePageBridgeRequestArgs = {
   getSnapshot: [];
   getPageColors: [];
   getComputedStyles: [selector: string, properties: Array<string>];
+  getPageOutline: [];
+  getPageCssContext: [selector: string];
 };
 
 export type RemotePageBridgeRequestMethod = keyof RemotePageBridgeRequestArgs;
@@ -24,6 +26,8 @@ export type RemotePageBridgeRequestResult = {
   getSnapshot: PageSnapshot;
   getPageColors: RoleColorGroups;
   getComputedStyles: Record<string, string>;
+  getPageOutline: string;
+  getPageCssContext: string;
 };
 
 export type RemotePageBridgeRequest = {

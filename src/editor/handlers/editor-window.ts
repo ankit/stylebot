@@ -137,6 +137,10 @@ export const createEditorWindowHandler = (
                 return bridge.getPageColors();
               case 'getComputedStyles':
                 return bridge.getComputedStyles(...message.args);
+              case 'getPageOutline':
+                return bridge.getPageOutline();
+              case 'getPageCssContext':
+                return bridge.getPageCssContext(...message.args);
             }
           });
           break;

@@ -22,6 +22,8 @@ import type { PageBridge, PageSnapshot } from './PageBridge';
 import { PageBridgeEmitter } from './PageBridgeEmitter';
 import { getPageColors } from './page-colors';
 import { getComputedStyles } from './computed-styles';
+import { getPageOutline } from './page-outline';
+import { getPageCssContext } from './page-css';
 
 const PREVIEW_ID = 'font-preview';
 
@@ -186,6 +188,14 @@ export class LocalPageBridge extends PageBridgeEmitter implements PageBridge {
     properties: Array<string>
   ): Promise<Record<string, string>> {
     return Promise.resolve(getComputedStyles(selector, properties));
+  }
+
+  getPageOutline(): Promise<string> {
+    return Promise.resolve(getPageOutline());
+  }
+
+  getPageCssContext(selector: string): Promise<string> {
+    return Promise.resolve(getPageCssContext(selector));
   }
 
   openInPage(): void {

@@ -29,6 +29,8 @@ const bridge = {
   unhighlight: jest.fn(),
   getPageColors: jest.fn(),
   getComputedStyles: jest.fn(),
+  getPageOutline: jest.fn(),
+  getPageCssContext: jest.fn(),
   openInPage: jest.fn(),
   focusPage: jest.fn(),
   on: jest.fn((event: string, listener: PageBridgeEvents['select']) => {

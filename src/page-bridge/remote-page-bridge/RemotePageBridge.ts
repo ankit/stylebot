@@ -256,6 +256,14 @@ export class RemotePageBridge extends PageBridgeEmitter implements PageBridge {
     return this.request('getComputedStyles', selector, properties);
   }
 
+  getPageOutline(): Promise<string> {
+    return this.request('getPageOutline');
+  }
+
+  getPageCssContext(selector: string): Promise<string> {
+    return this.request('getPageCssContext', selector);
+  }
+
   openInPage(): void {
     this.send({ type: 'openInPage' });
   }
