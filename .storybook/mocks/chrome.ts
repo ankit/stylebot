@@ -83,6 +83,7 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
   const storage: Record<string, unknown> = {
     [`notification~release/${RELEASE_VERSION}`]: true,
     recentColors: overrides.recentColors ?? [],
+    'readability-settings': readabilitySettings,
     ...overrides.storage,
   };
   const tab = {

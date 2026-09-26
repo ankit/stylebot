@@ -64,3 +64,15 @@ export const defaultReadabilitySettings: ReadabilitySettings = {
   justify: false,
   font: 'Merriweather',
 };
+
+export const READABILITY_SETTINGS_KEY = 'readability-settings';
+
+/**
+ * The saved reader settings, read straight from storage so content scripts
+ * don't depend on a possibly cold background to answer.
+ */
+export const getReadabilitySettings =
+  async (): Promise<ReadabilitySettings> => {
+    const items = await chrome.storage.local.get(READABILITY_SETTINGS_KEY);
+    return items[READABILITY_SETTINGS_KEY] || defaultReadabilitySettings;
+  };
