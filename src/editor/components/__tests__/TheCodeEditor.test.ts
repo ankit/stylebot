@@ -66,7 +66,7 @@ describe('TheCodeEditor.vue', () => {
 
     jest.advanceTimersByTime(1);
     expect(applyCssCalls(store)).toEqual([
-      ['applyCss', { css: 'h1 { color: blue; }' }],
+      ['applyCss', { css: 'h1 { color: blue; }', source: 'code' }],
     ]);
   });
 
@@ -84,7 +84,7 @@ describe('TheCodeEditor.vue', () => {
 
     expect(applyCssCalls(store)[0]).toEqual([
       'applyCss',
-      { css: 'a { color: blue; }' },
+      { css: 'a { color: blue; }', source: 'code' },
     ]);
   });
 
@@ -104,7 +104,7 @@ describe('TheCodeEditor.vue', () => {
     wrapper = undefined;
 
     expect(applyCssCalls(store)).toEqual([
-      ['applyCss', { css: 'a { color: blue; }' }],
+      ['applyCss', { css: 'a { color: blue; }', source: 'code' }],
     ]);
   });
 });

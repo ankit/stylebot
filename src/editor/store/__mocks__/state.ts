@@ -1,4 +1,5 @@
 import type { State } from '..';
+import { emptyUndoStack } from '../undo-stack';
 import { emptyPageSnapshot } from '@stylebot/page-bridge';
 
 import {
@@ -17,6 +18,7 @@ const mockState: State = {
   tab: null,
 
   css: '',
+  undoStack: emptyUndoStack(),
   enabled: true,
   url: document.domain,
 

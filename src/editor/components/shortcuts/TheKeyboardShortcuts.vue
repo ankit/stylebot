@@ -11,8 +11,9 @@ import type {
   StylebotLayout,
   StylebotEditorCommands,
 } from '@stylebot/types';
+import { isFieldTarget, isMac } from '@stylebot/utils';
 
-import { isFieldTarget } from '@stylebot/utils';
+import { undoKeyFor } from '../../store/undo-stack';
 
 export default Vue.extend({
   name: 'TheKeyboardShortcuts',
@@ -132,10 +133,42 @@ export default Vue.extend({
       this.$store.dispatch('escape');
     },
 
-    handleStylebotShortcut(event: KeyboardEvent): void {
-      const target = event.composedPath()[0];
+    /**
+     * Only taken from the panel, or when nothing on the page holds focus:
+     * Cmd/Ctrl+Z means something to most page widgets.
+     */
+    handleUndoShortcut(event: KeyboardEvent, path: Array<EventTarget>): void {
+      const key = undoKeyFor(event, isMac());
 
+      if (!key) {
+        return;
+      }
+
+      const target = path[0] as HTMLElement;
+      const inPanel =
+        this.host === 'window' ||
+        target === document.body ||
+        target === document.documentElement ||
+        path.some(node => (node as HTMLElement).id === 'stylebot');
+
+      if (!inPanel) {
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      this.$store.dispatch(key);
+    },
+
+    handleStylebotShortcut(event: KeyboardEvent): void {
+      const path = event.composedPath();
+      const target = path[0];
+
+      // Ahead of the field check: undo/redo stay available while a panel
+      // field has focus, where a style edit is what the user just made.
       if (event.metaKey || event.altKey || event.ctrlKey) {
+        this.handleUndoShortcut(event, path);
         return;
       }
 

@@ -32,6 +32,10 @@ export default {
   alreadyUsedColors: (state: State): RoleColorGroups =>
     getAlreadyUsedColors(state.css),
 
+  canUndo: (state: State): boolean => state.undoStack.past.length > 0,
+
+  canRedo: (state: State): boolean => state.undoStack.future.length > 0,
+
   grayscale: (state: State): number => {
     return getFilterEffectValueForPage(
       'grayscale',

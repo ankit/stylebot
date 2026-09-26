@@ -148,6 +148,7 @@ describe('createEditorWindowHandler', () => {
 
     expect(applyCss).toBeCalledWith(expect.anything(), {
       css: 'b { color: blue; }',
+      source: 'window',
     });
     expect(store.state.css).toBe('b { color: blue; }');
     expect(store.state.forceImportant).toBe(false);

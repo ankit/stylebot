@@ -4,6 +4,7 @@ import { shortcutStore } from '../shortcut-store';
 import MoreMenu from '../MoreMenu.vue';
 
 jest.mock('@stylebot/utils', () => ({
+  isMac: () => true,
   openOptionsPage: jest.fn(),
   openReportIssuePage: jest.fn(),
   openDonatePage: jest.fn(),

@@ -21,9 +21,11 @@ export default meta;
 const injectedCss = (url: string) =>
   document.getElementById(`stylebot-css-${url}`)?.textContent ?? '';
 
+const settingRow = (toggle: HTMLElement) =>
+  toggle.closest('.setting-row') as HTMLElement;
+
 const caption = (toggle: HTMLElement) =>
-  toggle.closest('.push-page-row')?.querySelector('.push-page-copy')
-    ?.textContent ?? '';
+  settingRow(toggle).querySelector('.setting-copy')?.textContent ?? '';
 
 export const ToggleForceImportant: StoryObj = {
   ...editor(WITH_RULE),
@@ -46,9 +48,7 @@ export const ToggleForceImportant: StoryObj = {
       });
 
       await expect(toggle).toBeChecked();
-      await expect(caption(toggle)).toContain(
-        'Every rule gets !important, so your styles win.'
-      );
+      await expect(caption(toggle)).toContain('Every rule gets !important');
       await expect(
         within(menu).getByText('!important', { selector: 'code' })
       ).toBeVisible();
@@ -56,9 +56,7 @@ export const ToggleForceImportant: StoryObj = {
 
       await expect(store.state.forceImportant).toBe(false);
       await expect(toggle).not.toBeChecked();
-      await expect(caption(toggle)).toContain(
-        "Your CSS is applied as written. Some rules may lose to the site's own styles."
-      );
+      await expect(caption(toggle)).toContain('Rules apply as written');
       await waitFor(() =>
         expect(injectedCss(url)).toContain('color: #2a5fd6;')
       );
@@ -75,6 +73,20 @@ export const ToggleForceImportant: StoryObj = {
       await waitFor(() =>
         expect(injectedCss(url)).toContain('color: #2a5fd6 !important')
       );
+    });
+
+    await step('the row itself toggles, not just the switch', async () => {
+      const menu = canvas.getByRole('menu');
+      const toggle = within(menu).getByRole('checkbox', {
+        name: 'Override site styles',
+      });
+
+      await user.click(
+        settingRow(toggle).querySelector('.setting-copy') as HTMLElement
+      );
+
+      await expect(store.state.forceImportant).toBe(false);
+      await waitFor(() => expect(injectedCss(url)).not.toContain('!important'));
     });
   },
 };
