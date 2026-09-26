@@ -16,3 +16,28 @@ export type StyleWithoutUrl = Omit<Style, 'url'>;
 export type StyleMap = {
   [url: string]: Omit<Style, 'url'>;
 };
+
+/**
+ * A style ready to inject: its `@import` urls split out and `!important`
+ * already applied, so pages can inject it without parsing any css.
+ */
+export type CompiledStyle = {
+  css: string;
+  importUrls: Array<string>;
+  enabled: boolean;
+  readability: boolean;
+};
+
+export type CompiledStyleMap = {
+  [url: string]: CompiledStyle;
+};
+
+/**
+ * Every style compiled, stamped with the styles-metadata revision it was
+ * built from and the compiler version, so a stale copy can be told apart.
+ */
+export type CompiledStyles = {
+  version: number;
+  revision: string;
+  styles: CompiledStyleMap;
+};

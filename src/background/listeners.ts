@@ -23,6 +23,7 @@ import {
   GetReadabilitySettings,
   SetReadabilitySettings,
   GetImportCss,
+  GetCompiledStyles,
   GetGoogleWebFontExists,
   RunGoogleDriveSync,
   ScanVersionHistory,
@@ -215,6 +216,9 @@ chrome.runtime.onMessage.addListener(
 
       case 'GetImportCss':
         GetImportCss(message, sendResponse);
+        break;
+      case 'GetCompiledStyles':
+        GetCompiledStyles(sendResponse);
         break;
       case 'GetGoogleWebFontExists':
         GetGoogleWebFontExists(message, sendResponse);
