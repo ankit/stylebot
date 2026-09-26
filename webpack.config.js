@@ -319,6 +319,7 @@ const clientConfig = {
     'sync/index': './sync/index.ts',
     'popup/index': './popup/index.ts',
     'editor/index': './editor/content-script.ts',
+    'editor/app': './editor/app.ts',
     options: './options/index.ts',
     'editor-window/index': './editor-window/index.ts',
     'inject-css/index': './inject-css/content-script.ts',

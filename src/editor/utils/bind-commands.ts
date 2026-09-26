@@ -29,3 +29,17 @@ export const bindCommands = (
     }
   });
 };
+
+/**
+ * Calls onChange with the new shortcuts whenever they change in storage, as
+ * they can from the reader dock or the options page while a page is open.
+ */
+export const onCommandsChanged = (
+  onChange: (commands: StylebotCommands) => void
+): void => {
+  chrome.storage.onChanged.addListener((changes, areaName) => {
+    if (areaName === 'local' && changes.commands) {
+      onChange(changes.commands.newValue);
+    }
+  });
+};

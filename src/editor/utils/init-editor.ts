@@ -64,7 +64,7 @@ const fontFaceCss = (): string =>
   ).join('');
 
 const injectCss = (shadowRoot: ShadowRoot): Promise<void> => {
-  const url = chrome.runtime.getURL('editor/index.css');
+  const url = chrome.runtime.getURL('editor/app.css');
 
   return fetch(url, { method: 'GET' })
     .then(response => response.text())

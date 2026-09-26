@@ -4,11 +4,14 @@ The editor is one Vue app that runs in two hosts: docked inside the page, or in 
 
 ## In the page
 
-- The editor's content script runs on every page. It creates the store, sets up the local
-  page bridge, and starts listening for tab messages right away, so a click in the popup
-  can't arrive before the store is ready.
-- Messages are handled once options, shortcuts, reader settings and the page's saved style
-  have loaded; keyboard shortcuts and the context menu are bound after that.
+- Only a small listener script runs on every page. It listens for tab messages, keyboard
+  shortcuts, right-clicks and editor-window connections from the start, and loads the
+  editor itself the first time one of them needs it.
+- Until then, the listener script handles what only touches the page: re-applying saved
+  styles pushed from elsewhere, switching the reader on or off, and answering whether the
+  editor is open.
+- Once loaded, the editor creates the store and the local page bridge, loads options,
+  shortcuts, reader settings and the page's saved style, and then takes every event.
 - Nothing is mounted until the editor first opens. Then it adds a host element with a
   shadow root, fetches the editor stylesheet and mounts the app.
 - Opening refreshes what the store knows about the page, re-enables the style if needed

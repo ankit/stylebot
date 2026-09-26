@@ -78,7 +78,7 @@ class FakePort {
   }
 }
 
-describe('initEditorWindowListener', () => {
+describe('createEditorWindowHandler', () => {
   let store: Store<State>;
   let onConnect: (port: FakePort) => void;
   let applyCss: jest.Mock;
@@ -94,16 +94,6 @@ describe('initEditorWindowListener', () => {
   beforeEach(async () => {
     jest.clearAllMocks();
     selectListeners.length = 0;
-
-    global.chrome = {
-      runtime: {
-        onConnect: {
-          addListener: (fn: (port: FakePort) => void) => {
-            onConnect = fn;
-          },
-        },
-      },
-    } as unknown as typeof chrome;
 
     applyCss = jest.fn(({ commit }, { css }) => commit('setCss', css));
     applyReadability = jest.fn(({ commit }, value) =>
@@ -122,8 +112,10 @@ describe('initEditorWindowListener', () => {
       actions: { applyCss, applyReadability, openStylebot },
     });
 
-    const { initEditorWindowListener: init } = await import('../editor-window');
-    init(store);
+    const { createEditorWindowHandler } = await import('../editor-window');
+    onConnect = createEditorWindowHandler(store) as unknown as (
+      port: FakePort
+    ) => void;
   });
 
   it('greets the window with the page state and marks it connected', () => {
