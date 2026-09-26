@@ -105,7 +105,7 @@ test.describe('Sync tab', () => {
       ),
     });
 
-    await expect(page.getByText(/Synced about 1 hour ago/)).toBeVisible();
+    await expect(page.getByText(/Synced 1 hour ago/)).toBeVisible();
   });
 
   // Enabling also kicks off a sync, which parks on the OAuth consent window —
@@ -186,7 +186,7 @@ test.describe('Sync tab', () => {
       ),
     });
 
-    await expect(page.getByText(/Synced about 3 hours ago/)).toBeVisible();
+    await expect(page.getByText(/Synced 3 hours ago/)).toBeVisible();
 
     // What a scheduled run does from the service worker while the page is open.
     await page.evaluate(
@@ -194,7 +194,7 @@ test.describe('Sync tab', () => {
       syncState(new Date().toISOString())
     );
 
-    await expect(page.getByText(/Synced less than a minute ago/)).toBeVisible();
+    await expect(page.getByText(/Synced (now|\d+ seconds? ago)/)).toBeVisible();
   });
 
   test('asks for a sign-in when a scheduled sync could not get a token', async ({
