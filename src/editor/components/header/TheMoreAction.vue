@@ -255,9 +255,6 @@ export default Vue.extend({
 }
 
 .dock-toggle ::v-deep .segment {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
   padding: 4px 8px;
 
   &.active svg {
