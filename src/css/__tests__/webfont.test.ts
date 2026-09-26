@@ -8,10 +8,13 @@ let cleanGoogleWebFonts: typeof Webfont.cleanGoogleWebFonts;
 let googleWebFontExists: typeof Webfont.googleWebFontExists;
 
 const fontUrl =
+  'https://fonts.googleapis.com/css2?family=Muli:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap';
+
+const legacyFontUrl =
   'https://fonts.googleapis.com/css2?family=Muli:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap';
 
 const multiWordFontUrl =
-  'https://fonts.googleapis.com/css2?family=Playfair+Display+SC:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap';
+  'https://fonts.googleapis.com/css2?family=Playfair+Display+SC:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap';
 
 let fontExists: boolean;
 const sendMessage = jest.fn((_message: any) => Promise.resolve(fontExists));
@@ -134,6 +137,22 @@ describe('webfont', () => {
 
       expect(addGoogleWebFontImport('Muli', css)).toBe(css);
     });
+
+    it('replaces an import of the family that asks for other weights', () => {
+      const css = `@import url(${legacyFontUrl});\n\na { font-family: Muli }`;
+
+      expect(addGoogleWebFontImport('Muli', css)).toBe(
+        `@import url(${fontUrl});\n\na { font-family: Muli }`
+      );
+    });
+
+    it('keeps imports of other families', () => {
+      const css = `@import url(${multiWordFontUrl});\n\na { font-family: Muli }`;
+
+      expect(addGoogleWebFontImport('Muli', css)).toBe(
+        `@import url(${fontUrl});\n\n@import url(${multiWordFontUrl});\n\na { font-family: Muli }`
+      );
+    });
   });
 
   describe('cleanGoogleWebFonts', () => {
@@ -149,6 +168,18 @@ describe('webfont', () => {
       const output = cleanGoogleWebFonts(css);
 
       expect(output).toBe(css);
+    });
+
+    it('keeps an import saved with an older weight list', () => {
+      const css = `@import url(${legacyFontUrl});\n\na { font-family: Muli; }`;
+
+      expect(cleanGoogleWebFonts(css)).toBe(css);
+    });
+
+    it('matches a multi-word family', () => {
+      const css = `@import url(${multiWordFontUrl});\n\na { font-family: "Playfair Display SC"; }`;
+
+      expect(cleanGoogleWebFonts(css)).toBe(css);
     });
 
     it('keeps the @import when the first family is quoted', () => {
