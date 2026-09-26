@@ -256,13 +256,10 @@ export default Vue.extend({
     background: var(--accent);
     border-radius: 1px;
     opacity: 0;
-    transition: opacity 0.15s;
     content: '';
   }
 
-  &:hover::after,
-  &:focus-visible::after,
-  .stylebot-resizing > &::after {
+  &:focus-visible::after {
     opacity: 1;
   }
 
