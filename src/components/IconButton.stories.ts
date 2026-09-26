@@ -52,7 +52,7 @@ export const Variants = matrix({
     {
       label: 'Close',
       cell: attrs =>
-        `<icon-button ${attrs} title="Close"><icon-x :size="22" /></icon-button>`,
+        `<icon-button ${attrs} title="Close"><icon-x :size="16" /></icon-button>`,
     },
   ],
 });

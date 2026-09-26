@@ -17,7 +17,7 @@
 
     <s-tooltip class="release-dismiss" :text="t('hide')">
       <icon-button @click="dismiss">
-        <icon-x :size="22" />
+        <icon-x :size="16" />
       </icon-button>
     </s-tooltip>
   </div>
@@ -130,8 +130,12 @@ export default Vue.extend({
 .release-dismiss {
   flex: none;
 
-  ::v-deep .icon-button:hover {
-    background: var(--info-border);
+  ::v-deep .icon-button {
+    padding: 5px;
+
+    &:hover {
+      background: var(--info-border);
+    }
   }
 }
 </style>
