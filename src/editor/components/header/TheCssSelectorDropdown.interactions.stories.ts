@@ -142,3 +142,46 @@ export const DisabledOutsideBasicMode: StoryObj = {
     );
   },
 };
+
+const LONG_SELECTOR =
+  "main#site-content > div.page-wrapper [style*='background-color: rgb(238, 238, 238)'], main#site-content [class*='skeleton']";
+
+export const LongSelectorChips: StoryObj = {
+  ...editor({
+    css: `${LONG_SELECTOR} { color: red; }\n\np { color: blue; }`,
+    activeSelector: LONG_SELECTOR,
+  }),
+  name: 'a long selector list shows one single-line chip per selector, trimmed to fit',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const parts = [
+      "main#site-content > div.page-wrapper [style*='background-color: rgb(238, 238, 238)']",
+      "main#site-content [class*='skeleton']",
+    ];
+
+    const expectTrimmedChips = async (container: HTMLElement) => {
+      const chipEls = [
+        ...container.querySelectorAll('.chip'),
+      ] as Array<HTMLElement>;
+      await expect(chipEls.map(chip => chip.title)).toEqual(parts);
+
+      const lineHeight = parseFloat(getComputedStyle(chipEls[0]).lineHeight);
+      for (const chip of chipEls) {
+        await expect(chip.clientHeight).toBeLessThan(lineHeight * 2);
+        await expect(chip.getBoundingClientRect().right).toBeLessThanOrEqual(
+          container.getBoundingClientRect().right
+        );
+      }
+      await expect(chipEls[0].scrollWidth).toBeGreaterThan(
+        chipEls[0].clientWidth
+      );
+    };
+
+    await expectTrimmedChips(chips(canvasElement));
+
+    await user.click(chips(canvasElement));
+    await findOpenMenu(canvas);
+    await waitFor(() => expect(items(canvasElement)).toHaveLength(2));
+    await expectTrimmedChips(items(canvasElement)[0] as HTMLElement);
+  },
+};

@@ -1,3 +1,5 @@
+import { splitCommaList } from '@stylebot/utils';
+
 const escapeSelectorToken = (value: string): string => {
   if (typeof CSS !== 'undefined' && CSS.escape) {
     return CSS.escape(value);
@@ -216,10 +218,7 @@ export const getSelector = (el: HTMLElement): string => {
  * The members of a comma-separated selector list, trimmed.
  */
 export const splitSelectorList = (selector: string): Array<string> =>
-  selector
-    .split(',')
-    .map(part => part.trim())
-    .filter(Boolean);
+  splitCommaList(selector);
 
 export const validateSelector = (selector: string): boolean => {
   if (!selector) {

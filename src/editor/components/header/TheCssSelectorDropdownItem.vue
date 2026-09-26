@@ -9,7 +9,9 @@
   >
     <span class="item-row">
       <span class="chips">
-        <s-chip v-for="(part, i) in parts" :key="i">{{ part }}</s-chip>
+        <s-chip v-for="(part, i) in parts" :key="i" :title="part">
+          {{ part }}
+        </s-chip>
       </span>
       <s-count-badge
         v-if="styleCount > 0"
@@ -89,6 +91,7 @@ export default Vue.extend({
 .chips {
   flex: 1;
   min-width: 0;
+  contain: inline-size;
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
