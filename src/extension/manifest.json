@@ -59,7 +59,8 @@
     {
       "resources": [
         "monaco-editor/*",
-        "editor/index.css",
+        "editor/app.js",
+        "editor/app.css",
         "fonts/*",
         "readability/reader.js",
         "readability/reader.css",
