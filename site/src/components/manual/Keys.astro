@@ -1,0 +1,13 @@
+---
+type Props = { keys: string[]; sep?: string };
+const { keys, sep = '+' } = Astro.props;
+---
+
+<span class="keys">
+  {keys.map((key, i) => (
+    <>
+      {i > 0 && <span class="keys-sep">{sep}</span>}
+      <kbd>{key}</kbd>
+    </>
+  ))}
+</span>

@@ -59,26 +59,27 @@ export const seedStyles = async (
   extension: Extension,
   styles: Record<string, SeededStyle>
 ): Promise<void> => {
-  await extension.evaluate(
-    seeded =>
-      chrome.storage.local.set({
-        styles: Object.fromEntries(
-          Object.entries(seeded).map(([url, style]) => [
-            url,
-            {
-              css: style.css,
-              enabled: style.enabled,
-              readability: style.readability ?? false,
-              modifiedTime: new Date().toISOString(),
-              ...(style.forceImportant === false
-                ? { forceImportant: false }
-                : {}),
-            },
-          ])
-        ),
-      }),
-    styles
-  );
+  // Written straight to storage rather than through the background, so the
+  // compiled copy is dropped too: pages then ask the background to rebuild it.
+  await extension.evaluate(async seeded => {
+    await chrome.storage.local.remove('styles-compiled');
+    await chrome.storage.local.set({
+      styles: Object.fromEntries(
+        Object.entries(seeded).map(([url, style]) => [
+          url,
+          {
+            css: style.css,
+            enabled: style.enabled,
+            readability: style.readability ?? false,
+            modifiedTime: new Date().toISOString(),
+            ...(style.forceImportant === false
+              ? { forceImportant: false }
+              : {}),
+          },
+        ])
+      ),
+    });
+  }, styles);
 };
 
 /**

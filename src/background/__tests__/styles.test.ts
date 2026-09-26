@@ -12,8 +12,10 @@ import {
   move,
   setReadability,
   getGoogleWebFontExists,
+  ensureCompiledStyles,
 } from '../styles';
 import { scheduleSyncAfterEdit } from '../sync-scheduler';
+import * as compiledStylesModule from '../compiled-styles';
 
 describe('set', () => {
   let store: Record<string, unknown>;
@@ -36,19 +38,20 @@ describe('set', () => {
       storage: {
         local: {
           get: jest.fn(
-            (key: string) =>
+            (keys: string | Array<string>) =>
               new Promise(resolve => {
                 // Simulate the read taking a tick, so a second write can start
                 // before the first one's read-modify-write finishes — mirroring
                 // rapid keystrokes in the code editor firing overlapping
                 // SetStyle messages. Deep-clone, since real chrome.storage.local
                 // returns a structured-clone copy, not a live reference.
-                const held = store[key];
-                const snapshot =
-                  held === undefined
-                    ? undefined
-                    : JSON.parse(JSON.stringify(held));
-                setTimeout(() => resolve({ [key]: snapshot }), 10);
+                const items: Record<string, unknown> = {};
+                for (const key of Array.isArray(keys) ? keys : [keys]) {
+                  if (store[key] !== undefined) {
+                    items[key] = JSON.parse(JSON.stringify(store[key]));
+                  }
+                }
+                setTimeout(() => resolve(items), 10);
               })
           ),
           set: jest.fn(
@@ -233,5 +236,107 @@ describe('getGoogleWebFontExists', () => {
     fetchMock.mockResponse(() => Promise.reject(new Error('offline')));
 
     await expect(getGoogleWebFontExists(fontUrl)).resolves.toBe(false);
+  });
+});
+
+describe('compiled styles', () => {
+  let store: Record<string, unknown>;
+
+  const style = { css: 'a { color: red; }', enabled: true, readability: false };
+
+  beforeEach(() => {
+    store = {};
+
+    global.chrome = {
+      storage: {
+        local: {
+          get: jest.fn(async (keys: string | Array<string>) => {
+            const items: Record<string, unknown> = {};
+            for (const key of Array.isArray(keys) ? keys : [keys]) {
+              if (store[key] !== undefined) {
+                items[key] = JSON.parse(JSON.stringify(store[key]));
+              }
+            }
+            return items;
+          }),
+          set: jest.fn(async (items: Record<string, unknown>) => {
+            Object.assign(store, items);
+          }),
+        },
+      },
+    } as unknown as typeof chrome;
+  });
+
+  it('stores the compiled copy with every write, stamped with its revision', async () => {
+    await setAll({ 'a.com': { ...style, modifiedTime: 't' } });
+
+    const revision = (store['styles-metadata'] as { modifiedTime: string })
+      .modifiedTime;
+
+    expect(store['styles-compiled']).toEqual({
+      version: 1,
+      revision,
+      styles: {
+        'a.com': {
+          css: 'a { color: red !important; }',
+          importUrls: [],
+          enabled: true,
+          readability: false,
+        },
+      },
+    });
+  });
+
+  it('reuses the stored compiled copy on a write only when it matches the styles being replaced', async () => {
+    const compileStyles = jest.spyOn(compiledStylesModule, 'compileStyles');
+
+    await setAll({ 'a.com': { ...style, modifiedTime: 't' } });
+    await setAll({ 'a.com': { ...style, enabled: false, modifiedTime: 't' } });
+
+    expect(compileStyles.mock.calls[1][2]).toEqual({
+      styles: { 'a.com': { ...style, modifiedTime: 't' } },
+      compiled: expect.objectContaining({ 'a.com': expect.anything() }),
+    });
+
+    store['styles-metadata'] = { modifiedTime: 'written-elsewhere' };
+    await setAll({ 'a.com': { ...style, modifiedTime: 't' } });
+
+    expect(compileStyles.mock.calls[2][2]).toBeUndefined();
+    compileStyles.mockRestore();
+  });
+
+  it('builds the compiled copy when none is stored yet', async () => {
+    store.styles = { 'a.com': { ...style, modifiedTime: 't' } };
+    store['styles-metadata'] = { modifiedTime: 'rev-1' };
+
+    const compiled = await ensureCompiledStyles();
+
+    expect(compiled.revision).toBe('rev-1');
+    expect(compiled.styles['a.com'].css).toBe('a { color: red !important; }');
+    expect(store['styles-compiled']).toEqual(compiled);
+  });
+
+  it('keeps a stored copy that matches the current styles', async () => {
+    const stored = { version: 1, revision: 'rev-1', styles: {} };
+    store.styles = { 'a.com': { ...style, modifiedTime: 't' } };
+    store['styles-metadata'] = { modifiedTime: 'rev-1' };
+    store['styles-compiled'] = stored;
+
+    expect(await ensureCompiledStyles()).toEqual(stored);
+    expect(chrome.storage.local.set).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['built from other styles', { version: 1, revision: 'rev-0', styles: {} }],
+    ['from an older compiler', { version: 0, revision: 'rev-1', styles: {} }],
+  ])('rebuilds a stored copy %s', async (_label, stored) => {
+    store.styles = { 'a.com': { ...style, modifiedTime: 't' } };
+    store['styles-metadata'] = { modifiedTime: 'rev-1' };
+    store['styles-compiled'] = stored;
+
+    const compiled = await ensureCompiledStyles();
+
+    expect(compiled).toMatchObject({ version: 1, revision: 'rev-1' });
+    expect(Object.keys(compiled.styles)).toEqual(['a.com']);
   });
 });

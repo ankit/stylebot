@@ -1,9 +1,17 @@
 import * as postcss from 'postcss';
 
 import { getCurrentTimestamp } from '@stylebot/utils';
-import { getStylesForPage } from '@stylebot/styles';
+import {
+  COMPILED_STYLES_KEY,
+  STYLES_KEY,
+  STYLES_METADATA_KEY,
+  getStylesForPage,
+  isCompiledStylesCurrent,
+  isForceImportant,
+} from '@stylebot/styles';
 
 import type {
+  CompiledStyles,
   StyleMap,
   StyleWithoutUrl,
   ApplyStylesToTab,
@@ -11,7 +19,8 @@ import type {
 } from '@stylebot/types';
 
 import { getIsReadabilityActive, updateIcon } from './badge';
-import { recordStyleChange } from '../history/store';
+import { compileStyles } from './compiled-styles';
+import { recordStyleChange } from '@stylebot/history';
 import { scheduleSyncAfterEdit } from './sync-scheduler';
 
 export { getStylesForPage } from '@stylebot/styles';
@@ -65,8 +74,8 @@ export const refreshBadgeForTab = async (
  * Reads the full style map from storage, defaulting to an empty map.
  */
 export const getAll = async (): Promise<StyleMap> => {
-  const items = await chrome.storage.local.get('styles');
-  return items['styles'] || {};
+  const items = await chrome.storage.local.get(STYLES_KEY);
+  return items[STYLES_KEY] || {};
 };
 
 /**
@@ -75,6 +84,30 @@ export const getAll = async (): Promise<StyleMap> => {
 export const get = async (url: string): Promise<StyleWithoutUrl> => {
   const styles = await getAll();
   return styles[url];
+};
+
+type StoredState = {
+  styles: StyleMap;
+  revision?: string;
+  compiled?: CompiledStyles;
+};
+
+/**
+ * Everything a write needs from storage, in one read: the styles it replaces,
+ * their revision, and the compiled copy it can reuse entries from.
+ */
+const readForWrite = async (): Promise<StoredState> => {
+  const items = await chrome.storage.local.get([
+    STYLES_KEY,
+    STYLES_METADATA_KEY,
+    COMPILED_STYLES_KEY,
+  ]);
+
+  return {
+    styles: items[STYLES_KEY] || {},
+    revision: items[STYLES_METADATA_KEY]?.modifiedTime,
+    compiled: items[COMPILED_STYLES_KEY],
+  };
 };
 
 /**
@@ -87,17 +120,23 @@ const writeToStorage = async (
     fromSync,
     previous,
     restoredFrom,
-  }: { fromSync: boolean; previous?: StyleMap; restoredFrom?: Timestamp }
+  }: { fromSync: boolean; previous?: StoredState; restoredFrom?: Timestamp }
 ): Promise<string> => {
   const modifiedTime = getCurrentTimestamp();
-  const before = previous ?? (await getAll());
+  const before = previous ?? (await readForWrite());
+  const reuse =
+    before.compiled &&
+    isCompiledStylesCurrent(before.compiled, before.revision ?? '')
+      ? { styles: before.styles, compiled: before.compiled.styles }
+      : undefined;
 
   await chrome.storage.local.set({
-    styles,
-    'styles-metadata': { modifiedTime },
+    [STYLES_KEY]: styles,
+    [STYLES_METADATA_KEY]: { modifiedTime },
+    [COMPILED_STYLES_KEY]: compileStyles(styles, modifiedTime, reuse),
   });
 
-  await recordStyleChange(before, styles, { fromSync, restoredFrom });
+  await recordStyleChange(before.styles, styles, { fromSync, restoredFrom });
 
   if (!fromSync) {
     await scheduleSyncAfterEdit();
@@ -145,16 +184,41 @@ export const setAllIfUnchanged = (
   { fromSync = false }: { fromSync?: boolean } = {}
 ): Promise<string | null> => {
   const attempt = pendingWrite.then(async () => {
-    const items = await chrome.storage.local.get(['styles', 'styles-metadata']);
+    const previous = await readForWrite();
 
-    if (items['styles-metadata']?.modifiedTime !== revision) {
+    if (previous.revision !== revision) {
       return null;
     }
 
-    return writeToStorage(styles, {
-      fromSync,
-      previous: items['styles'] || {},
-    });
+    return writeToStorage(styles, { fromSync, previous });
+  });
+
+  pendingWrite = attempt.then(() => undefined);
+  return attempt;
+};
+
+/**
+ * Returns the stored compiled styles, rebuilding them first when they're
+ * missing, from an older compiler, or built from other styles than the ones
+ * stored now. Runs in the write chain, so no write lands halfway through.
+ */
+export const ensureCompiledStyles = (): Promise<CompiledStyles> => {
+  const attempt = pendingWrite.then(async () => {
+    const items = await chrome.storage.local.get([
+      STYLES_KEY,
+      STYLES_METADATA_KEY,
+      COMPILED_STYLES_KEY,
+    ]);
+    const revision: string = items[STYLES_METADATA_KEY]?.modifiedTime ?? '';
+    const stored: CompiledStyles | undefined = items[COMPILED_STYLES_KEY];
+
+    if (stored && isCompiledStylesCurrent(stored, revision)) {
+      return stored;
+    }
+
+    const compiled = compileStyles(items[STYLES_KEY] || {}, revision);
+    await chrome.storage.local.set({ [COMPILED_STYLES_KEY]: compiled });
+    return compiled;
   });
 
   pendingWrite = attempt.then(() => undefined);
@@ -182,8 +246,8 @@ const update = (
   mutate: (styles: StyleMap) => StyleMap | undefined
 ): Promise<void> => {
   pendingWrite = pendingWrite.then(async () => {
-    const previous = await getAll();
-    const styles = mutate({ ...previous });
+    const previous = await readForWrite();
+    const styles = mutate({ ...previous.styles });
 
     if (styles) {
       await writeToStorage(styles, { fromSync: false, previous });
@@ -208,7 +272,7 @@ export const set = (
       delete styles[url];
     } else {
       const keepForceImportant =
-        forceImportant ?? styles[url]?.forceImportant !== false;
+        forceImportant ?? isForceImportant(styles[url]);
 
       styles[url] = {
         css,

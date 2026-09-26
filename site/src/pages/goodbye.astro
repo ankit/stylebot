@@ -1,0 +1,191 @@
+---
+import Base from '../layouts/Base.astro';
+import GoodbyeFeedback from '../components/GoodbyeFeedback';
+import StoreLink from '../components/StoreLink.astro';
+---
+
+<Base title="Goodbye" description="Thanks for using Stylebot.">
+  <main class="gb">
+    <div
+      class="gb-panda"
+      role="img"
+      aria-label="A pixel panda waving goodbye"
+    ></div>
+    <h1>Thanks for using Stylebot.</h1>
+    <p class="gb-lede">
+      Your styles were removed from this browser. If you turned on sync, a
+      backup is still in your Google Drive.
+    </p>
+    <GoodbyeFeedback client:visible />
+    <div class="gb-reinstall">
+      <span>Changed your mind?</span>
+      <StoreLink index={0} format="reinstall" class="btn btn-outline" />
+    </div>
+    <p class="gb-note">
+      I’ve been working on Stylebot since 2011. Thanks for giving it a try, and
+      for any feedback you leave. <span>— Ankit</span>
+    </p>
+  </main>
+</Base>
+
+<style is:global>
+  .gb {
+    max-width: 620px;
+    margin: 0 auto;
+    padding: 56px 24px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 20px;
+  }
+
+  .gb-panda {
+    width: min(520px, 100%);
+    aspect-ratio: 3 / 2;
+    border-radius: 14px;
+    background: var(--fill);
+    border: 1px dashed var(--strong);
+  }
+
+  .gb h1 {
+    margin: 14px 0 0;
+    font: 700 clamp(30px, 4vw, 42px) / 1.1 var(--display);
+    letter-spacing: -0.03em;
+    color: var(--ink);
+    text-wrap: balance;
+  }
+
+  .gb-lede {
+    margin: 0;
+    max-width: 46ch;
+    font: 400 17px/1.6 var(--ui);
+    color: var(--muted);
+    text-wrap: pretty;
+  }
+
+  .gb-form,
+  .gb-thanks {
+    width: 100%;
+    margin-top: 10px;
+    padding: 22px;
+    border-radius: 14px;
+    text-align: left;
+  }
+
+  .gb-form {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .gb-thanks {
+    background: var(--acctint);
+    border: 1px solid var(--accline);
+    font: 500 15px/1.5 var(--ui);
+    color: var(--ink);
+  }
+
+  .gb-q {
+    font: 600 15px/1.3 var(--ui);
+    color: var(--ink);
+  }
+
+  .gb-q span {
+    font-weight: 400;
+    color: var(--muted);
+  }
+
+  .gb-reasons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .gb-chip {
+    padding: 8px 12px;
+    border-radius: 18px;
+    cursor: pointer;
+    font: 500 13px/1 var(--ui);
+    border: 1px solid var(--strong);
+    background: var(--surface);
+    color: var(--ink2);
+    transition: all 0.12s;
+  }
+
+  .gb-chip.is-on {
+    border-color: var(--acc);
+    background: var(--acctint);
+    color: var(--acc);
+  }
+
+  .gb-form textarea {
+    width: 100%;
+    resize: vertical;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--strong);
+    background: var(--sunken);
+    color: var(--ink);
+    font: 400 14px/1.5 var(--ui);
+    outline: none;
+  }
+
+  .gb-form textarea:focus {
+    border-color: var(--acc);
+  }
+
+  .gb-send {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .gb-send .btn {
+    border: none;
+    padding: 10px 16px;
+    font-size: 13.5px;
+    cursor: pointer;
+  }
+
+  .gb-send .btn:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+
+  .gb-send span {
+    font: 400 12.5px/1.4 var(--ui);
+    color: var(--faint);
+  }
+
+  .gb-reinstall {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 8px 16px;
+    margin-top: 6px;
+    font: 400 14px/1.4 var(--ui);
+    color: var(--muted);
+  }
+
+  .gb-reinstall .btn {
+    padding: 10px 16px;
+    font-size: 13.5px;
+  }
+
+  .gb-note {
+    margin: 18px 0 0;
+    max-width: 460px;
+    font: 400 14.5px/1.5 var(--ui);
+    color: var(--ink2);
+    text-wrap: pretty;
+  }
+
+  .gb-note span {
+    color: var(--muted);
+  }
+</style>

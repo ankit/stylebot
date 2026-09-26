@@ -4,6 +4,75 @@ import pluginVue from 'eslint-plugin-vue';
 import jsdoc from 'eslint-plugin-jsdoc';
 import prettier from 'eslint-config-prettier';
 import globals from 'globals';
+import { readdirSync } from 'node:fs';
+import path from 'node:path';
+
+const SRC_DIR = path.join(import.meta.dirname, 'src');
+const PACKAGES = new Set(
+  readdirSync(SRC_DIR, { withFileTypes: true })
+    .filter(entry => entry.isDirectory())
+    .map(entry => entry.name)
+);
+
+const packageOf = file => path.relative(SRC_DIR, file).split(path.sep)[0];
+
+/**
+ * The src/ folder an import resolves into, or null for anything outside it.
+ */
+const targetPackage = (file, source) => {
+  if (source.startsWith('.')) {
+    return packageOf(path.resolve(path.dirname(file), source));
+  }
+
+  const first = source.split('/')[0];
+  return source.includes('/') && PACKAGES.has(first) ? first : null;
+};
+
+/**
+ * Flags an import that reaches into another folder under src/, by relative
+ * path or bare baseUrl path, instead of going through its @stylebot/ entry.
+ */
+const packageEntryImports = {
+  meta: {
+    type: 'problem',
+    messages: {
+      usePackageEntry:
+        "'{{source}}' reaches into {{target}}/; import it through its package entry.",
+    },
+  },
+  create(context) {
+    const file = context.filename;
+
+    if (!file.startsWith(SRC_DIR + path.sep)) {
+      return {};
+    }
+
+    const check = node => {
+      const source = node.source?.value;
+
+      if (typeof source !== 'string') {
+        return;
+      }
+
+      const target = targetPackage(file, source);
+
+      if (target && PACKAGES.has(target) && target !== packageOf(file)) {
+        context.report({
+          node,
+          messageId: 'usePackageEntry',
+          data: { source, target },
+        });
+      }
+    };
+
+    return {
+      ImportDeclaration: check,
+      ExportNamedDeclaration: check,
+      ExportAllDeclaration: check,
+      ImportExpression: check,
+    };
+  },
+};
 
 export default tseslint.config(
   {
@@ -138,6 +207,17 @@ export default tseslint.config(
         tsconfigRootDir: import.meta.dirname,
       },
     },
+  },
+
+  {
+    // Packages use each other only through their @stylebot/ entries, so their
+    // internals can change freely; sideEffects keeps entries free to import.
+    files: ['src/**/*.{ts,vue}'],
+    ignores: ['**/__tests__/**', '**/*.test.ts', '**/*.stories.ts'],
+    plugins: {
+      stylebot: { rules: { 'package-entry-imports': packageEntryImports } },
+    },
+    rules: { 'stylebot/package-entry-imports': 'error' },
   },
 
   {

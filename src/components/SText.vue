@@ -47,7 +47,7 @@ export default Vue.extend({
 }
 
 .primary {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .label {

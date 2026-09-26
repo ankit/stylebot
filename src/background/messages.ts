@@ -11,7 +11,9 @@ import {
   getImportCss,
   getGoogleWebFontExists,
   applyStylesToAllTabs,
+  ensureCompiledStyles,
 } from './styles';
+import * as styleStorage from './styles';
 
 import { getIsReadabilityActive, updateIcon } from './badge';
 
@@ -36,6 +38,7 @@ import type {
   ReadabilityActiveChanged as ReadabilityActiveChangedType,
   SetReadabilitySettings as SetReadabilitySettingsType,
   GetImportCss as GetImportCssType,
+  GetCompiledStylesResponse,
   GetGoogleWebFontExists as GetGoogleWebFontExistsType,
   RunGoogleDriveSync as RunGoogleDriveSyncType,
   ScanVersionHistory as ScanVersionHistoryType,
@@ -254,6 +257,12 @@ export const GetImportCss = async (
   sendResponse(css);
 };
 
+export const GetCompiledStyles = async (
+  sendResponse: (response: GetCompiledStylesResponse) => void
+): Promise<void> => {
+  sendResponse(await ensureCompiledStyles());
+};
+
 export const GetGoogleWebFontExists = async (
   message: GetGoogleWebFontExistsType,
 
@@ -268,7 +277,7 @@ export const RunGoogleDriveSync = async (
   sendResponse: (response: RunGoogleDriveSyncResponse) => void
 ): Promise<void> => {
   try {
-    sendResponse(await runGoogleDriveSync());
+    sendResponse(await runGoogleDriveSync(styleStorage));
   } catch (e) {
     // runGoogleDriveSync already returns failures as a result, so this only
     // fires if that contract breaks. Left in because a missed sendResponse
@@ -285,7 +294,7 @@ export const ScanVersionHistory = async (
   message: ScanVersionHistoryType,
   sendResponse: (response: ScanVersionHistoryResponse) => void
 ): Promise<void> => {
-  sendResponse({ scan: await scanVersionHistory(message.limit) });
+  sendResponse({ scan: await scanVersionHistory(styleStorage, message.limit) });
 };
 
 export const RestoreVersion = async (
@@ -293,7 +302,7 @@ export const RestoreVersion = async (
   sendResponse: (response: RestoreVersionResponse) => void
 ): Promise<void> => {
   sendResponse({
-    ok: await restoreVersion(message.versionId, message.urls),
+    ok: await restoreVersion(styleStorage, message.versionId, message.urls),
   });
 };
 

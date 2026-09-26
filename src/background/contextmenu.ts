@@ -8,7 +8,7 @@ const CONTEXT_MENU_ID = 'stylebot-contextmenu';
 const VIEW_OPTIONS_MENU_ITEM_ID = 'view-options';
 const STYLE_ELEMENT_MENU_ITEM_ID = 'style-element';
 
-const ContextMenu = {
+export const ContextMenu = {
   init(): void {
     this.remove();
 
@@ -59,7 +59,13 @@ const ContextMenu = {
   },
 };
 
-chrome.contextMenus.onClicked.addListener((info, tab) => {
+/**
+ * Handles a click on one of Stylebot's context menu items.
+ */
+export const handleContextMenuClick = (
+  info: chrome.contextMenus.OnClickData,
+  tab?: chrome.tabs.Tab
+): void => {
   switch (info.menuItemId) {
     case STYLE_ELEMENT_MENU_ITEM_ID:
       if (tab?.id) {
@@ -76,6 +82,4 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
       OpenOptionsPage();
       break;
   }
-});
-
-export default ContextMenu;
+};

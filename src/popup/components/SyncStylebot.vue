@@ -30,11 +30,7 @@
 <script lang="ts">
 import Vue from 'vue';
 
-// Bypasses @stylebot/sync, whose barrel also drags in runGoogleDriveSync's postcss dependency chain.
-import {
-  getLastSyncedAt,
-  getSyncNeedsAuth,
-} from '../../sync/google-drive/sync-metadata';
+import { getLastSyncedAt, getSyncNeedsAuth } from '@stylebot/sync';
 import type {
   RunGoogleDriveSync,
   RunGoogleDriveSyncResponse,
@@ -160,7 +156,7 @@ export default Vue.extend({
   }
 
   &:focus-visible {
-    outline: 2px solid var(--ring);
+    outline: 2px solid var(--accent);
     outline-offset: -2px;
   }
 

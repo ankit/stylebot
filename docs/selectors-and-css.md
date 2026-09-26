@@ -89,9 +89,13 @@ every transform untouched. Stylebot treats nested rules as opaque:
 
 ## Where `!important` comes from
 
-Styles are stored exactly as the user wrote them. `!important` is added only
-when the CSS is injected into the page: it is parsed once, its `@import`s are
-stripped and its declarations marked important in the same pass. That happens
-for every style unless the user turned off Override site styles for it. CSS
-fetched through an `@import` is never forced, and the cache used at page load
-holds the same unforced CSS.
+Styles are stored exactly as the user wrote them. The CSS that reaches the
+page is prepared from them separately: parsed once, its `@import`s stripped
+and its declarations marked important in the same pass. That happens for
+every style unless the user turned off Override site styles for it, and CSS
+fetched through an `@import` is never forced.
+
+The background prepares every style when it's saved and keeps the result
+alongside the styles, so a page only injects it and never parses CSS itself;
+the cache used at page load holds the same prepared CSS. The editor prepares
+CSS the same way as you type, so what you preview is what later loads.

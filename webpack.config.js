@@ -63,6 +63,9 @@ const config = {
   devtool: process.env.NODE_ENV === 'production' ? false : 'inline-source-map',
 
   optimization: {
+    // On in development too (webpack enables it only in production), so a
+    // side-effect-only import missing from package.json breaks in dev:chrome.
+    sideEffects: true,
     minimize: process.env.NODE_ENV === 'production',
     minimizer: [
       new TerserPlugin({
@@ -93,9 +96,11 @@ const config = {
       '@stylebot/components': path.resolve(__dirname, './src/components/index'),
       '@stylebot/icons': path.resolve(__dirname, './src/icons/index'),
       '@stylebot/css': path.resolve(__dirname, './src/css/index'),
+      '@stylebot/inject-css': path.resolve(__dirname, './src/inject-css/index'),
       '@stylebot/i18n': path.resolve(__dirname, './src/i18n/index'),
       '@stylebot/sync': path.resolve(__dirname, './src/sync/index'),
       '@stylebot/history': path.resolve(__dirname, './src/history/index'),
+      '@stylebot/editor': path.resolve(__dirname, './src/editor/index'),
       '@stylebot/types': path.resolve(__dirname, './src/types/index'),
       '@stylebot/utils': path.resolve(__dirname, './src/utils/index'),
       '@stylebot/styles': path.resolve(__dirname, './src/styles/index'),
@@ -132,6 +137,10 @@ const config = {
       {
         test: /\.vue$/,
         loader: 'vue-loader',
+      },
+      {
+        resourceQuery: /type=style/,
+        sideEffects: true,
       },
       {
         test: /\.ts$/,
@@ -314,17 +323,24 @@ const backgroundPageConfig = {
 const clientConfig = {
   ...config,
   entry: {
-    'sync/index': './sync/index.ts',
     'popup/index': './popup/index.ts',
-    'editor/index': './editor/index.ts',
+    'editor/index': './editor/content-script.ts',
+    'editor/app': './editor/app.ts',
     options: './options/index.ts',
     'editor-window/index': './editor-window/index.ts',
-    'inject-css/index': './inject-css/index.ts',
+    'inject-css/index': './inject-css/content-script.ts',
     'monaco-editor/iframe/index': './monaco-editor/iframe/index.ts',
     'monaco-editor/iframe/options-index':
       './monaco-editor/iframe/options-index.ts',
     'readability/reader': './readability/reader.ts',
   },
+  // Webpack's `global` shim falls back to `new Function` in the bundles loaded
+  // with import(), which a strict page CSP blocks and reports as an issue.
+  node: { global: false },
+  plugins: [
+    ...config.plugins,
+    new webpack.DefinePlugin({ global: 'globalThis' }),
+  ],
 };
 
 module.exports = [backgroundPageConfig, clientConfig];

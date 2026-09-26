@@ -1,3 +1,4 @@
+import { STYLES_METADATA_KEY } from '@stylebot/styles';
 import { getCurrentTimestamp } from '@stylebot/utils';
 
 /**
@@ -6,14 +7,14 @@ import { getCurrentTimestamp } from '@stylebot/utils';
  * than once, because a profile migrated by those versions is still corrupt.
  */
 const StylesMetadataUpdate = async (): Promise<void> => {
-  const items = await chrome.storage.local.get('styles-metadata');
-  const metadata = items['styles-metadata'];
+  const items = await chrome.storage.local.get(STYLES_METADATA_KEY);
+  const metadata = items[STYLES_METADATA_KEY];
 
   if (typeof metadata === 'string') {
     // Keep the original timestamp. Replacing it with now would look like a
     // local edit and trigger a pointless upload on the next sync.
     await chrome.storage.local.set({
-      'styles-metadata': { modifiedTime: metadata },
+      [STYLES_METADATA_KEY]: { modifiedTime: metadata },
     });
 
     return;
@@ -28,7 +29,7 @@ const StylesMetadataUpdate = async (): Promise<void> => {
   }
 
   await chrome.storage.local.set({
-    'styles-metadata': { modifiedTime: getCurrentTimestamp() },
+    [STYLES_METADATA_KEY]: { modifiedTime: getCurrentTimestamp() },
   });
 };
 

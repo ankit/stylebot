@@ -2,8 +2,8 @@ import {
   isSyncAlarm,
   updatePeriodicSync,
   scheduleSyncAfterEdit,
-  SYNC_PERIOD_MINUTES,
 } from '../sync-scheduler';
+import { SYNC_PERIOD_MINUTES } from '@stylebot/sync';
 
 let store: Record<string, unknown>;
 

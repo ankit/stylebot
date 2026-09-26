@@ -1,5 +1,6 @@
 import type {
   StyleMap,
+  StyleStorage,
   SyncState,
   SyncConflict,
   RunGoogleDriveSyncResponse,
@@ -29,11 +30,6 @@ import {
   downloadSyncFile,
   writeSyncFile,
 } from './sync-file';
-import {
-  setAllIfUnchanged as setAllStylesIfUnchanged,
-  getAll as getAllStyles,
-  applyStylesToAllTabs,
-} from '../../background/styles';
 
 export type SyncOptions = {
   // Whether an auth window may be opened. Off for scheduled runs, which have
@@ -64,15 +60,16 @@ const mergeConflicts = (
  * what it will find, or null when the write was refused.
  */
 const writeLocal = async (
+  storage: StyleStorage,
   styles: StyleMap,
   localRevision: string
 ): Promise<string | null> => {
-  const revision = await setAllStylesIfUnchanged(styles, localRevision, {
+  const revision = await storage.setAllIfUnchanged(styles, localRevision, {
     fromSync: true,
   });
 
   if (revision !== null) {
-    await applyStylesToAllTabs();
+    await storage.applyStylesToAllTabs();
   }
 
   return revision;
@@ -107,6 +104,7 @@ const recordSyncState = async (next: SyncState): Promise<void> => {
  * base behind reality only costs a conflict, one ahead of it loses data.
  */
 const reconcile = async (
+  storage: StyleStorage,
   { interactive }: SyncOptions,
   retrying = false
 ): Promise<SyncState> => {
@@ -115,7 +113,7 @@ const reconcile = async (
   }
 
   const now = getCurrentTimestamp();
-  const local = await getAllStyles();
+  const local = await storage.getAll();
   const { modifiedTime: localRevision } = await getLocalStylesMetadata();
   const accessToken = await getAccessToken({ interactive });
   const state = await getSyncState();
@@ -186,12 +184,12 @@ const reconcile = async (
         throw syncError('Drive file changed during sync', 'unknown');
       }
 
-      return reconcile({ interactive }, true);
+      return reconcile(storage, { interactive }, true);
     }
   }
 
   if (shouldUpdateLocal) {
-    const written = await writeLocal(styles, localRevision);
+    const written = await writeLocal(storage, styles, localRevision);
 
     // Same story as the remote: an edit saved while this ran is not in the
     // merge, so start over from a fresh read of local — once.
@@ -200,7 +198,7 @@ const reconcile = async (
         throw syncError('Styles changed during sync', 'unknown');
       }
 
-      return reconcile({ interactive }, true);
+      return reconcile(storage, { interactive }, true);
     }
 
     nextLocalRevision = written;
@@ -248,10 +246,11 @@ const toFailure = (e: unknown): RunGoogleDriveSyncResponse => ({
 });
 
 const run = async (
+  storage: StyleStorage,
   options: SyncOptions
 ): Promise<RunGoogleDriveSyncResponse> => {
   try {
-    const { metadata } = await reconcile(options);
+    const { metadata } = await reconcile(storage, options);
     await setSyncNeedsAuth(false);
 
     return { ok: true, metadata };
@@ -262,7 +261,7 @@ const run = async (
       await clearCachedToken();
 
       try {
-        const { metadata } = await reconcile(options);
+        const { metadata } = await reconcile(storage, options);
         await setSyncNeedsAuth(false);
 
         return { ok: true, metadata };
@@ -290,13 +289,14 @@ const run = async (
  * fire, so failures come back as a result rather than an exception.
  */
 export const runGoogleDriveSync = (
+  storage: StyleStorage,
   options: SyncOptions = { interactive: true }
 ): Promise<RunGoogleDriveSyncResponse> => {
   // Not .finally(): tsconfig sets no target, so ES3 output has no
   // Promise.prototype.finally.
   inFlight =
     inFlight ??
-    run(options).then(
+    run(storage, options).then(
       response => {
         inFlight = null;
         return response;

@@ -1,0 +1,439 @@
+---
+import { Image, getImage } from 'astro:assets';
+import CarouselNav from './CarouselNav.astro';
+import { GALLERY } from '../lib/gallery';
+
+const items = await Promise.all(
+  GALLERY.map(async (item) => ({
+    ...item,
+    full: (
+      await getImage({
+        src: item.image,
+        width: item.image.width,
+        format: 'webp',
+        quality: 90,
+      })
+    ).src,
+  })),
+);
+
+const copyIcon = `<svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.8"></rect><path d="M10.5 3.2V3A1.5 1.5 0 0 0 9 1.5H4A2.5 2.5 0 0 0 1.5 4v5A1.5 1.5 0 0 0 3 10.5h.2"></path></svg>`;
+const checkIcon = `<svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5 6.5 12 13 4.5"></path></svg>`;
+---
+
+<section id="gallery" class="section">
+  <div class="section-inner">
+    <div class="section-head">
+      <div>
+        <h2 class="section-title">What people make with it</h2>
+        <p class="section-lede">Real sites, restyled with Stylebot.</p>
+      </div>
+      <CarouselNav target="gallery-track" label="example" />
+    </div>
+    <div id="gallery-track" class="carousel gallery-track">
+      {items.map((item) => (
+        <figure class="gallery-item" data-gallery={item.id}>
+          <div class="gallery-shot">
+            <button
+              class="gallery-open"
+              data-open
+              data-full={item.full}
+              aria-label={`Enlarge ${item.site}: ${item.name}`}
+            >
+              <Image
+                src={item.image}
+                widths={[480, 720, 960]}
+                sizes="(min-width: 1180px) 265px, (min-width: 700px) 25vw, 240px"
+                loading="eager"
+                alt={`${item.site} restyled with Stylebot: ${item.name}`}
+              />
+            </button>
+            <button
+              class="gallery-copy"
+              data-copy
+              title="Copy CSS"
+              aria-label={`Copy CSS for ${item.name}`}
+            >
+              <span class="gallery-copy-idle" set:html={copyIcon} />
+              <span class="gallery-copy-ok" set:html={checkIcon} />
+            </button>
+          </div>
+          <figcaption class="gallery-caption">
+            <span class="gallery-name">{item.name}</span>
+            <span class="gallery-site">{item.site}</span>
+          </figcaption>
+          <template data-css>{item.css}</template>
+        </figure>
+      ))}
+    </div>
+  </div>
+</section>
+
+<dialog class="lightbox" aria-label="Restyled site">
+  <div class="lightbox-body" data-close>
+    <img class="lightbox-img" alt="" />
+    <div class="lightbox-bar">
+      <span class="lightbox-name"></span>
+      <span class="lightbox-site"></span>
+      <button class="lightbox-copy" data-lightbox-copy>
+        Copy CSS
+      </button>
+    </div>
+  </div>
+  <button class="lightbox-close" data-close aria-label="Close">
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 14 14"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.6"
+      stroke-linecap="round"
+      aria-hidden="true"
+    >
+      <path d="M2.5 2.5l9 9M11.5 2.5l-9 9"></path>
+    </svg>
+  </button>
+</dialog>
+
+<script>
+  const COPIED_MS = 1600;
+  let resetTimer: ReturnType<typeof setTimeout> | undefined;
+  let lightboxItem: HTMLElement | null = null;
+
+  const cssOf = (item: HTMLElement) =>
+    item.querySelector<HTMLTemplateElement>('template[data-css]')!.content
+      .textContent ?? '';
+
+  async function copyText(text: string) {
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      const area = document.createElement('textarea');
+      area.value = text;
+      area.style.position = 'fixed';
+      area.style.opacity = '0';
+      document.body.appendChild(area);
+      area.select();
+      document.execCommand('copy');
+      area.remove();
+    }
+  }
+
+  const dialog = document.querySelector<HTMLDialogElement>('.lightbox')!;
+  const lightboxCopy = dialog.querySelector<HTMLButtonElement>(
+    '[data-lightbox-copy]',
+  )!;
+
+  function markCopied(item: HTMLElement) {
+    document
+      .querySelectorAll('.gallery-item.is-copied')
+      .forEach((el) => el.classList.remove('is-copied'));
+    item.classList.add('is-copied');
+    item.querySelector('[data-copy]')!.setAttribute('title', 'Copied');
+    if (lightboxItem === item) lightboxCopy.textContent = 'Copied';
+    clearTimeout(resetTimer);
+    resetTimer = setTimeout(() => {
+      item.classList.remove('is-copied');
+      item.querySelector('[data-copy]')!.setAttribute('title', 'Copy CSS');
+      lightboxCopy.textContent = 'Copy CSS';
+    }, COPIED_MS);
+  }
+
+  async function copyItem(item: HTMLElement) {
+    await copyText(cssOf(item));
+    markCopied(item);
+  }
+
+  const items = [...document.querySelectorAll<HTMLElement>('.gallery-item')];
+  const fullSrc = (item: HTMLElement) =>
+    item.querySelector<HTMLButtonElement>('[data-open]')!.dataset.full!;
+
+  /**
+   * Fetches the full-size screenshots once the gallery is near the viewport,
+   * so opening one shows it immediately.
+   */
+  const preloaded = new Set<string>();
+  function preload() {
+    items.forEach((item) => {
+      const src = fullSrc(item);
+      if (preloaded.has(src)) return;
+      preloaded.add(src);
+      const img = new Image();
+      img.decoding = 'async';
+      img.src = src;
+    });
+  }
+  new IntersectionObserver(
+    (entries, observer) => {
+      if (!entries.some((e) => e.isIntersecting)) return;
+      observer.disconnect();
+      preload();
+    },
+    { rootMargin: '600px 0px' },
+  ).observe(document.getElementById('gallery')!);
+
+  function show(item: HTMLElement) {
+    const img = dialog.querySelector<HTMLImageElement>('.lightbox-img')!;
+    img.src = fullSrc(item);
+    img.alt = item.querySelector('[data-open] img')!.getAttribute('alt') ?? '';
+    dialog.querySelector('.lightbox-name')!.textContent =
+      item.querySelector('.gallery-name')!.textContent;
+    dialog.querySelector('.lightbox-site')!.textContent =
+      item.querySelector('.gallery-site')!.textContent;
+    lightboxItem = item;
+    lightboxCopy.textContent = item.classList.contains('is-copied')
+      ? 'Copied'
+      : 'Copy CSS';
+  }
+
+  items.forEach((item) => {
+    item
+      .querySelector('[data-copy]')!
+      .addEventListener('click', () => copyItem(item));
+    item
+      .querySelector<HTMLButtonElement>('[data-open]')!
+      .addEventListener('click', () => {
+        preload();
+        show(item);
+        dialog.showModal();
+      });
+  });
+
+  dialog.addEventListener('keydown', (e) => {
+    if (!lightboxItem || (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight'))
+      return;
+    e.preventDefault();
+    const dir = e.key === 'ArrowRight' ? 1 : -1;
+    const next =
+      (items.indexOf(lightboxItem) + dir + items.length) % items.length;
+    show(items[next]);
+  });
+
+  lightboxCopy.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (lightboxItem) copyItem(lightboxItem);
+  });
+
+  dialog.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    if (target === dialog || target.closest('[data-close]')) dialog.close();
+  });
+
+  dialog.addEventListener('close', () => {
+    lightboxItem = null;
+  });
+</script>
+
+<style>
+  .gallery-track {
+    padding-bottom: 8px;
+  }
+
+  .gallery-item {
+    flex: 0 0 max(240px, calc((100% - 72px) / 4));
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 0;
+  }
+
+  .gallery-shot {
+    position: relative;
+    aspect-ratio: 3 / 2;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: var(--fill);
+    box-shadow: 0 8px 24px rgba(25, 27, 31, 0.08);
+    transition:
+      transform 0.2s,
+      box-shadow 0.2s;
+  }
+
+  .gallery-shot:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 32px rgba(25, 27, 31, 0.14);
+  }
+
+  .gallery-open {
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: zoom-in;
+  }
+
+  .gallery-open img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top left;
+  }
+
+  .gallery-copy {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 2;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 7px;
+    border: none;
+    cursor: pointer;
+    backdrop-filter: blur(6px);
+    background: rgba(20, 22, 26, 0.45);
+    color: #fff;
+    opacity: 0;
+    transform: translateY(-4px);
+    pointer-events: none;
+    transition:
+      opacity 0.15s,
+      transform 0.15s,
+      background 0.15s;
+  }
+
+  .gallery-shot:hover .gallery-copy,
+  .gallery-copy:focus-visible,
+  .is-copied .gallery-copy {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .is-copied .gallery-copy {
+    background: rgba(31, 138, 76, 0.85);
+  }
+
+  .gallery-copy-idle,
+  .gallery-copy-ok {
+    display: flex;
+  }
+
+  .gallery-copy-ok,
+  .is-copied .gallery-copy-idle {
+    display: none;
+  }
+
+  .is-copied .gallery-copy-ok {
+    display: flex;
+  }
+
+  .gallery-caption {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 0 2px;
+    flex-wrap: wrap;
+  }
+
+  .gallery-name {
+    font: 600 14px/1.3 var(--ui);
+    color: var(--ink);
+  }
+
+  .gallery-site {
+    font: 400 12.5px/1.3 var(--mono);
+    color: var(--faint);
+  }
+
+  .lightbox {
+    width: 100vw;
+    height: 100vh;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 40px;
+    border: none;
+    background: transparent;
+    cursor: zoom-out;
+  }
+
+  .lightbox::backdrop {
+    background: rgba(12, 13, 16, 0.82);
+    backdrop-filter: blur(6px);
+  }
+
+  .lightbox-body {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+  }
+
+  .lightbox-img {
+    width: min(1400px, 100%);
+    max-height: calc(100vh - 140px);
+    object-fit: contain;
+    filter: drop-shadow(0 24px 48px rgba(0, 0, 0, 0.5));
+  }
+
+  .lightbox-bar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    color: #fff;
+  }
+
+  .lightbox-name {
+    font: 600 14px/1.3 var(--ui);
+  }
+
+  .lightbox-site {
+    font: 400 12.5px/1.3 var(--mono);
+    opacity: 0.7;
+  }
+
+  .lightbox-copy {
+    margin-left: 6px;
+    padding: 7px 12px;
+    border-radius: 8px;
+    border: none;
+    background: #fff;
+    color: #191b1f;
+    cursor: pointer;
+    font: 600 12.5px/1 var(--ui);
+  }
+
+  .lightbox-copy:hover {
+    background: #e9eaee;
+  }
+
+  .lightbox-close {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+    border: none;
+    background: rgba(255, 255, 255, 0.14);
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .lightbox-close:hover {
+    background: rgba(255, 255, 255, 0.24);
+  }
+
+  @media (max-width: 600px) {
+    .lightbox {
+      padding: 16px;
+    }
+  }
+</style>

@@ -85,6 +85,6 @@ export default Vue.extend({
 
 .menu-item-check {
   flex: none;
-  color: var(--accent);
+  color: var(--accent-text);
 }
 </style>

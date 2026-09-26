@@ -124,11 +124,11 @@ import { Heading, SText, SButton, SLinkButton } from '@stylebot/components';
 import { ArrowRepeatIcon } from '@stylebot/icons';
 import type { SyncAccount, SyncConflict } from '@stylebot/types';
 import { formatSyncTime } from '@stylebot/utils';
-import { SYNC_PERIOD_MINUTES } from '../../../background/sync-scheduler';
 import {
   SYNC_FILE_PATH,
   SYNC_FILE_NAME,
-} from '../../../sync/google-drive/constants';
+  SYNC_PERIOD_MINUTES,
+} from '@stylebot/sync';
 
 export default Vue.extend({
   name: 'TheGoogleDriveSync',
@@ -351,7 +351,7 @@ export default Vue.extend({
   gap: 5px;
   font-family: var(--font-mono);
   font-size: 12.5px;
-  color: var(--accent);
+  color: var(--accent-text);
   text-decoration: none;
 
   &:hover {

@@ -1,3 +1,4 @@
+import { STYLES_METADATA_KEY } from '@stylebot/styles';
 import type { SyncState } from '@stylebot/types';
 
 const SYNC_STATE_KEY = 'google-drive-sync-state';
@@ -67,8 +68,8 @@ export const getGoogleDriveSyncEnabled = async (): Promise<boolean> => {
 export const getLocalStylesMetadata = async (): Promise<{
   modifiedTime: string;
 }> => {
-  const items = await chrome.storage.local.get('styles-metadata');
-  const metadata = items['styles-metadata'];
+  const items = await chrome.storage.local.get(STYLES_METADATA_KEY);
+  const metadata = items[STYLES_METADATA_KEY];
 
   if (typeof metadata?.modifiedTime === 'string') {
     return metadata;

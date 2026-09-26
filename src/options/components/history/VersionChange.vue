@@ -132,7 +132,7 @@ export default Vue.extend({
 }
 
 .edited .verb {
-  color: var(--accent-tint-ink);
+  color: var(--accent-text);
 }
 
 .restored {

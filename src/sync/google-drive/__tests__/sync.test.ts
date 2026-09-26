@@ -14,7 +14,9 @@ jest.mock('../sync-file', () => ({
 
 import type { StyleMap, SyncState } from '@stylebot/types';
 
-import { runGoogleDriveSync } from '../sync';
+import * as styleStorage from '../../../background/styles';
+import type { SyncOptions } from '../sync';
+import { runGoogleDriveSync as runSync } from '../sync';
 import {
   getSyncFileMetadata,
   getFileMetadata,
@@ -22,6 +24,9 @@ import {
   downloadSyncFile,
   writeSyncFile,
 } from '../sync-file';
+
+const runGoogleDriveSync = (options?: SyncOptions) =>
+  runSync(styleStorage, options);
 
 const mockedGetRemote = getSyncFileMetadata as jest.Mock;
 const mockedGetFile = getFileMetadata as jest.Mock;
