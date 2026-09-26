@@ -50,11 +50,23 @@ let activeInstance: { hide(): void } | null = null;
 // :focus-visible isn't precise enough — Chrome marks a programmatic
 // .focus() call as visible too. Track an actual Tab press instead.
 let lastKeyWasTab = false;
-document.addEventListener(
-  'keydown',
-  event => (lastKeyWasTab = event.key === 'Tab'),
-  true
-);
+let trackingTab = false;
+
+/**
+ * Starts tracking Tab presses, once, when the first tooltip mounts.
+ */
+const trackTabKey = (): void => {
+  if (trackingTab) {
+    return;
+  }
+  trackingTab = true;
+
+  document.addEventListener(
+    'keydown',
+    event => (lastKeyWasTab = event.key === 'Tab'),
+    true
+  );
+};
 
 export default Vue.extend({
   name: 'STooltip',
@@ -121,6 +133,10 @@ export default Vue.extend({
     bubbleTransform(): string {
       return `translateX(calc(-50% + ${this.shiftX}px))`;
     },
+  },
+
+  mounted() {
+    trackTabKey();
   },
 
   beforeDestroy() {

@@ -2,7 +2,7 @@ import Vue from 'vue';
 import { t } from '@stylebot/i18n';
 
 import App from './App.vue';
-import store from './store/index';
+import { createStore } from './store/index';
 import { createRouter } from './router';
 
 Vue.mixin({
@@ -12,7 +12,7 @@ Vue.mixin({
 });
 
 new Vue({
-  store,
+  store: createStore(),
   router: createRouter(),
   el: '#app',
   render: h => h(App),

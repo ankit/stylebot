@@ -22,8 +22,6 @@ import getters from './getters';
 import actions from './actions';
 import mutations from './mutations';
 
-Vue.use(Vuex);
-
 /**
  * Where the editor UI lives: injected into the styled page itself, or in a
  * separate extension window driving that page over a tab port.
@@ -83,8 +81,10 @@ export type State = {
   readabilitySettings: ReadabilitySettings;
 };
 
-export const createStore = (host: EditorHost): Store<State> =>
-  new Vuex.Store<State>({
+export const createStore = (host: EditorHost): Store<State> => {
+  Vue.use(Vuex);
+
+  return new Vuex.Store<State>({
     state: {
       host,
       page: emptyPageSnapshot(),
@@ -120,3 +120,4 @@ export const createStore = (host: EditorHost): Store<State> =>
     actions,
     mutations,
   });
+};

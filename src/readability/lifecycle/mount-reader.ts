@@ -9,11 +9,23 @@ import { getReadabilityArticle } from './get-readability-article';
 import type { ReadabilityArticle } from '@stylebot/types';
 import { cacheDocument } from './document-cache';
 
-Vue.mixin({
-  methods: {
-    t,
-  },
-});
+let vueReady = false;
+
+/**
+ * Registers the globals the reader's components need before the first mount.
+ */
+const setupVue = (): void => {
+  if (vueReady) {
+    return;
+  }
+  vueReady = true;
+
+  Vue.mixin({
+    methods: {
+      t,
+    },
+  });
+};
 
 /**
  * Fetches the reader's compiled stylesheet and injects it into the shadow root.
@@ -87,6 +99,8 @@ export const mountReader = async (): Promise<void> => {
   if (!hasReaderableContent(document)) {
     return Promise.reject();
   }
+
+  setupVue();
 
   try {
     const { url, source } = getDomainUrlAndSource();

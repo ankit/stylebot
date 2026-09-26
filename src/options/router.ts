@@ -8,8 +8,6 @@ import TheHistoryTab from './components/TheHistoryTab.vue';
 import TheSyncTab from './components/TheSyncTab.vue';
 import TheStyleEditorPage from './components/styles/TheStyleEditorPage.vue';
 
-Vue.use(VueRouter);
-
 export const TABS = ['basics', 'styles', 'history', 'sync'] as const;
 
 export type Tab = (typeof TABS)[number];
@@ -57,5 +55,7 @@ export const routes: Array<RouteConfig> = [
  * Abstract mode is for Storybook and Jest; it does no initial navigation,
  * so callers start it with `router.replace(...)`.
  */
-export const createRouter = (mode: 'hash' | 'abstract' = 'hash'): VueRouter =>
-  new VueRouter({ mode, routes });
+export const createRouter = (mode: 'hash' | 'abstract' = 'hash'): VueRouter => {
+  Vue.use(VueRouter);
+  return new VueRouter({ mode, routes });
+};
