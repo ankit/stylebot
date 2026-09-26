@@ -64,7 +64,7 @@
 
       <div class="popup-divider" />
 
-      <template v-if="googleDriveSyncEnabled">
+      <template v-if="syncNeedsSignIn">
         <sync-stylebot />
         <div class="popup-divider" />
       </template>
@@ -104,13 +104,9 @@ import {
   getIsPageReaderable,
 } from './utils';
 
-import { getGoogleDriveSyncEnabled } from '@stylebot/sync';
+import { getGoogleDriveSyncEnabled, getSyncNeedsAuth } from '@stylebot/sync';
 import { BackgroundPageUtils } from '@stylebot/styles';
-import type {
-  GoogleDriveSyncMetadata,
-  GetCommandsResponse,
-  StylebotAppearance,
-} from '@stylebot/types';
+import type { GetCommandsResponse, StylebotAppearance } from '@stylebot/types';
 
 export default Vue.extend({
   name: 'App',
@@ -134,8 +130,7 @@ export default Vue.extend({
     pageReaderable: boolean;
     tab?: chrome.tabs.Tab;
     styles: Array<{ url: string; css: string; enabled: boolean }>;
-    googleDriveSyncEnabled: boolean;
-    googleDriveSyncMetadata?: GoogleDriveSyncMetadata;
+    syncNeedsSignIn: boolean;
     commands?: GetCommandsResponse;
     appearance: StylebotAppearance;
   } {
@@ -145,8 +140,7 @@ export default Vue.extend({
       tab: undefined,
       readability: false,
       pageReaderable: true,
-      googleDriveSyncEnabled: false,
-      googleDriveSyncMetadata: undefined,
+      syncNeedsSignIn: false,
       commands: undefined,
       appearance: 'system',
     };
@@ -202,9 +196,11 @@ export default Vue.extend({
       });
     });
 
-    getGoogleDriveSyncEnabled().then(enabled => {
-      this.googleDriveSyncEnabled = enabled;
-    });
+    Promise.all([getGoogleDriveSyncEnabled(), getSyncNeedsAuth()]).then(
+      ([enabled, needsAuth]) => {
+        this.syncNeedsSignIn = enabled && needsAuth;
+      }
+    );
 
     getCommands(commands => {
       this.commands = commands;
