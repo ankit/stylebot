@@ -63,6 +63,9 @@ const config = {
   devtool: process.env.NODE_ENV === 'production' ? false : 'inline-source-map',
 
   optimization: {
+    // On in development too (webpack enables it only in production), so a
+    // side-effect-only import missing from package.json breaks in dev:chrome.
+    sideEffects: true,
     minimize: process.env.NODE_ENV === 'production',
     minimizer: [
       new TerserPlugin({
