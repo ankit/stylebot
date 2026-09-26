@@ -48,6 +48,10 @@ Stories:
 - Use `@storybook/test` (`within`, `expect`, `waitFor`) and the helpers in `.storybook/story-helpers.ts`; group longer plays into `step('…', …)` phases.
 - Drive input through the shared `user` from `story-helpers` (not `userEvent` directly) so the toolbar's Slow motion toggle applies, and hover page elements while inspecting via `hoverPage`/`pick`, which first let the browser settle its own hover state.
 
+## Side effects
+
+`package.json` declares `sideEffects`, so webpack drops modules whose exports go unused, in development builds as well as production. A module imported only for what it does on load (`import './listeners'`) has to be listed there; stylesheets and Vue style blocks already are.
+
 ## Commit messages
 
 Use [Conventional Commits](https://www.conventionalcommits.org/) format: `<type>[optional scope]: <description>` (e.g. `fix: correct Firefox extension launch`, `feat(editor): add JS snippet execution`). Common types: `feat`, `fix`, `refactor`, `chore`, `docs`, `test`.
