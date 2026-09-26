@@ -65,7 +65,6 @@ export type ChatAssistantTurn = {
   applied: boolean;
   model: string;
   usage?: ChatUsage;
-  cost?: number;
 };
 
 export type ChatTurn = ChatUserTurn | ChatAssistantTurn;
@@ -98,11 +97,6 @@ export type ChatModel = {
   id: string;
   name: string;
   tier: ChatModelTier;
-  // USD per million tokens.
-  inputPrice: number;
-  outputPrice: number;
-  cacheReadPrice: number;
-  cacheWritePrice: number;
   // Extra request fields this model takes, merged into every request body.
   requestOptions?: Record<string, unknown>;
 };
