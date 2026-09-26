@@ -578,8 +578,10 @@ describe('actions', () => {
 
     beforeEach(() => {
       jest
-        .spyOn(googleFonts, 'loadGoogleFonts')
-        .mockResolvedValue([{ family: 'Inter', category: 'sans-serif' }]);
+        .spyOn(googleFonts, 'resolveGoogleFont')
+        .mockImplementation(async family =>
+          family.toLowerCase() === 'inter' ? 'Inter' : null
+        );
       jest
         .spyOn(stylebotCss, 'getPrimaryFontFamily')
         .mockImplementation(value => value.split(',')[0].trim());
@@ -589,7 +591,6 @@ describe('actions', () => {
       jest
         .spyOn(stylebotCss, 'addGoogleWebFontImport')
         .mockImplementation((family, css) => `@import ${family};\n${css}`);
-      jest.spyOn(stylebotCss, 'googleWebFontExists').mockResolvedValue(false);
     });
 
     it('applies the declaration, remembers a pick, and imports a bundled font', async () => {
@@ -603,7 +604,6 @@ describe('actions', () => {
         value: 'Inter, sans-serif',
       });
       expect(mockDispatch).toHaveBeenNthCalledWith(2, 'rememberFont', 'Inter');
-      expect(stylebotCss.googleWebFontExists).not.toBeCalled();
       expect(mockDispatch).toHaveBeenNthCalledWith(3, 'applyCss', {
         css: '@import Inter;\na { }',
         record: false,
@@ -622,17 +622,15 @@ describe('actions', () => {
       );
     });
 
-    it('checks fonts outside the bundled list before importing', async () => {
-      jest.spyOn(stylebotCss, 'googleWebFontExists').mockResolvedValue(true);
-
+    it('imports a font under its Google Fonts spelling', async () => {
       await actions.applyFontFamily(
         { state, dispatch: mockDispatch },
-        { value: 'Some Font' }
+        { value: 'inter' }
       );
 
-      expect(stylebotCss.googleWebFontExists).toBeCalledWith('Some Font');
+      expect(googleFonts.resolveGoogleFont).toBeCalledWith('inter');
       expect(mockDispatch).toBeCalledWith('applyCss', {
-        css: '@import Some Font;\na { }',
+        css: '@import Inter;\na { }',
         record: false,
       });
     });
@@ -650,11 +648,11 @@ describe('actions', () => {
     it('adds the import to the css as it is after the lookup, not before', async () => {
       const live = { ...state };
       jest
-        .spyOn(stylebotCss, 'googleWebFontExists')
-        .mockImplementation(async () => {
+        .spyOn(googleFonts, 'resolveGoogleFont')
+        .mockImplementation(async family => {
           // Another edit lands while the lookup is in flight.
           live.css = 'a { color: red; }';
-          return true;
+          return family;
         });
 
       await actions.applyFontFamily(
@@ -669,8 +667,8 @@ describe('actions', () => {
     });
 
     it('lets a newer apply win when lookups resolve out of order', async () => {
-      let resolveFirst: (exists: boolean) => void = () => undefined;
-      jest.spyOn(stylebotCss, 'googleWebFontExists').mockImplementationOnce(
+      let resolveFirst: (family: string) => void = () => undefined;
+      jest.spyOn(googleFonts, 'resolveGoogleFont').mockImplementationOnce(
         () =>
           new Promise(resolve => {
             resolveFirst = resolve;
@@ -685,7 +683,7 @@ describe('actions', () => {
         { state, dispatch: mockDispatch },
         { value: 'Inter' }
       );
-      resolveFirst(true);
+      resolveFirst('Slow Font');
       await first;
 
       expect(stylebotCss.addGoogleWebFontImport).toBeCalledTimes(1);
@@ -709,7 +707,7 @@ describe('actions', () => {
         property: 'font-family',
         value: '',
       });
-      expect(stylebotCss.googleWebFontExists).not.toBeCalled();
+      expect(googleFonts.resolveGoogleFont).not.toBeCalled();
       expect(stylebotCss.addGoogleWebFontImport).not.toBeCalled();
     });
   });
@@ -719,8 +717,12 @@ describe('actions', () => {
 
     beforeEach(() => {
       jest
-        .spyOn(googleFonts, 'loadGoogleFonts')
-        .mockResolvedValue([{ family: 'Inter', category: 'sans-serif' }]);
+        .spyOn(googleFonts, 'resolveGoogleFont')
+        .mockImplementation(async family =>
+          ['inter', 'zen kurenaido'].includes(family.toLowerCase())
+            ? family
+            : null
+        );
       jest
         .spyOn(stylebotCss, 'getPrimaryFontFamily')
         .mockImplementation(value => value.split(',')[0].trim());
@@ -759,6 +761,19 @@ describe('actions', () => {
       });
     });
 
+    it('imports a Google font outside the bundled list', async () => {
+      await actions.previewFontFamily({ state }, 'Zen Kurenaido');
+
+      expect(stylebotCss.addGoogleWebFontImport).toBeCalledWith(
+        'Zen Kurenaido',
+        'h1 { font-family: Zen Kurenaido; }'
+      );
+      expect(mockBridge.setPreviewCss).toBeCalledWith({
+        css: '@import;\nh1 { font-family: Zen Kurenaido; }',
+        forceImportant: true,
+      });
+    });
+
     it('skips the import for an unknown font', async () => {
       await actions.previewFontFamily({ state }, 'Some Local');
 
@@ -773,19 +788,18 @@ describe('actions', () => {
       expect(mockBridge.setPreviewCss).toBeCalledTimes(1);
     });
 
-    it('drops a preview that was cleared while the font list was loading', async () => {
-      let resolveFonts: (fonts: Array<googleFonts.GoogleFont>) => void = () =>
-        undefined;
-      jest.spyOn(googleFonts, 'loadGoogleFonts').mockImplementation(
+    it('drops a preview that was cleared while the font was resolving', async () => {
+      let resolveFont: (family: string) => void = () => undefined;
+      jest.spyOn(googleFonts, 'resolveGoogleFont').mockImplementation(
         () =>
           new Promise(resolve => {
-            resolveFonts = resolve;
+            resolveFont = resolve;
           })
       );
 
       const pending = actions.previewFontFamily({ state }, 'Inter');
       await actions.previewFontFamily({ state }, '');
-      resolveFonts([{ family: 'Inter', category: 'sans-serif' }]);
+      resolveFont('Inter');
       await pending;
 
       // Only the clearing call reached the page; the stale preview did not.

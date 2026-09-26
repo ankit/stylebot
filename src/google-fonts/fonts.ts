@@ -1,3 +1,5 @@
+import { googleWebFontExists } from '@stylebot/css';
+
 export type GoogleFontCategory =
   | 'sans-serif'
   | 'serif'
@@ -32,6 +34,26 @@ export const loadGoogleFonts = (): Promise<Array<GoogleFont>> => {
     });
 
   return pending;
+};
+
+/**
+ * The Google Fonts spelling of a family, or null if Google doesn't serve it.
+ * The bundled list answers first and ignoring case, since the Google Fonts
+ * API only accepts its own spelling; any other family is looked up.
+ */
+export const resolveGoogleFont = async (
+  family: string
+): Promise<string | null> => {
+  const id = family.toLowerCase();
+  const bundled = (await loadGoogleFonts()).find(
+    font => font.family.toLowerCase() === id
+  );
+
+  if (bundled) {
+    return bundled.family;
+  }
+
+  return (await googleWebFontExists(family)) ? family : null;
 };
 
 /**
