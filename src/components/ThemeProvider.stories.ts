@@ -37,7 +37,7 @@ const TOKEN_GROUPS: Array<{ label: string; tokens: Array<string> }> = [
   },
   {
     label: 'Accent',
-    tokens: ['accent', 'accent-ink', 'accent-text', 'ring'],
+    tokens: ['accent', 'accent-ink', 'accent-text'],
   },
   {
     label: 'Selection',

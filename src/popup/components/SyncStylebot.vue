@@ -160,7 +160,7 @@ export default Vue.extend({
   }
 
   &:focus-visible {
-    outline: 2px solid var(--ring);
+    outline: 2px solid var(--accent);
     outline-offset: -2px;
   }
 

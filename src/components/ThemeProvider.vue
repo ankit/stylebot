@@ -121,8 +121,6 @@ export default Vue.extend({
   --success-background: #e8f5ee;
   --success-border: #c3e6d1;
 
-  --ring: var(--accent);
-
   --font-mono: 'Fira Code', Menlo, Monaco, Consolas, monospace;
 }
 

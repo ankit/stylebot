@@ -101,12 +101,12 @@ export default Vue.extend({
   }
 
   &:focus-visible::-webkit-slider-thumb {
-    outline: 2px solid var(--ring);
+    outline: 2px solid var(--accent);
     outline-offset: 1px;
   }
 
   &:focus-visible::-moz-range-thumb {
-    outline: 2px solid var(--ring);
+    outline: 2px solid var(--accent);
     outline-offset: 1px;
   }
 }
