@@ -75,18 +75,34 @@ const injectFontFaces = (): void => {
   (document.head || document.documentElement).appendChild(styleEl);
 };
 
-const injectCss = (shadowRoot: ShadowRoot): Promise<void> => {
-  const url = chrome.runtime.getURL('editor/app.css');
+let editorCss: Promise<string> | null = null;
 
-  return fetch(url, { method: 'GET' })
-    .then(response => response.text())
-    .then(css => {
-      const styleEl = document.createElement('style');
-      styleEl.setAttribute('id', 'stylebot-editor-css');
-      styleEl.innerHTML = css;
-      shadowRoot.appendChild(styleEl);
-    });
+/**
+ * Starts fetching the editor's stylesheet, so opening the editor doesn't
+ * wait on it. A failed fetch is forgotten, so the next open tries again.
+ */
+const preloadEditorCss = (): Promise<string> => {
+  if (!editorCss) {
+    const url = chrome.runtime.getURL('editor/app.css');
+
+    editorCss = fetch(url, { method: 'GET' })
+      .then(response => response.text())
+      .catch((e: unknown) => {
+        editorCss = null;
+        throw e;
+      });
+  }
+
+  return editorCss;
 };
+
+const injectCss = (shadowRoot: ShadowRoot): Promise<void> =>
+  preloadEditorCss().then(css => {
+    const styleEl = document.createElement('style');
+    styleEl.setAttribute('id', 'stylebot-editor-css');
+    styleEl.innerHTML = css;
+    shadowRoot.appendChild(styleEl);
+  });
 
 const initEditor = (store: Store<State>): void => {
   if (document.getElementById('stylebot')) {
@@ -127,4 +143,4 @@ const initEditor = (store: Store<State>): void => {
   injectCss(shadowRoot).then(() => mountEditor(store, stylebotApp));
 };
 
-export { initEditor, mountEditor };
+export { initEditor, mountEditor, preloadEditorCss };

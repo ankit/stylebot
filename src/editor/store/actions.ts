@@ -76,13 +76,14 @@ let computedStylesRequest = 0;
 
 export default {
   async initialize({ commit }: { commit: Commit }): Promise<void> {
-    const options = await getAllOptions();
+    const [options, commands, readabilitySettings] = await Promise.all([
+      getAllOptions(),
+      getCommands(),
+      getReadabilitySettings(),
+    ]);
+
     commit('setOptions', options);
-
-    const commands = await getCommands();
     commit('setCommands', commands);
-
-    const readabilitySettings = await getReadabilitySettings();
     commit('setReadabilitySettings', readabilitySettings);
   },
 

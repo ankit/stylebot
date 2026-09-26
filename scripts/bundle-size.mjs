@@ -19,10 +19,20 @@ function getBundles(distDir) {
     readFileSync(path.join(distDir, 'manifest.json'), 'utf8')
   );
 
-  const bundles = manifest.content_scripts.map(script => ({
-    name: `Content script (${script.run_at ?? 'document_idle'})`,
-    files: [...(script.js ?? []), ...(script.css ?? [])],
-  }));
+  const bundles = [];
+
+  // Scripts that share a run_at load together, and share a bundle name too.
+  manifest.content_scripts.forEach(script => {
+    const name = `Content script (${script.run_at ?? 'document_idle'})`;
+    const files = [...(script.js ?? []), ...(script.css ?? [])];
+    const bundle = bundles.find(b => b.name === name);
+
+    if (bundle) {
+      bundle.files.push(...files);
+    } else {
+      bundles.push({ name, files });
+    }
+  });
 
   const popupPage = manifest.action?.default_popup;
 

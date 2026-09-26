@@ -18,7 +18,7 @@
       "js": ["editor/index.js"],
       "matches": ["<all_urls>"],
       "exclude_matches": ["*://*/*.xml"],
-      "run_at": "document_idle"
+      "run_at": "document_start"
     },
     {
       "all_frames": true,
