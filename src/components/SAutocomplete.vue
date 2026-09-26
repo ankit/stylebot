@@ -410,7 +410,7 @@ export default Vue.extend({
   border: none;
   outline: none;
   background: transparent;
-  padding: 6px 0 4px 10px;
+  padding: 5px 0 5px 10px;
   margin: 0;
   resize: none;
   overflow: hidden;
