@@ -1,4 +1,6 @@
-import { getStyles, onEnterOrSpace } from './utils';
+import { defaultCommands } from '@stylebot/settings';
+
+import { getCommands, getOption, getStyles, onEnterOrSpace } from './utils';
 
 const keydown = (key: string): KeyboardEvent =>
   new KeyboardEvent('keydown', { key });
@@ -67,6 +69,48 @@ describe('getStyles', () => {
       'example.com/docs',
     ]);
     expect(defaultStyle.url).toBe('example.com/docs');
+    expect(chrome.runtime.sendMessage).not.toHaveBeenCalled();
+  });
+});
+
+describe('getOption and getCommands', () => {
+  const mockStorage = (items: Record<string, unknown>) => {
+    global.chrome = {
+      storage: {
+        local: {
+          get: jest.fn((key: string, cb) => cb({ [key]: items[key] })),
+        },
+      },
+      runtime: { sendMessage: jest.fn() },
+    } as unknown as typeof chrome;
+  };
+
+  it('should read a stored option without messaging the background', () => {
+    mockStorage({ options: { appearance: 'dark' } });
+    const callback = jest.fn();
+
+    getOption('appearance', callback);
+
+    expect(callback).toHaveBeenCalledWith('dark');
+    expect(chrome.runtime.sendMessage).not.toHaveBeenCalled();
+  });
+
+  it('should fall back to the default for an option missing from storage', () => {
+    mockStorage({ options: {} });
+    const callback = jest.fn();
+
+    getOption('appearance', callback);
+
+    expect(callback).toHaveBeenCalledWith('system');
+  });
+
+  it('should fall back to the default commands when none are stored', () => {
+    mockStorage({});
+    const callback = jest.fn();
+
+    getCommands(callback);
+
+    expect(callback).toHaveBeenCalledWith(defaultCommands);
     expect(chrome.runtime.sendMessage).not.toHaveBeenCalled();
   });
 });

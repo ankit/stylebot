@@ -84,6 +84,8 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
     [`notification~release/${RELEASE_VERSION}`]: true,
     recentColors: overrides.recentColors ?? [],
     'readability-settings': readabilitySettings,
+    options,
+    commands,
     ...overrides.storage,
   };
   const tab = {
@@ -207,6 +209,7 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
         callback?: Callback
       ) => respond(callback, tabResponses[message.name]?.()),
       create: () => respond(undefined, undefined),
+      query: (_info: unknown, callback?: Callback) => respond(callback, [tab]),
     },
 
     windows: {
