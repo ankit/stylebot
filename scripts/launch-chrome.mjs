@@ -189,6 +189,8 @@ const reloadTabs = () =>
       .map(p => p.reload().catch(() => {}))
   );
 
+// The first load re-enables last session's cached service worker; the second reloads it.
+await loadExtension();
 const extensionId = await loadExtension();
 
 // Navigate after installing so the content script injects on load.
