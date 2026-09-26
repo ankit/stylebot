@@ -115,6 +115,11 @@ export const openOptions = (): void => {
   window.close();
 };
 
+export const openSyncOptions = (): void => {
+  openOptionsPage('/sync');
+  window.close();
+};
+
 export const reportIssue = (): void => {
   openReportIssuePage();
   window.close();
