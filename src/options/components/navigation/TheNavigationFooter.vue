@@ -1,13 +1,15 @@
 <template>
   <div class="footer">
     <span class="version">v{{ version }}</span>
-    <a target="_blank" href="https://stylebot.dev/help">
-      {{ t('help_options') }}
-    </a>
-    <a target="_blank" href="http://github.com/ankit/stylebot">
-      {{ t('github') }}
-    </a>
-    <a target="_blank" href="https://ko-fi.com/stylebot">{{ t('donate') }}</a>
+    <div class="links">
+      <a target="_blank" href="https://stylebot.dev/help">
+        {{ t('help_options') }}
+      </a>
+      <a target="_blank" href="http://github.com/ankit/stylebot">
+        {{ t('github') }}
+      </a>
+      <a target="_blank" href="https://ko-fi.com/stylebot">{{ t('donate') }}</a>
+    </div>
   </div>
 </template>
 
@@ -30,12 +32,18 @@ export default Vue.extend({
 .footer {
   padding: 0 12px;
   display: flex;
-  flex-wrap: wrap;
-  gap: 4px 10px;
+  flex-direction: column;
+  gap: 4px;
   font-weight: 400;
   font-size: 12px;
   line-height: 1.4;
   color: var(--text-muted);
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
 }
 
 .version {
