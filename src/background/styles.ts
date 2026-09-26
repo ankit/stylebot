@@ -20,7 +20,7 @@ import type {
 
 import { getIsReadabilityActive, updateIcon } from './badge';
 import { compileStyles } from './compiled-styles';
-import { recordStyleChange } from '../history/store';
+import { recordStyleChange } from '@stylebot/history';
 import { scheduleSyncAfterEdit } from './sync-scheduler';
 
 export { getStylesForPage } from '@stylebot/styles';

@@ -104,10 +104,8 @@ import {
   getIsPageReaderable,
 } from './utils';
 
-// Bypasses @stylebot/sync, whose barrel also drags in runGoogleDriveSync's postcss dependency chain.
-import { getGoogleDriveSyncEnabled } from '../sync/google-drive/sync-metadata';
-// Bypasses @stylebot/styles' barrel, whose page.ts export drags in @stylebot/css's postcss chain.
-import BackgroundPageUtils from '../styles/utils';
+import { getGoogleDriveSyncEnabled } from '@stylebot/sync';
+import { BackgroundPageUtils } from '@stylebot/styles';
 import type {
   GoogleDriveSyncMetadata,
   GetCommandsResponse,

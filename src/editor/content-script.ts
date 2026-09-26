@@ -7,8 +7,7 @@ import { reapplySavedStyles } from '@stylebot/inject-css';
 import { applyReadability, removeReadability } from '@stylebot/readability';
 import type { StylebotCommandName, TabMessage } from '@stylebot/types';
 
-// The page-bridge entry would bundle the in-page bridge, and with it postcss.
-import { REMOTE_PAGE_BRIDGE_PORT } from '../page-bridge/remote-page-bridge/constants';
+import { REMOTE_PAGE_BRIDGE_PORT } from '@stylebot/page-bridge';
 
 import type { EditorApp } from './load-editor';
 import { isEditorLoading, loadEditor } from './load-editor';
