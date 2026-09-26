@@ -192,7 +192,7 @@ test('closing the tab closes its window', async ({ context, openPopup }) => {
   await closed;
 });
 
-test('docking back from the window shows the panel in the page again', async ({
+test('docking back from the window shows the panel in the page, in the mode picked there', async ({
   context,
   openPopup,
 }) => {
@@ -201,6 +201,7 @@ test('docking back from the window shows the panel in the page again', async ({
 
   const editorRoot = await openEditor(page, openPopup);
   const popout = await popOutEditor(context, page, editorRoot);
+  await switchEditorMode(popout.locator('.stylebot-app'), 'presets');
 
   const closed = popout.waitForEvent('close');
   await popout.getByRole('button', { name: 'Options' }).click();
@@ -208,6 +209,9 @@ test('docking back from the window shows the panel in the page again', async ({
   await closed;
 
   await expect(editorRoot.locator('.stylebot.left')).toBeVisible();
+  await expect(
+    editorRoot.getByRole('tab', { name: 'Presets', exact: true })
+  ).toHaveAttribute('aria-selected', 'true');
 });
 
 test('the window reconnects after the tab navigates', async ({
