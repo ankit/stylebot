@@ -334,6 +334,13 @@ const clientConfig = {
       './monaco-editor/iframe/options-index.ts',
     'readability/reader': './readability/reader.ts',
   },
+  // Webpack's `global` shim falls back to `new Function` in the bundles loaded
+  // with import(), which a strict page CSP blocks and reports as an issue.
+  node: { global: false },
+  plugins: [
+    ...config.plugins,
+    new webpack.DefinePlugin({ global: 'globalThis' }),
+  ],
 };
 
 module.exports = [backgroundPageConfig, clientConfig];
