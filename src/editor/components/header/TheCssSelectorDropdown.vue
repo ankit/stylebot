@@ -158,6 +158,7 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .active-style-count {
-  margin: 0 6px;
+  align-self: flex-start;
+  margin: 8px 6px 0;
 }
 </style>
