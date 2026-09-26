@@ -351,7 +351,7 @@ export default Vue.extend({
   gap: 5px;
   font-family: var(--font-mono);
   font-size: 12.5px;
-  color: var(--accent);
+  color: var(--accent-text);
   text-decoration: none;
 
   &:hover {

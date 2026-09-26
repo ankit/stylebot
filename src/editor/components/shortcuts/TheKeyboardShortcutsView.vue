@@ -304,7 +304,7 @@ export default Vue.extend({
 }
 
 .options-link {
-  color: var(--accent);
+  color: var(--accent-text);
 
   &:hover {
     text-decoration: underline;

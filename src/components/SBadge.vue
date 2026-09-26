@@ -36,7 +36,7 @@ export default Vue.extend({
 .badge.accent {
   background: var(--info);
   border-color: var(--info-border);
-  color: var(--accent-tint-ink);
+  color: var(--accent-text);
 }
 
 .badge.muted {

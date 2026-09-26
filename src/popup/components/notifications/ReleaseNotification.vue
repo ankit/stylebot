@@ -124,7 +124,7 @@ export default Vue.extend({
 }
 
 .release-link {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .release-dismiss {

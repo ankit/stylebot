@@ -214,7 +214,7 @@ export default Vue.extend({
   width: 27px;
   height: 27px;
   @include field-border(6px);
-  color: var(--accent);
+  color: var(--accent-text);
   outline: none;
   cursor: pointer;
 
