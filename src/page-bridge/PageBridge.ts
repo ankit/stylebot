@@ -96,6 +96,18 @@ export type PageBridge = {
   ): Promise<Record<string, string>>;
 
   /**
+   * An indented outline of the page's visible elements, for describing the
+   * page to a language model.
+   */
+  getPageOutline(): Promise<string>;
+
+  /**
+   * The page's CSS as context for restyling it: its variables, and its
+   * own rules for the elements matching the selector.
+   */
+  getPageCssContext(selector: string): Promise<string>;
+
+  /**
    * Asks the page to show its own panel again; a no-op for the in-page host.
    */
   openInPage(): void;
