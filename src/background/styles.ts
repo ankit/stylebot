@@ -1,7 +1,12 @@
 import * as postcss from 'postcss';
 
 import { getCurrentTimestamp } from '@stylebot/utils';
-import { getStylesForPage } from '@stylebot/styles';
+import {
+  STYLES_KEY,
+  STYLES_METADATA_KEY,
+  getStylesForPage,
+  isForceImportant,
+} from '@stylebot/styles';
 
 import type {
   StyleMap,
@@ -65,8 +70,8 @@ export const refreshBadgeForTab = async (
  * Reads the full style map from storage, defaulting to an empty map.
  */
 export const getAll = async (): Promise<StyleMap> => {
-  const items = await chrome.storage.local.get('styles');
-  return items['styles'] || {};
+  const items = await chrome.storage.local.get(STYLES_KEY);
+  return items[STYLES_KEY] || {};
 };
 
 /**
@@ -93,8 +98,8 @@ const writeToStorage = async (
   const before = previous ?? (await getAll());
 
   await chrome.storage.local.set({
-    styles,
-    'styles-metadata': { modifiedTime },
+    [STYLES_KEY]: styles,
+    [STYLES_METADATA_KEY]: { modifiedTime },
   });
 
   await recordStyleChange(before, styles, { fromSync, restoredFrom });
@@ -145,15 +150,18 @@ export const setAllIfUnchanged = (
   { fromSync = false }: { fromSync?: boolean } = {}
 ): Promise<string | null> => {
   const attempt = pendingWrite.then(async () => {
-    const items = await chrome.storage.local.get(['styles', 'styles-metadata']);
+    const items = await chrome.storage.local.get([
+      STYLES_KEY,
+      STYLES_METADATA_KEY,
+    ]);
 
-    if (items['styles-metadata']?.modifiedTime !== revision) {
+    if (items[STYLES_METADATA_KEY]?.modifiedTime !== revision) {
       return null;
     }
 
     return writeToStorage(styles, {
       fromSync,
-      previous: items['styles'] || {},
+      previous: items[STYLES_KEY] || {},
     });
   });
 
@@ -208,7 +216,7 @@ export const set = (
       delete styles[url];
     } else {
       const keepForceImportant =
-        forceImportant ?? styles[url]?.forceImportant !== false;
+        forceImportant ?? isForceImportant(styles[url]);
 
       styles[url] = {
         css,

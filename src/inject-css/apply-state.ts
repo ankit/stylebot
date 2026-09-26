@@ -1,5 +1,6 @@
 import { injectCSSIntoDocument, removeCSSFromDocument } from '@stylebot/css';
 import { applyReadability, removeReadability } from '@stylebot/readability';
+import { isForceImportant } from '@stylebot/styles';
 
 import type { CachedState } from './cache';
 
@@ -28,7 +29,7 @@ export const applyState = (state: CachedState): Promise<void> => {
 
   const injections = enabled.map(style =>
     injectCSSIntoDocument(style.css, style.url, {
-      forceImportant: style.forceImportant !== false,
+      forceImportant: isForceImportant(style),
     })
   );
 

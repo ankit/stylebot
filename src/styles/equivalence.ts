@@ -1,5 +1,7 @@
 import type { StyleMap, StyleWithoutUrl } from '@stylebot/types';
 
+import { isForceImportant } from './force-important';
+
 /**
  * Whitespace-insensitive view of a stylesheet, so reformatting on one device
  * does not read as an edit.
@@ -21,7 +23,7 @@ export const isEquivalentStyle = (
   return (
     a.enabled === b.enabled &&
     a.readability === b.readability &&
-    (a.forceImportant !== false) === (b.forceImportant !== false) &&
+    isForceImportant(a) === isForceImportant(b) &&
     normalizeCss(a.css) === normalizeCss(b.css)
   );
 };

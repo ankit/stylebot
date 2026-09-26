@@ -5,7 +5,11 @@
  */
 import { extractImports, pruneImportCache } from '@stylebot/css';
 import { isReaderable } from '@stylebot/readability';
-import { getStylesForPage } from '@stylebot/styles';
+import {
+  STYLES_KEY,
+  getStylesForPage,
+  isForceImportant,
+} from '@stylebot/styles';
 import type { StyleMap, TabMessage } from '@stylebot/types';
 
 import { applyState } from './apply-state';
@@ -46,19 +50,19 @@ const run = () => {
 
   const revealTimeout = setTimeout(revealPage, REVEAL_TIMEOUT_MS);
 
-  chrome.storage.local.get('styles', items => {
-    const allStyles: StyleMap = items['styles'] || {};
+  chrome.storage.local.get(STYLES_KEY, items => {
+    const allStyles: StyleMap = items[STYLES_KEY] || {};
     const { styles, defaultStyle } = getStylesForPage(
       window.location.href,
       allStyles
     );
 
     const freshState: CachedState = {
-      styles: styles.map(({ url, css, enabled, forceImportant }) => ({
-        url,
-        css,
-        enabled,
-        forceImportant: forceImportant !== false,
+      styles: styles.map(style => ({
+        url: style.url,
+        css: style.css,
+        enabled: style.enabled,
+        forceImportant: isForceImportant(style),
       })),
       readability: Boolean(defaultStyle?.readability),
     };

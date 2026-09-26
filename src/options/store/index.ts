@@ -32,6 +32,7 @@ import {
   scanVersionHistory,
   restoreVersion,
 } from '../utils';
+import { isForceImportant } from '@stylebot/styles';
 
 Vue.use(Vuex);
 
@@ -135,9 +136,7 @@ export default new Vuex.Store<State>({
           readability: styles[url] ? styles[url].readability : false,
           enabled: styles[url] ? styles[url].enabled : true,
           modifiedTime: getCurrentTimestamp(),
-          ...(styles[url]?.forceImportant === false
-            ? { forceImportant: false }
-            : {}),
+          ...(!isForceImportant(styles[url]) ? { forceImportant: false } : {}),
         };
 
         if (initialUrl && initialUrl !== url) {
