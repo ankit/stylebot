@@ -69,10 +69,8 @@ export const addGoogleWebFontImport = (family: string, css: string): string => {
 const fontExistence = new Map<string, Promise<boolean>>();
 
 /**
- * Whether a family is served by https://fonts.google.com, remembered per
- * family. Checked from the background page because a content script's fetch
- * runs in the page's context, where Firefox enforces the page's CSP on it
- * (see #754). An unreachable background isn't remembered.
+ * Whether Google Fonts serves a family, remembered per family. Asked via the
+ * background page, since a content script's fetch is bound by the page's CSP.
  */
 export const googleWebFontExists = (family: string): Promise<boolean> => {
   if (CSS_FAMILY_KEYWORDS.has(family.toLowerCase())) {

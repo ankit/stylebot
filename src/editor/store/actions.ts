@@ -463,10 +463,8 @@ export default {
   },
 
   /**
-   * Applies a font-family value right away, then adds the Google Fonts import
-   * for its first family once it resolves against the bundled list or the
-   * existence check. Only explicit picks are remembered as recents, not text
-   * applied by leaving the field.
+   * Applies a font-family value, then imports its first family if Google
+   * serves it. Only explicit picks are remembered as recents.
    */
   async applyFontFamily(
     { state, dispatch }: { state: State; dispatch: Dispatch },

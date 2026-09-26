@@ -37,9 +37,8 @@ export const loadGoogleFonts = (): Promise<Array<GoogleFont>> => {
 };
 
 /**
- * The Google Fonts spelling of a family, or null if Google doesn't serve it.
- * The bundled list answers first and ignoring case, since the Google Fonts
- * API only accepts its own spelling; any other family is looked up.
+ * The Google Fonts spelling of a family (the API is case-sensitive), or null
+ * if Google doesn't serve it.
  */
 export const resolveGoogleFont = async (
   family: string
