@@ -5,7 +5,7 @@ import type { StylebotCommands } from './commands';
 import type { ReadabilitySettings } from './readability';
 import type { GoogleDriveSyncMetadata } from './sync';
 import type { VersionHistory } from './history';
-import type { ChatErrorKey, ChatStatus } from './chat';
+import type { ChatErrorKey, ChatStatus, ChatTurn } from './chat';
 
 export type GetAllOptionsResponse = StylebotOptions;
 export type GetOptionResponse = StylebotOptions[keyof StylebotOptions];
@@ -59,6 +59,7 @@ export type ChatStatusResponse = ChatStatus;
 export type ChatConnectResponse =
   | { ok: true; status: ChatStatus }
   | { ok: false; errorKey: ChatErrorKey; errorDetail?: string };
+export type ChatGetThreadResponse = Array<ChatTurn>;
 
 type BackgroundPageMessageResponse =
   | GetAllOptionsResponse
@@ -77,6 +78,7 @@ type BackgroundPageMessageResponse =
   | AddRecentColorResponse
   | GetIsEditorWindowOpenResponse
   | ChatStatusResponse
-  | ChatConnectResponse;
+  | ChatConnectResponse
+  | ChatGetThreadResponse;
 
 export default BackgroundPageMessageResponse;

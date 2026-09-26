@@ -2,7 +2,7 @@ import type { StyleMap } from './styles';
 import type { StylebotOptions } from './options';
 import type { StylebotCommands } from './commands';
 import type { ReadabilitySettings } from './readability';
-import type { ChatProviderId } from './chat';
+import type { ChatProviderId, ChatTurn } from './chat';
 
 export type SetStyle = {
   name: 'SetStyle';
@@ -188,6 +188,18 @@ export type ChatSetModel = {
   model: string;
 };
 
+export type ChatGetThread = {
+  name: 'ChatGetThread';
+  url: string;
+};
+
+// An empty list clears the site's thread.
+export type ChatSetThread = {
+  name: 'ChatSetThread';
+  url: string;
+  turns: Array<ChatTurn>;
+};
+
 type BackgroundPageMessage =
   | SetStyle
   | EnableStyle
@@ -224,6 +236,8 @@ type BackgroundPageMessage =
   | ChatGetStatus
   | ChatConnect
   | ChatDisconnect
-  | ChatSetModel;
+  | ChatSetModel
+  | ChatGetThread
+  | ChatSetThread;
 
 export default BackgroundPageMessage;

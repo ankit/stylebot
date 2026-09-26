@@ -63,8 +63,11 @@ import type {
   AddRecentColorResponse,
   ChatConnect as ChatConnectType,
   ChatSetModel as ChatSetModelType,
+  ChatGetThread as ChatGetThreadType,
+  ChatSetThread as ChatSetThreadType,
   ChatStatusResponse,
   ChatConnectResponse,
+  ChatGetThreadResponse,
 } from '@stylebot/types';
 import { runGoogleDriveSync } from '@stylebot/sync';
 
@@ -88,6 +91,8 @@ import {
   connectChat,
   disconnectChat,
   setChatModel,
+  getChatThread,
+  setChatThread,
 } from './chat';
 
 export const DisableStyle = async (
@@ -401,4 +406,17 @@ export const ChatSetModel = async (
   sendResponse: (response: ChatStatusResponse) => void
 ): Promise<void> => {
   sendResponse(await setChatModel(message.model));
+};
+
+export const ChatGetThread = async (
+  message: ChatGetThreadType,
+  sendResponse: (response: ChatGetThreadResponse) => void
+): Promise<void> => {
+  sendResponse(await getChatThread(message.url));
+};
+
+export const ChatSetThread = async (
+  message: ChatSetThreadType
+): Promise<void> => {
+  await setChatThread(message.url, message.turns);
 };

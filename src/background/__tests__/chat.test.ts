@@ -1,3 +1,5 @@
+import type { ChatTurn } from '@stylebot/types';
+
 const validateKey = jest.fn();
 
 jest.mock('@stylebot/chat', () => ({
@@ -10,8 +12,10 @@ import {
   connectChat,
   disconnectChat,
   getChatStatus,
+  getChatThread,
   maskKey,
   setChatModel,
+  setChatThread,
 } from '../chat';
 
 let store: Record<string, unknown>;
@@ -102,6 +106,31 @@ describe('model and disconnect', () => {
       model: 'gpt-5.6-terra',
     });
     expect(JSON.stringify(store)).not.toContain('sk-good');
+  });
+});
+
+describe('threads', () => {
+  const turn = (id: string): ChatTurn => ({ role: 'user', id, text: id });
+
+  it('keeps one thread per site and clears it when emptied', async () => {
+    await setChatThread('a.com', [turn('1')]);
+    await setChatThread('b.com', [turn('2')]);
+
+    expect(await getChatThread('a.com')).toEqual([turn('1')]);
+    expect(await getChatThread('c.com')).toEqual([]);
+
+    await setChatThread('a.com', []);
+
+    expect(store).toEqual({ 'chat-thread-b.com': [turn('2')] });
+  });
+
+  it('keeps only the latest turns', async () => {
+    const turns = Array.from({ length: 60 }, (_, i) => turn(String(i)));
+    await setChatThread('a.com', turns);
+
+    const kept = await getChatThread('a.com');
+    expect(kept).toHaveLength(50);
+    expect(kept[0].id).toBe('10');
   });
 });
 
