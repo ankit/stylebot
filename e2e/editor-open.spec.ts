@@ -68,7 +68,7 @@ for (const dockLocation of ['left', 'right'] as const) {
     await page.goto(`${server.baseUrl}/rtl`);
 
     const editorRoot = await openEditor(page, openPopup);
-    const panel = editorRoot.locator('.stylebot.vdr');
+    const panel = editorRoot.locator('.stylebot-docked');
     await expect(panel).toBeInViewport({ ratio: 1 });
 
     const viewportWidth = await page.evaluate(() => window.innerWidth);

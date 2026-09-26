@@ -218,6 +218,7 @@ export default Vue.extend({
 
   &.stylebot-docked {
     position: fixed;
+    box-sizing: border-box;
     top: 12px;
     bottom: 12px;
     z-index: 100000000;
