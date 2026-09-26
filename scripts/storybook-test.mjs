@@ -7,8 +7,11 @@
 // headless Chromium. Everything else is passed through to `test-storybook`.
 
 import { spawn } from 'node:child_process';
+import path from 'node:path';
 
-import { bin, localBin, rootDir, run, runOrExit } from './lib/cli.mjs';
+import httpServer from 'http-server';
+
+import { bin, localBin, rootDir, runOrExit } from './lib/cli.mjs';
 
 const USAGE = `usage: yarn test:storybook [--no-build | --dev] [test-storybook args]
 
@@ -18,7 +21,7 @@ const USAGE = `usage: yarn test:storybook [--no-build | --dev] [test-storybook a
               (pair with --watch to iterate on a file)
 `;
 
-const STATIC_PORT = 6007;
+const HOST = '127.0.0.1';
 const DEV_PORT = 6006;
 const OWN_FLAGS = ['--no-build', '--dev'];
 const args = process.argv.slice(2);
@@ -53,28 +56,47 @@ if (!dev && !args.includes('--no-build')) {
   runOrExit(bin('yarn'), ['build-storybook']);
 }
 
+/**
+ * Serves storybook-static in-process on a port the OS picks, so a server
+ * another checkout left running can never answer in its place.
+ */
+const serveStatic = () =>
+  new Promise((resolve, reject) => {
+    const server = httpServer.createServer({
+      root: path.join(rootDir, 'storybook-static'),
+      cache: -1,
+    });
+    server.server.once('error', reject);
+    server.listen(0, HOST, () => resolve(server));
+  });
+
 let server;
-const port = dev ? DEV_PORT : STATIC_PORT;
-const url = `http://127.0.0.1:${port}`;
+let url = `http://${HOST}:${DEV_PORT}`;
 
-if (!dev) {
-  server = spawn(
-    localBin('http-server'),
-    ['storybook-static', '-p', String(port), '-s', '-c-1'],
-    { stdio: 'ignore', cwd: rootDir }
-  );
+if (dev) {
+  await waitForServer(`${url}/index.json`);
+} else {
+  server = await serveStatic();
+  url = `http://${HOST}:${server.server.address().port}`;
 }
-
-await waitForServer(`${url}/index.json`);
 
 // --index-json reads stories from Storybook's own index, so stories built
 // by factories (editor(), popover(), …) are found without static parsing.
-const status = run(localBin('test-storybook'), [
+const runnerArgs = [
   '--url',
   url,
   '--index-json',
   ...args.filter(arg => !OWN_FLAGS.includes(arg)),
-]);
+];
 
-server?.kill();
+// Async so the event loop stays free to serve storybook-static meanwhile.
+const runner = spawn(localBin('test-storybook'), runnerArgs, {
+  stdio: 'inherit',
+  cwd: rootDir,
+});
+const status = await new Promise(resolve =>
+  runner.on('close', code => resolve(code ?? 1))
+);
+
+server?.close();
 process.exit(status);
