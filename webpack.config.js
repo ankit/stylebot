@@ -323,7 +323,6 @@ const backgroundPageConfig = {
 const clientConfig = {
   ...config,
   entry: {
-    'sync/index': './sync/index.ts',
     'popup/index': './popup/index.ts',
     'editor/index': './editor/content-script.ts',
     'editor/app': './editor/app.ts',
