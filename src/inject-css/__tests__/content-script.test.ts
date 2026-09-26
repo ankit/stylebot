@@ -1,7 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import type { CompiledStyles } from '@stylebot/types';
+
 jest.mock('../apply-state');
 jest.mock('../cache');
 jest.mock('../hide-page');
+jest.mock('../import-cache');
 jest.mock('@stylebot/styles', () => ({
   ...jest.requireActual('@stylebot/styles'),
   getStylesForPage: jest.fn(),
@@ -10,11 +13,26 @@ jest.mock('@stylebot/readability');
 
 const flushPromises = () => new Promise(resolve => setTimeout(resolve, 0));
 
+const REVISION = '2026-09-25T00:00:00.000Z';
+
+const compiledStyles = (
+  overrides: Partial<CompiledStyles> = {}
+): CompiledStyles => ({
+  version: 1,
+  revision: REVISION,
+  styles: {
+    a: { css: '.a{}', importUrls: [], enabled: true, readability: false },
+  },
+  ...overrides,
+});
+
 describe('inject-css run()', () => {
   let applyStateModule: typeof import('../apply-state');
   let cacheModule: typeof import('../cache');
   let hidePageModule: typeof import('../hide-page');
+  let importCacheModule: typeof import('../import-cache');
   let stylesModule: typeof import('@stylebot/styles');
+  let sendMessage: jest.Mock;
   let registeredListener: (
     message: { name: string },
     sender: unknown,
@@ -27,13 +45,15 @@ describe('inject-css run()', () => {
     applyStateModule = require('../apply-state');
     cacheModule = require('../cache');
     hidePageModule = require('../hide-page');
+    importCacheModule = require('../import-cache');
     stylesModule = require('@stylebot/styles');
 
-    (applyStateModule.applyState as jest.Mock).mockResolvedValue(undefined);
+    sendMessage = jest.fn();
 
     (global as any).chrome = {
       storage: { local: { get: jest.fn() } },
       runtime: {
+        sendMessage,
         onMessage: {
           addListener: (fn: typeof registeredListener) => {
             registeredListener = fn;
@@ -43,27 +63,37 @@ describe('inject-css run()', () => {
     };
   });
 
-  const load = (storedItems: Record<string, unknown>) => {
-    ((global as any).chrome.storage.local.get as jest.Mock).mockImplementation(
-      (_key: string, callback: (items: unknown) => void) =>
-        callback(storedItems)
-    );
+  // null stands for nothing stored, since undefined would pick the default.
+  const load = (
+    stored: CompiledStyles | null = compiledStyles(),
+    revision = REVISION
+  ) => {
+    ((global as any).chrome.storage.local.get as jest.Mock).mockResolvedValue({
+      'styles-compiled': stored ?? undefined,
+      'styles-metadata': { modifiedTime: revision },
+    });
 
     require('../content-script');
   };
 
-  it('hides the page and applies the fresh state when there is no cache', async () => {
-    (cacheModule.readCache as jest.Mock).mockReturnValue(null);
+  const matching = (
+    styles: Array<Record<string, unknown>>,
+    defaultStyle?: Record<string, unknown>
+  ) =>
     (stylesModule.getStylesForPage as jest.Mock).mockReturnValue({
-      styles: [{ url: 'a', css: '.a{}', enabled: true }],
-      defaultStyle: undefined,
+      styles,
+      defaultStyle,
     });
 
-    load({ styles: {} });
+  it('hides the page and applies the fresh state when there is no cache', async () => {
+    (cacheModule.readCache as jest.Mock).mockReturnValue(null);
+    matching([{ url: 'a', css: '.a{}', importUrls: [], enabled: true }]);
+
+    load();
     await flushPromises();
 
     const expectedState = {
-      styles: [{ url: 'a', css: '.a{}', enabled: true, forceImportant: true }],
+      styles: [{ url: 'a', css: '.a{}', importUrls: [], enabled: true }],
       readability: false,
     };
 
@@ -73,19 +103,55 @@ describe('inject-css run()', () => {
     expect(hidePageModule.revealPage).toHaveBeenCalledTimes(1);
   });
 
-  it('applies the cache immediately, without hiding, when there is one', async () => {
+  it('matches the page against the stored compiled styles when they are current', async () => {
+    (cacheModule.readCache as jest.Mock).mockReturnValue(null);
+    matching([]);
+
+    const stored = compiledStyles();
+    load(stored);
+    await flushPromises();
+
+    expect(sendMessage).not.toHaveBeenCalled();
+    expect(stylesModule.getStylesForPage).toHaveBeenCalledWith(
+      window.location.href,
+      stored.styles
+    );
+  });
+
+  it.each([
+    ['missing', null, REVISION],
+    ['built from other styles', compiledStyles(), 'a-later-revision'],
+    ['from an older compiler', compiledStyles({ version: 0 }), REVISION],
+  ])(
+    'asks the background for the compiled styles when the stored copy is %s',
+    async (_label, stored, revision) => {
+      (cacheModule.readCache as jest.Mock).mockReturnValue(null);
+      matching([]);
+
+      const rebuilt = compiledStyles({ revision });
+      sendMessage.mockResolvedValue(rebuilt);
+
+      load(stored, revision);
+      await flushPromises();
+
+      expect(sendMessage).toHaveBeenCalledWith({ name: 'GetCompiledStyles' });
+      expect(stylesModule.getStylesForPage).toHaveBeenCalledWith(
+        window.location.href,
+        rebuilt.styles
+      );
+    }
+  );
+
+  it('applies the cache immediately, without hiding, when there is one', () => {
     const cached = {
-      styles: [{ url: 'a', css: '.a{}', enabled: true }],
+      styles: [{ url: 'a', css: '.a{}', importUrls: [], enabled: true }],
       readability: false,
     };
 
     (cacheModule.readCache as jest.Mock).mockReturnValue(cached);
-    (stylesModule.getStylesForPage as jest.Mock).mockReturnValue({
-      styles: [{ url: 'a', css: '.a{}', enabled: true }],
-      defaultStyle: undefined,
-    });
+    matching([]);
 
-    load({ styles: {} });
+    load();
 
     expect(hidePageModule.hidePage).not.toHaveBeenCalled();
     expect(applyStateModule.applyState).toHaveBeenCalledWith(cached);
@@ -93,17 +159,14 @@ describe('inject-css run()', () => {
 
   it('does not re-apply when the fresh state matches the cache', async () => {
     const cached = {
-      styles: [{ url: 'a', css: '.a{}', enabled: true, forceImportant: true }],
+      styles: [{ url: 'a', css: '.a{}', importUrls: [], enabled: true }],
       readability: false,
     };
 
     (cacheModule.readCache as jest.Mock).mockReturnValue(cached);
-    (stylesModule.getStylesForPage as jest.Mock).mockReturnValue({
-      styles: [{ url: 'a', css: '.a{}', enabled: true }],
-      defaultStyle: undefined,
-    });
+    matching([{ url: 'a', css: '.a{}', importUrls: [], enabled: true }]);
 
-    load({ styles: {} });
+    load();
     await flushPromises();
 
     // Only the initial cache-hit application — nothing patched afterwards.
@@ -113,22 +176,23 @@ describe('inject-css run()', () => {
 
   it('patches to the fresh state when it differs from a stale cache', async () => {
     const cached = {
-      styles: [{ url: 'a', css: '.a{color:old}', enabled: true }],
+      styles: [
+        { url: 'a', css: '.a{color:old}', importUrls: [], enabled: true },
+      ],
       readability: false,
     };
 
     (cacheModule.readCache as jest.Mock).mockReturnValue(cached);
-    (stylesModule.getStylesForPage as jest.Mock).mockReturnValue({
-      styles: [{ url: 'a', css: '.a{color:new}', enabled: true }],
-      defaultStyle: undefined,
-    });
+    matching([
+      { url: 'a', css: '.a{color:new}', importUrls: [], enabled: true },
+    ]);
 
-    load({ styles: {} });
+    load();
     await flushPromises();
 
     const freshState = {
       styles: [
-        { url: 'a', css: '.a{color:new}', enabled: true, forceImportant: true },
+        { url: 'a', css: '.a{color:new}', importUrls: [], enabled: true },
       ],
       readability: false,
     };
@@ -138,33 +202,30 @@ describe('inject-css run()', () => {
     expect(cacheModule.writeCache).toHaveBeenCalledWith(freshState);
   });
 
-  it("carries a style's Override site styles setting into the applied and cached state", async () => {
+  it('keeps only the @import responses the page still uses in the cache', async () => {
     (cacheModule.readCache as jest.Mock).mockReturnValue(null);
-    (stylesModule.getStylesForPage as jest.Mock).mockReturnValue({
-      styles: [{ url: 'a', css: '.a{}', enabled: true, forceImportant: false }],
-      defaultStyle: undefined,
-    });
+    matching([
+      {
+        url: 'a',
+        css: '.a{}',
+        importUrls: ['https://x.test/a.css'],
+        enabled: true,
+      },
+    ]);
 
-    load({ styles: {} });
+    load();
     await flushPromises();
 
-    const expectedState = {
-      styles: [{ url: 'a', css: '.a{}', enabled: true, forceImportant: false }],
-      readability: false,
-    };
-
-    expect(applyStateModule.applyState).toHaveBeenCalledWith(expectedState);
-    expect(cacheModule.writeCache).toHaveBeenCalledWith(expectedState);
+    expect(importCacheModule.pruneImportCache).toHaveBeenCalledWith(
+      new Set(['https://x.test/a.css'])
+    );
   });
 
   it('reads readability off the matched default style', async () => {
     (cacheModule.readCache as jest.Mock).mockReturnValue(null);
-    (stylesModule.getStylesForPage as jest.Mock).mockReturnValue({
-      styles: [],
-      defaultStyle: { url: '*', readability: true },
-    });
+    matching([], { url: '*', readability: true });
 
-    load({ styles: {} });
+    load();
     await flushPromises();
 
     expect(applyStateModule.applyState).toHaveBeenCalledWith({
@@ -175,12 +236,9 @@ describe('inject-css run()', () => {
 
   it('answers GetIsReadabilityActive based on whether #stylebot-reader is mounted', () => {
     (cacheModule.readCache as jest.Mock).mockReturnValue(null);
-    (stylesModule.getStylesForPage as jest.Mock).mockReturnValue({
-      styles: [],
-      defaultStyle: undefined,
-    });
+    matching([]);
 
-    load({ styles: {} });
+    load();
 
     const sendResponse = jest.fn();
     registeredListener({ name: 'GetIsReadabilityActive' }, {}, sendResponse);

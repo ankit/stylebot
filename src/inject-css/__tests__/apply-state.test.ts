@@ -1,10 +1,17 @@
-import type { CachedState } from '../cache';
+import type { CachedState, CachedStyle } from '../cache';
 
-jest.mock('@stylebot/css');
+jest.mock('../stylesheet');
 jest.mock('@stylebot/readability');
 
+const style = (
+  url: string,
+  css: string,
+  enabled: boolean,
+  importUrls: Array<string> = []
+): CachedStyle => ({ url, css, importUrls, enabled });
+
 describe('applyState', () => {
-  let css: typeof import('@stylebot/css');
+  let stylesheet: typeof import('../stylesheet');
   let readability: typeof import('@stylebot/readability');
   let applyState: typeof import('../apply-state').applyState;
 
@@ -13,106 +20,78 @@ describe('applyState', () => {
     // injected across calls — reset the module so each test starts clean.
     jest.resetModules();
 
-    css = require('@stylebot/css');
+    stylesheet = require('../stylesheet');
     readability = require('@stylebot/readability');
     ({ applyState } = require('../apply-state'));
-
-    (css.injectCSSIntoDocument as jest.Mock).mockResolvedValue(undefined);
   });
 
-  it('injects only the enabled styles', async () => {
+  it('injects only the enabled styles', () => {
     const state: CachedState = {
-      styles: [
-        { url: 'a', css: '.a{}', enabled: true },
-        { url: 'b', css: '.b{}', enabled: false },
-      ],
+      styles: [style('a', '.a{}', true), style('b', '.b{}', false)],
       readability: false,
     };
 
-    await applyState(state);
+    applyState(state);
 
-    expect(css.injectCSSIntoDocument).toHaveBeenCalledTimes(1);
-    expect(css.injectCSSIntoDocument).toHaveBeenCalledWith('.a{}', 'a', {
-      forceImportant: true,
-    });
+    expect(stylesheet.injectStylesheet).toHaveBeenCalledTimes(1);
+    expect(stylesheet.injectStylesheet).toHaveBeenCalledWith('a', '.a{}', []);
   });
 
-  it('forces !important unless the style turned Override site styles off', async () => {
-    await applyState({
+  it('passes the compiled css and its @import urls through unchanged', () => {
+    applyState({
       styles: [
-        { url: 'a', css: '.a{}', enabled: true },
-        { url: 'b', css: '.b{}', enabled: true, forceImportant: true },
-        { url: 'c', css: '.c{}', enabled: true, forceImportant: false },
+        style('a', '.a{color:red !important}', true, ['https://x.test/a.css']),
       ],
       readability: false,
     });
 
-    expect(css.injectCSSIntoDocument).toHaveBeenCalledWith('.a{}', 'a', {
-      forceImportant: true,
-    });
-    expect(css.injectCSSIntoDocument).toHaveBeenCalledWith('.b{}', 'b', {
-      forceImportant: true,
-    });
-    expect(css.injectCSSIntoDocument).toHaveBeenCalledWith('.c{}', 'c', {
-      forceImportant: false,
-    });
+    expect(stylesheet.injectStylesheet).toHaveBeenCalledWith(
+      'a',
+      '.a{color:red !important}',
+      ['https://x.test/a.css']
+    );
   });
 
-  it('applies readability when the state calls for it', async () => {
-    await applyState({ styles: [], readability: true });
+  it('applies readability when the state calls for it', () => {
+    applyState({ styles: [], readability: true });
 
     expect(readability.applyReadability).toHaveBeenCalledTimes(1);
     expect(readability.removeReadability).not.toHaveBeenCalled();
   });
 
-  it('removes readability when the state does not call for it', async () => {
-    await applyState({ styles: [], readability: false });
+  it('removes readability when the state does not call for it', () => {
+    applyState({ styles: [], readability: false });
 
     expect(readability.removeReadability).toHaveBeenCalledTimes(1);
     expect(readability.applyReadability).not.toHaveBeenCalled();
   });
 
-  it('removes a stylesheet that is no longer enabled on a later call', async () => {
-    await applyState({
-      styles: [{ url: 'a', css: '.a{}', enabled: true }],
-      readability: false,
-    });
+  it('removes a stylesheet that is no longer enabled on a later call', () => {
+    applyState({ styles: [style('a', '.a{}', true)], readability: false });
+    applyState({ styles: [], readability: false });
 
-    await applyState({ styles: [], readability: false });
-
-    expect(css.removeCSSFromDocument).toHaveBeenCalledWith('a');
+    expect(stylesheet.removeStylesheet).toHaveBeenCalledWith('a');
   });
 
-  it('removes a stylesheet that was disabled on a later call', async () => {
-    await applyState({
-      styles: [{ url: 'a', css: '.a{}', enabled: true }],
-      readability: false,
-    });
+  it('removes a stylesheet that was disabled on a later call', () => {
+    applyState({ styles: [style('a', '.a{}', true)], readability: false });
+    applyState({ styles: [style('a', '.a{}', false)], readability: false });
 
-    await applyState({
-      styles: [{ url: 'a', css: '.a{}', enabled: false }],
-      readability: false,
-    });
-
-    expect(css.removeCSSFromDocument).toHaveBeenCalledWith('a');
+    expect(stylesheet.removeStylesheet).toHaveBeenCalledWith('a');
   });
 
-  it('does not remove a stylesheet that remains enabled', async () => {
-    await applyState({
-      styles: [{ url: 'a', css: '.a{}', enabled: true }],
+  it('does not remove a stylesheet that remains enabled', () => {
+    applyState({ styles: [style('a', '.a{}', true)], readability: false });
+    applyState({
+      styles: [style('a', '.a{updated}', true)],
       readability: false,
     });
 
-    await applyState({
-      styles: [{ url: 'a', css: '.a{updated}', enabled: true }],
-      readability: false,
-    });
-
-    expect(css.removeCSSFromDocument).not.toHaveBeenCalled();
-    expect(css.injectCSSIntoDocument).toHaveBeenLastCalledWith(
-      '.a{updated}',
+    expect(stylesheet.removeStylesheet).not.toHaveBeenCalled();
+    expect(stylesheet.injectStylesheet).toHaveBeenLastCalledWith(
       'a',
-      { forceImportant: true }
+      '.a{updated}',
+      []
     );
   });
 });

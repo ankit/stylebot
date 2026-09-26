@@ -1,10 +1,15 @@
 import * as stylebotCss from '@stylebot/css';
+import { injectStylesheet } from '@stylebot/inject-css';
 import * as stylebotReadability from '@stylebot/readability';
 import { readCache, writeCache } from '../../inject-css/cache';
 
 import { LocalPageBridge } from '../LocalPageBridge';
 
 jest.mock('@stylebot/css');
+jest.mock('@stylebot/inject-css', () => ({
+  ...jest.requireActual('@stylebot/inject-css'),
+  injectStylesheet: jest.fn(),
+}));
 jest.mock('@stylebot/readability');
 
 const mockHighlighter = {
@@ -31,25 +36,36 @@ describe('LocalPageBridge', () => {
 
   describe('applyCss', () => {
     const css = 'a { color: red; }';
+    const compiled = { css: 'a { color: red !important; }', importUrls: [] };
 
     beforeEach(() => {
       jest.spyOn(stylebotCss, 'removeEmptyRules').mockReturnValue(css);
+      jest.spyOn(stylebotCss, 'compileStyle').mockReturnValue(compiled);
     });
 
-    it('injects into the document with !important forced', () => {
+    it('injects the style compiled with !important forced', () => {
       bridge.applyCss({ url, css, enabled: true, forceImportant: true });
 
-      expect(stylebotCss.injectCSSIntoDocument).toBeCalledWith(css, url, {
+      expect(stylebotCss.compileStyle).toBeCalledWith(css, {
         forceImportant: true,
+      });
+      expect(injectStylesheet).toBeCalledWith(url, compiled.css, []);
+    });
+
+    it('compiles a style with Override site styles off without forcing it', () => {
+      bridge.applyCss({ url, css, enabled: true, forceImportant: false });
+
+      expect(stylebotCss.compileStyle).toBeCalledWith(css, {
+        forceImportant: false,
       });
     });
 
-    it('injects a style with Override site styles off without forcing it', () => {
-      bridge.applyCss({ url, css, enabled: true, forceImportant: false });
+    it('compiles each edit only once', () => {
+      writeCache({ styles: [], readability: false });
 
-      expect(stylebotCss.injectCSSIntoDocument).toBeCalledWith(css, url, {
-        forceImportant: false,
-      });
+      bridge.applyCss({ url, css, enabled: true, forceImportant: true });
+
+      expect(stylebotCss.compileStyle).toHaveBeenCalledTimes(1);
     });
 
     it('does nothing to the cache when nothing is cached yet', () => {
@@ -61,10 +77,11 @@ describe('LocalPageBridge', () => {
     it('updates the matching cached style in place', () => {
       writeCache({
         styles: [
-          { url, css: 'a { color: blue; }', enabled: true },
+          { url, css: 'a { color: blue; }', importUrls: [], enabled: true },
           {
             url: 'other.example.com',
             css: 'b { color: green; }',
+            importUrls: [],
             enabled: true,
           },
         ],
@@ -73,17 +90,39 @@ describe('LocalPageBridge', () => {
 
       bridge.applyCss({ url, css, enabled: true, forceImportant: true });
 
+      expect(stylebotCss.compileStyle).toBeCalledWith(css, {
+        forceImportant: true,
+      });
       expect(readCache()).toEqual({
         styles: [
-          { url, css, enabled: true, forceImportant: true },
+          { url, ...compiled, enabled: true },
           {
             url: 'other.example.com',
             css: 'b { color: green; }',
+            importUrls: [],
             enabled: true,
           },
         ],
         readability: false,
       });
+    });
+
+    it('leaves the page and the cached style alone while the css does not parse', () => {
+      const cachedState = {
+        styles: [
+          { url, css: 'a { color: blue; }', importUrls: [], enabled: true },
+        ],
+        readability: false,
+      };
+      writeCache(cachedState);
+      jest.spyOn(stylebotCss, 'compileStyle').mockImplementation(() => {
+        throw new Error('Unclosed block');
+      });
+
+      bridge.applyCss({ url, css: 'a {', enabled: true, forceImportant: true });
+
+      expect(readCache()).toEqual(cachedState);
+      expect(injectStylesheet).not.toBeCalled();
     });
 
     it('appends a cached style if none exists yet for this url', () => {
@@ -92,6 +131,7 @@ describe('LocalPageBridge', () => {
           {
             url: 'other.example.com',
             css: 'b { color: green; }',
+            importUrls: [],
             enabled: true,
           },
         ],
@@ -105,9 +145,10 @@ describe('LocalPageBridge', () => {
           {
             url: 'other.example.com',
             css: 'b { color: green; }',
+            importUrls: [],
             enabled: true,
           },
-          { url, css, enabled: true, forceImportant: true },
+          { url, ...compiled, enabled: true },
         ],
         readability: false,
       });
@@ -166,14 +207,18 @@ describe('LocalPageBridge', () => {
 
     it('updates the cached readability flag in place', () => {
       writeCache({
-        styles: [{ url, css: 'a { color: blue; }', enabled: true }],
+        styles: [
+          { url, css: 'a { color: blue; }', importUrls: [], enabled: true },
+        ],
         readability: false,
       });
 
       bridge.applyReadability(true);
 
       expect(readCache()).toEqual({
-        styles: [{ url, css: 'a { color: blue; }', enabled: true }],
+        styles: [
+          { url, css: 'a { color: blue; }', importUrls: [], enabled: true },
+        ],
         readability: true,
       });
     });

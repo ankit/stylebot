@@ -3,14 +3,19 @@
  * localStorage cache (cache.ts) immediately if there is one, otherwise hides
  * the page (hide-page.ts) until chrome.storage.local.get resolves.
  */
-import { extractImports } from '@stylebot/css';
 import { isReaderable } from '@stylebot/readability';
 import {
-  STYLES_KEY,
+  COMPILED_STYLES_KEY,
+  STYLES_METADATA_KEY,
   getStylesForPage,
-  isForceImportant,
+  isCompiledStylesCurrent,
 } from '@stylebot/styles';
-import type { StyleMap, TabMessage } from '@stylebot/types';
+import type {
+  CompiledStyles,
+  GetCompiledStyles,
+  GetCompiledStylesResponse,
+  TabMessage,
+} from '@stylebot/types';
 
 import { applyState } from './apply-state';
 import type { CachedState } from './cache';
@@ -40,6 +45,30 @@ if (window === window.top) {
 // completion almost always wins the race and reveals sooner.
 const REVEAL_TIMEOUT_MS = 150;
 
+/**
+ * The compiled styles from storage, or from the background when the stored
+ * copy is missing or was built from other styles, as on the first load after
+ * an update.
+ */
+const getCompiledStyles = async (): Promise<CompiledStyles> => {
+  const items = await chrome.storage.local.get([
+    COMPILED_STYLES_KEY,
+    STYLES_METADATA_KEY,
+  ]);
+  const stored: CompiledStyles | undefined = items[COMPILED_STYLES_KEY];
+  const revision: string = items[STYLES_METADATA_KEY]?.modifiedTime ?? '';
+
+  if (stored && isCompiledStylesCurrent(stored, revision)) {
+    return stored;
+  }
+
+  const message: GetCompiledStyles = { name: 'GetCompiledStyles' };
+  return chrome.runtime.sendMessage<
+    GetCompiledStyles,
+    GetCompiledStylesResponse
+  >(message);
+};
+
 const run = () => {
   const cached = readCache();
 
@@ -51,41 +80,32 @@ const run = () => {
 
   const revealTimeout = setTimeout(revealPage, REVEAL_TIMEOUT_MS);
 
-  chrome.storage.local.get(STYLES_KEY, items => {
-    const allStyles: StyleMap = items[STYLES_KEY] || {};
+  getCompiledStyles().then(compiled => {
     const { styles, defaultStyle } = getStylesForPage(
       window.location.href,
-      allStyles
+      compiled.styles
     );
 
     const freshState: CachedState = {
-      styles: styles.map(style => ({
-        url: style.url,
-        css: style.css,
-        enabled: style.enabled,
-        forceImportant: isForceImportant(style),
+      styles: styles.map(({ url, css, importUrls, enabled }) => ({
+        url,
+        css,
+        importUrls,
+        enabled,
       })),
       readability: Boolean(defaultStyle?.readability),
     };
 
-    const finish = () => {
-      clearTimeout(revealTimeout);
-      revealPage();
-
-      writeCache(freshState);
-
-      const liveImportUrls = new Set(
-        freshState.styles.flatMap(style => extractImports(style.css).importUrls)
-      );
-      pruneImportCache(liveImportUrls);
-    };
-
-    if (cached && JSON.stringify(cached) === JSON.stringify(freshState)) {
-      finish();
-      return;
+    if (!cached || JSON.stringify(cached) !== JSON.stringify(freshState)) {
+      applyState(freshState);
     }
 
-    applyState(freshState).then(finish);
+    clearTimeout(revealTimeout);
+    revealPage();
+    writeCache(freshState);
+    pruneImportCache(
+      new Set(freshState.styles.flatMap(style => style.importUrls))
+    );
   });
 };
 

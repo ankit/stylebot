@@ -1,14 +1,13 @@
-import { injectCSSIntoDocument, removeCSSFromDocument } from '@stylebot/css';
 import { applyReadability, removeReadability } from '@stylebot/readability';
-import { isForceImportant } from '@stylebot/styles';
 
 import type { CachedState } from './cache';
+import { injectStylesheet, removeStylesheet } from './stylesheet';
 
 // Tracks which stylesheets are currently injected so a later call (once the
 // real storage read resolves) can remove any that are no longer enabled.
 let appliedUrls = new Set<string>();
 
-export const applyState = (state: CachedState): Promise<void> => {
+export const applyState = (state: CachedState): void => {
   // Called synchronously, ahead of CSS injection below — readability's own
   // showLoader() needs to hide the page before the browser's first paint,
   // and waiting on style injection (which may fetch @imports) risks missing it.
@@ -23,17 +22,13 @@ export const applyState = (state: CachedState): Promise<void> => {
 
   appliedUrls.forEach(url => {
     if (!nextUrls.has(url)) {
-      removeCSSFromDocument(url);
+      removeStylesheet(url);
     }
   });
 
-  const injections = enabled.map(style =>
-    injectCSSIntoDocument(style.css, style.url, {
-      forceImportant: isForceImportant(style),
-    })
+  enabled.forEach(style =>
+    injectStylesheet(style.url, style.css, style.importUrls)
   );
 
-  return Promise.all(injections).then(() => {
-    appliedUrls = nextUrls;
-  });
+  appliedUrls = nextUrls;
 };
