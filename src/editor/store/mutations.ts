@@ -63,10 +63,6 @@ export default {
     state.inspecting = inspecting;
   },
 
-  setResizing(state: State, resizing: boolean): void {
-    state.resizing = resizing;
-  },
-
   setColorPickerVisible(state: State, colorPickerVisible: boolean): void {
     state.colorPickerVisible = colorPickerVisible;
   },

@@ -3,59 +3,59 @@
     <slot></slot>
   </div>
 
-  <vue-draggable-resizable
+  <div
     v-else
-    :class="`stylebot ${layout.dockLocation}`"
-    class-name-resizing="stylebot-resizing"
-    class-name-active="stylebot-resizing-active"
-    drag-handle=".stylebot-null"
-    :x="x"
-    :y="margin"
-    :w="width"
-    :h="height"
-    :z="100000000"
-    :min-width="minWidth"
-    :active="resizing"
-    :draggable="false"
-    :prevent-deactivation="true"
-    :handles="handles"
-    @resizing="onResizing"
-    @activated="onActivated"
-    @resizestop="onResizeStop"
+    class="stylebot stylebot-docked"
+    :class="[layout.dockLocation, { 'stylebot-resizing': dragging }]"
+    :style="{ width: `${width}px` }"
   >
     <slot></slot>
-  </vue-draggable-resizable>
+
+    <div
+      class="stylebot-resize-edge"
+      role="separator"
+      tabindex="0"
+      aria-orientation="vertical"
+      :aria-label="t('resize_the_panel')"
+      :aria-valuenow="width"
+      :aria-valuemin="minWidth"
+      :aria-valuemax="maxWidth"
+      @pointerdown="onPointerDown"
+      @pointermove="onPointerMove"
+      @pointerup="onPointerUp"
+      @pointercancel="onPointerUp"
+      @dblclick="onReset"
+      @keydown="onKeydown"
+    ></div>
+  </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 
-import type { StylebotLayout, StylebotEditingMode } from '@stylebot/types';
+import { defaultOptions } from '@stylebot/settings';
+import type { StylebotLayout } from '@stylebot/types';
 
 const MARGIN = 12;
 const MIN_WIDTH = 340;
+const MAX_WIDTH_RATIO = 0.6;
+const KEYBOARD_STEP = 16;
+
+type Drag = { startX: number; startWidth: number; width: number };
 
 export default Vue.extend({
   name: 'TheStylebotResizer',
 
-  data: () => {
+  data(): { windowWidth: number; drag: Drag | null } {
     return {
       windowWidth: window.innerWidth,
-      windowHeight: window.innerHeight,
+      drag: null,
     };
   },
 
   computed: {
     host(): string {
       return this.$store.state.host;
-    },
-
-    resizing(): boolean {
-      return this.$store.state.resizing;
-    },
-
-    mode(): StylebotEditingMode {
-      return this.$store.state.options.mode;
     },
 
     layout(): StylebotLayout {
@@ -66,46 +66,36 @@ export default Vue.extend({
       return this.$store.state.visible;
     },
 
-    dockedRight(): boolean {
-      if (this.layout.dockLocation === 'right') {
-        return true;
-      }
+    dragging(): boolean {
+      return this.drag !== null;
+    },
 
-      return false;
+    dockedRight(): boolean {
+      return this.layout.dockLocation === 'right';
     },
 
     minWidth(): number {
       return MIN_WIDTH;
     },
 
+    maxWidth(): number {
+      return Math.max(
+        MIN_WIDTH,
+        Math.round(this.windowWidth * MAX_WIDTH_RATIO)
+      );
+    },
+
     width(): number {
-      // Guards against a width persisted before MIN_WIDTH was raised.
-      return Math.max(this.layout.width, MIN_WIDTH);
-    },
-
-    height(): number {
-      return this.windowHeight - MARGIN * 2;
-    },
-
-    margin(): number {
-      return MARGIN;
-    },
-
-    x(): number {
-      if (this.dockedRight) {
-        return this.windowWidth - this.width - MARGIN;
-      }
-
-      return MARGIN;
-    },
-
-    handles(): Array<'ml' | 'mr'> {
-      return this.dockedRight ? ['ml'] : ['mr'];
+      return this.clamp(this.drag ? this.drag.width : this.layout.width);
     },
   },
 
   watch: {
     layout() {
+      this.adjustPageLayout();
+    },
+
+    width() {
       this.adjustPageLayout();
     },
   },
@@ -121,28 +111,72 @@ export default Vue.extend({
   },
 
   methods: {
+    clamp(width: number): number {
+      return Math.min(Math.max(Math.round(width), MIN_WIDTH), this.maxWidth);
+    },
+
+    saveWidth(width: number): void {
+      this.$store.dispatch('setLayout', {
+        ...this.layout,
+        width: this.clamp(width),
+      });
+    },
+
     onWindowResize() {
       this.windowWidth = window.innerWidth;
-      this.windowHeight = window.innerHeight;
       this.adjustPageLayout();
     },
 
-    onActivated() {
+    onPointerDown(event: PointerEvent) {
+      if (event.button !== 0) {
+        return;
+      }
+
+      event.preventDefault();
+      (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
       this.$store.commit('setInspecting', false);
+
+      this.drag = {
+        startX: event.clientX,
+        startWidth: this.width,
+        width: this.width,
+      };
     },
 
-    onResizing(x: number, y: number, width: number) {
-      this.$store.dispatch('setLayout', {
-        ...this.layout,
-        width,
-      });
+    onPointerMove(event: PointerEvent) {
+      if (!this.drag) {
+        return;
+      }
+
+      const delta = event.clientX - this.drag.startX;
+      this.drag.width =
+        this.drag.startWidth + (this.dockedRight ? -delta : delta);
     },
 
-    onResizeStop(x: number, y: number, width: number) {
-      this.$store.dispatch('setLayout', {
-        ...this.layout,
-        width,
-      });
+    onPointerUp() {
+      if (!this.drag) {
+        return;
+      }
+
+      const { width } = this.drag;
+      this.drag = null;
+      this.saveWidth(width);
+    },
+
+    onReset() {
+      this.saveWidth(defaultOptions.layout.width);
+    },
+
+    onKeydown(event: KeyboardEvent) {
+      if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') {
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      const grows = (event.key === 'ArrowLeft') === this.dockedRight;
+      this.saveWidth(this.width + (grows ? KEYBOARD_STEP : -KEYBOARD_STEP));
     },
 
     adjustPageLayout() {
@@ -177,31 +211,64 @@ export default Vue.extend({
     inset: 0;
   }
 
-  &.vdr {
+  &.stylebot-docked {
     position: fixed;
+    top: 12px;
+    bottom: 12px;
+    z-index: 100000000;
     border: 1px solid var(--panel-border);
     border-radius: 14px;
     box-shadow: 0 14px 40px var(--panel-shadow);
 
-    &.stylebot-resizing,
-    &.stylebot-resizing-active {
-      border: 5px solid var(--accent);
+    &.left {
+      left: 12px;
     }
 
-    .handle {
-      width: 20px;
-      height: 20px;
-      background: var(--accent);
-      border: none;
+    &.right {
+      right: 12px;
     }
+  }
 
-    .handle-ml {
-      left: -20px;
-    }
+  &.stylebot-resizing {
+    user-select: none;
 
-    .handle-mr {
-      right: -20px;
+    .stylebot-content {
+      pointer-events: none;
     }
+  }
+}
+
+.stylebot-resize-edge {
+  position: absolute;
+  top: 14px;
+  bottom: 14px;
+  width: 8px;
+  cursor: col-resize;
+  touch-action: none;
+  outline: none;
+
+  &::after {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 3px;
+    width: 2px;
+    background: var(--accent);
+    border-radius: 1px;
+    opacity: 0;
+    content: '';
+  }
+
+  &:focus-visible::after {
+    opacity: 1;
+  }
+
+  .right > & {
+    left: -5px;
+  }
+
+  .left > & {
+    right: -5px;
   }
 }
 </style>

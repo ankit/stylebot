@@ -27,9 +27,6 @@ export default Vue.extend({
     inspecting(): boolean {
       return this.$store.state.inspecting;
     },
-    resizing(): boolean {
-      return this.$store.state.resizing;
-    },
     mode(): StylebotEditingMode {
       return this.$store.state.options.mode;
     },
@@ -84,14 +81,6 @@ export default Vue.extend({
       if (this.mode === 'basic') {
         this.$store.commit('setInspecting', !this.inspecting);
       }
-    },
-
-    toggleResize(): void {
-      if (this.host === 'window') {
-        return;
-      }
-
-      this.$store.commit('setResizing', !this.resizing);
     },
 
     toggleVisibilityOfActiveSelector(): void {
@@ -234,14 +223,6 @@ export default Vue.extend({
         event.stopPropagation();
 
         this.toggleAdjustPageLayout();
-      }
-
-      // Toggle resizing
-      if (event.key === this.editorCommands.resize) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        this.toggleResize();
       }
 
       // Hide help / stylebot

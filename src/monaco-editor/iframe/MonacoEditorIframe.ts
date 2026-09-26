@@ -139,8 +139,8 @@ class MonacEditorIframe {
     // Layout may still be settling at creation time — re-measure after paint.
     requestAnimationFrame(() => this.editor.layout());
 
-    // Container can resize with no window resize event to catch it (e.g. the panel
-    // resizer) since it's same-document, not the iframe's own viewport.
+    // Container can resize with no window resize event to catch it (e.g. dragging the
+    // panel's edge) since it's same-document, not the iframe's own viewport.
     new ResizeObserver(() => this.editor.layout()).observe(container);
   }
 

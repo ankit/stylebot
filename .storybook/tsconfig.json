@@ -1,12 +1,7 @@
 {
   "extends": "../tsconfig.json",
   "exclude": ["../node_modules"],
-  "include": [
-    "./**/*",
-    "../src/**/*.stories.ts",
-    "../shims.vue.d.ts",
-    "../src/editor/vue-draggable-resizable.d.ts"
-  ],
+  "include": ["./**/*", "../src/**/*.stories.ts", "../shims.vue.d.ts"],
   "compilerOptions": {
     "types": ["chrome", "node"],
     "baseUrl": "../src",
