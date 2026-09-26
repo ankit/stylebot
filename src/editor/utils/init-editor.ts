@@ -91,6 +91,10 @@ const initEditor = (store: Store<State>): void => {
   hostStyle.setProperty('width', '0', 'important');
   hostStyle.setProperty('height', '0', 'important');
   hostStyle.setProperty('z-index', '2147483647', 'important');
+  // direction/writing-mode inherit into the shadow tree; an RTL or vertical
+  // page would otherwise flip the panel's flow and push it off-screen.
+  hostStyle.setProperty('direction', 'ltr', 'important');
+  hostStyle.setProperty('writing-mode', 'horizontal-tb', 'important');
 
   document.body.appendChild(stylebotAppHost);
 

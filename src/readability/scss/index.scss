@@ -61,6 +61,7 @@
 }
 
 .stylebot-reader-body {
+  direction: var(--stylebot-page-direction, ltr);
   margin: 0 auto;
   padding: var(--body-padding);
   opacity: 0;
