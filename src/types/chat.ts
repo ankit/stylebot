@@ -192,3 +192,13 @@ export type ChatStatus = {
   // Enough of the key to recognise it, with its middle hidden.
   maskedKey?: string;
 };
+
+/**
+ * Sent over the chat port to start a reply. The system prompt is built in
+ * the editor, which has the page at hand.
+ */
+export type ChatStreamRequest = {
+  type: 'send';
+  system: string;
+  turns: Array<ChatTurn>;
+};

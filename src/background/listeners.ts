@@ -38,7 +38,10 @@ import {
   ChatConnect,
   ChatDisconnect,
   ChatSetModel,
+  ChatGetThread,
+  ChatSetThread,
 } from './messages';
+import { initChatPort } from './chat';
 
 import { refreshBadgeForTab } from './styles';
 import * as styleStorage from './styles';
@@ -266,11 +269,19 @@ export const initListeners = (): void => {
         case 'ChatSetModel':
           ChatSetModel(message, sendResponse);
           break;
+        case 'ChatGetThread':
+          ChatGetThread(message, sendResponse);
+          break;
+        case 'ChatSetThread':
+          ChatSetThread(message);
+          break;
       }
 
       return true;
     }
   );
+
+  initChatPort();
 
   chrome.contextMenus.onClicked.addListener(handleContextMenuClick);
 };
