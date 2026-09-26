@@ -97,6 +97,7 @@ const config = {
       '@stylebot/i18n': path.resolve(__dirname, './src/i18n/index'),
       '@stylebot/sync': path.resolve(__dirname, './src/sync/index'),
       '@stylebot/history': path.resolve(__dirname, './src/history/index'),
+      '@stylebot/editor': path.resolve(__dirname, './src/editor/index'),
       '@stylebot/types': path.resolve(__dirname, './src/types/index'),
       '@stylebot/utils': path.resolve(__dirname, './src/utils/index'),
       '@stylebot/styles': path.resolve(__dirname, './src/styles/index'),
@@ -317,7 +318,7 @@ const clientConfig = {
   entry: {
     'sync/index': './sync/index.ts',
     'popup/index': './popup/index.ts',
-    'editor/index': './editor/index.ts',
+    'editor/index': './editor/content-script.ts',
     options: './options/index.ts',
     'editor-window/index': './editor-window/index.ts',
     'inject-css/index': './inject-css/content-script.ts',

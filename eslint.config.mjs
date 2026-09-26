@@ -141,6 +141,31 @@ export default tseslint.config(
   },
 
   {
+    // Other surfaces use the editor only through its package entry, so its
+    // internals can change (or move into lazily loaded bundles) freely.
+    files: ['src/**/*.{ts,vue}'],
+    ignores: [
+      'src/editor/**',
+      '**/__tests__/**',
+      '**/*.test.ts',
+      '**/*.stories.ts',
+    ],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['**/editor', '**/editor/*', '!@stylebot/editor'],
+              message: 'Import the editor through @stylebot/editor.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+
+  {
     // Tests re-require modules after jest.resetModules().
     files: ['**/__tests__/**', '**/*.test.ts'],
     languageOptions: { globals: globals.jest },
