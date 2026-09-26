@@ -7,8 +7,13 @@ import type {
 
 import { anthropic, anthropicProvider } from './anthropic';
 import { openai, openAiProvider } from './openai';
+import { gemini, geminiProvider } from './gemini';
 
-export const chatProviders: Array<ChatProviderInfo> = [anthropic, openai];
+export const chatProviders: Array<ChatProviderInfo> = [
+  anthropic,
+  openai,
+  gemini,
+];
 
 export const getProviderInfo = (id: ChatProviderId): ChatProviderInfo =>
   chatProviders.find(provider => provider.id === id) ?? anthropic;
@@ -30,6 +35,7 @@ export const getModel = (provider: ChatProviderId, id: string): ChatModel => {
 const adapters: Record<ChatProviderId, ChatProvider> = {
   anthropic: anthropicProvider,
   openai: openAiProvider,
+  gemini: geminiProvider,
 };
 
 export const getProvider = (id: ChatProviderId): ChatProvider => adapters[id];
