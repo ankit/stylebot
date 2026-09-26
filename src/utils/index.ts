@@ -5,6 +5,7 @@ export {
 } from './keydown-to-shortcut';
 
 export { debounce } from './debounce';
+export { splitCommaList } from './split-comma-list';
 export { isMac } from './is-mac';
 export { resolveAppearance, getSystemPreference } from './resolve-appearance';
 

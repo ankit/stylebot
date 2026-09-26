@@ -9,7 +9,7 @@
   >
     <span class="item-row">
       <span class="chips">
-        <s-chip v-for="(part, i) in parts" :key="i">{{ part }}</s-chip>
+        <selector-chips :parts="parts" />
       </span>
       <s-count-badge
         v-if="styleCount > 0"
@@ -22,10 +22,11 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { MenuItem, SCountBadge, SChip } from '@stylebot/components';
+import { MenuItem, SCountBadge } from '@stylebot/components';
 import { splitSelectorList } from '@stylebot/css';
 
 import { getPageBridge } from '@stylebot/page-bridge';
+import SelectorChips from './SelectorChips.vue';
 
 export default Vue.extend({
   name: 'TheCssSelectorDropdownItem',
@@ -33,7 +34,7 @@ export default Vue.extend({
   components: {
     MenuItem,
     SCountBadge,
-    SChip,
+    SelectorChips,
   },
 
   props: {
@@ -89,6 +90,7 @@ export default Vue.extend({
 .chips {
   flex: 1;
   min-width: 0;
+  contain: inline-size;
   display: flex;
   flex-wrap: wrap;
   gap: 6px;

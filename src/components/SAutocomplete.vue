@@ -22,7 +22,14 @@
           @keydown="onChipsKeydown"
           @blur="quietFocus = false"
         >
-          <s-chip v-for="(part, i) in chipParts" :key="i">{{ part }}</s-chip>
+          <slot name="chips" :parts="chipParts">
+            <s-chip
+              v-for="(part, i) in chipParts"
+              :key="i"
+              :label="part"
+              :title="part"
+            />
+          </slot>
         </div>
 
         <textarea
@@ -86,6 +93,7 @@ import type { PropType } from 'vue';
 import Vue from 'vue';
 
 import { ChevronDownIcon } from '@stylebot/icons';
+import { splitCommaList } from '@stylebot/utils';
 
 import AnchoredMenu from './AnchoredMenu.vue';
 import SMenu from './SMenu.vue';
@@ -214,11 +222,7 @@ export default Vue.extend({
 
   computed: {
     chipParts(): Array<string> {
-      return this.value
-        .split(',')
-        .map(part => part.trim())
-        .filter(Boolean)
-        .map(this.chipLabel);
+      return splitCommaList(this.value).map(this.chipLabel);
     },
   },
 

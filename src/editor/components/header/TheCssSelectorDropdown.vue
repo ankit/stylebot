@@ -14,6 +14,10 @@
     @focus="onFocus"
     @blur="onBlur"
   >
+    <template #chips="{ parts }">
+      <selector-chips :parts="parts" />
+    </template>
+
     <template v-if="activeStyleCount > 0" #suffix>
       <s-count-badge :count="activeStyleCount" class="active-style-count" />
     </template>
@@ -37,6 +41,7 @@ import type { CssDeclaration, StylebotEditingMode } from '@stylebot/types';
 
 import type { CssSelectorMetadata } from '../../store';
 import { getPageBridge } from '@stylebot/page-bridge';
+import SelectorChips from './SelectorChips.vue';
 import TheCssSelectorDropdownItem from './TheCssSelectorDropdownItem.vue';
 
 export default Vue.extend({
@@ -45,6 +50,7 @@ export default Vue.extend({
   components: {
     SAutocomplete,
     SCountBadge,
+    SelectorChips,
     TheCssSelectorDropdownItem,
   },
 
@@ -152,6 +158,7 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .active-style-count {
-  margin: 0 6px;
+  align-self: flex-start;
+  margin: 8px 6px 0;
 }
 </style>
