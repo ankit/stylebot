@@ -10,6 +10,7 @@ import {
   toggleEditorWindow,
 } from '../utils/chrome';
 import { initEditor } from '../utils/init-editor';
+import { isForceImportant } from '@stylebot/styles';
 
 /**
  * Whether opening the editor for this page means its separate window: the
@@ -98,7 +99,7 @@ export const applyStyles = (
   styles.forEach(style => {
     if (style.enabled) {
       injectCSSIntoDocument(style.css, style.url, {
-        forceImportant: style.forceImportant !== false,
+        forceImportant: isForceImportant(style),
       });
     } else {
       injectCSSIntoDocument('', style.url);

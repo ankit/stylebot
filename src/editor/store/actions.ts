@@ -48,6 +48,7 @@ import type { RemotePageBridgeSyncedState } from '@stylebot/page-bridge';
 import { getPageBridge } from '@stylebot/page-bridge';
 
 import { PLACEHOLDER_PROPERTIES } from '../utils/computed-placeholder';
+import { isForceImportant } from '@stylebot/styles';
 
 const RECENT_FONTS_LIMIT = 10;
 const isBundledGoogleFont = async (family: string): Promise<boolean> =>
@@ -88,7 +89,7 @@ export default {
     defaultStyle: Style
   ): void {
     const { url, enabled, css, readability } = defaultStyle;
-    const forceImportant = defaultStyle.forceImportant !== false;
+    const forceImportant = isForceImportant(defaultStyle);
     dispatch('syncFromPage', {
       url,
       enabled,

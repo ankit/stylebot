@@ -2,7 +2,10 @@
 jest.mock('../apply-state');
 jest.mock('../cache');
 jest.mock('../hide-page');
-jest.mock('@stylebot/styles');
+jest.mock('@stylebot/styles', () => ({
+  ...jest.requireActual('@stylebot/styles'),
+  getStylesForPage: jest.fn(),
+}));
 jest.mock('@stylebot/readability');
 
 const flushPromises = () => new Promise(resolve => setTimeout(resolve, 0));
