@@ -7,12 +7,14 @@ export const KEYBOARD_FOCUS: FocusOptions & { focusVisible: boolean } = {
 
 /**
  * Whether keys pressed in the element are text entry, which single-key
- * shortcuts must leave alone.
+ * shortcuts must leave alone. A combobox counts even when it shows its
+ * value as something else, since typing on it edits that value.
  */
 export const isFieldTarget = (target: EventTarget | null): boolean =>
   target instanceof HTMLElement &&
   (target.isContentEditable ||
-    ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName));
+    ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName) ||
+    target.getAttribute('role') === 'combobox');
 
 /**
  * Consumes an Escape pressed in a field for the innermost section handling it,

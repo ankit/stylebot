@@ -85,9 +85,12 @@ export const ArrowKeysBetweenFieldAndList: StoryObj = {
 
     await expect(chips(canvasElement)).toHaveTextContent('h1');
 
-    // The chips are a tab stop that hands focus to the input, which
-    // opens the list.
+    // The chips are a tab stop that leaves the list closed; Enter hands
+    // focus to the input and opens it.
     chips(canvasElement).focus();
+    await expect(chips(canvasElement)).toHaveFocus();
+    await expect(canvas.queryByRole('menu')).toBeNull();
+    await pressKey('Enter');
     await waitFor(() => expect(input(canvasElement)).toHaveFocus());
     await findOpenMenu(canvas);
     await pressKey('Escape');

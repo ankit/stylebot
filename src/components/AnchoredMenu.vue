@@ -43,6 +43,14 @@ export default Vue.extend({
       type: Function as PropType<() => HTMLElement | null | undefined>,
       default: () => null,
     },
+
+    // The item standing for the current choice, if any: scrolled into view
+    // on open, and where the arrow keys start from while focus is in the
+    // trigger field.
+    currentItem: {
+      type: Function as PropType<() => HTMLElement | null | undefined>,
+      default: () => null,
+    },
   },
 
   data(): {
@@ -80,6 +88,7 @@ export default Vue.extend({
         this.$emit('open');
         this.$nextTick(() => {
           this.position();
+          this.scrollToCurrent();
           if (!this.retainFocus) {
             this.focusableItems()[0]?.focus();
           }
@@ -135,6 +144,26 @@ export default Vue.extend({
       this.open = false;
     },
 
+    // Centres the current item in the scrolling list, leaving the rest of
+    // the page where it is.
+    scrollToCurrent(): void {
+      const item = this.currentItem();
+      const panel = this.$refs.panel as HTMLElement | undefined;
+      let list = item?.parentElement;
+
+      while (list && list !== panel && list.scrollHeight <= list.clientHeight) {
+        list = list.parentElement;
+      }
+
+      if (!item || !list) {
+        return;
+      }
+
+      const itemTop =
+        item.getBoundingClientRect().top - list.getBoundingClientRect().top;
+      list.scrollTop += itemTop - (list.clientHeight - item.offsetHeight) / 2;
+    },
+
     focusableItems(): Array<HTMLElement> {
       const panel = this.$refs.panel as HTMLElement | undefined;
       return panel
@@ -184,7 +213,7 @@ export default Vue.extend({
     // as inside.
     onDocMousedown(event: MouseEvent): void {
       if (!event.composedPath().includes(this.$el)) {
-        this.$emit('cancel');
+        this.$emit('cancel', 'outside');
         this.close();
       }
     },
@@ -201,7 +230,7 @@ export default Vue.extend({
     onDocKeydown(event: KeyboardEvent): void {
       if (event.key === 'Escape') {
         event.stopPropagation();
-        this.$emit('cancel');
+        this.$emit('cancel', 'escape');
         this.close();
         return;
       }
@@ -225,6 +254,16 @@ export default Vue.extend({
       const active = this.activeElement();
       const currentIndex = active ? cycle.indexOf(active) : -1;
       const delta = event.key === 'ArrowDown' ? 1 : -1;
+
+      // From the field, move on from the current choice rather than the top.
+      const current = field && active === field ? this.currentItem() : null;
+      const currentItemIndex = current ? items.indexOf(current) : -1;
+
+      if (currentItemIndex !== -1) {
+        const next = (currentItemIndex + delta + items.length) % items.length;
+        items[next].focus();
+        return;
+      }
 
       if (currentIndex === -1) {
         // Nothing in the cycle has focus yet: enter it at the first or last item.

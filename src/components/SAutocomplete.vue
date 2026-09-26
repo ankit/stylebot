@@ -4,6 +4,7 @@
     class="autocomplete"
     retain-focus
     :trigger-field="() => $refs.input"
+    :current-item="currentItem"
     @cancel="onCancel"
     @leave="$emit('leave', value)"
   >
@@ -11,10 +12,15 @@
       <div class="autocomplete-pill" :class="{ disabled }">
         <div
           v-if="chips && !focused && !open && chipParts.length"
+          ref="chips"
           class="autocomplete-chips"
+          :class="{ quiet: quietFocus }"
+          role="combobox"
+          aria-expanded="false"
           tabindex="0"
           @mousedown.prevent="revealInput"
-          @focus="revealInput"
+          @keydown="onChipsKeydown"
+          @blur="quietFocus = false"
         >
           <s-chip v-for="(part, i) in chipParts" :key="i">{{ part }}</s-chip>
         </div>
@@ -55,7 +61,13 @@
       </div>
     </template>
 
-    <s-menu dense :min-width="minWidth" class="autocomplete-menu">
+    <s-menu
+      dense
+      :min-width="minWidth"
+      class="autocomplete-menu"
+      @pointerdown.native="pointerPick = true"
+      @keydown.native="pointerPick = false"
+    >
       <slot name="header" />
 
       <div
@@ -173,10 +185,27 @@ export default Vue.extend({
     suppressReopen: boolean;
     focused: boolean;
     keepSelectionOnMouseUp: boolean;
+    openOnFocus: boolean;
+    pointerPick: boolean;
+    quietFocus: boolean;
+    typedAhead: string | null;
+    edited: boolean;
   } {
     return {
       suppressReopen: false,
       focused: false,
+      // Only a click on the field, or starting to edit from the chips, opens
+      // the menu as the field takes focus; tabbing onto it leaves it closed.
+      openOnFocus: false,
+      // A pick made with the pointer hands focus back to the chips without
+      // a focus ring, as it would have on any other click.
+      pointerPick: false,
+      quietFocus: false,
+      // Keys typed on the chips before the field they reveal has mounted.
+      typedAhead: null,
+      // Whether the text changed since editing began; until it does, the
+      // selected item is the current one for the menu.
+      edited: false,
       // The mouseup that ends a focusing click would collapse the
       // select-on-focus selection to a caret; swallow that one mouseup.
       keepSelectionOnMouseUp: false,
@@ -206,6 +235,14 @@ export default Vue.extend({
   methods: {
     menu(): AnchoredMenuRef {
       return this.$refs.menu as unknown as AnchoredMenuRef;
+    },
+
+    currentItem(): HTMLElement | null {
+      return this.edited
+        ? null
+        : this.$el.querySelector<HTMLElement>(
+            '.autocomplete-menu .menu-item.selected'
+          );
     },
 
     showMenu(): void {
@@ -249,6 +286,7 @@ export default Vue.extend({
     },
 
     onInput(value: string): void {
+      this.edited = true;
       this.$emit('input', value);
       this.resize();
       // `items` updates on the parent's next render, so defer the open/close
@@ -272,6 +310,28 @@ export default Vue.extend({
         return;
       }
 
+      // Keys typed on the chips only land now: had they changed the value
+      // while the chips were going away, leaving them would have applied it.
+      if (this.typedAhead !== null) {
+        this.$emit('input', this.typedAhead);
+        this.typedAhead = null;
+        this.startSession(false);
+        this.edited = true;
+        return;
+      }
+
+      const open = this.openOnFocus;
+      this.openOnFocus = false;
+
+      if (!open) {
+        this.suppressReopen = false;
+        if (this.selectOnFocus) {
+          (this.$refs.input as HTMLTextAreaElement | undefined)?.select();
+        }
+        this.$emit('focus');
+        return;
+      }
+
       this.startSession();
     },
 
@@ -279,6 +339,8 @@ export default Vue.extend({
     // then opens the menu once `items` reflect the consumer's reaction to
     // focus (e.g. listing everything while the value is untouched).
     startSession(select = this.selectOnFocus): void {
+      this.edited = false;
+
       if (select) {
         (this.$refs.input as HTMLTextAreaElement | undefined)?.select();
       }
@@ -294,10 +356,13 @@ export default Vue.extend({
     },
 
     onMouseDown(): void {
+      this.openOnFocus = !this.focused;
       this.keepSelectionOnMouseUp = this.selectOnFocus && !this.focused;
     },
 
     onMouseUp(event: MouseEvent): void {
+      this.openOnFocus = false;
+
       if (this.keepSelectionOnMouseUp) {
         event.preventDefault();
         this.keepSelectionOnMouseUp = false;
@@ -307,6 +372,7 @@ export default Vue.extend({
     // Switches from the pill display back to the raw editable textarea
     // and focuses it, once it exists on the next render.
     revealInput(): void {
+      this.openOnFocus = true;
       this.focused = true;
       this.$nextTick(() => {
         (this.$refs.input as HTMLTextAreaElement | undefined)?.focus();
@@ -315,7 +381,7 @@ export default Vue.extend({
 
     onSelect(item: Record<string, unknown>): void {
       this.$emit('select', item);
-      this.finishCommit();
+      this.finishCommit(this.pointerPick);
     },
 
     // Confirms the typed value, which may be a custom entry not in `items`.
@@ -326,10 +392,13 @@ export default Vue.extend({
       this.finishCommit();
     },
 
-    finishCommit(): void {
+    finishCommit(quiet = false): void {
+      this.pointerPick = false;
+
       if (this.blurOnCommit) {
         this.menu().close({ skipRestoreFocus: true });
         (this.$refs.input as HTMLTextAreaElement | undefined)?.blur();
+        this.$nextTick(() => this.focusCommitted(quiet));
         return;
       }
 
@@ -338,11 +407,49 @@ export default Vue.extend({
       this.hideMenu();
     },
 
-    onCancel(): void {
-      // Escape / click-outside close the menu and keep the text as typed;
-      // the refocus-on-close must not reopen it.
+    // Keeps focus on the control once the committed value shows, so Tab
+    // carries on from here: on the chips, or on the field when there's no
+    // value to show as chips.
+    focusCommitted(quiet: boolean): void {
+      const chips = this.$refs.chips as HTMLElement | undefined;
+
+      if (chips) {
+        this.quietFocus = quiet;
+        chips.focus();
+        return;
+      }
+
+      (this.$refs.input as HTMLTextAreaElement | undefined)?.focus();
+    },
+
+    // Focusing the chips leaves the menu closed, like a select: Enter, Space
+    // and the arrow keys start editing, and so does typing, from the typed
+    // text (or after the value, when the field doesn't select on focus).
+    onChipsKeydown(event: KeyboardEvent): void {
+      this.quietFocus = false;
+
+      if (event.ctrlKey || event.metaKey || event.altKey) {
+        return;
+      }
+
+      if (['Enter', ' ', 'ArrowDown', 'ArrowUp'].includes(event.key)) {
+        event.preventDefault();
+        this.revealInput();
+      } else if (event.key.length === 1 || event.key === 'Backspace') {
+        event.preventDefault();
+        const text = this.typedAhead ?? (this.selectOnFocus ? '' : this.value);
+        this.typedAhead =
+          event.key === 'Backspace' ? text.slice(0, -1) : text + event.key;
+        this.revealInput();
+      }
+    },
+
+    // Escape / click-outside close the menu, leaving it to the consumer
+    // (told which one) whether to keep the text as typed; the
+    // refocus-on-close must not reopen it.
+    onCancel(reason: 'escape' | 'outside'): void {
       this.suppressReopen = true;
-      this.$emit('cancel');
+      this.$emit('cancel', reason);
     },
 
     // Opens the menu from the chevron or Up/Down, like a click on the field:
@@ -381,7 +488,8 @@ export default Vue.extend({
 
   // Only the text field itself highlights the whole pill — the chevron
   // button gets its own focus ring instead (see .autocomplete-chevron).
-  &:has(.autocomplete-input:focus) {
+  &:has(.autocomplete-input:focus),
+  &:has(.autocomplete-chips:focus-visible:not(.quiet)) {
     @include field-active-border;
   }
 
@@ -400,6 +508,7 @@ export default Vue.extend({
   gap: 6px;
   padding: 5px 8px 5px 6px;
   cursor: text;
+  outline: none;
 }
 
 .autocomplete-input {

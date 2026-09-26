@@ -7,6 +7,7 @@ import type { Canvas } from '@stylebot/storybook/story-helpers';
 import {
   declaration,
   findOpenMenu,
+  focusViaTab,
   pageStyle,
   pressKey,
   storeOf,
@@ -39,6 +40,9 @@ const openPicker = async (root: HTMLElement) => {
   await waitFor(() => expect(input(root)).toHaveFocus());
   return input(root);
 };
+
+const chipsControl = (root: HTMLElement) =>
+  field(root).querySelector('.autocomplete-chips') as HTMLElement | null;
 
 // A row's accessible name is its label plus, for Google Fonts, the category.
 const menuItem = (canvas: Canvas, name: string) =>
@@ -195,17 +199,19 @@ export const ArrowKeys: StoryObj = {
       await waitFor(() => expect(text).toHaveFocus());
     });
 
-    await step('Escape closes the list and keeps the text', async () => {
+    await step('Escape closes the list and reverts the text', async () => {
       await pressKey('Escape');
       await waitFor(() => expect(canvas.queryByRole('menu')).toBeNull());
-      await expect(text).toHaveValue('playfa');
+      await expect(text).toHaveValue('Merriweather');
       await expect(text).toHaveFocus();
     });
 
     await step('Down reopens it without re-selecting the text', async () => {
       await pressKey('ArrowDown');
       await findOpenMenu(canvas);
-      await user.keyboard('i');
+      await expect(text.selectionStart).toBe(text.value.length);
+      await user.clear(text);
+      await user.keyboard('playfai');
       await expect(text).toHaveValue('playfai');
     });
 
@@ -219,6 +225,325 @@ export const ArrowKeys: StoryObj = {
         await expect(store.state.options.fonts).not.toContain('playfai');
       }
     );
+  },
+};
+
+export const EscapeRevertsDraft: StoryObj = {
+  ...editor({ css: 'h1 { font-family: Georgia; }', activeSelector: 'h1' }),
+  name: 'Escape reverts typed text to the applied font',
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+    const text = await openPicker(canvasElement);
+
+    await step('Escape from a suggestion restores the text', async () => {
+      await user.keyboard('playf');
+      await menuItem(canvas, 'Playfair Display');
+      await pressKey('ArrowDown');
+      await pressKey('Escape');
+      await waitFor(() => expect(canvas.queryByRole('menu')).toBeNull());
+      await expect(text).toHaveFocus();
+      await expect(text).toHaveValue('Georgia');
+    });
+
+    await step('Down reopens it with the caret at the end', async () => {
+      await pressKey('ArrowDown');
+      await findOpenMenu(canvas);
+      await expect(text.selectionStart).toBe(text.value.length);
+      await expect(text.selectionEnd).toBe(text.value.length);
+      await pressKey('Escape');
+    });
+
+    await step('leaving afterwards applies nothing', async () => {
+      await user.click(document.body);
+      await waitFor(() => expect(chips(canvasElement)).toEqual(['Georgia']));
+      await expect(declaration(store, 'h1', 'font-family')).toBe('Georgia');
+    });
+  },
+};
+
+export const ClickAwayApplies: StoryObj = {
+  ...editor({ css: 'h1 { font-family: Georgia; }', activeSelector: 'h1' }),
+  name: 'clicking away applies typed text rather than reverting it',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+
+    await openPicker(canvasElement);
+    await user.keyboard('Lora');
+    await findOpenMenu(canvas);
+
+    await user.click(document.body);
+
+    await waitFor(() =>
+      expect(declaration(store, 'h1', 'font-family')).toBe('Lora')
+    );
+    await expect(canvas.queryByRole('menu')).toBeNull();
+  },
+};
+
+export const KeyboardPickKeepsFocus: StoryObj = {
+  ...editor(WITH_RULE),
+  name: 'after a keyboard pick, focus stays on the field and Tab moves on',
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+
+    await step('Enter on a suggestion focuses its chips, ringed', async () => {
+      await openPicker(canvasElement);
+      await user.keyboard('playf');
+      await menuItem(canvas, 'Playfair Display');
+      await pressKey('ArrowDown');
+      await pressKey('Enter');
+
+      await waitFor(() => expect(chipsControl(canvasElement)).toHaveFocus());
+      await expect(chips(canvasElement)).toEqual(['Playfair Display']);
+      await expect(chipsControl(canvasElement)).not.toHaveClass('quiet');
+      await expect(canvas.queryByRole('menu')).toBeNull();
+    });
+
+    await step('Tab carries on past the field', async () => {
+      await user.tab();
+      await expect(field(canvasElement)).not.toContainElement(
+        document.activeElement as HTMLElement
+      );
+      await expect(document.activeElement).not.toBe(document.body);
+      await expect(canvas.queryByRole('menu')).toBeNull();
+    });
+  },
+};
+
+export const PointerPickKeepsFocusQuietly: StoryObj = {
+  ...editor(WITH_RULE),
+  name: 'after a click pick, focus stays on the field without a ring',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await openPicker(canvasElement);
+    await user.keyboard('playf');
+    await user.click(await menuItem(canvas, 'Playfair Display'));
+
+    await waitFor(() => expect(chipsControl(canvasElement)).toHaveFocus());
+    await expect(chipsControl(canvasElement)).toHaveClass('quiet');
+  },
+};
+
+/* Picks the first suggestion for `query` with the keyboard, leaving focus
+   on the chips it commits to. */
+const pickWithKeyboard = async (root: HTMLElement, query: string) => {
+  await openPicker(root);
+  await user.keyboard(query);
+  await findOpenMenu(within(root));
+  await pressKey('ArrowDown');
+  await pressKey('Enter');
+  await waitFor(() => expect(chipsControl(root)).toHaveFocus());
+};
+
+export const TabOntoChipsStaysClosed: StoryObj = {
+  ...editor(WITH_RULE),
+  name: 'tabbing onto the chips focuses them without opening the list',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const control = chipsControl(canvasElement) as HTMLElement;
+
+    focusViaTab(canvasElement, '.font-family-autocomplete .autocomplete-chips');
+
+    await expect(control).toHaveFocus();
+    await expect(control).not.toHaveClass('quiet');
+    await expect(canvas.queryByRole('menu')).toBeNull();
+    await expect(chips(canvasElement)).toEqual(['Merriweather']);
+  },
+};
+
+export const TabOntoEmptyFieldStaysClosed: StoryObj = {
+  ...editor({ css: 'h1 { color: red; }', activeSelector: 'h1' }),
+  name: 'tabbing onto an empty field focuses it without opening the list',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const text = input(canvasElement);
+
+    focusViaTab(canvasElement, '.font-family-autocomplete .autocomplete-input');
+    await expect(text).toHaveFocus();
+    await new Promise(resolve => setTimeout(resolve, 100));
+    await expect(canvas.queryByRole('menu')).toBeNull();
+
+    await pressKey('ArrowDown');
+    await findOpenMenu(canvas);
+    await pressKey('Escape');
+    await waitFor(() => expect(canvas.queryByRole('menu')).toBeNull());
+
+    await user.keyboard('lor');
+    await findOpenMenu(canvas);
+    await menuItem(canvas, 'Lora');
+  },
+};
+
+export const EnterOnChipsEdits: StoryObj = {
+  ...editor(WITH_RULE),
+  name: 'Enter on the chips after a pick starts editing, value selected',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await pickWithKeyboard(canvasElement, 'playf');
+
+    await pressKey('Enter');
+
+    await findOpenMenu(canvas);
+    const text = input(canvasElement);
+    await expect(text).toHaveFocus();
+    await expect(text).toHaveValue('Playfair Display');
+    await expect(text.selectionStart).toBe(0);
+    await expect(text.selectionEnd).toBe(text.value.length);
+  },
+};
+
+export const TypingOnChipsEdits: StoryObj = {
+  ...editor(WITH_RULE),
+  name: 'typing on the chips after a pick starts over from the typed text',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+    await pickWithKeyboard(canvasElement, 'playf');
+
+    await user.keyboard('lo');
+
+    const text = input(canvasElement);
+    await waitFor(() => expect(text).toHaveFocus());
+    await expect(text).toHaveValue('lo');
+    await expect(text.selectionStart).toBe(2);
+    await findOpenMenu(canvas);
+    await menuItem(canvas, 'Lora');
+    await expect(declaration(store, 'h1', 'font-family')).toBe(
+      'Playfair Display'
+    );
+  },
+};
+
+export const DefaultPickKeepsFocus: StoryObj = {
+  ...editor({ css: 'h1 { font-family: Georgia; }', activeSelector: 'h1' }),
+  name: 'picking Default keeps focus on the empty field, menu closed',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+
+    await openPicker(canvasElement);
+    await pressKey('Backspace');
+    await menuItem(canvas, 'Default');
+    await pressKey('ArrowDown');
+    await pressKey('Enter');
+
+    await waitFor(() =>
+      expect(declaration(store, 'h1', 'font-family')).toBeUndefined()
+    );
+    await waitFor(() => expect(input(canvasElement)).toHaveFocus());
+    await expect(canvas.queryByRole('menu')).toBeNull();
+  },
+};
+
+const RECENTS = ['Lora', 'Merriweather', 'Playfair Display', 'Roboto'];
+
+export const ArrowsStartFromSelected: StoryObj = {
+  ...editor({
+    ...WITH_RULE,
+    options: { fonts: RECENTS },
+  }),
+  name: 'arrow keys start from the applied font until the text is edited',
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+    const text = await openPicker(canvasElement);
+    await findOpenMenu(canvas);
+
+    await step('Down moves to the font after the applied one', async () => {
+      await pressKey('ArrowDown');
+      await waitFor(() =>
+        expect(
+          canvas.getByRole('menuitem', { name: /^Playfair Display/ })
+        ).toHaveFocus()
+      );
+    });
+
+    await step('Up from the field moves to the font before it', async () => {
+      await pressKey('Escape');
+      await waitFor(() => expect(text).toHaveFocus());
+      await pressKey('ArrowDown');
+      await findOpenMenu(canvas);
+      await pressKey('ArrowUp');
+      await waitFor(() =>
+        expect(canvas.getByRole('menuitem', { name: /^Lora/ })).toHaveFocus()
+      );
+    });
+
+    await step('once edited, Down starts from the first match', async () => {
+      await pressKey('Escape');
+      await waitFor(() => expect(text).toHaveFocus());
+      await user.keyboard('ro');
+      await menuItem(canvas, 'Roboto');
+      await pressKey('ArrowDown');
+      await waitFor(() =>
+        expect(canvas.getAllByRole('menuitem')[0]).toHaveFocus()
+      );
+    });
+  },
+};
+
+const MANY_RECENTS = Array.from({ length: 30 }, (_, i) => `Font${i + 1}`);
+
+export const OpensScrolledToSelected: StoryObj = {
+  ...editor({
+    css: 'h1 { font-family: Font28; }',
+    activeSelector: 'h1',
+    options: { fonts: MANY_RECENTS },
+  }),
+  name: 'a long list opens scrolled to the applied font',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await openPicker(canvasElement);
+    const menu = await findOpenMenu(canvas);
+
+    const selected = menu.querySelector('.menu-item.selected') as HTMLElement;
+    await expect(selected).toHaveTextContent('Font28');
+
+    const list = menu.closest('.autocomplete-menu') ?? menu;
+    await waitFor(() => {
+      const box = list.getBoundingClientRect();
+      const row = selected.getBoundingClientRect();
+      expect(row.top).toBeGreaterThanOrEqual(box.top);
+      expect(row.bottom).toBeLessThanOrEqual(box.bottom);
+    });
+  },
+};
+
+export const TypingDefault: StoryObj = {
+  ...editor({ css: 'h1 { font-family: Georgia; }', activeSelector: 'h1' }),
+  name: 'typing "default" offers the default and clears the font',
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+
+    await step('the start of the label lists Default first', async () => {
+      await openPicker(canvasElement);
+      await user.keyboard('def');
+      await findOpenMenu(canvas);
+      await waitFor(() =>
+        expect(canvas.getAllByRole('menuitem')[0]).toHaveTextContent(
+          /^Default$/
+        )
+      );
+    });
+
+    await step('the full word never becomes a custom font', async () => {
+      await user.keyboard('ault');
+      await waitFor(() =>
+        expect(
+          canvas.queryByRole('menuitem', { name: /^Use "default"/ })
+        ).toBeNull()
+      );
+    });
+
+    await step('Enter clears the font instead of writing it', async () => {
+      await pressKey('Enter');
+      await waitFor(() =>
+        expect(declaration(store, 'h1', 'font-family')).toBeUndefined()
+      );
+    });
   },
 };
 
