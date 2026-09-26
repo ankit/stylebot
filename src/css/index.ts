@@ -36,7 +36,11 @@ export {
   unquoteFamily,
 } from './font-family';
 export type { FontValueToken } from './font-family';
-export { addDeclaration, markDeclarationsImportant } from './declaration';
+export {
+  addDeclaration,
+  markDeclarationsImportant,
+  withoutImportant,
+} from './declaration';
 export {
   getRule,
   findRule,

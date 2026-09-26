@@ -5,6 +5,7 @@ export * from './readability';
 export * from './commands';
 export * from './sync';
 export * from './history';
+export * from './chat';
 export * from './styles';
 export * from './TabMessage';
 export * from './BackgroundPageMessage';
