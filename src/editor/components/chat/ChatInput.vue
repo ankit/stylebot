@@ -73,7 +73,7 @@ export default Vue.extend({
   font-family: inherit;
   font-size: 14px;
   line-height: 1.5;
-  color: var(--chat-ink);
+  color: var(--text-body);
   background: transparent;
 
   &::placeholder {

@@ -93,7 +93,7 @@ export default Vue.extend({
   gap: 6px;
   padding: 8px 8px 8px 12px;
   @include field-border(12px);
-  background: var(--chat-composer-surface);
+  background: var(--panel-surface);
   box-shadow: 0 1px 2px rgb(20 30 50 / 4%);
   transition: border-color 0.15s, box-shadow 0.15s;
 

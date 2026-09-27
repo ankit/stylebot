@@ -55,7 +55,7 @@ export default Vue.extend({
   font-family: var(--font-mono);
   font-size: 11px;
   line-height: 1.3;
-  color: var(--chat-ink-faint);
+  color: var(--text-faint);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -74,10 +74,11 @@ export default Vue.extend({
 .chat-user-message .chat-user-text {
   padding: 7px 11px;
   font-size: 14px;
-  border: 1px solid var(--chat-bubble-border);
+  border: 1px solid
+    color-mix(in srgb, var(--text-primary) 9%, var(--tab-surface));
   border-radius: 16px;
-  background: var(--chat-bubble-surface);
-  color: var(--chat-ink);
+  background: color-mix(in srgb, var(--text-primary) 6%, var(--tab-surface));
+  color: var(--text-body);
   line-height: 1.5;
   text-wrap: pretty;
   overflow-wrap: anywhere;
