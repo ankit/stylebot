@@ -1,5 +1,8 @@
 import { compileStyle } from '@stylebot/css';
-import { COMPILED_STYLES_VERSION, isForceImportant } from '@stylebot/styles';
+import {
+  COMPILED_STYLES_VERSION,
+  isForceImportant,
+} from '@stylebot/saved-styles';
 import type {
   CompiledStyleMap,
   CompiledStyles,

@@ -18,7 +18,7 @@ const aliasedPackages = [
   'history',
   'types',
   'utils',
-  'styles',
+  'saved-styles',
   'stylesheets',
   'settings',
   'google-fonts',
@@ -85,7 +85,7 @@ const config: StorybookConfig = {
         preprocessorOptions: {
           scss: {
             additionalData: '@import "mixins";',
-            includePaths: [src('styles')],
+            includePaths: [src('scss')],
           },
         },
       },

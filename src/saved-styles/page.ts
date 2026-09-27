@@ -1,6 +1,6 @@
 import type { StyleMap } from '@stylebot/types';
 
-import BackgroundPageUtils from './utils';
+import { isHtmlUrl, matchesUrlPattern } from './url';
 
 type WithUrl<T> = T & { url: string };
 
@@ -20,7 +20,7 @@ export const getStylesForPage = <T extends { css: string } = StyleMap[string]>(
     return { styles: [] };
   }
 
-  if (!BackgroundPageUtils.isValidHTML(pageUrl)) {
+  if (!isHtmlUrl(pageUrl)) {
     return { styles: [] };
   }
 
@@ -28,7 +28,7 @@ export const getStylesForPage = <T extends { css: string } = StyleMap[string]>(
   let defaultStyle: WithUrl<T> | undefined;
 
   for (const url in allStyles) {
-    const matches = BackgroundPageUtils.matches(pageUrl, url);
+    const matches = matchesUrlPattern(pageUrl, url);
 
     if (matches && allStyles[url]) {
       const style = { url, ...allStyles[url] };

@@ -7,7 +7,7 @@ import type {
   GetStylesForPageResponse,
   StylebotOptions,
 } from '@stylebot/types';
-import { STYLES_KEY, getStylesForPage } from '@stylebot/styles';
+import { STYLES_KEY, getStylesForPage } from '@stylebot/saved-styles';
 import { defaultCommands, defaultOptions } from '@stylebot/settings';
 
 import {

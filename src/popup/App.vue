@@ -105,7 +105,7 @@ import {
 } from './utils';
 
 import { getGoogleDriveSyncEnabled, getSyncNeedsAuth } from '@stylebot/sync';
-import { BackgroundPageUtils } from '@stylebot/styles';
+import { isSupportedUrl } from '@stylebot/saved-styles';
 import type { GetCommandsResponse, StylebotAppearance } from '@stylebot/types';
 
 export default Vue.extend({
@@ -158,7 +158,7 @@ export default Vue.extend({
     // Pages the content script can't run on (chrome://, Web Store, PDFs) —
     // same check the background page uses to decide whether it can inject.
     restricted(): boolean {
-      return !!this.tab?.url && !BackgroundPageUtils.isValidUrl(this.tab.url);
+      return !!this.tab?.url && !isSupportedUrl(this.tab.url);
     },
 
     styleShortcut(): string {

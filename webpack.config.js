@@ -103,7 +103,10 @@ const config = {
       '@stylebot/editor': path.resolve(__dirname, './src/editor/index'),
       '@stylebot/types': path.resolve(__dirname, './src/types/index'),
       '@stylebot/utils': path.resolve(__dirname, './src/utils/index'),
-      '@stylebot/styles': path.resolve(__dirname, './src/styles/index'),
+      '@stylebot/saved-styles': path.resolve(
+        __dirname,
+        './src/saved-styles/index'
+      ),
       '@stylebot/stylesheets': path.resolve(
         __dirname,
         './src/stylesheets/index'
@@ -182,7 +185,7 @@ const config = {
             options: {
               prependData: `@import "mixins";`,
               sassOptions: {
-                includePaths: [path.resolve(__dirname, 'src/styles')],
+                includePaths: [path.resolve(__dirname, 'src/scss')],
               },
             },
           },

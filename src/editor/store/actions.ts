@@ -47,7 +47,7 @@ import type { RemotePageBridgeSyncedState } from '@stylebot/page-bridge';
 import { getPageBridge } from '@stylebot/page-bridge';
 
 import { PLACEHOLDER_PROPERTIES } from '../utils/computed-placeholder';
-import { isForceImportant } from '@stylebot/styles';
+import { isForceImportant } from '@stylebot/saved-styles';
 
 import {
   emptyUndoStack,

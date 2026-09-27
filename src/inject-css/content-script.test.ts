@@ -7,8 +7,8 @@ jest.mock('./page-state', () => ({
 }));
 jest.mock('./hide-page');
 jest.mock('@stylebot/stylesheets');
-jest.mock('@stylebot/styles', () => ({
-  ...jest.requireActual('@stylebot/styles'),
+jest.mock('@stylebot/saved-styles', () => ({
+  ...jest.requireActual('@stylebot/saved-styles'),
   getStylesForPage: jest.fn(),
 }));
 jest.mock('@stylebot/readability');
@@ -32,7 +32,7 @@ describe('inject-css run()', () => {
   let pageStateModule: typeof import('./page-state');
   let stylesheets: typeof import('@stylebot/stylesheets');
   let hidePageModule: typeof import('./hide-page');
-  let stylesModule: typeof import('@stylebot/styles');
+  let stylesModule: typeof import('@stylebot/saved-styles');
   let sendMessage: jest.Mock;
   let registeredListener: (
     message: { name: string },
@@ -46,7 +46,7 @@ describe('inject-css run()', () => {
     pageStateModule = require('./page-state');
     stylesheets = require('@stylebot/stylesheets');
     hidePageModule = require('./hide-page');
-    stylesModule = require('@stylebot/styles');
+    stylesModule = require('@stylebot/saved-styles');
 
     sendMessage = jest.fn();
 

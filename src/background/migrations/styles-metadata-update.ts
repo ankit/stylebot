@@ -1,4 +1,4 @@
-import { STYLES_METADATA_KEY } from '@stylebot/styles';
+import { STYLES_METADATA_KEY } from '@stylebot/saved-styles';
 import { getCurrentTimestamp } from '@stylebot/utils';
 
 /**

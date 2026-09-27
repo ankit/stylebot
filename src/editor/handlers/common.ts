@@ -10,7 +10,7 @@ import {
   toggleEditorWindow,
 } from '../utils/chrome';
 import { initEditor } from '../utils/init-editor';
-import { isForceImportant } from '@stylebot/styles';
+import { isForceImportant } from '@stylebot/saved-styles';
 
 /**
  * Whether opening the editor for this page means its separate window: the

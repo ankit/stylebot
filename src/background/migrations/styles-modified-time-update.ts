@@ -1,4 +1,4 @@
-import { STYLES_KEY } from '@stylebot/styles';
+import { STYLES_KEY } from '@stylebot/saved-styles';
 
 /**
  * A style with no recorded edit time has to lose a merge against a copy that
