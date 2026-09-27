@@ -79,9 +79,7 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .truncate {
   max-width: 220px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  @include truncate;
 }
 
 .divider {

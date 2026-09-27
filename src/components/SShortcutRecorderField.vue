@@ -154,8 +154,7 @@ export default Vue.extend({
 }
 
 .field {
-  all: unset;
-  box-sizing: border-box;
+  @include button-reset;
   width: 100%;
   display: flex;
   align-items: center;
@@ -205,8 +204,7 @@ export default Vue.extend({
 }
 
 .clear {
-  all: unset;
-  box-sizing: border-box;
+  @include button-reset;
   flex: none;
   margin-left: auto;
   display: flex;
@@ -232,8 +230,7 @@ export default Vue.extend({
 }
 
 .cancel {
-  all: unset;
-  box-sizing: border-box;
+  @include button-reset;
   flex: none;
   font-weight: 400;
   font-size: 11.5px;
@@ -248,8 +245,7 @@ export default Vue.extend({
 }
 
 .record-btn {
-  all: unset;
-  box-sizing: border-box;
+  @include button-reset;
   width: 100%;
   display: flex;
   align-items: center;

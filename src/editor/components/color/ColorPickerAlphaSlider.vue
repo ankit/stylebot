@@ -89,15 +89,9 @@ export default Vue.extend({
     background: var(--thumb-color);
   }
 
-  &:focus-visible::-webkit-slider-thumb {
-    outline: 2px solid var(--accent);
-    outline-offset: 1px;
-  }
+  @include focus-ring(1px, '::-webkit-slider-thumb');
 
-  &:focus-visible::-moz-range-thumb {
-    outline: 2px solid var(--accent);
-    outline-offset: 1px;
-  }
+  @include focus-ring(1px, '::-moz-range-thumb');
 }
 
 .readout {

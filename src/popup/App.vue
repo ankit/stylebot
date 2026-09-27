@@ -248,9 +248,7 @@ body {
 .popup-header-domain {
   min-width: 0;
   flex: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  @include truncate;
 }
 
 .popup-header-domain.popup-header-domain--muted {

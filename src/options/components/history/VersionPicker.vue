@@ -144,11 +144,9 @@ export default Vue.extend({
 }
 
 .url {
-  overflow: hidden;
+  @include truncate;
   font-weight: 600;
   color: var(--text-primary);
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .restore {

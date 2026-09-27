@@ -88,10 +88,7 @@ export default Vue.extend({
     cursor: pointer;
   }
 
-  &:focus-visible::-webkit-slider-thumb {
-    outline: 2px solid var(--accent);
-    outline-offset: 1px;
-  }
+  @include focus-ring(1px, '::-webkit-slider-thumb');
 
   &:disabled {
     opacity: 0.6;

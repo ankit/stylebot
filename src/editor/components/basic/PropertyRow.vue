@@ -51,9 +51,7 @@ export default Vue.extend({
 .property-row-label {
   flex: 1 0 auto;
   min-width: 0;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  @include truncate;
 }
 
 .property-row-control {

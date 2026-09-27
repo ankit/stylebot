@@ -93,9 +93,7 @@ export default Vue.extend({
 }
 
 .chat-image-attachment .chat-image-attachment-name {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  @include truncate;
 }
 
 .chat-image-attachment-remove {

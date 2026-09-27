@@ -21,8 +21,7 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .btn {
-  all: unset;
-  box-sizing: border-box;
+  @include button-reset;
   width: 38px;
   height: 38px;
   border-radius: 9px;

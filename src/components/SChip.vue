@@ -31,8 +31,6 @@ export default Vue.extend({
   font-size: 12px;
   line-height: 1.5;
   color: var(--text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  @include truncate;
 }
 </style>

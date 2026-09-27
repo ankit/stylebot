@@ -60,8 +60,7 @@ export default Vue.extend({
   }
 
   > button {
-    all: unset;
-    box-sizing: border-box;
+    @include button-reset;
     height: 28px;
     display: flex;
     align-items: center;

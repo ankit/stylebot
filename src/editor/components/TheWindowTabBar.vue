@@ -91,9 +91,7 @@ export default Vue.extend({
 .window-tab-title {
   flex: 1;
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  @include truncate;
 }
 
 .window-tab.background {

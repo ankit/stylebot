@@ -157,9 +157,8 @@ input:checked:not(:disabled) ~ .track .thumb {
   left: 1px;
 }
 
-input:focus-visible ~ .track {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
+input {
+  @include focus-ring(2px, ' ~ .track');
 }
 
 .label {

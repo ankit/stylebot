@@ -56,9 +56,7 @@ export default Vue.extend({
   font-size: 11px;
   line-height: 1.3;
   color: var(--text-faint);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  @include truncate;
 
   @include dark-mode {
     color: #80858e;

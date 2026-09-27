@@ -162,9 +162,7 @@ export default Vue.extend({
   line-height: 20px;
   font-variant-numeric: tabular-nums;
   color: var(--text-secondary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  @include truncate;
 }
 
 .count {

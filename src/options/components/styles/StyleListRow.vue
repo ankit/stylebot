@@ -129,9 +129,7 @@ export default Vue.extend({
   font-size: 14px;
   line-height: 1.3;
   color: var(--text-primary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  @include truncate;
 
   &.disabled {
     color: var(--text-muted);

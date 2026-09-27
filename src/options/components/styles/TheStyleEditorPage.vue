@@ -302,7 +302,7 @@ export default Vue.extend({
 }
 
 .url-input {
-  all: unset;
+  @include button-reset;
   display: block;
   width: 100%;
   font-weight: 600;
@@ -310,9 +310,7 @@ export default Vue.extend({
   line-height: 1.25;
   letter-spacing: -0.01em;
   color: var(--text-primary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  @include truncate;
   margin-top: 2px;
 
   &::placeholder {

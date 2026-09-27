@@ -82,9 +82,7 @@ export default Vue.extend({
 .url {
   flex: none;
   max-width: 150px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  @include truncate;
 }
 
 .selector-row {

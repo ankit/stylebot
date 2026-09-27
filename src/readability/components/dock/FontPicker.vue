@@ -79,8 +79,7 @@ export default Vue.extend({
 }
 
 .font {
-  all: unset;
-  box-sizing: border-box;
+  @include button-reset;
   padding: 7px 8px;
   font-size: 14px;
   text-align: center;
