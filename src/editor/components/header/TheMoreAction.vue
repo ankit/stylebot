@@ -73,7 +73,7 @@
           </span>
         </s-toggle-switch>
 
-        <hr class="more-menu-divider" />
+        <s-menu-divider class="more-menu-divider" />
 
         <s-menu-item
           @click="
@@ -109,6 +109,7 @@ import {
   SAnchoredMenu,
   SMenu,
   SMenuItem,
+  SMenuDivider,
   SIconButton,
   SToggleSwitch,
   SSegmentedControl,
@@ -137,6 +138,7 @@ export default Vue.extend({
     SAnchoredMenu,
     SMenu,
     SMenuItem,
+    SMenuDivider,
     SIconButton,
     SToggleSwitch,
     SSegmentedControl,
@@ -291,10 +293,8 @@ export default Vue.extend({
   min-width: 0;
 }
 
-.more-menu-divider {
+.more-menu .more-menu-divider {
   margin: 10px -10px;
-  border: none;
-  border-top: 1px solid var(--panel-border);
 }
 
 .menu-item-row {

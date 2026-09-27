@@ -64,7 +64,7 @@
 
         <template v-if="!level">
           <template v-if="others.length">
-            <hr class="chat-model-divider" />
+            <s-menu-divider />
             <s-menu-item
               v-for="other in others"
               :key="other.id"
@@ -81,7 +81,7 @@
             </s-menu-item>
           </template>
 
-          <hr class="chat-model-divider" />
+          <s-menu-divider />
 
           <s-menu-item
             :disabled="!hasTurns"
@@ -115,7 +115,13 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { SAnchoredMenu, SMenuItem, SMenu, SText } from '@stylebot/components';
+import {
+  SAnchoredMenu,
+  SMenuItem,
+  SMenuDivider,
+  SMenu,
+  SText,
+} from '@stylebot/components';
 import {
   ChevronDownIcon,
   ChevronLeftIcon,
@@ -147,6 +153,7 @@ export default Vue.extend({
     ComposeIcon,
     KeyIcon,
     SMenuItem,
+    SMenuDivider,
     SMenu,
     SText,
   },
@@ -288,12 +295,5 @@ export default Vue.extend({
 .chat-menu-icon {
   flex: none;
   color: var(--icon-color);
-}
-
-.chat-model-divider {
-  height: 1px;
-  margin: 0 2px 2px;
-  border: 0;
-  background: var(--panel-border);
 }
 </style>
