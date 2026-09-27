@@ -184,8 +184,12 @@ class MonacEditorIframe {
       value: '',
       tabSize: 2,
       theme: this.getMonacoTheme(),
-      fontFamily: "'Fira Code', Menlo, Monaco, Consolas, monospace",
+      fontFamily: "'Geist Mono', Menlo, Monaco, Consolas, monospace",
+      fontSize: 12,
+      lineHeight: 18,
       fontLigatures: true,
+      // URLs stay quiet grey rather than underlined.
+      links: false,
       ...wrapOptions,
       scrollBeyondLastLine: false,
       language: 'css',
