@@ -15,6 +15,7 @@ CHANGELOG.md
 site
 
 # Prompt content — the manual line wrapping there is deliberate.
+.agents
 .claude
 
 # Chrome profile created by yarn dev:chrome.

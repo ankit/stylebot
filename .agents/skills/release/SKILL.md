@@ -57,7 +57,7 @@ git commit -am "Release X.Y.Z"
 git push -u origin release/vX.Y.Z
 ```
 
-`Release X.Y.Z` is a deliberate exception to the Conventional Commits rule in CLAUDE.md,
+`Release X.Y.Z` is a deliberate exception to the Conventional Commits rule in AGENTS.md,
 matching every previous release commit. Don't write `chore(release): ...`.
 
 Open the PR against `main`. Do not create a GitHub Release yet — the tag comes after
