@@ -1,6 +1,6 @@
 import * as postcss from 'postcss';
 import mutations from './mutations';
-import mockState from './__mocks__/state';
+import mockState from './state.fixtures';
 
 describe('mutations', () => {
   describe('setSelectors', () => {

@@ -2,8 +2,8 @@ import type { Meta, StoryObj } from '@storybook/vue';
 
 import TheStylebotApp from '../TheStylebotApp.vue';
 import TheKeyboardShortcutsView from './TheKeyboardShortcutsView.vue';
-import { editor } from '@stylebot/storybook/editor-story';
-import { createEditorStore } from '@stylebot/storybook/mocks/editor-store';
+import { editor } from '@stylebot/storybook/fixtures/editor';
+import { createEditorStore } from '@stylebot/storybook/fixtures/editor-store';
 
 const meta: Meta = {
   title: 'Editor/TheKeyboardShortcutsView',

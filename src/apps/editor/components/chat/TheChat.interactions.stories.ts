@@ -7,7 +7,7 @@ import {
   chatStateOf,
   chatWithThread,
   SCREENSHOT,
-} from '@stylebot/storybook/chat-story';
+} from '@stylebot/storybook/fixtures/chat';
 import { findOpenMenu, storeOf, user } from '@stylebot/storybook/story-helpers';
 import type { Canvas } from '@stylebot/storybook/story-helpers';
 

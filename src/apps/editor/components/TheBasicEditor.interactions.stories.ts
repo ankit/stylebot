@@ -6,7 +6,7 @@ import {
   editor,
   PANEL_STATE_PAGE,
   WITH_RULE,
-} from '@stylebot/storybook/editor-story';
+} from '@stylebot/storybook/fixtures/editor';
 import {
   cardCollapse,
   cardHeader,

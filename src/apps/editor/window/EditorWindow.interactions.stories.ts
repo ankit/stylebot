@@ -7,7 +7,7 @@ import {
   editor,
   editorWindow,
   WITH_RULE,
-} from '@stylebot/storybook/editor-story';
+} from '@stylebot/storybook/fixtures/editor';
 import {
   openEditorMenu,
   pressKey,

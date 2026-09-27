@@ -51,7 +51,7 @@
       "vue"
     ],
     "setupFiles": [
-      "./setupJest.js"
+      "<rootDir>/jest/setup.js"
     ],
     "testRegex": "\\.(test|spec)\\.(jsx?|tsx?)$",
     "transform": {
@@ -67,7 +67,7 @@
         "<rootDir>/src/ui/$1/index",
         "<rootDir>/src/apps/$1/index"
       ],
-      "\\.(css|scss)$": "<rootDir>/__mocks__/styleMock.js"
+      "\\.(css|scss)$": "<rootDir>/jest/style-mock.js"
     },
     "testEnvironment": "jsdom"
   },

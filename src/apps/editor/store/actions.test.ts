@@ -1,7 +1,7 @@
 import * as postcss from 'postcss';
 import actions from './actions';
 
-import mockState from './__mocks__/state';
+import mockState from './state.fixtures';
 import * as stylebotCss from '@stylebot/css';
 import * as googleFonts from '@stylebot/google-fonts';
 import * as chromeUtils from '../utils/chrome';

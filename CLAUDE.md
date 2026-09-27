@@ -12,7 +12,7 @@ Browser extension (Chrome/Edge/Firefox) that lets users change the appearance of
   - `src/assets/` — `manifest` (base manifest plus dev and Firefox overrides), `icon` (the extension icon: SVG sources and the PNGs the build copies to `img/`), `fonts`, `_locales` (i18n strings per locale)
 - Imports only point down: apps → features, ui, core; features → ui, core; ui → ui, core; core → core. Nothing imports an app, and features don't import each other. The `stylebot/tier-imports` lint rule enforces this; the few imports that predate it are allowlisted in `eslint.config.mjs` — remove entries, never add them.
 - `e2e/` — Playwright end-to-end tests, driven against a real built extension: via CDP (`Extensions.loadUnpacked`) on Chrome/Edge, via Firefox's remote debugging protocol on Firefox; engine-specific code lives in `e2e/chromium/` and `e2e/firefox/` behind the `e2e/engine.ts` contract
-- `__mocks__/` — Jest mocks
+- `jest/` — Jest setup and the stylesheet stub
 - `dist/` — Chrome/Edge build output; `firefox-dist/` — Firefox build output; `preview-dist/` — `yarn build:preview` output
 - `store/` — store listing art (promo tiles, screenshots) per store; not part of the build
 - `site/` — stylebot.dev static site
@@ -53,6 +53,14 @@ Stories:
 - Each test is an object literal spreading its factory (`...editor(state)`) with a spec-style `name` sentence and its `play`. Storybook only picks `name` up from the literal, not through a factory call.
 - Use `@storybook/test` (`within`, `expect`, `waitFor`) and the helpers in `.storybook/story-helpers.ts`; group longer plays into `step('…', …)` phases.
 - Drive input through the shared `user` from `story-helpers` (not `userEvent` directly) so the toolbar's Slow motion toggle applies, and hover page elements while inspecting via `hoverPage`/`pick`, which first let the browser settle its own hover state.
+
+## Mocks and fixtures
+
+A mock stands in for a module or browser API; a fixture is seeded data or a seeded surface that tests and stories build on.
+
+- Jest: no `__mocks__/` or `__fixtures__/` folders. Mock with `jest.mock()` in the test, passing a factory when automocking isn't enough; shared test data goes in a `*.fixtures.ts` file beside the code that uses it, as tests do in `*.test.ts`.
+- Storybook: `.storybook/mocks/` holds only stand-ins (the chrome shim, the chat background, modules aliased in `main.ts`); `.storybook/fixtures/` holds the seeded stores and the surface factories stories spread (`editor`, `chat`, `popup`, `optionsPage`).
+- e2e: `e2e/fixtures.ts` holds Playwright fixtures.
 
 ## Side effects
 

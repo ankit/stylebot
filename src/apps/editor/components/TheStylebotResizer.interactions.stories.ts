@@ -3,7 +3,7 @@ import { expect, waitFor, within } from '@storybook/test';
 
 import TheStylebotApp from './TheStylebotApp.vue';
 import { defaultOptions } from '@stylebot/settings';
-import { editor, WITH_RULE } from '@stylebot/storybook/editor-story';
+import { editor, WITH_RULE } from '@stylebot/storybook/fixtures/editor';
 import { storeOf, user } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {

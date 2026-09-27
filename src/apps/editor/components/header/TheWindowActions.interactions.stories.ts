@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue';
 import { expect, waitFor, within } from '@storybook/test';
 
 import TheWindowActions from './TheWindowActions.vue';
-import { editor, WITH_RULE } from '@stylebot/storybook/editor-story';
+import { editor, WITH_RULE } from '@stylebot/storybook/fixtures/editor';
 import {
   openEditorMenu,
   pressKey,

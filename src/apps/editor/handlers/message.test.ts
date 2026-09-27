@@ -2,7 +2,7 @@ import type { Store } from 'vuex';
 
 import type { State } from 'apps/editor/store';
 import type { TabMessage } from '@stylebot/types';
-import mockState from '../store/__mocks__/state';
+import mockState from '../store/state.fixtures';
 
 jest.mock('./common');
 jest.mock('../utils/chrome');

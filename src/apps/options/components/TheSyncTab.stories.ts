@@ -2,7 +2,7 @@ import type { Meta } from '@storybook/vue';
 import type { SyncState } from '@stylebot/types';
 
 import TheSyncTab from './TheSyncTab.vue';
-import { optionsPage } from '@stylebot/storybook/mocks/options-page';
+import { optionsPage } from '@stylebot/storybook/fixtures/options';
 
 const meta: Meta = {
   title: 'Options/Sync',

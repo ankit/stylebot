@@ -3,7 +3,7 @@ import type { ChatStreamEvent, ChatTurn } from '@stylebot/types';
 import { geminiProvider, toInteractionSteps } from './providers/gemini';
 import { getModel } from './providers';
 import { ChatProviderError } from './providers/ChatProviderError';
-import { streamResponse } from './__fixtures__/stream';
+import { streamResponse } from './stream.fixtures';
 
 const fetchMock = jest.fn();
 

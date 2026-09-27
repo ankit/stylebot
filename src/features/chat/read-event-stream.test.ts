@@ -1,5 +1,5 @@
 import { readEventStream } from './read-event-stream';
-import { streamResponse } from './__fixtures__/stream';
+import { streamResponse } from './stream.fixtures';
 
 const read = async (chunks: Array<string>) => {
   const events: Array<{ event: string; data: string }> = [];

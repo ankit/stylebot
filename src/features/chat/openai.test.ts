@@ -2,7 +2,7 @@ import type { ChatStreamEvent, ChatTurn } from '@stylebot/types';
 
 import { openAiProvider, toResponsesInput } from './providers/openai';
 import { getModel } from './providers';
-import { streamResponse } from './__fixtures__/stream';
+import { streamResponse } from './stream.fixtures';
 
 const fetchMock = jest.fn();
 
