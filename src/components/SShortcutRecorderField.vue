@@ -12,7 +12,7 @@
         <span class="placeholder">_</span>
       </span>
       <button type="button" class="cancel" @click="stopRecording">
-        Cancel
+        {{ t('cancel') }}
       </button>
     </div>
 
@@ -29,7 +29,7 @@
       <button
         type="button"
         class="clear"
-        aria-label="Clear shortcut"
+        :aria-label="t('clear_shortcut')"
         @click.stop="clear"
       >
         <icon-x />
@@ -38,10 +38,12 @@
 
     <button v-else type="button" class="record-btn" @click="startRecording">
       <icon-keyboard />
-      Record a shortcut
+      {{ t('record_a_shortcut') }}
     </button>
 
-    <p v-if="recording" class="helper">Press a key to finish · Esc cancels</p>
+    <p v-if="recording" class="helper">
+      {{ t('press_key_to_finish') }} {{ t('esc_cancels') }}
+    </p>
   </div>
 </template>
 
