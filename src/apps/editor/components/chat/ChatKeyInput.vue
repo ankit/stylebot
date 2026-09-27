@@ -33,6 +33,12 @@
         :aria-describedby="helpText ? `${inputId}-help` : undefined"
         spellcheck="false"
         autocomplete="off"
+        autocorrect="off"
+        autocapitalize="off"
+        data-1p-ignore
+        data-bwignore
+        data-lpignore="true"
+        data-form-type="other"
         @input="type"
       />
       <button

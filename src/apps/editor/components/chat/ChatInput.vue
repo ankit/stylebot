@@ -6,6 +6,13 @@
     :value="value"
     :placeholder="t('describe_a_change')"
     :aria-label="t('describe_a_change')"
+    spellcheck="false"
+    autocomplete="off"
+    autocorrect="off"
+    data-1p-ignore
+    data-bwignore
+    data-lpignore="true"
+    data-form-type="other"
     @input="$emit('input', $event.target.value)"
     @keydown.enter.exact="onEnter"
   />
