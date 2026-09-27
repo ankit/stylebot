@@ -4,8 +4,13 @@ Browser extension (Chrome/Edge/Firefox) that lets users change the appearance of
 
 ## Structure
 
-- `src/` — extension source (background, content scripts, popup, options UI, editor)
-- `src/_locales/` — i18n strings per locale
+- `src/` — extension source, grouped into tiers. Each folder directly inside a tier is a package, imported as `@stylebot/<folder>` (resolved by `scripts/lib/src-packages.js`; `@stylebot/inject-css` keeps its old name for `apps/content`):
+  - `src/apps/` — webpack entries and HTML pages: `background`, `popup`, `options`, `editor` (with the pop-out window in `editor/window`), `content` (the content script), `reader` (the readability UI bundle), `monaco-iframe`
+  - `src/features/` — capabilities shared by apps: `chat`, `sync`, `history`, `page-bridge`, `highlighter`, `google-fonts`, `readability` (eligibility and reader lifecycle), `monaco-editor`
+  - `src/ui/` — `components`, `icons`, `scss`
+  - `src/core/` — `css`, `stylesheets`, `saved-styles`, `types`, `settings`, `i18n`, `utils`
+  - `src/assets/` — `extension` (manifests, images), `fonts`, `_locales` (i18n strings per locale)
+- Imports only point down: apps → features, ui, core; features → ui, core; ui → ui, core; core → core. Nothing imports an app, and features don't import each other. The `stylebot/tier-imports` lint rule enforces this; the few imports that predate it are allowlisted in `eslint.config.mjs` — remove entries, never add them.
 - `e2e/` — Playwright end-to-end tests, driven against a real built extension: via CDP (`Extensions.loadUnpacked`) on Chrome/Edge, via Firefox's remote debugging protocol on Firefox; engine-specific code lives in `e2e/chromium/` and `e2e/firefox/` behind the `e2e/engine.ts` contract
 - `__mocks__/` — Jest mocks
 - `dist/` — Chrome/Edge build output; `firefox-dist/` — Firefox build output; `preview-dist/` — `yarn build:preview` output
@@ -52,11 +57,11 @@ Stories:
 
 `package.json` declares stylesheets and single-file components as having `sideEffects`, so webpack drops any other module whose exports go unused, in development builds as well as production. Components are listed because a treeshakeable component is free to have its `<style>` block emitted out of order, and a consumer's class on a shared component ties with that component's own class on specificity — so whichever lands last silently wins. Keep modules free of work on load: register listeners, call `Vue.use` / `Vue.mixin` and create stores from functions an entry point calls, never at a module's top level.
 
-Import another folder under `src/` only through its `@stylebot/` entry, never its files; the `stylebot/package-entry-imports` lint rule enforces it. With `sideEffects`, an entry import costs no more than a deep one.
+Import another package only through its `@stylebot/` entry, never its files; the `stylebot/package-entry-imports` lint rule enforces it. With `sideEffects`, an entry import costs no more than a deep one.
 
 ## Styles
 
-Reuse the mixins in `src/scss/mixins.scss` (prepended to every stylesheet) instead of copying their declarations; never add shared utility classes, for the specificity reason above. Mixins that only emit declarations (`button-reset`, `truncate`, `field-border`) go at the top of a rule, followed by a blank line. Mixins that emit nested rules (`focus-ring`, `dark-mode`) go with the other nested rules, after the declarations.
+Reuse the mixins in `src/ui/scss/mixins.scss` (prepended to every stylesheet) instead of copying their declarations; never add shared utility classes, for the specificity reason above. Mixins that only emit declarations (`button-reset`, `truncate`, `field-border`) go at the top of a rule, followed by a blank line. Mixins that emit nested rules (`focus-ring`, `dark-mode`) go with the other nested rules, after the declarations.
 
 ## Commit messages
 
@@ -79,6 +84,6 @@ Comments on functions and methods use JSDoc style, always in this shape:
 
 ## i18n
 
-Never hardcode user-facing strings — always add an i18n key in `src/_locales/*.config` (all 15 locales) and reference it via `t('key')`. This applies to every string a user sees: labels, placeholders, titles, aria-labels, error messages.
+Never hardcode user-facing strings — always add an i18n key in `src/assets/_locales/*.config` (all 15 locales) and reference it via `t('key')`. This applies to every string a user sees: labels, placeholders, titles, aria-labels, error messages.
 
 Keep each key matching its English string (e.g. `@box` → `Box`, not a stale `@layout_properties` → `Box`). When a string's copy changes, rename the key to match in the same change, across all 15 locale files. If two keys end up with the identical string in every locale, collapse them into one key instead of keeping duplicates.

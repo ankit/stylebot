@@ -3,10 +3,12 @@ import { mergeConfig } from 'vite';
 import { createVuePlugin } from 'vite-plugin-vue2';
 import type { StorybookConfig } from '@storybook/vue-vite';
 
+import { packageDirs } from '../scripts/lib/src-packages';
 import localePlugin from './locale-plugin';
 
 const src = (p: string) => path.resolve(__dirname, '../src', p);
 const mock = (p: string) => path.resolve(__dirname, 'mocks', p);
+const dirs = packageDirs();
 
 const aliasedPackages = [
   'components',
@@ -31,7 +33,7 @@ const config: StorybookConfig = {
   framework: '@storybook/vue-vite',
   stories: ['../src/**/*.stories.ts'],
   // Serves what the extension reads via chrome.runtime.getURL().
-  staticDirs: [{ from: '../src/google-fonts', to: '/google-fonts' }],
+  staticDirs: [{ from: '../src/features/google-fonts', to: '/google-fonts' }],
   addons: [
     '@storybook/addon-toolbars',
     '@storybook/addon-controls',
@@ -77,7 +79,7 @@ const config: StorybookConfig = {
           },
           ...aliasedPackages.map(name => ({
             find: `@stylebot/${name}`,
-            replacement: src(`${name}/index`),
+            replacement: src(`${dirs[name]}/index`),
           })),
         ],
       },
@@ -85,7 +87,7 @@ const config: StorybookConfig = {
         preprocessorOptions: {
           scss: {
             additionalData: '@import "mixins";',
-            includePaths: [src('scss')],
+            includePaths: [src('ui/scss')],
           },
         },
       },

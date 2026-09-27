@@ -15,8 +15,8 @@ import { installChrome } from './mocks/chrome';
 import { resetHoverSettled, setInteractionDelay } from './story-helpers';
 import { setPageBridge, LocalPageBridge } from '@stylebot/page-bridge';
 
-import '../src/fonts/fonts.css';
-import '../src/editor/index.scss';
+import '../src/assets/fonts/fonts.css';
+import '../src/apps/editor/index.scss';
 import './preview.css';
 
 Vue.use(Vuex);

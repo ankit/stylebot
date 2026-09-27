@@ -5,12 +5,12 @@ import * as postcss from 'postcss';
 import { getPrimaryFontFamily, injectCSSIntoDocument } from '@stylebot/css';
 import type { StylebotOptions } from '@stylebot/types';
 
-import mockState from '@/editor/store/__mocks__/state';
-import actions from '@/editor/store/actions';
-import getters from '@/editor/store/getters';
-import mutations from '@/editor/store/mutations';
-import type { State } from '@/editor/store';
-import { createChatModule } from '@/editor/store/chat';
+import mockState from '@/apps/editor/store/__mocks__/state';
+import actions from '@/apps/editor/store/actions';
+import getters from '@/apps/editor/store/getters';
+import mutations from '@/apps/editor/store/mutations';
+import type { State } from '@/apps/editor/store';
+import { createChatModule } from '@/apps/editor/store/chat';
 
 export type EditorStateOverrides = Partial<Omit<State, 'options'>> & {
   options?: Partial<StylebotOptions>;

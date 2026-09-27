@@ -1,7 +1,7 @@
 import type { StoryObj } from '@storybook/vue';
 
-import App from '@/options/App.vue';
-import { createRouter } from '@/options/router';
+import App from '@/apps/options/App.vue';
+import { createRouter } from '@/apps/options/router';
 import type { OptionsStateOverrides } from './options-store';
 import { createOptionsStore } from './options-store';
 import { expect, waitFor } from '@storybook/test';

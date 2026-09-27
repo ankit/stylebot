@@ -24,7 +24,7 @@ const localePlugin = (): Plugin => ({
     }
 
     const raw = fs.readFileSync(
-      path.resolve(__dirname, '../src/_locales/en.config'),
+      path.resolve(__dirname, '../src/assets/_locales/en.config'),
       'utf8'
     );
 

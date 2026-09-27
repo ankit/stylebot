@@ -1,4 +1,4 @@
-// Regenerates src/google-fonts/fonts.json from Google Fonts' metadata endpoint:
+// Regenerates src/features/google-fonts/fonts.json from Google Fonts' metadata endpoint:
 // the most popular families as [name, category], most popular first. Fonts
 // outside the list still apply when typed in full. Needs Node 18+.
 
@@ -19,7 +19,7 @@ const CATEGORIES = {
 
 const outputPath = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
-  '../src/google-fonts/fonts.json'
+  '../src/features/google-fonts/fonts.json'
 );
 
 const response = await fetch(METADATA_URL);

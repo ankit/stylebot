@@ -28,7 +28,7 @@ jobs:
           version="$(node -p "require('./package.json').version")"
           tag="v${version}"
 
-          manifest_version="$(node -p "require('./src/extension/manifest.json').version")"
+          manifest_version="$(node -p "require('./src/assets/extension/manifest.json').version")"
           if [ "$manifest_version" != "$version" ]; then
             echo "::error::package.json ($version) and manifest.json ($manifest_version) disagree on the version."
             exit 1
