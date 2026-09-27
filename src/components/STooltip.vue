@@ -319,9 +319,9 @@ export default Vue.extend({
   gap: 6px;
   padding: 3px 7px;
   border-radius: 6px;
-  background: var(--tooltip-bg, var(--menu-surface, #23262b));
-  color: var(--tooltip-fg, var(--text-primary, #f2f4f7));
-  border: 1px solid var(--tooltip-border, var(--menu-border, #3a3e46));
+  background: var(--tooltip-bg, var(--menu-surface));
+  color: var(--tooltip-fg, var(--text-primary));
+  border: 1px solid var(--tooltip-border, var(--menu-border));
   box-shadow: 0 2px 6px rgb(0 0 0 / 8%);
   font-size: 11.5px;
   font-weight: 400;

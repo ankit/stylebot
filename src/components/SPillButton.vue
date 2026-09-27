@@ -21,26 +21,17 @@ export default Vue.extend({
   min-height: 40px;
   padding: 9px 12px;
   border-radius: 8px;
-  border: 1px solid #d3d6dd;
-  background: #fff;
+  border: 1px solid var(--pill-border);
+  background: var(--pill-surface);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
 
   &:hover {
-    background: #f2f3f6;
+    background: var(--pill-hover);
   }
 
   @include focus-ring;
-
-  @include dark-mode {
-    border-color: #3a3d45;
-    background: #26282e;
-
-    &:hover {
-      background: #31343b;
-    }
-  }
 }
 
 .pill-btn-label {

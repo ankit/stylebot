@@ -116,13 +116,9 @@ export default Vue.extend({
 
 .chat-pending .chat-pending-text {
   font-family: var(--font-reading);
-  color: var(--text-primary);
+  color: var(--chat-ink);
   font-size: 14px;
   line-height: 1.55;
-
-  @include dark-mode {
-    color: #c3c7ce;
-  }
 
   .chat-pending-body {
     font-family: inherit;

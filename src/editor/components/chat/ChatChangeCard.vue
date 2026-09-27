@@ -114,17 +114,16 @@ export default Vue.extend({
   height: 34px;
   box-sizing: border-box;
   padding: 0 11px;
-  border: 1px solid var(--panel-border);
+  border: 1px solid var(--chat-card-border);
   border-radius: 9px;
-  background: var(--card-surface);
+  background: var(--chat-card-surface);
 
   &.undone {
     background: var(--tab-surface);
-  }
 
-  @include dark-mode {
-    border-color: #34363b;
-    background: #26282c;
+    @include dark-mode {
+      background: var(--chat-card-surface);
+    }
   }
 }
 
@@ -142,15 +141,15 @@ export default Vue.extend({
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: var(--text-primary);
-
-  @include dark-mode {
-    color: #c3c7ce;
-  }
+  color: var(--chat-ink);
 }
 
 .chat-change.undone .chat-change-label {
   color: var(--text-faint);
+
+  @include dark-mode {
+    color: var(--chat-ink);
+  }
 }
 
 .chat-change .chat-change-actions .chat-change-action {

@@ -55,14 +55,10 @@ export default Vue.extend({
   font-family: var(--font-mono);
   font-size: 11px;
   line-height: 1.3;
-  color: var(--text-faint);
+  color: var(--chat-ink-faint);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-
-  @include dark-mode {
-    color: #80858e;
-  }
 }
 
 .chat-user-image {
@@ -78,20 +74,13 @@ export default Vue.extend({
 .chat-user-message .chat-user-text {
   padding: 7px 11px;
   font-size: 14px;
-  border: 1px solid
-    color-mix(in srgb, var(--text-primary) 9%, var(--tab-surface));
+  border: 1px solid var(--chat-bubble-border);
   border-radius: 16px;
-  background: color-mix(in srgb, var(--text-primary) 6%, var(--tab-surface));
-  color: var(--text-primary);
+  background: var(--chat-bubble-surface);
+  color: var(--chat-ink);
   line-height: 1.5;
   text-wrap: pretty;
   overflow-wrap: anywhere;
-
-  @include dark-mode {
-    border-color: #313338;
-    background: #27292d;
-    color: #c3c7ce;
-  }
 }
 
 .chat-user-body {

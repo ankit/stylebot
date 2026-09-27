@@ -51,21 +51,13 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .chat-clear-confirmation {
-  --chat-clear-confirmation-surface: #fff8ec;
-  --chat-clear-confirmation-border: #f1e3c6;
-
   flex: none;
   display: flex;
   flex-direction: column;
   gap: 10px;
   padding: 12px 16px;
-  border-bottom: 1px solid var(--chat-clear-confirmation-border);
-  background: var(--chat-clear-confirmation-surface);
-
-  @include dark-mode {
-    --chat-clear-confirmation-surface: #2b2518;
-    --chat-clear-confirmation-border: #4a3d22;
-  }
+  border-bottom: 1px solid var(--warning-border);
+  background: var(--warning-background);
 }
 
 .chat-clear-confirmation-copy {

@@ -104,11 +104,7 @@ export default Vue.extend({
   height: 100%;
 
   &.conversation {
-    background: var(--tab-surface);
-
-    @include dark-mode {
-      background: #1f2023;
-    }
+    background: var(--chat-surface);
   }
 }
 </style>
