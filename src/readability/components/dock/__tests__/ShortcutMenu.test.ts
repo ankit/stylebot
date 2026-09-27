@@ -65,7 +65,7 @@ describe('ShortcutMenu.vue', () => {
     await wrapper.findAll('.menu-item').at(0).trigger('click'); // "change_shortcut"
     expect(shortcutStore.state.recording).toBe(true);
 
-    wrapper.element.dispatchEvent(
+    wrapper.find('.recorder').element.dispatchEvent(
       new KeyboardEvent('keydown', {
         key: 't',
         code: 'KeyT',
@@ -85,9 +85,9 @@ describe('ShortcutMenu.vue', () => {
     const wrapper = mountMenu('');
 
     await wrapper.find('.record-btn').trigger('click');
-    wrapper.element.dispatchEvent(
-      new KeyboardEvent('keydown', { key: 'Escape' })
-    );
+    wrapper
+      .find('.recorder')
+      .element.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
     await wrapper.vm.$nextTick();
 
     expect(shortcutStore.state.recording).toBe(false);

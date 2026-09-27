@@ -1,90 +1,81 @@
 <template>
-  <div
-    ref="root"
-    class="menu-root"
-    tabindex="-1"
-    @keydown="onKeydown"
-    @keyup="onKeyup"
-  >
-    <s-menu dense :min-width="232">
-      <div v-if="recording" class="content">
-        <div class="capture-row">
-          <span class="capture-field">
-            <s-shortcut-kbd v-if="liveModifiers" :value="liveModifiers" />
-            <span class="placeholder">_</span>
-          </span>
-          <button type="button" class="cancel" @click="cancelRecording">
-            {{ t('cancel') }}
-          </button>
-        </div>
-        <s-text size="caption" variant="muted" class="helper">
-          {{ t('press_key_to_finish') }}
+  <s-menu dense :min-width="232">
+    <div class="content">
+      <s-shortcut-recorder-field
+        :value="value"
+        :recording.sync="recording"
+        @update="update"
+      >
+        <template #idle="{ start }">
           <template v-if="hasValue">
-            {{ t('esc_keeps') }}
-            <span class="chip chip-inline">
-              <s-shortcut-kbd :value="value" />
-            </span>
+            <div class="header-row">
+              <div class="title">{{ t('readability_shortcut') }}</div>
+              <s-shortcut-chip :value="value" />
+            </div>
+            <s-text size="caption" variant="muted" class="desc">
+              {{ t('readability_shortcut_description') }}
+            </s-text>
+            <div class="divider" />
+            <div class="actions">
+              <s-menu-item @click="start">
+                {{ t('change_shortcut') }}
+              </s-menu-item>
+              <s-menu-item danger @click="remove">
+                {{ t('remove') }}
+              </s-menu-item>
+            </div>
           </template>
-          <template v-else>{{ t('esc_cancels') }}</template>
-        </s-text>
-      </div>
 
-      <div v-else-if="hasValue" class="content">
-        <div class="header-row">
-          <div class="title">{{ t('readability_shortcut') }}</div>
-          <s-shortcut-chip :value="value" />
-        </div>
-        <s-text size="caption" variant="muted" class="desc">
-          {{ t('readability_shortcut_description') }}
-        </s-text>
-        <div class="divider" />
-        <div class="actions">
-          <s-menu-item @click="startRecording">
-            {{ t('change_shortcut') }}
-          </s-menu-item>
-          <s-menu-item danger @click="remove">{{ t('remove') }}</s-menu-item>
-        </div>
-      </div>
+          <template v-else>
+            <div class="header-row">
+              <div class="title">{{ t('readability_shortcut') }}</div>
+              <button
+                v-if="dismissible"
+                type="button"
+                class="dismiss"
+                :aria-label="t('dismiss')"
+                @click="dismiss"
+              >
+                <icon-x />
+              </button>
+            </div>
+            <s-text size="caption" variant="muted" class="desc">
+              {{ t('readability_shortcut_description') }}
+            </s-text>
+            <button type="button" class="record-btn" @click="start">
+              <icon-keyboard />
+              {{ t('record_shortcut') }}
+            </button>
+          </template>
+        </template>
 
-      <div v-else class="content">
-        <div class="header-row">
-          <div class="title">{{ t('readability_shortcut') }}</div>
-          <button
-            v-if="dismissible"
-            type="button"
-            class="dismiss"
-            :aria-label="t('dismiss')"
-            @click="dismiss"
-          >
-            <icon-x />
-          </button>
-        </div>
-        <s-text size="caption" variant="muted" class="desc">
-          {{ t('readability_shortcut_description') }}
-        </s-text>
-        <button type="button" class="record-btn" @click="startRecording">
-          <icon-keyboard />
-          {{ t('record_shortcut') }}
-        </button>
-      </div>
-    </s-menu>
-  </div>
+        <template #helper>
+          <s-text size="caption" variant="muted" class="helper">
+            {{ t('press_key_to_finish') }}
+            <template v-if="hasValue">
+              {{ t('esc_keeps') }}
+              <span class="chip chip-inline">
+                <s-shortcut-kbd :value="value" />
+              </span>
+            </template>
+            <template v-else>{{ t('esc_cancels') }}</template>
+          </s-text>
+        </template>
+      </s-shortcut-recorder-field>
+    </div>
+  </s-menu>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 
-import {
-  keydownToShortcut,
-  modifiersFromEvent,
-  MODIFIER_KEYS,
-} from '@stylebot/utils';
 import { shortcutStore } from './shortcut-store';
 
 import {
   SMenuItem,
   SShortcutChip,
   SShortcutKbd,
+  SShortcutRecorderField,
   SMenu,
   SText,
 } from '@stylebot/components';
@@ -97,6 +88,7 @@ export default Vue.extend({
     SMenuItem,
     SShortcutKbd,
     SShortcutChip,
+    SShortcutRecorderField,
     SMenu,
     SText,
     IconKeyboard,
@@ -112,14 +104,6 @@ export default Vue.extend({
     },
   },
 
-  data(): {
-    liveModifiers: string;
-  } {
-    return {
-      liveModifiers: '',
-    };
-  },
-
   computed: {
     value(): string {
       return shortcutStore.value();
@@ -129,8 +113,14 @@ export default Vue.extend({
       return this.value.length > 0;
     },
 
-    recording(): boolean {
-      return shortcutStore.state.recording;
+    recording: {
+      get(): boolean {
+        return shortcutStore.state.recording;
+      },
+
+      set(recording: boolean): void {
+        shortcutStore.setRecording(recording);
+      },
     },
   },
 
@@ -139,21 +129,8 @@ export default Vue.extend({
   },
 
   methods: {
-    startRecording(): void {
-      shortcutStore.setRecording(true);
-      this.liveModifiers = '';
-      this.$nextTick(() => {
-        (this.$refs.root as HTMLElement).focus();
-      });
-    },
-
-    stopRecording(): void {
-      shortcutStore.setRecording(false);
-      this.liveModifiers = '';
-    },
-
-    cancelRecording(): void {
-      this.stopRecording();
+    update(value: string): void {
+      shortcutStore.update(value);
     },
 
     remove(): void {
@@ -163,53 +140,11 @@ export default Vue.extend({
     dismiss(): void {
       shortcutStore.dismissPrompt();
     },
-
-    onKeydown(event: KeyboardEvent): void {
-      if (!this.recording) {
-        return;
-      }
-
-      // Stop it reaching an already-bound shortcut or the dock's Escape handler.
-      event.stopPropagation();
-
-      if (event.key === 'Escape' || event.key === 'Tab') {
-        this.stopRecording();
-        return;
-      }
-
-      event.preventDefault();
-
-      this.liveModifiers = modifiersFromEvent(event).join('+');
-
-      if (MODIFIER_KEYS.has(event.key)) {
-        return;
-      }
-
-      const shortcut = keydownToShortcut(event);
-
-      if (shortcut) {
-        shortcutStore.update(shortcut);
-        this.stopRecording();
-      }
-    },
-
-    onKeyup(event: KeyboardEvent): void {
-      if (!this.recording) {
-        return;
-      }
-
-      event.stopPropagation();
-      this.liveModifiers = modifiersFromEvent(event).join('+');
-    },
   },
 });
 </script>
 
 <style lang="scss" scoped>
-.menu-root {
-  outline: none;
-}
-
 .content {
   --menu-padding: 12px;
   padding: 8px;
@@ -322,58 +257,7 @@ export default Vue.extend({
   background: var(--border);
 }
 
-.capture-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.capture-field {
-  flex: 1 1 auto;
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  background: color-mix(in srgb, var(--foreground) 6%, transparent);
-  border-radius: 6px;
-  padding: 8px 9px;
-  box-shadow: 0 0 0 2px var(--link-color);
-}
-
-.placeholder {
-  color: var(--muted-foreground);
-  font-weight: 400;
-  font-size: 13px;
-  line-height: 1;
-  animation: shortcut-cursor-blink 1s step-end infinite;
-}
-
-.cancel {
-  @include button-reset;
-
-  font-weight: 400;
-  font-size: 11.5px;
-  line-height: 1;
-  color: var(--muted-foreground);
-  cursor: pointer;
-  padding: 4px;
-
-  &:hover {
-    color: var(--foreground);
-  }
-}
-
 .helper {
   margin: 9px 0 0;
-}
-
-@keyframes shortcut-cursor-blink {
-  0%,
-  50% {
-    opacity: 1;
-  }
-  51%,
-  100% {
-    opacity: 0;
-  }
 }
 </style>
