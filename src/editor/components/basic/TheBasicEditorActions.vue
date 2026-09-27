@@ -44,10 +44,8 @@ export default Vue.extend({
 
   computed: {
     isHidden(): boolean {
-      return (
-        getDeclarationValue(this.$store.getters.activeRule, 'display') ===
-        'none'
-      );
+      const { activeRule } = this.$store.getters;
+      return getDeclarationValue(activeRule, 'display') === 'none';
     },
 
     disabled(): boolean {
