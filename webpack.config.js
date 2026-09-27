@@ -165,8 +165,8 @@ const config = {
     new CopyPlugin({
       patterns: [
         {
-          from: 'assets/extension/img',
-          to: 'img',
+          from: 'assets/icon/*.png',
+          to: 'img/[name].[ext]',
         },
         {
           from: 'assets/fonts',
@@ -228,7 +228,7 @@ const config = {
           },
         },
         {
-          from: 'assets/extension/manifest.json',
+          from: 'assets/manifest/manifest.json',
           to: 'manifest.json',
 
           transform: content => {
@@ -237,7 +237,7 @@ const config = {
             if (process.env.BROWSER === 'firefox') {
               const firefoxJsonContent = JSON.parse(
                 fs.readFileSync(
-                  `${__dirname}/src/assets/extension/manifest-firefox.json`
+                  `${__dirname}/src/assets/manifest/manifest-firefox.json`
                 )
               );
               jsonContent = { ...jsonContent, ...firefoxJsonContent };
@@ -248,7 +248,7 @@ const config = {
                */
               const devJsonContent = JSON.parse(
                 fs.readFileSync(
-                  `${__dirname}/src/assets/extension/manifest-dev.json`
+                  `${__dirname}/src/assets/manifest/manifest-dev.json`
                 )
               );
               jsonContent = { ...jsonContent, ...devJsonContent };
