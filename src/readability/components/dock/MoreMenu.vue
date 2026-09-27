@@ -1,20 +1,20 @@
 <template>
   <s-menu dense :min-width="184">
     <button class="item" @click="openShortcut">
-      <icon-keyboard />
+      <keyboard-icon />
       <span class="label">{{ shortcutLabel }}</span>
       <s-shortcut-chip v-if="shortcutValue" small :value="shortcutValue" />
     </button>
     <button class="item" @click="openOptions">
-      <icon-options />
+      <options-icon />
       {{ t('view_options') }}
     </button>
     <button class="item" @click="reportIssue">
-      <icon-flag />
+      <flag-icon />
       {{ t('report_an_issue') }}
     </button>
     <button class="item" @click="donate">
-      <icon-coffee />
+      <coffee-icon />
       {{ t('donate') }}
     </button>
   </s-menu>
@@ -32,10 +32,10 @@ import {
 
 import { SMenu, SShortcutChip } from '@stylebot/components';
 import {
-  IconOptions,
-  IconFlag,
-  IconCoffee,
-  IconKeyboard,
+  OptionsIcon,
+  FlagIcon,
+  CoffeeIcon,
+  KeyboardIcon,
 } from '@stylebot/icons';
 
 export default Vue.extend({
@@ -44,10 +44,10 @@ export default Vue.extend({
   components: {
     SMenu,
     SShortcutChip,
-    IconOptions,
-    IconFlag,
-    IconCoffee,
-    IconKeyboard,
+    OptionsIcon,
+    FlagIcon,
+    CoffeeIcon,
+    KeyboardIcon,
   },
 
   computed: {

@@ -5,8 +5,8 @@
     @prev="$emit('pick', false)"
     @next="$emit('pick', true)"
   >
-    <template #prev><icon-align-left /></template>
-    <template #next><icon-align-justify /></template>
+    <template #prev><align-left-bars-icon /></template>
+    <template #next><align-justify-icon /></template>
   </segmented>
 </template>
 
@@ -14,15 +14,15 @@
 import Vue from 'vue';
 
 import Segmented from './Segmented.vue';
-import { IconAlignLeft, IconAlignJustify } from '@stylebot/icons';
+import { AlignLeftBarsIcon, AlignJustifyIcon } from '@stylebot/icons';
 
 export default Vue.extend({
   name: 'JustifyToggle',
 
   components: {
     Segmented,
-    IconAlignLeft,
-    IconAlignJustify,
+    AlignLeftBarsIcon,
+    AlignJustifyIcon,
   },
 
   props: {
