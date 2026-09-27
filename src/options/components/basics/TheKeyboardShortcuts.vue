@@ -6,31 +6,14 @@
     </s-text>
 
     <div class="rows">
-      <shortcut-row :label="t('toggle_editor')">
+      <shortcut-row
+        v-for="row in rows"
+        :key="row.settingKey"
+        :label="t(row.labelKey)"
+      >
         <s-shortcut-recorder-field
-          :value="commands.stylebot"
-          @update="input('stylebot', $event)"
-        />
-      </shortcut-row>
-
-      <shortcut-row :label="t('toggle_styling')">
-        <s-shortcut-recorder-field
-          :value="commands.style"
-          @update="input('style', $event)"
-        />
-      </shortcut-row>
-
-      <shortcut-row :label="t('toggle_readability')">
-        <s-shortcut-recorder-field
-          :value="commands.readability"
-          @update="input('readability', $event)"
-        />
-      </shortcut-row>
-
-      <shortcut-row :label="t('toggle_grayscale')">
-        <s-shortcut-recorder-field
-          :value="commands.grayscale"
-          @update="input('grayscale', $event)"
+          :value="commands[row.settingKey]"
+          @update="input(row.settingKey, $event)"
         />
       </shortcut-row>
     </div>
@@ -44,6 +27,8 @@ import { SShortcutRecorderField, SHeading, SText } from '@stylebot/components';
 
 import ShortcutRow from './ShortcutRow.vue';
 
+type ShortcutSetting = { labelKey: string; settingKey: StylebotCommandName };
+
 export default Vue.extend({
   name: 'TheKeyboardShortcuts',
 
@@ -55,6 +40,15 @@ export default Vue.extend({
   },
 
   computed: {
+    rows(): Array<ShortcutSetting> {
+      return [
+        { labelKey: 'toggle_editor', settingKey: 'stylebot' },
+        { labelKey: 'toggle_styling', settingKey: 'style' },
+        { labelKey: 'toggle_readability', settingKey: 'readability' },
+        { labelKey: 'toggle_grayscale', settingKey: 'grayscale' },
+      ];
+    },
+
     commands(): StylebotCommands {
       return this.$store.state.commands;
     },

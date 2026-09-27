@@ -39,43 +39,25 @@
           {{ t(ramp.labelKey) }}
         </s-text>
         <div class="set-grid">
-          <button
+          <color-picker-swatch
             v-for="color in ramp.colors"
             :key="color"
-            type="button"
-            class="swatch"
-            :class="{ light: needsHairline(color) }"
-            :style="{ background: color }"
-            @click="$emit('select', color)"
-          >
-            <check-icon
-              v-if="color === value"
-              :size="14"
-              class="swatch-check"
-              :style="{ color: checkMarkColor(color) }"
-            />
-          </button>
+            :color="color"
+            :selected="color === value"
+            @select="$emit('select', $event)"
+          />
         </div>
       </div>
     </div>
 
     <div v-else class="set-grid">
-      <button
+      <color-picker-swatch
         v-for="color in activeColors"
         :key="color"
-        type="button"
-        class="swatch"
-        :class="{ light: needsHairline(color) }"
-        :style="{ background: color }"
-        @click="$emit('select', color)"
-      >
-        <check-icon
-          v-if="color === value"
-          :size="14"
-          class="swatch-check"
-          :style="{ color: checkMarkColor(color) }"
-        />
-      </button>
+        :color="color"
+        :selected="color === value"
+        @select="$emit('select', $event)"
+      />
     </div>
   </div>
 </template>
@@ -84,7 +66,6 @@
 // Flattened into one search/select rather than a nested set+scheme picker.
 import Vue from 'vue';
 import { SAutocomplete, SText, SMenuItem } from '@stylebot/components';
-import { CheckIcon } from '@stylebot/icons';
 import { colorSchemes } from '../../utils/color-schemes';
 import type { ColorRamp } from '../../utils/color-sets';
 import {
@@ -93,7 +74,7 @@ import {
   readingRow,
   darkModeRow,
 } from '../../utils/color-sets';
-import { needsHairline, checkMarkColor } from '../../utils/hsv-color';
+import ColorPickerSwatch from './ColorPickerSwatch.vue';
 
 type PaletteOption = { key: string; label: string; preview: Array<string> };
 type PaletteOptionMeta = {
@@ -139,7 +120,7 @@ export default Vue.extend({
     SAutocomplete,
     SText,
     SMenuItem,
-    CheckIcon,
+    ColorPickerSwatch,
   },
 
   props: {
@@ -221,9 +202,6 @@ export default Vue.extend({
   },
 
   methods: {
-    needsHairline,
-    checkMarkColor,
-
     selectOption(option: PaletteOption): void {
       this.activeKey = option.key;
       this.query = option.label;
@@ -234,8 +212,6 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-@import './color-picker-mixins';
-
 .palette {
   padding: 12px 14px;
   display: flex;
@@ -298,17 +274,5 @@ export default Vue.extend({
   overflow-y: auto;
   padding: 4px;
   margin: -4px;
-}
-
-.swatch {
-  @include button-reset;
-
-  aspect-ratio: 1;
-  border-radius: 5px;
-  @include swatch-states;
-}
-
-.swatch-check {
-  @include swatch-check;
 }
 </style>
