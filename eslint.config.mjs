@@ -213,7 +213,7 @@ export default tseslint.config(
     // Packages use each other only through their @stylebot/ entries, so their
     // internals can change freely; sideEffects keeps entries free to import.
     files: ['src/**/*.{ts,vue}'],
-    ignores: ['**/__tests__/**', '**/*.test.ts', '**/*.stories.ts'],
+    ignores: ['**/*.test.ts', '**/*.stories.ts'],
     plugins: {
       stylebot: { rules: { 'package-entry-imports': packageEntryImports } },
     },
@@ -222,7 +222,7 @@ export default tseslint.config(
 
   {
     // Tests re-require modules after jest.resetModules().
-    files: ['**/__tests__/**', '**/*.test.ts'],
+    files: ['**/*.test.ts'],
     languageOptions: { globals: globals.jest },
     rules: { '@typescript-eslint/no-require-imports': 'off' },
   },

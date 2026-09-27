@@ -1,6 +1,6 @@
 import { format } from 'date-fns';
 
-import { getCurrentTimestamp } from '../timestamp';
+import { getCurrentTimestamp } from './timestamp';
 
 describe('getCurrentTimestamp', () => {
   afterEach(() => {

@@ -1,4 +1,4 @@
-import { consumeFieldEscape, isFieldTarget } from '../focus';
+import { consumeFieldEscape, isFieldTarget } from './focus';
 
 const escapeFrom = (target: HTMLElement): KeyboardEvent => {
   const event = new KeyboardEvent('keydown', {

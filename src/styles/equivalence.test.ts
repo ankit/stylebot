@@ -1,6 +1,6 @@
 import type { StyleWithoutUrl } from '@stylebot/types';
 
-import { isEquivalentStyleMap } from '../equivalence';
+import { isEquivalentStyleMap } from './equivalence';
 
 const T1 = '2024-01-01T00:00:00.000Z';
 const T2 = '2024-02-01T00:00:00.000Z';

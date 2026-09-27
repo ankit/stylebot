@@ -1,4 +1,4 @@
-import { isForceImportant } from '../force-important';
+import { isForceImportant } from './force-important';
 
 describe('isForceImportant', () => {
   it('is true unless a style stores forceImportant: false', () => {

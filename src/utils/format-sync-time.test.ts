@@ -1,4 +1,4 @@
-import { formatSyncTime } from '../format-sync-time';
+import { formatSyncTime } from './format-sync-time';
 
 const ago = (ms: number) => new Date(Date.now() - ms).toISOString();
 

@@ -1,4 +1,4 @@
-import BackgroundPageUtils from '../utils';
+import BackgroundPageUtils from './utils';
 
 describe('matchesUrl', () => {
   const matchesUrl =

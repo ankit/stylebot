@@ -1,4 +1,4 @@
-import { splitCommaList } from '../split-comma-list';
+import { splitCommaList } from './split-comma-list';
 
 describe('splitCommaList', () => {
   it('splits on top-level commas and trims each member', () => {

@@ -3,7 +3,7 @@ import {
   formatDay,
   formatDayTime,
   formatWeekday,
-} from '../time-formatter';
+} from './time-formatter';
 
 const at = (day: number, hours: number, minutes: number): Date =>
   new Date(2026, 8, day, hours, minutes);
