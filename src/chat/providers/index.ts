@@ -1,9 +1,10 @@
 import type {
   ChatModel,
-  ChatProvider,
   ChatProviderId,
   ChatProviderInfo,
 } from '@stylebot/types';
+
+import type { ChatProvider } from '../types';
 
 import { anthropic, anthropicProvider } from './anthropic';
 import { openai, openAiProvider } from './openai';

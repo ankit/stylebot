@@ -6,7 +6,7 @@ import App from '../components/App.vue';
 import { getDomainUrlAndSource } from './get-domain-url-and-source';
 import { getReadabilityArticle } from './get-readability-article';
 
-import type { ReadabilityArticle } from '@stylebot/types';
+import type { ReadabilityArticle } from '../types';
 import { cacheDocument } from './document-cache';
 
 let vueReady = false;
