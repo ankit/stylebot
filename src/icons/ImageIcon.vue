@@ -5,7 +5,7 @@
     :height="size"
     fill="none"
     stroke="currentColor"
-    stroke-width="1.5"
+    stroke-width="1.2"
     stroke-linecap="round"
     stroke-linejoin="round"
   >

@@ -2,8 +2,10 @@
   <div class="chat-image-attachment">
     <img class="chat-image-attachment-thumb" :src="image.dataUrl" alt="" />
     <span class="chat-image-attachment-copy">
-      <s-text as="span" class="chat-image-attachment-name">{{ name }}</s-text>
-      <s-text as="span" size="small" variant="muted">
+      <s-text as="span" size="label" class="chat-image-attachment-name">
+        {{ name }}
+      </s-text>
+      <s-text as="span" size="caption" variant="muted">
         {{ t('image_size_kb', [size]) }}
       </s-text>
     </span>
@@ -91,7 +93,6 @@ export default Vue.extend({
 }
 
 .chat-image-attachment .chat-image-attachment-name {
-  font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

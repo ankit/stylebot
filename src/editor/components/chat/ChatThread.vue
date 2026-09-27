@@ -101,8 +101,8 @@ export default Vue.extend({
   overflow: auto;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 18px 16px 14px;
+  gap: 10px;
+  padding: 16px 16px 12px;
 
   &::-webkit-scrollbar {
     width: 10px;
@@ -132,6 +132,14 @@ export default Vue.extend({
     scrollbar-color: color-mix(in srgb, var(--text-primary) 22%, transparent)
       transparent;
   }
+}
+
+.chat-thread > :first-child {
+  margin-top: auto;
+}
+
+.chat-reply + .chat-user-message {
+  margin-top: 10px;
 }
 
 .chat-empty {

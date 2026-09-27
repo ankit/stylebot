@@ -1,6 +1,6 @@
 <template>
   <div class="chat-pending">
-    <s-text v-if="pending.text">
+    <s-text v-if="pending.text" class="chat-pending-text">
       <span class="chat-pending-body" v-text="pending.text" />
       <span v-if="pending.phase === 'writing'" class="chat-caret" />
     </s-text>
@@ -112,6 +112,21 @@ export default Vue.extend({
   display: flex;
   flex-direction: column;
   gap: 9px;
+}
+
+.chat-pending .chat-pending-text {
+  font-family: var(--font-reading);
+  color: var(--text-primary);
+  font-size: 14px;
+  line-height: 1.55;
+
+  @include dark-mode {
+    color: #c3c7ce;
+  }
+
+  .chat-pending-body {
+    font-family: inherit;
+  }
 }
 
 .chat-pending-body {

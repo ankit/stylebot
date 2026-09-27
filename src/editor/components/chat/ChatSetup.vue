@@ -1,8 +1,8 @@
 <template>
   <form class="chat-setup" @submit.prevent="connect">
     <div class="chat-setup-intro">
-      <heading as="h2" size="sm">{{ t('connect_a_model_to_start') }}</heading>
-      <s-text size="caption" variant="muted">
+      <heading as="h2" size="md">{{ t('connect_a_model_to_start') }}</heading>
+      <s-text variant="muted">
         {{ t('chat_setup_description') }}
       </s-text>
     </div>
@@ -122,6 +122,10 @@ export default Vue.extend({
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+.chat-setup-field ::v-deep .segment {
+  padding: 9px 0;
 }
 
 .chat-setup-spacer {

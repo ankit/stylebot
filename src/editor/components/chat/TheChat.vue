@@ -1,5 +1,8 @@
 <template>
-  <div class="the-chat">
+  <div
+    class="the-chat"
+    :class="{ conversation: status && status.connected && !showingProviders }"
+  >
     <template v-if="status">
       <chat-providers
         v-if="status.connected && showingProviders"
@@ -99,5 +102,13 @@ export default Vue.extend({
   display: flex;
   flex-direction: column;
   height: 100%;
+
+  &.conversation {
+    background: var(--tab-surface);
+
+    @include dark-mode {
+      background: #1f2023;
+    }
+  }
 }
 </style>

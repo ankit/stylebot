@@ -79,7 +79,7 @@ export default Vue.extend({
 
 .chat-loader-label {
   font-weight: 500;
-  font-size: 12.5px;
+  font-size: 13px;
   line-height: 1.3;
   color: transparent;
   background-image: linear-gradient(

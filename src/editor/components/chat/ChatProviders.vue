@@ -1,7 +1,12 @@
 <template>
   <div class="chat-providers">
     <div class="chat-providers-bar">
-      <s-button variant="ghost" size="small" @click="$emit('close')">
+      <s-button
+        variant="ghost"
+        size="small"
+        class="chat-providers-back"
+        @click="$emit('close')"
+      >
         <chevron-left-icon :size="12" />
         {{ t('back_to_chat') }}
       </s-button>
@@ -9,8 +14,10 @@
 
     <div class="chat-providers-body">
       <div class="chat-providers-intro">
-        <heading as="h2" size="sm">{{ t('providers') }}</heading>
-        <s-text size="caption" variant="muted">
+        <heading as="h2" size="md">
+          {{ t('providers') }}
+        </heading>
+        <s-text variant="muted">
           {{ t('add_a_key_for_each_provider') }}
         </s-text>
       </div>
@@ -93,9 +100,13 @@ export default Vue.extend({
   flex: none;
   display: flex;
   align-items: center;
-  padding: 6px 12px 6px 8px;
+  padding: 6px 18px;
   border-bottom: 1px solid var(--panel-border);
   background: var(--tab-surface);
+}
+
+.chat-providers-bar .chat-providers-back {
+  margin-left: -14px;
 }
 
 .chat-providers-body {

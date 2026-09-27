@@ -1,28 +1,22 @@
 <template>
   <div class="chat-change" :class="{ undone: !turn.applied }">
     <code-icon :size="14" class="chat-change-icon" />
-    <s-text as="span" class="chat-change-label" :title="selectors">
+    <s-text as="span" size="label" class="chat-change-label" :title="selectors">
       {{ summary }}
     </s-text>
     <span class="chat-change-spacer" />
     <div class="chat-change-actions">
-      <s-button
-        variant="ghost"
-        size="small"
-        :title="t('view_in_code')"
-        @click="viewInCode"
-      >
+      <s-link-button class="chat-change-action" @click="viewInCode">
         {{ t('code_mode') }}
-      </s-button>
-      <s-button
+      </s-link-button>
+      <s-link-button
         v-if="latest"
-        variant="ghost"
-        size="small"
+        class="chat-change-action"
         :disabled="busy"
         @click="toggle"
       >
         {{ turn.applied ? t('undo') : t('reapply') }}
-      </s-button>
+      </s-link-button>
     </div>
   </div>
 </template>
@@ -31,7 +25,7 @@
 import type { PropType } from 'vue';
 import Vue from 'vue';
 
-import { SButton, SText } from '@stylebot/components';
+import { SLinkButton, SText } from '@stylebot/components';
 import { CodeIcon } from '@stylebot/icons';
 import { countCssLines, findEditLines } from '@stylebot/chat';
 import type { ChatAssistantTurn } from '@stylebot/types';
@@ -44,7 +38,7 @@ export default Vue.extend({
 
   components: {
     CodeIcon,
-    SButton,
+    SLinkButton,
     SText,
   },
 
@@ -119,13 +113,18 @@ export default Vue.extend({
   min-width: 0;
   height: 34px;
   box-sizing: border-box;
-  padding: 0 6px 0 11px;
+  padding: 0 11px;
   border: 1px solid var(--panel-border);
   border-radius: 9px;
   background: var(--card-surface);
 
   &.undone {
     background: var(--tab-surface);
+  }
+
+  @include dark-mode {
+    border-color: #34363b;
+    background: #26282c;
   }
 }
 
@@ -140,14 +139,28 @@ export default Vue.extend({
 
 .chat-change .chat-change-label {
   min-width: 0;
-  font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: var(--text-primary);
+
+  @include dark-mode {
+    color: #c3c7ce;
+  }
 }
 
 .chat-change.undone .chat-change-label {
   color: var(--text-faint);
+}
+
+.chat-change .chat-change-actions .chat-change-action {
+  font-size: 12px;
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.5;
+    text-decoration: none;
+  }
 }
 
 .chat-change-spacer {
@@ -158,7 +171,7 @@ export default Vue.extend({
   flex: none;
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: 14px;
   opacity: 0;
   transition: opacity 0.12s;
 

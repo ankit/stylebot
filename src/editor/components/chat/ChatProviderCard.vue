@@ -2,13 +2,13 @@
   <div class="chat-provider-card">
     <div class="chat-provider-card-row">
       <div class="chat-provider-card-copy">
-        <s-text as="span" size="label" class="chat-provider-card-name">
+        <heading as="h3" size="sm" class="chat-provider-card-name">
           <span
             class="chat-provider-card-dot"
             :class="{ connected: provider.connected }"
           />
           {{ info.name }}
-        </s-text>
+        </heading>
         <s-text
           as="span"
           size="caption"
@@ -76,7 +76,7 @@
 import type { PropType } from 'vue';
 import Vue from 'vue';
 
-import { SButton, SText } from '@stylebot/components';
+import { Heading, SButton, SText } from '@stylebot/components';
 import { getProviderInfo } from '@stylebot/chat';
 import type { ChatProviderInfo, ChatProviderStatus } from '@stylebot/types';
 
@@ -91,6 +91,7 @@ export default Vue.extend({
 
   components: {
     ChatKeyInput,
+    Heading,
     SButton,
     SText,
   },
@@ -172,7 +173,6 @@ export default Vue.extend({
   display: flex;
   align-items: center;
   gap: 7px;
-  font-weight: 600;
 }
 
 .chat-provider-card-dot {
@@ -204,7 +204,8 @@ export default Vue.extend({
   gap: 14px;
 }
 
-.chat-provider-card-usage {
+.chat-provider-card-actions .chat-provider-card-usage {
+  font-weight: 500;
   text-decoration: none;
 
   &:hover {
@@ -216,6 +217,7 @@ export default Vue.extend({
 
 .chat-provider-card-actions .chat-provider-card-remove {
   padding: 0;
+  font-weight: 500;
   border: 0;
   background: none;
   font-family: inherit;

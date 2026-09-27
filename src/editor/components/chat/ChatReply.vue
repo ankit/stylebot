@@ -1,6 +1,6 @@
 <template>
   <div class="chat-reply">
-    <s-text v-if="turn.text || turn.stopped">
+    <s-text v-if="turn.text || turn.stopped" class="chat-reply-text">
       <span class="chat-reply-body" v-text="turn.text" />
       <template v-if="turn.stopped">
         {{ turn.text ? '… ' : '' }}
@@ -58,6 +58,22 @@ export default Vue.extend({
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+.chat-reply .chat-reply-text {
+  font-family: var(--font-reading);
+  color: var(--text-primary);
+  font-size: 14px;
+  line-height: 1.55;
+
+  @include dark-mode {
+    color: #c3c7ce;
+  }
+
+  .chat-reply-body,
+  .chat-reply-stopped {
+    font-family: inherit;
+  }
 }
 
 .chat-reply-body {

@@ -1,16 +1,8 @@
 <template>
   <div class="chat-user-message">
-    <s-text
-      v-if="turn.scope"
-      as="span"
-      size="small"
-      variant="primary"
-      class="chat-user-scope"
-      :title="turn.scope"
-    >
-      <cursor-icon :size="11" class="chat-user-scope-icon" />
-      <span class="chat-user-scope-selector">{{ turn.scope }}</span>
-    </s-text>
+    <span v-if="turn.scope" class="chat-user-scope" :title="turn.scope">
+      {{ turn.scope }}
+    </span>
     <img
       v-if="turn.image"
       class="chat-user-image"
@@ -28,14 +20,12 @@ import type { PropType } from 'vue';
 import Vue from 'vue';
 
 import { SText } from '@stylebot/components';
-import { CursorIcon } from '@stylebot/icons';
 import type { ChatUserTurn } from '@stylebot/types';
 
 export default Vue.extend({
   name: 'ChatUserMessage',
 
   components: {
-    CursorIcon,
     SText,
   },
 
@@ -58,23 +48,21 @@ export default Vue.extend({
   gap: 4px;
 }
 
-.chat-user-message .chat-user-scope {
+.chat-user-scope {
   max-width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 5px;
+  box-sizing: border-box;
+  padding: 0 2px;
   font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.3;
+  color: var(--text-faint);
   white-space: nowrap;
   overflow: hidden;
-}
-
-.chat-user-scope-icon {
-  flex: none;
-}
-
-.chat-user-scope-selector {
-  overflow: hidden;
   text-overflow: ellipsis;
+
+  @include dark-mode {
+    color: #80858e;
+  }
 }
 
 .chat-user-image {
@@ -87,12 +75,23 @@ export default Vue.extend({
   object-position: top left;
 }
 
-.chat-user-text {
-  padding: 9px 12px;
-  border-radius: 12px 12px 4px 12px;
-  background: var(--active);
+.chat-user-message .chat-user-text {
+  padding: 7px 11px;
+  font-size: 14px;
+  border: 1px solid
+    color-mix(in srgb, var(--text-primary) 9%, var(--tab-surface));
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--text-primary) 6%, var(--tab-surface));
+  color: var(--text-primary);
+  line-height: 1.5;
   text-wrap: pretty;
   overflow-wrap: anywhere;
+
+  @include dark-mode {
+    border-color: #313338;
+    background: #27292d;
+    color: #c3c7ce;
+  }
 }
 
 .chat-user-body {

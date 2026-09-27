@@ -85,6 +85,10 @@ export default Vue.extend({
   flex: none;
   padding: 10px 12px 12px;
   border-top: 1px solid var(--panel-border);
+
+  @include dark-mode {
+    border-top-color: #2e3034;
+  }
 }
 
 .chat-composer-box {
@@ -93,7 +97,9 @@ export default Vue.extend({
   gap: 6px;
   padding: 8px 8px 8px 12px;
   @include field-border(12px);
-  background: var(--field-fill);
+  background: var(--card-surface);
+  box-shadow: 0 1px 2px rgb(20 30 50 / 4%);
+  transition: border-color 0.15s, box-shadow 0.15s;
 
   &:hover,
   &:focus-within {
@@ -101,7 +107,17 @@ export default Vue.extend({
   }
 
   &.dropping {
-    @include field-active-border;
+    border-color: color-mix(in srgb, var(--accent) 60%, var(--card-surface));
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+
+  @include dark-mode {
+    border-color: #3a3d43;
+    background: #17181b;
   }
 }
 
