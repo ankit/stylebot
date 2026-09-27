@@ -120,11 +120,10 @@ export default Vue.extend({
 
   &.undone {
     background: var(--tab-surface);
-  }
 
-  @include dark-mode {
-    border-color: #34363b;
-    background: #26282c;
+    @include dark-mode {
+      background: var(--card-surface);
+    }
   }
 }
 
@@ -141,15 +140,15 @@ export default Vue.extend({
   @include truncate;
 
   min-width: 0;
-  color: var(--text-primary);
-
-  @include dark-mode {
-    color: #c3c7ce;
-  }
+  color: var(--text-body);
 }
 
 .chat-change.undone .chat-change-label {
   color: var(--text-faint);
+
+  @include dark-mode {
+    color: var(--text-body);
+  }
 }
 
 .chat-change .chat-change-actions .chat-change-action {

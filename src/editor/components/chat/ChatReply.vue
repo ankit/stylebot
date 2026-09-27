@@ -62,13 +62,9 @@ export default Vue.extend({
 
 .chat-reply .chat-reply-text {
   font-family: var(--font-reading);
-  color: var(--text-primary);
+  color: var(--text-body);
   font-size: 14px;
   line-height: 1.55;
-
-  @include dark-mode {
-    color: #c3c7ce;
-  }
 
   .chat-reply-body,
   .chat-reply-stopped {

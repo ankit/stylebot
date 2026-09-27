@@ -89,7 +89,7 @@ export default Vue.extend({
 .button.primary {
   background: var(--accent);
   border-color: var(--accent);
-  color: #fff;
+  color: var(--accent-ink);
 
   &:hover:not(:disabled) {
     filter: brightness(0.92);

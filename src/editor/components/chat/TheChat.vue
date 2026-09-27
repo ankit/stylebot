@@ -105,10 +105,6 @@ export default Vue.extend({
 
   &.conversation {
     background: var(--tab-surface);
-
-    @include dark-mode {
-      background: #1f2023;
-    }
   }
 }
 </style>

@@ -73,15 +73,11 @@ export default Vue.extend({
   font-family: inherit;
   font-size: 14px;
   line-height: 1.5;
-  color: var(--text-primary);
+  color: var(--text-body);
   background: transparent;
 
   &::placeholder {
     color: var(--text-faint);
-  }
-
-  @include dark-mode {
-    color: #c3c7ce;
   }
 }
 </style>

@@ -335,11 +335,7 @@ export default Vue.extend({
 .editor-code-area {
   flex: 1;
   min-height: 0;
-  background: #fcfcfd;
-
-  @include dark-mode {
-    background: #1a1b1e;
-  }
+  background: var(--code-surface);
 }
 
 .editor-footer {

@@ -308,9 +308,6 @@ export default Vue.extend({
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
     Ubuntu, 'Helvetica Neue', sans-serif;
   transition: opacity 0.32s ease;
-  --tooltip-bg: var(--background);
-  --tooltip-fg: var(--foreground);
-  --tooltip-border: var(--border);
   --menu-surface: var(--background);
   --menu-border: var(--border);
   --menu-shadow: rgb(0 0 0 / 30%);
