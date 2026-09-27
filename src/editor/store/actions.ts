@@ -242,7 +242,7 @@ export default {
       commit('setVisible', false);
       openEditorWindow();
     } else if (state.host === 'window' && dockLocation !== 'window') {
-      getPageBridge().openInPage();
+      getPageBridge().openInPage(dockLocation);
     }
   },
 

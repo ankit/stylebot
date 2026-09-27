@@ -254,8 +254,9 @@ describe('createEditorWindowHandler', () => {
     const port = connect();
     const { closeEditorWindow } = jest.requireMock('../../utils/chrome');
 
-    port.send({ type: 'openInPage' });
+    port.send({ type: 'openInPage', dockLocation: 'left' });
 
+    expect(store.state.options.layout.dockLocation).toBe('left');
     expect(openStylebot).toBeCalledWith(expect.anything(), { inspect: false });
     expect(closeEditorWindow).toBeCalled();
 

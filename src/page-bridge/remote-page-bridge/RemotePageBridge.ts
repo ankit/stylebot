@@ -264,8 +264,8 @@ export class RemotePageBridge extends PageBridgeEmitter implements PageBridge {
     return this.request('getPageCssContext', selector);
   }
 
-  openInPage(): void {
-    this.send({ type: 'openInPage' });
+  openInPage(dockLocation: 'left' | 'right'): void {
+    this.send({ type: 'openInPage', dockLocation });
   }
 
   focusPage(): void {

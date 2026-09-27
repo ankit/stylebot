@@ -94,6 +94,7 @@ export const DockBackFromWindow: StoryObj = {
 
     await expect(store.state.options.layout.dockLocation).toBe('left');
     await expect(openInPage).toHaveBeenCalledTimes(1);
+    await expect(openInPage).toHaveBeenCalledWith('left');
   },
 };
 

@@ -281,7 +281,7 @@ describe('RemotePageBridge', () => {
     bridge.highlight('h1');
     bridge.unhighlight();
     bridge.stopInspecting();
-    bridge.openInPage();
+    bridge.openInPage('left');
 
     expect(ports[0].postMessage.mock.calls.map(([m]) => m)).toEqual([
       { type: 'applyCss', css: 'b {}', forceImportant: false },
@@ -291,7 +291,7 @@ describe('RemotePageBridge', () => {
       { type: 'highlight', selector: 'h1' },
       { type: 'unhighlight' },
       { type: 'stopInspecting' },
-      { type: 'openInPage' },
+      { type: 'openInPage', dockLocation: 'left' },
     ]);
   });
 });
