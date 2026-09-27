@@ -123,11 +123,11 @@ import {
 } from '@stylebot/components';
 import { ArrowRepeatIcon, ExternalLinkIcon } from '@stylebot/icons';
 import type { SyncAccount, SyncConflict } from '@stylebot/types';
-import { formatSyncTime } from '@stylebot/utils';
 import {
   SYNC_FILE_PATH,
   SYNC_FILE_NAME,
   SYNC_PERIOD_MINUTES,
+  formatSyncTime,
 } from '@stylebot/sync';
 
 export default Vue.extend({

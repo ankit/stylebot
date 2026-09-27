@@ -1,9 +1,3 @@
-import type {
-  OpenOptionsPage,
-  OpenReportIssuePage,
-  OpenDonatePage,
-} from '@stylebot/types';
-
 export {
   MODIFIER_KEYS,
   modifiersFromEvent,
@@ -15,7 +9,6 @@ export { splitCommaList } from './split-comma-list';
 export { isMac } from './is-mac';
 export { resolveAppearance, getSystemPreference } from './resolve-appearance';
 
-export { formatSyncTime } from './format-sync-time';
 export {
   formatClockTime,
   formatDay,
@@ -27,52 +20,14 @@ export { KEYBOARD_FOCUS, isFieldTarget, consumeFieldEscape } from './focus';
 
 export { getCurrentTimestamp } from './timestamp';
 
-type NotificationId = string;
-
-const getNotificationKey = (id: NotificationId) => `notification~${id}`;
-
-export const getNotification = async (id: NotificationId): Promise<boolean> => {
-  const items = await chrome.storage.local.get(getNotificationKey(id));
-  return items[getNotificationKey(id)];
-};
-
-export const setNotification = (
-  id: NotificationId,
-  value: boolean
-): Promise<void> =>
-  chrome.storage.local.set({ [getNotificationKey(id)]: value });
-
-export const getExtensionVersion = (): string =>
-  chrome.runtime.getManifest().version;
-
-// e.g. "3.1.4" -> "3.1", matching how releases are grouped on stylebot.dev.
-export const getReleaseVersion = (): string =>
-  getExtensionVersion().split('.').slice(0, 2).join('.');
-
-export const getReleaseNotificationId = (): NotificationId =>
-  `release/${getReleaseVersion()}`;
-
-export const openOptionsPage = (route?: string): void => {
-  const message: OpenOptionsPage = {
-    name: 'OpenOptionsPage',
-    ...(route ? { route } : {}),
-  };
-
-  chrome.runtime.sendMessage(message);
-};
-
-export const openReportIssuePage = (): void => {
-  const message: OpenReportIssuePage = {
-    name: 'OpenReportIssuePage',
-  };
-
-  chrome.runtime.sendMessage(message);
-};
-
-export const openDonatePage = (): void => {
-  const message: OpenDonatePage = {
-    name: 'OpenDonatePage',
-  };
-
-  chrome.runtime.sendMessage(message);
-};
+export { getNotification, setNotification } from './notification';
+export {
+  getExtensionVersion,
+  getReleaseVersion,
+  getReleaseNotificationId,
+} from './release';
+export {
+  openOptionsPage,
+  openReportIssuePage,
+  openDonatePage,
+} from './open-page';

@@ -10,6 +10,8 @@ export {
 
 export { runGoogleDriveSync } from './google-drive/sync';
 
+export { formatSyncTime } from './format-sync-time';
+
 export {
   SYNC_FILE_NAME,
   SYNC_FILE_PATH,
