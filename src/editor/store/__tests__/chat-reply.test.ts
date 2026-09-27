@@ -7,6 +7,7 @@ import {
   getFailedMessage,
   getAssistantTurn,
   getStoppedTurn,
+  getUserTurn,
 } from '../chat-reply';
 
 const page = {
@@ -32,6 +33,12 @@ describe('getStreamRequest', () => {
     );
     expect(system).toContain(':root { --fg: #111 }');
     expect(system).toContain('a { color: red; }');
+  });
+
+  it('names the picked element', () => {
+    const { system } = getStreamRequest({ ...page, selector: 'h1.title' }, []);
+
+    expect(system).toContain('`h1.title`');
   });
 
   it('falls back to the site when the page has no address', () => {
@@ -78,6 +85,28 @@ describe('getAssistantTurn', () => {
   });
 });
 
+describe('getUserTurn', () => {
+  const image = {
+    dataUrl: 'data:image/png;base64,AA',
+    mediaType: 'image/png' as const,
+    name: '',
+    size: 1,
+  };
+
+  it('keeps the picked element and image with the message', () => {
+    expect(getUserTurn({ text: ' Bigger ', scope: 'h1', image })).toMatchObject(
+      { role: 'user', text: 'Bigger', scope: 'h1', image }
+    );
+  });
+
+  it('leaves out what the message went without', () => {
+    const turn = getUserTurn({ text: 'Bigger' });
+
+    expect(turn).not.toHaveProperty('scope');
+    expect(turn).not.toHaveProperty('image');
+  });
+});
+
 describe('getStoppedTurn', () => {
   it('keeps the text that came in, with no edits', () => {
     expect(getStoppedTurn(' Making it ', 'm')).toMatchObject({
@@ -99,9 +128,9 @@ describe('getFailedMessage', () => {
   );
 
   it('splits off the last message when it got no reply', () => {
-    expect(getFailedMessage([reply, user])).toEqual({
+    expect(getFailedMessage([reply, { ...user, scope: 'h1' }])).toEqual({
       turns: [reply],
-      text: 'again',
+      message: { text: 'again', scope: 'h1', image: undefined },
     });
   });
 

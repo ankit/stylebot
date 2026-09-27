@@ -4,6 +4,7 @@ import { applyEdits, revertEdits } from '@stylebot/chat';
 import { getPageBridge } from '@stylebot/page-bridge';
 import type {
   ChatAssistantTurn,
+  ChatImage,
   ChatCssEdit,
   ChatCssPreviousValue,
   ChatErrorKey,
@@ -30,7 +31,10 @@ import {
   getAssistantTurn,
   getStoppedTurn,
   getPlainTurns,
+  getUserTurn,
 } from './chat-reply';
+import type { ChatMessage } from './chat-reply';
+import { readChatImage } from '../utils/chat-image';
 import { streamReply } from './chat-stream';
 import type { ChatStreamHandlers } from './chat-stream';
 
@@ -52,20 +56,24 @@ export type ChatState = {
   error: ChatError | null;
   connecting: boolean;
   connectError: ChatError | null;
+  // Attached in the composer, going out with the next message.
+  draftImage: ChatImage | null;
+  // The last file attached couldn't be read as an image.
+  imageError: boolean;
 };
 
 type Context = ActionContext<ChatState, State>;
 
-const buildRequest = async ({
-  state,
-  rootState,
-}: Context): Promise<ChatStreamRequest> => {
+const buildRequest = async (
+  { state, rootState }: Context,
+  selector?: string
+): Promise<ChatStreamRequest> => {
   const bridge = getPageBridge();
   // Either can fail (the page navigating away); the model can still work
   // from what it does get.
   const [outline, pageCss] = await Promise.all([
     bridge.getPageOutline().catch(() => ''),
-    bridge.getPageCssContext('').catch(() => ''),
+    bridge.getPageCssContext(selector ?? '').catch(() => ''),
   ]);
 
   return getStreamRequest(
@@ -76,6 +84,7 @@ const buildRequest = async ({
       css: rootState.css,
       outline,
       pageCss,
+      selector,
     },
     state.turns
   );
@@ -193,6 +202,8 @@ export const createChatModule = (): Module<ChatState, State> => {
       error: null,
       connecting: false,
       connectError: null,
+      draftImage: null,
+      imageError: false,
     }),
 
     mutations: {
@@ -237,6 +248,14 @@ export const createChatModule = (): Module<ChatState, State> => {
 
       setConnectError(state: ChatState, error: ChatError | null): void {
         state.connectError = error;
+      },
+
+      setDraftImage(state: ChatState, image: ChatImage | null): void {
+        state.draftImage = image;
+      },
+
+      setImageError(state: ChatState, value: boolean): void {
+        state.imageError = value;
       },
     },
 
@@ -296,6 +315,28 @@ export const createChatModule = (): Module<ChatState, State> => {
         }
       },
 
+      /**
+       * Attaches an image file to the next message, replacing any already
+       * attached.
+       */
+      async attachImage(
+        { commit }: Context,
+        { file, name }: { file: Blob; name?: string }
+      ): Promise<void> {
+        commit('setImageError', false);
+
+        try {
+          commit('setDraftImage', await readChatImage(file, name));
+        } catch {
+          commit('setImageError', true);
+        }
+      },
+
+      removeImage({ commit }: Context): void {
+        commit('setDraftImage', null);
+        commit('setImageError', false);
+      },
+
       clearConnectError({ commit }: Context): void {
         commit('setConnectError', null);
       },
@@ -325,24 +366,41 @@ export const createChatModule = (): Module<ChatState, State> => {
       },
 
       /**
-       * Sends a message and streams the reply.
+       * Sends what's in the composer: the text, with the element picked and
+       * the image attached right now.
        */
-      async send(context: Context, text: string): Promise<void> {
-        const { state, commit } = context;
-        const message = text.trim();
+      sendDraft(
+        { state, rootState, dispatch }: Context,
+        text: string
+      ): Promise<void> {
+        return dispatch('send', {
+          text,
+          scope: rootState.activeSelector || undefined,
+          image: state.draftImage ?? undefined,
+        });
+      },
 
-        if (!message || state.pending || !state.status?.connected) {
+      /**
+       * Sends a message and streams the reply. Its picked element's page
+       * CSS goes into the prompt.
+       */
+      async send(context: Context, message: ChatMessage): Promise<void> {
+        const { state, commit } = context;
+
+        if (!message.text.trim() || state.pending || !state.status?.connected) {
           return;
         }
 
         const model = state.status.model;
 
         commit('setError', null);
-        commit('addTurn', { role: 'user', id: getTurnId(), text: message });
+        commit('setDraftImage', null);
+        commit('setImageError', false);
+        commit('addTurn', getUserTurn(message));
         commit('setPending', { phase: 'reading', text: '' });
         save(context);
 
-        const request = await buildRequest(context);
+        const request = await buildRequest(context, message.scope);
 
         // Stopped while the page was being read.
         if (!state.pending) {
@@ -421,7 +479,7 @@ export const createChatModule = (): Module<ChatState, State> => {
         }
 
         commit('setThread', { url: state.url, turns: failed.turns });
-        await dispatch('send', failed.text);
+        await dispatch('send', failed.message);
       },
     },
   };

@@ -3,9 +3,11 @@ import type {
   ChatAssistantTurn,
   ChatCssEdit,
   ChatCssPreviousValue,
+  ChatImage,
   ChatStreamRequest,
   ChatTurn,
   ChatUsage,
+  ChatUserTurn,
 } from '@stylebot/types';
 
 /**
@@ -27,6 +29,18 @@ export type ChatRequestPage = {
   css: string;
   outline: string;
   pageCss: string;
+  // The element picked, which the request is about.
+  selector?: string;
+};
+
+/**
+ * A message as the user sends it: its text, the element picked, and an
+ * attached image.
+ */
+export type ChatMessage = {
+  text: string;
+  scope?: string;
+  image?: ChatImage;
 };
 
 /**
@@ -47,7 +61,7 @@ export const getPlainTurns = (turns: Array<ChatTurn>): Array<ChatTurn> =>
  * describing the page as it stands.
  */
 export const getStreamRequest = (
-  { url, href, title, css, outline, pageCss }: ChatRequestPage,
+  { url, href, title, css, outline, pageCss, selector }: ChatRequestPage,
   turns: Array<ChatTurn>
 ): ChatStreamRequest => ({
   type: 'send',
@@ -57,8 +71,21 @@ export const getStreamRequest = (
     outline,
     pageCss,
     css,
+    selector,
   }),
   turns: getPlainTurns(turns),
+});
+
+export const getUserTurn = ({
+  text,
+  scope,
+  image,
+}: ChatMessage): ChatUserTurn => ({
+  role: 'user',
+  id: getTurnId(),
+  text: text.trim(),
+  ...(scope ? { scope } : {}),
+  ...(image ? { image } : {}),
 });
 
 /**
@@ -103,10 +130,13 @@ export const getStoppedTurn = (
  */
 export const getFailedMessage = (
   turns: Array<ChatTurn>
-): { turns: Array<ChatTurn>; text: string } | null => {
+): { turns: Array<ChatTurn>; message: ChatMessage } | null => {
   const last = turns[turns.length - 1];
 
-  return last?.role === 'user'
-    ? { turns: turns.slice(0, -1), text: last.text }
-    : null;
+  if (last?.role !== 'user') {
+    return null;
+  }
+
+  const { text, scope, image } = last;
+  return { turns: turns.slice(0, -1), message: { text, scope, image } };
 };

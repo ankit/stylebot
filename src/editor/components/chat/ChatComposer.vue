@@ -1,9 +1,10 @@
 <template>
   <div class="chat-composer">
-    <div class="chat-composer-box">
-      <chat-input v-model="draft" @submit="send" />
+    <chat-image-drop-zone class="chat-composer-box" @change="focus">
+      <chat-input ref="input" v-model="draft" @submit="send" />
 
       <div class="chat-composer-footer">
+        <chat-attach-image-button @change="focus" />
         <chat-model-menu
           @new-chat="$emit('new-chat')"
           @change-key="$emit('change-key')"
@@ -16,13 +17,15 @@
           @stop="stop"
         />
       </div>
-    </div>
+    </chat-image-drop-zone>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 
+import ChatAttachImageButton from './ChatAttachImageButton.vue';
+import ChatImageDropZone from './ChatImageDropZone.vue';
 import ChatInput from './ChatInput.vue';
 import ChatModelMenu from './ChatModelMenu.vue';
 import ChatSendButton from './ChatSendButton.vue';
@@ -31,6 +34,8 @@ export default Vue.extend({
   name: 'ChatComposer',
 
   components: {
+    ChatAttachImageButton,
+    ChatImageDropZone,
     ChatInput,
     ChatModelMenu,
     ChatSendButton,
@@ -53,6 +58,10 @@ export default Vue.extend({
   },
 
   methods: {
+    focus(): void {
+      (this.$refs.input as InstanceType<typeof ChatInput>).focus();
+    },
+
     stop(): void {
       this.$store.dispatch('chat/stop');
     },
@@ -62,7 +71,7 @@ export default Vue.extend({
         return;
       }
 
-      this.$store.dispatch('chat/send', this.draft);
+      this.$store.dispatch('chat/sendDraft', this.draft);
       this.draft = '';
     },
   },
@@ -90,7 +99,8 @@ export default Vue.extend({
     border-color: var(--field-border-hover);
   }
 
-  &:focus-within {
+  &:focus-within,
+  &.dropping {
     @include field-active-border;
   }
 }
