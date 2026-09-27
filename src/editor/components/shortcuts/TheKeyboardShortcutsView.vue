@@ -1,16 +1,9 @@
 <template>
   <div class="keyboard-shortcuts-view">
     <div class="view-header">
-      <s-tooltip :text="t('back')">
-        <s-icon-button
-          :size="26"
-          class="back-button"
-          :aria-label="t('back')"
-          @click="back"
-        >
-          <chevron-left-icon :size="15" />
-        </s-icon-button>
-      </s-tooltip>
+      <s-icon-button :size="26" :tooltip="t('back')" @click="back">
+        <chevron-left-icon :size="15" />
+      </s-icon-button>
 
       <s-heading as="h1" size="sm" class="title">
         {{ t('keyboard_shortcuts') }}
@@ -72,13 +65,11 @@ import {
   SIconButton,
   SShortcutChip,
   SText,
-  STooltip,
 } from '@stylebot/components';
 import { ChevronLeftIcon } from '@stylebot/icons';
 import type { StylebotCommands, StylebotEditorCommands } from '@stylebot/types';
-import { isMac } from '@stylebot/utils';
+import { isMac, openOptionsPage } from '@stylebot/utils';
 
-import { openOptionsPage } from '../../utils/chrome';
 import { undoShortcuts } from '../../store/undo-stack';
 
 type ShortcutRow = { label: string; keys: Array<string> };
@@ -92,7 +83,6 @@ export default Vue.extend({
     SIconButton,
     SShortcutChip,
     SText,
-    STooltip,
     ChevronLeftIcon,
   },
 

@@ -3,7 +3,6 @@ import type {
   SetReadability,
   SetOption,
   GetAllOptions,
-  OpenOptionsPage,
   EnableStyle,
   DisableStyle,
   GetStylesForPage,
@@ -16,7 +15,6 @@ import type {
   GetReadabilitySettings,
   SetReadabilitySettings,
   ReadabilitySettings,
-  OpenDonatePage,
   OpenGoogleFontsPage,
   GetRecentColors,
   AddRecentColor,
@@ -100,23 +98,6 @@ export const getStylesForPage = (): Promise<GetStylesForPageResponse> => {
   return chrome.runtime.sendMessage<GetStylesForPage, GetStylesForPageResponse>(
     message
   );
-};
-
-export const openOptionsPage = (route?: string): void => {
-  const message: OpenOptionsPage = {
-    name: 'OpenOptionsPage',
-    ...(route ? { route } : {}),
-  };
-
-  chrome.runtime.sendMessage(message);
-};
-
-export const openDonatePage = (): void => {
-  const message: OpenDonatePage = {
-    name: 'OpenDonatePage',
-  };
-
-  chrome.runtime.sendMessage(message);
 };
 
 export const openGoogleFontsPage = (): void => {

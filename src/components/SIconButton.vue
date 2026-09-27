@@ -1,10 +1,26 @@
 <template>
+  <s-tooltip v-if="tooltip" :text="tooltip" :shortcut="tooltipShortcut">
+    <button
+      type="button"
+      class="icon-button"
+      :class="{ bordered }"
+      :style="sizeStyle"
+      :title="title"
+      v-bind="$attrs"
+      :aria-label="ariaLabel"
+      @click.stop="$emit('click', $event)"
+    >
+      <slot />
+    </button>
+  </s-tooltip>
   <button
+    v-else
     type="button"
     class="icon-button"
     :class="{ bordered }"
-    :style="size ? { width: `${size}px`, height: `${size}px` } : undefined"
+    :style="sizeStyle"
     :title="title"
+    v-bind="$attrs"
     @click.stop="$emit('click', $event)"
   >
     <slot />
@@ -13,9 +29,16 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import STooltip from './STooltip.vue';
 
 export default Vue.extend({
   name: 'SIconButton',
+
+  components: {
+    STooltip,
+  },
+
+  inheritAttrs: false,
 
   props: {
     title: {
@@ -29,6 +52,28 @@ export default Vue.extend({
     size: {
       type: Number,
       default: 0,
+    },
+    // Wraps the button in a tooltip and doubles as its aria-label, unless
+    // one is passed explicitly.
+    tooltip: {
+      type: String,
+      default: '',
+    },
+    tooltipShortcut: {
+      type: String,
+      default: '',
+    },
+  },
+
+  computed: {
+    sizeStyle(): Record<string, string> | undefined {
+      return this.size
+        ? { width: `${this.size}px`, height: `${this.size}px` }
+        : undefined;
+    },
+
+    ariaLabel(): string {
+      return this.$attrs['aria-label'] ?? this.tooltip;
     },
   },
 });

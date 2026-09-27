@@ -1,15 +1,9 @@
 <template>
   <s-anchored-menu class="more-action-anchor">
     <template #trigger="{ toggle }">
-      <s-tooltip :text="t('view_options')">
-        <s-icon-button
-          :size="20"
-          :aria-label="t('view_options')"
-          @click="toggle"
-        >
-          <more-icon :size="20" />
-        </s-icon-button>
-      </s-tooltip>
+      <s-icon-button :size="20" :tooltip="t('view_options')" @click="toggle">
+        <more-icon :size="20" />
+      </s-icon-button>
     </template>
 
     <template #default="{ close }">
@@ -79,7 +73,7 @@
           </span>
         </s-toggle-switch>
 
-        <hr class="more-menu-divider" />
+        <s-menu-divider class="more-menu-divider" />
 
         <s-menu-item
           @click="
@@ -115,8 +109,8 @@ import {
   SAnchoredMenu,
   SMenu,
   SMenuItem,
+  SMenuDivider,
   SIconButton,
-  STooltip,
   SToggleSwitch,
   SSegmentedControl,
   SText,
@@ -131,7 +125,7 @@ import {
 
 import type { StylebotEditorCommands, StylebotLayout } from '@stylebot/types';
 
-import { openOptionsPage } from '../../utils/chrome';
+import { openOptionsPage } from '@stylebot/utils';
 
 // Stands in for `!important` in the translated caption, which is split around
 // it so the keyword can be set as code without any stray whitespace.
@@ -144,8 +138,8 @@ export default Vue.extend({
     SAnchoredMenu,
     SMenu,
     SMenuItem,
+    SMenuDivider,
     SIconButton,
-    STooltip,
     SToggleSwitch,
     SSegmentedControl,
     SText,
@@ -299,10 +293,8 @@ export default Vue.extend({
   min-width: 0;
 }
 
-.more-menu-divider {
+.more-menu .more-menu-divider {
   margin: 10px -10px;
-  border: none;
-  border-top: 1px solid var(--panel-border);
 }
 
 .menu-item-row {
