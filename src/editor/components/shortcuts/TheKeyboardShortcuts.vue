@@ -79,7 +79,7 @@ export default Vue.extend({
     },
 
     toggleInspect(): void {
-      if (this.mode === 'basic') {
+      if (this.mode === 'basic' || this.mode === 'chat') {
         this.$store.commit('setInspecting', !this.inspecting);
       }
     },
