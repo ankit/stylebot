@@ -8,7 +8,7 @@
 <script lang="ts">
 import Vue from 'vue';
 
-export default Vue.extend({ name: 'IconToggle' });
+export default Vue.extend({ name: 'ToggleIcon' });
 </script>
 
 <style lang="scss" scoped>

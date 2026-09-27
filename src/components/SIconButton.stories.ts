@@ -1,7 +1,7 @@
 import type { Meta } from '@storybook/vue';
 
 import SIconButton from './SIconButton.vue';
-import { MoreIcon, SunIcon, InspectorIcon, IconX } from '@stylebot/icons';
+import { MoreIcon, SunIcon, InspectorIcon, XIcon } from '@stylebot/icons';
 import {
   focusViaTab,
   fromTemplate,
@@ -18,7 +18,7 @@ const meta: Meta = {
     tooltip: { control: 'text' },
     icon: {
       control: 'select',
-      options: ['more-icon', 'sun-icon', 'inspector-icon', 'icon-x'],
+      options: ['more-icon', 'sun-icon', 'inspector-icon', 'x-icon'],
     },
   },
   args: { bordered: false, size: 0, tooltip: 'Action', icon: 'more-icon' },
@@ -26,7 +26,7 @@ const meta: Meta = {
 
 export default meta;
 
-const components = { SIconButton, MoreIcon, SunIcon, InspectorIcon, IconX };
+const components = { SIconButton, MoreIcon, SunIcon, InspectorIcon, XIcon };
 
 export const Playground = playground(
   components,
@@ -62,7 +62,7 @@ export const Variants = matrix({
     {
       label: 'Close',
       cell: attrs =>
-        `<s-icon-button ${attrs} title="Close"><icon-x :size="16" /></s-icon-button>`,
+        `<s-icon-button ${attrs} title="Close"><x-icon :size="16" /></s-icon-button>`,
     },
   ],
 });
@@ -70,7 +70,7 @@ export const Variants = matrix({
 export const WithTooltip = fromTemplate(
   components,
   `<s-icon-button :size="20" tooltip="Close" tooltip-shortcut="esc">
-    <icon-x :size="14" />
+    <x-icon :size="14" />
   </s-icon-button>`,
   {
     play: async ({ canvasElement }) => {

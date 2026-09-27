@@ -15,5 +15,5 @@
 <script lang="ts">
 import Vue from 'vue';
 
-export default Vue.extend({ name: 'IconFlag' });
+export default Vue.extend({ name: 'FlagIcon' });
 </script>

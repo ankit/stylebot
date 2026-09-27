@@ -20,7 +20,7 @@
       :tooltip="t('hide')"
       @click="dismiss"
     >
-      <icon-x :size="16" />
+      <x-icon :size="16" />
     </s-icon-button>
   </div>
 </template>
@@ -35,14 +35,14 @@ import {
 } from '@stylebot/utils';
 
 import { onEnterOrSpace } from '../../utils';
-import { IconX } from '@stylebot/icons';
+import { XIcon } from '@stylebot/icons';
 import { SIconButton, SText } from '@stylebot/components';
 
 export default Vue.extend({
   name: 'ReleaseNotification',
 
   components: {
-    IconX,
+    XIcon,
     SIconButton,
     SText,
   },

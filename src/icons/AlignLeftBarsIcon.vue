@@ -24,5 +24,5 @@
 <script lang="ts">
 import Vue from 'vue';
 
-export default Vue.extend({ name: 'IconAlignLeft' });
+export default Vue.extend({ name: 'AlignLeftBarsIcon' });
 </script>

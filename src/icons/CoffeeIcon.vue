@@ -19,5 +19,5 @@
 <script lang="ts">
 import Vue from 'vue';
 
-export default Vue.extend({ name: 'IconCoffee' });
+export default Vue.extend({ name: 'CoffeeIcon' });
 </script>

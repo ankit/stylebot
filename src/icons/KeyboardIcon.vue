@@ -19,5 +19,5 @@
 <script lang="ts">
 import Vue from 'vue';
 
-export default Vue.extend({ name: 'IconKeyboard' });
+export default Vue.extend({ name: 'KeyboardIcon' });
 </script>

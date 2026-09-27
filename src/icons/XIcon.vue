@@ -25,7 +25,7 @@
 import Vue from 'vue';
 
 export default Vue.extend({
-  name: 'IconX',
+  name: 'XIcon',
 
   props: {
     size: {
