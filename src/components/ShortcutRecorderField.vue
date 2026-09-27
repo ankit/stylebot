@@ -255,8 +255,8 @@ export default Vue.extend({
   align-items: center;
   justify-content: center;
   gap: 7px;
-  font-weight: 400;
-  font-size: 12px;
+  font-weight: 500;
+  font-size: 13px;
   line-height: 1;
   color: var(--text-primary);
   background: color-mix(in srgb, var(--text-primary) 4%, var(--panel-surface));

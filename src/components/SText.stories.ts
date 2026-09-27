@@ -7,7 +7,10 @@ const meta: Meta = {
   title: 'Primitives/Typography/SText',
   component: SText,
   argTypes: {
-    size: { control: 'radio', options: ['label', 'body', 'caption', 'small'] },
+    size: {
+      control: 'radio',
+      options: ['body', 'label', 'caption', 'overline'],
+    },
     variant: { control: 'radio', options: ['default', 'muted', 'primary'] },
     as: { control: 'select', options: ['p', 'span', 'div'] },
     text: { control: 'text' },
@@ -30,10 +33,10 @@ export const Playground = playground(
 export const Variants = matrix({
   components: { SText },
   rows: [
-    { label: 'label', attrs: 'size="label"' },
     { label: 'body', attrs: 'size="body"' },
+    { label: 'label', attrs: 'size="label"' },
     { label: 'caption', attrs: 'size="caption"' },
-    { label: 'small', attrs: 'size="small"' },
+    { label: 'overline', attrs: 'size="overline"' },
   ],
   columns: [
     {

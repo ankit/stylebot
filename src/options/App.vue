@@ -156,7 +156,7 @@ a {
 
 .options-app {
   display: grid;
-  grid-template-columns: 216px 1fr;
+  grid-template-columns: 200px 1fr;
   grid-template-rows: 1fr auto;
   min-height: 100vh;
 }

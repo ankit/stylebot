@@ -35,7 +35,7 @@
 
     <div v-if="activeKey === 'neutrals'" class="ramps">
       <div v-for="ramp in neutralRamps" :key="ramp.labelKey" class="ramp">
-        <s-text size="small" variant="muted" as="span">
+        <s-text size="caption" variant="muted" as="span">
           {{ t(ramp.labelKey) }}
         </s-text>
         <div class="set-grid">

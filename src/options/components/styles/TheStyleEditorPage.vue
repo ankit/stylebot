@@ -49,7 +49,7 @@
     </div>
 
     <div class="editor-footer">
-      <s-text size="caption" variant="muted" class="stats">
+      <s-text variant="muted" class="stats">
         {{ lineCountLabel }} · {{ ruleCountLabel }}
         <template v-if="savedLabel">· {{ savedLabel }}</template>
       </s-text>
@@ -296,7 +296,7 @@ export default Vue.extend({
 
 .breadcrumb {
   font-weight: 400;
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.3;
   color: var(--text-muted);
 }
@@ -328,7 +328,7 @@ export default Vue.extend({
 
 .enabled-label {
   font-weight: 400;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.3;
   color: var(--text-muted);
 }

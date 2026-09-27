@@ -108,8 +108,8 @@ export default Vue.extend({
   flex-wrap: wrap;
   column-gap: 14px;
   overflow: hidden;
-  font-size: 13px;
-  line-height: 1.4;
+  font-size: 14px;
+  line-height: 20px;
 }
 
 .part {
@@ -119,11 +119,12 @@ export default Vue.extend({
 }
 
 .verb {
+  font-weight: 400;
   color: var(--text-secondary);
 }
 
 .subject {
-  font-weight: 600;
+  font-weight: 400;
   color: var(--text-primary);
 }
 

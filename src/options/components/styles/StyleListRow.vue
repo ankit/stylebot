@@ -4,7 +4,7 @@
       <div class="domain" :class="{ disabled: !enabled }">{{ url }}</div>
     </toggle-switch>
 
-    <s-text size="caption" variant="muted" class="timestamp">
+    <s-text variant="muted" class="timestamp">
       {{ formattedTimestamp }}
     </s-text>
 

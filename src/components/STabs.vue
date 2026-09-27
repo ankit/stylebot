@@ -175,7 +175,7 @@ export default Vue.extend({
   border-radius: 0;
   background: none;
   font-family: inherit;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 400;
   line-height: 1.3;
   color: var(--text-muted);

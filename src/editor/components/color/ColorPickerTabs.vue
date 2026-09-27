@@ -52,6 +52,10 @@ export default Vue.extend({
 <style lang="scss" scoped>
 // Reuse STabs' own sliding-underline look as-is; only the horizontal inset needs adjusting.
 .color-picker-tabs ::v-deep .tabs {
-  padding: 10px 14px 0;
+  padding: 10px 8px 0;
+}
+
+.color-picker-tabs ::v-deep .tab {
+  font-size: 13px;
 }
 </style>

@@ -3,12 +3,7 @@
     <!-- Reading the history is local and immediate, so there is nothing to
          say while it happens: a spinner here only ever flashes. -->
     <template v-if="loaded">
-      <s-text
-        v-if="!versions.length"
-        size="caption"
-        variant="muted"
-        class="empty"
-      >
+      <s-text v-if="!versions.length" variant="muted" class="empty">
         {{ t('history_empty') }}
       </s-text>
 

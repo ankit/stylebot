@@ -5,8 +5,8 @@
       :value="contextMenu"
       @change="contextMenu = $event"
     >
-      <heading as="h2" size="sm">{{ t('right_click_menu') }}</heading>
-      <s-text size="caption" variant="muted" class="description">
+      <heading as="h2" size="md">{{ t('right_click_menu') }}</heading>
+      <s-text variant="muted" class="description">
         {{ t('right_click_menu_description') }}
       </s-text>
     </toggle-switch>

@@ -35,7 +35,7 @@ export default Vue.extend({
   flex-direction: column;
   gap: 4px;
   font-weight: 400;
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.4;
   color: var(--text-muted);
 }

@@ -4,7 +4,7 @@
       {{ t('restore_success') }}
     </sync-status-banner>
 
-    <heading as="h1">{{ t('history_options') }}</heading>
+    <heading as="h1" size="xl">{{ t('history_options') }}</heading>
     <s-text variant="muted" class="description">
       {{ t('history_tab_description') }}
     </s-text>

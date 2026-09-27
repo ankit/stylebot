@@ -98,8 +98,8 @@
     </div>
 
     <div v-if="conflicts.length" class="conflicts">
-      <heading as="h3" size="sm">{{ t('sync_conflicts_title') }}</heading>
-      <s-text size="caption" variant="muted" class="description">
+      <heading as="h3" size="md">{{ t('sync_conflicts_title') }}</heading>
+      <s-text variant="muted" class="description">
         {{ t('sync_conflicts_description') }}
       </s-text>
 
@@ -232,7 +232,7 @@ export default Vue.extend({
 }
 
 .title {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
 }
 
@@ -268,7 +268,7 @@ export default Vue.extend({
 
 .service-description {
   margin-top: 2px;
-  font-size: 12.5px;
+  font-size: 13px;
   line-height: 1.45;
   color: var(--text-muted);
 }
@@ -329,7 +329,7 @@ export default Vue.extend({
     flex: 1;
     min-width: 0;
     margin: 0;
-    font-size: 13.5px;
+    font-size: 14px;
     line-height: 1.45;
   }
 }
@@ -350,7 +350,7 @@ export default Vue.extend({
   align-items: center;
   gap: 5px;
   font-family: var(--font-mono);
-  font-size: 12.5px;
+  font-size: 13px;
   color: var(--accent-text);
   text-decoration: none;
 
@@ -395,6 +395,6 @@ export default Vue.extend({
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 13px;
+  font-size: 14px;
 }
 </style>

@@ -158,8 +158,9 @@ export default Vue.extend({
 }
 
 .time {
-  font-size: 13px;
-  line-height: 1.4;
+  font-size: 14px;
+  line-height: 20px;
+  font-variant-numeric: tabular-nums;
   color: var(--text-secondary);
   white-space: nowrap;
   overflow: hidden;
@@ -168,7 +169,7 @@ export default Vue.extend({
 
 .count {
   font-size: 13px;
-  line-height: 1.4;
+  line-height: 18px;
   white-space: nowrap;
   color: var(--text-faint);
 }

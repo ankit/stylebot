@@ -119,4 +119,9 @@ export default Vue.extend({
     cursor: default;
   }
 }
+
+.popup-header .popup-header-domain {
+  position: relative;
+  top: -1px;
+}
 </style>

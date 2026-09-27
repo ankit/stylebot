@@ -2,6 +2,7 @@
   <div class="basic-editor-actions">
     <s-tooltip :text="hideTooltipText" :shortcut="editorCommands.hide">
       <s-button
+        size="small"
         class="action-button hide-button"
         :class="{ active: isHidden }"
         :disabled="disabled"
@@ -13,7 +14,12 @@
     </s-tooltip>
 
     <s-tooltip :text="t('reset_style_description')">
-      <s-button class="action-button" :disabled="resetDisabled" @click="reset">
+      <s-button
+        size="small"
+        class="action-button"
+        :disabled="resetDisabled"
+        @click="reset"
+      >
         {{ t('reset') }}
       </s-button>
     </s-tooltip>
@@ -92,13 +98,9 @@ export default Vue.extend({
   gap: 6px;
 }
 
-.action-button {
-  gap: 4px;
-  padding: 4px 9px;
-  font-size: 11.5px;
-}
-
 .basic-editor-actions .action-button {
+  gap: 4px;
+  padding: 8px;
   color: var(--text-muted);
 }
 

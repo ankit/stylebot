@@ -7,7 +7,7 @@ const meta: Meta = {
   title: 'Primitives/Typography/Heading',
   component: Heading,
   argTypes: {
-    size: { control: 'radio', options: ['lg', 'md', 'sm'] },
+    size: { control: 'radio', options: ['xl', 'lg', 'md', 'sm'] },
     as: { control: 'select', options: ['h1', 'h2', 'h3', 'div'] },
     text: { control: 'text' },
   },
@@ -25,7 +25,8 @@ export const Sizes = fromTemplate(
   { Heading },
   `
   <div class="sb-stack">
-    <heading as="h1" size="lg">Large heading</heading>
+    <heading as="h1" size="xl">Extra large heading</heading>
+    <heading as="h2" size="lg">Large heading</heading>
     <heading as="h2" size="md">Medium heading</heading>
     <heading as="h3" size="sm">Small heading</heading>
   </div>

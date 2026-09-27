@@ -33,7 +33,7 @@
       </s-button>
     </template>
 
-    <s-text v-else size="caption" variant="muted">
+    <s-text v-else variant="muted">
       {{ t('restore_same_as_now') }}
     </s-text>
   </div>
@@ -136,7 +136,7 @@ export default Vue.extend({
   align-items: baseline;
   gap: 6px;
   min-width: 0;
-  font-size: 13.5px;
+  font-size: 14px;
 }
 
 .verb {

@@ -66,7 +66,7 @@ export default Vue.extend({
   &.dense {
     --menu-padding: 4px;
     --menu-item-padding-y: 7px;
-    --menu-item-font-size: 12.5px;
+    --menu-item-font-size: 13px;
     padding: var(--menu-padding);
     border-radius: 11px;
     gap: 1px;

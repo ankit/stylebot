@@ -4,7 +4,7 @@
       <div class="popup-header">
         <heading
           as="h1"
-          size="sm"
+          size="md"
           class="popup-header-domain popup-header-domain--muted"
         >
           {{ tab.url }}
@@ -34,10 +34,10 @@
         :shortcut="styleShortcut"
       />
       <div v-else class="popup-header">
-        <heading as="h1" size="sm" class="popup-header-domain">
+        <heading as="h1" size="md" class="popup-header-domain">
           {{ domain }}
         </heading>
-        <s-text size="caption" variant="muted">
+        <s-text variant="muted">
           {{ t('no_style_saved_for_site') }}
         </s-text>
       </div>

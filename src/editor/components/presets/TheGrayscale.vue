@@ -4,7 +4,9 @@
       <toggle-switch size="lg" :value="active" @change="toggleActive" />
     </template>
 
-    <s-text variant="muted">{{ t('grayscale_description') }}</s-text>
+    <s-text variant="muted">
+      {{ t('grayscale_description') }}
+    </s-text>
 
     <div v-if="active" class="grayscale-slider-row">
       <s-slider

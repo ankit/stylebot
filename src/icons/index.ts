@@ -38,3 +38,4 @@ export { default as ComposeIcon } from './ComposeIcon.vue';
 export { default as KeyIcon } from './KeyIcon.vue';
 export { default as CursorIcon } from './CursorIcon.vue';
 export { default as ImageIcon } from './ImageIcon.vue';
+export { default as LogoIcon } from './LogoIcon.vue';

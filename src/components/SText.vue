@@ -1,5 +1,5 @@
 <template>
-  <component :is="as" class="text" :class="[size, variant]">
+  <component :is="as" class="text" :class="[`text-${size}`, variant]">
     <slot />
   </component>
 </template>
@@ -8,7 +8,7 @@
 import type { PropType } from 'vue';
 import Vue from 'vue';
 
-type Size = 'label' | 'body' | 'caption' | 'small';
+type Size = 'label' | 'body' | 'caption' | 'overline';
 type Variant = 'muted' | 'default' | 'primary';
 
 export default Vue.extend({
@@ -50,23 +50,28 @@ export default Vue.extend({
   color: var(--accent-text);
 }
 
-.label {
+.text-body {
   font-size: 13px;
-  line-height: 1.3;
-}
-
-.body {
-  font-size: 12.5px;
   line-height: 1.45;
 }
 
-.caption {
+.text-label {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.text-caption {
   font-size: 12px;
   line-height: 1.4;
 }
 
-.small {
-  font-size: 11.5px;
+.text-overline {
+  font-size: 11px;
+  font-weight: 600;
   line-height: 1.3;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--text-faint);
 }
 </style>

@@ -164,7 +164,7 @@ export default Vue.extend({
   flex: none;
   width: 32px;
   font-family: var(--font-mono);
-  font-size: 12.5px;
+  font-size: 13px;
   color: var(--text-primary);
 }
 </style>

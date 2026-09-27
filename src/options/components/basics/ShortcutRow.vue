@@ -38,8 +38,8 @@ export default Vue.extend({
 .label {
   flex: 1;
   font-weight: 400;
-  font-size: 13.5px;
-  line-height: 1.3;
+  font-size: 14px;
+  line-height: 20px;
   color: var(--text-primary);
 }
 

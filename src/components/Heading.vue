@@ -8,7 +8,7 @@
 import type { PropType } from 'vue';
 import Vue from 'vue';
 
-type Size = 'lg' | 'md' | 'sm';
+type Size = 'xl' | 'lg' | 'md' | 'sm';
 type As = 'h1' | 'h2' | 'h3' | 'div';
 
 export default Vue.extend({
@@ -36,23 +36,30 @@ export default Vue.extend({
   color: var(--text-primary);
 }
 
+.xl {
+  font-weight: 600;
+  font-size: 20px;
+  line-height: 28px;
+  letter-spacing: -0.01em;
+}
+
 .lg {
   font-weight: 600;
-  font-size: 17px;
-  line-height: 1.2;
+  font-size: 16px;
+  line-height: 24px;
   letter-spacing: -0.01em;
 }
 
 .md {
   font-weight: 600;
-  font-size: 15px;
+  font-size: 14px;
   line-height: 1.25;
   letter-spacing: -0.01em;
 }
 
 .sm {
   font-weight: 600;
-  font-size: 13.5px;
+  font-size: 13px;
   line-height: 1.25;
 }
 </style>

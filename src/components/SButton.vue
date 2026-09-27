@@ -74,7 +74,7 @@ export default Vue.extend({
 .button.size-small {
   gap: 5px;
   padding: 7px 13px;
-  font-size: 12.5px;
+  font-size: 12px;
 }
 
 .button.default {

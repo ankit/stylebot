@@ -38,7 +38,9 @@
           @change="toggleAdjustPageLayout"
         >
           <span class="setting-copy">
-            <s-text>{{ t('adjust_page_layout') }}</s-text>
+            <s-text>
+              {{ t('adjust_page_layout') }}
+            </s-text>
             <s-text size="caption" variant="muted">
               {{ t('adjust_page_layout_description') }}
             </s-text>
@@ -53,7 +55,9 @@
           @change="setForceImportant"
         >
           <span class="setting-copy">
-            <s-text>{{ t('override_site_styles') }}</s-text>
+            <s-text>
+              {{ t('override_site_styles') }}
+            </s-text>
             <s-text v-if="forceImportant" size="caption" variant="muted">
               <template v-for="(part, index) in overrideOnDescription">
                 <code

@@ -8,14 +8,21 @@
         @change="setValue"
       >
         <template v-if="!pageReaderable" #trailing>
-          <s-text as="span" size="small" variant="muted" class="articles-only">
+          <s-text
+            as="span"
+            size="caption"
+            variant="muted"
+            class="articles-only"
+          >
             {{ t('articles_only') }}
           </s-text>
         </template>
       </toggle-switch>
     </template>
 
-    <s-text variant="muted">{{ t('readability_description') }}</s-text>
+    <s-text variant="muted">
+      {{ t('readability_description') }}
+    </s-text>
   </feature-card>
 </template>
 

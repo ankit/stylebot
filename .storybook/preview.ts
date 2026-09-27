@@ -74,9 +74,10 @@ const FONTS = [
   '500 14px Geist',
   '600 14px Geist',
   '700 14px Geist',
-  '400 14px "Fira Code"',
-  '500 14px "Fira Code"',
-  '600 14px "Fira Code"',
+  '400 14px "Geist Mono"',
+  '500 14px "Geist Mono"',
+  '600 14px "Geist Mono"',
+  '400 14px Literata',
 ];
 
 const preview: Preview = {

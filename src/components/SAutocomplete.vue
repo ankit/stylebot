@@ -523,13 +523,13 @@ export default Vue.extend({
   border: none;
   outline: none;
   background: transparent;
-  padding: 5px 0 5px 10px;
+  padding: 5px 0 3px 10px;
   margin: 0;
   resize: none;
   overflow: hidden;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
-  font: 400 12.5px/22px 'Geist', system-ui, sans-serif;
+  font: 400 13px/22px 'Geist', system-ui, sans-serif;
   color: var(--text-primary);
 
   &.mono {
@@ -538,6 +538,7 @@ export default Vue.extend({
   }
 
   &::placeholder {
+    line-height: 19px;
     color: var(--text-muted);
   }
 

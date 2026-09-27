@@ -1,6 +1,6 @@
 <template>
   <div v-if="optionsLoaded" class="basics-tab">
-    <heading as="h1">{{ t('basics_options') }}</heading>
+    <heading as="h1" size="xl">{{ t('basics_options') }}</heading>
 
     <the-context-menu />
 

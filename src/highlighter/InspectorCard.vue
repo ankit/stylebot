@@ -232,14 +232,7 @@ export default Vue.extend({
 
 .detail-label {
   white-space: nowrap;
-  font-family: var(
-    --font-mono,
-    'Fira Code',
-    Menlo,
-    Monaco,
-    Consolas,
-    monospace
-  );
+  font-family: var(--font-mono);
   color: var(--text-secondary);
 }
 
@@ -249,14 +242,7 @@ export default Vue.extend({
   gap: 6px;
   min-width: 0;
   overflow-wrap: anywhere;
-  font-family: var(
-    --font-mono,
-    'Fira Code',
-    Menlo,
-    Monaco,
-    Consolas,
-    monospace
-  );
+  font-family: var(--font-mono);
   color: var(--text-secondary);
 }
 
