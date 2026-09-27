@@ -15,7 +15,7 @@ const rootDir = path.resolve(
 );
 const localesDir = path.join(rootDir, 'src/assets/_locales');
 const srcDir = path.join(rootDir, 'src');
-const manifestPath = path.join(rootDir, 'src/assets/extension/manifest.json');
+const manifestPath = path.join(rootDir, 'src/assets/manifest/manifest.json');
 
 const KEY_PATTERN = /^[a-z][a-z0-9_]*$/;
 

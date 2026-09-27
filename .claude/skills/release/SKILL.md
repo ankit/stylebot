@@ -44,9 +44,9 @@ the `(#NNN)` suffixes that squash merges leave in commit subjects.
 Update `version` in both:
 
 - `package.json`
-- `src/assets/extension/manifest.json`
+- `src/assets/manifest/manifest.json`
 
-`src/assets/extension/manifest-firefox.json` has **no** `version` field — it only overrides
+`src/assets/manifest/manifest-firefox.json` has **no** `version` field — it only overrides
 `background` and `browser_specific_settings`, and webpack shallow-merges it over the base
 manifest. Leave it alone.
 
@@ -86,7 +86,7 @@ automatically: it reads the version from `package.json`, tags the squashed commi
 
 Nothing to do by hand — but check the workflow went green. It fails loudly rather than
 publishing something wrong if the tag already exists, if `package.json` and
-`src/assets/extension/manifest.json` disagree on the version, or if the changelog section is
+`src/assets/manifest/manifest.json` disagree on the version, or if the changelog section is
 missing.
 
 ## 7. Build the store packages
