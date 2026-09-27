@@ -49,6 +49,8 @@ export default Vue.extend({
 }
 
 .chat-user-scope {
+  @include truncate;
+
   max-width: 100%;
   box-sizing: border-box;
   padding: 0 2px;
@@ -56,9 +58,6 @@ export default Vue.extend({
   font-size: 11px;
   line-height: 1.3;
   color: var(--text-faint);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 
   @include dark-mode {
     color: #80858e;

@@ -246,11 +246,10 @@ body {
 }
 
 .popup-header-domain {
+  @include truncate;
+
   min-width: 0;
   flex: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .popup-header-domain.popup-header-domain--muted {

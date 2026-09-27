@@ -264,12 +264,13 @@ export default Vue.extend({
 }
 
 .color-field {
+  @include field-border;
+
   box-sizing: border-box;
   display: flex;
   align-items: stretch;
   width: 108px;
   height: 27px;
-  @include field-border;
 
   // Only the hex text field highlights the whole pill — the swatch button
   // (which opens the picker) gets its own focus ring instead.
@@ -285,6 +286,7 @@ export default Vue.extend({
 
 .color-swatch {
   @include button-reset;
+
   flex: none;
   width: 26px;
   align-self: stretch;
@@ -316,6 +318,7 @@ export default Vue.extend({
 
 .color-hex {
   @include button-reset;
+
   flex: 1;
   min-width: 0;
   padding: 1px 8px 0;

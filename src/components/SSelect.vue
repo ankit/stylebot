@@ -98,6 +98,8 @@ export default Vue.extend({
 
 .select-trigger {
   @include button-reset;
+  @include field-border;
+
   box-sizing: border-box;
   display: flex;
   align-items: center;
@@ -105,7 +107,6 @@ export default Vue.extend({
   gap: 6px;
   min-width: 108px;
   padding: 5px 8px;
-  @include field-border;
   font-size: 13px;
   line-height: 1.2;
   color: var(--text-primary);
@@ -134,11 +135,10 @@ export default Vue.extend({
 }
 
 .select-value {
+  @include truncate;
+
   flex: 1;
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .select-chevron {

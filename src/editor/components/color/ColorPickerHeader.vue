@@ -124,11 +124,10 @@ export default Vue.extend({
 }
 
 .hex {
+  @include truncate;
+
   font: 500 13.5px/1.2 var(--font-mono);
   color: var(--text-primary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 
   &.not-set {
     color: var(--text-muted);

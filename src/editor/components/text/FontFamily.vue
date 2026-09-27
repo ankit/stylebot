@@ -220,10 +220,9 @@ export default Vue.extend({
 }
 
 .font-row-label {
+  @include truncate;
+
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .font-row-category {

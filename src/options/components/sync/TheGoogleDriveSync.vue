@@ -390,11 +390,10 @@ export default Vue.extend({
 }
 
 .conflict-url {
+  @include truncate;
+
   flex: 1;
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   font-size: 14px;
 }
 </style>

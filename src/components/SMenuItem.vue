@@ -49,6 +49,7 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .menu-item {
   @include button-reset;
+
   display: flex;
   align-items: center;
   gap: 8px;

@@ -234,6 +234,7 @@ export default Vue.extend({
 
 .chat-model-button {
   @include button-reset;
+
   display: flex;
   align-items: center;
   gap: 5px;

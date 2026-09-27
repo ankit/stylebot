@@ -55,6 +55,7 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .chat-send-button {
   @include button-reset;
+
   flex: none;
   display: flex;
   align-items: center;

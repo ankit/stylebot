@@ -185,9 +185,10 @@ export default Vue.extend({
 }
 
 .chat-key-box {
+  @include field-border(10px);
+
   display: flex;
   align-items: stretch;
-  @include field-border(10px);
   overflow: hidden;
   background: var(--field-fill);
 
@@ -227,6 +228,7 @@ export default Vue.extend({
 
 .chat-key-show {
   @include button-reset;
+
   flex: none;
   display: flex;
   align-items: center;

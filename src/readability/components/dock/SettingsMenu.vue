@@ -125,7 +125,8 @@ export default Vue.extend({
 }
 
 .reset {
-  all: unset;
+  @include button-reset;
+
   font-weight: 400;
   font-size: 11px;
   line-height: 1.2;
@@ -133,9 +134,6 @@ export default Vue.extend({
   text-decoration: underline;
   color: var(--muted-foreground);
 
-  &:focus-visible {
-    outline: 2px solid var(--link-color);
-    outline-offset: 2px;
-  }
+  @include focus-ring(2px);
 }
 </style>
