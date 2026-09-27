@@ -6,7 +6,7 @@ import {
   getCssAfterApplyingFilterEffectToPage,
   getBodyChildSelectors,
 } from '@stylebot/css';
-import { editor, WITH_RULE } from '@stylebot/storybook/editor-story';
+import { editor, WITH_RULE } from '@stylebot/storybook/fixtures/editor';
 import { collapseAllCards, storeOf } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {

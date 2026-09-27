@@ -1,7 +1,7 @@
 import { getDeclarationValue } from '@stylebot/css';
 
 import getters from './getters';
-import mockState from './__mocks__/state';
+import mockState from './state.fixtures';
 
 describe('getters', () => {
   describe('readabilityActive', () => {

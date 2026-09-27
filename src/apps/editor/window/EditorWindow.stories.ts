@@ -5,7 +5,7 @@ import {
   editorWindow,
   WINDOW_TAB,
   WITH_RULE,
-} from '@stylebot/storybook/editor-story';
+} from '@stylebot/storybook/fixtures/editor';
 
 const meta: Meta = {
   title: 'Editor/Window',

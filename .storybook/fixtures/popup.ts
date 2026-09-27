@@ -1,7 +1,7 @@
 import type { StoryObj } from '@storybook/vue';
 
 import App from '@/apps/popup/App.vue';
-import type { ChromeShimOptions } from './chrome';
+import type { ChromeShimOptions } from '../mocks/chrome';
 
 export const style = (url: string, enabled = true) => ({
   url,

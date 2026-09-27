@@ -3,7 +3,7 @@ import { expect, waitFor, within } from '@storybook/test';
 import type { SyncState } from '@stylebot/types';
 
 import TheSyncTab from './TheSyncTab.vue';
-import { optionsPage } from '@stylebot/storybook/mocks/options-page';
+import { optionsPage } from '@stylebot/storybook/fixtures/options';
 import { user } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {

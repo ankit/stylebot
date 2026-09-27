@@ -1,7 +1,7 @@
 import type { Meta } from '@storybook/vue';
 
 import ToggleStylebot from './ToggleStylebot.vue';
-import { popup, style } from '@stylebot/storybook/mocks/popup';
+import { popup, style } from '@stylebot/storybook/fixtures/popup';
 
 const meta: Meta = {
   title: 'Browser Action/Editor Toggle',

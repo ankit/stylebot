@@ -1,5 +1,5 @@
-import type { State } from '..';
-import { emptyUndoStack } from '../undo-stack';
+import type { State } from '.';
+import { emptyUndoStack } from './undo-stack';
 import { emptyPageSnapshot } from '@stylebot/page-bridge';
 
 import {

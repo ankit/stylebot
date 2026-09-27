@@ -7,10 +7,10 @@ import type {
 } from '@stylebot/types';
 import type { ChatState } from '@/apps/editor/store/chat';
 
-import { editor } from './editor-story';
-import { storeOf } from './story-helpers';
-import type { ChatShimOptions } from './mocks/chat';
-import type { EditorStateOverrides } from './mocks/editor-store';
+import { editor } from './editor';
+import { storeOf } from '../story-helpers';
+import type { ChatShimOptions } from '../mocks/chat';
+import type { EditorStateOverrides } from './editor-store';
 
 export const THREAD_CSS = `.article-body {
   font-size: 18px;

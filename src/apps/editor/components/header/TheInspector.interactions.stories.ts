@@ -6,7 +6,7 @@ import {
   editor,
   IFRAME_PAGE,
   INSPECT_PAGE,
-} from '@stylebot/storybook/editor-story';
+} from '@stylebot/storybook/fixtures/editor';
 import {
   hoverPage,
   pressKey,

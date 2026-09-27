@@ -2,7 +2,7 @@ import Vue from 'vue';
 import Vuex, { Store } from 'vuex';
 
 import type { State } from 'apps/editor/store';
-import mockState from '../store/__mocks__/state';
+import mockState from '../store/state.fixtures';
 import mutations from '../store/mutations';
 import type { PageBridge, PageBridgeEvents } from '@stylebot/page-bridge';
 import type {

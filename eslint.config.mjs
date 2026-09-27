@@ -320,7 +320,7 @@ export default tseslint.config(
   },
 
   {
-    files: ['*.js', 'scripts/**/*.js'],
+    files: ['*.js', 'jest/**/*.js', 'scripts/**/*.js'],
     languageOptions: { sourceType: 'commonjs' },
     rules: { '@typescript-eslint/no-require-imports': 'off' },
   },

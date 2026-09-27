@@ -5,7 +5,7 @@ import type { VersionChange, VersionPreview, Version } from '@stylebot/types';
 import { set, subDays } from 'date-fns';
 
 import TheHistoryTab from '../TheHistoryTab.vue';
-import { optionsPage } from '@stylebot/storybook/mocks/options-page';
+import { optionsPage } from '@stylebot/storybook/fixtures/options';
 
 const meta: Meta = {
   title: 'Options/Version history',

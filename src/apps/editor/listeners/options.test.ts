@@ -3,7 +3,7 @@ import Vuex, { Store } from 'vuex';
 
 import type { State } from 'apps/editor/store';
 import type { StylebotOptions } from '@stylebot/types';
-import mockState from '../store/__mocks__/state';
+import mockState from '../store/state.fixtures';
 import initOptionsListener from './options';
 
 Vue.use(Vuex);
