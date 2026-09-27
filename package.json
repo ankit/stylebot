@@ -107,7 +107,6 @@
   },
   "devDependencies": {
     "@babel/core": "^7.10.1",
-    "@babel/preset-env": "^7.10.1",
     "@eslint/js": "^9",
     "@playwright/test": "1.63.0",
     "@storybook/addon-controls": "~7.6.20",
@@ -126,7 +125,6 @@
     "@vue/test-utils": "^1.0.3",
     "@vue/vue2-jest": "^29",
     "babel-jest": "^29",
-    "babel-loader": "^8.4.1",
     "copy-webpack-plugin": "^6.0.1",
     "cross-env": "^7.0.2",
     "css-loader": "^3.5.3",

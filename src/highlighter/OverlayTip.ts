@@ -6,7 +6,7 @@ import type { Box, NextAncestorInfo, TipPlacement } from './types';
 import type { CssDeclaration } from '@stylebot/types';
 
 /**
- * The instance shape InspectorCard.vue exposes (shims.vue.d.ts types
+ * The instance shape InspectorCard.vue exposes (shims-vue.d.ts types
  * `.vue` imports generically), for what's driven imperatively here.
  */
 type InspectorCardInstance = Vue & {
