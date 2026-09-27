@@ -1,13 +1,13 @@
 import type {
   ChatCssEdit,
   ChatModel,
-  ChatProvider,
   ChatProviderInfo,
-  ChatStreamArgs,
   ChatStreamEvent,
   ChatTurn,
   ChatUsage,
 } from '@stylebot/types';
+
+import type { ChatProvider, ChatStreamArgs } from '../types';
 
 import { readEventStream } from '../read-event-stream';
 import { ChatProviderError } from './ChatProviderError';

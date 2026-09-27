@@ -16,7 +16,7 @@
       :aria-label="t('remove')"
       @click="$emit('remove')"
     >
-      <icon-x :size="12" />
+      <x-icon :size="12" />
     </s-icon-button>
   </div>
 </template>
@@ -26,7 +26,7 @@ import type { PropType } from 'vue';
 import Vue from 'vue';
 
 import { SIconButton, SText } from '@stylebot/components';
-import { IconX } from '@stylebot/icons';
+import { XIcon } from '@stylebot/icons';
 import type { ChatImage } from '@stylebot/types';
 
 /**
@@ -37,7 +37,7 @@ export default Vue.extend({
 
   components: {
     SIconButton,
-    IconX,
+    XIcon,
     SText,
   },
 

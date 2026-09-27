@@ -36,14 +36,14 @@
                 :aria-label="t('dismiss')"
                 @click="dismiss"
               >
-                <icon-x />
+                <x-icon />
               </button>
             </div>
             <s-text size="caption" variant="muted" class="desc">
               {{ t('readability_shortcut_description') }}
             </s-text>
             <button type="button" class="record-btn" @click="start">
-              <icon-keyboard />
+              <keyboard-icon />
               {{ t('record_shortcut') }}
             </button>
           </template>
@@ -79,7 +79,7 @@ import {
   SMenu,
   SText,
 } from '@stylebot/components';
-import { IconKeyboard, IconX } from '@stylebot/icons';
+import { KeyboardIcon, XIcon } from '@stylebot/icons';
 
 export default Vue.extend({
   name: 'ShortcutMenu',
@@ -91,8 +91,8 @@ export default Vue.extend({
     SShortcutRecorderField,
     SMenu,
     SText,
-    IconKeyboard,
-    IconX,
+    KeyboardIcon,
+    XIcon,
   },
 
   props: {

@@ -1,6 +1,6 @@
 <template>
   <dock-button :disabled="disabled" @click="$emit('click')">
-    <icon-toggle />
+    <toggle-icon />
   </dock-button>
 </template>
 
@@ -8,14 +8,14 @@
 import Vue from 'vue';
 
 import DockButton from './DockButton.vue';
-import { IconToggle } from '@stylebot/icons';
+import { ToggleIcon } from '@stylebot/icons';
 
 export default Vue.extend({
   name: 'CloseButton',
 
   components: {
     DockButton,
-    IconToggle,
+    ToggleIcon,
   },
 
   props: {
