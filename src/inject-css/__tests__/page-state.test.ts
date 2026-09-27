@@ -1,6 +1,10 @@
-import type { CachedState, CachedStyle } from '../cache';
+import type { CachedState, CachedStyle } from '@stylebot/stylesheets';
 
-jest.mock('../stylesheet');
+jest.mock('@stylebot/stylesheets', () => ({
+  ...jest.requireActual('@stylebot/stylesheets'),
+  injectStylesheet: jest.fn(),
+  removeStylesheet: jest.fn(),
+}));
 jest.mock('@stylebot/readability');
 
 const style = (
@@ -11,14 +15,14 @@ const style = (
 ): CachedStyle => ({ url, css, importUrls, enabled });
 
 describe('applyPageState', () => {
-  let stylesheet: typeof import('../stylesheet');
+  let stylesheet: typeof import('@stylebot/stylesheets');
   let readability: typeof import('@stylebot/readability');
   let applyPageState: typeof import('../page-state').applyPageState;
 
   beforeEach(() => {
     jest.resetModules();
 
-    stylesheet = require('../stylesheet');
+    stylesheet = require('@stylebot/stylesheets');
     readability = require('@stylebot/readability');
     ({ applyPageState } = require('../page-state'));
   });

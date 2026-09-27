@@ -1,7 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { CompiledStyles } from '@stylebot/types';
 
-jest.mock('../stylesheet');
+jest.mock('@stylebot/stylesheets', () => ({
+  ...jest.requireActual('@stylebot/stylesheets'),
+  injectStylesheet: jest.fn(),
+  removeStylesheet: jest.fn(),
+}));
 jest.mock('@stylebot/readability');
 
 const REVISION = '2026-09-26T00:00:00.000Z';
@@ -13,8 +17,8 @@ const compiled = (styles: CompiledStyles['styles']): CompiledStyles => ({
 });
 
 describe('reapplySavedStyles', () => {
-  let stylesheet: typeof import('../stylesheet');
-  let cache: typeof import('../cache');
+  let stylesheet: typeof import('@stylebot/stylesheets');
+  let cache: typeof import('@stylebot/stylesheets');
   let reapplySavedStyles: typeof import('../saved-styles').reapplySavedStyles;
 
   const store = (stored: CompiledStyles) => {
@@ -35,8 +39,8 @@ describe('reapplySavedStyles', () => {
     jest.resetModules();
     localStorage.clear();
 
-    stylesheet = require('../stylesheet');
-    cache = require('../cache');
+    stylesheet = require('@stylebot/stylesheets');
+    cache = require('@stylebot/stylesheets');
     ({ reapplySavedStyles } = require('../saved-styles'));
   });
 

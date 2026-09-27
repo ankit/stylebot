@@ -5,9 +5,8 @@ jest.mock('../page-state', () => ({
   ...jest.requireActual('../page-state'),
   applyPageState: jest.fn(),
 }));
-jest.mock('../cache');
 jest.mock('../hide-page');
-jest.mock('../import-cache');
+jest.mock('@stylebot/stylesheets');
 jest.mock('@stylebot/styles', () => ({
   ...jest.requireActual('@stylebot/styles'),
   getStylesForPage: jest.fn(),
@@ -31,9 +30,8 @@ const compiledStyles = (
 
 describe('inject-css run()', () => {
   let pageStateModule: typeof import('../page-state');
-  let cacheModule: typeof import('../cache');
+  let stylesheets: typeof import('@stylebot/stylesheets');
   let hidePageModule: typeof import('../hide-page');
-  let importCacheModule: typeof import('../import-cache');
   let stylesModule: typeof import('@stylebot/styles');
   let sendMessage: jest.Mock;
   let registeredListener: (
@@ -46,9 +44,8 @@ describe('inject-css run()', () => {
     jest.resetModules();
 
     pageStateModule = require('../page-state');
-    cacheModule = require('../cache');
+    stylesheets = require('@stylebot/stylesheets');
     hidePageModule = require('../hide-page');
-    importCacheModule = require('../import-cache');
     stylesModule = require('@stylebot/styles');
 
     sendMessage = jest.fn();
@@ -89,7 +86,7 @@ describe('inject-css run()', () => {
     });
 
   it('hides the page and applies the fresh state when there is no cache', async () => {
-    (cacheModule.readCache as jest.Mock).mockReturnValue(null);
+    (stylesheets.readCache as jest.Mock).mockReturnValue(null);
     matching([{ url: 'a', css: '.a{}', importUrls: [], enabled: true }]);
 
     load();
@@ -105,12 +102,12 @@ describe('inject-css run()', () => {
       expectedState,
       null
     );
-    expect(cacheModule.writeCache).toHaveBeenCalledWith(expectedState);
+    expect(stylesheets.writeCache).toHaveBeenCalledWith(expectedState);
     expect(hidePageModule.revealPage).toHaveBeenCalledTimes(1);
   });
 
   it('matches the page against the stored compiled styles when they are current', async () => {
-    (cacheModule.readCache as jest.Mock).mockReturnValue(null);
+    (stylesheets.readCache as jest.Mock).mockReturnValue(null);
     matching([]);
 
     const stored = compiledStyles();
@@ -131,7 +128,7 @@ describe('inject-css run()', () => {
   ])(
     'asks the background for the compiled styles when the stored copy is %s',
     async (_label, stored, revision) => {
-      (cacheModule.readCache as jest.Mock).mockReturnValue(null);
+      (stylesheets.readCache as jest.Mock).mockReturnValue(null);
       matching([]);
 
       const rebuilt = compiledStyles({ revision });
@@ -154,7 +151,7 @@ describe('inject-css run()', () => {
       readability: false,
     };
 
-    (cacheModule.readCache as jest.Mock).mockReturnValue(cached);
+    (stylesheets.readCache as jest.Mock).mockReturnValue(cached);
     matching([]);
 
     load();
@@ -169,7 +166,7 @@ describe('inject-css run()', () => {
       readability: false,
     };
 
-    (cacheModule.readCache as jest.Mock).mockReturnValue(cached);
+    (stylesheets.readCache as jest.Mock).mockReturnValue(cached);
     matching([{ url: 'a', css: '.a{}', importUrls: [], enabled: true }]);
 
     load();
@@ -188,7 +185,7 @@ describe('inject-css run()', () => {
       readability: false,
     };
 
-    (cacheModule.readCache as jest.Mock).mockReturnValue(cached);
+    (stylesheets.readCache as jest.Mock).mockReturnValue(cached);
     matching([
       { url: 'a', css: '.a{color:new}', importUrls: [], enabled: true },
     ]);
@@ -209,11 +206,11 @@ describe('inject-css run()', () => {
       freshState,
       cached
     );
-    expect(cacheModule.writeCache).toHaveBeenCalledWith(freshState);
+    expect(stylesheets.writeCache).toHaveBeenCalledWith(freshState);
   });
 
   it('keeps only the @import responses the page still uses in the cache', async () => {
-    (cacheModule.readCache as jest.Mock).mockReturnValue(null);
+    (stylesheets.readCache as jest.Mock).mockReturnValue(null);
     matching([
       {
         url: 'a',
@@ -226,13 +223,13 @@ describe('inject-css run()', () => {
     load();
     await flushPromises();
 
-    expect(importCacheModule.pruneImportCache).toHaveBeenCalledWith(
+    expect(stylesheets.pruneImportCache).toHaveBeenCalledWith(
       new Set(['https://x.test/a.css'])
     );
   });
 
   it('reads readability off the matched default style', async () => {
-    (cacheModule.readCache as jest.Mock).mockReturnValue(null);
+    (stylesheets.readCache as jest.Mock).mockReturnValue(null);
     matching([], { url: '*', readability: true });
 
     load();
@@ -245,7 +242,7 @@ describe('inject-css run()', () => {
   });
 
   it('answers GetIsReadabilityActive based on whether #stylebot-reader is mounted', () => {
-    (cacheModule.readCache as jest.Mock).mockReturnValue(null);
+    (stylesheets.readCache as jest.Mock).mockReturnValue(null);
     matching([]);
 
     load();

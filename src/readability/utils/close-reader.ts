@@ -1,5 +1,5 @@
 import { removeReadability } from '../lifecycle';
-import { readCache, writeCache } from '@stylebot/inject-css';
+import { readCache, writeCache } from '@stylebot/stylesheets';
 
 import type {
   GetStylesForPage,

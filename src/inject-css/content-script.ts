@@ -4,9 +4,9 @@
  * the page (hide-page.ts) until chrome.storage.local.get resolves.
  */
 import { isReaderable } from '@stylebot/readability';
+import { readCache } from '@stylebot/stylesheets';
 import type { TabMessage } from '@stylebot/types';
 
-import { readCache } from './cache';
 import { hidePage, revealPage } from './hide-page';
 import { applyPageState, getPageState, savePageState } from './page-state';
 import { getCompiledStyles } from './saved-styles';

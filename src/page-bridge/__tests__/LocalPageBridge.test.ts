@@ -1,13 +1,12 @@
 import * as stylebotCss from '@stylebot/css';
-import { injectStylesheet } from '@stylebot/inject-css';
 import * as stylebotReadability from '@stylebot/readability';
-import { readCache, writeCache } from '../../inject-css/cache';
+import { injectStylesheet, readCache, writeCache } from '@stylebot/stylesheets';
 
 import { LocalPageBridge } from '../LocalPageBridge';
 
 jest.mock('@stylebot/css');
-jest.mock('@stylebot/inject-css', () => ({
-  ...jest.requireActual('@stylebot/inject-css'),
+jest.mock('@stylebot/stylesheets', () => ({
+  ...jest.requireActual('@stylebot/stylesheets'),
   injectStylesheet: jest.fn(),
 }));
 jest.mock('@stylebot/readability');
