@@ -29,7 +29,7 @@ import type {
   GetIsEditorWindowOpenResponse,
   ChatGetStatus,
   ChatConnect,
-  ChatDisconnect,
+  ChatRemoveKey,
   ChatSetModel,
   ChatGetThread,
   ChatSetThread,
@@ -258,13 +258,20 @@ export const chatSetThread = (url: string, turns: Array<ChatTurn>): void => {
   chrome.runtime.sendMessage(message);
 };
 
-export const chatDisconnect = (): Promise<ChatStatusResponse> =>
-  chrome.runtime.sendMessage<ChatDisconnect, ChatStatusResponse>({
-    name: 'ChatDisconnect',
+export const chatRemoveKey = (
+  provider: ChatProviderId
+): Promise<ChatStatusResponse> =>
+  chrome.runtime.sendMessage<ChatRemoveKey, ChatStatusResponse>({
+    name: 'ChatRemoveKey',
+    provider,
   });
 
-export const chatSetModel = (model: string): Promise<ChatStatusResponse> =>
+export const chatSetModel = (
+  provider: ChatProviderId,
+  model: string
+): Promise<ChatStatusResponse> =>
   chrome.runtime.sendMessage<ChatSetModel, ChatStatusResponse>({
     name: 'ChatSetModel',
+    provider,
     model,
   });

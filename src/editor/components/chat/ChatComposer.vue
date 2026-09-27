@@ -7,7 +7,7 @@
         <chat-attach-image-button @change="focus" />
         <chat-model-menu
           @new-chat="$emit('new-chat')"
-          @change-key="$emit('change-key')"
+          @providers="$emit('providers')"
         />
         <span class="chat-composer-spacer" />
         <chat-send-button
@@ -95,11 +95,11 @@ export default Vue.extend({
   @include field-border(12px);
   background: var(--field-fill);
 
-  &:hover {
+  &:hover,
+  &:focus-within {
     border-color: var(--field-border-hover);
   }
 
-  &:focus-within,
   &.dropping {
     @include field-active-border;
   }

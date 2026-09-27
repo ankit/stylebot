@@ -8,7 +8,10 @@
         :aria-label="`${t('choose_a_model')}: ${model.name}`"
         aria-haspopup="menu"
         :aria-expanded="open ? 'true' : 'false'"
-        @click="toggle"
+        @click="
+          level = null;
+          toggle();
+        "
       >
         <s-text as="span" size="caption" class="chat-model-name">
           {{ model.shortName }}
@@ -18,16 +21,26 @@
     </template>
 
     <template #default="{ close }">
-      <s-menu dense :min-width="270">
-        <s-text size="small" variant="muted" class="chat-model-heading">
-          {{ t('provider_models', [info.name]) }}
+      <s-menu ref="menu" dense :min-width="270">
+        <menu-item
+          v-if="level"
+          class="chat-model-back"
+          @click="openLevel(null)"
+        >
+          <span class="chat-menu-action">
+            <chevron-left-icon :size="12" class="chat-menu-icon" />
+            {{ shown.name }}
+          </span>
+        </menu-item>
+        <s-text v-else size="small" variant="muted" class="chat-model-heading">
+          {{ t('provider_models', [shown.name]) }}
         </s-text>
 
         <menu-item
-          v-for="option in info.models"
+          v-for="option in shown.models"
           :key="option.id"
-          :selected="option.id === model.id"
-          :aria-checked="option.id === model.id ? 'true' : 'false'"
+          :selected="isCurrent(option)"
+          :aria-checked="isCurrent(option) ? 'true' : 'false'"
           role="menuitemradio"
           @click="
             pick(option.id);
@@ -44,31 +57,51 @@
           </span>
         </menu-item>
 
-        <hr class="chat-model-divider" />
+        <template v-if="!level">
+          <template v-if="others.length">
+            <hr class="chat-model-divider" />
+            <menu-item
+              v-for="other in others"
+              :key="other.id"
+              aria-haspopup="menu"
+              @click="openLevel(other.id)"
+            >
+              <span class="chat-menu-action">
+                <span class="chat-model-other-name">{{ other.name }}</span>
+                <s-text as="span" size="caption" variant="muted">
+                  {{ t('count_models', [String(other.models.length)]) }}
+                </s-text>
+                <chevron-right-icon :size="10" class="chat-menu-icon" />
+              </span>
+            </menu-item>
+          </template>
 
-        <menu-item
-          :disabled="!hasTurns"
-          @click="
-            $emit('new-chat');
-            close();
-          "
-        >
-          <span class="chat-menu-action">
-            <compose-icon :size="14" class="chat-menu-icon" />
-            {{ t('new_chat') }}
-          </span>
-        </menu-item>
-        <menu-item
-          @click="
-            $emit('change-key');
-            close();
-          "
-        >
-          <span class="chat-menu-action">
-            <key-icon :size="14" class="chat-menu-icon" />
-            {{ t('change_api_key') }}
-          </span>
-        </menu-item>
+          <hr class="chat-model-divider" />
+
+          <menu-item
+            :disabled="!hasTurns"
+            @click="
+              $emit('new-chat');
+              close();
+            "
+          >
+            <span class="chat-menu-action">
+              <compose-icon :size="14" class="chat-menu-icon" />
+              {{ t('new_chat') }}
+            </span>
+          </menu-item>
+          <menu-item
+            @click="
+              $emit('providers');
+              close();
+            "
+          >
+            <span class="chat-menu-action">
+              <key-icon :size="14" class="chat-menu-icon" />
+              {{ t('providers') }}
+            </span>
+          </menu-item>
+        </template>
       </s-menu>
     </template>
   </anchored-menu>
@@ -78,13 +111,25 @@
 import Vue from 'vue';
 
 import { AnchoredMenu, MenuItem, SMenu, SText } from '@stylebot/components';
-import { ChevronDownIcon, ComposeIcon, KeyIcon } from '@stylebot/icons';
+import {
+  ChevronDownIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  ComposeIcon,
+  KeyIcon,
+} from '@stylebot/icons';
 import { getModel, getProviderInfo } from '@stylebot/chat';
-import type { ChatModel, ChatProviderInfo, ChatStatus } from '@stylebot/types';
+import type {
+  ChatModel,
+  ChatProviderId,
+  ChatProviderInfo,
+  ChatStatus,
+} from '@stylebot/types';
 
 /**
- * The model in use, opening onto the provider's models, New chat and
- * Change API key.
+ * The model in use, opening onto the current provider's models. Other
+ * connected providers sit below as rows that open their models in place;
+ * New chat and Providers stay at the bottom.
  */
 export default Vue.extend({
   name: 'ChatModelMenu',
@@ -92,6 +137,8 @@ export default Vue.extend({
   components: {
     AnchoredMenu,
     ChevronDownIcon,
+    ChevronLeftIcon,
+    ChevronRightIcon,
     ComposeIcon,
     KeyIcon,
     MenuItem,
@@ -99,17 +146,31 @@ export default Vue.extend({
     SText,
   },
 
+  data(): { level: ChatProviderId | null } {
+    return {
+      // Another provider whose models are open in place of the current's.
+      level: null,
+    };
+  },
+
   computed: {
     status(): ChatStatus {
       return this.$store.state.chat.status;
     },
 
-    info(): ChatProviderInfo {
-      return getProviderInfo(this.status.provider);
-    },
-
     model(): ChatModel {
       return getModel(this.status.provider, this.status.model);
+    },
+
+    // The provider whose models are showing.
+    shown(): ChatProviderInfo {
+      return getProviderInfo(this.level ?? this.status.provider);
+    },
+
+    others(): Array<ChatProviderInfo> {
+      return this.status.providers
+        .filter(({ id, connected }) => connected && id !== this.status.provider)
+        .map(({ id }) => getProviderInfo(id));
     },
 
     hasTurns(): boolean {
@@ -118,6 +179,27 @@ export default Vue.extend({
   },
 
   methods: {
+    /**
+     * Swaps the rows for another provider's models, or back. Focus moves
+     * to the menu first: the clicked row is about to go, and focus lost
+     * with it would close the menu.
+     */
+    openLevel(level: ChatProviderId | null): void {
+      const menu = (this.$refs.menu as Vue).$el as HTMLElement;
+
+      menu.focus();
+      this.level = level;
+      this.$nextTick(() =>
+        menu.querySelector<HTMLElement>('[role^="menuitem"]')?.focus()
+      );
+    },
+
+    isCurrent(model: ChatModel): boolean {
+      return (
+        this.shown.id === this.status.provider && model.id === this.status.model
+      );
+    },
+
     describe(model: ChatModel): string {
       switch (model.tier) {
         case 'fastest':
@@ -130,7 +212,10 @@ export default Vue.extend({
     },
 
     pick(model: string): void {
-      this.$store.dispatch('chat/setModel', model);
+      this.$store.dispatch('chat/setModel', {
+        provider: this.shown.id,
+        model,
+      });
     },
   },
 });
@@ -179,6 +264,14 @@ export default Vue.extend({
   display: flex;
   flex-direction: column;
   gap: 2px;
+}
+
+.chat-model-back {
+  font-weight: 600;
+}
+
+.chat-model-other-name {
+  flex: 1;
 }
 
 .chat-model-option .chat-model-option-name {

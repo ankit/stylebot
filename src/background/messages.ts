@@ -62,6 +62,7 @@ import type {
   GetRecentColorsResponse,
   AddRecentColorResponse,
   ChatConnect as ChatConnectType,
+  ChatRemoveKey as ChatRemoveKeyType,
   ChatSetModel as ChatSetModelType,
   ChatGetThread as ChatGetThreadType,
   ChatSetThread as ChatSetThreadType,
@@ -89,7 +90,7 @@ import * as editorWindow from './editor-window';
 import {
   getChatStatus,
   connectChat,
-  disconnectChat,
+  removeChatKey,
   setChatModel,
   getChatThread,
   setChatThread,
@@ -395,17 +396,18 @@ export const ChatConnect = async (
   }
 };
 
-export const ChatDisconnect = async (
+export const ChatRemoveKey = async (
+  message: ChatRemoveKeyType,
   sendResponse: (response: ChatStatusResponse) => void
 ): Promise<void> => {
-  sendResponse(await disconnectChat());
+  sendResponse(await removeChatKey(message.provider));
 };
 
 export const ChatSetModel = async (
   message: ChatSetModelType,
   sendResponse: (response: ChatStatusResponse) => void
 ): Promise<void> => {
-  sendResponse(await setChatModel(message.model));
+  sendResponse(await setChatModel(message.provider, message.model));
 };
 
 export const ChatGetThread = async (

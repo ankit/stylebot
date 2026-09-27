@@ -33,7 +33,7 @@ export const SetupKeyRejected: StoryObj = {
   },
 };
 
-export const Empty = chat({ connected: true });
+export const Empty = chat({ connected: ['anthropic'] });
 
 export const Conversation = chatWithThread();
 
@@ -63,7 +63,7 @@ export const PickedElementAndScreenshot = chatWithThread({
 /* Streams half the reply and holds there, so the status line and caret
    stay up. */
 export const Replying: StoryObj = {
-  ...chat({ connected: true, hold: true }),
+  ...chat({ connected: ['anthropic'], hold: true }),
   play: async ({ canvasElement }) => {
     const store = storeOf(canvasElement);
     await waitFor(() =>
@@ -78,7 +78,7 @@ export const Replying: StoryObj = {
 
 export const Failed: StoryObj = {
   ...chat({
-    connected: true,
+    connected: ['anthropic'],
     error: {
       type: 'error',
       errorKey: 'chat_error_rate_limited',
@@ -98,7 +98,7 @@ export const Failed: StoryObj = {
 };
 
 export const ImageAttached: StoryObj = {
-  ...chat({ connected: true }),
+  ...chat({ connected: ['anthropic'] }),
   play: async ({ canvasElement }) => {
     const store = storeOf(canvasElement);
     await waitFor(() =>
@@ -108,14 +108,31 @@ export const ImageAttached: StoryObj = {
   },
 };
 
+const ALL_PROVIDERS = {
+  connected: ['anthropic' as const, 'openai' as const, 'gemini' as const],
+};
+
 export const ModelMenu: StoryObj = {
-  ...chatWithThread(),
+  ...chatWithThread(ALL_PROVIDERS),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await user.click(
       await canvas.findByRole('button', { name: /Choose a model/ })
     );
     await findOpenMenu(canvas);
+  },
+};
+
+export const ModelMenuOtherProvider: StoryObj = {
+  ...chatWithThread(ALL_PROVIDERS),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await user.click(
+      await canvas.findByRole('button', { name: /Choose a model/ })
+    );
+    const menu = await findOpenMenu(canvas);
+    await user.click(within(menu).getByText('OpenAI'));
+    await within(menu).findByText('GPT-5.6 Luna');
   },
 };
 
@@ -132,15 +149,27 @@ export const ClearConfirmation: StoryObj = {
   },
 };
 
-export const ChangeKey: StoryObj = {
-  ...chatWithThread(),
+const openProviders = async (canvasElement: HTMLElement) => {
+  const canvas = within(canvasElement);
+  await user.click(
+    await canvas.findByRole('button', { name: /Choose a model/ })
+  );
+  const menu = await findOpenMenu(canvas);
+  await user.click(within(menu).getByText('Providers'));
+  await canvas.findByText('Back to chat');
+};
+
+export const Providers: StoryObj = {
+  ...chatWithThread({ connected: ['anthropic', 'gemini'] }),
+  play: ({ canvasElement }) => openProviders(canvasElement),
+};
+
+export const ProvidersAddingKey: StoryObj = {
+  ...chatWithThread({ connected: ['anthropic', 'gemini'] }),
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
+    await openProviders(canvasElement);
     await user.click(
-      await canvas.findByRole('button', { name: /Choose a model/ })
+      within(canvasElement).getByRole('button', { name: 'Add key' })
     );
-    const menu = await findOpenMenu(canvas);
-    await user.click(within(menu).getByText('Change API key'));
-    await canvas.findByText('Back to chat');
   },
 };

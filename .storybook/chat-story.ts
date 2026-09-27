@@ -75,7 +75,11 @@ export const chatWithThread = (
   overrides: EditorStateOverrides = {}
 ): StoryObj =>
   chat(
-    { connected: true, threads: { 'example.com': THREAD }, ...chatOptions },
+    {
+      connected: ['anthropic'],
+      threads: { 'example.com': THREAD },
+      ...chatOptions,
+    },
     { css: THREAD_CSS, ...overrides }
   );
 

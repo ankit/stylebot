@@ -1,4 +1,4 @@
-import type { ChatTurn } from '@stylebot/types';
+import type { ChatStatus, ChatTurn } from '@stylebot/types';
 
 const validateKey = jest.fn();
 
@@ -10,7 +10,7 @@ jest.mock('@stylebot/chat', () => ({
 import { ChatProviderError } from '@stylebot/chat';
 import {
   connectChat,
-  disconnectChat,
+  removeChatKey,
   getChatStatus,
   getChatThread,
   maskKey,
@@ -48,14 +48,19 @@ describe('connectChat', () => {
     const response = await connectChat('anthropic', '  sk-ant-abc  ');
 
     expect(validateKey).toHaveBeenCalledWith('sk-ant-abc');
-    expect(response).toEqual({
+    expect(response).toMatchObject({
       ok: true,
       status: {
         connected: true,
         provider: 'anthropic',
         model: 'claude-sonnet-5',
-        maskedKey: '••••••••',
       },
+    });
+    expect(response.ok && response.status.providers[0]).toEqual({
+      id: 'anthropic',
+      connected: true,
+      model: 'claude-sonnet-5',
+      maskedKey: '••••••••',
     });
     expect(JSON.stringify(response)).not.toContain('sk-ant-abc');
     expect(JSON.stringify(await getChatStatus())).not.toContain('sk-ant-abc');
@@ -90,22 +95,48 @@ describe('connectChat', () => {
   });
 });
 
-describe('model and disconnect', () => {
-  it('switches models, ignores unknown ones, and forgets the key', async () => {
-    validateKey.mockResolvedValue(undefined);
+describe('several providers', () => {
+  beforeEach(() => validateKey.mockResolvedValue(undefined));
+
+  const connectedIds = (status: ChatStatus) =>
+    status.providers.filter(({ connected }) => connected).map(({ id }) => id);
+
+  it('keeps replying from the first provider when another is added', async () => {
+    await connectChat('openai', 'sk-good');
+    const status = await connectChat('anthropic', 'sk-ant-good');
+
+    expect(status.ok && status.status.provider).toBe('openai');
+    expect(status.ok && connectedIds(status.status)).toEqual([
+      'anthropic',
+      'openai',
+    ]);
+  });
+
+  it('switches provider and model together, ignoring unknown models', async () => {
+    await connectChat('openai', 'sk-good');
+    await connectChat('anthropic', 'sk-ant-good');
+
+    expect(await setChatModel('anthropic', 'claude-opus-5')).toMatchObject({
+      provider: 'anthropic',
+      model: 'claude-opus-5',
+    });
+    expect((await setChatModel('openai', 'gpt-2')).model).toBe('gpt-5.6-terra');
+  });
+
+  it('falls back to another provider when the one in use is removed', async () => {
+    await connectChat('openai', 'sk-good');
+    await connectChat('anthropic', 'sk-ant-good');
+
+    const status = await removeChatKey('openai');
+
+    expect(status).toMatchObject({ connected: true, provider: 'anthropic' });
+    expect(JSON.stringify(store)).not.toContain('sk-good');
+  });
+
+  it('turns chat off once the last key is removed', async () => {
     await connectChat('openai', 'sk-good');
 
-    expect((await setChatModel('gpt-5.6-luna')).model).toBe('gpt-5.6-luna');
-    expect((await setChatModel('gpt-2')).model).toBe('gpt-5.6-terra');
-
-    const status = await disconnectChat();
-
-    expect(status).toEqual({
-      connected: false,
-      provider: 'openai',
-      model: 'gpt-5.6-terra',
-    });
-    expect(JSON.stringify(store)).not.toContain('sk-good');
+    expect((await removeChatKey('openai')).connected).toBe(false);
   });
 });
 

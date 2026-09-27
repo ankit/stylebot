@@ -74,7 +74,7 @@ export const ConnectsWithAKey: StoryObj = {
 };
 
 export const RepliesAndApplies: StoryObj = {
-  ...chat({ connected: true }),
+  ...chat({ connected: ['anthropic'] }),
   name: 'a message streams a reply whose CSS lands in the stylesheet, with a card counting its lines',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -110,7 +110,7 @@ export const UndoesAndReapplies: StoryObj = {
 };
 
 export const StopsAReply: StoryObj = {
-  ...chat({ connected: true, hold: true }),
+  ...chat({ connected: ['anthropic'], hold: true }),
   name: 'Stop ends a reply midway, keeping what came in and changing nothing',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -128,7 +128,7 @@ export const StopsAReply: StoryObj = {
 
 export const RetriesAFailure: StoryObj = {
   ...chat({
-    connected: true,
+    connected: ['anthropic'],
     error: { type: 'error', errorKey: 'chat_error_rate_limited' },
   }),
   name: 'a failed reply says why, and Try again sends the message once more',
@@ -147,7 +147,7 @@ export const RetriesAFailure: StoryObj = {
 };
 
 export const SwitchesModels: StoryObj = {
-  ...chat({ connected: true }),
+  ...chat({ connected: ['anthropic'] }),
   name: 'the model menu switches the model the next reply uses',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -189,24 +189,81 @@ export const ClearsTheChat: StoryObj = {
   },
 };
 
-export const RemovesTheKey: StoryObj = {
+const openProviders = async (canvas: Canvas): Promise<void> => {
+  await user.click(within(await openModelMenu(canvas)).getByText('Providers'));
+  await canvas.findByText('Back to chat');
+};
+
+const cardOf = (canvas: Canvas, name: string): Canvas =>
+  within(canvas.getByText(name).closest('.chat-provider-card') as HTMLElement);
+
+export const AddsAnotherProvider: StoryObj = {
   ...chatWithThread(),
-  name: 'Remove key on the API key screen goes back to setup',
+  name: 'a second provider’s key keeps replies on the first, and its models open from the menu',
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+
+    await step('Add key on the Providers screen connects OpenAI', async () => {
+      await openProviders(canvas);
+      await user.click(
+        cardOf(canvas, 'OpenAI').getByRole('button', { name: 'Add key' })
+      );
+      await user.type(
+        canvas.getByLabelText('API key'),
+        'sk-proj-abcdefghijklmnop{Enter}'
+      );
+
+      await waitFor(() =>
+        expect(chatStateOf(canvasElement).status?.providers).toContainEqual(
+          expect.objectContaining({ id: 'openai', connected: true })
+        )
+      );
+      await expect(chatStateOf(canvasElement).status?.provider).toBe(
+        'anthropic'
+      );
+    });
+
+    await step('its models open in place from the menu', async () => {
+      await user.click(canvas.getByRole('button', { name: /Back to chat/ }));
+      const menu = await openModelMenu(canvas);
+
+      await user.click(within(menu).getByText('OpenAI'));
+      await user.click(await within(menu).findByText('GPT-5.6 Luna'));
+
+      await waitFor(() =>
+        expect(chatStateOf(canvasElement).status).toMatchObject({
+          provider: 'openai',
+          model: 'gpt-5.6-luna',
+        })
+      );
+    });
+  },
+};
+
+export const RemovesAProvider: StoryObj = {
+  ...chatWithThread({ connected: ['anthropic', 'openai'] }),
+  name: 'removing the provider in use moves replies to another, and removing the last turns Chat off',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
+    await openProviders(canvas);
     await user.click(
-      within(await openModelMenu(canvas)).getByText('Change API key')
+      cardOf(canvas, 'Claude').getByRole('button', { name: 'Remove' })
     );
-    await canvas.findByText('Connected to Claude');
 
-    await user.click(canvas.getByRole('button', { name: 'Remove key' }));
+    await waitFor(() =>
+      expect(chatStateOf(canvasElement).status?.provider).toBe('openai')
+    );
+
+    await user.click(
+      cardOf(canvas, 'OpenAI').getByRole('button', { name: 'Remove' })
+    );
     await canvas.findByRole('button', { name: 'Connect Claude' });
   },
 };
 
 export const SendsThePickedElement: StoryObj = {
-  ...chat({ connected: true }, { activeSelector: 'h1' }),
+  ...chat({ connected: ['anthropic'] }, { activeSelector: 'h1' }),
   name: 'a message sent with an element picked shows its selector',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -228,7 +285,7 @@ export const SendsThePickedElement: StoryObj = {
 };
 
 export const AttachesAnImage: StoryObj = {
-  ...chat({ connected: true }),
+  ...chat({ connected: ['anthropic'] }),
   name: 'an image picked from disk shows above the text, goes with the message, and can be removed',
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement);

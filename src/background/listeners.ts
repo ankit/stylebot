@@ -36,7 +36,7 @@ import {
   GetIsEditorWindowOpen,
   ChatGetStatus,
   ChatConnect,
-  ChatDisconnect,
+  ChatRemoveKey,
   ChatSetModel,
   ChatGetThread,
   ChatSetThread,
@@ -263,8 +263,8 @@ export const initListeners = (): void => {
         case 'ChatConnect':
           ChatConnect(message, sendResponse);
           break;
-        case 'ChatDisconnect':
-          ChatDisconnect(sendResponse);
+        case 'ChatRemoveKey':
+          ChatRemoveKey(message, sendResponse);
           break;
         case 'ChatSetModel':
           ChatSetModel(message, sendResponse);

@@ -186,15 +186,28 @@ export type ChatProvider = {
 };
 
 /**
- * What the editor knows about the connection; the key itself never leaves
- * the background.
+ * One provider as the editor sees it.
  */
-export type ChatStatus = {
+export type ChatProviderStatus = {
+  id: ChatProviderId;
   connected: boolean;
-  provider: ChatProviderId;
+  // The model picked for this provider.
   model: string;
   // Enough of the key to recognise it, with its middle hidden.
   maskedKey?: string;
+};
+
+/**
+ * What the editor knows about the connection; the keys themselves never
+ * leave the background.
+ */
+export type ChatStatus = {
+  // Whether any provider has a key.
+  connected: boolean;
+  // The provider replies come from, and its model.
+  provider: ChatProviderId;
+  model: string;
+  providers: Array<ChatProviderStatus>;
 };
 
 /**

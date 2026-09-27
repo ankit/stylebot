@@ -12,14 +12,18 @@ Requests go straight from the browser to the provider over plain `fetch` and ser
 
 | Where | Key                       | What                                                   |
 | :---- | :------------------------ | :----------------------------------------------------- |
-| local | `chat-provider`           | the provider in use                                    |
+| local | `chat-provider`           | the provider last picked, which replies come from      |
 | local | `chat-api-key-<provider>` | that provider's key                                    |
 | local | `chat-model-<provider>`   | the model picked for that provider                     |
 | local | `chat-thread-<site>`      | the site's conversation, capped at its latest 50 turns |
 
 One entry per value, so every write is a single set or remove and nothing needs serialising across a service worker restart. None of it is synced, and it is kept out of the options that content scripts receive.
 
-**The key never leaves the background.** The editor only learns whether it is connected, the provider, the model and a masked copy of the key. Connecting rejects a key with another provider's prefix before any request, then checks the key with the provider before storing it.
+**Keys never leave the background.** The editor only learns, for each provider, whether it is connected, its model and a masked copy of its key. Connecting rejects a key with another provider's prefix before any request, then checks the key with the provider before storing it.
+
+## Several providers
+
+Any number of providers can be connected at once, from the Providers screen. Replies come from the provider whose model was last picked in the model menu, which lists the current provider's models and opens the others' in place. Adding a key doesn't change which provider replies unless none was connected; removing the key of the one in use moves replies to another connected provider, and removing the last key turns Chat off.
 
 ## A reply
 

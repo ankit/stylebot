@@ -1,9 +1,9 @@
 <template>
   <div class="the-chat">
     <template v-if="status">
-      <chat-change-key
-        v-if="status.connected && changingKey"
-        @close="changingKey = false"
+      <chat-providers
+        v-if="status.connected && showingProviders"
+        @close="showingProviders = false"
       />
 
       <template v-else-if="status.connected">
@@ -15,7 +15,7 @@
         <chat-thread />
         <chat-composer
           @new-chat="confirmingClear = true"
-          @change-key="changeKey"
+          @providers="showProviders"
         />
       </template>
       <chat-setup v-else />
@@ -28,7 +28,7 @@ import Vue from 'vue';
 
 import type { ChatStatus } from '@stylebot/types';
 
-import ChatChangeKey from './ChatChangeKey.vue';
+import ChatProviders from './ChatProviders.vue';
 import ChatClearConfirmation from './ChatClearConfirmation.vue';
 import ChatSetup from './ChatSetup.vue';
 import ChatThread from './ChatThread.vue';
@@ -38,17 +38,17 @@ export default Vue.extend({
   name: 'TheChat',
 
   components: {
-    ChatChangeKey,
+    ChatProviders,
     ChatClearConfirmation,
     ChatSetup,
     ChatThread,
     ChatComposer,
   },
 
-  data(): { confirmingClear: boolean; changingKey: boolean } {
+  data(): { confirmingClear: boolean; showingProviders: boolean } {
     return {
       confirmingClear: false,
-      changingKey: false,
+      showingProviders: false,
     };
   },
 
@@ -63,6 +63,13 @@ export default Vue.extend({
   },
 
   watch: {
+    // Removing the last key turns Chat off; the next key starts in the chat.
+    'status.connected'(connected: boolean): void {
+      if (!connected) {
+        this.showingProviders = false;
+      }
+    },
+
     url(): void {
       this.confirmingClear = false;
       this.$store.dispatch('chat/load');
@@ -74,9 +81,9 @@ export default Vue.extend({
   },
 
   methods: {
-    changeKey(): void {
+    showProviders(): void {
       this.confirmingClear = false;
-      this.changingKey = true;
+      this.showingProviders = true;
     },
 
     clear(): void {

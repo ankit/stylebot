@@ -179,12 +179,15 @@ export type ChatConnect = {
   key: string;
 };
 
-export type ChatDisconnect = {
-  name: 'ChatDisconnect';
+export type ChatRemoveKey = {
+  name: 'ChatRemoveKey';
+  provider: ChatProviderId;
 };
 
+// Replies come from this provider, with this model, from now on.
 export type ChatSetModel = {
   name: 'ChatSetModel';
+  provider: ChatProviderId;
   model: string;
 };
 
@@ -235,7 +238,7 @@ type BackgroundPageMessage =
   | GetIsEditorWindowOpen
   | ChatGetStatus
   | ChatConnect
-  | ChatDisconnect
+  | ChatRemoveKey
   | ChatSetModel
   | ChatGetThread
   | ChatSetThread;

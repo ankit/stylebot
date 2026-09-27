@@ -17,7 +17,7 @@ import type {
 import type { State } from './';
 import {
   chatConnect,
-  chatDisconnect,
+  chatRemoveKey,
   chatGetStatus,
   chatGetThread,
   chatSetModel,
@@ -341,14 +341,26 @@ export const createChatModule = (): Module<ChatState, State> => {
         commit('setConnectError', null);
       },
 
-      async disconnect({ commit }: Context): Promise<void> {
-        closeReply();
-        commit('setPending', null);
-        commit('setStatus', await chatDisconnect());
+      /**
+       * Forgets a provider's key, stopping a reply coming from it.
+       */
+      async removeKey(
+        { state, commit }: Context,
+        provider: ChatProviderId
+      ): Promise<void> {
+        if (state.status?.provider === provider) {
+          closeReply();
+          commit('setPending', null);
+        }
+
+        commit('setStatus', await chatRemoveKey(provider));
       },
 
-      async setModel({ commit }: Context, model: string): Promise<void> {
-        commit('setStatus', await chatSetModel(model));
+      async setModel(
+        { commit }: Context,
+        { provider, model }: { provider: ChatProviderId; model: string }
+      ): Promise<void> {
+        commit('setStatus', await chatSetModel(provider, model));
       },
 
       /**

@@ -1,6 +1,7 @@
 import {
   CHAT_PORT,
   ChatProviderError,
+  chatProviders,
   getModel,
   getProvider,
   getProviderInfo,
@@ -28,11 +29,6 @@ const getApiKey = (provider: ChatProviderId) => `chat-api-key-${provider}`;
 const getModelKey = (provider: ChatProviderId) => `chat-model-${provider}`;
 const getThreadKey = (url: string) => `chat-thread-${url}`;
 
-const readActiveProvider = async (): Promise<ChatProviderId> => {
-  const items = await chrome.storage.local.get(ACTIVE_PROVIDER);
-  return items[ACTIVE_PROVIDER] ?? DEFAULT_PROVIDER;
-};
-
 /**
  * The key with its middle hidden: the prefix that names the key's kind
  * (`sk-ant-api03-`) and its last four characters.
@@ -46,40 +42,62 @@ export const maskKey = (key: string): string => {
   return `${prefix}••••••••${key.slice(-4)}`;
 };
 
-/**
- * The active provider with its stored key, if connected, and its model.
- */
-const readActiveSettings = async (): Promise<{
-  provider: ChatProviderId;
+type ProviderSettings = {
+  id: ChatProviderId;
   storedKey?: string;
   model: ChatModel;
-}> => {
-  const provider = await readActiveProvider();
-  const apiKey = getApiKey(provider);
-  const modelKey = getModelKey(provider);
-  const items = await chrome.storage.local.get([apiKey, modelKey]);
+};
 
-  return {
-    provider,
-    storedKey: items[apiKey],
-    model: getModel(provider, items[modelKey] ?? ''),
-  };
+/**
+ * Every provider's key and model, and the one replies come from: the
+ * provider last picked while it has a key, else the first that does.
+ */
+const readSettings = async (): Promise<{
+  active: ProviderSettings;
+  providers: Array<ProviderSettings>;
+}> => {
+  const items = await chrome.storage.local.get([
+    ACTIVE_PROVIDER,
+    ...chatProviders.flatMap(({ id }) => [getApiKey(id), getModelKey(id)]),
+  ]);
+
+  const providers = chatProviders.map(({ id }) => ({
+    id,
+    storedKey: items[getApiKey(id)] as string | undefined,
+    model: getModel(id, items[getModelKey(id)] ?? ''),
+  }));
+
+  const pickedId = items[ACTIVE_PROVIDER] ?? DEFAULT_PROVIDER;
+  const picked = providers.find(({ id }) => id === pickedId) ?? providers[0];
+  const firstConnected = providers.find(({ storedKey }) => storedKey);
+
+  if (picked.storedKey || !firstConnected) {
+    return { active: picked, providers };
+  }
+
+  return { active: firstConnected, providers };
 };
 
 export const getChatStatus = async (): Promise<ChatStatus> => {
-  const { provider, storedKey, model } = await readActiveSettings();
+  const { active, providers } = await readSettings();
 
   return {
-    connected: !!storedKey,
-    provider,
-    model: model.id,
-    maskedKey: storedKey ? maskKey(storedKey) : undefined,
+    connected: !!active.storedKey,
+    provider: active.id,
+    model: active.model.id,
+    providers: providers.map(({ id, storedKey, model }) => ({
+      id,
+      connected: !!storedKey,
+      model: model.id,
+      maskedKey: storedKey ? maskKey(storedKey) : undefined,
+    })),
   };
 };
 
 /**
- * Checks the key with the provider and, if it works, stores it and makes
- * that provider the active one.
+ * Checks the key with the provider and, if it works, stores it. The
+ * provider becomes the one replies come from only when no other is
+ * connected.
  */
 export const connectChat = async (
   provider: ChatProviderId,
@@ -100,32 +118,43 @@ export const connectChat = async (
       : { ok: false, errorKey: 'chat_error_provider' };
   }
 
+  const { active } = await readSettings();
   const apiKey = getApiKey(provider);
 
   await chrome.storage.local.set({
-    [ACTIVE_PROVIDER]: provider,
     [apiKey]: key,
+    ...(active.storedKey ? {} : { [ACTIVE_PROVIDER]: provider }),
   });
 
   return { ok: true, status: await getChatStatus() };
 };
 
 /**
- * Forgets the active provider's key.
+ * Forgets a provider's key. Replies then come from another connected
+ * provider, if there is one.
  */
-export const disconnectChat = async (): Promise<ChatStatus> => {
-  const provider = await readActiveProvider();
+export const removeChatKey = async (
+  provider: ChatProviderId
+): Promise<ChatStatus> => {
   const apiKey = getApiKey(provider);
 
   await chrome.storage.local.remove(apiKey);
   return getChatStatus();
 };
 
-export const setChatModel = async (model: string): Promise<ChatStatus> => {
-  const provider = await readActiveProvider();
+/**
+ * Makes the provider the one replies come from, with the given model.
+ */
+export const setChatModel = async (
+  provider: ChatProviderId,
+  model: string
+): Promise<ChatStatus> => {
   const modelKey = getModelKey(provider);
 
-  await chrome.storage.local.set({ [modelKey]: getModel(provider, model).id });
+  await chrome.storage.local.set({
+    [ACTIVE_PROVIDER]: provider,
+    [modelKey]: getModel(provider, model).id,
+  });
   return getChatStatus();
 };
 
@@ -169,16 +198,16 @@ const streamReply = async (
     }
   };
 
-  const { provider, storedKey, model } = await readActiveSettings();
+  const { active } = await readSettings();
 
-  if (!storedKey) {
+  if (!active.storedKey) {
     post({ type: 'error', errorKey: 'chat_error_not_connected' });
     return;
   }
 
-  await getProvider(provider).stream({
-    key: storedKey,
-    model,
+  await getProvider(active.id).stream({
+    key: active.storedKey,
+    model: active.model,
     system: request.system,
     turns: request.turns,
     signal,

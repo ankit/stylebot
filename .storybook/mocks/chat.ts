@@ -1,4 +1,4 @@
-import { getModel, getProviderInfo } from '@stylebot/chat';
+import { chatProviders, getModel, getProviderInfo } from '@stylebot/chat';
 import type {
   ChatCssEdit,
   ChatProviderId,
@@ -14,9 +14,10 @@ export type ChatReplyScript = {
 };
 
 export type ChatShimOptions = {
-  connected?: boolean;
+  // The providers with a key.
+  connected?: Array<ChatProviderId>;
+  // The one replies come from; the first connected when left out.
   provider?: ChatProviderId;
-  model?: string;
   // Keyed by site, as the background stores them.
   threads?: Record<string, Array<ChatTurn>>;
   // Streams part of the reply, then waits forever: the reply in progress.
@@ -82,12 +83,34 @@ type Listener<T> = (value: T) => void;
  * per-site threads, and a port streams a canned reply to each request.
  */
 export const createChatShim = (options: ChatShimOptions = {}) => {
-  const provider = options.provider ?? 'anthropic';
-  let status: ChatStatus = {
-    connected: !!options.connected,
-    provider,
-    model: getModel(provider, options.model ?? '').id,
-    maskedKey: options.connected ? 'sk-ant-api03-••••••••9fK4' : undefined,
+  const keys: Partial<Record<ChatProviderId, string>> = Object.fromEntries(
+    (options.connected ?? []).map(id => [
+      id,
+      `${getProviderInfo(id).keyPrefix ?? ''}••••••••9fK4`,
+    ])
+  );
+  const models: Partial<Record<ChatProviderId, string>> = {};
+  let active: ChatProviderId =
+    options.provider ?? options.connected?.[0] ?? 'anthropic';
+
+  // As the background reports it: the active provider while it has a key,
+  // else the first that does.
+  const status = (): ChatStatus => {
+    const provider = keys[active]
+      ? active
+      : chatProviders.find(({ id }) => keys[id])?.id ?? active;
+
+    return {
+      connected: !!keys[provider],
+      provider,
+      model: getModel(provider, models[provider] ?? '').id,
+      providers: chatProviders.map(({ id }) => ({
+        id,
+        connected: !!keys[id],
+        model: getModel(id, models[id] ?? '').id,
+        maskedKey: keys[id],
+      })),
+    };
   };
   const threads: Record<string, Array<ChatTurn>> = { ...options.threads };
 
@@ -102,7 +125,7 @@ export const createChatShim = (options: ChatShimOptions = {}) => {
       turns?: Array<ChatTurn>;
     }) => unknown
   > = {
-    ChatGetStatus: () => status,
+    ChatGetStatus: status,
 
     ChatConnect: ({ provider: id = 'anthropic', key = '' }) => {
       const info = getProviderInfo(id);
@@ -115,23 +138,23 @@ export const createChatShim = (options: ChatShimOptions = {}) => {
         return { ok: false, errorKey: 'chat_error_invalid_key' };
       }
 
-      status = {
-        connected: true,
-        provider: id,
-        model: info.defaultModel,
-        maskedKey: `${key.slice(0, 7)}••••••••${key.slice(-4)}`,
-      };
-      return { ok: true, status };
+      if (!status().connected) {
+        active = id;
+      }
+
+      keys[id] = `${key.slice(0, 7)}••••••••${key.slice(-4)}`;
+      return { ok: true, status: status() };
     },
 
-    ChatDisconnect: () => {
-      status = { ...status, connected: false, maskedKey: undefined };
-      return status;
+    ChatRemoveKey: ({ provider: id = 'anthropic' }) => {
+      delete keys[id];
+      return status();
     },
 
-    ChatSetModel: ({ model = '' }) => {
-      status = { ...status, model: getModel(status.provider, model).id };
-      return status;
+    ChatSetModel: ({ provider: id = 'anthropic', model = '' }) => {
+      active = id;
+      models[id] = getModel(id, model).id;
+      return status();
     },
 
     ChatGetThread: ({ url = '' }) => threads[url] ?? [],

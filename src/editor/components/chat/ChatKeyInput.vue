@@ -1,71 +1,59 @@
 <template>
-  <div class="chat-provider-key">
-    <div class="chat-key-field">
-      <s-text as="span" size="label">{{ t('provider') }}</s-text>
-      <s-segmented-control
-        :value="provider"
-        :options="providerOptions"
-        :disabled="connecting"
-        @change="pickProvider"
-      />
-    </div>
-
-    <div class="chat-key-field">
-      <div class="chat-key-label-row">
-        <s-text as="label" size="label" :for="inputId">{{ label }}</s-text>
-        <s-text
-          as="a"
-          size="caption"
-          variant="primary"
-          class="chat-key-link"
-          :href="info.keyUrl"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {{ t('get_a_key_from', [info.company]) }}
-        </s-text>
-      </div>
-
-      <div class="chat-key-box" :class="{ invalid: !!error }">
-        <input
-          :id="inputId"
-          ref="input"
-          class="chat-key-input"
-          :value="value"
-          :type="show ? 'text' : 'password'"
-          :placeholder="
-            info.keyPlaceholder
-              ? t('paste_your_key', [info.keyPlaceholder])
-              : t('paste_your_api_key')
-          "
-          :aria-invalid="error ? 'true' : 'false'"
-          :aria-describedby="helpText ? `${inputId}-help` : undefined"
-          spellcheck="false"
-          autocomplete="off"
-          @input="type"
-        />
-        <button
-          type="button"
-          class="chat-key-show"
-          :aria-pressed="show ? 'true' : 'false'"
-          @click="show = !show"
-        >
-          {{ show ? t('hide') : t('show') }}
-        </button>
-      </div>
-
+  <div class="chat-key-input">
+    <div class="chat-key-label-row">
+      <s-text as="label" size="label" :for="inputId">{{ label }}</s-text>
       <s-text
-        v-if="helpText"
-        :id="`${inputId}-help`"
+        as="a"
         size="caption"
-        variant="muted"
-        class="chat-key-help"
-        :class="{ error: !!error }"
-        :role="error ? 'alert' : undefined"
+        variant="primary"
+        class="chat-key-link"
+        :href="info.keyUrl"
+        target="_blank"
+        rel="noopener noreferrer"
       >
-        {{ helpText }}
+        {{ t('get_a_key_from', [info.company]) }}
       </s-text>
     </div>
+
+    <div class="chat-key-box" :class="{ invalid: !!error }">
+      <input
+        :id="inputId"
+        ref="input"
+        class="chat-key-input-field"
+        :value="value"
+        :type="show ? 'text' : 'password'"
+        :placeholder="
+          info.keyPlaceholder
+            ? t('paste_your_key', [info.keyPlaceholder])
+            : t('paste_your_api_key')
+        "
+        :aria-invalid="error ? 'true' : 'false'"
+        :aria-describedby="helpText ? `${inputId}-help` : undefined"
+        spellcheck="false"
+        autocomplete="off"
+        @input="type"
+      />
+      <button
+        type="button"
+        class="chat-key-show"
+        :aria-pressed="show ? 'true' : 'false'"
+        @click="show = !show"
+      >
+        {{ show ? t('hide') : t('show') }}
+      </button>
+    </div>
+
+    <s-text
+      v-if="helpText"
+      :id="`${inputId}-help`"
+      size="caption"
+      variant="muted"
+      class="chat-key-help"
+      :class="{ error: !!error }"
+      :role="error ? 'alert' : undefined"
+    >
+      {{ helpText }}
+    </s-text>
   </div>
 </template>
 
@@ -73,21 +61,20 @@
 import type { PropType } from 'vue';
 import Vue from 'vue';
 
-import { SSegmentedControl, SText } from '@stylebot/components';
-import { chatProviders, getProviderInfo } from '@stylebot/chat';
+import { SText } from '@stylebot/components';
+import { getProviderInfo } from '@stylebot/chat';
 import type { ChatProviderId, ChatProviderInfo } from '@stylebot/types';
 
 import type { ChatError } from '../../store/chat';
 
 /**
- * Picking a provider and pasting its key, with the reason in place of the
- * help line when the key is refused.
+ * A field for pasting a provider's key, with where to get one, and the
+ * reason in place of the help line when the key is refused.
  */
 export default Vue.extend({
-  name: 'ChatProviderKey',
+  name: 'ChatKeyInput',
 
   components: {
-    SSegmentedControl,
     SText,
   },
 
@@ -130,17 +117,6 @@ export default Vue.extend({
       return getProviderInfo(this.provider);
     },
 
-    providerOptions(): Array<{ value: string; label: string }> {
-      return chatProviders.map(provider => ({
-        value: provider.id,
-        label: provider.name,
-      }));
-    },
-
-    connecting(): boolean {
-      return this.$store.state.chat.connecting;
-    },
-
     error(): ChatError | null {
       return this.$store.state.chat.connectError;
     },
@@ -168,11 +144,6 @@ export default Vue.extend({
   },
 
   methods: {
-    pickProvider(provider: ChatProviderId): void {
-      this.$emit('update:provider', provider);
-      this.clearError();
-    },
-
     type(event: Event): void {
       this.$emit('input', (event.target as HTMLInputElement).value);
       this.clearError();
@@ -188,13 +159,7 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-.chat-provider-key {
-  display: flex;
-  flex-direction: column;
-  gap: 26px;
-}
-
-.chat-key-field {
+.chat-key-input {
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -239,7 +204,7 @@ export default Vue.extend({
   }
 }
 
-.chat-key-input {
+.chat-key-input-field {
   flex: 1;
   min-width: 0;
   box-sizing: border-box;
