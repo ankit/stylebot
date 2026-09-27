@@ -1,5 +1,5 @@
 import { applyReadability, removeReadability } from '@stylebot/readability';
-import { getStylesForPage } from '@stylebot/styles';
+import { getStylesForPage } from '@stylebot/saved-styles';
 import type { CompiledStyles } from '@stylebot/types';
 
 import type { CachedState } from './cache';

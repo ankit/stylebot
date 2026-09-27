@@ -6,7 +6,7 @@ import type {
   Timestamp,
 } from '@stylebot/types';
 
-import { isEquivalentStyle } from '@stylebot/styles';
+import { isEquivalentStyle } from '@stylebot/saved-styles';
 
 const HISTORY_KEY = 'version-history';
 const SESSION_KEY = 'version-history-session';

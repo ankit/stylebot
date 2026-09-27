@@ -1,6 +1,6 @@
 import type { VersionChange, VersionPreview, StyleMap } from '@stylebot/types';
 
-import { isEquivalentStyle } from '@stylebot/styles';
+import { isEquivalentStyle } from '@stylebot/saved-styles';
 
 /**
  * How `after` differs from `before`, read forwards: what it has gained, what

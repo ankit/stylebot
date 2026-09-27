@@ -1,4 +1,4 @@
-import { COMPILED_STYLES_VERSION } from '@stylebot/styles';
+import { COMPILED_STYLES_VERSION } from '@stylebot/saved-styles';
 
 // localStorage is readable synchronously (chrome.storage isn't), so the
 // last-applied result is cached here, one entry per origin.

@@ -1,4 +1,4 @@
-import { BackgroundPageUtils } from '@stylebot/styles';
+import { isSupportedUrl } from '@stylebot/saved-styles';
 import type { EditorWindowBounds, StylebotLayout } from '@stylebot/types';
 
 import { get as getOption } from './options';
@@ -159,7 +159,7 @@ const openWindow = async (tabId: number): Promise<void> => {
   }
 
   const tab = await chrome.tabs.get(tabId);
-  if (!tab.url || !BackgroundPageUtils.isValidUrl(tab.url)) {
+  if (!tab.url || !isSupportedUrl(tab.url)) {
     return;
   }
 

@@ -1,4 +1,4 @@
-import { COMPILED_STYLES_VERSION } from '@stylebot/styles';
+import { COMPILED_STYLES_VERSION } from '@stylebot/saved-styles';
 
 import type { CachedState } from '../cache';
 import { readCache, writeCache } from '../cache';

@@ -33,7 +33,7 @@ import {
   scanVersionHistory,
   restoreVersion,
 } from '../utils';
-import { isForceImportant } from '@stylebot/styles';
+import { isForceImportant } from '@stylebot/saved-styles';
 
 // Only failures get a banner; success shows in the card's synced pill.
 export type SyncStatus = {

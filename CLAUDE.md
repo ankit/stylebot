@@ -56,7 +56,7 @@ Import another folder under `src/` only through its `@stylebot/` entry, never it
 
 ## Styles
 
-Reuse the mixins in `src/styles/mixins.scss` (prepended to every stylesheet) instead of copying their declarations; never add shared utility classes, for the specificity reason above. Mixins that only emit declarations (`button-reset`, `truncate`, `field-border`) go at the top of a rule, followed by a blank line. Mixins that emit nested rules (`focus-ring`, `dark-mode`) go with the other nested rules, after the declarations.
+Reuse the mixins in `src/scss/mixins.scss` (prepended to every stylesheet) instead of copying their declarations; never add shared utility classes, for the specificity reason above. Mixins that only emit declarations (`button-reset`, `truncate`, `field-border`) go at the top of a rule, followed by a blank line. Mixins that emit nested rules (`focus-ring`, `dark-mode`) go with the other nested rules, after the declarations.
 
 ## Commit messages
 

@@ -8,7 +8,7 @@ import {
   getStylesForPage,
   isCompiledStylesCurrent,
   isForceImportant,
-} from '@stylebot/styles';
+} from '@stylebot/saved-styles';
 
 import type {
   CompiledStyles,
@@ -23,7 +23,7 @@ import { compileStyles } from './compiled-styles';
 import { recordStyleChange } from '@stylebot/history';
 import { scheduleSyncAfterEdit } from './sync-scheduler';
 
-export { getStylesForPage } from '@stylebot/styles';
+export { getStylesForPage } from '@stylebot/saved-styles';
 
 /**
  * Pushes the current styles to every open tab and refreshes the badge

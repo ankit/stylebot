@@ -2,7 +2,7 @@ import {
   COMPILED_STYLES_KEY,
   STYLES_METADATA_KEY,
   isCompiledStylesCurrent,
-} from '@stylebot/styles';
+} from '@stylebot/saved-styles';
 import type {
   CompiledStyles,
   GetCompiledStyles,

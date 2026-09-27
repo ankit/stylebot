@@ -1,6 +1,6 @@
 import { t } from '@stylebot/i18n';
 import type { OpenStylebotFromContextMenu } from '@stylebot/types';
-import { BackgroundPageUtils } from '@stylebot/styles';
+import { isSupportedUrl } from '@stylebot/saved-styles';
 
 import { OpenOptionsPage } from './messages';
 
@@ -38,7 +38,7 @@ export const ContextMenu = {
       return;
     }
 
-    if (tab.url && BackgroundPageUtils.isValidUrl(tab.url)) {
+    if (tab.url && isSupportedUrl(tab.url)) {
       // If it is a valid url, show the contextMenu
       chrome.contextMenus.update(CONTEXT_MENU_ID, {
         documentUrlPatterns: ['<all_urls>'],
