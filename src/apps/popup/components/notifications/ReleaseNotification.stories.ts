@@ -1,7 +1,7 @@
 import type { Meta } from '@storybook/vue';
 
 import ReleaseNotification from './ReleaseNotification.vue';
-import { popup } from '@stylebot/storybook/mocks/popup';
+import { popup } from '@stylebot/storybook/fixtures/popup';
 
 const meta: Meta = {
   title: 'Browser Action/Release Notification',

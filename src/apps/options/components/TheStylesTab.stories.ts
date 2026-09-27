@@ -4,7 +4,7 @@ import TheStylesTab from './TheStylesTab.vue';
 import {
   optionsPage,
   seededStyles,
-} from '@stylebot/storybook/mocks/options-page';
+} from '@stylebot/storybook/fixtures/options';
 import { user } from '@stylebot/storybook/story-helpers';
 import { expect } from '@storybook/test';
 

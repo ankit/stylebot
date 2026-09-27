@@ -1,7 +1,7 @@
 import type { Meta } from '@storybook/vue';
 
 import Readability from './Readability.vue';
-import { popup, style } from '@stylebot/storybook/mocks/popup';
+import { popup, style } from '@stylebot/storybook/fixtures/popup';
 
 const meta: Meta = {
   title: 'Browser Action/Readability',

@@ -1,7 +1,7 @@
 import type { Meta } from '@storybook/vue';
 
 import TheBasicsTab from './TheBasicsTab.vue';
-import { optionsPage } from '@stylebot/storybook/mocks/options-page';
+import { optionsPage } from '@stylebot/storybook/fixtures/options';
 
 const meta: Meta = {
   title: 'Options/Basics',

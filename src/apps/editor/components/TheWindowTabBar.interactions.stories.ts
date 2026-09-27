@@ -3,7 +3,7 @@ import { expect, spyOn, waitFor, within } from '@storybook/test';
 
 import TheWindowTabBar from './TheWindowTabBar.vue';
 import { getPageBridge } from '@stylebot/page-bridge';
-import { editorWindow, WINDOW_TAB } from '@stylebot/storybook/editor-story';
+import { editorWindow, WINDOW_TAB } from '@stylebot/storybook/fixtures/editor';
 import { storeOf, user } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {

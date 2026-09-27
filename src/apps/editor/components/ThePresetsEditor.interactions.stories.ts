@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue';
 import { expect, waitFor, within } from '@storybook/test';
 
 import ThePresetsEditor from './ThePresetsEditor.vue';
-import { editor } from '@stylebot/storybook/editor-story';
+import { editor } from '@stylebot/storybook/fixtures/editor';
 import {
   featureSwitch,
   setRange,

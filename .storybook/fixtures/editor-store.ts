@@ -5,7 +5,7 @@ import * as postcss from 'postcss';
 import { getPrimaryFontFamily, injectCSSIntoDocument } from '@stylebot/css';
 import type { StylebotOptions } from '@stylebot/types';
 
-import mockState from '@/apps/editor/store/__mocks__/state';
+import mockState from '@/apps/editor/store/state.fixtures';
 import actions from '@/apps/editor/store/actions';
 import getters from '@/apps/editor/store/getters';
 import mutations from '@/apps/editor/store/mutations';

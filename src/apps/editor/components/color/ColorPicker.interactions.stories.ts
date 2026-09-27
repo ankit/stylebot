@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue';
 import { expect, fireEvent, waitFor, within } from '@storybook/test';
 
 import ColorPicker from './ColorPicker.vue';
-import { editor, WITH_RULE } from '@stylebot/storybook/editor-story';
+import { editor, WITH_RULE } from '@stylebot/storybook/fixtures/editor';
 import type { Canvas } from '@stylebot/storybook/story-helpers';
 import {
   cardCollapse,

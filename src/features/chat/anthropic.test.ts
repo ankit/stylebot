@@ -2,7 +2,7 @@ import type { ChatStreamEvent, ChatTurn } from '@stylebot/types';
 
 import { anthropicProvider, toAnthropicMessages } from './providers/anthropic';
 import { getModel } from './providers';
-import { sse, streamResponse } from './__fixtures__/stream';
+import { sse, streamResponse } from './stream.fixtures';
 
 const fetchMock = jest.fn();
 
