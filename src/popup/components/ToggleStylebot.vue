@@ -1,23 +1,23 @@
 <template>
-  <pill-button @click="toggle">
+  <s-pill-button @click="toggle">
     {{ label }}
     <template v-if="shortcut" #trailing>
-      <shortcut-chip muted :value="shortcut" />
+      <s-shortcut-chip muted :value="shortcut" />
     </template>
-  </pill-button>
+  </s-pill-button>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import { toggleStylebot } from '../utils';
-import { PillButton, ShortcutChip } from '@stylebot/components';
+import { SPillButton, SShortcutChip } from '@stylebot/components';
 
 export default Vue.extend({
   name: 'ToggleStylebot',
 
   components: {
-    PillButton,
-    ShortcutChip,
+    SPillButton,
+    SShortcutChip,
   },
 
   props: {

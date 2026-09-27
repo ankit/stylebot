@@ -1,5 +1,5 @@
 <template>
-  <theme-provider class="options-app" :mode="appearance">
+  <s-theme-provider class="options-app" :mode="appearance">
     <the-navigation
       class="nav"
       :tabs="tabs"
@@ -20,7 +20,7 @@
     <div class="nav-footer">
       <the-navigation-footer />
     </div>
-  </theme-provider>
+  </s-theme-provider>
 </template>
 
 <script lang="ts">
@@ -28,7 +28,7 @@ import Vue from 'vue';
 import type { RawLocation } from 'vue-router';
 
 import type { StylebotAppearance } from '@stylebot/types';
-import { ThemeProvider } from '@stylebot/components';
+import { SThemeProvider } from '@stylebot/components';
 
 import TheNavigation from './components/TheNavigation.vue';
 import TheNavigationFooter from './components/navigation/TheNavigationFooter.vue';
@@ -40,7 +40,7 @@ export default Vue.extend({
   components: {
     TheNavigation,
     TheNavigationFooter,
-    ThemeProvider,
+    SThemeProvider,
   },
 
   data(): {

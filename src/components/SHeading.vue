@@ -12,7 +12,7 @@ type Size = 'xl' | 'lg' | 'md' | 'sm';
 type As = 'h1' | 'h2' | 'h3' | 'div';
 
 export default Vue.extend({
-  name: 'Heading',
+  name: 'SHeading',
 
   props: {
     size: {

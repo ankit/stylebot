@@ -1,5 +1,5 @@
 <template>
-  <anchored-menu class="chat-model-anchor">
+  <s-anchored-menu class="chat-model-anchor">
     <template #trigger="{ toggle, open }">
       <button
         type="button"
@@ -22,7 +22,7 @@
 
     <template #default="{ close }">
       <s-menu ref="menu" dense :min-width="270">
-        <menu-item
+        <s-menu-item
           v-if="level"
           class="chat-model-back"
           @click="openLevel(null)"
@@ -31,7 +31,7 @@
             <chevron-left-icon :size="12" class="chat-menu-icon" />
             {{ shown.name }}
           </span>
-        </menu-item>
+        </s-menu-item>
         <s-text
           v-else
           size="caption"
@@ -41,7 +41,7 @@
           {{ t('provider_models', [shown.name]) }}
         </s-text>
 
-        <menu-item
+        <s-menu-item
           v-for="option in shown.models"
           :key="option.id"
           :selected="isCurrent(option)"
@@ -60,12 +60,12 @@
               {{ describe(option) }}
             </s-text>
           </span>
-        </menu-item>
+        </s-menu-item>
 
         <template v-if="!level">
           <template v-if="others.length">
             <hr class="chat-model-divider" />
-            <menu-item
+            <s-menu-item
               v-for="other in others"
               :key="other.id"
               aria-haspopup="menu"
@@ -78,12 +78,12 @@
                 </s-text>
                 <chevron-right-icon :size="10" class="chat-menu-icon" />
               </span>
-            </menu-item>
+            </s-menu-item>
           </template>
 
           <hr class="chat-model-divider" />
 
-          <menu-item
+          <s-menu-item
             :disabled="!hasTurns"
             @click="
               $emit('new-chat');
@@ -94,8 +94,8 @@
               <compose-icon :size="14" class="chat-menu-icon" />
               {{ t('new_chat') }}
             </span>
-          </menu-item>
-          <menu-item
+          </s-menu-item>
+          <s-menu-item
             @click="
               $emit('providers');
               close();
@@ -105,17 +105,17 @@
               <key-icon :size="14" class="chat-menu-icon" />
               {{ t('providers') }}
             </span>
-          </menu-item>
+          </s-menu-item>
         </template>
       </s-menu>
     </template>
-  </anchored-menu>
+  </s-anchored-menu>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 
-import { AnchoredMenu, MenuItem, SMenu, SText } from '@stylebot/components';
+import { SAnchoredMenu, SMenuItem, SMenu, SText } from '@stylebot/components';
 import {
   ChevronDownIcon,
   ChevronLeftIcon,
@@ -140,13 +140,13 @@ export default Vue.extend({
   name: 'ChatModelMenu',
 
   components: {
-    AnchoredMenu,
+    SAnchoredMenu,
     ChevronDownIcon,
     ChevronLeftIcon,
     ChevronRightIcon,
     ComposeIcon,
     KeyIcon,
-    MenuItem,
+    SMenuItem,
     SMenu,
     SText,
   },

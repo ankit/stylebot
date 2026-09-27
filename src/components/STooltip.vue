@@ -23,7 +23,7 @@
       }"
     >
       <span class="tooltip-text">{{ text }}</span>
-      <shortcut-kbd
+      <s-shortcut-kbd
         v-if="shortcut"
         small
         class="tooltip-shortcut"
@@ -36,7 +36,7 @@
 <script lang="ts">
 import type { PropType } from 'vue';
 import Vue from 'vue';
-import ShortcutKbd from './ShortcutKbd.vue';
+import SShortcutKbd from './SShortcutKbd.vue';
 
 // Delay before showing, to avoid flashing a tooltip on every incidental
 // mouse pass; hiding is instant so it never lingers.
@@ -72,7 +72,7 @@ export default Vue.extend({
   name: 'STooltip',
 
   components: {
-    ShortcutKbd,
+    SShortcutKbd,
   },
 
   props: {

@@ -1,12 +1,12 @@
 import type { Meta } from '@storybook/vue';
 
-import IconButton from './IconButton.vue';
+import SIconButton from './SIconButton.vue';
 import { MoreIcon, SunIcon, InspectorIcon, IconX } from '@stylebot/icons';
 import { matrix, playground } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
-  title: 'Primitives/Buttons/IconButton',
-  component: IconButton,
+  title: 'Primitives/Buttons/SIconButton',
+  component: SIconButton,
   argTypes: {
     bordered: { control: 'boolean' },
     size: { control: { type: 'number', min: 20, max: 48 } },
@@ -20,14 +20,14 @@ const meta: Meta = {
 
 export default meta;
 
-const components = { IconButton, MoreIcon, SunIcon, InspectorIcon, IconX };
+const components = { SIconButton, MoreIcon, SunIcon, InspectorIcon, IconX };
 
 export const Playground = playground(
   components,
   `
-  <icon-button :bordered="bordered" :size="size || undefined" title="Action">
+  <s-icon-button :bordered="bordered" :size="size || undefined" title="Action">
     <component :is="icon" :size="16" />
-  </icon-button>
+  </s-icon-button>
 `
 );
 
@@ -42,17 +42,17 @@ export const Variants = matrix({
     {
       label: 'More',
       cell: attrs =>
-        `<icon-button ${attrs} title="More"><more-icon :size="16" /></icon-button>`,
+        `<s-icon-button ${attrs} title="More"><more-icon :size="16" /></s-icon-button>`,
     },
     {
       label: 'Appearance',
       cell: attrs =>
-        `<icon-button ${attrs} title="Appearance"><sun-icon :size="16" /></icon-button>`,
+        `<s-icon-button ${attrs} title="Appearance"><sun-icon :size="16" /></s-icon-button>`,
     },
     {
       label: 'Close',
       cell: attrs =>
-        `<icon-button ${attrs} title="Close"><icon-x :size="16" /></icon-button>`,
+        `<s-icon-button ${attrs} title="Close"><icon-x :size="16" /></s-icon-button>`,
     },
   ],
 });

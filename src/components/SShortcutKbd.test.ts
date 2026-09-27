@@ -5,16 +5,18 @@ jest.mock('./utils/format-shortcut', () => ({
 }));
 
 import { formatShortcut } from './utils/format-shortcut';
-import ShortcutKbd from './ShortcutKbd.vue';
+import SShortcutKbd from './SShortcutKbd.vue';
 
-describe('ShortcutKbd.vue', () => {
+describe('SShortcutKbd.vue', () => {
   it('renders one <kbd> per part with the joiner between them', () => {
     (formatShortcut as jest.Mock).mockReturnValue({
       parts: [{ text: 'Alt' }, { text: 'Shift' }, { text: 'R' }],
       joiner: '+',
     });
 
-    const wrapper = mount(ShortcutKbd, { propsData: { value: 'alt+shift+r' } });
+    const wrapper = mount(SShortcutKbd, {
+      propsData: { value: 'alt+shift+r' },
+    });
     const kbds = wrapper.findAll('kbd');
 
     expect(kbds.length).toBe(3);
@@ -34,7 +36,9 @@ describe('ShortcutKbd.vue', () => {
       joiner: '',
     });
 
-    const wrapper = mount(ShortcutKbd, { propsData: { value: 'alt+shift+r' } });
+    const wrapper = mount(SShortcutKbd, {
+      propsData: { value: 'alt+shift+r' },
+    });
 
     expect(wrapper.findAll('kbd').length).toBe(3);
     wrapper.findAll('.joiner').wrappers.forEach(joiner => {
@@ -48,7 +52,7 @@ describe('ShortcutKbd.vue', () => {
       joiner: '',
     });
 
-    const wrapper = mount(ShortcutKbd, { propsData: { value: 'alt+r' } });
+    const wrapper = mount(SShortcutKbd, { propsData: { value: 'alt+r' } });
     const kbds = wrapper.findAll('kbd');
 
     expect(kbds.at(0).find('svg').exists()).toBe(true);

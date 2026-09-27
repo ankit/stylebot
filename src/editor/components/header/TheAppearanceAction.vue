@@ -1,21 +1,21 @@
 <template>
-  <anchored-menu class="appearance-action-anchor">
+  <s-anchored-menu class="appearance-action-anchor">
     <template #trigger="{ toggle }">
       <s-tooltip :text="t('panel_appearance')">
-        <icon-button
+        <s-icon-button
           :size="20"
           :aria-label="t('panel_appearance')"
           @click="toggle"
         >
           <sun-icon v-if="resolvedTheme === 'light'" />
           <moon-icon v-else />
-        </icon-button>
+        </s-icon-button>
       </s-tooltip>
     </template>
 
     <template #default="{ close }">
       <s-menu dense class="appearance-menu">
-        <menu-item
+        <s-menu-item
           :selected="appearance === 'light'"
           @click="
             setAppearance('light');
@@ -26,9 +26,9 @@
             <sun-icon />
             <span>{{ t('appearance_light') }}</span>
           </span>
-        </menu-item>
+        </s-menu-item>
 
-        <menu-item
+        <s-menu-item
           :selected="appearance === 'dark'"
           @click="
             setAppearance('dark');
@@ -39,9 +39,9 @@
             <moon-icon />
             <span>{{ t('appearance_dark') }}</span>
           </span>
-        </menu-item>
+        </s-menu-item>
 
-        <menu-item
+        <s-menu-item
           :selected="appearance === 'system'"
           @click="
             setAppearance('system');
@@ -52,19 +52,19 @@
             <monitor-icon />
             <span>{{ t('appearance_system') }}</span>
           </span>
-        </menu-item>
+        </s-menu-item>
       </s-menu>
     </template>
-  </anchored-menu>
+  </s-anchored-menu>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import {
-  AnchoredMenu,
+  SAnchoredMenu,
   SMenu,
-  MenuItem,
-  IconButton,
+  SMenuItem,
+  SIconButton,
   STooltip,
 } from '@stylebot/components';
 import { SunIcon, MoonIcon, MonitorIcon } from '@stylebot/icons';
@@ -76,10 +76,10 @@ export default Vue.extend({
   name: 'TheAppearanceAction',
 
   components: {
-    AnchoredMenu,
+    SAnchoredMenu,
     SMenu,
-    MenuItem,
-    IconButton,
+    SMenuItem,
+    SIconButton,
     STooltip,
     SunIcon,
     MoonIcon,

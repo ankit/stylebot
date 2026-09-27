@@ -2,7 +2,7 @@ import type { Meta } from '@storybook/vue';
 import { within } from '@storybook/test';
 
 import SAutocomplete from './SAutocomplete.vue';
-import MenuItem from './MenuItem.vue';
+import SMenuItem from './SMenuItem.vue';
 import {
   findOpenMenu,
   fromTemplate,
@@ -32,7 +32,7 @@ const meta: Meta = {
 
 export default meta;
 
-const components = { SAutocomplete, MenuItem };
+const components = { SAutocomplete, SMenuItem };
 
 const data = () => ({
   items: [
@@ -44,7 +44,7 @@ const data = () => ({
 
 const item = `
   <template #item="{ item, select }">
-    <menu-item @click="select">{{ item.value }}</menu-item>
+    <s-menu-item @click="select">{{ item.value }}</s-menu-item>
   </template>`;
 
 export const Playground = playground(

@@ -192,7 +192,7 @@ export const numberInput = (control: HTMLElement): HTMLInputElement =>
   control.querySelector('.number-input') as HTMLInputElement;
 
 /**
- * Resolves with the open menu once AnchoredMenu has positioned it — it
+ * Resolves with the open menu once SAnchoredMenu has positioned it — it
  * renders hidden for a tick first, so presence alone isn't enough.
  */
 export const findOpenMenu = async (canvas: Canvas): Promise<HTMLElement> => {

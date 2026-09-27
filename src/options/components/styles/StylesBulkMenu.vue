@@ -1,32 +1,32 @@
 <template>
-  <anchored-menu>
+  <s-anchored-menu>
     <template #trigger="{ toggle }">
       <icon-menu-trigger :size="38" title="More actions" @click="toggle" />
     </template>
 
     <template #default="{ close }">
       <s-menu dense :min-width="176">
-        <menu-item
+        <s-menu-item
           @click="
             $emit('enable-all');
             close();
           "
         >
           Enable all
-        </menu-item>
+        </s-menu-item>
 
-        <menu-item
+        <s-menu-item
           @click="
             $emit('disable-all');
             close();
           "
         >
           Disable all
-        </menu-item>
+        </s-menu-item>
 
         <div class="divider" />
 
-        <menu-item
+        <s-menu-item
           danger
           @click="
             $emit('delete-all');
@@ -34,26 +34,26 @@
           "
         >
           Delete all styles
-        </menu-item>
+        </s-menu-item>
       </s-menu>
     </template>
-  </anchored-menu>
+  </s-anchored-menu>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 
-import { AnchoredMenu, SMenu, MenuItem } from '@stylebot/components';
+import { SAnchoredMenu, SMenu, SMenuItem } from '@stylebot/components';
 import IconMenuTrigger from '../IconMenuTrigger.vue';
 
 export default Vue.extend({
   name: 'StylesBulkMenu',
 
   components: {
-    AnchoredMenu,
+    SAnchoredMenu,
     IconMenuTrigger,
     SMenu,
-    MenuItem,
+    SMenuItem,
   },
 });
 </script>

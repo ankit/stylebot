@@ -2,7 +2,7 @@ import type { Meta } from '@storybook/vue';
 import { within } from '@storybook/test';
 
 import SSelect from './SSelect.vue';
-import MenuItem from './MenuItem.vue';
+import SMenuItem from './SMenuItem.vue';
 import {
   findOpenMenu,
   fromTemplate,
@@ -30,16 +30,16 @@ const meta: Meta = {
 
 export default meta;
 
-const components = { SSelect, MenuItem };
+const components = { SSelect, SMenuItem };
 
 const FONTS = ['Helvetica', 'Montserrat', 'Merriweather', 'Fira Code'];
 const data = () => ({ fonts: FONTS });
 
 const items = `
   <template #default="{ close }">
-    <menu-item v-for="font in fonts" :key="font" :selected="font === 'Merriweather'" @click="close">
+    <s-menu-item v-for="font in fonts" :key="font" :selected="font === 'Merriweather'" @click="close">
       {{ font }}
-    </menu-item>
+    </s-menu-item>
   </template>`;
 
 export const Playground = playground(

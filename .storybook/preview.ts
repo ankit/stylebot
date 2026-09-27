@@ -10,7 +10,7 @@ import {
 import type { Preview } from '@storybook/vue';
 
 import { t } from '@stylebot/i18n';
-import { ThemeProvider } from '@stylebot/components';
+import { SThemeProvider } from '@stylebot/components';
 import { installChrome } from './mocks/chrome';
 import { resetHoverSettled, setInteractionDelay } from './story-helpers';
 import { setPageBridge, LocalPageBridge } from '@stylebot/page-bridge';
@@ -164,22 +164,22 @@ const preview: Preview = {
       resetPageBridge();
 
       // Composites read their appearance from options, so the toolbar theme
-      // flows through the shim as well as the outer ThemeProvider.
+      // flows through the shim as well as the outer SThemeProvider.
       installChrome({
         ...parameters.chrome,
         options: { appearance: globals.theme, ...parameters.chrome?.options },
       });
 
       return {
-        components: { ThemeProvider },
+        components: { SThemeProvider },
         data: () => ({
           mode: globals.theme,
           padded: parameters.padded !== false,
         }),
         template: `
-          <theme-provider :mode="mode" class="sb-canvas" :class="{ padded }">
+          <s-theme-provider :mode="mode" class="sb-canvas" :class="{ padded }">
             <story />
-          </theme-provider>
+          </s-theme-provider>
         `,
       };
     },

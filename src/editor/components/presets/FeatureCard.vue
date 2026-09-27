@@ -1,9 +1,9 @@
 <template>
   <s-card class="feature-card">
     <div class="feature-card-header">
-      <heading as="h3" size="sm" :class="{ muted: disabled }">
+      <s-heading as="h3" size="sm" :class="{ muted: disabled }">
         {{ label }}
-      </heading>
+      </s-heading>
       <slot name="toggle" />
     </div>
 
@@ -15,13 +15,13 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { Heading, SCard } from '@stylebot/components';
+import { SHeading, SCard } from '@stylebot/components';
 
 export default Vue.extend({
   name: 'FeatureCard',
 
   components: {
-    Heading,
+    SHeading,
     SCard,
   },
 

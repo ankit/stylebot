@@ -9,7 +9,7 @@
         {{ t('image_size_kb', [size]) }}
       </s-text>
     </span>
-    <icon-button
+    <s-icon-button
       :size="22"
       class="chat-image-attachment-remove"
       :title="t('remove')"
@@ -17,7 +17,7 @@
       @click="$emit('remove')"
     >
       <icon-x :size="12" />
-    </icon-button>
+    </s-icon-button>
   </div>
 </template>
 
@@ -25,7 +25,7 @@
 import type { PropType } from 'vue';
 import Vue from 'vue';
 
-import { IconButton, SText } from '@stylebot/components';
+import { SIconButton, SText } from '@stylebot/components';
 import { IconX } from '@stylebot/icons';
 import type { ChatImage } from '@stylebot/types';
 
@@ -36,7 +36,7 @@ export default Vue.extend({
   name: 'ChatImageAttachment',
 
   components: {
-    IconButton,
+    SIconButton,
     IconX,
     SText,
   },

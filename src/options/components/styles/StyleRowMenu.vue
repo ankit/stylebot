@@ -1,5 +1,5 @@
 <template>
-  <anchored-menu>
+  <s-anchored-menu>
     <template #trigger="{ toggle }">
       <icon-menu-trigger
         :size="size"
@@ -11,7 +11,7 @@
 
     <template #default="{ close }">
       <s-menu dense :min-width="200">
-        <menu-item
+        <s-menu-item
           class="truncate"
           @click="
             $emit('open-site');
@@ -19,20 +19,20 @@
           "
         >
           Open {{ url }}
-        </menu-item>
+        </s-menu-item>
 
-        <menu-item
+        <s-menu-item
           @click="
             $emit('copy-css');
             close();
           "
         >
           Copy CSS
-        </menu-item>
+        </s-menu-item>
 
         <div class="divider" />
 
-        <menu-item
+        <s-menu-item
           danger
           @click="
             $emit('delete');
@@ -40,26 +40,26 @@
           "
         >
           Delete this site's style
-        </menu-item>
+        </s-menu-item>
       </s-menu>
     </template>
-  </anchored-menu>
+  </s-anchored-menu>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 
-import { AnchoredMenu, SMenu, MenuItem } from '@stylebot/components';
+import { SAnchoredMenu, SMenu, SMenuItem } from '@stylebot/components';
 import IconMenuTrigger from '../IconMenuTrigger.vue';
 
 export default Vue.extend({
   name: 'StyleRowMenu',
 
   components: {
-    AnchoredMenu,
+    SAnchoredMenu,
     IconMenuTrigger,
     SMenu,
-    MenuItem,
+    SMenuItem,
   },
 
   props: {

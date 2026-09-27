@@ -26,7 +26,7 @@
   box-shadow: inset 0 0 0 1px var(--accent);
 }
 
-// Dark styling that respects ThemeProvider's manual override, not just the OS setting.
+// Dark styling that respects SThemeProvider's manual override, not just the OS setting.
 @mixin dark-mode {
   @media (prefers-color-scheme: dark) {
     .theme-provider:not([data-theme]) & {

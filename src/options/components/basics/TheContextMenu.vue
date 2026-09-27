@@ -1,28 +1,28 @@
 <template>
   <div class="card">
-    <toggle-switch
+    <s-toggle-switch
       size="lg"
       :value="contextMenu"
       @change="contextMenu = $event"
     >
-      <heading as="h2" size="md">{{ t('right_click_menu') }}</heading>
+      <s-heading as="h2" size="md">{{ t('right_click_menu') }}</s-heading>
       <s-text variant="muted" class="description">
         {{ t('right_click_menu_description') }}
       </s-text>
-    </toggle-switch>
+    </s-toggle-switch>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import { ToggleSwitch, Heading, SText } from '@stylebot/components';
+import { SToggleSwitch, SHeading, SText } from '@stylebot/components';
 
 export default Vue.extend({
   name: 'TheContextMenu',
 
   components: {
-    ToggleSwitch,
-    Heading,
+    SToggleSwitch,
+    SHeading,
     SText,
   },
 

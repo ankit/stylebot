@@ -37,7 +37,7 @@ const MODIFIER_ICONS: Record<ModifierIcon, Component> = {
 };
 
 export default Vue.extend({
-  name: 'ShortcutKbd',
+  name: 'SShortcutKbd',
 
   props: {
     value: {

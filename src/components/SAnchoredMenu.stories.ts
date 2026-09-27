@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/vue';
 
-import AnchoredMenu from './AnchoredMenu.vue';
+import SAnchoredMenu from './SAnchoredMenu.vue';
 import SMenu from './SMenu.vue';
-import MenuItem from './MenuItem.vue';
+import SMenuItem from './SMenuItem.vue';
 import SButton from './SButton.vue';
 import { within } from '@storybook/test';
 
@@ -13,29 +13,29 @@ import {
 } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
-  title: 'Primitives/Overlays/AnchoredMenu',
-  component: AnchoredMenu,
+  title: 'Primitives/Overlays/SAnchoredMenu',
+  component: SAnchoredMenu,
 };
 
 export default meta;
 
-const components = { AnchoredMenu, SMenu, MenuItem, SButton };
+const components = { SAnchoredMenu, SMenu, SMenuItem, SButton };
 
 /* Panels hang off the trigger's right edge, so anchor it right of a box. */
 const menu = (wrapperStyle: string): string => `
   <div class="sb-anchor-right" style="${wrapperStyle}">
-    <anchored-menu>
+    <s-anchored-menu>
       <template #trigger="{ toggle }">
         <s-button variant="ghost" @click="toggle">Open menu</s-button>
       </template>
       <template #default="{ close }">
         <s-menu dense>
-          <menu-item @click="close">Dock left</menu-item>
-          <menu-item @click="close">Dock right</menu-item>
-          <menu-item @click="close">Adjust page layout</menu-item>
+          <s-menu-item @click="close">Dock left</s-menu-item>
+          <s-menu-item @click="close">Dock right</s-menu-item>
+          <s-menu-item @click="close">Adjust page layout</s-menu-item>
         </s-menu>
       </template>
-    </anchored-menu>
+    </s-anchored-menu>
   </div>
 `;
 

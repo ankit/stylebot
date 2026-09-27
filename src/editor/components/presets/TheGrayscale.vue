@@ -1,7 +1,7 @@
 <template>
   <feature-card :label="t('grayscale')">
     <template #toggle>
-      <toggle-switch size="lg" :value="active" @change="toggleActive" />
+      <s-toggle-switch size="lg" :value="active" @change="toggleActive" />
     </template>
 
     <s-text variant="muted">
@@ -24,7 +24,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { ToggleSwitch, SText, SSlider } from '@stylebot/components';
+import { SToggleSwitch, SText, SSlider } from '@stylebot/components';
 
 import FeatureCard from './FeatureCard.vue';
 
@@ -33,7 +33,7 @@ export default Vue.extend({
 
   components: {
     FeatureCard,
-    ToggleSwitch,
+    SToggleSwitch,
     SText,
     SSlider,
   },

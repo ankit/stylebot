@@ -1,5 +1,5 @@
 <template>
-  <anchored-menu class="select" :class="{ 'full-width': fullWidth }">
+  <s-anchored-menu class="select" :class="{ 'full-width': fullWidth }">
     <template #trigger="{ toggle, open }">
       <button
         type="button"
@@ -22,7 +22,7 @@
         <slot :close="close" />
       </s-menu>
     </template>
-  </anchored-menu>
+  </s-anchored-menu>
 </template>
 
 <script lang="ts">
@@ -30,14 +30,14 @@ import Vue from 'vue';
 
 import { ChevronDownIcon } from '@stylebot/icons';
 
-import AnchoredMenu from './AnchoredMenu.vue';
+import SAnchoredMenu from './SAnchoredMenu.vue';
 import SMenu from './SMenu.vue';
 
 export default Vue.extend({
   name: 'SSelect',
 
   components: {
-    AnchoredMenu,
+    SAnchoredMenu,
     SMenu,
     ChevronDownIcon,
   },

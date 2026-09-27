@@ -1,21 +1,21 @@
 <template>
   <s-tooltip :text="t('close')" :shortcut="shortcut">
-    <icon-button :size="20" :aria-label="t('close')" @click="onClick">
+    <s-icon-button :size="20" :aria-label="t('close')" @click="onClick">
       <icon-x :size="14" />
-    </icon-button>
+    </s-icon-button>
   </s-tooltip>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import { IconButton, isMac, STooltip } from '@stylebot/components';
+import { SIconButton, isMac, STooltip } from '@stylebot/components';
 import { IconX } from '@stylebot/icons';
 
 export default Vue.extend({
   name: 'TheCloseAction',
 
   components: {
-    IconButton,
+    SIconButton,
     STooltip,
     IconX,
   },

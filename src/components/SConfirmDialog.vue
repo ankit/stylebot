@@ -7,7 +7,9 @@
       aria-labelledby="confirm-dialog-title"
       aria-describedby="confirm-dialog-message"
     >
-      <heading id="confirm-dialog-title" as="h2" size="md">{{ title }}</heading>
+      <s-heading id="confirm-dialog-title" as="h2" size="md">
+        {{ title }}
+      </s-heading>
       <s-text
         id="confirm-dialog-message"
         size="caption"
@@ -32,14 +34,14 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { Heading, SText, SButton, SDialog } from '@stylebot/components';
+import { SHeading, SText, SButton, SDialog } from '@stylebot/components';
 
 export default Vue.extend({
-  name: 'ConfirmDialog',
+  name: 'SConfirmDialog',
 
   components: {
     SButton,
-    Heading,
+    SHeading,
     SText,
     SDialog,
   },

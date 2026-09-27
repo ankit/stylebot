@@ -16,7 +16,7 @@ describe('Style.vue', () => {
   it('should forward a click on the header padding to the nested checkbox in header mode', async () => {
     const wrapper = mount(Style, {
       propsData: { url: 'example.com', header: true },
-      stubs: { ShortcutChip: stub },
+      stubs: { SShortcutChip: stub },
     });
 
     const input = wrapper.find('input').element as HTMLInputElement;
@@ -32,7 +32,7 @@ describe('Style.vue', () => {
   it('should not double-forward when the click already landed on the label in header mode', async () => {
     const wrapper = mount(Style, {
       propsData: { url: 'example.com', header: true },
-      stubs: { ShortcutChip: stub },
+      stubs: { SShortcutChip: stub },
     });
 
     const input = wrapper.find('input').element as HTMLInputElement;
@@ -46,7 +46,7 @@ describe('Style.vue', () => {
   it('should not forward clicks when disabled in header mode', async () => {
     const wrapper = mount(Style, {
       propsData: { url: 'example.com', header: true, disableToggle: true },
-      stubs: { ShortcutChip: stub },
+      stubs: { SShortcutChip: stub },
     });
 
     const input = wrapper.find('input').element as HTMLInputElement;

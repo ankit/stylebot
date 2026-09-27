@@ -10,7 +10,7 @@
       <div v-if="recording" class="content">
         <div class="capture-row">
           <span class="capture-field">
-            <shortcut-kbd v-if="liveModifiers" :value="liveModifiers" />
+            <s-shortcut-kbd v-if="liveModifiers" :value="liveModifiers" />
             <span class="placeholder">_</span>
           </span>
           <button type="button" class="cancel" @click="cancelRecording">
@@ -22,7 +22,7 @@
           <template v-if="hasValue">
             {{ t('esc_keeps') }}
             <span class="chip chip-inline">
-              <shortcut-kbd :value="value" />
+              <s-shortcut-kbd :value="value" />
             </span>
           </template>
           <template v-else>{{ t('esc_cancels') }}</template>
@@ -32,17 +32,17 @@
       <div v-else-if="hasValue" class="content">
         <div class="header-row">
           <div class="title">{{ t('readability_shortcut') }}</div>
-          <shortcut-chip :value="value" />
+          <s-shortcut-chip :value="value" />
         </div>
         <s-text size="caption" variant="muted" class="desc">
           {{ t('readability_shortcut_description') }}
         </s-text>
         <div class="divider" />
         <div class="actions">
-          <menu-item @click="startRecording">
+          <s-menu-item @click="startRecording">
             {{ t('change_shortcut') }}
-          </menu-item>
-          <menu-item danger @click="remove">{{ t('remove') }}</menu-item>
+          </s-menu-item>
+          <s-menu-item danger @click="remove">{{ t('remove') }}</s-menu-item>
         </div>
       </div>
 
@@ -82,9 +82,9 @@ import {
 import { shortcutStore } from './shortcut-store';
 
 import {
-  MenuItem,
-  ShortcutChip,
-  ShortcutKbd,
+  SMenuItem,
+  SShortcutChip,
+  SShortcutKbd,
   SMenu,
   SText,
 } from '@stylebot/components';
@@ -94,9 +94,9 @@ export default Vue.extend({
   name: 'ShortcutMenu',
 
   components: {
-    MenuItem,
-    ShortcutKbd,
-    ShortcutChip,
+    SMenuItem,
+    SShortcutKbd,
+    SShortcutChip,
     SMenu,
     SText,
     IconKeyboard,

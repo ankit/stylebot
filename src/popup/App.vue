@@ -1,14 +1,14 @@
 <template>
-  <theme-provider class="popup" :mode="appearance">
+  <s-theme-provider class="popup" :mode="appearance">
     <div v-if="restricted">
       <div class="popup-header">
-        <heading
+        <s-heading
           as="h1"
           size="md"
           class="popup-header-domain popup-header-domain--muted"
         >
           {{ tab.url }}
-        </heading>
+        </s-heading>
       </div>
 
       <div class="popup-divider" />
@@ -34,9 +34,9 @@
         :shortcut="styleShortcut"
       />
       <div v-else class="popup-header">
-        <heading as="h1" size="md" class="popup-header-domain">
+        <s-heading as="h1" size="md" class="popup-header-domain">
           {{ domain }}
-        </heading>
+        </s-heading>
         <s-text variant="muted">
           {{ t('no_style_saved_for_site') }}
         </s-text>
@@ -80,12 +80,12 @@
 
       <release-notification />
     </div>
-  </theme-provider>
+  </s-theme-provider>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import { Heading, SText, ThemeProvider } from '@stylebot/components';
+import { SHeading, SText, SThemeProvider } from '@stylebot/components';
 
 import StyleComponent from './components/Style.vue';
 import SettingsButton from './components/SettingsButton.vue';
@@ -112,9 +112,9 @@ export default Vue.extend({
   name: 'App',
 
   components: {
-    Heading,
+    SHeading,
     SText,
-    ThemeProvider,
+    SThemeProvider,
     SettingsButton,
     StyleComponent,
     ToggleStylebot,

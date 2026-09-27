@@ -20,7 +20,7 @@ import Vue from 'vue';
 type Size = 'sm' | 'lg';
 
 export default Vue.extend({
-  name: 'ToggleSwitch',
+  name: 'SToggleSwitch',
 
   model: {
     prop: 'value',

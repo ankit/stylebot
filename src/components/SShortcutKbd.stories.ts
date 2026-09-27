@@ -1,42 +1,37 @@
 import type { Meta } from '@storybook/vue';
 
-import ShortcutChip from './ShortcutChip.vue';
+import SShortcutKbd from './SShortcutKbd.vue';
 import { matrix, playground } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
-  title: 'Primitives/Display/ShortcutChip',
-  component: ShortcutChip,
+  title: 'Primitives/Display/SShortcutKbd',
+  component: SShortcutKbd,
   argTypes: {
     value: { control: 'text' },
     small: { control: 'boolean' },
-    muted: { control: 'boolean' },
     mac: { control: 'boolean' },
   },
-  args: { value: 'alt+shift+m', small: false, muted: false },
+  args: { value: 'alt+shift+r', small: false },
 };
 
 export default meta;
 
 export const Playground = playground(
-  { ShortcutChip },
-  `<shortcut-chip :value="value" :small="small" :muted="muted" :mac="mac" />`
+  { SShortcutKbd },
+  `<s-shortcut-kbd :value="value" :small="small" :mac="mac" />`
 );
 
 export const Variants = matrix({
-  components: { ShortcutChip },
+  components: { SShortcutKbd },
   rows: [
-    { label: 'default', attrs: '' },
-    { label: 'small', attrs: 'small' },
+    { label: 'alt+shift+r', attrs: 'value="alt+shift+r"' },
+    { label: 'ctrl+k', attrs: 'value="ctrl+k"' },
+    { label: 'Escape', attrs: 'value="Escape"' },
+    { label: '?', attrs: 'value="?"' },
   ],
   columns: [
-    {
-      label: 'Default',
-      cell: attrs => `<shortcut-chip ${attrs} value="alt+shift+m" />`,
-    },
-    {
-      label: 'Muted',
-      cell: attrs => `<shortcut-chip ${attrs} muted value="Escape" />`,
-    },
+    { label: 'Default', cell: attrs => `<s-shortcut-kbd ${attrs} />` },
+    { label: 'Small', cell: attrs => `<s-shortcut-kbd ${attrs} small />` },
   ],
 });
 
@@ -45,13 +40,13 @@ export const Variants = matrix({
  * readable words instead (Alt/Shift/Win/Ctrl), so both need coverage.
  */
 export const ModifierKeys = matrix({
-  components: { ShortcutChip },
+  components: { SShortcutKbd },
   rows: [
     { label: 'Option', attrs: 'value="alt"' },
     { label: 'Shift', attrs: 'value="shift"' },
     { label: 'Command', attrs: 'value="command"' },
     { label: 'Control', attrs: 'value="ctrl"' },
-    { label: 'Option + Shift + M', attrs: 'value="alt+shift+m"' },
+    { label: 'Option + Shift + R', attrs: 'value="alt+shift+r"' },
     { label: 'Command + K', attrs: 'value="command+k"' },
     { label: 'Shift + Control + K', attrs: 'value="shift+ctrl+k"' },
     { label: 'Command + Shift + P', attrs: 'value="command+shift+p"' },
@@ -63,10 +58,10 @@ export const ModifierKeys = matrix({
     },
   ],
   columns: [
-    { label: 'macOS', cell: attrs => `<shortcut-chip ${attrs} mac />` },
+    { label: 'macOS', cell: attrs => `<s-shortcut-kbd ${attrs} mac />` },
     {
       label: 'Windows',
-      cell: attrs => `<shortcut-chip ${attrs} :mac="false" />`,
+      cell: attrs => `<s-shortcut-kbd ${attrs} :mac="false" />`,
     },
   ],
 });

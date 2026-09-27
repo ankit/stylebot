@@ -1,14 +1,14 @@
 <template>
-  <theme-provider class="stylebot-app" :mode="appearance">
+  <s-theme-provider class="stylebot-app" :mode="appearance">
     <the-stylebot v-if="visible" />
     <the-keyboard-shortcuts />
-  </theme-provider>
+  </s-theme-provider>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import type { StylebotCommands, StylebotAppearance } from '@stylebot/types';
-import { ThemeProvider } from '@stylebot/components';
+import { SThemeProvider } from '@stylebot/components';
 
 import TheStylebot from './TheStylebot.vue';
 import TheKeyboardShortcuts from './shortcuts/TheKeyboardShortcuts.vue';
@@ -17,7 +17,7 @@ export default Vue.extend({
   name: 'App',
 
   components: {
-    ThemeProvider,
+    SThemeProvider,
     TheStylebot,
     TheKeyboardShortcuts,
   },

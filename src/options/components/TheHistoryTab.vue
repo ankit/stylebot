@@ -4,7 +4,7 @@
       {{ t('restore_success') }}
     </sync-status-banner>
 
-    <heading as="h1" size="xl">{{ t('history_options') }}</heading>
+    <s-heading as="h1" size="xl">{{ t('history_options') }}</s-heading>
     <s-text variant="muted" class="description">
       {{ t('history_tab_description') }}
     </s-text>
@@ -16,7 +16,7 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { Heading, SText } from '@stylebot/components';
+import { SHeading, SText } from '@stylebot/components';
 
 import SyncStatusBanner from './sync/SyncStatusBanner.vue';
 import TheVersionHistory from './history/TheVersionHistory.vue';
@@ -25,7 +25,7 @@ export default Vue.extend({
   name: 'TheHistoryTab',
 
   components: {
-    Heading,
+    SHeading,
     SText,
     SyncStatusBanner,
     TheVersionHistory,

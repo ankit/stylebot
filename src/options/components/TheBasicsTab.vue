@@ -1,6 +1,6 @@
 <template>
   <div v-if="optionsLoaded" class="basics-tab">
-    <heading as="h1" size="xl">{{ t('basics_options') }}</heading>
+    <s-heading as="h1" size="xl">{{ t('basics_options') }}</s-heading>
 
     <the-context-menu />
 
@@ -13,7 +13,7 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { Heading } from '@stylebot/components';
+import { SHeading } from '@stylebot/components';
 import TheContextMenu from './basics/TheContextMenu.vue';
 import TheKeyboardShortcuts from './basics/TheKeyboardShortcuts.vue';
 
@@ -21,7 +21,7 @@ export default Vue.extend({
   name: 'TheBasicsTab',
 
   components: {
-    Heading,
+    SHeading,
     TheContextMenu,
     TheKeyboardShortcuts,
   },

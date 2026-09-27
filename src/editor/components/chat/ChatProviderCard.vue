@@ -2,13 +2,13 @@
   <div class="chat-provider-card">
     <div class="chat-provider-card-row">
       <div class="chat-provider-card-copy">
-        <heading as="h3" size="sm" class="chat-provider-card-name">
+        <s-heading as="h3" size="sm" class="chat-provider-card-name">
           <span
             class="chat-provider-card-dot"
             :class="{ connected: provider.connected }"
           />
           {{ info.name }}
-        </heading>
+        </s-heading>
         <s-text
           as="span"
           size="caption"
@@ -76,7 +76,7 @@
 import type { PropType } from 'vue';
 import Vue from 'vue';
 
-import { Heading, SButton, SText } from '@stylebot/components';
+import { SHeading, SButton, SText } from '@stylebot/components';
 import { getProviderInfo } from '@stylebot/chat';
 import type { ChatProviderInfo, ChatProviderStatus } from '@stylebot/types';
 
@@ -91,7 +91,7 @@ export default Vue.extend({
 
   components: {
     ChatKeyInput,
-    Heading,
+    SHeading,
     SButton,
     SText,
   },

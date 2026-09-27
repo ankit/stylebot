@@ -1,19 +1,19 @@
 <template>
   <span class="chip" :class="{ small, muted }">
-    <shortcut-kbd :small="small" :value="value" :mac="mac" />
+    <s-shortcut-kbd :small="small" :value="value" :mac="mac" />
   </span>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 
-import ShortcutKbd from './ShortcutKbd.vue';
+import SShortcutKbd from './SShortcutKbd.vue';
 
 export default Vue.extend({
-  name: 'ShortcutChip',
+  name: 'SShortcutChip',
 
   components: {
-    ShortcutKbd,
+    SShortcutKbd,
   },
 
   props: {

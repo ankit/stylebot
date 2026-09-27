@@ -1,5 +1,5 @@
 <template>
-  <menu-item
+  <s-menu-item
     class="css-selector-dropdown-item"
     @click="click"
     @mouseenter.native="preview"
@@ -17,12 +17,12 @@
         class="style-count"
       />
     </span>
-  </menu-item>
+  </s-menu-item>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import { MenuItem, SCountBadge } from '@stylebot/components';
+import { SMenuItem, SCountBadge } from '@stylebot/components';
 import { splitSelectorList } from '@stylebot/css';
 
 import { getPageBridge } from '@stylebot/page-bridge';
@@ -32,7 +32,7 @@ export default Vue.extend({
   name: 'TheCssSelectorDropdownItem',
 
   components: {
-    MenuItem,
+    SMenuItem,
     SCountBadge,
     SelectorChips,
   },

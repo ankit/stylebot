@@ -1,7 +1,9 @@
 <template>
   <form class="chat-setup" @submit.prevent="connect">
     <div class="chat-setup-intro">
-      <heading as="h2" size="md">{{ t('connect_a_model_to_start') }}</heading>
+      <s-heading as="h2" size="md">
+        {{ t('connect_a_model_to_start') }}
+      </s-heading>
       <s-text variant="muted">
         {{ t('chat_setup_description') }}
       </s-text>
@@ -41,7 +43,7 @@
 import Vue from 'vue';
 
 import {
-  Heading,
+  SHeading,
   SButton,
   SSegmentedControl,
   SText,
@@ -56,7 +58,7 @@ export default Vue.extend({
 
   components: {
     ChatKeyInput,
-    Heading,
+    SHeading,
     SButton,
     SSegmentedControl,
     SText,

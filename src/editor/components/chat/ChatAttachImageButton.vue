@@ -1,6 +1,6 @@
 <template>
   <span class="chat-attach-image">
-    <icon-button
+    <s-icon-button
       :size="26"
       class="chat-attach-image-button"
       :title="t('attach_an_image_or_paste_a_screenshot')"
@@ -8,7 +8,7 @@
       @click="pick"
     >
       <image-icon :size="16" />
-    </icon-button>
+    </s-icon-button>
     <input
       ref="file"
       class="chat-attach-image-file"
@@ -24,7 +24,7 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { IconButton } from '@stylebot/components';
+import { SIconButton } from '@stylebot/components';
 import { ImageIcon } from '@stylebot/icons';
 
 /**
@@ -35,7 +35,7 @@ export default Vue.extend({
   name: 'ChatAttachImageButton',
 
   components: {
-    IconButton,
+    SIconButton,
     ImageIcon,
   },
 

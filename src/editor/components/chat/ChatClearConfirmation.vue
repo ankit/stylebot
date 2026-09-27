@@ -5,9 +5,9 @@
     :aria-label="t('start_a_new_chat')"
   >
     <div class="chat-clear-confirmation-copy">
-      <heading as="h3" size="sm">
+      <s-heading as="h3" size="sm">
         {{ t('start_a_new_chat') }}
-      </heading>
+      </s-heading>
       <s-text variant="muted">{{ t('new_chat_clears_conversation') }}</s-text>
     </div>
     <div class="chat-clear-confirmation-actions">
@@ -29,7 +29,7 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { Heading, SButton, SText } from '@stylebot/components';
+import { SHeading, SButton, SText } from '@stylebot/components';
 
 /**
  * Asks before clearing the site's conversation; its changes stay in Code.
@@ -38,7 +38,7 @@ export default Vue.extend({
   name: 'ChatClearConfirmation',
 
   components: {
-    Heading,
+    SHeading,
     SButton,
     SText,
   },

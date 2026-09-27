@@ -98,7 +98,7 @@
     </div>
 
     <div v-if="conflicts.length" class="conflicts">
-      <heading as="h3" size="md">{{ t('sync_conflicts_title') }}</heading>
+      <s-heading as="h3" size="md">{{ t('sync_conflicts_title') }}</s-heading>
       <s-text variant="muted" class="description">
         {{ t('sync_conflicts_description') }}
       </s-text>
@@ -120,7 +120,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { Heading, SText, SButton, SLinkButton } from '@stylebot/components';
+import { SHeading, SText, SButton, SLinkButton } from '@stylebot/components';
 import { ArrowRepeatIcon } from '@stylebot/icons';
 import type { SyncAccount, SyncConflict } from '@stylebot/types';
 import { formatSyncTime } from '@stylebot/utils';
@@ -137,7 +137,7 @@ export default Vue.extend({
     SButton,
     SLinkButton,
     ArrowRepeatIcon,
-    Heading,
+    SHeading,
     SText,
   },
 

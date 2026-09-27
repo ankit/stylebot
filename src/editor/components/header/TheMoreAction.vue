@@ -1,10 +1,14 @@
 <template>
-  <anchored-menu class="more-action-anchor">
+  <s-anchored-menu class="more-action-anchor">
     <template #trigger="{ toggle }">
       <s-tooltip :text="t('view_options')">
-        <icon-button :size="20" :aria-label="t('view_options')" @click="toggle">
+        <s-icon-button
+          :size="20"
+          :aria-label="t('view_options')"
+          @click="toggle"
+        >
           <more-icon :size="20" />
-        </icon-button>
+        </s-icon-button>
       </s-tooltip>
     </template>
 
@@ -29,7 +33,7 @@
           </s-segmented-control>
         </div>
 
-        <toggle-switch
+        <s-toggle-switch
           v-if="host === 'page'"
           class="setting-row"
           :value="adjustPageLayout"
@@ -45,9 +49,9 @@
               {{ t('adjust_page_layout_description') }}
             </s-text>
           </span>
-        </toggle-switch>
+        </s-toggle-switch>
 
-        <toggle-switch
+        <s-toggle-switch
           class="setting-row"
           :value="forceImportant"
           size="sm"
@@ -73,11 +77,11 @@
               {{ t('override_site_styles_off_description') }}
             </s-text>
           </span>
-        </toggle-switch>
+        </s-toggle-switch>
 
         <hr class="more-menu-divider" />
 
-        <menu-item
+        <s-menu-item
           @click="
             keyboardShortcuts();
             close();
@@ -87,9 +91,9 @@
             <span>{{ t('keyboard_shortcuts') }}</span>
             <span class="menu-item-hint">{{ editorCommands.help }}</span>
           </span>
-        </menu-item>
+        </s-menu-item>
 
-        <menu-item
+        <s-menu-item
           @click="
             optionsPage();
             close();
@@ -99,21 +103,21 @@
             <span>{{ t('view_all_styles_and_settings') }}</span>
             <external-link-icon />
           </span>
-        </menu-item>
+        </s-menu-item>
       </s-menu>
     </template>
-  </anchored-menu>
+  </s-anchored-menu>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import {
-  AnchoredMenu,
+  SAnchoredMenu,
   SMenu,
-  MenuItem,
-  IconButton,
+  SMenuItem,
+  SIconButton,
   STooltip,
-  ToggleSwitch,
+  SToggleSwitch,
   SSegmentedControl,
   SText,
 } from '@stylebot/components';
@@ -137,12 +141,12 @@ export default Vue.extend({
   name: 'TheMoreAction',
 
   components: {
-    AnchoredMenu,
+    SAnchoredMenu,
     SMenu,
-    MenuItem,
-    IconButton,
+    SMenuItem,
+    SIconButton,
     STooltip,
-    ToggleSwitch,
+    SToggleSwitch,
     SSegmentedControl,
     SText,
     MoreIcon,

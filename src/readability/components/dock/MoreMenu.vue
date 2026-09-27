@@ -3,7 +3,7 @@
     <button class="item" @click="openShortcut">
       <icon-keyboard />
       <span class="label">{{ shortcutLabel }}</span>
-      <shortcut-chip v-if="shortcutValue" small :value="shortcutValue" />
+      <s-shortcut-chip v-if="shortcutValue" small :value="shortcutValue" />
     </button>
     <button class="item" @click="openOptions">
       <icon-options />
@@ -30,7 +30,7 @@ import {
   openDonatePage,
 } from '@stylebot/utils';
 
-import { SMenu, ShortcutChip } from '@stylebot/components';
+import { SMenu, SShortcutChip } from '@stylebot/components';
 import {
   IconOptions,
   IconFlag,
@@ -43,7 +43,7 @@ export default Vue.extend({
 
   components: {
     SMenu,
-    ShortcutChip,
+    SShortcutChip,
     IconOptions,
     IconFlag,
     IconCoffee,

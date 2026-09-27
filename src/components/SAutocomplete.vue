@@ -1,5 +1,5 @@
 <template>
-  <anchored-menu
+  <s-anchored-menu
     ref="menu"
     class="autocomplete"
     retain-focus
@@ -85,7 +85,7 @@
         <slot name="item" :item="item" :select="() => onSelect(item)" />
       </div>
     </s-menu>
-  </anchored-menu>
+  </s-anchored-menu>
 </template>
 
 <script lang="ts">
@@ -95,7 +95,7 @@ import Vue from 'vue';
 import { ChevronDownIcon } from '@stylebot/icons';
 import { splitCommaList } from '@stylebot/utils';
 
-import AnchoredMenu from './AnchoredMenu.vue';
+import SAnchoredMenu from './SAnchoredMenu.vue';
 import SMenu from './SMenu.vue';
 import SChip from './SChip.vue';
 
@@ -109,7 +109,7 @@ export default Vue.extend({
   name: 'SAutocomplete',
 
   components: {
-    AnchoredMenu,
+    SAnchoredMenu,
     SMenu,
     SChip,
     ChevronDownIcon,

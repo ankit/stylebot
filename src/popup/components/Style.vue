@@ -5,7 +5,7 @@
     :class="{ disabled: disableToggle }"
     @click="onHeaderClick"
   >
-    <toggle-switch
+    <s-toggle-switch
       v-model="enabled"
       size="lg"
       :disabled="disableToggle"
@@ -13,19 +13,19 @@
     >
       <div class="popup-header-domain">{{ url }}</div>
       <template #trailing>
-        <shortcut-chip v-if="shortcut" muted :value="shortcut" />
+        <s-shortcut-chip v-if="shortcut" muted :value="shortcut" />
       </template>
-    </toggle-switch>
+    </s-toggle-switch>
   </div>
 
   <popup-row v-else hover :disabled="disableToggle">
-    <toggle-switch
+    <s-toggle-switch
       v-model="enabled"
       :disabled="disableToggle"
       @change="onChange"
     >
       {{ url }}
-    </toggle-switch>
+    </s-toggle-switch>
   </popup-row>
 </template>
 
@@ -33,7 +33,7 @@
 import Vue from 'vue';
 import type { EnableStyle, DisableStyle } from '@stylebot/types';
 import PopupRow from './PopupRow.vue';
-import { ShortcutChip, ToggleSwitch } from '@stylebot/components';
+import { SShortcutChip, SToggleSwitch } from '@stylebot/components';
 import { forwardClickToInput } from '../utils';
 
 export default Vue.extend({
@@ -41,8 +41,8 @@ export default Vue.extend({
 
   components: {
     PopupRow,
-    ToggleSwitch,
-    ShortcutChip,
+    SToggleSwitch,
+    SShortcutChip,
   },
 
   props: {

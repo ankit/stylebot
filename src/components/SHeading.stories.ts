@@ -1,11 +1,11 @@
 import type { Meta } from '@storybook/vue';
 
-import Heading from './Heading.vue';
+import SHeading from './SHeading.vue';
 import { fromTemplate, playground } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
-  title: 'Primitives/Typography/Heading',
-  component: Heading,
+  title: 'Primitives/Typography/SHeading',
+  component: SHeading,
   argTypes: {
     size: { control: 'radio', options: ['xl', 'lg', 'md', 'sm'] },
     as: { control: 'select', options: ['h1', 'h2', 'h3', 'div'] },
@@ -17,18 +17,18 @@ const meta: Meta = {
 export default meta;
 
 export const Playground = playground(
-  { Heading },
-  `<heading :as="as" :size="size">{{ text }}</heading>`
+  { SHeading },
+  `<s-heading :as="as" :size="size">{{ text }}</s-heading>`
 );
 
 export const Sizes = fromTemplate(
-  { Heading },
+  { SHeading },
   `
   <div class="sb-stack">
-    <heading as="h1" size="xl">Extra large heading</heading>
-    <heading as="h2" size="lg">Large heading</heading>
-    <heading as="h2" size="md">Medium heading</heading>
-    <heading as="h3" size="sm">Small heading</heading>
+    <s-heading as="h1" size="xl">Extra large heading</s-heading>
+    <s-heading as="h2" size="lg">Large heading</s-heading>
+    <s-heading as="h2" size="md">Medium heading</s-heading>
+    <s-heading as="h3" size="sm">Small heading</s-heading>
   </div>
 `
 );

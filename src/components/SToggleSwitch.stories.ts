@@ -1,12 +1,12 @@
 import type { Meta } from '@storybook/vue';
 
-import ToggleSwitch from './ToggleSwitch.vue';
-import ShortcutKbd from './ShortcutKbd.vue';
+import SToggleSwitch from './SToggleSwitch.vue';
+import SShortcutKbd from './SShortcutKbd.vue';
 import { matrix, playground } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
-  title: 'Primitives/Inputs/ToggleSwitch',
-  component: ToggleSwitch,
+  title: 'Primitives/Inputs/SToggleSwitch',
+  component: SToggleSwitch,
   argTypes: {
     value: { control: 'boolean' },
     disabled: { control: 'boolean' },
@@ -25,17 +25,17 @@ const meta: Meta = {
 
 export default meta;
 
-const components = { ToggleSwitch, ShortcutKbd };
+const components = { SToggleSwitch, SShortcutKbd };
 
 export const Playground = playground(
   components,
   `
-  <toggle-switch :value="value" :disabled="disabled" :size="size">
+  <s-toggle-switch :value="value" :disabled="disabled" :size="size">
     {{ label }}
     <template v-if="shortcut" #trailing>
-      <shortcut-kbd small :value="shortcut" />
+      <s-shortcut-kbd small :value="shortcut" />
     </template>
-  </toggle-switch>
+  </s-toggle-switch>
 `
 );
 
@@ -49,24 +49,25 @@ export const Variants = matrix({
     {
       label: 'Off',
       cell: attrs =>
-        `<toggle-switch ${attrs} :value="false">Off</toggle-switch>`,
+        `<s-toggle-switch ${attrs} :value="false">Off</s-toggle-switch>`,
     },
     {
       label: 'On',
-      cell: attrs => `<toggle-switch ${attrs} :value="true">On</toggle-switch>`,
+      cell: attrs =>
+        `<s-toggle-switch ${attrs} :value="true">On</s-toggle-switch>`,
     },
     {
       label: 'Disabled',
       cell: attrs =>
-        `<toggle-switch ${attrs} :value="true" disabled>Disabled</toggle-switch>`,
+        `<s-toggle-switch ${attrs} :value="true" disabled>Disabled</s-toggle-switch>`,
     },
     {
       label: 'With trailing',
       cell: attrs => `
-        <toggle-switch ${attrs} :value="true">
+        <s-toggle-switch ${attrs} :value="true">
           Reader mode
-          <template #trailing><shortcut-kbd small value="alt+shift+r" /></template>
-        </toggle-switch>`,
+          <template #trailing><s-shortcut-kbd small value="alt+shift+r" /></template>
+        </s-toggle-switch>`,
     },
   ],
 });

@@ -1,7 +1,7 @@
 <template>
   <feature-card :label="t('readability')" :disabled="!pageReaderable">
     <template #toggle>
-      <toggle-switch
+      <s-toggle-switch
         size="lg"
         :value="value"
         :disabled="!pageReaderable"
@@ -17,7 +17,7 @@
             {{ t('articles_only') }}
           </s-text>
         </template>
-      </toggle-switch>
+      </s-toggle-switch>
     </template>
 
     <s-text variant="muted">
@@ -28,7 +28,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { ToggleSwitch, SText } from '@stylebot/components';
+import { SToggleSwitch, SText } from '@stylebot/components';
 
 import FeatureCard from './FeatureCard.vue';
 
@@ -37,7 +37,7 @@ export default Vue.extend({
 
   components: {
     FeatureCard,
-    ToggleSwitch,
+    SToggleSwitch,
     SText,
   },
 

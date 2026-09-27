@@ -2,21 +2,21 @@
   <div class="keyboard-shortcuts-view">
     <div class="view-header">
       <s-tooltip :text="t('back')">
-        <icon-button
+        <s-icon-button
           :size="26"
           class="back-button"
           :aria-label="t('back')"
           @click="back"
         >
           <chevron-left-icon :size="15" />
-        </icon-button>
+        </s-icon-button>
       </s-tooltip>
 
-      <heading as="h1" size="sm" class="title">
+      <s-heading as="h1" size="sm" class="title">
         {{ t('keyboard_shortcuts') }}
-      </heading>
+      </s-heading>
 
-      <shortcut-chip small :value="editorCommands.close" :mac="mac" />
+      <s-shortcut-chip small :value="editorCommands.close" :mac="mac" />
     </div>
 
     <div class="view-body">
@@ -30,7 +30,7 @@
             <s-text class="row-label">{{ row.label }}</s-text>
             <div class="keys">
               <template v-for="(key, index) in row.keys">
-                <shortcut-chip
+                <s-shortcut-chip
                   v-if="key"
                   :key="index"
                   small
@@ -63,7 +63,7 @@
             <s-text class="row-label">{{ row.label }}</s-text>
             <div class="keys">
               <template v-for="(key, index) in row.keys">
-                <shortcut-chip
+                <s-shortcut-chip
                   v-if="key"
                   :key="index"
                   small
@@ -101,9 +101,9 @@
 <script lang="ts">
 import Vue from 'vue';
 import {
-  Heading,
-  IconButton,
-  ShortcutChip,
+  SHeading,
+  SIconButton,
+  SShortcutChip,
   SText,
   STooltip,
 } from '@stylebot/components';
@@ -120,9 +120,9 @@ export default Vue.extend({
   name: 'TheKeyboardShortcutsView',
 
   components: {
-    Heading,
-    IconButton,
-    ShortcutChip,
+    SHeading,
+    SIconButton,
+    SShortcutChip,
     SText,
     STooltip,
     ChevronLeftIcon,

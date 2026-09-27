@@ -1,10 +1,10 @@
 import { mount } from '@vue/test-utils';
 
-import ShortcutChip from './ShortcutChip.vue';
+import SShortcutChip from './SShortcutChip.vue';
 
-describe('ShortcutChip.vue', () => {
+describe('SShortcutChip.vue', () => {
   it('renders the formatted value and no "small" class by default', () => {
-    const wrapper = mount(ShortcutChip, {
+    const wrapper = mount(SShortcutChip, {
       propsData: { value: 'alt+shift+r' },
     });
 
@@ -12,8 +12,8 @@ describe('ShortcutChip.vue', () => {
     expect(wrapper.classes()).not.toContain('small');
   });
 
-  it('applies the small class and forwards it to ShortcutKbd', () => {
-    const wrapper = mount(ShortcutChip, {
+  it('applies the small class and forwards it to SShortcutKbd', () => {
+    const wrapper = mount(SShortcutChip, {
       propsData: { value: 'alt+shift+r', small: true },
     });
 

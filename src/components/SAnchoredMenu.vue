@@ -27,7 +27,7 @@ import type { PropType } from 'vue';
 import Vue from 'vue';
 
 export default Vue.extend({
-  name: 'AnchoredMenu',
+  name: 'SAnchoredMenu',
 
   props: {
     // For combobox-style triggers (a text input), keep focus in the trigger

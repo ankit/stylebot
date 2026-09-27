@@ -1,8 +1,8 @@
 <template>
   <div class="row">
-    <toggle-switch class="row-toggle" :value="enabled" @change="onToggle">
+    <s-toggle-switch class="row-toggle" :value="enabled" @change="onToggle">
       <div class="domain" :class="{ disabled: !enabled }">{{ url }}</div>
-    </toggle-switch>
+    </s-toggle-switch>
 
     <s-text variant="muted" class="timestamp">
       {{ formattedTimestamp }}
@@ -20,7 +20,7 @@
       @delete="showDeleteConfirm = true"
     />
 
-    <confirm-dialog
+    <s-confirm-dialog
       v-if="showDeleteConfirm"
       :title="`Delete style for ${url}`"
       :message="t('delete_style_warning')"
@@ -39,10 +39,10 @@ import Vue from 'vue';
 import { formatDistanceToNow } from 'date-fns';
 
 import {
-  ToggleSwitch,
+  SToggleSwitch,
   SText,
   SButton,
-  ConfirmDialog,
+  SConfirmDialog,
 } from '@stylebot/components';
 import StyleRowMenu from './StyleRowMenu.vue';
 
@@ -50,10 +50,10 @@ export default Vue.extend({
   name: 'StyleListRow',
 
   components: {
-    ToggleSwitch,
+    SToggleSwitch,
     SText,
     SButton,
-    ConfirmDialog,
+    SConfirmDialog,
     StyleRowMenu,
   },
 

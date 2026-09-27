@@ -20,7 +20,7 @@ import Vue from 'vue';
 import { CheckIcon } from '@stylebot/icons';
 
 export default Vue.extend({
-  name: 'MenuItem',
+  name: 'SMenuItem',
 
   components: {
     CheckIcon,

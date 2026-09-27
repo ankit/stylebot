@@ -1,6 +1,6 @@
 <template>
   <popup-row hover :disabled="disabled">
-    <toggle-switch
+    <s-toggle-switch
       v-model="readability"
       :disabled="disabled"
       @change="onChange"
@@ -12,9 +12,9 @@
         </span>
       </template>
       <template v-else-if="shortcut" #trailing>
-        <shortcut-chip muted :value="shortcut" />
+        <s-shortcut-chip muted :value="shortcut" />
       </template>
-    </toggle-switch>
+    </s-toggle-switch>
   </popup-row>
 </template>
 
@@ -22,15 +22,15 @@
 import Vue from 'vue';
 import type { ToggleReadabilityForTab } from '@stylebot/types';
 import PopupRow from './PopupRow.vue';
-import { ShortcutChip, ToggleSwitch } from '@stylebot/components';
+import { SShortcutChip, SToggleSwitch } from '@stylebot/components';
 
 export default Vue.extend({
   name: 'Readability',
 
   components: {
     PopupRow,
-    ToggleSwitch,
-    ShortcutChip,
+    SToggleSwitch,
+    SShortcutChip,
   },
 
   props: {

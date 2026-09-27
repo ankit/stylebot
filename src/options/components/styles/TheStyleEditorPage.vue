@@ -1,9 +1,9 @@
 <template>
   <div class="editor-page">
     <div class="editor-header">
-      <icon-button class="back" title="Back" @click="attemptLeave">
+      <s-icon-button class="back" title="Back" @click="attemptLeave">
         <chevron-left-icon />
-      </icon-button>
+      </s-icon-button>
 
       <div class="title-block">
         <div class="breadcrumb">
@@ -21,7 +21,7 @@
         />
       </div>
 
-      <toggle-switch
+      <s-toggle-switch
         v-if="existingStyle"
         class="enabled-toggle"
         size="lg"
@@ -29,7 +29,7 @@
         @change="onToggleEnabled"
       >
         <span class="enabled-label">{{ t('enabled') }}</span>
-      </toggle-switch>
+      </s-toggle-switch>
 
       <style-row-menu
         :url="url"
@@ -63,7 +63,7 @@
       </s-button>
     </div>
 
-    <confirm-dialog
+    <s-confirm-dialog
       v-if="showDeleteConfirm"
       :title="`Delete style for ${url}`"
       :message="t('delete_style_warning')"
@@ -72,7 +72,7 @@
       @confirm="confirmDelete"
     />
 
-    <confirm-dialog
+    <s-confirm-dialog
       v-if="showLeaveConfirm"
       :title="t('discard_changes')"
       :message="t('unsaved_changes_warning')"
@@ -91,11 +91,11 @@ import { formatDistanceToNow } from 'date-fns';
 
 import type { StyleWithoutUrl } from '@stylebot/types';
 import {
-  ToggleSwitch,
-  IconButton,
+  SToggleSwitch,
+  SIconButton,
   SText,
   SButton,
-  ConfirmDialog,
+  SConfirmDialog,
 } from '@stylebot/components';
 import { ChevronLeftIcon } from '@stylebot/icons';
 
@@ -106,12 +106,12 @@ export default Vue.extend({
   name: 'TheStyleEditorPage',
 
   components: {
-    ToggleSwitch,
+    SToggleSwitch,
     ChevronLeftIcon,
-    IconButton,
+    SIconButton,
     SText,
     SButton,
-    ConfirmDialog,
+    SConfirmDialog,
     StyleRowMenu,
     CodeEditor,
   },

@@ -8,7 +8,7 @@
   >
     <div v-if="recording" class="field recording">
       <span class="capture">
-        <shortcut-kbd v-if="liveModifiers" :value="liveModifiers" />
+        <s-shortcut-kbd v-if="liveModifiers" :value="liveModifiers" />
         <span class="placeholder">_</span>
       </span>
       <button type="button" class="cancel" @click="stopRecording">
@@ -25,7 +25,7 @@
       @keydown.enter="startRecording"
       @keydown.space.prevent="startRecording"
     >
-      <shortcut-kbd :value="value" />
+      <s-shortcut-kbd :value="value" />
       <button
         type="button"
         class="clear"
@@ -54,14 +54,14 @@ import {
   MODIFIER_KEYS,
 } from '@stylebot/utils';
 
-import ShortcutKbd from './ShortcutKbd.vue';
+import SShortcutKbd from './SShortcutKbd.vue';
 import { IconKeyboard, IconX } from '@stylebot/icons';
 
 export default Vue.extend({
-  name: 'ShortcutRecorderField',
+  name: 'SShortcutRecorderField',
 
   components: {
-    ShortcutKbd,
+    SShortcutKbd,
     IconKeyboard,
     IconX,
   },

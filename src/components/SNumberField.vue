@@ -14,7 +14,7 @@
 
     <div v-if="unit" class="number-unit">{{ unit }}</div>
 
-    <anchored-menu v-if="presets.length" class="number-presets">
+    <s-anchored-menu v-if="presets.length" class="number-presets">
       <template #trigger="{ toggle, open }">
         <button
           type="button"
@@ -29,7 +29,7 @@
 
       <template #default="{ close }">
         <s-menu dense :min-width="menuMinWidth" :max-height="260">
-          <menu-item
+          <s-menu-item
             v-for="preset in presets"
             :key="preset"
             @click="
@@ -38,10 +38,10 @@
             "
           >
             {{ preset }}
-          </menu-item>
+          </s-menu-item>
         </s-menu>
       </template>
-    </anchored-menu>
+    </s-anchored-menu>
   </div>
 </template>
 
@@ -51,17 +51,17 @@ import Vue from 'vue';
 
 import { ChevronDownIcon } from '@stylebot/icons';
 
-import AnchoredMenu from './AnchoredMenu.vue';
+import SAnchoredMenu from './SAnchoredMenu.vue';
 import SMenu from './SMenu.vue';
-import MenuItem from './MenuItem.vue';
+import SMenuItem from './SMenuItem.vue';
 
 export default Vue.extend({
   name: 'SNumberField',
 
   components: {
-    AnchoredMenu,
+    SAnchoredMenu,
     SMenu,
-    MenuItem,
+    SMenuItem,
     ChevronDownIcon,
   },
 

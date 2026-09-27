@@ -133,19 +133,19 @@ describe('options App routing', () => {
     await flush();
 
     expect(router.currentRoute.name).toBe('style-edit');
-    const dialog = wrapper.findComponent({ name: 'ConfirmDialog' });
+    const dialog = wrapper.findComponent({ name: 'SConfirmDialog' });
     expect(dialog.exists()).toBe(true);
 
     dialog.vm.$emit('cancel');
     await flush();
     expect(router.currentRoute.name).toBe('style-edit');
-    expect(wrapper.findComponent({ name: 'ConfirmDialog' }).exists()).toBe(
+    expect(wrapper.findComponent({ name: 'SConfirmDialog' }).exists()).toBe(
       false
     );
 
     router.push('/basics').catch(() => undefined);
     await flush();
-    wrapper.findComponent({ name: 'ConfirmDialog' }).vm.$emit('confirm');
+    wrapper.findComponent({ name: 'SConfirmDialog' }).vm.$emit('confirm');
     await flush();
 
     expect(router.currentRoute.name).toBe('basics');
@@ -172,7 +172,7 @@ describe('options App routing', () => {
     await flush();
 
     expect(router.currentRoute.name).toBe('styles');
-    expect(wrapper.findComponent({ name: 'ConfirmDialog' }).exists()).toBe(
+    expect(wrapper.findComponent({ name: 'SConfirmDialog' }).exists()).toBe(
       false
     );
   });

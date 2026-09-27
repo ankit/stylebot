@@ -2,7 +2,7 @@
   <div class="styles-tab">
     <div class="header">
       <div class="title-block">
-        <heading as="h1" size="xl">{{ t('styles_options') }}</heading>
+        <s-heading as="h1" size="xl">{{ t('styles_options') }}</s-heading>
         <s-text variant="muted" class="subtitle">
           {{
             t(totalCount === 1 ? 'sites_count_one' : 'sites_count_other', [
@@ -48,7 +48,7 @@
       />
     </div>
 
-    <confirm-dialog
+    <s-confirm-dialog
       v-if="showDeleteAllConfirm"
       :title="t('delete_all_styles')"
       :message="t('delete_all_warning')"
@@ -67,7 +67,7 @@ import Vue from 'vue';
 import { compareAsc } from 'date-fns';
 
 import type { Style } from '@stylebot/types';
-import { Heading, SText, SButton, ConfirmDialog } from '@stylebot/components';
+import { SHeading, SText, SButton, SConfirmDialog } from '@stylebot/components';
 import { SearchIcon } from '@stylebot/icons';
 
 import StyleListRow from './styles/StyleListRow.vue';
@@ -77,10 +77,10 @@ export default Vue.extend({
   name: 'TheStylesTab',
 
   components: {
-    Heading,
+    SHeading,
     SText,
     SButton,
-    ConfirmDialog,
+    SConfirmDialog,
     SearchIcon,
     StyleListRow,
     StylesBulkMenu,

@@ -35,7 +35,7 @@
     <template v-if="nextAncestor">
       <div class="divider" />
       <div class="row next-row">
-        <shortcut-chip value="arrowup" small />
+        <s-shortcut-chip value="arrowup" small />
         <span class="chips">
           <s-chip v-for="(part, i) in ancestorChips" :key="i">
             {{ part }}
@@ -54,7 +54,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { SChip, SCountBadge, ShortcutChip } from '@stylebot/components';
+import { SChip, SCountBadge, SShortcutChip } from '@stylebot/components';
 import { splitSelectorList } from '@stylebot/css';
 import type { CssDeclaration } from '@stylebot/types';
 
@@ -75,7 +75,7 @@ export default Vue.extend({
   components: {
     SChip,
     SCountBadge,
-    ShortcutChip,
+    SShortcutChip,
   },
 
   data(): {

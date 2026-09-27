@@ -1,13 +1,13 @@
 import type { Meta } from '@storybook/vue';
 
-import ThemeProvider from './ThemeProvider.vue';
-import Heading from './Heading.vue';
+import SThemeProvider from './SThemeProvider.vue';
+import SHeading from './SHeading.vue';
 import SText from './SText.vue';
 import { fromTemplate } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
-  title: 'Primitives/Theme/ThemeProvider',
-  component: ThemeProvider,
+  title: 'Primitives/Theme/SThemeProvider',
+  component: SThemeProvider,
 };
 
 export default meta;
@@ -72,11 +72,11 @@ const TOKEN_GROUPS: Array<{ label: string; tokens: Array<string> }> = [
 
 /* Every color token as a swatch — a cheap tripwire for palette changes. */
 export const Tokens = fromTemplate(
-  { Heading },
+  { SHeading },
   `
   <div class="sb-token-groups">
     <section v-for="group in groups" :key="group.label" class="sb-token-group">
-      <heading as="h2" size="sm">{{ group.label }}</heading>
+      <s-heading as="h2" size="sm">{{ group.label }}</s-heading>
       <div class="sb-tokens">
         <div v-for="token in group.tokens" :key="token" class="sb-token">
           <span class="sb-swatch" :style="{ background: 'var(--' + token + ')' }" />

@@ -1,7 +1,7 @@
 import type { Meta } from '@storybook/vue';
 
 import SMenu from './SMenu.vue';
-import MenuItem from './MenuItem.vue';
+import SMenuItem from './SMenuItem.vue';
 import {
   fromTemplate,
   matrix,
@@ -21,15 +21,15 @@ const meta: Meta = {
 
 export default meta;
 
-const components = { SMenu, MenuItem };
+const components = { SMenu, SMenuItem };
 
 export const Playground = playground(
   components,
   `
   <s-menu :dense="dense" :min-width="minWidth" :max-height="maxHeight">
-    <menu-item>Open site</menu-item>
-    <menu-item selected>Copy CSS</menu-item>
-    <menu-item danger>Delete</menu-item>
+    <s-menu-item>Open site</s-menu-item>
+    <s-menu-item selected>Copy CSS</s-menu-item>
+    <s-menu-item danger>Delete</s-menu-item>
   </s-menu>
 `
 );
@@ -45,18 +45,18 @@ export const Variants = matrix({
       label: 'Items',
       cell: attrs => `
         <s-menu ${attrs}>
-          <menu-item>Open site</menu-item>
-          <menu-item>Copy CSS</menu-item>
-          <menu-item>Delete</menu-item>
+          <s-menu-item>Open site</s-menu-item>
+          <s-menu-item>Copy CSS</s-menu-item>
+          <s-menu-item>Delete</s-menu-item>
         </s-menu>`,
     },
     {
       label: 'Selected + danger',
       cell: attrs => `
         <s-menu ${attrs}>
-          <menu-item>System</menu-item>
-          <menu-item selected>Light</menu-item>
-          <menu-item danger>Delete</menu-item>
+          <s-menu-item>System</s-menu-item>
+          <s-menu-item selected>Light</s-menu-item>
+          <s-menu-item danger>Delete</s-menu-item>
         </s-menu>`,
     },
   ],
@@ -66,7 +66,7 @@ export const Scrollable = fromTemplate(
   components,
   `
   <s-menu dense :max-height="140">
-    <menu-item v-for="font in fonts" :key="font">{{ font }}</menu-item>
+    <s-menu-item v-for="font in fonts" :key="font">{{ font }}</s-menu-item>
   </s-menu>
 `,
   {

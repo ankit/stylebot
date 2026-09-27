@@ -167,7 +167,7 @@ export default Vue.extend({
         }
       });
 
-      // window capture, like AnchoredMenu: fires before the editor's
+      // window capture, like SAnchoredMenu: fires before the editor's
       // document-level keydown handler, which would otherwise treat Escape as "close editor".
       window.addEventListener('keydown', this.onWindowKeydown, true);
 
@@ -224,7 +224,7 @@ export default Vue.extend({
       );
 
       // Flip above the trigger if it doesn't fit below but does fit above
-      // (mirrors AnchoredMenu), clamped either way to stay on-screen.
+      // (mirrors SAnchoredMenu), clamped either way to stay on-screen.
       const spaceBelow = window.innerHeight - fieldRect.bottom;
       const spaceAbove = fieldRect.top;
       const flipUp =

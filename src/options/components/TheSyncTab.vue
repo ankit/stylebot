@@ -17,7 +17,7 @@
     </sync-status-banner>
 
     <div>
-      <heading as="h1" size="xl">{{ t('sync_options') }}</heading>
+      <s-heading as="h1" size="xl">{{ t('sync_options') }}</s-heading>
       <s-text variant="muted" class="description">
         {{ t('sync_tab_description') }}
       </s-text>
@@ -29,7 +29,7 @@
     </div>
 
     <div class="section">
-      <heading as="h2" size="lg">{{ t('backup') }}</heading>
+      <s-heading as="h2" size="lg">{{ t('backup') }}</s-heading>
       <s-text variant="muted" class="description">
         {{ t('backup_description') }}
       </s-text>
@@ -45,7 +45,7 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { Heading, SText, SButton } from '@stylebot/components';
+import { SHeading, SText, SButton } from '@stylebot/components';
 import TheGoogleDriveSync from './sync/TheGoogleDriveSync.vue';
 import SyncStatusBanner from './sync/SyncStatusBanner.vue';
 
@@ -56,7 +56,7 @@ export default Vue.extend({
   name: 'TheSyncTab',
 
   components: {
-    Heading,
+    SHeading,
     SText,
     SButton,
     TheGoogleDriveSync,

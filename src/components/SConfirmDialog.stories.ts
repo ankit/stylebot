@@ -1,11 +1,11 @@
 import type { Meta } from '@storybook/vue';
 
-import ConfirmDialog from './ConfirmDialog.vue';
+import SConfirmDialog from './SConfirmDialog.vue';
 import { playground } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
-  title: 'Primitives/Overlays/ConfirmDialog',
-  component: ConfirmDialog,
+  title: 'Primitives/Overlays/SConfirmDialog',
+  component: SConfirmDialog,
   parameters: { padded: false },
   argTypes: {
     title: { control: 'text' },
@@ -24,10 +24,10 @@ const meta: Meta = {
 export default meta;
 
 export const Playground = playground(
-  { ConfirmDialog },
+  { SConfirmDialog },
   `
   <div style="height: 100vh">
-    <confirm-dialog
+    <s-confirm-dialog
       :title="title"
       :message="message"
       :confirm-label="confirmLabel"

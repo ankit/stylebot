@@ -9,7 +9,7 @@
         :menu-min-width="160"
       >
         <template #default="{ close }">
-          <menu-item
+          <s-menu-item
             v-for="option in options"
             :key="option.value"
             :selected="option.value === styleValue"
@@ -25,7 +25,7 @@
               />
               {{ option.title }}
             </span>
-          </menu-item>
+          </s-menu-item>
         </template>
       </s-select>
 
@@ -47,7 +47,7 @@
 import Vue from 'vue';
 import { t } from '@stylebot/i18n';
 import type { Declaration } from 'postcss';
-import { SSelect, MenuItem } from '@stylebot/components';
+import { SSelect, SMenuItem } from '@stylebot/components';
 
 import PropertyRow from '../basic/PropertyRow.vue';
 import Length from '../Length.vue';
@@ -60,7 +60,7 @@ export default Vue.extend({
   components: {
     PropertyRow,
     SSelect,
-    MenuItem,
+    SMenuItem,
     Length,
     ColorPicker,
   },

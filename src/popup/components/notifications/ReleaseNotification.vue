@@ -16,9 +16,9 @@
     </s-text>
 
     <s-tooltip class="release-dismiss" :text="t('hide')">
-      <icon-button @click="dismiss">
+      <s-icon-button @click="dismiss">
         <icon-x :size="16" />
-      </icon-button>
+      </s-icon-button>
     </s-tooltip>
   </div>
 </template>
@@ -34,14 +34,14 @@ import {
 
 import { onEnterOrSpace } from '../../utils';
 import { IconX } from '@stylebot/icons';
-import { IconButton, SText, STooltip } from '@stylebot/components';
+import { SIconButton, SText, STooltip } from '@stylebot/components';
 
 export default Vue.extend({
   name: 'ReleaseNotification',
 
   components: {
     IconX,
-    IconButton,
+    SIconButton,
     SText,
     STooltip,
   },

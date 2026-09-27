@@ -22,7 +22,7 @@ export default Vue.extend({
     // The row itself is the sole clickable/focusable target (no nested control).
     button: Boolean,
     // CSS-only hover/rounded treatment for rows that wrap their own focusable
-    // control (e.g. a ToggleSwitch) — no extra role/tabindex/click-forwarding.
+    // control (e.g. a SToggleSwitch) — no extra role/tabindex/click-forwarding.
     hover: Boolean,
     disabled: Boolean,
   },

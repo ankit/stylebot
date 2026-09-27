@@ -11,7 +11,7 @@
       @cancel="query = activeLabel"
     >
       <template #item="{ item, select }">
-        <menu-item
+        <s-menu-item
           :selected="item.key === activeKey"
           @click="
             selectOption(item);
@@ -29,7 +29,7 @@
             </span>
             <span class="option-name">{{ item.label }}</span>
           </span>
-        </menu-item>
+        </s-menu-item>
       </template>
     </s-autocomplete>
 
@@ -83,7 +83,7 @@
 <script lang="ts">
 // Flattened into one search/select rather than a nested set+scheme picker.
 import Vue from 'vue';
-import { SAutocomplete, SText, MenuItem } from '@stylebot/components';
+import { SAutocomplete, SText, SMenuItem } from '@stylebot/components';
 import { CheckIcon } from '@stylebot/icons';
 import { colorSchemes } from '../../utils/color-schemes';
 import type { ColorRamp } from '../../utils/color-sets';
@@ -138,7 +138,7 @@ export default Vue.extend({
   components: {
     SAutocomplete,
     SText,
-    MenuItem,
+    SMenuItem,
     CheckIcon,
   },
 

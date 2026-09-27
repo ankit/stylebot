@@ -14,9 +14,9 @@
 
     <div class="chat-providers-body">
       <div class="chat-providers-intro">
-        <heading as="h2" size="md">
+        <s-heading as="h2" size="md">
           {{ t('providers') }}
-        </heading>
+        </s-heading>
         <s-text variant="muted">
           {{ t('add_a_key_for_each_provider') }}
         </s-text>
@@ -41,7 +41,7 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { Heading, SButton, SText } from '@stylebot/components';
+import { SHeading, SButton, SText } from '@stylebot/components';
 import { ChevronLeftIcon } from '@stylebot/icons';
 import type { ChatProviderId, ChatProviderStatus } from '@stylebot/types';
 
@@ -57,7 +57,7 @@ export default Vue.extend({
   components: {
     ChatProviderCard,
     ChevronLeftIcon,
-    Heading,
+    SHeading,
     SButton,
     SText,
   },

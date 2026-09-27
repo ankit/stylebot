@@ -17,7 +17,7 @@
       @cancel="cancel"
     >
       <template #item="{ item, select }">
-        <menu-item
+        <s-menu-item
           class="font-row"
           :class="{ 'font-link': item.kind === 'link' }"
           :selected="item.kind !== 'link' && item.value === value"
@@ -30,7 +30,7 @@
           <span v-else-if="item.category" class="font-row-category">
             {{ item.category }}
           </span>
-        </menu-item>
+        </s-menu-item>
       </template>
     </s-autocomplete>
   </property-row>
@@ -40,7 +40,7 @@
 import Vue from 'vue';
 import type { Declaration } from 'postcss';
 
-import { SAutocomplete, MenuItem } from '@stylebot/components';
+import { SAutocomplete, SMenuItem } from '@stylebot/components';
 import { ExternalLinkIcon } from '@stylebot/icons';
 import { unquoteFamily } from '@stylebot/css';
 import type { Debounced } from '@stylebot/utils';
@@ -65,7 +65,7 @@ export default Vue.extend({
 
   components: {
     SAutocomplete,
-    MenuItem,
+    SMenuItem,
     ExternalLinkIcon,
     PropertyRow,
   },

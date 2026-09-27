@@ -8,7 +8,7 @@ import Vue from 'vue';
 import type { StylebotAppearance } from '@stylebot/types';
 
 export default Vue.extend({
-  name: 'ThemeProvider',
+  name: 'SThemeProvider',
 
   props: {
     mode: {

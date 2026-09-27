@@ -1,26 +1,26 @@
 <template>
   <s-tooltip :text="title">
-    <icon-button
+    <s-icon-button
       :bordered="bordered"
       :size="size"
       @click="$emit('click', $event)"
     >
       <more-icon />
-    </icon-button>
+    </s-icon-button>
   </s-tooltip>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 
-import { IconButton, STooltip } from '@stylebot/components';
+import { SIconButton, STooltip } from '@stylebot/components';
 import { MoreIcon } from '@stylebot/icons';
 
 export default Vue.extend({
   name: 'IconMenuTrigger',
 
   components: {
-    IconButton,
+    SIconButton,
     STooltip,
     MoreIcon,
   },
