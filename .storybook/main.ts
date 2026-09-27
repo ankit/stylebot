@@ -19,6 +19,7 @@ const aliasedPackages = [
   'types',
   'utils',
   'saved-styles',
+  'stylesheets',
   'settings',
   'google-fonts',
   'highlighter',

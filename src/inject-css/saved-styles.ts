@@ -3,13 +3,13 @@ import {
   STYLES_METADATA_KEY,
   isCompiledStylesCurrent,
 } from '@stylebot/saved-styles';
+import { readCache } from '@stylebot/stylesheets';
 import type {
   CompiledStyles,
   GetCompiledStyles,
   GetCompiledStylesResponse,
 } from '@stylebot/types';
 
-import { readCache } from './cache';
 import { applyPageState, getPageState, savePageState } from './page-state';
 
 /**

@@ -1,6 +1,6 @@
 import * as postcss from 'postcss';
 
-import { fetchImportCss } from '@stylebot/inject-css';
+import { fetchImportCss } from '@stylebot/stylesheets';
 
 /**
  * Strips @import rules out of the parsed css, so the rest of it can be

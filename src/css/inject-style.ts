@@ -1,4 +1,4 @@
-import { injectStylesheet, removeStylesheet } from '@stylebot/inject-css';
+import { injectStylesheet, removeStylesheet } from '@stylebot/stylesheets';
 
 import { compileStyle } from './compile';
 

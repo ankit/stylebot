@@ -107,6 +107,10 @@ const config = {
         __dirname,
         './src/saved-styles/index'
       ),
+      '@stylebot/stylesheets': path.resolve(
+        __dirname,
+        './src/stylesheets/index'
+      ),
       '@stylebot/settings': path.resolve(__dirname, './src/settings/index'),
       '@stylebot/chat': path.resolve(__dirname, './src/chat/index'),
       '@stylebot/page-bridge': path.resolve(

@@ -1,11 +1,13 @@
 import { applyReadability, removeReadability } from '@stylebot/readability';
 import { getStylesForPage } from '@stylebot/saved-styles';
+import type { CachedState } from '@stylebot/stylesheets';
+import {
+  injectStylesheet,
+  pruneImportCache,
+  removeStylesheet,
+  writeCache,
+} from '@stylebot/stylesheets';
 import type { CompiledStyles } from '@stylebot/types';
-
-import type { CachedState } from './cache';
-import { writeCache } from './cache';
-import { pruneImportCache } from './import-cache';
-import { injectStylesheet, removeStylesheet } from './stylesheet';
 
 /**
  * What this page should have applied: the compiled styles matching its url,
