@@ -52,6 +52,10 @@ export default {
     state.css = css;
   },
 
+  setCodeHighlight(state: State, ranges: State['codeHighlight']): void {
+    state.codeHighlight = ranges;
+  },
+
   setUndoStack(state: State, undoStack: UndoStack): void {
     state.undoStack = undoStack;
   },

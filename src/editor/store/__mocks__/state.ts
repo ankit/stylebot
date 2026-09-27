@@ -19,6 +19,7 @@ const mockState: State = {
 
   css: '',
   undoStack: emptyUndoStack(),
+  codeHighlight: null,
   enabled: true,
   url: document.domain,
 

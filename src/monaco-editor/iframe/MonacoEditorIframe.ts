@@ -2,6 +2,7 @@
 import CustomLight from './themes/CustomLight';
 import CustomDark from './themes/CustomDark';
 import type { IframeMessage, ParentMessage } from '@stylebot/monaco-editor';
+import type { CssLineRange } from '@stylebot/types';
 
 declare global {
   // Must stay an interface: augmenting Window relies on declaration merging.
@@ -21,6 +22,8 @@ class MonacEditorIframe {
   // Whether the panel has sent its css yet; the first send seeds the
   // editor rather than being an edit the user could undo away.
   populated = false;
+  // Decoration ids of the lines marked by stylebotHighlightLines.
+  highlights: Array<string> = [];
 
   constructor(variant: MonacoEditorVariant = 'default') {
     this.variant = variant;
@@ -133,6 +136,7 @@ class MonacEditorIframe {
 
     this.editor = window.monaco.editor.create(container, editorOptions);
     this.editor.onDidChangeModelContent(() => {
+      this.clearHighlights();
       this.postMessage({
         css: this.editor.getValue(),
         type: 'stylebotMonacoIframeCssUpdated',
@@ -250,6 +254,34 @@ class MonacEditorIframe {
     }
   }
 
+  /**
+   * Marks the given lines, scrolls the first into view, and unmarks them
+   * as soon as the text changes, since the line numbers no longer hold.
+   */
+  highlightLines(ranges: Array<CssLineRange>): void {
+    // The frame may have only just been unhidden; measure before scrolling.
+    this.editor.layout();
+
+    this.highlights = this.editor.deltaDecorations(
+      this.highlights,
+      ranges.map(({ startLine, endLine }) => ({
+        range: new window.monaco.Range(startLine, 1, endLine, 1),
+        options: { isWholeLine: true, className: 'stylebot-added-line' },
+      }))
+    );
+
+    if (ranges.length) {
+      this.editor.revealLinesInCenter(ranges[0].startLine, ranges[0].endLine);
+      this.editor.setPosition({ lineNumber: ranges[0].startLine, column: 1 });
+    }
+  }
+
+  clearHighlights(): void {
+    if (this.highlights.length) {
+      this.highlights = this.editor.deltaDecorations(this.highlights, []);
+    }
+  }
+
   attachWindowListeners(): void {
     window.addEventListener('resize', () => {
       this.editor.layout();
@@ -270,6 +302,8 @@ class MonacEditorIframe {
           message.data.selector,
           message.data.focus ?? true
         );
+      } else if (message.data.type === 'stylebotHighlightLines') {
+        this.highlightLines(message.data.ranges);
       } else if (message.data.type === 'stylebotFocusEditor') {
         this.editor.focus();
       } else if (message.data.type === 'stylebotThemeUpdate') {

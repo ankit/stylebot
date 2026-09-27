@@ -3,6 +3,7 @@ import type { Store } from 'vuex';
 import Vuex from 'vuex';
 
 import type {
+  CssLineRange,
   StylebotOptions,
   StylebotCommands,
   ReadabilitySettings,
@@ -64,6 +65,8 @@ export type State = {
   css: string;
   // Undo/redo trail of css, kept only while the editor is open.
   undoStack: UndoStack;
+  // Lines for the code editor to mark next time it shows, then cleared.
+  codeHighlight: Array<CssLineRange> | null;
   enabled: boolean;
   readability: boolean;
   forceImportant: boolean;
@@ -99,6 +102,7 @@ export const createStore = (host: EditorHost): Store<State> => {
 
       css: '',
       undoStack: emptyUndoStack(),
+      codeHighlight: null,
       enabled: true,
       readability: false,
       forceImportant: true,

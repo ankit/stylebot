@@ -16,7 +16,9 @@ import type {
   IframeMessage,
   ParentUpdateCssMessage,
   ParentFocusEditorMessage,
+  ParentHighlightLinesMessage,
 } from '@stylebot/monaco-editor';
+import type { CssLineRange } from '@stylebot/types';
 import type { Debounced } from '@stylebot/utils';
 import { debounce } from '@stylebot/utils';
 
@@ -33,8 +35,13 @@ export default Vue.extend({
     CodeEditorIframe,
   },
 
-  data(): { iframeCss: string | null; applyTypedCss: Debounced<[string]> } {
+  data(): {
+    iframeCss: string | null;
+    iframeLoaded: boolean;
+    applyTypedCss: Debounced<[string]>;
+  } {
     return {
+      iframeLoaded: false,
       // What the iframe last showed, whether it reported it or we sent it.
       iframeCss: null,
       applyTypedCss: debounce((css: string) => {
@@ -59,9 +66,17 @@ export default Vue.extend({
     mode(): string {
       return this.$store.state.options.mode;
     },
+
+    codeHighlight(): Array<CssLineRange> | null {
+      return this.$store.state.codeHighlight;
+    },
   },
 
   watch: {
+    codeHighlight(): void {
+      this.sendHighlight();
+    },
+
     activeSelector(selector: string): void {
       // Applies what was just typed before the css it is based on is read
       // and pushed back into the editor.
@@ -174,7 +189,29 @@ export default Vue.extend({
     },
 
     handleIframeLoaded(): void {
+      this.iframeLoaded = true;
       this.handleActiveSelectorChange(this.activeSelector);
+      this.sendHighlight();
+    },
+
+    /**
+     * Hands pending line highlights (a chat reply's changes) to the editor
+     * once it's there to show them.
+     */
+    sendHighlight(): void {
+      const contentWindow = this.getIframeContentWindow();
+
+      if (!this.codeHighlight || !this.iframeLoaded || !contentWindow) {
+        return;
+      }
+
+      const message: ParentHighlightLinesMessage = {
+        type: 'stylebotHighlightLines',
+        ranges: this.codeHighlight,
+      };
+
+      contentWindow.postMessage(message, chrome.runtime.getURL('*'));
+      this.$store.commit('setCodeHighlight', null);
     },
 
     handleIframeCssUpdate(css: string): void {

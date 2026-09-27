@@ -7,6 +7,14 @@
     <span class="chat-change-spacer" />
     <div class="chat-change-actions">
       <s-button
+        variant="ghost"
+        size="small"
+        :title="t('view_in_code')"
+        @click="viewInCode"
+      >
+        {{ t('code_mode') }}
+      </s-button>
+      <s-button
         v-if="latest"
         variant="ghost"
         size="small"
@@ -25,7 +33,7 @@ import Vue from 'vue';
 
 import { SButton, SText } from '@stylebot/components';
 import { CodeIcon } from '@stylebot/icons';
-import { countCssLines } from '@stylebot/chat';
+import { countCssLines, findEditLines } from '@stylebot/chat';
 import type { ChatAssistantTurn } from '@stylebot/types';
 
 /**
@@ -76,6 +84,26 @@ export default Vue.extend({
   },
 
   methods: {
+    /**
+     * Opens the Code tab with this reply's lines marked, leaving the picked
+     * element as it was.
+     */
+    viewInCode(): void {
+      const { applied, edits, previous } = this.turn;
+      const ranges = applied
+        ? findEditLines(this.$store.state.css, edits, previous)
+        : [];
+
+      this.$store.dispatch('setMode', 'code');
+
+      // Once the editor is showing, so it scrolls with its real size.
+      this.$nextTick(() => {
+        if (ranges.length) {
+          this.$store.commit('setCodeHighlight', ranges);
+        }
+      });
+    },
+
     toggle(): void {
       this.$store.dispatch('chat/toggleTurn', this.turn.id);
     },
