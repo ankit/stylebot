@@ -74,6 +74,17 @@
       "prettier --write"
     ]
   },
+  "prettier": {
+    "trailingComma": "es5",
+    "tabWidth": 2,
+    "semi": true,
+    "singleQuote": true,
+    "bracketSpacing": true,
+    "arrowParens": "avoid",
+    "useTabs": false,
+    "printWidth": 80,
+    "htmlWhitespaceSensitivity": "ignore"
+  },
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged"
