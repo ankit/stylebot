@@ -315,6 +315,9 @@ export default Vue.extend({
   --menu-border: var(--border);
   --menu-shadow: rgb(0 0 0 / 30%);
   --text-primary: var(--foreground);
+  --text-muted: var(--muted-foreground);
+  --panel-surface: var(--background);
+  --panel-border: var(--border);
   --hover-tint: color-mix(in srgb, var(--foreground) 6%, transparent);
   --accent: var(--link-color);
   --accent-text: var(--link-color);

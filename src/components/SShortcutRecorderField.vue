@@ -6,7 +6,7 @@
     @keydown="onKeydown"
     @keyup="onKeyup"
   >
-    <div v-if="recording" class="field recording">
+    <div v-if="isRecording" class="field recording">
       <span class="capture">
         <s-shortcut-kbd v-if="liveModifiers" :value="liveModifiers" />
         <span class="placeholder">_</span>
@@ -16,34 +16,38 @@
       </button>
     </div>
 
-    <div
-      v-else-if="hasValue"
-      class="field has-value"
-      role="button"
-      tabindex="0"
-      @click="startRecording"
-      @keydown.enter="startRecording"
-      @keydown.space.prevent="startRecording"
-    >
-      <s-shortcut-kbd :value="value" />
-      <button
-        type="button"
-        class="clear"
-        :aria-label="t('clear_shortcut')"
-        @click.stop="clear"
+    <slot v-else name="idle" :start="startRecording">
+      <div
+        v-if="hasValue"
+        class="field has-value"
+        role="button"
+        tabindex="0"
+        @click="startRecording"
+        @keydown.enter="startRecording"
+        @keydown.space.prevent="startRecording"
       >
-        <icon-x />
+        <s-shortcut-kbd :value="value" />
+        <button
+          type="button"
+          class="clear"
+          :aria-label="t('clear_shortcut')"
+          @click.stop="clear"
+        >
+          <icon-x />
+        </button>
+      </div>
+
+      <button v-else type="button" class="record-btn" @click="startRecording">
+        <icon-keyboard />
+        {{ t('record_a_shortcut') }}
       </button>
-    </div>
+    </slot>
 
-    <button v-else type="button" class="record-btn" @click="startRecording">
-      <icon-keyboard />
-      {{ t('record_a_shortcut') }}
-    </button>
-
-    <p v-if="recording" class="helper">
-      {{ t('press_key_to_finish') }} {{ t('esc_cancels') }}
-    </p>
+    <slot v-if="isRecording" name="helper">
+      <p class="helper">
+        {{ t('press_key_to_finish') }} {{ t('esc_cancels') }}
+      </p>
+    </slot>
   </div>
 </template>
 
@@ -73,14 +77,19 @@ export default Vue.extend({
       type: String,
       required: true,
     },
+
+    recording: {
+      type: Boolean,
+      default: false,
+    },
   },
 
   data(): {
-    recording: boolean;
+    isRecording: boolean;
     liveModifiers: string;
   } {
     return {
-      recording: false,
+      isRecording: this.recording,
       liveModifiers: '',
     };
   },
@@ -91,18 +100,29 @@ export default Vue.extend({
     },
   },
 
-  methods: {
-    startRecording(): void {
-      this.recording = true;
+  watch: {
+    recording(recording: boolean): void {
+      this.isRecording = recording;
       this.liveModifiers = '';
+    },
+  },
+
+  methods: {
+    setRecording(recording: boolean): void {
+      this.isRecording = recording;
+      this.liveModifiers = '';
+      this.$emit('update:recording', recording);
+    },
+
+    startRecording(): void {
+      this.setRecording(true);
       this.$nextTick(() => {
         (this.$refs.root as HTMLElement).focus();
       });
     },
 
     stopRecording(): void {
-      this.recording = false;
-      this.liveModifiers = '';
+      this.setRecording(false);
     },
 
     clear(): void {
@@ -110,7 +130,7 @@ export default Vue.extend({
     },
 
     onKeydown(event: KeyboardEvent): void {
-      if (!this.recording) {
+      if (!this.isRecording) {
         return;
       }
 
@@ -138,7 +158,7 @@ export default Vue.extend({
     },
 
     onKeyup(event: KeyboardEvent): void {
-      if (!this.recording) {
+      if (!this.isRecording) {
         return;
       }
 
