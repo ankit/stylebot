@@ -20,6 +20,8 @@ Stylebot is built with Vue 2, TypeScript and webpack.
 - `docs/` — developer docs ([index](README.md))
 - `patches/` — patches to dependencies
 
+Imports only point down the tiers: apps build on features, ui and core; features on ui and core; ui on core. Nothing imports an app, and features don't import each other. Code in another folder is imported through its `@stylebot/<folder>` entry, never its files. `yarn lint` enforces both.
+
 ## Run a development build
 
 Each command builds in watch mode and opens a fresh browser profile with the extension loaded:
