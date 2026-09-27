@@ -108,9 +108,10 @@ export type PageBridge = {
   getPageCssContext(selector: string): Promise<string>;
 
   /**
-   * Asks the page to show its own panel again; a no-op for the in-page host.
+   * Asks the page to show its own panel again, docked on the given side;
+   * a no-op for the in-page host.
    */
-  openInPage(): void;
+  openInPage(dockLocation: 'left' | 'right'): void;
 
   /**
    * Brings the page's tab and window to the front; a no-op in-page.

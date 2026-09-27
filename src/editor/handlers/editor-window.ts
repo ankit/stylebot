@@ -194,6 +194,15 @@ export const createEditorWindowHandler = (
           // would be forwarded and wiped as context-menu picks. The port
           // itself drops when the window closes.
           cleanup();
+          // The window's stored layout arrives after this message; without
+          // this the panel first shows on the stale side.
+          store.commit('setOptions', {
+            ...store.state.options,
+            layout: {
+              ...store.state.options.layout,
+              dockLocation: message.dockLocation,
+            },
+          });
           store.dispatch('openStylebot', { inspect: false });
           closeEditorWindow();
           break;
