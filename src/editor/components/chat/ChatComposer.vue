@@ -84,7 +84,7 @@ export default Vue.extend({
   z-index: 3;
   flex: none;
   padding: 10px 12px 12px;
-  border-top: 1px solid var(--chat-divider);
+  border-top: 1px solid var(--panel-border);
 }
 
 .chat-composer-box {
@@ -92,8 +92,7 @@ export default Vue.extend({
   flex-direction: column;
   gap: 6px;
   padding: 8px 8px 8px 12px;
-  border: 1px solid var(--chat-composer-border);
-  border-radius: 12px;
+  @include field-border(12px);
   background: var(--chat-composer-surface);
   box-shadow: 0 1px 2px rgb(20 30 50 / 4%);
   transition: border-color 0.15s, box-shadow 0.15s;
@@ -116,7 +115,7 @@ export default Vue.extend({
     &:hover,
     &:focus-within,
     &.dropping {
-      border-color: var(--chat-composer-border);
+      border-color: var(--field-border);
     }
   }
 }

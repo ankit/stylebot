@@ -82,13 +82,11 @@ export default Vue.extend({
   --chat-surface: #1f2023;
   --chat-ink: #c3c7ce;
   --chat-ink-faint: #80858e;
-  --chat-divider: #2e3034;
   --chat-bubble-surface: #27292d;
   --chat-bubble-border: #313338;
   --chat-card-surface: #26282c;
   --chat-card-border: #34363b;
-  --chat-composer-surface: #17181b;
-  --chat-composer-border: #3a3d43;
+  --chat-composer-surface: var(--field-fill);
 }
 
 .theme-provider {
@@ -151,7 +149,6 @@ export default Vue.extend({
   --chat-surface: var(--tab-surface);
   --chat-ink: var(--text-primary);
   --chat-ink-faint: var(--text-faint);
-  --chat-divider: var(--panel-border);
   --chat-bubble-surface: color-mix(
     in srgb,
     var(--text-primary) 6%,
@@ -165,7 +162,6 @@ export default Vue.extend({
   --chat-card-surface: var(--card-surface);
   --chat-card-border: var(--panel-border);
   --chat-composer-surface: var(--card-surface);
-  --chat-composer-border: var(--field-border);
 
   --font-mono: 'Geist Mono', Menlo, Monaco, Consolas, monospace;
   --font-reading: 'Literata', Georgia, serif;
