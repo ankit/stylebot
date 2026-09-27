@@ -1,0 +1,98 @@
+# Stylebot
+
+Browser extension (Chrome/Edge/Firefox) that lets users change the appearance of any website via a visual CSS editor. Vue 2 + TypeScript, built with webpack.
+
+## Structure
+
+- `src/` — extension source, grouped into tiers. Each folder directly inside a tier is a package, imported as `@stylebot/<folder>` (resolved by `scripts/lib/src-packages.js`; `@stylebot/inject-css` keeps its old name for `apps/content`):
+  - `src/apps/` — webpack entries and HTML pages: `background`, `popup`, `options`, `editor` (with the pop-out window in `editor/window`), `content` (the content script), `reader` (the readability UI bundle), `monaco-iframe`
+  - `src/features/` — capabilities shared by apps: `chat`, `sync`, `history`, `page-bridge`, `highlighter`, `google-fonts`, `readability` (eligibility and reader lifecycle), `monaco-editor`
+  - `src/ui/` — `components`, `icons`, `scss`
+  - `src/core/` — `css`, `stylesheets`, `saved-styles`, `types`, `settings`, `i18n`, `utils`
+  - `src/assets/` — `manifest` (base manifest plus dev and Firefox overrides), `icon` (the extension icon: SVG sources and the PNGs the build copies to `img/`), `fonts`, `_locales` (i18n strings per locale)
+- Imports only point down: apps → features, ui, core; features → ui, core; ui → ui, core; core → core. Nothing imports an app, and features don't import each other. The `stylebot/tier-imports` lint rule enforces this; the few imports that predate it are allowlisted in `eslint/rules/tier-imports.mjs` — remove entries, never add them.
+- `e2e/` — Playwright end-to-end tests, driven against a real built extension: via CDP (`Extensions.loadUnpacked`) on Chrome/Edge, via Firefox's remote debugging protocol on Firefox; engine-specific code lives in `e2e/chromium/` and `e2e/firefox/` behind the `e2e/engine.ts` contract
+- `jest/` — Jest setup and the stylesheet stub
+- `dist/` — Chrome/Edge build output; `firefox-dist/` — Firefox build output; `preview-dist/` — `yarn build:preview` output
+- `store/` — store listing art (promo tiles, screenshots) per store; not part of the build
+- `site/` — stylebot.dev static site
+- `docs/` — developer docs: setup, releases, translation, e2e, architecture (editor, selectors and CSS, readability, sync, chat)
+- `patches/` — patch-package patches applied to dependencies on install
+
+## Workflow
+
+Always make changes in a new worktree, never directly on `main` or the checkout the
+session started in. Use the `EnterWorktree` tool before starting any edits, unless the
+session is already inside a worktree.
+
+## Commands
+
+- `yarn watch` — build for Chrome/Edge in watch mode
+- `yarn watch:firefox` — build for Firefox in watch mode
+- `yarn build:preview` — production build for local testing (not release) into `preview-dist/`, with the store's public key so it gets the store id
+- `yarn dev:chrome` — watch + launch a Chrome instance with the extension loaded
+- `yarn lint` / `yarn lint:fix` — ESLint
+- `yarn typecheck` — `tsc --noEmit` for the extension, then again with `.storybook/tsconfig.json` for Storybook config and stories
+- `yarn test` — Jest unit tests
+- `yarn e2e` — builds the extension then runs the Playwright e2e suite headless on Chrome, as CI does. `--edge` / `--firefox` switch browser, `--headed` / `--ui` / `--debug` switch mode, `--no-build` skips the rebuild; see `docs/e2e.md`.
+- `yarn test:storybook` — builds Storybook and runs every story headless with `@storybook/test-runner`, asserting the `play` functions. `--no-build` reuses `storybook-static`; `--dev --watch <path>` runs against a `yarn storybook` already on :6006.
+- `yarn storybook` — Storybook 7.6 (last line with Vue 2 support) for the shared primitives and popup/options/editor composites, with a light/dark toolbar
+
+## Validation
+
+Always validate UI/extension changes headless, not with manual/headed browser interaction, and confirm a change works with the relevant suite before calling it done.
+
+- **Storybook interaction tests** (`yarn test:storybook`) cover behaviour that lives inside a Vue surface: the editor panel, popup, options page. Only what needs the real extension goes to e2e.
+- **Playwright e2e** (`yarn e2e`, or a targeted spec like `yarn e2e --no-build editor-open`) covers extension plumbing: popup/background/content-script messaging, storage persistence across reloads, CSS injected into a real page, web-font fetches, Firefox/Edge. `e2e/fixtures.ts` loads the real unpacked extension via CDP.
+
+Stories:
+
+- Stories live beside their component as `*.stories.ts`; give new shared primitives a story.
+- Visual stories only set up the state they show — a `play` may open a menu and wait for it, nothing more.
+- Interaction tests go in a separate `*.interactions.stories.ts` file titled `Tests/<Surface>/<Feature>` with `tags: ['test']`, so they sit in their own sidebar root.
+- Each test is an object literal spreading its factory (`...editor(state)`) with a spec-style `name` sentence and its `play`. Storybook only picks `name` up from the literal, not through a factory call.
+- Use `@storybook/test` (`within`, `expect`, `waitFor`) and the helpers in `.storybook/story-helpers.ts`; group longer plays into `step('…', …)` phases.
+- Drive input through the shared `user` from `story-helpers` (not `userEvent` directly) so the toolbar's Slow motion toggle applies, and hover page elements while inspecting via `hoverPage`/`pick`, which first let the browser settle its own hover state.
+
+## Mocks and fixtures
+
+A mock stands in for a module or browser API; a fixture is seeded data or a seeded surface that tests and stories build on.
+
+- Jest: no `__mocks__/` or `__fixtures__/` folders. Mock with `jest.mock()` in the test, passing a factory when automocking isn't enough; shared test data goes in a `*.fixtures.ts` file beside the code that uses it, as tests do in `*.test.ts`.
+- Storybook: `.storybook/mocks/` holds only stand-ins (the chrome shim, the chat background, modules aliased in `main.ts`); `.storybook/fixtures/` holds the seeded stores and the surface factories stories spread (`editor`, `chat`, `popup`, `optionsPage`).
+- e2e: `e2e/fixtures.ts` holds Playwright fixtures.
+
+## Side effects
+
+`package.json` declares stylesheets and single-file components as having `sideEffects`, so webpack drops any other module whose exports go unused, in development builds as well as production. Components are listed because a treeshakeable component is free to have its `<style>` block emitted out of order, and a consumer's class on a shared component ties with that component's own class on specificity — so whichever lands last silently wins. Keep modules free of work on load: register listeners, call `Vue.use` / `Vue.mixin` and create stores from functions an entry point calls, never at a module's top level.
+
+Import another package only through its `@stylebot/` entry, never its files; the `stylebot/package-entry-imports` lint rule enforces it. With `sideEffects`, an entry import costs no more than a deep one.
+
+## Styles
+
+Reuse the mixins in `src/ui/scss/mixins.scss` (prepended to every stylesheet) instead of copying their declarations; never add shared utility classes, for the specificity reason above. Mixins that only emit declarations (`button-reset`, `truncate`, `field-border`) go at the top of a rule, followed by a blank line. Mixins that emit nested rules (`focus-ring`, `dark-mode`) go with the other nested rules, after the declarations.
+
+## Commit messages
+
+Use [Conventional Commits](https://www.conventionalcommits.org/) format: `<type>[optional scope]: <description>` (e.g. `fix: correct Firefox extension launch`, `feat(editor): add JS snippet execution`). Common types: `feat`, `fix`, `refactor`, `chore`, `docs`, `test`.
+
+## Comments
+
+Avoid comments by default. Only add one to state something non-obvious — a hidden constraint, a workaround, a reason that isn't clear from the code itself. Never add comments in CSS. When a comment is warranted, keep it to 1-2 lines max, and use `/* */` for multiline comments.
+
+Comments on functions and methods use JSDoc style, always in this shape:
+
+```ts
+/**
+ * What the function does, in plain prose.
+ * A second line if the first doesn't fit.
+ */
+```
+
+`/**` and `*/` each go on their own line — never `/** text */` on one line. Up to 4 lines of prose is fine. Never use `@` tags (`@param`, `@returns`, `@throws`, etc.); the TypeScript signature already documents those.
+
+## i18n
+
+Never hardcode user-facing strings — always add an i18n key in `src/assets/_locales/*.config` (all 15 locales) and reference it via `t('key')`. This applies to every string a user sees: labels, placeholders, titles, aria-labels, error messages.
+
+Keep each key matching its English string (e.g. `@box` → `Box`, not a stale `@layout_properties` → `Box`). When a string's copy changes, rename the key to match in the same change, across all 15 locale files. If two keys end up with the identical string in every locale, collapse them into one key instead of keeping duplicates.
