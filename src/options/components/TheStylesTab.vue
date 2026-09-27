@@ -205,7 +205,8 @@ export default Vue.extend({
   color: var(--text-muted);
 
   input {
-    all: unset;
+    @include button-reset;
+
     flex: 1;
     min-width: 0;
     font-weight: 400;

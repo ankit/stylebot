@@ -1,3 +1,5 @@
+import { getDeclarationValue } from '@stylebot/css';
+
 import getters from '../getters';
 import mockState from '../__mocks__/state';
 
@@ -69,6 +71,17 @@ describe('getters', () => {
       });
 
       expect(declarations).toEqual([['color', 'pink']]);
+    });
+
+    it('falls back to a grouped rule the selector belongs to', () => {
+      const state = {
+        ...mockState,
+        css: 'a, b { opacity: 0.5; }',
+        activeSelector: 'b',
+      };
+      expect(getDeclarationValue(getters.activeRule(state), 'opacity')).toBe(
+        '0.5'
+      );
     });
   });
 

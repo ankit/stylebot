@@ -122,6 +122,7 @@ export default Vue.extend({
 <style lang="scss">
 .stylebot-inspector {
   @include button-reset;
+
   flex: none;
   display: inline-flex;
   align-items: center;

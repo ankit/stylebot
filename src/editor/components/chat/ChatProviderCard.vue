@@ -188,9 +188,7 @@ export default Vue.extend({
 }
 
 .chat-provider-card-key {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  @include truncate;
 
   &.masked {
     font-family: var(--font-mono);

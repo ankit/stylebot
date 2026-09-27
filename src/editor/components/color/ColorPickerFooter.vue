@@ -76,6 +76,7 @@ export default Vue.extend({
 .value-field {
   @include button-reset;
   @include field-border(8px);
+
   display: block;
   width: 100%;
   padding: 6px 10px;

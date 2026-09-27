@@ -9,61 +9,15 @@
       />
     </property-row>
 
-    <div v-if="mode === 'all'" class="spacing-grid">
+    <div v-if="fields.length" class="spacing-grid">
       <spacing-field
-        :label="t('all')"
-        :value="all"
-        :placeholder="placeholders.all"
+        v-for="(field, index) in fields"
+        :key="index"
+        :label="t(field.labelKey)"
+        :value="field.value"
+        :placeholder="field.placeholder"
         :disabled="disabled"
-        @input="setAll"
-      />
-    </div>
-
-    <div v-else-if="mode === 'xy'" class="spacing-grid">
-      <spacing-field
-        :label="t('vertical')"
-        :value="vertical"
-        :placeholder="placeholders.vertical"
-        :disabled="disabled"
-        @input="setVertical"
-      />
-      <spacing-field
-        :label="t('horizontal')"
-        :value="horizontal"
-        :placeholder="placeholders.horizontal"
-        :disabled="disabled"
-        @input="setHorizontal"
-      />
-    </div>
-
-    <div v-else-if="mode === 'individual'" class="spacing-grid">
-      <spacing-field
-        :label="t('top')"
-        :value="top"
-        :placeholder="placeholders.top"
-        :disabled="disabled"
-        @input="setSide('top', $event)"
-      />
-      <spacing-field
-        :label="t('right')"
-        :value="right"
-        :placeholder="placeholders.right"
-        :disabled="disabled"
-        @input="setSide('right', $event)"
-      />
-      <spacing-field
-        :label="t('bottom')"
-        :value="bottom"
-        :placeholder="placeholders.bottom"
-        :disabled="disabled"
-        @input="setSide('bottom', $event)"
-      />
-      <spacing-field
-        :label="t('left')"
-        :value="left"
-        :placeholder="placeholders.left"
-        :disabled="disabled"
-        @input="setSide('left', $event)"
+        @input="field.set"
       />
     </div>
   </div>
@@ -87,6 +41,12 @@ import {
 } from '../../utils/spacing';
 
 type Mode = 'none' | 'all' | 'xy' | 'individual';
+type SpacingFieldConfig = {
+  labelKey: string;
+  value: string;
+  placeholder: string;
+  set: (length: string) => void;
+};
 
 export default Vue.extend({
   name: 'SpacingControl',
@@ -155,7 +115,7 @@ export default Vue.extend({
         return sides;
       }
 
-      activeRule.clone().walkDecls((decl: Declaration) => {
+      activeRule.walkDecls((decl: Declaration) => {
         if (decl.prop === this.shorthandProperty) {
           const expanded = expandShorthand(decl.value);
           if (expanded) {
@@ -221,6 +181,48 @@ export default Vue.extend({
 
     horizontal(): string {
       return this.left === this.right ? this.left : '';
+    },
+
+    fields(): Array<SpacingFieldConfig> {
+      const { placeholders } = this;
+
+      switch (this.mode) {
+        case 'all':
+          return [
+            {
+              labelKey: 'all',
+              value: this.all,
+              placeholder: placeholders.all,
+              set: this.setAll,
+            },
+          ];
+        case 'xy':
+          return [
+            {
+              labelKey: 'vertical',
+              value: this.vertical,
+              placeholder: placeholders.vertical,
+              set: this.setVertical,
+            },
+            {
+              labelKey: 'horizontal',
+              value: this.horizontal,
+              placeholder: placeholders.horizontal,
+              set: this.setHorizontal,
+            },
+          ];
+        case 'individual':
+          return (['top', 'right', 'bottom', 'left'] as Array<Side>).map(
+            side => ({
+              labelKey: side,
+              value: this[side],
+              placeholder: placeholders[side],
+              set: (length: string) => this.setSide(side, length),
+            })
+          );
+        default:
+          return [];
+      }
     },
   },
 

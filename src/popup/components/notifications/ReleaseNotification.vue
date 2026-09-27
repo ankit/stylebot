@@ -99,10 +99,7 @@ export default Vue.extend({
   border-top: 1px solid var(--info-border);
   cursor: pointer;
 
-  &:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: -2px;
-  }
+  @include focus-ring;
 }
 
 .release-dot {

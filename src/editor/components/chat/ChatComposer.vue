@@ -88,11 +88,12 @@ export default Vue.extend({
 }
 
 .chat-composer-box {
+  @include field-border(12px);
+
   display: flex;
   flex-direction: column;
   gap: 6px;
   padding: 8px 8px 8px 12px;
-  @include field-border(12px);
   background: var(--panel-surface);
   box-shadow: 0 1px 2px rgb(20 30 50 / 4%);
   transition: border-color 0.15s, box-shadow 0.15s;

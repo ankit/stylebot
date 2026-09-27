@@ -137,10 +137,9 @@ export default Vue.extend({
 }
 
 .chat-change .chat-change-label {
+  @include truncate;
+
   min-width: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   color: var(--text-body);
 }
 

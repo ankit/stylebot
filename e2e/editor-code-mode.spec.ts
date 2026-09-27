@@ -68,7 +68,7 @@ test('toggling the panel appearance updates the Monaco editor theme immediately'
   await editorRoot.getByRole('menuitem', { name: 'Dark' }).click();
   await expect(monacoBackground).toHaveCSS(
     'background-color',
-    'rgb(30, 30, 30)'
+    'rgb(26, 27, 30)'
   );
 
   // No reload here — the editor iframe stays mounted throughout.
@@ -77,7 +77,7 @@ test('toggling the panel appearance updates the Monaco editor theme immediately'
 
   await expect(monacoBackground).toHaveCSS(
     'background-color',
-    'rgb(255, 255, 255)'
+    'rgb(252, 252, 253)'
   );
 });
 

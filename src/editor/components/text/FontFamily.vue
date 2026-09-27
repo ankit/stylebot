@@ -38,11 +38,10 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import type { Declaration } from 'postcss';
 
 import { SAutocomplete, SMenuItem } from '@stylebot/components';
 import { ExternalLinkIcon } from '@stylebot/icons';
-import { unquoteFamily } from '@stylebot/css';
+import { getDeclarationValue, unquoteFamily } from '@stylebot/css';
 import type { Debounced } from '@stylebot/utils';
 import { debounce } from '@stylebot/utils';
 import type { FontSuggestion, GoogleFont } from '@stylebot/google-fonts';
@@ -89,16 +88,7 @@ export default Vue.extend({
 
   computed: {
     value(): string {
-      const activeRule = this.$store.getters.activeRule;
-      let value = '';
-
-      if (activeRule) {
-        activeRule.clone().walkDecls('font-family', (decl: Declaration) => {
-          value = decl.value;
-        });
-      }
-
-      return value;
+      return getDeclarationValue(this.$store.getters.activeRule, 'font-family');
     },
 
     disabled(): boolean {
@@ -230,10 +220,9 @@ export default Vue.extend({
 }
 
 .font-row-label {
+  @include truncate;
+
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .font-row-category {

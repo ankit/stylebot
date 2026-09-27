@@ -69,8 +69,8 @@ export default Vue.extend({
 }
 
 .nav-item {
-  all: unset;
-  box-sizing: border-box;
+  @include button-reset;
+
   display: block;
   width: 100%;
   padding: 8px 12px;
@@ -86,10 +86,7 @@ export default Vue.extend({
     color: var(--text-primary);
   }
 
-  &:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: -2px;
-  }
+  @include focus-ring;
 
   &.active {
     font-weight: 600;

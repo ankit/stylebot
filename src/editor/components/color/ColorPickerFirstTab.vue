@@ -99,6 +99,7 @@ export default Vue.extend({
 // repeat(8, 1fr), 4px gaps → 36px) so every tab reads as the same surface.
 .swatch {
   @include button-reset;
+
   width: 36px;
   height: 36px;
   border-radius: 5px;

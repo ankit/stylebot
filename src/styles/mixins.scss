@@ -1,17 +1,27 @@
 // Shared SCSS mixins, auto-injected into every stylesheet via sass-loader's
 // prependData (see webpack.config.js). Defines mixins only — emits no CSS.
 
-@mixin focus-ring($offset: -2px) {
-  &:focus-visible {
+// Accent keyboard-focus outline. $target is appended after :focus-visible to
+// ring a pseudo-element or sibling instead, e.g. '::-webkit-slider-thumb'.
+@mixin focus-ring($offset: -2px, $target: '') {
+  &:focus-visible#{$target} {
     outline: 2px solid var(--accent);
     outline-offset: $offset;
   }
 }
 
 // Strip native button styling down to a bare box for custom-styled buttons.
+// Include it first in the rule, since all: unset resets everything before it.
 @mixin button-reset {
   all: unset;
   box-sizing: border-box;
+}
+
+// Clip overflowing text to a single line ending in an ellipsis.
+@mixin truncate {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 // Shared chrome for field-like containers (selects, number/color/text inputs).

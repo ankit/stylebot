@@ -20,46 +20,13 @@
     </div>
 
     <div class="view-body">
-      <div class="group">
+      <div v-for="group in groups" :key="group.label" class="group">
         <s-text size="overline" class="group-label">
-          {{ t('this_panel') }}
+          {{ group.label }}
         </s-text>
 
         <div class="rows">
-          <div v-for="row in panelRows" :key="row.label" class="row">
-            <s-text class="row-label">{{ row.label }}</s-text>
-            <div class="keys">
-              <template v-for="(key, index) in row.keys">
-                <s-shortcut-chip
-                  v-if="key"
-                  :key="index"
-                  small
-                  class="key-chip"
-                  :value="key"
-                  :mac="mac"
-                />
-                <s-text
-                  v-else
-                  :key="index"
-                  size="caption"
-                  variant="muted"
-                  class="unassigned"
-                >
-                  {{ t('not_set') }}
-                </s-text>
-              </template>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="group">
-        <s-text size="overline" class="group-label">
-          {{ t('anywhere') }}
-        </s-text>
-
-        <div class="rows">
-          <div v-for="row in globalRows" :key="row.label" class="row">
+          <div v-for="row in group.rows" :key="row.label" class="row">
             <s-text class="row-label">{{ row.label }}</s-text>
             <div class="keys">
               <template v-for="(key, index) in row.keys">
@@ -115,6 +82,7 @@ import { openOptionsPage } from '../../utils/chrome';
 import { undoShortcuts } from '../../store/undo-stack';
 
 type ShortcutRow = { label: string; keys: Array<string> };
+type ShortcutGroup = { label: string; rows: Array<ShortcutRow> };
 
 export default Vue.extend({
   name: 'TheKeyboardShortcutsView',
@@ -199,6 +167,13 @@ export default Vue.extend({
           label: this.t('toggle_readability'),
           keys: [this.commands.readability],
         },
+      ];
+    },
+
+    groups(): Array<ShortcutGroup> {
+      return [
+        { label: this.t('this_panel'), rows: this.panelRows },
+        { label: this.t('anywhere'), rows: this.globalRows },
       ];
     },
   },

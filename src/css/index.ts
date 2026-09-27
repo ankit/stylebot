@@ -38,6 +38,7 @@ export {
 export type { FontValueToken } from './font-family';
 export {
   addDeclaration,
+  getDeclarationValue,
   markDeclarationsImportant,
   withoutImportant,
 } from './declaration';

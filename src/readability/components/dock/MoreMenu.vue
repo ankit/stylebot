@@ -87,8 +87,8 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .item {
-  all: unset;
-  box-sizing: border-box;
+  @include button-reset;
+
   display: flex;
   align-items: center;
   gap: 7px;

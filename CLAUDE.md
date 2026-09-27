@@ -54,6 +54,10 @@ Stories:
 
 Import another folder under `src/` only through its `@stylebot/` entry, never its files; the `stylebot/package-entry-imports` lint rule enforces it. With `sideEffects`, an entry import costs no more than a deep one.
 
+## Styles
+
+Reuse the mixins in `src/styles/mixins.scss` (prepended to every stylesheet) instead of copying their declarations; never add shared utility classes, for the specificity reason above. Mixins that only emit declarations (`button-reset`, `truncate`, `field-border`) go at the top of a rule, followed by a blank line. Mixins that emit nested rules (`focus-ring`, `dark-mode`) go with the other nested rules, after the declarations.
+
 ## Commit messages
 
 Use [Conventional Commits](https://www.conventionalcommits.org/) format: `<type>[optional scope]: <description>` (e.g. `fix: correct Firefox extension launch`, `feat(editor): add JS snippet execution`). Common types: `feat`, `fix`, `refactor`, `chore`, `docs`, `test`.

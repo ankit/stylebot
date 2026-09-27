@@ -125,13 +125,12 @@ export default Vue.extend({
 }
 
 .domain {
+  @include truncate;
+
   font-weight: 500;
   font-size: 14px;
   line-height: 1.3;
   color: var(--text-primary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 
   &.disabled {
     color: var(--text-muted);
