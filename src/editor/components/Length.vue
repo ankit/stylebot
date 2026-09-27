@@ -12,8 +12,8 @@
 <script lang="ts">
 import type { PropType } from 'vue';
 import Vue from 'vue';
-import type { Declaration } from 'postcss';
 import { SNumberField } from '@stylebot/components';
+import { getDeclarationValue } from '@stylebot/css';
 import { extractLength } from '../utils/css-value';
 import { computedPlaceholder } from '../utils/computed-placeholder';
 
@@ -47,15 +47,10 @@ export default Vue.extend({
   computed: {
     length: {
       get(): string {
-        const activeRule = this.$store.getters.activeRule;
-        let value = '';
-
-        if (activeRule) {
-          activeRule.clone().walkDecls(this.property, (decl: Declaration) => {
-            value = decl.value;
-          });
-        }
-
+        let value = getDeclarationValue(
+          this.$store.getters.activeRule,
+          this.property
+        );
         if (!value && this.fallback) {
           value = extractLength(this.fallback);
         }

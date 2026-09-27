@@ -163,7 +163,7 @@ export default Vue.extend({
       }
 
       let count = 0;
-      rule.clone().walkDecls((decl: Declaration) => {
+      rule.walkDecls((decl: Declaration) => {
         if (matches(decl.prop)) {
           count++;
         }

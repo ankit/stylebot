@@ -17,8 +17,8 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import type { Declaration } from 'postcss';
 import { SSlider, SText } from '@stylebot/components';
+import { getDeclarationValue } from '@stylebot/css';
 
 import PropertyRow from '../basic/PropertyRow.vue';
 
@@ -33,15 +33,10 @@ export default Vue.extend({
 
   computed: {
     value(): number {
-      const activeRule = this.$store.getters.activeRule;
-      let value = '';
-
-      if (activeRule) {
-        activeRule.clone().walkDecls('opacity', (decl: Declaration) => {
-          value = decl.value;
-        });
-      }
-
+      const value = getDeclarationValue(
+        this.$store.getters.activeRule,
+        'opacity'
+      );
       const parsed = parseFloat(value);
       return Number.isNaN(parsed) ? 1 : parsed;
     },

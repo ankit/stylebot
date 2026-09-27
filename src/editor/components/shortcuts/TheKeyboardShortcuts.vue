@@ -5,13 +5,13 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import type { Declaration, Rule } from 'postcss';
 import type {
   StylebotEditingMode,
   StylebotLayout,
   StylebotEditorCommands,
 } from '@stylebot/types';
 import { isFieldTarget, isMac } from '@stylebot/utils';
+import { getDeclarationValue } from '@stylebot/css';
 
 import { undoKeyFor } from '../../store/undo-stack';
 
@@ -33,9 +33,6 @@ export default Vue.extend({
     },
     activeSelector(): string {
       return this.$store.state.activeSelector;
-    },
-    activeRule(): Rule {
-      return this.$store.getters.activeRule;
     },
     help(): boolean {
       return this.$store.state.help;
@@ -86,13 +83,10 @@ export default Vue.extend({
 
     toggleVisibilityOfActiveSelector(): void {
       if (this.activeSelector) {
-        let value = '';
-
-        if (this.activeRule) {
-          this.activeRule.clone().walkDecls('display', (decl: Declaration) => {
-            value = decl.value;
-          });
-        }
+        const value = getDeclarationValue(
+          this.$store.getters.activeRule,
+          'display'
+        );
 
         this.$store.dispatch('applyDeclaration', {
           property: 'display',

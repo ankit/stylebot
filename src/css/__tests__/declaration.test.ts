@@ -4,6 +4,7 @@ import 'jest-fetch-mock';
 import * as postcss from 'postcss';
 import {
   addDeclaration,
+  getDeclarationValue,
   markDeclarationsImportant,
   withoutImportant,
 } from '../declaration';
@@ -546,5 +547,22 @@ describe('withoutImportant', () => {
     expect(withoutImportant('url("a!important.png")')).toBe(
       'url("a!important.png")'
     );
+  });
+});
+
+describe('getDeclarationValue', () => {
+  it('is empty without a rule', () => {
+    expect(getDeclarationValue(null, 'color')).toBe('');
+  });
+
+  it('is empty when the property is not declared', () => {
+    expect(
+      getDeclarationValue(getRule('a { color: red; }', 'a'), 'display')
+    ).toBe('');
+  });
+
+  it('takes the last declaration when a property is repeated', () => {
+    const rule = getRule('a { color: red; color: blue; }', 'a');
+    expect(getDeclarationValue(rule, 'color')).toBe('blue');
   });
 });

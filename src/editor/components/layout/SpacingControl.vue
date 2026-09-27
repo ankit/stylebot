@@ -155,7 +155,7 @@ export default Vue.extend({
         return sides;
       }
 
-      activeRule.clone().walkDecls((decl: Declaration) => {
+      activeRule.walkDecls((decl: Declaration) => {
         if (decl.prop === this.shorthandProperty) {
           const expanded = expandShorthand(decl.value);
           if (expanded) {
