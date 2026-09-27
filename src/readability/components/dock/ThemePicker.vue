@@ -50,6 +50,7 @@ export default Vue.extend({
 
 .swatch {
   @include button-reset;
+
   height: 24px;
   border-radius: 7px;
   cursor: pointer;

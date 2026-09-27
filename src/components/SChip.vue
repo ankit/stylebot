@@ -21,6 +21,8 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .chip {
+  @include truncate;
+
   min-width: 0;
   max-width: 100%;
   box-sizing: border-box;
@@ -31,6 +33,5 @@ export default Vue.extend({
   font-size: 12px;
   line-height: 1.5;
   color: var(--text-primary);
-  @include truncate;
 }
 </style>

@@ -70,6 +70,7 @@ export default Vue.extend({
 
 .nav-item {
   @include button-reset;
+
   display: block;
   width: 100%;
   padding: 8px 12px;

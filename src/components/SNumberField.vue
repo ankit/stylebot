@@ -135,6 +135,8 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .number-field {
+  @include field-border;
+
   box-sizing: border-box;
   position: relative;
   display: flex;
@@ -142,7 +144,6 @@ export default Vue.extend({
   width: 108px;
   font-size: 13px;
   line-height: 1.2;
-  @include field-border;
 
   // Only the numeric input highlights the whole field — the chevron button
   // gets its own focus ring instead (see .number-chevron).
@@ -201,6 +202,7 @@ export default Vue.extend({
 
 .number-chevron {
   @include button-reset;
+
   flex: none;
   display: inline-flex;
   align-items: center;

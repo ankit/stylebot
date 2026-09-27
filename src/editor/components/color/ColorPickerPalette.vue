@@ -271,9 +271,10 @@ export default Vue.extend({
 }
 
 .option-name {
+  @include truncate;
+
   flex: 1;
   min-width: 0;
-  @include truncate;
 }
 
 .ramps {
@@ -301,6 +302,7 @@ export default Vue.extend({
 
 .swatch {
   @include button-reset;
+
   aspect-ratio: 1;
   border-radius: 5px;
   @include swatch-states;

@@ -108,6 +108,7 @@ export default Vue.extend({
 
 .property-card-header {
   @include button-reset;
+
   display: flex;
   align-items: center;
   gap: 8px;

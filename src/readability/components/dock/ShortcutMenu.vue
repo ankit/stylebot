@@ -235,6 +235,7 @@ export default Vue.extend({
 
 .dismiss {
   @include button-reset;
+
   width: 24px;
   height: 24px;
   flex-shrink: 0;
@@ -271,6 +272,7 @@ export default Vue.extend({
 
 .record-btn {
   @include button-reset;
+
   width: 100%;
   display: flex;
   align-items: center;
@@ -347,6 +349,7 @@ export default Vue.extend({
 
 .cancel {
   @include button-reset;
+
   font-weight: 400;
   font-size: 11.5px;
   line-height: 1;

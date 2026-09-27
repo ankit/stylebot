@@ -145,6 +145,7 @@ export default Vue.extend({
 
 .url {
   @include truncate;
+
   font-weight: 600;
   color: var(--text-primary);
 }

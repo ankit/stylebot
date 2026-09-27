@@ -246,9 +246,10 @@ body {
 }
 
 .popup-header-domain {
+  @include truncate;
+
   min-width: 0;
   flex: 1;
-  @include truncate;
 }
 
 .popup-header-domain.popup-header-domain--muted {

@@ -155,6 +155,7 @@ export default Vue.extend({
 
 .field {
   @include button-reset;
+
   width: 100%;
   display: flex;
   align-items: center;
@@ -205,6 +206,7 @@ export default Vue.extend({
 
 .clear {
   @include button-reset;
+
   flex: none;
   margin-left: auto;
   display: flex;
@@ -231,6 +233,7 @@ export default Vue.extend({
 
 .cancel {
   @include button-reset;
+
   flex: none;
   font-weight: 400;
   font-size: 11.5px;
@@ -246,6 +249,7 @@ export default Vue.extend({
 
 .record-btn {
   @include button-reset;
+
   width: 100%;
   display: flex;
   align-items: center;

@@ -138,8 +138,9 @@ export default Vue.extend({
 }
 
 .chat-change .chat-change-label {
-  min-width: 0;
   @include truncate;
+
+  min-width: 0;
   color: var(--text-primary);
 
   @include dark-mode {

@@ -61,6 +61,7 @@ export default Vue.extend({
 
 .window-tab {
   @include button-reset;
+
   display: flex;
   align-items: center;
   gap: 8px;
@@ -89,9 +90,10 @@ export default Vue.extend({
 }
 
 .window-tab-title {
+  @include truncate;
+
   flex: 1;
   min-width: 0;
-  @include truncate;
 }
 
 .window-tab.background {

@@ -80,6 +80,7 @@ export default Vue.extend({
 // Matches the used-colors row above it and the Palette tab's grid — 36px squares.
 .swatch {
   @include button-reset;
+
   width: 36px;
   height: 36px;
   border-radius: 5px;

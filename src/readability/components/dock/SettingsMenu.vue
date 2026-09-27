@@ -126,6 +126,7 @@ export default Vue.extend({
 
 .reset {
   @include button-reset;
+
   font-weight: 400;
   font-size: 11px;
   line-height: 1.2;

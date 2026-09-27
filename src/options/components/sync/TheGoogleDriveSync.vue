@@ -390,9 +390,10 @@ export default Vue.extend({
 }
 
 .conflict-url {
+  @include truncate;
+
   flex: 1;
   min-width: 0;
-  @include truncate;
   font-size: 14px;
 }
 </style>

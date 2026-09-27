@@ -80,9 +80,10 @@ export default Vue.extend({
 }
 
 .url {
+  @include truncate;
+
   flex: none;
   max-width: 150px;
-  @include truncate;
 }
 
 .selector-row {

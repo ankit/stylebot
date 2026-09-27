@@ -49,9 +49,10 @@ export default Vue.extend({
 }
 
 .property-row-label {
+  @include truncate;
+
   flex: 1 0 auto;
   min-width: 0;
-  @include truncate;
 }
 
 .property-row-control {

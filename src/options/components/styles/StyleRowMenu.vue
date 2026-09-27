@@ -78,8 +78,9 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .truncate {
-  max-width: 220px;
   @include truncate;
+
+  max-width: 220px;
 }
 
 .divider {

@@ -152,14 +152,16 @@ export default Vue.extend({
 }
 
 .more-property-value {
+  @include truncate;
+
   flex: 1;
   min-width: 0;
-  @include truncate;
   font-family: var(--font-mono);
 }
 
 .more-property-remove {
   @include button-reset;
+
   flex: none;
   display: inline-flex;
   align-items: center;
@@ -183,10 +185,11 @@ export default Vue.extend({
 }
 
 .add-property-input {
+  @include field-border(6px);
+
   box-sizing: border-box;
   flex: 1;
   min-width: 0;
-  @include field-border(6px);
   padding: 5px 8px;
   font-family: var(--font-mono);
   font-size: 12px;
@@ -198,20 +201,22 @@ export default Vue.extend({
   }
 
   &:focus {
-    outline: none;
     @include field-active-border;
+
+    outline: none;
   }
 }
 
 .add-property-confirm {
   @include button-reset;
+  @include field-border(6px);
+
   flex: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 27px;
   height: 27px;
-  @include field-border(6px);
   color: var(--accent-text);
   outline: none;
   cursor: pointer;
@@ -225,6 +230,7 @@ export default Vue.extend({
 
 .add-property-button {
   @include button-reset;
+
   display: flex;
   align-items: center;
   justify-content: center;

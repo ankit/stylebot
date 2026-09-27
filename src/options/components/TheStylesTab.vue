@@ -206,6 +206,7 @@ export default Vue.extend({
 
   input {
     @include button-reset;
+
     flex: 1;
     min-width: 0;
     font-weight: 400;

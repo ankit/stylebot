@@ -220,8 +220,9 @@ export default Vue.extend({
 }
 
 .font-row-label {
-  min-width: 0;
   @include truncate;
+
+  min-width: 0;
 }
 
 .font-row-category {
