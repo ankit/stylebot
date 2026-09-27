@@ -27,9 +27,9 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import type { Declaration } from 'postcss';
 import { t } from '@stylebot/i18n';
 import { SSlider, SSegmentedControl } from '@stylebot/components';
+import { getDeclarationValue } from '@stylebot/css';
 
 import PropertyRow from '../basic/PropertyRow.vue';
 
@@ -73,16 +73,7 @@ export default Vue.extend({
 
   computed: {
     rawValue(): string {
-      const activeRule = this.$store.getters.activeRule;
-      let value = '';
-
-      if (activeRule) {
-        activeRule.clone().walkDecls('filter', (decl: Declaration) => {
-          value = decl.value;
-        });
-      }
-
-      return value;
+      return getDeclarationValue(this.$store.getters.activeRule, 'filter');
     },
 
     type(): FilterType {

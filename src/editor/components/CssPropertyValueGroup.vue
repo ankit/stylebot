@@ -18,8 +18,8 @@
 <script lang="ts">
 import type { PropType, Component } from 'vue';
 import Vue from 'vue';
-import type { Declaration } from 'postcss';
 import { SSegmentedControl } from '@stylebot/components';
+import { getDeclarationValue } from '@stylebot/css';
 
 type Option = { title: string; value: string; html?: string; icon?: Component };
 
@@ -44,16 +44,7 @@ export default Vue.extend({
 
   computed: {
     value(): string {
-      const activeRule = this.$store.getters.activeRule;
-
-      let value = '';
-      if (activeRule) {
-        activeRule.clone().walkDecls(this.property, (decl: Declaration) => {
-          value = decl.value;
-        });
-      }
-
-      return value;
+      return getDeclarationValue(this.$store.getters.activeRule, this.property);
     },
 
     disabled(): boolean {

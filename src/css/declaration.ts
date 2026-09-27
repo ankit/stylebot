@@ -78,6 +78,21 @@ export const withoutImportant = (value: string): string =>
   value.replace(/\s*!\s*important\s*$/i, '');
 
 /**
+ * The rule's value for a property, or '' when it isn't declared.
+ * The last declaration wins, matching how the browser resolves it.
+ */
+export const getDeclarationValue = (
+  rule: postcss.Rule | null,
+  property: string
+): string => {
+  let value = '';
+  rule?.walkDecls(property, decl => {
+    value = decl.value;
+  });
+  return value;
+};
+
+/**
  * At-rules that only group ordinary style rules, so `!important` applies
  * inside them as it would at the top level, nested in a rule or not.
  */

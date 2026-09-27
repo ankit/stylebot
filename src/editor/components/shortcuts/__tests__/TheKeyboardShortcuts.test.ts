@@ -21,7 +21,7 @@ const buildMockStore = (visible: boolean, host = 'page') => ({
     },
     editorCommands: defaultEditorCommands,
   },
-  getters: { activeRule: undefined },
+  getters: { activeRule: null },
   commit: jest.fn(),
   dispatch: jest.fn(),
 });

@@ -46,8 +46,8 @@
 <script lang="ts">
 import Vue from 'vue';
 import { t } from '@stylebot/i18n';
-import type { Declaration } from 'postcss';
 import { SSelect, SMenuItem } from '@stylebot/components';
+import { getDeclarationValue } from '@stylebot/css';
 
 import PropertyRow from '../basic/PropertyRow.vue';
 import Length from '../Length.vue';
@@ -90,28 +90,14 @@ export default Vue.extend({
     // Raw value of the border shorthand (e.g. '1px solid #44475a'), used
     // to fall back to when the specific longhand isn't declared.
     shorthandValue(): string {
-      const activeRule = this.$store.getters.activeRule;
-
-      let value = '';
-      if (activeRule) {
-        activeRule.clone().walkDecls('border', (decl: Declaration) => {
-          value = decl.value;
-        });
-      }
-
-      return value;
+      return getDeclarationValue(this.$store.getters.activeRule, 'border');
     },
 
     styleValue(): string {
-      const activeRule = this.$store.getters.activeRule;
-
-      let value = '';
-      if (activeRule) {
-        activeRule.clone().walkDecls('border-style', (decl: Declaration) => {
-          value = decl.value;
-        });
-      }
-
+      let value = getDeclarationValue(
+        this.$store.getters.activeRule,
+        'border-style'
+      );
       if (!value && this.shorthandValue) {
         value = extractBorderStyle(this.shorthandValue);
       }

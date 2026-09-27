@@ -42,7 +42,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import type { Declaration } from 'postcss';
+import { getDeclarationValue } from '@stylebot/css';
 
 import ColorPickerPopover from './ColorPickerPopover.vue';
 import { extractColor } from '../../utils/css-value';
@@ -93,15 +93,10 @@ export default Vue.extend({
   computed: {
     value: {
       get(): string {
-        const activeRule = this.$store.getters.activeRule;
-
-        let value = '';
-        if (activeRule) {
-          activeRule.clone().walkDecls(this.property, (decl: Declaration) => {
-            value = decl.value;
-          });
-        }
-
+        let value = getDeclarationValue(
+          this.$store.getters.activeRule,
+          this.property
+        );
         if (!value && this.fallback) {
           value = extractColor(this.fallback);
         }

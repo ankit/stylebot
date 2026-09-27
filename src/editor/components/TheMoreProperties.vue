@@ -87,7 +87,7 @@ export default Vue.extend({
       const declarations: Array<{ property: string; value: string }> = [];
 
       if (activeRule) {
-        activeRule.clone().walkDecls((decl: Declaration) => {
+        activeRule.walkDecls((decl: Declaration) => {
           if (!KNOWN_PROPERTIES.includes(decl.prop)) {
             declarations.push({ property: decl.prop, value: decl.value });
           }

@@ -28,8 +28,8 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import type { Declaration } from 'postcss';
 import { SButton, STooltip } from '@stylebot/components';
+import { getDeclarationValue } from '@stylebot/css';
 import { EyeOffIcon } from '@stylebot/icons';
 import type { StylebotEditorCommands } from '@stylebot/types';
 
@@ -44,16 +44,10 @@ export default Vue.extend({
 
   computed: {
     isHidden(): boolean {
-      const activeRule = this.$store.getters.activeRule;
-      let value = '';
-
-      if (activeRule) {
-        activeRule.clone().walkDecls('display', (decl: Declaration) => {
-          value = decl.value;
-        });
-      }
-
-      return value === 'none';
+      return (
+        getDeclarationValue(this.$store.getters.activeRule, 'display') ===
+        'none'
+      );
     },
 
     disabled(): boolean {
