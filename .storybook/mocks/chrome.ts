@@ -19,6 +19,9 @@ import type {
   VersionHistory,
 } from '@stylebot/types';
 
+import type { ChatShimOptions } from './chat';
+import { createChatShim } from './chat';
+
 /**
  * A response a story can leave unresolved, to show the surface still waiting.
  */
@@ -37,6 +40,7 @@ export type ChromeShimOptions = {
   tabUrl?: string;
   googleDriveSync?: Pending<RunGoogleDriveSyncResponse>;
   versionHistory?: Pending<VersionHistory>;
+  chat?: ChatShimOptions;
 };
 
 type Callback = (response?: unknown) => void;
@@ -93,6 +97,8 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
     active: true,
     url: overrides.tabUrl ?? 'https://example.com/article',
   };
+
+  const chat = createChatShim(overrides.chat);
 
   const runtimeResponses: Record<
     string,
@@ -158,6 +164,8 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
     },
 
     RestoreVersion: () => ({ ok: true }),
+
+    ...chat.runtimeResponses,
   };
 
   const tabResponses: Record<string, () => unknown> = {
@@ -169,6 +177,7 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
     runtime: {
       sendMessage: (message: { name: string }, callback?: Callback) =>
         respond(callback, runtimeResponses[message.name]?.(message)),
+      connect: chat.connect,
       getURL: (p: string) => `/${p}`,
       getManifest: () => ({ version: MANIFEST_VERSION }),
       onMessage: {

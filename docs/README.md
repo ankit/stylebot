@@ -16,3 +16,4 @@
 - [Selectors and CSS](selectors-and-css.md) — how selectors are picked and CSS is transformed before injection
 - [Readability](readability.md) — the reader view and how it loads
 - [Sync](sync.md) — Google Drive sync and its three-way merge
+- [Chat](chat.md) — bring-your-own-key chat that writes CSS, and its provider adapters
