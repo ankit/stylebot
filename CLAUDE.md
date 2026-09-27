@@ -9,11 +9,12 @@ Browser extension (Chrome/Edge/Firefox) that lets users change the appearance of
   - `src/features/` — capabilities shared by apps: `chat`, `sync`, `history`, `page-bridge`, `highlighter`, `google-fonts`, `readability` (eligibility and reader lifecycle), `monaco-editor`
   - `src/ui/` — `components`, `icons`, `scss`
   - `src/core/` — `css`, `stylesheets`, `saved-styles`, `types`, `settings`, `i18n`, `utils`
-  - `src/assets/` — `extension` (manifests, images), `fonts`, `_locales` (i18n strings per locale)
+  - `src/assets/` — `extension` (manifests, shipped images in `img/`, icon sources in `icon/`), `fonts`, `_locales` (i18n strings per locale)
 - Imports only point down: apps → features, ui, core; features → ui, core; ui → ui, core; core → core. Nothing imports an app, and features don't import each other. The `stylebot/tier-imports` lint rule enforces this; the few imports that predate it are allowlisted in `eslint.config.mjs` — remove entries, never add them.
 - `e2e/` — Playwright end-to-end tests, driven against a real built extension: via CDP (`Extensions.loadUnpacked`) on Chrome/Edge, via Firefox's remote debugging protocol on Firefox; engine-specific code lives in `e2e/chromium/` and `e2e/firefox/` behind the `e2e/engine.ts` contract
 - `__mocks__/` — Jest mocks
 - `dist/` — Chrome/Edge build output; `firefox-dist/` — Firefox build output; `preview-dist/` — `yarn build:preview` output
+- `store/` — store listing art (promo tiles, screenshots) per store; not part of the build
 - `site/` — stylebot.dev static site
 - `docs/` — developer docs: setup, releases, translation, e2e, architecture (editor, selectors and CSS, readability, sync, chat)
 - `patches/` — patch-package patches applied to dependencies on install

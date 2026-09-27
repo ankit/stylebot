@@ -16,6 +16,7 @@ Stylebot is built with Vue 2, TypeScript and webpack.
   - `core/` — the foundation: CSS parsing, saved styles, settings, i18n, shared types and utilities
   - `assets/` — the manifests, bundled fonts and translations (`src/assets/_locales/`)
 - `e2e/` — Playwright end-to-end tests
+- `store/` — promo tiles and screenshots for the store listings
 - `site/` — the [stylebot.dev](https://stylebot.dev) site
 - `docs/` — developer docs ([index](README.md))
 - `patches/` — patches to dependencies
