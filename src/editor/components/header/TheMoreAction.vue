@@ -131,7 +131,7 @@ import {
 
 import type { StylebotEditorCommands, StylebotLayout } from '@stylebot/types';
 
-import { openOptionsPage } from '../../utils/chrome';
+import { openOptionsPage } from '@stylebot/utils';
 
 // Stands in for `!important` in the translated caption, which is split around
 // it so the keyword can be set as code without any stray whitespace.

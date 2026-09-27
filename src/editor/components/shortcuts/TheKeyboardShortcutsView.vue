@@ -109,9 +109,8 @@ import {
 } from '@stylebot/components';
 import { ChevronLeftIcon } from '@stylebot/icons';
 import type { StylebotCommands, StylebotEditorCommands } from '@stylebot/types';
-import { isMac } from '@stylebot/utils';
+import { isMac, openOptionsPage } from '@stylebot/utils';
 
-import { openOptionsPage } from '../../utils/chrome';
 import { undoShortcuts } from '../../store/undo-stack';
 
 type ShortcutRow = { label: string; keys: Array<string> };

@@ -1,3 +1,9 @@
+import type {
+  OpenOptionsPage,
+  OpenReportIssuePage,
+  OpenDonatePage,
+} from '@stylebot/types';
+
 export {
   MODIFIER_KEYS,
   modifiersFromEvent,
@@ -47,16 +53,26 @@ export const getReleaseNotificationId = (): NotificationId =>
   `release/${getReleaseVersion()}`;
 
 export const openOptionsPage = (route?: string): void => {
-  chrome.runtime.sendMessage({
+  const message: OpenOptionsPage = {
     name: 'OpenOptionsPage',
     ...(route ? { route } : {}),
-  });
+  };
+
+  chrome.runtime.sendMessage(message);
 };
 
 export const openReportIssuePage = (): void => {
-  chrome.runtime.sendMessage({ name: 'OpenReportIssuePage' });
+  const message: OpenReportIssuePage = {
+    name: 'OpenReportIssuePage',
+  };
+
+  chrome.runtime.sendMessage(message);
 };
 
 export const openDonatePage = (): void => {
-  chrome.runtime.sendMessage({ name: 'OpenDonatePage' });
+  const message: OpenDonatePage = {
+    name: 'OpenDonatePage',
+  };
+
+  chrome.runtime.sendMessage(message);
 };
