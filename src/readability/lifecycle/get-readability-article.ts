@@ -1,6 +1,6 @@
 import Defuddle from 'defuddle';
 
-import type { ReadabilityArticle } from '@stylebot/types';
+import type { ReadabilityArticle } from '../types';
 
 /**
  * Sites serve the same photo under multiple resized-variant URLs, so compare
