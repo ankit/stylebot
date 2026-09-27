@@ -5,7 +5,7 @@ import type {
   ChatTurn,
   ChatUserTurn,
 } from '@stylebot/types';
-import type { ChatState } from '@/editor/store/chat';
+import type { ChatState } from '@/apps/editor/store/chat';
 
 import { editor } from './editor-story';
 import { storeOf } from './story-helpers';

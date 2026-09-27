@@ -1,6 +1,6 @@
 import type { StoryObj } from '@storybook/vue';
 
-import TheStylebotApp from '@/editor/components/TheStylebotApp.vue';
+import TheStylebotApp from '@/apps/editor/components/TheStylebotApp.vue';
 import type { EditorStateOverrides } from './mocks/editor-store';
 import { createEditorStore } from './mocks/editor-store';
 

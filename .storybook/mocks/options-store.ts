@@ -8,12 +8,12 @@ import type {
   StylebotCommands,
   SyncState,
 } from '@stylebot/types';
-import type { SyncStatus } from '@/options/store';
+import type { SyncStatus } from '@/apps/options/store';
 import {
   runGoogleDriveSync,
   scanVersionHistory,
   restoreVersion,
-} from '@/options/utils';
+} from '@/apps/options/utils';
 
 export type OptionsState = {
   styles: StyleMap;

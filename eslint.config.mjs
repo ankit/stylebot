@@ -4,28 +4,30 @@ import pluginVue from 'eslint-plugin-vue';
 import jsdoc from 'eslint-plugin-jsdoc';
 import prettier from 'eslint-config-prettier';
 import globals from 'globals';
-import { readdirSync } from 'node:fs';
 import path from 'node:path';
+import { SRC_DIR, TIERS } from './scripts/lib/src-packages.js';
 
-const SRC_DIR = path.join(import.meta.dirname, 'src');
-const PACKAGES = new Set(
-  readdirSync(SRC_DIR, { withFileTypes: true })
-    .filter(entry => entry.isDirectory())
-    .map(entry => entry.name)
-);
-
-const packageOf = file => path.relative(SRC_DIR, file).split(path.sep)[0];
+const TIER_DIRS = new Set([...TIERS, 'assets']);
 
 /**
- * The src/ folder an import resolves into, or null for anything outside it.
+ * The package a path under src/ belongs to: the folder inside its tier, so
+ * src/core/css/x.ts is in package css.
+ */
+const packageOf = file => {
+  const [first, second] = path.relative(SRC_DIR, file).split(path.sep);
+  return TIER_DIRS.has(first) ? second : null;
+};
+
+/**
+ * The src/ package an import resolves into, or null for anything outside it.
  */
 const targetPackage = (file, source) => {
   if (source.startsWith('.')) {
     return packageOf(path.resolve(path.dirname(file), source));
   }
 
-  const first = source.split('/')[0];
-  return source.includes('/') && PACKAGES.has(first) ? first : null;
+  const [first, second, ...rest] = source.split('/');
+  return TIER_DIRS.has(first) && rest.length > 0 ? second : null;
 };
 
 /**
@@ -56,7 +58,7 @@ const packageEntryImports = {
 
       const target = targetPackage(file, source);
 
-      if (target && PACKAGES.has(target) && target !== packageOf(file)) {
+      if (target && target !== packageOf(file)) {
         context.report({
           node,
           messageId: 'usePackageEntry',
@@ -228,7 +230,7 @@ export default tseslint.config(
   },
 
   {
-    files: ['*.js'],
+    files: ['*.js', 'scripts/**/*.js'],
     languageOptions: { sourceType: 'commonjs' },
     rules: { '@typescript-eslint/no-require-imports': 'off' },
   },
