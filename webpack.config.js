@@ -165,8 +165,8 @@ const config = {
     new CopyPlugin({
       patterns: [
         {
-          from: 'assets/img',
-          to: 'img',
+          from: 'assets/icon/*.png',
+          to: 'img/[name].[ext]',
         },
         {
           from: 'assets/fonts',
