@@ -19,7 +19,7 @@
       </button>
     </div>
 
-    <s-text v-else-if="!recentColors.length" size="small" variant="muted">
+    <s-text v-else-if="!recentColors.length" size="caption" variant="muted">
       {{ t('color_picker_already_used_empty') }}
     </s-text>
 

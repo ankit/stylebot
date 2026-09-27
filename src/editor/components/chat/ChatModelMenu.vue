@@ -32,7 +32,12 @@
             {{ shown.name }}
           </span>
         </menu-item>
-        <s-text v-else size="small" variant="muted" class="chat-model-heading">
+        <s-text
+          v-else
+          size="caption"
+          variant="muted"
+          class="chat-model-heading"
+        >
           {{ t('provider_models', [shown.name]) }}
         </s-text>
 
@@ -48,7 +53,7 @@
           "
         >
           <span class="chat-model-option">
-            <s-text as="span" size="label" class="chat-model-option-name">
+            <s-text as="span" size="label">
               {{ option.name }}
             </s-text>
             <s-text as="span" size="caption" variant="muted">
@@ -272,10 +277,6 @@ export default Vue.extend({
 
 .chat-model-other-name {
   flex: 1;
-}
-
-.chat-model-option .chat-model-option-name {
-  font-weight: 500;
 }
 
 .chat-menu-action {

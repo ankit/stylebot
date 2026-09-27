@@ -5,7 +5,7 @@
     </sync-status-banner>
 
     <heading as="h1">{{ t('history_options') }}</heading>
-    <s-text variant="muted" class="description">
+    <s-text size="caption" variant="muted" class="description">
       {{ t('history_tab_description') }}
     </s-text>
 

@@ -38,26 +38,29 @@ const mountEditor = (store: Store<State>, el: Element): Vue => {
   });
 };
 
+// Geist Mono is a variable font, so one file covers every weight.
 const SELF_HOSTED_FONTS = [
-  { family: 'Fira Code', file: 'fira-code', weights: [400, 500, 600] },
-  { family: 'Geist', file: 'geist', weights: [400, 500, 600, 700] },
+  { family: 'Geist Mono', file: 'geist-mono', weight: '100 900' },
+  ...[400, 500, 600, 700].map(weight => ({
+    family: 'Geist',
+    file: `geist-${weight}`,
+    weight: String(weight),
+  })),
 ];
 
 const fontFaceCss = (): string =>
-  SELF_HOSTED_FONTS.flatMap(({ family, file, weights }) =>
-    weights.map(
-      weight => `
-        @font-face {
-          font-family: '${family}';
-          font-style: normal;
-          font-weight: ${weight};
-          font-display: swap;
-          src: url('${chrome.runtime.getURL(
-            `fonts/${file}-${weight}.woff2`
-          )}') format('woff2');
-        }
-      `
-    )
+  SELF_HOSTED_FONTS.map(
+    ({ family, file, weight }) => `
+      @font-face {
+        font-family: '${family}';
+        font-style: normal;
+        font-weight: ${weight};
+        font-display: swap;
+        src: url('${chrome.runtime.getURL(
+          `fonts/${file}.woff2`
+        )}') format('woff2');
+      }
+    `
   ).join('');
 
 /**

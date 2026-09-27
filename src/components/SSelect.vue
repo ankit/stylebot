@@ -106,7 +106,7 @@ export default Vue.extend({
   min-width: 108px;
   padding: 5px 8px;
   @include field-border;
-  font-size: 12.5px;
+  font-size: 13px;
   line-height: 1.2;
   color: var(--text-primary);
   outline: none;

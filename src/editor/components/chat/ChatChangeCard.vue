@@ -1,7 +1,7 @@
 <template>
   <div class="chat-change" :class="{ undone: !turn.applied }">
     <code-icon :size="14" class="chat-change-icon" />
-    <s-text as="span" class="chat-change-label" :title="selectors">
+    <s-text as="span" size="label" class="chat-change-label" :title="selectors">
       {{ summary }}
     </s-text>
     <span class="chat-change-spacer" />
@@ -140,7 +140,6 @@ export default Vue.extend({
 
 .chat-change .chat-change-label {
   min-width: 0;
-  font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

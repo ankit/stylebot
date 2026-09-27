@@ -1,7 +1,9 @@
 <template>
   <div class="chat-key-input">
     <div class="chat-key-label-row">
-      <s-text as="label" size="label" :for="inputId">{{ label }}</s-text>
+      <s-text as="label" size="label" :for="inputId">
+        {{ label }}
+      </s-text>
       <s-text
         as="a"
         size="caption"

@@ -3,7 +3,7 @@
     <s-text class="chat-error-text">{{ t(error.key) }}</s-text>
     <s-text
       v-if="error.detail"
-      size="small"
+      size="caption"
       variant="muted"
       class="chat-error-detail"
     >

@@ -214,7 +214,8 @@ export default Vue.extend({
   border-radius: 6px;
   background: none;
   font-family: inherit;
-  font-size: 12px;
+  font-size: 13px;
+  font-weight: 500;
   color: var(--text-muted);
   outline: none;
   cursor: pointer;

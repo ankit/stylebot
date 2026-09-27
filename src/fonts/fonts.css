@@ -1,25 +1,9 @@
 @font-face {
-  font-family: 'Fira Code';
+  font-family: 'Geist Mono';
   font-style: normal;
-  font-weight: 400;
+  font-weight: 100 900;
   font-display: swap;
-  src: url('fira-code-400.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Fira Code';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url('fira-code-500.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Fira Code';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url('fira-code-600.woff2') format('woff2');
+  src: url('geist-mono.woff2') format('woff2');
 }
 
 @font-face {

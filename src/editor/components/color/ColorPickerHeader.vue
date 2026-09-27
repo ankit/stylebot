@@ -10,29 +10,40 @@
       <div class="hex" :class="{ 'not-set': !value }">
         {{ value || t('not_set') }}
       </div>
-      <s-text size="small" variant="muted" as="span">{{ roleLabel }}</s-text>
+      <s-text size="caption" variant="muted" as="span">{{ roleLabel }}</s-text>
     </div>
 
-    <button v-if="value" type="button" class="pick" @click="$emit('clear')">
+    <s-button
+      v-if="value"
+      size="small"
+      class="header-action"
+      @click="$emit('clear')"
+    >
       {{ t('color_picker_clear') }}
-    </button>
+    </s-button>
 
-    <button v-if="eyeDropperSupported" type="button" class="pick" @click="pick">
-      <eyedropper-icon :size="13" />
+    <s-button
+      v-if="eyeDropperSupported"
+      size="small"
+      class="header-action"
+      @click="pick"
+    >
+      <eyedropper-icon :size="11" />
       {{ t('color_picker_pick') }}
-    </button>
+    </s-button>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import { SText } from '@stylebot/components';
+import { SButton, SText } from '@stylebot/components';
 import { EyedropperIcon } from '@stylebot/icons';
 
 export default Vue.extend({
   name: 'ColorPickerHeader',
 
   components: {
+    SButton,
     SText,
     EyedropperIcon,
   },
@@ -118,26 +129,9 @@ export default Vue.extend({
   }
 }
 
-.pick {
-  @include button-reset;
-  flex: none;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  padding: 5px 9px;
-  border: 1px solid var(--field-border);
-  border-radius: 7px;
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 1.2;
-  color: var(--text-secondary);
-  cursor: pointer;
-
-  &:hover {
-    border-color: var(--field-border-hover);
-    color: var(--text-primary);
-  }
-
-  @include focus-ring;
+.header .header-action {
+  gap: 4px;
+  padding: 8px;
+  color: var(--text-muted);
 }
 </style>

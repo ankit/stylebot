@@ -1,6 +1,6 @@
 <template>
   <div v-if="colors.length" class="recent-row">
-    <s-text size="small" variant="muted" as="span" class="heading">
+    <s-text size="caption" variant="muted" as="span" class="heading">
       {{ t('color_picker_recent') }}
     </s-text>
     <div class="swatches">

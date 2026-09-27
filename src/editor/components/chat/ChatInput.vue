@@ -71,7 +71,7 @@ export default Vue.extend({
   outline: 0;
   resize: none;
   font-family: inherit;
-  font-size: 12.5px;
+  font-size: 13px;
   line-height: 1.5;
   color: var(--text-primary);
   background: transparent;

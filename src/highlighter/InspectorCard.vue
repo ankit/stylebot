@@ -234,7 +234,7 @@ export default Vue.extend({
   white-space: nowrap;
   font-family: var(
     --font-mono,
-    'Fira Code',
+    'Geist Mono',
     Menlo,
     Monaco,
     Consolas,
@@ -251,7 +251,7 @@ export default Vue.extend({
   overflow-wrap: anywhere;
   font-family: var(
     --font-mono,
-    'Fira Code',
+    'Geist Mono',
     Menlo,
     Monaco,
     Consolas,

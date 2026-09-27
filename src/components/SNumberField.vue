@@ -140,7 +140,7 @@ export default Vue.extend({
   display: flex;
   align-items: stretch;
   width: 108px;
-  font-size: 12.5px;
+  font-size: 13px;
   line-height: 1.2;
   @include field-border;
 
@@ -169,7 +169,7 @@ export default Vue.extend({
   background: transparent;
   padding: 5px 8px;
   font-family: var(--font-mono);
-  font-size: 12.5px;
+  font-size: 13px;
   line-height: 1.2;
   color: var(--text-primary);
   cursor: text;

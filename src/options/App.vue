@@ -155,8 +155,16 @@ a {
 }
 
 .options-app {
+  --text-body-size: 14px;
+  --text-body-line-height: 20px;
+  --text-caption-size: 13px;
+  --text-caption-line-height: 20px;
+  --heading-lg-size: 20px;
+  --heading-md-size: 16px;
+  --heading-sm-size: 14px;
+
   display: grid;
-  grid-template-columns: 216px 1fr;
+  grid-template-columns: 200px 1fr;
   grid-template-rows: 1fr auto;
   min-height: 100vh;
 }

@@ -87,8 +87,9 @@ export default Vue.extend({
   padding: 10px 18px;
   background: var(--tab-surface);
   border-bottom: 1px solid var(--panel-border);
-  font-size: 13px;
-  line-height: 1.4;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
   color: var(--text-faint);
 }
 </style>

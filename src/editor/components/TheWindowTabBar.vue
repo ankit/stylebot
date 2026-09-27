@@ -8,7 +8,7 @@
     >
       <img v-if="favIconUrl" class="window-tab-icon" :src="favIconUrl" alt="" />
       <span v-else class="window-tab-icon window-tab-icon-placeholder" />
-      <s-text size="small" class="window-tab-title">{{ title }}</s-text>
+      <s-text size="caption" class="window-tab-title">{{ title }}</s-text>
       <s-text v-if="inBackground" size="caption" class="window-tab-hint">
         {{ t('tab_in_background') }}
       </s-text>

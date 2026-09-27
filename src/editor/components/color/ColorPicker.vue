@@ -328,7 +328,7 @@ export default Vue.extend({
   // high — nudge down 1px to optically center it instead.
   line-height: 24px;
   font-family: var(--font-mono);
-  font-size: 12.5px;
+  font-size: 13px;
   color: var(--text-primary);
   outline: none;
   cursor: text;

@@ -1,6 +1,8 @@
 <template>
   <div class="navigation">
-    <heading as="div" class="wordmark">Stylebot</heading>
+    <div class="logo">
+      <logo-icon />
+    </div>
 
     <nav class="nav-list">
       <button
@@ -19,13 +21,13 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { Heading } from '@stylebot/components';
+import { LogoIcon } from '@stylebot/icons';
 
 export default Vue.extend({
   name: 'TheNavigation',
 
   components: {
-    Heading,
+    LogoIcon,
   },
 
   props: {
@@ -45,15 +47,19 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .navigation {
   flex: none;
-  width: 216px;
+  width: 200px;
   border-right: 1px solid var(--panel-border);
-  padding: 20px 12px;
+  padding: 24px 12px;
   display: flex;
   flex-direction: column;
 }
 
-.wordmark {
-  padding: 0 12px 20px;
+.logo {
+  display: flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 12px;
+  margin-bottom: 14px;
 }
 
 .nav-list {
@@ -69,14 +75,15 @@ export default Vue.extend({
   width: 100%;
   padding: 8px 12px;
   border-radius: 8px;
-  font-weight: 400;
-  font-size: 13.5px;
-  line-height: 1.3;
-  color: color-mix(in srgb, var(--text-muted) 65%, var(--text-primary));
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--text-secondary);
   cursor: pointer;
 
   &:hover {
     background: var(--hover-tint);
+    color: var(--text-primary);
   }
 
   &:focus-visible {

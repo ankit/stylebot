@@ -121,7 +121,7 @@ export default Vue.extend({
   --success-background: #e8f5ee;
   --success-border: #c3e6d1;
 
-  --font-mono: 'Fira Code', Menlo, Monaco, Consolas, monospace;
+  --font-mono: 'Geist Mono', Menlo, Monaco, Consolas, monospace;
 }
 
 .theme-provider ::v-deep ::selection {

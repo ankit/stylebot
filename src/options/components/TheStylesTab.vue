@@ -3,7 +3,7 @@
     <div class="header">
       <div class="title-block">
         <heading as="h1">{{ t('styles_options') }}</heading>
-        <s-text variant="muted" class="subtitle">
+        <s-text size="caption" variant="muted" class="subtitle">
           {{
             t(totalCount === 1 ? 'sites_count_one' : 'sites_count_other', [
               String(totalCount),
@@ -209,7 +209,7 @@ export default Vue.extend({
     flex: 1;
     min-width: 0;
     font-weight: 400;
-    font-size: 13px;
+    font-size: 14px;
     line-height: 1.2;
     color: var(--text-primary);
 

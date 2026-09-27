@@ -176,7 +176,7 @@ class MonacEditorIframe {
       value: '',
       tabSize: 2,
       theme: this.getMonacoTheme(),
-      fontFamily: "'Fira Code', Menlo, Monaco, Consolas, monospace",
+      fontFamily: "'Geist Mono', Menlo, Monaco, Consolas, monospace",
       fontLigatures: true,
       ...wrapOptions,
       scrollBeyondLastLine: false,

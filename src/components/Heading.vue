@@ -38,21 +38,21 @@ export default Vue.extend({
 
 .lg {
   font-weight: 600;
-  font-size: 17px;
+  font-size: var(--heading-lg-size, 17px);
   line-height: 1.2;
   letter-spacing: -0.01em;
 }
 
 .md {
   font-weight: 600;
-  font-size: 15px;
+  font-size: var(--heading-md-size, 14px);
   line-height: 1.25;
   letter-spacing: -0.01em;
 }
 
 .sm {
   font-weight: 600;
-  font-size: 13.5px;
+  font-size: var(--heading-sm-size, 13px);
   line-height: 1.25;
 }
 </style>

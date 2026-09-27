@@ -21,7 +21,7 @@
 
     <div class="view-body">
       <div class="group">
-        <s-text size="caption" variant="muted" class="group-label">
+        <s-text size="overline" class="group-label">
           {{ t('this_panel') }}
         </s-text>
 
@@ -54,7 +54,7 @@
       </div>
 
       <div class="group">
-        <s-text size="caption" variant="muted" class="group-label">
+        <s-text size="overline" class="group-label">
           {{ t('anywhere') }}
         </s-text>
 
@@ -235,7 +235,7 @@ export default Vue.extend({
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 12px 14px;
+  padding: 12px 14px 12px 7px;
   background: var(--panel-surface);
   border-bottom: 1px solid var(--panel-border);
 }
@@ -267,10 +267,6 @@ export default Vue.extend({
 .group-label {
   display: block;
   padding-bottom: 5px;
-  font-weight: 600;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-  color: var(--text-faint);
 }
 
 .row {
@@ -288,7 +284,6 @@ export default Vue.extend({
 .row-label {
   flex: 1;
   min-width: 0;
-  color: var(--text-primary);
 }
 
 .keys {

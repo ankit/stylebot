@@ -1,7 +1,7 @@
 <template>
   <div>
-    <heading as="h2">{{ t('keyboard_shortcuts') }}</heading>
-    <s-text variant="muted" class="description">
+    <heading as="h2" size="md">{{ t('keyboard_shortcuts') }}</heading>
+    <s-text size="caption" variant="muted" class="description">
       {{ t('keyboard_shortcuts_description') }}
     </s-text>
 

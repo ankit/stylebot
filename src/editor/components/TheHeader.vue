@@ -1,7 +1,7 @@
 <template>
   <div class="header">
     <div class="header-top">
-      <s-text size="small" variant="muted" class="url">{{ url }}</s-text>
+      <s-text size="caption" variant="muted" class="url">{{ url }}</s-text>
       <the-window-actions />
     </div>
 

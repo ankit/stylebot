@@ -3,7 +3,7 @@
     <s-text
       v-if="turn.scope"
       as="span"
-      size="small"
+      size="caption"
       variant="primary"
       class="chat-user-scope"
       :title="turn.scope"
@@ -87,7 +87,7 @@ export default Vue.extend({
   object-position: top left;
 }
 
-.chat-user-text {
+.chat-user-message .chat-user-text {
   padding: 9px 12px;
   border-radius: 12px 12px 4px 12px;
   background: var(--active);

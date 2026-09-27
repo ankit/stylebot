@@ -27,9 +27,9 @@ export default Vue.extend({
   padding: 2px 9px;
   border: 1px solid transparent;
   border-radius: 999px;
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 600;
-  line-height: 1.3;
+  line-height: 16px;
   white-space: nowrap;
 }
 
