@@ -5,21 +5,21 @@
     :tooltip-shortcut="shortcut"
     @click="onClick"
   >
-    <icon-x :size="14" />
+    <x-icon :size="14" />
   </s-icon-button>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import { SIconButton, isMac } from '@stylebot/components';
-import { IconX } from '@stylebot/icons';
+import { XIcon } from '@stylebot/icons';
 
 export default Vue.extend({
   name: 'TheCloseAction',
 
   components: {
     SIconButton,
-    IconX,
+    XIcon,
   },
 
   computed: {

@@ -53,7 +53,7 @@
     "setupFiles": [
       "./setupJest.js"
     ],
-    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "testRegex": "\\.(test|spec)\\.(jsx?|tsx?)$",
     "transform": {
       ".*\\.(vue)$": "@vue/vue2-jest",
       "^.+\\.ts$": "ts-jest",

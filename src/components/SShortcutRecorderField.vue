@@ -33,12 +33,12 @@
           :aria-label="t('clear_shortcut')"
           @click.stop="clear"
         >
-          <icon-x />
+          <x-icon />
         </button>
       </div>
 
       <button v-else type="button" class="record-btn" @click="startRecording">
-        <icon-keyboard />
+        <keyboard-icon />
         {{ t('record_a_shortcut') }}
       </button>
     </slot>
@@ -61,15 +61,15 @@ import {
 } from '@stylebot/utils';
 
 import SShortcutKbd from './SShortcutKbd.vue';
-import { IconKeyboard, IconX } from '@stylebot/icons';
+import { KeyboardIcon, XIcon } from '@stylebot/icons';
 
 export default Vue.extend({
   name: 'SShortcutRecorderField',
 
   components: {
     SShortcutKbd,
-    IconKeyboard,
-    IconX,
+    KeyboardIcon,
+    XIcon,
   },
 
   props: {

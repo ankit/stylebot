@@ -1,4 +1,4 @@
-import type { ChatPageContext } from '@stylebot/types';
+import type { ChatPageContext } from '../types';
 
 import { INSTRUCTIONS } from './instructions';
 

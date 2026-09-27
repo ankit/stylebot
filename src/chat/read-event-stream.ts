@@ -1,4 +1,4 @@
-import type { ServerSentEvent } from '@stylebot/types';
+import type { ServerSentEvent } from './types';
 
 /**
  * Reads a server-sent event stream, calling back once per event. Chunks
