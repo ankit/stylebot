@@ -11,6 +11,7 @@ const ProgressBarPlugin = require('progress-bar-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 
 const { parseLocaleConfig } = require('./scripts/lib/parse-locale-config');
+const { SRC_DIR, packageDirs } = require('./scripts/lib/src-packages');
 
 const isPreview = process.env.STYLEBOT_PREVIEW === '1';
 
@@ -92,52 +93,12 @@ const config = {
 
   resolve: {
     extensions: ['.ts', '.js', '.vue'],
-    alias: {
-      '@stylebot/components': path.resolve(__dirname, './src/components/index'),
-      '@stylebot/icons': path.resolve(__dirname, './src/icons/index'),
-      '@stylebot/css': path.resolve(__dirname, './src/css/index'),
-      '@stylebot/inject-css': path.resolve(__dirname, './src/inject-css/index'),
-      '@stylebot/i18n': path.resolve(__dirname, './src/i18n/index'),
-      '@stylebot/sync': path.resolve(__dirname, './src/sync/index'),
-      '@stylebot/history': path.resolve(__dirname, './src/history/index'),
-      '@stylebot/editor': path.resolve(__dirname, './src/editor/index'),
-      '@stylebot/types': path.resolve(__dirname, './src/types/index'),
-      '@stylebot/utils': path.resolve(__dirname, './src/utils/index'),
-      '@stylebot/saved-styles': path.resolve(
-        __dirname,
-        './src/saved-styles/index'
-      ),
-      '@stylebot/stylesheets': path.resolve(
-        __dirname,
-        './src/stylesheets/index'
-      ),
-      '@stylebot/settings': path.resolve(__dirname, './src/settings/index'),
-      '@stylebot/chat': path.resolve(__dirname, './src/chat/index'),
-      '@stylebot/page-bridge': path.resolve(
-        __dirname,
-        './src/page-bridge/index'
-      ),
-
-      '@stylebot/google-fonts': path.resolve(
-        __dirname,
-        './src/google-fonts/index'
-      ),
-
-      '@stylebot/readability': path.resolve(
-        __dirname,
-        './src/readability/index'
-      ),
-
-      '@stylebot/highlighter': path.resolve(
-        __dirname,
-        './src/highlighter/index'
-      ),
-
-      '@stylebot/monaco-editor': path.resolve(
-        __dirname,
-        './src/monaco-editor/index'
-      ),
-    },
+    alias: Object.fromEntries(
+      Object.entries(packageDirs()).map(([name, dir]) => [
+        `@stylebot/${name}`,
+        path.join(SRC_DIR, dir, 'index'),
+      ])
+    ),
   },
 
   module: {
@@ -185,7 +146,7 @@ const config = {
             options: {
               prependData: `@import "mixins";`,
               sassOptions: {
-                includePaths: [path.resolve(__dirname, 'src/scss')],
+                includePaths: [path.resolve(__dirname, 'src/ui/scss')],
               },
             },
           },
@@ -204,48 +165,48 @@ const config = {
     new CopyPlugin({
       patterns: [
         {
-          from: 'extension/img',
-          to: 'img',
+          from: 'assets/icon/*.png',
+          to: 'img/[name].[ext]',
         },
         {
-          from: 'fonts',
+          from: 'assets/fonts',
           to: 'fonts',
         },
         {
-          from: 'google-fonts/fonts.json',
+          from: 'features/google-fonts/fonts.json',
           to: 'google-fonts/fonts.json',
         },
         {
-          from: 'options/index.html',
+          from: 'apps/options/index.html',
           to: 'options.html',
           transform: transformHtml,
         },
         {
-          from: 'popup/index.html',
+          from: 'apps/popup/index.html',
           to: 'popup/index.html',
           transform: transformHtml,
         },
         {
-          from: 'editor-window/index.html',
+          from: 'apps/editor/window/index.html',
           to: 'editor-window/index.html',
           transform: transformHtml,
         },
         {
-          from: 'editor-window/appearance-init.js',
+          from: 'apps/editor/window/appearance-init.js',
           to: 'editor-window/appearance-init.js',
         },
         {
-          from: 'monaco-editor/iframe/index.html',
+          from: 'apps/monaco-iframe/index.html',
           to: 'monaco-editor/iframe/index.html',
           transform: transformHtml,
         },
         {
-          from: 'monaco-editor/iframe/options-index.html',
+          from: 'apps/monaco-iframe/options-index.html',
           to: 'monaco-editor/iframe/options-index.html',
           transform: transformHtml,
         },
         {
-          from: 'monaco-editor/iframe/theme-init.js',
+          from: 'apps/monaco-iframe/theme-init.js',
           to: 'monaco-editor/iframe/theme-init.js',
         },
         {
@@ -257,7 +218,7 @@ const config = {
           to: 'monaco-editor/iframe/requirejs',
         },
         {
-          from: '_locales/*.config',
+          from: 'assets/_locales/*.config',
           to: '_locales/[name]/messages.json',
 
           transform: raw => {
@@ -267,7 +228,7 @@ const config = {
           },
         },
         {
-          from: 'extension/manifest.json',
+          from: 'assets/manifest/manifest.json',
           to: 'manifest.json',
 
           transform: content => {
@@ -276,7 +237,7 @@ const config = {
             if (process.env.BROWSER === 'firefox') {
               const firefoxJsonContent = JSON.parse(
                 fs.readFileSync(
-                  `${__dirname}/src/extension/manifest-firefox.json`
+                  `${__dirname}/src/assets/manifest/manifest-firefox.json`
                 )
               );
               jsonContent = { ...jsonContent, ...firefoxJsonContent };
@@ -286,7 +247,9 @@ const config = {
                * Release builds leave it out: the store rejects an uploaded manifest with a `key`.
                */
               const devJsonContent = JSON.parse(
-                fs.readFileSync(`${__dirname}/src/extension/manifest-dev.json`)
+                fs.readFileSync(
+                  `${__dirname}/src/assets/manifest/manifest-dev.json`
+                )
               );
               jsonContent = { ...jsonContent, ...devJsonContent };
             }
@@ -318,7 +281,7 @@ function transformHtml(content) {
 const backgroundPageConfig = {
   ...config,
   entry: {
-    'background/index': './background/index.ts',
+    'background/index': './apps/background/index.ts',
   },
   plugins: [
     new WriteBuildMarkerPlugin('background'),
@@ -331,16 +294,16 @@ const backgroundPageConfig = {
 const clientConfig = {
   ...config,
   entry: {
-    'popup/index': './popup/index.ts',
-    'editor/index': './editor/content-script.ts',
-    'editor/app': './editor/app.ts',
-    options: './options/index.ts',
-    'editor-window/index': './editor-window/index.ts',
-    'inject-css/index': './inject-css/content-script.ts',
-    'monaco-editor/iframe/index': './monaco-editor/iframe/index.ts',
+    'popup/index': './apps/popup/index.ts',
+    'editor/index': './apps/editor/content-script.ts',
+    'editor/app': './apps/editor/app.ts',
+    options: './apps/options/index.ts',
+    'editor-window/index': './apps/editor/window/index.ts',
+    'inject-css/index': './apps/content/content-script.ts',
+    'monaco-editor/iframe/index': './apps/monaco-iframe/index.ts',
     'monaco-editor/iframe/options-index':
-      './monaco-editor/iframe/options-index.ts',
-    'readability/reader': './readability/reader.ts',
+      './apps/monaco-iframe/options-index.ts',
+    'readability/reader': './apps/reader/reader.ts',
   },
   // Webpack's `global` shim falls back to `new Function` in the bundles loaded
   // with import(), which a strict page CSP blocks and reports as an issue.

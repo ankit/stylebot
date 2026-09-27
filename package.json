@@ -60,7 +60,13 @@
       "^.+\\.js$": "babel-jest"
     },
     "moduleNameMapper": {
-      "^@stylebot/(.*)$": "<rootDir>/src/$1/index",
+      "^@stylebot/inject-css$": "<rootDir>/src/apps/content/index",
+      "^@stylebot/(.*)$": [
+        "<rootDir>/src/core/$1/index",
+        "<rootDir>/src/features/$1/index",
+        "<rootDir>/src/ui/$1/index",
+        "<rootDir>/src/apps/$1/index"
+      ],
       "\\.(css|scss)$": "<rootDir>/__mocks__/styleMock.js"
     },
     "testEnvironment": "jsdom"

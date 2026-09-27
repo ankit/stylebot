@@ -1,4 +1,4 @@
-// Cross-checks src/_locales/*.config against how message keys are referenced
+// Cross-checks src/assets/_locales/*.config against how message keys are referenced
 // from source. Exits 1 on errors; missing translations are warnings only.
 
 import { readFileSync, readdirSync } from 'node:fs';
@@ -13,9 +13,9 @@ const rootDir = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   '..'
 );
-const localesDir = path.join(rootDir, 'src/_locales');
+const localesDir = path.join(rootDir, 'src/assets/_locales');
 const srcDir = path.join(rootDir, 'src');
-const manifestPath = path.join(rootDir, 'src/extension/manifest.json');
+const manifestPath = path.join(rootDir, 'src/assets/manifest/manifest.json');
 
 const KEY_PATTERN = /^[a-z][a-z0-9_]*$/;
 

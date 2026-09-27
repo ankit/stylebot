@@ -13,7 +13,13 @@
     "types": ["chrome", "jest", "node"],
     "baseUrl": "src",
     "paths": {
-      "@stylebot/*": ["*/index"]
+      "@stylebot/inject-css": ["apps/content/index"],
+      "@stylebot/*": [
+        "core/*/index",
+        "features/*/index",
+        "ui/*/index",
+        "apps/*/index"
+      ]
     }
   }
 }

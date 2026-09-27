@@ -28,7 +28,7 @@ test.afterAll(async () => {
   await server.close();
 });
 
-// KNOWN GAP, LOCKED IN AS A BASELINE: src/editor/listeners/chrome.ts's TabUpdated
+// KNOWN GAP, LOCKED IN AS A BASELINE: src/apps/editor/listeners/chrome.ts's TabUpdated
 // handler re-derives readability on nav but never re-runs CSS matching/injection.
 test('CSS style matching does not re-run on a same-tab SPA navigation (documents a known gap)', async ({
   context,

@@ -6,7 +6,7 @@ import type { within } from '@storybook/test';
 import { expect, fireEvent, userEvent, waitFor } from '@storybook/test';
 
 import { getDeclarationsForSelector } from '@stylebot/css';
-import type { State } from '@/editor/store';
+import type { State } from '@/apps/editor/store';
 
 type Components = Record<string, Component>;
 type Data = () => Record<string, unknown>;

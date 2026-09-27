@@ -9,12 +9,19 @@ Stylebot is built with Vue 2, TypeScript and webpack.
 
 ## Project layout
 
-- `src/` — extension source (background, content scripts, popup, options page, editor)
-- `src/_locales/` — translations
+- `src/` — extension source, grouped into tiers:
+  - `apps/` — what the extension loads: the background worker, content script, popup, options page, editor and its pop-out window, reader, and code editor frame
+  - `features/` — capabilities the apps share, such as chat, sync, style history, readability and the page bridge
+  - `ui/` — shared components, icons and styles
+  - `core/` — the foundation: CSS parsing, saved styles, settings, i18n, shared types and utilities
+  - `assets/` — the manifests, extension icons, bundled fonts and translations (`src/assets/_locales/`)
 - `e2e/` — Playwright end-to-end tests
+- `store/` — promo tiles and screenshots for the store listings
 - `site/` — the [stylebot.dev](https://stylebot.dev) site
 - `docs/` — developer docs ([index](README.md))
 - `patches/` — patches to dependencies
+
+Imports only point down the tiers: apps build on features, ui and core; features on ui and core; ui on core. Nothing imports an app, and features don't import each other. Code in another folder is imported through its `@stylebot/<folder>` entry, never its files. `yarn lint` enforces both.
 
 ## Run a development build
 

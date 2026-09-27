@@ -8,7 +8,13 @@
     "paths": {
       "@stylebot/storybook/*": ["../.storybook/*"],
       "@/*": ["*"],
-      "@stylebot/*": ["*/index"]
+      "@stylebot/inject-css": ["apps/content/index"],
+      "@stylebot/*": [
+        "core/*/index",
+        "features/*/index",
+        "ui/*/index",
+        "apps/*/index"
+      ]
     },
     "skipLibCheck": true
   }
