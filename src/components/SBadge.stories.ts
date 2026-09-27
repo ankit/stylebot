@@ -7,7 +7,10 @@ const meta: Meta = {
   title: 'Primitives/SBadge',
   component: SBadge,
   argTypes: {
-    variant: { control: 'radio', options: ['muted', 'accent'] },
+    variant: {
+      control: 'radio',
+      options: ['muted', 'accent', 'success', 'danger'],
+    },
     label: { control: 'text' },
   },
   args: { variant: 'muted', label: 'Restored' },
@@ -28,6 +31,8 @@ export const Variants = fromTemplate(
   <div class="sb-row">
     <s-badge variant="accent">Current</s-badge>
     <s-badge variant="muted">Restored</s-badge>
+    <s-badge variant="success">Synced</s-badge>
+    <s-badge variant="danger">Sign in needed</s-badge>
   </div>
 `
 );

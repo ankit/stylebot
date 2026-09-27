@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="card">
+    <s-card class="card">
       <div class="header">
         <div class="status">
           <span class="title">
@@ -12,20 +12,25 @@
           </span>
 
           <template v-if="googleDriveSyncEnabled">
-            <span v-if="needsAuth" class="pill danger">
+            <s-badge v-if="needsAuth" variant="danger">
               {{ t('sync_needs_sign_in') }}
-            </span>
-            <span v-else-if="syncInProgress" class="pill muted">
+            </s-badge>
+            <s-badge v-else-if="syncInProgress" variant="muted">
               <arrow-repeat-icon :size="12" spinning />
               {{ t('sync_in_progress') }}
-            </span>
-            <span v-else-if="googleDriveSyncLastModifiedTime" class="pill ok">
+            </s-badge>
+            <s-badge
+              v-else-if="googleDriveSyncLastModifiedTime"
+              variant="success"
+            >
               <span class="dot" />
               {{ t('synced_at_time', [googleDriveSyncLastModifiedTime]) }}
-            </span>
+            </s-badge>
           </template>
 
-          <span v-else class="subtitle">{{ t('sync_not_connected') }}</span>
+          <s-text v-else variant="muted" class="subtitle">
+            {{ t('sync_not_connected') }}
+          </s-text>
         </div>
 
         <s-button
@@ -54,19 +59,7 @@
               target="_blank"
             >
               {{ syncFilePath }}
-              <svg
-                class="external"
-                viewBox="0 0 12 12"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M4.5 2.5h5v5" />
-                <path d="M9.5 2.5 3 9" />
-              </svg>
+              <external-link-icon aria-hidden="true" />
             </a>
             <span v-else class="path">{{ syncFilePath }}</span>
           </dd>
@@ -86,16 +79,16 @@
         <li class="service">
           <div class="service-text">
             <div class="service-name">{{ t('google_drive') }}</div>
-            <div class="service-description">
+            <s-text variant="muted">
               {{ t('sync_google_drive_description', [syncFileName]) }}
-            </div>
+            </s-text>
           </div>
           <s-button variant="primary" @click="googleDriveSyncEnabled = true">
             {{ t('sync_connect') }}
           </s-button>
         </li>
       </ul>
-    </div>
+    </s-card>
 
     <div v-if="conflicts.length" class="conflicts">
       <s-heading as="h3" size="md">{{ t('sync_conflicts_title') }}</s-heading>
@@ -120,8 +113,15 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { SHeading, SText, SButton, SLinkButton } from '@stylebot/components';
-import { ArrowRepeatIcon } from '@stylebot/icons';
+import {
+  SBadge,
+  SButton,
+  SCard,
+  SHeading,
+  SLinkButton,
+  SText,
+} from '@stylebot/components';
+import { ArrowRepeatIcon, ExternalLinkIcon } from '@stylebot/icons';
 import type { SyncAccount, SyncConflict } from '@stylebot/types';
 import { formatSyncTime } from '@stylebot/utils';
 import {
@@ -134,9 +134,12 @@ export default Vue.extend({
   name: 'TheGoogleDriveSync',
 
   components: {
+    SBadge,
     SButton,
+    SCard,
     SLinkButton,
     ArrowRepeatIcon,
+    ExternalLinkIcon,
     SHeading,
     SText,
   },
@@ -208,8 +211,6 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .card {
   margin-top: 20px;
-  border: 1px solid var(--panel-border);
-  border-radius: 12px;
   overflow: hidden;
 }
 
@@ -238,9 +239,6 @@ export default Vue.extend({
 
 .subtitle {
   flex-basis: 100%;
-  font-size: 13px;
-  line-height: 1.45;
-  color: var(--text-muted);
 }
 
 .services {
@@ -259,43 +257,14 @@ export default Vue.extend({
 .service-text {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .service-name {
   font-size: 14px;
   font-weight: 600;
-}
-
-.service-description {
-  margin-top: 2px;
-  font-size: 13px;
-  line-height: 1.45;
-  color: var(--text-muted);
-}
-
-.pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 3px 10px;
-  border-radius: 999px;
-  border: 1px solid var(--panel-border);
-  font-size: 11.5px;
-  font-weight: 600;
-  line-height: 1.5;
-  color: var(--text-muted);
-}
-
-.pill.ok {
-  color: var(--success);
-  background: var(--success-background);
-  border-color: var(--success-border);
-}
-
-.pill.danger {
-  color: var(--danger);
-  background: var(--danger-background);
-  border-color: var(--danger-border);
 }
 
 .dot {
@@ -357,11 +326,6 @@ export default Vue.extend({
   &:hover {
     text-decoration: underline;
   }
-}
-
-.external {
-  width: 11px;
-  height: 11px;
 }
 
 .description {
