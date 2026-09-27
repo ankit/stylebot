@@ -1,16 +1,14 @@
 <template>
   <s-anchored-menu class="appearance-action-anchor">
     <template #trigger="{ toggle }">
-      <s-tooltip :text="t('panel_appearance')">
-        <s-icon-button
-          :size="20"
-          :aria-label="t('panel_appearance')"
-          @click="toggle"
-        >
-          <sun-icon v-if="resolvedTheme === 'light'" />
-          <moon-icon v-else />
-        </s-icon-button>
-      </s-tooltip>
+      <s-icon-button
+        :size="20"
+        :tooltip="t('panel_appearance')"
+        @click="toggle"
+      >
+        <sun-icon v-if="resolvedTheme === 'light'" />
+        <moon-icon v-else />
+      </s-icon-button>
     </template>
 
     <template #default="{ close }">
@@ -65,7 +63,6 @@ import {
   SMenu,
   SMenuItem,
   SIconButton,
-  STooltip,
 } from '@stylebot/components';
 import { SunIcon, MoonIcon, MonitorIcon } from '@stylebot/icons';
 import { resolveAppearance, getSystemPreference } from '@stylebot/utils';
@@ -80,7 +77,6 @@ export default Vue.extend({
     SMenu,
     SMenuItem,
     SIconButton,
-    STooltip,
     SunIcon,
     MoonIcon,
     MonitorIcon,

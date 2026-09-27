@@ -1,14 +1,17 @@
 <template>
-  <s-tooltip :text="t('close')" :shortcut="shortcut">
-    <s-icon-button :size="20" :aria-label="t('close')" @click="onClick">
-      <icon-x :size="14" />
-    </s-icon-button>
-  </s-tooltip>
+  <s-icon-button
+    :size="20"
+    :tooltip="t('close')"
+    :tooltip-shortcut="shortcut"
+    @click="onClick"
+  >
+    <icon-x :size="14" />
+  </s-icon-button>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import { SIconButton, isMac, STooltip } from '@stylebot/components';
+import { SIconButton, isMac } from '@stylebot/components';
 import { IconX } from '@stylebot/icons';
 
 export default Vue.extend({
@@ -16,7 +19,6 @@ export default Vue.extend({
 
   components: {
     SIconButton,
-    STooltip,
     IconX,
   },
 

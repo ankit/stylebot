@@ -1,15 +1,9 @@
 <template>
   <s-anchored-menu class="more-action-anchor">
     <template #trigger="{ toggle }">
-      <s-tooltip :text="t('view_options')">
-        <s-icon-button
-          :size="20"
-          :aria-label="t('view_options')"
-          @click="toggle"
-        >
-          <more-icon :size="20" />
-        </s-icon-button>
-      </s-tooltip>
+      <s-icon-button :size="20" :tooltip="t('view_options')" @click="toggle">
+        <more-icon :size="20" />
+      </s-icon-button>
     </template>
 
     <template #default="{ close }">
@@ -116,7 +110,6 @@ import {
   SMenu,
   SMenuItem,
   SIconButton,
-  STooltip,
   SToggleSwitch,
   SSegmentedControl,
   SText,
@@ -145,7 +138,6 @@ export default Vue.extend({
     SMenu,
     SMenuItem,
     SIconButton,
-    STooltip,
     SToggleSwitch,
     SSegmentedControl,
     SText,

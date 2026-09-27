@@ -1,9 +1,7 @@
 <template>
-  <s-tooltip :text="t('view_options')">
-    <s-icon-button bordered @click="openOptions">
-      <icon-options />
-    </s-icon-button>
-  </s-tooltip>
+  <s-icon-button bordered :tooltip="t('view_options')" @click="openOptions">
+    <icon-options />
+  </s-icon-button>
 </template>
 
 <script lang="ts">
@@ -11,7 +9,7 @@ import Vue from 'vue';
 
 import { IconOptions } from '@stylebot/icons';
 import { openOptions } from '../utils';
-import { SIconButton, STooltip } from '@stylebot/components';
+import { SIconButton } from '@stylebot/components';
 
 export default Vue.extend({
   name: 'SettingsButton',
@@ -19,7 +17,6 @@ export default Vue.extend({
   components: {
     IconOptions,
     SIconButton,
-    STooltip,
   },
 
   methods: {
