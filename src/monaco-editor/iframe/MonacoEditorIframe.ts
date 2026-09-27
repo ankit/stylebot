@@ -32,7 +32,7 @@ class MonacEditorIframe {
     this.loadEditor(() => {
       this.attachWindowListeners();
       this.defineThemes();
-      this.configureDiagnostics();
+      this.configureCssLanguage();
       this.initEditor();
       this.postMessage({ type: 'stylebotMonacoIframeLoaded' });
     });
@@ -122,11 +122,19 @@ class MonacEditorIframe {
     );
   }
 
-  configureDiagnostics(): void {
+  configureCssLanguage(): void {
+    const { cssDefaults } = window.monaco.languages.css;
+
     // Both fire on normal Stylebot usage (empty rules on element pick,
     // single-browser vendor-prefixed hacks) rather than real mistakes.
-    window.monaco.languages.css.cssDefaults.setDiagnosticsOptions({
+    cssDefaults.setDiagnosticsOptions({
       lint: { emptyRules: 'ignore', vendorPrefix: 'ignore' },
+    });
+
+    // Drops the property-docs popup; lint hovers come from markers, so they stay.
+    cssDefaults.setModeConfiguration({
+      ...cssDefaults.modeConfiguration,
+      hovers: false,
     });
   }
 
