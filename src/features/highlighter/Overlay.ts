@@ -15,21 +15,13 @@ import OverlayRect from './OverlayRect';
 import OverlayTip from './OverlayTip';
 import type { Rect, Dimensions } from './utils';
 import { getElementDimensions, getNestedBoundingClientRect } from './utils';
-import type { Box, LayoutProperty, NextAncestorInfo } from './types';
-import type { CssDeclaration } from '@stylebot/types';
+import type { Box, LayoutProperty } from './types';
 
 type Edges = { top: number; right: number; bottom: number; left: number };
 
 type PickingOptions = {
   primary?: HTMLElement;
-  nextAncestor?: NextAncestorInfo | null;
-  styleCount?: number;
-  declarations?: Array<CssDeclaration> | null;
-  /**
-   * A selector preview rather than picking an element — see
-   * OverlayTip.updatePositionNextToPanel.
-   */
-  anchorToPanel?: boolean;
+  ruleCount?: number;
 };
 
 // A safety net against pathological cases, not a design choice.
@@ -41,6 +33,33 @@ const emptyEdges = (): Edges => ({
   bottom: Number.NEGATIVE_INFINITY,
   left: Number.POSITIVE_INFINITY,
 });
+
+const TILED_THRESHOLD = 8;
+
+const visibleBoxes = (elements: Array<HTMLElement>): Array<Rect> =>
+  elements
+    .map(element => getNestedBoundingClientRect(element, window))
+    .filter(
+      box =>
+        box.top + box.height > 0 &&
+        box.top < window.innerHeight &&
+        box.left + box.width > 0 &&
+        box.left < window.innerWidth
+    );
+
+const touches = (a: Rect, b: Rect): boolean =>
+  a.left <= b.left + b.width + 1 &&
+  b.left <= a.left + a.width + 1 &&
+  a.top <= b.top + b.height + 1 &&
+  b.top <= a.top + a.height + 1;
+
+/**
+ * How many boxes touch or overlap at least one other.
+ */
+const countTouching = (boxes: Array<Rect>): number =>
+  boxes.filter((box, i) =>
+    boxes.some((other, j) => i !== j && touches(box, other))
+  ).length;
 
 const isEmpty = (edges: Edges) => edges.left === Number.POSITIVE_INFINITY;
 
@@ -67,7 +86,7 @@ const toBox = (edges: Edges): Box => ({
 export default class Overlay {
   container: HTMLElement;
   mountRoot?: HTMLElement;
-  tip: OverlayTip;
+  tip: OverlayTip | null;
   rects: Array<OverlayRect>;
   hints: Array<OverlayHint>;
 
@@ -85,13 +104,13 @@ export default class Overlay {
     doc.body.appendChild(this.container);
 
     this.mountRoot = mountRoot;
-    this.tip = new OverlayTip(mountRoot ?? this.container);
+    this.tip = null;
     this.rects = [];
     this.hints = [];
   }
 
   remove(): void {
-    this.tip.remove();
+    this.tip?.remove();
     this.rects.forEach(rect => {
       rect.remove();
     });
@@ -104,6 +123,25 @@ export default class Overlay {
     }
   }
 
+  /**
+   * Created on first use, so an outline-only overlay never mounts a card.
+   */
+  ensureTip(): OverlayTip {
+    if (!this.tip) {
+      this.tip = new OverlayTip(this.mountRoot ?? this.container);
+    }
+
+    return this.tip;
+  }
+
+  /**
+   * Tints every match of a selector previewed from the panel, with no card.
+   */
+  outline(nodes: Array<HTMLElement>): void {
+    this.drawRects([]);
+    this.drawHints(nodes.slice(0, MAX_ELEMENTS), true);
+  }
+
   inspect(
     nodes: Array<HTMLElement>,
     cssSelector: string,
@@ -111,30 +149,31 @@ export default class Overlay {
     picking?: PickingOptions
   ): void {
     const primary = picking?.primary;
-    const anchorToPanel = picking?.anchorToPanel ?? false;
 
     const candidates = nodes.filter(
       node => node.nodeType === Node.ELEMENT_NODE
     ) as Array<HTMLElement>;
 
-    // Only a hovered element gets the full box; every other match, and every
-    // match of a selector previewed from the panel, gets a faint tint.
-    const hinting = !property && (primary !== undefined || anchorToPanel);
+    // Only a hovered element gets the full box; every other match gets a
+    // faint tint.
+    const hinting = !property && primary !== undefined;
     let elements: Array<HTMLElement> = [];
     if (primary) {
       elements = [primary];
     } else if (!hinting) {
       elements = candidates.slice(0, MAX_ELEMENTS);
     }
-    this.drawHints(
-      hinting
-        ? candidates.filter(node => node !== primary).slice(0, MAX_ELEMENTS)
-        : []
-    );
+    const others = hinting
+      ? candidates.filter(node => node !== primary).slice(0, MAX_ELEMENTS)
+      : [];
+    // Matches that tile together (stacked rows) would tint the page into one
+    // sheet, so only the hovered one is highlighted.
+    const tiled =
+      primary !== undefined &&
+      countTouching(visibleBoxes([primary, ...others])) > TILED_THRESHOLD;
+    this.drawHints(tiled ? [] : others);
 
-    // Beside the panel the card stands on its own, e.g. for a selector
-    // that matches nothing right now (:hover) or is deliberately unboxed.
-    if (elements.length === 0 && !anchorToPanel) {
+    if (elements.length === 0) {
       this.drawRects([], property);
       return;
     }
@@ -145,21 +184,15 @@ export default class Overlay {
       return;
     }
 
-    this.tip.showSummary({
+    const tip = this.ensureTip();
+
+    tip.showSummary({
       name: cssSelector,
-      showSelector: !anchorToPanel,
-      nextAncestor: picking?.nextAncestor,
-      styleCount: picking?.styleCount,
-      declarations: picking?.declarations,
+      ruleCount: picking?.ruleCount ?? 0,
     });
 
     const panelEl =
       this.mountRoot?.querySelector<HTMLElement>('.stylebot') ?? null;
-
-    if (anchorToPanel) {
-      this.tip.updatePositionNextToPanel(panelEl);
-      return;
-    }
 
     // Anchors to the primary element itself, not the union of every
     // match, so scattered matches don't fling the tooltip around.
@@ -173,7 +206,7 @@ export default class Overlay {
 
     const panelRect = panelEl?.getBoundingClientRect() ?? null;
 
-    this.tip.updatePosition(
+    tip.updatePosition(
       toBox(anchor),
       {
         top: docRect.top + window.scrollY,
@@ -189,16 +222,8 @@ export default class Overlay {
    * Tints each element that's in the viewport, reusing existing hints;
    * off-screen matches aren't drawn at all.
    */
-  drawHints(elements: Array<HTMLElement>): void {
-    const boxes = elements
-      .map(element => getNestedBoundingClientRect(element, window))
-      .filter(
-        box =>
-          box.top + box.height > 0 &&
-          box.top < window.innerHeight &&
-          box.left + box.width > 0 &&
-          box.left < window.innerWidth
-      );
+  drawHints(elements: Array<HTMLElement>, strong = false): void {
+    const boxes = visibleBoxes(elements);
 
     while (this.hints.length > boxes.length) {
       this.hints.pop()?.remove();
@@ -208,7 +233,7 @@ export default class Overlay {
       this.hints.push(new OverlayHint(window.document, this.container));
     }
 
-    boxes.forEach((box, index) => this.hints[index].update(box));
+    boxes.forEach((box, index) => this.hints[index].update(box, strong));
   }
 
   /**

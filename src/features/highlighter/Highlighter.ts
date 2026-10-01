@@ -1,7 +1,5 @@
 import Overlay from './Overlay';
-import type { LayoutProperty, NextAncestorInfo } from './types';
 import { getSelector, splitSelectorList } from '@stylebot/css';
-import type { CssDeclaration } from '@stylebot/types';
 
 const WHOLE_PAGE_SELECTORS = ['*', 'body', 'html', ':root'];
 
@@ -11,7 +9,7 @@ const isWholePageSelector = (selector: string): boolean =>
 class Highlighter {
   overlay: Overlay | null;
   onSelect: (selector: string) => void;
-  getStylebotDeclarations?: (selector: string) => Array<CssDeclaration> | null;
+  countRules?: (selector: string) => number;
   getExistingSelector?: (el: HTMLElement) => string | null;
   getMountRoot?: () => HTMLElement | undefined;
   currentElement: HTMLElement | null;
@@ -28,14 +26,15 @@ class Highlighter {
 
   constructor({
     onSelect,
-    getStylebotDeclarations,
+    countRules,
     getExistingSelector,
     getMountRoot,
   }: {
     onSelect: (selector: string) => void;
-    getStylebotDeclarations?: (
-      selector: string
-    ) => Array<CssDeclaration> | null;
+    /**
+     * How many declarations the user's style has for a selector, for the card.
+     */
+    countRules?: (selector: string) => number;
     getExistingSelector?: (el: HTMLElement) => string | null;
     /**
      * The editor's theme-provider element, for the on-page tip to mount into.
@@ -44,7 +43,7 @@ class Highlighter {
   }) {
     this.overlay = null;
     this.onSelect = onSelect;
-    this.getStylebotDeclarations = getStylebotDeclarations;
+    this.countRules = countRules;
     this.getExistingSelector = getExistingSelector;
     this.getMountRoot = getMountRoot;
     this.currentElement = null;
@@ -161,34 +160,15 @@ class Highlighter {
     );
   };
 
-  getCardDeclarations = (
-    selector: string
-  ): { styleCount: number; declarations: Array<CssDeclaration> | null } => {
-    const declarations = this.getStylebotDeclarations?.(selector) ?? null;
-
-    return {
-      styleCount: declarations?.length ?? 0,
-      declarations,
-    };
-  };
-
-  highlight = (selector: string, property?: LayoutProperty): void => {
+  highlight = (selector: string): void => {
     if (!selector) {
       return;
     }
 
-    // Boxing a whole-page selector just floods the page; the card alone
-    // still says what it styles.
-    const elements = isWholePageSelector(selector)
-      ? []
-      : this.queryMatches(selector);
-
-    this.ensureOverlay().inspect(elements, selector, property, {
-      // A selector preview, not picking one specific element — anchor
-      // beside the panel rather than near wherever it matches.
-      anchorToPanel: true,
-      ...this.getCardDeclarations(selector),
-    });
+    // Tinting a whole-page selector just floods the page.
+    this.ensureOverlay().outline(
+      isWholePageSelector(selector) ? [] : this.queryMatches(selector)
+    );
   };
 
   unhighlight = (): void => {
@@ -219,25 +199,6 @@ class Highlighter {
 
   selectElement = (el: HTMLElement): void => {
     this.onSelect(this.getSelectorFor(el));
-  };
-
-  /**
-   * Info about the immediate parent, offered as the single next step
-   * upward rather than listing several levels at once.
-   */
-  getNextAncestorInfo = (el: HTMLElement): NextAncestorInfo | null => {
-    const parent = el.parentElement;
-
-    if (!parent || this.isStylebotElement(parent)) {
-      return null;
-    }
-
-    const selector = this.getSelectorFor(parent);
-
-    return {
-      label: selector,
-      styleCount: this.getStylebotDeclarations?.(selector)?.length ?? 0,
-    };
   };
 
   onKeyDown = (event: KeyboardEvent): void => {
@@ -348,8 +309,7 @@ class Highlighter {
       undefined,
       {
         primary: el,
-        nextAncestor: this.getNextAncestorInfo(el),
-        ...this.getCardDeclarations(selector),
+        ruleCount: this.countRules?.(selector) ?? 0,
       }
     );
   };

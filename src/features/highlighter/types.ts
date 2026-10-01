@@ -12,9 +12,4 @@ export type LayoutProperty =
   | 'height'
   | 'width';
 
-export type NextAncestorInfo = {
-  label: string;
-  styleCount: number;
-};
-
 export type TipPlacement = 'above' | 'below' | null;

@@ -65,19 +65,16 @@ export class LocalPageBridge extends PageBridgeEmitter implements PageBridge {
   constructor({ getStylebotCss }: { getStylebotCss: () => string }) {
     super();
 
-    const getStylebotDeclarations = (selector: string) =>
-      getDeclarationsForSelector(getStylebotCss(), selector);
-
     this.inspector = new Highlighter({
       onSelect: selector => this.emit('select', selector),
-      getStylebotDeclarations,
+      countRules: selector =>
+        getDeclarationsForSelector(getStylebotCss(), selector)?.length ?? 0,
       getExistingSelector: el => getExistingSelector(el, getStylebotCss()),
       getMountRoot,
     });
 
     this.previewer = new Highlighter({
       onSelect: () => undefined,
-      getStylebotDeclarations,
       getMountRoot,
     });
   }

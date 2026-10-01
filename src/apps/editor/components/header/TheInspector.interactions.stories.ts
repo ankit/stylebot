@@ -33,8 +33,7 @@ const lastChipText = (root: ParentNode, scope: string) =>
   ).trim();
 
 const currentChip = () =>
-  lastChipText(document, '.inspect-card .row:not(.next-row)');
-const nextChip = () => lastChipText(document, '.inspect-card .next-row');
+  (document.querySelector('.inspect-card .selector')?.textContent ?? '').trim();
 const selectorChip = (root: HTMLElement) =>
   lastChipText(root, '.selector-autocomplete .autocomplete-chips');
 
@@ -125,16 +124,14 @@ export const ArrowKeysClimbAncestors: StoryObj = {
     const store = storeOf(canvasElement);
     const link = canvas.getByRole('link', { name: 'Learn more' });
 
-    await step('hovering shows the element and offers its parent', async () => {
+    await step('hovering shows the element', async () => {
       await hoverPage(link);
       await waitFor(() => expect(currentChip()).toMatch(/\ba$/));
-      await expect(nextChip()).toMatch(/\bp$/);
     });
 
     await step('ArrowUp climbs, ArrowDown descends', async () => {
       await pressKey('ArrowUp');
       await waitFor(() => expect(currentChip()).toMatch(/\bp$/));
-      await expect(nextChip()).toMatch(/\bmain$/);
 
       await pressKey('ArrowDown');
       await waitFor(() => expect(currentChip()).toMatch(/\ba$/));
@@ -167,9 +164,6 @@ export const ArrowKeysClimbAncestors: StoryObj = {
       }
 
       await waitFor(() => expect(currentChip()).toBe('html'));
-      await expect(
-        document.querySelector('.inspect-card .next-row')
-      ).toBeNull();
 
       await pressKey('Enter');
       await waitFor(() => expect(selectorChip(canvasElement)).toBe('html'));

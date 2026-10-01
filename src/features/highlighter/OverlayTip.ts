@@ -2,8 +2,7 @@ import type Vue from 'vue';
 
 import InspectorCard from './InspectorCard.vue';
 import { findTipPos, leftBesidePanel } from './tip-position';
-import type { Box, NextAncestorInfo, TipPlacement } from './types';
-import type { CssDeclaration } from '@stylebot/types';
+import type { Box, TipPlacement } from './types';
 
 /**
  * The instance shape InspectorCard.vue exposes (shims-vue.d.ts types
@@ -11,10 +10,7 @@ import type { CssDeclaration } from '@stylebot/types';
  */
 type InspectorCardInstance = Vue & {
   name: string;
-  showSelector: boolean;
-  styleCount: number;
-  declarations: Array<CssDeclaration> | null;
-  nextAncestor: NextAncestorInfo | null;
+  ruleCount: number;
   top: number;
   left: number;
   placement: TipPlacement;
@@ -22,10 +18,7 @@ type InspectorCardInstance = Vue & {
 
 export type TipSummary = {
   name: string;
-  showSelector: boolean;
-  nextAncestor: NextAncestorInfo | null | undefined;
-  styleCount: number | undefined;
-  declarations: Array<CssDeclaration> | null | undefined;
+  ruleCount: number;
 };
 
 /**
@@ -49,10 +42,7 @@ export default class OverlayTip {
 
   showSummary(summary: TipSummary): void {
     this.vm.name = summary.name;
-    this.vm.showSelector = summary.showSelector;
-    this.vm.nextAncestor = summary.nextAncestor ?? null;
-    this.vm.styleCount = summary.styleCount ?? 0;
-    this.vm.declarations = summary.declarations ?? null;
+    this.vm.ruleCount = summary.ruleCount;
   }
 
   /**
@@ -93,40 +83,6 @@ export default class OverlayTip {
       this.vm.top = tipPos.top;
       this.vm.left = left;
       this.vm.placement = tipPos.placement;
-    });
-  }
-
-  /**
-   * For a selector preview rather than picking an element — sits beside the
-   * panel instead of near matches that may be scattered or off-screen.
-   */
-  updatePositionNextToPanel(panelEl: HTMLElement | null): void {
-    this.vm.$nextTick(() => {
-      const tipRect = (this.vm.$el as HTMLElement).getBoundingClientRect();
-      const panelRect = panelEl?.getBoundingClientRect();
-      const margin = 16;
-      const viewportWidth = window.innerWidth;
-      const viewportHeight = window.innerHeight;
-
-      let left: number;
-      let top: number;
-
-      if (panelRect) {
-        left = leftBesidePanel(panelRect, tipRect.width, margin, viewportWidth);
-        top = panelRect.top;
-      } else {
-        // Panel not found (shouldn't normally happen) — a corner beats
-        // leaving the card wherever it last was.
-        left = Math.max(margin, viewportWidth - tipRect.width - margin);
-        top = margin;
-      }
-
-      this.vm.left = left;
-      this.vm.top = Math.max(
-        margin,
-        Math.min(top, viewportHeight - tipRect.height - margin)
-      );
-      this.vm.placement = null;
     });
   }
 }
