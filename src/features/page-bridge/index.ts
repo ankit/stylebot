@@ -17,7 +17,12 @@ export const getPageBridge = (): PageBridge => {
 export { LocalPageBridge } from './LocalPageBridge';
 export { RemotePageBridge } from './remote-page-bridge/RemotePageBridge';
 export { emptyPageSnapshot } from './utils';
-export type { PageBridge, PageBridgeEvents, PageSnapshot } from './PageBridge';
+export type {
+  PageBridge,
+  PageBridgeEvents,
+  PageSnapshot,
+  SelectorAlternatives,
+} from './PageBridge';
 export type { AppliedDeclaration } from './applied-declarations';
 export { REMOTE_PAGE_BRIDGE_PORT } from './remote-page-bridge/constants';
 export type {

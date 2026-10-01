@@ -9,6 +9,9 @@ import {
   getTagNameBasedSelector,
   getAncestorBasedSelector,
   validateSelector,
+  getSelectorCandidates,
+  dedupeByMatches,
+  byReach,
 } from './selector';
 
 describe('selector', () => {
@@ -442,5 +445,48 @@ describe('selector', () => {
     it('returns false for an invalid selector', () => {
       expect(validateSelector('div.foo:bar(')).toBe(false);
     });
+  });
+});
+
+describe('getSelectorCandidates, dedupeByMatches and byReach', () => {
+  afterEach(() => {
+    document.body.innerHTML = '';
+  });
+
+  it('offers wider and narrower selectors, keeping one per reach', () => {
+    document.body.innerHTML = `
+      <table><tr><td class="subtext">
+        <span class="subline"><span class="age"><a id="first">1</a></span></span>
+      </td></tr></table>
+      <a>other</a>
+    `;
+    const el = document.getElementById('first') as HTMLElement;
+    const candidates = getSelectorCandidates(el);
+
+    expect(candidates).toEqual(
+      expect.arrayContaining(['span.age a', 'td.subtext a', 'a'])
+    );
+    candidates.forEach(selector => expect(el.matches(selector)).toBe(true));
+
+    // span span a matches exactly what span.age a does.
+    const kept = dedupeByMatches(['span.age a', ...candidates]);
+    expect(kept).toContain('span.age a');
+    expect(kept).not.toContain('span span a');
+
+    expect(byReach(kept)[0]).toBe('a');
+  });
+
+  it("skips bare container tags and scopes by the element's own class", () => {
+    document.body.innerHTML = `
+      <table><tr><td class="title">
+        <span class="sitestr" id="site">site</span>
+      </td></tr></table>
+    `;
+    const candidates = getSelectorCandidates(
+      document.getElementById('site') as HTMLElement
+    );
+
+    expect(candidates).not.toContain('span');
+    expect(candidates).toContain('td.title span.sitestr');
   });
 });

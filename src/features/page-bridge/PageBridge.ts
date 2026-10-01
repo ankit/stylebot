@@ -15,6 +15,16 @@ export type PageSnapshot = {
   bodyChildSelectors: Array<string>;
 };
 
+/**
+ * Other ways to select an element: the style's selectors that already
+ * match it, then selectors built for it, broadest first. No two match the
+ * same set of elements.
+ */
+export type SelectorAlternatives = {
+  existing: Array<string>;
+  candidates: Array<string>;
+};
+
 export type PageBridgeEvents = {
   // The inspector picked an element on the page.
   select: (selector: string) => void;
@@ -112,6 +122,12 @@ export type PageBridge = {
    * is about, each with the selector it comes from.
    */
   getAppliedDeclarations(selector: string): Promise<Array<AppliedDeclaration>>;
+
+  /**
+   * Other selectors for the element last picked with this selector, or the
+   * selector's first match when that element no longer fits.
+   */
+  getSelectorAlternatives(selector: string): Promise<SelectorAlternatives>;
 
   /**
    * The page's CSS as context for restyling it: its variables, and its

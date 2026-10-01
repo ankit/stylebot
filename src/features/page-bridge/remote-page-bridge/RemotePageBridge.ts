@@ -1,7 +1,11 @@
 import type { AppliedDeclaration } from '../applied-declarations';
 import type { RoleColorGroups } from '@stylebot/css';
 
-import type { PageBridge, PageSnapshot } from '../PageBridge';
+import type {
+  PageBridge,
+  PageSnapshot,
+  SelectorAlternatives,
+} from '../PageBridge';
 import { PageBridgeEmitter } from '../PageBridgeEmitter';
 import {
   REMOTE_PAGE_BRIDGE_PORT,
@@ -267,6 +271,10 @@ export class RemotePageBridge extends PageBridgeEmitter implements PageBridge {
 
   getPageOutline(): Promise<string> {
     return this.request('getPageOutline');
+  }
+
+  getSelectorAlternatives(selector: string): Promise<SelectorAlternatives> {
+    return this.request('getSelectorAlternatives', selector);
   }
 
   getAppliedDeclarations(selector: string): Promise<Array<AppliedDeclaration>> {

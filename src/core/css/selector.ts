@@ -214,6 +214,142 @@ export const getSelector = (el: HTMLElement): string => {
   );
 };
 
+const countMatches = (selector: string): number => {
+  try {
+    return document.querySelectorAll(selector).length;
+  } catch {
+    return 0;
+  }
+};
+
+/**
+ * Scopes `el` by each of its nearest ancestors (up to 4 levels) that has a
+ * class, test id or name of its own, e.g. `td.subtext a`: each is a step
+ * wider or narrower than the others. The element keeps its own class if
+ * it has one (`td.title span.sitestr`), since its bare tag says little.
+ */
+const getAncestorScopedSelectors = (el: HTMLElement): Array<string> => {
+  const subject = getGoodOwnSelector(el) ?? el.tagName.toLowerCase();
+  const selectors: Array<string> = [];
+  let ancestor = el.parentElement;
+
+  for (let level = 0; ancestor && level < 4; level++) {
+    const own = getGoodOwnSelector(ancestor) ?? getClassBasedSelector(ancestor);
+
+    if (own) {
+      selectors.push(`${own} ${subject}`);
+    }
+
+    ancestor = ancestor.parentElement;
+  }
+
+  return selectors;
+};
+
+// Tags that say what an element is, so "every one of them" is a real choice;
+// span or div on their own are just containers.
+const MEANINGFUL_TAGS = new Set([
+  'a',
+  'article',
+  'aside',
+  'blockquote',
+  'button',
+  'code',
+  'figcaption',
+  'figure',
+  'footer',
+  'h1',
+  'h2',
+  'h3',
+  'h4',
+  'h5',
+  'h6',
+  'header',
+  'img',
+  'input',
+  'label',
+  'li',
+  'nav',
+  'ol',
+  'p',
+  'pre',
+  'table',
+  'td',
+  'th',
+  'tr',
+  'ul',
+]);
+
+const getMeaningfulTagSelector = (el: HTMLElement): string | null => {
+  const tag = el.tagName.toLowerCase();
+  return MEANINGFUL_TAGS.has(tag) ? tag : null;
+};
+
+const matchesOf = (selector: string): Array<Element> => {
+  try {
+    return Array.from(document.querySelectorAll(selector));
+  } catch {
+    return [];
+  }
+};
+
+/**
+ * Keeps the first of any selectors that match exactly the same elements,
+ * so a list only offers choices that change what gets styled.
+ */
+export const dedupeByMatches = (selectors: Array<string>): Array<string> => {
+  const kept: Array<{ selector: string; matches: Array<Element> }> = [];
+
+  for (const selector of new Set(selectors)) {
+    const matches = matchesOf(selector);
+    const duplicate = kept.some(
+      other =>
+        other.matches.length === matches.length &&
+        other.matches.every((match, i) => match === matches[i])
+    );
+
+    if (!duplicate) {
+      kept.push({ selector, matches });
+    }
+  }
+
+  return kept.map(({ selector }) => selector);
+};
+
+/**
+ * Every selector the strategies above offer for `el` that actually matches
+ * it, most readable first: its own names, then ancestor scopes, then
+ * hashed classes and bare tags.
+ */
+export const getSelectorCandidates = (el: HTMLElement): Array<string> =>
+  [
+    getNonHashedClassBasedSelector(el),
+    getTestIdBasedSelector(el),
+    getNameBasedSelector(el),
+    getAncestorBasedSelector(el),
+    ...getAncestorScopedSelectors(el),
+    getIdBasedSelector(el),
+    getClassBasedSelector(el),
+    getAncestorHashedClassSelector(el),
+    getMeaningfulTagSelector(el),
+    getTagNameBasedSelector(el),
+  ].filter((selector): selector is string => {
+    try {
+      return Boolean(selector) && el.matches(selector as string);
+    } catch {
+      return false;
+    }
+  });
+
+/**
+ * Sorts selectors broadest first, by how many elements each matches.
+ */
+export const byReach = (selectors: Array<string>): Array<string> =>
+  selectors
+    .map(selector => ({ selector, count: countMatches(selector) }))
+    .sort((a, b) => b.count - a.count)
+    .map(({ selector }) => selector);
+
 /**
  * The members of a comma-separated selector list, trimmed.
  */

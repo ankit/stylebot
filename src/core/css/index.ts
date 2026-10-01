@@ -20,6 +20,9 @@ export {
   splitSelectorList,
   validateSelector,
   getBodyChildSelectors,
+  getSelectorCandidates,
+  dedupeByMatches,
+  byReach,
 } from './selector';
 
 export {
@@ -51,6 +54,7 @@ export {
   getRuleForSelector,
   getDeclarationsForSelector,
   getExistingSelector,
+  getMatchingSelectors,
   splitSelectorFromGroup,
   addEmptyRule,
   removeEmptyRules,

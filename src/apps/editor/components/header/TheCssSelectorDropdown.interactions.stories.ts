@@ -166,9 +166,8 @@ export const LongSelectorChips: StoryObj = {
           container.getBoundingClientRect().right
         );
       }
-      await expect(chipEls[0].scrollWidth).toBeGreaterThan(
-        chipEls[0].clientWidth
-      );
+      const label = chipEls[0].querySelector('.chip-label') as HTMLElement;
+      await expect(label.scrollWidth).toBeGreaterThan(label.clientWidth);
     };
 
     await expectTrimmedChips(chips(canvasElement));
