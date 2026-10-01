@@ -1,5 +1,5 @@
 <template>
-  <property-row :label="t('font_size')">
+  <property-row property="font-size" :label="t('font_size')">
     <length property="font-size" :sizes="sizes" />
   </property-row>
 </template>

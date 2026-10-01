@@ -1,4 +1,5 @@
 import type { RoleColorGroups } from '@stylebot/css';
+import type { AppliedDeclaration } from '../applied-declarations';
 import type { PageSnapshot } from '../PageBridge';
 
 /**
@@ -17,6 +18,7 @@ export type RemotePageBridgeRequestArgs = {
   getPageColors: [];
   getComputedStyles: [selector: string, properties: Array<string>];
   getPageOutline: [];
+  getAppliedDeclarations: [selector: string];
   getPageCssContext: [selector: string];
 };
 
@@ -27,6 +29,7 @@ export type RemotePageBridgeRequestResult = {
   getPageColors: RoleColorGroups;
   getComputedStyles: Record<string, string>;
   getPageOutline: string;
+  getAppliedDeclarations: Array<AppliedDeclaration>;
   getPageCssContext: string;
 };
 

@@ -113,6 +113,60 @@ describe('getters', () => {
     });
   });
 
+  describe('setByOtherSelector and overriddenByOtherSelector', () => {
+    const state = {
+      ...mockState,
+      css: 'h1 { color: red; }',
+      activeSelector: 'h1',
+      appliedDeclarations: [
+        { property: 'color', value: 'rgb(0, 0, 255)', selector: '.title' },
+        { property: 'font-size', value: '20px', selector: '*' },
+      ],
+    };
+
+    const rulesFor = (inspected: typeof state, inspectedSelector: string) => {
+      const deps = {
+        activeRule: getters.activeRule(inspected, { inspectedSelector }),
+        otherSelectorValues: getters.otherSelectorValues(inspected, {
+          inspectedSelector,
+        }),
+      };
+
+      return {
+        other: getters.setByOtherSelector(inspected, deps),
+        overriding: getters.overriddenByOtherSelector(inspected, deps),
+      };
+    };
+
+    it('names the selector that sets a property the rule leaves unset', () => {
+      const { other, overriding } = rulesFor(state, 'h1');
+
+      expect(other).toEqual({ 'font-size': { selector: '*', value: '20px' } });
+      expect(overriding['font-size']).toBeUndefined();
+    });
+
+    it('names the selector that wins over a property the rule sets', () => {
+      const { other, overriding } = rulesFor(state, 'h1');
+
+      expect(overriding).toEqual({
+        color: { selector: '.title', value: '#0000ff' },
+      });
+      expect(other.color).toBeUndefined();
+    });
+
+    it('says nothing about other selectors while editing a page-wide rule', () => {
+      const pageWide = {
+        ...state,
+        css: '* { color: red; }',
+        activeSelector: '*',
+      };
+      const { other, overriding } = rulesFor(pageWide, '*');
+
+      expect(other).toEqual({});
+      expect(overriding).toEqual({});
+    });
+  });
+
   describe('grayscale', () => {
     it('reads the percentage off the rules for the page snapshot selectors', () => {
       const state = {

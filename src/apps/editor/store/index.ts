@@ -17,6 +17,7 @@ import {
 } from '@stylebot/settings';
 
 import type { PageSnapshot } from '@stylebot/page-bridge';
+import type { AppliedDeclaration } from '@stylebot/page-bridge';
 import { emptyPageSnapshot } from '@stylebot/page-bridge';
 
 import getters from './getters';
@@ -74,6 +75,8 @@ export type State = {
   activeSelector: string;
   // Computed values on the active selector's first match, for placeholders.
   computedStyles: Record<string, string>;
+  // The user's Stylebot declarations in effect on the inspected element.
+  appliedDeclarations: Array<AppliedDeclaration>;
   contextMenuSelector: string;
   selectors: Array<CssSelectorMetadata>;
 
@@ -113,6 +116,7 @@ export const createStore = (host: EditorHost): Store<State> => {
       selectors: [],
       activeSelector: '',
       computedStyles: {},
+      appliedDeclarations: [],
       contextMenuSelector: '',
 
       help: false,

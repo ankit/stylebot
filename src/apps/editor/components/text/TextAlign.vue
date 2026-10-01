@@ -1,5 +1,5 @@
 <template>
-  <property-row :label="t('text_align')">
+  <property-row property="text-align" :label="t('text_align')">
     <css-property-value-group property="text-align" :options="options" />
   </property-row>
 </template>

@@ -1,5 +1,5 @@
 <template>
-  <property-row :label="t('font_family')">
+  <property-row :label="t('font_family')" property="font-family">
     <s-autocomplete
       v-model="draft"
       chips
@@ -41,7 +41,11 @@ import Vue from 'vue';
 
 import { SAutocomplete, SMenuItem } from '@stylebot/components';
 import { ExternalLinkIcon } from '@stylebot/icons';
-import { getDeclarationValue, unquoteFamily } from '@stylebot/css';
+import {
+  getDeclarationValue,
+  getPrimaryFontFamily,
+  unquoteFamily,
+} from '@stylebot/css';
 import type { Debounced } from '@stylebot/utils';
 import { debounce } from '@stylebot/utils';
 import type { FontSuggestion, GoogleFont } from '@stylebot/google-fonts';
@@ -96,11 +100,16 @@ export default Vue.extend({
       return !this.$store.state.activeSelector;
     },
 
+    otherRule(): { selector: string; value: string } | null {
+      return this.$store.getters.setByOtherSelector['font-family'] ?? null;
+    },
+
     placeholder(): string {
-      return (
-        computedFontPlaceholder(this.$store.state.computedStyles) ||
-        this.t('default')
-      );
+      const family = this.otherRule
+        ? unquoteFamily(getPrimaryFontFamily(this.otherRule.value))
+        : computedFontPlaceholder(this.$store.state.computedStyles);
+
+      return family || this.t('default');
     },
 
     rows(): Array<Row> {

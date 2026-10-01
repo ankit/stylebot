@@ -60,3 +60,6 @@ export {
 export { getAlreadyUsedColors } from './already-used-colors';
 export type { RoleColorGroups } from './already-used-colors';
 export { toHexColors } from './to-hex-colors';
+export { compareSpecificity, getSpecificity } from './specificity';
+export type { Specificity } from './specificity';
+export { mergeShorthands } from './shorthands';
