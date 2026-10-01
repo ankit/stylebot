@@ -59,17 +59,11 @@ export const TypingCommitsSelector: StoryObj = {
       document.querySelectorAll('#stylebot-overlay .stylebot-overlay-rect')
     ).toHaveLength(0);
 
-    // Picking keeps the field focused for further edits, so the value
-    // shows in the input rather than as chips.
+    // Picking leaves the field, which shows the selector as chips again.
     await user.click(items(canvasElement)[0]);
     await expect(store.state.activeSelector).toBe('.article-body');
     await waitFor(() =>
-      expect(input(canvasElement)).toHaveValue('.article-body')
-    );
-    await waitFor(() =>
-      expect(
-        field(canvasElement).querySelector('.active-style-count')
-      ).toHaveTextContent('1')
+      expect(chips(canvasElement)).toHaveTextContent('.article-body')
     );
   },
 };
@@ -215,6 +209,6 @@ export const LongSelectorGroups: StoryObj = {
     await findOpenMenu(canvas);
     await waitFor(() => expect(items(canvasElement)).toHaveLength(2));
     await expectCollapsed(items(canvasElement)[0] as HTMLElement);
-    await expect(items(canvasElement)[1]).toHaveTextContent(/^\s*p\s*1\s*$/);
+    await expect(items(canvasElement)[1]).toHaveTextContent(/^\s*p\s*$/);
   },
 };

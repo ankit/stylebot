@@ -11,18 +11,13 @@
       <span class="chips">
         <selector-chips :parts="parts" />
       </span>
-      <s-count-badge
-        v-if="styleCount > 0"
-        :count="styleCount"
-        class="style-count"
-      />
     </span>
   </s-menu-item>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import { SMenuItem, SCountBadge } from '@stylebot/components';
+import { SMenuItem } from '@stylebot/components';
 import { splitSelectorList } from '@stylebot/css';
 
 import { getPageBridge } from '@stylebot/page-bridge';
@@ -33,17 +28,12 @@ export default Vue.extend({
 
   components: {
     SMenuItem,
-    SCountBadge,
     SelectorChips,
   },
 
   props: {
     selector: {
       type: String,
-      required: true,
-    },
-    styleCount: {
-      type: Number,
       required: true,
     },
   },
@@ -94,10 +84,6 @@ export default Vue.extend({
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-}
-
-.style-count {
-  margin-top: 2px;
 }
 
 .css-selector-dropdown-item:hover .chip,
