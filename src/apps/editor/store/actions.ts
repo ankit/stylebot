@@ -21,6 +21,7 @@ import {
 import { resolveGoogleFont } from '@stylebot/google-fonts';
 
 import type {
+  CssDeclaration,
   Style,
   StylebotEditingMode,
   FilterEffect,
@@ -78,6 +79,7 @@ let fontRequest = 0;
 let previewRequest = 0;
 let computedStylesRequest = 0;
 let appliedDeclarationsRequest = 0;
+let pageDeclarationsRequest = 0;
 
 export default {
   async initialize({ commit }: { commit: Commit }): Promise<void> {
@@ -466,6 +468,37 @@ export default {
 
     if (request === appliedDeclarationsRequest) {
       commit('setAppliedDeclarations', declarations);
+    }
+  },
+
+  /**
+   * Re-reads what the page's own CSS applies to the inspected element, for
+   * More Properties; a read overtaken by a newer one is dropped.
+   */
+  async refreshPageDeclarations({
+    commit,
+    state,
+    getters,
+  }: {
+    commit: Commit;
+    state: State;
+    getters: { inspectedSelector: string };
+  }): Promise<void> {
+    const request = ++pageDeclarationsRequest;
+    let declarations: Array<CssDeclaration> = [];
+
+    const selector = getters.inspectedSelector;
+
+    if (selector && state.pageConnected) {
+      try {
+        declarations = await getPageBridge().getPageDeclarations(selector);
+      } catch {
+        //
+      }
+    }
+
+    if (request === pageDeclarationsRequest) {
+      commit('setPageDeclarations', declarations);
     }
   },
 

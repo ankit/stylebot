@@ -3,6 +3,7 @@ import type { Store } from 'vuex';
 import Vuex from 'vuex';
 
 import type {
+  CssDeclaration,
   CssLineRange,
   StylebotOptions,
   StylebotCommands,
@@ -78,6 +79,8 @@ export type State = {
   computedStyles: Record<string, string>;
   // The user's Stylebot declarations in effect on the inspected element.
   appliedDeclarations: Array<AppliedDeclaration>;
+  // What the page's own CSS applies to the inspected element.
+  pageDeclarations: Array<CssDeclaration>;
   contextMenuSelector: string;
   selectors: Array<CssSelectorMetadata>;
 
@@ -120,6 +123,7 @@ export const createStore = (host: EditorHost): Store<State> => {
       activeSelector: '',
       computedStyles: {},
       appliedDeclarations: [],
+      pageDeclarations: [],
       contextMenuSelector: '',
 
       help: false,

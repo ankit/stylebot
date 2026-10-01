@@ -1,6 +1,7 @@
 import type * as postcss from 'postcss';
 
 import type {
+  CssDeclaration,
   StylebotOptions,
   StylebotCommands,
   ReadabilitySettings,
@@ -74,6 +75,10 @@ export default {
     declarations: Array<AppliedDeclaration>
   ): void {
     state.appliedDeclarations = declarations;
+  },
+
+  setPageDeclarations(state: State, declarations: Array<CssDeclaration>): void {
+    state.pageDeclarations = declarations;
   },
 
   setInspecting(state: State, inspecting: boolean): void {

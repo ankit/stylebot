@@ -1,4 +1,5 @@
 import type { RoleColorGroups } from '@stylebot/css';
+import type { CssDeclaration } from '@stylebot/types';
 import type { AppliedDeclaration } from './applied-declarations';
 
 /**
@@ -128,6 +129,12 @@ export type PageBridge = {
    * is about, each with the selector it comes from.
    */
   getAppliedDeclarations(selector: string): Promise<Array<AppliedDeclaration>>;
+
+  /**
+   * What the page's own CSS applies to the element the selector is about,
+   * as if Stylebot weren't there, less what changes nothing on its own.
+   */
+  getPageDeclarations(selector: string): Promise<Array<CssDeclaration>>;
 
   /**
    * Other selectors for the element last picked with this selector, or the
