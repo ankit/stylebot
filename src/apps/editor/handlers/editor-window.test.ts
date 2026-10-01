@@ -17,6 +17,9 @@ jest.mock('../utils/init-editor', () => ({ initEditor: jest.fn() }));
 jest.mock('../utils/chrome', () => ({ closeEditorWindow: jest.fn() }));
 
 const selectListeners: Array<PageBridgeEvents['select']> = [];
+const computedStylesListeners: Array<
+  PageBridgeEvents['computedStylesChanged']
+> = [];
 
 const bridge = {
   getSnapshot: jest.fn(),
@@ -36,6 +39,8 @@ const bridge = {
   on: jest.fn((event: string, listener: PageBridgeEvents['select']) => {
     if (event === 'select') {
       selectListeners.push(listener);
+    } else if (event === 'computedStylesChanged') {
+      computedStylesListeners.push(listener as () => void);
     }
     return () => undefined;
   }),
@@ -96,6 +101,7 @@ describe('createEditorWindowHandler', () => {
   beforeEach(async () => {
     jest.clearAllMocks();
     selectListeners.length = 0;
+    computedStylesListeners.length = 0;
 
     applyCss = jest.fn(({ commit }, { css }) => commit('setCss', css));
     applyReadability = jest.fn(({ commit }, value) =>
@@ -182,6 +188,15 @@ describe('createEditorWindowHandler', () => {
       { type: 'selectorChosen', selector: 'nav', source: 'contextMenu' },
     ]);
     expect(store.state.activeSelector).toBe('');
+  });
+
+  it('tells the window when the page’s computed styles change', () => {
+    const port = connect();
+    port.postMessage.mockClear();
+
+    computedStylesListeners.forEach(fn => fn());
+
+    expect(port.sent()).toEqual([{ type: 'computedStylesChanged' }]);
   });
 
   it('answers requests through the bridge', async () => {

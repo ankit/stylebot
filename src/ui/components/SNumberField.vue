@@ -176,7 +176,7 @@ export default Vue.extend({
   cursor: text;
 
   &::placeholder {
-    color: var(--text-muted);
+    color: var(--text-faint);
   }
 
   &:disabled {

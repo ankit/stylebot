@@ -53,6 +53,7 @@
 import Vue from 'vue';
 import type { Declaration, Rule } from 'postcss';
 import type { StylebotBasicModeSections } from '@stylebot/types';
+import { getPageBridge } from '@stylebot/page-bridge';
 
 import PropertyCard from './basic/PropertyCard.vue';
 import TheBasicEditorActions from './basic/TheBasicEditorActions.vue';
@@ -83,8 +84,12 @@ export default Vue.extend({
     TheMoreProperties,
   },
 
-  data(): { open: StylebotBasicModeSections } {
+  data(): {
+    open: StylebotBasicModeSections;
+    unsubscribeComputedStyles: (() => void) | null;
+  } {
     return {
+      unsubscribeComputedStyles: null,
       open: {
         text: false,
         colors: false,
@@ -153,6 +158,18 @@ export default Vue.extend({
         this.$store.dispatch('refreshComputedStyles');
       },
     },
+  },
+
+  // A pick reads the element while it's still hovered.
+  created() {
+    this.unsubscribeComputedStyles = getPageBridge().on(
+      'computedStylesChanged',
+      () => this.$store.dispatch('refreshComputedStyles')
+    );
+  },
+
+  beforeDestroy() {
+    this.unsubscribeComputedStyles?.();
   },
 
   methods: {

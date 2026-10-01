@@ -70,7 +70,8 @@ export type RemotePageBridgeMessageToWindow =
       selector: string;
       source: 'inspector' | 'contextMenu';
     }
-  | { type: 'inspectingStopped' };
+  | { type: 'inspectingStopped' }
+  | { type: 'computedStylesChanged' };
 
 export type RemotePageBridgeHandlers = {
   onStateChanged: (state: Partial<RemotePageBridgeSyncedState>) => void;

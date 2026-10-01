@@ -4,8 +4,8 @@
       <button
         type="button"
         class="color-swatch"
-        :class="{ empty: !value }"
-        :style="value ? { background: value } : undefined"
+        :class="{ empty: !shownColor }"
+        :style="shownColor ? { background: shownColor } : undefined"
         :disabled="disabled"
         @click="toggle"
       />
@@ -14,7 +14,7 @@
         class="color-hex"
         :value="value"
         :disabled="disabled"
-        placeholder="—"
+        :placeholder="placeholder || '—'"
         spellcheck="false"
         @focus="onFocus"
         @input="onInput"
@@ -46,6 +46,7 @@ import { getDeclarationValue } from '@stylebot/css';
 
 import ColorPickerPopover from './ColorPickerPopover.vue';
 import { extractColor } from '../../utils/css-value';
+import { computedColorPlaceholder } from '../../utils/computed-placeholder';
 
 const ROLE_LABEL_KEYS: Record<string, string> = {
   color: 'color_picker_subtitle_text',
@@ -91,6 +92,17 @@ export default Vue.extend({
   },
 
   computed: {
+    placeholder(): string {
+      return computedColorPlaceholder(
+        this.$store.state.computedStyles,
+        this.property
+      );
+    },
+
+    shownColor(): string {
+      return this.value || this.placeholder;
+    },
+
     value: {
       get(): string {
         let value = getDeclarationValue(
@@ -332,7 +344,7 @@ export default Vue.extend({
   cursor: text;
 
   &::placeholder {
-    color: var(--text-muted);
+    color: var(--text-faint);
   }
 }
 

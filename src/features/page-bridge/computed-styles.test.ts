@@ -13,13 +13,36 @@ describe('getComputedStyles', () => {
     `;
 
     expect(getComputedStyles('h1', ['font-size', 'padding-top'])).toEqual({
-      'font-size': '24px',
-      'padding-top': '4px',
+      styles: { 'font-size': '24px', 'padding-top': '4px' },
+      unwatch: null,
     });
   });
 
   it('is empty for an unmatched or invalid selector', () => {
-    expect(getComputedStyles('.missing', ['font-size'])).toEqual({});
-    expect(getComputedStyles('h1[', ['font-size'])).toEqual({});
+    expect(getComputedStyles('.missing', ['font-size']).styles).toEqual({});
+    expect(getComputedStyles('h1[', ['font-size']).styles).toEqual({});
+  });
+
+  it('calls back once the pointer leaves a hovered element', () => {
+    document.body.innerHTML = '<a>link</a>';
+    const link = document.querySelector('a') as Element;
+    jest.spyOn(link, 'matches').mockReturnValue(true);
+    const onHoverEnd = jest.fn();
+
+    const { unwatch } = getComputedStyles('a', ['font-size'], onHoverEnd);
+    expect(unwatch).not.toBeNull();
+
+    link.dispatchEvent(new MouseEvent('mouseleave'));
+    link.dispatchEvent(new MouseEvent('mouseleave'));
+    expect(onHoverEnd).toHaveBeenCalledTimes(1);
+  });
+
+  it('skips the editor host’s ancestors, which stay hovered', () => {
+    document.body.innerHTML = '<main><div id="stylebot"></div></main>';
+    jest
+      .spyOn(document.querySelector('main') as Element, 'matches')
+      .mockReturnValue(true);
+
+    expect(getComputedStyles('main', ['font-size']).unwatch).toBeNull();
   });
 });

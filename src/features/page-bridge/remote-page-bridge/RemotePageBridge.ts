@@ -170,6 +170,10 @@ export class RemotePageBridge extends PageBridgeEmitter implements PageBridge {
       case 'inspectingStopped':
         this.handlers.onInspectingStopped();
         break;
+
+      case 'computedStylesChanged':
+        this.emit('computedStylesChanged');
+        break;
     }
   }
 

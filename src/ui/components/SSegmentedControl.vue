@@ -17,7 +17,10 @@
       <button
         type="button"
         class="segment"
-        :class="{ active: option.value === value }"
+        :class="{
+          active: option.value === value,
+          placeholder: value === '' && option.value === placeholder,
+        }"
         :aria-label="option.title"
         :aria-pressed="option.value === value ? 'true' : 'false'"
         :disabled="disabled"
@@ -80,6 +83,13 @@ export default Vue.extend({
     disabled: {
       type: Boolean,
       default: false,
+    },
+
+    // The option in effect without a value set here (e.g. from the page),
+    // outlined faintly instead of selected.
+    placeholder: {
+      type: [String, Number],
+      default: '',
     },
   },
 
@@ -228,6 +238,12 @@ export default Vue.extend({
   &.active {
     font-weight: 600;
     color: var(--text-primary);
+  }
+
+  &.placeholder {
+    outline: 1px dashed color-mix(in srgb, var(--text-primary) 24%, transparent);
+    outline-offset: -1px;
+    color: var(--text-secondary);
   }
 
   ::v-deep svg {

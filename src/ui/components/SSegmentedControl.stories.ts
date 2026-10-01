@@ -63,6 +63,10 @@ export const Variants = matrix({
     { label: 'text', attrs: ':options="textOptions" value="underline"' },
     { label: 'fit', attrs: ':options="textOptions" value="none" fit' },
     { label: 'icons', attrs: ':options="iconOptions" value="center"' },
+    {
+      label: 'placeholder',
+      attrs: ':options="iconOptions" value="" placeholder="left"',
+    },
   ],
   columns: [
     {

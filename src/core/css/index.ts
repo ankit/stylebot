@@ -59,3 +59,4 @@ export {
 
 export { getAlreadyUsedColors } from './already-used-colors';
 export type { RoleColorGroups } from './already-used-colors';
+export { toHexColors } from './to-hex-colors';

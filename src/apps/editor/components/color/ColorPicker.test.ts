@@ -12,7 +12,7 @@ jest.mock('@stylebot/page-bridge', () => ({
 }));
 
 const buildMockStore = () => ({
-  state: { activeSelector: 'h1' },
+  state: { activeSelector: 'h1', computedStyles: {} },
   getters: { activeRule: null },
   commit: jest.fn(),
   dispatch: jest.fn(),

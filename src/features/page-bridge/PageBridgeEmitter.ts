@@ -11,6 +11,7 @@ export class PageBridgeEmitter {
   private listeners: Listeners = {
     select: new Set(),
     connection: new Set(),
+    computedStylesChanged: new Set(),
   };
 
   on<E extends keyof PageBridgeEvents>(

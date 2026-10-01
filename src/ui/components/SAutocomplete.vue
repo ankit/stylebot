@@ -539,7 +539,7 @@ export default Vue.extend({
 
   &::placeholder {
     line-height: 19px;
-    color: var(--text-muted);
+    color: var(--text-faint);
   }
 
   &:disabled {

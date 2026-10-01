@@ -19,6 +19,9 @@ export type PageBridgeEvents = {
   select: (selector: string) => void;
   // The page came within reach or dropped away; always reachable in-page.
   connection: (connected: boolean) => void;
+  // The element last read for computed styles was read mid-:hover, and the
+  // pointer has since left it.
+  computedStylesChanged: () => void;
 };
 
 /**

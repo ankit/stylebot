@@ -61,6 +61,7 @@ const getMountRoot = (): HTMLElement | undefined => {
 export class LocalPageBridge extends PageBridgeEmitter implements PageBridge {
   private inspector: Highlighter;
   private previewer: Highlighter;
+  private unwatchHover: (() => void) | null = null;
 
   constructor({ getStylebotCss }: { getStylebotCss: () => string }) {
     super();
@@ -184,7 +185,14 @@ export class LocalPageBridge extends PageBridgeEmitter implements PageBridge {
     selector: string,
     properties: Array<string>
   ): Promise<Record<string, string>> {
-    return Promise.resolve(getComputedStyles(selector, properties));
+    this.unwatchHover?.();
+    const { styles, unwatch } = getComputedStyles(selector, properties, () => {
+      this.unwatchHover = null;
+      this.emit('computedStylesChanged');
+    });
+    this.unwatchHover = unwatch;
+
+    return Promise.resolve(styles);
   }
 
   getPageOutline(): Promise<string> {

@@ -3,6 +3,7 @@
     class="value-group"
     fit
     :value="value"
+    :placeholder="placeholder"
     :options="options"
     :disabled="disabled"
     @change="select"
@@ -20,6 +21,8 @@ import type { PropType, Component } from 'vue';
 import Vue from 'vue';
 import { SSegmentedControl } from '@stylebot/components';
 import { getDeclarationValue } from '@stylebot/css';
+
+import { computedKeywordPlaceholder } from '../utils/computed-placeholder';
 
 type Option = { title: string; value: string; html?: string; icon?: Component };
 
@@ -45,6 +48,13 @@ export default Vue.extend({
   computed: {
     value(): string {
       return getDeclarationValue(this.$store.getters.activeRule, this.property);
+    },
+
+    placeholder(): string {
+      return computedKeywordPlaceholder(
+        this.$store.state.computedStyles,
+        this.property
+      );
     },
 
     disabled(): boolean {

@@ -1,4 +1,7 @@
 import {
+  computedColorPlaceholder,
+  computedFontPlaceholder,
+  computedKeywordPlaceholder,
   computedPlaceholder,
   computedSides,
   toPlaceholder,
@@ -67,5 +70,74 @@ describe('computed-placeholder', () => {
         }
       )
     ).toEqual({ top: '1', right: '2', bottom: '3', left: '4' });
+  });
+});
+
+describe('computedColorPlaceholder', () => {
+  it('reads a computed color as hex', () => {
+    expect(
+      computedColorPlaceholder({ color: 'rgb(234, 236, 244)' }, 'color')
+    ).toBe('#eaecf4');
+  });
+
+  it('leaves a transparent background empty', () => {
+    expect(
+      computedColorPlaceholder(
+        { 'background-color': 'rgba(0, 0, 0, 0)' },
+        'background-color'
+      )
+    ).toBe('');
+  });
+
+  it('leaves the color of an undrawn border empty', () => {
+    const sides = ['top', 'right', 'bottom', 'left'];
+    const styles = Object.fromEntries(
+      sides.flatMap(side => [
+        [`border-${side}-color`, 'rgb(255, 0, 0)'],
+        [`border-${side}-style`, 'none'],
+      ])
+    );
+
+    expect(computedColorPlaceholder(styles, 'border-color')).toBe('');
+  });
+
+  it('reads a border color only when every side agrees', () => {
+    const sides = ['top', 'right', 'bottom', 'left'];
+    const styles = Object.fromEntries(
+      sides.map(side => [`border-${side}-color`, 'rgb(255, 0, 0)'])
+    );
+
+    expect(computedColorPlaceholder(styles, 'border-color')).toBe('#ff0000');
+    expect(
+      computedColorPlaceholder(
+        { ...styles, 'border-left-color': 'rgb(0, 0, 0)' },
+        'border-color'
+      )
+    ).toBe('');
+  });
+});
+
+describe('computedFontPlaceholder', () => {
+  it('reads the primary family, unquoted', () => {
+    expect(
+      computedFontPlaceholder({ 'font-family': '"Fira Code", monospace' })
+    ).toBe('Fira Code');
+  });
+});
+
+describe('computedKeywordPlaceholder', () => {
+  it('maps logical text-align keywords to the left and right options', () => {
+    expect(
+      computedKeywordPlaceholder({ 'text-align': 'start' }, 'text-align')
+    ).toBe('left');
+  });
+
+  it('reads text-decoration through its line longhand', () => {
+    expect(
+      computedKeywordPlaceholder(
+        { 'text-decoration-line': 'underline' },
+        'text-decoration'
+      )
+    ).toBe('underline');
   });
 });

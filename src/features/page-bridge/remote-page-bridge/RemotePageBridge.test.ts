@@ -230,6 +230,16 @@ describe('RemotePageBridge', () => {
     expect(handlers.onInspectingStopped).toBeCalled();
   });
 
+  it('relays a change to the page’s computed styles', () => {
+    const bridge = new RemotePageBridge(7, handlers);
+    const changed = jest.fn();
+    bridge.on('computedStylesChanged', changed);
+    bridge.connect();
+
+    ports[0].receive({ type: 'computedStylesChanged' });
+    expect(changed).toBeCalled();
+  });
+
   it('brings the tab and its window to the front', async () => {
     new RemotePageBridge(7, handlers).focusPage();
     await settle();

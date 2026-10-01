@@ -53,6 +53,7 @@ import PropertyRow from '../basic/PropertyRow.vue';
 import Length from '../Length.vue';
 import ColorPicker from '../color/ColorPicker.vue';
 import { extractBorderStyle } from '../../utils/css-value';
+import { computedKeywordPlaceholder } from '../../utils/computed-placeholder';
 
 export default Vue.extend({
   name: 'BorderControl',
@@ -105,8 +106,15 @@ export default Vue.extend({
       return value;
     },
 
+    // Unset, it shows the page's own border style, muted.
     text(): string {
-      const option = this.options.find(o => o.value === this.styleValue);
+      const value =
+        this.styleValue ||
+        computedKeywordPlaceholder(
+          this.$store.state.computedStyles,
+          'border-style'
+        );
+      const option = this.options.find(o => o.value === value);
       return option ? option.title : t('default');
     },
 

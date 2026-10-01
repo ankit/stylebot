@@ -9,7 +9,7 @@
       :items="rows"
       :disabled="disabled"
       :min-width="184"
-      :placeholder="t('default')"
+      :placeholder="placeholder"
       :chip-label="unquoteFamily"
       @select="pick"
       @submit="submit($event, true)"
@@ -53,6 +53,7 @@ import {
 
 import PropertyRow from '../basic/PropertyRow.vue';
 import { openGoogleFontsPage } from '../../utils/chrome';
+import { computedFontPlaceholder } from '../../utils/computed-placeholder';
 
 type Row = FontSuggestion | { kind: 'link'; value: '' };
 
@@ -93,6 +94,13 @@ export default Vue.extend({
 
     disabled(): boolean {
       return !this.$store.state.activeSelector;
+    },
+
+    placeholder(): string {
+      return (
+        computedFontPlaceholder(this.$store.state.computedStyles) ||
+        this.t('default')
+      );
     },
 
     rows(): Array<Row> {
