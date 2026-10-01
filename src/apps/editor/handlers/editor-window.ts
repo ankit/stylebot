@@ -95,6 +95,10 @@ export const createEditorWindowHandler = (
       post({ type: 'computedStylesChanged' })
     );
 
+    const unsubscribeHover = bridge.on('hover', selector => {
+      post({ type: 'selectorHovered', selector });
+    });
+
     // The page has no keyboard-shortcut handler while its panel is hidden,
     // so Escape here is the way out of inspecting for the window's user.
     const onKeydown = (event: KeyboardEvent) => {
@@ -115,6 +119,7 @@ export const createEditorWindowHandler = (
       unsubscribe();
       unsubscribeSelect();
       unsubscribeComputedStyles();
+      unsubscribeHover();
       document.removeEventListener('keydown', onKeydown, true);
       store.commit('setInspecting', false);
       bridge.stopInspecting();

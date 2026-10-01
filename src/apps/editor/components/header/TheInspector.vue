@@ -23,7 +23,10 @@ import type { StylebotEditingMode } from '@stylebot/types';
 
 import { getPageBridge } from '@stylebot/page-bridge';
 
-import { KEYBOARD_FOCUS } from '@stylebot/utils';
+import type { Debounced } from '@stylebot/utils';
+import { KEYBOARD_FOCUS, debounce } from '@stylebot/utils';
+
+const PREVIEW_DELAY = 100;
 
 export default Vue.extend({
   name: 'TheInspector',
@@ -35,9 +38,18 @@ export default Vue.extend({
 
   data(): {
     unsubscribeSelect: (() => void) | null;
+    unsubscribeHover: (() => void) | null;
+    preview: Debounced<[string]>;
   } {
     return {
       unsubscribeSelect: null,
+      unsubscribeHover: null,
+      // Sweeping across elements shouldn't ask the page about each one.
+      preview: debounce(selector => {
+        if (this.$store.state.inspecting) {
+          this.$store.commit('setPreviewSelector', selector);
+        }
+      }, PREVIEW_DELAY),
     };
   },
 
@@ -77,6 +89,7 @@ export default Vue.extend({
 
   created() {
     this.unsubscribeSelect = getPageBridge().on('select', this.select);
+    this.unsubscribeHover = getPageBridge().on('hover', this.preview);
   },
 
   // On mount, not create: a replaced instance stops inspecting on destroy,
@@ -89,6 +102,8 @@ export default Vue.extend({
 
   beforeDestroy() {
     this.unsubscribeSelect?.();
+    this.unsubscribeHover?.();
+    this.preview.cancel();
     this.$store.commit('setInspecting', false);
     getPageBridge().stopInspecting();
   },
@@ -112,6 +127,7 @@ export default Vue.extend({
     },
 
     select(selector: string): void {
+      this.preview.cancel();
       this.toggle();
       this.$emit('select', selector);
     },

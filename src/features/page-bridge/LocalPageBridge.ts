@@ -62,12 +62,24 @@ export class LocalPageBridge extends PageBridgeEmitter implements PageBridge {
   private inspector: Highlighter;
   private previewer: Highlighter;
   private unwatchHover: (() => void) | null = null;
+  // The element behind the last pick, which a broad selector's first match
+  // may not be.
+  private pickedElement: HTMLElement | null = null;
+  // The element under the inspector while picking.
+  private hoveredElement: HTMLElement | null = null;
 
   constructor({ getStylebotCss }: { getStylebotCss: () => string }) {
     super();
 
     this.inspector = new Highlighter({
-      onSelect: selector => this.emit('select', selector),
+      onSelect: selector => {
+        this.pickedElement = this.inspector.currentElement;
+        this.emit('select', selector);
+      },
+      onHover: selector => {
+        this.hoveredElement = this.inspector.currentElement;
+        this.emit('hover', selector);
+      },
       countRules: selector =>
         getDeclarationsForSelector(getStylebotCss(), selector)?.length ?? 0,
       getExistingSelector: el => getExistingSelector(el, getStylebotCss()),
@@ -186,10 +198,15 @@ export class LocalPageBridge extends PageBridgeEmitter implements PageBridge {
     properties: Array<string>
   ): Promise<Record<string, string>> {
     this.unwatchHover?.();
-    const { styles, unwatch } = getComputedStyles(selector, properties, () => {
-      this.unwatchHover = null;
-      this.emit('computedStylesChanged');
-    });
+    const { styles, unwatch } = getComputedStyles(
+      selector,
+      properties,
+      () => {
+        this.unwatchHover = null;
+        this.emit('computedStylesChanged');
+      },
+      this.elementFor(selector)
+    );
     this.unwatchHover = unwatch;
 
     return Promise.resolve(styles);
@@ -197,6 +214,23 @@ export class LocalPageBridge extends PageBridgeEmitter implements PageBridge {
 
   getPageOutline(): Promise<string> {
     return Promise.resolve(getPageOutline());
+  }
+
+  /**
+   * The element the panel is about: the one under the inspector or the one
+   * last picked, while it still fits the selector, else the first match. A
+   * broad selector's first match can be a different element entirely.
+   */
+  private elementFor(selector: string): HTMLElement | null {
+    if (!validateSelector(selector)) {
+      return null;
+    }
+
+    const known = [this.hoveredElement, this.pickedElement].find(
+      el => el?.isConnected && el.matches(selector)
+    );
+
+    return known ?? document.querySelector<HTMLElement>(selector);
   }
 
   getPageCssContext(selector: string): Promise<string> {

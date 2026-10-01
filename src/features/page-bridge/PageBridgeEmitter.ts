@@ -10,6 +10,7 @@ type Listeners = {
 export class PageBridgeEmitter {
   private listeners: Listeners = {
     select: new Set(),
+    hover: new Set(),
     connection: new Set(),
     computedStylesChanged: new Set(),
   };

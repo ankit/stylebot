@@ -80,6 +80,8 @@ export type State = {
   help: boolean;
   visible: boolean;
   inspecting: boolean;
+  // The element under the inspector while picking, previewed in the panel.
+  previewSelector: string;
   colorPickerVisible: boolean;
 
   options: StylebotOptions;
@@ -116,6 +118,7 @@ export const createStore = (host: EditorHost): Store<State> => {
       help: false,
       visible: false,
       inspecting: false,
+      previewSelector: '',
       colorPickerVisible: false,
 
       commands: null,

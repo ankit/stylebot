@@ -362,17 +362,21 @@ export default {
   async refreshComputedStyles({
     commit,
     state,
+    getters,
   }: {
     commit: Commit;
     state: State;
+    getters: { inspectedSelector: string };
   }): Promise<void> {
     const request = ++computedStylesRequest;
     let styles: Record<string, string> = {};
 
-    if (state.activeSelector && state.pageConnected) {
+    const selector = getters.inspectedSelector;
+
+    if (selector && state.pageConnected) {
       try {
         styles = await getPageBridge().getComputedStyles(
-          state.activeSelector,
+          selector,
           PLACEHOLDER_PROPERTIES
         );
       } catch {

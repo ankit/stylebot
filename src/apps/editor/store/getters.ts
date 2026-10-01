@@ -15,19 +15,31 @@ export default {
    * Falls back to a grouped rule the selector belongs to, so Basic mode
    * shows its declarations before any edit splits it into its own rule.
    * Carries only the rule's own declarations, so the property controls
-   * don't read values from rules nested inside it.
+   * don't read values from rules nested inside it. While picking, it's the
+   * previewed element's rule, so the panel shows what a pick would.
    */
-  activeRule: (state: State): postcss.Rule | null => {
-    if (!state.activeSelector) {
+  activeRule: (
+    state: State,
+    getters: { inspectedSelector: string }
+  ): postcss.Rule | null => {
+    const selector = getters.inspectedSelector;
+
+    if (!selector) {
       return null;
     }
 
     const rule =
-      getRule(state.css, state.activeSelector) ??
-      getRuleForSelector(state.css, state.activeSelector);
+      getRule(state.css, selector) ?? getRuleForSelector(state.css, selector);
 
     return rule ? withOwnDeclarationsOnly(rule) : null;
   },
+
+  /**
+   * The selector the panel reads the page for: the element under the
+   * inspector while picking, otherwise the active selector.
+   */
+  inspectedSelector: (state: State): string =>
+    (state.inspecting && state.previewSelector) || state.activeSelector,
 
   alreadyUsedColors: (state: State): RoleColorGroups =>
     getAlreadyUsedColors(state.css),

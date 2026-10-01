@@ -167,6 +167,10 @@ export class RemotePageBridge extends PageBridgeEmitter implements PageBridge {
         }
         break;
 
+      case 'selectorHovered':
+        this.emit('hover', message.selector);
+        break;
+
       case 'inspectingStopped':
         this.handlers.onInspectingStopped();
         break;
