@@ -9,6 +9,7 @@ const isWholePageSelector = (selector: string): boolean =>
 class Highlighter {
   overlay: Overlay | null;
   onSelect: (selector: string) => void;
+  onHover?: (selector: string) => void;
   countRules?: (selector: string) => number;
   getExistingSelector?: (el: HTMLElement) => string | null;
   getMountRoot?: () => HTMLElement | undefined;
@@ -26,11 +27,16 @@ class Highlighter {
 
   constructor({
     onSelect,
+    onHover,
     countRules,
     getExistingSelector,
     getMountRoot,
   }: {
     onSelect: (selector: string) => void;
+    /**
+     * Called as the inspector moves onto an element, before it's picked.
+     */
+    onHover?: (selector: string) => void;
     /**
      * How many declarations the user's style has for a selector, for the card.
      */
@@ -43,6 +49,7 @@ class Highlighter {
   }) {
     this.overlay = null;
     this.onSelect = onSelect;
+    this.onHover = onHover;
     this.countRules = countRules;
     this.getExistingSelector = getExistingSelector;
     this.getMountRoot = getMountRoot;
@@ -312,6 +319,8 @@ class Highlighter {
         ruleCount: this.countRules?.(selector) ?? 0,
       }
     );
+
+    this.onHover?.(selector);
   };
 
   hideOverlay = (): void => {

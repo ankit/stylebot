@@ -70,6 +70,7 @@ export type RemotePageBridgeMessageToWindow =
       selector: string;
       source: 'inspector' | 'contextMenu';
     }
+  | { type: 'selectorHovered'; selector: string }
   | { type: 'inspectingStopped' }
   | { type: 'computedStylesChanged' };
 

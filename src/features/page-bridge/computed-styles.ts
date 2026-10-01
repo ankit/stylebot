@@ -19,24 +19,26 @@ const watchHoverEnd = (
 };
 
 /**
- * Reads computed values for the first element a selector matches, skipping
- * the editor's own host. An invalid or unmatched selector reads as empty.
+ * Reads computed values for `element`, or else the first element a selector
+ * matches, skipping the editor's own host. An invalid or unmatched selector
+ * reads as empty.
  * When the element is hovered, `onHoverEnd` runs once the pointer leaves it;
  * the returned `unwatch` stops that.
  */
 export const getComputedStyles = (
   selector: string,
   properties: Array<string>,
-  onHoverEnd: () => void = () => undefined
+  onHoverEnd: () => void = () => undefined,
+  element?: Element | null
 ): { styles: Record<string, string>; unwatch: (() => void) | null } => {
-  let element: Element | undefined;
-
-  try {
-    element = Array.from(document.querySelectorAll(selector)).find(
-      el => !el.closest('#stylebot')
-    );
-  } catch {
-    return { styles: {}, unwatch: null };
+  if (!element) {
+    try {
+      element = Array.from(document.querySelectorAll(selector)).find(
+        el => !el.closest('#stylebot')
+      );
+    } catch {
+      return { styles: {}, unwatch: null };
+    }
   }
 
   if (!element) {

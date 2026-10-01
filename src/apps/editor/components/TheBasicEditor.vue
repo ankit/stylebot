@@ -135,9 +135,9 @@ export default Vue.extend({
 
     // Anything that can change what the page computes for the selector.
     computedStylesInputs(): Array<unknown> {
-      const { activeSelector, css, enabled, forceImportant, pageConnected } =
-        this.$store.state;
-      return [activeSelector, css, enabled, forceImportant, pageConnected];
+      const { css, enabled, forceImportant, pageConnected } = this.$store.state;
+      const { inspectedSelector } = this.$store.getters;
+      return [inspectedSelector, css, enabled, forceImportant, pageConnected];
     },
   },
 

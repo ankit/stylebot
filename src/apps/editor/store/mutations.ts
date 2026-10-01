@@ -70,6 +70,14 @@ export default {
 
   setInspecting(state: State, inspecting: boolean): void {
     state.inspecting = inspecting;
+
+    if (!inspecting) {
+      state.previewSelector = '';
+    }
+  },
+
+  setPreviewSelector(state: State, selector: string): void {
+    state.previewSelector = selector;
   },
 
   setColorPickerVisible(state: State, colorPickerVisible: boolean): void {

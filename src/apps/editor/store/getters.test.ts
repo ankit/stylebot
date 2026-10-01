@@ -55,9 +55,13 @@ describe('getters', () => {
       const state = { ...mockState, css, activeSelector: '.card' };
       const declarations: Array<[string, string]> = [];
 
-      getters.activeRule(state)?.walkDecls(decl => {
-        declarations.push([decl.prop, decl.value]);
-      });
+      getters
+        .activeRule(state, {
+          inspectedSelector: state.activeSelector,
+        })
+        ?.walkDecls(decl => {
+          declarations.push([decl.prop, decl.value]);
+        });
 
       expect(declarations).toEqual([['color', 'red']]);
     });
@@ -66,9 +70,13 @@ describe('getters', () => {
       const state = { ...mockState, css, activeSelector: '.title' };
       const declarations: Array<[string, string]> = [];
 
-      getters.activeRule(state)?.walkDecls(decl => {
-        declarations.push([decl.prop, decl.value]);
-      });
+      getters
+        .activeRule(state, {
+          inspectedSelector: state.activeSelector,
+        })
+        ?.walkDecls(decl => {
+          declarations.push([decl.prop, decl.value]);
+        });
 
       expect(declarations).toEqual([['color', 'pink']]);
     });
@@ -79,8 +87,28 @@ describe('getters', () => {
         css: 'a, b { opacity: 0.5; }',
         activeSelector: 'b',
       };
-      expect(getDeclarationValue(getters.activeRule(state), 'opacity')).toBe(
-        '0.5'
+      expect(
+        getDeclarationValue(
+          getters.activeRule(state, {
+            inspectedSelector: state.activeSelector,
+          }),
+          'opacity'
+        )
+      ).toBe('0.5');
+    });
+  });
+
+  describe('inspectedSelector', () => {
+    it('is the previewed selector while picking, else the active one', () => {
+      const state = {
+        ...mockState,
+        activeSelector: 'h1',
+        previewSelector: 'p.note',
+      };
+
+      expect(getters.inspectedSelector(state)).toBe('h1');
+      expect(getters.inspectedSelector({ ...state, inspecting: true })).toBe(
+        'p.note'
       );
     });
   });

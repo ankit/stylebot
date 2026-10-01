@@ -822,11 +822,28 @@ describe('actions', () => {
   });
 
   describe('refreshComputedStyles', () => {
+    it('reads the element under the inspector while picking', async () => {
+      await actions.refreshComputedStyles({
+        commit: mockCommit,
+        state: { ...mockState, activeSelector: 'h1' },
+        getters: { inspectedSelector: 'p.note' },
+      });
+
+      expect(mockBridge.getComputedStyles).toBeCalledWith(
+        'p.note',
+        expect.any(Array)
+      );
+    });
+
     it('reads the placeholder properties for the active selector', async () => {
       const state = { ...mockState, activeSelector: 'h1' };
       mockBridge.getComputedStyles.mockResolvedValue({ 'font-size': '16px' });
 
-      await actions.refreshComputedStyles({ commit: mockCommit, state });
+      await actions.refreshComputedStyles({
+        commit: mockCommit,
+        state,
+        getters: { inspectedSelector: 'h1' },
+      });
 
       expect(mockBridge.getComputedStyles).toBeCalledWith(
         'h1',
@@ -841,6 +858,7 @@ describe('actions', () => {
       await actions.refreshComputedStyles({
         commit: mockCommit,
         state: mockState,
+        getters: { inspectedSelector: '' },
       });
 
       expect(mockBridge.getComputedStyles).not.toBeCalled();
@@ -858,8 +876,13 @@ describe('actions', () => {
       const first = actions.refreshComputedStyles({
         commit: mockCommit,
         state,
+        getters: { inspectedSelector: 'h1' },
       });
-      await actions.refreshComputedStyles({ commit: mockCommit, state });
+      await actions.refreshComputedStyles({
+        commit: mockCommit,
+        state,
+        getters: { inspectedSelector: 'h1' },
+      });
       resolveFirst({ 'font-size': '16px' });
       await first;
 
