@@ -1,14 +1,23 @@
 import type * as postcss from 'postcss';
 
 import type { State } from './';
+import type { CssDeclaration } from '@stylebot/types';
 import type { RoleColorGroups } from '@stylebot/css';
 import {
   getRule,
   getRuleForSelector,
   withOwnDeclarationsOnly,
+  getDeclarationValue,
+  toHexColors,
+  mergeShorthands,
   getFilterEffectValueForPage,
   getAlreadyUsedColors,
 } from '@stylebot/css';
+
+// A rule for every element can't be judged by the one that was picked.
+const PAGE_WIDE_SELECTOR = /^\s*(\*|html|body|:root)\s*$/i;
+
+export type OtherSelectorValue = { selector: string; value: string };
 
 export default {
   /**
@@ -33,6 +42,76 @@ export default {
 
     return rule ? withOwnDeclarationsOnly(rule) : null;
   },
+
+  /**
+   * Each property the inspected element takes from another of the user's
+   * selectors, with that selector and its value, merged per selector so four
+   * corner radii read as border-radius. The two getters below split it.
+   */
+  otherSelectorValues: (
+    state: State,
+    getters: { inspectedSelector: string }
+  ): Record<string, OtherSelectorValue> => {
+    const { inspectedSelector } = getters;
+    const winners: Record<string, OtherSelectorValue> = {};
+
+    if (PAGE_WIDE_SELECTOR.test(inspectedSelector)) {
+      return winners;
+    }
+
+    const bySelector = new Map<string, Array<CssDeclaration>>();
+
+    state.appliedDeclarations
+      .filter(({ selector }) => selector !== inspectedSelector)
+      .forEach(({ selector, property, value }) => {
+        bySelector.set(selector, [
+          ...(bySelector.get(selector) ?? []),
+          { property, value },
+        ]);
+      });
+
+    for (const [selector, declarations] of bySelector) {
+      for (const { property, value } of mergeShorthands(declarations)) {
+        winners[property] ??= { selector, value: toHexColors(value) };
+      }
+    }
+
+    return winners;
+  },
+
+  /**
+   * The user's other selectors that set a property on the inspected element
+   * which the active rule leaves unset, keyed by property.
+   */
+  setByOtherSelector: (
+    state: State,
+    getters: {
+      activeRule: postcss.Rule | null;
+      otherSelectorValues: Record<string, OtherSelectorValue>;
+    }
+  ): Record<string, OtherSelectorValue> =>
+    Object.fromEntries(
+      Object.entries(getters.otherSelectorValues).filter(
+        ([property]) => !getDeclarationValue(getters.activeRule, property)
+      )
+    ),
+
+  /**
+   * The user's other selectors that win a property on the element even
+   * though the active rule sets it too, so edits here won't show.
+   */
+  overriddenByOtherSelector: (
+    state: State,
+    getters: {
+      activeRule: postcss.Rule | null;
+      otherSelectorValues: Record<string, OtherSelectorValue>;
+    }
+  ): Record<string, OtherSelectorValue> =>
+    Object.fromEntries(
+      Object.entries(getters.otherSelectorValues).filter(
+        ([property]) => !!getDeclarationValue(getters.activeRule, property)
+      )
+    ),
 
   /**
    * The selector the panel reads the page for: the element under the

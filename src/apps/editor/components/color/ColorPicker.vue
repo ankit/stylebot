@@ -92,10 +92,17 @@ export default Vue.extend({
   },
 
   computed: {
+    otherRule(): { selector: string; value: string } | null {
+      return this.$store.getters.setByOtherSelector[this.property] ?? null;
+    },
+
     placeholder(): string {
-      return computedColorPlaceholder(
-        this.$store.state.computedStyles,
-        this.property
+      return (
+        this.otherRule?.value ??
+        computedColorPlaceholder(
+          this.$store.state.computedStyles,
+          this.property
+        )
       );
     },
 

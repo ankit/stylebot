@@ -1,5 +1,5 @@
 <template>
-  <property-row :label="t('radius')" last>
+  <property-row property="border-radius" :label="t('radius')" last>
     <length property="border-radius" :sizes="sizes" />
   </property-row>
 </template>

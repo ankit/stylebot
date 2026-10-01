@@ -45,6 +45,7 @@ import {
 
 import type { RemotePageBridgeSyncedState } from '@stylebot/page-bridge';
 import { getPageBridge } from '@stylebot/page-bridge';
+import type { AppliedDeclaration } from '@stylebot/page-bridge';
 
 import { PLACEHOLDER_PROPERTIES } from '../utils/computed-placeholder';
 import { isForceImportant } from '@stylebot/saved-styles';
@@ -73,6 +74,7 @@ const RECENT_FONTS_LIMIT = 10;
 let fontRequest = 0;
 let previewRequest = 0;
 let computedStylesRequest = 0;
+let appliedDeclarationsRequest = 0;
 
 export default {
   async initialize({ commit }: { commit: Commit }): Promise<void> {
@@ -386,6 +388,38 @@ export default {
 
     if (request === computedStylesRequest) {
       commit('setComputedStyles', styles);
+    }
+  },
+
+  /**
+   * Re-reads the user's Stylebot declarations in effect on the inspected
+   * element, for the basic editor's inline hints; a read overtaken by a
+   * newer one is dropped.
+   */
+  async refreshAppliedDeclarations({
+    commit,
+    state,
+    getters,
+  }: {
+    commit: Commit;
+    state: State;
+    getters: { inspectedSelector: string };
+  }): Promise<void> {
+    const request = ++appliedDeclarationsRequest;
+    let declarations: Array<AppliedDeclaration> = [];
+
+    const selector = getters.inspectedSelector;
+
+    if (selector && state.pageConnected) {
+      try {
+        declarations = await getPageBridge().getAppliedDeclarations(selector);
+      } catch {
+        //
+      }
+    }
+
+    if (request === appliedDeclarationsRequest) {
+      commit('setAppliedDeclarations', declarations);
     }
   },
 

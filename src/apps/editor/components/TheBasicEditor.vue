@@ -156,6 +156,7 @@ export default Vue.extend({
       immediate: true,
       handler(): void {
         this.$store.dispatch('refreshComputedStyles');
+        this.$store.dispatch('refreshAppliedDeclarations');
       },
     },
   },

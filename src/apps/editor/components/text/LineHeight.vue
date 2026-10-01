@@ -1,5 +1,5 @@
 <template>
-  <property-row :label="t('line_height')">
+  <property-row property="line-height" :label="t('line_height')">
     <length property="line-height" :sizes="sizes" />
   </property-row>
 </template>

@@ -1,9 +1,17 @@
 <template>
   <div class="property-row" :class="{ last }">
-    <s-text size="label" variant="muted" class="property-row-label">
-      {{ label }}
-    </s-text>
-    <div class="property-row-control"><slot /></div>
+    <div class="property-row-main">
+      <s-text size="label" variant="muted" class="property-row-label">
+        {{ label }}
+      </s-text>
+      <div class="property-row-control"><slot /></div>
+    </div>
+    <other-rule-hint v-if="otherRule" :selector="otherRule.selector" />
+    <other-rule-hint
+      v-else-if="overridingRule"
+      :selector="overridingRule.selector"
+      overrides
+    />
   </div>
 </template>
 
@@ -11,10 +19,13 @@
 import Vue from 'vue';
 import { SText } from '@stylebot/components';
 
+import OtherRuleHint from './OtherRuleHint.vue';
+
 export default Vue.extend({
   name: 'PropertyRow',
 
   components: {
+    OtherRuleHint,
     SText,
   },
 
@@ -29,6 +40,24 @@ export default Vue.extend({
       type: Boolean,
       default: false,
     },
+
+    // The property the control edits, to say when another selector sets it.
+    property: {
+      type: String,
+      default: '',
+    },
+  },
+
+  computed: {
+    overridingRule(): { selector: string; value: string } | null {
+      return (
+        this.$store.getters.overriddenByOtherSelector[this.property] ?? null
+      );
+    },
+
+    otherRule(): { selector: string; value: string } | null {
+      return this.$store.getters.setByOtherSelector[this.property] ?? null;
+    },
   },
 });
 </script>
@@ -36,8 +65,8 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .property-row {
   display: flex;
-  align-items: center;
-  gap: 12px;
+  flex-direction: column;
+  gap: 4px;
   padding: 6px 0;
   border-bottom: 1px solid
     color-mix(in srgb, var(--text-primary) 7%, transparent);
@@ -46,6 +75,12 @@ export default Vue.extend({
     padding-bottom: 2px;
     border-bottom: none;
   }
+}
+
+.property-row-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .property-row-label {

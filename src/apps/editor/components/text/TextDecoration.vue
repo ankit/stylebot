@@ -1,5 +1,5 @@
 <template>
-  <property-row :label="t('text_decoration')">
+  <property-row property="text-decoration" :label="t('text_decoration')">
     <css-property-value-group property="text-decoration" :options="options" />
   </property-row>
 </template>

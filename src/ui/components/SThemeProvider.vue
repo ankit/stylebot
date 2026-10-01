@@ -72,6 +72,7 @@ export default Vue.extend({
   --success-background: #1e3129;
   --success-border: #2f4d3e;
 
+  --warning: #e5b567;
   --warning-background: #2b2518;
   --warning-border: #4a3d22;
 
@@ -131,6 +132,7 @@ export default Vue.extend({
   --success-background: #e8f5ee;
   --success-border: #c3e6d1;
 
+  --warning: #8a5a00;
   --warning-background: #fff8ec;
   --warning-border: #f1e3c6;
 

@@ -1,4 +1,5 @@
 import type { RoleColorGroups } from '@stylebot/css';
+import type { AppliedDeclaration } from './applied-declarations';
 
 /**
  * Facts about the page that the editor needs without touching its DOM.
@@ -105,6 +106,12 @@ export type PageBridge = {
    * page to a language model.
    */
   getPageOutline(): Promise<string>;
+
+  /**
+   * The user's Stylebot declarations in effect on the element the selector
+   * is about, each with the selector it comes from.
+   */
+  getAppliedDeclarations(selector: string): Promise<Array<AppliedDeclaration>>;
 
   /**
    * The page's CSS as context for restyling it: its variables, and its

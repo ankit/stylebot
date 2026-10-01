@@ -24,6 +24,8 @@ import { getPageColors } from './page-colors';
 import { getComputedStyles } from './computed-styles';
 import { getPageOutline } from './page-outline';
 import { getPageCssContext } from './page-css';
+import { getAppliedDeclarations } from './applied-declarations';
+import type { AppliedDeclaration } from './applied-declarations';
 
 const PREVIEW_ID = 'font-preview';
 
@@ -231,6 +233,12 @@ export class LocalPageBridge extends PageBridgeEmitter implements PageBridge {
     );
 
     return known ?? document.querySelector<HTMLElement>(selector);
+  }
+
+  getAppliedDeclarations(selector: string): Promise<Array<AppliedDeclaration>> {
+    const el = this.elementFor(selector);
+
+    return Promise.resolve(el ? getAppliedDeclarations(el) : []);
   }
 
   getPageCssContext(selector: string): Promise<string> {

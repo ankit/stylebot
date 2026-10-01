@@ -10,6 +10,7 @@ import { walkUnnestedRules } from '@stylebot/css';
 import type { State, CssSelectorMetadata, EditorTab } from './';
 import type { UndoStack } from './undo-stack';
 import type { PageSnapshot } from '@stylebot/page-bridge';
+import type { AppliedDeclaration } from '@stylebot/page-bridge';
 
 export default {
   setVisible(state: State, visible: boolean): void {
@@ -66,6 +67,13 @@ export default {
 
   setComputedStyles(state: State, styles: Record<string, string>): void {
     state.computedStyles = styles;
+  },
+
+  setAppliedDeclarations(
+    state: State,
+    declarations: Array<AppliedDeclaration>
+  ): void {
+    state.appliedDeclarations = declarations;
   },
 
   setInspecting(state: State, inspecting: boolean): void {
