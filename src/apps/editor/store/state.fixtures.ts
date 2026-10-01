@@ -33,6 +33,7 @@ const mockState: State = {
   visible: false,
   inspecting: false,
   previewSelector: '',
+  selectorAlternatives: { existing: [], candidates: [] },
   readability: false,
   forceImportant: true,
   colorPickerVisible: false,

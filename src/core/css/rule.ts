@@ -248,3 +248,32 @@ export const removeRule = (css: string, selector: string): string => {
 
   return root.toString();
 };
+
+/**
+ * The selectors in `css` that match `el`, skipping ones for interaction
+ * states like :hover, in the order the style lists them.
+ */
+export const getMatchingSelectors = (
+  el: HTMLElement,
+  css: string
+): Array<string> => {
+  const matches = new Set<string>();
+
+  walkUnnestedRules(postcss.parse(css), rule => {
+    for (const selector of rule.selectors) {
+      if (STATE_PSEUDO_CLASSES.test(selector)) {
+        continue;
+      }
+
+      try {
+        if (el.matches(selector)) {
+          matches.add(selector);
+        }
+      } catch {
+        //
+      }
+    }
+  });
+
+  return Array.from(matches);
+};

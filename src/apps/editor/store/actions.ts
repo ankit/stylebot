@@ -392,6 +392,26 @@ export default {
   },
 
   /**
+   * Fetches other selectors for the element just picked, which the panel
+   * offers under the selector field.
+   */
+  async loadSelectorAlternatives(
+    { commit }: { commit: Commit },
+    selector: string
+  ): Promise<void> {
+    commit('setSelectorAlternatives', { existing: [], candidates: [] });
+
+    try {
+      commit(
+        'setSelectorAlternatives',
+        await getPageBridge().getSelectorOptions(selector)
+      );
+    } catch {
+      //
+    }
+  },
+
+  /**
    * Re-reads the user's Stylebot declarations in effect on the inspected
    * element, for the basic editor's inline hints; a read overtaken by a
    * newer one is dropped.

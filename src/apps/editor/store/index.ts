@@ -16,7 +16,7 @@ import {
   defaultReadabilitySettings,
 } from '@stylebot/settings';
 
-import type { PageSnapshot } from '@stylebot/page-bridge';
+import type { PageSnapshot, SelectorOptions } from '@stylebot/page-bridge';
 import type { AppliedDeclaration } from '@stylebot/page-bridge';
 import { emptyPageSnapshot } from '@stylebot/page-bridge';
 
@@ -85,6 +85,8 @@ export type State = {
   inspecting: boolean;
   // The element under the inspector while picking, previewed in the panel.
   previewSelector: string;
+  // Other selectors for the last picked element.
+  selectorAlternatives: SelectorOptions;
   colorPickerVisible: boolean;
 
   options: StylebotOptions;
@@ -123,6 +125,7 @@ export const createStore = (host: EditorHost): Store<State> => {
       visible: false,
       inspecting: false,
       previewSelector: '',
+      selectorAlternatives: { existing: [], candidates: [] },
       colorPickerVisible: false,
 
       commands: null,

@@ -6,6 +6,7 @@ import {
   withOwnDeclarationsOnly,
   getRuleForSelector,
   getDeclarationsForSelector,
+  getMatchingSelectors,
   getExistingSelector,
   splitSelectorFromGroup,
   addEmptyRule,
@@ -652,5 +653,21 @@ describe('rule', () => {
         }
       `);
     });
+  });
+});
+
+describe('getMatchingSelectors', () => {
+  it('lists the style selectors that match an element, skipping :hover', () => {
+    document.body.innerHTML = '<p class="note" id="p">hi</p>';
+    const el = document.getElementById('p') as HTMLElement;
+
+    expect(
+      getMatchingSelectors(
+        el,
+        'p { color: red; }\n.note:hover { color: blue; }\nh1, .note { margin: 0; }\ndiv { color: red; }'
+      )
+    ).toEqual(['p', '.note']);
+
+    document.body.innerHTML = '';
   });
 });

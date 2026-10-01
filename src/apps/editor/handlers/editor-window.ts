@@ -151,6 +151,8 @@ export const createEditorWindowHandler = (
                 return bridge.getPageOutline();
               case 'getAppliedDeclarations':
                 return bridge.getAppliedDeclarations(...message.args);
+              case 'getSelectorOptions':
+                return bridge.getSelectorOptions(...message.args);
               case 'getPageCssContext':
                 return bridge.getPageCssContext(...message.args);
             }
