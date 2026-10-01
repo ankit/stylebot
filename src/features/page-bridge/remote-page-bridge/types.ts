@@ -1,6 +1,6 @@
 import type { RoleColorGroups } from '@stylebot/css';
 import type { AppliedDeclaration } from '../applied-declarations';
-import type { PageSnapshot, SelectorOptions } from '../PageBridge';
+import type { PageSnapshot, SelectorAlternatives } from '../PageBridge';
 
 /**
  * The slice of editor state the page owns and the window mirrors.
@@ -19,7 +19,7 @@ export type RemotePageBridgeRequestArgs = {
   getComputedStyles: [selector: string, properties: Array<string>];
   getPageOutline: [];
   getAppliedDeclarations: [selector: string];
-  getSelectorOptions: [selector: string];
+  getSelectorAlternatives: [selector: string];
   getPageCssContext: [selector: string];
 };
 
@@ -31,7 +31,7 @@ export type RemotePageBridgeRequestResult = {
   getComputedStyles: Record<string, string>;
   getPageOutline: string;
   getAppliedDeclarations: Array<AppliedDeclaration>;
-  getSelectorOptions: SelectorOptions;
+  getSelectorAlternatives: SelectorAlternatives;
   getPageCssContext: string;
 };
 

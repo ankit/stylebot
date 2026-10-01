@@ -20,7 +20,7 @@ export type PageSnapshot = {
  * match it, then selectors built for it, broadest first. No two match the
  * same set of elements.
  */
-export type SelectorOptions = {
+export type SelectorAlternatives = {
   existing: Array<string>;
   candidates: Array<string>;
 };
@@ -127,7 +127,7 @@ export type PageBridge = {
    * Other selectors for the element last picked with this selector, or the
    * selector's first match when that element no longer fits.
    */
-  getSelectorOptions(selector: string): Promise<SelectorOptions>;
+  getSelectorAlternatives(selector: string): Promise<SelectorAlternatives>;
 
   /**
    * The page's CSS as context for restyling it: its variables, and its

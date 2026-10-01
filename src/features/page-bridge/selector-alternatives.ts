@@ -5,7 +5,7 @@ import {
   getSelectorCandidates,
 } from '@stylebot/css';
 
-import type { SelectorOptions } from './PageBridge';
+import type { SelectorAlternatives } from './PageBridge';
 import { getAppliedDeclarations } from './applied-declarations';
 
 const PAGE_WIDE_SELECTOR = /^\s*(\*|html|body|:root)\s*$/i;
@@ -18,11 +18,11 @@ const TAG_CHAIN = /^[a-z][\w-]*(\s+[a-z][\w-]*)+$/i;
  * reach a different set of elements than the current selector and those.
  * Bare tag chains are left out as noise when anything more readable exists.
  */
-export const getSelectorOptions = (
+export const getSelectorAlternatives = (
   el: HTMLElement,
   selector: string,
   css: string
-): SelectorOptions => {
+): SelectorAlternatives => {
   const matching = getMatchingSelectors(el, css);
   // A page-wide rule (* or body) matches everything, so it's worth offering
   // only when it actually sets something on this element; it goes last.

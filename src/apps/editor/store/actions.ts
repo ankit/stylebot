@@ -404,7 +404,7 @@ export default {
     try {
       commit(
         'setSelectorAlternatives',
-        await getPageBridge().getSelectorOptions(selector)
+        await getPageBridge().getSelectorAlternatives(selector)
       );
     } catch {
       //

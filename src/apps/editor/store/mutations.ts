@@ -9,7 +9,7 @@ import type {
 import { walkUnnestedRules } from '@stylebot/css';
 import type { State, CssSelectorMetadata, EditorTab } from './';
 import type { UndoStack } from './undo-stack';
-import type { PageSnapshot, SelectorOptions } from '@stylebot/page-bridge';
+import type { PageSnapshot, SelectorAlternatives } from '@stylebot/page-bridge';
 import type { AppliedDeclaration } from '@stylebot/page-bridge';
 
 export default {
@@ -88,8 +88,11 @@ export default {
     state.previewSelector = selector;
   },
 
-  setSelectorAlternatives(state: State, options: SelectorOptions): void {
-    state.selectorAlternatives = options;
+  setSelectorAlternatives(
+    state: State,
+    alternatives: SelectorAlternatives
+  ): void {
+    state.selectorAlternatives = alternatives;
   },
 
   setColorPickerVisible(state: State, colorPickerVisible: boolean): void {

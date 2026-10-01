@@ -1,6 +1,6 @@
-import { getSelectorOptions } from './selector-options';
+import { getSelectorAlternatives } from './selector-alternatives';
 
-describe('getSelectorOptions', () => {
+describe('getSelectorAlternatives', () => {
   afterEach(() => {
     document.body.innerHTML = '';
   });
@@ -15,13 +15,17 @@ describe('getSelectorOptions', () => {
   };
 
   it('keeps the current selector among the candidates', () => {
-    const { candidates } = getSelectorOptions(pick(), 'span.titleline a', '');
+    const { candidates } = getSelectorAlternatives(
+      pick(),
+      'span.titleline a',
+      ''
+    );
 
     expect(candidates).toContain('span.titleline a');
   });
 
   it("keeps the style's rules even when one reaches what the current does", () => {
-    const { existing, candidates } = getSelectorOptions(
+    const { existing, candidates } = getSelectorAlternatives(
       pick(),
       'span.titleline a',
       '.athing .titleline a { color: red; }'
@@ -32,7 +36,11 @@ describe('getSelectorOptions', () => {
   });
 
   it('skips a page-wide rule that sets nothing on the element', () => {
-    const { existing } = getSelectorOptions(pick(), 'span.titleline a', '');
+    const { existing } = getSelectorAlternatives(
+      pick(),
+      'span.titleline a',
+      ''
+    );
 
     expect(existing).not.toContain('*');
   });

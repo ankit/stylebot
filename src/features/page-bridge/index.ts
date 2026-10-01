@@ -21,7 +21,7 @@ export type {
   PageBridge,
   PageBridgeEvents,
   PageSnapshot,
-  SelectorOptions,
+  SelectorAlternatives,
 } from './PageBridge';
 export type { AppliedDeclaration } from './applied-declarations';
 export { REMOTE_PAGE_BRIDGE_PORT } from './remote-page-bridge/constants';

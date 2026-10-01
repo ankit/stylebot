@@ -5,57 +5,59 @@
     class="selector-alternatives"
     :class="{ expanded }"
   >
-    <button
+    <s-chip
       v-for="selector in shown"
       :key="selector"
-      type="button"
+      :label="selector"
+      variant="outline"
+      size="small"
       class="selector-alternative"
-      :class="{ styled: styled.includes(selector) }"
       @click="choose(selector)"
       @mouseenter="preview(selector)"
       @mouseleave="clearPreview"
       @focus="preview(selector)"
       @blur="clearPreview"
     >
-      <span class="selector-alternative-text">{{ selector }}</span>
-      <arrow-up-right-icon
-        v-if="styled.includes(selector)"
-        :size="11"
-        class="selector-alternative-icon"
-      />
-    </button>
-    <button
+      <template v-if="styled.includes(selector)" #icon>
+        <arrow-up-right-icon :size="11" />
+      </template>
+    </s-chip>
+    <s-chip
       v-if="hiddenCount > 0"
-      type="button"
+      :label="t('count_more', [String(hiddenCount)])"
+      variant="outline"
+      size="small"
       class="selector-alternative more"
       @click="expanded = true"
-    >
-      {{ t('count_more', [String(hiddenCount)]) }}
-    </button>
+    />
 
     <!-- Every chip at full width, unseen, to work out how many fit. -->
     <div ref="measure" class="selector-alternatives-measure" aria-hidden="true">
-      <span
+      <s-chip
         v-for="selector in others"
         :key="selector"
-        class="selector-alternative"
+        :label="selector"
+        variant="outline"
+        size="small"
+        class="measured"
       >
-        <span class="selector-alternative-text">{{ selector }}</span>
-        <arrow-up-right-icon
-          v-if="styled.includes(selector)"
-          :size="11"
-          class="selector-alternative-icon"
-        />
-      </span>
-      <span class="selector-alternative more">
-        {{ t('count_more', [String(others.length)]) }}
-      </span>
+        <template v-if="styled.includes(selector)" #icon>
+          <arrow-up-right-icon :size="11" />
+        </template>
+      </s-chip>
+      <s-chip
+        :label="t('count_more', [String(others.length)])"
+        variant="outline"
+        size="small"
+        class="measured"
+      />
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
+import { SChip } from '@stylebot/components';
 import { ArrowUpRightIcon } from '@stylebot/icons';
 import { getPageBridge } from '@stylebot/page-bridge';
 
@@ -73,6 +75,7 @@ export default Vue.extend({
 
   components: {
     ArrowUpRightIcon,
+    SChip,
   },
 
   data(): {
@@ -233,54 +236,17 @@ export default Vue.extend({
   gap: 6px;
   visibility: hidden;
   pointer-events: none;
-
-  .selector-alternative {
-    flex: none;
-  }
 }
 
 .selector-alternative {
-  @include button-reset;
-
   flex: 0 1 auto;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  min-width: 0;
-  padding: 2px 7px;
-  border: 1px solid var(--panel-border);
-  border-radius: 5px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  line-height: 1.3;
-  color: var(--text-secondary);
-  cursor: pointer;
-
-  &:hover {
-    background: var(--hover-tint);
-    color: var(--text-primary);
-  }
-
-  &.styled {
-    color: var(--text-body);
-  }
 
   &.more {
     flex: none;
   }
-
-  @include focus-ring;
 }
 
-.selector-alternative-text {
-  @include truncate;
-
-  min-width: 0;
-  font-family: var(--font-mono);
-}
-
-.selector-alternative-icon {
+.measured {
   flex: none;
-  color: var(--accent-text);
 }
 </style>

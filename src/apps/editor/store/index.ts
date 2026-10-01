@@ -16,7 +16,7 @@ import {
   defaultReadabilitySettings,
 } from '@stylebot/settings';
 
-import type { PageSnapshot, SelectorOptions } from '@stylebot/page-bridge';
+import type { PageSnapshot, SelectorAlternatives } from '@stylebot/page-bridge';
 import type { AppliedDeclaration } from '@stylebot/page-bridge';
 import { emptyPageSnapshot } from '@stylebot/page-bridge';
 
@@ -86,7 +86,7 @@ export type State = {
   // The element under the inspector while picking, previewed in the panel.
   previewSelector: string;
   // Other selectors for the last picked element.
-  selectorAlternatives: SelectorOptions;
+  selectorAlternatives: SelectorAlternatives;
   colorPickerVisible: boolean;
 
   options: StylebotOptions;

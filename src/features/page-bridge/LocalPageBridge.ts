@@ -18,7 +18,11 @@ import {
 
 import { injectStylesheet, readCache, writeCache } from '@stylebot/stylesheets';
 
-import type { PageBridge, PageSnapshot, SelectorOptions } from './PageBridge';
+import type {
+  PageBridge,
+  PageSnapshot,
+  SelectorAlternatives,
+} from './PageBridge';
 import { PageBridgeEmitter } from './PageBridgeEmitter';
 import { getPageColors } from './page-colors';
 import { getComputedStyles } from './computed-styles';
@@ -26,7 +30,7 @@ import { getPageOutline } from './page-outline';
 import { getPageCssContext } from './page-css';
 import { getAppliedDeclarations } from './applied-declarations';
 import type { AppliedDeclaration } from './applied-declarations';
-import { getSelectorOptions } from './selector-options';
+import { getSelectorAlternatives } from './selector-alternatives';
 
 const PREVIEW_ID = 'font-preview';
 
@@ -222,12 +226,12 @@ export class LocalPageBridge extends PageBridgeEmitter implements PageBridge {
     return Promise.resolve(getPageOutline());
   }
 
-  getSelectorOptions(selector: string): Promise<SelectorOptions> {
+  getSelectorAlternatives(selector: string): Promise<SelectorAlternatives> {
     const el = this.elementFor(selector);
 
     return Promise.resolve(
       el
-        ? getSelectorOptions(el, selector, this.getStylebotCss())
+        ? getSelectorAlternatives(el, selector, this.getStylebotCss())
         : { existing: [], candidates: [] }
     );
   }
