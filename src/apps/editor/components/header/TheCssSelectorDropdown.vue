@@ -2,6 +2,7 @@
   <s-autocomplete
     mono
     chips
+    blur-on-commit
     class="selector-autocomplete"
     :value="activeSelector"
     :items="filteredSelectors"
@@ -13,19 +14,16 @@
     @click.native="stopInspecting"
     @focus="onFocus"
     @blur="onBlur"
+    @mouseenter.native="onMouseEnter"
+    @mouseleave.native="onMouseLeave"
   >
     <template #chips="{ parts }">
       <selector-chips :parts="parts" />
     </template>
 
-    <template v-if="activeStyleCount > 0" #suffix>
-      <s-count-badge :count="activeStyleCount" class="active-style-count" />
-    </template>
-
     <template #item="{ item, select }">
       <the-css-selector-dropdown-item
         :selector="item.value"
-        :style-count="item.styleCount"
         @select="select"
         @preview-end="previewActiveSelector"
       />
@@ -35,9 +33,8 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { SAutocomplete, SCountBadge } from '@stylebot/components';
-import { getDeclarationsForSelector } from '@stylebot/css';
-import type { CssDeclaration, StylebotEditingMode } from '@stylebot/types';
+import { SAutocomplete } from '@stylebot/components';
+import type { StylebotEditingMode } from '@stylebot/types';
 
 import type { CssSelectorMetadata } from '../../store';
 import { getPageBridge } from '@stylebot/page-bridge';
@@ -49,14 +46,14 @@ export default Vue.extend({
 
   components: {
     SAutocomplete,
-    SCountBadge,
     SelectorChips,
     TheCssSelectorDropdownItem,
   },
 
-  data(): { focused: boolean; openingSelector: string } {
+  data(): { focused: boolean; hovered: boolean; openingSelector: string } {
     return {
       focused: false,
+      hovered: false,
       // The selector as it was when editing began; until it's changed, the
       // suggestions list everything rather than filtering by it.
       openingSelector: '',
@@ -74,10 +71,6 @@ export default Vue.extend({
 
     selectors(): Array<CssSelectorMetadata> {
       return this.$store.state.selectors;
-    },
-
-    activeStyleCount(): number {
-      return this.getStylebotDeclarations(this.activeSelector)?.length ?? 0;
     },
 
     filteredSelectors(): Array<CssSelectorMetadata> {
@@ -132,11 +125,31 @@ export default Vue.extend({
 
     onBlur(): void {
       this.focused = false;
-      getPageBridge().unhighlight();
+
+      if (!this.hovered) {
+        getPageBridge().unhighlight();
+      }
     },
 
-    previewActiveSelector(): void {
+    onMouseEnter(): void {
+      this.hovered = true;
+      this.previewActiveSelector();
+    },
+
+    onMouseLeave(): void {
+      this.hovered = false;
+
       if (!this.focused) {
+        getPageBridge().unhighlight();
+      }
+    },
+
+    /**
+     * Tints the selector's matches while the field is focused or hovered;
+     * the inspector draws its own highlight while picking.
+     */
+    previewActiveSelector(): void {
+      if (!(this.focused || this.hovered) || this.$store.state.inspecting) {
         return;
       }
 
@@ -148,17 +161,6 @@ export default Vue.extend({
         getPageBridge().unhighlight();
       }
     },
-
-    getStylebotDeclarations(selector: string): Array<CssDeclaration> | null {
-      return getDeclarationsForSelector(this.$store.state.css, selector);
-    },
   },
 });
 </script>
-
-<style lang="scss" scoped>
-.active-style-count {
-  align-self: flex-start;
-  margin: 8px 6px 0;
-}
-</style>
