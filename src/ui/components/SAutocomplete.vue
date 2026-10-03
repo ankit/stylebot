@@ -56,6 +56,18 @@
         <slot name="suffix" />
 
         <button
+          v-if="clearLabel && value && !disabled"
+          type="button"
+          class="autocomplete-clear"
+          tabindex="-1"
+          :aria-label="clearLabel"
+          @mousedown.prevent
+          @click="clear"
+        >
+          <x-icon :size="12" />
+        </button>
+
+        <button
           type="button"
           class="autocomplete-chevron"
           :class="{ open }"
@@ -93,7 +105,7 @@
 import type { PropType } from 'vue';
 import Vue from 'vue';
 
-import { ChevronDownIcon } from '@stylebot/icons';
+import { ChevronDownIcon, XIcon } from '@stylebot/icons';
 import { splitCommaList } from '@stylebot/utils';
 
 import SAnchoredMenu from './SAnchoredMenu.vue';
@@ -114,6 +126,7 @@ export default Vue.extend({
     SMenu,
     SChip,
     ChevronDownIcon,
+    XIcon,
   },
 
   model: {
@@ -186,6 +199,12 @@ export default Vue.extend({
     selectOnFocus: {
       type: Boolean,
       default: false,
+    },
+
+    // Shows a button that empties the field, labelled with this text.
+    clearLabel: {
+      type: String,
+      default: '',
     },
 
     // Leave the field after a pick or Enter instead of keeping the caret in
@@ -398,6 +417,18 @@ export default Vue.extend({
       }
     },
 
+    // Empties the field and leaves the caret in it, menu closed, ready for
+    // a new value.
+    clear(): void {
+      this.$emit('input', '');
+      this.$emit('clear');
+      this.suppressReopen = false;
+      this.hideMenu();
+      this.$nextTick(() => {
+        (this.$refs.input as HTMLTextAreaElement | undefined)?.focus();
+      });
+    },
+
     // Switches from the pill display back to the raw editable textarea
     // and focuses it, once it exists on the next render.
     revealInput(): void {
@@ -585,6 +616,23 @@ export default Vue.extend({
   }
 }
 
+.autocomplete-clear {
+  @include button-reset;
+
+  flex: none;
+  align-self: stretch;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  color: var(--text-muted);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--text-primary);
+  }
+}
+
 .autocomplete-chevron {
   @include button-reset;
 
@@ -655,6 +703,11 @@ export default Vue.extend({
     padding: 7px 4px 7px 10px;
     font-size: 13px;
     line-height: 16px;
+  }
+
+  .autocomplete-clear {
+    align-self: flex-start;
+    height: 30px;
   }
 
   .autocomplete-chevron {

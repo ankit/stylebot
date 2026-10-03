@@ -327,3 +327,24 @@ export const RepeatedRulesListedOnce: StoryObj = {
     ]);
   },
 };
+
+export const ClearButtonEmptiesSelector: StoryObj = {
+  ...editor(WITH_RULE),
+  name: 'the clear button empties the selector and leaves the caret in the field',
+  play: async ({ canvasElement }) => {
+    const store = storeOf(canvasElement);
+    const clear = () =>
+      field(canvasElement).querySelector(
+        '.autocomplete-clear'
+      ) as HTMLButtonElement | null;
+
+    await waitFor(() => expect(clear()).not.toBeNull());
+    await user.click(clear() as HTMLButtonElement);
+
+    await expect(store.state.activeSelector).toBe('');
+    await waitFor(() => expect(input(canvasElement)).toHaveFocus());
+    await expect(input(canvasElement)).toHaveValue('');
+    await expect(clear()).toBeNull();
+    await expect(within(canvasElement).queryByRole('menu')).toBeNull();
+  },
+};
