@@ -50,6 +50,26 @@ Add back $site$
    (developer.chrome.com/docs/extensions/reference/api/i18n#locales) — nothing
    else in the repo lists locales.
 
+## Audit a locale
+
+For `/translate audit <code>`: review a whole locale that already passes the
+validator, as one pass with its own PR.
+
+1. `yarn validate-locales --audit <code>` lists what to look at first:
+   strings identical to English (a loanword, or untranslated?), "..." for
+   "…", stray spaces, and short labels much longer than the English.
+2. Read the whole file against `en.config`, top to bottom, applying "Sound
+   native" below and the locale's per-language note. Fix untranslated
+   strings, calques, typos and grammar, register and terminology drift.
+   Store copy (`store_listing`, `privacy_policy`) is the oldest text and
+   usually needs the most.
+3. Look at it in the extension with `yarn dev:chrome:locale <code>`: the tab
+   row, segmented controls, the shortcuts view, menus and the popup are
+   the tight spots.
+4. In the PR, list every changed string with its English and why it
+   changed, in English, so it can be reviewed without reading the language.
+   Say what still needs a native speaker's eye.
+
 ## How to translate well
 
 - **Look at where a string is used** before translating a short or ambiguous

@@ -214,6 +214,73 @@ function placeholderNames(message) {
   return new Set([...message.matchAll(/\$([^$]+)\$/g)].map(m => m[1]));
 }
 
+// Strings that read the same as English in any language: names and codes.
+const SAME_IN_EVERY_LANGUAGE = new Set([
+  'language_code',
+  'github',
+  'google_drive',
+  'x_and_y',
+  'image_size_kb',
+  'editor_window_title',
+]);
+
+/**
+ * `yarn validate-locales --audit <locale>`: what a reviewer of that locale
+ * should look at first. Reports only; whether a match is right is a call
+ * for someone who knows the language.
+ */
+function audit(locale, parsedByLocale, baseLocale) {
+  const base = parsedByLocale[baseLocale].messages;
+  const messages = parsedByLocale[locale]?.messages;
+
+  if (!messages) {
+    console.error(`No ${locale}.config`);
+    process.exit(1);
+  }
+
+  const raw = readFileSync(path.join(localesDir, `${locale}.config`), 'utf8');
+  const report = (title, lines) => {
+    console.log(`${title} (${lines.length})`);
+    lines.forEach(line => console.log(`  - ${line}`));
+    console.log('');
+  };
+
+  report(
+    'Same as English: a loanword, or untranslated?',
+    Object.entries(messages)
+      .filter(
+        ([key, { message }]) =>
+          !SAME_IN_EVERY_LANGUAGE.has(key) &&
+          message === base[key]?.message &&
+          /[A-Za-z]{3}/.test(message)
+      )
+      .map(([key, { message }]) => `${key}: ${message.slice(0, 60)}`)
+  );
+  report(
+    'Three dots instead of an ellipsis (…)',
+    Object.entries(messages)
+      .filter(([, { message }]) => message.includes('...'))
+      .map(([key]) => key)
+  );
+  report(
+    'Trailing or doubled spaces',
+    raw
+      .split('\n')
+      .map((line, index) => [line, index + 1])
+      .filter(([line]) => line !== line.trimEnd() || / {2}/.test(line.trim()))
+      .map(([line, number]) => `line ${number}: ${line.trim().slice(0, 50)}`)
+  );
+  report(
+    'Short labels over twice the English length (check their controls)',
+    Object.entries(messages)
+      .filter(([key, { message }]) => {
+        const english = base[key]?.message ?? '';
+        return english.length <= 15 && message.length > english.length * 2 + 4;
+      })
+      .map(([key, { message }]) => `${key}: ${base[key].message} → ${message}`)
+  );
+}
+
 function main() {
   const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
   const baseLocale = manifest.default_locale;
@@ -229,6 +296,13 @@ function main() {
     const raw = readFileSync(path.join(localesDir, file), 'utf8');
 
     parsedByLocale[locale] = parseLocaleConfig(raw);
+  }
+
+  const auditIndex = process.argv.indexOf('--audit');
+
+  if (auditIndex > -1) {
+    audit(process.argv[auditIndex + 1], parsedByLocale, baseLocale);
+    return;
   }
 
   const baseMessages = parsedByLocale[baseLocale]?.messages;

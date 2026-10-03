@@ -130,7 +130,7 @@ test.describe('Sync tab', () => {
       page.getByRole('button', { name: 'Disconnect' })
     ).toBeVisible();
     await expect(page.getByRole('button', { name: 'Sync now' })).toBeDisabled();
-    await expect(page.getByText('Syncing...')).toBeVisible();
+    await expect(page.getByText('Syncing…')).toBeVisible();
 
     await expect
       .poll(

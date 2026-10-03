@@ -7,6 +7,7 @@ Add support for a locale via the following steps
 - If not, copy [`src/assets/_locales/en.config`](../src/assets/_locales/en.config) to `src/assets/_locales/[locale].config`
 - Update strings in `src/assets/_locales/[locale].config` to match the locale
 - See it in the extension with `yarn dev:chrome:locale [locale]`, which opens Chrome in that language
+- `yarn validate-locales --audit [locale]` lists what to review first: strings left in English, stray punctuation and spacing, and labels much longer than the English
 
 ## Checks
 
