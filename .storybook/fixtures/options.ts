@@ -21,6 +21,14 @@ export const seededStyles = {
     false,
     '2025-12-24T18:00:00Z'
   ),
+  'reader.example.org': {
+    ...style('body { max-width: 680px; }', true, '2026-01-05T12:00:00Z'),
+    profiles: {
+      default: { name: '' },
+      night: { name: 'Night', css: 'body { background: #111; }' },
+    },
+    activeProfile: 'default',
+  },
   '*.wikipedia.org': style(
     '#content { max-width: 720px; }',
     true,

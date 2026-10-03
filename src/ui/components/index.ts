@@ -13,6 +13,7 @@ export { default as SMenuItem } from './SMenuItem.vue';
 export { default as SMenuDivider } from './SMenuDivider.vue';
 export { default as SDialog } from './SDialog.vue';
 export { default as SConfirmDialog } from './SConfirmDialog.vue';
+export { default as SPromptDialog } from './SPromptDialog.vue';
 export { default as SThemeProvider } from './SThemeProvider.vue';
 export { default as SAutocomplete } from './SAutocomplete.vue';
 export { default as SSegmentedControl } from './SSegmentedControl.vue';

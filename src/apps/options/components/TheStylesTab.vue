@@ -42,6 +42,7 @@
         :url="style.url"
         :modified-time="style.modifiedTime"
         :enabled="style.enabled"
+        :profile-count="profileCount(style)"
         @edit="$emit('edit', $event)"
         @toggle="toggleStyle(style)"
         @delete="deleteStyle(style)"
@@ -69,6 +70,7 @@ import { compareAsc } from 'date-fns';
 import type { Style } from '@stylebot/types';
 import { SHeading, SText, SButton, SConfirmDialog } from '@stylebot/components';
 import { SearchIcon } from '@stylebot/icons';
+import { listProfiles } from '@stylebot/saved-styles';
 
 import StyleListRow from './styles/StyleListRow.vue';
 import StylesBulkMenu from './styles/StylesBulkMenu.vue';
@@ -130,6 +132,10 @@ export default Vue.extend({
   },
 
   methods: {
+    profileCount(style: Style): number {
+      return listProfiles(style).length;
+    },
+
     deleteStyle(style: Style): void {
       this.$store.dispatch('deleteStyle', style.url);
     },
@@ -218,6 +224,7 @@ export default Vue.extend({
   flex: 1;
   min-height: 0;
   overflow-y: auto;
+  padding: 6px;
   border-top: 1px solid var(--panel-border);
 }
 </style>

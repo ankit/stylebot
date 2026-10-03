@@ -5,6 +5,17 @@ import { getSelector } from './selector';
 import { getSubjectCompound } from './get-subject-compound';
 
 /**
+ * How many top-level rules a stylesheet has, or null when it doesn't parse.
+ */
+export const countRules = (css: string): number | null => {
+  try {
+    return postcss.parse(css).nodes?.length ?? 0;
+  } catch {
+    return null;
+  }
+};
+
+/**
  * Whether the rule sits inside another rule (native CSS nesting). Its
  * selector is then relative to the parent — `.title` inside `.card` means
  * `.card .title` — so it can't be looked up or edited by selector alone.

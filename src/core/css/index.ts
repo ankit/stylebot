@@ -59,6 +59,7 @@ export {
   addEmptyRule,
   removeEmptyRules,
   removeRule,
+  countRules,
 } from './rule';
 
 export { getAlreadyUsedColors } from './already-used-colors';

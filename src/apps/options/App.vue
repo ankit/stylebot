@@ -112,13 +112,13 @@ export default Vue.extend({
     onSaveStyle({
       initialUrl,
       url,
-      css,
+      drafts,
     }: {
       initialUrl: string;
       url: string;
-      css: string;
+      drafts: Record<string, string>;
     }): void {
-      this.$store.dispatch('saveStyle', { initialUrl, url, css });
+      this.$store.dispatch('saveStyle', { initialUrl, url, drafts });
       this.navigate({ name: 'styles' });
     },
   },
