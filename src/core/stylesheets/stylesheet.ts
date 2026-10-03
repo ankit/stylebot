@@ -1,3 +1,4 @@
+import { watchBlockedFonts } from './blocked-fonts';
 import { fetchImportCss } from './import-cache';
 
 const getStylesheetId = (id: string) => {
@@ -89,6 +90,8 @@ export const injectStylesheet = (
   if (importUrls.length === 0) {
     return;
   }
+
+  watchBlockedFonts();
 
   Promise.all(importUrls.map(fetchImportCss)).then(values => {
     const merged = values.join('\n\n');

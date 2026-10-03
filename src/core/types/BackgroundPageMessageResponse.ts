@@ -30,6 +30,8 @@ export type GetReadabilitySettingsResponse = ReadabilitySettings;
 export type GetImportCssResponse = string;
 export type GetCompiledStylesResponse = CompiledStyles;
 export type GetGoogleWebFontExistsResponse = boolean;
+// The font file as base64, or empty when it couldn't be fetched.
+export type GetGoogleFontFileResponse = string;
 
 /**
  * Locale keys rather than raw messages, so a Drive failure can be shown in
@@ -72,6 +74,7 @@ type BackgroundPageMessageResponse =
   | GetImportCssResponse
   | GetCompiledStylesResponse
   | GetGoogleWebFontExistsResponse
+  | GetGoogleFontFileResponse
   | RunGoogleDriveSyncResponse
   | ScanVersionHistoryResponse
   | RestoreVersionResponse

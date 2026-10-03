@@ -368,6 +368,38 @@ export const getGoogleWebFontExists = (url: string): Promise<boolean> => {
     .catch(() => false);
 };
 
+const GOOGLE_FONT_FILE = /^https:\/\/fonts\.gstatic\.com\//;
+
+/**
+ * Fetches a Google Fonts file as base64, for a page whose CSP blocks loading
+ * it. Any other url, or a failed request, resolves to an empty string.
+ */
+export const getGoogleFontFile = async (url: string): Promise<string> => {
+  if (!GOOGLE_FONT_FILE.test(url)) {
+    return '';
+  }
+
+  try {
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      return '';
+    }
+
+    const bytes = new Uint8Array(await response.arrayBuffer());
+    let binary = '';
+
+    // Chunked, since spreading a whole font into one call overflows the stack.
+    for (let i = 0; i < bytes.length; i += 0x8000) {
+      binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+    }
+
+    return btoa(binary);
+  } catch {
+    return '';
+  }
+};
+
 /**
  * Fetches CSS from a url for import, resolving to an empty string on
  * failure or invalid CSS.
