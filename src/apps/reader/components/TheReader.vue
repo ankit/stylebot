@@ -15,7 +15,11 @@
       @update="onUpdateSettings"
     />
 
-    <div class="stylebot-reader-body" :style="`max-width: ${width}em`">
+    <div
+      class="stylebot-reader-body"
+      :style="`max-width: ${width}em`"
+      :lang="pageLanguage"
+    >
       <the-reader-header
         :url="url"
         :source="source"
@@ -94,6 +98,13 @@ export default Vue.extend({
     revealed: boolean;
   } {
     return { ...defaultReadabilitySettings, revealed: false };
+  },
+
+  computed: {
+    // The article is in the page's language; the dock around it in Stylebot's.
+    pageLanguage(): string | undefined {
+      return document.documentElement.lang || undefined;
+    },
   },
 
   async mounted(): Promise<void> {

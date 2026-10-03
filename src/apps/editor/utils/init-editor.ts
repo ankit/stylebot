@@ -130,6 +130,9 @@ const initEditor = (store: Store<State>): void => {
   // page would otherwise flip the panel's flow and push it off-screen.
   hostStyle.setProperty('direction', 'ltr', 'important');
   hostStyle.setProperty('writing-mode', 'horizontal-tb', 'important');
+  // So is the page's language, which would pick fonts and line breaks for the
+  // panel; it takes Stylebot's own instead.
+  stylebotAppHost.lang = t('language_code');
 
   document.body.appendChild(stylebotAppHost);
 

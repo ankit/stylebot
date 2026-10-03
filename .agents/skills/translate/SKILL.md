@@ -32,6 +32,8 @@ Add back $site$
 - The text can't contain `@` — the parser starts a new string at every `@`.
 - `$NAME$` is a placeholder. Copy it exactly (same name, same case); move it
   wherever the sentence needs it. The validator fails on mismatches.
+- `language_code` isn't translated: it's the file's own locale with a hyphen
+  (`ja`, `zh-TW`, `pt-BR`), set as the UI's `lang` so fonts follow it.
 - `store_listing` and `privacy_policy` are multi-paragraph store copy, not UI;
   translate them too, keeping the paragraphs and bullet characters.
 

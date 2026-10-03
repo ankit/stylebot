@@ -242,7 +242,7 @@ button {
 
 body {
   margin: 0;
-  font-family: 'Geist', system-ui, sans-serif;
+  font-family: var(--font-ui, 'Geist', system-ui, sans-serif);
   font-size: 14px;
 }
 

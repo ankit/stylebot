@@ -567,7 +567,7 @@ export default Vue.extend({
   overflow: hidden;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
-  font: 400 13px/20px 'Geist', system-ui, sans-serif;
+  font: 400 13px/20px var(--font-ui, 'Geist', system-ui, sans-serif);
   color: var(--field-ink);
 
   &.mono {

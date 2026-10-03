@@ -210,8 +210,36 @@ export default Vue.extend({
   --warning-border: #f1e3c6;
 
   // Fonts
+  --font-ui: 'Geist', system-ui, sans-serif;
   --font-mono: 'Geist Mono', Menlo, Monaco, Consolas, monospace;
   --font-reading: 'Literata', Georgia, serif;
+
+  font-family: var(--font-ui);
+
+  &:lang(ja) {
+    --font-ui: 'Geist', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN',
+      'Yu Gothic UI', Meiryo, 'Noto Sans JP', sans-serif;
+    --font-reading: 'Literata', 'Hiragino Mincho ProN', 'Yu Mincho',
+      'Noto Serif JP', serif;
+  }
+
+  &:lang(ko) {
+    --font-ui: 'Geist', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR',
+      sans-serif;
+    --font-reading: 'Literata', AppleMyungjo, Batang, 'Noto Serif KR', serif;
+  }
+
+  &:lang(zh-CN) {
+    --font-ui: 'Geist', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+      'Noto Sans SC', sans-serif;
+    --font-reading: 'Literata', 'Songti SC', SimSun, 'Noto Serif SC', serif;
+  }
+
+  &:lang(zh-TW) {
+    --font-ui: 'Geist', 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans TC',
+      sans-serif;
+    --font-reading: 'Literata', 'Songti TC', PMingLiU, 'Noto Serif TC', serif;
+  }
 }
 
 .theme-provider ::v-deep ::selection {

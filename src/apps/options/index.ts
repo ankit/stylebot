@@ -11,6 +11,8 @@ Vue.mixin({
   },
 });
 
+document.documentElement.lang = t('language_code');
+
 new Vue({
   store: createStore(),
   router: createRouter(),

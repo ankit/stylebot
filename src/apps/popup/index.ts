@@ -9,6 +9,8 @@ Vue.mixin({
   },
 });
 
+document.documentElement.lang = t('language_code');
+
 new Vue({
   el: '#app',
   render: h => h(App),

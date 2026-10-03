@@ -60,6 +60,8 @@ const initShadowDOM = async (): Promise<HTMLElement> => {
 
   host.id = 'stylebot-reader';
   host.setAttribute('style', hostStyle);
+  // The reader's own text follows Stylebot's language, not the page's.
+  host.lang = t('language_code');
   document.body.appendChild(host);
 
   const shadowRoot = host.attachShadow({ mode: 'open' });

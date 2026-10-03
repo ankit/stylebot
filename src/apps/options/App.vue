@@ -138,7 +138,7 @@ body {
 }
 
 body {
-  font-family: 'Geist', system-ui, sans-serif;
+  font-family: var(--font-ui, 'Geist', system-ui, sans-serif);
 }
 
 #app {
