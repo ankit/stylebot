@@ -4,13 +4,13 @@
       <s-heading as="h2" size="md">
         {{ t('connect_a_model_to_start') }}
       </s-heading>
-      <s-text variant="muted">
+      <s-text variant="muted" class="chat-setup-description">
         {{ t('chat_setup_description') }}
       </s-text>
     </div>
 
     <div class="chat-setup-field">
-      <s-text as="span" size="label">{{ t('provider') }}</s-text>
+      <s-text as="span" class="chat-setup-label">{{ t('provider') }}</s-text>
       <s-segmented-control
         :value="provider"
         :options="providerOptions"
@@ -25,8 +25,6 @@
       :label="t('api_key')"
       :help="t('api_key_saved_locally', [info.company])"
     />
-
-    <div class="chat-setup-spacer" />
 
     <s-button
       class="chat-setup-connect"
@@ -108,34 +106,45 @@ export default Vue.extend({
 .chat-setup {
   display: flex;
   flex-direction: column;
-  gap: 26px;
-  min-height: 100%;
-  padding: 24px 18px 18px;
+  gap: 20px;
+  padding: 20px 16px;
   box-sizing: border-box;
 }
 
 .chat-setup-intro {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
+}
+
+.chat-setup-description {
+  font-size: 13px;
+  line-height: 1.5;
+  text-wrap: pretty;
 }
 
 .chat-setup-field {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
-.chat-setup-field ::v-deep .segment {
-  padding: 9px 0;
+.chat-setup-label {
+  font-size: 13px;
+  color: var(--text-body);
 }
 
-.chat-setup-spacer {
-  flex: 1;
-}
+.chat-setup .chat-setup-connect {
+  height: 34px;
+  padding: 0;
+  border-radius: 8px;
+  font-size: 13px;
 
-.chat-setup-connect {
-  padding: 10px 0;
-  border-radius: 10px;
+  &:disabled {
+    border-color: transparent;
+    background: var(--field-surface);
+    color: var(--text-muted);
+    opacity: 1;
+  }
 }
 </style>

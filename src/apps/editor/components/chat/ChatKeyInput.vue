@@ -1,7 +1,7 @@
 <template>
   <div class="chat-key-input">
     <div class="chat-key-label-row">
-      <s-text as="label" size="label" :for="inputId">
+      <s-text as="label" class="chat-key-label" :for="inputId">
         {{ label }}
       </s-text>
       <s-text
@@ -13,7 +13,7 @@
         target="_blank"
         rel="noopener noreferrer"
       >
-        {{ t('get_a_key_from', [info.company]) }}
+        {{ t('get_a_key') }}
       </s-text>
     </div>
 
@@ -24,11 +24,7 @@
         class="chat-key-input-field"
         :value="value"
         :type="show ? 'text' : 'password'"
-        :placeholder="
-          info.keyPlaceholder
-            ? t('paste_your_key', [info.keyPlaceholder])
-            : t('paste_your_api_key')
-        "
+        :placeholder="info.keyPlaceholder || t('paste_your_api_key')"
         :aria-invalid="error ? 'true' : 'false'"
         :aria-describedby="helpText ? `${inputId}-help` : undefined"
         spellcheck="false"
@@ -44,10 +40,12 @@
       <button
         type="button"
         class="chat-key-show"
+        :aria-label="show ? t('hide') : t('show')"
         :aria-pressed="show ? 'true' : 'false'"
         @click="show = !show"
       >
-        {{ show ? t('hide') : t('show') }}
+        <eye-off-icon v-if="show" :size="14" />
+        <eye-icon v-else :size="14" />
       </button>
     </div>
 
@@ -70,6 +68,7 @@ import type { PropType } from 'vue';
 import Vue from 'vue';
 
 import { SText } from '@stylebot/components';
+import { EyeIcon, EyeOffIcon } from '@stylebot/icons';
 import { getProviderInfo } from '@stylebot/chat';
 import type { ChatProviderId, ChatProviderInfo } from '@stylebot/types';
 
@@ -83,6 +82,8 @@ export default Vue.extend({
   name: 'ChatKeyInput',
 
   components: {
+    EyeIcon,
+    EyeOffIcon,
     SText,
   },
 
@@ -170,7 +171,7 @@ export default Vue.extend({
 .chat-key-input {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .chat-key-label-row {
@@ -180,7 +181,14 @@ export default Vue.extend({
   gap: 10px;
 }
 
+.chat-key-label {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-body);
+}
+
 .chat-key-link {
+  font-size: 13px;
   text-decoration: none;
 
   &:hover {
@@ -191,44 +199,38 @@ export default Vue.extend({
 }
 
 .chat-key-box {
-  @include field-border(10px);
-
   display: flex;
-  align-items: stretch;
-  overflow: hidden;
-  background: var(--field-fill);
-
-  &:hover {
-    border-color: var(--field-border-hover);
-  }
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  padding: 0 4px 0 12px;
+  border-radius: 8px;
+  background: var(--field-surface);
 
   &:focus-within {
-    @include field-active-border;
+    box-shadow: 0 0 0 2px var(--accent);
   }
 
   &.invalid,
   &.invalid:focus-within {
-    border-color: var(--danger);
-    box-shadow: none;
+    box-shadow: 0 0 0 1px var(--danger);
   }
 }
 
 .chat-key-input-field {
   flex: 1;
   min-width: 0;
-  box-sizing: border-box;
-  height: 38px;
-  padding: 0 12px;
+  height: 100%;
+  padding: 0;
   border: 0;
   outline: 0;
   font-family: var(--font-mono);
-  font-size: 12px;
-  line-height: normal;
-  color: var(--text-primary);
+  font-size: 13px;
+  color: var(--field-ink);
   background: transparent;
 
   &::placeholder {
-    color: var(--text-faint);
+    color: var(--field-placeholder);
   }
 }
 
@@ -238,15 +240,15 @@ export default Vue.extend({
   flex: none;
   display: flex;
   align-items: center;
-  padding: 0 12px;
-  border-left: 1px solid var(--field-divider);
-  font-weight: 500;
-  font-size: 12px;
-  color: var(--text-secondary);
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  color: var(--text-muted);
   cursor: pointer;
 
   &:hover {
-    background: var(--hover-tint);
+    background: var(--field-surface-hover);
     color: var(--text-primary);
   }
 
@@ -254,6 +256,7 @@ export default Vue.extend({
 }
 
 .chat-key-help {
+  font-size: 12px;
   text-wrap: pretty;
 
   &.error {
