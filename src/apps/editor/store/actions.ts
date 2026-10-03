@@ -45,6 +45,10 @@ import {
   openEditorWindow,
   requestEditorSidePanel,
   requestCloseEditorSidePanel,
+  setActiveProfile,
+  createProfile,
+  renameProfile,
+  deleteProfile,
 } from '../utils/chrome';
 
 import type { RemotePageBridgeSyncedState } from '@stylebot/page-bridge';
@@ -52,7 +56,7 @@ import { getPageBridge } from '@stylebot/page-bridge';
 import type { AppliedDeclaration } from '@stylebot/page-bridge';
 
 import { PLACEHOLDER_PROPERTIES } from '../utils/computed-placeholder';
-import { isForceImportant } from '@stylebot/saved-styles';
+import { expandProfiles, isForceImportant } from '@stylebot/saved-styles';
 
 import {
   emptyUndoStack,
@@ -112,12 +116,16 @@ export default {
   ): void {
     const { url, enabled, css, readability } = defaultStyle;
     const forceImportant = isForceImportant(defaultStyle);
+    const { active, sheets } = expandProfiles(defaultStyle);
+
     dispatch('syncFromPage', {
       url,
       enabled,
       css,
       readability,
       forceImportant,
+      profiles: Object.entries(sheets).map(([id, { name }]) => ({ id, name })),
+      activeProfile: active,
     });
   },
 
@@ -126,11 +134,22 @@ export default {
    * host, whatever the tab reports over the port.
    */
   syncFromPage(
-    { commit }: { commit: Commit },
+    { commit, state: current }: { commit: Commit; state: State },
     state: Partial<RemotePageBridgeSyncedState>
   ): void {
     if (state.url !== undefined) {
       commit('setUrl', state.url);
+    }
+    if (state.profiles !== undefined) {
+      commit('setProfiles', state.profiles);
+    }
+    // Undoing past a switch would write one profile's css into another.
+    if (
+      state.activeProfile !== undefined &&
+      state.activeProfile !== current.activeProfile
+    ) {
+      commit('setActiveProfile', state.activeProfile);
+      commit('setUndoStack', emptyUndoStack());
     }
     if (state.enabled !== undefined) {
       commit('setEnabled', state.enabled);
@@ -348,7 +367,8 @@ export default {
         state.url,
         removeEmptyRules(css),
         state.readability,
-        state.forceImportant
+        state.forceImportant,
+        state.activeProfile
       );
 
       if (record && css !== state.css) {
@@ -363,6 +383,37 @@ export default {
     } catch {
       //
     }
+  },
+
+  /**
+   * Makes another profile the one applied to the page. The background's
+   * push of the saved styles brings its css into the editor.
+   */
+  switchProfile({ state }: { state: State }, id: string): void {
+    if (id !== state.activeProfile) {
+      setActiveProfile(state.url, id);
+    }
+  },
+
+  /**
+   * Adds a profile, blank or a copy of another, and switches to it.
+   */
+  async createProfile(
+    { state }: { state: State },
+    { name, sourceProfileId }: { name: string; sourceProfileId?: string }
+  ): Promise<void> {
+    await createProfile(state.url, name, sourceProfileId);
+  },
+
+  renameProfile(
+    { state }: { state: State },
+    { id, name }: { id: string; name: string }
+  ): void {
+    renameProfile(state.url, id, name);
+  },
+
+  deleteProfile({ state }: { state: State }, id: string): void {
+    deleteProfile(state.url, id);
   },
 
   /**

@@ -17,6 +17,7 @@ import {
   defaultReadabilitySettings,
 } from '@stylebot/settings';
 
+import { DEFAULT_PROFILE_ID } from '@stylebot/saved-styles';
 import type { PageSnapshot, SelectorAlternatives } from '@stylebot/page-bridge';
 import type { AppliedDeclaration } from '@stylebot/page-bridge';
 import { emptyPageSnapshot } from '@stylebot/page-bridge';
@@ -46,6 +47,11 @@ export type EditorTab = {
   active: boolean;
 };
 
+export type EditorProfile = {
+  id: string;
+  name: string;
+};
+
 export type CssSelectorMetadata = {
   id: number;
   value: string;
@@ -66,6 +72,8 @@ export type State = {
 
   url: string;
   css: string;
+  profiles: Array<EditorProfile>;
+  activeProfile: string;
   // Undo/redo trail of css, kept only while the editor is open.
   undoStack: UndoStack;
   // Lines for the code editor to mark next time it shows, then cleared.
@@ -112,6 +120,8 @@ export const createStore = (host: EditorHost): Store<State> => {
       tab: null,
 
       css: '',
+      profiles: [{ id: DEFAULT_PROFILE_ID, name: '' }],
+      activeProfile: DEFAULT_PROFILE_ID,
       undoStack: emptyUndoStack(),
       codeHighlight: null,
       enabled: true,

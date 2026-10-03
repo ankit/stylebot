@@ -2,6 +2,7 @@ import type { Store } from 'vuex';
 import type { State } from 'apps/editor/store';
 
 import type {
+  RemotePageBridgeSyncedState,
   RemotePageBridgeMessageToWindow,
   RemotePageBridgeMessageToPage,
 } from '@stylebot/page-bridge';
@@ -13,10 +14,9 @@ import {
   requestCloseEditorSidePanel,
 } from '../utils/chrome';
 
-const SYNCED_MUTATIONS: Record<
-  string,
-  'url' | 'css' | 'enabled' | 'readability' | 'forceImportant'
-> = {
+const SYNCED_MUTATIONS: Record<string, keyof RemotePageBridgeSyncedState> = {
+  setProfiles: 'profiles',
+  setActiveProfile: 'activeProfile',
   setUrl: 'url',
   setCss: 'css',
   setEnabled: 'enabled',
@@ -64,6 +64,8 @@ export const createEditorWindowHandler = (
         enabled: store.state.enabled,
         readability: store.state.readability,
         forceImportant: store.state.forceImportant,
+        profiles: store.state.profiles,
+        activeProfile: store.state.activeProfile,
       },
       snapshot: store.state.page,
       activeSelector: store.state.activeSelector,

@@ -278,3 +278,28 @@ export const setProfileCss = <T extends WithProfiles>(
   id === expandProfiles(style).active
     ? { ...style, css }
     : updateSheet(style, id, { css });
+
+/**
+ * Whether a name is already in use, ignoring case and surrounding spaces.
+ */
+export const isProfileNameTaken = (
+  name: string,
+  names: Array<string>
+): boolean => {
+  const wanted = name.trim().toLowerCase();
+
+  return names.some(other => other.toLowerCase() === wanted);
+};
+
+/**
+ * The name, or the name with the first number that makes it unused.
+ */
+export const freeProfileName = (name: string, names: Array<string>): string => {
+  let candidate = name;
+
+  for (let n = 2; isProfileNameTaken(candidate, names); n++) {
+    candidate = `${name} ${n}`;
+  }
+
+  return candidate;
+};

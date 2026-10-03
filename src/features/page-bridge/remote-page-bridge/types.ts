@@ -12,6 +12,8 @@ export type RemotePageBridgeSyncedState = {
   enabled: boolean;
   readability: boolean;
   forceImportant: boolean;
+  profiles: Array<{ id: string; name: string }>;
+  activeProfile: string;
 };
 
 export type RemotePageBridgeRequestArgs = {

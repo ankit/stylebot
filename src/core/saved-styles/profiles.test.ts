@@ -10,6 +10,8 @@ import {
   removeProfile,
   renameProfile,
   setProfileCss,
+  isProfileNameTaken,
+  freeProfileName,
 } from './profiles';
 import { isStyleMap, sanitizeStyleMap } from './style-map';
 import { getStylesForPage } from './page';
@@ -183,5 +185,19 @@ describe('profile order', () => {
       'Night',
       'Print',
     ]);
+  });
+});
+
+describe('profile names', () => {
+  it('treats a name as taken whatever its case or surrounding spaces', () => {
+    expect(isProfileNameTaken(' dark ', ['Default', 'Dark'])).toBe(true);
+    expect(isProfileNameTaken('Night', ['Default', 'Dark'])).toBe(false);
+  });
+
+  it('numbers a name until it is free', () => {
+    expect(freeProfileName('Untitled', ['Default'])).toBe('Untitled');
+    expect(freeProfileName('Untitled', ['Untitled', 'untitled 2'])).toBe(
+      'Untitled 3'
+    );
   });
 });
