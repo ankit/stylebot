@@ -5,7 +5,7 @@
     <s-anchored-menu
       class="profile-anchor"
       :style="{ '--menu-shift': `${menuShift}px` }"
-      :keep-open-on-escape="!!editing || !!rowMenu"
+      :keep-open-on-escape="editing !== null || !!rowMenu"
       @escape="onEscape"
       @close="reset"
     >
@@ -30,115 +30,46 @@
           tabindex="-1"
           @mousedown="onPanelMousedown"
         >
-          <s-menu dense class="profile-menu">
-            <div
+          <s-menu dense class="profile-list">
+            <profile
               v-for="profile in profiles"
               :key="profile.id"
-              class="profile-row"
-              :class="{
-                active: profile.id === activeProfile,
-                'menu-open': rowMenu && rowMenu.id === profile.id,
-              }"
-              @click="
+              v-model="draft"
+              :name="displayName(profile)"
+              :active="profile.id === activeProfile"
+              :editing="editing === profile.id"
+              :menu-open="!!rowMenu && rowMenu.id === profile.id"
+              :error="nameError"
+              @pick="
                 switchProfile(profile.id);
                 close();
               "
-            >
-              <span class="check-slot">
-                <check-icon v-if="profile.id === activeProfile" :size="12" />
-              </span>
-
-              <input
-                v-if="editing && editing.id === profile.id"
-                ref="nameInput"
-                v-model="draft"
-                class="row-input"
-                :class="{ invalid: !!nameError }"
-                :aria-label="t('profile_name')"
-                :aria-invalid="nameError ? 'true' : 'false'"
-                :title="nameError"
-                @click.stop
-                @keydown.enter.prevent="submitEdit(close)"
-              />
-              <template v-else>
-                <button
-                  type="button"
-                  class="row-name"
-                  role="menuitem"
-                  tabindex="-1"
-                  :aria-current="
-                    profile.id === activeProfile ? 'true' : undefined
-                  "
-                >
-                  {{ displayName(profile) }}
-                </button>
-
-                <button
-                  type="button"
-                  class="row-more"
-                  tabindex="-1"
-                  :aria-label="t('profile_actions')"
-                  aria-haspopup="menu"
-                  :aria-expanded="
-                    rowMenu && rowMenu.id === profile.id ? 'true' : 'false'
-                  "
-                  @click.stop="toggleRowMenu(profile, $event)"
-                >
-                  <more-icon :size="14" />
-                </button>
-              </template>
-            </div>
+              @more="toggleRowMenu(profile.id, $event)"
+              @submit="submitEdit(close)"
+            />
 
             <s-menu-divider />
 
-            <div v-if="editing && editing.id === NEW_ID" class="profile-row">
-              <span class="check-slot" />
-              <input
-                ref="nameInput"
-                v-model="draft"
-                class="row-input"
-                :class="{ invalid: !!nameError }"
-                :aria-label="t('profile_name')"
-                :aria-invalid="nameError ? 'true' : 'false'"
-                :title="nameError"
-                @keydown.enter.prevent="submitEdit(close)"
-              />
-            </div>
-            <button
-              v-if="!(editing && editing.id === NEW_ID && inputFocused)"
-              type="button"
-              class="profile-row create-row"
-              role="menuitem"
-              tabindex="-1"
-              @click="startCreate"
-            >
-              <span class="check-slot" />
-              {{ t('create_profile') }}
-            </button>
+            <profile
+              v-model="draft"
+              :name="t('create_profile')"
+              muted
+              :actions="false"
+              :editing="editing === NEW_ID"
+              :error="nameError"
+              @pick="startCreate"
+              @submit="submitEdit(close)"
+            />
           </s-menu>
 
-          <s-menu
+          <profile-menu
             v-if="rowMenu"
-            ref="rowMenu"
-            dense
-            :min-width="132"
-            class="row-menu"
-            :style="{ top: `${rowMenu.top}px` }"
-          >
-            <s-menu-item @click="startRename(rowMenu.id)">
-              {{ t('rename') }}
-            </s-menu-item>
-            <s-menu-item @click="duplicate(rowMenu.id, close)">
-              {{ t('duplicate') }}
-            </s-menu-item>
-            <s-menu-item
-              v-if="profiles.length > 1"
-              danger
-              @click="confirmDelete(rowMenu.id, close)"
-            >
-              {{ t('delete') }}
-            </s-menu-item>
-          </s-menu>
+            :top="rowMenu.top"
+            :can-delete="profiles.length > 1"
+            @rename="startRename(rowMenu.id)"
+            @duplicate="duplicate(rowMenu.id, close)"
+            @delete="confirmDelete(rowMenu.id, close)"
+          />
         </div>
       </template>
     </s-anchored-menu>
@@ -161,13 +92,14 @@ import Vue from 'vue';
 import {
   SAnchoredMenu,
   SMenu,
-  SMenuItem,
   SMenuDivider,
   SConfirmDialog,
 } from '@stylebot/components';
-import { CheckIcon, ChevronDownIcon, MoreIcon } from '@stylebot/icons';
+import { ChevronDownIcon } from '@stylebot/icons';
 
 import type { EditorProfile } from '../../store';
+import Profile from './Profile.vue';
+import ProfileMenu from './ProfileMenu.vue';
 
 const MENU_WIDTH = 220;
 const MENU_EDGE_GAP = 8;
@@ -180,22 +112,20 @@ export default Vue.extend({
   components: {
     SAnchoredMenu,
     SMenu,
-    SMenuItem,
     SMenuDivider,
     SConfirmDialog,
-    CheckIcon,
     ChevronDownIcon,
-    MoreIcon,
+    Profile,
+    ProfileMenu,
   },
 
   data(): {
     NEW_ID: string;
     menuShift: number;
-    editing: { id: string } | null;
+    // The id of the profile being renamed, NEW_ID while one is being
+    // created, or null.
+    editing: string | null;
     draft: string;
-    // Create profile stays a button until its field has focus: removing the
-    // focused element would blur out of the menu and close it.
-    inputFocused: boolean;
     rowMenu: { id: string; top: number } | null;
     deleteTarget: EditorProfile | null;
   } {
@@ -204,7 +134,6 @@ export default Vue.extend({
       menuShift: 0,
       editing: null,
       draft: '',
-      inputFocused: false,
       rowMenu: null,
       deleteTarget: null,
     };
@@ -229,10 +158,9 @@ export default Vue.extend({
 
     nameError(): string {
       const name = this.draft.trim().toLowerCase();
-      const editingId = this.editing?.id;
       const taken = this.profiles.some(
         profile =>
-          profile.id !== editingId &&
+          profile.id !== this.editing &&
           this.displayName(profile).toLowerCase() === name
       );
 
@@ -279,7 +207,6 @@ export default Vue.extend({
 
     reset(): void {
       this.editing = null;
-      this.inputFocused = false;
       this.rowMenu = null;
     },
 
@@ -291,30 +218,20 @@ export default Vue.extend({
       (this.$refs.panel as HTMLElement | undefined)?.focus();
     },
 
-    stopEditing(): void {
-      this.holdFocus();
-      this.editing = null;
-      this.inputFocused = false;
-    },
-
     onEscape(): void {
+      this.holdFocus();
+
       if (this.rowMenu) {
-        this.holdFocus();
         this.rowMenu = null;
       } else {
-        this.stopEditing();
+        this.editing = null;
       }
     },
 
     onPanelMousedown(event: MouseEvent): void {
-      const rowMenu = (this.$refs.rowMenu as Vue | undefined)?.$el;
       const target = event.target as HTMLElement;
 
-      if (
-        this.rowMenu &&
-        !rowMenu?.contains(target) &&
-        !target.closest('.row-more')
-      ) {
+      if (!target.closest('.row-menu, .row-more')) {
         this.rowMenu = null;
       }
     },
@@ -322,8 +239,8 @@ export default Vue.extend({
     /**
      * Opens a row's own menu just below it, or closes it if it's open.
      */
-    toggleRowMenu(profile: EditorProfile, event: MouseEvent): void {
-      if (this.rowMenu?.id === profile.id) {
+    toggleRowMenu(id: string, event: MouseEvent): void {
+      if (this.rowMenu?.id === id) {
         this.rowMenu = null;
         return;
       }
@@ -335,40 +252,22 @@ export default Vue.extend({
 
       this.editing = null;
       this.rowMenu = {
-        id: profile.id,
+        id,
         top:
           row.getBoundingClientRect().bottom -
           panel.getBoundingClientRect().top +
           2,
       };
-
-      this.$nextTick(() => {
-        const rowMenu = (this.$refs.rowMenu as Vue | undefined)?.$el;
-        rowMenu?.querySelector<HTMLElement>('button')?.focus();
-      });
     },
 
     /**
-     * Puts a field in place of a row and focuses it, only then dropping the
-     * row menu so focus never leaves the menu.
+     * Swaps a row for a name field, which takes focus as it appears.
      */
     startEditing(id: string, draft: string): void {
-      this.editing = { id };
+      this.holdFocus();
+      this.rowMenu = null;
+      this.editing = id;
       this.draft = draft;
-      this.inputFocused = false;
-
-      this.$nextTick(() => {
-        const input = this.$refs.nameInput as
-          | HTMLInputElement
-          | Array<HTMLInputElement>
-          | undefined;
-        const field = Array.isArray(input) ? input[0] : input;
-
-        field?.focus();
-        field?.select();
-        this.inputFocused = true;
-        this.rowMenu = null;
-      });
     },
 
     startRename(id: string): void {
@@ -386,23 +285,24 @@ export default Vue.extend({
     submitEdit(close: () => void): void {
       const name = this.draft.trim();
 
-      if (!name || this.nameError || !this.editing) {
+      if (!name || this.nameError || this.editing === null) {
         return;
       }
 
-      if (this.editing.id === NEW_ID) {
+      if (this.editing === NEW_ID) {
         this.$store.dispatch('createProfile', { name });
         close();
         return;
       }
 
-      const profile = this.profiles.find(item => item.id === this.editing?.id);
+      const profile = this.profiles.find(item => item.id === this.editing);
 
       if (profile && name !== this.displayName(profile)) {
         this.$store.dispatch('renameProfile', { id: profile.id, name });
       }
 
-      this.stopEditing();
+      this.holdFocus();
+      this.editing = null;
     },
 
     duplicate(id: string, close: () => void): void {
@@ -501,123 +401,8 @@ export default Vue.extend({
   outline: none;
 }
 
-.profile-menu {
+.profile-list {
   box-sizing: border-box;
   width: 220px;
-}
-
-.profile-row {
-  @include button-reset;
-
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: none;
-  height: 28px;
-  padding: 0 3px 0 8px;
-  border-radius: 7px;
-  font-size: 13px;
-  line-height: 1;
-  color: var(--text-body);
-  cursor: pointer;
-
-  &:hover,
-  &:has(.row-name:focus-visible, .row-more:focus-visible),
-  &.menu-open,
-  &.active {
-    background: var(--field-surface-hover);
-  }
-
-  &.active {
-    font-weight: 500;
-    color: var(--text-primary);
-  }
-
-  &:has(.row-input) {
-    background: none;
-  }
-}
-
-.check-slot {
-  display: flex;
-  justify-content: center;
-  flex: none;
-  width: 12px;
-  color: var(--accent-text);
-}
-
-.row-name {
-  @include button-reset;
-  @include truncate;
-
-  flex: 1;
-  min-width: 0;
-  font: inherit;
-  color: inherit;
-  cursor: pointer;
-}
-
-.row-more {
-  @include button-reset;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: none;
-  width: 22px;
-  height: 22px;
-  border-radius: 5px;
-  color: var(--text-muted);
-  opacity: 0;
-  cursor: pointer;
-
-  .profile-row:hover &,
-  .profile-row:has(.row-name:focus-visible) &,
-  .menu-open &,
-  &:focus-visible {
-    opacity: 1;
-  }
-
-  &:hover,
-  .menu-open & {
-    color: var(--text-primary);
-    background: var(--field-surface-active);
-  }
-}
-
-.row-input {
-  flex: 1;
-  width: 0;
-  min-width: 0;
-  height: 24px;
-  margin-left: -6px;
-  padding: 0 6px;
-  border: none;
-  border-radius: 6px;
-  outline: none;
-  font: inherit;
-  color: var(--text-primary);
-  background: var(--field-surface);
-  box-shadow: 0 0 0 1.5px var(--accent);
-
-  &.invalid {
-    box-shadow: 0 0 0 1.5px var(--danger);
-  }
-}
-
-.create-row {
-  color: var(--text-muted);
-
-  &:hover,
-  &:focus-visible {
-    color: var(--text-primary);
-  }
-}
-
-.row-menu {
-  position: absolute;
-  right: 4px;
-  z-index: 1;
 }
 </style>
