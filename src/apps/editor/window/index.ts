@@ -1,11 +1,7 @@
 import { t } from '@stylebot/i18n';
 import { setPageBridge, RemotePageBridge } from '@stylebot/page-bridge';
 
-import {
-  createStore,
-  mountEditor,
-  initCommandListener,
-} from '@stylebot/editor';
+import { createStore, mountEditor } from '@stylebot/editor';
 
 import { initWindowListeners, initTabInfo } from './listeners';
 
@@ -99,7 +95,6 @@ const start = async (): Promise<void> => {
   if (host === 'window') {
     initWindowListeners(store);
   }
-  initCommandListener(store);
 
   const app = document.getElementById('app');
   if (app) {

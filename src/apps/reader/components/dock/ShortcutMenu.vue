@@ -1,67 +1,26 @@
 <template>
   <s-menu dense :min-width="232">
     <div class="content">
-      <s-shortcut-recorder-field
-        :value="value"
-        :recording.sync="recording"
-        @update="update"
-      >
-        <template #idle="{ start }">
-          <template v-if="hasValue">
-            <div class="header-row">
-              <div class="title">{{ t('readability_shortcut') }}</div>
-              <s-shortcut-chip :value="value" />
-            </div>
-            <s-text size="caption" variant="muted" class="desc">
-              {{ t('readability_shortcut_description') }}
-            </s-text>
-            <div class="divider" />
-            <div class="actions">
-              <s-menu-item @click="start">
-                {{ t('change_shortcut') }}
-              </s-menu-item>
-              <s-menu-item danger @click="remove">
-                {{ t('remove') }}
-              </s-menu-item>
-            </div>
-          </template>
-
-          <template v-else>
-            <div class="header-row">
-              <div class="title">{{ t('readability_shortcut') }}</div>
-              <button
-                v-if="dismissible"
-                type="button"
-                class="dismiss"
-                :aria-label="t('dismiss')"
-                @click="dismiss"
-              >
-                <x-icon />
-              </button>
-            </div>
-            <s-text size="caption" variant="muted" class="desc">
-              {{ t('readability_shortcut_description') }}
-            </s-text>
-            <button type="button" class="record-btn" @click="start">
-              <keyboard-icon />
-              {{ t('record_shortcut') }}
-            </button>
-          </template>
-        </template>
-
-        <template #helper>
-          <s-text size="caption" variant="muted" class="helper">
-            {{ t('press_key_to_finish') }}
-            <template v-if="hasValue">
-              {{ t('esc_keeps') }}
-              <span class="chip chip-inline">
-                <s-shortcut-kbd :value="value" />
-              </span>
-            </template>
-            <template v-else>{{ t('esc_cancels') }}</template>
-          </s-text>
-        </template>
-      </s-shortcut-recorder-field>
+      <div class="header-row">
+        <div class="title">{{ t('readability_shortcut') }}</div>
+        <s-shortcut-chip v-if="value" :value="value" />
+        <button
+          v-else-if="dismissible"
+          type="button"
+          class="dismiss"
+          :aria-label="t('dismiss')"
+          @click="dismiss"
+        >
+          <x-icon />
+        </button>
+      </div>
+      <s-text size="caption" variant="muted" class="desc">
+        {{ t('readability_shortcut_description') }}
+      </s-text>
+      <button type="button" class="change-btn" @click="change">
+        <keyboard-icon />
+        {{ t(value ? 'modify_shortcut' : 'set_shortcut') }}
+      </button>
     </div>
   </s-menu>
 </template>
@@ -71,24 +30,15 @@ import Vue from 'vue';
 
 import { shortcutStore } from './shortcut-store';
 
-import {
-  SMenuItem,
-  SShortcutChip,
-  SShortcutKbd,
-  SShortcutRecorderField,
-  SMenu,
-  SText,
-} from '@stylebot/components';
+import { SShortcutChip, SMenu, SText } from '@stylebot/components';
 import { KeyboardIcon, XIcon } from '@stylebot/icons';
+import { openShortcutsPage } from '@stylebot/utils';
 
 export default Vue.extend({
   name: 'ShortcutMenu',
 
   components: {
-    SMenuItem,
-    SShortcutKbd,
     SShortcutChip,
-    SShortcutRecorderField,
     SMenu,
     SText,
     KeyboardIcon,
@@ -108,20 +58,6 @@ export default Vue.extend({
     value(): string {
       return shortcutStore.value();
     },
-
-    hasValue(): boolean {
-      return this.value.length > 0;
-    },
-
-    recording: {
-      get(): boolean {
-        return shortcutStore.state.recording;
-      },
-
-      set(recording: boolean): void {
-        shortcutStore.setRecording(recording);
-      },
-    },
   },
 
   mounted() {
@@ -129,12 +65,13 @@ export default Vue.extend({
   },
 
   methods: {
-    update(value: string): void {
-      shortcutStore.update(value);
-    },
-
-    remove(): void {
-      shortcutStore.update('');
+    /**
+     * Opens the browser's page for extension shortcuts, where this one is
+     * set; going there answers the invite.
+     */
+    change(): void {
+      shortcutStore.dismissPrompt();
+      openShortcutsPage();
     },
 
     dismiss(): void {
@@ -196,16 +133,11 @@ export default Vue.extend({
   }
 }
 
-.actions {
-  display: flex;
-  flex-direction: column;
-}
-
 .desc {
   margin: 4px 0 14px;
 }
 
-.record-btn {
+.change-btn {
   @include button-reset;
 
   width: 100%;
@@ -236,28 +168,5 @@ export default Vue.extend({
     outline: none;
     box-shadow: 0 0 0 2px var(--link-color);
   }
-}
-
-.chip {
-  display: inline-flex;
-  align-items: center;
-  background: color-mix(in srgb, var(--foreground) 7%, transparent);
-  border-radius: 6px;
-  padding: 4px 8px;
-}
-
-.chip-inline {
-  padding: 2px 5px;
-  margin: 0 1px;
-}
-
-.divider {
-  height: 1px;
-  margin: 8px 0 4px;
-  background: var(--border);
-}
-
-.helper {
-  margin: 9px 0 0;
 }
 </style>

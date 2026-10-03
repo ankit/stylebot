@@ -32,7 +32,7 @@ const opensSidePanel = (state: State): boolean =>
  * a browser without one, or a request that lost the user's gesture.
  */
 export const openSidePanel = (store: Store<State>, inspect: boolean): void => {
-  requestEditorSidePanel(store.state.options.appearance).then(opened => {
+  requestEditorSidePanel().then(opened => {
     if (!opened && !store.state.visible) {
       initEditor(store);
       store.dispatch('openStylebot', { inspect });

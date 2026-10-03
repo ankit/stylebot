@@ -5,18 +5,13 @@
  */
 import { reapplySavedStyles } from '@stylebot/inject-css';
 import { applyReadability, removeReadability } from '@stylebot/readability';
-import type { StylebotCommandName, TabMessage } from '@stylebot/types';
+import type { TabMessage } from '@stylebot/types';
 
 import { REMOTE_PAGE_BRIDGE_PORT } from '@stylebot/page-bridge';
 
 import type { EditorApp } from './load-editor';
 import { isEditorLoading, loadEditor } from './load-editor';
-import { bindCommands, onCommandsChanged } from './utils/bind-commands';
-import {
-  getCommands,
-  getIsEditorWindowOpen,
-  getStylesForPage,
-} from './utils/chrome';
+import { getIsEditorWindowOpen, getStylesForPage } from './utils/chrome';
 
 const EDITOR_MESSAGES: Array<TabMessage['name']> = [
   'ToggleStylebot',
@@ -29,7 +24,7 @@ let contextMenuTarget: EventTarget | null = null;
 
 /**
  * Runs fn once the page has parsed its body, which the editor and the
- * reader mount into. This script starts earlier, so no keypress is missed.
+ * reader mount into. This script starts earlier, so no message is missed.
  */
 const whenDomReady = (fn: () => void): void => {
   if (document.readyState === 'loading') {
@@ -105,6 +100,12 @@ chrome.runtime.onMessage.addListener(
       return;
     }
 
+    // A global shortcut, which the browser catches wherever focus is.
+    if (message.name === 'RunCommand') {
+      forwardToEditor(editor => editor.handleCommand(message.command));
+      return false;
+    }
+
     if (isEditorLoading() || EDITOR_MESSAGES.includes(message.name)) {
       forwardToEditor(editor => editor.handleMessage(message, sendResponse));
       return message.name === 'GetIsStylebotOpen';
@@ -118,12 +119,6 @@ chrome.runtime.onMessage.addListener(
     return handlePageMessage(message, sendResponse);
   }
 );
-
-const forwardCommand = (name: StylebotCommandName) =>
-  forwardToEditor(editor => editor.handleCommand(name));
-
-getCommands().then(commands => bindCommands(commands, forwardCommand));
-onCommandsChanged(commands => bindCommands(commands, forwardCommand));
 
 document.addEventListener('contextmenu', event => {
   contextMenuTarget = event.target;

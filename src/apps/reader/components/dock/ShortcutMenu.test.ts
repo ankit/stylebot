@@ -1,10 +1,13 @@
 import { mount } from '@vue/test-utils';
 
 jest.mock('../../utils/get-commands');
-jest.mock('../../utils/set-commands');
+jest.mock('@stylebot/utils', () => ({
+  ...jest.requireActual('@stylebot/utils'),
+  openShortcutsPage: jest.fn(),
+}));
 
+import { openShortcutsPage } from '@stylebot/utils';
 import { getCommands } from '../../utils/get-commands';
-import { setCommands } from '../../utils/set-commands';
 import { shortcutStore } from './shortcut-store';
 import ShortcutMenu from './ShortcutMenu.vue';
 
@@ -16,15 +19,15 @@ const commands = (readability: string) => ({
 });
 
 describe('ShortcutMenu.vue', () => {
-  const mountMenu = (initial: string) => {
+  const mountMenu = (initial: string, dismissible = false) => {
     shortcutStore.state.commands = commands(initial);
-    return mount(ShortcutMenu);
+    shortcutStore.state.promptDismissed = false;
+    return mount(ShortcutMenu, { propsData: { dismissible } });
   };
 
   beforeEach(() => {
-    shortcutStore.state.recording = false;
     (getCommands as jest.Mock).mockResolvedValue(commands(''));
-    (setCommands as jest.Mock).mockClear();
+    (openShortcutsPage as jest.Mock).mockClear();
 
     global.chrome = {
       storage: {
@@ -36,71 +39,35 @@ describe('ShortcutMenu.vue', () => {
     } as unknown as typeof chrome;
   });
 
-  it('shows the invite to record a shortcut when unset', () => {
+  it('invites setting a shortcut when there is none', () => {
     const wrapper = mountMenu('');
 
-    expect(wrapper.text()).toContain('record_shortcut');
-    expect(wrapper.text()).not.toContain('change_shortcut');
+    expect(wrapper.text()).toContain('set_shortcut');
+    expect(wrapper.find('.chip').exists()).toBe(false);
   });
 
-  it('shows the current shortcut with Change/Remove when set', () => {
+  it('shows the current shortcut with a way to change it', () => {
     const wrapper = mountMenu('alt+shift+r');
 
-    expect(wrapper.text()).toContain('change_shortcut');
-    expect(wrapper.text()).toContain('remove');
+    expect(wrapper.text()).toContain('modify_shortcut');
+    expect(wrapper.find('.chip').exists()).toBe(true);
   });
 
-  it('clicking "Record a shortcut" starts recording', async () => {
-    const wrapper = mountMenu('');
+  it('opens the browser’s shortcuts page and answers the invite', async () => {
+    const wrapper = mountMenu('', true);
 
-    await wrapper.find('.record-btn').trigger('click');
+    await wrapper.find('.change-btn').trigger('click');
 
-    expect(shortcutStore.state.recording).toBe(true);
-    expect(wrapper.text()).toContain('press_key_to_finish');
+    expect(openShortcutsPage).toHaveBeenCalled();
+    expect(shortcutStore.state.promptDismissed).toBe(true);
   });
 
-  it('capturing a key combo persists it and stops recording', async () => {
-    const wrapper = mountMenu('alt+shift+r');
+  it('lets the invite be dismissed without going there', async () => {
+    const wrapper = mountMenu('', true);
 
-    await wrapper.findAll('.menu-item').at(0).trigger('click'); // "change_shortcut"
-    expect(shortcutStore.state.recording).toBe(true);
+    await wrapper.find('.dismiss').trigger('click');
 
-    wrapper.find('.recorder').element.dispatchEvent(
-      new KeyboardEvent('keydown', {
-        key: 't',
-        code: 'KeyT',
-        ctrlKey: true,
-        shiftKey: true,
-      })
-    );
-    await wrapper.vm.$nextTick();
-
-    expect(setCommands).toHaveBeenCalledWith(
-      expect.objectContaining({ readability: 'ctrl+shift+t' })
-    );
-    expect(shortcutStore.state.recording).toBe(false);
-  });
-
-  it('Escape cancels recording without persisting', async () => {
-    const wrapper = mountMenu('');
-
-    await wrapper.find('.record-btn').trigger('click');
-    wrapper
-      .find('.recorder')
-      .element.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
-    await wrapper.vm.$nextTick();
-
-    expect(shortcutStore.state.recording).toBe(false);
-    expect(setCommands).not.toHaveBeenCalled();
-  });
-
-  it('clicking Remove clears the shortcut', async () => {
-    const wrapper = mountMenu('alt+shift+r');
-
-    await wrapper.find('.menu-item.danger').trigger('click');
-
-    expect(setCommands).toHaveBeenCalledWith(
-      expect.objectContaining({ readability: '' })
-    );
+    expect(openShortcutsPage).not.toHaveBeenCalled();
+    expect(shortcutStore.state.promptDismissed).toBe(true);
   });
 });

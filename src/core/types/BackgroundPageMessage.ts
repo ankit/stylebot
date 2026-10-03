@@ -1,6 +1,5 @@
 import type { StyleMap } from './styles';
-import type { StylebotAppearance, StylebotOptions } from './options';
-import type { StylebotCommands } from './commands';
+import type { StylebotOptions } from './options';
 import type { ReadabilitySettings } from './readability';
 import type { ChatProviderId, ChatTurn } from './chat';
 
@@ -65,6 +64,10 @@ export type OpenOptionsPage = {
   route?: string;
 };
 
+export type OpenShortcutsPage = {
+  name: 'OpenShortcutsPage';
+};
+
 export type OpenDonatePage = {
   name: 'OpenDonatePage';
 };
@@ -87,11 +90,6 @@ export type ReadabilityActiveChanged = {
 
 export type GetCommands = {
   name: 'GetCommands';
-};
-
-export type SetCommands = {
-  name: 'SetCommands';
-  value: StylebotCommands;
 };
 
 export type GetReadabilitySettings = {
@@ -161,7 +159,6 @@ export type CloseEditorWindow = {
 
 export type OpenEditorSidePanel = {
   name: 'OpenEditorSidePanel';
-  appearance: StylebotAppearance;
   tabId?: number;
 };
 
@@ -222,12 +219,12 @@ type BackgroundPageMessage =
   | GetOption
   | SetOption
   | OpenOptionsPage
+  | OpenShortcutsPage
   | OpenDonatePage
   | OpenReportIssuePage
   | SetReadability
   | ReadabilityActiveChanged
   | GetCommands
-  | SetCommands
   | GetReadabilitySettings
   | SetReadabilitySettings
   | GetImportCss

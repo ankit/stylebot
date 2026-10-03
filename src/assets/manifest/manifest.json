@@ -42,6 +42,22 @@
     "48": "img/icon48.png",
     "128": "img/icon128.png"
   },
+  "commands": {
+    "stylebot": {
+      "suggested_key": { "default": "Alt+Shift+M" },
+      "description": "__MSG_toggle_editor__"
+    },
+    "style": {
+      "suggested_key": { "default": "Alt+Shift+T" },
+      "description": "__MSG_toggle_styling__"
+    },
+    "readability": {
+      "description": "__MSG_toggle_readability__"
+    },
+    "grayscale": {
+      "description": "__MSG_toggle_grayscale__"
+    }
+  },
   "permissions": [
     "tabs",
     "storage",

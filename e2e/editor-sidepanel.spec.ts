@@ -1,4 +1,5 @@
-import { test, expect } from './fixtures';
+import type { BrowserContext, Page } from '@playwright/test';
+import { test, expect, type Extension, type Popup } from './fixtures';
 import {
   startTestServer,
   openEditor,
@@ -23,6 +24,31 @@ const PAGE_HTML = `
 
 const byLabel = (label: string): string =>
   `document.querySelector('[aria-label="${label}"]')`;
+
+/*
+ * This harness's popup is a tab in the page's window, and closing a tab takes
+ * the window's side panel with it; a real popup is a bubble beside the tab.
+ */
+const keepPopupOpen = (popup: Popup) =>
+  popup.evaluate(() => {
+    window.close = () => undefined;
+  });
+
+// The toggle shortcut is a browser command Playwright can't press; the
+// popup opens the side panel the same way, straight from its click.
+const openSidePanel = async (
+  page: Page,
+  context: BrowserContext,
+  extension: Extension,
+  openPopup: () => Promise<Popup>
+) => {
+  await page.bringToFront();
+  const popup = await openPopup();
+  await keepPopupOpen(popup);
+  await waitForEditorListener(popup);
+  await popup.locator('button', { hasText: 'Style this page' }).click();
+  return waitForSidePanel(context, extension);
+};
 
 let baseUrl: string;
 let closePageServer: () => Promise<void>;
@@ -67,6 +93,7 @@ test('the popup opens the side panel once it is the chosen position', async ({
   await page.bringToFront();
 
   const popup = await openPopup();
+  await keepPopupOpen(popup);
   await waitForEditorListener(popup);
   await popup.locator('button', { hasText: 'Style this page' }).click();
   await waitForSidePanel(context, extension);
@@ -74,39 +101,54 @@ test('the popup opens the side panel once it is the chosen position', async ({
   await expect(page.locator('#stylebot .stylebot')).toHaveCount(0);
 });
 
-test('the keyboard shortcut opens the side panel and closes it again', async ({
+test('the side panel is set up on every tab while it is the chosen position', async ({
   context,
   extension,
 }) => {
-  await dockToSidePanel(extension);
-
   const page = await context.newPage();
   await page.goto(`${baseUrl}/`);
-  await page.bringToFront();
-  await page.locator('h1').click();
 
-  await page.keyboard.press('Alt+Shift+M');
-  await waitForSidePanel(context, extension);
-  await expect(page.locator('#stylebot .stylebot')).toHaveCount(0);
+  const panelOptions = () =>
+    extension.evaluate(async url => {
+      const tabs = await chrome.tabs.query({});
+      const tab = tabs.find(candidate => candidate.url?.startsWith(url));
+      return (
+        chrome.sidePanel as unknown as {
+          getOptions: (options: {
+            tabId?: number;
+          }) => Promise<{ enabled?: boolean; path?: string }>;
+        }
+      ).getOptions({ tabId: tab?.id });
+    }, baseUrl);
 
-  await page.keyboard.press('Alt+Shift+M');
-  await expect.poll(() => isSidePanelOpen(extension)).toBe(false);
-  await expect(page.locator('#stylebot .stylebot')).toHaveCount(0);
+  await dockToSidePanel(extension);
+  await expect
+    .poll(panelOptions)
+    .toMatchObject({
+      enabled: true,
+      path: expect.stringContaining('host=sidepanel'),
+    });
+
+  await extension.evaluate(() =>
+    chrome.storage.local.set({
+      options: {
+        layout: { width: 360, adjustPageLayout: false, dockLocation: 'right' },
+      },
+    })
+  );
+  await expect.poll(panelOptions).toMatchObject({ enabled: false });
 });
 
 test('moving from the side panel to a window closes the panel', async ({
   context,
   extension,
+  openPopup,
 }) => {
   await dockToSidePanel(extension);
 
   const page = await context.newPage();
   await page.goto(`${baseUrl}/`);
-  await page.bringToFront();
-  await page.locator('h1').click();
-
-  await page.keyboard.press('Alt+Shift+M');
-  const panel = await waitForSidePanel(context, extension);
+  const panel = await openSidePanel(page, context, extension, openPopup);
 
   const popoutPromise = context.waitForEvent(
     'page',
@@ -128,16 +170,13 @@ test('moving from the side panel to a window closes the panel', async ({
 test('docking in the page from the side panel closes the panel', async ({
   context,
   extension,
+  openPopup,
 }) => {
   await dockToSidePanel(extension);
 
   const page = await context.newPage();
   await page.goto(`${baseUrl}/`);
-  await page.bringToFront();
-  await page.locator('h1').click();
-
-  await page.keyboard.press('Alt+Shift+M');
-  const panel = await waitForSidePanel(context, extension);
+  const panel = await openSidePanel(page, context, extension, openPopup);
 
   await panel.evaluate(`${byLabel('Options')}.click()`);
   await expect
@@ -152,16 +191,13 @@ test('docking in the page from the side panel closes the panel', async ({
 test('editor shortcuts typed on the page reach the side panel', async ({
   context,
   extension,
+  openPopup,
 }) => {
   await dockToSidePanel(extension);
 
   const page = await context.newPage();
   await page.goto(`${baseUrl}/`);
-  await page.bringToFront();
-  await page.locator('h1').click();
-
-  await page.keyboard.press('Alt+Shift+M');
-  const panel = await waitForSidePanel(context, extension);
+  const panel = await openSidePanel(page, context, extension, openPopup);
   const selectedTab = () =>
     panel.evaluate(
       `document.querySelector('[role="tab"][aria-selected="true"]')?.textContent.trim()`

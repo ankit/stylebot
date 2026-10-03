@@ -213,15 +213,21 @@ export const popOutEditor = async (
  */
 export type SidePanel = { evaluate: (expression: string) => Promise<unknown> };
 
+// Panels stay set up on every tab, so an earlier test's panel can still be
+// closing; the live one is the one Chrome reports as a side panel context.
 const findSidePanelTarget = async (
-  cdp: CDPSession
+  cdp: CDPSession,
+  extension: Extension
 ): Promise<string | undefined> => {
+  const urls = await extension.evaluate(async () =>
+    (
+      await chrome.runtime.getContexts({
+        contextTypes: ['SIDE_PANEL' as chrome.runtime.ContextType],
+      })
+    ).map(context => context.documentUrl)
+  );
   const { targetInfos } = await cdp.send('Target.getTargets');
-  return targetInfos.find(
-    info =>
-      info.url.includes('/editor-window/index.html') &&
-      info.url.includes('host=sidepanel')
-  )?.targetId;
+  return targetInfos.find(info => urls.includes(info.url))?.targetId;
 };
 
 export const isSidePanelOpen = (extension: Extension) =>
@@ -239,19 +245,29 @@ export const waitForSidePanel = async (
   await expect.poll(() => isSidePanelOpen(extension)).toBe(true);
 
   const cdp = await context.browser()!.newBrowserCDPSession();
-  let targetId: string | undefined;
-  await expect
-    .poll(async () => (targetId = await findSidePanelTarget(cdp)))
-    .toBeTruthy();
 
-  const { sessionId } = await cdp.send('Target.attachToTarget', {
-    targetId: targetId!,
-    flatten: false,
-  });
+  const attach = async (): Promise<string> => {
+    let targetId: string | undefined;
+    await expect
+      .poll(async () => (targetId = await findSidePanelTarget(cdp, extension)))
+      .toBeTruthy();
 
+    const { sessionId } = await cdp.send('Target.attachToTarget', {
+      targetId: targetId!,
+      flatten: false,
+    });
+    return sessionId;
+  };
+
+  // The panel can reload just after it opens; a session to the page it
+  // replaced is re-attached, and the poll below tries again.
+  let session = attach();
   let nextId = 1;
-  const evaluate = (expression: string): Promise<unknown> =>
-    new Promise((resolve, reject) => {
+
+  const evaluate = async (expression: string): Promise<unknown> => {
+    const sessionId = await session;
+
+    return new Promise((resolve, reject) => {
       const id = nextId++;
       const onMessage = ({ message }: { message: string }) => {
         const response = JSON.parse(message);
@@ -266,15 +282,22 @@ export const waitForSidePanel = async (
         }
       };
       cdp.on('Target.receivedMessageFromTarget', onMessage);
-      cdp.send('Target.sendMessageToTarget', {
-        sessionId,
-        message: JSON.stringify({
-          id,
-          method: 'Runtime.evaluate',
-          params: { expression, awaitPromise: true, userGesture: true },
-        }),
-      });
+      cdp
+        .send('Target.sendMessageToTarget', {
+          sessionId,
+          message: JSON.stringify({
+            id,
+            method: 'Runtime.evaluate',
+            params: { expression, awaitPromise: true, userGesture: true },
+          }),
+        })
+        .catch(error => {
+          cdp.off('Target.receivedMessageFromTarget', onMessage);
+          session = attach();
+          reject(error);
+        });
     });
+  };
 
   // Connected once the page's state has arrived over the port.
   await expect

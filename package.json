@@ -103,7 +103,6 @@
   "dependencies": {
     "date-fns": "^2.16.1",
     "defuddle": "^0.19.3",
-    "hotkeys-js": "^3.8.1",
     "monaco-editor": "^0.56.0",
     "postcss": "^7.0.32",
     "requirejs": "^2.3.6",

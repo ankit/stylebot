@@ -2,7 +2,6 @@ export { default as SHeading } from './SHeading.vue';
 export { default as SText } from './SText.vue';
 export { default as SShortcutChip } from './SShortcutChip.vue';
 export { default as SShortcutKbd } from './SShortcutKbd.vue';
-export { default as SShortcutRecorderField } from './SShortcutRecorderField.vue';
 export { default as SMenu } from './SMenu.vue';
 export { default as SToggleSwitch } from './SToggleSwitch.vue';
 export { default as SPillButton } from './SPillButton.vue';

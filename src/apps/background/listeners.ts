@@ -1,13 +1,15 @@
 import { ContextMenu, handleContextMenuClick } from './contextmenu';
+import { handleCommand } from './global-commands';
+import { configureSidePanelTabs, initSidePanelTabs } from './side-panel-tabs';
 import * as editorWindow from './editor-window';
 
 import {
   GetCommands,
-  SetCommands,
   GetOption,
   SetOption,
   GetAllOptions,
   OpenOptionsPage,
+  OpenShortcutsPage,
   OpenDonatePage,
   OpenReportIssuePage,
   SetStyle,
@@ -63,8 +65,10 @@ import { setNotification, getReleaseNotificationId } from '@stylebot/utils';
  * synchronously when the service worker starts, for Chrome to wake it for them.
  */
 export const initListeners = (): void => {
-  // Open Help page on installation; clean up retired options on update.
+  // Set up side panels and open Help on install; clean up retired options on update.
   chrome.runtime.onInstalled.addListener(async ({ reason }) => {
+    configureSidePanelTabs();
+
     if (reason === 'install') {
       chrome.tabs.create({
         url: 'https://stylebot.dev/help',
@@ -77,6 +81,9 @@ export const initListeners = (): void => {
       pruneRetired();
     }
   });
+
+  chrome.commands.onCommand.addListener(handleCommand);
+  initSidePanelTabs();
 
   // Scheduled syncs run without a user in front of them, so they never open an
   // auth window; a run that needs one leaves a flag for the UI instead.
@@ -96,6 +103,8 @@ export const initListeners = (): void => {
 
   // Pick up what other devices pushed while the browser was closed.
   chrome.runtime.onStartup.addListener(async () => {
+    configureSidePanelTabs();
+
     if (await getGoogleDriveSyncEnabled()) {
       runGoogleDriveSync(styleStorage, { interactive: false });
     }
@@ -156,9 +165,6 @@ export const initListeners = (): void => {
         case 'GetCommands':
           GetCommands(sendResponse);
           break;
-        case 'SetCommands':
-          SetCommands(message);
-          break;
 
         case 'GetOption':
           GetOption(message, sendResponse);
@@ -172,6 +178,9 @@ export const initListeners = (): void => {
 
         case 'OpenOptionsPage':
           OpenOptionsPage(message);
+          break;
+        case 'OpenShortcutsPage':
+          OpenShortcutsPage();
           break;
         case 'OpenDonatePage':
           OpenDonatePage();

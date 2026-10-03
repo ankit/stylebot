@@ -31,7 +31,6 @@ import type {
   SetStyle as SetStyleType,
   MoveStyle as MoveStyleType,
   SetAllStyles as SetAllStylesType,
-  SetCommands as SetCommandsType,
   SetReadability as SetReadabilityType,
   ReadabilityStateChanged,
   ReadabilityActiveChanged as ReadabilityActiveChangedType,
@@ -82,7 +81,7 @@ import {
   set as setReadabilitySettings,
 } from './readability-settings';
 
-import { get as getCommands, set as setCommands } from './commands';
+import { get as getCommands } from './commands';
 
 import {
   getAll as getAllRecentColors,
@@ -203,6 +202,20 @@ export const OpenOptionsPage = async (message?: {
   await chrome.tabs.create({ url, active: true });
 };
 
+/**
+ * Opens the browser's own page for extension shortcuts, where they're
+ * changed. Firefox has its page opened for the extension; the others by URL.
+ */
+export const OpenShortcutsPage = (): void => {
+  if (chrome.commands.openShortcutSettings) {
+    chrome.commands.openShortcutSettings();
+    return;
+  }
+
+  const scheme = /\bEdg\//.test(navigator.userAgent) ? 'edge' : 'chrome';
+  chrome.tabs.create({ url: `${scheme}://extensions/shortcuts` });
+};
+
 export const OpenDonatePage = (): void => {
   chrome.tabs.create({ url: 'https://ko-fi.com/stylebot' });
 };
@@ -220,10 +233,6 @@ export const GetCommands = async (
 ): Promise<void> => {
   const commands = await getCommands();
   sendResponse(commands);
-};
-
-export const SetCommands = (message: SetCommandsType): void => {
-  setCommands(message.value);
 };
 
 export const SetReadability = async (
@@ -393,7 +402,7 @@ export const OpenEditorSidePanel = (
     return;
   }
 
-  openEditorSidePanel(tabId, message.appearance).then(
+  openEditorSidePanel(tabId).then(
     () => sendResponse(true),
     () => sendResponse(false)
   );

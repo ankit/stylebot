@@ -8,6 +8,7 @@ import {
   GetRecentColors,
   AddRecentColor,
   OpenOptionsPage,
+  OpenShortcutsPage,
 } from './messages';
 import * as stylesModule from './styles';
 import * as colorHistoryModule from './color-history';
@@ -187,5 +188,49 @@ describe('OpenOptionsPage', () => {
       url: `${base}#/basics`,
     });
     expect(chrome.tabs.create).not.toBeCalled();
+  });
+});
+
+describe('OpenShortcutsPage', () => {
+  const userAgent = navigator.userAgent;
+
+  const setUserAgent = (value: string) =>
+    Object.defineProperty(navigator, 'userAgent', {
+      value,
+      configurable: true,
+    });
+
+  afterEach(() => setUserAgent(userAgent));
+
+  it('has Firefox open its page for the extension', () => {
+    const openShortcutSettings = jest.fn();
+    global.chrome = {
+      commands: { openShortcutSettings },
+      tabs: { create: jest.fn() },
+    } as unknown as typeof chrome;
+
+    OpenShortcutsPage();
+
+    expect(openShortcutSettings).toBeCalled();
+    expect(chrome.tabs.create).not.toBeCalled();
+  });
+
+  it('opens the extension shortcuts page by URL in Chrome and Edge', () => {
+    global.chrome = {
+      commands: {},
+      tabs: { create: jest.fn() },
+    } as unknown as typeof chrome;
+
+    setUserAgent('Mozilla/5.0 Chrome/154.0.0.0 Safari/537.36');
+    OpenShortcutsPage();
+    setUserAgent('Mozilla/5.0 Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0');
+    OpenShortcutsPage();
+
+    expect(chrome.tabs.create).toBeCalledWith({
+      url: 'chrome://extensions/shortcuts',
+    });
+    expect(chrome.tabs.create).toBeCalledWith({
+      url: 'edge://extensions/shortcuts',
+    });
   });
 });

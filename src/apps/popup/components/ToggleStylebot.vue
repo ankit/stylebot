@@ -11,7 +11,6 @@
 import Vue from 'vue';
 import { toggleStylebot, openStylebotSidePanel } from '../utils';
 import { SPillButton, SShortcutChip } from '@stylebot/components';
-import type { StylebotAppearance } from '@stylebot/types';
 
 export default Vue.extend({
   name: 'ToggleStylebot',
@@ -29,10 +28,6 @@ export default Vue.extend({
 
     isOpen: Boolean,
     sidePanel: Boolean,
-    appearance: {
-      type: String,
-      default: 'system',
-    },
     shortcut: {
       type: String,
       default: '',
@@ -48,7 +43,7 @@ export default Vue.extend({
   methods: {
     toggle(): void {
       if (this.sidePanel && !this.isOpen) {
-        openStylebotSidePanel(this.tab, this.appearance as StylebotAppearance);
+        openStylebotSidePanel(this.tab);
       } else {
         toggleStylebot(this.tab);
       }

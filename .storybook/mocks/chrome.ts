@@ -19,6 +19,8 @@ import type {
   VersionHistory,
 } from '@stylebot/types';
 
+import { isMac, toBrowserShortcut } from '@stylebot/utils';
+
 import type { ChatShimOptions } from './chat';
 import { createChatShim } from './chat';
 
@@ -113,6 +115,7 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
       defaultStyle: overrides.defaultStyle,
     }),
     GetCommands: () => commands,
+    SetCommands: message => (message as unknown as { value: unknown }).value,
     GetOption: message =>
       message.optionName ? options[message.optionName] : undefined,
     GetAllOptions: () => options,
@@ -232,6 +235,17 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
       setOptions: () => Promise.resolve(),
       open: () => Promise.resolve(),
       close: () => Promise.resolve(),
+    },
+
+    // The browser owns the global shortcuts; this one reports the seeded ones.
+    commands: {
+      getAll: () =>
+        Promise.resolve(
+          Object.entries(commands).map(([name, combo]) => ({
+            name,
+            shortcut: toBrowserShortcut(combo, isMac()) ?? '',
+          }))
+        ),
     },
   };
 

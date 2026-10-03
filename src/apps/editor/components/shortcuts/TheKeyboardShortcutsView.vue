@@ -19,10 +19,10 @@
           <a
             v-if="group.editable"
             href="#"
-            class="options-link"
-            @click="openOptions"
+            class="shortcuts-link"
+            @click="editShortcuts"
           >
-            {{ t('edit_in_options') }}
+            {{ t('change_shortcuts') }}
           </a>
         </div>
 
@@ -60,7 +60,7 @@ import {
 } from '@stylebot/components';
 import { ChevronLeftIcon } from '@stylebot/icons';
 import type { StylebotCommands, StylebotEditorCommands } from '@stylebot/types';
-import { isMac, openOptionsPage } from '@stylebot/utils';
+import { isMac, openShortcutsPage } from '@stylebot/utils';
 
 import { undoShortcuts } from '../../store/undo-stack';
 import { hasSidePanel } from '../../utils/side-panel';
@@ -171,9 +171,13 @@ export default Vue.extend({
       this.$store.commit('setHelp', false);
     },
 
-    openOptions(event: MouseEvent): void {
+    /**
+     * Opens the browser's own page for extension shortcuts, where the global
+     * ones are changed.
+     */
+    editShortcuts(event: MouseEvent): void {
       event.preventDefault();
-      openOptionsPage('/basics');
+      openShortcutsPage();
     },
   },
 });
@@ -237,8 +241,8 @@ export default Vue.extend({
   color: var(--section-heading);
 }
 
-.options-link {
-  font-size: 12px;
+.shortcuts-link {
+  font-size: 13px;
   color: var(--accent-text);
   text-decoration: none;
 

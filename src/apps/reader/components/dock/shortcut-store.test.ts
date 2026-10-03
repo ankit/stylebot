@@ -1,7 +1,6 @@
 export {};
 
 jest.mock('../../utils/get-commands');
-jest.mock('../../utils/set-commands');
 
 const commands = (readability: string) => ({
   readability,
@@ -12,7 +11,6 @@ const commands = (readability: string) => ({
 
 describe('shortcutStore', () => {
   let getCommandsModule: typeof import('../../utils/get-commands');
-  let setCommandsModule: typeof import('../../utils/set-commands');
   let shortcutStore: typeof import('./shortcut-store').shortcutStore;
   let storageGet: jest.Mock;
   let storageSet: jest.Mock;
@@ -21,7 +19,6 @@ describe('shortcutStore', () => {
     jest.resetModules();
 
     getCommandsModule = require('../../utils/get-commands');
-    setCommandsModule = require('../../utils/set-commands');
     (getCommandsModule.getCommands as jest.Mock).mockResolvedValue(
       commands('')
     );
@@ -70,48 +67,5 @@ describe('shortcutStore', () => {
     expect(storageSet).toHaveBeenCalledWith({
       readabilityShortcutPromptDismissed: true,
     });
-  });
-
-  it('setRecording updates state.recording', () => {
-    expect(shortcutStore.state.recording).toBe(false);
-
-    shortcutStore.setRecording(true);
-    expect(shortcutStore.state.recording).toBe(true);
-  });
-
-  it('update() is a no-op before commands have loaded', () => {
-    shortcutStore.update('alt+shift+r');
-
-    expect(setCommandsModule.setCommands).not.toHaveBeenCalled();
-  });
-
-  it('update() persists the merged commands after load', async () => {
-    await shortcutStore.ensureLoaded();
-
-    shortcutStore.update('alt+shift+r');
-
-    expect(shortcutStore.value()).toBe('alt+shift+r');
-    expect(setCommandsModule.setCommands).toHaveBeenCalledWith(
-      commands('alt+shift+r')
-    );
-  });
-
-  it('update() with a non-empty value also dismisses the prompt', async () => {
-    await shortcutStore.ensureLoaded();
-
-    shortcutStore.update('alt+shift+r');
-
-    expect(shortcutStore.state.promptDismissed).toBe(true);
-    expect(storageSet).toHaveBeenCalledWith({
-      readabilityShortcutPromptDismissed: true,
-    });
-  });
-
-  it('update() with an empty value (Remove) does not dismiss the prompt', async () => {
-    await shortcutStore.ensureLoaded();
-
-    shortcutStore.update('');
-
-    expect(shortcutStore.state.promptDismissed).toBe(false);
   });
 });

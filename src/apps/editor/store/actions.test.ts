@@ -411,10 +411,7 @@ describe('actions', () => {
       jest.mocked(chromeUtils.requestEditorSidePanel).mockResolvedValue(true);
 
       actions.setDockLocation(from('page'), 'sidepanel');
-      expect(chromeUtils.requestEditorSidePanel).toBeCalledWith(
-        mockState.options.appearance,
-        undefined
-      );
+      expect(chromeUtils.requestEditorSidePanel).toBeCalledWith(undefined);
       expect(mockCommit).not.toBeCalled();
 
       await Promise.resolve();
@@ -441,10 +438,7 @@ describe('actions', () => {
       jest.mocked(chromeUtils.requestEditorSidePanel).mockResolvedValue(true);
 
       actions.setDockLocation(from('window'), 'sidepanel');
-      expect(chromeUtils.requestEditorSidePanel).toBeCalledWith(
-        mockState.options.appearance,
-        7
-      );
+      expect(chromeUtils.requestEditorSidePanel).toBeCalledWith(7);
       expect(chromeUtils.closeEditorWindow).not.toBeCalled();
 
       await Promise.resolve();

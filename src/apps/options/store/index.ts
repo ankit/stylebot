@@ -28,7 +28,6 @@ import {
   setOption,
   getAllOptions,
   getCommands,
-  setCommands,
   runGoogleDriveSync,
   scanVersionHistory,
   restoreVersion,
@@ -215,11 +214,6 @@ export const createStore = (): Store<State> => {
         // @ts-expect-error TS cannot correlate the key/value union members of StylebotOptions.
         state.options[name] = value;
         setOption(name, value);
-      },
-
-      setCommands({ state }, commands: StylebotCommands) {
-        state.commands = commands;
-        setCommands(commands);
       },
 
       async setGoogleDriveSyncEnabled({ state, dispatch }, enabled: boolean) {

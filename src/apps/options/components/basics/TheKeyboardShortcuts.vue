@@ -2,7 +2,7 @@
   <div>
     <s-heading as="h2" size="lg">{{ t('keyboard_shortcuts') }}</s-heading>
     <s-text variant="muted" class="description">
-      {{ t('keyboard_shortcuts_description') }}
+      {{ t('shortcuts_are_set_in_your_browser') }}
     </s-text>
 
     <div class="rows">
@@ -11,19 +11,25 @@
         :key="row.settingKey"
         :label="t(row.labelKey)"
       >
-        <s-shortcut-recorder-field
+        <s-shortcut-chip
+          v-if="commands[row.settingKey]"
           :value="commands[row.settingKey]"
-          @update="input(row.settingKey, $event)"
         />
+        <s-text v-else variant="muted">{{ t('not_set') }}</s-text>
       </shortcut-row>
     </div>
+
+    <s-button class="change" @click="openShortcutsPage">
+      {{ t('change_shortcuts') }}
+    </s-button>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import type { StylebotCommandName, StylebotCommands } from '@stylebot/types';
-import { SShortcutRecorderField, SHeading, SText } from '@stylebot/components';
+import { SButton, SShortcutChip, SHeading, SText } from '@stylebot/components';
+import { openShortcutsPage } from '@stylebot/utils';
 
 import ShortcutRow from './ShortcutRow.vue';
 
@@ -34,7 +40,8 @@ export default Vue.extend({
 
   components: {
     ShortcutRow,
-    SShortcutRecorderField,
+    SButton,
+    SShortcutChip,
     SHeading,
     SText,
   },
@@ -55,11 +62,7 @@ export default Vue.extend({
   },
 
   methods: {
-    input(name: StylebotCommandName, value: string) {
-      const commands = { ...this.$store.state.commands };
-      commands[name] = value;
-      this.$store.dispatch('setCommands', commands);
-    },
+    openShortcutsPage,
   },
 });
 </script>
@@ -71,6 +74,10 @@ export default Vue.extend({
 }
 
 .rows {
+  margin-top: 12px;
+}
+
+.change {
   margin-top: 12px;
 }
 </style>

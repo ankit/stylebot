@@ -273,7 +273,7 @@ export default {
       leave();
     } else if (dockLocation === 'sidepanel') {
       // Sent before anything is awaited, so Chrome still sees the click's gesture.
-      requestEditorSidePanel(state.options.appearance, tabId).then(opened => {
+      requestEditorSidePanel(tabId).then(opened => {
         if (opened) {
           leave();
         }

@@ -1,5 +1,3 @@
-import { defaultCommands } from '@stylebot/settings';
-
 import { getCommands, getOption, getStyles, onEnterOrSpace } from './utils';
 
 const keydown = (key: string): KeyboardEvent =>
@@ -104,13 +102,30 @@ describe('getOption and getCommands', () => {
     expect(callback).toHaveBeenCalledWith('system');
   });
 
-  it('should fall back to the default commands when none are stored', () => {
+  it('should read the shortcuts from the browser without messaging the background', async () => {
     mockStorage({});
+    (chrome as unknown as { commands: unknown }).commands = {
+      getAll: jest.fn(() =>
+        Promise.resolve([
+          { name: 'stylebot', shortcut: 'Alt+Shift+M' },
+          { name: 'style', shortcut: '' },
+          { name: 'readability', shortcut: 'Ctrl+Shift+R' },
+          { name: '_execute_action', shortcut: '' },
+        ])
+      ),
+    };
     const callback = jest.fn();
 
     getCommands(callback);
+    await Promise.resolve();
+    await Promise.resolve();
 
-    expect(callback).toHaveBeenCalledWith(defaultCommands);
+    expect(callback).toHaveBeenCalledWith({
+      stylebot: 'alt+shift+m',
+      style: '',
+      readability: 'ctrl+shift+r',
+      grayscale: '',
+    });
     expect(chrome.runtime.sendMessage).not.toHaveBeenCalled();
   });
 });

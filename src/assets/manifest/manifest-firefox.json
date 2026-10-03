@@ -6,7 +6,8 @@
 
   "browser_specific_settings": {
     "gecko": {
-      "id": "stylebot@stylebot.dev"
+      "id": "stylebot@stylebot.dev",
+      "strict_min_version": "137.0"
     }
   }
 }

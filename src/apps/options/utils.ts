@@ -7,9 +7,7 @@ import type {
   GetAllOptionsResponse,
   StylebotOptions,
   GetCommands,
-  SetCommands,
   GetCommandsResponse,
-  StylebotCommands,
   StyleMap,
   RunGoogleDriveSync,
   RunGoogleDriveSyncResponse,
@@ -70,15 +68,6 @@ export const getCommands = (): Promise<GetCommandsResponse> => {
   };
 
   return chrome.runtime.sendMessage<GetCommands, GetCommandsResponse>(message);
-};
-
-export const setCommands = (commands: StylebotCommands): void => {
-  const message: SetCommands = {
-    name: 'SetCommands',
-    value: commands,
-  };
-
-  chrome.runtime.sendMessage(message);
 };
 
 export const runGoogleDriveSync =

@@ -6,10 +6,9 @@ import type {
   GetIsPageReaderable,
   GetStylesForPageResponse,
   StylebotOptions,
-  StylebotAppearance,
 } from '@stylebot/types';
 import { STYLES_KEY, getStylesForPage } from '@stylebot/saved-styles';
-import { defaultCommands, defaultOptions } from '@stylebot/settings';
+import { defaultOptions } from '@stylebot/settings';
 
 import {
   openOptionsPage,
@@ -17,6 +16,7 @@ import {
   openDonatePage,
   supportsEditorSidePanel,
   openEditorSidePanel,
+  getBrowserCommands,
 } from '@stylebot/utils';
 
 export const getCurrentTab = (
@@ -89,31 +89,26 @@ export const toggleStylebot = (tab: chrome.tabs.Tab): void => {
  * Opens the editor in the tab's side panel straight from the popup's click,
  * as the page couldn't once its gesture is gone; falls back to the page.
  */
-export const openStylebotSidePanel = (
-  tab: chrome.tabs.Tab,
-  appearance: StylebotAppearance
-): void => {
+export const openStylebotSidePanel = (tab: chrome.tabs.Tab): void => {
   if (!tab.id || !supportsEditorSidePanel()) {
     toggleStylebot(tab);
     return;
   }
 
-  openEditorSidePanel(tab.id, appearance).then(
+  openEditorSidePanel(tab.id).then(
     () => window.close(),
     () => toggleStylebot(tab)
   );
 };
 
 /**
- * Reads commands and options straight from storage, like getStyles, so the
- * popup's shortcuts and theme never wait on the background waking up.
+ * Reads the shortcuts from the browser, which owns them, and options straight
+ * from storage, so the popup's chips and theme never wait on the background.
  */
 export const getCommands = (
   callback: (commands: GetCommandsResponse) => void
 ): void => {
-  chrome.storage.local.get('commands', items => {
-    callback(items['commands'] || defaultCommands);
-  });
+  getBrowserCommands().then(callback);
 };
 
 export const getOption = <K extends keyof StylebotOptions>(

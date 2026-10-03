@@ -27,7 +27,6 @@ import type {
   OpenEditorSidePanel,
   OpenEditorSidePanelResponse,
   CloseEditorSidePanel,
-  StylebotAppearance,
   ChatGetStatus,
   ChatConnect,
   ChatRemoveKey,
@@ -213,14 +212,9 @@ export const getIsEditorWindowOpen = (
  * awaiting anything first, so the background still has the user's gesture.
  */
 export const requestEditorSidePanel = (
-  appearance: StylebotAppearance,
   tabId?: number
 ): Promise<OpenEditorSidePanelResponse> => {
-  const message: OpenEditorSidePanel = {
-    name: 'OpenEditorSidePanel',
-    appearance,
-    tabId,
-  };
+  const message: OpenEditorSidePanel = { name: 'OpenEditorSidePanel', tabId };
 
   return chrome.runtime.sendMessage<
     OpenEditorSidePanel,

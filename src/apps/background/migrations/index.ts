@@ -1,3 +1,4 @@
+import CommandsToBrowser from './commands-to-browser';
 import DefaultShortcutUpdate from './default-shortcut-update';
 import StylesMetadataUpdate from './styles-metadata-update';
 import StylesModifiedTimeUpdate from './styles-modified-time-update';
@@ -12,6 +13,7 @@ import SyncStorageUpdate from './sync-storage-update';
  */
 export const runMigrations = async (): Promise<void> => {
   await DefaultShortcutUpdate();
+  await CommandsToBrowser();
   await StylesMetadataUpdate();
   await StylesModifiedTimeUpdate();
   await SyncStorageUpdate();

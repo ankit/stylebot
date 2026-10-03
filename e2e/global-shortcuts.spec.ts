@@ -1,0 +1,111 @@
+import { test, expect, type Extension } from './fixtures';
+import { PAGE_URL, seedStyles, servePage } from './helpers';
+
+/*
+ * Playwright can't press a browser-level shortcut, so these cover the parts
+ * around it: the commands the browser registers, and the page carrying out
+ * one the background hands it.
+ */
+
+const PAGE_HTML = `
+  <!doctype html>
+  <html>
+    <body>
+      <h1>Test page</h1>
+    </body>
+  </html>
+`;
+
+// The content script answers once it has registered its listener.
+const waitForContentScript = (extension: Extension) =>
+  expect
+    .poll(() =>
+      extension
+        .evaluate(async url => {
+          const tabs = await chrome.tabs.query({});
+          const tab = tabs.find(candidate => candidate.url?.startsWith(url));
+          const open = await chrome.tabs.sendMessage(tab?.id as number, {
+            name: 'GetIsStylebotOpen',
+          });
+          return typeof open === 'boolean';
+        }, PAGE_URL)
+        .catch(() => false)
+    )
+    .toBe(true);
+
+// What the background sends the page when the browser reports a command.
+const runCommand = (extension: Extension, command: string) =>
+  extension.evaluate(
+    async ([url, name]) => {
+      const tabs = await chrome.tabs.query({});
+      const tab = tabs.find(candidate => candidate.url?.startsWith(url));
+      await chrome.tabs.sendMessage(tab?.id as number, {
+        name: 'RunCommand',
+        command: name,
+      });
+    },
+    [PAGE_URL, command]
+  );
+
+test('the global shortcuts are registered with the browser, two of them with keys', async ({
+  extension,
+}) => {
+  const commands = await extension.evaluate(async () =>
+    Object.fromEntries(
+      (
+        await chrome.commands.getAll()
+      ).map(command => [command.name, Boolean(command.shortcut)])
+    )
+  );
+
+  expect(commands).toMatchObject({
+    stylebot: true,
+    style: true,
+    readability: false,
+    grayscale: false,
+  });
+});
+
+test('the page toggles the editor when the browser reports the shortcut', async ({
+  context,
+  extension,
+}) => {
+  await servePage(context, PAGE_HTML);
+  await extension.evaluate(() =>
+    chrome.storage.local.set({
+      options: {
+        layout: { width: 360, adjustPageLayout: false, dockLocation: 'right' },
+      },
+    })
+  );
+
+  const page = await context.newPage();
+  await page.goto(PAGE_URL);
+
+  await waitForContentScript(extension);
+
+  await runCommand(extension, 'stylebot');
+  await expect(page.locator('#stylebot .stylebot')).toHaveCount(1);
+
+  await runCommand(extension, 'stylebot');
+  await expect(page.locator('#stylebot .stylebot')).toHaveCount(0);
+});
+
+test('the page toggles styling when the browser reports the shortcut', async ({
+  context,
+  extension,
+}) => {
+  await servePage(context, PAGE_HTML);
+  await seedStyles(extension, {
+    localhost: { css: 'h1 { color: rgb(255, 0, 128); }', enabled: true },
+  });
+
+  const page = await context.newPage();
+  await page.goto(PAGE_URL);
+  await expect(page.locator('h1')).toHaveCSS('color', 'rgb(255, 0, 128)');
+  await waitForContentScript(extension);
+
+  await runCommand(extension, 'style');
+
+  await expect(page.locator('h1')).not.toHaveCSS('color', 'rgb(255, 0, 128)');
+});

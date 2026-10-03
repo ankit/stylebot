@@ -75,7 +75,6 @@
           :tab="tab"
           :shortcut="stylebotShortcut"
           :side-panel="dockLocation === 'sidepanel'"
-          :appearance="appearance"
         />
         <settings-button />
       </div>

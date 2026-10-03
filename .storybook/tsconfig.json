@@ -5,7 +5,8 @@
     "./**/*",
     "../src/**/*.stories.ts",
     "../src/shims-vue.d.ts",
-    "../src/chrome-side-panel.d.ts"
+    "../src/chrome-side-panel.d.ts",
+    "../src/chrome-commands.d.ts"
   ],
   "compilerOptions": {
     "types": ["chrome", "node"],

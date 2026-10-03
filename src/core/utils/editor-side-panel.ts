@@ -1,5 +1,3 @@
-import type { StylebotAppearance } from '@stylebot/types';
-
 /**
  * Whether this browser can host the editor in its side panel. Content
  * scripts can't see chrome.sidePanel, so they can't use this.
@@ -8,29 +6,31 @@ export const supportsEditorSidePanel = (): boolean =>
   typeof chrome !== 'undefined' && !!chrome.sidePanel?.open;
 
 /**
+ * Sets up the tab's side panel to host the editor, or takes it away. The path
+ * is the same every time, so setting it again doesn't reload an open panel,
+ * which paints first with the theme it last used.
+ */
+export const configureEditorSidePanel = (
+  tabId: number,
+  enabled: boolean
+): Promise<void> =>
+  chrome.sidePanel.setOptions(
+    enabled
+      ? {
+          tabId,
+          path: `editor-window/index.html?tabId=${tabId}&host=sidepanel`,
+          enabled,
+        }
+      : { tabId, enabled }
+  );
+
+/**
  * Opens the editor in the tab's own side panel, which Chrome then shows only
  * while that tab is active. Chrome only allows this during a user gesture,
- * so callers must reach it before awaiting anything. Without an appearance
- * the panel paints first with the one it last used.
+ * so callers must reach it before awaiting anything.
  */
-export const openEditorSidePanel = (
-  tabId: number,
-  appearance?: StylebotAppearance
-): Promise<void> => {
-  const params = new URLSearchParams({
-    tabId: String(tabId),
-    host: 'sidepanel',
-  });
-  if (appearance) {
-    params.set('appearance', appearance);
-  }
-
-  chrome.sidePanel.setOptions({
-    tabId,
-    path: `editor-window/index.html?${params}`,
-    enabled: true,
-  });
-
+export const openEditorSidePanel = (tabId: number): Promise<void> => {
+  configureEditorSidePanel(tabId, true);
   return chrome.sidePanel.open({ tabId });
 };
 

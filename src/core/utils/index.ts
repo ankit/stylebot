@@ -1,9 +1,3 @@
-export {
-  MODIFIER_KEYS,
-  modifiersFromEvent,
-  keydownToShortcut,
-} from './keydown-to-shortcut';
-
 export { debounce } from './debounce';
 export { splitCommaList } from './split-comma-list';
 export { isMac } from './is-mac';
@@ -28,12 +22,21 @@ export {
 } from './release';
 export {
   openOptionsPage,
+  openShortcutsPage,
   openReportIssuePage,
   openDonatePage,
 } from './open-page';
 export {
   supportsEditorSidePanel,
+  configureEditorSidePanel,
   openEditorSidePanel,
   closeEditorSidePanel,
   isEditorSidePanelOpen,
 } from './editor-side-panel';
+export { fromBrowserShortcut, toBrowserShortcut } from './browser-shortcut';
+export {
+  COMMAND_NAMES,
+  getBrowserCommands,
+  canSetBrowserCommands,
+  setBrowserCommand,
+} from './browser-commands';

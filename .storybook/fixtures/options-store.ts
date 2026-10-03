@@ -44,7 +44,6 @@ const NOOP_ACTIONS = [
   'enableAllStyles',
   'disableAllStyles',
   'setOption',
-  'setCommands',
 ];
 
 const noop = () => undefined;

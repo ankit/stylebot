@@ -2,14 +2,13 @@
   <div class="dock" :style="{ opacity: dockOpacity }" @focusin="wake">
     <div class="buttons">
       <s-tooltip :text="closeTipText">
-        <close-button :disabled="recording" @click="close" />
+        <close-button @click="close" />
       </s-tooltip>
 
       <s-tooltip :text="t('reading_settings')">
         <typography-button
           ref="typographyBtn"
           :active="activeMenu === 'settings'"
-          :disabled="recording"
           @click="toggleMenu('settings')"
         />
       </s-tooltip>
@@ -17,7 +16,6 @@
       <more-button
         ref="moreBtn"
         :active="activeMenu === 'more'"
-        :disabled="recording"
         @click="toggleMenu('more')"
       />
     </div>
@@ -152,10 +150,6 @@ export default Vue.extend({
       return this.t('turn_off_readability_for_domain', [document.domain]);
     },
 
-    recording(): boolean {
-      return shortcutStore.state.recording;
-    },
-
     // Nudges the user to set a shortcut until they either set one or
     // dismiss it — hidden while any menu (including the shortcut menu
     // itself) is open, so it never overlaps another panel.
@@ -169,14 +163,6 @@ export default Vue.extend({
   },
 
   watch: {
-    // A click outside the dock can tear the menu down mid-recording, so
-    // reset here instead of relying on the menu's own cleanup.
-    activeMenu(menu: MenuName | null): void {
-      if (menu !== 'shortcut') {
-        shortcutStore.setRecording(false);
-      }
-    },
-
     anyMenuOpen(isOpen: boolean): void {
       // Only listen while a menu is open, so a closed dock costs nothing.
       if (isOpen) {

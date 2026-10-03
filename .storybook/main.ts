@@ -103,7 +103,7 @@ const config: StorybookConfig = {
         },
       },
       optimizeDeps: {
-        include: ['tinycolor2', 'hotkeys-js', 'postcss'],
+        include: ['tinycolor2', 'postcss'],
       },
     });
   },

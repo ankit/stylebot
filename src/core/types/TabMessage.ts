@@ -1,5 +1,6 @@
 import type { Style } from './styles';
 import type { ReadabilitySettings } from './readability';
+import type { StylebotCommandName } from './commands';
 
 export type ToggleStylebot = {
   name: 'ToggleStylebot';
@@ -13,6 +14,12 @@ export type OpenStylebotFromContextMenu = {
   name: 'OpenStylebotFromContextMenu';
   // The background already opened the side panel, which needs the click's gesture.
   sidePanel?: boolean;
+};
+
+// A global shortcut the browser caught, for the page to carry out.
+export type RunCommand = {
+  name: 'RunCommand';
+  command: StylebotCommandName;
 };
 
 export type ToggleReadabilityForTab = {
@@ -57,6 +64,7 @@ export type ReadabilityStateChanged = {
 
 type TabMessage =
   | ToggleStylebot
+  | RunCommand
   | OpenStylebot
   | OpenStylebotFromContextMenu
   | ToggleReadabilityForTab

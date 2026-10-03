@@ -7,7 +7,6 @@ import { createMessageHandler } from './handlers/message';
 import initOptionsListener from './listeners/options';
 import type { EditorApp, EditorAppWindow } from './load-editor';
 import { createStore } from './store';
-import { onCommandsChanged } from './utils/bind-commands';
 import { getStylesForPage } from './utils/chrome';
 import { preloadEditorCss } from './utils/init-editor';
 
@@ -30,7 +29,6 @@ const ready = (async () => {
 
 (window as EditorAppWindow).stylebotEditorApp = ready.then((): EditorApp => {
   initOptionsListener(store);
-  onCommandsChanged(commands => store.commit('setCommands', commands));
 
   return {
     handleMessage: createMessageHandler(store, ready),
