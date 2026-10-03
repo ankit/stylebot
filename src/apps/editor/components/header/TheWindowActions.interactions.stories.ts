@@ -69,23 +69,15 @@ export const DockShortcuts: StoryObj = {
    so this one has to leave it the way it found it. */
 export const AdjustPageLayout: StoryObj = {
   ...editor(WITH_RULE),
-  name: 'pushing the page aside reserves room in the body and a toggles it back',
+  name: 'a pushes the page aside, reserving room in the body, and toggles it back',
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
 
-    const menu = await openEditorMenu(canvas, 'Options');
-    await user.click(
-      within(menu).getByRole('checkbox', { name: 'Push the page aside' })
-    );
-
+    await pressKey('a');
     await expect(store.state.options.layout.adjustPageLayout).toBe(true);
     await waitFor(() =>
       expect(document.body.style.width).toMatch(/^calc\(100% - \d+px\)$/)
     );
-
-    await pressKey('Escape');
-    await expect(canvas.queryByRole('menu')).toBeNull();
 
     await pressKey('a');
     await expect(store.state.options.layout.adjustPageLayout).toBe(false);
@@ -95,19 +87,20 @@ export const AdjustPageLayout: StoryObj = {
 
 export const AppearanceMenu: StoryObj = {
   ...editor(WITH_RULE),
-  name: 'the appearance menu switches the panel between light, dark and system',
+  name: "the Options menu's Theme row switches the panel between light, dark and system",
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
     const app = canvasElement.querySelector('.stylebot-app') as HTMLElement;
+
+    const menu = await openEditorMenu(canvas, 'Options');
 
     for (const [item, appearance] of [
       ['Dark', 'dark'],
       ['Light', 'light'],
       ['System', 'system'],
     ] as const) {
-      const menu = await openEditorMenu(canvas, 'Panel appearance');
-      await user.click(within(menu).getByRole('menuitem', { name: item }));
+      await user.click(within(menu).getByRole('button', { name: item }));
 
       await expect(store.state.options.appearance).toBe(appearance);
       // System follows the OS, so the provider sets no theme of its own.

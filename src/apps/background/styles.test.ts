@@ -79,7 +79,7 @@ describe('set', () => {
     expect(styles['example.com'].enabled).toBe(true);
   });
 
-  it('keeps Override site styles off when a save leaves the setting out', async () => {
+  it('keeps Use !important off when a save leaves the setting out', async () => {
     (store.styles as Record<string, { forceImportant?: boolean }>)[
       'example.com'
     ].forceImportant = false;

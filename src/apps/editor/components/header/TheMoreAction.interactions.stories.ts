@@ -1,16 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/vue';
-import { expect, waitFor, within } from '@storybook/test';
+import { expect, within } from '@storybook/test';
 
 import TheMoreAction from './TheMoreAction.vue';
 import { editor, WITH_RULE } from '@stylebot/storybook/fixtures/editor';
-import {
-  openEditorMenu,
-  storeOf,
-  user,
-} from '@stylebot/storybook/story-helpers';
+import { openEditorMenu } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
-  title: 'Tests/Editor/Override site styles',
+  title: 'Tests/Editor/Options menu',
   tags: ['test'],
   component: TheMoreAction,
   parameters: { padded: false },
@@ -18,75 +14,35 @@ const meta: Meta = {
 
 export default meta;
 
-const injectedCss = (url: string) =>
-  document.getElementById(`stylebot-css-${url}`)?.textContent ?? '';
-
-const settingRow = (toggle: HTMLElement) =>
-  toggle.closest('.setting-row') as HTMLElement;
-
-const caption = (toggle: HTMLElement) =>
-  settingRow(toggle).querySelector('.setting-copy')?.textContent ?? '';
-
-export const ToggleForceImportant: StoryObj = {
+export const MenuContents: StoryObj = {
   ...editor(WITH_RULE),
-  name: 'turning Override site styles off applies the style as written, and back on forces it',
-  play: async ({ canvasElement, step }) => {
-    const canvas = within(canvasElement);
-    const store = storeOf(canvasElement);
-    const url = store.state.url;
+  name: 'the Options menu offers Position, Theme, Keyboard shortcuts and Options',
+  play: async ({ canvasElement }) => {
+    const menu = within(await openEditorMenu(within(canvasElement), 'Options'));
 
-    await step('the style starts out forced', async () => {
-      await waitFor(() =>
-        expect(injectedCss(url)).toContain('color: #2a5fd6 !important')
-      );
-    });
+    await expect(menu.getByText('Position')).toBeVisible();
+    await expect(menu.getByText('Theme')).toBeVisible();
 
-    await step('switching it off reapplies the css as written', async () => {
-      const menu = await openEditorMenu(canvas, 'Options');
-      const toggle = within(menu).getByRole('checkbox', {
-        name: 'Override site styles',
-      });
+    const positions = [
+      'Dock to Left',
+      'Dock to Right',
+      'Open in separate window',
+    ];
+    const buttons = positions.map(name => menu.getByRole('button', { name }));
+    await expect(
+      buttons.every(
+        (button, index) =>
+          index === 0 ||
+          buttons[index - 1].compareDocumentPosition(button) &
+            Node.DOCUMENT_POSITION_FOLLOWING
+      )
+    ).toBe(true);
 
-      await expect(toggle).toBeChecked();
-      await expect(caption(toggle)).toContain('Every rule gets !important');
-      await expect(
-        within(menu).getByText('!important', { selector: 'code' })
-      ).toBeVisible();
-      await user.click(toggle);
-
-      await expect(store.state.forceImportant).toBe(false);
-      await expect(toggle).not.toBeChecked();
-      await expect(caption(toggle)).toContain('Rules apply as written');
-      await waitFor(() =>
-        expect(injectedCss(url)).toContain('color: #2a5fd6;')
-      );
-      await expect(injectedCss(url)).not.toContain('!important');
-    });
-
-    await step('switching it back on forces it again', async () => {
-      const menu = canvas.getByRole('menu');
-      await user.click(
-        within(menu).getByRole('checkbox', { name: 'Override site styles' })
-      );
-
-      await expect(store.state.forceImportant).toBe(true);
-      await waitFor(() =>
-        expect(injectedCss(url)).toContain('color: #2a5fd6 !important')
-      );
-    });
-
-    await step('the row itself toggles, not just the switch', async () => {
-      const menu = canvas.getByRole('menu');
-      const toggle = within(menu).getByRole('checkbox', {
-        name: 'Override site styles',
-      });
-
-      await user.click(
-        settingRow(toggle).querySelector('.setting-copy') as HTMLElement
-      );
-
-      await expect(store.state.forceImportant).toBe(false);
-      await waitFor(() => expect(injectedCss(url)).not.toContain('!important'));
-    });
+    const items = menu.getAllByRole('menuitem');
+    await expect(items.map(item => item.textContent?.trim())).toEqual([
+      expect.stringMatching(/^Keyboard shortcuts/),
+      'Options',
+    ]);
+    await expect(menu.queryByRole('checkbox')).toBeNull();
   },
 };

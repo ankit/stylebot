@@ -92,7 +92,7 @@ every transform untouched. Stylebot treats nested rules as opaque:
 Styles are stored exactly as the user wrote them. The CSS that reaches the
 page is prepared from them separately: parsed once, its `@import`s stripped
 and its declarations marked important in the same pass. That happens for
-every style unless the user turned off Override site styles for it, and CSS
+every style unless the user turned off Use !important for it, and CSS
 fetched through an `@import` is never forced.
 
 The background prepares every style when it's saved and keeps the result

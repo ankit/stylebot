@@ -76,7 +76,7 @@ test('injects native CSS nesting intact, with !important reaching nested rules a
   await expect(page.locator('p')).toHaveCSS('color', 'rgb(0, 128, 0)');
 });
 
-test('applies a style with Override site styles off exactly as written, on first and repeat visits', async ({
+test('applies a style with Use !important off exactly as written, on first and repeat visits', async ({
   context,
   extension,
 }) => {

@@ -1,6 +1,5 @@
 <template>
   <div class="window-actions">
-    <the-appearance-action />
     <the-more-action />
     <the-close-action />
   </div>
@@ -9,7 +8,6 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import TheAppearanceAction from './TheAppearanceAction.vue';
 import TheMoreAction from './TheMoreAction.vue';
 import TheCloseAction from './TheCloseAction.vue';
 
@@ -17,7 +15,6 @@ export default Vue.extend({
   name: 'TheWindowActions',
 
   components: {
-    TheAppearanceAction,
     TheMoreAction,
     TheCloseAction,
   },

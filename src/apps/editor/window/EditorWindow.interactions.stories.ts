@@ -79,15 +79,6 @@ export const DockBackFromWindow: StoryObj = {
     const openInPage = spyOn(getPageBridge(), 'openInPage');
 
     const menu = await openEditorMenu(canvas, 'Options');
-    // Pushing the page aside only makes sense in the page; forcing
-    // !important is a setting of the style, so the window offers it too.
-    await expect(
-      within(menu).queryByRole('checkbox', { name: 'Push the page aside' })
-    ).toBeNull();
-    await expect(
-      within(menu).getByRole('checkbox', { name: 'Override site styles' })
-    ).toBeChecked();
-
     await user.click(
       within(menu).getByRole('button', { name: 'Dock to Left' })
     );

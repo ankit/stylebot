@@ -181,7 +181,7 @@ export default Vue.extend({
   gap: 2px;
   padding: 2px;
   border-radius: 7px;
-  background: var(--field-surface);
+  background: color-mix(in srgb, var(--text-primary) 6%, transparent);
 
   &.fit .segment {
     flex: none;

@@ -9,11 +9,10 @@
     <template #default="{ close }">
       <s-menu dense class="more-menu">
         <div class="dock-row">
-          <s-text>{{ t('dock_side') }}</s-text>
+          <s-text>{{ t('position') }}</s-text>
 
           <s-segmented-control
             fit
-            class="dock-toggle"
             :value="layout.dockLocation"
             :options="dockOptions"
             @change="
@@ -22,56 +21,25 @@
             "
           >
             <template #option="{ option }">
-              <component :is="option.icon" :size="16" />
+              <component :is="option.icon" :size="14" />
             </template>
           </s-segmented-control>
         </div>
 
-        <s-toggle-switch
-          v-if="host === 'page'"
-          class="setting-row"
-          :value="adjustPageLayout"
-          size="sm"
-          :aria-label="t('adjust_page_layout')"
-          @change="toggleAdjustPageLayout"
-        >
-          <span class="setting-copy">
-            <s-text>
-              {{ t('adjust_page_layout') }}
-            </s-text>
-            <s-text size="caption" variant="muted">
-              {{ t('adjust_page_layout_description') }}
-            </s-text>
-          </span>
-        </s-toggle-switch>
+        <div class="dock-row">
+          <s-text>{{ t('theme') }}</s-text>
 
-        <s-toggle-switch
-          class="setting-row"
-          :value="forceImportant"
-          size="sm"
-          :aria-label="t('override_site_styles')"
-          @change="setForceImportant"
-        >
-          <span class="setting-copy">
-            <s-text>
-              {{ t('override_site_styles') }}
-            </s-text>
-            <s-text v-if="forceImportant" size="caption" variant="muted">
-              <template v-for="(part, index) in overrideOnDescription">
-                <code
-                  v-if="part.code"
-                  :key="index"
-                  class="important-keyword"
-                  v-text="part.text"
-                />
-                <span v-else :key="index" v-text="part.text" />
-              </template>
-            </s-text>
-            <s-text v-else size="caption" variant="muted">
-              {{ t('override_site_styles_off_description') }}
-            </s-text>
-          </span>
-        </s-toggle-switch>
+          <s-segmented-control
+            fit
+            :value="appearance"
+            :options="appearanceOptions"
+            @change="setAppearance"
+          >
+            <template #option="{ option }">
+              <component :is="option.icon" :size="14" />
+            </template>
+          </s-segmented-control>
+        </div>
 
         <s-menu-divider class="more-menu-divider" />
 
@@ -94,8 +62,8 @@
           "
         >
           <span class="menu-item-row">
-            <span>{{ t('view_all_styles_and_settings') }}</span>
-            <external-link-icon />
+            <span>{{ t('view_options') }}</span>
+            <arrow-up-right-icon :size="12" class="menu-item-hint-icon" />
           </span>
         </s-menu-item>
       </s-menu>
@@ -111,25 +79,27 @@ import {
   SMenuItem,
   SMenuDivider,
   SIconButton,
-  SToggleSwitch,
   SSegmentedControl,
   SText,
 } from '@stylebot/components';
 import {
+  ArrowUpRightIcon,
   MoreIcon,
-  ExternalLinkIcon,
   DockLeftIcon,
   DockRightIcon,
   UndockIcon,
+  SunIcon,
+  MoonIcon,
+  MonitorIcon,
 } from '@stylebot/icons';
 
-import type { StylebotEditorCommands, StylebotLayout } from '@stylebot/types';
+import type {
+  StylebotAppearance,
+  StylebotEditorCommands,
+  StylebotLayout,
+} from '@stylebot/types';
 
 import { openOptionsPage } from '@stylebot/utils';
-
-// Stands in for `!important` in the translated caption, which is split around
-// it so the keyword can be set as code without any stray whitespace.
-const IMPORTANT_MARKER = '\uE000';
 
 export default Vue.extend({
   name: 'TheMoreAction',
@@ -140,21 +110,19 @@ export default Vue.extend({
     SMenuItem,
     SMenuDivider,
     SIconButton,
-    SToggleSwitch,
     SSegmentedControl,
     SText,
+    ArrowUpRightIcon,
     MoreIcon,
-    ExternalLinkIcon,
     DockLeftIcon,
     DockRightIcon,
     UndockIcon,
+    SunIcon,
+    MoonIcon,
+    MonitorIcon,
   },
 
   computed: {
-    host(): string {
-      return this.$store.state.host;
-    },
-
     layout(): StylebotLayout {
       return this.$store.state.options.layout;
     },
@@ -171,12 +139,6 @@ export default Vue.extend({
     }> {
       return [
         {
-          value: 'window',
-          icon: 'undock-icon',
-          title: this.t('open_in_separate_window'),
-          shortcut: this.editorCommands.dockWindow,
-        },
-        {
           value: 'left',
           icon: 'dock-left-icon',
           title: this.t('dock_to_left'),
@@ -188,27 +150,40 @@ export default Vue.extend({
           title: this.t('dock_to_right'),
           shortcut: this.editorCommands.dockRight,
         },
+        {
+          value: 'window',
+          icon: 'undock-icon',
+          title: this.t('open_in_separate_window'),
+          shortcut: this.editorCommands.dockWindow,
+        },
       ];
     },
 
-    adjustPageLayout(): boolean {
-      return this.layout.adjustPageLayout;
+    appearance(): StylebotAppearance {
+      return this.$store.state.options.appearance;
     },
 
-    forceImportant(): boolean {
-      return this.$store.state.forceImportant;
-    },
-
-    overrideOnDescription(): Array<{ text: string; code: boolean }> {
-      const [before, after = ''] = this.t(
-        'override_site_styles_on_description',
-        [IMPORTANT_MARKER]
-      ).split(IMPORTANT_MARKER);
-
+    appearanceOptions(): Array<{
+      value: StylebotAppearance;
+      icon: string;
+      title: string;
+    }> {
       return [
-        { text: before, code: false },
-        { text: '!important', code: true },
-        { text: after, code: false },
+        {
+          value: 'system',
+          icon: 'monitor-icon',
+          title: this.t('appearance_system'),
+        },
+        {
+          value: 'light',
+          icon: 'sun-icon',
+          title: this.t('appearance_light'),
+        },
+        {
+          value: 'dark',
+          icon: 'moon-icon',
+          title: this.t('appearance_dark'),
+        },
       ];
     },
   },
@@ -218,15 +193,8 @@ export default Vue.extend({
       this.$store.dispatch('setDockLocation', dockLocation);
     },
 
-    toggleAdjustPageLayout(): void {
-      this.$store.dispatch('setLayout', {
-        ...this.layout,
-        adjustPageLayout: !this.adjustPageLayout,
-      });
-    },
-
-    setForceImportant(value: boolean): void {
-      this.$store.dispatch('setForceImportant', value);
+    setAppearance(appearance: StylebotAppearance): void {
+      this.$store.dispatch('setAppearance', appearance);
     },
 
     keyboardShortcuts(): void {
@@ -242,59 +210,30 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .more-menu {
-  width: 270px;
-  --menu-padding: 10px;
-  padding: 8px var(--menu-padding) !important;
-  gap: 0 !important;
+  width: 200px;
+  --menu-padding: 8px;
+  padding: 8px !important;
+  gap: 2px !important;
+}
+
+.more-menu .text,
+.more-menu .menu-item {
+  color: var(--text-body);
 }
 
 .dock-row {
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 4px 8px;
-}
-
-.dock-toggle ::v-deep .segment {
-  padding: 4px 8px;
-
-  &.active svg {
-    stroke-width: 1.5;
-  }
-}
-
-.setting-row {
-  box-sizing: border-box;
   width: 100%;
-  align-items: flex-start;
-  gap: 10px;
-  margin: 16px 0 6px;
+  min-height: 34px;
   padding: 0 8px;
-
-  ::v-deep .label {
-    order: 1;
-  }
-
-  ::v-deep .track {
-    order: 2;
-    margin-top: 2px;
-  }
-}
-
-.important-keyword {
-  font-family: var(--font-mono);
-}
-
-.setting-copy {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
 }
 
 .more-menu .more-menu-divider {
-  margin: 10px -10px;
+  margin: 6px 8px;
 }
 
 .menu-item-row {
@@ -309,5 +248,17 @@ export default Vue.extend({
   font-family: var(--font-mono);
   font-size: 12px;
   color: var(--text-muted);
+}
+
+.menu-item-hint-icon {
+  flex: none;
+  color: var(--text-muted);
+}
+
+.more-menu .menu-item {
+  margin: 0;
+  min-height: 34px;
+  padding: 0 8px;
+  border-radius: 8px;
 }
 </style>

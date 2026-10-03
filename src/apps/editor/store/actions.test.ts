@@ -231,7 +231,7 @@ describe('actions', () => {
       expect(chromeUtils.setStyle).toBeCalledWith(state.url, '', false, true);
     });
 
-    it('applies and persists a style with Override site styles off', () => {
+    it('applies and persists a style with Use !important off', () => {
       const state = { ...mockState, forceImportant: false };
       jest.spyOn(stylebotCss, 'removeEmptyRules').mockReturnValue('clean');
 
@@ -753,7 +753,7 @@ describe('actions', () => {
       });
     });
 
-    it('previews unforced when the style has Override site styles off', async () => {
+    it('previews unforced when the style has Use !important off', async () => {
       await actions.previewFontFamily(
         { state: { ...state, forceImportant: false } },
         'Some Local'
