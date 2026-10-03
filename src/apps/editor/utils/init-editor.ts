@@ -38,45 +38,28 @@ const mountEditor = (store: Store<State>, el: Element): Vue => {
   });
 };
 
-// Geist Mono and Literata are variable fonts: one file covers every weight.
-const SELF_HOSTED_FONTS = [
-  { family: 'Geist Mono', file: 'geist-mono', weight: '100 900' },
-  { family: 'Literata', file: 'literata', weight: '200 900' },
-  ...[400, 500, 600, 700].map(weight => ({
-    family: 'Geist',
-    file: `geist-${weight}`,
-    weight: String(weight),
-  })),
-];
-
-const fontFaceCss = (): string =>
-  SELF_HOSTED_FONTS.map(
-    ({ family, file, weight }) => `
-      @font-face {
-        font-family: '${family}';
-        font-style: normal;
-        font-weight: ${weight};
-        font-display: swap;
-        src: url('${chrome.runtime.getURL(
-          `fonts/${file}.woff2`
-        )}') format('woff2');
-      }
-    `
-  ).join('');
-
 /**
  * Registers the editor's fonts on the page's document, since browsers
- * ignore font-face rules inside a shadow root.
+ * ignore font-face rules inside a shadow root. Reads the same fonts.css the
+ * extension pages use, pointing its files at the extension.
  */
-const injectFontFaces = (): void => {
+const injectFontFaces = async (): Promise<void> => {
   if (document.getElementById('stylebot-editor-fonts')) {
     return;
   }
 
   const styleEl = document.createElement('style');
   styleEl.setAttribute('id', 'stylebot-editor-fonts');
-  styleEl.textContent = fontFaceCss();
   (document.head || document.documentElement).appendChild(styleEl);
+
+  const css = await fetch(chrome.runtime.getURL('fonts/fonts.css')).then(
+    response => response.text()
+  );
+
+  styleEl.textContent = css.replace(
+    /url\('([^']+)'\)/g,
+    (_, file: string) => `url('${chrome.runtime.getURL(`fonts/${file}`)}')`
+  );
 };
 
 let editorCss: Promise<string> | null = null;
@@ -142,7 +125,7 @@ const initEditor = (store: Store<State>): void => {
   stylebotApp.id = 'stylebot-app';
   shadowRoot.appendChild(stylebotApp);
 
-  injectFontFaces();
+  injectFontFaces().catch(() => {});
 
   // Wait for the stylesheet to land before mounting — otherwise Vue's
   // synchronous mount renders the unstyled markup first, causing a
