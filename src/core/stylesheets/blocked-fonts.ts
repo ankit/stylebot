@@ -5,13 +5,13 @@ import type {
 
 const GOOGLE_FONT_FILE = /^https:\/\/fonts\.gstatic\.com\//;
 
-const DESCRIPTORS: Array<[keyof FontFaceDescriptors, string]> = [
-  ['style', 'font-style'],
-  ['weight', 'font-weight'],
-  ['stretch', 'font-stretch'],
-  ['unicodeRange', 'unicode-range'],
-  ['display', 'font-display'],
-];
+const DESCRIPTORS: Record<string, string> = {
+  style: 'font-style',
+  weight: 'font-weight',
+  stretch: 'font-stretch',
+  unicodeRange: 'unicode-range',
+  display: 'font-display',
+};
 
 const handledUrls = new Set<string>();
 let watching = false;
@@ -42,21 +42,20 @@ const getFontFaceRules = (url: string): Array<CSSFontFaceRule> => {
   return rules;
 };
 
+// Index access rather than destructuring, which compiles to an ES5 helper.
 const getDescriptors = (rule: CSSFontFaceRule): FontFaceDescriptors =>
   Object.fromEntries(
-    DESCRIPTORS.map(([key, property]) => [
-      key,
-      rule.style.getPropertyValue(property),
-    ])
+    Object.entries(DESCRIPTORS)
+      .map(entry => [entry[0], rule.style.getPropertyValue(entry[1])])
       // An empty descriptor is a syntax error that fails the whole face.
-      .filter(([, value]) => value)
+      .filter(entry => entry[1])
   );
 
 /**
  * Registers a blocked font file from its bytes, fetched by the background,
  * since a FontFace built from data makes no request for the page CSP to block.
  */
-const loadBlockedFont = async (url: string): Promise<void> => {
+const loadBlockedFont = (url: string): void => {
   const rules = getFontFaceRules(url);
 
   if (rules.length === 0) {
@@ -64,21 +63,25 @@ const loadBlockedFont = async (url: string): Promise<void> => {
   }
 
   const message: GetGoogleFontFile = { name: 'GetGoogleFontFile', url };
-  const data = await chrome.runtime
+
+  // Promise chain rather than async, which would pull the ES5 async helpers
+  // into every content script.
+  chrome.runtime
     .sendMessage<GetGoogleFontFile, GetGoogleFontFileResponse>(message)
-    .catch(() => '');
+    .catch(() => '')
+    .then(data => {
+      if (!data) {
+        handledUrls.delete(url);
+        return;
+      }
 
-  if (!data) {
-    handledUrls.delete(url);
-    return;
-  }
+      const bytes = Uint8Array.from(atob(data), char => char.charCodeAt(0));
 
-  const bytes = Uint8Array.from(atob(data), char => char.charCodeAt(0));
-
-  rules.forEach(rule => {
-    const family = unquote(rule.style.getPropertyValue('font-family'));
-    document.fonts.add(new FontFace(family, bytes, getDescriptors(rule)));
-  });
+      rules.forEach(rule => {
+        const family = unquote(rule.style.getPropertyValue('font-family'));
+        document.fonts.add(new FontFace(family, bytes, getDescriptors(rule)));
+      });
+    });
 };
 
 /**
