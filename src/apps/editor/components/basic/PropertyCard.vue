@@ -179,7 +179,8 @@ export default Vue.extend({
 .property-card-body {
   min-height: 0;
   min-width: 0;
-  padding: 0 0 12px;
+  margin: 0 -8px;
+  padding: 0 8px 12px;
   opacity: 1;
   transition: opacity 0.16s ease 0.08s;
 
