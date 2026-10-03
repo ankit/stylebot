@@ -130,7 +130,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 0 2px 0 6px;
+  padding: 0 2px 0 10px;
 }
 
 .demo-ed-card {
@@ -393,6 +393,16 @@
   background: var(--ink);
   color: var(--surface);
   transition: background 0.15s;
+}
+
+.demo-shortcut {
+  font:
+    500 12px/1 -apple-system,
+    BlinkMacSystemFont,
+    system-ui,
+    sans-serif;
+  letter-spacing: 0.06em;
+  color: var(--muted);
 }
 
 .demo-caption {

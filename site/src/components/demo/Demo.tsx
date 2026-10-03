@@ -31,6 +31,7 @@ type State = DemoState & {
   ry: number;
   speed: number;
   dark: boolean;
+  mac: boolean;
   scale: number;
   stageHeight: number;
 };
@@ -173,6 +174,7 @@ export default class Demo extends Component<Props, State> {
     ry: 0,
     speed: 1,
     dark: false,
+    mac: false,
     scale: 1,
     stageHeight: 0,
   };
@@ -192,6 +194,7 @@ export default class Demo extends Component<Props, State> {
   };
 
   componentDidMount() {
+    this.setState({ mac: /mac/i.test(navigator.platform) });
     this.onTheme();
     window.addEventListener('themechange', this.onTheme);
     this.fit();
@@ -732,9 +735,6 @@ export default class Demo extends Component<Props, State> {
               <span style="flex:1;font:400 13.5px/1.2 var(--ui);color:var(--ink)">
                 Readability
               </span>
-              <span style="font:500 11.5px/1 var(--mono);color:var(--muted)">
-                ⌥R
-              </span>
             </div>
             <div style="display:flex;gap:8px;padding:10px 12px 12px">
               <span
@@ -745,8 +745,8 @@ export default class Demo extends Component<Props, State> {
                 }
               >
                 <span style="flex:1;text-align:center">Style this page</span>
-                <span style="font:500 11.5px/1 var(--mono);color:var(--muted)">
-                  ⌥⇧M
+                <span class="demo-shortcut">
+                  {S.mac ? '⌥⇧M' : 'Alt+Shift+M'}
                 </span>
               </span>
               <span style="width:40px;height:38px;border-radius:8px;border:1px solid var(--strong);display:flex;align-items:center;justify-content:center;color:var(--muted)">
@@ -915,7 +915,7 @@ export default class Demo extends Component<Props, State> {
                   </span>
                 </div>
                 <div class="demo-ed-card">
-                  <div style="flex:none;height:48px;display:flex;align-items:center;gap:8px;padding:4px 8px 0 16px">
+                  <div style="flex:none;height:48px;display:flex;align-items:center;gap:8px;padding:4px 6px 0 10px">
                     <span style="font:400 13.5px/1 var(--ui);color:var(--ink);white-space:nowrap">
                       harbourpost.example
                     </span>
@@ -1004,7 +1004,7 @@ export default class Demo extends Component<Props, State> {
                     </span>
                   </div>
 
-                  <div style="flex:none;padding:6px 14px 0;display:flex;gap:8px;align-items:center">
+                  <div style="flex:none;padding:6px 10px 0;display:flex;gap:8px;align-items:center">
                     <span
                       data-t="picker"
                       class="demo-picker"
@@ -1052,7 +1052,7 @@ export default class Demo extends Component<Props, State> {
                     </div>
                   </div>
 
-                  <div style="flex:none;display:flex;align-items:flex-end;gap:22px;padding:16px 16px 0;border-bottom:1px solid var(--border)">
+                  <div style="flex:none;display:flex;align-items:flex-end;gap:22px;padding:16px 10px 0;border-bottom:1px solid var(--border)">
                     <span data-t="tab-basic" style={tab('basic')}>
                       Basic
                     </span>
@@ -1086,7 +1086,7 @@ export default class Demo extends Component<Props, State> {
 
                   <div style="flex:1;min-height:0;overflow:hidden;background:var(--fill)">
                     {S.tab === 'basic' && (
-                      <div style="padding:10px 12px 16px;display:flex;flex-direction:column;gap:8px">
+                      <div style="padding:10px 6px 16px;display:flex;flex-direction:column;gap:8px">
                         <div style="display:flex;justify-content:flex-end;gap:6px">
                           <span
                             class="demo-small-btn"
@@ -1235,7 +1235,7 @@ export default class Demo extends Component<Props, State> {
                       >
                         <div
                           style={
-                            'padding:12px 14px 40px;transition:transform 1.6s cubic-bezier(.4,0,.2,1);transform:translateY(' +
+                            'padding:12px 10px 40px;transition:transform 1.6s cubic-bezier(.4,0,.2,1);transform:translateY(' +
                             (S.codeScroll
                               ? -Math.max(0, codeLines.length * 21 - 8)
                               : 0) +
@@ -1244,7 +1244,9 @@ export default class Demo extends Component<Props, State> {
                         >
                           {this.renderLines(codeLines)}
                           {ag && (
-                            <div style="margin:12px -14px 0;padding:6px 14px 8px 12px;border-left:2px solid #1f8a4c;background:rgba(31,138,76,.07)">
+                            <div
+                              style={`margin:${codeLines.length ? 12 : 0}px -10px 0;padding:6px 10px 8px 8px;border-left:2px solid #1f8a4c;background:rgba(31,138,76,.07)`}
+                            >
                               <div style="font:400 12px/1.75 var(--mono);color:var(--ccom)">
                                 /* Everforest · added by Stylebot agent */
                               </div>
@@ -1256,7 +1258,7 @@ export default class Demo extends Component<Props, State> {
                     )}
 
                     {needsKey && (
-                      <div style="height:100%;background:var(--surface);padding:18px 16px;display:flex;flex-direction:column;gap:14px">
+                      <div style="height:100%;background:var(--surface);padding:18px 10px;display:flex;flex-direction:column;gap:14px">
                         <div>
                           <div style="font:600 14px/1.3 var(--ui);color:var(--ink)">
                             Set up the Stylebot agent
@@ -1311,7 +1313,7 @@ export default class Demo extends Component<Props, State> {
 
                     {isChat && (
                       <div style="height:100%;display:flex;flex-direction:column;background:var(--surface)">
-                        <div style="flex:1;min-height:0;padding:16px;display:flex;flex-direction:column;justify-content:flex-end;gap:12px">
+                        <div style="flex:1;min-height:0;padding:16px 10px;display:flex;flex-direction:column;justify-content:flex-end;gap:12px">
                           {S.chatSent && (
                             <div class="demo-sent">
                               <span>article h1</span>
@@ -1344,7 +1346,7 @@ export default class Demo extends Component<Props, State> {
                             </>
                           )}
                         </div>
-                        <div style="flex:none;padding:0 12px 12px">
+                        <div style="flex:none;padding:0 6px 6px">
                           <div
                             data-t="chat-input"
                             class="demo-composer"
@@ -1425,7 +1427,7 @@ export default class Demo extends Component<Props, State> {
                     )}
 
                     {S.tab === 'presets' && (
-                      <div style="padding:12px;display:flex;flex-direction:column;gap:10px">
+                      <div style="padding:10px 6px;display:flex;flex-direction:column;gap:10px">
                         <div class="demo-card" style="padding:14px 16px">
                           <div style="display:flex;align-items:center;gap:12px">
                             <span style="font:600 14px/1.2 var(--ui);color:var(--ink)">
@@ -1482,7 +1484,7 @@ export default class Demo extends Component<Props, State> {
                 : 'opacity:0;transform:translate(-50%,8px);pointer-events:none'
             }
           >
-            <span style={keyCap}>alt</span>
+            <span style={keyCap}>{S.mac ? 'option' : 'alt'}</span>
             <span class="demo-plus">+</span>
             <span style={keyCap}>shift</span>
             <span class="demo-plus">+</span>
