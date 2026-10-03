@@ -2,6 +2,7 @@
   <div v-if="optionsLoaded" class="basics-tab">
     <s-heading as="h1" size="xl">{{ t('basics_options') }}</s-heading>
 
+    <the-theme />
     <the-context-menu />
 
     <div class="section">
@@ -14,6 +15,7 @@
 import Vue from 'vue';
 
 import { SHeading } from '@stylebot/components';
+import TheTheme from './basics/TheTheme.vue';
 import TheContextMenu from './basics/TheContextMenu.vue';
 import TheKeyboardShortcuts from './basics/TheKeyboardShortcuts.vue';
 
@@ -22,6 +24,7 @@ export default Vue.extend({
 
   components: {
     SHeading,
+    TheTheme,
     TheContextMenu,
     TheKeyboardShortcuts,
   },
