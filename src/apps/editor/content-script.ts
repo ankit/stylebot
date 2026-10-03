@@ -107,6 +107,12 @@ chrome.runtime.onMessage.addListener(
     }
 
     if (isEditorLoading() || EDITOR_MESSAGES.includes(message.name)) {
+      // The editor restyles the page itself, but the next load paints first
+      // from the cache, which only the saved-styles path keeps current.
+      if (message.name === 'ApplyStylesToTab') {
+        reapplySavedStyles();
+      }
+
       forwardToEditor(editor => editor.handleMessage(message, sendResponse));
       return message.name === 'GetIsStylebotOpen';
     }
