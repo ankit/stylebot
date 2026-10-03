@@ -7,6 +7,7 @@ import * as postcss from 'postcss';
 import { defaultCommands } from '@stylebot/settings';
 import type {
   StyleMap,
+  StyleWithoutUrl,
   StylebotOptions,
   StylebotCommands,
   SyncState,
@@ -21,6 +22,13 @@ import {
   dismissSyncConflict,
 } from '@stylebot/sync';
 import { getCurrentTimestamp } from '@stylebot/utils';
+import {
+  activateProfile,
+  addProfile,
+  removeProfile,
+  renameProfile,
+  setProfileCss,
+} from '@stylebot/saved-styles';
 
 import {
   getAllStyles,
@@ -52,6 +60,29 @@ type State = {
 
   syncInProgress: boolean;
   syncStatus: SyncStatus;
+};
+
+/**
+ * Applies an edit to one stored style and saves every style, stamping the
+ * edited one. Does nothing when the style is missing or the edit is a no-op.
+ */
+const updateStyle = (
+  state: State,
+  url: string,
+  edit: (style: StyleWithoutUrl) => StyleWithoutUrl
+) => {
+  const style = state.styles[url];
+  const edited = style && edit(style);
+
+  if (!edited || edited === style) {
+    return;
+  }
+
+  state.styles = {
+    ...state.styles,
+    [url]: { ...edited, modifiedTime: getCurrentTimestamp() },
+  };
+  setAllStyles(state.styles);
 };
 
 /**
@@ -121,26 +152,36 @@ export const createStore = (): Store<State> => {
         setAllStyles(styles);
       },
 
+      /**
+       * Saves edited css for any of a style's profiles, keyed by profile id,
+       * moving the style when its url changed.
+       */
       saveStyle(
         { state },
         {
           initialUrl,
           url,
-          css,
-        }: { initialUrl?: string; url: string; css: string }
+          drafts,
+        }: { initialUrl?: string; url: string; drafts: Record<string, string> }
       ) {
         try {
           // validate by parsing
-          postcss.parse(css);
+          Object.values(drafts).forEach(css => postcss.parse(css));
           const styles = { ...state.styles };
 
           const existing = styles[initialUrl || url] ?? styles[url];
-
-          styles[url] = {
-            ...(existing ?? { readability: false, enabled: true }),
-            css,
-            modifiedTime: getCurrentTimestamp(),
+          let style: StyleWithoutUrl = existing ?? {
+            css: '',
+            readability: false,
+            enabled: true,
+            modifiedTime: '',
           };
+
+          for (const [id, css] of Object.entries(drafts)) {
+            style = setProfileCss(style, id, css);
+          }
+
+          styles[url] = { ...style, modifiedTime: getCurrentTimestamp() };
 
           if (initialUrl && initialUrl !== url) {
             delete styles[initialUrl];
@@ -151,6 +192,35 @@ export const createStore = (): Store<State> => {
         } catch {
           // todo
         }
+      },
+
+      createProfile(
+        { state },
+        {
+          url,
+          id,
+          name,
+          css,
+        }: { url: string; id: string; name: string; css: string }
+      ) {
+        updateStyle(state, url, style =>
+          addProfile(style, { id, name, css, activate: false })
+        );
+      },
+
+      renameProfile(
+        { state },
+        { url, id, name }: { url: string; id: string; name: string }
+      ) {
+        updateStyle(state, url, style => renameProfile(style, id, name));
+      },
+
+      deleteProfile({ state }, { url, id }: { url: string; id: string }) {
+        updateStyle(state, url, style => removeProfile(style, id));
+      },
+
+      setActiveProfile({ state }, { url, id }: { url: string; id: string }) {
+        updateStyle(state, url, style => activateProfile(style, id));
       },
 
       deleteStyle({ state }, url: string) {

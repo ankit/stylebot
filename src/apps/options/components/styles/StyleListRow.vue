@@ -1,36 +1,58 @@
 <template>
-  <div class="row">
-    <s-toggle-switch class="row-toggle" :value="enabled" @change="onToggle">
-      <div class="domain" :class="{ disabled: !enabled }">{{ url }}</div>
-    </s-toggle-switch>
+  <div
+    class="row"
+    role="link"
+    tabindex="0"
+    @click="$emit('edit', url)"
+    @keydown.enter.self="$emit('edit', url)"
+  >
+    <span class="toggle" @click.stop>
+      <s-toggle-switch :value="enabled" @change="onToggle">
+        <span class="toggle-label">{{ url }}</span>
+      </s-toggle-switch>
+    </span>
 
-    <s-text variant="muted" class="timestamp">
+    <s-text
+      as="span"
+      size="label"
+      class="domain"
+      :variant="enabled ? 'default' : 'muted'"
+    >
+      {{ url }}
+    </s-text>
+
+    <s-text as="span" variant="muted" class="meta">
+      <template v-if="profileCount > 1">
+        {{ t('profile_count', [String(profileCount)]) }}
+      </template>
+    </s-text>
+
+    <s-text as="span" variant="muted" class="meta timestamp">
       {{ formattedTimestamp }}
     </s-text>
 
-    <s-button variant="ghost" @click="$emit('edit', url)">
-      {{ t('edit') }}
-    </s-button>
+    <span class="actions" @click.stop>
+      <style-row-menu
+        :url="url"
+        :size="28"
+        @open-site="openSite"
+        @copy-css="copyCss"
+        @delete="showDeleteConfirm = true"
+      />
+    </span>
 
-    <style-row-menu
-      :url="url"
-      :size="32"
-      @open-site="openSite"
-      @copy-css="copyCss"
-      @delete="showDeleteConfirm = true"
-    />
-
-    <s-confirm-dialog
-      v-if="showDeleteConfirm"
-      :title="`Delete style for ${url}`"
-      :message="t('delete_style_warning')"
-      :confirm-label="t('delete')"
-      @cancel="showDeleteConfirm = false"
-      @confirm="
-        showDeleteConfirm = false;
-        $emit('delete');
-      "
-    />
+    <span v-if="showDeleteConfirm" @click.stop>
+      <s-confirm-dialog
+        :title="t('delete_style_for_url', [url])"
+        :message="t('delete_style_warning')"
+        :confirm-label="t('delete')"
+        @cancel="showDeleteConfirm = false"
+        @confirm="
+          showDeleteConfirm = false;
+          $emit('delete');
+        "
+      />
+    </span>
   </div>
 </template>
 
@@ -38,12 +60,7 @@
 import Vue from 'vue';
 import { formatDistanceToNow } from 'date-fns';
 
-import {
-  SToggleSwitch,
-  SText,
-  SButton,
-  SConfirmDialog,
-} from '@stylebot/components';
+import { SToggleSwitch, SConfirmDialog, SText } from '@stylebot/components';
 import StyleRowMenu from './StyleRowMenu.vue';
 
 export default Vue.extend({
@@ -51,9 +68,8 @@ export default Vue.extend({
 
   components: {
     SToggleSwitch,
-    SText,
-    SButton,
     SConfirmDialog,
+    SText,
     StyleRowMenu,
   },
 
@@ -76,6 +92,11 @@ export default Vue.extend({
     enabled: {
       type: Boolean,
       required: true,
+    },
+
+    profileCount: {
+      type: Number,
+      default: 1,
     },
   },
 
@@ -111,33 +132,51 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .row {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto 28px;
   align-items: center;
-  gap: 14px;
-  padding: 13px 18px;
-  border-bottom: 1px solid var(--panel-border);
+  gap: 16px;
+  height: 44px;
+  padding: 0 6px 0 12px;
+  border-radius: 8px;
+  outline: none;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    background: var(--hover-tint);
+  }
+
+  @include focus-ring;
 }
 
-.switch.row-toggle {
-  flex: 1;
-  min-width: 0;
-  width: auto;
+.toggle {
+  display: flex;
+}
+
+.toggle-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 
 .domain {
   @include truncate;
+}
 
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 1.3;
-  color: var(--text-primary);
-
-  &.disabled {
-    color: var(--text-muted);
-  }
+.meta {
+  white-space: nowrap;
 }
 
 .timestamp {
-  flex: none;
+  min-width: 92px;
+  text-align: right;
+}
+
+.actions {
+  display: flex;
 }
 </style>
