@@ -16,19 +16,25 @@
       @leave="submit"
       @cancel="cancel"
     >
+      <template #chips="{ parts }">
+        <s-inline-list :parts="parts" />
+      </template>
+
       <template #item="{ item, select }">
         <s-menu-item
           class="font-row"
-          :class="{ 'font-link': item.kind === 'link' }"
-          :selected="item.kind !== 'link' && item.value === value"
+          :selected="item.value === value"
           @click="select"
           @mouseenter.native="preview(item)"
           @focus.native="preview(item)"
         >
-          <span class="font-row-label">{{ label(item) }}</span>
-          <external-link-icon v-if="item.kind === 'link'" />
-          <span v-else-if="item.category" class="font-row-category">
-            {{ item.category }}
+          <span class="font-row-label">
+            <span
+              v-for="(part, index) in labelParts(item)"
+              :key="index"
+              :class="{ 'font-row-match': part.match }"
+              v-text="part.text"
+            />
           </span>
         </s-menu-item>
       </template>
@@ -39,8 +45,7 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { SAutocomplete, SMenuItem } from '@stylebot/components';
-import { ExternalLinkIcon } from '@stylebot/icons';
+import { SAutocomplete, SInlineList, SMenuItem } from '@stylebot/components';
 import {
   getDeclarationValue,
   getPrimaryFontFamily,
@@ -56,12 +61,10 @@ import {
 } from '@stylebot/google-fonts';
 
 import PropertyRow from '../basic/PropertyRow.vue';
-import { openGoogleFontsPage } from '../../utils/chrome';
 import { computedFontPlaceholder } from '../../utils/computed-placeholder';
 
-type Row = FontSuggestion | { kind: 'link'; value: '' };
+type Row = FontSuggestion;
 
-const BROWSE_ROW: Row = { kind: 'link', value: '' };
 const PREVIEW_DELAY = 150;
 
 export default Vue.extend({
@@ -69,8 +72,8 @@ export default Vue.extend({
 
   components: {
     SAutocomplete,
+    SInlineList,
     SMenuItem,
-    ExternalLinkIcon,
     PropertyRow,
   },
 
@@ -112,16 +115,23 @@ export default Vue.extend({
       return family || this.t('default');
     },
 
+    // The family being typed, which matching rows show in bold.
+    query(): string {
+      if (this.draft === this.value) {
+        return '';
+      }
+
+      return this.draft.split(',').pop()?.trim().toLowerCase() ?? '';
+    },
+
     rows(): Array<Row> {
-      const suggestions = suggestFonts(
+      return suggestFonts(
         this.draft,
         this.value,
         this.$store.state.options.fonts,
         this.googleFonts,
         this.t('default')
       );
-
-      return [...suggestions, BROWSE_ROW];
     },
   },
 
@@ -147,14 +157,31 @@ export default Vue.extend({
   methods: {
     unquoteFamily,
 
+    labelParts(row: Row): Array<{ text: string; match: boolean }> {
+      const text = this.label(row);
+      const start =
+        row.kind === 'font' && this.query
+          ? text.toLowerCase().indexOf(this.query)
+          : -1;
+
+      if (start < 0) {
+        return [{ text, match: false }];
+      }
+
+      const end = start + this.query.length;
+      return [
+        { text: text.slice(0, start), match: false },
+        { text: text.slice(start, end), match: true },
+        { text: text.slice(end), match: false },
+      ].filter(part => part.text);
+    },
+
     label(row: Row): string {
       switch (row.kind) {
         case 'default':
           return this.t('default');
         case 'custom':
           return this.t('use_font', [row.value]);
-        case 'link':
-          return this.t('browse_google_fonts');
         default:
           return row.family;
       }
@@ -166,15 +193,7 @@ export default Vue.extend({
     },
 
     pick(row: Row): void {
-      if (row.kind === 'link') {
-        // The panel goes away with the focused row, so no leave follows:
-        // drop any typed text rather than leave it on show unapplied.
-        this.draft = this.value;
-        this.clearPreview();
-        openGoogleFontsPage();
-      } else {
-        this.apply(row.value, true);
-      }
+      this.apply(row.value, true);
     },
 
     // Enter applies the text as typed and remembers it; leaving the field
@@ -201,10 +220,9 @@ export default Vue.extend({
       this.clearPreview();
     },
 
-    // The link row previews nothing, so moving onto it clears the last
-    // font's preview like the Default row does.
+    // The Default row previews the page's own font by clearing any other.
     preview(row: Row): void {
-      this.previewFont(row.kind === 'link' ? '' : row.value);
+      this.previewFont(row.value);
     },
 
     clearPreview(): void {
@@ -217,44 +235,23 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .property-row ::v-deep .property-row-control {
-  flex: 0 1 236px;
+  flex: 0 1 176px;
   min-width: 0;
-}
-
-.font-family-autocomplete ::v-deep .anchored-menu-panel {
-  left: 0;
 }
 
 .font-family-autocomplete ::v-deep .autocomplete-menu {
   width: 100%;
 }
 
-.font-row ::v-deep .menu-item-content {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 10px;
-}
-
 .font-row-label {
   @include truncate;
 
+  display: block;
   min-width: 0;
+  color: var(--field-ink);
 }
 
-.font-row-category {
-  flex: none;
-  font-size: 10.5px;
-  color: var(--text-muted);
-}
-
-.font-link {
-  margin-top: 3px;
-  border-top: 1px solid var(--panel-border);
-  color: var(--accent-text);
-
-  svg {
-    flex: none;
-  }
+.font-row-match {
+  font-weight: 600;
 }
 </style>

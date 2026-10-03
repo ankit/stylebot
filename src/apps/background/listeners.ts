@@ -10,7 +10,6 @@ import {
   OpenOptionsPage,
   OpenDonatePage,
   OpenReportIssuePage,
-  OpenGoogleFontsPage,
   SetStyle,
   MoveStyle,
   GetAllStyles,
@@ -177,9 +176,6 @@ export const initListeners = (): void => {
           break;
         case 'OpenReportIssuePage':
           OpenReportIssuePage();
-          break;
-        case 'OpenGoogleFontsPage':
-          OpenGoogleFontsPage();
           break;
 
         case 'SetStyle':

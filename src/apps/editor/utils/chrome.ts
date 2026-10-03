@@ -15,7 +15,6 @@ import type {
   GetReadabilitySettings,
   SetReadabilitySettings,
   ReadabilitySettings,
-  OpenGoogleFontsPage,
   GetRecentColors,
   AddRecentColor,
   GetRecentColorsResponse,
@@ -98,14 +97,6 @@ export const getStylesForPage = (): Promise<GetStylesForPageResponse> => {
   return chrome.runtime.sendMessage<GetStylesForPage, GetStylesForPageResponse>(
     message
   );
-};
-
-export const openGoogleFontsPage = (): void => {
-  const message: OpenGoogleFontsPage = {
-    name: 'OpenGoogleFontsPage',
-  };
-
-  chrome.runtime.sendMessage(message);
 };
 
 export const enableStyle = (url: string): void => {
