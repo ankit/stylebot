@@ -1,4 +1,4 @@
-import type { StyleProfiles } from '@stylebot/types';
+import type { StyleProfile, StyleProfiles } from '@stylebot/types';
 
 export const DEFAULT_PROFILE_ID = 'default';
 
@@ -31,61 +31,48 @@ export type ProfileSummary = {
 const isPlainObject = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
 
+const isProfile = (value: unknown): value is StyleProfile =>
+  isPlainObject(value) &&
+  typeof value.name === 'string' &&
+  (value.css === undefined || typeof value.css === 'string');
+
 /**
- * Repairs a style's profiles so they hold to the stored shape: both fields
- * present or both absent, the active id one of the profiles, and its css only
- * in the style's own css. Returns the style itself when nothing needs fixing.
+ * Repairs a style's profiles into the stored shape: invalid entries dropped,
+ * the active id one of the profiles, and its css only in the style's own
+ * css. A style left without profiles loses both fields.
  */
 export const normalizeProfiles = <T extends WithProfiles>(style: T): T => {
-  const { profiles, activeProfile } = style;
+  const { profiles, activeProfile, ...rest } = style;
 
   if (profiles === undefined && activeProfile === undefined) {
     return style;
   }
 
-  const valid: StyleProfiles = {};
+  const entries = isPlainObject(profiles)
+    ? Object.entries(profiles).filter(([, profile]) => isProfile(profile))
+    : [];
 
-  if (isPlainObject(profiles)) {
-    for (const [id, profile] of Object.entries(profiles)) {
-      if (
-        isPlainObject(profile) &&
-        typeof profile.name === 'string' &&
-        (profile.css === undefined || typeof profile.css === 'string')
-      ) {
-        valid[id] =
-          profile.css === undefined
-            ? { name: profile.name }
-            : { name: profile.name, css: profile.css };
-      }
-    }
-  }
-
-  const ids = Object.keys(valid);
-
-  if (ids.length === 0) {
-    const { profiles: _profiles, activeProfile: _active, ...rest } = style;
+  if (entries.length === 0) {
     return rest as T;
   }
 
+  const ids = entries.map(([id]) => id);
   const active =
-    activeProfile !== undefined && activeProfile in valid
+    activeProfile !== undefined && ids.includes(activeProfile)
       ? activeProfile
-      : ids.find(id => valid[id].css === undefined) ?? ids[0];
+      : entries.find(([, profile]) => profile.css === undefined)?.[0] ?? ids[0];
 
-  valid[active] = { name: valid[active].name };
-
-  const unchanged =
-    active === activeProfile &&
-    ids.length === Object.keys(profiles as object).length &&
-    ids.every(
-      id =>
-        (profiles as StyleProfiles)[id].name === valid[id].name &&
-        (profiles as StyleProfiles)[id].css === valid[id].css
-    );
-
-  return unchanged
-    ? style
-    : { ...style, profiles: valid, activeProfile: active };
+  return {
+    ...style,
+    activeProfile: active,
+    profiles: Object.fromEntries(
+      entries.map(([id, { name, css }]) =>
+        id === active || css === undefined
+          ? [id, { name }]
+          : [id, { name, css }]
+      )
+    ),
+  };
 };
 
 /**

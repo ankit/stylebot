@@ -122,7 +122,7 @@ describe('normalizeProfiles', () => {
   it('leaves a well-formed style as it is', () => {
     const two = withTwo();
 
-    expect(normalizeProfiles(two)).toBe(two);
+    expect(normalizeProfiles(two)).toEqual(two);
   });
 
   it('drops profiles that are not objects with a name', () => {
