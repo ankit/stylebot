@@ -106,11 +106,8 @@ export default Vue.extend({
   padding: 0 14px;
   border-radius: 12px;
   background: var(--card-surface);
-
-  @include dark-mode {
-    --field-surface: var(--field-surface-hover);
-    --field-surface-hover: var(--field-surface-active);
-  }
+  --field-surface: var(--card-field-surface);
+  --field-surface-hover: var(--card-field-surface-hover);
 }
 
 .property-card-header {

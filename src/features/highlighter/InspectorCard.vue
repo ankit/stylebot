@@ -1,6 +1,16 @@
 <template>
   <div class="inspect-card" :style="{ top: `${top}px`, left: `${left}px` }">
-    <div v-if="placement" class="arrow" :class="placement" />
+    <svg
+      v-if="placement"
+      class="arrow"
+      :class="placement"
+      viewBox="0 0 14 8"
+      width="14"
+      height="8"
+      aria-hidden="true"
+    >
+      <path d="M0 8 7 1 14 8z" />
+    </svg>
 
     <s-text as="span" size="label" class="selector">
       {{ selectorText }}
@@ -70,37 +80,31 @@ export default Vue.extend({
   align-items: center;
   gap: 10px;
   max-width: 320px;
-  padding: 7px 11px;
+  --card-edge: color-mix(in srgb, var(--text-primary) 18%, var(--menu-surface));
+
+  padding: 8px 12px;
   border-radius: 8px;
-  border: 1px solid color-mix(in srgb, var(--text-primary) 18%, transparent);
   background: var(--menu-surface);
-  box-shadow: 0 1px 2px rgb(0 0 0 / 10%), 0 4px 12px rgb(0 0 0 / 12%);
+  filter: drop-shadow(0 1px 0 var(--card-edge))
+    drop-shadow(0 -1px 0 var(--card-edge)) drop-shadow(1px 0 0 var(--card-edge))
+    drop-shadow(-1px 0 0 var(--card-edge))
+    drop-shadow(0 4px 12px rgb(0 0 0 / 14%));
   pointer-events: none;
 }
 
 .arrow {
   position: absolute;
-  left: 14px;
-  width: 10px;
-  height: 10px;
-  background: var(--menu-surface);
-  border-radius: 2px;
-  transform: rotate(45deg);
+  left: 12px;
+  fill: var(--menu-surface);
+  pointer-events: none;
 
   &.below {
-    top: -5px;
-    border-left: 1px solid
-      color-mix(in srgb, var(--text-primary) 18%, transparent);
-    border-top: 1px solid
-      color-mix(in srgb, var(--text-primary) 18%, transparent);
+    top: -7px;
   }
 
   &.above {
-    bottom: -5px;
-    border-right: 1px solid
-      color-mix(in srgb, var(--text-primary) 18%, transparent);
-    border-bottom: 1px solid
-      color-mix(in srgb, var(--text-primary) 18%, transparent);
+    bottom: -7px;
+    transform: rotate(180deg);
   }
 }
 

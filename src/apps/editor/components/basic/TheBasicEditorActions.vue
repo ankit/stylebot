@@ -94,12 +94,16 @@ export default Vue.extend({
   gap: 5px;
   height: 28px;
   padding: 0 10px;
-  border-color: transparent;
+  border-color: color-mix(
+    in srgb,
+    var(--text-primary) 12%,
+    var(--card-surface)
+  );
   border-radius: 7px;
-  background: var(--field-surface);
+  background: var(--card-surface);
   font-size: 13px;
   font-weight: 400;
-  color: var(--text-secondary);
+  color: var(--text-body);
 
   &:hover:not(:disabled) {
     background: var(--field-surface-hover);

@@ -72,7 +72,7 @@
 // Active/focused state for the same fields — pair with field-border.
 @mixin field-active-border {
   border-color: var(--accent);
-  box-shadow: inset 0 0 0 1px var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
 }
 
 // Dark styling that respects SThemeProvider's manual override, not just the OS setting.

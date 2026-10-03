@@ -1,7 +1,7 @@
 <template>
   <div class="spacing-control">
     <property-row :label="label">
-      <div class="spacing-row" :class="`mode-${mode}`">
+      <div class="spacing-row">
         <spacing-field
           v-for="(field, index) in inlineFields"
           :key="index"
@@ -36,11 +36,12 @@
       </div>
     </property-row>
 
-    <div v-if="mode === 'individual'" class="spacing-grid">
+    <div v-if="mode !== 'all'" class="spacing-grid" :class="`mode-${mode}`">
       <spacing-field
         v-for="(field, index) in fields"
         :key="index"
         :prefix="field.prefix"
+        :unit="mode === 'xy' ? 'px' : ''"
         :value="field.value"
         :placeholder="field.placeholder"
         :disabled="disabled"
@@ -253,7 +254,7 @@ export default Vue.extend({
     },
 
     inlineFields(): Array<SpacingFieldConfig> {
-      return this.mode === 'individual' ? [] : this.fields;
+      return this.mode === 'all' ? this.fields : [];
     },
   },
 
@@ -343,22 +344,28 @@ export default Vue.extend({
 }
 
 .spacing-row .spacing-field {
-  width: 76px;
-}
-
-.spacing-row.mode-all .spacing-field {
   width: 64px;
 }
 
 .spacing-mode {
+  --select-ink: var(--text-body);
+
   flex: none;
   width: 84px;
 }
 
 .spacing-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 4px;
   padding: 2px 0 4px;
+
+  &.mode-xy {
+    grid-template-columns: repeat(2, 64px);
+    justify-content: end;
+  }
+
+  &.mode-individual {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 }
 </style>

@@ -210,6 +210,8 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .more-menu {
+  --field-surface: var(--card-field-surface);
+
   width: 200px;
   --menu-padding: 8px;
   padding: 8px !important;

@@ -214,7 +214,7 @@ export default Vue.extend({
   padding: 5px 7px;
   font-family: var(--font-mono);
   font-size: 12px;
-  color: var(--text-muted);
+  color: var(--text-faint);
 }
 
 .number-presets {

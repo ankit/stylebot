@@ -348,7 +348,7 @@ export default Vue.extend({
   cursor: text;
 
   &::placeholder {
-    color: var(--text-faint);
+    color: var(--field-placeholder);
   }
 }
 

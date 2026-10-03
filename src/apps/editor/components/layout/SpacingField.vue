@@ -1,7 +1,7 @@
 <template>
   <div class="spacing-field">
     <s-number-field
-      unit="px"
+      :unit="unit"
       :prefix="prefix"
       :value="value"
       :placeholder="placeholder"
@@ -26,6 +26,11 @@ export default Vue.extend({
     prefix: {
       type: String,
       default: '',
+    },
+
+    unit: {
+      type: String,
+      default: 'px',
     },
 
     value: {

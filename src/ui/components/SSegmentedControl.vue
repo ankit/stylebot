@@ -1,5 +1,5 @@
 <template>
-  <div ref="root" class="segmented" :class="{ fit }" role="group">
+  <div ref="root" class="segmented" :class="{ fit, disabled }" role="group">
     <span
       class="segment-indicator"
       :class="{ ready }"
@@ -181,7 +181,11 @@ export default Vue.extend({
   gap: 2px;
   padding: 2px;
   border-radius: 7px;
-  background: color-mix(in srgb, var(--text-primary) 6%, transparent);
+  background: var(--field-surface);
+
+  &.disabled {
+    opacity: 0.6;
+  }
 
   &.fit .segment {
     flex: none;
@@ -201,7 +205,7 @@ export default Vue.extend({
   bottom: 2px;
   border-radius: 5px;
   background: var(--field-surface-active);
-  box-shadow: 0 1px 2px rgb(0 0 0 / 14%);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 18%), 0 0 0 1px rgb(0 0 0 / 6%);
   pointer-events: none;
 
   &:not(.ready) {
@@ -251,6 +255,11 @@ export default Vue.extend({
       transparent
     );
     color: var(--text-secondary);
+
+    @include dark-mode {
+      background: color-mix(in srgb, var(--text-primary) 5%, transparent);
+      color: var(--text-body);
+    }
   }
 
   ::v-deep svg {
@@ -271,7 +280,6 @@ export default Vue.extend({
 
   &:disabled {
     cursor: default;
-    opacity: 0.6;
   }
 
   @include focus-ring;

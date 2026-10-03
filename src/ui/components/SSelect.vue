@@ -109,12 +109,12 @@ export default Vue.extend({
   padding: 5px 8px 5px 10px;
   font-size: 13px;
   line-height: 1.2;
-  color: var(--field-ink);
+  color: var(--select-ink, var(--field-ink));
   outline: none;
   cursor: pointer;
 
   &.muted {
-    color: var(--text-muted);
+    color: var(--field-placeholder);
   }
 
   &:hover:not(:disabled):not(.open) {
@@ -125,8 +125,6 @@ export default Vue.extend({
   &:focus-visible {
     @include field-active-border;
   }
-
-  @include focus-ring;
 
   &:disabled {
     cursor: default;

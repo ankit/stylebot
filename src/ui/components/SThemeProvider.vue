@@ -31,8 +31,8 @@ export default Vue.extend({
 @mixin dark-theme-vars {
   // Surfaces
   --panel-surface: #1c1e22;
-  --card-surface: #212429;
-  --tab-surface: #181a1e;
+  --card-surface: #1f2026;
+  --tab-surface: #141519;
   --raised-surface: #000;
   --code-surface: #1a1b1e;
   --panel-shadow: rgb(0 0 0 / 34%);
@@ -62,8 +62,10 @@ export default Vue.extend({
   --field-surface: #24262c;
   --field-surface-hover: #2a2c33;
   --field-surface-active: #3a3d46;
+  --card-field-surface: #2a2c33;
+  --card-field-surface-hover: #33363d;
   --field-ink: #e4e6eb;
-  --field-placeholder: #6b717c;
+  --field-placeholder: #7d838e;
   --field-border: #3a3e46;
   --field-border-hover: #4a4f58;
   --field-border-selector: #3a3e46;
@@ -146,8 +148,10 @@ export default Vue.extend({
   --field-surface: #f1f2f5;
   --field-surface-hover: #e7e9ee;
   --field-surface-active: #fff;
+  --card-field-surface: #f1f2f5;
+  --card-field-surface-hover: #e7e9ee;
   --field-ink: #191b1f;
-  --field-placeholder: #a0a5ae;
+  --field-placeholder: #8f949e;
   --field-border: #dcdfe5;
   --field-border-hover: #b9bec8;
   --field-border-selector: #d3d6dd;
