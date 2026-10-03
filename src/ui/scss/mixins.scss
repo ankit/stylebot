@@ -10,6 +10,38 @@
   }
 }
 
+// Thin, low-contrast scrollbar for panels; put it with the nested rules.
+@mixin thin-scrollbar {
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border: 2px solid transparent;
+    border-radius: 4px;
+    background: color-mix(in srgb, var(--text-primary) 14%, transparent)
+      padding-box;
+
+    &:hover {
+      background-color: color-mix(
+        in srgb,
+        var(--text-primary) 26%,
+        transparent
+      );
+    }
+  }
+
+  @supports (-moz-appearance: none) {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--text-primary) 14%, transparent)
+      transparent;
+  }
+}
+
 // Strip native button styling down to a bare box for custom-styled buttons.
 // Include it first in the rule, since all: unset resets everything before it.
 @mixin button-reset {
@@ -28,6 +60,13 @@
 @mixin field-border($radius: 7px) {
   border: 1px solid var(--field-border);
   border-radius: $radius;
+}
+
+// Borderless filled variant of field-border, for the Basic panel's controls.
+@mixin field-fill($radius: 7px) {
+  border: 1px solid transparent;
+  border-radius: $radius;
+  background: var(--field-surface);
 }
 
 // Active/focused state for the same fields — pair with field-border.

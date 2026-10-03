@@ -51,7 +51,7 @@ export default Vue.extend({
 
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
   min-width: 0;
   max-width: 100%;
   padding: 2px 6px;
@@ -72,7 +72,7 @@ export default Vue.extend({
     color: var(--text-secondary);
     cursor: pointer;
 
-    &:hover:not(.warning) {
+    &:hover:not(.warning):not(:disabled) {
       color: var(--text-primary);
     }
 
@@ -81,10 +81,10 @@ export default Vue.extend({
 
   &.outline {
     background: transparent;
-    box-shadow: inset 0 0 0 1px var(--panel-border);
+    box-shadow: inset 0 0 0 1px var(--field-border-selector);
 
-    &.clickable:hover {
-      background: var(--hover-tint);
+    &.clickable:hover:not(:disabled) {
+      background: var(--field-surface-hover);
     }
   }
 

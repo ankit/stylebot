@@ -55,19 +55,17 @@ export default Vue.extend({
   gap: 8px;
   flex-shrink: 0;
   font-weight: 400;
-  font-size: var(--menu-item-font-size, 13.5px);
+  font-size: var(--menu-item-font-size, 13px);
   line-height: 1.3;
   color: var(--text-primary);
-  margin: 0 calc(-1 * var(--menu-padding, 12px));
-  padding: var(--menu-item-padding-y, 10px) 12px;
-  border-radius: 0;
+  padding: var(--menu-item-padding-y, 10px) 10px;
+  border-radius: 6px;
   outline: none;
   cursor: pointer;
 
   &:hover,
   &:focus-visible {
-    background: var(--hover-tint);
-    box-shadow: inset 4px 0 0 var(--accent);
+    background: var(--field-surface-hover);
   }
 
   &.danger {
@@ -79,17 +77,12 @@ export default Vue.extend({
     }
   }
 
-  &.selected {
-    background: color-mix(in srgb, var(--accent) 8%, transparent);
-  }
-
   &:disabled {
     color: var(--text-faint);
     cursor: default;
 
     &:hover {
       background: none;
-      box-shadow: none;
     }
   }
 }

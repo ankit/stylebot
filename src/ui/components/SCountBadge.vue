@@ -25,14 +25,15 @@ export default Vue.extend({
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 18px;
-  padding: 3px 8px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--accent) 14%, transparent);
-  font-size: 10.5px;
-  font-weight: 500;
-  line-height: 1;
-  color: var(--accent-text);
+  padding: 2px 6px;
+  border-radius: 10px;
+  background: var(--count-badge-surface);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0;
+  color: var(--count-badge-ink);
   text-align: center;
 }
 </style>

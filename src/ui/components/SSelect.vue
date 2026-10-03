@@ -98,7 +98,7 @@ export default Vue.extend({
 
 .select-trigger {
   @include button-reset;
-  @include field-border;
+  @include field-fill;
 
   box-sizing: border-box;
   display: flex;
@@ -106,10 +106,10 @@ export default Vue.extend({
   justify-content: space-between;
   gap: 6px;
   min-width: 108px;
-  padding: 5px 8px;
+  padding: 5px 8px 5px 10px;
   font-size: 13px;
   line-height: 1.2;
-  color: var(--text-primary);
+  color: var(--field-ink);
   outline: none;
   cursor: pointer;
 
@@ -118,7 +118,7 @@ export default Vue.extend({
   }
 
   &:hover:not(:disabled):not(.open) {
-    border-color: var(--field-border-hover);
+    background: var(--field-surface-hover);
   }
 
   &.open,
@@ -131,6 +131,7 @@ export default Vue.extend({
   &:disabled {
     cursor: default;
     opacity: 0.6;
+    color: var(--field-placeholder);
   }
 }
 

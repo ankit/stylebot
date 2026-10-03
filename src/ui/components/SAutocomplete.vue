@@ -17,7 +17,8 @@
           :class="{ quiet: quietFocus }"
           role="combobox"
           aria-expanded="false"
-          tabindex="0"
+          :aria-disabled="disabled"
+          :tabindex="disabled ? -1 : 0"
           @mousedown.prevent="revealInput"
           @keydown="onChipsKeydown"
           @blur="quietFocus = false"
@@ -272,7 +273,7 @@ export default Vue.extend({
       }
 
       el.style.height = 'auto';
-      el.style.height = `${Math.max(el.scrollHeight, 30)}px`;
+      el.style.height = `${Math.max(el.scrollHeight, 26)}px`;
     },
 
     syncMenu(): void {
@@ -376,6 +377,10 @@ export default Vue.extend({
     // Switches from the pill display back to the raw editable textarea
     // and focuses it, once it exists on the next render.
     revealInput(): void {
+      if (this.disabled) {
+        return;
+      }
+
       this.openOnFocus = true;
       this.focused = true;
       this.$nextTick(() => {
@@ -484,11 +489,14 @@ export default Vue.extend({
   display: flex;
   align-items: center;
   width: 100%;
-  min-height: 30px;
+  min-height: 28px;
   min-width: 0;
-  border: 1px solid var(--field-border-selector);
-  border-radius: 9px;
-  background: var(--field-fill);
+
+  @include field-fill;
+
+  &:hover:not(.disabled) {
+    background: var(--field-surface-hover);
+  }
 
   // Only the text field itself highlights the whole pill — the chevron
   // button gets its own focus ring instead (see .autocomplete-chevron).
@@ -499,6 +507,10 @@ export default Vue.extend({
 
   &.disabled {
     opacity: 0.6;
+
+    .autocomplete-chips {
+      cursor: default;
+    }
   }
 }
 
@@ -510,7 +522,9 @@ export default Vue.extend({
   flex-wrap: wrap;
   align-content: center;
   gap: 6px;
-  padding: 5px 8px 5px 6px;
+  padding: 5px 8px 5px 10px;
+  font-size: 13px;
+  line-height: 1.3;
   cursor: text;
   outline: none;
 }
@@ -519,31 +533,31 @@ export default Vue.extend({
   box-sizing: border-box;
   flex: 1;
   min-width: 0;
-  height: 30px;
+  height: 26px;
   border: none;
   outline: none;
   background: transparent;
-  padding: 5px 0 3px 10px;
+  padding: 3px 0 3px 10px;
   margin: 0;
   resize: none;
   overflow: hidden;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
-  font: 400 13px/22px 'Geist', system-ui, sans-serif;
-  color: var(--text-primary);
+  font: 400 13px/20px 'Geist', system-ui, sans-serif;
+  color: var(--field-ink);
 
   &.mono {
     font-family: var(--font-mono);
+    font-size: 12px;
     font-weight: 400;
   }
 
   &::placeholder {
-    line-height: 19px;
-    color: var(--text-faint);
+    color: var(--field-placeholder);
   }
 
   &:disabled {
-    opacity: 0.6;
+    cursor: default;
   }
 }
 
@@ -555,9 +569,8 @@ export default Vue.extend({
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  border-left: 1px solid var(--field-border);
-  border-radius: 0 8px 8px 0;
+  width: 28px;
+  border-radius: 0 7px 7px 0;
   outline: none;
   color: var(--text-muted);
   cursor: pointer;
@@ -583,6 +596,7 @@ export default Vue.extend({
 }
 
 .autocomplete-menu {
+  border-radius: 9px !important;
   max-height: 240px !important;
   overflow-y: auto !important;
 }

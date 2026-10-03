@@ -46,7 +46,7 @@ export default Vue.extend({
 .menu {
   --menu-padding: 12px;
   --menu-item-padding-y: 10px;
-  --menu-item-font-size: 13.5px;
+  --menu-item-font-size: 13px;
 
   max-height: calc(100vh - 92px);
   overflow-x: hidden;
@@ -63,12 +63,14 @@ export default Vue.extend({
   box-shadow: 0 6px 16px var(--menu-shadow);
   animation: dock-menu-in 0.16s ease-out;
 
+  @include thin-scrollbar;
+
   &.dense {
     --menu-padding: 4px;
     --menu-item-padding-y: 7px;
     --menu-item-font-size: 13px;
     padding: var(--menu-padding);
-    border-radius: 11px;
+    border-radius: 10px;
     gap: 1px;
   }
 }

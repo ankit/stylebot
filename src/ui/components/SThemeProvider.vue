@@ -29,57 +29,80 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 @mixin dark-theme-vars {
+  // Surfaces
   --panel-surface: #1c1e22;
+  --card-surface: #212429;
+  --tab-surface: #181a1e;
+  --raised-surface: #000;
+  --code-surface: #1a1b1e;
+  --panel-shadow: rgb(0 0 0 / 34%);
+
+  // Text
   --text-primary: #f2f4f7;
   --text-body: #c3c7ce;
   --text-secondary: #a3aab6;
   --text-muted: #a3aab6;
   --text-faint: #8d95a2;
+
+  // Lines and interaction states
   --panel-border: #2c2f35;
   --hover-tint: #2e3238;
   --active: #2a2d33;
+  --icon-color: #9aa1ae;
 
+  // Accent
   --accent-text: #7fa4e1;
 
+  // Text selection
   --selection: #2f4f8f;
   --selection-ink: #f2f4f7;
 
+  // Form fields
+  --field-surface: #24262c;
+  --field-surface-hover: #2a2c33;
+  --field-surface-active: #3a3d46;
+  --field-ink: #e4e6eb;
+  --field-placeholder: #6b717c;
   --field-border: #3a3e46;
   --field-border-hover: #4a4f58;
   --field-border-selector: #3a3e46;
   --field-fill: #15171a;
   --field-divider: #2c2f35;
   --slider-track: #3a3e46;
-  --icon-color: #9aa1ae;
 
-  --card-surface: #212429;
-  --tab-surface: #181a1e;
-  --raised-surface: #000;
-  --panel-shadow: rgb(0 0 0 / 34%);
-
+  // Menus and popovers
   --menu-surface: #23262b;
   --menu-border: #3a3e46;
   --menu-shadow: rgb(0 0 0 / 45%);
 
+  // Pills
+  --pill-surface: #26282e;
+  --pill-border: #3a3d45;
+  --pill-hover: #31343b;
+
+  // Count badges
+  --count-badge-surface: #22304d;
+  --count-badge-ink: #9dbcff;
+
+  // Status: info
   --info: #1f2740;
   --info-border: #2b3654;
 
+  // Status: danger
   --danger: #f2726a;
   --danger-background: #3a2220;
   --danger-border: #4a2b28;
 
+  // Status: success
   --success: #7fd3a5;
   --success-background: #1e3129;
   --success-border: #2f4d3e;
 
+  // Status: warning
   --warning: #e5b567;
+  --warning-icon: #e5b567;
   --warning-background: #2b2518;
   --warning-border: #4a3d22;
-
-  --code-surface: #1a1b1e;
-  --pill-border: #3a3d45;
-  --pill-surface: #26282e;
-  --pill-hover: #31343b;
 }
 
 .theme-provider {
@@ -87,60 +110,84 @@ export default Vue.extend({
   background: var(--panel-surface);
   color: var(--text-primary);
 
+  // Surfaces
   --panel-surface: #fff;
+  --card-surface: #fff;
+  --tab-surface: #f7f8fa;
+  --raised-surface: #fff;
+  --code-surface: #fcfcfd;
+  --panel-shadow: rgb(0 0 0 / 16%);
+
+  // Text
   --text-primary: #191b1f;
-  --text-body: var(--text-primary);
+  --text-body: #3f434c;
   --text-secondary: #5f6672;
   --text-muted: #6b7280;
   --text-faint: #8b909b;
+
+  // Lines and interaction states
   --panel-border: #e9eaee;
   --hover-tint: #f2f3f6;
   --active: #eef0f4;
+  --icon-color: #6a7180;
 
+  // Accent
   --accent: #286cd8;
   --accent-ink: #fff;
   --accent-text: var(--accent);
 
+  // Text selection
   --selection: #c7dbff;
   --selection-ink: #191b1f;
 
+  // Form fields
+  --field-surface: #f1f2f5;
+  --field-surface-hover: #e7e9ee;
+  --field-surface-active: #fff;
+  --field-ink: #191b1f;
+  --field-placeholder: #a0a5ae;
   --field-border: #dcdfe5;
   --field-border-hover: #b9bec8;
   --field-border-selector: #d3d6dd;
   --field-fill: transparent;
   --field-divider: #ecedf0;
   --slider-track: #e4e7ed;
-  --icon-color: #6a7180;
 
-  --card-surface: #fff;
-  --tab-surface: #f7f8fa;
-  --raised-surface: #fff;
-  --panel-shadow: rgb(0 0 0 / 16%);
-
+  // Menus and popovers
   --menu-surface: #fff;
   --menu-border: #e2e4e9;
   --menu-shadow: rgb(0 0 0 / 20%);
 
+  // Pills
+  --pill-surface: var(--card-surface);
+  --pill-border: var(--field-border-selector);
+  --pill-hover: var(--hover-tint);
+
+  // Count badges
+  --count-badge-surface: #e7eefc;
+  --count-badge-ink: #24509e;
+
+  // Status: info
   --info: #eef3ff;
   --info-border: #dbe4fb;
 
+  // Status: danger
   --danger: #b3261e;
   --danger-background: #fdf1f0;
   --danger-border: #f6cfcb;
 
+  // Status: success
   --success: #1a7f4b;
   --success-background: #e8f5ee;
   --success-border: #c3e6d1;
 
+  // Status: warning
   --warning: #8a5a00;
+  --warning-icon: #e08a00;
   --warning-background: #fff8ec;
   --warning-border: #f1e3c6;
 
-  --code-surface: #fcfcfd;
-  --pill-border: var(--field-border-selector);
-  --pill-surface: var(--card-surface);
-  --pill-hover: var(--hover-tint);
-
+  // Fonts
   --font-mono: 'Geist Mono', Menlo, Monaco, Consolas, monospace;
   --font-reading: 'Literata', Georgia, serif;
 }
