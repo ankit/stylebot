@@ -69,10 +69,6 @@ export type OpenDonatePage = {
   name: 'OpenDonatePage';
 };
 
-export type OpenGoogleFontsPage = {
-  name: 'OpenGoogleFontsPage';
-};
-
 export type OpenReportIssuePage = {
   name: 'OpenReportIssuePage';
 };
@@ -217,7 +213,6 @@ type BackgroundPageMessage =
   | OpenOptionsPage
   | OpenDonatePage
   | OpenReportIssuePage
-  | OpenGoogleFontsPage
   | SetReadability
   | ReadabilityActiveChanged
   | GetCommands

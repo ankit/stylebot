@@ -81,11 +81,7 @@ const openPicker = async (font: Locator): Promise<void> => {
 
 // A row's accessible name is its label plus, for Google Fonts, the category.
 const menuItem = (page: Page, name: string) =>
-  page.getByRole('menuitem', {
-    name: new RegExp(
-      `^${name}( (sans-serif|serif|display|handwriting|monospace))?$`
-    ),
-  });
+  page.getByRole('menuitem', { name: new RegExp(`^${name}$`) });
 
 const SAVED_STYLES = `style[id^="stylebot-css-"]:not(#${PREVIEW_ID})`;
 
@@ -101,30 +97,6 @@ const previewCss = (page: Page) =>
   page
     .locator(`#${PREVIEW_ID}`)
     .evaluateAll(els => els.map(el => el.textContent).join(''));
-
-const GOOGLE_FONTS_SITE = /^https:\/\/fonts\.google\.com/;
-
-/**
- * Runs `action`, which makes the background open fonts.google.com in a new
- * tab, and waits for that tab to appear. The real site is a heavy SPA, and
- * context.route() can't reliably stub it — on Chromium the tab's request
- * starts before Playwright attaches to it. Closing the tab here isn't safe
- * either: on Firefox, closing an extension-opened tab can take the page under
- * test down with it. The per-test teardown closes it instead.
- */
-const expectGoogleFontsOpened = async (
-  context: BrowserContext,
-  action: () => Promise<void>
-): Promise<void> => {
-  await context.route(GOOGLE_FONTS_SITE, route =>
-    route.fulfill({ contentType: 'text/html', body: '<title>Fonts</title>' })
-  );
-
-  const opened = context.waitForEvent('page');
-  await action();
-  const fontsPage = await opened;
-  await expect.poll(() => fontsPage.url()).toMatch(GOOGLE_FONTS_SITE);
-};
 
 const readRecentFonts = (extension: Extension) =>
   extension.evaluate(async () => {
@@ -209,22 +181,6 @@ test('highlighting a Google Font outside the bundled list previews it with its i
   expect(await savedCss(page)).not.toContain('Zen Kurenaido');
 });
 
-test('the browse row opens Google Fonts in a new tab without applying anything', async ({
-  context,
-  openPopup,
-}) => {
-  const { page, font } = await setup(context, openPopup);
-
-  await openPicker(font);
-  await page.keyboard.type('playf');
-
-  await expectGoogleFontsOpened(context, () =>
-    menuItem(page, 'Browse Google Fonts').click()
-  );
-
-  await expect(page.locator('h1')).not.toHaveCSS('font-family', /playf/);
-});
-
 test('highlighting a font previews it on the page until the picker is dismissed', async ({
   context,
   extension,
@@ -259,8 +215,8 @@ test('highlighting a font previews it on the page until the picker is dismissed'
   await expect.poll(() => previewCss(page)).toContain('Lora');
   await expect(heading).toHaveCSS('font-family', /Lora/);
 
-  // Rows that aren't fonts (Browse, Default) preview nothing.
-  await menuItem(page, 'Browse Google Fonts').hover();
+  // Rows that aren't fonts (Default) preview nothing.
+  await menuItem(page, 'Default').hover();
   await expect.poll(() => previewCss(page)).toBe('');
   await expect(heading).toHaveCSS('font-family', initialFont);
 });

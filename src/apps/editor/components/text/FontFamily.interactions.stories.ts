@@ -28,7 +28,7 @@ const field = (root: HTMLElement) =>
 const input = (root: HTMLElement) =>
   field(root).querySelector('.autocomplete-input') as HTMLTextAreaElement;
 const chips = (root: HTMLElement) =>
-  Array.from(field(root).querySelectorAll('.autocomplete-chips .chip'), chip =>
+  Array.from(field(root).querySelectorAll('.autocomplete-chips .part'), chip =>
     chip.textContent?.trim()
   );
 
@@ -44,13 +44,9 @@ const openPicker = async (root: HTMLElement) => {
 const chipsControl = (root: HTMLElement) =>
   field(root).querySelector('.autocomplete-chips') as HTMLElement | null;
 
-// A row's accessible name is its label plus, for Google Fonts, the category.
+// Default's row also names the font it resolves to.
 const menuItem = (canvas: Canvas, name: string) =>
-  canvas.findByRole('menuitem', {
-    name: new RegExp(
-      `^${name}( (sans-serif|serif|display|handwriting|monospace))?$`
-    ),
-  });
+  canvas.findByRole('menuitem', { name: new RegExp(`^${name}$`) });
 
 export const EscapeClosesPickerNotEditor: StoryObj = {
   ...editor(WITH_RULE),
@@ -81,8 +77,12 @@ export const SuggestsAndApplies: StoryObj = {
     await user.keyboard('playf');
 
     const row = await menuItem(canvas, 'Playfair Display');
-    await expect(row.querySelector('.font-row-category')).toHaveTextContent(
-      'serif'
+    await expect(row.querySelector('.font-row-match')).toHaveTextContent(
+      'Playf'
+    );
+    // The bold part joins the rest of the name without a gap.
+    await expect(row.querySelector('.font-row-label')?.textContent).toBe(
+      'Playfair Display'
     );
 
     await pressKey('ArrowDown');
@@ -113,30 +113,25 @@ export const SuggestsAndApplies: StoryObj = {
     await expect(text.selectionEnd).toBe(text.value.length);
 
     const items = canvas.getAllByRole('menuitem');
-    await expect(items[0]).toHaveTextContent('Default');
+    await expect(items[0]).toHaveTextContent(/^Default/);
     await expect(items[1]).toHaveTextContent('Playfair Display');
-    await expect(items.at(-1)).toHaveTextContent('Browse Google Fonts');
   },
 };
 
-export const CategoryFilter: StoryObj = {
+export const BoldMatches: StoryObj = {
   ...editor(WITH_RULE),
-  name: 'a category name lists that category',
+  name: 'typing bolds the typed part of each match',
   play: async ({ canvasElement }) => {
     await openPicker(canvasElement);
     await user.keyboard('mono');
 
-    await waitFor(() =>
-      expect(
-        canvasElement.querySelectorAll('[role=menuitem] .font-row-category')
-          .length
-      ).toBeGreaterThan(3)
-    );
-    const categories = Array.from(
-      canvasElement.querySelectorAll('[role=menuitem] .font-row-category'),
-      el => el.textContent?.trim()
-    );
-    await expect(categories.every(text => text === 'monospace')).toBe(true);
+    const matches = () =>
+      Array.from(
+        canvasElement.querySelectorAll('[role=menuitem] .font-row-match'),
+        el => el.textContent?.trim().toLowerCase()
+      );
+    await waitFor(() => expect(matches().length).toBeGreaterThan(1));
+    await expect(matches().every(text => text === 'mono')).toBe(true);
   },
 };
 
@@ -192,7 +187,7 @@ export const ArrowKeys: StoryObj = {
       await pressKey('ArrowUp');
       await waitFor(() =>
         expect(
-          canvas.getByRole('menuitem', { name: 'Browse Google Fonts' })
+          canvas.getByRole('menuitem', { name: 'Use "playfa"' })
         ).toHaveFocus()
       );
       await pressKey('ArrowDown');
@@ -426,7 +421,9 @@ export const DefaultPickKeepsFocus: StoryObj = {
 
     await openPicker(canvasElement);
     await pressKey('Backspace');
-    await menuItem(canvas, 'Default');
+    await waitFor(() =>
+      expect(canvas.getAllByRole('menuitem')[0]).toHaveTextContent(/^Default/)
+    );
     await pressKey('ArrowDown');
     await pressKey('Enter');
 
@@ -523,9 +520,7 @@ export const TypingDefault: StoryObj = {
       await user.keyboard('def');
       await findOpenMenu(canvas);
       await waitFor(() =>
-        expect(canvas.getAllByRole('menuitem')[0]).toHaveTextContent(
-          /^Default$/
-        )
+        expect(canvas.getAllByRole('menuitem')[0]).toHaveTextContent(/^Default/)
       );
     });
 
@@ -544,24 +539,6 @@ export const TypingDefault: StoryObj = {
         expect(declaration(store, 'h1', 'font-family')).toBeUndefined()
       );
     });
-  },
-};
-
-export const BrowseDiscardsDraft: StoryObj = {
-  ...editor({ css: 'h1 { color: red; }', activeSelector: 'h1' }),
-  name: 'browsing Google Fonts discards typed text instead of showing it unapplied',
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const store = storeOf(canvasElement);
-
-    await openPicker(canvasElement);
-    await user.keyboard('playf');
-
-    await user.click(await menuItem(canvas, 'Browse Google Fonts'));
-
-    await waitFor(() => expect(input(canvasElement)).toHaveValue(''));
-    await expect(chips(canvasElement)).toEqual([]);
-    await expect(declaration(store, 'h1', 'font-family')).toBeUndefined();
   },
 };
 
