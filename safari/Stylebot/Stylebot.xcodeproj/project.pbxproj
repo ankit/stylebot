@@ -17,22 +17,6 @@
 		BC9E611A3067731200A7D161 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BC9E61193067731200A7D161 /* Assets.xcassets */; };
 		BC9E61213067731200A7D161 /* Stylebot Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = BC9E61203067731200A7D161 /* Stylebot Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		BC9E61263067731200A7D161 /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC9E61253067731200A7D161 /* SafariWebExtensionHandler.swift */; };
-		BC9E61433067731200A7D161 /* background in Resources */ = {isa = PBXBuildFile; fileRef = BC9E61323067731200A7D161 /* background */; };
-		BC9E61443067731200A7D161 /* popup in Resources */ = {isa = PBXBuildFile; fileRef = BC9E61333067731200A7D161 /* popup */; };
-		BC9E61453067731200A7D161 /* options.js.LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = BC9E61343067731200A7D161 /* options.js.LICENSE.txt */; };
-		BC9E61463067731200A7D161 /* options.js in Resources */ = {isa = PBXBuildFile; fileRef = BC9E61353067731200A7D161 /* options.js */; };
-		BC9E61473067731200A7D161 /* img in Resources */ = {isa = PBXBuildFile; fileRef = BC9E61363067731200A7D161 /* img */; };
-		BC9E61483067731200A7D161 /* editor-window in Resources */ = {isa = PBXBuildFile; fileRef = BC9E61373067731200A7D161 /* editor-window */; };
-		BC9E61493067731200A7D161 /* google-fonts in Resources */ = {isa = PBXBuildFile; fileRef = BC9E61383067731200A7D161 /* google-fonts */; };
-		BC9E614A3067731200A7D161 /* inject-css in Resources */ = {isa = PBXBuildFile; fileRef = BC9E61393067731200A7D161 /* inject-css */; };
-		BC9E614B3067731200A7D161 /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = BC9E613A3067731200A7D161 /* manifest.json */; };
-		BC9E614C3067731200A7D161 /* options.html in Resources */ = {isa = PBXBuildFile; fileRef = BC9E613B3067731200A7D161 /* options.html */; };
-		BC9E614D3067731200A7D161 /* _locales in Resources */ = {isa = PBXBuildFile; fileRef = BC9E613C3067731200A7D161 /* _locales */; };
-		BC9E614F3067731200A7D161 /* fonts in Resources */ = {isa = PBXBuildFile; fileRef = BC9E613E3067731200A7D161 /* fonts */; };
-		BC9E61503067731200A7D161 /* monaco-editor in Resources */ = {isa = PBXBuildFile; fileRef = BC9E613F3067731200A7D161 /* monaco-editor */; };
-		BC9E61513067731200A7D161 /* readability in Resources */ = {isa = PBXBuildFile; fileRef = BC9E61403067731200A7D161 /* readability */; };
-		BC9E61523067731200A7D161 /* options.css in Resources */ = {isa = PBXBuildFile; fileRef = BC9E61413067731200A7D161 /* options.css */; };
-		BC9E61533067731200A7D161 /* editor in Resources */ = {isa = PBXBuildFile; fileRef = BC9E61423067731200A7D161 /* editor */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -73,22 +57,6 @@
 		BC9E61203067731200A7D161 /* Stylebot Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Stylebot Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BC9E61253067731200A7D161 /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
 		BC9E61273067731200A7D161 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		BC9E61323067731200A7D161 /* background */ = {isa = PBXFileReference; lastKnownFileType = folder; name = background; path = "../../../safari-dist/background"; sourceTree = "<group>"; };
-		BC9E61333067731200A7D161 /* popup */ = {isa = PBXFileReference; lastKnownFileType = folder; name = popup; path = "../../../safari-dist/popup"; sourceTree = "<group>"; };
-		BC9E61343067731200A7D161 /* options.js.LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = options.js.LICENSE.txt; path = "../../../safari-dist/options.js.LICENSE.txt"; sourceTree = "<group>"; };
-		BC9E61353067731200A7D161 /* options.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = options.js; path = "../../../safari-dist/options.js"; sourceTree = "<group>"; };
-		BC9E61363067731200A7D161 /* img */ = {isa = PBXFileReference; lastKnownFileType = folder; name = img; path = "../../../safari-dist/img"; sourceTree = "<group>"; };
-		BC9E61373067731200A7D161 /* editor-window */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "editor-window"; path = "../../../safari-dist/editor-window"; sourceTree = "<group>"; };
-		BC9E61383067731200A7D161 /* google-fonts */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "google-fonts"; path = "../../../safari-dist/google-fonts"; sourceTree = "<group>"; };
-		BC9E61393067731200A7D161 /* inject-css */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "inject-css"; path = "../../../safari-dist/inject-css"; sourceTree = "<group>"; };
-		BC9E613A3067731200A7D161 /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = manifest.json; path = "../../../safari-dist/manifest.json"; sourceTree = "<group>"; };
-		BC9E613B3067731200A7D161 /* options.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = options.html; path = "../../../safari-dist/options.html"; sourceTree = "<group>"; };
-		BC9E613C3067731200A7D161 /* _locales */ = {isa = PBXFileReference; lastKnownFileType = folder; name = _locales; path = "../../../safari-dist/_locales"; sourceTree = "<group>"; };
-		BC9E613E3067731200A7D161 /* fonts */ = {isa = PBXFileReference; lastKnownFileType = folder; name = fonts; path = "../../../safari-dist/fonts"; sourceTree = "<group>"; };
-		BC9E613F3067731200A7D161 /* monaco-editor */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "monaco-editor"; path = "../../../safari-dist/monaco-editor"; sourceTree = "<group>"; };
-		BC9E61403067731200A7D161 /* readability */ = {isa = PBXFileReference; lastKnownFileType = folder; name = readability; path = "../../../safari-dist/readability"; sourceTree = "<group>"; };
-		BC9E61413067731200A7D161 /* options.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; name = options.css; path = "../../../safari-dist/options.css"; sourceTree = "<group>"; };
-		BC9E61423067731200A7D161 /* editor */ = {isa = PBXFileReference; lastKnownFileType = folder; name = editor; path = "../../../safari-dist/editor"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -154,36 +122,11 @@
 		BC9E61243067731200A7D161 /* Stylebot Extension */ = {
 			isa = PBXGroup;
 			children = (
-				BC9E61313067731200A7D161 /* Resources */,
 				BC9E61253067731200A7D161 /* SafariWebExtensionHandler.swift */,
 				BC9E61273067731200A7D161 /* Info.plist */,
 			);
 			path = "Stylebot Extension";
 			sourceTree = "<group>";
-		};
-		BC9E61313067731200A7D161 /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				BC9E61323067731200A7D161 /* background */,
-				BC9E61333067731200A7D161 /* popup */,
-				BC9E61343067731200A7D161 /* options.js.LICENSE.txt */,
-				BC9E61353067731200A7D161 /* options.js */,
-				BC9E61363067731200A7D161 /* img */,
-				BC9E61373067731200A7D161 /* editor-window */,
-				BC9E61383067731200A7D161 /* google-fonts */,
-				BC9E61393067731200A7D161 /* inject-css */,
-				BC9E613A3067731200A7D161 /* manifest.json */,
-				BC9E613B3067731200A7D161 /* options.html */,
-				BC9E613C3067731200A7D161 /* _locales */,
-				BC9E613E3067731200A7D161 /* fonts */,
-				BC9E613F3067731200A7D161 /* monaco-editor */,
-				BC9E61403067731200A7D161 /* readability */,
-				BC9E61413067731200A7D161 /* options.css */,
-				BC9E61423067731200A7D161 /* editor */,
-			);
-			name = Resources;
-			path = "Stylebot Extension";
-			sourceTree = SOURCE_ROOT;
 		};
 /* End PBXGroup section */
 
@@ -216,6 +159,7 @@
 				BC9E611C3067731200A7D161 /* Sources */,
 				BC9E611D3067731200A7D161 /* Frameworks */,
 				BC9E611E3067731200A7D161 /* Resources */,
+				BC9E61543067731200A7D161 /* Copy safari-dist */,
 			);
 			buildRules = (
 			);
@@ -284,26 +228,32 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BC9E61473067731200A7D161 /* img in Resources */,
-				BC9E614F3067731200A7D161 /* fonts in Resources */,
-				BC9E61503067731200A7D161 /* monaco-editor in Resources */,
-				BC9E61433067731200A7D161 /* background in Resources */,
-				BC9E61463067731200A7D161 /* options.js in Resources */,
-				BC9E61483067731200A7D161 /* editor-window in Resources */,
-				BC9E61533067731200A7D161 /* editor in Resources */,
-				BC9E614B3067731200A7D161 /* manifest.json in Resources */,
-				BC9E61443067731200A7D161 /* popup in Resources */,
-				BC9E614A3067731200A7D161 /* inject-css in Resources */,
-				BC9E61513067731200A7D161 /* readability in Resources */,
-				BC9E614C3067731200A7D161 /* options.html in Resources */,
-				BC9E61453067731200A7D161 /* options.js.LICENSE.txt in Resources */,
-				BC9E614D3067731200A7D161 /* _locales in Resources */,
-				BC9E61523067731200A7D161 /* options.css in Resources */,
-				BC9E61493067731200A7D161 /* google-fonts in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		BC9E61543067731200A7D161 /* Copy safari-dist */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Copy safari-dist";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "SRC=\"${SRCROOT}/../../safari-dist/\"\nif [ ! -f \"${SRC}manifest.json\" ]; then\n  echo \"error: safari-dist/ is missing; run yarn build:safari first\"\n  exit 1\nfi\nrsync -a --delete \"$SRC\" \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		BC9E61013067731000A7D161 /* Sources */ = {
@@ -478,6 +428,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Stylebot Extension/Info.plist";
@@ -512,6 +463,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Stylebot Extension/Info.plist";
