@@ -9,6 +9,14 @@ import {
   isCompiledStylesCurrent,
   isForceImportant,
   withForceImportant,
+  hasAnyCss,
+  listProfiles,
+  setProfileCss,
+  addProfile,
+  activateProfile,
+  renameProfile as renameStyleProfile,
+  removeProfile,
+  expandProfiles,
 } from '@stylebot/saved-styles';
 
 import type {
@@ -259,29 +267,46 @@ const update = (
 };
 
 /**
- * Saves the style for a url, or removes it if css is empty. An undefined
- * forceImportant keeps the stored style's current value.
+ * Saves a profile's css for a url, the active one unless profileId names
+ * another, and removes the style once no profile has css left. Skips the
+ * write when profileId no longer exists. An undefined forceImportant keeps
+ * the stored style's current value.
  */
 export const set = (
   url: string,
   css: string,
   readability: boolean,
-  forceImportant?: boolean
+  forceImportant?: boolean,
+  profileId?: string
 ): Promise<void> =>
   update(styles => {
-    if (!css) {
-      delete styles[url];
+    const existing = styles[url] ?? {
+      css: '',
+      readability,
+      enabled: true,
+      modifiedTime: getCurrentTimestamp(),
+    };
+    const id =
+      profileId ?? listProfiles(existing).find(profile => profile.active)?.id;
+
+    if (!listProfiles(existing).some(profile => profile.id === id)) {
+      return undefined;
+    }
+
+    const style = withForceImportant(
+      {
+        ...setProfileCss(existing, id as string, css),
+        readability,
+        enabled: true,
+        modifiedTime: getCurrentTimestamp(),
+      },
+      forceImportant ?? isForceImportant(styles[url])
+    );
+
+    if (hasAnyCss(style)) {
+      styles[url] = style;
     } else {
-      styles[url] = withForceImportant(
-        {
-          ...styles[url],
-          css,
-          readability,
-          enabled: true,
-          modifiedTime: getCurrentTimestamp(),
-        },
-        forceImportant ?? isForceImportant(styles[url])
-      );
+      delete styles[url];
     }
 
     return styles;
@@ -357,6 +382,89 @@ export const move = (src: string, dest: string): Promise<void> =>
     styles[dest] = editStyle(styles[src], {});
     delete styles[src];
 
+    return styles;
+  });
+
+/**
+ * Makes a profile the one applied for a url. No-op if the style or the
+ * profile does not exist, or it is already active.
+ */
+export const setActiveProfile = (url: string, profileId: string) =>
+  update(styles => {
+    const style = styles[url] && activateProfile(styles[url], profileId);
+
+    if (!style || style === styles[url]) {
+      return undefined;
+    }
+
+    styles[url] = editStyle(style, {});
+    return styles;
+  });
+
+/**
+ * Adds a profile to a url's style, blank or a copy of sourceProfileId, and
+ * returns its id. Creates the style when the url has none yet.
+ */
+export const createProfile = async (
+  url: string,
+  {
+    name,
+    sourceProfileId,
+    activate,
+  }: { name: string; sourceProfileId?: string; activate: boolean }
+): Promise<string> => {
+  const id = crypto.randomUUID();
+
+  await update(styles => {
+    const existing = styles[url] ?? {
+      css: '',
+      readability: false,
+      enabled: true,
+      modifiedTime: getCurrentTimestamp(),
+    };
+    const source = sourceProfileId
+      ? expandProfiles(existing).sheets[sourceProfileId]
+      : undefined;
+
+    styles[url] = editStyle(
+      addProfile(existing, { id, name, css: source?.css ?? '', activate }),
+      {}
+    );
+    return styles;
+  });
+
+  return id;
+};
+
+/**
+ * Renames one of a url's profiles. No-op if it does not exist or already
+ * has that name.
+ */
+export const renameProfile = (url: string, profileId: string, name: string) =>
+  update(styles => {
+    const style =
+      styles[url] && renameStyleProfile(styles[url], profileId, name);
+
+    if (!style || style === styles[url]) {
+      return undefined;
+    }
+
+    styles[url] = editStyle(style, {});
+    return styles;
+  });
+
+/**
+ * Deletes one of a url's profiles, never its last one.
+ */
+export const deleteProfile = (url: string, profileId: string) =>
+  update(styles => {
+    const style = styles[url] && removeProfile(styles[url], profileId);
+
+    if (!style || style === styles[url]) {
+      return undefined;
+    }
+
+    styles[url] = editStyle(style, {});
     return styles;
   });
 

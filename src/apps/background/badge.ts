@@ -21,7 +21,7 @@ export const updateIcon = (
   styles: Array<Style>,
   readabilityActive: boolean
 ): void => {
-  const enabledStyles = styles.filter(style => style.enabled);
+  const enabledStyles = styles.filter(style => style.enabled && style.css);
 
   if (readabilityActive) {
     chrome.action.setBadgeBackgroundColor({

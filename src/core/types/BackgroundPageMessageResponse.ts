@@ -1,5 +1,4 @@
-import type { Timestamp } from './shared';
-import type { CompiledStyles, Style } from './styles';
+import type { CompiledStyles, Style, StyleMap } from './styles';
 import type { StylebotOptions } from './options';
 import type { StylebotCommands } from './commands';
 import type { ReadabilitySettings } from './readability';
@@ -10,13 +9,10 @@ import type { ChatErrorKey, ChatStatus, ChatTurn } from './chat';
 export type GetAllOptionsResponse = StylebotOptions;
 export type GetOptionResponse = StylebotOptions[keyof StylebotOptions];
 
-export type GetAllStylesResponse = {
-  [url: string]: {
-    css: string;
-    enabled: boolean;
-    readability: boolean;
-    modifiedTime: Timestamp;
-  };
+export type GetAllStylesResponse = StyleMap;
+
+export type CreateProfileResponse = {
+  profileId: string;
 };
 
 export type GetStylesForPageResponse = {
@@ -69,6 +65,7 @@ type BackgroundPageMessageResponse =
   | GetOptionResponse
   | GetAllStylesResponse
   | GetStylesForPageResponse
+  | CreateProfileResponse
   | GetCommandsResponse
   | GetReadabilitySettingsResponse
   | GetImportCssResponse

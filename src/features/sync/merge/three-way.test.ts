@@ -220,3 +220,148 @@ describe('mergeThreeWay', () => {
     });
   });
 });
+
+describe('mergeThreeWay with profiles', () => {
+  const T3 = '2024-03-01T00:00:00.000Z';
+  const RED = 'a { color: red; }';
+  const WHITE = 'a { color: white; }';
+
+  // Two profiles, default active with RED; dark holds WHITE.
+  const base = style(RED, T1, {
+    profiles: { default: { name: '' }, dark: { name: 'Dark', css: WHITE } },
+    activeProfile: 'default',
+  });
+
+  it('gives back the profiles an older Stylebot stripped, keeping its edit', () => {
+    const stripped = style('a { color: blue; }', T2);
+    const { styles } = merge(
+      { 'a.com': base },
+      { 'a.com': stripped },
+      { 'a.com': base }
+    );
+
+    expect(styles['a.com']).toMatchObject({
+      css: 'a { color: blue; }',
+      activeProfile: 'default',
+      profiles: { dark: { name: 'Dark', css: WHITE } },
+    });
+  });
+
+  it('keeps an edit to a profile the other side switched away from', () => {
+    const switched = style(WHITE, T3, {
+      profiles: { default: { name: '', css: RED }, dark: { name: 'Dark' } },
+      activeProfile: 'dark',
+    });
+    const edited = style('a { color: pink; }', T2, {
+      profiles: base.profiles,
+      activeProfile: 'default',
+    });
+
+    const { styles, conflicts } = merge(
+      { 'a.com': base },
+      { 'a.com': switched },
+      { 'a.com': edited }
+    );
+
+    expect(conflicts).toEqual([]);
+    expect(styles['a.com']).toEqual(
+      style(WHITE, T3, {
+        profiles: {
+          default: { name: '', css: 'a { color: pink; }' },
+          dark: { name: 'Dark' },
+        },
+        activeProfile: 'dark',
+      })
+    );
+  });
+
+  it('keeps profiles added on each side', () => {
+    const add = (id: string, time: string) =>
+      style(RED, time, {
+        profiles: { ...base.profiles, [id]: { name: id, css: 'b {}' } },
+        activeProfile: 'default',
+      });
+
+    const { styles } = merge(
+      { 'a.com': base },
+      { 'a.com': add('one', T2) },
+      { 'a.com': add('two', T3) }
+    );
+
+    expect(Object.keys(styles['a.com'].profiles ?? {})).toEqual([
+      'default',
+      'dark',
+      'one',
+      'two',
+    ]);
+  });
+
+  it('takes a rename from one side and an edit from the other', () => {
+    const renamed = style(RED, T2, {
+      profiles: { default: { name: '' }, dark: { name: 'Night', css: WHITE } },
+      activeProfile: 'default',
+    });
+    const edited = style(RED, T3, {
+      profiles: { default: { name: '' }, dark: { name: 'Dark', css: 'c {}' } },
+      activeProfile: 'default',
+    });
+
+    const { styles } = merge(
+      { 'a.com': base },
+      { 'a.com': renamed },
+      { 'a.com': edited }
+    );
+
+    expect(styles['a.com'].profiles?.dark).toEqual({
+      name: 'Night',
+      css: 'c {}',
+    });
+  });
+
+  it('falls back to another active profile when a newer edit deleted the active one', () => {
+    const switched = style(WHITE, T2, {
+      profiles: { default: { name: '', css: RED }, dark: { name: 'Dark' } },
+      activeProfile: 'dark',
+    });
+    const deletedDark = style(RED, T3, {
+      profiles: { default: { name: '' } },
+      activeProfile: 'default',
+    });
+
+    // Switching to dark is not an edit of dark, so the newer deletion stands.
+    const { styles } = merge(
+      { 'a.com': base },
+      { 'a.com': switched },
+      { 'a.com': deletedDark }
+    );
+
+    expect(styles['a.com']).toMatchObject({
+      css: RED,
+      activeProfile: 'default',
+      profiles: { default: { name: '' } },
+    });
+  });
+
+  it('keeps a profile that only an older copy of the style is missing', () => {
+    const withPrint = style(RED, T2, {
+      profiles: { ...base.profiles, print: { name: 'Print', css: 'p {}' } },
+      activeProfile: 'default',
+    });
+    // An older device writing back a stale copy that predates Print.
+    const stale = style('a { color: pink; }', T1, {
+      profiles: base.profiles,
+      activeProfile: 'default',
+    });
+
+    const { styles } = merge(
+      { 'a.com': withPrint },
+      { 'a.com': withPrint },
+      { 'a.com': stale }
+    );
+
+    expect(styles['a.com'].profiles?.print).toEqual({
+      name: 'Print',
+      css: 'p {}',
+    });
+  });
+});

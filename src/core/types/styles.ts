@@ -1,5 +1,18 @@
 import type { Timestamp } from './shared';
 
+/**
+ * One of a style's alternative stylesheets. The active profile's css lives
+ * in the style's own css, so its entry here holds only the name.
+ */
+export type StyleProfile = {
+  name: string;
+  css?: string;
+};
+
+export type StyleProfiles = {
+  [id: string]: StyleProfile;
+};
+
 export type Style = {
   url: string;
   css: string;
@@ -9,6 +22,9 @@ export type Style = {
   // Whether `!important` is forced onto every declaration. Missing means
   // true; only false is ever stored.
   forceImportant?: boolean;
+  // Missing means one unnamed profile holding css.
+  profiles?: StyleProfiles;
+  activeProfile?: string;
 };
 
 export type StyleWithoutUrl = Omit<Style, 'url'>;

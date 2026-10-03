@@ -50,3 +50,45 @@ describe('isEquivalentStyleMap', () => {
     ).toBe(false);
   });
 });
+
+describe('isEquivalentStyleMap with profiles', () => {
+  const plain = style('a { color: red; }');
+  const materialized = style('a { color: red; }', T1, {
+    profiles: { default: { name: '' } },
+    activeProfile: 'default',
+  });
+  const two = style('a { color: red; }', T1, {
+    profiles: { default: { name: '' }, dark: { name: 'Dark', css: 'b {}' } },
+    activeProfile: 'default',
+  });
+
+  it('treats a style without profiles as its lone default profile', () => {
+    expect(
+      isEquivalentStyleMap({ 'a.com': plain }, { 'a.com': materialized })
+    ).toBe(true);
+  });
+
+  it('tells apart a switch, a rename and an edit to an inactive profile', () => {
+    const switched = style('b {}', T1, {
+      profiles: {
+        default: { name: '', css: 'a { color: red; }' },
+        dark: { name: 'Dark' },
+      },
+      activeProfile: 'dark',
+    });
+    const renamed = style('a { color: red; }', T1, {
+      profiles: { default: { name: '' }, dark: { name: 'Night', css: 'b {}' } },
+      activeProfile: 'default',
+    });
+    const edited = style('a { color: red; }', T1, {
+      profiles: { default: { name: '' }, dark: { name: 'Dark', css: 'c {}' } },
+      activeProfile: 'default',
+    });
+
+    for (const other of [switched, renamed, edited, plain]) {
+      expect(isEquivalentStyleMap({ 'a.com': two }, { 'a.com': other })).toBe(
+        false
+      );
+    }
+  });
+});

@@ -76,3 +76,30 @@ describe('mergeWithoutBase', () => {
     });
   });
 });
+
+describe('mergeWithoutBase with profiles', () => {
+  it('keeps a profile only the older copy has', () => {
+    const older = {
+      css: 'a {}',
+      enabled: true,
+      readability: false,
+      modifiedTime: '2024-01-01T00:00:00.000Z',
+      profiles: { default: { name: '' }, dark: { name: 'Dark', css: 'b {}' } },
+      activeProfile: 'default',
+    };
+    const newer = {
+      css: 'c {}',
+      enabled: true,
+      readability: false,
+      modifiedTime: '2024-02-01T00:00:00.000Z',
+    };
+
+    expect(
+      mergeStyles({ 'a.com': older }, { 'a.com': newer })['a.com']
+    ).toMatchObject({
+      css: 'c {}',
+      activeProfile: 'default',
+      profiles: { dark: { name: 'Dark', css: 'b {}' } },
+    });
+  });
+});

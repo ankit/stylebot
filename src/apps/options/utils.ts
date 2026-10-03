@@ -17,6 +17,8 @@ import type {
   RestoreVersion,
   RestoreVersionResponse,
 } from '@stylebot/types';
+import { t } from '@stylebot/i18n';
+import { isStyleMap, sanitizeStyleMap } from '@stylebot/saved-styles';
 
 export const getAllStyles = (): Promise<GetAllStylesResponse> => {
   const message: GetAllStyles = {
@@ -151,8 +153,13 @@ export const importStylesWithFilePicker = (): Promise<StyleMap> => {
 
         reader.onload = () => {
           try {
-            const styles = JSON.parse(reader.result as string);
-            resolve(styles);
+            const styles: unknown = JSON.parse(reader.result as string);
+
+            if (isStyleMap(styles)) {
+              resolve(sanitizeStyleMap(styles));
+            } else {
+              reject(t('import_error_not_backup'));
+            }
           } catch (e) {
             reject(e);
           }
