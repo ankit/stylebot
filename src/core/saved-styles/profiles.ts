@@ -1,12 +1,12 @@
-import type { StyleProfile, StyleProfiles } from '@stylebot/types';
+import type {
+  StyleProfile,
+  StyleProfiles,
+  StyleWithoutUrl,
+} from '@stylebot/types';
 
 export const DEFAULT_PROFILE_ID = 'default';
 
-type WithProfiles = {
-  css: string;
-  profiles?: StyleProfiles;
-  activeProfile?: string;
-};
+type WithProfiles = Pick<StyleWithoutUrl, 'css' | 'profiles' | 'activeProfile'>;
 
 export type ProfileSheet = {
   name: string;
@@ -131,20 +131,16 @@ export const collapseProfiles = <T extends WithProfiles>(
   style: T,
   { active, sheets }: ExpandedProfiles
 ): T => {
-  const profiles: StyleProfiles = {};
-
-  for (const [id, sheet] of Object.entries(sheets)) {
-    profiles[id] =
-      id === active
-        ? { name: sheet.name }
-        : { name: sheet.name, css: sheet.css };
-  }
-
   return {
     ...style,
     css: sheets[active].css,
-    profiles,
     activeProfile: active,
+    profiles: Object.fromEntries(
+      Object.entries(sheets).map(([id, { name, css }]) => [
+        id,
+        id === active ? { name } : { name, css },
+      ])
+    ),
   };
 };
 
@@ -210,24 +206,40 @@ export const activateProfile = <T extends WithProfiles>(
 };
 
 /**
+ * Changes one profile's name or css. Returns the style itself when the
+ * profile does not exist or already has those values.
+ */
+const updateSheet = <T extends WithProfiles>(
+  style: T,
+  id: string,
+  change: Partial<ProfileSheet>
+): T => {
+  const expanded = expandProfiles(style);
+  const sheet = expanded.sheets[id];
+
+  if (
+    !sheet ||
+    Object.entries(change).every(
+      ([key, value]) => sheet[key as keyof ProfileSheet] === value
+    )
+  ) {
+    return style;
+  }
+
+  return collapseProfiles(style, {
+    ...expanded,
+    sheets: { ...expanded.sheets, [id]: { ...sheet, ...change } },
+  });
+};
+
+/**
  * Renames a profile.
  */
 export const renameProfile = <T extends WithProfiles>(
   style: T,
   id: string,
   name: string
-): T => {
-  const expanded = expandProfiles(style);
-
-  if (!(id in expanded.sheets) || expanded.sheets[id].name === name) {
-    return style;
-  }
-
-  return collapseProfiles(style, {
-    ...expanded,
-    sheets: { ...expanded.sheets, [id]: { ...expanded.sheets[id], name } },
-  });
-};
+): T => updateSheet(style, id, { name });
 
 /**
  * Removes a profile, never the last one. Removing the active profile makes
@@ -255,26 +267,14 @@ export const removeProfile = <T extends WithProfiles>(
 };
 
 /**
- * Sets one profile's css, active or not. Returns the style itself when the
- * profile does not exist.
+ * Sets one profile's css, active or not. The active one's is the style's own
+ * css, so a style without profiles doesn't gain them on a save.
  */
 export const setProfileCss = <T extends WithProfiles>(
   style: T,
   id: string,
   css: string
-): T => {
-  const expanded = expandProfiles(style);
-
-  if (!(id in expanded.sheets)) {
-    return style;
-  }
-
-  if (id === expanded.active) {
-    return { ...style, css };
-  }
-
-  return collapseProfiles(style, {
-    ...expanded,
-    sheets: { ...expanded.sheets, [id]: { ...expanded.sheets[id], css } },
-  });
-};
+): T =>
+  id === expandProfiles(style).active
+    ? { ...style, css }
+    : updateSheet(style, id, { css });
