@@ -13,7 +13,7 @@
           toggle();
         "
       >
-        <s-text as="span" size="caption" class="chat-model-name">
+        <s-text as="span" size="label" class="chat-model-name">
           {{ model.shortName }}
         </s-text>
         <chevron-down-icon :size="10" class="chat-model-chevron" />
@@ -21,7 +21,7 @@
     </template>
 
     <template #default="{ close }">
-      <s-menu ref="menu" dense :min-width="270">
+      <s-menu ref="menu" dense :min-width="250">
         <s-menu-item
           v-if="level"
           class="chat-model-back"
@@ -84,27 +84,12 @@
           <s-menu-divider />
 
           <s-menu-item
-            :disabled="!hasTurns"
-            @click="
-              $emit('new-chat');
-              close();
-            "
-          >
-            <span class="chat-menu-action">
-              <compose-icon :size="14" class="chat-menu-icon" />
-              {{ t('new_chat') }}
-            </span>
-          </s-menu-item>
-          <s-menu-item
             @click="
               $emit('providers');
               close();
             "
           >
-            <span class="chat-menu-action">
-              <key-icon :size="14" class="chat-menu-icon" />
-              {{ t('providers') }}
-            </span>
+            {{ t('manage_providers') }}
           </s-menu-item>
         </template>
       </s-menu>
@@ -126,8 +111,6 @@ import {
   ChevronDownIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
-  ComposeIcon,
-  KeyIcon,
 } from '@stylebot/icons';
 import { getModel, getProviderInfo } from '@stylebot/chat';
 import type {
@@ -140,7 +123,7 @@ import type {
 /**
  * The model in use, opening onto the current provider's models. Other
  * connected providers sit below as rows that open their models in place;
- * New chat and Providers stay at the bottom.
+ * Manage providers stays at the bottom.
  */
 export default Vue.extend({
   name: 'ChatModelMenu',
@@ -150,8 +133,6 @@ export default Vue.extend({
     ChevronDownIcon,
     ChevronLeftIcon,
     ChevronRightIcon,
-    ComposeIcon,
-    KeyIcon,
     SMenuItem,
     SMenuDivider,
     SMenu,
@@ -183,10 +164,6 @@ export default Vue.extend({
       return this.status.providers
         .filter(({ id, connected }) => connected && id !== this.status.provider)
         .map(({ id }) => getProviderInfo(id));
-    },
-
-    hasTurns(): boolean {
-      return this.$store.state.chat.turns.length > 0;
     },
   },
 
@@ -261,7 +238,8 @@ export default Vue.extend({
 }
 
 .chat-model-button .chat-model-name {
-  font-weight: 500;
+  font-weight: 400;
+  color: var(--text-muted);
   white-space: nowrap;
 }
 

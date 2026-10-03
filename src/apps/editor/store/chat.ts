@@ -60,6 +60,8 @@ export type ChatState = {
   draftImage: ChatImage | null;
   // The last file attached couldn't be read as an image.
   imageError: boolean;
+  // New chat is waiting on the clear confirmation.
+  confirmingClear: boolean;
 };
 
 type Context = ActionContext<ChatState, State>;
@@ -211,6 +213,7 @@ export const createChatModule = (): Module<ChatState, State> => {
       connectError: null,
       draftImage: null,
       imageError: false,
+      confirmingClear: false,
     }),
 
     mutations: {
@@ -263,6 +266,10 @@ export const createChatModule = (): Module<ChatState, State> => {
 
       setImageError(state: ChatState, value: boolean): void {
         state.imageError = value;
+      },
+
+      setConfirmingClear(state: ChatState, value: boolean): void {
+        state.confirmingClear = value;
       },
     },
 

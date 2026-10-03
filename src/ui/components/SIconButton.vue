@@ -92,8 +92,13 @@ export default Vue.extend({
   color: inherit;
   cursor: pointer;
 
-  &:hover {
+  &:hover:not(:disabled) {
     background: var(--hover-tint);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: default;
   }
 
   @include focus-ring;

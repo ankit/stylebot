@@ -169,13 +169,13 @@ export const ClearsTheChat: StoryObj = {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
 
-    await user.click(within(await openModelMenu(canvas)).getByText('New chat'));
+    await user.click(await canvas.findByRole('button', { name: 'New chat' }));
     const confirm = await canvas.findByRole('alertdialog');
 
     await user.click(within(confirm).getByRole('button', { name: 'Cancel' }));
     await expect(chatStateOf(canvasElement).turns).toHaveLength(2);
 
-    await user.click(within(await openModelMenu(canvas)).getByText('New chat'));
+    await user.click(canvas.getByRole('button', { name: 'New chat' }));
     await user.click(
       within(await canvas.findByRole('alertdialog')).getByRole('button', {
         name: 'Clear chat',
@@ -186,11 +186,16 @@ export const ClearsTheChat: StoryObj = {
       expect(chatStateOf(canvasElement).turns).toHaveLength(0)
     );
     await expect(store.state.css).toContain('font-size: 18px');
+    await expect(
+      canvas.getByRole('button', { name: 'New chat' })
+    ).toBeDisabled();
   },
 };
 
 const openProviders = async (canvas: Canvas): Promise<void> => {
-  await user.click(within(await openModelMenu(canvas)).getByText('Providers'));
+  await user.click(
+    within(await openModelMenu(canvas)).getByText('Manage providers')
+  );
   await canvas.findByText('Back to chat');
 };
 

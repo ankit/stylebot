@@ -5,10 +5,7 @@
 
       <div class="chat-composer-footer">
         <chat-attach-image-button @change="focus" />
-        <chat-model-menu
-          @new-chat="$emit('new-chat')"
-          @providers="$emit('providers')"
-        />
+        <chat-model-menu @providers="$emit('providers')" />
         <span class="chat-composer-spacer" />
         <chat-send-button
           :pending="pending"

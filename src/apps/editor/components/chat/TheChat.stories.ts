@@ -140,11 +140,7 @@ export const ClearConfirmation: StoryObj = {
   ...chatWithThread(),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await user.click(
-      await canvas.findByRole('button', { name: /Choose a model/ })
-    );
-    const menu = await findOpenMenu(canvas);
-    await user.click(within(menu).getByText('New chat'));
+    await user.click(await canvas.findByRole('button', { name: 'New chat' }));
     await canvas.findByRole('alertdialog');
   },
 };
@@ -155,7 +151,7 @@ const openProviders = async (canvasElement: HTMLElement) => {
     await canvas.findByRole('button', { name: /Choose a model/ })
   );
   const menu = await findOpenMenu(canvas);
-  await user.click(within(menu).getByText('Providers'));
+  await user.click(within(menu).getByText('Manage providers'));
   await canvas.findByText('Back to chat');
 };
 

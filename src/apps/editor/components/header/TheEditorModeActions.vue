@@ -1,12 +1,24 @@
 <template>
   <div class="mode-actions">
     <s-tabs ref="tabs" :value="mode" :tabs="tabs" @change="setMode" />
+
+    <s-icon-button
+      v-if="chatConnected"
+      class="new-chat"
+      :size="26"
+      :tooltip="t('new_chat')"
+      :disabled="!hasTurns"
+      @click="newChat"
+    >
+      <compose-icon :size="16" />
+    </s-icon-button>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import { STabs } from '@stylebot/components';
+import { SIconButton, STabs } from '@stylebot/components';
+import { ComposeIcon } from '@stylebot/icons';
 
 import { KEYBOARD_FOCUS } from '@stylebot/utils';
 
@@ -16,12 +28,22 @@ export default Vue.extend({
   name: 'TheEditorModeActions',
 
   components: {
+    ComposeIcon,
+    SIconButton,
     STabs,
   },
 
   computed: {
     mode(): string {
       return this.$store.state.options.mode;
+    },
+
+    chatConnected(): boolean {
+      return this.mode === 'chat' && !!this.$store.state.chat.status?.connected;
+    },
+
+    hasTurns(): boolean {
+      return this.$store.state.chat.turns.length > 0;
     },
 
     readability(): boolean {
@@ -73,6 +95,10 @@ export default Vue.extend({
       (this.$refs.tabs as unknown as TabsRef).focusSelectedTab(KEYBOARD_FOCUS);
     },
 
+    newChat(): void {
+      this.$store.commit('chat/setConfirmingClear', true);
+    },
+
     setMode(mode: string): void {
       this.$store.dispatch('setMode', mode);
     },
@@ -89,5 +115,12 @@ export default Vue.extend({
 
 .mode-actions .tabs {
   margin: 0 16px;
+}
+
+.new-chat {
+  position: absolute;
+  top: 2px;
+  right: 11px;
+  color: var(--icon-color);
 }
 </style>

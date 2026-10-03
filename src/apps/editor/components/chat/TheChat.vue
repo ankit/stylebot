@@ -13,13 +13,10 @@
         <chat-clear-confirmation
           v-if="confirmingClear"
           @confirm="clear"
-          @cancel="confirmingClear = false"
+          @cancel="setConfirmingClear(false)"
         />
         <chat-thread />
-        <chat-composer
-          @new-chat="confirmingClear = true"
-          @providers="showProviders"
-        />
+        <chat-composer @providers="showProviders" />
       </template>
       <chat-setup v-else />
     </template>
@@ -48,9 +45,8 @@ export default Vue.extend({
     ChatComposer,
   },
 
-  data(): { confirmingClear: boolean; showingProviders: boolean } {
+  data(): { showingProviders: boolean } {
     return {
-      confirmingClear: false,
       showingProviders: false,
     };
   },
@@ -63,6 +59,10 @@ export default Vue.extend({
     url(): string {
       return this.$store.state.url;
     },
+
+    confirmingClear(): boolean {
+      return this.$store.state.chat.confirmingClear;
+    },
   },
 
   watch: {
@@ -73,8 +73,15 @@ export default Vue.extend({
       }
     },
 
+    // New chat in the tab bar can ask while the providers are open.
+    confirmingClear(confirming: boolean): void {
+      if (confirming) {
+        this.showingProviders = false;
+      }
+    },
+
     url(): void {
-      this.confirmingClear = false;
+      this.setConfirmingClear(false);
       this.$store.dispatch('chat/load');
     },
   },
@@ -83,14 +90,22 @@ export default Vue.extend({
     this.$store.dispatch('chat/load');
   },
 
+  beforeDestroy() {
+    this.setConfirmingClear(false);
+  },
+
   methods: {
+    setConfirmingClear(value: boolean): void {
+      this.$store.commit('chat/setConfirmingClear', value);
+    },
+
     showProviders(): void {
-      this.confirmingClear = false;
+      this.setConfirmingClear(false);
       this.showingProviders = true;
     },
 
     clear(): void {
-      this.confirmingClear = false;
+      this.setConfirmingClear(false);
       this.$store.dispatch('chat/newChat');
     },
   },
