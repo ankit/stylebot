@@ -118,3 +118,39 @@ export const ClearAllInCodeMode: StoryObj = {
     );
   },
 };
+
+export const UndoRedoButtons: StoryObj = {
+  ...editor(WITH_RULE),
+  name: 'undo and redo buttons appear once there is history and enable only when they can act',
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+    const control = propertyControl(canvas, 'Opacity');
+
+    await expect(canvas.queryByRole('button', { name: 'Undo' })).toBeNull();
+    await expect(canvas.queryByRole('button', { name: 'Redo' })).toBeNull();
+
+    await setRange(slider(control), 0.5);
+
+    const undo = await canvas.findByRole('button', { name: 'Undo' });
+    const redo = canvas.getByRole('button', { name: 'Redo' });
+    await expect(undo).toBeEnabled();
+    await expect(redo).toBeDisabled();
+
+    await step('undo', async () => {
+      await user.click(undo);
+
+      await expect(declaration(store, 'h1', 'opacity')).toBe('0.9');
+      await waitFor(() => expect(undo).toBeDisabled());
+      await expect(redo).toBeEnabled();
+    });
+
+    await step('redo', async () => {
+      await user.click(redo);
+
+      await expect(declaration(store, 'h1', 'opacity')).toBe('0.5');
+      await waitFor(() => expect(redo).toBeDisabled());
+      await expect(undo).toBeEnabled();
+    });
+  },
+};
