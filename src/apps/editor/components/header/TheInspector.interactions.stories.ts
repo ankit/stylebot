@@ -103,8 +103,10 @@ export const HintsOtherMatches: StoryObj = {
     );
     await expect(rects).toHaveLength(1);
     await expect(hints).toHaveLength(1);
-    await expect(hints[0].style.top).toBe(
-      `${second.getBoundingClientRect().top}px`
+    // Inline styles keep three decimals, so a fractional top rounds.
+    await expect(parseFloat(hints[0].style.top)).toBeCloseTo(
+      second.getBoundingClientRect().top,
+      2
     );
 
     await hoverPage(canvasElement.querySelector('h1') as HTMLElement);
