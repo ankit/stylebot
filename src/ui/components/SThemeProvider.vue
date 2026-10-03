@@ -33,6 +33,7 @@ export default Vue.extend({
   --panel-surface: #1c1e22;
   --card-surface: #1f2026;
   --tab-surface: #141519;
+  --chat-surface: #1b1c20;
   --code-surface: #1a1b1e;
   --panel-shadow: rgb(0 0 0 / 34%);
 
@@ -43,6 +44,8 @@ export default Vue.extend({
   --text-muted: #a3aab6;
   --text-faint: #8d95a2;
   --section-heading: #b4b8c0;
+  --reading-ink: #d4d6dc;
+  --reading-strong: #eceef1;
 
   // Lines and interaction states
   --panel-border: #2c2f35;
@@ -122,6 +125,7 @@ export default Vue.extend({
   --panel-surface: #fff;
   --card-surface: #fff;
   --tab-surface: #f7f8fa;
+  --chat-surface: #f7f8fa;
   --code-surface: #fcfcfd;
   --panel-shadow: rgb(0 0 0 / 16%);
 
@@ -132,6 +136,8 @@ export default Vue.extend({
   --text-muted: #6b7280;
   --text-faint: #8b909b;
   --section-heading: #4b5563;
+  --reading-ink: #3f434c;
+  --reading-strong: #191b1f;
 
   // Lines and interaction states
   --panel-border: #e9eaee;

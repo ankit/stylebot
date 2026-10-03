@@ -1,9 +1,8 @@
 <template>
   <div class="chat-pending">
-    <s-text v-if="pending.text" class="chat-pending-text">
-      <span class="chat-pending-body" v-text="pending.text" />
+    <chat-markdown v-if="pending.text" :text="pending.text">
       <span v-if="pending.phase === 'writing'" class="chat-caret" />
-    </s-text>
+    </chat-markdown>
     <chat-loader :label="phaseLabel" />
   </div>
 </template>
@@ -12,9 +11,8 @@
 import type { PropType } from 'vue';
 import Vue from 'vue';
 
-import { SText } from '@stylebot/components';
-
 import ChatLoader from './ChatLoader.vue';
+import ChatMarkdown from './ChatMarkdown.vue';
 import type { ChatPhase, ChatState } from '../../store/chat';
 
 const PHRASE_INTERVAL = 1600;
@@ -26,7 +24,7 @@ export default Vue.extend({
 
   components: {
     ChatLoader,
-    SText,
+    ChatMarkdown,
   },
 
   props: {
@@ -112,21 +110,6 @@ export default Vue.extend({
   display: flex;
   flex-direction: column;
   gap: 9px;
-}
-
-.chat-pending .chat-pending-text {
-  font-family: var(--font-reading);
-  color: var(--text-body);
-  font-size: 14px;
-  line-height: 1.55;
-
-  .chat-pending-body {
-    font-family: inherit;
-  }
-}
-
-.chat-pending-body {
-  white-space: pre-wrap;
 }
 
 .chat-caret {

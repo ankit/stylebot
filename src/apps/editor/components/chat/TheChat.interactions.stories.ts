@@ -3,9 +3,11 @@ import { expect, waitFor, within } from '@storybook/test';
 
 import TheChat from './TheChat.vue';
 import {
+  ASK,
   chat,
   chatStateOf,
   chatWithThread,
+  REPLY,
   SCREENSHOT,
 } from '@stylebot/storybook/fixtures/chat';
 import { findOpenMenu, storeOf, user } from '@stylebot/storybook/story-helpers';
@@ -162,9 +164,41 @@ export const SwitchesModels: StoryObj = {
   },
 };
 
+export const RendersMarkdown: StoryObj = {
+  ...chatWithThread({
+    threads: {
+      'example.com': [
+        ASK,
+        {
+          ...REPLY,
+          text: '1. **Bold** and `code`\n2. <b>tags</b> stay text',
+        },
+      ],
+    },
+  }),
+  name: 'a reply’s markdown renders as a list with bold and code, and HTML stays text',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    const list = await canvas.findByRole('list');
+    await expect(within(list).getAllByRole('listitem')).toHaveLength(2);
+    // No stray spaces where code and bold meet the text around them.
+    await expect(within(list).getAllByRole('listitem')[0]).toHaveTextContent(
+      /^Bold and code$/
+    );
+    await expect(
+      within(list).getByText('Bold').closest('strong')
+    ).not.toBeNull();
+    await expect(within(list).getByText('code').tagName).toBe('CODE');
+    await expect(
+      within(list).getByText(/<b>tags<\/b> stay text/)
+    ).toBeVisible();
+    await expect(list.querySelector('b')).toBeNull();
+  },
+};
+
 export const ClearsTheChat: StoryObj = {
   ...chatWithThread(),
-  name: 'New chat asks first, then clears the conversation but keeps its CSS',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);

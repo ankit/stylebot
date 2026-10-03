@@ -46,6 +46,32 @@ export const Undone = chatWithThread(
   { css: '' }
 );
 
+export const MarkdownReply = chatWithThread({
+  threads: {
+    'example.com': [
+      ASK,
+      {
+        ...REPLY,
+        text: [
+          'A few things would help:',
+          '',
+          '1. **Screenshots after each change** - especially of the broken areas.',
+          '2. **Specific element names** - like `a.WwrzSb`, so I can target it _precisely_.',
+          '3. **Avoid blanket overrides on `div`** - they hit every card.',
+          '',
+          '```css',
+          '.card {',
+          '  background: #1f2026;',
+          '}',
+          '```',
+          '',
+          'If you want, I can do a more careful audit.',
+        ].join('\n'),
+      },
+    ],
+  },
+});
+
 export const PickedElementAndScreenshot = chatWithThread({
   threads: {
     'example.com': [

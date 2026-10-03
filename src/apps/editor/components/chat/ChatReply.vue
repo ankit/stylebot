@@ -1,12 +1,11 @@
 <template>
   <div class="chat-reply">
-    <s-text v-if="turn.text || turn.stopped" class="chat-reply-text">
-      <span class="chat-reply-body" v-text="turn.text" />
+    <chat-markdown v-if="turn.text || turn.stopped" :text="turn.text">
       <template v-if="turn.stopped">
         {{ turn.text ? '… ' : '' }}
         <span class="chat-reply-stopped">({{ t('stopped') }})</span>
       </template>
-    </s-text>
+    </chat-markdown>
 
     <chat-change-card
       v-if="turn.edits.length"
@@ -21,17 +20,17 @@
 import type { PropType } from 'vue';
 import Vue from 'vue';
 
-import { SText } from '@stylebot/components';
 import type { ChatAssistantTurn } from '@stylebot/types';
 
 import ChatChangeCard from './ChatChangeCard.vue';
+import ChatMarkdown from './ChatMarkdown.vue';
 
 export default Vue.extend({
   name: 'ChatReply',
 
   components: {
     ChatChangeCard,
-    SText,
+    ChatMarkdown,
   },
 
   props: {
@@ -60,23 +59,8 @@ export default Vue.extend({
   gap: 8px;
 }
 
-.chat-reply .chat-reply-text {
-  font-family: var(--font-reading);
-  color: var(--text-body);
-  font-size: 14px;
-  line-height: 1.55;
-
-  .chat-reply-body,
-  .chat-reply-stopped {
-    font-family: inherit;
-  }
-}
-
-.chat-reply-body {
-  white-space: pre-wrap;
-}
-
 .chat-reply-stopped {
+  font-family: inherit;
   color: var(--text-faint);
 }
 </style>

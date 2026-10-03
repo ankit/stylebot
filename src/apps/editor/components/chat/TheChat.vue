@@ -119,6 +119,8 @@ export default Vue.extend({
   height: 100%;
 
   &.conversation {
+    --tab-surface: var(--chat-surface);
+
     background: var(--tab-surface);
   }
 }
