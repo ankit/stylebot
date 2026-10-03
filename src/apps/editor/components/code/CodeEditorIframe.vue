@@ -1,6 +1,6 @@
 <template>
   <div class="stylebot-code-editor-iframe" :class="{ ready }">
-    <iframe ref="iframe" :src="src" />
+    <iframe ref="iframe" :src="src" @load="postTheme(resolvedTheme)" />
   </div>
 </template>
 
