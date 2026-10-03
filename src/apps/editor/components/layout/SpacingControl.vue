@@ -344,7 +344,7 @@ export default Vue.extend({
 }
 
 .spacing-row .spacing-field {
-  width: 64px;
+  width: 72px;
 }
 
 .spacing-mode {
@@ -360,7 +360,7 @@ export default Vue.extend({
   padding: 2px 0 4px;
 
   &.mode-xy {
-    grid-template-columns: repeat(2, 64px);
+    grid-template-columns: repeat(2, 88px);
     justify-content: end;
   }
 
