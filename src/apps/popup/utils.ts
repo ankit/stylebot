@@ -5,6 +5,9 @@ import type {
   GetIsStylebotOpen,
   GetIsPageReaderable,
   GetStylesForPageResponse,
+  EnableStyle,
+  DisableStyle,
+  SetActiveProfile,
   StylebotOptions,
 } from '@stylebot/types';
 import { STYLES_KEY, getStylesForPage } from '@stylebot/saved-styles';
@@ -27,6 +30,28 @@ export const getCurrentTab = (
       callback(tab);
     }
   });
+};
+
+export const enableStyle = (url: string): void => {
+  const message: EnableStyle = { name: 'EnableStyle', url };
+
+  chrome.runtime.sendMessage(message);
+};
+
+export const disableStyle = (url: string): void => {
+  const message: DisableStyle = { name: 'DisableStyle', url };
+
+  chrome.runtime.sendMessage(message);
+};
+
+export const setActiveProfile = (url: string, profileId: string): void => {
+  const message: SetActiveProfile = {
+    name: 'SetActiveProfile',
+    url,
+    profileId,
+  };
+
+  chrome.runtime.sendMessage(message);
 };
 
 /**

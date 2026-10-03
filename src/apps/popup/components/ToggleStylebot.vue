@@ -28,6 +28,12 @@ export default Vue.extend({
 
     isOpen: Boolean,
     sidePanel: Boolean,
+    // Set when the site has several profiles, so the button says which one
+    // the editor opens on.
+    profileName: {
+      type: String,
+      default: '',
+    },
     shortcut: {
       type: String,
       default: '',
@@ -36,7 +42,13 @@ export default Vue.extend({
 
   computed: {
     label(): string {
-      return this.isOpen ? this.t('close_stylebot') : this.t('style_this_page');
+      if (this.isOpen) {
+        return this.t('close_stylebot');
+      }
+
+      return this.profileName
+        ? this.t('edit_name', [this.profileName])
+        : this.t('style_this_page');
     },
   },
 

@@ -26,15 +26,44 @@
     >
       {{ url }}
     </s-toggle-switch>
+
+    <span v-if="profiles.length > 1" class="profile-select" @click.stop>
+      <s-select :text="activeName" :menu-min-width="160">
+        <template #default="{ close }">
+          <s-menu-item
+            v-for="profile in profiles"
+            :key="profile.id"
+            :selected="profile.id === activeProfile"
+            @click="
+              switchProfile(profile.id);
+              close();
+            "
+          >
+            {{ displayName(profile) }}
+          </s-menu-item>
+        </template>
+      </s-select>
+    </span>
   </popup-row>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import type { EnableStyle, DisableStyle } from '@stylebot/types';
+import type { PropType } from 'vue';
+import type { ProfileSummary } from '@stylebot/saved-styles';
 import PopupRow from './PopupRow.vue';
-import { SShortcutChip, SToggleSwitch } from '@stylebot/components';
-import { forwardClickToInput } from '../utils';
+import {
+  SMenuItem,
+  SSelect,
+  SShortcutChip,
+  SToggleSwitch,
+} from '@stylebot/components';
+import {
+  disableStyle,
+  enableStyle,
+  forwardClickToInput,
+  setActiveProfile,
+} from '../utils';
 
 export default Vue.extend({
   name: 'StyleComponent',
@@ -43,6 +72,8 @@ export default Vue.extend({
     PopupRow,
     SToggleSwitch,
     SShortcutChip,
+    SSelect,
+    SMenuItem,
   },
 
   props: {
@@ -63,17 +94,44 @@ export default Vue.extend({
       type: String,
       default: '',
     },
+    profiles: {
+      type: Array as PropType<Array<ProfileSummary>>,
+      default: () => [],
+    },
   },
 
   data(): {
     enabled: boolean;
+    activeProfile: string;
   } {
     return {
       enabled: this.initialEnabled,
+      activeProfile: this.profiles.find(profile => profile.active)?.id ?? '',
     };
   },
 
+  computed: {
+    activeName(): string {
+      const active = this.profiles.find(
+        profile => profile.id === this.activeProfile
+      );
+
+      return active ? this.displayName(active) : '';
+    },
+  },
+
   methods: {
+    displayName(profile: ProfileSummary): string {
+      return profile.name || this.t('profile_default_name');
+    },
+
+    switchProfile(id: string): void {
+      if (id !== this.activeProfile) {
+        this.activeProfile = id;
+        setActiveProfile(this.url, id);
+      }
+    },
+
     onHeaderClick(event: MouseEvent): void {
       if (this.disableToggle) {
         return;
@@ -84,28 +142,10 @@ export default Vue.extend({
 
     onChange(): void {
       if (this.enabled) {
-        this.enable();
+        enableStyle(this.url);
       } else {
-        this.disable();
+        disableStyle(this.url);
       }
-    },
-
-    enable(): void {
-      const message: EnableStyle = {
-        name: 'EnableStyle',
-        url: this.url,
-      };
-
-      chrome.runtime.sendMessage(message);
-    },
-
-    disable(): void {
-      const message: DisableStyle = {
-        name: 'DisableStyle',
-        url: this.url,
-      };
-
-      chrome.runtime.sendMessage(message);
     },
   },
 });
@@ -118,6 +158,11 @@ export default Vue.extend({
   &.disabled {
     cursor: default;
   }
+}
+
+.profile-select {
+  flex: none;
+  cursor: default;
 }
 
 .popup-header .popup-header-domain {
