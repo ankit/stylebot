@@ -16,7 +16,7 @@ Browser extension (Chrome/Edge/Firefox) that lets users change the appearance of
 - `dist/` — Chrome/Edge build output; `firefox-dist/` — Firefox build output; `preview-dist/` — `yarn build:preview` output
 - `store/` — store listing art (promo tiles, screenshots) per store; not part of the build
 - `site/` — stylebot.dev static site
-- `docs/` — developer docs: setup, releases, translation, e2e, architecture (editor, selectors and CSS, readability, sync, chat)
+- `docs/` — developer docs: setup, releases, translation, e2e, architecture (editor, selectors and CSS, readability, profiles, sync, chat)
 - `patches/` — patch-package patches applied to dependencies on install
 
 ## Workflow
