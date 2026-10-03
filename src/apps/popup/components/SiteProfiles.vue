@@ -1,8 +1,8 @@
 <template>
   <div class="site-profiles">
     <div class="popup-header site-header">
-      <h1 class="site-domain">{{ url }}</h1>
-      <p class="site-summary">{{ summary }}</p>
+      <s-heading as="h1" size="sm" class="site-domain">{{ url }}</s-heading>
+      <s-text size="caption" variant="muted">{{ summary }}</s-text>
     </div>
 
     <div class="popup-divider" />
@@ -26,7 +26,9 @@
             :size="13"
           />
         </span>
-        <span class="profile-name">{{ displayName(profile) }}</span>
+        <s-text as="span" class="profile-name">
+          {{ displayName(profile) }}
+        </s-text>
       </button>
 
       <button
@@ -41,7 +43,9 @@
         <span class="check-slot" aria-hidden="true">
           <check-icon v-if="!enabled" :size="13" />
         </span>
-        <span class="profile-name">{{ t('no_style') }}</span>
+        <s-text as="span" variant="muted" class="profile-name">
+          {{ t('no_style') }}
+        </s-text>
       </button>
     </div>
   </div>
@@ -50,6 +54,7 @@
 <script lang="ts">
 import type { PropType } from 'vue';
 import Vue from 'vue';
+import { SHeading, SText } from '@stylebot/components';
 import { CheckIcon } from '@stylebot/icons';
 import type { ProfileSummary } from '@stylebot/saved-styles';
 
@@ -57,6 +62,8 @@ export default Vue.extend({
   name: 'SiteProfiles',
 
   components: {
+    SHeading,
+    SText,
     CheckIcon,
   },
 
@@ -120,19 +127,6 @@ export default Vue.extend({
 
 .site-domain {
   @include truncate;
-
-  margin: 0;
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 1.2;
-  color: var(--text-primary);
-}
-
-.site-summary {
-  margin: 0;
-  font-size: 12px;
-  line-height: 1.2;
-  color: var(--text-muted);
 }
 
 .profile-list {
@@ -150,9 +144,6 @@ export default Vue.extend({
   height: 36px;
   padding: 0 10px;
   border-radius: 8px;
-  font-size: 13px;
-  line-height: 1;
-  color: var(--text-primary);
   cursor: pointer;
 
   &:hover:not(:disabled) {
@@ -160,12 +151,7 @@ export default Vue.extend({
   }
 
   &.checked {
-    font-weight: 600;
     background: var(--field-surface-hover);
-  }
-
-  &.off {
-    color: var(--text-muted);
   }
 
   &:disabled {
@@ -186,5 +172,9 @@ export default Vue.extend({
 
 .profile-name {
   @include truncate;
+
+  .checked & {
+    font-weight: 600;
+  }
 }
 </style>
