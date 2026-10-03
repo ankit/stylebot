@@ -4,10 +4,10 @@ import { isSupportedUrl } from '@stylebot/saved-styles';
 
 import { supportsEditorSidePanel, openEditorSidePanel } from '@stylebot/utils';
 
-import type { StylebotLayout, StylebotDockLocation } from '@stylebot/types';
+import type { StylebotDockLocation } from '@stylebot/types';
 
 import { OpenOptionsPage } from './messages';
-import { get as getOption } from './options';
+import { getAll as getAllOptions } from './options';
 
 const CONTEXT_MENU_ID = 'stylebot-contextmenu';
 const VIEW_OPTIONS_MENU_ITEM_ID = 'view-options';
@@ -17,9 +17,40 @@ const STYLE_ELEMENT_MENU_ITEM_ID = 'style-element';
 const STYLE_ELEMENT_IN_SIDE_PANEL_MENU_ITEM_ID = 'style-element-side-panel';
 
 export const ContextMenu = {
-  init(): void {
-    this.remove();
+  shown: undefined as boolean | undefined,
 
+  init(): void {
+    this.sync();
+
+    chrome.storage.onChanged.addListener((changes, area) => {
+      if (area === 'local' && changes['options']) {
+        this.sync();
+      }
+    });
+  },
+
+  /**
+   * Adds or removes the menu to match the contextMenu option, and shows the
+   * Style element item for where the editor is docked.
+   */
+  async sync(): Promise<void> {
+    const { contextMenu, layout } = await getAllOptions();
+
+    if (contextMenu !== this.shown) {
+      this.shown = contextMenu;
+      this.remove();
+
+      if (contextMenu) {
+        this.create();
+      }
+    }
+
+    if (contextMenu) {
+      this.showDock(layout.dockLocation);
+    }
+  },
+
+  create(): void {
     chrome.contextMenus.create({
       id: CONTEXT_MENU_ID,
       title: 'Stylebot',
@@ -46,17 +77,6 @@ export const ContextMenu = {
       title: t('view_options'),
       parentId: CONTEXT_MENU_ID,
       id: VIEW_OPTIONS_MENU_ITEM_ID,
-    });
-
-    getOption('layout').then(layout =>
-      this.showDock((layout as StylebotLayout).dockLocation)
-    );
-
-    chrome.storage.onChanged.addListener((changes, area) => {
-      const layout = changes['options']?.newValue?.layout;
-      if (area === 'local' && layout) {
-        this.showDock(layout.dockLocation);
-      }
     });
   },
 
