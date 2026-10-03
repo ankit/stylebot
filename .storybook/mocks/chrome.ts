@@ -92,6 +92,10 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
     'readability-settings': readabilitySettings,
     options,
     commands,
+    // The popup reads a page's styles straight from storage.
+    styles: Object.fromEntries(
+      (overrides.styles ?? []).map(({ url, ...style }) => [url, style])
+    ),
     ...overrides.storage,
   };
   const tab = {
