@@ -7,7 +7,7 @@ const SESSION_KEY = 'editorWindows';
 
 const DEFAULT_WIDTH = 420;
 const DEFAULT_HEIGHT = 820;
-const MIN_WIDTH = 340;
+const MIN_WIDTH = 360;
 const MIN_HEIGHT = 400;
 
 type Registry = Record<number, number>;

@@ -25,7 +25,7 @@ export const defaultOptions: StylebotOptions = {
     more: false,
   },
   layout: {
-    width: 350,
+    width: 360,
     adjustPageLayout: false,
     dockLocation: 'right',
   },

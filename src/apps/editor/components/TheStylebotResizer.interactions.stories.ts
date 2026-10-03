@@ -97,7 +97,7 @@ export const Clamped: StoryObj = {
     );
 
     await dragEdge(canvasElement, window.innerWidth);
-    await expect(store.state.options.layout.width).toBe(340);
+    await expect(store.state.options.layout.width).toBe(360);
   },
 };
 

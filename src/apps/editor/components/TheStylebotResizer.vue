@@ -37,7 +37,7 @@ import { defaultOptions } from '@stylebot/settings';
 import type { StylebotLayout } from '@stylebot/types';
 
 const MARGIN = 12;
-const MIN_WIDTH = 340;
+const MIN_WIDTH = 360;
 const MAX_WIDTH_RATIO = 0.6;
 const KEYBOARD_STEP = 16;
 
