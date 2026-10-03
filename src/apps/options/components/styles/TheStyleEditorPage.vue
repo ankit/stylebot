@@ -21,7 +21,7 @@
         :value="existingStyle.enabled"
         @change="onToggleEnabled"
       >
-        <span class="enabled-label">{{ t('enabled') }}</span>
+        <s-text as="span">{{ t('enabled') }}</s-text>
       </s-toggle-switch>
 
       <style-row-menu
@@ -623,12 +623,6 @@ export default Vue.extend({
   ::v-deep .label {
     order: -1;
   }
-}
-
-.enabled-label {
-  font-size: 13px;
-  line-height: 1;
-  color: var(--text-body);
 }
 
 .profile-bar {
