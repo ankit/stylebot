@@ -122,6 +122,7 @@ import {
 
 import { getGoogleDriveSyncEnabled, getSyncNeedsAuth } from '@stylebot/sync';
 import {
+  expandProfiles,
   hasAnyCss,
   isSupportedUrl,
   listProfiles,
@@ -245,10 +246,11 @@ export default Vue.extend({
       getStyles(this.tab, ({ styles, defaultStyle }) => {
         this.styles = styles.filter(hasAnyCss);
 
-        if (this.styles.length) {
-          this.siteEnabled = this.styles[0].enabled;
-          this.siteActiveProfile =
-            listProfiles(this.styles[0]).find(({ active }) => active)?.id ?? '';
+        const [site] = this.styles;
+
+        if (site) {
+          this.siteEnabled = site.enabled;
+          this.siteActiveProfile = expandProfiles(site).active;
         }
         this.readability = !!defaultStyle && defaultStyle.readability;
       });
