@@ -10,6 +10,7 @@
     :disabled="disabled"
     :min-width="300"
     :placeholder="t('pick_an_element')"
+    :clear-label="t('clear_selector')"
     @input="setSelector"
     @select="pickSelector"
     @click.native="stopInspecting"
