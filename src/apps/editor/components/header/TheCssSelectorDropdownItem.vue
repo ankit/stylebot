@@ -1,6 +1,8 @@
 <template>
   <s-menu-item
     class="css-selector-dropdown-item"
+    :class="{ current }"
+    :selected="current"
     @click="click"
     @mouseenter.native="preview"
     @mouseleave.native="clearPreview"
@@ -8,33 +10,48 @@
     @blur.native="clearPreview"
   >
     <span class="item-row">
-      <span class="chips">
-        <selector-chips :parts="parts" />
-      </span>
+      <s-inline-list mono :parts="parts" class="item-text" />
+      <arrow-up-right-icon
+        v-if="styled && !current"
+        :size="12"
+        class="item-icon"
+      />
     </span>
   </s-menu-item>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import { SMenuItem } from '@stylebot/components';
+import { SInlineList, SMenuItem } from '@stylebot/components';
+import { ArrowUpRightIcon } from '@stylebot/icons';
 import { splitSelectorList } from '@stylebot/css';
 
 import { getPageBridge } from '@stylebot/page-bridge';
-import SelectorChips from './SelectorChips.vue';
 
 export default Vue.extend({
   name: 'TheCssSelectorDropdownItem',
 
   components: {
     SMenuItem,
-    SelectorChips,
+    ArrowUpRightIcon,
+    SInlineList,
   },
 
   props: {
     selector: {
       type: String,
       required: true,
+    },
+
+    current: {
+      type: Boolean,
+      default: false,
+    },
+
+    // Whether the style already has a rule for the selector.
+    styled: {
+      type: Boolean,
+      default: false,
     },
   },
 
@@ -70,24 +87,36 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
+.css-selector-dropdown-item {
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.45;
+
+  &:hover,
+  &:focus-visible,
+  &.current {
+    background: var(--field-surface-hover);
+    box-shadow: none;
+  }
+}
+
 .item-row {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
+  gap: 8px;
   width: 100%;
 }
 
-.chips {
+.item-text {
   flex: 1;
   min-width: 0;
-  contain: inline-size;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
 }
 
-.css-selector-dropdown-item:hover .chip,
-.css-selector-dropdown-item:focus-visible .chip {
-  background: var(--panel-surface);
+.item-icon {
+  flex: none;
+  margin-top: 3px;
+  color: var(--accent-text);
 }
 </style>

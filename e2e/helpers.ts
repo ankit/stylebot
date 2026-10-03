@@ -155,7 +155,7 @@ export const pickElement = async (
   await expect(editorRoot.locator('.stylebot-inspector')).toHaveClass(/active/);
   await page.locator(selector).click({ force: true });
   await expect(
-    editorRoot.locator('.autocomplete-chips .chip').first()
+    editorRoot.locator('.autocomplete-chips .part').first()
   ).toHaveText(new RegExp(`${escapeRegExp(selector)}$`));
 };
 

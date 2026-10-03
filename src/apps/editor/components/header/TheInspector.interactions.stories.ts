@@ -28,7 +28,7 @@ const inspector = (root: HTMLElement) =>
 
 const lastChipText = (root: ParentNode, scope: string) =>
   (
-    Array.from(root.querySelectorAll(`${scope} .chip`)).at(-1)?.textContent ??
+    Array.from(root.querySelectorAll(`${scope} .part`)).at(-1)?.textContent ??
     ''
   ).trim();
 

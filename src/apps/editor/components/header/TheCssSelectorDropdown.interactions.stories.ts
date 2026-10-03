@@ -2,7 +2,11 @@ import type { Meta, StoryObj } from '@storybook/vue';
 import { expect, waitFor, within } from '@storybook/test';
 
 import TheCssSelectorDropdown from './TheCssSelectorDropdown.vue';
-import { editor, WITH_RULE } from '@stylebot/storybook/fixtures/editor';
+import {
+  editor,
+  RULE_CSS,
+  WITH_RULE,
+} from '@stylebot/storybook/fixtures/editor';
 import {
   findOpenMenu,
   pressKey,
@@ -100,7 +104,12 @@ export const ArrowKeysBetweenFieldAndList: StoryObj = {
     await expect(input(canvasElement)).toHaveValue('h1');
     await expect(items(canvasElement)).toHaveLength(2);
 
+    // The active selector's row is checked, and Down moves on from it.
+    await expect(items(canvasElement)[0]).toHaveClass('selected');
     await pressKey('ArrowDown');
+    await waitFor(() => expect(items(canvasElement)[1]).toHaveFocus());
+
+    await pressKey('ArrowUp');
     await waitFor(() => expect(items(canvasElement)[0]).toHaveFocus());
 
     await pressKey('ArrowUp');
@@ -137,77 +146,184 @@ export const DisabledOutsideBasicMode: StoryObj = {
   },
 };
 
-const LONG_SELECTOR =
-  "main#site-content > div.page-wrapper [style*='background-color: rgb(238, 238, 238)'], main#site-content [class*='skeleton']";
-
-export const LongSelectorChips: StoryObj = {
-  ...editor({
-    css: `${LONG_SELECTOR} { color: red; }\n\np { color: blue; }`,
-    activeSelector: LONG_SELECTOR,
-  }),
-  name: 'a long selector list shows one single-line chip per selector, trimmed to fit',
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const parts = [
-      "main#site-content > div.page-wrapper [style*='background-color: rgb(238, 238, 238)']",
-      "main#site-content [class*='skeleton']",
-    ];
-
-    const expectTrimmedChips = async (container: HTMLElement) => {
-      const chipEls = [
-        ...container.querySelectorAll('.chip'),
-      ] as Array<HTMLElement>;
-      await expect(chipEls.map(chip => chip.title)).toEqual(parts);
-
-      const lineHeight = parseFloat(getComputedStyle(chipEls[0]).lineHeight);
-      for (const chip of chipEls) {
-        await expect(chip.clientHeight).toBeLessThan(lineHeight * 2);
-        await expect(chip.getBoundingClientRect().right).toBeLessThanOrEqual(
-          container.getBoundingClientRect().right
-        );
-      }
-      const label = chipEls[0].querySelector('.chip-label') as HTMLElement;
-      await expect(label.scrollWidth).toBeGreaterThan(label.clientWidth);
-    };
-
-    await expectTrimmedChips(chips(canvasElement));
-
-    await user.click(chips(canvasElement));
-    await findOpenMenu(canvas);
-    await waitFor(() => expect(items(canvasElement)).toHaveLength(2));
-    await expectTrimmedChips(items(canvasElement)[0] as HTMLElement);
-  },
-};
-
 const GROUP = ['h1', 'h2', '.title', '.subtitle', '.byline'];
 
-export const LongSelectorGroups: StoryObj = {
+export const SelectorListAsText: StoryObj = {
   ...editor({
     css: `${GROUP.join(', ')} { color: red; }\n\np { color: blue; }`,
     activeSelector: GROUP.join(', '),
   }),
-  name: 'a selector group of more than three shows its first two and a "+N more" chip',
+  name: 'a selector list reads as one line of text with dimmed commas, in the field and in the list',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    const expectCollapsed = async (container: HTMLElement) => {
-      const chipEls = [
-        ...container.querySelectorAll('.chip'),
-      ] as Array<HTMLElement>;
-      await expect(chipEls.map(chip => chip.textContent?.trim())).toEqual([
-        'h1',
-        'h2',
-        '+3 more',
-      ]);
-      await expect(chipEls[2].title).toBe('.title\n.subtitle\n.byline');
+    const expectInOrder = async (container: HTMLElement) => {
+      const parts = [...container.querySelectorAll('.part')];
+      await expect(parts.map(part => part.textContent)).toEqual(GROUP);
+      await expect(container.querySelectorAll('.separator')).toHaveLength(
+        GROUP.length - 1
+      );
+      await expect(container.querySelector('.chip')).toBeNull();
     };
 
-    await expectCollapsed(chips(canvasElement));
+    await expectInOrder(chips(canvasElement));
 
     await user.click(chips(canvasElement));
     await findOpenMenu(canvas);
     await waitFor(() => expect(items(canvasElement)).toHaveLength(2));
-    await expectCollapsed(items(canvasElement)[0] as HTMLElement);
+    await expectInOrder(items(canvasElement)[0] as HTMLElement);
     await expect(items(canvasElement)[1]).toHaveTextContent(/^\s*p\s*$/);
+  },
+};
+
+const ALTERNATIVES_CSS = `${RULE_CSS}
+
+* {
+  box-sizing: border-box;
+}`;
+
+const WITH_ALTERNATIVES = {
+  css: ALTERNATIVES_CSS,
+  activeSelector: 'h1',
+  selectorAlternatives: {
+    existing: ['h1', '*'],
+    candidates: ['h1', '.sb-page h1', 'div h1'],
+  },
+};
+
+const headers = (root: HTMLElement) =>
+  Array.from(root.querySelectorAll('.section-header'), header =>
+    header.textContent?.trim()
+  );
+
+const dividers = (root: HTMLElement) =>
+  root.querySelectorAll('.section-divider');
+
+const row = (root: HTMLElement, selector: string) =>
+  Array.from(items(root)).find(
+    item => item.querySelector('.item-text')?.textContent?.trim() === selector
+  ) as HTMLElement;
+
+const rowTexts = (root: HTMLElement) =>
+  Array.from(items(root), item =>
+    item.querySelector('.item-text')?.textContent?.trim()
+  );
+
+const linked = (item: HTMLElement) => item.querySelector('.item-icon') !== null;
+
+export const SectionsForTheElementAndPage: StoryObj = {
+  ...editor(WITH_ALTERNATIVES),
+  name: "the list offers the picked element's selectors, then the page's other rules",
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await user.click(chips(canvasElement));
+    await findOpenMenu(canvas);
+
+    await expect(headers(canvasElement)).toEqual([
+      'This element',
+      'Styled on this page',
+    ]);
+    await expect(dividers(canvasElement)).toHaveLength(1);
+    const line = dividers(canvasElement)[0].getBoundingClientRect();
+    await expect(line.height).toBeGreaterThan(0.5);
+    await expect(line.width).toBeGreaterThan(200);
+    await expect(rowTexts(canvasElement)).toEqual([
+      'h1',
+      '*',
+      '.sb-page h1',
+      'div h1',
+      '.article-body',
+    ]);
+
+    // The active selector leads, checked rather than linked.
+    const current = row(canvasElement, 'h1');
+    await expect(current).toHaveClass('selected');
+    await expect(current.querySelector('.menu-item-check')).not.toBeNull();
+    await expect(linked(current)).toBe(false);
+
+    // Selectors the style already has link to their rules.
+    await expect(linked(row(canvasElement, '*'))).toBe(true);
+    await expect(linked(row(canvasElement, '.sb-page h1'))).toBe(false);
+    await expect(linked(row(canvasElement, '.article-body'))).toBe(true);
+  },
+};
+
+export const PickAnAlternative: StoryObj = {
+  ...editor(WITH_ALTERNATIVES),
+  name: "picking one of the element's selectors makes it the active selector",
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+
+    await user.click(chips(canvasElement));
+    await findOpenMenu(canvas);
+    await user.click(row(canvasElement, 'div h1'));
+    await expect(store.state.activeSelector).toBe('div h1');
+    await waitFor(() => expect(canvas.queryByRole('menu')).toBeNull());
+
+    // The element's selectors are still offered, the new one first.
+    await user.click(chips(canvasElement));
+    await findOpenMenu(canvas);
+    await expect(rowTexts(canvasElement).slice(0, 2)).toEqual(['div h1', 'h1']);
+    await expect(row(canvasElement, 'div h1')).toHaveClass('selected');
+    await pressKey('Escape');
+
+    // Choosing something unrelated leaves only the page's rules.
+    store.commit('setActiveSelector', '.article-body');
+    await user.click(
+      field(canvasElement).querySelector('.autocomplete-chevron') as Element
+    );
+    await findOpenMenu(canvas);
+    await expect(headers(canvasElement)).toEqual(['Styled on this page']);
+    await expect(dividers(canvasElement)).toHaveLength(0);
+  },
+};
+
+export const TypingFiltersBothSections: StoryObj = {
+  ...editor(WITH_ALTERNATIVES),
+  name: 'typing filters both sections and drops an emptied one with its divider',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await user.click(chips(canvasElement));
+    await waitFor(() => expect(input(canvasElement)).toHaveFocus());
+    await user.clear(input(canvasElement));
+    await user.type(input(canvasElement), '.');
+
+    await findOpenMenu(canvas);
+    await waitFor(() =>
+      expect(rowTexts(canvasElement)).toEqual(['.sb-page h1', '.article-body'])
+    );
+    await expect(headers(canvasElement)).toEqual([
+      'This element',
+      'Styled on this page',
+    ]);
+    await expect(dividers(canvasElement)).toHaveLength(1);
+
+    await user.type(input(canvasElement), 'sb');
+    await waitFor(() =>
+      expect(rowTexts(canvasElement)).toEqual(['.sb-page h1'])
+    );
+    await expect(headers(canvasElement)).toEqual(['This element']);
+    await expect(dividers(canvasElement)).toHaveLength(0);
+  },
+};
+
+export const RepeatedRulesListedOnce: StoryObj = {
+  ...editor({
+    css: 'h1 { color: red; }\n\np { color: blue; }\n\np { margin: 0; }',
+    activeSelector: 'h1',
+  }),
+  name: 'a selector with several rules is listed once',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await user.click(chips(canvasElement));
+    await findOpenMenu(canvas);
+    await waitFor(() => expect(rowTexts(canvasElement)).toContain('p'));
+    await expect(rowTexts(canvasElement).filter(text => text === 'p')).toEqual([
+      'p',
+    ]);
   },
 };

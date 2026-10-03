@@ -94,6 +94,8 @@ export default Vue.extend({
 
 .menu-item-check {
   flex: none;
+  align-self: flex-start;
+  margin-top: 3px;
   color: var(--accent-text);
 }
 </style>

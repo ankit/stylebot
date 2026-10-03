@@ -10,8 +10,6 @@
       <the-css-selector-dropdown />
     </div>
 
-    <the-selector-alternatives />
-
     <the-editor-mode-actions ref="modeActions" />
   </div>
 </template>
@@ -24,7 +22,6 @@ import TheInspector from './header/TheInspector.vue';
 import TheWindowActions from './header/TheWindowActions.vue';
 import TheCssSelectorDropdown from './header/TheCssSelectorDropdown.vue';
 import TheEditorModeActions from './header/TheEditorModeActions.vue';
-import TheSelectorAlternatives from './header/TheSelectorAlternatives.vue';
 import { consumeFieldEscape } from '@stylebot/utils';
 
 type InspectorRef = { focus(): void };
@@ -39,7 +36,6 @@ export default Vue.extend({
     TheWindowActions,
     TheCssSelectorDropdown,
     TheEditorModeActions,
-    TheSelectorAlternatives,
   },
 
   computed: {

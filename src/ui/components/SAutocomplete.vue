@@ -9,7 +9,7 @@
     @leave="$emit('leave', value)"
   >
     <template #trigger="{ open }">
-      <div class="autocomplete-pill" :class="{ disabled }">
+      <div class="autocomplete-pill" :class="{ disabled, large }">
         <div
           v-if="chips && !focused && !open && chipParts.length"
           ref="chips"
@@ -158,6 +158,12 @@ export default Vue.extend({
 
     // Render the input in a monospace font (e.g. for CSS selectors / values).
     mono: {
+      type: Boolean,
+      default: false,
+    },
+
+    // A taller field that grows with wrapped text, for the selector.
+    large: {
       type: Boolean,
       default: false,
     },
@@ -596,12 +602,51 @@ export default Vue.extend({
 }
 
 .autocomplete-menu {
+  padding-right: 0 !important;
+  padding-left: 0 !important;
   border-radius: 9px !important;
   max-height: 240px !important;
   overflow-y: auto !important;
+  scrollbar-gutter: stable both-edges;
 }
 
 .autocomplete-option {
   display: contents;
+}
+.autocomplete-pill.large {
+  align-items: flex-start;
+  min-height: 32px;
+  border-radius: 8px;
+
+  &:has(.autocomplete-input:focus),
+  &:has(.autocomplete-chips:focus-visible:not(.quiet)) {
+    background: var(--field-surface-hover);
+    border-color: transparent;
+    box-shadow: 0 0 0 2px var(--accent);
+  }
+
+  .autocomplete-chips {
+    align-content: flex-start;
+    padding: 7px 4px 7px 10px;
+    font-size: 13px;
+    line-height: 16px;
+  }
+
+  .autocomplete-input {
+    height: auto;
+    padding: 7px 4px 7px 10px;
+    font-size: 13px;
+    line-height: 16px;
+  }
+
+  .autocomplete-chevron {
+    align-self: flex-start;
+    height: 30px;
+    border-radius: 0 8px 8px 0;
+
+    &:hover:not(:disabled) {
+      background: none;
+    }
+  }
 }
 </style>

@@ -67,7 +67,7 @@ export default Vue.extend({
     },
 
     disabled(): boolean {
-      return !['basic', 'code', 'chat'].includes(this.mode);
+      return !['basic', 'chat'].includes(this.mode);
     },
   },
 
@@ -143,15 +143,15 @@ export default Vue.extend({
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   border-radius: 8px !important;
   cursor: pointer;
-  background: var(--active);
+  background: var(--field-surface);
   color: var(--text-primary);
 
   &:hover:not(:disabled):not(.active) {
-    background: var(--panel-border);
+    background: var(--field-surface-hover);
   }
 
   &:disabled {
