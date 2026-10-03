@@ -1,3 +1,4 @@
+import type Vue from 'vue';
 import type { Meta, StoryObj } from '@storybook/vue';
 import { expect, waitFor, within } from '@storybook/test';
 
@@ -59,5 +60,42 @@ export const EscapeBacksOutFirst: StoryObj = {
 
       await waitFor(() => expect(canvas.queryByRole('menu')).toBeNull());
     });
+  },
+};
+
+export const StaysInsideBoundary: StoryObj = {
+  render: () => ({
+    components: { SAnchoredMenu, SMenu, SMenuItem, SButton },
+    methods: {
+      bounds(): HTMLElement {
+        return (this as unknown as Vue).$refs.box as HTMLElement;
+      },
+    },
+    template: `
+      <div ref="box" class="box" style="position: relative; width: 300px; height: 200px; border: 1px solid var(--panel-border)">
+        <div style="position: absolute; right: 16px">
+          <s-anchored-menu align="start" :boundary="bounds">
+            <template #trigger="{ toggle }">
+              <s-button variant="ghost" @click="toggle">Open menu</s-button>
+            </template>
+            <s-menu dense :min-width="220">
+              <s-menu-item>A wide menu item</s-menu-item>
+            </s-menu>
+          </s-anchored-menu>
+        </div>
+      </div>
+    `,
+  }),
+  name: 'a menu opening past its boundary is shifted back inside it',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const box = canvasElement.querySelector('.box') as HTMLElement;
+
+    await user.click(canvas.getByRole('button', { name: 'Open menu' }));
+    const menu = await findOpenMenu(canvas);
+
+    await expect(menu.getBoundingClientRect().right).toBeLessThanOrEqual(
+      box.getBoundingClientRect().right - 8
+    );
   },
 };

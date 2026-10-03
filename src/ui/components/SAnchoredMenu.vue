@@ -14,8 +14,11 @@
       v-if="open"
       ref="panel"
       class="anchored-menu-panel"
-      :class="{ 'flip-up': flipUp }"
-      :style="{ visibility: positioned ? 'visible' : 'hidden' }"
+      :class="[`align-${align}`, { 'flip-up': flipUp }]"
+      :style="{
+        visibility: positioned ? 'visible' : 'hidden',
+        transform: shiftX ? `translateX(${shiftX}px)` : undefined,
+      }"
     >
       <slot :close="close" />
     </div>
@@ -30,6 +33,20 @@ export default Vue.extend({
   name: 'SAnchoredMenu',
 
   props: {
+    // Which edge of the panel lines up with the trigger's: its right edge
+    // (end) or its left edge (start).
+    align: {
+      type: String as PropType<'start' | 'end'>,
+      default: 'end',
+    },
+
+    // Returns an element the panel must stay inside; it's shifted sideways
+    // when it would stick out.
+    boundary: {
+      type: Function as PropType<() => HTMLElement | null | undefined>,
+      default: () => null,
+    },
+
     // Emits escape instead of closing, for content that backs out of
     // something first, e.g. a field cancelling an edit in place.
     keepOpenOnEscape: {
@@ -65,6 +82,8 @@ export default Vue.extend({
     previouslyFocused: HTMLElement | null;
     // Whether the panel didn't fit below the trigger and got flipped above it.
     flipUp: boolean;
+    // Sideways shift that keeps the panel inside its boundary.
+    shiftX: number;
     // Hides the panel until its position (flipUp) is resolved, to avoid a
     // visible jump from the default (below) placement to the flipped one.
     positioned: boolean;
@@ -78,6 +97,7 @@ export default Vue.extend({
       // trigger, rather than leaving it wherever it happened to land.
       previouslyFocused: null,
       flipUp: false,
+      shiftX: 0,
       positioned: false,
       skipRestoreFocus: false,
     };
@@ -88,6 +108,7 @@ export default Vue.extend({
       if (isOpen) {
         this.previouslyFocused = this.activeElement();
         this.positioned = false;
+        this.shiftX = 0;
         document.addEventListener('mousedown', this.onDocMousedown);
         // window, not document: capture on window always fires before the
         // editor's own capture-phase document listener, regardless of attach order.
@@ -133,9 +154,33 @@ export default Vue.extend({
 
         this.flipUp =
           panel.offsetHeight + margin > spaceBelow && spaceAbove > spaceBelow;
+        this.shiftX = this.shiftIntoBoundary(panel);
       }
 
       this.positioned = true;
+    },
+
+    /**
+     * How far to move the panel sideways so it stays at least a small gap
+     * inside the boundary, or 0 without one.
+     */
+    shiftIntoBoundary(panel: HTMLElement): number {
+      const bounds = this.boundary()?.getBoundingClientRect();
+
+      if (!bounds) {
+        return 0;
+      }
+
+      const gap = 8;
+      const rect = panel.getBoundingClientRect();
+      const overRight = rect.right - (bounds.right - gap);
+      const overLeft = bounds.left + gap - rect.left;
+
+      if (overRight > 0) {
+        return Math.max(-overRight, overLeft);
+      }
+
+      return Math.max(0, overLeft);
     },
 
     toggleOpen(): void {
@@ -303,6 +348,11 @@ export default Vue.extend({
   right: 0;
   margin-top: 6px;
   z-index: 20;
+
+  &.align-start {
+    right: auto;
+    left: 0;
+  }
 
   &.flip-up {
     top: auto;
