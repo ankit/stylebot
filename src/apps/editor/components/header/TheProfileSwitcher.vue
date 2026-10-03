@@ -325,7 +325,7 @@ export default Vue.extend({
 .profile-switcher {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   min-width: 0;
 }
 
@@ -344,23 +344,22 @@ export default Vue.extend({
 
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   min-width: 0;
   max-width: 160px;
-  padding: 5px 8px;
-  border-radius: 7px;
+  border-radius: 4px;
   font-size: 13px;
   font-weight: 500;
   line-height: 1.2;
   color: var(--text-primary);
   cursor: pointer;
 
-  &:hover,
-  &.open {
-    background: var(--hover-tint);
+  &:hover .trigger-chevron,
+  &.open .trigger-chevron {
+    color: var(--text-primary);
   }
 
-  @include focus-ring($target: ':not(.open)');
+  @include focus-ring($offset: 2px, $target: ':not(.open)');
 }
 
 .trigger-name {
