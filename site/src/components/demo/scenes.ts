@@ -4,6 +4,7 @@ export type Patch = Record<string, unknown> & {
   qType?: boolean;
   keyType?: boolean;
   chatType?: boolean;
+  profType?: boolean;
 };
 
 export type Scene = {
@@ -43,6 +44,11 @@ export const INIT = {
   caption: '',
   tab: 'basic',
   focus: null as string | null,
+  profile: 'Default',
+  profiles: ['Default'],
+  profMenu: false,
+  profCreating: false,
+  profLen: 0,
 };
 
 export type DemoState = typeof INIT;
@@ -50,7 +56,7 @@ export type DemoState = typeof INIT;
 export const SCENES: Scene[] = [
   {
     title: 'Open the editor',
-    body: 'Click the icon, then Style this page. Or press alt shift M.',
+    body: 'Click the icon, or press alt shift M.',
     dur: 6600,
     acts: [
       [0, { caption: 'Click the Stylebot icon.', cur: 'sbicon' }],
@@ -79,7 +85,7 @@ export const SCENES: Scene[] = [
   },
   {
     title: 'Pick an element',
-    body: 'The picker is on when the editor opens. Hover, then click to select.',
+    body: 'Hover, then click to select.',
     dur: 5600,
     acts: [
       [
@@ -106,16 +112,16 @@ export const SCENES: Scene[] = [
     ],
   },
   {
-    title: 'Change it',
-    body: 'Set size, colour and spacing in Basic. Every change is saved as CSS.',
-    dur: 8400,
+    title: 'Style it',
+    body: 'Use the Basic controls or write CSS.',
+    dur: 13200,
     acts: [
       [0, { caption: 'Set the size…', cur: 'size' }],
       [800, { click: 1, focus: 'size' }],
       [1200, { h1Size: 36 }],
       [1450, { h1Size: 40 }],
       [1700, { h1Size: 44 }],
-      [2400, { cur: 'color', caption: '…and the colour.' }],
+      [2400, { cur: 'color', caption: '…and the color.' }],
       [3200, { click: 1, focus: 'color' }],
       [3600, { h1Color: '#b0303a' }],
       [
@@ -123,30 +129,47 @@ export const SCENES: Scene[] = [
         {
           focus: null,
           cur: 'tab-code',
-          caption: 'Every change is plain CSS, ready to edit.',
+          caption: 'Every change is plain CSS, saved for this site.',
         },
       ],
       [5200, { click: 1, tab: 'code' }],
-      [
-        6400,
-        { caption: 'Saved for this site. It loads every time you visit.' },
-      ],
+      [6200, { caption: 'Or write CSS by hand.', cur: 'code' }],
+      [7000, { click: 1, qType: true }],
+      [10400, { cur: 'quote', caption: 'The page updates as you type.' }],
     ],
   },
   {
-    title: 'Write CSS',
-    body: 'The Code tab is a full stylesheet. The page updates as you type.',
-    dur: 8200,
+    title: 'Profiles',
+    body: 'Keep several styles per site.',
+    dur: 6000,
     acts: [
-      [0, { caption: 'Or write CSS by hand in the Code tab.', cur: 'code' }],
-      [800, { click: 1, qType: true }],
-      [4200, { cur: 'quote', caption: 'The quote restyles as you type.' }],
+      [
+        0,
+        {
+          caption: 'Profiles keep more than one style per site.',
+          cur: 'prof-btn',
+        },
+      ],
+      [800, { click: 1, profMenu: true }],
+      [1600, { cur: 'prof-create', caption: 'Create one to try a new look.' }],
+      [2300, { click: 1, profCreating: true, profType: true }],
+      [
+        3500,
+        {
+          profCreating: false,
+          profMenu: false,
+          profLen: 0,
+          profiles: ['Default', 'Everforest'],
+          profile: 'Everforest',
+          caption: 'Everforest starts clean. Default is still saved.',
+        },
+      ],
     ],
   },
   {
     title: 'Describe it',
-    body: 'Add your Claude or OpenAI key and tell the Stylebot agent what you want. It writes the CSS.',
-    dur: 16000,
+    body: 'Tell the agent what you want.',
+    dur: 19500,
     acts: [
       [
         0,
@@ -204,6 +227,19 @@ export const SCENES: Scene[] = [
         {
           codeScroll: true,
           caption: 'The full CSS lands in the Code tab, ready to edit.',
+        },
+      ],
+      [14800, { cur: 'prof-btn', caption: 'Switch profiles any time.' }],
+      [15500, { click: 1, profMenu: true }],
+      [16300, { cur: 'prof-Default' }],
+      [
+        17000,
+        {
+          click: 1,
+          profMenu: false,
+          profile: 'Default',
+          codeScroll: false,
+          caption: 'Back to Default, with your earlier styles.',
         },
       ],
     ],
@@ -266,9 +302,11 @@ export const CHAT_MSG = 'give this site an Everforest theme with nicer fonts';
 
 export const KEY_LEN = 24;
 
+export const NEW_PROFILE = 'Everforest';
+
 export const PIN_SCENE: Scene = {
   title: 'Pin it to the toolbar',
-  body: 'Stylebot starts in the extensions menu. Pin it so it stays one click away.',
+  body: 'Keep Stylebot one click away.',
   dur: 6000,
   acts: [
     [0, { caption: 'Stylebot starts in the extensions menu.', cur: 'puzzle' }],

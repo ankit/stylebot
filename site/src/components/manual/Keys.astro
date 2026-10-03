@@ -1,13 +1,27 @@
 ---
 type Props = { keys: string[]; sep?: string };
 const { keys, sep = '+' } = Astro.props;
+
+const MAC_KEYS: Record<string, string> = { ctrl: 'cmd', alt: 'option' };
 ---
 
 <span class="keys">
   {keys.map((key, i) => (
     <>
       {i > 0 && <span class="keys-sep">{sep}</span>}
-      <kbd>{key}</kbd>
+      <kbd data-mac={MAC_KEYS[key]}>{key}</kbd>
     </>
   ))}
 </span>
+
+<script>
+  const platform =
+    (navigator as Navigator & { userAgentData?: { platform: string } })
+      .userAgentData?.platform ?? navigator.platform;
+
+  if (/mac/i.test(platform)) {
+    document.querySelectorAll<HTMLElement>('kbd[data-mac]').forEach((kbd) => {
+      kbd.textContent = kbd.dataset.mac!;
+    });
+  }
+</script>

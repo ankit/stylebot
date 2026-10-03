@@ -5,21 +5,25 @@ import Keys from '../components/manual/Keys.astro';
 import Shot from '../components/manual/Shot.astro';
 import Term from '../components/manual/Term.astro';
 import Terms from '../components/manual/Terms.astro';
+import agentShot from '../assets/manual/agent-chat.png';
+import agentDarkShot from '../assets/manual/agent-chat-dark.png';
+import basicShot from '../assets/manual/basic-editor.webp';
+import basicDarkShot from '../assets/manual/basic-editor-dark.webp';
+import popupProfilesShot from '../assets/manual/popup-profiles.png';
+import popupProfilesDarkShot from '../assets/manual/popup-profiles-dark.png';
+import readabilityShot from '../assets/manual/readability.webp';
+import readabilityDarkShot from '../assets/manual/readability-dark.webp';
 import { LINKS } from '../lib/links';
 
 const toc = [
-  ['launch', 'Opening Stylebot'],
-  ['basic', 'Basic editor'],
-  ['code', 'Code editor'],
+  ['start', 'Getting started'],
+  ['profiles', 'Profiles'],
   ['agent', 'Stylebot agent'],
-  ['presets', 'Presets'],
-  ['sync', 'Sync and backup'],
-  ['history', 'Version history'],
+  ['presets', 'Readability and grayscale'],
+  ['sync', 'Sync, backup and history'],
   ['urls', 'URL rules'],
-  ['layout', 'Resizing and docking'],
   ['shortcuts', 'Keyboard shortcuts'],
-  ['requests', 'Bugs and feature requests'],
-  ['support', 'Support Stylebot'],
+  ['help', 'Help and support'],
 ];
 
 const wildcards = [
@@ -42,45 +46,58 @@ const examples = [
     'Either domain, or any of their subdomains.',
   ],
   ['^http://www.reddit.com/$', 'The Reddit homepage only.'],
+  ['*', 'Every site. Useful for styles you want everywhere.'],
 ];
 
 type Shortcut = [string, string[] | null, string?];
 
 const globalShortcuts: Shortcut[] = [
   ['Toggle editor', ['alt', 'shift', 'M']],
-  ['Toggle styling', ['alt', 'shift', 'T']],
+  ['Toggle styling', ['alt', 'shift', 'S']],
   ['Toggle readability', null],
   ['Toggle grayscale', null],
 ];
 
 const editorShortcuts: Shortcut[] = [
   ['Element picker', ['I']],
+  ['Hide selected elements', ['H']],
   ['Basic tab', ['B']],
   ['Code tab', ['C']],
   ['Presets tab', ['P']],
-  ['Show or hide selected elements', ['H']],
-  ['Adjust page layout', ['A']],
-  ['Resize the editor', ['S']],
-  ['Dock left or right', ['L', 'R'], 'or'],
+  ['Chat tab', ['T']],
+  ['Open in the side panel', ['S']],
   ['Open in a separate window', ['W']],
+  ['Dock left or right in the page', ['L', 'R'], 'or'],
+  ['Undo', ['ctrl', 'Z']],
+  ['Redo', ['ctrl', 'shift', 'Z']],
   ['Show shortcuts', ['?']],
+];
+
+const pickerShortcuts: Shortcut[] = [
+  ['Select the parent element', ['↑', '←'], 'or'],
+  ['Go back to the child element', ['↓', '→'], 'or'],
+  ['Select the highlighted element', ['enter']],
 ];
 
 const shortcutGroups = [
   { title: 'Global', rows: globalShortcuts },
   { title: 'In the editor', rows: editorShortcuts },
+  { title: 'While picking an element', rows: pickerShortcuts },
 ];
 ---
 
 <Base
   title="Manual"
-  description="How Stylebot works, from your first style to sync and shortcuts."
+  description="How to use Stylebot: styling a site, profiles, the agent, sync, URL rules and shortcuts."
   current="manual"
 >
   <div class="manual">
     <div class="manual-intro">
       <h1>Manual</h1>
-      <p>How Stylebot works, from your first style to sync and shortcuts.</p>
+      <p>
+        How Stylebot works, from your first style to profiles, the agent and
+        sync.
+      </p>
     </div>
 
     <div class="manual-body">
@@ -97,46 +114,42 @@ const shortcutGroups = [
       </nav>
 
       <main class="sections">
-        <section id="launch">
-          <h2>Opening Stylebot</h2>
+        <section id="start">
+          <h2>Getting started</h2>
           <p>
             Click the Stylebot icon in the toolbar, then{' '}
             <strong>Style this page</strong>. Or press{' '}
-            <Keys keys={['alt', 'shift', 'M']} /> on any tab.
+            <Keys keys={['alt', 'shift', 'M']} /> on any tab, or right-click an
+            element and choose <strong>Stylebot → Style Element</strong>.
           </p>
-          <Callout>
-            Stylebot starts inside the extensions menu. Pin it to the toolbar so
-            it stays one click away. You can change the shortcut in Stylebot's
-            Options.
-          </Callout>
-          <Shot label="toolbar popup with Style this page" />
-        </section>
-
-        <section id="basic">
-          <h2>Basic editor</h2>
-          <Shot label="Basic tab with the element picker active" />
+          <Shot
+            label="The Basic tab, picking a search result heading on Google"
+            src={basicShot}
+            dark={basicDarkShot}
+          />
+          <p>
+            Click the picker, hover the page and click an element. Press{' '}
+            <Keys keys={['↑']} /> before clicking to select its parent instead.
+            Then change it in <strong>Basic</strong>, or write CSS in{' '}
+            <strong>Code</strong>. Changes save as you make them and load every
+            time you visit the site.
+          </p>
           <Terms>
-            <Term term="Pick an element">
-              Click the picker, hover the page and click. Stylebot generates a
-              CSS selector that matches similar elements on the page.
-            </Term>
-            <Term term="Selector">
-              You can type your own CSS selector. Focusing the field highlights
-              every element it currently matches.
-            </Term>
-            <Term term="Apply styles">
-              Once an element is selected, set text, background, box and effects
-              in plain controls. Changes override the page's styling and are
-              saved automatically.
-            </Term>
             <Term term="Fonts">
-              Pick a font from the list, or type any font installed on your
-              computer. Fonts from{' '}
-              <a href="https://fonts.google.com/">Google Fonts</a> work too.
+              Search 400 <a href="https://fonts.google.com/">Google Fonts</a>{' '}
+              and Stylebot loads the one you pick, or type any font installed on
+              your computer.
             </Term>
-            <Term term="Site URL">
-              By default styles match the site's domain. Edit the URL in Options
-              for more flexible matching; see <a href="#urls">URL rules</a>.
+            <Term term="Editor position">
+              In Chrome and Edge the editor opens in the side panel. Use{' '}
+              <strong>Position</strong> in its <strong>⋯</strong> menu to open
+              it in a separate window or dock it in the page. Firefox has no
+              side panel.
+            </Term>
+            <Term term="Turning a style off">
+              Use the switch in the popup, or{' '}
+              <Keys keys={['alt', 'shift', 'S']} />. The style is kept, just not
+              applied.
             </Term>
           </Terms>
           <Callout>
@@ -146,85 +159,103 @@ const shortcutGroups = [
           </Callout>
         </section>
 
-        <section id="code">
-          <h2>Code editor</h2>
+        <section id="profiles">
+          <h2>Profiles</h2>
           <p>
-            The Code tab holds the full stylesheet for the site. Write any
-            modern CSS and the page updates as you type. Everything you set in
-            Basic, and everything the agent writes, appears here.
+            A profile is a separate stylesheet for the same site, so you can
+            keep more than one look and switch between them. Only one is applied
+            at a time, and every site starts with Default.
           </p>
-          <Shot label="Code tab with a stylesheet" />
+          <Shot
+            label="The popup on a site with two profiles, Dracula and Gruvbox"
+            src={popupProfilesShot}
+            dark={popupProfilesDarkShot}
+          />
+          <p>
+            Click the profile name next to the site in the editor's header to
+            create, rename, duplicate or delete profiles. Switch between them
+            there or in the popup, where <strong>No style</strong> turns styling
+            off for the site. New profiles start empty.
+          </p>
         </section>
 
         <section id="agent">
           <h2>Stylebot agent</h2>
           <p>
             Describe the change you want in the Chat tab and the agent writes
-            the CSS for you, from small fixes to a whole new theme.
+            the CSS, from small fixes to a whole new theme. Pick an element
+            first to point it at something, or attach a screenshot to show what
+            you mean.
           </p>
+          <Shot
+            label="The Chat tab after asking the agent for a calmer, Everforest-themed Google"
+            src={agentShot}
+            dark={agentDarkShot}
+          />
           <Terms>
             <Term term="Bring your own key">
-              Connect a Claude or OpenAI API key once. The key is stored in your
-              browser and only sent to the provider you choose.
+              Connect a Claude, OpenAI or Gemini API key. Keys are saved on this
+              computer only and never synced. Messages go straight from your
+              browser to the provider.
             </Term>
             <Term term="Where changes go">
-              The agent adds its CSS to the site's stylesheet. Use{' '}
-              <strong>View in Code</strong> to review or edit it.
+              Each change is applied right away and added to the current
+              profile's stylesheet. Click <strong>Added N lines</strong> to see
+              it in Code, or undo it from the chat.
             </Term>
-            <Term term="Undo">
-              Every agent change is saved in version history, so you can restore
-              the previous style.
+            <Term term="Cost">
+              The token count under the message box shows what the conversation
+              has used, with an estimated cost.
             </Term>
           </Terms>
         </section>
 
         <section id="presets">
-          <h2>Presets</h2>
-          <Terms>
-            <Term term="Readability">
-              Removes noisy elements from articles on a site. It does not change
-              non-article pages. Choose a Dark, Sepia or Light theme, any font,
-              and set font size, line height and page width.
-            </Term>
-            <Term term="Grayscale">Applies grayscale to the current site.</Term>
-          </Terms>
-          <p>Presets stack with your own changes.</p>
+          <h2>Readability and grayscale</h2>
+          <p>
+            Both are in the Presets tab and stack with your own changes.{' '}
+            <strong>Readability</strong> turns a site's articles into a clean
+            reading view, with a choice of theme, font, size and width; it
+            leaves pages that aren't articles alone. <strong>Grayscale</strong>{' '}
+            removes color from the site, at any strength.
+          </p>
+          <Shot
+            label="The Wikipedia article on Typography in the Readability view, Sepia theme, with Reading settings open"
+            src={readabilityShot}
+            dark={readabilityDarkShot}
+          />
         </section>
 
         <section id="sync">
-          <h2>Sync and backup</h2>
+          <h2>Sync, backup and history</h2>
           <Terms>
             <Term term="Google Drive sync">
-              Turn on sync in Options and sign in with Google. Styles then sync
-              every 30 minutes and right after you edit. Use{' '}
-              <strong>Sync now</strong> in the popup to sync straight away.
+              Connect Google Drive in Options. Your styles, including profiles,
+              sync every 30 minutes and right after you edit. Stylebot only sees
+              the files it creates in your Drive, and there is no Stylebot
+              server.
+            </Term>
+            <Term term="Conflicts">
+              If a style changed on two computers, your newer edit is kept and
+              the other version is saved in a comment, so nothing is lost.
             </Term>
             <Term term="Backup">
               Export and import all your styles as JSON from Options.
             </Term>
-            <Term term="Permissions">
-              Stylebot only asks to read and write its own files in your Drive.
-              There is no Stylebot server, so you may occasionally need to sign
-              in again.
+            <Term term="Version history">
+              Every change on this computer is kept in Options, including ones
+              that arrive through sync. Restore any earlier version, for some
+              sites or all of them.
             </Term>
           </Terms>
-          <Shot label="Sync settings in Options" />
-        </section>
-
-        <section id="history">
-          <h2>Version history</h2>
-          <p>
-            Every change to your styles is kept, newest first, grouped by day.
-            Open an entry to see what changed and restore it in one click.
-          </p>
-          <Shot label="Version history list" />
         </section>
 
         <section id="urls">
           <h2>URL rules</h2>
           <p>
-            By default, Stylebot matches styles to websites by domain name. Use
-            these patterns in Options for anything more specific.
+            By default, Stylebot matches styles to websites by domain name. Edit
+            a style's URL in Options and use these patterns for anything more
+            specific.
           </p>
           <div class="table">
             {wildcards.map(([pattern, meaning]) => (
@@ -247,29 +278,13 @@ const shortcutGroups = [
           </Terms>
         </section>
 
-        <section id="layout">
-          <h2>Resizing and docking</h2>
-          <Terms>
-            <Term term="Dock">
-              Dock the editor on the left or right of the window with{' '}
-              <Keys keys={['L']} /> or <Keys keys={['R']} />.
-            </Term>
-            <Term term="Resize">
-              Change the editor's width with <Keys keys={['S']} />.
-            </Term>
-            <Term term="Adjust page layout">
-              Press <Keys keys={['A']} /> to shrink the page so it doesn't sit
-              under the editor.
-            </Term>
-          </Terms>
-        </section>
-
         <section id="shortcuts">
           <h2>Keyboard shortcuts</h2>
           <p>
-            Global shortcuts work on any page Stylebot can style. Editor
-            shortcuts work while the editor is open. Press <Keys keys={['?']} />{' '}
-            in the editor to see this list.
+            Global shortcuts work on any page Stylebot can style; change them in
+            your browser's shortcut settings, linked from Options. Editor
+            shortcuts work while focus isn't in a text field. Press{' '}
+            <Keys keys={['?']} /> in the editor to see this list.
           </p>
           {shortcutGroups.map((group) => (
             <div class="table">
@@ -281,7 +296,7 @@ const shortcutGroups = [
                     <Keys keys={keys} sep={sep} />
                   ) : (
                     <span class="shortcut-unset">
-                      Not set; assign in Options
+                      Not set; assign in your browser
                     </span>
                   )}
                 </div>
@@ -290,19 +305,12 @@ const shortcutGroups = [
           ))}
         </section>
 
-        <section id="requests">
-          <h2>Bugs and feature requests</h2>
+        <section id="help">
+          <h2>Help and support</h2>
           <p>
             Found a bug or have an idea? Open an issue on{' '}
-            <a href={LINKS.issues}>GitHub</a>.
-          </p>
-        </section>
-
-        <section id="support">
-          <h2>Support Stylebot</h2>
-          <p>
-            Stylebot is free and open source, used by more than 200,000 people,
-            and maintained since 2011. You can support it by{' '}
+            <a href={LINKS.issues}>GitHub</a>. Stylebot is free and open source,
+            maintained since 2011. If it's useful to you, you can support it by{' '}
             <a href={LINKS.donate}>buying me a coffee</a>.
           </p>
         </section>
@@ -510,6 +518,29 @@ const shortcutGroups = [
     color: var(--faint);
   }
 
+  .sections :global(.shot-image) {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 24px rgba(25, 27, 31, 0.08);
+  }
+
+  .sections :global(.shot-image.is-dark) {
+    display: none;
+  }
+
+  :global([data-theme='dark']) .sections :global(.shot-image.is-light),
+  :global([data-theme='stylebot']) .sections :global(.shot-image.is-light) {
+    display: none;
+  }
+
+  :global([data-theme='dark']) .sections :global(.shot-image.is-dark),
+  :global([data-theme='stylebot']) .sections :global(.shot-image.is-dark) {
+    display: block;
+  }
+
   .sections :global(.terms) {
     margin: 0;
     display: flex;
@@ -523,6 +554,10 @@ const shortcutGroups = [
     gap: 8px 24px;
     padding: 14px 0;
     border-bottom: 1px solid var(--border);
+  }
+
+  .sections :global(.terms:last-child > .term:last-child) {
+    border-bottom: none;
   }
 
   .sections :global(.term dt) {

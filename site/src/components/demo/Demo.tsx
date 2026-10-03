@@ -1,4 +1,4 @@
-import { Component, createRef, type JSX } from 'preact';
+import { Component, createRef } from 'preact';
 import SbIcon from '../SbIcon';
 import './demo.css';
 import { isDarkTheme } from '../../lib/themes';
@@ -8,6 +8,7 @@ import {
   CHAT_MSG,
   INIT,
   KEY_LEN,
+  NEW_PROFILE,
   QUOTE_CSS,
   QUOTE_TOTAL,
   PIN_SCENE,
@@ -35,19 +36,17 @@ type State = DemoState & {
 };
 
 type Token = { text: string; style: string };
-type Step = {
-  title: string;
-  body: string;
-  active: boolean;
-  mark: string;
-  dotClass: string;
-  titleStyle: string;
-  barStyle: string;
-};
 type Line = { style: string; toks: Token[] };
 
-const PANE_WIDTH = { landing: 980, welcome: 620 };
-const PLAYBACK_KEYS = new Set(['cur', 'click', 'chatType', 'keyType', 'qType']);
+const PANE_WIDTH = 980;
+const PLAYBACK_KEYS = new Set([
+  'cur',
+  'click',
+  'chatType',
+  'keyType',
+  'qType',
+  'profType',
+]);
 
 const CODE_COLORS: Record<string, string> = {
   sel: 'color:var(--csel)',
@@ -64,12 +63,12 @@ const tk = (text: string, c: string): Token => ({
   style: CODE_COLORS[c],
 });
 
-const ToolbarIcon = () => (
+const ToolbarIcon = ({ size = 20 }: { size?: number }) => (
   <svg
-    width="20"
-    height="20"
+    width={size}
+    height={size}
     viewBox="0 0 64 64"
-    style="display:block;flex:none;transform:translateX(1px)"
+    style={`display:block;flex:none${size === 20 ? ';transform:translateX(1px)' : ''}`}
     aria-hidden="true"
   >
     <rect x="6" y="12" width="44" height="10" rx="5" fill="#ec4d86" />
@@ -80,19 +79,13 @@ const ToolbarIcon = () => (
 );
 
 /**
- * The inspector tooltip shown under a hovered element: its selector, and the
- * parent that the up-arrow key would select instead.
+ * The inspector tooltip shown under a hovered element, naming its selector.
  */
-function PickCard({ selector, parent }: { selector: string; parent: string }) {
+function PickCard({ selector, dark }: { selector: string; dark: boolean }) {
   return (
-    <div class="demo-pick-card">
+    <div class={`demo-pick-card${dark ? ' is-dark' : ''}`}>
       <span class="demo-pick-arrow" />
-      <span class="demo-pick-chip">{selector}</span>
-      <span class="demo-pick-rule" />
-      <div class="demo-pick-parent">
-        <kbd>↑</kbd>
-        <span class="demo-pick-chip is-muted">{parent}</span>
-      </div>
+      {selector}
     </div>
   );
 }
@@ -120,31 +113,29 @@ const ChevronDown = () => (
   </svg>
 );
 
-const SmallChevron = () => (
+const Close = ({ size }: { size: number }) => (
   <svg
-    width="8"
-    height="8"
-    viewBox="0 0 10 10"
+    width={size}
+    height={size}
+    viewBox="0 0 14 14"
     fill="none"
     stroke="currentColor"
     stroke-width="1.5"
     stroke-linecap="round"
   >
-    <path d="M2 3.5 5 6.5 8 3.5" />
+    <path d="M2.5 2.5l9 9M11.5 2.5l-9 9" />
   </svg>
 );
 
 type Props = {
   variant?: 'landing' | 'welcome';
-  heading?: string;
-  lede?: string;
 };
 
 /**
  * The hero walkthrough: a scripted browser window that plays through opening
- * the editor, picking an element, editing it, writing CSS, and asking the
- * agent. The welcome variant starts by pinning Stylebot, shows the steps in a
- * sidebar and stops at the end instead of looping.
+ * the editor, picking an element, styling it, creating a profile, and asking
+ * the agent. The welcome variant starts by pinning Stylebot and stops at the end
+ * instead of looping.
  */
 export default class Demo extends Component<Props, State> {
   get welcome() {
@@ -159,12 +150,7 @@ export default class Demo extends Component<Props, State> {
     return { ...INIT, pinned: !this.welcome };
   }
 
-  get paneWidth() {
-    return PANE_WIDTH[this.welcome ? 'welcome' : 'landing'];
-  }
-
   paneRef = createRef<HTMLDivElement>();
-  artRef = createRef<HTMLDivElement>();
   stageRef = createRef<HTMLDivElement>();
   resizeObserver?: ResizeObserver;
   timers: ReturnType<typeof setTimeout>[] = [];
@@ -201,7 +187,7 @@ export default class Demo extends Component<Props, State> {
     const stage = this.stageRef.current;
     const pane = this.paneRef.current;
     if (!stage || !pane) return;
-    const scale = Math.min(1, stage.clientWidth / this.paneWidth);
+    const scale = Math.min(1, stage.clientWidth / PANE_WIDTH);
     this.setState({ scale, stageHeight: pane.offsetHeight * scale });
   };
 
@@ -276,6 +262,11 @@ export default class Demo extends Component<Props, State> {
         this.later(i * 26 * k, () => this.setState({ chatDraft: i }));
       }
     }
+    if (patch.profType) {
+      for (let i = 1; i <= NEW_PROFILE.length; i++) {
+        this.later(i * 70 * k, () => this.setState({ profLen: i }));
+      }
+    }
     const next: Partial<State> = {};
     Object.keys(patch).forEach((key) => {
       if (!PLAYBACK_KEYS.has(key))
@@ -313,6 +304,9 @@ export default class Demo extends Component<Props, State> {
       menuOpen: false,
       focus: null,
       codeScroll: false,
+      profMenu: false,
+      profCreating: false,
+      profLen: 0,
     });
     if (this.scenes.slice(0, i).some((sc) => sc.acts.some(([, p]) => p.qType)))
       s.qChars = QUOTE_TOTAL;
@@ -369,6 +363,7 @@ export default class Demo extends Component<Props, State> {
       chatType: () => ({ chatDraft: CHAT_MSG.length }),
       keyType: () => ({ keyLen: KEY_LEN }),
       qType: () => ({ qChars: QUOTE_TOTAL }),
+      profType: () => ({ profLen: NEW_PROFILE.length }),
     };
     let cur: string | null = null;
     sc.acts.forEach(([t, p]) => {
@@ -397,8 +392,7 @@ export default class Demo extends Component<Props, State> {
     this.seek(i, Math.max(0, Math.min(0.98, (ev.clientX - r.left) / r.width)));
   }
 
-  codeLines(): { lines: Line[]; quoteDone: Record<string, boolean> } {
-    const S = this.state;
+  codeLines(S: State): { lines: Line[]; quoteDone: Record<string, boolean> } {
     const lines: Line[] = [];
     const indent =
       'padding-left:14px;margin-left:3px;border-left:1px solid var(--border)';
@@ -441,7 +435,7 @@ export default class Demo extends Component<Props, State> {
       });
       decls.forEach((toks) => lines.push({ style: indent, toks }));
       lines.push({ style: '', toks: [tk('}', 'br')] });
-    } else if (!typed.length) {
+    } else if (!typed.length && !S.agentTheme) {
       lines.push({ style: '', toks: [tk('/* No styles yet */', 'com')] });
     }
     if (typed.length) {
@@ -514,7 +508,18 @@ export default class Demo extends Component<Props, State> {
     ));
   }
 
-  render(_: Props, S: State) {
+  /**
+   * The state as the current profile shows it: Default keeps the hand-written
+   * styles, and the new profile starts clean and gets the agent's theme.
+   */
+  profileView(state: State): State {
+    return state.profile === 'Default'
+      ? { ...state, agentTheme: false }
+      : { ...state, h1Size: 32, h1Color: null, qChars: 0 };
+  }
+
+  render(_: Props, state: State) {
+    const S = this.profileView(state);
     const read = S.read;
     const ag = S.agentTheme;
     const dk = S.dark;
@@ -534,21 +539,21 @@ export default class Demo extends Component<Props, State> {
     const tr =
       ';transition:font-size .25s,color .25s,background .3s,outline-color .2s';
 
-    const { lines: codeLines, quoteDone: qd } = this.codeLines();
+    const { lines: codeLines, quoteDone: qd } = this.codeLines(S);
     const agentLines = this.agentLines();
     const hasSel = !!S.sel;
     const sizeSet = S.h1Size !== 32;
 
     const tab = (k: string) =>
-      'padding:0 0 10px;font:400 14px/1 var(--ui);margin-bottom:-1px;border-bottom:2px solid ' +
+      `padding:0 0 11px;font:${S.tab === k ? 600 : 400} 14px/1 var(--ui);margin-bottom:-1px;border-bottom:2px solid ` +
       (S.tab === k
         ? 'var(--acc);color:var(--ink)'
         : 'transparent;color:var(--muted)');
-    const field = (f: string, w: number) =>
-      `width:${w}px;height:28px;flex:none;border-radius:8px;display:flex;align-items:center;overflow:hidden;background:var(--surface);transition:border-color .15s,box-shadow .15s;` +
+    const field = (f: string) =>
+      'width:104px;height:30px;flex:none;border-radius:8px;display:flex;align-items:center;overflow:hidden;background:var(--hover);transition:box-shadow .15s;' +
       (S.focus === f
-        ? 'border:1px solid var(--acc);box-shadow:0 0 0 3px rgba(42,95,214,.15)'
-        : 'border:1px solid var(--strong)');
+        ? 'box-shadow:0 0 0 1px var(--acc),0 0 0 4px rgba(42,95,214,.15)'
+        : 'box-shadow:none');
     const toggle = (on: boolean) => ({
       track: `width:36px;height:20px;border-radius:10px;flex:none;position:relative;transition:background .2s;background:${on ? 'var(--acc)' : 'var(--strong)'}`,
       knob: `position:absolute;top:2px;left:${on ? 18 : 2}px;width:16px;height:16px;border-radius:8px;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.15);transition:left .2s`,
@@ -564,9 +569,11 @@ export default class Demo extends Component<Props, State> {
     const selText = selected ? 'article h1' : 'Pick an element';
     const isChat = S.tab === 'chat' && S.keyOk;
     const needsKey = S.tab === 'chat' && !S.keyOk;
-    const loadText = ['Reading the page…', 'Picking colours…', 'Writing CSS…'][
-      Math.min(2, Math.floor(S.thinkT / 400))
-    ];
+    const loadText = [
+      'Reading the page…',
+      'Picking colors…',
+      'Measuring the margins…',
+    ][Math.min(2, Math.floor(S.thinkT / 400))];
     const provOn =
       'flex:1;text-align:center;padding:7px 0;border-radius:7px;font:600 12.5px/1 var(--ui);background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)';
     const provOff =
@@ -589,9 +596,6 @@ export default class Demo extends Component<Props, State> {
       return {
         title: sc.title,
         body: sc.body,
-        active,
-        mark: doneStep ? '✓' : String(i + 1),
-        dotClass: doneStep ? 'is-done' : active ? 'is-active' : '',
         titleStyle:
           `font:${active ? 600 : 500} 13.5px/1.35 var(--ui);padding-top:2px;color:` +
           (doneStep ? 'var(--muted)' : active ? 'var(--ink)' : 'var(--faint)'),
@@ -612,7 +616,7 @@ export default class Demo extends Component<Props, State> {
           class="demo-pane"
           style={
             S.scale < 1
-              ? `width:${this.paneWidth}px;transform:scale(${S.scale})`
+              ? `width:${PANE_WIDTH}px;transform:scale(${S.scale})`
               : ''
           }
         >
@@ -789,13 +793,10 @@ export default class Demo extends Component<Props, State> {
                   <span>Sign in</span>
                 </span>
                 {S.inspecting && S.hover === 'header' && (
-                  <PickCard selector="header.site-header" parent="div.page" />
+                  <PickCard selector="header.site-header" dark={dk} />
                 )}
               </div>
-              <div
-                ref={this.artRef}
-                style={`padding:26px 28px 36px;transition:transform .7s cubic-bezier(.4,0,.2,1);transform:translateY(-${this.artShift()}px)`}
-              >
+              <div style="padding:26px 28px 36px">
                 <div
                   style={`flex:1 1 260px;min-width:0;transition:max-width .3s;max-width:${read ? '32em' : '60em'}`}
                 >
@@ -827,13 +828,13 @@ export default class Demo extends Component<Props, State> {
                       The quiet return of the night ferry
                     </h2>
                     {S.inspecting && S.hover === 'h1' && (
-                      <PickCard selector="h1.headline" parent="article.story" />
+                      <PickCard selector="h1.headline" dark={dk} />
                     )}
                   </div>
                   <div
                     style={`margin:0 0 16px;font:400 16px/1.5 ${serif};color:${muted};transition:color .5s`}
                   >
-                    Three operators are betting that travellers will trade speed
+                    Three operators are betting that travelers will trade speed
                     for a cabin, a sea view and no airport.
                   </div>
                   <div style="display:flex;align-items:center;gap:10px;margin:0 0 18px">
@@ -885,451 +886,580 @@ export default class Demo extends Component<Props, State> {
             <div
               data-ed="1"
               class="demo-editor-wrap"
-              style={`--mono:'Fira Code',ui-monospace,monospace;width:${S.editorOpen ? 362 : 0}px`}
+              style={`width:${S.editorOpen ? 362 : 0}px`}
             >
               <div class="demo-editor">
-                <div style="flex:none;height:46px;display:flex;align-items:center;gap:4px;padding:0 8px 0 16px;border-bottom:1px solid var(--border)">
-                  <span style="flex:1;min-width:0;font:400 13.5px/1 var(--ui);color:var(--ink2);overflow:hidden;white-space:nowrap;text-overflow:ellipsis">
-                    harbourpost.example
+                <div class="demo-ed-bar">
+                  <ToolbarIcon size={18} />
+                  <span style="flex:1;font:600 14.5px/1 var(--ui);color:var(--ink)">
+                    Stylebot
                   </span>
                   <span class="demo-ed-icon">
                     <svg
-                      width="16"
-                      height="16"
+                      width="15"
+                      height="15"
                       viewBox="0 0 16 16"
                       fill="none"
                       stroke="currentColor"
                       stroke-width="1.3"
                       stroke-linecap="round"
-                    >
-                      <circle cx="8" cy="8" r="2.8" />
-                      <path d="M8 1.5v1.6M8 12.9v1.6M1.5 8h1.6M12.9 8h1.6M3.4 3.4l1.1 1.1M11.5 11.5l1.1 1.1M3.4 12.6l1.1-1.1M11.5 4.5l1.1-1.1" />
-                    </svg>
-                  </span>
-                  <span class="demo-ed-icon">
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 16 16"
-                      fill="currentColor"
-                    >
-                      <circle cx="3.5" cy="8" r="1.3" />
-                      <circle cx="8" cy="8" r="1.3" />
-                      <circle cx="12.5" cy="8" r="1.3" />
-                    </svg>
-                  </span>
-                  <span class="demo-ed-icon">
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 14 14"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="1.4"
-                      stroke-linecap="round"
-                    >
-                      <path d="M2.5 2.5l9 9M11.5 2.5l-9 9" />
-                    </svg>
-                  </span>
-                </div>
-
-                <div style="flex:none;padding:12px 14px 0;display:flex;gap:8px;align-items:center">
-                  <span
-                    data-t="picker"
-                    style={
-                      'width:40px;height:40px;flex:none;border-radius:9px;display:flex;align-items:center;justify-content:center;transition:all .15s;' +
-                      (S.inspecting
-                        ? 'background:#2f62de;color:#fff'
-                        : 'background:#e9ebef;color:#191b1f')
-                    }
-                  >
-                    <svg
-                      width="19"
-                      height="19"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
                       stroke-linejoin="round"
                     >
-                      <path d="M21 10V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h5" />
-                      <path
-                        d="M11 11l9.5 3.6-4.2 1.7-1.7 4.2z"
-                        fill="currentColor"
-                      />
-                      <path d="M16.6 16.6l4.4 4.4" />
+                      <path d="M5.5 2h5l-.7 4.2 2.2 2.3H4l2.2-2.3z" />
+                      <path d="M8 8.5v5.5" />
+                      <path d="M2 2l12 12" />
                     </svg>
                   </span>
-                  <div style="flex:1;min-width:0;height:38px;border-radius:9px;border:1px solid var(--strong);display:flex;align-items:center;overflow:hidden">
-                    <span
-                      style={
-                        'flex:1;min-width:0;padding:0 12px;font:400 12.5px/1 var(--mono);overflow:hidden;white-space:nowrap;color:' +
-                        (selected ? 'var(--ink)' : 'var(--faint)')
-                      }
-                    >
-                      {selText}
+                  <span class="demo-ed-icon">
+                    <Close size={11} />
+                  </span>
+                </div>
+                <div class="demo-ed-card">
+                  <div style="flex:none;height:48px;display:flex;align-items:center;gap:8px;padding:4px 8px 0 16px">
+                    <span style="font:400 13.5px/1 var(--ui);color:var(--ink);white-space:nowrap">
+                      harbourpost.example
                     </span>
-                    <span style="width:32px;height:100%;flex:none;border-left:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--faint)">
-                      <ChevronDown />
+                    <span style="font:400 13.5px/1 var(--ui);color:var(--faint)">
+                      /
+                    </span>
+                    <span style="position:relative;display:flex">
+                      <span
+                        data-t="prof-btn"
+                        class="demo-prof-btn"
+                        style={S.profMenu ? 'background:var(--hover)' : ''}
+                      >
+                        {S.profile}
+                        <ChevronDown />
+                      </span>
+                      <div
+                        class="demo-prof-menu"
+                        style={
+                          S.profMenu
+                            ? 'opacity:1;transform:scale(1)'
+                            : 'opacity:0;transform:scale(.97);pointer-events:none'
+                        }
+                      >
+                        {S.profiles.map((name) => {
+                          const on = name === S.profile;
+                          return (
+                            <div
+                              key={name}
+                              data-t={`prof-${name}`}
+                              class="demo-prof-row"
+                              style={
+                                on
+                                  ? 'font-weight:600;background:var(--hover)'
+                                  : ''
+                              }
+                            >
+                              <span
+                                class="demo-prof-check"
+                                style={`opacity:${on ? 1 : 0}`}
+                              >
+                                <svg
+                                  width="12"
+                                  height="12"
+                                  viewBox="0 0 12 12"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  stroke-width="1.6"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                >
+                                  <path d="M2.5 6.2 5 8.6 9.5 3.5" />
+                                </svg>
+                              </span>
+                              <span>{name}</span>
+                            </div>
+                          );
+                        })}
+                        <div class="demo-prof-sep" />
+                        {S.profCreating ? (
+                          <div class="demo-prof-input">
+                            <span>{NEW_PROFILE.slice(0, S.profLen)}</span>
+                            <span class="demo-caret" />
+                          </div>
+                        ) : (
+                          <div
+                            data-t="prof-create"
+                            class="demo-prof-row"
+                            style="padding-left:32px;color:var(--muted)"
+                          >
+                            Create profile
+                          </div>
+                        )}
+                      </div>
+                    </span>
+                    <span class="demo-ed-icon" style="margin-left:auto">
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 16 16"
+                        fill="currentColor"
+                      >
+                        <circle cx="3.5" cy="8" r="1.3" />
+                        <circle cx="8" cy="8" r="1.3" />
+                        <circle cx="12.5" cy="8" r="1.3" />
+                      </svg>
                     </span>
                   </div>
-                </div>
 
-                <div style="flex:none;display:flex;gap:20px;padding:14px 16px 0;border-bottom:1px solid var(--border)">
-                  <span data-t="tab-basic" style={tab('basic')}>
-                    Basic
-                  </span>
-                  <span data-t="tab-code" style={tab('code')}>
-                    Code
-                  </span>
-                  <span data-t="tab-presets" style={tab('presets')}>
-                    Presets
-                  </span>
-                  <span data-t="tab-chat" style={tab('chat')}>
-                    Chat
-                  </span>
-                </div>
+                  <div style="flex:none;padding:6px 14px 0;display:flex;gap:8px;align-items:center">
+                    <span
+                      data-t="picker"
+                      class="demo-picker"
+                      style={
+                        S.inspecting
+                          ? 'background:#2f62de;color:#fff'
+                          : 'background:var(--hover);color:var(--ink)'
+                      }
+                    >
+                      <svg
+                        width="19"
+                        height="19"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M21 10V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h5" />
+                        <path
+                          d="M11 11l9.5 3.6-4.2 1.7-1.7 4.2z"
+                          fill="currentColor"
+                        />
+                        <path d="M16.6 16.6l4.4 4.4" />
+                      </svg>
+                    </span>
+                    <div class="demo-sel-field">
+                      <span
+                        style={
+                          'flex:1;min-width:0;padding:0 12px;font:400 13px/1 var(--mono);overflow:hidden;white-space:nowrap;color:' +
+                          (selected ? 'var(--ink)' : 'var(--faint)')
+                        }
+                      >
+                        {selText}
+                      </span>
+                      {selected && (
+                        <span class="demo-sel-icon">
+                          <Close size={11} />
+                        </span>
+                      )}
+                      <span class="demo-sel-icon">
+                        <ChevronDown />
+                      </span>
+                    </div>
+                  </div>
 
-                <div style="flex:1;min-height:0;overflow:hidden;background:var(--fill)">
-                  {S.tab === 'basic' && (
-                    <div style="padding:12px 12px 16px;display:flex;flex-direction:column;gap:8px">
-                      <div style="display:flex;justify-content:flex-end;gap:6px">
-                        <span
-                          class="demo-small-btn"
-                          style={`color:${hasSel ? 'var(--ink2)' : 'var(--faint)'}`}
+                  <div style="flex:none;display:flex;align-items:flex-end;gap:22px;padding:16px 16px 0;border-bottom:1px solid var(--border)">
+                    <span data-t="tab-basic" style={tab('basic')}>
+                      Basic
+                    </span>
+                    <span data-t="tab-code" style={tab('code')}>
+                      Code
+                    </span>
+                    <span data-t="tab-presets" style={tab('presets')}>
+                      Presets
+                    </span>
+                    <span data-t="tab-chat" style={tab('chat')}>
+                      Chat
+                    </span>
+                    {S.tab === 'chat' && (
+                      <span style="margin-left:auto;padding-bottom:9px;display:flex;color:var(--muted)">
+                        <svg
+                          width="15"
+                          height="15"
+                          viewBox="0 0 16 16"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="1.3"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
                         >
-                          <svg
-                            width="13"
-                            height="13"
-                            viewBox="0 0 14 14"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="1.3"
-                            stroke-linecap="round"
+                          <path d="M13.5 9v3.5a1.5 1.5 0 0 1-1.5 1.5H3.5A1.5 1.5 0 0 1 2 12.5V4a1.5 1.5 0 0 1 1.5-1.5H7" />
+                          <path d="M11.8 1.8a1.3 1.3 0 0 1 1.9 1.9L8 9.4 5.8 10l.6-2.2z" />
+                        </svg>
+                      </span>
+                    )}
+                  </div>
+
+                  <div style="flex:1;min-height:0;overflow:hidden;background:var(--fill)">
+                    {S.tab === 'basic' && (
+                      <div style="padding:10px 12px 16px;display:flex;flex-direction:column;gap:8px">
+                        <div style="display:flex;justify-content:flex-end;gap:6px">
+                          <span
+                            class="demo-small-btn"
+                            style={`color:${hasSel ? 'var(--ink2)' : 'var(--faint)'}`}
                           >
-                            <path d="M1.5 7s2-3.8 5.5-3.8S12.5 7 12.5 7s-2 3.8-5.5 3.8S1.5 7 1.5 7z" />
-                            <path d="M2.5 11.5l9-9" />
-                          </svg>
-                          Hide
-                        </span>
-                        <span
-                          class="demo-small-btn"
-                          style={`color:${hasSel ? 'var(--ink2)' : 'var(--faint)'}`}
-                        >
-                          Reset
-                        </span>
-                      </div>
-                      <div class="demo-card" style="padding:0 14px">
-                        <div style="display:flex;align-items:center;height:42px;font:600 13.5px/1 var(--ui);color:var(--ink2)">
-                          <span style="flex:1">Text</span>
-                          <span style="color:var(--muted);display:flex;transform:rotate(180deg)">
-                            <ChevronDown />
+                            <svg
+                              width="13"
+                              height="13"
+                              viewBox="0 0 14 14"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="1.3"
+                              stroke-linecap="round"
+                            >
+                              <path d="M1.5 7s2-3.8 5.5-3.8S12.5 7 12.5 7s-2 3.8-5.5 3.8S1.5 7 1.5 7z" />
+                              <path d="M2.5 11.5l9-9" />
+                            </svg>
+                            Hide
+                          </span>
+                          <span
+                            class="demo-small-btn"
+                            style={`color:${hasSel ? 'var(--ink2)' : 'var(--faint)'}`}
+                          >
+                            Reset
                           </span>
                         </div>
-                        <div style="display:flex;align-items:center;gap:12px;padding:0 0 9px;border-bottom:1px solid var(--border)">
-                          <span class="demo-label" style="width:52px;flex:none">
-                            Font
-                          </span>
-                          <div style="flex:1;height:32px;border:1px solid var(--strong);border-radius:9px;display:flex;align-items:center;overflow:hidden">
-                            <span style="flex:1;padding:0 10px;font:400 12.5px/1 var(--ui);color:var(--faint)">
-                              Default
-                            </span>
-                            <span style="width:30px;height:100%;border-left:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--faint)">
+                        <div class="demo-card" style="padding:0 14px 8px">
+                          <div style="display:flex;align-items:center;height:42px;font:600 13.5px/1 var(--ui);color:var(--ink2)">
+                            <span style="flex:1">Text</span>
+                            <span style="color:var(--muted);display:flex;transform:rotate(180deg)">
                               <ChevronDown />
                             </span>
                           </div>
-                        </div>
-                        <div class="demo-row">
-                          <span class="demo-label">Size</span>
-                          <div data-t="size" style={field('size', 116)}>
-                            <span
-                              style={`flex:1;padding:0 9px;font:400 12.5px/1 var(--ui);color:${sizeSet ? 'var(--ink)' : 'var(--faint)'}`}
+                          <div class="demo-row">
+                            <span class="demo-label">Font</span>
+                            <div
+                              class="demo-field"
+                              style="width:160px;gap:6px;padding:0 10px;color:var(--muted)"
                             >
-                              {sizeSet ? String(S.h1Size) : '—'}
-                            </span>
-                            <span class="demo-unit">px</span>
-                            <span class="demo-stepper">
-                              <SmallChevron />
-                            </span>
-                          </div>
-                        </div>
-                        <div class="demo-row">
-                          <span class="demo-label">Line Height</span>
-                          <div style={field('lh', 116)}>
-                            <span style="flex:1;padding:0 9px;font:400 12.5px/1 var(--ui);color:var(--faint)">
-                              —
-                            </span>
-                            <span class="demo-unit">px</span>
-                            <span class="demo-stepper">
-                              <SmallChevron />
-                            </span>
-                          </div>
-                        </div>
-                        <div class="demo-row">
-                          <span class="demo-label">Color</span>
-                          <div data-t="color" style={field('color', 116)}>
-                            <span
-                              style={
-                                'width:30px;height:100%;flex:none;border-right:1px solid var(--border);background:' +
-                                (S.h1Color ||
-                                  'repeating-linear-gradient(135deg,var(--surface) 0 4px,var(--border) 4px 5px)')
-                              }
-                            />
-                            <span
-                              style={`flex:1;padding:0 9px;font:400 12px/1 var(--mono);color:${S.h1Color ? 'var(--ink)' : 'var(--faint)'}`}
-                            >
-                              {S.h1Color || '—'}
-                            </span>
-                          </div>
-                        </div>
-                        <div class="demo-row">
-                          <span class="demo-label">Decoration</span>
-                          <div
-                            class="demo-seg"
-                            style="font:400 12.5px/1 var(--ui)"
-                          >
-                            <span style="padding:6px 8px;text-decoration:underline">
-                              U
-                            </span>
-                            <span style="padding:6px 8px;text-decoration:line-through">
-                              S
-                            </span>
-                            <span style="padding:6px 8px;text-decoration:overline">
-                              A
-                            </span>
-                            <span style="padding:6px 8px">None</span>
-                          </div>
-                        </div>
-                        <div class="demo-row" style="border-bottom:none">
-                          <span class="demo-label">Alignment</span>
-                          <div class="demo-seg">
-                            {[
-                              'M1 1.5h11M1 5.5h7M1 9.5h9',
-                              'M1 1.5h11M3 5.5h7M2 9.5h9',
-                              'M1 1.5h11M5 5.5h7M3 9.5h9',
-                            ].map((d) => (
-                              <span
-                                key={d}
-                                style="padding:6px 9px;display:flex"
-                              >
-                                <svg
-                                  width="13"
-                                  height="11"
-                                  viewBox="0 0 13 11"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  stroke-width="1.3"
-                                  stroke-linecap="round"
-                                >
-                                  <path d={d} />
-                                </svg>
+                              <span style="flex:1;font:400 12.5px/1 var(--ui);color:var(--faint)">
+                                Default
                               </span>
-                            ))}
+                              <ChevronDown />
+                            </div>
+                          </div>
+                          <div class="demo-row">
+                            <span class="demo-label">Size</span>
+                            <div data-t="size" style={field('size')}>
+                              <span
+                                style={`flex:1;padding:0 10px;font:400 12.5px/1 var(--ui);color:${sizeSet ? 'var(--ink)' : 'var(--faint)'}`}
+                              >
+                                {sizeSet ? String(S.h1Size) : '—'}
+                              </span>
+                              <span class="demo-unit">px</span>
+                            </div>
+                          </div>
+                          <div class="demo-row">
+                            <span class="demo-label">Line Height</span>
+                            <div style={field('lh')}>
+                              <span style="flex:1;padding:0 10px;font:400 12.5px/1 var(--ui);color:var(--faint)">
+                                —
+                              </span>
+                              <span class="demo-unit">px</span>
+                            </div>
+                          </div>
+                          <div class="demo-row">
+                            <span class="demo-label">Color</span>
+                            <div data-t="color" style={field('color')}>
+                              <span
+                                class="demo-swatch"
+                                style={`background:${S.h1Color || 'repeating-linear-gradient(135deg,transparent 0 3px,var(--strong) 3px 4px)'}`}
+                              />
+                              <span
+                                style={`flex:1;padding:0 8px;font:400 12px/1 var(--mono);color:${S.h1Color ? 'var(--ink)' : 'var(--faint)'}`}
+                              >
+                                {S.h1Color || '—'}
+                              </span>
+                            </div>
+                          </div>
+                          <div class="demo-row">
+                            <span class="demo-label">Decoration</span>
+                            <div
+                              class="demo-seg"
+                              style="font:400 12.5px/1 var(--ui)"
+                            >
+                              <span style="padding:6px 8px;text-decoration:underline">
+                                U
+                              </span>
+                              <span style="padding:6px 8px;text-decoration:line-through">
+                                S
+                              </span>
+                              <span style="padding:6px 8px;text-decoration:overline">
+                                A
+                              </span>
+                              <span style="padding:6px 8px">None</span>
+                            </div>
+                          </div>
+                          <div class="demo-row">
+                            <span class="demo-label">Alignment</span>
+                            <div class="demo-seg">
+                              {[
+                                'M1 1.5h11M1 5.5h7M1 9.5h9',
+                                'M1 1.5h11M3 5.5h7M2 9.5h9',
+                                'M1 1.5h11M5 5.5h7M3 9.5h9',
+                              ].map((d) => (
+                                <span
+                                  key={d}
+                                  style="padding:6px 9px;display:flex"
+                                >
+                                  <svg
+                                    width="13"
+                                    height="11"
+                                    viewBox="0 0 13 11"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.3"
+                                    stroke-linecap="round"
+                                  >
+                                    <path d={d} />
+                                  </svg>
+                                </span>
+                              ))}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                      {['Background', 'Box', 'Effects', 'More Properties'].map(
-                        (g) => (
+                        {[
+                          'Background',
+                          'Box',
+                          'Effects',
+                          'More properties',
+                        ].map((g) => (
                           <div key={g} class="demo-card demo-group">
                             <span style="flex:1">{g}</span>
                             <span style="color:var(--muted);display:flex">
                               <ChevronDown />
                             </span>
                           </div>
-                        ),
-                      )}
-                    </div>
-                  )}
+                        ))}
+                      </div>
+                    )}
 
-                  {S.tab === 'code' && (
-                    <div
-                      data-t="code"
-                      style="height:100%;overflow:hidden;background:var(--surface);font:400 12px/1.75 var(--mono)"
-                    >
+                    {S.tab === 'code' && (
                       <div
-                        style={
-                          'padding:12px 14px 40px;transition:transform 1.6s cubic-bezier(.4,0,.2,1);transform:translateY(' +
-                          (S.codeScroll
-                            ? -Math.max(0, codeLines.length * 21 - 8)
-                            : 0) +
-                          'px)'
-                        }
+                        data-t="code"
+                        style="height:100%;overflow:hidden;background:var(--surface);font:400 12px/1.75 var(--mono)"
                       >
-                        {this.renderLines(codeLines)}
-                        {ag && (
-                          <div style="margin:12px -14px 0;padding:6px 14px 8px 12px;border-left:2px solid #1f8a4c;background:rgba(31,138,76,.07)">
-                            <div style="font:400 12px/1.75 var(--mono);color:var(--ccom)">
-                              /* Everforest · added by Stylebot agent */
-                            </div>
-                            {this.renderLines(agentLines)}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  {needsKey && (
-                    <div style="height:100%;background:var(--surface);padding:18px 16px;display:flex;flex-direction:column;gap:14px">
-                      <div>
-                        <div style="font:600 14px/1.3 var(--ui);color:var(--ink)">
-                          Set up the Stylebot agent
-                        </div>
-                        <div style="margin-top:5px;font:400 12.5px/1.5 var(--ui);color:var(--muted);text-wrap:pretty">
-                          Bring your own key. It stays in this browser and is
-                          only sent to the provider you pick.
-                        </div>
-                      </div>
-                      <div style="display:flex;padding:3px;gap:2px;border-radius:9px;background:var(--track)">
-                        <span
-                          data-t="prov-claude"
-                          style={S.prov === 'claude' ? provOn : provOff}
-                        >
-                          Claude
-                        </span>
-                        <span style={provOff}>OpenAI</span>
-                      </div>
-                      <div style="display:flex;flex-direction:column;gap:6px">
-                        <span style="font:500 12px/1 var(--ui);color:var(--ink2)">
-                          API key
-                        </span>
                         <div
-                          data-t="key-input"
                           style={
-                            'height:36px;display:flex;align-items:center;padding:0 12px;border-radius:9px;overflow:hidden;background:var(--surface);transition:border-color .15s,box-shadow .15s;' +
-                            (S.keyFocus
-                              ? 'border:1px solid var(--acc);box-shadow:0 0 0 3px rgba(42,95,214,.15)'
-                              : 'border:1px solid var(--strong)')
+                            'padding:12px 14px 40px;transition:transform 1.6s cubic-bezier(.4,0,.2,1);transform:translateY(' +
+                            (S.codeScroll
+                              ? -Math.max(0, codeLines.length * 21 - 8)
+                              : 0) +
+                            'px)'
                           }
                         >
-                          <span
-                            style={`font:400 12.5px/1 var(--mono);overflow:hidden;white-space:nowrap;color:${S.keyLen ? 'var(--ink)' : 'var(--faint)'}`}
-                          >
-                            {S.keyLen
-                              ? `sk-ant-${'•'.repeat(S.keyLen)}`
-                              : 'Paste your key'}
-                          </span>
+                          {this.renderLines(codeLines)}
+                          {ag && (
+                            <div style="margin:12px -14px 0;padding:6px 14px 8px 12px;border-left:2px solid #1f8a4c;background:rgba(31,138,76,.07)">
+                              <div style="font:400 12px/1.75 var(--mono);color:var(--ccom)">
+                                /* Everforest · added by Stylebot agent */
+                              </div>
+                              {this.renderLines(agentLines)}
+                            </div>
+                          )}
                         </div>
                       </div>
-                      <span
-                        data-t="key-save"
-                        style={
-                          'align-self:flex-start;padding:10px 16px;border-radius:9px;font:600 13px/1 var(--ui);background:var(--ink);color:var(--surface);transition:opacity .15s;opacity:' +
-                          (S.keyLen ? 1 : 0.45)
-                        }
-                      >
-                        {S.keySaving ? 'Checking…' : 'Connect'}
-                      </span>
-                    </div>
-                  )}
+                    )}
 
-                  {isChat && (
-                    <div style="height:100%;display:flex;flex-direction:column;background:var(--surface)">
-                      <div style="flex:1;min-height:0;padding:14px;display:flex;flex-direction:column;justify-content:flex-end;gap:10px">
-                        {S.chatSent && (
-                          <div class="demo-bubble">{CHAT_MSG}</div>
-                        )}
-                        {S.chatThinking && (
-                          <div style="display:flex;align-items:center;gap:10px;font:400 12.5px/1.4 var(--ui);color:var(--muted)">
-                            <SbIcon size={18} bare animate cycle={1.8} />
-                            <span>{loadText}</span>
+                    {needsKey && (
+                      <div style="height:100%;background:var(--surface);padding:18px 16px;display:flex;flex-direction:column;gap:14px">
+                        <div>
+                          <div style="font:600 14px/1.3 var(--ui);color:var(--ink)">
+                            Set up the Stylebot agent
                           </div>
-                        )}
-                        {S.chatReplied && (
-                          <>
-                            <div style="font:400 13px/1.5 var(--ui);color:var(--ink2);text-wrap:pretty">
-                              Done. I switched the page to Everforest colours
-                              with Lora and Newsreader, and added the CSS to
-                              your style.
+                          <div style="margin-top:5px;font:400 12.5px/1.5 var(--ui);color:var(--muted);text-wrap:pretty">
+                            Bring your own key. It stays in this browser and is
+                            only sent to the provider you pick.
+                          </div>
+                        </div>
+                        <div style="display:flex;padding:3px;gap:2px;border-radius:9px;background:var(--track)">
+                          <span
+                            data-t="prov-claude"
+                            style={S.prov === 'claude' ? provOn : provOff}
+                          >
+                            Claude
+                          </span>
+                          <span style={provOff}>OpenAI</span>
+                        </div>
+                        <div style="display:flex;flex-direction:column;gap:6px">
+                          <span style="font:500 12px/1 var(--ui);color:var(--ink2)">
+                            API key
+                          </span>
+                          <div
+                            data-t="key-input"
+                            style={
+                              'height:36px;display:flex;align-items:center;padding:0 12px;border-radius:9px;overflow:hidden;background:var(--surface);transition:border-color .15s,box-shadow .15s;' +
+                              (S.keyFocus
+                                ? 'border:1px solid var(--acc);box-shadow:0 0 0 3px rgba(42,95,214,.15)'
+                                : 'border:1px solid var(--strong)')
+                            }
+                          >
+                            <span
+                              style={`font:400 12.5px/1 var(--mono);overflow:hidden;white-space:nowrap;color:${S.keyLen ? 'var(--ink)' : 'var(--faint)'}`}
+                            >
+                              {S.keyLen
+                                ? `sk-ant-${'•'.repeat(S.keyLen)}`
+                                : 'Paste your key'}
+                            </span>
+                          </div>
+                        </div>
+                        <span
+                          data-t="key-save"
+                          style={
+                            'align-self:flex-start;padding:10px 16px;border-radius:9px;font:600 13px/1 var(--ui);background:var(--ink);color:var(--surface);transition:opacity .15s;opacity:' +
+                            (S.keyLen ? 1 : 0.45)
+                          }
+                        >
+                          {S.keySaving ? 'Checking…' : 'Connect'}
+                        </span>
+                      </div>
+                    )}
+
+                    {isChat && (
+                      <div style="height:100%;display:flex;flex-direction:column;background:var(--surface)">
+                        <div style="flex:1;min-height:0;padding:16px;display:flex;flex-direction:column;justify-content:flex-end;gap:12px">
+                          {S.chatSent && (
+                            <div class="demo-sent">
+                              <span>article h1</span>
+                              <div class="demo-bubble">{CHAT_MSG}</div>
                             </div>
-                            <div style="display:flex;align-items:center;gap:10px">
-                              <span style="font:500 11.5px/1 var(--mono);color:#1f8a4c">
-                                +{agentLines.length + 1} lines
-                              </span>
+                          )}
+                          {S.chatThinking && (
+                            <div style="display:flex;align-items:center;gap:10px;font:500 12.5px/1.4 var(--ui);color:var(--muted)">
+                              <SbIcon size={18} bare animate cycle={1.8} />
+                              <span>{loadText}</span>
+                            </div>
+                          )}
+                          {S.chatReplied && (
+                            <>
+                              <div style="font:400 15px/1.55 'Newsreader',Georgia,serif;color:var(--ink2);text-wrap:pretty">
+                                Done. I switched the page to Everforest colors
+                                with Lora and Newsreader, and added the CSS to
+                                this profile.
+                              </div>
                               <span
                                 data-t="view-code"
+                                class="demo-added"
+                                style={`opacity:${S.clicking && S.tab === 'chat' ? 0.6 : 1}`}
+                              >
+                                <span style="font:500 12.5px/1 var(--mono);color:#1f8a4c">
+                                  {'{ }'}
+                                </span>
+                                Added {agentLines.length + 1} lines
+                              </span>
+                            </>
+                          )}
+                        </div>
+                        <div style="flex:none;padding:0 12px 12px">
+                          <div
+                            data-t="chat-input"
+                            class="demo-composer"
+                            style={
+                              S.chatDraft
+                                ? 'border-color:var(--acc);box-shadow:0 0 0 3px rgba(42,95,214,.15)'
+                                : ''
+                            }
+                          >
+                            <span
+                              style={`min-height:36px;font:400 13px/1.45 var(--ui);color:${S.chatDraft ? 'var(--ink)' : 'var(--faint)'}`}
+                            >
+                              {S.chatDraft
+                                ? CHAT_MSG.slice(0, S.chatDraft)
+                                : 'Describe a change…'}
+                            </span>
+                            <div style="display:flex;align-items:center;gap:10px;color:var(--muted)">
+                              <svg
+                                width="15"
+                                height="15"
+                                viewBox="0 0 16 16"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.3"
+                                stroke-linejoin="round"
+                              >
+                                <rect
+                                  x="1.8"
+                                  y="2.5"
+                                  width="12.4"
+                                  height="11"
+                                  rx="2"
+                                />
+                                <circle cx="5.6" cy="6.2" r="1.2" />
+                                <path
+                                  d="M2.2 12l3.8-3.6 2.6 2.4 2.2-2 3.2 3"
+                                  stroke-linecap="round"
+                                />
+                              </svg>
+                              <span style="display:flex;align-items:center;gap:5px;font:500 12.5px/1 var(--ui);color:var(--ink2)">
+                                Haiku 4.5
+                                <span style="display:flex;transform:rotate(180deg)">
+                                  <ChevronDown />
+                                </span>
+                              </span>
+                              <span style="margin-left:auto;font:400 12px/1 var(--ui);color:var(--faint)">
+                                {S.chatReplied ? '6.8K tokens' : ''}
+                              </span>
+                              <span
+                                class="demo-send"
                                 style={
-                                  'font:600 12.5px/1 var(--ui);color:var(--acc);transition:opacity .1s;opacity:' +
-                                  (S.clicking && S.tab === 'chat' ? 0.6 : 1)
+                                  S.chatThinking || S.chatDraft
+                                    ? ''
+                                    : 'background:var(--track);color:var(--muted)'
                                 }
                               >
-                                View in Code
+                                {S.chatThinking ? (
+                                  <span style="width:9px;height:9px;border-radius:2px;background:currentColor" />
+                                ) : (
+                                  <svg
+                                    width="12"
+                                    height="12"
+                                    viewBox="0 0 12 12"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.6"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                  >
+                                    <path d="M6 10V2M2.5 5.5 6 2l3.5 3.5" />
+                                  </svg>
+                                )}
                               </span>
                             </div>
-                          </>
-                        )}
-                      </div>
-                      <div style="flex:none;padding:10px 12px 12px;border-top:1px solid var(--border)">
-                        <div
-                          data-t="chat-input"
-                          style={
-                            'display:flex;align-items:center;gap:8px;padding:6px 6px 6px 14px;border-radius:12px;background:var(--surface);min-height:44px;transition:border-color .15s,box-shadow .15s;' +
-                            (S.chatDraft
-                              ? 'border:1px solid var(--acc);box-shadow:0 0 0 3px rgba(42,95,214,.15)'
-                              : 'border:1px solid var(--strong)')
-                          }
-                        >
-                          <span
-                            style={`flex:1;min-width:0;font:400 13px/1.4 var(--ui);color:${S.chatDraft ? 'var(--ink)' : 'var(--faint)'}`}
-                          >
-                            {S.chatDraft
-                              ? CHAT_MSG.slice(0, S.chatDraft)
-                              : 'Describe a change…'}
-                          </span>
-                          <span class="demo-send">
-                            <svg
-                              width="12"
-                              height="12"
-                              viewBox="0 0 12 12"
-                              fill="none"
-                              stroke="currentColor"
-                              stroke-width="1.6"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                            >
-                              <path d="M6 10V2M2.5 5.5 6 2l3.5 3.5" />
-                            </svg>
-                          </span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  )}
+                    )}
 
-                  {S.tab === 'presets' && (
-                    <div style="padding:12px;display:flex;flex-direction:column;gap:10px">
-                      <div class="demo-card" style="padding:14px 16px">
-                        <div style="display:flex;align-items:center;gap:12px">
-                          <span style="font:600 14px/1.2 var(--ui);color:var(--ink)">
-                            Readability
-                          </span>
-                          <span style={readTog.track}>
-                            <span style={readTog.knob} />
-                          </span>
-                          <span style="margin-left:auto;font:400 12px/1 var(--ui);color:var(--muted)">
-                            Articles only
-                          </span>
+                    {S.tab === 'presets' && (
+                      <div style="padding:12px;display:flex;flex-direction:column;gap:10px">
+                        <div class="demo-card" style="padding:14px 16px">
+                          <div style="display:flex;align-items:center;gap:12px">
+                            <span style="font:600 14px/1.2 var(--ui);color:var(--ink)">
+                              Readability
+                            </span>
+                            <span style={readTog.track}>
+                              <span style={readTog.knob} />
+                            </span>
+                            <span style="margin-left:auto;font:400 12px/1 var(--ui);color:var(--muted)">
+                              Articles only
+                            </span>
+                          </div>
+                          <div class="demo-card-body">
+                            Turn this site's articles into a clean,
+                            distraction-free reading view, with your choice of
+                            theme, font, and size.
+                          </div>
                         </div>
-                        <div class="demo-card-body">
-                          Turn this site's articles into a clean,
-                          distraction-free reading view, with your choice of
-                          theme, font, and size.
+                        <div class="demo-card" style="padding:14px 16px">
+                          <div style="display:flex;align-items:center;gap:12px">
+                            <span style="font:600 14px/1.2 var(--ui);color:var(--ink)">
+                              Grayscale
+                            </span>
+                            <span style={grayTog.track}>
+                              <span style={grayTog.knob} />
+                            </span>
+                          </div>
+                          <div class="demo-card-body">
+                            Apply grayscale to the page.
+                          </div>
                         </div>
                       </div>
-                      <div class="demo-card" style="padding:14px 16px">
-                        <div style="display:flex;align-items:center;gap:12px">
-                          <span style="font:600 14px/1.2 var(--ui);color:var(--ink)">
-                            Grayscale
-                          </span>
-                          <span style={grayTog.track}>
-                            <span style={grayTog.knob} />
-                          </span>
-                        </div>
-                        <div class="demo-card-body">
-                          Apply grayscale to the page.
-                        </div>
-                      </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -1386,8 +1516,6 @@ export default class Demo extends Component<Props, State> {
       </div>
     );
 
-    if (this.welcome) return this.renderSplit(stage, steps);
-
     return (
       <>
         {stage}
@@ -1411,88 +1539,6 @@ export default class Demo extends Component<Props, State> {
           ))}
         </ol>
       </>
-    );
-  }
-
-  /**
-   * In the narrower welcome layout, how far to scroll the article up so the
-   * quote stays in view once the Write CSS scene starts restyling it.
-   */
-  artShift() {
-    const art = this.artRef.current;
-    const box = art?.parentElement;
-    const quote = art?.querySelector('[data-t="quote"]');
-    if (!this.welcome || this.state.scene < 4 || !art || !box || !quote)
-      return 0;
-    const current = new DOMMatrix(getComputedStyle(art).transform).m42;
-    const s = this.state.scale;
-    const quoteBottom =
-      (quote.getBoundingClientRect().bottom - current * s) / s;
-    const boxBottom = box.getBoundingClientRect().bottom / s;
-    return Math.max(0, Math.round(quoteBottom + 24 - boxBottom));
-  }
-
-  renderSplit(stage: JSX.Element, steps: Step[]) {
-    return (
-      <div class="demo-split">
-        <aside class="demo-side">
-          {this.props.heading && (
-            <h1 class="demo-side-title">{this.props.heading}</h1>
-          )}
-          {this.props.lede && <p class="demo-side-lede">{this.props.lede}</p>}
-          <div class="demo-side-card">
-            <div class="demo-side-head">How it works</div>
-            <ol class="demo-side-steps">
-              {steps.map((s, i) => (
-                <li
-                  key={s.title}
-                  class={`demo-side-step${s.active ? ' is-active' : ''}`}
-                  onClick={() => this.jump(i)}
-                >
-                  <span class={`demo-side-dot ${s.dotClass}`}>{s.mark}</span>
-                  <div style="flex:1;min-width:0">
-                    <button class="demo-step-title" style={s.titleStyle}>
-                      {s.title}
-                    </button>
-                    {s.active && <div class="demo-side-body">{s.body}</div>}
-                    {s.active && (
-                      <div
-                        class="demo-side-bar"
-                        title="Jump to this point"
-                        onClick={(ev: MouseEvent) => this.seekFromBar(i, ev)}
-                      >
-                        <div class="demo-side-track">
-                          <div style={s.barStyle} />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </li>
-              ))}
-            </ol>
-          </div>
-          {this.state.done && (
-            <div class="demo-side-card demo-your-turn">
-              <div class="demo-your-turn-title">Your turn.</div>
-              <p>
-                Open any site and press the shortcut. Nothing changes until you
-                do.
-              </p>
-              <div class="demo-your-turn-keys">
-                <kbd>alt</kbd>
-                <kbd>shift</kbd>
-                <kbd>M</kbd>
-              </div>
-              <nav>
-                <a href="/manual">
-                  Manual<span>›</span>
-                </a>
-              </nav>
-            </div>
-          )}
-        </aside>
-        {stage}
-      </div>
     );
   }
 

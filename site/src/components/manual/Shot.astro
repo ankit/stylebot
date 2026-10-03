@@ -1,8 +1,32 @@
 ---
-type Props = { label: string };
-const { label } = Astro.props;
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+
+type Props = { label: string; src?: ImageMetadata; dark?: ImageMetadata };
+const { label, src, dark } = Astro.props;
 ---
 
-<div class="shot" role="img" aria-label={label}>
-  Screenshot: {label}
-</div>
+{src ? (
+  <>
+    <Image
+      class:list={['shot-image', { 'is-light': dark }]}
+      src={src}
+      alt={label}
+      width={src.width / 2}
+      densities={[1, 2]}
+    />
+    {dark && (
+      <Image
+        class="shot-image is-dark"
+        src={dark}
+        alt={label}
+        width={dark.width / 2}
+        densities={[1, 2]}
+      />
+    )}
+  </>
+) : (
+  <div class="shot" role="img" aria-label={label}>
+    Screenshot: {label}
+  </div>
+)}

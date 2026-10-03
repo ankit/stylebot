@@ -1,35 +1,25 @@
-export type ThemeKey =
-  'light' | 'dark' | 'sepia' | 'riso' | 'newsprint' | 'midnight';
+export type ThemeKey = 'light' | 'dark' | 'stylebot' | 'newsprint';
 
 type Theme = { label: string } & Record<string, string>;
 
-const publicSans = "'Public Sans',system-ui,sans-serif";
-const plexMono = "'IBM Plex Mono',ui-monospace,monospace";
+const geist = "'Geist',system-ui,sans-serif";
+const geistMono = "'Geist Mono',ui-monospace,monospace";
 
 const lightCode = {
-  csel: '#800000',
-  cbr: '#0000ff',
-  cprop: '#e50000',
-  cval: '#0451a5',
-  cnum: '#098658',
-  ccom: '#008000',
-};
-
-const darkCode = {
-  csel: '#f7768e',
-  cbr: '#89ddff',
-  cprop: '#7aa2f7',
-  cval: '#e0af68',
-  cnum: '#ff9e64',
-  ccom: '#6b7394',
+  csel: '#b8406c',
+  cbr: '#8b919c',
+  cprop: '#2a7f99',
+  cval: '#9a6a1f',
+  cnum: '#9a6a1f',
+  ccom: '#8b919c',
 };
 
 export const THEMES: Record<ThemeKey, Theme> = {
   light: {
     label: 'Light',
-    ui: publicSans,
-    display: publicSans,
-    mono: plexMono,
+    ui: geist,
+    display: geist,
+    mono: geistMono,
     surface: '#ffffff',
     sunken: '#f7f8fa',
     fill: '#f5f6f8',
@@ -41,16 +31,16 @@ export const THEMES: Record<ThemeKey, Theme> = {
     ink2: '#3f4550',
     muted: '#5f6672',
     faint: '#8b919c',
-    acc: '#2a5fd6',
-    acctint: '#f3f6fd',
-    accline: '#e2e9fa',
+    acc: '#2563eb',
+    acctint: '#f2f6fe',
+    accline: '#dfe8fc',
     ...lightCode,
   },
   dark: {
     label: 'Dark',
-    ui: publicSans,
-    display: publicSans,
-    mono: plexMono,
+    ui: geist,
+    display: geist,
+    mono: geistMono,
     surface: '#1c1e22',
     sunken: '#15171a',
     fill: '#212429',
@@ -62,65 +52,48 @@ export const THEMES: Record<ThemeKey, Theme> = {
     ink2: '#c9ced6',
     muted: '#a3aab6',
     faint: '#7d8593',
-    acc: '#4d80f0',
+    acc: '#5b8cf5',
     acctint: '#1f2330',
     accline: '#2b3140',
-    ...darkCode,
+    csel: '#f4a3bf',
+    cbr: '#8b919c',
+    cprop: '#93d3e6',
+    cval: '#f0d38a',
+    cnum: '#f0d38a',
+    ccom: '#7d8593',
   },
-  sepia: {
-    label: 'Sepia',
-    ui: publicSans,
-    display: publicSans,
-    mono: plexMono,
-    surface: '#fbf8f2',
-    sunken: '#f4efe5',
-    fill: '#efe9dd',
-    hover: '#ebe4d6',
-    track: '#e6dfd0',
-    border: '#e3dccd',
-    strong: '#d2c9b6',
-    ink: '#2b2620',
-    ink2: '#4a4237',
-    muted: '#6c6252',
-    faint: '#978c79',
-    acc: '#a8511d',
-    acctint: '#f6eadf',
-    accline: '#ecd6c6',
-    csel: '#8a2f1a',
-    cbr: '#5b4a8a',
-    cprop: '#a8511d',
-    cval: '#2f5d7c',
-    cnum: '#4f7a3a',
-    ccom: '#8a8171',
-  },
-  riso: {
-    label: 'Riso',
-    ui: "'Bricolage Grotesque',system-ui,sans-serif",
-    display: "'Bricolage Grotesque',system-ui,sans-serif",
-    mono: "'Space Mono',ui-monospace,monospace",
-    surface: '#fffaf0',
-    sunken: '#f7efdc',
-    fill: '#f3e8cf',
-    hover: '#efe2c4',
-    track: '#eadbb8',
-    border: '#e6d7b3',
-    strong: '#d6c294',
-    ink: '#1d1a4f',
-    ink2: '#2f2b6b',
-    muted: '#5a5580',
-    faint: '#8e88a8',
-    acc: '#ff4f8b',
-    acctint: '#ffe6ef',
-    accline: '#ffc2d7',
-    ...lightCode,
-    cprop: '#d2336b',
-    cval: '#2f45c4',
+  stylebot: {
+    label: 'Stylebot',
+    ui: geist,
+    display: "'Gabarito','Geist',system-ui,sans-serif",
+    mono: geistMono,
+    link: '#e8ad2a',
+    surface: '#1b1917',
+    sunken: '#131210',
+    fill: '#201e1b',
+    hover: '#272421',
+    track: '#2d2a26',
+    border: '#2f2c28',
+    strong: '#3e3a35',
+    ink: '#f5f1ea',
+    ink2: '#d6d0c6',
+    muted: '#a8a196',
+    faint: '#7d776d',
+    acc: '#ef5f93',
+    acctint: '#2c1e23',
+    accline: '#4a2b36',
+    csel: '#ef5f93',
+    cbr: '#8f887d',
+    cprop: '#3cb6dc',
+    cval: '#e8ad2a',
+    cnum: '#e8ad2a',
+    ccom: '#7d776d',
   },
   newsprint: {
     label: 'Newsprint',
-    ui: "'DM Sans',system-ui,sans-serif",
+    ui: geist,
     display: "'Newsreader',Georgia,serif",
-    mono: plexMono,
+    mono: geistMono,
     surface: '#fbfaf6',
     sunken: '#f1efe8',
     fill: '#ebe8de',
@@ -132,35 +105,16 @@ export const THEMES: Record<ThemeKey, Theme> = {
     ink2: '#33312b',
     muted: '#5d5a50',
     faint: '#8d897c',
-    acc: '#c2261b',
-    acctint: '#f8e5e1',
-    accline: '#efc4bd',
+    acc: '#0f7391',
+    acctint: '#e3f0f3',
+    accline: '#bfdde5',
     ...lightCode,
-  },
-  midnight: {
-    label: 'Midnight',
-    ui: "'Space Grotesk',system-ui,sans-serif",
-    display: "'Space Grotesk',system-ui,sans-serif",
-    mono: "'JetBrains Mono',ui-monospace,monospace",
-    surface: '#121630',
-    sunken: '#0b0e22',
-    fill: '#181d3d',
-    hover: '#1d2348',
-    track: '#222955',
-    border: '#262d5c',
-    strong: '#343d78',
-    ink: '#eef0ff',
-    ink2: '#c9cdf2',
-    muted: '#9aa0d0',
-    faint: '#6f76a8',
-    acc: '#c6ff3d',
-    acctint: '#232b3a',
-    accline: '#3c4a2a',
-    ...darkCode,
   },
 };
 
 export const THEME_KEYS = Object.keys(THEMES) as ThemeKey[];
+
+export const DARK_THEMES: ThemeKey[] = ['dark', 'stylebot'];
 
 export const STORAGE_KEY = 'stylebot-site-theme';
 
@@ -169,7 +123,7 @@ export const STORAGE_KEY = 'stylebot-site-theme';
  * to the dark editor palette.
  */
 export function isDarkTheme(key: string): boolean {
-  return key === 'dark' || key === 'midnight';
+  return DARK_THEMES.includes(key as ThemeKey);
 }
 
 function vars(theme: Theme): string {
@@ -190,7 +144,7 @@ export function themeStylesheet(): string {
       (key) => `:root[data-theme="${key}"]{${vars(THEMES[key])}}`,
     ),
     `[data-ed]{${vars(THEMES.light)}}`,
-    `:root[data-theme="dark"] [data-ed],:root[data-theme="midnight"] [data-ed]{${vars(THEMES.dark)}}`,
+    `${DARK_THEMES.map((key) => `:root[data-theme="${key}"] [data-ed]`).join(',')}{${vars(THEMES.dark)}}`,
   ];
   return rules.join('\n');
 }

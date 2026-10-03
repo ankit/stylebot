@@ -9,7 +9,7 @@ html {
 }
 
 :root[data-theme='dark'],
-:root[data-theme='midnight'] {
+:root[data-theme='stylebot'] {
   color-scheme: dark;
 }
 
@@ -86,7 +86,7 @@ img {
 }
 
 .logo:hover {
-  color: var(--ink);
+  color: var(--link, var(--ink));
 }
 
 .logo-mark {
@@ -159,6 +159,10 @@ img {
   transition:
     opacity 0.12s,
     transform 0.12s;
+}
+
+a.icon-btn:hover {
+  color: var(--link, var(--ink));
 }
 
 .icon-btn:hover .tip,
@@ -384,7 +388,7 @@ img {
 }
 
 .site-footer a:hover {
-  color: var(--ink);
+  color: var(--link, var(--ink));
 }
 
 .site-footer-copy {

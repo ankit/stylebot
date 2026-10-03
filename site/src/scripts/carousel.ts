@@ -3,7 +3,7 @@ const reducedMotion = () =>
 
 /**
  * Width of one item plus the gap after it, i.e. the distance between the
- * starts of two neighbouring items.
+ * starts of two neighboring items.
  */
 function itemStep(el: HTMLElement) {
   const item = el.firstElementChild;

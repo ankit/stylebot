@@ -1,26 +1,147 @@
 ---
 import Base from '../layouts/Base.astro';
 import Demo from '../components/demo/Demo';
+import Keys from '../components/manual/Keys.astro';
 ---
 
 <Base
   title="Welcome"
   description="How Stylebot works, start to finish, in about a minute."
+  install={false}
 >
-  <main class="welcome">
-    <Demo
-      client:load
-      variant="welcome"
-      heading="Stylebot is installed."
-      lede="Here's how it works, start to finish, in about a minute."
-    />
+  <main>
+    <div class="hero">
+      <h1>Stylebot is installed.</h1>
+      <p>Here's how it works, start to finish, in about a minute.</p>
+    </div>
+    <div class="demo-wrap">
+      <Demo client:load variant="welcome" />
+      <div class="your-turn">
+        <div class="your-turn-text">
+          <strong>Your turn.</strong>
+          <span>
+            Open any site and press the shortcut. Nothing changes until you do.
+          </span>
+        </div>
+        <Keys keys={['alt', 'shift', 'M']} />
+        <a href="/manual" class="your-turn-link">
+          Manual<span>›</span>
+        </a>
+      </div>
+    </div>
   </main>
 </Base>
 
 <style>
-  .welcome {
+  .hero {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 88px 24px 44px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .hero h1 {
+    font: 700 clamp(36px, 5.4vw, 58px) / 1.04 var(--display);
+    letter-spacing: -0.035em;
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  .hero p {
+    font: 400 18px/1.55 var(--ui);
+    color: var(--muted);
+    margin: 0;
+    max-width: 48ch;
+    text-wrap: pretty;
+  }
+
+  .demo-wrap {
     max-width: 1180px;
     margin: 0 auto;
-    padding: 56px 24px 64px;
+    padding: 0 24px 88px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  .your-turn {
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px 24px;
+    padding: 18px 22px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+
+  .your-turn-text {
+    flex: 1 1 280px;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font: 400 13.5px/1.5 var(--ui);
+    color: var(--muted);
+    text-wrap: pretty;
+  }
+
+  .your-turn-text strong {
+    font: 600 15px/1.25 var(--ui);
+    color: var(--ink);
+  }
+
+  .your-turn :global(.keys) {
+    display: flex;
+    gap: 4px;
+  }
+
+  .your-turn :global(.keys-sep) {
+    display: none;
+  }
+
+  .your-turn :global(kbd) {
+    padding: 4px 8px;
+    border-radius: 5px;
+    background: var(--fill);
+    border: 1px solid var(--strong);
+    border-bottom-width: 2px;
+    font: 500 12px/1.3 var(--mono);
+    color: var(--ink2);
+  }
+
+  .your-turn-link {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 14px;
+    border-radius: 9px;
+    border: 1px solid var(--strong);
+    font: 600 13.5px/1 var(--ui);
+    color: var(--ink);
+  }
+
+  .your-turn-link:hover {
+    background: var(--hover);
+    color: var(--ink);
+  }
+
+  .your-turn-link span {
+    color: var(--faint);
+  }
+
+  @media (max-width: 600px) {
+    .hero {
+      padding-top: 56px;
+    }
+
+    .demo-wrap {
+      padding-bottom: 64px;
+    }
   }
 </style>

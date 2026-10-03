@@ -121,6 +121,7 @@ import { LINKS } from '../lib/links';
   }
 
   .cta-also :global(.ink-link:hover) {
+    color: var(--link, var(--ink));
     text-decoration-color: var(--ink);
   }
 
@@ -147,7 +148,7 @@ import { LINKS } from '../lib/links';
   }
 
   .stats a:hover {
-    color: var(--ink);
+    color: var(--link, var(--ink));
   }
 
   .stats .sep {

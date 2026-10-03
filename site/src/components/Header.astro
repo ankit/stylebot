@@ -4,8 +4,8 @@ import ThemeMenu from './ThemeMenu';
 import StoreLink from './StoreLink.astro';
 import { LINKS } from '../lib/links';
 
-type Props = { current?: 'manual'; storeCta?: boolean };
-const { current, storeCta = false } = Astro.props;
+type Props = { current?: 'manual'; storeCta?: boolean; install?: boolean };
+const { current, storeCta = false, install = true } = Astro.props;
 ---
 
 <header class="site-header">
@@ -46,13 +46,14 @@ const { current, storeCta = false } = Astro.props;
         </svg>
         <span class="tip">GitHub</span>
       </a>
-      {!storeCta ? (
-        <a href="/#install" class="btn btn-primary btn-sm">
-          Install
-        </a>
-      ) : (
-        <StoreLink index={0} format="add" class="btn btn-primary btn-sm" />
-      )}
+      {install &&
+        (storeCta ? (
+          <StoreLink index={0} format="add" class="btn btn-primary btn-sm" />
+        ) : (
+          <a href="/#install" class="btn btn-primary btn-sm">
+            Install
+          </a>
+        ))}
     </div>
   </div>
 </header>
