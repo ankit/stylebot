@@ -108,5 +108,7 @@ export default Vue.extend({
   min-width: 0;
   overflow-wrap: anywhere;
   font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--field-ink);
 }
 </style>

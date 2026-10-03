@@ -1,7 +1,6 @@
 <template>
   <the-stylebot-resizer>
     <div class="stylebot-content">
-      <the-window-tab-bar v-if="host === 'window'" />
       <the-window-status v-if="host === 'window' && !pageConnected" />
 
       <the-keyboard-shortcuts-view v-if="help" />
@@ -41,7 +40,6 @@ import ThePresetsEditor from './ThePresetsEditor.vue';
 import TheChat from './chat/TheChat.vue';
 import TheStylebotResizer from './TheStylebotResizer.vue';
 import TheWindowStatus from './TheWindowStatus.vue';
-import TheWindowTabBar from './TheWindowTabBar.vue';
 import TheKeyboardShortcutsView from './shortcuts/TheKeyboardShortcutsView.vue';
 
 import type { StylebotEditingMode } from '@stylebot/types';
@@ -59,7 +57,6 @@ export default Vue.extend({
     TheCodeEditor,
     TheStylebotResizer,
     TheWindowStatus,
-    TheWindowTabBar,
     TheKeyboardShortcutsView,
   },
 
