@@ -392,8 +392,8 @@ export default {
   },
 
   /**
-   * Fetches other selectors for the element just picked, which the panel
-   * offers under the selector field.
+   * Fetches other selectors for the element just picked, which the
+   * selector dropdown offers under the element.
    */
   async loadSelectorAlternatives(
     { commit }: { commit: Commit },

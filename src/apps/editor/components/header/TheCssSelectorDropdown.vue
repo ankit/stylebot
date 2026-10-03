@@ -1,11 +1,12 @@
 <template>
   <s-autocomplete
     mono
+    large
     chips
     blur-on-commit
     class="selector-autocomplete"
     :value="activeSelector"
-    :items="filteredSelectors"
+    :items="entries"
     :disabled="disabled"
     :min-width="300"
     :placeholder="t('pick_an_element')"
@@ -18,12 +19,19 @@
     @mouseleave.native="onMouseLeave"
   >
     <template #chips="{ parts }">
-      <selector-chips :parts="parts" />
+      <s-inline-list mono :parts="parts" />
     </template>
 
     <template #item="{ item, select }">
+      <div v-if="item.header" class="section-header" role="presentation">
+        {{ item.header }}
+      </div>
+      <div v-else-if="item.divider" class="section-divider" role="separator" />
       <the-css-selector-dropdown-item
+        v-else
         :selector="item.value"
+        :current="item.value === activeSelector"
+        :styled="item.styled"
         @select="select"
         @preview-end="previewActiveSelector"
       />
@@ -33,24 +41,36 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { SAutocomplete } from '@stylebot/components';
+import { SAutocomplete, SInlineList } from '@stylebot/components';
 import type { StylebotEditingMode } from '@stylebot/types';
 
 import type { CssSelectorMetadata } from '../../store';
+import type { SelectorAlternatives } from '@stylebot/page-bridge';
 import { getPageBridge } from '@stylebot/page-bridge';
-import SelectorChips from './SelectorChips.vue';
 import TheCssSelectorDropdownItem from './TheCssSelectorDropdownItem.vue';
+
+type DropdownEntry = {
+  id: string;
+  value: string;
+  header?: string;
+  divider?: boolean;
+  styled?: boolean;
+};
 
 export default Vue.extend({
   name: 'TheCssSelectorDropdown',
 
   components: {
     SAutocomplete,
-    SelectorChips,
+    SInlineList,
     TheCssSelectorDropdownItem,
   },
 
-  data(): { focused: boolean; hovered: boolean; openingSelector: string } {
+  data(): {
+    focused: boolean;
+    hovered: boolean;
+    openingSelector: string;
+  } {
     return {
       focused: false,
       hovered: false,
@@ -73,16 +93,87 @@ export default Vue.extend({
       return this.$store.state.selectors;
     },
 
-    filteredSelectors(): Array<CssSelectorMetadata> {
-      const query = this.activeSelector.trim().toLowerCase();
-      if (!query || this.activeSelector === this.openingSelector) {
-        return this.selectors;
+    alternatives(): SelectorAlternatives {
+      return this.$store.state.selectorAlternatives;
+    },
+
+    /**
+     * Selectors for the element last picked, the active one first, while
+     * the field holds (or began editing from) one of them.
+     */
+    elementSelectors(): Array<string> {
+      const { existing, candidates } = this.alternatives;
+      const all = [...existing, ...candidates];
+      const current = all.includes(this.activeSelector)
+        ? [this.activeSelector]
+        : [];
+
+      if (!current.length && !all.includes(this.openingSelector)) {
+        return [];
       }
 
-      return this.selectors.filter(s => {
-        const value = s.value.toLowerCase();
-        return value.includes(query) && value !== query;
-      });
+      return [...new Set([...current, ...all])];
+    },
+
+    // The style's other rules, once each even when a selector has several
+    // rules; a selector offered for the element isn't repeated here.
+    pageSelectors(): Array<string> {
+      return [...new Set(this.selectors.map(s => s.value))].filter(
+        value => !this.elementSelectors.includes(value)
+      );
+    },
+
+    styledSelectors(): Set<string> {
+      return new Set([
+        ...this.alternatives.existing,
+        ...this.selectors.map(s => s.value),
+      ]);
+    },
+
+    entries(): Array<DropdownEntry> {
+      const query = this.activeSelector.trim().toLowerCase();
+      const filtering = !!query && this.activeSelector !== this.openingSelector;
+      const matches = (selector: string) => {
+        const value = selector.toLowerCase();
+        return !filtering || (value.includes(query) && value !== query);
+      };
+
+      const element = this.elementSelectors.filter(matches);
+      const page = this.pageSelectors.filter(matches);
+
+      const entries: Array<DropdownEntry> = [];
+
+      if (element.length) {
+        entries.push({
+          id: 'header:element',
+          value: '',
+          header: this.t('this_element'),
+        });
+        element.forEach(value =>
+          entries.push({
+            id: `element:${value}`,
+            value,
+            styled: this.styledSelectors.has(value),
+          })
+        );
+      }
+
+      if (page.length) {
+        if (element.length) {
+          entries.push({ id: 'divider', value: '', divider: true });
+        }
+
+        entries.push({
+          id: 'header:page',
+          value: '',
+          header: this.t('styled_on_this_page'),
+        });
+        page.forEach(value =>
+          entries.push({ id: `page:${value}`, value, styled: true })
+        );
+      }
+
+      return entries;
     },
 
     disabled(): boolean {
@@ -109,7 +200,7 @@ export default Vue.extend({
       this.$store.commit('setActiveSelector', value);
     },
 
-    pickSelector(item: CssSelectorMetadata): void {
+    pickSelector(item: DropdownEntry): void {
       this.$store.commit('setActiveSelector', item.value);
     },
 
@@ -126,7 +217,7 @@ export default Vue.extend({
     onBlur(): void {
       this.focused = false;
 
-      if (!this.hovered) {
+      if (!this.hovered && !this.disabled) {
         getPageBridge().unhighlight();
       }
     },
@@ -139,7 +230,7 @@ export default Vue.extend({
     onMouseLeave(): void {
       this.hovered = false;
 
-      if (!this.focused) {
+      if (!this.focused && !this.disabled) {
         getPageBridge().unhighlight();
       }
     },
@@ -149,7 +240,11 @@ export default Vue.extend({
      * the inspector draws its own highlight while picking.
      */
     previewActiveSelector(): void {
-      if (!(this.focused || this.hovered) || this.$store.state.inspecting) {
+      if (
+        this.disabled ||
+        !(this.focused || this.hovered) ||
+        this.$store.state.inspecting
+      ) {
         return;
       }
 
@@ -164,3 +259,22 @@ export default Vue.extend({
   },
 });
 </script>
+
+<style lang="scss" scoped>
+.section-header {
+  flex: none;
+  padding: 10px 10px 4px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--text-muted);
+}
+
+.section-divider {
+  flex: none;
+  align-self: stretch;
+  height: 1px;
+  margin: 4px 2px;
+  background: color-mix(in srgb, var(--text-primary) 14%, transparent);
+}
+</style>

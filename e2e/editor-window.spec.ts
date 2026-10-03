@@ -117,7 +117,7 @@ test('inspecting from the window picks an element on the page', async ({
   await page.bringToFront();
   await page.locator('p.intro').click();
 
-  await expect(popout.locator('.autocomplete-chips .chip').first()).toHaveText(
+  await expect(popout.locator('.autocomplete-chips .part').first()).toHaveText(
     'p.intro'
   );
   await expect(inspector).not.toHaveClass(/active/);
