@@ -1,46 +1,38 @@
 <template>
   <s-dialog @cancel="$emit('cancel')">
-    <form
-      class="card"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="prompt-dialog-title"
-      @submit.prevent="submit"
-    >
-      <s-heading id="prompt-dialog-title" as="h2" size="md">
-        {{ title }}
-      </s-heading>
+    <form @submit.prevent="submit">
+      <s-dialog-card :title="title" role="dialog">
+        <input
+          ref="input"
+          v-model="text"
+          class="prompt-input"
+          tabindex="0"
+          :aria-label="label"
+          :placeholder="label"
+          :aria-invalid="!!error"
+          aria-describedby="prompt-dialog-error"
+        />
 
-      <input
-        ref="input"
-        v-model="text"
-        class="prompt-input"
-        tabindex="0"
-        :aria-label="label"
-        :placeholder="label"
-        :aria-invalid="!!error"
-        aria-describedby="prompt-dialog-error"
-      />
+        <s-text
+          id="prompt-dialog-error"
+          size="caption"
+          variant="muted"
+          class="error"
+          role="alert"
+        >
+          {{ error }}
+        </s-text>
 
-      <s-text
-        id="prompt-dialog-error"
-        size="caption"
-        variant="muted"
-        class="error"
-        role="alert"
-      >
-        {{ error }}
-      </s-text>
+        <template #actions>
+          <s-button variant="ghost" @click="$emit('cancel')">
+            {{ cancelLabel }}
+          </s-button>
 
-      <div class="actions">
-        <s-button variant="ghost" @click="$emit('cancel')">
-          {{ cancelLabel }}
-        </s-button>
-
-        <s-button variant="primary" :disabled="!canSubmit" @click="submit">
-          {{ confirmLabel }}
-        </s-button>
-      </div>
+          <s-button variant="primary" :disabled="!canSubmit" @click="submit">
+            {{ confirmLabel }}
+          </s-button>
+        </template>
+      </s-dialog-card>
     </form>
   </s-dialog>
 </template>
@@ -49,19 +41,19 @@
 import type { PropType } from 'vue';
 import Vue from 'vue';
 
-import SHeading from './SHeading.vue';
 import SText from './SText.vue';
 import SButton from './SButton.vue';
 import SDialog from './SDialog.vue';
+import SDialogCard from './SDialogCard.vue';
 
 export default Vue.extend({
   name: 'SPromptDialog',
 
   components: {
     SButton,
-    SHeading,
     SText,
     SDialog,
+    SDialogCard,
   },
 
   props: {
@@ -136,15 +128,6 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-.card {
-  width: 360px;
-  max-width: calc(100vw - 32px);
-  background: var(--panel-surface);
-  border-radius: 14px;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.24);
-  padding: 20px;
-}
-
 .prompt-input {
   box-sizing: border-box;
   width: 100%;
@@ -166,11 +149,5 @@ export default Vue.extend({
   min-height: 18px;
   margin: 4px 0 12px;
   color: var(--danger);
-}
-
-.actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
 }
 </style>
