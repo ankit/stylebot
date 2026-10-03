@@ -35,6 +35,8 @@ export const gemini: ChatProviderInfo = {
       name: 'Gemini 3.8 Flash',
       shortName: '3.8 Flash',
       tier: 'balanced',
+      // Rises to 1.5 / 7.5 / 0.15 on 2027-01-01.
+      pricing: { input: 0.75, output: 3.75, cacheRead: 0.075 },
       requestOptions: { generation_config: { thinking_level: 'low' } },
     },
     {
@@ -42,12 +44,15 @@ export const gemini: ChatProviderInfo = {
       name: 'Gemini 3.5 Flash-Lite',
       shortName: '3.5 Flash-Lite',
       tier: 'fastest',
+      pricing: { input: 0.3, output: 2.5, cacheRead: 0.03 },
     },
     {
       id: 'gemini-3.1-pro-preview',
       name: 'Gemini 3.1 Pro',
       shortName: '3.1 Pro',
       tier: 'best',
+      // For prompts up to 200k tokens; longer ones cost more.
+      pricing: { input: 2, output: 12, cacheRead: 0.2 },
       requestOptions: { generation_config: { thinking_level: 'low' } },
     },
   ],

@@ -200,8 +200,29 @@ export const RendersMarkdown: StoryObj = {
   },
 };
 
+export const ShowsTokenUsage: StoryObj = {
+  ...chatWithThread(),
+  name: 'the composer counts the chat’s tokens, breaks them into input and output, and estimates the cost',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await user.click(
+      await canvas.findByRole('button', { name: '44.6K tokens' })
+    );
+    const usage = await canvas.findByRole('dialog', { name: 'This chat' });
+
+    await expect(usage).toHaveTextContent(/Input\s*44.4K/);
+    await expect(usage).toHaveTextContent(/Output\s*214/);
+    await expect(usage).toHaveTextContent(/Est. cost\s*\$0.02/);
+    await expect(
+      within(usage).getByRole('link', { name: /Claude usage/ })
+    ).toHaveAttribute('href', 'https://console.anthropic.com/settings/usage');
+  },
+};
+
 export const ClearsTheChat: StoryObj = {
   ...chatWithThread(),
+  name: 'New chat in the tab bar asks first, then clears the conversation but keeps its CSS',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);

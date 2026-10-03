@@ -36,6 +36,7 @@ export const anthropic: ChatProviderInfo = {
       name: 'Claude Sonnet 5',
       shortName: 'Sonnet 5',
       tier: 'balanced',
+      pricing: { input: 2, output: 10, cacheRead: 0.2, cacheWrite: 2.5 },
       requestOptions: { output_config: { effort: 'low' } },
     },
     {
@@ -43,12 +44,14 @@ export const anthropic: ChatProviderInfo = {
       name: 'Claude Haiku 4.5',
       shortName: 'Haiku 4.5',
       tier: 'fastest',
+      pricing: { input: 1, output: 5, cacheRead: 0.1, cacheWrite: 1.25 },
     },
     {
       id: 'claude-opus-5',
       name: 'Claude Opus 5',
       shortName: 'Opus 5',
       tier: 'best',
+      pricing: { input: 5, output: 25, cacheRead: 0.5, cacheWrite: 6.25 },
       requestOptions: { output_config: { effort: 'medium' } },
     },
   ],

@@ -7,6 +7,7 @@
         <chat-attach-image-button @change="focus" />
         <chat-model-menu @providers="$emit('providers')" />
         <span class="chat-composer-spacer" />
+        <chat-usage />
         <chat-send-button
           :pending="pending"
           :disabled="!canSend"
@@ -25,6 +26,7 @@ import ChatAttachImageButton from './ChatAttachImageButton.vue';
 import ChatImageDropZone from './ChatImageDropZone.vue';
 import ChatInput from './ChatInput.vue';
 import ChatModelMenu from './ChatModelMenu.vue';
+import ChatUsage from './ChatUsage.vue';
 import ChatSendButton from './ChatSendButton.vue';
 
 export default Vue.extend({
@@ -35,6 +37,7 @@ export default Vue.extend({
     ChatImageDropZone,
     ChatInput,
     ChatModelMenu,
+    ChatUsage,
     ChatSendButton,
   },
 

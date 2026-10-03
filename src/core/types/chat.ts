@@ -104,12 +104,24 @@ export type ChatStreamEvent =
 
 export type ChatModelTier = 'balanced' | 'fastest' | 'best';
 
+/**
+ * A model's list price in USD per million tokens. Cache writes are only
+ * billed by providers that charge for them.
+ */
+export type ChatModelPricing = {
+  input: number;
+  output: number;
+  cacheRead: number;
+  cacheWrite?: number;
+};
+
 export type ChatModel = {
   id: string;
   name: string;
   // The name without the provider's, for where the provider is implied.
   shortName: string;
   tier: ChatModelTier;
+  pricing?: ChatModelPricing;
   // Extra request fields this model takes, merged into every request body.
   requestOptions?: Record<string, unknown>;
 };

@@ -33,6 +33,14 @@ export const getModel = (provider: ChatProviderId, id: string): ChatModel => {
   );
 };
 
+/**
+ * The model with this id, from whichever provider offers it.
+ */
+export const findModel = (id: string): ChatModel | undefined =>
+  chatProviders
+    .flatMap(provider => provider.models)
+    .find(model => model.id === id);
+
 const adapters: Record<ChatProviderId, ChatProvider> = {
   anthropic: anthropicProvider,
   openai: openAiProvider,

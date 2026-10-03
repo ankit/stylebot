@@ -44,6 +44,11 @@ export const REPLY: ChatAssistantTurn = {
   ],
   applied: true,
   model: 'claude-sonnet-5',
+  usage: {
+    inputTokens: 3180,
+    outputTokens: 214,
+    cacheReadTokens: 41200,
+  },
 };
 
 export const THREAD: Array<ChatTurn> = [ASK, REPLY];
