@@ -7,8 +7,8 @@ dist
 firefox-dist
 preview-dist
 node_modules
-.chrome-dev-profile
-.edge-dev-profile
+.chrome-dev-profile*
+.edge-dev-profile*
 yarn-error.log
 coverage
 .history

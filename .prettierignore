@@ -19,4 +19,5 @@ site
 .claude
 
 # Chrome profile created by yarn dev:chrome.
-.chrome-dev-profile
+.chrome-dev-profile*
+.edge-dev-profile*

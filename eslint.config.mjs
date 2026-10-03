@@ -18,8 +18,8 @@ export default tseslint.config(
       'storybook-static',
       'junit.xml',
       'patches',
-      '.chrome-dev-profile',
-      '.edge-dev-profile',
+      '.chrome-dev-profile*',
+      '.edge-dev-profile*',
       '.history',
       '.claude',
 

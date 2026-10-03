@@ -31,6 +31,7 @@ session is already inside a worktree.
 - `yarn watch:firefox` — build for Firefox in watch mode
 - `yarn build:preview` — production build for local testing (not release) into `preview-dist/`, with the store's public key so it gets the store id
 - `yarn dev:chrome` — watch + launch a Chrome instance with the extension loaded
+- `yarn dev:chrome:locale <locale>` — the same, with the browser and extension in another language (e.g. `vi`), in its own profile
 - `yarn lint` / `yarn lint:fix` — ESLint
 - `yarn typecheck` — `tsc --noEmit` for the extension, then again with `.storybook/tsconfig.json` for Storybook config and stories
 - `yarn test` — Jest unit tests

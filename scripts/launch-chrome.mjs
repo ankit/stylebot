@@ -14,6 +14,8 @@ import {
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { launchWithMacLanguage } from './lib/launch-with-mac-language.mjs';
+
 const rootDir = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   '..'
@@ -26,9 +28,17 @@ const startUrl = 'https://news.ycombinator.com';
 // Set by `yarn dev:edge`: launch Edge instead of Chrome. Separate profile dir
 // since the two browsers can't share one.
 const channel = process.env.STYLEBOT_BROWSER === 'edge' ? 'msedge' : 'chrome';
+
+// Set by `yarn dev:chrome:locale <locale>`: the browser's UI language, which is
+// the one the extension's strings follow. Its own profile, so it can run beside
+// the default one.
+const locale = process.env.STYLEBOT_LOCALE;
+const lang = locale?.replace('_', '-');
 const userDataDir = path.join(
   rootDir,
-  channel === 'msedge' ? '.edge-dev-profile' : '.chrome-dev-profile'
+  `${channel === 'msedge' ? '.edge-dev-profile' : '.chrome-dev-profile'}${
+    locale ? `-${locale}` : ''
+  }`
 );
 
 // Set by `yarn dev:chrome`: wait for a build that finishes after this script
@@ -100,30 +110,38 @@ const clearCrashFlags = () => {
 };
 clearCrashFlags();
 
-const context = await chromium.launchPersistentContext(userDataDir, {
-  headless,
-  // Playwright's bundled "Chrome for Testing" build gets flagged as a bot by some sites.
-  channel,
-  // Otherwise Playwright adds --no-sandbox, which real Chrome (unlike "for Testing") nags about.
-  chromiumSandbox: true,
-  // Without this, Playwright pins a fixed emulated viewport and the window can't resize.
-  viewport: null,
-  // Playwright defaults this to 'light', forcing every tab to prefers-color-scheme:
-  // light regardless of the OS setting. null leaves it unemulated so tabs match the
-  // real OS preference, same as extension surfaces Playwright doesn't manage (the popup).
-  colorScheme: null,
-  ignoreDefaultArgs: [
-    // Playwright disables extensions by default, which would block our CDP-loaded one.
-    '--disable-extensions',
-    // Playwright's default; sets navigator.webdriver=true, flagged as a bot by Google.
-    '--enable-automation',
-  ],
-  args: [
-    // Required for Extensions.loadUnpacked.
-    '--enable-unsafe-extension-debugging',
-    ...(headless ? [] : ['--start-maximized']),
-  ],
-});
+// Chrome on macOS takes its UI language, which picks the extension's strings,
+// from AppleLanguages rather than --lang.
+const macLanguage = lang && process.platform === 'darwin';
+
+const context = macLanguage
+  ? await launchWithMacLanguage({ channel, userDataDir, lang, headless })
+  : await chromium.launchPersistentContext(userDataDir, {
+      headless,
+      // Playwright's bundled "Chrome for Testing" build gets flagged as a bot by some sites.
+      channel,
+      // Otherwise Playwright adds --no-sandbox, which real Chrome (unlike "for Testing") nags about.
+      chromiumSandbox: true,
+      // Without this, Playwright pins a fixed emulated viewport and the window can't resize.
+      viewport: null,
+      // Playwright defaults this to 'light', forcing every tab to prefers-color-scheme:
+      // light regardless of the OS setting. null leaves it unemulated so tabs match the
+      // real OS preference, same as extension surfaces Playwright doesn't manage (the popup).
+      colorScheme: null,
+      ...(lang ? { locale: lang } : {}),
+      ignoreDefaultArgs: [
+        // Playwright disables extensions by default, which would block our CDP-loaded one.
+        '--disable-extensions',
+        // Playwright's default; sets navigator.webdriver=true, flagged as a bot by Google.
+        '--enable-automation',
+      ],
+      args: [
+        // Required for Extensions.loadUnpacked.
+        '--enable-unsafe-extension-debugging',
+        ...(headless ? [] : ['--start-maximized']),
+        ...(lang ? [`--lang=${lang}`] : []),
+      ],
+    });
 
 const cdp = await context.browser().newBrowserCDPSession();
 
@@ -214,7 +232,9 @@ const page = context.pages()[0] ?? (await context.newPage());
 await page.goto(startUrl);
 
 console.log(
-  `\n🎉 Stylebot loaded on Hacker News (${channel}) — extension id: ${extensionId}`
+  `\n🎉 Stylebot loaded on Hacker News (${channel}${
+    locale ? `, ${locale}` : ''
+  }) — extension id: ${extensionId}`
 );
 console.log(
   '👀 Watching ./dist — the extension hot-reloads in place on rebuild.'
@@ -257,5 +277,8 @@ const watcher = watch(extensionPath, (event, filename) => {
 });
 
 // Keep the process alive until the user closes the browser.
-await new Promise(resolve => context.on('close', resolve));
+await new Promise(resolve => {
+  context.on('close', resolve);
+  context.browser().on('disconnected', resolve);
+});
 watcher.close();
