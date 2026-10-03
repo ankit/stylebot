@@ -80,6 +80,15 @@
       @cancel="cancelLeave"
       @confirm="confirmLeave"
     />
+
+    <s-confirm-dialog
+      v-if="showReplaceConfirm"
+      :title="t('replace_style')"
+      :message="t('replace_style_warning', [url])"
+      :confirm-label="t('replace')"
+      @cancel="showReplaceConfirm = false"
+      @confirm="confirmReplace"
+    />
   </div>
 </template>
 
@@ -137,6 +146,7 @@ export default Vue.extend({
     css: string;
     showDeleteConfirm: boolean;
     showLeaveConfirm: boolean;
+    showReplaceConfirm: boolean;
     leaving: boolean;
     pendingNext: NavigationGuardNext | null;
   } {
@@ -147,6 +157,7 @@ export default Vue.extend({
       css: existing ? existing.css : '',
       showDeleteConfirm: false,
       showLeaveConfirm: false,
+      showReplaceConfirm: false,
       leaving: false,
       pendingNext: null,
     };
@@ -251,6 +262,11 @@ export default Vue.extend({
       navigator.clipboard.writeText(this.css);
     },
 
+    confirmReplace(): void {
+      this.showReplaceConfirm = false;
+      this.emitSave();
+    },
+
     confirmDelete(): void {
       this.$store.dispatch('deleteStyle', this.initialUrl);
       this.showDeleteConfirm = false;
@@ -259,6 +275,15 @@ export default Vue.extend({
     },
 
     save(): void {
+      if (this.url !== this.initialUrl && this.$store.state.styles[this.url]) {
+        this.showReplaceConfirm = true;
+        return;
+      }
+
+      this.emitSave();
+    },
+
+    emitSave(): void {
       this.leaving = true;
       this.$emit('save', {
         initialUrl: this.initialUrl,
