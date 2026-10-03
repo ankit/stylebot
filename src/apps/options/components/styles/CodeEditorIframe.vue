@@ -1,7 +1,7 @@
 <template>
   <div class="stylebot-code-editor-iframe" :class="{ ready }">
     <iframe ref="iframe" :src="src" />
-    <span ref="exit" tabindex="-1" />
+    <span ref="exit" class="exit" tabindex="-1" />
   </div>
 </template>
 
@@ -104,6 +104,7 @@ export default Vue.extend({
 <style lang="scss">
 .stylebot-code-editor-iframe {
   height: calc(100% - 5px);
+  position: relative;
 
   iframe {
     width: 100%;
@@ -116,6 +117,14 @@ export default Vue.extend({
 
   &.ready iframe {
     opacity: 1;
+  }
+
+  .exit {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+
+    @include focus-ring;
   }
 }
 </style>
