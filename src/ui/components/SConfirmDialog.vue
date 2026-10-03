@@ -1,7 +1,8 @@
 <template>
-  <s-dialog @cancel="$emit('cancel')">
+  <s-dialog :contained="contained" @cancel="$emit('cancel')">
     <div
       class="card"
+      :class="{ contained }"
       role="alertdialog"
       aria-modal="true"
       aria-labelledby="confirm-dialog-title"
@@ -10,12 +11,7 @@
       <s-heading id="confirm-dialog-title" as="h2" size="md">
         {{ title }}
       </s-heading>
-      <s-text
-        id="confirm-dialog-message"
-        size="caption"
-        variant="muted"
-        class="message"
-      >
+      <s-text id="confirm-dialog-message" variant="muted" class="message">
         {{ message }}
       </s-text>
 
@@ -66,6 +62,11 @@ export default Vue.extend({
       type: String,
       default: 'Cancel',
     },
+
+    contained: {
+      type: Boolean,
+      default: false,
+    },
   },
 });
 </script>
@@ -78,6 +79,10 @@ export default Vue.extend({
   border-radius: 14px;
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.24);
   padding: 20px;
+
+  &.contained {
+    max-width: 100%;
+  }
 }
 
 .message {

@@ -1,5 +1,10 @@
 <template>
-  <div ref="root" class="dialog-backdrop" @click.self="$emit('cancel')">
+  <div
+    ref="root"
+    class="dialog-backdrop"
+    :class="{ contained }"
+    @click.self="$emit('cancel')"
+  >
     <slot />
   </div>
 </template>
@@ -9,6 +14,15 @@ import Vue from 'vue';
 
 export default Vue.extend({
   name: 'SDialog',
+
+  props: {
+    // Covers only the nearest positioned ancestor, e.g. the editor panel,
+    // instead of the whole viewport.
+    contained: {
+      type: Boolean,
+      default: false,
+    },
+  },
 
   data(): { previouslyFocused: HTMLElement | null } {
     return {
@@ -105,5 +119,15 @@ export default Vue.extend({
   padding: 20px;
   overflow: auto;
   background: rgba(0, 0, 0, 0.5);
+
+  &.contained {
+    position: absolute;
+    inset: 0;
+    z-index: 30;
+    width: auto;
+    height: auto;
+    padding: 16px;
+    border-radius: 13px;
+  }
 }
 </style>
