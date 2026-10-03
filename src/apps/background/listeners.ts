@@ -26,6 +26,7 @@ import {
   GetImportCss,
   GetCompiledStyles,
   GetGoogleWebFontExists,
+  GetGoogleFontFile,
   RunGoogleDriveSync,
   ScanVersionHistory,
   RestoreVersion,
@@ -232,6 +233,9 @@ export const initListeners = (): void => {
           break;
         case 'GetGoogleWebFontExists':
           GetGoogleWebFontExists(message, sendResponse);
+          break;
+        case 'GetGoogleFontFile':
+          GetGoogleFontFile(message, sendResponse);
           break;
 
         case 'RunGoogleDriveSync':

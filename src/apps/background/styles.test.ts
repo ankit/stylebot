@@ -12,6 +12,7 @@ import {
   move,
   setReadability,
   getGoogleWebFontExists,
+  getGoogleFontFile,
   ensureCompiledStyles,
 } from './styles';
 import { scheduleSyncAfterEdit } from './sync-scheduler';
@@ -247,6 +248,33 @@ describe('getGoogleWebFontExists', () => {
     fetchMock.mockResponse(() => Promise.reject(new Error('offline')));
 
     await expect(getGoogleWebFontExists(fontUrl)).resolves.toBe(false);
+  });
+});
+
+const fontFileUrl = 'https://fonts.gstatic.com/s/muli/v1/a.woff2';
+
+describe('getGoogleFontFile', () => {
+  it('resolves to the file as base64', async () => {
+    fetchMock.mockResponse(() => Promise.resolve({ body: 'wOF2' }));
+
+    await expect(getGoogleFontFile(fontFileUrl)).resolves.toBe(btoa('wOF2'));
+  });
+
+  it('fetches nothing outside Google Fonts', async () => {
+    fetchMock.mockClear();
+
+    await expect(
+      getGoogleFontFile('https://example.com/a.woff2')
+    ).resolves.toBe('');
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('is empty when the request fails', async () => {
+    fetchMock.mockResponse(() => Promise.resolve({ status: 404 }));
+    await expect(getGoogleFontFile(fontFileUrl)).resolves.toBe('');
+
+    fetchMock.mockResponse(() => Promise.reject(new Error('offline')));
+    await expect(getGoogleFontFile(fontFileUrl)).resolves.toBe('');
   });
 });
 

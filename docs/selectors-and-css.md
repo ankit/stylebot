@@ -99,3 +99,17 @@ The background prepares every style when it's saved and keeps the result
 alongside the styles, so a page only injects it and never parses CSS itself;
 the cache used at page load holds the same prepared CSS. The editor prepares
 CSS the same way as you type, so what you preview is what later loads.
+
+## Web fonts on pages with a strict CSP
+
+An `@import` is fetched by the background, so a page's Content Security
+Policy never blocks it. The font files that CSS points to are another matter:
+Firefox loads them under the page's policy, and a page with `default-src
+'self'` and no `font-src` (Hacker News, for one) blocks every Google Fonts
+file. Chrome and Edge exempt fonts in extension-injected CSS.
+
+When the page reports a blocked Google Fonts file, the background fetches it
+and the page registers the font from its bytes, which makes no request for
+the policy to block. Only files the page actually blocked are handled, so it
+still loads just the character subsets it renders, and pages without such a
+policy never take this path.

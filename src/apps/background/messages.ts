@@ -10,6 +10,7 @@ import {
   refreshBadgeForTab,
   getImportCss,
   getGoogleWebFontExists,
+  getGoogleFontFile,
   applyStylesToAllTabs,
   ensureCompiledStyles,
 } from './styles';
@@ -38,6 +39,7 @@ import type {
   GetImportCss as GetImportCssType,
   GetCompiledStylesResponse,
   GetGoogleWebFontExists as GetGoogleWebFontExistsType,
+  GetGoogleFontFile as GetGoogleFontFileType,
   RunGoogleDriveSync as RunGoogleDriveSyncType,
   ScanVersionHistory as ScanVersionHistoryType,
   RestoreVersion as RestoreVersionType,
@@ -58,6 +60,7 @@ import type {
   GetReadabilitySettingsResponse,
   GetImportCssResponse,
   GetGoogleWebFontExistsResponse,
+  GetGoogleFontFileResponse,
   RunGoogleDriveSyncResponse,
   ScanVersionHistoryResponse,
   RestoreVersionResponse,
@@ -298,6 +301,14 @@ export const GetGoogleWebFontExists = async (
 ): Promise<void> => {
   const exists = await getGoogleWebFontExists(message.url);
   sendResponse(exists);
+};
+
+export const GetGoogleFontFile = async (
+  message: GetGoogleFontFileType,
+
+  sendResponse: (response: GetGoogleFontFileResponse) => void
+): Promise<void> => {
+  sendResponse(await getGoogleFontFile(message.url));
 };
 
 export const RunGoogleDriveSync = async (

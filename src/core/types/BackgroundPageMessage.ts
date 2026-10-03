@@ -115,6 +115,11 @@ export type GetGoogleWebFontExists = {
   url: string;
 };
 
+export type GetGoogleFontFile = {
+  name: 'GetGoogleFontFile';
+  url: string;
+};
+
 export type RunGoogleDriveSync = {
   name: 'RunGoogleDriveSync';
 };
@@ -230,6 +235,7 @@ type BackgroundPageMessage =
   | GetImportCss
   | GetCompiledStyles
   | GetGoogleWebFontExists
+  | GetGoogleFontFile
   | RunGoogleDriveSync
   | ScanVersionHistory
   | RestoreVersion
