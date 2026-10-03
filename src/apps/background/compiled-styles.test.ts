@@ -42,7 +42,7 @@ describe('compileStyles', () => {
     });
   });
 
-  it('leaves a style that turned Override site styles off as written', () => {
+  it('leaves a style that turned Use !important off as written', () => {
     const compiled = compileStyles(
       { 'a.com': style('a { color: red; }', { forceImportant: false }) },
       'rev-1'

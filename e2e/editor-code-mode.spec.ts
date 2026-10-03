@@ -64,16 +64,15 @@ test('toggling the panel appearance updates the Monaco editor theme immediately'
 
   // The trigger's label lives in a hover/focus-only STooltip, not an
   // accessible name, so target it via the anchor's wrapper class instead.
-  await editorRoot.locator('.appearance-action-anchor button').click();
-  await editorRoot.getByRole('menuitem', { name: 'Dark' }).click();
+  await editorRoot.locator('.more-action-anchor button').click();
+  await editorRoot.getByRole('button', { name: 'Dark' }).click();
   await expect(monacoBackground).toHaveCSS(
     'background-color',
     'rgb(26, 27, 30)'
   );
 
   // No reload here — the editor iframe stays mounted throughout.
-  await editorRoot.locator('.appearance-action-anchor button').click();
-  await editorRoot.getByRole('menuitem', { name: 'Light' }).click();
+  await editorRoot.getByRole('button', { name: 'Light' }).click();
 
   await expect(monacoBackground).toHaveCSS(
     'background-color',

@@ -51,7 +51,7 @@ describe('LocalPageBridge', () => {
       expect(injectStylesheet).toBeCalledWith(url, compiled.css, []);
     });
 
-    it('compiles a style with Override site styles off without forcing it', () => {
+    it('compiles a style with Use !important off without forcing it', () => {
       bridge.applyCss({ url, css, enabled: true, forceImportant: false });
 
       expect(stylebotCss.compileStyle).toBeCalledWith(css, {

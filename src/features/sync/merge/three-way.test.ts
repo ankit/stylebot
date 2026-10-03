@@ -109,7 +109,7 @@ describe('mergeThreeWay', () => {
     expect(styles['a.com'].css).toContain('a { color: green; }\n\n/*');
   });
 
-  it('takes a change to Override site styles made on one side', () => {
+  it('takes a change to Use !important made on one side', () => {
     const unforced = style(X.css, T2, { forceImportant: false });
 
     expect(
@@ -117,7 +117,7 @@ describe('mergeThreeWay', () => {
     ).toEqual({ styles: { 'a.com': unforced }, conflicts: [] });
   });
 
-  it("gives the newer edit's Override site styles setting when both sides changed", () => {
+  it("gives the newer edit's Use !important setting when both sides changed", () => {
     const local = style('a { color: blue; }', T1);
     const remote = style('a { color: green; }', T2, { forceImportant: false });
 
