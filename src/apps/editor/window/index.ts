@@ -11,7 +11,9 @@ import { initWindowListeners, initTabInfo } from './listeners';
 
 import './index.scss';
 
-const tabId = Number(new URLSearchParams(window.location.search).get('tabId'));
+const params = new URLSearchParams(window.location.search);
+const tabId = Number(params.get('tabId'));
+const host = params.get('host') === 'sidepanel' ? 'sidepanel' : 'window';
 
 const renderUnavailable = (): void => {
   const app = document.getElementById('app');
@@ -29,8 +31,24 @@ const updateTitle = (href: string): void => {
   }
 };
 
+// Read back by appearance-init.js when the page is opened without an appearance.
+const APPEARANCE_KEY = 'editor-window-appearance';
+
+const rememberAppearance = (appearance: string): void => {
+  try {
+    localStorage.setItem(APPEARANCE_KEY, appearance);
+  } catch {
+    //
+  }
+};
+
 const start = async (): Promise<void> => {
-  const store = createStore('window');
+  const store = createStore(host);
+  store.subscribe(mutation => {
+    if (mutation.type === 'setOptions') {
+      rememberAppearance(mutation.payload.appearance);
+    }
+  });
   store.commit('setTabId', tabId);
 
   const bridge = new RemotePageBridge(tabId, {
@@ -44,6 +62,11 @@ const start = async (): Promise<void> => {
       store.commit('setActiveSelector', selector);
     },
     onInspectingStopped: () => store.commit('setInspecting', false),
+    // Replayed so the panel's own shortcut handling takes it as if typed here.
+    onShortcut: key =>
+      document.dispatchEvent(
+        new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true })
+      ),
   });
 
   setPageBridge(bridge);
@@ -57,13 +80,15 @@ const start = async (): Promise<void> => {
 
   // Picking an element happens in the page's window; bring the editor back
   // in front so the pick can be styled right away, as devtools does.
-  bridge.on('select', () => {
-    chrome.windows.getCurrent().then(current => {
-      if (current.id !== undefined) {
-        chrome.windows.update(current.id, { focused: true });
-      }
+  if (host === 'window') {
+    bridge.on('select', () => {
+      chrome.windows.getCurrent().then(current => {
+        if (current.id !== undefined) {
+          chrome.windows.update(current.id, { focused: true });
+        }
+      });
     });
-  });
+  }
 
   initTabInfo(store, tabId);
 
@@ -71,7 +96,9 @@ const start = async (): Promise<void> => {
   await store.dispatch('initialize');
   await store.dispatch('openStylebot', { inspect: false });
 
-  initWindowListeners(store);
+  if (host === 'window') {
+    initWindowListeners(store);
+  }
   initCommandListener(store);
 
   const app = document.getElementById('app');

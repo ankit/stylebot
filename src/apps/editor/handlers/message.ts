@@ -44,7 +44,10 @@ export const createMessageHandler = (
       openStylebot(store);
     } else if (message.name === 'OpenStylebotFromContextMenu') {
       updateSelectorWithContextMenuSelector({ state, commit });
-      openStylebot(store, false);
+      // The panel picks up the selector when it connects.
+      if (!message.sidePanel) {
+        openStylebot(store, false);
+      }
     } else if (message.name === 'GetIsStylebotOpen') {
       // A window that is open but still loading hasn't connected yet;
       // the background knows either way.

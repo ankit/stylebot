@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue';
-import { expect, waitFor, within } from '@storybook/test';
+import { expect, spyOn, waitFor, within } from '@storybook/test';
 
 import TheWindowActions from './TheWindowActions.vue';
 import { editor, WITH_RULE } from '@stylebot/storybook/fixtures/editor';
@@ -26,7 +26,45 @@ const shortcutsView = (root: HTMLElement) =>
 
 export const DockFromOptionsMenu: StoryObj = {
   ...editor(WITH_RULE),
-  name: 'docks the panel left or right from the Options menu',
+  name: 'Open in side panel asks for the side panel, then hides the panel',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+    const sendMessage = spyOn(chrome.runtime, 'sendMessage');
+
+    const menu = await openEditorMenu(canvas, 'Options');
+    await user.click(
+      within(menu).getByRole('button', { name: 'Open in side panel' })
+    );
+
+    await expect(store.state.options.layout.dockLocation).toBe('sidepanel');
+    await waitFor(() => expect(store.state.visible).toBe(false));
+    await waitFor(() => expect(panel(canvasElement)).toBeNull());
+    await expect(sendMessage).toHaveBeenCalledWith(
+      expect.objectContaining({ name: 'OpenEditorSidePanel' })
+    );
+  },
+};
+
+export const SidePanelShortcut: StoryObj = {
+  ...editor(WITH_RULE),
+  name: 's moves the editor to the side panel',
+  play: async ({ canvasElement }) => {
+    const store = storeOf(canvasElement);
+    const sendMessage = spyOn(chrome.runtime, 'sendMessage');
+
+    await pressKey('s');
+    await expect(store.state.options.layout.dockLocation).toBe('sidepanel');
+    await waitFor(() => expect(store.state.visible).toBe(false));
+    await expect(sendMessage).toHaveBeenCalledWith(
+      expect.objectContaining({ name: 'OpenEditorSidePanel' })
+    );
+  },
+};
+
+export const DockInPageFromOptionsMenu: StoryObj = {
+  ...editor(WITH_RULE),
+  name: 'docks the panel left or right in the page from the Options menu',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
@@ -35,7 +73,7 @@ export const DockFromOptionsMenu: StoryObj = {
 
     const menu = await openEditorMenu(canvas, 'Options');
     await user.click(
-      within(menu).getByRole('button', { name: 'Dock to Left' })
+      within(menu).getByRole('button', { name: 'Dock left in page' })
     );
 
     await expect(store.state.options.layout.dockLocation).toBe('left');
@@ -43,7 +81,9 @@ export const DockFromOptionsMenu: StoryObj = {
     await expect(canvas.queryByRole('menu')).toBeNull();
 
     await openEditorMenu(canvas, 'Options');
-    await user.click(canvas.getByRole('button', { name: 'Dock to Right' }));
+    await user.click(
+      canvas.getByRole('button', { name: 'Dock right in page' })
+    );
     await expect(store.state.options.layout.dockLocation).toBe('right');
     await waitFor(() => expect(panel(canvasElement)).toHaveClass('right'));
   },
@@ -51,7 +91,7 @@ export const DockFromOptionsMenu: StoryObj = {
 
 export const DockShortcuts: StoryObj = {
   ...editor(WITH_RULE),
-  name: 'l and r dock the panel left and right',
+  name: 'l and r dock the panel left and right in the page',
   play: async ({ canvasElement }) => {
     const store = storeOf(canvasElement);
 

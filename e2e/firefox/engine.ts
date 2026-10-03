@@ -25,6 +25,7 @@ export class FirefoxEngine implements Engine {
   readonly distDir = 'firefox-dist';
   readonly routesExtensionRequests = false;
   readonly opensExtensionPages = false;
+  readonly hasSidePanel = false;
   // Chosen at launch, needed again at loadExtension time.
   private rdpPort = 0;
 

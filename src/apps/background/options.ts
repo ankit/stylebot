@@ -1,5 +1,6 @@
 import type { StylebotOptions } from '@stylebot/types';
 import { defaultOptions } from '@stylebot/settings';
+import { supportsEditorSidePanel } from '@stylebot/utils';
 
 /**
  * Layers stored options over the defaults so keys added in later releases
@@ -7,7 +8,17 @@ import { defaultOptions } from '@stylebot/settings';
  */
 export const getAll = async (): Promise<StylebotOptions> => {
   const items = await chrome.storage.local.get('options');
-  return { ...defaultOptions, ...items['options'] };
+  const options: StylebotOptions = { ...defaultOptions, ...items['options'] };
+
+  // Without a side panel the editor docks in the page, where it used to.
+  if (
+    options.layout.dockLocation === 'sidepanel' &&
+    !supportsEditorSidePanel()
+  ) {
+    return { ...options, layout: { ...options.layout, dockLocation: 'right' } };
+  }
+
+  return options;
 };
 
 export const get = async (

@@ -70,6 +70,34 @@ export const DockToWindowShortcut: StoryObj = {
   },
 };
 
+export const DockToSidePanelFromWindow: StoryObj = {
+  ...editorWindow(WITH_RULE),
+  name: 'in the window, Open in side panel opens it for the tab, then closes the window',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+    const sendMessage = sentMessages();
+
+    const menu = await openEditorMenu(canvas, 'Options');
+    await user.click(
+      within(menu).getByRole('button', { name: 'Open in side panel' })
+    );
+
+    await expect(store.state.options.layout.dockLocation).toBe('sidepanel');
+    await expect(sendMessage).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'OpenEditorSidePanel',
+        tabId: store.state.tabId,
+      })
+    );
+    await waitFor(() =>
+      expect(sendMessage).toHaveBeenCalledWith(
+        expect.objectContaining({ name: 'CloseEditorWindow' })
+      )
+    );
+  },
+};
+
 export const DockBackFromWindow: StoryObj = {
   ...editorWindow(WITH_RULE),
   name: 'in the window, docking left hands the editor back to the page',
@@ -80,7 +108,7 @@ export const DockBackFromWindow: StoryObj = {
 
     const menu = await openEditorMenu(canvas, 'Options');
     await user.click(
-      within(menu).getByRole('button', { name: 'Dock to Left' })
+      within(menu).getByRole('button', { name: 'Dock left in page' })
     );
 
     await expect(store.state.options.layout.dockLocation).toBe('left');

@@ -24,6 +24,10 @@ import type {
   CloseEditorWindow,
   GetIsEditorWindowOpen,
   GetIsEditorWindowOpenResponse,
+  OpenEditorSidePanel,
+  OpenEditorSidePanelResponse,
+  CloseEditorSidePanel,
+  StylebotAppearance,
   ChatGetStatus,
   ChatConnect,
   ChatRemoveKey,
@@ -202,6 +206,31 @@ export const getIsEditorWindowOpen = (
     GetIsEditorWindowOpen,
     GetIsEditorWindowOpenResponse
   >(message);
+};
+
+/**
+ * Asks the background to open the tab's side panel. Must be sent without
+ * awaiting anything first, so the background still has the user's gesture.
+ */
+export const requestEditorSidePanel = (
+  appearance: StylebotAppearance,
+  tabId?: number
+): Promise<OpenEditorSidePanelResponse> => {
+  const message: OpenEditorSidePanel = {
+    name: 'OpenEditorSidePanel',
+    appearance,
+    tabId,
+  };
+
+  return chrome.runtime.sendMessage<
+    OpenEditorSidePanel,
+    OpenEditorSidePanelResponse
+  >(message);
+};
+
+export const requestCloseEditorSidePanel = (tabId?: number): void => {
+  const message: CloseEditorSidePanel = { name: 'CloseEditorSidePanel', tabId };
+  chrome.runtime.sendMessage(message);
 };
 
 export const chatGetStatus = (): Promise<ChatStatusResponse> =>

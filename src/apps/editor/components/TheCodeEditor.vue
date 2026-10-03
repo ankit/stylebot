@@ -120,12 +120,16 @@ export default Vue.extend({
 
   created() {
     window.addEventListener('message', this.handleMessage);
+    // Closing a separate window or side panel unloads the editor without
+    // destroying it, so what was just typed has to go out here.
+    window.addEventListener('pagehide', this.applyTypedCss.flush);
     this.pruneEmptyRules();
   },
 
   beforeDestroy() {
     this.applyTypedCss.flush();
     window.removeEventListener('message', this.handleMessage);
+    window.removeEventListener('pagehide', this.applyTypedCss.flush);
   },
 
   methods: {

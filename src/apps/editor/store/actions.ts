@@ -27,6 +27,7 @@ import type {
   ReadabilitySettings,
   StylebotBasicModeSections,
   StylebotLayout,
+  StylebotDockLocation,
   StylebotAppearance,
 } from '@stylebot/types';
 
@@ -41,6 +42,8 @@ import {
   setReadabilitySettings,
   closeEditorWindow,
   openEditorWindow,
+  requestEditorSidePanel,
+  requestCloseEditorSidePanel,
 } from '../utils/chrome';
 
 import type { RemotePageBridgeSyncedState } from '@stylebot/page-bridge';
@@ -181,6 +184,11 @@ export default {
       return;
     }
 
+    if (state.host === 'sidepanel') {
+      requestCloseEditorSidePanel(state.tabId ?? undefined);
+      return;
+    }
+
     commit('setVisible', false);
     commit('setUndoStack', emptyUndoStack());
   },
@@ -199,8 +207,8 @@ export default {
       return;
     }
 
-    // A separate window closes with Cmd/Ctrl+W like any other, so Escape only backs out.
-    if (state.host === 'window') {
+    // A separate window closes with Cmd/Ctrl+W, and a side panel with its own button, so Escape only backs out.
+    if (state.host !== 'page') {
       if (state.inspecting) {
         commit('setInspecting', false);
       }
@@ -227,8 +235,8 @@ export default {
   },
 
   /**
-   * Persists the dock choice and moves the editor to match: the page hands
-   * off to a separate window, or a window hands back to the page.
+   * Persists the dock choice and moves the editor there: it opens in its new
+   * place first, then the one it was in hides or closes.
    */
   setDockLocation(
     {
@@ -236,14 +244,40 @@ export default {
       commit,
       dispatch,
     }: { state: State; commit: Commit; dispatch: Dispatch },
-    dockLocation: StylebotLayout['dockLocation']
+    dockLocation: StylebotDockLocation
   ): void {
     dispatch('setLayout', { ...state.options.layout, dockLocation });
 
-    if (state.host === 'page' && dockLocation === 'window') {
-      commit('setVisible', false);
-      openEditorWindow();
-    } else if (state.host === 'window' && dockLocation !== 'window') {
+    const { host } = state;
+    // From the page, the background takes the tab from the sender.
+    const tabId = state.tabId ?? undefined;
+
+    if (dockLocation === host) {
+      return;
+    }
+
+    const leave = () => {
+      if (host === 'page') {
+        commit('setVisible', false);
+      } else if (host === 'window') {
+        closeEditorWindow(tabId);
+      } else {
+        requestCloseEditorSidePanel(tabId);
+      }
+    };
+
+    if (dockLocation === 'window') {
+      openEditorWindow(tabId);
+      leave();
+    } else if (dockLocation === 'sidepanel') {
+      // Sent before anything is awaited, so Chrome still sees the click's gesture.
+      requestEditorSidePanel(state.options.appearance, tabId).then(opened => {
+        if (opened) {
+          leave();
+        }
+      });
+    } else if (host !== 'page') {
+      // The page shows its panel and closes the window or side panel itself.
       getPageBridge().openInPage(dockLocation);
     }
   },

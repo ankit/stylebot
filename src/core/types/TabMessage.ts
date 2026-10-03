@@ -11,6 +11,8 @@ export type OpenStylebot = {
 
 export type OpenStylebotFromContextMenu = {
   name: 'OpenStylebotFromContextMenu';
+  // The background already opened the side panel, which needs the click's gesture.
+  sidePanel?: boolean;
 };
 
 export type ToggleReadabilityForTab = {

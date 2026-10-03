@@ -107,4 +107,13 @@ describe('TheCodeEditor.vue', () => {
       ['applyCss', { css: 'a { color: blue; }', source: 'code' }],
     ]);
   });
+
+  it('applies pending typing when its page unloads, as closing a side panel or window does', () => {
+    type('a { color: blue; }');
+    window.dispatchEvent(new Event('pagehide'));
+
+    expect(applyCssCalls(store)).toEqual([
+      ['applyCss', { css: 'a { color: blue; }', source: 'code' }],
+    ]);
+  });
 });

@@ -183,6 +183,10 @@ export class RemotePageBridge extends PageBridgeEmitter implements PageBridge {
       case 'computedStylesChanged':
         this.emit('computedStylesChanged');
         break;
+
+      case 'shortcut':
+        this.handlers.onShortcut(message.key);
+        break;
     }
   }
 

@@ -79,11 +79,14 @@ export type RemotePageBridgeMessageToWindow =
     }
   | { type: 'selectorHovered'; selector: string }
   | { type: 'inspectingStopped' }
-  | { type: 'computedStylesChanged' };
+  | { type: 'computedStylesChanged' }
+  | { type: 'shortcut'; key: string };
 
 export type RemotePageBridgeHandlers = {
   onStateChanged: (state: Partial<RemotePageBridgeSyncedState>) => void;
   onSnapshotChanged: (snapshot: PageSnapshot) => void;
   onContextMenuSelector: (selector: string) => void;
   onInspectingStopped: () => void;
+  // An editor shortcut typed on the page, which a side panel can't take focus back from.
+  onShortcut: (key: string) => void;
 };

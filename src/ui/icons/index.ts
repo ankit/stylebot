@@ -27,6 +27,7 @@ export { default as ToggleIcon } from './ToggleIcon.vue';
 export { default as XIcon } from './XIcon.vue';
 export { default as DockLeftIcon } from './DockLeftIcon.vue';
 export { default as DockRightIcon } from './DockRightIcon.vue';
+export { default as SidePanelIcon } from './SidePanelIcon.vue';
 export { default as UndockIcon } from './UndockIcon.vue';
 export { default as OptionKeyIcon } from './OptionKeyIcon.vue';
 export { default as ShiftKeyIcon } from './ShiftKeyIcon.vue';

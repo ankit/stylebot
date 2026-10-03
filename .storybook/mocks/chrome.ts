@@ -165,6 +165,8 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
 
     RestoreVersion: () => ({ ok: true }),
 
+    OpenEditorSidePanel: () => true,
+
     ...chat.runtimeResponses,
   };
 
@@ -224,6 +226,12 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
     windows: {
       getCurrent: (_info: unknown, callback?: Callback) =>
         respond(callback, { tabs: [tab] }),
+    },
+
+    sidePanel: {
+      setOptions: () => Promise.resolve(),
+      open: () => Promise.resolve(),
+      close: () => Promise.resolve(),
     },
   };
 

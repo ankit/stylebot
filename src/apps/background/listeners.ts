@@ -33,6 +33,8 @@ import {
   ToggleEditorWindow,
   CloseEditorWindow,
   GetIsEditorWindowOpen,
+  OpenEditorSidePanel,
+  CloseEditorSidePanel,
   ChatGetStatus,
   ChatConnect,
   ChatRemoveKey,
@@ -251,6 +253,12 @@ export const initListeners = (): void => {
           break;
         case 'GetIsEditorWindowOpen':
           GetIsEditorWindowOpen(message, sender, sendResponse);
+          break;
+        case 'OpenEditorSidePanel':
+          OpenEditorSidePanel(message, sender, sendResponse);
+          break;
+        case 'CloseEditorSidePanel':
+          CloseEditorSidePanel(message, sender);
           break;
 
         case 'ChatGetStatus':

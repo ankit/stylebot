@@ -18,7 +18,7 @@ export const createCommandHandler =
   (name: StylebotCommandName): void => {
     switch (name) {
       case 'stylebot':
-        if (store.state.host === 'window') {
+        if (store.state.host !== 'page') {
           store.dispatch('closeStylebot');
         } else {
           toggleStylebot(store);

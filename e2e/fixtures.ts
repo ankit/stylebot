@@ -281,9 +281,47 @@ export const test = base.extend<
     await use(engine);
   },
 
+  /*
+   * Chrome and Edge open the editor in the side panel by default, which
+   * Playwright can't drive, so unless a test picked a dock the popup opens
+   * the in-page panel instead, as it does where there's no side panel.
+   */
   openPopup: async ({ browserPool }, use) => {
     const { context, extension } = await browserPool.get();
-    await use(() => engine.openPopup(context, extension));
+
+    await use(async () => {
+      const popup = await engine.openPopup(context, extension);
+      if (!engine.hasSidePanel) {
+        return popup;
+      }
+
+      const docked = await popup.evaluate(async () => {
+        const { options } = await chrome.storage.local.get('options');
+        if (options?.layout) {
+          return false;
+        }
+
+        await chrome.storage.local.set({
+          options: {
+            ...options,
+            layout: {
+              width: 360,
+              adjustPageLayout: false,
+              dockLocation: 'right',
+            },
+          },
+        });
+        return true;
+      });
+
+      if (!docked) {
+        return popup;
+      }
+
+      // Reopened, as the popup read the dock while it was loading.
+      await popup.close();
+      return engine.openPopup(context, extension);
+    });
   },
 });
 

@@ -63,6 +63,7 @@ import type { StylebotCommands, StylebotEditorCommands } from '@stylebot/types';
 import { isMac, openOptionsPage } from '@stylebot/utils';
 
 import { undoShortcuts } from '../../store/undo-stack';
+import { hasSidePanel } from '../../utils/side-panel';
 
 type ShortcutRow = { label: string; key: string };
 type ShortcutGroup = {
@@ -125,15 +126,26 @@ export default Vue.extend({
             { label: this.t('chat_mode'), key: keys.chat },
           ],
         },
-        {
-          label: this.t('position'),
-          columns: 3,
-          rows: [
-            { label: this.t('left'), key: keys.dockLeft },
-            { label: this.t('right'), key: keys.dockRight },
-            { label: this.t('window'), key: keys.dockWindow },
-          ],
-        },
+        hasSidePanel()
+          ? {
+              label: this.t('position'),
+              columns: 2,
+              rows: [
+                { label: this.t('side_panel'), key: keys.dockSidePanel },
+                { label: this.t('window'), key: keys.dockWindow },
+                { label: this.t('left'), key: keys.dockLeft },
+                { label: this.t('right'), key: keys.dockRight },
+              ],
+            }
+          : {
+              label: this.t('position'),
+              columns: 3,
+              rows: [
+                { label: this.t('left'), key: keys.dockLeft },
+                { label: this.t('right'), key: keys.dockRight },
+                { label: this.t('window'), key: keys.dockWindow },
+              ],
+            },
         {
           label: this.t('anywhere'),
           editable: true,

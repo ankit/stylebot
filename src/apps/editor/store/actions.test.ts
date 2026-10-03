@@ -386,6 +386,96 @@ describe('actions', () => {
       expect(chromeUtils.closeEditorWindow).toBeCalledWith(7);
       expect(mockCommit).not.toBeCalled();
     });
+
+    it('closes the side panel for the tab it edits in the side panel host', () => {
+      actions.closeStylebot({
+        state: { ...mockState, host: 'sidepanel', tabId: 7 },
+        commit: mockCommit,
+      });
+
+      expect(chromeUtils.requestCloseEditorSidePanel).toBeCalledWith(7);
+      expect(chromeUtils.closeEditorWindow).not.toBeCalled();
+      expect(mockCommit).not.toBeCalled();
+    });
+  });
+
+  describe('setDockLocation', () => {
+    const from = (host: 'page' | 'window' | 'sidepanel') => ({
+      state: { ...mockState, host, tabId: host === 'page' ? null : 7 },
+      commit: mockCommit,
+      dispatch: mockDispatch,
+    });
+
+    it('hides the page panel once the side panel opens', async () => {
+      jest.mocked(chromeUtils.requestEditorSidePanel).mockResolvedValue(true);
+
+      actions.setDockLocation(from('page'), 'sidepanel');
+      expect(chromeUtils.requestEditorSidePanel).toBeCalledWith(
+        mockState.options.appearance,
+        undefined
+      );
+      expect(mockCommit).not.toBeCalled();
+
+      await Promise.resolve();
+      expect(mockCommit).toBeCalledWith('setVisible', false);
+    });
+
+    it('keeps the page panel when the side panel does not open', async () => {
+      jest.mocked(chromeUtils.requestEditorSidePanel).mockResolvedValue(false);
+
+      actions.setDockLocation(from('page'), 'sidepanel');
+      await Promise.resolve();
+
+      expect(mockCommit).not.toBeCalled();
+    });
+
+    it('hides the page panel for a separate window', () => {
+      actions.setDockLocation(from('page'), 'window');
+
+      expect(chromeUtils.openEditorWindow).toBeCalledWith(undefined);
+      expect(mockCommit).toBeCalledWith('setVisible', false);
+    });
+
+    it('closes the window once the side panel opens for its tab', async () => {
+      jest.mocked(chromeUtils.requestEditorSidePanel).mockResolvedValue(true);
+
+      actions.setDockLocation(from('window'), 'sidepanel');
+      expect(chromeUtils.requestEditorSidePanel).toBeCalledWith(
+        mockState.options.appearance,
+        7
+      );
+      expect(chromeUtils.closeEditorWindow).not.toBeCalled();
+
+      await Promise.resolve();
+      expect(chromeUtils.closeEditorWindow).toBeCalledWith(7);
+    });
+
+    it('closes the side panel for a separate window', () => {
+      actions.setDockLocation(from('sidepanel'), 'window');
+
+      expect(chromeUtils.openEditorWindow).toBeCalledWith(7);
+      expect(chromeUtils.requestCloseEditorSidePanel).toBeCalledWith(7);
+    });
+
+    it('hands the window or side panel back to the page', () => {
+      actions.setDockLocation(from('sidepanel'), 'right');
+      actions.setDockLocation(from('window'), 'left');
+
+      expect(mockBridge.openInPage).toBeCalledWith('right');
+      expect(mockBridge.openInPage).toBeCalledWith('left');
+    });
+
+    it('only saves the choice when the editor is already there', () => {
+      actions.setDockLocation(from('page'), 'left');
+      actions.setDockLocation(from('window'), 'window');
+      actions.setDockLocation(from('sidepanel'), 'sidepanel');
+
+      expect(mockDispatch).toBeCalledTimes(3);
+      expect(mockCommit).not.toBeCalled();
+      expect(mockBridge.openInPage).not.toBeCalled();
+      expect(chromeUtils.openEditorWindow).not.toBeCalled();
+      expect(chromeUtils.requestEditorSidePanel).not.toBeCalled();
+    });
   });
 
   describe('refreshPage', () => {

@@ -15,10 +15,12 @@ export type EditorWindowBounds = {
   top: number;
 };
 
+export type StylebotDockLocation = 'left' | 'right' | 'window' | 'sidepanel';
+
 export type StylebotLayout = {
   width: number;
   adjustPageLayout: boolean;
-  dockLocation: 'left' | 'right' | 'window';
+  dockLocation: StylebotDockLocation;
   // Where the separate editor window was last left, restored on next open.
   window?: EditorWindowBounds;
 };

@@ -87,6 +87,7 @@ import {
   MoreIcon,
   DockLeftIcon,
   DockRightIcon,
+  SidePanelIcon,
   UndockIcon,
   SunIcon,
   MoonIcon,
@@ -97,9 +98,19 @@ import type {
   StylebotAppearance,
   StylebotEditorCommands,
   StylebotLayout,
+  StylebotDockLocation,
 } from '@stylebot/types';
 
 import { openOptionsPage } from '@stylebot/utils';
+
+import { hasSidePanel } from '../../utils/side-panel';
+
+type DockOption = {
+  value: StylebotDockLocation;
+  icon: string;
+  title: string;
+  shortcut: string;
+};
 
 export default Vue.extend({
   name: 'TheMoreAction',
@@ -116,6 +127,7 @@ export default Vue.extend({
     MoreIcon,
     DockLeftIcon,
     DockRightIcon,
+    SidePanelIcon,
     UndockIcon,
     SunIcon,
     MoonIcon,
@@ -131,31 +143,42 @@ export default Vue.extend({
       return this.$store.state.editorCommands;
     },
 
-    dockOptions(): Array<{
-      value: StylebotLayout['dockLocation'];
-      icon: string;
-      title: string;
-      shortcut: string;
-    }> {
-      return [
+    dockOptions(): Array<DockOption> {
+      const separateWindow: DockOption = {
+        value: 'window',
+        icon: 'undock-icon',
+        title: this.t('open_in_separate_window'),
+        shortcut: this.editorCommands.dockWindow,
+      };
+
+      const inPage: Array<DockOption> = [
         {
           value: 'left',
           icon: 'dock-left-icon',
-          title: this.t('dock_to_left'),
+          title: this.t('dock_left_in_page'),
           shortcut: this.editorCommands.dockLeft,
         },
         {
           value: 'right',
           icon: 'dock-right-icon',
-          title: this.t('dock_to_right'),
+          title: this.t('dock_right_in_page'),
           shortcut: this.editorCommands.dockRight,
         },
+      ];
+
+      if (!hasSidePanel()) {
+        return [...inPage, separateWindow];
+      }
+
+      return [
         {
-          value: 'window',
-          icon: 'undock-icon',
-          title: this.t('open_in_separate_window'),
-          shortcut: this.editorCommands.dockWindow,
+          value: 'sidepanel',
+          icon: 'side-panel-icon',
+          title: this.t('open_in_side_panel'),
+          shortcut: this.editorCommands.dockSidePanel,
         },
+        separateWindow,
+        ...inPage,
       ];
     },
 
@@ -189,7 +212,7 @@ export default Vue.extend({
   },
 
   methods: {
-    dock(dockLocation: StylebotLayout['dockLocation']): void {
+    dock(dockLocation: StylebotDockLocation): void {
       this.$store.dispatch('setDockLocation', dockLocation);
     },
 
@@ -212,7 +235,8 @@ export default Vue.extend({
 .more-menu {
   --field-surface: var(--card-field-surface);
 
-  width: 200px;
+  width: max-content;
+  min-width: 200px;
 }
 
 .more-menu .text,

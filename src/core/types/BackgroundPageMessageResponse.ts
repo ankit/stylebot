@@ -54,6 +54,7 @@ export type RestoreVersionResponse = { ok: boolean };
 export type GetRecentColorsResponse = Array<string>;
 export type AddRecentColorResponse = Array<string>;
 export type GetIsEditorWindowOpenResponse = boolean;
+export type OpenEditorSidePanelResponse = boolean;
 
 export type ChatStatusResponse = ChatStatus;
 export type ChatConnectResponse =
@@ -77,6 +78,7 @@ type BackgroundPageMessageResponse =
   | GetRecentColorsResponse
   | AddRecentColorResponse
   | GetIsEditorWindowOpenResponse
+  | OpenEditorSidePanelResponse
   | ChatStatusResponse
   | ChatConnectResponse
   | ChatGetThreadResponse;

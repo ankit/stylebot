@@ -6,6 +6,7 @@ import type {
   GetIsPageReaderable,
   GetStylesForPageResponse,
   StylebotOptions,
+  StylebotAppearance,
 } from '@stylebot/types';
 import { STYLES_KEY, getStylesForPage } from '@stylebot/saved-styles';
 import { defaultCommands, defaultOptions } from '@stylebot/settings';
@@ -14,6 +15,8 @@ import {
   openOptionsPage,
   openReportIssuePage,
   openDonatePage,
+  supportsEditorSidePanel,
+  openEditorSidePanel,
 } from '@stylebot/utils';
 
 export const getCurrentTab = (
@@ -80,6 +83,25 @@ export const toggleStylebot = (tab: chrome.tabs.Tab): void => {
     chrome.tabs.sendMessage(tab.id, message);
     window.close();
   }
+};
+
+/**
+ * Opens the editor in the tab's side panel straight from the popup's click,
+ * as the page couldn't once its gesture is gone; falls back to the page.
+ */
+export const openStylebotSidePanel = (
+  tab: chrome.tabs.Tab,
+  appearance: StylebotAppearance
+): void => {
+  if (!tab.id || !supportsEditorSidePanel()) {
+    toggleStylebot(tab);
+    return;
+  }
+
+  openEditorSidePanel(tab.id, appearance).then(
+    () => window.close(),
+    () => toggleStylebot(tab)
+  );
 };
 
 /**

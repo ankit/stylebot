@@ -1,7 +1,7 @@
 <template>
   <the-stylebot-resizer>
     <div class="stylebot-content">
-      <the-window-status v-if="host === 'window' && !pageConnected" />
+      <the-window-status v-if="host !== 'page' && !pageConnected" />
 
       <the-keyboard-shortcuts-view v-if="help" />
 

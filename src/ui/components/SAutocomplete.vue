@@ -205,6 +205,8 @@ export default Vue.extend({
     quietFocus: boolean;
     typedAhead: string | null;
     edited: boolean;
+    resizeObserver: ResizeObserver | null;
+    measuredWidth: number;
   } {
     return {
       suppressReopen: false,
@@ -221,6 +223,10 @@ export default Vue.extend({
       // Whether the text changed since editing began; until it does, the
       // selected item is the current one for the menu.
       edited: false,
+      resizeObserver: null,
+      // The wrapped height depends on the width, which can still be settling
+      // after mount, as in a side panel that is sliding open.
+      measuredWidth: 0,
       // The mouseup that ends a focusing click would collapse the
       // select-on-focus selection to a caret; swallow that one mouseup.
       keepSelectionOnMouseUp: false,
@@ -241,6 +247,18 @@ export default Vue.extend({
 
   mounted() {
     this.resize();
+
+    this.resizeObserver = new ResizeObserver(([entry]) => {
+      if (entry.contentRect.width !== this.measuredWidth) {
+        this.measuredWidth = entry.contentRect.width;
+        this.resize();
+      }
+    });
+    this.resizeObserver.observe(this.$el);
+  },
+
+  beforeDestroy() {
+    this.resizeObserver?.disconnect();
   },
 
   methods: {

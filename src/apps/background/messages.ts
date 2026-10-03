@@ -48,6 +48,9 @@ import type {
   CloseEditorWindow as CloseEditorWindowType,
   GetIsEditorWindowOpen as GetIsEditorWindowOpenType,
   GetIsEditorWindowOpenResponse,
+  OpenEditorSidePanel as OpenEditorSidePanelType,
+  CloseEditorSidePanel as CloseEditorSidePanelType,
+  OpenEditorSidePanelResponse,
   GetCommandsResponse,
   GetAllOptionsResponse,
   GetAllStylesResponse,
@@ -87,6 +90,12 @@ import {
 } from './color-history';
 
 import * as editorWindow from './editor-window';
+import {
+  supportsEditorSidePanel,
+  openEditorSidePanel,
+  closeEditorSidePanel,
+  isEditorSidePanelOpen,
+} from '@stylebot/utils';
 import {
   getChatStatus,
   connectChat,
@@ -346,7 +355,14 @@ export const ToggleEditorWindow = async (
   sender: chrome.runtime.MessageSender
 ): Promise<void> => {
   const tabId = message.tabId ?? sender.tab?.id;
-  if (tabId !== undefined) {
+  if (tabId === undefined) {
+    return;
+  }
+
+  // The page also counts a connected side panel as its editor window.
+  if (supportsEditorSidePanel() && (await isEditorSidePanelOpen(tabId))) {
+    await closeEditorSidePanel(tabId);
+  } else {
     await editorWindow.toggle(tabId);
   }
 };
@@ -361,13 +377,49 @@ export const CloseEditorWindow = async (
   }
 };
 
+/**
+ * Opens the side panel straight away, while the gesture of the page's
+ * keypress or click that sent this still counts. Answers whether it opened,
+ * so the page can fall back to its own panel.
+ */
+export const OpenEditorSidePanel = (
+  message: OpenEditorSidePanelType,
+  sender: chrome.runtime.MessageSender,
+  sendResponse: (response: OpenEditorSidePanelResponse) => void
+): void => {
+  const tabId = message.tabId ?? sender.tab?.id;
+  if (tabId === undefined || !supportsEditorSidePanel()) {
+    sendResponse(false);
+    return;
+  }
+
+  openEditorSidePanel(tabId, message.appearance).then(
+    () => sendResponse(true),
+    () => sendResponse(false)
+  );
+};
+
+export const CloseEditorSidePanel = async (
+  message: CloseEditorSidePanelType,
+  sender: chrome.runtime.MessageSender
+): Promise<void> => {
+  const tabId = message.tabId ?? sender.tab?.id;
+  if (tabId !== undefined && supportsEditorSidePanel()) {
+    await closeEditorSidePanel(tabId);
+  }
+};
+
 export const GetIsEditorWindowOpen = async (
   message: GetIsEditorWindowOpenType,
   sender: chrome.runtime.MessageSender,
   sendResponse: (response: GetIsEditorWindowOpenResponse) => void
 ): Promise<void> => {
   const tabId = message.tabId ?? sender.tab?.id;
-  sendResponse(tabId !== undefined && (await editorWindow.isOpen(tabId)));
+  sendResponse(
+    tabId !== undefined &&
+      ((await editorWindow.isOpen(tabId)) ||
+        (supportsEditorSidePanel() && (await isEditorSidePanelOpen(tabId))))
+  );
 };
 
 export const ChatGetStatus = async (

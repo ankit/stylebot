@@ -4,6 +4,7 @@ import {
   openEditor,
   popOutEditor,
   switchEditorMode,
+  waitForSidePanel,
 } from './helpers';
 
 // Editor-open depends on a popup tab-messaging round trip, which can lag
@@ -164,6 +165,26 @@ test('closing the tab closes its window', async ({ context, openPopup }) => {
   await closed;
 });
 
+test('moving from the window to the side panel closes the window', async ({
+  context,
+  extension,
+  openPopup,
+}) => {
+  const page = await context.newPage();
+  await page.goto(`${baseUrl}/`);
+
+  const editorRoot = await openEditor(page, openPopup);
+  const popout = await popOutEditor(context, page, editorRoot);
+
+  const closed = popout.waitForEvent('close');
+  await popout.getByRole('button', { name: 'Options' }).click();
+  await popout.getByRole('button', { name: 'Open in side panel' }).click();
+  await closed;
+
+  await waitForSidePanel(context, extension);
+  await expect(editorRoot.locator('.stylebot')).toHaveCount(0);
+});
+
 test('docking back from the window shows the panel in the page, in the mode picked there', async ({
   context,
   openPopup,
@@ -177,7 +198,7 @@ test('docking back from the window shows the panel in the page, in the mode pick
 
   const closed = popout.waitForEvent('close');
   await popout.getByRole('button', { name: 'Options' }).click();
-  await popout.getByRole('button', { name: 'Dock to Left' }).click();
+  await popout.getByRole('button', { name: 'Dock left in page' }).click();
   await closed;
 
   await expect(editorRoot.locator('.stylebot.left')).toBeVisible();

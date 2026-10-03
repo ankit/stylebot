@@ -71,6 +71,21 @@ describe('getAll', () => {
       layout: { width: 300, adjustPageLayout: true, dockLocation: 'right' },
     });
   });
+
+  it('docks to the side panel by default where the browser has one', async () => {
+    store = {};
+    (chrome as unknown as { sidePanel: object }).sidePanel = {
+      open: jest.fn(),
+    };
+
+    expect((await getAll()).layout.dockLocation).toBe('sidepanel');
+  });
+
+  it('docks right by default where the browser has no side panel', async () => {
+    store = {};
+
+    expect((await getAll()).layout.dockLocation).toBe('right');
+  });
 });
 
 describe('pruneRetired', () => {

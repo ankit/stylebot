@@ -241,6 +241,10 @@ const config = {
                 )
               );
               jsonContent = { ...jsonContent, ...firefoxJsonContent };
+              // Firefox has no per-tab side panel and warns on the unknown permission.
+              jsonContent.permissions = jsonContent.permissions.filter(
+                permission => permission !== 'sidePanel'
+              );
             } else if (process.env.NODE_ENV === 'development' || isPreview) {
               /*
                * Store public key, for the store id that Drive sign-in's OAuth redirect needs.

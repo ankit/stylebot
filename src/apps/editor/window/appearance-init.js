@@ -2,7 +2,15 @@
 // as an external script (not inline) because the extension's CSP blocks
 // inline script execution.
 (function () {
+  // Opened without one (from the context menu), use what this page last showed.
   var appearance = new URLSearchParams(location.search).get('appearance');
+  if (!appearance) {
+    try {
+      appearance = localStorage.getItem('editor-window-appearance');
+    } catch {
+      //
+    }
+  }
   var dark =
     appearance === 'dark' ||
     (appearance !== 'light' &&

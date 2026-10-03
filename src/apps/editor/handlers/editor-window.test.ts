@@ -14,7 +14,10 @@ Vue.use(Vuex);
 
 jest.mock('postcss', () => ({ parse: () => ({ walkRules: jest.fn() }) }));
 jest.mock('../utils/init-editor', () => ({ initEditor: jest.fn() }));
-jest.mock('../utils/chrome', () => ({ closeEditorWindow: jest.fn() }));
+jest.mock('../utils/chrome', () => ({
+  closeEditorWindow: jest.fn(),
+  requestCloseEditorSidePanel: jest.fn(),
+}));
 
 const selectListeners: Array<PageBridgeEvents['select']> = [];
 const computedStylesListeners: Array<
@@ -62,6 +65,7 @@ jest.mock('@stylebot/page-bridge', () => ({
 
 class FakePort {
   name = 'stylebot-editor-window';
+  sender: { url: string };
   postMessage = jest.fn();
   disconnect = jest.fn();
   private messageListeners: Array<(m: RemotePageBridgeMessageToPage) => void> =
@@ -74,6 +78,10 @@ class FakePort {
   onDisconnect = {
     addListener: (fn: () => void) => this.disconnectListeners.push(fn),
   };
+
+  constructor(url = 'chrome-extension://id/editor-window/index.html?tabId=7') {
+    this.sender = { url };
+  }
 
   send(message: RemotePageBridgeMessageToPage): void {
     this.messageListeners.forEach(fn => fn(message));
@@ -95,8 +103,8 @@ describe('createEditorWindowHandler', () => {
   let applyReadability: jest.Mock;
   let openStylebot: jest.Mock;
 
-  const connect = () => {
-    const port = new FakePort();
+  const connect = (url?: string) => {
+    const port = new FakePort(url);
     onConnect(port);
     return port;
   };
@@ -255,6 +263,57 @@ describe('createEditorWindowHandler', () => {
     expect(bridge.stopInspecting).toBeCalled();
   });
 
+  describe('editor shortcuts typed on the page', () => {
+    const SIDE_PANEL_URL =
+      'chrome-extension://id/editor-window/index.html?tabId=7&host=sidepanel';
+
+    const press = (target: EventTarget, init: KeyboardEventInit) => {
+      const event = new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        ...init,
+      });
+      target.dispatchEvent(event);
+      return event;
+    };
+
+    const forwarded = (port: FakePort) =>
+      port.sent().filter(message => message.type === 'shortcut');
+
+    afterEach(() => {
+      document.body.innerHTML = '';
+    });
+
+    it('are forwarded to a side panel, which can’t take focus back', () => {
+      const port = connect(SIDE_PANEL_URL);
+
+      const event = press(document.body, { key: 'b' });
+
+      expect(forwarded(port)).toEqual([{ type: 'shortcut', key: 'b' }]);
+      expect(event.defaultPrevented).toBe(true);
+    });
+
+    it('stay with the page in its own fields, with modifiers, and for other keys', () => {
+      const port = connect(SIDE_PANEL_URL);
+      const input = document.body.appendChild(document.createElement('input'));
+
+      press(input, { key: 'b' });
+      press(document.body, { key: 'b', ctrlKey: true });
+      press(document.body, { key: 'x' });
+      press(document.body, { key: 'Escape' });
+
+      expect(forwarded(port)).toEqual([]);
+    });
+
+    it('stay with the page for a separate window, which refocuses itself', () => {
+      const port = connect();
+
+      press(document.body, { key: 'b' });
+
+      expect(forwarded(port)).toEqual([]);
+    });
+  });
+
   it('cleans up when the window goes away', () => {
     const port = connect();
     port.send({ type: 'startInspecting' });
@@ -270,13 +329,15 @@ describe('createEditorWindowHandler', () => {
 
   it('shows the panel again and closes the window when asked to dock back', async () => {
     const port = connect();
-    const { closeEditorWindow } = jest.requireMock('../utils/chrome');
+    const { closeEditorWindow, requestCloseEditorSidePanel } =
+      jest.requireMock('../utils/chrome');
 
     port.send({ type: 'openInPage', dockLocation: 'left' });
 
     expect(store.state.options.layout.dockLocation).toBe('left');
     expect(openStylebot).toBeCalledWith(expect.anything(), { inspect: false });
     expect(closeEditorWindow).toBeCalled();
+    expect(requestCloseEditorSidePanel).toBeCalled();
 
     // Handed off: the page panel's own selector edits are no longer
     // forwarded or wiped.

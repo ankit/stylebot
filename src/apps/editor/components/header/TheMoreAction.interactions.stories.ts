@@ -24,9 +24,10 @@ export const MenuContents: StoryObj = {
     await expect(menu.getByText('Theme')).toBeVisible();
 
     const positions = [
-      'Dock to Left',
-      'Dock to Right',
+      'Open in side panel',
       'Open in separate window',
+      'Dock left in page',
+      'Dock right in page',
     ];
     const buttons = positions.map(name => menu.getByRole('button', { name }));
     await expect(

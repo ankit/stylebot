@@ -74,6 +74,8 @@
           :is-open="isOpen"
           :tab="tab"
           :shortcut="stylebotShortcut"
+          :side-panel="dockLocation === 'sidepanel'"
+          :appearance="appearance"
         />
         <settings-button />
       </div>
@@ -106,7 +108,12 @@ import {
 
 import { getGoogleDriveSyncEnabled, getSyncNeedsAuth } from '@stylebot/sync';
 import { isSupportedUrl } from '@stylebot/saved-styles';
-import type { GetCommandsResponse, StylebotAppearance } from '@stylebot/types';
+import type {
+  GetCommandsResponse,
+  StylebotAppearance,
+  StylebotLayout,
+  StylebotDockLocation,
+} from '@stylebot/types';
 
 export default Vue.extend({
   name: 'App',
@@ -133,6 +140,7 @@ export default Vue.extend({
     syncNeedsSignIn: boolean;
     commands?: GetCommandsResponse;
     appearance: StylebotAppearance;
+    dockLocation: StylebotDockLocation | '';
   } {
     return {
       styles: [],
@@ -143,6 +151,7 @@ export default Vue.extend({
       syncNeedsSignIn: false,
       commands: undefined,
       appearance: 'system',
+      dockLocation: '',
     };
   },
 
@@ -208,6 +217,10 @@ export default Vue.extend({
 
     getOption('appearance', appearance => {
       this.appearance = (appearance as StylebotAppearance) ?? 'system';
+    });
+
+    getOption('layout', layout => {
+      this.dockLocation = (layout as StylebotLayout).dockLocation;
     });
   },
 });

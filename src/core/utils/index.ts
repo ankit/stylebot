@@ -31,3 +31,9 @@ export {
   openReportIssuePage,
   openDonatePage,
 } from './open-page';
+export {
+  supportsEditorSidePanel,
+  openEditorSidePanel,
+  closeEditorSidePanel,
+  isEditorSidePanelOpen,
+} from './editor-side-panel';

@@ -1,12 +1,12 @@
 <template>
-  <div v-if="host === 'window'" class="stylebot stylebot-window">
+  <div v-if="host !== 'page'" class="stylebot stylebot-window">
     <slot></slot>
   </div>
 
   <div
     v-else
     class="stylebot stylebot-docked"
-    :class="[layout.dockLocation, { 'stylebot-resizing': dragging }]"
+    :class="[dockedRight ? 'right' : 'left', { 'stylebot-resizing': dragging }]"
     :style="{ width: `${width}px` }"
   >
     <slot></slot>
@@ -70,8 +70,9 @@ export default Vue.extend({
       return this.drag !== null;
     },
 
+    // In the page only as the side panel's fallback, the panel sits on the right.
     dockedRight(): boolean {
-      return this.layout.dockLocation === 'right';
+      return this.layout.dockLocation !== 'left';
     },
 
     minWidth(): number {
@@ -180,7 +181,7 @@ export default Vue.extend({
     },
 
     adjustPageLayout() {
-      if (this.host === 'window') {
+      if (this.host !== 'page') {
         return;
       }
 

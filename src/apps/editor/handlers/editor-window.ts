@@ -6,8 +6,12 @@ import type {
   RemotePageBridgeMessageToPage,
 } from '@stylebot/page-bridge';
 import { getPageBridge } from '@stylebot/page-bridge';
+import { isFieldTarget } from '@stylebot/utils';
 import { initEditor } from '../utils/init-editor';
-import { closeEditorWindow } from '../utils/chrome';
+import {
+  closeEditorWindow,
+  requestCloseEditorSidePanel,
+} from '../utils/chrome';
 
 const SYNCED_MUTATIONS: Record<
   string,
@@ -99,6 +103,15 @@ export const createEditorWindowHandler = (
       post({ type: 'selectorHovered', selector });
     });
 
+    // A side panel can't take focus back after a pick, so its shortcuts get
+    // typed on the page; they're forwarded under the in-page panel's rules.
+    const fromSidePanel = !!incoming.sender?.url?.includes('host=sidepanel');
+    const forwardedKeys = new Set(
+      Object.values(store.state.editorCommands).filter(
+        key => key && key !== 'Escape'
+      )
+    );
+
     // The page has no keyboard-shortcut handler while its panel is hidden,
     // so Escape here is the way out of inspecting for the window's user.
     const onKeydown = (event: KeyboardEvent) => {
@@ -106,6 +119,20 @@ export const createEditorWindowHandler = (
         store.commit('setInspecting', false);
         bridge.stopInspecting();
         post({ type: 'inspectingStopped' });
+        return;
+      }
+
+      if (
+        fromSidePanel &&
+        forwardedKeys.has(event.key) &&
+        !event.metaKey &&
+        !event.altKey &&
+        !event.ctrlKey &&
+        !isFieldTarget(event.composedPath()[0])
+      ) {
+        event.preventDefault();
+        event.stopPropagation();
+        post({ type: 'shortcut', key: event.key });
       }
     };
     document.addEventListener('keydown', onKeydown, true);
@@ -221,6 +248,7 @@ export const createEditorWindowHandler = (
           });
           store.dispatch('openStylebot', { inspect: false });
           closeEditorWindow();
+          requestCloseEditorSidePanel();
           break;
       }
     });

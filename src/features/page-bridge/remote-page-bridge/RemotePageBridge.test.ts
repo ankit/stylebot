@@ -79,6 +79,7 @@ describe('RemotePageBridge', () => {
       onSnapshotChanged: jest.fn(),
       onContextMenuSelector: jest.fn(),
       onInspectingStopped: jest.fn(),
+      onShortcut: jest.fn(),
     };
 
     tabsUpdate = jest.fn();
@@ -228,6 +229,9 @@ describe('RemotePageBridge', () => {
 
     ports[0].receive({ type: 'inspectingStopped' });
     expect(handlers.onInspectingStopped).toBeCalled();
+
+    ports[0].receive({ type: 'shortcut', key: 'b' });
+    expect(handlers.onShortcut).toBeCalledWith('b');
   });
 
   it('relays a change to the page’s computed styles', () => {

@@ -8,6 +8,7 @@ import {
   disableStyle as sendDisableStyleMessage,
   openEditorWindow,
   toggleEditorWindow,
+  requestEditorSidePanel,
 } from '../utils/chrome';
 import { initEditor } from '../utils/init-editor';
 import { isForceImportant } from '@stylebot/saved-styles';
@@ -19,7 +20,32 @@ import { isForceImportant } from '@stylebot/saved-styles';
 export const usesEditorWindow = (state: State): boolean =>
   state.windowConnected || state.options.layout.dockLocation === 'window';
 
+/**
+ * Whether opening the editor means a new side panel: the user chose that
+ * dock and no window or panel is attached to this tab yet.
+ */
+const opensSidePanel = (state: State): boolean =>
+  state.options.layout.dockLocation === 'sidepanel' && !state.windowConnected;
+
+/**
+ * Opens the tab's side panel, or the page's own panel where Chrome won't:
+ * a browser without one, or a request that lost the user's gesture.
+ */
+export const openSidePanel = (store: Store<State>, inspect: boolean): void => {
+  requestEditorSidePanel(store.state.options.appearance).then(opened => {
+    if (!opened && !store.state.visible) {
+      initEditor(store);
+      store.dispatch('openStylebot', { inspect });
+    }
+  });
+};
+
 export const toggleStylebot = (store: Store<State>, inspect = true): void => {
+  if (opensSidePanel(store.state) && !store.state.visible) {
+    openSidePanel(store, inspect);
+    return;
+  }
+
   if (usesEditorWindow(store.state)) {
     toggleEditorWindow();
     return;
@@ -34,6 +60,13 @@ export const toggleStylebot = (store: Store<State>, inspect = true): void => {
 };
 
 export const openStylebot = (store: Store<State>, inspect = true): void => {
+  if (store.state.options.layout.dockLocation === 'sidepanel') {
+    if (!store.state.visible && !store.state.windowConnected) {
+      openSidePanel(store, inspect);
+    }
+    return;
+  }
+
   if (usesEditorWindow(store.state)) {
     openEditorWindow();
     return;

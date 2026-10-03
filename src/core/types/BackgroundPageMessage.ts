@@ -1,5 +1,5 @@
 import type { StyleMap } from './styles';
-import type { StylebotOptions } from './options';
+import type { StylebotAppearance, StylebotOptions } from './options';
 import type { StylebotCommands } from './commands';
 import type { ReadabilitySettings } from './readability';
 import type { ChatProviderId, ChatTurn } from './chat';
@@ -159,6 +159,17 @@ export type CloseEditorWindow = {
   tabId?: number;
 };
 
+export type OpenEditorSidePanel = {
+  name: 'OpenEditorSidePanel';
+  appearance: StylebotAppearance;
+  tabId?: number;
+};
+
+export type CloseEditorSidePanel = {
+  name: 'CloseEditorSidePanel';
+  tabId?: number;
+};
+
 export type GetIsEditorWindowOpen = {
   name: 'GetIsEditorWindowOpen';
   tabId?: number;
@@ -231,6 +242,8 @@ type BackgroundPageMessage =
   | ToggleEditorWindow
   | CloseEditorWindow
   | GetIsEditorWindowOpen
+  | OpenEditorSidePanel
+  | CloseEditorSidePanel
   | ChatGetStatus
   | ChatConnect
   | ChatRemoveKey

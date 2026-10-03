@@ -1,6 +1,11 @@
 import http from 'node:http';
 import type { AddressInfo } from 'node:net';
-import type { BrowserContext, Locator, Page } from '@playwright/test';
+import type {
+  BrowserContext,
+  CDPSession,
+  Locator,
+  Page,
+} from '@playwright/test';
 import { expect, closeServer, type Extension, type Popup } from './fixtures';
 
 // The editor content script registers its listener only after several async
@@ -201,3 +206,97 @@ export const popOutEditor = async (
 
   return popout;
 };
+
+/*
+ * Playwright never surfaces a side panel as a page, so tests find it among
+ * the browser's CDP targets and drive it with Runtime.evaluate.
+ */
+export type SidePanel = { evaluate: (expression: string) => Promise<unknown> };
+
+const findSidePanelTarget = async (
+  cdp: CDPSession
+): Promise<string | undefined> => {
+  const { targetInfos } = await cdp.send('Target.getTargets');
+  return targetInfos.find(
+    info =>
+      info.url.includes('/editor-window/index.html') &&
+      info.url.includes('host=sidepanel')
+  )?.targetId;
+};
+
+export const isSidePanelOpen = (extension: Extension) =>
+  extension.evaluate(async () => {
+    const contexts = await chrome.runtime.getContexts({
+      contextTypes: ['SIDE_PANEL' as chrome.runtime.ContextType],
+    });
+    return contexts.length > 0;
+  });
+
+export const waitForSidePanel = async (
+  context: BrowserContext,
+  extension: Extension
+): Promise<SidePanel> => {
+  await expect.poll(() => isSidePanelOpen(extension)).toBe(true);
+
+  const cdp = await context.browser()!.newBrowserCDPSession();
+  let targetId: string | undefined;
+  await expect
+    .poll(async () => (targetId = await findSidePanelTarget(cdp)))
+    .toBeTruthy();
+
+  const { sessionId } = await cdp.send('Target.attachToTarget', {
+    targetId: targetId!,
+    flatten: false,
+  });
+
+  let nextId = 1;
+  const evaluate = (expression: string): Promise<unknown> =>
+    new Promise((resolve, reject) => {
+      const id = nextId++;
+      const onMessage = ({ message }: { message: string }) => {
+        const response = JSON.parse(message);
+        if (response.id !== id) {
+          return;
+        }
+        cdp.off('Target.receivedMessageFromTarget', onMessage);
+        if (response.result?.exceptionDetails) {
+          reject(new Error(response.result.exceptionDetails.text));
+        } else {
+          resolve(response.result?.result?.value);
+        }
+      };
+      cdp.on('Target.receivedMessageFromTarget', onMessage);
+      cdp.send('Target.sendMessageToTarget', {
+        sessionId,
+        message: JSON.stringify({
+          id,
+          method: 'Runtime.evaluate',
+          params: { expression, awaitPromise: true, userGesture: true },
+        }),
+      });
+    });
+
+  // Connected once the page's state has arrived over the port.
+  await expect
+    .poll(() =>
+      evaluate(
+        "!!document.querySelector('.stylebot-window') && !document.querySelector('[role=status]')"
+      )
+    )
+    .toBe(true);
+
+  return { evaluate };
+};
+
+export const dockToSidePanel = (extension: Extension) =>
+  extension.evaluate(() =>
+    chrome.storage.local.set({
+      options: {
+        layout: {
+          width: 360,
+          adjustPageLayout: false,
+          dockLocation: 'sidepanel',
+        },
+      },
+    })
+  );

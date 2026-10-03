@@ -62,6 +62,8 @@ export type Engine = {
   // Whether extension pages (options, popup) can be opened as Playwright Pages via
   // `page.goto`; Firefox can't attach to moz-extension:// documents (see docs/e2e.md).
   opensExtensionPages: boolean;
+  // Whether the editor opens in the browser's side panel by default.
+  hasSidePanel: boolean;
   launch(userDataDir: string, options: LaunchOptions): Promise<BrowserContext>;
   loadExtension(context: BrowserContext, distPath: string): Promise<Extension>;
   // Opens the popup in the background so the page under test stays the "current tab".

@@ -14,6 +14,7 @@ import { isFieldTarget, isMac } from '@stylebot/utils';
 import { getDeclarationValue } from '@stylebot/css';
 
 import { undoKeyFor } from '../../store/undo-stack';
+import { hasSidePanel } from '../../utils/side-panel';
 
 export default Vue.extend({
   name: 'TheKeyboardShortcuts',
@@ -112,8 +113,12 @@ export default Vue.extend({
       this.$store.dispatch('setDockLocation', 'window');
     },
 
+    dockSidePanel(): void {
+      this.$store.dispatch('setDockLocation', 'sidepanel');
+    },
+
     toggleAdjustPageLayout(): void {
-      if (this.host === 'window') {
+      if (this.host !== 'page') {
         return;
       }
 
@@ -140,7 +145,7 @@ export default Vue.extend({
 
       const target = path[0] as HTMLElement;
       const inPanel =
-        this.host === 'window' ||
+        this.host !== 'page' ||
         target === document.body ||
         target === document.documentElement ||
         path.some(node => (node as HTMLElement).id === 'stylebot');
@@ -250,6 +255,14 @@ export default Vue.extend({
         event.stopPropagation();
 
         this.dockWindow();
+      }
+
+      // Move stylebot into the side panel
+      if (hasSidePanel() && event.key === this.editorCommands.dockSidePanel) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        this.dockSidePanel();
       }
 
       // Toggle page layout adjustment

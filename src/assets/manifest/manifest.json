@@ -48,7 +48,8 @@
     "identity",
     "contextMenus",
     "unlimitedStorage",
-    "alarms"
+    "alarms",
+    "sidePanel"
   ],
   "host_permissions": [
     "https://drive.google.com/*",

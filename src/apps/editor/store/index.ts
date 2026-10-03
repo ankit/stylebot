@@ -29,9 +29,10 @@ import { emptyUndoStack } from './undo-stack';
 
 /**
  * Where the editor UI lives: injected into the styled page itself, or in a
- * separate extension window driving that page over a tab port.
+ * separate extension window or the tab's side panel, driving that page over
+ * a tab port.
  */
-export type EditorHost = 'page' | 'window';
+export type EditorHost = 'page' | 'window' | 'sidepanel';
 
 /**
  * What the browser knows about the styled tab, for the window host to show
@@ -56,7 +57,7 @@ export type State = {
   // Whether the page can be reached: always in the page host; in the window
   // host, whether the port to the tab is up.
   pageConnected: boolean;
-  // Whether a separate editor window is attached to this page; page host only.
+  // Whether a separate window or side panel is attached to this page; page host only.
   windowConnected: boolean;
   // Window host: the tab this window edits.
   tabId: number | null;
