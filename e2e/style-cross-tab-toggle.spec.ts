@@ -1,5 +1,5 @@
 import { test, expect } from './fixtures';
-import { PAGE_URL, seedStyles, servePage } from './helpers';
+import { PAGE_URL, openEditor, seedStyles, servePage } from './helpers';
 
 const PAGE_HTML = `
   <!doctype html>
@@ -49,4 +49,43 @@ test('disabling/enabling a style propagates live to every open tab on that host'
 
   await expect(tabA.locator('h1')).toHaveCSS('color', 'rgb(255, 0, 128)');
   await expect(tabB.locator('h1')).toHaveCSS('color', 'rgb(255, 0, 128)');
+});
+
+test('with the editor open, a style turned off elsewhere stays off from the first frame of the next load', async ({
+  context,
+  extension,
+  openPopup,
+}) => {
+  await servePage(context, PAGE_HTML);
+  await seedStyles(extension, {
+    localhost: { css: 'h1 { color: rgb(255, 0, 128); }', enabled: true },
+  });
+
+  const page = await context.newPage();
+  await page.goto(PAGE_URL);
+  await expect(page.locator('h1')).toHaveCSS('color', 'rgb(255, 0, 128)');
+  await openEditor(page, openPopup);
+
+  const popup = await openPopup();
+  await popup.evaluate(() => {
+    chrome.runtime.sendMessage({ name: 'DisableStyle', url: 'localhost' });
+  });
+  await expect(page.locator('h1')).not.toHaveCSS('color', 'rgb(255, 0, 128)');
+
+  // A reload applies this cache before storage answers.
+  await expect
+    .poll(() =>
+      page.evaluate(() => {
+        const cache = JSON.parse(
+          localStorage.getItem('stylebot-cache') ?? '{}'
+        );
+        return cache.styles?.find(
+          (style: { url: string }) => style.url === 'localhost'
+        )?.enabled;
+      })
+    )
+    .toBe(false);
+
+  await page.reload();
+  await expect(page.locator('h1')).not.toHaveCSS('color', 'rgb(255, 0, 128)');
 });
