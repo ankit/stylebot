@@ -20,9 +20,21 @@ const rootDir = path.resolve(
 const distDir = path.join(rootDir, 'safari-dist');
 const markerPath = path.join(distDir, '.build-complete');
 const projectPath = path.join(rootDir, 'safari/Stylebot/Stylebot.xcodeproj');
-const derivedDataPath = path.join(rootDir, 'safari/DerivedData');
-const appPath = path.join(derivedDataPath, 'Build/Products/Debug/Stylebot.app');
 const watchMode = process.argv.includes('--watch');
+
+// Xcode's default build folder, so builds from here and from the Xcode app
+// share one Stylebot.app; two copies with the same extension id leave Safari
+// loading whichever one macOS registered first.
+const xcodebuildArgs = [
+  '-project',
+  projectPath,
+  '-scheme',
+  'Stylebot',
+  '-configuration',
+  'Debug',
+  '-destination',
+  `platform=macOS,arch=${process.arch === 'arm64' ? 'arm64' : 'x86_64'}`,
+];
 
 const readMarker = () =>
   existsSync(markerPath) ? readFileSync(markerPath, 'utf8') : null;
@@ -34,24 +46,25 @@ const readMarker = () =>
 const buildApp = () => {
   const { status } = spawnSync(
     'xcodebuild',
-    [
-      '-project',
-      projectPath,
-      '-scheme',
-      'Stylebot',
-      '-configuration',
-      'Debug',
-      '-destination',
-      `platform=macOS,arch=${process.arch === 'arm64' ? 'arm64' : 'x86_64'}`,
-      '-derivedDataPath',
-      derivedDataPath,
-      '-quiet',
-      'build',
-    ],
+    [...xcodebuildArgs, '-quiet', 'build'],
     { stdio: 'inherit' }
   );
 
   return status === 0;
+};
+
+/**
+ * Path of the built Stylebot.app, as xcodebuild reports it.
+ */
+const getAppPath = () => {
+  const { stdout } = spawnSync(
+    'xcodebuild',
+    [...xcodebuildArgs, '-showBuildSettings', '-json'],
+    { encoding: 'utf8' }
+  );
+  const app = JSON.parse(stdout).find(entry => entry.target === 'Stylebot');
+
+  return path.join(app.buildSettings.BUILT_PRODUCTS_DIR, 'Stylebot.app');
 };
 
 /**
@@ -74,7 +87,7 @@ const waitForBuild = baseline =>
   });
 
 const launch = () => {
-  spawnSync('open', [appPath], { stdio: 'inherit' });
+  spawnSync('open', [getAppPath()], { stdio: 'inherit' });
   spawnSync('open', ['-a', 'Safari'], { stdio: 'inherit' });
 
   console.log(`
