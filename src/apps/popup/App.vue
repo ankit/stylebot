@@ -25,8 +25,17 @@
     </div>
 
     <div v-else-if="tab && tab.id">
+      <site-profiles
+        v-if="siteProfiles.length > 1"
+        :url="styles[0].url"
+        :profiles="siteProfiles"
+        :active-profile="siteActiveProfile"
+        :enabled="siteEnabled"
+        :disable-off="isOpen"
+        @pick="pickSiteProfile"
+      />
       <style-component
-        v-if="styles.length"
+        v-else-if="styles.length"
         header
         :url="styles[0].url"
         :disable-toggle="isOpen || (pageReaderable && readability)"
@@ -59,6 +68,7 @@
           :url="style.url"
           :disable-toggle="isOpen || (pageReaderable && readability)"
           :initial-enabled="style.enabled"
+          :profiles="profilesOf(style)"
         />
       </div>
 
@@ -75,6 +85,7 @@
           :tab="tab"
           :shortcut="stylebotShortcut"
           :side-panel="dockLocation === 'sidepanel'"
+          :profile-name="editProfileName"
         />
         <settings-button />
       </div>
@@ -89,6 +100,7 @@ import Vue from 'vue';
 import { SHeading, SText, SThemeProvider } from '@stylebot/components';
 
 import StyleComponent from './components/Style.vue';
+import SiteProfiles from './components/SiteProfiles.vue';
 import SettingsButton from './components/SettingsButton.vue';
 import Readability from './components/Readability.vue';
 import SyncStylebot from './components/SyncStylebot.vue';
@@ -103,12 +115,22 @@ import {
   getCurrentTab,
   getIsStylebotOpen,
   getIsPageReaderable,
+  enableStyle,
+  disableStyle,
+  setActiveProfile,
 } from './utils';
 
 import { getGoogleDriveSyncEnabled, getSyncNeedsAuth } from '@stylebot/sync';
-import { isSupportedUrl } from '@stylebot/saved-styles';
+import {
+  expandProfiles,
+  hasAnyCss,
+  isSupportedUrl,
+  listProfiles,
+} from '@stylebot/saved-styles';
+import type { ProfileSummary } from '@stylebot/saved-styles';
 import type {
   GetCommandsResponse,
+  Style,
   StylebotAppearance,
   StylebotLayout,
   StylebotDockLocation,
@@ -123,6 +145,7 @@ export default Vue.extend({
     SThemeProvider,
     SettingsButton,
     StyleComponent,
+    SiteProfiles,
     ToggleStylebot,
     Readability,
     SyncStylebot,
@@ -135,7 +158,10 @@ export default Vue.extend({
     readability: boolean;
     pageReaderable: boolean;
     tab?: chrome.tabs.Tab;
-    styles: Array<{ url: string; css: string; enabled: boolean }>;
+    styles: Array<Style>;
+    // The site's own style, as picked here since the popup opened.
+    siteActiveProfile: string;
+    siteEnabled: boolean;
     syncNeedsSignIn: boolean;
     commands?: GetCommandsResponse;
     appearance: StylebotAppearance;
@@ -143,6 +169,8 @@ export default Vue.extend({
   } {
     return {
       styles: [],
+      siteActiveProfile: '',
+      siteEnabled: true,
       isOpen: false,
       tab: undefined,
       readability: false,
@@ -167,6 +195,23 @@ export default Vue.extend({
     // same check the background page uses to decide whether it can inject.
     restricted(): boolean {
       return !!this.tab?.url && !isSupportedUrl(this.tab.url);
+    },
+
+    siteProfiles(): Array<ProfileSummary> {
+      return this.styles.length ? listProfiles(this.styles[0]) : [];
+    },
+
+    // Names the profile the editor would open on, once there's a choice.
+    editProfileName(): string {
+      if (this.siteProfiles.length < 2) {
+        return '';
+      }
+
+      const profile = this.siteProfiles.find(
+        ({ id }) => id === this.siteActiveProfile
+      );
+
+      return profile ? profile.name || this.t('profile_default_name') : '';
     },
 
     styleShortcut(): string {
@@ -199,7 +244,14 @@ export default Vue.extend({
       });
 
       getStyles(this.tab, ({ styles, defaultStyle }) => {
-        this.styles = styles.filter(style => style.css);
+        this.styles = styles.filter(hasAnyCss);
+
+        const [site] = this.styles;
+
+        if (site) {
+          this.siteEnabled = site.enabled;
+          this.siteActiveProfile = expandProfiles(site).active;
+        }
         this.readability = !!defaultStyle && defaultStyle.readability;
       });
     });
@@ -221,6 +273,38 @@ export default Vue.extend({
     getOption('layout', layout => {
       this.dockLocation = (layout as StylebotLayout).dockLocation;
     });
+  },
+
+  methods: {
+    profilesOf(style: Style): Array<ProfileSummary> {
+      return listProfiles(style);
+    },
+
+    /**
+     * Applies a profile picked for the site, turning its style back on if
+     * it was off, or turns the style off when no profile is picked.
+     */
+    pickSiteProfile(id: string | null): void {
+      const { url } = this.styles[0];
+
+      if (id === null) {
+        if (this.siteEnabled) {
+          disableStyle(url);
+        }
+        this.siteEnabled = false;
+        return;
+      }
+
+      if (id !== this.siteActiveProfile) {
+        setActiveProfile(url, id);
+      }
+      if (!this.siteEnabled) {
+        enableStyle(url);
+      }
+
+      this.siteActiveProfile = id;
+      this.siteEnabled = true;
+    },
   },
 });
 </script>

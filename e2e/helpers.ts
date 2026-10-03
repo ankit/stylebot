@@ -132,8 +132,9 @@ export const waitForEditorListener = async (popup: Popup): Promise<void> => {
     .toBe(true);
 };
 
-// Opens the editor through the popup's "Style this page" button and waits for
-// the Vue app to actually mount, not just the host to attach.
+// Opens the editor through the popup's "Style this page" button (named "Edit
+// <profile>" on a site with several profiles) and waits for the Vue app to
+// actually mount, not just the host to attach.
 export const openEditor = async (
   page: Page,
   openPopup: () => Promise<Popup>
@@ -142,7 +143,9 @@ export const openEditor = async (
 
   const popup = await openPopup();
   await waitForEditorListener(popup);
-  await popup.locator('button', { hasText: 'Style this page' }).click();
+  await popup
+    .locator('button', { hasText: /^\s*(Style this page|Edit )/ })
+    .click();
 
   const editorRoot = page.locator('#stylebot');
   // Vue mounts TheStylebotApp by replacing the #stylebot-app mount div with

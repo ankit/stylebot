@@ -1,7 +1,11 @@
 import type { Meta } from '@storybook/vue';
 
 import Style from './Style.vue';
-import { popup, style } from '@stylebot/storybook/fixtures/popup';
+import {
+  popup,
+  profiledStyle,
+  style,
+} from '@stylebot/storybook/fixtures/popup';
 
 const meta: Meta = {
   title: 'Browser Action/Styles',
@@ -30,4 +34,9 @@ export const MultipleStyles = popup({
 export const StyleDisabled = popup({
   styles: [style('example.com', false)],
   defaultStyle: style('example.com', false),
+});
+
+export const WithProfiles = popup({
+  styles: [profiledStyle('example.com'), profiledStyle('*.example.com')],
+  defaultStyle: profiledStyle('example.com'),
 });
