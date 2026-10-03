@@ -1,5 +1,10 @@
 import type {
   SetStyle,
+  SetActiveProfile,
+  CreateProfile,
+  CreateProfileResponse,
+  RenameProfile,
+  DeleteProfile,
   SetReadability,
   SetOption,
   GetAllOptions,
@@ -69,7 +74,8 @@ export const setStyle = (
   url: string,
   css: string,
   readability: boolean,
-  forceImportant: boolean
+  forceImportant: boolean,
+  profileId?: string
 ): void => {
   const message: SetStyle = {
     name: 'SetStyle',
@@ -77,7 +83,57 @@ export const setStyle = (
     css,
     readability,
     forceImportant,
+    profileId,
   };
+
+  chrome.runtime.sendMessage(message);
+};
+
+export const setActiveProfile = (url: string, profileId: string): void => {
+  const message: SetActiveProfile = {
+    name: 'SetActiveProfile',
+    url,
+    profileId,
+  };
+
+  chrome.runtime.sendMessage(message);
+};
+
+export const createProfile = (
+  url: string,
+  profileName: string,
+  sourceProfileId?: string
+): Promise<CreateProfileResponse> => {
+  const message: CreateProfile = {
+    name: 'CreateProfile',
+    url,
+    profileName,
+    sourceProfileId,
+    activate: true,
+  };
+
+  return chrome.runtime.sendMessage<CreateProfile, CreateProfileResponse>(
+    message
+  );
+};
+
+export const renameProfile = (
+  url: string,
+  profileId: string,
+  profileName: string
+): void => {
+  const message: RenameProfile = {
+    name: 'RenameProfile',
+    url,
+    profileId,
+    profileName,
+  };
+
+  chrome.runtime.sendMessage(message);
+};
+
+export const deleteProfile = (url: string, profileId: string): void => {
+  const message: DeleteProfile = { name: 'DeleteProfile', url, profileId };
 
   chrome.runtime.sendMessage(message);
 };

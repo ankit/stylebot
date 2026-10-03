@@ -150,6 +150,8 @@ describe('createEditorWindowHandler', () => {
         enabled: true,
         readability: false,
         forceImportant: true,
+        profiles: [{ id: 'default', name: '' }],
+        activeProfile: 'default',
       },
       snapshot: store.state.page,
       activeSelector: '',

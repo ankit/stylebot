@@ -8,7 +8,7 @@ import type {
 } from '@stylebot/types';
 
 import { walkUnnestedRules } from '@stylebot/css';
-import type { State, CssSelectorMetadata, EditorTab } from './';
+import type { State, CssSelectorMetadata, EditorProfile, EditorTab } from './';
 import type { UndoStack } from './undo-stack';
 import type { PageSnapshot, SelectorAlternatives } from '@stylebot/page-bridge';
 import type { AppliedDeclaration } from '@stylebot/page-bridge';
@@ -48,6 +48,14 @@ export default {
 
   setEnabled(state: State, enabled: boolean): void {
     state.enabled = enabled;
+  },
+
+  setProfiles(state: State, profiles: Array<EditorProfile>): void {
+    state.profiles = profiles;
+  },
+
+  setActiveProfile(state: State, id: string): void {
+    state.activeProfile = id;
   },
 
   setCss(state: State, css: string): void {

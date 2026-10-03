@@ -1,7 +1,10 @@
 <template>
   <div class="header">
     <div class="header-top">
-      <s-text size="caption" variant="muted" class="url">{{ url }}</s-text>
+      <div class="style-identity">
+        <s-text class="url">{{ url }}</s-text>
+        <the-profile-switcher />
+      </div>
       <the-window-actions />
     </div>
 
@@ -20,6 +23,7 @@ import { SText } from '@stylebot/components';
 
 import TheInspector from './header/TheInspector.vue';
 import TheWindowActions from './header/TheWindowActions.vue';
+import TheProfileSwitcher from './header/TheProfileSwitcher.vue';
 import TheCssSelectorDropdown from './header/TheCssSelectorDropdown.vue';
 import TheEditorModeActions from './header/TheEditorModeActions.vue';
 import { consumeFieldEscape } from '@stylebot/utils';
@@ -34,6 +38,7 @@ export default Vue.extend({
     SText,
     TheInspector,
     TheWindowActions,
+    TheProfileSwitcher,
     TheCssSelectorDropdown,
     TheEditorModeActions,
   },
@@ -79,11 +84,19 @@ export default Vue.extend({
   padding: 8px 13px 4px 16px;
 }
 
+.style-identity {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
 .url {
   @include truncate;
 
-  flex: none;
+  flex: 0 1 auto;
   max-width: 150px;
+  min-width: 0;
 }
 
 .selector-row {

@@ -84,7 +84,8 @@ describe('actions', () => {
         mockState.url,
         'clean',
         mockState.readability,
-        true
+        true,
+        'default'
       );
       expect(mockCommit).toHaveBeenNthCalledWith(1, 'setUndoStack', {
         past: [{ css: mockState.css, source: 'edit', at: expect.any(Number) }],
@@ -230,7 +231,13 @@ describe('actions', () => {
 
       actions.applyCss({ commit: mockCommit, state }, { css: '' });
 
-      expect(chromeUtils.setStyle).toBeCalledWith(state.url, '', false, true);
+      expect(chromeUtils.setStyle).toBeCalledWith(
+        state.url,
+        '',
+        false,
+        true,
+        'default'
+      );
     });
 
     it('applies and persists a style with Use !important off', () => {
@@ -246,7 +253,8 @@ describe('actions', () => {
         state.url,
         'clean',
         state.readability,
-        false
+        false,
+        'default'
       );
     });
   });

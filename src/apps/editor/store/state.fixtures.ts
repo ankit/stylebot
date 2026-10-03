@@ -18,6 +18,8 @@ const mockState: State = {
   tab: null,
 
   css: '',
+  profiles: [{ id: 'default', name: '' }],
+  activeProfile: 'default',
   undoStack: emptyUndoStack(),
   codeHighlight: null,
   enabled: true,
