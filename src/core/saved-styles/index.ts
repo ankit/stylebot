@@ -25,6 +25,8 @@ export {
   renameProfile,
   removeProfile,
   setProfileCss,
+  isProfileNameTaken,
+  freeProfileName,
 } from './profiles';
 export type {
   ExpandedProfiles,

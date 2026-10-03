@@ -4,7 +4,8 @@
 
     <s-anchored-menu
       class="profile-anchor"
-      :style="{ '--menu-shift': `${menuShift}px` }"
+      align="start"
+      :boundary="header"
       :keep-open-on-escape="editing !== null || !!rowMenu"
       @escape="onEscape"
       @close="reset"
@@ -16,7 +17,7 @@
           :class="{ open }"
           :aria-label="t('switch_profile')"
           :aria-expanded="open ? 'true' : 'false'"
-          @click="toggleMenu($event, toggle)"
+          @click="toggle"
         >
           <span class="trigger-name">{{ activeName }}</span>
           <chevron-down-icon :size="10" class="trigger-chevron" />
@@ -96,13 +97,12 @@ import {
   SConfirmDialog,
 } from '@stylebot/components';
 import { ChevronDownIcon } from '@stylebot/icons';
+import { freeProfileName, isProfileNameTaken } from '@stylebot/saved-styles';
 
 import type { EditorProfile } from '../../store';
 import Profile from './Profile.vue';
 import ProfileMenu from './ProfileMenu.vue';
 
-const MENU_WIDTH = 220;
-const MENU_EDGE_GAP = 8;
 // Stands for the row being typed into by Create profile.
 const NEW_ID = '';
 
@@ -121,7 +121,6 @@ export default Vue.extend({
 
   data(): {
     NEW_ID: string;
-    menuShift: number;
     // The id of the profile being renamed, NEW_ID while one is being
     // created, or null.
     editing: string | null;
@@ -131,7 +130,6 @@ export default Vue.extend({
   } {
     return {
       NEW_ID,
-      menuShift: 0,
       editing: null,
       draft: '',
       rowMenu: null,
@@ -156,15 +154,18 @@ export default Vue.extend({
       return active ? this.displayName(active) : '';
     },
 
-    nameError(): string {
-      const name = this.draft.trim().toLowerCase();
-      const taken = this.profiles.some(
-        profile =>
-          profile.id !== this.editing &&
-          this.displayName(profile).toLowerCase() === name
-      );
+    names(): Array<string> {
+      return this.profiles.map(this.displayName);
+    },
 
-      return taken ? this.t('profile_name_taken') : '';
+    nameError(): string {
+      const others = this.profiles
+        .filter(profile => profile.id !== this.editing)
+        .map(this.displayName);
+
+      return isProfileNameTaken(this.draft, others)
+        ? this.t('profile_name_taken')
+        : '';
     },
   },
 
@@ -174,35 +175,11 @@ export default Vue.extend({
     },
 
     /**
-     * The name, or the name with the first number that makes it unique.
+     * The panel's header, which the menu stays inside however long the
+     * site name.
      */
-    freeName(name: string): string {
-      const taken = new Set(
-        this.profiles.map(profile => this.displayName(profile).toLowerCase())
-      );
-      let candidate = name;
-
-      for (let n = 2; taken.has(candidate.toLowerCase()); n++) {
-        candidate = `${name} ${n}`;
-      }
-
-      return candidate;
-    },
-
-    /**
-     * Opens or closes the menu, shifting it left first when a long site
-     * name leaves too little room for it beside the trigger.
-     */
-    toggleMenu(event: MouseEvent, toggle: () => void): void {
-      const trigger = event.currentTarget as HTMLElement;
-      const bounds = (
-        trigger.closest('.header') ?? document.body
-      ).getBoundingClientRect();
-      const room =
-        bounds.right - MENU_EDGE_GAP - trigger.getBoundingClientRect().left;
-
-      this.menuShift = Math.min(0, room - MENU_WIDTH);
-      toggle();
+    header(): HTMLElement | null {
+      return this.$el.closest('.header');
     },
 
     reset(): void {
@@ -279,7 +256,10 @@ export default Vue.extend({
     },
 
     startCreate(): void {
-      this.startEditing(NEW_ID, this.freeName(this.t('untitled')));
+      this.startEditing(
+        NEW_ID,
+        freeProfileName(this.t('untitled'), this.names)
+      );
     },
 
     submitEdit(close: () => void): void {
@@ -310,7 +290,10 @@ export default Vue.extend({
 
       if (profile) {
         this.$store.dispatch('createProfile', {
-          name: this.freeName(this.t('name_copy', [this.displayName(profile)])),
+          name: freeProfileName(
+            this.t('name_copy', [this.displayName(profile)]),
+            this.names
+          ),
           sourceProfileId: id,
         });
       }
@@ -348,11 +331,6 @@ export default Vue.extend({
 
 .profile-anchor {
   min-width: 0;
-
-  ::v-deep .anchored-menu-panel {
-    right: auto;
-    left: var(--menu-shift);
-  }
 }
 
 .separator {
