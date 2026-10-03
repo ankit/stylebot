@@ -81,7 +81,7 @@ export default Vue.extend({
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding: 8px 13px 4px 16px;
+  padding: 8px calc(var(--panel-gutter) - 3px) 4px var(--panel-gutter);
 }
 
 .style-identity {
@@ -103,6 +103,6 @@ export default Vue.extend({
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 4px 16px;
+  padding: 4px var(--panel-gutter);
 }
 </style>

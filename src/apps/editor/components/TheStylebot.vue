@@ -109,6 +109,8 @@ export default Vue.extend({
 
 <style lang="scss">
 .stylebot {
+  --panel-gutter: 16px;
+
   top: 0;
   padding: 0;
   color: var(--text-primary);

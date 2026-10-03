@@ -31,3 +31,8 @@ export const Code: StoryObj = editorWindow({
   ...WITH_RULE,
   options: { mode: 'code' },
 });
+
+export const SidePanel: StoryObj = editorWindow({
+  ...WITH_RULE,
+  host: 'sidepanel',
+});

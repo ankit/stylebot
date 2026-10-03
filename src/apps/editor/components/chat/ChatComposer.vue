@@ -83,7 +83,7 @@ export default Vue.extend({
   position: relative;
   z-index: 3;
   flex: none;
-  padding: 0 12px 12px;
+  padding: 0 calc(var(--panel-gutter) - 4px) 12px;
 }
 
 .chat-composer-box {

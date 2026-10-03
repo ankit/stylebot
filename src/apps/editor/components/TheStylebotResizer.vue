@@ -1,5 +1,9 @@
 <template>
-  <div v-if="host !== 'page'" class="stylebot stylebot-window">
+  <div
+    v-if="host !== 'page'"
+    class="stylebot stylebot-window"
+    :class="{ 'stylebot-sidepanel': host === 'sidepanel' }"
+  >
     <slot></slot>
   </div>
 
@@ -215,6 +219,10 @@ export default Vue.extend({
   &.stylebot-window {
     position: absolute;
     inset: 0;
+  }
+
+  &.stylebot-sidepanel {
+    --panel-gutter: 10px;
   }
 
   &.stylebot-docked {

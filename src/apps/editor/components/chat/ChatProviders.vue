@@ -100,7 +100,7 @@ export default Vue.extend({
   flex: none;
   display: flex;
   align-items: center;
-  padding: 6px 18px;
+  padding: 6px calc(var(--panel-gutter) + 2px);
   border-bottom: 1px solid var(--panel-border);
   background: var(--tab-surface);
 }
@@ -116,7 +116,7 @@ export default Vue.extend({
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 20px 18px 18px;
+  padding: 20px calc(var(--panel-gutter) + 2px) 18px;
 }
 
 .chat-providers-intro {

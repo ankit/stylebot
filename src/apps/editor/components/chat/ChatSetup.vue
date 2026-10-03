@@ -107,7 +107,7 @@ export default Vue.extend({
   display: flex;
   flex-direction: column;
   gap: 20px;
-  padding: 20px 16px;
+  padding: 20px var(--panel-gutter);
   box-sizing: border-box;
 }
 

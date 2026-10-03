@@ -114,13 +114,13 @@ export default Vue.extend({
 }
 
 .mode-actions .tabs {
-  margin: 0 16px;
+  margin: 0 var(--panel-gutter);
 }
 
 .new-chat {
   position: absolute;
   top: 2px;
-  right: 11px;
+  right: calc(var(--panel-gutter) - 5px);
   color: var(--icon-color);
 }
 </style>
