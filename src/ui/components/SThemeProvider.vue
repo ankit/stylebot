@@ -43,6 +43,7 @@ export default Vue.extend({
   --text-secondary: #a3aab6;
   --text-muted: #a3aab6;
   --text-faint: #8d95a2;
+  --section-heading: #b4b8c0;
 
   // Lines and interaction states
   --panel-border: #2c2f35;
@@ -124,6 +125,7 @@ export default Vue.extend({
   --text-secondary: #5f6672;
   --text-muted: #6b7280;
   --text-faint: #8b909b;
+  --section-heading: #4b5563;
 
   // Lines and interaction states
   --panel-border: #e9eaee;

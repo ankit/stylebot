@@ -153,13 +153,9 @@ export default Vue.extend({
 }
 
 .border-color ::v-deep .color-field {
-  width: 27px;
-  height: 27px;
-}
-
-.border-color ::v-deep .color-swatch {
-  border-right: none;
-  border-radius: 6px;
+  justify-content: center;
+  width: 28px;
+  padding: 0;
 }
 
 .border-style-option {

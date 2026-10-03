@@ -91,18 +91,29 @@ export default Vue.extend({
 }
 
 .basic-editor-actions .action-button {
-  gap: 4px;
-  padding: 8px;
-  color: var(--text-muted);
+  gap: 5px;
+  height: 28px;
+  padding: 0 10px;
+  border-color: transparent;
+  border-radius: 7px;
+  background: var(--field-surface);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-secondary);
+
+  &:hover:not(:disabled) {
+    background: var(--field-surface-hover);
+    color: var(--text-primary);
+  }
 }
 
-.hide-button.active {
+.basic-editor-actions .hide-button.active {
   color: var(--accent-ink);
   background: var(--accent);
-  border-color: var(--accent);
 
   &:hover:not(:disabled) {
     background: var(--accent);
+    color: var(--accent-ink);
   }
 }
 </style>

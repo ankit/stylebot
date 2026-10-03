@@ -1,9 +1,8 @@
 <template>
   <div class="spacing-field">
-    <s-text variant="muted" class="spacing-field-label">{{ label }}</s-text>
-
     <s-number-field
       unit="px"
+      :prefix="prefix"
       :value="value"
       :placeholder="placeholder"
       :disabled="disabled"
@@ -14,20 +13,19 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { SNumberField, SText } from '@stylebot/components';
+import { SNumberField } from '@stylebot/components';
 
 export default Vue.extend({
   name: 'SpacingField',
 
   components: {
     SNumberField,
-    SText,
   },
 
   props: {
-    label: {
+    prefix: {
       type: String,
-      required: true,
+      default: '',
     },
 
     value: {
@@ -49,12 +47,6 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-.spacing-field {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
 .spacing-field ::v-deep .number-field {
   width: 100%;
 }

@@ -48,13 +48,11 @@ export const sharedValue = (...values: Array<string>): string =>
 
 /**
  * A computed px length as a field placeholder, rounded to one decimal;
- * zero and anything else (`normal`, elliptical radii) read as empty.
+ * anything else (`normal`, elliptical radii) reads as empty.
  */
 export const toPlaceholder = (value = ''): string => {
   const match = value.match(/^(-?[\d.]+)px$/);
-  const length = match ? Math.round(parseFloat(match[1]) * 10) / 10 : 0;
-
-  return length === 0 ? '' : `${length}`;
+  return match ? `${Math.round(parseFloat(match[1]) * 10) / 10}` : '';
 };
 
 /**
@@ -64,12 +62,19 @@ export const toPlaceholder = (value = ''): string => {
 export const computedPlaceholder = (
   styles: Record<string, string>,
   property: string
-): string =>
-  toPlaceholder(
+): string => {
+  // `normal` has no px value; browsers render it at roughly 1.2em.
+  if (property === 'line-height' && styles['line-height'] === 'normal') {
+    const fontSize = parseFloat(styles['font-size'] ?? '');
+    return Number.isNaN(fontSize) ? '' : toPlaceholder(`${fontSize * 1.2}px`);
+  }
+
+  return toPlaceholder(
     sharedValue(
       ...(LONGHANDS[property] ?? [property]).map(prop => styles[prop] ?? '')
     )
   );
+};
 
 /**
  * Placeholders for each side of a spacing control.

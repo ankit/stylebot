@@ -5,6 +5,7 @@ import TheLayoutProperties from './TheLayoutProperties.vue';
 import { editor, WITH_RULE } from '@stylebot/storybook/fixtures/editor';
 import type { Canvas } from '@stylebot/storybook/story-helpers';
 import {
+  cardHeader,
   declaration,
   findOpenMenu,
   numberInput,
@@ -23,52 +24,65 @@ const meta: Meta = {
 
 export default meta;
 
-/* A spacing control is a mode row plus a grid of labelled fields; both
-   live inside the same `.spacing-control` block as its label. */
+/* A spacing control is a row with a mode dropdown and its fields; Individual
+   moves the four side fields onto a grid below, inside the same block. */
 const spacing = (canvas: Canvas, label: string) =>
   propertyControl(canvas, label).closest('.spacing-control') as HTMLElement;
 
-const modeButton = (control: HTMLElement, label: string) =>
-  within(control).getByRole('button', { name: label });
+const pickMode = async (canvas: Canvas, control: HTMLElement, mode: string) => {
+  await waitFor(() => expect(canvas.queryByRole('menu')).toBeNull());
+  await user.click(control.querySelector('.select-trigger') as Element);
+  await user.click(
+    within(await findOpenMenu(canvas)).getByRole('menuitem', { name: mode })
+  );
+};
 
-// Fields appear when a mode is picked, so this waits for the label.
-const spacingInput = async (control: HTMLElement, label: string) =>
-  numberInput(
+// Fields are told apart by their X / Y / T / R / B / L prefix; a lone field has none.
+const spacingInput = async (control: HTMLElement, prefix = '') => {
+  if (!prefix) {
+    return control.querySelector('.number-input') as HTMLInputElement;
+  }
+
+  return numberInput(
     (
-      await within(control).findByText(label, {
-        selector: '.spacing-field-label',
-      })
+      await within(control).findByText(prefix, { selector: '.number-prefix' })
     ).closest('.spacing-field') as HTMLElement
   );
+};
 
 export const SpacingModes: StoryObj = {
   ...editor(WITH_RULE),
-  name: 'padding switches between All, X & Y, Individual and None and writes the right shorthand',
+  name: 'padding switches between All sides, X & Y and Individual and writes the right shorthand',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
     const padding = spacing(canvas, 'Padding');
 
     // `12px 24px` is a vertical/horizontal pair.
-    await expect(modeButton(padding, 'X & Y')).toHaveClass('active');
-    await expect(await spacingInput(padding, 'Vertical')).toHaveValue('12');
-    await expect(await spacingInput(padding, 'Horizontal')).toHaveValue('24');
+    await expect(padding.querySelector('.select-trigger')).toHaveTextContent(
+      'X & Y'
+    );
+    await expect(await spacingInput(padding, 'Y')).toHaveValue('12');
+    await expect(await spacingInput(padding, 'X')).toHaveValue('24');
 
-    await user.click(modeButton(padding, 'All'));
-    const all = await spacingInput(padding, 'All');
+    await pickMode(canvas, padding, 'All sides');
+    const all = await spacingInput(padding);
     await user.type(all, '8');
     await expect(declaration(store, 'h1', 'padding')).toBe('8px');
     await expect(pageStyle(canvasElement, 'h1', 'padding')).toBe('8px');
 
-    await user.click(modeButton(padding, 'Individual'));
-    const top = await spacingInput(padding, 'Top');
+    await pickMode(canvas, padding, 'Individual');
+    const top = await spacingInput(padding, 'T');
     // Focusing a field selects its value, so typing replaces it.
     await user.type(top, '4');
     await expect(declaration(store, 'h1', 'padding')).toBe('4px 8px 8px');
     await expect(pageStyle(canvasElement, 'h1', 'padding-top')).toBe('4px');
     await expect(pageStyle(canvasElement, 'h1', 'padding-left')).toBe('8px');
 
-    await user.click(modeButton(padding, 'None'));
+    // An empty field means none.
+    await pickMode(canvas, padding, 'All sides');
+    await user.type(await spacingInput(padding), '3');
+    await user.clear(await spacingInput(padding));
     await expect(declaration(store, 'h1', 'padding')).toBeUndefined();
     await expect(declaration(store, 'h1', 'padding-top')).toBeUndefined();
     await expect(pageStyle(canvasElement, 'h1', 'padding')).toBe('0px');
@@ -77,24 +91,25 @@ export const SpacingModes: StoryObj = {
 
 export const SpacingPlaceholders: StoryObj = {
   ...editor({ ...WITH_RULE, activeSelector: '.sb-page p' }),
-  name: "spacing fields show the page's nonzero computed sides, and a combined field only when they agree",
+  name: "spacing fields show the page's computed sides, and a combined field only when they agree",
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
+    await user.click(cardHeader(canvas, 'Box'));
     const margin = spacing(canvas, 'Margin');
 
-    await user.click(modeButton(margin, 'Individual'));
-    const bottom = await spacingInput(margin, 'Bottom');
+    await pickMode(canvas, margin, 'Individual');
+    const bottom = await spacingInput(margin, 'B');
     await waitFor(() => expect(bottom).toHaveAttribute('placeholder', '12'));
     await expect(bottom).toHaveValue('');
-    await expect(await spacingInput(margin, 'Top')).toHaveAttribute(
+    await expect(await spacingInput(margin, 'T')).toHaveAttribute(
       'placeholder',
-      '—'
+      '0'
     );
 
     // `0 0 12px` has no single value to show.
-    await user.click(modeButton(margin, 'All'));
-    await expect(await spacingInput(margin, 'All')).toHaveAttribute(
+    await pickMode(canvas, margin, 'All sides');
+    await expect(await spacingInput(margin)).toHaveAttribute(
       'placeholder',
       '—'
     );
@@ -110,11 +125,7 @@ export const MarginIndependent: StoryObj = {
     const store = storeOf(canvasElement);
     const margin = spacing(canvas, 'Margin');
 
-    await expect(modeButton(margin, 'None')).toHaveClass('active');
-
-    await user.click(modeButton(margin, 'All'));
-    const all = await spacingInput(margin, 'All');
-    await user.type(all, '10');
+    await user.type(await spacingInput(margin), '10');
 
     await expect(declaration(store, 'h1', 'margin')).toBe('10px');
     await expect(declaration(store, 'h1', 'padding')).toBe('12px 24px');
@@ -129,9 +140,9 @@ export const IndividualSidesIsolated: StoryObj = {
     const store = storeOf(canvasElement);
     const margin = spacing(canvas, 'Margin');
 
-    await user.click(modeButton(margin, 'Individual'));
-    await user.type(await spacingInput(margin, 'Top'), '10');
-    await user.type(await spacingInput(margin, 'Left'), '6');
+    await pickMode(canvas, margin, 'Individual');
+    await user.type(await spacingInput(margin, 'T'), '10');
+    await user.type(await spacingInput(margin, 'L'), '6');
 
     await expect(declaration(store, 'h1', 'margin-top')).toBe('10px');
     await expect(declaration(store, 'h1', 'margin-left')).toBe('6px');
@@ -192,21 +203,13 @@ export const BorderWidthOnly: StoryObj = {
 
 export const RadiusField: StoryObj = {
   ...editor(WITH_RULE),
-  name: 'the radius field applies typed and preset values',
+  name: 'the radius field applies typed values',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
-    const control = propertyControl(canvas, 'Radius');
-    const input = numberInput(control);
+    const input = numberInput(propertyControl(canvas, 'Radius'));
 
     await user.type(input, '8');
     await expect(declaration(store, 'h1', 'border-radius')).toBe('8px');
-
-    await user.click(control.querySelector('.number-chevron') as Element);
-    const menu = await findOpenMenu(canvas);
-    const preset = within(menu).getAllByRole('menuitem').at(-1) as HTMLElement;
-    const value = preset.textContent?.trim();
-    await user.click(preset);
-    await expect(declaration(store, 'h1', 'border-radius')).toBe(`${value}px`);
   },
 };

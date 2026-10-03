@@ -1,6 +1,5 @@
 <template>
   <s-segmented-control
-    class="value-group"
     fit
     :value="value"
     :placeholder="placeholder"
@@ -73,10 +72,3 @@ export default Vue.extend({
   },
 });
 </script>
-
-<style lang="scss" scoped>
-.value-group ::v-deep .segment {
-  min-width: 27px;
-  padding: 5px 6px;
-}
-</style>

@@ -2,6 +2,7 @@
   <property-row :label="t('opacity')">
     <div class="opacity-control">
       <s-slider
+        class="opacity-slider"
         :value="value"
         :min="0"
         :max="1"
@@ -10,14 +11,20 @@
         @input="apply"
       />
 
-      <s-text as="span" class="opacity-value">{{ value }}</s-text>
+      <s-number-field
+        unit="%"
+        placeholder="100"
+        :value="percent"
+        :disabled="disabled"
+        @input="applyPercent"
+      />
     </div>
   </property-row>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import { SSlider, SText } from '@stylebot/components';
+import { SNumberField, SSlider } from '@stylebot/components';
 import { getDeclarationValue } from '@stylebot/css';
 
 import PropertyRow from '../basic/PropertyRow.vue';
@@ -27,8 +34,8 @@ export default Vue.extend({
 
   components: {
     PropertyRow,
+    SNumberField,
     SSlider,
-    SText,
   },
 
   computed: {
@@ -41,12 +48,26 @@ export default Vue.extend({
       return Number.isNaN(parsed) ? 1 : parsed;
     },
 
+    // Empty while opacity is unset, so clearing the field reads as "none".
+    percent(): string {
+      const declared = getDeclarationValue(
+        this.$store.getters.activeRule,
+        'opacity'
+      );
+      return declared ? String(Math.round(this.value * 100)) : '';
+    },
+
     disabled(): boolean {
       return !this.$store.state.activeSelector;
     },
   },
 
   methods: {
+    applyPercent(percent: string): void {
+      const parsed = parseFloat(percent);
+      this.apply(Number.isNaN(parsed) ? 1 : Math.min(100, parsed) / 100);
+    },
+
     apply(value: number): void {
       const rounded = Math.round(value * 100) / 100;
 
@@ -60,29 +81,14 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-.property-row ::v-deep .property-row-label {
-  flex: 0 0 auto;
-}
-
-.property-row ::v-deep .property-row-control {
-  flex: 1;
-  min-width: 0;
-}
-
-.property-row {
-  border-bottom: none;
-}
-
 .opacity-control {
   display: flex;
   align-items: center;
-  gap: 8px;
-  width: 100%;
+  gap: 10px;
 }
 
-.opacity-value {
+.opacity-slider {
   flex: none;
-  width: 24px;
-  font-family: var(--font-mono);
+  width: 100px;
 }
 </style>

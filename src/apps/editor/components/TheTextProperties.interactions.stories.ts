@@ -5,7 +5,6 @@ import TheTextProperties from './TheTextProperties.vue';
 import { editor, WITH_RULE } from '@stylebot/storybook/fixtures/editor';
 import {
   declaration,
-  findOpenMenu,
   numberInput,
   pageStyle,
   pressKey,
@@ -29,12 +28,11 @@ const segments = (control: HTMLElement) =>
 
 export const FontSizeField: StoryObj = {
   ...editor(WITH_RULE),
-  name: 'the size field applies px values live, clears them, and offers presets',
+  name: 'the size field applies px values live and clears them',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
-    const control = propertyControl(canvas, 'Size');
-    const input = numberInput(control);
+    const input = numberInput(propertyControl(canvas, 'Size'));
 
     await expect(input).toHaveValue('32');
 
@@ -46,14 +44,6 @@ export const FontSizeField: StoryObj = {
 
     await user.clear(input);
     await expect(declaration(store, 'h1', 'font-size')).toBeUndefined();
-
-    await user.click(control.querySelector('.number-chevron') as Element);
-    const menu = await findOpenMenu(canvas);
-    await user.click(within(menu).getAllByRole('menuitem')[0]);
-    await waitFor(() => expect(input.value).not.toBe(''));
-    await expect(declaration(store, 'h1', 'font-size')).toBe(
-      `${input.value}px`
-    );
   },
 };
 

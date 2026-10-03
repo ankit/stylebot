@@ -147,7 +147,6 @@ export default Vue.extend({
   position: relative;
   display: flex;
   gap: 6px;
-  padding: 0 10px;
   border-bottom: 1px solid var(--panel-border);
 }
 
@@ -175,7 +174,7 @@ export default Vue.extend({
   border-radius: 0;
   background: none;
   font-family: inherit;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 400;
   line-height: 1.3;
   color: var(--text-muted);
@@ -184,7 +183,7 @@ export default Vue.extend({
   transition: color 0.15s ease;
 
   &:hover:not(:disabled):not(.active) {
-    color: var(--text-primary);
+    color: var(--field-ink);
   }
 
   &:disabled {
@@ -194,7 +193,7 @@ export default Vue.extend({
 
   &.active {
     font-weight: 600;
-    color: var(--text-primary);
+    color: var(--field-ink);
   }
 
   &:focus-visible::after {
@@ -205,5 +204,8 @@ export default Vue.extend({
     box-shadow: 0 0 0 2px var(--accent);
     pointer-events: none;
   }
+}
+.tab-indicator + * .tab {
+  padding-left: 0;
 }
 </style>

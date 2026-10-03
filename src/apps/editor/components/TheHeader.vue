@@ -80,8 +80,7 @@ export default Vue.extend({
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding: 7px 8px 7px 14px;
-  border-bottom: 1px solid var(--panel-border);
+  padding: 8px 13px 4px 16px;
 }
 
 .url {
@@ -95,6 +94,6 @@ export default Vue.extend({
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 14px;
+  padding: 4px 16px;
 }
 </style>

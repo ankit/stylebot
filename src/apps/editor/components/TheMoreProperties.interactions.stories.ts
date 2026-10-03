@@ -28,7 +28,7 @@ export const ListsUnknownDeclarations: StoryObj = {
   ...editor(WITH_RULE),
   name: 'lists the declarations no other panel edits',
   play: async ({ canvasElement }) => {
-    const card = propertyCard(within(canvasElement), 'More Properties');
+    const card = propertyCard(within(canvasElement), 'More properties');
 
     // Only what no other panel edits shows up here.
     await expect(rows(card)).toEqual(['letter-spacing 1px']);
@@ -41,7 +41,7 @@ export const AddProperty: StoryObj = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
-    const card = within(propertyCard(canvas, 'More Properties'));
+    const card = within(propertyCard(canvas, 'More properties'));
 
     await user.click(card.getByRole('button', { name: /Add property/ }));
     await user.type(card.getByPlaceholderText('Property'), 'cursor');
@@ -49,7 +49,7 @@ export const AddProperty: StoryObj = {
 
     await expect(declaration(store, 'h1', 'cursor')).toBe('pointer');
     await waitFor(() =>
-      expect(rows(propertyCard(canvas, 'More Properties'))).toContain(
+      expect(rows(propertyCard(canvas, 'More properties'))).toContain(
         'cursor pointer'
       )
     );
@@ -73,13 +73,13 @@ export const RemoveProperty: StoryObj = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
-    const card = within(propertyCard(canvas, 'More Properties'));
+    const card = within(propertyCard(canvas, 'More properties'));
 
     await user.click(card.getByRole('button', { name: 'Remove' }));
 
     await expect(declaration(store, 'h1', 'letter-spacing')).toBeUndefined();
     await waitFor(() =>
-      expect(rows(propertyCard(canvas, 'More Properties'))).toEqual([])
+      expect(rows(propertyCard(canvas, 'More properties'))).toEqual([])
     );
     // The rule itself survives.
     await expect(declaration(store, 'h1', 'color')).toBe('#2a5fd6');

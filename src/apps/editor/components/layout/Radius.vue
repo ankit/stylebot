@@ -1,6 +1,6 @@
 <template>
-  <property-row property="border-radius" :label="t('radius')" last>
-    <length property="border-radius" :sizes="sizes" />
+  <property-row property="border-radius" :label="t('radius')">
+    <length property="border-radius" />
   </property-row>
 </template>
 
@@ -16,14 +16,6 @@ export default Vue.extend({
   components: {
     Length,
     PropertyRow,
-  },
-
-  data(): {
-    sizes: Array<string>;
-  } {
-    return {
-      sizes: ['0', '2', '4', '6', '8', '12', '16', '24'],
-    };
   },
 });
 </script>

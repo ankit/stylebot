@@ -1,34 +1,31 @@
 <template>
-  <property-row :label="t('filter')" last>
-    <div class="filter-control">
+  <div class="filter">
+    <property-row :label="t('filter')">
       <s-segmented-control
         fit
-        :value="type"
+        :value="type === 'none' ? '' : type"
+        placeholder="none"
         :options="options"
         :disabled="disabled"
         @change="select"
       />
+    </property-row>
 
-      <div v-if="type !== 'none'" class="filter-amount-row">
-        <s-slider
-          :value="amount"
-          :min="config.min"
-          :max="config.max"
-          :step="config.step"
-          :disabled="disabled"
-          @input="setAmount"
-        />
-
-        <span class="filter-amount-value">{{ amount }}{{ config.unit }}</span>
-      </div>
-    </div>
-  </property-row>
+    <property-row v-if="type !== 'none'" :label="amountLabel">
+      <s-number-field
+        :unit="config.unit"
+        :value="String(amount)"
+        :disabled="disabled"
+        @input="setAmountText"
+      />
+    </property-row>
+  </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import { t } from '@stylebot/i18n';
-import { SSlider, SSegmentedControl } from '@stylebot/components';
+import { SNumberField, SSegmentedControl } from '@stylebot/components';
 import { getDeclarationValue } from '@stylebot/css';
 
 import PropertyRow from '../basic/PropertyRow.vue';
@@ -56,7 +53,7 @@ export default Vue.extend({
 
   components: {
     PropertyRow,
-    SSlider,
+    SNumberField,
     SSegmentedControl,
   },
 
@@ -92,6 +89,11 @@ export default Vue.extend({
         : FILTER_CONFIG[this.type];
     },
 
+    amountLabel(): string {
+      const option = this.options.find(({ value }) => value === this.type);
+      return t('filter_amount', [option?.label ?? '']);
+    },
+
     disabled(): boolean {
       return !this.$store.state.activeSelector;
     },
@@ -114,6 +116,12 @@ export default Vue.extend({
       });
     },
 
+    setAmountText(text: string): void {
+      const parsed = parseFloat(text);
+      const { default: fallback, max } = this.config;
+      this.setAmount(Number.isNaN(parsed) ? fallback : Math.min(max, parsed));
+    },
+
     setAmount(amount: number): void {
       if (this.type === 'none') {
         return;
@@ -127,35 +135,3 @@ export default Vue.extend({
   },
 });
 </script>
-
-<style lang="scss" scoped>
-.property-row ::v-deep .property-row-label {
-  flex: 0 0 auto;
-}
-
-.property-row ::v-deep .property-row-control {
-  flex: 1;
-  min-width: 0;
-}
-
-.filter-control {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  width: 100%;
-}
-
-.filter-amount-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.filter-amount-value {
-  flex: none;
-  width: 32px;
-  font-family: var(--font-mono);
-  font-size: 13px;
-  color: var(--text-primary);
-}
-</style>

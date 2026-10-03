@@ -1,19 +1,46 @@
 <template>
-  <div class="spacing-control" :class="{ last }">
-    <property-row :label="label" last>
-      <s-segmented-control
-        fit
-        :value="mode"
-        :options="modeOptions"
-        @change="selectMode"
-      />
+  <div class="spacing-control">
+    <property-row :label="label">
+      <div class="spacing-row" :class="`mode-${mode}`">
+        <spacing-field
+          v-for="(field, index) in inlineFields"
+          :key="index"
+          :prefix="field.prefix"
+          :value="field.value"
+          :placeholder="field.placeholder"
+          :disabled="disabled"
+          @input="field.set"
+        />
+
+        <s-select
+          class="spacing-mode"
+          full-width
+          :text="modeText"
+          :disabled="disabled"
+          :menu-min-width="150"
+        >
+          <template #default="{ close }">
+            <s-menu-item
+              v-for="option in modeOptions"
+              :key="option.value"
+              :selected="option.value === mode"
+              @click="
+                selectMode(option.value);
+                close();
+              "
+            >
+              {{ option.label }}
+            </s-menu-item>
+          </template>
+        </s-select>
+      </div>
     </property-row>
 
-    <div v-if="fields.length" class="spacing-grid">
+    <div v-if="mode === 'individual'" class="spacing-grid">
       <spacing-field
         v-for="(field, index) in fields"
         :key="index"
-        :label="t(field.labelKey)"
+        :prefix="field.prefix"
         :value="field.value"
         :placeholder="field.placeholder"
         :disabled="disabled"
@@ -28,7 +55,7 @@ import type { PropType } from 'vue';
 import Vue from 'vue';
 import type { Declaration } from 'postcss';
 import { t } from '@stylebot/i18n';
-import { SSegmentedControl } from '@stylebot/components';
+import { SMenuItem, SSelect } from '@stylebot/components';
 
 import PropertyRow from '../basic/PropertyRow.vue';
 import SpacingField from './SpacingField.vue';
@@ -40,9 +67,9 @@ import {
   resolveSpacingDeclarations,
 } from '../../utils/spacing';
 
-type Mode = 'none' | 'all' | 'xy' | 'individual';
+type Mode = 'all' | 'xy' | 'individual';
 type SpacingFieldConfig = {
-  labelKey: string;
+  prefix: string;
   value: string;
   placeholder: string;
   set: (length: string) => void;
@@ -53,7 +80,8 @@ export default Vue.extend({
 
   components: {
     PropertyRow,
-    SSegmentedControl,
+    SMenuItem,
+    SSelect,
     SpacingField,
   },
 
@@ -69,28 +97,29 @@ export default Vue.extend({
       type: Object as PropType<Sides>,
       required: true,
     },
-
-    // Drops the bottom divider when this is the last control in a card.
-    last: {
-      type: Boolean,
-      default: false,
-    },
   },
 
   data(): { mode: Mode } {
     return {
-      mode: 'none',
+      mode: 'all',
     };
   },
 
   computed: {
     modeOptions(): Array<{ value: Mode; label: string }> {
       return [
-        { value: 'none', label: t('none') },
-        { value: 'all', label: t('all') },
+        { value: 'all', label: t('all_sides') },
         { value: 'xy', label: t('x_and_y') },
         { value: 'individual', label: t('individual') },
       ];
+    },
+
+    modeText(): string {
+      return {
+        all: t('all'),
+        xy: t('x_and_y'),
+        individual: t('sides'),
+      }[this.mode];
     },
 
     disabled(): boolean {
@@ -190,7 +219,7 @@ export default Vue.extend({
         case 'all':
           return [
             {
-              labelKey: 'all',
+              prefix: '',
               value: this.all,
               placeholder: placeholders.all,
               set: this.setAll,
@@ -199,30 +228,32 @@ export default Vue.extend({
         case 'xy':
           return [
             {
-              labelKey: 'vertical',
-              value: this.vertical,
-              placeholder: placeholders.vertical,
-              set: this.setVertical,
-            },
-            {
-              labelKey: 'horizontal',
+              prefix: 'X',
               value: this.horizontal,
               placeholder: placeholders.horizontal,
               set: this.setHorizontal,
             },
+            {
+              prefix: 'Y',
+              value: this.vertical,
+              placeholder: placeholders.vertical,
+              set: this.setVertical,
+            },
           ];
-        case 'individual':
+        default:
           return (['top', 'right', 'bottom', 'left'] as Array<Side>).map(
             side => ({
-              labelKey: side,
+              prefix: t(side).charAt(0).toUpperCase(),
               value: this[side],
               placeholder: placeholders[side],
               set: (length: string) => this.setSide(side, length),
             })
           );
-        default:
-          return [];
       }
+    },
+
+    inlineFields(): Array<SpacingFieldConfig> {
+      return this.mode === 'individual' ? [] : this.fields;
     },
   },
 
@@ -239,10 +270,6 @@ export default Vue.extend({
     deriveMode(): Mode {
       const { top, right, bottom, left } = this;
 
-      if (!top && !right && !bottom && !left) {
-        return 'none';
-      }
-
       if (top === right && right === bottom && bottom === left) {
         return 'all';
       }
@@ -256,10 +283,6 @@ export default Vue.extend({
 
     selectMode(mode: Mode): void {
       this.mode = mode;
-
-      if (mode === 'none') {
-        this.setAll('');
-      }
     },
 
     applySides(sides: Sides): void {
@@ -313,26 +336,29 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-.spacing-control {
-  padding-bottom: 6px;
-  border-bottom: 1px solid
-    color-mix(in srgb, var(--text-primary) 7%, transparent);
+.spacing-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
 
-  &.last {
-    padding-bottom: 2px;
-    border-bottom: none;
-  }
+.spacing-row .spacing-field {
+  width: 76px;
+}
+
+.spacing-row.mode-all .spacing-field {
+  width: 64px;
+}
+
+.spacing-mode {
+  flex: none;
+  width: 84px;
 }
 
 .spacing-grid {
-  display: flex;
-  flex-wrap: wrap;
-  row-gap: 8px;
-  column-gap: 12px;
-  padding-top: 8px;
-}
-
-.spacing-grid ::v-deep .spacing-field {
-  flex: 1 1 120px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+  padding: 2px 0 4px;
 }
 </style>

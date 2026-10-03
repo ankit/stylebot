@@ -1,5 +1,5 @@
 <template>
-  <s-card class="property-card" @keydown.native.esc="onEscape">
+  <div class="property-card" @keydown.esc="onEscape">
     <button
       ref="header"
       type="button"
@@ -30,13 +30,13 @@
         <slot />
       </div>
     </div>
-  </s-card>
+  </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import { ChevronDownIcon } from '@stylebot/icons';
-import { SCard, SCountBadge } from '@stylebot/components';
+import { SCountBadge } from '@stylebot/components';
 
 import { consumeFieldEscape, KEYBOARD_FOCUS } from '@stylebot/utils';
 
@@ -45,7 +45,6 @@ export default Vue.extend({
 
   components: {
     ChevronDownIcon,
-    SCard,
     SCountBadge,
   },
 
@@ -103,7 +102,15 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .property-card {
-  --panel-surface: var(--card-surface);
+  min-width: 0;
+  padding: 0 14px;
+  border-radius: 12px;
+  background: var(--card-surface);
+
+  @include dark-mode {
+    --field-surface: var(--field-surface-hover);
+    --field-surface-hover: var(--field-surface-active);
+  }
 }
 
 .property-card-header {
@@ -112,12 +119,21 @@ export default Vue.extend({
   display: flex;
   align-items: center;
   gap: 8px;
-  width: 100%;
-  padding: 9px 12px;
+  width: calc(100% + 16px);
+  margin: 0 -8px;
+  padding: 12px 8px;
+  position: relative;
   outline: none;
   cursor: pointer;
 
-  @include focus-ring;
+  &:focus-visible::after {
+    content: '';
+    position: absolute;
+    inset: 6px 0;
+    border-radius: 7px;
+    box-shadow: 0 0 0 2px var(--accent);
+    pointer-events: none;
+  }
 }
 
 .property-card-title {
@@ -136,7 +152,7 @@ export default Vue.extend({
   font-weight: 600;
   font-size: 13px;
   line-height: 1;
-  color: var(--text-secondary);
+  color: var(--section-heading);
 }
 
 .property-card-chevron {
@@ -166,10 +182,9 @@ export default Vue.extend({
 .property-card-body {
   min-height: 0;
   min-width: 0;
-  padding: 0 12px 8px;
+  padding: 0 0 12px;
   opacity: 1;
-  transition: padding-bottom 0.24s cubic-bezier(0.4, 0, 0.2, 1),
-    opacity 0.16s ease 0.08s;
+  transition: opacity 0.16s ease 0.08s;
 
   &.clip-while-animating {
     overflow: hidden;
@@ -178,18 +193,11 @@ export default Vue.extend({
   .property-card-collapse.collapsed & {
     padding-bottom: 0;
     opacity: 0;
-    transition: padding-bottom 0.24s cubic-bezier(0.4, 0, 0.2, 1),
-      opacity 0.1s ease;
+    transition: opacity 0.1s ease;
   }
 
   @media (prefers-reduced-motion: reduce) {
     transition: none;
   }
-}
-
-// The final property row in a card drops its divider.
-.property-card ::v-deep .property-row:last-child {
-  padding-bottom: 2px;
-  border-bottom: none;
 }
 </style>

@@ -22,7 +22,9 @@
         transform: bubbleTransform,
       }"
     >
-      <span class="tooltip-text">{{ text }}</span>
+      <span class="tooltip-text">
+        <slot name="text">{{ text }}</slot>
+      </span>
       <s-shortcut-kbd
         v-if="shortcut"
         small
@@ -323,7 +325,7 @@ export default Vue.extend({
   color: var(--text-primary);
   border: 1px solid var(--menu-border);
   box-shadow: 0 2px 6px rgb(0 0 0 / 8%);
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 400;
   line-height: 1.3;
   white-space: nowrap;
