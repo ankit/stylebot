@@ -48,7 +48,7 @@
       "description": "__MSG_toggle_editor__"
     },
     "style": {
-      "suggested_key": { "default": "Alt+Shift+S", "mac": "Alt+Shift+T" },
+      "suggested_key": { "default": "Alt+Shift+S" },
       "description": "__MSG_toggle_styling__"
     },
     "readability": {
