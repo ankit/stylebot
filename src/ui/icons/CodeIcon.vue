@@ -5,11 +5,13 @@
     :height="size"
     fill="none"
     stroke="currentColor"
-    stroke-width="1.6"
+    stroke-width="1.5"
     stroke-linecap="round"
     stroke-linejoin="round"
   >
-    <path d="M5.5 4 2 8l3.5 4M10.5 4 14 8l-3.5 4" />
+    <path
+      d="M5.5 2.5c-1.5 0-2 .7-2 2v1.6c0 .9-.5 1.4-1.5 1.9 1 .5 1.5 1 1.5 1.9v1.6c0 1.3.5 2 2 2M10.5 2.5c1.5 0 2 .7 2 2v1.6c0 .9.5 1.4 1.5 1.9-1 .5-1.5 1-1.5 1.9v1.6c0 1.3-.5 2-2 2"
+    />
   </svg>
 </template>
 

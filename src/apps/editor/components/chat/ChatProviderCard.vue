@@ -23,7 +23,7 @@
       <div v-if="provider.connected" class="chat-provider-card-actions">
         <s-text
           as="a"
-          size="caption"
+          size="label"
           variant="primary"
           class="chat-provider-card-usage"
           :href="info.usageUrl"
@@ -35,7 +35,7 @@
         <s-text
           as="button"
           type="button"
-          size="caption"
+          size="label"
           class="chat-provider-card-remove"
           @click.native="remove"
         >
@@ -203,7 +203,6 @@ export default Vue.extend({
 }
 
 .chat-provider-card-actions .chat-provider-card-usage {
-  font-weight: 500;
   text-decoration: none;
 
   &:hover {
@@ -215,7 +214,6 @@ export default Vue.extend({
 
 .chat-provider-card-actions .chat-provider-card-remove {
   padding: 0;
-  font-weight: 500;
   border: 0;
   background: none;
   font-family: inherit;

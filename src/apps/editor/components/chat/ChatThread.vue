@@ -101,8 +101,9 @@ export default Vue.extend({
   overflow: auto;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 16px 16px 12px;
+  gap: 8px;
+  padding: 20px 8px 24px 16px;
+  scrollbar-gutter: stable;
 
   @include thin-scrollbar;
 }
@@ -112,7 +113,15 @@ export default Vue.extend({
 }
 
 .chat-reply + .chat-user-message {
-  margin-top: 10px;
+  margin-top: 20px;
+}
+
+.chat-user-message + .chat-reply {
+  margin-top: 8px;
+}
+
+.chat-thread > .chat-pending {
+  margin-top: 8px;
 }
 
 .chat-empty {

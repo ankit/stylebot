@@ -80,7 +80,7 @@ export default Vue.extend({
   background: transparent;
 
   &::placeholder {
-    color: var(--text-faint);
+    color: var(--field-placeholder);
   }
 }
 </style>

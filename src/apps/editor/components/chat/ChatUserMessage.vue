@@ -41,11 +41,11 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .chat-user-message {
   align-self: flex-end;
-  max-width: 84%;
+  max-width: 76%;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 4px;
+  gap: 6px;
 }
 
 .chat-user-scope {
@@ -53,7 +53,7 @@ export default Vue.extend({
 
   max-width: 100%;
   box-sizing: border-box;
-  padding: 0 2px;
+  padding: 0 4px;
   font-family: var(--font-mono);
   font-size: 11px;
   line-height: 1.3;
@@ -61,24 +61,24 @@ export default Vue.extend({
 }
 
 .chat-user-image {
-  width: 120px;
-  height: 80px;
+  width: 140px;
+  height: 84px;
   box-sizing: border-box;
   border: 1px solid var(--field-border);
-  border-radius: 6px;
+  border-radius: 8px;
   object-fit: cover;
   object-position: top left;
 }
 
 .chat-user-message .chat-user-text {
-  padding: 7px 11px;
+  padding: 9px 13px;
   font-size: 14px;
   border: 1px solid
     color-mix(in srgb, var(--text-primary) 9%, var(--tab-surface));
-  border-radius: 16px;
+  border-radius: 14px;
   background: color-mix(in srgb, var(--text-primary) 6%, var(--tab-surface));
-  color: var(--text-body);
-  line-height: 1.5;
+  color: var(--text-primary);
+  line-height: 1.45;
   text-wrap: pretty;
   overflow-wrap: anywhere;
 }

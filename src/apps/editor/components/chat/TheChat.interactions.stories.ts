@@ -32,10 +32,10 @@ const openModelMenu = async (canvas: Canvas): Promise<HTMLElement> => {
   return findOpenMenu(canvas);
 };
 
-// The latest reply's card, whose buttons only show on hover.
+// The latest reply's card.
 const replyCard = async (canvas: Canvas): Promise<Canvas> =>
   within(
-    (await canvas.findByText(/lines of CSS/)).closest(
+    (await canvas.findByText(/^(Added|Removed) 4 lines$/)).closest(
       '.chat-change'
     ) as HTMLElement
   );
@@ -77,7 +77,7 @@ export const ConnectsWithAKey: StoryObj = {
 
 export const RepliesAndApplies: StoryObj = {
   ...chat({ connected: ['anthropic'] }),
-  name: 'a message streams a reply whose CSS lands in the stylesheet, with a card counting its lines',
+  name: 'a message streams a reply whose CSS lands in the stylesheet, with a line counting its CSS',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
@@ -86,7 +86,7 @@ export const RepliesAndApplies: StoryObj = {
 
     await canvas.findByText('Make the text easier to read');
     await canvas.findByText(/Bumped the article text up a size/);
-    await canvas.findByText('Added 4 lines of CSS');
+    await canvas.findByRole('button', { name: 'Added 4 lines' });
     await expect(store.state.css).toContain('font-size: 18px');
     await expect(store.state.css).toContain('line-height: 1.8');
   },
@@ -102,11 +102,14 @@ export const UndoesAndReapplies: StoryObj = {
     const card = await replyCard(canvas);
 
     await user.click(card.getByRole('button', { name: 'Undo' }));
-    await canvas.findByText('Removed 4 lines of CSS');
+    await card.findByRole('button', { name: 'Reapply' });
+    await expect(
+      canvas.getByText('Removed 4 lines').closest('.chat-change')
+    ).toHaveClass('undone');
     await waitFor(() => expect(store.state.css).not.toContain('18px'));
 
     await user.click(card.getByRole('button', { name: 'Reapply' }));
-    await canvas.findByText('Added 4 lines of CSS');
+    await card.findByRole('button', { name: 'Undo' });
     await waitFor(() => expect(store.state.css).toContain('font-size: 18px'));
   },
 };
@@ -361,13 +364,13 @@ export const AttachesAnImage: StoryObj = {
 
 export const ShowsTheCode: StoryObj = {
   ...chatWithThread(),
-  name: 'Code on a reply opens the Code tab without changing the picked element',
+  name: 'clicking a reply’s change row opens the Code tab without changing the picked element',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
 
     const card = await replyCard(canvas);
-    await user.click(card.getByRole('button', { name: 'Code' }));
+    await user.click(card.getByRole('button', { name: 'Added 4 lines' }));
 
     await waitFor(() => expect(store.state.options.mode).toBe('code'));
     await expect(store.state.activeSelector).toBe('');
