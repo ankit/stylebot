@@ -137,6 +137,33 @@ test('the side panel is set up on every tab while it is the chosen position', as
   await expect.poll(panelOptions).toMatchObject({ enabled: false });
 });
 
+test('the side panel opens with the inspector on', async ({
+  context,
+  extension,
+  openPopup,
+}) => {
+  await dockToSidePanel(extension);
+
+  const page = await context.newPage();
+  await page.goto(`${baseUrl}/`);
+  const panel = await openSidePanel(page, context, extension, openPopup);
+
+  await expect
+    .poll(() =>
+      panel.evaluate(`!!document.querySelector('.stylebot-inspector.active')`)
+    )
+    .toBe(true);
+
+  await page.locator('h1').click({ force: true });
+  await expect
+    .poll(() =>
+      panel.evaluate(
+        `document.querySelector('.autocomplete-chips .part')?.textContent.trim()`
+      )
+    )
+    .toMatch(/h1$/);
+});
+
 test('moving from the side panel to a window closes the panel', async ({
   context,
   extension,

@@ -92,7 +92,10 @@ const start = async (): Promise<void> => {
 
   await bridge.connect();
   await store.dispatch('initialize');
-  await store.dispatch('openStylebot', { inspect: false });
+  // A context-menu pick arrives with the connection and is already chosen.
+  await store.dispatch('openStylebot', {
+    inspect: host === 'sidepanel' && !store.state.activeSelector,
+  });
 
   if (host === 'window') {
     initWindowListeners(store);
