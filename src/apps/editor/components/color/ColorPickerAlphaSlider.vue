@@ -37,7 +37,7 @@ export default Vue.extend({
   computed: {
     trackBackground(): string {
       const { r, g, b } = tinycolor(this.color).toRgb();
-      return `linear-gradient(to right, rgba(${r}, ${g}, ${b}, 0), ${this.color}), repeating-conic-gradient(#e6e8ed 0% 25%, #fff 0% 50%) 0 / 10px 10px`;
+      return `linear-gradient(to right, rgba(${r}, ${g}, ${b}, 0), ${this.color}), repeating-conic-gradient(var(--field-surface-active) 0% 25%, var(--field-surface) 0% 50%) 0 / 8px 8px`;
     },
   },
 });
@@ -55,7 +55,7 @@ export default Vue.extend({
 .range {
   flex: 1;
   min-width: 0;
-  height: 20px;
+  height: 16px;
   margin: 0;
   appearance: none;
   -webkit-appearance: none;
@@ -63,8 +63,8 @@ export default Vue.extend({
   cursor: pointer;
 
   &::-webkit-slider-runnable-track {
-    height: 11px;
-    border-radius: 6px;
+    height: 8px;
+    border-radius: 4px;
     @include picker-track-edge;
     background: var(--track-background);
   }
@@ -78,8 +78,8 @@ export default Vue.extend({
   }
 
   &::-moz-range-track {
-    height: 11px;
-    border-radius: 6px;
+    height: 8px;
+    border-radius: 4px;
     @include picker-track-edge;
     background: var(--track-background);
   }

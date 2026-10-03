@@ -171,7 +171,7 @@ export default Vue.extend({
       this.$nextTick(() => {
         this.positionPopover();
 
-        // Content height varies by tab, so re-clamp on any resize, not just at open.
+        // The custom picker folds in and out, so re-clamp on any resize, not just at open.
         const popover = this.$refs.popover as HTMLElement | undefined;
         if (popover) {
           this.popoverResizeObserver = new ResizeObserver(() =>
@@ -207,7 +207,7 @@ export default Vue.extend({
         return;
       }
 
-      // A dropdown inside the popover (e.g. the palette search) is open —
+      // A dropdown inside the popover (e.g. the palette menu) is open —
       // its own Escape handler closes it; leave the picker alone.
       const popover = this.$refs.popover as HTMLElement | undefined;
       if (popover?.querySelector('.anchored-menu-panel')) {
@@ -277,6 +277,8 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
+@import './color-picker-mixins';
+
 .color-picker {
   position: relative;
   pointer-events: all;
@@ -320,13 +322,7 @@ export default Vue.extend({
     color-mix(in srgb, var(--text-primary) 12%, transparent);
 
   &.empty {
-    background: repeating-linear-gradient(
-      -45deg,
-      transparent,
-      transparent 4px,
-      color-mix(in srgb, var(--text-primary) 20%, transparent) 4px,
-      color-mix(in srgb, var(--text-primary) 20%, transparent) 5px
-    );
+    @include empty-swatch;
   }
 
   @include focus-ring;

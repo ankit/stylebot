@@ -1,73 +1,84 @@
 <template>
-  <div class="color-picker-popover">
+  <div class="color-picker-popover" role="dialog" :aria-label="roleLabel">
     <color-picker-header
       :value="value"
       :role-label="roleLabel"
-      @input="commit"
+      @input="setColor"
+      @commit="commit"
       @clear="setColor('')"
     />
 
-    <color-picker-tabs
-      :value="activeTab"
-      :first-tab-label="firstTabLabel"
-      :first-tab-disabled="firstTabDisabled"
-      @change="setTab"
+    <color-picker-custom
+      v-if="customOpen"
+      :value="value"
+      @input="setColor"
+      @commit="commit"
     />
 
-    <div class="tab-content">
-      <color-picker-first-tab
-        v-if="activeTab === 'already-used'"
-        :colors="firstTabColors"
-        :recent-colors="recentColors"
-        :value="value"
-        @select="commit"
-      />
+    <color-picker-swatch-group
+      class="page-colors"
+      :label="t('on_this_page')"
+      :colors="pageColors"
+      :value="value"
+      @select="commit"
+    >
+      <button
+        type="button"
+        class="custom-toggle"
+        :class="{ open: customOpen }"
+        :title="t('custom_color')"
+        :aria-label="t('custom_color')"
+        :aria-expanded="customOpen ? 'true' : 'false'"
+        @click="customOpen = !customOpen"
+      >
+        <plus-icon :size="12" />
+      </button>
+    </color-picker-swatch-group>
 
-      <color-picker-palette
-        v-else-if="activeTab === 'palette'"
-        :value="value"
-        @select="commit"
-      />
+    <color-picker-swatch-group
+      v-if="recentColors.length"
+      class="recent-colors"
+      :label="t('color_picker_recent')"
+      :colors="recentColors"
+      :value="value"
+      @select="commit"
+    />
 
-      <color-picker-custom
-        v-else
-        :value="value"
-        @input="setColor"
-        @commit="commit"
-      />
-    </div>
-
-    <color-picker-footer :value="value" @input="setColor" @commit="commit" />
+    <color-picker-palette :value="value" @select="commit" />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
+import tinycolor from 'tinycolor2';
+import { PlusIcon } from '@stylebot/icons';
 import type { RoleColorGroups } from '@stylebot/css';
+import { getPageBridge } from '@stylebot/page-bridge';
 
 import ColorPickerHeader from './ColorPickerHeader.vue';
-import ColorPickerTabs from './ColorPickerTabs.vue';
-import ColorPickerFirstTab from './ColorPickerFirstTab.vue';
-import ColorPickerPalette from './ColorPickerPalette.vue';
 import ColorPickerCustom from './ColorPickerCustom.vue';
-import ColorPickerFooter from './ColorPickerFooter.vue';
-import { getPageBridge } from '@stylebot/page-bridge';
+import ColorPickerSwatchGroup from './ColorPickerSwatchGroup.vue';
+import ColorPickerPalette from './ColorPickerPalette.vue';
 import { getRecentColors, addRecentColor } from '../../utils/chrome';
+import { tinycolorToCssColor, uniqueColors } from '../../utils/hsv-color';
 
-type Tab = 'already-used' | 'palette' | 'custom';
+// Two rows of swatches, leaving the last slot for the custom color toggle.
+const PAGE_COLORS_CAP = 15;
 
-const EMPTY_COLORS: RoleColorGroups = { text: [], surface: [], total: 0 };
+const flatten = (groups: RoleColorGroups): Array<string> => [
+  ...groups.text,
+  ...groups.surface,
+];
 
 export default Vue.extend({
   name: 'ColorPickerPopover',
 
   components: {
+    PlusIcon,
     ColorPickerHeader,
-    ColorPickerTabs,
-    ColorPickerFirstTab,
-    ColorPickerPalette,
     ColorPickerCustom,
-    ColorPickerFooter,
+    ColorPickerSwatchGroup,
+    ColorPickerPalette,
   },
 
   props: {
@@ -83,60 +94,30 @@ export default Vue.extend({
   },
 
   data(): {
-    activeTab: Tab;
-    alreadyUsedColors: RoleColorGroups;
-    pageColors: RoleColorGroups;
+    customOpen: boolean;
+    pageColors: Array<string>;
     recentColors: Array<string>;
     lastCommittedColor: string;
   } {
     return {
-      activeTab: 'already-used',
+      customOpen: false,
       // A snapshot, not a live getter — must not reshuffle while the user is still picking.
-      alreadyUsedColors: EMPTY_COLORS,
-      pageColors: EMPTY_COLORS,
+      pageColors: [],
       recentColors: [],
       lastCommittedColor: '',
     };
   },
 
-  computed: {
-    firstTabSource(): 'rules' | 'page' {
-      return this.alreadyUsedColors.total > 0 ? 'rules' : 'page';
-    },
-
-    firstTabColors(): RoleColorGroups {
-      return this.firstTabSource === 'rules'
-        ? this.alreadyUsedColors
-        : this.pageColors;
-    },
-
-    firstTabDisabled(): boolean {
-      return this.firstTabColors.total === 0 && this.recentColors.length === 0;
-    },
-
-    firstTabLabel(): string {
-      return this.firstTabSource === 'rules'
-        ? this.t('color_picker_tab_your_colors')
-        : this.t('color_picker_tab_page_colors');
-    },
-  },
-
   async created() {
-    this.alreadyUsedColors = this.$store.getters.alreadyUsedColors;
-
-    if (this.alreadyUsedColors.total === 0) {
-      this.pageColors = await getPageBridge().getPageColors();
-    }
-
-    const lastTab = this.$store.state.options.lastColorPickerTab as Tab;
-    const canRestoreLastTab =
-      lastTab !== 'already-used' || !this.firstTabDisabled;
-
-    this.activeTab = canRestoreLastTab ? lastTab : 'custom';
+    const usedColors = flatten(this.$store.getters.alreadyUsedColors);
+    this.pageColors = this.capped(usedColors);
 
     getRecentColors().then(colors => {
       this.recentColors = colors;
     });
+
+    const pageColors = flatten(await getPageBridge().getPageColors());
+    this.pageColors = this.capped([...usedColors, ...pageColors]);
   },
 
   beforeDestroy() {
@@ -147,9 +128,17 @@ export default Vue.extend({
   },
 
   methods: {
-    setTab(tab: Tab): void {
-      this.activeTab = tab;
-      this.$store.dispatch('setLastColorPickerTab', tab);
+    /**
+     * Dedupes the colors and spells each as hex where it can, since the
+     * page reports its own as rgb().
+     */
+    capped(colors: Array<string>): Array<string> {
+      return uniqueColors(colors)
+        .slice(0, PAGE_COLORS_CAP)
+        .map(color => {
+          const parsed = tinycolor(color);
+          return parsed.isValid() ? tinycolorToCssColor(parsed) : color;
+        });
     },
 
     setColor(color: string): void {
@@ -166,11 +155,41 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .color-picker-popover {
-  width: 344px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 268px;
+  padding: 12px;
   background: var(--menu-surface);
   border: 1px solid var(--menu-border);
-  border-radius: 13px;
-  box-shadow: 0 18px 44px var(--menu-shadow);
-  // No overflow: hidden — the Palette tab's search dropdown needs to extend past this box.
+  border-radius: 11px;
+  box-shadow: 0 14px 32px var(--menu-shadow);
+}
+
+.custom-toggle {
+  @include button-reset;
+
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 6px;
+  box-shadow: inset 0 0 0 1px var(--field-border);
+  color: var(--icon-color);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--field-ink);
+  }
+
+  &.open {
+    background: var(--field-surface-hover);
+    color: var(--field-ink);
+  }
+
+  @include focus-ring(2px);
 }
 </style>

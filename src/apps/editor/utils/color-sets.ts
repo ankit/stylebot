@@ -1,39 +1,26 @@
-export type ColorRamp = {
-  // An i18n key (see @stylebot/i18n's t()), not display text — translate at
-  // the point of render.
-  labelKey: string;
-  colors: Array<string>;
-};
-
-// Two ramps, warm and cool, eight steps each from paper to ink — the set
+// Two ramps, warm then cool, eight steps each from paper to ink — the set
 // that opens when nothing is remembered.
-export const neutralRamps: Array<ColorRamp> = [
-  {
-    labelKey: 'color_picker_ramp_warm',
-    colors: [
-      '#ffffff',
-      '#f7f5f2',
-      '#eae7e1',
-      '#d6d1c8',
-      '#b3aca0',
-      '#7d7669',
-      '#4b463d',
-      '#221f1a',
-    ],
-  },
-  {
-    labelKey: 'color_picker_ramp_cool',
-    colors: [
-      '#ffffff',
-      '#f5f7fa',
-      '#e6eaf0',
-      '#d2d8e2',
-      '#a7b0be',
-      '#6f7987',
-      '#414a56',
-      '#171b21',
-    ],
-  },
+export const neutralRamps: Array<Array<string>> = [
+  [
+    '#ffffff',
+    '#f7f5f2',
+    '#eae7e1',
+    '#d6d1c8',
+    '#b3aca0',
+    '#7d7669',
+    '#4b463d',
+    '#221f1a',
+  ],
+  [
+    '#ffffff',
+    '#f5f7fa',
+    '#e6eaf0',
+    '#d2d8e2',
+    '#a7b0be',
+    '#6f7987',
+    '#414a56',
+    '#171b21',
+  ],
 ];
 
 // Eight hues per column, five lightnesses per row, row 1 lightest to row 5 darkest.

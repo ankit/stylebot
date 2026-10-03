@@ -1,5 +1,5 @@
 <template>
-  <div class="custom-tab">
+  <div class="custom">
     <color-picker-sv-square
       :saturation="hsva.s"
       :value="hsva.v"
@@ -117,10 +117,9 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-.custom-tab {
+.custom {
   display: flex;
   flex-direction: column;
-  gap: 11px;
-  padding: 12px 14px 6px;
+  gap: 10px;
 }
 </style>

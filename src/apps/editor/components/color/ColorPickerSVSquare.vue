@@ -105,17 +105,18 @@ export default Vue.extend({
 
 .sv-square {
   position: relative;
-  height: 132px;
-  border-radius: 9px;
+  height: 120px;
+  border-radius: 7px;
   @include picker-track-edge;
   cursor: crosshair;
   touch-action: none;
 }
 
 .thumb {
+  @include picker-thumb;
+
   position: absolute;
-  margin: -7.5px 0 0 -7.5px;
-  @include picker-thumb(9px);
+  margin: -6px 0 0 -6px;
   pointer-events: none;
 }
 </style>
