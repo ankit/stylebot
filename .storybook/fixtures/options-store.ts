@@ -51,7 +51,6 @@ const NOOP_ACTIONS = [
   'disableStyle',
   'enableAllStyles',
   'disableAllStyles',
-  'setOption',
 ];
 
 const noop = () => undefined;
@@ -143,6 +142,19 @@ const actions: ActionTree<OptionsState, OptionsState> = {
 
   setActiveProfile({ state }, { url, id }: { url: string; id: string }) {
     editStyle(state, url, style => activateProfile(style, id));
+  },
+
+  setOption(
+    { state },
+    {
+      name,
+      value,
+    }: {
+      name: keyof StylebotOptions;
+      value: StylebotOptions[keyof StylebotOptions];
+    }
+  ) {
+    state.options = { ...(state.options as StylebotOptions), [name]: value };
   },
 
   dismissSyncConflict({ state }, url: string) {
