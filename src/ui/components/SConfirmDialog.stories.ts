@@ -36,3 +36,18 @@ export const Playground = playground(
   </div>
 `
 );
+
+export const Contained = playground(
+  { SConfirmDialog },
+  `
+  <div style="position: relative; width: 396px; height: 600px; border: 1px solid var(--panel-border); border-radius: 14px">
+    <s-confirm-dialog
+      contained
+      :title="title"
+      :message="message"
+      :confirm-label="confirmLabel"
+      :cancel-label="cancelLabel"
+    />
+  </div>
+`
+);

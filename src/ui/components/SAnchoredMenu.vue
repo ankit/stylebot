@@ -30,6 +30,13 @@ export default Vue.extend({
   name: 'SAnchoredMenu',
 
   props: {
+    // Emits escape instead of closing, for content that backs out of
+    // something first, e.g. a field cancelling an edit in place.
+    keepOpenOnEscape: {
+      type: Boolean,
+      default: false,
+    },
+
     // For combobox-style triggers (a text input), keep focus in the trigger
     // when the menu opens instead of moving it to the first item.
     retainFocus: {
@@ -230,6 +237,12 @@ export default Vue.extend({
     onDocKeydown(event: KeyboardEvent): void {
       if (event.key === 'Escape') {
         event.stopPropagation();
+
+        if (this.keepOpenOnEscape) {
+          this.$emit('escape');
+          return;
+        }
+
         this.$emit('cancel', 'escape');
         this.close();
         return;
