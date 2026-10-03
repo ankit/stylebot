@@ -2,6 +2,8 @@
   <segmented
     :prev-disabled="widthIndex === 0"
     :next-disabled="widthIndex === WIDTHS.length - 1"
+    :prev-label="t('decrease_width')"
+    :next-label="t('increase_width')"
     @prev="pickPrev"
     @next="pickNext"
   >

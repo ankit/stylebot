@@ -1,7 +1,11 @@
 <template>
   <s-anchored-menu>
     <template #trigger="{ toggle }">
-      <icon-menu-trigger :size="38" title="More actions" @click="toggle" />
+      <icon-menu-trigger
+        :size="38"
+        :title="t('more_actions')"
+        @click="toggle"
+      />
     </template>
 
     <template #default="{ close }">
@@ -12,7 +16,7 @@
             close();
           "
         >
-          Enable all
+          {{ t('enable_all_styles') }}
         </s-menu-item>
 
         <s-menu-item
@@ -21,7 +25,7 @@
             close();
           "
         >
-          Disable all
+          {{ t('disable_all_styles') }}
         </s-menu-item>
 
         <div class="divider" />
@@ -33,7 +37,7 @@
             close();
           "
         >
-          Delete all styles
+          {{ t('delete_all_styles') }}
         </s-menu-item>
       </s-menu>
     </template>

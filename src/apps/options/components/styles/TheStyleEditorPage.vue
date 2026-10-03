@@ -1,7 +1,7 @@
 <template>
   <div class="editor-page">
     <div class="editor-header">
-      <s-icon-button class="back" title="Back" @click="attemptLeave">
+      <s-icon-button class="back" :title="t('back')" @click="attemptLeave">
         <chevron-left-icon />
       </s-icon-button>
 

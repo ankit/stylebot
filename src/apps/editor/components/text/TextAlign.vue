@@ -29,9 +29,17 @@ export default Vue.extend({
   } {
     return {
       options: [
-        { title: 'Align Left', value: 'left', icon: AlignLeftIcon },
-        { title: 'Align Center', value: 'center', icon: AlignCenterIcon },
-        { title: 'Align Right', value: 'right', icon: AlignRightIcon },
+        { title: this.t('align_left'), value: 'left', icon: AlignLeftIcon },
+        {
+          title: this.t('align_center'),
+          value: 'center',
+          icon: AlignCenterIcon,
+        },
+        {
+          title: this.t('align_right'),
+          value: 'right',
+          icon: AlignRightIcon,
+        },
       ],
     };
   },

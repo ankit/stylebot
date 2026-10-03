@@ -4,7 +4,7 @@
       <icon-menu-trigger
         :size="size"
         :bordered="false"
-        title="More actions"
+        :title="t('more_actions')"
         @click="toggle"
       />
     </template>
@@ -18,7 +18,7 @@
             close();
           "
         >
-          Open {{ url }}
+          {{ t('open_url', [url]) }}
         </s-menu-item>
 
         <s-menu-item
@@ -27,7 +27,7 @@
             close();
           "
         >
-          Copy CSS
+          {{ t('copy_css') }}
         </s-menu-item>
 
         <div class="divider" />
@@ -39,7 +39,7 @@
             close();
           "
         >
-          Delete this site's style
+          {{ t('delete_this_sites_style') }}
         </s-menu-item>
       </s-menu>
     </template>

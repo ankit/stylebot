@@ -6,6 +6,8 @@
       class="swatch"
       :class="{ selected: themeOption.value === theme }"
       :style="{ background: themeOption.bg }"
+      :title="themeOption.label"
+      :aria-label="themeOption.label"
       @click="$emit('pick', themeOption.value)"
     />
   </div>
@@ -32,9 +34,21 @@ export default Vue.extend({
   computed: {
     themeList(): Array<{ value: ReadabilityTheme; label: string; bg: string }> {
       return [
-        { value: 'light', label: 'Light', bg: THEME_BACKGROUNDS.light },
-        { value: 'sepia', label: 'Sepia', bg: THEME_BACKGROUNDS.sepia },
-        { value: 'dark', label: 'Dark', bg: THEME_BACKGROUNDS.dark },
+        {
+          value: 'light',
+          label: this.t('light_theme'),
+          bg: THEME_BACKGROUNDS.light,
+        },
+        {
+          value: 'sepia',
+          label: this.t('sepia_theme'),
+          bg: THEME_BACKGROUNDS.sepia,
+        },
+        {
+          value: 'dark',
+          label: this.t('dark_theme'),
+          bg: THEME_BACKGROUNDS.dark,
+        },
       ];
     },
   },

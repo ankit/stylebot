@@ -1,5 +1,6 @@
 // Cross-checks src/assets/_locales/*.config against how message keys are referenced
-// from source. Exits 1 on errors; missing translations are warnings only.
+// from source, and flags user-facing text written straight into components.
+// Exits 1 on any error, a missing translation included.
 
 import { readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
@@ -8,6 +9,7 @@ import { createRequire } from 'node:module';
 
 const require = createRequire(import.meta.url);
 const { parseLocaleConfig } = require('./lib/parse-locale-config.js');
+const { parseComponent, compile } = require('vue-template-compiler');
 
 const rootDir = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -18,6 +20,27 @@ const srcDir = path.join(rootDir, 'src');
 const manifestPath = path.join(rootDir, 'src/assets/manifest/manifest.json');
 
 const KEY_PATTERN = /^[a-z][a-z0-9_]*$/;
+
+// Kept for use outside the extension: the Chrome Web Store listing.
+const UNREFERENCED_KEYS = new Set(['store_listing', 'privacy_policy']);
+
+// Attributes and script properties whose value a user reads.
+const TEXT_ATTRIBUTES = new Set([
+  'title',
+  'placeholder',
+  'aria-label',
+  'alt',
+  'label',
+]);
+const TEXT_PROPERTY =
+  /\b(?:label|title|text|placeholder|tooltip|ariaLabel)\s*:\s*'([A-Z][^']*)'/g;
+
+// Literals that read the same in every language: the name, a typography
+// glyph, an example domain and a CSS keyword.
+const UNTRANSLATED_TEXT = new Set(['Stylebot', 'Aa', 'example.com', 'none']);
+
+const isText = value =>
+  /[A-Za-z]{2,}/.test(value) && !UNTRANSLATED_TEXT.has(value.trim());
 
 // Returns a call's first argument text, e.g. `a ? 'x' : 'y'` for `t(a ? 'x' : 'y', [z])`.
 function extractFirstArg(text, startIdx) {
@@ -76,9 +99,27 @@ function walk(dir) {
     .filter(p => /\.(ts|vue)$/.test(p));
 }
 
+// A key built in a template literal, e.g. t(`${verb}_one_line`), as a pattern
+// matching every key it can build.
+function templatePatterns(text) {
+  return [...text.matchAll(/\bt\(\s*`([^`]*)`/g)].map(
+    ([, template]) =>
+      new RegExp(
+        `^${template
+          .split(/\$\{[^}]*\}/)
+          .map(part => part.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+          .join('[a-z0-9_]+')}$`
+      )
+  );
+}
+
 function collectUsedKeys() {
   const usedKeys = new Set();
   const dynamicCalls = [];
+  // Every quoted key-like string, since keys passed through variables
+  // (`labelKey: 'toggle_editor'`) are written somewhere as literals.
+  const quoted = new Set();
+  const patterns = [];
 
   for (const file of walk(srcDir)) {
     const text = readFileSync(file, 'utf8');
@@ -88,6 +129,10 @@ function collectUsedKeys() {
     found.dynamicCalls.forEach(call =>
       dynamicCalls.push(`${path.relative(rootDir, file)}: ${call}`)
     );
+    [...text.matchAll(/['"`]([a-z][a-z0-9_]*)['"`]/g)].forEach(m =>
+      quoted.add(m[1])
+    );
+    patterns.push(...templatePatterns(text));
   }
 
   const manifest = readFileSync(manifestPath, 'utf8');
@@ -96,7 +141,73 @@ function collectUsedKeys() {
     usedKeys.add(m[1])
   );
 
-  return { usedKeys, dynamicCalls };
+  const isReferenced = key =>
+    usedKeys.has(key) ||
+    quoted.has(key) ||
+    patterns.some(pattern => pattern.test(key));
+
+  return { usedKeys, dynamicCalls, isReferenced };
+}
+
+// Text in a component template that skips t(): static text between tags,
+// and static attributes a user reads.
+function templateText(template) {
+  const found = [];
+  const { ast } = compile(template, { whitespace: 'condense' });
+
+  const visit = node => {
+    if (!node) {
+      return;
+    }
+
+    if (node.type === 3 && !node.isComment && isText(node.text)) {
+      found.push(node.text.trim());
+    }
+
+    if (node.type === 2) {
+      node.tokens
+        .filter(token => typeof token === 'string' && isText(token))
+        .forEach(token => found.push(token.trim()));
+    }
+
+    if (node.type === 1) {
+      node.attrsList
+        .filter(attr => TEXT_ATTRIBUTES.has(attr.name) && isText(attr.value))
+        .forEach(attr => found.push(`${attr.name}="${attr.value}"`));
+      node.children.forEach(visit);
+      (node.ifConditions ?? [])
+        .filter(condition => condition.block !== node)
+        .forEach(condition => visit(condition.block));
+      Object.values(node.scopedSlots ?? {}).forEach(visit);
+    }
+  };
+
+  visit(ast);
+
+  return found;
+}
+
+function collectHardcodedText() {
+  const found = [];
+
+  for (const file of walk(srcDir).filter(p => p.endsWith('.vue'))) {
+    const { template, script } = parseComponent(readFileSync(file, 'utf8'));
+    const relative = path.relative(rootDir, file);
+
+    if (template) {
+      templateText(template.content).forEach(text =>
+        found.push(`${relative}: ${text}`)
+      );
+    }
+
+    if (script) {
+      [...script.content.matchAll(TEXT_PROPERTY)]
+        .filter(([, value]) => isText(value))
+        .forEach(([match]) => found.push(`${relative}: ${match}`));
+    }
+  }
+
+  return found;
 }
 
 function placeholderNames(message) {
@@ -130,7 +241,6 @@ function main() {
   }
 
   const errors = [];
-  const warnings = [];
 
   // Duplicate @key within a single file (silently dropped by the build).
   for (const [locale, { duplicateKeys }] of Object.entries(parsedByLocale)) {
@@ -140,7 +250,7 @@ function main() {
   }
 
   // Keys referenced from source but missing from the base locale.
-  const { usedKeys, dynamicCalls } = collectUsedKeys();
+  const { usedKeys, dynamicCalls, isReferenced } = collectUsedKeys();
 
   usedKeys.forEach(key => {
     if (!(key in baseMessages)) {
@@ -149,6 +259,18 @@ function main() {
       );
     }
   });
+
+  // Keys nothing references, which would otherwise linger untranslated.
+  Object.keys(baseMessages)
+    .filter(key => !UNREFERENCED_KEYS.has(key) && !isReferenced(key))
+    .forEach(key =>
+      errors.push(`"${key}" in ${baseLocale}.config is never referenced`)
+    );
+
+  // User-facing text written into a component instead of a locale.
+  collectHardcodedText().forEach(text =>
+    errors.push(`hardcoded text, use t(): ${text}`)
+  );
 
   // Per-locale: orphan keys, missing translations, placeholder mismatches.
   for (const [locale, { messages }] of Object.entries(parsedByLocale)) {
@@ -166,7 +288,7 @@ function main() {
 
     for (const key of Object.keys(baseMessages)) {
       if (!(key in messages)) {
-        warnings.push(`${locale}.config: missing translation for "@${key}"`);
+        errors.push(`${locale}.config: missing translation for "@${key}"`);
         continue;
       }
 
@@ -192,12 +314,6 @@ function main() {
       `Skipped ${dynamicCalls.length} dynamic (non-literal) key reference(s), not statically checkable:`
     );
     dynamicCalls.forEach(call => console.log(`  - ${call}`));
-    console.log('');
-  }
-
-  if (warnings.length > 0) {
-    console.log(`${warnings.length} warning(s):`);
-    warnings.forEach(w => console.log(`  - ${w}`));
     console.log('');
   }
 

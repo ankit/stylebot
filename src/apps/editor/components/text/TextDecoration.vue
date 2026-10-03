@@ -24,21 +24,21 @@ export default Vue.extend({
     return {
       options: [
         {
-          title: 'Underline',
+          title: this.t('underline'),
           html: '<span style="text-decoration: underline">U</span>',
           value: 'underline',
         },
         {
-          title: 'Strikethrough',
+          title: this.t('strikethrough'),
           html: '<span style="text-decoration: line-through">S</span>',
           value: 'line-through',
         },
         {
-          title: 'Overline',
+          title: this.t('overline'),
           html: '<span style="text-decoration: overline">A</span>',
           value: 'overline',
         },
-        { title: 'None', html: 'None', value: 'none' },
+        { title: this.t('none'), html: this.t('none'), value: 'none' },
       ],
     };
   },

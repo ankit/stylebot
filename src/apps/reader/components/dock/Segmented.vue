@@ -3,6 +3,8 @@
     <button
       :disabled="prevDisabled"
       :class="{ active: prevActive }"
+      :title="prevLabel || undefined"
+      :aria-label="prevLabel || undefined"
       @click="$emit('prev')"
     >
       <slot name="prev" />
@@ -10,6 +12,8 @@
     <button
       :disabled="nextDisabled"
       :class="{ active: nextActive }"
+      :title="nextLabel || undefined"
+      :aria-label="nextLabel || undefined"
       @click="$emit('next')"
     >
       <slot name="next" />
@@ -42,6 +46,18 @@ export default Vue.extend({
     nextActive: {
       type: Boolean,
       default: false,
+    },
+
+    // Names the buttons for their tooltip and screen readers, since their
+    // content is a glyph.
+    prevLabel: {
+      type: String,
+      default: '',
+    },
+
+    nextLabel: {
+      type: String,
+      default: '',
     },
   },
 });
