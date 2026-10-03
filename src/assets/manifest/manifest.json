@@ -23,7 +23,6 @@
     {
       "all_frames": true,
       "match_about_blank": true,
-      "match_origin_as_fallback": true,
       "js": ["inject-css/index.js"],
       "matches": ["<all_urls>"],
       "exclude_matches": ["*://*/*.xml"],
