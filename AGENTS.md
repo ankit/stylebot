@@ -93,6 +93,6 @@ Comments on functions and methods use JSDoc style, always in this shape:
 
 ## i18n
 
-Never hardcode user-facing strings — always add an i18n key in `src/assets/_locales/*.config` (all 15 locales) and reference it via `t('key')`. This applies to every string a user sees: labels, placeholders, titles, aria-labels, error messages.
+Never hardcode user-facing strings — always add an i18n key in `src/assets/_locales/*.config` (every locale) and reference it via `t('key')`. This applies to every string a user sees: labels, placeholders, titles, aria-labels, error messages. Write the English, then use the `translate` skill to fill in the other locales; `yarn validate-locales` fails until every locale has it.
 
 Keep each key matching its English string (e.g. `@box` → `Box`, not a stale `@layout_properties` → `Box`). When a string's copy changes, rename the key to match in the same change, across all 15 locale files. If two keys end up with the identical string in every locale, collapse them into one key instead of keeping duplicates.
