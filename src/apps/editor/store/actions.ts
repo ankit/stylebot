@@ -272,14 +272,6 @@ export default {
     commit('setOptions', { ...state.options, lastColorSet });
   },
 
-  setLastColorPickerTab(
-    { state, commit }: { state: State; commit: Commit },
-    lastColorPickerTab: string
-  ): void {
-    setOption('lastColorPickerTab', lastColorPickerTab);
-    commit('setOptions', { ...state.options, lastColorPickerTab });
-  },
-
   /**
    * Moves a font to the front of the recently used list, which the font
    * picker shows by default.

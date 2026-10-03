@@ -13,6 +13,7 @@ import {
   pressKey,
   propertyCard,
   propertyControl,
+  setRange,
   storeOf,
   user,
 } from '@stylebot/storybook/story-helpers';
@@ -39,6 +40,8 @@ const swatch = (canvas: Canvas, card: string) =>
   picker(canvas, card).querySelector('.color-swatch') as HTMLElement;
 const popover = (root: HTMLElement) =>
   root.querySelector('.color-picker-popover') as HTMLElement | null;
+const popoverHex = (panel: HTMLElement) =>
+  panel.querySelector('.hex-input') as HTMLInputElement;
 
 const openPopover = async (root: HTMLElement, card: string) => {
   await user.click(swatch(within(root), card));
@@ -47,6 +50,21 @@ const openPopover = async (root: HTMLElement, card: string) => {
     expect(el).toBeVisible();
     return el as HTMLElement;
   });
+};
+
+const reopenPopover = async (root: HTMLElement, card: string) => {
+  await user.click(swatch(within(root), card));
+  await waitFor(() => expect(popover(root)).toBeNull());
+  return openPopover(root, card);
+};
+
+// Set in one go, as a paste would: typing it out would apply the partial
+// hexes along the way.
+const pasteHex = async (panel: HTMLElement, value: string) => {
+  const input = popoverHex(panel);
+  input.focus();
+  await fireEvent.input(input, { target: { value } });
+  input.blur();
 };
 
 export const HexFieldApplies: StoryObj = {
@@ -74,93 +92,148 @@ export const HexFieldApplies: StoryObj = {
   },
 };
 
-export const PopoverTabsFollowRule: StoryObj = {
+export const PopoverListsColors: StoryObj = {
   ...editor(noRule),
-  name: 'the popover falls back to page colors, then switches to already-used colors once a rule is set',
+  name: 'the popover lists page colors, then the color a rule sets and the one it closed on',
   play: async ({ canvasElement, step }) => {
-    const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
 
     let panel = await openPopover(canvasElement, 'Text');
-    const firstTab = () => panel.querySelector('.tabs .tab') as HTMLElement;
+    const pageColors = () => panel.querySelector('.page-colors') as HTMLElement;
 
-    await step(
-      'with no rule yet, the first tab shows page colors',
-      async () => {
-        await expect(firstTab()).toHaveTextContent('Page colors');
-        await expect(firstTab()).toHaveClass('active');
-        await expect(panel.querySelector('.first-tab .swatch')).toBeVisible();
-      }
-    );
+    await step('with no rule yet, it shows the page colors', async () => {
+      await expect(popoverHex(panel)).toHaveAttribute('placeholder', 'Not set');
+      await waitFor(() =>
+        expect(pageColors().querySelector('.swatch')).toBeVisible()
+      );
+      await expect(panel.querySelector('.recent-colors')).toBeNull();
+    });
 
-    await step('the footer field applies a declaration', async () => {
-      // Set in one go, as a paste would: typing it out would apply the
-      // partial hexes along the way.
-      const valueField = panel.querySelector(
-        '.value-field'
-      ) as HTMLInputElement;
-      valueField.focus();
-      await fireEvent.input(valueField, { target: { value: '#112233' } });
-      valueField.blur();
+    await step('its hex field applies a declaration', async () => {
+      await pasteHex(panel, '#112233');
       await expect(declaration(store, 'h1', 'color')).toBe('#112233');
     });
 
-    await step('reopened, the first tab shows the used colors', async () => {
-      await user.click(swatch(canvas, 'Text'));
-      await waitFor(() => expect(popover(canvasElement)).toBeNull());
-      panel = await openPopover(canvasElement, 'Text');
+    await step("reopened, the rule's color leads the page colors", async () => {
+      panel = await reopenPopover(canvasElement, 'Text');
 
-      await expect(firstTab()).toHaveTextContent('Your colors');
-      await expect(
-        panel.querySelector('.used-colors .swatch[style*="17, 34, 51"]')
-      ).toBeVisible();
+      const first = pageColors().querySelector('.swatch') as HTMLElement;
+      await expect(first).toHaveAttribute('title', '#112233');
+      await expect(first).toHaveClass('selected');
     });
 
     await step('the color it closed on is listed as recent', async () => {
-      await expect(panel.querySelector('.recent-section')).toBeVisible();
-      await expect(
-        panel.querySelector('.recent-section .swatch[style*="17, 34, 51"]')
-      ).toBeVisible();
+      await waitFor(() =>
+        expect(
+          panel.querySelector('.recent-colors .swatch[style*="17, 34, 51"]')
+        ).toBeVisible()
+      );
     });
   },
 };
 
-export const PaletteSearchChevron: StoryObj = {
-  ...editor(noRule),
-  name: 'the palette search lists every palette again from the chevron, even after a dead-end query',
+export const SwatchApplies: StoryObj = {
+  ...editor(WITH_RULE),
+  name: 'a palette swatch applies its color and shows a check',
   play: async ({ canvasElement }) => {
+    const store = storeOf(canvasElement);
     const panel = await openPopover(canvasElement, 'Text');
 
-    await user.click(within(panel).getByRole('tab', { name: 'Palette' }));
-    const search = await waitFor(() => {
-      const el = panel.querySelector('.palette-search') as HTMLElement;
-      expect(el).toBeInTheDocument();
-      return el;
+    const paletteSwatch = panel.querySelector(
+      '.palette .swatch[title="#7d7669"]'
+    ) as HTMLElement;
+    await user.click(paletteSwatch);
+
+    await expect(declaration(store, 'h1', 'color')).toBe('#7d7669');
+    await waitFor(() => expect(paletteSwatch).toHaveClass('selected'));
+    await expect(popoverHex(panel)).toHaveValue('#7d7669');
+  },
+};
+
+export const PaletteMenu: StoryObj = {
+  ...editor(noRule),
+  name: 'the palette name opens the list of palettes, and the choice is remembered',
+  play: async ({ canvasElement, step }) => {
+    const store = storeOf(canvasElement);
+    let panel = await openPopover(canvasElement, 'Text');
+    const trigger = () =>
+      panel.querySelector('.palette-trigger') as HTMLButtonElement;
+
+    await step('Escape closes the list but not the popover', async () => {
+      await user.click(trigger());
+      await findOpenMenu(within(panel));
+      await pressKey('Escape');
+      await waitFor(() => expect(within(panel).queryByRole('menu')).toBeNull());
+      await expect(popover(canvasElement)).toBeVisible();
     });
-    const input = search.querySelector(
-      '.autocomplete-input'
-    ) as HTMLTextAreaElement;
-    const activeLabel = input.value;
 
-    // Escape on an open list restores the active palette's name...
-    await user.clear(input);
-    await user.keyboard(activeLabel.slice(0, 3));
-    await findOpenMenu(within(panel));
-    await pressKey('Escape');
-    await waitFor(() => expect(input).toHaveValue(activeLabel));
+    await step('picking Hues swaps the swatches', async () => {
+      await expect(trigger()).toHaveTextContent('Neutrals');
+      await user.click(trigger());
+      const menu = await findOpenMenu(within(panel));
+      await expect(within(menu).getAllByRole('menuitemradio').length).toBe(12);
 
-    // ...and a query that matches nothing closes the list, but the chevron
-    // still lists every palette without touching the text.
-    await user.clear(input);
-    await user.keyboard('zzz');
-    await waitFor(() => expect(within(panel).queryByRole('menu')).toBeNull());
+      await user.click(
+        within(menu).getByRole('menuitemradio', { name: 'Hues' })
+      );
+      await waitFor(() => expect(trigger()).toHaveTextContent('Hues'));
+      await expect(panel.querySelectorAll('.palette .swatch').length).toBe(40);
+      await expect(store.state.options.lastColorSet).toBe('hues');
+    });
 
-    await user.click(search.querySelector('.autocomplete-chevron') as Element);
-    await findOpenMenu(within(panel));
-    await expect(input).toHaveValue('zzz');
-    await expect(within(panel).getAllByRole('menuitem').length).toBeGreaterThan(
-      1
+    await step('reopened, the popover shows Hues again', async () => {
+      panel = await reopenPopover(canvasElement, 'Text');
+      await expect(trigger()).toHaveTextContent('Hues');
+    });
+  },
+};
+
+export const CustomPicker: StoryObj = {
+  ...editor(WITH_RULE),
+  name: 'the + swatch folds the custom picker in and out, and its sliders apply',
+  play: async ({ canvasElement }) => {
+    const store = storeOf(canvasElement);
+    const panel = await openPopover(canvasElement, 'Text');
+    const toggle = within(panel).getByRole('button', { name: 'Custom color' });
+
+    await expect(panel.querySelector('.sv-square')).toBeNull();
+    await user.click(toggle);
+    await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    await expect(panel.querySelector('.sv-square')).toBeVisible();
+
+    const alpha = panel.querySelector(
+      '.alpha-slider-row .range'
+    ) as HTMLInputElement;
+    await setRange(alpha, 50);
+    await expect(declaration(store, 'h1', 'color')).toBe(
+      'rgba(42, 95, 214, 0.5)'
     );
+    await expect(panel.querySelector('.alpha-slider-row')).toHaveTextContent(
+      '50%'
+    );
+
+    await user.click(toggle);
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    await expect(panel.querySelector('.sv-square')).toBeNull();
+  },
+};
+
+export const ClearButton: StoryObj = {
+  ...editor(noRule),
+  name: 'Clear shows once there is a value and removes the declaration',
+  play: async ({ canvasElement }) => {
+    const store = storeOf(canvasElement);
+    const panel = await openPopover(canvasElement, 'Text');
+    const clear = () => within(panel).queryByRole('button', { name: 'Clear' });
+
+    await expect(clear()).toBeNull();
+    await pasteHex(panel, '#112233');
+    await waitFor(() => expect(clear()).toBeVisible());
+
+    await user.click(clear() as HTMLElement);
+    await expect(declaration(store, 'h1', 'color')).toBeFalsy();
+    await waitFor(() => expect(clear()).toBeNull());
+    await expect(popoverHex(panel)).toHaveValue('');
   },
 };
 

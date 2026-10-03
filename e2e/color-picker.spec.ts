@@ -12,8 +12,8 @@ const PAGE_HTML = `
   </html>
 `;
 
-// The popover's tabs, swatches and palette search are covered by the
-// Storybook interaction tests; this proves the footer field styles the page
+// The popover's swatches, palettes and custom picker are covered by the
+// Storybook interaction tests; this proves its hex field styles the page
 // and that the picked color round-trips through the background's history.
 test('a color picked in the popover applies to the page and is remembered as recent', async ({
   context,
@@ -41,7 +41,7 @@ test('a color picked in the popover applies to the page and is remembered as rec
   await swatch.click();
 
   const popover = page.locator('.color-picker-popover');
-  const valueField = popover.locator('.value-field');
+  const valueField = popover.locator('.hex-input');
   await valueField.fill('#112233');
   await valueField.blur();
 
@@ -53,6 +53,6 @@ test('a color picked in the popover applies to the page and is remembered as rec
   await swatch.click();
 
   await expect(
-    popover.locator('.recent-section .swatch[style*="17, 34, 51"]')
+    popover.locator('.recent-colors .swatch[style*="17, 34, 51"]')
   ).toBeVisible();
 });

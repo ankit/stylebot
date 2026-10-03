@@ -35,6 +35,4 @@ export type StylebotOptions = {
   appearance: StylebotAppearance;
   // Key of the last-picked Palette option — a built-in set, or a scheme name from color-schemes.ts.
   lastColorSet: string;
-  // Last tab open in the color picker ('already-used' | 'palette' | 'custom').
-  lastColorPickerTab: string;
 };

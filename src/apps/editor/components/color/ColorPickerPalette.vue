@@ -1,126 +1,124 @@
 <template>
-  <div class="palette">
-    <s-autocomplete
-      class="palette-search"
-      item-key="key"
-      :value="query"
-      :items="filteredOptions"
-      :placeholder="t('color_picker_search_palettes')"
-      @input="query = $event"
-      @focus="openingQuery = query"
-      @cancel="query = activeLabel"
-    >
-      <template #item="{ item, select }">
-        <s-menu-item
-          :selected="item.key === activeKey"
-          @click="
-            selectOption(item);
-            select();
-          "
-        >
-          <span class="option-row">
-            <span class="option-bars">
-              <span
-                v-for="color in item.preview"
-                :key="color"
-                class="option-bar"
-                :style="{ background: color }"
-              />
-            </span>
-            <span class="option-name">{{ item.label }}</span>
-          </span>
-        </s-menu-item>
-      </template>
-    </s-autocomplete>
+  <color-picker-swatch-group
+    class="palette"
+    :label="t('palette')"
+    :colors="activeColors"
+    :value="value"
+    @select="$emit('select', $event)"
+  >
+    <template #label-action>
+      <s-anchored-menu class="palette-menu-anchor">
+        <template #trigger="{ toggle, open }">
+          <button
+            type="button"
+            class="palette-trigger"
+            :class="{ open }"
+            aria-haspopup="menu"
+            :aria-expanded="open ? 'true' : 'false'"
+            @click="toggle"
+          >
+            {{ activeLabel }}
+            <chevron-down-icon :size="12" class="palette-chevron" />
+          </button>
+        </template>
 
-    <div v-if="activeKey === 'neutrals'" class="ramps">
-      <div v-for="ramp in neutralRamps" :key="ramp.labelKey" class="ramp">
-        <s-text size="caption" variant="muted" as="span">
-          {{ t(ramp.labelKey) }}
-        </s-text>
-        <div class="set-grid">
-          <color-picker-swatch
-            v-for="color in ramp.colors"
-            :key="color"
-            :color="color"
-            :selected="color === value"
-            @select="$emit('select', $event)"
-          />
-        </div>
-      </div>
-    </div>
-
-    <div v-else class="set-grid">
-      <color-picker-swatch
-        v-for="color in activeColors"
-        :key="color"
-        :color="color"
-        :selected="color === value"
-        @select="$emit('select', $event)"
-      />
-    </div>
-  </div>
+        <template #default="{ close }">
+          <s-menu dense :min-width="190" :max-height="260">
+            <s-menu-item
+              v-for="option in options"
+              :key="option.key"
+              :selected="option.key === activeKey"
+              role="menuitemradio"
+              :aria-checked="option.key === activeKey ? 'true' : 'false'"
+              @click="
+                selectOption(option.key);
+                close();
+              "
+            >
+              <span class="option-row">
+                <span class="option-bars">
+                  <span
+                    v-for="(color, index) in option.preview"
+                    :key="index"
+                    class="option-bar"
+                    :style="{ background: color }"
+                  />
+                </span>
+                <span class="option-name">{{ option.label }}</span>
+              </span>
+            </s-menu-item>
+          </s-menu>
+        </template>
+      </s-anchored-menu>
+    </template>
+  </color-picker-swatch-group>
 </template>
 
 <script lang="ts">
-// Flattened into one search/select rather than a nested set+scheme picker.
 import Vue from 'vue';
-import { SAutocomplete, SText, SMenuItem } from '@stylebot/components';
+import { SAnchoredMenu, SMenu, SMenuItem } from '@stylebot/components';
+import { ChevronDownIcon } from '@stylebot/icons';
+
+import ColorPickerSwatchGroup from './ColorPickerSwatchGroup.vue';
 import { colorSchemes } from '../../utils/color-schemes';
-import type { ColorRamp } from '../../utils/color-sets';
 import {
   neutralRamps,
   hueGrid,
   readingRow,
   darkModeRow,
 } from '../../utils/color-sets';
-import ColorPickerSwatch from './ColorPickerSwatch.vue';
 
-type PaletteOption = { key: string; label: string; preview: Array<string> };
-type PaletteOptionMeta = {
+type PaletteOption = {
   key: string;
-  labelKey: string;
+  label: string;
   preview: Array<string>;
+  colors: Array<string>;
 };
 
-// Translated in data() via this.t(), not at module scope — Jest mocks t() per-component, not a global chrome.
-const SET_OPTION_META: Array<PaletteOptionMeta> = [
-  {
-    key: 'neutrals',
-    labelKey: 'color_picker_set_neutrals',
-    preview: neutralRamps[0].colors.slice(0, 6),
-  },
-  {
-    key: 'hues',
-    labelKey: 'color_picker_set_hues',
-    preview: hueGrid[2].slice(0, 6),
-  },
-  {
-    key: 'reading',
-    labelKey: 'color_picker_set_reading',
-    preview: readingRow.slice(0, 6),
-  },
-  {
-    key: 'dark-mode',
-    labelKey: 'color_picker_set_dark_mode',
-    preview: darkModeRow.slice(0, 6),
-  },
-];
+const SET_OPTIONS: Array<Omit<PaletteOption, 'label'> & { labelKey: string }> =
+  [
+    {
+      key: 'neutrals',
+      labelKey: 'color_picker_set_neutrals',
+      preview: neutralRamps[0].slice(0, 6),
+      colors: neutralRamps.flat(),
+    },
+    {
+      key: 'hues',
+      labelKey: 'color_picker_set_hues',
+      preview: hueGrid[2].slice(0, 6),
+      colors: hueGrid.flat(),
+    },
+    {
+      key: 'reading',
+      labelKey: 'color_picker_set_reading',
+      preview: readingRow.slice(0, 6),
+      colors: readingRow,
+    },
+    {
+      key: 'dark-mode',
+      labelKey: 'color_picker_set_dark_mode',
+      preview: darkModeRow.slice(0, 6),
+      colors: darkModeRow,
+    },
+  ];
 
 const SCHEME_OPTIONS: Array<PaletteOption> = colorSchemes.map(scheme => ({
   key: scheme.name,
   label: scheme.name,
   preview: scheme.colors.slice(0, 6),
+  colors: scheme.colors,
 }));
 
 export default Vue.extend({
   name: 'ColorPickerPalette',
 
   components: {
-    SAutocomplete,
-    SText,
+    SAnchoredMenu,
+    SMenu,
     SMenuItem,
-    ColorPickerSwatch,
+    ChevronDownIcon,
+    ColorPickerSwatchGroup,
   },
 
   props: {
@@ -130,100 +128,74 @@ export default Vue.extend({
     },
   },
 
-  data(): {
-    activeKey: string;
-    query: string;
-    openingQuery: string;
-    neutralRamps: Array<ColorRamp>;
-    allOptions: Array<PaletteOption>;
-  } {
-    const allOptions: Array<PaletteOption> = [
-      ...SET_OPTION_META.map(option => ({
-        key: option.key,
-        label: this.t(option.labelKey),
-        preview: option.preview,
-      })),
-      ...SCHEME_OPTIONS,
-    ];
-
-    const lastColorSet = this.$store.state.options.lastColorSet;
-    const activeKey = allOptions.some(option => option.key === lastColorSet)
-      ? lastColorSet
-      : 'neutrals';
-
+  data(): { activeKey: string } {
     return {
-      activeKey,
-      query: allOptions.find(option => option.key === activeKey)?.label || '',
-      // The query as it was when editing began (focus or chevron); until
-      // it's changed, every palette is listed rather than filtering by it.
-      openingQuery: '',
-      neutralRamps,
-      allOptions,
+      activeKey: this.$store.state.options.lastColorSet,
     };
   },
 
   computed: {
-    activeLabel(): string {
+    options(): Array<PaletteOption> {
+      return [
+        ...SET_OPTIONS.map(({ labelKey, ...option }) => ({
+          ...option,
+          label: this.t(labelKey),
+        })),
+        ...SCHEME_OPTIONS,
+      ];
+    },
+
+    activeOption(): PaletteOption {
       return (
-        this.allOptions.find(option => option.key === this.activeKey)?.label ||
-        ''
+        this.options.find(option => option.key === this.activeKey) ??
+        this.options[0]
       );
     },
 
-    filteredOptions(): Array<PaletteOption> {
-      const query = this.query.trim().toLowerCase();
-      if (
-        !query ||
-        this.query === this.openingQuery ||
-        query === this.activeLabel.toLowerCase()
-      ) {
-        return this.allOptions;
-      }
-
-      return this.allOptions.filter(option =>
-        option.label.toLowerCase().includes(query)
-      );
+    activeLabel(): string {
+      return this.activeOption.label;
     },
 
     activeColors(): Array<string> {
-      switch (this.activeKey) {
-        case 'hues':
-          return hueGrid.flat();
-        case 'reading':
-          return readingRow;
-        case 'dark-mode':
-          return darkModeRow;
-        default: {
-          const scheme = colorSchemes.find(s => s.name === this.activeKey);
-          return scheme ? scheme.colors : [];
-        }
-      }
+      return this.activeOption.colors;
     },
   },
 
   methods: {
-    selectOption(option: PaletteOption): void {
-      this.activeKey = option.key;
-      this.query = option.label;
-      this.$store.dispatch('setLastColorSet', option.key);
+    selectOption(key: string): void {
+      this.activeKey = key;
+      this.$store.dispatch('setLastColorSet', key);
     },
   },
 });
 </script>
 
 <style lang="scss" scoped>
-.palette {
-  padding: 12px 14px;
+.palette-trigger {
+  @include button-reset;
+
   display: flex;
-  flex-direction: column;
-  gap: 11px;
+  align-items: center;
+  gap: 4px;
+  margin: -3px -2px -3px -6px;
+  padding: 3px 2px 3px 6px;
+  border-radius: 5px;
+  color: var(--text-body);
+  cursor: pointer;
+
+  &:hover,
+  &.open {
+    background: var(--field-surface-hover);
+  }
+
+  @include focus-ring;
 }
 
-.palette-search {
-  width: 100%;
+.palette-chevron {
+  color: var(--text-faint);
 
-  ::v-deep .autocomplete-input {
-    line-height: 18px;
+  .open & {
+    transform: rotate(180deg);
   }
 }
 
@@ -241,8 +213,8 @@ export default Vue.extend({
 }
 
 .option-bar {
-  width: 9px;
-  height: 16px;
+  width: 8px;
+  height: 14px;
   border-radius: 2px;
 }
 
@@ -251,28 +223,5 @@ export default Vue.extend({
 
   flex: 1;
   min-width: 0;
-}
-
-.ramps {
-  display: flex;
-  flex-direction: column;
-  gap: 9px;
-}
-
-.ramp {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.set-grid {
-  display: grid;
-  grid-template-columns: repeat(8, 1fr);
-  gap: 4px;
-  // Tall enough for Hues' 5 rows (the largest set) without scrolling.
-  max-height: 200px;
-  overflow-y: auto;
-  padding: 4px;
-  margin: -4px;
 }
 </style>

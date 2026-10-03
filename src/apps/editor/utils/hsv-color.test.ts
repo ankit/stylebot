@@ -1,4 +1,10 @@
-import { parseToHsva, toCssColor, needsHairline } from './hsv-color';
+import {
+  checkMarkColor,
+  parseToHsva,
+  toCssColor,
+  sameColor,
+  uniqueColors,
+} from './hsv-color';
 
 describe('parseToHsva / toCssColor round-trip', () => {
   it('round-trips an opaque hex color', () => {
@@ -26,22 +32,34 @@ describe('parseToHsva / toCssColor round-trip', () => {
   });
 });
 
-describe('needsHairline', () => {
-  it('is true for white', () => {
-    expect(needsHairline('#ffffff')).toBe(true);
+describe('sameColor', () => {
+  it('matches two spellings of one color', () => {
+    expect(sameColor('#ffffff', 'rgb(255, 255, 255)')).toBe(true);
+    expect(sameColor('#FFF', '#ffffff')).toBe(true);
   });
 
-  it('is true for colors lighter than #e8e8e8', () => {
-    expect(needsHairline('#f8f8f2')).toBe(true);
+  it('tells colors and alphas apart', () => {
+    expect(sameColor('#ffffff', '#fffffe')).toBe(false);
+    expect(sameColor('#ffffff', 'rgba(255, 255, 255, 0.5)')).toBe(false);
   });
 
-  it('is false for colors at or darker than #e8e8e8', () => {
-    expect(needsHairline('#e8e8e8')).toBe(false);
-    expect(needsHairline('#282a36')).toBe(false);
-    expect(needsHairline('#000000')).toBe(false);
+  it('never matches an empty value', () => {
+    expect(sameColor('', '')).toBe(false);
   });
+});
 
-  it('is false for an invalid color', () => {
-    expect(needsHairline('not-a-color')).toBe(false);
+describe('uniqueColors', () => {
+  it('keeps the first spelling of each color, in order', () => {
+    expect(
+      uniqueColors(['#112233', 'rgb(17, 34, 51)', 'red', '#ff0000', '#000'])
+    ).toEqual(['#112233', 'red', '#000']);
+  });
+});
+
+describe('checkMarkColor', () => {
+  it('uses ink on light swatches and white on dark ones', () => {
+    expect(checkMarkColor('#f4f3ef')).toBe('#191b1f');
+    expect(checkMarkColor('#171a20')).toBe('#ffffff');
+    expect(checkMarkColor('#4a90d9')).toBe('#ffffff');
   });
 });

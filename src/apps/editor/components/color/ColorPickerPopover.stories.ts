@@ -1,9 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/vue';
+import { expect, waitFor, within } from '@storybook/test';
 
 import ColorPickerPopover from './ColorPickerPopover.vue';
 import type { EditorStateOverrides } from '@stylebot/storybook/fixtures/editor-store';
 import { createEditorStore } from '@stylebot/storybook/fixtures/editor-store';
 import type { ChromeShimOptions } from '@stylebot/storybook/mocks/chrome';
+import { findOpenMenu, user } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
   title: 'Editor/ColorPickerPopover',
@@ -28,10 +30,10 @@ p {
 
 const RECENT = ['#3d7bff', '#f2726a', '#191b1f'];
 
-/* Rendered inside the editor's typography scope, sized like the panel,
-   with enough room below for the palette search dropdown. */
+/* Rendered inside the editor's typography scope, with enough room below
+   for the palette menu. */
 const popover = (
-  tab: 'already-used' | 'palette' | 'custom',
+  value: string,
   overrides: EditorStateOverrides = {},
   chrome: ChromeShimOptions = { recentColors: RECENT }
 ): StoryObj => ({
@@ -42,25 +44,43 @@ const popover = (
       ...overrides,
       options: {
         appearance: globals.theme,
-        lastColorPickerTab: tab,
         ...overrides.options,
       },
     }),
+    data: () => ({ value }),
     template: `
-      <div class="stylebot-app" style="padding-bottom: 120px">
-        <color-picker-popover value="#2a5fd6" role-label="Text color" />
+      <div class="stylebot-app" style="padding-bottom: 160px">
+        <color-picker-popover
+          :value="value"
+          role-label="Text color"
+          @input="value = $event"
+        />
       </div>
     `,
   }),
   parameters: { chrome },
 });
 
-export const YourColors = popover('already-used', { css: RULE_CSS });
+export const NotSet = popover('', {}, {});
 
-export const PageColors = popover('already-used');
+export const WithColor = popover('#2a5fd6', { css: RULE_CSS });
 
-export const NoRecentColors = popover('already-used', { css: RULE_CSS }, {});
+export const ChoosingAPalette: StoryObj = {
+  ...popover('#e6eaf0', { css: RULE_CSS }),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await user.click(canvas.getByRole('button', { name: /Neutrals/ }));
+    await findOpenMenu(canvas);
+  },
+};
 
-export const Palette = popover('palette', { css: RULE_CSS });
-
-export const Custom = popover('custom', { css: RULE_CSS });
+export const CustomColor: StoryObj = {
+  ...popover('#8be9fd', { css: RULE_CSS }),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await user.click(canvas.getByRole('button', { name: 'Custom color' }));
+    await waitFor(() =>
+      expect(canvasElement.querySelector('.sv-square')).toBeVisible()
+    );
+  },
+};

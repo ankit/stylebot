@@ -7,8 +7,6 @@ export type Hsva = {
   a: number;
 };
 
-const HAIRLINE_BRIGHTNESS_THRESHOLD = tinycolor('#e8e8e8').getBrightness();
-
 export const parseToHsva = (value: string): Hsva => {
   const hsv = tinycolor(value || '#000000').toHsv();
   return { h: hsv.h, s: hsv.s, v: hsv.v, a: hsv.a };
@@ -25,23 +23,35 @@ export const toCssColor = (hsva: Hsva): string => {
   );
 };
 
-// Matches the design spec's swatch rule: colors lighter than #e8e8e8 get a
-// hairline border so a near-white swatch still reads against a white popup.
-export const needsHairline = (value: string): boolean => {
+const colorKey = (value: string): string => {
   const color = tinycolor(value);
-  return (
-    color.isValid() && color.getBrightness() > HAIRLINE_BRIGHTNESS_THRESHOLD
-  );
+  return color.isValid() ? color.toHex8String() : value.trim().toLowerCase();
 };
 
-// Selection checkmark color for a swatch — picks whichever of white/ink
-// actually has readable contrast against this specific color, rather than
-// needsHairline's coarser threshold (tuned for a border, not an icon).
+// Treats any two spellings of one color as equal, e.g. #fff and rgb(255, 255, 255).
+export const sameColor = (a: string, b: string): boolean => {
+  return !!a && !!b && colorKey(a) === colorKey(b);
+};
+
+export const uniqueColors = (colors: Array<string>): Array<string> => {
+  const seen = new Set<string>();
+
+  return colors.filter(color => {
+    const key = colorKey(color);
+    if (!color || seen.has(key)) {
+      return false;
+    }
+
+    seen.add(key);
+    return true;
+  });
+};
+
+/**
+ * The checkmark color for a selected swatch: white on all but the lightest
+ * colors, where it switches to ink.
+ */
 export const checkMarkColor = (value: string): string => {
   const color = tinycolor(value);
-  if (!color.isValid()) {
-    return '#fff';
-  }
-
-  return tinycolor.mostReadable(color, ['#ffffff', '#191b1f']).toHexString();
+  return color.isValid() && color.getBrightness() > 190 ? '#191b1f' : '#ffffff';
 };

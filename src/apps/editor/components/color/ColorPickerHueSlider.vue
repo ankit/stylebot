@@ -48,7 +48,7 @@ export default Vue.extend({
 .range {
   flex: 1;
   min-width: 0;
-  height: 20px;
+  height: 16px;
   margin: 0;
   appearance: none;
   -webkit-appearance: none;
@@ -56,8 +56,8 @@ export default Vue.extend({
   cursor: pointer;
 
   &::-webkit-slider-runnable-track {
-    height: 11px;
-    border-radius: 6px;
+    height: 8px;
+    border-radius: 4px;
     @include picker-track-edge;
     background: linear-gradient(
       to right,
@@ -80,8 +80,8 @@ export default Vue.extend({
   }
 
   &::-moz-range-track {
-    height: 11px;
-    border-radius: 6px;
+    height: 8px;
+    border-radius: 4px;
     @include picker-track-edge;
     background: linear-gradient(
       to right,
