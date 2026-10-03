@@ -216,9 +216,6 @@ class MonacEditorIframe {
         enabled: true,
       },
       codeLens: false,
-      // Tab indents only where Escape leaves the editor (the panel); elsewhere
-      // it would trap focus, since macOS swallows the Ctrl+M toggle in-browser.
-      tabFocusMode: isOptions,
     };
   }
 
