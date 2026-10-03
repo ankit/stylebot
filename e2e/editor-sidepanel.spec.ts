@@ -122,12 +122,10 @@ test('the side panel is set up on every tab while it is the chosen position', as
     }, baseUrl);
 
   await dockToSidePanel(extension);
-  await expect
-    .poll(panelOptions)
-    .toMatchObject({
-      enabled: true,
-      path: expect.stringContaining('host=sidepanel'),
-    });
+  await expect.poll(panelOptions).toMatchObject({
+    enabled: true,
+    path: expect.stringContaining('host=sidepanel'),
+  });
 
   await extension.evaluate(() =>
     chrome.storage.local.set({
