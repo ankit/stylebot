@@ -18,6 +18,7 @@ export type ChatReplyResult = {
   model: string;
   edits: Array<ChatCssEdit>;
   previous: Array<ChatCssPreviousValue>;
+  matches?: Array<number | null>;
   usage?: ChatUsage;
   replay?: Array<unknown>;
 };
@@ -93,7 +94,7 @@ export const getUserTurn = ({
  * in. It counts as applied when it made edits.
  */
 export const getAssistantTurn = (
-  { id, model, edits, previous, usage, replay }: ChatReplyResult,
+  { id, model, edits, previous, matches, usage, replay }: ChatReplyResult,
   text: string
 ): ChatAssistantTurn => ({
   role: 'assistant',
@@ -104,6 +105,7 @@ export const getAssistantTurn = (
   applied: edits.length > 0,
   model,
   usage,
+  ...(matches ? { matches } : {}),
   ...(replay ? { replay } : {}),
 });
 

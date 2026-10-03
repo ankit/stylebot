@@ -36,6 +36,7 @@ const bridge = {
   getAppliedDeclarations: jest.fn(),
   getSelectorAlternatives: jest.fn(),
   getPageCssContext: jest.fn(),
+  countMatches: jest.fn(),
   openInPage: jest.fn(),
   focusPage: jest.fn(),
   on: jest.fn((event: string, listener: PageBridgeEvents['select']) => {

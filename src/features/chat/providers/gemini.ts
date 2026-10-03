@@ -17,8 +17,7 @@ import {
   TOOL_NAME,
   TOOL_DESCRIPTION,
   TOOL_SCHEMA,
-  TOOL_RESULT_APPLIED,
-  TOOL_RESULT_UNDONE,
+  toolResultFor,
   parseEdits,
 } from '../apply-css-tool';
 import { userMessageText } from '../prompt';
@@ -128,7 +127,7 @@ export const toInteractionSteps = (turns: Array<ChatTurn>): Array<InputStep> =>
       result: [
         {
           type: 'text',
-          text: turn.applied ? TOOL_RESULT_APPLIED : TOOL_RESULT_UNDONE,
+          text: toolResultFor(turn),
         },
       ],
     });
@@ -170,7 +169,7 @@ export const toInteractionSteps = (turns: Array<ChatTurn>): Array<InputStep> =>
           result: [
             {
               type: 'text',
-              text: turn.applied ? TOOL_RESULT_APPLIED : TOOL_RESULT_UNDONE,
+              text: toolResultFor(turn),
             },
           ],
         }

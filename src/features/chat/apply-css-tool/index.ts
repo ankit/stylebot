@@ -6,3 +6,4 @@ export {
   TOOL_RESULT_UNDONE,
 } from './schema';
 export { parseEdits } from './parse-edits';
+export { toolResultFor } from './tool-result';

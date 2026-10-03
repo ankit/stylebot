@@ -118,6 +118,12 @@ export type PageBridge = {
   getPageOutline(): Promise<string>;
 
   /**
+   * How many of the page's elements each selector matches, or null for a
+   * selector the page can't parse.
+   */
+  countMatches(selectors: Array<string>): Promise<Array<number | null>>;
+
+  /**
    * The user's Stylebot declarations in effect on the element the selector
    * is about, each with the selector it comes from.
    */

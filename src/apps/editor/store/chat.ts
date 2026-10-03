@@ -152,6 +152,7 @@ export const createChatModule = (): Module<ChatState, State> => {
     const id = getTurnId();
     let edits: Array<ChatCssEdit> = [];
     let previous: Array<ChatCssPreviousValue> = [];
+    let matches: Array<number | null> | undefined;
 
     return {
       onText: delta => setPhase(context, 'writing', delta),
@@ -163,12 +164,18 @@ export const createChatModule = (): Module<ChatState, State> => {
         const result = applyEdits(rootState.css, replyEdits);
         edits = replyEdits;
         previous = result.previous;
-        return applyCss(context, result.css, edits, `chat:${id}`);
+        return applyCss(context, result.css, edits, `chat:${id}`).then(
+          async () => {
+            matches = await getPageBridge()
+              .countMatches(edits.map(edit => edit.selector))
+              .catch(() => undefined);
+          }
+        );
       },
 
       onDone: ({ usage, replay }) => {
         const turn = getAssistantTurn(
-          { id, model, edits, previous, usage, replay },
+          { id, model, edits, previous, matches, usage, replay },
           state.pending?.text ?? ''
         );
 

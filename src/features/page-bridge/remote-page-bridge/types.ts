@@ -18,6 +18,7 @@ export type RemotePageBridgeRequestArgs = {
   getPageColors: [];
   getComputedStyles: [selector: string, properties: Array<string>];
   getPageOutline: [];
+  countMatches: [selectors: Array<string>];
   getAppliedDeclarations: [selector: string];
   getSelectorAlternatives: [selector: string];
   getPageCssContext: [selector: string];
@@ -30,6 +31,7 @@ export type RemotePageBridgeRequestResult = {
   getPageColors: RoleColorGroups;
   getComputedStyles: Record<string, string>;
   getPageOutline: string;
+  countMatches: Array<number | null>;
   getAppliedDeclarations: Array<AppliedDeclaration>;
   getSelectorAlternatives: SelectorAlternatives;
   getPageCssContext: string;

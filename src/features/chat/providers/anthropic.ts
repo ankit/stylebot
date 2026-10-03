@@ -16,8 +16,7 @@ import {
   TOOL_NAME,
   TOOL_DESCRIPTION,
   TOOL_SCHEMA,
-  TOOL_RESULT_APPLIED,
-  TOOL_RESULT_UNDONE,
+  toolResultFor,
   parseEdits,
 } from '../apply-css-tool';
 import { userMessageText } from '../prompt';
@@ -131,7 +130,7 @@ export const toAnthropicMessages = (turns: Array<ChatTurn>): Array<Message> => {
       pendingResult = {
         type: 'tool_result',
         tool_use_id: toolUseId(turn.id),
-        content: turn.applied ? TOOL_RESULT_APPLIED : TOOL_RESULT_UNDONE,
+        content: toolResultFor(turn),
       };
     }
 

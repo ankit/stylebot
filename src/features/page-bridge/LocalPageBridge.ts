@@ -27,6 +27,7 @@ import { PageBridgeEmitter } from './PageBridgeEmitter';
 import { getPageColors } from './page-colors';
 import { getComputedStyles } from './computed-styles';
 import { getPageOutline } from './page-outline';
+import { countMatches } from './count-matches';
 import { getPageCssContext } from './page-css';
 import { getAppliedDeclarations } from './applied-declarations';
 import type { AppliedDeclaration } from './applied-declarations';
@@ -224,6 +225,10 @@ export class LocalPageBridge extends PageBridgeEmitter implements PageBridge {
 
   getPageOutline(): Promise<string> {
     return Promise.resolve(getPageOutline());
+  }
+
+  countMatches(selectors: Array<string>): Promise<Array<number | null>> {
+    return Promise.resolve(countMatches(selectors));
   }
 
   getSelectorAlternatives(selector: string): Promise<SelectorAlternatives> {

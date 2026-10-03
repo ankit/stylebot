@@ -273,6 +273,10 @@ export class RemotePageBridge extends PageBridgeEmitter implements PageBridge {
     return this.request('getPageOutline');
   }
 
+  countMatches(selectors: Array<string>): Promise<Array<number | null>> {
+    return this.request('countMatches', selectors);
+  }
+
   getSelectorAlternatives(selector: string): Promise<SelectorAlternatives> {
     return this.request('getSelectorAlternatives', selector);
   }

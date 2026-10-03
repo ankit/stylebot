@@ -66,6 +66,9 @@ export type ChatAssistantTurn = {
   // Stopped by the user before its edits arrived; the text is what came in.
   stopped?: boolean;
   model: string;
+  // How many page elements each edit's selector matched once applied, in
+  // edit order; null for a selector the page couldn't parse.
+  matches?: Array<number | null>;
   // The reply in the provider's own format, for providers that need it back
   // unchanged when the thread is replayed.
   replay?: Array<unknown>;

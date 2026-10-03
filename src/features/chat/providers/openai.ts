@@ -16,8 +16,7 @@ import {
   TOOL_NAME,
   TOOL_DESCRIPTION,
   TOOL_SCHEMA,
-  TOOL_RESULT_APPLIED,
-  TOOL_RESULT_UNDONE,
+  toolResultFor,
   parseEdits,
 } from '../apply-css-tool';
 import { userMessageText } from '../prompt';
@@ -119,7 +118,7 @@ export const toResponsesInput = (turns: Array<ChatTurn>): Array<InputItem> =>
         {
           type: 'function_call_output',
           call_id: callId(turn.id),
-          output: turn.applied ? TOOL_RESULT_APPLIED : TOOL_RESULT_UNDONE,
+          output: toolResultFor(turn),
         }
       );
     }
