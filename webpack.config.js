@@ -245,9 +245,12 @@ const config = {
               jsonContent.permissions = jsonContent.permissions.filter(
                 permission => permission !== 'sidePanel'
               );
-            } else if (process.env.NODE_ENV === 'development' || isPreview) {
+            } else if (
+              !process.env.BROWSER &&
+              (process.env.NODE_ENV === 'development' || isPreview)
+            ) {
               /*
-               * Store public key, for the store id that Drive sign-in's OAuth redirect needs.
+               * Chrome Web Store public key, for the store id that Drive sign-in's OAuth redirect needs.
                * Release builds leave it out: the store rejects an uploaded manifest with a `key`.
                */
               const devJsonContent = JSON.parse(

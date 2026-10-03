@@ -251,7 +251,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "SRC=\"${SRCROOT}/../../safari-dist/\"\nif [ ! -f \"${SRC}manifest.json\" ]; then\n  echo \"error: safari-dist/ is missing; run yarn build:safari first\"\n  exit 1\nfi\nrsync -a --delete \"$SRC\" \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\n";
+			shellScript = "SRC=\"${SRCROOT}/../../safari-dist/\"\nif [ ! -f \"${SRC}manifest.json\" ]; then\n  echo \"error: safari-dist/ is missing; run yarn build:safari first\"\n  exit 1\nfi\nrsync -a --delete --exclude .build-complete \"$SRC\" \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
