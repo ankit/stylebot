@@ -16,6 +16,7 @@ import {
   isReaderable,
 } from '@stylebot/readability';
 
+import type { CssDeclaration } from '@stylebot/types';
 import { injectStylesheet, readCache, writeCache } from '@stylebot/stylesheets';
 
 import type {
@@ -31,6 +32,7 @@ import { countMatches } from './count-matches';
 import { getPageCssContext } from './page-css';
 import { getAppliedDeclarations } from './applied-declarations';
 import type { AppliedDeclaration } from './applied-declarations';
+import { getPageDeclarations } from './page-declarations';
 import { getSelectorAlternatives } from './selector-alternatives';
 
 const PREVIEW_ID = 'font-preview';
@@ -262,6 +264,12 @@ export class LocalPageBridge extends PageBridgeEmitter implements PageBridge {
     const el = this.elementFor(selector);
 
     return Promise.resolve(el ? getAppliedDeclarations(el) : []);
+  }
+
+  getPageDeclarations(selector: string): Promise<Array<CssDeclaration>> {
+    const el = this.elementFor(selector);
+
+    return Promise.resolve(el ? getPageDeclarations(el) : []);
   }
 
   getPageCssContext(selector: string): Promise<string> {

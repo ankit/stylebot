@@ -37,6 +37,7 @@ const bridge = {
   getComputedStyles: jest.fn(),
   getPageOutline: jest.fn(),
   getAppliedDeclarations: jest.fn(),
+  getPageDeclarations: jest.fn(),
   getSelectorAlternatives: jest.fn(),
   getPageCssContext: jest.fn(),
   countMatches: jest.fn(),

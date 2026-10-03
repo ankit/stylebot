@@ -155,8 +155,12 @@ export default Vue.extend({
       }
     },
 
+    /**
+     * Shows the tooltip after a delay. Whether it may show is checked only
+     * then, so an anchor can still enable it in its own mouseenter.
+     */
     scheduleShow(): void {
-      if (this.disabled || !this.text || this.showTimeout) {
+      if (this.showTimeout) {
         return;
       }
 

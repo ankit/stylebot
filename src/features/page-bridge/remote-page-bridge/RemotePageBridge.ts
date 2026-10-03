@@ -1,5 +1,6 @@
 import type { AppliedDeclaration } from '../applied-declarations';
 import type { RoleColorGroups } from '@stylebot/css';
+import type { CssDeclaration } from '@stylebot/types';
 
 import type {
   PageBridge,
@@ -287,6 +288,10 @@ export class RemotePageBridge extends PageBridgeEmitter implements PageBridge {
 
   getAppliedDeclarations(selector: string): Promise<Array<AppliedDeclaration>> {
     return this.request('getAppliedDeclarations', selector);
+  }
+
+  getPageDeclarations(selector: string): Promise<Array<CssDeclaration>> {
+    return this.request('getPageDeclarations', selector);
   }
 
   getPageCssContext(selector: string): Promise<string> {

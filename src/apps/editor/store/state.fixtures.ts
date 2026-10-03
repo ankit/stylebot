@@ -27,6 +27,7 @@ const mockState: State = {
   activeSelector: '',
   computedStyles: {},
   appliedDeclarations: [],
+  pageDeclarations: [],
   contextMenuSelector: '',
 
   help: false,
