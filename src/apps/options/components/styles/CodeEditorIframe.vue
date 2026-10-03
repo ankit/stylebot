@@ -1,6 +1,7 @@
 <template>
   <div class="stylebot-code-editor-iframe" :class="{ ready }">
     <iframe ref="iframe" :src="src" />
+    <span ref="exit" tabindex="-1" />
   </div>
 </template>
 
@@ -80,6 +81,9 @@ export default Vue.extend({
         this.ready = true;
         // Covers a theme change that happened while the iframe was still loading.
         this.postTheme(this.resolvedTheme);
+      } else if (message.data.type === 'stylebotEscapePressed') {
+        // Tab indents inside Monaco, so Escape steps just past it instead.
+        (this.$refs.exit as HTMLElement).focus();
       }
     },
 
