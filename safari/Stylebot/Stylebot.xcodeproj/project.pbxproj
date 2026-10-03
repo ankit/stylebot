@@ -28,7 +28,6 @@
 		BC9E614B3067731200A7D161 /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = BC9E613A3067731200A7D161 /* manifest.json */; };
 		BC9E614C3067731200A7D161 /* options.html in Resources */ = {isa = PBXBuildFile; fileRef = BC9E613B3067731200A7D161 /* options.html */; };
 		BC9E614D3067731200A7D161 /* _locales in Resources */ = {isa = PBXBuildFile; fileRef = BC9E613C3067731200A7D161 /* _locales */; };
-		BC9E614E3067731200A7D161 /* sync in Resources */ = {isa = PBXBuildFile; fileRef = BC9E613D3067731200A7D161 /* sync */; };
 		BC9E614F3067731200A7D161 /* fonts in Resources */ = {isa = PBXBuildFile; fileRef = BC9E613E3067731200A7D161 /* fonts */; };
 		BC9E61503067731200A7D161 /* monaco-editor in Resources */ = {isa = PBXBuildFile; fileRef = BC9E613F3067731200A7D161 /* monaco-editor */; };
 		BC9E61513067731200A7D161 /* readability in Resources */ = {isa = PBXBuildFile; fileRef = BC9E61403067731200A7D161 /* readability */; };
@@ -85,7 +84,6 @@
 		BC9E613A3067731200A7D161 /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = manifest.json; path = "../../../safari-dist/manifest.json"; sourceTree = "<group>"; };
 		BC9E613B3067731200A7D161 /* options.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = options.html; path = "../../../safari-dist/options.html"; sourceTree = "<group>"; };
 		BC9E613C3067731200A7D161 /* _locales */ = {isa = PBXFileReference; lastKnownFileType = folder; name = _locales; path = "../../../safari-dist/_locales"; sourceTree = "<group>"; };
-		BC9E613D3067731200A7D161 /* sync */ = {isa = PBXFileReference; lastKnownFileType = folder; name = sync; path = "../../../safari-dist/sync"; sourceTree = "<group>"; };
 		BC9E613E3067731200A7D161 /* fonts */ = {isa = PBXFileReference; lastKnownFileType = folder; name = fonts; path = "../../../safari-dist/fonts"; sourceTree = "<group>"; };
 		BC9E613F3067731200A7D161 /* monaco-editor */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "monaco-editor"; path = "../../../safari-dist/monaco-editor"; sourceTree = "<group>"; };
 		BC9E61403067731200A7D161 /* readability */ = {isa = PBXFileReference; lastKnownFileType = folder; name = readability; path = "../../../safari-dist/readability"; sourceTree = "<group>"; };
@@ -177,7 +175,6 @@
 				BC9E613A3067731200A7D161 /* manifest.json */,
 				BC9E613B3067731200A7D161 /* options.html */,
 				BC9E613C3067731200A7D161 /* _locales */,
-				BC9E613D3067731200A7D161 /* sync */,
 				BC9E613E3067731200A7D161 /* fonts */,
 				BC9E613F3067731200A7D161 /* monaco-editor */,
 				BC9E61403067731200A7D161 /* readability */,
@@ -295,7 +292,6 @@
 				BC9E61483067731200A7D161 /* editor-window in Resources */,
 				BC9E61533067731200A7D161 /* editor in Resources */,
 				BC9E614B3067731200A7D161 /* manifest.json in Resources */,
-				BC9E614E3067731200A7D161 /* sync in Resources */,
 				BC9E61443067731200A7D161 /* popup in Resources */,
 				BC9E614A3067731200A7D161 /* inject-css in Resources */,
 				BC9E61513067731200A7D161 /* readability in Resources */,
