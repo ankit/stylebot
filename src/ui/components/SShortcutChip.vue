@@ -48,19 +48,19 @@ export default Vue.extend({
   display: inline-flex;
   align-items: center;
   flex-shrink: 0;
-  background: var(--raised-surface);
-  border: 1px solid var(--field-border);
-  border-bottom-width: 2px;
+  padding: 5px 8px;
   border-radius: 5px;
-  padding: 4px 8px;
+  background: var(--key-surface);
+  box-shadow: 0 0 0 1px var(--key-outline), inset 0 -1px 0 var(--key-edge);
+  color: var(--key-ink);
 
   &.small {
-    padding: 5px 5px;
+    padding: 5px 6px;
   }
 
   &.muted {
     background: transparent;
-    border-color: transparent;
+    box-shadow: none;
     color: var(--text-muted);
   }
 }

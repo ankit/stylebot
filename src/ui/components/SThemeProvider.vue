@@ -33,7 +33,6 @@ export default Vue.extend({
   --panel-surface: #1c1e22;
   --card-surface: #1f2026;
   --tab-surface: #141519;
-  --raised-surface: #000;
   --code-surface: #1a1b1e;
   --panel-shadow: rgb(0 0 0 / 34%);
 
@@ -83,6 +82,12 @@ export default Vue.extend({
   --pill-border: #3a3d45;
   --pill-hover: #31343b;
 
+  // Keys
+  --key-surface: #33353c;
+  --key-outline: transparent;
+  --key-edge: #45474f;
+  --key-ink: #d1d3d8;
+
   // Count badges
   --count-badge-surface: #22304d;
   --count-badge-ink: #9dbcff;
@@ -117,7 +122,6 @@ export default Vue.extend({
   --panel-surface: #fff;
   --card-surface: #fff;
   --tab-surface: #f7f8fa;
-  --raised-surface: #fff;
   --code-surface: #fcfcfd;
   --panel-shadow: rgb(0 0 0 / 16%);
 
@@ -168,6 +172,12 @@ export default Vue.extend({
   --pill-surface: var(--card-surface);
   --pill-border: var(--field-border-selector);
   --pill-hover: var(--hover-tint);
+
+  // Keys
+  --key-surface: #fff;
+  --key-outline: #e1e3e8;
+  --key-edge: #d9dce1;
+  --key-ink: #374151;
 
   // Count badges
   --count-badge-surface: #e7eefc;

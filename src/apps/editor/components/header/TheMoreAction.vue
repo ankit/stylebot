@@ -213,9 +213,6 @@ export default Vue.extend({
   --field-surface: var(--card-field-surface);
 
   width: 200px;
-  --menu-padding: 8px;
-  padding: 8px !important;
-  gap: 2px !important;
 }
 
 .more-menu .text,
@@ -230,12 +227,12 @@ export default Vue.extend({
   justify-content: space-between;
   gap: 12px;
   width: 100%;
-  min-height: 34px;
+  min-height: 32px;
   padding: 0 8px;
 }
 
 .more-menu .more-menu-divider {
-  margin: 6px 8px;
+  margin: 4px 8px;
 }
 
 .menu-item-row {
@@ -259,7 +256,7 @@ export default Vue.extend({
 
 .more-menu .menu-item {
   margin: 0;
-  min-height: 34px;
+  min-height: 32px;
   padding: 0 8px;
   border-radius: 8px;
 }

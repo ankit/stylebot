@@ -9,51 +9,43 @@
         {{ t('keyboard_shortcuts') }}
       </s-heading>
 
-      <s-shortcut-chip small :value="editorCommands.close" :mac="mac" />
+      <s-text size="caption" variant="muted">{{ t('esc_to_close') }}</s-text>
     </div>
 
     <div class="view-body">
-      <div v-for="group in groups" :key="group.label" class="group">
-        <s-text size="overline" class="group-label">
-          {{ group.label }}
-        </s-text>
+      <section v-for="group in groups" :key="group.label" class="group">
+        <div class="group-heading">
+          <h2 class="group-label">{{ group.label }}</h2>
+          <a
+            v-if="group.editable"
+            href="#"
+            class="options-link"
+            @click="openOptions"
+          >
+            {{ t('edit_in_options') }}
+          </a>
+        </div>
 
-        <div class="rows">
+        <div class="rows" :class="`columns-${group.columns || 1}`">
           <div v-for="row in group.rows" :key="row.label" class="row">
-            <s-text class="row-label">{{ row.label }}</s-text>
-            <div class="keys">
-              <template v-for="(key, index) in row.keys">
-                <s-shortcut-chip
-                  v-if="key"
-                  :key="index"
-                  small
-                  class="key-chip"
-                  :value="key"
-                  :mac="mac"
-                />
-                <s-text
-                  v-else
-                  :key="index"
-                  size="caption"
-                  variant="muted"
-                  class="unassigned"
-                >
-                  {{ t('not_set') }}
-                </s-text>
-              </template>
-            </div>
+            <span class="row-label">{{ row.label }}</span>
+            <s-shortcut-chip
+              v-if="row.key"
+              small
+              class="key-chip"
+              :value="row.key"
+              :mac="mac"
+            />
+            <s-text v-else size="caption" variant="muted">
+              {{ t('not_set') }}
+            </s-text>
           </div>
         </div>
-      </div>
+      </section>
 
-      <div class="footer">
-        <s-text size="caption" variant="muted">
-          {{ t('change_in_options') }}
-          <a href="#" class="options-link" @click="openOptions">
-            {{ t('view_options') }}
-          </a>
-        </s-text>
-      </div>
+      <s-text size="caption" variant="muted" class="footer">
+        {{ t('panel_keys_work_outside_text_fields') }}
+      </s-text>
     </div>
   </div>
 </template>
@@ -72,8 +64,13 @@ import { isMac, openOptionsPage } from '@stylebot/utils';
 
 import { undoShortcuts } from '../../store/undo-stack';
 
-type ShortcutRow = { label: string; keys: Array<string> };
-type ShortcutGroup = { label: string; rows: Array<ShortcutRow> };
+type ShortcutRow = { label: string; key: string };
+type ShortcutGroup = {
+  label: string;
+  rows: Array<ShortcutRow>;
+  columns?: number;
+  editable?: boolean;
+};
 
 export default Vue.extend({
   name: 'TheKeyboardShortcutsView',
@@ -96,10 +93,6 @@ export default Vue.extend({
   },
 
   computed: {
-    host(): string {
-      return this.$store.state.host;
-    },
-
     commands(): StylebotCommands {
       return this.$store.state.commands;
     },
@@ -108,62 +101,51 @@ export default Vue.extend({
       return this.$store.state.editorCommands;
     },
 
-    panelRows(): Array<ShortcutRow> {
+    groups(): Array<ShortcutGroup> {
+      const keys = this.editorCommands;
       const undo = undoShortcuts(this.mac ?? isMac());
 
-      const rows: Array<ShortcutRow> = [
+      return [
         {
-          label: this.t('toggle_inspector'),
-          keys: [this.editorCommands.inspect],
-        },
-        {
-          label: this.t('undo_redo'),
-          keys: [undo.undo, undo.redo],
-        },
-        {
-          label: this.t('hide_selected_element'),
-          keys: [this.editorCommands.hide],
-        },
-        {
-          label: ['basic_mode', 'code_mode', 'presets_mode', 'chat_mode']
-            .map(key => this.t(key))
-            .join(' · '),
-          keys: [
-            this.editorCommands.basic,
-            this.editorCommands.code,
-            this.editorCommands.magic,
-            this.editorCommands.chat,
+          label: this.t('this_panel'),
+          rows: [
+            { label: this.t('element_picker'), key: keys.inspect },
+            { label: this.t('hide_selected'), key: keys.hide },
+            { label: this.t('undo'), key: undo.undo },
+            { label: this.t('redo'), key: undo.redo },
           ],
         },
         {
-          label: this.t('dock_left_right'),
-          keys: [this.editorCommands.dockLeft, this.editorCommands.dockRight],
+          label: this.t('tabs'),
+          columns: 2,
+          rows: [
+            { label: this.t('basic_mode'), key: keys.basic },
+            { label: this.t('code_mode'), key: keys.code },
+            { label: this.t('presets_mode'), key: keys.magic },
+            { label: this.t('chat_mode'), key: keys.chat },
+          ],
         },
-      ];
-
-      rows.push({
-        label: this.t('open_in_separate_window'),
-        keys: [this.editorCommands.dockWindow],
-      });
-
-      return rows;
-    },
-
-    globalRows(): Array<ShortcutRow> {
-      return [
-        { label: this.t('toggle_editor'), keys: [this.commands.stylebot] },
-        { label: this.t('toggle_styling'), keys: [this.commands.style] },
         {
-          label: this.t('toggle_readability'),
-          keys: [this.commands.readability],
+          label: this.t('position'),
+          columns: 3,
+          rows: [
+            { label: this.t('left'), key: keys.dockLeft },
+            { label: this.t('right'), key: keys.dockRight },
+            { label: this.t('window'), key: keys.dockWindow },
+          ],
         },
-      ];
-    },
-
-    groups(): Array<ShortcutGroup> {
-      return [
-        { label: this.t('this_panel'), rows: this.panelRows },
-        { label: this.t('anywhere'), rows: this.globalRows },
+        {
+          label: this.t('anywhere'),
+          editable: true,
+          rows: [
+            { label: this.t('toggle_editor'), key: this.commands.stylebot },
+            { label: this.t('toggle_styling'), key: this.commands.style },
+            {
+              label: this.t('toggle_readability'),
+              key: this.commands.readability,
+            },
+          ],
+        },
       ];
     },
   },
@@ -205,10 +187,6 @@ export default Vue.extend({
   border-bottom: 1px solid var(--panel-border);
 }
 
-.back-button ::v-deep .icon-button {
-  border-radius: 7px;
-}
-
 .title {
   flex: 1;
   min-width: 0;
@@ -220,41 +198,72 @@ export default Vue.extend({
   overflow: auto;
   display: flex;
   flex-direction: column;
-  padding: 12px 16px 16px;
+  gap: 8px;
+  padding: 12px;
 }
 
-.group + .group {
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px solid var(--panel-border);
+.group {
+  flex: none;
+  padding: 0 14px 8px;
+  border-radius: 12px;
+  background: var(--card-surface);
+}
+
+.group-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 12px 0 4px;
 }
 
 .group-label {
-  display: block;
-  padding-bottom: 5px;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 20px;
+  color: var(--section-heading);
+}
+
+.options-link {
+  font-size: 12px;
+  color: var(--accent-text);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.rows {
+  display: grid;
+  column-gap: 20px;
+
+  &.columns-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  &.columns-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: 16px;
+  }
 }
 
 .row {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--panel-border);
-
-  &:last-child {
-    border-bottom: none;
-  }
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 28px;
+  padding: 2px 0;
 }
 
 .row-label {
-  flex: 1;
-  min-width: 0;
-}
+  @include truncate;
 
-.keys {
-  display: flex;
-  align-items: center;
-  gap: 3px;
+  min-width: 0;
+  font-size: 13px;
+  color: var(--text-body);
 }
 
 .key-chip {
@@ -263,15 +272,6 @@ export default Vue.extend({
 }
 
 .footer {
-  margin-top: auto;
-  padding-top: 12px;
-}
-
-.options-link {
-  color: var(--accent-text);
-
-  &:hover {
-    text-decoration: underline;
-  }
+  padding: 4px 4px 0;
 }
 </style>

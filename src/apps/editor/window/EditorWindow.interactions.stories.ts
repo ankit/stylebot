@@ -135,7 +135,7 @@ export const ShortcutsViewInWindow: StoryObj = {
     await waitFor(() => expect(shortcutsView(canvasElement)).toBeVisible());
 
     const view = within(shortcutsView(canvasElement) as HTMLElement);
-    await expect(view.getByText('Open in separate window')).toBeInTheDocument();
+    await expect(view.getByText('Window')).toBeInTheDocument();
     await expect(view.queryByText('Push the page aside')).toBeNull();
   },
 };
