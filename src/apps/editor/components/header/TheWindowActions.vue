@@ -1,7 +1,7 @@
 <template>
   <div class="window-actions">
     <the-more-action />
-    <the-close-action />
+    <the-close-action v-if="$store.state.host !== 'window'" />
   </div>
 </template>
 

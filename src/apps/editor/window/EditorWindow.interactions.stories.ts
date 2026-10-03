@@ -89,18 +89,12 @@ export const DockBackFromWindow: StoryObj = {
   },
 };
 
-export const CloseFromWindow: StoryObj = {
+export const NoCloseInWindow: StoryObj = {
   ...editorWindow(WITH_RULE),
-  name: 'the close button closes the window for its tab',
+  name: 'the window leaves closing to its own title bar',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const sendMessage = sentMessages();
-
-    await user.click(canvas.getByRole('button', { name: 'Close' }));
-    await expect(sendMessage).toHaveBeenCalledWith({
-      name: 'CloseEditorWindow',
-      tabId: 7,
-    });
+    await expect(canvas.queryByRole('button', { name: 'Close' })).toBeNull();
   },
 };
 

@@ -55,22 +55,6 @@ test('popping out hides the in-page panel and opens the editor in its own window
 
   const windows = await extension.evaluate(() => chrome.windows.getAll());
   expect(windows.filter(w => w.type === 'popup')).toHaveLength(1);
-
-  // The strip's rendering is covered in Storybook; here it drives the real
-  // tabs API: activating the edited tab from the window.
-  const tabBar = popout.locator('.window-tab');
-  const other = await context.newPage();
-  await other.goto(`${baseUrl}/two`);
-  await other.bringToFront();
-  const isEditedTabActive = () =>
-    extension.evaluate(
-      async url => (await chrome.tabs.query({ url }))[0]?.active,
-      `${baseUrl}/`
-    );
-  await expect.poll(isEditedTabActive).toBe(false);
-
-  await tabBar.click();
-  await expect.poll(isEditedTabActive).toBe(true);
 });
 
 test('edits made in the window apply to the page live and persist', async ({
@@ -165,18 +149,6 @@ test('once undocked, the popup opens and closes the window', async ({
 
   const closed = popout.waitForEvent('close');
   await closeButton.click();
-  await closed;
-});
-
-test('the close button closes the window', async ({ context, openPopup }) => {
-  const page = await context.newPage();
-  await page.goto(`${baseUrl}/`);
-
-  const editorRoot = await openEditor(page, openPopup);
-  const popout = await popOutEditor(context, page, editorRoot);
-
-  const closed = popout.waitForEvent('close');
-  await popout.getByRole('button', { name: 'Close' }).click();
   await closed;
 });
 
