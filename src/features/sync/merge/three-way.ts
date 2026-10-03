@@ -1,5 +1,5 @@
 import type { StyleMap, StyleWithoutUrl } from '@stylebot/types';
-import { isEquivalentStyle, isForceImportant } from '@stylebot/saved-styles';
+import { isEquivalentStyle } from '@stylebot/saved-styles';
 
 import { mergeCss } from './merge-css';
 import { mergeWithoutBase } from './merge-without-base';
@@ -39,13 +39,7 @@ const mergeStyle = (
   );
 
   return {
-    style: {
-      css,
-      enabled: newer.enabled,
-      readability: newer.readability,
-      modifiedTime: newer.modifiedTime,
-      ...(!isForceImportant(newer) ? { forceImportant: false } : {}),
-    },
+    style: { ...newer, css },
     conflicted,
   };
 };

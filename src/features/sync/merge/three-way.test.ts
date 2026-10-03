@@ -130,6 +130,20 @@ describe('mergeThreeWay', () => {
     expect(styles['a.com'].forceImportant).toBe(false);
   });
 
+  it('keeps fields it does not know about when both sides changed', () => {
+    const newer = {
+      ...style('a { color: green; }', '2024-03-01T00:00:00.000Z'),
+      futureField: 'kept',
+    } as StyleWithoutUrl;
+    const { styles } = merge(
+      { 'a.com': X },
+      { 'a.com': X1 },
+      { 'a.com': newer }
+    );
+
+    expect(styles['a.com']).toHaveProperty('futureField', 'kept');
+  });
+
   it('deletes a style local removed', () => {
     expect(merge({ 'a.com': X }, {}, { 'a.com': X })).toEqual({
       styles: {},

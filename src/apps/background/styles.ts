@@ -8,6 +8,7 @@ import {
   getStylesForPage,
   isCompiledStylesCurrent,
   isForceImportant,
+  withForceImportant,
 } from '@stylebot/saved-styles';
 
 import type {
@@ -271,16 +272,16 @@ export const set = (
     if (!css) {
       delete styles[url];
     } else {
-      const keepForceImportant =
-        forceImportant ?? isForceImportant(styles[url]);
-
-      styles[url] = {
-        css,
-        readability,
-        enabled: true,
-        modifiedTime: getCurrentTimestamp(),
-        ...(keepForceImportant ? {} : { forceImportant: false }),
-      };
+      styles[url] = withForceImportant(
+        {
+          ...styles[url],
+          css,
+          readability,
+          enabled: true,
+          modifiedTime: getCurrentTimestamp(),
+        },
+        forceImportant ?? isForceImportant(styles[url])
+      );
     }
 
     return styles;

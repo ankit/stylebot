@@ -99,6 +99,17 @@ describe('set', () => {
     styles = store.styles as Record<string, object>;
     expect(styles['example.com']).not.toHaveProperty('forceImportant');
   });
+
+  it('keeps fields it does not know about', async () => {
+    (store.styles as Record<string, Record<string, unknown>>)[
+      'example.com'
+    ].futureField = 'kept';
+
+    await set('example.com', 'body { color: blue; }', false);
+
+    const styles = store.styles as Record<string, object>;
+    expect(styles['example.com']).toHaveProperty('futureField', 'kept');
+  });
 });
 
 describe('style edits', () => {

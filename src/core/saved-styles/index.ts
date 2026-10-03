@@ -1,7 +1,7 @@
 export { isSupportedUrl } from './url';
 export { getStylesForPage } from './page';
 export { isEquivalentStyle, isEquivalentStyleMap } from './equivalence';
-export { isForceImportant } from './force-important';
+export { isForceImportant, withForceImportant } from './force-important';
 export {
   STYLES_KEY,
   STYLES_METADATA_KEY,
