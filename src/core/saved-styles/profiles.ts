@@ -76,6 +76,25 @@ export const normalizeProfiles = <T extends WithProfiles>(style: T): T => {
 };
 
 /**
+ * Orders profile ids for display: the default profile first, then by name,
+ * with the id breaking a tie between two profiles of the same name.
+ */
+const inDisplayOrder =
+  (profiles: StyleProfiles) =>
+  (a: string, b: string): number => {
+    if (a === DEFAULT_PROFILE_ID) {
+      return -1;
+    }
+    if (b === DEFAULT_PROFILE_ID) {
+      return 1;
+    }
+
+    return (
+      profiles[a].name.localeCompare(profiles[b].name) || a.localeCompare(b)
+    );
+  };
+
+/**
  * Every profile of a style with its css. A style that never had profiles
  * reads as one unnamed default profile.
  */
@@ -91,11 +110,7 @@ export const expandProfiles = (style: WithProfiles): ExpandedProfiles => {
 
   const sheets: ExpandedProfiles['sheets'] = {};
   // chrome.storage sorts object keys, so stored order is not creation order.
-  const ids = Object.keys(profiles).sort((a, b) =>
-    a === DEFAULT_PROFILE_ID || b === DEFAULT_PROFILE_ID
-      ? Number(b === DEFAULT_PROFILE_ID) - Number(a === DEFAULT_PROFILE_ID)
-      : profiles[a].name.localeCompare(profiles[b].name) || (a < b ? -1 : 1)
-  );
+  const ids = Object.keys(profiles).sort(inDisplayOrder(profiles));
 
   for (const id of ids) {
     const profile = profiles[id];
