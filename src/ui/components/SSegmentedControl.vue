@@ -186,8 +186,10 @@ export default Vue.extend({
   &.fit .segment {
     flex: none;
     box-sizing: border-box;
+    min-width: 28px;
     height: 24px;
-    padding: 0 9px;
+    padding: 0 8px;
+    border-radius: 5px;
     font-size: 13px;
   }
 }

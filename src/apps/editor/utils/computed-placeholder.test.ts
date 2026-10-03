@@ -15,9 +15,9 @@ describe('computed-placeholder', () => {
       expect(toPlaceholder('-8px')).toBe('-8');
     });
 
-    it('is empty for zero and anything that is not a px length', () => {
-      expect(toPlaceholder('0px')).toBe('');
-      expect(toPlaceholder('0.01px')).toBe('');
+    it('keeps zero and is empty for anything that is not a px length', () => {
+      expect(toPlaceholder('0px')).toBe('0');
+      expect(toPlaceholder('0.01px')).toBe('0');
       expect(toPlaceholder('normal')).toBe('');
       expect(toPlaceholder('4px 8px')).toBe('');
       expect(toPlaceholder('')).toBe('');
@@ -26,6 +26,15 @@ describe('computed-placeholder', () => {
   });
 
   describe('computedPlaceholder', () => {
+    it('estimates a normal line height from the font size', () => {
+      expect(
+        computedPlaceholder(
+          { 'line-height': 'normal', 'font-size': '15px' },
+          'line-height'
+        )
+      ).toBe('18');
+    });
+
     const corners = (a: string, b: string) => ({
       'border-top-left-radius': a,
       'border-top-right-radius': a,

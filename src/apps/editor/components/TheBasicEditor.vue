@@ -225,7 +225,7 @@ export default Vue.extend({
   display: flex;
   flex-direction: column;
   min-height: 100%;
-  gap: 10px;
+  gap: 8px;
   padding: 12px;
   background: var(--tab-surface);
 }

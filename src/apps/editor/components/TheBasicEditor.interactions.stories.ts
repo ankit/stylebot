@@ -177,3 +177,53 @@ export const CollapseAll: StoryObj = {
     ).not.toContain(true);
   },
 };
+
+export const OtherSelectorSource: StoryObj = {
+  ...editor({
+    css: 'h1 { color: #2a5fd6; }',
+    activeSelector: 'h1',
+  }),
+  name: 'a value another selector sets shows its source beside the label, and clicking it switches to that selector',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+
+    store.commit('setAppliedDeclarations', [
+      { selector: 'body', property: 'font-family', value: 'Georgia' },
+    ]);
+
+    const source = await canvas.findByRole('button', {
+      name: 'Styled by body',
+    });
+    await expect(source.closest('.property-row-heading')).toHaveTextContent(
+      'Font'
+    );
+
+    await user.click(source);
+    await expect(store.state.activeSelector).toBe('body');
+  },
+};
+
+export const OverriddenBySelector: StoryObj = {
+  ...editor({
+    css: 'h1 { color: #2a5fd6; font-family: Georgia; }',
+    activeSelector: 'h1',
+  }),
+  name: 'a value another selector overrides shows a warning with the winning selector',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+
+    store.commit('setAppliedDeclarations', [
+      { selector: 'body', property: 'font-family', value: 'Arial' },
+    ]);
+
+    const warning = await canvas.findByRole('button', {
+      name: 'Overridden by body',
+    });
+    await expect(warning.closest('.property-row-heading')).toHaveTextContent(
+      'Font'
+    );
+    await expect(warning.querySelector('svg')).not.toBeNull();
+  },
+};

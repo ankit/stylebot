@@ -82,6 +82,12 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .mode-actions {
-  margin-top: 10px;
+  position: relative;
+  margin-top: 16px;
+  margin-bottom: -1px;
+}
+
+.mode-actions .tabs {
+  margin: 0 16px;
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
   <property-row property="font-size" :label="t('font_size')">
-    <length property="font-size" :sizes="sizes" />
+    <length property="font-size" />
   </property-row>
 </template>
 
@@ -16,28 +16,6 @@ export default Vue.extend({
   components: {
     Length,
     PropertyRow,
-  },
-
-  data(): {
-    sizes: Array<string>;
-  } {
-    return {
-      sizes: [
-        '9',
-        '10',
-        '11',
-        '12',
-        '14',
-        '18',
-        '24',
-        '30',
-        '36',
-        '48',
-        '64',
-        '72',
-        '96',
-      ],
-    };
   },
 });
 </script>

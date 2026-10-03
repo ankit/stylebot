@@ -1,6 +1,6 @@
 <template>
   <property-row property="line-height" :label="t('line_height')">
-    <length property="line-height" :sizes="sizes" />
+    <length property="line-height" />
   </property-row>
 </template>
 
@@ -16,14 +16,6 @@ export default Vue.extend({
   components: {
     Length,
     PropertyRow,
-  },
-
-  data(): {
-    sizes: Array<string>;
-  } {
-    return {
-      sizes: ['12', '14', '18', '24', '30', '36', '48'],
-    };
   },
 });
 </script>
