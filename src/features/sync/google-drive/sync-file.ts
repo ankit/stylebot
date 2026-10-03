@@ -5,11 +5,11 @@ import type {
   StyleMap,
   SyncAccount,
 } from '@stylebot/types';
+import { isStyleMap, sanitizeStyleMap } from '@stylebot/saved-styles';
 
 import { syncError } from '../errors';
 import type { AccessToken } from './get-access-token';
 import { getAuthorizationHeaders, parseJsonResponse } from './http';
-import { isStyleMap } from './style-map';
 import { SYNC_FOLDER_NAME, SYNC_FILE_NAME } from './constants';
 
 const GOOGLE_DRIVE_FILE_GET_API = `https://www.googleapis.com/drive/v3/files`;
@@ -234,7 +234,7 @@ export const downloadSyncFile = async (
     throw syncError('The synced file is not a map of styles', 'parse');
   }
 
-  return styles;
+  return sanitizeStyleMap(styles);
 };
 
 /**

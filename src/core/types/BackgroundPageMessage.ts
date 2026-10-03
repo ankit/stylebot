@@ -10,6 +10,36 @@ export type SetStyle = {
   readability: boolean;
   // Left out, the stored style keeps its current value.
   forceImportant?: boolean;
+  // Left out, the css goes to the active profile.
+  profileId?: string;
+};
+
+export type SetActiveProfile = {
+  name: 'SetActiveProfile';
+  url: string;
+  profileId: string;
+};
+
+export type CreateProfile = {
+  name: 'CreateProfile';
+  url: string;
+  profileName: string;
+  // Left out, the new profile starts blank.
+  sourceProfileId?: string;
+  activate: boolean;
+};
+
+export type RenameProfile = {
+  name: 'RenameProfile';
+  url: string;
+  profileId: string;
+  profileName: string;
+};
+
+export type DeleteProfile = {
+  name: 'DeleteProfile';
+  url: string;
+  profileId: string;
 };
 
 export type EnableStyle = {
@@ -220,6 +250,10 @@ type BackgroundPageMessage =
   | SetAllStyles
   | MoveStyle
   | GetStylesForPage
+  | SetActiveProfile
+  | CreateProfile
+  | RenameProfile
+  | DeleteProfile
   | GetAllOptions
   | GetOption
   | SetOption

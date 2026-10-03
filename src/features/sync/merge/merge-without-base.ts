@@ -1,5 +1,6 @@
 import { compareAsc } from 'date-fns';
-import type { StyleMap } from '@stylebot/types';
+import type { StyleMap, StyleWithoutUrl } from '@stylebot/types';
+import { collapseProfiles, expandProfiles } from '@stylebot/saved-styles';
 
 /**
  * Returns 0 for an unparseable timestamp on either side, so the caller's
@@ -15,6 +16,34 @@ const compareModifiedTime = (t1?: string, t2?: string) => {
   }
 
   return compareAsc(d1, d2);
+};
+
+/**
+ * The winning copy of a style with any profiles only the losing copy has
+ * added, so a profile made on one device before its first sync survives.
+ */
+const withMissingProfiles = (
+  winner: StyleWithoutUrl,
+  loser?: StyleWithoutUrl
+): StyleWithoutUrl => {
+  if (!loser?.profiles) {
+    return winner;
+  }
+
+  const won = expandProfiles(winner);
+  const lost = expandProfiles(loser);
+  const missing = Object.keys(lost.sheets).filter(id => !(id in won.sheets));
+
+  if (missing.length === 0) {
+    return winner;
+  }
+
+  const sheets = { ...won.sheets };
+  missing.forEach(id => {
+    sheets[id] = lost.sheets[id];
+  });
+
+  return collapseProfiles(winner, { active: won.active, sheets });
 };
 
 /**
@@ -35,9 +64,9 @@ export const mergeWithoutBase = (
       remote[url] &&
       compareModifiedTime(remote[url].modifiedTime, local[url].modifiedTime) > 0
     ) {
-      styles[url] = remote[url];
+      styles[url] = withMissingProfiles(remote[url], local[url]);
     } else {
-      styles[url] = local[url];
+      styles[url] = withMissingProfiles(local[url], remote[url]);
     }
   });
 

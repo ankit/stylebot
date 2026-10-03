@@ -13,6 +13,10 @@ import {
   getGoogleFontFile,
   applyStylesToAllTabs,
   ensureCompiledStyles,
+  setActiveProfile,
+  createProfile,
+  renameProfile,
+  deleteProfile,
 } from './styles';
 import * as styleStorage from './styles';
 
@@ -30,6 +34,11 @@ import type {
   DisableStyle as DisableStyleType,
   EnableStyle as EnableStyleType,
   SetStyle as SetStyleType,
+  SetActiveProfile as SetActiveProfileType,
+  CreateProfile as CreateProfileType,
+  CreateProfileResponse,
+  RenameProfile as RenameProfileType,
+  DeleteProfile as DeleteProfileType,
   MoveStyle as MoveStyleType,
   SetAllStyles as SetAllStylesType,
   SetReadability as SetReadabilityType,
@@ -120,7 +129,48 @@ export const EnableStyle = async (message: EnableStyleType): Promise<void> => {
 };
 
 export const SetStyle = (message: SetStyleType): Promise<void> =>
-  set(message.url, message.css, message.readability, message.forceImportant);
+  set(
+    message.url,
+    message.css,
+    message.readability,
+    message.forceImportant,
+    message.profileId
+  );
+
+export const SetActiveProfile = async (
+  message: SetActiveProfileType
+): Promise<void> => {
+  await setActiveProfile(message.url, message.profileId);
+  return applyStylesToAllTabs();
+};
+
+export const CreateProfile = async (
+  message: CreateProfileType,
+  sendResponse: (response: CreateProfileResponse) => void
+): Promise<void> => {
+  const profileId = await createProfile(message.url, {
+    name: message.profileName,
+    sourceProfileId: message.sourceProfileId,
+    activate: message.activate,
+  });
+
+  sendResponse({ profileId });
+  return applyStylesToAllTabs();
+};
+
+export const RenameProfile = async (
+  message: RenameProfileType
+): Promise<void> => {
+  await renameProfile(message.url, message.profileId, message.profileName);
+  return applyStylesToAllTabs();
+};
+
+export const DeleteProfile = async (
+  message: DeleteProfileType
+): Promise<void> => {
+  await deleteProfile(message.url, message.profileId);
+  return applyStylesToAllTabs();
+};
 
 export const GetAllStyles = async (
   sendResponse: (response: GetAllStylesResponse) => void

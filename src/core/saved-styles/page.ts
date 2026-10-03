@@ -1,6 +1,7 @@
 import type { StyleMap } from '@stylebot/types';
 
 import { isHtmlUrl, matchesUrlPattern } from './url';
+import { hasAnyCss } from './profiles';
 
 type WithUrl<T> = T & { url: string };
 
@@ -39,7 +40,7 @@ export const getStylesForPage = <T extends { css: string } = StyleMap[string]>(
         }
       }
 
-      if (style.css) {
+      if (hasAnyCss(style)) {
         styles.push(style);
       }
     }

@@ -11,6 +11,10 @@ import {
   disable,
   move,
   setReadability,
+  setActiveProfile,
+  createProfile,
+  renameProfile,
+  deleteProfile,
   getGoogleWebFontExists,
   getGoogleFontFile,
   ensureCompiledStyles,
@@ -212,6 +216,109 @@ describe('style edits', () => {
 
     expect(stored('new.com')).toMatchObject({ css: '', readability: true });
     expect(writes()).toBe(1);
+  });
+
+  it('adds a profile in one write, keeping the existing css as the default', async () => {
+    const id = await createProfile('example.com', {
+      name: 'Dark',
+      activate: true,
+    });
+
+    expect(writes()).toBe(1);
+    expect(stored('example.com')).toMatchObject({
+      css: '',
+      activeProfile: id,
+      profiles: {
+        default: { name: '', css: 'body { color: red; }' },
+        [id]: { name: 'Dark' },
+      },
+    });
+  });
+
+  it('duplicates the css of the profile it copies', async () => {
+    const id = await createProfile('example.com', {
+      name: 'Copy',
+      sourceProfileId: 'default',
+      activate: false,
+    });
+
+    expect(stored('example.com')).toMatchObject({
+      css: 'body { color: red; }',
+      profiles: { [id]: { name: 'Copy', css: 'body { color: red; }' } },
+    });
+  });
+
+  it('switches, renames and deletes profiles', async () => {
+    const id = await createProfile('example.com', {
+      name: 'Dark',
+      activate: false,
+    });
+
+    await setActiveProfile('example.com', id);
+    expect(stored('example.com')).toMatchObject({ css: '', activeProfile: id });
+
+    await renameProfile('example.com', id, 'Night');
+    expect(stored('example.com')).toMatchObject({
+      profiles: { [id]: { name: 'Night' } },
+    });
+
+    await deleteProfile('example.com', id);
+    expect(stored('example.com')).toMatchObject({
+      css: 'body { color: red; }',
+      activeProfile: 'default',
+      profiles: { default: { name: '' } },
+    });
+  });
+
+  it('skips the write when a profile change does nothing', async () => {
+    await setActiveProfile('example.com', 'default');
+    await setActiveProfile('example.com', 'missing');
+    await renameProfile('example.com', 'missing', 'x');
+    await deleteProfile('example.com', 'default');
+
+    expect(writes()).toBe(0);
+  });
+
+  it('saves css to the profile it names, and keeps a style whose active profile is blank', async () => {
+    const id = await createProfile('example.com', {
+      name: 'Dark',
+      activate: false,
+    });
+
+    await set('example.com', 'a {}', false, undefined, id);
+    expect(stored('example.com')).toMatchObject({
+      css: 'body { color: red; }',
+      profiles: { [id]: { css: 'a {}' } },
+    });
+
+    await set('example.com', '', false);
+    expect(stored('example.com')).toMatchObject({ css: '' });
+
+    await set('example.com', '', false, undefined, id);
+    expect(stored('example.com')).toBeUndefined();
+  });
+
+  it('never adds profile fields to a style that has none', async () => {
+    await set('example.com', 'a {}', false);
+    await disable('example.com');
+    await enable('example.com');
+    await setReadability('example.com', true);
+    await move('example.com', 'moved.com');
+
+    expect(stored('moved.com')).not.toHaveProperty('profiles');
+    expect(stored('moved.com')).not.toHaveProperty('activeProfile');
+  });
+
+  it('still deletes a style without profiles when its css is cleared', async () => {
+    await set('example.com', '', false);
+
+    expect(stored('example.com')).toBeUndefined();
+  });
+
+  it('drops a save to a profile that no longer exists', async () => {
+    await set('example.com', 'a {}', false, undefined, 'gone');
+
+    expect(writes()).toBe(0);
   });
 
   it('lines up a sync after an edit, but not after a write sync itself made', async () => {

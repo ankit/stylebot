@@ -19,6 +19,10 @@ import {
   GetStylesForPage,
   EnableStyle,
   DisableStyle,
+  SetActiveProfile,
+  CreateProfile,
+  RenameProfile,
+  DeleteProfile,
   SetReadability,
   ReadabilityActiveChanged,
   GetReadabilitySettings,
@@ -210,6 +214,18 @@ export const initListeners = (): void => {
           break;
         case 'DisableStyle':
           DisableStyle(message);
+          break;
+        case 'SetActiveProfile':
+          SetActiveProfile(message);
+          break;
+        case 'CreateProfile':
+          CreateProfile(message, sendResponse);
+          break;
+        case 'RenameProfile':
+          RenameProfile(message);
+          break;
+        case 'DeleteProfile':
+          DeleteProfile(message);
           break;
 
         case 'SetReadability':
