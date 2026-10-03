@@ -1,5 +1,27 @@
 <template>
   <div class="basic-editor-actions">
+    <div v-if="canUndo || canRedo" class="history">
+      <s-icon-button
+        :size="28"
+        :tooltip="t('undo')"
+        :tooltip-shortcut="undoShortcuts.undo"
+        :disabled="!canUndo"
+        @click="undo"
+      >
+        <undo-icon :size="16" />
+      </s-icon-button>
+
+      <s-icon-button
+        :size="28"
+        :tooltip="t('redo')"
+        :tooltip-shortcut="undoShortcuts.redo"
+        :disabled="!canRedo"
+        @click="redo"
+      >
+        <redo-icon :size="16" />
+      </s-icon-button>
+    </div>
+
     <s-tooltip :text="hideTooltipText" :shortcut="editorCommands.hide">
       <s-button
         size="small"
@@ -28,18 +50,24 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { SButton, STooltip } from '@stylebot/components';
+import { SButton, SIconButton, STooltip } from '@stylebot/components';
 import { getDeclarationValue } from '@stylebot/css';
-import { EyeOffIcon } from '@stylebot/icons';
+import { EyeOffIcon, RedoIcon, UndoIcon } from '@stylebot/icons';
 import type { StylebotEditorCommands } from '@stylebot/types';
+import { isMac } from '@stylebot/utils';
+
+import { undoShortcuts } from '../../store/undo-stack';
 
 export default Vue.extend({
   name: 'TheBasicEditorActions',
 
   components: {
     SButton,
+    SIconButton,
     STooltip,
     EyeOffIcon,
+    RedoIcon,
+    UndoIcon,
   },
 
   computed: {
@@ -55,6 +83,18 @@ export default Vue.extend({
     // Nothing to reset until the active selector actually has a rule.
     resetDisabled(): boolean {
       return this.disabled || !this.$store.getters.activeRule;
+    },
+
+    canUndo(): boolean {
+      return this.$store.getters.canUndo;
+    },
+
+    canRedo(): boolean {
+      return this.$store.getters.canRedo;
+    },
+
+    undoShortcuts(): { undo: string; redo: string } {
+      return undoShortcuts(isMac());
     },
 
     editorCommands(): StylebotEditorCommands {
@@ -76,6 +116,14 @@ export default Vue.extend({
       });
     },
 
+    undo(): void {
+      this.$store.dispatch('undo');
+    },
+
+    redo(): void {
+      this.$store.dispatch('redo');
+    },
+
     reset(): void {
       this.$store.dispatch('resetActiveRule');
     },
@@ -88,6 +136,13 @@ export default Vue.extend({
   display: flex;
   justify-content: flex-end;
   gap: 6px;
+}
+
+.basic-editor-actions .history {
+  display: flex;
+  gap: 2px;
+  margin-right: 8px;
+  color: var(--text-body);
 }
 
 .basic-editor-actions .action-button {

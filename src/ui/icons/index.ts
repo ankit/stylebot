@@ -14,6 +14,8 @@ export { default as DropletIcon } from './DropletIcon.vue';
 export { default as EyedropperIcon } from './EyedropperIcon.vue';
 export { default as EyeIcon } from './EyeIcon.vue';
 export { default as EyeOffIcon } from './EyeOffIcon.vue';
+export { default as UndoIcon } from './UndoIcon.vue';
+export { default as RedoIcon } from './RedoIcon.vue';
 export { default as AlignLeftIcon } from './AlignLeftIcon.vue';
 export { default as AlignCenterIcon } from './AlignCenterIcon.vue';
 export { default as AlignRightIcon } from './AlignRightIcon.vue';
