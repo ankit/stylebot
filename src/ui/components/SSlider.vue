@@ -7,6 +7,7 @@
     :step="step"
     :value="value"
     :disabled="disabled"
+    :style="{ '--fill': `${fill}%` }"
     @input="$emit('input', $event.target.valueAsNumber)"
   />
 </template>
@@ -43,6 +44,14 @@ export default Vue.extend({
       default: false,
     },
   },
+
+  computed: {
+    fill(): number {
+      const span = this.max - this.min;
+      const ratio = span > 0 ? (this.value - this.min) / span : 0;
+      return Math.min(100, Math.max(0, ratio * 100));
+    },
+  },
 });
 </script>
 
@@ -50,42 +59,54 @@ export default Vue.extend({
 .s-slider {
   flex: 1;
   min-width: 0;
-  height: 16px;
+  height: 12px;
   margin: 0;
   appearance: none;
   -webkit-appearance: none;
   background: transparent;
 
   &::-webkit-slider-runnable-track {
-    height: 4px;
-    border-radius: 2px;
-    background: var(--slider-track);
+    height: 2px;
+    border-radius: 1px;
+    background: linear-gradient(
+      to right,
+      var(--text-muted) var(--fill),
+      var(--slider-track) var(--fill)
+    );
   }
 
   &::-webkit-slider-thumb {
     appearance: none;
     -webkit-appearance: none;
-    width: 16px;
-    height: 16px;
-    margin-top: -6px;
+    width: 12px;
+    height: 12px;
+    margin-top: -5px;
     border-radius: 50%;
-    background: var(--accent);
-    cursor: pointer;
+    background: #fff;
+    box-shadow: 0 0 0 1px rgb(0 0 0 / 25%), 0 1px 2px rgb(0 0 0 / 30%);
+    cursor: grab;
   }
 
   &::-moz-range-track {
-    height: 4px;
-    border-radius: 2px;
+    height: 2px;
+    border-radius: 1px;
     background: var(--slider-track);
   }
 
+  &::-moz-range-progress {
+    height: 2px;
+    border-radius: 1px;
+    background: var(--text-muted);
+  }
+
   &::-moz-range-thumb {
-    width: 16px;
-    height: 16px;
+    width: 12px;
+    height: 12px;
     border: none;
     border-radius: 50%;
-    background: var(--accent);
-    cursor: pointer;
+    background: #fff;
+    box-shadow: 0 0 0 1px rgb(0 0 0 / 25%), 0 1px 2px rgb(0 0 0 / 30%);
+    cursor: grab;
   }
 
   @include focus-ring(1px, '::-webkit-slider-thumb');
@@ -93,13 +114,8 @@ export default Vue.extend({
   &:disabled {
     opacity: 0.6;
 
-    &::-webkit-slider-thumb {
-      background: var(--text-muted);
-      cursor: default;
-    }
-
+    &::-webkit-slider-thumb,
     &::-moz-range-thumb {
-      background: var(--text-muted);
       cursor: default;
     }
   }

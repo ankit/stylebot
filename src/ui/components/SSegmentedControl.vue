@@ -180,12 +180,15 @@ export default Vue.extend({
   display: flex;
   gap: 2px;
   padding: 2px;
-  border-radius: 8px;
-  background: var(--tab-surface);
+  border-radius: 7px;
+  background: var(--field-surface);
 
   &.fit .segment {
     flex: none;
-    padding: 4px 10px;
+    box-sizing: border-box;
+    height: 24px;
+    padding: 0 9px;
+    font-size: 13px;
   }
 }
 
@@ -194,10 +197,9 @@ export default Vue.extend({
   top: 2px;
   left: 0;
   bottom: 2px;
-  border-radius: 6px;
-  background: var(--card-surface);
-  box-shadow: 0 1px 2px rgb(0 0 0 / 10%),
-    inset 0 0 0 1px color-mix(in srgb, var(--text-primary) 12%, transparent);
+  border-radius: 5px;
+  background: var(--field-surface-active);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 14%);
   pointer-events: none;
 
   &:not(.ready) {
@@ -225,7 +227,7 @@ export default Vue.extend({
   background: none;
   font-family: inherit;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 400;
   color: var(--text-muted);
   outline: none;
   cursor: pointer;
@@ -236,13 +238,16 @@ export default Vue.extend({
   }
 
   &.active {
-    font-weight: 600;
+    font-weight: 400;
     color: var(--text-primary);
   }
 
   &.placeholder {
-    outline: 1px dashed color-mix(in srgb, var(--text-primary) 24%, transparent);
-    outline-offset: -1px;
+    background: color-mix(
+      in srgb,
+      var(--field-surface-active) 70%,
+      transparent
+    );
     color: var(--text-secondary);
   }
 
@@ -279,6 +284,6 @@ export default Vue.extend({
 
 .segment .segment-sizer {
   visibility: hidden;
-  font-weight: 600;
+  font-weight: 400;
 }
 </style>

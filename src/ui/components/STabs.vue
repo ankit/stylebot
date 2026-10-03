@@ -197,6 +197,13 @@ export default Vue.extend({
     color: var(--text-primary);
   }
 
-  @include focus-ring;
+  &:focus-visible::after {
+    content: '';
+    position: absolute;
+    inset: 2px -6px 5px;
+    border-radius: 6px;
+    box-shadow: 0 0 0 2px var(--accent);
+    pointer-events: none;
+  }
 }
 </style>

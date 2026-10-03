@@ -1,5 +1,7 @@
 <template>
   <div class="number-field" :class="{ disabled }">
+    <span v-if="prefix" class="number-prefix">{{ prefix }}</span>
+
     <input
       ref="input"
       class="number-input"
@@ -71,6 +73,12 @@ export default Vue.extend({
       default: '',
     },
 
+    // Short label shown before the value (e.g. 'X' or 'T').
+    prefix: {
+      type: String,
+      default: '',
+    },
+
     // Unit label shown after the value (e.g. 'px'); omit for unitless values.
     unit: {
       type: String,
@@ -135,13 +143,14 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .number-field {
-  @include field-border;
+  @include field-fill;
 
   box-sizing: border-box;
   position: relative;
   display: flex;
   align-items: stretch;
-  width: 108px;
+  width: 96px;
+  height: 28px;
   font-size: 13px;
   line-height: 1.2;
 
@@ -153,6 +162,20 @@ export default Vue.extend({
 
   &.disabled {
     opacity: 0.6;
+  }
+}
+
+.number-prefix {
+  flex: none;
+  display: flex;
+  align-items: center;
+  padding-left: 8px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-muted);
+
+  + .number-input {
+    padding-left: 9px;
   }
 }
 
@@ -170,13 +193,13 @@ export default Vue.extend({
   background: transparent;
   padding: 5px 8px;
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1.2;
-  color: var(--text-primary);
+  color: var(--field-ink);
   cursor: text;
 
   &::placeholder {
-    color: var(--text-faint);
+    color: var(--field-placeholder);
   }
 
   &:disabled {
@@ -189,9 +212,8 @@ export default Vue.extend({
   display: flex;
   align-items: center;
   padding: 5px 7px;
-  border-left: 1px solid var(--field-divider);
   font-family: var(--font-mono);
-  font-size: 11.5px;
+  font-size: 12px;
   color: var(--text-muted);
 }
 
@@ -208,7 +230,6 @@ export default Vue.extend({
   align-items: center;
   justify-content: center;
   width: 22px;
-  border-left: 1px solid var(--field-divider);
   border-radius: 0 6px 6px 0;
   outline: none;
   color: var(--text-muted);

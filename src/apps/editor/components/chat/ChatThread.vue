@@ -104,34 +104,7 @@ export default Vue.extend({
   gap: 10px;
   padding: 16px 16px 12px;
 
-  &::-webkit-scrollbar {
-    width: 10px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    border: 3px solid transparent;
-    border-radius: 5px;
-    background: color-mix(in srgb, var(--text-primary) 22%, transparent)
-      padding-box;
-
-    &:hover {
-      background-color: color-mix(
-        in srgb,
-        var(--text-primary) 36%,
-        transparent
-      );
-    }
-  }
-
-  @supports (-moz-appearance: none) {
-    scrollbar-width: thin;
-    scrollbar-color: color-mix(in srgb, var(--text-primary) 22%, transparent)
-      transparent;
-  }
+  @include thin-scrollbar;
 }
 
 .chat-thread > :first-child {

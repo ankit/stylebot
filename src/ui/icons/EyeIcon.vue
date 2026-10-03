@@ -1,19 +1,18 @@
 <template>
   <svg
-    viewBox="0 0 24 24"
+    viewBox="0 0 16 16"
     :width="size"
     :height="size"
     fill="none"
     stroke="currentColor"
-    stroke-width="1.8"
+    stroke-width="1.4"
     stroke-linecap="round"
     stroke-linejoin="round"
   >
-    <path d="m2 22 1-1h3l9-9" />
-    <path d="M3 21v-3l9-9" />
     <path
-      d="m15 6 3.4-3.4a2.1 2.1 0 1 1 3 3L18 9l.4.4a2.1 2.1 0 1 1-3 3l-3.8-3.8a2.1 2.1 0 1 1 3-3l.4.4Z"
+      d="M1.5 8c1.5-3 4-4.5 6.5-4.5S13.5 5 14.5 8c-1.5 3-4 4.5-6.5 4.5S2.5 11 1.5 8z"
     />
+    <circle cx="8" cy="8" r="1.6" />
   </svg>
 </template>
 
@@ -21,12 +20,12 @@
 import Vue from 'vue';
 
 export default Vue.extend({
-  name: 'EyedropperIcon',
+  name: 'EyeIcon',
 
   props: {
     size: {
       type: Number,
-      default: 13,
+      default: 14,
     },
   },
 });
