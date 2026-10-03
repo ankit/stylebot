@@ -24,11 +24,22 @@ class MonacEditorIframe {
   populated = false;
   // Decoration ids of the lines marked by stylebotHighlightLines.
   highlights: Array<string> = [];
+  // Seeded from the url, then kept current from the very first message, so
+  // a theme sent while Monaco is still loading isn't lost.
+  theme: 'light' | 'dark' =
+    new URLSearchParams(window.location.search).get('theme') === 'dark'
+      ? 'dark'
+      : 'light';
 
   constructor(variant: MonacoEditorVariant = 'default') {
     this.variant = variant;
 
     this.patchBlobWorkerLoading();
+    window.addEventListener('message', (message: { data: ParentMessage }) => {
+      if (message.data.type === 'stylebotThemeUpdate') {
+        this.setTheme(message.data.theme);
+      }
+    });
     this.loadEditor(() => {
       this.attachWindowListeners();
       this.defineThemes();
@@ -108,18 +119,14 @@ class MonacEditorIframe {
   }
 
   getMonacoTheme(): 'custom-light' | 'custom-dark' {
-    return new URLSearchParams(window.location.search).get('theme') === 'dark'
-      ? 'custom-dark'
-      : 'custom-light';
+    return this.theme === 'dark' ? 'custom-dark' : 'custom-light';
   }
 
   setTheme(theme: 'light' | 'dark'): void {
-    // Keeps the pre-Monaco-load background (see theme-init.js) in sync too,
-    // in case the parent's theme changes again before the editor is ready.
+    this.theme = theme;
+    // Keeps the pre-Monaco-load background (see theme-init.js) in sync too.
     document.documentElement.classList.toggle('theme-dark', theme === 'dark');
-    window.monaco.editor.setTheme(
-      theme === 'dark' ? 'custom-dark' : 'custom-light'
-    );
+    window.monaco?.editor.setTheme(this.getMonacoTheme());
   }
 
   configureCssLanguage(): void {
@@ -318,8 +325,6 @@ class MonacEditorIframe {
         this.highlightLines(message.data.ranges);
       } else if (message.data.type === 'stylebotFocusEditor') {
         this.editor.focus();
-      } else if (message.data.type === 'stylebotThemeUpdate') {
-        this.setTheme(message.data.theme);
       }
     });
   }
