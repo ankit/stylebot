@@ -8,7 +8,7 @@
 import type { PropType } from 'vue';
 import Vue from 'vue';
 
-type Size = 'label' | 'body' | 'caption' | 'overline';
+type Size = 'large' | 'label' | 'body' | 'caption' | 'overline';
 type Variant = 'muted' | 'default' | 'primary';
 
 export default Vue.extend({
@@ -48,6 +48,11 @@ export default Vue.extend({
 
 .primary {
   color: var(--accent-text);
+}
+
+.text-large {
+  font-size: 14px;
+  line-height: 1.3;
 }
 
 .text-body {

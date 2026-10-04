@@ -57,7 +57,7 @@ export default Vue.extend({
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 9px 10px;
+  padding: 8px 10px;
   border-radius: 8px;
 
   &.button:not(.disabled),

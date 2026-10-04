@@ -9,7 +9,7 @@ const meta: Meta = {
   argTypes: {
     size: {
       control: 'radio',
-      options: ['body', 'label', 'caption', 'overline'],
+      options: ['large', 'body', 'label', 'caption', 'overline'],
     },
     variant: { control: 'radio', options: ['default', 'muted', 'primary'] },
     as: { control: 'select', options: ['p', 'span', 'div'] },
@@ -33,6 +33,7 @@ export const Playground = playground(
 export const Variants = matrix({
   components: { SText },
   rows: [
+    { label: 'large', attrs: 'size="large"' },
     { label: 'body', attrs: 'size="body"' },
     { label: 'label', attrs: 'size="label"' },
     { label: 'caption', attrs: 'size="caption"' },

@@ -23,6 +23,7 @@ export { default as AlignJustifyIcon } from './AlignJustifyIcon.vue';
 export { default as AlignLeftBarsIcon } from './AlignLeftBarsIcon.vue';
 export { default as CoffeeIcon } from './CoffeeIcon.vue';
 export { default as FlagIcon } from './FlagIcon.vue';
+export { default as GearIcon } from './GearIcon.vue';
 export { default as KeyboardIcon } from './KeyboardIcon.vue';
 export { default as OptionsIcon } from './OptionsIcon.vue';
 export { default as ToggleIcon } from './ToggleIcon.vue';

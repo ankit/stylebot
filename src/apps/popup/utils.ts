@@ -155,6 +155,18 @@ export const openSyncOptions = (): void => {
   window.close();
 };
 
+/**
+ * Opens Stylebot's page in the browser's extension settings, where access to
+ * file URLs is turned on.
+ */
+export const openExtensionDetails = (): void => {
+  chrome.tabs.create({ url: `chrome://extensions/?id=${chrome.runtime.id}` });
+  window.close();
+};
+
+export const getFileAccessAllowed = (): Promise<boolean> =>
+  new Promise(resolve => chrome.extension.isAllowedFileSchemeAccess(resolve));
+
 export const reportIssue = (): void => {
   openReportIssuePage();
   window.close();

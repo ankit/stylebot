@@ -106,7 +106,7 @@ test.describe('popup sync strip', () => {
       .poll(() =>
         popup
           .locator('.sync-strip', {
-            hasText: 'Sign in to Google Drive to resume syncing.',
+            hasText: 'Sign in to keep syncing',
           })
           .isVisible()
       )
@@ -138,14 +138,14 @@ test.describe('popup sync strip', () => {
       .poll(() =>
         popup
           .locator('.sync-strip', {
-            hasText: 'Sign in to Google Drive to resume syncing.',
+            hasText: 'Sign in to keep syncing',
           })
           .isVisible()
       )
       .toBe(true);
 
     const opened = context.waitForEvent('page');
-    await popup.locator('.sync-strip').click();
+    await popup.locator('.sync-button', { hasText: 'Sign in' }).click();
     const options = await opened;
 
     await expect.poll(() => options.url()).toMatch(/options\.html#\/sync$/);

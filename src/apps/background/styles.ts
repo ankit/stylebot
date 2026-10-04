@@ -76,7 +76,15 @@ export const refreshBadgeForTab = async (
   const allStyles = await getAll();
   const { styles } = getStylesForPage(tab.url, allStyles);
   const readabilityActive = await getIsReadabilityActive(tab.id);
-  updateIcon(tab, styles, readabilityActive);
+  await updateIcon(tab, styles, readabilityActive);
+};
+
+/**
+ * Refreshes every tab's badge, for changes that aren't about one page.
+ */
+export const refreshAllBadges = async (): Promise<void> => {
+  const tabs = await chrome.tabs.query({});
+  await Promise.all(tabs.map(refreshBadgeForTab));
 };
 
 /**

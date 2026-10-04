@@ -11,6 +11,7 @@ const meta: Meta = {
     value: { control: 'boolean' },
     disabled: { control: 'boolean' },
     size: { control: 'radio', options: ['sm', 'lg'] },
+    trackEnd: { control: 'boolean' },
     label: { control: 'text' },
     shortcut: { control: 'text' },
   },
@@ -18,6 +19,7 @@ const meta: Meta = {
     value: true,
     disabled: false,
     size: 'sm',
+    trackEnd: false,
     label: 'Readability',
     shortcut: '',
   },
@@ -30,7 +32,12 @@ const components = { SToggleSwitch, SShortcutKbd };
 export const Playground = playground(
   components,
   `
-  <s-toggle-switch :value="value" :disabled="disabled" :size="size">
+  <s-toggle-switch
+    :value="value"
+    :disabled="disabled"
+    :size="size"
+    :track-end="trackEnd"
+  >
     {{ label }}
     <template v-if="shortcut" #trailing>
       <s-shortcut-kbd small :value="shortcut" />
@@ -44,6 +51,7 @@ export const Variants = matrix({
   rows: [
     { label: 'sm', attrs: 'size="sm"' },
     { label: 'lg', attrs: 'size="lg"' },
+    { label: 'sm, track end', attrs: 'size="sm" track-end' },
   ],
   columns: [
     {

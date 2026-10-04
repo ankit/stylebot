@@ -1,13 +1,35 @@
 <template>
   <div class="site-profiles">
     <div class="popup-header site-header">
-      <s-heading as="h1" size="sm" class="site-domain">{{ url }}</s-heading>
-      <s-text variant="muted">{{ summary }}</s-text>
+      <s-heading as="h1" size="md" class="site-domain">{{ url }}</s-heading>
+      <options-button />
     </div>
 
     <div class="popup-divider" />
 
-    <div class="profile-list" role="radiogroup" :aria-label="url">
+    <div
+      class="profile-list"
+      :class="{ 'profile-list--joined': joined }"
+      role="radiogroup"
+      :aria-label="url"
+    >
+      <button
+        type="button"
+        role="radio"
+        class="profile-option"
+        :class="{ checked: !enabled }"
+        :aria-checked="enabled ? 'false' : 'true'"
+        :disabled="disableOff"
+        @click="$emit('pick', null)"
+      >
+        <span class="check-slot" aria-hidden="true">
+          <check-icon v-if="!enabled" :size="13" />
+        </span>
+        <s-text as="span" size="large" class="profile-name">
+          {{ t('no_style') }}
+        </s-text>
+      </button>
+
       <button
         v-for="profile in profiles"
         :key="profile.id"
@@ -26,25 +48,8 @@
             :size="13"
           />
         </span>
-        <s-text as="span" class="profile-name">
+        <s-text as="span" size="large" class="profile-name">
           {{ displayName(profile) }}
-        </s-text>
-      </button>
-
-      <button
-        type="button"
-        role="radio"
-        class="profile-option off"
-        :class="{ checked: !enabled }"
-        :aria-checked="enabled ? 'false' : 'true'"
-        :disabled="disableOff"
-        @click="$emit('pick', null)"
-      >
-        <span class="check-slot" aria-hidden="true">
-          <check-icon v-if="!enabled" :size="13" />
-        </span>
-        <s-text as="span" variant="muted" class="profile-name">
-          {{ t('no_style') }}
         </s-text>
       </button>
     </div>
@@ -56,6 +61,7 @@ import type { PropType } from 'vue';
 import Vue from 'vue';
 import { SHeading, SText } from '@stylebot/components';
 import { CheckIcon } from '@stylebot/icons';
+import OptionsButton from './OptionsButton.vue';
 import type { ProfileSummary } from '@stylebot/saved-styles';
 
 export default Vue.extend({
@@ -65,6 +71,7 @@ export default Vue.extend({
     SHeading,
     SText,
     CheckIcon,
+    OptionsButton,
   },
 
   props: {
@@ -88,26 +95,16 @@ export default Vue.extend({
       required: true,
     },
 
+    // Rows follow straight on below the list, as more items of the same group.
+    joined: {
+      type: Boolean,
+      default: false,
+    },
+
     // While the editor is open it keeps the style on, so turning it off waits.
     disableOff: {
       type: Boolean,
       default: false,
-    },
-  },
-
-  computed: {
-    summary(): string {
-      if (!this.enabled) {
-        return this.t('styling_off_on_this_site');
-      }
-
-      const active = this.profiles.find(
-        profile => profile.id === this.activeProfile
-      );
-
-      return `${this.t('profile_count', [
-        String(this.profiles.length),
-      ])} · ${this.t('name_is_on', [active ? this.displayName(active) : ''])}`;
     },
   },
 
@@ -121,18 +118,27 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .site-header {
-  gap: 8px;
-  padding: 16px 16px 14px;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px 12px;
 }
 
 .site-domain {
   @include truncate;
+
+  flex: 1;
+  min-width: 0;
 }
 
 .profile-list {
   display: flex;
   flex-direction: column;
   padding: 6px;
+
+  &.profile-list--joined {
+    padding-bottom: 0;
+  }
 }
 
 .profile-option {
@@ -140,10 +146,10 @@ export default Vue.extend({
 
   display: flex;
   align-items: center;
-  gap: 14px;
-  height: 36px;
+  gap: 12px;
+  height: 34px;
   padding: 0 10px;
-  border-radius: 8px;
+  border-radius: 7px;
   cursor: pointer;
 
   &:hover:not(:disabled) {

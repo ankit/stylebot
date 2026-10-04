@@ -2,7 +2,11 @@ import { mount } from '@vue/test-utils';
 
 import SyncStylebot from './SyncStylebot.vue';
 import { openSyncOptions } from '../utils';
-import { getLastSyncedAt, getSyncNeedsAuth } from '@stylebot/sync';
+import {
+  getLastSyncedAt,
+  getSyncError,
+  getSyncNeedsAuth,
+} from '@stylebot/sync';
 import type { RunGoogleDriveSyncResponse } from '@stylebot/types';
 
 jest.mock('../utils', () => ({
@@ -12,6 +16,7 @@ jest.mock('../utils', () => ({
 jest.mock('@stylebot/sync', () => ({
   formatSyncTime: (value?: string) => (value ? `at ${value}` : ''),
   getLastSyncedAt: jest.fn(),
+  getSyncError: jest.fn(),
   getSyncNeedsAuth: jest.fn(),
 }));
 
@@ -29,9 +34,14 @@ const metadata = {
   webContentLink: 'https://drive.google.com/download',
 };
 
-const syncState = (lastSyncedAt?: string, needsAuth = false) => {
+const syncState = (
+  lastSyncedAt?: string,
+  needsAuth = false,
+  errorKey: string | null = null
+) => {
   (getLastSyncedAt as jest.Mock).mockResolvedValue(lastSyncedAt);
   (getSyncNeedsAuth as jest.Mock).mockResolvedValue(needsAuth);
+  (getSyncError as jest.Mock).mockResolvedValue(errorKey);
 };
 
 /**
@@ -103,13 +113,14 @@ describe('SyncStylebot.vue', () => {
     respond({ ok: false, errorKey: 'sync_error_network' });
     await flush();
 
-    expect(wrapper.text()).toContain('sync_error_network');
+    expect(wrapper.text()).toContain('couldnt_reach_google_drive');
+    expect(wrapper.text()).toContain('retry');
     expect(wrapper.emitted('synced')).toBeUndefined();
 
     await wrapper.find('.sync-button').trigger('click');
 
     expect(sendMessage).toHaveBeenCalledTimes(2);
-    expect(wrapper.text()).not.toContain('sync_error_network');
+    expect(wrapper.text()).not.toContain('couldnt_reach_google_drive');
   });
 
   it('treats a background that never answered as a failure', async () => {
@@ -118,7 +129,16 @@ describe('SyncStylebot.vue', () => {
     respond(undefined);
     await flush();
 
-    expect(wrapper.text()).toContain('sync_error_unknown');
+    expect(wrapper.text()).toContain('couldnt_sync');
+  });
+
+  it('shows a failure from a sync that ran while the popup was closed', async () => {
+    syncState('earlier', false, 'sync_error_network');
+    const wrapper = mount(SyncStylebot);
+    await flush();
+
+    expect(wrapper.text()).toContain('couldnt_reach_google_drive');
+    expect(wrapper.text()).toContain('retry');
   });
 
   it('points to the Sync tab when a sign-in is needed', async () => {
@@ -126,9 +146,9 @@ describe('SyncStylebot.vue', () => {
     const wrapper = mount(SyncStylebot);
     await flush();
 
-    expect(wrapper.text()).toContain('sync_needs_sign_in');
+    expect(wrapper.text()).toContain('sign_in_to_keep_syncing');
 
-    await wrapper.trigger('click');
+    await wrapper.find('.sync-button').trigger('click');
 
     expect(openSyncOptions).toHaveBeenCalled();
   });
@@ -140,6 +160,6 @@ describe('SyncStylebot.vue', () => {
     respond({ ok: false, errorKey: 'sync_error_auth' });
     await flush();
 
-    expect(wrapper.text()).toContain('sync_needs_sign_in');
+    expect(wrapper.text()).toContain('sign_in_to_keep_syncing');
   });
 });

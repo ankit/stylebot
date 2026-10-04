@@ -1,30 +1,18 @@
 <template>
-  <div
-    v-if="header"
-    class="popup-header"
-    :class="{ disabled: disableToggle }"
-    @click="onHeaderClick"
-  >
-    <s-toggle-switch
-      v-model="enabled"
-      size="lg"
-      :disabled="disableToggle"
-      @change="onChange"
-    >
-      <div class="popup-header-domain">{{ url }}</div>
-      <template #trailing>
-        <s-shortcut-chip v-if="shortcut" muted :value="shortcut" />
-      </template>
-    </s-toggle-switch>
-  </div>
-
-  <popup-row v-else hover :disabled="disableToggle">
+  <popup-row hover :disabled="disableToggle">
     <s-toggle-switch
       v-model="enabled"
       :disabled="disableToggle"
+      :track-end="site"
       @change="onChange"
     >
-      {{ url }}
+      <span v-if="site" class="site-style-label">
+        <s-text as="span" size="large">{{ name || t('style') }}</s-text>
+        <span v-if="shortcut" class="shortcut-hint">
+          <s-shortcut-kbd :value="shortcut" />
+        </span>
+      </span>
+      <template v-else>{{ url }}</template>
     </s-toggle-switch>
 
     <span v-if="profiles.length > 1" class="profile-select" @click.stop>
@@ -55,15 +43,11 @@ import PopupRow from './PopupRow.vue';
 import {
   SMenuItem,
   SSelect,
-  SShortcutChip,
+  SShortcutKbd,
+  SText,
   SToggleSwitch,
 } from '@stylebot/components';
-import {
-  disableStyle,
-  enableStyle,
-  forwardClickToInput,
-  setActiveProfile,
-} from '../utils';
+import { disableStyle, enableStyle, setActiveProfile } from '../utils';
 
 export default Vue.extend({
   name: 'StyleComponent',
@@ -71,7 +55,8 @@ export default Vue.extend({
   components: {
     PopupRow,
     SToggleSwitch,
-    SShortcutChip,
+    SShortcutKbd,
+    SText,
     SSelect,
     SMenuItem,
   },
@@ -87,8 +72,14 @@ export default Vue.extend({
     initialEnabled: {
       type: Boolean,
     },
-    header: {
+    // The page's own style, when it has a single profile: an on/off row
+    // labelled by the profile's name, or "Style" until it has one.
+    site: {
       type: Boolean,
+    },
+    name: {
+      type: String,
+      default: '',
     },
     shortcut: {
       type: String,
@@ -132,14 +123,6 @@ export default Vue.extend({
       }
     },
 
-    onHeaderClick(event: MouseEvent): void {
-      if (this.disableToggle) {
-        return;
-      }
-
-      forwardClickToInput(event, this.$el);
-    },
-
     onChange(): void {
       if (this.enabled) {
         enableStyle(this.url);
@@ -152,12 +135,10 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-.popup-header {
-  cursor: pointer;
-
-  &.disabled {
-    cursor: default;
-  }
+.site-style-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .profile-select {
@@ -165,8 +146,15 @@ export default Vue.extend({
   cursor: default;
 }
 
-.popup-header .popup-header-domain {
-  position: relative;
-  top: -1px;
+.shortcut-hint {
+  display: inline-flex;
+  color: var(--text-muted);
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+
+.popup-row:hover .shortcut-hint,
+.popup-row:focus-within .shortcut-hint {
+  opacity: 1;
 }
 </style>

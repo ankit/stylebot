@@ -1,5 +1,8 @@
 <template>
-  <label class="switch" :class="[`switch--${size}`, { disabled }]">
+  <label
+    class="switch"
+    :class="[`switch--${size}`, { disabled, 'switch--track-end': trackEnd }]"
+  >
     <input
       ref="input"
       type="checkbox"
@@ -30,6 +33,8 @@ export default Vue.extend({
   props: {
     value: Boolean,
     disabled: Boolean,
+    // Puts the switch after the label and trailing content, at the row's end.
+    trackEnd: Boolean,
     size: {
       type: String as PropType<Size>,
       default: 'sm',
@@ -164,5 +169,9 @@ input {
 .label {
   min-width: 0;
   flex: 1;
+}
+
+.switch--track-end .track {
+  order: 1;
 }
 </style>

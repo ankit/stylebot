@@ -53,7 +53,7 @@ export const RetriesAfterFailure: StoryObj = {
     storage: syncOn,
     googleDriveSync: { ok: false, errorKey: 'sync_error_network' },
   }),
-  name: 'a failed sync says why, and Sync now tries again',
+  name: 'a failed sync says why, and Retry tries again',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const sendMessage = spyOn(chrome.runtime, 'sendMessage');
@@ -65,7 +65,7 @@ export const RetriesAfterFailure: StoryObj = {
       await canvas.findByText(/Couldn't reach Google Drive/)
     ).toBeVisible();
 
-    await user.click(syncNow);
+    await user.click(canvas.getByRole('button', { name: 'Retry' }));
 
     await expect(sendMessage).toHaveBeenCalledTimes(2);
     await expect(sendMessage).toHaveBeenLastCalledWith(

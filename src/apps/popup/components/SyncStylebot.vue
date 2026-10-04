@@ -1,20 +1,16 @@
 <template>
-  <button
-    v-if="needsAuth"
-    type="button"
-    class="sync-strip sync-strip--sign-in"
-    @click="openSyncOptions"
-  >
-    <s-text as="span" class="sync-status">
-      {{ t('sync_needs_sign_in') }}
-    </s-text>
-    <chevron-right-icon :size="14" />
-  </button>
-
-  <div v-else class="sync-strip" :class="{ 'sync-strip--error': errorKey }">
-    <s-text v-if="errorKey" as="span" class="sync-status">
-      {{ t(errorKey, [errorDetail]) }}
-    </s-text>
+  <div class="sync-strip" :class="{ 'sync-strip--standalone': standalone }">
+    <component
+      :is="syncTime ? 's-tooltip' : 'span'"
+      v-if="issueText"
+      :text="t('last_synced_time', [syncTime])"
+      class="sync-status-tooltip"
+    >
+      <s-text as="span" class="sync-status">
+        <span class="dot dot--danger" />
+        {{ issueText }}
+      </s-text>
+    </component>
     <s-text v-else-if="syncTime" as="span" variant="muted" class="sync-status">
       <span class="dot" />
       {{ t('synced_at_time', [syncTime]) }}
@@ -29,18 +25,25 @@
     </s-text>
 
     <button
+      v-if="needsAuth"
+      type="button"
+      class="sync-button"
+      @click="openSyncOptions"
+    >
+      <s-text as="span" size="label" variant="muted" class="sync-button-label">
+        {{ t('sign_in') }}
+      </s-text>
+    </button>
+    <button
+      v-else
       type="button"
       class="sync-button"
       :disabled="syncInProgress"
       @click="sync"
     >
       <arrow-repeat-icon :size="13" :spinning="syncInProgress" />
-      <s-text
-        as="span"
-        size="label"
-        :variant="syncInProgress ? 'muted' : 'default'"
-      >
-        {{ t('sync_now') }}
+      <s-text as="span" size="label" variant="muted" class="sync-button-label">
+        {{ errorKey ? t('retry') : t('sync_now') }}
       </s-text>
     </button>
   </div>
@@ -49,11 +52,12 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { SText } from '@stylebot/components';
-import { ArrowRepeatIcon, ChevronRightIcon } from '@stylebot/icons';
+import { SText, STooltip } from '@stylebot/components';
+import { ArrowRepeatIcon } from '@stylebot/icons';
 import {
   formatSyncTime,
   getLastSyncedAt,
+  getSyncError,
   getSyncNeedsAuth,
 } from '@stylebot/sync';
 import type {
@@ -69,8 +73,13 @@ export default Vue.extend({
 
   components: {
     SText,
+    STooltip,
     ArrowRepeatIcon,
-    ChevronRightIcon,
+  },
+
+  props: {
+    // On its own below a header, rather than tucked under the footer buttons.
+    standalone: Boolean,
   },
 
   data(): {
@@ -78,15 +87,28 @@ export default Vue.extend({
     syncInProgress: boolean;
     needsAuth: boolean;
     errorKey: SyncErrorKey | null;
-    errorDetail: string;
   } {
     return {
       syncTime: '',
       syncInProgress: false,
       needsAuth: false,
       errorKey: null,
-      errorDetail: '',
     };
+  },
+
+  computed: {
+    // One short line; the Sync tab has the full explanation.
+    issueText(): string {
+      if (this.needsAuth) {
+        return this.t('sign_in_to_keep_syncing');
+      }
+
+      if (this.errorKey === 'sync_error_network') {
+        return this.t('couldnt_reach_google_drive');
+      }
+
+      return this.errorKey ? this.t('couldnt_sync') : '';
+    },
   },
 
   created() {
@@ -97,13 +119,15 @@ export default Vue.extend({
     openSyncOptions,
 
     async readSyncState(): Promise<void> {
-      const [lastSyncedAt, needsAuth] = await Promise.all([
+      const [lastSyncedAt, needsAuth, errorKey] = await Promise.all([
         getLastSyncedAt(),
         getSyncNeedsAuth(),
+        getSyncError(),
       ]);
 
       this.syncTime = formatSyncTime(lastSyncedAt);
       this.needsAuth = needsAuth;
+      this.errorKey = errorKey;
     },
 
     /**
@@ -131,10 +155,8 @@ export default Vue.extend({
 
           if (failed) {
             this.errorKey = 'sync_error_unknown';
-            this.errorDetail = '';
           } else if (response && !response.ok) {
             this.errorKey = response.errorKey;
-            this.errorDetail = response.errorDetail ?? '';
           }
           this.syncInProgress = false;
 
@@ -152,38 +174,28 @@ export default Vue.extend({
 .sync-strip {
   display: flex;
   align-items: center;
-  gap: 10px;
-  min-height: 44px;
-  padding: 6px 10px 6px 16px;
+  gap: 8px;
+  min-height: 32px;
+  padding: 0 10px 6px 16px;
 }
 
-.sync-strip--sign-in {
-  @include button-reset;
+.sync-strip--standalone {
+  min-height: 40px;
+  padding: 0 10px 0 16px;
+}
 
-  width: 100%;
-  padding-right: 14px;
-  text-align: left;
-  color: var(--danger);
-  cursor: pointer;
-
-  &:hover {
-    background: var(--hover-tint);
-  }
-
-  @include focus-ring;
+.sync-status-tooltip {
+  display: flex;
+  flex: 1;
+  min-width: 0;
 }
 
 .sync-status {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex: 1;
   min-width: 0;
-}
-
-.sync-strip--sign-in .sync-status,
-.sync-strip--error .sync-status {
-  color: var(--danger);
 }
 
 .dot {
@@ -194,6 +206,10 @@ export default Vue.extend({
   background: var(--success);
 }
 
+.dot--danger {
+  background: var(--danger);
+}
+
 .sync-button {
   @include button-reset;
 
@@ -201,21 +217,22 @@ export default Vue.extend({
   flex: none;
   align-items: center;
   gap: 6px;
+  height: 24px;
   margin-left: auto;
-  padding: 6px 10px;
-  border-radius: 7px;
-  color: var(--text-primary);
+  padding: 0 6px;
+  border-radius: 6px;
+  color: var(--text-muted);
   cursor: pointer;
-
-  &:hover:not(:disabled) {
-    background: var(--hover-tint);
-  }
 
   &:disabled {
     cursor: default;
-    color: var(--text-muted);
   }
 
   @include focus-ring;
+}
+
+.sync-button:hover:not(:disabled),
+.sync-button:hover:not(:disabled) .sync-button-label {
+  color: var(--text-primary);
 }
 </style>

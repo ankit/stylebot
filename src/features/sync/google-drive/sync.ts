@@ -20,6 +20,7 @@ import {
   getSyncState,
   setSyncState,
   setSyncNeedsAuth,
+  setSyncError,
   getLocalStylesMetadata,
   getGoogleDriveSyncEnabled,
 } from './sync-metadata';
@@ -290,6 +291,21 @@ const run = async (
 };
 
 /**
+ * Keeps the failure until a run succeeds. Nothing is kept once sync is off:
+ * disconnecting already cleared it, and a run still in flight must not put it
+ * back.
+ */
+const recordOutcome = async (
+  response: RunGoogleDriveSyncResponse
+): Promise<void> => {
+  if (response.ok) {
+    await setSyncError(null);
+  } else if (await getGoogleDriveSyncEnabled()) {
+    await setSyncError(response.errorKey);
+  }
+};
+
+/**
  * Never rejects. Callers are message handlers whose sendResponse must always
  * fire, so failures come back as a result rather than an exception.
  */
@@ -302,7 +318,8 @@ export const runGoogleDriveSync = (
   inFlight =
     inFlight ??
     run(storage, options).then(
-      response => {
+      async response => {
+        await recordOutcome(response).catch(() => undefined);
         inFlight = null;
         return response;
       },
