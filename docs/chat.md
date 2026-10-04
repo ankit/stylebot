@@ -42,10 +42,10 @@ An excerpt from Hacker News's front page, as the model reads it. A bare `…` ma
 ```text
 (page) [color #828282, font 13.3px]
 center
-  table#hnmain[bgcolor="#f6f6ef"] [bg #f6f6ef, font 16px]
+  table#hnmain[bgcolor="#f6f6ef"] [font 16px]
     tbody
       tr [pad 0, margin 0, h 24px]
-        td[bgcolor="#ff6600"] [bg #ff6600, font 13.3px]
+        td[bgcolor="#ff6600"] [font 13.3px]
           …
                   span.pagetop "| | | | | |" [color #222222]
                     b.hnname
@@ -88,7 +88,7 @@ Each choice answers a failure seen in the eval:
 | Tag, id, up to 4 short classes, 40 characters of own text                                                       | `span.rank "1."`                                                                        | enough to write a selector and recognise the element                                                                  |
 | Looks only where they differ from the parent                                                                    | `td.subtext [font 9.3px]`, the white search `input`                                     | the brackets point at what a request must change                                                                      |
 | `(page)` base line                                                                                              | first line                                                                              | what elements without their own `bg` show                                                                             |
-| `bgcolor` attribute                                                                                             | `td[bgcolor="#ff6600"]`                                                                 | HN's orange header has no class; this is its only selector                                                            |
+| `bgcolor` attribute                                                                                             | `td[bgcolor="#ff6600"]`                                                                 | HN's orange header has no class; this is its only selector. It is the element's background, so no `bg` repeats it     |
 | **Repeats folded**, even when they alternate                                                                    | stories are three rows (title, subtext, spacer); after two of each, `… ×84 more`        | an unfolded list ran out of budget at story 11, and the footer never reached the model                                |
 | Kind of row includes its first children                                                                         | the subtext row (`td, td.subtext`) folds with its kind; `tr.morespace` after it doesn't | plain `tr`s holding different things stay distinct                                                                    |
 | Named ids never fold; numbered ones do                                                                          | `tr#49949235.athing` and `tr#49949438.athing` count as one kind                         | numbered ids mark list items                                                                                          |
