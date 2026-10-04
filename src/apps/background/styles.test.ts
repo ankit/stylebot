@@ -254,8 +254,13 @@ describe('style edits', () => {
       activate: false,
     });
 
+    const { modifiedTime } = stored('example.com');
     await setActiveProfile('example.com', id);
-    expect(stored('example.com')).toMatchObject({ css: '', activeProfile: id });
+    expect(stored('example.com')).toMatchObject({
+      css: '',
+      activeProfile: id,
+      modifiedTime,
+    });
 
     await renameProfile('example.com', id, 'Night');
     expect(stored('example.com')).toMatchObject({

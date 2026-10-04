@@ -78,6 +78,32 @@ describe('mergeWithoutBase', () => {
 });
 
 describe('mergeWithoutBase with profiles', () => {
+  it("keeps this device's applied profile when the remote copy is newer", () => {
+    const local = {
+      css: 'b {}',
+      enabled: true,
+      readability: false,
+      modifiedTime: '2024-01-01T00:00:00.000Z',
+      profiles: { default: { name: '', css: 'a {}' }, dark: { name: 'Dark' } },
+      activeProfile: 'dark',
+    };
+    const remote = {
+      ...local,
+      css: 'c {}',
+      modifiedTime: '2024-02-01T00:00:00.000Z',
+      profiles: { default: { name: '' }, dark: { name: 'Dark', css: 'b {}' } },
+      activeProfile: 'default',
+    };
+
+    expect(
+      mergeStyles({ 'a.com': local }, { 'a.com': remote })['a.com']
+    ).toMatchObject({
+      css: 'b {}',
+      activeProfile: 'dark',
+      profiles: { default: { name: '', css: 'c {}' } },
+    });
+  });
+
   it('keeps a profile only the older copy has', () => {
     const older = {
       css: 'a {}',

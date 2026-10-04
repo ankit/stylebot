@@ -34,6 +34,7 @@ A style map read from outside the extension, an imported backup or the synced fi
 ## Saving and switching
 
 - **Edits name the profile they're for.** The editor saves to the profile it's showing, so if another tab or the popup switches profiles mid-edit, the edit still lands where it was made.
+- **A switch stays on this device.** It isn't an edit, so sync leaves it out, and it doesn't make this device's copy the newer one in a merge.
 - **A switch reaches every open tab**, as turning a style on or off does. The editor's undo history starts over, since undoing past a switch would write one profile's CSS into another.
 - **A style is deleted only once no profile has CSS.** A blank applied profile keeps the style, and it stays listed in the popup so it can be switched back.
 - **The options page can edit a profile without applying it.** Its tabs open any profile; making one the applied profile is a separate action.
@@ -45,7 +46,8 @@ Users switch profiles from the editor's header, the popup and the options page, 
 Profiles merge one by one, with the same rules as the styles they belong to (see [Sync](sync.md)):
 
 - A profile changed on one side takes that side; one edited on both merges its CSS with the line-level diff3, conflicts and all.
-- A rename made on one side wins; when both sides renamed, the newer edit does. The applied profile follows the newer edit.
+- A rename made on one side wins; when both sides renamed, the newer edit does.
+- **Each device keeps its applied profile.** A merge only picks one for a style new to the device, or when the applied profile was deleted.
 - **A profile is deleted only when the copy that deleted it is the newer edit of the style.** An older copy missing a profile is more likely stale than deliberate, so the profile is kept.
 - **A copy from an older Stylebot** has lost its profiles. The merge gives them back from the base, treating that copy's `css` as an edit to the applied profile.
 

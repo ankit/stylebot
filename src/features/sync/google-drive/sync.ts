@@ -170,8 +170,13 @@ const reconcile = async (
   let nextLocalRevision = localRevision;
 
   // A side that differs only in timestamps or whitespace is left as it is.
-  const shouldUpdateRemote = !isEquivalentStyleMap(styles, remoteStyles);
-  const shouldUpdateLocal = !isEquivalentStyleMap(styles, local);
+  // So is one that differs only in which profile is applied, which is per device.
+  const shouldUpdateRemote = !isEquivalentStyleMap(styles, remoteStyles, {
+    ignoreActiveProfile: true,
+  });
+  const shouldUpdateLocal = !isEquivalentStyleMap(styles, local, {
+    ignoreActiveProfile: true,
+  });
 
   if (shouldUpdateRemote) {
     // Another device may have uploaded since the metadata was read. Merging

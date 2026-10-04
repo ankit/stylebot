@@ -1,5 +1,6 @@
 import type { StyleMap, StyleWithoutUrl } from '@stylebot/types';
 import {
+  activateProfile,
   collapseProfiles,
   expandProfiles,
   isEquivalentCss,
@@ -15,6 +16,9 @@ export type StyleMergeResult = {
   // Urls whose css had lines parked in a conflict comment.
   conflicts: Array<string>;
 };
+
+// Each device keeps its own applied profile, so switching is not a change.
+const ignoreActiveProfile = true;
 
 const parseTime = (timestamp?: string) => {
   const time = new Date(timestamp ?? '').getTime();
@@ -46,11 +50,11 @@ const mergeName = (
 };
 
 /**
- * Both sides changed the same style: flags and which profile is active
- * follow the newer edit, and each profile merges like a style does, its css
- * hunk by hunk against the base with the newer edit winning any hunk both
- * sides rewrote. A profile is only deleted when the side that deleted it
- * holds the newer copy of the style.
+ * Both sides changed the same style: flags follow the newer edit, this
+ * device's applied profile stays applied while it exists, and each profile
+ * merges like a style does, its css hunk by hunk against the base with the
+ * newer edit winning any hunk both sides rewrote. A profile is only deleted
+ * when the side that deleted it holds the newer copy of the style.
  */
 const mergeStyle = (
   base: StyleWithoutUrl | undefined,
@@ -103,9 +107,7 @@ const mergeStyle = (
     }
   });
 
-  const older = localWins ? r : l;
-  const newest = localWins ? l : r;
-  const active = [newest.active, older.active, ...Object.keys(sheets)].find(
+  const active = [l.active, r.active, ...Object.keys(sheets)].find(
     id => id in sheets
   );
 
@@ -182,8 +184,8 @@ export const mergeThreeWay = (
     const l = restoreProfiles(b, local[url]);
     const r = restoreProfiles(b, remote[url]);
 
-    const localChanged = !isEquivalentStyle(b, l);
-    const remoteChanged = !isEquivalentStyle(b, r);
+    const localChanged = !isEquivalentStyle(b, l, { ignoreActiveProfile });
+    const remoteChanged = !isEquivalentStyle(b, r, { ignoreActiveProfile });
 
     let result: StyleWithoutUrl | undefined;
 
@@ -201,7 +203,7 @@ export const mergeThreeWay = (
       // Deleted on one side and edited on the other keeps the edit; deleted
       // on both stays deleted.
       result = l ?? r;
-    } else if (isEquivalentStyle(l, r)) {
+    } else if (isEquivalentStyle(l, r, { ignoreActiveProfile })) {
       result = parseTime(l.modifiedTime) >= parseTime(r.modifiedTime) ? l : r;
     } else {
       const merged = mergeStyle(b, l, r, at);
@@ -212,8 +214,11 @@ export const mergeThreeWay = (
       }
     }
 
+    // Which profile is applied is this device's, as long as it still exists.
     if (result) {
-      styles[url] = result;
+      styles[url] = l
+        ? activateProfile(result, expandProfiles(l).active)
+        : result;
     }
   });
 

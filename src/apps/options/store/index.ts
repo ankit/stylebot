@@ -64,12 +64,14 @@ type State = {
 
 /**
  * Applies an edit to one stored style and saves every style, stamping the
- * edited one. Does nothing when the style is missing or the edit is a no-op.
+ * edited one unless told not to. Does nothing when the style is missing or
+ * the edit is a no-op.
  */
 const updateStyle = (
   state: State,
   url: string,
-  edit: (style: StyleWithoutUrl) => StyleWithoutUrl
+  edit: (style: StyleWithoutUrl) => StyleWithoutUrl,
+  { stamp = true }: { stamp?: boolean } = {}
 ) => {
   const style = state.styles[url];
   const edited = style && edit(style);
@@ -80,7 +82,7 @@ const updateStyle = (
 
   state.styles = {
     ...state.styles,
-    [url]: { ...edited, modifiedTime: getCurrentTimestamp() },
+    [url]: stamp ? { ...edited, modifiedTime: getCurrentTimestamp() } : edited,
   };
   setAllStyles(state.styles);
 };
@@ -220,7 +222,10 @@ export const createStore = (): Store<State> => {
       },
 
       setActiveProfile({ state }, { url, id }: { url: string; id: string }) {
-        updateStyle(state, url, style => activateProfile(style, id));
+        // Not an edit: which profile is applied stays on this device.
+        updateStyle(state, url, style => activateProfile(style, id), {
+          stamp: false,
+        });
       },
 
       deleteStyle({ state }, url: string) {

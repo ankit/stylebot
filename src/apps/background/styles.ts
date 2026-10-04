@@ -387,7 +387,8 @@ export const move = (src: string, dest: string): Promise<void> =>
 
 /**
  * Makes a profile the one applied for a url. No-op if the style or the
- * profile does not exist, or it is already active.
+ * profile does not exist, or it is already active. Not stamped as an edit:
+ * which profile is applied is this device's choice, and sync keeps it local.
  */
 export const setActiveProfile = (url: string, profileId: string) =>
   update(styles => {
@@ -397,7 +398,7 @@ export const setActiveProfile = (url: string, profileId: string) =>
       return undefined;
     }
 
-    styles[url] = editStyle(style, {});
+    styles[url] = style;
     return styles;
   });
 
