@@ -917,6 +917,62 @@ describe('actions', () => {
     });
   });
 
+  describe('previewDeclaration', () => {
+    const state = { ...mockState, activeSelector: 'h1' };
+
+    it('no-ops without an active selector', () => {
+      actions.previewDeclaration(
+        { state: mockState },
+        { property: 'color', value: '#ff0000' }
+      );
+
+      expect(mockBridge.setPreviewCss).not.toBeCalled();
+    });
+
+    it('injects the declaration on the active selector', () => {
+      actions.previewDeclaration(
+        { state },
+        { property: 'background-color', value: '#ff0000' }
+      );
+
+      expect(mockBridge.setPreviewCss).toBeCalledWith({
+        css: 'h1 { background-color: #ff0000; }',
+        forceImportant: true,
+      });
+    });
+
+    it('removes the preview for an empty value', () => {
+      actions.previewDeclaration({ state }, { property: 'color', value: '' });
+
+      expect(mockBridge.setPreviewCss).toBeCalledWith(null);
+    });
+
+    it('supersedes a font preview still resolving', async () => {
+      jest.spyOn(stylebotCss, 'getPrimaryFontFamily').mockReturnValue('Inter');
+      let resolveFont: (family: string) => void = () => undefined;
+      jest.spyOn(googleFonts, 'resolveGoogleFont').mockImplementation(
+        () =>
+          new Promise(resolve => {
+            resolveFont = resolve;
+          })
+      );
+
+      const pending = actions.previewFontFamily({ state }, 'Inter');
+      actions.previewDeclaration(
+        { state },
+        { property: 'color', value: '#ff0000' }
+      );
+      resolveFont('Inter');
+      await pending;
+
+      expect(mockBridge.setPreviewCss).toBeCalledTimes(1);
+      expect(mockBridge.setPreviewCss).toBeCalledWith({
+        css: 'h1 { color: #ff0000; }',
+        forceImportant: true,
+      });
+    });
+  });
+
   describe('refreshComputedStyles', () => {
     it('reads the element under the inspector while picking', async () => {
       await actions.refreshComputedStyles({

@@ -150,6 +150,51 @@ export const SwatchApplies: StoryObj = {
   },
 };
 
+export const SwatchHoverPreviews: StoryObj = {
+  ...editor(WITH_RULE),
+  name: 'hovering a swatch previews its color on the page without applying it',
+  play: async ({ canvasElement, step }) => {
+    const store = storeOf(canvasElement);
+    const panel = await openPopover(canvasElement, 'Text');
+    const paletteSwatch = panel.querySelector(
+      '.palette .swatch[title="#7d7669"]'
+    ) as HTMLElement;
+
+    await step('hovering shows the color on the page', async () => {
+      await user.hover(paletteSwatch);
+      await waitFor(() =>
+        expect(pageStyle(canvasElement, 'h1', 'color')).toBe(
+          'rgb(125, 118, 105)'
+        )
+      );
+      await expect(declaration(store, 'h1', 'color')).toBe('#2a5fd6');
+    });
+
+    await step('leaving the swatches restores the color', async () => {
+      // user-event fires mouseleave only on the swatch, not its grid as a browser would.
+      await user.hover(popoverHex(panel));
+      await fireEvent.mouseLeave(paletteSwatch.parentElement as HTMLElement);
+      await waitFor(() =>
+        expect(pageStyle(canvasElement, 'h1', 'color')).toBe('rgb(42, 95, 214)')
+      );
+    });
+
+    await step('closing the popover mid-hover drops the preview', async () => {
+      await user.hover(paletteSwatch);
+      await waitFor(() =>
+        expect(pageStyle(canvasElement, 'h1', 'color')).toBe(
+          'rgb(125, 118, 105)'
+        )
+      );
+      await pressKey('Escape');
+      await waitFor(() => expect(popover(canvasElement)).toBeNull());
+      await expect(pageStyle(canvasElement, 'h1', 'color')).toBe(
+        'rgb(42, 95, 214)'
+      );
+    });
+  },
+};
+
 export const PaletteMenu: StoryObj = {
   ...editor(noRule),
   name: 'the palette name opens the list of palettes, and the choice is remembered',

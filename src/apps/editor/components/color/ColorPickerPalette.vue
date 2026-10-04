@@ -5,6 +5,8 @@
     :colors="activeColors"
     :value="value"
     @select="$emit('select', $event)"
+    @preview="$emit('preview', $event)"
+    @preview-end="$emit('preview-end')"
   >
     <template #label-action>
       <s-anchored-menu class="palette-menu-anchor">
