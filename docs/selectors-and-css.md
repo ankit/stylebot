@@ -49,16 +49,16 @@ Anything containing `-` or `_` is treated as authored, whatever its shape.
 ### Other selectors for the element
 
 The selector field also offers the other strategies' selectors for the picked
-element, broadest first, keeping one per set of matched elements. The
-narrow end always has:
+element, narrowest first, keeping one per set of matched elements. The
+list always starts with:
 
-- **This item** — elements like it inside the nearest repeated ancestor (a
-  row, list item or card), e.g. `tr.athing:nth-of-type(3) a` for every link
-  in one row.
 - **Only this element** — its `#id` when that's unique, otherwise a chain of
   ancestors positioned with `:nth-of-type`, trimmed back to the steps that
   keep it unique. Positions shift when a list reorders, so this is the least
   stable choice.
+- **This item** — elements like it inside the nearest repeated ancestor (a
+  row, list item or card), e.g. `tr.athing:nth-of-type(3) a` for every link
+  in one row.
 
 ### Reusing existing rules
 

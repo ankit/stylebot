@@ -18,7 +18,7 @@ export type PageSnapshot = {
 
 /**
  * Other ways to select an element: the style's selectors that already
- * match it, then selectors built for it, broadest first. No two match the
+ * match it, then selectors built for it, narrowest first. No two match the
  * same set of elements.
  */
 export type SelectorAlternatives = {

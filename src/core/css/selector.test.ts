@@ -475,7 +475,7 @@ describe('getSelectorCandidates, dedupeByMatches and byReach', () => {
     expect(kept).toContain('span.age a');
     expect(kept).not.toContain('span span a');
 
-    expect(byReach(kept)[0]).toBe('a');
+    expect(byReach(kept).at(-1)).toBe('a');
   });
 
   it("skips bare container tags and scopes by the element's own class", () => {

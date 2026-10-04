@@ -451,12 +451,12 @@ export const getSelectorCandidates = (el: HTMLElement): Array<string> =>
   });
 
 /**
- * Sorts selectors broadest first, by how many elements each matches.
+ * Sorts selectors narrowest first, by how many elements each matches.
  */
 export const byReach = (selectors: Array<string>): Array<string> =>
   selectors
     .map(selector => ({ selector, count: countMatches(selector) }))
-    .sort((a, b) => b.count - a.count)
+    .sort((a, b) => a.count - b.count)
     .map(({ selector }) => selector);
 
 /**
