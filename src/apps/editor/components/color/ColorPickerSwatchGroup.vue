@@ -5,13 +5,16 @@
       <slot name="label-action" />
     </div>
 
-    <div class="swatches">
+    <!-- Ends the preview on leaving the grid, not each swatch, so sweeping across the gaps doesn't flash the page's color. -->
+    <div class="swatches" @mouseleave="$emit('preview-end')">
       <color-picker-swatch
         v-for="(color, index) in colors"
         :key="`${index}-${color}`"
         :color="color"
         :selected="sameColor(color, value)"
         @select="$emit('select', $event)"
+        @preview="$emit('preview', $event)"
+        @preview-end="$emit('preview-end')"
       />
       <slot />
     </div>

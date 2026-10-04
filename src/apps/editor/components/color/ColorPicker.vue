@@ -35,6 +35,7 @@
         :value="value"
         :role-label="roleLabel"
         @input="value = $event"
+        @preview="preview"
       />
     </div>
   </div>
@@ -149,6 +150,13 @@ export default Vue.extend({
   methods: {
     onFocus(event: FocusEvent): void {
       (event.target as HTMLInputElement).select();
+    },
+
+    preview(value: string): void {
+      this.$store.dispatch('previewDeclaration', {
+        property: this.property,
+        value,
+      });
     },
 
     onInput(event: Event): void {

@@ -714,6 +714,31 @@ export default {
     });
   },
 
+  /**
+   * Shows a declaration on the active selector without saving it, in the
+   * same stylesheet as the font preview. An empty value removes the preview.
+   */
+  previewDeclaration(
+    { state }: { state: State },
+    { property, value }: { property: string; value: string }
+  ): void {
+    ++previewRequest;
+
+    if (!state.activeSelector) {
+      return;
+    }
+
+    if (!value) {
+      getPageBridge().setPreviewCss(null);
+      return;
+    }
+
+    getPageBridge().setPreviewCss({
+      css: `${state.activeSelector} { ${property}: ${value}; }`,
+      forceImportant: state.forceImportant,
+    });
+  },
+
   applyReadability(
     { state, commit }: { state: State; commit: Commit },
     value: boolean

@@ -8,6 +8,9 @@
     :aria-label="color"
     :aria-pressed="selected ? 'true' : 'false'"
     @click="$emit('select', color)"
+    @mouseenter="$emit('preview', color)"
+    @focus="$emit('preview', color)"
+    @blur="$emit('preview-end')"
   >
     <svg
       v-if="selected"

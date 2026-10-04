@@ -21,6 +21,8 @@
       :colors="pageColors"
       :value="value"
       @select="commit"
+      @preview="preview"
+      @preview-end="endPreview"
     >
       <button
         type="button"
@@ -30,6 +32,7 @@
         :aria-label="t('custom_color')"
         :aria-expanded="customOpen ? 'true' : 'false'"
         @click="customOpen = !customOpen"
+        @mouseenter="endPreview"
       >
         <plus-icon :size="12" />
       </button>
@@ -42,9 +45,16 @@
       :colors="recentColors"
       :value="value"
       @select="commit"
+      @preview="preview"
+      @preview-end="endPreview"
     />
 
-    <color-picker-palette :value="value" @select="commit" />
+    <color-picker-palette
+      :value="value"
+      @select="commit"
+      @preview="preview"
+      @preview-end="endPreview"
+    />
   </div>
 </template>
 
@@ -121,6 +131,8 @@ export default Vue.extend({
   },
 
   beforeDestroy() {
+    this.endPreview();
+
     // Only the color the user settled on goes to Recent — recorded once, on close, not per commit.
     if (this.lastCommittedColor) {
       addRecentColor(this.lastCommittedColor);
@@ -146,8 +158,17 @@ export default Vue.extend({
     },
 
     commit(color: string): void {
+      this.endPreview();
       this.$emit('input', color);
       this.lastCommittedColor = color;
+    },
+
+    preview(color: string): void {
+      this.$emit('preview', color);
+    },
+
+    endPreview(): void {
+      this.$emit('preview', '');
     },
   },
 });
