@@ -1,8 +1,11 @@
 <template>
+  <!-- A "search" name keeps Safari from offering contacts for this field. -->
   <input
     ref="input"
     :value="value"
     class="name-input"
+    name="profile-search"
+    autocomplete="off"
     :class="{ invalid: !!error }"
     :aria-label="t('profile_name')"
     :aria-invalid="error ? 'true' : 'false'"
