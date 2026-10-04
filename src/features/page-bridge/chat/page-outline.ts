@@ -65,6 +65,13 @@ const ownText = (element: Element): string => {
 const shortSize = (value: string): string =>
   `${Math.round(parseFloat(value) * 10) / 10}px`;
 
+// The family a font stack asks for first, which says what it is.
+const firstFamily = (value: string): string =>
+  value
+    .split(',')[0]
+    .trim()
+    .replace(/^["']|["']$/g, '');
+
 const hex = (channel: string): string =>
   Math.round(Number(channel)).toString(16).padStart(2, '0');
 
@@ -133,6 +140,11 @@ const styleHints = (element: Element): Array<string> => {
 
   if (style.fontSize && style.fontSize !== parent?.fontSize) {
     hints.push(`font ${shortSize(style.fontSize)}`);
+  }
+
+  // An element with its own family doesn't inherit one set on body.
+  if (style.fontFamily && style.fontFamily !== parent?.fontFamily) {
+    hints.push(`family ${firstFamily(style.fontFamily)}`);
   }
 
   return hints;
@@ -282,6 +294,7 @@ const pageHints = (): string => {
     background ? `bg ${background}` : '',
     color ? `color ${color}` : '',
     body.fontSize ? `font ${shortSize(body.fontSize)}` : '',
+    body.fontFamily ? `family ${firstFamily(body.fontFamily)}` : '',
   ].filter(Boolean);
 
   return hints.length ? `(page) [${hints.join(', ')}]` : '';

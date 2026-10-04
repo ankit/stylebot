@@ -34,6 +34,7 @@ export {
 export {
   getPrimaryFontFamily,
   getTokenAtCaret,
+  isFontFamilyProperty,
   quoteFamily,
   replaceToken,
   unquoteFamily,

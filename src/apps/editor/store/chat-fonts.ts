@@ -2,14 +2,15 @@ import {
   addGoogleWebFontImport,
   cleanGoogleWebFonts,
   getPrimaryFontFamily,
+  isFontFamilyProperty,
 } from '@stylebot/css';
 import { resolveGoogleFont } from '@stylebot/google-fonts';
 
 import type { ChatCssEdit, ChatCssPreviousValue } from '@stylebot/types';
 
 /**
- * Adds Google Fonts imports for any family the edits name, as picking a font
- * in the font field does.
+ * Adds Google Fonts imports for any family the edits name, in font-family or
+ * a font variable, as picking a font in the font field does.
  */
 export const addFontImports = async (
   css: string,
@@ -17,7 +18,7 @@ export const addFontImports = async (
 ): Promise<string> => {
   const families = edits.flatMap(edit =>
     edit.declarations
-      .filter(declaration => declaration.property === 'font-family')
+      .filter(declaration => isFontFamilyProperty(declaration.property))
       .map(declaration => getPrimaryFontFamily(declaration.value))
       .filter((family): family is string => !!family)
   );
@@ -43,6 +44,6 @@ export const removeFontImports = (
   css: string,
   previous: Array<ChatCssPreviousValue>
 ): string =>
-  previous.some(({ property }) => property === 'font-family')
+  previous.some(({ property }) => isFontFamilyProperty(property))
     ? cleanGoogleWebFonts(css)
     : css;

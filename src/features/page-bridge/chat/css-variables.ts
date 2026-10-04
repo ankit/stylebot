@@ -40,8 +40,20 @@ const customProperties = (element: Element): Map<string, string> => {
   return properties;
 };
 
-const isColor = ({ name, value }: PageCssVariable): boolean =>
-  COLOR_VALUE.test(value) || COLOR_NAME.test(name);
+const MAX_FONTS = 8;
+
+/**
+ * A font stack the page sets as a variable (GitHub's --fontStack-*):
+ * overriding it is how a font change reaches components that set their own.
+ */
+const isFont = ({ name, value }: PageCssVariable): boolean =>
+  /font|family|typeface/i.test(name) &&
+  /,|serif|sans|mono|system-ui/i.test(value) &&
+  !COLOR_VALUE.test(value);
+
+const isColor = (variable: PageCssVariable): boolean =>
+  !isFont(variable) &&
+  (COLOR_VALUE.test(variable.value) || COLOR_NAME.test(variable.name));
 
 /**
  * A color as lowercase six-digit hex when written as hex or rgb(), so
@@ -173,10 +185,14 @@ export const getCssVariables = (): Array<PageCssVariable> => {
   });
   const first = new Set(spread);
   const rest = ranked.filter(variable => !first.has(variable));
+  // Few and short, so they go first rather than lose the budget to colors.
+  const fonts = variables.filter(isFont).slice(0, MAX_FONTS);
+  const shown = new Set([...fonts, ...colors]);
 
   return [
+    ...fonts,
     ...spread,
     ...rest,
-    ...variables.filter(variable => !isColor(variable)),
+    ...variables.filter(variable => !shown.has(variable)),
   ].slice(0, MAX_VARIABLES);
 };

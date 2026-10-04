@@ -1,6 +1,6 @@
 import { parse } from 'postcss';
 
-import { getPrimaryFontFamily } from './font-family';
+import { getPrimaryFontFamily, isFontFamilyProperty } from './font-family';
 
 import type {
   GetGoogleWebFontExists,
@@ -145,7 +145,11 @@ export const cleanGoogleWebFonts = (css: string): string => {
   const root = parse(css);
   const fonts = new Set<string>();
 
-  root.walkDecls('font-family', decl => {
+  root.walkDecls(decl => {
+    if (!isFontFamilyProperty(decl.prop)) {
+      return;
+    }
+
     const family = getPrimaryFontFamily(decl.value);
 
     if (family) {

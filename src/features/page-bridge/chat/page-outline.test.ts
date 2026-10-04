@@ -63,6 +63,21 @@ describe('getPageOutline', () => {
     );
   });
 
+  it('names the font an element sets for itself, first in its stack', () => {
+    document.body.innerHTML = `
+      <div class="post" style="font-family: Georgia, serif">
+        <p class="body">text</p>
+        <code class="snippet" style="font-family: 'SF Mono', monospace">x</code>
+      </div>
+    `;
+
+    expect(getPageOutline().split('\n').slice(-3)).toEqual([
+      'div.post [family Georgia]',
+      '  p.body "text"',
+      '  code.snippet "x" [family SF Mono]',
+    ]);
+  });
+
   it('notes backgrounds, and colors and sizes that differ from the parent', () => {
     document.body.innerHTML = `
       <div class="card" style="background-color: rgb(255, 255, 255); color: rgb(17, 17, 17)">

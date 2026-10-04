@@ -53,6 +53,30 @@ describe('getCssVariables', () => {
     });
   });
 
+  it('lists font stacks first, so colors can’t crowd them out', () => {
+    const colors = Object.fromEntries(
+      Array.from({ length: 50 }, (_, i) => [
+        `--bg-${i}`,
+        `#0000${i % 10}${i % 10}`,
+      ])
+    );
+
+    jest.spyOn(window, 'getComputedStyle').mockImplementation(element =>
+      element === document.documentElement
+        ? computed({
+            ...colors,
+            '--fontStack-sansSerif': '-apple-system, "Segoe UI", sans-serif',
+            '--fontsize-base': '14px',
+          })
+        : computed({})
+    );
+
+    const names = getCssVariables().map(({ name }) => name);
+
+    expect(names[0]).toBe('--fontStack-sansSerif');
+    expect(names.indexOf('--fontsize-base')).toBeGreaterThan(50);
+  });
+
   it('spans the palette’s shades before listing more names for one color', () => {
     const whites = Object.fromEntries(
       Array.from({ length: 50 }, (_, i) => [`--surface-${i}`, '#fff'])
