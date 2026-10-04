@@ -10,6 +10,7 @@ import {
   GetAllOptions,
   OpenOptionsPage,
   OpenShortcutsPage,
+  GoogleSignInRedirect,
   OpenDonatePage,
   OpenReportIssuePage,
   SetStyle,
@@ -256,6 +257,9 @@ export const initListeners = (): void => {
 
         case 'RunGoogleDriveSync':
           RunGoogleDriveSync(message, sendResponse);
+          break;
+        case 'GoogleSignInRedirect':
+          GoogleSignInRedirect(message, sender);
           break;
         case 'ScanVersionHistory':
           ScanVersionHistory(message, sendResponse);

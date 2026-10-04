@@ -15,6 +15,21 @@ const { SRC_DIR, packageDirs } = require('./scripts/lib/src-packages');
 
 const isPreview = process.env.STYLEBOT_PREVIEW === '1';
 
+// Safari's Drive sign-in can't exchange codes without it, so a release
+// built without it would ship with sign-in broken.
+if (
+  process.env.BROWSER === 'safari' &&
+  !process.env.STYLEBOT_GOOGLE_CLIENT_SECRET
+) {
+  const message =
+    'STYLEBOT_GOOGLE_CLIENT_SECRET is not set; Google Drive sign-in will fail in this Safari build.';
+
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error(message);
+  }
+  console.warn(`Warning: ${message}`);
+}
+
 const getOutputPath = () => {
   if (isPreview) {
     return `${__dirname}/preview-dist`;
@@ -187,6 +202,11 @@ const config = {
           transform: transformHtml,
         },
         {
+          from: 'apps/options/google-sign-in/index.html',
+          to: 'google-sign-in/index.html',
+          transform: transformHtml,
+        },
+        {
           from: 'apps/editor/window/index.html',
           to: 'editor-window/index.html',
           transform: transformHtml,
@@ -252,6 +272,33 @@ const config = {
                 19: 'img/icon19.png',
                 38: 'img/icon38.png',
               };
+
+              /*
+               * Safari has no identity API, so Drive sign-in runs in a tab: Google's
+               * loopback redirect is rerouted to an extension page, and tokens refresh by fetch.
+               */
+              jsonContent.permissions = [
+                ...jsonContent.permissions.filter(
+                  permission =>
+                    permission !== 'sidePanel' && permission !== 'identity'
+                ),
+                'declarativeNetRequestWithHostAccess',
+              ];
+              jsonContent.host_permissions = [
+                ...jsonContent.host_permissions,
+                'https://oauth2.googleapis.com/*',
+                'http://127.0.0.1/*',
+              ];
+              jsonContent.web_accessible_resources = [
+                ...jsonContent.web_accessible_resources,
+                {
+                  resources: ['google-sign-in/index.html'],
+                  matches: [
+                    'https://accounts.google.com/*',
+                    'http://127.0.0.1/*',
+                  ],
+                },
+              ];
             } else if (
               !process.env.BROWSER &&
               (process.env.NODE_ENV === 'development' || isPreview)
@@ -301,6 +348,10 @@ const backgroundPageConfig = {
     new WriteBuildMarkerPlugin('background'),
     new webpack.DefinePlugin({
       global: 'this',
+      // Safari's Google sign-in client secret, kept out of the repo.
+      'process.env.STYLEBOT_GOOGLE_CLIENT_SECRET': JSON.stringify(
+        process.env.STYLEBOT_GOOGLE_CLIENT_SECRET ?? ''
+      ),
     }),
   ],
 };
@@ -312,6 +363,7 @@ const clientConfig = {
     'editor/index': './apps/editor/content-script.ts',
     'editor/app': './apps/editor/app.ts',
     options: './apps/options/index.ts',
+    'google-sign-in/index': './apps/options/google-sign-in/index.ts',
     'editor-window/index': './apps/editor/window/index.ts',
     'inject-css/index': './apps/content/content-script.ts',
     'monaco-editor/iframe/index': './apps/monaco-iframe/index.ts',
