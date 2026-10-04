@@ -31,15 +31,11 @@ const syncOn = {
   },
 };
 
-export const SyncNow: StoryObj = {
+export const SyncsOnOpen: StoryObj = {
   ...popup({ storage: syncOn, googleDriveSync: { ok: true, metadata } }),
-  name: 'Sync now syncs and shows when it last did',
+  name: 'opening the popup syncs and shows when it last did',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-
-    await expect(await canvas.findByText(/Synced 2 hours ago/)).toBeVisible();
-
-    await user.click(canvas.getByRole('button', { name: 'Sync now' }));
 
     await expect(await canvas.findByText(/Synced now/)).toBeVisible();
     await waitFor(() =>
@@ -53,22 +49,18 @@ export const RetriesAfterFailure: StoryObj = {
     storage: syncOn,
     googleDriveSync: { ok: false, errorKey: 'sync_error_network' },
   }),
-  name: 'a failed sync says why, and Retry tries again',
+  name: 'a failed sync on open says why, and Retry tries again',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const sendMessage = spyOn(chrome.runtime, 'sendMessage');
-    const syncNow = await canvas.findByRole('button', { name: 'Sync now' });
-
-    await user.click(syncNow);
 
     await expect(
       await canvas.findByText(/Couldn't reach Google Drive/)
     ).toBeVisible();
 
-    await user.click(canvas.getByRole('button', { name: 'Retry' }));
+    const sendMessage = spyOn(chrome.runtime, 'sendMessage');
+    await user.click(await canvas.findByRole('button', { name: 'Retry' }));
 
-    await expect(sendMessage).toHaveBeenCalledTimes(2);
-    await expect(sendMessage).toHaveBeenLastCalledWith(
+    await expect(sendMessage).toHaveBeenCalledWith(
       { name: 'RunGoogleDriveSync', interactive: false },
       expect.any(Function)
     );

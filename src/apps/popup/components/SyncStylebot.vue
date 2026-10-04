@@ -111,8 +111,14 @@ export default Vue.extend({
     },
   },
 
-  created() {
-    this.readSyncState();
+  async created() {
+    await this.readSyncState();
+
+    // Opening the popup is when stale styles would show, so pick up what
+    // other devices pushed. A sign-in can't happen here, so leave that be.
+    if (!this.needsAuth) {
+      this.sync();
+    }
   },
 
   methods: {
@@ -134,6 +140,7 @@ export default Vue.extend({
      * Never opens an auth window: the popup would close under it. A run that
      * needs one flags it, and the strip then points to the Sync tab instead.
      * Joins a run already in flight in the background rather than queueing.
+     * An earlier failure stays on screen until this run's result replaces it.
      */
     sync(): void {
       const message: RunGoogleDriveSync = {
@@ -142,7 +149,6 @@ export default Vue.extend({
       };
 
       this.syncInProgress = true;
-      this.errorKey = null;
 
       chrome.runtime.sendMessage(
         message,

@@ -3,6 +3,7 @@ import type { Meta } from '@storybook/vue';
 import Style from './Style.vue';
 import {
   popup,
+  syncSucceeds,
   profiledStyle,
   style,
 } from '@stylebot/storybook/fixtures/popup';
@@ -51,6 +52,7 @@ export const WithProfilesAndSync = popup({
       lastSyncedAt: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
     },
   },
+  googleDriveSync: syncSucceeds,
 });
 
 export const WithStyleAndSync = popup({
@@ -64,4 +66,5 @@ export const WithStyleAndSync = popup({
       lastSyncedAt: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
     },
   },
+  googleDriveSync: syncSucceeds,
 });

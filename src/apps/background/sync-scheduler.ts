@@ -8,6 +8,10 @@ const AFTER_EDIT_ALARM = 'google-drive-sync-after-edit';
 // extension (Chrome 120+ clamps anything under 30s).
 const AFTER_EDIT_DELAY_MS = 30 * 1000;
 
+// How long without input counts as being away, so coming back syncs what
+// other devices pushed meanwhile. Locking the screen counts straight away.
+export const AWAY_SECONDS = 10 * 60;
+
 export const isSyncAlarm = (name: string): boolean =>
   name === PERIODIC_ALARM || name === AFTER_EDIT_ALARM;
 

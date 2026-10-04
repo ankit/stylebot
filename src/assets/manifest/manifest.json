@@ -65,6 +65,7 @@
     "contextMenus",
     "unlimitedStorage",
     "alarms",
+    "idle",
     "sidePanel"
   ],
   "host_permissions": [

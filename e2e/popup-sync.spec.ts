@@ -61,33 +61,7 @@ test.describe('popup sync strip', () => {
     expect(await popup.locator('.sync-strip').isVisible()).toBe(false);
   });
 
-  test('reports the last sync and offers Sync now when on', async ({
-    context,
-    extension,
-    openPopup,
-  }) => {
-    await seedAndFocusPage(context, extension, {
-      'google-drive-sync-enabled': true,
-      'google-drive-sync-state': syncState(
-        new Date(Date.now() - 6 * 60 * 1000).toISOString()
-      ),
-    });
-
-    const popup = await openPopup();
-
-    await expect
-      .poll(() =>
-        popup
-          .locator('.sync-strip', { hasText: /Synced 6 minutes ago/ })
-          .isVisible()
-      )
-      .toBe(true);
-    expect(
-      await popup.locator('.sync-button', { hasText: 'Sync now' }).isVisible()
-    ).toBe(true);
-  });
-
-  test('Sync now runs without an auth window, then asks for a sign-in when there is no token', async ({
+  test('syncs on open without an auth window, then asks for a sign-in when there is no token', async ({
     context,
     extension,
     openPopup,
@@ -98,16 +72,13 @@ test.describe('popup sync strip', () => {
     });
 
     const popup = await openPopup();
-    await popup.locator('.sync-button').click();
 
     // Only a non-interactive run leaves this flag; an interactive one would
     // have opened a sign-in tab instead.
     await expect
       .poll(() =>
         popup
-          .locator('.sync-strip', {
-            hasText: 'Sign in to keep syncing',
-          })
+          .locator('.sync-strip', { hasText: 'Sign in to keep syncing' })
           .isVisible()
       )
       .toBe(true);
