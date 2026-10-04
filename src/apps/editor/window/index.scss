@@ -18,7 +18,12 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  box-sizing: border-box;
   padding: 24px;
-  font-family: system-ui, sans-serif;
-  color: #666;
+  font-family: 'Geist', system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.4;
+  text-align: center;
+  color: CanvasText;
 }

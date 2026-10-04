@@ -164,9 +164,6 @@ export const openExtensionDetails = (): void => {
   window.close();
 };
 
-export const getFileAccessAllowed = (): Promise<boolean> =>
-  new Promise(resolve => chrome.extension.isAllowedFileSchemeAccess(resolve));
-
 export const reportIssue = (): void => {
   openReportIssuePage();
   window.close();

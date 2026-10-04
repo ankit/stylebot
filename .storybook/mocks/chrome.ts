@@ -40,7 +40,8 @@ export type ChromeShimOptions = {
   isOpen?: boolean;
   pageReaderable?: boolean;
   tabUrl?: string;
-  fileAccess?: boolean;
+  // The page script's answer; "unreachable" leaves the message unanswered.
+  pageSupport?: 'supported' | 'unsupported' | 'unreachable';
   googleDriveSync?: Pending<RunGoogleDriveSyncResponse>;
   versionHistory?: Pending<VersionHistory>;
   chat?: ChatShimOptions;
@@ -181,6 +182,10 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
   const tabResponses: Record<string, () => unknown> = {
     GetIsStylebotOpen: () => overrides.isOpen ?? false,
     GetIsPageReaderable: () => overrides.pageReaderable ?? true,
+    GetCanStylePage: () => {
+      const support = overrides.pageSupport ?? 'supported';
+      return support === 'unreachable' ? undefined : support === 'supported';
+    },
   };
 
   const shim = {
@@ -197,11 +202,6 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
     },
 
     i18n: { getMessage },
-
-    extension: {
-      isAllowedFileSchemeAccess: (callback: (allowed: boolean) => void) =>
-        callback(overrides.fileAccess ?? false),
-    },
 
     storage: {
       local: {

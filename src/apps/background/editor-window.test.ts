@@ -28,6 +28,11 @@ const makeChrome = () => {
           url: 'https://example.com/',
         })
       ),
+      // The page script answers that it can style the page.
+      sendMessage: jest.fn(
+        (_tabId: number, _message: unknown, callback: (r?: boolean) => void) =>
+          callback(true)
+      ),
     },
     windows: {
       create: jest.fn(async (info: chrome.windows.CreateData) => {
@@ -90,11 +95,10 @@ describe('editor-window', () => {
   });
 
   it('refuses pages Stylebot cannot style', async () => {
-    fake.api.tabs.get.mockResolvedValueOnce({
-      id: 7,
-      windowId: 1,
-      url: 'chrome://extensions',
-    });
+    fake.api.tabs.sendMessage.mockImplementationOnce(
+      (_tabId: number, _message: unknown, callback: (r?: boolean) => void) =>
+        callback(undefined)
+    );
 
     await editorWindow.open(7);
 

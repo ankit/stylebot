@@ -4,12 +4,15 @@
  * the page (hide-page.ts) until chrome.storage.local.get resolves.
  */
 import { isReaderable } from '@stylebot/readability';
+import { isStylableDocument } from '@stylebot/saved-styles';
 import { readCache } from '@stylebot/stylesheets';
 import type { TabMessage } from '@stylebot/types';
 
 import { hidePage, revealPage } from './hide-page';
 import { applyPageState, getPageState, savePageState } from './page-state';
 import { getCompiledStyles } from './saved-styles';
+
+const canStyle = isStylableDocument(document.contentType);
 
 // Registered synchronously here (unlike the editor script's listener,
 // gated behind async init) so the popup always gets a response.
@@ -20,7 +23,9 @@ if (window === window.top) {
       _sender,
       sendResponse: (response: boolean) => void
     ) => {
-      if (message.name === 'GetIsPageReaderable') {
+      if (message.name === 'GetCanStylePage') {
+        sendResponse(canStyle);
+      } else if (message.name === 'GetIsPageReaderable') {
         sendResponse(isReaderable());
       } else if (message.name === 'GetIsReadabilityActive') {
         sendResponse(!!document.getElementById('stylebot-reader'));
@@ -58,4 +63,6 @@ const run = () => {
   });
 };
 
-run();
+if (canStyle) {
+  run();
+}

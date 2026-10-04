@@ -5,6 +5,7 @@
  */
 import { reapplySavedStyles } from '@stylebot/inject-css';
 import { applyReadability, removeReadability } from '@stylebot/readability';
+import { isStylableDocument } from '@stylebot/saved-styles';
 import type { TabMessage } from '@stylebot/types';
 
 import { REMOTE_PAGE_BRIDGE_PORT } from '@stylebot/page-bridge';
@@ -94,61 +95,71 @@ const handlePageMessage = (
   }
 };
 
-chrome.runtime.onMessage.addListener(
-  (message: TabMessage, _, sendResponse: (response: boolean) => void) => {
-    if (window !== window.top) {
+/**
+ * Listens for the page's messages, context menu and editor window.
+ */
+const listen = (): void => {
+  chrome.runtime.onMessage.addListener(
+    (message: TabMessage, _, sendResponse: (response: boolean) => void) => {
+      if (window !== window.top) {
+        return;
+      }
+
+      // A global shortcut, which the browser catches wherever focus is.
+      if (message.name === 'RunCommand') {
+        forwardToEditor(editor => editor.handleCommand(message.command));
+        return false;
+      }
+
+      if (isEditorLoading() || EDITOR_MESSAGES.includes(message.name)) {
+        // The editor restyles the page itself, but the next load paints first
+        // from the cache, which only the saved-styles path keeps current.
+        if (message.name === 'ApplyStylesToTab') {
+          reapplySavedStyles();
+        }
+
+        forwardToEditor(editor => editor.handleMessage(message, sendResponse));
+        return message.name === 'GetIsStylebotOpen';
+      }
+
+      if (document.readyState === 'loading') {
+        whenDomReady(() => handlePageMessage(message, sendResponse));
+        return message.name === 'GetIsStylebotOpen';
+      }
+
+      return handlePageMessage(message, sendResponse);
+    }
+  );
+
+  document.addEventListener('contextmenu', event => {
+    contextMenuTarget = event.target;
+
+    if (isEditorLoading()) {
+      forwardToEditor(editor => editor.handleContextMenu(event.target));
+    }
+  });
+
+  chrome.runtime.onConnect.addListener(port => {
+    if (port.name !== REMOTE_PAGE_BRIDGE_PORT) {
       return;
     }
 
-    // A global shortcut, which the browser catches wherever focus is.
-    if (message.name === 'RunCommand') {
-      forwardToEditor(editor => editor.handleCommand(message.command));
-      return false;
-    }
+    // A window that closes while the editor loads must not be adopted, since
+    // its disconnect has already fired and the editor would never see it.
+    let disconnected = false;
+    port.onDisconnect.addListener(() => {
+      disconnected = true;
+    });
 
-    if (isEditorLoading() || EDITOR_MESSAGES.includes(message.name)) {
-      // The editor restyles the page itself, but the next load paints first
-      // from the cache, which only the saved-styles path keeps current.
-      if (message.name === 'ApplyStylesToTab') {
-        reapplySavedStyles();
+    forwardToEditor(editor => {
+      if (!disconnected) {
+        editor.handleEditorWindowPort(port);
       }
-
-      forwardToEditor(editor => editor.handleMessage(message, sendResponse));
-      return message.name === 'GetIsStylebotOpen';
-    }
-
-    if (document.readyState === 'loading') {
-      whenDomReady(() => handlePageMessage(message, sendResponse));
-      return message.name === 'GetIsStylebotOpen';
-    }
-
-    return handlePageMessage(message, sendResponse);
-  }
-);
-
-document.addEventListener('contextmenu', event => {
-  contextMenuTarget = event.target;
-
-  if (isEditorLoading()) {
-    forwardToEditor(editor => editor.handleContextMenu(event.target));
-  }
-});
-
-chrome.runtime.onConnect.addListener(port => {
-  if (port.name !== REMOTE_PAGE_BRIDGE_PORT) {
-    return;
-  }
-
-  // A window that closes while the editor loads must not be adopted, since
-  // its disconnect has already fired and the editor would never see it.
-  let disconnected = false;
-  port.onDisconnect.addListener(() => {
-    disconnected = true;
+    });
   });
+};
 
-  forwardToEditor(editor => {
-    if (!disconnected) {
-      editor.handleEditorWindowPort(port);
-    }
-  });
-});
+// A PDF, JSON or XML file gets nothing; its viewer breaks under the editor.
+if (isStylableDocument(document.contentType)) {
+  listen();
+}

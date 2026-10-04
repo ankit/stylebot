@@ -29,10 +29,24 @@ export const ExtensionPage = popup({
 
 export const WebStore = popup({
   tabUrl: 'https://chromewebstore.google.com/detail/stylebot/abc',
+  pageSupport: 'unreachable',
   storage: syncOn,
 });
 
 export const LocalFile = popup({
   tabUrl: 'file:///Users/me/notes.html',
+  pageSupport: 'unreachable',
   storage: syncOn,
 });
+
+export const PdfFile = popup({
+  tabUrl: 'https://example.com/report.pdf',
+  pageSupport: 'unsupported',
+});
+
+export const NeedsReload = popup({
+  tabUrl: 'https://example.com/article',
+  pageSupport: 'unreachable',
+});
+
+export const EdgeSettings = popup({ tabUrl: 'edge://settings/profiles' });

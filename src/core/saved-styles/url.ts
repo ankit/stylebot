@@ -131,41 +131,8 @@ export const matchesUrlPattern = (
 };
 
 /**
- * Guess if the given URL is an HTML page by comparing its extension
- * against an extension blacklist
+ * Whether a document is one Stylebot can style: a web page, as opposed to a
+ * PDF, JSON or XML file, whatever its URL says.
  */
-export const isHtmlUrl = (url: string): boolean => {
-  const extension = url.split('.').pop();
-  if (!extension) {
-    return true;
-  }
-
-  return ['json', 'pdf', 'xml'].indexOf(extension) === -1;
-};
-
-/**
- * Check if Stylebot should run on a URL.
- */
-export const isSupportedUrl = (url: string): boolean => {
-  if (url.indexOf('chrome://') !== -1) {
-    return false;
-  }
-
-  if (!isHtmlUrl(url)) {
-    return false;
-  }
-
-  const urlBlacklist = [
-    'https://chrome.google.com/webstore',
-    'https://chromewebstore.google.com',
-    'chrome-extension://',
-  ];
-
-  for (let i = 0; i < urlBlacklist.length; i++) {
-    if (url.indexOf(urlBlacklist[i]) !== -1) {
-      return false;
-    }
-  }
-
-  return true;
-};
+export const isStylableDocument = (contentType: string): boolean =>
+  contentType === 'text/html' || contentType === 'application/xhtml+xml';

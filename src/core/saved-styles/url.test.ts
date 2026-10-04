@@ -1,4 +1,4 @@
-import { isHtmlUrl, isSupportedUrl, matchesUrlPattern } from './url';
+import { isStylableDocument, matchesUrlPattern } from './url';
 
 describe('matchesUrlPattern with urls', () => {
   describe('matches', () => {
@@ -276,35 +276,15 @@ describe('matchesUrlPattern with wildcards', () => {
   });
 });
 
-describe('isHtmlUrl', () => {
-  it('is true for pages', () => {
-    expect(isHtmlUrl('https://example.com/docs/index.html')).toBe(true);
+describe('isStylableDocument', () => {
+  it('is true for web pages', () => {
+    expect(isStylableDocument('text/html')).toBe(true);
+    expect(isStylableDocument('application/xhtml+xml')).toBe(true);
   });
 
   it('is false for pdf, json and xml files', () => {
-    expect(isHtmlUrl('https://example.com/report.pdf')).toBe(false);
-    expect(isHtmlUrl('https://example.com/data.json')).toBe(false);
-    expect(isHtmlUrl('https://example.com/feed.xml')).toBe(false);
-  });
-});
-
-describe('isSupportedUrl', () => {
-  it('is true for web pages', () => {
-    expect(isSupportedUrl('https://github.com/ankit/stylebot')).toBe(true);
-  });
-
-  it('is false for browser and extension pages', () => {
-    expect(isSupportedUrl('chrome://extensions')).toBe(false);
-    expect(isSupportedUrl('chrome-extension://abc/options.html')).toBe(false);
-    expect(isSupportedUrl('https://chrome.google.com/webstore/detail')).toBe(
-      false
-    );
-    expect(
-      isSupportedUrl('https://chromewebstore.google.com/detail/stylebot/abc')
-    ).toBe(false);
-  });
-
-  it('is false for files that are not html', () => {
-    expect(isSupportedUrl('https://example.com/report.pdf')).toBe(false);
+    expect(isStylableDocument('application/pdf')).toBe(false);
+    expect(isStylableDocument('application/json')).toBe(false);
+    expect(isStylableDocument('text/xml')).toBe(false);
   });
 });
