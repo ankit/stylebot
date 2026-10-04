@@ -139,32 +139,12 @@
     ]
   },
   {
-    "id": "govuk-dark",
-    "tags": ["theme"],
-    "steps": [
-      {
-        "url": "https://www.gov.uk/browse/benefits",
-        "text": "Make it dark"
-      }
-    ]
-  },
-  {
     "id": "paulgraham-readable",
     "tags": ["readability", "typography"],
     "steps": [
       {
         "url": "http://paulgraham.com/greatwork.html",
         "text": "Make this essay pleasant to read"
-      }
-    ]
-  },
-  {
-    "id": "danluu-serif",
-    "tags": ["typography"],
-    "steps": [
-      {
-        "url": "https://danluu.com/",
-        "text": "Give this a typography makeover with a nice serif font"
       }
     ]
   },

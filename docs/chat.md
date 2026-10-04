@@ -218,9 +218,7 @@ Each case tests one thing a real request needs. Tags group them by kind; `core` 
 | GitHub                          | "Give this page a Dracula theme"                                                                                                  | theme, variables, core            |
 | GitHub                          | "Restyle this page to use the Nord theme and use monospace typography (Fira Code). Ensure all the elements and colors match up."  | theme, typography, variables      |
 | Discourse (Python forum)        | "Use the Catppuccin Mocha theme"                                                                                                  | theme, variables                  |
-| GOV.UK                          | "Make it dark"                                                                                                                    | theme                             |
 | Paul Graham's essays            | "Make this essay pleasant to read"                                                                                                | readability, typography           |
-| Dan Luu's blog                  | "Give this a typography makeover with a nice serif font"                                                                          | typography                        |
 | Python docs                     | "Make the code examples stand out and easier to read"                                                                             | readability                       |
 | Lobsters                        | "Make it more compact so more stories fit on screen"                                                                              | layout, core                      |
 | React docs                      | "Hide the sidebar and let the content use the space"                                                                              | layout, hide                      |
