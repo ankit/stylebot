@@ -1,11 +1,36 @@
 [
   {
     "id": "hn-front-gruvbox",
-    "tags": ["theme"],
+    "tags": ["theme", "core"],
     "steps": [
       {
         "url": "https://news.ycombinator.com/news",
         "text": "Make this page a Gruvbox dark theme"
+      }
+    ]
+  },
+  {
+    "id": "hn-gruvbox-then-footer",
+    "tags": ["theme", "multi-turn", "core"],
+    "steps": [
+      {
+        "url": "https://news.ycombinator.com/news",
+        "text": "Make this page a Gruvbox dark theme"
+      },
+      {
+        "url": "https://news.ycombinator.com/news",
+        "text": "The footer and the search box still look off, fix them"
+      }
+    ]
+  },
+  {
+    "id": "hn-item-comments-picked",
+    "tags": ["readability", "picked", "core"],
+    "steps": [
+      {
+        "url": "https://news.ycombinator.com/item?id=8863",
+        "scope": "div.commtext",
+        "text": "Make these comments easier to read"
       }
     ]
   },
@@ -16,16 +41,6 @@
       {
         "url": "https://news.ycombinator.com/news",
         "text": "Make it easier to read"
-      }
-    ]
-  },
-  {
-    "id": "hn-item-gruvbox",
-    "tags": ["theme"],
-    "steps": [
-      {
-        "url": "https://news.ycombinator.com/item?id=8863",
-        "text": "Make this page a Gruvbox dark theme"
       }
     ]
   },
@@ -44,6 +59,16 @@
     ]
   },
   {
+    "id": "hn-gruvbox-spec",
+    "tags": ["theme", "detailed"],
+    "steps": [
+      {
+        "url": "https://news.ycombinator.com/news",
+        "text": "Gruvbox dark theme: page background #1d2021, text #ebdbb2, links #83a598, visited links #d3869b, rank numbers and the points/by/comments lines #928374, and the top bar #3c3836 with its links in #fabd2f."
+      }
+    ]
+  },
+  {
     "id": "wikipedia-nord",
     "tags": ["theme"],
     "steps": [
@@ -55,7 +80,7 @@
   },
   {
     "id": "wikipedia-readable",
-    "tags": ["readability"],
+    "tags": ["readability", "core"],
     "steps": [
       {
         "url": "https://en.wikipedia.org/wiki/Typography",
@@ -64,22 +89,42 @@
     ]
   },
   {
-    "id": "mdn-dark",
-    "tags": ["theme"],
+    "id": "wikipedia-links",
+    "tags": ["precise"],
     "steps": [
       {
-        "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/color",
-        "text": "Make it dark"
+        "url": "https://en.wikipedia.org/wiki/Typography",
+        "text": "Make the links a darker blue and underline them"
+      }
+    ]
+  },
+  {
+    "id": "wikipedia-book",
+    "tags": ["readability", "typography", "detailed"],
+    "steps": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Typography",
+        "text": "Make the article read like a book: a serif body font at 19px with 1.6 line height, the text column 680px wide and centered, hide the left sidebar and the Appearance panel, and keep the images."
       }
     ]
   },
   {
     "id": "github-dracula",
-    "tags": ["theme", "variables"],
+    "tags": ["theme", "variables", "core"],
     "steps": [
       {
         "url": "https://github.com/sindresorhus/awesome",
         "text": "Give this page a Dracula theme"
+      }
+    ]
+  },
+  {
+    "id": "github-nord-fira",
+    "tags": ["theme", "typography", "variables"],
+    "steps": [
+      {
+        "url": "https://github.com/sindresorhus/awesome",
+        "text": "Restyle this page to use the Nord theme and use monospace typography (Fira Code). Ensure all the elements and colors match up."
       }
     ]
   },
@@ -94,32 +139,12 @@
     ]
   },
   {
-    "id": "govuk-dark",
-    "tags": ["theme"],
-    "steps": [
-      {
-        "url": "https://www.gov.uk/browse/benefits",
-        "text": "Make it dark"
-      }
-    ]
-  },
-  {
     "id": "paulgraham-readable",
     "tags": ["readability", "typography"],
     "steps": [
       {
         "url": "http://paulgraham.com/greatwork.html",
         "text": "Make this essay pleasant to read"
-      }
-    ]
-  },
-  {
-    "id": "danluu-serif",
-    "tags": ["typography"],
-    "steps": [
-      {
-        "url": "https://danluu.com/",
-        "text": "Give this a typography makeover with a nice serif font"
       }
     ]
   },
@@ -135,7 +160,7 @@
   },
   {
     "id": "lobsters-compact",
-    "tags": ["layout"],
+    "tags": ["layout", "core"],
     "steps": [
       {
         "url": "https://lobste.rs/",
@@ -165,7 +190,7 @@
   },
   {
     "id": "arxiv-modern",
-    "tags": ["taste"],
+    "tags": ["taste", "vague"],
     "steps": [
       {
         "url": "https://arxiv.org/abs/1706.03762",
@@ -180,6 +205,16 @@
       {
         "url": "https://books.toscrape.com/",
         "text": "Make the products look like a modern store: cards with rounded corners and a soft shadow"
+      }
+    ]
+  },
+  {
+    "id": "books-store-spec",
+    "tags": ["taste", "layout", "detailed"],
+    "steps": [
+      {
+        "url": "https://books.toscrape.com/",
+        "text": "Product grid: 4 columns, each product a card with 12px rounded corners, a 1px #e5e7eb border and a soft shadow; prices bold and green; the Add to basket button a full-width pill."
       }
     ]
   },

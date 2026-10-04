@@ -152,19 +152,23 @@ const screenshot = async (page, file) => {
   const height = await page.evaluate(
     () => document.documentElement.scrollHeight
   );
-  await page.screenshot({
-    path: file,
-    fullPage: true,
-    clip: {
-      x: 0,
-      y: 0,
-      width: VIEWPORT.width,
-      height: Math.min(height, MAX_SHOT_HEIGHT),
-    },
+  /* A viewport as tall as the shot, rather than a full-page capture, which
+   * renders the whole page first: 20 seconds on a 37,000px docs page. */
+  await page.setViewportSize({
+    width: VIEWPORT.width,
+    height: Math.max(VIEWPORT.height, Math.min(height, MAX_SHOT_HEIGHT)),
   });
+  await page.screenshot({ path: file });
+  await page.setViewportSize(VIEWPORT);
 };
 
 const tag = (name, body) => `<${name}>\n${body}\n</${name}>`;
+
+// A step's request as the judge reads it, naming the element it's about.
+const requestText = step =>
+  step.scope
+    ? `${step.text} (about the picked element: ${step.scope})`
+    : step.text;
 
 /**
  * The thread as one prompt, since headless Claude Code takes a single
@@ -324,6 +328,8 @@ const runCase = async ({ browser, testCase, variant, scorer, dir }) => {
       id: turnId(),
       text: step.text,
       href: step.url,
+      // A picked element, as the inspector would send it with the message.
+      ...(step.scope ? { scope: step.scope } : {}),
       ...(previousUser && previousUser.href !== step.url
         ? { newPage: true }
         : {}),
@@ -348,9 +354,13 @@ const runCase = async ({ browser, testCase, variant, scorer, dir }) => {
           outline: window.StylebotEval.getPageOutline(),
           pageCss: window.StylebotEval.getPageCssContext(selector),
         }),
-        ''
+        step.scope ?? ''
       );
-      const system = ref.node.buildSystemPrompt({ ...facts, css });
+      const system = ref.node.buildSystemPrompt({
+        ...facts,
+        css,
+        ...(step.scope ? { selector: step.scope } : {}),
+      });
       const replyTurn = rounds.length
         ? {
             ...assistant,
@@ -450,7 +460,7 @@ const runCase = async ({ browser, testCase, variant, scorer, dir }) => {
   const replies = turns.filter(turn => turn.role === 'assistant');
   const matches = replies.flatMap(turn => turn.matches ?? []);
   const grade = await judge({
-    requests: testCase.steps.map(step => step.text),
+    requests: testCase.steps.map(requestText),
     before: firstShot,
     after: afterShot,
     dir,
@@ -530,7 +540,7 @@ const mean = values => {
     : '–';
 };
 
-const summarise = (results, variants, preferences) => {
+const summarise = (results, variants, preferences, cases) => {
   const columns = [
     'done',
     'looks',
@@ -588,6 +598,23 @@ const summarise = (results, variants, preferences) => {
 
   const decided = preferences.filter(p => !p.error);
   const tally = winner => decided.filter(p => p.winner === winner).length;
+
+  // Kinds of request read separately: a vague one shouldn't hide a theme win.
+  const byTag = [...new Set(cases.flatMap(c => c.tags))].flatMap(tag => {
+    const ids = cases.filter(c => c.tags.includes(tag)).map(c => c.id);
+    const verdicts = decided.filter(p => ids.includes(p.case));
+    const won = winner => verdicts.filter(p => p.winner === winner).length;
+
+    return variants.map(v =>
+      row(
+        `${tag} · ${v.name}${
+          v.name === 'head' ? ` (preferred ${won('head')}–${won('base')})` : ''
+        }`,
+        results.filter(r => ids.includes(r.case) && r.variant === v.name)
+      )
+    );
+  });
+
   const preferred = [
     `Of ${
       decided.length
@@ -607,6 +634,9 @@ const summarise = (results, variants, preferences) => {
     `## Overall`,
     header,
     ...overall,
+    `## By kind of request`,
+    header,
+    ...byTag,
     `## Preferred side by side`,
     ...preferred,
     `## By case`,
@@ -783,7 +813,7 @@ const main = async () => {
               pairDir,
               () =>
                 prefer({
-                  requests: testCase.steps.map(step => step.text),
+                  requests: testCase.steps.map(requestText),
                   before: path.join(dir, 'head', 'before.png'),
                   base: path.join(dir, 'base', 'after.png'),
                   head: path.join(dir, 'head', 'after.png'),
@@ -805,7 +835,7 @@ const main = async () => {
   );
   const preferences = await pool(pairs, Number(args.concurrency));
 
-  const summary = summarise(results, variants, preferences);
+  const summary = summarise(results, variants, preferences, cases);
   fs.writeFileSync(path.join(outDir, 'summary.md'), summary);
   log(`\n${summary}\n\nResults in ${outDir}`);
 };
