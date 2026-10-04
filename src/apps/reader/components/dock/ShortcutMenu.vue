@@ -17,7 +17,7 @@
       <s-text size="caption" variant="muted" class="desc">
         {{ t('readability_shortcut_description') }}
       </s-text>
-      <button v-if="canChange" type="button" class="change-btn" @click="change">
+      <button v-if="!safari" type="button" class="change-btn" @click="change">
         <keyboard-icon />
         {{ t(value ? 'modify_shortcut' : 'set_shortcut') }}
       </button>
@@ -35,7 +35,7 @@ import { shortcutStore } from './shortcut-store';
 
 import { SShortcutChip, SMenu, SText } from '@stylebot/components';
 import { KeyboardIcon, XIcon } from '@stylebot/icons';
-import { canOpenShortcutsPage, openShortcutsPage } from '@stylebot/utils';
+import { isSafari, openShortcutsPage } from '@stylebot/utils';
 
 export default Vue.extend({
   name: 'ShortcutMenu',
@@ -62,8 +62,9 @@ export default Vue.extend({
       return shortcutStore.value();
     },
 
-    canChange(): boolean {
-      return canOpenShortcutsPage();
+    // Safari keeps extension shortcuts in its own settings, which no API opens.
+    safari(): boolean {
+      return isSafari();
     },
   },
 

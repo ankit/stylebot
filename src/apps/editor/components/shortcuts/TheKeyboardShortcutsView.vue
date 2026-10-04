@@ -17,7 +17,7 @@
         <div class="group-heading">
           <h2 class="group-label">{{ group.label }}</h2>
           <a
-            v-if="group.editable && canChange"
+            v-if="group.editable && !safari"
             href="#"
             class="shortcuts-link"
             @click="editShortcuts"
@@ -43,7 +43,7 @@
         </div>
 
         <s-text
-          v-if="group.editable && !canChange"
+          v-if="group.editable && safari"
           size="caption"
           variant="muted"
           class="hint"
@@ -69,11 +69,7 @@ import {
 } from '@stylebot/components';
 import { ChevronLeftIcon } from '@stylebot/icons';
 import type { StylebotCommands, StylebotEditorCommands } from '@stylebot/types';
-import {
-  canOpenShortcutsPage,
-  isMac,
-  openShortcutsPage,
-} from '@stylebot/utils';
+import { isMac, isSafari, openShortcutsPage } from '@stylebot/utils';
 
 import { undoShortcuts } from '../../store/undo-stack';
 import { hasSidePanel } from '../../utils/side-panel';
@@ -111,8 +107,9 @@ export default Vue.extend({
       return this.$store.state.commands;
     },
 
-    canChange(): boolean {
-      return canOpenShortcutsPage();
+    // Safari keeps extension shortcuts in its own settings, which no API opens.
+    safari(): boolean {
+      return isSafari();
     },
 
     editorCommands(): StylebotEditorCommands {
