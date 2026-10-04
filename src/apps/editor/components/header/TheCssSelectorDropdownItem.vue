@@ -10,20 +10,30 @@
     @blur.native="clearPreview"
   >
     <span class="item-row">
-      <span class="item-text" :title="selector">
-        <span class="item-head">
-          <template v-for="(part, i) in headParts">
-            <span
-              v-if="i > 0"
-              :key="`separator-${i}`"
-              class="separator"
-              v-text="', '"
-            />
-            <span :key="i" v-text="part" />
-          </template>
+      <s-tooltip
+        :text="selector"
+        :disabled="!truncated"
+        grow
+        @mouseenter.native="measureTruncation"
+      >
+        <template #text>
+          <span class="selector-tooltip">{{ selector }}</span>
+        </template>
+        <span class="item-text">
+          <span class="item-head">
+            <template v-for="(part, i) in headParts">
+              <span
+                v-if="i > 0"
+                :key="`separator-${i}`"
+                class="separator"
+                v-text="', '"
+              />
+              <span :key="i" class="part" v-text="part" />
+            </template>
+          </span>
+          <span class="item-tail" v-text="subject" />
         </span>
-        <span class="item-tail" v-text="subject" />
-      </span>
+      </s-tooltip>
       <arrow-up-right-icon
         v-if="styled && !current"
         :size="12"
@@ -35,7 +45,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { SMenuItem } from '@stylebot/components';
+import { SMenuItem, STooltip } from '@stylebot/components';
 import { ArrowUpRightIcon } from '@stylebot/icons';
 import { getSubjectCompound, splitSelectorList } from '@stylebot/css';
 
@@ -46,6 +56,7 @@ export default Vue.extend({
 
   components: {
     SMenuItem,
+    STooltip,
     ArrowUpRightIcon,
   },
 
@@ -65,6 +76,10 @@ export default Vue.extend({
       type: Boolean,
       default: false,
     },
+  },
+
+  data(): { truncated: boolean } {
+    return { truncated: false };
   },
 
   computed: {
@@ -95,6 +110,18 @@ export default Vue.extend({
   },
 
   methods: {
+    /**
+     * Notes whether the selector is cut short, so its tooltip only shows
+     * when there's more to read.
+     */
+    measureTruncation(): void {
+      const text = this.$el.querySelector('.item-text');
+
+      this.truncated = Array.from(text?.children ?? []).some(
+        child => child.scrollWidth > child.clientWidth
+      );
+    },
+
     click(): void {
       this.$emit('select');
     },
@@ -140,6 +167,7 @@ export default Vue.extend({
   display: flex;
   flex: 1;
   min-width: 0;
+  contain: inline-size;
   font-family: var(--font-mono);
   color: var(--field-ink);
   white-space: pre;
@@ -150,6 +178,7 @@ export default Vue.extend({
 
   flex: 0 1 auto;
   min-width: 0;
+  white-space: pre;
 }
 
 .item-tail {
@@ -157,10 +186,22 @@ export default Vue.extend({
 
   flex: none;
   max-width: 100%;
+  white-space: pre;
+}
+
+.item-head,
+.item-tail,
+.part,
+.separator {
+  font-family: inherit;
 }
 
 .separator {
   color: var(--field-placeholder);
+}
+
+.selector-tooltip {
+  font-family: var(--font-mono);
 }
 
 .item-icon {

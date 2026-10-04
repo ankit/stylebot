@@ -20,6 +20,7 @@
       :style="{
         visibility: positioned ? 'visible' : 'hidden',
         transform: bubbleTransform,
+        maxWidth: maxWidth ? `${maxWidth}px` : undefined,
       }"
     >
       <span class="tooltip-text">
@@ -113,6 +114,7 @@ export default Vue.extend({
     positioned: boolean;
     flipped: boolean;
     shiftX: number;
+    maxWidth: number;
     showTimeout: ReturnType<typeof setTimeout> | null;
     resizeObserver: ResizeObserver | null;
   } {
@@ -121,6 +123,7 @@ export default Vue.extend({
       positioned: false,
       flipped: false,
       shiftX: 0,
+      maxWidth: 0,
       showTimeout: null,
       resizeObserver: null,
     };
@@ -266,6 +269,7 @@ export default Vue.extend({
       }
 
       const clip = this.clipRect();
+      this.maxWidth = clip.right - clip.left - 2 * EDGE_MARGIN;
       const anchorRect = anchor.getBoundingClientRect();
       const spaceAbove = anchorRect.top - clip.top;
       const spaceBelow = clip.bottom - anchorRect.bottom;
@@ -332,7 +336,8 @@ export default Vue.extend({
   font-size: 12px;
   font-weight: 400;
   line-height: 1.3;
-  white-space: nowrap;
+  width: max-content;
+  overflow-wrap: anywhere;
   pointer-events: none;
 
   &.placement-bottom {
