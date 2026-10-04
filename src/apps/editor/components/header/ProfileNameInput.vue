@@ -1,5 +1,4 @@
 <template>
-  <!-- A "search" name keeps Safari from offering contacts for this field. -->
   <input
     ref="input"
     :value="value"
