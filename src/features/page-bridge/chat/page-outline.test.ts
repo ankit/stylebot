@@ -167,6 +167,15 @@ describe('getPageOutline', () => {
     expect(getPageOutline().split('\n')[1]).toBe('  span.by "a"');
   });
 
+  it('escapes Tailwind class names so they read as valid selectors', () => {
+    document.body.innerHTML = '<nav class="lg:-mt-16 z-10 w-1/2">x</nav>';
+
+    const line = getPageOutline();
+
+    expect(line).toBe('nav.lg\\:-mt-16.z-10.w-1\\/2 "x"');
+    expect(document.querySelector(line.split(' ')[0])).not.toBeNull();
+  });
+
   it('cuts long text', () => {
     document.body.innerHTML = `<p>${'a'.repeat(60)}</p>`;
 

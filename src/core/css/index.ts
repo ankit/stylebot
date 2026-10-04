@@ -10,6 +10,7 @@ export { getCssWithExpandedImports } from './import';
 
 export {
   getSelector,
+  escapeSelectorToken,
   getTestIdBasedSelector,
   getNameBasedSelector,
   getNonHashedClassBasedSelector,
