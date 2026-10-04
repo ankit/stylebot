@@ -1,4 +1,5 @@
 import type { Style, GetIsReadabilityActive } from '@stylebot/types';
+import { isSafari } from '@stylebot/utils';
 
 // Asked live from the content script rather than tracked/persisted here,
 // so there's no stale cached value to race against.
@@ -23,7 +24,10 @@ export const updateIcon = (
 ): void => {
   const enabledStyles = styles.filter(style => style.enabled && style.css);
 
-  if (readabilityActive) {
+  // Safari ignores the badge color and always paints it red, like an alert.
+  if (isSafari()) {
+    chrome.action.setBadgeText({ text: '', tabId: tab.id });
+  } else if (readabilityActive) {
     chrome.action.setBadgeBackgroundColor({
       color: DEFAULT_BADGE_COLOR,
       tabId: tab.id,
