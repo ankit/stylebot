@@ -107,12 +107,15 @@ export const initListeners = (): void => {
     }
   });
 
-  chrome.idle.setDetectionInterval(AWAY_SECONDS);
-  chrome.idle.onStateChanged.addListener(async state => {
-    if (state === 'active' && (await getGoogleDriveSyncEnabled())) {
-      runGoogleDriveSync(styleStorage, { interactive: false });
-    }
-  });
+  // Safari has no idle API; there the popup and the alarm still sync.
+  if (chrome.idle) {
+    chrome.idle.setDetectionInterval(AWAY_SECONDS);
+    chrome.idle.onStateChanged.addListener(async state => {
+      if (state === 'active' && (await getGoogleDriveSyncEnabled())) {
+        runGoogleDriveSync(styleStorage, { interactive: false });
+      }
+    });
+  }
 
   // The enabled flag is flipped from the options page; the alarms and the
   // badge that follow it are owned here so they stay in step no matter which
