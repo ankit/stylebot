@@ -46,3 +46,22 @@ Applying a reply records, for every declaration it set, the value it replaced or
 ## Cost
 
 Providers report tokens, not money, and prices change, so the Chat tab shows no cost. The API key screen links to the provider's own usage page.
+
+## Evaluating prompt changes
+
+Unit tests show the plumbing works, not that replies got better. `yarn eval:chat` measures that: it runs a set of styling requests, listed beside the script, against recorded copies of real pages, once for a base version of Stylebot (`v4` by default) and once for the working tree, and compares them.
+
+Each version's own prompt and page-reading code is built from its checkout, so the comparison is of what each would ship. Model calls go through headless Claude Code, billed to the signed-in Claude subscription rather than an API key, with the reply returned in the same shape as the tool call. Where a version checks its own edits and fixes what the check finds, the run does the same.
+
+A stronger model grades each result from before and after screenshots: whether the request was done, how polished and how pleasing it looks, and the defects it sees. It also compares the two versions' results side by side, shown in a random order, which is steadier than their scores. Once Chat has a page check, the same check, run against the original page, also counts the text each result left hard to read, the surfaces a theme missed and the declarations the page overrode. A summary table is written to a timestamped results folder, beside each case's screenshots, conversation and stylesheet.
+
+- `--base <ref>` / `--head <ref>`: the versions to compare; `.` is the working tree.
+- `--model haiku`, `--judge opus`: the model replying and the one grading.
+- `--cases a,b`, `--tags theme,layout`, `--runs 3`: a subset by name or by kind of request (theme, readability, typography, layout, hide, taste), and how many times to run each, since replies vary.
+- `--record`: records the pages again; otherwise each is recorded once and reused.
+- `--concurrency 6`: how many cases run at once.
+- `--fresh`: runs everything again instead of reusing cached results.
+
+Results are cached by what produced them: the code each version runs, the case and run number, the models, and the harness. Rerunning against an unchanged base, or after a change that leaves one version's code alone, only runs what changed, and a side-by-side verdict is reused while both of its results are. Haiku is called without extended thinking, as the extension calls it.
+
+It costs subscription usage and takes minutes, so it isn't part of CI. While iterating, run a subset with one run and `--judge sonnet`; before merging a change to the prompt, the page outline or the page check, run every case with `--runs 3`.
