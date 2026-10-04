@@ -55,6 +55,16 @@ const stubBuiltins = {
 const exists = (root, file) => fs.existsSync(path.join(root, file));
 
 /**
+ * Where a checkout keeps one of Chat's page readers, without its extension:
+ * in page-bridge's chat folder, or loose in page-bridge in older versions.
+ * Null when it has neither.
+ */
+const pageModule = (root, name) =>
+  [`src/features/page-bridge/chat/${name}`, `src/features/page-bridge/${name}`]
+    .filter(file => exists(root, `${file}.ts`))
+    .map(file => path.join(root, file))[0] ?? null;
+
+/**
  * The checkout to evaluate: the working tree for '.', else a detached
  * worktree of the ref, kept in the cache between runs.
  */
@@ -86,9 +96,8 @@ export const checkoutRef = (repo, cacheDir, ref) => {
 export const buildRef = async (root, outDir, nodeModules) => {
   fs.mkdirSync(outDir, { recursive: true });
 
-  const features = {
-    pageCheck: exists(root, 'src/features/page-bridge/style-check.ts'),
-  };
+  const check = pageModule(root, 'style-check');
+  const features = { pageCheck: Boolean(check) };
   const alias = packageAliases(root);
   const nodePaths = [nodeModules];
 
@@ -106,12 +115,10 @@ export const buildRef = async (root, outDir, nodeModules) => {
   fs.writeFileSync(
     pageEntry,
     [
-      `export { getPageOutline } from '${root}/src/features/page-bridge/page-outline';`,
-      `export { getPageCssContext } from '${root}/src/features/page-bridge/page-css';`,
-      `export { countMatches } from '${root}/src/features/page-bridge/count-matches';`,
-      features.pageCheck
-        ? `export { startStyleCheck, checkStyle } from '${root}/src/features/page-bridge/style-check';`
-        : '',
+      `export { getPageOutline } from '${pageModule(root, 'page-outline')}';`,
+      `export { getPageCssContext } from '${pageModule(root, 'page-css')}';`,
+      `export { countMatches } from '${pageModule(root, 'count-matches')}';`,
+      check ? `export { startStyleCheck, checkStyle } from '${check}';` : '',
     ].join('\n')
   );
 
@@ -147,15 +154,13 @@ export const buildRef = async (root, outDir, nodeModules) => {
   };
 };
 
-const CHECK = 'src/features/page-bridge/style-check.ts';
-
 /**
  * Chat's page check, for scoring every variant the same way whether or not
  * it has the check itself: from the first checkout that has it, or null
  * when none does yet.
  */
 export const buildScorer = async (roots, outDir) => {
-  const repo = roots.find(root => exists(root, CHECK));
+  const repo = roots.find(root => pageModule(root, 'style-check'));
 
   if (!repo) {
     return null;
@@ -163,7 +168,10 @@ export const buildScorer = async (roots, outDir) => {
 
   await esbuild.build({
     stdin: {
-      contents: `export { startStyleCheck, checkStyle } from '${repo}/src/features/page-bridge/style-check';`,
+      contents: `export { startStyleCheck, checkStyle } from '${pageModule(
+        repo,
+        'style-check'
+      )}';`,
       resolveDir: repo,
       loader: 'ts',
     },
