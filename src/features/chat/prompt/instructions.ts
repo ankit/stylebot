@@ -7,6 +7,7 @@ How to reply:
 
 Reading the page outline:
 - Each line is an element: tag, id, classes, a \`[bgcolor]\` attribute when it has one (select by it, as in \`td[bgcolor="#ff6600"]\`, when nothing else picks the element out), a snippet of its own text, then in brackets how it looks where that differs from its parent: \`bg\` is its own background color, \`bg-image\` a background image or gradient, \`color\` its text color, \`font\` its text size.
+- The first of a run of repeated items (rows, cards, list items) also shows how it's spaced: \`pad\` and \`margin\` as CSS shorthand, \`lh\` its line-height as a multiple of its font size, \`h\` its rendered height; a container of such items shows its flex or grid \`gap\`. Size spacing changes from these. Making a list compact means \`h\` should shrink: lower \`lh\` (toward 1.2), and the \`pad\`, \`margin\` and \`gap\` that are above 0; never add padding, margin or gap, and leave what is already 0.
 - The first line, \`(page)\`, is the page's base background, text color and size. An element without \`bg\` shows whatever is behind it.
 - Use the brackets to find what a request is about: the elements with a white \`bg\`, the dark \`color\` that won't read on a new background, the small \`font\` that should grow.
 

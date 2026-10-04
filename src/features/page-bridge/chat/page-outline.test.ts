@@ -24,7 +24,12 @@ describe('getPageOutline', () => {
     document.body.innerHTML = `<ul>${'<li class="row">x</li>'.repeat(6)}</ul>`;
 
     expect(getPageOutline()).toBe(
-      ['ul', '  li.row "x"', '  li.row "x"', '  … ×4 more'].join('\n')
+      [
+        'ul',
+        '  li.row "x" [pad 0, margin 0]',
+        '  li.row "x"',
+        '  … ×4 more',
+      ].join('\n')
     );
   });
 
@@ -39,14 +44,16 @@ describe('getPageOutline', () => {
       [
         'table',
         '  tbody',
-        ...[1, 2].flatMap(() => [
-          '    tr.athing',
-          '      td.title "t"',
-          '    tr',
-          '      td',
-          '      td.subtext "s"',
-          '    tr.spacer',
-        ]),
+        ...['[pad 0, margin 0]', ''].flatMap(spacing =>
+          [
+            `    tr.athing ${spacing}`,
+            '      td.title "t"',
+            `    tr ${spacing}`,
+            '      td',
+            '      td.subtext "s"',
+            `    tr.spacer ${spacing}`,
+          ].map(line => line.trimEnd())
+        ),
         '    … ×6 more',
         '    tr',
         '      td',
@@ -81,13 +88,13 @@ describe('getPageOutline', () => {
 
     expect(getPageOutline()).toBe(
       [
-        'div.box',
+        'div.box [pad 0, margin 0]',
         '  p "a"',
         'div.box',
         '  p "b"',
         'div#main.box',
         '  p "c"',
-        'article#post-1 "x"',
+        'article#post-1 "x" [pad 0, margin 0]',
         'article#post-2 "x"',
         '… ×2 more',
       ].join('\n')
@@ -98,6 +105,38 @@ describe('getPageOutline', () => {
     document.body.innerHTML = `<table><tbody><tr><td bgcolor="#ff6600">x</td></tr></tbody></table>`;
 
     expect(getPageOutline()).toContain('td[bgcolor="#ff6600"] "x"');
+  });
+
+  it('notes how the first of a run of repeated items is spaced', () => {
+    const item =
+      '<li class="story" style="padding: 4px 0; margin: 0 0 8px; font-size: 12px; line-height: 18px">x</li>';
+    document.body.innerHTML = `<ul style="display: flex; row-gap: 6px; column-gap: 6px">${item.repeat(
+      3
+    )}</ul><p class="note" style="padding: 9px">y</p>`;
+
+    expect(getPageOutline().split('\n')).toEqual([
+      'ul [gap 6px]',
+      '  li.story "x" [font 12px, pad 4px 0, margin 0 0 8px, lh 1.5]',
+      '  li.story "x" [font 12px]',
+      '  … ×1 more',
+      'p.note "y"',
+    ]);
+  });
+
+  it('spells out zero spacing on a repeated item', () => {
+    document.body.innerHTML =
+      '<ol><li class="row">a</li><li class="row">b</li></ol>';
+
+    expect(getPageOutline().split('\n')[1]).toBe(
+      '  li.row "a" [pad 0, margin 0]'
+    );
+  });
+
+  it('leaves spacing off repeated inline text', () => {
+    document.body.innerHTML =
+      '<p><span class="by" style="display: inline">a</span><span class="by" style="display: inline">b</span></p>';
+
+    expect(getPageOutline().split('\n')[1]).toBe('  span.by "a"');
   });
 
   it('cuts long text', () => {

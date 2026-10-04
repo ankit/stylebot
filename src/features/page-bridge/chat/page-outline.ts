@@ -128,6 +128,95 @@ const styleHints = (element: Element): Array<string> => {
   return hints;
 };
 
+const px = (value: string): string => {
+  const rounded = Math.round(parseFloat(value) || 0);
+  return rounded ? `${rounded}px` : '0';
+};
+
+/**
+ * A box's four sides as the shortest CSS shorthand, or '' when all are 0.
+ */
+const boxShorthand = (
+  top: string,
+  right: string,
+  bottom: string,
+  left: string
+): string => {
+  const [t, r, b, l] = [top, right, bottom, left].map(px);
+
+  if ([t, r, b, l].every(side => side === '0')) {
+    return '';
+  }
+
+  if (t === b && r === l) {
+    return t === r ? t : `${t} ${r}`;
+  }
+
+  return r === l ? `${t} ${r} ${b}` : `${t} ${r} ${b} ${l}`;
+};
+
+/**
+ * How a repeated item is spaced: its padding, margin, line-height as a
+ * ratio of its font size, and rendered height. The model can't see these
+ * otherwise, and density and readability requests turn on them.
+ */
+const spacingHints = (element: Element): Array<string> => {
+  const style = getComputedStyle(element);
+
+  // Runs of inline text (bylines, nav links) are spaced by what holds them.
+  if (style.display === 'inline') {
+    return [];
+  }
+
+  const padding = boxShorthand(
+    style.paddingTop,
+    style.paddingRight,
+    style.paddingBottom,
+    style.paddingLeft
+  );
+  const margin = boxShorthand(
+    style.marginTop,
+    style.marginRight,
+    style.marginBottom,
+    style.marginLeft
+  );
+  const lineHeight = parseFloat(style.lineHeight);
+  const fontSize = parseFloat(style.fontSize);
+  const height = Math.round(element.getBoundingClientRect().height);
+
+  // Zero is spelled out: a missing value reads as unknown, and the model adds
+  // padding to "compact" a row that has none.
+  return [
+    `pad ${padding || '0'}`,
+    `margin ${margin || '0'}`,
+    lineHeight && fontSize
+      ? `lh ${Math.round((lineHeight / fontSize) * 100) / 100}`
+      : '',
+    height ? `h ${height}px` : '',
+  ].filter(Boolean);
+};
+
+/**
+ * The gap a flex or grid container puts between its children, when it
+ * has one.
+ */
+const gapHint = (element: Element): string => {
+  const style = getComputedStyle(element);
+
+  if (!/flex|grid/.test(style.display)) {
+    return '';
+  }
+
+  const row = px(style.rowGap);
+  const column = px(style.columnGap);
+
+  if (row === '0' && column === '0') {
+    return '';
+  }
+
+  return `gap ${row === column ? row : `${row} ${column}`}`;
+};
+
 // Old-style pages color elements with this attribute, often their only
 // selectable trait (a table cell with no class).
 const bgcolorOf = (element: Element): string => {
@@ -135,14 +224,34 @@ const bgcolorOf = (element: Element): string => {
   return value ? `[bgcolor="${value.replace(/"/g, '')}"]` : '';
 };
 
-const describe = (element: Element): string => {
+const holdsRepeats = (element: Element): boolean => {
+  const seen = new Set<string>();
+
+  return Array.from(element.children).some(child => {
+    const signature = signatureOf(child);
+    const repeat = seen.has(signature);
+    seen.add(signature);
+    return repeat;
+  });
+};
+
+/**
+ * One element's line: its selector parts, text and look, with how it's
+ * spaced when it's the first of a run of repeated items, and its gap when
+ * it holds such a run.
+ */
+const describe = (element: Element, repeated = false): string => {
   const tag = element.tagName.toLowerCase();
   const id = element.id ? `#${element.id}` : '';
   const classes = classesOf(element)
     .map(name => `.${name}`)
     .join('');
   const text = ownText(element);
-  const hints = styleHints(element);
+  const hints = [
+    ...styleHints(element),
+    ...(repeated ? spacingHints(element) : []),
+    ...(holdsRepeats(element) ? [gapHint(element)] : []),
+  ].filter(Boolean);
 
   return `${tag}${id}${classes}${bgcolorOf(element)}${
     text ? ` "${text}"` : ''
@@ -211,15 +320,21 @@ export const getPageOutline = (): string => {
       return count ? push(`${'  '.repeat(depth)}… ×${count} more`) : true;
     };
 
-    for (const child of Array.from(parent.children)) {
-      if (
-        SKIPPED_TAGS.has(child.tagName) ||
-        child.id === 'stylebot' ||
-        !isVisible(child)
-      ) {
-        continue;
-      }
+    const shown = Array.from(parent.children).filter(
+      child =>
+        !SKIPPED_TAGS.has(child.tagName) &&
+        child.id !== 'stylebot' &&
+        isVisible(child)
+    );
+    const totals = new Map<string, number>();
+    shown
+      .filter(child => !isBareWrapper(child))
+      .forEach(child => {
+        const signature = signatureOf(child);
+        totals.set(signature, (totals.get(signature) ?? 0) + 1);
+      });
 
+    for (const child of shown) {
       if (isBareWrapper(child)) {
         if (!walk(child, depth)) {
           return false;
@@ -236,7 +351,12 @@ export const getPageOutline = (): string => {
         continue;
       }
 
-      if (!flushSkipped() || !push(`${'  '.repeat(depth)}${describe(child)}`)) {
+      const repeated = count === 1 && (totals.get(signature) ?? 0) > 1;
+
+      if (
+        !flushSkipped() ||
+        !push(`${'  '.repeat(depth)}${describe(child, repeated)}`)
+      ) {
         return false;
       }
 
