@@ -189,7 +189,12 @@ export const OtherSelectorSource: StoryObj = {
     const store = storeOf(canvasElement);
 
     store.commit('setAppliedDeclarations', [
-      { selector: 'body', property: 'font-family', value: 'Georgia' },
+      {
+        selector: 'body',
+        property: 'font-family',
+        value: 'Georgia',
+        everywhere: true,
+      },
     ]);
 
     const source = await canvas.findByRole('button', {
@@ -215,7 +220,12 @@ export const OverriddenBySelector: StoryObj = {
     const store = storeOf(canvasElement);
 
     store.commit('setAppliedDeclarations', [
-      { selector: 'body', property: 'font-family', value: 'Arial' },
+      {
+        selector: 'body',
+        property: 'font-family',
+        value: 'Arial',
+        everywhere: true,
+      },
     ]);
 
     const warning = await canvas.findByRole('button', {
@@ -225,5 +235,32 @@ export const OverriddenBySelector: StoryObj = {
       'Font'
     );
     await expect(warning.querySelector('svg')).not.toBeNull();
+  },
+};
+
+export const OverriddenOnThisElement: StoryObj = {
+  ...editor({
+    css: 'h1 { color: #2a5fd6; } .title { color: #d62a2a; }',
+    activeSelector: 'h1',
+  }),
+  name: 'a value another selector overrides on only some of the elements says it is overridden on this element',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+
+    store.commit('setAppliedDeclarations', [
+      {
+        selector: '.title',
+        property: 'color',
+        value: '#d62a2a',
+        everywhere: false,
+      },
+    ]);
+
+    await expect(
+      await canvas.findByRole('button', {
+        name: 'Overridden by .title on this element',
+      })
+    ).toBeVisible();
   },
 };

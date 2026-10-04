@@ -262,7 +262,13 @@ export class LocalPageBridge extends PageBridgeEmitter implements PageBridge {
     const el = this.elementFor(selector);
 
     return Promise.resolve(
-      el ? getAppliedDeclarations(el, this.getStylebotCss()) : []
+      el
+        ? getAppliedDeclarations(
+            el,
+            this.getStylebotCss(),
+            Array.from(document.querySelectorAll(selector))
+          )
+        : []
     );
   }
 

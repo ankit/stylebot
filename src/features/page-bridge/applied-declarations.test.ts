@@ -27,7 +27,12 @@ describe('getAppliedDeclarations', () => {
       .mockReturnValue(computed as unknown as CSSStyleDeclaration);
 
     expect(getAppliedDeclarations(el, 'p { color: var(--ink); }')).toEqual([
-      { property: 'color', value: 'rgb(1, 2, 3)', selector: 'p' },
+      {
+        property: 'color',
+        value: 'rgb(1, 2, 3)',
+        selector: 'p',
+        everywhere: true,
+      },
     ]);
 
     spy.mockRestore();
@@ -57,8 +62,13 @@ describe('getAppliedDeclarations', () => {
     expect(
       getAppliedDeclarations(document.getElementById('p') as HTMLElement, css)
     ).toEqual([
-      { property: 'font-size', value: '12px', selector: 'p' },
-      { property: 'font-weight', value: 'bold', selector: 'p' },
+      { property: 'font-size', value: '12px', selector: 'p', everywhere: true },
+      {
+        property: 'font-weight',
+        value: 'bold',
+        selector: 'p',
+        everywhere: true,
+      },
     ]);
   });
 
@@ -82,8 +92,43 @@ describe('getAppliedDeclarations', () => {
         document.getElementById('p') as HTMLElement,
         'div>p { color: red; }'
       )
-    ).toEqual([{ property: 'color', value: 'red', selector: 'div>p' }]);
+    ).toEqual([
+      { property: 'color', value: 'red', selector: 'div>p', everywhere: true },
+    ]);
 
     spy.mockRestore();
+  });
+
+  it('says whether the winning selector reaches every element the inspected one matches', () => {
+    document.body.innerHTML =
+      '<p id="intro" class="intro">a</p><p id="other">b</p>';
+    const css = 'p { color: blue; } .intro { color: red; font-size: 20px; }';
+    addStyle(css, 'stylebot-css-example');
+    const intro = document.getElementById('intro') as HTMLElement;
+    const paragraphs = Array.from(document.querySelectorAll('p'));
+
+    expect(getAppliedDeclarations(intro, css, paragraphs)).toEqual([
+      {
+        property: 'color',
+        value: 'red',
+        selector: '.intro',
+        everywhere: false,
+      },
+      {
+        property: 'font-size',
+        value: '20px',
+        selector: '.intro',
+        everywhere: false,
+      },
+    ]);
+    expect(getAppliedDeclarations(intro, css, [intro])).toEqual([
+      { property: 'color', value: 'red', selector: '.intro', everywhere: true },
+      {
+        property: 'font-size',
+        value: '20px',
+        selector: '.intro',
+        everywhere: true,
+      },
+    ]);
   });
 });

@@ -119,8 +119,18 @@ describe('getters', () => {
       css: 'h1 { color: red; }',
       activeSelector: 'h1',
       appliedDeclarations: [
-        { property: 'color', value: 'rgb(0, 0, 255)', selector: '.title' },
-        { property: 'font-size', value: '20px', selector: '*' },
+        {
+          property: 'color',
+          value: 'rgb(0, 0, 255)',
+          selector: '.title',
+          everywhere: false,
+        },
+        {
+          property: 'font-size',
+          value: '20px',
+          selector: '*',
+          everywhere: true,
+        },
       ],
     };
 
@@ -141,7 +151,9 @@ describe('getters', () => {
     it('names the selector that sets a property the rule leaves unset', () => {
       const { other, overriding } = rulesFor(state, 'h1');
 
-      expect(other).toEqual({ 'font-size': { selector: '*', value: '20px' } });
+      expect(other).toEqual({
+        'font-size': { selector: '*', value: '20px', everywhere: true },
+      });
       expect(overriding['font-size']).toBeUndefined();
     });
 
@@ -149,7 +161,7 @@ describe('getters', () => {
       const { other, overriding } = rulesFor(state, 'h1');
 
       expect(overriding).toEqual({
-        color: { selector: '.title', value: '#0000ff' },
+        color: { selector: '.title', value: '#0000ff', everywhere: false },
       });
       expect(other.color).toBeUndefined();
     });
