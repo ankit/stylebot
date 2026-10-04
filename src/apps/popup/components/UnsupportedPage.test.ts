@@ -12,17 +12,20 @@ jest.mock('../utils', () => ({
 describe('UnsupportedPage.vue', () => {
   it('names the page, says why, and offers settings', () => {
     const wrapper = mount(UnsupportedPage, {
-      propsData: { url: 'chrome://settings' },
+      propsData: { url: 'chrome://settings', support: 'unreachable' },
     });
 
-    expect(wrapper.text()).toContain('chrome_settings');
+    expect(wrapper.text()).toContain('browser_settings');
     expect(wrapper.text()).toContain('stylebot_cant_style_browser_pages');
     expect(wrapper.findComponent(OptionsButton).exists()).toBe(true);
   });
 
   it('names a website file by its host', () => {
     const wrapper = mount(UnsupportedPage, {
-      propsData: { url: 'https://example.com/report.pdf' },
+      propsData: {
+        url: 'https://example.com/report.pdf',
+        support: 'unsupported',
+      },
     });
 
     expect(wrapper.text()).toContain('example.com');
@@ -30,7 +33,7 @@ describe('UnsupportedPage.vue', () => {
 
   it('links a local file to the file access setting', async () => {
     const wrapper = mount(UnsupportedPage, {
-      propsData: { url: 'file:///Users/me/page.html' },
+      propsData: { url: 'file:///Users/me/page.html', support: 'unreachable' },
     });
 
     await wrapper.find('.file-access-link').trigger('click');

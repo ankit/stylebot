@@ -49,6 +49,10 @@ describe('inject-css run()', () => {
     stylesModule = require('@stylebot/saved-styles');
 
     sendMessage = jest.fn();
+    Object.defineProperty(document, 'contentType', {
+      value: 'text/html',
+      configurable: true,
+    });
 
     (global as any).chrome = {
       storage: { local: { get: jest.fn() } },
@@ -144,6 +148,22 @@ describe('inject-css run()', () => {
       );
     }
   );
+
+  it('leaves a PDF alone, whatever its url, and says so when asked', () => {
+    Object.defineProperty(document, 'contentType', {
+      value: 'application/pdf',
+      configurable: true,
+    });
+    (stylesheets.readCache as jest.Mock).mockReturnValue(null);
+
+    load();
+
+    expect(hidePageModule.hidePage).not.toHaveBeenCalled();
+    expect(stylesModule.getStylesForPage).not.toHaveBeenCalled();
+    const sendResponse = jest.fn();
+    registeredListener({ name: 'GetCanStylePage' }, {}, sendResponse);
+    expect(sendResponse).toHaveBeenCalledWith(false);
+  });
 
   it('applies the cache immediately, without hiding, when there is one', () => {
     const cached = {

@@ -2,6 +2,7 @@ import { t } from '@stylebot/i18n';
 import { setPageBridge, RemotePageBridge } from '@stylebot/page-bridge';
 
 import { createStore, mountEditor } from '@stylebot/editor';
+import { getPageSupport } from '@stylebot/utils';
 
 import { openEditorWindow } from '../utils/chrome';
 import { initWindowListeners, initTabInfo } from './listeners';
@@ -18,7 +19,7 @@ const renderUnavailable = (): void => {
   const app = document.getElementById('app');
   if (app) {
     app.className = 'editor-window-unavailable';
-    app.textContent = t('editor_window_unavailable');
+    app.textContent = t('stylebot_cant_style_this_page');
   }
 };
 
@@ -102,8 +103,43 @@ const start = async (): Promise<void> => {
   }
 };
 
-if (Number.isInteger(tabId) && tabId > 0) {
-  start();
-} else {
-  renderUnavailable();
-}
+const canStyleTab = async (tab?: chrome.tabs.Tab): Promise<boolean> =>
+  !!tab && (await getPageSupport(tab)) === 'supported';
+
+/**
+ * Starts over when the tab loads a page whose answer differs from the one
+ * shown, so a panel left open on a PDF becomes the editor on the next page.
+ */
+const watchTab = (showingEditor: boolean): void => {
+  chrome.tabs.onUpdated.addListener(async (id, { status }, tab) => {
+    if (id === tabId && status === 'complete') {
+      if ((await canStyleTab(tab)) !== showingEditor) {
+        window.location.reload();
+      }
+    }
+  });
+};
+
+/**
+ * Opens the editor on the tab, or says the tab can't be styled rather than
+ * waiting on a page script that isn't there, as on a PDF or browser page.
+ */
+const init = async (): Promise<void> => {
+  if (!Number.isInteger(tabId) || tabId <= 0) {
+    renderUnavailable();
+    return;
+  }
+
+  const tab = await chrome.tabs.get(tabId).catch(() => undefined);
+  const canStyle = await canStyleTab(tab);
+
+  watchTab(canStyle);
+
+  if (canStyle) {
+    start();
+  } else {
+    renderUnavailable();
+  }
+};
+
+init();

@@ -119,6 +119,7 @@ export default Vue.extend({
 }
 
 .stylebot-content {
+  position: relative;
   display: flex;
   flex-direction: column;
   height: 100%;

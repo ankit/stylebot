@@ -1,7 +1,7 @@
 <template>
   <s-theme-provider class="popup" :mode="appearance">
-    <div v-if="restricted">
-      <unsupported-page :url="tab.url" />
+    <div v-if="tab && pageSupport && pageSupport !== 'supported'">
+      <unsupported-page :url="tab.url || ''" :support="pageSupport" />
 
       <template v-if="syncEnabled">
         <div class="popup-divider" />
@@ -9,7 +9,7 @@
       </template>
     </div>
 
-    <div v-else-if="tab && tab.id">
+    <div v-else-if="tab && tab.id && pageSupport === 'supported'">
       <site-profiles
         v-if="hasProfiles"
         :url="styles[0].url"
@@ -108,7 +108,6 @@ import {
   getCommands,
   getOption,
   getCurrentTab,
-  getFileAccessAllowed,
   getIsStylebotOpen,
   getIsPageReaderable,
   enableStyle,
@@ -120,7 +119,6 @@ import { getGoogleDriveSyncEnabled } from '@stylebot/sync';
 import {
   expandProfiles,
   hasAnyCss,
-  isSupportedUrl,
   listProfiles,
 } from '@stylebot/saved-styles';
 import type { ProfileSummary } from '@stylebot/saved-styles';
@@ -131,6 +129,8 @@ import type {
   StylebotLayout,
   StylebotDockLocation,
 } from '@stylebot/types';
+import { getPageSupport } from '@stylebot/utils';
+import type { PageSupport } from '@stylebot/utils';
 
 export default Vue.extend({
   name: 'App',
@@ -158,7 +158,8 @@ export default Vue.extend({
     siteActiveProfile: string;
     siteEnabled: boolean;
     syncEnabled: boolean;
-    fileAccessAllowed: boolean;
+    // Null until the tab answers, so neither view shows before it does.
+    pageSupport: PageSupport | null;
     commands?: GetCommandsResponse;
     appearance: StylebotAppearance;
     dockLocation: StylebotDockLocation | '';
@@ -172,7 +173,7 @@ export default Vue.extend({
       readability: false,
       pageReaderable: false,
       syncEnabled: false,
-      fileAccessAllowed: true,
+      pageSupport: null,
       commands: undefined,
       appearance: 'system',
       dockLocation: '',
@@ -186,22 +187,6 @@ export default Vue.extend({
       } catch {
         return '';
       }
-    },
-
-    // Pages the content script can't run on (chrome://, Web Store, PDFs) —
-    // same check the background page uses to decide whether it can inject —
-    // and local files while the browser keeps extensions out of them.
-    restricted(): boolean {
-      const url = this.tab?.url;
-
-      if (!url) {
-        return false;
-      }
-
-      return (
-        !isSupportedUrl(url) ||
-        (url.startsWith('file://') && !this.fileAccessAllowed)
-      );
     },
 
     siteProfiles(): Array<ProfileSummary> {
@@ -266,13 +251,10 @@ export default Vue.extend({
 
   created() {
     getCurrentTab(async tab => {
-      if (tab.url?.startsWith('file://')) {
-        this.fileAccessAllowed = await getFileAccessAllowed();
-      }
-
       this.tab = tab;
+      this.pageSupport = await getPageSupport(tab);
 
-      if (this.restricted) {
+      if (this.pageSupport !== 'supported') {
         return;
       }
 

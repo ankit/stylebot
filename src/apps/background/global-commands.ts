@@ -1,9 +1,9 @@
-import { isSupportedUrl } from '@stylebot/saved-styles';
 import type { RunCommand, StylebotCommandName } from '@stylebot/types';
 import {
   COMMAND_NAMES,
   closeEditorSidePanel,
   isEditorSidePanelOpen,
+  isWebPageUrl,
   supportsEditorSidePanel,
 } from '@stylebot/utils';
 
@@ -28,7 +28,10 @@ const getTarget = (
     return Number.isInteger(tabId) ? { tabId, fromEditorWindow: true } : null;
   }
 
-  if (tab.id === undefined || !isSupportedUrl(tab.url)) {
+  // Checked by URL alone: asking the page first would let the shortcut's
+  // gesture lapse before the side panel opens. A page Stylebot can't style
+  // never answers the command.
+  if (tab.id === undefined || !isWebPageUrl(tab.url)) {
     return null;
   }
 

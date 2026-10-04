@@ -1,8 +1,10 @@
 import { t } from '@stylebot/i18n';
 import type { OpenStylebotFromContextMenu } from '@stylebot/types';
-import { isSupportedUrl } from '@stylebot/saved-styles';
-
-import { supportsEditorSidePanel, openEditorSidePanel } from '@stylebot/utils';
+import {
+  getPageSupport,
+  supportsEditorSidePanel,
+  openEditorSidePanel,
+} from '@stylebot/utils';
 
 import type { StylebotDockLocation } from '@stylebot/types';
 
@@ -10,6 +12,9 @@ import { OpenOptionsPage } from './messages';
 import { getAll as getAllOptions } from './options';
 
 const CONTEXT_MENU_ID = 'stylebot-contextmenu';
+
+// Each update asks its tab first; only the latest one may apply its answer.
+let latestUpdate = 0;
 const VIEW_OPTIONS_MENU_ITEM_ID = 'view-options';
 const STYLE_ELEMENT_MENU_ITEM_ID = 'style-element';
 // A click on this one opens the side panel without first reading the dock
@@ -94,12 +99,19 @@ export const ContextMenu = {
     });
   },
 
-  update(tab: chrome.tabs.Tab): void {
+  async update(tab: chrome.tabs.Tab): Promise<void> {
     if (!tab) {
       return;
     }
 
-    if (tab.url && isSupportedUrl(tab.url)) {
+    const update = ++latestUpdate;
+    const supported = (await getPageSupport(tab)) === 'supported';
+
+    if (update !== latestUpdate) {
+      return;
+    }
+
+    if (supported) {
       // If it is a valid url, show the contextMenu
       chrome.contextMenus.update(CONTEXT_MENU_ID, {
         documentUrlPatterns: ['<all_urls>'],

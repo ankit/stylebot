@@ -14,23 +14,25 @@
       @click="openExtensionDetails"
     >
       <s-text as="span" size="large" variant="primary">
-        {{ t(page.reasonKey) }}
+        {{ reason }}
       </s-text>
     </button>
     <s-text v-else size="large" variant="muted">
-      {{ t(page.reasonKey) }}
+      {{ reason }}
     </s-text>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
+import type { PropType } from 'vue';
 import { SHeading, SText } from '@stylebot/components';
 
 import OptionsButton from './OptionsButton.vue';
 import { openExtensionDetails } from '../utils';
 import { describeUnsupportedPage } from '../unsupported-page';
 import type { UnsupportedPage } from '../unsupported-page';
+import type { PageSupport } from '@stylebot/utils';
 
 export default Vue.extend({
   name: 'UnsupportedPage',
@@ -46,16 +48,24 @@ export default Vue.extend({
       type: String,
       required: true,
     },
+
+    // The tab's own answer to whether Stylebot runs there.
+    support: {
+      type: String as PropType<Exclude<PageSupport, 'supported'>>,
+      required: true,
+    },
   },
 
   computed: {
     page(): UnsupportedPage {
-      return describeUnsupportedPage(this.url);
+      return describeUnsupportedPage(this.url, this.support);
     },
 
     name(): string {
-      if (this.page.nameKey) {
-        return this.t(this.page.nameKey);
+      const { name } = this.page;
+
+      if (name) {
+        return this.t(name.key, name.browser ? [name.browser] : []);
       }
 
       try {
@@ -63,6 +73,11 @@ export default Vue.extend({
       } catch {
         return this.url;
       }
+    },
+
+    reason(): string {
+      const { reason } = this.page;
+      return this.t(reason.key, reason.browser ? [reason.browser] : []);
     },
   },
 

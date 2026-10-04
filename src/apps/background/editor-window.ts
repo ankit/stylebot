@@ -1,4 +1,4 @@
-import { isSupportedUrl } from '@stylebot/saved-styles';
+import { getPageSupport } from '@stylebot/utils';
 import type { EditorWindowBounds, StylebotLayout } from '@stylebot/types';
 
 import { get as getOption } from './options';
@@ -159,7 +159,7 @@ const openWindow = async (tabId: number): Promise<void> => {
   }
 
   const tab = await chrome.tabs.get(tabId);
-  if (!tab.url || !isSupportedUrl(tab.url)) {
+  if ((await getPageSupport(tab)) !== 'supported') {
     return;
   }
 

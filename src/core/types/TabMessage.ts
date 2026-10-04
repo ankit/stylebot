@@ -40,6 +40,12 @@ export type GetIsStylebotOpen = {
   name: 'GetIsStylebotOpen';
 };
 
+// Answered by Stylebot's page script, where it runs, with whether it can
+// style the page. No answer means it isn't running there.
+export type GetCanStylePage = {
+  name: 'GetCanStylePage';
+};
+
 export type GetIsPageReaderable = {
   name: 'GetIsPageReaderable';
 };
@@ -71,6 +77,7 @@ type TabMessage =
   | ApplyStylesToTab
   | TabUpdated
   | GetIsStylebotOpen
+  | GetCanStylePage
   | GetIsPageReaderable
   | GetIsReadabilityActive
   | UpdateReader

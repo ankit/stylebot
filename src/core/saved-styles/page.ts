@@ -1,6 +1,6 @@
 import type { StyleMap } from '@stylebot/types';
 
-import { isHtmlUrl, matchesUrlPattern } from './url';
+import { matchesUrlPattern } from './url';
 import { hasAnyCss } from './profiles';
 
 type WithUrl<T> = T & { url: string };
@@ -18,10 +18,6 @@ export const getStylesForPage = <T extends { css: string } = StyleMap[string]>(
   defaultStyle?: WithUrl<T>;
 } => {
   if (!pageUrl) {
-    return { styles: [] };
-  }
-
-  if (!isHtmlUrl(pageUrl)) {
     return { styles: [] };
   }
 
