@@ -23,6 +23,7 @@ const COMPONENT_NAME =
 const MAX_SAMPLED = 300;
 const DOMINANT = 10;
 const MANY_COLORS = 40;
+const PER_COLOR = 3;
 
 const customProperties = (element: Element): Map<string, string> => {
   const style = getComputedStyle(element);
@@ -53,12 +54,20 @@ const normalizeColor = (value: string): string => {
     return `#${short[1]}${short[1]}${short[2]}${short[2]}${short[3]}${short[3]}`.toLowerCase();
   }
 
-  const rgb = /^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/.exec(value);
+  const rgb = /^rgb\(([\d.]+%?),\s*([\d.]+%?),\s*([\d.]+%?)\)$/.exec(value);
 
   if (rgb) {
     return `#${rgb
       .slice(1)
-      .map(channel => Number(channel).toString(16).padStart(2, '0'))
+      .map(channel =>
+        Math.round(
+          channel.endsWith('%')
+            ? (parseFloat(channel) * 255) / 100
+            : parseFloat(channel)
+        )
+          .toString(16)
+          .padStart(2, '0')
+      )
       .join('')}`;
   }
 
@@ -153,8 +162,21 @@ export const getCssVariables = (): Array<PageCssVariable> => {
     .sort((a, b) => b.score - a.score)
     .map(({ variable }) => variable);
 
-  return [...ranked, ...variables.filter(variable => !isColor(variable))].slice(
-    0,
-    MAX_VARIABLES
-  );
+  // A few variables per color first, so the list spans the palette's shades
+  // instead of dozens of names for its white.
+  const perValue = new Map<string, number>();
+  const spread = ranked.filter(variable => {
+    const color = normalizeColor(variable.value);
+    const seen = perValue.get(color) ?? 0;
+    perValue.set(color, seen + 1);
+    return seen < PER_COLOR;
+  });
+  const first = new Set(spread);
+  const rest = ranked.filter(variable => !first.has(variable));
+
+  return [
+    ...spread,
+    ...rest,
+    ...variables.filter(variable => !isColor(variable)),
+  ].slice(0, MAX_VARIABLES);
 };

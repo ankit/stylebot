@@ -52,4 +52,24 @@ describe('getCssVariables', () => {
       on: 'html',
     });
   });
+
+  it('spans the palette’s shades before listing more names for one color', () => {
+    const whites = Object.fromEntries(
+      Array.from({ length: 50 }, (_, i) => [`--surface-${i}`, '#fff'])
+    );
+
+    jest
+      .spyOn(window, 'getComputedStyle')
+      .mockImplementation(element =>
+        element === document.documentElement
+          ? computed({ ...whites, '--primary-low': 'rgb(91.3%, 91.3%, 91.3%)' })
+          : computed({})
+      );
+
+    expect(
+      getCssVariables()
+        .slice(0, 4)
+        .map(({ name }) => name)
+    ).toContain('--primary-low');
+  });
 });
