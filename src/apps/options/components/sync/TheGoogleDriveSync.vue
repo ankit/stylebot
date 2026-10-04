@@ -71,7 +71,13 @@
 
         <div class="row">
           <dt>{{ t('sync_schedule') }}</dt>
-          <dd>{{ t('sync_schedule_value', [String(syncPeriodMinutes)]) }}</dd>
+          <dd>
+            {{
+              t('when_you_edit_a_style_or_open_the_popup_and_every_minutes', [
+                String(syncPeriodMinutes),
+              ])
+            }}
+          </dd>
         </div>
       </dl>
 
