@@ -10,7 +10,20 @@
     @blur.native="clearPreview"
   >
     <span class="item-row">
-      <s-inline-list mono :parts="parts" class="item-text" />
+      <span class="item-text" :title="selector">
+        <span class="item-head">
+          <template v-for="(part, i) in headParts">
+            <span
+              v-if="i > 0"
+              :key="`separator-${i}`"
+              class="separator"
+              v-text="', '"
+            />
+            <span :key="i" v-text="part" />
+          </template>
+        </span>
+        <span class="item-tail" v-text="subject" />
+      </span>
       <arrow-up-right-icon
         v-if="styled && !current"
         :size="12"
@@ -22,9 +35,9 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { SInlineList, SMenuItem } from '@stylebot/components';
+import { SMenuItem } from '@stylebot/components';
 import { ArrowUpRightIcon } from '@stylebot/icons';
-import { splitSelectorList } from '@stylebot/css';
+import { getSubjectCompound, splitSelectorList } from '@stylebot/css';
 
 import { getPageBridge } from '@stylebot/page-bridge';
 
@@ -34,7 +47,6 @@ export default Vue.extend({
   components: {
     SMenuItem,
     ArrowUpRightIcon,
-    SInlineList,
   },
 
   props: {
@@ -58,6 +70,21 @@ export default Vue.extend({
   computed: {
     parts(): Array<string> {
       return splitSelectorList(this.selector);
+    },
+
+    // The last part's rightmost compound stays whole; what's before it is
+    // cut short with an ellipsis, so a long selector keeps both its ends.
+    subject(): string {
+      return getSubjectCompound(this.parts[this.parts.length - 1] ?? '');
+    },
+
+    headParts(): Array<string> {
+      const last = this.parts[this.parts.length - 1] ?? '';
+
+      return [
+        ...this.parts.slice(0, -1),
+        last.slice(0, last.length - this.subject.length),
+      ];
     },
   },
 
@@ -104,19 +131,40 @@ export default Vue.extend({
 
 .item-row {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 8px;
   width: 100%;
 }
 
 .item-text {
+  display: flex;
   flex: 1;
   min-width: 0;
+  font-family: var(--font-mono);
+  color: var(--field-ink);
+  white-space: pre;
+}
+
+.item-head {
+  @include truncate;
+
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.item-tail {
+  @include truncate;
+
+  flex: none;
+  max-width: 100%;
+}
+
+.separator {
+  color: var(--field-placeholder);
 }
 
 .item-icon {
   flex: none;
-  margin-top: 3px;
   color: var(--accent-text);
 }
 </style>

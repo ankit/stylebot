@@ -171,7 +171,11 @@ export const SelectorListAsText: StoryObj = {
     await user.click(chips(canvasElement));
     await findOpenMenu(canvas);
     await waitFor(() => expect(items(canvasElement)).toHaveLength(2));
-    await expectInOrder(items(canvasElement)[0] as HTMLElement);
+    const item = items(canvasElement)[0] as HTMLElement;
+    await expect(item).toHaveTextContent(GROUP.join(', '));
+    await expect(item.querySelectorAll('.separator')).toHaveLength(
+      GROUP.length - 1
+    );
     await expect(items(canvasElement)[1]).toHaveTextContent(/^\s*p\s*$/);
   },
 };
