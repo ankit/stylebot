@@ -17,14 +17,16 @@ use it well.
 From the checkout with the change, after `yarn install`:
 
 ```
-yarn eval:chat --base HEAD --head . --tags theme --judge sonnet
+yarn eval:chat --base HEAD --head . --tags core --judge sonnet
 ```
 
 - **Compare against the previous commit** (`--base HEAD --head .`) while iterating, so the
   numbers isolate this change; compare against `v4` for a PR's description.
-- **Iterate on a subset**: `--tags` (theme, readability, typography, layout, hide, taste)
-  or `--cases`, one run, `--judge sonnet`. Before a PR, run every case with `--runs 3`
-  and the default Opus judge.
+- **Iterate on a subset**: `--tags core` (six cases across kinds of request), or the tags a
+  change targets (theme, readability, typography, layout, hide, taste, detailed, precise,
+  picked, multi-turn), one run, `--judge sonnet`. Before a PR, run every case with
+  `--runs 3` and the default Opus judge, and read the "by kind of request" table: a vague
+  request's noise shouldn't hide a theme's gain, or the other way round.
 - **Run it in the background** and wait for `Results in …`; a full cold run takes about
   six minutes, and results are cached by the code that produced them, so an unchanged
   base costs nothing the second time.

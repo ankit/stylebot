@@ -189,29 +189,48 @@ Once Chat checks its own edits, that check also counts what each result left har
 
 ### Cases
 
-| Site                            | Request                                                                                    | Tags                    |
-| :------------------------------ | :----------------------------------------------------------------------------------------- | :---------------------- |
-| Hacker News                     | "Make this page a Gruvbox dark theme"                                                      | theme                   |
-| Hacker News                     | "Make it easier to read"                                                                   | readability             |
-| Hacker News, a story            | "Make this page a Gruvbox dark theme"                                                      | theme                   |
-| Hacker News, story → front page | "Make this page a Gruvbox dark theme" → "apply the same theme to this page"                | theme, multi-page       |
-| Wikipedia                       | "Give this page a Nord theme"                                                              | theme                   |
-| Wikipedia                       | "Make it easier to read"                                                                   | readability             |
-| MDN                             | "Make it dark"                                                                             | theme                   |
-| GitHub                          | "Give this page a Dracula theme"                                                           | theme, variables        |
-| Discourse (Python forum)        | "Use the Catppuccin Mocha theme"                                                           | theme, variables        |
-| GOV.UK                          | "Make it dark"                                                                             | theme                   |
-| Paul Graham's essays            | "Make this essay pleasant to read"                                                         | readability, typography |
-| Dan Luu's blog                  | "Give this a typography makeover with a nice serif font"                                   | typography              |
-| Python docs                     | "Make the code examples stand out and easier to read"                                      | readability             |
-| Lobsters                        | "Make it more compact so more stories fit on screen"                                       | layout                  |
-| React docs                      | "Hide the sidebar and let the content use the space"                                       | layout, hide            |
-| BBC News                        | "Remove the ads and clutter"                                                               | hide                    |
-| arXiv                           | "Make it look modern"                                                                      | taste                   |
-| A store (Books to Scrape)       | "Make the products look like a modern store: cards with rounded corners and a soft shadow" | taste, layout           |
-| NPR, text edition               | "Make it look like a printed newspaper"                                                    | taste, typography       |
+Each case tests one thing a real request needs. Tags group them by kind; `core` is a six-case set for a quick check while iterating.
 
-Pick a subset by tag or name. Reddit and Stack Overflow block headless browsers, and some news sites cover the page with a consent dialog, so check a new site loads before adding it.
+| Tag                     | What it tests                                                                     |
+| :---------------------- | :-------------------------------------------------------------------------------- |
+| theme                   | a named or described palette applied to every surface, readably                   |
+| readability, typography | type size, line length, fonts across the whole page                               |
+| layout, hide            | density, hiding parts and letting the rest reflow                                 |
+| taste                   | a look ("modern", "newspaper"); `vague` marks the request with no concrete target |
+| detailed                | a spec with several explicit values, all of which should land                     |
+| precise                 | a small change that should touch nothing else                                     |
+| picked                  | a request about the element picked with the inspector                             |
+| multi-turn, multi-page  | a follow-up correction; the same theme carried to another page                    |
+| variables               | a design system recolored through its CSS variables                               |
+
+| Site                            | Request                                                                                                                           | Tags                              |
+| :------------------------------ | :-------------------------------------------------------------------------------------------------------------------------------- | :-------------------------------- |
+| Hacker News                     | "Make this page a Gruvbox dark theme"                                                                                             | theme, core                       |
+| Hacker News                     | "Make this page a Gruvbox dark theme" → "The footer and the search box still look off, fix them"                                  | theme, multi-turn, core           |
+| Hacker News, a story            | "Make these comments easier to read", with a comment picked                                                                       | readability, picked, core         |
+| Hacker News                     | "Make it easier to read"                                                                                                          | readability                       |
+| Hacker News, story → front page | "Make this page a Gruvbox dark theme" → "apply the same theme to this page"                                                       | theme, multi-page                 |
+| Hacker News                     | Gruvbox with an exact color for the page, text, links, visited links, metadata and top bar                                        | theme, detailed                   |
+| Wikipedia                       | "Give this page a Nord theme"                                                                                                     | theme                             |
+| Wikipedia                       | "Make it easier to read"                                                                                                          | readability, core                 |
+| Wikipedia                       | "Make the links a darker blue and underline them"                                                                                 | precise                           |
+| Wikipedia                       | "Make the article read like a book": serif at 19px, 1.6 line height, a centered 680px column, sidebar and Appearance panel hidden | readability, typography, detailed |
+| GitHub                          | "Give this page a Dracula theme"                                                                                                  | theme, variables, core            |
+| GitHub                          | "Restyle this page to use the Nord theme and use monospace typography (Fira Code). Ensure all the elements and colors match up."  | theme, typography, variables      |
+| Discourse (Python forum)        | "Use the Catppuccin Mocha theme"                                                                                                  | theme, variables                  |
+| GOV.UK                          | "Make it dark"                                                                                                                    | theme                             |
+| Paul Graham's essays            | "Make this essay pleasant to read"                                                                                                | readability, typography           |
+| Dan Luu's blog                  | "Give this a typography makeover with a nice serif font"                                                                          | typography                        |
+| Python docs                     | "Make the code examples stand out and easier to read"                                                                             | readability                       |
+| Lobsters                        | "Make it more compact so more stories fit on screen"                                                                              | layout, core                      |
+| React docs                      | "Hide the sidebar and let the content use the space"                                                                              | layout, hide                      |
+| BBC News                        | "Remove the ads and clutter"                                                                                                      | hide                              |
+| arXiv                           | "Make it look modern"                                                                                                             | taste, vague                      |
+| A store (Books to Scrape)       | "Make the products look like a modern store: cards with rounded corners and a soft shadow"                                        | taste, layout                     |
+| A store (Books to Scrape)       | 4 columns, cards with 12px corners, a 1px border and soft shadow, bold green prices, full-width pill buttons                      | taste, layout, detailed           |
+| NPR, text edition               | "Make it look like a printed newspaper"                                                                                           | taste, typography                 |
+
+The summary reads each tag separately, so a vague request's noise doesn't hide a theme's gain. Reddit and Stack Overflow block headless browsers, and some news sites cover the page with a consent dialog, so check a new site loads before adding it.
 
 ### What it has caught
 
@@ -239,4 +258,4 @@ Pick a subset by tag or name. Reddit and Stack Overflow block headless browsers,
 | `--record`            | off              | record the pages again                           |
 | `--fresh`             | off              | ignore cached results                            |
 
-While iterating, run a subset once with `--judge sonnet` against the previous commit. Before merging a change to the prompt, the outline or the page context, run every case with `--runs 3` against `v4`, and put the overall row and the side-by-side tally in the PR.
+While iterating, run `--tags core` (or the tags a change targets) once with `--judge sonnet` against the previous commit. Before merging a change to the prompt, the outline or the page context, run every case with `--runs 3` against `v4`, and put the overall row and the side-by-side tally in the PR.
