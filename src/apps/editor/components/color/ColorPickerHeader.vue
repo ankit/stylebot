@@ -17,6 +17,17 @@
         @blur="onBlur"
         @keydown.enter="$event.target.blur()"
       />
+
+      <button
+        v-if="value"
+        type="button"
+        class="clear"
+        :title="t('color_picker_clear')"
+        :aria-label="t('color_picker_clear')"
+        @click.prevent="$emit('clear')"
+      >
+        <x-icon :size="12" />
+      </button>
     </label>
 
     <button
@@ -28,17 +39,6 @@
       @click="pick"
     >
       <eyedropper-icon :size="14" />
-    </button>
-
-    <button
-      v-if="value"
-      type="button"
-      class="header-action clear"
-      :title="t('color_picker_clear')"
-      :aria-label="t('color_picker_clear')"
-      @click="$emit('clear')"
-    >
-      <x-icon :size="14" />
     </button>
   </div>
 </template>
@@ -151,7 +151,7 @@ export default Vue.extend({
   align-items: center;
   gap: 8px;
   height: 30px;
-  padding: 0 0 0 10px;
+  padding: 0 4px 0 10px;
   cursor: text;
 
   &:hover {
@@ -201,6 +201,25 @@ export default Vue.extend({
   }
 }
 
+.clear {
+  @include button-reset;
+
+  flex: none;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  color: var(--text-muted);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--text-primary);
+  }
+
+  @include focus-ring;
+}
+
 .header-action {
   @include button-reset;
 
@@ -210,11 +229,8 @@ export default Vue.extend({
   justify-content: center;
   width: 30px;
   height: 30px;
+  margin-left: 2px;
   border-radius: 7px;
-
-  &:first-of-type {
-    margin-left: 2px;
-  }
   color: var(--icon-color);
   cursor: pointer;
 
