@@ -11,6 +11,7 @@ export default tseslint.config(
     ignores: [
       'dist',
       'firefox-dist',
+      'safari-dist',
       'preview-dist',
       'coverage',
       'test-results',
@@ -25,6 +26,10 @@ export default tseslint.config(
 
       // Separate Gatsby project with its own toolchain.
       'site',
+
+      // Xcode project; its JS is Apple's generated wrapper-app boilerplate,
+      // not part of the extension's own source.
+      'safari',
     ],
   },
 

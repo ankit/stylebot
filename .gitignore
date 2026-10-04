@@ -5,6 +5,7 @@
 .Trashes
 dist
 firefox-dist
+safari-dist
 preview-dist
 node_modules
 .chrome-dev-profile*
