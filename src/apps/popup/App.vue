@@ -362,11 +362,6 @@ body {
   color: var(--text-muted);
 }
 
-.popup-caption {
-  font-size: 11.5px;
-  color: var(--text-muted);
-}
-
 .popup-restricted-message {
   padding: 16px;
 }

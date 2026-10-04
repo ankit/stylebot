@@ -2,7 +2,7 @@
   <div class="site-profiles">
     <div class="popup-header site-header">
       <s-heading as="h1" size="sm" class="site-domain">{{ url }}</s-heading>
-      <s-text size="caption" variant="muted">{{ summary }}</s-text>
+      <s-text variant="muted">{{ summary }}</s-text>
     </div>
 
     <div class="popup-divider" />

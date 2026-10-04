@@ -7,9 +7,9 @@
     >
       {{ t('readability') }}
       <template v-if="disabled" #trailing>
-        <span class="popup-caption articles-only-label">
+        <s-text as="span" variant="muted" class="articles-only-label">
           {{ t('articles_only') }}
-        </span>
+        </s-text>
       </template>
       <template v-else-if="shortcut" #trailing>
         <s-shortcut-chip muted :value="shortcut" />
@@ -22,7 +22,7 @@
 import Vue from 'vue';
 import type { ToggleReadabilityForTab } from '@stylebot/types';
 import PopupRow from './PopupRow.vue';
-import { SShortcutChip, SToggleSwitch } from '@stylebot/components';
+import { SShortcutChip, SText, SToggleSwitch } from '@stylebot/components';
 
 export default Vue.extend({
   name: 'Readability',
@@ -31,6 +31,7 @@ export default Vue.extend({
     PopupRow,
     SToggleSwitch,
     SShortcutChip,
+    SText,
   },
 
   props: {

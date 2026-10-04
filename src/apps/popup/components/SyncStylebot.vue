@@ -5,21 +5,28 @@
     class="sync-strip sync-strip--sign-in"
     @click="openSyncOptions"
   >
-    <span class="sync-status">{{ t('sync_needs_sign_in') }}</span>
+    <s-text as="span" class="sync-status">
+      {{ t('sync_needs_sign_in') }}
+    </s-text>
     <chevron-right-icon :size="14" />
   </button>
 
   <div v-else class="sync-strip" :class="{ 'sync-strip--error': errorKey }">
-    <span v-if="errorKey" class="sync-status">
+    <s-text v-if="errorKey" as="span" class="sync-status">
       {{ t(errorKey, [errorDetail]) }}
-    </span>
-    <span v-else-if="syncTime" class="sync-status">
+    </s-text>
+    <s-text v-else-if="syncTime" as="span" variant="muted" class="sync-status">
       <span class="dot" />
       {{ t('synced_at_time', [syncTime]) }}
-    </span>
-    <span v-else-if="syncInProgress" class="sync-status">
+    </s-text>
+    <s-text
+      v-else-if="syncInProgress"
+      as="span"
+      variant="muted"
+      class="sync-status"
+    >
       {{ t('sync_in_progress') }}
-    </span>
+    </s-text>
 
     <button
       type="button"
@@ -28,7 +35,13 @@
       @click="sync"
     >
       <arrow-repeat-icon :size="13" :spinning="syncInProgress" />
-      {{ t('sync_now') }}
+      <s-text
+        as="span"
+        size="label"
+        :variant="syncInProgress ? 'muted' : 'default'"
+      >
+        {{ t('sync_now') }}
+      </s-text>
     </button>
   </div>
 </template>
@@ -36,6 +49,7 @@
 <script lang="ts">
 import Vue from 'vue';
 
+import { SText } from '@stylebot/components';
 import { ArrowRepeatIcon, ChevronRightIcon } from '@stylebot/icons';
 import {
   formatSyncTime,
@@ -54,6 +68,7 @@ export default Vue.extend({
   name: 'SyncStylebot',
 
   components: {
+    SText,
     ArrowRepeatIcon,
     ChevronRightIcon,
   },
@@ -164,9 +179,6 @@ export default Vue.extend({
   gap: 10px;
   flex: 1;
   min-width: 0;
-  font-size: 12.5px;
-  line-height: 1.35;
-  color: var(--text-muted);
 }
 
 .sync-strip--sign-in .sync-status,
@@ -192,9 +204,6 @@ export default Vue.extend({
   margin-left: auto;
   padding: 6px 10px;
   border-radius: 7px;
-  font-size: 12.5px;
-  font-weight: 500;
-  line-height: 1;
   color: var(--text-primary);
   cursor: pointer;
 
