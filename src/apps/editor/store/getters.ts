@@ -17,7 +17,11 @@ import {
 // A rule for every element can't be judged by the one that was picked.
 const PAGE_WIDE_SELECTOR = /^\s*(\*|html|body|:root)\s*$/i;
 
-export type OtherSelectorValue = { selector: string; value: string };
+export type OtherSelectorValue = {
+  selector: string;
+  value: string;
+  everywhere: boolean;
+};
 
 export default {
   /**
@@ -60,19 +64,25 @@ export default {
     }
 
     const bySelector = new Map<string, Array<CssDeclaration>>();
+    const everywhere = new Map<string, boolean>();
 
     state.appliedDeclarations
       .filter(({ selector }) => selector !== inspectedSelector)
-      .forEach(({ selector, property, value }) => {
+      .forEach(({ selector, property, value, everywhere: reaches }) => {
         bySelector.set(selector, [
           ...(bySelector.get(selector) ?? []),
           { property, value },
         ]);
+        everywhere.set(selector, reaches);
       });
 
     for (const [selector, declarations] of bySelector) {
       for (const { property, value } of mergeShorthands(declarations)) {
-        winners[property] ??= { selector, value: toHexColors(value) };
+        winners[property] ??= {
+          selector,
+          value: toHexColors(value),
+          everywhere: everywhere.get(selector) ?? false,
+        };
       }
     }
 

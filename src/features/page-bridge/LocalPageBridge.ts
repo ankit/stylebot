@@ -261,7 +261,15 @@ export class LocalPageBridge extends PageBridgeEmitter implements PageBridge {
   getAppliedDeclarations(selector: string): Promise<Array<AppliedDeclaration>> {
     const el = this.elementFor(selector);
 
-    return Promise.resolve(el ? getAppliedDeclarations(el) : []);
+    return Promise.resolve(
+      el
+        ? getAppliedDeclarations(
+            el,
+            this.getStylebotCss(),
+            Array.from(document.querySelectorAll(selector))
+          )
+        : []
+    );
   }
 
   getPageDeclarations(selector: string): Promise<Array<CssDeclaration>> {

@@ -9,6 +9,7 @@
         <other-rule-hint
           v-else-if="overridingRule"
           :selector="overridingRule.selector"
+          :everywhere="overridingRule.everywhere"
           overrides
         />
       </div>
@@ -21,6 +22,7 @@
 import Vue from 'vue';
 import { SText } from '@stylebot/components';
 
+import type { OtherSelectorValue } from '../../store/getters';
 import OtherRuleHint from './OtherRuleHint.vue';
 
 export default Vue.extend({
@@ -45,13 +47,13 @@ export default Vue.extend({
   },
 
   computed: {
-    overridingRule(): { selector: string; value: string } | null {
+    overridingRule(): OtherSelectorValue | null {
       return (
         this.$store.getters.overriddenByOtherSelector[this.property] ?? null
       );
     },
 
-    otherRule(): { selector: string; value: string } | null {
+    otherRule(): OtherSelectorValue | null {
       return this.$store.getters.setByOtherSelector[this.property] ?? null;
     },
   },

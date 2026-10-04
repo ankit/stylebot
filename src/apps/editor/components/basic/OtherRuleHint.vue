@@ -33,7 +33,8 @@ import { AlertTriangleIcon, ArrowUpRightIcon } from '@stylebot/icons';
 /**
  * Sits beside the label of a control whose value comes from another of the user's
  * selectors, naming it and switching the editor to it. With `overrides`,
- * that selector wins over a value the active rule sets too.
+ * that selector wins over a value the active rule sets too: on every element
+ * the active rule reaches, or only the inspected one without `everywhere`.
  */
 export default Vue.extend({
   name: 'OtherRuleHint',
@@ -54,12 +55,24 @@ export default Vue.extend({
       type: Boolean,
       default: false,
     },
+
+    // Whether the selector overrides on every element the active one matches.
+    everywhere: {
+      type: Boolean,
+      default: true,
+    },
   },
 
   computed: {
     tooltip(): string {
+      if (!this.overrides) {
+        return this.t('styled_by_selector', [this.selector]);
+      }
+
       return this.t(
-        this.overrides ? 'overridden_by_selector' : 'styled_by_selector',
+        this.everywhere
+          ? 'overridden_by_selector'
+          : 'overridden_by_selector_on_this_element',
         [this.selector]
       );
     },
