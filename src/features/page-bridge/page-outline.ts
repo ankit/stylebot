@@ -2,7 +2,8 @@ const MAX_LINES = 400;
 const MAX_CHARS = 16000;
 const MAX_TEXT = 40;
 const MAX_CLASSES = 4;
-// Siblings with the same tag and classes past this many are summarised.
+// Siblings of the same kind past this many are summarised, alternating
+// ones too (a story's title row, subtext row, spacer).
 const MAX_REPEATS = 2;
 
 const SKIPPED_TAGS = new Set([
@@ -35,12 +36,20 @@ const classesOf = (element: Element): Array<string> =>
 
 // A named id makes an element unique, so it's never folded into a run;
 // numbered ones (a post's id) mark items of a list, which still fold.
-const signatureOf = (element: Element): string =>
+const ownSignature = (element: Element): string =>
   [
     element.tagName,
     /\d/.test(element.id) ? '' : element.id,
     ...classesOf(element),
   ].join('.');
+
+// Its first few children tell apart plain siblings that hold different
+// things, like a list's rows and the "More" row after them.
+const signatureOf = (element: Element): string =>
+  [
+    ownSignature(element),
+    ...Array.from(element.children).slice(0, 3).map(ownSignature),
+  ].join('>');
 
 const ownText = (element: Element): string => {
   const text = Array.from(element.childNodes)
@@ -119,6 +128,13 @@ const styleHints = (element: Element): Array<string> => {
   return hints;
 };
 
+// Old-style pages color elements with this attribute, often their only
+// selectable trait (a table cell with no class).
+const bgcolorOf = (element: Element): string => {
+  const value = element.getAttribute('bgcolor');
+  return value ? `[bgcolor="${value.replace(/"/g, '')}"]` : '';
+};
+
 const describe = (element: Element): string => {
   const tag = element.tagName.toLowerCase();
   const id = element.id ? `#${element.id}` : '';
@@ -128,9 +144,9 @@ const describe = (element: Element): string => {
   const text = ownText(element);
   const hints = styleHints(element);
 
-  return `${tag}${id}${classes}${text ? ` "${text}"` : ''}${
-    hints.length ? ` [${hints.join(', ')}]` : ''
-  }`;
+  return `${tag}${id}${classes}${bgcolorOf(element)}${
+    text ? ` "${text}"` : ''
+  }${hints.length ? ` [${hints.join(', ')}]` : ''}`;
 };
 
 /**
@@ -186,13 +202,14 @@ export const getPageOutline = (): string => {
   };
 
   const walk = (parent: Element, depth: number): boolean => {
-    let previous = '';
-    let repeats = 0;
+    const seen = new Map<string, number>();
+    let skipped = 0;
 
-    const flushRepeats = (): boolean =>
-      repeats > MAX_REPEATS
-        ? push(`${'  '.repeat(depth)}… ×${repeats - MAX_REPEATS} more`)
-        : true;
+    const flushSkipped = (): boolean => {
+      const count = skipped;
+      skipped = 0;
+      return count ? push(`${'  '.repeat(depth)}… ×${count} more`) : true;
+    };
 
     for (const child of Array.from(parent.children)) {
       if (
@@ -211,21 +228,15 @@ export const getPageOutline = (): string => {
       }
 
       const signature = signatureOf(child);
+      const count = (seen.get(signature) ?? 0) + 1;
+      seen.set(signature, count);
 
-      if (signature === previous) {
-        repeats++;
-        if (repeats > MAX_REPEATS) {
-          continue;
-        }
-      } else {
-        if (!flushRepeats()) {
-          return false;
-        }
-        previous = signature;
-        repeats = 1;
+      if (count > MAX_REPEATS) {
+        skipped++;
+        continue;
       }
 
-      if (!push(`${'  '.repeat(depth)}${describe(child)}`)) {
+      if (!flushSkipped() || !push(`${'  '.repeat(depth)}${describe(child)}`)) {
         return false;
       }
 
@@ -234,7 +245,7 @@ export const getPageOutline = (): string => {
       }
     }
 
-    return flushRepeats();
+    return flushSkipped();
   };
 
   if (!walk(document.body, 0)) {

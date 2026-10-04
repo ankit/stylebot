@@ -28,6 +28,34 @@ describe('getPageOutline', () => {
     );
   });
 
+  it('summarises alternating runs, keeping a different row after them', () => {
+    const story =
+      '<tr class="athing"><td class="title">t</td></tr><tr><td></td><td class="subtext">s</td></tr><tr class="spacer"></tr>';
+    document.body.innerHTML = `<table><tbody>${story.repeat(
+      4
+    )}<tr><td></td><td class="title"><a class="morelink">More</a></td></tr></tbody></table>`;
+
+    expect(getPageOutline()).toBe(
+      [
+        'table',
+        '  tbody',
+        ...[1, 2].flatMap(() => [
+          '    tr.athing',
+          '      td.title "t"',
+          '    tr',
+          '      td',
+          '      td.subtext "s"',
+          '    tr.spacer',
+        ]),
+        '    … ×6 more',
+        '    tr',
+        '      td',
+        '      td.title',
+        '        a.morelink "More"',
+      ].join('\n')
+    );
+  });
+
   it('notes backgrounds, and colors and sizes that differ from the parent', () => {
     document.body.innerHTML = `
       <div class="card" style="background-color: rgb(255, 255, 255); color: rgb(17, 17, 17)">
@@ -64,6 +92,12 @@ describe('getPageOutline', () => {
         '… ×2 more',
       ].join('\n')
     );
+  });
+
+  it('names a bgcolor attribute, the only trait some cells have', () => {
+    document.body.innerHTML = `<table><tbody><tr><td bgcolor="#ff6600">x</td></tr></tbody></table>`;
+
+    expect(getPageOutline()).toContain('td[bgcolor="#ff6600"] "x"');
   });
 
   it('cuts long text', () => {

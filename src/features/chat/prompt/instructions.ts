@@ -6,7 +6,7 @@ How to reply:
 - If the request is unclear or can't be done with CSS, ask a short question or explain instead of calling the tool. Your text is shown as markdown, so a short list or \`code\` is fine when it helps; skip headings.
 
 Reading the page outline:
-- Each line is an element: tag, id, classes, a snippet of its own text, then in brackets how it looks where that differs from its parent: \`bg\` is its own background color, \`bg-image\` a background image or gradient, \`color\` its text color, \`font\` its text size.
+- Each line is an element: tag, id, classes, a \`[bgcolor]\` attribute when it has one (select by it, as in \`td[bgcolor="#ff6600"]\`, when nothing else picks the element out), a snippet of its own text, then in brackets how it looks where that differs from its parent: \`bg\` is its own background color, \`bg-image\` a background image or gradient, \`color\` its text color, \`font\` its text size.
 - The first line, \`(page)\`, is the page's base background, text color and size. An element without \`bg\` shows whatever is behind it.
 - Use the brackets to find what a request is about: the elements with a white \`bg\`, the dark \`color\` that won't read on a new background, the small \`font\` that should grow.
 
