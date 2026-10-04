@@ -26,7 +26,7 @@ describe('getAppliedDeclarations', () => {
       .spyOn(window, 'getComputedStyle')
       .mockReturnValue(computed as unknown as CSSStyleDeclaration);
 
-    expect(getAppliedDeclarations(el)).toEqual([
+    expect(getAppliedDeclarations(el, 'p { color: var(--ink); }')).toEqual([
       { property: 'color', value: 'rgb(1, 2, 3)', selector: 'p' },
     ]);
 
@@ -39,7 +39,9 @@ describe('getAppliedDeclarations', () => {
     const el = document.getElementById('a') as HTMLElement;
     jest.spyOn(el, 'matches').mockReturnValue(true);
 
-    expect(getAppliedDeclarations(el)).toEqual([]);
+    expect(
+      getAppliedDeclarations(el, 'a:hover, a:focus { color: red; }')
+    ).toEqual([]);
   });
 
   it('keeps Stylebot declarations that win over the page', () => {
@@ -47,17 +49,41 @@ describe('getAppliedDeclarations', () => {
     addStyle(
       'p.note { color: red; } p { font-size: 10pt; } #p { line-height: 2; }'
     );
-    addStyle(
-      'div, p { color: blue; font-weight: bold; font-size: 12px; line-height: 1; }',
-      'stylebot-css-example'
-    );
+    const css =
+      'div, p { color: blue; font-weight: bold; font-size: 12px; line-height: 1; }';
+    addStyle(css, 'stylebot-css-example');
     addStyle('p { color: green; }', 'stylebot-editor-css');
 
     expect(
-      getAppliedDeclarations(document.getElementById('p') as HTMLElement)
+      getAppliedDeclarations(document.getElementById('p') as HTMLElement, css)
     ).toEqual([
       { property: 'font-size', value: '12px', selector: 'p' },
       { property: 'font-weight', value: 'bold', selector: 'p' },
     ]);
+  });
+
+  it('names the selector as the user wrote it, not as the browser serialized it', () => {
+    document.body.innerHTML = '<div><p id="p">hi</p></div>';
+    // jsdom keeps selectors as written; browsers add spaces around combinators.
+    addStyle('div > p { color: red; }', 'stylebot-css-example');
+    const insertRule = CSSStyleSheet.prototype.insertRule;
+    const spy = jest
+      .spyOn(CSSStyleSheet.prototype, 'insertRule')
+      .mockImplementation(function (
+        this: CSSStyleSheet,
+        rule: string,
+        index?: number
+      ) {
+        return insertRule.call(this, rule.replace('>', ' > '), index);
+      });
+
+    expect(
+      getAppliedDeclarations(
+        document.getElementById('p') as HTMLElement,
+        'div>p { color: red; }'
+      )
+    ).toEqual([{ property: 'color', value: 'red', selector: 'div>p' }]);
+
+    spy.mockRestore();
   });
 });

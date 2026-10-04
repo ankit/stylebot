@@ -26,7 +26,7 @@ export const getSelectorAlternatives = (
   const matching = getMatchingSelectors(el, css);
   // A page-wide rule (* or body) matches everything, so it's worth offering
   // only when it actually sets something on this element; it goes last.
-  const winning = new Set(getAppliedDeclarations(el).map(d => d.selector));
+  const winning = new Set(getAppliedDeclarations(el, css).map(d => d.selector));
   const existing = [
     ...matching.filter(s => !PAGE_WIDE_SELECTOR.test(s)),
     ...matching.filter(s => PAGE_WIDE_SELECTOR.test(s) && winning.has(s)),
