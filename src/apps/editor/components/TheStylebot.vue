@@ -128,6 +128,8 @@ export default Vue.extend({
 
 .stylebot-body {
   flex: 1;
+  display: flex;
+  flex-direction: column;
   min-height: 0;
   overflow: auto;
 

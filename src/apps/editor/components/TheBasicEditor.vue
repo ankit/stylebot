@@ -225,7 +225,7 @@ export default Vue.extend({
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  min-height: 100%;
+  flex: 1 0 auto;
   gap: 8px;
   padding: 12px calc(var(--panel-gutter) - 4px);
   background: var(--tab-surface);
