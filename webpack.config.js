@@ -318,6 +318,19 @@ const config = {
             return JSON.stringify(jsonContent, null, 2);
           },
         },
+        // The Safari Xcode project reads its app and extension version from here.
+        ...(process.env.BROWSER === 'safari'
+          ? [
+              {
+                from: 'assets/manifest/manifest.json',
+                to: 'Version.xcconfig',
+                transform: content => {
+                  const { version } = JSON.parse(content);
+                  return `MARKETING_VERSION = ${version}\nCURRENT_PROJECT_VERSION = ${version}\n`;
+                },
+              },
+            ]
+          : []),
       ],
     }),
   ],
