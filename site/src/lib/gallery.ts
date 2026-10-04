@@ -9,8 +9,7 @@ export type GalleryItem = {
   name: string;
   site: string;
   image: ImageMetadata;
-  css: string;
-};
+} & ({ css: string; note?: never } | { note: string; css?: never });
 
 export const GALLERY: GalleryItem[] = [
   {
@@ -18,18 +17,7 @@ export const GALLERY: GalleryItem[] = [
     name: 'Readability',
     site: 'wikipedia.org',
     image: wikipedia,
-    css: `/* Wikipedia: Readability */
-body { background: #f9f8f5; }
-.mw-body, #content {
-  max-width: 42em;
-  margin: 0 auto;
-  font-family: "Source Serif 4", Georgia, serif;
-  font-size: 20px;
-  line-height: 1.7;
-  color: #222;
-}
-.vector-header-container, #mw-panel, .mw-editsection, #footer { display: none; }
-a { color: #0b63ce; }`,
+    note: 'Readability turned on in Stylebot',
   },
   {
     id: 'github',
