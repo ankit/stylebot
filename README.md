@@ -9,7 +9,7 @@
 
 Change the appearance of any website. Available for [Chrome](https://chrome.google.com/webstore/detail/stylebot/oiaejidbmkiecgbjeifoejpgmdaleoha), [Firefox](https://addons.mozilla.org/firefox/addon/stylebot-web/) and [Edge](https://microsoftedge.microsoft.com/addons/detail/stylebot/mjolbpfednnbebfapicajpifliopnnai).
 
-![Stylebot's visual editor open on GitHub in dark mode](docs/images/editor-basic-mode.webp)
+![Stylebot's editor in the side panel, picking an element on Hacker News styled with Dracula](docs/images/editor.webp)
 
 - **Visual editor**: Pick any element and restyle it, no CSS needed. Dock it beside the page or pop it out.
 - **Code editor**: Write your own CSS with autocomplete and color swatches.
