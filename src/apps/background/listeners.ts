@@ -52,11 +52,15 @@ import {
 } from './messages';
 import { initChatPort } from './chat';
 
-import { refreshBadgeForTab } from './styles';
+import { refreshAllBadges, refreshBadgeForTab } from './styles';
 import * as styleStorage from './styles';
 import { get as getOption, pruneRetired } from './options';
 import { isSyncAlarm, updatePeriodicSync } from './sync-scheduler';
-import { runGoogleDriveSync, getGoogleDriveSyncEnabled } from '@stylebot/sync';
+import {
+  runGoogleDriveSync,
+  getGoogleDriveSyncEnabled,
+  SYNC_ISSUE_KEYS,
+} from '@stylebot/sync';
 
 import type {
   TabUpdated,
@@ -99,11 +103,20 @@ export const initListeners = (): void => {
     }
   });
 
-  // The enabled flag is flipped from the options page; the alarms that follow
-  // it are owned here so they stay in step no matter which page changed it.
+  // The enabled flag is flipped from the options page; the alarms and the
+  // badge that follow it are owned here so they stay in step no matter which
+  // page changed it.
   chrome.storage.onChanged.addListener((changes, area) => {
-    if (area === 'local' && changes['google-drive-sync-enabled']) {
+    if (area !== 'local') {
+      return;
+    }
+
+    if (changes['google-drive-sync-enabled']) {
       updatePeriodicSync();
+    }
+
+    if (SYNC_ISSUE_KEYS.some(key => changes[key])) {
+      refreshAllBadges();
     }
   });
 

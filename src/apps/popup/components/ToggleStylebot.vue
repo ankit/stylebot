@@ -2,7 +2,7 @@
   <s-pill-button @click="toggle">
     {{ label }}
     <template v-if="shortcut" #trailing>
-      <s-shortcut-chip muted :value="shortcut" />
+      <s-shortcut-chip muted :value="shortcut" class="shortcut-hint" />
     </template>
   </s-pill-button>
 </template>
@@ -28,12 +28,13 @@ export default Vue.extend({
 
     isOpen: Boolean,
     sidePanel: Boolean,
-    // Set when the site has several profiles, so the button says which one
-    // the editor opens on.
+    // Set when the profile the editor opens on has a name, so the button
+    // says which one.
     profileName: {
       type: String,
       default: '',
     },
+    hasStyle: Boolean,
     shortcut: {
       type: String,
       default: '',
@@ -46,9 +47,11 @@ export default Vue.extend({
         return this.t('close_stylebot');
       }
 
-      return this.profileName
-        ? this.t('edit_name', [this.profileName])
-        : this.t('style_this_page');
+      if (this.profileName) {
+        return this.t('edit_name', [this.profileName]);
+      }
+
+      return this.hasStyle ? this.t('edit_style') : this.t('style_this_page');
     },
   },
 
@@ -63,3 +66,15 @@ export default Vue.extend({
   },
 });
 </script>
+
+<style lang="scss" scoped>
+.shortcut-hint {
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+
+.pill-btn:hover .shortcut-hint,
+.pill-btn:focus-within .shortcut-hint {
+  opacity: 1;
+}
+</style>

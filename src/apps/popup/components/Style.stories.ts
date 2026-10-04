@@ -40,3 +40,28 @@ export const WithProfiles = popup({
   styles: [profiledStyle('example.com'), profiledStyle('*.example.com')],
   defaultStyle: profiledStyle('example.com'),
 });
+
+export const WithProfilesAndSync = popup({
+  styles: [profiledStyle('example.com')],
+  defaultStyle: profiledStyle('example.com'),
+  pageReaderable: false,
+  storage: {
+    'google-drive-sync-enabled': true,
+    'google-drive-sync-state': {
+      lastSyncedAt: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
+    },
+  },
+});
+
+export const WithStyleAndSync = popup({
+  styles: [style('example.com')],
+  defaultStyle: style('example.com'),
+  pageReaderable: false,
+  commands: { style: 'alt+shift+s' },
+  storage: {
+    'google-drive-sync-enabled': true,
+    'google-drive-sync-state': {
+      lastSyncedAt: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
+    },
+  },
+});

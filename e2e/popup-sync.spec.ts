@@ -61,7 +61,33 @@ test.describe('popup sync strip', () => {
     expect(await popup.locator('.sync-strip').isVisible()).toBe(false);
   });
 
-  test('is absent while sync is healthy', async ({
+  test('reports the last sync and offers Sync now when on', async ({
+    context,
+    extension,
+    openPopup,
+  }) => {
+    await seedAndFocusPage(context, extension, {
+      'google-drive-sync-enabled': true,
+      'google-drive-sync-state': syncState(
+        new Date(Date.now() - 6 * 60 * 1000).toISOString()
+      ),
+    });
+
+    const popup = await openPopup();
+
+    await expect
+      .poll(() =>
+        popup
+          .locator('.sync-strip', { hasText: /Synced 6 minutes ago/ })
+          .isVisible()
+      )
+      .toBe(true);
+    expect(
+      await popup.locator('.sync-button', { hasText: 'Sync now' }).isVisible()
+    ).toBe(true);
+  });
+
+  test('Sync now runs without an auth window, then asks for a sign-in when there is no token', async ({
     context,
     extension,
     openPopup,
@@ -72,11 +98,27 @@ test.describe('popup sync strip', () => {
     });
 
     const popup = await openPopup();
+    await popup.locator('.sync-button').click();
 
+    // Only a non-interactive run leaves this flag; an interactive one would
+    // have opened a sign-in tab instead.
     await expect
-      .poll(() => popup.locator('.popup-footer').isVisible())
+      .poll(() =>
+        popup
+          .locator('.sync-strip', {
+            hasText: 'Sign in to keep syncing',
+          })
+          .isVisible()
+      )
       .toBe(true);
-    expect(await popup.locator('.sync-strip').isVisible()).toBe(false);
+    expect(
+      await extension.evaluate(
+        async () =>
+          (
+            await chrome.storage.local.get('google-drive-sync-needs-auth')
+          )['google-drive-sync-needs-auth']
+      )
+    ).toBe(true);
   });
 
   test('asks for a sign-in when a scheduled sync could not get a token, and opens the Sync tab', async ({
@@ -96,14 +138,14 @@ test.describe('popup sync strip', () => {
       .poll(() =>
         popup
           .locator('.sync-strip', {
-            hasText: 'Sign in to Google Drive to resume syncing.',
+            hasText: 'Sign in to keep syncing',
           })
           .isVisible()
       )
       .toBe(true);
 
     const opened = context.waitForEvent('page');
-    await popup.locator('.sync-strip').click();
+    await popup.locator('.sync-button', { hasText: 'Sign in' }).click();
     const options = await opened;
 
     await expect.poll(() => options.url()).toMatch(/options\.html#\/sync$/);

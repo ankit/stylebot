@@ -157,6 +157,7 @@ export const isSupportedUrl = (url: string): boolean => {
 
   const urlBlacklist = [
     'https://chrome.google.com/webstore',
+    'https://chromewebstore.google.com',
     'chrome-extension://',
   ];
 

@@ -1,69 +1,64 @@
 <template>
   <s-theme-provider class="popup" :mode="appearance">
     <div v-if="restricted">
-      <div class="popup-header">
-        <s-heading
-          as="h1"
-          size="md"
-          class="popup-header-domain popup-header-domain--muted"
-        >
-          {{ tab.url }}
-        </s-heading>
-      </div>
+      <unsupported-page :url="tab.url" />
 
-      <div class="popup-divider" />
-
-      <s-text variant="muted" class="popup-restricted-message">
-        {{ t('restricted_page_description') }}
-      </s-text>
-
-      <div class="popup-divider" />
-
-      <div class="popup-footer">
-        <manage-all-styles />
-      </div>
+      <template v-if="syncEnabled">
+        <div class="popup-divider" />
+        <sync-stylebot standalone />
+      </template>
     </div>
 
     <div v-else-if="tab && tab.id">
       <site-profiles
-        v-if="siteProfiles.length > 1"
+        v-if="hasProfiles"
         :url="styles[0].url"
         :profiles="siteProfiles"
         :active-profile="siteActiveProfile"
         :enabled="siteEnabled"
         :disable-off="isOpen"
+        :joined="hasToggleRows"
         @pick="pickSiteProfile"
       />
-      <style-component
-        v-else-if="styles.length"
-        header
-        :url="styles[0].url"
-        :disable-toggle="isOpen || (pageReaderable && readability)"
-        :initial-enabled="styles[0].enabled"
-        :shortcut="styleShortcut"
-      />
-      <div v-else class="popup-header">
-        <s-heading as="h1" size="md" class="popup-header-domain">
-          {{ domain }}
-        </s-heading>
-        <s-text variant="muted">
-          {{ t('no_style_saved_for_site') }}
-        </s-text>
-      </div>
+      <template v-else>
+        <div class="popup-header">
+          <div class="popup-header-title">
+            <s-heading as="h1" size="md" class="popup-header-domain">
+              {{ styles.length ? styles[0].url : domain }}
+            </s-heading>
+            <options-button />
+          </div>
+        </div>
 
-      <div class="popup-divider" />
+        <div v-if="hasToggleRows" class="popup-divider" />
+      </template>
 
-      <div class="popup-menu">
+      <div
+        v-if="hasToggleRows"
+        class="popup-menu"
+        :class="{ 'popup-menu--after-profiles': hasProfiles }"
+      >
+        <style-component
+          v-if="showSiteStyle"
+          site
+          :url="styles[0].url"
+          :name="siteProfiles[0].name"
+          :shortcut="styleShortcut"
+          :disable-toggle="isOpen || (pageReaderable && readability)"
+          :initial-enabled="styles[0].enabled"
+        />
+
         <readability
+          v-if="showReadability"
           :tab="tab"
           :initial-readability="readability"
-          :disabled="!pageReaderable && !readability"
           :shortcut="readabilityShortcut"
+          :indent="hasProfiles"
           @change="readability = $event"
         />
 
         <style-component
-          v-for="style in styles.slice(1)"
+          v-for="style in otherStyles"
           :key="style.url"
           :url="style.url"
           :disable-toggle="isOpen || (pageReaderable && readability)"
@@ -74,21 +69,21 @@
 
       <div class="popup-divider" />
 
-      <template v-if="syncNeedsSignIn">
-        <sync-stylebot />
-        <div class="popup-divider" />
-      </template>
-
-      <div class="popup-footer">
+      <div
+        class="popup-footer"
+        :class="{ 'popup-footer--above-sync': syncEnabled }"
+      >
         <toggle-stylebot
           :is-open="isOpen"
           :tab="tab"
           :shortcut="stylebotShortcut"
           :side-panel="dockLocation === 'sidepanel'"
           :profile-name="editProfileName"
+          :has-style="styles.length > 0"
         />
-        <settings-button />
       </div>
+
+      <sync-stylebot v-if="syncEnabled" @synced="loadStyles" />
 
       <release-notification />
     </div>
@@ -97,15 +92,15 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { SHeading, SText, SThemeProvider } from '@stylebot/components';
+import { SHeading, SThemeProvider } from '@stylebot/components';
 
 import StyleComponent from './components/Style.vue';
 import SiteProfiles from './components/SiteProfiles.vue';
-import SettingsButton from './components/SettingsButton.vue';
+import OptionsButton from './components/OptionsButton.vue';
 import Readability from './components/Readability.vue';
 import SyncStylebot from './components/SyncStylebot.vue';
 import ToggleStylebot from './components/ToggleStylebot.vue';
-import ManageAllStyles from './components/ManageAllStyles.vue';
+import UnsupportedPage from './components/UnsupportedPage.vue';
 import ReleaseNotification from './components/notifications/ReleaseNotification.vue';
 
 import {
@@ -113,6 +108,7 @@ import {
   getCommands,
   getOption,
   getCurrentTab,
+  getFileAccessAllowed,
   getIsStylebotOpen,
   getIsPageReaderable,
   enableStyle,
@@ -120,7 +116,7 @@ import {
   setActiveProfile,
 } from './utils';
 
-import { getGoogleDriveSyncEnabled, getSyncNeedsAuth } from '@stylebot/sync';
+import { getGoogleDriveSyncEnabled } from '@stylebot/sync';
 import {
   expandProfiles,
   hasAnyCss,
@@ -141,15 +137,14 @@ export default Vue.extend({
 
   components: {
     SHeading,
-    SText,
     SThemeProvider,
-    SettingsButton,
+    OptionsButton,
     StyleComponent,
     SiteProfiles,
     ToggleStylebot,
     Readability,
     SyncStylebot,
-    ManageAllStyles,
+    UnsupportedPage,
     ReleaseNotification,
   },
 
@@ -162,7 +157,8 @@ export default Vue.extend({
     // The site's own style, as picked here since the popup opened.
     siteActiveProfile: string;
     siteEnabled: boolean;
-    syncNeedsSignIn: boolean;
+    syncEnabled: boolean;
+    fileAccessAllowed: boolean;
     commands?: GetCommandsResponse;
     appearance: StylebotAppearance;
     dockLocation: StylebotDockLocation | '';
@@ -174,8 +170,9 @@ export default Vue.extend({
       isOpen: false,
       tab: undefined,
       readability: false,
-      pageReaderable: true,
-      syncNeedsSignIn: false,
+      pageReaderable: false,
+      syncEnabled: false,
+      fileAccessAllowed: true,
       commands: undefined,
       appearance: 'system',
       dockLocation: '',
@@ -192,26 +189,66 @@ export default Vue.extend({
     },
 
     // Pages the content script can't run on (chrome://, Web Store, PDFs) —
-    // same check the background page uses to decide whether it can inject.
+    // same check the background page uses to decide whether it can inject —
+    // and local files while the browser keeps extensions out of them.
     restricted(): boolean {
-      return !!this.tab?.url && !isSupportedUrl(this.tab.url);
+      const url = this.tab?.url;
+
+      if (!url) {
+        return false;
+      }
+
+      return (
+        !isSupportedUrl(url) ||
+        (url.startsWith('file://') && !this.fileAccessAllowed)
+      );
     },
 
     siteProfiles(): Array<ProfileSummary> {
       return this.styles.length ? listProfiles(this.styles[0]) : [];
     },
 
-    // Names the profile the editor would open on, once there's a choice.
-    editProfileName(): string {
-      if (this.siteProfiles.length < 2) {
-        return '';
-      }
+    hasProfiles(): boolean {
+      return this.siteProfiles.length > 1;
+    },
 
+    // Offered only where it applies, or to turn it back off.
+    showReadability(): boolean {
+      return this.pageReaderable || this.readability;
+    },
+
+    // The site's one style, as an on/off row rather than a profile list.
+    showSiteStyle(): boolean {
+      return this.styles.length > 0 && !this.hasProfiles;
+    },
+
+    // Styles of broader patterns that also match the page, e.g. *.example.com.
+    otherStyles(): Array<Style> {
+      return this.styles.slice(1);
+    },
+
+    hasToggleRows(): boolean {
+      return (
+        this.showSiteStyle ||
+        this.showReadability ||
+        this.otherStyles.length > 0
+      );
+    },
+
+    // Names the profile the editor would open on, once it has a name: a
+    // single style left unnamed is just "the style".
+    editProfileName(): string {
       const profile = this.siteProfiles.find(
         ({ id }) => id === this.siteActiveProfile
       );
 
-      return profile ? profile.name || this.t('profile_default_name') : '';
+      if (!profile) {
+        return '';
+      }
+
+      return this.hasProfiles
+        ? profile.name || this.t('profile_default_name')
+        : profile.name;
     },
 
     styleShortcut(): string {
@@ -228,7 +265,11 @@ export default Vue.extend({
   },
 
   created() {
-    getCurrentTab(tab => {
+    getCurrentTab(async tab => {
+      if (tab.url?.startsWith('file://')) {
+        this.fileAccessAllowed = await getFileAccessAllowed();
+      }
+
       this.tab = tab;
 
       if (this.restricted) {
@@ -243,24 +284,12 @@ export default Vue.extend({
         this.pageReaderable = isReaderable;
       });
 
-      getStyles(this.tab, ({ styles, defaultStyle }) => {
-        this.styles = styles.filter(hasAnyCss);
-
-        const [site] = this.styles;
-
-        if (site) {
-          this.siteEnabled = site.enabled;
-          this.siteActiveProfile = expandProfiles(site).active;
-        }
-        this.readability = !!defaultStyle && defaultStyle.readability;
-      });
+      this.loadStyles();
     });
 
-    Promise.all([getGoogleDriveSyncEnabled(), getSyncNeedsAuth()]).then(
-      ([enabled, needsAuth]) => {
-        this.syncNeedsSignIn = enabled && needsAuth;
-      }
-    );
+    getGoogleDriveSyncEnabled().then(enabled => {
+      this.syncEnabled = enabled;
+    });
 
     getCommands(commands => {
       this.commands = commands;
@@ -276,6 +305,28 @@ export default Vue.extend({
   },
 
   methods: {
+    /**
+     * Reads the tab's styles; again after a sync, which may have brought in
+     * styles or profiles edited on another device.
+     */
+    loadStyles(): void {
+      if (!this.tab) {
+        return;
+      }
+
+      getStyles(this.tab, ({ styles, defaultStyle }) => {
+        this.styles = styles.filter(hasAnyCss);
+
+        const [site] = this.styles;
+
+        if (site) {
+          this.siteEnabled = site.enabled;
+          this.siteActiveProfile = expandProfiles(site).active;
+        }
+        this.readability = !!defaultStyle && defaultStyle.readability;
+      });
+    },
+
     profilesOf(style: Style): Array<ProfileSummary> {
       return listProfiles(style);
     },
@@ -341,24 +392,17 @@ body {
   padding: 14px 16px;
 }
 
+.popup-header-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .popup-header-domain {
   @include truncate;
 
   min-width: 0;
   flex: 1;
-}
-
-.popup-header-domain.popup-header-domain--muted {
-  color: var(--text-muted);
-}
-
-.popup-caption {
-  font-size: 11.5px;
-  color: var(--text-muted);
-}
-
-.popup-restricted-message {
-  padding: 16px;
 }
 
 .popup-divider {
@@ -367,13 +411,21 @@ body {
 }
 
 .popup-menu {
-  padding: 6px;
+  padding: 8px 6px;
+}
+
+.popup-menu.popup-menu--after-profiles {
+  padding-top: 0;
 }
 
 .popup-footer {
   display: flex;
   gap: 8px;
   padding: 10px 12px 12px;
+}
+
+.popup-footer.popup-footer--above-sync {
+  padding-bottom: 8px;
 }
 
 .row-label {

@@ -1,19 +1,13 @@
 <template>
-  <popup-row hover :disabled="disabled">
-    <s-toggle-switch
-      v-model="readability"
-      :disabled="disabled"
-      @change="onChange"
-    >
-      {{ t('readability') }}
-      <template v-if="disabled" #trailing>
-        <span class="popup-caption articles-only-label">
-          {{ t('articles_only') }}
+  <popup-row hover>
+    <span v-if="indent" class="check-slot" />
+    <s-toggle-switch v-model="readability" track-end @change="onChange">
+      <span class="readability-label">
+        <s-text as="span" size="large">{{ t('readability') }}</s-text>
+        <span v-if="shortcut" class="shortcut-hint">
+          <s-shortcut-kbd :value="shortcut" />
         </span>
-      </template>
-      <template v-else-if="shortcut" #trailing>
-        <s-shortcut-chip muted :value="shortcut" />
-      </template>
+      </span>
     </s-toggle-switch>
   </popup-row>
 </template>
@@ -22,7 +16,7 @@
 import Vue from 'vue';
 import type { ToggleReadabilityForTab } from '@stylebot/types';
 import PopupRow from './PopupRow.vue';
-import { SShortcutChip, SToggleSwitch } from '@stylebot/components';
+import { SShortcutKbd, SText, SToggleSwitch } from '@stylebot/components';
 
 export default Vue.extend({
   name: 'Readability',
@@ -30,7 +24,8 @@ export default Vue.extend({
   components: {
     PopupRow,
     SToggleSwitch,
-    SShortcutChip,
+    SShortcutKbd,
+    SText,
   },
 
   props: {
@@ -40,7 +35,8 @@ export default Vue.extend({
     },
 
     initialReadability: Boolean,
-    disabled: Boolean,
+    // Lines the label up with the profile names above it.
+    indent: Boolean,
     shortcut: {
       type: String,
       default: '',
@@ -78,7 +74,26 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-.articles-only-label {
+.check-slot {
   flex: none;
+  width: 14px;
+}
+
+.readability-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.shortcut-hint {
+  display: inline-flex;
+  color: var(--text-muted);
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+
+.popup-row:hover .shortcut-hint,
+.popup-row:focus-within .shortcut-hint {
+  opacity: 1;
 }
 </style>

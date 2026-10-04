@@ -299,6 +299,9 @@ describe('isSupportedUrl', () => {
     expect(isSupportedUrl('https://chrome.google.com/webstore/detail')).toBe(
       false
     );
+    expect(
+      isSupportedUrl('https://chromewebstore.google.com/detail/stylebot/abc')
+    ).toBe(false);
   });
 
   it('is false for files that are not html', () => {

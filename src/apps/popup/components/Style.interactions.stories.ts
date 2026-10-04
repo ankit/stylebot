@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue';
-import { expect, waitFor, within } from '@storybook/test';
+import { expect, within } from '@storybook/test';
 
 import Style from './Style.vue';
 import { popup, style } from '@stylebot/storybook/fixtures/popup';
@@ -18,16 +18,41 @@ export const SavedStyle: StoryObj = {
     styles: [style('example.com')],
     defaultStyle: style('example.com'),
   }),
-  name: "the page's saved style shows with its toggle on",
+  name: "the page's one style shows as a Style toggle, on, and Edit style opens it",
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    await waitFor(() =>
-      expect(
-        canvas.getByRole('checkbox', { name: /example\.com/ })
-      ).toBeChecked()
-    );
-    await expect(canvas.queryByText('No style saved for this site')).toBeNull();
+    await expect(
+      await canvas.findByRole('checkbox', { name: /^Style/ })
+    ).toBeChecked();
+    await expect(canvas.queryByRole('radio')).toBeNull();
+    await expect(
+      canvas.getByRole('button', { name: /^Edit style/ })
+    ).toBeVisible();
+  },
+};
+
+export const NamedStyle: StoryObj = {
+  ...popup({
+    styles: [
+      {
+        ...style('example.com'),
+        profiles: { default: { name: 'Dracula' } },
+        activeProfile: 'default',
+      },
+    ],
+    defaultStyle: style('example.com'),
+  }),
+  name: 'a renamed style shows its name instead of Style',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await expect(
+      await canvas.findByRole('checkbox', { name: /^Dracula/ })
+    ).toBeChecked();
+    await expect(
+      canvas.getByRole('button', { name: /^Edit Dracula/ })
+    ).toBeVisible();
   },
 };
 
@@ -40,9 +65,8 @@ export const DisabledStyle: StoryObj = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    const toggle = await canvas.findByRole('checkbox', {
-      name: /example\.com/,
-    });
-    await expect(toggle).not.toBeChecked();
+    await expect(
+      await canvas.findByRole('checkbox', { name: /^Style/ })
+    ).not.toBeChecked();
   },
 };

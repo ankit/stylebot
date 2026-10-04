@@ -1,16 +1,20 @@
 import { shallowMount } from '@vue/test-utils';
 
 import App from './App.vue';
-import SettingsButton from './components/SettingsButton.vue';
+import OptionsButton from './components/OptionsButton.vue';
 import SyncStylebot from './components/SyncStylebot.vue';
-import { getCurrentTab, getStyles, getCommands } from './utils';
+import UnsupportedPage from './components/UnsupportedPage.vue';
 import {
-  getGoogleDriveSyncEnabled,
-  getSyncNeedsAuth,
-} from '../../features/sync/google-drive/sync-metadata';
+  getCurrentTab,
+  getStyles,
+  getCommands,
+  getFileAccessAllowed,
+} from './utils';
+import { getGoogleDriveSyncEnabled } from '../../features/sync/google-drive/sync-metadata';
 
 jest.mock('./utils', () => ({
   getCurrentTab: jest.fn(),
+  getFileAccessAllowed: jest.fn(),
   getStyles: jest.fn(),
   getCommands: jest.fn(),
   getOption: jest.fn(),
@@ -20,15 +24,12 @@ jest.mock('./utils', () => ({
 
 jest.mock('../../features/sync/google-drive/sync-metadata', () => ({
   getGoogleDriveSyncEnabled: jest.fn(),
-  getSyncNeedsAuth: jest.fn(),
 }));
 
 const flush = () => new Promise(resolve => setTimeout(resolve));
 
-const syncStatus = (enabled: boolean, needsAuth: boolean) => {
+const syncStatus = (enabled: boolean) =>
   (getGoogleDriveSyncEnabled as jest.Mock).mockResolvedValue(enabled);
-  (getSyncNeedsAuth as jest.Mock).mockResolvedValue(needsAuth);
-};
 
 const currentTab = (url: string) =>
   (getCurrentTab as jest.Mock).mockImplementation(cb =>
@@ -38,35 +39,53 @@ const currentTab = (url: string) =>
 describe('App.vue', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    syncStatus(false, false);
+    syncStatus(false);
   });
 
   it('should show the restricted message for chrome:// pages', () => {
     currentTab('chrome://extensions');
     const wrapper = shallowMount(App);
 
-    expect(wrapper.find('.popup-restricted-message').exists()).toBe(true);
+    expect(wrapper.findComponent(UnsupportedPage).exists()).toBe(true);
   });
 
   it('should show the restricted message for the Chrome Web Store', () => {
     currentTab('https://chrome.google.com/webstore/detail/foo');
     const wrapper = shallowMount(App);
 
-    expect(wrapper.find('.popup-restricted-message').exists()).toBe(true);
+    expect(wrapper.findComponent(UnsupportedPage).exists()).toBe(true);
   });
 
   it('should show the restricted message for a PDF document', () => {
     currentTab('https://example.com/report.pdf');
     const wrapper = shallowMount(App);
 
-    expect(wrapper.find('.popup-restricted-message').exists()).toBe(true);
+    expect(wrapper.findComponent(UnsupportedPage).exists()).toBe(true);
   });
 
   it('should not show the restricted message for an ordinary web page', () => {
     currentTab('https://news.ycombinator.com');
     const wrapper = shallowMount(App);
 
-    expect(wrapper.find('.popup-restricted-message').exists()).toBe(false);
+    expect(wrapper.findComponent(UnsupportedPage).exists()).toBe(false);
+  });
+
+  it('should show the restricted message for a local file without file access', async () => {
+    currentTab('file:///Users/me/page.html');
+    (getFileAccessAllowed as jest.Mock).mockResolvedValue(false);
+    const wrapper = shallowMount(App);
+    await flush();
+
+    expect(wrapper.findComponent(UnsupportedPage).exists()).toBe(true);
+  });
+
+  it('should style a local file once file access is on', async () => {
+    currentTab('file:///Users/me/page.html');
+    (getFileAccessAllowed as jest.Mock).mockResolvedValue(true);
+    const wrapper = shallowMount(App);
+    await flush();
+
+    expect(wrapper.findComponent(UnsupportedPage).exists()).toBe(false);
   });
 
   it('should skip fetching page state for restricted pages', () => {
@@ -87,14 +106,7 @@ describe('App.vue', () => {
     currentTab('https://news.ycombinator.com');
     const wrapper = shallowMount(App);
 
-    expect(wrapper.findComponent(SettingsButton).exists()).toBe(true);
-  });
-
-  it('should not show the settings button on the restricted view', () => {
-    currentTab('chrome://extensions');
-    const wrapper = shallowMount(App);
-
-    expect(wrapper.findComponent(SettingsButton).exists()).toBe(false);
+    expect(wrapper.findComponent(OptionsButton).exists()).toBe(true);
   });
 
   it('should fetch keyboard shortcuts on load', () => {
@@ -104,30 +116,32 @@ describe('App.vue', () => {
     expect(getCommands).toHaveBeenCalled();
   });
 
-  it('should hide the sync strip while sync is healthy', async () => {
+  it('should show the sync strip while sync is on', async () => {
     currentTab('https://news.ycombinator.com');
-    syncStatus(true, false);
-    const wrapper = shallowMount(App);
-    await flush();
-
-    expect(wrapper.findComponent(SyncStylebot).exists()).toBe(false);
-  });
-
-  it('should show the sync strip when a scheduled sync needs a sign-in', async () => {
-    currentTab('https://news.ycombinator.com');
-    syncStatus(true, true);
+    syncStatus(true);
     const wrapper = shallowMount(App);
     await flush();
 
     expect(wrapper.findComponent(SyncStylebot).exists()).toBe(true);
   });
 
-  it('should ignore a stale sign-in flag once sync is off', async () => {
+  it('should hide the sync strip while sync is off', async () => {
     currentTab('https://news.ycombinator.com');
-    syncStatus(false, true);
+    syncStatus(false);
     const wrapper = shallowMount(App);
     await flush();
 
     expect(wrapper.findComponent(SyncStylebot).exists()).toBe(false);
+  });
+
+  it('should reload the styles once a sync lands', async () => {
+    currentTab('https://news.ycombinator.com');
+    syncStatus(true);
+    const wrapper = shallowMount(App);
+    await flush();
+
+    wrapper.findComponent(SyncStylebot).vm.$emit('synced');
+
+    expect(getStyles).toHaveBeenCalledTimes(2);
   });
 });

@@ -1,7 +1,9 @@
 <template>
   <button type="button" class="pill-btn" @click="$emit('click', $event)">
     <span class="pill-btn-label"><slot /></span>
-    <slot name="trailing" />
+    <span v-if="$slots.trailing" class="pill-btn-trailing">
+      <slot name="trailing" />
+    </span>
   </button>
 </template>
 
@@ -15,15 +17,17 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .pill-btn {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
+  column-gap: 8px;
   flex: 1;
   min-height: 40px;
   padding: 9px 12px;
   border-radius: 8px;
   border: 1px solid var(--pill-border);
   background: var(--pill-surface);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
 
@@ -35,7 +39,13 @@ export default Vue.extend({
 }
 
 .pill-btn-label {
-  flex: 1;
+  grid-column: 2;
   text-align: center;
+}
+
+.pill-btn-trailing {
+  display: flex;
+  grid-column: 3;
+  justify-self: end;
 }
 </style>

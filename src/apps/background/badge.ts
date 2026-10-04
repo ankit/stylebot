@@ -1,4 +1,5 @@
 import type { Style, GetIsReadabilityActive } from '@stylebot/types';
+import { hasSyncIssue } from '@stylebot/sync';
 import { isSafari } from '@stylebot/utils';
 
 // Asked live from the content script rather than tracked/persisted here,
@@ -16,16 +17,27 @@ export const getIsReadabilityActive = (tabId: number): Promise<boolean> =>
 // color since the 📖 badge glyph already reads as distinct on its own.
 const STYLES_APPLIED_BADGE_COLOR = '#2e8b57';
 const DEFAULT_BADGE_COLOR = '#555';
+const ALERT_BADGE_COLOR = '#ef4444';
 
-export const updateIcon = (
+/**
+ * Sets a tab's badge: a sync that stopped working wins over everything else,
+ * since it's the one thing the user has to act on.
+ */
+export const updateIcon = async (
   tab: chrome.tabs.Tab,
   styles: Array<Style>,
   readabilityActive: boolean
-): void => {
+): Promise<void> => {
   const enabledStyles = styles.filter(style => style.enabled && style.css);
 
-  // Safari ignores the badge color and always paints it red, like an alert.
-  if (isSafari()) {
+  if (await hasSyncIssue()) {
+    chrome.action.setBadgeBackgroundColor({
+      color: ALERT_BADGE_COLOR,
+      tabId: tab.id,
+    });
+    chrome.action.setBadgeText({ text: '!', tabId: tab.id });
+  } else if (isSafari()) {
+    // Safari ignores the badge color and always paints it red, like an alert.
     chrome.action.setBadgeText({ text: '', tabId: tab.id });
   } else if (readabilityActive) {
     chrome.action.setBadgeBackgroundColor({

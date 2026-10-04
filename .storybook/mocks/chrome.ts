@@ -40,6 +40,7 @@ export type ChromeShimOptions = {
   isOpen?: boolean;
   pageReaderable?: boolean;
   tabUrl?: string;
+  fileAccess?: boolean;
   googleDriveSync?: Pending<RunGoogleDriveSyncResponse>;
   versionHistory?: Pending<VersionHistory>;
   chat?: ChatShimOptions;
@@ -196,6 +197,11 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
     },
 
     i18n: { getMessage },
+
+    extension: {
+      isAllowedFileSchemeAccess: (callback: (allowed: boolean) => void) =>
+        callback(overrides.fileAccess ?? false),
+    },
 
     storage: {
       local: {

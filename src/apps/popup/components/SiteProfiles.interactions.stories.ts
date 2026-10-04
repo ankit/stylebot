@@ -27,14 +27,16 @@ const sentMessages = () => spyOn(chrome.runtime, 'sendMessage');
 
 export const ListsProfiles: StoryObj = {
   ...twoProfiles,
-  name: 'a site with several profiles lists them, says which is on, and edits that one',
+  name: 'a site with several profiles lists them after No style, checks the one that is on, and edits it',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
     await expect(
-      await canvas.findByText('2 profiles · Default is on')
-    ).toBeVisible();
-    await expect(canvas.getByRole('radio', { name: 'Default' })).toBeChecked();
+      await canvas.findByRole('radio', { name: 'Default' })
+    ).toBeChecked();
+    await expect(
+      canvas.getAllByRole('radio').map(radio => radio.textContent?.trim())
+    ).toEqual(['No style', 'Default', 'Dark']);
     await expect(canvas.getByRole('radio', { name: 'Dark' })).not.toBeChecked();
     await expect(
       canvas.getByRole('radio', { name: 'No style' })
@@ -65,7 +67,6 @@ export const PickProfile: StoryObj = {
       expect.objectContaining({ name: 'DisableStyle' })
     );
     await expect(canvas.getByRole('radio', { name: 'Dark' })).toBeChecked();
-    await expect(canvas.getByText('2 profiles · Dark is on')).toBeVisible();
     await expect(
       canvas.getByRole('button', { name: /^Edit Dark/ })
     ).toBeVisible();
@@ -85,7 +86,6 @@ export const NoStyle: StoryObj = {
       await expect(sendMessage).toHaveBeenCalledWith(
         expect.objectContaining({ name: 'DisableStyle', url: 'example.com' })
       );
-      await expect(canvas.getByText('Styling off on this site')).toBeVisible();
       await expect(
         canvas.getByRole('radio', { name: 'No style' })
       ).toBeChecked();
