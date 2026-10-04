@@ -70,13 +70,13 @@ import { setNotification, getReleaseNotificationId } from '@stylebot/utils';
  * synchronously when the service worker starts, for Chrome to wake it for them.
  */
 export const initListeners = (): void => {
-  // Set up side panels and open Help on install; clean up retired options on update.
+  // Set up side panels and open the welcome page on install; clean up retired options on update.
   chrome.runtime.onInstalled.addListener(async ({ reason }) => {
     configureSidePanelTabs();
 
     if (reason === 'install') {
       chrome.tabs.create({
-        url: 'https://stylebot.dev/help',
+        url: 'https://stylebot.dev/welcome',
       });
 
       setNotification(getReleaseNotificationId(), true);

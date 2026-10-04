@@ -2,7 +2,7 @@
   <div class="footer">
     <span class="version">v{{ version }}</span>
     <div class="links">
-      <a target="_blank" href="https://stylebot.dev/help">
+      <a target="_blank" href="https://stylebot.dev/manual">
         {{ t('help_options') }}
       </a>
       <a target="_blank" href="http://github.com/ankit/stylebot">

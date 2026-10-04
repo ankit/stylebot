@@ -23,7 +23,7 @@ const engine: Engine =
 
 const DIST_PATH = path.resolve(__dirname, '..', engine.distDir);
 
-// How long a fresh launch waits for the extension's onInstalled help tab.
+// How long a fresh launch waits for the extension's onInstalled welcome tab.
 const HELP_TAB_TIMEOUT_MS = 15_000;
 
 // Launching a browser and installing the extension is the slowest thing a
@@ -122,7 +122,7 @@ class BrowserPool {
     // The extension opens this on fresh install, stealing tab focus.
     const helpTabClosed = new Promise<void>(resolve => {
       const closeHelpTab = (p: Page) => {
-        if (/^https:\/\/stylebot\.dev\/help/.test(p.url())) {
+        if (/^https:\/\/stylebot\.dev\/welcome/.test(p.url())) {
           // Resolve only once it's gone: a context.route() installed while the
           // tab is still closing fails with a target-closed error.
           p.close()

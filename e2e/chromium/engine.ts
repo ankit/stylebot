@@ -55,7 +55,7 @@ export class ChromiumEngine implements Engine {
   ): Promise<Popup> {
     const popupUrl = `chrome-extension://${extension.id}/popup/index.html`;
 
-    // Filtered so the onInstalled help tab can't win this race instead.
+    // Filtered so the onInstalled welcome tab can't win this race instead.
     const pagePromise = context.waitForEvent('page', p => p.url() === popupUrl);
     const cdp = await context.browser()!.newBrowserCDPSession();
     await cdp.send('Target.createTarget', { url: popupUrl, background: true });
