@@ -321,9 +321,112 @@ export const dedupeByMatches = (selectors: Array<string>): Array<string> => {
 };
 
 /**
+ * `el`'s own name (or tag), with :nth-of-type when a sibling of the same
+ * tag would match it too, e.g. `tr.athing:nth-of-type(3)`.
+ */
+const getPositionedStep = (el: HTMLElement): string => {
+  const own = getGoodOwnSelector(el) ?? el.tagName.toLowerCase();
+  const siblings = Array.from(el.parentElement?.children ?? []).filter(
+    sibling => sibling.tagName === el.tagName
+  );
+  const clashes = siblings.some(
+    sibling => sibling !== el && sibling.matches(own)
+  );
+
+  return clashes ? `${own}:nth-of-type(${siblings.indexOf(el) + 1})` : own;
+};
+
+const joinSteps = (steps: Array<{ step: string; child: boolean }>) =>
+  steps
+    .map(({ step, child }, i) =>
+      i === 0 ? step : `${child ? '> ' : ''}${step}`
+    )
+    .join(' ');
+
+/**
+ * A selector matching `el` and nothing else: its unique #id, or a chain of
+ * positioned steps up to a unique ancestor, then with every step and `>`
+ * that isn't needed for uniqueness dropped again.
+ */
+export const getUniqueSelector = (el: HTMLElement): string | null => {
+  const isUnique = (selector: string) =>
+    countMatches(selector) === 1 && el.matches(selector);
+
+  const id = getIdBasedSelector(el);
+  if (id && isUnique(id)) {
+    return id;
+  }
+
+  const steps = [{ step: getPositionedStep(el), child: true }];
+  let ancestor = el.parentElement;
+
+  while (!isUnique(joinSteps(steps))) {
+    if (!ancestor) {
+      return null;
+    }
+
+    const ancestorId = getIdBasedSelector(ancestor);
+    const anchored = ancestorId !== null && countMatches(ancestorId) === 1;
+
+    steps.unshift({
+      step: anchored ? (ancestorId as string) : getPositionedStep(ancestor),
+      child: true,
+    });
+    ancestor = anchored ? null : ancestor.parentElement;
+  }
+
+  for (let i = steps.length - 2; i > 0; i--) {
+    const shorter = [...steps.slice(0, i), ...steps.slice(i + 1)];
+    shorter[i] = { ...shorter[i], child: false };
+
+    if (isUnique(joinSteps(shorter))) {
+      steps.splice(0, steps.length, ...shorter);
+    }
+  }
+
+  for (let i = 1; i < steps.length; i++) {
+    const looser = steps.map((step, j) =>
+      j === i ? { ...step, child: false } : step
+    );
+
+    if (isUnique(joinSteps(looser))) {
+      steps.splice(0, steps.length, ...looser);
+    }
+  }
+
+  return joinSteps(steps);
+};
+
+/**
+ * Elements like `el` within the nearest repeated ancestor it sits in (a
+ * row, list item or card), e.g. every link in this one row: a step between
+ * just this element and all of its kind.
+ */
+export const getItemScopedSelector = (el: HTMLElement): string | null => {
+  const subject = getGoodOwnSelector(el) ?? el.tagName.toLowerCase();
+  let ancestor = el.parentElement;
+
+  for (let level = 0; ancestor && level < 6; level++) {
+    if (ancestor === document.body || ancestor === document.documentElement) {
+      return null;
+    }
+
+    if (getPositionedStep(ancestor).includes(':nth-of-type(')) {
+      const item = getUniqueSelector(ancestor);
+      return item ? `${item} ${subject}` : null;
+    }
+
+    ancestor = ancestor.parentElement;
+  }
+
+  return null;
+};
+
+/**
  * Every selector the strategies above offer for `el` that actually matches
  * it, most readable first: its own names, then ancestor scopes, then
- * hashed classes and bare tags.
+ * hashed classes and bare tags, then ones scoped to this element's item
+ * and to this element alone.
  */
 export const getSelectorCandidates = (el: HTMLElement): Array<string> =>
   [
@@ -337,6 +440,8 @@ export const getSelectorCandidates = (el: HTMLElement): Array<string> =>
     getAncestorHashedClassSelector(el),
     getMeaningfulTagSelector(el),
     getTagNameBasedSelector(el),
+    getItemScopedSelector(el),
+    getUniqueSelector(el),
   ].filter((selector): selector is string => {
     try {
       return Boolean(selector) && el.matches(selector as string);

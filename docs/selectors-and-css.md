@@ -46,6 +46,20 @@ A class name counts as hashed, carrying no stable meaning, when it has:
 
 Anything containing `-` or `_` is treated as authored, whatever its shape.
 
+### Other selectors for the element
+
+The selector field also offers the other strategies' selectors for the picked
+element, broadest first, keeping one per set of matched elements. The
+narrow end always has:
+
+- **This item** — elements like it inside the nearest repeated ancestor (a
+  row, list item or card), e.g. `tr.athing:nth-of-type(3) a` for every link
+  in one row.
+- **Only this element** — its `#id` when that's unique, otherwise a chain of
+  ancestors positioned with `:nth-of-type`, trimmed back to the steps that
+  keep it unique. Positions shift when a list reorders, so this is the least
+  stable choice.
+
 ### Reusing existing rules
 
 Before generating a fresh selector, the inspector checks whether the user's
