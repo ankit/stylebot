@@ -4,10 +4,7 @@ import App from './App.vue';
 import SettingsButton from './components/SettingsButton.vue';
 import SyncStylebot from './components/SyncStylebot.vue';
 import { getCurrentTab, getStyles, getCommands } from './utils';
-import {
-  getGoogleDriveSyncEnabled,
-  getSyncNeedsAuth,
-} from '../../features/sync/google-drive/sync-metadata';
+import { getGoogleDriveSyncEnabled } from '../../features/sync/google-drive/sync-metadata';
 
 jest.mock('./utils', () => ({
   getCurrentTab: jest.fn(),
@@ -20,15 +17,12 @@ jest.mock('./utils', () => ({
 
 jest.mock('../../features/sync/google-drive/sync-metadata', () => ({
   getGoogleDriveSyncEnabled: jest.fn(),
-  getSyncNeedsAuth: jest.fn(),
 }));
 
 const flush = () => new Promise(resolve => setTimeout(resolve));
 
-const syncStatus = (enabled: boolean, needsAuth: boolean) => {
+const syncStatus = (enabled: boolean) =>
   (getGoogleDriveSyncEnabled as jest.Mock).mockResolvedValue(enabled);
-  (getSyncNeedsAuth as jest.Mock).mockResolvedValue(needsAuth);
-};
 
 const currentTab = (url: string) =>
   (getCurrentTab as jest.Mock).mockImplementation(cb =>
@@ -38,7 +32,7 @@ const currentTab = (url: string) =>
 describe('App.vue', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    syncStatus(false, false);
+    syncStatus(false);
   });
 
   it('should show the restricted message for chrome:// pages', () => {
@@ -104,30 +98,32 @@ describe('App.vue', () => {
     expect(getCommands).toHaveBeenCalled();
   });
 
-  it('should hide the sync strip while sync is healthy', async () => {
+  it('should show the sync strip while sync is on', async () => {
     currentTab('https://news.ycombinator.com');
-    syncStatus(true, false);
-    const wrapper = shallowMount(App);
-    await flush();
-
-    expect(wrapper.findComponent(SyncStylebot).exists()).toBe(false);
-  });
-
-  it('should show the sync strip when a scheduled sync needs a sign-in', async () => {
-    currentTab('https://news.ycombinator.com');
-    syncStatus(true, true);
+    syncStatus(true);
     const wrapper = shallowMount(App);
     await flush();
 
     expect(wrapper.findComponent(SyncStylebot).exists()).toBe(true);
   });
 
-  it('should ignore a stale sign-in flag once sync is off', async () => {
+  it('should hide the sync strip while sync is off', async () => {
     currentTab('https://news.ycombinator.com');
-    syncStatus(false, true);
+    syncStatus(false);
     const wrapper = shallowMount(App);
     await flush();
 
     expect(wrapper.findComponent(SyncStylebot).exists()).toBe(false);
+  });
+
+  it('should reload the styles once a sync lands', async () => {
+    currentTab('https://news.ycombinator.com');
+    syncStatus(true);
+    const wrapper = shallowMount(App);
+    await flush();
+
+    wrapper.findComponent(SyncStylebot).vm.$emit('synced');
+
+    expect(getStyles).toHaveBeenCalledTimes(2);
   });
 });

@@ -74,11 +74,6 @@
 
       <div class="popup-divider" />
 
-      <template v-if="syncNeedsSignIn">
-        <sync-stylebot />
-        <div class="popup-divider" />
-      </template>
-
       <div class="popup-footer">
         <toggle-stylebot
           :is-open="isOpen"
@@ -89,6 +84,11 @@
         />
         <settings-button />
       </div>
+
+      <template v-if="syncEnabled">
+        <div class="popup-divider" />
+        <sync-stylebot @synced="loadStyles" />
+      </template>
 
       <release-notification />
     </div>
@@ -120,7 +120,7 @@ import {
   setActiveProfile,
 } from './utils';
 
-import { getGoogleDriveSyncEnabled, getSyncNeedsAuth } from '@stylebot/sync';
+import { getGoogleDriveSyncEnabled } from '@stylebot/sync';
 import {
   expandProfiles,
   hasAnyCss,
@@ -162,7 +162,7 @@ export default Vue.extend({
     // The site's own style, as picked here since the popup opened.
     siteActiveProfile: string;
     siteEnabled: boolean;
-    syncNeedsSignIn: boolean;
+    syncEnabled: boolean;
     commands?: GetCommandsResponse;
     appearance: StylebotAppearance;
     dockLocation: StylebotDockLocation | '';
@@ -175,7 +175,7 @@ export default Vue.extend({
       tab: undefined,
       readability: false,
       pageReaderable: true,
-      syncNeedsSignIn: false,
+      syncEnabled: false,
       commands: undefined,
       appearance: 'system',
       dockLocation: '',
@@ -243,24 +243,12 @@ export default Vue.extend({
         this.pageReaderable = isReaderable;
       });
 
-      getStyles(this.tab, ({ styles, defaultStyle }) => {
-        this.styles = styles.filter(hasAnyCss);
-
-        const [site] = this.styles;
-
-        if (site) {
-          this.siteEnabled = site.enabled;
-          this.siteActiveProfile = expandProfiles(site).active;
-        }
-        this.readability = !!defaultStyle && defaultStyle.readability;
-      });
+      this.loadStyles();
     });
 
-    Promise.all([getGoogleDriveSyncEnabled(), getSyncNeedsAuth()]).then(
-      ([enabled, needsAuth]) => {
-        this.syncNeedsSignIn = enabled && needsAuth;
-      }
-    );
+    getGoogleDriveSyncEnabled().then(enabled => {
+      this.syncEnabled = enabled;
+    });
 
     getCommands(commands => {
       this.commands = commands;
@@ -276,6 +264,28 @@ export default Vue.extend({
   },
 
   methods: {
+    /**
+     * Reads the tab's styles; again after a sync, which may have brought in
+     * styles or profiles edited on another device.
+     */
+    loadStyles(): void {
+      if (!this.tab) {
+        return;
+      }
+
+      getStyles(this.tab, ({ styles, defaultStyle }) => {
+        this.styles = styles.filter(hasAnyCss);
+
+        const [site] = this.styles;
+
+        if (site) {
+          this.siteEnabled = site.enabled;
+          this.siteActiveProfile = expandProfiles(site).active;
+        }
+        this.readability = !!defaultStyle && defaultStyle.readability;
+      });
+    },
+
     profilesOf(style: Style): Array<ProfileSummary> {
       return listProfiles(style);
     },

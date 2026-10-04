@@ -152,6 +152,8 @@ export type GetGoogleFontFile = {
 
 export type RunGoogleDriveSync = {
   name: 'RunGoogleDriveSync';
+  // Defaults to true. Off where an auth window can't be shown, like the popup.
+  interactive?: boolean;
 };
 
 // Sent by the page Google's sign-in redirects to where there's no identity API.

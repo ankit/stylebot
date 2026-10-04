@@ -23,17 +23,19 @@ const syncState = (lastSyncedAt: string) => ({
   },
 });
 
+const synced = syncState('2026-01-12T08:00:00Z');
+
 export const Synced = popup({
   storage: {
     'google-drive-sync-enabled': true,
-    'google-drive-sync-state': syncState('2026-01-12T08:00:00Z'),
+    'google-drive-sync-state': synced,
   },
 });
 
 export const NeedsSignIn = popup({
   storage: {
     'google-drive-sync-enabled': true,
-    'google-drive-sync-state': syncState('2026-01-12T08:00:00Z'),
+    'google-drive-sync-state': synced,
     'google-drive-sync-needs-auth': true,
   },
 });

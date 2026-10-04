@@ -376,11 +376,15 @@ export const GoogleSignInRedirect = async (
 };
 
 export const RunGoogleDriveSync = async (
-  _message: RunGoogleDriveSyncType,
+  message: RunGoogleDriveSyncType,
   sendResponse: (response: RunGoogleDriveSyncResponse) => void
 ): Promise<void> => {
   try {
-    sendResponse(await runGoogleDriveSync(styleStorage));
+    sendResponse(
+      await runGoogleDriveSync(styleStorage, {
+        interactive: message.interactive ?? true,
+      })
+    );
   } catch (e) {
     // runGoogleDriveSync already returns failures as a result, so this only
     // fires if that contract breaks. Left in because a missed sendResponse

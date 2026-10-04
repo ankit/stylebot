@@ -31,6 +31,19 @@ describe('RunGoogleDriveSync', () => {
     expect(sendResponse).toBeCalledWith({ ok: true, metadata });
   });
 
+  it('runs interactively unless the sender opts out', async () => {
+    mockedRunSync.mockResolvedValue({ ok: false, errorKey: 'sync_error_auth' });
+
+    await RunGoogleDriveSync({ name: 'RunGoogleDriveSync' }, jest.fn());
+    await RunGoogleDriveSync(
+      { name: 'RunGoogleDriveSync', interactive: false },
+      jest.fn()
+    );
+
+    expect(mockedRunSync.mock.calls[0][1]).toEqual({ interactive: true });
+    expect(mockedRunSync.mock.calls[1][1]).toEqual({ interactive: false });
+  });
+
   it('answers with the failure result rather than throwing', async () => {
     mockedRunSync.mockResolvedValue({
       ok: false,
