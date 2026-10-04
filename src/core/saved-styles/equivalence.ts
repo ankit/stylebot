@@ -16,17 +16,27 @@ export const isEquivalentCss = (a: string, b: string): boolean =>
   normalizeCss(a) === normalizeCss(b);
 
 /**
+ * Whether profiles compare by which one is applied. Sync leaves it out,
+ * since each device keeps its own.
+ */
+type EquivalenceOptions = { ignoreActiveProfile?: boolean };
+
+/**
  * Whether both styles have the same profiles, the same one active, and each
  * profile the same name and css. A style without profiles matches one whose
  * only profile is the unnamed default.
  */
-const hasEquivalentProfiles = (a: StyleWithoutUrl, b: StyleWithoutUrl) => {
+const hasEquivalentProfiles = (
+  a: StyleWithoutUrl,
+  b: StyleWithoutUrl,
+  { ignoreActiveProfile = false }: EquivalenceOptions
+) => {
   const expandedA = expandProfiles(a);
   const expandedB = expandProfiles(b);
   const ids = Object.keys(expandedA.sheets);
 
   return (
-    expandedA.active === expandedB.active &&
+    (ignoreActiveProfile || expandedA.active === expandedB.active) &&
     ids.length === Object.keys(expandedB.sheets).length &&
     ids.every(id => {
       const sheetA = expandedA.sheets[id];
@@ -47,7 +57,8 @@ const hasEquivalentProfiles = (a: StyleWithoutUrl, b: StyleWithoutUrl) => {
  */
 export const isEquivalentStyle = (
   a?: StyleWithoutUrl,
-  b?: StyleWithoutUrl
+  b?: StyleWithoutUrl,
+  options: EquivalenceOptions = {}
 ): boolean => {
   if (!a || !b) {
     return !a && !b;
@@ -57,7 +68,7 @@ export const isEquivalentStyle = (
     a.enabled === b.enabled &&
     a.readability === b.readability &&
     isForceImportant(a) === isForceImportant(b) &&
-    hasEquivalentProfiles(a, b)
+    hasEquivalentProfiles(a, b, options)
   );
 };
 
@@ -65,11 +76,15 @@ export const isEquivalentStyle = (
  * Two maps are equivalent when they hold the same urls and every style would
  * behave the same on a page, however its timestamps or whitespace differ.
  */
-export const isEquivalentStyleMap = (a: StyleMap, b: StyleMap): boolean => {
+export const isEquivalentStyleMap = (
+  a: StyleMap,
+  b: StyleMap,
+  options: EquivalenceOptions = {}
+): boolean => {
   const urls = Object.keys(a);
 
   return (
     urls.length === Object.keys(b).length &&
-    urls.every(url => url in b && isEquivalentStyle(a[url], b[url]))
+    urls.every(url => url in b && isEquivalentStyle(a[url], b[url], options))
   );
 };

@@ -68,6 +68,24 @@ describe('isEquivalentStyleMap with profiles', () => {
     ).toBe(true);
   });
 
+  it('ignores which profile is applied when asked to', () => {
+    const switched = style('b {}', T1, {
+      profiles: {
+        default: { name: '', css: 'a { color: red; }' },
+        dark: { name: 'Dark' },
+      },
+      activeProfile: 'dark',
+    });
+
+    expect(
+      isEquivalentStyleMap(
+        { 'a.com': two },
+        { 'a.com': switched },
+        { ignoreActiveProfile: true }
+      )
+    ).toBe(true);
+  });
+
   it('tells apart a switch, a rename and an edit to an inactive profile', () => {
     const switched = style('b {}', T1, {
       profiles: {

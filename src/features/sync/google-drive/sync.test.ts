@@ -437,6 +437,39 @@ describe('runGoogleDriveSync', () => {
     });
   });
 
+  it('does not upload a profile switch', async () => {
+    const red = 'a { color: red; }';
+    const onDefault = {
+      'a.com': {
+        ...style(red),
+        profiles: {
+          default: { name: '' },
+          dark: { name: 'Dark', css: 'b {}' },
+        },
+        activeProfile: 'default',
+      },
+    };
+    const onDark = {
+      'a.com': {
+        ...style('b {}'),
+        profiles: { default: { name: '', css: red }, dark: { name: 'Dark' } },
+        activeProfile: 'dark',
+      },
+    };
+    seed({
+      styles: onDark,
+      localRevision: 'local-2',
+      state: synced('remote-1', 'local-1', onDefault),
+    });
+
+    mockedGetRemote.mockResolvedValue(remoteMetadata('remote-1'));
+
+    await runGoogleDriveSync();
+
+    expect(mockedWrite).not.toBeCalled();
+    expect(storedStyles()).toEqual(onDark);
+  });
+
   it('still uploads a change to enabled', async () => {
     const disabled = { 'a.com': { ...RED['a.com'], enabled: false } };
     seed({

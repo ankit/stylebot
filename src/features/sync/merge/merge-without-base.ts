@@ -1,6 +1,10 @@
 import { compareAsc } from 'date-fns';
 import type { StyleMap, StyleWithoutUrl } from '@stylebot/types';
-import { collapseProfiles, expandProfiles } from '@stylebot/saved-styles';
+import {
+  activateProfile,
+  collapseProfiles,
+  expandProfiles,
+} from '@stylebot/saved-styles';
 
 /**
  * Returns 0 for an unparseable timestamp on either side, so the caller's
@@ -48,9 +52,10 @@ const withMissingProfiles = (
 
 /**
  * Merges local and remote with no record of what they last agreed on: the
- * union of both, newest modifiedTime winning per style. Only right for a
- * first sync or a reinstall — without a base a missing style cannot be told
- * apart from a deleted one, so nothing is ever removed.
+ * union of both, newest modifiedTime winning per style, with this device's
+ * applied profile kept. Only right for a first sync or a reinstall — without
+ * a base a missing style cannot be told apart from a deleted one, so nothing
+ * is ever removed.
  */
 export const mergeWithoutBase = (
   local: StyleMap,
@@ -64,7 +69,10 @@ export const mergeWithoutBase = (
       remote[url] &&
       compareModifiedTime(remote[url].modifiedTime, local[url].modifiedTime) > 0
     ) {
-      styles[url] = withMissingProfiles(remote[url], local[url]);
+      styles[url] = activateProfile(
+        withMissingProfiles(remote[url], local[url]),
+        expandProfiles(local[url]).active
+      );
     } else {
       styles[url] = withMissingProfiles(local[url], remote[url]);
     }

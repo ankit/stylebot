@@ -318,6 +318,39 @@ describe('mergeThreeWay with profiles', () => {
     });
   });
 
+  it("keeps each device's applied profile when the other side only switched", () => {
+    const switched = style(WHITE, T2, {
+      profiles: { default: { name: '', css: RED }, dark: { name: 'Dark' } },
+      activeProfile: 'dark',
+    });
+
+    expect(
+      merge({ 'a.com': base }, { 'a.com': base }, { 'a.com': switched }).styles
+    ).toEqual({ 'a.com': base });
+    expect(
+      merge({ 'a.com': base }, { 'a.com': switched }, { 'a.com': base }).styles
+    ).toEqual({ 'a.com': switched });
+  });
+
+  it("keeps this device's applied profile through a newer edit that switched", () => {
+    const switchedAndEdited = style('a { color: pink; }', T3, {
+      profiles: { default: { name: '', css: RED }, dark: { name: 'Dark' } },
+      activeProfile: 'dark',
+    });
+
+    const { styles } = merge(
+      { 'a.com': base },
+      { 'a.com': base },
+      { 'a.com': switchedAndEdited }
+    );
+
+    expect(styles['a.com']).toMatchObject({
+      css: RED,
+      activeProfile: 'default',
+      profiles: { dark: { name: 'Dark', css: 'a { color: pink; }' } },
+    });
+  });
+
   it('falls back to another active profile when a newer edit deleted the active one', () => {
     const switched = style(WHITE, T2, {
       profiles: { default: { name: '', css: RED }, dark: { name: 'Dark' } },
