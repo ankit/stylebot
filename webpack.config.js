@@ -245,6 +245,13 @@ const config = {
               jsonContent.permissions = jsonContent.permissions.filter(
                 permission => permission !== 'sidePanel'
               );
+            } else if (process.env.BROWSER === 'safari') {
+              // Safari draws the toolbar icon at 19pt and blurs anything smaller.
+              jsonContent.action.default_icon = {
+                ...jsonContent.action.default_icon,
+                19: 'img/icon19.png',
+                38: 'img/icon38.png',
+              };
             } else if (
               !process.env.BROWSER &&
               (process.env.NODE_ENV === 'development' || isPreview)
