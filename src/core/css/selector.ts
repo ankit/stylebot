@@ -1,6 +1,10 @@
 import { splitCommaList } from '@stylebot/utils';
 
-const escapeSelectorToken = (value: string): string => {
+/**
+ * An id or class name escaped for use in a selector, so a Tailwind class
+ * like `lg:-mt-16` becomes `lg\:-mt-16`.
+ */
+export const escapeSelectorToken = (value: string): string => {
   if (typeof CSS !== 'undefined' && CSS.escape) {
     return CSS.escape(value);
   }

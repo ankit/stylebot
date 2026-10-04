@@ -1,3 +1,5 @@
+import { escapeSelectorToken } from '@stylebot/css';
+
 const MAX_LINES = 400;
 const MAX_CHARS = 16000;
 const MAX_TEXT = 40;
@@ -264,9 +266,10 @@ const holdsRepeats = (element: Element): boolean => {
  */
 const describe = (element: Element, repeated = false): string => {
   const tag = element.tagName.toLowerCase();
-  const id = element.id ? `#${element.id}` : '';
+  // Escaped as a selector needs them, since the model copies them as written.
+  const id = element.id ? `#${escapeSelectorToken(element.id)}` : '';
   const classes = classesOf(element)
-    .map(name => `.${name}`)
+    .map(name => `.${escapeSelectorToken(name)}`)
     .join('');
   const text = ownText(element);
   const hints = [
