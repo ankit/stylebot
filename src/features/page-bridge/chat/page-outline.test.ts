@@ -107,6 +107,19 @@ describe('getPageOutline', () => {
     expect(getPageOutline()).toContain('td[bgcolor="#ff6600"] "x"');
   });
 
+  it('doesn’t repeat a bgcolor attribute as its background', () => {
+    document.body.innerHTML = `<table><tbody><tr>
+      <td bgcolor="#FF6600" style="background-color: rgb(255, 102, 0)">a</td>
+      <td bgcolor="orange" style="background-color: rgb(255, 165, 0)">b</td>
+    </tr></tbody></table>`;
+
+    const outline = getPageOutline();
+
+    expect(outline).toContain('td[bgcolor="#FF6600"] "a"');
+    expect(outline).not.toContain('bg #ff6600');
+    expect(outline).toContain('td[bgcolor="orange"] "b" [bg #ffa500]');
+  });
+
   it('notes how the first of a run of repeated items is spaced', () => {
     const item =
       '<li class="story" style="padding: 4px 0; margin: 0 0 8px; font-size: 12px; line-height: 18px">x</li>';

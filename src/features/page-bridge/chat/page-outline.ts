@@ -97,6 +97,15 @@ const shortColor = (value: string): string | null => {
  * background, and the text color and size it changes. Backgrounds aren't
  * inherited, so any is worth naming.
  */
+/**
+ * The element's bgcolor attribute as the outline writes colors, when it's
+ * written as six-digit hex; anything else (a name, no #) isn't compared.
+ */
+const bgcolorValue = (element: Element): string | null => {
+  const hex = /^#?([0-9a-f]{6})$/i.exec(element.getAttribute('bgcolor') ?? '');
+  return hex ? `#${hex[1].toLowerCase()}` : null;
+};
+
 const styleHints = (element: Element): Array<string> => {
   const style = getComputedStyle(element);
   const parent = element.parentElement
@@ -105,7 +114,8 @@ const styleHints = (element: Element): Array<string> => {
   const hints: Array<string> = [];
   const background = shortColor(style.backgroundColor);
 
-  if (background) {
+  // The bgcolor attribute named beside the tag already says it.
+  if (background && background !== bgcolorValue(element)) {
     hints.push(`bg ${background}`);
   }
 

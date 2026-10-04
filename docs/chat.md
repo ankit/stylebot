@@ -1,67 +1,242 @@
 # Chat
 
-The Chat tab lets a user describe a change in words and have a language model write the CSS for the site they're on. Users bring their own API key, so there is no Stylebot backend and no billing. This page is the summary; the code comments carry the detail.
+The Chat tab turns a request in words ("make this a Gruvbox dark theme") into CSS for the site you're on. You bring your own API key: there's no Stylebot backend and no billing. This page is the map; the code comments carry the detail.
 
-## Providers
+## A reply, end to end
 
-Claude (Anthropic), OpenAI and Gemini are supported. Each sits behind one small adapter with two jobs: check that a key works, and stream one reply. An adapter translates Stylebot's provider-neutral thread into its API's format and turns the streamed response back into a common set of events: text as it arrives, the CSS edits once they are complete, token usage, and done or an error. Adding a provider means writing one adapter and listing its models; nothing else changes.
+```mermaid
+sequenceDiagram
+    participant E as Editor
+    participant P as Page
+    participant B as Background
+    participant M as Model API
+    E->>P: read outline, CSS variables, picked element's rules
+    P-->>E: page context
+    E->>B: system prompt + thread (over a port)
+    B->>M: request with the key and model
+    M-->>B: streamed text, then one apply_css call
+    B-->>E: text, edits, usage, done
+    E->>P: apply edits (saved, one undo step)
+```
 
-Requests go straight from the browser to the provider over plain `fetch` and server-sent events, with no SDKs and no new host permissions. Each model can carry extra request fields, such as a reasoning effort, merged into every request.
+- **The editor builds the prompt**, since it has the page at hand.
+- **The background holds the key** and streams the reply. Closing the port (Stop, New chat, closing the editor) aborts it; an open port keeps the service worker alive.
+- **The model answers in prose plus one tool call** under a strict schema: selectors, each with property and value pairs. Structured edits, not free CSS, are what make every reply exactly undoable.
+- **Edits apply like any other edit**: live, saved, one step on the undo trail. A Google Fonts import is added for any font family the model picks.
 
-## Keys and what is stored
+## What the model sees
 
-| Where | Key                       | What                                                   |
-| :---- | :------------------------ | :----------------------------------------------------- |
-| local | `chat-provider`           | the provider last picked, which replies come from      |
-| local | `chat-api-key-<provider>` | that provider's key                                    |
-| local | `chat-model-<provider>`   | the model picked for that provider                     |
-| local | `chat-thread-<site>`      | the site's conversation, capped at its latest 50 turns |
+Each reply's system prompt has four parts, rebuilt every turn since the page may have changed:
 
-One entry per value, so every write is a single set or remove and nothing needs serialising across a service worker restart. None of it is synced, and it is kept out of the options that content scripts receive.
+| Part         | What                                                         | Budget                     |
+| :----------- | :----------------------------------------------------------- | :------------------------- |
+| Instructions | what Stylebot is, how to answer, how to restyle well         | fixed                      |
+| Page outline | the visible elements, compactly                              | 400 lines / 16k characters |
+| Page CSS     | the page's CSS variables, and the picked element's own rules | 4k + 8k characters         |
+| Stylesheet   | the site's current Stylebot CSS                              | whole                      |
 
-**Keys never leave the background.** The editor only learns, for each provider, whether it is connected, its model and a masked copy of its key. Connecting rejects a key with another provider's prefix before any request, then checks the key with the provider before storing it.
+### The outline
 
-## Several providers
+An excerpt from Hacker News's front page, as the model reads it. A bare `…` marks lines cut for this page; `… ×N more` is the outline's own folding:
 
-Any number of providers can be connected at once, from the Providers screen. Replies come from the provider whose model was last picked in the model menu, which lists the current provider's models and opens the others' in place. Adding a key doesn't change which provider replies unless none was connected; removing the key of the one in use moves replies to another connected provider, and removing the last key turns Chat off.
+```text
+(page) [color #828282, font 13.3px]
+center
+  table#hnmain[bgcolor="#f6f6ef"] [font 16px]
+    tbody
+      tr [pad 0, margin 0, h 24px]
+        td[bgcolor="#ff6600"] [font 13.3px]
+          …
+                  span.pagetop "| | | | | |" [color #222222]
+                    b.hnname
+                      a "Hacker News" [color #000000]
+                    a "new" [color #000000]
+                    a "past" [color #000000]
+                    … ×5 more
+      …
+              tr#49949235.athing.submission [pad 0, margin 0, h 19px]
+                td.title [font 13.3px]
+                  span.rank "1."
+                …
+              tr [pad 0, margin 0, h 11px]
+                td [font 13.3px]
+                td.subtext [font 9.3px]
+                  span.subline "by | |"
+                    span#score_49949235.score "242 points"
+                    …
+              tr.spacer [pad 0, margin 0, h 5px]
+              tr#49949438.athing.submission
+                …
+              … ×84 more
+              tr.morespace
+      …
+          center
+            span.yclinks "| | | | | | |" [font 10.7px]
+              a "Guidelines" [color #000000]
+              a "FAQ" [color #000000]
+              … ×6 more
+            form "Search:"
+              input [bg #ffffff, color #000000]
+```
 
-## A reply
+Each choice answers a failure seen in the eval:
 
-1. **The editor builds the prompt**, since it has the page at hand: what Stylebot is and how to answer, a compact outline of the page's visible elements (repeated rows folded, so a long list doesn't crowd out what comes after it), the page's CSS variables (its base palette first, when a design system defines thousands), the rules for the picked element if one is picked, and the site's current Stylebot stylesheet.
-2. **The background streams the reply** over a port: it adds the key and model, calls the provider, and forwards each event. Closing the port (Stop, New chat, the editor closing) aborts the request; an open port keeps the service worker alive for the length of the reply.
-3. **The model answers in prose and one tool call.** The tool takes a list of selectors, each with property and value pairs, under a strict schema. Asking for structured edits instead of free CSS is what makes each reply exactly undoable.
-4. **The edits are applied like any other edit**: live on the page, saved, and one step on the editor's undo trail. A Google Fonts import is added for any font family the model picks.
+| Technique                                                                                                       | Example above                                                                           | Why                                                                                                                   |
+| :-------------------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------- |
+| Visible elements only; scripts, styles and the insides of `svg`, `iframe`, `video` skipped                      | —                                                                                       | page structure, not page code                                                                                         |
+| Anonymous wrappers flattened                                                                                    | a `div` with no id, class or text isn't listed; its children are                        | depth without information                                                                                             |
+| Tag, id, up to 4 short classes, 40 characters of own text                                                       | `span.rank "1."`                                                                        | enough to write a selector and recognise the element                                                                  |
+| Looks only where they differ from the parent                                                                    | `td.subtext [font 9.3px]`, the white search `input`                                     | the brackets point at what a request must change                                                                      |
+| `(page)` base line                                                                                              | first line                                                                              | what elements without their own `bg` show                                                                             |
+| `bgcolor` attribute                                                                                             | `td[bgcolor="#ff6600"]`                                                                 | HN's orange header has no class; this is its only selector. It is the element's background, so no `bg` repeats it     |
+| **Repeats folded**, even when they alternate                                                                    | stories are three rows (title, subtext, spacer); after two of each, `… ×84 more`        | an unfolded list ran out of budget at story 11, and the footer never reached the model                                |
+| Kind of row includes its first children                                                                         | the subtext row (`td, td.subtext`) folds with its kind; `tr.morespace` after it doesn't | plain `tr`s holding different things stay distinct                                                                    |
+| Named ids never fold; numbered ones do                                                                          | `tr#49949235.athing` and `tr#49949438.athing` count as one kind                         | numbered ids mark list items                                                                                          |
+| **Spacing on the first repeated item**: padding, margin, line-height ratio, height; containers show their `gap` | `[pad 0, margin 0, h 19px]`; inline runs like the nav links get none                    | without it, "make it compact" guessed padding and made rows taller; zero is spelled out so it doesn't read as unknown |
 
-A failed reply keeps the user's message and offers to send it again with the same picked element and image.
+### The page's CSS variables
+
+Many sites define their palette as variables, and overriding one recolors everything that uses it, states included. The prompt lists the variables set on `html` and `body`, colors first, as rules the model can override.
+
+Design systems define thousands (GitHub's Primer, Discourse), far more than fit. So color variables are ranked:
+
+```text
+GitHub, the first four before:              GitHub, the first four now:
+--button-danger-shadow-selected: inset …    --fgColor-default: #1f2328
+--diffBlob-hunkNum-bgColor-rest: #b6e3ff    --bgColor-default: #fff
+--label-brown-fgColor-hover: #64513a        --bgColor-accent-emphasis: #0969da
+--display-pink-scale-5: #ce2c85             --fgColor-link: #0969da
+```
+
+| Signal                                                                              | Effect                                    |
+| :---------------------------------------------------------------------------------- | :---------------------------------------- |
+| Its color is one the page shows a lot (sampled backgrounds, text, borders)          | up                                        |
+| Short name naming a role: `bg`, `fg`, `text`, `border`, `link`, `accent`, `surface` | up                                        |
+| Base words: `default`, `base`, `primary`, `muted`                                   | up                                        |
+| Component or scale names (`button`, `badge`, `scale`, digits)                       | down                                      |
+| More than 3 names for the same color                                                | the rest wait until every color has had 3 |
+
+The last rule matters on Discourse: ranking alone filled the list with dozens of names for its white, and dropped the precomputed shades its numbers, borders and banner use, so a theme left them light.
+
+### The picked element
+
+With an element picked, the message names its selector, and the page CSS adds the site's own rules for it (up to five matching elements; cross-origin stylesheets are counted, not read). The model can match their specificity and build on their values.
 
 ## Undo and Reapply
 
-Applying a reply records, for every declaration it set, the value it replaced or that there was none. Undo puts exactly those back, and drops imports of fonts no longer used. Only the latest reply can be undone from the chat, since later replies may build on earlier ones. When the thread is sent again, each reply's edits are replayed as its tool call, with a result saying whether they are still applied, so the model knows what the page looks like now.
+| Step                 | Recorded                                                                                |
+| :------------------- | :-------------------------------------------------------------------------------------- |
+| Apply                | for every declaration set, the value it replaced or that there was none                 |
+| Undo                 | puts exactly those back, and drops imports of fonts no longer used                      |
+| Replaying the thread | each reply's edits as its tool call, with a result saying whether they're still applied |
 
-## Context from the user
+Only the latest reply can be undone from the chat, since later replies may build on earlier ones. A failed reply keeps your message and offers to send it again with the same picked element and image.
 
-- **A picked element.** The inspector works in Chat. A message sent with an element picked is about that element: its selector is named in the prompt and its page rules are included.
-- **An image.** A screenshot can be pasted, an image dropped or picked from disk. It is scaled down to what the models read in detail and kept as PNG unless that gets large. No capture permission is needed.
+## Context you add
 
-## Cost
+- **A picked element**: the inspector works in Chat; the message is about that element.
+- **An image**: paste a screenshot, drop or pick a file. It's scaled to what models read in detail, kept as PNG unless that gets large. No capture permission is needed.
 
-Providers report tokens, not money, and prices change, so the Chat tab shows no cost. The API key screen links to the provider's own usage page.
+## Providers and keys
 
-## Evaluating prompt changes
+Claude, OpenAI and Gemini, each behind one small adapter: check that a key works, stream one reply, and translate between Stylebot's provider-neutral thread and the API's format. Requests go straight from the browser over `fetch` and server-sent events, with no SDKs and no new host permissions. Adding a provider means one adapter and its model list.
 
-Unit tests show the plumbing works, not that replies got better. `yarn eval:chat` measures that: it runs a set of styling requests, listed beside the script, against recorded copies of real pages, once for a base version of Stylebot (`v4` by default) and once for the working tree, and compares them.
+| Where | Key                       | What                                         |
+| :---- | :------------------------ | :------------------------------------------- |
+| local | `chat-provider`           | the provider replies come from               |
+| local | `chat-api-key-<provider>` | that provider's key                          |
+| local | `chat-model-<provider>`   | the model picked for that provider           |
+| local | `chat-thread-<site>`      | the site's conversation, its latest 50 turns |
 
-Each version's own prompt and page-reading code is built from its checkout, so the comparison is of what each would ship. Model calls go through headless Claude Code, billed to the signed-in Claude subscription rather than an API key, with the reply returned in the same shape as the tool call. Where a version checks its own edits and fixes what the check finds, the run does the same.
+- One entry per value, so every write is a single set or remove. None of it syncs, and content scripts never receive it.
+- **Keys never leave the background.** The editor sees, per provider, whether it's connected, its model and a masked key. A key with another provider's prefix is rejected before any request; others are checked with the provider before they're stored.
+- Several providers can be connected. Replies come from the one whose model was picked last; removing its key moves replies to another, and removing the last turns Chat off.
+- Providers report tokens, not money, and prices change, so Chat shows no cost; the key screen links to each provider's usage page.
 
-A stronger model grades each result from before and after screenshots: whether the request was done, how polished and how pleasing it looks, and the defects it sees. It also compares the two versions' results side by side, shown in a random order, which is steadier than their scores. Once Chat has a page check, the same check, run against the original page, also counts the text each result left hard to read, the surfaces a theme missed and the declarations the page overrode. A summary table is written to a timestamped results folder, beside each case's screenshots, conversation and stylesheet.
+## Evaluating changes
 
-- `--base <ref>` / `--head <ref>`: the versions to compare; `.` is the working tree.
-- `--model haiku`, `--judge opus`: the model replying and the one grading.
-- `--cases a,b`, `--tags theme,layout`, `--runs 3`: a subset by name or by kind of request (theme, readability, typography, layout, hide, taste), and how many times to run each, since replies vary.
-- `--record`: records the pages again; otherwise each is recorded once and reused.
-- `--concurrency 6`: how many cases run at once.
-- `--fresh`: runs everything again instead of reusing cached results.
+Unit tests show the plumbing works, not that replies got better. `yarn eval:chat` measures that.
 
-Results are cached by what produced them: the code each version runs, the case and run number, the models, and the harness. Rerunning against an unchanged base, or after a change that leaves one version's code alone, only runs what changed, and a side-by-side verdict is reused while both of its results are. Haiku is called without extended thinking, as the extension calls it.
+```mermaid
+flowchart LR
+    C[Cases: request + recorded page] --> B[Base version]
+    C --> H[Head version]
+    B --> R1[Reply, applied]
+    H --> R2[Reply, applied]
+    R1 --> J[Judge: before/after screenshots]
+    R2 --> J
+    R1 --> S[Side by side, random order]
+    R2 --> S
+    J --> T[summary.md]
+    S --> T
+```
 
-It costs subscription usage and takes minutes, so it isn't part of CI. While iterating, run a subset with one run and `--judge sonnet`; before merging a change to the prompt, the page outline or the page check, run every case with `--runs 3`.
+- **Both versions are built from their own checkout**, so it compares what each would ship. Pages are recorded once and replayed, so both style the same page.
+- **Model calls go through headless Claude Code** on the signed-in subscription, not an API key. Haiku runs without extended thinking, as the extension calls it.
+- **Results are cached by the code that produced them**: a rerun against an unchanged base only runs what changed. A full cold run takes about six minutes.
+
+### Scores
+
+| Score                | Asks                                                                                                                                                |
+| :------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **done** (1–5)       | how fully the result does what was asked; a named theme must use that theme's palette across the whole page                                         |
+| **looks** (1–5)      | polish and readability: no unreadable text, no leftover surfaces in the old colors, nothing broken                                                  |
+| **aesthetics** (1–5) | pleasing to a careful designer, apart from defects: colors that belong together, clear hierarchy, consistent spacing, restraint                     |
+| **preferred**        | which version's result the judge would ship, compared side by side; steadier than the scores, which swing about half a point between identical runs |
+| defects              | each visible problem, one line, naming where it is                                                                                                  |
+
+Once Chat checks its own edits, that check also counts what each result left hard to read, the surfaces a theme missed, and declarations the page overrode.
+
+### Cases
+
+| Site                            | Request                                                                                    | Tags                    |
+| :------------------------------ | :----------------------------------------------------------------------------------------- | :---------------------- |
+| Hacker News                     | "Make this page a Gruvbox dark theme"                                                      | theme                   |
+| Hacker News                     | "Make it easier to read"                                                                   | readability             |
+| Hacker News, a story            | "Make this page a Gruvbox dark theme"                                                      | theme                   |
+| Hacker News, story → front page | "Make this page a Gruvbox dark theme" → "apply the same theme to this page"                | theme, multi-page       |
+| Wikipedia                       | "Give this page a Nord theme"                                                              | theme                   |
+| Wikipedia                       | "Make it easier to read"                                                                   | readability             |
+| MDN                             | "Make it dark"                                                                             | theme                   |
+| GitHub                          | "Give this page a Dracula theme"                                                           | theme, variables        |
+| Discourse (Python forum)        | "Use the Catppuccin Mocha theme"                                                           | theme, variables        |
+| GOV.UK                          | "Make it dark"                                                                             | theme                   |
+| Paul Graham's essays            | "Make this essay pleasant to read"                                                         | readability, typography |
+| Dan Luu's blog                  | "Give this a typography makeover with a nice serif font"                                   | typography              |
+| Python docs                     | "Make the code examples stand out and easier to read"                                      | readability             |
+| Lobsters                        | "Make it more compact so more stories fit on screen"                                       | layout                  |
+| React docs                      | "Hide the sidebar and let the content use the space"                                       | layout, hide            |
+| BBC News                        | "Remove the ads and clutter"                                                               | hide                    |
+| arXiv                           | "Make it look modern"                                                                      | taste                   |
+| A store (Books to Scrape)       | "Make the products look like a modern store: cards with rounded corners and a soft shadow" | taste, layout           |
+| NPR, text edition               | "Make it look like a printed newspaper"                                                    | taste, typography       |
+
+Pick a subset by tag or name. Reddit and Stack Overflow block headless browsers, and some news sites cover the page with a consent dialog, so check a new site loads before adding it.
+
+### What it has caught
+
+**Repeated rows folded** — "apply the same theme to this page" on Hacker News. Before, the outline stopped at story 11, so the story list was left a bright orange slab:
+
+![Hacker News themed Gruvbox: before, the story list stays orange; after, it's dark with cream titles](images/chat-eval-hn-same-theme.webp)
+
+**Variables ranked and spread** — "Give this page a Dracula theme" on GitHub. Before, file names and tabs went dark on dark:
+
+![GitHub themed Dracula: before, file names and tabs are invisible; after, every surface is readable](images/chat-eval-github-dracula.webp)
+
+**Spacing in the outline** — "Make it more compact" on Lobsters. Before, guessed padding made the list taller; after, it's about 30% denser with the footer in view:
+
+![Lobsters made compact: before, the list grows past the screen; after, all stories and the footer fit](images/chat-eval-lobsters-compact.webp)
+
+### Running it
+
+| Flag                  | Default          |                                                  |
+| :-------------------- | :--------------- | :----------------------------------------------- |
+| `--base` / `--head`   | `v4` / `.`       | the versions to compare; `.` is the working tree |
+| `--model` / `--judge` | `haiku` / `opus` | the model replying and the one grading           |
+| `--cases` / `--tags`  | all              | a subset by name, or by tag                      |
+| `--runs`              | 1                | runs per case, since replies vary                |
+| `--concurrency`       | 6                | cases at once                                    |
+| `--record`            | off              | record the pages again                           |
+| `--fresh`             | off              | ignore cached results                            |
+
+While iterating, run a subset once with `--judge sonnet` against the previous commit. Before merging a change to the prompt, the outline or the page context, run every case with `--runs 3` against `v4`, and put the overall row and the side-by-side tally in the PR.
