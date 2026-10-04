@@ -27,9 +27,7 @@ import type {
 import { PageBridgeEmitter } from './PageBridgeEmitter';
 import { getPageColors } from './page-colors';
 import { getComputedStyles } from './computed-styles';
-import { getPageOutline } from './page-outline';
-import { countMatches } from './count-matches';
-import { getPageCssContext } from './page-css';
+import { countMatches, getPageCssContext, getPageOutline } from './chat';
 import { getAppliedDeclarations } from './applied-declarations';
 import type { AppliedDeclaration } from './applied-declarations';
 import { getPageDeclarations } from './page-declarations';
