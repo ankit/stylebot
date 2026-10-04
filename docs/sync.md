@@ -12,6 +12,7 @@ Keeps a user's styles the same on every browser they sign in to, using a single 
 | local | `google-drive-sync-enabled`        | the user's setting; kept apart from the state so it is cheap to read and never contends with a run's write                                                                                |
 | local | `google-drive-access-token`        | the cached token and its expiry                                                                                                                                                           |
 | local | `google-drive-sync-needs-auth`     | set by a scheduled run that could not get a token silently                                                                                                                                |
+| local | `google-drive-refresh-token`       | Safari only: the refresh token that keeps runs silent; removed on disconnect                                                                                                              |
 
 The base is a second copy of the style map: the one both sides agreed on at the end of the last sync. Storage is not a concern — the extension declares `unlimitedStorage` — and it is only ever read by a run.
 
@@ -51,3 +52,13 @@ A fork needs its own client:
 2. Under **OAuth consent screen**, choose Internal (local use, or within an organisation) or External (a published fork), and add the scope `https://www.googleapis.com/auth/drive.file`.
 3. Under **Credentials**, create an **OAuth client ID** of type Web application, with `https://<your extension id>.chromiumapp.org/` as an authorised redirect URI — `chrome.identity.getRedirectURL()` returns it.
 4. Replace the `CLIENT_ID` constant in the sync code with your client ID.
+
+## Safari
+
+Safari has no identity API, so there is no browser-run sign-in window and no silent re-authorization. Sign-in instead runs in an ordinary tab, against a separate **Desktop app** OAuth client in the same Cloud project — Drive only shows a client the files its own project created, so it has to be the same project.
+
+1. The tab opens Google's consent page with PKCE, asking for offline access.
+2. Google redirects to a loopback address, the only kind a Desktop client accepts. A redirect rule the extension adds for the sign-in sends that address to an extension page before anything loads; the page hands the code to the background, which closes the tab and returns to the one the user started from. The sign-in in progress is kept in storage rather than memory, since Safari may unload the background while the user is on Google's page; whichever background receives the code finishes it, and a second sync brings the open sign-in tab forward instead of opening another.
+3. The code is exchanged for an access token and a refresh token. The refresh token is kept, so scheduled runs get new access tokens without the user; when Google stops honouring it, the next interactive sync signs in again.
+
+Google treats a Desktop client's secret as public, since it ships inside the extension, but it is kept out of the repository: Safari builds read it from `STYLEBOT_GOOGLE_CLIENT_SECRET` at build time.

@@ -1,5 +1,11 @@
 // Code from https://github.com/mdn/webextensions-examples/tree/master/google-userinfo
 import { syncError } from '../errors';
+import {
+  DESKTOP_CLIENT_ID,
+  refreshAccessToken,
+  signInInTab,
+  usesTabSignIn,
+} from './tab-sign-in';
 
 export type AccessToken = string;
 
@@ -7,6 +13,8 @@ const CLIENT_ID =
   '662998053209-s49tq55ic3td87m08gi8vpjqm5t7r9st.apps.googleusercontent.com';
 
 const CACHE_KEY = 'google-drive-access-token';
+
+const SCOPES = ['https://www.googleapis.com/auth/drive.file'];
 
 // Retire the token a minute early so a sync started just under the wire does
 // not fail halfway through with a 401.
@@ -70,7 +78,10 @@ const extractTokenParams = (redirectUri: string) => {
  * Note that the Google page talks about an "audience" property, but in fact
  * it seems to be "aud".
  */
-const validate = async (token: AccessToken): Promise<void> => {
+const validate = async (
+  token: AccessToken,
+  clientId: string
+): Promise<void> => {
   const validationBaseURL = 'https://www.googleapis.com/oauth2/v3/tokeninfo';
   const response = await fetch(`${validationBaseURL}?access_token=${token}`, {
     method: 'GET',
@@ -82,7 +93,7 @@ const validate = async (token: AccessToken): Promise<void> => {
 
   const json: { aud?: string } = await response.json();
 
-  if (json.aud !== CLIENT_ID) {
+  if (json.aud !== clientId) {
     throw syncError('Token validation error', 'auth');
   }
 };
@@ -94,13 +105,12 @@ const validate = async (token: AccessToken): Promise<void> => {
 const authorize = (interactive: boolean): Promise<string | undefined> => {
   return new Promise((resolve, reject) => {
     const redirectURL = chrome.identity.getRedirectURL();
-    const scopes = ['https://www.googleapis.com/auth/drive.file'];
 
     let authURL = 'https://accounts.google.com/o/oauth2/auth';
     authURL += `?client_id=${CLIENT_ID}`;
     authURL += `&response_type=token`;
     authURL += `&redirect_uri=${encodeURIComponent(redirectURL)}`;
-    authURL += `&scope=${encodeURIComponent(scopes.join(' '))}`;
+    authURL += `&scope=${encodeURIComponent(SCOPES.join(' '))}`;
 
     chrome.identity.launchWebAuthFlow(
       { interactive, url: authURL },
@@ -132,10 +142,31 @@ const authorizeAndCache = async (
     throw syncError('Authorization failure', 'auth');
   }
 
-  await validate(params.token);
+  await validate(params.token, CLIENT_ID);
   await setCachedToken(params.token, params.expiresIn);
 
   return params.token;
+};
+
+/**
+ * Where there's no identity API: a stored refresh token keeps scheduled runs
+ * silent, and only an interactive run opens a sign-in tab.
+ */
+const getTabSignInToken = async (
+  interactive: boolean
+): Promise<AccessToken> => {
+  const issued =
+    (await refreshAccessToken()) ??
+    (interactive ? await signInInTab(SCOPES) : null);
+
+  if (!issued) {
+    throw syncError('Sign-in needed', 'auth');
+  }
+
+  await validate(issued.token, DESKTOP_CLIENT_ID);
+  await setCachedToken(issued.token, issued.expiresIn);
+
+  return issued.token;
 };
 
 /**
@@ -149,6 +180,10 @@ export default async (
 
   if (cached) {
     return cached;
+  }
+
+  if (usesTabSignIn()) {
+    return getTabSignInToken(interactive);
   }
 
   try {

@@ -5,6 +5,8 @@ const SYNC_STATE_KEY = 'google-drive-sync-state';
 const LEGACY_METADATA_KEY = 'google-drive-sync';
 const ACCESS_TOKEN_KEY = 'google-drive-access-token';
 const NEEDS_AUTH_KEY = 'google-drive-sync-needs-auth';
+const REFRESH_TOKEN_KEY = 'google-drive-refresh-token';
+const SIGN_IN_KEY = 'google-drive-sign-in';
 
 export const getSyncState = async (): Promise<SyncState | undefined> => {
   const items = await chrome.storage.local.get(SYNC_STATE_KEY);
@@ -22,6 +24,8 @@ export const clearSyncState = (): Promise<void> =>
     LEGACY_METADATA_KEY,
     ACCESS_TOKEN_KEY,
     NEEDS_AUTH_KEY,
+    REFRESH_TOKEN_KEY,
+    SIGN_IN_KEY,
   ]);
 
 /**

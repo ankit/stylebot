@@ -50,6 +50,7 @@ import type {
   GetGoogleWebFontExists as GetGoogleWebFontExistsType,
   GetGoogleFontFile as GetGoogleFontFileType,
   RunGoogleDriveSync as RunGoogleDriveSyncType,
+  GoogleSignInRedirect as GoogleSignInRedirectType,
   ScanVersionHistory as ScanVersionHistoryType,
   RestoreVersion as RestoreVersionType,
   AddRecentColor as AddRecentColorType,
@@ -84,7 +85,7 @@ import type {
   ChatConnectResponse,
   ChatGetThreadResponse,
 } from '@stylebot/types';
-import { runGoogleDriveSync } from '@stylebot/sync';
+import { runGoogleDriveSync, completeTabSignIn } from '@stylebot/sync';
 
 import { scanVersionHistory, restoreVersion } from '@stylebot/history';
 
@@ -359,6 +360,19 @@ export const GetGoogleFontFile = async (
   sendResponse: (response: GetGoogleFontFileResponse) => void
 ): Promise<void> => {
   sendResponse(await getGoogleFontFile(message.url));
+};
+
+/**
+ * Finishes a tab sign-in, then syncs: the run that opened the tab may have
+ * gone with a background Safari unloaded while the user was on Google's page.
+ */
+export const GoogleSignInRedirect = async (
+  message: GoogleSignInRedirectType,
+  sender: chrome.runtime.MessageSender
+): Promise<void> => {
+  if (await completeTabSignIn(message.url, sender.tab?.id)) {
+    runGoogleDriveSync(styleStorage, { interactive: false });
+  }
 };
 
 export const RunGoogleDriveSync = async (

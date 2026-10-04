@@ -154,6 +154,12 @@ export type RunGoogleDriveSync = {
   name: 'RunGoogleDriveSync';
 };
 
+// Sent by the page Google's sign-in redirects to where there's no identity API.
+export type GoogleSignInRedirect = {
+  name: 'GoogleSignInRedirect';
+  url: string;
+};
+
 export type ScanVersionHistory = {
   name: 'ScanVersionHistory';
   // Absent asks for every version held.
@@ -271,6 +277,7 @@ type BackgroundPageMessage =
   | GetGoogleWebFontExists
   | GetGoogleFontFile
   | RunGoogleDriveSync
+  | GoogleSignInRedirect
   | ScanVersionHistory
   | RestoreVersion
   | GetRecentColors
