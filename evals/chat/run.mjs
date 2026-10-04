@@ -107,7 +107,10 @@ const pageCssFor = css => {
 
   root.walkDecls(decl => {
     decl.important = true;
-    if (decl.prop === 'font-family') {
+    if (
+      decl.prop === 'font-family' ||
+      (decl.prop.startsWith('--') && /font|family|typeface/i.test(decl.prop))
+    ) {
       const family = decl.value.split(',')[0].trim().replace(/['"]/g, '');
       if (
         family &&

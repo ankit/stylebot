@@ -170,6 +170,12 @@ describe('webfont', () => {
       expect(output).toBe(css);
     });
 
+    it('keeps the @import of a font set through a font variable', () => {
+      const css = `@import url(${fontUrl});\n\n:root { --fontStack-sansSerif: Muli; }`;
+
+      expect(cleanGoogleWebFonts(css)).toBe(css);
+    });
+
     it('keeps an import saved with an older weight list', () => {
       const css = `@import url(${legacyFontUrl});\n\na { font-family: Muli; }`;
 

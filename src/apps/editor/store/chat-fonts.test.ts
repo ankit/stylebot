@@ -23,6 +23,20 @@ describe('addFontImports', () => {
     );
   });
 
+  it('imports a Google font set through a font variable', async () => {
+    const css = ':root { --fontStack-sansSerif: Inter; }';
+    const edits = [
+      {
+        selector: ':root',
+        declarations: [{ property: '--fontStack-sansSerif', value: 'Inter' }],
+      },
+    ];
+
+    expect(await addFontImports(css, edits)).toContain(
+      '@import url(https://fonts.googleapis.com/css2?family=Inter:'
+    );
+  });
+
   it('leaves the css alone for fonts that are not on Google Fonts', async () => {
     const css = 'h1 { font-family: Georgia; }';
 

@@ -59,3 +59,12 @@ export const replaceToken = (
  */
 export const getPrimaryFontFamily = (value: string): string =>
   getTokenAtCaret(value, 0).value;
+
+/**
+ * Whether a declaration names a font: `font-family`, or a custom property
+ * holding one (GitHub's `--fontStack-sansSerif`), which is how a font change
+ * reaches components that set their own.
+ */
+export const isFontFamilyProperty = (property: string): boolean =>
+  property === 'font-family' ||
+  (property.startsWith('--') && /font|family|typeface/i.test(property));
