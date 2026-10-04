@@ -150,10 +150,6 @@ export default Vue.extend({
     background: var(--hover-tint);
   }
 
-  &.checked {
-    background: var(--field-surface-hover);
-  }
-
   &:disabled {
     cursor: default;
     opacity: 0.5;
