@@ -1,0 +1,196 @@
+[
+  {
+    "id": "hn-front-gruvbox",
+    "tags": ["theme"],
+    "steps": [
+      {
+        "url": "https://news.ycombinator.com/news",
+        "text": "Make this page a Gruvbox dark theme"
+      }
+    ]
+  },
+  {
+    "id": "hn-front-readable",
+    "tags": ["readability"],
+    "steps": [
+      {
+        "url": "https://news.ycombinator.com/news",
+        "text": "Make it easier to read"
+      }
+    ]
+  },
+  {
+    "id": "hn-item-gruvbox",
+    "tags": ["theme"],
+    "steps": [
+      {
+        "url": "https://news.ycombinator.com/item?id=8863",
+        "text": "Make this page a Gruvbox dark theme"
+      }
+    ]
+  },
+  {
+    "id": "hn-same-theme-other-page",
+    "tags": ["theme", "multi-page"],
+    "steps": [
+      {
+        "url": "https://news.ycombinator.com/item?id=8863",
+        "text": "Make this page a Gruvbox dark theme"
+      },
+      {
+        "url": "https://news.ycombinator.com/news",
+        "text": "apply the same theme to this page"
+      }
+    ]
+  },
+  {
+    "id": "wikipedia-nord",
+    "tags": ["theme"],
+    "steps": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Typography",
+        "text": "Give this page a Nord theme"
+      }
+    ]
+  },
+  {
+    "id": "wikipedia-readable",
+    "tags": ["readability"],
+    "steps": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Typography",
+        "text": "Make it easier to read"
+      }
+    ]
+  },
+  {
+    "id": "mdn-dark",
+    "tags": ["theme"],
+    "steps": [
+      {
+        "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/color",
+        "text": "Make it dark"
+      }
+    ]
+  },
+  {
+    "id": "github-dracula",
+    "tags": ["theme", "variables"],
+    "steps": [
+      {
+        "url": "https://github.com/sindresorhus/awesome",
+        "text": "Give this page a Dracula theme"
+      }
+    ]
+  },
+  {
+    "id": "discourse-catppuccin",
+    "tags": ["theme", "variables"],
+    "steps": [
+      {
+        "url": "https://discuss.python.org/latest",
+        "text": "Use the Catppuccin Mocha theme"
+      }
+    ]
+  },
+  {
+    "id": "govuk-dark",
+    "tags": ["theme"],
+    "steps": [
+      {
+        "url": "https://www.gov.uk/browse/benefits",
+        "text": "Make it dark"
+      }
+    ]
+  },
+  {
+    "id": "paulgraham-readable",
+    "tags": ["readability", "typography"],
+    "steps": [
+      {
+        "url": "http://paulgraham.com/greatwork.html",
+        "text": "Make this essay pleasant to read"
+      }
+    ]
+  },
+  {
+    "id": "danluu-serif",
+    "tags": ["typography"],
+    "steps": [
+      {
+        "url": "https://danluu.com/",
+        "text": "Give this a typography makeover with a nice serif font"
+      }
+    ]
+  },
+  {
+    "id": "python-docs-code",
+    "tags": ["readability"],
+    "steps": [
+      {
+        "url": "https://docs.python.org/3/library/functions.html",
+        "text": "Make the code examples stand out and easier to read"
+      }
+    ]
+  },
+  {
+    "id": "lobsters-compact",
+    "tags": ["layout"],
+    "steps": [
+      {
+        "url": "https://lobste.rs/",
+        "text": "Make it more compact so more stories fit on screen"
+      }
+    ]
+  },
+  {
+    "id": "react-hide-sidebar",
+    "tags": ["layout", "hide"],
+    "steps": [
+      {
+        "url": "https://react.dev/learn",
+        "text": "Hide the sidebar and let the content use the space"
+      }
+    ]
+  },
+  {
+    "id": "bbc-declutter",
+    "tags": ["hide"],
+    "steps": [
+      {
+        "url": "https://www.bbc.com/news",
+        "text": "Remove the ads and clutter"
+      }
+    ]
+  },
+  {
+    "id": "arxiv-modern",
+    "tags": ["taste"],
+    "steps": [
+      {
+        "url": "https://arxiv.org/abs/1706.03762",
+        "text": "Make it look modern"
+      }
+    ]
+  },
+  {
+    "id": "books-store-cards",
+    "tags": ["taste", "layout"],
+    "steps": [
+      {
+        "url": "https://books.toscrape.com/",
+        "text": "Make the products look like a modern store: cards with rounded corners and a soft shadow"
+      }
+    ]
+  },
+  {
+    "id": "npr-newspaper",
+    "tags": ["taste", "typography"],
+    "steps": [
+      {
+        "url": "https://text.npr.org/",
+        "text": "Make it look like a printed newspaper"
+      }
+    ]
+  }
+]

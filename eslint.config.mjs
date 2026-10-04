@@ -23,6 +23,9 @@ export default tseslint.config(
       '.edge-dev-profile*',
       '.history',
       '.claude',
+      'evals/chat/.cache',
+      'evals/chat/pages',
+      'evals/chat/results',
 
       // Separate Gatsby project with its own toolchain.
       'site',
@@ -185,7 +188,7 @@ export default tseslint.config(
 
   {
     // createRequire() is the ESM-correct way to load these CommonJS helpers.
-    files: ['scripts/**/*.mjs'],
+    files: ['scripts/**/*.mjs', 'evals/**/*.mjs'],
     rules: { '@typescript-eslint/no-require-imports': 'off' },
   }
 );

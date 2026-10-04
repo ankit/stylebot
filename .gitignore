@@ -18,3 +18,6 @@ playwright-report
 storybook-static
 junit.xml
 .claude/worktrees
+evals/chat/.cache
+evals/chat/pages
+evals/chat/results
