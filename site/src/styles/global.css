@@ -453,6 +453,21 @@ a.icon-btn:hover {
   color: var(--ink);
 }
 
+.shot-image {
+  display: block;
+}
+
+.shot-image.is-dark,
+:root[data-theme='dark'] .shot-image.is-light,
+:root[data-theme='stylebot'] .shot-image.is-light {
+  display: none;
+}
+
+:root[data-theme='dark'] .shot-image.is-dark,
+:root[data-theme='stylebot'] .shot-image.is-dark {
+  display: block;
+}
+
 .prose figure {
   margin: 20px 0 24px;
   padding: 16px;

@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import ImageZoom from '../components/ImageZoom.astro';
 import Callout from '../components/manual/Callout.astro';
 import Keys from '../components/manual/Keys.astro';
 import Shot from '../components/manual/Shot.astro';
@@ -11,6 +12,10 @@ import basicShot from '../assets/manual/basic-editor.webp';
 import basicDarkShot from '../assets/manual/basic-editor-dark.webp';
 import popupProfilesShot from '../assets/manual/popup-profiles.png';
 import popupProfilesDarkShot from '../assets/manual/popup-profiles-dark.png';
+import syncShot from '../assets/manual/sync.png';
+import syncDarkShot from '../assets/manual/sync-dark.png';
+import historyShot from '../assets/manual/history.png';
+import historyDarkShot from '../assets/manual/history-dark.png';
 import readabilityShot from '../assets/manual/readability.webp';
 import readabilityDarkShot from '../assets/manual/readability-dark.webp';
 import { LINKS } from '../lib/links';
@@ -228,6 +233,11 @@ const shortcutGroups = [
 
         <section id="sync">
           <h2>Sync, backup and history</h2>
+          <Shot
+            label="Options, connected to Google Drive and synced"
+            src={syncShot}
+            dark={syncDarkShot}
+          />
           <Terms>
             <Term term="Google Drive sync">
               Connect Google Drive in Options. Your styles, including profiles,
@@ -248,6 +258,11 @@ const shortcutGroups = [
               sites or all of them.
             </Term>
           </Terms>
+          <Shot
+            label="Version history in Options, newest change first"
+            src={historyShot}
+            dark={historyDarkShot}
+          />
         </section>
 
         <section id="urls">
@@ -317,6 +332,7 @@ const shortcutGroups = [
       </main>
     </div>
   </div>
+  <ImageZoom />
 </Base>
 
 <script>
@@ -519,26 +535,11 @@ const shortcutGroups = [
   }
 
   .sections :global(.shot-image) {
-    display: block;
     max-width: 100%;
     height: auto;
     border-radius: 12px;
     border: 1px solid var(--border);
     box-shadow: 0 8px 24px rgba(25, 27, 31, 0.08);
-  }
-
-  .sections :global(.shot-image.is-dark) {
-    display: none;
-  }
-
-  :global([data-theme='dark']) .sections :global(.shot-image.is-light),
-  :global([data-theme='stylebot']) .sections :global(.shot-image.is-light) {
-    display: none;
-  }
-
-  :global([data-theme='dark']) .sections :global(.shot-image.is-dark),
-  :global([data-theme='stylebot']) .sections :global(.shot-image.is-dark) {
-    display: block;
   }
 
   .sections :global(.terms) {

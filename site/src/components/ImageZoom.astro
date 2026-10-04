@@ -1,0 +1,115 @@
+<dialog class="zoom" aria-label="Enlarged screenshot">
+  <img class="zoom-img" alt="" />
+  <button class="zoom-close" aria-label="Close">
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 14 14"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.6"
+      stroke-linecap="round"
+      aria-hidden="true"
+    >
+      <path d="M2.5 2.5l9 9M11.5 2.5l-9 9"></path>
+    </svg>
+  </button>
+</dialog>
+
+<script>
+  const dialog = document.querySelector<HTMLDialogElement>('.zoom')!;
+  const zoomed = dialog.querySelector<HTMLImageElement>('.zoom-img')!;
+
+  /**
+   * The sharpest source the image offers: its last `srcset` candidate, which
+   * Astro lists from 1x up.
+   */
+  function largest(img: HTMLImageElement) {
+    const last = img.srcset.split(',').pop()?.trim().split(/\s+/)[0];
+    return last || img.currentSrc || img.src;
+  }
+
+  function open(img: HTMLImageElement) {
+    zoomed.src = img.dataset.full || largest(img);
+    zoomed.alt = img.alt;
+    dialog.showModal();
+  }
+
+  document
+    .querySelectorAll<HTMLImageElement>('img.shot-image')
+    .forEach((img) => {
+      img.tabIndex = 0;
+      img.setAttribute('role', 'button');
+      img.addEventListener('click', () => open(img));
+      img.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault();
+        open(img);
+      });
+    });
+
+  dialog.addEventListener('click', () => dialog.close());
+</script>
+
+<style>
+  :global(img.shot-image) {
+    cursor: zoom-in;
+  }
+
+  .zoom {
+    width: 100vw;
+    height: 100vh;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 40px;
+    border: none;
+    background: transparent;
+    cursor: zoom-out;
+  }
+
+  .zoom[open] {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .zoom::backdrop {
+    background: rgba(12, 13, 16, 0.82);
+    backdrop-filter: blur(6px);
+  }
+
+  .zoom-img {
+    max-width: min(1400px, 100%);
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 10px;
+    filter: drop-shadow(0 24px 48px rgba(0, 0, 0, 0.5));
+  }
+
+  .zoom-close {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+    border: none;
+    background: rgba(255, 255, 255, 0.14);
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .zoom-close:hover {
+    background: rgba(255, 255, 255, 0.24);
+  }
+
+  @media (max-width: 600px) {
+    .zoom {
+      padding: 16px;
+    }
+  }
+</style>

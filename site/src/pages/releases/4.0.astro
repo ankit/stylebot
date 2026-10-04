@@ -1,0 +1,224 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import ImageZoom from '../../components/ImageZoom.astro';
+import { LINKS } from '../../lib/links';
+import { crisp } from '../../lib/screenshots';
+import agent from '../../assets/manual/agent-chat.png';
+import profiles from '../../assets/manual/popup-profiles.png';
+import agentDark from '../../assets/manual/agent-chat-dark.png';
+import profilesDark from '../../assets/manual/popup-profiles-dark.png';
+import editor from '../../assets/manual/editor-panel.png';
+import editorDark from '../../assets/manual/editor-panel-dark.png';
+import sync from '../../assets/manual/sync.png';
+import syncDark from '../../assets/manual/sync-dark.png';
+import position from '../../assets/manual/position-menu.png';
+import positionDark from '../../assets/manual/position-menu-dark.png';
+import history from '../../assets/manual/history.png';
+import historyDark from '../../assets/manual/history-dark.png';
+---
+
+<Base title="What's new in 4.0">
+  <main class="prose">
+    <h1>What's new in 4.0</h1>
+    <p class="lede">
+      A redesigned editor, an AI agent, profiles, and a side panel.
+    </p>
+    <nav class="release-toc" aria-label="Sections">
+      <a href="#editor">Redesigned editor</a>
+      <a href="#agent">Stylebot agent</a>
+      <a href="#profiles">Profiles</a>
+      <a href="#panel">Side panel</a>
+      <a href="#history">Version history</a>
+      <a href="#sync">Sync</a>
+      <a href="#more">And more</a>
+    </nav>
+
+    <h2 id="editor">A redesigned editor</h2>
+    <figure>
+      <Image
+        class="shot-image is-light"
+        src={editor}
+        height={560}
+        densities={[1, 2]}
+        {...crisp(editor)}
+        alt="The redesigned Basic tab, styling Hacker News with a Dracula profile"
+      />
+      <Image
+        class="shot-image is-dark"
+        src={editorDark}
+        height={560}
+        densities={[1, 2]}
+        {...crisp(editorDark)}
+        alt="The redesigned Basic tab, styling Hacker News with a Dracula profile"
+      />
+    </figure>
+    <p>Rebuilt from the ground up, now with dark mode.</p>
+    <ul>
+      <li>Grouped controls that show the page's own values</li>
+      <li>Color palettes and an eyedropper</li>
+      <li>400 Google Fonts</li>
+      <li>Edit any other CSS property in place under More properties</li>
+      <li>Undo and redo</li>
+    </ul>
+
+    <h2 id="agent">The Stylebot agent</h2>
+    <figure>
+      <Image
+        class="shot-image is-light"
+        src={agent}
+        height={400}
+        densities={[1, 2]}
+        {...crisp(agent)}
+        alt="The Chat tab after asking the agent for a calmer, Everforest-themed Google"
+      />
+      <Image
+        class="shot-image is-dark"
+        src={agentDark}
+        height={400}
+        densities={[1, 2]}
+        {...crisp(agentDark)}
+        alt="The Chat tab after asking the agent for a calmer, Everforest-themed Google"
+      />
+    </figure>
+    <p>Describe what you want in the Chat tab and the agent writes the CSS.</p>
+    <ul>
+      <li>Bring your own Claude, OpenAI or Gemini key</li>
+      <li>Point at an element or attach a screenshot</li>
+      <li>Undo any change</li>
+    </ul>
+
+    <h2 id="profiles">Profiles</h2>
+    <figure>
+      <Image
+        class="shot-image is-light"
+        src={profiles}
+        height={profiles.height / 2}
+        densities={[1, 2]}
+        {...crisp(profiles)}
+        alt="The popup on a site with two profiles, Dracula and Gruvbox"
+      />
+      <Image
+        class="shot-image is-dark"
+        src={profilesDark}
+        height={profilesDark.height / 2}
+        densities={[1, 2]}
+        {...crisp(profilesDark)}
+        alt="The popup on a site with two profiles, Dracula and Gruvbox"
+      />
+    </figure>
+    <p>
+      Keep several looks for a site and switch between them from the editor or
+      the popup.
+    </p>
+
+    <h2 id="panel">The side panel, or its own window</h2>
+    <figure>
+      <Image
+        class="shot-image is-light"
+        src={position}
+        height={position.height / 2}
+        densities={[1, 2]}
+        {...crisp(position)}
+        alt="The editor's menu, with Position set to the side panel"
+      />
+      <Image
+        class="shot-image is-dark"
+        src={positionDark}
+        height={positionDark.height / 2}
+        densities={[1, 2]}
+        {...crisp(positionDark)}
+        alt="The editor's menu, with Position set to the side panel"
+      />
+    </figure>
+    <p>
+      In Chrome and Edge the editor opens in the side panel. Or pop it out into
+      its own window, from <strong>Position</strong> in the editor's
+      <strong>⋯</strong> menu.
+    </p>
+
+    <h2 id="history">Version history</h2>
+    <figure>
+      <Image
+        class="shot-image is-light"
+        src={history}
+        width={history.width / 2}
+        densities={[1, 2]}
+        {...crisp(history)}
+        alt="Version history in Options, newest change first"
+      />
+      <Image
+        class="shot-image is-dark"
+        src={historyDark}
+        width={historyDark.width / 2}
+        densities={[1, 2]}
+        {...crisp(historyDark)}
+        alt="Version history in Options, newest change first"
+      />
+    </figure>
+    <p>Every change is kept, and you can restore any earlier version.</p>
+
+    <h2 id="sync">Sync</h2>
+    <figure>
+      <Image
+        class="shot-image is-light"
+        src={sync}
+        width={sync.width / 2}
+        densities={[1, 2]}
+        {...crisp(sync)}
+        alt="Options, connected to Google Drive and synced"
+      />
+      <Image
+        class="shot-image is-dark"
+        src={syncDark}
+        width={syncDark.width / 2}
+        densities={[1, 2]}
+        {...crisp(syncDark)}
+        alt="Options, connected to Google Drive and synced"
+      />
+    </figure>
+    <p>
+      Google Drive sync is more robust, and merges changes from different
+      computers instead of overwriting them.
+    </p>
+
+    <h2 id="more">And more</h2>
+    <ul>
+      <li>A new Stylebot icon</li>
+      <li>Change Stylebot's shortcuts in your browser's shortcut settings</li>
+      <li>Stylebot is now available in Vietnamese</li>
+    </ul>
+
+    <h2>
+      And lots of <a href={LINKS.changelog}>bug fixes</a>
+    </h2>
+  </main>
+  <ImageZoom />
+</Base>
+
+<style>
+  .release-toc {
+    margin: 20px 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .release-toc a {
+    padding: 7px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    font: 500 13.5px/1 var(--ui);
+    color: var(--ink2);
+  }
+
+  .release-toc a:hover {
+    background: var(--hover);
+    color: var(--ink);
+  }
+
+  h2[id] {
+    scroll-margin-top: 80px;
+  }
+</style>
