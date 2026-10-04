@@ -15,6 +15,21 @@ const { SRC_DIR, packageDirs } = require('./scripts/lib/src-packages');
 
 const isPreview = process.env.STYLEBOT_PREVIEW === '1';
 
+// Safari's Drive sign-in can't exchange codes without it, so a release
+// built without it would ship with sign-in broken.
+if (
+  process.env.BROWSER === 'safari' &&
+  !process.env.STYLEBOT_GOOGLE_CLIENT_SECRET
+) {
+  const message =
+    'STYLEBOT_GOOGLE_CLIENT_SECRET is not set; Google Drive sign-in will fail in this Safari build.';
+
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error(message);
+  }
+  console.warn(`Warning: ${message}`);
+}
+
 const getOutputPath = () => {
   if (isPreview) {
     return `${__dirname}/preview-dist`;
