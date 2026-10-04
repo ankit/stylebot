@@ -12,6 +12,20 @@ export const style = (url: string, enabled = true) => ({
 });
 
 /**
+ * A sync that succeeds, for stories with sync on, since the popup syncs
+ * as soon as it opens.
+ */
+export const syncSucceeds = {
+  ok: true as const,
+  metadata: {
+    id: 'drive-file-id',
+    modifiedTime: '2026-01-12T08:00:00Z',
+    webViewLink: 'https://drive.google.com/file/d/drive-file-id/view',
+    webContentLink: 'https://drive.google.com/uc?id=drive-file-id',
+  },
+};
+
+/**
  * A style with a Default profile and a Dark one, the first active.
  */
 export const profiledStyle = (url: string, enabled = true) => ({

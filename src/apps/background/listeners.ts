@@ -55,7 +55,11 @@ import { initChatPort } from './chat';
 import { refreshAllBadges, refreshBadgeForTab } from './styles';
 import * as styleStorage from './styles';
 import { get as getOption, pruneRetired } from './options';
-import { isSyncAlarm, updatePeriodicSync } from './sync-scheduler';
+import {
+  AWAY_SECONDS,
+  isSyncAlarm,
+  updatePeriodicSync,
+} from './sync-scheduler';
 import {
   runGoogleDriveSync,
   getGoogleDriveSyncEnabled,
@@ -99,6 +103,13 @@ export const initListeners = (): void => {
   // auth window; a run that needs one leaves a flag for the UI instead.
   chrome.alarms.onAlarm.addListener(alarm => {
     if (isSyncAlarm(alarm.name)) {
+      runGoogleDriveSync(styleStorage, { interactive: false });
+    }
+  });
+
+  chrome.idle.setDetectionInterval(AWAY_SECONDS);
+  chrome.idle.onStateChanged.addListener(async state => {
+    if (state === 'active' && (await getGoogleDriveSyncEnabled())) {
       runGoogleDriveSync(styleStorage, { interactive: false });
     }
   });

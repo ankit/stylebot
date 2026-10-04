@@ -45,14 +45,17 @@ const syncState = (
 };
 
 /**
- * Mounts the strip with the given sync state and clicks Sync now.
+ * Opens the strip with the given sync state, which starts a sync unless it
+ * needs a sign-in.
  */
-const mountAndSync = async (lastSyncedAt?: string) => {
-  syncState(lastSyncedAt);
+const openStrip = async (
+  lastSyncedAt?: string,
+  needsAuth = false,
+  errorKey: string | null = null
+) => {
+  syncState(lastSyncedAt, needsAuth, errorKey);
   const wrapper = mount(SyncStylebot);
   await flush();
-
-  await wrapper.find('.sync-button').trigger('click');
   return wrapper;
 };
 
@@ -64,18 +67,8 @@ describe('SyncStylebot.vue', () => {
     } as unknown as typeof chrome;
   });
 
-  it('shows when it last synced, without syncing on its own', async () => {
-    syncState('earlier');
-    const wrapper = mount(SyncStylebot);
-    await flush();
-
-    expect(wrapper.text()).toContain('synced_at_time');
-    expect(wrapper.text()).toContain('sync_now');
-    expect(sendMessage).not.toHaveBeenCalled();
-  });
-
-  it('syncs without an auth window when Sync now is clicked', async () => {
-    await mountAndSync('earlier');
+  it('syncs without an auth window as soon as it opens', async () => {
+    await openStrip('earlier');
 
     expect(sendMessage).toHaveBeenCalledWith(
       { name: 'RunGoogleDriveSync', interactive: false },
@@ -84,20 +77,20 @@ describe('SyncStylebot.vue', () => {
   });
 
   it('keeps the last sync time on screen while it syncs', async () => {
-    const wrapper = await mountAndSync('earlier');
+    const wrapper = await openStrip('earlier');
 
     expect(wrapper.text()).toContain('synced_at_time');
     expect(wrapper.find('.sync-button').attributes('disabled')).toBeDefined();
   });
 
   it('says it is syncing when it never has', async () => {
-    const wrapper = await mountAndSync(undefined);
+    const wrapper = await openStrip(undefined);
 
     expect(wrapper.text()).toContain('sync_in_progress');
   });
 
   it('reports success and tells the popup', async () => {
-    const wrapper = await mountAndSync('earlier');
+    const wrapper = await openStrip('earlier');
 
     syncState('now');
     respond({ ok: true, metadata });
@@ -108,8 +101,9 @@ describe('SyncStylebot.vue', () => {
   });
 
   it('shows a failure and lets the user retry', async () => {
-    const wrapper = await mountAndSync('earlier');
+    const wrapper = await openStrip('earlier');
 
+    syncState('earlier', false, 'sync_error_network');
     respond({ ok: false, errorKey: 'sync_error_network' });
     await flush();
 
@@ -120,11 +114,10 @@ describe('SyncStylebot.vue', () => {
     await wrapper.find('.sync-button').trigger('click');
 
     expect(sendMessage).toHaveBeenCalledTimes(2);
-    expect(wrapper.text()).not.toContain('couldnt_reach_google_drive');
   });
 
   it('treats a background that never answered as a failure', async () => {
-    const wrapper = await mountAndSync('earlier');
+    const wrapper = await openStrip('earlier');
 
     respond(undefined);
     await flush();
@@ -132,20 +125,24 @@ describe('SyncStylebot.vue', () => {
     expect(wrapper.text()).toContain('couldnt_sync');
   });
 
-  it('shows a failure from a sync that ran while the popup was closed', async () => {
-    syncState('earlier', false, 'sync_error_network');
-    const wrapper = mount(SyncStylebot);
+  it('keeps showing a failure from a closed popup while it tries again', async () => {
+    const wrapper = await openStrip('earlier', false, 'sync_error_network');
+
+    expect(sendMessage).toHaveBeenCalledTimes(1);
+    expect(wrapper.text()).toContain('couldnt_reach_google_drive');
+
+    syncState('now');
+    respond({ ok: true, metadata });
     await flush();
 
-    expect(wrapper.text()).toContain('couldnt_reach_google_drive');
-    expect(wrapper.text()).toContain('retry');
+    expect(wrapper.text()).not.toContain('couldnt_reach_google_drive');
+    expect(wrapper.text()).toContain('synced_at_time');
   });
 
-  it('points to the Sync tab when a sign-in is needed', async () => {
-    syncState('earlier', true);
-    const wrapper = mount(SyncStylebot);
-    await flush();
+  it('points to the Sync tab when a sign-in is needed, without syncing', async () => {
+    const wrapper = await openStrip('earlier', true);
 
+    expect(sendMessage).not.toHaveBeenCalled();
     expect(wrapper.text()).toContain('sign_in_to_keep_syncing');
 
     await wrapper.find('.sync-button').trigger('click');
@@ -154,7 +151,7 @@ describe('SyncStylebot.vue', () => {
   });
 
   it('switches to the sign-in prompt when a sync finds it needs one', async () => {
-    const wrapper = await mountAndSync('earlier');
+    const wrapper = await openStrip('earlier');
 
     syncState('earlier', true);
     respond({ ok: false, errorKey: 'sync_error_auth' });
