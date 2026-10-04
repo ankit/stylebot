@@ -17,7 +17,7 @@
         <div class="group-heading">
           <h2 class="group-label">{{ group.label }}</h2>
           <a
-            v-if="group.editable"
+            v-if="group.editable && canChange"
             href="#"
             class="shortcuts-link"
             @click="editShortcuts"
@@ -41,6 +41,15 @@
             </s-text>
           </div>
         </div>
+
+        <s-text
+          v-if="group.editable && !canChange"
+          size="caption"
+          variant="muted"
+          class="hint"
+        >
+          {{ t('change_shortcuts_in_safari_settings_extensions') }}
+        </s-text>
       </section>
 
       <s-text size="caption" variant="muted" class="footer">
@@ -60,7 +69,11 @@ import {
 } from '@stylebot/components';
 import { ChevronLeftIcon } from '@stylebot/icons';
 import type { StylebotCommands, StylebotEditorCommands } from '@stylebot/types';
-import { isMac, openShortcutsPage } from '@stylebot/utils';
+import {
+  canOpenShortcutsPage,
+  isMac,
+  openShortcutsPage,
+} from '@stylebot/utils';
 
 import { undoShortcuts } from '../../store/undo-stack';
 import { hasSidePanel } from '../../utils/side-panel';
@@ -96,6 +109,10 @@ export default Vue.extend({
   computed: {
     commands(): StylebotCommands {
       return this.$store.state.commands;
+    },
+
+    canChange(): boolean {
+      return canOpenShortcutsPage();
     },
 
     editorCommands(): StylebotEditorCommands {
@@ -240,6 +257,11 @@ export default Vue.extend({
   font-weight: 600;
   line-height: 20px;
   color: var(--section-heading);
+}
+
+.hint {
+  display: block;
+  margin: 4px 0;
 }
 
 .shortcuts-link {

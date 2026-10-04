@@ -22,6 +22,7 @@ export {
 } from './release';
 export {
   openOptionsPage,
+  canOpenShortcutsPage,
   openShortcutsPage,
   openReportIssuePage,
   openDonatePage,

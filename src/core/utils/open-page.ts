@@ -14,6 +14,13 @@ export const openOptionsPage = (route?: string): void => {
   chrome.runtime.sendMessage(message);
 };
 
+/**
+ * Whether the browser has a shortcuts page the extension can open. Safari
+ * keeps them in its own settings, which no extension API reaches.
+ */
+export const canOpenShortcutsPage = (): boolean =>
+  /Chrome\//.test(navigator.userAgent) || !/Safari\//.test(navigator.userAgent);
+
 export const openShortcutsPage = (): void => {
   const message: OpenShortcutsPage = { name: 'OpenShortcutsPage' };
   chrome.runtime.sendMessage(message);
