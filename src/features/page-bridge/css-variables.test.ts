@@ -29,4 +29,27 @@ describe('getCssVariables', () => {
       { name: '--gap', value: '4px', on: 'html' },
     ]);
   });
+
+  it('puts a big design system’s base palette ahead of its components', () => {
+    const scale = Object.fromEntries(
+      Array.from({ length: 60 }, (_, i) => [
+        `--button-danger-scale-${i}-bgColor`,
+        '#123456',
+      ])
+    );
+
+    jest
+      .spyOn(window, 'getComputedStyle')
+      .mockImplementation(element =>
+        element === document.documentElement
+          ? computed({ ...scale, '--bgColor-default': '#fff' })
+          : computed({})
+      );
+
+    expect(getCssVariables()[0]).toEqual({
+      name: '--bgColor-default',
+      value: '#fff',
+      on: 'html',
+    });
+  });
 });

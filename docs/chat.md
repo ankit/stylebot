@@ -27,7 +27,7 @@ Any number of providers can be connected at once, from the Providers screen. Rep
 
 ## A reply
 
-1. **The editor builds the prompt**, since it has the page at hand: what Stylebot is and how to answer, a compact outline of the page's visible elements, the page's CSS variables, the rules for the picked element if one is picked, and the site's current Stylebot stylesheet.
+1. **The editor builds the prompt**, since it has the page at hand: what Stylebot is and how to answer, a compact outline of the page's visible elements (repeated rows folded, so a long list doesn't crowd out what comes after it), the page's CSS variables (its base palette first, when a design system defines thousands), the rules for the picked element if one is picked, and the site's current Stylebot stylesheet.
 2. **The background streams the reply** over a port: it adds the key and model, calls the provider, and forwards each event. Closing the port (Stop, New chat, the editor closing) aborts the request; an open port keeps the service worker alive for the length of the reply.
 3. **The model answers in prose and one tool call.** The tool takes a list of selectors, each with property and value pairs, under a strict schema. Asking for structured edits instead of free CSS is what makes each reply exactly undoable.
 4. **The edits are applied like any other edit**: live on the page, saved, and one step on the editor's undo trail. A Google Fonts import is added for any font family the model picks.
