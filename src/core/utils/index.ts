@@ -1,6 +1,7 @@
 export { debounce } from './debounce';
 export { splitCommaList } from './split-comma-list';
 export { isMac } from './is-mac';
+export { isSafari } from './is-safari';
 export { resolveAppearance, getSystemPreference } from './resolve-appearance';
 
 export {

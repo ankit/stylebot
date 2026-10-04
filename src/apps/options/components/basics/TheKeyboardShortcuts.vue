@@ -19,9 +19,12 @@
       </shortcut-row>
     </div>
 
-    <s-button class="change" @click="openShortcutsPage">
+    <s-button v-if="!safari" class="change" @click="openShortcutsPage">
       {{ t('change_shortcuts') }}
     </s-button>
+    <s-text v-else variant="muted" class="change">
+      {{ t('change_shortcuts_in_safari_settings_extensions') }}
+    </s-text>
   </div>
 </template>
 
@@ -29,7 +32,7 @@
 import Vue from 'vue';
 import type { StylebotCommandName, StylebotCommands } from '@stylebot/types';
 import { SButton, SShortcutChip, SHeading, SText } from '@stylebot/components';
-import { openShortcutsPage } from '@stylebot/utils';
+import { isSafari, openShortcutsPage } from '@stylebot/utils';
 
 import ShortcutRow from './ShortcutRow.vue';
 
@@ -58,6 +61,11 @@ export default Vue.extend({
 
     commands(): StylebotCommands {
       return this.$store.state.commands;
+    },
+
+    // Safari keeps extension shortcuts in its own settings, which no API opens.
+    safari(): boolean {
+      return isSafari();
     },
   },
 

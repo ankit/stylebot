@@ -288,7 +288,15 @@ export const createStore = (): Store<State> => {
         setGoogleDriveSyncEnabled(enabled);
 
         if (enabled) {
-          return dispatch('syncWithGoogleDrive');
+          await dispatch('syncWithGoogleDrive');
+
+          // Connecting only counts once a sync has gone through; the banner
+          // keeps the reason it didn't.
+          if (state.syncStatus && !state.googleDriveSyncState) {
+            state.googleDriveSyncEnabled = false;
+            setGoogleDriveSyncEnabled(false);
+          }
+          return;
         }
 
         state.googleDriveSyncState = undefined;

@@ -3,6 +3,7 @@ import { setPageBridge, RemotePageBridge } from '@stylebot/page-bridge';
 
 import { createStore, mountEditor } from '@stylebot/editor';
 
+import { openEditorWindow } from '../utils/chrome';
 import { initWindowListeners, initTabInfo } from './listeners';
 
 import './index.scss';
@@ -76,16 +77,10 @@ const start = async (): Promise<void> => {
     }
   });
 
-  // Picking an element happens in the page's window; bring the editor back
-  // in front so the pick can be styled right away, as devtools does.
+  // Bring the editor back in front after a pick in the page, as devtools does.
+  // Safari's windows.getCurrent() returns the page's window, so ask the background.
   if (host === 'window') {
-    bridge.on('select', () => {
-      chrome.windows.getCurrent().then(current => {
-        if (current.id !== undefined) {
-          chrome.windows.update(current.id, { focused: true });
-        }
-      });
-    });
+    bridge.on('select', () => openEditorWindow(tabId));
   }
 
   initTabInfo(store, tabId);
