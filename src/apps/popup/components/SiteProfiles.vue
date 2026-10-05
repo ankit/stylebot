@@ -22,12 +22,12 @@
         :disabled="disableOff"
         @click="$emit('pick', null)"
       >
-        <span class="check-slot" aria-hidden="true">
-          <check-icon v-if="!enabled" :size="13" />
-        </span>
         <s-text as="span" size="large" class="profile-name">
           {{ t('no_style') }}
         </s-text>
+        <span class="check-slot" aria-hidden="true">
+          <check-icon v-if="!enabled" :size="16" />
+        </span>
       </button>
 
       <button
@@ -42,15 +42,15 @@
         "
         @click="$emit('pick', profile.id)"
       >
-        <span class="check-slot" aria-hidden="true">
-          <check-icon
-            v-if="enabled && profile.id === activeProfile"
-            :size="13"
-          />
-        </span>
         <s-text as="span" size="large" class="profile-name">
           {{ displayName(profile) }}
         </s-text>
+        <span class="check-slot" aria-hidden="true">
+          <check-icon
+            v-if="enabled && profile.id === activeProfile"
+            :size="16"
+          />
+        </span>
       </button>
     </div>
   </div>
@@ -168,12 +168,15 @@ export default Vue.extend({
   display: flex;
   justify-content: center;
   flex: none;
-  width: 14px;
+  width: 16px;
   color: var(--accent-text);
 }
 
 .profile-name {
   @include truncate;
+
+  flex: 1;
+  min-width: 0;
 
   .checked & {
     font-weight: 600;
