@@ -55,11 +55,16 @@ describe('hashed-class', () => {
     it.each([
       'WwrzSb',
       'a1b2c3',
+      'm5k28',
+      'vr1PYe',
+      'tvs3Id',
       'r-1awozwy',
       'css-175oi2r',
       'css-1q2w3e-MuiButton-root',
       '_9dls',
       '_a6hd',
+      'gb_Ra',
+      'gb_3d',
       'svelte-1abc2de',
       'astro-J7PV25F6',
       '__className_a64ecd',
@@ -73,6 +78,11 @@ describe('hashed-class', () => {
 
     it.each([
       'primaryButton',
+      'item12',
+      'Item2',
+      'col2',
+      'grid12',
+      'h264',
       'card__title',
       'col-md-12',
       'r-auto',

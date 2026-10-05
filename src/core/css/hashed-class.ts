@@ -89,14 +89,15 @@ export function getStableClassParts(className: string): Array<string> | null {
 
 /**
  * Generated classes with no authored part: CSS-in-JS prefixes, React Native
- * Web's atomic classes (X), Instagram's legacy `_a6hd`, Svelte/Astro
- * scoping, next/font, and JSS counters.
+ * Web's atomic classes (X), Instagram's legacy `_a6hd`, the Google bar's
+ * `gb_Ra`, Svelte/Astro scoping, next/font, and JSS counters.
  */
 const GENERATED_CLASS_PATTERNS = [
   /^css-(?=[a-z]*\d)[0-9a-z]{5,8}(-|$)/,
   /^(sc|jsx|emotion|styled|chakra)-/i,
   /^r-(?=[a-z]*\d)[0-9a-z]{6,9}$/,
   /^_(?=[a-z]*\d)[0-9a-z]{4}$/,
+  /^gb_[0-9A-Za-z]{1,3}$/,
   /^(svelte|astro)-[0-9a-z]{5,8}$/i,
   /^__(className|variable)_[0-9a-f]{6}$/,
   /^jss\d+$/,
@@ -155,6 +156,12 @@ export function looksHashed(className: string): boolean {
 
   // A hex-like hash, e.g. CSS Modules' "_1a2b3c".
   if (/^_?[0-9a-f]{5,}$/i.test(className)) {
+    return true;
+  }
+
+  // Google's obfuscated names, e.g. "m5k28" or "vr1PYe": digits among the
+  // letters, unlike a word with a number on the end ("item12").
+  if (/^(?=.*\d)(?![a-z]+\d+$)[a-z0-9]{5,8}$/i.test(className)) {
     return true;
   }
 
