@@ -11,27 +11,16 @@
     @blur.native="clearPreview"
   >
     <span class="item-row">
-      <s-tooltip :text="selector" :disabled="!trimmed" grow>
+      <s-tooltip
+        :text="selector"
+        :disabled="!truncated"
+        grow
+        @mouseenter.native="measureTruncation"
+      >
         <template #text>
           <span class="selector-tooltip">{{ selector }}</span>
         </template>
-        <span ref="text" class="item-text">
-          <span class="item-selector">
-            <template v-for="(piece, i) in short.pieces">
-              <span v-if="piece.kind === 'ellipsis'" :key="i" class="ellipsis">
-                <more-icon :size="14" />
-              </span>
-              <span
-                v-else
-                :key="i"
-                class="piece"
-                :class="piece.kind"
-                v-text="piece.text"
-              />
-            </template>
-          </span>
-          <span v-if="short.more" class="item-more" v-text="`+${short.more}`" />
-        </span>
+        <s-inline-list mono :parts="parts" class="item-text" />
       </s-tooltip>
       <s-text
         v-if="count"
@@ -54,18 +43,16 @@
 <script lang="ts">
 import type { PropType } from 'vue';
 import Vue from 'vue';
-import { SMenuItem, SText, STooltip } from '@stylebot/components';
-import { MoreIcon } from '@stylebot/icons';
+import { SInlineList, SMenuItem, SText, STooltip } from '@stylebot/components';
+import { splitSelectorList } from '@stylebot/css';
 
 import { getPageBridge } from '@stylebot/page-bridge';
-import type { ShortSelector } from '../../utils/shorten-selector';
-import { shortenSelector } from '../../utils/shorten-selector';
 
 export default Vue.extend({
   name: 'TheCssSelectorDropdownItem',
 
   components: {
-    MoreIcon,
+    SInlineList,
     SMenuItem,
     SText,
     STooltip,
@@ -89,37 +76,17 @@ export default Vue.extend({
     },
   },
 
-  data(): {
-    maxChars: number;
-    resizeObserver: ResizeObserver | null;
-  } {
-    return { maxChars: Infinity, resizeObserver: null };
+  data(): { truncated: boolean } {
+    return { truncated: false };
   },
 
   computed: {
-    short(): ShortSelector {
-      return shortenSelector(this.selector, this.maxChars);
+    parts(): Array<string> {
+      return splitSelectorList(this.selector);
     },
-
-    // Whether the row shows less than the whole selector, so its tooltip
-    // has more to say.
-    trimmed(): boolean {
-      return this.selector.length > this.maxChars;
-    },
-  },
-
-  mounted() {
-    const { text } = this.$refs;
-
-    if (text instanceof HTMLElement) {
-      this.resizeObserver = new ResizeObserver(() => this.measureWidth());
-      this.resizeObserver.observe(text);
-    }
   },
 
   beforeDestroy() {
-    this.resizeObserver?.disconnect();
-
     // The menu unmounts on select/close, so the pointer/focus leave events
     // may never fire to clear a preview highlight — clear it here.
     this.clearPreview();
@@ -127,21 +94,13 @@ export default Vue.extend({
 
   methods: {
     /**
-     * How many characters fit on the row. The selector is set in a
-     * monospace font, so any of its text gives every character's width.
+     * Notes whether the selector is cut short, so its tooltip only shows
+     * when there's more to read.
      */
-    measureWidth(): void {
-      const { text } = this.$refs;
-      const piece = this.$el.querySelector('.piece');
+    measureTruncation(): void {
+      const text = this.$el.querySelector('.item-text');
 
-      if (!(text instanceof HTMLElement) || !piece?.textContent) {
-        return;
-      }
-
-      const charWidth =
-        piece.getBoundingClientRect().width / piece.textContent.length;
-
-      this.maxChars = Math.floor(text.clientWidth / charWidth) || Infinity;
+      this.truncated = !!text && text.scrollWidth > text.clientWidth;
     },
 
     click(): void {
@@ -186,50 +145,10 @@ export default Vue.extend({
 }
 
 .item-text {
-  position: relative;
-  display: flex;
-  flex: 1;
-  min-width: 0;
-  contain: inline-size;
-  font-family: var(--font-mono);
-  color: var(--field-ink);
-}
-
-.item-selector {
   @include truncate;
 
-  min-width: 0;
-  white-space: pre;
-}
-
-.item-more {
-  flex: none;
-  margin-left: 1ch;
-  color: var(--field-placeholder);
-}
-
-.item-selector,
-.item-more,
-.piece {
-  font-family: inherit;
-}
-
-.separator {
-  color: var(--field-placeholder);
-}
-
-.piece:has(+ .ellipsis) {
-  color: var(--text-muted);
-}
-
-.ellipsis {
-  display: inline-flex;
-  margin: 0 0.5ch;
-  padding: 1px 5px;
-  border-radius: 5px;
-  vertical-align: middle;
-  color: var(--text-muted);
-  background: color-mix(in srgb, var(--text-primary) 8%, transparent);
+  display: block;
+  contain: inline-size;
 }
 
 .selector-tooltip {

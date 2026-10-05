@@ -1,7 +1,12 @@
 <template>
   <span class="inline-list" :class="{ mono }">
     <template v-for="(part, i) in parts">
-      <span v-if="i > 0" :key="`separator-${i}`" class="separator">,</span>
+      <span
+        v-if="i > 0"
+        :key="`separator-${i}`"
+        class="separator"
+        v-text="', '"
+      />
       <span :key="i" class="part">{{ part }}</span>
     </template>
   </span>

@@ -146,7 +146,7 @@ export const DisabledOutsideBasicMode: StoryObj = {
   },
 };
 
-const GROUP = ['h1', 'h2', '.title', '.byline'];
+const GROUP = ['h1', 'h2', '.title', '.subtitle', '.byline'];
 
 export const SelectorListAsText: StoryObj = {
   ...editor({
@@ -171,15 +171,9 @@ export const SelectorListAsText: StoryObj = {
     await user.click(chips(canvasElement));
     await findOpenMenu(canvas);
     await waitFor(() => expect(items(canvasElement)).toHaveLength(2));
-    const item = items(canvasElement)[0] as HTMLElement;
-    await expect(item.querySelector('.item-selector')).toHaveTextContent(
-      GROUP.join(', ')
-    );
-    await expect(item.querySelectorAll('.separator')).toHaveLength(
-      GROUP.length - 1
-    );
+    await expectInOrder(items(canvasElement)[0] as HTMLElement);
     await expect(
-      items(canvasElement)[1].querySelector('.item-selector')
+      items(canvasElement)[1].querySelector('.item-text')
     ).toHaveTextContent(/^\s*p\s*$/);
   },
 };
