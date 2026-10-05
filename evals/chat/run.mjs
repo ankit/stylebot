@@ -25,9 +25,10 @@ const PAGES = path.join(HERE, 'pages');
 const REFERENCES = path.join(HERE, 'references');
 const VIEWPORT = { width: 1280, height: 900 };
 const MAX_SHOT_HEIGHT = 2000;
-const MAX_FIX_ROUNDS = 1;
 const BROAD_MATCHES = 300;
 const STYLE_ID = 'stylebot-eval-css';
+// The page check's problem types, under their current and earlier names.
+const UNREADABLE = ['unreadable-text', 'unreadable'];
 // List prices in dollars per million tokens, input and output, uncached.
 const PRICES = {
   'claude-haiku-4-5': [1, 5],
@@ -441,7 +442,10 @@ const runCase = async ({ browser, testCase, variant, scorer, dir }) => {
       }
 
       // As the extension does: a fix that made text hard to read is undone.
-      if (rounds.length && round.problems?.some(p => p.type === 'unreadable')) {
+      if (
+        rounds.length &&
+        round.problems?.some(p => UNREADABLE.includes(p.type))
+      ) {
         css = cssBefore;
         await injectCss(page, css);
         undoneFixes++;
@@ -450,13 +454,19 @@ const runCase = async ({ browser, testCase, variant, scorer, dir }) => {
 
       rounds.push(round);
 
-      if (!round.problems?.length || rounds.length > MAX_FIX_ROUNDS) {
+      // Checkouts from before the fix rule moved into the tool fixed problems only.
+      const { needsFix, MAX_FIX_ROUNDS = 1 } = ref.node.tool;
+      const fix = needsFix ? needsFix(round) : Boolean(round.problems?.length);
+      if (!fix || rounds.length > MAX_FIX_ROUNDS) {
         break;
       }
     }
 
     const done = { ...assistant, ...combine(rounds) };
-    if (ref.node.tool.roundsOf && rounds.some(round => round.problems)) {
+    if (
+      ref.node.tool.roundsOf &&
+      (rounds.length > 1 || rounds.some(round => round.problems))
+    ) {
       done.rounds = rounds;
     }
     turns.push(done);
@@ -487,8 +497,8 @@ const runCase = async ({ browser, testCase, variant, scorer, dir }) => {
   const problems = scorer
     ? await fresh.evaluate(() => window.StylebotScore.checkStyle())
     : null;
-  const count = type =>
-    problems ? problems.filter(p => p.type === type).length : null;
+  const count = types =>
+    problems ? problems.filter(p => types.includes(p.type)).length : null;
   await screenshot(fresh, path.join(dir, 'after.png'));
   await context.close();
 
@@ -499,9 +509,9 @@ const runCase = async ({ browser, testCase, variant, scorer, dir }) => {
     case: testCase.id,
     variant: variant.name,
     checks,
-    unreadable: count('unreadable'),
-    clashing: count('clashing'),
-    noEffect: count('no-effect'),
+    unreadable: count(UNREADABLE),
+    missedSurfaces: count(['missed-surface', 'clashing']),
+    overridden: count(['overridden-declaration', 'no-effect']),
     zeroMatch: matches.filter(count => !count).length,
     broad: matches.filter(count => count > BROAD_MATCHES).length,
     asked: replies.some(turn => !turn.edits.length),
@@ -612,8 +622,8 @@ const summarise = (results, variants, cases, references) => {
   const columns = [
     'checks',
     'unreadable',
-    'clashing',
-    'no-effect',
+    'missed surfaces',
+    'overridden',
     'zero-match',
     'asked',
     'undone fixes',
@@ -635,8 +645,8 @@ const summarise = (results, variants, cases, references) => {
           )}%)`
         : '–',
       mean(ok.map(r => r.unreadable)),
-      mean(ok.map(r => r.clashing)),
-      mean(ok.map(r => r.noEffect)),
+      mean(ok.map(r => r.missedSurfaces)),
+      mean(ok.map(r => r.overridden)),
       mean(ok.map(r => r.zeroMatch)),
       ok.filter(r => r.asked).length,
       ok.reduce((sum, r) => sum + (r.undoneFixes ?? 0), 0),
@@ -857,7 +867,7 @@ const main = async () => {
   );
   if (!scorer && !args.references) {
     log(
-      'No page check in either version yet: no unreadable or clashing counts.'
+      'No page check in either version yet: no unreadable or missed-surface counts.'
     );
   }
 

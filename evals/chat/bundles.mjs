@@ -61,7 +61,9 @@ const exists = (root, file) => fs.existsSync(path.join(root, file));
  */
 const pageModule = (root, name) =>
   [`src/features/page-bridge/chat/${name}`, `src/features/page-bridge/${name}`]
-    .filter(file => exists(root, `${file}.ts`))
+    .filter(
+      file => exists(root, `${file}.ts`) || exists(root, `${file}/index.ts`)
+    )
     .map(file => path.join(root, file))[0] ?? null;
 
 /**

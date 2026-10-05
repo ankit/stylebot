@@ -1,6 +1,10 @@
 import type { AppliedDeclaration } from '../applied-declarations';
 import type { RoleColorGroups } from '@stylebot/css';
-import type { CssDeclaration } from '@stylebot/types';
+import type {
+  ChatCssEdit,
+  ChatStyleProblem,
+  CssDeclaration,
+} from '@stylebot/types';
 
 import type {
   PageBridge,
@@ -288,6 +292,14 @@ export class RemotePageBridge extends PageBridgeEmitter implements PageBridge {
 
   getStableSelectors(selectors: Array<string>): Promise<Array<string>> {
     return this.request('getStableSelectors', selectors);
+  }
+
+  startStyleCheck(edits: Array<ChatCssEdit>): Promise<void> {
+    return this.request('startStyleCheck', edits);
+  }
+
+  checkStyle(): Promise<Array<ChatStyleProblem>> {
+    return this.request('checkStyle');
   }
 
   getSelectorAlternatives(selector: string): Promise<SelectorAlternatives> {

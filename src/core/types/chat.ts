@@ -55,6 +55,54 @@ export type ChatUserTurn = {
   image?: ChatImage;
 };
 
+/**
+ * Something the page check found once a reply's edits were applied: text
+ * that became hard to read, a surface a new theme missed, or a declaration
+ * that changed nothing.
+ */
+export type ChatStyleProblem =
+  | {
+      type: 'unreadable-text';
+      selector: string;
+      count: number;
+      // How many elements the selector matches in all.
+      of: number;
+      color: string;
+      background: string;
+      ratio: number;
+      // The reply's selector that painted the background behind the text.
+      paintedBy?: string;
+      /* The reply's variable, or selector, that set the text's color. Text a
+       * variable colors is one problem for all of it, with selector an example. */
+      coloredBy?: string;
+    }
+  | {
+      type: 'missed-surface';
+      selector: string;
+      count: number;
+      background: string;
+      // What the page's base background turned into.
+      page: 'dark' | 'light';
+    }
+  | {
+      type: 'overridden-declaration';
+      selector: string;
+      property: string;
+      value: string;
+    };
+
+/**
+ * One apply_css call within a reply: the reply's first call, or one fixing
+ * what the page check found after the call before it.
+ */
+export type ChatReplyRound = {
+  text: string;
+  edits: Array<ChatCssEdit>;
+  matches?: Array<number | null>;
+  problems?: Array<ChatStyleProblem>;
+  replay?: Array<unknown>;
+};
+
 export type ChatAssistantTurn = {
   role: 'assistant';
   id: string;
@@ -73,6 +121,9 @@ export type ChatAssistantTurn = {
   // unchanged when the thread is replayed.
   replay?: Array<unknown>;
   usage?: ChatUsage;
+  // Each call of a reply that went on to fix what the page check found;
+  // the fields above combine them. Absent for a reply of one call.
+  rounds?: Array<ChatReplyRound>;
 };
 
 export type ChatTurn = ChatUserTurn | ChatAssistantTurn;

@@ -1,7 +1,9 @@
 import type {
+  ChatAssistantTurn,
   ChatCssEdit,
   ChatModel,
   ChatProviderInfo,
+  ChatReplyRound,
   ChatStreamEvent,
   ChatTurn,
   ChatUsage,
@@ -18,6 +20,8 @@ import {
   TOOL_DESCRIPTION,
   TOOL_SCHEMA,
   toolResultFor,
+  roundCallId,
+  roundsOf,
   parseEdits,
 } from '../apply-css-tool';
 import { userMessageText } from '../prompt';
@@ -95,11 +99,62 @@ const TOOL_PARAMETERS = JSON.parse(
   )
 );
 
-const callId = (turnId: string): string => `call_${turnId}`;
+/**
+ * Replays one apply_css call of a reply: the model's output, the call, and
+ * what it came to.
+ */
+const roundSteps = (
+  turn: ChatAssistantTurn,
+  round: ChatReplyRound,
+  index: number
+): Array<InputStep> => {
+  const result = (id: string): InputStep => ({
+    type: 'function_result',
+    call_id: id,
+    name: TOOL_NAME,
+    result: [{ type: 'text', text: toolResultFor(turn, round) }],
+  });
+
+  // A Gemini reply goes back exactly as it came, thoughts and all.
+  if (round.replay?.length) {
+    const call = round.replay.find(
+      (step): step is { type: 'function_call'; id: string } =>
+        (step as { type?: string }).type === 'function_call'
+    );
+
+    return [
+      ...(round.replay as Array<InputStep>),
+      ...(call && round.edits.length ? [result(call.id)] : []),
+    ];
+  }
+
+  const steps: Array<InputStep> = [];
+
+  if (round.text) {
+    steps.push({
+      type: 'model_output',
+      content: [{ type: 'text', text: round.text }],
+    });
+  }
+
+  if (round.edits.length) {
+    steps.push(
+      {
+        type: 'function_call',
+        id: roundCallId('call', turn.id, index),
+        name: TOOL_NAME,
+        arguments: { edits: round.edits },
+      },
+      result(roundCallId('call', turn.id, index))
+    );
+  }
+
+  return steps;
+};
 
 /**
- * Replays the thread as Interactions API steps; a reply that changed the
- * page becomes a function call followed by its result.
+ * Replays the thread as Interactions API steps; each apply_css call a
+ * reply made becomes a function call followed by its result.
  */
 export const toInteractionSteps = (turns: Array<ChatTurn>): Array<InputStep> =>
   turns.flatMap((turn): Array<InputStep> => {
@@ -125,63 +180,9 @@ export const toInteractionSteps = (turns: Array<ChatTurn>): Array<InputStep> =>
       ];
     }
 
-    const result = (id: string): InputStep => ({
-      type: 'function_result',
-      call_id: id,
-      name: TOOL_NAME,
-      result: [
-        {
-          type: 'text',
-          text: toolResultFor(turn),
-        },
-      ],
-    });
-
-    // A Gemini reply goes back exactly as it came, thoughts and all.
-    if (turn.replay?.length) {
-      const call = turn.replay.find(
-        (step): step is { type: 'function_call'; id: string } =>
-          (step as { type?: string }).type === 'function_call'
-      );
-
-      return [
-        ...(turn.replay as Array<InputStep>),
-        ...(call && turn.edits.length ? [result(call.id)] : []),
-      ];
-    }
-
-    const steps: Array<InputStep> = [];
-
-    if (turn.text) {
-      steps.push({
-        type: 'model_output',
-        content: [{ type: 'text', text: turn.text }],
-      });
-    }
-
-    if (turn.edits.length) {
-      steps.push(
-        {
-          type: 'function_call',
-          id: callId(turn.id),
-          name: TOOL_NAME,
-          arguments: { edits: turn.edits },
-        },
-        {
-          type: 'function_result',
-          call_id: callId(turn.id),
-          name: TOOL_NAME,
-          result: [
-            {
-              type: 'text',
-              text: toolResultFor(turn),
-            },
-          ],
-        }
-      );
-    }
-
-    return steps;
+    return roundsOf(turn).flatMap((round, index) =>
+      roundSteps(turn, round, index)
+    );
   });
 
 const requestBody = (

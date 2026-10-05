@@ -17,6 +17,8 @@ import {
   TOOL_DESCRIPTION,
   TOOL_SCHEMA,
   toolResultFor,
+  roundCallId,
+  roundsOf,
   parseEdits,
 } from '../apply-css-tool';
 import { userMessageText } from '../prompt';
@@ -77,11 +79,9 @@ const headers = (key: string): Record<string, string> => ({
   authorization: `Bearer ${key}`,
 });
 
-const callId = (turnId: string): string => `call_${turnId}`;
-
 /**
- * Replays the thread as Responses API input items; a reply that changed
- * the page becomes a function call followed by its output.
+ * Replays the thread as Responses API input items; each apply_css call a
+ * reply made becomes a function call followed by its output.
  */
 export const toResponsesInput = (turns: Array<ChatTurn>): Array<InputItem> =>
   turns.flatMap((turn): Array<InputItem> => {
@@ -104,29 +104,31 @@ export const toResponsesInput = (turns: Array<ChatTurn>): Array<InputItem> =>
       ];
     }
 
-    const items: Array<InputItem> = [];
+    return roundsOf(turn).flatMap((round, index): Array<InputItem> => {
+      const items: Array<InputItem> = [];
 
-    if (turn.text) {
-      items.push({ role: 'assistant', content: turn.text });
-    }
+      if (round.text) {
+        items.push({ role: 'assistant', content: round.text });
+      }
 
-    if (turn.edits.length) {
-      items.push(
-        {
-          type: 'function_call',
-          call_id: callId(turn.id),
-          name: TOOL_NAME,
-          arguments: JSON.stringify({ edits: turn.edits }),
-        },
-        {
-          type: 'function_call_output',
-          call_id: callId(turn.id),
-          output: toolResultFor(turn),
-        }
-      );
-    }
+      if (round.edits.length) {
+        items.push(
+          {
+            type: 'function_call',
+            call_id: roundCallId('call', turn.id, index),
+            name: TOOL_NAME,
+            arguments: JSON.stringify({ edits: round.edits }),
+          },
+          {
+            type: 'function_call_output',
+            call_id: roundCallId('call', turn.id, index),
+            output: toolResultFor(turn, round),
+          }
+        );
+      }
 
-    return items;
+      return items;
+    });
   });
 
 const requestBody = (

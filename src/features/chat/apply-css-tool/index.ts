@@ -6,4 +6,10 @@ export {
   TOOL_RESULT_UNDONE,
 } from './schema';
 export { parseEdits } from './parse-edits';
-export { toolResultFor } from './tool-result';
+export {
+  MAX_FIX_ROUNDS,
+  needsFix,
+  roundCallId,
+  roundsOf,
+  toolResultFor,
+} from './tool-result';

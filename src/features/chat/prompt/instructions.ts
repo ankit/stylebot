@@ -33,7 +33,10 @@ Restyling the whole page (a dark mode, a new theme):
 5. Remember form fields, borders, and icons drawn with \`fill\` or \`stroke\`; set \`color-scheme\` on \`:root\` so scrollbars and native controls follow.
 Keep contrast readable: light text on dark backgrounds or the reverse, never dark on dark.
 
-After each apply_css call you're told how many elements each selector matched. A selector that matched nothing changed nothing: fix it with one from the outline on your next call. One that matched hundreds of elements is probably too broad.
+After each apply_css call you're told how many elements each selector matched, and any problems your edits caused on the page. If any are listed, fix them with one more apply_css call and say in one short sentence what you fixed:
+- Fix the cause, not the symptom. When only some of a selector's elements are hard to read, or one of your selectors painted the background, that selector is probably too broad (\`tr:first-child td\` matches the first row of every table): narrow it or take it back rather than recoloring text everywhere.
+- When one of your variables set the text's color, change that variable once instead of recoloring each element that uses it.
+- Replace a selector that matched nothing with one from the outline. One that matched hundreds of elements is probably too broad.
 
 The page CSS also lists the site's own rules for the picked element, if one is picked: match or outdo their selectors where specificity matters, and build on the values already there.
 

@@ -1,12 +1,16 @@
 import type { ActionContext, Module } from 'vuex';
 
-import { applyEdits, revertEdits } from '@stylebot/chat';
+import {
+  applyEdits,
+  revertEdits,
+  MAX_FIX_ROUNDS,
+  needsFix,
+} from '@stylebot/chat';
 import { getPageBridge } from '@stylebot/page-bridge';
 import type {
   ChatAssistantTurn,
   ChatImage,
   ChatCssEdit,
-  ChatCssPreviousValue,
   ChatErrorKey,
   ChatProviderId,
   ChatStatus,
@@ -28,21 +32,23 @@ import {
   getStreamRequest,
   getTurnId,
   getFailedMessage,
-  getAssistantTurn,
+  addUsage,
+  getRoundsTurn,
   getStoppedTurn,
   getPlainTurns,
   getUserTurn,
 } from './chat-reply';
-import type { ChatMessage } from './chat-reply';
+import type { ChatMessage, ChatRoundResult } from './chat-reply';
 import { readChatImage } from '../utils/chat-image';
 import { streamReply } from './chat-stream';
 import type { ChatStreamHandlers } from './chat-stream';
 
 /**
  * Where a reply is: reading the page before the model answers, writing
- * while it streams, applying once its edits arrive.
+ * while it streams, applying once its edits arrive, and fixing what the
+ * page check found after them.
  */
-export type ChatPhase = 'reading' | 'writing' | 'applying';
+export type ChatPhase = 'reading' | 'writing' | 'applying' | 'fixing';
 
 export type ChatError = { key: ChatErrorKey; detail?: string };
 
@@ -66,9 +72,28 @@ export type ChatState = {
 
 type Context = ActionContext<ChatState, State>;
 
+type AppliedRound = Pick<
+  ChatRoundResult,
+  'edits' | 'previous' | 'matches' | 'problems'
+>;
+
+/**
+ * The reply in progress: the message's picked element, which a fix round
+ * is about too, the apply_css calls made so far, and how to stop the call
+ * streaming in.
+ */
+type Reply = {
+  id: string;
+  model: string;
+  scope?: string;
+  rounds: Array<ChatRoundResult>;
+  stop?: () => void;
+};
+
 const buildRequest = async (
   { state, rootState }: Context,
-  selector?: string
+  selector?: string,
+  replyTurn?: ChatAssistantTurn
 ): Promise<ChatStreamRequest> => {
   const bridge = getPageBridge();
   // Either can fail (the page navigating away); the model can still work
@@ -88,7 +113,7 @@ const buildRequest = async (
       pageCss,
       selector,
     },
-    state.turns
+    replyTurn ? [...state.turns, replyTurn] : state.turns
   );
 };
 
@@ -105,12 +130,11 @@ const setPhase = (
  * streaming in. Created per store, so nothing runs when the module loads.
  */
 export const createChatModule = (): Module<ChatState, State> => {
-  // Stops the reply streaming in, if there is one.
-  let stopReply: (() => void) | null = null;
+  let reply: Reply | null = null;
 
   const closeReply = () => {
-    stopReply?.();
-    stopReply = null;
+    reply?.stop?.();
+    reply = null;
   };
 
   const save = ({ state }: Context) => {
@@ -160,49 +184,149 @@ export const createChatModule = (): Module<ChatState, State> => {
   };
 
   /**
-   * Keeps the pending reply in step with its stream, then adds it to the
-   * thread as a turn, or shows why it failed.
+   * Adds the reply's calls so far to the thread as one turn.
    */
-  const getReplyHandlers = (
-    context: Context,
-    model: string
-  ): ChatStreamHandlers => {
-    const { state, rootState, commit, dispatch } = context;
-    const id = getTurnId();
-    let edits: Array<ChatCssEdit> = [];
-    let previous: Array<ChatCssPreviousValue> = [];
-    let matches: Array<number | null> | undefined;
+  const finishReply = (context: Context, current: Reply) => {
+    const { commit } = context;
 
-    return {
-      onText: delta => setPhase(context, 'writing', delta),
+    reply = null;
+    commit('setPending', null);
+    commit('addTurn', getRoundsTurn(current.id, current.model, current.rounds));
+    save(context);
+  };
+
+  /**
+   * Applies a call's edits, then counts what each selector matched and
+   * checks the page for what they made worse. A fix that made text hard to
+   * read is taken back, and comes to null.
+   */
+  const applyRound = async (
+    context: Context,
+    current: Reply,
+    replyEdits: Array<ChatCssEdit>
+  ): Promise<AppliedRound | null> => {
+    const bridge = getPageBridge();
+    const fixing = current.rounds.length > 0;
+    const edits = await withStableSelectors(replyEdits);
+
+    // The check is a bonus; a page that can't be read still gets the edits.
+    const checking = await bridge.startStyleCheck(edits).then(
+      () => true,
+      () => false
+    );
+    const result = applyEdits(context.rootState.css, edits);
+
+    await applyCss(context, result.css, edits, `chat:${current.id}`);
+
+    const [matches, problems] = await Promise.all([
+      bridge
+        .countMatches(edits.map(edit => edit.selector))
+        .catch(() => undefined),
+      checking ? bridge.checkStyle().catch(() => undefined) : undefined,
+    ]);
+
+    if (
+      fixing &&
+      problems?.some(problem => problem.type === 'unreadable-text')
+    ) {
+      const reverted = revertEdits(context.rootState.css, result.previous);
+      await applyCss(context, reverted, [], `chat:${current.id}`);
+      return null;
+    }
+
+    return { edits, previous: result.previous, matches, problems };
+  };
+
+  /**
+   * Streams one apply_css call of the reply into the pending reply, then
+   * either finishes the reply or, when the page check found problems,
+   * streams another call to fix them.
+   */
+  const streamRound = (
+    context: Context,
+    current: Reply,
+    request: ChatStreamRequest
+  ) => {
+    const { state, commit, dispatch } = context;
+    const separator = state.pending?.text ? '\n\n' : '';
+    let text = '';
+    let round: AppliedRound = { edits: [], previous: [] };
+    let undone = false;
+
+    const handlers: ChatStreamHandlers = {
+      onText: delta => {
+        setPhase(context, 'writing', text ? delta : separator + delta);
+        text += delta;
+      },
 
       onEditsStart: () => setPhase(context, 'writing'),
 
-      onEdits: async replyEdits => {
+      onEdits: async edits => {
         setPhase(context, 'applying');
-        edits = await withStableSelectors(replyEdits);
-        const result = applyEdits(rootState.css, edits);
-        previous = result.previous;
-        await applyCss(context, result.css, edits, `chat:${id}`);
-        matches = await getPageBridge()
-          .countMatches(edits.map(edit => edit.selector))
-          .catch(() => undefined);
+        const applied = await applyRound(context, current, edits);
+        undone = !applied;
+        round = applied ?? round;
       },
 
-      onDone: ({ usage, replay }) => {
-        const turn = getAssistantTurn(
-          { id, model, edits, previous, matches, usage, replay },
-          state.pending?.text ?? ''
-        );
+      onDone: async ({ usage, replay }) => {
+        if (reply !== current) {
+          return;
+        }
 
-        stopReply = null;
-        commit('setPending', null);
-        commit('addTurn', turn);
-        save(context);
+        // The tokens an undone fix spent still count toward the reply.
+        if (undone) {
+          const last = current.rounds[current.rounds.length - 1];
+          current.rounds[current.rounds.length - 1] = {
+            ...last,
+            usage: addUsage(last.usage, usage),
+          };
+          finishReply(context, current);
+          return;
+        }
+
+        current.rounds.push({
+          text,
+          ...round,
+          ...(usage ? { usage } : {}),
+          ...(replay ? { replay } : {}),
+        });
+
+        if (
+          !needsFix(current.rounds[current.rounds.length - 1]) ||
+          current.rounds.length > MAX_FIX_ROUNDS
+        ) {
+          finishReply(context, current);
+          return;
+        }
+
+        current.stop = undefined;
+        setPhase(context, 'fixing');
+
+        const replyTurn = getRoundsTurn(
+          current.id,
+          current.model,
+          current.rounds
+        );
+        const next = await buildRequest(context, current.scope, replyTurn);
+
+        // Stopped while the page was being read.
+        if (reply === current) {
+          streamRound(context, current, next);
+        }
       },
 
       onError: error => {
-        stopReply = null;
+        if (reply !== current) {
+          return;
+        }
+
+        // A fix that fails leaves the reply as its earlier calls made it.
+        if (current.rounds.length) {
+          finishReply(context, current);
+          return;
+        }
+
+        reply = null;
         commit('setPending', null);
         commit('setError', error);
 
@@ -212,6 +336,8 @@ export const createChatModule = (): Module<ChatState, State> => {
         }
       },
     };
+
+    current.stop = streamReply(request, handlers);
   };
 
   return {
@@ -448,7 +574,8 @@ export const createChatModule = (): Module<ChatState, State> => {
         }
 
         closeReply();
-        stopReply = streamReply(request, getReplyHandlers(context, model));
+        reply = { id: getTurnId(), model, scope: message.scope, rounds: [] };
+        streamRound(context, reply, request);
       },
 
       /**
@@ -459,6 +586,14 @@ export const createChatModule = (): Module<ChatState, State> => {
         const { state, commit } = context;
 
         if (!state.pending || state.pending.phase === 'applying') {
+          return;
+        }
+
+        // Stopping a fix keeps what the reply's earlier calls did.
+        if (reply?.rounds.length) {
+          const current = reply;
+          current.stop?.();
+          finishReply(context, current);
           return;
         }
 

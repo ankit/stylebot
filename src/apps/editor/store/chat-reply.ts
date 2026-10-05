@@ -1,27 +1,14 @@
 import { buildSystemPrompt } from '@stylebot/chat';
 import type {
   ChatAssistantTurn,
-  ChatCssEdit,
   ChatCssPreviousValue,
   ChatImage,
+  ChatReplyRound,
   ChatStreamRequest,
   ChatTurn,
   ChatUsage,
   ChatUserTurn,
 } from '@stylebot/types';
-
-/**
- * What a reply has gathered by the time its stream ends.
- */
-export type ChatReplyResult = {
-  id: string;
-  model: string;
-  edits: Array<ChatCssEdit>;
-  previous: Array<ChatCssPreviousValue>;
-  matches?: Array<number | null>;
-  usage?: ChatUsage;
-  replay?: Array<unknown>;
-};
 
 export type ChatRequestPage = {
   url: string;
@@ -90,24 +77,116 @@ export const getUserTurn = ({
 });
 
 /**
- * The finished reply as a turn in the thread, with the text that streamed
- * in. It counts as applied when it made edits.
+ * One apply_css call as the reply gathered it: the round as the model
+ * reads it back, plus what its edits replaced and what it cost.
  */
-export const getAssistantTurn = (
-  { id, model, edits, previous, matches, usage, replay }: ChatReplyResult,
-  text: string
-): ChatAssistantTurn => ({
-  role: 'assistant',
-  id,
+export type ChatRoundResult = ChatReplyRound & {
+  previous: Array<ChatCssPreviousValue>;
+  usage?: ChatUsage;
+};
+
+export const addUsage = (
+  total: ChatUsage | undefined,
+  usage: ChatUsage | undefined
+): ChatUsage | undefined =>
+  total && usage
+    ? {
+        inputTokens: total.inputTokens + usage.inputTokens,
+        outputTokens: total.outputTokens + usage.outputTokens,
+        cacheReadTokens:
+          (total.cacheReadTokens ?? 0) + (usage.cacheReadTokens ?? 0),
+        cacheWriteTokens:
+          (total.cacheWriteTokens ?? 0) + (usage.cacheWriteTokens ?? 0),
+      }
+    : total ?? usage;
+
+/**
+ * What the reply's edits replaced, each selector and property as it was
+ * before the first call that set it.
+ */
+const firstPrevious = (
+  rounds: Array<ChatRoundResult>
+): Array<ChatCssPreviousValue> => {
+  const found = new Map<string, ChatCssPreviousValue>();
+
+  rounds.forEach(round =>
+    round.previous.forEach(value => {
+      const key = `${value.selector}\n${value.property}`;
+
+      if (!found.has(key)) {
+        found.set(key, value);
+      }
+    })
+  );
+
+  return Array.from(found.values());
+};
+
+/**
+ * How many elements each of the reply's selectors matched, when every
+ * call counted them, so the counts line up with the edits.
+ */
+const allMatches = (
+  rounds: Array<ChatRoundResult>
+): Array<number | null> | undefined =>
+  rounds.every(round => round.matches)
+    ? rounds.flatMap(round => round.matches ?? [])
+    : undefined;
+
+/**
+ * A call as the thread keeps it, for the model to read back.
+ */
+const keptRound = ({
+  text,
+  edits,
+  matches,
+  problems,
+  replay,
+}: ChatRoundResult): ChatReplyRound => ({
   text: text.trim(),
   edits,
-  previous,
-  applied: edits.length > 0,
-  model,
-  usage,
   ...(matches ? { matches } : {}),
+  ...(problems?.length ? { problems } : {}),
   ...(replay ? { replay } : {}),
 });
+
+/**
+ * A reply of one or more apply_css calls as a single turn, which Undo
+ * takes back as a whole. It counts as applied when it made edits. The
+ * calls are kept when there were several, or the page check found
+ * anything, for the model to read back.
+ */
+export const getRoundsTurn = (
+  id: string,
+  model: string,
+  rounds: Array<ChatRoundResult>
+): ChatAssistantTurn => {
+  const [first] = rounds;
+  const edits = rounds.flatMap(round => round.edits);
+  const matches = allMatches(rounds);
+  const turn: ChatAssistantTurn = {
+    role: 'assistant',
+    id,
+    text: rounds
+      .map(round => round.text.trim())
+      .filter(Boolean)
+      .join('\n\n'),
+    edits,
+    previous: firstPrevious(rounds),
+    applied: edits.length > 0,
+    model,
+    usage: rounds
+      .map(round => round.usage)
+      .reduce<ChatUsage | undefined>(addUsage, undefined),
+    ...(matches ? { matches } : {}),
+  };
+
+  if (rounds.length === 1 && !first.problems?.length) {
+    return first.replay ? { ...turn, replay: first.replay } : turn;
+  }
+
+  return { ...turn, rounds: rounds.map(keptRound) };
+};
 
 /**
  * A reply the user stopped: the text that came in, with no edits.

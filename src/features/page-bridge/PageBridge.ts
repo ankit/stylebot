@@ -1,5 +1,9 @@
 import type { RoleColorGroups } from '@stylebot/css';
-import type { CssDeclaration } from '@stylebot/types';
+import type {
+  ChatCssEdit,
+  ChatStyleProblem,
+  CssDeclaration,
+} from '@stylebot/types';
 import type { AppliedDeclaration } from './applied-declarations';
 
 /**
@@ -135,6 +139,19 @@ export type PageBridge = {
    * matcher, checked against the page.
    */
   getStableSelectors(selectors: Array<string>): Promise<Array<string>>;
+
+  /**
+   * Notes what the page looks like before the edits are applied, for
+   * checkStyle to compare against.
+   */
+  startStyleCheck(edits: Array<ChatCssEdit>): Promise<void>;
+
+  /**
+   * Once the edits noted by startStyleCheck have applied: text they made
+   * hard to read, surfaces a theme change missed, and declarations that
+   * changed nothing.
+   */
+  checkStyle(): Promise<Array<ChatStyleProblem>>;
 
   /**
    * The user's Stylebot declarations in effect on the element the selector

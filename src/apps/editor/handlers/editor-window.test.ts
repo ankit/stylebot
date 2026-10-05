@@ -42,6 +42,8 @@ const bridge = {
   getPageCssContext: jest.fn(),
   countMatches: jest.fn(),
   getStableSelectors: jest.fn(),
+  startStyleCheck: jest.fn(),
+  checkStyle: jest.fn(),
   openInPage: jest.fn(),
   focusPage: jest.fn(),
   on: jest.fn((event: string, listener: PageBridgeEvents['select']) => {

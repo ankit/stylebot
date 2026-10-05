@@ -15,4 +15,10 @@ describe('countMatches', () => {
   it('returns null for a selector the page can’t parse', () => {
     expect(countMatches(['p[', '.note'])).toEqual([null, 2]);
   });
+
+  it('counts the elements a state or pseudo-element is on', () => {
+    expect(
+      countMatches(['.note:hover', 'p.note::before', '#x :focus'])
+    ).toEqual([2, 2, 0]);
+  });
 });
