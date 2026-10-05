@@ -4,6 +4,7 @@ import { queryPage } from '../count-matches';
 import { hasStatePseudo } from '../state-pseudos';
 import { MAX_PROBLEMS } from './page';
 
+// Elements of each selector compared before and after.
 const MAX_SAMPLES = 3;
 
 export type Sample = {
@@ -68,10 +69,13 @@ const probeValue = (
 };
 
 /**
- * Declarations that changed nothing on the elements sampled, though the
- * value would have taken elsewhere: the page overrides them.
+ * Declarations that changed nothing on the elements they target, though
+ * the same value takes on a test element beside them: the page's own CSS
+ * overrides them, or the property doesn't apply there (width on a span).
  */
-export const findNoEffect = (samples: Array<Sample>): Array<ChatStyleProblem> =>
+export const findOverriddenDeclarations = (
+  samples: Array<Sample>
+): Array<ChatStyleProblem> =>
   samples
     .filter(({ elements, before, property, value }) => {
       const after = elements.map(element =>
@@ -87,7 +91,7 @@ export const findNoEffect = (samples: Array<Sample>): Array<ChatStyleProblem> =>
     })
     .slice(0, MAX_PROBLEMS)
     .map(({ selector, property, value }) => ({
-      type: 'no-effect',
+      type: 'overridden-declaration',
       selector,
       property,
       value,

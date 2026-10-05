@@ -16,7 +16,7 @@ const describeCount = (count: number | null | undefined): string => {
 
 const describeProblem = (problem: ChatStyleProblem): string => {
   switch (problem.type) {
-    case 'unreadable':
+    case 'unreadable-text':
       if (problem.coloredBy?.startsWith('--')) {
         return `- Hard to read: ${describeCount(
           problem.count
@@ -36,13 +36,13 @@ const describeProblem = (problem: ChatStyleProblem): string => {
       } on ${problem.background}${
         problem.paintedBy ? ` painted by your \`${problem.paintedBy}\`` : ''
       }, contrast ${problem.ratio}:1`;
-    case 'clashing':
+    case 'missed-surface':
       return `- Still ${problem.page === 'dark' ? 'light' : 'dark'} on a now ${
         problem.page
       } page: ${problem.selector} (${describeCount(
         problem.count
       )}), background ${problem.background}`;
-    case 'no-effect':
+    case 'overridden-declaration':
       return `- No effect: ${problem.property}: ${problem.value} on ${problem.selector}, overridden by the page or not applicable to that element`;
   }
 };

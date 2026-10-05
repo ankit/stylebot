@@ -95,10 +95,12 @@ const textColorSources = (
 };
 
 /**
- * Text the edits made hard to read, grouped by the selector that names it,
- * or by the reply's variable that colors it.
+ * Text the reply made hard to read: its contrast against what's behind it
+ * fell by more than 0.5 and is now under WCAG's minimum (4.5:1, or 3:1 for
+ * large text). Grouped by the reply's variable that colors it, else by the
+ * selector that names it.
  */
-export const findUnreadable = (
+export const findUnreadableText = (
   before: Map<Element, number>,
   resolveBackground: (element: Element) => Rgba | null,
   edits: Array<ChatCssEdit>
@@ -162,7 +164,7 @@ export const findUnreadable = (
     const colorer = sourceOf(detail.color);
 
     return {
-      type: 'unreadable',
+      type: 'unreadable-text',
       selector,
       count,
       of,

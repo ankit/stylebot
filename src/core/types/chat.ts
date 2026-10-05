@@ -62,7 +62,7 @@ export type ChatUserTurn = {
  */
 export type ChatStyleProblem =
   | {
-      type: 'unreadable';
+      type: 'unreadable-text';
       selector: string;
       count: number;
       // How many elements the selector matches in all.
@@ -77,14 +77,19 @@ export type ChatStyleProblem =
       coloredBy?: string;
     }
   | {
-      type: 'clashing';
+      type: 'missed-surface';
       selector: string;
       count: number;
       background: string;
       // What the page's base background turned into.
       page: 'dark' | 'light';
     }
-  | { type: 'no-effect'; selector: string; property: string; value: string };
+  | {
+      type: 'overridden-declaration';
+      selector: string;
+      property: string;
+      value: string;
+    };
 
 /**
  * One apply_css call within a reply: the reply's first call, or one fixing

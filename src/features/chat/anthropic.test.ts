@@ -251,7 +251,7 @@ describe('toAnthropicMessages', () => {
 
 describe('toAnthropicMessages with a fix round', () => {
   const problem = {
-    type: 'clashing' as const,
+    type: 'missed-surface' as const,
     selector: '.card',
     count: 1,
     background: '#ffffff',

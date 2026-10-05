@@ -55,7 +55,7 @@ describe('toolResultFor with problems', () => {
       matches: [1],
       problems: [
         {
-          type: 'unreadable' as const,
+          type: 'unreadable-text' as const,
           selector: '.meta',
           count: 4,
           of: 4,
@@ -65,7 +65,7 @@ describe('toolResultFor with problems', () => {
           coloredBy: '--fg-muted',
         },
         {
-          type: 'unreadable' as const,
+          type: 'unreadable-text' as const,
           selector: 'span.titleline a',
           count: 1,
           of: 30,
@@ -76,14 +76,14 @@ describe('toolResultFor with problems', () => {
           coloredBy: '.titleline a',
         },
         {
-          type: 'clashing' as const,
+          type: 'missed-surface' as const,
           selector: '.card',
           count: 1,
           background: '#ffffff',
           page: 'dark' as const,
         },
         {
-          type: 'no-effect' as const,
+          type: 'overridden-declaration' as const,
           selector: 'span.tag',
           property: 'width',
           value: '80px',
@@ -117,7 +117,7 @@ describe('needsFix', () => {
         matches: [1],
         problems: [
           {
-            type: 'no-effect',
+            type: 'overridden-declaration',
             selector: '.card',
             property: 'width',
             value: '1px',

@@ -5,20 +5,22 @@ import { isDark, parseColor, toHex } from './colors';
 import type { Rgba } from './colors';
 import { groupBySelector, MAX_PROBLEMS, pageElements } from './page';
 
-const MAX_SURFACE_ELEMENTS = 5000;
+const MAX_ELEMENTS_CHECKED = 5000;
+// In px², about a 64px square: smaller backgrounds are badges and icons.
 const MIN_SURFACE_AREA = 4000;
 
 const FORM_FIELDS = new Set(['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON']);
 
 /**
- * Surfaces still in the page's old lightness once a reply turned the page
- * dark or light: the cards and panels a new theme missed.
+ * Backgrounds a theme missed: once the reply turned the page dark (or
+ * light), visible elements whose own background is still light (or dark),
+ * at least MIN_SURFACE_AREA or a form field, and not inside another one.
  */
-export const findClashing = (dark: boolean): Array<ChatStyleProblem> => {
+export const findMissedSurfaces = (dark: boolean): Array<ChatStyleProblem> => {
   const flagged = new Set<Element>();
-  const clashing: Array<{ element: Element; detail: Rgba }> = [];
+  const missed: Array<{ element: Element; detail: Rgba }> = [];
 
-  pageElements(MAX_SURFACE_ELEMENTS, () => true).forEach(element => {
+  pageElements(MAX_ELEMENTS_CHECKED, () => true).forEach(element => {
     const own = parseColor(getComputedStyle(element).backgroundColor);
 
     if (!own || own[3] < 0.9 || isDark(own) !== !dark) {
@@ -39,14 +41,14 @@ export const findClashing = (dark: boolean): Array<ChatStyleProblem> => {
       isVisible(element)
     ) {
       flagged.add(element);
-      clashing.push({ element, detail: own });
+      missed.push({ element, detail: own });
     }
   });
 
-  return groupBySelector(clashing)
+  return groupBySelector(missed)
     .slice(0, MAX_PROBLEMS)
     .map(({ selector, count, detail }) => ({
-      type: 'clashing',
+      type: 'missed-surface',
       selector,
       count,
       background: toHex(detail),

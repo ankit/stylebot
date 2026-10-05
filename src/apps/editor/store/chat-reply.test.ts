@@ -166,7 +166,7 @@ describe('getRoundsTurn', () => {
 
   it('combines a fix into one turn that Undo takes back as a whole', () => {
     const problem = {
-      type: 'clashing' as const,
+      type: 'missed-surface' as const,
       selector: '.card',
       count: 1,
       background: '#ffffff',

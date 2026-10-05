@@ -1,14 +1,17 @@
 import type { ChatCssEdit, ChatStyleProblem } from '@stylebot/types';
 
 import { isVisible } from '../page-outline';
-import { findClashing } from './clashing';
 import { backgroundResolver, textContrast } from './colors';
-import { findNoEffect, sampleEdits } from './no-effect';
-import type { Sample } from './no-effect';
+import { findMissedSurfaces } from './missed-surfaces';
+import {
+  findOverriddenDeclarations,
+  sampleEdits,
+} from './overridden-declarations';
+import type { Sample } from './overridden-declarations';
 import { hasOwnText, pageElements, pageIsDark, settle } from './page';
-import { findUnreadable } from './unreadable';
+import { findUnreadableText } from './unreadable-text';
 
-const MAX_TEXT_ELEMENTS = 1500;
+const MAX_TEXTS_CHECKED = 1500;
 
 // Properties that can change how text reads against what's behind it.
 const CONTRAST_PROPERTY = /^(?:--|color$|background|all$|opacity$|filter$)/;
@@ -36,7 +39,7 @@ export const startStyleCheck = (edits: Array<ChatCssEdit>): void => {
 
   if (recolors) {
     pageElements(
-      MAX_TEXT_ELEMENTS,
+      MAX_TEXTS_CHECKED,
       element => hasOwnText(element) && isVisible(element)
     ).forEach(element => {
       const result = textContrast(element, resolveBackground);
@@ -74,10 +77,10 @@ export const checkStyle = async (): Promise<Array<ChatStyleProblem>> => {
   const dark = pageIsDark();
 
   return [
-    ...findUnreadable(noted.contrast, resolveBackground, noted.edits),
+    ...findUnreadableText(noted.contrast, resolveBackground, noted.edits),
     ...(dark !== null && noted.dark !== null && dark !== noted.dark
-      ? findClashing(dark)
+      ? findMissedSurfaces(dark)
       : []),
-    ...findNoEffect(noted.samples),
+    ...findOverriddenDeclarations(noted.samples),
   ];
 };

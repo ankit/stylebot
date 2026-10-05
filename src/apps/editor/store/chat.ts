@@ -225,7 +225,10 @@ export const createChatModule = (): Module<ChatState, State> => {
       checking ? bridge.checkStyle().catch(() => undefined) : undefined,
     ]);
 
-    if (fixing && problems?.some(problem => problem.type === 'unreadable')) {
+    if (
+      fixing &&
+      problems?.some(problem => problem.type === 'unreadable-text')
+    ) {
       const reverted = revertEdits(context.rootState.css, result.previous);
       await applyCss(context, reverted, [], `chat:${current.id}`);
       return null;
