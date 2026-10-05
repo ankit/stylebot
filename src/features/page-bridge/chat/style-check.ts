@@ -483,27 +483,67 @@ const findUnreadable = (
   }
 
   const colors = textColorSources(edits);
+  const sourceOf = (color: Rgba) =>
+    colors.find(source => source.color === toHex(color))?.source;
+  const byVariable = new Map<string, typeof worse>();
+  const rest: typeof worse = [];
 
-  return groupBySelector(worse)
+  // Text one of the reply's variables colors is reported once for all of
+  // it, so a fix changes the variable rather than the few elements listed.
+  worse.forEach(item => {
+    const source = sourceOf(item.detail.color);
+
+    if (source?.startsWith('--')) {
+      byVariable.set(source, [...(byVariable.get(source) ?? []), item]);
+    } else {
+      rest.push(item);
+    }
+  });
+
+  const problem = (
+    selector: string,
+    count: number,
+    of: number,
+    { element, detail }: (typeof worse)[number]
+  ): ChatStyleProblem => {
+    const painter = paintedBy(element, edits);
+    const colorer = sourceOf(detail.color);
+
+    return {
+      type: 'unreadable',
+      selector,
+      count,
+      of,
+      color: toHex(detail.color),
+      background: toHex(detail.background),
+      ratio: Math.round(detail.ratio * 10) / 10,
+      ...(painter ? { paintedBy: painter } : {}),
+      ...(colorer ? { coloredBy: colorer } : {}),
+    };
+  };
+
+  const variableProblems = Array.from(byVariable.values()).map(items => {
+    const worst = items.reduce((a, b) =>
+      b.detail.ratio < a.detail.ratio ? b : a
+    );
+    return problem(
+      selectorOf(worst.element),
+      items.length,
+      items.length,
+      worst
+    );
+  });
+
+  const selectorProblems = groupBySelector(rest)
     .sort((a, b) => a.detail.ratio - b.detail.ratio)
-    .slice(0, MAX_PROBLEMS)
-    .map(({ selector, count, element, detail }) => {
-      const painter = paintedBy(element, edits);
-      const color = toHex(detail.color);
-      const colorer = colors.find(source => source.color === color)?.source;
+    .map(({ selector, count, element, detail }) =>
+      problem(selector, count, countMatches([selector])[0] ?? 0, {
+        element,
+        detail,
+      })
+    );
 
-      return {
-        type: 'unreadable',
-        selector,
-        count,
-        of: countMatches([selector])[0] ?? 0,
-        color,
-        background: toHex(detail.background),
-        ratio: Math.round(detail.ratio * 10) / 10,
-        ...(painter ? { paintedBy: painter } : {}),
-        ...(colorer ? { coloredBy: colorer } : {}),
-      };
-    });
+  return [...variableProblems, ...selectorProblems].slice(0, MAX_PROBLEMS);
 };
 
 /**

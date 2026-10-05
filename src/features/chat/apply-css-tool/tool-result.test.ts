@@ -73,6 +73,7 @@ describe('toolResultFor with problems', () => {
           background: '#fe8019',
           ratio: 1.2,
           paintedBy: 'tr:first-child td',
+          coloredBy: '.titleline a',
         },
         {
           type: 'clashing' as const,
@@ -96,8 +97,8 @@ describe('toolResultFor with problems', () => {
         'Elements each selector matched:',
         '- body: 1 element',
         'Problems the page check found:',
-        '- Hard to read: .meta (4 elements), text #333333 set by your `--fg-muted` on #111111, contrast 1.6:1',
-        '- Hard to read: span.titleline a (1 of the 30 elements it matches), text #8ec07c on #fe8019 painted by your `tr:first-child td`, contrast 1.2:1',
+        '- Hard to read: 4 elements colored by your `--fg-muted` (#333333), such as .meta on #111111, contrast 1.6:1',
+        '- Hard to read: span.titleline a (1 of the 30 elements it matches), text #8ec07c set by your `.titleline a` on #fe8019 painted by your `tr:first-child td`, contrast 1.2:1',
         '- Still light on a now dark page: .card (1 element), background #ffffff',
         '- No effect: width: 80px on span.tag, overridden by the page or not applicable to that element',
       ].join('\n')

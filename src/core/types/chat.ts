@@ -72,7 +72,8 @@ export type ChatStyleProblem =
       ratio: number;
       // The reply's selector that painted the background behind the text.
       paintedBy?: string;
-      // The reply's variable, or selector, that set the text's color.
+      /* The reply's variable, or selector, that set the text's color. Text a
+       * variable colors is one problem for all of it, with selector an example. */
       coloredBy?: string;
     }
   | {

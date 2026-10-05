@@ -17,6 +17,16 @@ const describeCount = (count: number | null | undefined): string => {
 const describeProblem = (problem: ChatStyleProblem): string => {
   switch (problem.type) {
     case 'unreadable':
+      if (problem.coloredBy?.startsWith('--')) {
+        return `- Hard to read: ${describeCount(
+          problem.count
+        )} colored by your \`${problem.coloredBy}\` (${
+          problem.color
+        }), such as ${problem.selector} on ${problem.background}, contrast ${
+          problem.ratio
+        }:1`;
+      }
+
       return `- Hard to read: ${problem.selector} (${
         problem.of > problem.count
           ? `${problem.count} of the ${problem.of} elements it matches`
