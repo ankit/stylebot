@@ -51,7 +51,7 @@ A class name counts as hashed, carrying no stable meaning, when it's:
   (Facebook, Instagram, Threads). A StyleX class can look like a word, so
   `x`-prefixed classes only count once the page has at least 10 of them.
 - Google's obfuscated `m5k28` (digits among the letters, unlike `item12`) or
-  Google bar's `gb_Ra`, Instagram's legacy `_a6hd`, Svelte's `svelte-1abc2de`, Astro's
+  Google bar's `gb_Ra`, Instagram's legacy `_a6hd`, vanilla-extract's `_7uluu50` (The Verge), Svelte's `svelte-1abc2de`, Astro's
   `astro-J7PV25F6`, next/font's `__className_a64ecd`, or a JSS counter like
   `jss123` or `makeStyles-root-12`
 - a hex-like hash such as CSS Modules' `_1a2b3c`

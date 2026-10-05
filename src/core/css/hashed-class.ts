@@ -89,14 +89,16 @@ export function getStableClassParts(className: string): Array<string> | null {
 
 /**
  * Generated classes with no authored part: CSS-in-JS prefixes, React Native
- * Web's atomic classes (X), Instagram's legacy `_a6hd`, the Google bar's
- * `gb_Ra`, Svelte/Astro scoping, next/font, and JSS counters.
+ * Web's atomic classes (X), Instagram's legacy `_a6hd`, vanilla-extract's
+ * `_7uluu50`, the Google bar's `gb_Ra`, Svelte/Astro scoping, next/font,
+ * and JSS counters.
  */
 const GENERATED_CLASS_PATTERNS = [
   /^css-(?=[a-z]*\d)[0-9a-z]{5,8}(-|$)/,
   /^(sc|jsx|emotion|styled|chakra)-/i,
   /^r-(?=[a-z]*\d)[0-9a-z]{6,9}$/,
   /^_(?=[a-z]*\d)[0-9a-z]{4}$/,
+  /^_\d[0-9a-z]{4,9}$/,
   /^gb_[0-9A-Za-z]{1,3}$/,
   /^(svelte|astro)-[0-9a-z]{5,8}$/i,
   /^__(className|variable)_[0-9a-f]{6}$/,
