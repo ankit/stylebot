@@ -423,6 +423,30 @@ describe('selector', () => {
       expect(getSelector(el)).toBe('input[data-testid="email-field"]');
     });
 
+    it('skips an ancestor scope that sweeps most of the page', () => {
+      document.body.innerHTML = `
+        <div class="app">
+          <div><div class="o1ls90" data-target></div></div>
+          ${'<div><div><div></div></div></div>'.repeat(20)}
+        </div>
+      `;
+
+      const el = document.querySelector('[data-target]') as HTMLElement;
+      expect(getSelector(el)).toBe('div.o1ls90');
+      expect(getSelectorCandidates(el)).not.toContain('div.app div div');
+    });
+
+    it('keeps an ancestor scope on a page too small to sweep', () => {
+      document.body.innerHTML = `
+        <div class="app">
+          <div><div class="o1ls90" data-target></div></div>
+        </div>
+      `;
+
+      const el = document.querySelector('[data-target]') as HTMLElement;
+      expect(getSelector(el)).toBe('div.app div div');
+    });
+
     it("prefers an ancestor's class over its own id", () => {
       document.body.innerHTML = `
         <section class="card">

@@ -40,6 +40,12 @@ Each strategy is tried in turn; the first one that returns something wins.
 9. **Bare tag chain** — `parent-parent parent tag`, up to 2 levels. The true
    last resort.
 
+An ancestor scope (steps 5 and 8) is skipped when it sweeps the page: when it
+ends in a bare tag and matches more than half of the page's elements of that
+tag, like `div.app div div` under an app's root, it's effectively the bare tag.
+Pages with fewer than 20 of that tag are exempt. The same check keeps such
+selectors out of the list of other selectors below.
+
 ### What counts as a "hashed" class
 
 A class name counts as hashed, carrying no stable meaning, when it's:

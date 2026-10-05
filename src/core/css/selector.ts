@@ -1,5 +1,6 @@
 import { splitCommaList } from '@stylebot/utils';
 
+import { getSubjectCompound } from './get-subject-compound';
 import { getStableClassParts, looksHashed } from './hashed-class';
 
 /**
@@ -205,6 +206,27 @@ function getAncestorHashedClassSelector(el: HTMLElement): string | null {
   return climbToNearestUsableAncestor(el, getClassBasedSelector);
 }
 
+// Below this many elements of a tag, matching most of them is still a choice.
+const MIN_SWEEP = 20;
+
+/**
+ * Whether a scoped selector ending in a bare tag, like `div.app div div`,
+ * matches most of the page's elements of that tag, so it's effectively the
+ * bare tag and would restyle nearly the whole page.
+ */
+const isSweeping = (selector: string): boolean => {
+  const subject = getSubjectCompound(selector);
+  if (subject === selector || !/^[a-z][a-z0-9-]*$/i.test(subject)) {
+    return false;
+  }
+
+  const all = countMatches(subject);
+  return all >= MIN_SWEEP && countMatches(selector) > all / 2;
+};
+
+const unlessSweeping = (selector: string | null): string | null =>
+  selector && !isSweeping(selector) ? selector : null;
+
 /**
  * #id ranks above a hashed class but below anything genuinely authored,
  * the element's own or an ancestor's. See docs/selectors-and-css.md.
@@ -212,10 +234,10 @@ function getAncestorHashedClassSelector(el: HTMLElement): string | null {
 export const getSelector = (el: HTMLElement): string => {
   return (
     getGoodOwnSelector(el) ??
-    getAncestorBasedSelector(el) ??
+    unlessSweeping(getAncestorBasedSelector(el)) ??
     getIdBasedSelector(el) ??
     getClassBasedSelector(el) ??
-    getAncestorHashedClassSelector(el) ??
+    unlessSweeping(getAncestorHashedClassSelector(el)) ??
     getTagNameBasedSelector(el)
   );
 };
@@ -381,7 +403,7 @@ export const getItemScopedSelector = (el: HTMLElement): string | null => {
  * Every selector the strategies above offer for `el` that actually matches
  * it, most readable first: its own names, then ancestor scopes, then
  * hashed classes and bare tags, then ones scoped to this element's item
- * and to this element alone.
+ * and to this element alone. Ones sweeping most of the page are left out.
  */
 export const getSelectorCandidates = (el: HTMLElement): Array<string> =>
   [
@@ -400,7 +422,11 @@ export const getSelectorCandidates = (el: HTMLElement): Array<string> =>
     getUniqueSelector(el),
   ].filter((selector): selector is string => {
     try {
-      return Boolean(selector) && el.matches(selector as string);
+      return (
+        Boolean(selector) &&
+        el.matches(selector as string) &&
+        !isSweeping(selector as string)
+      );
     } catch {
       return false;
     }
