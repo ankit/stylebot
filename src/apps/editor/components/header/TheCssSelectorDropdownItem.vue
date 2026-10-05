@@ -11,24 +11,24 @@
     @blur.native="clearPreview"
   >
     <span class="item-row">
-      <s-tooltip
-        :text="selector"
-        :disabled="!truncated"
-        grow
-        @mouseenter.native="measureTruncation"
-      >
+      <s-tooltip :text="selector" :disabled="!trimmed" grow>
         <template #text>
           <span class="selector-tooltip">{{ selector }}</span>
         </template>
         <span ref="text" class="item-text">
-          <span ref="selector" class="item-selector">
-            <span
-              v-for="(piece, i) in short.pieces"
-              :key="i"
-              class="piece"
-              :class="piece.kind"
-              v-text="piece.text"
-            />
+          <span class="item-selector">
+            <template v-for="(piece, i) in short.pieces">
+              <span v-if="piece.kind === 'ellipsis'" :key="i" class="ellipsis">
+                <more-icon :size="14" />
+              </span>
+              <span
+                v-else
+                :key="i"
+                class="piece"
+                :class="piece.kind"
+                v-text="piece.text"
+              />
+            </template>
           </span>
           <span v-if="short.more" class="item-more" v-text="`+${short.more}`" />
         </span>
@@ -55,15 +55,17 @@
 import type { PropType } from 'vue';
 import Vue from 'vue';
 import { SMenuItem, SText, STooltip } from '@stylebot/components';
+import { MoreIcon } from '@stylebot/icons';
 
 import { getPageBridge } from '@stylebot/page-bridge';
-import type { ShortSelector } from '../../utils/short-selector';
-import { shortenSelector } from '../../utils/short-selector';
+import type { ShortSelector } from '../../utils/shorten-selector';
+import { shortenSelector } from '../../utils/shorten-selector';
 
 export default Vue.extend({
   name: 'TheCssSelectorDropdownItem',
 
   components: {
+    MoreIcon,
     SMenuItem,
     SText,
     STooltip,
@@ -88,11 +90,10 @@ export default Vue.extend({
   },
 
   data(): {
-    truncated: boolean;
     maxChars: number;
     resizeObserver: ResizeObserver | null;
   } {
-    return { truncated: false, maxChars: Infinity, resizeObserver: null };
+    return { maxChars: Infinity, resizeObserver: null };
   },
 
   computed: {
@@ -100,11 +101,10 @@ export default Vue.extend({
       return shortenSelector(this.selector, this.maxChars);
     },
 
+    // Whether the row shows less than the whole selector, so its tooltip
+    // has more to say.
     trimmed(): boolean {
-      return (
-        this.short.more > 0 ||
-        this.short.pieces.some(piece => piece.kind === 'ellipsis')
-      );
+      return this.selector.length > this.maxChars;
     },
   },
 
@@ -128,35 +128,20 @@ export default Vue.extend({
   methods: {
     /**
      * How many characters fit on the row. The selector is set in a
-     * monospace font, so any of its characters gives the width of all.
+     * monospace font, so any of its text gives every character's width.
      */
     measureWidth(): void {
-      const { text, selector } = this.$refs;
+      const { text } = this.$refs;
+      const piece = this.$el.querySelector('.piece');
 
-      if (
-        !(text instanceof HTMLElement) ||
-        !(selector instanceof HTMLElement)
-      ) {
+      if (!(text instanceof HTMLElement) || !piece?.textContent) {
         return;
       }
 
       const charWidth =
-        selector.scrollWidth / (selector.textContent?.length || 1);
+        piece.getBoundingClientRect().width / piece.textContent.length;
 
       this.maxChars = Math.floor(text.clientWidth / charWidth) || Infinity;
-    },
-
-    /**
-     * Notes whether the selector is cut short, so its tooltip only shows
-     * when there's more to read.
-     */
-    measureTruncation(): void {
-      const { selector } = this.$refs;
-
-      this.truncated =
-        this.trimmed ||
-        (selector instanceof HTMLElement &&
-          selector.scrollWidth > selector.clientWidth);
     },
 
     click(): void {
@@ -233,12 +218,16 @@ export default Vue.extend({
   color: var(--field-placeholder);
 }
 
+.piece:has(+ .ellipsis) {
+  color: var(--text-muted);
+}
+
 .ellipsis {
-  display: inline-block;
+  display: inline-flex;
   margin: 0 0.5ch;
-  padding: 0 3px;
-  border-radius: 4px;
-  line-height: 1.3;
+  padding: 1px 5px;
+  border-radius: 5px;
+  vertical-align: middle;
   color: var(--text-muted);
   background: color-mix(in srgb, var(--text-primary) 8%, transparent);
 }

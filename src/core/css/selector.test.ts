@@ -520,7 +520,7 @@ describe('getUniqueSelector and getItemScopedSelector', () => {
 
     expect(document.querySelectorAll(selector)).toHaveLength(1);
     expect(el.matches(selector)).toBe(true);
-    expect(selector).toBe('tr.athing:nth-of-type(2) a:nth-of-type(1)');
+    expect(selector).toBe('tr.athing:nth-of-type(2) td.title a:nth-of-type(1)');
   });
 
   it('anchors at a unique ancestor id', () => {
@@ -547,6 +547,8 @@ describe('getUniqueSelector and getItemScopedSelector', () => {
     const candidates = dedupeByMatches(getSelectorCandidates(el));
 
     expect(candidates).toContain('tr.athing:nth-of-type(2) a');
-    expect(candidates).toContain('tr.athing:nth-of-type(2) a:nth-of-type(1)');
+    expect(candidates).toContain(
+      'tr.athing:nth-of-type(2) td.title a:nth-of-type(1)'
+    );
   });
 });

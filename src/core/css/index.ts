@@ -5,7 +5,6 @@ export {
 
 export { injectCSSIntoDocument, removeCSSFromDocument } from './inject-style';
 export { compileStyle } from './compile';
-export { splitSelectorParts } from './selector-parts';
 
 export { getCssWithExpandedImports } from './import';
 

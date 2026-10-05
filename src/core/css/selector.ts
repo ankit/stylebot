@@ -336,65 +336,26 @@ const getPositionedStep = (el: HTMLElement): string => {
   return clashes ? `${own}:nth-of-type(${siblings.indexOf(el) + 1})` : own;
 };
 
-const joinSteps = (steps: Array<{ step: string; child: boolean }>) =>
-  steps
-    .map(({ step, child }, i) =>
-      i === 0 ? step : `${child ? '> ' : ''}${step}`
-    )
-    .join(' ');
-
 /**
- * A selector matching `el` and nothing else: its unique #id, or a chain of
- * positioned steps up to a unique ancestor, then with every step and `>`
- * that isn't needed for uniqueness dropped again.
+ * A selector matching `el` and nothing else: its positioned step, prefixed
+ * by each ancestor's in turn until only `el` matches, stopping at the
+ * first ancestor with a unique #id.
  */
 export const getUniqueSelector = (el: HTMLElement): string | null => {
-  const isUnique = (selector: string) =>
-    countMatches(selector) === 1 && el.matches(selector);
+  let selector = '';
 
-  const id = getIdBasedSelector(el);
-  if (id && isUnique(id)) {
-    return id;
-  }
+  for (let node: HTMLElement | null = el; node; node = node.parentElement) {
+    const id = getIdBasedSelector(node);
+    const step = id && countMatches(id) === 1 ? id : getPositionedStep(node);
 
-  const steps = [{ step: getPositionedStep(el), child: true }];
-  let ancestor = el.parentElement;
+    selector = selector ? `${step} ${selector}` : step;
 
-  while (!isUnique(joinSteps(steps))) {
-    if (!ancestor) {
-      return null;
-    }
-
-    const ancestorId = getIdBasedSelector(ancestor);
-    const anchored = ancestorId !== null && countMatches(ancestorId) === 1;
-
-    steps.unshift({
-      step: anchored ? (ancestorId as string) : getPositionedStep(ancestor),
-      child: true,
-    });
-    ancestor = anchored ? null : ancestor.parentElement;
-  }
-
-  for (let i = steps.length - 2; i > 0; i--) {
-    const shorter = [...steps.slice(0, i), ...steps.slice(i + 1)];
-    shorter[i] = { ...shorter[i], child: false };
-
-    if (isUnique(joinSteps(shorter))) {
-      steps.splice(0, steps.length, ...shorter);
+    if (countMatches(selector) === 1) {
+      return selector;
     }
   }
 
-  for (let i = 1; i < steps.length; i++) {
-    const looser = steps.map((step, j) =>
-      j === i ? { ...step, child: false } : step
-    );
-
-    if (isUnique(joinSteps(looser))) {
-      steps.splice(0, steps.length, ...looser);
-    }
-  }
-
-  return joinSteps(steps);
+  return null;
 };
 
 /**

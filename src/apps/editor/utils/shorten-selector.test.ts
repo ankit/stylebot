@@ -1,4 +1,4 @@
-import { shortenSelector } from './short-selector';
+import { shortenSelector } from './shorten-selector';
 
 const shown = (selector: string, maxChars: number) => {
   const { pieces, more } = shortenSelector(selector, maxChars);
@@ -13,13 +13,13 @@ describe('shortenSelector', () => {
   });
 
   it('drops whole parts from the middle, keeping as many last ones as fit', () => {
-    expect(shown(long, 40)).toBe('#\\34 9953495…span.titleline > a');
-    expect(shown(long, 20)).toBe('#\\34 9953495…> a');
+    expect(shown(long, 40)).toBe('#\\34 9953495⋯span.titleline > a');
+    expect(shown(long, 20)).toBe('#\\34 9953495⋯> a');
   });
 
   it('drops the ends of a selector with nothing in its middle', () => {
     expect(shown('#_R_3idahlik5_.prc-Button-ButtonBase-c50BI', 30)).toBe(
-      '#_R_3idahlik5_…'
+      '#_R_3idahlik5_⋯'
     );
   });
 
@@ -43,7 +43,7 @@ describe('shortenSelector', () => {
       { text: 'h2' },
     ]);
     expect(shortenSelector(long, 20).pieces[1]).toEqual({
-      text: '…',
+      text: '⋯',
       kind: 'ellipsis',
     });
   });
