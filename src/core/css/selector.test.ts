@@ -427,13 +427,13 @@ describe('selector', () => {
     it('skips an ancestor scope that sweeps most of the page', () => {
       document.body.innerHTML = `
         <div class="app">
-          <div><div class="o1ls90" data-target></div></div>
+          <div><div class="WwrzSb" data-target></div></div>
           ${'<div><div><div></div></div></div>'.repeat(30)}
         </div>
       `;
 
       const el = document.querySelector('[data-target]') as HTMLElement;
-      expect(getSelector(el)).toBe('div.o1ls90');
+      expect(getSelector(el)).toBe('div.WwrzSb');
       expect(getSelectorCandidates(el)).not.toContain('div.app div div');
     });
 
@@ -450,6 +450,12 @@ describe('selector', () => {
 
       expect(document.querySelectorAll(selector)).toHaveLength(1);
       expect(el.matches(selector)).toBe(true);
+    });
+
+    it('keeps body-child selectors as they were before partly hashed classes', () => {
+      document.body.innerHTML = '<div class="Layout_root__a1B2c"></div>';
+
+      expect(getBodyChildSelectors()).toEqual(['div.Layout_root__a1B2c']);
     });
 
     it('keeps the tag chain for body children, which saved page effects look up', () => {
@@ -475,7 +481,7 @@ describe('selector', () => {
     it('keeps an ancestor scope on a page too small to sweep', () => {
       document.body.innerHTML = `
         <div class="app">
-          <div><div class="o1ls90" data-target></div></div>
+          <div><div class="WwrzSb" data-target></div></div>
         </div>
       `;
 

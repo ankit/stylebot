@@ -30,6 +30,7 @@ describe('hashed-class', () => {
       ['prc-Link-Link-85e08', ['prc-Link-Link-']],
       ['page-module__E0kJGG__main', ['page-module__', '__main']],
       ['page-module__E0kJGG__title', ['page-module__', '__title']],
+      ['Text-module__text2xl__Ab3Cd', ['Text-module__text2xl__']],
       ['_card_1wfme_1', ['_card_']],
       ['caa-button-label-_R_93adeslcldcpbn6b5ipam_', ['caa-button-label-']],
     ])('keeps the authored parts of %s', (className, expected) => {
@@ -84,6 +85,11 @@ describe('hashed-class', () => {
 
     it.each([
       'primaryButton',
+      'icon24px',
+      'grid3x3',
+      'v2Header',
+      'col2md',
+      'h1title',
       'item12',
       'Item2',
       'col2',

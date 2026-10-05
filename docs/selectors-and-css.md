@@ -48,8 +48,9 @@ like `div.app div div`. Other tags never count, since styling every link or
 date is a real choice. Sweeping selectors are also left out of the list
 below.
 
-Page-wide effects like grayscale skip this check, since a saved effect is
-found again by its exact selector.
+Page-wide effects like grayscale keep the selectors body's children got before
+any of this (the older hashed-class rules, no partly hashed classes, no
+sweeping check), since a saved effect is found again by its exact selector.
 
 ### What counts as a "hashed" class
 
@@ -61,7 +62,9 @@ A class name counts as hashed, carrying no stable meaning, when it's:
 - an atomic class: React Native Web's `r-1awozwy` (X), or StyleX's `xeuugli`
   (Facebook, Instagram, Threads). A StyleX class can look like a word, so
   `x`-prefixed classes only count once the page has at least 10 of them.
-- Google's obfuscated `m5k28` (digits among the letters, unlike `item12`) or
+- Google's obfuscated `m5k28` or `vr1PYe` (digits among the letters, in 5
+  lowercase characters or mixed case with no capitalised word, unlike
+  `icon24px` or `v2Header`) or
   Google bar's `gb_Ra`, Instagram's legacy `_a6hd`, vanilla-extract's `_7uluu50` (The Verge), Svelte's `svelte-1abc2de`, Astro's
   `astro-J7PV25F6`, next/font's `__className_a64ecd`, or a JSS counter like
   `jss123` or `makeStyles-root-12`, or Angular's `ng-tns-c3784233582-0`

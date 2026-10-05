@@ -58,9 +58,14 @@ export function getStableClassParts(className: string): Array<string> | null {
   }
 
   // `File-module__local__hash`, as Next.js and Primer name them: the last 5
-  // characters are the hash, whatever they look like (`PEHWX`, `yeury`).
-  const moduleHash = className.match(/^(.*[-_]module__(.+)__)[\w-]{5}$/);
-  if (moduleHash && !hasDigitAmongLetters(moduleHash[2])) {
+  // characters are the hash, whatever they look like (`PEHWX`, `yeury`),
+  // unless it's Turbopack's `File-module__hash__local` (`E0kJGG__title`).
+  const moduleHash = className.match(/^(.*[-_]module__(.+)__)([\w-]{5})$/);
+  const turbopackInfix =
+    moduleHash &&
+    hasDigitAmongLetters(moduleHash[2]) &&
+    /^[a-z][a-zA-Z]*$/.test(moduleHash[3]);
+  if (moduleHash && !turbopackInfix) {
     return [moduleHash[1]];
   }
 
@@ -149,6 +154,52 @@ function pageUsesStyleX(): boolean {
 }
 
 /**
+ * Google's obfuscated names: digits among the letters, and either 5
+ * lowercase characters (`m5k28`) or mixed case with no capitalised word in
+ * it (`vr1PYe`), unlike `icon24px`, `grid3x3` or `v2Header`.
+ */
+function isGoogleObfuscated(className: string): boolean {
+  if (!/^[a-z0-9]{5,8}$/i.test(className) || !hasDigitAmongLetters(className)) {
+    return false;
+  }
+
+  if (/^[a-z0-9]{5}$/.test(className)) {
+    return true;
+  }
+
+  return (
+    /[A-Z]/.test(className) &&
+    /[a-z]/.test(className) &&
+    !/[A-Z][a-z]{3}/.test(className)
+  );
+}
+
+/**
+ * The hashed-class rules before partly hashed and site-specific classes were
+ * recognized, kept so selectors for page-wide effects still match the ones
+ * already saved.
+ */
+export function looksHashedByShape(className: string): boolean {
+  if (/^(css|sc|jsx|emotion|styled|chakra)-/i.test(className)) {
+    return true;
+  }
+
+  if (/[-_]/.test(className)) {
+    return false;
+  }
+
+  if (/^_?[0-9a-f]{5,}$/i.test(className)) {
+    return true;
+  }
+
+  if (className.length < 4 || className.length > 12) {
+    return false;
+  }
+
+  return caseTransitionRatio(className) > 0.3;
+}
+
+/**
  * Flags build-tool-generated class names (CSS Modules, styled-components,
  * Closure Compiler) by shape, since they carry no stable meaning.
  */
@@ -175,9 +226,7 @@ export function looksHashed(className: string): boolean {
     return true;
   }
 
-  // Google's obfuscated names, e.g. "m5k28" or "vr1PYe": digits among the
-  // letters, unlike a word with a number on the end ("item12").
-  if (/^(?=.*\d)(?![a-z]+\d+$)[a-z0-9]{5,8}$/i.test(className)) {
+  if (isGoogleObfuscated(className)) {
     return true;
   }
 

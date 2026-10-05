@@ -1,7 +1,11 @@
 import { splitCommaList } from '@stylebot/utils';
 
 import { getSubjectCompound } from './get-subject-compound';
-import { getStableClassParts, looksHashed } from './hashed-class';
+import {
+  getStableClassParts,
+  looksHashed,
+  looksHashedByShape,
+} from './hashed-class';
 
 /**
  * An id or class name escaped for use in a selector, so a Tailwind class
@@ -232,29 +236,43 @@ const unlessSweeping = (selector: string | null): string | null =>
   selector && !isSweeping(selector) ? selector : null;
 
 /**
- * The strategies before the bare tag chain, in rank order. `guard` vets
- * the ancestor scopes, which can sweep the whole page.
- */
-const getRankedSelector = (
-  el: HTMLElement,
-  guard: (selector: string | null) => string | null
-): string | null =>
-  getGoodOwnSelector(el) ??
-  guard(getAncestorBasedSelector(el)) ??
-  getIdBasedSelector(el) ??
-  getClassBasedSelector(el) ??
-  guard(getAncestorHashedClassSelector(el));
-
-/**
  * #id ranks above a hashed class but below anything genuinely authored,
  * the element's own or an ancestor's. Rather than sweep the page, it falls
  * back to this element alone. See docs/selectors-and-css.md.
  */
 export const getSelector = (el: HTMLElement): string =>
-  getRankedSelector(el, unlessSweeping) ??
+  getGoodOwnSelector(el) ??
+  unlessSweeping(getAncestorBasedSelector(el)) ??
+  getIdBasedSelector(el) ??
+  getClassBasedSelector(el) ??
+  unlessSweeping(getAncestorHashedClassSelector(el)) ??
   unlessSweeping(getTagNameBasedSelector(el)) ??
   getUniqueSelector(el) ??
   getTagNameBasedSelector(el);
+
+/**
+ * The selector a body child got before partly hashed classes, newer hash
+ * shapes and the sweeping check, since page-wide effects saved against it
+ * are found again by its exact text.
+ */
+const getLegacyBodyChildSelector = (el: HTMLElement): string => {
+  const getOwnName = (node: HTMLElement) =>
+    classSelector(
+      node,
+      getClassNames(node).find(name => !looksHashedByShape(name))
+    ) ??
+    getTestIdBasedSelector(node) ??
+    getNameBasedSelector(node);
+
+  return (
+    getOwnName(el) ??
+    climbToNearestUsableAncestor(el, getOwnName) ??
+    getIdBasedSelector(el) ??
+    getClassBasedSelector(el) ??
+    getAncestorHashedClassSelector(el) ??
+    getTagNameBasedSelector(el)
+  );
+};
 
 /**
  * Scopes `el` by each of its nearest ancestors (up to 4 levels) that has a
@@ -501,10 +519,5 @@ export const getBodyChildSelectors = (): Array<string> => {
     return true;
   });
 
-  // Unguarded, so saved page-wide effects keep finding their rules.
-  return filteredNodes.map(
-    node =>
-      getRankedSelector(node, selector => selector) ??
-      getTagNameBasedSelector(node)
-  );
+  return filteredNodes.map(getLegacyBodyChildSelector);
 };
