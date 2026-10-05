@@ -102,7 +102,7 @@ export default Vue.extend({
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 20px 8px 24px var(--panel-gutter);
+  padding: 20px calc(var(--panel-gutter) - 8px) 24px var(--panel-gutter);
   scrollbar-gutter: stable;
 
   @include thin-scrollbar;

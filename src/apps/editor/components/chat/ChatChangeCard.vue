@@ -102,7 +102,6 @@ export default Vue.extend({
   align-items: center;
   gap: 10px;
   min-width: 0;
-  margin: 0 -8px;
   padding: 7px 8px;
   border-radius: 8px;
   font-size: 13px;
