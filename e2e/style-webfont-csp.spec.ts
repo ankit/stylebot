@@ -84,3 +84,56 @@ h1 { font-family: Lobster; }`,
     )
     .toBe(true);
 });
+
+test('registers a blocked Google Font from cache on the next load', async ({
+  context,
+  engine,
+  extension,
+}) => {
+  test.skip(
+    !engine.blocksExtensionFonts,
+    "This engine doesn't block extension fonts, so there's nothing to cache"
+  );
+
+  await seedStyles(extension, {
+    localhost: {
+      css: `@import url(https://fonts.googleapis.com/css2?family=Lobster&display=swap);
+h1 { font-family: Lobster; }`,
+      enabled: true,
+    },
+  });
+
+  const page = await context.newPage();
+
+  // Whether the font was ready when the page finished parsing, before the
+  // blocked request's round trip through the background could have landed.
+  await page.addInitScript(() => {
+    document.addEventListener('DOMContentLoaded', () => {
+      document.documentElement.dataset.lobsterAtDomReady = String(
+        [...document.fonts].some(
+          face =>
+            face.family.replace(/["']/g, '') === 'Lobster' &&
+            face.status === 'loaded'
+        )
+      );
+    });
+  });
+
+  await page.goto(server.baseUrl);
+
+  const isCached = () =>
+    page.evaluate(() =>
+      Object.keys(localStorage).some(key =>
+        key.startsWith('stylebot-font-cache:')
+      )
+    );
+
+  await expect.poll(isCached).toBe(true);
+
+  await page.reload();
+
+  await expect(page.locator('html')).toHaveAttribute(
+    'data-lobster-at-dom-ready',
+    'true'
+  );
+});

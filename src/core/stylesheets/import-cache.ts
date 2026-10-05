@@ -1,5 +1,7 @@
 import type { GetImportCss, GetImportCssResponse } from '@stylebot/types';
 
+import { pruneFontCache } from './font-cache';
+
 const IMPORT_CACHE_PREFIX = 'stylebot-import-cache:';
 const importCacheKey = (url: string) => `${IMPORT_CACHE_PREFIX}${url}`;
 
@@ -22,7 +24,8 @@ const writeImportCache = (url: string, css: string): void => {
 
 /**
  * Removes cached @import responses for urls no current style references, so
- * editing or removing an @import doesn't leak its entry on this origin.
+ * editing or removing an @import doesn't leak its entry on this origin, and
+ * the font files only those responses loaded.
  */
 export const pruneImportCache = (liveUrls: ReadonlySet<string>): void => {
   try {
@@ -43,6 +46,8 @@ export const pruneImportCache = (liveUrls: ReadonlySet<string>): void => {
   } catch {
     // localStorage may be unavailable; nothing to clean up then.
   }
+
+  pruneFontCache(Array.from(liveUrls, url => readImportCache(url) ?? ''));
 };
 
 /**

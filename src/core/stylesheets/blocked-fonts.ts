@@ -3,6 +3,12 @@ import type {
   GetGoogleFontFileResponse,
 } from '@stylebot/types';
 
+import {
+  getGoogleFontFileUrls,
+  readFontCache,
+  writeFontCache,
+} from './font-cache';
+
 const GOOGLE_FONT_FILE = /^https:\/\/fonts\.gstatic\.com\//;
 
 const DESCRIPTORS: Record<string, string> = {
@@ -52,8 +58,21 @@ const getDescriptors = (rule: CSSFontFaceRule): FontFaceDescriptors =>
   );
 
 /**
+ * Registers a font file from its base64 bytes for every rule that loads it.
+ */
+const addFontFaces = (rules: Array<CSSFontFaceRule>, data: string): void => {
+  const bytes = Uint8Array.from(atob(data), char => char.charCodeAt(0));
+
+  rules.forEach(rule => {
+    const family = unquote(rule.style.getPropertyValue('font-family'));
+    document.fonts.add(new FontFace(family, bytes, getDescriptors(rule)));
+  });
+};
+
+/**
  * Registers a blocked font file from its bytes, fetched by the background,
  * since a FontFace built from data makes no request for the page CSP to block.
+ * The bytes are cached so the next load can register the font before paint.
  */
 const loadBlockedFont = (url: string): void => {
   const rules = getFontFaceRules(url);
@@ -75,13 +94,26 @@ const loadBlockedFont = (url: string): void => {
         return;
       }
 
-      const bytes = Uint8Array.from(atob(data), char => char.charCodeAt(0));
-
-      rules.forEach(rule => {
-        const family = unquote(rule.style.getPropertyValue('font-family'));
-        document.fonts.add(new FontFace(family, bytes, getDescriptors(rule)));
-      });
+      writeFontCache(url, data);
+      addFontFaces(rules, data);
     });
+};
+
+/**
+ * Registers the font files in the css that the page's CSP blocked on an
+ * earlier load from their cached bytes, so the first paint has them instead
+ * of waiting on the blocked request and a round trip to the background.
+ */
+export const loadCachedFonts = (css: string): void => {
+  getGoogleFontFileUrls(css).forEach(url => {
+    const data = handledUrls.has(url) ? null : readFontCache(url);
+    const rules = data ? getFontFaceRules(url) : [];
+
+    if (data && rules.length > 0) {
+      handledUrls.add(url);
+      addFontFaces(rules, data);
+    }
+  });
 };
 
 /**

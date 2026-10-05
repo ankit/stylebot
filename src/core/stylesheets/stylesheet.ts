@@ -1,4 +1,4 @@
-import { watchBlockedFonts } from './blocked-fonts';
+import { loadCachedFonts, watchBlockedFonts } from './blocked-fonts';
 import { fetchImportCss } from './import-cache';
 
 const getStylesheetId = (id: string) => {
@@ -98,6 +98,7 @@ export const injectStylesheet = (
 
     if (merged && injectionVersions.get(id) === version) {
       setStylesheetContent(id, `${merged}\n\n${css}`);
+      loadCachedFonts(merged);
     }
   });
 };
