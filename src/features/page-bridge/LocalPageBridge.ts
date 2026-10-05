@@ -188,7 +188,7 @@ export class LocalPageBridge extends PageBridgeEmitter implements PageBridge {
     this.inspector.stopInspecting();
   }
 
-  inspectKey(key: string): void {
+  handleInspectKey(key: string): void {
     this.inspector.handleKey(key);
   }
 

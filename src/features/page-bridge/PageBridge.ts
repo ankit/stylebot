@@ -91,7 +91,7 @@ export type PageBridge = {
    * Takes an inspecting key typed outside the page, as if typed on it:
    * arrows climb and descend, Enter picks.
    */
-  inspectKey(key: string): void;
+  handleInspectKey(key: string): void;
 
   /**
    * Outlines what a selector matches on the page; an invalid selector

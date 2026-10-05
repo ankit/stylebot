@@ -189,7 +189,7 @@ export default Vue.extend({
         event.preventDefault();
         event.stopPropagation();
 
-        getPageBridge().inspectKey(event.key);
+        getPageBridge().handleInspectKey(event.key);
         return;
       }
 
