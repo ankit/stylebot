@@ -1,0 +1,55 @@
+:root {
+  --bgColor-default: #282a36;
+  --bgColor-muted: #21222c;
+  --bgColor-inset: #191a21;
+  --bgColor-neutral-muted: #44475a;
+  --bgColor-accent-muted: #44475a;
+  --fgColor-default: #f8f8f2;
+  --fgColor-muted: #b4b8d0;
+  --fgColor-neutral: #b4b8d0;
+  --fgColor-accent: #bd93f9;
+  --fgColor-link: #bd93f9;
+  --borderColor-default: #44475a;
+  --borderColor-muted: #44475a;
+  --button-default-bgColor-rest: #44475a;
+  --button-default-bgColor-hover: #6272a4;
+  --button-default-fgColor-rest: #f8f8f2;
+  --button-default-borderColor-rest: #6272a4;
+  --button-primary-bgColor-rest: #50fa7b;
+  --button-primary-fgColor-rest: #282a36;
+  --button-primary-iconColor-rest: #282a36;
+  --control-bgColor-rest: #21222c;
+  --control-fgColor-rest: #f8f8f2;
+  --control-iconColor-rest: #b4b8d0;
+  --overlay-bgColor: #21222c;
+  --underlineNav-borderColor-active: #ff79c6;
+  --topicTag-borderColor: #6272a4;
+}
+
+body {
+  background: #282a36;
+  color: #f8f8f2;
+}
+
+header.HeaderMktg {
+  --MarketingHeader-canvas-default: #191a21;
+}
+
+#repository-container-header {
+  background: #21222c;
+}
+
+.markdown-body a,
+#repository-container-header strong a {
+  color: #bd93f9;
+}
+
+.markdown-body code {
+  background: #191a21;
+  color: #ff79c6;
+}
+
+a[class*='TopicTag-TopicTag'] {
+  background: #44475a;
+  color: #8be9fd;
+}

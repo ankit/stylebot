@@ -1,0 +1,67 @@
+html,
+body,
+#hnmain,
+#hnmain td {
+  background: #2d353b;
+  color: #d3c6aa;
+}
+
+body,
+td,
+a,
+span,
+input,
+.title,
+.subtext,
+.comhead,
+.pagetop,
+.yclinks {
+  font-family: 'Fira Code', monospace;
+}
+
+td[bgcolor='#ff6600'],
+td[bgcolor='#ff6600'] * {
+  background: #343f44;
+}
+
+td[bgcolor='#ff6600'] img {
+  filter: hue-rotate(60deg) saturate(0.5);
+}
+
+.pagetop,
+.pagetop a,
+.titleline > a,
+.morelink,
+center > a {
+  color: #d3c6aa;
+}
+
+.pagetop b.hnname a,
+.score,
+.yclinks a {
+  color: #a7c080;
+}
+
+.titleline > a:visited {
+  color: #9da9a0;
+}
+
+.sitebit,
+.sitestr,
+.rank,
+.subtext,
+.subtext a,
+.subline,
+.subline a {
+  color: #859289;
+}
+
+.votearrow {
+  filter: invert(0.6) sepia(0.3);
+}
+
+input[name='q'] {
+  background: #343f44;
+  color: #d3c6aa;
+  border: 1px solid #475258;
+}

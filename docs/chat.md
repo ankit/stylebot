@@ -81,18 +81,16 @@ center
 
 Each choice answers a failure seen in the eval:
 
-| Technique                                                                                                       | Example above                                                                           | Why                                                                                                                                   |
-| :-------------------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------ |
-| Visible elements only; scripts, styles and the insides of `svg`, `iframe`, `video` skipped                      | —                                                                                       | page structure, not page code                                                                                                         |
-| Anonymous wrappers flattened                                                                                    | a `div` with no id, class or text isn't listed; its children are                        | depth without information                                                                                                             |
-| Tag, id, up to 4 short classes, 40 characters of own text; ids and classes escaped as selectors need them       | `span.rank "1."`; Tailwind's `lg:-mt-16` reads `.lg\:-mt-16`                            | enough to write a selector and recognise the element; unescaped, the model copied invalid selectors and react.dev's sidebar never hid |
-| Looks only where they differ from the parent                                                                    | `td.subtext [font 9.3px]`, the white search `input`                                     | the brackets point at what a request must change                                                                                      |
-| `(page)` base line                                                                                              | first line                                                                              | what elements without their own `bg` show                                                                                             |
-| `bgcolor` attribute                                                                                             | `td[bgcolor="#ff6600"]`                                                                 | HN's orange header has no class; this is its only selector. It is the element's background, so no `bg` repeats it                     |
-| **Repeats folded**, even when they alternate                                                                    | stories are three rows (title, subtext, spacer); after two of each, `… ×84 more`        | an unfolded list ran out of budget at story 11, and the footer never reached the model                                                |
-| Kind of row includes its first children                                                                         | the subtext row (`td, td.subtext`) folds with its kind; `tr.morespace` after it doesn't | plain `tr`s holding different things stay distinct                                                                                    |
-| Named ids never fold; numbered ones do                                                                          | `tr#49949235.athing` and `tr#49949438.athing` count as one kind                         | numbered ids mark list items                                                                                                          |
-| **Spacing on the first repeated item**: padding, margin, line-height ratio, height; containers show their `gap` | `[pad 0, margin 0, h 19px]`; inline runs like the nav links get none                    | without it, "make it compact" guessed padding and made rows taller; zero is spelled out so it doesn't read as unknown                 |
+- **Visible elements only.** Scripts, styles and the insides of `svg`, `iframe` and `video` are skipped: the model needs the page's structure, not its code.
+- **Anonymous wrappers flattened.** A `div` with no id, class or text isn't listed, only its children. It adds depth without information.
+- **Enough to write a selector.** Tag, id, up to 4 short classes and 40 characters of the element's own text, as in `span.rank "1."`. Ids and classes are escaped the way selectors need them, so Tailwind's `lg:-mt-16` reads `.lg\:-mt-16`; unescaped, the model copied invalid selectors and react.dev's sidebar never hid.
+- **Looks only where they differ from the parent**, as in `td.subtext [font 9.3px]` or the white search `input`. The brackets point at what a request has to change.
+- **A `(page)` line on top**: what elements without their own `bg` show.
+- **The `bgcolor` attribute.** HN's orange header has no class, so `td[bgcolor="#ff6600"]` is its only selector. It is the element's background, so no `bg` repeats it.
+- **Repeats folded, even when they alternate.** Each HN story is three rows (title, subtext, spacer); after two of each, `… ×84 more`. Unfolded, the list ran out of budget at story 11 and the footer never reached the model.
+  - A row's kind includes its first children: the subtext row (`td, td.subtext`) folds with its kind, and `tr.morespace` after it doesn't. Plain `tr`s holding different things stay distinct.
+  - Named ids never fold; numbered ones do, since they mark list items. `tr#49949235.athing` and `tr#49949438.athing` are one kind.
+- **Spacing on the first repeated item**: padding, margin, line-height ratio and height, plus `gap` on containers, as in `[pad 0, margin 0, h 19px]`. Inline runs like the nav links get none. Without it, "make it compact" guessed padding and made rows taller. Zero is spelled out so it doesn't read as unknown.
 
 ### The page's CSS variables
 
@@ -155,7 +153,24 @@ Claude, OpenAI and Gemini, each behind one small adapter: check that a key works
 
 ## Evaluating changes
 
-Unit tests show the plumbing works, not that replies got better. `yarn eval:chat` measures that.
+Unit tests show the plumbing works, not that replies got better. `yarn eval:chat` measures that: it sends a handful of real styling requests on recorded pages to two versions of Stylebot, applies each reply, and measures on the page whether the request was met.
+
+### Running it
+
+```bash
+yarn eval:chat --base HEAD --head .
+```
+
+That compares the working tree with the last commit on every case, once each. Open `summary.md` in the results folder it prints. Common variations:
+
+- **Before a PR**, compare against `v4` with `--runs 3`, since replies vary, and put the overall row and any case that got worse in the PR.
+- **A subset**: `--cases github-dracula` or `--tags layout`.
+- **Another model**: `--head-model claude-haiku-4-5` gives head a different model, effort or thinking, to answer "would Haiku do?" in one run.
+- **Only the references**: `--references` checks every case's reference in a few seconds, with no model calls.
+
+A full run makes 12 replies, about 40 cents at list prices, in under a minute.
+
+### How it works
 
 ```mermaid
 flowchart LR
@@ -163,97 +178,110 @@ flowchart LR
     C --> H[Head version]
     B --> R1[Reply, applied]
     H --> R2[Reply, applied]
-    R1 --> J[Judge: before/after screenshots]
-    R2 --> J
-    R1 --> S[Side by side, random order]
-    R2 --> S
-    J --> T[summary.md]
-    S --> T
+    R1 --> M[Checks measured on the page]
+    R2 --> M
+    M --> T[summary.md, with screenshots]
 ```
 
-- **Both versions are built from their own checkout**, so it compares what each would ship. Pages are recorded once and replayed, so both style the same page.
-- **Model calls go through headless Claude Code** on the signed-in subscription, not an API key. Haiku runs without extended thinking, as the extension calls it.
-- **Results are cached by the code that produced them**: a rerun against an unchanged base only runs what changed. A full cold run takes about six minutes.
+- **Each version is built from its own checkout**, so the comparison is of what each would ship.
+- **Pages are recorded once and replayed**, so both versions style the same page.
+- **Each version replies with its own Chat's default model** and the options Chat sends with it (Sonnet 5 at low effort today), so the eval tests what users get.
+- **Model calls go through headless Claude Code** on the signed-in subscription, not an API key.
+- **Results are cached by the code that produced them**, so rerunning against an unchanged base only runs what changed.
 
-### Scores
+### Reading the summary
 
-| Score                | Asks                                                                                                                                                |
-| :------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **done** (1–5)       | how fully the result does what was asked; a named theme must use that theme's palette across the whole page                                         |
-| **looks** (1–5)      | polish and readability: no unreadable text, no leftover surfaces in the old colors, nothing broken                                                  |
-| **aesthetics** (1–5) | pleasing to a careful designer, apart from defects: colors that belong together, clear hierarchy, consistent spacing, restraint                     |
-| **preferred**        | which version's result the judge would ship, compared side by side; steadier than the scores, which swing about half a point between identical runs |
-| defects              | each visible problem, one line, naming where it is                                                                                                  |
+For each case, the summary has a table with one row per check and a column each for the unstyled page, the case's reference, base and head. A failed check shows the value the page had instead, such as `@contrast 1.22 (was 4.56)`. Below it are screenshots of the original page, the reference and both results.
 
-Once Chat checks its own edits, that check also counts what each result left hard to read, the surfaces a theme missed, and declarations the page overrode.
+Above the cases, tables give totals overall, by kind of request and by case:
+
+| Column                | What it counts                                                                  |
+| :-------------------- | :------------------------------------------------------------------------------ |
+| **checks**            | checks passed: whether each request was met, measured on the page               |
+| zero-match            | selectors in a reply that matched nothing                                       |
+| asked                 | cases where a reply made no edits, as when the model asks a question back       |
+| tokens in, tokens out | mean per case; thinking counts as output                                        |
+| cost                  | mean per case, at list prices without caching                                   |
+| seconds               | mean per case                                                                   |
+| unreadable, clashing  | from Chat's own check of its edits, for versions that have it; empty until then |
+
+No model grades the results. An Opus judge once compared screenshots side by side, but between identical runs it agreed with itself about half the time, and it missed or invented details the checks measure: a font it said had changed, a color it didn't notice. What no check can measure, such as whether a theme looks good, is left to the screenshots.
+
+Replies vary: with identical code on both sides, totals differ by a point or two and a single case by up to three checks. Trust a difference that holds across `--runs 3`.
 
 ### Cases
 
-Each case tests one thing a real request needs. Tags group them by kind; `core` is a six-case set for a quick check while iterating.
+One case for each kind of request people make. Add a case when a kind of request isn't covered.
 
-| Tag                     | What it tests                                                                     |
-| :---------------------- | :-------------------------------------------------------------------------------- |
-| theme                   | a named or described palette applied to every surface, readably                   |
-| readability, typography | type size, line length, fonts across the whole page                               |
-| layout, hide            | density, hiding parts and letting the rest reflow                                 |
-| taste                   | a look ("modern", "newspaper"); `vague` marks the request with no concrete target |
-| detailed                | a spec with several explicit values, all of which should land                     |
-| precise                 | a small change that should touch nothing else                                     |
-| picked                  | a request about the element picked with the inspector                             |
-| multi-turn, multi-page  | a follow-up correction; the same theme carried to another page                    |
-| variables               | a design system recolored through its CSS variables                               |
+| Site                      | Request                                                                                                                           | What's checked                                                                         |
+| :------------------------ | :-------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------- |
+| Hacker News               | "Make this page an everforest theme with Fira Code as typography"                                                                 | Everforest colors on the page, top bar and search box; Fira Code titles; readable text |
+| GitHub                    | "Give this page a Dracula theme"                                                                                                  | Dracula colors on every surface, from the site header to the readme; readable text     |
+| Wikipedia                 | "Make the article read like a book": serif at 19px, 1.6 line height, a centered 680px column, sidebar and Appearance panel hidden | each value; images kept                                                                |
+| Lobsters                  | "Make it more compact so more stories fit on screen"                                                                              | rows 20% shorter and the footer on screen, without hiding stories or shrinking titles  |
+| React docs                | "Hide the sidebar and let the content use the space"                                                                              | sidebar hidden; content wider and centered                                             |
+| A store (Books to Scrape) | 4 columns of cards with 12px corners, a 1px `#e5e7eb` border and soft shadow; bold green prices; full-width pill buttons          | each value; cards that keep their content inside, with nothing overlapping             |
 
-| Site                            | Request                                                                                                                           | Tags                              |
-| :------------------------------ | :-------------------------------------------------------------------------------------------------------------------------------- | :-------------------------------- |
-| Hacker News                     | "Make this page a Gruvbox dark theme"                                                                                             | theme, core                       |
-| Hacker News                     | "Make this page a Gruvbox dark theme" → "The footer and the search box still look off, fix them"                                  | theme, multi-turn, core           |
-| Hacker News, a story            | "Make these comments easier to read", with a comment picked                                                                       | readability, picked, core         |
-| Hacker News                     | "Make it easier to read"                                                                                                          | readability                       |
-| Hacker News, story → front page | "Make this page a Gruvbox dark theme" → "apply the same theme to this page"                                                       | theme, multi-page                 |
-| Hacker News                     | Gruvbox with an exact color for the page, text, links, visited links, metadata and top bar                                        | theme, detailed                   |
-| Wikipedia                       | "Give this page a Nord theme"                                                                                                     | theme                             |
-| Wikipedia                       | "Make it easier to read"                                                                                                          | readability, core                 |
-| Wikipedia                       | "Make the links a darker blue and underline them"                                                                                 | precise                           |
-| Wikipedia                       | "Make the article read like a book": serif at 19px, 1.6 line height, a centered 680px column, sidebar and Appearance panel hidden | readability, typography, detailed |
-| GitHub                          | "Give this page a Dracula theme"                                                                                                  | theme, variables, core            |
-| GitHub                          | "Restyle this page to use the Nord theme and use monospace typography (Fira Code). Ensure all the elements and colors match up."  | theme, typography, variables      |
-| Discourse (Python forum)        | "Use the Catppuccin Mocha theme"                                                                                                  | theme, variables                  |
-| Paul Graham's essays            | "Make this essay pleasant to read"                                                                                                | readability, typography           |
-| Python docs                     | "Make the code examples stand out and easier to read"                                                                             | readability                       |
-| Lobsters                        | "Make it more compact so more stories fit on screen"                                                                              | layout, core                      |
-| React docs                      | "Hide the sidebar and let the content use the space"                                                                              | layout, hide                      |
-| BBC News                        | "Remove the ads and clutter"                                                                                                      | hide                              |
-| arXiv                           | "Make it look modern"                                                                                                             | taste, vague                      |
-| A store (Books to Scrape)       | "Make the products look like a modern store: cards with rounded corners and a soft shadow"                                        | taste, layout                     |
-| A store (Books to Scrape)       | 4 columns, cards with 12px corners, a 1px border and soft shadow, bold green prices, full-width pill buttons                      | taste, layout, detailed           |
-| NPR, text edition               | "Make it look like a printed newspaper"                                                                                           | taste, typography                 |
+Tags group the cases by kind of request (theme, readability, typography, layout, hide, detailed specs, design systems recolored through CSS variables), and the summary totals each tag separately.
 
-The summary reads each tag separately, so a vague request's noise doesn't hide a theme's gain. Reddit and Stack Overflow block headless browsers, and some news sites cover the page with a consent dialog, so check a new site loads before adding it.
+### Checks
+
+A case lists checks for each step of its request, measured on the page after the reply and compared with the unstyled page. Each names elements by selector and expects something of them:
+
+| Expectation                                                     | Example                                                                    |
+| :-------------------------------------------------------------- | :------------------------------------------------------------------------- |
+| a computed style, exactly or within a tolerance                 | font size 19, line height 30.4±1, border color `#e5e7eb`                   |
+| one of several values, or a pattern                             | a Gruvbox background; a serif font family                                  |
+| relative to the unstyled page                                   | rows at most 0.8× as tall; links darker; body text the same                |
+| a box: width, height, top, distance from center, parent's share | a 680px column within 40px of center; the footer within the first 900px    |
+| the background behind the element, and its text's contrast      | a dark background; contrast of at least 4.5                                |
+| hidden or still shown; columns in a grid                        | the sidebar hidden; images still shown; every story still shown; 4 columns |
+| inside its container, and clear of other elements in it         | prices and buttons inside each card, not covering the cover or title       |
+
+A check looks at the first element that showed before styling, unless it asks for every match or any match.
+
+Some checks guard rather than measure the request: "titles are readable" passes on the unstyled page, and fails only if a reply breaks it.
+
+### References
+
+Each case has a reference: a stylesheet for the result it should get, written the way a reply would write it. It does two jobs:
+
+- **It shows what correct looks like**, as a column in every summary.
+- **It tests the checks.** Every check should pass with it, and the checks about the request should fail on the unstyled page. A check that fails with the reference is broken, or the page was recorded again and changed.
+
+Writing a reference is also how to find gaps: if its screenshot looks wrong but every check passes, a check is missing. That's how the checks for overlapping card content were found.
+
+### Adding a case
+
+1. **Check the site loads headless.** Reddit and Stack Overflow block headless browsers, and some news sites cover the page with a consent dialog.
+2. **Add the request** to the cases file, with a few checks for what it asks and a guard or two for what it shouldn't break. The page is recorded on the first run, or again with `--record`.
+3. **Write its reference** in the references folder, and run `--references --cases <id>` until every check passes with it and the request's checks fail without it.
+4. **Look at the reference's screenshot**, and add a check for anything wrong that no check caught.
 
 ### What it has caught
 
-**Repeated rows folded** — "apply the same theme to this page" on Hacker News. Before, the outline stopped at story 11, so the story list was left a bright orange slab:
+**Repeated rows folded**: "apply the same theme to this page" on Hacker News. Before, the outline stopped at story 11, so the story list was left a bright orange slab:
 
 ![Hacker News themed Gruvbox: before, the story list stays orange; after, it's dark with cream titles](images/chat-eval-hn-same-theme.webp)
 
-**Variables ranked and spread** — "Give this page a Dracula theme" on GitHub. Before, file names and tabs went dark on dark:
+**Variables ranked and spread**: "Give this page a Dracula theme" on GitHub. Before, file names and tabs went dark on dark:
 
 ![GitHub themed Dracula: before, file names and tabs are invisible; after, every surface is readable](images/chat-eval-github-dracula.webp)
 
-**Spacing in the outline** — "Make it more compact" on Lobsters. Before, guessed padding made the list taller; after, it's about 30% denser with the footer in view:
+**Spacing in the outline**: "Make it more compact" on Lobsters. Before, guessed padding made the list taller; after, it was about 30% denser:
 
 ![Lobsters made compact: before, the list grows past the screen; after, all stories and the footer fit](images/chat-eval-lobsters-compact.webp)
 
-### Running it
+### Options
 
-| Flag                  | Default          |                                                  |
-| :-------------------- | :--------------- | :----------------------------------------------- |
-| `--base` / `--head`   | `v4` / `.`       | the versions to compare; `.` is the working tree |
-| `--model` / `--judge` | `haiku` / `opus` | the model replying and the one grading           |
-| `--cases` / `--tags`  | all              | a subset by name, or by tag                      |
-| `--runs`              | 1                | runs per case, since replies vary                |
-| `--concurrency`       | 6                | cases at once                                    |
-| `--record`            | off              | record the pages again                           |
-| `--fresh`             | off              | ignore cached results                            |
-
-While iterating, run `--tags core` (or the tags a change targets) once with `--judge sonnet` against the previous commit. Before merging a change to the prompt, the outline or the page context, run every case with `--runs 3` against `v4`, and put the overall row and the side-by-side tally in the PR.
+| Option                                               | Default                        |                                                                                   |
+| :--------------------------------------------------- | :----------------------------- | :-------------------------------------------------------------------------------- |
+| `--base` / `--head`                                  | `v4` / `.`                     | the versions to compare; `.` is the working tree                                  |
+| `--model` / `--effort` / `--thinking`                | Chat's default and its options | another model, by alias or full ID; its effort; whether it thinks (`on` or `off`) |
+| `--head-model` / `--head-effort` / `--head-thinking` | the same as base               | a different setup for head only                                                   |
+| `--cases` / `--tags`                                 | all                            | a subset by name, or by tag                                                       |
+| `--runs`                                             | 1                              | runs per case                                                                     |
+| `--concurrency`                                      | 6                              | cases at once                                                                     |
+| `--record`                                           | off                            | record the pages again                                                            |
+| `--fresh`                                            | off                            | ignore cached results                                                             |
+| `--references`                                       | off                            | only render and score the references                                              |

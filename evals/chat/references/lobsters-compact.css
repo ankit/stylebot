@@ -1,0 +1,56 @@
+ol.stories > li {
+  margin: 0;
+}
+
+ol.stories > li .story_liner {
+  padding: 0;
+}
+
+.story .details {
+  padding-top: 0;
+  font-size: 11px;
+}
+
+.story .details,
+.story .details * {
+  line-height: 14px;
+}
+
+.story .link,
+.story .link a {
+  font-size: 13px;
+}
+
+.story .tags,
+.story .tags li,
+.story .tags a {
+  font-size: 9px;
+}
+
+.story .tags a {
+  padding: 0 3px;
+}
+
+.story .byline {
+  margin: 0;
+}
+
+.story .byline img.avatar {
+  width: 12px;
+  height: 12px;
+}
+
+.voters,
+.voters .upvoter {
+  height: 28px;
+  margin-bottom: 0;
+}
+
+.voters .upvoter {
+  font-size: 11px;
+  line-height: 14px;
+}
+
+.morelink {
+  margin: 8px 0;
+}

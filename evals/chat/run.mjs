@@ -12,6 +12,7 @@ import { parseArgs } from 'node:util';
 
 import { askClaude } from './claude.mjs';
 import { buildRef, buildScorer, checkoutRef } from './bundles.mjs';
+import { measureChecks, scoreChecks } from './checks.mjs';
 
 const require = createRequire(import.meta.url);
 const { chromium } = require('playwright');
@@ -21,26 +22,39 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const REPO = path.resolve(HERE, '../..');
 const CACHE = path.join(HERE, '.cache');
 const PAGES = path.join(HERE, 'pages');
+const REFERENCES = path.join(HERE, 'references');
 const VIEWPORT = { width: 1280, height: 900 };
 const MAX_SHOT_HEIGHT = 2000;
-// Screenshots at this scale keep the layout but read faster for the judge.
-const SHOT_SCALE = 0.7;
 const MAX_FIX_ROUNDS = 1;
 const BROAD_MATCHES = 300;
 const STYLE_ID = 'stylebot-eval-css';
+// List prices in dollars per million tokens, input and output, uncached.
+const PRICES = {
+  'claude-haiku-4-5': [1, 5],
+  'claude-sonnet-5': [2, 10],
+  'claude-sonnet-5-5': [2, 10],
+  'claude-opus-5': [5, 25],
+  'claude-opus-5-5': [4, 20],
+  'claude-fable-5-1': [10, 50],
+};
 
 const { values: args } = parseArgs({
   options: {
     base: { type: 'string', default: 'v4' },
     head: { type: 'string', default: '.' },
-    model: { type: 'string', default: 'haiku' },
-    judge: { type: 'string', default: 'opus' },
+    model: { type: 'string' },
+    effort: { type: 'string' },
+    thinking: { type: 'string' },
+    'head-model': { type: 'string' },
+    'head-effort': { type: 'string' },
+    'head-thinking': { type: 'string' },
     cases: { type: 'string' },
     tags: { type: 'string' },
     runs: { type: 'string', default: '1' },
     concurrency: { type: 'string', default: '6' },
     record: { type: 'boolean', default: false },
     fresh: { type: 'boolean', default: false },
+    references: { type: 'boolean', default: false },
   },
 });
 
@@ -145,13 +159,17 @@ const injectCss = (page, css) =>
     { id: STYLE_ID, text: pageCssFor(css) }
   );
 
-const screenshot = async (page, file) => {
-  // Web fonts load after the stylesheet that imports them; wait for both.
+// Web fonts load after the stylesheet that imports them; wait for both.
+const settle = async page => {
   await page.waitForTimeout(300);
   await page
     .waitForLoadState('networkidle', { timeout: 8000 })
     .catch(() => undefined);
   await page.evaluate(() => document.fonts.ready.then(() => undefined));
+};
+
+const screenshot = async (page, file) => {
+  await settle(page);
   const height = await page.evaluate(
     () => document.documentElement.scrollHeight
   );
@@ -167,7 +185,7 @@ const screenshot = async (page, file) => {
 
 const tag = (name, body) => `<${name}>\n${body}\n</${name}>`;
 
-// A step's request as the judge reads it, naming the element it's about.
+// A step's request as the summary shows it, naming the element it's about.
 const requestText = step =>
   step.scope
     ? `${step.text} (about the picked element: ${step.scope})`
@@ -220,71 +238,64 @@ const replySchema = ref => ({
   },
 });
 
-const JUDGE_SCHEMA = {
-  type: 'object',
-  additionalProperties: false,
-  required: ['done', 'looks_good', 'aesthetics', 'defects'],
-  properties: {
-    done: { type: 'integer', minimum: 1, maximum: 5 },
-    looks_good: { type: 'integer', minimum: 1, maximum: 5 },
-    aesthetics: { type: 'integer', minimum: 1, maximum: 5 },
-    defects: { type: 'array', items: { type: 'string' } },
-  },
+/**
+ * A case's reference: a stylesheet for the result it should get, or null
+ * when it has none.
+ */
+const referenceFor = testCase => {
+  const file = path.join(REFERENCES, `${testCase.id}.css`);
+  return fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : null;
 };
-
-const AESTHETICS = `- aesthetics (1-5): whether the after page is genuinely pleasing to look at, judged as a careful visual designer would, apart from defects: colors that belong together, with one restrained accent rather than many competing ones; a clear hierarchy, where titles, body and secondary text each read at their own weight; consistent spacing and type rhythm; surfaces that relate to each other; nothing garish, muddy or flat. 5 is something a designer would ship as is, 3 is acceptable but plain or uneven, 1 is unpleasant.`;
-
-const JUDGE_SYSTEM = `You grade a browser extension that restyles web pages from a user's request. You get the requests and two screenshots of the same page, before and after. Read both images with the Read tool, then grade strictly:
-- done (1-5): how fully the after page does what was asked. A named theme (Gruvbox, Nord) must use that theme's actual palette across the whole page, not just the top.
-- looks_good (1-5): whether it looks polished and readable: no unreadable text, no leftover surfaces in the old colors, nothing broken.
-${AESTHETICS}
-- defects: each visible problem, one short line each, naming where it is. Empty when there are none.`;
-
-const judge = async ({ requests, before, after, dir }) =>
-  askClaude({
-    model: args.judge,
-    system: JUDGE_SYSTEM,
-    prompt: `Requests, in order:\n${requests
-      .map((text, index) => `${index + 1}. ${text}`)
-      .join('\n')}\n\nBefore: ${before}\nAfter: ${after}`,
-    schema: JUDGE_SCHEMA,
-    readDir: dir,
-  });
-
-const PREFER_SCHEMA = {
-  type: 'object',
-  additionalProperties: false,
-  required: ['winner', 'reason'],
-  properties: {
-    winner: { type: 'string', enum: ['A', 'B', 'tie'] },
-    reason: { type: 'string' },
-  },
-};
-
-const PREFER_SYSTEM = `You compare two restylings of the same web page, made from the same user request by two versions of a browser extension. Read the original and both results with the Read tool. Pick the one a careful visual designer would rather ship: first whether it does what was asked, then which is more aesthetically pleasing (colors that belong together, clear hierarchy, consistent spacing and type, restraint, no garish or muddy areas, nothing unreadable). Answer tie only when you genuinely can't choose. Give the reason in one sentence.`;
 
 /**
- * Asks which of the two variants' results is better, showing them in a
- * random order so the judge's position bias averages out.
+ * Applies a case's reference stylesheet to each step's page and scores the
+ * checks with it and without any styling: every check should pass with it,
+ * and the ones about the request should fail without it.
  */
-const prefer = async ({ requests, before, base, head, dir }) => {
-  const flipped = Math.random() < 0.5;
-  const [a, b] = flipped ? [head, base] : [base, head];
-  const { output } = await askClaude({
-    model: args.judge,
-    system: PREFER_SYSTEM,
-    prompt: `Requests, in order:\n${requests
-      .map((text, index) => `${index + 1}. ${text}`)
-      .join('\n')}\n\nOriginal: ${before}\nA: ${a}\nB: ${b}`,
-    schema: PREFER_SCHEMA,
-    readDir: dir,
+const runReference = async ({ browser, testCase, css, dir }) => {
+  const context = await browser.newContext({
+    viewport: VIEWPORT,
+    bypassCSP: true,
   });
-  if (output.winner === 'tie') {
-    return { winner: 'tie', reason: output.reason };
+  for (const step of testCase.steps) {
+    await context.routeFromHAR(harFor(step.url), { notFound: 'fallback' });
   }
 
-  const pickedBase = (output.winner === 'A') !== flipped;
-  return { winner: pickedBase ? 'base' : 'head', reason: output.reason };
+  const checks = [];
+  for (const [index, step] of testCase.steps.entries()) {
+    const last = index === testCase.steps.length - 1;
+    const page = await openPage(context, step.url, []);
+    const unstyled = await measureChecks(page, step.checks);
+    if (last) {
+      await screenshot(page, path.join(dir, 'before.png'));
+    }
+    await injectCss(page, css);
+    await settle(page);
+    const styled = await measureChecks(page, step.checks);
+    const without = scoreChecks(step.checks, unstyled, unstyled);
+    checks.push(
+      ...scoreChecks(step.checks, unstyled, styled).map((check, i) => ({
+        ...check,
+        unstyled: without[i].pass,
+      }))
+    );
+    if (last) {
+      await screenshot(page, path.join(dir, 'after.png'));
+    }
+    await page.close();
+  }
+
+  await context.close();
+  return { case: testCase.id, checks };
+};
+
+/**
+ * What a call would cost at list prices without caching, as a one-off
+ * reply from the extension does; NaN for a model with no listed price.
+ */
+const costOf = ({ model, usage }) => {
+  const [input, output] = PRICES[model] ?? [NaN, NaN];
+  return (usage.input * input + usage.output * output) / 1e6;
 };
 
 let turnCount = 0;
@@ -292,13 +303,13 @@ const turnId = () => `t${++turnCount}`;
 
 /**
  * One case for one variant: each step's message and reply, with the fix
- * round when the variant has the page check, then the scores.
+ * round when the variant has the page check, the step's measured checks,
+ * then the page check's counts on the final page.
  */
 const runCase = async ({ browser, testCase, variant, scorer, dir }) => {
   const { ref } = variant;
   const context = await browser.newContext({
     viewport: VIEWPORT,
-    deviceScaleFactor: SHOT_SCALE,
     bypassCSP: true,
   });
   for (const step of testCase.steps) {
@@ -310,17 +321,17 @@ const runCase = async ({ browser, testCase, variant, scorer, dir }) => {
   let undoneFixes = 0;
   let css = '';
   let page = null;
-  let firstShot = null;
+  const checks = [];
 
   for (const [index, step] of testCase.steps.entries()) {
     await page?.close();
     page = await openPage(context, step.url, [ref.pageScript]);
 
     if (index === testCase.steps.length - 1) {
-      firstShot = path.join(dir, 'before.png');
-      await screenshot(page, firstShot);
+      await screenshot(page, path.join(dir, 'before.png'));
     }
 
+    const unstyled = await measureChecks(page, step.checks);
     await injectCss(page, css);
 
     const previousUser = [...turns]
@@ -345,7 +356,7 @@ const runCase = async ({ browser, testCase, variant, scorer, dir }) => {
       edits: [],
       previous: [],
       applied: true,
-      model: args.model,
+      model: variant.model,
     };
     const rounds = [];
 
@@ -377,14 +388,14 @@ const runCase = async ({ browser, testCase, variant, scorer, dir }) => {
       );
 
       const reply = await askClaude({
-        model: args.model,
+        model: variant.model,
         system,
         prompt,
         schema: replySchema(ref),
-        // As the extension calls it: Haiku without extended thinking.
-        thinking: !/haiku/i.test(args.model),
+        thinking: variant.thinking,
+        effort: variant.effort,
       });
-      calls.push({ usage: reply.usage, ms: reply.ms });
+      calls.push({ usage: reply.usage, ms: reply.ms, model: reply.model });
 
       const { text, edits } = reply.output;
       const round = { text, edits };
@@ -433,6 +444,12 @@ const runCase = async ({ browser, testCase, variant, scorer, dir }) => {
       done.rounds = rounds;
     }
     turns.push(done);
+
+    if (step.checks?.length) {
+      await settle(page);
+      const styled = await measureChecks(page, step.checks);
+      checks.push(...scoreChecks(step.checks, unstyled, styled));
+    }
   }
 
   await page.close();
@@ -456,26 +473,16 @@ const runCase = async ({ browser, testCase, variant, scorer, dir }) => {
     : null;
   const count = type =>
     problems ? problems.filter(p => p.type === type).length : null;
-  const afterShot = path.join(dir, 'after.png');
-  await screenshot(fresh, afterShot);
+  await screenshot(fresh, path.join(dir, 'after.png'));
   await context.close();
 
   const replies = turns.filter(turn => turn.role === 'assistant');
   const matches = replies.flatMap(turn => turn.matches ?? []);
-  const grade = await judge({
-    requests: testCase.steps.map(requestText),
-    before: firstShot,
-    after: afterShot,
-    dir,
-  });
 
   const result = {
     case: testCase.id,
     variant: variant.name,
-    done: grade.output.done,
-    looksGood: grade.output.looks_good,
-    aesthetics: grade.output.aesthetics,
-    defects: grade.output.defects,
+    checks,
     unreadable: count('unreadable'),
     clashing: count('clashing'),
     noEffect: count('no-effect'),
@@ -484,10 +491,11 @@ const runCase = async ({ browser, testCase, variant, scorer, dir }) => {
     asked: replies.some(turn => !turn.edits.length),
     calls: calls.length,
     undoneFixes,
-    tokens: calls.reduce(
-      (sum, call) => sum + call.usage.input + call.usage.output,
-      0
-    ),
+    tokensIn: calls.reduce((sum, call) => sum + call.usage.input, 0),
+    tokensOut: calls.reduce((sum, call) => sum + call.usage.output, 0),
+    thinkingTokens: calls.reduce((sum, call) => sum + call.usage.thinking, 0),
+    cost: calls.reduce((sum, call) => sum + costOf(call), 0),
+    models: [...new Set(calls.map(call => call.model))],
     seconds: Math.round(calls.reduce((sum, call) => sum + call.ms, 0) / 1000),
     problems,
     turns,
@@ -535,6 +543,13 @@ const pool = async (tasks, size) => {
   return results;
 };
 
+const average = values => {
+  const numbers = values.filter(value => typeof value === 'number');
+  return numbers.length
+    ? numbers.reduce((a, b) => a + b, 0) / numbers.length
+    : null;
+};
+
 const mean = values => {
   const numbers = values.filter(value => typeof value === 'number');
   return numbers.length
@@ -543,11 +558,43 @@ const mean = values => {
     : '–';
 };
 
-const summarise = (results, variants, preferences, cases) => {
+const dollars = value =>
+  typeof value === 'number' && !Number.isNaN(value)
+    ? `$${value.toFixed(value < 0.1 ? 4 : 2)}`
+    : '–';
+
+/**
+ * How a version calls the model, as the summary labels it.
+ */
+const setupOf = variant =>
+  [
+    variant.model,
+    variant.effort && `effort ${variant.effort}`,
+    variant.thinking && `thinking ${variant.thinking}`,
+  ]
+    .filter(Boolean)
+    .join(', ');
+
+/**
+ * How a version's Chat calls a Claude model: the effort it sends, and no
+ * thinking for Haiku, which only thinks when asked. Without a model, its
+ * default one.
+ */
+const chatSetupFor = (node, model) => {
+  const provider = node.claude;
+  const id = model ?? provider?.defaultModel ?? 'claude-haiku-4-5';
+  const known = provider?.models.find(entry => entry.id === id);
+
+  return {
+    model: id,
+    effort: known?.requestOptions?.output_config?.effort,
+    thinking: /haiku/i.test(id) ? 'off' : undefined,
+  };
+};
+
+const summarise = (results, variants, cases, references) => {
   const columns = [
-    'done',
-    'looks',
-    'aesthetics',
+    'checks',
     'unreadable',
     'clashing',
     'no-effect',
@@ -555,15 +602,22 @@ const summarise = (results, variants, preferences, cases) => {
     'asked',
     'undone fixes',
     'calls',
-    'tokens',
+    'tokens in',
+    'tokens out',
+    'cost',
     'seconds',
   ];
   const row = (label, rows) => {
     const ok = rows.filter(r => !r.error);
+    const checks = ok.flatMap(r => r.checks ?? []);
+    const passed = checks.filter(check => check.pass).length;
+
     return `| ${label} | ${[
-      mean(ok.map(r => r.done)),
-      mean(ok.map(r => r.looksGood)),
-      mean(ok.map(r => r.aesthetics)),
+      checks.length
+        ? `${passed}/${checks.length} (${Math.round(
+            (passed / checks.length) * 100
+          )}%)`
+        : '–',
       mean(ok.map(r => r.unreadable)),
       mean(ok.map(r => r.clashing)),
       mean(ok.map(r => r.noEffect)),
@@ -571,7 +625,9 @@ const summarise = (results, variants, preferences, cases) => {
       ok.filter(r => r.asked).length,
       ok.reduce((sum, r) => sum + (r.undoneFixes ?? 0), 0),
       mean(ok.map(r => r.calls)),
-      mean(ok.map(r => r.tokens)),
+      Math.round(mean(ok.map(r => r.tokensIn))) || '–',
+      Math.round(mean(ok.map(r => r.tokensOut))) || '–',
+      dollars(average(ok.map(r => r.cost))),
       mean(ok.map(r => r.seconds)),
     ].join(' | ')} |${
       rows.length - ok.length ? ` ${rows.length - ok.length} failed` : ''
@@ -580,76 +636,120 @@ const summarise = (results, variants, preferences, cases) => {
   const header = `| | ${columns.join(' | ')} |\n|${' --- |'.repeat(
     columns.length + 1
   )}`;
+  const rowsFor = (ids, variant) =>
+    results.filter(r => ids.includes(r.case) && r.variant === variant);
 
   const overall = variants.map(v =>
     row(
-      `**${v.name}**: ${v.ref.label}`,
+      `**${v.name}**: ${v.ref.label} · ${setupOf(v)}`,
       results.filter(r => r.variant === v.name)
     )
   );
-  const byCase = [...new Set(results.map(r => r.case))].flatMap(id =>
-    variants.map(v =>
-      row(
-        `${id} · ${v.name}`,
-        results.filter(r => r.case === id && r.variant === v.name)
-      )
-    )
+  const byCase = cases.flatMap(c =>
+    variants.map(v => row(`${c.id} · ${v.name}`, rowsFor([c.id], v.name)))
   );
-  const defects = results
-    .filter(r => r.defects?.length)
-    .map(r => `- **${r.case} · ${r.variant}**: ${r.defects.join('; ')}`);
-
-  const decided = preferences.filter(p => !p.error);
-  const tally = winner => decided.filter(p => p.winner === winner).length;
 
   // Kinds of request read separately: a vague one shouldn't hide a theme win.
   const byTag = [...new Set(cases.flatMap(c => c.tags))].flatMap(tag => {
     const ids = cases.filter(c => c.tags.includes(tag)).map(c => c.id);
-    const verdicts = decided.filter(p => ids.includes(p.case));
-    const won = winner => verdicts.filter(p => p.winner === winner).length;
-
-    return variants.map(v =>
-      row(
-        `${tag} · ${v.name}${
-          v.name === 'head' ? ` (preferred ${won('head')}–${won('base')})` : ''
-        }`,
-        results.filter(r => ids.includes(r.case) && r.variant === v.name)
-      )
-    );
+    return variants.map(v => row(`${tag} · ${v.name}`, rowsFor(ids, v.name)));
   });
 
-  const preferred = [
-    `Of ${
-      decided.length
-    } side-by-side comparisons, the judge preferred **head** ${tally(
-      'head'
-    )} times, **base** ${tally('base')} times, and called ${tally(
-      'tie'
-    )} a tie.`,
-    ...decided.map(
-      p => `- ${p.case} · run ${p.run}: **${p.winner}**. ${p.reason}`
-    ),
-  ];
+  /* Every check side by side: on the unstyled page and with the reference
+   * stylesheet when the case has one, then each version's; then the
+   * screenshots in the same order. */
+  const caseByCase = cases.flatMap(testCase =>
+    Array.from({ length: Number(args.runs) }, (_, run) => {
+      const folder = `${testCase.id}-${run + 1}`;
+      const reference = references[testCase.id];
+      const verdict = check => (check.pass ? '✓' : `✗ ${check.detail}`);
+      const columns = [
+        ...(reference
+          ? [
+              {
+                name: 'unstyled',
+                cell: index => (reference.checks[index].unstyled ? '✓' : '✗'),
+              },
+              {
+                name: 'reference',
+                cell: index => verdict(reference.checks[index]),
+                shot: `${testCase.id}-1/reference/after.png`,
+              },
+            ]
+          : []),
+        ...variants.map(v => {
+          const result = results.find(
+            r =>
+              r.case === testCase.id &&
+              r.run === run + 1 &&
+              r.variant === v.name
+          );
+          return {
+            name: v.name,
+            result,
+            cell: index => {
+              if (!result || result.error) {
+                return result?.error ? 'failed to run' : '–';
+              }
+              return verdict(result.checks[index]);
+            },
+            shot: `${folder}/${v.name}/after.png`,
+          };
+        }),
+      ];
+      const scored =
+        reference ?? columns.map(c => c.result).find(r => r && !r.error);
+      const checks = scored?.checks.length
+        ? [
+            `| check | ${columns.map(c => c.name).join(' | ')} |`,
+            `|${' --- |'.repeat(columns.length + 1)}`,
+            ...scored.checks.map(
+              (check, index) =>
+                `| ${check.what} | ${columns
+                  .map(c => c.cell(index))
+                  .join(' | ')} |`
+            ),
+          ]
+        : ['No checks.'];
+      const shown = columns.filter(c => c.shot);
+      const original = reference
+        ? `${testCase.id}-1/reference/before.png`
+        : `${folder}/${variants[0]?.name}/before.png`;
+      const shots = [
+        `| original | ${shown.map(c => c.name).join(' | ')} |`,
+        `|${' --- |'.repeat(shown.length + 1)}`,
+        `| ![original](${original}) | ${shown
+          .map(c => `![${c.name}](${c.shot})`)
+          .join(' | ')} |`,
+      ];
+
+      return [
+        `### ${testCase.id}${variants.length ? ` · run ${run + 1}` : ''}`,
+        testCase.steps
+          .map((step, index) => `${index + 1}. ${requestText(step)}`)
+          .join('\n'),
+        checks.join('\n'),
+        shots.join('\n'),
+      ];
+    }).flat()
+  );
 
   return [
     `# Chat eval`,
-    `Model ${args.model}, judged by ${args.judge}, ${args.runs} run(s) per case. Means per case; asked counts replies that made no edits, undone fixes counts fix-up calls taken back for making text hard to read.`,
-    `## Overall`,
-    header,
-    ...overall,
-    `## By kind of request`,
-    header,
-    ...byTag,
-    `## Preferred side by side`,
-    ...preferred,
-    `## By case`,
-    header,
-    ...byCase,
-    `## Defects the judge saw`,
-    ...defects,
-  ]
-    .join('\n\n')
-    .replace(/\n\n\|/g, '\n|');
+    `${args.runs} run(s) per case. Cost is estimated at list prices without caching, as a one-off reply pays, with thinking billed as output; tokens, cost and seconds are means per case. Checks are measured on the page after each step, and on the unstyled page and with the case's reference stylesheet when it has one; the rest are means per case, except asked, which counts cases with a reply that made no edits, and undone fixes, which counts fix-up calls taken back for making text hard to read.`,
+    ...(variants.length
+      ? [
+          `## Overall`,
+          [header, ...overall].join('\n'),
+          `## By kind of request`,
+          [header, ...byTag].join('\n'),
+          `## By case`,
+          [header, ...byCase].join('\n'),
+        ]
+      : []),
+    `## Case by case`,
+    ...caseByCase,
+  ].join('\n\n');
 };
 
 const hash = (...parts) =>
@@ -679,6 +779,7 @@ const cached = async (key, dir, work) => {
 };
 
 const main = async () => {
+  const started = Date.now();
   const allCases = JSON.parse(
     fs.readFileSync(path.join(HERE, 'cases.json'), 'utf8')
   );
@@ -687,28 +788,48 @@ const main = async () => {
   const cases = allCases.filter(
     c =>
       (!wanted || wanted.includes(c.id)) &&
-      (!tags || c.tags.some(tag => tags.includes(tag)))
+      (!tags || c.tags.some(tag => tags.includes(tag))) &&
+      (!args.references || referenceFor(c))
   );
   const nodeModules = path.join(REPO, 'node_modules');
 
   const variants = [];
-  for (const [name, refName] of [
-    ['base', args.base],
-    ['head', args.head],
-  ]) {
+  // With --references, only the references run: no versions, no model calls.
+  for (const [name, refName] of args.references
+    ? []
+    : [
+        ['base', args.base],
+        ['head', args.head],
+      ]) {
     const checkout = checkoutRef(REPO, CACHE, refName);
     const built = await buildRef(
       checkout.root,
       path.join(CACHE, 'build', name),
       nodeModules
     );
-    variants.push({
+    const head = name === 'head';
+    const chat = chatSetupFor(
+      built.node,
+      (head && args['head-model']) || args.model
+    );
+    const model = chat.model;
+    const effort = (head && args['head-effort']) || args.effort || chat.effort;
+    const thinking =
+      (head && args['head-thinking']) || args.thinking || chat.thinking;
+    if (thinking && !['on', 'off'].includes(thinking)) {
+      throw new Error(`--thinking takes on or off, not ${thinking}`);
+    }
+    const variant = {
       name,
       root: checkout.root,
+      model,
+      effort,
+      thinking,
       ref: { ...built, label: checkout.label },
-    });
+    };
+    variants.push(variant);
     log(
-      `${name}: ${checkout.label}${
+      `${name}: ${checkout.label} · ${setupOf(variant)}${
         built.features.pageCheck ? ', with page check' : ''
       }`
     );
@@ -718,22 +839,28 @@ const main = async () => {
     [REPO, ...variants.map(variant => variant.root)],
     path.join(CACHE, 'build')
   );
-  if (!scorer) {
-    log('No page check in either version yet: scoring by the judge alone.');
+  if (!scorer && !args.references) {
+    log(
+      'No page check in either version yet: no unreadable or clashing counts.'
+    );
   }
 
   /* What a result depends on besides its case and run: the code each
-   * version runs, and the harness, judge and scorer. */
+   * version runs and how it calls the model, and the harness and scorer. */
   const harness = hash(
-    ...['run.mjs', 'claude.mjs', 'bundles.mjs'].map(file =>
+    ...['run.mjs', 'claude.mjs', 'bundles.mjs', 'checks.mjs'].map(file =>
       fs.readFileSync(path.join(HERE, file), 'utf8')
     ),
-    scorer ?? '',
-    args.model,
-    args.judge
+    scorer ?? ''
   );
   variants.forEach(variant => {
-    variant.key = hash(variant.ref.nodeScript, variant.ref.pageScript);
+    variant.key = hash(
+      variant.ref.nodeScript,
+      variant.ref.pageScript,
+      variant.model,
+      variant.effort ?? '',
+      variant.thinking ?? ''
+    );
   });
   const resultKey = (variant, testCase, run) =>
     hash(harness, variant.key, JSON.stringify(testCase), String(run));
@@ -765,12 +892,15 @@ const main = async () => {
               runCase({ browser, testCase, variant, scorer, dir })
             )),
           };
+          const passed = result.checks.filter(check => check.pass).length;
           log(
             `✓ ${testCase.id} · ${variant.name}${
               result.cached ? ' (cached)' : ''
-            }: done ${result.done}, looks ${result.looksGood}, ${
-              result.problems ? result.problems.length : '–'
-            } problems`
+            }: ${
+              result.checks.length
+                ? `${passed}/${result.checks.length} checks`
+                : 'no checks'
+            }, ${result.problems ? result.problems.length : '–'} problems`
           );
           return result;
         } catch (error) {
@@ -786,61 +916,53 @@ const main = async () => {
     ).flat()
   );
 
+  const referenceTasks = cases
+    .filter(referenceFor)
+    .map(testCase => async () => {
+      const dir = path.join(outDir, `${testCase.id}-1`, 'reference');
+      fs.mkdirSync(dir, { recursive: true });
+      try {
+        const result = await runReference({
+          browser,
+          testCase,
+          css: referenceFor(testCase),
+          dir,
+        });
+        const failed = result.checks.filter(check => !check.pass);
+        log(
+          failed.length
+            ? `⚠ ${testCase.id} · reference fails: ${failed
+                .map(check => `${check.what} (${check.detail})`)
+                .join('; ')}`
+            : `✓ ${testCase.id} · reference passes all ${result.checks.length} checks`
+        );
+        return result;
+      } catch (error) {
+        log(`✗ ${testCase.id} · reference: ${error.message}`);
+        return null;
+      }
+    });
+
   const results = await pool(tasks, Number(args.concurrency));
+  const references = Object.fromEntries(
+    (await pool(referenceTasks, Number(args.concurrency)))
+      .filter(Boolean)
+      .map(result => [result.case, result])
+  );
   await browser.close();
 
-  const pairs = cases.flatMap(testCase =>
-    Array.from({ length: Number(args.runs) }, (_, run) => {
-      const found = name =>
-        results.find(
-          r =>
-            r.case === testCase.id &&
-            r.run === run + 1 &&
-            r.variant === name &&
-            !r.error
-        );
-      const [base, head] = [found('base'), found('head')];
-
-      if (!base || !head) {
-        return [];
-      }
-
-      const dir = path.join(outDir, `${testCase.id}-${run + 1}`);
-      return [
-        async () => {
-          try {
-            const pairDir = path.join(dir, 'preference');
-            fs.mkdirSync(pairDir, { recursive: true });
-            const verdict = await cached(
-              hash(harness, base.key, head.key),
-              pairDir,
-              () =>
-                prefer({
-                  requests: testCase.steps.map(requestText),
-                  before: path.join(dir, 'head', 'before.png'),
-                  base: path.join(dir, 'base', 'after.png'),
-                  head: path.join(dir, 'head', 'after.png'),
-                  dir,
-                })
-            );
-            log(
-              `⚖ ${testCase.id} · run ${run + 1}${
-                verdict.cached ? ' (cached)' : ''
-              }: ${verdict.winner}`
-            );
-            return { case: testCase.id, run: run + 1, ...verdict };
-          } catch (error) {
-            return { case: testCase.id, run: run + 1, error: error.message };
-          }
-        },
-      ];
-    }).flat()
-  );
-  const preferences = await pool(pairs, Number(args.concurrency));
-
-  const summary = summarise(results, variants, preferences, cases);
+  const ran = results.filter(r => !r.error && !r.cached);
+  const calls = ran.reduce((sum, r) => sum + r.calls, 0);
+  const spent = ran.reduce((sum, r) => sum + (r.cost ?? 0), 0);
+  const summary = summarise(results, variants, cases, references);
   fs.writeFileSync(path.join(outDir, 'summary.md'), summary);
-  log(`\n${summary}\n\nResults in ${outDir}`);
+  log(
+    `\n${summary}\n\n${calls} model calls, about ${dollars(
+      spent
+    )} at list prices, in ${Math.round(
+      (Date.now() - started) / 1000
+    )}s.\nResults in ${outDir}`
+  );
 };
 
 main().catch(error => {

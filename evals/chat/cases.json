@@ -1,100 +1,282 @@
 [
   {
-    "id": "hn-front-gruvbox",
-    "tags": ["theme", "core"],
+    "id": "hn-everforest-fira",
+    "tags": ["theme", "typography"],
     "steps": [
       {
         "url": "https://news.ycombinator.com/news",
-        "text": "Make this page a Gruvbox dark theme"
+        "text": "Make this page an everforest theme with Fira Code as typography",
+        "checks": [
+          {
+            "what": "stories sit on an Everforest background",
+            "selector": ".titleline",
+            "expect": {
+              "@background": [
+                "#232a2e±6",
+                "#272e33±6",
+                "#2d353b±6",
+                "#333c43±6",
+                "#343f44±6",
+                "#3d484d±6",
+                "#475258±6",
+                "#fffbef±6",
+                "#fdf6e3±6",
+                "#f3ead3±6",
+                "#efebd4±6",
+                "#f4f0d9±6",
+                "#e6e2cc±6"
+              ]
+            }
+          },
+          {
+            "what": "story titles are readable",
+            "selector": ".titleline > a",
+            "expect": {
+              "@contrast": ">=4.5"
+            }
+          },
+          {
+            "what": "story titles in Fira Code",
+            "selector": ".titleline > a",
+            "expect": {
+              "font-family": "/Fira Code/"
+            }
+          },
+          {
+            "what": "top bar in an Everforest color",
+            "selector": ".pagetop",
+            "expect": {
+              "@background": [
+                "#232a2e±6",
+                "#272e33±6",
+                "#2d353b±6",
+                "#333c43±6",
+                "#343f44±6",
+                "#3d484d±6",
+                "#475258±6",
+                "#fffbef±6",
+                "#fdf6e3±6",
+                "#f3ead3±6",
+                "#efebd4±6",
+                "#f4f0d9±6",
+                "#e6e2cc±6",
+                "#a7c080±6",
+                "#83c092±6",
+                "#7fbbb3±6",
+                "#dbbc7f±6",
+                "#e69875±6",
+                "#e67e80±6",
+                "#d699b6±6"
+              ]
+            }
+          },
+          {
+            "what": "top bar links are readable",
+            "selector": ".pagetop a",
+            "expect": {
+              "@contrast": ">=4.5"
+            }
+          },
+          {
+            "what": "footer search box in Everforest colors with readable text",
+            "selector": "input[name=q]",
+            "expect": {
+              "@background": [
+                "#232a2e±6",
+                "#272e33±6",
+                "#2d353b±6",
+                "#333c43±6",
+                "#343f44±6",
+                "#3d484d±6",
+                "#475258±6",
+                "#fffbef±6",
+                "#fdf6e3±6",
+                "#f3ead3±6",
+                "#efebd4±6",
+                "#f4f0d9±6",
+                "#e6e2cc±6"
+              ],
+              "@contrast": ">=4.5"
+            }
+          },
+          {
+            "what": "More link and YC banner are readable",
+            "selector": ".morelink, center:has(> a[href*=\"apply\"]) > a",
+            "match": "all",
+            "expect": {
+              "@contrast": ">=4.5"
+            }
+          }
+        ]
       }
     ]
   },
   {
-    "id": "hn-gruvbox-then-footer",
-    "tags": ["theme", "multi-turn", "core"],
+    "id": "github-dracula",
+    "tags": ["theme", "variables"],
     "steps": [
       {
-        "url": "https://news.ycombinator.com/news",
-        "text": "Make this page a Gruvbox dark theme"
-      },
-      {
-        "url": "https://news.ycombinator.com/news",
-        "text": "The footer and the search box still look off, fix them"
-      }
-    ]
-  },
-  {
-    "id": "hn-item-comments-picked",
-    "tags": ["readability", "picked", "core"],
-    "steps": [
-      {
-        "url": "https://news.ycombinator.com/item?id=8863",
-        "scope": "div.commtext",
-        "text": "Make these comments easier to read"
-      }
-    ]
-  },
-  {
-    "id": "hn-front-readable",
-    "tags": ["readability"],
-    "steps": [
-      {
-        "url": "https://news.ycombinator.com/news",
-        "text": "Make it easier to read"
-      }
-    ]
-  },
-  {
-    "id": "hn-same-theme-other-page",
-    "tags": ["theme", "multi-page"],
-    "steps": [
-      {
-        "url": "https://news.ycombinator.com/item?id=8863",
-        "text": "Make this page a Gruvbox dark theme"
-      },
-      {
-        "url": "https://news.ycombinator.com/news",
-        "text": "apply the same theme to this page"
-      }
-    ]
-  },
-  {
-    "id": "hn-gruvbox-spec",
-    "tags": ["theme", "detailed"],
-    "steps": [
-      {
-        "url": "https://news.ycombinator.com/news",
-        "text": "Gruvbox dark theme: page background #1d2021, text #ebdbb2, links #83a598, visited links #d3869b, rank numbers and the points/by/comments lines #928374, and the top bar #3c3836 with its links in #fabd2f."
-      }
-    ]
-  },
-  {
-    "id": "wikipedia-nord",
-    "tags": ["theme"],
-    "steps": [
-      {
-        "url": "https://en.wikipedia.org/wiki/Typography",
-        "text": "Give this page a Nord theme"
-      }
-    ]
-  },
-  {
-    "id": "wikipedia-readable",
-    "tags": ["readability", "core"],
-    "steps": [
-      {
-        "url": "https://en.wikipedia.org/wiki/Typography",
-        "text": "Make it easier to read"
-      }
-    ]
-  },
-  {
-    "id": "wikipedia-links",
-    "tags": ["precise"],
-    "steps": [
-      {
-        "url": "https://en.wikipedia.org/wiki/Typography",
-        "text": "Make the links a darker blue and underline them"
+        "url": "https://github.com/ankit/stylebot",
+        "text": "Give this page a Dracula theme",
+        "checks": [
+          {
+            "what": "readme on a Dracula background",
+            "selector": ".markdown-body li",
+            "expect": {
+              "@background": ["#282a36±6", "#21222c±6", "#191a21±6"]
+            }
+          },
+          {
+            "what": "readme text in Dracula's foreground",
+            "selector": ".markdown-body li",
+            "expect": {
+              "color": "#f8f8f2±16"
+            }
+          },
+          {
+            "what": "readme links in a Dracula accent",
+            "selector": ".markdown-body li > a",
+            "expect": {
+              "color": [
+                "#bd93f9±12",
+                "#8be9fd±12",
+                "#ff79c6±12",
+                "#50fa7b±12",
+                "#ffb86c±12",
+                "#f1fa8c±12"
+              ]
+            }
+          },
+          {
+            "what": "readme headings and text are readable",
+            "selector": ".markdown-body h2, .markdown-body p",
+            "match": "all",
+            "expect": {
+              "@contrast": ">=4.5"
+            }
+          },
+          {
+            "what": "inline code is readable",
+            "selector": ".markdown-body code",
+            "match": "all",
+            "expect": {
+              "@contrast": ">=4.5"
+            }
+          },
+          {
+            "what": "site header in a Dracula color",
+            "selector": "header.HeaderMktg",
+            "expect": {
+              "@background": [
+                "#282a36±6",
+                "#21222c±6",
+                "#191a21±6",
+                "#44475a±6"
+              ]
+            }
+          },
+          {
+            "what": "repo header in a Dracula color",
+            "selector": "#repository-container-header",
+            "expect": {
+              "@background": [
+                "#282a36±6",
+                "#21222c±6",
+                "#191a21±6",
+                "#44475a±6"
+              ]
+            }
+          },
+          {
+            "what": "Notifications, Fork and Star buttons are Dracula and readable",
+            "selector": ".pagehead-actions .btn",
+            "match": "all",
+            "expect": {
+              "@background": [
+                "#282a36±6",
+                "#21222c±6",
+                "#191a21±6",
+                "#44475a±6"
+              ],
+              "@contrast": ">=4.5"
+            }
+          },
+          {
+            "what": "repo tabs are readable",
+            "selector": "#repository-container-header .UnderlineNav-item",
+            "match": "all",
+            "expect": {
+              "@contrast": ">=4.5"
+            }
+          },
+          {
+            "what": "file list on a Dracula background",
+            "selector": ".react-directory-filename-column a",
+            "expect": {
+              "@background": ["#282a36±6", "#21222c±6", "#191a21±6"]
+            }
+          },
+          {
+            "what": "file names, commit messages and dates are readable",
+            "selector": ".react-directory-filename-column a, .react-directory-commit-message a, .react-directory-commit-age",
+            "match": "all",
+            "expect": {
+              "@contrast": ">=4.5"
+            }
+          },
+          {
+            "what": "Code button is readable",
+            "selector": "button[data-variant=primary]",
+            "match": "first",
+            "expect": {
+              "@contrast": ">=4.5"
+            }
+          },
+          {
+            "what": "topic pills use Dracula colors",
+            "selector": "a[class*='TopicTag-TopicTag']",
+            "match": "all",
+            "expect": {
+              "@background": [
+                "#282a36±6",
+                "#21222c±6",
+                "#191a21±6",
+                "#44475a±6",
+                "#bd93f9±12",
+                "#8be9fd±12",
+                "#ff79c6±12",
+                "#50fa7b±12",
+                "#ffb86c±12",
+                "#f1fa8c±12",
+                "#6272a4±12"
+              ]
+            }
+          },
+          {
+            "what": "topic pills are readable",
+            "selector": "a[class*='TopicTag-TopicTag']",
+            "match": "all",
+            "expect": {
+              "@contrast": ">=4.5"
+            }
+          },
+          {
+            "what": "sidebar description is readable",
+            "selector": "p[class*='SidebarAbout-module__description']",
+            "match": "first",
+            "expect": {
+              "@contrast": ">=4.5"
+            }
+          },
+          {
+            "what": "sidebar links (Readme, license, stars) are readable",
+            "selector": "div[class*='SidebarSection-module__sidebarSection'] .mt-2 a",
+            "match": "all",
+            "expect": {
+              "@contrast": ">=4.5"
+            }
+          }
+        ]
       }
     ]
   },
@@ -104,67 +286,88 @@
     "steps": [
       {
         "url": "https://en.wikipedia.org/wiki/Typography",
-        "text": "Make the article read like a book: a serif body font at 19px with 1.6 line height, the text column 680px wide and centered, hide the left sidebar and the Appearance panel, and keep the images."
-      }
-    ]
-  },
-  {
-    "id": "github-dracula",
-    "tags": ["theme", "variables", "core"],
-    "steps": [
-      {
-        "url": "https://github.com/sindresorhus/awesome",
-        "text": "Give this page a Dracula theme"
-      }
-    ]
-  },
-  {
-    "id": "github-nord-fira",
-    "tags": ["theme", "typography", "variables"],
-    "steps": [
-      {
-        "url": "https://github.com/sindresorhus/awesome",
-        "text": "Restyle this page to use the Nord theme and use monospace typography (Fira Code). Ensure all the elements and colors match up."
-      }
-    ]
-  },
-  {
-    "id": "discourse-catppuccin",
-    "tags": ["theme", "variables"],
-    "steps": [
-      {
-        "url": "https://discuss.python.org/latest",
-        "text": "Use the Catppuccin Mocha theme"
-      }
-    ]
-  },
-  {
-    "id": "paulgraham-readable",
-    "tags": ["readability", "typography"],
-    "steps": [
-      {
-        "url": "http://paulgraham.com/greatwork.html",
-        "text": "Make this essay pleasant to read"
-      }
-    ]
-  },
-  {
-    "id": "python-docs-code",
-    "tags": ["readability"],
-    "steps": [
-      {
-        "url": "https://docs.python.org/3/library/functions.html",
-        "text": "Make the code examples stand out and easier to read"
+        "text": "Make the article read like a book: a serif body font at 19px with 1.6 line height, the text column 680px wide and centered, hide the left sidebar and the Appearance panel, and keep the images.",
+        "checks": [
+          {
+            "what": "body text in a serif font",
+            "selector": "#mw-content-text p",
+            "expect": {
+              "font-family": "/(^|,\\s*)serif$|Serif|Georgia|Times|Garamond|Merriweather|Lora|Charter|Palatino|Baskerville|Crimson|Spectral|Literata|Cambria|Book|Libertine|Iowan|Hoefler|Didot|Bodoni|Minion|Caslon|Sabon|Tinos|Gelasio|Newsreader|Fraunces|Playfair|Cormorant|Alegreya|Vollkorn|Slab/"
+            }
+          },
+          {
+            "what": "19px with 1.6 line height",
+            "selector": "#mw-content-text p",
+            "expect": {
+              "font-size": "19",
+              "line-height": "30.4±1"
+            }
+          },
+          {
+            "what": "a 680px column, centered",
+            "selector": "#mw-content-text p",
+            "expect": {
+              "@width": "680±40",
+              "@offcenter": "<=40"
+            }
+          },
+          {
+            "what": "left sidebar hidden",
+            "selector": "#vector-toc-pinned-container",
+            "hidden": true
+          },
+          {
+            "what": "Appearance panel hidden",
+            "selector": "#vector-appearance-pinned-container",
+            "hidden": true
+          },
+          {
+            "what": "images still shown",
+            "selector": "#mw-content-text figure img",
+            "hidden": false
+          }
+        ]
       }
     ]
   },
   {
     "id": "lobsters-compact",
-    "tags": ["layout", "core"],
+    "tags": ["layout"],
     "steps": [
       {
         "url": "https://lobste.rs/",
-        "text": "Make it more compact so more stories fit on screen"
+        "text": "Make it more compact so more stories fit on screen",
+        "checks": [
+          {
+            "what": "story rows at least 20% shorter",
+            "selector": "ol.stories > li",
+            "expect": {
+              "@height": "<=0.8x"
+            }
+          },
+          {
+            "what": "footer in the first screen",
+            "selector": "footer",
+            "expect": {
+              "@top": "<900"
+            }
+          },
+          {
+            "what": "every story still shown",
+            "selector": "ol.stories > li",
+            "match": "all",
+            "hidden": false
+          },
+          {
+            "what": "titles stay at least 13px and readable",
+            "selector": ".story .link a",
+            "match": "all",
+            "expect": {
+              "font-size": ">=13",
+              "@contrast": ">=4.5"
+            }
+          }
+        ]
       }
     ]
   },
@@ -174,37 +377,28 @@
     "steps": [
       {
         "url": "https://react.dev/learn",
-        "text": "Hide the sidebar and let the content use the space"
-      }
-    ]
-  },
-  {
-    "id": "bbc-declutter",
-    "tags": ["hide"],
-    "steps": [
-      {
-        "url": "https://www.bbc.com/news",
-        "text": "Remove the ads and clutter"
-      }
-    ]
-  },
-  {
-    "id": "arxiv-modern",
-    "tags": ["taste", "vague"],
-    "steps": [
-      {
-        "url": "https://arxiv.org/abs/1706.03762",
-        "text": "Make it look modern"
-      }
-    ]
-  },
-  {
-    "id": "books-store-cards",
-    "tags": ["taste", "layout"],
-    "steps": [
-      {
-        "url": "https://books.toscrape.com/",
-        "text": "Make the products look like a modern store: cards with rounded corners and a soft shadow"
+        "text": "Hide the sidebar and let the content use the space",
+        "checks": [
+          {
+            "what": "sidebar hidden",
+            "selector": "aside",
+            "hidden": true
+          },
+          {
+            "what": "content at least 20% wider",
+            "selector": "main",
+            "expect": {
+              "@width": ">=1.2x"
+            }
+          },
+          {
+            "what": "the text column sits in the middle, not against the left edge",
+            "selector": "main article p",
+            "expect": {
+              "@offcenter": "<=80"
+            }
+          }
+        ]
       }
     ]
   },
@@ -214,17 +408,80 @@
     "steps": [
       {
         "url": "https://books.toscrape.com/",
-        "text": "Product grid: 4 columns, each product a card with 12px rounded corners, a 1px #e5e7eb border and a soft shadow; prices bold and green; the Add to basket button a full-width pill."
-      }
-    ]
-  },
-  {
-    "id": "npr-newspaper",
-    "tags": ["taste", "typography"],
-    "steps": [
-      {
-        "url": "https://text.npr.org/",
-        "text": "Make it look like a printed newspaper"
+        "text": "Product grid: 4 columns, each product a card with 12px rounded corners, a 1px #e5e7eb border and a soft shadow; prices bold and green; the Add to basket button a full-width pill.",
+        "checks": [
+          {
+            "what": "4 columns",
+            "selector": "ol.row > li",
+            "columns": 4
+          },
+          {
+            "what": "cards have 12px corners",
+            "selector": "ol.row > li, article.product_pod",
+            "match": "any",
+            "expect": {
+              "border-top-left-radius": "12"
+            }
+          },
+          {
+            "what": "cards have a 1px #e5e7eb border",
+            "selector": "ol.row > li, article.product_pod",
+            "match": "any",
+            "expect": {
+              "border-top-width": "1",
+              "border-top-color": "#e5e7eb"
+            }
+          },
+          {
+            "what": "cards have a soft shadow",
+            "selector": "ol.row > li, article.product_pod",
+            "match": "any",
+            "expect": {
+              "box-shadow": "/^(?!none$)/"
+            }
+          },
+          {
+            "what": "prices bold and green",
+            "selector": ".product_pod .price_color",
+            "expect": {
+              "font-weight": ">=600",
+              "color": "hue 90-170"
+            }
+          },
+          {
+            "what": "button a full-width pill",
+            "selector": ".product_pod .btn",
+            "expect": {
+              "@fill": ">=0.95",
+              "border-top-left-radius": ">=15"
+            }
+          },
+          {
+            "what": "cards stay at least 150px wide",
+            "selector": "article.product_pod",
+            "match": "all",
+            "expect": {
+              "@width": ">=150"
+            }
+          },
+          {
+            "what": "titles, prices and buttons stay inside their card",
+            "selector": ".product_pod h3 a, .product_pod .price_color, .product_pod .btn",
+            "within": "article.product_pod"
+          },
+          {
+            "what": "prices, stock and buttons don't cover the cover, stars or title",
+            "selector": ".product_pod .price_color, .product_pod .instock, .product_pod .btn",
+            "within": "article.product_pod",
+            "clear": ".image_container img, .star-rating, h3 a"
+          },
+          {
+            "what": "book covers still shown",
+            "selector": ".product_pod .image_container img",
+            "match": "all",
+            "hidden": false
+          }
+        ]
       }
     ]
   }

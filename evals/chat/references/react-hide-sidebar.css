@@ -1,0 +1,12 @@
+.lg\:-mt-16 {
+  display: none;
+}
+
+.lg\:grid-cols-sidebar-content {
+  grid-template-columns: 1fr;
+}
+
+main article .max-w-4xl {
+  max-width: 960px;
+  margin-inline: auto;
+}

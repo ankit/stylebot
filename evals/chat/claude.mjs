@@ -5,19 +5,22 @@ import path from 'node:path';
 
 // Outside the repo, so the project's CLAUDE.md doesn't reach the model.
 const WORK_DIR = fs.mkdtempSync(path.join(os.tmpdir(), 'stylebot-eval-'));
+const THINKING_BUDGET = '8000';
 
 /**
  * Asks headless Claude Code for a reply matching the JSON schema, billed to
- * the signed-in subscription rather than an API key. Resolves to the
- * structured output with the call's usage and duration.
+ * the signed-in subscription rather than an API key. thinking is 'on', 'off',
+ * or undefined for Claude Code's default, and effort a level or undefined.
+ * Resolves to the structured output with the model that answered, its usage
+ * and duration.
  */
 export const askClaude = ({
   model,
   system,
   prompt,
   schema,
-  readDir,
-  thinking = true,
+  thinking,
+  effort,
 }) =>
   new Promise((resolve, reject) => {
     const systemFile = path.join(
@@ -39,16 +42,19 @@ export const askClaude = ({
       'json',
       '--json-schema',
       JSON.stringify(schema),
-      ...(readDir
-        ? ['--tools', 'Read', '--allowedTools', 'Read', '--add-dir', readDir]
-        : ['--tools', '']),
+      '--tools',
+      '',
+      ...(effort ? ['--effort', effort] : []),
     ];
 
     const child = spawn('claude', args, {
       cwd: WORK_DIR,
       env: thinking
-        ? process.env
-        : { ...process.env, MAX_THINKING_TOKENS: '0' },
+        ? {
+            ...process.env,
+            MAX_THINKING_TOKENS: thinking === 'on' ? THINKING_BUDGET : '0',
+          }
+        : process.env,
     });
     let stdout = '';
     let stderr = '';
@@ -81,7 +87,10 @@ export const askClaude = ({
             (result.usage?.cache_read_input_tokens ?? 0) +
             (result.usage?.cache_creation_input_tokens ?? 0),
           output: result.usage?.output_tokens ?? 0,
+          thinking: result.usage?.output_tokens_details?.thinking_tokens ?? 0,
         },
+        // The model that answered, without its date: claude-haiku-4-5.
+        model: Object.keys(result.modelUsage ?? {})[0]?.replace(/-\d{8}$/, ''),
         ms: result.duration_ms ?? 0,
       });
     });

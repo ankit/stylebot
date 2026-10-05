@@ -1,15 +1,16 @@
 ---
 name: eval-chat
-description: Measure whether a change makes Chat's styling replies better, with `yarn eval:chat` — it runs styling requests on recorded real pages for two versions of Stylebot and has a model grade and compare the results. Use after changing Chat's prompt, the page outline or CSS context it sends, or how replies are applied or checked, before claiming the change helps; when the user asks "is this better?", "run the evals", or wants numbers for a PR.
+description: Measure whether a change makes Chat's styling replies better, with `yarn eval:chat` — it runs styling requests on recorded real pages for two versions of Stylebot and measures on the page whether each request was met. Use after changing Chat's prompt, the page outline or CSS context it sends, or how replies are applied or checked, before claiming the change helps; when the user asks "is this better?", "run the evals", or wants numbers for a PR.
 ---
 
 # Evaluate Chat's styling
 
 Unit tests show Chat's plumbing works, not that its replies look better. `yarn eval:chat`
-measures that: each case is a request on a recorded page ("Make this page a Gruvbox dark
-theme" on Hacker News), run for a base and a head version, then graded from before/after
-screenshots and compared side by side. Model calls go through headless Claude Code on the
-user's subscription, not an API key. `docs/chat.md` describes the harness; this is how to
+measures that: each case is a request on a recorded page ("Make this page an everforest
+theme with Fira Code as typography" on Hacker News), run for a base and a head version,
+then measured on the page (a column's width, a sidebar hidden, a font, a color) and shown
+in screenshots. Model calls go through headless Claude Code on the user's subscription,
+not an API key. `docs/chat.md` describes the harness; this is how to
 use it well.
 
 ## 1. Run it
@@ -17,34 +18,39 @@ use it well.
 From the checkout with the change, after `yarn install`:
 
 ```
-yarn eval:chat --base HEAD --head . --tags core --judge sonnet
+yarn eval:chat --base HEAD --head .
 ```
 
 - **Compare against the previous commit** (`--base HEAD --head .`) while iterating, so the
   numbers isolate this change; compare against `v4` for a PR's description.
-- **Iterate on a subset**: `--tags core` (six cases across kinds of request), or the tags a
-  change targets (theme, readability, typography, layout, hide, taste, detailed, precise,
-  picked, multi-turn), one run, `--judge sonnet`. Before a PR, run every case with
-  `--runs 3` and the default Opus judge, and read the "by kind of request" table: a vague
-  request's noise shouldn't hide a theme's gain, or the other way round.
-- **Run it in the background** and wait for `Results in …`; a full cold run takes about
-  six minutes, and results are cached by the code that produced them, so an unchanged
-  base costs nothing the second time.
+- **Iterate on all six cases**, or the tags a change targets (theme, readability,
+  typography, layout, hide, detailed, variables), one run. Before a PR, run them with
+  `--runs 3`. To compare models or thinking, give head its own setup with `--head-model`
+  or `--head-thinking`.
+- **Run it in the background** and wait for `Results in …`; it ends by saying how many model
+  calls it made and how long it took. Results are cached by the code that produced them,
+  so an unchanged base costs nothing the second time.
 - New pages are recorded on first use. Check a new site loads headless before adding it:
   Reddit and Stack Overflow block it, and some news sites cover the page with a consent
-  dialog that the screenshots then grade.
+  dialog that the screenshots and checks then measure instead of the page.
 
 ## 2. Read it
 
 Open `summary.md` in the results folder.
 
-- **Trust the side-by-side preference most**, then counts like unreadable text. The 1–5
-  scores swing by about half a point between identical runs (the same base has scored 5,
-  then 3); one run is a hint, three are evidence.
+- **Read "Case by case"**: every check for base and head, with the value the page had when
+  one failed, then the original page and each version's result. Checks are the score;
+  the screenshots are for what no check measures, like whether a theme looks good.
+- **When reporting a run, show it**: each case's checks for base and head, and its
+  screenshots, not only the overall numbers. One run is a hint, three are evidence.
 - **Look before you believe a surprising score.** Each case's folder has the screenshots,
   the conversation and the stylesheet. Harness bugs have looked like model failures: web
   fonts not loaded before the screenshot, a page's CSP blocking the injected script.
-- **Read the judge's defects for patterns** that repeat across cases; those are what to fix.
+- **Look for failures that repeat across cases**; those are what to fix. When the
+  screenshots show a problem no check catches, add a check (see `docs/chat.md`).
+- **Changing a case's checks?** Run `yarn eval:chat --references --cases <id>` first: no
+  model calls, and every check should pass with the case's reference stylesheet. Write a
+  reference for a case that doesn't have one yet.
 
 ## 3. Improve what it finds
 
@@ -65,6 +71,5 @@ What moved the scores, roughly in order:
 
 ## 4. Report it
 
-In the PR description, give the comparison against `v4`: the overall row (done, looks,
-aesthetics, unreadable), the side-by-side tally, the model and runs, and any case that got
-worse. Say it's Haiku-only if it is.
+In the PR description, give the comparison against `v4`: the overall row (checks,
+unreadable, zero-match, cost), the model setup and runs, and any case that got worse.

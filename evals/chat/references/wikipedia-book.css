@@ -1,0 +1,29 @@
+.vector-column-start,
+#vector-appearance-pinned-container {
+  display: none;
+}
+
+.mw-page-container,
+.mw-page-container-inner {
+  display: block;
+  max-width: none;
+}
+
+.mw-content-container {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+.mw-body {
+  display: block;
+  padding: 0;
+}
+
+#mw-content-text p,
+#mw-content-text li,
+#mw-content-text blockquote {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 19px;
+  line-height: 1.6;
+}
