@@ -50,6 +50,8 @@ import type { SelectorAlternatives } from '@stylebot/page-bridge';
 import { getPageBridge } from '@stylebot/page-bridge';
 import TheCssSelectorDropdownItem from './TheCssSelectorDropdownItem.vue';
 
+const PSEUDO_ELEMENT = /::|:(before|after|first-line|first-letter)\b/i;
+
 type DropdownEntry = {
   id: string;
   value: string;
@@ -211,7 +213,10 @@ export default Vue.extend({
     },
 
     async loadMatchCounts(): Promise<void> {
-      const selectors = this.entries.map(entry => entry.value).filter(Boolean);
+      // A pseudo-element isn't an element the page can count, so it'd read 0.
+      const selectors = this.entries
+        .map(entry => entry.value)
+        .filter(value => value && !PSEUDO_ELEMENT.test(value));
       const counts = await getPageBridge().countMatches(selectors);
 
       this.matchCounts = Object.fromEntries(
