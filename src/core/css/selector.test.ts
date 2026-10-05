@@ -182,6 +182,10 @@ describe('selector', () => {
       ['Button_root___x7Yz', 'nav[class*="Button_root__"]'],
       ['styles_root__1hiof570', 'nav[class*="styles_root__"]'],
       ['Header__Nav-sc-1x2y3z-0', 'nav[class*="Header__Nav-sc-"]'],
+      [
+        'PullRequestBranchName-module__branchName__SCtl2',
+        'nav[class*="PullRequestBranchName-module__branchName__"]',
+      ],
       ['prc-TopicTag-TopicTag-LS-jX', 'nav[class*="prc-TopicTag-TopicTag-"]'],
       ['prc-Button-ButtonBase-c50BI', 'nav[class*="prc-Button-ButtonBase-"]'],
       ['prc-Link-Link-85e08', 'nav[class*="prc-Link-Link-"]'],
@@ -199,6 +203,7 @@ describe('selector', () => {
     it.each([
       'card__title',
       'card__item2',
+      'card__Item2',
       'menu__subMenu',
       'primary-nav',
       'col-md-12',

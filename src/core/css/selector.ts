@@ -73,7 +73,7 @@ function caseTransitionRatio(value: string): number {
  * CSS Modules' `a1B2c` or vanilla-extract's `1hiof570`, but not `item2`.
  */
 function isHashSegment(segment: string): boolean {
-  if (!/^[\w-]{5,10}$/.test(segment) || /^[a-z]+\d+$/i.test(segment)) {
+  if (!/^[\w-]{5,10}$/.test(segment) || /^[A-Z]?[a-z]+\d+$/.test(segment)) {
     return false;
   }
 
