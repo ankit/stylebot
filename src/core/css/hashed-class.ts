@@ -28,6 +28,16 @@ function isHashSegment(segment: string): boolean {
 }
 
 /**
+ * Whether a name mixes digits into its letters, like `E0kJGG`, rather than
+ * ending in a number like `item12`.
+ */
+function hasDigitAmongLetters(value: string): boolean {
+  return (
+    /\d/.test(value) && /[a-z]/i.test(value) && !/^[A-Z]?[a-z]+\d+$/.test(value)
+  );
+}
+
+/**
  * A 5-character CSS Modules hash at the end of a dash-separated class, like
  * `LS-jX` or `c50BI`, but not a word (`Large`) or a size token (`xs-12`).
  */
@@ -49,8 +59,8 @@ export function getStableClassParts(className: string): Array<string> | null {
 
   // `File-module__local__hash`, as Next.js and Primer name them: the last 5
   // characters are the hash, whatever they look like (`PEHWX`, `yeury`).
-  const moduleHash = className.match(/^(.*[-_]module__.+__)[\w-]{5}$/);
-  if (moduleHash) {
+  const moduleHash = className.match(/^(.*[-_]module__(.+)__)[\w-]{5}$/);
+  if (moduleHash && !hasDigitAmongLetters(moduleHash[2])) {
     return [moduleHash[1]];
   }
 
@@ -83,6 +93,9 @@ export function getStableClassParts(className: string): Array<string> | null {
 
   const before = segments.slice(0, hashAt).join('__');
   const after = segments.slice(hashAt + 1).join('__');
+  if (!before) {
+    return null;
+  }
 
   return after ? [`${before}__`, `__${after}`] : [`${before}__`];
 }
@@ -91,7 +104,7 @@ export function getStableClassParts(className: string): Array<string> | null {
  * Generated classes with no authored part: CSS-in-JS prefixes, React Native
  * Web's atomic classes (X), Instagram's legacy `_a6hd`, vanilla-extract's
  * `_7uluu50`, the Google bar's `gb_Ra`, Svelte/Astro scoping, next/font,
- * and JSS counters.
+ * JSS counters, and Angular's animation classes.
  */
 const GENERATED_CLASS_PATTERNS = [
   /^css-(?=[a-z]*\d)[0-9a-z]{5,8}(-|$)/,
@@ -103,6 +116,7 @@ const GENERATED_CLASS_PATTERNS = [
   /^(svelte|astro)-[0-9a-z]{5,8}$/i,
   /^__(className|variable)_[0-9a-f]{6}$/,
   /^jss\d+$/,
+  /^ng-tns-c\d+-\d+$/,
   /^makeStyles-.+-\d+$/,
 ];
 

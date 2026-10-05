@@ -29,6 +29,7 @@ describe('hashed-class', () => {
       ['prc-Button-ButtonBase-c50BI', ['prc-Button-ButtonBase-']],
       ['prc-Link-Link-85e08', ['prc-Link-Link-']],
       ['page-module__E0kJGG__main', ['page-module__', '__main']],
+      ['page-module__E0kJGG__title', ['page-module__', '__title']],
       ['_card_1wfme_1', ['_card_']],
       ['caa-button-label-_R_93adeslcldcpbn6b5ipam_', ['caa-button-label-']],
     ])('keeps the authored parts of %s', (className, expected) => {
@@ -46,6 +47,7 @@ describe('hashed-class', () => {
       'MuiButton-sizeLarge',
       'Card-Title-Large',
       'bg-red-500',
+      '__a1B2c',
     ])('finds no hash in %s', className => {
       expect(getStableClassParts(className)).toBeNull();
     });
@@ -74,6 +76,7 @@ describe('hashed-class', () => {
       '__variable_a64ecd',
       'jss123',
       'makeStyles-root-12',
+      'ng-tns-c3784233582-0',
       'Header_nav__a1B2c',
     ])('treats %s as generated', className => {
       expect(looksHashed(className)).toBe(true);

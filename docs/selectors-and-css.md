@@ -59,7 +59,7 @@ A class name counts as hashed, carrying no stable meaning, when it's:
 - Google's obfuscated `m5k28` (digits among the letters, unlike `item12`) or
   Google bar's `gb_Ra`, Instagram's legacy `_a6hd`, vanilla-extract's `_7uluu50` (The Verge), Svelte's `svelte-1abc2de`, Astro's
   `astro-J7PV25F6`, next/font's `__className_a64ecd`, or a JSS counter like
-  `jss123` or `makeStyles-root-12`
+  `jss123` or `makeStyles-root-12`, or Angular's `ng-tns-c3784233582-0`
 - a hex-like hash such as CSS Modules' `_1a2b3c`
 - a short (4–12 chars) name with an unusually high number of case transitions,
   which separates a hash like `WwrzSb` from a camelCase word like `navBar`
