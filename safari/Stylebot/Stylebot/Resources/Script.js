@@ -1,22 +1,29 @@
-function show(enabled, useSettingsInsteadOfPreferences) {
-  if (useSettingsInsteadOfPreferences) {
-    document.getElementsByClassName('state-on')[0].innerText =
-      'Stylebot’s extension is currently on. You can turn it off in the Extensions section of Safari Settings.';
-    document.getElementsByClassName('state-off')[0].innerText =
-      'Stylebot’s extension is currently off. You can turn it on in the Extensions section of Safari Settings.';
-    document.getElementsByClassName('state-unknown')[0].innerText =
-      'You can turn on Stylebot’s extension in the Extensions section of Safari Settings.';
-    document.getElementsByClassName('open-preferences')[0].innerText =
-      'Quit and Open Safari Settings…';
-  }
+/**
+ * Shows the extension's state, in the user's language.
+ * `messages` maps each of the extension's message keys to its text.
+ */
+function show(state, messages) {
+  const t = key => messages[key] ?? '';
+  const setText = (selector, text) => {
+    document.querySelector(selector).textContent = text;
+  };
 
-  if (typeof enabled === 'boolean') {
-    document.body.classList.toggle(`state-on`, enabled);
-    document.body.classList.toggle(`state-off`, !enabled);
-  } else {
-    document.body.classList.remove(`state-on`);
-    document.body.classList.remove(`state-off`);
-  }
+  document.documentElement.lang = t('language_code');
+  setText('.description', t('extension_description'));
+  setText(
+    '.state-on',
+    t('stylebot_is_on_turn_it_off_in_safari_settings_extensions')
+  );
+  setText(
+    '.state-off',
+    t('stylebot_is_off_turn_it_on_in_safari_settings_extensions')
+  );
+  setText(
+    '.state-unknown',
+    t('turn_on_stylebot_in_safari_settings_extensions')
+  );
+  setText('.open-preferences', t('quit_and_open_safari_settings'));
+  document.body.classList.add(`state-${state}`);
 }
 
 function openPreferences() {

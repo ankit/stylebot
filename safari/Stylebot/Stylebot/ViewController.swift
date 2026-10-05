@@ -11,6 +11,37 @@ import WebKit
 
 let extensionBundleIdentifier = "dev.stylebot.mac.Extension"
 
+struct ExtensionMessage: Decodable {
+    let message: String
+}
+
+/**
+ * The extension's messages in the user's language, with English for any it lacks,
+ * read from the _locales folder bundled with the extension.
+ */
+func extensionMessages() -> [String: String] {
+    guard let localesURL = Bundle.main.builtInPlugInsURL?
+            .appendingPathComponent("Stylebot Extension.appex/Contents/Resources/_locales"),
+          let locales = try? FileManager.default.contentsOfDirectory(atPath: localesURL.path) else {
+        return [:]
+    }
+
+    let locale = Bundle.preferredLocalizations(from: locales).first ?? "en"
+
+    return ["en", locale].reduce(into: [:]) { messages, locale in
+        let url = localesURL.appendingPathComponent("\(locale)/messages.json")
+
+        guard let data = try? Data(contentsOf: url),
+              let localeMessages = try? JSONDecoder().decode([String: ExtensionMessage].self, from: data) else {
+            return
+        }
+
+        for (key, value) in localeMessages {
+            messages[key] = value.message
+        }
+    }
+}
+
 class ViewController: NSViewController, WKNavigationDelegate, WKScriptMessageHandler {
 
     @IBOutlet var webView: WKWebView!
@@ -26,18 +57,18 @@ class ViewController: NSViewController, WKNavigationDelegate, WKScriptMessageHan
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        let messages = extensionMessages()
+
         SFSafariExtensionManager.getStateOfSafariExtension(withIdentifier: extensionBundleIdentifier) { (state, error) in
-            guard let state = state, error == nil else {
-                // Insert code to inform the user that something went wrong.
-                return
-            }
+            let enabledState = state.map { $0.isEnabled ? "on" : "off" } ?? "unknown"
 
             DispatchQueue.main.async {
-                if #available(macOS 13, *) {
-                    webView.evaluateJavaScript("show(\(state.isEnabled), true)")
-                } else {
-                    webView.evaluateJavaScript("show(\(state.isEnabled), false)")
-                }
+                webView.callAsyncJavaScript(
+                    "show(state, messages)",
+                    arguments: ["state": enabledState, "messages": messages],
+                    in: nil,
+                    in: .page
+                )
             }
         }
     }
