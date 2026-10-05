@@ -3,7 +3,7 @@
     class="css-selector-dropdown-item"
     :class="{ current }"
     :selected="current"
-    leading-check
+    :check="false"
     @click="click"
     @mouseenter.native="preview"
     @mouseleave.native="clearPreview"
@@ -21,7 +21,7 @@
           <span class="selector-tooltip">{{ selector }}</span>
         </template>
         <span ref="text" class="item-text">
-          <span class="item-selector" :class="{ styled }">
+          <span class="item-selector">
             <span
               v-for="(piece, i) in short.pieces"
               :key="i"
@@ -34,7 +34,7 @@
         </span>
       </s-tooltip>
       <span
-        v-if="count !== null"
+        v-if="count"
         class="item-count"
         :aria-label="
           t(count === 1 ? 'matches_count_one' : 'matches_count_other', [
@@ -71,12 +71,6 @@ export default Vue.extend({
     },
 
     current: {
-      type: Boolean,
-      default: false,
-    },
-
-    // Whether the style already has a rule for the selector.
-    styled: {
       type: Boolean,
       default: false,
     },
@@ -220,10 +214,6 @@ export default Vue.extend({
 
   min-width: 0;
   white-space: pre;
-
-  &.styled {
-    font-weight: 600;
-  }
 }
 
 .item-more {

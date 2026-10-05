@@ -33,7 +33,6 @@
         :selector="item.value"
         :current="item.value === activeSelector"
         :count="countFor(item.value)"
-        :styled="styledSelectors.has(item.value)"
         @select="select"
         @preview-end="previewActiveSelector"
       />
@@ -126,13 +125,6 @@ export default Vue.extend({
       return [...new Set(this.selectors.map(s => s.value))].filter(
         value => !this.elementSelectors.includes(value)
       );
-    },
-
-    styledSelectors(): Set<string> {
-      return new Set([
-        ...this.alternatives.existing,
-        ...this.selectors.map(s => s.value),
-      ]);
     },
 
     entries(): Array<DropdownEntry> {

@@ -9,15 +9,8 @@
     :aria-disabled="disabled ? 'true' : undefined"
     @click="$emit('click', $event)"
   >
-    <span v-if="leadingCheck" class="menu-item-lead">
-      <check-icon v-if="selected" :size="12" class="menu-item-check" />
-    </span>
     <span class="menu-item-content"><slot /></span>
-    <check-icon
-      v-if="selected && !leadingCheck"
-      :size="12"
-      class="menu-item-check"
-    />
+    <check-icon v-if="selected && check" :size="12" class="menu-item-check" />
   </button>
 </template>
 
@@ -50,11 +43,10 @@ export default Vue.extend({
       default: false,
     },
 
-    // Puts the check before the label, with room kept for it on every item,
-    // so a column of labels lines up and the end stays free.
-    leadingCheck: {
+    // Off for a list that marks its selected item some other way.
+    check: {
       type: Boolean,
-      default: false,
+      default: true,
     },
   },
 });
@@ -104,18 +96,6 @@ export default Vue.extend({
 .menu-item-content {
   flex: 1;
   min-width: 0;
-}
-
-.menu-item-lead {
-  flex: none;
-  display: flex;
-  align-items: center;
-  width: 12px;
-
-  .menu-item-check {
-    align-self: auto;
-    margin-top: 0;
-  }
 }
 
 .menu-item-check {

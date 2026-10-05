@@ -104,8 +104,8 @@ export const ArrowKeysBetweenFieldAndList: StoryObj = {
     await expect(input(canvasElement)).toHaveValue('h1');
     await expect(items(canvasElement)).toHaveLength(2);
 
-    // The active selector's row is checked, and Down moves on from it.
-    await expect(items(canvasElement)[0]).toHaveClass('selected');
+    // The active selector's row is highlighted, and Down moves on from it.
+    await expect(items(canvasElement)[0]).toHaveClass('current');
     await pressKey('ArrowDown');
     await waitFor(() => expect(items(canvasElement)[1]).toHaveFocus());
 
@@ -217,9 +217,6 @@ const rowTexts = (root: HTMLElement) =>
     item.querySelector('.item-text')?.textContent?.trim()
   );
 
-const styled = (item: HTMLElement) =>
-  item.querySelector('.item-selector')?.classList.contains('styled');
-
 const count = (item: HTMLElement) =>
   item.querySelector('.item-count')?.textContent?.trim();
 
@@ -248,15 +245,10 @@ export const SectionsForTheElementAndPage: StoryObj = {
       '.article-body',
     ]);
 
-    // The active selector leads, checked.
+    // The active selector leads, highlighted rather than checked.
     const current = row(canvasElement, 'h1');
-    await expect(current).toHaveClass('selected');
-    await expect(current.querySelector('.menu-item-check')).not.toBeNull();
-
-    // Selectors the style already has a rule for are set in bold.
-    await expect(styled(row(canvasElement, '*'))).toBe(true);
-    await expect(styled(row(canvasElement, '.sb-page h1'))).toBe(false);
-    await expect(styled(row(canvasElement, '.article-body'))).toBe(true);
+    await expect(current).toHaveClass('current');
+    await expect(current.querySelector('.menu-item-check')).toBeNull();
 
     // Each row counts the elements it matches on the page.
     await waitFor(() =>
@@ -287,7 +279,7 @@ export const PickAnAlternative: StoryObj = {
     await user.click(chips(canvasElement));
     await findOpenMenu(canvas);
     await expect(rowTexts(canvasElement).slice(0, 2)).toEqual(['div h1', 'h1']);
-    await expect(row(canvasElement, 'div h1')).toHaveClass('selected');
+    await expect(row(canvasElement, 'div h1')).toHaveClass('current');
     await pressKey('Escape');
 
     // Choosing something unrelated leaves only the page's rules.
