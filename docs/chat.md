@@ -84,6 +84,7 @@ Each choice answers a failure seen in the eval:
 - **Visible elements only.** Scripts, styles and the insides of `svg`, `iframe` and `video` are skipped: the model needs the page's structure, not its code.
 - **Anonymous wrappers flattened.** A `div` with no id, class or text isn't listed, only its children. It adds depth without information.
 - **Enough to write a selector.** Tag, id, up to 4 short classes and 40 characters of the element's own text, as in `span.rank "1."`. Ids and classes are escaped the way selectors need them, so Tailwind's `lg:-mt-16` reads `.lg\:-mt-16`; unescaped, the model copied invalid selectors and react.dev's sidebar never hid.
+- **Long classes listed when they have a stable part**, as in BBC's `header.Header-styles__HeaderStyled-sc-36071384-0`. Dropped as too long, they left only random classes like `.lkxsBq`; a reply's selectors are then saved by the stable part (see above).
 - **Looks only where they differ from the parent**, as in `td.subtext [font 9.3px]` or the white search `input`. The brackets point at what a request has to change.
 - **A `(page)` line on top**: what elements without their own `bg` show.
 - **The `bgcolor` attribute.** HN's orange header has no class, so `td[bgcolor="#ff6600"]` is its only selector. It is the element's background, so no `bg` repeats it.

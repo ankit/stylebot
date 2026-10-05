@@ -4,6 +4,7 @@ const MAX_LINES = 400;
 const MAX_CHARS = 16000;
 const MAX_TEXT = 40;
 const MAX_CLASSES = 4;
+const MAX_STABLE_CLASS = 60;
 // Siblings of the same kind past this many are summarised, alternating
 // ones too (a story's title row, subtext row, spacer).
 const MAX_REPEATS = 2;
@@ -34,6 +35,24 @@ const isVisible = (element: Element): boolean => {
 const classesOf = (element: Element): Array<string> =>
   Array.from(element.classList)
     .filter(name => name.length <= 30)
+    .slice(0, MAX_CLASSES);
+
+/**
+ * The element's classes as the model should copy them: escaped, and a
+ * partly hashed class by its stable part. A long class still gets in when
+ * it has one, as styled-components' display names on BBC News do.
+ */
+const classSelectorsOf = (element: Element): Array<string> =>
+  Array.from(element.classList)
+    .map(name => {
+      const stable = getStableClassMatcher(name);
+      if (stable) {
+        return stable.length <= MAX_STABLE_CLASS ? stable : null;
+      }
+
+      return name.length <= 30 ? `.${escapeSelectorToken(name)}` : null;
+    })
+    .filter((selector): selector is string => selector !== null)
     .slice(0, MAX_CLASSES);
 
 // A named id makes an element unique, so it's never folded into a run;
@@ -266,12 +285,9 @@ const holdsRepeats = (element: Element): boolean => {
  */
 const describe = (element: Element, repeated = false): string => {
   const tag = element.tagName.toLowerCase();
-  // Escaped as a selector needs them, since the model copies them as written;
-  // a partly hashed class by its stable part, so its rules outlive a rebuild.
+  // Escaped as a selector needs them, since the model copies them as written.
   const id = element.id ? `#${escapeSelectorToken(element.id)}` : '';
-  const classes = classesOf(element)
-    .map(name => getStableClassMatcher(name) ?? `.${escapeSelectorToken(name)}`)
-    .join('');
+  const classes = classSelectorsOf(element).join('');
   const text = ownText(element);
   const hints = [
     ...styleHints(element),

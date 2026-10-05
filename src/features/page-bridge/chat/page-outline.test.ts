@@ -185,6 +185,15 @@ describe('getPageOutline', () => {
     expect(document.querySelector(line.split(' ')[0])).not.toBeNull();
   });
 
+  it('shows a long styled-components class by its stable part', () => {
+    document.body.innerHTML =
+      '<header class="Header-styles__HeaderStyled-sc-36071384-0 lkxsBq">x</header>';
+
+    expect(getPageOutline()).toBe(
+      'header[class*="Header-styles__HeaderStyled-sc-"].lkxsBq "x"'
+    );
+  });
+
   it('keeps the full class when its stable part would match more', () => {
     document.body.innerHTML =
       '<nav class="Header_nav__a1B2c">x</nav><nav class="SubHeader_nav__z9Y8x">y</nav>';
