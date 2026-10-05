@@ -235,3 +235,38 @@ test('editor shortcuts typed on the page reach the side panel', async ({
   await page.keyboard.press('b');
   await expect.poll(selectedTab).toBe('Basic');
 });
+
+test('arrow keys and Enter typed in the side panel drive the inspector', async ({
+  context,
+  extension,
+  openPopup,
+}) => {
+  await dockToSidePanel(extension);
+
+  const page = await context.newPage();
+  await page.goto(`${baseUrl}/`);
+  const panel = await openSidePanel(page, context, extension, openPopup);
+  await expect
+    .poll(() =>
+      panel.evaluate(`!!document.querySelector('.stylebot-inspector.active')`)
+    )
+    .toBe(true);
+
+  const pressInPanel = (key: string) =>
+    panel.evaluate(
+      `document.body.dispatchEvent(new KeyboardEvent('keydown', { key: '${key}', bubbles: true, cancelable: true }))`
+    );
+
+  await page.locator('h1').hover();
+  await expect(page.locator('#stylebot-overlay')).not.toHaveCount(0);
+  await pressInPanel('ArrowUp');
+  await pressInPanel('Enter');
+
+  await expect
+    .poll(() =>
+      panel.evaluate(
+        `document.querySelector('.autocomplete-chips .part')?.textContent.trim()`
+      )
+    )
+    .toMatch(/body$/);
+});

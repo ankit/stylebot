@@ -255,6 +255,10 @@ export class RemotePageBridge extends PageBridgeEmitter implements PageBridge {
     this.send({ type: 'stopInspecting' });
   }
 
+  handleInspectKey(key: string): void {
+    this.send({ type: 'handleInspectKey', key });
+  }
+
   highlight(selector: string): void {
     this.send({ type: 'highlight', selector });
   }

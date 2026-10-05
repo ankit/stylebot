@@ -30,6 +30,7 @@ const mockBridge = {
   applyReadability: jest.fn(),
   startInspecting: jest.fn(),
   stopInspecting: jest.fn(),
+  handleInspectKey: jest.fn(),
   highlight: jest.fn(),
   unhighlight: jest.fn(),
   getPageColors: jest.fn(),
