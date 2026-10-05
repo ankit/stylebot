@@ -55,12 +55,70 @@ export const getNameBasedSelector = (el: HTMLElement): string | null => {
   return null;
 };
 
+function caseTransitionRatio(value: string): number {
+  let transitions = 0;
+  for (let i = 1; i < value.length; i++) {
+    const prevUpper = value[i - 1] !== value[i - 1].toLowerCase();
+    const curUpper = value[i] !== value[i].toLowerCase();
+    if (prevUpper !== curUpper) {
+      transitions++;
+    }
+  }
+
+  return transitions / value.length;
+}
+
+/**
+ * A class segment that reads like a build hash rather than a word, e.g.
+ * CSS Modules' `a1B2c` or vanilla-extract's `1hiof570`, but not `item2`.
+ */
+function isHashSegment(segment: string): boolean {
+  if (!/^[\w-]{5,10}$/.test(segment) || /^[a-z]+\d+$/i.test(segment)) {
+    return false;
+  }
+
+  if (/\d/.test(segment) && /[a-z]/i.test(segment)) {
+    return true;
+  }
+
+  return caseTransitionRatio(segment) > 0.3;
+}
+
+/**
+ * The authored parts of a class a build tool combined with a hash, e.g.
+ * `Header_nav__` from CSS Modules' `Header_nav__a1B2c`, or `Nav-sc-` from
+ * styled-components' `Nav-sc-1x2y3z-0`.
+ */
+function getStableClassParts(className: string): Array<string> | null {
+  const styled = className.match(/^(.+-sc-)[a-z0-9]+-\d+$/i);
+  if (styled) {
+    return [styled[1]];
+  }
+
+  const segments = className.split('__');
+  const hashAt = segments.findIndex(
+    (segment, i) => i > 0 && isHashSegment(segment)
+  );
+  if (hashAt === -1) {
+    return null;
+  }
+
+  const before = segments.slice(0, hashAt).join('__');
+  const after = segments.slice(hashAt + 1).join('__');
+
+  return after ? [`${before}__`, `__${after}`] : [`${before}__`];
+}
+
 /**
  * Flags build-tool-generated class names (CSS Modules, styled-components,
  * Closure Compiler) by shape, since they carry no stable meaning.
  */
 function looksHashed(className: string): boolean {
   if (/^(css|sc|jsx|emotion|styled|chakra)-/i.test(className)) {
+    return true;
+  }
+
+  if (getStableClassParts(className)) {
     return true;
   }
 
@@ -79,17 +137,16 @@ function looksHashed(className: string): boolean {
   }
 
   // camelCase words have 1-2 case transitions; hashes have far more.
-  let transitions = 0;
-  for (let i = 1; i < className.length; i++) {
-    const prevUpper = className[i - 1] !== className[i - 1].toLowerCase();
-    const curUpper = className[i] !== className[i].toLowerCase();
-    if (prevUpper !== curUpper) {
-      transitions++;
-    }
-  }
-
-  return transitions / className.length > 0.3;
+  return caseTransitionRatio(className) > 0.3;
 }
+
+const countMatches = (selector: string): number => {
+  try {
+    return document.querySelectorAll(selector).length;
+  } catch {
+    return 0;
+  }
+};
 
 const getClassNames = (el: HTMLElement): Array<string> =>
   (el.getAttribute('class') ?? '').split(/\s+/).filter(Boolean);
@@ -117,6 +174,33 @@ export const getNonHashedClassBasedSelector = (
  */
 export const getClassBasedSelector = (el: HTMLElement): string | null =>
   classSelector(el, getClassNames(el)[0]);
+
+/**
+ * Matches a partly hashed class by its authored parts alone, e.g.
+ * `nav[class*="Header_nav__"]`, so it survives the site's next build. Kept
+ * only while it matches no more of the page than the full class does.
+ */
+export const getStableClassPartsSelector = (el: HTMLElement): string | null => {
+  const tag = el.tagName.toLowerCase();
+
+  for (const className of getClassNames(el)) {
+    const parts = getStableClassParts(className);
+    if (!parts) {
+      continue;
+    }
+
+    const selector = `${tag}${parts
+      .map(part => `[class*="${escapeAttributeValue(part)}"]`)
+      .join('')}`;
+    const fullClass = `${tag}.${escapeSelectorToken(className)}`;
+
+    if (countMatches(selector) === countMatches(fullClass)) {
+      return selector;
+    }
+  }
+
+  return null;
+};
 
 export const getIdBasedSelector = (el: HTMLElement): string | null => {
   const id = el.getAttribute('id');
@@ -148,14 +232,15 @@ export const getTagNameBasedSelector = (
 };
 
 /**
- * Excludes #id and hashed classes on purpose, so a real ancestor match
+ * Excludes #id and fully hashed classes on purpose, so a real ancestor match
  * (see getAncestorBasedSelector) still outranks them.
  */
 function getGoodOwnSelector(el: HTMLElement): string | null {
   return (
     getNonHashedClassBasedSelector(el) ??
     getTestIdBasedSelector(el) ??
-    getNameBasedSelector(el)
+    getNameBasedSelector(el) ??
+    getStableClassPartsSelector(el)
   );
 }
 
@@ -216,14 +301,6 @@ export const getSelector = (el: HTMLElement): string => {
     getAncestorHashedClassSelector(el) ??
     getTagNameBasedSelector(el)
   );
-};
-
-const countMatches = (selector: string): number => {
-  try {
-    return document.querySelectorAll(selector).length;
-  } catch {
-    return 0;
-  }
 };
 
 /**
@@ -394,6 +471,7 @@ export const getSelectorCandidates = (el: HTMLElement): Array<string> =>
     getNonHashedClassBasedSelector(el),
     getTestIdBasedSelector(el),
     getNameBasedSelector(el),
+    getStableClassPartsSelector(el),
     getAncestorBasedSelector(el),
     ...getAncestorScopedSelectors(el),
     getIdBasedSelector(el),

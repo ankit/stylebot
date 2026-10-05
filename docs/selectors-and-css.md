@@ -20,18 +20,24 @@ Each strategy is tried in turn; the first one that returns something wins.
    `data-test-id`, `data-test`, `data-cy`, `data-qa` in that order.
 3. **Own `name`** — `tag[name="…"]`. Like a test id, it's an identifier, not a
    human-readable description (unlike `aria-label`).
-4. **Nearest ancestor with any of the above**, up to 2 levels up, joined with
+4. **Authored part of its own partly hashed class** — CSS Modules,
+   styled-components and similar tools join the author's name with a build
+   hash (`Header_nav__a1B2c`, `Nav-sc-1x2y3z-0`). Matching just the authored
+   part, `nav[class*="Header_nav__"]`, survives the site's next build and has
+   the same specificity as a class. It's used only while it matches exactly the
+   same elements on the page as the full class does.
+5. **Nearest ancestor with any of the above**, up to 2 levels up, joined with
    the intervening tag chain — e.g. `.card span` or `div.mw-heading h2`. The
    climb stops at the first usable ancestor rather than always reaching 2
    levels.
-5. **Own `#id`** — ranks below anything genuinely authored (its own or an
+6. **Own `#id`** — ranks below anything genuinely authored (its own or an
    ancestor's) since ids are often generated, but above a hashed class since
    it's still far more reliable than a random hash.
-6. **Own class, hashed or not** — the first class, whatever it looks like.
+7. **Own class, hashed or not** — the first class, whatever it looks like.
    Still much more specific than a bare tag chain.
-7. **Nearest ancestor's class, hashed or not** — the same 2-level climb as
-   step 4, but accepting a hashed class.
-8. **Bare tag chain** — `parent-parent parent tag`, up to 2 levels. The true
+8. **Nearest ancestor's class, hashed or not** — the same 2-level climb as
+   step 5, but accepting a hashed class.
+9. **Bare tag chain** — `parent-parent parent tag`, up to 2 levels. The true
    last resort.
 
 ### What counts as a "hashed" class
@@ -44,7 +50,14 @@ A class name counts as hashed, carrying no stable meaning, when it has:
 - a short (4–12 chars) name with an unusually high number of case transitions,
   which separates a hash like `WwrzSb` from a camelCase word like `navBar`
 
-Anything containing `-` or `_` is treated as authored, whatever its shape.
+Otherwise, anything containing `-` or `_` is treated as authored, unless it's
+partly hashed:
+
+- a `__`-separated segment that reads like a hash rather than a word: letters
+  mixed with digits (`a1B2c`, but not `item2`) or frequent case changes. The
+  parts on either side are kept, so Turbopack's `page-module__E0kJGG__main`
+  becomes `[class*="page-module__"][class*="__main"]`.
+- styled-components' `Name-sc-hash-0`, which keeps `Name-sc-`.
 
 ### Other selectors for the element
 

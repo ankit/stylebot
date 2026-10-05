@@ -4,6 +4,7 @@ import {
   getTestIdBasedSelector,
   getNameBasedSelector,
   getNonHashedClassBasedSelector,
+  getStableClassPartsSelector,
   getClassBasedSelector,
   getIdBasedSelector,
   getTagNameBasedSelector,
@@ -172,6 +173,74 @@ describe('selector', () => {
       el.setAttribute('class', 'primaryButton');
 
       expect(getNonHashedClassBasedSelector(el)).toBe('button.primaryButton');
+    });
+  });
+
+  describe('getStableClassPartsSelector', () => {
+    it.each([
+      ['Header_nav__a1B2c', 'nav[class*="Header_nav__"]'],
+      ['Button_root___x7Yz', 'nav[class*="Button_root__"]'],
+      ['styles_root__1hiof570', 'nav[class*="styles_root__"]'],
+      ['Header__Nav-sc-1x2y3z-0', 'nav[class*="Header__Nav-sc-"]'],
+      [
+        'page-module__E0kJGG__main',
+        'nav[class*="page-module__"][class*="__main"]',
+      ],
+    ])('keeps the authored parts of %s', (className, expected) => {
+      const el = document.createElement('nav');
+      el.setAttribute('class', className);
+
+      expect(getStableClassPartsSelector(el)).toBe(expected);
+    });
+
+    it.each(['card__title', 'card__item2', 'menu__subMenu', 'primary-nav'])(
+      'leaves an authored class like %s alone',
+      className => {
+        const el = document.createElement('div');
+        el.setAttribute('class', className);
+
+        expect(getStableClassPartsSelector(el)).toBeNull();
+        expect(getNonHashedClassBasedSelector(el)).toBe(`div.${className}`);
+      }
+    );
+
+    it('prefers an authored class over a partly hashed one', () => {
+      const el = document.createElement('div');
+      el.setAttribute('class', 'Card_body__a1B2c card-body');
+
+      expect(getNonHashedClassBasedSelector(el)).toBe('div.card-body');
+    });
+
+    it('skips the stable parts when they match more than the full class', () => {
+      document.body.innerHTML = `
+        <div class="Header_nav__a1B2c" id="target"></div>
+        <div class="SubHeader_nav__z9Y8x"></div>
+      `;
+
+      const el = document.getElementById('target') as HTMLElement;
+      expect(getStableClassPartsSelector(el)).toBeNull();
+    });
+
+    it("scopes by an ancestor's partly hashed class", () => {
+      document.body.innerHTML = `
+        <section class="Card_body__a1B2c">
+          <p id="target"></p>
+        </section>
+      `;
+
+      const el = document.getElementById('target') as HTMLElement;
+      expect(getSelector(el)).toBe('section[class*="Card_body__"] p');
+    });
+
+    it('ranks below a test id and above an #id', () => {
+      const el = document.createElement('div');
+      el.setAttribute('class', 'Card_body__a1B2c');
+      el.setAttribute('id', 'card');
+
+      expect(getSelector(el)).toBe('div[class*="Card_body__"]');
+
+      el.setAttribute('data-testid', 'card');
+      expect(getSelector(el)).toBe('div[data-testid="card"]');
     });
   });
 
