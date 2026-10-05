@@ -4,10 +4,6 @@
     :class="{ active, muted, editing, 'menu-open': menuOpen }"
     @click="editing || $emit('pick')"
   >
-    <span class="check-slot">
-      <check-icon v-if="active" :size="12" />
-    </span>
-
     <profile-name-input
       v-if="editing"
       :value="value"
@@ -26,18 +22,22 @@
         {{ name }}
       </button>
 
-      <button
-        v-if="actions"
-        type="button"
-        class="row-more"
-        tabindex="-1"
-        :aria-label="t('profile_actions')"
-        aria-haspopup="menu"
-        :aria-expanded="menuOpen ? 'true' : 'false'"
-        @click.stop="$emit('more', $event)"
-      >
-        <more-icon :size="14" />
-      </button>
+      <span v-if="active || actions" class="row-end">
+        <check-icon v-if="active" :size="14" class="row-check" />
+
+        <button
+          v-if="actions"
+          type="button"
+          class="row-more"
+          tabindex="-1"
+          :aria-label="t('profile_actions')"
+          aria-haspopup="menu"
+          :aria-expanded="menuOpen ? 'true' : 'false'"
+          @click.stop="$emit('more', $event)"
+        >
+          <more-icon :size="14" />
+        </button>
+      </span>
     </template>
   </div>
 </template>
@@ -131,12 +131,23 @@ export default Vue.extend({
   }
 }
 
-.check-slot {
-  display: flex;
-  justify-content: center;
+.row-end {
+  display: grid;
+  place-items: center;
   flex: none;
-  width: 12px;
+}
+
+.row-check {
+  grid-area: 1 / 1;
   color: var(--accent-text);
+
+  &:has(+ .row-more) {
+    .profile-row:hover &,
+    .profile-row:has(.row-name:focus-visible, .row-more:focus-visible) &,
+    .menu-open & {
+      opacity: 0;
+    }
+  }
 }
 
 .row-name {
@@ -153,6 +164,7 @@ export default Vue.extend({
 .row-more {
   @include button-reset;
 
+  grid-area: 1 / 1;
   display: flex;
   align-items: center;
   justify-content: center;

@@ -26,7 +26,7 @@
           {{ t('no_style') }}
         </s-text>
         <span class="check-slot" aria-hidden="true">
-          <check-icon v-if="!enabled" :size="13" />
+          <check-icon v-if="!enabled" :size="16" />
         </span>
       </button>
 
@@ -48,7 +48,7 @@
         <span class="check-slot" aria-hidden="true">
           <check-icon
             v-if="enabled && profile.id === activeProfile"
-            :size="13"
+            :size="16"
           />
         </span>
       </button>
@@ -168,7 +168,7 @@ export default Vue.extend({
   display: flex;
   justify-content: center;
   flex: none;
-  width: 14px;
+  width: 16px;
   color: var(--accent-text);
 }
 
