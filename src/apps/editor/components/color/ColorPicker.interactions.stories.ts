@@ -318,3 +318,34 @@ export const OpenPopoverBlocksBody: StoryObj = {
     await waitFor(() => expect(body.style.pointerEvents).toBe(''));
   },
 };
+
+export const OpeningAnotherClosesFirst: StoryObj = {
+  ...editor(WITH_RULE),
+  name: 'opening another color picker closes the open one',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+    const popovers = () =>
+      canvasElement.querySelectorAll('.color-picker-popover');
+
+    await user.click(cardHeader(canvas, 'Background'));
+    await waitFor(() =>
+      expect(cardCollapse(canvas, 'Background')).not.toHaveClass('collapsed')
+    );
+
+    await openPopover(canvasElement, 'Text');
+    await user.click(swatch(canvas, 'Background'));
+
+    await waitFor(() => expect(popovers()).toHaveLength(1));
+    await waitFor(() =>
+      expect(
+        picker(canvas, 'Background').querySelector('.color-picker-popover')
+      ).toBeVisible()
+    );
+    await expect(store.state.colorPickerVisible).toBe(true);
+
+    await user.click(hexField(canvas, 'Text'));
+    await waitFor(() => expect(popovers()).toHaveLength(0));
+    await expect(store.state.colorPickerVisible).toBe(false);
+  },
+};

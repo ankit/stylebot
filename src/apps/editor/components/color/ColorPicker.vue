@@ -55,6 +55,9 @@ const ROLE_LABEL_KEYS: Record<string, string> = {
   'border-color': 'color_picker_subtitle_border',
 };
 
+// Only one popover is open at a time; opening another closes this one first.
+let closeOpenPicker: (() => void) | null = null;
+
 export default Vue.extend({
   name: 'ColorPicker',
 
@@ -142,6 +145,9 @@ export default Vue.extend({
   },
 
   beforeDestroy() {
+    if (closeOpenPicker === this.onClose) {
+      closeOpenPicker = null;
+    }
     this.popoverResizeObserver?.disconnect();
     window.removeEventListener('keydown', this.onWindowKeydown, true);
     document.removeEventListener('click', this.onDocumentClick);
@@ -172,6 +178,9 @@ export default Vue.extend({
     },
 
     onOpen(): void {
+      closeOpenPicker?.();
+      closeOpenPicker = this.onClose;
+
       this.open = true;
       this.positioned = false;
       this.$store.commit('setColorPickerVisible', true);
@@ -199,6 +208,10 @@ export default Vue.extend({
     },
 
     onClose(): void {
+      if (closeOpenPicker === this.onClose) {
+        closeOpenPicker = null;
+      }
+
       this.open = false;
       this.$store.commit('setColorPickerVisible', false);
       this.popoverResizeObserver?.disconnect();
@@ -272,11 +285,7 @@ export default Vue.extend({
     },
 
     onDocumentClick(e: MouseEvent): void {
-      const insidePicker = e.composedPath().find(el => {
-        return (el as HTMLElement).className?.includes?.('color-picker');
-      });
-
-      if (!insidePicker) {
+      if (this.open && !e.composedPath().includes(this.$el)) {
         this.onClose();
       }
     },
