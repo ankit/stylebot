@@ -154,6 +154,65 @@ export const StopsAReply: StoryObj = {
   },
 };
 
+export const AppliesAsItStreams: StoryObj = {
+  ...chat({ connected: ['anthropic'], hold: 'edits' }),
+  name: 'a reply’s CSS lands while it streams, counting its lines, and Stop keeps it as one reply to undo',
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+
+    await step('the first rule lands while the reply streams', async () => {
+      await send(canvas, 'Give the page a dark theme');
+      await waitFor(() => expect(store.state.css).toContain('#16181c'));
+      await canvas.findByText('Added 4 lines…');
+      await expect(chatStateOf(canvasElement).pending).not.toBeNull();
+      await expect(store.state.undoStack.past).toHaveLength(1);
+    });
+
+    await step('Stop keeps it, and Undo takes it back out', async () => {
+      await user.click(canvas.getByRole('button', { name: 'Stop' }));
+      await canvas.findByText('(Stopped)');
+      await expect(store.state.css).toContain('#16181c');
+
+      const card = await replyCard(canvas);
+      await user.click(card.getByRole('button', { name: 'Undo' }));
+      await waitFor(() => expect(store.state.css).not.toContain('#16181c'));
+    });
+  },
+};
+
+export const RollsBackAFailureMidway: StoryObj = {
+  ...chat({
+    connected: ['anthropic'],
+    hold: 'edits',
+    error: { type: 'error', errorKey: 'chat_error_network' },
+  }),
+  name: 'a reply that fails after its first rule landed takes it back out, and offers to try again',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+
+    await send(canvas, 'Give the page a dark theme');
+    await canvas.findByRole('button', { name: 'Try again' });
+    await expect(store.state.css).not.toContain('#16181c');
+    await expect(store.state.undoStack.past).toHaveLength(0);
+  },
+};
+
+export const RepliesAsOneUndoStep: StoryObj = {
+  ...chat({ connected: ['anthropic'] }),
+  name: 'a reply whose rules stream in one by one is a single step to undo',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+
+    await send(canvas, 'Give the page a dark theme');
+    await canvas.findByRole('button', { name: 'Added 7 lines' });
+    await expect(store.state.css).toContain('#8ab4f8');
+    await expect(store.state.undoStack.past).toHaveLength(1);
+  },
+};
+
 export const RetriesAFailure: StoryObj = {
   ...chat({
     connected: ['anthropic'],

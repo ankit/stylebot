@@ -19,8 +19,8 @@ export type ChatStreamResult = {
 export type ChatStreamHandlers = {
   onText: (delta: string) => void;
   onEditsStart: () => void;
-  // The reply finishes once the returned promise settles.
-  onEdits: (edits: Array<ChatCssEdit>) => Promise<void>;
+  // Each edit of the tool call, as soon as it's complete.
+  onEdit: (edit: ChatCssEdit) => void;
   onDone: (result: ChatStreamResult) => void;
   onError: (error: ChatError) => void;
 };
@@ -37,7 +37,6 @@ export const streamReply = (
   const port = chrome.runtime.connect({ name: CHAT_PORT });
   const result: ChatStreamResult = {};
   let active = true;
-  let applying: Promise<void> = Promise.resolve();
 
   const stop = () => {
     if (active) {
@@ -53,9 +52,7 @@ export const streamReply = (
     }
   };
 
-  const finish = async () => {
-    await applying;
-
+  const finish = () => {
     if (active) {
       stop();
       handlers.onDone(result);
@@ -76,8 +73,8 @@ export const streamReply = (
         handlers.onEditsStart();
         break;
 
-      case 'edits':
-        applying = handlers.onEdits(event.edits);
+      case 'edit':
+        handlers.onEdit(event.edit);
         break;
 
       case 'usage':

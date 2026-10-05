@@ -42,15 +42,17 @@ For each case, the summary has a table with one row per check and a column each 
 
 Above the cases, tables give totals overall, by kind of request and by case:
 
-| Column                                  | What it counts                                                                  |
-| :-------------------------------------- | :------------------------------------------------------------------------------ |
-| **checks**                              | checks passed: whether each request was met, measured on the page               |
-| zero-match                              | selectors in a reply that matched nothing                                       |
-| asked                                   | cases where a reply made no edits, as when the model asks a question back       |
-| tokens in, tokens out                   | mean per case; thinking counts as output                                        |
-| cost                                    | mean per case, at list prices without caching                                   |
-| seconds                                 | mean per case                                                                   |
-| unreadable, missed surfaces, overridden | from Chat's own check of its edits, for versions that have it; empty until then |
+| Column                                  | What it counts                                                                                         |
+| :-------------------------------------- | :----------------------------------------------------------------------------------------------------- |
+| **checks**                              | checks passed: whether each request was met, measured on the page                                      |
+| zero-match                              | selectors in a reply that matched nothing                                                              |
+| asked                                   | cases where a reply made no edits, as when the model asks a question back                              |
+| tokens in, tokens out                   | mean per case; thinking counts as output                                                               |
+| cost                                    | mean per case, at list prices without caching                                                          |
+| seconds                                 | mean per case                                                                                          |
+| first edit, last edit                   | when the first call's first and last edits were complete, as Chat applies them while the reply streams |
+| reply in                                | when the first call's whole reply was in, as a version applying edits at the end would show them       |
+| unreadable, missed surfaces, overridden | from Chat's own check of its edits, for versions that have it; empty until then                        |
 
 No model grades the results. An Opus judge once compared screenshots side by side, but between identical runs it agreed with itself about half the time, and it missed or invented details the checks measure: a font it said had changed, a color it didn't notice. What no check can measure, such as whether a theme looks good, is left to the screenshots.
 

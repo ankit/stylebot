@@ -8,11 +8,49 @@ const WORK_DIR = fs.mkdtempSync(path.join(os.tmpdir(), 'stylebot-eval-'));
 const THINKING_BUDGET = '8000';
 
 /**
+ * Times the edits of a reply as its structured output streams in: when the
+ * first and the last are complete, in ms since the call started, as a
+ * version applying edits while they stream would apply them.
+ */
+const editTimer = (createEditStream, started) => {
+  const times = { first: null, last: null };
+  const streams = new Map();
+  const note = () => {
+    times.last = Date.now() - started;
+    times.first ??= times.last;
+  };
+
+  return {
+    times,
+    // One line of Claude Code's stream-json output.
+    read(line) {
+      let message;
+
+      try {
+        message = JSON.parse(line);
+      } catch {
+        return;
+      }
+
+      const event = message.type === 'stream_event' ? message.event : null;
+
+      if (event?.type === 'content_block_start') {
+        if (event.content_block?.type === 'tool_use') {
+          streams.set(event.index, createEditStream(note));
+        }
+      } else if (event?.delta?.type === 'input_json_delta') {
+        streams.get(event.index)?.write(event.delta.partial_json ?? '');
+      }
+    },
+  };
+};
+
+/**
  * Asks headless Claude Code for a reply matching the JSON schema, billed to
  * the signed-in subscription rather than an API key. thinking is 'on', 'off',
  * or undefined for Claude Code's default, and effort a level or undefined.
  * Resolves to the structured output with the model that answered, its usage
- * and duration.
+ * and duration, and when its first and last edits were complete.
  */
 export const askClaude = ({
   model,
@@ -21,6 +59,7 @@ export const askClaude = ({
   schema,
   thinking,
   effort,
+  createEditStream,
 }) =>
   new Promise((resolve, reject) => {
     const systemFile = path.join(
@@ -39,7 +78,9 @@ export const askClaude = ({
       '',
       '--no-session-persistence',
       '--output-format',
-      'json',
+      'stream-json',
+      '--verbose',
+      '--include-partial-messages',
       '--json-schema',
       JSON.stringify(schema),
       '--tools',
@@ -47,6 +88,10 @@ export const askClaude = ({
       ...(effort ? ['--effort', effort] : []),
     ];
 
+    const started = Date.now();
+    const timer = createEditStream
+      ? editTimer(createEditStream, started)
+      : null;
     const child = spawn('claude', args, {
       cwd: WORK_DIR,
       env: thinking
@@ -56,21 +101,32 @@ export const askClaude = ({
           }
         : process.env,
     });
-    let stdout = '';
+    // Only the last line is kept: stream-json ends on the result.
+    let lastLine = '';
     let stderr = '';
+    let pending = '';
 
-    child.stdout.on('data', chunk => (stdout += chunk));
+    child.stdout.on('data', chunk => {
+      pending += chunk;
+
+      const lines = pending.split('\n');
+      pending = lines.pop();
+      lines.forEach(line => timer?.read(line));
+      lastLine = [...lines, pending].filter(Boolean).pop() ?? lastLine;
+    });
     child.stderr.on('data', chunk => (stderr += chunk));
     child.on('error', reject);
     child.on('close', code => {
       fs.rmSync(systemFile, { force: true });
 
+      const wallMs = Date.now() - started;
       let result;
 
       try {
-        result = JSON.parse(stdout);
+        // The last line of stream-json is the result.
+        result = JSON.parse(lastLine);
       } catch {
-        reject(new Error(`claude exited ${code}: ${stderr || stdout}`));
+        reject(new Error(`claude exited ${code}: ${stderr || lastLine}`));
         return;
       }
 
@@ -92,6 +148,9 @@ export const askClaude = ({
         // The model that answered, without its date: claude-haiku-4-5.
         model: Object.keys(result.modelUsage ?? {})[0]?.replace(/-\d{8}$/, ''),
         ms: result.duration_ms ?? 0,
+        wallMs,
+        firstEditMs: timer?.times.first ?? null,
+        lastEditMs: timer?.times.last ?? null,
       });
     });
 

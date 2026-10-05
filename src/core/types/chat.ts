@@ -111,7 +111,7 @@ export type ChatAssistantTurn = {
   previous: Array<ChatCssPreviousValue>;
   // Whether the reply's edits are on the page, flipped by Undo / Reapply.
   applied: boolean;
-  // Stopped by the user before its edits arrived; the text is what came in.
+  // Stopped by the user mid-reply; the text and edits are what came in.
   stopped?: boolean;
   model: string;
   // How many page elements each edit's selector matched once applied, in
@@ -145,7 +145,8 @@ export type ChatErrorKey =
 export type ChatStreamEvent =
   | { type: 'text'; delta: string }
   | { type: 'edits-start' }
-  | { type: 'edits'; edits: Array<ChatCssEdit> }
+  // One edit of an apply_css call, reported as soon as it's complete.
+  | { type: 'edit'; edit: ChatCssEdit }
   // The reply in the provider's own format, for providers that need it back
   // unchanged when the thread is replayed.
   | { type: 'replay'; steps: Array<unknown> }

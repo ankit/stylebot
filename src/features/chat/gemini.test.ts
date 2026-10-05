@@ -118,6 +118,7 @@ describe('geminiProvider (Interactions API)', () => {
       { type: 'text', delta: 'Made it ' },
       { type: 'text', delta: 'red.' },
       { type: 'edits-start' },
+      { type: 'edit', edit: edits[0] },
       {
         type: 'usage',
         usage: { inputTokens: 300, outputTokens: 30, cacheReadTokens: 200 },
@@ -137,7 +138,6 @@ describe('geminiProvider (Interactions API)', () => {
           },
         ],
       },
-      { type: 'edits', edits },
       { type: 'done' },
     ]);
 
@@ -189,7 +189,7 @@ describe('geminiProvider (Interactions API)', () => {
       onEvent: e => events.push(e),
     });
 
-    expect(events).toContainEqual({ type: 'edits', edits });
+    expect(events).toContainEqual({ type: 'edit', edit: edits[0] });
   });
 });
 

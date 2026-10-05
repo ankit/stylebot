@@ -72,11 +72,11 @@ describe('openAiProvider (Responses API)', () => {
       { type: 'text', delta: 'Went ' },
       { type: 'text', delta: 'dark.' },
       { type: 'edits-start' },
+      { type: 'edit', edit: edits[0] },
       {
         type: 'usage',
         usage: { inputTokens: 200, outputTokens: 40, cacheReadTokens: 100 },
       },
-      { type: 'edits', edits },
       { type: 'done' },
     ]);
 

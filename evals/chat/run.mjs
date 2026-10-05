@@ -11,7 +11,12 @@ import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 
 import { askClaude } from './claude.mjs';
-import { buildRef, buildScorer, checkoutRef } from './bundles.mjs';
+import {
+  buildEditStream,
+  buildRef,
+  buildScorer,
+  checkoutRef,
+} from './bundles.mjs';
 import { measureChecks, scoreChecks } from './checks.mjs';
 
 const require = createRequire(import.meta.url);
@@ -319,7 +324,14 @@ const turnId = () => `t${++turnCount}`;
  * round when the variant has the page check, the step's measured checks,
  * then the page check's counts on the final page.
  */
-const runCase = async ({ browser, testCase, variant, scorer, dir }) => {
+const runCase = async ({
+  browser,
+  testCase,
+  variant,
+  scorer,
+  createEditStream,
+  dir,
+}) => {
   const { ref } = variant;
   const context = await browser.newContext({
     viewport: VIEWPORT,
@@ -407,8 +419,16 @@ const runCase = async ({ browser, testCase, variant, scorer, dir }) => {
         schema: replySchema(ref),
         thinking: variant.thinking,
         effort: variant.effort,
+        createEditStream,
       });
-      calls.push({ usage: reply.usage, ms: reply.ms, model: reply.model });
+      calls.push({
+        usage: reply.usage,
+        ms: reply.ms,
+        model: reply.model,
+        wallMs: reply.wallMs,
+        firstEditMs: reply.firstEditMs,
+        lastEditMs: reply.lastEditMs,
+      });
 
       const { text } = reply.output;
       // As the extension does: partly hashed classes saved by their stable part.
@@ -523,6 +543,11 @@ const runCase = async ({ browser, testCase, variant, scorer, dir }) => {
     cost: calls.reduce((sum, call) => sum + costOf(call), 0),
     models: [...new Set(calls.map(call => call.model))],
     seconds: Math.round(calls.reduce((sum, call) => sum + call.ms, 0) / 1000),
+    // The first call's: when its first edit and its last were complete, and
+    // when the whole reply was in, in seconds from the call's start.
+    firstEdit: secondsOf(calls[0]?.firstEditMs),
+    lastEdit: secondsOf(calls[0]?.lastEditMs),
+    replyIn: secondsOf(calls[0]?.wallMs),
     problems,
     turns,
     css,
@@ -534,6 +559,10 @@ const runCase = async ({ browser, testCase, variant, scorer, dir }) => {
   );
   return result;
 };
+
+function secondsOf(ms) {
+  return typeof ms === 'number' ? Math.round(ms / 100) / 10 : null;
+}
 
 /**
  * A reply's calls as one turn: their text and edits together.
@@ -632,6 +661,9 @@ const summarise = (results, variants, cases, references) => {
     'tokens out',
     'cost',
     'seconds',
+    'first edit',
+    'last edit',
+    'reply in',
   ];
   const row = (label, rows) => {
     const ok = rows.filter(r => !r.error);
@@ -655,6 +687,9 @@ const summarise = (results, variants, cases, references) => {
       Math.round(mean(ok.map(r => r.tokensOut))) || '–',
       dollars(average(ok.map(r => r.cost))),
       mean(ok.map(r => r.seconds)),
+      mean(ok.map(r => r.firstEdit)),
+      mean(ok.map(r => r.lastEdit)),
+      mean(ok.map(r => r.replyIn)),
     ].join(' | ')} |${
       rows.length - ok.length ? ` ${rows.length - ok.length} failed` : ''
     }`;
@@ -762,7 +797,7 @@ const summarise = (results, variants, cases, references) => {
 
   return [
     `# Chat eval`,
-    `${args.runs} run(s) per case. Cost is estimated at list prices without caching, as a one-off reply pays, with thinking billed as output; tokens, cost and seconds are means per case. Checks are measured on the page after each step, and on the unstyled page and with the case's reference stylesheet when it has one; the rest are means per case, except asked, which counts cases with a reply that made no edits, and undone fixes, which counts fix-up calls taken back for making text hard to read.`,
+    `${args.runs} run(s) per case. Cost is estimated at list prices without caching, as a one-off reply pays, with thinking billed as output; tokens, cost and seconds are means per case. First edit, last edit and reply in time the case's first call, in seconds from its start: when its first and last edits were complete, as Chat applying edits while they stream would apply them, and when the whole reply was in, as a version applying them at the end would. Checks are measured on the page after each step, and on the unstyled page and with the case's reference stylesheet when it has one; the rest are means per case, except asked, which counts cases with a reply that made no edits, and undone fixes, which counts fix-up calls taken back for making text hard to read.`,
     ...(variants.length
       ? [
           `## Overall`,
@@ -888,6 +923,10 @@ const main = async () => {
       variant.thinking ?? ''
     );
   });
+  const createEditStream = await buildEditStream(
+    REPO,
+    path.join(CACHE, 'build')
+  );
   const resultKey = (variant, testCase, run) =>
     hash(harness, variant.key, JSON.stringify(testCase), String(run));
   const browser = await chromium.launch();
@@ -915,7 +954,14 @@ const main = async () => {
             run: run + 1,
             key,
             ...(await cached(key, dir, () =>
-              runCase({ browser, testCase, variant, scorer, dir })
+              runCase({
+                browser,
+                testCase,
+                variant,
+                scorer,
+                createEditStream,
+                dir,
+              })
             )),
           };
           const passed = result.checks.filter(check => check.pass).length;

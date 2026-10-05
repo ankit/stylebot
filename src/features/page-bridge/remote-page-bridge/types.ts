@@ -28,6 +28,7 @@ export type RemotePageBridgeRequestArgs = {
   countMatches: [selectors: Array<string>];
   getStableSelectors: [selectors: Array<string>];
   startStyleCheck: [edits: Array<ChatCssEdit>];
+  extendStyleCheck: [edits: Array<ChatCssEdit>];
   checkStyle: [];
   getAppliedDeclarations: [selector: string];
   getPageDeclarations: [selector: string];
@@ -45,6 +46,7 @@ export type RemotePageBridgeRequestResult = {
   countMatches: Array<number | null>;
   getStableSelectors: Array<string>;
   startStyleCheck: void;
+  extendStyleCheck: void;
   checkStyle: Array<ChatStyleProblem>;
   getAppliedDeclarations: Array<AppliedDeclaration>;
   getPageDeclarations: Array<CssDeclaration>;

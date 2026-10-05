@@ -4,6 +4,7 @@ import {
   getPrimaryFontFamily,
   isFontFamilyProperty,
 } from '@stylebot/css';
+import { revertEdits } from '@stylebot/chat';
 import { resolveGoogleFont } from '@stylebot/google-fonts';
 
 import type { ChatCssEdit, ChatCssPreviousValue } from '@stylebot/types';
@@ -47,3 +48,12 @@ export const removeFontImports = (
   previous.some(({ property }) => isFontFamilyProperty(property))
     ? cleanGoogleWebFonts(css)
     : css;
+
+/**
+ * The css with a reply's edits taken back: what they replaced put back,
+ * and the imports of fonts no longer used dropped.
+ */
+export const revertReply = (
+  css: string,
+  previous: Array<ChatCssPreviousValue>
+): string => removeFontImports(revertEdits(css, previous), previous);

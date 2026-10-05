@@ -1,30 +1,49 @@
-import { parseEdits } from './apply-css-tool';
+import { parseEdit, readEditsList } from './apply-css-tool/parse-edits';
 
-describe('parseEdits', () => {
+describe('readEditsList', () => {
   it('returns null for broken JSON', () => {
-    expect(parseEdits('{"edits":[{"sel')).toBeNull();
+    expect(readEditsList('{"edits":[{"sel')).toBeNull();
   });
 
-  it('drops edits that do not fit the schema', () => {
+  it('reads an empty call, or one without a list, as no edits', () => {
+    expect(readEditsList('')).toEqual([]);
+    expect(readEditsList('{"edits":"none"}')).toEqual([]);
+  });
+});
+
+describe('parseEdit', () => {
+  it('trims what fits the schema', () => {
     expect(
-      parseEdits(
-        JSON.stringify({
-          edits: [
-            {
-              selector: ' .a ',
-              declarations: [{ property: 'color', value: 'red' }],
-            },
-            {
-              selector: '',
-              declarations: [{ property: 'color', value: 'red' }],
-            },
-            { selector: '.b', declarations: [{ property: 1, value: 'red' }] },
-            { selector: '.c' },
-          ],
-        })
-      )
-    ).toEqual([
-      { selector: '.a', declarations: [{ property: 'color', value: 'red' }] },
-    ]);
+      parseEdit({
+        selector: ' .a ',
+        declarations: [{ property: ' color ', value: ' red ' }],
+      })
+    ).toEqual({
+      selector: '.a',
+      declarations: [{ property: 'color', value: 'red' }],
+    });
+  });
+
+  it('drops declarations and edits that do not fit the schema', () => {
+    expect(
+      parseEdit({
+        selector: '.b',
+        declarations: [
+          { property: 1, value: 'red' },
+          { property: 'top', value: '0' },
+        ],
+      })
+    ).toEqual({
+      selector: '.b',
+      declarations: [{ property: 'top', value: '0' }],
+    });
+    expect(
+      parseEdit({
+        selector: '',
+        declarations: [{ property: 'color', value: 'red' }],
+      })
+    ).toBeNull();
+    expect(parseEdit({ selector: '.c' })).toBeNull();
+    expect(parseEdit('stray')).toBeNull();
   });
 });

@@ -199,3 +199,28 @@ export const buildScorer = async (roots, outDir) => {
 
   return fs.readFileSync(path.join(outDir, 'score.js'), 'utf8');
 };
+
+/**
+ * The streamed reading of apply_css calls from the harness's own checkout,
+ * to time when each edit of a reply is complete, the moment a version that
+ * applies edits as they stream would apply it. Null when it has none.
+ */
+export const buildEditStream = async (repo, outDir) => {
+  const file = 'src/features/chat/apply-css-tool/edit-stream.ts';
+
+  if (!exists(repo, file)) {
+    return null;
+  }
+
+  await esbuild.build({
+    entryPoints: [path.join(repo, file)],
+    outfile: path.join(outDir, 'edit-stream.cjs'),
+    bundle: true,
+    platform: 'node',
+    format: 'cjs',
+    alias: packageAliases(repo),
+    logLevel: 'error',
+  });
+
+  return require(path.join(outDir, 'edit-stream.cjs')).createEditStream;
+};

@@ -15,18 +15,20 @@ sequenceDiagram
     E->>B: system prompt + thread (over a port)
     B->>M: request with the key and model
     M-->>B: streamed text, then one apply_css call
-    B-->>E: text, edits, usage, done
-    E->>P: apply edits (saved, one undo step)
+    B-->>E: text, each edit as it completes, usage, done
+    E->>P: apply each edit live (one undo step)
     P-->>E: page check: unreadable text, missed surfaces, overridden or unmatched rules
     opt something to fix
-        E->>B: the result, for one more apply_css call
+        E->>B: the result, for one more apply_css call, streamed the same way
     end
+    E->>P: save once at the end
 ```
 
 - **The editor builds the prompt**, since it has the page at hand.
 - **The background holds the key** and streams the reply. Closing the port (Stop, New chat, closing the editor) aborts it; an open port keeps the service worker alive.
 - **The model answers in prose plus one tool call** under a strict schema: selectors, each with property and value pairs. Structured edits, not free CSS, are what make every reply exactly undoable.
-- **Edits apply like any other edit**: live, saved, one step on the undo trail. A Google Fonts import is added for any font family the model picks.
+- **Edits apply while the call streams in.** Each selector's edit lands on the page as soon as its entry in the call is complete, so a theme spreads across the page during the reply instead of after it. Once the call is whole, it's read again, and any edit the streamed reading missed is applied; none twice.
+- **Edits apply like any other edit**: one step on the undo trail for the whole reply, saved once when it ends rather than per rule. A Google Fonts import is added as soon as the model names a family.
 - **Hashed classes are saved by their stable part**: a selector naming `.Header_nav__a1B2c` is saved as `[class*="Header_nav__"]`, the same check the picker uses, so the rule outlives the site's next build. The tool result reports the saved selector. Showing that form in the outline instead taught the model to invent loose `[class*=…]` fragments of its own.
 - **The page is checked after the edits apply.** If they made text hard to read, left large surfaces in the old colors after a theme, set declarations the page overrides, or used selectors that match nothing, the model is told what and which of its selectors caused it, and makes one more call to fix it within the same reply. A fix that makes text hard to read is taken back. The user sees one reply, and Undo takes back every call together.
 
@@ -136,6 +138,16 @@ With an element picked, the message names its selector, and the page CSS adds th
 | Replaying the thread | each reply's edits as its tool call, with a result saying whether they're still applied |
 
 Only the latest reply can be undone from the chat, since later replies may build on earlier ones. A failed reply keeps your message and offers to send it again with the same picked element and image.
+
+A reply can end mid-call, with some of its edits already on the page:
+
+| How it ends                           | Its edits so far                                                            |
+| :------------------------------------ | :-------------------------------------------------------------------------- |
+| Stop, or closing the editor           | kept and saved, as a stopped reply that Undo takes back like any other      |
+| New chat                              | kept and saved, like every earlier reply's; only the conversation clears    |
+| An error (network, cut off, declined) | taken back, with their undo step, so sending again starts from a clean page |
+
+Stopping keeps what you've seen land, and Undo is one click. A failed reply leaves no turn to undo from, so its edits go with it. A fix call that fails or is stopped is different: the reply its earlier call made stays, without the failed fix's edits, or with the stopped fix's edits as part of it.
 
 ## Context you add
 

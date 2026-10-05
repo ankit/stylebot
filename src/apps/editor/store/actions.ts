@@ -73,6 +73,11 @@ export type ApplyCssArgs = {
   // False for housekeeping (empty-rule shuffling, import cleanup) and for
   // undo/redo itself, which must not become steps of their own.
   record?: boolean;
+  // Extends the latest step from the same source however long ago it was.
+  group?: boolean;
+  // False to apply to the page without saving yet, as a chat reply does
+  // while its edits stream in; it saves once at the end.
+  save?: boolean;
 };
 
 const RECENT_FONTS_LIMIT = 10;
@@ -346,7 +351,13 @@ export default {
 
   applyCss(
     { commit, state }: { commit: Commit; state: State },
-    { css, source = 'edit', record = true }: ApplyCssArgs
+    {
+      css,
+      source = 'edit',
+      record = true,
+      group = false,
+      save = true,
+    }: ApplyCssArgs
   ): void {
     // Saving empty css deletes the style, and holding none may just mean the
     // stored one never reached the editor rather than that there is none.
@@ -363,18 +374,20 @@ export default {
         enabled: state.enabled,
         forceImportant: state.forceImportant,
       });
-      setStyle(
-        state.url,
-        removeEmptyRules(css),
-        state.readability,
-        state.forceImportant,
-        state.activeProfile
-      );
+      if (save) {
+        setStyle(
+          state.url,
+          removeEmptyRules(css),
+          state.readability,
+          state.forceImportant,
+          state.activeProfile
+        );
+      }
 
       if (record && css !== state.css) {
         commit(
           'setUndoStack',
-          recordChange(state.undoStack, state.css, source)
+          recordChange(state.undoStack, state.css, source, Date.now(), group)
         );
       }
 

@@ -2,7 +2,7 @@ import type { ActionContext, Module } from 'vuex';
 
 import {
   applyEdits,
-  revertEdits,
+  countCssLines,
   MAX_FIX_ROUNDS,
   needsFix,
 } from '@stylebot/chat';
@@ -10,7 +10,6 @@ import { getPageBridge } from '@stylebot/page-bridge';
 import type {
   ChatAssistantTurn,
   ChatImage,
-  ChatCssEdit,
   ChatErrorKey,
   ChatProviderId,
   ChatStatus,
@@ -27,7 +26,7 @@ import {
   chatSetModel,
   chatSetThread,
 } from '../utils/chrome';
-import { addFontImports, removeFontImports } from './chat-fonts';
+import { revertReply } from './chat-fonts';
 import {
   getStreamRequest,
   getTurnId,
@@ -42,11 +41,13 @@ import type { ChatMessage, ChatRoundResult } from './chat-reply';
 import { readChatImage } from '../utils/chat-image';
 import { streamReply } from './chat-stream';
 import type { ChatStreamHandlers } from './chat-stream';
+import { applyChatCss, createLiveEdits } from './chat-live-edits';
+import type { LiveEdits } from './chat-live-edits';
 
 /**
  * Where a reply is: reading the page before the model answers, writing
- * while it streams, applying once its edits arrive, and fixing what the
- * page check found after them.
+ * while it streams, applying once its edits start to arrive, and fixing
+ * what the page check found after them.
  */
 export type ChatPhase = 'reading' | 'writing' | 'applying' | 'fixing';
 
@@ -58,7 +59,8 @@ export type ChatState = {
   // The site the thread belongs to.
   url: string;
   turns: Array<ChatTurn>;
-  pending: { phase: ChatPhase; text: string } | null;
+  // lines counts the CSS the reply has applied so far.
+  pending: { phase: ChatPhase; text: string; lines: number } | null;
   error: ChatError | null;
   connecting: boolean;
   connectError: ChatError | null;
@@ -72,21 +74,18 @@ export type ChatState = {
 
 type Context = ActionContext<ChatState, State>;
 
-type AppliedRound = Pick<
-  ChatRoundResult,
-  'edits' | 'previous' | 'matches' | 'problems'
->;
-
 /**
  * The reply in progress: the message's picked element, which a fix round
- * is about too, the apply_css calls made so far, and how to stop the call
- * streaming in.
+ * is about too, the apply_css calls made so far, and the one streaming in:
+ * its text, its edits as they apply, and how to stop it.
  */
 type Reply = {
   id: string;
   model: string;
   scope?: string;
   rounds: Array<ChatRoundResult>;
+  text: string;
+  live?: LiveEdits;
   stop?: () => void;
 };
 
@@ -120,9 +119,14 @@ const buildRequest = async (
 const setPhase = (
   { state, commit }: Context,
   phase: ChatPhase,
-  delta = ''
+  delta = '',
+  lines = state.pending?.lines ?? 0
 ): void => {
-  commit('setPending', { phase, text: (state.pending?.text ?? '') + delta });
+  commit('setPending', {
+    phase,
+    text: (state.pending?.text ?? '') + delta,
+    lines,
+  });
 };
 
 /**
@@ -131,10 +135,33 @@ const setPhase = (
  */
 export const createChatModule = (): Module<ChatState, State> => {
   let reply: Reply | null = null;
+  // Set while a reply streams, to keep its edits if the editor closes.
+  let onPageHide: (() => void) | null = null;
 
+  const unwatchPageHide = () => {
+    if (onPageHide) {
+      window.removeEventListener('pagehide', onPageHide);
+      onPageHide = null;
+    }
+  };
+
+  /**
+   * Stops the reply streaming in, keeping (and saving) whatever edits its
+   * call in progress has applied.
+   */
   const closeReply = () => {
     reply?.stop?.();
+    reply?.live?.close();
     reply = null;
+    unwatchPageHide();
+  };
+
+  /**
+   * Closes the reply and clears it from the chat.
+   */
+  const endReply = ({ commit }: Context) => {
+    closeReply();
+    commit('setPending', null);
   };
 
   const save = ({ state }: Context) => {
@@ -144,97 +171,55 @@ export const createChatModule = (): Module<ChatState, State> => {
   };
 
   /**
-   * The edits with partly hashed classes in their selectors swapped for
-   * stable matchers, or as written when the page can't be asked.
+   * Adds the reply's calls so far to the thread as one turn, marked
+   * stopped when its first call was cut short.
    */
-  const withStableSelectors = async (
-    replyEdits: Array<ChatCssEdit>
-  ): Promise<Array<ChatCssEdit>> => {
-    const selectors = await getPageBridge()
-      .getStableSelectors(replyEdits.map(edit => edit.selector))
-      .catch(() => null);
+  const finishReply = (context: Context, current: Reply, stopped = false) => {
+    const turn = getRoundsTurn(current.id, current.model, current.rounds);
 
-    return replyEdits.map((edit, i) => ({
-      ...edit,
-      selector: selectors?.[i] ?? edit.selector,
-    }));
-  };
-
-  /**
-   * Applies css the way any edit does, so it lands on the page, is saved,
-   * and is one step on the editor's undo trail.
-   */
-  const applyCss = async (
-    { dispatch, rootState }: Context,
-    css: string,
-    edits: Array<ChatCssEdit>,
-    source: string
-  ) => {
-    await dispatch('applyCss', { css, source }, { root: true });
-
-    const withImports = await addFontImports(rootState.css, edits);
-
-    if (withImports !== rootState.css) {
-      await dispatch(
-        'applyCss',
-        { css: withImports, record: false },
-        { root: true }
-      );
-    }
-  };
-
-  /**
-   * Adds the reply's calls so far to the thread as one turn.
-   */
-  const finishReply = (context: Context, current: Reply) => {
-    const { commit } = context;
-
-    reply = null;
-    commit('setPending', null);
-    commit('addTurn', getRoundsTurn(current.id, current.model, current.rounds));
+    endReply(context);
+    context.commit('addTurn', stopped ? { ...turn, stopped: true } : turn);
     save(context);
   };
 
   /**
-   * Applies a call's edits, then counts what each selector matched and
-   * checks the page for what they made worse. A fix that made text hard to
-   * read is taken back, and comes to null.
+   * Ends the reply streaming in early. The edits its call in progress has
+   * applied stay, with the reply's earlier calls, as one reply to undo;
+   * with none at all, the reply keeps only its text.
    */
-  const applyRound = async (
-    context: Context,
-    current: Reply,
-    replyEdits: Array<ChatCssEdit>
-  ): Promise<AppliedRound | null> => {
-    const bridge = getPageBridge();
-    const fixing = current.rounds.length > 0;
-    const edits = await withStableSelectors(replyEdits);
+  const keepStoppedReply = (context: Context) => {
+    const { state, commit } = context;
+    const current = reply;
+    const live = current?.live;
 
-    // The check is a bonus; a page that can't be read still gets the edits.
-    const checking = await bridge.startStyleCheck(edits).then(
-      () => true,
-      () => false
-    );
-    const result = applyEdits(context.rootState.css, edits);
-
-    await applyCss(context, result.css, edits, `chat:${current.id}`);
-
-    const [matches, problems] = await Promise.all([
-      bridge
-        .countMatches(edits.map(edit => edit.selector))
-        .catch(() => undefined),
-      checking ? bridge.checkStyle().catch(() => undefined) : undefined,
-    ]);
-
-    if (
-      fixing &&
-      problems?.some(problem => problem.type === 'unreadable-text')
-    ) {
-      const reverted = revertEdits(context.rootState.css, result.previous);
-      await applyCss(context, reverted, [], `chat:${current.id}`);
-      return null;
+    if (!state.pending) {
+      return;
     }
 
-    return { edits, previous: result.previous, matches, problems };
+    const { text } = state.pending;
+    const first = !current?.rounds.length;
+
+    closeReply();
+
+    if (current && live?.edits.length) {
+      current.rounds.push({
+        text: current.text,
+        edits: live.edits,
+        previous: live.previous,
+      });
+    }
+
+    if (current?.rounds.length) {
+      finishReply(context, current, first);
+      return;
+    }
+
+    commit('setPending', null);
+    commit(
+      'addTurn',
+      getStoppedTurn(text, current?.model ?? state.status?.model ?? '')
+    );
+    save(context);
   };
 
   /**
@@ -249,32 +234,54 @@ export const createChatModule = (): Module<ChatState, State> => {
   ) => {
     const { state, commit, dispatch } = context;
     const separator = state.pending?.text ? '\n\n' : '';
-    let text = '';
-    let round: AppliedRound = { edits: [], previous: [] };
-    let undone = false;
+    const fixing = current.rounds.length > 0;
+    const earlierLines = countCssLines(
+      current.rounds.flatMap(round => round.edits)
+    );
+    const live = createLiveEdits(context, current.id, applied =>
+      setPhase(context, 'applying', '', earlierLines + countCssLines(applied))
+    );
+
+    current.text = '';
+    current.live = live;
 
     const handlers: ChatStreamHandlers = {
       onText: delta => {
-        setPhase(context, 'writing', text ? delta : separator + delta);
-        text += delta;
+        setPhase(
+          context,
+          live.edits.length ? 'applying' : 'writing',
+          current.text ? delta : separator + delta
+        );
+        current.text += delta;
       },
 
       onEditsStart: () => setPhase(context, 'writing'),
 
-      onEdits: async edits => {
-        setPhase(context, 'applying');
-        const applied = await applyRound(context, current, edits);
-        undone = !applied;
-        round = applied ?? round;
-      },
+      onEdit: edit => live.add(edit),
 
       onDone: async ({ usage, replay }) => {
         if (reply !== current) {
           return;
         }
 
-        // The tokens an undone fix spent still count toward the reply.
-        if (undone) {
+        current.stop = undefined;
+        const { matches, problems } = await live.finish();
+
+        // Started over, or the editor left, while the edits applied.
+        if (reply !== current) {
+          return;
+        }
+
+        current.live = undefined;
+
+        /* A fix that made text hard to read is taken back; the tokens it
+         * spent still count toward the reply. */
+        if (
+          fixing &&
+          problems?.some(problem => problem.type === 'unreadable-text')
+        ) {
+          await live.rollBack({ keepUndoStep: true });
+
           const last = current.rounds[current.rounds.length - 1];
           current.rounds[current.rounds.length - 1] = {
             ...last,
@@ -285,8 +292,11 @@ export const createChatModule = (): Module<ChatState, State> => {
         }
 
         current.rounds.push({
-          text,
-          ...round,
+          text: current.text,
+          edits: live.edits,
+          previous: live.previous,
+          matches,
+          problems,
           ...(usage ? { usage } : {}),
           ...(replay ? { replay } : {}),
         });
@@ -299,7 +309,6 @@ export const createChatModule = (): Module<ChatState, State> => {
           return;
         }
 
-        current.stop = undefined;
         setPhase(context, 'fixing');
 
         const replyTurn = getRoundsTurn(
@@ -315,19 +324,29 @@ export const createChatModule = (): Module<ChatState, State> => {
         }
       },
 
-      onError: error => {
+      onError: async error => {
         if (reply !== current) {
           return;
         }
 
-        // A fix that fails leaves the reply as its earlier calls made it.
-        if (current.rounds.length) {
+        /* A failed call takes back what it applied: a fix leaves the reply as
+         * its earlier calls made it; a first call leaves no reply, and nothing
+         * on the page for sending again to build on. */
+        current.stop = undefined;
+        await live.rollBack({ keepUndoStep: fixing });
+
+        if (reply !== current) {
+          return;
+        }
+
+        current.live = undefined;
+
+        if (fixing) {
           finishReply(context, current);
           return;
         }
 
-        reply = null;
-        commit('setPending', null);
+        endReply(context);
         commit('setError', error);
 
         // The key is gone (removed from another tab); back to setup.
@@ -418,7 +437,8 @@ export const createChatModule = (): Module<ChatState, State> => {
        * Reads the connection and the thread for the site being edited;
        * again whenever that site changes.
        */
-      async load({ commit, state, rootState }: Context): Promise<void> {
+      async load(context: Context): Promise<void> {
+        const { commit, state, rootState } = context;
         const [status, turns] = await Promise.all([
           chatGetStatus(),
           state.url === rootState.url
@@ -429,8 +449,7 @@ export const createChatModule = (): Module<ChatState, State> => {
         commit('setStatus', status);
 
         if (state.url !== rootState.url) {
-          closeReply();
-          commit('setPending', null);
+          endReply(context);
           commit('setError', null);
           commit('setThread', { url: rootState.url, turns });
         }
@@ -499,12 +518,13 @@ export const createChatModule = (): Module<ChatState, State> => {
        * Forgets a provider's key, stopping a reply coming from it.
        */
       async removeKey(
-        { state, commit }: Context,
+        context: Context,
         provider: ChatProviderId
       ): Promise<void> {
+        const { state, commit } = context;
+
         if (state.status?.provider === provider) {
-          closeReply();
-          commit('setPending', null);
+          endReply(context);
         }
 
         commit('setStatus', await chatRemoveKey(provider));
@@ -524,8 +544,7 @@ export const createChatModule = (): Module<ChatState, State> => {
       newChat(context: Context): void {
         const { state, commit } = context;
 
-        closeReply();
-        commit('setPending', null);
+        endReply(context);
         commit('setError', null);
         commit('setThread', { url: state.url, turns: [] });
         save(context);
@@ -563,7 +582,7 @@ export const createChatModule = (): Module<ChatState, State> => {
         commit('setDraftImage', null);
         commit('setImageError', false);
         commit('addTurn', getUserTurn(message));
-        commit('setPending', { phase: 'reading', text: '' });
+        commit('setPending', { phase: 'reading', text: '', lines: 0 });
         save(context);
 
         const request = await buildRequest(context, message.scope);
@@ -574,38 +593,28 @@ export const createChatModule = (): Module<ChatState, State> => {
         }
 
         closeReply();
-        reply = { id: getTurnId(), model, scope: message.scope, rounds: [] };
+        reply = {
+          id: getTurnId(),
+          model,
+          scope: message.scope,
+          rounds: [],
+          text: '',
+        };
+        onPageHide = () => keepStoppedReply(context);
+        window.addEventListener('pagehide', onPageHide);
         streamRound(context, reply, request);
       },
 
       /**
-       * Stops the reply streaming in, keeping the text so far and applying
-       * no CSS. Once its edits have arrived the reply is left to finish.
+       * Stops the reply streaming in, keeping the text so far and the edits
+       * already applied, as one reply to undo. Once a call's stream has
+       * ended, it's left to finish applying and checking its edits.
        */
       stop(context: Context): void {
-        const { state, commit } = context;
-
-        if (!state.pending || state.pending.phase === 'applying') {
-          return;
+        // A call whose stream has ended (no stop left) is finishing.
+        if (!reply?.live || reply.stop) {
+          keepStoppedReply(context);
         }
-
-        // Stopping a fix keeps what the reply's earlier calls did.
-        if (reply?.rounds.length) {
-          const current = reply;
-          current.stop?.();
-          finishReply(context, current);
-          return;
-        }
-
-        const turn = getStoppedTurn(
-          state.pending.text,
-          state.status?.model ?? ''
-        );
-
-        closeReply();
-        commit('setPending', null);
-        commit('addTurn', turn);
-        save(context);
       },
 
       /**
@@ -624,11 +633,10 @@ export const createChatModule = (): Module<ChatState, State> => {
         }
 
         if (turn.applied) {
-          const reverted = revertEdits(rootState.css, turn.previous);
-          const css = removeFontImports(reverted, turn.previous);
+          const css = revertReply(rootState.css, turn.previous);
 
           commit('updateTurn', { id, patch: { applied: false } });
-          await applyCss(context, css, [], `chat:${id}`);
+          await applyChatCss(context, css, [], { source: `chat:${id}` });
         } else {
           const result = applyEdits(rootState.css, turn.edits);
 
@@ -636,7 +644,9 @@ export const createChatModule = (): Module<ChatState, State> => {
             id,
             patch: { applied: true, previous: result.previous },
           });
-          await applyCss(context, result.css, turn.edits, `chat:${id}`);
+          await applyChatCss(context, result.css, turn.edits, {
+            source: `chat:${id}`,
+          });
         }
 
         save(context);

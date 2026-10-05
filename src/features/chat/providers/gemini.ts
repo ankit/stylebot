@@ -1,6 +1,5 @@
 import type {
   ChatAssistantTurn,
-  ChatCssEdit,
   ChatModel,
   ChatProviderInfo,
   ChatReplyRound,
@@ -22,8 +21,9 @@ import {
   toolResultFor,
   roundCallId,
   roundsOf,
-  parseEdits,
 } from '../apply-css-tool';
+import type { EditStream } from '../apply-css-tool';
+import { finishEdits, startEdits } from './edits';
 import { userMessageText } from '../prompt';
 
 export const gemini: ChatProviderInfo = {
@@ -214,7 +214,7 @@ type Step = Record<string, unknown>;
 type StreamState = {
   usage: ChatUsage;
   // The apply_css call's arguments so far, by step index.
-  toolInputs: Map<number, string>;
+  toolInputs: Map<number, EditStream>;
   // Every output step as streamed, to send back verbatim next time.
   steps: Map<number, Step>;
   status: string;
@@ -276,12 +276,15 @@ const startStep = (
 
   if (step.type === 'function_call' && step.name === TOOL_NAME) {
     const args = step.arguments;
-    // Arguments may arrive whole on the start step instead of as deltas.
-    state.toolInputs.set(
-      index,
-      args && Object.keys(args).length ? JSON.stringify(args) : ''
-    );
+    const input = startEdits(onEvent);
+
+    state.toolInputs.set(index, input);
     onEvent({ type: 'edits-start' });
+
+    // Arguments may arrive whole on the start step instead of as deltas.
+    if (args && Object.keys(args).length) {
+      input.write(JSON.stringify(args));
+    }
   }
 };
 
@@ -307,14 +310,9 @@ const addDelta = (
     case 'thought_signature':
       step.signature = delta.signature;
       break;
-    case 'arguments_delta': {
-      const input = state.toolInputs.get(index as number);
-
-      if (input !== undefined) {
-        state.toolInputs.set(index as number, input + (delta.arguments ?? ''));
-      }
+    case 'arguments_delta':
+      state.toolInputs.get(index as number)?.write(delta.arguments ?? '');
       break;
-    }
   }
 };
 
@@ -363,7 +361,7 @@ const handleEvent = (
  * text and call, with the call's arguments whole.
  */
 const replaySteps = (state: StreamState): Array<Step> => {
-  state.toolInputs.forEach((json, index) => {
+  state.toolInputs.forEach(({ json }, index) => {
     const step = state.steps.get(index);
 
     if (step && json) {
@@ -384,8 +382,8 @@ const replaySteps = (state: StreamState): Array<Step> => {
 };
 
 /**
- * Reports what the reply came to once the stream ends: its usage and
- * steps, then its edits, or why there are none.
+ * Reports what the reply came to once the stream ends: its usage, any
+ * edits not yet reported and its steps, or why there are no edits.
  */
 const finishReply = (state: StreamState, onEvent: OnEvent) => {
   onEvent({ type: 'usage', usage: state.usage });
@@ -394,22 +392,11 @@ const finishReply = (state: StreamState, onEvent: OnEvent) => {
     throw new ChatProviderError('chat_error_provider');
   }
 
-  const edits: Array<ChatCssEdit> = [];
-
-  for (const json of state.toolInputs.values()) {
-    const parsed = parseEdits(json);
-
-    if (!parsed) {
-      throw new ChatProviderError('chat_error_incomplete');
-    }
-    edits.push(...parsed);
-  }
+  const count = finishEdits(state.toolInputs.values());
 
   onEvent({ type: 'replay', steps: replaySteps(state) });
 
-  if (edits.length) {
-    onEvent({ type: 'edits', edits });
-  } else if (state.status === 'incomplete') {
+  if (!count && state.status === 'incomplete') {
     throw new ChatProviderError('chat_error_incomplete');
   }
 

@@ -147,7 +147,13 @@ export type PageBridge = {
   startStyleCheck(edits: Array<ChatCssEdit>): Promise<void>;
 
   /**
-   * Once the edits noted by startStyleCheck have applied: text they made
+   * Adds edits about to be applied to the check startStyleCheck started,
+   * for a reply whose edits stream in one by one.
+   */
+  extendStyleCheck(edits: Array<ChatCssEdit>): Promise<void>;
+
+  /**
+   * Once the edits noted by startStyleCheck and extendStyleCheck have applied: text they made
    * hard to read, surfaces a theme change missed, and declarations that
    * changed nothing.
    */

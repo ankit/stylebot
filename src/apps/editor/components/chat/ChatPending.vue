@@ -3,7 +3,7 @@
     <chat-markdown v-if="pending.text" :text="pending.text">
       <span v-if="pending.phase === 'writing'" class="chat-caret" />
     </chat-markdown>
-    <chat-loader :label="phaseLabel" />
+    <chat-loader :label="label" />
   </div>
 </template>
 
@@ -18,6 +18,8 @@ import type { ChatPhase, ChatState } from '../../store/chat';
 const PHRASE_INTERVAL = 1600;
 
 type Pending = NonNullable<ChatState['pending']>;
+
+type TalkingPhase = Exclude<ChatPhase, 'applying'>;
 
 export default Vue.extend({
   name: 'ChatPending',
@@ -56,7 +58,7 @@ export default Vue.extend({
       return this.pending.phase;
     },
 
-    phrases(): Record<ChatPhase, Array<string>> {
+    phrases(): Record<TalkingPhase, Array<string>> {
       return {
         reading: [
           this.t('reading_the_page'),
@@ -73,7 +75,6 @@ export default Vue.extend({
           this.t('rounding_some_corners'),
           this.t('choosing_a_nicer_shade'),
         ],
-        applying: [this.t('applying_the_new_look'), this.t('tidying_up')],
         fixing: [
           this.t('checking_the_result'),
           this.t('touching_up_what_missed'),
@@ -81,7 +82,19 @@ export default Vue.extend({
       };
     },
 
-    phaseLabel(): string {
+    /**
+     * A rotating phrase while the model reads and writes, then the CSS
+     * applied so far, growing as the reply's edits land.
+     */
+    label(): string {
+      if (this.phase === 'applying') {
+        const { lines } = this.pending;
+
+        return lines === 1
+          ? this.t('added_one_line')
+          : this.t('added_count_lines', [String(lines)]);
+      }
+
       const phrases = this.phrases[this.phase];
       const step = Math.floor((this.now - this.phaseStart) / PHRASE_INTERVAL);
 

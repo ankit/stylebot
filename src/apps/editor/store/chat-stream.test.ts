@@ -1,8 +1,4 @@
-import type {
-  ChatCssEdit,
-  ChatStreamEvent,
-  ChatStreamRequest,
-} from '@stylebot/types';
+import type { ChatStreamEvent, ChatStreamRequest } from '@stylebot/types';
 
 import { streamReply } from './chat-stream';
 import type { ChatStreamHandlers } from './chat-stream';
@@ -47,7 +43,7 @@ beforeEach(() => {
   handlers = {
     onText: jest.fn(),
     onEditsStart: jest.fn(),
-    onEdits: jest.fn((_edits: Array<ChatCssEdit>) => Promise.resolve()),
+    onEdit: jest.fn(),
     onDone: jest.fn(),
     onError: jest.fn(),
   };
@@ -64,7 +60,8 @@ describe('streamReply', () => {
 
     port.emit({ type: 'text', delta: 'Done' });
     port.emit({ type: 'edits-start' });
-    port.emit({ type: 'edits', edits: [edit] });
+    port.emit({ type: 'edit', edit });
+    port.emit({ type: 'edit', edit: { ...edit, selector: 'b' } });
     port.emit({
       type: 'usage',
       usage: { inputTokens: 10, outputTokens: 2 },
@@ -75,33 +72,15 @@ describe('streamReply', () => {
 
     expect(handlers.onText).toHaveBeenCalledWith('Done');
     expect(handlers.onEditsStart).toHaveBeenCalled();
-    expect(handlers.onEdits).toHaveBeenCalledWith([edit]);
+    expect(handlers.onEdit.mock.calls).toEqual([
+      [edit],
+      [{ ...edit, selector: 'b' }],
+    ]);
     expect(handlers.onDone).toHaveBeenCalledWith({
       usage: { inputTokens: 10, outputTokens: 2 },
       replay: ['step'],
     });
     expect(port.disconnect).toHaveBeenCalled();
-  });
-
-  it('finishes only once the edits are applied', async () => {
-    let applied: () => void = () => undefined;
-    handlers.onEdits.mockReturnValue(
-      new Promise<void>(resolve => {
-        applied = resolve;
-      })
-    );
-
-    streamReply(request, handlers);
-    port.emit({ type: 'edits', edits: [edit] });
-    port.emit({ type: 'done' });
-    await flush();
-
-    expect(handlers.onDone).not.toHaveBeenCalled();
-
-    applied();
-    await flush();
-
-    expect(handlers.onDone).toHaveBeenCalled();
   });
 
   it('passes on an error from the provider', () => {
@@ -143,13 +122,12 @@ describe('streamReply', () => {
     expect(handlers.onError).not.toHaveBeenCalled();
   });
 
-  it('drops a reply stopped while its edits were being applied', async () => {
+  it('passes on no edits once stopped mid-call', () => {
     const stop = streamReply(request, handlers);
-    port.emit({ type: 'edits', edits: [edit] });
-    port.emit({ type: 'done' });
+    port.emit({ type: 'edit', edit });
     stop();
-    await flush();
+    port.emit({ type: 'edit', edit });
 
-    expect(handlers.onDone).not.toHaveBeenCalled();
+    expect(handlers.onEdit).toHaveBeenCalledTimes(1);
   });
 });

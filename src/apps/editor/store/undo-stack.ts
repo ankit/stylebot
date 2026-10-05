@@ -20,17 +20,19 @@ export const emptyUndoStack = (): UndoStack => ({ past: [], future: [] });
 
 /**
  * Records the css a change is about to replace, extending the latest step
- * when the same source repeats within the coalescing window.
+ * when the same source repeats within the coalescing window, or at any
+ * time for a grouped change (a chat reply whose edits stream in).
  */
 export const recordChange = (
   stack: UndoStack,
   css: string,
   source: string,
-  at = Date.now()
+  at = Date.now(),
+  group = false
 ): UndoStack => {
   const last = stack.past[stack.past.length - 1];
 
-  if (last?.source === source && at - last.at < COALESCE_WINDOW_MS) {
+  if (last?.source === source && (group || at - last.at < COALESCE_WINDOW_MS)) {
     return {
       past: [...stack.past.slice(0, -1), { ...last, at }],
       future: [],
@@ -42,6 +44,15 @@ export const recordChange = (
     future: [],
   };
 };
+
+/**
+ * Drops the latest step when it came from the source, for a change taken
+ * back before it was ever meant to be undone (a chat reply that failed).
+ */
+export const discardChange = (stack: UndoStack, source: string): UndoStack =>
+  stack.past[stack.past.length - 1]?.source === source
+    ? { ...stack, past: stack.past.slice(0, -1) }
+    : stack;
 
 export type UndoMove = {
   undoStack: UndoStack;

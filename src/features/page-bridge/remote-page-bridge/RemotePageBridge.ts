@@ -298,6 +298,10 @@ export class RemotePageBridge extends PageBridgeEmitter implements PageBridge {
     return this.request('startStyleCheck', edits);
   }
 
+  extendStyleCheck(edits: Array<ChatCssEdit>): Promise<void> {
+    return this.request('extendStyleCheck', edits);
+  }
+
   checkStyle(): Promise<Array<ChatStyleProblem>> {
     return this.request('checkStyle');
   }

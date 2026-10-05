@@ -1,5 +1,4 @@
 import type {
-  ChatCssEdit,
   ChatModel,
   ChatProviderInfo,
   ChatStreamEvent,
@@ -19,8 +18,9 @@ import {
   toolResultFor,
   roundCallId,
   roundsOf,
-  parseEdits,
 } from '../apply-css-tool';
+import type { EditStream } from '../apply-css-tool';
+import { finishEdits, startEdits } from './edits';
 import { userMessageText } from '../prompt';
 
 export const openai: ChatProviderInfo = {
@@ -160,7 +160,7 @@ const requestBody = (
 type StreamState = {
   usage: ChatUsage;
   // The apply_css call's arguments so far, by output index.
-  toolInputs: Map<number, string>;
+  toolInputs: Map<number, EditStream>;
   // Why the response stopped short, if it did.
   incomplete: string;
 };
@@ -198,7 +198,7 @@ const startItem = (
     item.name === TOOL_NAME &&
     index !== undefined
   ) {
-    state.toolInputs.set(index, '');
+    state.toolInputs.set(index, startEdits(onEvent));
     onEvent({ type: 'edits-start' });
   }
 };
@@ -207,10 +207,8 @@ const addArguments = (
   state: StreamState,
   { delta, output_index: index }: StreamEvent
 ) => {
-  const input = index !== undefined ? state.toolInputs.get(index) : undefined;
-
-  if (input !== undefined) {
-    state.toolInputs.set(index as number, input + (delta ?? ''));
+  if (index !== undefined) {
+    state.toolInputs.get(index)?.write(delta ?? '');
   }
 };
 
@@ -254,8 +252,8 @@ const handleEvent = (
 };
 
 /**
- * Reports what the reply came to once the stream ends: its usage, then its
- * edits, or why there are none.
+ * Reports what the reply came to once the stream ends: its usage, then any
+ * edits not yet reported, or why there are none.
  */
 const finishReply = (state: StreamState, onEvent: OnEvent) => {
   onEvent({ type: 'usage', usage: state.usage });
@@ -264,20 +262,9 @@ const finishReply = (state: StreamState, onEvent: OnEvent) => {
     throw new ChatProviderError('chat_error_declined');
   }
 
-  const edits: Array<ChatCssEdit> = [];
+  const count = finishEdits(state.toolInputs.values());
 
-  for (const json of state.toolInputs.values()) {
-    const parsed = parseEdits(json);
-
-    if (!parsed) {
-      throw new ChatProviderError('chat_error_incomplete');
-    }
-    edits.push(...parsed);
-  }
-
-  if (edits.length) {
-    onEvent({ type: 'edits', edits });
-  } else if (state.incomplete) {
+  if (!count && state.incomplete) {
     throw new ChatProviderError('chat_error_incomplete');
   }
 

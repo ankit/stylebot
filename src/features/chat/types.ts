@@ -46,8 +46,8 @@ export type ChatProvider = {
   validateKey(key: string): Promise<void>;
 
   /**
-   * Streams one reply, emitting text as it arrives, the edits once the tool
-   * call completes, then usage and done. Failures arrive as an error event.
+   * Streams one reply, emitting text and each edit of the tool call as they
+   * arrive, then usage and done. Failures arrive as an error event.
    */
   stream(args: ChatStreamArgs): Promise<void>;
 };

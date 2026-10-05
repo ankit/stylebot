@@ -43,6 +43,7 @@ const mockBridge = {
   countMatches: jest.fn(),
   getStableSelectors: jest.fn(),
   startStyleCheck: jest.fn(),
+  extendStyleCheck: jest.fn(),
   checkStyle: jest.fn(),
   openInPage: jest.fn(),
   focusPage: jest.fn(),

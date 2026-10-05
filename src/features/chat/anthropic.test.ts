@@ -39,7 +39,7 @@ const edits = [
 ];
 
 describe('anthropicProvider.stream', () => {
-  it('streams text, then the tool call as edits, usage and done', async () => {
+  it('streams text, then the tool call as edits, then usage and done', async () => {
     const input = JSON.stringify({ edits });
     const events = await run(
       streamResponse([
@@ -102,6 +102,7 @@ describe('anthropicProvider.stream', () => {
       { type: 'text', delta: 'Made titles ' },
       { type: 'text', delta: 'larger.' },
       { type: 'edits-start' },
+      { type: 'edit', edit: edits[0] },
       {
         type: 'usage',
         usage: {
@@ -111,7 +112,6 @@ describe('anthropicProvider.stream', () => {
           cacheWriteTokens: 10,
         },
       },
-      { type: 'edits', edits },
       { type: 'done' },
     ]);
 
@@ -127,6 +127,7 @@ describe('anthropicProvider.stream', () => {
     expect(body.stream).toBe(true);
     expect(body.system).toBe('system prompt');
     expect(body.tools[0].name).toBe('apply_css');
+    expect(body.tools[0].eager_input_streaming).toBe(true);
     expect(body.output_config).toEqual({ effort: 'low' });
   });
 
@@ -169,6 +170,155 @@ describe('anthropicProvider.stream', () => {
         detail: 'Failed to fetch',
       },
     ]);
+  });
+
+  it('reports each edit as soon as its entry closes, while the call still streams', async () => {
+    const two = [
+      ...edits,
+      {
+        selector: '[class*="a,b"] > p:not(.x)',
+        declarations: [{ property: 'content', value: '"}],\\""' }],
+      },
+    ];
+    const input = JSON.stringify({ edits: two });
+    const cut = input.indexOf('},{') + 4;
+    const log: Array<string> = [];
+
+    fetchMock.mockResolvedValue(
+      streamResponse(
+        [
+          sse([
+            {
+              type: 'content_block_start',
+              index: 0,
+              content_block: { type: 'tool_use', id: 't', name: 'apply_css' },
+            },
+            {
+              type: 'content_block_delta',
+              index: 0,
+              delta: {
+                type: 'input_json_delta',
+                partial_json: input.slice(0, cut),
+              },
+            },
+          ]),
+          sse([
+            {
+              type: 'content_block_delta',
+              index: 0,
+              delta: {
+                type: 'input_json_delta',
+                partial_json: input.slice(cut),
+              },
+            },
+            { type: 'message_delta', delta: { stop_reason: 'tool_use' } },
+          ]),
+        ],
+        index => log.push(`read ${index}`)
+      )
+    );
+
+    const events: Array<ChatStreamEvent> = [];
+
+    await anthropicProvider.stream({
+      key: 'sk-ant-test',
+      model: getModel('anthropic', 'claude-sonnet-5-5'),
+      system: '',
+      turns: [],
+      signal: new AbortController().signal,
+      onEvent: event => {
+        events.push(event);
+        log.push(event.type === 'edit' ? event.edit.selector : event.type);
+      },
+    });
+
+    expect(log).toEqual([
+      'read 0',
+      'edits-start',
+      '.title',
+      'read 1',
+      '[class*="a,b"] > p:not(.x)',
+      'usage',
+      'done',
+    ]);
+    expect(events.filter(event => event.type === 'edit')).toEqual(
+      two.map(edit => ({ type: 'edit', edit }))
+    );
+  });
+
+  it('reports the edits of every apply_css call in the reply', async () => {
+    const second = {
+      selector: 'h1',
+      declarations: [{ property: 'color', value: 'red' }],
+    };
+    const events = await run(
+      streamResponse([
+        sse(
+          [edits, [second]].flatMap((callEdits, index) => [
+            {
+              type: 'content_block_start',
+              index,
+              content_block: {
+                type: 'tool_use',
+                id: `t${index}`,
+                name: 'apply_css',
+              },
+            },
+            {
+              type: 'content_block_delta',
+              index,
+              delta: {
+                type: 'input_json_delta',
+                partial_json: JSON.stringify({ edits: callEdits }),
+              },
+            },
+          ])
+        ),
+      ])
+    );
+
+    expect(events.filter(event => event.type === 'edit')).toEqual([
+      { type: 'edit', edit: edits[0] },
+      { type: 'edit', edit: second },
+    ]);
+  });
+
+  it('keeps the edits reported before a call was cut off, then reports it incomplete', async () => {
+    const input = JSON.stringify({ edits: [...edits, ...edits] });
+    const events = await run(
+      streamResponse([
+        sse([
+          {
+            type: 'content_block_start',
+            index: 0,
+            content_block: { type: 'tool_use', id: 't', name: 'apply_css' },
+          },
+          {
+            type: 'content_block_delta',
+            index: 0,
+            delta: {
+              type: 'input_json_delta',
+              partial_json: input.slice(0, input.length - 12),
+            },
+          },
+          {
+            type: 'message_delta',
+            delta: { stop_reason: 'max_tokens' },
+          },
+        ]),
+      ])
+    );
+
+    expect(events.map(event => event.type)).toEqual([
+      'edits-start',
+      'edit',
+      'usage',
+      'error',
+    ]);
+    expect(events[events.length - 1]).toEqual({
+      type: 'error',
+      errorKey: 'chat_error_incomplete',
+    });
   });
 
   it('reports a tool call cut off by max_tokens as incomplete', async () => {

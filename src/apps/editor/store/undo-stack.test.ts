@@ -1,6 +1,7 @@
 import {
   COALESCE_WINDOW_MS,
   UNDO_LIMIT,
+  discardChange,
   emptyUndoStack,
   undoKeyFor,
   undoShortcuts,
@@ -13,6 +14,22 @@ const key = (init: KeyboardEventInit): KeyboardEvent =>
   new KeyboardEvent('keydown', init);
 
 describe('undo stack', () => {
+  describe('discardChange', () => {
+    it('drops the latest step only when it came from the source', () => {
+      const stack = recordChange(
+        recordChange(emptyUndoStack(), 'a', 'edit', 1000),
+        'b',
+        'chat:r1',
+        5000
+      );
+
+      expect(discardChange(stack, 'chat:r1').past).toEqual([
+        { css: 'a', source: 'edit', at: 1000 },
+      ]);
+      expect(discardChange(stack, 'chat:r2')).toBe(stack);
+    });
+  });
+
   describe('recordChange', () => {
     it('pushes the css being replaced as a new step', () => {
       const stack = recordChange(emptyUndoStack(), 'a', 'edit', 1000);
@@ -21,6 +38,13 @@ describe('undo stack', () => {
         past: [{ css: 'a', source: 'edit', at: 1000 }],
         future: [],
       });
+    });
+
+    it('extends the latest step for a grouped change from the same source, however late', () => {
+      const first = recordChange(emptyUndoStack(), 'a', 'chat:r1', 1000);
+      const second = recordChange(first, 'b', 'chat:r1', 60000, true);
+
+      expect(second.past).toEqual([{ css: 'a', source: 'chat:r1', at: 60000 }]);
     });
 
     it('extends the latest step for a quick change from the same source', () => {

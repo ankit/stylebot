@@ -38,6 +38,7 @@ import {
   getPageOutline,
   getStableSelectors,
   startStyleCheck,
+  extendStyleCheck,
 } from './chat';
 import { getAppliedDeclarations } from './applied-declarations';
 import type { AppliedDeclaration } from './applied-declarations';
@@ -252,6 +253,11 @@ export class LocalPageBridge extends PageBridgeEmitter implements PageBridge {
 
   startStyleCheck(edits: Array<ChatCssEdit>): Promise<void> {
     startStyleCheck(edits);
+    return Promise.resolve();
+  }
+
+  extendStyleCheck(edits: Array<ChatCssEdit>): Promise<void> {
+    extendStyleCheck(edits);
     return Promise.resolve();
   }
 

@@ -5,7 +5,8 @@ export {
   TOOL_RESULT_APPLIED,
   TOOL_RESULT_UNDONE,
 } from './schema';
-export { parseEdits } from './parse-edits';
+export { createEditStream } from './edit-stream';
+export type { EditStream } from './edit-stream';
 export {
   MAX_FIX_ROUNDS,
   needsFix,

@@ -21,7 +21,9 @@ export type ChatShimOptions = {
   // Keyed by site, as the background stores them.
   threads?: Record<string, Array<ChatTurn>>;
   // Streams part of the reply, then waits forever: the reply in progress.
-  hold?: boolean;
+  // 'edits' streams the text and the first edit before waiting, or before
+  // the error when there is one.
+  hold?: boolean | 'edits';
   // Ms between streamed words; 0 keeps plays fast.
   wordDelay?: number;
   error?: Extract<ChatStreamEvent, { type: 'error' }>;
@@ -40,6 +42,10 @@ const REPLIES: Array<[RegExp, ChatReplyScript]> = [
             { property: 'background-color', value: '#16181c' },
             { property: 'color', value: '#d8dbe1' },
           ],
+        },
+        {
+          selector: '.sb-page h1',
+          declarations: [{ property: 'color', value: '#8ab4f8' }],
         },
       ],
     },
@@ -204,7 +210,7 @@ export const createChatShim = (options: ChatShimOptions = {}) => {
       },
       disconnect: () => timers.forEach(clearTimeout),
       postMessage: (request: ChatStreamRequest) => {
-        if (options.error) {
+        if (options.error && options.hold !== 'edits') {
           emit(options.error);
           return;
         }
@@ -212,24 +218,35 @@ export const createChatShim = (options: ChatShimOptions = {}) => {
         const last = request.turns[request.turns.length - 1];
         const reply = replyFor(last?.role === 'user' ? last.text : '');
         const words = reply.text.split(' ');
-        const shown = options.hold
-          ? words.slice(0, Math.ceil(words.length / 2))
-          : words;
+        const shown =
+          options.hold === true
+            ? words.slice(0, Math.ceil(words.length / 2))
+            : words;
 
         shown.forEach((word, index) =>
           emit({ type: 'text', delta: index ? ` ${word}` : word })
         );
 
-        if (options.hold) {
+        if (options.hold === true) {
           return;
         }
 
         emit({ type: 'edits-start' });
+
+        if (options.hold === 'edits') {
+          emit({ type: 'edit', edit: reply.edits[0] });
+
+          if (options.error) {
+            emit(options.error);
+          }
+          return;
+        }
+
+        reply.edits.forEach(edit => emit({ type: 'edit', edit }));
         emit({
           type: 'usage',
           usage: { inputTokens: 2400, outputTokens: 180 },
         });
-        emit({ type: 'edits', edits: reply.edits });
         emit({ type: 'done' });
       },
     };
