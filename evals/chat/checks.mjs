@@ -1,7 +1,7 @@
 /*
  * Checks measured on the page: whether a reply did what was asked, read from
  * computed styles and element boxes rather than judged from a screenshot.
- * The case format is described in docs/chat.md.
+ * The case format is described in docs/chat-evals.md.
  */
 
 const MAX_ELEMENTS = 60;

@@ -1,7 +1,7 @@
 /*
  * Evaluates Chat's styling replies: runs each case against recorded pages for
  * two versions of Stylebot (git refs), with every model call made through
- * headless Claude Code, then scores the result. See docs/chat.md.
+ * headless Claude Code, then scores the result. See docs/chat-evals.md.
  */
 import { createHash } from 'node:crypto';
 import fs from 'node:fs';

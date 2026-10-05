@@ -10,7 +10,7 @@ measures that: each case is a request on a recorded page ("Make this page an eve
 theme with Fira Code as typography" on Hacker News), run for a base and a head version,
 then measured on the page (a column's width, a sidebar hidden, a font, a color) and shown
 in screenshots. Model calls go through headless Claude Code on the user's subscription,
-not an API key. `docs/chat.md` describes the harness; this is how to
+not an API key. `docs/chat-evals.md` describes the harness; this is how to
 use it well.
 
 ## 1. Run it
@@ -47,7 +47,7 @@ Open `summary.md` in the results folder.
   the conversation and the stylesheet. Harness bugs have looked like model failures: web
   fonts not loaded before the screenshot, a page's CSP blocking the injected script.
 - **Look for failures that repeat across cases**; those are what to fix. When the
-  screenshots show a problem no check catches, add a check (see `docs/chat.md`).
+  screenshots show a problem no check catches, add a check (see `docs/chat-evals.md`).
 - **Changing a case's checks?** Run `yarn eval:chat --references --cases <id>` first: no
   model calls, and every check should pass with the case's reference stylesheet. Write a
   reference for a case that doesn't have one yet.

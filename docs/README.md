@@ -9,6 +9,7 @@
 ## Testing
 
 - [e2e](e2e.md) — the Playwright suite against the real extension
+- [Chat evals](chat-evals.md) — measuring whether a change makes Chat's replies better
 
 ## Architecture
 
