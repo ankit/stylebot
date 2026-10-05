@@ -22,7 +22,7 @@ Each strategy is tried in turn; the first one that returns something wins.
    human-readable description (unlike `aria-label`).
 4. **Authored part of its own partly hashed class** — CSS Modules,
    styled-components and similar tools join the author's name with a build
-   hash (`Header_nav__a1B2c`, `Nav-sc-1x2y3z-0`). Matching just the authored
+   hash (`Header_nav__a1B2c`, `prc-Link-Link-85e08`, `Nav-sc-1x2y3z-0`). Matching just the authored
    part, `nav[class*="Header_nav__"]`, survives the site's next build and has
    the same specificity as a class. It's used only while it matches exactly the
    same elements on the page as the full class does.
@@ -58,6 +58,11 @@ partly hashed:
   parts on either side are kept, so Turbopack's `page-module__E0kJGG__main`
   becomes `[class*="page-module__"][class*="__main"]`.
 - styled-components' `Name-sc-hash-0`, which keeps `Name-sc-`.
+- a dash-separated CSS Modules name ending in a 5-character hash, like
+  Primer's `prc-TopicTag-TopicTag-LS-jX`, which keeps `prc-TopicTag-TopicTag-`.
+  It needs a PascalCase component name before the hash, and a hash that mixes
+  letters with digits or case, so utility classes like `col-md-12` stay
+  authored.
 
 ### Other selectors for the element
 

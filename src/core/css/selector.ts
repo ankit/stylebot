@@ -85,14 +85,30 @@ function isHashSegment(segment: string): boolean {
 }
 
 /**
+ * A 5-character CSS Modules hash at the end of a dash-separated class, like
+ * `LS-jX` or `c50BI`, but not a word (`Large`) or a size token (`xs-12`).
+ */
+function isDashedHash(hash: string): boolean {
+  return /[a-z]\d|\d[a-z]/i.test(hash) || caseTransitionRatio(hash) >= 0.4;
+}
+
+/**
  * The authored parts of a class a build tool combined with a hash, e.g.
- * `Header_nav__` from CSS Modules' `Header_nav__a1B2c`, or `Nav-sc-` from
+ * `Header_nav__` from CSS Modules' `Header_nav__a1B2c`, `prc-TopicTag-` from
+ * Primer's `prc-TopicTag-LS-jX`, or `Nav-sc-` from
  * styled-components' `Nav-sc-1x2y3z-0`.
  */
 function getStableClassParts(className: string): Array<string> | null {
   const styled = className.match(/^(.+-sc-)[a-z0-9]+-\d+$/i);
   if (styled) {
     return [styled[1]];
+  }
+
+  // Dash-separated CSS Modules names carry a PascalCase component name,
+  // which tells them apart from utility classes like `col-md-12`.
+  const dashed = className.match(/^(.+-)([\w-]{5})$/);
+  if (dashed && /(^|-)[A-Z][a-z]/.test(dashed[1]) && isDashedHash(dashed[2])) {
+    return [dashed[1]];
   }
 
   const segments = className.split('__');

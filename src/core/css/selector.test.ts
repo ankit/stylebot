@@ -182,6 +182,9 @@ describe('selector', () => {
       ['Button_root___x7Yz', 'nav[class*="Button_root__"]'],
       ['styles_root__1hiof570', 'nav[class*="styles_root__"]'],
       ['Header__Nav-sc-1x2y3z-0', 'nav[class*="Header__Nav-sc-"]'],
+      ['prc-TopicTag-TopicTag-LS-jX', 'nav[class*="prc-TopicTag-TopicTag-"]'],
+      ['prc-Button-ButtonBase-c50BI', 'nav[class*="prc-Button-ButtonBase-"]'],
+      ['prc-Link-Link-85e08', 'nav[class*="prc-Link-Link-"]'],
       [
         'page-module__E0kJGG__main',
         'nav[class*="page-module__"][class*="__main"]',
@@ -193,16 +196,23 @@ describe('selector', () => {
       expect(getStableClassPartsSelector(el)).toBe(expected);
     });
 
-    it.each(['card__title', 'card__item2', 'menu__subMenu', 'primary-nav'])(
-      'leaves an authored class like %s alone',
-      className => {
-        const el = document.createElement('div');
-        el.setAttribute('class', className);
+    it.each([
+      'card__title',
+      'card__item2',
+      'menu__subMenu',
+      'primary-nav',
+      'col-md-12',
+      'MuiGrid-grid-xs-12',
+      'MuiButton-sizeLarge',
+      'Card-Title-Large',
+      'bg-red-500',
+    ])('leaves an authored class like %s alone', className => {
+      const el = document.createElement('div');
+      el.setAttribute('class', className);
 
-        expect(getStableClassPartsSelector(el)).toBeNull();
-        expect(getNonHashedClassBasedSelector(el)).toBe(`div.${className}`);
-      }
-    );
+      expect(getStableClassPartsSelector(el)).toBeNull();
+      expect(getNonHashedClassBasedSelector(el)).toBe(`div.${className}`);
+    });
 
     it('prefers an authored class over a partly hashed one', () => {
       const el = document.createElement('div');
