@@ -1,8 +1,9 @@
 <template>
   <div class="chat-user-message">
-    <span v-if="turn.scope" class="chat-user-scope" :title="turn.scope">
+    <s-attachment v-if="turn.scope" mono size="small" class="chat-user-scope">
+      <template #media><inspector-icon :size="11" /></template>
       {{ turn.scope }}
-    </span>
+    </s-attachment>
     <img
       v-if="turn.image"
       class="chat-user-image"
@@ -19,13 +20,16 @@
 import type { PropType } from 'vue';
 import Vue from 'vue';
 
-import { SText } from '@stylebot/components';
+import { SAttachment, SText } from '@stylebot/components';
+import { InspectorIcon } from '@stylebot/icons';
 import type { ChatUserTurn } from '@stylebot/types';
 
 export default Vue.extend({
   name: 'ChatUserMessage',
 
   components: {
+    InspectorIcon,
+    SAttachment,
     SText,
   },
 
@@ -46,18 +50,6 @@ export default Vue.extend({
   flex-direction: column;
   align-items: flex-end;
   gap: 6px;
-}
-
-.chat-user-scope {
-  @include truncate;
-
-  max-width: 100%;
-  box-sizing: border-box;
-  padding: 0 4px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  line-height: 1.3;
-  color: var(--text-faint);
 }
 
 .chat-user-image {

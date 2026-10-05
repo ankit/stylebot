@@ -1,14 +1,15 @@
 <template>
   <span class="chat-attach-image">
-    <s-icon-button
-      :size="26"
-      class="chat-attach-image-button"
-      :title="t('attach_an_image_or_paste_a_screenshot')"
-      :aria-label="t('attach_an_image')"
-      @click="pick"
-    >
-      <image-icon :size="16" />
-    </s-icon-button>
+    <s-tooltip :text="t('attach_an_image_or_paste_a_screenshot')">
+      <s-icon-button
+        :size="26"
+        class="chat-attach-image-button"
+        :aria-label="t('attach_an_image')"
+        @click="pick"
+      >
+        <image-icon :size="16" />
+      </s-icon-button>
+    </s-tooltip>
     <input
       ref="file"
       class="chat-attach-image-file"
@@ -24,7 +25,7 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { SIconButton } from '@stylebot/components';
+import { SIconButton, STooltip } from '@stylebot/components';
 import { ImageIcon } from '@stylebot/icons';
 
 /**
@@ -36,6 +37,7 @@ export default Vue.extend({
 
   components: {
     SIconButton,
+    STooltip,
     ImageIcon,
   },
 

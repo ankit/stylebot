@@ -11,6 +11,7 @@
     autocorrect="off"
     @input="$emit('input', $event.target.value)"
     @keydown.enter.exact="onEnter"
+    @keydown.backspace.exact="onBackspace"
   />
 </template>
 
@@ -21,7 +22,8 @@ const MAX_HEIGHT = 160;
 
 /**
  * The message field: grows with its text, and Enter submits while
- * Shift+Enter starts a new line.
+ * Shift+Enter starts a new line. Backspace in the empty field emits
+ * `remove-last`, for what's attached above it.
  */
 export default Vue.extend({
   name: 'ChatInput',
@@ -62,6 +64,12 @@ export default Vue.extend({
 
       event.preventDefault();
       this.$emit('submit');
+    },
+
+    onBackspace(event: KeyboardEvent): void {
+      if (!this.value && !event.isComposing) {
+        this.$emit('remove-last');
+      }
     },
   },
 });
