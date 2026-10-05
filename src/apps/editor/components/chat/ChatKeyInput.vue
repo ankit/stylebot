@@ -22,8 +22,9 @@
         :id="inputId"
         ref="input"
         class="chat-key-input-field"
+        :class="{ masked: !show }"
         :value="value"
-        :type="show ? 'text' : 'password'"
+        type="text"
         :placeholder="info.keyPlaceholder || t('paste_your_api_key')"
         :aria-invalid="error ? 'true' : 'false'"
         :aria-describedby="helpText ? `${inputId}-help` : undefined"
@@ -228,6 +229,10 @@ export default Vue.extend({
   font-size: 13px;
   color: var(--field-ink);
   background: transparent;
+
+  &.masked {
+    -webkit-text-security: disc;
+  }
 
   &::placeholder {
     color: var(--field-placeholder);
