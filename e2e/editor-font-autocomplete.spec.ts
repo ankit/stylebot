@@ -40,6 +40,7 @@ const fontFaceFor = (family: string): string => `
 `;
 
 const PREVIEW_ID = 'stylebot-css-font-preview';
+const PREVIEW_IMPORTS_ID = 'stylebot-css-imports-font-preview';
 
 const setup = async (
   context: BrowserContext,
@@ -83,7 +84,7 @@ const openPicker = async (font: Locator): Promise<void> => {
 const menuItem = (page: Page, name: string) =>
   page.getByRole('menuitem', { name: new RegExp(`^${name}$`) });
 
-const SAVED_STYLES = `style[id^="stylebot-css-"]:not(#${PREVIEW_ID})`;
+const SAVED_STYLES = `style[id^="stylebot-css-"]:not(#${PREVIEW_ID}, #${PREVIEW_IMPORTS_ID})`;
 
 const savedStylesheet = (page: Page) => page.locator(SAVED_STYLES).first();
 
@@ -95,7 +96,7 @@ const savedCss = (page: Page) =>
 // removeCSSFromDocument empties the preview stylesheet rather than detaching it.
 const previewCss = (page: Page) =>
   page
-    .locator(`#${PREVIEW_ID}`)
+    .locator(`#${PREVIEW_IMPORTS_ID}, #${PREVIEW_ID}`)
     .evaluateAll(els => els.map(el => el.textContent).join(''));
 
 const readRecentFonts = (extension: Extension) =>
