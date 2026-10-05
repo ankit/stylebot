@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import type { Store } from 'vuex';
 import { t } from '@stylebot/i18n';
+import { isFieldTarget } from '@stylebot/utils';
 
 import type { State } from '../store';
 import TheStylebotApp from '../components/TheStylebotApp.vue';
@@ -91,6 +92,30 @@ const injectCss = (shadowRoot: ShadowRoot): Promise<void> =>
     shadowRoot.appendChild(styleEl);
   });
 
+/**
+ * Keeps keys typed in the panel's fields from reaching the page. Out of the
+ * shadow root they look like keys pressed on the host, which sites like
+ * GitHub take as their own shortcuts and swallow. Escape and Tab still pass,
+ * for the panel's dialogs and tooltips listening on the document.
+ */
+const isolateFieldKeys = (host: HTMLElement): void => {
+  const stopFieldKey = (event: Event): void => {
+    const { key } = event as KeyboardEvent;
+
+    if (
+      key !== 'Escape' &&
+      key !== 'Tab' &&
+      isFieldTarget(event.composedPath()[0])
+    ) {
+      event.stopPropagation();
+    }
+  };
+
+  ['keydown', 'keypress', 'keyup'].forEach(type =>
+    host.addEventListener(type, stopFieldKey)
+  );
+};
+
 const initEditor = (store: Store<State>): void => {
   if (document.getElementById('stylebot')) {
     return;
@@ -118,6 +143,7 @@ const initEditor = (store: Store<State>): void => {
   stylebotAppHost.lang = t('language_code');
 
   document.body.appendChild(stylebotAppHost);
+  isolateFieldKeys(stylebotAppHost);
 
   const shadowRoot = stylebotAppHost.attachShadow({ mode: 'open' });
   const stylebotApp = document.createElement('div');

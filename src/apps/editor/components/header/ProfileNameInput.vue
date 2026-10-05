@@ -3,6 +3,8 @@
     ref="input"
     :value="value"
     class="name-input"
+    name="profile-search"
+    autocomplete="off"
     :class="{ invalid: !!error }"
     :aria-label="t('profile_name')"
     :aria-invalid="error ? 'true' : 'false'"
