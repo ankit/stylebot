@@ -61,7 +61,7 @@ describe('openAiProvider (Responses API)', () => {
 
     await openAiProvider.stream({
       key: 'sk-test',
-      model: getModel('openai', 'gpt-5.6-luna'),
+      model: getModel('openai', 'gpt-6-luna'),
       system: 'system prompt',
       turns: [{ role: 'user', id: 'u1', text: 'Dark please' }],
       signal: new AbortController().signal,
@@ -85,7 +85,7 @@ describe('openAiProvider (Responses API)', () => {
 
     expect(url).toBe('https://api.openai.com/v1/responses');
     expect(body).toMatchObject({
-      model: 'gpt-5.6-luna',
+      model: 'gpt-6-luna',
       stream: true,
       store: false,
       instructions: 'system prompt',
@@ -112,7 +112,7 @@ describe('openAiProvider (Responses API)', () => {
 
     await openAiProvider.stream({
       key: 'sk-test',
-      model: getModel('openai', 'gpt-5.6-terra'),
+      model: getModel('openai', 'gpt-6.1-sol'),
       system: '',
       turns: [],
       signal: new AbortController().signal,
@@ -150,7 +150,7 @@ describe('toResponsesInput', () => {
         edits,
         previous: [],
         applied: false,
-        model: 'gpt-5.6-terra',
+        model: 'gpt-6.1-sol',
       },
     ];
 

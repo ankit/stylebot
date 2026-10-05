@@ -13,7 +13,7 @@ const turn = (overrides: Partial<ChatAssistantTurn>): ChatAssistantTurn => ({
   ],
   previous: [],
   applied: true,
-  model: 'claude-sonnet-5',
+  model: 'claude-sonnet-5-5',
   ...overrides,
 });
 

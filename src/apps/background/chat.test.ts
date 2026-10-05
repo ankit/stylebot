@@ -53,13 +53,13 @@ describe('connectChat', () => {
       status: {
         connected: true,
         provider: 'anthropic',
-        model: 'claude-sonnet-5',
+        model: 'claude-sonnet-5-5',
       },
     });
     expect(response.ok && response.status.providers[0]).toEqual({
       id: 'anthropic',
       connected: true,
-      model: 'claude-sonnet-5',
+      model: 'claude-sonnet-5-5',
       maskedKey: '••••••••',
     });
     expect(JSON.stringify(response)).not.toContain('sk-ant-abc');
@@ -116,11 +116,11 @@ describe('several providers', () => {
     await connectChat('openai', 'sk-good');
     await connectChat('anthropic', 'sk-ant-good');
 
-    expect(await setChatModel('anthropic', 'claude-opus-5')).toMatchObject({
+    expect(await setChatModel('anthropic', 'claude-opus-5-5')).toMatchObject({
       provider: 'anthropic',
-      model: 'claude-opus-5',
+      model: 'claude-opus-5-5',
     });
-    expect((await setChatModel('openai', 'gpt-2')).model).toBe('gpt-5.6-terra');
+    expect((await setChatModel('openai', 'gpt-2')).model).toBe('gpt-6.1-sol');
   });
 
   it('falls back to another provider when the one in use is removed', async () => {

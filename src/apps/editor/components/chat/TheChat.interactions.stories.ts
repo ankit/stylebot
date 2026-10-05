@@ -158,10 +158,10 @@ export const SwitchesModels: StoryObj = {
     const canvas = within(canvasElement);
     const menu = await openModelMenu(canvas);
 
-    await user.click(within(menu).getByText('Claude Opus 5'));
+    await user.click(within(menu).getByText('Claude Opus 5.5'));
 
     await waitFor(() =>
-      expect(chatStateOf(canvasElement).status?.model).toBe('claude-opus-5')
+      expect(chatStateOf(canvasElement).status?.model).toBe('claude-opus-5-5')
     );
     await canvas.findByRole('button', { name: /Claude Opus 5/ });
   },
@@ -291,12 +291,12 @@ export const AddsAnotherProvider: StoryObj = {
       const menu = await openModelMenu(canvas);
 
       await user.click(within(menu).getByText('OpenAI'));
-      await user.click(await within(menu).findByText('GPT-5.6 Luna'));
+      await user.click(await within(menu).findByText('GPT-6 Luna'));
 
       await waitFor(() =>
         expect(chatStateOf(canvasElement).status).toMatchObject({
           provider: 'openai',
-          model: 'gpt-5.6-luna',
+          model: 'gpt-6-luna',
         })
       );
     });

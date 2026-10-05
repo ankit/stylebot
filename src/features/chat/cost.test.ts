@@ -20,7 +20,7 @@ const reply = (
 describe('estimateCost', () => {
   it('prices input, output and cache tokens at the model’s rates', () => {
     const turns: Array<ChatTurn> = [
-      reply('claude-sonnet-5', {
+      reply('claude-sonnet-5-5', {
         inputTokens: 1_000_000,
         outputTokens: 100_000,
         cacheReadTokens: 1_000_000,
@@ -36,15 +36,15 @@ describe('estimateCost', () => {
     expect(
       estimateCost([
         reply('claude-haiku-4-5', { inputTokens: 1_000_000, outputTokens: 0 }),
-        reply('gpt-5.6-luna', { inputTokens: 0, outputTokens: 1_000_000 }),
+        reply('gpt-6-luna', { inputTokens: 0, outputTokens: 1_000_000 }),
       ])
-    ).toBeCloseTo(2.2);
+    ).toBeCloseTo(1.5);
   });
 
   it('skips replies without usage or with a model it has no price for', () => {
     expect(
       estimateCost([
-        reply('claude-opus-5'),
+        reply('claude-opus-5-5'),
         reply('retired-model', { inputTokens: 1_000_000, outputTokens: 0 }),
       ])
     ).toBeNull();
