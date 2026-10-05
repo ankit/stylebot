@@ -53,6 +53,20 @@ describe('page-colors', () => {
       });
     });
 
+    it('excludes translucent colors from both roles', () => {
+      const root = document.createElement('div');
+      root.innerHTML = `
+        <div style="color: rgba(129, 139, 152, 0.2); background-color: rgb(0 0 0 / 50%);">a</div>
+        <div style="color: #555555; background-color: rgba(255, 255, 255, 1);">b</div>
+      `;
+
+      expect(getPageColors(root)).toEqual({
+        text: ['rgb(85, 85, 85)'],
+        surface: ['rgb(255, 255, 255)'],
+        total: 2,
+      });
+    });
+
     it('ranks a color repeated across more elements above one seen once', () => {
       const root = document.createElement('div');
       root.innerHTML = `

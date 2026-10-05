@@ -1,15 +1,29 @@
 import type { RoleColorGroups } from '@stylebot/css';
 
 const ROLE_CAP = 4;
-const TRANSPARENT_REGEX = /rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*0\s*\)/i;
+const ALPHA_REGEX = /(?:^rgba\(.*,|\/)\s*([\d.]+)(%?)\s*\)$/i;
 
 const isLaidOut = (el: Element): boolean => {
   const style = getComputedStyle(el);
   return style.display !== 'none' && style.visibility !== 'hidden';
 };
 
-const isTransparent = (color: string): boolean => {
-  return !color || color === 'transparent' || TRANSPARENT_REGEX.test(color);
+const alphaOf = (color: string): number => {
+  const match = ALPHA_REGEX.exec(color);
+  if (!match) {
+    return 1;
+  }
+
+  const alpha = parseFloat(match[1]);
+  return match[2] ? alpha / 100 : alpha;
+};
+
+/**
+ * Whether a computed color is fully opaque. A translucent one looks like
+ * whatever was behind it, so applied elsewhere it wouldn't match the page.
+ */
+const isOpaque = (color: string): boolean => {
+  return !!color && color !== 'transparent' && alphaOf(color) >= 1;
 };
 
 const topByFrequency = (counts: Map<string, number>): Array<string> => {
@@ -35,11 +49,11 @@ export const getPageColors = (root: ParentNode = document): RoleColorGroups => {
 
     const style = getComputedStyle(el);
 
-    if (!isTransparent(style.color)) {
+    if (isOpaque(style.color)) {
       tally(textCounts, style.color);
     }
 
-    if (!isTransparent(style.backgroundColor)) {
+    if (isOpaque(style.backgroundColor)) {
       tally(surfaceCounts, style.backgroundColor);
     }
   });
