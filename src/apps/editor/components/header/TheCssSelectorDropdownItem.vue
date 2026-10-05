@@ -3,6 +3,7 @@
     class="css-selector-dropdown-item"
     :class="{ current }"
     :selected="current"
+    leading-check
     @click="click"
     @mouseenter.native="preview"
     @mouseleave.native="clearPreview"

@@ -62,6 +62,17 @@ export const Variants = matrix({
   ],
 });
 
+export const LeadingCheck = fromTemplate(
+  components,
+  `
+  <s-menu>
+    <s-menu-item leading-check>System</s-menu-item>
+    <s-menu-item leading-check selected>Light</s-menu-item>
+    <s-menu-item leading-check>Dark</s-menu-item>
+  </s-menu>
+`
+);
+
 export const Scrollable = fromTemplate(
   components,
   `
