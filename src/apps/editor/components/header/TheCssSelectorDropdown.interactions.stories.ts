@@ -146,7 +146,7 @@ export const DisabledOutsideBasicMode: StoryObj = {
   },
 };
 
-const GROUP = ['h1', 'h2', '.title', '.subtitle', '.byline'];
+const GROUP = ['h1', 'h2', '.title', '.byline'];
 
 export const SelectorListAsText: StoryObj = {
   ...editor({
@@ -172,11 +172,15 @@ export const SelectorListAsText: StoryObj = {
     await findOpenMenu(canvas);
     await waitFor(() => expect(items(canvasElement)).toHaveLength(2));
     const item = items(canvasElement)[0] as HTMLElement;
-    await expect(item).toHaveTextContent(GROUP.join(', '));
+    await expect(item.querySelector('.item-selector')).toHaveTextContent(
+      GROUP.join(', ')
+    );
     await expect(item.querySelectorAll('.separator')).toHaveLength(
       GROUP.length - 1
     );
-    await expect(items(canvasElement)[1]).toHaveTextContent(/^\s*p\s*$/);
+    await expect(
+      items(canvasElement)[1].querySelector('.item-selector')
+    ).toHaveTextContent(/^\s*p\s*$/);
   },
 };
 
@@ -213,7 +217,8 @@ const rowTexts = (root: HTMLElement) =>
     item.querySelector('.item-text')?.textContent?.trim()
   );
 
-const linked = (item: HTMLElement) => item.querySelector('.item-icon') !== null;
+const count = (item: HTMLElement) =>
+  item.querySelector('.item-count')?.textContent?.trim();
 
 export const SectionsForTheElementAndPage: StoryObj = {
   ...editor(WITH_ALTERNATIVES),
@@ -240,16 +245,20 @@ export const SectionsForTheElementAndPage: StoryObj = {
       '.article-body',
     ]);
 
-    // The active selector leads, checked rather than linked.
+    // The active selector leads, checked.
     const current = row(canvasElement, 'h1');
     await expect(current).toHaveClass('selected');
     await expect(current.querySelector('.menu-item-check')).not.toBeNull();
-    await expect(linked(current)).toBe(false);
 
-    // Selectors the style already has link to their rules.
-    await expect(linked(row(canvasElement, '*'))).toBe(true);
-    await expect(linked(row(canvasElement, '.sb-page h1'))).toBe(false);
-    await expect(linked(row(canvasElement, '.article-body'))).toBe(true);
+    // Each row counts the elements it matches on the page.
+    await waitFor(() =>
+      expect(count(row(canvasElement, 'h1'))).toBe(
+        String(document.querySelectorAll('h1').length)
+      )
+    );
+    await expect(count(row(canvasElement, '.article-body'))).toBe(
+      String(document.querySelectorAll('.article-body').length)
+    );
   },
 };
 

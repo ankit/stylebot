@@ -5,7 +5,8 @@ export {
 
 export { injectCSSIntoDocument, removeCSSFromDocument } from './inject-style';
 export { compileStyle } from './compile';
-export { getSubjectCompound } from './get-subject-compound';
+export { splitCompounds } from './compounds';
+export type { Compound } from './compounds';
 
 export { getCssWithExpandedImports } from './import';
 

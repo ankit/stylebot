@@ -19,37 +19,41 @@
         <template #text>
           <span class="selector-tooltip">{{ selector }}</span>
         </template>
-        <span class="item-text">
-          <span class="item-head">
-            <template v-for="(part, i) in headParts">
-              <span
-                v-if="i > 0"
-                :key="`separator-${i}`"
-                class="separator"
-                v-text="', '"
-              />
-              <span :key="i" class="part" v-text="part" />
-            </template>
+        <span ref="text" class="item-text">
+          <span class="item-selector">
+            <span
+              v-for="(piece, i) in short.pieces"
+              :key="i"
+              class="piece"
+              :class="piece.kind"
+              v-text="piece.text"
+            />
           </span>
-          <span class="item-tail" v-text="subject" />
+          <span v-if="short.more" class="item-more" v-text="`+${short.more}`" />
         </span>
       </s-tooltip>
-      <arrow-up-right-icon
-        v-if="styled && !current"
-        :size="12"
-        class="item-icon"
+      <span
+        v-if="count !== null"
+        class="item-count"
+        :aria-label="
+          t(count === 1 ? 'matches_count_one' : 'matches_count_other', [
+            String(count),
+          ])
+        "
+        v-text="count"
       />
     </span>
   </s-menu-item>
 </template>
 
 <script lang="ts">
+import type { PropType } from 'vue';
 import Vue from 'vue';
 import { SMenuItem, STooltip } from '@stylebot/components';
-import { ArrowUpRightIcon } from '@stylebot/icons';
-import { getSubjectCompound, splitSelectorList } from '@stylebot/css';
 
 import { getPageBridge } from '@stylebot/page-bridge';
+import type { ShortSelector } from '../../utils/short-selector';
+import { shortenSelector } from '../../utils/short-selector';
 
 export default Vue.extend({
   name: 'TheCssSelectorDropdownItem',
@@ -57,7 +61,6 @@ export default Vue.extend({
   components: {
     SMenuItem,
     STooltip,
-    ArrowUpRightIcon,
   },
 
   props: {
@@ -71,39 +74,47 @@ export default Vue.extend({
       default: false,
     },
 
-    // Whether the style already has a rule for the selector.
-    styled: {
-      type: Boolean,
-      default: false,
+    // How many of the page's elements the selector matches, once known.
+    count: {
+      type: Number as PropType<number | null>,
+      default: null,
     },
   },
 
-  data(): { truncated: boolean } {
-    return { truncated: false };
+  data(): {
+    truncated: boolean;
+    maxChars: number;
+    resizeObserver: ResizeObserver | null;
+  } {
+    return { truncated: false, maxChars: Infinity, resizeObserver: null };
   },
 
   computed: {
-    parts(): Array<string> {
-      return splitSelectorList(this.selector);
+    short(): ShortSelector {
+      return shortenSelector(this.selector, this.maxChars);
     },
 
-    // The last part's rightmost compound stays whole; what's before it is
-    // cut short with an ellipsis, so a long selector keeps both its ends.
-    subject(): string {
-      return getSubjectCompound(this.parts[this.parts.length - 1] ?? '');
-    },
-
-    headParts(): Array<string> {
-      const last = this.parts[this.parts.length - 1] ?? '';
-
-      return [
-        ...this.parts.slice(0, -1),
-        last.slice(0, last.length - this.subject.length),
-      ];
+    trimmed(): boolean {
+      return (
+        this.short.more > 0 ||
+        this.short.pieces.some(piece => piece.kind === 'ellipsis')
+      );
     },
   },
 
+  mounted() {
+    const text = this.$refs.text as HTMLElement;
+
+    this.measureWidth();
+    this.resizeObserver = new ResizeObserver(() => this.measureWidth());
+    this.resizeObserver.observe(text);
+    // Geist Mono can still be swapping in, changing every character's width.
+    document.fonts?.ready.then(() => this.measureWidth());
+  },
+
   beforeDestroy() {
+    this.resizeObserver?.disconnect();
+
     // The menu unmounts on select/close, so the pointer/focus leave events
     // may never fire to clear a preview highlight — clear it here.
     this.clearPreview();
@@ -111,15 +122,39 @@ export default Vue.extend({
 
   methods: {
     /**
+     * How many characters fit on the row. The selector is set in a
+     * monospace font, so that's its width over one character's.
+     */
+    measureWidth(): void {
+      const text = this.$refs.text as HTMLElement | undefined;
+
+      if (!text) {
+        return;
+      }
+
+      const probe = document.createElement('span');
+      probe.style.cssText =
+        'position: absolute; visibility: hidden; font-family: inherit;';
+      probe.textContent = '0'.repeat(20);
+      text.appendChild(probe);
+      const charWidth = probe.getBoundingClientRect().width / 20;
+      probe.remove();
+
+      this.maxChars = charWidth
+        ? Math.floor(text.clientWidth / charWidth)
+        : Infinity;
+    },
+
+    /**
      * Notes whether the selector is cut short, so its tooltip only shows
      * when there's more to read.
      */
     measureTruncation(): void {
-      const text = this.$el.querySelector('.item-text');
+      const selector = this.$el.querySelector('.item-selector');
 
-      this.truncated = Array.from(text?.children ?? []).some(
-        child => child.scrollWidth > child.clientWidth
-      );
+      this.truncated =
+        this.trimmed ||
+        (!!selector && selector.scrollWidth > selector.clientWidth);
     },
 
     click(): void {
@@ -164,39 +199,36 @@ export default Vue.extend({
 }
 
 .item-text {
+  position: relative;
   display: flex;
   flex: 1;
   min-width: 0;
   contain: inline-size;
   font-family: var(--font-mono);
   color: var(--field-ink);
-  white-space: pre;
 }
 
-.item-head {
+.item-selector {
   @include truncate;
 
-  flex: 0 1 auto;
   min-width: 0;
   white-space: pre;
 }
 
-.item-tail {
-  @include truncate;
-
+.item-more {
   flex: none;
-  max-width: 100%;
-  white-space: pre;
+  margin-left: 1ch;
+  color: var(--field-placeholder);
 }
 
-.item-head,
-.item-tail,
-.part,
-.separator {
+.item-selector,
+.item-more,
+.piece {
   font-family: inherit;
 }
 
-.separator {
+.separator,
+.ellipsis {
   color: var(--field-placeholder);
 }
 
@@ -204,8 +236,10 @@ export default Vue.extend({
   font-family: var(--font-mono);
 }
 
-.item-icon {
+.item-count {
   flex: none;
-  color: var(--accent-text);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--field-placeholder);
 }
 </style>

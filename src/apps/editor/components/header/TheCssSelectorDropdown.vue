@@ -32,7 +32,7 @@
         v-else
         :selector="item.value"
         :current="item.value === activeSelector"
-        :styled="item.styled"
+        :count="matchCounts[item.value] ?? null"
         @select="select"
         @preview-end="previewActiveSelector"
       />
@@ -55,7 +55,6 @@ type DropdownEntry = {
   value: string;
   header?: string;
   divider?: boolean;
-  styled?: boolean;
 };
 
 export default Vue.extend({
@@ -71,8 +70,10 @@ export default Vue.extend({
     focused: boolean;
     hovered: boolean;
     openingSelector: string;
+    matchCounts: Record<string, number | null>;
   } {
     return {
+      matchCounts: {},
       focused: false,
       hovered: false,
       // The selector as it was when editing began; until it's changed, the
@@ -124,13 +125,6 @@ export default Vue.extend({
       );
     },
 
-    styledSelectors(): Set<string> {
-      return new Set([
-        ...this.alternatives.existing,
-        ...this.selectors.map(s => s.value),
-      ]);
-    },
-
     entries(): Array<DropdownEntry> {
       const query = this.activeSelector.trim().toLowerCase();
       const filtering = !!query && this.activeSelector !== this.openingSelector;
@@ -151,11 +145,7 @@ export default Vue.extend({
           header: this.t('this_element'),
         });
         element.forEach(value =>
-          entries.push({
-            id: `element:${value}`,
-            value,
-            styled: this.styledSelectors.has(value),
-          })
+          entries.push({ id: `element:${value}`, value })
         );
       }
 
@@ -169,9 +159,7 @@ export default Vue.extend({
           value: '',
           header: this.t('styled_on_this_page'),
         });
-        page.forEach(value =>
-          entries.push({ id: `page:${value}`, value, styled: true })
-        );
+        page.forEach(value => entries.push({ id: `page:${value}`, value }));
       }
 
       return entries;
@@ -183,6 +171,12 @@ export default Vue.extend({
   },
 
   watch: {
+    entries(): void {
+      if (this.focused) {
+        this.loadMatchCounts();
+      }
+    },
+
     // Re-preview on every keystroke while focused, not just on select —
     // setSelector already updates activeSelector as the user types.
     activeSelector(): void {
@@ -213,6 +207,16 @@ export default Vue.extend({
       this.focused = true;
       this.openingSelector = this.activeSelector;
       this.previewActiveSelector();
+      this.loadMatchCounts();
+    },
+
+    async loadMatchCounts(): Promise<void> {
+      const selectors = this.entries.map(entry => entry.value).filter(Boolean);
+      const counts = await getPageBridge().countMatches(selectors);
+
+      this.matchCounts = Object.fromEntries(
+        selectors.map((selector, i) => [selector, counts[i]])
+      );
     },
 
     onBlur(): void {
