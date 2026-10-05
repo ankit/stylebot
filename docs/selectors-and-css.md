@@ -43,10 +43,12 @@ Each strategy is tried in turn; the first one that returns something wins.
     never targets most of the page.
 
 An ancestor scope (steps 5, 8 and 9) is skipped when it sweeps the page: when
-it ends in a bare tag and matches more than half of the page's elements of that
-tag, like `div.app div div` under an app's root, it's effectively the bare tag.
-Pages with fewer than 20 of that tag are exempt. The same check keeps such
-selectors out of the list of other selectors below.
+it ends in a bare `div` or `span` and matches more than half of the page's
+elements of that tag, like `div.app div div` under an app's root, it's
+effectively the bare tag. It also has to match at least 50 elements. Other
+tags are never treated as sweeping, since matching most of a page's links or
+dates (`div.commit-age relative-time`) is a real choice. The same check keeps
+sweeping selectors out of the list of other selectors below.
 
 Page-wide effects like grayscale attach to body's children with selectors from
 the same steps but without this check, since a saved effect is found again by

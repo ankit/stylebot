@@ -206,22 +206,26 @@ function getAncestorHashedClassSelector(el: HTMLElement): string | null {
   return climbToNearestUsableAncestor(el, getClassBasedSelector);
 }
 
-// Below this many elements of a tag, matching most of them is still a choice.
-const MIN_SWEEP = 20;
+// Generic containers, whose "most of them" means most of the page; matching
+// most of a page's links or dates is a real choice.
+const CONTAINER_TAGS = new Set(['div', 'span']);
+
+// Below this many matches, a selector is still a choice, not the whole page.
+const MIN_SWEEP = 50;
 
 /**
- * Whether a scoped selector ending in a bare tag, like `div.app div div`,
- * matches most of the page's elements of that tag, so it's effectively the
- * bare tag and would restyle nearly the whole page.
+ * Whether a scoped selector ending in a bare container, like
+ * `div.app div div`, matches most of the page's elements of that tag, so
+ * it's effectively the bare tag and would restyle nearly the whole page.
  */
 const isSweeping = (selector: string): boolean => {
   const subject = getSubjectCompound(selector);
-  if (subject === selector || !/^[a-z][a-z0-9-]*$/i.test(subject)) {
+  if (subject === selector || !CONTAINER_TAGS.has(subject.toLowerCase())) {
     return false;
   }
 
-  const all = countMatches(subject);
-  return all >= MIN_SWEEP && countMatches(selector) > all / 2;
+  const matches = countMatches(selector);
+  return matches >= MIN_SWEEP && matches > countMatches(subject) / 2;
 };
 
 const unlessSweeping = (selector: string | null): string | null =>

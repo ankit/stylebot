@@ -428,7 +428,7 @@ describe('selector', () => {
       document.body.innerHTML = `
         <div class="app">
           <div><div class="o1ls90" data-target></div></div>
-          ${'<div><div><div></div></div></div>'.repeat(20)}
+          ${'<div><div><div></div></div></div>'.repeat(30)}
         </div>
       `;
 
@@ -441,7 +441,7 @@ describe('selector', () => {
       document.body.innerHTML = `
         <div>
           <div><div></div><div data-target></div></div>
-          ${'<div><div><div></div></div></div>'.repeat(20)}
+          ${'<div><div><div></div></div></div>'.repeat(30)}
         </div>
       `;
 
@@ -455,10 +455,21 @@ describe('selector', () => {
     it('keeps the tag chain for body children, which saved page effects look up', () => {
       document.body.innerHTML = `
         <div><div></div></div>
-        ${'<div><div><div></div></div></div>'.repeat(20)}
+        ${'<div><div><div></div></div></div>'.repeat(30)}
       `;
 
       expect(getBodyChildSelectors()[0]).toBe('html body div');
+    });
+
+    it('keeps a scope that matches most of a specific tag, like every date', () => {
+      document.body.innerHTML = `
+        ${'<div class="commit-age"><relative-time></relative-time></div>'.repeat(
+          60
+        )}
+      `;
+
+      const el = document.querySelector('relative-time') as HTMLElement;
+      expect(getSelector(el)).toBe('div.commit-age relative-time');
     });
 
     it('keeps an ancestor scope on a page too small to sweep', () => {
