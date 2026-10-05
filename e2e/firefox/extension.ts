@@ -161,6 +161,14 @@ export class FirefoxExtension implements Extension {
   }
 
   /**
+   * The extension pages open right now, so a caller can tell a page it is
+   * about to open apart from an earlier one at the same URL.
+   */
+  openTargetActors(): Set<string> {
+    return new Set(this.targets.keys());
+  }
+
+  /**
    * Resolves with the first live extension page matching `matches`, whether it
    * already exists or appears later.
    */

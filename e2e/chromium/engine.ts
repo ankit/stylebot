@@ -10,6 +10,7 @@ export class ChromiumEngine implements Engine {
   readonly distDir = 'dist';
   readonly routesExtensionRequests = true;
   readonly opensExtensionPages = true;
+  readonly opensPdfs = true;
   readonly hasSidePanel = true;
 
   launch(userDataDir: string, options: LaunchOptions): Promise<BrowserContext> {

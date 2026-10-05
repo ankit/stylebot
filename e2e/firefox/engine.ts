@@ -25,6 +25,7 @@ export class FirefoxEngine implements Engine {
   readonly distDir = 'firefox-dist';
   readonly routesExtensionRequests = false;
   readonly opensExtensionPages = false;
+  readonly opensPdfs = false;
   readonly hasSidePanel = false;
   // Chosen at launch, needed again at loadExtension time.
   private rdpPort = 0;
@@ -73,8 +74,10 @@ export class FirefoxEngine implements Engine {
     const firefoxExtension = extension as FirefoxExtension;
     const popupUrl = `moz-extension://${extension.id}/popup/index.html`;
 
+    // A popup an earlier test left open has the same URL; wait for this one.
+    const earlier = firefoxExtension.openTargetActors();
     const popupReady = firefoxExtension.waitForTarget(
-      target => target.url === popupUrl,
+      target => target.url === popupUrl && !earlier.has(target.actor),
       'The popup tab never appeared as a DevTools target.'
     );
     const tabId = await firefoxExtension.evaluate(

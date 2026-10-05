@@ -58,8 +58,14 @@ for (const [kind, path] of [
 ]) {
   test(`says Stylebot can't style ${kind}, whatever its url`, async ({
     context,
+    engine,
     openPopup,
   }) => {
+    test.skip(
+      path === '/report' && !engine.opensPdfs,
+      'Playwright downloads a PDF on this engine instead of opening it'
+    );
+
     const page = await context.newPage();
     await page.goto(`${baseUrl}${path}`);
     await page.bringToFront();
