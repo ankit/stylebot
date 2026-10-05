@@ -4,13 +4,18 @@ import { expect, waitFor, within } from '@storybook/test';
 import TheChat from './TheChat.vue';
 import { emptyPageSnapshot } from '@stylebot/page-bridge';
 import {
+  ADDED_EDITS,
   ASK,
   chat,
   chatStateOf,
+  chatWithChange,
   chatWithThread,
   DARK_PAGE,
   DARK_PAGE_BACKGROUND,
   LIST_PAGE,
+  MANY_EDITS,
+  MIXED_EDITS,
+  REMOVED_EDITS,
   REPLY,
   SCREENSHOT,
   SIDEBAR_PAGE,
@@ -72,14 +77,39 @@ export const EmptyPageNotRead: StoryObj = {
 
 export const Conversation = chatWithThread();
 
-export const Undone = chatWithThread(
-  {
-    threads: {
-      'example.com': [ASK, { ...REPLY, applied: false }],
-    },
+export const ChangeAddedOnly = chatWithChange(ADDED_EDITS);
+
+export const ChangeAddedAndRemoved = chatWithChange(MIXED_EDITS);
+
+export const ChangeRemovedOnly = chatWithChange(REMOVED_EDITS);
+
+export const ChangeOneRule = chatWithChange([MIXED_EDITS[0]]);
+
+export const ChangeManyRules = chatWithChange(MANY_EDITS);
+
+export const Undone = chatWithChange(MIXED_EDITS, { applied: false });
+
+export const ChangeOlderRows = chatWithThread({
+  threads: {
+    'example.com': [
+      ASK,
+      REPLY,
+      { ...ASK, id: 'u2', text: 'Darken the heading' },
+      {
+        ...REPLY,
+        id: 'a2',
+        text: 'Darkened the heading.',
+        edits: [
+          {
+            selector: 'h1',
+            declarations: [{ property: 'color', value: '#111' }],
+          },
+        ],
+        previous: [{ selector: 'h1', property: 'color', value: null }],
+      },
+    ],
   },
-  { css: '' }
-);
+});
 
 export const MarkdownReply = chatWithThread({
   threads: {

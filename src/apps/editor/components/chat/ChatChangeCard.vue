@@ -1,16 +1,39 @@
 <template>
-  <div class="chat-change" :class="{ undone: !turn.applied }">
-    <button type="button" class="chat-change-open" @click="viewInCode">
-      <code-icon :size="14" class="chat-change-icon" />
-      <span class="chat-change-label">{{ summary }}</span>
-    </button>
+  <div
+    class="chat-change"
+    :class="{ undone: !turn.applied, older: !latest }"
+    :role="latest ? undefined : 'button'"
+    :tabindex="latest ? undefined : 0"
+    @click="openOlder"
+    @keydown.enter.space.self.prevent="openOlder"
+  >
+    <logo-icon :size="12" class="chat-change-mark" aria-hidden="true" />
+    <span class="chat-change-label">{{ label }}</span>
+    <chat-change-diff
+      v-if="turn.applied"
+      class="chat-change-count"
+      :added="summary.added"
+      :removed="summary.removed"
+    >
+      <button
+        v-if="latest"
+        type="button"
+        class="chat-change-open"
+        :aria-label="t('view_code')"
+        @click="viewInCode"
+      >
+        <chevron-right-icon :size="12" />
+      </button>
+    </chat-change-diff>
     <button
       v-if="latest"
       type="button"
-      class="chat-change-action"
+      class="chat-change-undo"
       :disabled="busy"
-      @click="toggle"
+      @click="toggleApplied"
     >
+      <undo-icon v-if="turn.applied" :size="14" />
+      <arrow-repeat-icon v-else :size="14" />
       {{ turn.applied ? t('undo') : t('reapply') }}
     </button>
   </div>
@@ -20,24 +43,43 @@
 import type { PropType } from 'vue';
 import Vue from 'vue';
 
-import { CodeIcon } from '@stylebot/icons';
-import { countCssLines, findEditLines } from '@stylebot/chat';
+import { findEditLines, summarizeChanges } from '@stylebot/chat';
+import {
+  ArrowRepeatIcon,
+  ChevronRightIcon,
+  LogoIcon,
+  UndoIcon,
+} from '@stylebot/icons';
+import type { ChatChangeSummary } from '@stylebot/chat';
 import type { ChatAssistantTurn } from '@stylebot/types';
 
+import ChatChangeDiff from './ChatChangeDiff.vue';
+
+type ChatChange = Pick<
+  ChatAssistantTurn,
+  'id' | 'edits' | 'previous' | 'applied'
+>;
+
 /**
- * What a reply changed on the page, opening it in the Code tab, with
- * Undo / Reapply for the latest.
+ * The row that ends a reply which changed the page, with a diff count of
+ * its declarations, leaving out a side that's 0. On the latest reply the
+ * count opens them in the Code tab, beside Undo / Reapply; an older one
+ * fades, and the whole row opens it in Code.
  */
 export default Vue.extend({
   name: 'ChatChangeCard',
 
   components: {
-    CodeIcon,
+    ArrowRepeatIcon,
+    ChatChangeDiff,
+    ChevronRightIcon,
+    LogoIcon,
+    UndoIcon,
   },
 
   props: {
     turn: {
-      type: Object as PropType<ChatAssistantTurn>,
+      type: Object as PropType<ChatChange>,
       required: true,
     },
 
@@ -57,13 +99,16 @@ export default Vue.extend({
   },
 
   computed: {
-    summary(): string {
-      const lines = countCssLines(this.turn.edits);
-      const verb = this.turn.applied ? 'added' : 'removed';
+    summary(): ChatChangeSummary {
+      return summarizeChanges(this.turn.edits, this.turn.previous);
+    },
 
-      return lines === 1
-        ? this.t(`${verb}_one_line`)
-        : this.t(`${verb}_count_lines`, [String(lines)]);
+    label(): string {
+      if (!this.turn.applied) {
+        return this.t('styles_undone');
+      }
+
+      return this.t('updated_styles');
     },
   },
 
@@ -88,7 +133,13 @@ export default Vue.extend({
       });
     },
 
-    toggle(): void {
+    openOlder(): void {
+      if (!this.latest) {
+        this.viewInCode();
+      }
+    },
+
+    toggleApplied(): void {
       this.$store.dispatch('chat/toggleTurn', this.turn.id);
     },
   },
@@ -97,57 +148,42 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .chat-change {
-  position: relative;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   min-width: 0;
-  padding: 7px 8px;
+  min-height: 28px;
+  margin: 0 -8px;
+  padding: 3px 8px;
   border-radius: 8px;
   font-size: 13px;
   line-height: 1;
   color: var(--text-muted);
 
-  &:hover {
-    background: color-mix(in srgb, var(--text-primary) 4%, var(--tab-surface));
+  &.older {
+    &:hover {
+      background: color-mix(
+        in srgb,
+        var(--text-primary) 5%,
+        var(--tab-surface)
+      );
+    }
+
+    @include focus-ring(0);
   }
 }
 
-.chat-change-open {
-  @include button-reset;
-
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-  font-size: inherit;
-  line-height: inherit;
-  color: inherit;
-  text-align: left;
-  cursor: pointer;
-
-  &::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-  }
-
-  &:focus-visible {
-    outline: none;
-  }
-
-  @include focus-ring(-2px, '::after');
-}
-
-.chat-change-icon {
+.chat-change-mark {
   display: block;
   flex: none;
-  color: color-mix(in srgb, var(--success) 80%, var(--tab-surface));
+
+  .older & {
+    opacity: 0.5;
+  }
 
   .undone & {
-    color: var(--text-faint);
+    opacity: 0.45;
+    filter: grayscale(1);
   }
 }
 
@@ -155,9 +191,11 @@ export default Vue.extend({
   @include truncate;
 
   min-width: 0;
+  font-weight: 500;
+  color: var(--reading-ink);
 
-  .chat-change:hover & {
-    color: var(--reading-ink);
+  .older & {
+    color: var(--text-muted);
   }
 
   .undone & {
@@ -165,21 +203,57 @@ export default Vue.extend({
   }
 }
 
-.chat-change-action {
+.chat-change-count {
+  margin-left: 2px;
+}
+
+.chat-change-open {
   @include button-reset;
 
-  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 3px;
+  background: color-mix(in srgb, var(--text-primary) 6%, var(--tab-surface));
+  color: var(--text-muted);
+  cursor: pointer;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 5px;
+  }
+
+  &:focus-visible {
+    outline: none;
+  }
+
+  .chat-change-count:hover & {
+    background: color-mix(in srgb, var(--text-primary) 11%, var(--tab-surface));
+    color: var(--text-primary);
+  }
+
+  @include focus-ring(-2px, '::after');
+}
+
+.chat-change-undo {
+  @include button-reset;
+
+  display: flex;
   flex: none;
-  margin: -3px -6px -3px 0;
-  padding: 3px 6px;
-  border-radius: 5px;
-  font-size: inherit;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  padding: 5px 9px;
+  border: 1px solid var(--field-border);
+  border-radius: 7px;
+  font-size: 12px;
   line-height: 1;
   color: var(--text-body);
   cursor: pointer;
 
   &:hover:not(:disabled) {
-    background: color-mix(in srgb, var(--text-primary) 8%, var(--tab-surface));
+    background: color-mix(in srgb, var(--text-primary) 5%, var(--tab-surface));
     color: var(--text-primary);
   }
 
@@ -188,6 +262,6 @@ export default Vue.extend({
     opacity: 0.5;
   }
 
-  @include focus-ring(0);
+  @include focus-ring(1px);
 }
 </style>

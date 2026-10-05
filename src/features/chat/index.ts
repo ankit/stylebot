@@ -6,7 +6,13 @@ export {
   getProvider,
 } from './providers';
 export { ChatProviderError } from './providers/ChatProviderError';
-export { applyEdits, revertEdits, countCssLines, findEditLines } from './edits';
+export {
+  applyEdits,
+  revertEdits,
+  summarizeChanges,
+  findEditLines,
+} from './edits';
+export type { ChatChangeSummary, ChatRuleChange } from './edits';
 export { buildSystemPrompt } from './prompt';
 export { MAX_FIX_ROUNDS, needsFix } from './apply-css-tool';
 export { readEventStream } from './read-event-stream';

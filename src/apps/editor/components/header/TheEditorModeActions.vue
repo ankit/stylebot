@@ -120,7 +120,7 @@ export default Vue.extend({
 .new-chat {
   position: absolute;
   top: 2px;
-  right: calc(var(--panel-gutter) - 5px);
+  right: calc(var(--panel-gutter) - 1px);
   color: var(--icon-color);
 }
 </style>

@@ -150,7 +150,7 @@ export default Vue.extend({
   position: relative;
   z-index: 3;
   flex: none;
-  padding: 0 var(--panel-gutter) 12px;
+  padding: 0 var(--chat-gutter) 12px;
 }
 
 .chat-composer-box {

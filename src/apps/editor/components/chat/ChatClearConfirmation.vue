@@ -55,7 +55,7 @@ export default Vue.extend({
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding: 12px var(--panel-gutter);
+  padding: 12px var(--chat-gutter);
   border-bottom: 1px solid var(--warning-border);
   background: var(--warning-background);
 }

@@ -1,7 +1,9 @@
 import type { StoryObj } from '@storybook/vue';
 
+import { applyEdits } from '@stylebot/chat';
 import type {
   ChatAssistantTurn,
+  ChatCssEdit,
   ChatTurn,
   ChatUserTurn,
 } from '@stylebot/types';
@@ -91,6 +93,116 @@ export const chatWithThread = (
     },
     { css: THREAD_CSS, ...overrides }
   );
+
+export const CHANGE_BEFORE_CSS = `.sb-page {
+  color: #1f2328;
+}
+
+h1 {
+  border: 1px solid #dcdfe5;
+  letter-spacing: 1px;
+}
+
+.article-body {
+  line-height: 1.6;
+}`;
+
+/* Over CHANGE_BEFORE_CSS: new declarations, a changed value and a
+   removal. */
+export const MIXED_EDITS: Array<ChatCssEdit> = [
+  {
+    selector: '.sb-page',
+    declarations: [
+      { property: 'background-color', value: '#16181c' },
+      { property: 'color', value: '#d8dbe1' },
+    ],
+  },
+  {
+    selector: 'h1',
+    declarations: [
+      { property: 'color', value: '#8ab4f8' },
+      { property: 'border', value: '' },
+    ],
+  },
+  {
+    selector: '.article-body',
+    declarations: [{ property: 'color', value: '#b9bec8' }],
+  },
+];
+
+export const ADDED_EDITS: Array<ChatCssEdit> = [
+  {
+    selector: 'h1',
+    declarations: [
+      { property: 'font-family', value: 'Literata, serif' },
+      { property: 'font-weight', value: '600' },
+    ],
+  },
+  {
+    selector: '.article-body',
+    declarations: [
+      { property: 'font-size', value: '18px' },
+      { property: 'max-width', value: '62ch' },
+    ],
+  },
+];
+
+export const REMOVED_EDITS: Array<ChatCssEdit> = [
+  {
+    selector: 'h1',
+    declarations: [
+      { property: 'border', value: '' },
+      { property: 'letter-spacing', value: '' },
+    ],
+  },
+  {
+    selector: '.article-body',
+    declarations: [{ property: 'line-height', value: '' }],
+  },
+];
+
+const LONG_SELECTORS = [
+  '.sb-page',
+  'h1',
+  '.article-body',
+  'header nav[aria-label="Primary"] > ul.menu-list > li.menu-item > a',
+  'main article.post-content > section:first-of-type p:not(.lede)',
+  'div.Page_root__a1B2c aside[role="complementary"] .widget-title',
+  'footer .site-footer__links a:hover',
+  'table.data-table tbody tr:nth-child(even) td',
+  'button.btn-primary:not([disabled])',
+];
+
+export const MANY_EDITS: Array<ChatCssEdit> = LONG_SELECTORS.map(
+  (selector, i) => ({
+    selector,
+    declarations: [
+      { property: 'color', value: '#d8dbe1' },
+      ...(i % 3 === 0
+        ? [{ property: 'background-color', value: '#16181c' }]
+        : []),
+      ...(i % 4 === 1 ? [{ property: 'border', value: '' }] : []),
+    ],
+  })
+);
+
+/**
+ * Connected, with one exchange whose reply made the edits over the
+ * stylesheet before it, so the change row counts them as a real reply's.
+ */
+export const chatWithChange = (
+  edits: Array<ChatCssEdit>,
+  reply: Partial<ChatAssistantTurn> = {},
+  before = CHANGE_BEFORE_CSS
+): StoryObj => {
+  const { css, previous } = applyEdits(before, edits);
+  const turn = { ...REPLY, edits, previous, ...reply };
+
+  return chatWithThread(
+    { threads: { 'example.com': [ASK, turn] } },
+    { css: turn.applied ? css : before }
+  );
+};
 
 /* A small page-like screenshot: a pink bar over a sidebar and body. */
 export const SCREENSHOT = {

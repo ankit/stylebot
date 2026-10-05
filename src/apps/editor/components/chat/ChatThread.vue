@@ -61,8 +61,12 @@ export default Vue.extend({
       return this.$store.state.chat.turns;
     },
 
+    // The last reply that changed styles keeps Undo, even under replies
+    // that only answered.
     latestReplyId(): string {
-      const replies = this.turns.filter(turn => turn.role === 'assistant');
+      const replies = this.turns.filter(
+        turn => turn.role === 'assistant' && turn.edits.length
+      );
       return replies[replies.length - 1]?.id ?? '';
     },
 
@@ -111,7 +115,7 @@ export default Vue.extend({
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 20px calc(var(--panel-gutter) - 8px) 24px var(--panel-gutter);
+  padding: 20px calc(var(--chat-gutter) - 8px) 24px var(--chat-gutter);
   scrollbar-gutter: stable;
 
   @include thin-scrollbar;

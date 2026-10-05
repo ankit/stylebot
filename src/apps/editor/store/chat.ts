@@ -1,11 +1,6 @@
 import type { ActionContext, Module } from 'vuex';
 
-import {
-  applyEdits,
-  countCssLines,
-  MAX_FIX_ROUNDS,
-  needsFix,
-} from '@stylebot/chat';
+import { applyEdits, MAX_FIX_ROUNDS, needsFix } from '@stylebot/chat';
 import { getPageBridge } from '@stylebot/page-bridge';
 import type {
   ChatAssistantTurn,
@@ -53,14 +48,15 @@ export type ChatPhase = 'reading' | 'writing' | 'applying' | 'fixing';
 
 export type ChatError = { key: ChatErrorKey; detail?: string };
 
+export type ChatPending = { phase: ChatPhase; text: string };
+
 export type ChatState = {
   // Null until the background has answered.
   status: ChatStatus | null;
   // The site the thread belongs to.
   url: string;
   turns: Array<ChatTurn>;
-  // lines counts the CSS the reply has applied so far.
-  pending: { phase: ChatPhase; text: string; lines: number } | null;
+  pending: ChatPending | null;
   error: ChatError | null;
   connecting: boolean;
   connectError: ChatError | null;
@@ -119,13 +115,11 @@ const buildRequest = async (
 const setPhase = (
   { state, commit }: Context,
   phase: ChatPhase,
-  delta = '',
-  lines = state.pending?.lines ?? 0
+  delta = ''
 ): void => {
   commit('setPending', {
     phase,
     text: (state.pending?.text ?? '') + delta,
-    lines,
   });
 };
 
@@ -235,11 +229,8 @@ export const createChatModule = (): Module<ChatState, State> => {
     const { state, commit, dispatch } = context;
     const separator = state.pending?.text ? '\n\n' : '';
     const fixing = current.rounds.length > 0;
-    const earlierLines = countCssLines(
-      current.rounds.flatMap(round => round.edits)
-    );
-    const live = createLiveEdits(context, current.id, current.rounds, applied =>
-      setPhase(context, 'applying', '', earlierLines + countCssLines(applied))
+    const live = createLiveEdits(context, current.id, current.rounds, () =>
+      setPhase(context, 'applying')
     );
 
     current.text = '';
@@ -589,7 +580,7 @@ export const createChatModule = (): Module<ChatState, State> => {
         commit('setDraftImage', null);
         commit('setImageError', false);
         commit('addTurn', getUserTurn(message));
-        commit('setPending', { phase: 'reading', text: '', lines: 0 });
+        commit('setPending', { phase: 'reading', text: '' });
         save(context);
 
         const request = await buildRequest(context, message.scope);

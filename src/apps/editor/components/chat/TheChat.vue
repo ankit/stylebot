@@ -124,6 +124,7 @@ export default Vue.extend({
 
   &.conversation {
     --tab-surface: var(--chat-surface);
+    --chat-gutter: calc(var(--panel-gutter) + 4px);
 
     background: var(--tab-surface);
   }

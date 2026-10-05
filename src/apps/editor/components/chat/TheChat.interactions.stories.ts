@@ -12,7 +12,9 @@ import {
   ASK,
   chat,
   chatStateOf,
+  chatWithChange,
   chatWithThread,
+  MIXED_EDITS,
   REPLY,
   SCREENSHOT,
 } from '@stylebot/storybook/fixtures/chat';
@@ -44,13 +46,23 @@ const openModelMenu = async (canvas: Canvas): Promise<HTMLElement> => {
   return findOpenMenu(canvas);
 };
 
-// The latest reply's card.
+// The latest reply's change row.
 const replyCard = async (canvas: Canvas): Promise<Canvas> =>
   within(
-    (await canvas.findByText(/^(Added|Removed) 4 lines$/)).closest(
+    (await canvas.findByText(/^(Updated styles|Styles undone)$/)).closest(
       '.chat-change'
     ) as HTMLElement
   );
+
+// The latest reply's label and diff count.
+const summary = (root: HTMLElement): string =>
+  Array.from(
+    root.querySelectorAll(
+      '.chat-change-label, .chat-change-added, .chat-change-removed'
+    )
+  )
+    .map(part => (part.textContent ?? '').replace(/\s+/g, ' ').trim())
+    .join(' ');
 
 const send = async (canvas: Canvas, text: string): Promise<void> => {
   await user.type(await messageField(canvas), `${text}{Enter}`);
@@ -89,7 +101,7 @@ export const ConnectsWithAKey: StoryObj = {
 
 export const RepliesAndApplies: StoryObj = {
   ...chat({ connected: ['anthropic'] }),
-  name: 'a message streams a reply whose CSS lands in the stylesheet, with a line counting its CSS',
+  name: 'a message streams a reply whose CSS lands in the stylesheet, with a row counting what it changed',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
@@ -98,7 +110,9 @@ export const RepliesAndApplies: StoryObj = {
 
     await canvas.findByText('Make the text easier to read');
     await canvas.findByText(/Bumped the article text up a size/);
-    await canvas.findByRole('button', { name: 'Added 4 lines' });
+    await waitFor(() =>
+      expect(summary(canvasElement)).toBe('Updated styles +2')
+    );
     await expect(store.state.css).toContain('font-size: 18px');
     await expect(store.state.css).toContain('line-height: 1.8');
   },
@@ -133,7 +147,7 @@ export const UndoesAndReapplies: StoryObj = {
     await user.click(card.getByRole('button', { name: 'Undo' }));
     await card.findByRole('button', { name: 'Reapply' });
     await expect(
-      canvas.getByText('Removed 4 lines').closest('.chat-change')
+      canvas.getByText('Styles undone').closest('.chat-change')
     ).toHaveClass('undone');
     await waitFor(() => expect(store.state.css).not.toContain('18px'));
 
@@ -162,7 +176,7 @@ export const StopsAReply: StoryObj = {
 
 export const AppliesAsItStreams: StoryObj = {
   ...chat({ connected: ['anthropic'], hold: 'edits' }),
-  name: 'a reply’s CSS lands while it streams, counting its lines, and Stop keeps it as one reply to undo',
+  name: 'a reply’s CSS lands while it streams, its change row waiting for it to finish, and Stop keeps it as one reply to undo',
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
@@ -170,9 +184,14 @@ export const AppliesAsItStreams: StoryObj = {
     await step('the first rule lands while the reply streams', async () => {
       await send(canvas, 'Give the page a dark theme');
       await waitFor(() => expect(store.state.css).toContain('#16181c'));
-      await canvas.findByText('Added 4 lines…');
       await expect(chatStateOf(canvasElement).pending).not.toBeNull();
       await expect(store.state.undoStack.past).toHaveLength(1);
+    });
+
+    await step('its change row waits for the reply to finish', async () => {
+      await expect(
+        canvas.queryByText('Updated styles')
+      ).not.toBeInTheDocument();
     });
 
     await step('Stop keeps it, and Undo takes it back out', async () => {
@@ -213,7 +232,9 @@ export const RepliesAsOneUndoStep: StoryObj = {
     const store = storeOf(canvasElement);
 
     await send(canvas, 'Give the page a dark theme');
-    await canvas.findByRole('button', { name: 'Added 7 lines' });
+    await waitFor(() =>
+      expect(summary(canvasElement)).toBe('Updated styles +3')
+    );
     await expect(store.state.css).toContain('#8ab4f8');
     await expect(store.state.undoStack.past).toHaveLength(1);
   },
@@ -586,19 +607,130 @@ export const AttachesAnImage: StoryObj = {
 
 export const ShowsTheCode: StoryObj = {
   ...chatWithThread(),
-  name: 'clicking a reply’s change row opens the Code tab without changing the picked element',
+  name: 'View switches to the Code tab with the reply’s lines marked, keeping the picked element',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
 
     const card = await replyCard(canvas);
-    await user.click(card.getByRole('button', { name: 'Added 4 lines' }));
+    await user.click(card.getByRole('button', { name: 'View code' }));
 
     await waitFor(() => expect(store.state.options.mode).toBe('code'));
     await expect(store.state.activeSelector).toBe('');
     await expect(store.state.codeHighlight).toEqual([
       { startLine: 1, endLine: 4 },
     ]);
+  },
+};
+
+export const SumsUpTheChange: StoryObj = {
+  ...chatWithChange(MIXED_EDITS),
+  name: 'a reply’s change row counts what it added and removed',
+  play: async ({ canvasElement }) => {
+    await within(canvasElement).findByText('Updated styles');
+    await expect(summary(canvasElement)).toMatch(/^Updated styles \+4 −2$/);
+  },
+};
+
+export const OpensAnOlderChange: StoryObj = {
+  ...chatWithThread({
+    threads: {
+      'example.com': [
+        ASK,
+        REPLY,
+        { ...ASK, id: 'u2', text: 'Darken the heading' },
+        {
+          ...REPLY,
+          id: 'a2',
+          text: 'Darkened the heading.',
+          edits: [
+            {
+              selector: 'h1',
+              declarations: [{ property: 'color', value: '#111' }],
+            },
+          ],
+          previous: [{ selector: 'h1', property: 'color', value: null }],
+        },
+      ],
+    },
+  }),
+  name: 'an older reply’s row has no buttons, and clicking it or pressing Enter on it opens the Code tab',
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+    const older = await canvas.findByRole('button', {
+      name: /^Updated styles/,
+    });
+
+    await step('it has no View or Undo of its own', async () => {
+      await expect(within(older).queryAllByRole('button')).toHaveLength(0);
+    });
+
+    await step('clicking the row opens its lines in Code', async () => {
+      await user.click(within(older).getByText('Updated styles'));
+      await waitFor(() => expect(store.state.options.mode).toBe('code'));
+      await expect(store.state.codeHighlight).toEqual([
+        { startLine: 1, endLine: 4 },
+      ]);
+    });
+
+    await step('Enter on the row does the same', async () => {
+      await store.dispatch('setMode', 'chat');
+      const row = await canvas.findByRole('button', {
+        name: /^Updated styles/,
+      });
+      row.focus();
+      await user.keyboard('{Enter}');
+      await waitFor(() => expect(store.state.options.mode).toBe('code'));
+    });
+  },
+};
+
+export const KeepsUndoOnTheLastChange: StoryObj = {
+  ...chatWithThread({
+    threads: {
+      'example.com': [
+        ASK,
+        REPLY,
+        { ...ASK, id: 'u2', text: 'Why is it easier to read?' },
+        {
+          ...REPLY,
+          id: 'a2',
+          text: 'Bigger text and more space between lines.',
+          edits: [],
+          previous: [],
+          applied: false,
+        },
+      ],
+    },
+  }),
+  name: 'Undo stays on the last reply that changed styles, under replies that only answered',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+
+    await canvas.findByText('Bigger text and more space between lines.');
+    const card = await replyCard(canvas);
+
+    await user.click(card.getByRole('button', { name: 'Undo' }));
+    await waitFor(() => expect(store.state.css).not.toContain('18px'));
+  },
+};
+
+export const UndoUpdatesTheSummary: StoryObj = {
+  ...chatWithChange(MIXED_EDITS),
+  name: 'Undo turns the row’s label into Styles undone, and Reapply brings the diff back',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const card = await replyCard(canvas);
+
+    await user.click(card.getByRole('button', { name: 'Undo' }));
+    await card.findByRole('button', { name: 'Reapply' });
+    await expect(summary(canvasElement)).toMatch(/^Styles undone$/);
+
+    await user.click(card.getByRole('button', { name: 'Reapply' }));
+    await card.findByRole('button', { name: 'Undo' });
+    await expect(summary(canvasElement)).toMatch(/^Updated styles \+4 −2$/);
   },
 };
 

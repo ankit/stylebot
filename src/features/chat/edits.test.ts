@@ -1,4 +1,9 @@
-import { applyEdits, countCssLines, findEditLines, revertEdits } from './edits';
+import {
+  applyEdits,
+  findEditLines,
+  revertEdits,
+  summarizeChanges,
+} from './edits';
 
 describe('applyEdits / revertEdits', () => {
   it('adds new rules and reverts them away', () => {
@@ -117,20 +122,167 @@ describe('applyEdits / revertEdits', () => {
       revertEdits(second.css, [...second.earlier[0], ...second.previous]).trim()
     ).toBe('');
   });
+});
 
-  it('counts the lines the edits make as rules', () => {
+describe('summarizeChanges', () => {
+  const summarize = (css: string, edits: Parameters<typeof applyEdits>[1]) =>
+    summarizeChanges(edits, applyEdits(css, edits).previous);
+
+  it('counts declarations a rule didn’t have as added', () => {
     expect(
-      countCssLines([
+      summarize('', [
+        {
+          selector: '.title',
+          declarations: [
+            { property: 'font-size', value: '18px' },
+            { property: 'color', value: 'red' },
+          ],
+        },
+        { selector: 'p', declarations: [{ property: 'margin', value: '0' }] },
+      ])
+    ).toEqual({
+      rules: [
+        { selector: '.title', added: 2, removed: 0 },
+        { selector: 'p', added: 1, removed: 0 },
+      ],
+      added: 3,
+      removed: 0,
+    });
+  });
+
+  it('counts a changed value as one added and one removed', () => {
+    expect(
+      summarize('a { color: blue !important; }', [
+        { selector: 'a', declarations: [{ property: 'color', value: 'red' }] },
+      ])
+    ).toEqual({
+      rules: [{ selector: 'a', added: 1, removed: 1 }],
+      added: 1,
+      removed: 1,
+    });
+  });
+
+  it('counts an emptied declaration as removed', () => {
+    expect(
+      summarize('a { color: blue; margin: 0; }', [
+        { selector: 'a', declarations: [{ property: 'margin', value: '' }] },
+      ])
+    ).toEqual({
+      rules: [{ selector: 'a', added: 0, removed: 1 }],
+      added: 0,
+      removed: 1,
+    });
+  });
+
+  it('adds up a mix, leaving out values set to what they were', () => {
+    expect(
+      summarize('a { color: blue; margin: 0; }\nb { padding: 4px; }', [
         {
           selector: 'a',
           declarations: [
             { property: 'color', value: 'red' },
-            { property: 'margin', value: '0' },
+            { property: 'margin', value: '' },
+            { property: 'gap', value: '8px' },
           ],
         },
-        { selector: 'b', declarations: [{ property: 'color', value: 'red' }] },
+        {
+          selector: 'b',
+          declarations: [{ property: 'padding', value: '4px' }],
+        },
       ])
-    ).toBe(7);
+    ).toEqual({
+      rules: [{ selector: 'a', added: 2, removed: 2 }],
+      added: 2,
+      removed: 2,
+    });
+  });
+
+  it('counts a selector the fix round came back to once, by its last value', () => {
+    const first = [
+      {
+        selector: 'a',
+        declarations: [
+          { property: 'color', value: 'red' },
+          { property: 'border', value: '1px solid' },
+        ],
+      },
+    ];
+    const fix = [
+      {
+        selector: 'a',
+        declarations: [
+          { property: 'color', value: 'white' },
+          { property: 'border', value: '' },
+        ],
+      },
+    ];
+    const round = applyEdits('a { color: blue; }', first);
+    const fixRound = applyEdits(round.css, fix);
+    const previous = [
+      ...round.previous,
+      ...fixRound.previous.filter(
+        value =>
+          !round.previous.some(
+            earlier =>
+              earlier.selector === value.selector &&
+              earlier.property === value.property
+          )
+      ),
+    ];
+
+    expect(summarizeChanges([...first, ...fix], previous)).toEqual({
+      rules: [{ selector: 'a', added: 1, removed: 1 }],
+      added: 1,
+      removed: 1,
+    });
+  });
+
+  it('counts a group the reply then split a member out of', () => {
+    expect(
+      summarize('h1, h2 { color: red; }', [
+        {
+          selector: 'h1, h2',
+          declarations: [{ property: 'color', value: 'blue' }],
+        },
+        { selector: 'h1', declarations: [{ property: 'margin', value: '0' }] },
+      ])
+    ).toEqual({
+      rules: [
+        { selector: 'h1, h2', added: 1, removed: 1 },
+        { selector: 'h1', added: 1, removed: 0 },
+      ],
+      added: 2,
+      removed: 1,
+    });
+  });
+
+  it('leaves out edits that never landed', () => {
+    expect(
+      summarizeChanges(
+        [
+          {
+            selector: 'a',
+            declarations: [{ property: 'color', value: 'red' }],
+          },
+        ],
+        []
+      )
+    ).toEqual({ rules: [], added: 0, removed: 0 });
+  });
+
+  it('describes an undone reply by what it changed', () => {
+    const edits = [
+      { selector: 'a', declarations: [{ property: 'color', value: 'red' }] },
+    ];
+    const { css, previous } = applyEdits('a { color: blue; }', edits);
+    const undone = revertEdits(css, previous);
+
+    expect(undone).toContain('color: blue');
+    expect(summarizeChanges(edits, previous)).toEqual({
+      rules: [{ selector: 'a', added: 1, removed: 1 }],
+      added: 1,
+      removed: 1,
+    });
   });
 });
 

@@ -97,13 +97,12 @@ describe('a reply streaming its edits', () => {
     await flush();
 
     expect(store.state.css).toContain('background-color: #111');
-    expect(chat().pending).toMatchObject({ phase: 'applying', lines: 3 });
+    expect(chat().pending).toMatchObject({ phase: 'applying' });
 
     handlers.onEdit(links);
     await flush();
 
     expect(store.state.css).toContain('color: #8ab4f8');
-    expect(chat().pending?.lines).toBe(6);
     expect(store.state.undoStack.past).toHaveLength(1);
     expect(chromeUtils.setStyle).not.toHaveBeenCalled();
 
@@ -345,7 +344,6 @@ describe('a reply that fixes what the page check found', () => {
     await flush();
 
     expect(store.state.css).toContain('#8ab4f8');
-    expect(chat().pending?.lines).toBe(6);
 
     handlers.onDone({});
     await flush();

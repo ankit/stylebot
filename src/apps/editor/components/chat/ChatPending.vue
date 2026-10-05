@@ -13,11 +13,9 @@ import Vue from 'vue';
 
 import ChatLoader from './ChatLoader.vue';
 import ChatMarkdown from './ChatMarkdown.vue';
-import type { ChatPhase, ChatState } from '../../store/chat';
+import type { ChatPending, ChatPhase } from '../../store/chat';
 
 const PHRASE_INTERVAL = 1600;
-
-type Pending = NonNullable<ChatState['pending']>;
 
 type TalkingPhase = Exclude<ChatPhase, 'applying'>;
 
@@ -31,7 +29,7 @@ export default Vue.extend({
 
   props: {
     pending: {
-      type: Object as PropType<Pending>,
+      type: Object as PropType<ChatPending>,
       required: true,
     },
   },
@@ -54,8 +52,11 @@ export default Vue.extend({
   },
 
   computed: {
-    phase(): ChatPhase {
-      return this.pending.phase;
+    // Applying carries on the writing phrases, as the model still writes.
+    phase(): TalkingPhase {
+      const { phase } = this.pending;
+
+      return phase === 'applying' ? 'writing' : phase;
     },
 
     phrases(): Record<TalkingPhase, Array<string>> {
@@ -83,18 +84,9 @@ export default Vue.extend({
     },
 
     /**
-     * A rotating phrase while the model reads and writes, then the CSS
-     * applied so far, growing as the reply's edits land.
+     * A rotating phrase while the model reads, writes and fixes.
      */
     label(): string {
-      if (this.phase === 'applying') {
-        const { lines } = this.pending;
-
-        return lines === 1
-          ? this.t('added_one_line')
-          : this.t('added_count_lines', [String(lines)]);
-      }
-
       const phrases = this.phrases[this.phase];
       const step = Math.floor((this.now - this.phaseStart) / PHRASE_INTERVAL);
 
