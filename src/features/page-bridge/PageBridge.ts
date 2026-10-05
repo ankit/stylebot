@@ -125,6 +125,12 @@ export type PageBridge = {
   countMatches(selectors: Array<string>): Promise<Array<number | null>>;
 
   /**
+   * The selectors with each partly hashed class swapped for its stable
+   * matcher, checked against the page.
+   */
+  getStableSelectors(selectors: Array<string>): Promise<Array<string>>;
+
+  /**
    * The user's Stylebot declarations in effect on the element the selector
    * is about, each with the selector it comes from.
    */

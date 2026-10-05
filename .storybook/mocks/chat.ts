@@ -60,6 +60,18 @@ const REPLIES: Array<[RegExp, ChatReplyScript]> = [
     },
   ],
   [
+    /border/i,
+    {
+      text: 'Framed the page with a thin border.',
+      edits: [
+        {
+          selector: 'div.Page_root__a1B2c',
+          declarations: [{ property: 'border', value: '1px solid #dcdfe5' }],
+        },
+      ],
+    },
+  ],
+  [
     /.*/,
     {
       text: 'Gave the heading more room below it.',

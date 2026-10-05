@@ -98,30 +98,91 @@ export const getClassBasedSelector = (el: HTMLElement): string | null =>
   classSelector(el, getClassNames(el)[0]);
 
 /**
- * Matches a partly hashed class by its authored parts alone, e.g.
- * `nav[class*="Header_nav__"]`, so it survives the site's next build. Kept
- * only while it matches no more of the page than the full class does.
+ * A partly hashed class as `[class*="…"]` on its authored parts, e.g.
+ * `[class*="Header_nav__"]` for `Header_nav__a1B2c`, so it survives the
+ * site's next build. Null when it has no hash, or while the parts would
+ * match more of the page than the full class does.
+ */
+export const getStableClassMatcher = (
+  className: string,
+  tag = ''
+): string | null => {
+  const parts = getStableClassParts(className);
+  if (!parts) {
+    return null;
+  }
+
+  const matcher = `${tag}${parts
+    .map(part => `[class*="${escapeAttributeValue(part)}"]`)
+    .join('')}`;
+  const fullClass = `${tag}.${escapeSelectorToken(className)}`;
+
+  return countMatches(matcher) === countMatches(fullClass) ? matcher : null;
+};
+
+/**
+ * The element's first partly hashed class matched by its authored parts,
+ * e.g. `nav[class*="Header_nav__"]`.
  */
 export const getStableClassPartsSelector = (el: HTMLElement): string | null => {
   const tag = el.tagName.toLowerCase();
 
   for (const className of getClassNames(el)) {
-    const parts = getStableClassParts(className);
-    if (!parts) {
-      continue;
-    }
-
-    const selector = `${tag}${parts
-      .map(part => `[class*="${escapeAttributeValue(part)}"]`)
-      .join('')}`;
-    const fullClass = `${tag}.${escapeSelectorToken(className)}`;
-
-    if (countMatches(selector) === countMatches(fullClass)) {
+    const selector = getStableClassMatcher(className, tag);
+    if (selector) {
       return selector;
     }
   }
 
   return null;
+};
+
+/**
+ * `selector` with each partly hashed class swapped for its stable matcher,
+ * e.g. `nav .Header_nav__a1B2c a` → `nav [class*="Header_nav__"] a`. Classes
+ * inside quoted attribute values are left alone.
+ */
+export const getStableSelector = (selector: string): string => {
+  let result = '';
+  let quote: string | null = null;
+
+  for (let i = 0; i < selector.length; i++) {
+    const char = selector[i];
+
+    if (quote) {
+      result += char;
+      if (char === '\\') {
+        result += selector[++i] ?? '';
+      } else if (char === quote) {
+        quote = null;
+      }
+      continue;
+    }
+
+    if (char === '\\') {
+      result += char + (selector[++i] ?? '');
+      continue;
+    }
+
+    if (char === '"' || char === "'") {
+      quote = char;
+      result += char;
+      continue;
+    }
+
+    const token =
+      char === '.' && selector.slice(i + 1).match(/^(?:\\.|[\w-])+/);
+    if (!token) {
+      result += char;
+      continue;
+    }
+
+    const className = token[0].replace(/\\(.)/g, '$1');
+    result += getStableClassMatcher(className) ?? `.${token[0]}`;
+    i += token[0].length;
+  }
+
+  return result;
 };
 
 export const getIdBasedSelector = (el: HTMLElement): string | null => {

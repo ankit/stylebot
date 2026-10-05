@@ -15,6 +15,8 @@ export {
   getNameBasedSelector,
   getNonHashedClassBasedSelector,
   getStableClassPartsSelector,
+  getStableClassMatcher,
+  getStableSelector,
   getIdBasedSelector,
   getClassBasedSelector,
   getTagNameBasedSelector,

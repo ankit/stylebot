@@ -176,6 +176,21 @@ describe('getPageOutline', () => {
     expect(document.querySelector(line.split(' ')[0])).not.toBeNull();
   });
 
+  it('lists a long class when it has a stable part', () => {
+    document.body.innerHTML =
+      '<header class="Header-styles__HeaderStyled-sc-36071384-0 lkxsBq">x</header>';
+
+    expect(getPageOutline()).toBe(
+      'header.Header-styles__HeaderStyled-sc-36071384-0.lkxsBq "x"'
+    );
+  });
+
+  it('leaves out a long class with no stable part', () => {
+    document.body.innerHTML = `<p class="${'a'.repeat(31)} short">x</p>`;
+
+    expect(getPageOutline()).toBe('p.short "x"');
+  });
+
   it('cuts long text', () => {
     document.body.innerHTML = `<p>${'a'.repeat(60)}</p>`;
 

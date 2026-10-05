@@ -1,9 +1,10 @@
-import { escapeSelectorToken } from '@stylebot/css';
+import { escapeSelectorToken, getStableClassMatcher } from '@stylebot/css';
 
 const MAX_LINES = 400;
 const MAX_CHARS = 16000;
 const MAX_TEXT = 40;
 const MAX_CLASSES = 4;
+const MAX_HASHED_CLASS = 60;
 // Siblings of the same kind past this many are summarised, alternating
 // ones too (a story's title row, subtext row, spacer).
 const MAX_REPEATS = 2;
@@ -31,9 +32,18 @@ const isVisible = (element: Element): boolean => {
   return getComputedStyle(element).display !== 'none';
 };
 
+/**
+ * Up to 4 of the element's short classes. A long one still gets in when
+ * it has a stable part, as styled-components' display names on BBC News do,
+ * since Stylebot swaps it for that part when Chat uses it.
+ */
 const classesOf = (element: Element): Array<string> =>
   Array.from(element.classList)
-    .filter(name => name.length <= 30)
+    .filter(
+      name =>
+        name.length <= 30 ||
+        (name.length <= MAX_HASHED_CLASS && getStableClassMatcher(name))
+    )
     .slice(0, MAX_CLASSES);
 
 // A named id makes an element unique, so it's never folded into a run;

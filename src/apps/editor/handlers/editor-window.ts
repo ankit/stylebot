@@ -180,6 +180,8 @@ export const createEditorWindowHandler = (
                 return bridge.getPageOutline();
               case 'countMatches':
                 return bridge.countMatches(...message.args);
+              case 'getStableSelectors':
+                return bridge.getStableSelectors(...message.args);
               case 'getAppliedDeclarations':
                 return bridge.getAppliedDeclarations(...message.args);
               case 'getPageDeclarations':

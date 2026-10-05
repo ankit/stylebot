@@ -282,6 +282,10 @@ export class RemotePageBridge extends PageBridgeEmitter implements PageBridge {
     return this.request('countMatches', selectors);
   }
 
+  getStableSelectors(selectors: Array<string>): Promise<Array<string>> {
+    return this.request('getStableSelectors', selectors);
+  }
+
   getSelectorAlternatives(selector: string): Promise<SelectorAlternatives> {
     return this.request('getSelectorAlternatives', selector);
   }

@@ -22,6 +22,7 @@ export type RemotePageBridgeRequestArgs = {
   getComputedStyles: [selector: string, properties: Array<string>];
   getPageOutline: [];
   countMatches: [selectors: Array<string>];
+  getStableSelectors: [selectors: Array<string>];
   getAppliedDeclarations: [selector: string];
   getPageDeclarations: [selector: string];
   getSelectorAlternatives: [selector: string];
@@ -36,6 +37,7 @@ export type RemotePageBridgeRequestResult = {
   getComputedStyles: Record<string, string>;
   getPageOutline: string;
   countMatches: Array<number | null>;
+  getStableSelectors: Array<string>;
   getAppliedDeclarations: Array<AppliedDeclaration>;
   getPageDeclarations: Array<CssDeclaration>;
   getSelectorAlternatives: SelectorAlternatives;

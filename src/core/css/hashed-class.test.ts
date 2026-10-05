@@ -31,6 +31,11 @@ describe('hashed-class', () => {
       ['page-module__E0kJGG__main', ['page-module__', '__main']],
       ['page-module__E0kJGG__title', ['page-module__', '__title']],
       ['Text-module__text2xl__Ab3Cd', ['Text-module__text2xl__']],
+      [
+        'DirectoryContent-module__Box_1__fuSBO',
+        ['DirectoryContent-module__Box_1__'],
+      ],
+      ['page-module__E0kJGG__navItem', ['page-module__', '__navItem']],
       ['_card_1wfme_1', ['_card_']],
       ['caa-button-label-_R_93adeslcldcpbn6b5ipam_', ['caa-button-label-']],
     ])('keeps the authored parts of %s', (className, expected) => {

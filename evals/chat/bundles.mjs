@@ -97,7 +97,11 @@ export const buildRef = async (root, outDir, nodeModules) => {
   fs.mkdirSync(outDir, { recursive: true });
 
   const check = pageModule(root, 'style-check');
-  const features = { pageCheck: Boolean(check) };
+  const stable = pageModule(root, 'stable-selectors');
+  const features = {
+    pageCheck: Boolean(check),
+    stableSelectors: Boolean(stable),
+  };
   const alias = packageAliases(root);
   const nodePaths = [nodeModules];
 
@@ -123,6 +127,7 @@ export const buildRef = async (root, outDir, nodeModules) => {
       `export { getPageCssContext } from '${pageModule(root, 'page-css')}';`,
       `export { countMatches } from '${pageModule(root, 'count-matches')}';`,
       check ? `export { startStyleCheck, checkStyle } from '${check}';` : '',
+      stable ? `export { getStableSelectors } from '${stable}';` : '',
     ].join('\n')
   );
 

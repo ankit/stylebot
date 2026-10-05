@@ -60,6 +60,18 @@ const { values: args } = parseArgs({
 
 const log = (...parts) => console.log(...parts);
 
+/**
+ * The edits with their selectors' partly hashed classes swapped for stable
+ * matchers by the page, as the extension applies them.
+ */
+const withStableSelectors = async (page, edits) => {
+  const selectors = await page.evaluate(
+    list => window.StylebotEval.getStableSelectors(list),
+    edits.map(edit => edit.selector)
+  );
+  return edits.map((edit, i) => ({ ...edit, selector: selectors[i] }));
+};
+
 const slug = url =>
   url
     .replace(/^https?:\/\//, '')
@@ -397,7 +409,11 @@ const runCase = async ({ browser, testCase, variant, scorer, dir }) => {
       });
       calls.push({ usage: reply.usage, ms: reply.ms, model: reply.model });
 
-      const { text, edits } = reply.output;
+      const { text } = reply.output;
+      // As the extension does: partly hashed classes saved by their stable part.
+      const edits = variant.ref.features.stableSelectors
+        ? await withStableSelectors(page, reply.output.edits)
+        : reply.output.edits;
       const round = { text, edits };
       const checking = variant.ref.features.pageCheck && edits.length;
       const cssBefore = css;
@@ -831,7 +847,7 @@ const main = async () => {
     log(
       `${name}: ${checkout.label} · ${setupOf(variant)}${
         built.features.pageCheck ? ', with page check' : ''
-      }`
+      }${built.features.stableSelectors ? ', with stable selectors' : ''}`
     );
   }
 
