@@ -62,6 +62,7 @@ export type RemotePageBridgeMessageToPage =
   | { type: 'applyReadability'; value: boolean }
   | { type: 'startInspecting' }
   | { type: 'stopInspecting' }
+  | { type: 'inspectKey'; key: string }
   | { type: 'highlight'; selector: string }
   | { type: 'unhighlight' }
   | { type: 'openInPage'; dockLocation: 'left' | 'right' };

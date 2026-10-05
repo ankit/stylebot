@@ -228,6 +228,10 @@ export const createEditorWindowHandler = (
           bridge.stopInspecting();
           break;
 
+        case 'inspectKey':
+          bridge.inspectKey(message.key);
+          break;
+
         case 'highlight':
           bridge.highlight(message.selector);
           break;

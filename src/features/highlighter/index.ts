@@ -1,1 +1,1 @@
-export { default as Highlighter } from './Highlighter';
+export { default as Highlighter, INSPECT_KEYS } from './Highlighter';

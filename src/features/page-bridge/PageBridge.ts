@@ -88,6 +88,12 @@ export type PageBridge = {
   stopInspecting(): void;
 
   /**
+   * Takes an inspecting key typed outside the page, as if typed on it:
+   * arrows climb and descend, Enter picks.
+   */
+  inspectKey(key: string): void;
+
+  /**
    * Outlines what a selector matches on the page; an invalid selector
    * clears the outline instead.
    */

@@ -188,6 +188,10 @@ export class LocalPageBridge extends PageBridgeEmitter implements PageBridge {
     this.inspector.stopInspecting();
   }
 
+  inspectKey(key: string): void {
+    this.inspector.handleKey(key);
+  }
+
   highlight(selector: string): void {
     if (validateSelector(selector)) {
       this.previewer.highlight(selector);

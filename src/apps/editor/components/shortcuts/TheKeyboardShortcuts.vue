@@ -12,6 +12,8 @@ import type {
 } from '@stylebot/types';
 import { isFieldTarget, isMac } from '@stylebot/utils';
 import { getDeclarationValue } from '@stylebot/css';
+import { INSPECT_KEYS } from '@stylebot/highlighter';
+import { getPageBridge } from '@stylebot/page-bridge';
 
 import { undoKeyFor } from '../../store/undo-stack';
 import { hasSidePanel } from '../../utils/side-panel';
@@ -174,6 +176,20 @@ export default Vue.extend({
       // Escape in a field is left to the section around it, which moves
       // focus out of the field.
       if (isFieldTarget(target)) {
+        return;
+      }
+
+      // Outside the page, focus stays in the editor while the pointer
+      // inspects the page, so the page never sees these keys itself.
+      if (
+        this.host !== 'page' &&
+        this.inspecting &&
+        INSPECT_KEYS.includes(event.key)
+      ) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        getPageBridge().inspectKey(event.key);
         return;
       }
 

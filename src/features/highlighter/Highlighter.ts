@@ -1,6 +1,15 @@
 import Overlay from './Overlay';
 import { getSelector, splitSelectorList } from '@stylebot/css';
 
+// What the inspector takes from the keyboard: climb, descend and pick.
+export const INSPECT_KEYS = [
+  'ArrowUp',
+  'ArrowDown',
+  'ArrowLeft',
+  'ArrowRight',
+  'Enter',
+];
+
 const WHOLE_PAGE_SELECTORS = ['*', 'body', 'html', ':root'];
 
 const isWholePageSelector = (selector: string): boolean =>
@@ -209,38 +218,53 @@ class Highlighter {
   };
 
   onKeyDown = (event: KeyboardEvent): void => {
+    if (this.handleKey(event.key)) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+  };
+
+  /**
+   * Climbs, descends or picks for an inspecting key, wherever it was typed.
+   * Returns whether the key did anything.
+   */
+  handleKey = (key: string): boolean => {
     if (!this.currentElement) {
-      return;
+      return false;
     }
 
     // Left/Right mirror Up/Down as alternate keys for the same climb/descend.
-    if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
+    if (key === 'ArrowUp' || key === 'ArrowLeft') {
       const parent = this.currentElement.parentElement;
 
-      if (parent && !this.isStylebotElement(parent)) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        this.drillStack.push(this.currentElement);
-        this.setCurrentElement(parent);
-        this.showOverlay(parent);
+      if (!parent || this.isStylebotElement(parent)) {
+        return false;
       }
-    } else if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
+
+      this.drillStack.push(this.currentElement);
+      this.setCurrentElement(parent);
+      this.showOverlay(parent);
+      return true;
+    }
+
+    if (key === 'ArrowDown' || key === 'ArrowRight') {
       const child = this.drillStack.pop();
 
-      if (child) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        this.setCurrentElement(child);
-        this.showOverlay(child);
+      if (!child) {
+        return false;
       }
-    } else if (event.key === 'Enter') {
-      event.preventDefault();
-      event.stopPropagation();
 
-      this.selectElement(this.currentElement);
+      this.setCurrentElement(child);
+      this.showOverlay(child);
+      return true;
     }
+
+    if (key === 'Enter') {
+      this.selectElement(this.currentElement);
+      return true;
+    }
+
+    return false;
   };
 
   onClick = (event: MouseEvent): void => {
