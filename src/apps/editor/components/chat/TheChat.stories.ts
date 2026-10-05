@@ -134,6 +134,35 @@ export const ImageAttached: StoryObj = {
   },
 };
 
+export const PickedElement = chat(
+  { connected: ['anthropic'] },
+  { activeSelector: '.article-body' }
+);
+
+export const PickedElementAndImage: StoryObj = {
+  ...chat({ connected: ['anthropic'] }, { activeSelector: '.article-body' }),
+  play: async ({ canvasElement }) => {
+    const store = storeOf(canvasElement);
+    await waitFor(() =>
+      expect(chatStateOf(canvasElement).status).not.toBeNull()
+    );
+    store.commit('chat/setDraftImage', SCREENSHOT);
+  },
+};
+
+export const PickedElementNoMatches = chat(
+  { connected: ['anthropic'] },
+  { activeSelector: '.sidebar-promo' }
+);
+
+export const PickedElementLongSelector = chat(
+  { connected: ['anthropic'] },
+  {
+    activeSelector:
+      'div.Page_root__a1B2c > p.article-body:nth-of-type(2):not(:first-child)',
+  }
+);
+
 const ALL_PROVIDERS = {
   connected: ['anthropic' as const, 'openai' as const, 'gemini' as const],
 };

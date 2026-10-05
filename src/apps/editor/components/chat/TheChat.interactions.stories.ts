@@ -10,7 +10,13 @@ import {
   REPLY,
   SCREENSHOT,
 } from '@stylebot/storybook/fixtures/chat';
-import { findOpenMenu, storeOf, user } from '@stylebot/storybook/story-helpers';
+import {
+  findOpenMenu,
+  hoverPage,
+  pick,
+  storeOf,
+  user,
+} from '@stylebot/storybook/story-helpers';
 import type { Canvas } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
@@ -361,6 +367,119 @@ export const SendsThePickedElement: StoryObj = {
         'h1'
       )
     );
+  },
+};
+
+const pickedElement = (canvas: Canvas) =>
+  canvas.queryByRole('group', { name: 'Picked element' });
+
+const overlayHints = () =>
+  document.querySelectorAll('#stylebot-overlay .stylebot-overlay-hint');
+
+export const ShowsThePickedElement: StoryObj = {
+  ...chat({ connected: ['anthropic'] }),
+  name: 'a pick shows above the field with its match count, and focus goes back to the field',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+
+    await user.click(
+      await canvas.findByRole('button', {
+        name: 'Select an element in the page to style it',
+      })
+    );
+    await expect(store.state.inspecting).toBe(true);
+
+    await pick(canvas.getByRole('heading', { level: 1 }));
+
+    await waitFor(() => expect(pickedElement(canvas)).not.toBeNull());
+    const chip = pickedElement(canvas) as HTMLElement;
+    await expect(chip).toHaveTextContent(store.state.activeSelector);
+    await within(chip).findByText('1 match');
+    await waitFor(async () => expect(await messageField(canvas)).toHaveFocus());
+  },
+};
+
+export const RemovesThePickedElement: StoryObj = {
+  ...chat({ connected: ['anthropic'] }, { activeSelector: 'h1' }),
+  name: 'removing the picked element in the composer clears it in the header too',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+    const header = canvasElement.querySelector(
+      '.selector-autocomplete'
+    ) as HTMLElement;
+
+    await waitFor(() => expect(header).toHaveTextContent('h1'));
+    await user.click(
+      await canvas.findByRole('button', { name: 'Remove picked element' })
+    );
+
+    await expect(store.state.activeSelector).toBe('');
+    await waitFor(() => expect(pickedElement(canvas)).toBeNull());
+    await waitFor(() => expect(header).not.toHaveTextContent('h1'));
+  },
+};
+
+export const BackspaceRemovesAttachments: StoryObj = {
+  ...chat({ connected: ['anthropic'] }, { activeSelector: 'h1' }),
+  name: 'Backspace in the empty field takes off the image first, then the picked element',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+    const field = await messageField(canvas);
+
+    await waitFor(() =>
+      expect(chatStateOf(canvasElement).status).not.toBeNull()
+    );
+    store.commit('chat/setDraftImage', SCREENSHOT);
+    await canvas.findByText('Screenshot');
+
+    await user.type(field, 'ab{Backspace}{Backspace}');
+    await expect(chatStateOf(canvasElement).draftImage).not.toBeNull();
+
+    await user.type(field, '{Backspace}');
+    await waitFor(() =>
+      expect(chatStateOf(canvasElement).draftImage).toBeNull()
+    );
+    await expect(store.state.activeSelector).toBe('h1');
+
+    await user.type(field, '{Backspace}');
+    await expect(store.state.activeSelector).toBe('');
+    await waitFor(() => expect(pickedElement(canvas)).toBeNull());
+  },
+};
+
+export const KeepsThePickedElement: StoryObj = {
+  ...chat({ connected: ['anthropic'] }, { activeSelector: 'h1' }),
+  name: 'the picked element stays above the field after a message goes out with it',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+
+    await send(canvas, 'Give this more room');
+    await canvas.findByText('Gave the heading more room below it.');
+
+    await expect(store.state.activeSelector).toBe('h1');
+    await expect(pickedElement(canvas)).toHaveTextContent('h1');
+  },
+};
+
+export const HighlightsThePickedElement: StoryObj = {
+  ...chat({ connected: ['anthropic'] }, { activeSelector: '.article-body' }),
+  name: 'hovering the picked element highlights its matches on the page until the pointer leaves',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await waitFor(() => expect(pickedElement(canvas)).not.toBeNull());
+    const chip = pickedElement(canvas) as HTMLElement;
+    await within(chip).findByText('2 matches');
+
+    await hoverPage(chip);
+    await waitFor(() => expect(overlayHints()).toHaveLength(2));
+
+    await user.unhover(chip);
+    await waitFor(() => expect(overlayHints()).toHaveLength(0));
   },
 };
 

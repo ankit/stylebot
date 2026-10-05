@@ -1,7 +1,21 @@
 <template>
   <div class="chat-composer">
     <chat-image-drop-zone class="chat-composer-box" @change="focus">
-      <chat-input ref="input" v-model="draft" @submit="send" />
+      <div v-if="selector || image" class="chat-composer-context">
+        <chat-picked-element v-if="selector" @remove="focus" />
+        <chat-image-attachment
+          v-if="image"
+          :image="image"
+          @remove="removeImage"
+        />
+      </div>
+
+      <chat-input
+        ref="input"
+        v-model="draft"
+        @submit="send"
+        @remove-last="removeLast"
+      />
 
       <div class="chat-composer-footer">
         <chat-attach-image-button @change="focus" />
@@ -22,10 +36,14 @@
 <script lang="ts">
 import Vue from 'vue';
 
+import type { ChatImage } from '@stylebot/types';
+
 import ChatAttachImageButton from './ChatAttachImageButton.vue';
+import ChatImageAttachment from './ChatImageAttachment.vue';
 import ChatImageDropZone from './ChatImageDropZone.vue';
 import ChatInput from './ChatInput.vue';
 import ChatModelMenu from './ChatModelMenu.vue';
+import ChatPickedElement from './ChatPickedElement.vue';
 import ChatUsage from './ChatUsage.vue';
 import ChatSendButton from './ChatSendButton.vue';
 
@@ -34,9 +52,11 @@ export default Vue.extend({
 
   components: {
     ChatAttachImageButton,
+    ChatImageAttachment,
     ChatImageDropZone,
     ChatInput,
     ChatModelMenu,
+    ChatPickedElement,
     ChatUsage,
     ChatSendButton,
   },
@@ -48,6 +68,18 @@ export default Vue.extend({
   },
 
   computed: {
+    selector(): string {
+      return this.$store.state.activeSelector;
+    },
+
+    image(): ChatImage | null {
+      return this.$store.state.chat.draftImage;
+    },
+
+    inspecting(): boolean {
+      return this.$store.state.inspecting;
+    },
+
     pending(): boolean {
       return !!this.$store.state.chat.pending;
     },
@@ -57,9 +89,36 @@ export default Vue.extend({
     },
   },
 
+  watch: {
+    // Back to the field once a pick lands.
+    inspecting(value: boolean): void {
+      if (!value && this.selector) {
+        this.focus();
+      }
+    },
+  },
+
   methods: {
     focus(): void {
       (this.$refs.input as InstanceType<typeof ChatInput>).focus();
+    },
+
+    removeImage(): void {
+      this.$store.dispatch('chat/removeImage');
+      this.focus();
+    },
+
+    /**
+     * Backspace in the empty field takes off the last item above it: the
+     * image first, since it was added for this message, then the picked
+     * element.
+     */
+    removeLast(): void {
+      if (this.image) {
+        this.$store.dispatch('chat/removeImage');
+      } else if (this.selector) {
+        this.$store.commit('setActiveSelector', '');
+      }
     },
 
     stop(): void {
@@ -118,6 +177,12 @@ export default Vue.extend({
       border-color: var(--field-border);
     }
   }
+}
+
+.chat-composer-context {
+  display: flex;
+  gap: 6px;
+  min-width: 0;
 }
 
 .chat-composer-footer {

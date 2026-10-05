@@ -6,7 +6,6 @@
     @drop.prevent="onDrop"
     @paste="onPaste"
   >
-    <chat-image-attachment v-if="image" :image="image" @remove="remove" />
     <s-text v-if="imageError" size="caption" class="chat-image-error">
       {{ t('couldnt_read_that_image') }}
     </s-text>
@@ -19,21 +18,17 @@
 import Vue from 'vue';
 
 import { SText } from '@stylebot/components';
-import type { ChatImage } from '@stylebot/types';
 
-import ChatImageAttachment from './ChatImageAttachment.vue';
 import { getImageFile } from '../../utils/chat-image';
 
 /**
  * Takes an image dropped or pasted onto its contents as the next message's
- * attachment, and shows it above them. Emits `change` when the attachment
- * does.
+ * attachment. Emits `change` once a dropped image is attached.
  */
 export default Vue.extend({
   name: 'ChatImageDropZone',
 
   components: {
-    ChatImageAttachment,
     SText,
   },
 
@@ -44,10 +39,6 @@ export default Vue.extend({
   },
 
   computed: {
-    image(): ChatImage | null {
-      return this.$store.state.chat.draftImage;
-    },
-
     imageError(): boolean {
       return this.$store.state.chat.imageError;
     },
@@ -59,11 +50,6 @@ export default Vue.extend({
         file,
         name: file.name,
       });
-      this.$emit('change');
-    },
-
-    remove(): void {
-      this.$store.dispatch('chat/removeImage');
       this.$emit('change');
     },
 

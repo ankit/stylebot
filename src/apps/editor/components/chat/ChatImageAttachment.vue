@@ -1,32 +1,22 @@
 <template>
-  <div class="chat-image-attachment">
-    <img class="chat-image-attachment-thumb" :src="image.dataUrl" alt="" />
-    <span class="chat-image-attachment-copy">
-      <s-text as="span" size="label" class="chat-image-attachment-name">
-        {{ name }}
-      </s-text>
-      <s-text as="span" size="caption" variant="muted">
-        {{ t('image_size_kb', [size]) }}
-      </s-text>
-    </span>
-    <s-icon-button
-      :size="22"
-      class="chat-image-attachment-remove"
-      :title="t('remove')"
-      :aria-label="t('remove')"
-      @click="$emit('remove')"
-    >
-      <x-icon :size="12" />
-    </s-icon-button>
-  </div>
+  <s-attachment
+    class="chat-image-attachment"
+    :remove-label="t('remove')"
+    @remove="$emit('remove')"
+  >
+    <template #media>
+      <img class="chat-image-attachment-thumb" :src="image.dataUrl" alt="" />
+    </template>
+    {{ name }}
+    <template #meta>{{ t('image_size_kb', [size]) }}</template>
+  </s-attachment>
 </template>
 
 <script lang="ts">
 import type { PropType } from 'vue';
 import Vue from 'vue';
 
-import { SIconButton, SText } from '@stylebot/components';
-import { XIcon } from '@stylebot/icons';
+import { SAttachment } from '@stylebot/components';
 import type { ChatImage } from '@stylebot/types';
 
 /**
@@ -36,9 +26,7 @@ export default Vue.extend({
   name: 'ChatImageAttachment',
 
   components: {
-    SIconButton,
-    XIcon,
-    SText,
+    SAttachment,
   },
 
   props: {
@@ -62,41 +50,13 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .chat-image-attachment {
-  align-self: flex-start;
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  box-sizing: border-box;
-  max-width: min(100% - 4px, 280px);
-  padding: 4px;
-  border-radius: 9px;
-  background: var(--active);
+  flex-shrink: 3;
 }
 
 .chat-image-attachment-thumb {
-  flex: none;
-  width: 52px;
-  height: 36px;
-  box-sizing: border-box;
-  border: 1px solid var(--field-border);
-  border-radius: 6px;
+  width: 36px;
+  height: 100%;
   object-fit: cover;
   object-position: top left;
-}
-
-.chat-image-attachment-copy {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  padding-right: 2px;
-}
-
-.chat-image-attachment .chat-image-attachment-name {
-  @include truncate;
-}
-
-.chat-image-attachment-remove {
-  color: var(--icon-color);
 }
 </style>
