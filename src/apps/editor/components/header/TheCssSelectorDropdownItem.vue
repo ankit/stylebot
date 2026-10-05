@@ -20,7 +20,7 @@
           <span class="selector-tooltip">{{ selector }}</span>
         </template>
         <span ref="text" class="item-text">
-          <span class="item-selector">
+          <span class="item-selector" :class="{ styled }">
             <span
               v-for="(piece, i) in short.pieces"
               :key="i"
@@ -70,6 +70,12 @@ export default Vue.extend({
     },
 
     current: {
+      type: Boolean,
+      default: false,
+    },
+
+    // Whether the style already has a rule for the selector.
+    styled: {
       type: Boolean,
       default: false,
     },
@@ -213,6 +219,10 @@ export default Vue.extend({
 
   min-width: 0;
   white-space: pre;
+
+  &.styled {
+    font-weight: 600;
+  }
 }
 
 .item-more {

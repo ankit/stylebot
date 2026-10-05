@@ -217,6 +217,9 @@ const rowTexts = (root: HTMLElement) =>
     item.querySelector('.item-text')?.textContent?.trim()
   );
 
+const styled = (item: HTMLElement) =>
+  item.querySelector('.item-selector')?.classList.contains('styled');
+
 const count = (item: HTMLElement) =>
   item.querySelector('.item-count')?.textContent?.trim();
 
@@ -249,6 +252,11 @@ export const SectionsForTheElementAndPage: StoryObj = {
     const current = row(canvasElement, 'h1');
     await expect(current).toHaveClass('selected');
     await expect(current.querySelector('.menu-item-check')).not.toBeNull();
+
+    // Selectors the style already has a rule for are set in bold.
+    await expect(styled(row(canvasElement, '*'))).toBe(true);
+    await expect(styled(row(canvasElement, '.sb-page h1'))).toBe(false);
+    await expect(styled(row(canvasElement, '.article-body'))).toBe(true);
 
     // Each row counts the elements it matches on the page.
     await waitFor(() =>
