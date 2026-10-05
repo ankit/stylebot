@@ -32,7 +32,7 @@
         v-else
         :selector="item.value"
         :current="item.value === activeSelector"
-        :count="matchCounts[item.value] ?? null"
+        :count="countFor(item.value)"
         :styled="styledSelectors.has(item.value)"
         @select="select"
         @preview-end="previewActiveSelector"
@@ -218,6 +218,10 @@ export default Vue.extend({
       this.openingSelector = this.activeSelector;
       this.previewActiveSelector();
       this.loadMatchCounts();
+    },
+
+    countFor(selector: string): number | null {
+      return this.matchCounts[selector] ?? null;
     },
 
     async loadMatchCounts(): Promise<void> {
