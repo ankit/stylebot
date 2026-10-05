@@ -17,6 +17,11 @@ const rootDir = path.resolve(
 );
 const localesDir = path.join(rootDir, 'src/assets/_locales');
 const srcDir = path.join(rootDir, 'src');
+// The Safari wrapper app shows the extension's messages too.
+const safariAppScript = path.join(
+  rootDir,
+  'safari/Stylebot/Stylebot/Resources/Script.js'
+);
 const manifestPath = path.join(rootDir, 'src/assets/manifest/manifest.json');
 
 const KEY_PATTERN = /^[a-z][a-z0-9_]*$/;
@@ -121,7 +126,7 @@ function collectUsedKeys() {
   const quoted = new Set();
   const patterns = [];
 
-  for (const file of walk(srcDir)) {
+  for (const file of [...walk(srcDir), safariAppScript]) {
     const text = readFileSync(file, 'utf8');
     const found = findReferencedKeys(text);
 

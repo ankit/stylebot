@@ -28,15 +28,27 @@ body {
   text-align: center;
 }
 
-body:not(.state-on, .state-off) :is(.state-on, .state-off) {
-  display: none;
+body:not(.state-on, .state-off, .state-unknown) {
+  visibility: hidden;
 }
 
-body.state-on :is(.state-off, .state-unknown) {
-  display: none;
+h1 {
+  margin: 0;
+
+  font: -apple-system-title1;
 }
 
-body.state-off :is(.state-on, .state-unknown) {
+p {
+  margin: 0;
+}
+
+.description {
+  color: GrayText;
+}
+
+body:not(.state-on) .state-on,
+body:not(.state-off) .state-off,
+body:not(.state-unknown) .state-unknown {
   display: none;
 }
 
