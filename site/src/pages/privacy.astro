@@ -1,0 +1,187 @@
+---
+import Base from '../layouts/Base.astro';
+import { LINKS } from '../lib/links';
+---
+
+<Base
+  title="Privacy"
+  description="What Stylebot does with your data: no server, no account, no analytics."
+>
+  <main class="privacy">
+    <div class="privacy-intro">
+      <h1>Privacy</h1>
+      <p>
+        Stylebot has no server, no account and no analytics. Your styles stay in
+        your browser unless you turn on sync or the agent, and then they go
+        straight to a service you chose.
+      </p>
+      <p class="updated">Last updated October 5, 2026</p>
+    </div>
+
+    <section>
+      <h2>What stays in your browser</h2>
+      <p>
+        Your styles, profiles, settings, version history, chat conversations
+        and API keys are saved in your browser's extension storage on this
+        computer. Uninstalling Stylebot removes them.
+      </p>
+      <p>
+        Stylebot can read and change the pages you visit, since that's how it
+        applies your styles. What it reads there is used to style the page, and
+        isn't sent anywhere unless you use the agent.
+      </p>
+    </section>
+
+    <section>
+      <h2>Google Drive sync</h2>
+      <p>
+        Sync is off until you connect Google Drive in Options. Your styles,
+        including profiles, are then saved to a file in your own Google Drive.
+        Stylebot asks only for access to the files it creates, so it can't see
+        anything else in your Drive.
+      </p>
+      <p>
+        The access token Google issues is kept in your browser and expires
+        after an hour. Disconnect in Options, or remove Stylebot's access in
+        your <a href="https://myaccount.google.com/connections">Google account</a>.
+        Google's <a href="https://policies.google.com/privacy">privacy policy</a>{' '}
+        applies to what's stored in your Drive.
+      </p>
+      <p>
+        Stylebot's use of information received from Google APIs adheres to the{' '}
+        <a
+          href="https://developers.google.com/terms/api-services-user-data-policy"
+          >Google API Services User Data Policy</a
+        >, including the Limited Use requirements.
+      </p>
+    </section>
+
+    <section>
+      <h2>Stylebot agent</h2>
+      <p>
+        The agent is off until you add an API key. When you send a message, your
+        browser sends it straight to the provider you picked, with your key.
+        The request includes your message, any screenshot you attach, the page's
+        address and title, an outline of the text and elements visible on the
+        page, and the site's CSS and your Stylebot styles for it.
+      </p>
+      <p>
+        Page text can include personal information, such as your name or
+        messages on the page. Don't use the agent on pages you wouldn't share
+        with the provider. Their policy covers what happens next:{' '}
+        <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>,{' '}
+        <a href="https://openai.com/policies/privacy-policy/">OpenAI</a> and{' '}
+        <a href="https://ai.google.dev/gemini-api/terms">Google</a>.
+      </p>
+    </section>
+
+    <section>
+      <h2>Fonts and imported CSS</h2>
+      <p>
+        When a style uses a Google Font, it's downloaded from Google Fonts, which
+        sees your IP address as with any web font. When a style uses{' '}
+        <code>@import</code>, Stylebot fetches that stylesheet from its address.
+      </p>
+    </section>
+
+    <section>
+      <h2>This website</h2>
+      <p>
+        stylebot.dev has no analytics, ads or cookies, and is hosted on GitHub
+        Pages, which keeps standard server logs. Your theme choice is saved in
+        your browser. The feedback form on the uninstall page opens your email
+        app, and nothing is sent unless you send that email.
+      </p>
+    </section>
+
+    <section>
+      <h2>Sharing</h2>
+      <p>
+        Stylebot doesn't collect, sell or share your data. Data only leaves your
+        browser for the services above, when you use the features that need
+        them.
+      </p>
+    </section>
+
+    <section>
+      <h2>Changes and contact</h2>
+      <p>
+        Changes to this policy are listed in the{' '}
+        <a href={`${LINKS.github}/commits/v4/site/src/pages/privacy.astro`}
+          >site's history on GitHub</a
+        >. Questions go to <a href={`mailto:${LINKS.feedbackEmail}`}
+          >{LINKS.feedbackEmail}</a
+        > or a <a href={LINKS.issues}>GitHub issue</a>.
+      </p>
+    </section>
+  </main>
+</Base>
+
+<style>
+  .privacy {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 64px 24px 0;
+  }
+
+  .privacy-intro {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 36px;
+  }
+
+  h1 {
+    margin: 0;
+    font: 700 clamp(34px, 4.6vw, 48px) / 1.05 var(--display);
+    letter-spacing: -0.03em;
+    color: var(--ink);
+  }
+
+  .privacy-intro p {
+    font-size: 18px;
+    line-height: 1.55;
+    color: var(--muted);
+  }
+
+  .privacy-intro .updated {
+    font-size: 14px;
+    color: var(--faint);
+  }
+
+  section {
+    padding: 40px 0;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  h2 {
+    margin: 0;
+    font: 700 26px/1.2 var(--display);
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+
+  p {
+    margin: 0;
+    font: 400 16px/1.65 var(--ui);
+    color: var(--ink2);
+    text-wrap: pretty;
+  }
+
+  code {
+    padding: 1px 6px;
+    border-radius: 5px;
+    background: var(--fill);
+    border: 1px solid var(--border);
+    font: 400 0.88em/1.5 var(--mono);
+  }
+
+  @media (max-width: 760px) {
+    .privacy {
+      padding-top: 40px;
+    }
+  }
+</style>
