@@ -1,4 +1,4 @@
-import { splitCompounds, splitSelectorList } from '@stylebot/css';
+import { splitSelectorList, splitSelectorParts } from '@stylebot/css';
 
 export type SelectorPiece = {
   text: string;
@@ -18,26 +18,27 @@ const length = (pieces: Array<SelectorPiece>) =>
   pieces.reduce((total, piece) => total + piece.text.length, 0);
 
 /**
- * One selector cut to `maxChars` by dropping whole compounds from its
- * middle, keeping the first and as many of the last as fit.
+ * One selector cut to `maxChars` by dropping whole parts from its middle,
+ * keeping the first and as many of the last as fit; the dropped ones show
+ * as an ellipsis, at the end when no last part fits.
  */
-const dropMiddleCompounds = (
+const dropMiddleParts = (
   selector: string,
   maxChars: number
 ): Array<SelectorPiece> => {
-  const compounds = splitCompounds(selector);
-  const lastOf = (count: number) =>
-    compounds.slice(-count).join('').trimStart();
+  const parts = splitSelectorParts(selector);
 
-  if (selector.length <= maxChars || compounds.length < 3) {
+  if (selector.length <= maxChars || parts.length < 2) {
     return [{ text: selector }];
   }
 
-  const first = compounds[0];
-  let keep = compounds.length - 2;
+  const [first] = parts;
+  const lastOf = (count: number) =>
+    count ? parts.slice(-count).join('').trimStart() : '';
+  let keep = parts.length - 2;
 
   while (
-    keep > 1 &&
+    keep > 0 &&
     first.length + ELLIPSIS_CHARS + lastOf(keep).length > maxChars
   ) {
     keep--;
@@ -46,13 +47,13 @@ const dropMiddleCompounds = (
   return [
     { text: first },
     { text: '…', kind: 'ellipsis' },
-    { text: lastOf(keep) },
+    ...(keep ? [{ text: lastOf(keep) }] : []),
   ];
 };
 
 /**
  * `selector` as pieces to show within `maxChars`: whole when it fits, else
- * a list's first member with a count of the rest, its middle compounds
+ * a list's first member with a count of the rest, its middle parts
  * dropped for an ellipsis when still too long.
  */
 export const shortenSelector = (
@@ -72,12 +73,12 @@ export const shortenSelector = (
   }
 
   if (parts.length === 1) {
-    return { pieces: dropMiddleCompounds(parts[0], maxChars), more: 0 };
+    return { pieces: dropMiddleParts(parts[0], maxChars), more: 0 };
   }
 
   const more = parts.length - 1;
   return {
-    pieces: dropMiddleCompounds(parts[0], maxChars - ` +${more}`.length - 1),
+    pieces: dropMiddleParts(parts[0], maxChars - ` +${more}`.length - 1),
     more,
   };
 };

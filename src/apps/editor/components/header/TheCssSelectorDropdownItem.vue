@@ -249,5 +249,6 @@ export default Vue.extend({
 
 .item-count {
   flex: none;
+  font-family: var(--font-mono);
 }
 </style>

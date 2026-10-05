@@ -12,14 +12,20 @@ describe('shortenSelector', () => {
     expect(shown(long, 80)).toBe(long);
   });
 
-  it('drops whole compounds from the middle, keeping as many last ones as fit', () => {
+  it('drops whole parts from the middle, keeping as many last ones as fit', () => {
     expect(shown(long, 40)).toBe('#\\34 9953495…span.titleline > a');
     expect(shown(long, 20)).toBe('#\\34 9953495…> a');
   });
 
-  it("doesn't cut a selector with nothing in its middle", () => {
-    expect(shown('td.title:nth-of-type(3) a', 10)).toBe(
-      'td.title:nth-of-type(3) a'
+  it('drops the ends of a selector with nothing in its middle', () => {
+    expect(shown('#_R_3idahlik5_.prc-Button-ButtonBase-c50BI', 30)).toBe(
+      '#_R_3idahlik5_…'
+    );
+  });
+
+  it('leaves a single part too long to cut', () => {
+    expect(shown('.prc-Button-ButtonBase-c50BI', 10)).toBe(
+      '.prc-Button-ButtonBase-c50BI'
     );
   });
 
