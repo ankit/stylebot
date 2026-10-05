@@ -42,27 +42,41 @@ Each strategy is tried in turn; the first one that returns something wins.
 
 ### What counts as a "hashed" class
 
-A class name counts as hashed, carrying no stable meaning, when it has:
+A class name counts as hashed, carrying no stable meaning, when it's:
 
-- a known library prefix: `css-`, `sc-`, `jsx-`, `emotion-`, `styled-`,
-  `chakra-`
+- from a CSS-in-JS library: `css-1q2w3e` (Emotion), `sc-`, `jsx-`,
+  `emotion-`, `styled-`, `chakra-`. `css-` needs a digit in its hash, so a
+  real class like `css-truncate` stays authored.
+- an atomic class: React Native Web's `r-1awozwy` (X), or StyleX's `xeuugli`
+  (Facebook, Instagram, Threads). A StyleX class can look like a word, so
+  `x`-prefixed classes only count once the page has at least 10 of them.
+- Instagram's legacy `_a6hd`, Svelte's `svelte-1abc2de`, Astro's
+  `astro-J7PV25F6`, next/font's `__className_a64ecd`, or a JSS counter like
+  `jss123` or `makeStyles-root-12`
 - a hex-like hash such as CSS Modules' `_1a2b3c`
 - a short (4–12 chars) name with an unusually high number of case transitions,
   which separates a hash like `WwrzSb` from a camelCase word like `navBar`
 
 Otherwise, anything containing `-` or `_` is treated as authored, unless it's
-partly hashed:
+partly hashed, in which case the authored part is kept:
 
-- a `__`-separated segment that reads like a hash rather than a word: letters
-  mixed with digits (`a1B2c`, but not `item2`) or frequent case changes. The
-  parts on either side are kept, so Turbopack's `page-module__E0kJGG__main`
-  becomes `[class*="page-module__"][class*="__main"]`.
-- styled-components' `Name-sc-hash-0`, which keeps `Name-sc-`.
+- `File-module__local__hash`, as Next.js and Primer name CSS Modules: the last
+  5 characters are the hash whatever they look like, so
+  `NavDropdown-module__button__PEHWX` keeps `NavDropdown-module__button__`.
 - a dash-separated CSS Modules name ending in a 5-character hash, like
   Primer's `prc-TopicTag-TopicTag-LS-jX`, which keeps `prc-TopicTag-TopicTag-`.
   It needs a PascalCase component name before the hash, and a hash that mixes
   letters with digits or case, so utility classes like `col-md-12` stay
   authored.
+- another `__`-separated segment that reads like a hash rather than a word:
+  letters mixed with digits (`a1B2c`, but not `item2`) or frequent case
+  changes. The parts on either side are kept, so Turbopack's
+  `page-module__E0kJGG__main` becomes
+  `[class*="page-module__"][class*="__main"]`.
+- styled-components' `Name-sc-hash-0`, which keeps `Name-sc-`.
+- Vite's `_card_1wfme_1`, which keeps `_card_`.
+- a React id suffix, as in `button-label-_R_93ades_`, which keeps
+  `button-label-`.
 
 ### Other selectors for the element
 
