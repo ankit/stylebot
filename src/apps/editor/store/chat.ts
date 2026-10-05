@@ -120,6 +120,23 @@ export const createChatModule = (): Module<ChatState, State> => {
   };
 
   /**
+   * The edits with partly hashed classes in their selectors swapped for
+   * stable matchers, or as written when the page can't be asked.
+   */
+  const withStableSelectors = async (
+    replyEdits: Array<ChatCssEdit>
+  ): Promise<Array<ChatCssEdit>> => {
+    const selectors = await getPageBridge()
+      .getStableSelectors(replyEdits.map(edit => edit.selector))
+      .catch(() => null);
+
+    return replyEdits.map((edit, i) => ({
+      ...edit,
+      selector: selectors?.[i] ?? edit.selector,
+    }));
+  };
+
+  /**
    * Applies css the way any edit does, so it lands on the page, is saved,
    * and is one step on the editor's undo trail.
    */
@@ -161,18 +178,15 @@ export const createChatModule = (): Module<ChatState, State> => {
 
       onEditsStart: () => setPhase(context, 'writing'),
 
-      onEdits: replyEdits => {
+      onEdits: async replyEdits => {
         setPhase(context, 'applying');
-        const result = applyEdits(rootState.css, replyEdits);
-        edits = replyEdits;
+        edits = await withStableSelectors(replyEdits);
+        const result = applyEdits(rootState.css, edits);
         previous = result.previous;
-        return applyCss(context, result.css, edits, `chat:${id}`).then(
-          async () => {
-            matches = await getPageBridge()
-              .countMatches(edits.map(edit => edit.selector))
-              .catch(() => undefined);
-          }
-        );
+        await applyCss(context, result.css, edits, `chat:${id}`);
+        matches = await getPageBridge()
+          .countMatches(edits.map(edit => edit.selector))
+          .catch(() => undefined);
       },
 
       onDone: ({ usage, replay }) => {

@@ -92,6 +92,23 @@ export const RepliesAndApplies: StoryObj = {
   },
 };
 
+export const StabilizesHashedClasses: StoryObj = {
+  ...chat({ connected: ['anthropic'] }),
+  name: 'a reply naming a build-hashed class lands in the stylesheet by the class’s stable part',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+
+    await send(canvas, 'Put a border around the page');
+
+    await canvas.findByText(/Framed the page/);
+    await waitFor(() =>
+      expect(store.state.css).toContain('div[class*="Page_root__"]')
+    );
+    await expect(store.state.css).not.toContain('a1B2c');
+  },
+};
+
 export const UndoesAndReapplies: StoryObj = {
   ...chatWithThread(),
   name: 'Undo takes the latest reply’s CSS back out, and Reapply puts it back',

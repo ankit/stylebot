@@ -5,6 +5,7 @@ import {
   getNameBasedSelector,
   getNonHashedClassBasedSelector,
   getStableClassPartsSelector,
+  getStableSelector,
   getClassBasedSelector,
   getIdBasedSelector,
   getTagNameBasedSelector,
@@ -224,6 +225,37 @@ describe('selector', () => {
 
       el.setAttribute('data-testid', 'card');
       expect(getSelector(el)).toBe('div[data-testid="card"]');
+    });
+  });
+
+  describe('getStableSelector', () => {
+    it('swaps each partly hashed class for its stable matcher', () => {
+      expect(getStableSelector('nav .Header_nav__a1B2c > a.link')).toBe(
+        'nav [class*="Header_nav__"] > a.link'
+      );
+      expect(
+        getStableSelector('div.Card_body__x9Y8z:not(.Card_muted__q1W2e) p')
+      ).toBe('div[class*="Card_body__"]:not([class*="Card_muted__"]) p');
+    });
+
+    it('leaves authored classes, escapes and quoted values alone', () => {
+      expect(getStableSelector('.lg\\:-mt-16 a#nav\\.main')).toBe(
+        '.lg\\:-mt-16 a#nav\\.main'
+      );
+      expect(getStableSelector('a[href=".Header_nav__a1B2c"]')).toBe(
+        'a[href=".Header_nav__a1B2c"]'
+      );
+    });
+
+    it('keeps a class whose stable part would match more of the page', () => {
+      document.body.innerHTML = `
+        <div class="Header_nav__a1B2c"></div>
+        <div class="SubHeader_nav__z9Y8x"></div>
+      `;
+
+      expect(getStableSelector('.Header_nav__a1B2c')).toBe(
+        '.Header_nav__a1B2c'
+      );
     });
   });
 

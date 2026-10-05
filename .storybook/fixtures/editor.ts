@@ -22,7 +22,7 @@ export const RULE_CSS = `h1 {
 /* A stand-in page behind the docked panel, so its edge and shadow are
    captured against real content rather than a blank canvas. */
 export const PAGE = `
-  <div class="sb-page">
+  <div class="sb-page Page_root__a1B2c">
     <h1>Stylebot lets you restyle any website</h1>
     <p class="article-body">
       Change fonts, colors, layout and more with a visual editor, or write

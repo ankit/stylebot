@@ -176,29 +176,19 @@ describe('getPageOutline', () => {
     expect(document.querySelector(line.split(' ')[0])).not.toBeNull();
   });
 
-  it('shows a partly hashed class by its stable part', () => {
-    document.body.innerHTML = '<nav class="Header_nav__a1B2c primary">x</nav>';
-
-    const line = getPageOutline();
-
-    expect(line).toBe('nav[class*="Header_nav__"].primary "x"');
-    expect(document.querySelector(line.split(' ')[0])).not.toBeNull();
-  });
-
-  it('shows a long styled-components class by its stable part', () => {
+  it('lists a long class when it has a stable part', () => {
     document.body.innerHTML =
       '<header class="Header-styles__HeaderStyled-sc-36071384-0 lkxsBq">x</header>';
 
     expect(getPageOutline()).toBe(
-      'header[class*="Header-styles__HeaderStyled-sc-"].lkxsBq "x"'
+      'header.Header-styles__HeaderStyled-sc-36071384-0.lkxsBq "x"'
     );
   });
 
-  it('keeps the full class when its stable part would match more', () => {
-    document.body.innerHTML =
-      '<nav class="Header_nav__a1B2c">x</nav><nav class="SubHeader_nav__z9Y8x">y</nav>';
+  it('leaves out a long class with no stable part', () => {
+    document.body.innerHTML = `<p class="${'a'.repeat(31)} short">x</p>`;
 
-    expect(getPageOutline().split('\n')[0]).toBe('nav.Header_nav__a1B2c "x"');
+    expect(getPageOutline()).toBe('p.short "x"');
   });
 
   it('cuts long text', () => {

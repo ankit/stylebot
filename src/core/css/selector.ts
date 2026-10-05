@@ -137,6 +137,54 @@ export const getStableClassPartsSelector = (el: HTMLElement): string | null => {
   return null;
 };
 
+/**
+ * `selector` with each partly hashed class swapped for its stable matcher,
+ * e.g. `nav .Header_nav__a1B2c a` → `nav [class*="Header_nav__"] a`. Classes
+ * inside quoted attribute values are left alone.
+ */
+export const getStableSelector = (selector: string): string => {
+  let result = '';
+  let quote: string | null = null;
+
+  for (let i = 0; i < selector.length; i++) {
+    const char = selector[i];
+
+    if (quote) {
+      result += char;
+      if (char === '\\') {
+        result += selector[++i] ?? '';
+      } else if (char === quote) {
+        quote = null;
+      }
+      continue;
+    }
+
+    if (char === '\\') {
+      result += char + (selector[++i] ?? '');
+      continue;
+    }
+
+    if (char === '"' || char === "'") {
+      quote = char;
+      result += char;
+      continue;
+    }
+
+    const token =
+      char === '.' && selector.slice(i + 1).match(/^(?:\\.|[\w-])+/);
+    if (!token) {
+      result += char;
+      continue;
+    }
+
+    const className = token[0].replace(/\\(.)/g, '$1');
+    result += getStableClassMatcher(className) ?? `.${token[0]}`;
+    i += token[0].length;
+  }
+
+  return result;
+};
+
 export const getIdBasedSelector = (el: HTMLElement): string | null => {
   const id = el.getAttribute('id');
   if (id) {

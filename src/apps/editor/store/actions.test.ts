@@ -40,6 +40,7 @@ const mockBridge = {
   getSelectorAlternatives: jest.fn(),
   getPageCssContext: jest.fn(),
   countMatches: jest.fn(),
+  getStableSelectors: jest.fn(),
   openInPage: jest.fn(),
   focusPage: jest.fn(),
   on: jest.fn(),
