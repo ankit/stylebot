@@ -2,6 +2,7 @@
 import type * as InjectStyle from './inject-style';
 
 const stylesheetId = (id: string) => `stylebot-css-${id}`;
+const importsStylesheetId = (id: string) => `stylebot-css-imports-${id}`;
 
 const flush = () => new Promise(resolve => setTimeout(resolve, 0));
 
@@ -87,8 +88,9 @@ a { color: red; }`;
       await flush();
 
       const style = document.getElementById(stylesheetId('example'));
+      const imports = document.getElementById(importsStylesheetId('example'));
 
-      expect(style?.textContent).toContain('b { color: blue; }');
+      expect(imports?.textContent).toBe('b { color: blue; }');
       expect(style?.textContent).toContain('a { color: red !important; }');
       expect(style?.textContent).not.toContain('@import');
     });
@@ -130,8 +132,61 @@ a { color: red; }`;
       deliverImport('@font-face { font-family: "Test"; }');
       await flush();
 
-      expect(style?.textContent).toContain('@font-face');
+      const imports = document.getElementById(importsStylesheetId('example'));
+
+      expect(imports?.textContent).toContain('@font-face');
+      expect(imports?.nextSibling).toBe(style);
       expect(style?.textContent).toContain('color: red');
+    });
+
+    it('leaves the imported css alone when only the rest of the style changes', async () => {
+      (global as any).chrome = {
+        runtime: {
+          sendMessage: jest.fn(() =>
+            Promise.resolve('@font-face { font-family: "Test"; }')
+          ),
+        },
+      };
+
+      const fontImport = '@import url(https://fonts.example.com/font.css);';
+
+      await injectCSSIntoDocument(`${fontImport} a { color: red; }`, 'example');
+      await flush();
+
+      const imports = document.getElementById(importsStylesheetId('example'));
+      const importedText = imports?.firstChild;
+
+      await injectCSSIntoDocument(
+        `${fontImport} a { color: red; font-weight: bold; }`,
+        'example'
+      );
+      await flush();
+
+      expect(imports?.firstChild).toBe(importedText);
+      expect(
+        document.getElementById(stylesheetId('example'))?.textContent
+      ).toContain('font-weight: bold');
+    });
+
+    it('clears the imported css once the style no longer has an @import', async () => {
+      (global as any).chrome = {
+        runtime: {
+          sendMessage: jest.fn(() =>
+            Promise.resolve('@font-face { font-family: "Test"; }')
+          ),
+        },
+      };
+
+      await injectCSSIntoDocument(
+        '@import url(https://fonts.example.com/font.css); a { color: red; }',
+        'example'
+      );
+      await flush();
+      await injectCSSIntoDocument('a { color: red; }', 'example');
+
+      expect(
+        document.getElementById(importsStylesheetId('example'))?.textContent
+      ).toBe('');
     });
 
     it('drops an @import fetch that resolves after the stylesheet was removed', async () => {
@@ -160,6 +215,9 @@ a { color: red; }`;
       expect(
         document.getElementById(stylesheetId('example'))?.textContent
       ).toBe('');
+      expect(
+        document.getElementById(importsStylesheetId('example'))
+      ).toBeNull();
     });
 
     it('drops an @import fetch that resolves after a newer injection', async () => {
@@ -186,8 +244,10 @@ a { color: red; }`;
       await flush();
 
       const style = document.getElementById(stylesheetId('example'));
-      expect(style?.textContent).not.toContain('Stale');
       expect(style?.textContent).toContain('color: blue');
+      expect(
+        document.getElementById(importsStylesheetId('example'))
+      ).toBeNull();
     });
   });
 

@@ -5,6 +5,10 @@ const getStylesheetId = (id: string) => {
   return `stylebot-css-${id}`;
 };
 
+const getImportsStylesheetId = (id: string) => {
+  return `stylebot-css-imports-${id}`;
+};
+
 // document_start injection can land ahead of the page's own <head>; keep our
 // stylesheet last so an equally-`!important` page rule can't win the tie.
 const stylebotElements: Array<HTMLStyleElement> = [];
@@ -44,23 +48,60 @@ const keepStylebotStylesLast = (style: HTMLStyleElement): void => {
   );
 };
 
-const setStylesheetContent = (id: string, css: string): void => {
-  const stylesheetId = getStylesheetId(id);
-  const el = document.getElementById(stylesheetId);
-
-  if (el) {
-    el.innerHTML = css;
-    return;
-  }
-
+const appendStyle = (
+  stylesheetId: string,
+  before?: HTMLStyleElement
+): HTMLStyleElement => {
   const style = document.createElement('style');
 
   style.type = 'text/css';
   style.setAttribute('id', stylesheetId);
-  style.appendChild(document.createTextNode(css));
 
-  document.documentElement.appendChild(style);
-  keepStylebotStylesLast(style);
+  if (before) {
+    before.parentNode?.insertBefore(style, before);
+    stylebotElements.splice(stylebotElements.indexOf(before), 0, style);
+  } else {
+    document.documentElement.appendChild(style);
+    keepStylebotStylesLast(style);
+  }
+
+  return style;
+};
+
+// Rewriting a <style> recreates its @font-face rules unloaded, so text falls
+// back until the font reloads; unchanged content is never written.
+const setContent = (style: HTMLStyleElement, css: string): void => {
+  if (style.textContent !== css) {
+    style.textContent = css;
+  }
+};
+
+const setStylesheetContent = (id: string, css: string): void => {
+  const el = document.getElementById(getStylesheetId(id));
+
+  setContent(
+    el instanceof HTMLStyleElement ? el : appendStyle(getStylesheetId(id)),
+    css
+  );
+};
+
+/**
+ * Fetched `@import` content lives in its own stylesheet just ahead of the
+ * style's, so editing the style leaves the imported @font-face rules alone.
+ */
+const setImportsContent = (id: string, css: string): void => {
+  const el = document.getElementById(getImportsStylesheetId(id));
+
+  if (el instanceof HTMLStyleElement) {
+    setContent(el, css);
+    return;
+  }
+
+  const style = document.getElementById(getStylesheetId(id));
+
+  if (css && style instanceof HTMLStyleElement) {
+    setContent(appendStyle(getImportsStylesheetId(id), style), css);
+  }
 };
 
 // Bumped on every injection or removal per stylesheet, so an `@import` fetch
@@ -88,28 +129,30 @@ export const injectStylesheet = (
   setStylesheetContent(id, css);
 
   if (importUrls.length === 0) {
+    setImportsContent(id, '');
     return;
   }
 
   watchBlockedFonts();
 
   Promise.all(importUrls.map(fetchImportCss)).then(values => {
-    const merged = values.join('\n\n');
+    if (injectionVersions.get(id) === version) {
+      const merged = values.join('\n\n');
 
-    if (merged && injectionVersions.get(id) === version) {
-      setStylesheetContent(id, `${merged}\n\n${css}`);
+      setImportsContent(id, merged);
       loadCachedFonts(merged);
     }
   });
 };
 
 export const removeStylesheet = (id: string): void => {
-  const stylesheetId = getStylesheetId(id);
-  const el = document.getElementById(stylesheetId);
-
   bumpInjectionVersion(id);
 
-  if (el) {
-    el.innerHTML = '';
-  }
+  [getStylesheetId(id), getImportsStylesheetId(id)].forEach(stylesheetId => {
+    const el = document.getElementById(stylesheetId);
+
+    if (el) {
+      el.textContent = '';
+    }
+  });
 };

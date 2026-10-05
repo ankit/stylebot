@@ -3,6 +3,7 @@
     class="css-selector-dropdown-item"
     :class="{ current }"
     :selected="current"
+    :check="false"
     @click="click"
     @mouseenter.native="preview"
     @mouseleave.native="clearPreview"
@@ -10,20 +11,39 @@
     @blur.native="clearPreview"
   >
     <span class="item-row">
-      <s-inline-list mono :parts="parts" class="item-text" />
-      <arrow-up-right-icon
-        v-if="styled && !current"
-        :size="12"
-        class="item-icon"
-      />
+      <s-tooltip
+        :text="selector"
+        :disabled="!truncated"
+        grow
+        @mouseenter.native="measureTruncation"
+      >
+        <template #text>
+          <span class="selector-tooltip">{{ selector }}</span>
+        </template>
+        <s-inline-list mono :parts="parts" class="item-text" />
+      </s-tooltip>
+      <s-text
+        v-if="count"
+        as="span"
+        size="caption"
+        variant="muted"
+        class="item-count"
+        :aria-label="
+          t(count === 1 ? 'matches_count_one' : 'matches_count_other', [
+            String(count),
+          ])
+        "
+      >
+        {{ count }}
+      </s-text>
     </span>
   </s-menu-item>
 </template>
 
 <script lang="ts">
+import type { PropType } from 'vue';
 import Vue from 'vue';
-import { SInlineList, SMenuItem } from '@stylebot/components';
-import { ArrowUpRightIcon } from '@stylebot/icons';
+import { SInlineList, SMenuItem, SText, STooltip } from '@stylebot/components';
 import { splitSelectorList } from '@stylebot/css';
 
 import { getPageBridge } from '@stylebot/page-bridge';
@@ -32,9 +52,10 @@ export default Vue.extend({
   name: 'TheCssSelectorDropdownItem',
 
   components: {
-    SMenuItem,
-    ArrowUpRightIcon,
     SInlineList,
+    SMenuItem,
+    SText,
+    STooltip,
   },
 
   props: {
@@ -48,11 +69,15 @@ export default Vue.extend({
       default: false,
     },
 
-    // Whether the style already has a rule for the selector.
-    styled: {
-      type: Boolean,
-      default: false,
+    // How many of the page's elements the selector matches, once known.
+    count: {
+      type: Number as PropType<number | null>,
+      default: null,
     },
+  },
+
+  data(): { truncated: boolean } {
+    return { truncated: false };
   },
 
   computed: {
@@ -68,6 +93,16 @@ export default Vue.extend({
   },
 
   methods: {
+    /**
+     * Notes whether the selector is cut short, so its tooltip only shows
+     * when there's more to read.
+     */
+    measureTruncation(): void {
+      const text = this.$el.querySelector('.item-text');
+
+      this.truncated = !!text && text.scrollWidth > text.clientWidth;
+    },
+
     click(): void {
       this.$emit('select');
     },
@@ -104,19 +139,24 @@ export default Vue.extend({
 
 .item-row {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 8px;
   width: 100%;
 }
 
 .item-text {
-  flex: 1;
-  min-width: 0;
+  @include truncate;
+
+  display: block;
+  contain: inline-size;
 }
 
-.item-icon {
+.selector-tooltip {
+  font-family: var(--font-mono);
+}
+
+.item-count {
   flex: none;
-  margin-top: 3px;
-  color: var(--accent-text);
+  font-family: var(--font-mono);
 }
 </style>
