@@ -17,6 +17,10 @@ sequenceDiagram
     M-->>B: streamed text, then one apply_css call
     B-->>E: text, edits, usage, done
     E->>P: apply edits (saved, one undo step)
+    P-->>E: page check: unreadable text, missed surfaces, overridden or unmatched rules
+    opt something to fix
+        E->>B: the result, for one more apply_css call
+    end
 ```
 
 - **The editor builds the prompt**, since it has the page at hand.
@@ -24,6 +28,7 @@ sequenceDiagram
 - **The model answers in prose plus one tool call** under a strict schema: selectors, each with property and value pairs. Structured edits, not free CSS, are what make every reply exactly undoable.
 - **Edits apply like any other edit**: live, saved, one step on the undo trail. A Google Fonts import is added for any font family the model picks.
 - **Hashed classes are saved by their stable part**: a selector naming `.Header_nav__a1B2c` is saved as `[class*="Header_nav__"]`, the same check the picker uses, so the rule outlives the site's next build. The tool result reports the saved selector. Showing that form in the outline instead taught the model to invent loose `[class*=…]` fragments of its own.
+- **The page is checked after the edits apply.** If they made text hard to read, left large surfaces in the old colors after a theme, set declarations the page overrides, or used selectors that match nothing, the model is told what and which of its selectors caused it, and makes one more call to fix it within the same reply. A fix that makes text hard to read is taken back. The user sees one reply, and Undo takes back every call together.
 
 ## What the model sees
 

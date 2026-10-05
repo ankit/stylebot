@@ -182,6 +182,10 @@ export const createEditorWindowHandler = (
                 return bridge.countMatches(...message.args);
               case 'getStableSelectors':
                 return bridge.getStableSelectors(...message.args);
+              case 'startStyleCheck':
+                return bridge.startStyleCheck(...message.args);
+              case 'checkStyle':
+                return bridge.checkStyle();
               case 'getAppliedDeclarations':
                 return bridge.getAppliedDeclarations(...message.args);
               case 'getPageDeclarations':

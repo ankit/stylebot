@@ -25,6 +25,7 @@ const PAGES = path.join(HERE, 'pages');
 const REFERENCES = path.join(HERE, 'references');
 const VIEWPORT = { width: 1280, height: 900 };
 const MAX_SHOT_HEIGHT = 2000;
+// For checkouts from before the fix rounds' rule moved into the tool.
 const MAX_FIX_ROUNDS = 1;
 const BROAD_MATCHES = 300;
 const STYLE_ID = 'stylebot-eval-css';
@@ -450,13 +451,18 @@ const runCase = async ({ browser, testCase, variant, scorer, dir }) => {
 
       rounds.push(round);
 
-      if (!round.problems?.length || rounds.length > MAX_FIX_ROUNDS) {
+      const { needsFix, MAX_FIX_ROUNDS: maxFixRounds } = ref.node.tool;
+      const fix = needsFix ? needsFix(round) : Boolean(round.problems?.length);
+      if (!fix || rounds.length > (maxFixRounds ?? MAX_FIX_ROUNDS)) {
         break;
       }
     }
 
     const done = { ...assistant, ...combine(rounds) };
-    if (ref.node.tool.roundsOf && rounds.some(round => round.problems)) {
+    if (
+      ref.node.tool.roundsOf &&
+      (rounds.length > 1 || rounds.some(round => round.problems))
+    ) {
       done.rounds = rounds;
     }
     turns.push(done);

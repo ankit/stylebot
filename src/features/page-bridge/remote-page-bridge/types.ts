@@ -1,5 +1,9 @@
 import type { RoleColorGroups } from '@stylebot/css';
-import type { CssDeclaration } from '@stylebot/types';
+import type {
+  ChatCssEdit,
+  ChatStyleProblem,
+  CssDeclaration,
+} from '@stylebot/types';
 import type { AppliedDeclaration } from '../applied-declarations';
 import type { PageSnapshot, SelectorAlternatives } from '../PageBridge';
 
@@ -23,6 +27,8 @@ export type RemotePageBridgeRequestArgs = {
   getPageOutline: [];
   countMatches: [selectors: Array<string>];
   getStableSelectors: [selectors: Array<string>];
+  startStyleCheck: [edits: Array<ChatCssEdit>];
+  checkStyle: [];
   getAppliedDeclarations: [selector: string];
   getPageDeclarations: [selector: string];
   getSelectorAlternatives: [selector: string];
@@ -38,6 +44,8 @@ export type RemotePageBridgeRequestResult = {
   getPageOutline: string;
   countMatches: Array<number | null>;
   getStableSelectors: Array<string>;
+  startStyleCheck: void;
+  checkStyle: Array<ChatStyleProblem>;
   getAppliedDeclarations: Array<AppliedDeclaration>;
   getPageDeclarations: Array<CssDeclaration>;
   getSelectorAlternatives: SelectorAlternatives;

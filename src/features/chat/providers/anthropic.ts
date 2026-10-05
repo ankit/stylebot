@@ -17,6 +17,7 @@ import {
   TOOL_DESCRIPTION,
   TOOL_SCHEMA,
   toolResultFor,
+  roundsOf,
   parseEdits,
 } from '../apply-css-tool';
 import { userMessageText } from '../prompt';
@@ -79,16 +80,25 @@ const headers = (key: string): Record<string, string> => ({
   'anthropic-dangerous-direct-browser-access': 'true',
 });
 
-const toolUseId = (turnId: string): string => `toolu_${turnId}`;
+const toolUseId = (turnId: string, round: number): string =>
+  round ? `toolu_${turnId}_${round}` : `toolu_${turnId}`;
 
 /**
- * Replays the thread as Messages API turns. A reply that changed the page
- * becomes a tool call, answered in the next user turn with whether it's
- * still applied, so the model knows what the page looks like now.
+ * Replays the thread as Messages API turns. Each apply_css call a reply
+ * made becomes a tool call, answered in the next user turn with what it
+ * came to, so the model knows what the page looks like now. A thread that
+ * ends on a call is answered too, for the model to follow up on.
  */
 export const toAnthropicMessages = (turns: Array<ChatTurn>): Array<Message> => {
   const messages: Array<Message> = [];
   let pendingResult: ContentBlock | null = null;
+
+  const flushResult = () => {
+    if (pendingResult) {
+      messages.push({ role: 'user', content: [pendingResult] });
+      pendingResult = null;
+    }
+  };
 
   turns.forEach(turn => {
     if (turn.role === 'user') {
@@ -117,31 +127,38 @@ export const toAnthropicMessages = (turns: Array<ChatTurn>): Array<Message> => {
       return;
     }
 
-    const content: Array<ContentBlock> = [];
+    roundsOf(turn).forEach((round, index) => {
+      const content: Array<ContentBlock> = [];
 
-    if (turn.text) {
-      content.push({ type: 'text', text: turn.text });
-    }
+      if (round.text) {
+        content.push({ type: 'text', text: round.text });
+      }
 
-    if (turn.edits.length) {
-      content.push({
-        type: 'tool_use',
-        id: toolUseId(turn.id),
-        name: TOOL_NAME,
-        input: { edits: turn.edits },
-      });
-      pendingResult = {
-        type: 'tool_result',
-        tool_use_id: toolUseId(turn.id),
-        content: toolResultFor(turn),
-      };
-    }
+      if (round.edits.length) {
+        content.push({
+          type: 'tool_use',
+          id: toolUseId(turn.id, index),
+          name: TOOL_NAME,
+          input: { edits: round.edits },
+        });
+      }
 
-    if (content.length) {
-      messages.push({ role: 'assistant', content });
-    }
+      if (content.length) {
+        flushResult();
+        messages.push({ role: 'assistant', content });
+      }
+
+      if (round.edits.length) {
+        pendingResult = {
+          type: 'tool_result',
+          tool_use_id: toolUseId(turn.id, index),
+          content: toolResultFor(turn, round),
+        };
+      }
+    });
   });
 
+  flushResult();
   return messages;
 };
 

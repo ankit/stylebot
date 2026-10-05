@@ -1,4 +1,8 @@
-import type { ChatStreamEvent, ChatTurn } from '@stylebot/types';
+import type {
+  ChatAssistantTurn,
+  ChatStreamEvent,
+  ChatTurn,
+} from '@stylebot/types';
 
 import { anthropicProvider, toAnthropicMessages } from './providers/anthropic';
 import { getModel } from './providers';
@@ -240,6 +244,74 @@ describe('toAnthropicMessages', () => {
           },
           { type: 'text', text: 'Now blue' },
         ],
+      },
+    ]);
+  });
+});
+
+describe('toAnthropicMessages with a fix round', () => {
+  const problem = {
+    type: 'clashing' as const,
+    selector: '.card',
+    count: 1,
+    background: '#ffffff',
+    page: 'dark' as const,
+  };
+  const fix = [{ selector: '.card', declarations: [] }];
+  const turns: Array<ChatTurn> = [
+    { role: 'user', id: 'u1', text: 'Dark mode' },
+    {
+      role: 'assistant',
+      id: 'a1',
+      text: 'Made it dark.',
+      edits,
+      previous: [],
+      applied: true,
+      model: 'claude-sonnet-5',
+      rounds: [{ text: 'Made it dark.', edits, problems: [problem] }],
+    },
+  ];
+
+  it('answers a thread that ends on a call, with what the check found', () => {
+    const messages = toAnthropicMessages(turns);
+
+    expect(messages).toHaveLength(3);
+    expect(messages[2]).toEqual({
+      role: 'user',
+      content: [
+        {
+          type: 'tool_result',
+          tool_use_id: 'toolu_a1',
+          content: expect.stringContaining('Still light on a now dark page'),
+        },
+      ],
+    });
+  });
+
+  it('replays each round as its own call, answered before the next', () => {
+    const [, first, result, second] = toAnthropicMessages([
+      turns[0],
+      {
+        ...(turns[1] as ChatAssistantTurn),
+        rounds: [
+          { text: 'Made it dark.', edits, problems: [problem] },
+          { text: 'Fixed the card.', edits: fix, matches: [1] },
+        ],
+      },
+    ]);
+
+    expect(first.role).toBe('assistant');
+    expect(result.content[0]).toMatchObject({
+      type: 'tool_result',
+      tool_use_id: 'toolu_a1',
+    });
+    expect(second.content).toEqual([
+      { type: 'text', text: 'Fixed the card.' },
+      {
+        type: 'tool_use',
+        id: 'toolu_a1_1',
+        name: 'apply_css',
+        input: { edits: fix },
       },
     ]);
   });

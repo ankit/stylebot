@@ -16,7 +16,11 @@ import {
   isReaderable,
 } from '@stylebot/readability';
 
-import type { CssDeclaration } from '@stylebot/types';
+import type {
+  ChatCssEdit,
+  ChatStyleProblem,
+  CssDeclaration,
+} from '@stylebot/types';
 import { injectStylesheet, readCache, writeCache } from '@stylebot/stylesheets';
 
 import type {
@@ -28,10 +32,12 @@ import { PageBridgeEmitter } from './PageBridgeEmitter';
 import { getPageColors } from './page-colors';
 import { getComputedStyles } from './computed-styles';
 import {
+  checkStyle,
   countMatches,
   getPageCssContext,
   getPageOutline,
   getStableSelectors,
+  startStyleCheck,
 } from './chat';
 import { getAppliedDeclarations } from './applied-declarations';
 import type { AppliedDeclaration } from './applied-declarations';
@@ -238,6 +244,15 @@ export class LocalPageBridge extends PageBridgeEmitter implements PageBridge {
 
   getStableSelectors(selectors: Array<string>): Promise<Array<string>> {
     return Promise.resolve(getStableSelectors(selectors));
+  }
+
+  startStyleCheck(edits: Array<ChatCssEdit>): Promise<void> {
+    startStyleCheck(edits);
+    return Promise.resolve();
+  }
+
+  checkStyle(): Promise<Array<ChatStyleProblem>> {
+    return checkStyle();
   }
 
   getSelectorAlternatives(selector: string): Promise<SelectorAlternatives> {

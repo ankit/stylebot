@@ -6,6 +6,7 @@ import {
   getStreamRequest,
   getFailedMessage,
   getAssistantTurn,
+  getRoundsTurn,
   getStoppedTurn,
   getUserTurn,
 } from './chat-reply';
@@ -137,5 +138,79 @@ describe('getFailedMessage', () => {
   it('is null when the thread ends with a reply', () => {
     expect(getFailedMessage([user, reply])).toBeNull();
     expect(getFailedMessage([])).toBeNull();
+  });
+});
+
+describe('getRoundsTurn', () => {
+  const first = {
+    text: 'Made it dark.',
+    edits: [
+      {
+        selector: 'body',
+        declarations: [{ property: 'color', value: '#eee' }],
+      },
+    ],
+    previous: [{ selector: 'body', property: 'color', value: null }],
+    matches: [1],
+    usage: { inputTokens: 10, outputTokens: 5 },
+  };
+
+  it('is the plain turn for one call the check found nothing in', () => {
+    const turn = getRoundsTurn('a1', 'm', [first]);
+
+    expect(turn).not.toHaveProperty('rounds');
+    expect(turn.text).toBe('Made it dark.');
+  });
+
+  it('combines a fix into one turn that Undo takes back as a whole', () => {
+    const problem = {
+      type: 'clashing' as const,
+      selector: '.card',
+      count: 1,
+      background: '#ffffff',
+      page: 'dark' as const,
+    };
+    const fix = {
+      text: 'Darkened the cards.',
+      edits: [
+        {
+          selector: '.card',
+          declarations: [{ property: 'background', value: '#222' }],
+        },
+        {
+          selector: 'body',
+          declarations: [{ property: 'color', value: '#ddd' }],
+        },
+      ],
+      previous: [
+        { selector: '.card', property: 'background', value: null },
+        { selector: 'body', property: 'color', value: '#eee' },
+      ],
+      matches: [3, 1],
+      usage: { inputTokens: 20, outputTokens: 7 },
+    };
+
+    const turn = getRoundsTurn('a1', 'm', [
+      { ...first, problems: [problem] },
+      fix,
+    ]);
+
+    expect(turn.text).toBe('Made it dark.\n\nDarkened the cards.');
+    expect(turn.edits).toEqual([...first.edits, ...fix.edits]);
+    expect(turn.matches).toEqual([1, 3, 1]);
+    expect(turn.previous).toEqual([
+      { selector: 'body', property: 'color', value: null },
+      { selector: '.card', property: 'background', value: null },
+    ]);
+    expect(turn.usage).toEqual({
+      inputTokens: 30,
+      outputTokens: 12,
+      cacheReadTokens: 0,
+      cacheWriteTokens: 0,
+    });
+    expect(turn.rounds?.map(round => round.problems)).toEqual([
+      [problem],
+      undefined,
+    ]);
   });
 });

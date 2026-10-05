@@ -74,6 +74,10 @@ export default Vue.extend({
           this.t('choosing_a_nicer_shade'),
         ],
         applying: [this.t('applying_the_new_look'), this.t('tidying_up')],
+        fixing: [
+          this.t('checking_the_result'),
+          this.t('touching_up_what_missed'),
+        ],
       };
     },
 

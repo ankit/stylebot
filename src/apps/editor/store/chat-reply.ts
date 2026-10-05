@@ -4,6 +4,7 @@ import type {
   ChatCssEdit,
   ChatCssPreviousValue,
   ChatImage,
+  ChatReplyRound,
   ChatStreamRequest,
   ChatTurn,
   ChatUsage,
@@ -108,6 +109,96 @@ export const getAssistantTurn = (
   ...(matches ? { matches } : {}),
   ...(replay ? { replay } : {}),
 });
+
+/**
+ * One apply_css call as the reply gathered it: the round as the model
+ * reads it back, plus what its edits replaced and what it cost.
+ */
+export type ChatRoundResult = ChatReplyRound & {
+  previous: Array<ChatCssPreviousValue>;
+  usage?: ChatUsage;
+};
+
+export const addUsage = (
+  total: ChatUsage | undefined,
+  usage: ChatUsage | undefined
+): ChatUsage | undefined =>
+  total && usage
+    ? {
+        inputTokens: total.inputTokens + usage.inputTokens,
+        outputTokens: total.outputTokens + usage.outputTokens,
+        cacheReadTokens:
+          (total.cacheReadTokens ?? 0) + (usage.cacheReadTokens ?? 0),
+        cacheWriteTokens:
+          (total.cacheWriteTokens ?? 0) + (usage.cacheWriteTokens ?? 0),
+      }
+    : total ?? usage;
+
+/**
+ * A reply of one or more apply_css calls as a single turn, which Undo
+ * takes back as a whole: their text, edits and usage together, and what
+ * the edits replaced before the first call. The rounds are kept when the
+ * page check found anything, for the model to read back.
+ */
+export const getRoundsTurn = (
+  id: string,
+  model: string,
+  rounds: Array<ChatRoundResult>
+): ChatAssistantTurn => {
+  const [first, ...rest] = rounds;
+  const checked = rounds.some(round => round.problems?.length);
+
+  if (!rest.length && !checked) {
+    return getAssistantTurn({ id, model, ...first }, first.text);
+  }
+
+  const previous = [...first.previous];
+  rest.forEach(round =>
+    round.previous.forEach(value => {
+      if (
+        !previous.some(
+          ({ selector, property }) =>
+            selector === value.selector && property === value.property
+        )
+      ) {
+        previous.push(value);
+      }
+    })
+  );
+
+  const matches = rounds.every(round => round.matches)
+    ? rounds.flatMap(round => round.matches ?? [])
+    : undefined;
+
+  const turn = getAssistantTurn(
+    {
+      id,
+      model,
+      edits: rounds.flatMap(round => round.edits),
+      previous,
+      matches,
+      usage: rounds.reduce<ChatUsage | undefined>(
+        (total, round) => addUsage(total, round.usage),
+        undefined
+      ),
+    },
+    rounds
+      .map(round => round.text.trim())
+      .filter(Boolean)
+      .join('\n\n')
+  );
+
+  return {
+    ...turn,
+    rounds: rounds.map(({ text, edits, matches, problems, replay }) => ({
+      text: text.trim(),
+      edits,
+      ...(matches ? { matches } : {}),
+      ...(problems?.length ? { problems } : {}),
+      ...(replay ? { replay } : {}),
+    })),
+  };
+};
 
 /**
  * A reply the user stopped: the text that came in, with no edits.
