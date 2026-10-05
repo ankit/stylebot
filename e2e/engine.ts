@@ -67,6 +67,8 @@ export type Engine = {
   opensPdfs: boolean;
   // Whether the editor opens in the browser's side panel by default.
   hasSidePanel: boolean;
+  // Whether a page's CSP blocks fonts that extension-injected CSS loads.
+  blocksExtensionFonts: boolean;
   launch(userDataDir: string, options: LaunchOptions): Promise<BrowserContext>;
   loadExtension(context: BrowserContext, distPath: string): Promise<Extension>;
   // Opens the popup in the background so the page under test stays the "current tab".

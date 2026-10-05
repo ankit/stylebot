@@ -12,6 +12,7 @@ export class ChromiumEngine implements Engine {
   readonly opensExtensionPages = true;
   readonly opensPdfs = true;
   readonly hasSidePanel = true;
+  readonly blocksExtensionFonts = false;
 
   launch(userDataDir: string, options: LaunchOptions): Promise<BrowserContext> {
     // Chrome 137+ removed --load-extension; CDP's Extensions domain replaces it

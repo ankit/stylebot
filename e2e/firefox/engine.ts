@@ -27,6 +27,7 @@ export class FirefoxEngine implements Engine {
   readonly opensExtensionPages = false;
   readonly opensPdfs = false;
   readonly hasSidePanel = false;
+  readonly blocksExtensionFonts = true;
   // Chosen at launch, needed again at loadExtension time.
   private rdpPort = 0;
 

@@ -114,6 +114,27 @@ describe('import-cache', () => {
       ).toBeNull();
     });
 
+    it('removes cached font files only a removed import loaded', () => {
+      const kept = 'https://fonts.gstatic.com/s/kept/a.woff2';
+      const removed = 'https://fonts.gstatic.com/s/removed/b.woff2';
+
+      localStorage.setItem(
+        'stylebot-import-cache:https://example.com/still-used.css',
+        `@font-face{src:url(${kept})}`
+      );
+      localStorage.setItem(
+        'stylebot-import-cache:https://example.com/removed.css',
+        `@font-face{src:url(${removed})}`
+      );
+      localStorage.setItem(`stylebot-font-cache:${kept}`, 'a');
+      localStorage.setItem(`stylebot-font-cache:${removed}`, 'b');
+
+      pruneImportCache(new Set(['https://example.com/still-used.css']));
+
+      expect(localStorage.getItem(`stylebot-font-cache:${kept}`)).toBe('a');
+      expect(localStorage.getItem(`stylebot-font-cache:${removed}`)).toBeNull();
+    });
+
     it('leaves unrelated localStorage keys alone', () => {
       localStorage.setItem('some-other-key', 'value');
 

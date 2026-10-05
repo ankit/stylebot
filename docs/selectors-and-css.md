@@ -128,3 +128,9 @@ and the page registers the font from its bytes, which makes no request for
 the policy to block. Only files the page actually blocked are handled, so it
 still loads just the character subsets it renders, and pages without such a
 policy never take this path.
+
+That round trip lands after the first paint, so the page would show its
+fallback font and then swap on every load. The page keeps each blocked file's
+bytes alongside its cached CSS instead, and on later loads registers the font
+from them as the style is applied, before the browser first paints. A file no
+current `@import` loads is dropped from the cache.
