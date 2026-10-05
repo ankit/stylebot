@@ -13,8 +13,8 @@ describe('shortenSelector', () => {
   });
 
   it('drops whole compounds from the middle, keeping as many last ones as fit', () => {
-    expect(shown(long, 40)).toBe('#\\34 9953495 … span.titleline > a');
-    expect(shown(long, 20)).toBe('#\\34 9953495 … > a');
+    expect(shown(long, 40)).toBe('#\\34 9953495…span.titleline > a');
+    expect(shown(long, 20)).toBe('#\\34 9953495…> a');
   });
 
   it("doesn't cut a selector with nothing in its middle", () => {
@@ -37,7 +37,7 @@ describe('shortenSelector', () => {
       { text: 'h2' },
     ]);
     expect(shortenSelector(long, 20).pieces[1]).toEqual({
-      text: ' …',
+      text: '…',
       kind: 'ellipsis',
     });
   });

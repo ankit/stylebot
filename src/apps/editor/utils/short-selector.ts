@@ -11,7 +11,8 @@ export type ShortSelector = {
   more: number;
 };
 
-const ELLIPSIS = ' …';
+// The ellipsis chip takes about three characters' room with its margins.
+const ELLIPSIS_CHARS = 3;
 
 const length = (pieces: Array<SelectorPiece>) =>
   pieces.reduce((total, piece) => total + piece.text.length, 0);
@@ -20,31 +21,31 @@ const length = (pieces: Array<SelectorPiece>) =>
  * One selector cut to `maxChars` by dropping whole compounds from its
  * middle, keeping the first and as many of the last as fit.
  */
-const shortenOne = (
+const dropMiddleCompounds = (
   selector: string,
   maxChars: number
 ): Array<SelectorPiece> => {
   const compounds = splitCompounds(selector);
   const lastOf = (count: number) =>
-    compounds
-      .slice(-count)
-      .map(({ combinator, text }) => combinator + text)
-      .join('');
+    compounds.slice(-count).join('').trimStart();
 
   if (selector.length <= maxChars || compounds.length < 3) {
     return [{ text: selector }];
   }
 
-  const first = compounds[0].text;
+  const first = compounds[0];
   let keep = compounds.length - 2;
 
-  while (keep > 1 && (first + ELLIPSIS + lastOf(keep)).length > maxChars) {
+  while (
+    keep > 1 &&
+    first.length + ELLIPSIS_CHARS + lastOf(keep).length > maxChars
+  ) {
     keep--;
   }
 
   return [
     { text: first },
-    { text: ELLIPSIS, kind: 'ellipsis' },
+    { text: '…', kind: 'ellipsis' },
     { text: lastOf(keep) },
   ];
 };
@@ -71,12 +72,12 @@ export const shortenSelector = (
   }
 
   if (parts.length === 1) {
-    return { pieces: shortenOne(parts[0], maxChars), more: 0 };
+    return { pieces: dropMiddleCompounds(parts[0], maxChars), more: 0 };
   }
 
   const more = parts.length - 1;
   return {
-    pieces: shortenOne(parts[0], maxChars - ` +${more}`.length - 1),
+    pieces: dropMiddleCompounds(parts[0], maxChars - ` +${more}`.length - 1),
     more,
   };
 };

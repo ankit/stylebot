@@ -21,7 +21,7 @@
           <span class="selector-tooltip">{{ selector }}</span>
         </template>
         <span ref="text" class="item-text">
-          <span class="item-selector">
+          <span ref="selector" class="item-selector">
             <span
               v-for="(piece, i) in short.pieces"
               :key="i"
@@ -33,16 +33,20 @@
           <span v-if="short.more" class="item-more" v-text="`+${short.more}`" />
         </span>
       </s-tooltip>
-      <span
+      <s-text
         v-if="count"
+        as="span"
+        size="caption"
+        variant="muted"
         class="item-count"
         :aria-label="
           t(count === 1 ? 'matches_count_one' : 'matches_count_other', [
             String(count),
           ])
         "
-        v-text="count"
-      />
+      >
+        {{ count }}
+      </s-text>
     </span>
   </s-menu-item>
 </template>
@@ -50,7 +54,7 @@
 <script lang="ts">
 import type { PropType } from 'vue';
 import Vue from 'vue';
-import { SMenuItem, STooltip } from '@stylebot/components';
+import { SMenuItem, SText, STooltip } from '@stylebot/components';
 
 import { getPageBridge } from '@stylebot/page-bridge';
 import type { ShortSelector } from '../../utils/short-selector';
@@ -61,6 +65,7 @@ export default Vue.extend({
 
   components: {
     SMenuItem,
+    SText,
     STooltip,
   },
 
@@ -104,13 +109,12 @@ export default Vue.extend({
   },
 
   mounted() {
-    const text = this.$refs.text as HTMLElement;
+    const { text } = this.$refs;
 
-    this.measureWidth();
-    this.resizeObserver = new ResizeObserver(() => this.measureWidth());
-    this.resizeObserver.observe(text);
-    // Geist Mono can still be swapping in, changing every character's width.
-    document.fonts?.ready.then(() => this.measureWidth());
+    if (text instanceof HTMLElement) {
+      this.resizeObserver = new ResizeObserver(() => this.measureWidth());
+      this.resizeObserver.observe(text);
+    }
   },
 
   beforeDestroy() {
@@ -124,26 +128,22 @@ export default Vue.extend({
   methods: {
     /**
      * How many characters fit on the row. The selector is set in a
-     * monospace font, so that's its width over one character's.
+     * monospace font, so any of its characters gives the width of all.
      */
     measureWidth(): void {
-      const text = this.$refs.text as HTMLElement | undefined;
+      const { text, selector } = this.$refs;
 
-      if (!text) {
+      if (
+        !(text instanceof HTMLElement) ||
+        !(selector instanceof HTMLElement)
+      ) {
         return;
       }
 
-      const probe = document.createElement('span');
-      probe.style.cssText =
-        'position: absolute; visibility: hidden; font-family: inherit;';
-      probe.textContent = '0'.repeat(20);
-      text.appendChild(probe);
-      const charWidth = probe.getBoundingClientRect().width / 20;
-      probe.remove();
+      const charWidth =
+        selector.scrollWidth / (selector.textContent?.length || 1);
 
-      this.maxChars = charWidth
-        ? Math.floor(text.clientWidth / charWidth)
-        : Infinity;
+      this.maxChars = Math.floor(text.clientWidth / charWidth) || Infinity;
     },
 
     /**
@@ -151,11 +151,12 @@ export default Vue.extend({
      * when there's more to read.
      */
     measureTruncation(): void {
-      const selector = this.$el.querySelector('.item-selector');
+      const { selector } = this.$refs;
 
       this.truncated =
         this.trimmed ||
-        (!!selector && selector.scrollWidth > selector.clientWidth);
+        (selector instanceof HTMLElement &&
+          selector.scrollWidth > selector.clientWidth);
     },
 
     click(): void {
@@ -228,9 +229,18 @@ export default Vue.extend({
   font-family: inherit;
 }
 
-.separator,
-.ellipsis {
+.separator {
   color: var(--field-placeholder);
+}
+
+.ellipsis {
+  display: inline-block;
+  margin: 0 0.5ch;
+  padding: 0 3px;
+  border-radius: 4px;
+  line-height: 1.3;
+  color: var(--text-muted);
+  background: color-mix(in srgb, var(--text-primary) 8%, transparent);
 }
 
 .selector-tooltip {
@@ -239,8 +249,5 @@ export default Vue.extend({
 
 .item-count {
   flex: none;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--field-placeholder);
 }
 </style>
