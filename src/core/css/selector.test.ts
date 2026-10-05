@@ -15,6 +15,7 @@ import {
   getItemScopedSelector,
   dedupeByMatches,
   byReach,
+  getBodyChildSelectors,
 } from './selector';
 
 describe('selector', () => {
@@ -434,6 +435,30 @@ describe('selector', () => {
       const el = document.querySelector('[data-target]') as HTMLElement;
       expect(getSelector(el)).toBe('div.o1ls90');
       expect(getSelectorCandidates(el)).not.toContain('div.app div div');
+    });
+
+    it('falls back to this element alone rather than a sweeping tag chain', () => {
+      document.body.innerHTML = `
+        <div>
+          <div><div></div><div data-target></div></div>
+          ${'<div><div><div></div></div></div>'.repeat(20)}
+        </div>
+      `;
+
+      const el = document.querySelector('[data-target]') as HTMLElement;
+      const selector = getSelector(el);
+
+      expect(document.querySelectorAll(selector)).toHaveLength(1);
+      expect(el.matches(selector)).toBe(true);
+    });
+
+    it('keeps the tag chain for body children, which saved page effects look up', () => {
+      document.body.innerHTML = `
+        <div><div></div></div>
+        ${'<div><div><div></div></div></div>'.repeat(20)}
+      `;
+
+      expect(getBodyChildSelectors()[0]).toBe('html body div');
     });
 
     it('keeps an ancestor scope on a page too small to sweep', () => {

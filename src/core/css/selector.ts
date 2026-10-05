@@ -228,19 +228,29 @@ const unlessSweeping = (selector: string | null): string | null =>
   selector && !isSweeping(selector) ? selector : null;
 
 /**
- * #id ranks above a hashed class but below anything genuinely authored,
- * the element's own or an ancestor's. See docs/selectors-and-css.md.
+ * The strategies before the bare tag chain, in rank order. `guard` vets
+ * the ancestor scopes, which can sweep the whole page.
  */
-export const getSelector = (el: HTMLElement): string => {
-  return (
-    getGoodOwnSelector(el) ??
-    unlessSweeping(getAncestorBasedSelector(el)) ??
-    getIdBasedSelector(el) ??
-    getClassBasedSelector(el) ??
-    unlessSweeping(getAncestorHashedClassSelector(el)) ??
-    getTagNameBasedSelector(el)
-  );
-};
+const getRankedSelector = (
+  el: HTMLElement,
+  guard: (selector: string | null) => string | null
+): string | null =>
+  getGoodOwnSelector(el) ??
+  guard(getAncestorBasedSelector(el)) ??
+  getIdBasedSelector(el) ??
+  getClassBasedSelector(el) ??
+  guard(getAncestorHashedClassSelector(el));
+
+/**
+ * #id ranks above a hashed class but below anything genuinely authored,
+ * the element's own or an ancestor's. Rather than sweep the page, it falls
+ * back to this element alone. See docs/selectors-and-css.md.
+ */
+export const getSelector = (el: HTMLElement): string =>
+  getRankedSelector(el, unlessSweeping) ??
+  unlessSweeping(getTagNameBasedSelector(el)) ??
+  getUniqueSelector(el) ??
+  getTagNameBasedSelector(el);
 
 /**
  * Scopes `el` by each of its nearest ancestors (up to 4 levels) that has a
@@ -487,5 +497,10 @@ export const getBodyChildSelectors = (): Array<string> => {
     return true;
   });
 
-  return filteredNodes.map(node => getSelector(node));
+  // Unguarded, so saved page-wide effects keep finding their rules.
+  return filteredNodes.map(
+    node =>
+      getRankedSelector(node, selector => selector) ??
+      getTagNameBasedSelector(node)
+  );
 };

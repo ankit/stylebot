@@ -37,14 +37,20 @@ Each strategy is tried in turn; the first one that returns something wins.
    Still much more specific than a bare tag chain.
 8. **Nearest ancestor's class, hashed or not** — the same 2-level climb as
    step 5, but accepting a hashed class.
-9. **Bare tag chain** — `parent-parent parent tag`, up to 2 levels. The true
-   last resort.
+9. **Bare tag chain** — `parent-parent parent tag`, up to 2 levels.
+10. **Only this element** — when the tag chain would sweep the page, the
+    selector matching just this element (see below), so picking one element
+    never targets most of the page.
 
-An ancestor scope (steps 5 and 8) is skipped when it sweeps the page: when it
-ends in a bare tag and matches more than half of the page's elements of that
+An ancestor scope (steps 5, 8 and 9) is skipped when it sweeps the page: when
+it ends in a bare tag and matches more than half of the page's elements of that
 tag, like `div.app div div` under an app's root, it's effectively the bare tag.
 Pages with fewer than 20 of that tag are exempt. The same check keeps such
 selectors out of the list of other selectors below.
+
+Page-wide effects like grayscale attach to body's children with selectors from
+the same steps but without this check, since a saved effect is found again by
+its exact selector.
 
 ### What counts as a "hashed" class
 
