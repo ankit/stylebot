@@ -1,5 +1,12 @@
 import { splitCommaList } from '@stylebot/utils';
 
+import { getSubjectCompound } from './get-subject-compound';
+import {
+  getStableClassParts,
+  looksHashed,
+  looksHashedByShape,
+} from './hashed-class';
+
 /**
  * An id or class name escaped for use in a selector, so a Tailwind class
  * like `lg:-mt-16` becomes `lg\:-mt-16`.
@@ -55,41 +62,13 @@ export const getNameBasedSelector = (el: HTMLElement): string | null => {
   return null;
 };
 
-/**
- * Flags build-tool-generated class names (CSS Modules, styled-components,
- * Closure Compiler) by shape, since they carry no stable meaning.
- */
-function looksHashed(className: string): boolean {
-  if (/^(css|sc|jsx|emotion|styled|chakra)-/i.test(className)) {
-    return true;
+const countMatches = (selector: string): number => {
+  try {
+    return document.querySelectorAll(selector).length;
+  } catch {
+    return 0;
   }
-
-  // An intentional separator means an authored name, whatever its shape.
-  if (/[-_]/.test(className)) {
-    return false;
-  }
-
-  // A hex-like hash, e.g. CSS Modules' "_1a2b3c".
-  if (/^_?[0-9a-f]{5,}$/i.test(className)) {
-    return true;
-  }
-
-  if (className.length < 4 || className.length > 12) {
-    return false;
-  }
-
-  // camelCase words have 1-2 case transitions; hashes have far more.
-  let transitions = 0;
-  for (let i = 1; i < className.length; i++) {
-    const prevUpper = className[i - 1] !== className[i - 1].toLowerCase();
-    const curUpper = className[i] !== className[i].toLowerCase();
-    if (prevUpper !== curUpper) {
-      transitions++;
-    }
-  }
-
-  return transitions / className.length > 0.3;
-}
+};
 
 const getClassNames = (el: HTMLElement): Array<string> =>
   (el.getAttribute('class') ?? '').split(/\s+/).filter(Boolean);
@@ -117,6 +96,33 @@ export const getNonHashedClassBasedSelector = (
  */
 export const getClassBasedSelector = (el: HTMLElement): string | null =>
   classSelector(el, getClassNames(el)[0]);
+
+/**
+ * Matches a partly hashed class by its authored parts alone, e.g.
+ * `nav[class*="Header_nav__"]`, so it survives the site's next build. Kept
+ * only while it matches no more of the page than the full class does.
+ */
+export const getStableClassPartsSelector = (el: HTMLElement): string | null => {
+  const tag = el.tagName.toLowerCase();
+
+  for (const className of getClassNames(el)) {
+    const parts = getStableClassParts(className);
+    if (!parts) {
+      continue;
+    }
+
+    const selector = `${tag}${parts
+      .map(part => `[class*="${escapeAttributeValue(part)}"]`)
+      .join('')}`;
+    const fullClass = `${tag}.${escapeSelectorToken(className)}`;
+
+    if (countMatches(selector) === countMatches(fullClass)) {
+      return selector;
+    }
+  }
+
+  return null;
+};
 
 export const getIdBasedSelector = (el: HTMLElement): string | null => {
   const id = el.getAttribute('id');
@@ -148,14 +154,15 @@ export const getTagNameBasedSelector = (
 };
 
 /**
- * Excludes #id and hashed classes on purpose, so a real ancestor match
+ * Excludes #id and fully hashed classes on purpose, so a real ancestor match
  * (see getAncestorBasedSelector) still outranks them.
  */
 function getGoodOwnSelector(el: HTMLElement): string | null {
   return (
     getNonHashedClassBasedSelector(el) ??
     getTestIdBasedSelector(el) ??
-    getNameBasedSelector(el)
+    getNameBasedSelector(el) ??
+    getStableClassPartsSelector(el)
   );
 }
 
@@ -203,27 +210,68 @@ function getAncestorHashedClassSelector(el: HTMLElement): string | null {
   return climbToNearestUsableAncestor(el, getClassBasedSelector);
 }
 
+// Generic containers, whose "most of them" means most of the page; matching
+// most of a page's links or dates is a real choice.
+const CONTAINER_TAGS = new Set(['div', 'span']);
+
+// Below this many matches, a selector is still a choice, not the whole page.
+const MIN_SWEEP = 50;
+
+/**
+ * Whether a scoped selector ending in a bare container, like
+ * `div.app div div`, matches most of the page's elements of that tag, so
+ * it's effectively the bare tag and would restyle nearly the whole page.
+ */
+const isSweeping = (selector: string): boolean => {
+  const subject = getSubjectCompound(selector);
+  if (subject === selector || !CONTAINER_TAGS.has(subject.toLowerCase())) {
+    return false;
+  }
+
+  const matches = countMatches(selector);
+  return matches >= MIN_SWEEP && matches > countMatches(subject) / 2;
+};
+
+const unlessSweeping = (selector: string | null): string | null =>
+  selector && !isSweeping(selector) ? selector : null;
+
 /**
  * #id ranks above a hashed class but below anything genuinely authored,
- * the element's own or an ancestor's. See docs/selectors-and-css.md.
+ * the element's own or an ancestor's. Rather than sweep the page, it falls
+ * back to this element alone. See docs/selectors-and-css.md.
  */
-export const getSelector = (el: HTMLElement): string => {
+export const getSelector = (el: HTMLElement): string =>
+  getGoodOwnSelector(el) ??
+  unlessSweeping(getAncestorBasedSelector(el)) ??
+  getIdBasedSelector(el) ??
+  getClassBasedSelector(el) ??
+  unlessSweeping(getAncestorHashedClassSelector(el)) ??
+  unlessSweeping(getTagNameBasedSelector(el)) ??
+  getUniqueSelector(el) ??
+  getTagNameBasedSelector(el);
+
+/**
+ * The selector a body child got before partly hashed classes, newer hash
+ * shapes and the sweeping check, since page-wide effects saved against it
+ * are found again by its exact text.
+ */
+const getLegacyBodyChildSelector = (el: HTMLElement): string => {
+  const getOwnName = (node: HTMLElement) =>
+    classSelector(
+      node,
+      getClassNames(node).find(name => !looksHashedByShape(name))
+    ) ??
+    getTestIdBasedSelector(node) ??
+    getNameBasedSelector(node);
+
   return (
-    getGoodOwnSelector(el) ??
-    getAncestorBasedSelector(el) ??
+    getOwnName(el) ??
+    climbToNearestUsableAncestor(el, getOwnName) ??
     getIdBasedSelector(el) ??
     getClassBasedSelector(el) ??
     getAncestorHashedClassSelector(el) ??
     getTagNameBasedSelector(el)
   );
-};
-
-const countMatches = (selector: string): number => {
-  try {
-    return document.querySelectorAll(selector).length;
-  } catch {
-    return 0;
-  }
 };
 
 /**
@@ -387,13 +435,14 @@ export const getItemScopedSelector = (el: HTMLElement): string | null => {
  * Every selector the strategies above offer for `el` that actually matches
  * it, most readable first: its own names, then ancestor scopes, then
  * hashed classes and bare tags, then ones scoped to this element's item
- * and to this element alone.
+ * and to this element alone. Ones sweeping most of the page are left out.
  */
 export const getSelectorCandidates = (el: HTMLElement): Array<string> =>
   [
     getNonHashedClassBasedSelector(el),
     getTestIdBasedSelector(el),
     getNameBasedSelector(el),
+    getStableClassPartsSelector(el),
     getAncestorBasedSelector(el),
     ...getAncestorScopedSelectors(el),
     getIdBasedSelector(el),
@@ -405,7 +454,11 @@ export const getSelectorCandidates = (el: HTMLElement): Array<string> =>
     getUniqueSelector(el),
   ].filter((selector): selector is string => {
     try {
-      return Boolean(selector) && el.matches(selector as string);
+      return (
+        Boolean(selector) &&
+        el.matches(selector as string) &&
+        !isSweeping(selector as string)
+      );
     } catch {
       return false;
     }
@@ -466,5 +519,5 @@ export const getBodyChildSelectors = (): Array<string> => {
     return true;
   });
 
-  return filteredNodes.map(node => getSelector(node));
+  return filteredNodes.map(getLegacyBodyChildSelector);
 };

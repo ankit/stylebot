@@ -4,6 +4,7 @@ import {
   getTestIdBasedSelector,
   getNameBasedSelector,
   getNonHashedClassBasedSelector,
+  getStableClassPartsSelector,
   getClassBasedSelector,
   getIdBasedSelector,
   getTagNameBasedSelector,
@@ -14,6 +15,7 @@ import {
   getItemScopedSelector,
   dedupeByMatches,
   byReach,
+  getBodyChildSelectors,
 } from './selector';
 
 describe('selector', () => {
@@ -172,6 +174,56 @@ describe('selector', () => {
       el.setAttribute('class', 'primaryButton');
 
       expect(getNonHashedClassBasedSelector(el)).toBe('button.primaryButton');
+    });
+  });
+
+  describe('getStableClassPartsSelector', () => {
+    it('matches a partly hashed class by its authored parts', () => {
+      const el = document.createElement('nav');
+      el.setAttribute('class', 'page-module__E0kJGG__main');
+
+      expect(getStableClassPartsSelector(el)).toBe(
+        'nav[class*="page-module__"][class*="__main"]'
+      );
+    });
+
+    it('prefers an authored class over a partly hashed one', () => {
+      const el = document.createElement('div');
+      el.setAttribute('class', 'Card_body__a1B2c card-body');
+
+      expect(getNonHashedClassBasedSelector(el)).toBe('div.card-body');
+    });
+
+    it('skips the stable parts when they match more than the full class', () => {
+      document.body.innerHTML = `
+        <div class="Header_nav__a1B2c" id="target"></div>
+        <div class="SubHeader_nav__z9Y8x"></div>
+      `;
+
+      const el = document.getElementById('target') as HTMLElement;
+      expect(getStableClassPartsSelector(el)).toBeNull();
+    });
+
+    it("scopes by an ancestor's partly hashed class", () => {
+      document.body.innerHTML = `
+        <section class="Card_body__a1B2c">
+          <p id="target"></p>
+        </section>
+      `;
+
+      const el = document.getElementById('target') as HTMLElement;
+      expect(getSelector(el)).toBe('section[class*="Card_body__"] p');
+    });
+
+    it('ranks below a test id and above an #id', () => {
+      const el = document.createElement('div');
+      el.setAttribute('class', 'Card_body__a1B2c');
+      el.setAttribute('id', 'card');
+
+      expect(getSelector(el)).toBe('div[class*="Card_body__"]');
+
+      el.setAttribute('data-testid', 'card');
+      expect(getSelector(el)).toBe('div[data-testid="card"]');
     });
   });
 
@@ -370,6 +422,71 @@ describe('selector', () => {
       el.setAttribute('data-testid', 'email-field');
 
       expect(getSelector(el)).toBe('input[data-testid="email-field"]');
+    });
+
+    it('skips an ancestor scope that sweeps most of the page', () => {
+      document.body.innerHTML = `
+        <div class="app">
+          <div><div class="WwrzSb" data-target></div></div>
+          ${'<div><div><div></div></div></div>'.repeat(30)}
+        </div>
+      `;
+
+      const el = document.querySelector('[data-target]') as HTMLElement;
+      expect(getSelector(el)).toBe('div.WwrzSb');
+      expect(getSelectorCandidates(el)).not.toContain('div.app div div');
+    });
+
+    it('falls back to this element alone rather than a sweeping tag chain', () => {
+      document.body.innerHTML = `
+        <div>
+          <div><div></div><div data-target></div></div>
+          ${'<div><div><div></div></div></div>'.repeat(30)}
+        </div>
+      `;
+
+      const el = document.querySelector('[data-target]') as HTMLElement;
+      const selector = getSelector(el);
+
+      expect(document.querySelectorAll(selector)).toHaveLength(1);
+      expect(el.matches(selector)).toBe(true);
+    });
+
+    it('keeps body-child selectors as they were before partly hashed classes', () => {
+      document.body.innerHTML = '<div class="Layout_root__a1B2c"></div>';
+
+      expect(getBodyChildSelectors()).toEqual(['div.Layout_root__a1B2c']);
+    });
+
+    it('keeps the tag chain for body children, which saved page effects look up', () => {
+      document.body.innerHTML = `
+        <div><div></div></div>
+        ${'<div><div><div></div></div></div>'.repeat(30)}
+      `;
+
+      expect(getBodyChildSelectors()[0]).toBe('html body div');
+    });
+
+    it('keeps a scope that matches most of a specific tag, like every date', () => {
+      document.body.innerHTML = `
+        ${'<div class="commit-age"><relative-time></relative-time></div>'.repeat(
+          60
+        )}
+      `;
+
+      const el = document.querySelector('relative-time') as HTMLElement;
+      expect(getSelector(el)).toBe('div.commit-age relative-time');
+    });
+
+    it('keeps an ancestor scope on a page too small to sweep', () => {
+      document.body.innerHTML = `
+        <div class="app">
+          <div><div class="WwrzSb" data-target></div></div>
+        </div>
+      `;
+
+      const el = document.querySelector('[data-target]') as HTMLElement;
+      expect(getSelector(el)).toBe('div.app div div');
     });
 
     it("prefers an ancestor's class over its own id", () => {
