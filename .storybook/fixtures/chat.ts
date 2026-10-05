@@ -43,7 +43,7 @@ export const REPLY: ChatAssistantTurn = {
     { selector: '.article-body', property: 'line-height', value: null },
   ],
   applied: true,
-  model: 'claude-sonnet-5',
+  model: 'claude-sonnet-5-5',
   usage: {
     inputTokens: 3180,
     outputTokens: 214,

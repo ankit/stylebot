@@ -17,7 +17,7 @@ const run = async (response: Response, turns: Array<ChatTurn> = []) => {
 
   await anthropicProvider.stream({
     key: 'sk-ant-test',
-    model: getModel('anthropic', 'claude-sonnet-5'),
+    model: getModel('anthropic', 'claude-sonnet-5-5'),
     system: 'system prompt',
     turns,
     signal: new AbortController().signal,
@@ -119,7 +119,7 @@ describe('anthropicProvider.stream', () => {
     expect(init.headers['anthropic-dangerous-direct-browser-access']).toBe(
       'true'
     );
-    expect(body.model).toBe('claude-sonnet-5');
+    expect(body.model).toBe('claude-sonnet-5-5');
     expect(body.stream).toBe(true);
     expect(body.system).toBe('system prompt');
     expect(body.tools[0].name).toBe('apply_css');
@@ -151,7 +151,7 @@ describe('anthropicProvider.stream', () => {
 
     await anthropicProvider.stream({
       key: 'sk-ant-test',
-      model: getModel('anthropic', 'claude-sonnet-5'),
+      model: getModel('anthropic', 'claude-sonnet-5-5'),
       system: '',
       turns: [],
       signal: new AbortController().signal,
@@ -211,7 +211,7 @@ describe('toAnthropicMessages', () => {
         edits,
         previous: [],
         applied: false,
-        model: 'claude-sonnet-5',
+        model: 'claude-sonnet-5-5',
       },
       { role: 'user', id: 'u2', text: 'Now blue' },
     ];

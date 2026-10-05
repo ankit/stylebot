@@ -158,7 +158,7 @@ export const ModelMenuOtherProvider: StoryObj = {
     );
     const menu = await findOpenMenu(canvas);
     await user.click(within(menu).getByText('OpenAI'));
-    await within(menu).findByText('GPT-5.6 Luna');
+    await within(menu).findByText('GPT-6 Luna');
   },
 };
 
