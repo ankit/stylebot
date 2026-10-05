@@ -176,6 +176,22 @@ describe('getPageOutline', () => {
     expect(document.querySelector(line.split(' ')[0])).not.toBeNull();
   });
 
+  it('shows a partly hashed class by its stable part', () => {
+    document.body.innerHTML = '<nav class="Header_nav__a1B2c primary">x</nav>';
+
+    const line = getPageOutline();
+
+    expect(line).toBe('nav[class*="Header_nav__"].primary "x"');
+    expect(document.querySelector(line.split(' ')[0])).not.toBeNull();
+  });
+
+  it('keeps the full class when its stable part would match more', () => {
+    document.body.innerHTML =
+      '<nav class="Header_nav__a1B2c">x</nav><nav class="SubHeader_nav__z9Y8x">y</nav>';
+
+    expect(getPageOutline().split('\n')[0]).toBe('nav.Header_nav__a1B2c "x"');
+  });
+
   it('cuts long text', () => {
     document.body.innerHTML = `<p>${'a'.repeat(60)}</p>`;
 

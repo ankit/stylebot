@@ -13,6 +13,7 @@ Reading the page outline:
 
 Writing selectors:
 - Use selectors that match elements in the page outline below. Prefer stable ids and classes; avoid generated-looking class names (long random strings) and :nth-child chains.
+- A class that joins a name with a build hash, like \`Header_nav__a1B2c\`, changes on the site's next build. The outline shows it by its stable part, \`[class*="Header_nav__"]\`: copy that as written, and match such classes from the page CSS the same way.
 - Keep selectors as short as they can be while still matching the right elements.
 - Never style bare element selectors that sweep the whole page, like \`div\`, \`span\`, \`section\`, \`article\`, \`p\` or \`*\`: setting a background on \`div\` paints over every card and panel at once. Name the specific elements instead.
 - Edits add to Stylebot's stylesheet for this site; to take back an earlier change, set that property's value to an empty string.
