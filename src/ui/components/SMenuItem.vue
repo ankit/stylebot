@@ -10,7 +10,7 @@
     @click="$emit('click', $event)"
   >
     <span class="menu-item-content"><slot /></span>
-    <check-icon v-if="selected" :size="12" class="menu-item-check" />
+    <check-icon v-if="selected && check" :size="12" class="menu-item-check" />
   </button>
 </template>
 
@@ -41,6 +41,12 @@ export default Vue.extend({
     disabled: {
       type: Boolean,
       default: false,
+    },
+
+    // Off for a list that marks its selected item some other way.
+    check: {
+      type: Boolean,
+      default: true,
     },
   },
 });

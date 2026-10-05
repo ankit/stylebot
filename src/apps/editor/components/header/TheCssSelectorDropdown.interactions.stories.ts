@@ -104,8 +104,8 @@ export const ArrowKeysBetweenFieldAndList: StoryObj = {
     await expect(input(canvasElement)).toHaveValue('h1');
     await expect(items(canvasElement)).toHaveLength(2);
 
-    // The active selector's row is checked, and Down moves on from it.
-    await expect(items(canvasElement)[0]).toHaveClass('selected');
+    // The active selector's row is highlighted, and Down moves on from it.
+    await expect(items(canvasElement)[0]).toHaveClass('current');
     await pressKey('ArrowDown');
     await waitFor(() => expect(items(canvasElement)[1]).toHaveFocus());
 
@@ -172,7 +172,9 @@ export const SelectorListAsText: StoryObj = {
     await findOpenMenu(canvas);
     await waitFor(() => expect(items(canvasElement)).toHaveLength(2));
     await expectInOrder(items(canvasElement)[0] as HTMLElement);
-    await expect(items(canvasElement)[1]).toHaveTextContent(/^\s*p\s*$/);
+    await expect(
+      items(canvasElement)[1].querySelector('.item-text')
+    ).toHaveTextContent(/^\s*p\s*$/);
   },
 };
 
@@ -209,7 +211,8 @@ const rowTexts = (root: HTMLElement) =>
     item.querySelector('.item-text')?.textContent?.trim()
   );
 
-const linked = (item: HTMLElement) => item.querySelector('.item-icon') !== null;
+const count = (item: HTMLElement) =>
+  item.querySelector('.item-count')?.textContent?.trim();
 
 export const SectionsForTheElementAndPage: StoryObj = {
   ...editor(WITH_ALTERNATIVES),
@@ -236,16 +239,20 @@ export const SectionsForTheElementAndPage: StoryObj = {
       '.article-body',
     ]);
 
-    // The active selector leads, checked rather than linked.
+    // The active selector leads, highlighted rather than checked.
     const current = row(canvasElement, 'h1');
-    await expect(current).toHaveClass('selected');
-    await expect(current.querySelector('.menu-item-check')).not.toBeNull();
-    await expect(linked(current)).toBe(false);
+    await expect(current).toHaveClass('current');
+    await expect(current.querySelector('.menu-item-check')).toBeNull();
 
-    // Selectors the style already has link to their rules.
-    await expect(linked(row(canvasElement, '*'))).toBe(true);
-    await expect(linked(row(canvasElement, '.sb-page h1'))).toBe(false);
-    await expect(linked(row(canvasElement, '.article-body'))).toBe(true);
+    // Each row counts the elements it matches on the page.
+    await waitFor(() =>
+      expect(count(row(canvasElement, 'h1'))).toBe(
+        String(document.querySelectorAll('h1').length)
+      )
+    );
+    await expect(count(row(canvasElement, '.article-body'))).toBe(
+      String(document.querySelectorAll('.article-body').length)
+    );
   },
 };
 
@@ -266,7 +273,7 @@ export const PickAnAlternative: StoryObj = {
     await user.click(chips(canvasElement));
     await findOpenMenu(canvas);
     await expect(rowTexts(canvasElement).slice(0, 2)).toEqual(['div h1', 'h1']);
-    await expect(row(canvasElement, 'div h1')).toHaveClass('selected');
+    await expect(row(canvasElement, 'div h1')).toHaveClass('current');
     await pressKey('Escape');
 
     // Choosing something unrelated leaves only the page's rules.

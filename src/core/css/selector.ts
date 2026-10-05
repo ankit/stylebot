@@ -321,9 +321,73 @@ export const dedupeByMatches = (selectors: Array<string>): Array<string> => {
 };
 
 /**
+ * `el`'s own name (or tag), with :nth-of-type when a sibling of the same
+ * tag would match it too, e.g. `tr.athing:nth-of-type(3)`.
+ */
+const getPositionedStep = (el: HTMLElement): string => {
+  const own = getGoodOwnSelector(el) ?? el.tagName.toLowerCase();
+  const siblings = Array.from(el.parentElement?.children ?? []).filter(
+    sibling => sibling.tagName === el.tagName
+  );
+  const clashes = siblings.some(
+    sibling => sibling !== el && sibling.matches(own)
+  );
+
+  return clashes ? `${own}:nth-of-type(${siblings.indexOf(el) + 1})` : own;
+};
+
+/**
+ * A selector matching `el` and nothing else: its positioned step, prefixed
+ * by each ancestor's in turn until only `el` matches, stopping at the
+ * first ancestor with a unique #id.
+ */
+export const getUniqueSelector = (el: HTMLElement): string | null => {
+  let selector = '';
+
+  for (let node: HTMLElement | null = el; node; node = node.parentElement) {
+    const id = getIdBasedSelector(node);
+    const step = id && countMatches(id) === 1 ? id : getPositionedStep(node);
+
+    selector = selector ? `${step} ${selector}` : step;
+
+    if (countMatches(selector) === 1) {
+      return selector;
+    }
+  }
+
+  return null;
+};
+
+/**
+ * Elements like `el` within the nearest repeated ancestor it sits in (a
+ * row, list item or card), e.g. every link in this one row: a step between
+ * just this element and all of its kind.
+ */
+export const getItemScopedSelector = (el: HTMLElement): string | null => {
+  const subject = getGoodOwnSelector(el) ?? el.tagName.toLowerCase();
+  let ancestor = el.parentElement;
+
+  for (let level = 0; ancestor && level < 6; level++) {
+    if (ancestor === document.body || ancestor === document.documentElement) {
+      return null;
+    }
+
+    if (getPositionedStep(ancestor).includes(':nth-of-type(')) {
+      const item = getUniqueSelector(ancestor);
+      return item ? `${item} ${subject}` : null;
+    }
+
+    ancestor = ancestor.parentElement;
+  }
+
+  return null;
+};
+
+/**
  * Every selector the strategies above offer for `el` that actually matches
  * it, most readable first: its own names, then ancestor scopes, then
- * hashed classes and bare tags.
+ * hashed classes and bare tags, then ones scoped to this element's item
+ * and to this element alone.
  */
 export const getSelectorCandidates = (el: HTMLElement): Array<string> =>
   [
@@ -337,6 +401,8 @@ export const getSelectorCandidates = (el: HTMLElement): Array<string> =>
     getAncestorHashedClassSelector(el),
     getMeaningfulTagSelector(el),
     getTagNameBasedSelector(el),
+    getItemScopedSelector(el),
+    getUniqueSelector(el),
   ].filter((selector): selector is string => {
     try {
       return Boolean(selector) && el.matches(selector as string);
@@ -346,12 +412,12 @@ export const getSelectorCandidates = (el: HTMLElement): Array<string> =>
   });
 
 /**
- * Sorts selectors broadest first, by how many elements each matches.
+ * Sorts selectors narrowest first, by how many elements each matches.
  */
 export const byReach = (selectors: Array<string>): Array<string> =>
   selectors
     .map(selector => ({ selector, count: countMatches(selector) }))
-    .sort((a, b) => b.count - a.count)
+    .sort((a, b) => a.count - b.count)
     .map(({ selector }) => selector);
 
 /**
