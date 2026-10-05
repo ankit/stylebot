@@ -247,11 +247,15 @@ export default Vue.extend({
           style.overflowX !== 'visible' ||
           style.overflowY !== 'visible'
         ) {
+          // Clipping happens at the padding box, inside borders and any
+          // scrollbar gutters, which client* already account for.
           const nodeRect = node.getBoundingClientRect();
-          rect.top = Math.max(rect.top, nodeRect.top);
-          rect.right = Math.min(rect.right, nodeRect.right);
-          rect.bottom = Math.min(rect.bottom, nodeRect.bottom);
-          rect.left = Math.max(rect.left, nodeRect.left);
+          const top = nodeRect.top + node.clientTop;
+          const left = nodeRect.left + node.clientLeft;
+          rect.top = Math.max(rect.top, top);
+          rect.right = Math.min(rect.right, left + node.clientWidth);
+          rect.bottom = Math.min(rect.bottom, top + node.clientHeight);
+          rect.left = Math.max(rect.left, left);
         }
 
         node = node.parentElement;
@@ -320,6 +324,7 @@ export default Vue.extend({
 }
 
 .s-tooltip-bubble {
+  box-sizing: border-box;
   position: absolute;
   bottom: calc(100% + 6px);
   left: 50%;
