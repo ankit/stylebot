@@ -90,6 +90,19 @@ export const SwitchProfile: StoryObj = {
   },
 };
 
+export const OpeningStopsInspecting: StoryObj = {
+  ...editor({ ...WITH_PROFILES, inspecting: true }),
+  name: 'opening the menu stops inspecting, so Enter in a name field saves it instead of picking an element',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+
+    await expect(store.state.inspecting).toBe(true);
+    await openSwitcher(canvas);
+    await expect(store.state.inspecting).toBe(false);
+  },
+};
+
 export const MenuFitsLongSiteName: StoryObj = {
   ...editor({
     ...WITH_PROFILES,
@@ -245,7 +258,7 @@ export const DuplicateProfile: StoryObj = {
 
 export const RenameProfile: StoryObj = {
   ...editor(WITH_PROFILES),
-  name: 'Rename on a row edits that name in place, and Enter saves it',
+  name: 'Rename on a row edits that name in place, and Enter saves it and shows the new name right away',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const sendMessage = sentMessages();
@@ -269,6 +282,9 @@ export const RenameProfile: StoryObj = {
       })
     );
     await expect(menu).toBeVisible();
+    await expect(
+      within(menu).getByRole('menuitem', { name: 'Night' })
+    ).toBeVisible();
   },
 };
 

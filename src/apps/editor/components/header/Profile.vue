@@ -109,8 +109,7 @@ export default Vue.extend({
 
   &:hover,
   &:has(.row-name:focus-visible, .row-more:focus-visible),
-  &.menu-open,
-  &.active {
+  &.menu-open {
     background: var(--field-surface-hover);
   }
 

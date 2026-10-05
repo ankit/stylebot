@@ -1,6 +1,6 @@
 <template>
   <s-icon-button
-    :size="20"
+    :size="24"
     :tooltip="t('close')"
     :tooltip-shortcut="shortcut"
     @click="onClick"

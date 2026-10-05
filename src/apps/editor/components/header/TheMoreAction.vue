@@ -1,8 +1,8 @@
 <template>
   <s-anchored-menu class="more-action-anchor">
     <template #trigger="{ toggle }">
-      <s-icon-button :size="20" :tooltip="t('view_options')" @click="toggle">
-        <more-icon :size="20" />
+      <s-icon-button :size="24" :tooltip="t('view_options')" @click="toggle">
+        <more-icon :size="16" />
       </s-icon-button>
     </template>
 

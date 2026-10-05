@@ -405,10 +405,20 @@ export default {
     await createProfile(state.url, name, sourceProfileId);
   },
 
+  /**
+   * Renames a profile, showing the new name before the background confirms
+   * it so the row doesn't flash back to the old one.
+   */
   renameProfile(
-    { state }: { state: State },
+    { state, commit }: { state: State; commit: Commit },
     { id, name }: { id: string; name: string }
   ): void {
+    commit(
+      'setProfiles',
+      state.profiles.map(profile =>
+        profile.id === id ? { ...profile, name } : profile
+      )
+    );
     renameProfile(state.url, id, name);
   },
 

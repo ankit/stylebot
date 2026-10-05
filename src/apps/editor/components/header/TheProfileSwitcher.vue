@@ -17,7 +17,10 @@
           :class="{ open }"
           :aria-label="t('switch_profile')"
           :aria-expanded="open ? 'true' : 'false'"
-          @click="toggle"
+          @click="
+            stopInspecting();
+            toggle();
+          "
         >
           <span class="trigger-name">{{ activeName }}</span>
           <chevron-down-icon :size="10" class="trigger-chevron" />
@@ -182,6 +185,10 @@ export default Vue.extend({
       return this.$el.closest('.header');
     },
 
+    stopInspecting(): void {
+      this.$store.commit('setInspecting', false);
+    },
+
     reset(): void {
       this.editing = null;
       this.rowMenu = null;
@@ -323,6 +330,7 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .profile-switcher {
+  flex: none;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -347,19 +355,26 @@ export default Vue.extend({
   gap: 4px;
   min-width: 0;
   max-width: 160px;
-  border-radius: 4px;
+  margin-left: -6px;
+  padding: 4px 6px;
+  border-radius: 6px;
   font-size: 13px;
-  font-weight: 500;
-  line-height: 1.2;
+  font-weight: 600;
+  line-height: 16px;
   color: var(--text-primary);
   cursor: pointer;
+
+  &:hover,
+  &.open {
+    background: var(--hover-tint);
+  }
 
   &:hover .trigger-chevron,
   &.open .trigger-chevron {
     color: var(--text-primary);
   }
 
-  @include focus-ring($offset: 2px, $target: ':not(.open)');
+  @include focus-ring($target: ':not(.open)');
 }
 
 .trigger-name {

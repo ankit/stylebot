@@ -2,7 +2,7 @@
   <div class="header">
     <div class="header-top">
       <div class="style-identity">
-        <s-text class="url">{{ url }}</s-text>
+        <s-text variant="muted" class="url">{{ url }}</s-text>
         <the-profile-switcher />
       </div>
       <the-window-actions />
@@ -80,8 +80,8 @@ export default Vue.extend({
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
-  padding: 8px calc(var(--panel-gutter) - 3px) 4px var(--panel-gutter);
+  gap: 4px;
+  padding: 6px calc(var(--panel-gutter) - 5px) 4px var(--panel-gutter);
 }
 
 .style-identity {
@@ -95,7 +95,6 @@ export default Vue.extend({
   @include truncate;
 
   flex: 0 1 auto;
-  max-width: 150px;
   min-width: 0;
 }
 
