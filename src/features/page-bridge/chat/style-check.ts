@@ -1,6 +1,8 @@
 import { getSelector } from '@stylebot/css';
 import type { ChatCssEdit, ChatStyleProblem } from '@stylebot/types';
 
+import { countMatches, queryPage } from './count-matches';
+import { isVisible } from './page-outline';
 import { hasStatePseudo } from './state-pseudos';
 
 const MAX_TEXT_ELEMENTS = 1500;
@@ -9,6 +11,9 @@ const MAX_SAMPLES = 3;
 const MAX_PROBLEMS = 6;
 const SETTLE_TIMEOUT = 1000;
 const MIN_SURFACE_AREA = 4000;
+
+// Properties that can change how text reads against what's behind it.
+const CONTRAST_PROPERTY = /^(?:--|color$|background|all$|opacity$|filter$)/;
 
 const SKIPPED_TAGS = new Set([
   'SCRIPT',
@@ -163,11 +168,6 @@ const backgroundResolver = () => {
 const isPageElement = (element: Element): boolean =>
   !SKIPPED_TAGS.has(element.tagName) && element.id !== 'stylebot';
 
-const isVisible = (element: Element): boolean =>
-  typeof element.checkVisibility === 'function'
-    ? element.checkVisibility()
-    : getComputedStyle(element).display !== 'none';
-
 const hasOwnText = (element: Element): boolean =>
   Array.from(element.childNodes).some(
     node => node.nodeType === Node.TEXT_NODE && node.textContent?.trim()
@@ -228,7 +228,7 @@ const minimumContrast = (element: Element): number => {
   return size >= 24 || (bold && size >= 18.66) ? 3 : 4.5;
 };
 
-const pageBackground = (): Rgba | null => {
+const pageBackground = (): Rgba => {
   const body = parseColor(getComputedStyle(document.body).backgroundColor);
 
   if (body && body[3] > 0) {
@@ -241,10 +241,7 @@ const pageBackground = (): Rgba | null => {
   return root && root[3] > 0 ? root : WHITE;
 };
 
-const pageIsDark = (): boolean | null => {
-  const background = pageBackground();
-  return background ? isDark(background) : null;
-};
+const pageIsDark = (): boolean | null => isDark(pageBackground());
 
 const sampleEdits = (edits: Array<ChatCssEdit>): Array<Sample> =>
   edits.flatMap(({ selector, declarations }) => {
@@ -252,17 +249,9 @@ const sampleEdits = (edits: Array<ChatCssEdit>): Array<Sample> =>
       return [];
     }
 
-    let elements: Array<Element>;
+    const elements = queryPage(selector, MAX_SAMPLES);
 
-    try {
-      elements = Array.from(document.querySelectorAll(selector))
-        .filter(element => !element.closest('#stylebot'))
-        .slice(0, MAX_SAMPLES);
-    } catch {
-      return [];
-    }
-
-    if (!elements.length) {
+    if (!elements?.length) {
       return [];
     }
 
@@ -287,17 +276,22 @@ const sampleEdits = (edits: Array<ChatCssEdit>): Array<Sample> =>
 export const startStyleCheck = (edits: Array<ChatCssEdit>): void => {
   const resolveBackground = backgroundResolver();
   const contrast = new Map<Element, number>();
+  const recolors = edits.some(({ declarations }) =>
+    declarations.some(({ property }) => CONTRAST_PROPERTY.test(property))
+  );
 
-  pageElements(
-    MAX_TEXT_ELEMENTS,
-    element => hasOwnText(element) && isVisible(element)
-  ).forEach(element => {
-    const result = textContrast(element, resolveBackground);
+  if (recolors) {
+    pageElements(
+      MAX_TEXT_ELEMENTS,
+      element => hasOwnText(element) && isVisible(element)
+    ).forEach(element => {
+      const result = textContrast(element, resolveBackground);
 
-    if (result) {
-      contrast.set(element, result.ratio);
-    }
-  });
+      if (result) {
+        contrast.set(element, result.ratio);
+      }
+    });
+  }
 
   baseline = {
     edits,
@@ -341,7 +335,10 @@ const selectorOf = (element: Element): string =>
  * of each group as its example.
  */
 const groupBySelector = <T>(items: Array<{ element: Element; detail: T }>) => {
-  const groups = new Map<string, { count: number; detail: T }>();
+  const groups = new Map<
+    string,
+    { count: number; element: Element; detail: T }
+  >();
 
   items.forEach(({ element, detail }) => {
     const selector = selectorOf(element);
@@ -355,21 +352,11 @@ const groupBySelector = <T>(items: Array<{ element: Element; detail: T }>) => {
     if (group) {
       group.count++;
     } else {
-      groups.set(selector, { count: 1, detail });
+      groups.set(selector, { count: 1, element, detail });
     }
   });
 
   return Array.from(groups, ([selector, group]) => ({ selector, ...group }));
-};
-
-const pageMatches = (selector: string): number => {
-  try {
-    return Array.from(document.querySelectorAll(selector)).filter(
-      element => !element.closest('#stylebot')
-    ).length;
-  } catch {
-    return 0;
-  }
 };
 
 /**
@@ -470,11 +457,8 @@ const findUnreadable = (
       ratio: number;
       color: Rgba;
       background: Rgba;
-      paintedBy?: string;
-      coloredBy?: string;
     };
   }> = [];
-  const colors = textColorSources(edits);
 
   before.forEach((ratioBefore, element) => {
     if (!element.isConnected || !isVisible(element)) {
@@ -490,32 +474,36 @@ const findUnreadable = (
       now.ratio < minimumContrast(element) &&
       now.ratio < ratioBefore - 0.5
     ) {
-      worse.push({
-        element,
-        detail: {
-          ...now,
-          paintedBy: paintedBy(element, edits),
-          coloredBy: colors.find(({ color }) => color === toHex(now.color))
-            ?.source,
-        },
-      });
+      worse.push({ element, detail: now });
     }
   });
+
+  if (!worse.length) {
+    return [];
+  }
+
+  const colors = textColorSources(edits);
 
   return groupBySelector(worse)
     .sort((a, b) => a.detail.ratio - b.detail.ratio)
     .slice(0, MAX_PROBLEMS)
-    .map(({ selector, count, detail }) => ({
-      type: 'unreadable',
-      selector,
-      count,
-      of: pageMatches(selector),
-      color: toHex(detail.color),
-      background: toHex(detail.background),
-      ratio: Math.round(detail.ratio * 10) / 10,
-      ...(detail.paintedBy ? { paintedBy: detail.paintedBy } : {}),
-      ...(detail.coloredBy ? { coloredBy: detail.coloredBy } : {}),
-    }));
+    .map(({ selector, count, element, detail }) => {
+      const painter = paintedBy(element, edits);
+      const color = toHex(detail.color);
+      const colorer = colors.find(source => source.color === color)?.source;
+
+      return {
+        type: 'unreadable',
+        selector,
+        count,
+        of: countMatches([selector])[0] ?? 0,
+        color,
+        background: toHex(detail.background),
+        ratio: Math.round(detail.ratio * 10) / 10,
+        ...(painter ? { paintedBy: painter } : {}),
+        ...(colorer ? { coloredBy: colorer } : {}),
+      };
+    });
 };
 
 /**
@@ -625,11 +613,12 @@ export const checkStyle = async (): Promise<Array<ChatStyleProblem>> => {
 
   const resolveBackground = backgroundResolver();
   const dark = pageIsDark();
-  const flipped = dark !== null && noted.dark !== null && dark !== noted.dark;
 
   return [
     ...findUnreadable(noted.contrast, resolveBackground, noted.edits),
-    ...(flipped ? findClashing(dark as boolean) : []),
+    ...(dark !== null && noted.dark !== null && dark !== noted.dark
+      ? findClashing(dark)
+      : []),
     ...findNoEffect(noted.samples),
   ];
 };

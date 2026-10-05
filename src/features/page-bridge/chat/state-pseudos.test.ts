@@ -5,6 +5,10 @@ describe('withoutStatePseudos', () => {
     expect(withoutStatePseudos('a:hover, input::placeholder')).toBe('a, input');
   });
 
+  it('keeps a comma inside :is() within its selector', () => {
+    expect(withoutStatePseudos(':is(a:hover, b) span')).toBe(':is(a, b) span');
+  });
+
   it('keeps a selector valid when a state was all of a compound', () => {
     expect(withoutStatePseudos('nav :focus-visible')).toBe('nav *');
   });

@@ -52,6 +52,16 @@ export const needsFix = (round: ChatReplyRound): boolean =>
   Boolean(round.matches?.some(count => !count));
 
 /**
+ * The id of one of a reply's apply_css calls: the reply's own for its
+ * first call, as threads saved before fix rounds have it, then numbered.
+ */
+export const roundCallId = (
+  prefix: string,
+  turnId: string,
+  round: number
+): string => (round ? `${prefix}_${turnId}_${round}` : `${prefix}_${turnId}`);
+
+/**
  * Each apply_css call a reply made, in order: its rounds, or the reply
  * itself when it made one call.
  */
@@ -73,7 +83,7 @@ export const roundsOf = (turn: ChatAssistantTurn): Array<ChatReplyRound> =>
  */
 export const toolResultFor = (
   turn: ChatAssistantTurn,
-  round: ChatReplyRound = roundsOf(turn)[0]
+  round: ChatReplyRound
 ): string => {
   if (!turn.applied) {
     return TOOL_RESULT_UNDONE;

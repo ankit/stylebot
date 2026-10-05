@@ -20,6 +20,7 @@ import {
   TOOL_DESCRIPTION,
   TOOL_SCHEMA,
   toolResultFor,
+  roundCallId,
   roundsOf,
   parseEdits,
 } from '../apply-css-tool';
@@ -98,9 +99,6 @@ const TOOL_PARAMETERS = JSON.parse(
   )
 );
 
-const callId = (turnId: string, round: number): string =>
-  round ? `call_${turnId}_${round}` : `call_${turnId}`;
-
 /**
  * Replays one apply_css call of a reply: the model's output, the call, and
  * what it came to.
@@ -143,11 +141,11 @@ const roundSteps = (
     steps.push(
       {
         type: 'function_call',
-        id: callId(turn.id, index),
+        id: roundCallId('call', turn.id, index),
         name: TOOL_NAME,
         arguments: { edits: round.edits },
       },
-      result(callId(turn.id, index))
+      result(roundCallId('call', turn.id, index))
     );
   }
 

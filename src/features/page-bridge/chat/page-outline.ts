@@ -24,7 +24,7 @@ const SKIPPED_TAGS = new Set([
 // Their insides are drawing or foreign documents, not page structure.
 const OPAQUE_TAGS = new Set(['svg', 'IFRAME', 'VIDEO', 'CANVAS', 'PICTURE']);
 
-const isVisible = (element: Element): boolean => {
+export const isVisible = (element: Element): boolean => {
   if (typeof element.checkVisibility === 'function') {
     return element.checkVisibility();
   }

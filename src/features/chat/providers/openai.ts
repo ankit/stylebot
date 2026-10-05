@@ -17,6 +17,7 @@ import {
   TOOL_DESCRIPTION,
   TOOL_SCHEMA,
   toolResultFor,
+  roundCallId,
   roundsOf,
   parseEdits,
 } from '../apply-css-tool';
@@ -78,9 +79,6 @@ const headers = (key: string): Record<string, string> => ({
   authorization: `Bearer ${key}`,
 });
 
-const callId = (turnId: string, round: number): string =>
-  round ? `call_${turnId}_${round}` : `call_${turnId}`;
-
 /**
  * Replays the thread as Responses API input items; each apply_css call a
  * reply made becomes a function call followed by its output.
@@ -117,13 +115,13 @@ export const toResponsesInput = (turns: Array<ChatTurn>): Array<InputItem> =>
         items.push(
           {
             type: 'function_call',
-            call_id: callId(turn.id, index),
+            call_id: roundCallId('call', turn.id, index),
             name: TOOL_NAME,
             arguments: JSON.stringify({ edits: round.edits }),
           },
           {
             type: 'function_call_output',
-            call_id: callId(turn.id, index),
+            call_id: roundCallId('call', turn.id, index),
             output: toolResultFor(turn, round),
           }
         );

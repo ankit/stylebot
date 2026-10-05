@@ -5,7 +5,6 @@ import type { ChatTurn } from '@stylebot/types';
 import {
   getStreamRequest,
   getFailedMessage,
-  getAssistantTurn,
   getRoundsTurn,
   getStoppedTurn,
   getUserTurn,
@@ -60,11 +59,11 @@ describe('getStreamRequest', () => {
   });
 });
 
-describe('getAssistantTurn', () => {
-  const reply = { id: 'r1', model: 'm', edits: [edit], previous: [] };
+describe('getRoundsTurn with one call', () => {
+  const round = { text: '  Done.  ', edits: [edit], previous: [] };
 
   it('is applied when the reply made edits', () => {
-    expect(getAssistantTurn(reply, '  Done.  ')).toEqual({
+    expect(getRoundsTurn('r1', 'm', [round])).toEqual({
       role: 'assistant',
       id: 'r1',
       text: 'Done.',
@@ -77,12 +76,16 @@ describe('getAssistantTurn', () => {
   });
 
   it('is not applied without edits', () => {
-    expect(getAssistantTurn({ ...reply, edits: [] }, 'Hm').applied).toBe(false);
+    expect(getRoundsTurn('r1', 'm', [{ ...round, edits: [] }]).applied).toBe(
+      false
+    );
   });
 
   it('keeps the replay only when the provider sent one', () => {
-    expect(getAssistantTurn(reply, '')).not.toHaveProperty('replay');
-    expect(getAssistantTurn({ ...reply, replay: [1] }, '').replay).toEqual([1]);
+    expect(getRoundsTurn('r1', 'm', [round])).not.toHaveProperty('replay');
+    expect(
+      getRoundsTurn('r1', 'm', [{ ...round, replay: [1] }]).replay
+    ).toEqual([1]);
   });
 });
 
@@ -123,10 +126,9 @@ describe('getStoppedTurn', () => {
 
 describe('getFailedMessage', () => {
   const user: ChatTurn = { role: 'user', id: '2', text: 'again' };
-  const reply = getAssistantTurn(
-    { id: '1', model: 'm', edits: [], previous: [] },
-    'ok'
-  );
+  const reply = getRoundsTurn('1', 'm', [
+    { text: 'ok', edits: [], previous: [] },
+  ]);
 
   it('splits off the last message when it got no reply', () => {
     expect(getFailedMessage([reply, { ...user, scope: 'h1' }])).toEqual({

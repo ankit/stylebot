@@ -1,6 +1,6 @@
-import type { ChatAssistantTurn } from '@stylebot/types';
+import type { ChatAssistantTurn, ChatReplyRound } from '@stylebot/types';
 
-import { needsFix, toolResultFor } from './tool-result';
+import { needsFix, roundsOf, toolResultFor } from './tool-result';
 
 const turn = (overrides: Partial<ChatAssistantTurn>): ChatAssistantTurn => ({
   role: 'assistant',
@@ -17,9 +17,14 @@ const turn = (overrides: Partial<ChatAssistantTurn>): ChatAssistantTurn => ({
   ...overrides,
 });
 
+// A one-call reply's call, as the providers pass it.
+const only = (
+  reply: ChatAssistantTurn
+): [ChatAssistantTurn, ChatReplyRound] => [reply, roundsOf(reply)[0]];
+
 describe('toolResultFor', () => {
   it('lists how many elements each selector matched and flags misses', () => {
-    expect(toolResultFor(turn({ matches: [1, 0, null] }))).toBe(
+    expect(toolResultFor(...only(turn({ matches: [1, 0, null] })))).toBe(
       [
         'Applied to the page.',
         'Elements each selector matched:',
@@ -32,13 +37,13 @@ describe('toolResultFor', () => {
   });
 
   it('says only that it applied when the counts weren’t taken', () => {
-    expect(toolResultFor(turn({}))).toBe('Applied to the page.');
+    expect(toolResultFor(...only(turn({})))).toBe('Applied to the page.');
   });
 
   it('says the user undid it', () => {
-    expect(toolResultFor(turn({ applied: false, matches: [1, 1, 1] }))).toBe(
-      'Applied, then undone by the user.'
-    );
+    expect(
+      toolResultFor(...only(turn({ applied: false, matches: [1, 1, 1] })))
+    ).toBe('Applied, then undone by the user.');
   });
 });
 

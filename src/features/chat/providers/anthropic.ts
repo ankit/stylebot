@@ -17,6 +17,7 @@ import {
   TOOL_DESCRIPTION,
   TOOL_SCHEMA,
   toolResultFor,
+  roundCallId,
   roundsOf,
   parseEdits,
 } from '../apply-css-tool';
@@ -80,9 +81,6 @@ const headers = (key: string): Record<string, string> => ({
   'anthropic-dangerous-direct-browser-access': 'true',
 });
 
-const toolUseId = (turnId: string, round: number): string =>
-  round ? `toolu_${turnId}_${round}` : `toolu_${turnId}`;
-
 /**
  * Replays the thread as Messages API turns. Each apply_css call a reply
  * made becomes a tool call, answered in the next user turn with what it
@@ -134,10 +132,14 @@ export const toAnthropicMessages = (turns: Array<ChatTurn>): Array<Message> => {
         content.push({ type: 'text', text: round.text });
       }
 
-      if (round.edits.length) {
+      const id = round.edits.length
+        ? roundCallId('toolu', turn.id, index)
+        : null;
+
+      if (id) {
         content.push({
           type: 'tool_use',
-          id: toolUseId(turn.id, index),
+          id,
           name: TOOL_NAME,
           input: { edits: round.edits },
         });
@@ -148,10 +150,10 @@ export const toAnthropicMessages = (turns: Array<ChatTurn>): Array<Message> => {
         messages.push({ role: 'assistant', content });
       }
 
-      if (round.edits.length) {
+      if (id) {
         pendingResult = {
           type: 'tool_result',
-          tool_use_id: toolUseId(turn.id, index),
+          tool_use_id: id,
           content: toolResultFor(turn, round),
         };
       }

@@ -72,23 +72,22 @@ export type ChatState = {
 
 type Context = ActionContext<ChatState, State>;
 
-/**
- * The reply in progress: the message's picked element, which a fix round
- * is about too, and the apply_css calls made so far.
- */
 type AppliedRound = Pick<
   ChatRoundResult,
   'edits' | 'previous' | 'matches' | 'problems'
-> & {
-  // A fix that made text hard to read, taken back as soon as it applied.
-  undone?: boolean;
-};
+>;
 
+/**
+ * The reply in progress: the message's picked element, which a fix round
+ * is about too, the apply_css calls made so far, and how to stop the call
+ * streaming in.
+ */
 type Reply = {
   id: string;
   model: string;
   scope?: string;
   rounds: Array<ChatRoundResult>;
+  stop?: () => void;
 };
 
 const buildRequest = async (
@@ -131,13 +130,10 @@ const setPhase = (
  * streaming in. Created per store, so nothing runs when the module loads.
  */
 export const createChatModule = (): Module<ChatState, State> => {
-  // Stops the reply streaming in, if there is one.
-  let stopReply: (() => void) | null = null;
   let reply: Reply | null = null;
 
   const closeReply = () => {
-    stopReply?.();
-    stopReply = null;
+    reply?.stop?.();
     reply = null;
   };
 
@@ -194,7 +190,6 @@ export const createChatModule = (): Module<ChatState, State> => {
     const { commit } = context;
 
     reply = null;
-    stopReply = null;
     commit('setPending', null);
     commit('addTurn', getRoundsTurn(current.id, current.model, current.rounds));
     save(context);
@@ -203,13 +198,13 @@ export const createChatModule = (): Module<ChatState, State> => {
   /**
    * Applies a call's edits, then counts what each selector matched and
    * checks the page for what they made worse. A fix that made text hard to
-   * read is taken back.
+   * read is taken back, and comes to null.
    */
   const applyRound = async (
     context: Context,
     current: Reply,
     replyEdits: Array<ChatCssEdit>
-  ): Promise<AppliedRound> => {
+  ): Promise<AppliedRound | null> => {
     const bridge = getPageBridge();
     const fixing = current.rounds.length > 0;
     const edits = await withStableSelectors(replyEdits);
@@ -233,7 +228,7 @@ export const createChatModule = (): Module<ChatState, State> => {
     if (fixing && problems?.some(problem => problem.type === 'unreadable')) {
       const reverted = revertEdits(context.rootState.css, result.previous);
       await applyCss(context, reverted, [], `chat:${current.id}`);
-      return { edits: [], previous: [], undone: true };
+      return null;
     }
 
     return { edits, previous: result.previous, matches, problems };
@@ -252,7 +247,8 @@ export const createChatModule = (): Module<ChatState, State> => {
     const { state, commit, dispatch } = context;
     const separator = state.pending?.text ? '\n\n' : '';
     let text = '';
-    let round: AppliedRound | null = null;
+    let round: AppliedRound = { edits: [], previous: [] };
+    let undone = false;
 
     const handlers: ChatStreamHandlers = {
       onText: delta => {
@@ -264,7 +260,9 @@ export const createChatModule = (): Module<ChatState, State> => {
 
       onEdits: async edits => {
         setPhase(context, 'applying');
-        round = await applyRound(context, current, edits);
+        const applied = await applyRound(context, current, edits);
+        undone = !applied;
+        round = applied ?? round;
       },
 
       onDone: async ({ usage, replay }) => {
@@ -273,7 +271,7 @@ export const createChatModule = (): Module<ChatState, State> => {
         }
 
         // The tokens an undone fix spent still count toward the reply.
-        if (round?.undone) {
+        if (undone) {
           const last = current.rounds[current.rounds.length - 1];
           current.rounds[current.rounds.length - 1] = {
             ...last,
@@ -283,12 +281,9 @@ export const createChatModule = (): Module<ChatState, State> => {
           return;
         }
 
-        const { undone: _undone, ...applied } = round ?? {};
         current.rounds.push({
           text,
-          edits: [],
-          previous: [],
-          ...applied,
+          ...round,
           ...(usage ? { usage } : {}),
           ...(replay ? { replay } : {}),
         });
@@ -301,7 +296,7 @@ export const createChatModule = (): Module<ChatState, State> => {
           return;
         }
 
-        stopReply = null;
+        current.stop = undefined;
         setPhase(context, 'fixing');
 
         const replyTurn = getRoundsTurn(
@@ -329,7 +324,6 @@ export const createChatModule = (): Module<ChatState, State> => {
         }
 
         reply = null;
-        stopReply = null;
         commit('setPending', null);
         commit('setError', error);
 
@@ -340,7 +334,7 @@ export const createChatModule = (): Module<ChatState, State> => {
       },
     };
 
-    stopReply = streamReply(request, handlers);
+    current.stop = streamReply(request, handlers);
   };
 
   return {
@@ -595,7 +589,7 @@ export const createChatModule = (): Module<ChatState, State> => {
         // Stopping a fix keeps what the reply's earlier calls did.
         if (reply?.rounds.length) {
           const current = reply;
-          stopReply?.();
+          current.stop?.();
           finishReply(context, current);
           return;
         }

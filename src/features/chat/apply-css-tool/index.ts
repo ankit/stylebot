@@ -9,6 +9,7 @@ export { parseEdits } from './parse-edits';
 export {
   MAX_FIX_ROUNDS,
   needsFix,
+  roundCallId,
   roundsOf,
   toolResultFor,
 } from './tool-result';
