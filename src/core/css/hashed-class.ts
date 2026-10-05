@@ -64,7 +64,7 @@ export function getStableClassParts(className: string): Array<string> | null {
   const turbopackInfix =
     moduleHash &&
     hasDigitAmongLetters(moduleHash[2]) &&
-    /^[a-z][a-zA-Z]*$/.test(moduleHash[3]);
+    /^[a-z]+(?:[A-Z][a-z]+)*$/.test(moduleHash[3]);
   if (moduleHash && !turbopackInfix) {
     return [moduleHash[1]];
   }
