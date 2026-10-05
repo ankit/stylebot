@@ -62,6 +62,9 @@ export type Engine = {
   // Whether extension pages (options, popup) can be opened as Playwright Pages via
   // `page.goto`; Firefox can't attach to moz-extension:// documents (see docs/e2e.md).
   opensExtensionPages: boolean;
+  // Whether `page.goto` opens a PDF in the browser's viewer; Playwright's Firefox
+  // downloads it instead.
+  opensPdfs: boolean;
   // Whether the editor opens in the browser's side panel by default.
   hasSidePanel: boolean;
   launch(userDataDir: string, options: LaunchOptions): Promise<BrowserContext>;

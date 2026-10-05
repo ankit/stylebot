@@ -94,6 +94,7 @@ test.describe('popup sync strip', () => {
 
   test('asks for a sign-in when a scheduled sync could not get a token, and opens the Sync tab', async ({
     context,
+    engine,
     extension,
     openPopup,
   }) => {
@@ -114,6 +115,10 @@ test.describe('popup sync strip', () => {
           .isVisible()
       )
       .toBe(true);
+
+    if (!engine.opensExtensionPages) {
+      return;
+    }
 
     const opened = context.waitForEvent('page');
     await popup.locator('.sync-button', { hasText: 'Sign in' }).click();
