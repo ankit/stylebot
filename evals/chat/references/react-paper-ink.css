@@ -1,0 +1,21 @@
+html,
+body,
+.bg-wash,
+main,
+main article {
+  background: #f7f3ea;
+}
+
+main article p,
+main article li {
+  max-width: 680px;
+  font-family: Literata;
+  font-size: 19px;
+  line-height: 1.6;
+  color: #2b2b2b;
+}
+
+main article p a,
+main article li a {
+  color: #7a4a1e;
+}

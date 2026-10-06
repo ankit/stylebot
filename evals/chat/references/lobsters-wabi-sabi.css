@@ -1,0 +1,37 @@
+:root {
+  --color-bg: #f5f3ee;
+  --color-fg: #333330;
+}
+
+html,
+body,
+#inside,
+ol.stories > li {
+  background: #f5f3ee;
+  color: #333330;
+  box-shadow: none;
+}
+
+ol.stories > li {
+  margin-bottom: 20px;
+}
+
+.story .link,
+.story .link a,
+.story .byline {
+  line-height: 1.8;
+}
+
+.story .link a {
+  color: #333330;
+}
+
+.story .byline,
+.story .byline a {
+  color: #333330;
+}
+
+.story .comments_label a,
+.story .byline a.u-author {
+  color: #d0451b;
+}

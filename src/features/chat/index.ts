@@ -14,3 +14,10 @@ export { parseMarkdown } from './markdown';
 export type { MarkdownBlock, MarkdownInline, MarkdownLine } from './markdown';
 export { estimateCost } from './cost';
 export { CHAT_PORT } from './constants';
+export {
+  getPracticalSuggestions,
+  getCreativeSuggestions,
+  CREATIVE_SUGGESTIONS,
+  TERMINAL_THEMES,
+} from './suggestions';
+export type { ChatSuggestion, ChatSuggestionContext } from './suggestions';

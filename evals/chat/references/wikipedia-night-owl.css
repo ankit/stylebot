@@ -1,0 +1,49 @@
+:root {
+  color-scheme: dark;
+  --background-color-base: #1e1a17;
+  --background-color-neutral-subtle: #2a2420;
+  --background-color-interactive-subtle: #2a2420;
+  --color-base: #e8dccb;
+  --color-subtle: #b8a993;
+  --color-emphasized: #e8dccb;
+  --color-progressive: #e0a96d;
+  --color-progressive--hover: #ebbd8a;
+  --color-link-red: #e8907a;
+  --color-visited: #c79a6a;
+  --border-color-base: #3a322c;
+  --border-color-subtle: #3a322c;
+}
+
+html,
+body,
+.mw-page-container,
+.vector-header-container,
+.mw-body {
+  background: #1e1a17;
+  color: #e8dccb;
+}
+
+#mw-content-text,
+#mw-content-text p,
+.mw-page-title-main,
+#mw-content-text h2,
+.vector-toc-text {
+  color: #e8dccb;
+}
+
+#mw-content-text a,
+.vector-toc a {
+  color: #e0a96d;
+}
+
+.infobox,
+.thumbinner,
+figure figcaption,
+input {
+  background: #2a2420;
+  color: #e8dccb;
+}
+
+#mw-content-text img {
+  filter: brightness(0.8);
+}

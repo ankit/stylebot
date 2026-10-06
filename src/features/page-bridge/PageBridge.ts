@@ -1,6 +1,7 @@
 import type { RoleColorGroups } from '@stylebot/css';
 import type {
   ChatCssEdit,
+  ChatPageSignals,
   ChatStyleProblem,
   CssDeclaration,
 } from '@stylebot/types';
@@ -127,6 +128,11 @@ export type PageBridge = {
    * page to a language model.
    */
   getPageOutline(): Promise<string>;
+
+  /**
+   * Cheap facts about the page, for suggesting requests that suit it.
+   */
+  getPageSignals(): Promise<ChatPageSignals>;
 
   /**
    * How many of the page's elements each selector matches, or null for a

@@ -3,6 +3,12 @@ import { expect, waitFor, within } from '@storybook/test';
 
 import TheChat from './TheChat.vue';
 import {
+  CREATIVE_SUGGESTIONS,
+  getPracticalSuggestions,
+  TERMINAL_THEMES,
+} from '@stylebot/chat';
+import { t } from '@stylebot/i18n';
+import {
   ASK,
   chat,
   chatStateOf,
@@ -593,5 +599,118 @@ export const ShowsTheCode: StoryObj = {
     await expect(store.state.codeHighlight).toEqual([
       { startLine: 1, endLine: 4 },
     ]);
+  },
+};
+
+const suggestions = async (canvas: Canvas): Promise<Canvas> =>
+  within(
+    await canvas.findByRole('group', {
+      name: 'What should this site look like?',
+    })
+  );
+
+export const SendsASuggestion: StoryObj = {
+  ...chat({ connected: ['anthropic'] }),
+  name: 'clicking a suggestion sends its full request as a message, and the suggestions go once the chat has one',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const request = getPracticalSuggestions({
+      signals: null,
+      article: false,
+    })[0].request;
+
+    await user.click(
+      (await suggestions(canvas)).getByRole('button', { name: 'Dark mode' })
+    );
+
+    await waitFor(() =>
+      expect(chatStateOf(canvasElement).turns[0]).toMatchObject({
+        role: 'user',
+        text: request,
+      })
+    );
+    await canvas.findByText(request);
+    await canvas.findByText(/Switched the page/);
+    await expect(
+      canvas.queryByRole('group', { name: 'What should this site look like?' })
+    ).not.toBeInTheDocument();
+  },
+};
+
+// A card's label, without the characters its preview draws with.
+const labelOf = (card: HTMLElement): string =>
+  card.lastElementChild?.textContent?.trim() ?? '';
+
+const isCreative = (card: HTMLElement): boolean => {
+  const label = labelOf(card);
+
+  return (
+    CREATIVE_SUGGESTIONS.some(item => t(item.label) === label) ||
+    TERMINAL_THEMES.some(name => t('terminal_theme', [name]) === label)
+  );
+};
+
+export const SuggestsSomethingCreative: StoryObj = {
+  ...chat({ connected: ['anthropic'] }),
+  name: 'the last card is a creative look, and More ideas swaps in three other looks',
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+    const cards = async (): Promise<Array<HTMLElement>> =>
+      (await suggestions(canvas)).getAllByRole('button');
+
+    await step('two page suggestions, then a creative look', async () => {
+      const first = await cards();
+
+      await expect(first).toHaveLength(3);
+      await expect(isCreative(first[0])).toBe(false);
+      await expect(isCreative(first[2])).toBe(true);
+    });
+
+    await step('More ideas shows three looks', async () => {
+      const before = (await cards()).map(labelOf);
+
+      await user.click(canvas.getByRole('button', { name: 'More ideas' }));
+
+      await waitFor(async () => {
+        const after = await cards();
+        await expect(after).toHaveLength(3);
+        await expect(after.every(isCreative)).toBe(true);
+        await expect(after.map(labelOf)).not.toEqual(before);
+      });
+    });
+  },
+};
+
+export const FillsASuggestion: StoryObj = {
+  ...chat({ connected: ['anthropic'] }),
+  name: 'Shift-clicking a suggestion puts its request in the message field to edit, without sending it',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const chip = (await suggestions(canvas)).getByRole('button', {
+      name: 'Easier to read',
+    });
+
+    await user.keyboard('{Shift>}');
+    await user.click(chip);
+    await user.keyboard('{/Shift}');
+
+    await expect(await messageField(canvas)).toHaveValue(
+      getPracticalSuggestions({ signals: null, article: false })[1].request
+    );
+    await expect(await messageField(canvas)).toHaveFocus();
+    await expect(chatStateOf(canvasElement).turns).toHaveLength(0);
+  },
+};
+
+export const HidesSuggestionsInAConversation: StoryObj = {
+  ...chatWithThread(),
+  name: 'a chat that already has messages shows no suggestions',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await canvas.findByText(ASK.text);
+    await expect(
+      canvas.queryByRole('group', { name: 'What should this site look like?' })
+    ).not.toBeInTheDocument();
   },
 };

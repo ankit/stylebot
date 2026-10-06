@@ -2,13 +2,18 @@ import type { Meta, StoryObj } from '@storybook/vue';
 import { expect, waitFor, within } from '@storybook/test';
 
 import TheChat from './TheChat.vue';
+import { emptyPageSnapshot } from '@stylebot/page-bridge';
 import {
   ASK,
   chat,
   chatStateOf,
   chatWithThread,
+  DARK_PAGE,
+  DARK_PAGE_BACKGROUND,
+  LIST_PAGE,
   REPLY,
   SCREENSHOT,
+  SIDEBAR_PAGE,
 } from '@stylebot/storybook/fixtures/chat';
 import { findOpenMenu, storeOf, user } from '@stylebot/storybook/story-helpers';
 
@@ -34,6 +39,36 @@ export const SetupKeyRejected: StoryObj = {
 };
 
 export const Empty = chat({ connected: ['anthropic'] });
+
+const CONNECTED = { connected: ['anthropic' as const] };
+
+export const EmptyDarkPage: StoryObj = {
+  ...chat(CONNECTED, {}, { page: DARK_PAGE }),
+  parameters: {
+    ...chat(CONNECTED).parameters,
+    pageBackground: DARK_PAGE_BACKGROUND,
+  },
+};
+
+export const EmptyArticle = chat(CONNECTED, {
+  page: { ...emptyPageSnapshot(), readerable: true },
+});
+
+export const EmptyList = chat(CONNECTED, {}, { page: LIST_PAGE });
+
+export const EmptySidebarAndStickyHeader = chat(
+  CONNECTED,
+  {},
+  { page: SIDEBAR_PAGE }
+);
+
+export const EmptyPageNotRead: StoryObj = {
+  ...chat(CONNECTED),
+  parameters: {
+    ...chat(CONNECTED).parameters,
+    pageBridge: { getPageSignals: () => Promise.reject(new Error()) },
+  },
+};
 
 export const Conversation = chatWithThread();
 

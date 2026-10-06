@@ -36,6 +36,7 @@ const mockBridge = {
   getPageColors: jest.fn(),
   getComputedStyles: jest.fn(),
   getPageOutline: jest.fn(),
+  getPageSignals: jest.fn(),
   getAppliedDeclarations: jest.fn(),
   getPageDeclarations: jest.fn(),
   getSelectorAlternatives: jest.fn(),

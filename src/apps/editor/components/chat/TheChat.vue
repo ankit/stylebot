@@ -15,8 +15,8 @@
           @confirm="clear"
           @cancel="setConfirmingClear(false)"
         />
-        <chat-thread />
-        <chat-composer @providers="showProviders" />
+        <chat-thread @fill="fill" />
+        <chat-composer ref="composer" @providers="showProviders" />
       </template>
       <chat-setup v-else />
     </template>
@@ -102,6 +102,10 @@ export default Vue.extend({
     showProviders(): void {
       this.setConfirmingClear(false);
       this.showingProviders = true;
+    },
+
+    fill(text: string): void {
+      (this.$refs.composer as InstanceType<typeof ChatComposer>).fill(text);
     },
 
     clear(): void {

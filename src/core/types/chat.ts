@@ -92,6 +92,19 @@ export type ChatStyleProblem =
     };
 
 /**
+ * What Chat reads from the page to suggest requests that suit it: whether
+ * it's dark, and whether it has a long list, a sidebar, a header that
+ * stays on screen as it scrolls, or ads.
+ */
+export type ChatPageSignals = {
+  dark: boolean;
+  list: boolean;
+  sidebar: boolean;
+  pinnedHeader: boolean;
+  ads: boolean;
+};
+
+/**
  * One apply_css call within a reply: the reply's first call, or one fixing
  * what the page check found after the call before it.
  */

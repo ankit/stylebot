@@ -15,7 +15,7 @@ That compares the working tree with the last commit on every case, once each. Op
 - **Another model**: `--head-model claude-haiku-4-5` gives head a different model, effort or thinking, to answer "would Haiku do?" in one run.
 - **Only the references**: `--references` checks every case's reference in a few seconds, with no model calls.
 
-A full run makes 12 replies, about 40 cents at list prices, in under a minute.
+A full run makes 24 replies, about 440K tokens in and 22K out.
 
 ## How it works
 
@@ -62,16 +62,22 @@ Replies vary: with identical code on both sides, totals differ by a point or two
 
 One case for each kind of request people make. Add a case when a kind of request isn't covered.
 
-| Site                      | Request                                                                                                                           | What's checked                                                                         |
-| :------------------------ | :-------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------- |
-| Hacker News               | "Make this page an everforest theme with Fira Code as typography"                                                                 | Everforest colors on the page, top bar and search box; Fira Code titles; readable text |
-| GitHub                    | "Give this page a Dracula theme"                                                                                                  | Dracula colors on every surface, from the site header to the readme; readable text     |
-| Wikipedia                 | "Make the article read like a book": serif at 19px, 1.6 line height, a centered 680px column, sidebar and Appearance panel hidden | each value; images kept                                                                |
-| Lobsters                  | "Make it more compact so more stories fit on screen"                                                                              | rows 20% shorter and the footer on screen, without hiding stories or shrinking titles  |
-| React docs                | "Hide the sidebar and let the content use the space"                                                                              | sidebar hidden; content wider and centered                                             |
-| A store (Books to Scrape) | 4 columns of cards with 12px corners, a 1px `#e5e7eb` border and soft shadow; bold green prices; full-width pill buttons          | each value; cards that keep their content inside, with nothing overlapping             |
+| Site                      | Request                                                                                                                               | What's checked                                                                                                       |
+| :------------------------ | :------------------------------------------------------------------------------------------------------------------------------------ | :------------------------------------------------------------------------------------------------------------------- |
+| Hacker News               | "Make this page an everforest theme with Fira Code as typography"                                                                     | Everforest colors on the page, top bar and search box; Fira Code titles; readable text                               |
+| GitHub                    | "Give this page a Dracula theme"                                                                                                      | Dracula colors on every surface, from the site header to the readme; readable text                                   |
+| Wikipedia                 | "Make the article read like a book": serif at 19px, 1.6 line height, a centered 680px column, sidebar and Appearance panel hidden     | each value; images kept                                                                                              |
+| Lobsters                  | "Make it more compact so more stories fit on screen"                                                                                  | rows 20% shorter and the footer on screen, without hiding stories or shrinking titles                                |
+| React docs                | "Hide the sidebar and let the content use the space"                                                                                  | sidebar hidden; content wider and centered                                                                           |
+| A store (Books to Scrape) | 4 columns of cards with 12px corners, a 1px `#e5e7eb` border and soft shadow; bold green prices; full-width pill buttons              | each value; cards that keep their content inside, with nothing overlapping                                           |
+| React docs                | Paper & ink, one of Chat's suggested looks, asked in plain words: warm off-white paper, a bookish serif, a narrow column, brown links | paper color, serif, size, column width, link hue; readable text                                                      |
+| Hacker News               | Terminal: a near-black background, phosphor green text, a monospace font throughout                                                   | dark surfaces, green text, monospace; readable text and search box                                                   |
+| Lobsters                  | Wabi-sabi: paper white, charcoal text, one vermilion accent, generous space, ads and decorative extras hidden                         | paper color, accent hue, taller rows; readable text; every story and the navigation still shown                      |
+| Wikipedia                 | Night owl: a warm dark theme with amber links and images dimmed                                                                       | dark background, light text, amber links, dimmed images; readable text and table of contents                         |
+| BBC News                  | Calm: quiet off-white colors, soft dark text, roomy lines, ads, promos, banners and pop-ups hidden                                    | the ad and the subscription banner hidden; quieter colors; readable text; every story and the navigation still shown |
+| BBC News                  | Hide distractions: ads, promos, banners, pop-ups and other prompts, keeping the navigation and content                                | the ad and the subscription banner hidden; every story and the navigation still shown; headlines unchanged           |
 
-Tags group the cases by kind of request (theme, readability, typography, layout, hide, detailed specs, design systems recolored through CSS variables), and the summary totals each tag separately.
+Tags group the cases by kind of request (theme, readability, typography, layout, hide, detailed specs, design systems recolored through CSS variables, and the creative looks Chat suggests), and the summary totals each tag separately.
 
 ## Checks
 

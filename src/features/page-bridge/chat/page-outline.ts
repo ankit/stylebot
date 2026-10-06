@@ -57,7 +57,7 @@ const ownSignature = (element: Element): string =>
 
 // Its first few children tell apart plain siblings that hold different
 // things, like a list's rows and the "More" row after them.
-const signatureOf = (element: Element): string =>
+export const signatureOf = (element: Element): string =>
   [
     ownSignature(element),
     ...Array.from(element.children).slice(0, 3).map(ownSignature),

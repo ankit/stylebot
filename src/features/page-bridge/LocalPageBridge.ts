@@ -18,6 +18,7 @@ import {
 
 import type {
   ChatCssEdit,
+  ChatPageSignals,
   ChatStyleProblem,
   CssDeclaration,
 } from '@stylebot/types';
@@ -36,6 +37,7 @@ import {
   countMatches,
   getPageCssContext,
   getPageOutline,
+  getPageSignals,
   getStableSelectors,
   startStyleCheck,
   extendStyleCheck,
@@ -241,6 +243,10 @@ export class LocalPageBridge extends PageBridgeEmitter implements PageBridge {
 
   getPageOutline(): Promise<string> {
     return Promise.resolve(getPageOutline());
+  }
+
+  getPageSignals(): Promise<ChatPageSignals> {
+    return Promise.resolve(getPageSignals());
   }
 
   countMatches(selectors: Array<string>): Promise<Array<number | null>> {

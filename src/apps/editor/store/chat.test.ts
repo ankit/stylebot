@@ -87,6 +87,10 @@ beforeEach(async () => {
 });
 
 describe('a reply streaming its edits', () => {
+  beforeEach(() => {
+    handlers.onText('Going dark.');
+  });
+
   it('applies each edit as it arrives, as one undo step, saved once at the end', async () => {
     handlers.onEditsStart();
     handlers.onEdit(dark);
@@ -170,7 +174,6 @@ describe('a reply streaming its edits', () => {
   });
 
   it('keeps the edits applied when stopped, as a stopped reply to undo', async () => {
-    handlers.onText('Going dark.');
     handlers.onEdit(dark);
     await flush();
 
@@ -260,6 +263,54 @@ describe('a reply streaming its edits', () => {
     expect(extendStyleCheck.mock.calls).toEqual([[[links, third]]]);
     expect(store.state.css).toContain('h1');
     expect(store.state.undoStack.past).toHaveLength(1);
+  });
+});
+
+describe('a reply that changes the page without a word', () => {
+  it('gets one more call, whose words finish the reply', async () => {
+    handlers.onEdit(dark);
+    handlers.onDone({});
+    await flush();
+    await flush();
+
+    expect(streamReply).toHaveBeenCalledTimes(2);
+    expect(chat().pending?.phase).toBe('writing');
+
+    handlers.onText('Gave the page a dark background.');
+    handlers.onDone({});
+    await flush();
+
+    expect(streamReply).toHaveBeenCalledTimes(2);
+    expect(chat().pending).toBeNull();
+    expect(lastTurn()).toMatchObject({
+      text: 'Gave the page a dark background.',
+      edits: [dark],
+    });
+  });
+
+  it('finishes as it is when the extra call says nothing either', async () => {
+    handlers.onEdit(dark);
+    handlers.onDone({});
+    await flush();
+    await flush();
+
+    handlers.onDone({});
+    await flush();
+
+    expect(streamReply).toHaveBeenCalledTimes(2);
+    expect(chat().pending).toBeNull();
+    expect((lastTurn() as ChatAssistantTurn).edits).toEqual([dark]);
+  });
+
+  it('finishes at once when the reply says what it changed', async () => {
+    handlers.onText('Went dark.');
+    handlers.onEdit(dark);
+    handlers.onDone({});
+    await flush();
+    await flush();
+
+    expect(streamReply).toHaveBeenCalledTimes(1);
+    expect(chat().pending).toBeNull();
   });
 });
 

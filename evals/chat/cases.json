@@ -484,5 +484,365 @@
         ]
       }
     ]
+  },
+  {
+    "id": "react-paper-ink",
+    "tags": ["creative", "typography", "readability"],
+    "steps": [
+      {
+        "url": "https://react.dev/learn",
+        "text": "Paper & ink: give the page the look of an e-reader, with warm off-white paper, soft black ink, a bookish serif at a comfortable size with roomy lines, a narrow centered text column, and links in a muted brown.",
+        "checks": [
+          {
+            "what": "body text on warm paper, off the white",
+            "selector": "main article p",
+            "expect": {
+              "@background": "darker"
+            }
+          },
+          {
+            "what": "paper stays light",
+            "selector": "main article p",
+            "expect": {
+              "@background": "light"
+            }
+          },
+          {
+            "what": "body text in a serif",
+            "selector": "main article p",
+            "expect": {
+              "font-family": "/(^|,\\s*)serif$|Serif|Georgia|Times|Garamond|Merriweather|Lora|Charter|Palatino|Baskerville|Crimson|Spectral|Literata|Cambria|Book|Libertine|Iowan|Hoefler|Didot|Bodoni|Minion|Caslon|Sabon|Tinos|Gelasio|Newsreader|Fraunces|Playfair|Cormorant|Alegreya|Vollkorn|Slab/"
+            }
+          },
+          {
+            "what": "body text at a comfortable size",
+            "selector": "main article p",
+            "expect": {
+              "font-size": ">=17"
+            }
+          },
+          {
+            "what": "a narrow column",
+            "selector": "main article p",
+            "expect": {
+              "@width": "<=760"
+            }
+          },
+          {
+            "what": "links in a muted brown",
+            "selector": "main article p a",
+            "expect": {
+              "color": "hue 10-50"
+            }
+          },
+          {
+            "what": "headings, text and links are readable",
+            "selector": "main article h1, main article h2:not(.text-red-40), main article p, main article p a",
+            "match": "all",
+            "expect": {
+              "@contrast": ">=4.5"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "hn-terminal",
+    "tags": ["creative", "theme", "typography"],
+    "steps": [
+      {
+        "url": "https://news.ycombinator.com/news",
+        "text": "Terminal: a near-black background, phosphor green text, a monospace font for everything, links in a lighter green, and dim green borders.",
+        "checks": [
+          {
+            "what": "stories on a near-black background",
+            "selector": ".titleline",
+            "expect": {
+              "@background": "dark"
+            }
+          },
+          {
+            "what": "top bar dark",
+            "selector": ".pagetop",
+            "expect": {
+              "@background": "dark"
+            }
+          },
+          {
+            "what": "titles in a green",
+            "selector": ".titleline > a",
+            "expect": {
+              "color": "hue 90-180"
+            }
+          },
+          {
+            "what": "story details in a green",
+            "selector": ".subline",
+            "expect": {
+              "color": "hue 90-180"
+            }
+          },
+          {
+            "what": "titles and details in a monospace font",
+            "selector": ".titleline > a, .subline",
+            "match": "all",
+            "expect": {
+              "font-family": "/mono|Mono|Code|Courier|Consolas|Menlo|Monaco|Fira|JetBrains|Inconsolata|Cascadia|Hack|Plex Mono|Space Mono|VT323|Terminal/"
+            }
+          },
+          {
+            "what": "titles, details and top bar links are readable",
+            "selector": ".titleline > a, .subline, .subline a, .pagetop a",
+            "match": "all",
+            "expect": {
+              "@contrast": ">=4.5"
+            }
+          },
+          {
+            "what": "search box is readable",
+            "selector": "input[name=q]",
+            "expect": {
+              "@contrast": ">=4.5"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "lobsters-wabi-sabi",
+    "tags": ["creative", "theme"],
+    "steps": [
+      {
+        "url": "https://lobste.rs/",
+        "text": "Wabi-sabi: paper white with charcoal text, a single vermilion accent for links and buttons only, generous space between lines and sections, no shadows or gradients, and ads, promos and decorative extras like badges and icons hidden.",
+        "checks": [
+          {
+            "what": "stories on paper white, off the white",
+            "selector": "ol.stories > li",
+            "expect": {
+              "@background": "darker"
+            }
+          },
+          {
+            "what": "paper stays light",
+            "selector": "ol.stories > li",
+            "expect": {
+              "@background": "light"
+            }
+          },
+          {
+            "what": "titles in charcoal or the vermilion accent",
+            "selector": ".story .link a",
+            "expect": {
+              "color": ["dark", "hue 0-30"]
+            }
+          },
+          {
+            "what": "a vermilion accent on links",
+            "selector": ".story .link a, .story .byline a, .story .comments_label a",
+            "match": "any",
+            "expect": {
+              "color": "hue 0-30"
+            }
+          },
+          {
+            "what": "rows given more space",
+            "selector": "ol.stories > li",
+            "expect": {
+              "@height": ">=1.1x"
+            }
+          },
+          {
+            "what": "titles and bylines are readable",
+            "selector": ".story .link a, .story .byline",
+            "match": "all",
+            "expect": {
+              "@contrast": ">=4.5"
+            }
+          },
+          {
+            "what": "every story still shown",
+            "selector": "ol.stories > li",
+            "match": "all",
+            "hidden": false
+          },
+          {
+            "what": "site navigation still shown",
+            "selector": "header#header nav a",
+            "match": "all",
+            "hidden": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "wikipedia-night-owl",
+    "tags": ["creative", "theme"],
+    "steps": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Typography",
+        "text": "Night owl: a warm dark theme, with a deep brown-black background, cream text, muted tan for secondary text, amber links, slightly lighter cards and inputs, and images dimmed a little.",
+        "checks": [
+          {
+            "what": "article on a dark background",
+            "selector": "#mw-content-text p",
+            "expect": {
+              "@background": "dark"
+            }
+          },
+          {
+            "what": "body text light",
+            "selector": "#mw-content-text p",
+            "expect": {
+              "color": "light"
+            }
+          },
+          {
+            "what": "links in amber",
+            "selector": "#mw-content-text p a",
+            "expect": {
+              "color": "hue 20-55"
+            }
+          },
+          {
+            "what": "images dimmed",
+            "selector": "#mw-content-text figure img",
+            "expect": {
+              "filter": "/brightness\\((0?\\.\\d+|\\d{1,2}%)\\)/"
+            }
+          },
+          {
+            "what": "headings, text and links are readable",
+            "selector": ".mw-page-title-main, #mw-content-text h2, #mw-content-text p, #mw-content-text p a",
+            "match": "all",
+            "expect": {
+              "@contrast": ">=4.5"
+            }
+          },
+          {
+            "what": "table of contents is readable",
+            "selector": ".vector-toc-text",
+            "match": "all",
+            "expect": {
+              "@contrast": ">=4.5"
+            }
+          },
+          {
+            "what": "images still shown",
+            "selector": "#mw-content-text figure img",
+            "hidden": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "bbc-calm",
+    "tags": ["creative", "theme", "hide"],
+    "steps": [
+      {
+        "url": "https://www.bbc.com/news",
+        "text": "Calm: quiet, desaturated colors, with an off-white background, soft dark gray text and muted blue-gray links, nothing bright, roomy lines, plenty of space between sections, and ads, promos, banners and pop-ups hidden.",
+        "checks": [
+          {
+            "what": "the ad hidden",
+            "selector": "div[data-testid='ad-unit']",
+            "hidden": true
+          },
+          {
+            "what": "the subscription banner hidden",
+            "selector": "#subliminal-banner",
+            "hidden": true
+          },
+          {
+            "what": "stories on an off-white background",
+            "selector": "h2[data-testid='card-headline']",
+            "expect": {
+              "@background": "darker"
+            }
+          },
+          {
+            "what": "background stays light",
+            "selector": "h2[data-testid='card-headline']",
+            "expect": {
+              "@background": "light"
+            }
+          },
+          {
+            "what": "headlines in a soft dark gray",
+            "selector": "h2[data-testid='card-headline']",
+            "expect": {
+              "color": "lighter"
+            }
+          },
+          {
+            "what": "headlines and story details are readable",
+            "selector": "h2[data-testid='card-headline'], span[data-testid='card-metadata-lastupdated']",
+            "match": "all",
+            "expect": {
+              "@contrast": ">=4.5"
+            }
+          },
+          {
+            "what": "site navigation still shown",
+            "selector": "#main-navigation-container, nav[data-testid='level2-navigation-container']",
+            "match": "all",
+            "hidden": false
+          },
+          {
+            "what": "every story still shown",
+            "selector": "h2[data-testid='card-headline']",
+            "match": "all",
+            "hidden": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "bbc-hide-distractions",
+    "tags": ["hide"],
+    "steps": [
+      {
+        "url": "https://www.bbc.com/news",
+        "text": "Hide distractions: ads and promos, banners and pop-ups, cookie, subscription and newsletter prompts, social share buttons, autoplay videos and sticky footers. Keep the navigation and the main content with its images as they are.",
+        "checks": [
+          {
+            "what": "the ad hidden",
+            "selector": "div[data-testid='ad-unit']",
+            "hidden": true
+          },
+          {
+            "what": "the subscription banner hidden",
+            "selector": "#subliminal-banner",
+            "hidden": true
+          },
+          {
+            "what": "site navigation still shown",
+            "selector": "#main-navigation-container, nav[data-testid='level2-navigation-container']",
+            "match": "all",
+            "hidden": false
+          },
+          {
+            "what": "every story still shown",
+            "selector": "h2[data-testid='card-headline']",
+            "match": "all",
+            "hidden": false
+          },
+          {
+            "what": "headlines look as they did",
+            "selector": "h2[data-testid='card-headline']",
+            "expect": {
+              "color": "same",
+              "font-size": "same",
+              "@background": "same"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]

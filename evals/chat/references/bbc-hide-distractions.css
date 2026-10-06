@@ -1,0 +1,4 @@
+div[data-testid='ad-unit'],
+#subliminal-banner {
+  display: none;
+}

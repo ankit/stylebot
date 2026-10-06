@@ -121,6 +121,14 @@ export default Vue.extend({
       }
     },
 
+    /**
+     * Puts text in the message field to edit before sending.
+     */
+    fill(text: string): void {
+      this.draft = text;
+      this.focus();
+    },
+
     stop(): void {
       this.$store.dispatch('chat/stop');
     },

@@ -2,6 +2,7 @@ import type { AppliedDeclaration } from '../applied-declarations';
 import type { RoleColorGroups } from '@stylebot/css';
 import type {
   ChatCssEdit,
+  ChatPageSignals,
   ChatStyleProblem,
   CssDeclaration,
 } from '@stylebot/types';
@@ -284,6 +285,10 @@ export class RemotePageBridge extends PageBridgeEmitter implements PageBridge {
 
   getPageOutline(): Promise<string> {
     return this.request('getPageOutline');
+  }
+
+  getPageSignals(): Promise<ChatPageSignals> {
+    return this.request('getPageSignals');
   }
 
   countMatches(selectors: Array<string>): Promise<Array<number | null>> {

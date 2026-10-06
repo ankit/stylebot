@@ -1,0 +1,32 @@
+div[data-testid='ad-unit'],
+#subliminal-banner {
+  display: none;
+}
+
+html,
+body,
+#main-content,
+main,
+header#bbc-header,
+#main-navigation-container {
+  background: #f6f7f5;
+}
+
+body,
+h2[data-testid='card-headline'],
+p[data-testid='card-description'] {
+  color: #3c4043;
+}
+
+h2[data-testid='card-headline'] {
+  line-height: 1.4;
+}
+
+span[data-testid='card-metadata-lastupdated'],
+span[data-testid='card-metadata-tag'] {
+  color: #5f6670;
+}
+
+a {
+  color: #4f6b7a;
+}

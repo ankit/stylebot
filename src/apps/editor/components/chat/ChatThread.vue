@@ -1,7 +1,13 @@
 <template>
   <div ref="scroller" class="chat-thread" aria-live="polite">
     <div v-if="empty" class="chat-empty">
-      <s-text variant="muted">{{ t('chat_empty_description') }}</s-text>
+      <div class="chat-empty-intro">
+        <s-heading as="h2" size="xl" class="chat-empty-title">
+          {{ t('what_should_this_site_look_like') }}
+        </s-heading>
+        <s-text variant="muted">{{ t('chat_empty_description') }}</s-text>
+      </div>
+      <chat-suggestions @fill="$emit('fill', $event)" />
     </div>
 
     <template v-for="turn in turns">
@@ -27,12 +33,13 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { SText } from '@stylebot/components';
+import { SHeading, SText } from '@stylebot/components';
 import type { ChatTurn } from '@stylebot/types';
 
 import ChatError from './ChatError.vue';
 import ChatPending from './ChatPending.vue';
 import ChatReply from './ChatReply.vue';
+import ChatSuggestions from './ChatSuggestions.vue';
 import ChatUserMessage from './ChatUserMessage.vue';
 import type { ChatError as ChatErrorState, ChatState } from '../../store/chat';
 
@@ -43,7 +50,9 @@ export default Vue.extend({
     ChatError,
     ChatPending,
     ChatReply,
+    ChatSuggestions,
     ChatUserMessage,
+    SHeading,
     SText,
   },
 
@@ -98,7 +107,7 @@ export default Vue.extend({
 .chat-thread {
   flex: 1;
   min-height: 0;
-  overflow: auto;
+  overflow: hidden auto;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -129,5 +138,16 @@ export default Vue.extend({
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
+  gap: 18px;
+}
+
+.chat-empty-intro {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.chat-empty-title {
+  text-wrap: balance;
 }
 </style>

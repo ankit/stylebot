@@ -301,15 +301,22 @@ export const createChatModule = (): Module<ChatState, State> => {
           ...(replay ? { replay } : {}),
         });
 
+        const last = current.rounds[current.rounds.length - 1];
+        // A reply that changed the page without a word gets one more call,
+        // so the model can say what it did.
+        const silent =
+          last.edits.length > 0 &&
+          current.rounds.every(item => !item.text.trim());
+
         if (
-          !needsFix(current.rounds[current.rounds.length - 1]) ||
+          !(needsFix(last) || silent) ||
           current.rounds.length > MAX_FIX_ROUNDS
         ) {
           finishReply(context, current);
           return;
         }
 
-        setPhase(context, 'fixing');
+        setPhase(context, silent && !needsFix(last) ? 'writing' : 'fixing');
 
         const replyTurn = getRoundsTurn(
           current.id,

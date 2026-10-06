@@ -1,6 +1,7 @@
 import type { RoleColorGroups } from '@stylebot/css';
 import type {
   ChatCssEdit,
+  ChatPageSignals,
   ChatStyleProblem,
   CssDeclaration,
 } from '@stylebot/types';
@@ -25,6 +26,7 @@ export type RemotePageBridgeRequestArgs = {
   getPageColors: [];
   getComputedStyles: [selector: string, properties: Array<string>];
   getPageOutline: [];
+  getPageSignals: [];
   countMatches: [selectors: Array<string>];
   getStableSelectors: [selectors: Array<string>];
   startStyleCheck: [edits: Array<ChatCssEdit>];
@@ -43,6 +45,7 @@ export type RemotePageBridgeRequestResult = {
   getPageColors: RoleColorGroups;
   getComputedStyles: Record<string, string>;
   getPageOutline: string;
+  getPageSignals: ChatPageSignals;
   countMatches: Array<number | null>;
   getStableSelectors: Array<string>;
   startStyleCheck: void;

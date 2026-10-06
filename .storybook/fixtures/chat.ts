@@ -66,9 +66,13 @@ export const chatStateOf = (root: HTMLElement): ChatState =>
  */
 export const chat = (
   chatOptions: ChatShimOptions = {},
-  overrides: EditorStateOverrides = {}
+  overrides: EditorStateOverrides = {},
+  page: { page?: string } = {}
 ): StoryObj => ({
-  ...editor({ ...overrides, options: { mode: 'chat', ...overrides.options } }),
+  ...editor(
+    { ...overrides, options: { mode: 'chat', ...overrides.options } },
+    page
+  ),
   parameters: { chrome: { chat: chatOptions } },
 });
 
@@ -96,3 +100,44 @@ export const SCREENSHOT = {
   name: '',
   size: 117,
 };
+
+export const DARK_PAGE_BACKGROUND = '#15171b';
+
+/* The stand-in page in dark colors; stories pair it with the body
+   background, which is what Chat reads. */
+export const DARK_PAGE = `
+  <div class="sb-page" style="min-height: 100vh; max-width: none; background: ${DARK_PAGE_BACKGROUND}; color: #e6e6e6">
+    <h1>Stylebot lets you restyle any website</h1>
+    <p>Change fonts, colors, layout and more with a visual editor.</p>
+  </div>
+`;
+
+/* A page of a dozen alike stories, the run Chat calls a list. */
+export const LIST_PAGE = `
+  <div class="sb-page">
+    <h1>Top stories</h1>
+    <ol class="stories">
+      ${Array.from(
+        { length: 12 },
+        (_, i) =>
+          `<li class="story"><a href="#">Story number ${
+            i + 1
+          }</a> <span class="meta">${i + 3} comments</span></li>`
+      ).join('')}
+    </ol>
+  </div>
+`;
+
+/* A header that sticks to the top over a page with a sidebar. */
+export const SIDEBAR_PAGE = `
+  <div>
+    <header style="position: sticky; top: 0; width: 100%; height: 48px; background: var(--hover-tint)"></header>
+    <div style="display: flex; gap: 24px">
+      <aside style="width: 200px; height: 480px; background: var(--tab-surface)"></aside>
+      <div class="sb-page">
+        <h1>Stylebot lets you restyle any website</h1>
+        <p class="article-body">Pick an element to start.</p>
+      </div>
+    </div>
+  </div>
+`;

@@ -14,6 +14,7 @@ import { SThemeProvider } from '@stylebot/components';
 import { installChrome } from './mocks/chrome';
 import { resetHoverSettled, setInteractionDelay } from './story-helpers';
 import { setPageBridge, LocalPageBridge } from '@stylebot/page-bridge';
+import type { PageBridge } from '@stylebot/page-bridge';
 
 import '../src/assets/fonts/fonts.css';
 import '../src/apps/editor/index.scss';
@@ -36,10 +37,13 @@ const mountedStoryCss = (): string => {
 // One bridge per story, or highlighter overlays and listeners outlive it.
 let pageBridge: LocalPageBridge | null = null;
 
-const resetPageBridge = (): void => {
+// A story can stand in for some of the bridge's methods, as for a page that
+// can't be read.
+const resetPageBridge = (overrides: Partial<PageBridge> = {}): void => {
   pageBridge?.stopInspecting();
   pageBridge?.unhighlight();
   pageBridge = new LocalPageBridge({ getStylebotCss: mountedStoryCss });
+  Object.assign(pageBridge, overrides);
   setPageBridge(pageBridge);
 };
 
@@ -161,7 +165,10 @@ const preview: Preview = {
       // sets it, so CI stays instant.
       setInteractionDelay(globals.speed === 'slow' ? 250 : 0);
       resetHoverSettled();
-      resetPageBridge();
+      resetPageBridge(parameters.pageBridge);
+
+      // The page's own background, which Chat reads to tell a dark page.
+      document.body.style.backgroundColor = parameters.pageBackground ?? '';
 
       // Composites read their appearance from options, so the toolbar theme
       // flows through the shim as well as the outer SThemeProvider.

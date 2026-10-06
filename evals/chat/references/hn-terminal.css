@@ -1,0 +1,50 @@
+html,
+body,
+#hnmain,
+#hnmain td,
+td[bgcolor='#ff6600'],
+td[bgcolor='#ff6600'] * {
+  background: #0c0c0c;
+  color: #33ff66;
+}
+
+body,
+td,
+a,
+span,
+input,
+.title,
+.subtext,
+.subline,
+.comhead,
+.pagetop,
+.yclinks {
+  font-family: 'Fira Code';
+}
+
+.pagetop a,
+.titleline > a,
+.subline a,
+.morelink,
+.yclinks a,
+center > a {
+  color: #66ffcc;
+}
+
+.sitebit,
+.sitestr,
+.rank,
+.subtext,
+.subline {
+  color: #33ff66;
+}
+
+td[bgcolor='#ff6600'] {
+  border-bottom: 1px solid #1f5f2f;
+}
+
+input[name='q'] {
+  background: #0c0c0c;
+  color: #33ff66;
+  border: 1px solid #1f5f2f;
+}
