@@ -8,7 +8,6 @@ export { default as InspectorIcon } from './InspectorIcon.vue';
 export { default as SearchIcon } from './SearchIcon.vue';
 export { default as CheckIcon } from './CheckIcon.vue';
 export { default as SunIcon } from './SunIcon.vue';
-export { default as StarIcon } from './StarIcon.vue';
 export { default as MoonIcon } from './MoonIcon.vue';
 export { default as MonitorIcon } from './MonitorIcon.vue';
 export { default as DropletIcon } from './DropletIcon.vue';

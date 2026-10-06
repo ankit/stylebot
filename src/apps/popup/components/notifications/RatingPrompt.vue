@@ -1,38 +1,29 @@
 <template>
-  <section
-    v-if="visible"
-    class="rating-prompt"
-    :aria-label="t('having_fun_restyling_the_web')"
-  >
-    <div class="rating-prompt-stars" aria-hidden="true">
-      <star-icon
-        v-for="n in 5"
-        :key="n"
-        :size="16"
-        class="rating-prompt-star"
-        :style="{ '--star': n }"
-      />
-    </div>
+  <section v-if="visible" class="rating-prompt" :aria-label="title">
+    <div class="rating-prompt-header">
+      <s-heading as="h2" size="lg" class="rating-prompt-title">
+        {{ title }}
+      </s-heading>
 
-    <div class="rating-prompt-text">
-      <s-text as="span" class="rating-prompt-title">
-        {{ t('having_fun_restyling_the_web') }}
-      </s-text>
-      <s-text as="span" size="label" variant="muted">
-        {{ t('a_quick_rating_helps_others_find_stylebot') }}
-      </s-text>
-    </div>
-
-    <div class="rating-prompt-actions">
-      <s-button size="small" variant="ghost" @click="dismiss">
-        {{ t('not_now') }}
-      </s-button>
-      <s-button
-        size="small"
-        variant="primary"
-        class="rating-prompt-rate"
-        @click="rate"
+      <s-icon-button
+        class="rating-prompt-dismiss"
+        :tooltip="t('dismiss')"
+        @click="dismiss"
       >
+        <x-icon :size="16" />
+      </s-icon-button>
+    </div>
+
+    <s-text variant="muted" class="rating-prompt-body">
+      {{
+        t(
+          'if_stylebot_has_made_the_web_nicer_for_you_a_quick_rating_helps_others_find_it'
+        )
+      }}
+    </s-text>
+
+    <div>
+      <s-button variant="primary" @click="rate">
         {{ t('rate_stylebot') }}
       </s-button>
     </div>
@@ -41,8 +32,8 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { SButton, SText } from '@stylebot/components';
-import { StarIcon } from '@stylebot/icons';
+import { SButton, SHeading, SIconButton, SText } from '@stylebot/components';
+import { XIcon } from '@stylebot/icons';
 
 import {
   dismissRatingPrompt,
@@ -56,18 +47,28 @@ export default Vue.extend({
 
   components: {
     SButton,
+    SHeading,
+    SIconButton,
     SText,
-    StarIcon,
+    XIcon,
   },
 
   data(): {
     visible: boolean;
+    savedStyles: number;
     reviewUrl: string | null;
   } {
     return {
       visible: false,
+      savedStyles: 0,
       reviewUrl: getReviewUrl(),
     };
+  },
+
+  computed: {
+    title(): string {
+      return this.t('youve_restyled_count_sites', [String(this.savedStyles)]);
+    },
   },
 
   async created() {
@@ -75,7 +76,10 @@ export default Vue.extend({
       return;
     }
 
-    this.visible = isEligibleForRatingPrompt(await getRatingPromptState());
+    const state = await getRatingPromptState();
+
+    this.savedStyles = state.savedStyles;
+    this.visible = isEligibleForRatingPrompt(state);
   },
 
   methods: {
@@ -100,74 +104,39 @@ export default Vue.extend({
 .rating-prompt {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 14px 12px 12px 16px;
+  gap: 6px;
+  padding: 16px 12px 16px 16px;
   background: var(--info);
   border-top: 1px solid var(--info-border);
 }
 
-.rating-prompt-stars {
+.rating-prompt-header {
   display: flex;
-  gap: 3px;
-  color: var(--warning-icon);
-}
-
-.rating-prompt-star {
-  animation: star-pop 420ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
-  animation-delay: calc(var(--star) * 70ms);
-  transform-origin: center;
-
-  @media (prefers-reduced-motion: reduce) {
-    animation: none;
-  }
-}
-
-.rating-prompt:has(.rating-prompt-rate:hover) .rating-prompt-star,
-.rating-prompt:has(.rating-prompt-rate:focus-visible) .rating-prompt-star {
-  animation: star-hop 600ms ease-in-out infinite;
-  animation-delay: calc(var(--star) * 80ms);
-
-  @media (prefers-reduced-motion: reduce) {
-    animation: none;
-  }
-}
-
-.rating-prompt-text {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+  align-items: flex-start;
+  gap: 8px;
 }
 
 .rating-prompt-title {
-  font-weight: 600;
+  flex: 1;
+  min-width: 0;
 }
 
-.rating-prompt-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 6px;
-}
+.rating-prompt-dismiss {
+  flex: none;
+  margin-top: -2px;
 
-@keyframes star-pop {
-  from {
-    opacity: 0;
-    transform: scale(0.3) rotate(-30deg);
-  }
+  ::v-deep .icon-button {
+    padding: 5px;
+    color: var(--text-muted);
 
-  to {
-    opacity: 1;
-    transform: scale(1) rotate(0);
+    &:hover {
+      background: var(--info-border);
+    }
   }
 }
 
-@keyframes star-hop {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-
-  40% {
-    transform: translateY(-3px) rotate(8deg);
-  }
+.rating-prompt-body {
+  padding-right: 32px;
+  margin-bottom: 8px;
 }
 </style>

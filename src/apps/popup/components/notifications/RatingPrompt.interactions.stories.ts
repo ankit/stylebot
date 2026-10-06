@@ -27,12 +27,12 @@ export const ShownWhenEligible: StoryObj = {
     const canvas = within(canvasElement);
 
     await expect(
-      await canvas.findByText('Having fun restyling the web?')
+      await canvas.findByText('You’ve restyled 3 sites')
     ).toBeVisible();
     await expect(
       canvas.getByRole('button', { name: 'Rate Stylebot' })
     ).toBeVisible();
-    await expect(canvas.getByRole('button', { name: 'Not now' })).toBeVisible();
+    await expect(canvas.getByRole('button', { name: 'Dismiss' })).toBeVisible();
   },
 };
 
@@ -43,9 +43,7 @@ export const HiddenWhenTooNew: StoryObj = {
     const canvas = within(canvasElement);
 
     await canvas.findByRole('heading', { name: 'example.com' });
-    await expect(
-      canvas.queryByText('Having fun restyling the web?')
-    ).toBeNull();
+    await expect(canvas.queryByText('You’ve restyled 3 sites')).toBeNull();
   },
 };
 
@@ -59,9 +57,7 @@ export const HiddenWithFewStyles: StoryObj = {
     const canvas = within(canvasElement);
 
     await canvas.findByRole('heading', { name: 'example.com' });
-    await expect(
-      canvas.queryByText('Having fun restyling the web?')
-    ).toBeNull();
+    await expect(canvas.queryByText('You’ve restyled 3 sites')).toBeNull();
   },
 };
 
@@ -72,23 +68,21 @@ export const HiddenOnceDismissed: StoryObj = {
     const canvas = within(canvasElement);
 
     await canvas.findByRole('heading', { name: 'example.com' });
-    await expect(
-      canvas.queryByText('Having fun restyling the web?')
-    ).toBeNull();
+    await expect(canvas.queryByText('You’ve restyled 3 sites')).toBeNull();
   },
 };
 
 export const DismissHidesForGood: StoryObj = {
   ...popup(ratingEligible()),
-  name: 'Not now hides the prompt and never shows it again',
+  name: 'dismissing hides the prompt and never shows it again',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const create = spyOn(chrome.tabs, 'create');
 
-    await user.click(await canvas.findByRole('button', { name: 'Not now' }));
+    await user.click(await canvas.findByRole('button', { name: 'Dismiss' }));
 
     await waitFor(() =>
-      expect(canvas.queryByText('Having fun restyling the web?')).toBeNull()
+      expect(canvas.queryByText('You’ve restyled 3 sites')).toBeNull()
     );
     await expect(create).not.toHaveBeenCalled();
     await expect(
