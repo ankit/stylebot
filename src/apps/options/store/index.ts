@@ -149,9 +149,18 @@ export const createStore = (): Store<State> => {
         state.googleDriveSyncState = await getSyncState();
       },
 
-      setAllStyles({ state }, styles: StyleMap) {
-        state.styles = styles;
-        setAllStyles(styles);
+      /**
+       * Replaces every saved style with an imported set, keeping the page's
+       * copy as it was when the background fails to store them.
+       */
+      async importStyles({ state }, styles: StyleMap): Promise<boolean> {
+        const ok = await setAllStyles(styles);
+
+        if (ok) {
+          state.styles = styles;
+        }
+
+        return ok;
       },
 
       /**

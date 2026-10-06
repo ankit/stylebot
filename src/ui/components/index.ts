@@ -12,6 +12,7 @@ export { default as SAnchoredMenu } from './SAnchoredMenu.vue';
 export { default as SMenuItem } from './SMenuItem.vue';
 export { default as SMenuDivider } from './SMenuDivider.vue';
 export { default as SDialog } from './SDialog.vue';
+export { default as SDialogCard } from './SDialogCard.vue';
 export { default as SConfirmDialog } from './SConfirmDialog.vue';
 export { default as SPromptDialog } from './SPromptDialog.vue';
 export { default as SThemeProvider } from './SThemeProvider.vue';

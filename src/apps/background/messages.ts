@@ -74,6 +74,7 @@ import type {
   RunGoogleDriveSyncResponse,
   ScanVersionHistoryResponse,
   RestoreVersionResponse,
+  SetAllStylesResponse,
   GetRecentColorsResponse,
   AddRecentColorResponse,
   ChatConnect as ChatConnectType,
@@ -181,9 +182,17 @@ export const GetAllStyles = async (
 };
 
 export const SetAllStyles = async (
-  message: SetAllStylesType
+  message: SetAllStylesType,
+  sendResponse: (response: SetAllStylesResponse) => void
 ): Promise<void> => {
-  await setAll(message.styles);
+  try {
+    await setAll(message.styles);
+  } catch {
+    sendResponse({ ok: false });
+    return;
+  }
+
+  sendResponse({ ok: true });
   return applyStylesToAllTabs();
 };
 

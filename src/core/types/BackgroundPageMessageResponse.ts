@@ -11,6 +11,8 @@ export type GetOptionResponse = StylebotOptions[keyof StylebotOptions];
 
 export type GetAllStylesResponse = StyleMap;
 
+export type SetAllStylesResponse = { ok: boolean };
+
 export type CreateProfileResponse = {
   profileId: string;
 };
@@ -75,6 +77,7 @@ type BackgroundPageMessageResponse =
   | RunGoogleDriveSyncResponse
   | ScanVersionHistoryResponse
   | RestoreVersionResponse
+  | SetAllStylesResponse
   | GetRecentColorsResponse
   | AddRecentColorResponse
   | GetIsEditorWindowOpenResponse

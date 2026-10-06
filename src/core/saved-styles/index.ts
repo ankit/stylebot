@@ -34,3 +34,17 @@ export type {
   ProfileSummary,
 } from './profiles';
 export { isStyleMap, sanitizeStyleMap } from './style-map';
+export {
+  BACKUP_FORMAT,
+  BACKUP_VERSION,
+  createBackup,
+  parseBackup,
+  previewImport,
+  mergeBackup,
+} from './backup';
+export type {
+  Backup,
+  BackupErrorKey,
+  ImportPreview,
+  ParsedBackup,
+} from './backup';

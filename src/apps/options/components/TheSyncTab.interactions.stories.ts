@@ -3,7 +3,10 @@ import { expect, waitFor, within } from '@storybook/test';
 import type { SyncState } from '@stylebot/types';
 
 import TheSyncTab from './TheSyncTab.vue';
-import { optionsPage } from '@stylebot/storybook/fixtures/options';
+import {
+  optionsPage,
+  seededStyles,
+} from '@stylebot/storybook/fixtures/options';
 import { user } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
@@ -21,6 +24,34 @@ const metadata = {
   webViewLink: 'https://drive.google.com/file/d/drive-file-id/view',
   webContentLink: 'https://drive.google.com/uc?id=drive-file-id',
 };
+
+/**
+ * Answers the next file picker with a file holding `contents`, since a story
+ * can't drive the browser's own file chooser.
+ */
+const chooseFileOnNextPicker = (contents: unknown) => {
+  const click = HTMLInputElement.prototype.click;
+
+  HTMLInputElement.prototype.click = function (this: HTMLInputElement) {
+    HTMLInputElement.prototype.click = click;
+
+    const transfer = new DataTransfer();
+    transfer.items.add(
+      new File([JSON.stringify(contents)], 'stylebot_backup.json', {
+        type: 'application/json',
+      })
+    );
+    this.files = transfer.files;
+    this.dispatchEvent(new Event('change'));
+  };
+};
+
+const backup = (styles: Record<string, unknown>) => ({
+  format: 'stylebot-backup',
+  version: 1,
+  exportedAt: '2026-10-01T00:00:00Z',
+  styles,
+});
 
 const syncState = (overrides: Partial<SyncState> = {}): SyncState => ({
   remoteRevision: metadata.modifiedTime,
@@ -118,4 +149,96 @@ export const DisconnectingShowsTheConnectOptionAgain: StoryObj = {
     }
   ),
   name: 'disconnecting drops the card back to the not-connected state',
+};
+
+export const MergingABackupKeepsLocalStyles: StoryObj = {
+  ...optionsPage('Sync', { styles: seededStyles }, async root => {
+    const canvas = within(root);
+
+    chooseFileOnNextPicker(
+      backup({
+        'example.com': {
+          ...seededStyles['example.com'],
+          css: 'h1 { color: blue; }',
+        },
+        'new.example.net': {
+          css: 'body { margin: 0; }',
+          enabled: true,
+          readability: false,
+          modifiedTime: '2026-09-01T00:00:00Z',
+        },
+      })
+    );
+    await user.click(canvas.getByRole('button', { name: 'Import' }));
+
+    const dialog = await canvas.findByRole('heading', {
+      name: 'Import backup',
+    });
+    await expect(dialog).toBeVisible();
+    await expect(canvas.getByText('1 new style')).toBeVisible();
+    await expect(
+      canvas.getByText('1 style that differs from yours')
+    ).toBeVisible();
+    await expect(
+      canvas.getByText(
+        "You have 3 styles that aren't in this backup. Merge keeps them; Replace all deletes them."
+      )
+    ).toBeVisible();
+
+    await user.click(canvas.getByRole('button', { name: 'Merge' }));
+
+    await waitFor(() =>
+      expect(canvas.getByText(/^Imported 2 styles\./)).toBeVisible()
+    );
+    await expect(
+      canvas.queryByRole('heading', { name: 'Import backup' })
+    ).toBeNull();
+  }),
+  name: 'merging a backup counts what it adds and changes, then confirms the import',
+};
+
+export const AnEmptyBackupIsRejected: StoryObj = {
+  ...optionsPage('Sync', { styles: seededStyles }, async root => {
+    const canvas = within(root);
+
+    chooseFileOnNextPicker({});
+    await user.click(canvas.getByRole('button', { name: 'Import' }));
+
+    await waitFor(() =>
+      expect(
+        canvas.getByText('Could not import styles - The backup has no styles')
+      ).toBeVisible()
+    );
+    await expect(
+      canvas.queryByRole('heading', { name: 'Import backup' })
+    ).toBeNull();
+  }),
+  name: 'an empty backup shows an error instead of offering to replace every style',
+};
+
+export const CancellingAnImportChangesNothing: StoryObj = {
+  ...optionsPage('Sync', { styles: seededStyles }, async root => {
+    const canvas = within(root);
+
+    chooseFileOnNextPicker(backup(seededStyles));
+    await user.click(canvas.getByRole('button', { name: 'Import' }));
+
+    await expect(
+      await canvas.findByText('Everything in this backup matches your styles.')
+    ).toBeVisible();
+    await expect(canvas.getByRole('button', { name: 'Merge' })).toBeDisabled();
+    await expect(
+      canvas.queryByRole('button', { name: 'Replace all' })
+    ).toBeNull();
+
+    await user.click(canvas.getByRole('button', { name: 'Cancel' }));
+
+    await waitFor(() =>
+      expect(
+        canvas.queryByRole('heading', { name: 'Import backup' })
+      ).toBeNull()
+    );
+    await expect(canvas.queryByText(/^Imported/)).toBeNull();
+  }),
+  name: 'a backup matching every style offers nothing to merge and cancels cleanly',
 };
