@@ -6,7 +6,8 @@ type Props = {
   bare?: boolean;
   once?: boolean;
   cycle?: number;
-  nudge?: number;
+  nudgeX?: number;
+  nudgeY?: number;
 };
 
 const BARS: [number, number, string][] = [
@@ -30,7 +31,8 @@ export default function SbIcon({
   bare = false,
   once = false,
   cycle = 1.8,
-  nudge,
+  nudgeX = 0,
+  nudgeY = 0,
 }: Props) {
   const [t, setT] = useState<number | null>(null);
 
@@ -65,7 +67,8 @@ export default function SbIcon({
         display: 'block',
         flex: 'none',
         overflow: 'visible',
-        transform: nudge ? `translateY(${nudge}px)` : undefined,
+        transform:
+          nudgeX || nudgeY ? `translate(${nudgeX}px,${nudgeY}px)` : undefined,
       }}
       aria-hidden="true"
     >

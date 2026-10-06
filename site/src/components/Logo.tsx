@@ -128,7 +128,7 @@ export default function Logo() {
         onMouseLeave={() => setHover(false)}
       >
         <span class="logo-mark">
-          <SbIcon size={26} nudge={1} once animate={hover} />
+          <SbIcon size={26} nudgeY={1} once animate={hover} />
         </span>
         <span class="logo-name">stylebot</span>
       </a>

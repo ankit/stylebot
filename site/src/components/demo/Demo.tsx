@@ -1,12 +1,20 @@
 import { Component, createRef } from 'preact';
 import SbIcon from '../SbIcon';
+import { ChevronDown, Close, EyeOff } from '../icons';
+import {
+  ChatComposer,
+  ChatEmpty,
+  FIRST_DECK,
+  NIGHT_OWL,
+  SECOND_DECK,
+} from '../chat/Chat';
 import './demo.css';
 import { isDarkTheme } from '../../lib/themes';
 import { currentTheme } from '../../lib/theme-state';
 import {
-  AGENT_CSS,
-  CHAT_MSG,
+  LOOKS,
   INIT,
+  LOOK_STEPS,
   KEY_LEN,
   NEW_PROFILE,
   QUOTE_CSS,
@@ -40,14 +48,7 @@ type Token = { text: string; style: string };
 type Line = { style: string; toks: Token[] };
 
 const PANE_WIDTH = 980;
-const PLAYBACK_KEYS = new Set([
-  'cur',
-  'click',
-  'chatType',
-  'keyType',
-  'qType',
-  'profType',
-]);
+const PLAYBACK_KEYS = new Set(['cur', 'click', 'keyType', 'qType', 'profType']);
 
 const CODE_COLORS: Record<string, string> = {
   sel: 'color:var(--csel)',
@@ -63,21 +64,6 @@ const tk = (text: string, c: string): Token => ({
   text,
   style: CODE_COLORS[c],
 });
-
-const ToolbarIcon = ({ size = 20 }: { size?: number }) => (
-  <svg
-    width={size}
-    height={size}
-    viewBox="0 0 64 64"
-    style={`display:block;flex:none${size === 20 ? ';transform:translateX(1px)' : ''}`}
-    aria-hidden="true"
-  >
-    <rect x="6" y="12" width="44" height="10" rx="5" fill="#ec4d86" />
-    <rect x="6" y="28" width="30" height="10" rx="5" fill="#1c9fc4" />
-    <rect x="6" y="44" width="36" height="10" rx="5" fill="#e0a218" />
-    <rect x="47" y="41" width="4.5" height="16" rx="2" fill="#2563eb" />
-  </svg>
-);
 
 /**
  * The inspector tooltip shown under a hovered element, naming its selector.
@@ -99,32 +85,23 @@ const EXTENSIONS: [string, string][] = [
   ['Web archive', '#6b6f76'],
 ];
 
-const ChevronDown = () => (
+const Gear = () => (
   <svg
-    width="10"
-    height="10"
-    viewBox="0 0 10 10"
+    width="16"
+    height="16"
+    viewBox="0 0 16 16"
     fill="none"
     stroke="currentColor"
     stroke-width="1.4"
-    stroke-linecap="round"
-    stroke-linejoin="round"
   >
-    <path d="M2 3.5 5 6.5 8 3.5" />
-  </svg>
-);
-
-const Close = ({ size }: { size: number }) => (
-  <svg
-    width={size}
-    height={size}
-    viewBox="0 0 14 14"
-    fill="none"
-    stroke="currentColor"
-    stroke-width="1.5"
-    stroke-linecap="round"
-  >
-    <path d="M2.5 2.5l9 9M11.5 2.5l-9 9" />
+    <circle cx="8" cy="8" r="2.3" />
+    <circle
+      cx="8"
+      cy="8"
+      r="5.6"
+      stroke-dasharray="2.2 1.6"
+      stroke-width="2.2"
+    />
   </svg>
 );
 
@@ -216,12 +193,12 @@ export default class Demo extends Component<Props, State> {
 
   componentWillUnmount() {
     this.clear();
-    clearTimeout(this.startId);
     window.removeEventListener('themechange', this.onTheme);
     this.resizeObserver?.disconnect();
   }
 
   clear() {
+    clearTimeout(this.startId);
     this.timers.forEach(clearTimeout);
     this.timers = [];
   }
@@ -250,7 +227,7 @@ export default class Demo extends Component<Props, State> {
     const k = 1 / this.state.speed;
     if (patch.qType) {
       for (let i = 1; i <= QUOTE_TOTAL; i++) {
-        this.later(i * 34 * k + Math.floor(i / 22) * 260 * k, () =>
+        this.later(i * 28 * k + Math.floor(i / 22) * 200 * k, () =>
           this.setState({ qChars: i }),
         );
       }
@@ -258,11 +235,6 @@ export default class Demo extends Component<Props, State> {
     if (patch.keyType) {
       for (let i = 1; i <= KEY_LEN; i++) {
         this.later(i * 38 * k, () => this.setState({ keyLen: i }));
-      }
-    }
-    if (patch.chatType) {
-      for (let i = 1; i <= CHAT_MSG.length; i++) {
-        this.later(i * 26 * k, () => this.setState({ chatDraft: i }));
       }
     }
     if (patch.profType) {
@@ -301,15 +273,16 @@ export default class Demo extends Component<Props, State> {
       ),
     );
     Object.assign(s, {
-      keys: false,
-      keyDown: false,
       popOpen: false,
+      popHover: false,
       menuOpen: false,
       focus: null,
       codeScroll: false,
       profMenu: false,
       profCreating: false,
       profLen: 0,
+      cardHover: null,
+      dealing: false,
     });
     if (this.scenes.slice(0, i).some((sc) => sc.acts.some(([, p]) => p.qType)))
       s.qChars = QUOTE_TOTAL;
@@ -363,7 +336,6 @@ export default class Demo extends Component<Props, State> {
     const from = sc.dur * k * frac;
     const s: Record<string, unknown> = { ...this.baseline(i) };
     const typed: Record<string, () => Partial<DemoState>> = {
-      chatType: () => ({ chatDraft: CHAT_MSG.length }),
       keyType: () => ({ keyLen: KEY_LEN }),
       qType: () => ({ qChars: QUOTE_TOTAL }),
       profType: () => ({ profLen: NEW_PROFILE.length }),
@@ -465,7 +437,7 @@ export default class Demo extends Component<Props, State> {
     return { lines, quoteDone };
   }
 
-  agentLines(): Line[] {
+  agentLines(css: [string, [string, string][]][]): Line[] {
     const hex = (v: string): Token[] =>
       /^#[0-9a-f]{6}$/i.test(v)
         ? [
@@ -486,7 +458,7 @@ export default class Demo extends Component<Props, State> {
                   ),
             );
     const lines: Line[] = [];
-    AGENT_CSS.forEach(([sel, props]) => {
+    css.forEach(([sel, props]) => {
       lines.push({ style: '', toks: [tk(`${sel} `, 'sel'), tk('{', 'br')] });
       props.forEach(([p, v]) =>
         lines.push({
@@ -497,6 +469,50 @@ export default class Demo extends Component<Props, State> {
       lines.push({ style: '', toks: [tk('}', 'br')] });
     });
     return lines;
+  }
+
+  /**
+   * The style for suggestion card `i` of deck `d`: the shown deck rests fanned
+   * out as Chat's stylesheet sets it, and More ideas tosses it away while the
+   * next deck lands in its place.
+   */
+  cardStyle(S: State, d: number, i: number) {
+    const shown = S.deal === d;
+    const hov = shown && S.cardHover === `${d}${i}`;
+    const turn = i % 2 ? 1 : -1;
+    const transform = !shown
+      ? d === 0
+        ? `translateY(-12px) rotate(${turn * 6}deg) scale(.9)`
+        : `translateY(-18px) rotate(${turn * -8}deg) scale(.9)`
+      : hov
+        ? S.clicking
+          ? 'scale(.97)'
+          : 'translateY(-4px) scale(1.04)'
+        : null;
+    const delay = S.dealing ? (shown ? 140 + i * 70 : i * 40) : 0;
+    const dur = S.dealing ? (shown ? '.44s' : '.18s') : '.2s';
+    return (
+      `border-color:${hov ? 'var(--faint)' : 'var(--strong)'};${transform ? `transform:${transform};` : ''}opacity:${shown ? 1 : 0};` +
+      `transition:transform ${dur} cubic-bezier(.3,1.6,.5,1) ${delay}ms,opacity .18s ease ${delay}ms,border-color .2s`
+    );
+  }
+
+  renderEmptyChat(S: State) {
+    const second = S.dark
+      ? [SECOND_DECK[0], NIGHT_OWL, SECOND_DECK[2]]
+      : SECOND_DECK;
+    return (
+      <ChatEmpty
+        decks={[FIRST_DECK, second]}
+        moreStyle={
+          S.clicking && S.dealing
+            ? 'background:var(--hover);transform:scale(.96)'
+            : ''
+        }
+        moreIconStyle={`transition:transform .35s cubic-bezier(.3,1.5,.5,1);transform:rotate(${S.deal * 180}deg)`}
+        cardStyle={(d, i) => this.cardStyle(S, d, i)}
+      />
+    );
   }
 
   renderLines(lines: Line[]) {
@@ -517,7 +533,7 @@ export default class Demo extends Component<Props, State> {
    */
   profileView(state: State): State {
     return state.profile === 'Default'
-      ? { ...state, agentTheme: false }
+      ? { ...state, agentTheme: false, lookStep: 0 }
       : { ...state, h1Size: 32, h1Color: null, qChars: 0 };
   }
 
@@ -525,15 +541,19 @@ export default class Demo extends Component<Props, State> {
     const S = this.profileView(state);
     const read = S.read;
     const ag = S.agentTheme;
+    const step = ag ? LOOK_STEPS : S.lookStep;
+    const at = (n: number) => step >= n;
     const dk = S.dark;
-    const ink = ag ? '#d3c6aa' : dk ? '#dfe2e7' : '#22252b';
-    const muted = ag ? '#859289' : dk ? '#8f96a3' : '#6b7280';
-    const serif = ag
-      ? "'Lora',Georgia,serif"
-      : read
-        ? "Georgia,'Times New Roman',serif"
-        : "'Helvetica Neue',Arial,sans-serif";
-    const headF = ag ? "'Newsreader',Georgia,serif" : serif;
+    const look = LOOKS[dk ? 'dark' : 'light'];
+    const np = look.colors;
+    const ink = at(1) ? np.ink : 'var(--page-ink)';
+    const muted = at(4) ? np.muted : 'var(--page-muted)';
+    const serif =
+      at(2) && look.serif
+        ? "'Newsreader',Georgia,serif"
+        : read
+          ? "Georgia,'Times New Roman',serif"
+          : "'Helvetica Neue',Arial,sans-serif";
     const mark = (k: string) =>
       S.inspecting && S.hover === k
         ? ';background-color:rgba(111,168,220,.66)' +
@@ -543,15 +563,24 @@ export default class Demo extends Component<Props, State> {
       ';transition:font-size .25s,color .25s,background .3s,outline-color .2s';
 
     const { lines: codeLines, quoteDone: qd } = this.codeLines(S);
-    const agentLines = this.agentLines();
-    const hasSel = !!S.sel;
+    const agentLines = this.agentLines(look.css);
+    const agentDecls = look.css.reduce((n, [, props]) => n + props.length, 0);
+    const profileName = (name: string) =>
+      name === NEW_PROFILE ? look.profile : name;
+    const hasSel = !!S.sel && !S.inspecting;
     const sizeSet = S.h1Size !== 32;
+    const computedInk = at(1) ? np.head : dk ? '#dfe2e7' : '#22252b';
 
-    const tab = (k: string) =>
-      `padding:0 0 11px;font:${S.tab === k ? 600 : 400} 14px/1 var(--ui);margin-bottom:-1px;border-bottom:2px solid ` +
-      (S.tab === k
-        ? 'var(--acc);color:var(--ink)'
-        : 'transparent;color:var(--muted)');
+    const tab = (k: string) => {
+      const on = S.tab === k;
+      const first = k === 'basic';
+      const inset = first ? 0 : 6;
+      return (
+        `padding:6px 6px 8px ${inset}px;font:${on ? 600 : 400} 14px/1.3 var(--ui);margin-bottom:-1px;transition:color .15s;` +
+        `background:${on ? `linear-gradient(var(--acc),var(--acc)) no-repeat ${inset}px 100% / calc(100% - ${inset + 6}px) 2px` : 'none'};` +
+        `color:${on ? 'var(--ink)' : 'var(--muted)'}`
+      );
+    };
     const field = (f: string) =>
       'width:104px;height:30px;flex:none;border-radius:8px;display:flex;align-items:center;overflow:hidden;background:var(--hover);transition:box-shadow .15s;' +
       (S.focus === f
@@ -563,11 +592,6 @@ export default class Demo extends Component<Props, State> {
     });
     const readTog = toggle(read);
     const grayTog = toggle(S.gray);
-    const keyCap =
-      'padding:5px 10px;border-radius:6px;font:500 13px/1.3 var(--mono);transition:all .12s;' +
-      (S.keyDown
-        ? 'background:var(--acctint);border:1px solid var(--acc);border-bottom-width:1px;color:var(--acc);transform:translateY(1px)'
-        : 'background:var(--fill);border:1px solid var(--strong);border-bottom-width:2px;color:var(--ink2)');
     const selected = !S.inspecting && !!S.sel;
     const selText = selected ? 'article h1' : 'Pick an element';
     const isChat = S.tab === 'chat' && S.keyOk;
@@ -584,14 +608,17 @@ export default class Demo extends Component<Props, State> {
 
     const quote =
       'margin:4px 0 18px;transition:all .35s' +
-      (qd.bg
-        ? `;background:${ag ? '#343f44' : dk ? '#23262c' : '#faf4ee'}`
+      (qd.bg || at(5)
+        ? `;background:${at(5) ? np.panel : 'var(--page-quote)'}`
         : '') +
-      (qd.pad ? ';padding:18px 20px' : '') +
-      (qd.radius ? ';border-radius:8px' : '') +
-      (qd.border
-        ? `;border-left:3px solid ${ag ? '#e69875' : dk ? '#e2795f' : '#c2410c'}`
+      (qd.pad || at(5) ? ';padding:18px 20px' : '') +
+      (qd.radius || at(5) ? ';border-radius:8px' : '') +
+      (qd.border || at(5)
+        ? `;border-left:3px solid ${at(5) ? np.acc : 'var(--page-kicker)'}`
         : '');
+    const quoteFont = at(5)
+      ? `font-family:${serif};font-size:18px;font-style:italic;`
+      : `font-family:${qd.font ? "'Lora',Georgia,serif" : serif};font-size:${qd.size ? '20px' : '16px'};font-style:${qd.size ? 'italic' : 'normal'};`;
 
     const steps = this.scenes.map((sc, i) => {
       const doneStep = S.done || i < S.scene;
@@ -638,7 +665,7 @@ export default class Demo extends Component<Props, State> {
                 (S.popOpen || S.editorOpen ? ';background:var(--strong)' : '')
               }
             >
-              <ToolbarIcon />
+              <SbIcon size={20} nudgeX={1} />
             </div>
             <div
               data-t="puzzle"
@@ -683,7 +710,7 @@ export default class Demo extends Component<Props, State> {
               return (
                 <div key={name} class="demo-menu-row">
                   {sb ? (
-                    <ToolbarIcon />
+                    <SbIcon size={20} nudgeX={1} />
                   ) : (
                     <span class="demo-menu-icon" style={`background:${bg}`} />
                   )}
@@ -720,49 +747,36 @@ export default class Demo extends Component<Props, State> {
                 : 'opacity:0;transform:scale(.97);pointer-events:none'
             }
           >
-            <div style="padding:14px 16px 12px;border-bottom:1px solid var(--border)">
-              <div style="font:600 14.5px/1.2 var(--ui);color:var(--ink)">
-                harbourpost.example
-              </div>
-              <div style="margin-top:5px;font:400 12.5px/1.3 var(--ui);color:var(--muted)">
-                No style saved for this site
-              </div>
-            </div>
-            <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border)">
-              <span style="width:28px;height:16px;border-radius:8px;background:var(--strong);position:relative;flex:none">
-                <span style="position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:6px;background:#fff" />
-              </span>
-              <span style="flex:1;font:400 13.5px/1.2 var(--ui);color:var(--ink)">
-                Readability
+            <div class="demo-pop-head">
+              <span class="demo-pop-site">harbourpost.example</span>
+              <span class="demo-pop-gear">
+                <Gear />
               </span>
             </div>
-            <div style="display:flex;gap:8px;padding:10px 12px 12px">
+            <div class="demo-pop-sep" />
+            <div style="padding:8px 6px">
+              <div class="demo-pop-row">
+                <span style="flex:1;min-width:0">Readability</span>
+                <span style="width:28px;height:16px;border-radius:8px;background:var(--strong);position:relative;flex:none">
+                  <span style="position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:6px;background:#fff" />
+                </span>
+              </div>
+            </div>
+            <div class="demo-pop-sep" />
+            <div style="display:flex;padding:10px 12px 12px">
               <span
                 data-t="style-btn"
-                style={
-                  'flex:1;height:38px;display:flex;align-items:center;gap:8px;padding:0 14px;border-radius:8px;border:1px solid var(--strong);font:600 13px/1 var(--ui);color:var(--ink);transition:background .1s;background:' +
-                  (S.clicking && S.popOpen ? 'var(--track)' : 'var(--surface)')
-                }
+                class="demo-style-btn"
+                style={`background:${S.popHover ? (S.clicking ? 'var(--track)' : 'var(--hover)') : 'var(--surface)'}`}
               >
-                <span style="flex:1;text-align:center">Style this page</span>
-                <span class="demo-shortcut">
+                <span />
+                <span style="text-align:center">Style this page</span>
+                <span
+                  class="demo-shortcut"
+                  style={`opacity:${S.popHover ? 1 : 0}`}
+                >
                   {S.mac ? '⌥⇧M' : 'Alt+Shift+M'}
                 </span>
-              </span>
-              <span style="width:40px;height:38px;border-radius:8px;border:1px solid var(--strong);display:flex;align-items:center;justify-content:center;color:var(--muted)">
-                <svg
-                  width="15"
-                  height="15"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.3"
-                  stroke-linecap="round"
-                >
-                  <path d="M2 5h12M2 11h12" />
-                  <circle cx="10" cy="5" r="1.8" fill="var(--surface)" />
-                  <circle cx="6" cy="11" r="1.8" fill="var(--surface)" />
-                </svg>
               </span>
             </div>
           </div>
@@ -770,15 +784,15 @@ export default class Demo extends Component<Props, State> {
           <div class="demo-page-row">
             <div
               class="demo-page"
-              style={`background:${ag ? '#2d353b' : dk ? '#17191d' : '#fff'};filter:${S.gray ? 'grayscale(1)' : 'none'}`}
+              style={`background:${at(1) ? np.bg : 'var(--page-bg)'};filter:${S.gray ? 'grayscale(1)' : 'none'}`}
             >
               <div
                 data-t="header"
                 style={
                   'position:relative;z-index:2;display:flex;gap:16px;align-items:center;padding:14px 28px;font-size:15px;border-bottom:1px solid ' +
-                  (ag ? '#859289' : dk ? '#2a2d33' : '#e5e5e5') +
+                  (at(2) ? np.line : 'var(--page-line)') +
                   ';background:' +
-                  (ag ? '#343f44' : dk ? '#1e2126' : '#fafafa') +
+                  (at(2) ? np.panel : 'var(--page-bar)') +
                   `;color:${ink};font-family:${serif}` +
                   tr +
                   mark('header')
@@ -803,7 +817,7 @@ export default class Demo extends Component<Props, State> {
                   <div
                     style={
                       "margin:0 0 10px;font:700 11px/1 'Helvetica Neue',Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:" +
-                      (ag ? '#a7c080' : dk ? '#e2795f' : '#c2410c') +
+                      (at(3) ? np.acc : 'var(--page-kicker)') +
                       ';transition:color .5s'
                     }
                   >
@@ -813,9 +827,9 @@ export default class Demo extends Component<Props, State> {
                     <h2
                       data-t="h1"
                       style={
-                        `margin:0 0 10px;font-family:${headF};font-weight:${ag ? 600 : 700};line-height:1.15;letter-spacing:${ag ? '-.02em' : '-.01em'};font-size:${S.h1Size}px;color:` +
-                        (ag
-                          ? '#e69875'
+                        `margin:0 0 10px;font-family:${serif};font-weight:${at(3) ? 600 : 700};line-height:1.15;letter-spacing:${at(3) ? '-.02em' : '-.01em'};font-size:${S.h1Size}px;color:` +
+                        (at(3)
+                          ? np.head
                           : S.h1Color
                             ? dk
                               ? '#ef6b6b'
@@ -841,7 +855,7 @@ export default class Demo extends Component<Props, State> {
                     <span
                       style={
                         "width:26px;height:26px;border-radius:13px;flex:none;display:flex;align-items:center;justify-content:center;font:700 10px/1 'Helvetica Neue',Arial,sans-serif;color:#fff;background:" +
-                        (ag ? '#83c092' : '#3d5a80') +
+                        (at(3) ? np.avatar : '#3d5a80') +
                         ';transition:background .5s'
                       }
                     >
@@ -860,7 +874,7 @@ export default class Demo extends Component<Props, State> {
                   <div data-t="quote" style={quote}>
                     <div
                       style={
-                        `font-family:${qd.font ? "'Lora',Georgia,serif" : serif};font-size:${qd.size ? '20px' : '16px'};font-style:${qd.size ? 'italic' : 'normal'};` +
+                        quoteFont +
                         `line-height:1.45;text-wrap:pretty;color:${ink};transition:all .35s`
                       }
                     >
@@ -886,40 +900,36 @@ export default class Demo extends Component<Props, State> {
             <div
               data-ed="1"
               class="demo-editor-wrap"
-              style={`width:${S.editorOpen ? 362 : 0}px`}
+              style={`width:${S.editorOpen ? 378 : 0}px`}
             >
               <div class="demo-editor">
-                <div class="demo-ed-bar">
-                  <ToolbarIcon size={18} />
-                  <span style="flex:1;font:600 14.5px/1 var(--ui);color:var(--ink)">
-                    Stylebot
-                  </span>
-                  <span class="demo-ed-icon">
+                <div class="demo-side-bar">
+                  <SbIcon size={16} />
+                  <span class="demo-side-name">Stylebot</span>
+                  <ChevronDown />
+                  <span class="demo-side-icon" style="margin-left:auto">
                     <svg
-                      width="15"
-                      height="15"
+                      width="14"
+                      height="14"
                       viewBox="0 0 16 16"
                       fill="none"
                       stroke="currentColor"
-                      stroke-width="1.3"
+                      stroke-width="1.4"
                       stroke-linecap="round"
                       stroke-linejoin="round"
                     >
-                      <path d="M5.5 2h5l-.7 4.2 2.2 2.3H4l2.2-2.3z" />
-                      <path d="M8 8.5v5.5" />
-                      <path d="M2 2l12 12" />
+                      <path d="M9.5 2.5 13.5 6.5 11 7.5 8.5 10 8 13 3 8 6 7.5 8.5 5z" />
+                      <path d="M5.5 10.5 2.5 13.5" />
                     </svg>
                   </span>
-                  <span class="demo-ed-icon">
-                    <Close size={11} />
+                  <span class="demo-side-icon">
+                    <Close size={12} />
                   </span>
                 </div>
-                <div class="demo-ed-card">
-                  <div style="flex:none;height:48px;display:flex;align-items:center;gap:8px;padding:4px 6px 0 10px">
-                    <span style="font:400 13.5px/1 var(--ui);color:var(--ink);white-space:nowrap">
-                      harbourpost.example
-                    </span>
-                    <span style="font:400 13.5px/1 var(--ui);color:var(--faint)">
+                <div class="demo-ed-body">
+                  <div class="demo-ed-head">
+                    <span class="demo-ed-site">harbourpost.example</span>
+                    <span style="flex:none;font:400 13px/1 var(--ui);color:var(--faint)">
                       /
                     </span>
                     <span style="position:relative;display:flex">
@@ -928,8 +938,10 @@ export default class Demo extends Component<Props, State> {
                         class="demo-prof-btn"
                         style={S.profMenu ? 'background:var(--hover)' : ''}
                       >
-                        {S.profile}
-                        <ChevronDown />
+                        {profileName(S.profile)}
+                        <span style="display:flex;color:var(--muted)">
+                          <ChevronDown />
+                        </span>
                       </span>
                       <div
                         class="demo-prof-menu"
@@ -969,14 +981,14 @@ export default class Demo extends Component<Props, State> {
                                   <path d="M2.5 6.2 5 8.6 9.5 3.5" />
                                 </svg>
                               </span>
-                              <span>{name}</span>
+                              <span>{profileName(name)}</span>
                             </div>
                           );
                         })}
                         <div class="demo-prof-sep" />
                         {S.profCreating ? (
                           <div class="demo-prof-input">
-                            <span>{NEW_PROFILE.slice(0, S.profLen)}</span>
+                            <span>{look.profile.slice(0, S.profLen)}</span>
                             <span class="demo-caret" />
                           </div>
                         ) : (
@@ -990,7 +1002,7 @@ export default class Demo extends Component<Props, State> {
                         )}
                       </div>
                     </span>
-                    <span class="demo-ed-icon" style="margin-left:auto">
+                    <span class="demo-ed-more">
                       <svg
                         width="16"
                         height="16"
@@ -1004,19 +1016,19 @@ export default class Demo extends Component<Props, State> {
                     </span>
                   </div>
 
-                  <div style="flex:none;padding:6px 10px 0;display:flex;gap:8px;align-items:center">
+                  <div style="flex:none;display:flex;align-items:center;gap:8px;padding:4px 16px">
                     <span
                       data-t="picker"
                       class="demo-picker"
                       style={
                         S.inspecting
-                          ? 'background:#2f62de;color:#fff'
+                          ? 'background:var(--acc);color:#fff'
                           : 'background:var(--hover);color:var(--ink)'
                       }
                     >
                       <svg
-                        width="19"
-                        height="19"
+                        width="16"
+                        height="16"
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
@@ -1052,7 +1064,7 @@ export default class Demo extends Component<Props, State> {
                     </div>
                   </div>
 
-                  <div style="flex:none;display:flex;align-items:flex-end;gap:22px;padding:16px 10px 0;border-bottom:1px solid var(--border)">
+                  <div style="flex:none;display:flex;align-items:flex-end;gap:6px;padding:16px 16px 0;border-bottom:1px solid var(--border)">
                     <span data-t="tab-basic" style={tab('basic')}>
                       Basic
                     </span>
@@ -1066,10 +1078,10 @@ export default class Demo extends Component<Props, State> {
                       Chat
                     </span>
                     {S.tab === 'chat' && (
-                      <span style="margin-left:auto;padding-bottom:9px;display:flex;color:var(--muted)">
+                      <span class="demo-new-chat">
                         <svg
-                          width="15"
-                          height="15"
+                          width="16"
+                          height="16"
                           viewBox="0 0 16 16"
                           fill="none"
                           stroke="currentColor"
@@ -1092,18 +1104,7 @@ export default class Demo extends Component<Props, State> {
                             class="demo-small-btn"
                             style={`color:${hasSel ? 'var(--ink2)' : 'var(--faint)'}`}
                           >
-                            <svg
-                              width="13"
-                              height="13"
-                              viewBox="0 0 14 14"
-                              fill="none"
-                              stroke="currentColor"
-                              stroke-width="1.3"
-                              stroke-linecap="round"
-                            >
-                              <path d="M1.5 7s2-3.8 5.5-3.8S12.5 7 12.5 7s-2 3.8-5.5 3.8S1.5 7 1.5 7z" />
-                              <path d="M2.5 11.5l9-9" />
-                            </svg>
+                            <EyeOff size={12} />
                             Hide
                           </span>
                           <span
@@ -1123,11 +1124,14 @@ export default class Demo extends Component<Props, State> {
                           <div class="demo-row">
                             <span class="demo-label">Font</span>
                             <div
+                              data-t="font-field"
                               class="demo-field"
                               style="width:160px;gap:6px;padding:0 10px;color:var(--muted)"
                             >
-                              <span style="flex:1;font:400 12.5px/1 var(--ui);color:var(--faint)">
-                                Default
+                              <span class="demo-field-text">
+                                {hasSel
+                                  ? serif.split(',')[0].replace(/'/g, '')
+                                  : 'Default'}
                               </span>
                               <ChevronDown />
                             </div>
@@ -1138,7 +1142,7 @@ export default class Demo extends Component<Props, State> {
                               <span
                                 style={`flex:1;padding:0 10px;font:400 12.5px/1 var(--ui);color:${sizeSet ? 'var(--ink)' : 'var(--faint)'}`}
                               >
-                                {sizeSet ? String(S.h1Size) : '—'}
+                                {sizeSet || hasSel ? String(S.h1Size) : '—'}
                               </span>
                               <span class="demo-unit">px</span>
                             </div>
@@ -1147,7 +1151,9 @@ export default class Demo extends Component<Props, State> {
                             <span class="demo-label">Line Height</span>
                             <div style={field('lh')}>
                               <span style="flex:1;padding:0 10px;font:400 12.5px/1 var(--ui);color:var(--faint)">
-                                —
+                                {hasSel
+                                  ? String(Math.round(S.h1Size * 1.15))
+                                  : '—'}
                               </span>
                               <span class="demo-unit">px</span>
                             </div>
@@ -1157,12 +1163,12 @@ export default class Demo extends Component<Props, State> {
                             <div data-t="color" style={field('color')}>
                               <span
                                 class="demo-swatch"
-                                style={`background:${S.h1Color || 'repeating-linear-gradient(135deg,transparent 0 3px,var(--strong) 3px 4px)'}`}
+                                style={`background:${S.h1Color || (hasSel ? computedInk : 'repeating-linear-gradient(135deg,transparent 0 3px,var(--strong) 3px 4px)')}`}
                               />
                               <span
                                 style={`flex:1;padding:0 8px;font:400 12px/1 var(--mono);color:${S.h1Color ? 'var(--ink)' : 'var(--faint)'}`}
                               >
-                                {S.h1Color || '—'}
+                                {S.h1Color || (hasSel ? computedInk : '—')}
                               </span>
                             </div>
                           </div>
@@ -1235,7 +1241,7 @@ export default class Demo extends Component<Props, State> {
                       >
                         <div
                           style={
-                            'padding:12px 10px 40px;transition:transform 1.6s cubic-bezier(.4,0,.2,1);transform:translateY(' +
+                            'padding:12px 14px 40px;transition:transform 1.6s cubic-bezier(.4,0,.2,1);transform:translateY(' +
                             (S.codeScroll
                               ? -Math.max(0, codeLines.length * 21 - 8)
                               : 0) +
@@ -1245,10 +1251,10 @@ export default class Demo extends Component<Props, State> {
                           {this.renderLines(codeLines)}
                           {ag && (
                             <div
-                              style={`margin:${codeLines.length ? 12 : 0}px -10px 0;padding:6px 10px 8px 8px;border-left:2px solid #1f8a4c;background:rgba(31,138,76,.07)`}
+                              style={`margin:${codeLines.length ? 12 : 0}px -14px 0;padding:6px 14px 8px 12px;border-left:2px solid #1f8a4c;background:rgba(31,138,76,.07)`}
                             >
                               <div style="font:400 12px/1.75 var(--mono);color:var(--ccom)">
-                                /* Everforest · added by Stylebot agent */
+                                {`/* ${look.name} · added by Stylebot agent */`}
                               </div>
                               {this.renderLines(agentLines)}
                             </div>
@@ -1258,7 +1264,7 @@ export default class Demo extends Component<Props, State> {
                     )}
 
                     {needsKey && (
-                      <div style="height:100%;background:var(--surface);padding:18px 10px;display:flex;flex-direction:column;gap:14px">
+                      <div style="height:100%;background:var(--surface);padding:18px 16px;display:flex;flex-direction:column;gap:14px">
                         <div>
                           <div style="font:600 14px/1.3 var(--ui);color:var(--ink)">
                             Set up the Stylebot agent
@@ -1312,122 +1318,80 @@ export default class Demo extends Component<Props, State> {
                     )}
 
                     {isChat && (
-                      <div style="height:100%;display:flex;flex-direction:column;background:var(--surface)">
-                        <div style="flex:1;min-height:0;padding:16px 10px;display:flex;flex-direction:column;justify-content:flex-end;gap:12px">
+                      <div class="demo-chat">
+                        <div class="demo-thread">
+                          {!S.chatSent && this.renderEmptyChat(S)}
                           {S.chatSent && (
-                            <div class="demo-sent">
-                              <span>article h1</span>
-                              <div class="demo-bubble">{CHAT_MSG}</div>
-                            </div>
+                            <div class="demo-bubble">{look.msg}</div>
                           )}
                           {S.chatThinking && (
-                            <div style="display:flex;align-items:center;gap:10px;font:500 12.5px/1.4 var(--ui);color:var(--muted)">
-                              <SbIcon size={18} bare animate cycle={1.8} />
+                            <div class="demo-thinking">
+                              <SbIcon size={16} animate cycle={1.8} />
                               <span>{loadText}</span>
                             </div>
                           )}
                           {S.chatReplied && (
                             <>
-                              <div style="font:400 15px/1.55 'Newsreader',Georgia,serif;color:var(--ink2);text-wrap:pretty">
-                                Done. I switched the page to Everforest colors
-                                with Lora and Newsreader, and added the CSS to
-                                this profile.
-                              </div>
-                              <span
-                                data-t="view-code"
-                                class="demo-added"
-                                style={`opacity:${S.clicking && S.tab === 'chat' ? 0.6 : 1}`}
-                              >
-                                <span style="font:500 12.5px/1 var(--mono);color:#1f8a4c">
-                                  {'{ }'}
+                              <div class="demo-reply">{look.reply}</div>
+                              <div class="demo-change">
+                                <SbIcon size={16} />
+                                <span class="demo-change-label">
+                                  Updated styles
                                 </span>
-                                Added {agentLines.length + 1} lines
-                              </span>
-                            </>
-                          )}
-                        </div>
-                        <div style="flex:none;padding:0 6px 6px">
-                          <div
-                            data-t="chat-input"
-                            class="demo-composer"
-                            style={
-                              S.chatDraft
-                                ? 'border-color:var(--acc);box-shadow:0 0 0 3px rgba(42,95,214,.15)'
-                                : ''
-                            }
-                          >
-                            <span
-                              style={`min-height:36px;font:400 13px/1.45 var(--ui);color:${S.chatDraft ? 'var(--ink)' : 'var(--faint)'}`}
-                            >
-                              {S.chatDraft
-                                ? CHAT_MSG.slice(0, S.chatDraft)
-                                : 'Describe a change…'}
-                            </span>
-                            <div style="display:flex;align-items:center;gap:10px;color:var(--muted)">
-                              <svg
-                                width="15"
-                                height="15"
-                                viewBox="0 0 16 16"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="1.3"
-                                stroke-linejoin="round"
-                              >
-                                <rect
-                                  x="1.8"
-                                  y="2.5"
-                                  width="12.4"
-                                  height="11"
-                                  rx="2"
-                                />
-                                <circle cx="5.6" cy="6.2" r="1.2" />
-                                <path
-                                  d="M2.2 12l3.8-3.6 2.6 2.4 2.2-2 3.2 3"
-                                  stroke-linecap="round"
-                                />
-                              </svg>
-                              <span style="display:flex;align-items:center;gap:5px;font:500 12.5px/1 var(--ui);color:var(--ink2)">
-                                Haiku 4.5
-                                <span style="display:flex;transform:rotate(180deg)">
-                                  <ChevronDown />
+                                <span
+                                  data-t="view-code"
+                                  class="demo-diff"
+                                  style={`opacity:${S.clicking && S.tab === 'chat' ? 0.6 : 1}`}
+                                >
+                                  <span class="demo-diff-count">
+                                    +{agentDecls}
+                                  </span>
+                                  <span class="demo-diff-open">
+                                    <svg
+                                      width="12"
+                                      height="12"
+                                      viewBox="0 0 12 12"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      stroke-width="1.5"
+                                      stroke-linecap="round"
+                                      stroke-linejoin="round"
+                                    >
+                                      <path d="M4.5 2.5 8 6l-3.5 3.5" />
+                                    </svg>
+                                  </span>
                                 </span>
-                              </span>
-                              <span style="margin-left:auto;font:400 12px/1 var(--ui);color:var(--faint)">
-                                {S.chatReplied ? '6.8K tokens' : ''}
-                              </span>
-                              <span
-                                class="demo-send"
-                                style={
-                                  S.chatThinking || S.chatDraft
-                                    ? ''
-                                    : 'background:var(--track);color:var(--muted)'
-                                }
-                              >
-                                {S.chatThinking ? (
-                                  <span style="width:9px;height:9px;border-radius:2px;background:currentColor" />
-                                ) : (
+                                <span class="demo-undo">
                                   <svg
-                                    width="12"
-                                    height="12"
-                                    viewBox="0 0 12 12"
+                                    width="14"
+                                    height="14"
+                                    viewBox="0 0 16 16"
                                     fill="none"
                                     stroke="currentColor"
-                                    stroke-width="1.6"
+                                    stroke-width="1.4"
                                     stroke-linecap="round"
                                     stroke-linejoin="round"
                                   >
-                                    <path d="M6 10V2M2.5 5.5 6 2l3.5 3.5" />
+                                    <path d="M5.5 3.5 2.5 6.5l3 3" />
+                                    <path d="M2.5 6.5h7a4 4 0 0 1 0 8H8" />
                                   </svg>
-                                )}
-                              </span>
-                            </div>
-                          </div>
+                                  Undo
+                                </span>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                        <div style="flex:none;padding:0 20px 12px">
+                          <ChatComposer
+                            tokens={S.chatReplied ? '6.8K tokens' : ''}
+                            thinking={S.chatThinking}
+                          />
                         </div>
                       </div>
                     )}
 
                     {S.tab === 'presets' && (
-                      <div style="padding:10px 6px;display:flex;flex-direction:column;gap:10px">
+                      <div style="padding:12px;display:flex;flex-direction:column;gap:10px">
                         <div class="demo-card" style="padding:14px 16px">
                           <div style="display:flex;align-items:center;gap:12px">
                             <span style="font:600 14px/1.2 var(--ui);color:var(--ink)">
@@ -1472,23 +1436,8 @@ export default class Demo extends Component<Props, State> {
               {S.scene + 1} / {this.scenes.length}
             </span>
             <span aria-live="polite" style="flex:1;min-width:0">
-              {S.caption}
+              {S.caption.replace(NEW_PROFILE, look.profile)}
             </span>
-          </div>
-
-          <div
-            class="demo-keys"
-            style={
-              S.keys
-                ? 'opacity:1;transform:translate(-50%,0)'
-                : 'opacity:0;transform:translate(-50%,8px);pointer-events:none'
-            }
-          >
-            <span style={keyCap}>{S.mac ? 'option' : 'alt'}</span>
-            <span class="demo-plus">+</span>
-            <span style={keyCap}>shift</span>
-            <span class="demo-plus">+</span>
-            <span style={keyCap}>M</span>
           </div>
 
           <div
