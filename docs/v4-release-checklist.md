@@ -21,7 +21,8 @@ Tracking the 4.0.0 release. The general release steps are in [releases.md](relea
 
 ## Release
 
-- [ ] Branch `release/v4.0.0` from `v4` and open the PR into `main`
+- [ ] Merge `v4` into `main`
+- [ ] Branch `release/v4.0.0` from `main` and open the PR
 - [ ] Add the 4.0.0 entry to `CHANGELOG.md`
 - [ ] Bump the version to 4.0.0 in `package.json` and `src/assets/manifest/manifest.json`
 - [ ] CI is green: `build`, `validation`, `storybook`, `e2e`, `e2e (edge)`, `e2e (firefox)`
