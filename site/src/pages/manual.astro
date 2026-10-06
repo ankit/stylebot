@@ -18,7 +18,7 @@ import historyShot from '../assets/manual/history.png';
 import historyDarkShot from '../assets/manual/history-dark.png';
 import readabilityShot from '../assets/manual/readability.webp';
 import readabilityDarkShot from '../assets/manual/readability-dark.webp';
-import { LINKS } from '../lib/links';
+import { API_KEYS, LINKS } from '../lib/links';
 
 const toc = [
   ['start', 'Getting started'],
@@ -197,11 +197,28 @@ const shortcutGroups = [
             src={agentShot}
             dark={agentDarkShot}
           />
+          <h3 id="api-key">Connecting a key</h3>
+          <p>
+            The agent uses your own API key from Claude, OpenAI or Gemini,
+            billed to your account with that provider. Create a key on the
+            provider's site, open the <strong>Chat</strong> tab, pick the
+            provider, paste the key and click <strong>Connect</strong>. Add more
+            providers later from <strong>Manage providers</strong> in the model
+            menu.
+          </p>
           <Terms>
-            <Term term="Bring your own key">
-              Connect a Claude, OpenAI or Gemini API key. Keys are saved on this
-              computer only and never synced. Messages go straight from your
-              browser to the provider.
+            <Term term="Claude">
+              <a href={API_KEYS.claude}>Anthropic Console → API keys</a>
+            </Term>
+            <Term term="OpenAI">
+              <a href={API_KEYS.openai}>OpenAI Platform → API keys</a>
+            </Term>
+            <Term term="Gemini">
+              <a href={API_KEYS.gemini}>Google AI Studio → API keys</a>
+            </Term>
+            <Term term="Your key stays in your browser">
+              Keys are saved on this computer only and never synced. Messages go
+              straight from your browser to the provider.
             </Term>
             <Term term="Where changes go">
               Each change is applied right away and added to the current
@@ -445,6 +462,7 @@ const shortcutGroups = [
   }
 
   h3 {
+    scroll-margin-top: 88px;
     margin: 10px 0 0;
     font: 600 16px/1.3 var(--ui);
     color: var(--ink);

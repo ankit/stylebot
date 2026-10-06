@@ -2,7 +2,10 @@
 import { Image } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
 import ImageZoom from '../../components/ImageZoom.astro';
-import { LINKS } from '../../lib/links';
+import StoreLink from '../../components/StoreLink.astro';
+import Callout from '../../components/manual/Callout.astro';
+import Keys from '../../components/manual/Keys.astro';
+import { API_KEYS, LINKS } from '../../lib/links';
 import { crisp } from '../../lib/screenshots';
 import agent from '../../assets/manual/agent-chat.png';
 import profiles from '../../assets/manual/popup-profiles.png';
@@ -21,8 +24,17 @@ import historyDark from '../../assets/manual/history-dark.png';
 <Base title="What's new in 4.0">
   <main class="prose">
     <h1>What's new in 4.0</h1>
+    <Callout>
+      <strong>
+        Stylebot updated itself, and your styles and settings came with it.
+      </strong>{' '}
+      One thing moved: in Chrome and Edge the editor now opens in the side
+      panel. To change that, use <strong>Position</strong> in the editor's
+      <strong>⋯</strong> menu.
+    </Callout>
     <p class="lede">
-      A redesigned editor, an AI agent, profiles, and a side panel.
+      Restyle any site by describing it, or by clicking. Now with dark mode,
+      profiles and a side panel.
     </p>
     <nav class="release-toc" aria-label="Sections">
       <a href="#editor">Redesigned editor</a>
@@ -32,6 +44,7 @@ import historyDark from '../../assets/manual/history-dark.png';
       <a href="#history">Version history</a>
       <a href="#sync">Sync</a>
       <a href="#more">And more</a>
+      <a href="#try">Try it</a>
     </nav>
 
     <h2 id="editor">A redesigned editor</h2>
@@ -83,10 +96,16 @@ import historyDark from '../../assets/manual/history-dark.png';
     </figure>
     <p>Describe what you want in the Chat tab and the agent writes the CSS.</p>
     <ul>
-      <li>Bring your own Claude, OpenAI or Gemini key</li>
       <li>Point at an element or attach a screenshot</li>
       <li>Undo any change</li>
     </ul>
+    <p>
+      It needs your own API key. Get a <a href={API_KEYS.claude}>Claude</a>,{' '}
+      <a href={API_KEYS.openai}>OpenAI</a> or{' '}
+      <a href={API_KEYS.gemini}>Gemini</a> key and paste it into the Chat tab.
+      Your key stays in your browser, and messages go straight to the provider.{' '}
+      <a href={`${LINKS.manual}#api-key`}>See how to connect a key</a>.
+    </p>
 
     <h2 id="profiles">Profiles</h2>
     <figure>
@@ -108,8 +127,8 @@ import historyDark from '../../assets/manual/history-dark.png';
       />
     </figure>
     <p>
-      Keep several looks for a site and switch between them from the editor or
-      the popup.
+      Keep several looks for a site, like a dark one for night and a light one
+      for the day, and switch between them from the editor or the popup.
     </p>
 
     <h2 id="panel">The side panel, or its own window</h2>
@@ -185,13 +204,30 @@ import historyDark from '../../assets/manual/history-dark.png';
     <h2 id="more">And more</h2>
     <ul>
       <li>A new Stylebot icon</li>
-      <li>Change Stylebot's shortcuts in your browser's shortcut settings</li>
+      <li>
+        Change Stylebot's shortcuts in your browser's shortcut settings. If you
+        had changed them in Chrome or Edge, set them again there.
+      </li>
       <li>Stylebot is now available in Vietnamese</li>
     </ul>
 
-    <h2>
-      And lots of <a href={LINKS.changelog}>bug fixes</a>
-    </h2>
+    <h2 id="try">Try it</h2>
+    <p>
+      Open any site and press <Keys keys={['alt', 'shift', 'M']} />, then go to{' '}
+      <strong>Chat</strong> and describe the change you want.
+    </p>
+    <p>
+      If Stylebot is useful to you, please rate it. It helps others find it, as
+      does sharing it with a friend.
+    </p>
+    <p class="release-rate">
+      <StoreLink index={0} format="rate" class="btn btn-primary" />
+    </p>
+
+    <p class="release-end">
+      Plus lots of bug fixes. See the <a href={LINKS.changelog}>changelog</a>{' '}
+      for everything in 4.0.
+    </p>
   </main>
   <ImageZoom />
 </Base>
@@ -220,5 +256,63 @@ import historyDark from '../../assets/manual/history-dark.png';
 
   h2[id] {
     scroll-margin-top: 80px;
+  }
+
+  .prose :global(.callout) {
+    margin: 0 0 16px;
+    display: flex;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 10px;
+    background: var(--fill);
+    border: 1px solid var(--border);
+    font: 400 14.5px/1.55 var(--ui);
+    color: var(--ink2);
+    text-wrap: pretty;
+  }
+
+  .prose :global(.callout-icon) {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    margin-top: 1px;
+    border-radius: 9px;
+    background: var(--muted);
+    color: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font: 700 11px/1 system-ui;
+  }
+
+  .prose :global(.keys) {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .prose :global(kbd) {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 5px;
+    background: var(--fill);
+    border: 1px solid var(--strong);
+    border-bottom-width: 2px;
+    font: 500 12px/1.4 var(--mono);
+    color: var(--ink2);
+  }
+
+  .prose :global(.keys-sep) {
+    font: 400 12px/1 var(--ui);
+    color: var(--faint);
+  }
+
+  .release-rate {
+    margin-top: 20px;
+  }
+
+  .release-end {
+    margin-top: 56px;
+    color: var(--muted);
   }
 </style>

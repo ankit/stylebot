@@ -3,7 +3,7 @@ import { BROWSERS, STORES } from '../lib/links';
 
 type Props = {
   index: 0 | 1 | 2;
-  format: 'add' | 'add-free' | 'name' | 'reinstall';
+  format: 'add' | 'add-free' | 'name' | 'reinstall' | 'rate';
   class?: string;
 };
 
@@ -14,11 +14,13 @@ const label = {
   'add-free': `Add to ${store.name} — it’s free`,
   name: store.name,
   reinstall: `Reinstall for ${store.name}`,
+  rate: `Rate Stylebot for ${store.name}`,
 }[format];
+const href = format === 'rate' ? (store.reviews ?? store.href) : store.href;
 ---
 
 <a
-  href={store.href}
+  href={href}
   class={className}
   data-store-slot={index}
   data-store-format={format}
@@ -41,13 +43,16 @@ const label = {
     .querySelectorAll<HTMLAnchorElement>('[data-store-slot]')
     .forEach((link) => {
       const store = STORES[order[Number(link.dataset.storeSlot)]];
-      link.href = store.href;
+      const format = link.dataset.storeFormat!;
+      link.href =
+        format === 'rate' ? (store.reviews ?? store.href) : store.href;
       const labels: Record<string, string> = {
         add: `Add to ${store.name}`,
         'add-free': `Add to ${store.name} — it’s free`,
         name: store.name,
         reinstall: `Reinstall for ${store.name}`,
+        rate: `Rate Stylebot for ${store.name}`,
       };
-      link.textContent = labels[link.dataset.storeFormat!];
+      link.textContent = labels[format];
     });
 </script>
