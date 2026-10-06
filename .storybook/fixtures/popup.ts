@@ -48,3 +48,17 @@ export const popup = (chrome: ChromeShimOptions = {}): StoryObj => ({
   }),
   parameters: { chrome },
 });
+
+/**
+ * State past the rating prompt's bar: three saved styles, one of them for
+ * the popup's page, installed a month ago.
+ */
+export const ratingEligible = (
+  storage: Record<string, unknown> = {}
+): ChromeShimOptions => ({
+  styles: [style('example.com'), style('news.site'), style('docs.site')],
+  storage: {
+    'install-time': Date.now() - 30 * 24 * 60 * 60 * 1000,
+    ...storage,
+  },
+});

@@ -72,7 +72,11 @@ import type {
   BackgroundPageMessageResponse,
 } from '@stylebot/types';
 
-import { setNotification, getReleaseNotificationId } from '@stylebot/utils';
+import {
+  setNotification,
+  getReleaseNotificationId,
+  recordInstallTime,
+} from '@stylebot/utils';
 
 /**
  * Registers the background's Chrome listeners. They must be registered
@@ -82,6 +86,10 @@ export const initListeners = (): void => {
   // Set up side panels and open the welcome page on install; clean up retired options on update.
   chrome.runtime.onInstalled.addListener(async ({ reason }) => {
     configureSidePanelTabs();
+
+    if (reason === 'install' || reason === 'update') {
+      recordInstallTime();
+    }
 
     if (reason === 'install') {
       chrome.tabs.create({
