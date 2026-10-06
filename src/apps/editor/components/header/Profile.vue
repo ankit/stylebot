@@ -140,6 +140,7 @@ export default Vue.extend({
 .row-check {
   grid-area: 1 / 1;
   color: var(--accent-text);
+  pointer-events: none;
 
   &:has(+ .row-more) {
     .profile-row:hover &,
