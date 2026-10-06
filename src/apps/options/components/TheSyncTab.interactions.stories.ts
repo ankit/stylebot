@@ -311,3 +311,21 @@ export const StartingAnImportClearsTheLastBanner: StoryObj = {
   }),
   name: 'starting a new import clears the previous import banner',
 };
+
+export const ExportNeedsSavedStyles: StoryObj = {
+  ...optionsPage('Sync', {}, async root => {
+    const canvas = within(root);
+
+    await expect(canvas.getByRole('button', { name: 'Export' })).toBeDisabled();
+  }),
+  name: 'export is disabled while there are no saved styles',
+};
+
+export const ExportIsEnabledWithSavedStyles: StoryObj = {
+  ...optionsPage('Sync', { styles: seededStyles }, async root => {
+    const canvas = within(root);
+
+    await expect(canvas.getByRole('button', { name: 'Export' })).toBeEnabled();
+  }),
+  name: 'export is enabled once there are saved styles',
+};

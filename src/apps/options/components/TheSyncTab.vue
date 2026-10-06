@@ -53,7 +53,9 @@
       </s-text>
 
       <div class="buttons">
-        <s-button @click="exportJson">{{ t('export') }}</s-button>
+        <s-button :disabled="!hasStyles" @click="exportJson">
+          {{ t('export') }}
+        </s-button>
         <s-button @click="importJson">{{ t('import') }}</s-button>
       </div>
     </div>
@@ -120,6 +122,10 @@ export default Vue.extend({
   },
 
   computed: {
+    hasStyles(): boolean {
+      return Object.keys(this.$store.state.styles).length > 0;
+    },
+
     syncStatus(): SyncStatus {
       return this.$store.state.syncStatus;
     },
