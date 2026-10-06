@@ -4,6 +4,8 @@ import {
   addDeclaration,
   findRule,
   getDeclarationsForSelector,
+  splitSelectorFromGroup,
+  walkUnnestedRules,
   withoutImportant,
 } from '@stylebot/css';
 import type {
@@ -25,24 +27,97 @@ const currentValue = (
   return match ? match.value : null;
 };
 
+const previousKey = ({ selector, property }: ChatCssPreviousValue) =>
+  `${selector}\n${property}`;
+
+/**
+ * The grouped rule (`h1, h2`) a selector would be split out of before it can
+ * be edited on its own, with what the group's selector becomes without it.
+ */
+const findGroup = (
+  css: string,
+  selector: string
+): { selector: string; rest: string } | null => {
+  let group: postcss.Rule | null = null;
+
+  walkUnnestedRules(postcss.parse(css), rule => {
+    if (rule.selector !== selector && rule.selectors.includes(selector)) {
+      group = rule;
+    }
+  });
+
+  if (!group) {
+    return null;
+  }
+
+  const { selector: groupSelector, selectors } = group as postcss.Rule;
+  const rest = (group as postcss.Rule).clone();
+  rest.selectors = selectors.filter(part => part !== selector);
+
+  return { selector: groupSelector, rest: rest.selector };
+};
+
+/**
+ * Keeps a list of previous values in step with a group splitting a member
+ * out: what the group held is now held by the rest of it and by the member.
+ */
+const followSplit = (
+  list: Array<ChatCssPreviousValue>,
+  group: { selector: string; rest: string },
+  member: string
+): Array<ChatCssPreviousValue> => {
+  const split = list.filter(value => value.selector === group.selector);
+
+  if (!split.length) {
+    return list;
+  }
+
+  const keys = new Set(list.map(previousKey));
+  const moved = list.map(value =>
+    value.selector === group.selector
+      ? { ...value, selector: group.rest }
+      : value
+  );
+  const added = split
+    .map(value => ({ ...value, selector: member }))
+    .filter(value => !keys.has(previousKey(value)));
+
+  return [...moved, ...added];
+};
+
 /**
  * Applies a reply's edits to the stylesheet, noting what each declaration
- * held before so the reply can later be undone on its own. A selector the
+ * held before so the reply can later be undone on its own. previous carries
+ * on a list from edits already applied; earlier lists are kept in step when
+ * an edit splits a member out of a group they styled. A selector the
  * stylesheet can't hold (invalid CSS) is skipped.
  */
 export const applyEdits = (
   css: string,
-  edits: Array<ChatCssEdit>
-): { css: string; previous: Array<ChatCssPreviousValue> } => {
-  const previous: Array<ChatCssPreviousValue> = [];
-  const seen = new Set<string>();
+  edits: Array<ChatCssEdit>,
+  {
+    previous: initial = [],
+    earlier: initialEarlier = [],
+  }: {
+    previous?: Array<ChatCssPreviousValue>;
+    earlier?: Array<Array<ChatCssPreviousValue>>;
+  } = {}
+): {
+  css: string;
+  previous: Array<ChatCssPreviousValue>;
+  earlier: Array<Array<ChatCssPreviousValue>>;
+} => {
+  let previous = initial;
+  let earlier = initialEarlier;
   let next = css;
 
   edits.forEach(({ selector, declarations }) => {
     declarations.forEach(({ property, value }) => {
       let updated: string;
+      let group: ReturnType<typeof findGroup>;
 
       try {
+        group = findGroup(next, selector);
         // Stylebot adds !important itself unless the user opted out; one
         // kept in the value would be doubled, and the declaration dropped.
         updated = addDeclaration(
@@ -55,22 +130,28 @@ export const applyEdits = (
         return;
       }
 
-      const key = `${selector}\n${property}`;
+      if (group) {
+        const split = group;
+        previous = followSplit(previous, split, selector);
+        earlier = earlier.map(list => followSplit(list, split, selector));
+        next = splitSelectorFromGroup(next, selector);
+      }
 
-      if (!seen.has(key)) {
-        seen.add(key);
-        previous.push({
-          selector,
-          property,
-          value: currentValue(next, selector, property),
-        });
+      const entry = {
+        selector,
+        property,
+        value: currentValue(next, selector, property),
+      };
+
+      if (!previous.some(item => previousKey(item) === previousKey(entry))) {
+        previous = [...previous, entry];
       }
 
       next = updated;
     });
   });
 
-  return { css: next, previous };
+  return { css: next, previous, earlier };
 };
 
 /**

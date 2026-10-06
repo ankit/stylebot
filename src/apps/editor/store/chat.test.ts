@@ -149,6 +149,26 @@ describe('a reply streaming its edits', () => {
     expect(store.state.css).toContain('background-color: red');
   });
 
+  it('undoes a group whose member a later edit split out', async () => {
+    store.dispatch('applyCss', { css: 'p {\n  margin: 0;\n}' });
+
+    handlers.onEdit({
+      selector: 'h1, h2',
+      declarations: [{ property: 'color', value: '#111' }],
+    });
+    await flush();
+    handlers.onEdit({
+      selector: 'h1',
+      declarations: [{ property: 'font-size', value: '40px' }],
+    });
+    handlers.onDone({});
+    await flush();
+    await flush();
+
+    await store.dispatch('chat/toggleTurn', lastTurn().id);
+    expect(store.state.css).toBe('p {\n  margin: 0;\n}');
+  });
+
   it('keeps the edits applied when stopped, as a stopped reply to undo', async () => {
     handlers.onText('Going dark.');
     handlers.onEdit(dark);
@@ -285,6 +305,29 @@ describe('a reply that fixes what the page check found', () => {
     expect(store.state.undoStack.past).toHaveLength(1);
 
     store.dispatch('undo');
+    expect(store.state.css).toBe('');
+  });
+
+  it('undoes the first call’s group when the fix splits a member out', async () => {
+    problems = [missed];
+    handlers.onEdit({
+      selector: 'h1, h2',
+      declarations: [{ property: 'color', value: '#111' }],
+    });
+    handlers.onDone({});
+    await flush();
+    await flush();
+    problems = [];
+
+    handlers.onEdit({
+      selector: 'h1',
+      declarations: [{ property: 'color', value: 'red' }],
+    });
+    handlers.onDone({});
+    await flush();
+    await flush();
+
+    await store.dispatch('chat/toggleTurn', lastTurn().id);
     expect(store.state.css).toBe('');
   });
 

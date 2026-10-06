@@ -57,6 +57,67 @@ describe('applyEdits / revertEdits', () => {
     ]);
   });
 
+  it('reverts a group the reply later split a member out of', () => {
+    const before = 'p {\n  margin: 0;\n}';
+    const { css, previous } = applyEdits(before, [
+      {
+        selector: 'h1, h2, h3',
+        declarations: [
+          { property: 'font-family', value: 'Georgia' },
+          { property: 'color', value: '#111' },
+        ],
+      },
+      {
+        selector: 'h1',
+        declarations: [{ property: 'font-size', value: '40px' }],
+      },
+      { selector: 'h2', declarations: [{ property: 'color', value: '#333' }] },
+    ]);
+
+    expect(css).toContain('h3 {');
+    expect(revertEdits(css, previous)).toBe(before);
+  });
+
+  it('puts back a group the user had once the reply splits it', () => {
+    const before = 'h1, h2 {\n  color: red;\n}';
+    const { css, previous } = applyEdits(before, [
+      {
+        selector: 'h1, h2',
+        declarations: [{ property: 'color', value: 'blue' }],
+      },
+      { selector: 'h1', declarations: [{ property: 'margin', value: '0' }] },
+    ]);
+    const reverted = revertEdits(css, previous);
+
+    expect(reverted).not.toContain('blue');
+    expect(reverted).not.toContain('margin');
+    expect(reverted.match(/color: red/g)).toHaveLength(2);
+  });
+
+  it('keeps earlier calls in step when a later one splits their group', () => {
+    const first = applyEdits('', [
+      {
+        selector: 'h1, h2',
+        declarations: [{ property: 'color', value: '#111' }],
+      },
+    ]);
+    const second = applyEdits(
+      first.css,
+      [{ selector: 'h1', declarations: [{ property: 'color', value: 'red' }] }],
+      { earlier: [first.previous] }
+    );
+
+    expect(second.previous).toEqual([
+      { selector: 'h1', property: 'color', value: '#111' },
+    ]);
+    expect(revertEdits(second.css, second.previous)).toContain(
+      'h1 {\n  color: #111;'
+    );
+    expect(
+      revertEdits(second.css, [...second.earlier[0], ...second.previous]).trim()
+    ).toBe('');
+  });
+
   it('counts the lines the edits make as rules', () => {
     expect(
       countCssLines([

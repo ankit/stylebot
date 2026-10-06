@@ -238,7 +238,7 @@ export const createChatModule = (): Module<ChatState, State> => {
     const earlierLines = countCssLines(
       current.rounds.flatMap(round => round.edits)
     );
-    const live = createLiveEdits(context, current.id, applied =>
+    const live = createLiveEdits(context, current.id, current.rounds, applied =>
       setPhase(context, 'applying', '', earlierLines + countCssLines(applied))
     );
 

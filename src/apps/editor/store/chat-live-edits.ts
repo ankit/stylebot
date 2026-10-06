@@ -56,9 +56,6 @@ const withStableSelectors = async (
   }));
 };
 
-const declarationKey = ({ selector, property }: ChatCssPreviousValue) =>
-  `${selector}\n${property}`;
-
 export type LiveEdits = ReturnType<typeof createLiveEdits>;
 
 /**
@@ -66,19 +63,20 @@ export type LiveEdits = ReturnType<typeof createLiveEdits>;
  * batches of whatever has arrived since the last one landed. Every call of
  * a reply shares one undo step, and is saved once, when the call ends or
  * is cut short. previous holds what the first edit of each declaration
- * replaced, so the call can be undone.
+ * replaced, so the call can be undone; the reply's earlier calls have
+ * theirs kept in step as edits reshape the rules they set.
  */
 export const createLiveEdits = (
   context: Context,
   id: string,
+  earlier: Array<{ previous: Array<ChatCssPreviousValue> }>,
   onApplied: (edits: Array<ChatCssEdit>) => void
 ) => {
   const { rootState, dispatch, commit } = context;
   const bridge = getPageBridge();
   const source = `chat:${id}`;
   const edits: Array<ChatCssEdit> = [];
-  const previous: Array<ChatCssPreviousValue> = [];
-  const seen = new Set<string>();
+  let previous: Array<ChatCssPreviousValue> = [];
   let waiting: Array<ChatCssEdit> = [];
   let queue: Promise<void> = Promise.resolve();
   // The page check, started with the first batch; false when the page can't
@@ -127,13 +125,14 @@ export const createLiveEdits = (
       return;
     }
 
-    const result = applyEdits(rootState.css, stable);
+    const result = applyEdits(rootState.css, stable, {
+      previous,
+      earlier: earlier.map(round => round.previous),
+    });
 
-    result.previous.forEach(value => {
-      if (!seen.has(declarationKey(value))) {
-        seen.add(declarationKey(value));
-        previous.push(value);
-      }
+    previous = result.previous;
+    earlier.forEach((round, i) => {
+      round.previous = result.earlier[i];
     });
     edits.push(...stable);
 
@@ -152,7 +151,10 @@ export const createLiveEdits = (
 
   return {
     edits,
-    previous,
+
+    get previous(): Array<ChatCssPreviousValue> {
+      return previous;
+    },
 
     /**
      * Queues an edit, applied with any others waiting once those before
