@@ -37,6 +37,9 @@
       <div class="buttons">
         <s-button @click="exportJson">{{ t('export') }}</s-button>
         <s-button @click="importJson">{{ t('import') }}</s-button>
+        <s-button v-if="stylesBeforeV4" @click="restoreStylesBeforeV4">
+          {{ t('restore_styles_from_before_4_0') }}
+        </s-button>
       </div>
     </div>
   </div>
@@ -49,8 +52,13 @@ import { SHeading, SText, SButton } from '@stylebot/components';
 import TheGoogleDriveSync from './sync/TheGoogleDriveSync.vue';
 import SyncStatusBanner from './sync/SyncStatusBanner.vue';
 
-import { importStylesWithFilePicker, exportAsJSONFile } from '../utils';
+import {
+  importStylesWithFilePicker,
+  exportAsJSONFile,
+  getStylesBeforeV4,
+} from '../utils';
 import type { SyncStatus } from '../store/index';
+import type { StyleMap } from '@stylebot/types';
 
 export default Vue.extend({
   name: 'TheSyncTab',
@@ -68,12 +76,14 @@ export default Vue.extend({
     showImportSuccessAlert: boolean;
     importError: string | DOMException | null;
     showRestoreSuccess: boolean;
+    stylesBeforeV4: StyleMap | null;
   } {
     return {
       importError: null,
       showImportErrorAlert: false,
       showImportSuccessAlert: false,
       showRestoreSuccess: false,
+      stylesBeforeV4: null,
     };
   },
 
@@ -83,12 +93,24 @@ export default Vue.extend({
     },
   },
 
+  async created(): Promise<void> {
+    this.stylesBeforeV4 = await getStylesBeforeV4();
+  },
+
   methods: {
     exportJson(): void {
       exportAsJSONFile(this.$store.state.styles);
     },
 
     onRestored(): void {
+      this.showRestoreSuccess = true;
+    },
+
+    restoreStylesBeforeV4(): void {
+      this.$store.dispatch('setAllStyles', this.stylesBeforeV4);
+
+      this.showImportErrorAlert = false;
+      this.showImportSuccessAlert = false;
       this.showRestoreSuccess = true;
     },
 

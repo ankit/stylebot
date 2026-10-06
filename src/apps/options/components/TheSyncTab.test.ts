@@ -2,8 +2,28 @@ import { mount } from '@vue/test-utils';
 
 import TheSyncTab from './TheSyncTab.vue';
 
-const mountTab = (state: Record<string, unknown>) =>
-  mount(TheSyncTab, {
+const stylesBeforeV4 = {
+  'example.com': {
+    css: 'a { color: red; }',
+    enabled: true,
+    readability: false,
+    modifiedTime: '2026-09-01T10:00:00.000Z',
+  },
+};
+
+const flushPromises = () => new Promise(resolve => setTimeout(resolve));
+
+const mountTab = (
+  state: Record<string, unknown>,
+  stored: Record<string, unknown> = {}
+) => {
+  global.chrome = {
+    storage: {
+      local: { get: jest.fn(async (key: string) => ({ [key]: stored[key] })) },
+    },
+  } as unknown as typeof chrome;
+
+  return mount(TheSyncTab, {
     stubs: { 'the-google-drive-sync': true },
     mocks: {
       $store: {
@@ -19,6 +39,12 @@ const mountTab = (state: Record<string, unknown>) =>
       },
     },
   });
+};
+
+const restoreButton = (wrapper: ReturnType<typeof mountTab>) =>
+  wrapper
+    .findAll('button')
+    .filter(button => button.text() === 'restore_styles_from_before_4_0');
 
 describe('TheSyncTab.vue', () => {
   it('shows no banner when nothing has happened yet', () => {
@@ -43,5 +69,28 @@ describe('TheSyncTab.vue', () => {
   it('localizes its description instead of hardcoding English', () => {
     const wrapper = mountTab({});
     expect(wrapper.text()).toContain('sync_tab_description');
+  });
+
+  it('offers no restore without styles backed up before 4.0', async () => {
+    const wrapper = mountTab({}, { backup_before_v4: { items: {} } });
+    await flushPromises();
+
+    expect(restoreButton(wrapper)).toHaveLength(0);
+  });
+
+  it('restores the styles backed up before 4.0', async () => {
+    const wrapper = mountTab(
+      {},
+      { backup_before_v4: { items: { styles: stylesBeforeV4 } } }
+    );
+    await flushPromises();
+
+    await restoreButton(wrapper).at(0).trigger('click');
+
+    expect(wrapper.vm.$store.dispatch).toBeCalledWith(
+      'setAllStyles',
+      stylesBeforeV4
+    );
+    expect(wrapper.text()).toContain('restore_success');
   });
 });

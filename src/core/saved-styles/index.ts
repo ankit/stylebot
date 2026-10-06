@@ -11,8 +11,10 @@ export {
   STYLES_METADATA_KEY,
   COMPILED_STYLES_KEY,
   COMPILED_STYLES_VERSION,
+  BACKUP_BEFORE_V4_KEY,
   isCompiledStylesCurrent,
 } from './storage';
+export type { BackupBeforeV4 } from './storage';
 export {
   DEFAULT_PROFILE_ID,
   normalizeProfiles,

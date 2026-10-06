@@ -1,3 +1,5 @@
+import type { Timestamp } from '@stylebot/types';
+
 export const STYLES_KEY = 'styles';
 export const STYLES_METADATA_KEY = 'styles-metadata';
 export const COMPILED_STYLES_KEY = 'styles-compiled';
@@ -15,3 +17,13 @@ export const isCompiledStylesCurrent = (
   revision: string
 ): boolean =>
   stored?.version === COMPILED_STYLES_VERSION && stored.revision === revision;
+
+export const BACKUP_BEFORE_V4_KEY = 'backup_before_v4';
+
+/**
+ * What storage held before 4.0's migrations ran, copied as it was.
+ */
+export type BackupBeforeV4 = {
+  createdAt: Timestamp;
+  items: Record<string, unknown>;
+};

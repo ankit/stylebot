@@ -53,18 +53,14 @@ import {
 import { initChatPort } from './chat';
 
 import { refreshAllBadges, refreshBadgeForTab } from './styles';
-import * as styleStorage from './styles';
 import { get as getOption, pruneRetired } from './options';
 import {
   AWAY_SECONDS,
   isSyncAlarm,
   updatePeriodicSync,
 } from './sync-scheduler';
-import {
-  runGoogleDriveSync,
-  getGoogleDriveSyncEnabled,
-  SYNC_ISSUE_KEYS,
-} from '@stylebot/sync';
+import { getGoogleDriveSyncEnabled, SYNC_ISSUE_KEYS } from '@stylebot/sync';
+import { syncStyles } from './sync';
 
 import type {
   TabUpdated,
@@ -103,7 +99,7 @@ export const initListeners = (): void => {
   // auth window; a run that needs one leaves a flag for the UI instead.
   chrome.alarms.onAlarm.addListener(alarm => {
     if (isSyncAlarm(alarm.name)) {
-      runGoogleDriveSync(styleStorage, { interactive: false });
+      syncStyles({ interactive: false });
     }
   });
 
@@ -112,7 +108,7 @@ export const initListeners = (): void => {
     chrome.idle.setDetectionInterval(AWAY_SECONDS);
     chrome.idle.onStateChanged.addListener(async state => {
       if (state === 'active' && (await getGoogleDriveSyncEnabled())) {
-        runGoogleDriveSync(styleStorage, { interactive: false });
+        syncStyles({ interactive: false });
       }
     });
   }
@@ -139,7 +135,7 @@ export const initListeners = (): void => {
     configureSidePanelTabs();
 
     if (await getGoogleDriveSyncEnabled()) {
-      runGoogleDriveSync(styleStorage, { interactive: false });
+      syncStyles({ interactive: false });
     }
   });
 

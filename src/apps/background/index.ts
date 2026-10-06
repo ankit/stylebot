@@ -1,14 +1,15 @@
 import { ContextMenu } from './contextmenu';
 import { initListeners } from './listeners';
 import { runMigrations } from './migrations';
-import { ensureCompiledStyles } from './styles';
+import { ensureCompiledStyles, holdWritesUntil } from './styles';
 import { updatePeriodicSync } from './sync-scheduler';
 
 initListeners();
 
-// Alarms are set up after the migrations so the first sync they trigger
-// sees repaired data.
-runMigrations().then(ensureCompiledStyles).then(updatePeriodicSync);
+// Before any event is dispatched, so no write reads styles a migration has
+// yet to repair. runMigrations never rejects, so startup always continues.
+holdWritesUntil(runMigrations());
+ensureCompiledStyles().then(updatePeriodicSync);
 
 chrome.runtime.setUninstallURL('https://stylebot.dev/goodbye');
 chrome.action.setBadgeBackgroundColor({

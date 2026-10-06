@@ -1,9 +1,17 @@
 jest.mock('@stylebot/sync', () => ({
   runGoogleDriveSync: jest.fn(),
 }));
+jest.mock('./migrations', () => ({
+  runMigrations: jest.fn(async () => undefined),
+}));
 
 import { RunGoogleDriveSync } from './messages';
 import { runGoogleDriveSync } from '@stylebot/sync';
+import { runMigrations } from './migrations';
+
+const mockedRunMigrations = runMigrations as jest.MockedFunction<
+  typeof runMigrations
+>;
 
 const mockedRunSync = runGoogleDriveSync as jest.MockedFunction<
   typeof runGoogleDriveSync
@@ -75,5 +83,24 @@ describe('RunGoogleDriveSync', () => {
       errorKey: 'sync_error_unknown',
       errorDetail: 'unexpected',
     });
+  });
+
+  it('waits for the migrations before syncing', async () => {
+    let finish = (): void => undefined;
+    mockedRunMigrations.mockReturnValue(
+      new Promise<void>(resolve => (finish = resolve))
+    );
+    mockedRunSync.mockResolvedValue({ ok: false, errorKey: 'sync_error_auth' });
+
+    const answered = RunGoogleDriveSync(
+      { name: 'RunGoogleDriveSync' },
+      jest.fn()
+    );
+    await Promise.resolve();
+    expect(mockedRunSync).not.toBeCalled();
+
+    finish();
+    await answered;
+    expect(mockedRunSync).toBeCalledTimes(1);
   });
 });

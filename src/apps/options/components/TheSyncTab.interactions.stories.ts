@@ -119,3 +119,41 @@ export const DisconnectingShowsTheConnectOptionAgain: StoryObj = {
   ),
   name: 'disconnecting drops the card back to the not-connected state',
 };
+
+export const RestoringStylesFromBeforeV4: StoryObj = {
+  ...optionsPage('Sync', {}, async root => {
+    const canvas = within(root);
+
+    await user.click(
+      await canvas.findByRole('button', {
+        name: 'Restore styles from before 4.0',
+      })
+    );
+
+    await waitFor(() =>
+      expect(
+        canvas.getByText('Your styles have been restored from the backup.')
+      ).toBeVisible()
+    );
+  }),
+  name: 'restoring the styles from before 4.0 confirms it with a banner',
+  parameters: {
+    chrome: {
+      storage: {
+        backup_before_v4: {
+          createdAt: '2026-10-01T10:00:00.000Z',
+          items: {
+            styles: {
+              'example.com': {
+                css: 'a { color: red; }',
+                enabled: true,
+                readability: false,
+                modifiedTime: '2026-09-01T10:00:00.000Z',
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+};

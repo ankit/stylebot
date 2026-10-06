@@ -18,7 +18,12 @@ import type {
   RestoreVersionResponse,
 } from '@stylebot/types';
 import { t } from '@stylebot/i18n';
-import { isStyleMap, sanitizeStyleMap } from '@stylebot/saved-styles';
+import {
+  BACKUP_BEFORE_V4_KEY,
+  isStyleMap,
+  sanitizeStyleMap,
+} from '@stylebot/saved-styles';
+import type { BackupBeforeV4 } from '@stylebot/saved-styles';
 
 export const getAllStyles = (): Promise<GetAllStylesResponse> => {
   const message: GetAllStyles = {
@@ -131,6 +136,21 @@ export const restoreVersion = async (
   >(message);
 
   return Boolean(response?.ok);
+};
+
+/**
+ * The styles stored before 4.0's migrations ran, or null when there are none
+ * to restore: a fresh install, or a backup that is not a style map.
+ */
+export const getStylesBeforeV4 = async (): Promise<StyleMap | null> => {
+  const { [BACKUP_BEFORE_V4_KEY]: backup } = await chrome.storage.local.get(
+    BACKUP_BEFORE_V4_KEY
+  );
+  const styles = (backup as BackupBeforeV4 | undefined)?.items?.styles;
+
+  return isStyleMap(styles) && Object.keys(styles).length > 0
+    ? sanitizeStyleMap(styles)
+    : null;
 };
 
 export const importStylesWithFilePicker = (): Promise<StyleMap> => {

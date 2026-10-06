@@ -1,4 +1,7 @@
 import { STYLES_KEY } from '@stylebot/saved-styles';
+import type { StyleMap } from '@stylebot/types';
+
+import { assertKeepsStyles } from './keeps-styles';
 
 /**
  * A style with no recorded edit time has to lose a merge against a copy that
@@ -15,22 +18,23 @@ const StylesModifiedTimeUpdate = async (): Promise<void> => {
     return;
   }
 
-  let changed = false;
+  const missing = Object.keys(styles).filter(url => !styles[url].modifiedTime);
 
-  for (const url in styles) {
-    if (!styles[url].modifiedTime) {
-      styles[url].modifiedTime = UNKNOWN_MODIFIED_TIME;
-      changed = true;
-    }
-  }
-
-  if (!changed) {
+  if (missing.length === 0) {
     return;
   }
 
+  const updated: StyleMap = { ...styles };
+
+  for (const url of missing) {
+    updated[url] = { ...styles[url], modifiedTime: UNKNOWN_MODIFIED_TIME };
+  }
+
+  assertKeepsStyles(styles, updated);
+
   // Deliberately not routed through setAll: a backfill is not a user edit
   // and must not bump styles-metadata, or it would sync as one.
-  await chrome.storage.local.set({ [STYLES_KEY]: styles });
+  await chrome.storage.local.set({ [STYLES_KEY]: updated });
 };
 
 export default StylesModifiedTimeUpdate;
