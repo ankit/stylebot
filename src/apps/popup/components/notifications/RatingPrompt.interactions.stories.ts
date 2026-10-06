@@ -26,7 +26,9 @@ export const ShownWhenEligible: StoryObj = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    await expect(await canvas.findByText('Enjoying Stylebot?')).toBeVisible();
+    await expect(
+      await canvas.findByText('Having fun restyling the web?')
+    ).toBeVisible();
     await expect(
       canvas.getByRole('button', { name: 'Rate Stylebot' })
     ).toBeVisible();
@@ -41,7 +43,9 @@ export const HiddenWhenTooNew: StoryObj = {
     const canvas = within(canvasElement);
 
     await canvas.findByRole('heading', { name: 'example.com' });
-    await expect(canvas.queryByText('Enjoying Stylebot?')).toBeNull();
+    await expect(
+      canvas.queryByText('Having fun restyling the web?')
+    ).toBeNull();
   },
 };
 
@@ -55,7 +59,9 @@ export const HiddenWithFewStyles: StoryObj = {
     const canvas = within(canvasElement);
 
     await canvas.findByRole('heading', { name: 'example.com' });
-    await expect(canvas.queryByText('Enjoying Stylebot?')).toBeNull();
+    await expect(
+      canvas.queryByText('Having fun restyling the web?')
+    ).toBeNull();
   },
 };
 
@@ -66,7 +72,9 @@ export const HiddenOnceDismissed: StoryObj = {
     const canvas = within(canvasElement);
 
     await canvas.findByRole('heading', { name: 'example.com' });
-    await expect(canvas.queryByText('Enjoying Stylebot?')).toBeNull();
+    await expect(
+      canvas.queryByText('Having fun restyling the web?')
+    ).toBeNull();
   },
 };
 
@@ -80,7 +88,7 @@ export const DismissHidesForGood: StoryObj = {
     await user.click(await canvas.findByRole('button', { name: 'Not now' }));
 
     await waitFor(() =>
-      expect(canvas.queryByText('Enjoying Stylebot?')).toBeNull()
+      expect(canvas.queryByText('Having fun restyling the web?')).toBeNull()
     );
     await expect(create).not.toHaveBeenCalled();
     await expect(
