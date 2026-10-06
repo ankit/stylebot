@@ -18,6 +18,7 @@ export { KEYBOARD_FOCUS, isFieldTarget, consumeFieldEscape } from './focus';
 export { getCurrentTimestamp } from './timestamp';
 
 export { getNotification, setNotification } from './notification';
+export { INSTALL_TIME_KEY, recordInstallTime } from './install-time';
 export {
   getExtensionVersion,
   getReleaseVersion,

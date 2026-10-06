@@ -86,6 +86,9 @@
       <sync-stylebot v-if="syncEnabled" @synced="loadStyles" />
 
       <release-notification />
+
+      <!-- Asked only on a page the user has styled, where they see it work. -->
+      <rating-prompt v-if="styles.length" />
     </div>
   </s-theme-provider>
 </template>
@@ -102,6 +105,7 @@ import SyncStylebot from './components/SyncStylebot.vue';
 import ToggleStylebot from './components/ToggleStylebot.vue';
 import UnsupportedPage from './components/UnsupportedPage.vue';
 import ReleaseNotification from './components/notifications/ReleaseNotification.vue';
+import RatingPrompt from './components/notifications/RatingPrompt.vue';
 
 import {
   getStyles,
@@ -146,6 +150,7 @@ export default Vue.extend({
     SyncStylebot,
     UnsupportedPage,
     ReleaseNotification,
+    RatingPrompt,
   },
 
   data(): {
