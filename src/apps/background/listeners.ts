@@ -240,7 +240,7 @@ export const initListeners = (): void => {
           GetAllStyles(sendResponse);
           break;
         case 'SetAllStyles':
-          SetAllStyles(message);
+          SetAllStyles(message, sendResponse);
           break;
         case 'GetStylesForPage':
           GetStylesForPage(sender, sendResponse);

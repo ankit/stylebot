@@ -94,6 +94,8 @@ export default Vue.extend({
   &:hover:not(:disabled) {
     filter: brightness(0.92);
   }
+
+  @include focus-ring(2px);
 }
 
 .button.ghost {

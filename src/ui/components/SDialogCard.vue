@@ -5,9 +5,7 @@
     aria-modal="true"
     aria-labelledby="dialog-title"
   >
-    <s-heading id="dialog-title" as="h2" size="md">
-      {{ title }}
-    </s-heading>
+    <h2 id="dialog-title" class="title">{{ title }}</h2>
 
     <slot />
 
@@ -20,14 +18,8 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import SHeading from './SHeading.vue';
-
 export default Vue.extend({
   name: 'SDialogCard',
-
-  components: {
-    SHeading,
-  },
 
   props: {
     title: {
@@ -45,20 +37,33 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .card {
-  width: 360px;
+  width: 420px;
   max-width: calc(100vw - 32px);
   background: var(--panel-surface);
   border-radius: 14px;
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.24);
-  padding: 20px;
+  padding: 24px;
 
   &.contained {
     max-width: 100%;
   }
 }
 
+.title {
+  margin: 0;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.3;
+  color: var(--text-primary);
+}
+
+.title + .actions {
+  margin-top: 28px;
+}
+
 .actions {
   display: flex;
+  flex-wrap: wrap;
   justify-content: flex-end;
   gap: 8px;
 }

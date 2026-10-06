@@ -1,6 +1,7 @@
 import type {
   GetAllStyles,
   SetAllStyles,
+  SetAllStylesResponse,
   SetOption,
   GetAllOptions,
   GetAllStylesResponse,
@@ -17,8 +18,6 @@ import type {
   RestoreVersion,
   RestoreVersionResponse,
 } from '@stylebot/types';
-import { t } from '@stylebot/i18n';
-import { isStyleMap, sanitizeStyleMap } from '@stylebot/saved-styles';
 
 export const getAllStyles = (): Promise<GetAllStylesResponse> => {
   const message: GetAllStyles = {
@@ -40,13 +39,26 @@ export const getAllOptions = (): Promise<StylebotOptions> => {
   );
 };
 
-export const setAllStyles = (styles: StyleMap): void => {
+/**
+ * Replaces every saved style, resolving with whether the background stored
+ * them. A torn-down worker answering with nothing counts as a failure.
+ */
+export const setAllStyles = async (styles: StyleMap): Promise<boolean> => {
   const message: SetAllStyles = {
     name: 'SetAllStyles',
     styles,
   };
 
-  chrome.runtime.sendMessage(message);
+  try {
+    const response = await chrome.runtime.sendMessage<
+      SetAllStyles,
+      SetAllStylesResponse | undefined
+    >(message);
+
+    return Boolean(response?.ok);
+  } catch {
+    return false;
+  }
 };
 
 export const setOption = (
@@ -131,59 +143,4 @@ export const restoreVersion = async (
   >(message);
 
   return Boolean(response?.ok);
-};
-
-export const importStylesWithFilePicker = (): Promise<StyleMap> => {
-  return new Promise((resolve, reject) => {
-    const fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.accept = 'application/json';
-
-    fileInput.addEventListener('change', (event: Event) => {
-      const files = (event.target as HTMLInputElement).files;
-      if (files?.[0]) {
-        const file = files[0];
-        if (file.type && file.type !== 'application/json') {
-          reject('Only JSON format is supported.');
-          return;
-        }
-
-        const reader = new FileReader();
-        reader.readAsText(file);
-
-        reader.onload = () => {
-          try {
-            const styles: unknown = JSON.parse(reader.result as string);
-
-            if (isStyleMap(styles)) {
-              resolve(sanitizeStyleMap(styles));
-            } else {
-              reject(t('import_error_not_backup'));
-            }
-          } catch (e) {
-            reject(e);
-          }
-        };
-
-        reader.onerror = () => {
-          reject(reader.error);
-        };
-      }
-    });
-
-    document.body.appendChild(fileInput);
-    fileInput.click();
-    fileInput.remove();
-  });
-};
-
-export const exportAsJSONFile = (styles: StyleMap): void => {
-  const json = JSON.stringify(styles);
-  const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(json);
-  const downloadAnchorNode = document.createElement('a');
-  downloadAnchorNode.setAttribute('href', dataStr);
-  downloadAnchorNode.setAttribute('download', 'stylebot_backup.json');
-  document.body.appendChild(downloadAnchorNode);
-  downloadAnchorNode.click();
-  downloadAnchorNode.remove();
 };

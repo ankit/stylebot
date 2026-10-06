@@ -44,7 +44,6 @@ const NOOP_ACTIONS = [
   'getAllOptions',
   'getCommands',
   'getGoogleDriveSyncMetadata',
-  'setAllStyles',
   'deleteStyle',
   'deleteAllStyles',
   'enableStyle',
@@ -113,6 +112,11 @@ const actions: ActionTree<OptionsState, OptionsState> = {
     }
 
     state.styles = styles;
+  },
+
+  importStyles({ state }, styles: StyleMap) {
+    state.styles = styles;
+    return true;
   },
 
   createProfile(

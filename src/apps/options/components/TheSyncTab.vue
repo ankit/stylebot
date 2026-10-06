@@ -1,18 +1,36 @@
 <template>
   <div class="sync-tab">
-    <sync-status-banner v-if="showRestoreSuccess">
+    <sync-status-banner
+      v-if="showRestoreSuccess"
+      @dismiss="showRestoreSuccess = false"
+    >
       {{ t('restore_success') }}
     </sync-status-banner>
 
-    <sync-status-banner v-if="showImportSuccessAlert">
-      {{ t('import_success') }}
+    <sync-status-banner
+      v-if="importedCount !== null"
+      @dismiss="importedCount = null"
+    >
+      {{ importedMessage }}
     </sync-status-banner>
 
-    <sync-status-banner v-if="showImportErrorAlert" variant="error">
-      {{ t('import_error', [String(importError)]) }}
+    <sync-status-banner v-if="showUpToDate" @dismiss="showUpToDate = false">
+      {{ t('import_up_to_date') }}
     </sync-status-banner>
 
-    <sync-status-banner v-if="syncStatus" :variant="syncStatus.type">
+    <sync-status-banner
+      v-if="importErrorKey"
+      variant="error"
+      @dismiss="importErrorKey = null"
+    >
+      {{ t('import_error', [t(importErrorKey)]) }}
+    </sync-status-banner>
+
+    <sync-status-banner
+      v-if="syncStatus"
+      :variant="syncStatus.type"
+      @dismiss="$store.dispatch('dismissSyncStatus')"
+    >
       {{ t(syncStatus.messageKey, [syncStatus.detail || '']) }}
     </sync-status-banner>
 
@@ -39,6 +57,14 @@
         <s-button @click="importJson">{{ t('import') }}</s-button>
       </div>
     </div>
+
+    <import-backup-dialog
+      v-if="pendingImport"
+      :preview="pendingImport.preview"
+      @cancel="pendingImport = null"
+      @merge="applyImport('merge')"
+      @replace="applyImport('replace')"
+    />
   </div>
 </template>
 
@@ -46,11 +72,24 @@
 import Vue from 'vue';
 
 import { SHeading, SText, SButton } from '@stylebot/components';
+import type { ImportPreview } from '@stylebot/saved-styles';
+import {
+  mergeBackup,
+  parseBackup,
+  previewImport,
+} from '@stylebot/saved-styles';
+import type { StyleMap } from '@stylebot/types';
 import TheGoogleDriveSync from './sync/TheGoogleDriveSync.vue';
 import SyncStatusBanner from './sync/SyncStatusBanner.vue';
+import ImportBackupDialog from './sync/ImportBackupDialog.vue';
 
-import { importStylesWithFilePicker, exportAsJSONFile } from '../utils';
+import { downloadBackup, pickBackupFile } from '../backup';
 import type { SyncStatus } from '../store/index';
+
+type PendingImport = {
+  styles: StyleMap;
+  preview: ImportPreview;
+};
 
 export default Vue.extend({
   name: 'TheSyncTab',
@@ -61,19 +100,22 @@ export default Vue.extend({
     SButton,
     TheGoogleDriveSync,
     SyncStatusBanner,
+    ImportBackupDialog,
   },
 
   data(): {
-    showImportErrorAlert: boolean;
-    showImportSuccessAlert: boolean;
-    importError: string | DOMException | null;
+    importErrorKey: string | null;
+    importedCount: number | null;
+    pendingImport: PendingImport | null;
     showRestoreSuccess: boolean;
+    showUpToDate: boolean;
   } {
     return {
-      importError: null,
-      showImportErrorAlert: false,
-      showImportSuccessAlert: false,
+      importErrorKey: null,
+      importedCount: null,
+      pendingImport: null,
       showRestoreSuccess: false,
+      showUpToDate: false,
     };
   },
 
@@ -81,11 +123,21 @@ export default Vue.extend({
     syncStatus(): SyncStatus {
       return this.$store.state.syncStatus;
     },
+
+    importedMessage(): string {
+      const count = this.importedCount ?? 0;
+      const imported = this.t(
+        count === 1 ? 'imported_styles_one' : 'imported_styles_other',
+        [String(count)]
+      );
+
+      return `${imported} ${this.t('import_undo_hint')}`;
+    },
   },
 
   methods: {
     exportJson(): void {
-      exportAsJSONFile(this.$store.state.styles);
+      downloadBackup(this.$store.state.styles);
     },
 
     onRestored(): void {
@@ -93,17 +145,72 @@ export default Vue.extend({
     },
 
     async importJson(): Promise<void> {
-      try {
-        const styles = await importStylesWithFilePicker();
-        this.$store.dispatch('setAllStyles', styles);
+      this.clearImportStatus();
 
-        this.showImportErrorAlert = false;
-        this.showImportSuccessAlert = true;
-      } catch (e) {
-        this.importError = e;
-        this.showImportErrorAlert = true;
-        this.showImportSuccessAlert = false;
+      let text: string | null;
+
+      try {
+        text = await pickBackupFile();
+      } catch {
+        this.showImportError('import_error_unreadable');
+        return;
       }
+
+      if (text === null) {
+        return;
+      }
+
+      const parsed = parseBackup(text);
+
+      if (!parsed.ok) {
+        this.showImportError(parsed.errorKey);
+        return;
+      }
+
+      const preview = previewImport(this.$store.state.styles, parsed.styles);
+
+      if (preview.added + preview.updated === 0) {
+        this.showUpToDate = true;
+        return;
+      }
+
+      this.pendingImport = { styles: parsed.styles, preview };
+    },
+
+    async applyImport(mode: 'merge' | 'replace'): Promise<void> {
+      if (!this.pendingImport) {
+        return;
+      }
+
+      const { styles, preview } = this.pendingImport;
+      this.pendingImport = null;
+
+      const next =
+        mode === 'merge'
+          ? mergeBackup(this.$store.state.styles, styles)
+          : styles;
+      const ok: boolean = await this.$store.dispatch('importStyles', next);
+
+      if (!ok) {
+        this.showImportError('import_error_not_saved');
+        return;
+      }
+
+      this.importedCount =
+        mode === 'merge'
+          ? preview.added + preview.updated
+          : Object.keys(styles).length;
+    },
+
+    showImportError(key: string): void {
+      this.clearImportStatus();
+      this.importErrorKey = key;
+    },
+
+    clearImportStatus(): void {
+      this.showUpToDate = false;
+      this.importErrorKey = null;
+      this.importedCount = null;
     },
   },
 });

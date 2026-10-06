@@ -40,7 +40,15 @@ export default Vue.extend({
     // Deferred a tick so it wins over a closing menu's own focus-restore,
     // which runs in the same reactivity flush and would otherwise steal it back.
     this.$nextTick(() => {
-      this.focusableElements()[0]?.focus();
+      const root = this.$refs.root as HTMLElement;
+      const preferred = root.querySelector<HTMLElement>('[autofocus]');
+
+      if (preferred) {
+        // Ring it even after a mouse click, so Enter's target is visible.
+        preferred.focus({ focusVisible: true } as FocusOptions);
+      } else {
+        this.focusableElements()[0]?.focus();
+      }
     });
   },
 

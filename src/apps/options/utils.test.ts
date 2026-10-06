@@ -1,6 +1,6 @@
 import type { RunGoogleDriveSyncResponse } from '@stylebot/types';
 
-import { runGoogleDriveSync } from './utils';
+import { runGoogleDriveSync, setAllStyles } from './utils';
 
 const mockRuntime = (
   sendMessage: () => Promise<RunGoogleDriveSyncResponse | undefined>
@@ -57,5 +57,30 @@ describe('runGoogleDriveSync', () => {
       ok: false,
       errorKey: 'sync_error_unknown',
     });
+  });
+});
+
+describe('setAllStyles', () => {
+  it('resolves true once the background stored the styles', async () => {
+    global.chrome = {
+      runtime: { sendMessage: async () => ({ ok: true }) },
+    } as unknown as typeof chrome;
+
+    await expect(setAllStyles({})).resolves.toBe(true);
+  });
+
+  it.each([
+    ['the background failed to store them', async () => ({ ok: false })],
+    ['the service worker answers with nothing', async () => undefined],
+    [
+      'the message port closes',
+      () => Promise.reject(new Error('The message port closed.')),
+    ],
+  ])('resolves false when %s', async (_name, sendMessage) => {
+    global.chrome = {
+      runtime: { sendMessage },
+    } as unknown as typeof chrome;
+
+    await expect(setAllStyles({})).resolves.toBe(false);
   });
 });
