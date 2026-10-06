@@ -54,6 +54,11 @@ export default Vue.extend({
               : null;
 
           this.$nextTick(() => {
+            // Chat's fields focus themselves as they mount.
+            if (this.$store.state.options?.mode === 'chat') {
+              return;
+            }
+
             const inspector = this.$el.querySelector<HTMLElement>(
               '.stylebot-inspector'
             );

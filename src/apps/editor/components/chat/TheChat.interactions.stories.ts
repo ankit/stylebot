@@ -486,6 +486,27 @@ export const ShowsThePickedElement: StoryObj = {
   },
 };
 
+export const FocusesTheFieldOnReopen: StoryObj = {
+  ...chat({ connected: ['anthropic'] }),
+  name: 'reopening the editor on the Chat tab focuses the message field',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+
+    await waitFor(async () => expect(await messageField(canvas)).toHaveFocus());
+
+    store.commit('setVisible', false);
+    await waitFor(() =>
+      expect(
+        canvas.queryByRole('textbox', { name: /Describe a change/ })
+      ).toBeNull()
+    );
+    store.commit('setVisible', true);
+
+    await waitFor(async () => expect(await messageField(canvas)).toHaveFocus());
+  },
+};
+
 export const RemovesThePickedElement: StoryObj = {
   ...chat({ connected: ['anthropic'] }, { activeSelector: 'h1' }),
   name: 'removing the picked element in the composer clears it in the header too',
