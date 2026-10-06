@@ -175,13 +175,35 @@ export const pickBackupFile = (): Promise<string | null> => {
   });
 };
 
+/**
+ * Names a backup after the local date it was made, so exports on different
+ * days don't collide in the downloads folder.
+ */
+export const getBackupFilename = (date: Date): string => {
+  const pad = (value: number) => String(value).padStart(2, '0');
+  const day = [
+    date.getFullYear(),
+    pad(date.getMonth() + 1),
+    pad(date.getDate()),
+  ].join('-');
+
+  return `stylebot-backup-${day}.json`;
+};
+
 export const exportAsJSONFile = (styles: StyleMap): void => {
-  const json = JSON.stringify(createBackup(styles, getCurrentTimestamp()));
-  const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(json);
+  const backup = createBackup(styles, getCurrentTimestamp());
+  const blob = new Blob([JSON.stringify(backup, null, 2)], {
+    type: 'application/json',
+  });
+  const url = URL.createObjectURL(blob);
+
   const downloadAnchorNode = document.createElement('a');
-  downloadAnchorNode.setAttribute('href', dataStr);
-  downloadAnchorNode.setAttribute('download', 'stylebot_backup.json');
+  downloadAnchorNode.href = url;
+  downloadAnchorNode.download = getBackupFilename(new Date());
   document.body.appendChild(downloadAnchorNode);
   downloadAnchorNode.click();
   downloadAnchorNode.remove();
+
+  // Revoking in the same task can cancel the download before it reads the blob.
+  setTimeout(() => URL.revokeObjectURL(url));
 };

@@ -1,18 +1,32 @@
 <template>
   <div class="sync-tab">
-    <sync-status-banner v-if="showRestoreSuccess">
+    <sync-status-banner
+      v-if="showRestoreSuccess"
+      @dismiss="showRestoreSuccess = false"
+    >
       {{ t('restore_success') }}
     </sync-status-banner>
 
-    <sync-status-banner v-if="importedCount !== null">
+    <sync-status-banner
+      v-if="importedCount !== null"
+      @dismiss="importedCount = null"
+    >
       {{ importedMessage }}
     </sync-status-banner>
 
-    <sync-status-banner v-if="importErrorKey" variant="error">
+    <sync-status-banner
+      v-if="importErrorKey"
+      variant="error"
+      @dismiss="importErrorKey = null"
+    >
       {{ t('import_error', [t(importErrorKey)]) }}
     </sync-status-banner>
 
-    <sync-status-banner v-if="syncStatus" :variant="syncStatus.type">
+    <sync-status-banner
+      v-if="syncStatus"
+      :variant="syncStatus.type"
+      @dismiss="$store.dispatch('dismissSyncStatus')"
+    >
       {{ t(syncStatus.messageKey, [syncStatus.detail || '']) }}
     </sync-status-banner>
 
@@ -125,6 +139,8 @@ export default Vue.extend({
     },
 
     async importJson(): Promise<void> {
+      this.clearImportStatus();
+
       let text: string | null;
 
       try {
@@ -170,7 +186,6 @@ export default Vue.extend({
         return;
       }
 
-      this.importErrorKey = null;
       this.importedCount =
         mode === 'merge'
           ? preview.added + preview.updated
@@ -178,7 +193,12 @@ export default Vue.extend({
     },
 
     showImportError(key: string): void {
+      this.clearImportStatus();
       this.importErrorKey = key;
+    },
+
+    clearImportStatus(): void {
+      this.importErrorKey = null;
       this.importedCount = null;
     },
   },

@@ -1,6 +1,6 @@
 import type { RunGoogleDriveSyncResponse } from '@stylebot/types';
 
-import { runGoogleDriveSync, setAllStyles } from './utils';
+import { getBackupFilename, runGoogleDriveSync, setAllStyles } from './utils';
 
 const mockRuntime = (
   sendMessage: () => Promise<RunGoogleDriveSyncResponse | undefined>
@@ -82,5 +82,13 @@ describe('setAllStyles', () => {
     } as unknown as typeof chrome;
 
     await expect(setAllStyles({})).resolves.toBe(false);
+  });
+});
+
+describe('getBackupFilename', () => {
+  it('names the backup after the local date, zero-padded', () => {
+    expect(getBackupFilename(new Date(2026, 0, 5, 23, 30))).toBe(
+      'stylebot-backup-2026-01-05.json'
+    );
   });
 });

@@ -242,3 +242,39 @@ export const CancellingAnImportChangesNothing: StoryObj = {
   }),
   name: 'a backup matching every style offers nothing to merge and cancels cleanly',
 };
+
+export const DismissingAnImportBannerHidesIt: StoryObj = {
+  ...optionsPage('Sync', { styles: seededStyles }, async root => {
+    const canvas = within(root);
+
+    chooseFileOnNextPicker({});
+    await user.click(canvas.getByRole('button', { name: 'Import' }));
+
+    const error = 'Could not import styles - The backup has no styles';
+    await waitFor(() => expect(canvas.getByText(error)).toBeVisible());
+
+    await user.click(canvas.getByRole('button', { name: 'Dismiss' }));
+
+    await waitFor(() => expect(canvas.queryByText(error)).toBeNull());
+  }),
+  name: 'dismissing an import error banner removes it',
+};
+
+export const StartingAnImportClearsTheLastBanner: StoryObj = {
+  ...optionsPage('Sync', { styles: seededStyles }, async root => {
+    const canvas = within(root);
+
+    chooseFileOnNextPicker({});
+    await user.click(canvas.getByRole('button', { name: 'Import' }));
+
+    const error = 'Could not import styles - The backup has no styles';
+    await waitFor(() => expect(canvas.getByText(error)).toBeVisible());
+
+    chooseFileOnNextPicker(backup(seededStyles));
+    await user.click(canvas.getByRole('button', { name: 'Import' }));
+
+    await canvas.findByRole('heading', { name: 'Import backup' });
+    await expect(canvas.queryByText(error)).toBeNull();
+  }),
+  name: 'starting a new import clears the previous import banner',
+};

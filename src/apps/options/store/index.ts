@@ -323,6 +323,10 @@ export const createStore = (): Store<State> => {
         await clearSyncState();
       },
 
+      dismissSyncStatus({ state }) {
+        state.syncStatus = null;
+      },
+
       async syncWithGoogleDrive({ state, dispatch }) {
         if (state.syncInProgress) {
           return;

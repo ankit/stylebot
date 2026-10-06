@@ -36,19 +36,23 @@ test.describe('Backup', () => {
     "Playwright can't open the options page as a page on this engine"
   );
 
-  test('exports a versioned backup of every style', async ({
+  test('exports a dated, pretty-printed backup of every style', async ({
     context,
     extension,
   }) => {
     const page = await context.newPage();
     await openSyncTab(page, extension, { 'example.com': style('a {}') });
 
-    const download = page.waitForEvent('download');
+    const downloading = page.waitForEvent('download');
     await page.getByRole('button', { name: 'Export', exact: true }).click();
-    const backup = JSON.parse(
-      await readFile((await (await download).path()) as string, 'utf8')
-    );
+    const download = await downloading;
+    const text = await readFile((await download.path()) as string, 'utf8');
+    const backup = JSON.parse(text);
 
+    expect(download.suggestedFilename()).toMatch(
+      /^stylebot-backup-\d{4}-\d{2}-\d{2}\.json$/
+    );
+    expect(text).toBe(JSON.stringify(backup, null, 2));
     expect(backup).toMatchObject({
       format: 'stylebot-backup',
       version: 1,

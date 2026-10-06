@@ -1,6 +1,6 @@
 <template>
   <div class="history-tab">
-    <sync-status-banner v-if="restored">
+    <sync-status-banner v-if="restored" @dismiss="restored = false">
       {{ t('restore_success') }}
     </sync-status-banner>
 
